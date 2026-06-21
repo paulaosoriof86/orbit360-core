@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Orbit 360 · Plataforma</title>
+  <meta name="description" content="Orbit 360 — sistema 360 inteligente e integral para intermediarios de seguros. Demo con datos ficticios.">
+  <meta name="theme-color" content="#1E2227">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/infra.css">
+</head>
+<body class="pre-auth">
+
+  <!-- ============ LOGIN (white-label · palette-adaptive) ============ -->
+  <div id="login">
+    <div class="lg-left">
+      <span class="lg-reg">DEMO · DATOS FICTICIOS</span>
+      <div class="lg-orbit">
+        <div class="orbit-wrap">
+          <div class="orbit-ring r2"></div>
+          <div class="orbit-ring r1"></div>
+          <!-- etiquetas exteriores -->
+          <span class="outer-label" style="top:6%;left:50%;transform:translateX(-50%)">Velocidad</span>
+          <span class="outer-label" style="top:30%;left:2%">Automatización</span>
+          <span class="outer-label" style="top:30%;right:2%">Calidad</span>
+          <span class="outer-label" style="bottom:30%;left:4%">Escala</span>
+          <span class="outer-label" style="bottom:30%;right:2%">Datos</span>
+          <span class="outer-label" style="bottom:6%;left:50%;transform:translateX(-50%)">Integración</span>
+          <!-- nodos orbitando -->
+          <div class="orbit-r1-spin">
+            <div class="n n1"><div class="orbit-node accent">🧑‍💼<span class="nlabel">Clientes</span></div></div>
+            <div class="n n2"><div class="orbit-node">👥<span class="nlabel">Su equipo</span></div></div>
+            <div class="n n3"><div class="orbit-node">📑<span class="nlabel">Pólizas</span></div></div>
+          </div>
+          <!-- núcleo -->
+          <div class="orbit-core"><span class="oc-mark"></span><b>ORBIT</b></div>
+        </div>
+      </div>
+      <div class="lg-eco">Ecosistema centrado en el cliente</div>
+      <div class="lg-foot">
+        <div class="lf-eyebrow">Plataforma · Insurance OS</div>
+        <div class="lf-logo">Orbit<b>360°</b></div>
+        <div class="lf-tag">Gestión inteligente</div>
+        <div class="lf-desc"><b style="color:#fff">Gestión integral</b> · donde los datos se convierten en decisiones. Sistema 360 inteligente para intermediarios de seguros, multipaís y configurable.</div>
+        <div class="lf-chips"><span>CRM</span><span>Cotizador</span><span>Comparativo</span><span>Finanzas</span><span>Marketing</span><span>Portal cliente</span></div>
+        <div class="lf-logoslot"><span class="slot">🏢</span> Tu logo aquí · white-label</div>
+      </div>
+    </div>
+    <div class="lg-right">
+      <div class="lg-card">
+        <div class="lg-welcome">Bienvenido de vuelta</div>
+        <div class="lg-welcome-sub">Ingresá con tus credenciales para acceder al Orbit 360.</div>
+        <form class="lg-box" id="login-form">
+          <span class="lg-eyebrow">Orbit 360 — Acceso del equipo</span>
+          <h3>Iniciar sesión</h3>
+          <div class="lg-hint">Ingresá con tu usuario y contraseña asignados por administración.</div>
+          <input class="lg-field" id="lg-user" type="email" value="admin@demo.com" autocomplete="username">
+          <input class="lg-field" id="lg-pass" type="password" value="demo123" autocomplete="current-password">
+          <button class="lg-submit" type="submit">Ingresar al Orbit 360</button>
+          <a class="lg-reset" id="lg-reset">¿Problemas al ingresar? → Limpiar sesión</a>
+        </form>
+        <div class="lg-themehint">
+          <span>Paleta:</span>
+          <span class="lg-sw" id="lg-sw"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TOPBAR ============ -->
+  <header class="topbar">
+    <button class="tb-burger" id="burger" aria-label="Menú">☰</button>
+    <div class="brand" data-home>
+      <span class="brand-mark"></span>
+      <span>
+        <span class="brand-name">Orbit<b>360</b></span>
+        <span class="brand-sub">Insurance OS</span>
+      </span>
+    </div>
+    <div class="tb-logo" title="Logo del cliente (configurable / white-label)">
+      <span class="slot" id="client-logo">🏢</span>
+      <span class="cn">Tu marca<small>White-label</small></span>
+    </div>
+    <div class="tb-spacer"></div>
+    <div class="tb-search">
+      <span>🔍</span><input placeholder="Buscar clientes, pólizas, cobros…" aria-label="Buscar">
+    </div>
+    <div class="tb-switch" id="sw-pais" title="Operación multipaís">
+      <span>🌎</span>
+      <select id="pais-sel" aria-label="País"></select>
+    </div>
+    <div class="tb-ico" id="sw-theme" title="Paleta de la marca"><span>🎨</span></div>
+    <div class="tb-ico" title="Notificaciones"><span>🔔</span><span class="dot"></span></div>
+    <div class="tb-user" id="tb-user" title="Sesión demo">
+      <span class="av" style="background:linear-gradient(135deg,var(--red),var(--red-700))">PO</span>
+      <span class="who"><b>Paula Osorio</b><br><span>Dirección · salir</span></span>
+    </div>
+  </header>
+
+  <!-- ============ SHELL ============ -->
+  <div id="shell">
+    <nav id="sidebar" aria-label="Navegación principal"></nav>
+    <div class="sb-overlay"></div>
+    <main id="main"><div id="host"></div></main>
+  </div>
+
+  <!-- ============ DATA LAYER ============ -->
+  <script src="data/store.js"></script>
+  <script src="data/seed.js"></script>
+  <!-- CORE -->
+  <script src="core/theme.js"></script>
+  <script src="core/ui.js"></script>
+  <script src="core/config.js"></script>
+  <script src="core/queries.js"></script>
+  <script src="core/crmkit.js"></script>
+  <script src="core/importa.js"></script>
+  <script src="core/auth.js"></script>
+  <script src="core/router.js"></script>
+  <!-- MODULES -->
+  <script src="modules/inicio.js"></script>
+  <script src="modules/cliente360.js"></script>
+  <script src="modules/polizas.js"></script>
+  <script src="modules/cobros.js"></script>
+  <script src="modules/renovaciones.js"></script>
+  <script src="modules/cancelaciones.js"></script>
+  <script src="modules/comisiones.js"></script>
+  <script src="modules/historial.js"></script>
+  <script src="modules/importar.js"></script>
+  <!-- BOOT -->
+  <script>
+    Orbit.store.init(Orbit.SEED);
+    Orbit.router.init();
+    Orbit.auth.init();
+
+    // país switcher
+    (function () {
+      var sel = document.getElementById('pais-sel');
+      var paises = (Orbit.PAISES || [{ id: 'TODOS', label: 'Todos los países' }]);
+      sel.innerHTML = paises.map(function (p) { return '<option value="' + p.id + '">' + p.label + '</option>'; }).join('');
+      sel.value = Orbit.pais || 'TODOS';
+      sel.addEventListener('change', function () { Orbit.pais = sel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); if (Orbit.router) location.hash = location.hash || '#/inicio'; window.dispatchEvent(new HashChangeEvent('hashchange')); });
+    })();
+
+    // theme picker
+    document.getElementById('sw-theme').addEventListener('click', function (e) { e.stopPropagation(); Orbit.theme.picker(this); });
+
+    // login palette swatches
+    (function () {
+      var sw = document.getElementById('lg-sw');
+      if (sw) sw.innerHTML = Orbit.theme.PALETTES.slice(0, 6).map(function (p) { return '<button title="' + p.name + '" data-p="' + p.id + '" style="background:' + p.primary + '"></button>'; }).join('');
+      sw && sw.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { Orbit.theme.apply(b.dataset.p); }); });
+    })();
+
+    // logout
+    document.getElementById('tb-user').addEventListener('click', function () { if (confirm('¿Cerrar sesión? (demo)')) Orbit.auth.logout(); });
+  </script>
+</body>
+</html>
