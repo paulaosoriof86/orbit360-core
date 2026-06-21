@@ -175,6 +175,75 @@ Cliente 360, Pólizas, Cobros, Renovaciones, Cancelaciones, Comisiones, Historia
 8. ⏳ **Integrar Cotizador + Comparativo** (módulo aislado; tarifas configurables).
 9. ⏳ **Marketing** (calendario + import) · **Reportes** · **Portal del Cliente** · **IA**.
 
+---
+
+# Ronda 5 — Ops/Leads ciclo completo, integraciones, Academia, Marketing, Cronograma (21-jun)
+> Capturado del feedback con capturas (Trello + plataforma A&S antigua). NADA se omite. Prioridad para 1.0.
+
+## Fixes UI inmediatos
+- **Menú interno de la ficha (tabs) se desborda**: hacerlo scrollable con indicador / wrap / flechas; que se vea que hay más después de "Comisiones". (Ya es `.ficha-tabs` con overflow-x; falta affordance visible — degradado/flecha "más".)
+- **Quitar notas técnicas** que el usuario no debe ver (en ficha y en todo el sistema). Revisar textos "demo/laboratorio/Firestore/técnico".
+- **Títulos de listas de Leads y Ops más llamativos**: con **emojis y colores** por lista.
+
+## Ops + Leads — CICLO COMPLETO (rediseñar fichas Lead/Ops)
+**Listas editables/personalizables** en Ops y Leads: agregar, quitar, **reordenar**, con **automatizaciones** por lista.
+Flujo del ciclo (vincula y sincroniza en vivo, comparte datos que luego hereda Cliente 360 al convertir):
+1. **Ingreso**: se crea prospecto en **Ops** (usual: entra pidiendo cotización) o en **Leads** (manifestó interés sin datos completos para cotizar).
+2. **Ops · Cotización**: cuando ya se cotizó, **desaparece de Ops** y queda en **Leads** durante negociación.
+3. **Leads · negociación**: continúa seguimiento en la lista que corresponda; al entrar a **Propuesta** se **automatizan seguimientos por cadencia**. Listas/tareas de Leads **editables**.
+4. **Cierre en Leads**: seleccionar si pasa a **Inspección** o **Emisión** → reaparece en **Ops** **sin desaparecer de Leads**. Leads tiene listas espejo de **Inspecciones** y **Emisiones** (el asesor NO ve Ops, pero debe saber la etapa).
+5. **Emisión**: en Ops, al emitir **desaparece** (se crea el cliente con toda la info; la póliza se agrega manual o importando documentos). En Leads puede aparecer en **Cierre** durante el mes en curso y luego **archivarse** (auto o manual).
+- **Sincronización en vivo** Ops↔Leads para gestiones del mismo cliente (Cotizando↔Cotizando, Inspecciones, Emisiones, Gestiones Admin, Modificaciones). En **clientes activos** se refleja en su **Día/tareas activas** y en la **ficha del cliente**.
+- **Permisos/roles**: el **asesor NO ve Ops** (interno del equipo) pero ve **todo lo de sus gestiones** vía Leads. **Cada usuario puede tener varios roles** y elegir **qué tablero ver según el rol** (un interno también puede ser asesor y querer ver solo sus metas/clientes/gestiones).
+- **Fichas Lead/Ops** (diseñar la mejor versión, no copiar la actual): práctica, útil, que facilite automatización, sincronización, vínculos y seguimiento. Campos tipo: etapa, cliente vinculado, país, producto, ramo/subramo, aseguradora, asesor, canal, tipo de gestión, seguimiento, resultado, prioridad, vencimiento, próxima acción, responsable, etiquetas, checklist, adjuntos/Drive, N.º póliza, N.º cotización, tel WA, correo, descripción, notas internas. Eventos para automatización (al mover columna, al cambiar resultado, al registrar vencimiento, al faltar documentos, al marcar inspección, al emitir póliza…).
+- **Al convertir** a cliente: heredar datos iniciales + **cadencia automática de envío de encuestas de satisfacción**.
+
+## Solicitar gestión desde la ficha del cliente
+- Botón **"Solicitar gestión"** en la ficha (y en pólizas/renovaciones): el usuario **selecciona tipo** (solicitar condiciones de renovación a aseguradora, cancelar, sustituir vehículo, cambiar propietario, modificar datos…), **crea otro si no existe**, agrega **nota**, y **aparece en Ops** en la lista correcta (Gestiones Admin, Renovaciones/Modif., etc.) **asociada al cliente/póliza**.
+
+## Renovaciones (ampliar)
+- Desde la ficha (renovaciones) **solicitar propuestas de renovación**: con la **misma aseguradora**, con **otras en general**, o con **otras seleccionando cuáles**.
+- **Renovación inteligente**: el comparativo debe comparar la **propuesta de renovación actual vs propuesta de renovación de la misma aseguradora Y/O de otras**. (Hoy solo simula misma aseguradora — ampliar a multi-aseguradora.)
+
+## Calidad de datos (ampliar)
+- **Edición rápida inline** del dato faltante en la misma lista; al completar lo pendiente, el cliente **desaparece de la lista**.
+
+## Finanzas (ampliar)
+- Importadores para **movimientos, presupuesto, liquidaciones** (sobre todo etapa inicial), no solo banco. Opción de **mostrar/ocultar el importador**.
+- **Metas**: de **recaudo**, de **ventas** y de **producción** (tres tipos).
+
+## WhatsApp
+- No solo API: también **abrir WhatsApp Web** (wa.me) como opción.
+
+## Integraciones / APIs a evaluar (Configuración → Integraciones)
+- **Correo**: **Outlook** (corporativo — PRIORITARIO; explorar **utilidad de gestión de correos** y asociación de correos a gestiones/clientes), **Gmail**.
+- **Mensajería**: **Green API** (WhatsApp), WhatsApp Web.
+- **Datos/Hojas**: **Google Sheets**.
+- **IA/Contenido**: agentes de IA varios, **Canva, Gamma, NotebookLM, HeyGen**.
+- **Marketing/Redes**: **Facebook, Instagram, LinkedIn, YouTube, TikTok, Metricool, Mailchimp** (o similares) para campañas.
+- Todas con seguridad correcta (secrets cifrados, scopes, por rol).
+- **Aprovechar Outlook**: bandeja/gestión de correos dentro de la plataforma, vincular hilos a clientes/gestiones, crear gestión desde un correo.
+
+## Academia (para 1.0) — `Orbit Academia`
+- **Inducción**, **capacitación técnica**, **certificaciones**, **piezas comerciales** (propias y de aseguradoras), **recursos adicionales**.
+- **Instructivo/onboarding** de cómo funciona el sistema (puede vivir en Configuración o Academia).
+- **Videos embebidos**; mensajes con **formato y emojis**.
+
+## Marketing (para 1.0) — `Orbit Marketing`
+- **Calendario** que dentro de **cada día** contenga la **ficha con el/los contenidos por red, piezas** y asociados.
+- Segmentación, medición, estadísticas, automatización de producción/generación de contenidos y publicación.
+- Integraciones de redes (ver arriba).
+
+## Otros para 1.0
+- **Reportes** (`Orbit Reportes`), **Orbit IA**, **Portal del Cliente** (lenguaje de marca por sección: "Orbit Reportes", portal propio, etc.).
+- **Localización por país**: normalizar **términos técnicos y comunes** distintos por país (glosario configurable por tenant) para clientes en otros países.
+- **Cronograma de actividades** tipo **calendario por día/semana/mes** — evaluar agregarlo en **Inicio**, donde también se **agreguen tareas por día**.
+- **Multi-rol por usuario**: selector de "ver como" (rol activo) que cambia el tablero/visibilidad.
+- **Videos embebidos + formato + emojis** en Academia y Notificaciones.
+
+## Estado de implementación de Ronda 5
+- TODO PENDIENTE (documentado). Próximo chat retoma por aquí, priorizando: (a) fixes UI ficha/tabs + quitar notas técnicas, (b) **rediseño fichas Ops/Leads + ciclo completo + solicitar gestión**, (c) Finanzas import/metas, (d) Integraciones (Outlook), (e) Academia + Marketing + Reportes + IA + Portal, (f) responsive global.
+
 > **Definición de "1.0 comercializable" (cuando aviso para arrancar A&S)**: pasos 3 y 4 completos + Finanzas operativa + Ops/Leads + Aseguradoras configurables. Cotizador se integra después, ya sobre A&S.
 
 ---
