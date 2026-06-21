@@ -94,7 +94,7 @@
       <select id="pais-sel" aria-label="País"></select>
     </div>
     <div class="tb-ico" id="sw-theme" title="Paleta de la marca"><span>🎨</span></div>
-    <div class="tb-ico" title="Notificaciones"><span>🔔</span><span class="dot"></span></div>
+    <div class="tb-ico" id="nov-bell" title="Novedades"><span>🔔</span><span class="dot"></span><span id="nov-count" class="nov-count"></span></div>
     <div class="tb-user" id="tb-user" title="Sesión demo">
       <span class="av" style="background:linear-gradient(135deg,var(--red),var(--red-700))">PO</span>
       <span class="who"><b>Paula Osorio</b><br><span>Dirección · salir</span></span>
@@ -118,10 +118,13 @@
   <script src="core/queries.js"></script>
   <script src="core/crmkit.js"></script>
   <script src="core/importa.js"></script>
+  <script src="core/novedades.js"></script>
   <script src="core/auth.js"></script>
   <script src="core/router.js"></script>
   <!-- MODULES -->
   <script src="modules/inicio.js"></script>
+  <script src="modules/ops.js"></script>
+  <script src="modules/leads.js"></script>
   <script src="modules/cliente360.js"></script>
   <script src="modules/polizas.js"></script>
   <script src="modules/cobros.js"></script>
@@ -139,6 +142,7 @@
     Orbit.store.init(Orbit.SEED);
     Orbit.router.init();
     Orbit.auth.init();
+    if (Orbit.novedades) Orbit.novedades.init();
 
     // país switcher
     (function () {

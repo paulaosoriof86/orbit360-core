@@ -136,6 +136,36 @@ Cliente 360, Pólizas, Cobros, Renovaciones, Cancelaciones, Comisiones, Historia
 
 ## Re-priorización (lo más crítico primero)
 1. ✅ Fundación + Núcleo CRM.
+
+---
+
+# Ronda 4 — Finanzas avanzada, Novedades y Renovación inteligente (21-jun)
+
+## Finanzas (complementos)
+- **Importación histórica A&S**: ingresos por **comisiones** y por **financiamiento**; egresos por **comisiones**, **gastos fijos** y demás de operación.
+- **Presupuesto**: sección dedicada (ingresos esperados vs reales, egresos por categoría, gastos fijos).
+- **Cruce pago↔liquidación de asesores**: los pagos a asesores se cruzan con su liquidación, **modificable**.
+- **Asesor ve solo lo suyo**, incluyendo **su liquidación de comisiones**.
+- **Dashboard financiero** para toma de decisiones: **comparativo intermensual e interanual**; permite **fijar metas a partir de la realidad financiera y comercial**.
+- **Base prima NETA (no total)**: producción real, cumplimiento, metas de recaudo y metas financieras se calculan sobre **prima neta**.
+- **Ajustes por no devengado**: la producción (asesor/aseguradora/empresa) **descuenta primas netas no devengadas** por cancelación. El asesor puede ver sus **ajustes de producción** en sus cancelaciones.
+
+## Metas
+- Creación de metas **mensuales por asesor**, **de la empresa** y/o **por aseguradora** (mensual o anual, para cumplimiento de **incentivos**).
+- Todas sobre **prima neta**; derivan metas de recaudo y financieras.
+
+## Novedades / Incentivos (todo el equipo)
+- Cualquiera del equipo crea **novedades** (incentivos, novedades de producto, avisos).
+- Aparecen en **ventana grande al ingresar** (nuevo ingreso) y en un **tablón de novedades** con **contador** (no leídas).
+
+## Renovación inteligente
+- Al **renovar** una póliza: poder **modificar datos** (No. de póliza, **aseguradora**, etc.) — a veces renuevan con nosotros pero **con otra aseguradora**.
+- **Comparativo de renovación**: cargar **propuesta de renovación vs propuesta actual** de la misma aseguradora → herramienta **inteligente con análisis crítico** para enviar al cliente (qué cambia, recomendaciones).
+
+## Responsive
+- **Todas las secciones responsive** (móvil/tablet/desktop). Verificar en cada módulo.
+
+## Re-priorización (continuación)
 2. ✅ Infraestructura transversal (theming, login, multipaís, importación scaffold) + **refinamiento UI ronda 2**.
 3. ⏳ **Expediente del cliente completo** (editable + automatizaciones + recordatorios + recibos + Drive). ← siguiente
 4. ⏳ **Configuración sin código** (marca/branding, usuarios/roles/permisos, países/monedas, add-ons/Make, APIs, planes). ← habilita la autonomía

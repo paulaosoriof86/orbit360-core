@@ -2,6 +2,23 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.8.0] — 2026-06-21 · Ops + Leads, Finanzas avanzada, Novedades, Renovación IA
+### Added — Ops + Leads (`modules/ops.js`, `modules/leads.js`)
+- **Orbit Ops**: kanban operativo (Gestiones Admin, Cotizaciones, Inspecciones, Emisiones, Renovaciones/Modif.), **sin prospectos**, listas personalizables, tarjetas clickeables, enlace a Leads.
+- **Orbit Leads**: pipeline por etapa con **probabilidad**, **cadencias** y pronóstico ponderado; convierte a cliente.
+- Seed: colecciones `leads`, `gestiones`, `novedades` (`__v=9`).
+### Added — Finanzas avanzada
+- **Dashboard**: comparativo intermensual e interanual, salud financiera, fijar metas desde datos.
+- **Presupuesto**: ingresos (comisiones + financiamiento) y egresos (comisiones + gastos fijos + operación), ppto vs real.
+- **Metas**: por asesor/empresa/aseguradora, mensual/anual, sobre **prima NETA**; deriva recaudo.
+- **Producción neta** con **ajuste por no devengado** (cancelaciones).
+- **Liquidación asesores**: el asesor ve **solo su** liquidación; pagos cruzables/ajustables.
+### Added — Novedades / Incentivos (`core/novedades.js`)
+- Tablón con **contador** de no leídas (campana), **modal grande al ingresar** (1/día), publicación por todo el equipo.
+### Added — Renovación inteligente (Cliente 360)
+- **Renovar** modificando N.º de póliza, **aseguradora**, prima, producto (renovación con otra aseguradora).
+- **Comparativo IA**: renovación vs actual con análisis crítico y recomendación; cargar propuesta y enviar al cliente.
+
 ## [0.7.0] — 2026-06-21 · Finanzas + Calidad de datos + Plantillas
 ### Added — Orbit Finanzas (`modules/finanzas.js`, `#/finanzas`)
 - **Movimientos**: KPIs (recaudo, comisión a cobrar, a pagar asesores, vencida), tabla, importar histórico, generar cierre mensual.

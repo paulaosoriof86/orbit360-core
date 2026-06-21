@@ -251,10 +251,63 @@ Orbit.SEED = (function () {
     }
   });
 
+  // ---- Leads (pipeline comercial) + Gestiones Ops (operativo) ----
+  const leads = [], gestiones = [];
+  const leadEtapas = ['Nuevo', 'Contactado', 'Cotizando', 'Propuesta', 'Cierre'];
+  const leadCanales = ['Referido', 'Web', 'WhatsApp', 'Campaña', 'Facebook', 'Telemarketing'];
+  const ramosLead = ['Auto', 'Vida', 'Gastos Médicos', 'Hogar', 'Daños', 'RC'];
+  const nombresLead = ['Andrea Solís', 'Bytes Solutions S.A.', 'Carlos Méndez', 'Mariana Téllez', 'Grupo Lumen', 'Pedro Ramírez', 'Inmobiliaria Cresta', 'Verónica Aguilar', 'Tech Andina Ltda.', 'José Morales', 'Clínica Vida', 'Laura Bonilla'];
+  for (let i = 0; i < 12; i++) {
+    const ase = pick(asesores), et = pick(leadEtapas);
+    const prob = { 'Nuevo': 10, 'Contactado': 25, 'Cotizando': 45, 'Propuesta': 70, 'Cierre': 90 }[et];
+    const pais = rnd() > .4 ? 'GT' : 'CO';
+    leads.push({
+      id: id('lead', i + 1), nombre: nombresLead[i], etapa: et, asesorId: ase.id,
+      canal: pick(leadCanales), ramo: pick(ramosLead), pais, moneda: pais === 'GT' ? 'GTQ' : 'COP',
+      primaEst: (pais === 'CO' ? between(1, 14) * 1000000 : between(1200, 16000)),
+      prob, proximoToque: iso(addDays(NOW, between(-3, 12))),
+      cadencia: pick(['Día 1 · llamada', 'Día 3 · WhatsApp', 'Día 7 · correo', 'Día 14 · cierre']),
+      creado: iso(addDays(NOW, -between(1, 40)))
+    });
+  }
+  // Gestiones Ops (operativas — SIN prospectos; eso es Leads)
+  const opsListas = ['Gestiones Admin', 'Cotizaciones', 'Inspecciones', 'Emisiones', 'Renovaciones / Modif.'];
+  const opsTitulos = {
+    'Gestiones Admin': ['Actualizar datos de cliente', 'Solicitud de cancelación', 'Endoso de beneficiario', 'Carta de no adeudo'],
+    'Cotizaciones': ['Cotizar Auto Total', 'Cotizar Gastos Médicos familiar', 'Cotización flotilla'],
+    'Inspecciones': ['Inspección vehículo nuevo', 'Avalúo de inmueble', 'Inspección pre-póliza'],
+    'Emisiones': ['Emitir póliza Auto', 'Emitir Vida temporal', 'Emisión Hogar Plus'],
+    'Renovaciones / Modif.': ['Renovación Auto', 'Modificar suma asegurada', 'Cambio de aseguradora']
+  };
+  let gn = 0;
+  opsListas.forEach(lista => {
+    const n = between(2, 4);
+    for (let i = 0; i < n; i++) {
+      gn++;
+      const ase = pick(asesores), asg = pick(aseguradoras), cli = pick(clientes);
+      const prioridad = pick(['Alta', 'Media', 'Baja']);
+      const fromLead = lista === 'Cotizaciones' && rnd() > .5 ? pick(leads).id : null;
+      gestiones.push({
+        id: id('ges', gn), lista, titulo: pick(opsTitulos[lista]),
+        clienteId: cli.id, asesorId: ase.id, aseguradoraId: asg.id, ramo: pick(ramosLead),
+        prioridad, vence: iso(addDays(NOW, between(-2, 10))),
+        checklist: between(0, 3), checklistTotal: 3, leadId: fromLead,
+        creado: iso(addDays(NOW, -between(0, 20)))
+      });
+    }
+  });
+
+  // novedades / incentivos
+  const novedades = [
+    { id: 'nov1', tipo: 'incentivo', titulo: '🏆 Incentivo de junio: bono por 10 pólizas Auto', detalle: 'Cierra 10 pólizas de Auto este mes y gana un bono del 5% adicional sobre comisión.', autor: 'Paula Osorio', fecha: iso(addDays(NOW, -2)), prioridad: true },
+    { id: 'nov2', tipo: 'producto', titulo: '🆕 Nuevo producto: Salud Premium de MundoSeguro', detalle: 'Cobertura internacional y sin deducible en red preferente. Material comercial en Academia.', autor: 'Dirección', fecha: iso(addDays(NOW, -5)), prioridad: false },
+    { id: 'nov3', tipo: 'aviso', titulo: '📢 Cierre de mes: subir gestiones antes del 30', detalle: 'Recuerden dejar todas las gestiones y recaudos cargados antes del cierre.', autor: 'Finanzas', fecha: iso(addDays(NOW, -1)), prioridad: false }
+  ];
+
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 8,
+    __v: 9,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
-    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos
+    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, leads, gestiones, novedades
   };
 })();

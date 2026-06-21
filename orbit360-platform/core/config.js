@@ -8,6 +8,8 @@ window.Orbit = window.Orbit || {};
 /* Títulos de módulo (banda de header) — plantilla personalizable por cliente.
    Cada cliente/plan puede sobreescribir icon, title, sub y features. */
 Orbit.MODULE_TITLES = {
+  ops:           { icon: '🗂', title: 'Orbit Ops', sub: 'Gestiones operativas', features: ['Kanban', 'Listas personalizables', 'Enlazado con Leads'] },
+  leads:         { icon: '🎯', title: 'Orbit Leads', sub: 'Pipeline comercial', features: ['Cadencias', 'Probabilidad', 'Convierte a cliente'] },
   inicio:        { icon: '🌅', title: 'Orbit Inicio', sub: 'Mi día', features: ['Metas del mes', 'Prioridades', 'Avance por asesor'] },
   cliente360:    { icon: '🧑‍💼', title: 'Orbit Clientes', sub: 'Base de asegurados', features: ['Expediente 360', 'Autogestionable', 'Importación inteligente'] },
   polizas:       { icon: '📑', title: 'Orbit Pólizas', sub: 'Cartera completa', features: ['Multi-aseguradora', 'Vigencias', 'Ramos y productos'] },

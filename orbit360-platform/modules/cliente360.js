@@ -363,7 +363,8 @@ Orbit.modules.cliente360 = (function () {
           <div style="flex:1"><div class="bar"><i style="width:${pct}%;background:${tone === 'danger' ? 'var(--danger)' : tone === 'warn' ? 'linear-gradient(90deg,#c9821b,#e0a23c)' : 'linear-gradient(90deg,#1f8a4c,#34b96a)'}"></i></div></div>
           <div style="width:150px;text-align:right;font-size:12.5px">${U.fmtDate(p.vigenciaFin)}<div class="muted">${d < 0 ? 'venció hace ' + (-d) + ' d' : 'en ' + d + ' d'}</div></div>
           ${U.estadoBadge(estado)}
-          <button class="btn ${gestionable ? 'primary' : 'ghost'} sm" ${gestionable ? '' : 'disabled style="opacity:.4"'} onclick="alert('Demo: gestionar renovación de ${p.numero}')">Gestionar</button>
+          <button class="btn ${gestionable ? 'primary' : 'ghost'} sm" ${gestionable ? '' : 'disabled style="opacity:.4"'} onclick="Orbit.modules.cliente360.renovar('${p.id}')">Renovar</button>
+          <button class="btn ghost sm" onclick="Orbit.modules.cliente360.comparativo('${p.id}')" title="Comparar propuesta de renovación vs actual">⚖ Comparar</button>
         </div>`;
       }).join('') || '<span class="muted">Sin pólizas para renovar.</span>'}
       </div>
@@ -608,5 +609,91 @@ Orbit.modules.cliente360 = (function () {
   }
   function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
 
-  return { render, edit };
+  /* ---- Renovar: modificar No. póliza, aseguradora, prima ---- */
+  function renovar(polId) {
+    const p = S().get('polizas', polId); if (!p) return;
+    const asgs = S().all('aseguradoras');
+    let back = document.getElementById('c360-edit'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center';
+    back.innerHTML = `<div class="card" style="width:min(500px,94vw);max-height:90vh;overflow:auto;padding:0">
+      <div style="padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+        <b style="font-family:var(--f-display);font-size:17px">🔄 Renovar póliza ${p.numero}</b>
+        <button class="imp-x" id="rn-x">✕</button>
+      </div>
+      <div style="padding:18px 20px;display:grid;gap:11px">
+        <div class="cfg-note">A veces el cliente renueva con nosotros pero <b>con otra aseguradora</b>. Podés ajustar los datos de la nueva póliza.</div>
+        <label class="ce-l">N.º de póliza (nuevo)<input id="rn-num" class="o-sel" value="${U.esc(p.numero)}"></label>
+        <label class="ce-l">Aseguradora<select id="rn-asg" class="o-sel">${asgs.map(a => `<option value="${a.id}" ${a.id === p.aseguradoraId ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+          <label class="ce-l">Prima<input id="rn-prima" class="o-sel" type="number" value="${p.prima}"></label>
+          <label class="ce-l">Producto<input id="rn-prod" class="o-sel" value="${U.esc(p.producto)}"></label>
+        </div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="rn-cancel">Cancelar</button>
+        <button class="btn primary" id="rn-ok">Confirmar renovación</button>
+      </div>
+    </div>`;
+    document.body.appendChild(back);
+    const cid = p.clienteId, close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#rn-x').addEventListener('click', close);
+    back.querySelector('#rn-cancel').addEventListener('click', close);
+    back.querySelector('#rn-ok').addEventListener('click', () => {
+      const fin = new Date('2026-06-20'); fin.setFullYear(fin.getFullYear() + 1);
+      S().update('polizas', polId, {
+        numero: document.getElementById('rn-num').value || p.numero,
+        aseguradoraId: document.getElementById('rn-asg').value,
+        prima: +document.getElementById('rn-prima').value || p.prima,
+        producto: document.getElementById('rn-prod').value || p.producto,
+        estado: 'Vigente', vigenciaInicio: '2026-06-20', vigenciaFin: fin.toISOString().slice(0, 10)
+      });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: p.asesorId, tipo: 'sistema', icon: '🔄', fecha: '2026-06-20', titulo: 'Póliza renovada', detalle: 'Renovación de ' + p.numero + ' procesada.' });
+      close(); tab = 'renovaciones'; detalle(cid);
+    });
+  }
+
+  /* ---- Comparativo inteligente: renovación vs actual ---- */
+  function comparativo(polId) {
+    const p = S().get('polizas', polId); if (!p) return;
+    const asg = q.aseguradora(p.aseguradoraId);
+    const primaNueva = Math.round(p.prima * 1.12), sumaNueva = Math.round(p.sumaAsegurada * 1.05);
+    let back = document.getElementById('c360-edit'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center';
+    const rows = [
+      ['Prima anual', U.money(p.prima, p.moneda), U.money(primaNueva, p.moneda), '+12%', 'warn'],
+      ['Suma asegurada', U.money(p.sumaAsegurada, p.moneda), U.money(sumaNueva, p.moneda), '+5%', 'ok'],
+      ['Deducible', '1.0%', '0.8%', 'mejora', 'ok'],
+      ['Asistencia', 'Básica', 'Premium', 'mejora', 'ok'],
+      ['Forma de pago', p.forma, p.forma, 'igual', 'neutral']
+    ];
+    back.innerHTML = `<div class="card" style="width:min(620px,95vw);max-height:90vh;overflow:auto;padding:0">
+      <div style="padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+        <div><div class="nov-eyebrow">Comparativo inteligente de renovación</div><b style="font-family:var(--f-display);font-size:17px">${p.ramo} · ${asg ? U.esc(asg.nombre) : ''}</b></div>
+        <button class="imp-x" id="cmp-x">✕</button>
+      </div>
+      <div style="padding:18px 20px">
+        <div class="imp-scan" style="margin-bottom:14px"><span class="imp-spark">🧠</span> Análisis IA: la renovación <b>sube la prima 12%</b> pero <b>mejora coberturas</b> (suma +5%, deducible menor, asistencia Premium).</div>
+        <table class="tbl"><thead><tr><th>Concepto</th><th>Actual</th><th>Renovación</th><th>Cambio</th></tr></thead>
+          <tbody>${rows.map(r => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td><span class="badge ${r[4]}">${r[3]}</span></td></tr>`).join('')}</tbody>
+        </table>
+        <div class="card pad" style="margin-top:14px;border-left:3px solid var(--red)">
+          <b style="font-family:var(--f-display);font-size:14px">🧠 Recomendación</b>
+          <p class="muted" style="font-size:13px;margin:6px 0 0;line-height:1.55">El incremento de prima se justifica por la mejora de coberturas y suma asegurada. Conviene <b>renovar destacando el valor agregado</b>. Si el cliente es sensible al precio, ofrecer mantener la cobertura actual a prima similar como alternativa.</p>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+          <button class="btn ghost" onclick="alert('Demo: cargar PDF de la propuesta de renovación para extraer coberturas reales.')">⬇ Cargar propuesta</button>
+          <button class="btn primary" onclick="alert('Demo: enviar comparativo al cliente por WhatsApp / correo.')">Enviar al cliente</button>
+        </div>
+      </div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#cmp-x').addEventListener('click', close);
+  }
+
+  return { render, edit, renovar, comparativo };
 })();
