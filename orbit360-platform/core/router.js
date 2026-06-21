@@ -21,11 +21,15 @@ Orbit.router = (function () {
   // ---- sidebar ----
   function buildSidebar() {
     let h = '';
+    const active = (r) => !(Orbit.tenant && Orbit.tenant.isActive) || Orbit.tenant.isActive(r);
     Orbit.NAV.forEach(blk => {
       if (blk.type === 'home') {
+        if (!active(blk.route)) return;
         h += `<div class="nav-home"><div class="nav-link" data-route="${blk.route}">
           <span class="nav-ico">${blk.icon}</span><span class="nav-txt">${blk.label}</span></div></div>`;
       } else {
+        const items = blk.items.filter(it => active(it.route));
+        if (!items.length) return;
         const gid = 'g-' + blk.label.replace(/\s+/g, '');
         const col = blk.open ? '' : 'collapsed';
         h += `<div class="nav-group">
@@ -34,7 +38,7 @@ Orbit.router = (function () {
             <span class="nav-arrow ${col}" id="${gid}-arr">▾</span>
           </div>
           <div class="nav-links ${col}" id="${gid}">`;
-        blk.items.forEach(it => {
+        items.forEach(it => {
           h += `<div class="nav-link" data-route="${it.route}">
             <span class="nav-ico">${it.icon}</span>
             <span class="nav-txt">${it.label}</span>
@@ -132,5 +136,5 @@ Orbit.router = (function () {
     window.addEventListener('hashchange', onHash);
     onHash();
   }
-  return { init, go };
+  return { init, go, rebuildSidebar: () => { try { buildSidebar(); setActive((Orbit.route && Orbit.route.key) || 'inicio'); } catch (e) {} } };
 })();

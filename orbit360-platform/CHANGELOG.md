@@ -2,6 +2,26 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.6.0] — 2026-06-21 · Configuración (sin código) + detección en cartera
+### Added — Configuración (dos niveles)
+- **`Orbit.tenant`** (config.js): fuente única de la cuenta — `plan`, `modulosActivos[]`, `branding`, `paises[]`, `addons`, `portalVisibility`, `apis`. Persistente.
+- **`Orbit.PLANES`** (Estándar / Profesional / Personalizado) y **`Orbit.ROLES`** (Dirección, Admin, Finanzas, Asesor, Asistente).
+- **Módulo Configuración** (`modules/configuracion.js`, `#/configuracion`):
+  - *Self-service del cliente* (según plan): Marca (logo, paleta, menú claro/oscuro, auto-branding IA por manual de marca), Usuarios y permisos (roles, comisión, metas), Países y monedas (multipaís, no se mezclan), Integraciones (Make, Drive, WhatsApp), APIs (cifradas, scopes, por rol), Plan.
+  - *Interna (Orbit)*: banner privado, asignación de plan y **selección de módulos activos por cliente** → el sidebar se ajusta solo.
+- **Sidebar dinámico**: filtra por `tenant.modulosActivos`; `router.rebuildSidebar()` en caliente.
+### Added — Importación de estados de cartera
+- **Detección** en estados de cuenta (cualquier formato): **recibos no creados** y **pagos no aplicados**; conciliación **no-duplicante**.
+
+## [0.5.0] — 2026-06-21 · Ficha rediseñada + campos + importación en ficha
+### Changed
+- **Ficha cliente rediseñada**: header con chips de contacto, KPIs con acento e ícono, **menú interno tipo píldoras con íconos** (ya no se corta), bandera de país.
+### Added
+- **Campos extendidos** (editables, cascada): país → departamento → ciudad, dirección, canal, **contacto alterno (check)**, fecha de nacimiento, sexo (segmentación). `seed __v=7`.
+- **Importar al expediente** (`importa.openFor`): multi-archivo, vincula al cliente, asocia vehículo a póliza/cliente; tipos **facturas** y **documentos** (DPI/RTU/patente).
+- **Comisiones**: % por asesor, fija/variable; nota de base (prima neta, sobre recaudada).
+- **WhatsApp** en renovaciones y ficha. **Sidebar claro/oscuro** con auto-contraste. **FIX** deep-link abre la pestaña correcta.
+
 ## [0.4.0] — 2026-06-21 · UI ronda 2 + Expediente del cliente
 ### Changed (refinamiento UI)
 - **Topbar blanca** con **slot de logo del cliente** (white-label).

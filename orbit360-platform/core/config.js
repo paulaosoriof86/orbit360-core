@@ -34,6 +34,52 @@ Orbit.GEO = {
   CO: { 'Cundinamarca': ['Bogotá', 'Soacha', 'Chía'], 'Antioquia': ['Medellín', 'Envigado', 'Itagüí'], 'Valle del Cauca': ['Cali', 'Palmira'], 'Atlántico': ['Barranquilla', 'Soledad'] }
 };
 
+/* =========================================================
+   TENANT — configuración del cliente (white-label / plan).
+   Dos niveles: el cliente administra parte (según plan) y
+   nosotros administramos lo interno (módulos activos, plan).
+   Persistente. Una sola fuente de verdad para sidebar/router.
+   ========================================================= */
+Orbit.PLANES = {
+  estandar:      { id: 'estandar', nombre: 'Estándar', personalizacion: false, addons: false, apis: false, desc: 'Plantillas predefinidas, sin auto-branding.' },
+  profesional:   { id: 'profesional', nombre: 'Profesional', personalizacion: true, addons: true, apis: false, desc: 'Marca configurable + add-ons.' },
+  personalizado: { id: 'personalizado', nombre: 'Personalizado', personalizacion: true, addons: true, apis: true, desc: 'White-label completo, auto-branding por manual de marca, APIs.' }
+};
+Orbit.ROLES = {
+  'Dirección': { nivel: 4, desc: 'Acceso total + configuración + comisión empresa.' },
+  'Admin':     { nivel: 3, desc: 'Operación completa + configuración self-service.' },
+  'Finanzas':  { nivel: 3, desc: 'Cobros, comisiones, finanzas, conciliación.' },
+  'Asesor':    { nivel: 2, desc: 'Su cartera; ve solo su comisión.' },
+  'Asistente': { nivel: 1, desc: 'Captura y gestión, sin comisiones ni config.' }
+};
+Orbit.tenant = (function () {
+  const KEY = 'orbit360_tenant';
+  const DEFAULT = {
+    empresa: 'Tu marca',
+    plan: 'personalizado',
+    paises: ['GT', 'CO'],
+    monedaBase: 'GTQ',
+    branding: { logo: '', sidebar: 'oscuro', paleta: 'rojo', tipografia: 'Manrope' },
+    // módulos activos (config INTERNA nuestra) — todos los del nav
+    modulosActivos: ['inicio', 'ops', 'leads', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'historial', 'comisiones', 'importar', 'reportes', 'aseguradoras', 'ia', 'academia', 'insights', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
+    addons: { make: false, drive: true, whatsapp: true },
+    portalVisibility: { polizas: true, recibos: true, documentos: true, asesor: true, comisiones: false, drive: false },
+    apis: []
+  };
+  let data = null;
+  try { const raw = localStorage.getItem(KEY); if (raw) data = JSON.parse(raw); } catch (e) {}
+  if (!data) data = JSON.parse(JSON.stringify(DEFAULT));
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
+  return {
+    get: () => data,
+    set: (patch) => { Object.assign(data, patch); save(); document.dispatchEvent(new CustomEvent('orbit:tenant')); },
+    setDeep: (k, v) => { data[k] = v; save(); document.dispatchEvent(new CustomEvent('orbit:tenant')); },
+    isActive: (route) => data.modulosActivos.includes(route),
+    reset: () => { data = JSON.parse(JSON.stringify(DEFAULT)); save(); document.dispatchEvent(new CustomEvent('orbit:tenant')); },
+    DEFAULT
+  };
+})();
+
 Orbit.NAV = [
   { type: 'home', route: 'inicio', icon: '🌅', label: 'Orbit Inicio' },
   {

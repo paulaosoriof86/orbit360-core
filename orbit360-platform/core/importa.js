@@ -18,7 +18,7 @@ Orbit.importa = (function () {
     'polizas': { icon: '📑', title: 'Importar pólizas', desc: 'Extrae número, ramo, producto, aseguradora, vigencia y prima.', cols: ['Póliza', 'Ramo', 'Aseguradora', 'Prima'], sample: [['GT-AT-48210', 'Auto', 'Seguros Atlas', 'Q 8,400'], ['CO-PA-91733', 'Hogar', 'Pacífico Seguros', '$ 1,2M'], ['GT-VE-22041', 'Gastos Médicos', 'Vértice', 'Q 14,900']] },
     'vehiculos': { icon: '🚗', title: 'Importar vehículos', desc: 'Asocia vehículos a clientes y pólizas de auto (placa, marca, modelo, año).', cols: ['Placa', 'Vehículo', 'Año', 'Cliente'], sample: [['P-482GTR', 'Toyota Hilux', '2023', 'R. Quezada'], ['CO-ABC12', 'Mazda CX-5', '2022', 'C. Rojas'], ['P-901XYZ', 'Hyundai Tucson', '2024', 'J. Pineda']] },
     'directorio-aseguradoras': { icon: '🏢', title: 'Importar directorio de aseguradoras', desc: 'Contactos, ramos, accesos. Se fusiona con la info del Cotizador.', cols: ['Aseguradora', 'Ramos', 'Contacto'], sample: [['Seguros Atlas', 'Auto, Vida, GM', 'mesa@atlas.com'], ['Pacífico Seguros', 'Auto, Hogar, RC', 'corredores@pacifico.co'], ['Vértice Seguros', 'Auto, GM, Hogar', 'soporte@vertice.gt']] },
-    'estados-cuenta': { icon: '🧾', title: 'Importar estados de cuenta', desc: 'Lee el estado de la aseguradora, despliega recibos según forma de pago y permite aplicar pagos por póliza (habilita conciliación).', cols: ['Recibo', 'Póliza', 'Forma pago', 'Monto'], sample: [['REC-00451', 'GT-AT-48210', 'Mensual', 'Q 700'], ['REC-00452', 'GT-AT-48210', 'Mensual', 'Q 700'], ['REC-01188', 'CO-PA-91733', 'Trimestral', '$ 300K']], conciliacion: true },
+    'estados-cuenta': { icon: '🧾', title: 'Importar estados de cuenta', desc: 'Lee el estado de cartera que envía cada aseguradora en CUALQUIER formato (PDF, Excel, imagen). Despliega recibos según forma de pago, detecta recibos no creados y pagos aún no aplicados, y permite aplicar pagos por póliza.', cols: ['Recibo', 'Póliza', 'Forma pago', 'Monto'], sample: [['REC-00451', 'GT-AT-48210', 'Mensual', 'Q 700'], ['REC-00452', 'GT-AT-48210', 'Mensual', 'Q 700'], ['REC-01188', 'CO-PA-91733', 'Trimestral', '$ 300K']], conciliacion: true, detect: { noCreados: [['ATL-99820', 'GT-AT-77310', 'No existe en Orbit', 'Q 1,150'], ['ATL-99821', 'GT-AT-48210', 'Cuota 7/12 faltante', 'Q 700']], noAplicados: [['REC-00451', 'GT-AT-48210', 'Pagado en banco, sin aplicar', 'Q 700'], ['REC-01044', 'CO-PA-91733', 'Transferencia 12-jun', '$ 300K']] } },
     'planillas-comision': { icon: '💼', title: 'Importar planillas de comisiones', desc: 'Cruza la planilla de la aseguradora contra las comisiones devengadas.', cols: ['Aseguradora', 'Periodo', 'Comisión', 'Cruce'], sample: [['Seguros Atlas', '2026-05', 'Q 12,400', '✓ concilia'], ['Pacífico Seguros', '2026-05', '$ 3,1M', '◷ revisar'], ['Vértice', '2026-05', 'Q 6,900', '✓ concilia']] },
     'movimientos-finanzas': { icon: '💰', title: 'Importar movimientos / estados de cuenta (Finanzas)', desc: 'Histórico de movimientos para generar mensuales y conciliar.', cols: ['Fecha', 'Concepto', 'Monto', 'Tipo'], sample: [['2026-05-31', 'Liquidación Atlas', 'Q 12,400', 'Ingreso'], ['2026-05-28', 'Comisión asesor DM', 'Q -3,100', 'Egreso'], ['2026-05-15', 'Pago cliente REC-00451', 'Q 700', 'Ingreso']] },
     'calendario-marketing': { icon: '📣', title: 'Importar calendarización de contenidos', desc: 'Carga el calendario; se muestra como mes con cada día y sus piezas.', cols: ['Fecha', 'Contenido', 'Pieza', 'Canal'], sample: [['2026-06-03', 'Tip de renovación', 'Reel', 'Instagram'], ['2026-06-10', 'Beneficio Vida', 'Carrusel', 'Facebook'], ['2026-06-18', 'Caso de éxito', 'Post', 'LinkedIn']] },
@@ -114,7 +114,20 @@ Orbit.importa = (function () {
       <div class="card" style="overflow:hidden;margin-top:12px"><table class="tbl"><thead><tr>${m.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
         <tbody>${m.sample.map(row => `<tr>${row.map((cell, i) => `<td${i === 0 ? ' style="font-weight:600"' : ''}>${U.esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
       ${assoc}
-      ${m.conciliacion ? `<div class="imp-note" style="margin-top:12px">🧾 Se desplegaron los <b>recibos según forma de pago</b>. La conciliación <b>no duplica</b>: solo completa o ajusta lo que falte o no coincida. En el paso siguiente podés <b>aplicar pagos por póliza</b>.</div>` : ''}`;
+      ${m.detect ? `
+        <div class="imp-detect">
+          <div class="imp-det-card warn">
+            <div class="idc-h"><span>🧩</span> Recibos no creados <b>${m.detect.noCreados.length}</b></div>
+            <div class="idc-sub">Aparecen en el estado de la aseguradora pero no existen aún en Orbit. Se crearán al confirmar.</div>
+            <table class="tbl" style="margin-top:8px"><tbody>${m.detect.noCreados.map(r => `<tr><td class="mono" style="font-size:12px">${r[0]}</td><td class="mono" style="font-size:12px">${r[1]}</td><td style="font-size:12px">${r[2]}</td><td class="num">${r[3]}</td></tr>`).join('')}</tbody></table>
+          </div>
+          <div class="imp-det-card info">
+            <div class="idc-h"><span>💸</span> Pagos no aplicados <b>${m.detect.noAplicados.length}</b></div>
+            <div class="idc-sub">Pagos detectados que aún no se aplicaron a su póliza. Se aplicarán sin duplicar lo ya conciliado.</div>
+            <table class="tbl" style="margin-top:8px"><tbody>${m.detect.noAplicados.map(r => `<tr><td class="mono" style="font-size:12px">${r[0]}</td><td class="mono" style="font-size:12px">${r[1]}</td><td style="font-size:12px">${r[2]}</td><td class="num">${r[3]}</td></tr>`).join('')}</tbody></table>
+          </div>
+        </div>` : ''}
+      ${m.conciliacion ? `<div class="imp-note" style="margin-top:12px">🧾 Se desplegaron los <b>recibos según forma de pago</b>. La conciliación <b>no duplica</b>: solo crea lo que falta, completa o ajusta lo que no coincida. En el paso siguiente podés <b>aplicar pagos por póliza</b>.</div>` : ''}`;
   }
   function step3(m) {
     return `<div style="text-align:center;padding:24px 8px">
