@@ -47,16 +47,21 @@ Orbit.modules.renovaciones = (function () {
           <div style="padding:10px;display:grid;gap:9px;max-height:560px;overflow-y:auto">
             ${c.items.map(({ p, d }) => {
               const cli = S().get('clientes', p.clienteId), asg = q.aseguradora(p.aseguradoraId);
-              return `<div class="clickable" onclick="location.hash='#/cliente360?c=${p.clienteId}'" style="border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;cursor:pointer;background:var(--card)">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-                  <b style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(cli ? cli.nombre : '—')}</b>
-                  <span class="mono" style="font-size:10.5px;color:${d < 0 ? 'var(--danger)' : 'var(--ink-3)'};white-space:nowrap">${d < 0 ? (-d) + 'd vencida' : d + 'd'}</span>
+              const wa = (cli && cli.telefono || '').replace(/[^0-9]/g, '');
+              const waTxt = encodeURIComponent('Hola ' + (cli ? cli.nombre.split(' ')[0] : '') + ', tu póliza ' + p.ramo + ' (' + p.numero + ') vence el ' + U.fmtDate(p.vigenciaFin) + '. ¿Coordinamos la renovación?');
+              return `<div style="border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;background:var(--card)">
+                <div class="clickable" onclick="location.hash='#/cliente360?c=${p.clienteId}'" style="cursor:pointer">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+                    <b style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(cli ? cli.nombre : '—')}</b>
+                    <span class="mono" style="font-size:10.5px;color:${d < 0 ? 'var(--danger)' : 'var(--ink-3)'};white-space:nowrap">${d < 0 ? (-d) + 'd vencida' : d + 'd'}</span>
+                  </div>
+                  <div class="muted" style="font-size:11.5px;margin-top:4px">${p.ramo} · ${p.producto}</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">
+                    <span style="display:flex;align-items:center;gap:5px;font-size:11px"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${U.esc(asg ? asg.nombre : '')}</span>
+                    <span class="mono" style="font-size:11px;font-weight:600">${U.moneyShort(p.prima, p.moneda)}</span>
+                  </div>
                 </div>
-                <div class="muted" style="font-size:11.5px;margin-top:4px">${p.ramo} · ${p.producto}</div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">
-                  <span style="display:flex;align-items:center;gap:5px;font-size:11px"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${U.esc(asg ? asg.nombre : '')}</span>
-                  <span class="mono" style="font-size:11px;font-weight:600">${U.moneyShort(p.prima, p.moneda)}</span>
-                </div>
+                <a href="https://wa.me/${wa}?text=${waTxt}" target="_blank" rel="noopener" class="reno-wa" onclick="event.stopPropagation()">💬 Enviar WhatsApp</a>
               </div>`;
             }).join('') || `<div class="muted" style="text-align:center;padding:24px 8px;font-size:12.5px">Sin pólizas en este tramo.</div>`}
           </div>

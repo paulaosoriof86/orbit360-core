@@ -132,86 +132,93 @@ Orbit.modules.cliente360 = (function () {
     const r = q.clienteResumen(cid);
     const c = r.cli, ase = q.asesor(c.asesorId);
     const tabs = [
-      ['resumen', 'Resumen'], ['polizas', 'Pólizas'], ['vehiculos', 'Vehículos'], ['cobros', 'Cobros'],
-      ['recibos', 'Recibos y pagos'], ['renovaciones', 'Renovaciones'], ['comisiones', 'Comisiones'], ['historial', 'Historial']
+      ['resumen', 'Resumen', '📊'], ['polizas', 'Pólizas', '📑'], ['vehiculos', 'Vehículos', '🚗'], ['cobros', 'Cobros', '💳'],
+      ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['comisiones', 'Comisiones', '💼'], ['historial', 'Historial', '📝']
     ];
     const saludCol = r.salud >= 70 ? '#1f8a4c' : r.salud >= 45 ? '#c9821b' : '#C5162E';
+    const waNum = (c.telefono || '').replace(/[^0-9]/g, '');
+    const waMsg = encodeURIComponent('Hola ' + c.nombre.split(' ')[0] + ', te saluda tu asesor.');
 
     host.innerHTML = `<div class="page">
       <div class="crumb" style="margin-bottom:14px"><a style="cursor:pointer;color:var(--red)" onclick="location.hash='#/cliente360'">‹ Clientes 360</a> / ${U.esc(c.nombre)}</div>
 
       <!-- HEADER cerebro -->
-      <div class="card" style="overflow:hidden">
-        <div style="display:flex;gap:18px;padding:20px 22px;flex-wrap:wrap;align-items:flex-start;background:linear-gradient(120deg,#fff, #faf9f6)">
-          <div style="position:relative">
+      <div class="card fichahdr" style="overflow:hidden">
+        <div class="fh-top">
+          <div class="fh-avwrap">
             ${U.avatar(c.nombre, c.tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'lg')}
+            <span class="fh-pais">${c.pais === 'GT' ? '🇬🇹' : c.pais === 'CO' ? '🇨🇴' : '🌎'} ${c.pais}</span>
           </div>
           <div style="flex:1;min-width:240px">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-              <h2 style="font-family:var(--f-display);font-weight:800;font-size:24px;letter-spacing:-.02em;margin:0">${U.esc(c.nombre)}</h2>
+              <h2 style="font-family:var(--f-display);font-weight:800;font-size:25px;letter-spacing:-.02em;margin:0">${U.esc(c.nombre)}</h2>
               <span class="badge ${c.tipo === 'Empresa' ? 'info' : 'neutral'}">${c.tipo}</span>
               ${c.etiquetas.map(t => `<span class="badge ${t === 'VIP' ? 'danger' : 'neutral'}">${t}</span>`).join('')}
             </div>
-            <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;color:var(--ink-2);font-size:13.5px">
-              <span>🆔 ${U.esc(c.identificacion)}</span>
-              <span>✉ ${U.esc(c.email)}</span>
-              <span>📞 ${U.esc(c.telefono)}</span>
-              <span>📍 ${U.esc(c.ciudad)}, ${c.pais}</span>
+            <div class="fh-contact">
+              <span class="fh-chip">🆔 ${U.esc(c.identificacion)}</span>
+              <a class="fh-chip" href="mailto:${U.esc(c.email)}">✉ ${U.esc(c.email)}</a>
+              <span class="fh-chip">📞 ${U.esc(c.telefono)}</span>
+              <span class="fh-chip">📍 ${U.esc([c.direccion, c.ciudad, c.departamento].filter(Boolean).join(', ') || c.ciudad)}</span>
+              ${c.contactoAlt ? `<span class="fh-chip">👤 Alt: ${U.esc(c.contactoAlt)}</span>` : ''}
             </div>
-            <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:8px;color:var(--ink-3);font-size:12.5px">
-              <span>Asesor: <b style="color:${ase ? ase.color : '#333'}">${U.esc(ase ? ase.nombre : '—')}</b></span>
-              <span>Segmento: <b>${c.segmento}</b></span>
-              <span>Canal: <b>${c.canal}</b></span>
-              <span>Cliente desde: <b>${U.fmtDate(c.fechaAlta)}</b></span>
+            <div class="fh-meta">
+              <span>Asesor <b style="color:${ase ? ase.color : '#333'}">${U.esc(ase ? ase.nombre : '—')}</b></span>
+              <span>Segmento <b>${c.segmento}</b></span>
+              <span>Canal <b>${c.canal}</b></span>
+              <span>Desde <b>${U.fmtDate(c.fechaAlta)}</b></span>
+              ${c.fechaNac ? `<span>Nac. <b>${U.fmtDate(c.fechaNac)}</b></span>` : ''}
             </div>
-            <div style="margin-top:10px">
+            <div style="margin-top:11px;display:flex;gap:8px;flex-wrap:wrap">
               ${c.driveLink
-                ? `<a href="${U.esc(c.driveLink)}" target="_blank" rel="noopener" class="badge info" style="text-decoration:none">📁 Documentos en Drive ↗</a>`
-                : `<span class="badge neutral" style="cursor:pointer" onclick="Orbit.modules.cliente360.edit('${cid}')">📁 Agregar link de Drive</span>`}
+                ? `<a href="${U.esc(c.driveLink)}" target="_blank" rel="noopener" class="fh-drive">📁 Expediente en Drive <span style="opacity:.6">↗</span></a>`
+                : `<span class="fh-drive ghost" onclick="Orbit.modules.cliente360.edit('${cid}')">📁 Agregar link de Drive</span>`}
+              <span class="fh-drive ghost" onclick="Orbit.importa.openFor('${cid}')">⬇ Importar a este expediente</span>
             </div>
           </div>
-          <!-- salud -->
-          <div style="text-align:center;min-width:120px">
-            <div style="width:104px;height:104px;border-radius:50%;margin:0 auto;display:grid;place-items:center;background:conic-gradient(${saludCol} ${r.salud * 3.6}deg, #ececec ${r.salud * 3.6}deg)">
-              <div style="width:80px;height:80px;border-radius:50%;background:#fff;display:grid;place-items:center">
-                <div><div style="font-family:var(--f-display);font-weight:800;font-size:26px;color:${saludCol}">${r.salud}</div>
-                <div style="font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em">Salud</div></div>
+          <!-- salud + acciones -->
+          <div style="text-align:center;min-width:130px">
+            <div class="fh-salud" style="background:conic-gradient(${saludCol} ${r.salud * 3.6}deg, #ececec ${r.salud * 3.6}deg)">
+              <div class="fh-salud-in">
+                <div style="font-family:var(--f-display);font-weight:800;font-size:27px;color:${saludCol}">${r.salud}</div>
+                <div style="font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em">Salud</div>
               </div>
             </div>
-            <div style="display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap">
-              <button class="btn ghost sm" title="Enviar WhatsApp" onclick="alert('Demo: abre Notificaciones WA')">💬</button>
-              <button class="btn ghost sm" title="Importar estado de cuenta / pólizas" onclick="Orbit.importa.open('estados-cuenta')">⬇</button>
+            <div style="display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+              <a class="btn ghost sm" title="Enviar WhatsApp" href="https://wa.me/${waNum}?text=${waMsg}" target="_blank" rel="noopener" style="color:#1f8a4c">💬 WA</a>
+              <button class="btn ghost sm" title="Importar a este expediente" onclick="Orbit.importa.openFor('${cid}')">⬇</button>
               <button class="btn primary sm" onclick="Orbit.modules.cliente360.edit('${cid}')">Editar</button>
             </div>
           </div>
         </div>
 
         <!-- KPI band -->
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line)">
-          ${kpiCell('Pólizas vigentes', r.nVigentes + ' / ' + r.nPolizas, '')}
-          ${kpiCell('Prima anual', U.money(r.primaAnual, r.moneda), '')}
-          ${kpiCell('Cartera al día', U.money(r.cobrado, r.moneda), 'ok')}
-          ${kpiCell('Cartera vencida', U.money(r.vencido, r.moneda), r.vencido > 0 ? 'danger' : '')}
-          ${kpiCell('Comisión generada', U.money(r.comisionGen, r.moneda), '')}
+        <div class="fh-kpis">
+          ${kpiCell('Pólizas vigentes', r.nVigentes + ' <small>/ ' + r.nPolizas + '</small>', '', '📑')}
+          ${kpiCell('Prima anual', U.money(r.primaAnual, r.moneda), '', '💰')}
+          ${kpiCell('Cartera al día', U.money(r.cobrado, r.moneda), 'ok', '✅')}
+          ${kpiCell('Cartera vencida', U.money(r.vencido, r.moneda), r.vencido > 0 ? 'danger' : '', '⚠')}
+          ${kpiCell('Comisión generada', U.money(r.comisionGen, r.moneda), '', '💼')}
         </div>
       </div>
 
       <!-- tabs -->
-      <div class="tabs" style="margin:18px 0 16px;max-width:640px">
-        ${tabs.map(t => `<div class="tab ${tab === t[0] ? 'active' : ''}" data-tab="${t[0]}">${t[1]}</div>`).join('')}
+      <div class="ficha-tabs">
+        ${tabs.map(t => `<div class="ftab ${tab === t[0] ? 'active' : ''}" data-tab="${t[0]}"><span class="fi">${t[2]}</span>${t[1]}</div>`).join('')}
       </div>
       <div id="c360-body"></div>
     </div>`;
 
-    host.querySelectorAll('.tab').forEach(el => el.addEventListener('click', () => { tab = el.dataset.tab; detalle(cid); }));
+    host.querySelectorAll('.ftab').forEach(el => el.addEventListener('click', () => { tab = el.dataset.tab; detalle(cid); }));
     renderTab(cid, r);
   }
 
-  function kpiCell(label, val, tone) {
+  function kpiCell(label, val, tone, icon) {
     const col = tone === 'ok' ? 'var(--ok)' : tone === 'danger' ? 'var(--danger)' : 'var(--ink)';
-    return `<div style="padding:14px 16px;border-right:1px solid var(--line-2)">
-      <div style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600">${label}</div>
-      <div style="font-family:var(--f-display);font-weight:800;font-size:18px;margin-top:5px;color:${col}">${val}</div></div>`;
+    const ac = tone === 'ok' ? 'var(--ok)' : tone === 'danger' ? 'var(--danger)' : 'var(--red)';
+    return `<div class="fh-kpi"><span class="fh-kpi-ac" style="background:${ac}"></span>
+      <div class="fh-kpi-lab">${icon ? `<span>${icon}</span>` : ''}${label}</div>
+      <div class="fh-kpi-val" style="color:${col}">${val}</div></div>`;
   }
 
   function renderTab(cid, r) {
@@ -448,6 +455,9 @@ Orbit.modules.cliente360 = (function () {
     <div class="card" style="padding:11px 14px;margin-bottom:14px;font-size:12.5px;color:var(--ink-3);display:flex;align-items:center;gap:8px">
       <span>🔒</span> La <b>comisión de empresa</b> es información interna; su visibilidad es <b>configurable por rol</b> (hoy ves como <b>${U.esc(ROLE())}</b>). El vendedor solo ve su comisión.
     </div>
+    <div class="card" style="padding:11px 14px;margin-bottom:14px;font-size:12.5px;color:var(--ink-2);border-left:3px solid var(--red)">
+      <b>Base de cálculo:</b> la comisión se paga sobre <b>prima neta</b> (antes de gastos, impuestos y costos de asistencia) y se <b>causa sobre prima recaudada</b>, no sobre venta. El % por asesor puede ser <b>fijo o variable</b> (se configura en Equipo / Configuración).
+    </div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Periodo</th><th>Póliza</th><th class="num">Base</th><th class="num">%</th><th class="num">Comisión</th><th>Estado</th></tr></thead>
       <tbody>${com.map(c => {
@@ -524,18 +534,30 @@ Orbit.modules.cliente360 = (function () {
         <button class="imp-x" id="ce-x">✕</button>
       </div>
       <div style="padding:18px 20px;display:grid;gap:11px">
-        ${field('Nombre', 'ce-nombre', c.nombre)}
+        ${field('Nombre / Razón social', 'ce-nombre', c.nombre)}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
           ${field('Correo', 'ce-email', c.email)}
           ${field('Teléfono', 'ce-tel', c.telefono)}
         </div>
-        ${field('Contacto alterno (si es diferente al asegurado)', 'ce-cont', c.contactoAlt || '')}
+        <label class="ce-l" style="flex-direction:row;align-items:center;gap:8px;font-weight:600"><input type="checkbox" id="ce-cont-chk" ${c.contactoAlt ? 'checked' : ''}> El contacto es diferente al asegurado</label>
+        <div id="ce-cont-wrap" style="${c.contactoAlt ? '' : 'display:none'}">${field('Contacto (nombre y teléfono)', 'ce-cont', c.contactoAlt || '')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px">
+          <label class="ce-l">País<select id="ce-pais" class="o-sel" style="width:100%">${(Orbit.PAISES || []).filter(p => p.id !== 'TODOS').map(p => `<option value="${p.id}" ${p.id === c.pais ? 'selected' : ''}>${p.label}</option>`).join('')}</select></label>
+          <label class="ce-l">Departamento<select id="ce-depto" class="o-sel" style="width:100%"></select></label>
+          <label class="ce-l">Ciudad<select id="ce-ciudad" class="o-sel" style="width:100%"></select></label>
+        </div>
+        ${field('Dirección', 'ce-dir', c.direccion || '')}
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px">
+          <label class="ce-l">Canal<select id="ce-canal" class="o-sel" style="width:100%">${['Referido', 'Web', 'WhatsApp', 'Campaña', 'Telemarketing', 'Renovación', 'Ops', 'Leads'].map(s => `<option ${s === c.canal ? 'selected' : ''}>${s}</option>`).join('')}</select></label>
+          <label class="ce-l">Sexo<select id="ce-sexo" class="o-sel" style="width:100%"><option value="">—</option><option value="F" ${c.sexo === 'F' ? 'selected' : ''}>Femenino</option><option value="M" ${c.sexo === 'M' ? 'selected' : ''}>Masculino</option></select></label>
+          <label class="ce-l">Fecha nac.<input id="ce-nac" type="date" class="o-sel" style="width:100%" value="${c.fechaNac || ''}"></label>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
           <label class="ce-l">Asesor<select id="ce-ase" class="o-sel" style="width:100%">${asesores.map(a => `<option value="${a.id}" ${a.id === c.asesorId ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">Segmento<select id="ce-seg" class="o-sel" style="width:100%">${['Premium', 'Recurrente', 'Estándar', 'Nuevo'].map(s => `<option ${s === c.segmento ? 'selected' : ''}>${s}</option>`).join('')}</select></label>
         </div>
-        ${field('Link de Drive (documentos)', 'ce-drive', c.driveLink || '')}
-        <label class="ce-l">Notas<textarea id="ce-notas" class="o-sel" style="width:100%;min-height:70px;resize:vertical;padding:9px 11px">${U.esc(c.notas || '')}</textarea></label>
+        ${field('Link de Drive (expediente)', 'ce-drive', c.driveLink || '')}
+        <label class="ce-l">Notas<textarea id="ce-notas" class="o-sel" style="width:100%;min-height:62px;resize:vertical;padding:9px 11px">${U.esc(c.notas || '')}</textarea></label>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
         <button class="btn ghost" id="ce-cancel">Cancelar</button>
@@ -547,12 +569,36 @@ Orbit.modules.cliente360 = (function () {
     back.addEventListener('click', e => { if (e.target === back) closeM(); });
     back.querySelector('#ce-x').addEventListener('click', closeM);
     back.querySelector('#ce-cancel').addEventListener('click', closeM);
+    // contacto alterno toggle
+    const chk = back.querySelector('#ce-cont-chk');
+    chk.addEventListener('change', () => { back.querySelector('#ce-cont-wrap').style.display = chk.checked ? '' : 'none'; });
+    // cascada geográfica país → depto → ciudad
+    const selPais = back.querySelector('#ce-pais'), selDep = back.querySelector('#ce-depto'), selCiu = back.querySelector('#ce-ciudad');
+    function fillDeptos(keepDep, keepCiu) {
+      const geo = (Orbit.GEO && Orbit.GEO[selPais.value]) || {};
+      const deptos = Object.keys(geo);
+      selDep.innerHTML = deptos.map(d => `<option ${d === keepDep ? 'selected' : ''}>${d}</option>`).join('') || '<option>—</option>';
+      fillCiudades(keepCiu);
+    }
+    function fillCiudades(keepCiu) {
+      const geo = (Orbit.GEO && Orbit.GEO[selPais.value]) || {};
+      const ciudades = geo[selDep.value] || ['—'];
+      selCiu.innerHTML = ciudades.map(ci => `<option ${ci === keepCiu ? 'selected' : ''}>${ci}</option>`).join('');
+    }
+    selPais.addEventListener('change', () => fillDeptos());
+    selDep.addEventListener('change', () => fillCiudades());
+    fillDeptos(c.departamento, c.ciudad);
     back.querySelector('#ce-save').addEventListener('click', () => {
       S().update('clientes', cid, {
         nombre: val('ce-nombre') || c.nombre,
         email: val('ce-email'), telefono: val('ce-tel'),
+        pais: selPais.value, departamento: selDep.value, ciudad: selCiu.value, direccion: val('ce-dir'),
+        canal: val('ce-canal'), sexo: (document.getElementById('ce-sexo') || {}).value || '',
+        fechaNac: (document.getElementById('ce-nac') || {}).value || '',
         asesorId: val('ce-ase'), segmento: val('ce-seg'),
-        driveLink: val('ce-drive'), notas: val('ce-notas'), contactoAlt: val('ce-cont')
+        moneda: selPais.value === 'CO' ? 'COP' : 'GTQ',
+        driveLink: val('ce-drive'), notas: val('ce-notas'),
+        contactoAlt: chk.checked ? val('ce-cont') : ''
       });
       closeM(); detalle(cid);
     });

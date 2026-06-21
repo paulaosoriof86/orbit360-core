@@ -20,11 +20,11 @@ Orbit.SEED = (function () {
 
   // ---- Asesores (equipo) ----
   const asesores = [
-    { id: 'ase001', nombre: 'Paula Osorio', rol: 'Dirección', iniciales: 'PO', color: '#C5162E', metaPrima: 220000, metaRecaudo: 180000 },
-    { id: 'ase002', nombre: 'Diego Marroquín', rol: 'Asesor Sr.', iniciales: 'DM', color: '#1f3a5f', metaPrima: 160000, metaRecaudo: 140000 },
-    { id: 'ase003', nombre: 'Lucía Herrera', rol: 'Asesora', iniciales: 'LH', color: '#1f8a4c', metaPrima: 140000, metaRecaudo: 120000 },
-    { id: 'ase004', nombre: 'Marco Villatoro', rol: 'Asesor', iniciales: 'MV', color: '#c9821b', metaPrima: 120000, metaRecaudo: 100000 },
-    { id: 'ase005', nombre: 'Ana Lemus', rol: 'Asesora Jr.', iniciales: 'AL', color: '#6b4ea0', metaPrima: 90000, metaRecaudo: 78000 }
+    { id: 'ase001', nombre: 'Paula Osorio', rol: 'Dirección', iniciales: 'PO', color: '#C5162E', metaPrima: 220000, metaRecaudo: 180000, comTipo: 'variable', comPct: 18 },
+    { id: 'ase002', nombre: 'Diego Marroquín', rol: 'Asesor Sr.', iniciales: 'DM', color: '#1f3a5f', metaPrima: 160000, metaRecaudo: 140000, comTipo: 'variable', comPct: 15 },
+    { id: 'ase003', nombre: 'Lucía Herrera', rol: 'Asesora', iniciales: 'LH', color: '#1f8a4c', metaPrima: 140000, metaRecaudo: 120000, comTipo: 'variable', comPct: 12 },
+    { id: 'ase004', nombre: 'Marco Villatoro', rol: 'Asesor', iniciales: 'MV', color: '#c9821b', metaPrima: 120000, metaRecaudo: 100000, comTipo: 'fija', comPct: 10 },
+    { id: 'ase005', nombre: 'Ana Lemus', rol: 'Asesora Jr.', iniciales: 'AL', color: '#6b4ea0', metaPrima: 90000, metaRecaudo: 78000, comTipo: 'fija', comPct: 8 }
   ];
 
   // ---- Aseguradoras (directorio) ----
@@ -73,9 +73,16 @@ Orbit.SEED = (function () {
     const asesor = pick(asesores);
     const altaMonths = between(2, 46);
     const moneda = pais === 'GT' ? 'GTQ' : 'COP';
-    const ciudad = pais === 'GT' ? pick(['Guatemala', 'Mixco', 'Quetzaltenango', 'Villa Nueva']) : pick(['Bogotá', 'Medellín', 'Cali', 'Barranquilla']);
+    const GEO = {
+      GT: { Guatemala: ['Guatemala', 'Mixco', 'Villa Nueva'], Quetzaltenango: ['Quetzaltenango', 'Coatepeque'], Escuintla: ['Escuintla', 'Santa Lucía'], Sacatepéquez: ['Antigua Guatemala'] },
+      CO: { 'Cundinamarca': ['Bogotá', 'Soacha', 'Chía'], 'Antioquia': ['Medellín', 'Envigado', 'Itagüí'], 'Valle del Cauca': ['Cali', 'Palmira'], 'Atlántico': ['Barranquilla', 'Soledad'] }
+    };
+    const deptos = Object.keys(GEO[pais] || { '—': ['—'] });
+    const departamento = pick(deptos);
+    const ciudad = pick((GEO[pais] || {})[departamento] || ['—']);
+    const calle = pais === 'GT' ? between(1, 30) + ' Calle ' + between(1, 40) + '-' + between(10, 99) + ' Zona ' + between(1, 18) : 'Cra ' + between(1, 120) + ' # ' + between(1, 90) + '-' + between(10, 99);
     return {
-      id: id('cli', cn), tipo, nombre, pais, moneda, ciudad,
+      id: id('cli', cn), tipo, nombre, pais, moneda, ciudad, departamento, direccion: calle,
       identificacion: tipo === 'Empresa'
         ? (pais === 'GT' ? between(1000000, 9999999) + '-' + between(0, 9) : '9' + between(10000000, 99999999))
         : (pais === 'GT' ? between(1000, 9999) + ' ' + between(10000, 99999) + ' ' + between(1000, 9999) : between(10000000, 99999999) + ''),
@@ -84,6 +91,9 @@ Orbit.SEED = (function () {
       asesorId: asesor.id,
       segmento: pick(segmentos),
       canal: pick(canales),
+      sexo: tipo === 'Empresa' ? '' : pick(['F', 'M']),
+      fechaNac: tipo === 'Empresa' ? '' : iso(new Date(between(1965, 2002), between(0, 11), between(1, 28))),
+      contactoAlt: '',
       fechaAlta: iso(addMonths(NOW, -altaMonths)),
       cumple: iso(new Date(2026, between(0, 11), between(1, 28))),
       etiquetas: tipo === 'Empresa' ? ['Corporativo'] : (rnd() > .6 ? ['VIP'] : []),
@@ -235,7 +245,7 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 6,
+    __v: 7,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos
   };

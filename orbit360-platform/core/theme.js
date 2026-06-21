@@ -48,6 +48,15 @@ Orbit.theme = (function () {
   }
   function get() { try { return localStorage.getItem(KEY) || 'rojo'; } catch (e) { return 'rojo'; } }
 
+  // ---- sidebar claro/oscuro (personalizable, auto-contraste) ----
+  const SB_KEY = 'orbit360_sidebar';
+  function applySidebar(mode) {
+    document.body.classList.toggle('sb-light', mode === 'claro');
+    try { localStorage.setItem(SB_KEY, mode); } catch (e) {}
+    Orbit.theme.sidebar = mode;
+  }
+  function getSidebar() { try { return localStorage.getItem(SB_KEY) || 'oscuro'; } catch (e) { return 'oscuro'; } }
+
   // popover picker
   function picker(anchorEl) {
     closePicker();
@@ -59,12 +68,17 @@ Orbit.theme = (function () {
         <button class="tp-sw ${get() === p.id ? 'on' : ''}" data-p="${p.id}" title="${p.name}">
           <span style="background:${p.primary}"></span>${p.name}${p.brand ? ' ·' : ''}
         </button>`).join('')}</div>
-      <div class="tp-foot">Se aplica a toda la plataforma y al login. White-label para Alianzas.</div>`;
+      <div class="tp-foot">Se aplica a toda la plataforma y al login. White-label para Alianzas.</div>
+      <div class="tp-title" style="margin-top:12px">Menú lateral</div>
+      <div class="tp-grid">
+        <button class="tp-sw ${getSidebar() === 'oscuro' ? 'on' : ''}" data-sb="oscuro"><span style="background:#1E2227"></span>Oscuro</button>
+        <button class="tp-sw ${getSidebar() === 'claro' ? 'on' : ''}" data-sb="claro"><span style="background:#f3f1ec;box-shadow:inset 0 0 0 1px #ccc"></span>Claro</button>
+      </div>`;
     document.body.appendChild(pop);
     const r = anchorEl.getBoundingClientRect();
     pop.style.top = (r.bottom + 8) + 'px';
     pop.style.right = (window.innerWidth - r.right) + 'px';
-    pop.querySelectorAll('.tp-sw').forEach(b => b.addEventListener('click', () => { apply(b.dataset.p); closePicker(); }));
+    pop.querySelectorAll('.tp-sw').forEach(b => b.addEventListener('click', () => { if (b.dataset.sb) { applySidebar(b.dataset.sb); } else { apply(b.dataset.p); } closePicker(); }));
     setTimeout(() => document.addEventListener('click', outside), 0);
     function outside(e) { if (!pop.contains(e.target) && e.target !== anchorEl) closePicker(); }
     pop._outside = outside;
@@ -74,7 +88,8 @@ Orbit.theme = (function () {
     if (p) { if (p._outside) document.removeEventListener('click', p._outside); p.remove(); }
   }
 
-  return { PALETTES, apply, get, picker, current: 'rojo' };
+  return { PALETTES, apply, get, picker, current: 'rojo', applySidebar, getSidebar };
 })();
 // aplicar de inmediato (antes del primer render)
 Orbit.theme.apply(Orbit.theme.get());
+Orbit.theme.applySidebar(Orbit.theme.getSidebar());

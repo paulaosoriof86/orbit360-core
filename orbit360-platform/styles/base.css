@@ -90,6 +90,22 @@ button{font-family:inherit}
 #sidebar::-webkit-scrollbar-thumb{background:rgba(197,22,46,.3);border-radius:4px}
 #main{margin-left:var(--sidebar-w);flex:1;min-width:0;background:var(--surface);min-height:calc(100vh - var(--topbar-h))}
 
+/* Sidebar CLARO (personalizable) — texto oscuro sobre fondo claro */
+body.sb-light #sidebar{background:linear-gradient(180deg,#ffffff 0%,#f3f1ec 100%);border-right:1px solid var(--line)}
+body.sb-light .nav-home{border-bottom:1px solid var(--line)}
+body.sb-light .nav-toggle:hover{background:rgba(0,0,0,.03)}
+body.sb-light .nav-label{color:var(--ink-2)}
+body.sb-light .nav-arrow{color:var(--ink-3)}
+body.sb-light .nav-link{color:var(--ink-2)}
+body.sb-light .nav-link:hover{background:rgba(0,0,0,.04);color:var(--ink)}
+body.sb-light .nav-home .nav-link{color:var(--ink)}
+body.sb-light .nav-link.active{background:var(--red-soft);color:var(--red);border-left-color:var(--red)}
+body.sb-light .nav-divider{border-top-color:var(--line)}
+body.sb-light .nav-foot{color:var(--ink-3)}
+body.sb-light .nav-foot .pwa{color:var(--ink-2)}
+body.sb-light .nav-foot .pwa b,body.sb-light .nav-foot b{color:var(--ink)}
+body.sb-light #sidebar::-webkit-scrollbar-thumb{background:var(--red-line)}
+
 /* ---------- SIDEBAR NAV ---------- */
 .nav-home{padding:12px 0 8px;border-bottom:1px solid rgba(255,255,255,.06)}
 .nav-group{padding:6px 0 2px}

@@ -28,6 +28,12 @@ Orbit.PAISES = [
 ];
 Orbit.pais = 'TODOS';
 
+/* Catálogo geográfico (departamentos → ciudades) por país. Configurable por cliente. */
+Orbit.GEO = {
+  GT: { 'Guatemala': ['Guatemala', 'Mixco', 'Villa Nueva'], 'Quetzaltenango': ['Quetzaltenango', 'Coatepeque'], 'Escuintla': ['Escuintla', 'Santa Lucía'], 'Sacatepéquez': ['Antigua Guatemala'] },
+  CO: { 'Cundinamarca': ['Bogotá', 'Soacha', 'Chía'], 'Antioquia': ['Medellín', 'Envigado', 'Itagüí'], 'Valle del Cauca': ['Cali', 'Palmira'], 'Atlántico': ['Barranquilla', 'Soledad'] }
+};
+
 Orbit.NAV = [
   { type: 'home', route: 'inicio', icon: '🌅', label: 'Orbit Inicio' },
   {
