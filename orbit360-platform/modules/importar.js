@@ -20,7 +20,7 @@ Orbit.modules.importar = (function () {
     },
     {
       title: 'Finanzas y Marketing', sub: 'Histórico y operación continua',
-      items: ['movimientos-finanzas', 'calendario-marketing']
+      items: ['movimientos-finanzas', 'estados-banco', 'calendario-marketing']
     }
   ];
 

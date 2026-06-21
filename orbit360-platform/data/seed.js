@@ -103,6 +103,14 @@ Orbit.SEED = (function () {
   }
   personas.forEach(([n, p]) => clientes.push(makeCliente(n, p, 'Persona')));
   empresas.forEach(([n, p]) => clientes.push(makeCliente(n, p, 'Empresa')));
+  // Simular clientes históricos con datos INCOMPLETOS (calidad de datos)
+  clientes.forEach((c, i) => {
+    if (i % 10 === 3) { c.telefono = ''; }                 // sin teléfono (prioridad 1)
+    if (i % 10 === 6) { c.telefono = ''; c.direccion = ''; }
+    if (i % 7 === 2) { c.direccion = ''; }                 // sin dirección (prioridad 2)
+    if (i % 9 === 4) { c.email = ''; }                     // sin correo
+    if (i % 8 === 5) { c.fechaNac = ''; c.sexo = ''; }     // sin demográficos
+  });
 
   // ---- Build pólizas + cobros + comisiones + actividades ----
   const polizas = [], cobros = [], comisiones = [], actividades = [], cancelaciones = [], vehiculos = [];
@@ -245,7 +253,7 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 7,
+    __v: 8,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos
   };

@@ -2,6 +2,22 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.7.0] — 2026-06-21 · Finanzas + Calidad de datos + Plantillas
+### Added — Orbit Finanzas (`modules/finanzas.js`, `#/finanzas`)
+- **Movimientos**: KPIs (recaudo, comisión a cobrar, a pagar asesores, vencida), tabla, importar histórico, generar cierre mensual.
+- **Liquidación empresa**: comisión a **cobrar a cada aseguradora** (prima neta recaudada), conciliable contra planilla.
+- **Liquidación asesores**: % fijo/variable por asesor sobre **prima neta recaudada** (no sobre venta); a pagar / pendiente / liquidar.
+- **Conciliación bancaria**: doble conciliación (depósito↔recaudo y pago↔póliza); importar estado bancario.
+### Added — Importación
+- KIND **`estados-banco`** (estado de cuenta bancario, cualquier formato) con detección.
+- **Planillas de comisiones** ahora con detección: pagos no aplicados y validación de liquidación por asesor.
+### Added — Calidad de datos (`modules/calidad.js`, `#/calidad`)
+- Reporte de **expedientes incompletos**, prioridad **teléfono › dirección › resto**, foco en **póliza vigente**; campaña de actualización por **WhatsApp** (con tel) o **correo** (sin WA, con email). `seed __v=8` con clientes incompletos.
+### Added — Plantillas de mensajes (`modules/plantillas.js`, `#/plantillas`)
+- Plantillas WhatsApp/correo (propuesta, prima pendiente, actualización de datos, renovación, bienvenida) con variables; editables y persistentes.
+### Added — Configuración interna
+- **Planes comercializables**: importar catálogo o **crear plan**; editable por acuerdos/promos. Asignación de plan configura funcionalidades.
+
 ## [0.6.0] — 2026-06-21 · Configuración (sin código) + detección en cartera
 ### Added — Configuración (dos niveles)
 - **`Orbit.tenant`** (config.js): fuente única de la cuenta — `plan`, `modulosActivos[]`, `branding`, `paises[]`, `addons`, `portalVisibility`, `apis`. Persistente.

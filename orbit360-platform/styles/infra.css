@@ -186,6 +186,16 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
 .cfg-mod-ico{font-size:15px}
 @media(max-width:860px){.cfg-wrap{grid-template-columns:1fr}.cfg-side{position:static;grid-template-columns:repeat(2,1fr);display:grid}.cfg-grid2,.cfg-grid3,.cfg-mods{grid-template-columns:1fr}}
 
+/* ---------- PLANTILLAS ---------- */
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.pl-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:15px 16px;box-shadow:var(--sh-1);display:flex;flex-direction:column}
+.pl-h{display:flex;align-items:flex-start;gap:11px;margin-bottom:11px}
+.pl-ico{width:40px;height:40px;border-radius:10px;background:var(--red-soft);display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.pl-h b{font-family:var(--f-display);font-size:14.5px}
+.pl-meta{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.pl-body{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:11px 12px;font-size:13px;color:var(--ink-2);line-height:1.5;flex:1}
+.pl-actions{display:flex;gap:6px;margin-top:11px;justify-content:flex-end}
+
 /* ---------- FICHA CLIENTE (rediseño) ---------- */
 .fichahdr{background:linear-gradient(125deg,#fff 0%,var(--card-2) 100%)}
 .fh-top{display:flex;gap:20px;padding:22px 24px;flex-wrap:wrap;align-items:flex-start}

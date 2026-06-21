@@ -17,6 +17,9 @@ Orbit.MODULE_TITLES = {
   comisiones:    { icon: '💼', title: 'Orbit Comisiones', sub: 'Devengado y liquidado', features: ['Por asesor', 'Por aseguradora', 'Por periodo'] },
   historial:     { icon: '📝', title: 'Orbit Historial', sub: 'Actividades de la cartera', features: ['Llamadas', 'WhatsApp', 'Reuniones'] },
   importar:      { icon: '⬇', title: 'Orbit Importa', sub: 'Importación inteligente', features: ['Cualquier formato', 'Mapeo automático', 'Adaptable'] },
+  calidad:       { icon: '🩺', title: 'Calidad de datos', sub: 'Expedientes a completar', features: ['Prioridad teléfono', 'Clientes con póliza vigente', 'Notificar por WA/correo'] },
+  plantillas:    { icon: '✉', title: 'Plantillas de mensajes', sub: 'WhatsApp y correo', features: ['Propuestas', 'Primas pendientes', 'Actualización de datos'] },
+  finanzas:      { icon: '💰', title: 'Orbit Finanzas', sub: 'Liquidaciones y conciliación', features: ['Movimientos', 'Liquidación empresa/asesores', 'Conciliación bancaria'] },
   aseguradoras:  { icon: '🏢', title: 'Aseguradoras', sub: 'Directorio operativo', features: ['Fichas completas', 'Ejecutivos de cuenta', 'Documentos', 'Comisiones por ramo'] }
 };
 
@@ -61,7 +64,7 @@ Orbit.tenant = (function () {
     monedaBase: 'GTQ',
     branding: { logo: '', sidebar: 'oscuro', paleta: 'rojo', tipografia: 'Manrope' },
     // módulos activos (config INTERNA nuestra) — todos los del nav
-    modulosActivos: ['inicio', 'ops', 'leads', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'historial', 'comisiones', 'importar', 'reportes', 'aseguradoras', 'ia', 'academia', 'insights', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
+    modulosActivos: ['inicio', 'ops', 'leads', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'aseguradoras', 'ia', 'academia', 'insights', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
     addons: { make: false, drive: true, whatsapp: true },
     portalVisibility: { polizas: true, recibos: true, documentos: true, asesor: true, comisiones: false, drive: false },
     apis: []
@@ -104,6 +107,8 @@ Orbit.NAV = [
   {
     type: 'group', label: 'Datos e importación', open: false, items: [
       { route: 'importar', icon: '⬇', label: 'Importación inteligente', estado: 'beta' },
+      { route: 'calidad', icon: '🩺', label: 'Calidad de datos', estado: 'beta' },
+      { route: 'plantillas', icon: '✉', label: 'Plantillas de mensajes', estado: 'beta' },
       { route: 'reportes', icon: '📈', label: 'Reportes', estado: 'road' }
     ]
   },

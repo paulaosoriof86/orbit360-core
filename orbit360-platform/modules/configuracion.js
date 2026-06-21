@@ -165,9 +165,29 @@ Orbit.modules.configuracion = (function () {
   function interna() {
     const t = T().get();
     const nav = Orbit.NAV.flatMap(b => b.type === 'home' ? [{ route: b.route, label: b.label, icon: b.icon }] : b.items);
+    const planes = Object.values(Orbit.PLANES).concat(loadCustomPlans());
     return `${sectionHead('Configuración interna · Orbit', 'Solo nuestro equipo — provisioning del cliente')}
       <div class="cfg-int-banner">🔒 Esta sección NO es visible para el cliente. Aquí definimos plan, white-label y los <b>módulos activos</b> de cada cuenta.</div>
-      ${row('Plan del cliente', `<select class="o-sel" id="cf-plan">${Object.values(Orbit.PLANES).map(p => `<option value="${p.id}" ${t.plan === p.id ? 'selected' : ''}>${p.nombre}</option>`).join('')}</select>`, 'Cambia lo que el cliente puede personalizar')}
+
+      ${sectionHead('Planes comercializables', 'Importá tu catálogo o creá planes; editables por acuerdos y promociones')}
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn ghost sm" onclick="Orbit.importa.open('clientes',{})">⬇ Importar catálogo de planes</button>
+        <button class="btn primary sm" id="cf-plan-new">+ Crear plan</button>
+      </div>
+      <div class="card" style="overflow:hidden;margin-bottom:18px"><table class="tbl">
+        <thead><tr><th>Plan</th><th>Marca</th><th>Add-ons</th><th>APIs</th><th>Descripción</th><th></th></tr></thead>
+        <tbody>${planes.map(p => `<tr>
+          <td><b>${U.esc(p.nombre)}</b>${p.custom ? ' <span class="badge info">propio</span>' : ''}</td>
+          <td>${p.personalizacion ? '✓' : '—'}</td>
+          <td>${p.addons ? '✓' : '—'}</td>
+          <td>${p.apis ? '✓' : '—'}</td>
+          <td class="muted" style="font-size:12.5px">${U.esc(p.desc)}</td>
+          <td style="text-align:right"><button class="btn ghost sm" onclick="alert('Demo: editar funcionalidades, precio y vigencia del plan — ajustable por acuerdos comerciales o promociones.')">Editar</button></td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <div class="cfg-note" style="margin-bottom:18px">💡 Al asignar un plan al cliente se configuran de una vez sus funcionalidades; podés <b>modificar más o menos según acuerdos o promociones</b> sin cambiar el catálogo base.</div>
+
+      ${row('Plan del cliente', `<select class="o-sel" id="cf-plan">${planes.map(p => `<option value="${p.id}" ${t.plan === p.id ? 'selected' : ''}>${p.nombre}</option>`).join('')}</select>`, 'Cambia lo que el cliente puede personalizar')}
       ${sectionHead('Módulos activos por cliente', 'Enciende/apaga módulos de esta cuenta — el menú se ajusta solo')}
       <div class="cfg-mods">
         ${nav.map(it => {
@@ -180,6 +200,10 @@ Orbit.modules.configuracion = (function () {
         <button class="btn ghost" id="cf-reset" onclick="if(confirm('¿Restablecer configuración del cliente a valores por defecto?')){Orbit.tenant.reset();location.reload();}">Restablecer</button>
       </div>`;
   }
+  // planes propios (importados/creados), persistentes
+  const PKEY = 'orbit360_planes';
+  function loadCustomPlans() { try { const r = localStorage.getItem(PKEY); if (r) return JSON.parse(r); } catch (e) {} return []; }
+  function saveCustomPlans(d) { try { localStorage.setItem(PKEY, JSON.stringify(d)); } catch (e) {} }
 
   /* ---------- wiring ---------- */
   function wire(host) {
@@ -198,6 +222,16 @@ Orbit.modules.configuracion = (function () {
     // plan interno
     const pl = document.getElementById('cf-plan');
     if (pl) pl.addEventListener('change', () => { T().setDeep('plan', pl.value); paint(host); });
+    // crear plan propio
+    const np = document.getElementById('cf-plan-new');
+    if (np) np.addEventListener('click', () => {
+      const nombre = prompt('Nombre del nuevo plan comercializable:'); if (!nombre) return;
+      const cp = loadCustomPlans();
+      const id = 'plan-' + Date.now();
+      cp.push({ id, nombre, personalizacion: confirm('¿Incluye personalización de marca?'), addons: confirm('¿Incluye add-ons/integraciones?'), apis: confirm('¿Incluye APIs y auto-branding?'), desc: 'Plan propio — editable por acuerdos comerciales.', custom: true });
+      saveCustomPlans(cp);
+      paint(host);
+    });
     // módulos activos
     const save = document.getElementById('cf-mods-save');
     if (save) save.addEventListener('click', () => {
