@@ -55,7 +55,7 @@ Orbit.modules.cancelaciones = (function () {
           <thead><tr><th>Fecha</th><th>Cliente</th><th>Póliza</th><th>Ramo</th><th>Motivo</th><th class="num">Valor perdido</th></tr></thead>
           <tbody>${rows.map(c => {
             const p = S().get('polizas', c.polizaId);
-            return `<tr>
+            return `<tr class="clickable" onclick="${p ? `Orbit.modules.cliente360.verPoliza('${c.polizaId}')` : `location.hash='#/cliente360?c=${c.clienteId}'`}">
               <td style="font-size:12.5px">${U.fmtDate(c.fecha)}</td>
               <td>${K.clienteCell(c.clienteId)}</td>
               <td><span class="mono" style="font-size:12px">${p ? p.numero : '—'}</span></td>

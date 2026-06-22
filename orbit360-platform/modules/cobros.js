@@ -62,7 +62,7 @@ Orbit.modules.cobros = (function () {
           <thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th></tr></thead>
           <tbody>${r.map(c => {
             const p = S().get('polizas', c.polizaId);
-            return `<tr>
+            return `<tr class="clickable" onclick="${p ? `Orbit.modules.cliente360.verPoliza('${c.polizaId}')` : `location.hash='#/cliente360?c=${c.clienteId}'`}">
               <td>${K.clienteCell(c.clienteId)}</td>
               <td><span class="mono" style="font-size:12px">${p ? p.numero : '—'}</span></td>
               <td>${c.cuota}</td>

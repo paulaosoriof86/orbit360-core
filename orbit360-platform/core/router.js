@@ -21,7 +21,7 @@ Orbit.router = (function () {
   // ---- sidebar ----
   function buildSidebar() {
     let h = '';
-    const active = (r) => !(Orbit.tenant && Orbit.tenant.isActive) || Orbit.tenant.isActive(r);
+    const active = (r) => (!(Orbit.tenant && Orbit.tenant.isActive) || Orbit.tenant.isActive(r)) && (!(Orbit.session && Orbit.session.canSee) || Orbit.session.canSee(r));
     Orbit.NAV.forEach(blk => {
       if (blk.type === 'home') {
         if (!active(blk.route)) return;
@@ -50,7 +50,7 @@ Orbit.router = (function () {
     });
     h += `<hr class="nav-divider">
       <div class="nav-foot">
-        Datos de demostración · ficticios.<br>Marca de producto <b style="color:#fff">Orbit 360</b>.
+        Marca de producto <b style="color:#fff">Orbit 360</b>.
         <div class="pwa"><span>📲</span><span>Instalable como <b>app (PWA)</b></span></div>
       </div>`;
     sidebar.innerHTML = h;
@@ -86,7 +86,7 @@ Orbit.router = (function () {
         <h2>${U.esc(m.title)}</h2>
         <p>${U.esc(m.desc)}</p>
         <ul class="scope">${m.scope.map(s => `<li>${U.esc(s)}</li>`).join('')}</ul>
-        <p style="margin-top:20px;font-size:13px" class="muted">Alcance objetivo documentado en <code>ORBIT360-BUILD.md</code>. Este módulo se construye según el orden del build; el núcleo CRM está activo.</p>
+        <p style="margin-top:20px;font-size:13px" class="muted">Módulo en construcción según el plan del producto; el núcleo CRM está activo.</p>
       </div></div>`;
   }
 

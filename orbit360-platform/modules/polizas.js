@@ -46,8 +46,8 @@ Orbit.modules.polizas = (function () {
       <div class="card" style="overflow:hidden">
         ${K.filterBar(FDEFS(), st)}
         <div style="overflow-x:auto"><table class="tbl">
-          <thead><tr><th>Póliza</th><th>Cliente</th><th>Ramo / Producto</th><th>Aseguradora</th><th>Asesor</th><th class="num">Prima</th><th>Vence</th><th>Estado</th></tr></thead>
-          <tbody>${r.map(p => `<tr>
+          <thead><tr><th>Póliza</th><th>Cliente</th><th>Ramo / Producto</th><th>Aseguradora</th><th>Asesor</th><th class="num">Prima</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
+          <tbody>${r.map(p => `<tr class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')">
             <td><span class="mono" style="font-size:12.5px;font-weight:600">${p.numero}</span><div class="muted" style="font-size:11px">${p.forma}</div></td>
             <td>${K.clienteCell(p.clienteId)}</td>
             <td><b>${p.ramo}</b><div class="muted" style="font-size:12px">${p.producto}</div></td>
@@ -55,7 +55,8 @@ Orbit.modules.polizas = (function () {
             <td>${K.asesorCell(p.asesorId)}</td>
             <td class="num">${U.money(p.prima, p.moneda)}</td>
             <td style="font-size:12.5px">${U.fmtDate(p.vigenciaFin)}</td>
-            <td>${U.estadoBadge(p.estado)}</td></tr>`).join('') || emptyRow(8)}</tbody>
+            <td>${U.estadoBadge(p.estado)}</td>
+            <td style="text-align:right;color:var(--ink-3)">›</td></tr>`).join('') || emptyRow(9)}</tbody>
         </table></div>
       </div></div>`;
 

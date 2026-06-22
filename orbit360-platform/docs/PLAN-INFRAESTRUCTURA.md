@@ -242,7 +242,8 @@ Flujo del ciclo (vincula y sincroniza en vivo, comparte datos que luego hereda C
 - **Videos embebidos + formato + emojis** en Academia y Notificaciones.
 
 ## Estado de implementación de Ronda 5
-- TODO PENDIENTE (documentado). Próximo chat retoma por aquí, priorizando: (a) fixes UI ficha/tabs + quitar notas técnicas, (b) **rediseño fichas Ops/Leads + ciclo completo + solicitar gestión**, (c) Finanzas import/metas, (d) Integraciones (Outlook), (e) Academia + Marketing + Reportes + IA + Portal, (f) responsive global.
+- **HECHO (v0.9)**: (a) fixes UI ficha/tabs (indicador "hay más") + quitar notas técnicas; (b) **rediseño fichas Ops/Leads + ciclo completo** (negocios proyectados a dos tableros, sincronía en vivo, automatizaciones de cadencia, emisión→crea cliente, listas espejo Inspección/Emisión en Leads) + **multi-rol "ver como"** (asesor no ve Ops) + **solicitar gestión** desde la ficha del cliente; títulos de listas con emoji+color.
+- **PENDIENTE**: listas Ops/Leads *editables/reordenables por el cliente* + automatizaciones por lista (hoy las listas son fijas, el flujo sí es completo); (c) Finanzas import/metas (recaudo/ventas/producción); (d) Integraciones (Outlook prioritario); (e) Academia + Marketing + Reportes + IA + Portal; (f) responsive global; renovaciones multi-aseguradora; calidad de datos edición inline; WhatsApp Web.
 
 > **Definición de "1.0 comercializable" (cuando aviso para arrancar A&S)**: pasos 3 y 4 completos + Finanzas operativa + Ops/Leads + Aseguradoras configurables. Cotizador se integra después, ya sobre A&S.
 

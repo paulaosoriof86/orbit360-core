@@ -2,6 +2,46 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.10.0] — 2026-06-21 · Ronda 5 (2/n): catálogos, listas editables, notificaciones, confidencialidad
+### Added — Catálogos configurables (`Orbit.cat`)
+- Catálogos persistentes y editables: **canales** (redes sociales, conocido, referido, cliente actual/antiguo, web…), **ramos**, **productos**, **prioridades**, **tipos de gestión**. Todo desplegable para alimentar analítica.
+- **Opción "➕ Otro…"** en los desplegables del ciclo: al elegirla se agrega el valor al catálogo (persistente).
+### Added — Listas de Ops y Leads EDITABLES
+- Botón **⚙ Listas** en ambos tableros → **crear, renombrar, recolorear, reordenar y eliminar** listas. Las del ciclo (atadas a etapa) se editan pero no se eliminan; al renombrar una lista de gestiones se migran sus tarjetas. Listas personalizadas de Leads aceptan negocios vía selector "Columna en Leads".
+### Added — Notificaciones (WhatsApp / correo) + Portal del cliente
+- `Orbit.ciclo.notify()`: al **solicitar** una gestión (equipo o cliente) y al **resolverla** se notifica al asesor con **toast + enlaces a WhatsApp y correo**; queda registro en `avisos`.
+- **Solicitud del cliente** (🙋): crea la gestión en Ops con origen "Solicitud del cliente" y notifica.
+- **Adjuntos de soporte** en Solicitar gestión (drag&drop; se listan en la ficha).
+### Added — Mi Día · seguimientos manuales
+- Sección **"Seguimientos de hoy"** en Inicio: negocios sin cadencia con toque vencido/hoy y botón directo a **WhatsApp** (o correo).
+### Changed
+- **Cadencias** = seguimiento por **WhatsApp** y, en su ausencia, **correo** (no llamadas por defecto).
+- **Ficha de gestión**: **Responsable** (por defecto asesor, seleccionable); **Nota debajo del checklist**; tipo/estado con "Otro".
+- **País con bandera** en tarjetas + seleccionable.
+- **Ficha del cliente**: se quitó "Importar estado de cuenta"; **pólizas y vehículos abren detalle** (drawer + renovar/comparar/solicitar gestión).
+- **CRM**: filas de **Pólizas, Cobros y Cancelaciones** abren detalle.
+### Added — Seguridad
+- **Acuerdo de confidencialidad** obligatorio en el primer ingreso (aceptar + se almacena fecha/usuario).
+
+## [0.9.0] — 2026-06-21 · Ronda 5 (1/n): Ops+Leads ciclo completo, multi-rol, solicitar gestión
+### Added — Motor del ciclo comercial (`core/ciclo.js`)
+- **Modelo unificado `negocios`**: una sola oportunidad se **proyecta en dos tableros** (Ops equipo / Leads asesor) según su **etapa canónica** (nuevo → contactado → cotizando → propuesta → negociación → inspección → emisión → emitido). **Sincronización en vivo**: cambiar la etapa en cualquier lado se refleja al instante en el otro (misma fuente de datos + listeners).
+- **Automatizaciones**: al **enviar propuesta** se activa la **cadencia** de seguimiento; al cotizar se genera N.º de cotización; al **emitir** se **crea el cliente** heredando datos + se activa **cadencia de encuestas de satisfacción**.
+- **Cierre con decisión** (Inspección o Emisión) → **reaparece en Ops sin salir de Leads** (listas espejo Inspección/Emisión en Leads, solo lectura para el asesor).
+- **Bitácora estructurada** + **comentarios** + **checklist** por negocio y por gestión.
+### Changed — Orbit Ops (`modules/ops.js`) y Orbit Leads (`modules/leads.js`) — rediseño
+- **Listas con emoji + color** por columna (cabecera `.kcol-h2`). Ops = tablero **interno** (Cotizaciones/Inspecciones/Emisiones del ciclo + Gestiones Admin + Renov./Modif.). Leads = **vista del asesor** con listas espejo y subtotales.
+- Tarjetas clickeables a **ficha rediseñada** (drawer con **stepper de etapas**, datos editables, indicador de **sincronización** Ops↔Leads, cadencia, bitácora, acciones de etapa contextuales).
+- Ambos tableros **re-renderizan en vivo** ante cualquier cambio del ciclo.
+### Added — Multi-rol "ver como" (`Orbit.session`)
+- Selector de **rol activo** en la topbar. Con rol **Asesor** se **oculta Orbit Ops** (interno) y se filtra el pipeline a sus negocios; ve las etapas operativas vía Leads. El router respeta `session.canSee()`.
+### Added — Solicitar gestión desde la ficha del cliente
+- Botón **🗂 Gestión** en la ficha (y por póliza en Renovaciones): elige **tipo** (con opción de **crear otro**), nota y póliza → crea la gestión en **Orbit Ops** en la lista correcta, asociada al cliente/póliza, con bitácora y checklist. Deja rastro en el historial del cliente.
+### Fixed — UI
+- **Tabs de la ficha** ahora con **indicador "hay más"** (degradado + flecha que aparece al desbordar y desplaza; lleva la pestaña activa a la vista).
+- **Quitadas notas técnicas** visibles (login "DEMO", pie del sidebar, "capa de datos/localStorage", referencias de build, confirmaciones "(demo)").
+- Seed `__v=10`: colección `negocios` (14) + `gestiones` admin/renov (9); se retira `leads` legacy.
+
 ## [0.8.0] — 2026-06-21 · Ops + Leads, Finanzas avanzada, Novedades, Renovación IA
 ### Added — Ops + Leads (`modules/ops.js`, `modules/leads.js`)
 - **Orbit Ops**: kanban operativo (Gestiones Admin, Cotizaciones, Inspecciones, Emisiones, Renovaciones/Modif.), **sin prospectos**, listas personalizables, tarjetas clickeables, enlace a Leads.

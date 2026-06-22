@@ -251,51 +251,106 @@ Orbit.SEED = (function () {
     }
   });
 
-  // ---- Leads (pipeline comercial) + Gestiones Ops (operativo) ----
-  const leads = [], gestiones = [];
-  const leadEtapas = ['Nuevo', 'Contactado', 'Cotizando', 'Propuesta', 'Cierre'];
+  // ====================================================================
+  //  CICLO COMERCIAL UNIFICADO — negocios (oportunidades) + gestiones Ops
+  //  Un mismo "negocio" se proyecta en DOS tableros:
+  //   · Orbit Ops (interno): Cotizaciones, Inspecciones, Emisiones
+  //   · Orbit Leads (asesor): Nuevo → Contactado → … → Cierre
+  //  La etapa canónica determina en qué lista aparece en cada tablero.
+  //  Las gestiones administrativas (Gestiones Admin / Renov.-Modif.) son
+  //  operativas y NO son prospectos.
+  // ====================================================================
+  const negocios = [], gestiones = [], leads = [];
+  const etapasCanon = ['nuevo', 'contactado', 'cotizando', 'propuesta', 'negociacion', 'inspeccion', 'emision', 'emitido', 'perdido'];
+  const probDe = { nuevo: 10, contactado: 25, cotizando: 45, propuesta: 65, negociacion: 78, inspeccion: 85, emision: 92, emitido: 100, perdido: 0 };
   const leadCanales = ['Referido', 'Web', 'WhatsApp', 'Campaña', 'Facebook', 'Telemarketing'];
   const ramosLead = ['Auto', 'Vida', 'Gastos Médicos', 'Hogar', 'Daños', 'RC'];
-  const nombresLead = ['Andrea Solís', 'Bytes Solutions S.A.', 'Carlos Méndez', 'Mariana Téllez', 'Grupo Lumen', 'Pedro Ramírez', 'Inmobiliaria Cresta', 'Verónica Aguilar', 'Tech Andina Ltda.', 'José Morales', 'Clínica Vida', 'Laura Bonilla'];
-  for (let i = 0; i < 12; i++) {
-    const ase = pick(asesores), et = pick(leadEtapas);
-    const prob = { 'Nuevo': 10, 'Contactado': 25, 'Cotizando': 45, 'Propuesta': 70, 'Cierre': 90 }[et];
+  const prospectos = [
+    ['Andrea Solís', 'Persona'], ['Bytes Solutions S.A.', 'Empresa'], ['Carlos Méndez', 'Persona'],
+    ['Mariana Téllez', 'Persona'], ['Grupo Lumen', 'Empresa'], ['Pedro Ramírez', 'Persona'],
+    ['Inmobiliaria Cresta', 'Empresa'], ['Verónica Aguilar', 'Persona'], ['Tech Andina Ltda.', 'Empresa'],
+    ['José Morales', 'Persona'], ['Clínica Vida', 'Empresa'], ['Laura Bonilla', 'Persona'],
+    ['Ricardo Salguero', 'Persona'], ['Comercial El Faro', 'Empresa']
+  ];
+  // distribución intencional por etapa para un pipeline realista
+  const distEtapas = ['nuevo', 'nuevo', 'contactado', 'cotizando', 'cotizando', 'propuesta', 'propuesta', 'negociacion', 'inspeccion', 'emision', 'emitido', 'emitido', 'perdido', 'contactado'];
+  const cadencias = ['Día 1 · llamada de bienvenida', 'Día 3 · WhatsApp de seguimiento', 'Día 7 · correo con propuesta', 'Día 14 · llamada de cierre'];
+  prospectos.forEach((pr, i) => {
+    const [nombre, tipo] = pr;
+    const ase = pick(asesores);
+    const et = distEtapas[i] || pick(etapasCanon);
     const pais = rnd() > .4 ? 'GT' : 'CO';
-    leads.push({
-      id: id('lead', i + 1), nombre: nombresLead[i], etapa: et, asesorId: ase.id,
-      canal: pick(leadCanales), ramo: pick(ramosLead), pais, moneda: pais === 'GT' ? 'GTQ' : 'COP',
+    const ramo = pick(ramosLead);
+    const asg = pick(aseguradoras.filter(a => a.pais === pais).length ? aseguradoras.filter(a => a.pais === pais) : aseguradoras);
+    const origen = (et === 'cotizando' || rnd() > .55) ? 'Ops' : 'Leads';
+    const creado = iso(addDays(NOW, -between(1, 38)));
+    const avanzado = ['propuesta', 'negociacion', 'inspeccion', 'emision', 'emitido'].includes(et);
+    const bit = [{ ts: creado + ' 09:12', user: ase.nombre, campo: 'Creación', de: '', a: 'Ingreso (' + origen + ')', origen: 'manual' }];
+    if (avanzado) bit.push({ ts: iso(addDays(NOW, -between(1, 8))) + ' 11:40', user: ase.nombre, campo: 'Etapa', de: 'cotizando', a: et, origen: 'manual' });
+    negocios.push({
+      id: id('neg', i + 1), nombre, tipo, etapa: et, prob: probDe[et],
+      asesorId: ase.id, canal: pick(leadCanales),
+      pais, moneda: pais === 'GT' ? 'GTQ' : 'COP',
+      producto: pick(productos[ramo] || ['Plan estándar']), ramo,
+      aseguradoraId: asg.id,
+      telefono: (pais === 'GT' ? '+502 ' : '+57 ') + between(3000, 3999) + ' ' + between(1000, 9999),
+      email: nombre.toLowerCase().normalize('NFD').replace(/[^a-z ]/g, '').trim().split(' ').slice(0, 2).join('.') + (tipo === 'Empresa' ? '@empresa.com' : '@correo.com'),
       primaEst: (pais === 'CO' ? between(1, 14) * 1000000 : between(1200, 16000)),
-      prob, proximoToque: iso(addDays(NOW, between(-3, 12))),
-      cadencia: pick(['Día 1 · llamada', 'Día 3 · WhatsApp', 'Día 7 · correo', 'Día 14 · cierre']),
-      creado: iso(addDays(NOW, -between(1, 40)))
+      descripcion: pick(['Marca, modelo y año del vehículo; coberturas solicitadas.', 'Grupo familiar de 4; busca cobertura internacional.', 'Inmueble comercial; multirriesgo PYME.', 'Renovación con mejora de suma asegurada.', 'Flotilla de 6 vehículos de reparto.']),
+      notas: '',
+      cadencia: avanzado ? pick(cadencias) : '',
+      cadenciaActiva: ['propuesta', 'negociacion'].includes(et),
+      proximoToque: iso(addDays(NOW, between(-3, 10))),
+      vence: iso(addDays(NOW, between(-2, 14))),
+      prioridad: pick(['Alta', 'Media', 'Baja']),
+      decision: et === 'inspeccion' ? 'inspeccion' : et === 'emision' ? 'emision' : '',
+      nroCotizacion: ['cotizando', 'propuesta', 'negociacion', 'inspeccion', 'emision', 'emitido'].includes(et) ? 'COT-' + between(1000, 9999) : '',
+      nroPoliza: et === 'emitido' ? (pais === 'GT' ? 'GT-' : 'CO-') + asg.id.slice(-2).toUpperCase() + '-' + between(10000, 99999) : '',
+      checklist: [
+        { t: 'Datos completos para cotizar', done: et !== 'nuevo' },
+        { t: 'Cotización enviada al cliente', done: ['propuesta', 'negociacion', 'inspeccion', 'emision', 'emitido'].includes(et) },
+        { t: 'Documentos del riesgo recibidos', done: ['inspeccion', 'emision', 'emitido'].includes(et) },
+        { t: 'Inspección / avalúo realizado', done: ['emision', 'emitido'].includes(et) }
+      ],
+      clienteIdCreado: '', archivado: false,
+      etiquetas: [], bitacora: bit,
+      comentarios: avanzado && rnd() > .6 ? [{ ts: iso(addDays(NOW, -between(1, 5))) + ' 15:20', user: ase.nombre, texto: 'Cliente pidió comparar con otra aseguradora.' }] : [],
+      creado, actualizado: iso(NOW)
     });
-  }
-  // Gestiones Ops (operativas — SIN prospectos; eso es Leads)
-  const opsListas = ['Gestiones Admin', 'Cotizaciones', 'Inspecciones', 'Emisiones', 'Renovaciones / Modif.'];
-  const opsTitulos = {
-    'Gestiones Admin': ['Actualizar datos de cliente', 'Solicitud de cancelación', 'Endoso de beneficiario', 'Carta de no adeudo'],
-    'Cotizaciones': ['Cotizar Auto Total', 'Cotizar Gastos Médicos familiar', 'Cotización flotilla'],
-    'Inspecciones': ['Inspección vehículo nuevo', 'Avalúo de inmueble', 'Inspección pre-póliza'],
-    'Emisiones': ['Emitir póliza Auto', 'Emitir Vida temporal', 'Emisión Hogar Plus'],
-    'Renovaciones / Modif.': ['Renovación Auto', 'Modificar suma asegurada', 'Cambio de aseguradora']
-  };
-  let gn = 0;
-  opsListas.forEach(lista => {
-    const n = between(2, 4);
-    for (let i = 0; i < n; i++) {
-      gn++;
-      const ase = pick(asesores), asg = pick(aseguradoras), cli = pick(clientes);
-      const prioridad = pick(['Alta', 'Media', 'Baja']);
-      const fromLead = lista === 'Cotizaciones' && rnd() > .5 ? pick(leads).id : null;
-      gestiones.push({
-        id: id('ges', gn), lista, titulo: pick(opsTitulos[lista]),
-        clienteId: cli.id, asesorId: ase.id, aseguradoraId: asg.id, ramo: pick(ramosLead),
-        prioridad, vence: iso(addDays(NOW, between(-2, 10))),
-        checklist: between(0, 3), checklistTotal: 3, leadId: fromLead,
-        creado: iso(addDays(NOW, -between(0, 20)))
-      });
-    }
   });
+
+  // Gestiones operativas (NO prospectos): admin + renovaciones/modificaciones.
+  const tiposAdmin = ['Actualizar datos de cliente', 'Endoso de beneficiario', 'Carta de no adeudo', 'Emisión de certificado', 'Solicitud de cancelación'];
+  const tiposRenov = ['Renovación de póliza', 'Modificar suma asegurada', 'Sustitución de vehículo', 'Solicitar condiciones de renovación', 'Cambio de propietario'];
+  let gn = 0;
+  function makeGestion(lista, titulo) {
+    gn++;
+    const cli = pick(clientes);
+    const pols = polizas.filter(p => p.clienteId === cli.id);
+    const pol = pols.length ? pick(pols) : null;
+    const creado = iso(addDays(NOW, -between(0, 18)));
+    return {
+      id: id('ges', gn), lista, tipo: titulo, titulo,
+      clienteId: cli.id, polizaId: pol ? pol.id : '',
+      asesorId: cli.asesorId, aseguradoraId: pol ? pol.aseguradoraId : pick(aseguradoras).id,
+      ramo: pol ? pol.ramo : pick(ramosLead),
+      estado: pick(['Pendiente', 'En proceso', 'Pendiente']),
+      prioridad: pick(['Alta', 'Media', 'Baja']),
+      vence: iso(addDays(NOW, between(-2, 12))),
+      proximaAccion: pick(['Llamar al ejecutivo', 'Solicitar documento', 'Confirmar con cliente', 'Cargar a plataforma aseguradora']),
+      checklist: [
+        { t: 'Solicitud recibida', done: true },
+        { t: 'Documentación completa', done: rnd() > .5 },
+        { t: 'Enviado a aseguradora', done: rnd() > .7 }
+      ],
+      nota: '', notas: '', origen: 'manual',
+      bitacora: [{ ts: creado + ' 10:05', user: pick(asesores).nombre, campo: 'Creación', de: '', a: 'Gestión creada', origen: 'manual' }],
+      comentarios: [],
+      creado, actualizado: iso(NOW), archivado: false
+    };
+  }
+  for (let i = 0; i < 5; i++) gestiones.push(makeGestion('Gestiones Admin', pick(tiposAdmin)));
+  for (let i = 0; i < 4; i++) gestiones.push(makeGestion('Renovaciones / Modif.', pick(tiposRenov)));
 
   // novedades / incentivos
   const novedades = [
@@ -306,8 +361,8 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 9,
+    __v: 10,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
-    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, leads, gestiones, novedades
+    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades
   };
 })();

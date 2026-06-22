@@ -1,59 +1,75 @@
 /* ============================================================
-   Orbit 360 · Orbit Ops  — BETA (kanban operativo)
-   Gestiones operativas del intermediario (NO prospectos — eso
-   vive en Leads). Listas personalizables, tarjetas clickeables,
-   enlace con Leads (una cotización puede nacer de un lead).
+   Orbit 360 · Orbit Ops — tablero operativo (kanban, vista equipo)
+   Proyecta el ciclo comercial (Cotizaciones/Inspecciones/Emisiones)
+   + gestiones administrativas. Sincronizado EN VIVO con Orbit Leads.
+   El asesor NO ve este tablero (vista interna del equipo).
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.ops = (function () {
-  const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
-  const COLS = ['Gestiones Admin', 'Cotizaciones', 'Inspecciones', 'Emisiones', 'Renovaciones / Modif.'];
-  const COLOR = { 'Gestiones Admin': '#1f3a5f', 'Cotizaciones': '#C5162E', 'Inspecciones': '#c9821b', 'Emisiones': '#1f8a4c', 'Renovaciones / Modif.': '#6b4ea0' };
+  const U = Orbit.ui, K = Orbit.kit, C = () => Orbit.ciclo;
+  let host, unsub;
 
-  function render(host) {
-    const ges = S().all('gestiones');
+  function render(h) {
+    host = h;
+    // multi-rol: el asesor no accede a Ops
+    if (Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor()) { restricted(); return; }
+    draw();
+    if (!unsub) {
+      const re = () => { if (Orbit.route && Orbit.route.key === 'ops' && document.body.contains(host)) { if (Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor()) restricted(); else draw(); } };
+      const u1 = Orbit.store.on(re);
+      const f = () => re();
+      document.addEventListener('orbit:ciclo', f);
+      document.addEventListener('orbit:pais', f);
+      unsub = () => { u1(); document.removeEventListener('orbit:ciclo', f); document.removeEventListener('orbit:pais', f); };
+    }
+  }
+
+  function restricted() {
+    host.innerHTML = `<div class="page">${K.bannerFor('ops', '')}
+      <div class="modstate"><div class="ms-ico">🔒</div>
+        <h2>Tablero interno del equipo</h2>
+        <p>Orbit Ops concentra la operación técnica del intermediario. Con el rol <b>Asesor</b> das seguimiento a tus gestiones desde <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/leads'">Orbit Leads</a>, que refleja en vivo las etapas operativas (cotización, inspección, emisión).</p>
+        <button class="btn primary" style="margin-top:14px" onclick="location.hash='#/leads'">Ir a Orbit Leads →</button>
+      </div></div>`;
+  }
+
+  function draw() {
+    const board = C().opsBoard();
+    const totNeg = board.filter(c => c.def.kind === 'negocio').reduce((s, c) => s + c.items.length, 0);
+    const totGes = board.filter(c => c.def.kind === 'gestion').reduce((s, c) => s + c.items.length, 0);
     host.innerHTML = `<div class="page">
-      ${K.bannerFor('ops', `<button class="btn primary" onclick="alert('Demo: nueva gestión operativa')">+ Nueva gestión</button>`)}
-      <div class="cfg-note" style="margin-bottom:14px">🗂 Tablero operativo (kanban). Las <b>listas son personalizables</b> por el cliente. <b>No incluye prospectos</b> — esos viven en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/leads'">Orbit Leads</a>, enlazado con Ops.</div>
+      ${K.bannerFor('ops', `<button class="btn ghost" id="op-lists">⚙ Listas</button><button class="btn ghost" id="op-new-ges">+ Gestión</button><button class="btn primary" id="op-new-neg">+ Nuevo ingreso</button>`)}
+      <div class="ops-legend">
+        <span class="muted">Tablero operativo en vivo · <b>${totNeg}</b> negocios en flujo · <b>${totGes}</b> gestiones</span>
+        <span class="ops-sync">🔁 Sincronizado con Orbit Leads</span>
+      </div>
       <div class="kanban">
-        ${COLS.map(col => {
-          const items = ges.filter(g => g.lista === col);
-          return `<div class="kcol">
-            <div class="kcol-h" style="border-top:3px solid ${COLOR[col]}">
-              <b>${col}</b><span class="kcount">${items.length}</span>
-            </div>
-            <div class="kcol-body">
-              ${items.map(g => card(g)).join('') || '<div class="kempty">Sin gestiones</div>'}
-              <button class="kadd" onclick="alert('Demo: agregar a ${col}')">+ Agregar</button>
-            </div>
-          </div>`;
-        }).join('')}
+        ${board.map(col => kcol(col)).join('')}
       </div>
     </div>`;
-    host.querySelectorAll('[data-ges]').forEach(el => el.addEventListener('click', () => {
-      const g = S().get('gestiones', el.dataset.ges);
-      if (g && g.clienteId) location.hash = '#/cliente360?c=' + g.clienteId;
+    C().wireCards(host);
+    host.querySelector('#op-lists').addEventListener('click', () => C().gestionarListas('opsListas'));
+    host.querySelector('#op-new-ges').addEventListener('click', () => C().nuevaGestion());
+    host.querySelector('#op-new-neg').addEventListener('click', () => C().nuevoNegocio());
+    host.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
+      b.dataset.add === 'gestion' ? C().nuevaGestion() : C().nuevoNegocio();
     }));
   }
 
-  function card(g) {
-    const cli = S().get('clientes', g.clienteId), ase = q.asesor(g.asesorId), asg = q.aseguradora(g.aseguradoraId);
-    const d = U.daysFromNow(g.vence);
-    const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[g.prioridad];
-    return `<div class="kcard" data-ges="${g.id}">
-      <div class="kcard-top"><span class="badge ${pr}">${g.prioridad}</span>${g.leadId ? '<span class="badge info" title="Originada en un lead">🔗 Lead</span>' : ''}</div>
-      <div class="kcard-t">${U.esc(g.titulo)}</div>
-      <div class="kcard-cli">${cli ? U.esc(cli.nombre) : '—'}</div>
-      <div class="kcard-meta">
-        <span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${asg ? U.esc(asg.nombre) : ''}</span>
+  function kcol(col) {
+    const L = col.def;
+    const cards = col.items.map(it => it.kind === 'negocio' ? C().cardNegocio(it.rec, { board: 'ops' }) : C().cardGestion(it.rec)).join('');
+    return `<div class="kcol">
+      <div class="kcol-h2" style="--lc:${L.color}">
+        <span class="kcol-emoji">${L.emoji}</span><b>${L.nombre}</b><span class="kcount">${col.items.length}</span>
       </div>
-      <div class="kcard-foot">
-        <span title="${U.esc(ase ? ase.nombre : '')}">${U.avatar(ase ? ase.nombre : '?', ase ? ase.color : '#999', 'sm')}</span>
-        <span class="kchk">✓ ${g.checklist}/${g.checklistTotal}</span>
-        <span class="kvence ${d < 0 ? 'over' : ''}">${d < 0 ? (-d) + 'd' : d + 'd'}</span>
+      <div class="kcol-body">
+        ${cards || '<div class="kempty">Sin tarjetas</div>'}
+        <button class="kadd" data-add="${L.kind}">+ ${L.kind === 'gestion' ? 'Gestión' : 'Ingreso'}</button>
       </div>
     </div>`;
   }
+
   return { render };
 })();

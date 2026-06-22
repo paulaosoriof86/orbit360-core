@@ -57,6 +57,92 @@ Orbit.ROLES = {
   'Asesor':    { nivel: 2, desc: 'Su cartera; ve solo su comisión.' },
   'Asistente': { nivel: 1, desc: 'Captura y gestión, sin comisiones ni config.' }
 };
+/* =========================================================
+   CATÁLOGOS configurables (para que TODO sea desplegable →
+   analítica). Persistentes; editables desde Configuración.
+   Cualquier desplegable ofrece "➕ Otro…" que agrega aquí.
+   ========================================================= */
+Orbit.cat = (function () {
+  const KEY = 'orbit360_cat';
+  const DEF = {
+    canales: ['Referido', 'Conocido', 'Cliente actual', 'Cliente antiguo', 'Web / sitio', 'WhatsApp', 'Facebook', 'Instagram', 'TikTok', 'LinkedIn', 'YouTube', 'Campaña', 'Telemarketing', 'Evento / feria'],
+    ramos: ['Auto', 'Vida', 'Gastos Médicos', 'Hogar', 'Daños', 'Fianzas', 'Transporte', 'RC', 'Accidentes'],
+    productos: ['Auto Total', 'Auto Plus', 'Auto Básico', 'Vida Entera', 'Vida Temporal', 'Salud Integral', 'Salud Familiar', 'Salud Premium', 'Hogar Protegido', 'Hogar Plus', 'Multirriesgo PYME', 'Responsabilidad Civil', 'Transporte de Carga', 'Fianza Cumplimiento', 'Accidentes Personales'],
+    prioridades: ['Alta', 'Media', 'Baja'],
+    tiposGestion: [
+      { t: 'Solicitar condiciones de renovación', lista: 'Renovaciones / Modif.' },
+      { t: 'Renovación de póliza', lista: 'Renovaciones / Modif.' },
+      { t: 'Modificar suma asegurada', lista: 'Renovaciones / Modif.' },
+      { t: 'Sustitución de vehículo', lista: 'Renovaciones / Modif.' },
+      { t: 'Cambio de propietario', lista: 'Renovaciones / Modif.' },
+      { t: 'Actualizar datos de cliente', lista: 'Gestiones Admin' },
+      { t: 'Endoso de beneficiario', lista: 'Gestiones Admin' },
+      { t: 'Solicitud de cancelación', lista: 'Gestiones Admin' },
+      { t: 'Carta de no adeudo', lista: 'Gestiones Admin' },
+      { t: 'Emisión de certificado', lista: 'Gestiones Admin' },
+      { t: 'Reclamo / Siniestro', lista: 'Gestiones Admin' }
+    ],
+    // Listas de los tableros — EDITABLES (crear/renombrar/recolor/reordenar/eliminar).
+    // Las marcadas fixed están atadas a una etapa del ciclo (no se eliminan, sí se renombran/recolor/reordenan).
+    opsListas: [
+      { id: 'l-admin', nombre: 'Gestiones Admin', emoji: '🗂', color: '#1f3a5f', kind: 'gestion' },
+      { id: 'l-cotiz', nombre: 'Cotizaciones', emoji: '🧮', color: '#c9821b', kind: 'negocio', etapa: 'cotizando', fixed: true },
+      { id: 'l-insp', nombre: 'Inspecciones', emoji: '🔍', color: '#0f766e', kind: 'negocio', etapa: 'inspeccion', fixed: true },
+      { id: 'l-emis', nombre: 'Emisiones', emoji: '📝', color: '#1f8a4c', kind: 'negocio', etapa: 'emision', fixed: true },
+      { id: 'l-renov', nombre: 'Renovaciones / Modif.', emoji: '🔄', color: '#6b4ea0', kind: 'gestion' }
+    ],
+    leadsListas: [
+      { id: 'q-nuevo', nombre: 'Nuevo', emoji: '🌱', color: '#6b7280', etapa: 'nuevo', fixed: true },
+      { id: 'q-cont', nombre: 'Contactado', emoji: '📞', color: '#1f3a5f', etapa: 'contactado', fixed: true },
+      { id: 'q-cotiz', nombre: 'Cotizando', emoji: '🧮', color: '#c9821b', etapa: 'cotizando', espejo: true, fixed: true },
+      { id: 'q-prop', nombre: 'Propuesta', emoji: '📨', color: '#6b4ea0', etapa: 'propuesta', fixed: true },
+      { id: 'q-nego', nombre: 'Negociación', emoji: '🤝', color: '#2563a8', etapa: 'negociacion', fixed: true },
+      { id: 'q-insp', nombre: 'Inspección', emoji: '🔍', color: '#0f766e', etapa: 'inspeccion', espejo: true, fixed: true },
+      { id: 'q-emis', nombre: 'Emisión', emoji: '📝', color: '#1f8a4c', etapa: 'emision', espejo: true, fixed: true },
+      { id: 'q-cierre', nombre: 'Cierre', emoji: '🏆', color: '#15803d', etapa: 'emitido', fixed: true }
+    ]
+  };
+  let d = null;
+  try { const r = localStorage.getItem(KEY); if (r) d = JSON.parse(r); } catch (e) {}
+  if (!d) d = JSON.parse(JSON.stringify(DEF));
+  // merge claves nuevas si la versión cambió en el código
+  Object.keys(DEF).forEach(k => { if (d[k] == null) d[k] = JSON.parse(JSON.stringify(DEF[k])); });
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} document.dispatchEvent(new CustomEvent('orbit:cat')); }
+  return {
+    get: (k) => d[k] || [],
+    all: () => d,
+    add: (k, v) => { if (!v) return; d[k] = d[k] || []; if (d[k].indexOf(v) < 0) { d[k].push(v); save(); } },
+    setList: (k, arr) => { d[k] = arr; save(); },
+    save,
+    reset: () => { d = JSON.parse(JSON.stringify(DEF)); save(); },
+    DEF
+  };
+})();
+
+/* =========================================================
+   SESSION — vista activa del usuario (multi-rol "ver como").
+   Un usuario puede tener varios roles; elige cuál tablero ver.
+   El asesor NO ve Orbit Ops (interno del equipo); ve sus
+   gestiones vía Orbit Leads. Persistente.
+   ========================================================= */
+Orbit.session = (function () {
+  const KEY = 'orbit360_sessionview';
+  const def = { rol: 'Dirección', asesorId: 'ase001' };
+  let d = null;
+  try { const r = localStorage.getItem(KEY); if (r) d = JSON.parse(r); } catch (e) {}
+  if (!d) d = JSON.parse(JSON.stringify(def));
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
+  function esAsesor() { return d.rol === 'Asesor'; }
+  return {
+    rol: () => d.rol,
+    asesorId: () => d.asesorId,
+    esAsesor,
+    verEmpresa: () => ['Dirección', 'Admin', 'Finanzas'].includes(d.rol),
+    canSee: (route) => !(esAsesor() && route === 'ops'),
+    set: (rol, asesorId) => { d.rol = rol; if (asesorId) d.asesorId = asesorId; save(); document.dispatchEvent(new CustomEvent('orbit:session')); }
+  };
+})();
+
 Orbit.tenant = (function () {
   const KEY = 'orbit360_tenant';
   const DEFAULT = {

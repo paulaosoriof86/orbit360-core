@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Orbit 360 · Plataforma</title>
-  <meta name="description" content="Orbit 360 — sistema 360 inteligente e integral para intermediarios de seguros. Demo con datos ficticios.">
+  <meta name="description" content="Orbit 360 — sistema 360 inteligente e integral para intermediarios de seguros.">
   <meta name="theme-color" content="#1E2227">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
   <!-- ============ LOGIN (white-label · palette-adaptive) ============ -->
   <div id="login">
     <div class="lg-left">
-      <span class="lg-reg">DEMO · DATOS FICTICIOS</span>
+      <span class="lg-reg">PLATAFORMA SEGURA · ACCESO DEL EQUIPO</span>
       <div class="lg-orbit">
         <div class="orbit-wrap">
           <div class="orbit-ring r2"></div>
@@ -93,11 +93,14 @@
       <span>🌎</span>
       <select id="pais-sel" aria-label="País"></select>
     </div>
+    <div class="tb-rol" id="tb-rol" title="Ver como (rol activo)">
+      <span>👁</span><select id="rol-sel" aria-label="Ver como"></select>
+    </div>
     <div class="tb-ico" id="sw-theme" title="Paleta de la marca"><span>🎨</span></div>
     <div class="tb-ico" id="nov-bell" title="Novedades"><span>🔔</span><span class="dot"></span><span id="nov-count" class="nov-count"></span></div>
-    <div class="tb-user" id="tb-user" title="Sesión demo">
+    <div class="tb-user" id="tb-user" title="Cuenta">
       <span class="av" style="background:linear-gradient(135deg,var(--red),var(--red-700))">PO</span>
-      <span class="who"><b>Paula Osorio</b><br><span>Dirección · salir</span></span>
+      <span class="who"><b>Paula Osorio</b><br><span id="tb-rol-lbl">Dirección · salir</span></span>
     </div>
   </header>
 
@@ -117,6 +120,7 @@
   <script src="core/config.js"></script>
   <script src="core/queries.js"></script>
   <script src="core/crmkit.js"></script>
+  <script src="core/ciclo.js"></script>
   <script src="core/importa.js"></script>
   <script src="core/novedades.js"></script>
   <script src="core/auth.js"></script>
@@ -163,8 +167,26 @@
       sw && sw.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { Orbit.theme.apply(b.dataset.p); }); });
     })();
 
+    // "ver como" — selector de rol activo (multi-rol)
+    (function () {
+      var sel = document.getElementById('rol-sel');
+      var lbl = document.getElementById('tb-rol-lbl');
+      var roles = Object.keys(Orbit.ROLES || { 'Dirección': 1 });
+      function paint() {
+        sel.innerHTML = roles.map(function (r) { return '<option' + (r === Orbit.session.rol() ? ' selected' : '') + '>' + r + '</option>'; }).join('');
+        if (lbl) lbl.textContent = Orbit.session.rol() + ' · salir';
+      }
+      paint();
+      sel.addEventListener('change', function (e) { e.stopPropagation(); Orbit.session.set(sel.value, 'ase001'); });
+      document.addEventListener('orbit:session', function () {
+        paint();
+        if (Orbit.router && Orbit.router.rebuildSidebar) Orbit.router.rebuildSidebar();
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
+      });
+    })();
+
     // logout
-    document.getElementById('tb-user').addEventListener('click', function () { if (confirm('¿Cerrar sesión? (demo)')) Orbit.auth.logout(); });
+    document.getElementById('tb-user').addEventListener('click', function () { if (confirm('¿Cerrar sesión?')) Orbit.auth.logout(); });
   </script>
 </body>
 </html>

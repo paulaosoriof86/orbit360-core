@@ -1,64 +1,71 @@
 /* ============================================================
-   Orbit 360 · Orbit Leads  — BETA (pipeline comercial)
-   Prospectos por etapa con probabilidad y CADENCIAS de
-   seguimiento. Enlazado con Ops: un lead en "Cotizando" genera
-   una gestión de cotización; al "Cierre" → convierte a cliente.
+   Orbit 360 · Orbit Leads — pipeline comercial (vista del asesor)
+   Mismo ciclo que Ops, proyectado por etapa. Listas espejo de las
+   etapas operativas (Cotizando/Inspección/Emisión) para que el
+   asesor sepa el avance sin entrar a Ops. Cadencias automáticas.
+   Sincronizado EN VIVO con Orbit Ops.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.leads = (function () {
-  const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
-  const ETAPAS = ['Nuevo', 'Contactado', 'Cotizando', 'Propuesta', 'Cierre'];
-  const COLOR = { 'Nuevo': '#767f8a', 'Contactado': '#1f3a5f', 'Cotizando': '#c9821b', 'Propuesta': '#6b4ea0', 'Cierre': '#1f8a4c' };
+  const U = Orbit.ui, K = Orbit.kit, C = () => Orbit.ciclo;
+  let host, unsub;
 
-  function render(host) {
-    const leads = S().all('leads');
-    const tot = leads.reduce((s, l) => s + q.norm(l.primaEst, l.moneda), 0);
-    const ponderado = leads.reduce((s, l) => s + q.norm(l.primaEst, l.moneda) * l.prob / 100, 0);
+  function render(h) {
+    host = h;
+    draw();
+    if (!unsub) {
+      const re = () => { if (Orbit.route && Orbit.route.key === 'leads' && document.body.contains(host)) draw(); };
+      const u1 = Orbit.store.on(re);
+      const f = () => re();
+      document.addEventListener('orbit:ciclo', f);
+      document.addEventListener('orbit:pais', f);
+      document.addEventListener('orbit:session', f);
+      unsub = () => { u1(); document.removeEventListener('orbit:ciclo', f); document.removeEventListener('orbit:pais', f); document.removeEventListener('orbit:session', f); };
+    }
+  }
+
+  function draw() {
+    const board = C().leadsBoard();
+    const m = C().metricasLeads();
+    const esAse = Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor();
     host.innerHTML = `<div class="page">
-      ${K.bannerFor('leads', `<button class="btn primary" onclick="alert('Demo: nuevo lead')">+ Nuevo lead</button>`)}
+      ${K.bannerFor('leads', `<button class="btn ghost" id="ld-lists">⚙ Listas</button><button class="btn primary" id="ld-new">+ Nuevo lead</button>`)}
       ${K.kpis([
-        { label: 'Leads activos', val: leads.length, color: 'var(--red)', foot: 'en pipeline' },
-        { label: 'Prima estimada', val: U.moneyShort(tot, 'GTQ'), color: 'var(--info)', foot: 'potencial' },
-        { label: 'Pronóstico ponderado', val: U.moneyShort(ponderado, 'GTQ'), color: 'var(--ok)', foot: 'por probabilidad', footTone: 'up' },
-        { label: 'En cierre', val: leads.filter(l => l.etapa === 'Cierre').length, color: 'var(--warn)', foot: 'por convertir' }
+        { label: 'Leads activos', val: m.activos, color: 'var(--red)', foot: esAse ? 'tu pipeline' : 'en pipeline' },
+        { label: 'Prima estimada', val: U.moneyShort(m.tot, 'GTQ'), color: 'var(--info)', foot: 'potencial' },
+        { label: 'Pronóstico ponderado', val: U.moneyShort(m.pond, 'GTQ'), color: 'var(--ok)', foot: 'por probabilidad', footTone: 'up' },
+        { label: 'Ganados (emitidos)', val: m.ganados, color: 'var(--warn)', foot: 'cierre del mes' }
       ])}
-      <div class="cfg-note" style="margin-bottom:14px">🎯 Pipeline con <b>cadencias automáticas</b> de seguimiento. <b>Enlazado con Ops</b>: al cotizar se crea una gestión; al cerrar, el lead <b>se convierte en cliente</b> heredando sus datos (sin recapturar).</div>
+      <div class="ops-legend">
+        <span class="muted">🎯 Pipeline con <b>cadencias automáticas</b> al enviar propuesta · <span class="kmirror" style="position:static">🔗 en Ops</span> = el equipo lo está gestionando</span>
+        <span class="ops-sync">🔁 Sincronizado con Orbit Ops</span>
+      </div>
       <div class="kanban">
-        ${ETAPAS.map(et => {
-          const items = leads.filter(l => l.etapa === et);
-          const subt = items.reduce((s, l) => s + q.norm(l.primaEst, l.moneda), 0);
-          return `<div class="kcol">
-            <div class="kcol-h" style="border-top:3px solid ${COLOR[et]}">
-              <b>${et}</b><span class="kcount">${items.length}</span>
-            </div>
-            <div class="ksub">${U.moneyShort(subt, 'GTQ')}</div>
-            <div class="kcol-body">
-              ${items.map(l => card(l)).join('') || '<div class="kempty">—</div>'}
-            </div>
-          </div>`;
-        }).join('')}
+        ${board.map(col => kcol(col)).join('')}
       </div>
     </div>`;
-    host.querySelectorAll('[data-lead]').forEach(el => el.addEventListener('click', () => {
-      const l = S().get('leads', el.dataset.lead);
-      alert('Lead: ' + l.nombre + '\nEtapa: ' + l.etapa + ' · Prob. ' + l.prob + '%\nCadencia: ' + l.cadencia + '\nPróximo toque: ' + U.fmtDate(l.proximoToque) + '\n\n(Demo: abre ficha de lead con acciones y conversión a cliente.)');
-    }));
+    C().wireCards(host);
+    const lb = host.querySelector('#ld-lists'); if (lb) lb.addEventListener('click', () => C().gestionarListas('leadsListas'));
+    host.querySelector('#ld-new').addEventListener('click', () => C().nuevoNegocio());
+    host.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => C().nuevoNegocio()));
   }
 
-  function card(l) {
-    const ase = q.asesor(l.asesorId);
-    const d = U.daysFromNow(l.proximoToque);
-    return `<div class="kcard" data-lead="${l.id}">
-      <div class="kcard-top"><span class="badge ${l.prob >= 70 ? 'ok' : l.prob >= 40 ? 'warn' : 'neutral'}">${l.prob}%</span><span class="badge neutral">${l.ramo}</span></div>
-      <div class="kcard-t">${U.esc(l.nombre)}</div>
-      <div class="kcard-meta"><span class="mono" style="font-size:11px">${U.moneyShort(l.primaEst, l.moneda)}</span> · ${l.canal}</div>
-      <div class="kcad">🔁 ${U.esc(l.cadencia)}</div>
-      <div class="kcard-foot">
-        ${U.avatar(ase ? ase.nombre : '?', ase ? ase.color : '#999', 'sm')}
-        <span class="kvence ${d < 0 ? 'over' : ''}" title="Próximo toque">${d < 0 ? 'vencido' : 'en ' + d + 'd'}</span>
+  function kcol(col) {
+    const L = col.def, q = Orbit.q;
+    const subt = col.items.reduce((s, it) => s + q.norm(it.rec.primaEst, it.rec.moneda), 0);
+    const cards = col.items.map(it => C().cardNegocio(it.rec, { espejo: L.espejo, board: 'leads' })).join('');
+    return `<div class="kcol ${L.espejo ? 'kcol-espejo' : ''}">
+      <div class="kcol-h2" style="--lc:${L.color}">
+        <span class="kcol-emoji">${L.emoji}</span><b>${L.nombre}</b><span class="kcount">${col.items.length}</span>
+      </div>
+      <div class="ksub">${U.moneyShort(subt, 'GTQ')}${L.espejo ? ' · <span style="color:var(--ink-3)">operativo</span>' : ''}</div>
+      <div class="kcol-body">
+        ${cards || '<div class="kempty">—</div>'}
+        ${!L.espejo && L.etapa === 'nuevo' ? '<button class="kadd" data-add="neg">+ Nuevo lead</button>' : ''}
       </div>
     </div>`;
   }
+
   return { render };
 })();

@@ -14,7 +14,7 @@ Orbit.modules.cliente360 = (function () {
   let tab = 'resumen';
   let shownCid = null; // cliente actualmente abierto (para resetear pestaña al cambiar)
   // visibilidad por rol (la comisión de empresa es interna/configurable)
-  const ROLE = () => (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+  const ROLE = () => (Orbit.session && Orbit.session.rol && Orbit.session.rol()) || (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
   const verEmpresa = () => ['Dirección', 'Admin', 'Finanzas'].includes(ROLE());
 
   const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'comisiones', 'historial'];
@@ -53,7 +53,7 @@ Orbit.modules.cliente360 = (function () {
     const totPrima = clientes.reduce((s, c) => { const r = q.clienteResumen(c.id); return s + (r.moneda === 'COP' ? r.primaAnual / 1000 : r.primaAnual); }, 0);
 
     host.innerHTML = `<div class="page">
-      ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="alert('Demo: alta de cliente — formulario en el siguiente paso del build.')">+ Nuevo cliente</button>`)}
+      ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="alert('Alta de cliente: captura los datos del expediente o impórtalos desde un documento.')">+ Nuevo cliente</button>`)}
 
       <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
         <div class="kpi"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${clientes.length}</div><div class="k-foot muted">${clientes.filter(c => c.tipo === 'Empresa').length} empresas · ${clientes.filter(c => c.tipo === 'Persona').length} personas</div></div>
@@ -186,7 +186,8 @@ Orbit.modules.cliente360 = (function () {
             </div>
             <div style="display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap">
               <a class="btn ghost sm" title="Enviar WhatsApp" href="https://wa.me/${waNum}?text=${waMsg}" target="_blank" rel="noopener" style="color:#1f8a4c">💬 WA</a>
-              <button class="btn ghost sm" title="Importar a este expediente" onclick="Orbit.importa.openFor('${cid}')">⬇</button>
+              <button class="btn ghost sm" title="Solicitar gestión operativa (Ops)" onclick="Orbit.ciclo.solicitarGestion('${cid}')">🗂 Gestión</button>
+              <button class="btn ghost sm" title="Solicitud del cliente (Portal)" onclick="Orbit.ciclo.solicitarGestion('${cid}',null,true)">🙋 Cliente</button>
               <button class="btn primary sm" onclick="Orbit.modules.cliente360.edit('${cid}')">Editar</button>
             </div>
           </div>
@@ -203,14 +204,39 @@ Orbit.modules.cliente360 = (function () {
       </div>
 
       <!-- tabs -->
-      <div class="ficha-tabs">
-        ${tabs.map(t => `<div class="ftab ${tab === t[0] ? 'active' : ''}" data-tab="${t[0]}"><span class="fi">${t[2]}</span>${t[1]}</div>`).join('')}
+      <div class="ficha-tabs-wrap">
+        <div class="ficha-tabs" id="ficha-tabs">
+          ${tabs.map(t => `<div class="ftab ${tab === t[0] ? 'active' : ''}" data-tab="${t[0]}"><span class="fi">${t[2]}</span>${t[1]}</div>`).join('')}
+        </div>
+        <button class="ftab-more" id="ftab-more" aria-label="Ver más pestañas">›</button>
       </div>
       <div id="c360-body"></div>
     </div>`;
 
     host.querySelectorAll('.ftab').forEach(el => el.addEventListener('click', () => { tab = el.dataset.tab; detalle(cid); }));
+    wireTabsAffordance();
     renderTab(cid, r);
+  }
+
+  /* indicador "hay más" en las pestañas desbordadas */
+  function wireTabsAffordance() {
+    const wrap = document.querySelector('.ficha-tabs-wrap');
+    const strip = document.getElementById('ficha-tabs');
+    const more = document.getElementById('ftab-more');
+    if (!wrap || !strip || !more) return;
+    const upd = () => {
+      const overflow = strip.scrollWidth - strip.clientWidth;
+      const atEnd = strip.scrollLeft >= overflow - 2;
+      wrap.classList.toggle('has-more', overflow > 4 && !atEnd);
+      wrap.classList.toggle('has-prev', strip.scrollLeft > 2);
+    };
+    strip.addEventListener('scroll', upd);
+    window.addEventListener('resize', upd);
+    more.addEventListener('click', () => strip.scrollBy({ left: strip.clientWidth * 0.7, behavior: 'smooth' }));
+    // llevar la pestaña activa a la vista
+    const act = strip.querySelector('.ftab.active');
+    if (act) { const off = act.offsetLeft - 12; if (off > strip.scrollLeft + strip.clientWidth - act.offsetWidth || off < strip.scrollLeft) strip.scrollLeft = off; }
+    setTimeout(upd, 30);
   }
 
   function kpiCell(label, val, tone, icon) {
@@ -293,10 +319,10 @@ Orbit.modules.cliente360 = (function () {
   /* ---- Pólizas ---- */
   function tabPolizas(cid, r) {
     return `<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Póliza</th><th>Ramo / Producto</th><th>Aseguradora</th><th>Forma</th><th class="num">Prima</th><th>Vigencia</th><th>Estado</th></tr></thead>
+      <thead><tr><th>Póliza</th><th>Ramo / Producto</th><th>Aseguradora</th><th>Forma</th><th class="num">Prima</th><th>Vigencia</th><th>Estado</th><th></th></tr></thead>
       <tbody>${r.pol.map(p => {
         const asg = q.aseguradora(p.aseguradoraId);
-        return `<tr>
+        return `<tr class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')">
           <td><span class="mono" style="font-size:12.5px;font-weight:600">${p.numero}</span></td>
           <td><b>${p.ramo}</b><div class="muted" style="font-size:12px">${p.producto}</div></td>
           <td><span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${U.esc(asg ? asg.nombre : '—')}</span></td>
@@ -304,8 +330,9 @@ Orbit.modules.cliente360 = (function () {
           <td class="num">${U.money(p.prima, p.moneda)}</td>
           <td style="font-size:12.5px">${U.fmtDate(p.vigenciaInicio)}<div class="muted">→ ${U.fmtDate(p.vigenciaFin)}</div></td>
           <td>${U.estadoBadge(p.estado)}</td>
+          <td style="text-align:right;color:var(--ink-3)">›</td>
         </tr>`;
-      }).join('')}${r.pol.length === 0 ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:28px">Sin pólizas.</td></tr>' : ''}</tbody>
+      }).join('')}${r.pol.length === 0 ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:28px">Sin pólizas.</td></tr>' : ''}</tbody>
     </table></div></div>`;
   }
 
@@ -349,7 +376,7 @@ Orbit.modules.cliente360 = (function () {
     return `<div class="card pad">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <b style="font-family:var(--f-display);font-size:15px">Línea de renovaciones</b>
-        <button class="btn ghost sm" onclick="alert('Demo: inicia el flujo de renovación para todas las pólizas por vencer de este cliente.')">Gestionar todas</button>
+        <button class="btn ghost sm" onclick="Orbit.ciclo.solicitarGestion('${cid}')">🗂 Solicitar gestión</button>
       </div>
       <div style="margin-top:16px;display:grid;gap:12px">
       ${items.map(p => {
@@ -365,6 +392,7 @@ Orbit.modules.cliente360 = (function () {
           ${U.estadoBadge(estado)}
           <button class="btn ${gestionable ? 'primary' : 'ghost'} sm" ${gestionable ? '' : 'disabled style="opacity:.4"'} onclick="Orbit.modules.cliente360.renovar('${p.id}')">Renovar</button>
           <button class="btn ghost sm" onclick="Orbit.modules.cliente360.comparativo('${p.id}')" title="Comparar propuesta de renovación vs actual">⚖ Comparar</button>
+          <button class="btn ghost sm" onclick="Orbit.ciclo.solicitarGestion('${cid}','${p.id}')" title="Solicitar condiciones de renovación a la aseguradora">🗂</button>
         </div>`;
       }).join('') || '<span class="muted">Sin pólizas para renovar.</span>'}
       </div>
@@ -391,7 +419,7 @@ Orbit.modules.cliente360 = (function () {
             ${vrow('Suma asegurada', U.money(v.sumaAsegurada, p ? p.moneda : 'GTQ'))}${vrow('Póliza', p ? p.numero : '—')}
           </div>
           <div style="margin-top:12px;display:flex;gap:8px">
-            <button class="btn ghost sm" onclick="location.hash='#/cliente360?c=${cid}'" >Ver póliza</button>
+            <button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${v.polizaId}')">Ver póliza</button>
             <button class="btn ghost sm" onclick="Orbit.importa.open('polizas')">Importar documentos</button>
           </div>
         </div>`;
@@ -412,7 +440,6 @@ Orbit.modules.cliente360 = (function () {
     <div class="card" style="overflow:hidden">
       <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
         <b style="font-family:var(--f-display);font-size:15px">Recibos por forma de pago</b>
-        <button class="btn ghost sm" onclick="Orbit.importa.open('estados-cuenta')">⬇ Importar estado de cuenta</button>
       </div>
       <div style="overflow-x:auto"><table class="tbl">
         <thead><tr><th>Recibo</th><th>Póliza</th><th>Forma</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
@@ -431,7 +458,7 @@ Orbit.modules.cliente360 = (function () {
           </tr>`;
         }).join('')}</tbody>
       </table></div>
-      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Al importar el estado de cuenta se despliegan los recibos según forma de pago; <b>aplicar pago</b> concilia el recibo con su póliza.</div>
+      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)"><b>Aplicar pago</b> concilia el recibo con su póliza. Los estados de cuenta se cargan de forma centralizada en <b>Orbit Finanzas</b> (son generales de la aseguradora) y desde ahí impactan a cada cliente.</div>
     </div>`;
   }
   function wireRecibos(cid) {
@@ -501,7 +528,7 @@ Orbit.modules.cliente360 = (function () {
           <input id="na-tit" class="o-sel" style="width:100%" placeholder="Título (p. ej. Llamada de seguimiento)">
           <textarea id="na-det" class="o-sel" style="width:100%;min-height:74px;resize:vertical;padding:9px 11px" placeholder="Detalle…"></textarea>
           <button class="btn primary" id="na-save">Agregar al historial</button>
-          <div class="muted" style="font-size:11.5px">Se guarda en la capa de datos (localStorage) y queda disponible para Insights y Marketing.</div>
+          <div class="muted" style="font-size:11.5px">Queda registrado en el expediente y disponible para Insights y Marketing.</div>
         </div>
       </div>
     </div>`;
@@ -695,5 +722,49 @@ Orbit.modules.cliente360 = (function () {
     back.querySelector('#cmp-x').addEventListener('click', close);
   }
 
-  return { render, edit, renovar, comparativo };
+  /* ---- Detalle de póliza (drawer) ---- */
+  function verPoliza(polId) {
+    const p = Orbit.store.get('polizas', polId); if (!p) return;
+    const cid = p.clienteId, asg = q.aseguradora(p.aseguradoraId), ase = q.asesor(p.asesorId);
+    const veh = q.vehiculoDePoliza(polId);
+    const cob = Orbit.store.where('cobros', c => c.polizaId === polId).sort((a, b) => a.vence.localeCompare(b.vence));
+    const d = U.daysFromNow(p.vigenciaFin);
+    let back = document.getElementById('c360-edit'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center';
+    back.innerHTML = `<div class="card" style="width:min(640px,95vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div><div class="crumb" style="margin-bottom:4px">Póliza</div>
+          <b style="font-family:var(--f-display);font-size:18px">${p.ramo} · ${U.esc(p.producto)}</b>
+          <div class="muted mono" style="font-size:12.5px;margin-top:3px">${p.numero}</div></div>
+        <button class="imp-x" id="vp-x">✕</button>
+      </div>
+      <div style="padding:18px 20px;display:grid;gap:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:13px">
+          ${vrow('Aseguradora', (asg ? asg.nombre : '—'))}${vrow('Asesor', (ase ? ase.nombre : '—'))}
+          ${vrow('Forma de pago', p.forma)}${vrow('Estado', p.estado)}
+          ${vrow('Prima anual', U.money(p.prima, p.moneda))}${vrow('Suma asegurada', U.money(p.sumaAsegurada, p.moneda))}
+          ${vrow('Vigencia', U.fmtDate(p.vigenciaInicio) + ' → ' + U.fmtDate(p.vigenciaFin))}${vrow('Renueva', d < 0 ? 'venció hace ' + (-d) + ' d' : 'en ' + d + ' d')}
+        </div>
+        ${veh ? `<div class="card pad" style="background:var(--surface)"><b style="font-family:var(--f-display);font-size:14px">🚗 ${U.esc(veh.marca)} ${U.esc(veh.linea)} ${veh.anio}</b>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:12.5px;margin-top:9px">${vrow('Placa', veh.placa)}${vrow('Uso', veh.uso)}${vrow('Chasis', veh.chasis)}${vrow('Motor', veh.motor)}</div></div>` : ''}
+        <div>
+          <b style="font-family:var(--f-display);font-size:14px">Recibos de esta póliza</b>
+          <table class="tbl" style="margin-top:8px"><thead><tr><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Estado</th></tr></thead>
+          <tbody>${cob.map(c => `<tr><td>${c.cuota}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td>${U.estadoBadge(c.estado)}</td></tr>`).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:18px">Sin recibos.</td></tr>'}</tbody></table>
+        </div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn ghost" onclick="Orbit.ciclo.solicitarGestion('${cid}','${polId}')">🗂 Solicitar gestión</button>
+        <button class="btn ghost" onclick="Orbit.modules.cliente360.comparativo('${polId}')">⚖ Comparar renovación</button>
+        <button class="btn primary" onclick="Orbit.modules.cliente360.renovar('${polId}')">🔄 Renovar</button>
+      </div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#vp-x').addEventListener('click', close);
+  }
+
+  return { render, edit, renovar, comparativo, verPoliza };
 })();

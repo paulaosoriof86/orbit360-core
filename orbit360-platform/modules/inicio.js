@@ -121,7 +121,43 @@ Orbit.modules.inicio = (function () {
           </div>
         </div>
       </div>
+
+      <!-- Seguimientos de hoy (manuales, por WhatsApp) -->
+      ${seguimientosHoy()}
     </div>`;
   }
+
+  /* Seguimientos pendientes (sin automatizar) → gestionar por WhatsApp Web / correo */
+  function seguimientosHoy() {
+    if (!Orbit.ciclo) return '';
+    const negs = Orbit.ciclo.negocios({ ignoreRol: true })
+      .filter(n => ['nuevo', 'contactado', 'cotizando', 'propuesta', 'negociacion'].includes(n.etapa) && !n.cadenciaActiva && U.daysFromNow(n.proximoToque) <= 1)
+      .sort((a, b) => (a.proximoToque || '').localeCompare(b.proximoToque || '')).slice(0, 6);
+    if (!negs.length) return '';
+    return `<div class="card pad" style="margin-top:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <b style="font-family:var(--f-display);font-size:16px">Seguimientos de hoy</b>
+        <span class="muted" style="font-size:12px">sin cadencia automática · gestiona por WhatsApp</span>
+      </div>
+      <div style="margin-top:12px;display:grid;gap:9px">
+        ${negs.map(n => {
+          const ase = q.asesor(n.asesorId);
+          const wa = (n.telefono || '').replace(/[^0-9]/g, '');
+          const msg = encodeURIComponent('Hola ' + (n.nombre || '').split(' ')[0] + ', te damos seguimiento a tu ' + n.producto + '.');
+          const d = U.daysFromNow(n.proximoToque);
+          return `<div style="display:flex;align-items:center;gap:11px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)">
+            <span style="font-size:16px">${Orbit.ciclo.etapaInfo(n.etapa).emoji}</span>
+            <div style="flex:1;min-width:0" class="clickable" onclick="Orbit.ciclo.openNegocio('${n.id}')">
+              <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(n.nombre)} <span class="muted" style="font-weight:400">· ${U.esc(n.producto)}</span></div>
+              <div class="muted" style="font-size:11.5px">${ase ? U.esc(ase.nombre) : ''} · ${d < 0 ? 'vencido' : d === 0 ? 'hoy' : 'mañana'} · ${Orbit.ciclo.etapaInfo(n.etapa).label}</div>
+            </div>
+            ${wa ? `<a class="btn ghost sm" style="color:#1f8a4c" href="https://wa.me/${wa}?text=${msg}" target="_blank" rel="noopener">💬 WhatsApp</a>` : (n.email ? `<a class="btn ghost sm" href="mailto:${n.email}" target="_blank" rel="noopener">✉ Correo</a>` : '')}
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="muted" style="font-size:11.5px;margin-top:10px">Al activar la cadencia automática (al enviar propuesta) los toques se programan solos; aquí solo aparecen los que requieren tu gestión manual.</div>
+    </div>`;
+  }
+
   return { render };
 })();
