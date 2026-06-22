@@ -419,8 +419,8 @@ Orbit.modules.cliente360 = (function () {
             ${vrow('Suma asegurada', U.money(v.sumaAsegurada, p ? p.moneda : 'GTQ'))}${vrow('Póliza', p ? p.numero : '—')}
           </div>
           <div style="margin-top:12px;display:flex;gap:8px">
-            <button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${v.id}')">Ver detalle</button>
             <button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${v.polizaId}')">Ver póliza</button>
+            <button class="btn ghost sm" onclick="Orbit.importa.open('polizas')">Importar documentos</button>
           </div>
         </div>`;
       }).join('')}
@@ -462,10 +462,51 @@ Orbit.modules.cliente360 = (function () {
     </div>`;
   }
   function wireRecibos(cid) {
-    document.querySelectorAll('[data-apply]').forEach(b => b.addEventListener('click', () => {
-      S().update('cobros', b.dataset.apply, { estado: 'Pagado', fechaPago: '2026-06-20', metodo: 'Transferencia', conciliado: true });
-      detalle(cid);
-    }));
+    document.querySelectorAll('[data-apply]').forEach(b => b.addEventListener('click', () => aplicarPago(b.dataset.apply, cid)));
+  }
+
+  /* ---- Aplicar pago: fecha de envío a gestión (default hoy, editable) + factura (fecha real) ---- */
+  function aplicarPago(cobroId, cid) {
+    const c = S().get('cobros', cobroId); if (!c) return;
+    const p = S().get('polizas', c.polizaId);
+    let back = document.getElementById('c360-pago'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'c360-pago'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
+      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+        <b style="font-family:var(--f-display);font-size:16px">💳 Aplicar pago</b><button class="imp-x" id="ap-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:13px">
+        <div class="vp-grid">
+          ${vrow('Recibo', 'REC-' + c.id.slice(-5).toUpperCase())}${vrow('Cuota', c.cuota)}
+          ${vrow('Póliza', p ? p.numero : '—')}${vrow('Monto', U.money(c.monto, c.moneda))}
+        </div>
+        <label class="ce-l">Fecha de envío a gestión <span class="muted">(día en que se aplica)</span><input id="ap-fecha" class="o-sel" type="date" value="2026-06-22"></label>
+        <label class="ce-l">Forma de pago<select id="ap-metodo" class="o-sel">${(Orbit.primas ? Orbit.primas.FORMAS_PAGO : ['Transferencia', 'Tarjeta de crédito', 'Efectivo']).map(m => `<option ${m === (p && p.formaPago) ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+        <div class="ap-fact">
+          <label class="ce-l" style="margin:0">📄 Factura de la aseguradora <span class="muted">(opcional)</span><input id="ap-file" type="file" class="o-sel" accept="image/*,application/pdf"></label>
+          <label class="ce-l" id="ap-real-wrap" style="display:none;margin-top:9px">Fecha real en que pagó la aseguradora<input id="ap-real" class="o-sel" type="date" value="2026-06-20"></label>
+          <div class="muted" style="font-size:11px;margin-top:7px">Cargar la factura fija la <b>fecha real</b> del pago y <b>concilia</b> el recibo (medio adicional de conciliación). Sin factura, el recibo queda <b>Pagado · por conciliar</b>.</div>
+        </div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="ap-cancel">Cancelar</button><button class="btn primary" id="ap-ok">Aplicar pago</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    const $ = s => back.querySelector(s);
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#ap-x').addEventListener('click', close); $('#ap-cancel').addEventListener('click', close);
+    let factura = null;
+    $('#ap-file').addEventListener('change', e => { factura = e.target.files[0] ? e.target.files[0].name : null; $('#ap-real-wrap').style.display = factura ? '' : 'none'; });
+    $('#ap-ok').addEventListener('click', () => {
+      const conciliado = !!factura;
+      S().update('cobros', cobroId, {
+        estado: 'Pagado', fechaPago: $('#ap-fecha').value, metodo: $('#ap-metodo').value,
+        conciliado, facturaNombre: factura || '', fechaReal: conciliado ? $('#ap-real').value : ''
+      });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: (p && p.asesorId) || '', tipo: 'sistema', icon: '💳', fecha: $('#ap-fecha').value, titulo: 'Pago aplicado · ' + (p ? p.numero : ''), detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (conciliado ? ' · conciliado con factura (' + factura + ')' : ' · por conciliar') });
+      close(); detalle(cid);
+    });
   }
 
   /* ---- Comisiones ---- */
@@ -778,12 +819,8 @@ Orbit.modules.cliente360 = (function () {
           </table>
         </div>
 
-        ${coberturaCard(p, veh)}
-
-        <div class="pol-cover">
-          <div class="vp-sec-t" style="display:flex;justify-content:space-between;align-items:center">📜 Historial y endosos <button class="btn ghost sm" onclick="Orbit.modules.cliente360.endoso('${polId}')">+ Endoso / gestión</button></div>
-          ${histPoliza(p)}
-        </div>
+        ${veh ? `<div class="card pad" style="background:var(--surface)"><b style="font-family:var(--f-display);font-size:14px">🚗 ${U.esc(veh.marca)} ${U.esc(veh.linea)} ${veh.anio}</b>
+          <div class="vp-grid" style="margin-top:9px;font-size:12.5px">${vrow('Placa', veh.placa)}${vrow('Uso', veh.uso)}${vrow('Chasis', veh.chasis)}${vrow('Motor', veh.motor)}</div></div>` : ''}
 
         <div>
           <div class="vp-sec-t">📋 Cuadro de recibos</div>
@@ -809,7 +846,6 @@ Orbit.modules.cliente360 = (function () {
         </div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card)">
-        <button class="btn ghost" onclick="Orbit.modules.cliente360.editarPoliza('${polId}')">✏ Editar</button>
         <button class="btn ghost" onclick="Orbit.ciclo.solicitarGestion('${cid}','${polId}')">🗂 Solicitar gestión</button>
         <button class="btn ghost" onclick="Orbit.modules.cliente360.comparativo('${polId}')">⚖ Comparar renovación</button>
         ${p.renovable ? `<button class="btn primary" onclick="Orbit.modules.cliente360.renovar('${polId}')">🔄 Renovar</button>` : ''}
@@ -821,211 +857,5 @@ Orbit.modules.cliente360 = (function () {
     back.querySelector('#vp-x').addEventListener('click', close);
   }
 
-  /* ---- Qué cubre la póliza (según tipo) ---- */
-  function coberturaCard(p, veh) {
-    const cid = p.clienteId;
-    if (veh) {
-      return `<div class="pol-cover"><div class="vp-sec-t">🚗 Qué cubre · Vehículo</div>
-        <b style="font-family:var(--f-display);font-size:15px">${U.esc(veh.marca)} ${U.esc(veh.linea)} ${veh.anio}</b>
-        <div class="vp-grid" style="margin-top:9px;font-size:12.5px">${vrow('Placa', veh.placa)}${vrow('Uso', veh.uso)}${vrow('Chasis', veh.chasis)}${vrow('Motor', veh.motor)}</div>
-        <div style="margin-top:11px"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${veh.id}')">Ver detalle completo del vehículo →</button></div></div>`;
-    }
-    // bien asegurado genérico según ramo
-    const tipoBien = { 'Hogar': '🏠 Inmueble', 'Daños': '🏢 Bien / patrimonio', 'Vida': '👤 Persona asegurada', 'Gastos Médicos': '👪 Grupo asegurado', 'Salud': '👪 Grupo asegurado', 'Fianzas': '📄 Contrato afianzado', 'Cumplimiento': '📄 Contrato', 'Transporte': '📦 Mercancía / carga', 'RC': '⚖ Responsabilidad', 'Responsabilidad Civil': '⚖ Responsabilidad', 'Accidentes': '👤 Persona' };
-    const lbl = tipoBien[p.ramo] || '📋 Bien asegurado';
-    return `<div class="pol-cover"><div class="vp-sec-t">${lbl.split(' ')[0]} Qué cubre</div>
-      <b style="font-family:var(--f-display);font-size:14px">${lbl.replace(/^\S+\s/, '')}: ${U.esc(p.concepto || p.producto)}</b>
-      <div class="vp-grid" style="margin-top:9px;font-size:12.5px">${vrow('Suma asegurada', U.money(p.sumaAsegurada, p.moneda))}${vrow('Subramo', p.subramo || p.producto)}</div>
-      <div class="muted" style="font-size:11px;margin-top:8px">El detalle específico del riesgo (inmueble, grupo familiar, contrato) se administra de forma transversal y puede ampliarse al cargar el documento de la póliza.</div></div>`;
-  }
-
-  /* ---- Historial de la póliza (creación + endosos) ---- */
-  function histPoliza(p) {
-    const ev = (p.historial || []).slice();
-    ev.unshift({ icon: '✳', fecha: p.vigenciaInicio, t: 'Emisión de póliza', d: p.producto + ' · ' + (q.aseguradora(p.aseguradoraId) || {}).nombre });
-    if (p.contadorRenovaciones) ev.push({ icon: '🔄', fecha: p.vigenciaInicio, t: 'Renovación n.º ' + p.contadorRenovaciones, d: 'Continuidad de cobertura' });
-    ev.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
-    return `<div class="pol-hist">${ev.map(e => `<div class="pol-hev"><div class="pol-hev-i">${e.icon || '•'}</div><div><div class="pol-hev-t">${U.esc(e.t)}</div><div class="pol-hev-d">${U.fmtDate(e.fecha)}${e.d ? ' · ' + U.esc(e.d) : ''}</div></div></div>`).join('')}</div>`;
-  }
-
-  /* ---- Endoso / gestión que modifica la póliza (manual · importar · inteligente) ---- */
-  function endoso(polId) {
-    const p = S().get('polizas', polId); if (!p) return;
-    const tipos = ['Endoso de aumento de suma', 'Endoso de reducción', 'Sustitución de vehículo', 'Cambio de propietario', 'Inclusión de beneficiario', 'Modificación de cobertura', 'Endoso de cancelación parcial'];
-    let back = document.getElementById('c360-endoso'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'c360-endoso'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
-    back.innerHTML = `<div class="card" style="width:min(520px,94vw);max-height:90vh;overflow:auto;padding:0">
-      <div style="padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:17px">📜 Endoso / gestión · ${p.numero}</b>
-        <button class="imp-x" id="en-x">✕</button></div>
-      <div style="padding:18px 20px;display:grid;gap:12px">
-        <div class="seg" style="display:flex;gap:6px">
-          <button class="seg-b active" data-mode="manual">✍ Manual</button>
-          <button class="seg-b" data-mode="import">⬇ Importar</button>
-          <button class="seg-b" data-mode="ia">✨ Crear inteligente</button>
-        </div>
-        <div id="en-import" style="display:none"><div class="cfg-note">Cargá el documento del endoso (PDF/imagen). El extractor inteligente leerá tipo, fecha y montos, y <b>señalará lo que no pueda leer</b> para completar manual. Quedará en el Drive del cliente.</div>
-          <input type="file" id="en-file" class="o-sel" style="margin-top:9px"></div>
-        <label class="ce-l">Tipo de endoso<select id="en-tipo" class="o-sel">${tipos.map(t => `<option>${t}</option>`).join('')}</select></label>
-        <label class="ce-l">Fecha<input id="en-fecha" class="o-sel" type="date" value="2026-06-22"></label>
-        <label class="ce-l">Detalle<textarea id="en-det" class="o-sel" style="min-height:56px;resize:vertical;padding:9px 11px" placeholder="Descripción del cambio que aplica a la póliza…"></textarea></label>
-        <div class="cfg-note">Queda registrado en el <b>historial de la póliza</b> y en el del cliente.</div>
-      </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn ghost" id="en-cancel">Cancelar</button>
-        <button class="btn primary" id="en-ok">Registrar endoso</button></div>
-    </div>`;
-    document.body.appendChild(back);
-    const close = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    back.querySelector('#en-x').addEventListener('click', close);
-    back.querySelector('#en-cancel').addEventListener('click', close);
-    back.querySelectorAll('.seg-b').forEach(b => b.addEventListener('click', () => {
-      back.querySelectorAll('.seg-b').forEach(x => x.classList.remove('active')); b.classList.add('active');
-      back.querySelector('#en-import').style.display = b.dataset.mode === 'import' ? '' : 'none';
-    }));
-    back.querySelector('#en-ok').addEventListener('click', () => {
-      const tipo = back.querySelector('#en-tipo').value, fecha = back.querySelector('#en-fecha').value, det = back.querySelector('#en-det').value.trim();
-      const hist = (p.historial || []).concat([{ icon: '📜', fecha, t: tipo, d: det || '—' }]);
-      S().update('polizas', polId, { historial: hist });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: p.clienteId, asesorId: p.asesorId, tipo: 'sistema', icon: '📜', fecha, titulo: 'Endoso: ' + tipo + ' · ' + p.numero, detalle: det || '' });
-      if (Orbit.notify) Orbit.notify.emit && Orbit.notify.emit('Endoso registrado', tipo + ' en ' + p.numero);
-      close(); verPoliza(polId);
-    });
-  }
-
-  /* ---- Editar póliza (administrable) con auto-cálculo de prima ---- */
-  function editarPoliza(polId) {
-    const p = S().get('polizas', polId); if (!p) return;
-    const cli = S().get('clientes', p.clienteId), pais = cli ? cli.pais : 'GT';
-    const asgs = S().all('aseguradoras');
-    const ramos = Orbit.cat.ramosDe(pais);
-    const curRamo = ramos.indexOf(p.ramo) >= 0 ? p.ramo : ramos[0];
-    let back = document.getElementById('c360-edit'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center';
-    const frecs = Object.keys(Orbit.primas.FRECUENCIAS);
-    const formas = Orbit.primas.FORMAS_PAGO;
-    const subOpts = (ramo) => { const s = Orbit.cat.subramosDe(pais, ramo); return s.concat(s.indexOf(p.subramo) < 0 && p.subramo ? [p.subramo] : []); };
-    back.innerHTML = `<div class="card" style="width:min(680px,95vw);max-height:92vh;overflow:auto;padding:0">
-      <div style="padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:17px">✏ Editar póliza ${p.numero}</b>
-        <button class="imp-x" id="ep-x">✕</button></div>
-      <div style="padding:18px 20px;display:grid;gap:13px">
-        <div class="cgrid">
-          <label class="ce-l">N.º de póliza<input id="ep-num" class="o-sel" value="${U.esc(p.numero)}"></label>
-          <label class="ce-l">Aseguradora<select id="ep-asg" class="o-sel">${asgs.map(a => `<option value="${a.id}" ${a.id === p.aseguradoraId ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select></label>
-          <label class="ce-l">Ramo <span class="muted">(${pais})</span><select id="ep-ramo" class="o-sel">${ramos.map(r => `<option ${r === curRamo ? 'selected' : ''}>${r}</option>`).join('')}<option value="__otro">➕ Otro…</option></select></label>
-          <label class="ce-l">Subramo<select id="ep-sub" class="o-sel">${subOpts(curRamo).map(s => `<option ${s === p.subramo ? 'selected' : ''}>${s}</option>`).join('')}<option value="__otro">➕ Otro…</option></select></label>
-          <label class="ce-l">Tipo de póliza<select id="ep-tipo" class="o-sel">${['Individual', 'Colectiva', 'Empresarial', 'Flotilla'].map(t => `<option ${t === p.tipoPoliza ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
-          <label class="ce-l">Concepto<input id="ep-concepto" class="o-sel" value="${U.esc(p.concepto || '')}"></label>
-          <label class="ce-l">Vigencia inicio<input id="ep-vini" class="o-sel" type="date" value="${p.vigenciaInicio}"></label>
-          <label class="ce-l">Vigencia fin<input id="ep-vfin" class="o-sel" type="date" value="${p.vigenciaFin}"></label>
-          <label class="ce-l">Frecuencia<select id="ep-frec" class="o-sel">${frecs.map(f => `<option ${f === p.frecuencia ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
-          <label class="ce-l">Forma de pago<select id="ep-forma" class="o-sel">${formas.map(f => `<option ${f === p.formaPago ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
-          <label class="ce-l ck"><input type="checkbox" id="ep-renov" ${p.renovable ? 'checked' : ''}> Renovable anualmente</label>
-          <label class="ce-l">Suma asegurada<input id="ep-suma" class="o-sel" type="number" value="${p.sumaAsegurada}"></label>
-        </div>
-
-        <div class="vp-desglose">
-          <div class="vp-sec-t">🧾 Cálculo de prima <span class="muted">(${pais} · IVA ${Orbit.primas.cfgPais(pais).iva}%)</span></div>
-          <div class="cgrid">
-            <label class="ce-l">Prima neta<input id="ep-neta" class="o-sel" type="number" value="${p.primaNeta}"></label>
-            <label class="ce-l">Gastos de expedición <span class="muted">(auto ${pais === 'GT' ? '5%' : ''})</span><input id="ep-gem" class="o-sel" type="number" value="${p.gastosEmision}"></label>
-            <label class="ce-l">Otros / asistencias<input id="ep-otros" class="o-sel" type="number" value="${p.otros || 0}"></label>
-            <label class="ce-l">Recargo financiero %<input id="ep-rec" class="o-sel" type="number" value="${p.recargoFinPct}"></label>
-          </div>
-          <table class="vp-dtbl" style="margin-top:10px" id="ep-resumen"></table>
-          <label class="ce-l ck" style="margin-top:8px"><input type="checkbox" id="ep-auto" checked> Calcular gastos de expedición e IVA automáticamente</label>
-        </div>
-      </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn ghost" id="ep-cancel">Cancelar</button>
-        <button class="btn primary" id="ep-ok">Guardar cambios</button></div>
-    </div>`;
-    document.body.appendChild(back);
-    const close = () => back.remove();
-    const $ = s => back.querySelector(s);
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    $('#ep-x').addEventListener('click', close); $('#ep-cancel').addEventListener('click', close);
-
-    // ramo → recargar subramos
-    $('#ep-ramo').addEventListener('change', () => {
-      let r = $('#ep-ramo').value;
-      if (r === '__otro') { const nv = prompt('Nuevo ramo para ' + pais + ':', ''); if (nv) { Orbit.cat.addRamo(pais, nv); r = nv; } else { $('#ep-ramo').value = curRamo; r = curRamo; } }
-      const subs = Orbit.cat.subramosDe(pais, r);
-      $('#ep-sub').innerHTML = subs.map(s => `<option>${s}</option>`).join('') + '<option value="__otro">➕ Otro…</option>';
-    });
-    $('#ep-sub').addEventListener('change', () => { if ($('#ep-sub').value === '__otro') { const nv = prompt('Nuevo subramo:', ''); const r = $('#ep-ramo').value; if (nv && r !== '__otro') { Orbit.cat.addSubramo(pais, r, nv); $('#ep-sub').innerHTML = Orbit.cat.subramosDe(pais, r).map(s => `<option ${s === nv ? 'selected' : ''}>${s}</option>`).join('') + '<option value="__otro">➕ Otro…</option>'; } else $('#ep-sub').selectedIndex = 0; } });
-
-    function recalc() {
-      const auto = $('#ep-auto').checked;
-      const neta = +$('#ep-neta').value || 0;
-      if (auto && pais === 'GT') $('#ep-gem').value = Orbit.primas.r2(neta * 0.05);
-      const fraccionado = Orbit.primas.cuotasDe($('#ep-frec').value) > 1;
-      const d = Orbit.primas.desglose(neta, pais, {
-        fraccionado, gastosEmision: +$('#ep-gem').value || 0, otros: +$('#ep-otros').value || 0, recargoFinPct: +$('#ep-rec').value
-      });
-      $('#ep-resumen').innerHTML = `
-        <tr><td>Prima neta</td><td class="num">${U.money(d.neta, p.moneda)}</td></tr>
-        <tr><td>Gastos de expedición</td><td class="num">${U.money(d.gastosEmision, p.moneda)}</td></tr>
-        <tr><td>Gastos financieros ${d.gastosFinan > 0 ? '(' + d.recargoPct + '%)' : ''}</td><td class="num">${U.money(d.gastosFinan, p.moneda)}</td></tr>
-        <tr><td>Otros / asistencias</td><td class="num">${U.money(d.otros, p.moneda)}</td></tr>
-        <tr class="vp-sub"><td>Base gravable</td><td class="num">${U.money(d.baseGravable, p.moneda)}</td></tr>
-        <tr><td>IVA (${d.ivaPct}%)</td><td class="num">${U.money(d.iva, p.moneda)}</td></tr>
-        <tr class="vp-tot"><td>Prima total</td><td class="num">${U.money(d.total, p.moneda)}</td></tr>`;
-      back._d = d;
-    }
-    ['#ep-neta', '#ep-gem', '#ep-otros', '#ep-rec', '#ep-frec', '#ep-auto'].forEach(s => $(s).addEventListener('input', recalc));
-    recalc();
-
-    $('#ep-ok').addEventListener('click', () => {
-      const d = back._d, frecuencia = $('#ep-frec').value;
-      const recibos = Orbit.primas.recibos(d, { frecuencia, vigenciaInicio: $('#ep-vini').value, comAseguradoraPct: p.comAseguradoraPct, comVendedorPct: p.comVendedorPct });
-      S().update('polizas', polId, {
-        numero: $('#ep-num').value || p.numero, aseguradoraId: $('#ep-asg').value,
-        ramo: $('#ep-ramo').value === '__otro' ? p.ramo : $('#ep-ramo').value,
-        subramo: $('#ep-sub').value === '__otro' ? p.subramo : $('#ep-sub').value,
-        tipoPoliza: $('#ep-tipo').value, concepto: $('#ep-concepto').value,
-        vigenciaInicio: $('#ep-vini').value, vigenciaFin: $('#ep-vfin').value,
-        frecuencia, forma: frecuencia, formaPago: $('#ep-forma').value,
-        renovable: $('#ep-renov').checked, sumaAsegurada: +$('#ep-suma').value || p.sumaAsegurada,
-        primaNeta: d.neta, gastosEmision: d.gastosEmision, gastosFinan: d.gastosFinan, otros: d.otros,
-        ivaPct: d.ivaPct, ivaMonto: d.iva, recargoFinPct: d.recargoPct, baseGravable: d.baseGravable,
-        prima: d.total, primaTotal: d.total,
-        historial: (p.historial || []).concat([{ icon: '✏', fecha: '2026-06-22', t: 'Edición de póliza', d: 'Datos/prima actualizados' }])
-      });
-      close(); verPoliza(polId);
-    });
-  }
-
-  /* ---- Ver detalle de vehículo (desde la póliza) ---- */
-  function verVehiculo(vehId) {
-    const v = S().get('vehiculos', vehId); if (!v) return;
-    const cur = (S().get('clientes', v.clienteId) || {}).moneda || 'GTQ';
-    let back = document.getElementById('c360-veh'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'c360-veh'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
-    back.innerHTML = `<div class="card" style="width:min(540px,94vw);max-height:90vh;overflow:auto;padding:0">
-      <div style="padding:18px 20px;background:linear-gradient(120deg,#1f3a5f,#142840);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:17px;color:#fff">🚗 ${U.esc(v.marca)} ${U.esc(v.linea)} ${v.anio}</b>
-        <button class="imp-x" id="vh-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
-      <div style="padding:18px 20px;display:grid;gap:14px">
-        <div class="vp-grid">
-          ${vrow('Placa', v.placa)}${vrow('Uso', v.uso)}${vrow('Color', v.color)}${vrow('Año', v.anio)}
-          ${vrow('Chasis / VIN', v.chasis)}${vrow('Motor', v.motor)}${vrow('Suma asegurada', U.money(v.sumaAsegurada, cur))}${vrow('Póliza', (S().get('polizas', v.polizaId) || {}).numero || '—')}
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${v.polizaId}')">📑 Ver póliza</button>
-          <button class="btn ghost sm" onclick="document.getElementById('c360-veh').remove();Orbit.modules.cliente360.endoso('${v.polizaId}')">🔁 Sustituir vehículo (endoso)</button>
-        </div>
-      </div></div>`;
-    document.body.appendChild(back);
-    const close = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    back.querySelector('#vh-x').addEventListener('click', close);
-  }
-
-  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo };
+  return { render, edit, renovar, comparativo, verPoliza };
 })();

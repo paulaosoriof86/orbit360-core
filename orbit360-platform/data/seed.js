@@ -19,22 +19,26 @@ Orbit.SEED = (function () {
   const addMonths = (d, n) => { const x = new Date(d); x.setMonth(x.getMonth() + n); return x; };
 
   // ---- Asesores (equipo) ----
+  // shareCom = participación del vendedor sobre la comisión de la aseguradora (%)
   const asesores = [
-    { id: 'ase001', nombre: 'Paula Osorio', rol: 'Dirección', iniciales: 'PO', color: '#C5162E', metaPrima: 220000, metaRecaudo: 180000, comTipo: 'variable', comPct: 18 },
-    { id: 'ase002', nombre: 'Diego Marroquín', rol: 'Asesor Sr.', iniciales: 'DM', color: '#1f3a5f', metaPrima: 160000, metaRecaudo: 140000, comTipo: 'variable', comPct: 15 },
-    { id: 'ase003', nombre: 'Lucía Herrera', rol: 'Asesora', iniciales: 'LH', color: '#1f8a4c', metaPrima: 140000, metaRecaudo: 120000, comTipo: 'variable', comPct: 12 },
-    { id: 'ase004', nombre: 'Marco Villatoro', rol: 'Asesor', iniciales: 'MV', color: '#c9821b', metaPrima: 120000, metaRecaudo: 100000, comTipo: 'fija', comPct: 10 },
-    { id: 'ase005', nombre: 'Ana Lemus', rol: 'Asesora Jr.', iniciales: 'AL', color: '#6b4ea0', metaPrima: 90000, metaRecaudo: 78000, comTipo: 'fija', comPct: 8 }
+    { id: 'ase001', nombre: 'Paula Osorio', rol: 'Dirección', iniciales: 'PO', color: '#C5162E', metaPrima: 220000, metaRecaudo: 180000, comTipo: 'variable', comPct: 18, shareCom: 60 },
+    { id: 'ase002', nombre: 'Diego Marroquín', rol: 'Asesor Sr.', iniciales: 'DM', color: '#1f3a5f', metaPrima: 160000, metaRecaudo: 140000, comTipo: 'variable', comPct: 15, shareCom: 55 },
+    { id: 'ase003', nombre: 'Lucía Herrera', rol: 'Asesora', iniciales: 'LH', color: '#1f8a4c', metaPrima: 140000, metaRecaudo: 120000, comTipo: 'variable', comPct: 12, shareCom: 50 },
+    { id: 'ase004', nombre: 'Marco Villatoro', rol: 'Asesor', iniciales: 'MV', color: '#c9821b', metaPrima: 120000, metaRecaudo: 100000, comTipo: 'fija', comPct: 10, shareCom: 45 },
+    { id: 'ase005', nombre: 'Ana Lemus', rol: 'Asesora Jr.', iniciales: 'AL', color: '#6b4ea0', metaPrima: 90000, metaRecaudo: 78000, comTipo: 'fija', comPct: 8, shareCom: 40 }
   ];
 
   // ---- Aseguradoras (directorio) ----
+  // comisiones = % que la aseguradora paga al intermediario, por RAMO.
+  // comisionesProd = override por PRODUCTO (lo llena la planilla importada).
+  function tarifaRamos(ramos, lo, hi) { const o = {}; ramos.forEach(r => { o[r] = lo + Math.floor(rnd() * (hi - lo + 1)); }); return o; }
   const aseguradoras = [
-    { id: 'asg01', nombre: 'Seguros Atlas', color: '#C5162E', pais: 'GT', ramos: ['Auto', 'Vida', 'Gastos Médicos', 'Hogar'] },
-    { id: 'asg02', nombre: 'Aseguradora Cumbre', color: '#1f3a5f', pais: 'GT', ramos: ['Auto', 'Daños', 'Fianzas', 'Transporte'] },
-    { id: 'asg03', nombre: 'MundoSeguro', color: '#1f8a4c', pais: 'CO', ramos: ['Vida', 'Gastos Médicos', 'Accidentes'] },
-    { id: 'asg04', nombre: 'Pacífico Seguros', color: '#c9821b', pais: 'CO', ramos: ['Auto', 'Hogar', 'RC', 'Transporte'] },
-    { id: 'asg05', nombre: 'Andes Seguros', color: '#6b4ea0', pais: 'CO', ramos: ['Vida', 'Daños', 'Fianzas'] },
-    { id: 'asg06', nombre: 'Vértice Seguros', color: '#0f766e', pais: 'GT', ramos: ['Auto', 'Gastos Médicos', 'Hogar', 'RC'] }
+    { id: 'asg01', nombre: 'Seguros Atlas', color: '#C5162E', pais: 'GT', ramos: ['Auto', 'Vida', 'Gastos Médicos', 'Hogar'], comisionDefault: 12, comisiones: { 'Auto': 12, 'Vida': 22, 'Gastos Médicos': 15, 'Hogar': 18 }, comisionesProd: {} },
+    { id: 'asg02', nombre: 'Aseguradora Cumbre', color: '#1f3a5f', pais: 'GT', ramos: ['Auto', 'Daños', 'Fianzas', 'Transporte'], comisionDefault: 12, comisiones: { 'Auto': 11, 'Daños': 16, 'Fianzas': 20, 'Transporte': 14 }, comisionesProd: {} },
+    { id: 'asg03', nombre: 'MundoSeguro', color: '#1f8a4c', pais: 'CO', ramos: ['Vida', 'Gastos Médicos', 'Accidentes'], comisionDefault: 14, comisiones: { 'Vida': 25, 'Gastos Médicos': 16, 'Accidentes': 20 }, comisionesProd: {} },
+    { id: 'asg04', nombre: 'Pacífico Seguros', color: '#c9821b', pais: 'CO', ramos: ['Auto', 'Hogar', 'RC', 'Transporte'], comisionDefault: 13, comisiones: { 'Auto': 13, 'Hogar': 18, 'RC': 17, 'Transporte': 15 }, comisionesProd: {} },
+    { id: 'asg05', nombre: 'Andes Seguros', color: '#6b4ea0', pais: 'CO', ramos: ['Vida', 'Daños', 'Fianzas'], comisionDefault: 15, comisiones: { 'Vida': 24, 'Daños': 17, 'Fianzas': 21 }, comisionesProd: {} },
+    { id: 'asg06', nombre: 'Vértice Seguros', color: '#0f766e', pais: 'GT', ramos: ['Auto', 'Gastos Médicos', 'Hogar', 'RC'], comisionDefault: 12, comisiones: { 'Auto': 12, 'Gastos Médicos': 15, 'Hogar': 17, 'RC': 16 }, comisionesProd: {} }
   ];
 
   // ---- Catálogos ----
@@ -136,8 +140,10 @@ Orbit.SEED = (function () {
       const inicioMonths = between(1, 13);
       const vigInicio = addMonths(NOW, -inicioMonths);
       const vigFin = addMonths(vigInicio, 12);
-      const comPct = between(8, 22);       // comisión aseguradora (sobre neta)
-      const comVendPct = between(20, 45);  // comisión del vendedor (sobre la comisión, demo: sobre neta reducida)
+      // comisión aseguradora = tarifa por ramo de ESA aseguradora; vendedor = participación del asesor
+      const _ase = asesores.find(a => a.id === cli.asesorId) || {};
+      const comPct = (asg.comisiones && asg.comisiones[ramo] != null) ? asg.comisiones[ramo] : (asg.comisionDefault || 12);
+      const comVendPct = _ase.shareCom != null ? _ase.shareCom : 50;  // % sobre la comisión de la aseguradora
       // estado de la póliza
       const diasParaVencer = Math.round((vigFin - NOW) / 86400000);
       let estado = 'Vigente';
@@ -195,19 +201,11 @@ Orbit.SEED = (function () {
       // cancelación
       if (cancelada) {
         cxn++;
-        const fechaCancel = addDays(NOW, -between(10, 200));
-        const diasActiva = Math.max(15, Math.round((fechaCancel - vigInicio) / 86400000));
-        // comisión generada acumulada por esta póliza hasta la cancelación
         cancelaciones.push({
           id: id('can', cxn), polizaId: pol.id, clienteId: cli.id,
-          fecha: iso(fechaCancel), fechaInicio: pol.vigenciaInicio,
-          diasActiva,
-          motivo: pick(['No pago de prima', 'Cambio de aseguradora', 'Venta del bien', 'Insatisfacción', 'Mejor oferta', 'Duplicidad']),
-          valorPerdido: pol.prima,
-          comisionGenerada: 0, // se calcula tras generar comisiones (abajo)
-          ramo: pol.ramo,
-          recuperacion: pick(['Pendiente de contacto', 'Llamada de retención agendada', 'Oferta de mejora enviada', 'No recuperable', 'En negociación']),
-          recuperada: false
+          fecha: iso(addDays(NOW, -between(10, 200))),
+          motivo: pick(['No pago de prima', 'Cambio de aseguradora', 'Venta del bien', 'Insatisfacción', 'Duplicidad']),
+          valorPerdido: pol.prima
         });
       }
 
@@ -393,11 +391,6 @@ Orbit.SEED = (function () {
     { id: 'nov2', tipo: 'producto', titulo: '🆕 Nuevo producto: Salud Premium de MundoSeguro', detalle: 'Cobertura internacional y sin deducible en red preferente. Material comercial en Academia.', autor: 'Dirección', fecha: iso(addDays(NOW, -5)), prioridad: false },
     { id: 'nov3', tipo: 'aviso', titulo: '📢 Cierre de mes: subir gestiones antes del 30', detalle: 'Recuerden dejar todas las gestiones y recaudos cargados antes del cierre.', autor: 'Finanzas', fecha: iso(addDays(NOW, -1)), prioridad: false }
   ];
-
-  // comisión generada por póliza cancelada (suma de comisiones de sus recibos)
-  cancelaciones.forEach(c => {
-    c.comisionGenerada = comisiones.filter(x => x.polizaId === c.polizaId).reduce((s, x) => s + (+x.monto || 0), 0);
-  });
 
   // orden de actividades por fecha desc se hace en el módulo
   return {

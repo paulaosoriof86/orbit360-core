@@ -128,7 +128,34 @@ Orbit.importa = (function () {
             <table class="tbl" style="margin-top:8px"><tbody>${m.detect.noAplicados.map(r => `<tr><td class="mono" style="font-size:12px">${r[0]}</td><td class="mono" style="font-size:12px">${r[1]}</td><td style="font-size:12px">${r[2]}</td><td class="num">${r[3]}</td></tr>`).join('')}</tbody></table>
           </div>
         </div>` : ''}
+      ${state.kind === 'planillas-comision' ? tarifasDetect() : ''}
       ${m.conciliacion ? `<div class="imp-note" style="margin-top:12px">🧾 Se desplegaron los <b>recibos según forma de pago</b>. La conciliación <b>no duplica</b>: solo crea lo que falta, completa o ajusta lo que no coincida. En el paso siguiente podés <b>aplicar pagos por póliza</b>.</div>` : ''}`;
+  }
+
+  /* Tarifas detectadas en la planilla: % por PRODUCTO que paga cada aseguradora (editable) */
+  function tarifasDetect() {
+    if (!state.detectedRates) {
+      const asgs = Orbit.store.all('aseguradoras').slice(0, 3);
+      const rows = [];
+      asgs.forEach(a => {
+        const ramos = (a.ramos || []).slice(0, 2);
+        ramos.forEach(r => {
+          const prods = (Orbit.cat && Orbit.cat.subramosDe) ? Orbit.cat.subramosDe(a.pais, r) : [];
+          const prod = prods[0] || r;
+          const baseP = (a.comisiones && a.comisiones[r]) || a.comisionDefault || 12;
+          rows.push({ aseguradoraId: a.id, asg: a.nombre, ramo: r, producto: prod, pct: baseP + (Math.random() > .5 ? 2 : -1) });
+        });
+      });
+      state.detectedRates = rows;
+    }
+    return `<div class="card" style="overflow:hidden;margin-top:14px;border:1px solid var(--info)">
+      <div style="padding:10px 13px;background:rgba(31,58,95,.06);font-family:var(--f-display);font-weight:700;font-size:13px">💼 Tarifas leídas de la planilla · % por producto <span class="muted" style="font-weight:400">(editable antes de aplicar)</span></div>
+      <table class="tbl"><thead><tr><th>Aseguradora</th><th>Ramo</th><th>Producto</th><th class="num">% que paga</th></tr></thead>
+      <tbody>${state.detectedRates.map((r, i) => `<tr>
+        <td>${U.esc(r.asg)}</td><td>${U.esc(r.ramo)}</td><td>${U.esc(r.producto)}</td>
+        <td class="num"><input type="number" min="0" max="100" step="0.5" value="${r.pct}" data-rate="${i}" style="width:64px;text-align:right;padding:4px 6px;border:1px solid var(--line);border-radius:6px">%</td></tr>`).join('')}</tbody></table>
+      <div class="imp-note" style="margin:0;border-radius:0">Al confirmar, estos % se cargan en <b>Tarifas de comisión</b> como override por producto. No se duplica: actualiza lo existente.</div>
+    </div>`;
   }
   function step3(m) {
     return `<div style="text-align:center;padding:24px 8px">
@@ -154,6 +181,8 @@ Orbit.importa = (function () {
       drop.addEventListener('drop', e => { e.preventDefault(); adv(); });
     }
     if (state.step === 2) {
+      // editar tarifas detectadas (planilla de comisiones)
+      dr.querySelectorAll('[data-rate]').forEach(inp => inp.addEventListener('change', () => { state.detectedRates[+inp.dataset.rate].pct = +inp.value || 0; }));
       // botón continuar al pie
       const body = dr.querySelector('.imp-body');
       const bar = document.createElement('div'); bar.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin-top:16px';
@@ -162,7 +191,13 @@ Orbit.importa = (function () {
       bar.querySelector('#imp-back2').addEventListener('click', () => { state.step = 1; paint(); });
       bar.querySelector('#imp-next2').addEventListener('click', () => { state.step = 3; paint(); });
     }
-    const fin = dr.querySelector('#imp-finish'); if (fin) fin.addEventListener('click', () => { close(); if (state.opts.onDone) state.opts.onDone(); });
+    const fin = dr.querySelector('#imp-finish'); if (fin) fin.addEventListener('click', () => {
+      if (state.kind === 'planillas-comision' && state.detectedRates && Orbit.comeng) {
+        const n = Orbit.comeng.aplicarPlanilla(state.detectedRates);
+        if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('✓ ' + n + ' tarifas de comisión actualizadas');
+      }
+      close(); if (state.opts.onDone) state.opts.onDone();
+    });
     const again = dr.querySelector('#imp-again'); if (again) again.addEventListener('click', () => { state.step = 1; paint(); });
   }
 

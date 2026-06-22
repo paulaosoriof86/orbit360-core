@@ -99,11 +99,12 @@ Orbit.primas = (function () {
       const total = r2(baseGrav + iva);
       const venc = new Date(inicio); venc.setMonth(venc.getMonth() + Math.round(i * pasoMeses));
       const lim = new Date(venc); lim.setDate(lim.getDate() + 15);
+      const comAseguradora = r2(neta * comAsegPct / 100);
       rows.push({
         n: (i + 1) + '/' + n,
         neta, gastosEmision, gastosFinan, otros, iva, total,
-        comAseguradora: r2(neta * comAsegPct / 100),
-        comVendedor: r2(neta * comVendPct / 100),
+        comAseguradora,
+        comVendedor: r2(comAseguradora * comVendPct / 100), // comVendedorPct = participación sobre la comisión de la aseguradora
         vence: venc.toISOString().slice(0, 10),
         fechaLimite: lim.toISOString().slice(0, 10)
       });
