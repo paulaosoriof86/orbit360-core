@@ -111,13 +111,15 @@
     <main id="main"><div id="host"></div></main>
   </div>
 
-  <!-- ============ DATA LAYER ============ -->
-  <script src="data/store.js"></script>
-  <script src="data/seed.js"></script>
-  <!-- CORE -->
+  <!-- ============ CORE (base) ============ -->
   <script src="core/theme.js"></script>
   <script src="core/ui.js"></script>
   <script src="core/config.js"></script>
+  <script src="core/primas.js"></script>
+  <!-- ============ DATA LAYER (depende de config + primas) ============ -->
+  <script src="data/store.js"></script>
+  <script src="data/seed.js"></script>
+  <!-- CORE (resto) -->
   <script src="core/queries.js"></script>
   <script src="core/crmkit.js"></script>
   <script src="core/ciclo.js"></script>

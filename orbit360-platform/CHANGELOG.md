@@ -2,6 +2,18 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.12.0] — 2026-06-22 · Ronda 5 (4/n): modelo de póliza + motor de primas/recibos
+### Added — `core/primas.js` (motor de primas y recibos)
+- **Desglose de prima** confirmado con pólizas reales: Prima Neta + Gastos de Expedición + Gastos Financieros (recargo por fraccionamiento, % sobre neta, solo si fraccionado) + Otros/asistencias = Base gravable; + **IVA** (configurable por país) = **Prima Total**. Validado con el ejemplo GT (Q17 752,15).
+- **Generación de recibos por forma de pago**: Contado / Tarjeta de crédito / Visa Cuotas al contado → **1 recibo** (sin recargo); fraccionado (Mensual=12, Bimestral=6, Trimestral=4, Cuatrimestral=3, Semestral=2) → **N recibos** prorrateados con recargo, ajustando el residuo de redondeo en el último para cuadrar exacto. Cada recibo trae su propio desglose + comisión aseguradora/vendedor + fecha límite.
+### Added — Tasas por país configurables
+- `Orbit.PAISES` ahora define `iva` y `recargoFinanciero` por país (demo: **GT IVA 12% · CO IVA 19%**); `Orbit.paisCfg()` y `Orbit.primas.cfgPais()` los exponen. Pensado para fijarse al **dar de alta el país**.
+### Changed — Seed `__v=11` (pólizas enriquecidas)
+- Cada póliza incluye: primaNeta, gastosEmision, gastosFinan, otros, ivaPct/ivaMonto, recargoFinPct, baseGravable, prima(total), frecuencia, formaPago, conducto, tarjeta, tipoPoliza, subramo, concepto, **renovable** (~15% no renovables), multianual, contadorRenovaciones, comAseguradoraPct, comVendedorPct, vendidaPor.
+- Los **cobros/recibos se generan desde el motor** (coinciden con el desglose); cada recibo guarda neta/gastos/g.finan/otros/iva + comisiones + fecha límite + conducto.
+### Changed — Drawer de póliza (Cliente 360)
+- Rediseñado: cabecera grafito, tags (estado, **Renovable/No renovable**, multianual, contador), datos clave, **conducto de pago**, **cuadro de desglose de prima**, y **cuadro de recibos** con columnas Neta/Gastos/G.Finan/Otros/IVA/Total + fila Total y fechas límite. Botón Renovar solo si la póliza es renovable.
+
 ## [0.11.0] — 2026-06-21 · Ronda 5 (3/n): Orbit Insights (analítica)
 ### Added — `modules/insights.js`
 - **Orbit Insights**: módulo de analítica real con 5 vistas conmutables:

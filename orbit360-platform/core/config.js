@@ -26,12 +26,15 @@ Orbit.MODULE_TITLES = {
   insights:      { icon: '📊', title: 'Orbit Insights', sub: 'Analítica del CRM', features: ['Producción', 'Cartera y aging', 'Pipeline', 'Renovaciones'] }
 };
 
-/* Operación multipaís — el cliente puede operar uno o varios países. */
+/* Operación multipaís — el cliente puede operar uno o varios países.
+   Cada país define moneda + impuestos/recargos configurables (se editan
+   al dar de alta el país). Demo: IVA GT 12% · CO 19%. */
 Orbit.PAISES = [
   { id: 'TODOS', label: 'Todos los países' },
-  { id: 'GT', label: 'Guatemala', moneda: 'GTQ' },
-  { id: 'CO', label: 'Colombia', moneda: 'COP' }
+  { id: 'GT', label: 'Guatemala', moneda: 'GTQ', iva: 12, recargoFinanciero: 5, gastosEmision: 0 },
+  { id: 'CO', label: 'Colombia', moneda: 'COP', iva: 19, recargoFinanciero: 6, gastosEmision: 0 }
 ];
+Orbit.paisCfg = function (id) { return Orbit.PAISES.find(p => p.id === id) || { iva: 12, recargoFinanciero: 5, gastosEmision: 0 }; };
 Orbit.pais = 'TODOS';
 
 /* Catálogo geográfico (departamentos → ciudades) por país. Configurable por cliente. */

@@ -729,35 +729,85 @@ Orbit.modules.cliente360 = (function () {
     const veh = q.vehiculoDePoliza(polId);
     const cob = Orbit.store.where('cobros', c => c.polizaId === polId).sort((a, b) => a.vence.localeCompare(b.vence));
     const d = U.daysFromNow(p.vigenciaFin);
+    const cur = p.moneda;
+    const m2 = (n) => U.money(n, cur);
+    // totales del cuadro de recibos
+    const sum = (k) => cob.reduce((s, c) => s + (+c[k] || 0), 0);
     let back = document.getElementById('c360-edit'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center';
-    back.innerHTML = `<div class="card" style="width:min(640px,95vw);max-height:92vh;overflow:auto;padding:0">
-      <div style="padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-        <div><div class="crumb" style="margin-bottom:4px">Póliza</div>
-          <b style="font-family:var(--f-display);font-size:18px">${p.ramo} · ${U.esc(p.producto)}</b>
-          <div class="muted mono" style="font-size:12.5px;margin-top:3px">${p.numero}</div></div>
-        <button class="imp-x" id="vp-x">✕</button>
+    const estBadge = U.estadoBadge(p.estado);
+    const renBadge = p.renovable ? '<span class="badge ok">Renovable</span>' : '<span class="badge neutral">No renovable</span>';
+    back.innerHTML = `<div class="card" style="width:min(960px,96vw);max-height:92vh;overflow:auto;padding:0">
+      <div class="vp-head">
+        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Póliza · ${p.tipoPoliza || 'Individual'}</div>
+          <b style="font-family:var(--f-display);font-size:19px;color:#fff">${p.ramo} · ${U.esc(p.producto)}</b>
+          <div class="mono" style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${p.numero} · ${asg ? U.esc(asg.nombre) : '—'}</div></div>
+        <button class="imp-x" id="vp-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
       </div>
-      <div style="padding:18px 20px;display:grid;gap:14px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:13px">
-          ${vrow('Aseguradora', (asg ? asg.nombre : '—'))}${vrow('Asesor', (ase ? ase.nombre : '—'))}
-          ${vrow('Forma de pago', p.forma)}${vrow('Estado', p.estado)}
-          ${vrow('Prima anual', U.money(p.prima, p.moneda))}${vrow('Suma asegurada', U.money(p.sumaAsegurada, p.moneda))}
+      <div style="padding:18px 20px;display:grid;gap:16px">
+        <div class="vp-tags">${estBadge}${renBadge}${p.multianual ? '<span class="badge info">Multianual</span>' : ''}<span class="badge neutral">${p.contadorRenovaciones || 0} renovaciones</span></div>
+
+        <div class="vp-grid">
+          ${vrow('Asesor / vendido por', (ase ? ase.nombre : (p.vendidaPor || '—')))}${vrow('Divisa', p.divisa || p.moneda)}
+          ${vrow('Subramo', p.subramo || p.producto)}${vrow('Tipo de póliza', p.tipoPoliza || 'Individual')}
           ${vrow('Vigencia', U.fmtDate(p.vigenciaInicio) + ' → ' + U.fmtDate(p.vigenciaFin))}${vrow('Renueva', d < 0 ? 'venció hace ' + (-d) + ' d' : 'en ' + d + ' d')}
+          ${vrow('Suma asegurada', m2(p.sumaAsegurada))}${vrow('Concepto', p.concepto || '—')}
         </div>
+
+        <div class="vp-pay">
+          <div class="vp-sec-t">💳 Conducto de pago</div>
+          <div class="vp-grid">
+            ${vrow('Frecuencia', p.frecuencia + ' (' + (cob.length) + (cob.length === 1 ? ' recibo)' : ' recibos)'))}
+            ${vrow('Forma de pago', p.formaPago + (p.tarjeta ? ' · ' + p.tarjeta : ''))}
+            ${vrow('Conducto', p.conducto || '—')}
+            ${vrow('Recargo financiero', (p.gastosFinan > 0 ? p.recargoFinPct + '% · ' + m2(p.gastosFinan) : 'No aplica (contado)'))}
+          </div>
+        </div>
+
+        <div class="vp-desglose">
+          <div class="vp-sec-t">🧾 Desglose de prima</div>
+          <table class="vp-dtbl">
+            <tr><td>Prima neta</td><td class="num">${m2(p.primaNeta)}</td></tr>
+            <tr><td>Gastos de expedición</td><td class="num">${m2(p.gastosEmision)}</td></tr>
+            <tr><td>Gastos financieros <span class="muted">(${p.gastosFinan > 0 ? p.recargoFinPct + '%' : '—'})</span></td><td class="num">${m2(p.gastosFinan)}</td></tr>
+            <tr><td>Otros / asistencias</td><td class="num">${m2(p.otros)}</td></tr>
+            <tr class="vp-sub"><td>Base gravable</td><td class="num">${m2(p.baseGravable)}</td></tr>
+            <tr><td>IVA <span class="muted">(${p.ivaPct}%)</span></td><td class="num">${m2(p.ivaMonto)}</td></tr>
+            <tr class="vp-tot"><td>Prima total</td><td class="num">${m2(p.prima)}</td></tr>
+          </table>
+        </div>
+
         ${veh ? `<div class="card pad" style="background:var(--surface)"><b style="font-family:var(--f-display);font-size:14px">🚗 ${U.esc(veh.marca)} ${U.esc(veh.linea)} ${veh.anio}</b>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:12.5px;margin-top:9px">${vrow('Placa', veh.placa)}${vrow('Uso', veh.uso)}${vrow('Chasis', veh.chasis)}${vrow('Motor', veh.motor)}</div></div>` : ''}
+          <div class="vp-grid" style="margin-top:9px;font-size:12.5px">${vrow('Placa', veh.placa)}${vrow('Uso', veh.uso)}${vrow('Chasis', veh.chasis)}${vrow('Motor', veh.motor)}</div></div>` : ''}
+
         <div>
-          <b style="font-family:var(--f-display);font-size:14px">Recibos de esta póliza</b>
-          <table class="tbl" style="margin-top:8px"><thead><tr><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Estado</th></tr></thead>
-          <tbody>${cob.map(c => `<tr><td>${c.cuota}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td>${U.estadoBadge(c.estado)}</td></tr>`).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:18px">Sin recibos.</td></tr>'}</tbody></table>
+          <div class="vp-sec-t">📋 Cuadro de recibos</div>
+          <div style="overflow-x:auto">
+          <table class="tbl vp-rtbl"><thead><tr>
+            <th>#</th><th class="num">Neta</th><th class="num">Gastos</th><th class="num">G.Finan</th><th class="num">Otros</th><th class="num">IVA</th><th class="num">Total</th><th>F. límite</th><th>Estado</th>
+          </tr></thead>
+          <tbody>${cob.map(c => `<tr>
+            <td class="mono">${c.cuota}</td>
+            <td class="num">${m2(c.neta != null ? c.neta : c.monto)}</td>
+            <td class="num">${m2(c.gastosEmision || 0)}</td>
+            <td class="num">${m2(c.gastosFinan || 0)}</td>
+            <td class="num">${m2(c.otros || 0)}</td>
+            <td class="num">${m2(c.iva || 0)}</td>
+            <td class="num"><b>${m2(c.monto)}</b></td>
+            <td style="font-size:12px">${U.fmtDate(c.fechaLimite || c.vence)}</td>
+            <td>${U.estadoBadge(c.estado)}</td></tr>`).join('') || '<tr><td colspan="9" class="muted" style="text-align:center;padding:18px">Sin recibos.</td></tr>'}</tbody>
+          <tfoot><tr class="vp-rfoot">
+            <td>Total</td><td class="num">${m2(sum('neta'))}</td><td class="num">${m2(sum('gastosEmision'))}</td><td class="num">${m2(sum('gastosFinan'))}</td><td class="num">${m2(sum('otros'))}</td><td class="num">${m2(sum('iva'))}</td><td class="num"><b>${m2(sum('monto'))}</b></td><td colspan="2"></td>
+          </tr></tfoot></table>
+          </div>
+          <div class="muted" style="font-size:11.5px;margin-top:7px">Comisión aseguradora ${p.comAseguradoraPct}% · comisión vendedor ${p.comVendedorPct}% (sobre prima neta). Recibos generados según la forma de pago; el recargo financiero solo aplica en pago fraccionado.</div>
         </div>
       </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card)">
         <button class="btn ghost" onclick="Orbit.ciclo.solicitarGestion('${cid}','${polId}')">🗂 Solicitar gestión</button>
         <button class="btn ghost" onclick="Orbit.modules.cliente360.comparativo('${polId}')">⚖ Comparar renovación</button>
-        <button class="btn primary" onclick="Orbit.modules.cliente360.renovar('${polId}')">🔄 Renovar</button>
+        ${p.renovable ? `<button class="btn primary" onclick="Orbit.modules.cliente360.renovar('${polId}')">🔄 Renovar</button>` : ''}
       </div>
     </div>`;
     document.body.appendChild(back);

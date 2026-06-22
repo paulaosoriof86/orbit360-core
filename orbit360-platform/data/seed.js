@@ -124,34 +124,55 @@ Orbit.SEED = (function () {
       const asg = pick(asg0.length ? asg0 : aseguradoras);
       const ramo = pick(asg.ramos);
       const producto = pick(productos[ramo] || ['Plan estándar']);
-      const formas = ['Mensual', 'Trimestral', 'Anual'];
-      const forma = pick(formas);
-      const cuotasN = forma === 'Mensual' ? 12 : forma === 'Trimestral' ? 4 : 1;
+      // frecuencia / forma de pago / conducto
+      const frecuencias = ['Contado', 'Mensual', 'Trimestral', 'Semestral', 'Anual'];
+      const frecuencia = pick(frecuencias);
+      const fraccionado = Orbit.primas.cuotasDe(frecuencia) > 1;
+      const formaPago = fraccionado ? pick(['Tarjeta de crédito', 'Visa Cuotas', 'Transferencia', 'Domiciliado'])
+                                    : pick(['Tarjeta de crédito', 'Transferencia', 'Efectivo']);
+      const conducto = pick(Orbit.primas.CONDUCTOS);
       const base = cli.tipo === 'Empresa' ? between(8000, 60000) : between(1200, 14000);
-      const primaAnual = cli.pais === 'CO' ? base * 1000 : base; // COP en miles
+      const primaNeta = cli.pais === 'CO' ? base * 1000 : base; // COP en miles
       const inicioMonths = between(1, 13);
       const vigInicio = addMonths(NOW, -inicioMonths);
       const vigFin = addMonths(vigInicio, 12);
-      const comPct = between(8, 22);
+      const comPct = between(8, 22);       // comisión aseguradora (sobre neta)
+      const comVendPct = between(20, 45);  // comisión del vendedor (sobre la comisión, demo: sobre neta reducida)
       // estado de la póliza
       const diasParaVencer = Math.round((vigFin - NOW) / 86400000);
       let estado = 'Vigente';
       if (diasParaVencer < 0) estado = 'Vencida';
       else if (diasParaVencer <= 45) estado = 'Por renovar';
-      // ~12% canceladas
       const cancelada = rnd() < 0.12;
       if (cancelada) estado = 'Cancelada';
+
+      // desglose de prima con tasas del país
+      const d = Orbit.primas.desglose(primaNeta, cli.pais, { fraccionado: fraccionado, otros: ramo === 'Auto' ? Math.round(primaNeta * 0.02) : 0 });
+
+      const renovable = rnd() > 0.15; // ~15% no renovables (multianual o de un solo período)
+      const tiposPol = { Auto: 'Individual', Vida: 'Individual', 'Gastos Médicos': rnd() > .5 ? 'Colectiva' : 'Individual', Hogar: 'Individual', Daños: 'Empresarial', RC: 'Empresarial', Fianzas: 'Empresarial' };
 
       const pol = {
         id: id('pol', pn),
         numero: (cli.pais === 'GT' ? 'GT-' : 'CO-') + asg.id.slice(-2).toUpperCase() + '-' + String(between(10000, 99999)),
         clienteId: cli.id, asesorId: cli.asesorId, aseguradoraId: asg.id,
-        ramo, producto, forma, moneda: cli.moneda,
-        prima: primaAnual,
-        sumaAsegurada: primaAnual * between(20, 120),
-        comisionPct: comPct,
-        vigenciaInicio: iso(vigInicio),
-        vigenciaFin: iso(vigFin),
+        ramo, subramo: producto, producto, tipoPoliza: tiposPol[ramo] || 'Individual',
+        moneda: cli.moneda, divisa: cli.moneda,
+        // pago
+        frecuencia, forma: frecuencia, formaPago, conducto,
+        tarjeta: (formaPago === 'Tarjeta de crédito' || formaPago === 'Visa Cuotas') ? '**** ' + between(1000, 9999) : '',
+        // desglose de prima
+        primaNeta: d.neta, gastosEmision: d.gastosEmision, gastosFinan: d.gastosFinan,
+        otros: d.otros, ivaPct: d.ivaPct, ivaMonto: d.iva, recargoFinPct: d.recargoPct,
+        prima: d.total, primaTotal: d.total, baseGravable: d.baseGravable,
+        sumaAsegurada: primaNeta * between(20, 120),
+        comisionPct: comPct, comAseguradoraPct: comPct, comVendedorPct: comVendPct,
+        vendidaPor: (asesores.find(a => a.id === cli.asesorId) || {}).nombre || '',
+        // vigencia / renovación
+        vigenciaInicio: iso(vigInicio), vigenciaFin: iso(vigFin),
+        renovable, multianual: !renovable && rnd() > .5,
+        contadorRenovaciones: between(0, 4),
+        concepto: producto + ' · ' + ramo,
         estado
       };
       polizas.push(pol);
@@ -182,43 +203,49 @@ Orbit.SEED = (function () {
         });
       }
 
-      // cobros (cuotas)
-      const cuotaMonto = Math.round(pol.prima / cuotasN);
-      for (let q = 0; q < cuotasN; q++) {
+      // ---- RECIBOS generados desde el motor de primas ----
+      // Contado/Anual = 1 recibo; fraccionado = N con recargo prorrateado.
+      const recibos = Orbit.primas.recibos(d, {
+        frecuencia, vigenciaInicio: iso(vigInicio),
+        comAseguradoraPct: comPct, comVendedorPct: comVendPct
+      });
+      const cuotasN = recibos.length;
+      recibos.forEach((rec, qi) => {
         cbn++;
-        const venc = addMonths(vigInicio, Math.round(q * (12 / cuotasN)));
-        const venceTs = venc.getTime();
+        const venceTs = new Date(rec.vence).getTime();
         let cEstado = 'Pendiente', fechaPago = null, conciliado = false;
-        if (estado === 'Cancelada' && q > 0) { cEstado = 'Anulado'; }
+        if (estado === 'Cancelada' && qi > 0) { cEstado = 'Anulado'; }
         else if (venceTs < NOW.getTime() - 8 * 86400000) {
-          // vencida en el pasado → mayoría pagada, algunas vencidas
-          if (rnd() < 0.85) { cEstado = 'Pagado'; fechaPago = iso(addDays(venc, between(-3, 6))); conciliado = rnd() < 0.9; }
+          if (rnd() < 0.85) { cEstado = 'Pagado'; fechaPago = iso(addDays(new Date(rec.vence), between(-3, 6))); conciliado = rnd() < 0.9; }
           else { cEstado = 'Vencido'; }
         } else if (venceTs < NOW.getTime()) {
           cEstado = rnd() < 0.7 ? 'Pagado' : 'Vencido';
-          if (cEstado === 'Pagado') { fechaPago = iso(venc); conciliado = rnd() < 0.8; }
+          if (cEstado === 'Pagado') { fechaPago = rec.vence; conciliado = rnd() < 0.8; }
         }
         cobros.push({
           id: id('cob', cbn), polizaId: pol.id, clienteId: cli.id, asesorId: cli.asesorId,
-          cuota: (q + 1) + '/' + cuotasN, monto: cuotaMonto, moneda: cli.moneda,
-          vence: iso(venc), fechaPago, estado: cEstado,
-          metodo: cEstado === 'Pagado' ? pick(['Transferencia', 'Tarjeta', 'Efectivo', 'Domiciliado']) : null,
-          conciliado
+          cuota: rec.n, monto: rec.total, moneda: cli.moneda,
+          // desglose del recibo
+          neta: rec.neta, gastosEmision: rec.gastosEmision, gastosFinan: rec.gastosFinan,
+          otros: rec.otros, iva: rec.iva,
+          comAseguradora: rec.comAseguradora, comVendedor: rec.comVendedor,
+          vence: rec.vence, fechaLimite: rec.fechaLimite, fechaPago, estado: cEstado,
+          metodo: cEstado === 'Pagado' ? pol.formaPago : null,
+          conducto: pol.conducto, conciliado
         });
 
-        // comisión por cuota pagada
         if (cEstado === 'Pagado') {
           cmn++;
-          const monto = Math.round(cuotaMonto * comPct / 100);
+          const monto = rec.comAseguradora;
           comisiones.push({
             id: id('com', cmn), polizaId: pol.id, cobroId: id('cob', cbn), clienteId: cli.id,
             asesorId: cli.asesorId, aseguradoraId: asg.id,
-            base: cuotaMonto, pct: comPct, monto, moneda: cli.moneda,
-            periodo: fechaPago ? fechaPago.slice(0, 7) : iso(venc).slice(0, 7),
+            base: rec.neta, pct: comPct, monto, moneda: cli.moneda,
+            periodo: fechaPago ? fechaPago.slice(0, 7) : rec.vence.slice(0, 7),
             estado: rnd() < 0.7 ? 'Liquidada' : 'Devengada'
           });
         }
-      }
+      });
     }
 
     // actividades / historial por cliente
@@ -361,7 +388,7 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 10,
+    __v: 11,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades
   };

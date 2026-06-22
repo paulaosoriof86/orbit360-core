@@ -249,6 +249,7 @@ Flujo del ciclo (vincula y sincroniza en vivo, comparte datos que luego hereda C
 ## ✅ CHECKLIST MAESTRO 1.0 (nada se omite — fuente de verdad de cobertura)
 Estado: ✅ hecho · 🟡 parcial · ⏳ pendiente · 🧩 placeholder honesto en NAV
 - ✅ Núcleo CRM (Clientes 360, Pólizas, Cobros, Renovaciones, Cancelaciones, Comisiones, Historial)
+- ✅ **Modelo de póliza + motor de primas/recibos** (`core/primas.js`): desglose (neta/expedición/g.financieros/otros/IVA/total), tasas por país (IVA GT 12%·CO 19%), recibos por forma de pago (contado=1; fraccionado=N con recargo), renovable sí/no, drawer enriquecido
 - ✅ Ciclo Ops ↔ Leads (kanban editable, sincronía, cadencias, emisión→cliente, multi-rol)
 - ✅ Solicitar gestión (equipo) + Solicitud del cliente (proxy) + adjuntos + notificaciones WA/correo
 - ✅ Confidencialidad (gate primer ingreso, persistente)
