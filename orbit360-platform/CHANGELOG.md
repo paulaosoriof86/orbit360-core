@@ -2,6 +2,20 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.11.0] — 2026-06-21 · Ronda 5 (3/n): Orbit Insights (analítica)
+### Added — `modules/insights.js`
+- **Orbit Insights**: módulo de analítica real con 5 vistas conmutables:
+  - **Resumen**: KPIs (prima vigente, recaudado, por cobrar, comisión) + dona de prima por ramo + dona de estado de cartera + top aseguradoras + producción por canal.
+  - **Producción**: avance por asesor vs meta (barras con %), prima por ramo, top productos.
+  - **Cartera**: aging de vencido por tramos, saldo por forma de pago, recibos vencidos prioritarios (clicables al 360).
+  - **Pipeline**: embudo comercial por etapa del ciclo, prima potencial/ponderada, tasa de conversión, pipeline por canal.
+  - **Renovaciones**: prima a renovar por mes (6 meses), motivos de cancelación, renovaciones inminentes (clicables al detalle de póliza).
+- **Micro-gráficos sin librerías** (barras, donas conic-gradient, embudo, barras de meta) con CSS propio.
+- Respeta el **selector de país** y normaliza a base GTQ para comparación; se re-renderiza en vivo ante cambios del store/país/ciclo.
+- Registrado en NAV (ya existía la ruta) + `MODULE_TITLES.insights` + script en `index.html`.
+### Docs
+- **PLAN**: agregado **CHECKLIST MAESTRO 1.0** explícito (todo el alcance, con estado ✅/🟡/⏳/🧩) para que ningún módulo quede fuera de vista; aclaración de cómo opera "Solicitud del cliente" hoy (proxy) vs en el Portal 1.0.
+
 ## [0.10.0] — 2026-06-21 · Ronda 5 (2/n): catálogos, listas editables, notificaciones, confidencialidad
 ### Added — Catálogos configurables (`Orbit.cat`)
 - Catálogos persistentes y editables: **canales** (redes sociales, conocido, referido, cliente actual/antiguo, web…), **ramos**, **productos**, **prioridades**, **tipos de gestión**. Todo desplegable para alimentar analítica.

@@ -22,7 +22,8 @@ Orbit.MODULE_TITLES = {
   calidad:       { icon: '🩺', title: 'Calidad de datos', sub: 'Expedientes a completar', features: ['Prioridad teléfono', 'Clientes con póliza vigente', 'Notificar por WA/correo'] },
   plantillas:    { icon: '✉', title: 'Plantillas de mensajes', sub: 'WhatsApp y correo', features: ['Propuestas', 'Primas pendientes', 'Actualización de datos'] },
   finanzas:      { icon: '💰', title: 'Orbit Finanzas', sub: 'Liquidaciones y conciliación', features: ['Movimientos', 'Liquidación empresa/asesores', 'Conciliación bancaria'] },
-  aseguradoras:  { icon: '🏢', title: 'Aseguradoras', sub: 'Directorio operativo', features: ['Fichas completas', 'Ejecutivos de cuenta', 'Documentos', 'Comisiones por ramo'] }
+  aseguradoras:  { icon: '🏢', title: 'Aseguradoras', sub: 'Directorio operativo', features: ['Fichas completas', 'Ejecutivos de cuenta', 'Documentos', 'Comisiones por ramo'] },
+  insights:      { icon: '📊', title: 'Orbit Insights', sub: 'Analítica del CRM', features: ['Producción', 'Cartera y aging', 'Pipeline', 'Renovaciones'] }
 };
 
 /* Operación multipaís — el cliente puede operar uno o varios países. */

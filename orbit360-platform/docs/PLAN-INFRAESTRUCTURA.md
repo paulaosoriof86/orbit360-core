@@ -242,8 +242,38 @@ Flujo del ciclo (vincula y sincroniza en vivo, comparte datos que luego hereda C
 - **Videos embebidos + formato + emojis** en Academia y Notificaciones.
 
 ## Estado de implementación de Ronda 5
-- **HECHO (v0.9)**: (a) fixes UI ficha/tabs (indicador "hay más") + quitar notas técnicas; (b) **rediseño fichas Ops/Leads + ciclo completo** (negocios proyectados a dos tableros, sincronía en vivo, automatizaciones de cadencia, emisión→crea cliente, listas espejo Inspección/Emisión en Leads) + **multi-rol "ver como"** (asesor no ve Ops) + **solicitar gestión** desde la ficha del cliente; títulos de listas con emoji+color.
-- **PENDIENTE**: listas Ops/Leads *editables/reordenables por el cliente* + automatizaciones por lista (hoy las listas son fijas, el flujo sí es completo); (c) Finanzas import/metas (recaudo/ventas/producción); (d) Integraciones (Outlook prioritario); (e) Academia + Marketing + Reportes + IA + Portal; (f) responsive global; renovaciones multi-aseguradora; calidad de datos edición inline; WhatsApp Web.
+- **HECHO (v0.9)**: fixes UI ficha/tabs ("hay más") + quitar notas técnicas; ciclo Ops/Leads completo (sincronía en vivo, cadencias, emisión→cliente, listas espejo); multi-rol "ver como"; solicitar gestión desde ficha.
+- **HECHO (v0.10)**: catálogos configurables (`Orbit.cat`) con "➕ Otro" en todos los desplegables; **listas Ops/Leads editables** (crear/renombrar/recolor/reordenar/eliminar); país con bandera en tarjetas; responsable por defecto+seleccionable; nota bajo checklist; **notificaciones WA/correo** (solicitar/resolver gestión); **solicitud del cliente** (proxy del Portal) + **adjuntos**; seguimientos manuales en Mi Día (WA); cadencias = WA→correo; ficha cliente: quitar import estado de cuenta, pólizas/vehículos abren detalle; CRM (pólizas/cobros/cancelaciones) abren detalle; **acuerdo de confidencialidad** en primer ingreso.
+- **HECHO (v0.11)**: **Orbit Insights** — analítica real en 5 vistas (Resumen · Producción · Cartera/aging · Pipeline/embudo · Renovaciones), respeta país, micro-gráficos sin librerías.
+
+## ✅ CHECKLIST MAESTRO 1.0 (nada se omite — fuente de verdad de cobertura)
+Estado: ✅ hecho · 🟡 parcial · ⏳ pendiente · 🧩 placeholder honesto en NAV
+- ✅ Núcleo CRM (Clientes 360, Pólizas, Cobros, Renovaciones, Cancelaciones, Comisiones, Historial)
+- ✅ Ciclo Ops ↔ Leads (kanban editable, sincronía, cadencias, emisión→cliente, multi-rol)
+- ✅ Solicitar gestión (equipo) + Solicitud del cliente (proxy) + adjuntos + notificaciones WA/correo
+- ✅ Confidencialidad (gate primer ingreso, persistente)
+- ✅ Orbit Insights (analítica)
+- 🟡 Mi Día (dashboard + seguimientos manuales) — falta **Cronograma calendario día/semana/mes + tareas por día**
+- 🟡 Importación inteligente (scaffold) — falta motor real de extracción/mapeo
+- 🟡 Calidad de datos (lista) — falta **edición inline rápida que desaparece al completar**
+- 🧩 **Finanzas** (importar movimientos/presupuesto/liquidaciones/estados de cuenta, metas recaudo/ventas/producción, doble conciliación, dashboard intermensual/interanual sobre prima NETA) — placeholder
+- 🧩 **Aseguradoras** (ficha editable, contactos/accesos/clausulados, pólizas ejemplo, Drive, fusión con cotizador, alimenta IA) — placeholder
+- 🧩 **Cotizador + Comparativo** (multicompañía; comparativo IA con análisis crítico; tarifas configurables) — se **integra como módulo aislado** cuando la base 1.0 esté lista; viene de la herramienta de A&S
+- 🧩 **Orbit IA** (un cerebro, tres usuarios: equipo/asesores/clientes, sobre repositorio aseguradoras + biblioteca) — placeholder
+- 🧩 **Orbit Academia** (inducción, capacitación, certificaciones, piezas, recursos, instructivos, **video embebido**) — placeholder
+- 🧩 **Orbit Marketing** (calendario con ficha por día: contenidos/piezas/redes, segmentación, stats, automatización) — placeholder
+- 🧩 **Reportes** (exportables, filtros, programados por correo) — placeholder
+- 🧩 **Portal del Cliente** (sus pólizas/recibos/documentos/contacto + **solicitar gestiones que entran a Ops y notifican** — hoy simulado con el botón 🙋 en la ficha) — placeholder
+- 🧩 **Notificaciones WhatsApp** (centro de mensajería WA web + API, plantillas, encuestas) — base hecha (notify), falta centro dedicado
+- ⏳ **Integraciones** (Config): **Outlook prioritario**, Gmail, Green API, Sheets, Canva, Gamma, NotebookLM, HeyGen, redes, Metricool, Mailchimp
+- ⏳ **Localización por país** (glosario de términos configurable por tenant)
+- ⏳ **Equipo y permisos** + **Configuración** self-service (catálogos, metas, branding, módulos activos)
+- ⏳ **Renovaciones multi-aseguradora** (hoy comparativo simula misma aseguradora)
+- ⏳ **Responsive global** (revisar todos los módulos)
+
+### Sobre la "Solicitud del cliente" (cómo opera hoy vs 1.0)
+- **Hoy**: botón 🙋 en la ficha del cliente que crea la gestión en Ops con origen "Solicitud del cliente" y dispara notificación al asesor (WA/correo). Es el **proxy** mientras no exista el Portal.
+- **En 1.0**: el **Portal del Cliente** (módulo `portal`) expondrá esa misma acción al cliente final autenticado; usará el mismo motor (`Orbit.ciclo.solicitarGestion(..., desdeCliente=true)`), por lo que entrará a Ops y notificará igual. No hay rework: el botón actual ya llama al mismo flujo.
 
 > **Definición de "1.0 comercializable" (cuando aviso para arrancar A&S)**: pasos 3 y 4 completos + Finanzas operativa + Ops/Leads + Aseguradoras configurables. Cotizador se integra después, ya sobre A&S.
 
