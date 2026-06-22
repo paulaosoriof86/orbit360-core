@@ -195,11 +195,19 @@ Orbit.SEED = (function () {
       // cancelación
       if (cancelada) {
         cxn++;
+        const fechaCancel = addDays(NOW, -between(10, 200));
+        const diasActiva = Math.max(15, Math.round((fechaCancel - vigInicio) / 86400000));
+        // comisión generada acumulada por esta póliza hasta la cancelación
         cancelaciones.push({
           id: id('can', cxn), polizaId: pol.id, clienteId: cli.id,
-          fecha: iso(addDays(NOW, -between(10, 200))),
-          motivo: pick(['No pago de prima', 'Cambio de aseguradora', 'Venta del bien', 'Insatisfacción', 'Duplicidad']),
-          valorPerdido: pol.prima
+          fecha: iso(fechaCancel), fechaInicio: pol.vigenciaInicio,
+          diasActiva,
+          motivo: pick(['No pago de prima', 'Cambio de aseguradora', 'Venta del bien', 'Insatisfacción', 'Mejor oferta', 'Duplicidad']),
+          valorPerdido: pol.prima,
+          comisionGenerada: 0, // se calcula tras generar comisiones (abajo)
+          ramo: pol.ramo,
+          recuperacion: pick(['Pendiente de contacto', 'Llamada de retención agendada', 'Oferta de mejora enviada', 'No recuperable', 'En negociación']),
+          recuperada: false
         });
       }
 
@@ -386,9 +394,14 @@ Orbit.SEED = (function () {
     { id: 'nov3', tipo: 'aviso', titulo: '📢 Cierre de mes: subir gestiones antes del 30', detalle: 'Recuerden dejar todas las gestiones y recaudos cargados antes del cierre.', autor: 'Finanzas', fecha: iso(addDays(NOW, -1)), prioridad: false }
   ];
 
+  // comisión generada por póliza cancelada (suma de comisiones de sus recibos)
+  cancelaciones.forEach(c => {
+    c.comisionGenerada = comisiones.filter(x => x.polizaId === c.polizaId).reduce((s, x) => s + (+x.monto || 0), 0);
+  });
+
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 11,
+    __v: 12,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades
   };

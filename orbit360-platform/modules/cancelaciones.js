@@ -55,7 +55,7 @@ Orbit.modules.cancelaciones = (function () {
           <thead><tr><th>Fecha</th><th>Cliente</th><th>Póliza</th><th>Ramo</th><th>Motivo</th><th class="num">Valor perdido</th></tr></thead>
           <tbody>${rows.map(c => {
             const p = S().get('polizas', c.polizaId);
-            return `<tr class="clickable" onclick="${p ? `Orbit.modules.cliente360.verPoliza('${c.polizaId}')` : `location.hash='#/cliente360?c=${c.clienteId}'`}">
+            return `<tr class="clickable" onclick="Orbit.modules.cancelaciones.detalle('${c.id}')">
               <td style="font-size:12.5px">${U.fmtDate(c.fecha)}</td>
               <td>${K.clienteCell(c.clienteId)}</td>
               <td><span class="mono" style="font-size:12px">${p ? p.numero : '—'}</span></td>
@@ -69,5 +69,59 @@ Orbit.modules.cancelaciones = (function () {
 
     K.wireFilters(FDEFS(), st, () => render(host));
   }
-  return { render };
+
+  /* ---- Detalle de cancelación (drawer) ---- */
+  function detalle(canId) {
+    const c = S().get('cancelaciones', canId); if (!c) return;
+    const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
+    const asg = p ? q.aseguradora(p.aseguradoraId) : null, ase = q.asesor((p && p.asesorId) || (cli && cli.asesorId));
+    const cur = (cli && cli.moneda) || 'GTQ';
+    const meses = c.diasActiva ? (c.diasActiva / 30).toFixed(1) : '—';
+    const recOpts = ['Pendiente de contacto', 'Llamada de retención agendada', 'Oferta de mejora enviada', 'En negociación', 'Recuperada', 'No recuperable'];
+    let back = document.getElementById('c360-edit'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center';
+    back.innerHTML = `<div class="card" style="width:min(640px,95vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:18px 20px;background:linear-gradient(120deg,#7e1220,#b5253b);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.82)">Cancelación · ${U.fmtDate(c.fecha)}</div>
+          <b style="font-family:var(--f-display);font-size:18px;color:#fff">${cli ? U.esc(cli.nombre) : '—'}</b>
+          <div class="mono" style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${p ? p.numero + ' · ' + p.ramo : '—'}</div></div>
+        <button class="imp-x" id="cx-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
+      </div>
+      <div style="padding:18px 20px;display:grid;gap:16px">
+        <div class="cx-kpis">
+          <div class="cx-kpi"><span>Tiempo activa</span><b>${c.diasActiva || '—'} d</b><small>${meses} meses</small></div>
+          <div class="cx-kpi"><span>Valor perdido</span><b style="color:var(--danger)">${U.money(c.valorPerdido, cur)}</b><small>prima anual</small></div>
+          <div class="cx-kpi"><span>Comisión generada</span><b style="color:var(--info)">${U.money(c.comisionGenerada || 0, cur)}</b><small>antes de baja</small></div>
+        </div>
+        <div class="vp-grid">
+          ${vr('Aseguradora', asg ? asg.nombre : '—')}${vr('Asesor', ase ? ase.nombre : '—')}
+          ${vr('Motivo', '<span class="badge danger">' + U.esc(c.motivo) + '</span>')}${vr('Estado de póliza', p ? p.estado : '—')}
+          ${vr('Inicio de vigencia', U.fmtDate(c.fechaInicio || (p && p.vigenciaInicio)))}${vr('Fecha de cancelación', U.fmtDate(c.fecha))}
+        </div>
+        <div class="vp-pay">
+          <div class="vp-sec-t">♻ Acción de recuperación</div>
+          <select id="cx-rec" class="o-sel">${recOpts.map(o => `<option ${o === c.recuperacion ? 'selected' : ''}>${o}</option>`).join('')}</select>
+          <label class="ce-l" style="margin-top:10px">Nota de retención<textarea id="cx-nota" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px" placeholder="Gestión de recuperación, oferta, resultado…">${U.esc(c.notaRecuperacion || '')}</textarea></label>
+        </div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        ${p ? `<button class="btn ghost" onclick="Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
+        <button class="btn ghost" onclick="Orbit.ciclo.nuevoNegocio && Orbit.ciclo.nuevoNegocio()">🎯 Recuperar (nuevo negocio)</button>
+        <button class="btn primary" id="cx-save">Guardar</button>
+      </div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#cx-x').addEventListener('click', close);
+    back.querySelector('#cx-save').addEventListener('click', () => {
+      const rec = back.querySelector('#cx-rec').value;
+      S().update('cancelaciones', canId, { recuperacion: rec, recuperada: rec === 'Recuperada', notaRecuperacion: back.querySelector('#cx-nota').value.trim() });
+      close();
+    });
+  }
+  function vr(l, v) { return `<div class="vp-row"><span class="vp-l">${l}</span><span class="vp-v">${v}</span></div>`; }
+
+  return { render, detalle };
 })();

@@ -305,3 +305,48 @@ Secciones, todas dentro de la ficha 360 (pestañas):
 2. **Configuración interna (nuestra, para personalizar)**: **selección de módulos activos por cliente**, plan contratado, límites, white-label avanzado, provisioning. No visible para el cliente.
 
 > Implementación técnica: un objeto `Orbit.tenant` (config del cliente) define `modulosActivos[]`, `plan`, `branding`, `paises[]`, `roles{}` y `portalVisibility{}`. El sidebar/router ya leen de config → bastará filtrar por `modulosActivos`. Documentado para no repetir.
+
+---
+
+# 🔴 RONDA 6 — Pólizas administrables, cobertura, documentos, importador inteligente y analítica integral (PRIORIZADA)
+Feedback del 22-jun. Orden de ataque sugerido (de fundacional a avanzado):
+
+## R6.1 · Catálogos por país (ramos/subramos) — FUNDACIONAL ✅ (v0.13)
+- **Ramos y subramos en listas desplegables, con lenguaje por país** (GT/CO) para analítica/trazabilidad/estandarización. Nada escrito a mano.
+- `Orbit.cat` extendido con `ramosPais` y `subramosPais` (mapa ramo→[subramos] por país). "➕ Otro" sigue disponible y se guarda al catálogo del país.
+- Estos catálogos son **transversales**: pólizas, leads/negocios, gestiones, insights leen de la misma fuente.
+
+## R6.2 · Póliza administrable + cobertura + historial/endosos
+- **Editar póliza** (faltaba): drawer de edición con todos los campos; **toda sección debe poder editarse** (permisos definen quién/dónde).
+- **Auto-cálculo al crear/editar prima manual**: Gastos de emisión **GT = 5% de prima neta**, IVA por país — **calculados automáticamente pero modificables**. Al importar, respetar esos valores y **señalar lo que no se pudo leer** para completar manual.
+- **Qué cubre la póliza** (según tipo): vehículo / inmueble / grupo familiar / contrato. Mostrar datos generales en la póliza + **abrir el detalle completo** en su sección (p. ej. Vehículos). Datos **transversales**, no solo dentro de la póliza.
+- **Endosos / sustitución de vehículo / cambio de propietario / otras gestiones** (manual + importar + crear inteligente, como en todas las secciones) → se reflejan en el **histórico de la póliza**.
+- **Todas las pólizas renuevan anualmente** para el cálculo de renovaciones automatizadas (confirmado).
+
+## R6.3 · Aplicar pago + conciliación real + documentos
+- **Al aplicar pago**: seleccionar **fecha de envío a gestión** (default = hoy, modificable) + **cargar factura** para fijar la **fecha real en que la aseguradora pagó** (medio adicional de conciliación).
+- Aclarar/definir cómo cambian **Pagado** y **Conciliado**: *Pagado* = se registró el cobro al cliente/intermediario; *Conciliado* = cruzado contra el **estado de cuenta/planilla de la aseguradora** (o contra la **factura** cargada). Hoy es flag demo; en Finanzas se concilia con import de estados de cuenta.
+- **Estados de cuenta** son **generales de la aseguradora** (no por cliente) → su import vive en **Finanzas**, no en la ficha del cliente. (Ya se quitó de la ficha.)
+
+## R6.4 · Gestión documental (Drive del cliente / aseguradora)
+- No migramos el Drive actual (espacio). Estrategia: **cargar documentos al Drive en la carpeta del cliente**; si no se puede **mapear** la carpeta, **crearla con el nombre completo del cliente** y **etiquetar** los documentos.
+- Revisar y definir **dónde se refleja y almacena cada documento** que se cargue (póliza, recibo/factura, endoso, cliente, aseguradora).
+- **Ficha de aseguradora**: cargar documentos (comerciales, formularios, etc.) + sección de **documentos requeridos para emisión** seleccionando el **producto** al que aplican. Importar imágenes/documentos con contactos/instrucciones de una aseguradora → **mapear al sector correcto** de su ficha.
+- En **pólizas (directorio y leads)**: acceso al **Drive de la aseguradora** (o de la aseguradora ya identificada) para descargar formularios/documentos de emisión → reduce dependencia. Mejor: **dirigir al módulo Aseguradoras** que centraliza esa documentación/acceso.
+
+## R6.5 · Importador inteligente (motor real) — CLAVE
+- Motor real de **extracción de PDF muy potente** en **todas las secciones** + mapeo por tipo de archivo.
+- **Cruce con todos los módulos**: por llave (identificación, n.º póliza, placa) → **complementa lo existente, no duplica**.
+- Señala campos no leídos para completar manual.
+- **Interalimentación del modelo**: usa la **información comercial de Academia por aseguradora** (documentos de aseguradoras cargados) para entrenar/contextualizar la extracción e inteligencia. Cargar parte de documentos de aseguradoras añade valor.
+
+## R6.6 · Cancelaciones con detalle completo ✅ (v0.13)
+- Drawer/detalle: **cuál póliza**, **motivo**, **cuánto tiempo estuvo activa**, **comisión que generó**, **acción de recuperación**, aseguradora, valor perdido, asesor.
+
+## R6.7 · Analítica integral (Insights / Reportes / Metas) — de lo general a lo particular
+- Medir **dos tipos de producción con metas separadas**: **pólizas nuevas** vs **pólizas renovadas**.
+- KPIs/OKRs **completos**, de lo general a lo particular, con análisis profundo: operación general de la empresa en relación con **asesores, clientes, aseguradoras, finanzas, mercadeo**.
+- Periodicidad: **mes, intermensual, interanual**; **análisis crítico real e inteligente**, **recomendaciones por área**. Pensado integralmente para **tomar decisiones en todas las áreas**.
+
+## R6.8 · Editar en todas las secciones (administrable)
+- Toda sección con opción **editar**; **permisos** determinan quién puede y dónde (módulo Equipo/Permisos).

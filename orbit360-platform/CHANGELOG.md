@@ -2,6 +2,21 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.13.0] — 2026-06-22 · Ronda 6 (1/n): catálogos por país, póliza administrable, cancelaciones con detalle
+### Added — Catálogos ramos/subramos POR PAÍS (`Orbit.cat`)
+- `ramosPais` (GT/CO) con lenguaje local (GT: "Incendio y Líneas Aliadas", "Fianzas"; CO: "Incendio y Terremoto", "Cumplimiento", "ARL"…), cada ramo con su lista de **subramos**. API `ramosDe(pais)`, `subramosDe(pais, ramo)`, `addRamo`, `addSubramo`. Fuente única y **transversal** para listas desplegables, analítica y trazabilidad. "➕ Otro" agrega al catálogo del país.
+### Added — Póliza administrable (Cliente 360)
+- **Editar póliza** (`editarPoliza`): drawer con ramo/subramo **por país** (desplegables + "Otro"), datos, vigencia, pago, **renovable sí/no**, suma asegurada.
+- **Auto-cálculo de prima**: Gastos de expedición **GT = 5% de la prima neta** + **IVA por país** calculados automáticamente y **modificables** (toggle). Resumen de desglose en vivo; al guardar regenera los recibos.
+- **Qué cubre la póliza** (`coberturaCard`): vehículo (con enlace a **Ver detalle del vehículo**), o bien/inmueble/grupo familiar/contrato según ramo.
+- **Historial y endosos** (`endoso`): registrar endoso / sustitución de vehículo / cambio de propietario / inclusión de beneficiario / modificación, en modos **Manual · Importar · Crear inteligente**; queda en el **historial de la póliza** y del cliente.
+- **Ver detalle de vehículo** (`verVehiculo`) desde la póliza y desde la pestaña Vehículos, con acción de sustitución por endoso.
+### Added — Cancelaciones con detalle (`detalle`)
+- Drawer: **tiempo activa** (días/meses), **valor perdido**, **comisión generada** antes de la baja, aseguradora, asesor, motivo, fechas, y **acción de recuperación** editable + nota; accesos a ver póliza y recuperar (nuevo negocio).
+- Seed enriquecido: `fechaInicio`, `diasActiva`, `comisionGenerada` (suma real de comisiones de la póliza), `recuperacion`.
+### Changed
+- Seed `__v=12`. Plan: agregada **RONDA 6** completa y priorizada (catálogos por país, póliza administrable, aplicar pago + conciliación + factura, gestión documental Drive cliente/aseguradora, **importador inteligente**, cancelaciones, **analítica integral con producción nueva vs renovada**, editar en todas las secciones).
+
 ## [0.12.0] — 2026-06-22 · Ronda 5 (4/n): modelo de póliza + motor de primas/recibos
 ### Added — `core/primas.js` (motor de primas y recibos)
 - **Desglose de prima** confirmado con pólizas reales: Prima Neta + Gastos de Expedición + Gastos Financieros (recargo por fraccionamiento, % sobre neta, solo si fraccionado) + Otros/asistencias = Base gravable; + **IVA** (configurable por país) = **Prima Total**. Validado con el ejemplo GT (Q17 752,15).
