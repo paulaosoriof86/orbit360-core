@@ -337,8 +337,31 @@ Referencia (capturas lab) — implementar con mejor nivel gráfico y vinculado a
 - **Análisis crítico**: alertas (caída de PN vs período, tasa de cancelación sobre umbral, recaudo, vencimientos próximos) + **recomendaciones accionables por área** (renovaciones, cobros, cancelaciones). Todo desde datos reales, en vivo.
 - KPIs de negocio sugeridos (de lo general a lo particular): PN y prima total (mes/acumulado), # pólizas nuevas/renovadas, ticket promedio, tasa de renovación, tasa de cancelación/fuga, recaudo % y aging, comisión devengada/liquidada, concentración top-10, producción por asesor vs meta, mix por ramo/aseguradora, var interanual/intermensual.
 
-## R7.6 · Ficha de póliza — modificaciones pendientes (aplicar lo no aplicado)
-- Revisar y aplicar todo lo pedido antes (editar póliza, qué cubre con apertura del bien, endosos/sustituciones/cambios en el historial, etc.) — confirmar que quedó en la versión actual (parte se revirtió en un undo).
+## R7.6 · Ficha de PÓLIZA — checklist consolidado de TODAS las observaciones (varias iteraciones)
+Estado por ítem: ✅ hecho · 🟡 parcial · ⏳ pendiente. (Reúne lo dicho en los mensajes con capturas SIGA y el CRM actual.)
+- ✅ **Desglose de prima** = Prima Neta + Gastos de emisión/expedición + Gastos adicionales/asistencias (Otros) + Recargo por fraccionamiento (Gastos financieros) + IVA = **Prima Total**; **cambia por país** (IVA GT 12% / CO 19%).
+- ✅ **Recibos según forma de pago**: tarjeta de crédito / Visa Cuotas al **contado = 1 recibo**; **fraccionado = N recibos** según el fraccionamiento elegido, con recargo prorrateado.
+- ✅ **Auto-cálculo al crear/editar prima manual**: Gastos de emisión **GT = 5% de prima neta** + IVA, **calculados automáticamente y modificables**.
+- ✅ **Sin lenguaje mexicano de SIGA** ni campos inútiles (folio, ejecutivo, agente, CIS, carpeta).
+- ✅ **Editar póliza** (drawer) — administrable; ramo/subramo en desplegable **por país** (reconstruido v0.15 tras el undo).
+- ✅ **Qué cubre la póliza según tipo**: vehículo / inmueble / grupo familiar / contrato; en vehículo, **abrir el detalle completo** (reconstruido v0.15). *(Datos transversales.)*
+- ✅ **Endosos / sustitución de vehículo / cambio de propietario / inclusión de beneficiario** (manual · importar · crear inteligente) → **historial de la póliza** (reconstruido v0.15).
+- ✅ **Estados Pagado vs Conciliado** definidos; **aplicar pago** con **fecha de envío a gestión** (default hoy, editable) + **carga de factura** que fija la **fecha real** del pago de la aseguradora (conciliación adicional).
+- ✅ **Cancelaciones con detalle** (póliza, motivo, tiempo activa, comisión generada, acción de recuperación).
+- ✅ **Comisión aseguradora (%/ramo+producto) y vendedor (modelo flexible)** calculadas y editables; importables desde planilla.
+- ⏳ **Acceso al Drive de la aseguradora desde la ficha de póliza y desde Leads** para descargar formularios/documentos requeridos para emisión → dirige al **módulo Aseguradoras** (centraliza documentación/acceso). *(pendiente — depende de módulo Aseguradoras)*
+- ⏳ **Gestión documental**: documentos de la póliza (factura, endoso, PDF) se cargan al **Drive en la carpeta del cliente**; si no se mapea, **crear carpeta con nombre completo del cliente** y **etiquetar**. *(pendiente)*
+- ⏳ **Importador de pólizas que cruza y complementa sin duplicar** (por n.º póliza/placa/identificación) y **señala lo no leído** para completar manual. *(pendiente — motor real)*
+- ⏳ **Reportes/Insights/Metas con producción NUEVA vs RENOVADA** (afecta cómo se lee la póliza en analítica). *(pendiente — R7.5)*
+- ⏳ **Siniestros/reclamos asociados a la póliza** (bitácora + correos). *(pendiente — R7.10)*
+- ⏳ **Editar en TODAS las secciones** según permisos (no solo póliza). *(pendiente — patrón global)*
+
+> Nota: parte de lo ✅ se revirtió en un *undo* y se reconstruyó; confirmar en cada release que la ficha de póliza conserve editar + qué cubre + endosos/historial + aplicar pago con factura.
+
+## R7.6-bis · Ficha de póliza — pendientes específicos a aplicar ya
+- Acceso a **Drive aseguradora / formularios de emisión** desde la ficha y desde Leads.
+- **Carga de documentos** a la ficha con destino Drive del cliente (carpeta mapeada o creada + etiquetada).
+- **Siniestros** vinculados.
 
 ## R7.7 · Automatizaciones (módulo) — **Make** + herramientas creativas
 - Integración **Make** (escenarios/automatizaciones). Conectores y disparadores desde eventos de Orbit (gestión creada, póliza emitida, cobro vencido…).

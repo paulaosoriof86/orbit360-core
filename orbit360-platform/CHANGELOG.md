@@ -2,6 +2,20 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.15.0] — 2026-06-22 · Reconstrucción de la ficha de póliza (lo perdido en el undo) + ramos por país
+> El *undo* de una sesión previa había revertido estas mejoras; se reconstruyen y se confirma su estado en el plan (R7.6 checklist consolidado).
+### Added — Catálogos ramos/subramos por país (`Orbit.cat`)
+- `ramosPais` GT/CO con lenguaje local + API `ramosDe(pais)` / `subramosDe(pais, ramo)` / `addRamo` / `addSubramo`. Transversal (lo usa también el importador de planillas).
+### Added — Ficha de póliza administrable
+- **Editar póliza**: ramo/subramo **por país** (con "➕ Otro"), datos, vigencia, pago, **renovable**, suma; **auto-cálculo** de gastos de expedición (GT 5%) + IVA (modificable) con resumen de desglose en vivo.
+- **Qué cubre**: vehículo (con enlace a **Ver detalle del vehículo**) o inmueble/grupo/contrato según ramo.
+- **Historial y endosos**: registrar endoso/sustitución/cambio de propietario/beneficiario (manual·importar·inteligente) → historial de la póliza + actividad del cliente.
+- **Ver detalle de vehículo** desde la póliza, con acción de sustitución por endoso.
+### Added — Cancelaciones con detalle (`detalle`)
+- Drawer con **tiempo activa** (días/meses), valor perdido, **comisión generada** (derivada en vivo), aseguradora, asesor, motivo, fechas y **acción de recuperación** editable + nota.
+### Docs
+- **R7.6**: checklist consolidado de TODAS las observaciones de la ficha de póliza con estado real ítem por ítem (lo hecho y lo pendiente: Drive aseguradora/formularios, gestión documental, importador que cruza sin duplicar, siniestros, nuevas vs renovadas).
+
 ## [0.14.0] — 2026-06-22 · Inicio aligerado + comisión por asesor flexible (Ronda 7 1/n)
 ### Changed — Inicio (visual)
 - El panel **"Metas del mes"** pasa de gradiente oscuro a **card claro** con acento rojo superior; los dials se adaptan a fondo claro. Elimina la sobrecarga de dos paneles oscuros consecutivos (título + metas).

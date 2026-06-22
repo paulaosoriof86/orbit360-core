@@ -71,6 +71,32 @@ Orbit.cat = (function () {
   const DEF = {
     canales: ['Referido', 'Conocido', 'Cliente actual', 'Cliente antiguo', 'Web / sitio', 'WhatsApp', 'Facebook', 'Instagram', 'TikTok', 'LinkedIn', 'YouTube', 'Campaña', 'Telemarketing', 'Evento / feria'],
     ramos: ['Auto', 'Vida', 'Gastos Médicos', 'Hogar', 'Daños', 'Fianzas', 'Transporte', 'RC', 'Accidentes'],
+    // Ramos y subramos con LENGUAJE POR PAÍS (GT/CO) — fuente única para
+    // desplegables, analítica, trazabilidad y estandarización.
+    ramosPais: {
+      GT: {
+        'Automóviles': ['Auto Individual', 'Auto Flotilla', 'Motocicleta', 'Equipo Pesado', 'Auto Comercial'],
+        'Vida': ['Vida Individual', 'Vida Colectivo', 'Vida Deudores', 'Vida Temporal', 'Dotal'],
+        'Gastos Médicos': ['GM Individual', 'GM Colectivo', 'GM Familiar', 'GM Internacional'],
+        'Incendio y Líneas Aliadas': ['Hogar', 'Edificio', 'Comercio', 'Todo Riesgo Construcción'],
+        'Daños': ['Multirriesgo PYME', 'Robo y Hurto', 'Rotura de Maquinaria', 'Equipo Electrónico'],
+        'Fianzas': ['Cumplimiento', 'Anticipo', 'Sostenimiento de Oferta', 'Calidad de Obra'],
+        'Transporte': ['Carga Terrestre', 'Carga Marítima', 'Carga Aérea', 'Casco'],
+        'Responsabilidad Civil': ['RC General', 'RC Profesional', 'RC Productos', 'RC Patronal'],
+        'Accidentes Personales': ['AP Individual', 'AP Colectivo', 'AP Escolar', 'Viajero']
+      },
+      CO: {
+        'Automóviles': ['Auto Individual', 'Auto Flotas', 'Motos', 'Pesados', 'SOAT'],
+        'Vida': ['Vida Individual', 'Vida Grupo', 'Vida Deudores', 'Temporal', 'Exequias'],
+        'Salud': ['Medicina Prepagada', 'Plan Complementario', 'Hospitalización y Cirugía', 'Salud Internacional'],
+        'Incendio y Terremoto': ['Hogar', 'PYME', 'Copropiedades', 'Todo Riesgo Daño Material'],
+        'Daños': ['Multirriesgo Empresarial', 'Sustracción', 'Maquinaria', 'Equipo y Maquinaria'],
+        'Cumplimiento': ['Cumplimiento Particular', 'Cumplimiento Estatal', 'Seriedad de Oferta', 'Estabilidad de Obra'],
+        'Transporte': ['Mercancías', 'Automotor de Carga', 'Casco Marítimo', 'Importación/Exportación'],
+        'Responsabilidad Civil': ['RC Extracontractual', 'RC Profesional', 'D&O', 'RC Clínicas'],
+        'ARL / Riesgos Laborales': ['ARL', 'Accidentes Personales', 'AP Estudiantil', 'Viajero']
+      }
+    },
     productos: ['Auto Total', 'Auto Plus', 'Auto Básico', 'Vida Entera', 'Vida Temporal', 'Salud Integral', 'Salud Familiar', 'Salud Premium', 'Hogar Protegido', 'Hogar Plus', 'Multirriesgo PYME', 'Responsabilidad Civil', 'Transporte de Carga', 'Fianza Cumplimiento', 'Accidentes Personales'],
     prioridades: ['Alta', 'Media', 'Baja'],
     tiposGestion: [
@@ -115,6 +141,11 @@ Orbit.cat = (function () {
   return {
     get: (k) => d[k] || [],
     all: () => d,
+    // Ramos/subramos por país (lenguaje local GT/CO) para listas desplegables y analítica
+    ramosDe: (pais) => { const m = (d.ramosPais || {})[pais]; return m ? Object.keys(m) : (d.ramos || []); },
+    subramosDe: (pais, ramo) => { const m = (d.ramosPais || {})[pais]; return (m && m[ramo]) ? m[ramo].slice() : []; },
+    addRamo: (pais, ramo) => { d.ramosPais = d.ramosPais || {}; d.ramosPais[pais] = d.ramosPais[pais] || {}; if (!d.ramosPais[pais][ramo]) { d.ramosPais[pais][ramo] = []; save(); } },
+    addSubramo: (pais, ramo, sub) => { d.ramosPais = d.ramosPais || {}; d.ramosPais[pais] = d.ramosPais[pais] || {}; d.ramosPais[pais][ramo] = d.ramosPais[pais][ramo] || []; if (d.ramosPais[pais][ramo].indexOf(sub) < 0) { d.ramosPais[pais][ramo].push(sub); save(); } },
     add: (k, v) => { if (!v) return; d[k] = d[k] || []; if (d[k].indexOf(v) < 0) { d[k].push(v); save(); } },
     setList: (k, arr) => { d[k] = arr; save(); },
     save,
