@@ -2,6 +2,16 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.14.0] — 2026-06-22 · Inicio aligerado + comisión por asesor flexible (Ronda 7 1/n)
+### Changed — Inicio (visual)
+- El panel **"Metas del mes"** pasa de gradiente oscuro a **card claro** con acento rojo superior; los dials se adaptan a fondo claro. Elimina la sobrecarga de dos paneles oscuros consecutivos (título + metas).
+### Added — Comisión del vendedor por asesor (modelo flexible)
+- `core/comisiones-eng.js`: cada asesor puede tener **modelo distinto** — `comModo`: **% de la comisión** de la aseguradora · **% de prima neta** · **monto fijo** (`comValor`). `calc`/`calcSobre` lo respetan.
+- **Tarifas de comisión** (módulo Comisiones): por asesor se elige el **modelo** (selector) y su valor (% o Q fijo). Seed demo: L. Herrera = % de prima neta, A. Lemus = monto fijo.
+- Seed `__v=13` con `comModo`/`comValor` por asesor.
+### Docs — RONDA 7 (plan)
+- Registrada completa y priorizada: A&S como primer cliente; comisión por asesor; comisiones visibles al asesor en ficha; **KPIs clicables en todas las secciones**; **Insights profundo** (Metas, Cumplimiento, Recaudo, Cartera, Devengado, Top clientes con modal, Vencidas, Análisis crítico; **nuevas vs renovadas con metas**; comparativos **interanual/intermensual** por aseguradora/producto/ramo/asesor); ficha de póliza pendientes; **Automatizaciones (Make) + herramientas creativas**; **Academia** (bloques de capacitación); **Correo (Outlook)** transversal; **Siniestros/reclamos** + importador; **Finanzas** y **Marketing**.
+
 ## [0.13.0] — 2026-06-22 · Motor de comisiones + aplicar pago con factura
 ### Added — `core/comisiones-eng.js` (motor de comisiones)
 - **Comisión de la aseguradora**: % por **ramo** con override por **producto**, sobre **prima neta**. Tarifas viven en cada aseguradora (`comisiones`, `comisionesProd`, `comisionDefault`).

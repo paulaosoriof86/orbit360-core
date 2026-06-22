@@ -67,12 +67,22 @@ Orbit.modules.comisiones = (function () {
       </div>
 
       <div class="card pad" style="margin-bottom:16px">
-        <b style="font-family:var(--f-display);font-size:15px">Participación del vendedor (% sobre la comisión de la aseguradora)</b>
-        <div class="ct-vend">${asesores.map(a => `
-          <div class="ct-vend-row">
-            <span style="display:flex;align-items:center;gap:8px">${U.avatar(a.nombre, a.color, 'sm')}${U.esc(a.nombre)}</span>
-            <div class="ct-inp"><input type="number" min="0" max="100" value="${a.shareCom != null ? a.shareCom : 50}" data-vend="${a.id}"><span>%</span></div>
-          </div>`).join('')}</div>
+        <b style="font-family:var(--f-display);font-size:15px">Comisión del vendedor por asesor</b>
+        <div class="muted" style="font-size:12px;margin-top:3px">Cada asesor puede tener un modelo distinto: <b>% sobre la comisión</b> de la aseguradora, <b>% sobre prima neta</b>, o <b>monto fijo</b> por póliza.</div>
+        <div class="ct-vend">${asesores.map(a => {
+          const modo = a.comModo || 'comision';
+          return `<div class="ct-vend-row" style="display:grid;grid-template-columns:1fr auto auto;gap:9px;align-items:center">
+            <span style="display:flex;align-items:center;gap:8px;min-width:0">${U.avatar(a.nombre, a.color, 'sm')}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${U.esc(a.nombre)}</span></span>
+            <select data-modo="${a.id}" class="o-sel" style="padding:5px 8px;font-size:12px">
+              <option value="comision" ${modo === 'comision' ? 'selected' : ''}>% de la comisión</option>
+              <option value="neta" ${modo === 'neta' ? 'selected' : ''}>% de prima neta</option>
+              <option value="fijo" ${modo === 'fijo' ? 'selected' : ''}>Monto fijo</option>
+            </select>
+            <div class="ct-inp">${modo === 'fijo'
+              ? `<input type="number" min="0" value="${a.comValor || 0}" data-vval="${a.id}" style="width:80px"><span>Q</span>`
+              : `<input type="number" min="0" max="100" value="${a.shareCom != null ? a.shareCom : 50}" data-vend="${a.id}"><span>%</span>`}</div>
+          </div>`;
+        }).join('')}</div>
       </div>
 
       ${asgs.map(a => tarifaCard(a)).join('')}
@@ -80,6 +90,8 @@ Orbit.modules.comisiones = (function () {
 
     host.querySelector('#ct-import').addEventListener('click', () => Orbit.importa.open('planillas-comision', { onDone: () => render(host) }));
     host.querySelectorAll('[data-vend]').forEach(inp => inp.addEventListener('change', () => Orbit.comeng.setVendShare(inp.dataset.vend, inp.value)));
+    host.querySelectorAll('[data-vval]').forEach(inp => inp.addEventListener('change', () => Orbit.comeng.setVendValor(inp.dataset.vval, inp.value)));
+    host.querySelectorAll('[data-modo]').forEach(sel => sel.addEventListener('change', () => { Orbit.comeng.setVendModo(sel.dataset.modo, sel.value); render(host); }));
     host.querySelectorAll('[data-ramo]').forEach(inp => inp.addEventListener('change', () => Orbit.comeng.setRamoPct(inp.dataset.asg, inp.dataset.ramo, inp.value)));
     host.querySelectorAll('[data-prod]').forEach(inp => inp.addEventListener('change', () => { Orbit.comeng.setProdPct(inp.dataset.asg, inp.dataset.prod, inp.value); }));
     host.querySelectorAll('.tab[data-v]').forEach(el => el.addEventListener('click', () => { vista = el.dataset.v; render(host); }));

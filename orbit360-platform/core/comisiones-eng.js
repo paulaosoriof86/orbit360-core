@@ -38,23 +38,34 @@ Orbit.comeng = (function () {
     return (a && a.shareCom != null) ? a.shareCom : DEFAULT_VEND;
   }
 
+  /* modelo del vendedor: 'comision' (% sobre comisión aseguradora) | 'neta' (% sobre prima neta) | 'fijo' (monto) */
+  function modeloVendedor(aseId) {
+    const a = S().get('asesores', aseId) || {};
+    return { modo: a.comModo || 'comision', pct: a.shareCom != null ? a.shareCom : DEFAULT_VEND, valor: a.comValor || 0 };
+  }
+  function comVendedorDe(comAseguradora, baseNeta, aseId) {
+    const m = modeloVendedor(aseId);
+    if (m.modo === 'fijo') return r2(m.valor);
+    if (m.modo === 'neta') return r2(baseNeta * m.pct / 100);
+    return r2(comAseguradora * m.pct / 100);
+  }
+
   /* Desglose de comisión de una póliza (o de una base de prima neta dada) */
   function calc(poliza) {
     const base = +(poliza.primaNeta != null ? poliza.primaNeta : poliza.prima) || 0;
     const pctAseg = pctAseguradora(poliza.aseguradoraId, poliza.ramo, poliza.producto || poliza.subramo);
     const comAseguradora = r2(base * pctAseg / 100);
-    const pctVend = shareVendedor(poliza.asesorId);
-    const comVendedor = r2(comAseguradora * pctVend / 100);
+    const m = modeloVendedor(poliza.asesorId);
+    const comVendedor = comVendedorDe(comAseguradora, base, poliza.asesorId);
     const comEmpresa = r2(comAseguradora - comVendedor);
-    return { base, pctAseg, comAseguradora, pctVend, comVendedor, comEmpresa };
+    return { base, pctAseg, comAseguradora, modoVend: m.modo, pctVend: m.pct, comVendedor, comEmpresa };
   }
   /* Comisión sobre un monto recaudado (prima neta de un recibo) */
   function calcSobre(baseNeta, poliza) {
     const pctAseg = pctAseguradora(poliza.aseguradoraId, poliza.ramo, poliza.producto || poliza.subramo);
     const comAseguradora = r2(baseNeta * pctAseg / 100);
-    const pctVend = shareVendedor(poliza.asesorId);
-    const comVendedor = r2(comAseguradora * pctVend / 100);
-    return { pctAseg, comAseguradora, pctVend, comVendedor, comEmpresa: r2(comAseguradora - comVendedor) };
+    const comVendedor = comVendedorDe(comAseguradora, baseNeta, poliza.asesorId);
+    return { pctAseg, comAseguradora, comVendedor, comEmpresa: r2(comAseguradora - comVendedor) };
   }
 
   /* ---- setters (persisten vía store) ---- */
@@ -70,6 +81,8 @@ Orbit.comeng = (function () {
     S().update('aseguradoras', asgId, { comisionesProd: c });
   }
   function setVendShare(aseId, pct) { S().update('asesores', aseId, { shareCom: +pct || 0 }); }
+  function setVendModo(aseId, modo) { S().update('asesores', aseId, { comModo: modo }); }
+  function setVendValor(aseId, valor) { S().update('asesores', aseId, { comValor: +valor || 0 }); }
 
   /* Aplica filas de una planilla importada al matriz de tarifas.
      filas: [{ aseguradoraId, producto, ramo, pct }] */
@@ -85,5 +98,5 @@ Orbit.comeng = (function () {
     return n;
   }
 
-  return { pctAseguradora, shareVendedor, calc, calcSobre, setRamoPct, setProdPct, setVendShare, aplicarPlanilla, DEFAULT_ASEG, DEFAULT_VEND };
+  return { pctAseguradora, shareVendedor, modeloVendedor, comVendedorDe, calc, calcSobre, setRamoPct, setProdPct, setVendShare, setVendModo, setVendValor, aplicarPlanilla, DEFAULT_ASEG, DEFAULT_VEND };
 })();

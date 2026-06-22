@@ -14,12 +14,12 @@ Orbit.modules.inicio = (function () {
     const deg = p * 3.6;
     return `<div style="display:flex;flex-direction:column;align-items:center;gap:8px">
       <div style="width:118px;height:118px;border-radius:50%;display:grid;place-items:center;
-        background:conic-gradient(var(--red) ${deg}deg, rgba(255,255,255,.12) ${deg}deg)">
-        <div style="width:90px;height:90px;border-radius:50%;background:var(--graph);display:grid;place-items:center;text-align:center">
-          <div><div style="font-family:var(--f-display);font-weight:800;font-size:24px;color:#fff">${pct}%</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.55);font-family:var(--f-mono)">${val}</div></div>
+        background:conic-gradient(var(--red) ${deg}deg, var(--line) ${deg}deg)">
+        <div style="width:90px;height:90px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center;box-shadow:inset 0 0 0 1px var(--line)">
+          <div><div style="font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--ink)">${pct}%</div>
+          <div style="font-size:10px;color:var(--ink-3);font-family:var(--f-mono)">${val}</div></div>
         </div></div>
-      <div style="font-size:12px;color:rgba(255,255,255,.7);font-weight:600">${label}</div>
+      <div style="font-size:12px;color:var(--ink-2);font-weight:600">${label}</div>
     </div>`;
   }
 
@@ -41,15 +41,15 @@ Orbit.modules.inicio = (function () {
       ${Orbit.kit.banner({ icon: '🌅', title: 'Buen día', sub: 'esto es lo importante hoy', features: ['Metas del mes', 'Prioridades', 'Avance por asesor'], actions: `<button class="btn primary" onclick="location.hash='#/cliente360'">Abrir Cliente 360 →</button>` })}
 
       <!-- Metas del mes -->
-      <div style="background:linear-gradient(120deg,var(--graph),var(--graph-900));border-radius:var(--r-lg);padding:22px 24px;color:#fff;display:flex;gap:30px;align-items:center;flex-wrap:wrap;box-shadow:var(--sh-2)">
+      <div class="card" style="margin-top:18px;padding:22px 24px;display:flex;gap:30px;align-items:center;flex-wrap:wrap;border-top:3px solid var(--red)">
         <div style="flex:1;min-width:200px">
-          <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:rgba(255,255,255,.5);text-transform:uppercase">Metas del mes · Junio 2026</div>
-          <div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px">Vamos en camino</div>
-          <div style="color:rgba(255,255,255,.65);font-size:13.5px;margin-top:6px;line-height:1.5">
-            Quedan <b style="color:#fff">${diasMes} días</b> para cerrar el mes. La prima vigente y el recaudo aplicado se calculan desde las pólizas y cobros reales del CRM.</div>
+          <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · Junio 2026</div>
+          <div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Vamos en camino</div>
+          <div style="color:var(--ink-2);font-size:13.5px;margin-top:6px;line-height:1.5">
+            Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. La prima vigente y el recaudo aplicado se calculan desde las pólizas y cobros reales del CRM.</div>
           <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-            <span class="badge info" style="background:rgba(255,255,255,.1);color:#fff">${clientes.length} clientes</span>
-            <span class="badge info" style="background:rgba(255,255,255,.1);color:#fff">${polizas.length} pólizas</span>
+            <span class="badge neutral">${clientes.length} clientes</span>
+            <span class="badge neutral">${polizas.length} pólizas</span>
             <span class="badge danger">${venc.length} cobros vencidos</span>
           </div>
         </div>

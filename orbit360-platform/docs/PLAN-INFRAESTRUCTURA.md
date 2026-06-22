@@ -305,3 +305,58 @@ Secciones, todas dentro de la ficha 360 (pestañas):
 2. **Configuración interna (nuestra, para personalizar)**: **selección de módulos activos por cliente**, plan contratado, límites, white-label avanzado, provisioning. No visible para el cliente.
 
 > Implementación técnica: un objeto `Orbit.tenant` (config del cliente) define `modulosActivos[]`, `plan`, `branding`, `paises[]`, `roles{}` y `portalVisibility{}`. El sidebar/router ya leen de config → bastará filtrar por `modulosActivos`. Documentado para no repetir.
+
+---
+
+# 🔴 RONDA 7 — Analítica profunda, comisiones por asesor, automatizaciones, academia, correo y siniestros (PRIORIZADA)
+Feedback 22-jun (con capturas de la versión "lab" A&S como REFERENCIA de profundidad analítica — replicar la estructura/indicadores con MEJOR nivel gráfico, NO el chrome).
+
+## R7.0 · Contexto cliente: **Alianzas y Soluciones (A&S)** es el primer cliente
+- La plataforma base debe quedar lista para personalizar A&S **solo por configuración** (branding, países GT, ramos/aseguradoras locales: El Roble, G&T, Mapfre, Universales, La Ceiba, La General, Ficohsa, Bantrab, AseGuate…). No hardcodear A&S en el core.
+
+## R7.1 · Inicio — aligerar visual ✅
+- Título (banner oscuro) + panel "Metas del mes" oscuro seguidos = sobrecarga. **Metas del mes pasa a card claro** con acentos rojos; mantener los dials.
+
+## R7.2 · Comisiones por asesor (modelo flexible) — CRÍTICO
+- Cada asesor puede tener **% diferente** calculado sobre **prima neta**, **o** una **comisión FIJA** (monto) para algún asesor en particular. Configurable en Tarifas/Equipo.
+- `comeng` extendido: `asesor.comModo = 'variable'|'fijo'`, `comValor`. La comisión del vendedor sigue siendo participación sobre la comisión de la aseguradora **o** monto fijo.
+
+## R7.3 · Comisiones: visibilidad por rol + sección en ficha del cliente
+- El **módulo Comisiones** sigue siendo solo del **área administrativa** (como está).
+- **Nueva sección de comisiones en la ficha del cliente** que **el asesor sí ve**, con **solo lo que le compete** (su comisión por las pólizas de ese cliente; oculta la comisión empresa).
+
+## R7.4 · KPIs clicables en TODAS las secciones
+- Cada tarjeta KPI (Inicio, Insights, Pólizas, Cobros, Comisiones, Cancelaciones, ficha…) debe ser **clicable** y **desplegar detalle** (lista/modal con los registros que componen el indicador). Patrón reutilizable.
+
+## R7.5 · Insights — analítica profunda, crítica y EN VIVO (rehacer ampliando)
+Referencia (capturas lab) — implementar con mejor nivel gráfico y vinculado a datos reales en vivo:
+- **Vistas**: Resumen · **Metas del mes** · Cumplimiento · Recaudo · Cartera · **Devengado** · **Top clientes** (por volumen/cantidad/riesgo, con **modal de detalle** del cliente) · **Vencidas** (oportunidad de recuperación) · **Análisis crítico** (diagnóstico + alertas + recomendaciones por área).
+- **Producción NUEVA vs RENOVADA** con **metas separadas** para cada tipo; % cumplimiento.
+- **Comparativos**: **interanual** (2025 vs 2026, mismos meses, var %), **intermensual** (vs mes anterior), con criterios cruzables: **aseguradora, producto, ramo, asesor, país**.
+- KPIs con detalle; **tarjetas clicables**; gráficas: barras comparativas por mes, dona de composición de cartera, comparativo por aseguradora con var% y tendencia, producción por asesor (nuevas/renov), tabla asesor × aseguradora.
+- **Análisis crítico**: alertas (caída de PN vs período, tasa de cancelación sobre umbral, recaudo, vencimientos próximos) + **recomendaciones accionables por área** (renovaciones, cobros, cancelaciones). Todo desde datos reales, en vivo.
+- KPIs de negocio sugeridos (de lo general a lo particular): PN y prima total (mes/acumulado), # pólizas nuevas/renovadas, ticket promedio, tasa de renovación, tasa de cancelación/fuga, recaudo % y aging, comisión devengada/liquidada, concentración top-10, producción por asesor vs meta, mix por ramo/aseguradora, var interanual/intermensual.
+
+## R7.6 · Ficha de póliza — modificaciones pendientes (aplicar lo no aplicado)
+- Revisar y aplicar todo lo pedido antes (editar póliza, qué cubre con apertura del bien, endosos/sustituciones/cambios en el historial, etc.) — confirmar que quedó en la versión actual (parte se revirtió en un undo).
+
+## R7.7 · Automatizaciones (módulo) — **Make** + herramientas creativas
+- Integración **Make** (escenarios/automatizaciones). Conectores y disparadores desde eventos de Orbit (gestión creada, póliza emitida, cobro vencido…).
+- **Herramientas de creación** de imágenes, **infografías** y **recursos** para Academia/Marketing (generación asistida).
+
+## R7.8 · Academia — herramientas de capacitación
+- Crear **bloques de capacitación** con **avances** y **temáticas**; herramientas tipo LMS (módulos, progreso, certificación, piezas, video embebido, recursos). Se alimenta de documentos comerciales por aseguradora (interalimenta IA/Importador).
+
+## R7.9 · Integración de CORREO (Outlook prioritario, luego Gmail) — CLAVE
+- Bandeja integrada; **asociar correos a módulos**: cliente, póliza, **reclamo/siniestro**, gestión, aseguradora. Guardar hilos y respuestas de la aseguradora.
+- Diseñar como **capa transversal** (como el importador): `Orbit.correo` con vinculación por entidad. Funcional y asociable desde cada ficha.
+
+## R7.10 · Siniestros / Reclamos
+- **Importador inteligente de reclamos** + carga de **bitácora de reclamos** que envía la aseguradora (o registro manual del reclamo del cliente; correos de respuesta).
+- **Sección Siniestros en la ficha del cliente**: estado del reclamo, aseguradora, póliza, bitácora cronológica, correos asociados, documentos.
+
+## R7.11 · Módulo Financiero y Marketing (alto interés)
+- **Finanzas**: movimientos, liquidaciones (empresa + asesores), import de estados de cuenta/planillas, **doble conciliación** pago↔póliza y comisión↔planilla, metas de recaudo/ventas/producción, dashboards mes/intermensual/interanual sobre prima NETA.
+- **Marketing**: calendario real (día con piezas), creación/automatización de contenidos, segmentación desde la cartera real, stats.
+
+> Orden de ataque R7: (1) Inicio visual ✅ → (2) Comisiones por asesor + ficha cliente (asesor) → (3) KPIs clicables (patrón) → (4) Insights profundo (vistas + comparativos + nuevas/renov + crítico) → (5) Siniestros + ficha → (6) Correo (Outlook) → (7) Finanzas → (8) Marketing/Automatizaciones/Academia. Todo vinculado a datos en vivo.
