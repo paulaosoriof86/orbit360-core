@@ -2,6 +2,16 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.21.0] — 2026-06-23 · Módulo Equipo y permisos + Finanzas con emojis/lote
+### Added — `modules/equipo.js`
+- **Usuarios**: equipo del intermediario con rol, estado, color, metas; alta/edición de usuario en drawer.
+- **Permisos**: matriz **rol × módulo** (Ver / Editar) persistente, con valores por defecto según nivel de rol y botón de restablecer.
+- **Comisiones**: esquema por asesor (% de la comisión / % de prima neta / monto fijo) — reutiliza `Orbit.comeng`; las tarifas por aseguradora siguen en Comisiones › Tarifas.
+- **Metas**: por asesor, **mes** y **tipo** (nueva vs renovada), sobre prima neta — guardadas en `Orbit.cat.metas` como **fuente única** para Insights y Finanzas (`equipo.metaDe()`).
+- Ruta `equipo` activada (beta) y registrada en `index.html`.
+### Changed — Finanzas
+- Tabs con **emojis** (formato del resto) y scrollables; **liquidaciones con "Preparar lote"** (detalle + total en vivo, retirar partidas, incluir CxP de meses anteriores).
+
 ## [0.19.0] — 2026-06-23 · Orbit Finanzas dinámico (datos ficticios, en vivo)
 ### Added — Modelo de datos financiero (seed `__v=14`, **ficticio**, "Demo Corredores")
 - Colecciones `finmovs` (movimientos por mes y país, 16 meses Mar-25→Jun-26), `acreedores` (deuda) y `presupuesto`.

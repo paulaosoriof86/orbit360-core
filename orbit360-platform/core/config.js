@@ -257,7 +257,7 @@ Orbit.NAV = [
   {
     type: 'group', label: 'Administración', open: false, items: [
       { route: 'finanzas', icon: '💰', label: 'Orbit Finanzas', estado: 'beta' },
-      { route: 'equipo', icon: '👥', label: 'Equipo y permisos', estado: 'road' },
+      { route: 'equipo', icon: '👥', label: 'Equipo y permisos', estado: 'beta' },
       { route: 'configuracion', icon: '⚙', label: 'Configuración', estado: 'road' }
     ]
   }

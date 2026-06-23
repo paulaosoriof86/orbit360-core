@@ -499,6 +499,9 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 /* tabs scrollable (Finanzas y otros con muchas pestañas) */
 .tabs-scroll{display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;-webkit-overflow-scrolling:touch;gap:4px;padding-bottom:4px}
 .tabs-scroll .tab{white-space:nowrap;flex:0 0 auto}
+.lote-row{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--line);border-radius:var(--r-sm);font-size:13px;cursor:pointer;transition:.12s}
+.lote-row.off{opacity:.45}
+.lote-row:hover{border-color:var(--red)}
 
 /* ---------- VER PÓLIZA (drawer enriquecido) ---------- */
 .vp-head{padding:18px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:sticky;top:0;z-index:2}

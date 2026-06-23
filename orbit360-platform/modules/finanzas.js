@@ -28,7 +28,7 @@ Orbit.modules.finanzas = (function () {
   const sum = (arr, f) => arr.reduce((s, x) => s + norm(f(x), x.moneda), 0);
 
   function render(host) {
-    const TABS = [['movimientos', 'Movimientos'], ['dashboard', 'Dashboard'], ['cxcp', 'CxC / CxP'], ['financiacion', 'Financiación'], ['presupuesto', 'Presupuesto'], ['empresa', 'Liq. empresa'], ['asesores', 'Liq. asesores'], ['banco', 'Conciliación'], ['ia', '✨ Análisis IA']];
+    const TABS = [['movimientos', '🧾 Movimientos'], ['dashboard', '📊 Dashboard'], ['cxcp', '💳 CxC / CxP'], ['financiacion', '🏦 Financiación'], ['presupuesto', '📋 Presupuesto'], ['empresa', '🏢 Liq. empresa'], ['asesores', '👥 Liq. asesores'], ['banco', '🔗 Conciliación'], ['ia', '✨ Análisis IA']];
     const paisLbl = (Orbit.PAISES.find(p => p.id === (Orbit.pais || 'TODOS')) || {}).label || 'Todos los países';
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '💰', title: 'Orbit Finanzas', sub: 'Ingresos, egresos, financiación y presupuesto', features: [], actions: `<div class="ins-controls">
@@ -373,10 +373,62 @@ Orbit.modules.finanzas = (function () {
         <td class="num"><b>${U.money(r.aPagar, 'GTQ')}</b></td>
         <td class="num" style="color:var(--ok)">${U.money(r.liquidada, 'GTQ')}</td>
         <td class="num" style="color:${r.pendiente > 0 ? 'var(--warn)' : 'var(--ok)'}">${U.money(r.pendiente, 'GTQ')}</td>
-        ${esAsesor ? '' : `<td style="text-align:right"><button class="btn primary sm" onclick="alert('Demo: cruzar pago con liquidación de ${U.esc(r.a.nombre)} — monto ajustable antes de confirmar (${U.money(r.pendiente, 'GTQ')}).')">Liquidar / cruzar</button></td>`}
+        ${esAsesor ? '' : `<td style="text-align:right"><button class="btn primary sm" onclick="Orbit.modules.finanzas.lote('${r.a.id}')">Preparar lote</button></td>`}
       </tr>`).join('')}</tbody>
     </table></div></div>
-    ${esAsesor ? `<div class="card pad" style="margin-top:14px"><b style="font-family:var(--f-display);font-size:14px">Mis ajustes de producción</b><div class="muted" style="font-size:12.5px;margin-top:6px">Las cancelaciones de tu cartera descuentan prima neta no devengada. Revisa el detalle en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/cancelaciones'">Cancelaciones</a>.</div></div>` : ''}`;
+    ${esAsesor ? `<div class="card pad" style="margin-top:14px"><b style="font-family:var(--f-display);font-size:14px">Mis ajustes de producción</b><div class="muted" style="font-size:12.5px;margin-top:6px">Las cancelaciones de tu cartera descuentan prima neta no devengada. Revisa el detalle en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/cancelaciones'">Cancelaciones</a>.</div></div>`
+      : `<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="Orbit.modules.finanzas.lote('')">📦 Preparar lote de pago (todos)</button></div>`}`;
+  }
+
+  /* ---------- PREPARAR LOTE DE LIQUIDACIÓN ---------- */
+  // Reúne pagos pendientes (comisión del mes + CxP de meses pasados); se pueden
+  // retirar partidas del lote antes de confirmar; muestra total en vivo.
+  function lote(asesorId) {
+    const rows = comisionAsesor().filter(r => r.pendiente > 0 && (!asesorId || r.a.id === asesorId));
+    // partidas del lote: comisión pendiente por asesor + CxP de finanzas (egresos comisiones asesores no pagados de meses pasados)
+    const partidas = [];
+    rows.forEach(r => partidas.push({ id: 'liq-' + r.a.id, tipo: 'Comisión del periodo', quien: r.a.nombre, color: r.a.color, monto: r.pendiente, cur: 'GTQ' }));
+    S().all('finmovs').filter(m => m.tipo === 'egreso' && m.clase === 'Comisiones asesores' && m.estado === 'pendiente').forEach(m => {
+      partidas.push({ id: m.id, tipo: 'CxP ' + m.periodo, quien: m.beneficiario, color: '#6b7280', monto: norm(m.pendiente || m.valor, m.moneda), cur: 'GTQ', cxp: true });
+    });
+    const incluidos = new Set(partidas.map(p => p.id));
+    let back = document.getElementById('fin-lote'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-lote'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    function paint() {
+      const sel = partidas.filter(p => incluidos.has(p.id));
+      const total = sel.reduce((s, p) => s + p.monto, 0);
+      back.querySelector('#lote-body').innerHTML = partidas.map(p => `
+        <label class="lote-row ${incluidos.has(p.id) ? '' : 'off'}">
+          <input type="checkbox" data-lid="${p.id}" ${incluidos.has(p.id) ? 'checked' : ''}>
+          <span class="dot-s" style="background:${p.color}"></span>
+          <span style="flex:1"><b>${U.esc(p.quien)}</b><span class="muted" style="font-size:11.5px"> · ${p.tipo}</span>${p.cxp ? ' <span class="badge warn" style="font-size:9px">mes anterior</span>' : ''}</span>
+          <span class="mono">${U.money(p.monto, p.cur)}</span>
+        </label>`).join('') || '<div class="muted" style="padding:18px;text-align:center">No hay pagos pendientes.</div>';
+      back.querySelector('#lote-total').textContent = U.money(total, 'GTQ');
+      back.querySelector('#lote-count').textContent = sel.length + ' de ' + partidas.length + ' partidas';
+      back.querySelectorAll('[data-lid]').forEach(c => c.addEventListener('change', () => { c.checked ? incluidos.add(c.dataset.lid) : incluidos.delete(c.dataset.lid); paint(); }));
+    }
+    back.innerHTML = `<div class="card" style="width:min(560px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
+      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+        <b style="font-family:var(--f-display);font-size:16px">📦 Lote de pago de comisiones</b><button class="imp-x" id="lt-x">✕</button></div>
+      <div class="cfg-note" style="margin:14px 16px 0">Revisá el lote: podés <b>retirar partidas</b> y se incluyen <b>cuentas por pagar de meses anteriores</b>. El total se actualiza en vivo.</div>
+      <div id="lote-body" style="padding:12px 16px;overflow:auto;flex:1;display:grid;gap:7px"></div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line)">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><span class="muted" id="lote-count"></span><span style="font-family:var(--f-display);font-weight:800;font-size:22px" id="lote-total"></span></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="lt-cancel">Cancelar</button><button class="btn primary" id="lt-ok">Confirmar pago del lote</button></div>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#lt-x').addEventListener('click', close);
+    back.querySelector('#lt-cancel').addEventListener('click', close);
+    back.querySelector('#lt-ok').addEventListener('click', () => {
+      // marca las CxP incluidas como pagadas (las de comisión del periodo son demo agregada)
+      partidas.filter(p => incluidos.has(p.id) && p.cxp).forEach(p => S().update('finmovs', p.id, { estado: 'pagado', pendiente: 0 }));
+      close(); const host = document.getElementById('host'); if (host) render(host);
+    });
+    paint();
   }
 
   /* ---------- CONCILIACIÓN BANCARIA ---------- */
@@ -504,5 +556,5 @@ Orbit.modules.finanzas = (function () {
   }
 
   function wire(host) {}
-  return { render, toggleEstado };
+  return { render, toggleEstado, lote };
 })();
