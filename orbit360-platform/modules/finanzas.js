@@ -10,22 +10,134 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.finanzas = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
-  let tab = 'resumen';
-  const ROLE = () => (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+  let tab = 'movimientos';
+  const ROLE = () => (Orbit.session && Orbit.session.rol && Orbit.session.rol()) || (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+  // selector de mes (acumulado del año hasta el mes) + país
+  const NOW = U.NOW ? new Date(U.NOW) : new Date();
+  let mesSel = NOW.toISOString().slice(0, 7);        // 'YYYY-MM'
+  const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  function periodos() { return [...new Set(S().all('finmovs').map(m => m.periodo))].sort().reverse(); }
+  function paisFin() { return (!Orbit.pais || Orbit.pais === 'TODOS') ? null : Orbit.pais; }
+  function movs(periodo) {
+    const p = paisFin();
+    return S().all('finmovs').filter(m => (!periodo || m.periodo === periodo) && (!p || m.pais === p));
+  }
+  const norm = (v, cur) => q.norm(v, cur);
+  const M = (n) => U.moneyShort(n, 'GTQ');
+  const MM = (n) => U.money(n, 'GTQ');
+  const sum = (arr, f) => arr.reduce((s, x) => s + norm(f(x), x.moneda), 0);
 
   function render(host) {
+    const TABS = [['movimientos', 'Movimientos'], ['dashboard', 'Dashboard'], ['cxcp', 'CxC / CxP'], ['financiacion', 'Financiación'], ['presupuesto', 'Presupuesto'], ['empresa', 'Liq. empresa'], ['asesores', 'Liq. asesores'], ['ia', '✨ Análisis IA']];
+    const paisLbl = (Orbit.PAISES.find(p => p.id === (Orbit.pais || 'TODOS')) || {}).label || 'Todos los países';
     host.innerHTML = `<div class="page">
-      ${K.banner({ icon: '💰', title: 'Orbit Finanzas', sub: 'Liquidaciones y conciliación', features: ['Movimientos', 'Liquidación empresa/asesores', 'Conciliación bancaria'], actions: `<button class="btn primary" onclick="Orbit.importa.open('estados-banco')" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25)">⬇ Importar banco</button>` })}
-      <div class="tabs" style="max-width:880px;margin-bottom:16px">
-        ${[['resumen', 'Movimientos'], ['dashboard', 'Dashboard'], ['presupuesto', 'Presupuesto'], ['metas', 'Metas'], ['empresa', 'Liq. empresa'], ['asesores', 'Liq. asesores'], ['banco', 'Conciliación']].map(t =>
-          `<div class="tab ${tab === t[0] ? 'active' : ''}" data-t="${t[0]}">${t[1]}</div>`).join('')}
+      ${K.banner({ icon: '💰', title: 'Orbit Finanzas', sub: 'Ingresos, egresos, financiación y presupuesto', features: [], actions: `<div class="ins-controls">
+        <select id="fin-pais" class="ins-ctl">${Orbit.PAISES.map(p => `<option value="${p.id}" ${p.id === (Orbit.pais || 'TODOS') ? 'selected' : ''}>🌎 ${p.label}</option>`).join('')}</select>
+        <select id="fin-mes" class="ins-ctl">${periodos().map(pr => `<option value="${pr}" ${pr === mesSel ? 'selected' : ''}>${MESES[+pr.slice(5) - 1]} ${pr.slice(0, 4)}</option>`).join('')}</select>
+      </div>` })}
+      <div class="tabs" style="max-width:980px;margin-bottom:16px">
+        ${TABS.map(t => `<div class="tab ${tab === t[0] ? 'active' : ''}" data-t="${t[0]}">${t[1]}</div>`).join('')}
       </div>
       <div id="fin-body"></div>
     </div>`;
     host.querySelectorAll('.tab[data-t]').forEach(el => el.addEventListener('click', () => { tab = el.dataset.t; render(host); }));
+    const pSel = host.querySelector('#fin-pais'); if (pSel) pSel.addEventListener('change', () => { Orbit.pais = pSel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); render(host); });
+    const mSel = host.querySelector('#fin-mes'); if (mSel) mSel.addEventListener('change', () => { mesSel = mSel.value; render(host); });
     const body = document.getElementById('fin-body');
-    body.innerHTML = ({ resumen, dashboard, presupuesto, metas, empresa, asesores, banco }[tab] || resumen)();
+    body.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, ia }[tab] || movimientos)();
     wire(host);
+  }
+
+  /* ---------- MOVIMIENTOS (reales del periodo) ---------- */
+  function movimientos() {
+    const list = movs(mesSel).filter(m => m.tipo !== 'financiacion');
+    const ing = list.filter(m => m.tipo === 'ingreso'), egr = list.filter(m => m.tipo === 'egreso');
+    const tIng = sum(ing, m => m.valor), tEgr = sum(egr, m => m.valor);
+    const recaudado = sum(ing.filter(m => m.estado === 'recaudado'), m => m.valor);
+    const pagado = sum(egr.filter(m => m.estado === 'pagado'), m => m.valor);
+    const rows = list.slice().sort((a, b) => (b.dia || 0) - (a.dia || 0));
+    return `${K.kpis([
+      { label: 'Ingresos del mes', val: M(tIng), color: 'var(--ok)', foot: M(recaudado) + ' recaudado', footTone: 'up' },
+      { label: 'Egresos del mes', val: M(tEgr), color: 'var(--danger)', foot: M(pagado) + ' pagado' },
+      { label: 'Resultado operativo', val: M(tIng - tEgr), color: 'var(--red)', foot: 'ingresos − egresos' },
+      { label: 'Movimientos', val: list.length, color: 'var(--info)', foot: ing.length + ' ing · ' + egr.length + ' egr' }
+    ])}
+    <div class="card pad" style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <b style="font-family:var(--f-display);font-size:15px;flex:1">Movimientos · ${MESES[+mesSel.slice(5) - 1]} ${mesSel.slice(0, 4)}</b>
+      <button class="btn ghost sm" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar histórico</button>
+      <button class="btn ghost sm" onclick="Orbit.importa.open('estados-banco')">🏦 Estado de cuenta</button>
+    </div>
+    <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
+      <thead><tr><th>Día</th><th>Concepto</th><th>Clasificación</th><th>Pagador / Benef.</th><th class="num">Valor</th><th>Estado</th></tr></thead>
+      <tbody>${rows.map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.toggleEstado('${m.id}')" title="Clic: cambia estado (recaudado/pagado ↔ pendiente)">
+        <td class="mono" style="font-size:12px">${m.dia || '—'}</td>
+        <td><b>${U.esc(m.concepto)}</b></td>
+        <td><span class="badge ${m.tipo === 'ingreso' ? 'ok' : 'neutral'}">${U.esc(m.clase)}</span></td>
+        <td style="font-size:12.5px">${U.esc(m.pagador || m.beneficiario || '—')}</td>
+        <td class="num" style="color:${m.tipo === 'egreso' ? 'var(--danger)' : 'var(--ok)'}">${m.tipo === 'egreso' ? '−' : ''}${U.money(m.valor, m.moneda)}</td>
+        <td>${estBadge(m.estado)}</td></tr>`).join('')}</tbody>
+    </table></div></div>`;
+  }
+  function estBadge(e) {
+    const map = { recaudado: 'ok', pagado: 'ok', facturado: 'info', esperado: 'warn', pendiente: 'warn', presupuestado: 'neutral' };
+    return `<span class="badge ${map[e] || 'neutral'}">${e}</span>`;
+  }
+  function toggleEstado(id) {
+    const m = S().get('finmovs', id); if (!m) return;
+    const next = m.tipo === 'ingreso'
+      ? { esperado: 'facturado', facturado: 'recaudado', recaudado: 'esperado' }
+      : { pendiente: 'pagado', pagado: 'pendiente', presupuestado: 'pendiente' };
+    S().update('finmovs', id, { estado: next[m.estado] || (m.tipo === 'ingreso' ? 'recaudado' : 'pagado') });
+    const host = document.getElementById('host'); if (host) render(host);
+  }
+
+  /* ---------- CUENTAS POR COBRAR / POR PAGAR ---------- */
+  function cxcp() {
+    const all = movs(null);
+    const cxc = all.filter(m => m.tipo === 'ingreso' && (m.estado === 'esperado' || m.estado === 'facturado'));
+    const cxp = all.filter(m => m.tipo === 'egreso' && (m.estado === 'pendiente' || (m.pendiente || 0) > 0));
+    const tCxc = sum(cxc, m => m.valor), tCxp = cxp.reduce((s, m) => s + norm(m.pendiente || m.valor, m.moneda), 0);
+    return `<div class="cfg-note" style="margin-bottom:14px">💳 <b>Cuentas por cobrar</b> = ingresos esperados/facturados aún no recaudados (ej. planilla de comisiones ya facturada). <b>Cuentas por pagar</b> = egresos pendientes (ej. liquidación de asesores no pagada); el saldo pasa al mes siguiente. Clic en una fila cambia su estado.</div>
+    ${K.kpis([
+      { label: 'Por cobrar (CxC)', val: M(tCxc), color: 'var(--warn)', foot: cxc.length + ' partidas' },
+      { label: 'Por pagar (CxP)', val: M(tCxp), color: 'var(--danger)', foot: cxp.length + ' partidas' },
+      { label: 'Posición neta', val: M(tCxc - tCxp), color: 'var(--red)', foot: 'CxC − CxP' }
+    ])}
+    <div class="ins-grid-2">
+      ${cxcpTabla('Cuentas por cobrar', cxc, 'ok')}
+      ${cxcpTabla('Cuentas por pagar', cxp, 'danger')}
+    </div>`;
+  }
+  function cxcpTabla(titulo, rows, tone) {
+    return `<div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">${titulo}</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Periodo</th><th>Concepto</th><th class="num">Monto</th><th>Estado</th></tr></thead>
+      <tbody>${rows.slice(0, 14).map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.toggleEstado('${m.id}')">
+        <td class="mono" style="font-size:11.5px">${m.periodo}</td><td>${U.esc(m.concepto)}</td>
+        <td class="num"><b>${U.money(m.pendiente || m.valor, m.moneda)}</b></td><td>${estBadge(m.estado)}</td></tr>`).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:18px">Sin partidas.</td></tr>'}</tbody></table></div></div>`;
+  }
+
+  /* ---------- FINANCIACIÓN (deuda separada de operativo) ---------- */
+  function financiacion() {
+    const p = paisFin();
+    const acr = S().all('acreedores').filter(a => !p || a.pais === p);
+    const fin = S().all('finmovs').filter(m => (!p || m.pais === p) && (m.tipo === 'financiacion' || m.clase === 'Devolución de préstamo'));
+    const ingFin = sum(fin.filter(m => m.tipo === 'financiacion'), m => m.valor);
+    const abonos = sum(fin.filter(m => m.clase === 'Devolución de préstamo'), m => m.valor);
+    const deuda = acr.reduce((s, a) => s + norm(a.saldo, a.pais === 'GT' ? 'GTQ' : 'COP'), 0);
+    return `<div class="cfg-note" style="margin-bottom:14px">🏦 La <b>financiación es ingreso NO operativo</b> (no infla producción ni utilidad). Los egresos hechos con ese dinero sí son egresos normales. La <b>deuda</b> sube con cada financiación y baja con cada <b>devolución de préstamo</b> al acreedor.</div>
+    ${K.kpis([
+      { label: 'Deuda vigente', val: M(deuda), color: 'var(--danger)', foot: acr.length + ' acreedores' },
+      { label: 'Financiación recibida', val: M(ingFin), color: 'var(--warn)', foot: 'no operativo' },
+      { label: 'Abonos / amortización', val: M(abonos), color: 'var(--ok)', foot: 'devoluciones', footTone: 'up' }
+    ])}
+    <div class="card" style="overflow:hidden;margin-bottom:14px"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">Deuda por acreedor</div>
+      <table class="tbl"><thead><tr><th>Acreedor</th><th>País</th><th class="num">Saldo de deuda</th></tr></thead>
+      <tbody>${acr.map(a => `<tr><td><b>${U.esc(a.nombre)}</b></td><td>${a.pais}</td><td class="num" style="color:${a.saldo > 0 ? 'var(--danger)' : 'var(--ok)'}"><b>${U.money(a.saldo, a.pais === 'GT' ? 'GTQ' : 'COP')}</b></td></tr>`).join('')}</tbody></table></div>
+    <div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">Movimientos de financiación</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Periodo</th><th>Concepto</th><th>Acreedor</th><th class="num">Monto</th><th>Tipo</th></tr></thead>
+      <tbody>${fin.slice().reverse().slice(0, 16).map(m => `<tr><td class="mono" style="font-size:11.5px">${m.periodo}</td><td>${U.esc(m.concepto)}</td><td style="font-size:12.5px">${U.esc(m.pagador || m.beneficiario || '—')}</td>
+        <td class="num" style="color:${m.tipo === 'financiacion' ? 'var(--warn)' : 'var(--ok)'}">${m.tipo === 'financiacion' ? '+' : '−'}${U.money(m.valor, m.moneda)}</td>
+        <td><span class="badge ${m.tipo === 'financiacion' ? 'warn' : 'ok'}">${m.tipo === 'financiacion' ? 'Financiación' : 'Abono'}</span></td></tr>`).join('')}</tbody></table></div></div>`;
   }
 
   // ---- agregados ----
@@ -299,6 +411,98 @@ Orbit.modules.finanzas = (function () {
     </table></div></div>`;
   }
 
+  /* ---------- DASHBOARD (comparativo interanual/intermensual real) ---------- */
+  function serie(tipoFiltro) {
+    // serie mensual del año de mesSel y del anterior
+    const y = +mesSel.slice(0, 4), p = paisFin();
+    const arrFor = (yr) => MESES.map((_, i) => {
+      const ym = yr + '-' + String(i + 1).padStart(2, '0');
+      return sum(S().all('finmovs').filter(m => m.periodo === ym && (!p || m.pais === p) && tipoFiltro(m)), m => m.valor);
+    });
+    return { y, cur: arrFor(y), prev: arrFor(y - 1) };
+  }
+  function dashboard() {
+    const mi = +mesSel.slice(5) - 1;
+    const ingS = serie(m => m.tipo === 'ingreso'), egrS = serie(m => m.tipo === 'egreso');
+    const acumI = ingS.cur.slice(0, mi + 1).reduce((s, v) => s + v, 0), acumIp = ingS.prev.slice(0, mi + 1).reduce((s, v) => s + v, 0);
+    const acumE = egrS.cur.slice(0, mi + 1).reduce((s, v) => s + v, 0);
+    const varIA = acumIp > 0 ? Math.round((acumI - acumIp) / acumIp * 100) : 0;
+    const mesAnt = mi > 0 ? ingS.cur[mi - 1] : 0;
+    const varMM = mesAnt > 0 ? Math.round((ingS.cur[mi] - mesAnt) / mesAnt * 100) : 0;
+    const util = acumI - acumE;
+    return `${K.kpis([
+      { label: 'Ingresos acum.', val: M(acumI), color: 'var(--ok)', foot: 'Ene→' + MESES[mi] + ' ' + ingS.y },
+      { label: 'Utilidad operativa', val: M(util), color: 'var(--red)', foot: 'ingresos − egresos' },
+      { label: 'Var. interanual', val: (varIA >= 0 ? '+' : '') + varIA + '%', color: varIA >= 0 ? 'var(--ok)' : 'var(--danger)', foot: 'vs ' + (ingS.y - 1), footTone: varIA >= 0 ? 'up' : 'down' },
+      { label: 'Intermensual', val: (varMM >= 0 ? '+' : '') + varMM + '%', color: 'var(--info)', foot: MESES[mi] + ' vs ' + (mi > 0 ? MESES[mi - 1] : '—'), footTone: varMM >= 0 ? 'up' : 'down' }
+    ])}
+    ${card2('Ingresos vs egresos · ' + ingS.y + ' (intermensual)', dualBars(MESES, ingS.cur, egrS.cur, 'Ingresos', 'Egresos'))}
+    ${card2('Comparativo interanual de ingresos · ' + (ingS.y - 1) + ' vs ' + ingS.y, dualBars(MESES, ingS.prev, ingS.cur, ingS.y - 1 + '', ingS.y + ''))}`;
+  }
+  function card2(t, body) { return `<div class="card pad" style="margin-bottom:14px"><b style="font-family:var(--f-display);font-size:15px">${t}</b><div style="margin-top:14px">${body}</div></div>`; }
+  function dualBars(labels, a, b, la, lb) {
+    const max = Math.max(1, ...a, ...b);
+    return `<div style="display:flex;gap:14px;margin-bottom:10px;font-size:12px"><span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:#9aa0a8"></span>${la}</span><span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:var(--red)"></span>${lb}</span></div>
+    <div style="display:flex;align-items:flex-end;gap:8px;height:160px">${labels.map((l, i) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end">
+      <div style="display:flex;gap:2px;align-items:flex-end;height:100%;width:100%;justify-content:center">
+        <div title="${la}: ${M(a[i])}" style="width:44%;background:#c4c8cd;border-radius:3px 3px 0 0;height:${a[i] / max * 100}%"></div>
+        <div title="${lb}: ${M(b[i])}" style="width:44%;background:linear-gradient(180deg,#e0566a,#C5162E);border-radius:3px 3px 0 0;height:${b[i] / max * 100}%"></div>
+      </div><span style="font-size:10px;color:var(--ink-3);font-family:var(--f-mono)">${l}</span></div>`).join('')}</div>`;
+  }
+
+  /* ---------- PRESUPUESTO vs REAL (semáforos) ---------- */
+  function presupuesto() {
+    const p = paisFin() || 'GT';
+    const ppto = S().all('presupuesto').filter(x => x.pais === p && x.periodo === mesSel);
+    const realPorCat = {};
+    S().all('finmovs').filter(m => m.pais === p && m.periodo === mesSel && m.tipo === 'egreso').forEach(m => { const k = m.categoria || m.clase; realPorCat[k] = (realPorCat[k] || 0) + m.valor; });
+    const cur = p === 'GT' ? 'GTQ' : 'COP';
+    const rows = ppto.map(x => ({ cat: x.categoria, ppto: x.monto, real: realPorCat[x.categoria] || 0 }));
+    const tP = rows.reduce((s, r) => s + r.ppto, 0), tR = rows.reduce((s, r) => s + r.real, 0);
+    const sem = (pct) => pct <= 100 ? 'var(--ok)' : pct <= 115 ? 'var(--warn)' : 'var(--danger)';
+    return `<div class="cfg-note" style="margin-bottom:14px">📊 Presupuesto vs real del mes con <b>semáforos</b>: verde dentro de presupuesto, ámbar leve sobre-ejecución, rojo desviación alta. (${p})</div>
+    ${K.kpis([
+      { label: 'Presupuesto', val: U.moneyShort(tP, cur), color: 'var(--info)', foot: 'egresos del mes' },
+      { label: 'Ejecutado', val: U.moneyShort(tR, cur), color: tR <= tP ? 'var(--ok)' : 'var(--danger)', foot: Math.round(tR / (tP || 1) * 100) + '% del ppto' },
+      { label: 'Disponible', val: U.moneyShort(tP - tR, cur), color: 'var(--red)', foot: tP - tR >= 0 ? 'dentro de meta' : 'sobre-ejecutado' }
+    ])}
+    <div class="card" style="overflow:hidden"><table class="tbl"><thead><tr><th>Categoría</th><th class="num">Presupuesto</th><th class="num">Real</th><th class="num">%</th><th>Semáforo</th></tr></thead>
+      <tbody>${rows.map(r => { const pct = Math.round(r.real / (r.ppto || 1) * 100); return `<tr><td><b>${U.esc(r.cat)}</b></td><td class="num">${U.money(r.ppto, cur)}</td><td class="num">${U.money(r.real, cur)}</td><td class="num">${pct}%</td><td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${sem(pct)}"></span> ${pct <= 100 ? 'OK' : pct <= 115 ? 'Alerta' : 'Desviado'}</td></tr>`; }).join('')}</tbody></table></div>`;
+  }
+
+  /* ---------- ANÁLISIS IA (Gemini) ---------- */
+  function ia() {
+    const mi = +mesSel.slice(5) - 1;
+    const ingS = serie(m => m.tipo === 'ingreso'), egrS = serie(m => m.tipo === 'egreso');
+    const acumI = ingS.cur.slice(0, mi + 1).reduce((s, v) => s + v, 0), acumIp = ingS.prev.slice(0, mi + 1).reduce((s, v) => s + v, 0);
+    const varIA = acumIp > 0 ? Math.round((acumI - acumIp) / acumIp * 100) : 0;
+    const acumE = egrS.cur.slice(0, mi + 1).reduce((s, v) => s + v, 0);
+    const margen = acumI > 0 ? Math.round((acumI - acumE) / acumI * 100) : 0;
+    const metaSugerida = Math.round(acumI / (mi + 1) * 1.12);
+    return `<div class="cfg-note" style="margin-bottom:14px">✨ Análisis crítico asistido por IA (Gemini) a partir de los resultados financieros. Genera diagnóstico, metas sugeridas y estrategias. <i>Conector configurable por tenant.</i></div>
+    <div class="card pad" style="margin-bottom:14px;border-left:3px solid var(--red)">
+      <b style="font-family:var(--f-display);font-size:15px">🧠 Diagnóstico del periodo</b>
+      <ul class="ins-recs" style="margin-top:10px;line-height:1.7">
+        <li>Ingresos acumulados <b>${M(acumI)}</b>, ${varIA >= 0 ? 'creciendo' : 'cayendo'} <b style="color:${varIA >= 0 ? 'var(--ok)' : 'var(--danger)'}">${varIA}%</b> interanual.</li>
+        <li>Margen operativo del <b>${margen}%</b> ${margen < 25 ? '— por debajo del objetivo sano (25–35%); revisar gastos fijos y marketing.' : '— saludable.'}</li>
+        <li>Mejor canal de ingreso: <b>Comisiones de aseguradora</b>; la financiación debe mantenerse fuera del operativo.</li>
+      </ul>
+    </div>
+    <div class="ins-grid-2">
+      <div class="card pad"><b style="font-family:var(--f-display);font-size:14px">🎯 Metas sugeridas</b><ul class="ins-recs" style="margin-top:9px;line-height:1.7">
+        <li>Ventas (prima neta) próximo mes: <b>${M(metaSugerida)}</b></li>
+        <li>Recaudo objetivo: <b>${M(metaSugerida * 0.85)}</b> (85%)</li>
+        <li>Tope de gasto fijo: <b>≤ ${M(acumE / (mi + 1) * 0.95)}</b>/mes</li>
+      </ul></div>
+      <div class="card pad"><b style="font-family:var(--f-display);font-size:14px">📈 Estrategias recomendadas</b><ul class="ins-recs" style="margin-top:9px;line-height:1.7">
+        <li><b>Medios:</b> reforzar pauta en redes con mejor CAC; medir por canal.</li>
+        <li><b>Segmentación:</b> priorizar ramos de mayor comisión y renovación.</li>
+        <li><b>Comercial:</b> campaña de recuperación de cartera vencida y cross-sell a top clientes.</li>
+      </ul></div>
+    </div>
+    <button class="btn primary" style="margin-top:14px" onclick="alert('Conecta tu API key de Gemini en Configuración › Integraciones para generar análisis en vivo.')">✨ Regenerar con IA</button>`;
+  }
+
   function wire(host) {}
-  return { render };
+  return { render, toggleEstado };
 })();

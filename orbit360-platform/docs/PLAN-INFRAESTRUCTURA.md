@@ -382,4 +382,49 @@ Estado por ítem: ✅ hecho · 🟡 parcial · ⏳ pendiente. (Reúne lo dicho e
 - **Finanzas**: movimientos, liquidaciones (empresa + asesores), import de estados de cuenta/planillas, **doble conciliación** pago↔póliza y comisión↔planilla, metas de recaudo/ventas/producción, dashboards mes/intermensual/interanual sobre prima NETA.
 - **Marketing**: calendario real (día con piezas), creación/automatización de contenidos, segmentación desde la cartera real, stats.
 
-> Orden de ataque R7: (1) Inicio visual ✅ → (2) Comisiones por asesor + ficha cliente (asesor) → (3) KPIs clicables (patrón) → (4) Insights profundo (vistas + comparativos + nuevas/renov + crítico) → (5) Siniestros + ficha → (6) Correo (Outlook) → (7) Finanzas → (8) Marketing/Automatizaciones/Academia. Todo vinculado a datos en vivo.
+> Orden de ataque R7: (1) Inicio visual ✅ → (2) Comisiones por asesor ✅ → (3) KPIs clicables ✅ Insights → (4) Insights profundo ✅ → (5) Finanzas → (6) Siniestros + Correo → (7) Marketing/Academia/Automatizaciones.
+
+---
+
+# 🔴 RONDA 8 — Módulo FINANCIERO inteligente (basado en Excel real de movimientos) + profundizar analíticas
+Referencia: libro "Movimientos Ing y Eg" — 38 hojas mensuales GT/Col (Nov-24→May-26) + Salarios + Presupuesto + Análisis + Dashboard + Listado producción.
+
+## R8.1 · Modelo de datos financiero (genérico, comercializable)
+- **Movimientos** por **mes + país**: INGRESOS (concepto, pagador, día, clasificación, valor, IVA, observaciones, estado) y EGRESOS (concepto, beneficiario, clasificación, valor, **pendiente**, observaciones, estado).
+- **Clasificaciones de ingreso**: Comisiones de aseguradora, Incentivos, **Financiamiento/Préstamos** (separado de operativo), Otros.
+- **Clasificaciones de egreso**: Comisiones a asesores, Gastos fijos (contabilidad, CRM, internet, office, nómina/salarios), Marketing/publicidad, Operación/asistencias, **Devolución de préstamos**.
+- **Estados**: ingreso → *esperado / facturado / recaudado*; egreso → *presupuestado / pendiente / pagado*. Lo no pagado en el mes pasa como **cuenta por pagar** al siguiente; lo no recaudado como **cuenta por cobrar**.
+
+## R8.2 · Cuentas por cobrar / por pagar (devengado)
+- **Ingresos esperados**: al **cargar la planilla de comisiones del mes** (ya facturada, pendiente de recaudo) → opción de **agregarla como ingreso esperado** automáticamente; cambiar estado esperado→recaudado.
+- **Egresos pendientes**: al generar la **liquidación de comisiones a asesores** → opción de **agregar como egreso pendiente por pago**; cambiar estado; saldo no pagado = cuenta por pagar del próximo mes.
+- Tablero de **CxC / CxP** con antigüedad y estados editables.
+
+## R8.3 · Control de financiamientos (deuda) — separado de operativo
+- **Ingresos por financiación** se registran **aparte** de los ingresos operativos (no inflan producción/utilidad operativa).
+- Los **egresos hechos con ese dinero** sí cuentan como egresos normales.
+- **Control de deuda por acreedor**: la deuda **aumenta** con cada ingreso de financiación y **disminuye** con los egresos de **devolución de préstamo** a ese acreedor. Saldo de deuda vivo por acreedor.
+
+## R8.4 · Presupuesto vs real + semáforos
+- Cumplimiento del **presupuesto** medible y reportable **dinámicamente**: %, **semáforos** (verde/ámbar/rojo), **alertas** por categoría desviada.
+- Presupuesto mensual de egresos (contabilidad, CRM, internet, office, publicidad, salarios) importable.
+
+## R8.5 · Dashboard financiero (selector mes + país)
+- **Selector de mes y país** (igual que Insights).
+- **Comparativo interanual e intermensual** (ingresos, egresos, utilidad operativa, recaudo) — central en el dashboard.
+- Ingresos operativos vs financiación, margen, recaudo/producción, gasto fijo/ingreso.
+
+## R8.6 · Análisis crítico financiero con IA (Gemini)
+- Diagnóstico inteligente a partir de resultados financieros + **sugerencias de metas** (ventas, recaudo, total, por asesor), **estrategias de medios**, **segmentación**, **estrategias comerciales**.
+- Capa `Orbit.ia` (Gemini, económica) — también para extracción/import, comparativos y redacción. Configurable por tenant.
+
+## R8.7 · Importador inteligente financiero
+- **Histórico de movimientos** + **estados de cuenta** + **planillas de comisiones** → mapeo por tipo, cruce y de-duplicación; al importar planilla, ofrecer crear ingreso esperado / al liquidar, egreso pendiente.
+
+## R8.8 · Profundizar TODAS las analíticas (de lo general a lo particular) — pendiente recurrente
+- **Cartera**: por asesor / aseguradora / producto / ramo (hoy muy general).
+- **Comparativos**: además de anual, **por mes** y con detalle por concepto.
+- **Top clientes**: por ramo, aseguradora, asesor, nuevos/antiguos, cantidad de pólizas, volumen — con modal.
+- **Renovaciones**: por aseguradora / asesor / ramo.
+- **Análisis crítico dinámico** en todas.
+- **Gráficas**: salir del gris/negro — usar paleta de marca (rojo/grafito/acentos) con buen contraste.

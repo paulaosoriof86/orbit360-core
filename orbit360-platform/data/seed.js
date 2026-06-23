@@ -385,6 +385,54 @@ Orbit.SEED = (function () {
   for (let i = 0; i < 5; i++) gestiones.push(makeGestion('Gestiones Admin', pick(tiposAdmin)));
   for (let i = 0; i < 4; i++) gestiones.push(makeGestion('Renovaciones / Modif.', pick(tiposRenov)));
 
+  // ====================================================================
+  //  FINANZAS — movimientos por mes y país (genérico, comercializable)
+  // ====================================================================
+  const finmovs = [], acreedores = [], presupuesto = [];
+  const ACREEDORES = [{ id: 'acr1', nombre: 'Banco (línea de crédito)', pais: 'GT' }, { id: 'acr2', nombre: 'Socio capital', pais: 'CO' }];
+  ACREEDORES.forEach(a => acreedores.push(Object.assign({ saldo: 0 }, a)));
+  const PPTO = {
+    GT: [['Contabilidad', 250], ['Cuota CRM', 200], ['Internet', 200], ['Office 365', 67], ['Publicidad redes', 600], ['Salarios', 4200], ['Operación', 900]],
+    CO: [['Contabilidad', 900000], ['Cuota CRM', 750000], ['Internet', 700000], ['Office 365', 250000], ['Publicidad redes', 2200000], ['Salarios', 15500000], ['Operación', 3200000]]
+  };
+  let fmn = 0;
+  const fmId = () => 'fmv' + (++fmn);
+  for (let back = 15; back >= 0; back--) {
+    const base = addMonths(NOW, -back);
+    const ym = iso(base).slice(0, 7);
+    ['GT', 'CO'].forEach(pais => {
+      const cur = pais === 'GT' ? 'GTQ' : 'COP';
+      const k = pais === 'GT' ? 1 : 200;
+      const seasonal = 1 + Math.sin((base.getMonth() / 12) * Math.PI * 2) * 0.12 + (15 - back) * 0.012;
+      const recaudadoMes = back > 0;
+      aseguradoras.filter(a => a.pais === pais).forEach(asg => {
+        const val = Math.round(between(900, 4200) * k * seasonal);
+        finmovs.push({ id: fmId(), tipo: 'ingreso', clase: 'Comisiones aseguradora', pais, moneda: cur, periodo: ym, dia: between(3, 18), pagador: asg.nombre, aseguradoraId: asg.id, concepto: 'Comisiones ' + asg.nombre, valor: val, iva: Math.round(val * 0.12), estado: recaudadoMes ? 'recaudado' : (rnd() > .4 ? 'facturado' : 'esperado'), obs: '' });
+      });
+      if (rnd() > .55) finmovs.push({ id: fmId(), tipo: 'ingreso', clase: 'Incentivos', pais, moneda: cur, periodo: ym, dia: between(5, 25), pagador: pick(aseguradoras.filter(a => a.pais === pais)).nombre, concepto: 'Incentivo por producción', valor: Math.round(between(400, 1800) * k * seasonal), iva: 0, estado: recaudadoMes ? 'recaudado' : 'esperado', obs: 'Bono comercial' });
+      if (rnd() > .7) finmovs.push({ id: fmId(), tipo: 'ingreso', clase: 'Otros', pais, moneda: cur, periodo: ym, dia: between(5, 25), pagador: 'Varios', concepto: 'Otros ingresos', valor: Math.round(between(150, 700) * k), iva: 0, estado: 'recaudado', obs: '' });
+      const acr = acreedores.find(a => a.pais === pais);
+      if (acr && (back === 12 || back === 6)) {
+        const monto = Math.round(between(8000, 16000) * k);
+        finmovs.push({ id: fmId(), tipo: 'financiacion', clase: 'Financiamiento', pais, moneda: cur, periodo: ym, dia: between(2, 8), pagador: acr.nombre, acreedorId: acr.id, concepto: 'Ingreso por financiación', valor: monto, iva: 0, estado: 'recaudado', obs: 'Capital de trabajo' });
+        acr.saldo += monto;
+      }
+      const comAsesor = Math.round(between(2200, 5200) * k * seasonal);
+      finmovs.push({ id: fmId(), tipo: 'egreso', clase: 'Comisiones asesores', pais, moneda: cur, periodo: ym, dia: between(8, 20), beneficiario: pick(asesores).nombre, concepto: 'Liquidación comisiones asesores', valor: comAsesor, pendiente: recaudadoMes ? 0 : Math.round(comAsesor * 0.4), estado: recaudadoMes ? 'pagado' : 'pendiente', obs: '' });
+      PPTO[pais].forEach(([cat, ppto]) => {
+        const real = Math.round(ppto * (0.9 + rnd() * 0.25));
+        finmovs.push({ id: fmId(), tipo: 'egreso', clase: cat === 'Publicidad redes' ? 'Marketing' : (cat === 'Operación' ? 'Operación' : 'Gastos fijos'), categoria: cat, pais, moneda: cur, periodo: ym, dia: between(1, 28), beneficiario: cat, concepto: cat, valor: real, pendiente: 0, estado: recaudadoMes ? 'pagado' : (rnd() > .6 ? 'pendiente' : 'pagado'), obs: '' });
+      });
+      if (acr && acr.saldo > 0 && back < 11 && rnd() > .4) {
+        const cuota = Math.round(Math.min(acr.saldo, between(800, 2200) * k));
+        finmovs.push({ id: fmId(), tipo: 'egreso', clase: 'Devolución de préstamo', pais, moneda: cur, periodo: ym, dia: between(20, 28), beneficiario: acr.nombre, acreedorId: acr.id, concepto: 'Abono a financiación', valor: cuota, pendiente: 0, estado: 'pagado', obs: 'Amortización' });
+        acr.saldo = Math.max(0, acr.saldo - cuota);
+      }
+    });
+  }
+  const ymNow = iso(NOW).slice(0, 7);
+  ['GT', 'CO'].forEach(pais => { PPTO[pais].forEach(([cat, val]) => presupuesto.push({ id: 'ppt' + (presupuesto.length + 1), pais, periodo: ymNow, categoria: cat, clase: cat === 'Publicidad redes' ? 'Marketing' : (cat === 'Operación' ? 'Operación' : 'Gastos fijos'), monto: val })); });
+
   // novedades / incentivos
   const novedades = [
     { id: 'nov1', tipo: 'incentivo', titulo: '🏆 Incentivo de junio: bono por 10 pólizas Auto', detalle: 'Cierra 10 pólizas de Auto este mes y gana un bono del 5% adicional sobre comisión.', autor: 'Paula Osorio', fecha: iso(addDays(NOW, -2)), prioridad: true },
@@ -394,8 +442,8 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 13,
+    __v: 14,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
-    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades
+    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto
   };
 })();

@@ -2,6 +2,26 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.18.0] — 2026-06-22 · Insights interactivo (selectores + comparativo por concepto)
+### Added / Fixed — Orbit Insights
+- **Selector de país** y **selector de mes** funcionales en las analíticas (acumulado Ene→mes); país se sincroniza con la barra superior.
+- **Metas**: KPIs mensuales + acumulados (mes seleccionable); **arreglada** la tarjeta "nuevas vs renovadas por ramo" (antes mostraba solo ramos; ahora compara **nuevas vs renovadas** con barras duales). Producción mensual nuevas vs renovadas. Nota: las metas se asignan en **Equipo y permisos / Configuración**.
+- **Comparativo por concepto**: control segmentado **General · Por asesor · Por ramo · Por aseguradora** (interanual 2025 vs 2026, var% y tendencia, de lo general a lo particular) + comparativo mensual y **intermensual**.
+- **Top clientes** clasificable: por **volumen de prima**, **cantidad de pólizas**, **clientes nuevos**, **clientes antiguos**; columnas con asesor y badge de nuevo; distribución de cartera de clientes por **ramo** y **aseguradora**.
+
+## [0.17.0] — 2026-06-22 · Insights profundo + correcciones de póliza
+### Added — Orbit Insights v2 (analítica profunda, KPIs clicables)
+- **9 vistas**: Resumen · **Metas (nuevas vs renovadas)** · Producción · Cartera · **Comparativo** · **Top clientes** · Pipeline · Renovaciones · **Análisis crítico**.
+- **KPIs clicables (⤢)**: cada indicador abre un **drawer de detalle** con los registros que lo componen (pólizas, recibos, clientes), clicables a su vez.
+- **Producción nueva vs renovada** con **metas separadas** y % de cumplimiento (clasifica por contador de renovaciones).
+- **Comparativo interanual** (2025 vs 2026, mismos meses, barras duales + tabla por aseguradora con var % y tendencia) e **intermensual**.
+- **Top clientes** con **modal de detalle** (KPIs del cliente + pólizas + acceso al expediente); concentración top-10, ticket promedio.
+- **Análisis crítico**: alertas automáticas (caída de PN, tasa de cancelación, recaudo, vencimientos) + **recomendaciones por área**; composición de cartera y producción mensual.
+- Tabla **asesor × aseguradora**. Todo sobre **prima neta**, normalizado a base GTQ, respeta país, en vivo.
+### Fixed / Changed — Póliza
+- **Subramos por país CORREGIDOS** (GT/CO): vehículo liviano/pesado/grúa/RC/pérdidas totales/parciales/por km, tipos de fianza, GM individual/familiar, CO todo riesgo/cumplimiento/multirriesgo/salud ind-fam, etc.
+- **Editar póliza**: cambiar el **asesor que comercializó** (independiente del asesor del cliente); **recargo financiero** por **%** (auto) **o valor** directo (para importación); **concepto automático** por patrón (Ramo · Subramo · Tipo); al cambiar **forma de pago/frecuencia** se **regeneran los recibos pendientes** (preservando los pagados).
+
 ## [0.15.0] — 2026-06-22 · Reconstrucción de la ficha de póliza (lo perdido en el undo) + ramos por país
 > El *undo* de una sesión previa había revertido estas mejoras; se reconstruyen y se confirma su estado en el plan (R7.6 checklist consolidado).
 ### Added — Catálogos ramos/subramos por país (`Orbit.cat`)

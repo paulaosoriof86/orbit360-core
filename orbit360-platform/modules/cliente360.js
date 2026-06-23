@@ -946,7 +946,8 @@ Orbit.modules.cliente360 = (function () {
           <label class="ce-l">Ramo <span class="muted">(${pais})</span><select id="ep-ramo" class="o-sel">${ramos.map(r => `<option ${r === curRamo ? 'selected' : ''}>${r}</option>`).join('')}<option value="__otro">➕ Otro…</option></select></label>
           <label class="ce-l">Subramo<select id="ep-sub" class="o-sel">${subOpts(curRamo).map(s => `<option ${s === p.subramo ? 'selected' : ''}>${s}</option>`).join('')}<option value="__otro">➕ Otro…</option></select></label>
           <label class="ce-l">Tipo de póliza<select id="ep-tipo" class="o-sel">${['Individual', 'Colectiva', 'Empresarial', 'Flotilla'].map(t => `<option ${t === p.tipoPoliza ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
-          <label class="ce-l">Concepto<input id="ep-concepto" class="o-sel" value="${U.esc(p.concepto || '')}"></label>
+          <label class="ce-l">Concepto <span class="muted">(auto)</span><input id="ep-concepto" class="o-sel" value="${U.esc(p.concepto || '')}"></label>
+          <label class="ce-l">Asesor que comercializó<select id="ep-ase" class="o-sel">${S().all('asesores').map(a => `<option value="${a.id}" ${a.id === p.asesorId ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">Vigencia inicio<input id="ep-vini" class="o-sel" type="date" value="${p.vigenciaInicio}"></label>
           <label class="ce-l">Vigencia fin<input id="ep-vfin" class="o-sel" type="date" value="${p.vigenciaFin}"></label>
           <label class="ce-l">Frecuencia<select id="ep-frec" class="o-sel">${frecs.map(f => `<option ${f === p.frecuencia ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
@@ -960,7 +961,8 @@ Orbit.modules.cliente360 = (function () {
             <label class="ce-l">Prima neta<input id="ep-neta" class="o-sel" type="number" value="${p.primaNeta}"></label>
             <label class="ce-l">Gastos de expedición <span class="muted">(auto ${pais === 'GT' ? '5%' : ''})</span><input id="ep-gem" class="o-sel" type="number" value="${p.gastosEmision}"></label>
             <label class="ce-l">Otros / asistencias<input id="ep-otros" class="o-sel" type="number" value="${p.otros || 0}"></label>
-            <label class="ce-l">Recargo financiero %<input id="ep-rec" class="o-sel" type="number" value="${p.recargoFinPct}"></label>
+            <label class="ce-l">Recargo financiero
+              <div style="display:flex;gap:6px"><select id="ep-recmodo" class="o-sel" style="flex:0 0 90px">${[['pct', '%'], ['valor', 'Valor']].map(o => `<option value="${o[0]}" ${(p.recargoFinModo || 'pct') === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select><input id="ep-rec" class="o-sel" type="number" value="${(p.recargoFinModo === 'valor') ? (p.gastosFinan || 0) : p.recargoFinPct}" style="flex:1"></div></label>
           </div>
           <table class="vp-dtbl" style="margin-top:10px" id="ep-resumen"></table>
           <label class="ce-l ck" style="margin-top:8px"><input type="checkbox" id="ep-auto" checked> Calcular gastos de expedición e IVA automáticamente</label>
@@ -984,7 +986,13 @@ Orbit.modules.cliente360 = (function () {
       const auto = $('#ep-auto').checked, neta = +$('#ep-neta').value || 0;
       if (auto && pais === 'GT') $('#ep-gem').value = Orbit.primas.r2(neta * 0.05);
       const fraccionado = Orbit.primas.cuotasDe($('#ep-frec').value) > 1;
-      const dd = Orbit.primas.desglose(neta, pais, { fraccionado, gastosEmision: +$('#ep-gem').value || 0, otros: +$('#ep-otros').value || 0, recargoFinPct: +$('#ep-rec').value });
+      const recModo = $('#ep-recmodo').value;
+      const opt = { fraccionado, gastosEmision: +$('#ep-gem').value || 0, otros: +$('#ep-otros').value || 0 };
+      if (recModo === 'valor') { const v = +$('#ep-rec').value || 0; opt.recargoFinPct = neta > 0 ? Orbit.primas.r2(v / neta * 100) : 0; }
+      else opt.recargoFinPct = +$('#ep-rec').value;
+      const dd = Orbit.primas.desglose(neta, pais, opt);
+      // concepto automático por patrón: Ramo · Subramo · Tipo
+      $('#ep-concepto').value = [$('#ep-ramo').value, $('#ep-sub').value, $('#ep-tipo').value].filter(x => x && x !== '__otro').join(' · ');
       $('#ep-resumen').innerHTML = `
         <tr><td>Prima neta</td><td class="num">${U.money(dd.neta, p.moneda)}</td></tr>
         <tr><td>Gastos de expedición</td><td class="num">${U.money(dd.gastosEmision, p.moneda)}</td></tr>
@@ -995,23 +1003,48 @@ Orbit.modules.cliente360 = (function () {
         <tr class="vp-tot"><td>Prima total</td><td class="num">${U.money(dd.total, p.moneda)}</td></tr>`;
       back._d = dd;
     }
-    ['#ep-neta', '#ep-gem', '#ep-otros', '#ep-rec', '#ep-frec', '#ep-auto'].forEach(s => $(s).addEventListener('input', recalc));
+    ['#ep-neta', '#ep-gem', '#ep-otros', '#ep-rec', '#ep-recmodo', '#ep-frec', '#ep-auto', '#ep-tipo'].forEach(s => $(s).addEventListener('input', recalc));
+    $('#ep-tipo').addEventListener('change', recalc);
     recalc();
     $('#ep-ok').addEventListener('click', () => {
-      const dd = back._d, frecuencia = $('#ep-frec').value;
+      const dd = back._d, frecuencia = $('#ep-frec').value, formaPago = $('#ep-forma').value;
+      const cambioPago = frecuencia !== p.frecuencia || formaPago !== p.formaPago;
       S().update('polizas', polId, {
-        numero: $('#ep-num').value || p.numero, aseguradoraId: $('#ep-asg').value,
+        numero: $('#ep-num').value || p.numero, aseguradoraId: $('#ep-asg').value, asesorId: $('#ep-ase').value,
         ramo: $('#ep-ramo').value === '__otro' ? p.ramo : $('#ep-ramo').value,
         subramo: $('#ep-sub').value === '__otro' ? p.subramo : $('#ep-sub').value,
         tipoPoliza: $('#ep-tipo').value, concepto: $('#ep-concepto').value,
         vigenciaInicio: $('#ep-vini').value, vigenciaFin: $('#ep-vfin').value,
-        frecuencia, forma: frecuencia, formaPago: $('#ep-forma').value,
+        frecuencia, forma: frecuencia, formaPago,
         renovable: $('#ep-renov').checked, sumaAsegurada: +$('#ep-suma').value || p.sumaAsegurada,
+        recargoFinModo: $('#ep-recmodo').value,
         primaNeta: dd.neta, gastosEmision: dd.gastosEmision, gastosFinan: dd.gastosFinan, otros: dd.otros,
         ivaPct: dd.ivaPct, ivaMonto: dd.iva, recargoFinPct: dd.recargoPct, baseGravable: dd.baseGravable, prima: dd.total, primaTotal: dd.total,
-        historial: (p.historial || []).concat([{ icon: '✏', fecha: '2026-06-22', t: 'Edición de póliza', d: 'Datos/prima actualizados' }])
+        historial: (p.historial || []).concat([{ icon: '✏', fecha: '2026-06-22', t: 'Edición de póliza', d: 'Datos/prima actualizados' + (cambioPago ? ' · recibos pendientes regenerados' : '') }])
       });
+      if (cambioPago) regenerarRecibosPendientes(polId);
       close(); verPoliza(polId);
+    });
+  }
+
+  /* Regenera SOLO los recibos pendientes/vencidos al cambiar forma de pago; preserva los ya pagados. */
+  function regenerarRecibosPendientes(polId) {
+    const p = S().get('polizas', polId); if (!p) return;
+    const cli = S().get('clientes', p.clienteId), pais = cli ? cli.pais : 'GT';
+    const cobs = S().where('cobros', c => c.polizaId === polId);
+    const pagados = cobs.filter(c => c.estado === 'Pagado');
+    const dd = Orbit.primas.desglose(p.primaNeta, pais, { fraccionado: Orbit.primas.cuotasDe(p.frecuencia) > 1, gastosEmision: p.gastosEmision, otros: p.otros, recargoFinPct: p.recargoFinPct });
+    const nuevos = Orbit.primas.recibos(dd, { frecuencia: p.frecuencia, vigenciaInicio: p.vigenciaInicio, comAseguradoraPct: p.comAseguradoraPct, comVendedorPct: p.comVendedorPct });
+    // elimina los pendientes/vencidos actuales
+    cobs.filter(c => c.estado !== 'Pagado').forEach(c => S().remove && S().remove('cobros', c.id));
+    // agrega los nuevos que excedan los ya pagados (continúa la numeración)
+    nuevos.slice(pagados.length).forEach((rec, i) => {
+      S().insert('cobros', {
+        id: 'cob' + Date.now() + (i + ''), polizaId: polId, clienteId: p.clienteId, asesorId: p.asesorId,
+        cuota: rec.n, monto: rec.total, moneda: p.moneda, neta: rec.neta, gastosEmision: rec.gastosEmision,
+        gastosFinan: rec.gastosFinan, otros: rec.otros, iva: rec.iva, comAseguradora: rec.comAseguradora, comVendedor: rec.comVendedor,
+        vence: rec.vence, fechaLimite: rec.fechaLimite, fechaPago: null, estado: 'Pendiente', metodo: null, conducto: p.conducto, conciliado: false
+      });
     });
   }
 

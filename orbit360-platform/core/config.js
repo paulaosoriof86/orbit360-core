@@ -75,25 +75,25 @@ Orbit.cat = (function () {
     // desplegables, analítica, trazabilidad y estandarización.
     ramosPais: {
       GT: {
-        'Automóviles': ['Auto Individual', 'Auto Flotilla', 'Motocicleta', 'Equipo Pesado', 'Auto Comercial'],
-        'Vida': ['Vida Individual', 'Vida Colectivo', 'Vida Deudores', 'Vida Temporal', 'Dotal'],
-        'Gastos Médicos': ['GM Individual', 'GM Colectivo', 'GM Familiar', 'GM Internacional'],
-        'Incendio y Líneas Aliadas': ['Hogar', 'Edificio', 'Comercio', 'Todo Riesgo Construcción'],
-        'Daños': ['Multirriesgo PYME', 'Robo y Hurto', 'Rotura de Maquinaria', 'Equipo Electrónico'],
-        'Fianzas': ['Cumplimiento', 'Anticipo', 'Sostenimiento de Oferta', 'Calidad de Obra'],
-        'Transporte': ['Carga Terrestre', 'Carga Marítima', 'Carga Aérea', 'Casco'],
-        'Responsabilidad Civil': ['RC General', 'RC Profesional', 'RC Productos', 'RC Patronal'],
-        'Accidentes Personales': ['AP Individual', 'AP Colectivo', 'AP Escolar', 'Viajero']
+        'Automóviles': ['Vehículo Liviano', 'Vehículo Pesado', 'Motocicleta', 'Grúa / Equipo Especial', 'Pérdidas Totales', 'Pérdidas Parciales', 'Responsabilidad Civil Vehículos', 'Seguro por Kilómetros', 'Flotilla'],
+        'Vida': ['Vida Individual', 'Vida Colectivo', 'Vida Deudores', 'Vida Temporal', 'Dotal', 'Renta / Retiro'],
+        'Gastos Médicos': ['GM Individual', 'GM Familiar', 'GM Colectivo', 'GM Internacional', 'Enfermedades Graves'],
+        'Incendio y Líneas Aliadas': ['Hogar', 'Edificio / Comercio', 'Todo Riesgo Construcción', 'Lucro Cesante'],
+        'Daños': ['Multirriesgo PYME', 'Multirriesgo Hogar', 'Robo y Hurto', 'Rotura de Maquinaria', 'Equipo Electrónico', 'Dinero y Valores'],
+        'Fianzas': ['Fianza de Cumplimiento', 'Fianza de Anticipo', 'Fianza de Sostenimiento de Oferta', 'Fianza de Calidad / Conservación de Obra', 'Fianza Judicial', 'Fianza Aduanera'],
+        'Transporte': ['Carga Terrestre', 'Carga Marítima', 'Carga Aérea', 'Casco', 'Importación / Exportación'],
+        'Responsabilidad Civil': ['RC General', 'RC Profesional', 'RC Productos', 'RC Patronal', 'RC Directores y Funcionarios (D&O)'],
+        'Accidentes Personales': ['AP Individual', 'AP Colectivo', 'AP Escolar', 'Viajero / Asistencia']
       },
       CO: {
-        'Automóviles': ['Auto Individual', 'Auto Flotas', 'Motos', 'Pesados', 'SOAT'],
-        'Vida': ['Vida Individual', 'Vida Grupo', 'Vida Deudores', 'Temporal', 'Exequias'],
-        'Salud': ['Medicina Prepagada', 'Plan Complementario', 'Hospitalización y Cirugía', 'Salud Internacional'],
-        'Incendio y Terremoto': ['Hogar', 'PYME', 'Copropiedades', 'Todo Riesgo Daño Material'],
-        'Daños': ['Multirriesgo Empresarial', 'Sustracción', 'Maquinaria', 'Equipo y Maquinaria'],
-        'Cumplimiento': ['Cumplimiento Particular', 'Cumplimiento Estatal', 'Seriedad de Oferta', 'Estabilidad de Obra'],
-        'Transporte': ['Mercancías', 'Automotor de Carga', 'Casco Marítimo', 'Importación/Exportación'],
-        'Responsabilidad Civil': ['RC Extracontractual', 'RC Profesional', 'D&O', 'RC Clínicas'],
+        'Automóviles': ['Todo Riesgo Liviano', 'Todo Riesgo Pesado', 'Pérdidas Totales', 'Pérdidas Parciales', 'Responsabilidad Civil', 'Motos', 'Grúa / Maquinaria', 'Seguro por Kilómetros', 'SOAT', 'Flotas'],
+        'Vida': ['Vida Individual', 'Vida Grupo', 'Vida Deudores', 'Temporal', 'Exequias', 'Renta Voluntaria'],
+        'Salud': ['Salud Individual', 'Salud Familiar', 'Medicina Prepagada', 'Plan Complementario', 'Hospitalización y Cirugía', 'Salud Internacional'],
+        'Incendio y Terremoto': ['Hogar', 'PYME', 'Copropiedades', 'Todo Riesgo Daño Material', 'Lucro Cesante'],
+        'Daños': ['Multirriesgo Empresarial', 'Multirriesgo Hogar', 'Sustracción', 'Rotura de Maquinaria', 'Equipo y Maquinaria', 'Manejo'],
+        'Cumplimiento': ['Cumplimiento Particular', 'Cumplimiento Estatal', 'Seriedad de la Oferta', 'Buen Manejo de Anticipo', 'Estabilidad de Obra', 'Calidad del Servicio'],
+        'Transporte': ['Mercancías', 'Automotor de Carga', 'Casco Marítimo', 'Importación / Exportación'],
+        'Responsabilidad Civil': ['RC Extracontractual', 'RC Profesional', 'RC Directores y Administradores (D&O)', 'RC Clínicas y Hospitales', 'RC Contractual'],
         'ARL / Riesgos Laborales': ['ARL', 'Accidentes Personales', 'AP Estudiantil', 'Viajero']
       }
     },

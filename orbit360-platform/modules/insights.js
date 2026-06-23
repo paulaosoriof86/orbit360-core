@@ -14,7 +14,11 @@ Orbit.modules.insights = (function () {
   const M = (n) => U.moneyShort(n, 'GTQ');
   const MM = (n) => U.money(n, 'GTQ');
   const YEAR = 2026, PREV = 2025;
-  const MES = U.NOW ? new Date(U.NOW).getMonth() : 5; // 0-index mes actual
+  const MES0 = U.NOW ? new Date(U.NOW).getMonth() : 5; // mes actual
+  let mesSel = MES0;           // mes seleccionado (acumulado Ene→mesSel)
+  let criterio = 'general';    // comparativo: general | asesor | ramo | aseguradora
+  let topOrden = 'volumen';    // top clientes: volumen | cantidad | nuevos | antiguos
+  const MES = MES0;            // compat: algunos cálculos usan el mes actual base
 
   /* ---- país + accesos ---- */
   function paisOK(p) { return !Orbit.pais || Orbit.pais === 'TODOS' || p === Orbit.pais; }
@@ -185,20 +189,28 @@ Orbit.modules.insights = (function () {
     const metaTotal = S().all('asesores').reduce((s, a) => s + (a.metaPrima || 0), 0);
     const metaNueva = Math.round(metaTotal * 0.45), metaRenov = Math.round(metaTotal * 0.55);
     const pctN = Math.round(netaNueva / (metaNueva || 1) * 100), pctR = Math.round(netaRenov / (metaRenov || 1) * 100);
+    // series mensuales nueva/renov para acumulado y mes seleccionado
+    const sN = serieAnual(YEAR, 'nueva').arr, sR = serieAnual(YEAR, 'renov').arr;
+    const mesN = sN[mesSel] || 0, mesR = sR[mesSel] || 0, acN = acumHasta(sN, mesSel), acR = acumHasta(sR, mesSel);
     const metaBar = (label, val, meta, pct, color) => `
       <div class="ins-meta-block">
         <div class="ins-meta-top"><b>${label}</b><span class="mono">${MM(val)} <span class="muted">/ ${MM(meta)}</span></span></div>
         <div class="ins-meta-bar big"><i style="width:${Math.min(100, pct)}%;background:${pct >= 100 ? 'var(--ok)' : pct >= 70 ? 'var(--warn)' : color}"></i><span>${pct}%</span></div>
       </div>`;
+    // nuevas vs renovadas por ramo (comparación real)
+    const ramos = [...new Set(vig.map(p => p.ramo))];
+    const nByR = aggBy(nuevas, p => p.ramo, p => netaDe(p)), rByR = aggBy(renov, p => p.ramo, p => netaDe(p));
+    const ramoOrd = ramos.map(r => ({ r, t: (nByR[r] || 0) + (rByR[r] || 0) })).sort((a, b) => b.t - a.t).slice(0, 8).map(x => x.r);
     return insKpis([
-      { label: 'Prima neta NUEVA', val: M(netaNueva), color: 'var(--ok)', foot: nuevas.length + ' pólizas · meta ' + M(metaNueva), footTone: pctN >= 100 ? 'up' : '', detail: { title: 'Pólizas nuevas', sub: nuevas.length + ' pólizas · ' + MM(netaNueva), html: () => tablaPolizas(nuevas.slice().sort((a, b) => netaDe(b) - netaDe(a))) } },
-      { label: 'Prima neta RENOVADA', val: M(netaRenov), color: 'var(--info)', foot: renov.length + ' pólizas · meta ' + M(metaRenov), detail: { title: 'Pólizas renovadas', sub: renov.length + ' pólizas · ' + MM(netaRenov), html: () => tablaPolizas(renov.slice().sort((a, b) => netaDe(b) - netaDe(a))) } },
-      { label: 'Cumplimiento nuevas', val: pctN + '%', color: 'var(--red)', foot: 'vs meta de nuevas', footTone: pctN >= 100 ? 'up' : 'down' },
-      { label: 'Cumplimiento renov.', val: pctR + '%', color: 'var(--warn)', foot: 'vs meta de renovadas', footTone: pctR >= 100 ? 'up' : 'down' }
-    ]) + card('Avance de metas por tipo de producción', metaBar('Producción NUEVA', netaNueva, metaNueva, pctN, 'var(--red)') + metaBar('Producción RENOVADA', netaRenov, metaRenov, pctR, 'var(--red)'), 'metas separadas · prima neta') +
+      { label: 'PN NUEVA · ' + MESES[mesSel], val: M(mesN), color: 'var(--ok)', foot: 'acum. ' + M(acN), footTone: 'up', detail: { title: 'Pólizas nuevas (vigentes)', sub: nuevas.length + ' pólizas · ' + MM(netaNueva), html: () => tablaPolizas(nuevas.slice().sort((a, b) => netaDe(b) - netaDe(a))) } },
+      { label: 'PN RENOVADA · ' + MESES[mesSel], val: M(mesR), color: 'var(--info)', foot: 'acum. ' + M(acR), detail: { title: 'Pólizas renovadas (vigentes)', sub: renov.length + ' pólizas · ' + MM(netaRenov), html: () => tablaPolizas(renov.slice().sort((a, b) => netaDe(b) - netaDe(a))) } },
+      { label: 'Cumplimiento nuevas', val: pctN + '%', color: 'var(--red)', foot: 'acum. vs meta', footTone: pctN >= 100 ? 'up' : 'down' },
+      { label: 'Cumplimiento renov.', val: pctR + '%', color: 'var(--warn)', foot: 'acum. vs meta', footTone: pctR >= 100 ? 'up' : 'down' }
+    ]) + card('Avance de metas (acumulado del año · prima neta)', metaBar('Producción NUEVA', netaNueva, metaNueva, pctN, 'var(--red)') + metaBar('Producción RENOVADA', netaRenov, metaRenov, pctR, 'var(--red)'), 'metas separadas — se asignan en Equipo y permisos / Configuración') +
+      card('Producción mensual ' + YEAR + ' · nuevas vs renovadas', colsDual(MESES, sN, sR, 'Nuevas', 'Renovadas'), 'prima neta por mes · clic en Mes para acumular') +
       `<div class="ins-grid-2">
       ${card('Meta por asesor (prima neta)', `<table class="tbl"><thead><tr><th>Asesor</th><th>Avance</th><th class="num">Neta</th><th class="num">Meta</th></tr></thead><tbody>${asesorMetaRows()}</tbody></table>`)}
-      ${card('Nuevas vs renovadas por ramo', barsH(ramoNuevaRenov(), { money: true }), 'prima neta nueva por ramo')}
+      ${card('Nuevas vs renovadas por ramo', colsDual(ramoOrd, ramoOrd.map(r => nByR[r] || 0), ramoOrd.map(r => rByR[r] || 0), 'Nuevas', 'Renovadas'), 'prima neta por ramo')}
     </div>`;
   }
   function asesorMetaRows() {
@@ -260,31 +272,35 @@ Orbit.modules.insights = (function () {
     </div>` + card('Recibos vencidos prioritarios', tablaCobros(venc.slice(0, 14)));
   }
 
-  /* ---- COMPARATIVO interanual + intermensual ---- */
+  /* ---- COMPARATIVO interanual + intermensual (por concepto) ---- */
+  function compBucket(crit, mes) {
+    const keyFn = { general: () => 'Total', asesor: p => p.asesorId, ramo: p => p.ramo, aseguradora: p => p.aseguradoraId }[crit] || (() => 'Total');
+    const labelFn = { asesor: id => (q.asesor(id) || {}).nombre || id, aseguradora: id => (q.aseguradora(id) || {}).nombre || id }[crit];
+    const m = {};
+    polizas().forEach(p => { if (!p.vigenciaInicio) return; const dt = new Date(p.vigenciaInicio), y = dt.getFullYear(); if ((y !== YEAR && y !== PREV) || dt.getMonth() > mes) return; const k = keyFn(p); m[k] = m[k] || { a: 0, b: 0 }; if (y === YEAR) m[k].b += netaDe(p); else m[k].a += netaDe(p); });
+    return Object.entries(m).map(([k, v], i) => ({ key: k, label: labelFn ? labelFn(k) : k, color: crit === 'ramo' ? (RAMO_COLORS[k] || palette[i % palette.length]) : palette[i % palette.length], v25: v.a, v26: v.b, var: v.a > 0 ? Math.round((v.b - v.a) / v.a * 100) : (v.b > 0 ? 100 : 0) })).sort((x, y) => y.v26 - x.v26);
+  }
   function vComparativo() {
     const s26 = serieAnual(YEAR), s25 = serieAnual(PREV);
-    const acum26 = acumHasta(s26.arr, MES), acum25 = acumHasta(s25.arr, MES);
+    const acum26 = acumHasta(s26.arr, mesSel), acum25 = acumHasta(s25.arr, mesSel);
     const varPct = acum25 > 0 ? Math.round((acum26 - acum25) / acum25 * 100) : 0;
-    const nPol26 = s26.cnt.slice(0, MES + 1).reduce((s, v) => s + v, 0), nPol25 = s25.cnt.slice(0, MES + 1).reduce((s, v) => s + v, 0);
-    // intermensual
-    const mesAct = s26.arr[MES], mesAnt = MES > 0 ? s26.arr[MES - 1] : 0;
+    const nPol26 = s26.cnt.slice(0, mesSel + 1).reduce((s, v) => s + v, 0), nPol25 = s25.cnt.slice(0, mesSel + 1).reduce((s, v) => s + v, 0);
+    const mesAct = s26.arr[mesSel], mesAnt = mesSel > 0 ? s26.arr[mesSel - 1] : 0;
     const varMes = mesAnt > 0 ? Math.round((mesAct - mesAnt) / mesAnt * 100) : 0;
-    // comparativo por aseguradora (acumulado año vs año)
-    const byAsg = {};
-    polizas().forEach(p => { const y = new Date(p.vigenciaInicio).getFullYear(); if (y !== YEAR && y !== PREV) return; const k = p.aseguradoraId; byAsg[k] = byAsg[k] || { a: 0, b: 0 }; if (y === YEAR && new Date(p.vigenciaInicio).getMonth() <= MES) byAsg[k].b += netaDe(p); if (y === PREV && new Date(p.vigenciaInicio).getMonth() <= MES) byAsg[k].a += netaDe(p); });
-    const asgRows = Object.entries(byAsg).map(([id, v]) => ({ a: q.aseguradora(id), v25: v.a, v26: v.b, var: v.a > 0 ? Math.round((v.b - v.a) / v.a * 100) : (v.b > 0 ? 100 : 0) })).filter(r => r.a).sort((x, y) => y.v26 - x.v26);
+    const rows = compBucket(criterio, mesSel);
     const trend = (vp) => `<span style="color:${vp >= 0 ? 'var(--ok)' : 'var(--danger)'};font-weight:700">${vp >= 0 ? '▲' : '▼'} ${Math.abs(vp)}%</span>`;
+    const seg = `<div class="ins-seg">${[['general', 'General'], ['asesor', 'Por asesor'], ['ramo', 'Por ramo'], ['aseguradora', 'Por aseguradora']].map(o => `<button class="ins-seg-b ${criterio === o[0] ? 'active' : ''}" data-crit="${o[0]}">${o[1]}</button>`).join('')}</div>`;
     return insKpis([
-      { label: 'Prima neta acum. ' + YEAR, val: M(acum26), color: 'var(--red)', foot: 'Ene→' + MESES[MES] },
+      { label: 'PN acum. ' + YEAR, val: M(acum26), color: 'var(--red)', foot: 'Ene→' + MESES[mesSel] },
       { label: 'vs ' + PREV, val: (varPct >= 0 ? '+' : '') + varPct + '%', color: varPct >= 0 ? 'var(--ok)' : 'var(--danger)', foot: M(acum25) + ' en ' + PREV, footTone: varPct >= 0 ? 'up' : 'down' },
       { label: 'Pólizas ' + YEAR, val: nPol26, color: 'var(--info)', foot: nPol25 + ' en ' + PREV + ' (mismos meses)' },
-      { label: 'Intermensual', val: (varMes >= 0 ? '+' : '') + varMes + '%', color: 'var(--warn)', foot: MESES[MES] + ' vs ' + (MES > 0 ? MESES[MES - 1] : '—'), footTone: varMes >= 0 ? 'up' : 'down' }
+      { label: 'Intermensual', val: (varMes >= 0 ? '+' : '') + varMes + '%', color: 'var(--warn)', foot: MESES[mesSel] + ' vs ' + (mesSel > 0 ? MESES[mesSel - 1] : '—'), footTone: varMes >= 0 ? 'up' : 'down' }
     ]) + card('Comparativo de prima neta mensual · ' + PREV + ' vs ' + YEAR, colsDual(MESES, s25.arr, s26.arr, PREV + '', YEAR + ''), 'por mes') +
-      card('Comparativo por aseguradora · acumulado ' + PREV + ' vs ' + YEAR,
-        `<table class="tbl"><thead><tr><th>Aseguradora</th><th class="num">${PREV}</th><th class="num">${YEAR}</th><th class="num">Var %</th><th>Tendencia</th></tr></thead>
-        <tbody>${asgRows.map(r => `<tr><td><span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${r.a.color}"></span>${U.esc(r.a.nombre)}</span></td>
+      card('Comparativo ' + PREV + ' vs ' + YEAR + ' · acumulado Ene→' + MESES[mesSel], seg +
+        `<table class="tbl" style="margin-top:12px"><thead><tr><th>${criterio === 'general' ? 'Total' : criterio[0].toUpperCase() + criterio.slice(1)}</th><th class="num">${PREV}</th><th class="num">${YEAR}</th><th class="num">Var %</th><th>Tendencia</th></tr></thead>
+        <tbody>${rows.map(r => `<tr><td><span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${r.color}"></span>${U.esc(r.label)}</span></td>
           <td class="num muted">${M(r.v25)}</td><td class="num"><b>${M(r.v26)}</b></td><td class="num">${trend(r.var)}</td>
-          <td style="width:26%"><div class="ins-meta-bar"><i style="width:${Math.min(100, Math.abs(r.var))}%;background:${r.var >= 0 ? 'var(--ok)' : 'var(--danger)'}"></i></div></td></tr>`).join('')}</tbody></table>`, 'mismos meses Ene→' + MESES[MES]);
+          <td style="width:24%"><div class="ins-meta-bar"><i style="width:${Math.min(100, Math.abs(r.var))}%;background:${r.var >= 0 ? 'var(--ok)' : 'var(--danger)'}"></i></div></td></tr>`).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin datos del período.</td></tr>'}</tbody></table>`, 'de lo general a lo particular');
   }
 
   /* ---- TOP CLIENTES con modal de detalle ---- */
@@ -292,23 +308,37 @@ Orbit.modules.insights = (function () {
     const rows = clientes().map(c => {
       const pol = q.polizasDe(c.id).filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
       const neta = pol.reduce((s, p) => s + netaDe(p), 0);
-      return { c, pol, neta, n: pol.length };
-    }).filter(r => r.neta > 0).sort((a, b) => b.neta - a.neta);
+      const esNuevo = (c.segmento === 'Nuevo') || pol.every(esNueva);
+      return { c, pol, neta, n: pol.length, esNuevo };
+    }).filter(r => r.neta > 0);
+    let lista = rows.slice();
+    if (topOrden === 'cantidad') lista.sort((a, b) => b.n - a.n);
+    else if (topOrden === 'nuevos') lista = lista.filter(r => r.esNuevo).sort((a, b) => b.neta - a.neta);
+    else if (topOrden === 'antiguos') lista = lista.filter(r => !r.esNuevo).sort((a, b) => b.neta - a.neta);
+    else lista.sort((a, b) => b.neta - a.neta);
     const total = rows.reduce((s, r) => s + r.neta, 0) || 1;
-    const top10 = rows.slice(0, 10);
+    const top10 = rows.slice().sort((a, b) => b.neta - a.neta).slice(0, 10);
     const concentracion = Math.round(top10.reduce((s, r) => s + r.neta, 0) / total * 100);
+    const ordLbl = { volumen: 'volumen de prima neta', cantidad: 'cantidad de pólizas', nuevos: 'clientes nuevos', antiguos: 'clientes antiguos' }[topOrden];
+    // distribución por ramo / aseguradora / asesor de la cartera de clientes
+    const vig = vigentes();
+    const porRamo = topAgg(vig, p => p.ramo, p => netaDe(p), x => x, 6);
+    const porAsg = topAgg(vig, p => p.aseguradoraId, p => netaDe(p), id => (q.aseguradora(id) || {}).nombre || id, 6);
     return insKpis([
       { label: 'Clientes activos', val: rows.length, color: 'var(--red)', foot: 'con cartera vigente' },
+      { label: 'Clientes nuevos', val: rows.filter(r => r.esNuevo).length, color: 'var(--ok)', foot: 'sin renovaciones aún' },
       { label: 'Concentración top-10', val: concentracion + '%', color: concentracion > 60 ? 'var(--danger)' : 'var(--warn)', foot: 'de la prima neta' },
       { label: 'Ticket promedio', val: M(total / (rows.length || 1)), color: 'var(--info)', foot: 'prima neta por cliente' }
-    ]) + card('Top 20 clientes por prima neta vigente',
-      `<table class="tbl"><thead><tr><th>#</th><th>Cliente</th><th class="num">Pólizas</th><th class="num">Prima neta</th><th class="num">% total</th><th></th></tr></thead>
-      <tbody>${rows.slice(0, 20).map((r, i) => `<tr class="clickable" onclick="Orbit.modules.insights.cliente('${r.c.id}')">
+    ]) + card('Clientes · ordenados por ' + ordLbl,
+      `<table class="tbl"><thead><tr><th>#</th><th>Cliente</th><th>Asesor</th><th class="num">Pólizas</th><th class="num">Prima neta</th><th class="num">% total</th><th></th></tr></thead>
+      <tbody>${lista.slice(0, 25).map((r, i) => `<tr class="clickable" onclick="Orbit.modules.insights.cliente('${r.c.id}')">
         <td style="color:var(--red);font-weight:700">${i + 1}</td>
-        <td><b>${U.esc(r.c.nombre)}</b><div class="muted" style="font-size:11px">${(r.pol[0] || {}).ramo || ''}</div></td>
+        <td><b>${U.esc(r.c.nombre)}</b> ${r.esNuevo ? '<span class="badge ok" style="font-size:9px">Nuevo</span>' : ''}<div class="muted" style="font-size:11px">${(r.pol[0] || {}).ramo || ''}</div></td>
+        <td style="font-size:12px">${U.esc((q.asesor(r.c.asesorId) || {}).nombre || '—')}</td>
         <td class="num">${r.n}</td><td class="num"><b>${MM(r.neta)}</b></td>
-        <td class="num">${(r.neta / total * 100).toFixed(1)}%</td><td style="text-align:right;color:var(--ink-3)">›</td></tr>`).join('')}</tbody></table>`,
-      'concentración: top-10 = ' + concentracion + '% de la cartera');
+        <td class="num">${(r.neta / total * 100).toFixed(1)}%</td><td style="text-align:right;color:var(--ink-3)">›</td></tr>`).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">Sin clientes en este criterio.</td></tr>'}</tbody></table>`,
+      'concentración: top-10 = ' + concentracion + '% de la cartera') +
+      `<div class="ins-grid-2">${card('Cartera de clientes por ramo', barsH(porRamo, { money: true }))}${card('Cartera de clientes por aseguradora', barsH(porAsg, { money: true }))}</div>`;
   }
   // modal de detalle de cliente desde Top clientes
   function cliente(cid) {
@@ -409,13 +439,23 @@ Orbit.modules.insights = (function () {
   function draw() {
     const body = (FN[vista] || vResumen)();
     const paisLbl = (Orbit.PAISES.find(p => p.id === Orbit.pais) || {}).label || 'Todos los países';
+    const showMes = ['metas', 'comparativo', 'critico'].includes(vista);
+    const showTop = vista === 'topclientes';
     host.innerHTML = `<div class="page">
-      ${K.bannerFor('insights', `<span class="ins-paisbadge">🌎 ${paisLbl} · ${MESES[MES]} ${YEAR}</span>`)}
+      ${K.bannerFor('insights', `<div class="ins-controls">
+        <select id="ins-pais" class="ins-ctl" title="País">${Orbit.PAISES.map(p => `<option value="${p.id}" ${p.id === (Orbit.pais || 'TODOS') ? 'selected' : ''}>🌎 ${p.label}</option>`).join('')}</select>
+        ${showMes ? `<select id="ins-mes" class="ins-ctl" title="Mes (acumulado Ene→mes)">${MESES.map((m, i) => `<option value="${i}" ${i === mesSel ? 'selected' : ''}>${m} ${YEAR}</option>`).join('')}</select>` : ''}
+        ${showTop ? `<select id="ins-top" class="ins-ctl" title="Ordenar por">${[['volumen', 'Por volumen de prima'], ['cantidad', 'Por cantidad de pólizas'], ['nuevos', 'Clientes nuevos'], ['antiguos', 'Clientes antiguos']].map(o => `<option value="${o[0]}" ${o[0] === topOrden ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>` : ''}
+      </div>`)}
       <div class="ins-tabs">${VISTAS.map(v => `<button class="ins-tab ${vista === v[0] ? 'active' : ''}" data-v="${v[0]}">${v[1]}</button>`).join('')}</div>
       ${body}
       <div class="ins-note">Cifras normalizadas a base GTQ para comparar países; cada vista respeta el selector de país. Comisión y producción sobre <b>prima neta</b>. KPIs <b>clicables</b> (⤢) abren el detalle. Datos del CRM en vivo.</div>
     </div>`;
     host.querySelectorAll('.ins-tab').forEach(b => b.addEventListener('click', () => { vista = b.dataset.v; draw(); }));
+    const pSel = host.querySelector('#ins-pais'); if (pSel) pSel.addEventListener('change', () => { Orbit.pais = pSel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); draw(); });
+    const mSel = host.querySelector('#ins-mes'); if (mSel) mSel.addEventListener('change', () => { mesSel = +mSel.value; draw(); });
+    const tSel = host.querySelector('#ins-top'); if (tSel) tSel.addEventListener('change', () => { topOrden = tSel.value; draw(); });
+    host.querySelectorAll('[data-crit]').forEach(b => b.addEventListener('click', () => { criterio = b.dataset.crit; draw(); }));
     wireKpis();
   }
 
