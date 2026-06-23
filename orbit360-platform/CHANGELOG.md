@@ -2,6 +2,11 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.23.0] — 2026-06-23 · Fixes de navegación
+### Fixed
+- **Correo** ahora aparece en el menú (faltaba `'correo'` en `tenant.modulosActivos`; el sidebar filtra por esa lista).
+- **Orbit Aseguradoras** movido al grupo **Operación** (uso frecuente), antes estaba en "Gestión y recursos".
+
 ## [0.22.0] — 2026-06-23 · Integración de Correo (Outlook/Gmail) — transversal
 ### Added — `core/correo.js` (capa transversal)
 - Bandeja sobre el store (`correos`, seed `__v=15`), vínculo de correos a entidades (cliente/póliza/cobro/gestión/aseguradora), `enviar`, `vincular`, `marcarLeido`, `destacar`, `noLeidos`, y conector configurable (`conectar`/`desconectar`, persistente).

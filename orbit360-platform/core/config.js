@@ -187,7 +187,7 @@ Orbit.tenant = (function () {
     monedaBase: 'GTQ',
     branding: { logo: '', sidebar: 'oscuro', paleta: 'rojo', tipografia: 'Manrope' },
     // módulos activos (config INTERNA nuestra) — todos los del nav
-    modulosActivos: ['inicio', 'ops', 'leads', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'aseguradoras', 'ia', 'academia', 'insights', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
+    modulosActivos: ['inicio', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
     addons: { make: false, drive: true, whatsapp: true },
     portalVisibility: { polizas: true, recibos: true, documentos: true, asesor: true, comisiones: false, drive: false },
     apis: []
@@ -212,6 +212,7 @@ Orbit.NAV = [
     type: 'group', label: 'Operación', open: true, items: [
       { route: 'ops', icon: '🗂', label: 'Orbit Ops', estado: 'beta' },
       { route: 'leads', icon: '🎯', label: 'Orbit Leads', estado: 'beta' },
+      { route: 'aseguradoras', icon: '🏢', label: 'Orbit Aseguradoras', estado: 'beta' },
       { route: 'cotizador', icon: '🧮', label: 'Cotizador', estado: 'road' },
       { route: 'comparativo', icon: '📋', label: 'Comparativo', estado: 'road' }
     ]
@@ -237,7 +238,6 @@ Orbit.NAV = [
   },
   {
     type: 'group', label: 'Gestión y recursos', open: false, items: [
-      { route: 'aseguradoras', icon: '🏢', label: 'Orbit Aseguradoras', estado: 'beta' },
       { route: 'ia', icon: '🤖', label: 'Orbit IA', estado: 'beta' },
       { route: 'academia', icon: '🎓', label: 'Orbit Academia', estado: 'road' }
     ]
