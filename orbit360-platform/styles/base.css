@@ -106,6 +106,22 @@ body.sb-light .nav-foot .pwa{color:var(--ink-2)}
 body.sb-light .nav-foot .pwa b,body.sb-light .nav-foot b{color:var(--ink)}
 body.sb-light #sidebar::-webkit-scrollbar-thumb{background:var(--red-line)}
 
+/* Sidebar GRIS (personalizable) — grafito medio, texto claro */
+body.sb-gray #sidebar{background:linear-gradient(180deg,#3a4047 0%,#2b3036 100%);border-right:1px solid rgba(255,255,255,.08)}
+body.sb-gray .nav-home{border-bottom:1px solid rgba(255,255,255,.08)}
+body.sb-gray .nav-toggle:hover{background:rgba(255,255,255,.06)}
+body.sb-gray .nav-label{color:rgba(255,255,255,.6)}
+body.sb-gray .nav-arrow{color:rgba(255,255,255,.45)}
+body.sb-gray .nav-link{color:rgba(255,255,255,.82)}
+body.sb-gray .nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+body.sb-gray .nav-home .nav-link{color:#fff}
+body.sb-gray .nav-link.active{background:var(--red);color:#fff;border-left-color:#fff}
+body.sb-gray .nav-divider{border-top-color:rgba(255,255,255,.1)}
+body.sb-gray .nav-foot{color:rgba(255,255,255,.5)}
+body.sb-gray .nav-foot .pwa{color:rgba(255,255,255,.7)}
+body.sb-gray .nav-foot .pwa b,body.sb-gray .nav-foot b{color:#fff}
+body.sb-gray #sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
+
 /* ---------- SIDEBAR NAV ---------- */
 .nav-home{padding:12px 0 8px;border-bottom:1px solid rgba(255,255,255,.06)}
 .nav-group{padding:6px 0 2px}

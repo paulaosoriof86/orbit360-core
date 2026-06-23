@@ -52,6 +52,7 @@ Orbit.theme = (function () {
   const SB_KEY = 'orbit360_sidebar';
   function applySidebar(mode) {
     document.body.classList.toggle('sb-light', mode === 'claro');
+    document.body.classList.toggle('sb-gray', mode === 'gris');
     try { localStorage.setItem(SB_KEY, mode); } catch (e) {}
     Orbit.theme.sidebar = mode;
   }
@@ -73,6 +74,7 @@ Orbit.theme = (function () {
       <div class="tp-grid">
         <button class="tp-sw ${getSidebar() === 'oscuro' ? 'on' : ''}" data-sb="oscuro"><span style="background:#1E2227"></span>Oscuro</button>
         <button class="tp-sw ${getSidebar() === 'claro' ? 'on' : ''}" data-sb="claro"><span style="background:#f3f1ec;box-shadow:inset 0 0 0 1px #ccc"></span>Claro</button>
+        <button class="tp-sw ${getSidebar() === 'gris' ? 'on' : ''}" data-sb="gris"><span style="background:#3a4047"></span>Gris</button>
       </div>`;
     document.body.appendChild(pop);
     const r = anchorEl.getBoundingClientRect();
