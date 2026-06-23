@@ -2,6 +2,20 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.19.0] — 2026-06-23 · Orbit Finanzas dinámico (datos ficticios, en vivo)
+### Added — Modelo de datos financiero (seed `__v=14`, **ficticio**, "Demo Corredores")
+- Colecciones `finmovs` (movimientos por mes y país, 16 meses Mar-25→Jun-26), `acreedores` (deuda) y `presupuesto`.
+- Ingresos: Comisiones aseguradora, Incentivos, **Financiación (aparte)**, Otros. Egresos: Comisiones asesores, Gastos fijos, Marketing, Operación, Devolución de préstamo. Estados ingreso (esperado/facturado/recaudado) y egreso (pendiente/pagado).
+### Added — Módulo Finanzas reconstruido (lee datos reales del store, en vivo)
+- **Selector de país + mes** (igual que Insights). Tabs **scrollables** (ya no se desbordan).
+- **Movimientos**: tabla real del periodo; clic en fila **cambia el estado** (recaudado/pagado ↔ pendiente) en vivo.
+- **CxC / CxP**: cuentas por cobrar (ingresos esperados/facturados) y por pagar (egresos pendientes), con posición neta; estados editables al clic.
+- **Financiación**: ingreso NO operativo separado + **control de deuda por acreedor** (sube con financiación, baja con devoluciones).
+- **Presupuesto vs real** con **semáforos** (verde/ámbar/rojo) y % de ejecución por categoría.
+- **Dashboard**: comparativo **interanual** e **intermensual** real (ingresos/egresos/utilidad) con barras de marca.
+- **✨ Análisis IA**: diagnóstico del periodo + metas sugeridas + estrategias (medios/segmentación/comercial) — listo para conectar Gemini.
+- **Conservadas** Liquidación empresa, Liquidación asesores y Conciliación bancaria (no se eliminó nada de lo que ya servía).
+
 ## [0.18.0] — 2026-06-22 · Insights interactivo (selectores + comparativo por concepto)
 ### Added / Fixed — Orbit Insights
 - **Selector de país** y **selector de mes** funcionales en las analíticas (acumulado Ene→mes); país se sincroniza con la barra superior.

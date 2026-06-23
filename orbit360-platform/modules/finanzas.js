@@ -28,14 +28,14 @@ Orbit.modules.finanzas = (function () {
   const sum = (arr, f) => arr.reduce((s, x) => s + norm(f(x), x.moneda), 0);
 
   function render(host) {
-    const TABS = [['movimientos', 'Movimientos'], ['dashboard', 'Dashboard'], ['cxcp', 'CxC / CxP'], ['financiacion', 'Financiación'], ['presupuesto', 'Presupuesto'], ['empresa', 'Liq. empresa'], ['asesores', 'Liq. asesores'], ['ia', '✨ Análisis IA']];
+    const TABS = [['movimientos', 'Movimientos'], ['dashboard', 'Dashboard'], ['cxcp', 'CxC / CxP'], ['financiacion', 'Financiación'], ['presupuesto', 'Presupuesto'], ['empresa', 'Liq. empresa'], ['asesores', 'Liq. asesores'], ['banco', 'Conciliación'], ['ia', '✨ Análisis IA']];
     const paisLbl = (Orbit.PAISES.find(p => p.id === (Orbit.pais || 'TODOS')) || {}).label || 'Todos los países';
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '💰', title: 'Orbit Finanzas', sub: 'Ingresos, egresos, financiación y presupuesto', features: [], actions: `<div class="ins-controls">
         <select id="fin-pais" class="ins-ctl">${Orbit.PAISES.map(p => `<option value="${p.id}" ${p.id === (Orbit.pais || 'TODOS') ? 'selected' : ''}>🌎 ${p.label}</option>`).join('')}</select>
         <select id="fin-mes" class="ins-ctl">${periodos().map(pr => `<option value="${pr}" ${pr === mesSel ? 'selected' : ''}>${MESES[+pr.slice(5) - 1]} ${pr.slice(0, 4)}</option>`).join('')}</select>
       </div>` })}
-      <div class="tabs" style="max-width:980px;margin-bottom:16px">
+      <div class="tabs tabs-scroll" style="margin-bottom:16px">
         ${TABS.map(t => `<div class="tab ${tab === t[0] ? 'active' : ''}" data-t="${t[0]}">${t[1]}</div>`).join('')}
       </div>
       <div id="fin-body"></div>
@@ -44,7 +44,7 @@ Orbit.modules.finanzas = (function () {
     const pSel = host.querySelector('#fin-pais'); if (pSel) pSel.addEventListener('change', () => { Orbit.pais = pSel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); render(host); });
     const mSel = host.querySelector('#fin-mes'); if (mSel) mSel.addEventListener('change', () => { mesSel = mSel.value; render(host); });
     const body = document.getElementById('fin-body');
-    body.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, ia }[tab] || movimientos)();
+    body.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, ia }[tab] || movimientos)();
     wire(host);
   }
 
