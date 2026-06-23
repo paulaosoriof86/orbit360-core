@@ -433,6 +433,65 @@ Orbit.SEED = (function () {
   const ymNow = iso(NOW).slice(0, 7);
   ['GT', 'CO'].forEach(pais => { PPTO[pais].forEach(([cat, val]) => presupuesto.push({ id: 'ppt' + (presupuesto.length + 1), pais, periodo: ymNow, categoria: cat, clase: cat === 'Publicidad redes' ? 'Marketing' : (cat === 'Operación' ? 'Operación' : 'Gastos fijos'), monto: val })); });
 
+  // ====================================================================
+  //  CORREO — bandeja demo (Outlook/Gmail) con vínculos a entidades
+  // ====================================================================
+  const correos = [];
+  const asuntos = [
+    ['Cotización Auto — pendiente de su confirmación', 'cliente', 'cotiza'],
+    ['Aviso de vencimiento de prima', 'cobro', 'cobro'],
+    ['Documentos para emisión de póliza', 'poliza', 'doc'],
+    ['Respuesta de la aseguradora · reclamo', 'aseguradora', 'reclamo'],
+    ['Renovación próxima — propuesta adjunta', 'poliza', 'renov'],
+    ['Solicitud de actualización de datos', 'cliente', 'gestion'],
+    ['Confirmación de pago recibido', 'cobro', 'pago'],
+    ['Planilla de comisiones del mes', 'aseguradora', 'comision']
+  ];
+  let coN = 0;
+  for (let i = 0; i < 14; i++) {
+    coN++;
+    const cli = pick(clientes);
+    const a = pick(asuntos);
+    const entrante = rnd() > .4;
+    const asg = pick(aseguradoras.filter(x => x.pais === cli.pais).length ? aseguradoras.filter(x => x.pais === cli.pais) : aseguradoras);
+    const pol = polizas.filter(p => p.clienteId === cli.id)[0];
+    const vinc = a[1] === 'aseguradora'
+      ? { tipo: 'aseguradora', id: asg.id, label: asg.nombre }
+      : a[1] === 'poliza' && pol ? { tipo: 'poliza', id: pol.id, label: pol.numero }
+      : a[1] === 'cobro' && pol ? { tipo: 'cobro', id: '', label: 'Recibo de ' + cli.nombre, clienteId: cli.id }
+      : { tipo: 'cliente', id: cli.id, label: cli.nombre };
+    correos.push({
+      id: 'eml' + coN,
+      asunto: a[0],
+      de: entrante ? (cli.email || (cli.nombre.toLowerCase().replace(/[^a-z]/g, '.') + '@correo.com')) : 'equipo@democorredores.com',
+      para: entrante ? 'equipo@democorredores.com' : (cli.email || 'cliente@correo.com'),
+      remitenteNombre: entrante ? cli.nombre : 'Equipo Orbit',
+      direccion: entrante ? 'entrante' : 'saliente',
+      fecha: iso(addDays(NOW, -between(0, 20))),
+      hora: String(between(8, 18)).padStart(2, '0') + ':' + String(between(0, 59)).padStart(2, '0'),
+      leido: entrante ? rnd() > .4 : true,
+      destacado: rnd() > .8,
+      cuerpo: cuerpoCorreo(a[2], cli),
+      clienteId: cli.id,
+      adjuntos: rnd() > .5 ? [pick(['cotizacion.pdf', 'poliza.pdf', 'recibo.pdf', 'planilla.xlsx', 'cedula.jpg'])] : [],
+      vinculo: vinc,
+      carpeta: entrante ? 'recibidos' : 'enviados'
+    });
+  }
+  function cuerpoCorreo(t, cli) {
+    const m = {
+      cotiza: 'Estimado/a ' + cli.nombre + ', adjunto la cotización solicitada. Quedo atento/a a sus comentarios para avanzar con la emisión.',
+      cobro: 'Le recordamos que su prima vence próximamente. Puede realizar el pago por los canales habituales o responder este correo para coordinar.',
+      doc: 'Para completar la emisión necesitamos los siguientes documentos. Por favor responda adjuntándolos.',
+      reclamo: 'En atención a su reclamo, la aseguradora informa que el caso fue recibido y está en análisis. Le mantendremos informado.',
+      renov: 'Su póliza está próxima a renovar. Adjuntamos la propuesta de renovación con las mejoras de cobertura disponibles.',
+      gestion: 'Solicitamos amablemente actualizar sus datos de contacto para mantener su expediente al día.',
+      pago: 'Confirmamos la recepción de su pago. Gracias por su preferencia.',
+      comision: 'Adjuntamos la planilla de comisiones correspondiente al periodo para su conciliación.'
+    };
+    return m[t] || 'Mensaje de seguimiento.';
+  }
+
   // novedades / incentivos
   const novedades = [
     { id: 'nov1', tipo: 'incentivo', titulo: '🏆 Incentivo de junio: bono por 10 pólizas Auto', detalle: 'Cierra 10 pólizas de Auto este mes y gana un bono del 5% adicional sobre comisión.', autor: 'Paula Osorio', fecha: iso(addDays(NOW, -2)), prioridad: true },
@@ -442,8 +501,8 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 14,
+    __v: 15,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
-    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto
+    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos
   };
 })();

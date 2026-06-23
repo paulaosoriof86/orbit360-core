@@ -2,6 +2,14 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [0.22.0] — 2026-06-23 · Integración de Correo (Outlook/Gmail) — transversal
+### Added — `core/correo.js` (capa transversal)
+- Bandeja sobre el store (`correos`, seed `__v=15`), vínculo de correos a entidades (cliente/póliza/cobro/gestión/aseguradora), `enviar`, `vincular`, `marcarLeido`, `destacar`, `noLeidos`, y conector configurable (`conectar`/`desconectar`, persistente).
+### Added — `modules/correo.js` (bandeja, menú Comunicación)
+- Carpetas Recibidos/Enviados/Destacados, lista + lector, **redactar**, **vincular a cliente**, abrir entidad vinculada, badge de no leídos, banner "Conectar Outlook/Gmail" (modo demo → real al personalizar).
+### Added — Ficha de cliente
+- Nueva pestaña **Correos**: hilos vinculados al cliente + redactar contextual; helper `reabrir(cid, tab)`.
+
 ## [0.21.0] — 2026-06-23 · Módulo Equipo y permisos + Finanzas con emojis/lote
 ### Added — `modules/equipo.js`
 - **Usuarios**: equipo del intermediario con rol, estado, color, metas; alta/edición de usuario en drawer.

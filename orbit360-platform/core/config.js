@@ -249,6 +249,7 @@ Orbit.NAV = [
   },
   {
     type: 'group', label: 'Comunicación', open: false, items: [
+      { route: 'correo', icon: '✉', label: 'Correo', estado: 'beta' },
       { route: 'notificaciones', icon: '💬', label: 'Notificaciones WA', estado: 'road' },
       { route: 'marketing', icon: '📣', label: 'Orbit Marketing', estado: 'beta' },
       { route: 'portal', icon: '🚪', label: 'Portal del Cliente', estado: 'road' }

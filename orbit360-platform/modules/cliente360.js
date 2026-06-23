@@ -17,7 +17,7 @@ Orbit.modules.cliente360 = (function () {
   const ROLE = () => (Orbit.session && Orbit.session.rol && Orbit.session.rol()) || (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
   const verEmpresa = () => ['Dirección', 'Admin', 'Finanzas'].includes(ROLE());
 
-  const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'comisiones', 'historial'];
+  const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'comisiones', 'correos', 'historial'];
 
   // ---------- entry ----------
   function render(h) {
@@ -133,7 +133,7 @@ Orbit.modules.cliente360 = (function () {
     const c = r.cli, ase = q.asesor(c.asesorId);
     const tabs = [
       ['resumen', 'Resumen', '📊'], ['polizas', 'Pólizas', '📑'], ['vehiculos', 'Vehículos', '🚗'], ['cobros', 'Cobros', '💳'],
-      ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['comisiones', 'Comisiones', '💼'], ['historial', 'Historial', '📝']
+      ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']
     ];
     const saludCol = r.salud >= 70 ? '#1f8a4c' : r.salud >= 45 ? '#c9821b' : '#C5162E';
     const waNum = (c.telefono || '').replace(/[^0-9]/g, '');
@@ -256,6 +256,7 @@ Orbit.modules.cliente360 = (function () {
     else if (tab === 'cobros') body.innerHTML = tabCobros(cid, r);
     else if (tab === 'renovaciones') body.innerHTML = tabRenov(cid, r);
     else if (tab === 'comisiones') body.innerHTML = tabComis(cid, r);
+    else if (tab === 'correos') { body.innerHTML = tabCorreos(cid, r); }
     else if (tab === 'historial') { body.innerHTML = tabHistorial(cid, r); wireHistorial(cid); }
   }
 
@@ -862,6 +863,24 @@ Orbit.modules.cliente360 = (function () {
     back.querySelector('#vp-x').addEventListener('click', close);
   }
 
+  /* ---- Correos del cliente (capa Orbit.correo) ---- */
+  function tabCorreos(cid, r) {
+    const arr = (Orbit.correo ? Orbit.correo.deCliente(cid) : []).sort((a, b) => (b.fecha + b.hora).localeCompare(a.fecha + a.hora));
+    return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <b style="font-family:var(--f-display);font-size:15px">Correos de ${U.esc(r.cli.nombre)}</b>
+      <div style="display:flex;gap:8px"><button class="btn ghost sm" onclick="location.hash='#/correo'">Abrir bandeja</button><button class="btn primary sm" onclick="Orbit.correo.enviar({para:'${U.esc(r.cli.email || '')}',asunto:'',cuerpo:'',clienteId:'${cid}',vinculo:{tipo:'cliente',id:'${cid}',label:'${U.esc(r.cli.nombre)}'}});Orbit.modules.cliente360.reabrir('${cid}','correos')">✏ Redactar</button></div>
+    </div>
+    ${arr.length ? `<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
+      <thead><tr><th></th><th>Asunto</th><th>De / Para</th><th>Vínculo</th><th>Fecha</th></tr></thead>
+      <tbody>${arr.map(c => `<tr class="clickable" onclick="location.hash='#/correo'">
+        <td>${c.direccion === 'entrante' ? '📥' : '📤'}</td>
+        <td><b style="font-size:12.5px">${c.leido ? '' : '🔵 '}${U.esc(c.asunto)}</b></td>
+        <td style="font-size:12px">${U.esc(c.direccion === 'entrante' ? c.remitenteNombre : c.para)}</td>
+        <td>${c.vinculo ? `<span class="badge info" style="font-size:10px">🔗 ${U.esc(c.vinculo.label)}</span>` : '<span class="muted" style="font-size:11px">—</span>'}</td>
+        <td style="font-size:12px">${U.fmtDate(c.fecha)}</td></tr>`).join('')}</tbody></table></div></div>`
+      : `<div class="card pad" style="text-align:center;color:var(--ink-3)">Sin correos vinculados a este cliente. <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/correo'">Abrir la bandeja</a> para vincular.</div>`}`;
+  }
+
   /* ---- Qué cubre la póliza (según tipo) ---- */
   function coberturaCard(p, veh) {
     if (veh) {
@@ -1075,5 +1094,5 @@ Orbit.modules.cliente360 = (function () {
     back.querySelector('#vh-x').addEventListener('click', close);
   }
 
-  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo };
+  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); } };
 })();
