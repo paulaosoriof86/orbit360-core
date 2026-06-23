@@ -428,3 +428,64 @@ Referencia: libro "Movimientos Ing y Eg" — 38 hojas mensuales GT/Col (Nov-24�
 - **Renovaciones**: por aseguradora / asesor / ramo.
 - **Análisis crítico dinámico** en todas.
 - **Gráficas**: salir del gris/negro — usar paleta de marca (rojo/grafito/acentos) con buen contraste.
+
+---
+
+# 🔴 RONDA 9 — Correo en topbar, detalles clicables, Finanzas editable, Insights profundo (PRIORIZADA · 23-jun)
+Feedback con capturas. **Confirmación al usuario: TODO lo de Insights/comparativos/cartera/top/renovaciones de rondas previas SIGUE pendiente y documentado (R7.5, R8.8); la versión actual de Insights quedó simple y debe rehacerse al nivel solicitado, NO está completa.**
+
+## R9.1 · Correo — accesos, sincronización real y vínculos
+- **Abrir correo desde el TOPBAR** (junto a la campana de notificaciones); hoy está muy abajo en el menú. Es herramienta diaria.
+- **Notificaciones de correo**: badge de no leídos en topbar + aviso en Mi Día.
+- **Funcionalidad completa tipo Outlook/Gmail** según el proveedor elegido y **sincronizar todos los correos actuales**.
+- **No exclusivo de dominio Outlook**: soportar **IMAP/POP3** con distintos proveedores y **dominios propios**.
+- **Vincular correo a cliente DESDE el correo** de forma explícita (hoy parece automático); permitir asociación manual.
+- **Vincular también a PÓLIZA / GESTIÓN / RECLAMO / ASEGURADORA**; **crear gestión desde un correo**.
+- **Correo desde la ficha del cliente**: botón en el **panel superior** de la ficha (junto a WA y a "gestión"/historial). Al redactar, **asociar a póliza** y poner **nombre en el asunto** para enviar a la aseguradora y **relacionar automáticamente**.
+- **Ventajas del correo vinculado** (a implementar/comunicar): hilo completo por cliente/póliza/reclamo; trazabilidad y auditoría; adjuntar respuestas de la aseguradora a un siniestro; crear gestión/CxC desde un correo; plantillas; **envío por lote** de cobros/renovaciones; cadencias automáticas.
+
+## R9.2 · Detalles clicables (BUG recurrente — alta prioridad)
+- **KPIs sin clic** en varias secciones → todos deben abrir detalle.
+- **Renovaciones, Cobros y Cartera, Cancelaciones**: al seleccionar un registro **abre la ficha del cliente (Resumen)** en vez del **detalle** del registro. Debe abrir el detalle (recibo, renovación, cancelación) — patrón ya hecho en algunos, falta en estos.
+- **Recibos**: en NINGUNA sección muestran detalle; siempre devuelven al resumen del cliente. Falta drawer de recibo + aplicar pago con fecha + adjuntar factura.
+- **Orbit Historial**: muestra movimientos pero **no muestra clientes**; el detalle lleva al cliente en Resumen. Debe abrir el detalle de la interacción / entidad correcta.
+- Regla global: **todo registro es clicable y abre su propio detalle** (no el resumen del cliente por defecto).
+
+## R9.3 · Comisiones — es CRM, no analítica; y configuración mal ubicada
+- La sección **Comisiones del CRM** se volvió una **analítica tipo Insights** y **perdió el listado y el detalle** (antes mostraba listado, faltaba el detalle). Debe volver a ser **sección CRM con listado + detalle clicable** (devengado/liquidado por cuota, por asesor, por aseguradora).
+- La **configuración de comisión por asesor** (% / fijo) que quedó dentro de Comisiones **debe vivir en Configuración / Equipo y permisos**, NO en el CRM de comisiones. (Bug: al entrar a "comisiones asesores" desapareció el menú lateral y quedó solo la config.)
+
+## R9.4 · Importador del expediente — documental Y/O inteligente (faltan ambos claros)
+- Al importar al expediente, **elegir el modo**: **Documental** (conservar el archivo para visualizarlo después) **o Inteligente** (extraer info y mandarla a donde corresponde: datos del cliente, póliza, vehículo, estado de cuenta, pago aplicado con factura…). Necesita **ambos**.
+- **Falta la sección DOCUMENTAL** en el expediente para **visualizar los documentos** cargados del cliente (repositorio por cliente, con etiquetas y vínculo al Drive).
+
+## R9.5 · Recibos del expediente — organizar por póliza (ya pedido, confirmar en plan)
+- En la ficha del cliente, **Recibos y pagos** debe tener **selector de póliza** (No. de póliza, aseguradora, identificador del vehículo/bien) para no mezclar recibos de varias pólizas. (Pendiente #63 — confirmado.)
+
+## R9.6 · Finanzas — todo editable, con detalle, dinámico (rehacer profundo)
+- **Liquidaciones**: el listado muestra datos pero **no abre detalle** ni permite **editar**; debe poder verse qué se cobra/paga, **seleccionar** una partida y editarla.
+- **Conciliación dinámica**: al **conciliar la planilla de la aseguradora** y los **estados de cuenta**, las liquidaciones deben actualizarse desde **cualquier** sección que cargue la info; si cargo desde Liq. empresa la planilla de comisiones, **avisar si hay desviación** vs la liquidación para corregir/revisar.
+- **Conciliación bancaria**: conciliar con los **movimientos del mes**.
+- **Ingresos por financiamiento**: hoy aparece la sección pero **no hay por dónde registrarlos** ni cómo se **descuentan**. Debe haber alta/edición y control total de deuda.
+- **CxC desde planilla de comisiones**: generar la cuenta por cobrar al cargar la planilla y **registrar el movimiento de ingreso al cambiar estado**. Hoy **no hay opción de editar nada**.
+- **Dashboard financiero** está **demasiado genérico** → necesita **tablas, gráficas, comparativos mes/año y análisis** detallado.
+- **Movimientos**: falta **agregar ingresos, egresos, saldos bancarios al corte**; distinguir por **sub-secciones** (Ingresos / Egresos / Saldos), con **semáforos, avances y dinamismo** (hoy es listado fijo).
+- **Crear el siguiente mes** en Movimientos y en Presupuesto (no existe).
+- **Revisar la hoja Excel entregada**: era mucho más descriptiva por sección → **complementar y mejorar** con eso, sin perder lo bueno y manteniendo **datos ficticios**.
+- **Editar en todas las sub-secciones** de Finanzas.
+
+## R9.7 · Insights — sigue simple; rehacer al nivel ya solicitado (R7.5 + R8.8)
+- **Comparativo sigue demasiado simple** — falta todo lo pedido: interanual + intermensual, por **asesor/ramo/aseguradora/producto/general**, de lo general a lo particular, con tablas, gráficas y análisis crítico dinámico.
+- **Top clientes**, **Cartera** y **Renovaciones** con desglose por aseguradora/asesor/ramo/producto/nuevos-antiguos/volumen/cantidad — con modal de detalle.
+- Confirmar: **todo Insights de rondas previas está pendiente** (no se perdió), la versión actual NO cumple el nivel.
+
+## R9.8 · Sidebar — opción de color GRIS
+- Agregar al selector de color del sidebar una variante **gris** (además de oscuro/rojo actuales).
+
+## R9.9 · Integraciones de marketing/contenido + correo↔aseguradora + facturación por aseguradora
+- **Integraciones** ahora incluyen (Config › Integraciones): **Correo (Outlook/IMAP/POP3)**, **Metricool**, **Facebook/Instagram**, **LinkedIn**, **Página web**, **Canva**, **Gamma**, **HeyGen**, **IA (Gemini)**, **Mailchimp**, **Google Sheets** (además de Make, Drive, WhatsApp). ✅ catálogo agregado.
+- **Automatización de contenidos y publicación**: el flujo "generar contenido → pieza → publicar/medir" se arma con **Make (orquesta) + IA/Gemini (genera texto) + Canva/Gamma/HeyGen (piezas) + Metricool (programa, publica y mide en redes y pauta)**. Mailchimp para correo masivo. Documentar como receta en Marketing/Automatizaciones (R7.7).
+- **Correo vinculable a ASEGURADORA**: además de cliente/póliza/gestión/reclamo, poder vincular correos a una **aseguradora** (info de personal, procesos, procedimientos, productos, piezas). (Suma a R9.1.)
+- **Facturación por aseguradora**: en cada ficha de aseguradora guardar **patrones y datos de facturación** — **NIT**, **patrón de concepto**, razón social, dirección fiscal, notas — para no tener que buscar PDFs de facturas antiguas al facturar. El importador documental puede extraer estos datos de una factura previa. (Suma a R78 Aseguradoras.)
+
+> Orden sugerido R9 (alto impacto, sin parchar a ciegas): (1) detalles clicables en Cobros/Cartera/Renovaciones/Cancelaciones/Historial + recibo drawer + KPIs clicables → (2) Comisiones vuelve a CRM con listado+detalle, config a Equipo → (3) Correo a topbar + ficha cliente (botón superior) + IMAP/POP3 + vínculos múltiples → (4) Finanzas editable/detalle/sub-secciones/crear mes/dashboard profundo → (5) Insights profundo de verdad → (6) Aseguradoras → (7) Importador inteligente+documental + sección documental del expediente → (8) Siniestros → (9) sidebar gris (rápido).

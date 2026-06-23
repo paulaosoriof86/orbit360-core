@@ -164,6 +164,8 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
 .cfg-note{background:var(--surface);color:var(--ink-2);border:1px solid var(--line)}
 .cfg-int-banner{background:var(--red-soft);color:var(--red-700);border:1px solid var(--red-line);margin-bottom:16px;font-weight:600}
 .cfg-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cfg-intgroup{margin-bottom:18px}
+.cfg-intgroup-h{font-family:var(--f-display);font-weight:800;font-size:13px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;margin:6px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
 .cfg-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .cfg-rolecard,.cfg-paiscard,.cfg-addon,.cfg-plan{border:1px solid var(--line);border-radius:var(--r-md);padding:13px 14px;background:var(--card)}
 .cfg-rolecard b{font-family:var(--f-display);font-size:14px}

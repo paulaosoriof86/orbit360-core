@@ -188,7 +188,7 @@ Orbit.tenant = (function () {
     branding: { logo: '', sidebar: 'oscuro', paleta: 'rojo', tipografia: 'Manrope' },
     // módulos activos (config INTERNA nuestra) — todos los del nav
     modulosActivos: ['inicio', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
-    addons: { make: false, drive: true, whatsapp: true },
+    addons: { make: false, drive: true, whatsapp: true, correo: true, metricool: false, facebook: false, linkedin: false, web: true, canva: false, gamma: false, heygen: false, ia: false, mailchimp: false, sheets: false },
     portalVisibility: { polizas: true, recibos: true, documentos: true, asesor: true, comisiones: false, drive: false },
     apis: []
   };

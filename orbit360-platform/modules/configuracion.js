@@ -107,20 +107,76 @@ Orbit.modules.configuracion = (function () {
   function addons() {
     const t = T().get(), plan = Orbit.PLANES[t.plan];
     const lock = !plan.addons;
-    const items = [
-      ['make', '🔗 Make (Integromat)', 'Automatizaciones entre módulos y servicios externos por cadencia.', t.addons.make],
-      ['drive', '📁 Google Drive', 'Expedientes y documentos enlazados por cliente y aseguradora.', t.addons.drive],
-      ['whatsapp', '💬 WhatsApp Business', 'Recordatorios, renovaciones y encuestas automatizadas.', t.addons.whatsapp]
+    // Catálogo amplio por categorías (ecosistema completo). on = estado guardado en tenant.addons[id]
+    const CATS = [
+      ['Correo y comunicación', [
+        ['correo', '✉ Correo (Outlook / Microsoft 365)', 'Bandeja integrada; vincula correos a clientes, pólizas, gestiones y aseguradoras.'],
+        ['imap', '📨 IMAP / POP3 (dominio propio)', 'Conecta cualquier proveedor o correo corporativo con dominio propio.'],
+        ['gmail', '📩 Gmail / Google Workspace', 'Sincroniza correos y contactos de Google.'],
+        ['whatsapp', '💬 WhatsApp Business (API + Web)', 'Recordatorios, renovaciones, encuestas y mensajería por lote.'],
+        ['telegram', '✈ Telegram', 'Notificaciones internas del equipo y alertas.'],
+        ['sms', '📱 SMS', 'Avisos de cobro y renovación por mensaje de texto.']
+      ]],
+      ['Ecosistema Google', [
+        ['drive', '📁 Google Drive', 'Expedientes y documentos por cliente y aseguradora.'],
+        ['gcalendar', '📆 Google Calendar', 'Cronograma, citas y vencimientos sincronizados.'],
+        ['gsheets', '📊 Google Sheets', 'Importación/exportación de datos y reportes.'],
+        ['gdocs', '📝 Google Docs', 'Plantillas y documentos generados.'],
+        ['gmeet', '🎥 Google Meet', 'Asesorías y reuniones agendadas desde el CRM.'],
+        ['gcontacts', '👤 Google Contacts', 'Sincroniza la libreta de contactos.'],
+        ['gforms', '🧾 Google Forms', 'Formularios de captación → leads.'],
+        ['looker', '📈 Looker Studio', 'Dashboards externos sobre los datos del CRM.']
+      ]],
+      ['Inteligencia artificial', [
+        ['ia', '✨ Gemini (Google IA)', 'Extracción de documentos, análisis crítico, comparativos y redacción. Económica — recomendada como base.'],
+        ['openai', '🤖 ChatGPT / OpenAI', 'Generación de contenido y asistentes.'],
+        ['claude', '🧠 Claude (Anthropic)', 'Análisis de documentos largos y redacción.'],
+        ['notebooklm', '📓 NotebookLM', 'Base de conocimiento por aseguradora (productos, procesos) para consulta y Academia.'],
+        ['perplexity', '🔎 Perplexity', 'Investigación y respuestas con fuentes.']
+      ]],
+      ['Contenido y diseño', [
+        ['canva', '🎨 Canva', 'Piezas y plantillas de diseño para campañas y Academia.'],
+        ['gamma', '📑 Gamma', 'Presentaciones y material comercial.'],
+        ['heygen', '🎬 HeyGen', 'Videos con avatar para capacitación y marketing.'],
+        ['adobe', '🅰 Adobe Express', 'Edición rápida de piezas gráficas.'],
+        ['capcut', '🎞 CapCut', 'Edición de video para redes.']
+      ]],
+      ['Redes y marketing', [
+        ['metricool', '📅 Metricool', 'Programa, publica y mide redes y pauta desde un solo lugar.'],
+        ['meta', '📘 Facebook / Instagram (Meta)', 'Publicación, mensajes y captación de leads.'],
+        ['linkedin', '💼 LinkedIn', 'Publicación corporativa y captación B2B.'],
+        ['tiktok', '🎵 TikTok', 'Publicación y captación de audiencia.'],
+        ['youtube', '▶ YouTube', 'Canal de video y contenidos.'],
+        ['web', '🌐 Página web de la empresa', 'Formularios web → leads; contenidos publicados al sitio.'],
+        ['mailchimp', '📧 Mailchimp', 'Campañas de correo masivo y segmentación.']
+      ]],
+      ['Automatización y productividad', [
+        ['make', '🔗 Make (Integromat)', 'Orquesta automatizaciones entre módulos y servicios (genera → publica).'],
+        ['zapier', '⚡ Zapier', 'Automatizaciones con miles de apps.'],
+        ['n8n', '🔁 n8n', 'Automatización self-hosted y flujos a medida.'],
+        ['notion', '🗒 Notion', 'Base de conocimiento, procesos y wikis del equipo.'],
+        ['slack', '💬 Slack', 'Alertas y colaboración del equipo.'],
+        ['teams', '👔 Microsoft Teams', 'Colaboración y reuniones.'],
+        ['trello', '📋 Trello', 'Tableros de tareas conectados a Ops/Leads.']
+      ]],
+      ['Datos y facturación', [
+        ['onedrive', '☁ OneDrive / Excel', 'Documentos y hojas de Microsoft.'],
+        ['fel_gt', '🧾 FEL Guatemala (SAT)', 'Facturación electrónica en línea (GT).'],
+        ['dian_co', '🧾 Facturación DIAN (CO)', 'Facturación electrónica (CO).'],
+        ['openbank', '🏦 Banca / Open Banking', 'Importar movimientos y conciliar estados de cuenta.']
+      ]]
     ];
-    return `${sectionHead('Integraciones y add-ons', 'Conecta servicios externos — activables por plan')}
+    return `${sectionHead('Integraciones y add-ons', 'Conecta todo tu ecosistema — activables por plan')}
       ${lock ? `<div class="cfg-lock">🔒 Add-ons disponibles desde el plan Profesional.</div>` : ''}
-      <div class="cfg-grid2">
-        ${items.map(([id, t2, d, on]) => `<div class="cfg-addon ${on ? 'on' : ''}">
-          <div style="flex:1"><b>${t2}</b><p>${d}</p></div>
-          ${toggle('addon-' + id, on)}
-        </div>`).join('')}
-      </div>
-      <div class="cfg-note" style="margin-top:14px">⚡ Cada módulo declara sus <b>automatizaciones</b> (recordatorios de pago/renovación, cadencias de seguimiento Ops/Leads, generación de movimientos). Make las orquesta cuando está activo.</div>`;
+      ${CATS.map(([cat, items]) => `
+        <div class="cfg-intgroup"><div class="cfg-intgroup-h">${cat}</div>
+        <div class="cfg-grid2">
+          ${items.map(([id, t2, d]) => { const on = !!t.addons[id]; return `<div class="cfg-addon ${on ? 'on' : ''}">
+            <div style="flex:1"><b>${t2}</b><p>${d}</p></div>
+            ${toggle('addon-' + id, on)}
+          </div>`; }).join('')}
+        </div></div>`).join('')}
+      <div class="cfg-note" style="margin-top:14px">⚡ Receta de <b>generación y publicación de contenido</b>: <b>IA (Gemini/Claude)</b> redacta → <b>Canva/Gamma/HeyGen</b> crean las piezas → <b>Metricool</b> programa, publica y mide en redes → <b>Make/Zapier</b> orquestan el flujo disparado por eventos de Orbit. <b>NotebookLM</b> alimenta el conocimiento por aseguradora (productos/procesos) para Academia, Cotizador y la IA del sistema.</div>`;
   }
 
   /* ---------- APIs ---------- */
