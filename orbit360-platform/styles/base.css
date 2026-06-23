@@ -106,21 +106,37 @@ body.sb-light .nav-foot .pwa{color:var(--ink-2)}
 body.sb-light .nav-foot .pwa b,body.sb-light .nav-foot b{color:var(--ink)}
 body.sb-light #sidebar::-webkit-scrollbar-thumb{background:var(--red-line)}
 
-/* Sidebar GRIS (personalizable) — grafito medio, texto claro */
-body.sb-gray #sidebar{background:linear-gradient(180deg,#3a4047 0%,#2b3036 100%);border-right:1px solid rgba(255,255,255,.08)}
-body.sb-gray .nav-home{border-bottom:1px solid rgba(255,255,255,.08)}
-body.sb-gray .nav-toggle:hover{background:rgba(255,255,255,.06)}
-body.sb-gray .nav-label{color:rgba(255,255,255,.6)}
-body.sb-gray .nav-arrow{color:rgba(255,255,255,.45)}
-body.sb-gray .nav-link{color:rgba(255,255,255,.82)}
-body.sb-gray .nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
-body.sb-gray .nav-home .nav-link{color:#fff}
-body.sb-gray .nav-link.active{background:var(--red);color:#fff;border-left-color:#fff}
-body.sb-gray .nav-divider{border-top-color:rgba(255,255,255,.1)}
-body.sb-gray .nav-foot{color:rgba(255,255,255,.5)}
-body.sb-gray .nav-foot .pwa{color:rgba(255,255,255,.7)}
-body.sb-gray .nav-foot .pwa b,body.sb-gray .nav-foot b{color:#fff}
-body.sb-gray #sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
+/* Sidebar GRIS intermedio — fondo gris medio-claro, texto NEGRO */
+body.sb-gray #sidebar{background:linear-gradient(180deg,#d8d5ce 0%,#c7c4bc 100%);border-right:1px solid rgba(0,0,0,.12)}
+body.sb-gray .nav-home{border-bottom:1px solid rgba(0,0,0,.1)}
+body.sb-gray .nav-toggle:hover{background:rgba(0,0,0,.05)}
+body.sb-gray .nav-label{color:rgba(30,34,39,.62)}
+body.sb-gray .nav-arrow{color:rgba(30,34,39,.5)}
+body.sb-gray .nav-link{color:#262b30}
+body.sb-gray .nav-link:hover{background:rgba(0,0,0,.06);color:#000}
+body.sb-gray .nav-home .nav-link{color:#1E2227}
+body.sb-gray .nav-link.active{background:var(--red);color:#fff;border-left-color:#1E2227}
+body.sb-gray .nav-divider{border-top-color:rgba(0,0,0,.12)}
+body.sb-gray .nav-foot{color:rgba(30,34,39,.6)}
+body.sb-gray .nav-foot .pwa{color:rgba(30,34,39,.75)}
+body.sb-gray .nav-foot .pwa b,body.sb-gray .nav-foot b{color:#1E2227}
+body.sb-gray #sidebar::-webkit-scrollbar-thumb{background:rgba(0,0,0,.22)}
+
+/* Sidebar GRAFITO (gris oscuro) — texto claro */
+body.sb-graphite #sidebar{background:linear-gradient(180deg,#3a4047 0%,#2b3036 100%);border-right:1px solid rgba(255,255,255,.08)}
+body.sb-graphite .nav-home{border-bottom:1px solid rgba(255,255,255,.08)}
+body.sb-graphite .nav-toggle:hover{background:rgba(255,255,255,.06)}
+body.sb-graphite .nav-label{color:rgba(255,255,255,.6)}
+body.sb-graphite .nav-arrow{color:rgba(255,255,255,.45)}
+body.sb-graphite .nav-link{color:rgba(255,255,255,.82)}
+body.sb-graphite .nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+body.sb-graphite .nav-home .nav-link{color:#fff}
+body.sb-graphite .nav-link.active{background:var(--red);color:#fff;border-left-color:#fff}
+body.sb-graphite .nav-divider{border-top-color:rgba(255,255,255,.1)}
+body.sb-graphite .nav-foot{color:rgba(255,255,255,.5)}
+body.sb-graphite .nav-foot .pwa{color:rgba(255,255,255,.7)}
+body.sb-graphite .nav-foot .pwa b,body.sb-graphite .nav-foot b{color:#fff}
+body.sb-graphite #sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
 
 /* ---------- SIDEBAR NAV ---------- */
 .nav-home{padding:12px 0 8px;border-bottom:1px solid rgba(255,255,255,.06)}

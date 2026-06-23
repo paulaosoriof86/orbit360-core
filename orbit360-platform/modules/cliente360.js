@@ -429,25 +429,38 @@ Orbit.modules.cliente360 = (function () {
   }
   function vrow(k, v) { return `<div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">${k}</div><div style="font-weight:600;margin-top:1px">${U.esc(v)}</div></div>`; }
 
-  /* ---- Recibos y pagos (aplicar pago) ---- */
+  /* ---- Recibos y pagos (filtro por póliza + aplicar pago) ---- */
+  let recPolFiltro = {};  // por cliente: polizaId seleccionada
   function tabRecibos(cid, r) {
-    const cob = r.cob.slice().sort((a, b) => a.vence.localeCompare(b.vence));
+    const cobAll = r.cob.slice().sort((a, b) => a.vence.localeCompare(b.vence));
+    const polis = S().where('polizas', p => p.clienteId === cid);
+    const sel = recPolFiltro[cid] || 'todas';
+    const cob = sel === 'todas' ? cobAll : cobAll.filter(c => c.polizaId === sel);
     const pend = cob.filter(c => c.estado === 'Pendiente' || c.estado === 'Vencido');
+    const cobrado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + (+c.monto || 0), 0);
+    const ident = (p) => {
+      const v = S().where('vehiculos', x => x.polizaId === p.id)[0];
+      return v ? (v.marca + ' ' + v.linea + (v.placa ? ' · ' + v.placa : '')) : (p.concepto || p.subramo || p.ramo);
+    };
+    const opts = `<option value="todas" ${sel === 'todas' ? 'selected' : ''}>Todas las pólizas (${cobAll.length})</option>` +
+      polis.map(p => `<option value="${p.id}" ${sel === p.id ? 'selected' : ''}>${p.numero} · ${(q.aseguradora(p.aseguradoraId) || {}).nombre || ''} · ${U.esc(ident(p))}</option>`).join('');
     return `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
-      ${miniStat('Recibos del cliente', String(cob.length), '')}
+      ${miniStat('Recibos' + (sel === 'todas' ? ' del cliente' : ' de la póliza'), String(cob.length), '')}
       ${miniStat('Por aplicar', String(pend.length), pend.length ? 'warn' : 'ok')}
-      ${miniStat('Aplicado', U.money(r.cobrado, r.moneda), 'ok')}
+      ${miniStat('Aplicado', U.money(cobrado, r.moneda), 'ok')}
     </div>
     <div class="card" style="overflow:hidden">
-      <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <b style="font-family:var(--f-display);font-size:15px">Recibos por forma de pago</b>
+        <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2)">Póliza:
+          <select id="rec-pol-filtro" class="o-sel" style="min-width:240px;padding:6px 10px">${opts}</select></label>
       </div>
       <div style="overflow-x:auto"><table class="tbl">
         <thead><tr><th>Recibo</th><th>Póliza</th><th>Forma</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
         <tbody>${cob.map(c => {
           const p = S().get('polizas', c.polizaId);
           const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
-          return `<tr>
+          return `<tr class="clickable" onclick="Orbit.modules.cobros.detalle('${c.id}')">
             <td class="mono" style="font-size:12px">REC-${c.id.slice(-5).toUpperCase()}</td>
             <td class="mono" style="font-size:12px">${p ? p.numero : '—'}</td>
             <td>${p ? p.forma : '—'}</td>
@@ -455,15 +468,17 @@ Orbit.modules.cliente360 = (function () {
             <td class="num">${U.money(c.monto, c.moneda)}</td>
             <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
             <td>${U.estadoBadge(c.estado)}</td>
-            <td style="text-align:right">${aplicable ? `<button class="btn primary sm" data-apply="${c.id}">Aplicar pago</button>` : (c.estado === 'Pagado' ? `<span class="badge ${c.conciliado ? 'ok' : 'warn'}">${c.conciliado ? 'Conciliado' : 'Por conciliar'}</span>` : '<span class="muted">—</span>')}</td>
+            <td style="text-align:right" onclick="event.stopPropagation()">${aplicable ? `<button class="btn primary sm" data-apply="${c.id}">Aplicar pago</button>` : (c.estado === 'Pagado' ? `<span class="badge ${c.conciliado ? 'ok' : 'warn'}">${c.conciliado ? 'Conciliado' : 'Por conciliar'}</span>` : '<span class="muted">—</span>')}</td>
           </tr>`;
-        }).join('')}</tbody>
+        }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">Sin recibos para esta póliza.</td></tr>'}</tbody>
       </table></div>
-      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)"><b>Aplicar pago</b> concilia el recibo con su póliza. Los estados de cuenta se cargan de forma centralizada en <b>Orbit Finanzas</b> (son generales de la aseguradora) y desde ahí impactan a cada cliente.</div>
+      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Filtra por póliza para no mezclar recibos. <b>Aplicar pago</b> concilia el recibo con su póliza; clic en la fila abre el detalle. Los estados de cuenta se cargan en <b>Orbit Finanzas</b>.</div>
     </div>`;
   }
   function wireRecibos(cid) {
     document.querySelectorAll('[data-apply]').forEach(b => b.addEventListener('click', () => aplicarPago(b.dataset.apply, cid)));
+    const f = document.getElementById('rec-pol-filtro');
+    if (f) f.addEventListener('change', () => { recPolFiltro[cid] = f.value; tab = 'recibos'; detalle(cid); });
   }
 
   /* ---- Aplicar pago: fecha de envío a gestión (default hoy, editable) + factura (fecha real) ---- */

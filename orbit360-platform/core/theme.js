@@ -53,6 +53,7 @@ Orbit.theme = (function () {
   function applySidebar(mode) {
     document.body.classList.toggle('sb-light', mode === 'claro');
     document.body.classList.toggle('sb-gray', mode === 'gris');
+    document.body.classList.toggle('sb-graphite', mode === 'grafito');
     try { localStorage.setItem(SB_KEY, mode); } catch (e) {}
     Orbit.theme.sidebar = mode;
   }
@@ -74,7 +75,8 @@ Orbit.theme = (function () {
       <div class="tp-grid">
         <button class="tp-sw ${getSidebar() === 'oscuro' ? 'on' : ''}" data-sb="oscuro"><span style="background:#1E2227"></span>Oscuro</button>
         <button class="tp-sw ${getSidebar() === 'claro' ? 'on' : ''}" data-sb="claro"><span style="background:#f3f1ec;box-shadow:inset 0 0 0 1px #ccc"></span>Claro</button>
-        <button class="tp-sw ${getSidebar() === 'gris' ? 'on' : ''}" data-sb="gris"><span style="background:#3a4047"></span>Gris</button>
+        <button class="tp-sw ${getSidebar() === 'gris' ? 'on' : ''}" data-sb="gris"><span style="background:#cbc8c1;box-shadow:inset 0 0 0 1px #b3b0a8"></span>Gris</button>
+        <button class="tp-sw ${getSidebar() === 'grafito' ? 'on' : ''}" data-sb="grafito"><span style="background:#3a4047"></span>Grafito</button>
       </div>`;
     document.body.appendChild(pop);
     const r = anchorEl.getBoundingClientRect();
