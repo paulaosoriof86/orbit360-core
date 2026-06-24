@@ -38,19 +38,28 @@ Orbit.modules.marketing = (function () {
         { label: 'Leads generados', val: leads, color: 'var(--warn)', foot: 'desde contenidos', footTone: 'up' }
       ])}
       <div class="mk-bar">
-        <button class="btn ghost sm" id="mk-prev">‹</button>
-        <b style="font-family:var(--f-display);font-size:17px">${MESES[m - 1]} ${y}</b>
-        <button class="btn ghost sm" id="mk-next">›</button>
-        <span class="mk-auto">✨ Generar mes con IA · 📅 Programar en Metricool · 🔁 Automatizar (Make)</span>
+        <div class="mk-nav"><button class="mk-navb" id="mk-prev">‹</button>
+        <b style="font-family:var(--f-display);font-size:18px;min-width:150px;text-align:center">${MESES[m - 1]} ${y}</b>
+        <button class="mk-navb" id="mk-next">›</button></div>
+        <button class="btn ghost sm" id="mk-gen">✨ Generar mes con IA</button>
+        <button class="btn ghost sm" id="mk-reprog">🔁 Reprogramar atrasados</button>
       </div>
       <div class="mk-cal">
         <div class="mk-week">${DIAS.map(d => `<div class="mk-dh">${d}</div>`).join('')}</div>
         <div class="mk-grid">${grid(y, m)}</div>
       </div>
+      <div class="mk-legend">
+        <span><span class="mk-dot neutral"></span>Idea</span>
+        <span><span class="mk-dot info"></span>Programado</span>
+        <span><span class="mk-dot ok"></span>Publicado</span>
+        <span><span class="mk-dot danger"></span>Atrasado</span>
+      </div>
     </div>`;
     host.querySelector('#mk-prev').addEventListener('click', () => { mes = shift(-1); render(host); });
     host.querySelector('#mk-next').addEventListener('click', () => { mes = shift(1); render(host); });
     host.querySelector('#mk-new').addEventListener('click', () => ficha(null));
+    host.querySelector('#mk-gen').addEventListener('click', () => { generarMes(); });
+    host.querySelector('#mk-reprog').addEventListener('click', () => { reprogramar(); });
     host.querySelector('#mk-imp').addEventListener('click', () => Orbit.importa.open('calendario-marketing', { onDone: () => {
       // import demo: crea contenidos de ejemplo en el mes visible
       const [yy, mm] = mes.split('-').map(Number);
@@ -58,27 +67,59 @@ Orbit.modules.marketing = (function () {
       base.forEach((b, i) => S().insert('contenidos', { id: 'mk' + Date.now().toString().slice(-6) + i, fecha: mes + '-' + String(4 + i * 6).padStart(2, '0'), hora: '08:10', canal: b[2], tipo: 'Texto', enfoque: b[1], estado: 'Programado', titulo: b[0], copy: 'Contenido importado del calendario. Revisa y ajusta antes de publicar.', cta: 'Escríbeme por WhatsApp', hashtags: '#Seguros #GestiónDeRiesgos', stats: null }));
       toast('✓ Calendario importado · 4 contenidos agregados'); render(host);
     } }));
-    host.querySelectorAll('[data-day]').forEach(el => el.addEventListener('click', e => { if (e.target.closest('[data-c]')) return; ficha(null, el.dataset.day); }));
+    host.querySelectorAll('[data-day]').forEach(el => el.addEventListener('click', e => { if (e.target.closest('[data-c]') || e.target.closest('[data-add]')) return; ficha(null, el.dataset.day); }));
+    host.querySelectorAll('[data-add]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); ficha(null, el.dataset.add); }));
     host.querySelectorAll('[data-c]').forEach(el => el.addEventListener('click', () => ficha(el.dataset.c)));
   }
   function shift(d) { const [y, m] = mes.split('-').map(Number); const dt = new Date(y, m - 1 + d, 1); return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0'); }
 
   function grid(y, m) {
     const first = new Date(y, m - 1, 1);
-    let off = first.getDay() - 1; if (off < 0) off = 6; // lunes primero
+    let off = first.getDay() - 1; if (off < 0) off = 6;
     const days = new Date(y, m, 0).getDate();
     const arr = delMes();
+    const now = U.NOW ? new Date(U.NOW) : new Date();
+    const hoyStr = now.toISOString().slice(0, 10);
     let cells = '';
     for (let i = 0; i < off; i++) cells += `<div class="mk-cell empty"></div>`;
     for (let d = 1; d <= days; d++) {
       const fecha = mes + '-' + String(d).padStart(2, '0');
       const items = arr.filter(c => c.fecha === fecha);
-      cells += `<div class="mk-cell" data-day="${fecha}">
-        <div class="mk-d">${d}</div>
-        ${items.map(c => `<div class="mk-chip" data-c="${c.id}" title="${U.esc(c.titulo)}"><span>${CANAL_ICON[c.canal] || '•'}</span><span class="mk-chip-t">${U.esc(c.titulo.replace(/^\S+\s/, ''))}</span><span class="mk-dot ${EST_TONE[c.estado]}"></span></div>`).join('')}
+      const esHoy = fecha === hoyStr;
+      cells += `<div class="mk-cell ${esHoy ? 'today' : ''}" data-day="${fecha}">
+        <div class="mk-d">${esHoy ? '<span class="mk-today">' + d + '</span>' : d}${items.length ? `<span class="mk-count">${items.length}</span>` : ''}</div>
+        ${items.slice(0, 3).map(c => {
+          const atras = c.estado !== 'Publicado' && c.fecha < hoyStr;
+          const tone = atras ? 'danger' : EST_TONE[c.estado];
+          return `<div class="mk-chip" data-c="${c.id}" title="${U.esc(c.titulo)}" style="--enf:${enfColor(c.enfoque)}">
+            <span class="mk-chip-em">${enfEmoji(c.enfoque)}</span>
+            <span class="mk-chip-t">${U.esc(c.titulo.replace(/^\S+\s/, ''))}</span>
+            <span class="mk-chip-ico">${CANAL_ICON[c.canal] || '•'}</span>
+            <span class="mk-dot ${tone}"></span></div>`;
+        }).join('')}
+        ${items.length > 3 ? `<div class="mk-more">+${items.length - 3} más</div>` : ''}
+        <button class="mk-add" data-add="${fecha}" title="Agregar contenido">+</button>
       </div>`;
     }
     return cells;
+  }
+  const ENF_COLOR = { 'Seguros / Riesgos': '#C5162E', 'Auto': '#2563a8', 'Vida y GM': '#be185d', 'Hogar / Daños': '#c9821b', 'Logística / Transporte': '#0e7490', 'Educativo': '#6b4ea0', 'Tendencias': '#1f8a4c', 'Normativa': '#475569', 'Prospecting': '#b45309', 'Renovaciones': '#0f766e' };
+  function enfColor(e) { return ENF_COLOR[e] || '#C5162E'; }
+
+  /* generar mes con IA (demo: rellena días con ideas de seguros) */
+  function generarMes() {
+    const ideas = [['🚗 Auto: lo que tu póliza sí cubre', 'Auto', 'Instagram'], ['❤️ Vida: proteger a los tuyos en 3 pasos', 'Vida y GM', 'Facebook'], ['🏠 Hogar: riesgos que olvidamos', 'Hogar / Daños', 'LinkedIn'], ['📈 Tendencias 2026 en seguros', 'Tendencias', 'LinkedIn'], ['🔄 Renueva a tiempo y ahorra', 'Renovaciones', 'WhatsApp'], ['📚 ¿Qué es el deducible? En simple', 'Educativo', 'Instagram']];
+    const [y, mm] = mes.split('-').map(Number);
+    ideas.forEach((b, i) => { const dd = 3 + i * 4; if (dd <= new Date(y, mm, 0).getDate()) S().insert('contenidos', { id: 'mk' + Date.now().toString().slice(-6) + i, fecha: mes + '-' + String(dd).padStart(2, '0'), hora: '08:10', canal: b[2], tipo: 'Texto', enfoque: b[1], estado: 'Idea', titulo: b[0], copy: 'Borrador generado con IA — revisa el tono antes de programar.', cta: 'Escríbeme por WhatsApp', hashtags: '#Seguros #GestiónDeRiesgos', stats: null }); });
+    toast('✨ ' + ideas.length + ' ideas generadas con IA para ' + MESES[mm - 1]); render(host);
+  }
+  /* reprogramar publicaciones atrasadas al siguiente día disponible */
+  function reprogramar() {
+    const hoy = (U.NOW ? new Date(U.NOW) : new Date()).toISOString().slice(0, 10);
+    const atras = todos().filter(c => c.estado !== 'Publicado' && c.fecha < hoy);
+    if (!atras.length) { toast('✓ No hay publicaciones atrasadas'); return; }
+    atras.forEach((c, i) => { const d = new Date(hoy); d.setDate(d.getDate() + 1 + i); S().update('contenidos', c.id, { fecha: d.toISOString().slice(0, 10), estado: 'Programado' }); });
+    toast('🔁 ' + atras.length + ' publicación(es) reprogramada(s) automáticamente'); render(host);
   }
 
   function ficha(id, fecha) {

@@ -31,7 +31,7 @@ Orbit.modules.renovaciones = (function () {
     const toneBg = { danger: 'var(--danger)', warn: 'var(--warn)', info: 'var(--info)' };
 
     host.innerHTML = `<div class="page">
-      ${K.bannerFor('renovaciones', `<button class="btn primary" onclick="alert('Demo: campaña de renovación masiva')">Campaña de renovación</button>`)}
+      ${K.bannerFor('renovaciones', `<button class="btn primary" onclick="Orbit.modules.renovaciones.campana()">📤 Campaña de renovación</button>`)}
       ${K.kpis([
         { label: 'Vencidas', val: cols[0].items.length, color: 'var(--danger)', foot: 'recuperar ya', footTone: 'down' },
         { label: '≤15 días', val: cols[1].items.length, color: 'var(--danger)', foot: 'urgente' },
@@ -68,5 +68,49 @@ Orbit.modules.renovaciones = (function () {
         </div>`).join('')}
       </div></div>`;
   }
-  return { render };
+  /* ---- Campaña de renovación por LOTE ---- */
+  function campana() {
+    const arr = q.renovacionesProximas(60).filter(p => { const c = S().get('clientes', p.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }).sort((a, b) => (a.vigenciaFin || '').localeCompare(b.vigenciaFin || ''));
+    const incl = new Set(arr.map(p => p.id));
+    let back = document.getElementById('ren-lote'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'ren-lote'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    function paint() {
+      const sel = arr.filter(p => incl.has(p.id));
+      back.querySelector('#rl-body').innerHTML = arr.map(p => {
+        const cli = S().get('clientes', p.clienteId), d = U.daysFromNow(p.vigenciaFin);
+        return `<label class="lote-row ${incl.has(p.id) ? '' : 'off'}">
+          <input type="checkbox" data-rl="${p.id}" ${incl.has(p.id) ? 'checked' : ''}>
+          <span style="flex:1;min-width:0"><b>${cli ? U.esc(cli.nombre) : '—'}</b> <span class="muted" style="font-size:11.5px">· ${p.numero} · ${p.ramo}</span><br><span class="muted" style="font-size:11px">${d < 0 ? 'venció hace ' + (-d) + 'd' : 'vence en ' + d + 'd'}</span></span>
+          <span class="mono">${U.money(p.prima, p.moneda)}</span></label>`;
+      }).join('') || '<div class="muted" style="padding:18px;text-align:center">Sin renovaciones próximas.</div>';
+      back.querySelector('#rl-n').textContent = sel.length + ' de ' + arr.length + ' pólizas';
+      back.querySelectorAll('[data-rl]').forEach(x => x.addEventListener('change', () => { x.checked ? incl.add(x.dataset.rl) : incl.delete(x.dataset.rl); paint(); }));
+    }
+    back.innerHTML = `<div class="card" style="width:min(620px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
+      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">📤 Campaña de renovación</b><button class="imp-x" id="rl-x">✕</button></div>
+      <div class="cfg-note" style="margin:14px 16px 0">Selecciona las pólizas a notificar. Se envía <b>WhatsApp + correo</b> con propuesta de renovación generada por IA y queda en el <b>historial de cada cliente</b>.</div>
+      <div id="rl-body" style="padding:12px 16px;overflow:auto;flex:1;display:grid;gap:7px"></div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><span class="muted" id="rl-n"></span><div style="display:flex;gap:8px"><button class="btn ghost" id="rl-cancel">Cancelar</button><button class="btn primary" id="rl-ok">📲 Enviar campaña</button></div></div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#rl-x').addEventListener('click', close);
+    back.querySelector('#rl-cancel').addEventListener('click', close);
+    back.querySelector('#rl-ok').addEventListener('click', () => {
+      const sel = arr.filter(p => incl.has(p.id));
+      sel.forEach(p => {
+        const cli = S().get('clientes', p.clienteId);
+        const msg = Orbit.ia ? Orbit.ia.redactar('renovacion', { nombre: cli ? cli.nombre.split(' ')[0] : '', poliza: p.numero, ramo: p.ramo, vence: U.fmtDate(p.vigenciaFin) }) : 'Renovación próxima';
+        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: p.clienteId, asesorId: p.asesorId, tipo: 'sistema', icon: '📤', fecha: '2026-06-24', titulo: 'Campaña de renovación enviada', detalle: 'WhatsApp + correo · ' + p.numero });
+        if (Orbit.correo && cli) Orbit.correo.enviar({ para: cli.email || '', asunto: 'Renovación de tu póliza ' + p.numero, cuerpo: msg, clienteId: p.clienteId, vinculo: { tipo: 'poliza', id: p.id, label: p.numero } });
+      });
+      close();
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + sel.length + ' propuestas de renovación enviadas'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+    });
+    paint();
+  }
+
+  return { render, campana };
 })();

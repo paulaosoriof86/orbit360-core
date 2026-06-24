@@ -1,0 +1,258 @@
+/* ============================================================
+   Orbit 360 · Portal del Cliente (responsive · self-service)
+   Vista del cliente final con sincronía real al expediente:
+   pólizas, pagos (reportar soporte), siniestros, documentos
+   (ver + añadir), aprendizaje, notificaciones reales (campana),
+   asistente de chat y soporte directo al asesor. Las acciones
+   notifican al equipo y dejan trazabilidad en el expediente.
+   ============================================================ */
+window.Orbit = window.Orbit || {};
+Orbit.modules = Orbit.modules || {};
+Orbit.modules.portal = (function () {
+  const U = Orbit.ui, S = () => Orbit.store, q = Orbit.q;
+  let host, clienteId, tab = 'inicio';
+
+  function clientes() { return S().all('clientes'); }
+  function notifsDe(cid) { return S().where('notifs', n => n.clienteId === cid).sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')); }
+  function noLeidas(cid) { return notifsDe(cid).filter(n => !n.leida).length; }
+
+  function render(h) {
+    host = h;
+    if (!clienteId) clienteId = (clientes()[0] || {}).id;
+    const cli = S().get('clientes', clienteId);
+    if (!cli) { host.innerHTML = '<div class="page"><div class="modstate"><div class="ms-ico">🔒</div><h2>Portal del Cliente</h2><p>Sin clientes para previsualizar.</p></div></div>'; return; }
+    const nl = noLeidas(clienteId);
+    host.innerHTML = `<div class="page">
+      <div class="pt-preview">👁 Vista previa del <b>Portal del Cliente</b> · viendo a
+        <select id="pt-cli" class="o-sel" style="display:inline-block;width:auto;padding:4px 8px;margin:0 4px">${clientes().map(c => `<option value="${c.id}" ${c.id === clienteId ? 'selected' : ''}>${U.esc(c.nombre)}</option>`).join('')}</select>
+        <button class="btn ghost sm" id="pt-admin" style="margin-left:8px">📢 Enviar notificación (admin)</button>
+        <span style="float:right;color:var(--ink-3)">El portal real es <b>responsive</b> (móvil y escritorio)</span></div>
+      <div class="pt-shell">
+        <div class="pt-top">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="pt-logo">🏢</span>
+            <div><b style="font-family:var(--f-display);font-size:16px;color:#fff">Mi Portal</b><div style="font-size:11.5px;color:rgba(255,255,255,.7)">Hola, ${U.esc(cli.nombre.split(' ')[0])} 👋</div></div>
+          </div>
+          <button class="pt-bell" id="pt-bell">🔔${nl ? `<span class="pt-bell-c">${nl}</span>` : ''}</button>
+        </div>
+        <div class="pt-tabs">${[['inicio', '🏠 Inicio'], ['polizas', '📑 Pólizas'], ['recibos', '💳 Pagos'], ['siniestros', '🚨 Siniestros'], ['docs', '📁 Documentos'], ['aprende', '🎓 Aprende']].map(t => `<button class="pt-tab ${tab === t[0] ? 'on' : ''}" data-pt="${t[0]}">${t[1]}</button>`).join('')}</div>
+        <div class="pt-body" id="pt-body"></div>
+        <button class="pt-fab" id="pt-chat" title="Asistente">💬</button>
+      </div>
+    </div>`;
+    const cob = q.cobrosDe(clienteId);
+    const pols = q.polizasDe(clienteId).filter(p => p.estado !== 'Cancelada');
+    const pend = cob.filter(c => c.estado === 'Pendiente' || c.estado === 'Vencido');
+    const recl = S().where('reclamos', r => r.clienteId === clienteId);
+    const body = document.getElementById('pt-body');
+    if (tab === 'inicio') body.innerHTML = vInicio(cli, pols, pend, recl);
+    else if (tab === 'polizas') body.innerHTML = vPolizas(pols);
+    else if (tab === 'recibos') body.innerHTML = vRecibos(cob);
+    else if (tab === 'siniestros') body.innerHTML = vSiniestros(recl);
+    else if (tab === 'docs') body.innerHTML = vDocs(cli);
+    else body.innerHTML = vAprende();
+    // wiring
+    host.querySelector('#pt-cli').addEventListener('change', e => { clienteId = e.target.value; tab = 'inicio'; render(host); });
+    host.querySelector('#pt-admin').addEventListener('click', adminNotif);
+    host.querySelector('#pt-bell').addEventListener('click', verNotifs);
+    host.querySelector('#pt-chat').addEventListener('click', () => chat(cli));
+    host.querySelectorAll('.pt-tab').forEach(b => b.addEventListener('click', () => { tab = b.dataset.pt; render(host); }));
+    host.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { tab = b.dataset.go; render(host); }));
+    host.querySelectorAll('[data-sol]').forEach(b => b.addEventListener('click', () => solicitar(b.dataset.sol)));
+    host.querySelectorAll('[data-pago]').forEach(b => b.addEventListener('click', () => reportarPago(b.dataset.pago)));
+    host.querySelectorAll('[data-soporte]').forEach(b => b.addEventListener('click', () => soporteAsesor(cli)));
+    host.querySelectorAll('[data-adddoc]').forEach(b => b.addEventListener('click', subirDoc));
+  }
+
+  function vInicio(cli, pols, pend, recl) {
+    return `<div class="pt-cards">
+      <button class="pt-kpi" data-go="polizas"><span style="font-size:22px">📑</span><b style="font-size:24px;color:var(--info)">${pols.length}</b><span class="muted" style="font-size:11.5px">Pólizas activas</span></button>
+      <button class="pt-kpi" data-go="recibos"><span style="font-size:22px">💳</span><b style="font-size:24px;color:${pend.length ? 'var(--warn)' : 'var(--ok)'}">${pend.length}</b><span class="muted" style="font-size:11.5px">Pagos pendientes</span></button>
+      <button class="pt-kpi" data-go="siniestros"><span style="font-size:22px">🚨</span><b style="font-size:24px;color:var(--red)">${recl.length}</b><span class="muted" style="font-size:11.5px">Siniestros</span></button>
+    </div>
+    <div class="pt-quick">
+      <button class="pt-action" data-sol="">🗂 Solicitar una gestión</button>
+      <button class="pt-action" data-soporte="1">🧑‍💼 Hablar con mi asesor</button>
+      <button class="pt-action" data-go="docs">📁 Completar mi expediente</button>
+    </div>
+    ${pend.length ? `<div class="pt-alert">⏰ Tienes <b>${pend.length}</b> pago(s) pendiente(s). <button class="pt-link" data-go="recibos">Ver mis pagos →</button></div>` : '<div class="pt-ok">✓ Estás al día con tus pagos. ¡Gracias!</div>'}`;
+  }
+  function vPolizas(pols) {
+    return (pols.map(p => `<div class="pt-row">
+      <span class="pt-row-ic">${p.ramo === 'Auto' ? '🚗' : p.ramo === 'Vida' ? '❤️' : p.ramo === 'Hogar' ? '🏠' : '🛡️'}</span>
+      <div style="flex:1"><b>${U.esc(p.producto || p.ramo)}</b><div class="muted" style="font-size:11.5px">${p.numero} · ${(q.aseguradora(p.aseguradoraId) || {}).nombre || ''}</div></div>
+      <div style="text-align:right"><div style="font-family:var(--f-display);font-weight:700;font-size:13px">${U.money(p.prima, p.moneda)}</div><div class="muted" style="font-size:11px">vence ${U.fmtDate(p.vigenciaFin)}</div></div>
+    </div>`).join('') || '<div class="pt-empty">No tienes pólizas activas.</div>') + '<button class="pt-action" style="margin-top:12px" data-sol="Consulta de cobertura">❓ Consultar una cobertura</button>';
+  }
+  function vRecibos(cob) {
+    return (cob.filter(c => c.estado !== 'Anulado').sort((a, b) => (a.vence || '').localeCompare(b.vence || '')).map(c => {
+      const tone = c.estado === 'Pagado' ? 'ok' : c.estado === 'Vencido' ? 'danger' : 'warn';
+      const rep = c.reportado ? '<span class="badge info" style="font-size:9px">Reportado</span>' : '';
+      return `<div class="pt-row">
+        <span class="pt-row-ic">${c.estado === 'Pagado' ? '✅' : '💳'}</span>
+        <div style="flex:1"><b>Cuota ${c.cuota}</b><div class="muted" style="font-size:11.5px">vence ${U.fmtDate(c.vence)} ${rep}</div></div>
+        <div style="text-align:right"><div style="font-family:var(--f-display);font-weight:700;font-size:13px">${U.money(c.monto, c.moneda)}</div>
+          ${(c.estado === 'Pendiente' || c.estado === 'Vencido') && !c.reportado ? `<button class="pt-mini" data-pago="${c.id}">📤 Reportar pago</button>` : `<span class="badge ${tone}" style="font-size:10px">${c.estado}</span>`}</div>
+      </div>`;
+    }).join('') || '<div class="pt-empty">Sin pagos registrados.</div>');
+  }
+  function vSiniestros(recl) {
+    return (recl.length ? recl.map(r => `<div class="pt-row">
+      <span class="pt-row-ic">🚨</span>
+      <div style="flex:1"><b>${U.esc(r.tipo)}</b><div class="muted" style="font-size:11.5px">${r.numero} · ${U.fmtDate(r.fecha)}</div></div>
+      <span class="badge ${['Pagado', 'Aprobado'].includes(r.estado) ? 'ok' : r.estado === 'Rechazado' ? 'danger' : 'info'}">${r.estado}</span>
+    </div>`).join('') : '<div class="pt-empty">No tienes siniestros reportados.</div>') + '<button class="pt-action" style="margin-top:12px" data-sol="Reclamo / Siniestro">🚨 Reportar un siniestro</button>';
+  }
+  function vDocs(cli) {
+    const docs = S().where('documentos', d => d.clienteId === cli.id);
+    const faltan = !cli.identificacion || !cli.email;
+    return `${faltan ? `<div class="pt-alert">📋 Completa tu expediente para agilizar tus trámites. <button class="pt-link" data-adddoc="1">Subir documento →</button></div>` : ''}
+      ${(docs.length ? docs.map(d => `<div class="pt-row"><span class="pt-row-ic">📄</span><div style="flex:1"><b>${U.esc(d.nombre || d.tipo)}</b><div class="muted" style="font-size:11.5px">${d.tipo || 'documento'}</div></div><button class="btn ghost sm">Ver</button></div>`).join('')
+        : `<div class="pt-row"><span class="pt-row-ic">📄</span><div style="flex:1"><b>Carátula de póliza.pdf</b><div class="muted" style="font-size:11.5px">documento</div></div><button class="btn ghost sm">Ver</button></div>`)}
+      <button class="pt-action" style="margin-top:12px" data-adddoc="1">⬆ Añadir un documento</button>`;
+  }
+  function vAprende() {
+    const cursos = (S().all('cursos') || []).filter(c => c.cat === 'Producto' || c.cat === 'Educativo' || c.cat === 'Técnico').slice(0, 4);
+    return `<div class="pt-empty" style="text-align:left;color:var(--ink-2);padding:0 0 12px">📚 Recursos para entender mejor tus seguros:</div>
+      ${(cursos.length ? cursos : [{ emoji: '🛡️', titulo: 'Conoce tu seguro', desc: 'Coberturas, deducible y cómo usarlo.' }, { emoji: '🚗', titulo: 'Tu seguro de Auto', desc: 'Qué hacer ante un choque o robo.' }]).map(c => `<div class="pt-row"><span class="pt-row-ic">${c.emoji || '📘'}</span><div style="flex:1"><b>${U.esc(c.titulo)}</b><div class="muted" style="font-size:11.5px">${U.esc(c.desc || '')}</div></div><button class="btn ghost sm">Ver</button></div>`).join('')}
+      <button class="pt-action" style="margin-top:12px" onclick="location.hash='#/academia'">📖 Ver glosario de seguros</button>`;
+  }
+
+  /* ---- Notificaciones (campana) ---- */
+  function verNotifs() {
+    const cli = S().get('clientes', clienteId);
+    const arr = notifsDe(clienteId);
+    arr.forEach(n => { if (!n.leida) S().update('notifs', n.id, { leida: true }); });
+    drawer('🔔 Notificaciones', arr.length ? arr.map(n => `<div class="pt-row"><span class="pt-row-ic">${n.tipo === 'cobro' ? '💳' : n.tipo === 'renovacion' ? '🔄' : '📢'}</span><div style="flex:1"><b>${U.esc(n.titulo)}</b><div class="muted" style="font-size:11.5px">${U.esc(n.cuerpo)}</div><div class="muted" style="font-size:10.5px;margin-top:3px">${U.fmtDate(n.fecha)}</div></div></div>`).join('') : '<div class="pt-empty">Sin notificaciones.</div>', null, 'Cerrar', () => render(host));
+  }
+  /* ---- Admin: enviar notificación a uno o a todos ---- */
+  function adminNotif() {
+    const html = `<label class="ce-l">Destinatario<select id="an-dest" class="o-sel"><option value="__all">📢 Todos los clientes</option>${clientes().map(c => `<option value="${c.id}">${U.esc(c.nombre)}</option>`).join('')}</select></label>
+      <label class="ce-l" style="margin-top:10px">Título<input id="an-tit" class="o-sel" placeholder="Ej. Aviso importante"></label>
+      <label class="ce-l" style="margin-top:10px">Mensaje<textarea id="an-msg" class="o-sel" style="min-height:64px;resize:vertical;padding:9px 11px"></textarea></label>
+      <div class="cfg-note" style="margin-top:10px">La notificación aparece en el portal del cliente y se envía por WhatsApp/correo.</div>`;
+    const back = drawer('📢 Enviar notificación', html, () => {
+      const dest = back.querySelector('#an-dest').value, tit = back.querySelector('#an-tit').value || 'Aviso', msg = back.querySelector('#an-msg').value;
+      const dests = dest === '__all' ? clientes() : [S().get('clientes', dest)];
+      dests.forEach(c => { if (!c) return; S().insert('notifs', { id: 'ntf' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.id, titulo: tit, cuerpo: msg, tipo: 'admin', fecha: '2026-06-24', leida: false }); });
+      back.remove(); toast('✓ Notificación enviada a ' + (dest === '__all' ? 'todos' : '1 cliente')); render(host);
+    }, 'Enviar');
+  }
+
+  /* ---- Reportar pago (sube soporte → notifica al equipo) ---- */
+  function reportarPago(cobroId) {
+    const c = S().get('cobros', cobroId); if (!c) return;
+    const cli = S().get('clientes', clienteId);
+    const html = `<div class="cfg-note">Reporta tu pago de la cuota <b>${c.cuota}</b> por <b>${U.money(c.monto, c.moneda)}</b>. El equipo lo valida y te confirma.</div>
+      <label class="ce-l" style="margin-top:10px">Fecha del pago<input id="rp-fecha" class="o-sel" type="date" value="2026-06-24"></label>
+      <label class="ce-l" style="margin-top:10px">Soporte de pago (comprobante)<input id="rp-file" type="file" class="o-sel" accept="image/*,application/pdf"></label>
+      <label class="ce-l" style="margin-top:10px">Nota<input id="rp-nota" class="o-sel" placeholder="Banco, referencia…"></label>`;
+    const back = drawer('📤 Reportar pago', html, () => {
+      const f = back.querySelector('#rp-file').files[0];
+      S().update('cobros', cobroId, { reportado: '2026-06-24', soporteNombre: f ? f.name : '', notaReporte: back.querySelector('#rp-nota').value });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: (S().get('polizas', c.polizaId) || {}).asesorId || cli.asesorId, tipo: 'sistema', icon: '📤', fecha: '2026-06-24', titulo: 'Pago reportado por el cliente', detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (f ? ' · soporte: ' + f.name : '') + ' · pendiente de validar' });
+      if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo: 'Validar pago reportado', titulo: 'Validar pago · ' + cli.nombre, clienteId, polizaId: c.polizaId, asesorId: cli.asesorId, prioridad: 'Alta', vence: '2026-06-26', nota: 'El cliente reportó el pago de la cuota ' + c.cuota, origen: 'Portal del cliente' });
+      back.remove(); toast('✓ Pago reportado · el equipo lo validará'); render(host);
+    }, 'Enviar reporte');
+  }
+
+  /* ---- Soporte directo al asesor ---- */
+  function soporteAsesor(cli) {
+    const ase = q.asesor(cli.asesorId);
+    const wa = (cli.telefono || '').replace(/\D/g, '');
+    drawer('🧑‍💼 Tu asesor', `<div style="text-align:center;padding:8px 0">
+      <div style="width:60px;height:60px;border-radius:50%;margin:0 auto;background:${ase ? ase.color : '#999'};display:grid;place-items:center;color:#fff;font-family:var(--f-display);font-weight:800;font-size:22px">${ase ? ase.iniciales : '?'}</div>
+      <b style="display:block;margin-top:10px;font-family:var(--f-display);font-size:16px">${ase ? U.esc(ase.nombre) : 'Tu asesor'}</b>
+      <div class="muted" style="font-size:12.5px">${ase ? ase.rol : ''}</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:14px">
+        <a class="btn primary sm" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>
+        <a class="btn ghost sm" href="mailto:${ase ? '' : ''}">✉ Correo</a>
+      </div></div>`, null, 'Cerrar');
+  }
+
+  /* ---- Subir documento al expediente ---- */
+  function subirDoc() {
+    const cli = S().get('clientes', clienteId);
+    const html = `<label class="ce-l">Tipo de documento<select id="sd-tipo" class="o-sel">${['DPI / Cédula', 'RTU / RUT', 'Licencia', 'Comprobante de domicilio', 'Otro'].map(t => `<option>${t}</option>`).join('')}</select></label>
+      <label class="ce-l" style="margin-top:10px">Archivo<input id="sd-file" type="file" class="o-sel"></label>
+      <div class="cfg-note" style="margin-top:10px">Tu documento se guarda en tu expediente y el equipo lo verá al instante.</div>`;
+    const back = drawer('⬆ Añadir documento', html, () => {
+      const f = back.querySelector('#sd-file').files[0]; const tipo = back.querySelector('#sd-tipo').value;
+      S().insert('documentos', { id: 'doc' + Date.now(), clienteId, tipo, nombre: f ? f.name : tipo, fecha: '2026-06-24', origen: 'Portal del cliente' });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '📁', fecha: '2026-06-24', titulo: 'Documento subido por el cliente', detalle: tipo + (f ? ' · ' + f.name : '') });
+      back.remove(); toast('✓ Documento añadido a tu expediente'); render(host);
+    }, 'Subir');
+  }
+
+  /* ---- Asistente de chat (no se menciona IA) ---- */
+  function chat(cli) {
+    const nombre = cli.nombre.split(' ')[0];
+    const botName = 'Asistente de ' + nombre;
+    let back = document.getElementById('pt-chatw'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'pt-chatw'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = `<div class="card" style="width:min(420px,94vw);height:min(560px,90vh);display:flex;flex-direction:column;padding:0">
+      <div style="padding:14px 18px;background:linear-gradient(120deg,var(--red),#8f1020);color:#fff;display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center">💬</span><div><b style="font-family:var(--f-display);font-size:14px">${botName}</b><div style="font-size:10.5px;color:rgba(255,255,255,.8)">en línea · te ayudo al instante</div></div></div>
+        <button class="imp-x" id="pc-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
+      <div class="pt-chatbody" id="pc-body"></div>
+      <div style="padding:10px 12px;border-top:1px solid var(--line);display:flex;gap:7px"><input id="pc-in" class="o-sel" placeholder="Escribe tu consulta…" style="flex:1"><button class="btn primary sm" id="pc-send">➤</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const bd = back.querySelector('#pc-body');
+    function add(who, txt) { const d = document.createElement('div'); d.className = 'pc-msg ' + who; d.textContent = txt; bd.appendChild(d); bd.scrollTop = bd.scrollHeight; }
+    add('bot', '¡Hola ' + nombre + '! 👋 Soy tu asistente. Puedo ayudarte con tus pólizas, pagos, siniestros o conectarte con tu asesor. ¿Qué necesitas?');
+    function responder(q2) {
+      const t = q2.toLowerCase();
+      if (/pago|cuota|recibo|deuda/.test(t)) return 'Puedes ver y reportar tus pagos en la pestaña 💳 Pagos. Si ya pagaste, usa "Reportar pago" y adjunta tu comprobante; el equipo lo valida.';
+      if (/p[oó]liza|cobertura|cubre/.test(t)) return 'En 📑 Pólizas ves tus coberturas y vigencias. Si tienes dudas de qué cubre, puedo crear una consulta para tu asesor.';
+      if (/siniestro|choque|robo|reclam/.test(t)) return 'Lamento lo ocurrido. En 🚨 Siniestros puedes reportarlo y darle seguimiento. ¿Quieres que abra el reporte ahora?';
+      if (/asesor|humano|persona|hablar/.test(t)) return 'Te conecto con tu asesor: usa el botón "🧑‍💼 Hablar con mi asesor" en el inicio. ¿Quieres que le envíe un aviso?';
+      if (/renov/.test(t)) return 'Tu asesor te enviará la propuesta de renovación. Si quieres, registro tu interés para que te contacten pronto.';
+      return 'Gracias, ' + nombre + '. Lo registro para tu asesor y te darán seguimiento. ¿Algo más en lo que te ayude?';
+    }
+    function send() { const v = back.querySelector('#pc-in').value.trim(); if (!v) return; add('me', v); back.querySelector('#pc-in').value = ''; setTimeout(() => add('bot', responder(v)), 500); }
+    back.querySelector('#pc-send').addEventListener('click', send);
+    back.querySelector('#pc-in').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#pc-x').addEventListener('click', close);
+  }
+
+  /* ---- Solicitud del cliente → Ops + notifica ---- */
+  function solicitar(tipoPre) {
+    const cli = S().get('clientes', clienteId); if (!cli) return;
+    const tipos = ['Actualizar mis datos', 'Solicitar copia de póliza', 'Consulta de cobertura', 'Reclamo / Siniestro', 'Cancelar póliza', 'Otra solicitud'];
+    const html = `<label class="ce-l">Tipo de solicitud<select id="ps-tipo" class="o-sel">${tipos.map(t => `<option ${t === tipoPre ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+      <label class="ce-l" style="margin-top:10px">Detalle<textarea id="ps-det" class="o-sel" style="min-height:70px;resize:vertical;padding:9px 11px" placeholder="Cuéntanos qué necesitas…"></textarea></label>
+      <div class="cfg-note" style="margin-top:10px">Tu solicitud llega al equipo (Orbit Ops) y te avisaremos por WhatsApp/correo.</div>`;
+    const back = drawer('🗂 Solicitar una gestión', html, () => {
+      const tipo = back.querySelector('#ps-tipo').value, det = back.querySelector('#ps-det').value.trim();
+      if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo, titulo: tipo + ' · ' + cli.nombre, clienteId, asesorId: cli.asesorId, prioridad: 'Media', vence: '2026-06-30', nota: det, origen: 'Portal del cliente', checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'En gestión', done: false }] });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '🙋', fecha: '2026-06-24', titulo: 'Solicitud del cliente: ' + tipo, detalle: det + ' · Portal → Ops' });
+      back.remove(); toast('✓ Solicitud enviada al equipo'); render(host);
+    }, 'Enviar solicitud');
+  }
+
+  /* ---- helper drawer ---- */
+  function drawer(titulo, bodyHtml, onOk, okLabel, onClose) {
+    let back = document.getElementById('pt-dr'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'pt-dr'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = `<div class="card" style="width:min(460px,94vw);max-height:90vh;overflow:auto;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">${titulo}</b><button class="imp-x" id="dr-x">✕</button></div>
+      <div style="padding:18px 20px">${bodyHtml}</div>
+      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">${onOk ? '<button class="btn ghost" id="dr-cancel">Cancelar</button>' : ''}<button class="btn primary" id="dr-ok">${okLabel || 'Cerrar'}</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => { back.remove(); if (onClose) onClose(); };
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#dr-x').addEventListener('click', close);
+    const cc = back.querySelector('#dr-cancel'); if (cc) cc.addEventListener('click', close);
+    back.querySelector('#dr-ok').addEventListener('click', () => { if (onOk) onOk(); else close(); });
+    return back;
+  }
+  function toast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
+
+  return { render };
+})();

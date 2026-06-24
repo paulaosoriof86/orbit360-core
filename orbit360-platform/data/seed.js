@@ -256,6 +256,8 @@ Orbit.SEED = (function () {
         const venceTs = new Date(rec.vence).getTime();
         let cEstado = 'Pendiente', fechaPago = null, conciliado = false;
         if (estado === 'Cancelada' && qi > 0) { cEstado = 'Anulado'; }
+        else if (estado === 'Cancelada' && qi === 0 && rnd() < 0.7) { cEstado = 'Pagado'; fechaPago = iso(addDays(new Date(rec.vence), between(-3, 6))); conciliado = true; }
+        else if (estado === 'Cancelada') { cEstado = 'Anulado'; }
         else if (venceTs < NOW.getTime() - 8 * 86400000) {
           if (rnd() < 0.85) { cEstado = 'Pagado'; fechaPago = iso(addDays(new Date(rec.vence), between(-3, 6))); conciliado = rnd() < 0.9; }
           else { cEstado = 'Vencido'; }
@@ -589,7 +591,7 @@ Orbit.SEED = (function () {
     const fecha = iso(addDays(NOW, -between(2, 90)));
     const monto = Math.round((p.sumaAsegurada || p.primaNeta * 20) * (0.05 + rnd() * 0.4));
     const bit = [{ ts: fecha + ' 09:30', user: cli ? cli.nombre : 'Cliente', t: 'Reclamo reportado', d: 'El cliente notifica el siniestro.' }];
-    if (['En análisis', 'Documentación', 'Aprobado', 'Pagado', 'Rechazado'].includes(est)) bit.push({ ts: iso(addDays(new Date(fecha), 2)) + ' 11:00', user: q.aseguradora ? '' : '', t: 'Enviado a aseguradora', d: 'Expediente remitido para análisis.' });
+    if (['En análisis', 'Documentación', 'Aprobado', 'Pagado', 'Rechazado'].includes(est)) bit.push({ ts: iso(addDays(new Date(fecha), 2)) + ' 11:00', user: 'Equipo', t: 'Enviado a aseguradora', d: 'Expediente remitido para análisis.' });
     if (['Aprobado', 'Pagado'].includes(est)) bit.push({ ts: iso(addDays(new Date(fecha), 12)) + ' 15:20', user: 'Aseguradora', t: 'Reclamo aprobado', d: 'Procede indemnización por ' + monto + '.' });
     if (est === 'Pagado') bit.push({ ts: iso(addDays(new Date(fecha), 20)) + ' 10:00', user: 'Aseguradora', t: 'Indemnización pagada', d: 'Pago realizado al asegurado.' });
     if (est === 'Rechazado') bit.push({ ts: iso(addDays(new Date(fecha), 10)) + ' 16:40', user: 'Aseguradora', t: 'Reclamo rechazado', d: 'Causa fuera de cobertura.' });
@@ -602,10 +604,31 @@ Orbit.SEED = (function () {
     });
   });
 
+  // ====================================================================
+  //  ACADEMIA — cursos / bloques de capacitación con progreso
+  // ====================================================================
+  const cursos = [
+    { id: 'cur1', titulo: 'Inducción Orbit 360', cat: 'Inducción', emoji: '🚀', color: '#C5162E', desc: 'Conoce la plataforma, el ciclo comercial y tu día a día.', lecciones: [{ t: 'Bienvenida y visión 360', min: 8, tipo: 'video', url: 'https://www.youtube.com/embed/aqz-KE-bpKQ' }, { t: 'Navegación y módulos', min: 12, tipo: 'video', url: 'https://www.youtube.com/embed/ScMzIvxBSi4' }, { t: 'Ciclo Ops ↔ Leads', min: 15, tipo: 'lectura', texto: 'El ciclo comercial conecta Orbit Ops (operación interna del equipo) con Orbit Leads (seguimiento del asesor). Un mismo negocio se proyecta en ambos tableros según su etapa: ingreso → cotización → propuesta → negociación → inspección/emisión → cierre. La sincronización es en vivo: lo que cambia un rol, lo ve el otro al instante.' }, { t: 'Evaluación de inducción', min: 10, tipo: 'quiz' }], progreso: 100, certificado: true, recursos: [{ nombre: 'Manual de inducción.pdf', tipo: 'pdf' }, { nombre: 'Mapa de módulos.png', tipo: 'img' }] },
+    { id: 'cur2', titulo: 'Fundamentos de Seguros', cat: 'Técnico', emoji: '🛡️', color: '#1f3a5f', desc: 'Ramos, coberturas, prima, deducible y siniestros.', lecciones: [{ t: 'Qué es un seguro', min: 10, tipo: 'video' }, { t: 'Ramos y subramos', min: 14, tipo: 'lectura' }, { t: 'Prima, deducible y coberturas', min: 16, tipo: 'video' }, { t: 'Proceso de siniestro', min: 12, tipo: 'lectura' }, { t: 'Evaluación técnica', min: 15, tipo: 'quiz' }], progreso: 60, certificado: false },
+    { id: 'cur3', titulo: 'Ventas Consultivas', cat: 'Comercial', emoji: '🎯', color: '#1f8a4c', desc: 'Prospección, descubrimiento de necesidades y cierre.', lecciones: [{ t: 'Prospección efectiva', min: 12, tipo: 'video' }, { t: 'Preguntas de descubrimiento', min: 10, tipo: 'lectura' }, { t: 'Manejo de objeciones', min: 14, tipo: 'video' }, { t: 'Técnicas de cierre', min: 12, tipo: 'video' }], progreso: 25, certificado: false },
+    { id: 'cur4', titulo: 'Producto: Auto', cat: 'Producto', emoji: '🚗', color: '#c9821b', desc: 'Cobertura, tarifas y argumentos de venta de Auto.', lecciones: [{ t: 'Coberturas de Auto', min: 10, tipo: 'lectura' }, { t: 'Cómo cotizar', min: 12, tipo: 'video' }, { t: 'Argumentario de venta', min: 8, tipo: 'lectura' }], progreso: 0, certificado: false },
+    { id: 'cur5', titulo: 'Cumplimiento y Confidencialidad', cat: 'Normativa', emoji: '⚖️', color: '#6b4ea0', desc: 'Protección de datos y conducta profesional.', lecciones: [{ t: 'Protección de datos', min: 10, tipo: 'lectura' }, { t: 'Conducta y confidencialidad', min: 8, tipo: 'video' }, { t: 'Evaluación', min: 10, tipo: 'quiz' }], progreso: 100, certificado: true }
+  ];
+
+  // ====================================================================
+  //  NOTIFICACIONES DEL PORTAL (cliente) — admin envía a todos/uno
+  // ====================================================================
+  const notifs = [];
+  let ntn = 0;
+  clientes.slice(0, 8).forEach(cli => {
+    if (rnd() > .5) { ntn++; notifs.push({ id: 'ntf' + ntn, clienteId: cli.id, titulo: 'Tu póliza está próxima a renovar', cuerpo: 'Te preparamos una propuesta de renovación. Escríbenos para revisarla.', tipo: 'renovacion', fecha: iso(addDays(NOW, -between(1, 10))), leida: rnd() > .5 }); }
+    if (rnd() > .6) { ntn++; notifs.push({ id: 'ntf' + ntn, clienteId: cli.id, titulo: 'Recordatorio de pago', cuerpo: 'Tienes un recibo próximo a vencer. Puedes reportar tu pago desde el portal.', tipo: 'cobro', fecha: iso(addDays(NOW, -between(1, 6))), leida: false }); }
+  });
+
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 18,
+    __v: 22,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
-    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos, contenidos, reclamos
+    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos, contenidos, reclamos, cursos, notifs
   };
 })();

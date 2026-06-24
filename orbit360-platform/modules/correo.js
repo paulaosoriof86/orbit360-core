@@ -88,15 +88,30 @@ Orbit.modules.correo = (function () {
   }
 
   function vincularUI(c) {
-    const clientes = S().all('clientes').slice(0, 60);
-    const html = `<label class="ce-l">Vincular a cliente<select id="vl-cli" class="o-sel">${[['', '— ninguno —']].concat(clientes.map(x => [x.id, x.nombre])).map(o => `<option value="${o[0]}" ${c.vinculo && c.vinculo.id === o[0] ? 'selected' : ''}>${U.esc(o[1])}</option>`).join('')}</select></label>`;
+    const tipoActual = (c.vinculo && c.vinculo.tipo) || 'cliente';
+    const opciones = {
+      cliente: S().all('clientes').map(x => [x.id, x.nombre]),
+      poliza: S().all('polizas').map(p => [p.id, p.numero + ' · ' + p.ramo]),
+      gestion: S().all('gestiones').map(g => [g.id, (g.titulo || g.tipo) + (g.clienteId ? ' · ' + ((S().get('clientes', g.clienteId) || {}).nombre || '') : '')]),
+      reclamo: S().all('reclamos').map(r => [r.id, r.numero + ' · ' + r.tipo]),
+      aseguradora: S().all('aseguradoras').map(a => [a.id, a.nombre])
+    };
+    function optsHtml(tipo) { return [['', '— ninguno —']].concat(opciones[tipo] || []).map(o => `<option value="${o[0]}" ${c.vinculo && c.vinculo.id === o[0] ? 'selected' : ''}>${U.esc(o[1])}</option>`).join(''); }
+    const html = `<label class="ce-l">Tipo de vínculo
+        <select id="vl-tipo" class="o-sel">${[['cliente', '🧑‍💼 Cliente'], ['poliza', '📑 Póliza'], ['gestion', '🗂 Gestión'], ['reclamo', '🚨 Reclamo'], ['aseguradora', '🏢 Aseguradora']].map(t => `<option value="${t[0]}" ${t[0] === tipoActual ? 'selected' : ''}>${t[1]}</option>`).join('')}</select></label>
+      <label class="ce-l" style="margin-top:10px">Registro<select id="vl-id" class="o-sel">${optsHtml(tipoActual)}</select></label>
+      <div class="cfg-note" style="margin-top:10px">Vincula el correo al registro para que aparezca en su ficha (cliente, póliza, gestión, reclamo o aseguradora).</div>`;
     const back = drawer('🔗 Vincular correo', html, () => {
-      const cid = back.querySelector('#vl-cli').value;
-      const cli = cid ? S().get('clientes', cid) : null;
-      C().vincular(c.id, cli ? { tipo: 'cliente', id: cli.id, label: cli.nombre } : null);
-      if (cli) S().update('correos', c.id, { clienteId: cli.id });
+      const tipo = back.querySelector('#vl-tipo').value, id = back.querySelector('#vl-id').value;
+      if (!id) { C().vincular(c.id, null); back.remove(); paint(); return; }
+      const label = (opciones[tipo].find(o => o[0] === id) || [, ''])[1];
+      C().vincular(c.id, { tipo, id, label });
+      // si es cliente o se puede derivar el cliente, set clienteId
+      if (tipo === 'cliente') S().update('correos', c.id, { clienteId: id });
+      else { const rec = S().get(tipo === 'poliza' ? 'polizas' : tipo === 'gestion' ? 'gestiones' : tipo === 'reclamo' ? 'reclamos' : 'aseguradoras', id); if (rec && rec.clienteId) S().update('correos', c.id, { clienteId: rec.clienteId }); }
       back.remove(); paint();
     });
+    back.querySelector('#vl-tipo').addEventListener('change', () => { back.querySelector('#vl-id').innerHTML = optsHtml(back.querySelector('#vl-tipo').value); });
   }
 
   function redactar(pre) {

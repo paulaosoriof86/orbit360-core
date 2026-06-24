@@ -35,7 +35,7 @@ Orbit.modules.cobros = (function () {
     const agingCols = { '1-30': '#c9821b', '31-60': '#d9602e', '61-90': '#b5253b', '90+': '#7e1220' };
 
     host.innerHTML = `<div class="page">
-      ${K.bannerFor('cobros', `<button class="btn ghost" onclick="alert('Demo: registrar pago')" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">Registrar pago</button>`)}
+      ${K.bannerFor('cobros', `<button class="btn ghost" onclick="Orbit.modules.cobros.lote()" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📤 Notificar por lote</button>`)}
       ${K.kpis([
         { label: 'Cartera al día', val: U.moneyShort(cart.alDia, 'GTQ'), color: 'var(--ok)', foot: 'cobros aplicados', footTone: 'up' },
         { label: 'Pendiente', val: U.moneyShort(cart.pend, 'GTQ'), color: 'var(--warn)', foot: 'por vencer' },
@@ -137,5 +137,55 @@ Orbit.modules.cobros = (function () {
     });
   }
 
-  return { render, detalle };
+  /* ---- Notificación de cobro por LOTE (selecciona recibos pendientes/vencidos) ---- */
+  function lote() {
+    const arr = S().all('cobros').filter(c => { if (c.estado !== 'Pendiente' && c.estado !== 'Vencido') return false; const cli = S().get('clientes', c.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (cli && cli.pais === Orbit.pais); }).sort((a, b) => (a.vence || '').localeCompare(b.vence || ''));
+    const incl = new Set(arr.map(c => c.id));
+    let back = document.getElementById('cob-lote'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'cob-lote'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    function paint() {
+      const sel = arr.filter(c => incl.has(c.id));
+      const tot = sel.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
+      back.querySelector('#lo-body').innerHTML = arr.map(c => {
+        const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId), d = U.daysFromNow(c.vence);
+        return `<label class="lote-row ${incl.has(c.id) ? '' : 'off'}">
+          <input type="checkbox" data-lo="${c.id}" ${incl.has(c.id) ? 'checked' : ''}>
+          <span style="flex:1;min-width:0"><b>${cli ? U.esc(cli.nombre) : '—'}</b> <span class="muted" style="font-size:11.5px">· ${p ? p.numero : ''} · ${c.cuota}</span><br><span class="muted" style="font-size:11px">${d < 0 ? 'venció hace ' + (-d) + 'd' : 'vence en ' + d + 'd'}</span></span>
+          <span class="mono">${U.money(c.monto, c.moneda)}</span></label>`;
+      }).join('') || '<div class="muted" style="padding:18px;text-align:center">Sin recibos pendientes.</div>';
+      back.querySelector('#lo-tot').textContent = U.money(tot, 'GTQ');
+      back.querySelector('#lo-n').textContent = sel.length + ' de ' + arr.length + ' recibos';
+      back.querySelectorAll('[data-lo]').forEach(x => x.addEventListener('change', () => { x.checked ? incl.add(x.dataset.lo) : incl.delete(x.dataset.lo); paint(); }));
+    }
+    back.innerHTML = `<div class="card" style="width:min(620px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
+      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">📤 Notificación de cobro por lote</b><button class="imp-x" id="lo-x">✕</button></div>
+      <div class="cfg-note" style="margin:14px 16px 0">Selecciona los recibos a notificar. Se envía <b>WhatsApp + correo</b> con mensaje generado por IA, queda en el <b>historial de cada cliente</b> y baja de acciones pendientes.</div>
+      <div id="lo-body" style="padding:12px 16px;overflow:auto;flex:1;display:grid;gap:7px"></div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line)">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><span class="muted" id="lo-n"></span><span style="font-family:var(--f-display);font-weight:800;font-size:20px" id="lo-tot"></span></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="lo-cancel">Cancelar</button><button class="btn primary" id="lo-ok">📲 Enviar recordatorios</button></div>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#lo-x').addEventListener('click', close);
+    back.querySelector('#lo-cancel').addEventListener('click', close);
+    back.querySelector('#lo-ok').addEventListener('click', () => {
+      const sel = arr.filter(c => incl.has(c.id));
+      sel.forEach(c => {
+        const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
+        const msg = Orbit.ia ? Orbit.ia.redactar('cobro', { nombre: cli ? cli.nombre.split(' ')[0] : '', poliza: p ? p.numero : '', monto: U.money(c.monto, c.moneda), vence: U.fmtDate(c.vence) }) : 'Recordatorio de cobro';
+        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'sistema', icon: '📤', fecha: '2026-06-24', titulo: 'Recordatorio de cobro enviado', detalle: 'WhatsApp + correo · ' + (p ? p.numero : '') + ' · ' + U.money(c.monto, c.moneda) });
+        S().update('cobros', c.id, { notificado: '2026-06-24' });
+        if (Orbit.correo && cli) Orbit.correo.enviar({ para: cli.email || '', asunto: 'Recordatorio de pago · ' + (p ? p.numero : ''), cuerpo: msg, clienteId: c.clienteId, vinculo: { tipo: 'cobro', id: c.id, label: 'Recibo ' + c.cuota } });
+      });
+      close();
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + sel.length + ' recordatorios enviados (WhatsApp + correo)'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+      render(document.getElementById('host'));
+    });
+    paint();
+  }
+
+  return { render, detalle, lote };
 })();

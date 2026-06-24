@@ -39,8 +39,8 @@ Orbit.pais = 'TODOS';
 
 /* Catálogo geográfico (departamentos → ciudades) por país. Configurable por cliente. */
 Orbit.GEO = {
-  GT: { 'Guatemala': ['Guatemala', 'Mixco', 'Villa Nueva'], 'Quetzaltenango': ['Quetzaltenango', 'Coatepeque'], 'Escuintla': ['Escuintla', 'Santa Lucía'], 'Sacatepéquez': ['Antigua Guatemala'] },
-  CO: { 'Cundinamarca': ['Bogotá', 'Soacha', 'Chía'], 'Antioquia': ['Medellín', 'Envigado', 'Itagüí'], 'Valle del Cauca': ['Cali', 'Palmira'], 'Atlántico': ['Barranquilla', 'Soledad'] }
+  GT: { 'Guatemala': ['Guatemala', 'Mixco', 'Villa Nueva', 'San Miguel Petapa', 'Amatitlán', 'Chinautla'], 'Quetzaltenango': ['Quetzaltenango', 'Coatepeque', 'Salcajá'], 'Escuintla': ['Escuintla', 'Santa Lucía Cotzumalguapa', 'Tiquisate', 'Puerto San José'], 'Sacatepéquez': ['Antigua Guatemala', 'Jocotenango', 'Ciudad Vieja'], 'Sololá': ['Sololá', 'Panajachel'], 'Chimaltenango': ['Chimaltenango', 'Tecpán'], 'Huehuetenango': ['Huehuetenango'], 'Petén': ['Flores', 'San Benito'], 'Izabal': ['Puerto Barrios', 'Morales'], 'Alta Verapaz': ['Cobán'] },
+  CO: { 'Cundinamarca': ['Bogotá', 'Soacha', 'Chía', 'Zipaquirá', 'Facatativá', 'Fusagasugá'], 'Antioquia': ['Medellín', 'Envigado', 'Itagüí', 'Bello', 'Rionegro', 'Sabaneta'], 'Valle del Cauca': ['Cali', 'Palmira', 'Buenaventura', 'Tuluá', 'Cartago'], 'Atlántico': ['Barranquilla', 'Soledad', 'Malambo'], 'Santander': ['Bucaramanga', 'Floridablanca', 'Girón'], 'Bolívar': ['Cartagena', 'Magangué'], 'Risaralda': ['Pereira', 'Dosquebradas'], 'Caldas': ['Manizales'], 'Norte de Santander': ['Cúcuta'], 'Magdalena': ['Santa Marta'] }
 };
 
 /* =========================================================
@@ -187,7 +187,7 @@ Orbit.tenant = (function () {
     monedaBase: 'GTQ',
     branding: { logo: '', sidebar: 'oscuro', paleta: 'rojo', tipografia: 'Manrope' },
     // módulos activos (config INTERNA nuestra) — todos los del nav
-    modulosActivos: ['inicio', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
+    modulosActivos: ['inicio', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'siniestros', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
     addons: { make: false, drive: true, whatsapp: true, correo: true, metricool: false, facebook: false, linkedin: false, web: true, canva: false, gamma: false, heygen: false, ia: false, mailchimp: false, sheets: false },
     portalVisibility: { polizas: true, recibos: true, documentos: true, asesor: true, comisiones: false, drive: false },
     apis: []
@@ -234,13 +234,13 @@ Orbit.NAV = [
       { route: 'importar', icon: '⬇', label: 'Importación inteligente', estado: 'beta' },
       { route: 'calidad', icon: '🩺', label: 'Calidad de datos', estado: 'beta' },
       { route: 'plantillas', icon: '✉', label: 'Plantillas de mensajes', estado: 'beta' },
-      { route: 'reportes', icon: '📈', label: 'Reportes', estado: 'road' }
+      { route: 'reportes', icon: '📈', label: 'Reportes', estado: 'beta' }
     ]
   },
   {
     type: 'group', label: 'Gestión y recursos', open: false, items: [
       { route: 'ia', icon: '🤖', label: 'Orbit IA', estado: 'beta' },
-      { route: 'academia', icon: '🎓', label: 'Orbit Academia', estado: 'road' }
+      { route: 'academia', icon: '🎓', label: 'Orbit Academia', estado: 'beta' }
     ]
   },
   {
@@ -253,7 +253,7 @@ Orbit.NAV = [
       { route: 'correo', icon: '✉', label: 'Correo', estado: 'beta' },
       { route: 'notificaciones', icon: '💬', label: 'Notificaciones WA', estado: 'road' },
       { route: 'marketing', icon: '📣', label: 'Orbit Marketing', estado: 'beta' },
-      { route: 'portal', icon: '🚪', label: 'Portal del Cliente', estado: 'road' }
+      { route: 'portal', icon: '🚪', label: 'Portal del Cliente', estado: 'beta' }
     ]
   },
   {

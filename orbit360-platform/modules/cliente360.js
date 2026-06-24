@@ -17,7 +17,7 @@ Orbit.modules.cliente360 = (function () {
   const ROLE = () => (Orbit.session && Orbit.session.rol && Orbit.session.rol()) || (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
   const verEmpresa = () => ['Dirección', 'Admin', 'Finanzas'].includes(ROLE());
 
-  const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'comisiones', 'correos', 'historial'];
+  const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'siniestros', 'comisiones', 'correos', 'historial'];
 
   // ---------- entry ----------
   function render(h) {
@@ -133,7 +133,7 @@ Orbit.modules.cliente360 = (function () {
     const c = r.cli, ase = q.asesor(c.asesorId);
     const tabs = [
       ['resumen', 'Resumen', '📊'], ['polizas', 'Pólizas', '📑'], ['vehiculos', 'Vehículos', '🚗'], ['cobros', 'Cobros', '💳'],
-      ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']
+      ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']
     ];
     const saludCol = r.salud >= 70 ? '#1f8a4c' : r.salud >= 45 ? '#c9821b' : '#C5162E';
     const waNum = (c.telefono || '').replace(/[^0-9]/g, '');
