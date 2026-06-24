@@ -18,6 +18,7 @@ Orbit.modules.insights = (function () {
   let mesSel = MES0;           // mes seleccionado (acumulado Ene→mesSel)
   let criterio = 'general';    // comparativo: general | asesor | ramo | aseguradora
   let topOrden = 'volumen';    // top clientes: volumen | cantidad | nuevos | antiguos
+  let renovCrit = 'aseguradora'; // renovaciones: aseguradora | asesor | ramo
   const MES = MES0;            // compat: algunos cálculos usan el mes actual base
 
   /* ---- país + accesos ---- */
@@ -393,6 +394,12 @@ Orbit.modules.insights = (function () {
       { label: 'Tasa de cancelación', val: tasaCancel + '%', color: tasaCancel > 8 ? 'var(--danger)' : 'var(--ok)', foot: cancel.length + ' canceladas' },
       { label: 'Fuga de prima', val: M(fuga), color: 'var(--red)', foot: 'valor perdido', footTone: 'down' }
     ]) + `<div class="ins-grid-2">${card('Prima neta a renovar por mes', barsH(rows, { money: true }), 'próximos 6 meses')}${card('Motivos de cancelación', motivoRows.length ? barsH(motivoRows, { fmt: v => v + (v === 1 ? ' caso' : ' casos') }) : '<div class="muted">Sin cancelaciones.</div>')}</div>` +
+      (function () {
+        const keyFn = { aseguradora: p => (q.aseguradora(p.aseguradoraId) || {}).nombre || '—', asesor: p => (q.asesor(p.asesorId) || {}).nombre || '—', ramo: p => p.ramo }[renovCrit] || (p => p.ramo);
+        const rr = Object.entries(aggBy(prox, keyFn, p => netaDe(p))).sort((a, b) => b[1] - a[1]).map((e, i) => ({ label: e[0], val: e[1], color: palette[i % palette.length] }));
+        const seg = `<div class="ins-seg">${[['aseguradora', 'Aseguradora'], ['asesor', 'Asesor'], ['ramo', 'Ramo']].map(o => `<button class="ins-seg-b ${renovCrit === o[0] ? 'active' : ''}" data-renovcrit="${o[0]}">${o[1]}</button>`).join('')}</div>`;
+        return card('Renovaciones próximas por ' + renovCrit, seg + '<div style="margin-top:12px">' + (rr.length ? barsH(rr, { money: true }) : '<div class="muted">Sin renovaciones próximas.</div>') + '</div>', 'de lo general a lo particular');
+      })() +
       card('Renovaciones inminentes', tablaPolizas(prox.slice(0, 14)));
   }
 
@@ -456,6 +463,7 @@ Orbit.modules.insights = (function () {
     const mSel = host.querySelector('#ins-mes'); if (mSel) mSel.addEventListener('change', () => { mesSel = +mSel.value; draw(); });
     const tSel = host.querySelector('#ins-top'); if (tSel) tSel.addEventListener('change', () => { topOrden = tSel.value; draw(); });
     host.querySelectorAll('[data-crit]').forEach(b => b.addEventListener('click', () => { criterio = b.dataset.crit; draw(); }));
+    host.querySelectorAll('[data-renovcrit]').forEach(b => b.addEventListener('click', () => { renovCrit = b.dataset.renovcrit; draw(); }));
     wireKpis();
   }
 

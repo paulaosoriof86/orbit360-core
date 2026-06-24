@@ -285,21 +285,34 @@ Orbit.modules.finanzas = (function () {
     return { bruta: vig, ajuste: noDeveng, neta: Math.max(0, vig - noDeveng) };
   }
 
-  /* ---------- DASHBOARD financiero ---------- */
+  /* ---------- DASHBOARD financiero (datos en vivo del store) ---------- */
+  function serieMensual(anio, tipo) {
+    const p = paisFin();
+    return MESES.map((_, i) => {
+      const ym = anio + '-' + String(i + 1).padStart(2, '0');
+      return sum(S().all('finmovs').filter(m => m.periodo === ym && (!p || m.pais === p) && (tipo === 'ingreso' ? m.tipo === 'ingreso' : m.tipo === 'egreso')), m => m.valor);
+    });
+  }
   function dashboard() {
     const prod = produccionNeta();
-    // series demo intermensual (6 meses) e interanual
-    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
-    const ingresos = [82, 91, 88, 102, 110, 124].map(x => x * 1000);
-    const egresos = [60, 64, 70, 72, 75, 80].map(x => x * 1000);
-    const maxV = Math.max(...ingresos);
-    const anioActual = 612000, anioAnterior = 540000;
-    const varAnual = Math.round((anioActual / anioAnterior - 1) * 100);
-    const utilidad = ingresos[5] - egresos[5];
+    const anio = +mesSel.slice(0, 4), mi = +mesSel.slice(5) - 1;
+    const ingArr = serieMensual(anio, 'ingreso'), egrArr = serieMensual(anio, 'egreso');
+    const ingPrev = serieMensual(anio - 1, 'ingreso'), egrPrev = serieMensual(anio - 1, 'egreso');
+    // ventana de 6 meses hasta el mes seleccionado
+    const lo = Math.max(0, mi - 5);
+    const meses = MESES.slice(lo, mi + 1), ingresos = ingArr.slice(lo, mi + 1), egresos = egrArr.slice(lo, mi + 1);
+    const maxV = Math.max(1, ...ingresos, ...egresos);
+    const anioActual = ingArr.slice(0, mi + 1).reduce((s, v) => s + v, 0);
+    const anioAnterior = ingPrev.slice(0, mi + 1).reduce((s, v) => s + v, 0);
+    const varAnual = anioAnterior > 0 ? Math.round((anioActual / anioAnterior - 1) * 100) : 0;
+    const utilidad = (ingresos[ingresos.length - 1] || 0) - (egresos[egresos.length - 1] || 0);
+    const margen = ingresos[ingresos.length - 1] > 0 ? Math.round(utilidad / ingresos[ingresos.length - 1] * 100) : 0;
+    const egrAcum = egrArr.slice(0, mi + 1).reduce((s, v) => s + v, 0);
+    const gastoRatio = anioActual > 0 ? Math.round(egrAcum / anioActual * 100) : 0;
     return `${K.kpis([
       { label: 'Producción neta', val: U.moneyShort(prod.neta, 'GTQ'), color: 'var(--red)', foot: 'prima neta vigente' },
-      { label: 'Utilidad del mes', val: U.moneyShort(utilidad, 'GTQ'), color: 'var(--ok)', foot: 'ingresos − egresos', footTone: 'up' },
-      { label: 'Var. interanual', val: (varAnual >= 0 ? '+' : '') + varAnual + '%', color: 'var(--info)', foot: 'vs año anterior', footTone: varAnual >= 0 ? 'up' : 'down' },
+      { label: 'Utilidad del mes', val: U.moneyShort(utilidad, 'GTQ'), color: 'var(--ok)', foot: 'ingresos − egresos', footTone: utilidad >= 0 ? 'up' : 'down' },
+      { label: 'Var. interanual', val: (varAnual >= 0 ? '+' : '') + varAnual + '%', color: 'var(--info)', foot: 'vs ' + (anio - 1), footTone: varAnual >= 0 ? 'up' : 'down' },
       { label: 'Ajuste no devengado', val: '−' + U.moneyShort(prod.ajuste, 'GTQ'), color: 'var(--warn)', foot: 'cancelaciones', footTone: 'down' }
     ])}
     <div class="card pad" style="margin-bottom:14px">
@@ -319,24 +332,24 @@ Orbit.modules.finanzas = (function () {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="card pad">
-        <b style="font-family:var(--f-display);font-size:15px">Comparativo interanual</b>
+        <b style="font-family:var(--f-display);font-size:15px">Comparativo interanual · acum. Ene→${MESES[mi]}</b>
         <div style="display:flex;align-items:flex-end;gap:24px;margin-top:16px">
-          ${[['2025', anioAnterior, '#9aa0a8'], ['2026', anioActual, 'var(--red)']].map(([y, v, c]) => `<div style="flex:1;text-align:center">
-            <div style="height:120px;display:flex;align-items:flex-end;justify-content:center"><div style="width:60%;background:${c};border-radius:6px 6px 0 0;height:${v / anioActual * 100}%"></div></div>
+          ${[[anio - 1 + '', anioAnterior, '#9aa0a8'], [anio + '', anioActual, 'var(--red)']].map(([y, v, c]) => `<div style="flex:1;text-align:center">
+            <div style="height:120px;display:flex;align-items:flex-end;justify-content:center"><div style="width:60%;background:${c};border-radius:6px 6px 0 0;height:${Math.max(2, v / Math.max(anioActual, anioAnterior, 1) * 100)}%"></div></div>
             <div style="font-family:var(--f-display);font-weight:800;margin-top:8px">${U.moneyShort(v, 'GTQ')}</div>
             <div class="muted" style="font-size:12px">${y}</div></div>`).join('')}
         </div>
-        <div class="cfg-note" style="margin-top:14px">Crecimiento <b style="color:var(--ok)">+${varAnual}%</b> vs año anterior. Base para fijar metas realistas.</div>
+        <div class="cfg-note" style="margin-top:14px">${varAnual >= 0 ? 'Crecimiento' : 'Caída'} <b style="color:${varAnual >= 0 ? 'var(--ok)' : 'var(--danger)'}">${varAnual >= 0 ? '+' : ''}${varAnual}%</b> vs año anterior. Base para fijar metas realistas.</div>
       </div>
       <div class="card pad">
         <b style="font-family:var(--f-display);font-size:15px">Salud financiera</b>
         <div style="display:grid;gap:11px;margin-top:14px">
-          ${finRow('Margen operativo', Math.round(utilidad / ingresos[5] * 100) + '%', 'ok')}
-          ${finRow('Recaudo / producción', '78%', 'warn')}
-          ${finRow('Comisión efectiva', '14.2%', 'info')}
-          ${finRow('Gasto fijo / ingreso', '41%', 'neutral')}
+          ${finRow('Margen operativo', margen + '%', margen >= 25 ? 'ok' : 'warn')}
+          ${finRow('Gasto / ingreso (acum.)', gastoRatio + '%', gastoRatio <= 60 ? 'ok' : 'warn')}
+          ${finRow('Ingreso acum. ' + anio, U.moneyShort(anioActual, 'GTQ'), 'info')}
+          ${finRow('Egreso acum. ' + anio, U.moneyShort(egrAcum, 'GTQ'), 'neutral')}
         </div>
-        <button class="btn primary" style="margin-top:16px;width:100%" onclick="location.hash='#/finanzas';setTimeout(()=>document.querySelectorAll('.tab[data-t]').forEach(t=>{if(t.dataset.t==='metas')t.click()}),50)">Fijar metas desde estos datos →</button>
+        <button class="btn primary" style="margin-top:16px;width:100%" onclick="location.hash='#/equipo'">Fijar metas (Equipo y permisos) →</button>
       </div>
     </div>`;
   }

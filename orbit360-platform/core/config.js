@@ -224,6 +224,7 @@ Orbit.NAV = [
       { route: 'cobros', icon: '💳', label: 'Cobros y cartera', estado: 'core' },
       { route: 'renovaciones', icon: '🔄', label: 'Renovaciones', estado: 'core' },
       { route: 'cancelaciones', icon: '✕', label: 'Cancelaciones', estado: 'core' },
+      { route: 'siniestros', icon: '🚨', label: 'Siniestros', estado: 'beta' },
       { route: 'historial', icon: '📝', label: 'Historial y actividades', estado: 'core' },
       { route: 'comisiones', icon: '💼', label: 'Comisiones', estado: 'core' }
     ]

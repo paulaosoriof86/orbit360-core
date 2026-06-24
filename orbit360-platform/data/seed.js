@@ -534,10 +534,78 @@ Orbit.SEED = (function () {
     { id: 'nov3', tipo: 'aviso', titulo: '📢 Cierre de mes: subir gestiones antes del 30', detalle: 'Recuerden dejar todas las gestiones y recaudos cargados antes del cierre.', autor: 'Finanzas', fecha: iso(addDays(NOW, -1)), prioridad: false }
   ];
 
+  // ====================================================================
+  //  MARKETING — calendario de contenidos (redes) por día
+  // ====================================================================
+  const contenidos = [];
+  const MK_CANALES = ['LinkedIn', 'Facebook', 'Instagram', 'WhatsApp', 'TikTok'];
+  const MK_TIPOS = ['Texto', 'Carrusel', 'Reel', 'Historia', 'Video'];
+  const MK_ENFOQUES = ['Seguros / Riesgos', 'CX / Mystery', 'Logística', 'Educativo', 'Tendencias', 'Normativa', 'Prospecting'];
+  const MK_ESTADOS = ['Idea', 'Programado', 'Publicado'];
+  const mkTitulos = [
+    ['🚢 Más control en puerto: ¿y eso qué tiene que ver contigo?', 'Logística'],
+    ['📈 Tendencias 2026 en seguros (LatAm): 3 decisiones', 'Tendencias'],
+    ['🕵️‍♀️ Mystery Shopping bien hecho = mejoras reales', 'CX / Mystery'],
+    ['🚚 Seguro de transporte: 5 preguntas que evitan sorpresas', 'Seguros / Riesgos'],
+    ['⚖️ Por qué trabajar con un intermediario registrado', 'Normativa'],
+    ['📜 Derecho + CX: una promesa clara evita conflictos', 'Educativo'],
+    ['🔐 Riesgos 2026: ciber y AI ya están en el top', 'Prospecting'],
+    ['🌧️ El clima ya es riesgo financiero', 'Seguros / Riesgos'],
+    ['📡 Seguro paramétrico: pago rápido por evento', 'Tendencias'],
+    ['📦 E-commerce 2026: crece pero la lealtad se pierde', 'CX / Mystery']
+  ];
+  let mkn = 0;
+  const NOWmk = NOW;
+  for (let i = 0; i < 18; i++) {
+    mkn++;
+    const dia = addDays(new Date(NOWmk.getFullYear(), NOWmk.getMonth(), 1), between(0, 27));
+    const t = pick(mkTitulos);
+    const pub = dia < NOWmk;
+    contenidos.push({
+      id: 'mk' + mkn, fecha: iso(dia), canal: pick(MK_CANALES), tipo: pick(MK_TIPOS),
+      enfoque: t[1], titulo: t[0],
+      copy: 'Te comparto algo en palabras simples sobre ' + t[1].toLowerCase() + '. La idea es aportar valor real y claridad, sin tecnicismos.',
+      cta: pick(['Escríbeme CHECKLIST por WhatsApp', 'Agenda una revisión express', 'Comenta SEGUROS y te envío la guía', 'Solicita tu cotización sin enredos']),
+      hashtags: pick(['#Seguros #GestiónDeRiesgos #Guatemala', '#CX #CustomerExperience #LatAm', '#Logística #TransporteDeCarga #Empresas']),
+      estado: pub ? 'Publicado' : (rnd() > .4 ? 'Programado' : 'Idea'),
+      hora: String(between(8, 18)).padStart(2, '0') + ':' + pick(['00', '10', '30', '45']),
+      stats: pub ? { alcance: between(300, 4200), interac: between(12, 280), leads: between(0, 9) } : null
+    });
+  }
+
+  // ====================================================================
+  //  SINIESTROS / RECLAMOS — por póliza, con bitácora y correos
+  // ====================================================================
+  const reclamos = [];
+  const RC_ESTADOS = ['Reportado', 'En análisis', 'Documentación', 'Aprobado', 'Pagado', 'Rechazado'];
+  const RC_TIPOS = { Auto: ['Colisión', 'Robo total', 'Daños a terceros', 'Cristales'], Hogar: ['Incendio', 'Robo', 'Daño por agua'], 'Gastos Médicos': ['Hospitalización', 'Consulta', 'Cirugía'], Vida: ['Indemnización'], Daños: ['Daño material', 'Rotura de maquinaria'], RC: ['Reclamo de tercero'] };
+  let rcn = 0;
+  polizas.filter(p => p.estado !== 'Cancelada').forEach(p => {
+    if (rnd() > 0.22) return; // ~22% de pólizas con reclamo
+    rcn++;
+    const tipos = RC_TIPOS[p.ramo] || ['Reclamo general'];
+    const est = pick(RC_ESTADOS);
+    const cli = clientes.find(c => c.id === p.clienteId);
+    const fecha = iso(addDays(NOW, -between(2, 90)));
+    const monto = Math.round((p.sumaAsegurada || p.primaNeta * 20) * (0.05 + rnd() * 0.4));
+    const bit = [{ ts: fecha + ' 09:30', user: cli ? cli.nombre : 'Cliente', t: 'Reclamo reportado', d: 'El cliente notifica el siniestro.' }];
+    if (['En análisis', 'Documentación', 'Aprobado', 'Pagado', 'Rechazado'].includes(est)) bit.push({ ts: iso(addDays(new Date(fecha), 2)) + ' 11:00', user: q.aseguradora ? '' : '', t: 'Enviado a aseguradora', d: 'Expediente remitido para análisis.' });
+    if (['Aprobado', 'Pagado'].includes(est)) bit.push({ ts: iso(addDays(new Date(fecha), 12)) + ' 15:20', user: 'Aseguradora', t: 'Reclamo aprobado', d: 'Procede indemnización por ' + monto + '.' });
+    if (est === 'Pagado') bit.push({ ts: iso(addDays(new Date(fecha), 20)) + ' 10:00', user: 'Aseguradora', t: 'Indemnización pagada', d: 'Pago realizado al asegurado.' });
+    if (est === 'Rechazado') bit.push({ ts: iso(addDays(new Date(fecha), 10)) + ' 16:40', user: 'Aseguradora', t: 'Reclamo rechazado', d: 'Causa fuera de cobertura.' });
+    reclamos.push({
+      id: 'rec' + rcn, polizaId: p.id, clienteId: p.clienteId, aseguradoraId: p.aseguradoraId, asesorId: p.asesorId,
+      ramo: p.ramo, tipo: pick(tipos), estado: est, numero: 'SIN-' + between(10000, 99999),
+      fecha, montoReclamado: monto, montoAprobado: ['Aprobado', 'Pagado'].includes(est) ? monto : 0,
+      descripcion: 'Siniestro de ' + p.ramo.toLowerCase() + ' reportado por el cliente.',
+      bitacora: bit, correos: [], docs: rnd() > .5 ? ['denuncia.pdf', 'fotos_daños.jpg'] : [], actualizado: iso(NOW)
+    });
+  });
+
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 16,
+    __v: 18,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
-    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos
+    asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos, contenidos, reclamos
   };
 })();

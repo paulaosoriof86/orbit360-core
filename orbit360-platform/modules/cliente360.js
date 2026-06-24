@@ -1133,6 +1133,103 @@ Orbit.modules.cliente360 = (function () {
     back.querySelector('#vh-x').addEventListener('click', close);
   }
 
+  /* ---- Crear póliza completa (prima + recibos + vehículo si Auto) ---- */
+  function nuevaPoliza(clienteId) {
+    const clientes = S().all('clientes');
+    const cid0 = clienteId || (clientes[0] && clientes[0].id);
+    const asgs = S().all('aseguradoras').filter(a => a.vinculada !== false);
+    let back = document.getElementById('c360-edit'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center';
+    const frecs = Object.keys(Orbit.primas.FRECUENCIAS), formas = Orbit.primas.FORMAS_PAGO;
+    function paisDe(cid) { const c = S().get('clientes', cid); return c ? c.pais : 'GT'; }
+    const pais0 = paisDe(cid0), ramos0 = Orbit.cat.ramosDe(pais0);
+    back.innerHTML = `<div class="card" style="width:min(680px,95vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+        <b style="font-family:var(--f-display);font-size:17px">📑 Nueva póliza</b><button class="imp-x" id="np-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">
+        <div class="cgrid">
+          <label class="ce-l">Cliente<select id="np-cli" class="o-sel">${clientes.map(c => `<option value="${c.id}" ${c.id === cid0 ? 'selected' : ''}>${U.esc(c.nombre)}</option>`).join('')}</select></label>
+          <label class="ce-l">Aseguradora<select id="np-asg" class="o-sel">${asgs.map(a => `<option value="${a.id}">${U.esc(a.nombre)}</option>`).join('')}</select></label>
+          <label class="ce-l">Ramo<select id="np-ramo" class="o-sel">${ramos0.map(r => `<option>${r}</option>`).join('')}</select></label>
+          <label class="ce-l">Subramo<select id="np-sub" class="o-sel">${Orbit.cat.subramosDe(pais0, ramos0[0]).map(s => `<option>${s}</option>`).join('')}</select></label>
+          <label class="ce-l">N.º de póliza<input id="np-num" class="o-sel" placeholder="(auto si vacío)"></label>
+          <label class="ce-l">Suma asegurada<input id="np-suma" class="o-sel" type="number" value="0"></label>
+          <label class="ce-l">Frecuencia<select id="np-frec" class="o-sel">${frecs.map(f => `<option>${f}</option>`).join('')}</select></label>
+          <label class="ce-l">Forma de pago<select id="np-forma" class="o-sel">${formas.map(f => `<option>${f}</option>`).join('')}</select></label>
+        </div>
+        <div id="np-veh" style="display:none"><div class="cgrid">
+          <label class="ce-l">🚗 Marca y línea<input id="np-vmarca" class="o-sel" placeholder="Toyota Hilux"></label>
+          <label class="ce-l">Placa<input id="np-vplaca" class="o-sel"></label>
+          <label class="ce-l">Año<input id="np-vanio" class="o-sel" type="number" value="2024"></label>
+          <label class="ce-l">Uso<input id="np-vuso" class="o-sel" value="Particular"></label>
+        </div></div>
+        <div class="vp-desglose">
+          <div class="vp-sec-t">🧾 Prima <span class="muted" id="np-iva"></span></div>
+          <div class="cgrid">
+            <label class="ce-l">Prima neta<input id="np-neta" class="o-sel" type="number" value="0"></label>
+            <label class="ce-l">Gastos expedición<input id="np-gem" class="o-sel" type="number" value="0"></label>
+            <label class="ce-l">Otros / asistencias<input id="np-otros" class="o-sel" type="number" value="0"></label>
+            <label class="ce-l">Cantidad de pagos<input id="np-pagos" class="o-sel" type="number" value="1" title="Máximo según aseguradora"></label>
+          </div>
+          <table class="vp-dtbl" style="margin-top:10px" id="np-resumen"></table>
+          <div id="np-recibos" style="margin-top:10px"></div>
+        </div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="np-cancel">Cancelar</button><button class="btn primary" id="np-ok">Crear póliza + recibos</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const $ = s => back.querySelector(s);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#np-x').addEventListener('click', close); $('#np-cancel').addEventListener('click', close);
+    function pais() { return paisDe($('#np-cli').value); }
+    function syncRamos() { const rs = Orbit.cat.ramosDe(pais()); $('#np-ramo').innerHTML = rs.map(r => `<option>${r}</option>`).join(''); syncSub(); }
+    function syncSub() { $('#np-sub').innerHTML = Orbit.cat.subramosDe(pais(), $('#np-ramo').value).map(s => `<option>${s}</option>`).join(''); $('#np-veh').style.display = /Auto|vM|Veh/i.test($('#np-ramo').value) ? '' : 'none'; }
+    $('#np-cli').addEventListener('change', syncRamos);
+    $('#np-ramo').addEventListener('change', syncSub);
+    function recalc() {
+      const p = pais(), neta = +$('#np-neta').value || 0, frec = $('#np-frec').value;
+      const cuotas = Math.max(1, +$('#np-pagos').value || Orbit.primas.cuotasDe(frec));
+      const frac = cuotas > 1;
+      const d = Orbit.primas.desglose(neta, p, { fraccionado: frac, gastosEmision: +$('#np-gem').value || 0, otros: +$('#np-otros').value || 0 });
+      $('#np-iva').textContent = '(' + p + ' · IVA ' + d.ivaPct + '%)';
+      $('#np-resumen').innerHTML = `<tr class="vp-tot"><td>Prima total</td><td class="num">${U.money(d.total, p === 'CO' ? 'COP' : 'GTQ')}</td></tr>`;
+      const recs = Orbit.primas.recibos(d, { frecuencia: frec, vigenciaInicio: '2026-06-24' });
+      const usar = recs.length === cuotas ? recs : Orbit.primas.recibos(d, { frecuencia: frec, vigenciaInicio: '2026-06-24' });
+      $('#np-recibos').innerHTML = `<div class="muted" style="font-size:12px;margin-bottom:5px">${cuotas} recibo(s):</div>` + usar.slice(0, cuotas).map(r => `<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--line-2)"><span class="mono">${r.n}</span><span>${U.fmtDate(r.vence)}</span><b>${U.money(r.total, p === 'CO' ? 'COP' : 'GTQ')}</b></div>`).join('');
+      back._d = d; back._cuotas = cuotas;
+    }
+    ['#np-neta', '#np-gem', '#np-otros', '#np-frec', '#np-pagos'].forEach(s => $(s).addEventListener('input', recalc));
+    syncSub(); recalc();
+    $('#np-ok').addEventListener('click', () => {
+      const cid = $('#np-cli').value, p = pais(), cur = p === 'CO' ? 'COP' : 'GTQ', d = back._d;
+      const asg = S().get('aseguradoras', $('#np-asg').value);
+      const num = $('#np-num').value || ((p === 'GT' ? 'GT-' : 'CO-') + (asg ? asg.id.slice(-2).toUpperCase() : 'XX') + '-' + Math.floor(10000 + Math.random() * 89999));
+      const fin = new Date('2026-06-24'); fin.setFullYear(fin.getFullYear() + 1);
+      const cli = S().get('clientes', cid);
+      const polId = 'pol' + Date.now().toString().slice(-7);
+      S().insert('polizas', {
+        id: polId, numero: num, clienteId: cid, asesorId: cli.asesorId, aseguradoraId: $('#np-asg').value,
+        ramo: $('#np-ramo').value, subramo: $('#np-sub').value, producto: $('#np-sub').value, tipoPoliza: 'Individual',
+        moneda: cur, divisa: cur, frecuencia: $('#np-frec').value, forma: $('#np-frec').value, formaPago: $('#np-forma').value,
+        primaNeta: d.neta, gastosEmision: d.gastosEmision, gastosFinan: d.gastosFinan, otros: d.otros, ivaPct: d.ivaPct, ivaMonto: d.iva, recargoFinPct: d.recargoPct, baseGravable: d.baseGravable, prima: d.total, primaTotal: d.total,
+        sumaAsegurada: +$('#np-suma').value || 0, comAseguradoraPct: (asg && asg.comisiones && asg.comisiones[$('#np-ramo').value]) || (asg && asg.comisionDefault) || 12, comVendedorPct: 50,
+        concepto: [$('#np-ramo').value, $('#np-sub').value].join(' · '), vigenciaInicio: '2026-06-24', vigenciaFin: fin.toISOString().slice(0, 10),
+        renovable: true, contadorRenovaciones: 0, estado: 'Vigente', historial: [{ icon: '✳', fecha: '2026-06-24', t: 'Emisión de póliza', d: 'Alta manual' }]
+      });
+      Orbit.primas.recibos(d, { frecuencia: $('#np-frec').value, vigenciaInicio: '2026-06-24', comAseguradoraPct: 12, comVendedorPct: 50 }).slice(0, back._cuotas).forEach((rec, i) => {
+        S().insert('cobros', { id: 'cob' + Date.now() + i, polizaId: polId, clienteId: cid, asesorId: cli.asesorId, cuota: rec.n, monto: rec.total, moneda: cur, neta: rec.neta, gastosEmision: rec.gastosEmision, gastosFinan: rec.gastosFinan, otros: rec.otros, iva: rec.iva, comAseguradora: rec.comAseguradora, comVendedor: rec.comVendedor, vence: rec.vence, fechaLimite: rec.fechaLimite, fechaPago: null, estado: 'Pendiente', metodo: null, conducto: '', conciliado: false });
+      });
+      if (/Auto|Veh/i.test($('#np-ramo').value) && $('#np-vmarca').value) {
+        S().insert('vehiculos', { id: 'veh' + Date.now(), clienteId: cid, polizaId: polId, marca: $('#np-vmarca').value, linea: '', anio: $('#np-vanio').value, placa: $('#np-vplaca').value, uso: $('#np-vuso').value, chasis: '', motor: '', sumaAsegurada: +$('#np-suma').value || 0 });
+      }
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: cli.asesorId, tipo: 'sistema', icon: '📑', fecha: '2026-06-24', titulo: 'Póliza emitida: ' + num, detalle: $('#np-ramo').value + ' · ' + U.money(d.total, cur) });
+      close(); location.hash = '#/cliente360?c=' + cid; tab = 'polizas'; setTimeout(() => detalle(cid), 30);
+    });
+  }
+
   function correoPoliza(polId) {
     const p = S().get('polizas', polId); if (!p) return;
     const cli = S().get('clientes', p.clienteId) || {};
@@ -1144,5 +1241,5 @@ Orbit.modules.cliente360 = (function () {
     location.hash = '#/correo';
   }
 
-  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); } };
+  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); } };
 })();

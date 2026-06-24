@@ -36,7 +36,7 @@ Orbit.modules.polizas = (function () {
     st.__count = r.length + ' de ' + all.length;
 
     host.innerHTML = `<div class="page">
-      ${K.bannerFor('polizas', `<button class="btn primary" onclick="alert('Demo: emisión / alta de póliza')">+ Nueva póliza</button>`)}
+      ${K.bannerFor('polizas', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevaPoliza()">+ Nueva póliza</button>`)}
       ${K.kpis([
         { label: 'Pólizas vigentes', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'activas en cartera' },
         { label: 'Prima vigente', val: U.moneyShort(primaVig, 'GTQ'), color: 'var(--ok)', foot: 'anualizada' },
