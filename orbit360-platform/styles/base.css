@@ -141,6 +141,11 @@ body.sb-graphite #sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.
 /* ---------- SIDEBAR NAV ---------- */
 .nav-home{padding:12px 0 8px;border-bottom:1px solid rgba(255,255,255,.06)}
 .nav-group{padding:6px 0 2px}
+/* Sidebar oculto (toggle del topbar) */
+body.sb-hidden #sidebar{transform:translateX(-100%)}
+body.sb-hidden #main{margin-left:0}
+.tb-burger{display:inline-grid;place-items:center;width:30px;height:30px;border:none;background:none;font-size:17px;cursor:pointer;color:inherit;border-radius:6px;line-height:1;flex-shrink:0}
+.tb-burger:hover{background:rgba(0,0,0,.06)}
 .nav-toggle{
   display:flex;align-items:center;justify-content:space-between;
   padding:11px 18px 5px;cursor:pointer;user-select:none;

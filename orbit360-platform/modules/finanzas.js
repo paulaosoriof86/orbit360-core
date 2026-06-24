@@ -64,19 +64,87 @@ Orbit.modules.finanzas = (function () {
     ])}
     <div class="card pad" style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <b style="font-family:var(--f-display);font-size:15px;flex:1">Movimientos · ${MESES[+mesSel.slice(5) - 1]} ${mesSel.slice(0, 4)}</b>
-      <button class="btn ghost sm" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar histórico</button>
+      <button class="btn primary sm" onclick="Orbit.modules.finanzas.nuevoMov('ingreso')">+ Ingreso</button>
+      <button class="btn primary sm" onclick="Orbit.modules.finanzas.nuevoMov('egreso')" style="background:var(--danger)">+ Egreso</button>
+      <button class="btn ghost sm" onclick="Orbit.modules.finanzas.crearMes()">📅 Crear mes</button>
+      <button class="btn ghost sm" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar</button>
       <button class="btn ghost sm" onclick="Orbit.importa.open('estados-banco')">🏦 Estado de cuenta</button>
     </div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Día</th><th>Concepto</th><th>Clasificación</th><th>Pagador / Benef.</th><th class="num">Valor</th><th>Estado</th></tr></thead>
-      <tbody>${rows.map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.toggleEstado('${m.id}')" title="Clic: cambia estado (recaudado/pagado ↔ pendiente)">
+      <tbody>${rows.map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.editarMov('${m.id}')" title="Ver / editar movimiento">
         <td class="mono" style="font-size:12px">${m.dia || '—'}</td>
         <td><b>${U.esc(m.concepto)}</b></td>
         <td><span class="badge ${m.tipo === 'ingreso' ? 'ok' : 'neutral'}">${U.esc(m.clase)}</span></td>
         <td style="font-size:12.5px">${U.esc(m.pagador || m.beneficiario || '—')}</td>
         <td class="num" style="color:${m.tipo === 'egreso' ? 'var(--danger)' : 'var(--ok)'}">${m.tipo === 'egreso' ? '−' : ''}${U.money(m.valor, m.moneda)}</td>
-        <td>${estBadge(m.estado)}</td></tr>`).join('')}</tbody>
+        <td onclick="event.stopPropagation();Orbit.modules.finanzas.toggleEstado('${m.id}')" style="cursor:pointer" title="Clic: cambia estado">${estBadge(m.estado)}</td></tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">Sin movimientos. Usa “+ Ingreso/Egreso” o “Crear mes”.</td></tr>'}</tbody>
     </table></div></div>`;
+  }
+
+  const CLASES_ING = ['Comisiones aseguradora', 'Incentivos', 'Otros'];
+  const CLASES_EGR = ['Comisiones asesores', 'Gastos fijos', 'Marketing', 'Operación', 'Devolución de préstamo'];
+  /* ---- alta de movimiento (ingreso/egreso) ---- */
+  function nuevoMov(tipo) { editarMov(null, tipo); }
+  /* ---- editar / crear movimiento ---- */
+  function editarMov(id, tipoNuevo) {
+    const m = id ? S().get('finmovs', id) : null;
+    const tipo = m ? m.tipo : (tipoNuevo || 'ingreso');
+    const cur = paisFin() === 'CO' ? 'COP' : 'GTQ';
+    const clases = tipo === 'ingreso' ? CLASES_ING : CLASES_EGR;
+    const estados = tipo === 'ingreso' ? ['esperado', 'facturado', 'recaudado'] : ['presupuestado', 'pendiente', 'pagado'];
+    let back = document.getElementById('fin-mov'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-mov'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    back.innerHTML = `<div class="card" style="width:min(520px,94vw);padding:0">
+      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:${tipo === 'ingreso' ? 'var(--ok-soft)' : 'var(--danger-soft)'}">
+        <b style="font-family:var(--f-display);font-size:16px">${m ? '✏ Editar' : (tipo === 'ingreso' ? '+ Ingreso' : '+ Egreso')} · ${MESES[+mesSel.slice(5) - 1]} ${mesSel.slice(0, 4)}</b>
+        <button class="imp-x" id="fm-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">
+        <div class="cgrid">
+          <label class="ce-l">Concepto<input id="fm-concepto" class="o-sel" value="${m ? U.esc(m.concepto) : ''}"></label>
+          <label class="ce-l">Clasificación<select id="fm-clase" class="o-sel">${clases.map(c => `<option ${m && m.clase === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+          <label class="ce-l">${tipo === 'ingreso' ? 'Pagador' : 'Beneficiario'}<input id="fm-quien" class="o-sel" value="${m ? U.esc(m.pagador || m.beneficiario || '') : ''}"></label>
+          <label class="ce-l">Día<input id="fm-dia" class="o-sel" type="number" min="1" max="31" value="${m ? m.dia : new Date().getDate()}"></label>
+          <label class="ce-l">Valor (${cur})<input id="fm-valor" class="o-sel" type="number" value="${m ? m.valor : 0}"></label>
+          <label class="ce-l">Estado<select id="fm-estado" class="o-sel">${estados.map(e => `<option ${m && m.estado === e ? 'selected' : ''}>${e}</option>`).join('')}</select></label>
+        </div>
+        <label class="ce-l">Observaciones<input id="fm-obs" class="o-sel" value="${m ? U.esc(m.obs || '') : ''}"></label>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between">
+        ${m ? '<button class="btn ghost" id="fm-del" style="color:var(--danger)">🗑 Eliminar</button>' : '<span></span>'}
+        <div style="display:flex;gap:8px"><button class="btn ghost" id="fm-cancel">Cancelar</button><button class="btn primary" id="fm-ok">Guardar</button></div>
+      </div></div>`;
+    document.body.appendChild(back);
+    const $ = s => back.querySelector(s);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#fm-x').addEventListener('click', close); $('#fm-cancel').addEventListener('click', close);
+    if ($('#fm-del')) $('#fm-del').addEventListener('click', () => { S().remove('finmovs', id); close(); render(document.getElementById('host')); });
+    $('#fm-ok').addEventListener('click', () => {
+      const data = {
+        tipo, clase: $('#fm-clase').value, concepto: $('#fm-concepto').value || $('#fm-clase').value,
+        valor: +$('#fm-valor').value || 0, dia: +$('#fm-dia').value || 1, estado: $('#fm-estado').value,
+        obs: $('#fm-obs').value, periodo: m ? m.periodo : mesSel, pais: m ? m.pais : (paisFin() || 'GT'), moneda: m ? m.moneda : cur
+      };
+      data[tipo === 'ingreso' ? 'pagador' : 'beneficiario'] = $('#fm-quien').value;
+      if (m) S().update('finmovs', id, data); else S().insert('finmovs', Object.assign({ id: 'fmv' + Date.now().toString().slice(-7) }, data));
+      close(); render(document.getElementById('host'));
+    });
+  }
+  /* ---- crear el mes siguiente (copia categorías de presupuesto fijo, sin importes ejecutados) ---- */
+  function crearMes() {
+    const [y, mm] = mesSel.split('-').map(Number);
+    const d = new Date(y, mm, 1); // mm es 1-based → siguiente mes
+    const nuevo = d.toISOString().slice(0, 7);
+    const existe = S().all('finmovs').some(x => x.periodo === nuevo);
+    if (existe) { mesSel = nuevo; render(document.getElementById('host')); return; }
+    if (!confirm('¿Crear el mes ' + MESES[d.getMonth()] + ' ' + d.getFullYear() + '? Se generan las partidas de presupuesto fijo como egresos presupuestados.')) return;
+    const pais = paisFin() || 'GT', cur = pais === 'CO' ? 'COP' : 'GTQ';
+    S().all('presupuesto').filter(p => p.pais === pais).forEach(p => {
+      S().insert('finmovs', { id: 'fmv' + Date.now().toString().slice(-7) + Math.floor(Math.random() * 99), tipo: 'egreso', clase: p.clase, categoria: p.categoria, concepto: p.categoria, beneficiario: p.categoria, valor: p.monto, dia: 1, estado: 'presupuestado', periodo: nuevo, pais, moneda: cur, pendiente: p.monto, obs: '' });
+    });
+    mesSel = nuevo; render(document.getElementById('host'));
   }
   function estBadge(e) {
     const map = { recaudado: 'ok', pagado: 'ok', facturado: 'info', esperado: 'warn', pendiente: 'warn', presupuestado: 'neutral' };
@@ -130,6 +198,10 @@ Orbit.modules.finanzas = (function () {
       { label: 'Financiación recibida', val: M(ingFin), color: 'var(--warn)', foot: 'no operativo' },
       { label: 'Abonos / amortización', val: M(abonos), color: 'var(--ok)', foot: 'devoluciones', footTone: 'up' }
     ])}
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="btn primary sm" onclick="Orbit.modules.finanzas.regFinanciacion('ingreso')">+ Registrar financiamiento</button>
+      <button class="btn ghost sm" onclick="Orbit.modules.finanzas.regFinanciacion('abono')">− Registrar abono / pago</button>
+    </div>
     <div class="card" style="overflow:hidden;margin-bottom:14px"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">Deuda por acreedor</div>
       <table class="tbl"><thead><tr><th>Acreedor</th><th>País</th><th class="num">Saldo de deuda</th></tr></thead>
       <tbody>${acr.map(a => `<tr><td><b>${U.esc(a.nombre)}</b></td><td>${a.pais}</td><td class="num" style="color:${a.saldo > 0 ? 'var(--danger)' : 'var(--ok)'}"><b>${U.money(a.saldo, a.pais === 'GT' ? 'GTQ' : 'COP')}</b></td></tr>`).join('')}</tbody></table></div>
@@ -555,6 +627,47 @@ Orbit.modules.finanzas = (function () {
     <button class="btn primary" style="margin-top:14px" onclick="alert('Conecta tu API key de Gemini en Configuración › Integraciones para generar análisis en vivo.')">✨ Regenerar con IA</button>`;
   }
 
+  /* ---- registrar financiamiento (sube deuda) o abono (baja deuda) ---- */
+  function regFinanciacion(modo) {
+    const p = paisFin() || 'GT';
+    const acrs = S().all('acreedores').filter(a => a.pais === p);
+    if (!acrs.length) { alert('No hay acreedores para ' + p + '. Agrega uno primero.'); return; }
+    const cur = p === 'CO' ? 'COP' : 'GTQ';
+    let back = document.getElementById('fin-fz'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-fz'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
+      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+        <b style="font-family:var(--f-display);font-size:16px">${modo === 'ingreso' ? '+ Financiamiento recibido' : '− Abono / devolución'}</b><button class="imp-x" id="fz-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">
+        <label class="ce-l">Acreedor<select id="fz-acr" class="o-sel">${acrs.map(a => `<option value="${a.id}">${U.esc(a.nombre)} · saldo ${U.money(a.saldo, cur)}</option>`).join('')}</select></label>
+        <div class="cgrid">
+          <label class="ce-l">Monto (${cur})<input id="fz-monto" class="o-sel" type="number" value="0"></label>
+          <label class="ce-l">Día<input id="fz-dia" class="o-sel" type="number" min="1" max="31" value="${new Date().getDate()}"></label>
+        </div>
+        <label class="ce-l">Nota<input id="fz-obs" class="o-sel" value="${modo === 'ingreso' ? 'Capital de trabajo' : 'Amortización'}"></label>
+        <div class="cfg-note">${modo === 'ingreso' ? 'La financiación entra como <b>ingreso NO operativo</b> y <b>aumenta la deuda</b> del acreedor.' : 'El abono entra como <b>egreso</b> y <b>reduce la deuda</b> del acreedor.'}</div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="fz-cancel">Cancelar</button><button class="btn primary" id="fz-ok">Registrar</button></div></div>`;
+    document.body.appendChild(back);
+    const $ = s => back.querySelector(s);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#fz-x').addEventListener('click', close); $('#fz-cancel').addEventListener('click', close);
+    $('#fz-ok').addEventListener('click', () => {
+      const acr = S().get('acreedores', $('#fz-acr').value); const monto = +$('#fz-monto').value || 0;
+      if (!acr || monto <= 0) { close(); return; }
+      if (modo === 'ingreso') {
+        S().insert('finmovs', { id: 'fmv' + Date.now().toString().slice(-7), tipo: 'financiacion', clase: 'Financiamiento', concepto: 'Ingreso por financiación', pagador: acr.nombre, acreedorId: acr.id, valor: monto, dia: +$('#fz-dia').value || 1, estado: 'recaudado', periodo: mesSel, pais: p, moneda: cur, obs: $('#fz-obs').value });
+        S().update('acreedores', acr.id, { saldo: (acr.saldo || 0) + monto });
+      } else {
+        S().insert('finmovs', { id: 'fmv' + Date.now().toString().slice(-7), tipo: 'egreso', clase: 'Devolución de préstamo', concepto: 'Abono a financiación', beneficiario: acr.nombre, acreedorId: acr.id, valor: monto, dia: +$('#fz-dia').value || 1, estado: 'pagado', periodo: mesSel, pais: p, moneda: cur, pendiente: 0, obs: $('#fz-obs').value });
+        S().update('acreedores', acr.id, { saldo: Math.max(0, (acr.saldo || 0) - monto) });
+      }
+      close(); render(document.getElementById('host'));
+    });
+  }
+
   function wire(host) {}
-  return { render, toggleEstado, lote };
+  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, regFinanciacion };
 })();

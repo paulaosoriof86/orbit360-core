@@ -482,7 +482,7 @@ Orbit.ciclo = (function () {
         <div class="ciclo-sub">La gestión aparecerá en <b>Orbit Ops</b> asociada a este cliente${desdeCliente ? ' y notificará al asesor' : ''}.</div></div>
         <div class="ciclo-h-act"><button class="imp-x" data-close>✕</button></div>
       </div>
-      <div style="padding:20px 22px;display:grid;gap:13px">
+      <div class="ciclo-create-body" style="padding:20px 22px;display:grid;gap:13px">
         <label class="ce-l">Tipo de gestión<select id="sg-tipo" class="o-sel">${tipos.map((t, i) => `<option value="${i}">${t.t}  →  ${t.lista}</option>`).join('')}<option value="nueva">➕ Crear otro tipo…</option></select></label>
         <div id="sg-nueva-wrap" style="display:none"><div class="cgrid">${fInput('Nombre del nuevo tipo', 'sg-nueva', '')}${fSelect('Lista en Ops', 'sg-nueva-lista', ['Gestiones Admin', 'Renovaciones / Modif.'], 'Gestiones Admin')}</div></div>
         <div class="cgrid">
@@ -539,7 +539,7 @@ Orbit.ciclo = (function () {
         <div class="ciclo-sub">Entra a <b>Leads</b> (interés) o directo a <b>Cotización</b> en Ops.</div></div>
         <div class="ciclo-h-act"><button class="imp-x" data-close>✕</button></div>
       </div>
-      <div style="padding:20px 22px;display:grid;gap:13px">
+      <div class="ciclo-create-body" style="padding:20px 22px;display:grid;gap:13px">
         <div class="cgrid">
           ${fInput('Nombre / razón social', 'nn-nombre', '')}
           ${fSelect('Tipo', 'nn-tipo', ['Persona', 'Empresa'], 'Persona')}

@@ -30,6 +30,8 @@ Orbit.modules.correo = (function () {
     const cc = host.querySelector('#cr-conn'); if (cc) cc.addEventListener('click', conectar);
     const cd = host.querySelector('#cr-disc'); if (cd) cd.addEventListener('click', () => { C().desconectar(); render(host); });
     paint();
+    // compose pendiente (p. ej. desde la ficha del cliente)
+    if (window.__orbitCompose) { const pre = window.__orbitCompose; window.__orbitCompose = null; setTimeout(() => redactar(pre), 60); }
   }
 
   function lista() {
@@ -98,16 +100,37 @@ Orbit.modules.correo = (function () {
   }
 
   function redactar(pre) {
+    // asunto por patrón para envío a aseguradora si viene de un cliente sin asunto
+    let asuntoDef = pre.asunto || '';
+    if (!asuntoDef && pre.vinculo && pre.vinculo.tipo === 'cliente') asuntoDef = 'Gestión · ' + pre.vinculo.label + (pre.poliza ? ' · Póliza ' + pre.poliza : '');
+    const docs = pre.clienteId ? (Orbit.store.where('documentos', d => d.clienteId === pre.clienteId) || []) : [];
     const html = `<div class="cgrid">
         <label class="ce-l">Para<input id="rd-para" class="o-sel" value="${U.esc(pre.para || '')}"></label>
-        <label class="ce-l">Asunto<input id="rd-asunto" class="o-sel" value="${U.esc(pre.asunto || '')}"></label>
+        <label class="ce-l">Asunto<input id="rd-asunto" class="o-sel" value="${U.esc(asuntoDef)}"></label>
       </div>
       <label class="ce-l" style="margin-top:11px">Mensaje<textarea id="rd-cuerpo" class="o-sel" style="min-height:120px;resize:vertical;padding:9px 11px"></textarea></label>
-      ${pre.vinculo ? `<div class="cfg-note" style="margin-top:10px">🔗 Se vinculará a <b>${U.esc(pre.vinculo.label)}</b></div>` : ''}`;
+      <div class="ce-l" style="margin-top:11px">📎 Adjuntos
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:5px">
+          <label class="btn ghost sm" style="cursor:pointer">⬆ Desde el PC<input type="file" id="rd-file" multiple style="display:none"></label>
+          ${pre.clienteId ? `<button type="button" class="btn ghost sm" id="rd-docs">📁 Documentos del cliente${docs.length ? ' (' + docs.length + ')' : ''}</button>` : ''}
+        </div>
+        <div id="rd-adj" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
+      </div>
+      ${pre.vinculo ? `<div class="cfg-note" style="margin-top:10px">🔗 Se vinculará a <b>${U.esc(pre.vinculo.label)}</b> · queda en el expediente.</div>` : ''}
+      <div class="muted" style="font-size:11px;margin-top:8px">El editor de diseño completo es el de tu proveedor (Outlook/Gmail) al conectar la cuenta; aquí redactas y adjuntas, asociado al expediente.</div>`;
     const back = drawer('✏ Redactar correo', html, () => {
-      C().enviar({ para: back.querySelector('#rd-para').value, asunto: back.querySelector('#rd-asunto').value, cuerpo: back.querySelector('#rd-cuerpo').value, clienteId: pre.clienteId, vinculo: pre.vinculo });
+      C().enviar({ para: back.querySelector('#rd-para').value, asunto: back.querySelector('#rd-asunto').value, cuerpo: back.querySelector('#rd-cuerpo').value, clienteId: pre.clienteId, vinculo: pre.vinculo, adjuntos: adj.slice() });
       back.remove(); carpeta = 'enviados'; selId = null; render(host);
     }, 'Enviar');
+    const adj = [];
+    function paintAdj() { back.querySelector('#rd-adj').innerHTML = adj.map((a, i) => `<span class="mail-chip">📎 ${U.esc(a)} <span data-rm="${i}" style="cursor:pointer;color:var(--danger)">✕</span></span>`).join(''); back.querySelectorAll('[data-rm]').forEach(x => x.addEventListener('click', () => { adj.splice(+x.dataset.rm, 1); paintAdj(); })); }
+    back.querySelector('#rd-file').addEventListener('change', e => { [...e.target.files].forEach(f => adj.push(f.name)); paintAdj(); });
+    const dbtn = back.querySelector('#rd-docs');
+    if (dbtn) dbtn.addEventListener('click', () => {
+      if (!docs.length) { adj.push('(sin documentos en el expediente)'); paintAdj(); return; }
+      const pick = prompt('Documentos del cliente:\n' + docs.map((d, i) => (i + 1) + '. ' + (d.nombre || d.tipo)).join('\n') + '\n\nEscribe el número a adjuntar:', '1');
+      const idx = parseInt(pick, 10) - 1; if (docs[idx]) { adj.push(docs[idx].nombre || docs[idx].tipo); paintAdj(); }
+    });
   }
 
   function conectar() {
@@ -138,5 +161,5 @@ Orbit.modules.correo = (function () {
     return back;
   }
 
-  return { render };
+  return { render, redactar: (pre) => redactar(pre || {}) };
 })();

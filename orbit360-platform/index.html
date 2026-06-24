@@ -97,6 +97,7 @@
       <span>👁</span><select id="rol-sel" aria-label="Ver como"></select>
     </div>
     <div class="tb-ico" id="sw-theme" title="Paleta de la marca"><span>🎨</span></div>
+    <div class="tb-ico" id="tb-mail" title="Correo"><span>✉</span><span id="mail-count" class="nov-count"></span></div>
     <div class="tb-ico" id="nov-bell" title="Novedades"><span>🔔</span><span class="dot"></span><span id="nov-count" class="nov-count"></span></div>
     <div class="tb-user" id="tb-user" title="Cuenta">
       <span class="av" style="background:linear-gradient(135deg,var(--red),var(--red-700))">PO</span>
@@ -145,6 +146,7 @@
   <script src="modules/configuracion.js"></script>
   <script src="modules/equipo.js"></script>
   <script src="modules/correo.js"></script>
+  <script src="modules/aseguradoras.js"></script>
   <script src="modules/finanzas.js"></script>
   <script src="modules/calidad.js"></script>
   <script src="modules/plantillas.js"></script>
@@ -166,6 +168,32 @@
 
     // theme picker
     document.getElementById('sw-theme').addEventListener('click', function (e) { e.stopPropagation(); Orbit.theme.picker(this); });
+
+    // mostrar / ocultar sidebar (persistente)
+    (function () {
+      var b = document.getElementById('burger');
+      function paint() { document.body.classList.toggle('sb-hidden', localStorage.getItem('orbit360_sbhide') === '1'); }
+      b.addEventListener('click', function () {
+        var h = localStorage.getItem('orbit360_sbhide') === '1';
+        try { localStorage.setItem('orbit360_sbhide', h ? '0' : '1'); } catch (e) {}
+        paint();
+      });
+      paint();
+    })();
+
+    // correo (topbar) + badge de no leídos
+    (function () {
+      var mail = document.getElementById('tb-mail');
+      function paintMail() {
+        var n = (Orbit.correo && Orbit.correo.noLeidos) ? Orbit.correo.noLeidos() : 0;
+        var b = document.getElementById('mail-count');
+        if (b) { b.textContent = n || ''; b.style.display = n ? '' : 'none'; }
+      }
+      mail.addEventListener('click', function () { location.hash = '#/correo'; });
+      document.addEventListener('orbit:correo', paintMail);
+      document.addEventListener('orbit:store', paintMail);
+      setTimeout(paintMail, 300);
+    })();
 
     // login palette swatches
     (function () {

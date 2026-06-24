@@ -166,6 +166,37 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
 .cfg-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .cfg-intgroup{margin-bottom:18px}
 .cfg-intgroup-h{font-family:var(--f-display);font-weight:800;font-size:13px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;margin:6px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+/* ---------- ASEGURADORAS ---------- */
+.asg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px}
+.asg-card{border:1px solid var(--line);border-radius:var(--r-md);padding:14px;background:var(--card);cursor:pointer;transition:.14s}
+.asg-card:hover{border-color:var(--red);box-shadow:var(--sh-2)}
+.asg-card.off{opacity:.55}
+.asg-card-h{display:flex;align-items:center;gap:10px}
+.asg-card-h b{font-family:var(--f-display);font-size:14.5px}
+.asg-dot{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:#fff;font-family:var(--f-display);font-weight:800;flex-shrink:0}
+.asg-card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:11px}
+.asg-switch{position:relative;width:38px;height:21px;flex-shrink:0;cursor:pointer}
+.asg-switch input{opacity:0;width:0;height:0;position:absolute}
+.asg-switch span{position:absolute;inset:0;background:var(--line);border-radius:99px;transition:.18s}
+.asg-switch span::after{content:"";position:absolute;width:15px;height:15px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s}
+.asg-switch input:checked + span{background:var(--ok)}
+.asg-switch input:checked + span::after{transform:translateX(17px)}
+.asg-sec{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 15px;background:var(--surface)}
+.asg-sec-t{font-family:var(--f-display);font-weight:800;font-size:13.5px;margin-bottom:11px}
+.asg-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.asg-grid2{grid-template-columns:1fr}}
+.asg-logo{width:54px;height:54px;border-radius:11px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);display:grid;place-items:center;cursor:pointer;flex-shrink:0;overflow:hidden;color:#fff;font-size:11px;text-align:center;line-height:1.2}
+.asg-logo img{width:100%;height:100%;object-fit:contain}
+.asg-row{display:flex;gap:7px;align-items:center;margin-bottom:7px}
+.asg-row .o-sel{padding:6px 9px;font-size:12.5px}
+.asg-del{flex-shrink:0;width:28px;height:28px;border:1px solid var(--line);background:var(--card);border-radius:6px;color:var(--danger);cursor:pointer;font-size:12px}
+.asg-del:hover{background:var(--danger-soft);border-color:var(--danger)}
+/* ficha en modo VISTA: los inputs se leen como texto plano */
+.asg-view input,.asg-view select,.asg-view textarea{border-color:transparent!important;background:transparent!important;padding-left:0!important;color:var(--ink);-webkit-appearance:none;appearance:none;opacity:1!important;-webkit-text-fill-color:var(--ink)}
+.asg-view select{background-image:none}
+.asg-view .o-sel{cursor:default}
+.asg-link{flex-shrink:0;color:var(--info);font-weight:700;font-size:13px;text-decoration:none;padding:6px 8px;border:1px solid var(--line);border-radius:6px;white-space:nowrap}
+.asg-link:hover{border-color:var(--info);background:rgba(31,58,95,.06)}
 .cfg-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .cfg-rolecard,.cfg-paiscard,.cfg-addon,.cfg-plan{border:1px solid var(--line);border-radius:var(--r-md);padding:13px 14px;background:var(--card)}
 .cfg-rolecard b{font-family:var(--f-display);font-size:14px}
@@ -385,6 +416,9 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 /* ---------- CICLO: extras (flags, adjuntos, listas, notif) ---------- */
 .kflag{font-size:12px;line-height:1}
 .kcard-meta{min-height:0}
+.kcol-body{align-content:start}
+.kcard-foot{margin-top:auto}
+.ciclo-create-body{overflow-y:auto;flex:1;min-height:0}
 .sg-drop{border:2px dashed var(--line);border-radius:var(--r-sm);padding:16px;text-align:center;cursor:pointer;color:var(--ink-3);font-size:13px;transition:.15s}
 .sg-drop:hover,.sg-drop.over{border-color:var(--red);background:var(--red-soft);color:var(--red)}
 .sg-files{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}

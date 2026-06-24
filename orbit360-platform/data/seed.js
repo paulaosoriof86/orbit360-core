@@ -32,13 +32,48 @@ Orbit.SEED = (function () {
   // comisiones = % que la aseguradora paga al intermediario, por RAMO.
   // comisionesProd = override por PRODUCTO (lo llena la planilla importada).
   function tarifaRamos(ramos, lo, hi) { const o = {}; ramos.forEach(r => { o[r] = lo + Math.floor(rnd() * (hi - lo + 1)); }); return o; }
+  // helpers de ficha de aseguradora (datos ficticios genéricos)
+  function asgExtra(nombre, pais, nit) {
+    const slug = nombre.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
+    return {
+      vinculada: true,
+      nit: nit || (pais === 'GT' ? (between(1000000, 9999999) + '-' + between(0, 9)) : (between(800, 901) + '.' + between(100, 999) + '.' + between(100, 999) + '-' + between(0, 9))),
+      facturacion: { razonSocial: nombre + (pais === 'GT' ? ', S.A.' : ' S.A.S.'), patronConcepto: 'Comisiones de intermediación — póliza {NUMERO} — {RAMO}', dirFiscal: (pais === 'GT' ? 'Ciudad de Guatemala' : 'Bogotá D.C.') },
+      portal: 'https://portal.' + slug + '.com',
+      drive: 'https://drive.google.com/' + slug,
+      cuentas: [
+        { banco: pais === 'GT' ? 'Banco Industrial' : 'Bancolombia', tipo: 'Monetaria', numero: '****' + between(1000, 9999), moneda: pais === 'GT' ? 'GTQ' : 'COP' }
+      ],
+      contactos: [
+        { nombre: 'Ejecutivo Comercial', tipo: 'Comercial / Técnico', email: 'comercial@' + slug + '.com', tel: (pais === 'GT' ? '+502 ' : '+57 ') + between(3000, 3999) + between(1000, 9999) },
+        { nombre: 'Mesa Administrativa', tipo: 'Administrativo', email: 'admin@' + slug + '.com', tel: (pais === 'GT' ? '+502 ' : '+57 ') + between(2000, 2999) + between(1000, 9999) },
+        { nombre: 'Atención de Siniestros', tipo: 'Siniestros', email: 'siniestros@' + slug + '.com', tel: (pais === 'GT' ? '+502 ' : '+57 ') + between(1500, 1999) + between(1000, 9999) }
+      ],
+      docs: [
+        { nombre: 'Tarifario vigente.pdf', cat: 'Tarifas' },
+        { nombre: 'Formulario de emisión Auto.pdf', cat: 'Formularios' },
+        { nombre: 'Brochure comercial.pdf', cat: 'Comercial' }
+      ],
+      docsRequeridos: [
+        { producto: 'Auto', items: 'DPI/cédula, tarjeta de circulación, fotos del vehículo, formulario firmado' },
+        { producto: 'Vida', items: 'DPI/cédula, declaración de salud, beneficiarios' }
+      ]
+    };
+  }
   const aseguradoras = [
-    { id: 'asg01', nombre: 'Seguros Atlas', color: '#C5162E', pais: 'GT', ramos: ['Auto', 'Vida', 'Gastos Médicos', 'Hogar'], comisionDefault: 12, comisiones: { 'Auto': 12, 'Vida': 22, 'Gastos Médicos': 15, 'Hogar': 18 }, comisionesProd: {} },
-    { id: 'asg02', nombre: 'Aseguradora Cumbre', color: '#1f3a5f', pais: 'GT', ramos: ['Auto', 'Daños', 'Fianzas', 'Transporte'], comisionDefault: 12, comisiones: { 'Auto': 11, 'Daños': 16, 'Fianzas': 20, 'Transporte': 14 }, comisionesProd: {} },
-    { id: 'asg03', nombre: 'MundoSeguro', color: '#1f8a4c', pais: 'CO', ramos: ['Vida', 'Gastos Médicos', 'Accidentes'], comisionDefault: 14, comisiones: { 'Vida': 25, 'Gastos Médicos': 16, 'Accidentes': 20 }, comisionesProd: {} },
-    { id: 'asg04', nombre: 'Pacífico Seguros', color: '#c9821b', pais: 'CO', ramos: ['Auto', 'Hogar', 'RC', 'Transporte'], comisionDefault: 13, comisiones: { 'Auto': 13, 'Hogar': 18, 'RC': 17, 'Transporte': 15 }, comisionesProd: {} },
-    { id: 'asg05', nombre: 'Andes Seguros', color: '#6b4ea0', pais: 'CO', ramos: ['Vida', 'Daños', 'Fianzas'], comisionDefault: 15, comisiones: { 'Vida': 24, 'Daños': 17, 'Fianzas': 21 }, comisionesProd: {} },
-    { id: 'asg06', nombre: 'Vértice Seguros', color: '#0f766e', pais: 'GT', ramos: ['Auto', 'Gastos Médicos', 'Hogar', 'RC'], comisionDefault: 12, comisiones: { 'Auto': 12, 'Gastos Médicos': 15, 'Hogar': 17, 'RC': 16 }, comisionesProd: {} }
+    Object.assign({ id: 'asg01', nombre: 'Seguros Atlas', color: '#C5162E', pais: 'GT', ramos: ['Auto', 'Vida', 'Gastos Médicos', 'Hogar'], comisionDefault: 12, comisiones: { 'Auto': 12, 'Vida': 22, 'Gastos Médicos': 15, 'Hogar': 18 }, comisionesProd: {} }, asgExtra('Seguros Atlas', 'GT')),
+    Object.assign({ id: 'asg02', nombre: 'Aseguradora Cumbre', color: '#1f3a5f', pais: 'GT', ramos: ['Auto', 'Daños', 'Fianzas', 'Transporte'], comisionDefault: 12, comisiones: { 'Auto': 11, 'Daños': 16, 'Fianzas': 20, 'Transporte': 14 }, comisionesProd: {} }, asgExtra('Aseguradora Cumbre', 'GT')),
+    Object.assign({ id: 'asg03', nombre: 'MundoSeguro', color: '#1f8a4c', pais: 'CO', ramos: ['Vida', 'Gastos Médicos', 'Accidentes'], comisionDefault: 14, comisiones: { 'Vida': 25, 'Gastos Médicos': 16, 'Accidentes': 20 }, comisionesProd: {} }, asgExtra('MundoSeguro', 'CO')),
+    Object.assign({ id: 'asg04', nombre: 'Pacífico Seguros', color: '#c9821b', pais: 'CO', ramos: ['Auto', 'Hogar', 'RC', 'Transporte'], comisionDefault: 13, comisiones: { 'Auto': 13, 'Hogar': 18, 'RC': 17, 'Transporte': 15 }, comisionesProd: {} }, asgExtra('Pacífico Seguros', 'CO')),
+    Object.assign({ id: 'asg05', nombre: 'Andes Seguros', color: '#6b4ea0', pais: 'CO', ramos: ['Vida', 'Daños', 'Fianzas'], comisionDefault: 15, comisiones: { 'Vida': 24, 'Daños': 17, 'Fianzas': 21 }, comisionesProd: {} }, asgExtra('Andes Seguros', 'CO')),
+    Object.assign({ id: 'asg06', nombre: 'Vértice Seguros', color: '#0f766e', pais: 'GT', ramos: ['Auto', 'Gastos Médicos', 'Hogar', 'RC'], comisionDefault: 12, comisiones: { 'Auto': 12, 'Gastos Médicos': 15, 'Hogar': 17, 'RC': 16 }, comisionesProd: {} }, asgExtra('Vértice Seguros', 'GT')),
+    // directorio adicional autorizado (deshabilitadas por defecto — sin vinculación aún)
+    Object.assign({ id: 'asg07', nombre: 'El Roble', color: '#15803d', pais: 'GT', ramos: ['Auto', 'Vida', 'Daños'], comisionDefault: 12, comisiones: {}, comisionesProd: {} }, asgExtra('El Roble', 'GT'), { vinculada: false }),
+    Object.assign({ id: 'asg08', nombre: 'G&T Seguros', color: '#1d4ed8', pais: 'GT', ramos: ['Auto', 'Gastos Médicos', 'Fianzas'], comisionDefault: 12, comisiones: {}, comisionesProd: {} }, asgExtra('G&T Seguros', 'GT'), { vinculada: false }),
+    Object.assign({ id: 'asg09', nombre: 'Mapfre', color: '#b91c1c', pais: 'GT', ramos: ['Auto', 'Hogar', 'Transporte'], comisionDefault: 12, comisiones: {}, comisionesProd: {} }, asgExtra('Mapfre', 'GT'), { vinculada: false }),
+    Object.assign({ id: 'asg10', nombre: 'Sura', color: '#0369a1', pais: 'CO', ramos: ['Auto', 'Vida', 'Salud', 'Daños'], comisionDefault: 14, comisiones: {}, comisionesProd: {} }, asgExtra('Sura', 'CO'), { vinculada: false }),
+    Object.assign({ id: 'asg11', nombre: 'Bolívar', color: '#15803d', pais: 'CO', ramos: ['Vida', 'Hogar', 'Cumplimiento'], comisionDefault: 14, comisiones: {}, comisionesProd: {} }, asgExtra('Bolívar', 'CO'), { vinculada: false }),
+    Object.assign({ id: 'asg12', nombre: 'Allianz', color: '#1e3a8a', pais: 'CO', ramos: ['Auto', 'RC', 'Transporte'], comisionDefault: 13, comisiones: {}, comisionesProd: {} }, asgExtra('Allianz', 'CO'), { vinculada: false })
   ];
 
   // ---- Catálogos ----
@@ -501,7 +536,7 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 15,
+    __v: 16,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos
   };

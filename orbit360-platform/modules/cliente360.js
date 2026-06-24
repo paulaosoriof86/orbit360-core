@@ -186,6 +186,7 @@ Orbit.modules.cliente360 = (function () {
             </div>
             <div style="display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap">
               <a class="btn ghost sm" title="Enviar WhatsApp" href="https://wa.me/${waNum}?text=${waMsg}" target="_blank" rel="noopener" style="color:#1f8a4c">💬 WA</a>
+              <button class="btn ghost sm" title="Redactar correo (se asocia al cliente)" onclick="window.__orbitCompose={para:'${U.esc(c.email || '')}',asunto:'',cuerpo:'',clienteId:'${cid}',vinculo:{tipo:'cliente',id:'${cid}',label:'${U.esc(c.nombre)}'}};location.hash='#/correo'" style="color:#2563a8">✉ Correo</button>
               <button class="btn ghost sm" title="Solicitar gestión operativa (Ops)" onclick="Orbit.ciclo.solicitarGestion('${cid}')">🗂 Gestión</button>
               <button class="btn ghost sm" title="Solicitud del cliente (Portal)" onclick="Orbit.ciclo.solicitarGestion('${cid}',null,true)">🙋 Cliente</button>
               <button class="btn primary sm" onclick="Orbit.modules.cliente360.edit('${cid}')">Editar</button>
@@ -867,6 +868,7 @@ Orbit.modules.cliente360 = (function () {
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card)">
         <button class="btn ghost" onclick="Orbit.modules.cliente360.editarPoliza('${polId}')">✏ Editar</button>
+        <button class="btn ghost" onclick="Orbit.modules.cliente360.correoPoliza('${polId}')">✉ Correo</button>
         <button class="btn ghost" onclick="Orbit.ciclo.solicitarGestion('${cid}','${polId}')">🗂 Solicitar gestión</button>
         <button class="btn ghost" onclick="Orbit.modules.cliente360.comparativo('${polId}')">⚖ Comparar renovación</button>
         ${p.renovable ? `<button class="btn primary" onclick="Orbit.modules.cliente360.renovar('${polId}')">🔄 Renovar</button>` : ''}
@@ -1109,5 +1111,16 @@ Orbit.modules.cliente360 = (function () {
     back.querySelector('#vh-x').addEventListener('click', close);
   }
 
-  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); } };
+  function correoPoliza(polId) {
+    const p = S().get('polizas', polId); if (!p) return;
+    const cli = S().get('clientes', p.clienteId) || {};
+    window.__orbitCompose = {
+      para: '', asunto: 'Gestión póliza ' + p.numero + ' · ' + (cli.nombre || ''),
+      cuerpo: '', clienteId: p.clienteId, poliza: p.numero,
+      vinculo: { tipo: 'poliza', id: polId, label: p.numero }
+    };
+    location.hash = '#/correo';
+  }
+
+  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); } };
 })();
