@@ -153,7 +153,19 @@ Orbit.modules.aseguradoras = (function () {
     // logo
     $('#af-logo').addEventListener('change', e => { const file = e.target.files[0]; if (!file) return; const rd = new FileReader(); rd.onload = () => { up(id, { logo: rd.result }); ficha(id); reload(); }; rd.readAsDataURL(file); });
     // add-rows (persisten y reabren la ficha)
-    const push = (key, obj) => { const arr = (S().get('aseguradoras', id)[key] || []).slice(); arr.push(obj); up(id, { [key]: arr }); ficha(id, true); };
+    // snapshot: guarda lo escrito en el formulario ANTES de re-renderizar (evita perder filas no guardadas)
+    function snapshot() {
+      const g = s => (back.querySelector(s) || {}).value || '';
+      const portalesNew = [...back.querySelectorAll('[data-portal]')].map(row => ({ nombre: row.querySelector('[data-pn]').value, url: row.querySelector('[data-pu]').value, usuario: row.querySelector('[data-pus]').value, pass: row.querySelector('[data-pp]').value }));
+      const contNew = [...back.querySelectorAll('[data-cont]')].map(row => ({ tipo: row.querySelector('[data-ct]').value, nombre: row.querySelector('[data-cn]').value, email: row.querySelector('[data-ce]').value, tel: row.querySelector('[data-cl]').value }));
+      const ctaNew = [...back.querySelectorAll('[data-cta]')].map(row => ({ banco: row.querySelector('[data-cb]').value, tipo: row.querySelector('[data-ctt]').value, numero: row.querySelector('[data-ccn]').value, moneda: row.querySelector('[data-cm]').value }));
+      const docNew = [...back.querySelectorAll('[data-doc]')].map(row => ({ nombre: row.querySelector('[data-dn]').value, cat: row.querySelector('[data-dc]').value }));
+      const reqNew = [...back.querySelectorAll('[data-req]')].map(row => ({ producto: row.querySelector('[data-rp]').value, items: row.querySelector('[data-ri]').value }));
+      const comNew = Object.assign({}, S().get('aseguradoras', id).comisiones);
+      back.querySelectorAll('[data-ramopct]').forEach(inp => { comNew[inp.dataset.ramopct] = +inp.value || 0; });
+      up(id, { nombre: g('#af-nombre') || a.nombre, drive: g('#af-drive'), nit: g('#af-nit'), facturacion: { razonSocial: g('#af-rs'), patronConcepto: g('#af-patron'), dirFiscal: g('#af-dir') }, portales: portalesNew, contactos: contNew, cuentas: ctaNew, docs: docNew, docsRequeridos: reqNew, comisiones: comNew });
+    }
+    const push = (key, obj) => { snapshot(); const arr = (S().get('aseguradoras', id)[key] || []).slice(); arr.push(obj); up(id, { [key]: arr }); ficha(id, true); };
     $('#af-add-portal').addEventListener('click', () => push('portales', { nombre: 'Portal', url: '', usuario: '', pass: '' }));
     $('#af-add-cont').addEventListener('click', () => push('contactos', { tipo: 'Comercial / Técnico', nombre: '', email: '', tel: '' }));
     $('#af-add-cta').addEventListener('click', () => push('cuentas', { banco: '', tipo: 'Monetaria', numero: '', moneda: a.pais === 'GT' ? 'GTQ' : 'COP' }));

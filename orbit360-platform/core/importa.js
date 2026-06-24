@@ -24,7 +24,8 @@ Orbit.importa = (function () {
     'estados-banco': { icon: '🏦', title: 'Importar estado de cuenta bancario', desc: 'Lee el estado bancario en cualquier formato (PDF, Excel, CSV) para conciliar finanzas: cruza depósitos con recaudo y egresos con liquidaciones.', cols: ['Fecha', 'Descripción', 'Monto', 'Conciliación'], sample: [['2026-05-31', 'Depósito Atlas', 'Q 12,400', '✓ liquidación'], ['2026-05-15', 'Transf. cliente', 'Q 700', '✓ REC-00451'], ['2026-05-12', 'Comisión NETxxx', 'Q 4,210', '◷ sin asociar']], detect: { noCreados: [['MOV-5521', 'Depósito sin movimiento en Orbit', 'Crear movimiento', 'Q 1,900']], noAplicados: [['Transf. 0455', 'Depósito de cliente no aplicado', 'Aplicar a recibo', 'Q 700']] } },
     'calendario-marketing': { icon: '📣', title: 'Importar calendarización de contenidos', desc: 'Carga el calendario; se muestra como mes con cada día y sus piezas.', cols: ['Fecha', 'Contenido', 'Pieza', 'Canal'], sample: [['2026-06-03', 'Tip de renovación', 'Reel', 'Instagram'], ['2026-06-10', 'Beneficio Vida', 'Carrusel', 'Facebook'], ['2026-06-18', 'Caso de éxito', 'Post', 'LinkedIn']] },
     'facturas': { icon: '🧾', title: 'Importar facturas', desc: 'Adjunta facturas al expediente; se extraen número, fecha, monto y se vinculan a la póliza.', cols: ['Factura', 'Fecha', 'Monto', 'Póliza'], sample: [['FAC-2041', '2026-05-12', 'Q 8,400', 'GT-AT-48210'], ['FAC-2042', '2026-05-30', 'Q 700', 'GT-AT-48210']] },
-    'documentos': { icon: '📎', title: 'Importar documentos', desc: 'Carga uno o varios documentos (DPI, RTU, patente, recibo de servicios, pólizas en PDF). El motor extrae datos y completa la ficha.', cols: ['Documento', 'Tipo detectado', 'Dato extraído'], sample: [['dpi_frente.jpg', 'DPI', 'Dirección, fecha nac.'], ['rtu_2026.pdf', 'RTU', 'Razón social, NIT'], ['poliza_auto.pdf', 'Póliza', 'Vehículo, vigencia']] }
+    'documentos': { icon: '📎', title: 'Importar documentos', desc: 'Carga uno o varios documentos (DPI, RTU, patente, recibo de servicios, pólizas en PDF). El motor extrae datos y completa la ficha.', cols: ['Documento', 'Tipo detectado', 'Dato extraído'], sample: [['dpi_frente.jpg', 'DPI', 'Dirección, fecha nac.'], ['rtu_2026.pdf', 'RTU', 'Razón social, NIT'], ['poliza_auto.pdf', 'Póliza', 'Vehículo, vigencia']] },
+    'docs-aseguradora': { icon: '🏢', title: 'Importar documentos de aseguradora', desc: 'Carga tarifas, formularios, cotizaciones y pólizas de ejemplo. En modo inteligente, alimenta el Cotizador, el Comparativo y la IA; en modo documental, solo se almacenan para consulta.', cols: ['Documento', 'Categoría detectada', 'Uso'], sample: [['tarifario_2026.pdf', 'Tarifas', 'Cotizador / Comparativo'], ['formulario_auto.pdf', 'Formularios', 'Requisitos de emisión'], ['cotizacion_ejemplo.pdf', 'Cotización ejemplo', 'Entrenar IA']] }
   };
 
   let state = null;
@@ -68,7 +69,7 @@ Orbit.importa = (function () {
   function open(kind, opts) {
     ensureDom();
     const meta = KINDS[kind] || KINDS['clientes'];
-    state = { kind, meta, step: 1, opts: opts || {}, multi: opts && opts.multi, scope: opts && opts.scope };
+    state = { kind, meta, step: 1, opts: opts || {}, multi: opts && opts.multi, scope: opts && opts.scope, modo: (opts && opts.modo) || 'inteligente', files: [] };
     document.getElementById('imp-back').classList.add('open');
     document.getElementById('imp-drawer').classList.add('open');
     paint();
@@ -95,13 +96,18 @@ Orbit.importa = (function () {
 
   function step1(m) {
     return `<p class="imp-desc">${U.esc(m.desc)}</p>
+      <div class="imp-mode" id="imp-mode">
+        <button class="imp-mode-b ${state.modo !== 'documental' ? 'on' : ''}" data-modo="inteligente">✨ Inteligente<small>extrae y mapea a los módulos</small></button>
+        <button class="imp-mode-b ${state.modo === 'documental' ? 'on' : ''}" data-modo="documental">📁 Documental<small>solo almacena para consulta</small></button>
+      </div>
       <div class="imp-drop" id="imp-drop">
         <div style="font-size:40px">⬆️</div>
         <div style="font-weight:700;font-family:var(--f-display);font-size:16px;margin-top:6px">Arrastra ${state.multi ? 'tus archivos' : 'tu archivo'} aquí</div>
         <div class="muted" style="font-size:13px;margin-top:4px">Acepta <b>cualquier formato</b>${state.multi ? ' y <b>varios a la vez</b>' : ''}: PDF, Excel, CSV, imagen o planilla.</div>
-        <button class="btn ghost sm" style="margin-top:14px">Seleccionar archivo${state.multi ? 's' : ''}</button>
+        <label class="btn ghost sm" style="margin-top:14px;cursor:pointer">Seleccionar archivo${state.multi ? 's' : ''}<input type="file" id="imp-file" ${state.multi ? 'multiple' : ''} style="display:none"></label>
+        <div id="imp-files" class="imp-files"></div>
       </div>
-      <div class="imp-note">🧠 La extracción inteligente reconoce el formato automáticamente y mapea los campos a Orbit 360. Adaptable a la estructura de cada aseguradora.</div>`;
+      <div class="imp-note">${state.modo === 'documental' ? '📁 Modo documental: los archivos se <b>almacenan y quedan visibles</b> en el expediente/ficha, sin extraer datos.' : '🧠 Modo inteligente: reconoce el formato, <b>extrae los datos y los mapea</b> a Orbit 360 (cruza y complementa sin duplicar).'}</div>`;
   }
   function step2(m) {
     const scopeNote = state.scope ? `<div class="imp-note" style="margin-top:0;margin-bottom:12px">🔗 Se vinculará a <b>${U.esc(state.scope.nombre)}</b>.</div>` : '';
@@ -167,15 +173,23 @@ Orbit.importa = (function () {
           <button class="btn ghost" id="imp-again">Importar otro</button>
           <button class="btn primary" id="imp-finish">Finalizar</button>
         </div>
-        <div class="muted" style="font-size:12px;margin-top:14px">Demo: el motor de extracción real se conecta en producción.</div>
+        <div class="muted" style="font-size:12px;margin-top:14px">${state.modo === 'documental' ? 'Los archivos quedan almacenados y visibles en el expediente/ficha.' : 'En producción se conecta el extractor real (IA) para mapear automáticamente.'}</div>
       </div>`;
   }
   function wire() {
     const dr = document.getElementById('imp-drawer');
     const drop = dr.querySelector('#imp-drop');
+    dr.querySelectorAll('.imp-mode-b').forEach(b => b.addEventListener('click', () => { state.modo = b.dataset.modo; paint(); }));
+    const fileInput = dr.querySelector('#imp-file');
+    if (fileInput) fileInput.addEventListener('change', e => {
+      state.files = [...e.target.files].map(f => f.name);
+      const fl = dr.querySelector('#imp-files');
+      if (fl) fl.innerHTML = state.files.map(n => `<span class="mail-chip">📎 ${U.esc(n)}</span>`).join('');
+      if (state.files.length) setTimeout(() => { state.step = state.modo === 'documental' ? 3 : 2; paint(); }, 400);
+    });
     if (drop) {
-      const adv = () => { state.step = 2; paint(); };
-      drop.addEventListener('click', adv);
+      const adv = () => { state.step = state.modo === 'documental' ? 3 : 2; paint(); };
+      drop.addEventListener('click', e => { if (e.target.closest('label')) return; adv(); });
       drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
       drop.addEventListener('dragleave', () => drop.classList.remove('over'));
       drop.addEventListener('drop', e => { e.preventDefault(); adv(); });

@@ -197,6 +197,11 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
 .asg-view .o-sel{cursor:default}
 .asg-link{flex-shrink:0;color:var(--info);font-weight:700;font-size:13px;text-decoration:none;padding:6px 8px;border:1px solid var(--line);border-radius:6px;white-space:nowrap}
 .asg-link:hover{border-color:var(--info);background:rgba(31,58,95,.06)}
+.imp-mode{display:flex;gap:9px;margin-bottom:14px}
+.imp-mode-b{flex:1;display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);background:var(--card);border-radius:var(--r-md);padding:11px 13px;cursor:pointer;font-family:var(--f-display);font-weight:700;font-size:13.5px;color:var(--ink-2);text-align:left}
+.imp-mode-b small{font-weight:400;font-size:11px;color:var(--ink-3)}
+.imp-mode-b.on{border-color:var(--red);background:var(--red-soft);color:var(--red)}
+.imp-files{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px;justify-content:center}
 .cfg-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .cfg-rolecard,.cfg-paiscard,.cfg-addon,.cfg-plan{border:1px solid var(--line);border-radius:var(--r-md);padding:13px 14px;background:var(--card)}
 .cfg-rolecard b{font-family:var(--f-display);font-size:14px}

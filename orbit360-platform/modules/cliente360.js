@@ -707,13 +707,16 @@ Orbit.modules.cliente360 = (function () {
         <button class="imp-x" id="rn-x">✕</button>
       </div>
       <div style="padding:18px 20px;display:grid;gap:11px">
-        <div class="cfg-note">A veces el cliente renueva con nosotros pero <b>con otra aseguradora</b>. Podés ajustar los datos de la nueva póliza.</div>
+        <div class="cfg-note">A veces el cliente renueva con nosotros pero <b>con otra aseguradora</b>. Ajustá los datos; se <b>regeneran los recibos</b> según la forma de pago.</div>
         <label class="ce-l">N.º de póliza (nuevo)<input id="rn-num" class="o-sel" value="${U.esc(p.numero)}"></label>
         <label class="ce-l">Aseguradora<select id="rn-asg" class="o-sel">${asgs.map(a => `<option value="${a.id}" ${a.id === p.aseguradoraId ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select></label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
-          <label class="ce-l">Prima<input id="rn-prima" class="o-sel" type="number" value="${p.prima}"></label>
+          <label class="ce-l">Prima neta<input id="rn-prima" class="o-sel" type="number" value="${p.primaNeta || p.prima}"></label>
           <label class="ce-l">Producto<input id="rn-prod" class="o-sel" value="${U.esc(p.producto)}"></label>
+          <label class="ce-l">Forma de pago<select id="rn-frec" class="o-sel">${Object.keys(Orbit.primas.FRECUENCIAS).map(f => `<option ${f === p.frecuencia ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
+          <label class="ce-l">Medio<select id="rn-forma" class="o-sel">${Orbit.primas.FORMAS_PAGO.map(f => `<option ${f === p.formaPago ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
         </div>
+        <div class="cfg-note" id="rn-prev" style="background:var(--surface)"></div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
         <button class="btn ghost" id="rn-cancel">Cancelar</button>
@@ -722,19 +725,38 @@ Orbit.modules.cliente360 = (function () {
     </div>`;
     document.body.appendChild(back);
     const cid = p.clienteId, close = () => back.remove();
+    const $ = s => back.querySelector(s);
+    const cli = S().get('clientes', cid) || {}, pais = cli.pais || 'GT';
+    function preview() {
+      const neta = +$('#rn-prima').value || 0, frec = $('#rn-frec').value;
+      const frac = Orbit.primas.cuotasDe(frec) > 1;
+      const d = Orbit.primas.desglose(neta, pais, { fraccionado: frac });
+      back._d = d; back._frec = frec;
+      $('#rn-prev').innerHTML = `Prima total <b>${U.money(d.total, p.moneda)}</b> · ${Orbit.primas.cuotasDe(frec)} recibo(s) de <b>${U.money(d.total / Orbit.primas.cuotasDe(frec), p.moneda)}</b>${frac ? ' (incluye recargo)' : ''}`;
+    }
+    ['#rn-prima', '#rn-frec'].forEach(s => $(s).addEventListener('input', preview)); preview();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#rn-x').addEventListener('click', close);
     back.querySelector('#rn-cancel').addEventListener('click', close);
     back.querySelector('#rn-ok').addEventListener('click', () => {
       const fin = new Date('2026-06-20'); fin.setFullYear(fin.getFullYear() + 1);
+      const d = back._d, frec = back._frec;
       S().update('polizas', polId, {
-        numero: document.getElementById('rn-num').value || p.numero,
-        aseguradoraId: document.getElementById('rn-asg').value,
-        prima: +document.getElementById('rn-prima').value || p.prima,
-        producto: document.getElementById('rn-prod').value || p.producto,
-        estado: 'Vigente', vigenciaInicio: '2026-06-20', vigenciaFin: fin.toISOString().slice(0, 10)
+        numero: $('#rn-num').value || p.numero, aseguradoraId: $('#rn-asg').value,
+        primaNeta: d.neta, gastosEmision: d.gastosEmision, gastosFinan: d.gastosFinan, otros: d.otros,
+        ivaPct: d.ivaPct, ivaMonto: d.iva, recargoFinPct: d.recargoPct, baseGravable: d.baseGravable,
+        prima: d.total, primaTotal: d.total, producto: $('#rn-prod').value || p.producto,
+        frecuencia: frec, forma: frec, formaPago: $('#rn-forma').value,
+        estado: 'Vigente', vigenciaInicio: '2026-06-20', vigenciaFin: fin.toISOString().slice(0, 10),
+        contadorRenovaciones: (p.contadorRenovaciones || 0) + 1,
+        historial: (p.historial || []).concat([{ icon: '🔄', fecha: '2026-06-20', t: 'Renovación', d: 'Recibos regenerados (' + frec + ')' }])
       });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: p.asesorId, tipo: 'sistema', icon: '🔄', fecha: '2026-06-20', titulo: 'Póliza renovada', detalle: 'Renovación de ' + p.numero + ' procesada.' });
+      // regenerar recibos
+      S().where('cobros', c => c.polizaId === polId && c.estado !== 'Pagado').forEach(c => S().remove('cobros', c.id));
+      Orbit.primas.recibos(d, { frecuencia: frec, vigenciaInicio: '2026-06-20', comAseguradoraPct: p.comAseguradoraPct, comVendedorPct: p.comVendedorPct }).forEach((rec, i) => {
+        S().insert('cobros', { id: 'cob' + Date.now() + i, polizaId: polId, clienteId: cid, asesorId: p.asesorId, cuota: rec.n, monto: rec.total, moneda: p.moneda, neta: rec.neta, gastosEmision: rec.gastosEmision, gastosFinan: rec.gastosFinan, otros: rec.otros, iva: rec.iva, comAseguradora: rec.comAseguradora, comVendedor: rec.comVendedor, vence: rec.vence, fechaLimite: rec.fechaLimite, fechaPago: null, estado: 'Pendiente', metodo: null, conducto: p.conducto, conciliado: false });
+      });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: p.asesorId, tipo: 'sistema', icon: '🔄', fecha: '2026-06-20', titulo: 'Póliza renovada', detalle: 'Renovación de ' + p.numero + ' · recibos regenerados.' });
       close(); tab = 'renovaciones'; detalle(cid);
     });
   }

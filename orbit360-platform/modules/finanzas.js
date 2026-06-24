@@ -103,7 +103,7 @@ Orbit.modules.finanzas = (function () {
       <div style="padding:18px 20px;display:grid;gap:12px">
         <div class="cgrid">
           <label class="ce-l">Concepto<input id="fm-concepto" class="o-sel" value="${m ? U.esc(m.concepto) : ''}"></label>
-          <label class="ce-l">Clasificación<select id="fm-clase" class="o-sel">${clases.map(c => `<option ${m && m.clase === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+          <label class="ce-l">Clasificación<select id="fm-clase" class="o-sel">${clases.map(c => `<option ${m && m.clase === c ? 'selected' : ''}>${c}</option>`).join('')}<option value="__otro" ${m && clases.indexOf(m.clase) < 0 ? 'selected' : ''}>➕ Otro…</option></select><input id="fm-clase-otro" class="o-sel" placeholder="Nueva clasificación" style="margin-top:6px;display:${m && clases.indexOf(m.clase) < 0 ? '' : 'none'}" value="${m && clases.indexOf(m.clase) < 0 ? U.esc(m.clase) : ''}"></label>
           <label class="ce-l">${tipo === 'ingreso' ? 'Pagador' : 'Beneficiario'}<input id="fm-quien" class="o-sel" value="${m ? U.esc(m.pagador || m.beneficiario || '') : ''}"></label>
           <label class="ce-l">Día<input id="fm-dia" class="o-sel" type="number" min="1" max="31" value="${m ? m.dia : new Date().getDate()}"></label>
           <label class="ce-l">Valor (${cur})<input id="fm-valor" class="o-sel" type="number" value="${m ? m.valor : 0}"></label>
@@ -121,9 +121,10 @@ Orbit.modules.finanzas = (function () {
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#fm-x').addEventListener('click', close); $('#fm-cancel').addEventListener('click', close);
     if ($('#fm-del')) $('#fm-del').addEventListener('click', () => { S().remove('finmovs', id); close(); render(document.getElementById('host')); });
+    $('#fm-clase').addEventListener('change', () => { $('#fm-clase-otro').style.display = $('#fm-clase').value === '__otro' ? '' : 'none'; });
     $('#fm-ok').addEventListener('click', () => {
       const data = {
-        tipo, clase: $('#fm-clase').value, concepto: $('#fm-concepto').value || $('#fm-clase').value,
+        tipo, clase: $('#fm-clase').value === '__otro' ? ($('#fm-clase-otro').value || 'Otro') : $('#fm-clase').value, concepto: $('#fm-concepto').value || $('#fm-clase').value,
         valor: +$('#fm-valor').value || 0, dia: +$('#fm-dia').value || 1, estado: $('#fm-estado').value,
         obs: $('#fm-obs').value, periodo: m ? m.periodo : mesSel, pais: m ? m.pais : (paisFin() || 'GT'), moneda: m ? m.moneda : cur
       };
@@ -416,7 +417,7 @@ Orbit.modules.finanzas = (function () {
         <td class="num" style="color:var(--red)"><b>${U.money(r.devengada, 'GTQ')}</b></td>
         <td class="num" style="color:var(--ok)">${U.money(r.liquidada, 'GTQ')}</td>
         <td class="num">${U.money(r.devengada + r.liquidada, 'GTQ')}</td>
-        <td style="text-align:right"><button class="btn ghost sm" onclick="Orbit.importa.open('planillas-comision')">Conciliar planilla</button></td>
+        <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('aseguradoraId','${r.asg ? r.asg.id : ''}')">Ver detalle</button><button class="btn ghost sm" onclick="Orbit.importa.open('planillas-comision')">Conciliar planilla</button></td>
       </tr>`).join('')}</tbody>
     </table></div></div>`;
   }
@@ -445,7 +446,7 @@ Orbit.modules.finanzas = (function () {
         <td class="num"><b>${U.money(r.aPagar, 'GTQ')}</b></td>
         <td class="num" style="color:var(--ok)">${U.money(r.liquidada, 'GTQ')}</td>
         <td class="num" style="color:${r.pendiente > 0 ? 'var(--warn)' : 'var(--ok)'}">${U.money(r.pendiente, 'GTQ')}</td>
-        ${esAsesor ? '' : `<td style="text-align:right"><button class="btn primary sm" onclick="Orbit.modules.finanzas.lote('${r.a.id}')">Preparar lote</button></td>`}
+        ${esAsesor ? '' : `<td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('asesorId','${r.a.id}')">Detalle</button><button class="btn primary sm" onclick="Orbit.modules.finanzas.lote('${r.a.id}')">Preparar lote</button></td>`}
       </tr>`).join('')}</tbody>
     </table></div></div>
     ${esAsesor ? `<div class="card pad" style="margin-top:14px"><b style="font-family:var(--f-display);font-size:14px">Mis ajustes de producción</b><div class="muted" style="font-size:12.5px;margin-top:6px">Las cancelaciones de tu cartera descuentan prima neta no devengada. Revisa el detalle en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/cancelaciones'">Cancelaciones</a>.</div></div>`
@@ -668,6 +669,46 @@ Orbit.modules.finanzas = (function () {
     });
   }
 
+  /* ---------- DETALLE DE LIQUIDACIÓN (por aseguradora o asesor) ---------- */
+  function detLiq(campo, key) {
+    if (!key) return;
+    const regs = S().all('comisiones').filter(c => c[campo] === key).sort((a, b) => (b.periodo || '').localeCompare(a.periodo || ''));
+    const titulo = campo === 'aseguradoraId' ? (q.aseguradora(key) || {}).nombre : (q.asesor(key) || {}).nombre;
+    const tot = regs.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
+    const liq = regs.filter(c => c.estado === 'Liquidada').reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
+    let back = document.getElementById('fin-detliq'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-detliq'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    back.innerHTML = `<div class="card" style="width:min(740px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
+      <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Detalle de liquidación</div>
+          <b style="font-family:var(--f-display);font-size:18px;color:#fff">${U.esc(titulo || '—')}</b>
+          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${regs.length} registros · ${U.money(tot, 'GTQ')} total · ${U.money(liq, 'GTQ')} liquidado · clic en estado para cambiar</div></div>
+        <button class="imp-x" id="dl-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
+      <div style="overflow:auto;flex:1"><table class="tbl">
+        <thead><tr><th>Periodo</th><th>Cliente</th><th>Póliza</th><th class="num">Base neta</th><th class="num">%</th><th class="num">Comisión</th><th>Estado</th></tr></thead>
+        <tbody>${regs.map(c => { const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId); return `<tr>
+          <td class="mono" style="font-size:11.5px">${c.periodo || '—'}</td>
+          <td style="font-size:12.5px">${cli ? U.esc(cli.nombre) : '—'}</td>
+          <td class="mono" style="font-size:11.5px">${p ? p.numero : '—'}</td>
+          <td class="num">${U.money(c.base, c.moneda)}</td><td class="num">${c.pct}%</td>
+          <td class="num"><b>${U.money(c.monto, c.moneda)}</b></td>
+          <td style="cursor:pointer" onclick="Orbit.modules.finanzas.toggleComEstado('${c.id}','${campo}','${key}')"><span class="badge ${c.estado === 'Liquidada' ? 'ok' : 'warn'}">${c.estado}</span></td></tr>`; }).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody>
+      </table></div>
+      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn primary" id="dl-ok">Cerrar</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#dl-x').addEventListener('click', close);
+    back.querySelector('#dl-ok').addEventListener('click', close);
+  }
+  function toggleComEstado(comId, campo, key) {
+    const c = S().get('comisiones', comId); if (!c) return;
+    S().update('comisiones', comId, { estado: c.estado === 'Liquidada' ? 'Devengada' : 'Liquidada' });
+    detLiq(campo, key);
+  }
+
   function wire(host) {}
-  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, regFinanciacion };
+  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, regFinanciacion, detLiq, toggleComEstado };
 })();
