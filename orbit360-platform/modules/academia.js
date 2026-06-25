@@ -114,21 +114,31 @@ Orbit.modules.academia = (function () {
     back.querySelectorAll('[data-res]').forEach(b => b.addEventListener('click', () => verRecurso(b.dataset.res)));
   }
 
-  /* ---- Visor de recurso (documento legible en la plataforma) ---- */
-  function verRecurso(nombre) {
+  function verRecurso(nombre, iframeSrc) {
     const ext = (nombre.split('.').pop() || '').toLowerCase();
     let back = document.getElementById('ac-res'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'ac-res'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
-    const visor = (ext === 'png' || ext === 'jpg' || ext === 'jpeg' || ext === 'img')
-      ? `<div class="ac-docview" style="display:grid;place-items:center;background:var(--surface)"><div style="text-align:center;color:var(--ink-3)"><div style="font-size:46px">🖼️</div><div style="margin-top:8px">Vista previa de imagen</div></div></div>`
-      : `<div class="ac-docview"><div class="ac-doc-page"><b style="font-family:var(--f-display);font-size:16px">${U.esc(nombre)}</b><p style="margin-top:10px;line-height:1.7;font-size:13.5px">Este documento se visualiza dentro de la plataforma sin necesidad de descargarlo. El contenido real se renderiza al cargar el archivo (PDF embebido con visor nativo).</p><p style="margin-top:10px;line-height:1.7;font-size:13.5px;color:var(--ink-3)">Soporta PDF, imágenes y documentos de Office mediante visor integrado.</p></div></div>`;
-    back.innerHTML = `<div class="card" style="width:min(720px,96vw);max-height:92vh;overflow:auto;padding:0">
-      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:15px">📎 ${U.esc(nombre)}</b><button class="imp-x" id="ar-x">✕</button></div>
+    // si el recurso tiene iframeSrc, lo mostramos embebido
+    let visor;
+    if (iframeSrc) {
+      visor = `<div style="position:relative;width:100%;height:74vh;border-radius:var(--r-md);overflow:hidden;background:#f4f3ee"><iframe src="${iframeSrc}" style="width:100%;height:100%;border:0"></iframe></div>`;
+    } else if (ext === 'png' || ext === 'jpg' || ext === 'jpeg' || ext === 'gif' || ext === 'img' || ext === 'webp') {
+      visor = `<div class="ac-docview" style="display:grid;place-items:center;background:var(--surface);min-height:280px"><div style="text-align:center;color:var(--ink-3)"><div style="font-size:52px">🖼️</div><div style="margin-top:10px;font-weight:600">${U.esc(nombre)}</div><div style="font-size:12px;margin-top:6px">Imagen · previsualización disponible al cargar el archivo real.</div></div></div>`;
+    } else if (ext === 'pdf') {
+      visor = `<div class="ac-docview" style="display:grid;place-items:center;background:var(--surface);min-height:280px"><div style="text-align:center;color:var(--ink-3)"><div style="font-size:52px">📄</div><div style="margin-top:10px;font-weight:600">${U.esc(nombre)}</div><div style="font-size:12px;margin-top:6px">PDF · se visualizará aquí al cargar el archivo real.</div></div></div>`;
+    } else {
+      visor = `<div class="ac-docview"><div class="ac-doc-page"><b style="font-family:var(--f-display);font-size:16px">${U.esc(nombre)}</b><p style="margin-top:10px;line-height:1.7;font-size:13.5px">Documento cargado en la plataforma. Visualización nativa para PDF, imágenes y documentos.</p></div></div>`;
+    }
+    back.innerHTML = `<div class="card" style="width:min(760px,96vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--graph)">
+        <b style="font-family:var(--f-display);font-size:15px;color:#fff">📎 ${U.esc(nombre)}</b>
+        <button class="imp-x" id="ar-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>
       ${visor}
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px"><button class="btn ghost" id="ar-close">Cerrar</button><button class="btn primary" onclick="alert('Descarga del recurso')">⬇ Descargar</button></div>
-    </div>`;
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn ghost" id="ar-close">Cerrar</button>
+        <button class="btn primary" onclick="alert('Descarga disponible al conectar el almacenamiento (Drive o servidor).')">⬇ Descargar</button>
+      </div></div>`;
     document.body.appendChild(back);
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
@@ -219,25 +229,28 @@ Orbit.modules.academia = (function () {
     paint();
   }
 
-  /* ---- Visor de lección: video embebido / lectura legible / quiz ---- */
+  /* ---- Visor de lección: iframe interactivo / video / lectura / quiz ---- */
   function verLeccion(c, i, onDone) {
     const l = (c.lecciones || [])[i]; if (!l) return;
     let back = document.getElementById('ac-lec'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'ac-lec'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
     let cuerpo = '';
-    if (l.tipo === 'video') {
-      cuerpo = l.url ? `<div class="ac-video"><iframe src="${l.url}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>`
-        : `<div class="ac-video ac-video-ph"><div style="text-align:center"><div style="font-size:40px">🎬</div><div class="muted" style="margin-top:8px">Video pendiente de cargar.</div><div class="muted" style="font-size:11.5px">Pega la URL (YouTube/Vimeo) o sube el archivo en recursos.</div></div></div>`;
+    if (l.iframeSrc) {
+      cuerpo = `<div style="position:relative;width:100%;height:72vh;border-radius:var(--r-md);overflow:hidden;background:#f4f3ee"><iframe src="${l.iframeSrc}" style="width:100%;height:100%;border:0"></iframe></div>`;
+    } else if (l.tipo === 'video') {
+      cuerpo = l.url
+        ? `<div class="ac-video"><iframe src="${l.url}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>`
+        : `<div class="ac-video ac-video-ph"><div style="text-align:center"><div style="font-size:40px">🎬</div><div class="muted" style="margin-top:8px">Video pendiente de cargar. Pega URL (YouTube/Vimeo) en la lección.</div></div></div>`;
     } else if (l.tipo === 'lectura') {
-      cuerpo = `<div class="ac-read">${U.esc(l.texto || 'Contenido de lectura de la lección.')}</div>`;
+      cuerpo = `<div class="ac-read" style="white-space:pre-wrap;line-height:1.7">${U.esc(l.texto || 'Contenido pendiente de redactar.')}</div>`;
     } else {
-      cuerpo = `<div class="ac-read"><b>Evaluación</b><p style="margin-top:8px">Responde las preguntas para completar la lección. (En producción se conecta el banco de preguntas.)</p><label class="chk-row"><input type="checkbox"> Pregunta 1 respondida</label><label class="chk-row"><input type="checkbox"> Pregunta 2 respondida</label></div>`;
+      cuerpo = `<div class="ac-read"><b style="font-family:var(--f-display)">Evaluación</b><p style="margin-top:10px">Responde para completar la lección.</p><label class="chk-row" style="margin-top:10px"><input type="checkbox"> Concepto 1 comprendido</label><label class="chk-row"><input type="checkbox"> Concepto 2 comprendido</label></div>`;
     }
-    back.innerHTML = `<div class="card" style="width:min(720px,96vw);max-height:92vh;overflow:auto;padding:0">
-      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:15px">${TIPO_ICON[l.tipo] || '•'} ${U.esc(l.t)} <span class="muted" style="font-weight:400;font-size:12px">· ${l.min} min</span></b>
-        <button class="imp-x" id="al-x">✕</button></div>
+    back.innerHTML = `<div class="card" style="width:min(900px,96vw);max-height:94vh;overflow:auto;padding:0">
+      <div style="padding:14px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--graph)">
+        <b style="font-family:var(--f-display);font-size:15px;color:#fff">${TIPO_ICON[l.tipo] || '📖'} ${U.esc(l.t)} <span style="font-weight:400;font-size:12px;color:rgba(255,255,255,.6)">· ${l.min} min</span></b>
+        <button class="imp-x" id="al-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>
       <div style="padding:18px 20px">${cuerpo}</div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
         <button class="btn ghost" id="al-close">Cerrar</button>
@@ -249,6 +262,9 @@ Orbit.modules.academia = (function () {
     back.querySelector('#al-x').addEventListener('click', close);
     back.querySelector('#al-close').addEventListener('click', close);
     const dn = back.querySelector('#al-done'); if (dn) dn.addEventListener('click', () => { close(); if (onDone) onDone(); });
+    // escuchar mensaje de leccion completada desde el iframe interactivo
+    function msgHandler(ev) { if (ev.data && ev.data.orbit === 'leccion_completada') { window.removeEventListener('message', msgHandler); close(); if (onDone) onDone(); } }
+    window.addEventListener('message', msgHandler);
   }
 
   return { render };

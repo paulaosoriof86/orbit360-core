@@ -53,7 +53,7 @@ Orbit.modules.calidad = (function () {
             const faltaTxt = f.sort((a, b) => a.pri - b.pri).map(x => `<span class="badge ${x.pri === 1 ? 'danger' : x.pri === 2 ? 'warn' : 'neutral'}">${x.label}</span>`).join(' ');
             const accion = c.telefono
               ? `<a class="btn ghost sm" style="color:#1f8a4c" href="https://wa.me/${wa}?text=${encodeURIComponent('Hola ' + c.nombre.split(' ')[0] + ', para mantener tu póliza al día necesitamos actualizar algunos datos. ¿Nos ayudás?')}" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 WA</a>`
-              : c.email ? `<a class="btn ghost sm" href="mailto:${U.esc(c.email)}?subject=Actualización de datos" onclick="event.stopPropagation()">✉ Correo</a>`
+              : c.email ? `<button class="btn ghost sm" onclick="event.stopPropagation();window.__orbitCompose={para:'${U.esc(c.email)}',asunto:'Actualización de datos · ${U.esc(c.nombre)}',cuerpo:'',clienteId:'${c.id}',vinculo:{tipo:'cliente',id:'${c.id}',label:'${U.esc(c.nombre)}'}};location.hash='#/correo'">✉ Correo</button>`
               : `<button class="btn ghost sm" disabled style="opacity:.5">Sin canal</button>`;
             return `<tr class="clickable" onclick="location.hash='#/cliente360?c=${c.id}&t=resumen'">
               <td>${K.clienteCell(c.id)}</td>

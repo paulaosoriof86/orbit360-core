@@ -57,24 +57,28 @@ Orbit.modules.inicio = (function () {
         ${dial(pctRec, 'Recaudo aplicado', U.moneyShort(recaudo, 'GTQ'))}
       </div>
 
-      <!-- KPIs -->
+      <!-- KPIs clicables -->
       <div class="kpi-row" style="margin-top:18px">
-        <div class="kpi"><div class="k-accent"></div>
+        <button class="kpi kpi-click" onclick="location.hash='#/cobros'" title="Ver cobros aplicados">
+          <div class="k-accent"></div>
           <div class="k-label">Cartera al día</div>
           <div class="k-val">${U.moneyShort(cart.alDia, 'GTQ')}</div>
-          <div class="k-foot up">▲ cobros aplicados</div></div>
-        <div class="kpi"><div class="k-accent" style="background:var(--warn)"></div>
+          <div class="k-foot up">▲ cobros aplicados ›</div></button>
+        <button class="kpi kpi-click" onclick="location.hash='#/cobros'" title="Ver pendiente de cobro" style="border-color:var(--warn)">
+          <div class="k-accent" style="background:var(--warn)"></div>
           <div class="k-label">Pendiente de cobro</div>
           <div class="k-val">${U.moneyShort(cart.pend, 'GTQ')}</div>
-          <div class="k-foot muted">cuotas por vencer</div></div>
-        <div class="kpi"><div class="k-accent" style="background:var(--danger)"></div>
+          <div class="k-foot muted">cuotas por vencer ›</div></button>
+        <button class="kpi kpi-click" onclick="location.hash='#/cobros'" title="Ver cartera vencida">
+          <div class="k-accent" style="background:var(--danger)"></div>
           <div class="k-label">Cartera vencida</div>
           <div class="k-val">${U.moneyShort(cart.venc, 'GTQ')}</div>
-          <div class="k-foot down">▼ requiere gestión</div></div>
-        <div class="kpi"><div class="k-accent" style="background:var(--info)"></div>
+          <div class="k-foot down">▼ requiere gestión ›</div></button>
+        <button class="kpi kpi-click" onclick="location.hash='#/renovaciones'" title="Ver renovaciones">
+          <div class="k-accent" style="background:var(--info)"></div>
           <div class="k-label">Renovaciones ≤45 d</div>
           <div class="k-val">${renov.length}</div>
-          <div class="k-foot muted">pólizas por renovar</div></div>
+          <div class="k-foot muted">pólizas por renovar ›</div></button>
       </div>
 
       <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-top:18px">

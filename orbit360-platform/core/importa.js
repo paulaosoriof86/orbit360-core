@@ -183,6 +183,7 @@ Orbit.importa = (function () {
     const fileInput = dr.querySelector('#imp-file');
     if (fileInput) fileInput.addEventListener('change', e => {
       state.files = [...e.target.files].map(f => f.name);
+      state.filesReal = [...e.target.files];
       const fl = dr.querySelector('#imp-files');
       if (fl) fl.innerHTML = state.files.map(n => `<span class="mail-chip">📎 ${U.esc(n)}</span>`).join('');
       if (state.files.length) setTimeout(() => { state.step = state.modo === 'documental' ? 3 : 2; paint(); }, 400);

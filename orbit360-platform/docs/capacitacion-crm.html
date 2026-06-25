@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Capacitación: Orbit 360 CRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--red:#C5162E;--graph:#1E2227;--ink:#1E2227;--ink-2:#3d4350;--ink-3:#7a818e;--surface:#f4f3ee;--card:#fff;--line:#e4e2db;--r:14px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:var(--ink);line-height:1.6}
+
+    /* ---- NAV ---- */
+    .nav{position:sticky;top:0;z-index:50;background:var(--graph);color:#fff;display:flex;align-items:center;gap:14px;padding:14px 28px;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+    .nav-logo{font-size:22px;font-weight:800;letter-spacing:-.02em;color:#fff}
+    .nav-logo span{color:var(--red)}
+    .nav-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px}
+    .nav-prog{margin-left:auto;display:flex;align-items:center;gap:12px}
+    .prog-bar{width:120px;height:6px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden}
+    .prog-bar i{display:block;height:100%;background:var(--red);border-radius:99px;transition:.4s;width:0}
+    .prog-lbl{font-size:12px;color:rgba(255,255,255,.7)}
+
+    /* ---- TOC sidebar ---- */
+    .layout{display:grid;grid-template-columns:260px 1fr;max-width:1100px;margin:0 auto;padding:28px 20px;gap:24px}
+    .toc{position:sticky;top:72px;align-self:start;background:var(--card);border-radius:var(--r);padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+    .toc-t{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:14px}
+    .toc a{display:block;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink-2);text-decoration:none;cursor:pointer;transition:.12s}
+    .toc a:hover{background:var(--surface);color:var(--ink)}
+    .toc a.done::before{content:'✓ ';color:var(--red)}
+    .toc a.active{background:var(--red);color:#fff}
+
+    /* ---- CONTENT ---- */
+    .content{display:grid;gap:28px}
+    .slide{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+    .slide-hero{background:linear-gradient(120deg,var(--graph),#111820);padding:40px 44px;color:#fff}
+    .slide-hero .eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:10px}
+    .slide-hero h1{font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.15;margin-bottom:10px}
+    .slide-hero h1 span{color:var(--red)}
+    .slide-hero p{font-size:16px;color:rgba(255,255,255,.8);max-width:560px}
+    .slide-body{padding:36px 44px}
+    .slide h2{font-size:21px;font-weight:800;margin-bottom:18px;color:var(--ink)}
+    .slide h2 .num{display:inline-block;width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;font-size:14px;line-height:30px;text-align:center;margin-right:10px}
+    .slide p{font-size:14.5px;color:var(--ink-2);margin-bottom:14px}
+    .slide ul{list-style:none;display:grid;gap:10px;margin-bottom:18px}
+    .slide ul li{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink-2)}
+    .slide ul li::before{content:'';flex-shrink:0;width:8px;height:8px;border-radius:50%;background:var(--red);margin-top:6px}
+    .tips{background:var(--surface);border-left:4px solid var(--red);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:20px}
+    .tips b{display:block;font-size:13px;color:var(--red);margin-bottom:6px}
+    .tips p{font-size:13px;color:var(--ink-2);margin:0}
+    .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+    .info-card{border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+    .info-card .ic{font-size:24px;margin-bottom:8px}
+    .info-card b{display:block;font-size:14px;font-weight:700;margin-bottom:4px}
+    .info-card p{font-size:13px;color:var(--ink-3);margin:0}
+    .badge{display:inline-block;font-size:11px;font-weight:700;border-radius:99px;padding:3px 10px;background:rgba(197,22,46,.1);color:var(--red)}
+    .quiz{background:var(--surface);border-radius:10px;padding:20px 22px;margin-top:20px}
+    .quiz h3{font-size:15px;font-weight:700;margin-bottom:14px}
+    .quiz label{display:flex;align-items:center;gap:10px;font-size:14px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer;margin-bottom:8px;background:var(--card)}
+    .quiz label:hover{border-color:var(--red)}
+    .quiz label input{accent-color:var(--red)}
+    .quiz .btn{display:inline-block;background:var(--red);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-weight:700;font-size:14px;cursor:pointer;margin-top:10px}
+    .quiz .result{display:none;margin-top:12px;font-weight:700;font-size:14px}
+    .footer-nav{display:flex;justify-content:space-between;align-items:center;padding:18px 44px;border-top:1px solid var(--line)}
+    .footer-nav .btn{background:var(--red);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer}
+    .footer-nav .btn.ghost{background:none;color:var(--ink-2);border:1px solid var(--line)}
+    @media(max-width:800px){.layout{grid-template-columns:1fr}.toc{position:static}.card-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<div class="nav">
+  <div>
+    <div class="nav-logo">Orbit <span>360</span></div>
+    <div class="nav-sub">Capacitación · Módulo CRM</div>
+  </div>
+  <div class="nav-prog">
+    <div class="prog-bar"><i id="progbar"></i></div>
+    <span class="prog-lbl" id="proglbl">0 / 5 completados</span>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="toc">
+    <div class="toc-t">Contenido del módulo</div>
+    <a onclick="scrollTo('s1')">🌅 Bienvenida al CRM</a>
+    <a onclick="scrollTo('s2')">🧑‍💼 Clientes 360</a>
+    <a onclick="scrollTo('s3')">📑 Pólizas y recibos</a>
+    <a onclick="scrollTo('s4')">🔄 Ciclo Ops ↔ Leads</a>
+    <a onclick="scrollTo('s5')">✏️ Evaluación</a>
+  </aside>
+
+  <div class="content">
+
+    <!-- SLIDE 1: HERO -->
+    <div class="slide" id="s1">
+      <div class="slide-hero">
+        <div class="eyebrow">Módulo 01 · CRM</div>
+        <h1>Gestión de clientes con<br><span>Orbit 360</span></h1>
+        <p>Aprende a registrar, organizar y dar seguimiento a cada cliente, póliza y cobro desde un solo lugar.</p>
+      </div>
+      <div class="slide-body">
+        <h2><span class="num">1</span>¿Qué es el CRM de Orbit 360?</h2>
+        <p>El CRM (Centro de Relaciones con el Cliente) es el núcleo de la plataforma. Aquí vive <strong>cada cliente, su expediente, sus pólizas, sus cobros y todo su historial</strong>.</p>
+        <div class="card-grid">
+          <div class="info-card"><div class="ic">🧑‍💼</div><b>Clientes 360</b><p>Expediente completo: datos, pólizas, recibos, renovaciones, siniestros y correos.</p></div>
+          <div class="info-card"><div class="ic">📑</div><b>Pólizas</b><p>Con desglose de prima (neta, gastos, IVA), recibos generados automáticamente y endosos.</p></div>
+          <div class="info-card"><div class="ic">💳</div><b>Cobros y cartera</b><p>Recibos por estado, aplicar pago con fecha, conciliar con factura.</p></div>
+          <div class="info-card"><div class="ic">📊</div><b>Orbit Insights</b><p>Analítica profunda de producción, cartera, comisiones y renovaciones.</p></div>
+        </div>
+        <div class="tips"><b>💡 Buena práctica</b><p>Completa siempre el teléfono y correo del cliente — habilita WhatsApp y el correo interno de la plataforma.</p></div>
+      </div>
+      <div class="footer-nav">
+        <span></span>
+        <button class="btn" onclick="markDone('s1');scrollTo('s2')">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 2 -->
+    <div class="slide" id="s2">
+      <div class="slide-body">
+        <h2><span class="num">2</span>Clientes 360 — el expediente</h2>
+        <p>Cada cliente tiene un <strong>expediente completo</strong> con pestañas: Resumen · Pólizas · Vehículos · Cobros · Recibos y pagos · Renovaciones · Siniestros · Comisiones · Correos · Historial.</p>
+        <ul>
+          <li>Desde la ficha puedes <b>enviar WhatsApp</b>, <b>redactar un correo</b> (queda vinculado) o <b>solicitar una gestión</b> que entra a Orbit Ops.</li>
+          <li>Los KPIs del resumen (pólizas activas, prima anual, cobrado) son <b>clicables</b> y muestran el detalle.</li>
+          <li>En la pestaña <b>Pólizas</b>, cada fila abre el desglose completo de la póliza incluyendo el cuadro de recibos.</li>
+          <li>En <b>Recibos y pagos</b> usa el <b>filtro por póliza</b> para no mezclar cuotas de diferentes contratos.</li>
+        </ul>
+        <div class="tips"><b>🚀 Cómo crear un cliente nuevo</b><p>Menú Clientes 360 → + Nuevo cliente. Puedes también importar documentos del cliente (DPI, RTU, póliza) y el importador extrae y completa los datos automáticamente.</p></div>
+      </div>
+      <div class="footer-nav">
+        <button class="btn ghost" onclick="scrollTo('s1')">← Anterior</button>
+        <button class="btn" onclick="markDone('s2');scrollTo('s3')">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 -->
+    <div class="slide" id="s3">
+      <div class="slide-body">
+        <h2><span class="num">3</span>Pólizas y recibos</h2>
+        <p>Las pólizas en Orbit 360 incluyen el <strong>desglose real de prima</strong>:</p>
+        <ul>
+          <li><b>Prima neta</b> + Gastos de expedición (GT: 5% automático) + Gastos financieros (recargo por fraccionamiento) + Otros/asistencias = <b>Base gravable</b></li>
+          <li>+ <b>IVA</b> (12% GT · 19% CO) = <b>Prima Total</b></li>
+        </ul>
+        <p>Los <strong>recibos se generan automáticamente</strong> según la forma de pago: tarjeta de crédito/contado = 1 recibo; fraccionado = N recibos prorrateados con recargo.</p>
+        <div class="card-grid">
+          <div class="info-card"><div class="ic">✏️</div><b>Editar póliza</b><p>Cambia ramo, subramo, asesor, forma de pago. Al cambiar la forma de pago, los recibos pendientes se regeneran automáticamente.</p></div>
+          <div class="info-card"><div class="ic">📜</div><b>Endosos</b><b></b><p>Registra sustituciones de vehículo, cambio de propietario, inclusión de beneficiario — quedan en el historial de la póliza.</p></div>
+        </div>
+        <div class="tips"><b>💡 Conciliación</b><p>Al aplicar pago, selecciona la fecha de envío a gestión. Si cargas la factura de la aseguradora, la fecha real queda registrada y concilia el recibo.</p></div>
+      </div>
+      <div class="footer-nav">
+        <button class="btn ghost" onclick="scrollTo('s2')">← Anterior</button>
+        <button class="btn" onclick="markDone('s3');scrollTo('s4')">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 4 -->
+    <div class="slide" id="s4">
+      <div class="slide-body">
+        <h2><span class="num">4</span>Ciclo Ops ↔ Leads</h2>
+        <p>Un mismo <strong>negocio (prospecto)</strong> se proyecta en dos tableros sincronizados en vivo:</p>
+        <div class="card-grid">
+          <div class="info-card"><div class="ic">🗂</div><b>Orbit Ops (equipo interno)</b><p>Cotizaciones · Inspecciones · Emisiones. Solo lo ve el equipo.</p></div>
+          <div class="info-card"><div class="ic">🎯</div><b>Orbit Leads (asesor)</b><p>Pipeline comercial: Nuevo → Propuesta → Negociación → Cierre. Con cadencias automáticas.</p></div>
+        </div>
+        <ul>
+          <li>Cambiar la etapa en un tablero <b>se refleja inmediatamente</b> en el otro.</li>
+          <li>Al llegar a <b>Emisión</b> y confirmar, se <b>crea el cliente automáticamente</b> y se activa la cadencia de encuestas.</li>
+          <li>Las cadencias usan <b>WhatsApp primero</b>; en ausencia, correo.</li>
+        </ul>
+        <div class="tips"><b>🔄 Automatizaciones</b><p>Al enviar una propuesta, la cadencia de seguimiento se activa sola. Los recordatorios de cobro y renovación también pueden dispararse desde Automatizaciones.</p></div>
+      </div>
+      <div class="footer-nav">
+        <button class="btn ghost" onclick="scrollTo('s3')">← Anterior</button>
+        <button class="btn" onclick="markDone('s4');scrollTo('s5')">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: QUIZ -->
+    <div class="slide" id="s5">
+      <div class="slide-body">
+        <h2><span class="num">5</span>Evaluación del módulo</h2>
+        <p>Responde las preguntas para completar y obtener tu certificado.</p>
+
+        <div class="quiz" id="q1">
+          <h3>1. ¿Qué pasa cuando se emite una póliza (etapa "Emitido") en el ciclo Ops/Leads?</h3>
+          <label><input type="radio" name="q1" value="a"> Se archiva el negocio y no pasa nada más</label>
+          <label><input type="radio" name="q1" value="b"> Se crea automáticamente el cliente y se activa la cadencia de encuestas</label>
+          <label><input type="radio" name="q1" value="c"> Se envía un correo al cliente pero no se crea expediente</label>
+          <button class="btn" onclick="evalQ('q1','b')">Verificar</button>
+          <div class="result" id="r1"></div>
+        </div>
+
+        <div class="quiz" id="q2" style="margin-top:16px">
+          <h3>2. En Guatemala, ¿cuánto corresponde a gastos de expedición sobre la prima neta?</h3>
+          <label><input type="radio" name="q2" value="a"> 12%</label>
+          <label><input type="radio" name="q2" value="b"> 5%</label>
+          <label><input type="radio" name="q2" value="c"> No aplica en Guatemala</label>
+          <button class="btn" onclick="evalQ('q2','b')">Verificar</button>
+          <div class="result" id="r2"></div>
+        </div>
+
+        <div class="quiz" id="q3" style="margin-top:16px">
+          <h3>3. ¿Qué filtro debe usarse en la pestaña "Recibos y pagos" de un cliente con varias pólizas?</h3>
+          <label><input type="radio" name="q3" value="a"> No es necesario filtrar, se ven todos juntos</label>
+          <label><input type="radio" name="q3" value="b"> Filtrar por asesor</label>
+          <label><input type="radio" name="q3" value="c"> Filtrar por póliza (N.º + aseguradora + bien asegurado)</label>
+          <button class="btn" onclick="evalQ('q3','c')">Verificar</button>
+          <div class="result" id="r3"></div>
+        </div>
+
+      </div>
+      <div class="footer-nav">
+        <button class="btn ghost" onclick="scrollTo('s4')">← Anterior</button>
+        <button class="btn" id="finBtn" onclick="finish()" style="display:none">🏅 Obtener certificado</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<script>
+  const done = new Set();
+  function scrollTo(id) { document.getElementById(id).scrollIntoView({ behavior:'smooth', block:'start' }); updateToc(id); }
+  function markDone(id) { done.add(id); updateProgress(); updateToc(); }
+  function updateProgress() {
+    const pct = Math.round(done.size / 5 * 100);
+    document.getElementById('progbar').style.width = pct + '%';
+    document.getElementById('proglbl').textContent = done.size + ' / 5 completados';
+  }
+  function updateToc(active) {
+    document.querySelectorAll('.toc a').forEach((a, i) => {
+      const sid = 's' + (i + 1);
+      a.className = done.has(sid) ? 'done' : (sid === active ? 'active' : '');
+    });
+  }
+  let correct = 0;
+  function evalQ(qid, ans) {
+    const sel = document.querySelector(`input[name="${qid}"]:checked`);
+    const res = document.getElementById('r' + qid.slice(1));
+    res.style.display = 'block';
+    if (!sel) { res.textContent = '⚠️ Selecciona una respuesta.'; res.style.color = '#c9821b'; return; }
+    if (sel.value === ans) { res.textContent = '✅ ¡Correcto!'; res.style.color = '#1f8a4c'; correct++; }
+    else { res.textContent = '❌ Incorrecto. Revisa el contenido.'; res.style.color = '#C5162E'; }
+    if (correct >= 2) document.getElementById('finBtn').style.display = 'inline-block';
+  }
+  function finish() {
+    markDone('s5'); updateProgress();
+    alert('🏅 ¡Módulo CRM completado!\n\nTu certificado queda registrado en tu perfil de Orbit Academia.');
+    // post message para que el módulo padre actualice el progreso
+    if (window.parent !== window) window.parent.postMessage({ orbit: 'leccion_completada' }, '*');
+  }
+  // observer de visibilidad para actualizar TOC
+  document.querySelectorAll('.slide').forEach(s => {
+    new IntersectionObserver(([e]) => { if (e.isIntersecting) updateToc(s.id); }, { threshold: 0.4 }).observe(s);
+  });
+</script>
+</body>
+</html>
