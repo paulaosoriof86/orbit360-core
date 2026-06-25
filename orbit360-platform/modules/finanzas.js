@@ -40,7 +40,13 @@ Orbit.modules.finanzas = (function () {
       </div>
       <div id="fin-body"></div>
     </div>`;
-    host.querySelectorAll('.tab[data-t]').forEach(el => el.addEventListener('click', () => { tab = el.dataset.t; render(host); }));
+    host.querySelectorAll('.tab[data-t]').forEach(el => el.addEventListener('click', () => {
+      tab = el.dataset.t;
+      host.querySelectorAll('.tab[data-t]').forEach(t => t.classList.toggle('active', t.dataset.t === tab));
+      const b = document.getElementById('fin-body');
+      b.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, ia }[tab] || movimientos)();
+      wire(host);
+    }));
     const pSel = host.querySelector('#fin-pais'); if (pSel) pSel.addEventListener('change', () => { Orbit.pais = pSel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); render(host); });
     const mSel = host.querySelector('#fin-mes'); if (mSel) mSel.addEventListener('change', () => { mesSel = mSel.value; render(host); });
     const body = document.getElementById('fin-body');

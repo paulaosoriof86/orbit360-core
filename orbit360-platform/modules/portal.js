@@ -62,6 +62,10 @@ Orbit.modules.portal = (function () {
     host.querySelectorAll('[data-pago]').forEach(b => b.addEventListener('click', () => reportarPago(b.dataset.pago)));
     host.querySelectorAll('[data-soporte]').forEach(b => b.addEventListener('click', () => soporteAsesor(cli)));
     host.querySelectorAll('[data-adddoc]').forEach(b => b.addEventListener('click', subirDoc));
+    host.querySelectorAll('[data-pol]').forEach(b => b.addEventListener('click', () => detPoliza(b.dataset.pol)));
+    host.querySelectorAll('[data-rec]').forEach(b => b.addEventListener('click', () => detRecibo(b.dataset.rec)));
+    host.querySelectorAll('[data-sin]').forEach(b => b.addEventListener('click', () => detSiniestro(b.dataset.sin)));
+    host.querySelectorAll('[data-glos]').forEach(b => b.addEventListener('click', glosario));
   }
 
   function vInicio(cli, pols, pend, recl) {
@@ -78,28 +82,28 @@ Orbit.modules.portal = (function () {
     ${pend.length ? `<div class="pt-alert">⏰ Tienes <b>${pend.length}</b> pago(s) pendiente(s). <button class="pt-link" data-go="recibos">Ver mis pagos →</button></div>` : '<div class="pt-ok">✓ Estás al día con tus pagos. ¡Gracias!</div>'}`;
   }
   function vPolizas(pols) {
-    return (pols.map(p => `<div class="pt-row">
+    return (pols.map(p => `<div class="pt-row pt-click" data-pol="${p.id}">
       <span class="pt-row-ic">${p.ramo === 'Auto' ? '🚗' : p.ramo === 'Vida' ? '❤️' : p.ramo === 'Hogar' ? '🏠' : '🛡️'}</span>
       <div style="flex:1"><b>${U.esc(p.producto || p.ramo)}</b><div class="muted" style="font-size:11.5px">${p.numero} · ${(q.aseguradora(p.aseguradoraId) || {}).nombre || ''}</div></div>
-      <div style="text-align:right"><div style="font-family:var(--f-display);font-weight:700;font-size:13px">${U.money(p.prima, p.moneda)}</div><div class="muted" style="font-size:11px">vence ${U.fmtDate(p.vigenciaFin)}</div></div>
+      <div style="text-align:right"><div style="font-family:var(--f-display);font-weight:700;font-size:13px">${U.money(p.prima, p.moneda)}</div><div class="muted" style="font-size:11px">vence ${U.fmtDate(p.vigenciaFin)} ›</div></div>
     </div>`).join('') || '<div class="pt-empty">No tienes pólizas activas.</div>') + '<button class="pt-action" style="margin-top:12px" data-sol="Consulta de cobertura">❓ Consultar una cobertura</button>';
   }
   function vRecibos(cob) {
     return (cob.filter(c => c.estado !== 'Anulado').sort((a, b) => (a.vence || '').localeCompare(b.vence || '')).map(c => {
       const tone = c.estado === 'Pagado' ? 'ok' : c.estado === 'Vencido' ? 'danger' : 'warn';
       const rep = c.reportado ? '<span class="badge info" style="font-size:9px">Reportado</span>' : '';
-      return `<div class="pt-row">
+      return `<div class="pt-row pt-click" data-rec="${c.id}">
         <span class="pt-row-ic">${c.estado === 'Pagado' ? '✅' : '💳'}</span>
         <div style="flex:1"><b>Cuota ${c.cuota}</b><div class="muted" style="font-size:11.5px">vence ${U.fmtDate(c.vence)} ${rep}</div></div>
         <div style="text-align:right"><div style="font-family:var(--f-display);font-weight:700;font-size:13px">${U.money(c.monto, c.moneda)}</div>
-          ${(c.estado === 'Pendiente' || c.estado === 'Vencido') && !c.reportado ? `<button class="pt-mini" data-pago="${c.id}">📤 Reportar pago</button>` : `<span class="badge ${tone}" style="font-size:10px">${c.estado}</span>`}</div>
+          ${(c.estado === 'Pendiente' || c.estado === 'Vencido') && !c.reportado ? `<button class="pt-mini" data-pago="${c.id}" onclick="event.stopPropagation()">📤 Reportar pago</button>` : `<span class="badge ${tone}" style="font-size:10px">${c.estado}</span>`}</div>
       </div>`;
     }).join('') || '<div class="pt-empty">Sin pagos registrados.</div>');
   }
   function vSiniestros(recl) {
-    return (recl.length ? recl.map(r => `<div class="pt-row">
+    return (recl.length ? recl.map(r => `<div class="pt-row pt-click" data-sin="${r.id}">
       <span class="pt-row-ic">🚨</span>
-      <div style="flex:1"><b>${U.esc(r.tipo)}</b><div class="muted" style="font-size:11.5px">${r.numero} · ${U.fmtDate(r.fecha)}</div></div>
+      <div style="flex:1"><b>${U.esc(r.tipo)}</b><div class="muted" style="font-size:11.5px">${r.numero} · ${U.fmtDate(r.fecha)} ›</div></div>
       <span class="badge ${['Pagado', 'Aprobado'].includes(r.estado) ? 'ok' : r.estado === 'Rechazado' ? 'danger' : 'info'}">${r.estado}</span>
     </div>`).join('') : '<div class="pt-empty">No tienes siniestros reportados.</div>') + '<button class="pt-action" style="margin-top:12px" data-sol="Reclamo / Siniestro">🚨 Reportar un siniestro</button>';
   }
@@ -115,7 +119,7 @@ Orbit.modules.portal = (function () {
     const cursos = (S().all('cursos') || []).filter(c => c.cat === 'Producto' || c.cat === 'Educativo' || c.cat === 'Técnico').slice(0, 4);
     return `<div class="pt-empty" style="text-align:left;color:var(--ink-2);padding:0 0 12px">📚 Recursos para entender mejor tus seguros:</div>
       ${(cursos.length ? cursos : [{ emoji: '🛡️', titulo: 'Conoce tu seguro', desc: 'Coberturas, deducible y cómo usarlo.' }, { emoji: '🚗', titulo: 'Tu seguro de Auto', desc: 'Qué hacer ante un choque o robo.' }]).map(c => `<div class="pt-row"><span class="pt-row-ic">${c.emoji || '📘'}</span><div style="flex:1"><b>${U.esc(c.titulo)}</b><div class="muted" style="font-size:11.5px">${U.esc(c.desc || '')}</div></div><button class="btn ghost sm">Ver</button></div>`).join('')}
-      <button class="pt-action" style="margin-top:12px" onclick="location.hash='#/academia'">📖 Ver glosario de seguros</button>`;
+      <button class="pt-action" style="margin-top:12px" data-glos="1">📖 Ver glosario de seguros</button>`;
   }
 
   /* ---- Notificaciones (campana) ---- */
@@ -232,6 +236,63 @@ Orbit.modules.portal = (function () {
       S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '🙋', fecha: '2026-06-24', titulo: 'Solicitud del cliente: ' + tipo, detalle: det + ' · Portal → Ops' });
       back.remove(); toast('✓ Solicitud enviada al equipo'); render(host);
     }, 'Enviar solicitud');
+  }
+
+  /* ---- Detalles amplios para el cliente ---- */
+  function detPoliza(polId) {
+    const p = S().get('polizas', polId); if (!p) return;
+    const asg = q.aseguradora(p.aseguradoraId), veh = (S().where('vehiculos', v => v.polizaId === polId) || [])[0];
+    drawer('📑 ' + (p.producto || p.ramo), `
+      <div class="pt-det-grid">
+        <div class="pt-det"><span>N.º de póliza</span><b>${p.numero}</b></div>
+        <div class="pt-det"><span>Aseguradora</span><b>${asg ? U.esc(asg.nombre) : '—'}</b></div>
+        <div class="pt-det"><span>Ramo</span><b>${p.ramo}${p.subramo ? ' · ' + p.subramo : ''}</b></div>
+        <div class="pt-det"><span>Suma asegurada</span><b>${U.money(p.sumaAsegurada || 0, p.moneda)}</b></div>
+        <div class="pt-det"><span>Prima total</span><b>${U.money(p.prima, p.moneda)}</b></div>
+        <div class="pt-det"><span>Forma de pago</span><b>${p.formaPago || p.frecuencia || '—'}</b></div>
+        <div class="pt-det"><span>Vigencia</span><b>${U.fmtDate(p.vigenciaInicio)} → ${U.fmtDate(p.vigenciaFin)}</b></div>
+        <div class="pt-det"><span>Estado</span><b>${p.estado}</b></div>
+      </div>
+      ${veh ? `<div class="cfg-note" style="margin-top:12px">🚗 <b>${U.esc(veh.marca)} ${U.esc(veh.linea || '')} ${veh.anio || ''}</b>${veh.placa ? ' · placa ' + veh.placa : ''}</div>` : ''}
+      <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost sm" data-x-sol="Solicitar copia de póliza">📄 Solicitar copia</button><button class="btn ghost sm" data-x-sol="Consulta de cobertura">❓ Dudas de cobertura</button></div>`, null, 'Cerrar');
+    document.querySelectorAll('[data-x-sol]').forEach(b => b.addEventListener('click', () => { document.getElementById('pt-dr').remove(); solicitar(b.dataset.xSol); }));
+  }
+  function detRecibo(cobId) {
+    const c = S().get('cobros', cobId); if (!c) return;
+    const p = S().get('polizas', c.polizaId);
+    drawer('💳 Recibo · cuota ' + c.cuota, `
+      <div class="pt-det-grid">
+        <div class="pt-det"><span>Póliza</span><b>${p ? p.numero : '—'}</b></div>
+        <div class="pt-det"><span>Monto</span><b>${U.money(c.monto, c.moneda)}</b></div>
+        <div class="pt-det"><span>Vence</span><b>${U.fmtDate(c.vence)}</b></div>
+        <div class="pt-det"><span>Estado</span><b>${c.estado}</b></div>
+        ${c.neta != null ? `<div class="pt-det"><span>Prima neta</span><b>${U.money(c.neta, c.moneda)}</b></div><div class="pt-det"><span>IVA</span><b>${U.money(c.iva || 0, c.moneda)}</b></div>` : ''}
+        ${c.fechaPago ? `<div class="pt-det"><span>Pagado el</span><b>${U.fmtDate(c.fechaPago)}</b></div>` : ''}
+        ${c.reportado ? `<div class="pt-det"><span>Reportado</span><b>${U.fmtDate(c.reportado)}</b></div>` : ''}
+      </div>
+      ${(c.estado === 'Pendiente' || c.estado === 'Vencido') && !c.reportado ? '<button class="btn primary sm" style="margin-top:12px" data-x-pago="' + c.id + '">📤 Reportar mi pago</button>' : ''}`, null, 'Cerrar');
+    document.querySelectorAll('[data-x-pago]').forEach(b => b.addEventListener('click', () => { document.getElementById('pt-dr').remove(); reportarPago(b.dataset.xPago); }));
+  }
+  function detSiniestro(id) {
+    const r = S().get('reclamos', id); if (!r) return;
+    drawer('🚨 ' + r.tipo, `
+      <div class="pt-det-grid">
+        <div class="pt-det"><span>N.º</span><b>${r.numero}</b></div>
+        <div class="pt-det"><span>Estado</span><b>${r.estado}</b></div>
+        <div class="pt-det"><span>Reportado</span><b>${U.fmtDate(r.fecha)}</b></div>
+        <div class="pt-det"><span>Monto reclamado</span><b>${U.money(r.montoReclamado, 'GTQ')}</b></div>
+      </div>
+      <div class="asg-sec-t" style="margin-top:14px">Seguimiento</div>
+      <div class="pol-hist">${(r.bitacora || []).slice().reverse().map(b => `<div class="pol-hev"><div class="pol-hev-i">📌</div><div><div class="pol-hev-t">${U.esc(b.t)}</div><div class="pol-hev-d">${U.esc(b.ts || '')}</div></div></div>`).join('') || '<div class="muted" style="font-size:12px">Sin movimientos aún.</div>'}</div>`, null, 'Cerrar');
+  }
+
+  /* ---- Glosario propio del cliente ---- */
+  function glosario() {
+    const terms = (Orbit.GLOSARIO || []).slice();
+    drawer('📖 Glosario de seguros', `<input id="gl-q" class="o-sel" placeholder="Buscar término…" style="margin-bottom:10px">
+      <div id="gl-list">${terms.map(t => `<div class="pt-row" style="cursor:default"><div style="flex:1"><b>${U.esc(t.t)}</b><div class="muted" style="font-size:11.5px">${U.esc(t.d)}</div></div></div>`).join('')}</div>`, null, 'Cerrar');
+    const dr = document.getElementById('pt-dr'); const inp = dr.querySelector('#gl-q');
+    inp.addEventListener('input', () => { const v = inp.value.toLowerCase(); dr.querySelector('#gl-list').innerHTML = terms.filter(t => (t.t + t.d).toLowerCase().includes(v)).map(t => `<div class="pt-row" style="cursor:default"><div style="flex:1"><b>${U.esc(t.t)}</b><div class="muted" style="font-size:11.5px">${U.esc(t.d)}</div></div></div>`).join(''); });
   }
 
   /* ---- helper drawer ---- */

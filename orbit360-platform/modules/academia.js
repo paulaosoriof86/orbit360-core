@@ -12,6 +12,9 @@ Orbit.modules.academia = (function () {
   const TIPO_ICON = { video: '🎬', lectura: '📖', quiz: '✏️' };
 
   function cursos() { return S().all('cursos'); }
+  function kpi(label, val, foot, color, fkey) {
+    return `<button class="kpi kpi-click" data-kpi="${fkey}"><div class="k-accent" style="background:${color}"></div><div class="k-label">${label}</div><div class="k-val">${val}</div><div class="k-foot">${foot}</div></button>`;
+  }
 
   function render(h) {
     host = h;
@@ -22,13 +25,13 @@ Orbit.modules.academia = (function () {
     const certs = arr.filter(c => c.certificado).length;
     const avg = arr.length ? Math.round(arr.reduce((s, c) => s + c.progreso, 0) / arr.length) : 0;
     host.innerHTML = `<div class="page">
-      ${K.banner({ icon: '🎓', title: 'Orbit Academia', sub: 'Capacitación, certificaciones y recursos del equipo', features: [], actions: `<button class="btn ghost" id="ac-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬆ Cargar recurso</button><button class="btn primary" id="ac-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Curso</button>` })}
-      ${K.kpis([
-        { label: 'Cursos', val: arr.length, color: 'var(--red)', foot: compl + ' completados' },
-        { label: 'Avance promedio', val: avg + '%', color: 'var(--info)', foot: 'del equipo' },
-        { label: 'Certificaciones', val: certs, color: 'var(--ok)', foot: 'obtenidas', footTone: 'up' },
-        { label: 'Lecciones', val: arr.reduce((s, c) => s + (c.lecciones || []).length, 0), color: 'var(--warn)', foot: 'disponibles' }
-      ])}
+      ${K.banner({ icon: '🎓', title: 'Orbit Academia', sub: 'Capacitación, certificaciones y recursos del equipo', features: [], actions: `<button class="btn ghost" id="ac-ia" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Crear con IA</button><button class="btn ghost" id="ac-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬆ Cargar recurso</button><button class="btn primary" id="ac-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Curso</button>` })}
+      <div class="kpi-row">
+        ${kpi('Cursos', arr.length, compl + ' completados', 'var(--red)', 'todas')}
+        ${kpi('Avance promedio', avg + '%', 'del equipo', 'var(--info)', '')}
+        ${kpi('Certificaciones', certs, 'obtenidas', 'var(--ok)', 'cert')}
+        ${kpi('Lecciones', arr.reduce((s, c) => s + (c.lecciones || []).length, 0), 'disponibles', 'var(--warn)', '')}
+      </div>
       <div class="tabs" style="max-width:640px;margin-bottom:16px">
         ${cats.map(c => `<div class="tab ${filtro === c ? 'active' : ''}" data-f="${c}">${c === 'todas' ? 'Todas' : c}</div>`).join('')}
       </div>
@@ -36,8 +39,10 @@ Orbit.modules.academia = (function () {
     </div>`;
     host.querySelectorAll('.tab[data-f]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.f; render(host); }));
     host.querySelectorAll('[data-cur]').forEach(el => el.addEventListener('click', () => abrir(el.dataset.cur)));
+    host.querySelectorAll('[data-kpi]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.kpi || 'todas'; render(host); }));
     host.querySelector('#ac-imp').addEventListener('click', () => Orbit.importa.open('documentos', { onDone: () => render(host) }));
     host.querySelector('#ac-new').addEventListener('click', () => editar(null));
+    host.querySelector('#ac-ia').addEventListener('click', crearIA);
   }
 
   function card(c) {
@@ -131,6 +136,24 @@ Orbit.modules.academia = (function () {
     back.querySelector('#ar-close').addEventListener('click', close);
   }
 
+  /* ---- Crear curso con IA (genera estructura editable e iterable) ---- */
+  function crearIA() {
+    const html = `<label class="ce-l">¿Sobre qué tema?<input id="ai-tema" class="o-sel" placeholder="Ej. Seguro de Vida para familias"></label>
+      <label class="ce-l" style="margin-top:10px">Dirigido a<select id="ai-dest" class="o-sel"><option value="equipo">👥 Equipo (asesores)</option><option value="clientes">🧑 Clientes</option><option value="ambos">Ambos</option></select></label>
+      <label class="ce-l" style="margin-top:10px">Categoría<select id="ai-cat" class="o-sel">${['Inducción', 'Técnico', 'Comercial', 'Producto', 'Normativa', 'Educativo'].map(c => `<option>${c}</option>`).join('')}</select></label>
+      <div class="cfg-note" style="margin-top:10px">✨ La IA genera el curso (título, descripción y lecciones). Luego puedes <b>iterar, editar y completar</b> antes de publicar.</div>`;
+    const back = drawer('✨ Crear curso con IA', html, () => {
+      const tema = back.querySelector('#ai-tema').value || 'Tema de seguros';
+      const dest = back.querySelector('#ai-dest').value, cat = back.querySelector('#ai-cat').value;
+      const emoji = { 'Producto': '🚗', 'Técnico': '🛡️', 'Comercial': '🎯', 'Normativa': '⚖️', 'Educativo': '📚', 'Inducción': '🚀' }[cat] || '🎓';
+      const nuevo = { id: 'cur' + Date.now().toString().slice(-6), titulo: tema, cat, emoji, color: '#C5162E', desc: 'Curso generado con IA sobre ' + tema.toLowerCase() + '. Revisa y ajusta el contenido.', destinatarios: dest,
+        lecciones: [{ t: 'Introducción a ' + tema, tipo: 'video', min: 8, url: '' }, { t: 'Conceptos clave', tipo: 'lectura', min: 12, texto: 'La IA redacta aquí los conceptos clave de ' + tema + '. Edítalo para ajustar el tono y el detalle.' }, { t: 'Casos prácticos', tipo: 'lectura', min: 10, texto: 'Ejemplos prácticos generados por IA.' }, { t: 'Evaluación', tipo: 'quiz', min: 10 }],
+        recursos: [{ nombre: 'Resumen ' + tema + '.pdf', tipo: 'pdf' }], progreso: 0, certificado: false };
+      S().insert('cursos', nuevo);
+      back.remove(); editar(nuevo.id); // abre para iterar/editar
+    }, '✨ Generar y editar');
+  }
+
   /* ---- Crear / editar curso (autoadministrable: emoji + lecciones + recursos) ---- */
   function editar(id) {
     const c = id ? S().get('cursos', id) : { id: '', titulo: '', cat: 'Inducción', emoji: '🎓', color: '#C5162E', desc: '', lecciones: [], recursos: [], progreso: 0, certificado: false };
@@ -165,6 +188,7 @@ Orbit.modules.academia = (function () {
           <label class="ce-l">Título<input id="ae-titulo" class="o-sel" value="${U.esc(c.titulo)}"></label>
           <label class="ce-l">Categoría<select id="ae-cat" class="o-sel">${cats.map(x => `<option ${x === c.cat ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
         </div>
+        <label class="ce-l">Dirigido a<select id="ae-dest" class="o-sel">${[['equipo', '👥 Equipo (asesores)'], ['clientes', '🧑 Clientes'], ['ambos', 'Ambos']].map(o => `<option value="${o[0]}" ${(c.destinatarios || 'equipo') === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></label>
         <label class="ce-l">Emoji<div style="display:flex;gap:5px;flex-wrap:wrap" id="ae-emojis">${emojis.map(e => `<button type="button" class="ac-emoji-pick ${e === c.emoji ? 'on' : ''}" data-emoji="${e}">${e}</button>`).join('')}</div></label>
         <label class="ce-l">Color<div style="display:flex;gap:6px" id="ae-colors">${colores.map(col => `<button type="button" class="ac-color-pick ${col === c.color ? 'on' : ''}" data-color="${col}" style="background:${col}"></button>`).join('')}</div></label>
         <label class="ce-l">Descripción<textarea id="ae-desc" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px">${U.esc(c.desc)}</textarea></label>
@@ -188,7 +212,7 @@ Orbit.modules.academia = (function () {
     if ($('#ae-del')) $('#ae-del').addEventListener('click', () => { if (confirm('¿Borrar curso?')) { S().remove('cursos', id); close(); render(host); } });
     $('#ae-ok').addEventListener('click', () => {
       snapLecs(); snapRecs();
-      const data = { titulo: $('#ae-titulo').value || 'Nuevo curso', cat: $('#ae-cat').value, emoji, color, desc: $('#ae-desc').value, lecciones: lecs.filter(l => l.t), recursos: recs.filter(r => r.nombre) };
+      const data = { titulo: $('#ae-titulo').value || 'Nuevo curso', cat: $('#ae-cat').value, emoji, color, desc: $('#ae-desc').value, destinatarios: ($('#ae-dest') || {}).value || 'equipo', lecciones: lecs.filter(l => l.t), recursos: recs.filter(r => r.nombre) };
       if (id) S().update('cursos', id, data); else S().insert('cursos', Object.assign({ id: 'cur' + Date.now().toString().slice(-6), progreso: 0, certificado: false }, data));
       close(); render(host);
     });

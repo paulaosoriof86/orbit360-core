@@ -214,7 +214,11 @@ Orbit.modules.cliente360 = (function () {
       <div id="c360-body"></div>
     </div>`;
 
-    host.querySelectorAll('.ftab').forEach(el => el.addEventListener('click', () => { tab = el.dataset.tab; detalle(cid); }));
+    host.querySelectorAll('.ftab').forEach(el => el.addEventListener('click', () => {
+      tab = el.dataset.tab;
+      host.querySelectorAll('.ftab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+      renderTab(cid, r);
+    }));
     wireTabsAffordance();
     renderTab(cid, r);
   }

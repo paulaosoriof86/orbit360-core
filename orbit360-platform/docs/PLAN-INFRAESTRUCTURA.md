@@ -489,3 +489,57 @@ Feedback con capturas. **Confirmación al usuario: TODO lo de Insights/comparati
 - **Facturación por aseguradora**: en cada ficha de aseguradora guardar **patrones y datos de facturación** — **NIT**, **patrón de concepto**, razón social, dirección fiscal, notas — para no tener que buscar PDFs de facturas antiguas al facturar. El importador documental puede extraer estos datos de una factura previa. (Suma a R78 Aseguradoras.)
 
 > Orden sugerido R9 (alto impacto, sin parchar a ciegas): (1) detalles clicables en Cobros/Cartera/Renovaciones/Cancelaciones/Historial + recibo drawer + KPIs clicables → (2) Comisiones vuelve a CRM con listado+detalle, config a Equipo → (3) Correo a topbar + ficha cliente (botón superior) + IMAP/POP3 + vínculos múltiples → (4) Finanzas editable/detalle/sub-secciones/crear mes/dashboard profundo → (5) Insights profundo de verdad → (6) Aseguradoras → (7) Importador inteligente+documental + sección documental del expediente → (8) Siniestros → (9) sidebar gris (rápido).
+
+---
+
+# 🔴 RONDA 10 — Roles, aprendizaje por rol, confidencialidad, automatizaciones, manuales y capacitación (25-jun)
+
+## R10.1 · Roles ampliados + selección de módulos por rol
+- Crear usuarios **comercial / administrativo / marketing / operativo / asesor / dirección** con acceso a los módulos de su rol y **selección manual de módulos visibles** por usuario (override). En Equipo y permisos: por rol, qué módulos ve.
+- La visibilidad de módulos por rol alimenta también qué bloque de aprendizaje y qué navegación ve cada quien.
+
+## R10.2 · Paleta adicional suave (estilo Orbia) + elegir tipografía
+- Añadir (NO sustituir) una **paleta suave/clara** tipo Orbia manteniendo identidad Orbit; las paletas deben cambiar **también el fondo de los títulos/banners**, no solo líneas/letras. Selector de **tipografía** (Manrope, Segoe/corporativa, etc.).
+
+## R10.3 · Módulo de Automatizaciones (evaluar Orbia, adaptar a Orbit)
+- Inspirado en CXOrbia: **Automatizaciones por evento** (evento → destino → canal → plantilla → webhook propio), webhook de Make por tenant, integraciones (Outlook/Gmail/Sheets/WhatsApp Cloud vía Make), **asistente IA (Gemini)** con API key + toggle, **alertas de pendientes** (escanear y notificar) y **registro de disparos**. Adaptar eventos a seguros (gestión creada, pago vencido, póliza emitida, renovación próxima, siniestro, solicitud de cliente…).
+
+## R10.4 · Confidencialidad (doble vía) en primer ingreso
+- **Portal del cliente**: al abrir por primera vez, cláusula de confidencialidad **mutua** (nosotros↔cliente) a aceptar y almacenar.
+- **Usuarios internos**: al primer ingreso, cláusula amplia (resguardo de datos de clientes/empresa, uso interno de recursos). Persistente por usuario.
+
+## R10.5 · Aprendizaje por tipo de usuario (Academia)
+- Varios **bloques de aprendizaje según rol**: completo (dirección), sin finanzas (operativo/comercial), solo marketing/comunicación, solo administrativo, operativo completo, asesor. **Habilitable por tipo de usuario**.
+- Bloque por defecto en Academia con **control de avances + recursos inteligentes** (videos embebidos, imágenes, infografías) — sirve de demo de utilidad. Recursos creables manual o con IA, iterables.
+
+## R10.6 · Capacitación TÉCNICA interna (no visible al cliente)
+- Módulo interno (solo equipo): manejo de la plataforma, **cómo mostrar el demo**, configuración técnica (bases de datos, backend, automatizaciones, integraciones), **migración de información** por cliente, soporte, y **adaptación por plan** (transversal con usuarios → avanzados → 100% personalizables por módulo) + soporte posterior.
+
+## R10.7 · Manuales + documento maestro + guiones HeyGen
+- Generar al final: **manual completo** de la plataforma y **uno por módulo** (PDF + interactivo) + **documento maestro** para producir recursos de aprendizaje.
+- **Guion de capacitación por módulo** para videos con **HeyGen** (audio + avatar). Entregar prompts/guiones por módulo.
+
+## R10.8 · Acceso del cliente al portal + embebido en web
+- Definir ingreso del cliente: **link embebido en la página web** de la empresa + **link directo al portal del cliente**. Patrón de usuario/contraseña autogenerado (correo/identificación + contraseña temporal por WhatsApp/correo). Real en migración A&S.
+- Al crear usuario: enviar credenciales/bienvenida por **correo y WhatsApp**; crear su **comisión, correo de plataforma (conectable), teléfono**.
+
+## R10.9 · Demo interactivo ampliado (cliente y socios)
+- Actualizar el demo interactivo inicial para **mostrar beneficios y bondades reales** del prototipo actual (ya no genérico).
+
+> Nota de continuidad: el usuario prefiere **permanecer en este chat** para no perder contexto ni plan. Mantener snips al día.
+
+## ⚠️ BUGS PENDIENTES (lote 25-jun) — corregir sin falta, por lotes
+- ✅ Importador: selector de archivo ahora abre (v0.68). Scroll ya no salta en ficha cliente/finanzas (v0.68).
+- **KPIs clicables faltan**: Inicio, Leads, Aseguradoras, Cliente360 (todas las pestañas), CRM general, Finanzas, Marketing, Academia, Insights (varias vistas). Patrón único de KPI clicable → drawer de detalle.
+- **Correo interno**: símbolo de correo en ficha cliente/calidad abre Outlook del PC; debe abrir el redactor de la plataforma (window.__orbitCompose). Bandeja/redactar del tab Correos no funcionan.
+- **Botones que no cargan**: actividad reciente "ver todo"; resumen no clicable; siniestros en ficha; comisiones ficha sin detalle; renovaciones "renovar"/"comparar"/"cargar propuesta"/"enviar al cliente"; cotizador "+aseguradora"; configuración (subir logo, subir manual, agregar país, configurar integración); reportes "programar por correo"; calidad "campaña de actualización"; plantillas (sin pines/emojis); portal (varios botones, notificaciones, adjuntar en solicitud, aprende sin detalle).
+- **Cotizador/Comparativo**: datos requeridos por **ramo** (auto/GM/otros) con desplegables marca/línea/modelo; cargar PDFs en cotizador; historial de cotizador y de comparativo (seleccionar→ver/editar/convertir/pedir inspección-emisión); derivar a comparativo desde cotización; comparativo más rico (como el actual). Vincular SIEMPRE a Orbit Aseguradoras.
+- **Conciliación**: al aplicar pago "por conciliar" → cargar factura para conciliar/complementar; dónde se concilia.
+- **Reportes**: exportar también Excel/PDF; ampliar columnas (asesor en comisiones); administración para crear/editar reportes y verlos por aseguradora/asesor.
+- **Finanzas**: KPIs detalle; importadores abrir selector; dashboard profundo (tablas+comparativos reales, no solo gráficas); CxC/CxP detalle; financiación crear acreedor + abono muestra todos; import histórico actualiza CxC/CxP/financiación/presupuesto; liquidación asesor con **recibo imprimible** + detalle; scroll submenú.
+- **Nuevo cliente**: ventana de creación con datos completos + creación inteligente cargando varios documentos.
+- **Orbit IA**: módulo con detalle, apoyo en cualquier módulo o sobre cliente/cotización/póliza/concepto.
+- **Notificaciones WA**: módulo faltante; notificaciones del portal clicables.
+- **Novedades**: editor amplio con emojis/formato; ítem clicable a detalle.
+- **Importadores**: opción ITERAR visible en todos; siniestros "importar bitácora" abre "importar clientes" (corregir kind); definir dónde importar bitácora (crea/actualiza reclamo).
+- **Multitenant/branding**: logo en topbar+login cambia al subir; confirmar.

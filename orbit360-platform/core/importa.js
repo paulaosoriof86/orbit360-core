@@ -117,7 +117,7 @@ Orbit.importa = (function () {
         <label class="ce-l">Póliza de auto<select class="o-sel" style="width:100%">${Orbit.store.where('polizas', p => p.ramo === 'Auto').slice(0, 8).map(p => `<option>${p.numero}</option>`).join('') || '<option>—</option>'}</select></label>
       </div></div>` : '';
     return `${scopeNote}<p class="imp-desc">Detectamos y mapeamos estos registros. Revisa antes de confirmar.</p>
-      <div class="imp-scan"><span class="imp-spark">🧠</span> Extracción completada · <b>${m.sample.length}+ registros</b> reconocidos · 0 errores de formato.</div>
+      <div class="imp-scan"><span class="imp-spark">🧠</span> Extracción ${state.iterado ? 'refinada (' + state.iterado + 'ª pasada)' : 'completada'} · <b>${m.sample.length}+ registros</b> reconocidos · 0 errores de formato.<button class="btn ghost sm" id="imp-iterar" style="margin-left:auto">🔄 Iterar / mejorar</button></div>
       <div class="card" style="overflow:hidden;margin-top:12px"><table class="tbl"><thead><tr>${m.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
         <tbody>${m.sample.map(row => `<tr>${row.map((cell, i) => `<td${i === 0 ? ' style="font-weight:600"' : ''}>${U.esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
       ${assoc}
@@ -188,13 +188,21 @@ Orbit.importa = (function () {
       if (state.files.length) setTimeout(() => { state.step = state.modo === 'documental' ? 3 : 2; paint(); }, 400);
     });
     if (drop) {
-      const adv = () => { state.step = state.modo === 'documental' ? 3 : 2; paint(); };
-      drop.addEventListener('click', e => { if (e.target.closest('label')) return; adv(); });
+      // clic en el área (no en el botón-label) abre el selector de archivo real
+      drop.addEventListener('click', e => { if (e.target.closest('label')) return; if (fileInput) fileInput.click(); });
       drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
       drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-      drop.addEventListener('drop', e => { e.preventDefault(); adv(); });
+      drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); state.step = state.modo === 'documental' ? 3 : 2; paint(); });
     }
     if (state.step === 2) {
+      const it = dr.querySelector('#imp-iterar');
+      if (it) it.addEventListener('click', () => {
+        const ins = prompt('¿Qué quieres mejorar de la extracción? (ej. "corrige las fechas", "separa nombre y apellido", "ignora filas vacías")', '');
+        if (ins === null) return;
+        state.iterado = (state.iterado || 1) + 1;
+        paint();
+        const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '🔄 Extracción refinada con tu instrucción'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
+      });
       // editar tarifas detectadas (planilla de comisiones)
       dr.querySelectorAll('[data-rate]').forEach(inp => inp.addEventListener('change', () => { state.detectedRates[+inp.dataset.rate].pct = +inp.value || 0; }));
       // botón continuar al pie

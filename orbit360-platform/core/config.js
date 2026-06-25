@@ -37,6 +37,26 @@ Orbit.PAISES = [
 Orbit.paisCfg = function (id) { return Orbit.PAISES.find(p => p.id === id) || { iva: 12, recargoFinanciero: 5, gastosEmision: 0 }; };
 Orbit.pais = 'TODOS';
 
+/* Glosario de seguros (colaboradores + clientes). Configurable. */
+Orbit.GLOSARIO = [
+  { t: 'Prima', d: 'El precio que pagas por tu seguro durante la vigencia.' },
+  { t: 'Prima neta', d: 'Valor base del seguro, antes de impuestos y gastos.' },
+  { t: 'Deducible', d: 'Monto que asumes tú antes de que la aseguradora pague un siniestro.' },
+  { t: 'Suma asegurada', d: 'Cantidad máxima que cubre la póliza ante una pérdida.' },
+  { t: 'Cobertura', d: 'Los riesgos y situaciones que tu póliza protege.' },
+  { t: 'Vigencia', d: 'Período en el que tu póliza está activa (inicio y fin).' },
+  { t: 'Siniestro', d: 'El evento cubierto que da lugar a un reclamo (choque, robo, etc.).' },
+  { t: 'Reclamo', d: 'La solicitud para que la aseguradora pague por un siniestro.' },
+  { t: 'Endoso', d: 'Modificación que se hace a una póliza ya emitida.' },
+  { t: 'Renovación', d: 'Extender la póliza por un nuevo período al vencer.' },
+  { t: 'Beneficiario', d: 'Persona que recibe la indemnización en caso de siniestro.' },
+  { t: 'Indemnización', d: 'Pago que hace la aseguradora tras un siniestro aprobado.' },
+  { t: 'Recargo por fraccionamiento', d: 'Costo adicional por pagar la prima en cuotas.' },
+  { t: 'Gastos de emisión', d: 'Cargo administrativo por emitir la póliza.' },
+  { t: 'Pérdida total', d: 'Cuando el daño supera cierto % del valor del bien asegurado.' },
+  { t: 'Asistencia', d: 'Servicios incluidos (grúa, médico, vial) además de la cobertura.' }
+];
+
 /* Catálogo geográfico (departamentos → ciudades) por país. Configurable por cliente. */
 Orbit.GEO = {
   GT: { 'Guatemala': ['Guatemala', 'Mixco', 'Villa Nueva', 'San Miguel Petapa', 'Amatitlán', 'Chinautla'], 'Quetzaltenango': ['Quetzaltenango', 'Coatepeque', 'Salcajá'], 'Escuintla': ['Escuintla', 'Santa Lucía Cotzumalguapa', 'Tiquisate', 'Puerto San José'], 'Sacatepéquez': ['Antigua Guatemala', 'Jocotenango', 'Ciudad Vieja'], 'Sololá': ['Sololá', 'Panajachel'], 'Chimaltenango': ['Chimaltenango', 'Tecpán'], 'Huehuetenango': ['Huehuetenango'], 'Petén': ['Flores', 'San Benito'], 'Izabal': ['Puerto Barrios', 'Morales'], 'Alta Verapaz': ['Cobán'] },
@@ -187,7 +207,7 @@ Orbit.tenant = (function () {
     monedaBase: 'GTQ',
     branding: { logo: '', sidebar: 'oscuro', paleta: 'rojo', tipografia: 'Manrope' },
     // módulos activos (config INTERNA nuestra) — todos los del nav
-    modulosActivos: ['inicio', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'siniestros', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
+    modulosActivos: ['inicio', 'cronograma', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'siniestros', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
     addons: { make: false, drive: true, whatsapp: true, correo: true, metricool: false, facebook: false, linkedin: false, web: true, canva: false, gamma: false, heygen: false, ia: false, mailchimp: false, sheets: false },
     portalVisibility: { polizas: true, recibos: true, documentos: true, asesor: true, comisiones: false, drive: false },
     apis: []
@@ -210,11 +230,12 @@ Orbit.NAV = [
   { type: 'home', route: 'inicio', icon: '🌅', label: 'Orbit Inicio' },
   {
     type: 'group', label: 'Operación', open: true, items: [
+      { route: 'cronograma', icon: '📅', label: 'Cronograma', estado: 'beta' },
       { route: 'ops', icon: '🗂', label: 'Orbit Ops', estado: 'beta' },
       { route: 'leads', icon: '🎯', label: 'Orbit Leads', estado: 'beta' },
       { route: 'aseguradoras', icon: '🏢', label: 'Orbit Aseguradoras', estado: 'beta' },
-      { route: 'cotizador', icon: '🧮', label: 'Cotizador', estado: 'road' },
-      { route: 'comparativo', icon: '📋', label: 'Comparativo', estado: 'road' }
+      { route: 'cotizador', icon: '🧮', label: 'Cotizador', estado: 'beta' },
+      { route: 'comparativo', icon: '📋', label: 'Comparativo', estado: 'beta' }
     ]
   },
   {

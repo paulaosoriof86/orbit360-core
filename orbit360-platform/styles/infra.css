@@ -261,6 +261,8 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
 .ac-emoji-pick.on{border-color:var(--red);background:var(--red-soft)}
 .ac-color-pick{width:30px;height:30px;border:2px solid transparent;border-radius:50%;cursor:pointer}
 .ac-color-pick.on{border-color:var(--ink);box-shadow:0 0 0 2px #fff inset}
+.kpi-click{cursor:pointer;text-align:left;border:1px solid var(--line);background:var(--card);transition:.12s}
+.kpi-click:hover{border-color:var(--red);transform:translateY(-2px)}
 /* ---------- REPORTES ---------- */
 .rep-grid{display:grid;grid-template-columns:230px 1fr;gap:16px}
 .rep-side{display:grid;gap:5px;align-content:start}
@@ -303,6 +305,29 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
 .pc-msg{max-width:80%;padding:9px 12px;border-radius:13px;font-size:13px;line-height:1.45}
 .pc-msg.bot{background:var(--card);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
 .pc-msg.me{background:var(--red);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.pt-click{cursor:pointer}
+.pt-click:hover{background:var(--surface)}
+.pt-det-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pt-det{display:flex;flex-direction:column;gap:2px}
+.pt-det span{font-size:11px;color:var(--ink-3);font-weight:600}
+.pt-det b{font-size:13px}
+/* ---------- CRONOGRAMA ---------- */
+.cr-bar{display:flex;align-items:center;gap:10px;margin:6px 0 14px;flex-wrap:wrap}
+.cr-list{display:grid;gap:12px}
+.cr-day{border:1px solid var(--line);border-radius:var(--r-md);background:var(--card);padding:12px 14px}
+.cr-day-h{font-family:var(--f-display);font-weight:800;font-size:13.5px;text-transform:capitalize;margin-bottom:9px}
+.cr-ev{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-2);cursor:pointer;font-size:13px}
+.cr-ev:last-child{border-bottom:none}
+.cr-ev:hover{color:var(--red)}
+.cr-ev-ic{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:13px;color:#fff;flex-shrink:0}
+/* ---------- COTIZADOR / COMPARATIVO ---------- */
+.cz-grid{display:grid;grid-template-columns:minmax(340px,1fr) 1.2fr;gap:16px}
+.cz-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.cz-card{position:relative;border:1px solid var(--line);border-radius:var(--r-md);padding:14px;background:var(--card)}
+.cz-card.win{border-color:var(--red);box-shadow:0 0 0 2px color-mix(in srgb,var(--red) 20%,transparent)}
+.cz-badge{position:absolute;top:-9px;left:12px;background:var(--red);color:#fff;font-size:9px;font-weight:800;border-radius:99px;padding:3px 9px}
+.cz-total{font-family:var(--f-display);font-weight:800;font-size:22px;color:var(--ink)}
+@media(max-width:820px){.cz-grid{grid-template-columns:1fr}}
 .cfg-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .cfg-rolecard,.cfg-paiscard,.cfg-addon,.cfg-plan{border:1px solid var(--line);border-radius:var(--r-md);padding:13px 14px;background:var(--card)}
 .cfg-rolecard b{font-family:var(--f-display);font-size:14px}
