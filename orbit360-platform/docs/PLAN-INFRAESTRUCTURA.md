@@ -543,3 +543,31 @@ Feedback con capturas. **Confirmación al usuario: TODO lo de Insights/comparati
 - **Novedades**: editor amplio con emojis/formato; ítem clicable a detalle.
 - **Importadores**: opción ITERAR visible en todos; siniestros "importar bitácora" abre "importar clientes" (corregir kind); definir dónde importar bitácora (crea/actualiza reclamo).
 - **Multitenant/branding**: logo en topbar+login cambia al subir; confirmar.
+
+## Estado al cierre de sesión · v0.86 (25 Jun 2026)
+
+### ✅ Completado en esta sesión (v0.83–v0.86)
+- Correo interno (no mailto) · Orbit IA módulo · Notificaciones WA módulo
+- Cotizador: campos dinámicos por ramo, historial tab, wiring ramo→re-render
+- Cobros: aplicar pago con modal real (fecha + factura + conciliación automática)
+- Cobros: filtro por póliza en ficha cliente (tabCobros)
+- Insights: comparativo profundo con tabla 12 meses clicable, drill-down, nueva vs renovada
+- Academia: bug backticks + curso null + rol filter corregidos
+- Automatizaciones: ruta añadida al NAV
+- Reportes: Excel + PDF además de CSV
+- 8 roles con módulos predeterminados · Paletas suave+coral · Tipografía selector
+- Responsive global · Editor novedades con emojis · Logo uploader real
+
+### 🔲 Pendiente v0.87 (todo #121)
+1. Cotizador: guardar en historial al cotizar; PDF upload de propuestas
+2. Conciliación Finanzas: widget estado bancario vs recibos pagados
+3. Póliza: editar asesor directo + sustitución vehículo desde endosos
+4. Demo interactivo: actualizar HTML+PDF con módulos v0.86
+5. Academia: 14 cursos por módulo con contenido profundo
+6. Handoff A&S: actualizar docs/handoff-migracion-as.html con v0.86+
+
+### Para retomar
+```
+"Continua Orbit 360 v0.86. Lee orbit360-platform/docs/PLAN-INFRAESTRUCTURA.md 
+y CHANGELOG.md. Retoma desde pendientes del todo #121."
+```

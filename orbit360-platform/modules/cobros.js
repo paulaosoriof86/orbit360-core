@@ -22,7 +22,7 @@ Orbit.modules.cobros = (function () {
       return (!st.fq || txt.includes(st.fq.toLowerCase())) &&
         (!st.fest || c.estado === st.fest) &&
         (!st.fase || c.asesorId === st.fase);
-    }).sort((a, b) => a.vence.localeCompare(b.vence));
+    }).sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
   }
 
   function render(host) {
@@ -40,7 +40,7 @@ Orbit.modules.cobros = (function () {
         { label: 'Cartera al día', val: U.moneyShort(cart.alDia, 'GTQ'), color: 'var(--ok)', foot: 'cobros aplicados', footTone: 'up' },
         { label: 'Pendiente', val: U.moneyShort(cart.pend, 'GTQ'), color: 'var(--warn)', foot: 'por vencer' },
         { label: 'Vencido', val: U.moneyShort(cart.venc, 'GTQ'), color: 'var(--danger)', foot: 'en gestión', footTone: 'down' },
-        { label: 'Por conciliar', val: porConciliar, color: 'var(--info)', foot: 'pagos sin aplicar' }
+        { label: 'Por conciliar', onclick: "location.hash='#/cobros'", val: porConciliar, color: 'var(--info)', foot: 'pagos sin aplicar' }
       ])}
 
       <div class="card pad" style="margin-bottom:16px">
@@ -131,9 +131,62 @@ Orbit.modules.cobros = (function () {
     back.querySelector('#cd-x').addEventListener('click', close);
     const ap = back.querySelector('#cd-apply');
     if (ap) ap.addEventListener('click', () => {
-      const f = prompt('Fecha de envío a gestión (AAAA-MM-DD):', '2026-06-22'); if (f === null) return;
-      S().update('cobros', cobroId, { estado: 'Pagado', fechaPago: f, metodo: (p && p.formaPago) || 'Transferencia', conciliado: false });
-      close(); render(document.getElementById('host'));
+      // Remove detail modal and show payment modal
+      back.remove();
+      let pm = document.getElementById('cob-pay'); if (pm) pm.remove();
+      pm = document.createElement('div'); pm.id = 'cob-pay'; pm.className = 'drawer-back open';
+      pm.style.cssText = 'display:grid;place-items:center;z-index:210';
+      const hoy = new Date().toISOString().slice(0, 10);
+      pm.innerHTML = '<div class="card" style="width:min(480px,95vw);padding:0;max-height:92vh;overflow:auto">'
+        + '<div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center">'
+        + '<div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.6);text-transform:uppercase">Cobros · aplicar pago</div>'
+        + '<b style="font-family:var(--f-display);font-size:16px;color:#fff">💳 Aplicar pago — ' + U.money(c.monto, cur) + '</b></div>'
+        + '<button class="imp-x" id="pm-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
+        + '<div style="padding:18px 20px;display:grid;gap:12px">'
+        + '<label class="ce-l">Fecha de envío a gestión *<input id="pm-fecha" class="o-sel" type="date" value="' + hoy + '"></label>'
+        + '<label class="ce-l">Método de pago<select id="pm-metodo" class="o-sel"><option>Transferencia bancaria</option><option>Tarjeta de crédito</option><option>Tarjeta de débito</option><option>Cheque</option><option>Efectivo</option><option>Visa cuotas</option></select></label>'
+        + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">📄 Factura de la aseguradora (opcional)</span>'
+        + '<div style="display:flex;gap:8px;align-items:center">'
+        + '<button class="btn ghost sm" id="pm-fact-btn">⬆ Seleccionar factura</button>'
+        + '<span id="pm-fact-name" class="muted" style="font-size:12px">Sin factura</span></div>'
+        + '<div class="muted" style="font-size:11.5px;margin-top:5px">Al cargar la factura, el recibo pasa a <b>Conciliado</b> y se registra la fecha real de pago.</div></div>'
+        + '<label class="ce-l">Fecha real de pago (de la factura)<input id="pm-fecha-real" class="o-sel" type="date"></label>'
+        + '</div>'
+        + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">'
+        + '<button class="btn ghost" id="pm-cancel">Cancelar</button>'
+        + '<button class="btn primary" id="pm-ok">✅ Confirmar pago</button></div></div>';
+      document.body.appendChild(pm);
+      let factName = '', factData = '';
+      const pmClose = () => pm.remove();
+      pm.addEventListener('click', e => { if (e.target === pm) pmClose(); });
+      pm.querySelector('#pm-x').addEventListener('click', pmClose);
+      pm.querySelector('#pm-cancel').addEventListener('click', pmClose);
+      pm.querySelector('#pm-fact-btn').addEventListener('click', () => {
+        const fi = document.createElement('input'); fi.type = 'file'; fi.accept = '.pdf,image/*';
+        fi.onchange = () => {
+          if (!fi.files[0]) return;
+          factName = fi.files[0].name;
+          pm.querySelector('#pm-fact-name').textContent = '📄 ' + factName;
+          const r = new FileReader(); r.onload = e2 => { factData = e2.target.result; }; r.readAsDataURL(fi.files[0]);
+        };
+        fi.click();
+      });
+      pm.querySelector('#pm-ok').addEventListener('click', () => {
+        const fecha = pm.querySelector('#pm-fecha').value;
+        const metodo = pm.querySelector('#pm-metodo').value;
+        const fechaReal = pm.querySelector('#pm-fecha-real').value;
+        const conciliado = !!factName;
+        const patch = { estado: 'Pagado', fechaPago: fecha, metodo, conciliado };
+        if (factName) { patch.facturaNombre = factName; patch.fechaReal = fechaReal || fecha; }
+        S().update('cobros', cobroId, patch);
+        S().insert('actividades', { id: 'act'+Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'cobro', icon: '💳', fecha, titulo: 'Pago aplicado', detalle: U.money(c.monto, cur) + ' · ' + metodo + (conciliado ? ' · Conciliado' : '') });
+        // Fire automations
+        const cliObj = S().get('clientes', c.clienteId);
+        if (Orbit.modules.automatizaciones && cliObj) Orbit.modules.automatizaciones.disparar('pago_aplicado', { nombre: (cliObj.nombre||'').split(' ')[0], monto: U.money(c.monto, cur) });
+        pmClose();
+        const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✅ Pago aplicado' + (conciliado ? ' y conciliado' : ' — pendiente conciliación'); document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+        const host2 = document.getElementById('mod-host'); if (host2) render(host2);
+      });
     });
   }
 

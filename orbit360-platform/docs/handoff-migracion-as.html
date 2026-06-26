@@ -1,298 +1,241 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Handoff · Migración A&S — Orbit 360</title>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root{--red:#C5162E;--graph:#1E2227;--ink:#1E2227;--ink-2:#3d4350;--ink-3:#7a818e;--surface:#f4f3ee;--card:#fff;--line:#e4e2db;--r:14px}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:var(--ink);line-height:1.6}
-    .nav{background:var(--graph);color:#fff;padding:16px 32px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.25)}
-    .nav-logo{font-size:22px;font-weight:800;letter-spacing:-.02em}.nav-logo span{color:var(--red)}
-    .nav-badge{background:var(--red);color:#fff;font-size:11px;font-weight:700;border-radius:99px;padding:4px 12px;margin-left:auto}
-    .page{max-width:900px;margin:0 auto;padding:36px 24px;display:grid;gap:28px}
-    .hero{background:linear-gradient(120deg,var(--graph),#111820);border-radius:var(--r);padding:48px 52px;color:#fff}
-    .hero .tag{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:12px}
-    .hero h1{font-size:36px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:12px}
-    .hero h1 span{color:var(--red)}
-    .hero p{font-size:16px;color:rgba(255,255,255,.8);max-width:600px}
-    .card{background:var(--card);border-radius:var(--r);padding:32px 36px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
-    .card h2{font-size:22px;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:10px}
-    .card h3{font-size:16px;font-weight:700;margin:20px 0 10px;color:var(--ink)}
-    .card p,.card li{font-size:14.5px;color:var(--ink-2);margin-bottom:10px}
-    .card ul{list-style:none;display:grid;gap:8px;margin-bottom:16px}
-    .card ul li{display:flex;gap:10px;align-items:flex-start}
-    .card ul li::before{content:'';flex-shrink:0;width:7px;height:7px;border-radius:50%;background:var(--red);margin-top:7px}
-    .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-    .block{border:1px solid var(--line);border-radius:10px;padding:18px 20px}
-    .block .ic{font-size:28px;margin-bottom:10px}
-    .block b{display:block;font-size:15px;font-weight:700;margin-bottom:6px}
-    .block p{font-size:13px;color:var(--ink-3);margin:0}
-    .step{display:flex;gap:16px;margin-bottom:22px}
-    .step-n{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;font-weight:800;font-size:15px;display:grid;place-items:center}
-    .step-t{font-size:15px;font-weight:700;margin-bottom:4px}
-    .step-d{font-size:13.5px;color:var(--ink-2)}
-    .tag-ok{background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px}
-    .tag-pend{background:#fef3c7;color:#b45309;font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px}
-    .tag-soon{background:#fee2e2;color:#b91c1c;font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px}
-    .code{background:var(--graph);color:#a3e635;border-radius:8px;padding:16px 20px;font-family:monospace;font-size:13px;line-height:1.8;margin:12px 0;white-space:pre-wrap}
-    .warn{background:#fff7ed;border-left:4px solid #c9821b;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:var(--ink-2)}
-    .warn b{color:#c9821b}
-    table{width:100%;border-collapse:collapse;font-size:13.5px}
-    th{background:var(--graph);color:#fff;padding:10px 14px;text-align:left}
-    td{padding:10px 14px;border-bottom:1px solid var(--line)}
-    tr:nth-child(even) td{background:var(--surface)}
-    @media(max-width:700px){.cols{grid-template-columns:1fr}.hero{padding:28px 24px}.hero h1{font-size:26px}}
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handoff · Migración Alianzas y Soluciones · Orbit 360</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#C5162E;--graph:#1E2227;--ink:#1E2227;--ink-2:#3d4350;--ink-3:#7a818e;--surface:#f4f3ee;--card:#fff;--line:#e4e2db;--r:14px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:var(--ink);line-height:1.6}
+  .nav{background:var(--graph);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+  .nav-logo{font-size:20px;font-weight:800}.nav-logo span{color:var(--red)}
+  .nav-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:6px;padding:4px 11px;margin-left:auto;letter-spacing:.05em}
+  .page{max-width:900px;margin:0 auto;padding:32px 20px;display:grid;gap:22px}
+  .hero{background:linear-gradient(120deg,#111820,#0a0d12);border-radius:var(--r);padding:46px 52px;color:#fff}
+  .hero .tag{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:10px}
+  .hero h1{font-size:32px;font-weight:800;line-height:1.15;margin-bottom:12px}.hero h1 span{color:var(--red)}
+  .hero p{font-size:15px;color:rgba(255,255,255,.78);max-width:600px}
+  .card{background:var(--card);border-radius:var(--r);padding:28px 32px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  .card h2{font-size:21px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+  .card .lead{font-size:13.5px;color:var(--ink-3);margin-bottom:18px}
+  .card h3{font-size:15px;font-weight:700;margin:20px 0 9px;color:var(--ink);padding-left:11px;border-left:3px solid var(--red)}
+  .card p{font-size:14px;color:var(--ink-2);margin-bottom:10px}
+  .card ul{list-style:none;display:grid;gap:8px;margin-bottom:14px}
+  .card ul li{display:flex;gap:10px;font-size:13.5px;color:var(--ink-2)}
+  .card ul li::before{content:'▸';color:var(--red);flex-shrink:0;font-weight:700}
+  .code{background:#0f172a;color:#a3e635;border-radius:9px;padding:15px 18px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;margin:10px 0;white-space:pre-wrap;overflow-x:auto}
+  .code .c{color:#64748b}
+  .tip{background:#fff7ed;border-left:4px solid #c9821b;border-radius:0 10px 10px 0;padding:13px 17px;font-size:13px;color:var(--ink-2);margin:12px 0}
+  .tip b{color:#c9821b}
+  .warn{background:#fef2f2;border-left:4px solid var(--red);border-radius:0 10px 10px 0;padding:13px 17px;font-size:13px;color:var(--ink-2);margin:12px 0}
+  .warn b{color:var(--red)}
+  .step{display:flex;gap:14px;margin-bottom:16px}
+  .step-n{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center}
+  .step-t{font-size:14.5px;font-weight:700;margin-bottom:3px}
+  .step-d{font-size:13px;color:var(--ink-2)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+  th{background:var(--surface);text-align:left;padding:9px 11px;font-weight:700;border-bottom:2px solid var(--line)}
+  td{padding:9px 11px;border-bottom:1px solid var(--line);color:var(--ink-2)}
+  .toc{background:var(--card);border-radius:var(--r);padding:22px 28px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  .toc-t{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:12px}
+  .toc ol{margin-left:18px;display:grid;gap:6px}
+  .toc a{color:var(--red);text-decoration:none;font-size:14px;font-weight:600}
+  .toc a:hover{text-decoration:underline}
+  @media(max-width:700px){.hero{padding:30px 24px}.hero h1{font-size:24px}.card{padding:22px 20px}}
+</style>
 </head>
 <body>
-
-<div class="nav">
-  <div><div class="nav-logo">Orbit <span>360</span></div></div>
-  <span class="nav-badge">🚀 Handoff · Migración A&S</span>
-</div>
-
+<div class="nav"><div class="nav-logo">Orbit <span>360</span></div><span class="nav-badge">🔒 HANDOFF TÉCNICO · USO INTERNO</span></div>
 <div class="page">
 
-  <!-- HERO -->
   <div class="hero">
-    <div class="tag">Documento de Handoff · Versión 1.0 · Jun 2026</div>
-    <h1>Migración de<br><span>Alianzas &amp; Soluciones</span><br>como primer cliente</h1>
-    <p>Guía completa para configurar, migrar y poner en producción la plataforma Orbit 360 para A&S como tenant cero.</p>
+    <div class="tag">📦 Documento de entrega · v0.86</div>
+    <h1>Handoff de migración<br><span>Alianzas y Soluciones</span></h1>
+    <p>Todo lo necesario para crear el proyecto de A&S como primer cliente real: nuevo proyecto, backend, bases de datos, integraciones, fuentes a migrar y cómo actualizar la plataforma después.</p>
   </div>
 
-  <!-- PREGUNTAS CLAVE -->
-  <div class="card">
-    <h2>❓ Preguntas clave antes de empezar</h2>
+  <div class="toc">
+    <div class="toc-t">Contenido</div>
+    <ol>
+      <li><a href="#p1">1 · Crear el nuevo proyecto A&S</a></li>
+      <li><a href="#p2">2 · Conectar el backend</a></li>
+      <li><a href="#p3">3 · Bases de datos</a></li>
+      <li><a href="#p4">4 · Integraciones (IA, Make, correo, redes)</a></li>
+      <li><a href="#p5">5 · Fuentes a cargar para migrar A&S</a></li>
+      <li><a href="#p6">6 · Actualizaciones post-migración</a></li>
+    </ol>
+  </div>
 
-    <h3>¿Proyecto nuevo o continúo aquí?</h3>
-    <p><strong>Proyecto nuevo en Claude.</strong> Este proyecto ya acumula 580+ turnos de construcción. Para la migración A&S conviene una pizarra limpia que solo contenga el código, no el historial de build.</p>
+  <!-- 1 -->
+  <div class="card" id="p1">
+    <h2>1 · Crear el nuevo proyecto A&S</h2>
+    <p class="lead">Orbit 360 es la versión comercializable (genérica, datos ficticios). A&S es el primer cliente: se personaliza SOLO por configuración, sin tocar el core.</p>
 
-    <h3>¿Claude o ChatGPT?</h3>
-    <p><strong>Claude (Anthropic) obligatoriamente.</strong> El código de Orbit 360 vive en proyectos de Claude; solo Claude puede leer, editar y desplegar los archivos nativamente. ChatGPT no tiene acceso al filesystem del proyecto.</p>
+    <h3>Tipo de proyecto</h3>
+    <p><b>Proyecto normal de Claude</b> (no Design). Design es solo para prototipos visuales; A&S es trabajo de producto continuo sobre código real.</p>
 
-    <h3>¿Proyecto normal o especial?</h3>
-    <p>Proyecto <strong>normal de Claude Pro/Team</strong>. No necesitas una cuenta técnica especial — el mismo plan que usas aquí.</p>
+    <div class="step"><div class="step-n">1</div><div><div class="step-t">Crear el proyecto</div><div class="step-d">En claude.ai → "New Project" → nombre: <b>"Orbit 360 · Alianzas y Soluciones"</b>.</div></div></div>
+    <div class="step"><div class="step-n">2</div><div><div class="step-t">Subir el ZIP base</div><div class="step-d">Sube el ZIP de <b>orbit360-platform v0.86</b> (o la última versión). Esa carpeta ES el repo completo.</div></div></div>
+    <div class="step"><div class="step-n">3</div><div><div class="step-t">Pegar las instrucciones del proyecto</div><div class="step-d">Copia el contenido del <b>CLAUDE.md</b> que está en la raíz del ZIP en "Project Instructions". Ahí están las reglas fijas, arquitectura y forma de continuar.</div></div></div>
+    <div class="step"><div class="step-n">4</div><div><div class="step-t">Primer mensaje</div><div class="step-d">"Configura Orbit 360 para A&S. Lee CLAUDE.md y docs/PLAN-INFRAESTRUCTURA.md. Personaliza solo por config: Orbit.tenant, seed de aseguradoras reales, asesores, metas."</div></div></div>
 
-    <h3>¿Qué sube al nuevo proyecto?</h3>
+    <div class="warn"><b>⚠️ Regla de oro:</b> NUNCA modifiques el core para personalizar A&S. Toda personalización va en <b>core/config.js</b> (Orbit.tenant) y <b>data/seed.js</b>. Así puedes actualizar el core sin romper la personalización.</div>
+  </div>
+
+  <!-- 2 -->
+  <div class="card" id="p2">
+    <h2>2 · Conectar el backend</h2>
+    <p class="lead">Hoy la plataforma corre 100% en el navegador con localStorage. Para producción real (multi-usuario, datos persistentes en la nube) se swappea la capa de datos.</p>
+
+    <h3>El punto único de cambio: data/store.js</h3>
+    <p>TODOS los módulos llaman solo a <b>Orbit.store</b> — nunca tocan localStorage directo. Por eso migrar a backend es cambiar UN archivo, sin tocar los módulos.</p>
+    <div class="code"><span class="c">// Orbit.store expone exactamente esta interfaz:</span>
+all(coleccion)              <span class="c">// → array de todos los registros</span>
+get(coleccion, id)          <span class="c">// → un registro</span>
+where(coleccion, fn)        <span class="c">// → filtrados</span>
+insert(coleccion, obj)      <span class="c">// crear</span>
+update(coleccion, id, patch)<span class="c">// actualizar</span>
+remove(coleccion, id)       <span class="c">// borrar</span></div>
+    <p>Para conectar backend: reescribe esos 6 métodos para que lean/escriban en Firestore / Supabase / API REST en vez de localStorage. Los módulos no cambian.</p>
+
+    <h3>Opción recomendada: Firebase (Firestore)</h3>
+    <div class="code"><span class="c">// 1. Crear proyecto en console.firebase.google.com</span>
+<span class="c">// 2. Firestore Database → crear (modo producción)</span>
+<span class="c">// 3. Cada "colección" de Orbit = una colección Firestore:</span>
+<span class="c">//    clientes, polizas, cobros, aseguradoras, gestiones, etc.</span>
+<span class="c">// 4. En store.js, reemplazar la implementación:</span>
+async function all(col){
+  const snap = await db.collection(tenant+'_'+col).get();
+  return snap.docs.map(d => ({id:d.id, ...d.data()}));
+}</div>
+
+    <h3>Despliegue (hosting)</h3>
     <ul>
-      <li>El <strong>ZIP más reciente</strong> de este proyecto (orbit360-platform/) — es el estado completo.</li>
-      <li>Un <strong>CLAUDE.md</strong> nuevo (ver más abajo) que le da todo el contexto sin los 580 turnos.</li>
-      <li>Los documentos de A&S que necesites migrar (pólizas, clientes, estados de cuenta).</li>
+      <li><b>GitHub Pages</b> — push al repo → Settings → Pages → main/root. Listo en 2 min. Ideal para demos.</li>
+      <li><b>Hosting propio + dominio</b> — sube los archivos a tu servidor (cPanel/FTP/AWS S3). Configura HTTPS. Ideal para producción A&S: <code>app.alianzasysoluciones.com</code>.</li>
     </ul>
-
-    <h3>¿Sigo en el proyecto de la plataforma antigua de A&S?</h3>
-    <p><strong>No.</strong> La plataforma antigua de A&S (cotizador/comparativo legacy) es una herramienta separada. El proyecto nuevo de migración es independiente y solo usa Orbit 360 como base.</p>
+    <div class="tip"><b>💡 Multi-tenant:</b> cada cliente tiene un prefijo en las colecciones (<code>tenant_clientes</code>) o una base de datos separada. Orbit.tenant en config.js define cuál se usa.</div>
   </div>
 
-  <!-- CLAUDE.MD PARA EL NUEVO PROYECTO -->
-  <div class="card">
-    <h2>📋 CLAUDE.md listo para pegar en el nuevo proyecto</h2>
-    <p>Crea el nuevo proyecto en Claude, sube el ZIP, y pega esto en el archivo <code>CLAUDE.md</code> en la raíz:</p>
-    <div class="code"># CLAUDE.md — Orbit 360 · Personalización A&S (tenant cero)
+  <!-- 3 -->
+  <div class="card" id="p3">
+    <h2>3 · Bases de datos</h2>
+    <p class="lead">Estructura de datos que ya usa la plataforma — la misma que usará el backend.</p>
 
-> Este proyecto ES el repositorio de producción de A&S.
-> Base: orbit360-platform/ (último build estable v0.70).
-
-## Contexto
-Orbit 360 es un sistema 360 comercializable para intermediarios de seguros.
-Alianzas y Soluciones (A&S) es el PRIMER CLIENTE real.
-La personalización es SOLO POR CONFIGURACIÓN — no modificar el core.
-
-## Qué hacer en este proyecto
-1. Personalizar branding A&S (logo, colores, nombre del producto).
-2. Configurar aseguradoras reales de GT: El Roble, G&T, Mapfre, Universales,
-   La Ceiba, La General, Ficohsa, Bantrab, AseGuate.
-3. Migrar datos reales: clientes, pólizas, vehículos, estados de cuenta.
-4. Conectar integraciones reales: Outlook/Gmail, WhatsApp API, Drive, Make.
-5. Configurar la API key de Gemini para el importador inteligente real.
-6. Poner en producción (GitHub Pages o hosting propio).
-
-## Archivos clave
-- orbit360-platform/index.html — shell principal
-- orbit360-platform/core/config.js — tenant + módulos + GEO
-- orbit360-platform/data/seed.js — datos de arranque (__v actual)
-- orbit360-platform/docs/PLAN-INFRAESTRUCTURA.md — plan maestro completo
-
-## Reglas fijas (no negociables)
-- Marca A&S en el chrome (no Orbit 360 visible para el cliente final).
-- Datos de clientes REALES — sin datos ficticios de demo.
-- Moneda base: GTQ (Guatemala). Coberturas según normativa GT.
-- Fondo oscuro → texto SIEMPRE blanco.
-
-## Cómo continuar en un chat nuevo
-"Configura Orbit 360 para A&S. Lee CLAUDE.md y PLAN-INFRAESTRUCTURA.md."</div>
-  </div>
-
-  <!-- PASOS DE MIGRACIÓN -->
-  <div class="card">
-    <h2>📍 Pasos de migración (en orden)</h2>
-
-    <div class="step">
-      <div class="step-n">1</div>
-      <div>
-        <div class="step-t">Branding A&S</div>
-        <div class="step-d">Subir logo en Configuración → Marca. Cambiar nombre del producto. Ajustar paleta de colores si difiere del rojo Orbit. El sidebar y el login cambian automáticamente.</div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-n">2</div>
-      <div>
-        <div class="step-t">Configurar aseguradoras reales de GT</div>
-        <div class="step-d">En Orbit Aseguradoras: habilitar las vinculadas a A&S (El Roble, G&T, Mapfre…); cargar NIT, patrón de concepto, cuentas bancarias, ejecutivos de cuenta y documentos de cada una. El importador documental puede extraer NIT/patrón de facturas previas.</div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-n">3</div>
-      <div>
-        <div class="step-t">Migrar clientes y pólizas</div>
-        <div class="step-d">Desde Importación Inteligente → subir los archivos del histórico de A&S (Excel/CSV/PDF). El motor detecta clientes, pólizas y vehículos, cruza por identificación/N.º de póliza y complementa sin duplicar. Señala lo que no puede leer para completar manual.</div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-n">4</div>
-      <div>
-        <div class="step-t">Conectar integraciones</div>
-        <div class="step-d">En Configuración → Integraciones: (1) Outlook/Gmail para la bandeja interna, (2) Google Drive para los expedientes, (3) WhatsApp Business API para cadencias y recordatorios, (4) Make para automatizaciones de cobro/renovación, (5) Gemini API key para importador inteligente real.</div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-n">5</div>
-      <div>
-        <div class="step-t">Tarifas de comisiones</div>
-        <div class="step-d">En Comisiones → Tarifas o Equipo → Comisiones: configurar % por ramo por aseguradora e importar la planilla de comisiones mensual. La plataforma calcula automáticamente comisión aseguradora y vendedor.</div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-n">6</div>
-      <div>
-        <div class="step-t">Usuarios y roles del equipo A&S</div>
-        <div class="step-d">En Equipo y Permisos: crear un usuario por asesor con su rol (Asesor/Admin/Dirección/Marketing), conectar su correo de plataforma y asignar módulos visibles. Al crear, se envía bienvenida + credenciales por correo/WA.</div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-n">7</div>
-      <div>
-        <div class="step-t">Verificar y poner en producción</div>
-        <div class="step-d">Subir el código a GitHub → activar GitHub Pages (o hosting propio). URL tipo: https://tuusuario.github.io/orbit360-as/ . Compartir el link con el equipo. El Portal del Cliente tiene su URL separada.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ESTADO DEL CÓDIGO -->
-  <div class="card">
-    <h2>✅ Estado del código base (v0.70)</h2>
+    <h3>Colecciones principales</h3>
     <table>
-      <tr><th>Módulo</th><th>Estado</th><th>Notas</th></tr>
-      <tr><td>Núcleo CRM (Clientes 360, Pólizas, Cobros, Renovaciones, Cancelaciones)</td><td><span class="tag-ok">✅ Completo</span></td><td>Motor de primas/recibos, desglose IVA, endosos</td></tr>
-      <tr><td>Orbit Ops ↔ Leads (ciclo comercial sincronizado)</td><td><span class="tag-ok">✅ Completo</span></td><td>Multi-rol, cadencias, emisión→cliente</td></tr>
-      <tr><td>Orbit Insights (analítica)</td><td><span class="tag-ok">✅ Completo</span></td><td>9 vistas, KPIs clicables, comparativos interanuales</td></tr>
-      <tr><td>Orbit Finanzas</td><td><span class="tag-ok">✅ Completo</span></td><td>Movimientos, CxC/CxP, financiación, presupuesto, lote</td></tr>
-      <tr><td>Orbit Aseguradoras</td><td><span class="tag-ok">✅ Completo</span></td><td>Ficha editable, facturación, Drive, contactos</td></tr>
-      <tr><td>Cotizador + Comparativo</td><td><span class="tag-ok">✅ Completo</span></td><td>Motor por tasas, historial, PDFs externos</td></tr>
-      <tr><td>Correo (Outlook/IMAP)</td><td><span class="tag-ok">✅ Estructura</span></td><td>Bandeja demo; OAuth real en migración</td></tr>
-      <tr><td>Orbit Marketing (calendario)</td><td><span class="tag-ok">✅ Completo</span></td><td>Generación con IA, Metricool, reprogramar</td></tr>
-      <tr><td>Orbit Academia (LMS)</td><td><span class="tag-ok">✅ Completo</span></td><td>Cursos interactivos, videos embebidos, certificados</td></tr>
-      <tr><td>Orbit Reportes</td><td><span class="tag-ok">✅ Completo</span></td><td>6 reportes, exportar CSV; falta Excel/PDF</td></tr>
-      <tr><td>Portal del Cliente</td><td><span class="tag-ok">✅ Estructura</span></td><td>UI lista; OAuth clientes en migración</td></tr>
-      <tr><td>Siniestros/Reclamos</td><td><span class="tag-ok">✅ Completo</span></td><td>Ficha, bitácora, importador</td></tr>
-      <tr><td>Orbit Cronograma</td><td><span class="tag-ok">✅ Completo</span></td><td>Día/semana/mes, vencimientos + tareas</td></tr>
-      <tr><td>Automatizaciones</td><td><span class="tag-pend">🟡 Pendiente</span></td><td>R10.3 — próximo bloque</td></tr>
-      <tr><td>Importador inteligente (motor real)</td><td><span class="tag-pend">🟡 Scaffold</span></td><td>Real con Gemini API key conectada</td></tr>
-      <tr><td>Notificaciones WA (módulo)</td><td><span class="tag-pend">🟡 Pendiente</span></td><td>Lotes funcionan; módulo dedicado pendiente</td></tr>
-      <tr><td>Roles ampliados + módulos por rol</td><td><span class="tag-pend">🟡 Pendiente</span></td><td>R10.1 — base para aprendizaje por rol</td></tr>
+      <thead><tr><th>Colección</th><th>Qué guarda</th></tr></thead>
+      <tbody>
+        <tr><td><b>clientes</b></td><td>Expediente: datos, contacto, país, asesor, segmento</td></tr>
+        <tr><td><b>polizas</b></td><td>Pólizas con desglose de prima, ramo/subramo, vigencia, comisiones</td></tr>
+        <tr><td><b>cobros</b></td><td>Recibos por cuota, estado, conciliación, factura</td></tr>
+        <tr><td><b>vehiculos</b></td><td>Vehículos asegurados vinculados a pólizas auto</td></tr>
+        <tr><td><b>aseguradoras</b></td><td>Directorio, contactos, tarifas, facturación, accesos, Drive</td></tr>
+        <tr><td><b>negocios / gestiones</b></td><td>Pipeline Leads/Ops, ciclo comercial</td></tr>
+        <tr><td><b>siniestros</b></td><td>Reclamos con bitácora y estado</td></tr>
+        <tr><td><b>movimientos</b></td><td>Finanzas: ingresos, egresos, CxC, CxP, financiación</td></tr>
+        <tr><td><b>cursos</b></td><td>Academia: lecciones, recursos, quiz, destinatarios</td></tr>
+        <tr><td><b>actividades</b></td><td>Historial transversal de todo lo que pasa</td></tr>
+      </tbody>
     </table>
+
+    <h3>Seed (datos iniciales)</h3>
+    <p>En <code>data/seed.js</code> está todo el dataset ficticio con versión <code>__v</code>. Para A&S: reemplaza las aseguradoras por las reales vinculadas, los asesores por el equipo real, y las metas. Sube <code>__v</code> para forzar recarga del seed.</p>
+    <div class="warn"><b>⚠️ Datos ficticios en el core:</b> Orbit 360 (comercializable) siempre lleva datos ficticios. Los datos REALES de A&S van solo en el proyecto A&S, nunca en el core.</div>
   </div>
 
-  <!-- INTEGRACIONES REALES -->
-  <div class="card">
-    <h2>🔗 Integraciones que requieren credenciales reales (en migración)</h2>
-    <div class="cols">
-      <div class="block"><div class="ic">✉</div><b>Correo (Outlook/Gmail)</b><p>Registrar app en Azure AD (Outlook) o Google Cloud Console (Gmail) → OAuth2 → pegar client_id + secret en Config → Integraciones.</p></div>
-      <div class="block"><div class="ic">💬</div><b>WhatsApp Business API</b><p>Meta Business → WhatsApp API → token permanente → pegar en Config. O usar Green API como proxy.</p></div>
-      <div class="block"><div class="ic">📁</div><b>Google Drive</b><p>Google Cloud Console → Service Account → habilitar Drive API → JSON de credenciales → Config → Integraciones → Drive.</p></div>
-      <div class="block"><div class="ic">✨</div><b>Gemini (IA real)</b><p>Google AI Studio → Crear API key → pegar en Automatizaciones → Asistente IA → Guardar. Activa el importador inteligente real y el análisis crítico.</p></div>
-      <div class="block"><div class="ic">🔗</div><b>Make (automatizaciones)</b><p>Make.com → Crear escenario → Copiar webhook URL → pegar en Automatizaciones → Webhook de Make → Guardar. Cada evento de Orbit disparará el escenario.</p></div>
-      <div class="block"><div class="ic">🗄</div><b>Backend / Base de datos</b><p>Para producción real: reemplazar Orbit.store por Firebase/Supabase. El código está diseñado para este swap — los módulos solo llaman a Orbit.store.all/get/insert/update.</p></div>
-    </div>
-  </div>
+  <!-- 4 -->
+  <div class="card" id="p4">
+    <h2>4 · Integraciones</h2>
+    <p class="lead">Se configuran desde Automatizaciones y Configuración. Sin claves, la plataforma funciona con heurística (sin costo); con claves, se activan las funciones reales.</p>
 
-  <!-- GUÍA DE HeyGen -->
-  <div class="card">
-    <h2>🎬 Guiones HeyGen — video de capacitación por módulo</h2>
-    <p>Para cada módulo, graba un video con tu avatar en HeyGen usando este patrón de guion:</p>
-    <div class="code">GUION MÓDULO: [NOMBRE DEL MÓDULO]
-Duración objetivo: 5-8 minutos
-Avatar: [Tu nombre] · Tono: profesional, amable, directo
+    <h3>🤖 IA — Gemini (económico)</h3>
+    <div class="code"><span class="c">1. aistudio.google.com → Get API key → copiar</span>
+<span class="c">2. Orbit → Automatizaciones → Asistente IA → pegar key → Activar</span>
+<span class="c">3. Activa: extracción real de PDFs (importadores), generación</span>
+<span class="c">   de cursos/copys, análisis crítico de Insights y Finanzas</span></div>
 
-INTRO (30 seg):
-"Hola, soy [Nombre]. Hoy vamos a ver [módulo] de Orbit 360.
-En los próximos minutos vas a aprender [objetivo 1], [objetivo 2] y [objetivo 3]."
+    <h3>⚡ Make (automatizaciones)</h3>
+    <div class="code"><span class="c">1. make.com → nuevo escenario → módulo Webhook → copiar URL</span>
+<span class="c">2. Orbit → Automatizaciones → Webhook Make → pegar → guardar</span>
+<span class="c">3. Probar disparo → verificar que llega el payload en Make</span>
+<span class="c">4. En Make: ramificar a WhatsApp Cloud / Gmail / Sheets / Canva</span></div>
 
-PARTE 1 — QUÉ ES (1 min):
-Explica para qué sirve el módulo en una sola frase.
-Muestra la pantalla principal (slide/captura).
-
-PARTE 2 — CÓMO SE USA (3-4 min):
-Paso 1: [acción] → [resultado]
-Paso 2: [acción] → [resultado]
-Dato clave: [buena práctica o tip]
-
-PARTE 3 — CONEXIÓN CON OTROS MÓDULOS (1 min):
-"Este módulo se conecta con [X] y [Y] porque..."
-
-CIERRE (30 seg):
-"Recuerda: [acción clave del módulo].
-En la siguiente lección veremos [siguiente módulo]."
-
-SLIDE FINAL: Logo Orbit 360 + "Más en Orbit Academia"</div>
-    <div class="warn"><b>💡 Tip HeyGen:</b> usa "Screen Recording" + avatar pequeño en esquina para mostrar la plataforma real mientras narras. Exporta en MP4 y sube la URL de YouTube/Vimeo al campo URL de la lección en Orbit Academia.</div>
-  </div>
-
-  <!-- PORTAL DEL CLIENTE -->
-  <div class="card">
-    <h2>🚪 Acceso del cliente al Portal</h2>
-    <div class="cols">
-      <div class="block"><div class="ic">🔗</div><b>Link directo</b><p>URL: <code>https://tudominio.com/portal</code><br>El cliente entra con <b>usuario = correo</b> y <b>contraseña temporal</b> enviada por WA/correo al emitir su póliza.</p></div>
-      <div class="block"><div class="ic">🌐</div><b>Embebido en tu web</b><p>Añade un botón en tu página web:<br><code>&lt;a href="https://tudominio.com/portal"&gt;Mi Portal&lt;/a&gt;</code><br>O usa un iframe en una sección "Área de clientes".</p></div>
-    </div>
-    <h3>Patrón de credenciales autogenerado (al emitir póliza)</h3>
-    <div class="code">Usuario:    correo_del_cliente@dominio.com
-Contraseña: [4 primeras letras del apellido] + [últimos 4 dígitos de identificación]
-Ejemplo:    OSOR4594
-
-El sistema envía por WA: "Bienvenido/a [Nombre], tu acceso al portal:
-🔗 https://tudominio.com/portal
-👤 Usuario: tu correo
-🔑 Contraseña temporal: OSOR4594
-(Cámbiala en tu primer ingreso)"</div>
-  </div>
-
-  <!-- CHECKLIST FINAL -->
-  <div class="card">
-    <h2>☑️ Checklist de lanzamiento A&S</h2>
+    <h3>✉️ Correo (Outlook / Gmail / IMAP)</h3>
     <ul>
-      <li>ZIP v0.70 subido al nuevo proyecto Claude</li>
-      <li>CLAUDE.md configurado con contexto A&S</li>
-      <li>Logo y branding A&S aplicados</li>
-      <li>Aseguradoras GT configuradas (El Roble, G&T, Mapfre…)</li>
-      <li>Tarifas de comisiones importadas</li>
-      <li>Usuarios del equipo creados con roles</li>
-      <li>Datos migrados (clientes + pólizas actuales)</li>
-      <li>Correo/WhatsApp conectado</li>
-      <li>Gemini API key activa (importador inteligente real)</li>
-      <li>Make configurado con los primeros 3 escenarios (cobro/renovación/bienvenida)</li>
-      <li>URL pública activa y probada</li>
-      <li>Primer cliente invitado al Portal</li>
+      <li><b>Outlook/M365:</b> portal.azure.com → registrar app → permisos Mail.ReadWrite, Mail.Send, Calendars.Read → client_id + secret + tenant_id.</li>
+      <li><b>Gmail/Workspace:</b> Google Cloud Console → OAuth 2.0 → scopes de Gmail API.</li>
+      <li><b>IMAP/POP3:</b> para dominios propios — host, puerto, usuario, contraseña de aplicación. El correo del usuario es individual, no genérico.</li>
     </ul>
+
+    <h3>📣 Redes y contenido</h3>
+    <ul>
+      <li><b>Metricool</b> — programar/publicar en todas las redes desde un solo lugar.</li>
+      <li><b>Make → Canva → Metricool</b> — flujo automatizado de generación + publicación.</li>
+      <li>Facebook, Instagram, LinkedIn, TikTok, YouTube — vía Metricool o Make.</li>
+      <li><b>HeyGen</b> — videos de capacitación con avatar (Academia).</li>
+    </ul>
+    <div class="tip"><b>💡 Sin claves:</b> todo funciona en modo demo/heurístico. Conecta las integraciones de A&S una a una conforme tengas las credenciales — la plataforma no se rompe si faltan.</div>
+  </div>
+
+  <!-- 5 -->
+  <div class="card" id="p5">
+    <h2>5 · Fuentes a cargar para migrar A&S</h2>
+    <p class="lead">Qué archivos exportar de tus herramientas actuales y dónde importarlos en Orbit. El importador inteligente mapea, cruza y complementa sin duplicar.</p>
+
+    <table>
+      <thead><tr><th>Fuente (de tu sistema actual)</th><th>Dónde importar en Orbit</th></tr></thead>
+      <tbody>
+        <tr><td>Excel/CSV de clientes</td><td>Clientes 360 → Importar → Inteligente</td></tr>
+        <tr><td>Excel/CSV de pólizas (con desglose de prima)</td><td>Importación → Pólizas</td></tr>
+        <tr><td>PDFs de pólizas (carátulas)</td><td>Importación inteligente (extrae datos) o expediente documental</td></tr>
+        <tr><td>Vehículos asegurados</td><td>Importación → Vehículos (se vinculan a pólizas auto)</td></tr>
+        <tr><td>Estados de cuenta de aseguradoras</td><td>Finanzas → Movimientos → Estado de cuenta (concilia recibos)</td></tr>
+        <tr><td>Planillas de comisiones por aseguradora</td><td>Comisiones / Finanzas (configura % por producto)</td></tr>
+        <tr><td>Histórico de movimientos financieros</td><td>Finanzas → Movimientos → Importar histórico</td></tr>
+        <tr><td>Directorio de aseguradoras (NIT, contactos, tarifas)</td><td>Orbit Aseguradoras → Importar</td></tr>
+        <tr><td>Bitácoras de reclamos/siniestros</td><td>Siniestros → Importar bitácora</td></tr>
+        <tr><td>Cotizador/Comparativo (HTML A&S)</td><td>Se reconstruye en el módulo Cotizador, vinculado a Orbit Aseguradoras</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warn"><b>⚠️ Documentos en Drive:</b> NO migrar el histórico documental por espacio. El importador carga los documentos nuevos en la carpeta del cliente en Drive; cuando no encuentra la carpeta, la crea con el nombre completo del cliente y etiqueta los documentos.</div>
+    <div class="tip"><b>💡 Histórico:</b> al importar pólizas antiguas/canceladas NO se generan recibos pendientes (no alteran informes), pero SÍ se cuentan sus primas en analítica y comparativos.</div>
+  </div>
+
+  <!-- 6 -->
+  <div class="card" id="p6">
+    <h2>6 · Actualizaciones post-migración</h2>
+    <p class="lead">Cómo llevar las mejoras que hagamos en Orbit 360 (core) al proyecto A&S ya en producción — sin perder la personalización ni los datos reales.</p>
+
+    <h3>El principio: core separado de configuración</h3>
+    <p>Como A&S se personaliza solo en <code>config.js</code> y <code>seed.js</code>, puedes actualizar todo el resto del core sin tocar lo de A&S.</p>
+
+    <div class="step"><div class="step-n">1</div><div><div class="step-t">Mejora en Orbit 360 (este proyecto)</div><div class="step-d">Seguimos mejorando aquí la versión comercializable. Cada versión sale como ZIP.</div></div></div>
+    <div class="step"><div class="step-n">2</div><div><div class="step-t">Copiar los archivos del core actualizados</div><div class="step-d">En el proyecto A&S, reemplaza los archivos de <code>core/</code>, <code>modules/</code> y <code>styles/</code> con los nuevos. <b>NO</b> reemplaces <code>config.js</code> ni <code>seed.js</code> de A&S (tienen su personalización y datos reales).</div></div></div>
+    <div class="step"><div class="step-n">3</div><div><div class="step-t">Revisar config.js</div><div class="step-d">Si la mejora añadió nuevas claves de configuración (un módulo nuevo, un rol nuevo), agrégalas manualmente al config.js de A&S — son pocas líneas.</div></div></div>
+    <div class="step"><div class="step-n">4</div><div><div class="step-t">Migrar el seed si cambió la estructura</div><div class="step-d">Si una mejora cambió la forma de los datos (campos nuevos en pólizas, etc.), corre una migración puntual sobre los datos reales. El CHANGELOG indica cuándo aplica.</div></div></div>
+    <div class="step"><div class="step-n">5</div><div><div class="step-t">Verificar y desplegar</div><div class="step-d">Prueba 5 registros end-to-end, luego push/deploy. Los datos de A&S (en backend) no se tocan en este proceso.</div></div></div>
+
+    <h3>Flujo práctico con Codex / GitHub</h3>
+    <div class="code"><span class="c"># Si usas Codex con el ZIP:</span>
+"Descomprime este ZIP en la raíz, conserva config.js y seed.js
+ actuales, reemplaza core/ modules/ styles/ con los nuevos,
+ y haz push a main."
+
+<span class="c"># Si trabajas directo en GitHub:</span>
+git checkout -b update-vX.X
+<span class="c"># copia core/ modules/ styles/ del nuevo ZIP</span>
+git add core modules styles && git commit -m "core vX.X"
+git push  <span class="c"># revisa, mergea a main → deploy automático</span></div>
+
+    <div class="tip"><b>💡 Regla simple:</b> "el core viaja, la configuración se queda". Actualizas core/modules/styles desde Orbit 360; config.js y seed.js de A&S nunca se sobreescriben.</div>
+  </div>
+
+  <div class="card" style="text-align:center;background:linear-gradient(120deg,#111820,#0a0d12);color:#fff">
+    <h2 style="justify-content:center;color:#fff">✅ Listo para migrar</h2>
+    <p style="color:rgba(255,255,255,.8);max-width:560px;margin:0 auto">Con este documento tienes el camino completo: nuevo proyecto → backend → datos → integraciones → fuentes → actualizaciones. Orbit 360 sigue mejorando como producto; A&S es tu primer cliente real personalizado solo por configuración.</p>
   </div>
 
 </div>

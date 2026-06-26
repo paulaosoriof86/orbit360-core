@@ -53,11 +53,11 @@ Orbit.modules.cliente360 = (function () {
     const totPrima = clientes.reduce((s, c) => { const r = q.clienteResumen(c.id); return s + (r.moneda === 'COP' ? r.primaAnual / 1000 : r.primaAnual); }, 0);
 
     host.innerHTML = `<div class="page">
-      ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="alert('Alta de cliente: captura los datos del expediente o impórtalos desde un documento.')">+ Nuevo cliente</button>`)}
+      ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevoCliente()">+ Nuevo cliente</button>`)}
 
       <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
-        <div class="kpi"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${clientes.length}</div><div class="k-foot muted">${clientes.filter(c => c.tipo === 'Empresa').length} empresas · ${clientes.filter(c => c.tipo === 'Persona').length} personas</div></div>
-        <div class="kpi"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${S().where('polizas', p => p.estado === 'Vigente' || p.estado === 'Por renovar').length}</div><div class="k-foot muted">de ${S().all('polizas').length} históricas</div></div>
+        <button class="kpi kpi-click" onclick="Orbit.modules.cliente360.render(document.getElementById('mod-host'))" title="Ver todos"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${clientes.length}</div><div class="k-foot muted">${clientes.filter(c => c.tipo === 'Empresa').length} empresas · ${clientes.filter(c => c.tipo === 'Persona').length} personas</div></button>
+        <button class="kpi kpi-click" onclick="Orbit.kpi('polizas-vigentes')" title="Ver pólizas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${S().where('polizas', p => p.estado === 'Vigente' || p.estado === 'Por renovar').length}</div><div class="k-foot muted">de ${S().all('polizas').length} históricas</div></button>
         <div class="kpi"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima vigente</div><div class="k-val">${U.moneyShort(totPrima, 'GTQ')}</div><div class="k-foot muted">cartera total estimada</div></div>
         <div class="kpi"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Por renovar ≤45 d</div><div class="k-val">${q.renovacionesProximas(45).length}</div><div class="k-foot muted">requieren gestión</div></div>
       </div>
@@ -157,7 +157,7 @@ Orbit.modules.cliente360 = (function () {
             </div>
             <div class="fh-contact">
               <span class="fh-chip">🆔 ${U.esc(c.identificacion)}</span>
-              <a class="fh-chip" href="mailto:${U.esc(c.email)}">✉ ${U.esc(c.email)}</a>
+              <a class="fh-chip" style="cursor:pointer" onclick="Orbit.correoCompose({para:'${U.esc(c.email)}',clienteId:'${c.id}',vinculo:{tipo:'cliente',id:'${c.id}',label:'${U.esc(c.nombre)}'}})">✉ ${U.esc(c.email)}</a>
               <span class="fh-chip">📞 ${U.esc(c.telefono)}</span>
               <span class="fh-chip">📍 ${U.esc([c.direccion, c.ciudad, c.departamento].filter(Boolean).join(', ') || c.ciudad)}</span>
               ${c.contactoAlt ? `<span class="fh-chip">👤 Alt: ${U.esc(c.contactoAlt)}</span>` : ''}
@@ -258,18 +258,19 @@ Orbit.modules.cliente360 = (function () {
     else if (tab === 'polizas') body.innerHTML = tabPolizas(cid, r);
     else if (tab === 'vehiculos') body.innerHTML = tabVehiculos(cid, r);
     else if (tab === 'recibos') { body.innerHTML = tabRecibos(cid, r); wireRecibos(cid); }
-    else if (tab === 'cobros') body.innerHTML = tabCobros(cid, r);
+    else if (tab === 'cobros') { body.innerHTML = tabCobros(cid, r); const pf = body.querySelector('#cob-pol-fil'); if (pf) pf.addEventListener('change', () => { window._cobFilPol = window._cobFilPol || {}; window._cobFilPol[cid] = pf.value; body.innerHTML = tabCobros(cid, r); const pf2 = body.querySelector('#cob-pol-fil'); if (pf2) pf2.addEventListener('change', () => { window._cobFilPol[cid] = pf2.value; body.innerHTML = tabCobros(cid, r); }); }); }
     else if (tab === 'renovaciones') body.innerHTML = tabRenov(cid, r);
     else if (tab === 'comisiones') body.innerHTML = tabComis(cid, r);
     else if (tab === 'correos') { body.innerHTML = tabCorreos(cid, r); }
+    else if (tab === 'siniestros') { body.innerHTML = tabSiniestros(cid, r); }
     else if (tab === 'historial') { body.innerHTML = tabHistorial(cid, r); wireHistorial(cid); }
   }
 
   /* ---- Resumen (cerebro) ---- */
   function tabResumen(cid, r) {
     const acts = q.actividadesDe(cid).slice(0, 4);
-    const proxRenov = r.pol.filter(p => p.estado === 'Por renovar').sort((a, b) => a.vigenciaFin.localeCompare(b.vigenciaFin))[0];
-    const proxCobro = r.cob.filter(c => c.estado === 'Pendiente').sort((a, b) => a.vence.localeCompare(b.vence))[0];
+    const proxRenov = r.pol.filter(p => p.estado === 'Por renovar').sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')))[0];
+    const proxCobro = r.cob.filter(c => c.estado === 'Pendiente').sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')))[0];
     // distribución por ramo
     const porRamo = {};
     r.pol.filter(p => p.estado !== 'Cancelada').forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + p.prima);
@@ -301,7 +302,7 @@ Orbit.modules.cliente360 = (function () {
       <div class="card pad">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <b style="font-family:var(--f-display);font-size:15px">Actividad reciente</b>
-          <span class="tab" style="cursor:pointer;font-size:12px" onclick="document.querySelector('.tab[data-tab=historial]').click()">Ver todo →</span>
+          <span class="tab" style="cursor:pointer;font-size:12px" onclick="document.querySelector('.ftab[data-tab=&quot;historial&quot;]').click()">Ver todo →</span>
         </div>
         <div style="margin-top:14px;position:relative;padding-left:6px">
           ${acts.map(a => `<div style="display:flex;gap:12px;padding-bottom:14px;position:relative">
@@ -344,8 +345,14 @@ Orbit.modules.cliente360 = (function () {
 
   /* ---- Cobros y cartera ---- */
   function tabCobros(cid, r) {
-    const cob = r.cob.slice().sort((a, b) => b.vence.localeCompare(a.vence));
-    return `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+    const polFil = (window._cobFilPol && window._cobFilPol[cid]) || '';
+    const cob = r.cob.filter(c => !polFil || c.polizaId === polFil).sort((a, b) => (b.vence||'').localeCompare(a.vence||''));
+    const polOptions = '<option value="">Todas las pólizas</option>' + r.pol.map(p => {
+      const ase = S().all('aseguradoras').find(a => a && a.id === p.aseguradoraId);
+      const lbl = (p.numero||'—') + ' · ' + (ase ? ase.nombre : '—') + (p.ramo ? ' · '+p.ramo : '');
+      return '<option value="' + U.esc(p.id) + '" ' + (polFil === p.id ? 'selected' : '') + '>' + U.esc(lbl) + '</option>';
+    }).join('');
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="cob-pol-fil" class="o-sel" style="max-width:320px;font-size:12.5px">${polOptions}</select></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
       ${miniStat('Al día (pagado)', U.money(r.cobrado, r.moneda), 'ok')}
       ${miniStat('Pendiente', U.money(r.pendiente, r.moneda), 'warn')}
       ${miniStat('Vencido', U.money(r.vencido, r.moneda), r.vencido > 0 ? 'danger' : 'ok')}
@@ -378,7 +385,7 @@ Orbit.modules.cliente360 = (function () {
 
   /* ---- Renovaciones ---- */
   function tabRenov(cid, r) {
-    const items = r.pol.filter(p => p.estado !== 'Cancelada').slice().sort((a, b) => a.vigenciaFin.localeCompare(b.vigenciaFin));
+    const items = r.pol.filter(p => p.estado !== 'Cancelada').slice().sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
     return `<div class="card pad">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <b style="font-family:var(--f-display);font-size:15px">Línea de renovaciones</b>
@@ -437,7 +444,7 @@ Orbit.modules.cliente360 = (function () {
   /* ---- Recibos y pagos (filtro por póliza + aplicar pago) ---- */
   let recPolFiltro = {};  // por cliente: polizaId seleccionada
   function tabRecibos(cid, r) {
-    const cobAll = r.cob.slice().sort((a, b) => a.vence.localeCompare(b.vence));
+    const cobAll = r.cob.slice().sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
     const polis = S().where('polizas', p => p.clienteId === cid);
     const sel = recPolFiltro[cid] || 'todas';
     const cob = sel === 'todas' ? cobAll : cobAll.filter(c => c.polizaId === sel);
@@ -532,7 +539,7 @@ Orbit.modules.cliente360 = (function () {
 
   /* ---- Comisiones ---- */
   function tabComis(cid, r) {
-    const com = r.com.slice().sort((a, b) => b.periodo.localeCompare(a.periodo));
+    const com = r.com.slice().sort((a, b) => String(b.periodo||'').localeCompare(String(a.periodo||'')));
     const tot = com.reduce((s, c) => s + c.monto, 0);
     const liq = com.filter(c => c.estado === 'Liquidada').reduce((s, c) => s + c.monto, 0);
     const vendedor = Math.round(tot * 0.6), empresa = tot - vendedor; // split demo 60/40
@@ -719,6 +726,7 @@ Orbit.modules.cliente360 = (function () {
           <label class="ce-l">Producto<input id="rn-prod" class="o-sel" value="${U.esc(p.producto)}"></label>
           <label class="ce-l">Forma de pago<select id="rn-frec" class="o-sel">${Object.keys(Orbit.primas.FRECUENCIAS).map(f => `<option ${f === p.frecuencia ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
           <label class="ce-l">Medio<select id="rn-forma" class="o-sel">${Orbit.primas.FORMAS_PAGO.map(f => `<option ${f === p.formaPago ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
+          <label class="ce-l" id="rn-cuotas-wrap" style="display:none">Cantidad de cuotas<input id="rn-cuotas" class="o-sel" type="number" min="1" max="36" value="${Orbit.primas.cuotasDe(p.frecuencia)}"></label>
         </div>
         <div class="cfg-note" id="rn-prev" style="background:var(--surface)"></div>
       </div>
@@ -733,12 +741,15 @@ Orbit.modules.cliente360 = (function () {
     const cli = S().get('clientes', cid) || {}, pais = cli.pais || 'GT';
     function preview() {
       const neta = +$('#rn-prima').value || 0, frec = $('#rn-frec').value;
-      const frac = Orbit.primas.cuotasDe(frec) > 1;
+      const baseCuotas = Orbit.primas.cuotasDe(frec);
+      const frac = baseCuotas > 1;
+      const wrap = $('#rn-cuotas-wrap'); if (wrap) wrap.style.display = frac ? '' : 'none';
+      let cuotas = frac ? Math.max(1, +($('#rn-cuotas') ? $('#rn-cuotas').value : baseCuotas) || baseCuotas) : 1;
       const d = Orbit.primas.desglose(neta, pais, { fraccionado: frac });
-      back._d = d; back._frec = frec;
-      $('#rn-prev').innerHTML = `Prima total <b>${U.money(d.total, p.moneda)}</b> · ${Orbit.primas.cuotasDe(frec)} recibo(s) de <b>${U.money(d.total / Orbit.primas.cuotasDe(frec), p.moneda)}</b>${frac ? ' (incluye recargo)' : ''}`;
+      back._d = d; back._frec = frec; back._cuotas = cuotas;
+      $('#rn-prev').innerHTML = `Prima total <b>${U.money(d.total, p.moneda)}</b> · ${cuotas} recibo(s) de <b>${U.money(d.total / cuotas, p.moneda)}</b>${frac ? ' (incluye recargo)' : ''}`;
     }
-    ['#rn-prima', '#rn-frec'].forEach(s => $(s).addEventListener('input', preview)); preview();
+    ['#rn-prima', '#rn-frec', '#rn-cuotas'].forEach(s => { const el = $(s); if (el) el.addEventListener('input', preview); }); preview();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#rn-x').addEventListener('click', close);
     back.querySelector('#rn-cancel').addEventListener('click', close);
@@ -757,7 +768,7 @@ Orbit.modules.cliente360 = (function () {
       });
       // regenerar recibos
       S().where('cobros', c => c.polizaId === polId && c.estado !== 'Pagado').forEach(c => S().remove('cobros', c.id));
-      Orbit.primas.recibos(d, { frecuencia: frec, vigenciaInicio: '2026-06-20', comAseguradoraPct: p.comAseguradoraPct, comVendedorPct: p.comVendedorPct }).forEach((rec, i) => {
+      Orbit.primas.recibos(d, { frecuencia: frec, cuotas: back._cuotas, vigenciaInicio: '2026-06-20', comAseguradoraPct: p.comAseguradoraPct, comVendedorPct: p.comVendedorPct }).forEach((rec, i) => {
         S().insert('cobros', { id: 'cob' + Date.now() + i, polizaId: polId, clienteId: cid, asesorId: p.asesorId, cuota: rec.n, monto: rec.total, moneda: p.moneda, neta: rec.neta, gastosEmision: rec.gastosEmision, gastosFinan: rec.gastosFinan, otros: rec.otros, iva: rec.iva, comAseguradora: rec.comAseguradora, comVendedor: rec.comVendedor, vence: rec.vence, fechaLimite: rec.fechaLimite, fechaPago: null, estado: 'Pendiente', metodo: null, conducto: p.conducto, conciliado: false });
       });
       S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: p.asesorId, tipo: 'sistema', icon: '🔄', fecha: '2026-06-20', titulo: 'Póliza renovada', detalle: 'Renovación de ' + p.numero + ' · recibos regenerados.' });
@@ -769,41 +780,86 @@ Orbit.modules.cliente360 = (function () {
   function comparativo(polId) {
     const p = S().get('polizas', polId); if (!p) return;
     const asg = q.aseguradora(p.aseguradoraId);
-    const primaNueva = Math.round(p.prima * 1.12), sumaNueva = Math.round(p.sumaAsegurada * 1.05);
+    p.propuestasRenov = p.propuestasRenov || [];
     let back = document.getElementById('c360-edit'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center';
-    const rows = [
-      ['Prima anual', U.money(p.prima, p.moneda), U.money(primaNueva, p.moneda), '+12%', 'warn'],
-      ['Suma asegurada', U.money(p.sumaAsegurada, p.moneda), U.money(sumaNueva, p.moneda), '+5%', 'ok'],
-      ['Deducible', '1.0%', '0.8%', 'mejora', 'ok'],
-      ['Asistencia', 'Básica', 'Premium', 'mejora', 'ok'],
-      ['Forma de pago', p.forma, p.forma, 'igual', 'neutral']
-    ];
-    back.innerHTML = `<div class="card" style="width:min(620px,95vw);max-height:90vh;overflow:auto;padding:0">
-      <div style="padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <div><div class="nov-eyebrow">Comparativo inteligente de renovación</div><b style="font-family:var(--f-display);font-size:17px">${p.ramo} · ${asg ? U.esc(asg.nombre) : ''}</b></div>
-        <button class="imp-x" id="cmp-x">✕</button>
-      </div>
-      <div style="padding:18px 20px">
-        <div class="imp-scan" style="margin-bottom:14px"><span class="imp-spark">🧠</span> Análisis IA: la renovación <b>sube la prima 12%</b> pero <b>mejora coberturas</b> (suma +5%, deducible menor, asistencia Premium).</div>
-        <table class="tbl"><thead><tr><th>Concepto</th><th>Actual</th><th>Renovación</th><th>Cambio</th></tr></thead>
-          <tbody>${rows.map(r => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td><span class="badge ${r[4]}">${r[3]}</span></td></tr>`).join('')}</tbody>
-        </table>
-        <div class="card pad" style="margin-top:14px;border-left:3px solid var(--red)">
-          <b style="font-family:var(--f-display);font-size:14px">🧠 Recomendación</b>
-          <p class="muted" style="font-size:13px;margin:6px 0 0;line-height:1.55">El incremento de prima se justifica por la mejora de coberturas y suma asegurada. Conviene <b>renovar destacando el valor agregado</b>. Si el cliente es sensible al precio, ofrecer mantener la cobertura actual a prima similar como alternativa.</p>
-        </div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
-          <button class="btn ghost" onclick="alert('Demo: cargar PDF de la propuesta de renovación para extraer coberturas reales.')">⬇ Cargar propuesta</button>
-          <button class="btn primary" onclick="alert('Demo: enviar comparativo al cliente por WhatsApp / correo.')">Enviar al cliente</button>
-        </div>
-      </div>
-    </div>`;
     document.body.appendChild(back);
     const close = () => back.remove();
+    function mejor() {
+      // mejor = menor prima entre actual y propuestas
+      let best = { id: 'actual', prima: p.prima };
+      p.propuestasRenov.forEach(pr => { if (pr.prima > 0 && pr.prima < best.prima) best = { id: pr.id, prima: pr.prima }; });
+      return best.id;
+    }
+    function paint() {
+      const props = p.propuestasRenov;
+      const bestId = mejor();
+      const cols = [{ id: 'actual', asgNombre: (asg ? asg.nombre : 'Actual'), prima: p.prima, suma: p.sumaAsegurada, deducible: p.deducible || '1.0%', asistencia: p.asistencia || 'Básica', actual: true }].concat(props);
+      const filas = [
+        ['Aseguradora', cols.map(c => `<b>${U.esc(c.asgNombre)}</b>${c.actual ? ' <span class="badge neutral" style="font-size:9px">actual</span>' : ''}`)],
+        ['Prima anual', cols.map(c => `${U.money(c.prima, p.moneda)}${c.id === bestId && cols.length > 1 ? ' <span class="badge ok" style="font-size:9px">mejor</span>' : ''}`)],
+        ['Suma asegurada', cols.map(c => U.money(c.suma || 0, p.moneda))],
+        ['Deducible', cols.map(c => U.esc(c.deducible || '—'))],
+        ['Asistencia', cols.map(c => U.esc(c.asistencia || '—'))]
+      ];
+      back.innerHTML = `<div class="card" style="width:min(760px,96vw);max-height:92vh;overflow:auto;padding:0">
+        <div style="padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+          <div><div class="nov-eyebrow">Comparativo de renovación multi-aseguradora</div><b style="font-family:var(--f-display);font-size:17px">${U.esc(p.numero)} · ${p.ramo}</b></div>
+          <button class="imp-x" id="cmp-x">✕</button>
+        </div>
+        <div style="padding:18px 20px">
+          <div class="imp-scan" style="margin-bottom:14px"><span class="imp-spark">⚖</span> ${props.length ? ('Comparando <b>' + (cols.length) + ' opciones</b>. La de menor prima está marcada como <b>mejor</b>.') : 'Solicitá propuestas a la misma o a otras aseguradoras y cárgalas para comparar lado a lado.'}</div>
+          <div style="overflow-x:auto"><table class="tbl"><tbody>
+            ${filas.map((f, ri) => `<tr><td style="font-weight:600;white-space:nowrap">${f[0]}</td>${f[1].map(v => `<td>${v}</td>`).join('')}</tr>`).join('')}
+            ${props.length ? `<tr><td></td>${cols.map(c => c.actual ? '<td></td>' : `<td><button class="btn ghost sm cmp-del" data-id="${c.id}">✕ quitar</button></td>`).join('')}</tr>` : ''}
+          </tbody></table></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+            <button class="btn ghost" id="cmp-add">+ Agregar propuesta</button>
+            <button class="btn ghost" id="cmp-pdf">⬇ Cargar propuesta (PDF/imagen)</button>
+            <button class="btn ghost" id="cmp-solicitar">🗂 Solicitar a aseguradoras</button>
+            <button class="btn primary" id="cmp-enviar" style="margin-left:auto" ${props.length ? '' : 'disabled style="opacity:.4"'}>Enviar comparativo al cliente</button>
+          </div>
+        </div>
+      </div>`;
+      back.querySelector('#cmp-x').addEventListener('click', close);
+      back.querySelector('#cmp-add').addEventListener('click', addProp);
+      back.querySelector('#cmp-pdf').addEventListener('click', () => { Orbit.importa.open('documentos', { scope: { cid: p.clienteId, nombre: (S().get('clientes', p.clienteId) || {}).nombre }, onDone: () => {} }); });
+      back.querySelector('#cmp-solicitar').addEventListener('click', () => { Orbit.ciclo.solicitarGestion(p.clienteId, polId); });
+      const env = back.querySelector('#cmp-enviar'); if (env && !env.disabled) env.addEventListener('click', () => { Orbit.correo && Orbit.correo.enviar && Orbit.correo.enviar({ para: (S().get('clientes', p.clienteId) || {}).email || '', asunto: 'Comparativo de renovación · ' + p.numero, cuerpo: 'Adjunto el comparativo de tu renovación con ' + props.length + ' opción(es).', clienteId: p.clienteId }); const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Comparativo preparado para enviar al cliente'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); });
+      back.querySelectorAll('.cmp-del').forEach(b => b.addEventListener('click', () => { p.propuestasRenov = p.propuestasRenov.filter(x => x.id !== b.dataset.id); S().update('polizas', polId, { propuestasRenov: p.propuestasRenov }); paint(); }));
+    }
+    function addProp() {
+      const asgs = S().all('aseguradoras').filter(a => a.vinculada !== false);
+      let f = document.getElementById('cmp-form'); if (f) f.remove();
+      f = document.createElement('div'); f.id = 'cmp-form'; f.className = 'drawer-back open'; f.style.display = 'grid'; f.style.placeItems = 'center'; f.style.zIndex = 98;
+      f.innerHTML = `<div class="card" style="width:min(440px,94vw);padding:0">
+        <div style="padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display)">+ Propuesta de renovación</b><button class="imp-x" id="cf-x">✕</button></div>
+        <div style="padding:16px 18px;display:grid;gap:10px">
+          <label class="ce-l">Aseguradora<select id="cf-asg" class="o-sel">${asgs.map(a => `<option value="${a.id}">${U.esc(a.nombre)}</option>`).join('')}</select></label>
+          <div class="cgrid">
+            <label class="ce-l">Prima anual<input id="cf-prima" type="number" class="o-sel" value="${Math.round(p.prima * 1.1)}"></label>
+            <label class="ce-l">Suma asegurada<input id="cf-suma" type="number" class="o-sel" value="${p.sumaAsegurada || 0}"></label>
+            <label class="ce-l">Deducible<input id="cf-ded" class="o-sel" value="1.0%"></label>
+            <label class="ce-l">Asistencia<input id="cf-asis" class="o-sel" value="Premium"></label>
+          </div>
+        </div>
+        <div style="padding:13px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="cf-cancel">Cancelar</button><button class="btn primary" id="cf-ok">Agregar</button></div>
+      </div>`;
+      document.body.appendChild(f);
+      const cf = s => f.querySelector(s);
+      const closeF = () => f.remove();
+      cf('#cf-x').addEventListener('click', closeF); cf('#cf-cancel').addEventListener('click', closeF);
+      f.addEventListener('click', e => { if (e.target === f) closeF(); });
+      cf('#cf-ok').addEventListener('click', () => {
+        const a = S().get('aseguradoras', cf('#cf-asg').value);
+        p.propuestasRenov.push({ id: 'pr_' + Date.now().toString(36), aseguradoraId: a.id, asgNombre: a.nombre, prima: +cf('#cf-prima').value || 0, suma: +cf('#cf-suma').value || 0, deducible: cf('#cf-ded').value, asistencia: cf('#cf-asis').value });
+        S().update('polizas', polId, { propuestasRenov: p.propuestasRenov });
+        closeF(); paint();
+      });
+    }
     back.addEventListener('click', e => { if (e.target === back) close(); });
-    back.querySelector('#cmp-x').addEventListener('click', close);
+    paint();
   }
 
   /* ---- Detalle de póliza (drawer) ---- */
@@ -811,7 +867,7 @@ Orbit.modules.cliente360 = (function () {
     const p = Orbit.store.get('polizas', polId); if (!p) return;
     const cid = p.clienteId, asg = q.aseguradora(p.aseguradoraId), ase = q.asesor(p.asesorId);
     const veh = q.vehiculoDePoliza(polId);
-    const cob = Orbit.store.where('cobros', c => c.polizaId === polId).sort((a, b) => a.vence.localeCompare(b.vence));
+    const cob = Orbit.store.where('cobros', c => c.polizaId === polId).sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
     const d = U.daysFromNow(p.vigenciaFin);
     const cur = p.moneda;
     const m2 = (n) => U.money(n, cur);
@@ -904,6 +960,45 @@ Orbit.modules.cliente360 = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#vp-x').addEventListener('click', close);
+  }
+
+  /* ---- Siniestros / Reclamos del cliente ---- */
+  function tabSiniestros(cid, r) {
+    const arr = Orbit.store.where('reclamos', x => x.clienteId === cid).sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+    const estCol = { 'Pagado': '#1f8a4c', 'Aprobado': '#1f8a4c', 'En análisis': '#c9821b', 'Documentación': '#c9821b', 'Reportado': '#2a6fdb', 'Rechazado': '#C5162E' };
+    const head = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <b style="font-family:var(--f-display);font-size:15px">🚨 Siniestros / Reclamos de ${U.esc(r.cli.nombre)}</b>
+      <div style="display:flex;gap:8px">
+        <button class="btn ghost sm" onclick="Orbit.importa.open('documentos',{scope:{cid:'${cid}',nombre:'${U.esc(r.cli.nombre)}'},onDone:()=>Orbit.modules.cliente360.reabrir('${cid}','siniestros')})">🧠 Importar bitácora</button>
+        <button class="btn primary sm" onclick="Orbit.modules.cliente360.nuevoReclamo('${cid}')">+ Reclamo</button>
+      </div>
+    </div>`;
+    if (!arr.length) return head + `<div class="card pad" style="text-align:center;color:var(--ink-2);padding:30px">Sin siniestros registrados. Podés <b>importar la bitácora</b> que envíe la aseguradora o <b>crear un reclamo manual</b>.</div>`;
+    return head + arr.map(s => {
+      const pol = Orbit.store.get('polizas', s.polizaId);
+      const asg = Orbit.store.get('aseguradoras', s.aseguradoraId);
+      const col = estCol[s.estado] || '#6b7280';
+      const bit = (s.bitacora || []).map(b => `<div style="display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--line)"><span style="color:var(--ink-3);font-size:11.5px;min-width:120px">${U.esc(b.ts || '')}</span><div><b style="font-size:12.5px">${U.esc(b.t || '')}</b> <span class="muted" style="font-size:11px">· ${U.esc(b.user || '')}</span><div style="font-size:12px;color:var(--ink-2)">${U.esc(b.d || '')}</div></div></div>`).join('');
+      const docs = (s.docs || []).map(d => `<span class="mail-chip">📎 ${U.esc(d)}</span>`).join('');
+      return `<details class="card" style="overflow:hidden;margin-bottom:10px"><summary style="list-style:none;cursor:pointer;padding:13px 15px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:20px">🚨</span>
+        <div style="flex:1;min-width:0"><b style="font-family:var(--f-display);font-size:13.5px">${U.esc(s.numero || s.id)} · ${U.esc(s.tipo || '')}</b>
+          <div class="muted" style="font-size:11.5px">${pol ? U.esc(pol.numero) : '—'} · ${asg ? U.esc(asg.nombre) : '—'} · ${U.esc(s.fecha || '')}</div></div>
+        <span style="font-weight:700;font-size:12px;color:${col};background:${col}1a;padding:3px 10px;border-radius:20px">${U.esc(s.estado || '')}</span>
+        <span style="font-weight:700;font-size:13px;min-width:90px;text-align:right">${U.moneyShort(s.montoReclamado || 0, r.cli.moneda)}</span>
+      </summary>
+      <div style="padding:0 15px 15px">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 12px">
+          <div class="mini-stat"><span>Reclamado</span><b>${U.moneyShort(s.montoReclamado || 0, r.cli.moneda)}</b></div>
+          <div class="mini-stat"><span>Aprobado</span><b>${U.moneyShort(s.montoAprobado || 0, r.cli.moneda)}</b></div>
+          <div class="mini-stat"><span>Actualizado</span><b>${U.esc(s.actualizado || '—')}</b></div>
+        </div>
+        ${s.descripcion ? `<p style="font-size:13px;color:var(--ink-2);margin:0 0 10px">${U.esc(s.descripcion)}</p>` : ''}
+        ${docs ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${docs}</div>` : ''}
+        <b style="font-family:var(--f-display);font-size:12.5px">Bitácora</b>${bit || '<div class="muted" style="font-size:12px">Sin movimientos.</div>'}
+        <div style="margin-top:10px;display:flex;gap:8px"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.addBitacora('${s.id}','${cid}')">+ Anotar movimiento</button><button class="btn ghost sm" onclick="Orbit.correo.enviar({para:'',asunto:'${U.esc((s.numero || '') + ' · ' + r.cli.nombre)}',cuerpo:'',clienteId:'${cid}',vinculo:{tipo:'reclamo',id:'${s.id}',label:'${U.esc(s.numero || s.id)}'}})">✉ Correo a aseguradora</button></div>
+      </div></details>`;
+    }).join('');
   }
 
   /* ---- Correos del cliente (capa Orbit.correo) ---- */
@@ -1004,6 +1099,7 @@ Orbit.modules.cliente360 = (function () {
       <div style="padding:18px 20px;display:grid;gap:13px">
         <div class="cgrid">
           <label class="ce-l">N.º de póliza<input id="ep-num" class="o-sel" value="${U.esc(p.numero)}"></label>
+          <label class="ce-l">Cliente <span class="muted">(titular)</span><select id="ep-cli" class="o-sel">${p.clienteId ? '' : '<option value="">— Sin cliente (asignar) —</option>'}${S().all('clientes').map(cc => `<option value="${cc.id}" ${cc.id === p.clienteId ? 'selected' : ''}>${U.esc(cc.nombre)}</option>`).join('')}<option value="__nuevo">➕ Crear cliente nuevo…</option></select></label>
           <label class="ce-l">Aseguradora<select id="ep-asg" class="o-sel">${asgs.map(a => `<option value="${a.id}" ${a.id === p.aseguradoraId ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">Ramo <span class="muted">(${pais})</span><select id="ep-ramo" class="o-sel">${ramos.map(r => `<option ${r === curRamo ? 'selected' : ''}>${r}</option>`).join('')}<option value="__otro">➕ Otro…</option></select></label>
           <label class="ce-l">Subramo<select id="ep-sub" class="o-sel">${subOpts(curRamo).map(s => `<option ${s === p.subramo ? 'selected' : ''}>${s}</option>`).join('')}<option value="__otro">➕ Otro…</option></select></label>
@@ -1014,6 +1110,7 @@ Orbit.modules.cliente360 = (function () {
           <label class="ce-l">Vigencia fin<input id="ep-vfin" class="o-sel" type="date" value="${p.vigenciaFin}"></label>
           <label class="ce-l">Frecuencia<select id="ep-frec" class="o-sel">${frecs.map(f => `<option ${f === p.frecuencia ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
           <label class="ce-l">Forma de pago<select id="ep-forma" class="o-sel">${formas.map(f => `<option ${f === p.formaPago ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
+          <label class="ce-l" id="ep-cuotas-wrap" style="display:none">Cantidad de cuotas<input id="ep-cuotas" class="o-sel" type="number" min="1" max="36" value="${p.cuotas || Orbit.primas.cuotasDe(p.frecuencia)}"></label>
           <label class="ce-l ck"><input type="checkbox" id="ep-renov" ${p.renovable ? 'checked' : ''}> Renovable anualmente</label>
           <label class="ce-l">Suma asegurada<input id="ep-suma" class="o-sel" type="number" value="${p.sumaAsegurada}"></label>
         </div>
@@ -1048,6 +1145,7 @@ Orbit.modules.cliente360 = (function () {
       const auto = $('#ep-auto').checked, neta = +$('#ep-neta').value || 0;
       if (auto && pais === 'GT') $('#ep-gem').value = Orbit.primas.r2(neta * 0.05);
       const fraccionado = Orbit.primas.cuotasDe($('#ep-frec').value) > 1;
+      const cw = $('#ep-cuotas-wrap'); if (cw) cw.style.display = fraccionado ? '' : 'none';
       const recModo = $('#ep-recmodo').value;
       const opt = { fraccionado, gastosEmision: +$('#ep-gem').value || 0, otros: +$('#ep-otros').value || 0 };
       if (recModo === 'valor') { const v = +$('#ep-rec').value || 0; opt.recargoFinPct = neta > 0 ? Orbit.primas.r2(v / neta * 100) : 0; }
@@ -1065,19 +1163,36 @@ Orbit.modules.cliente360 = (function () {
         <tr class="vp-tot"><td>Prima total</td><td class="num">${U.money(dd.total, p.moneda)}</td></tr>`;
       back._d = dd;
     }
-    ['#ep-neta', '#ep-gem', '#ep-otros', '#ep-rec', '#ep-recmodo', '#ep-frec', '#ep-auto', '#ep-tipo'].forEach(s => $(s).addEventListener('input', recalc));
+    ['#ep-neta', '#ep-gem', '#ep-otros', '#ep-rec', '#ep-recmodo', '#ep-frec', '#ep-auto', '#ep-tipo', '#ep-cuotas'].forEach(s => { const el = $(s); if (el) el.addEventListener('input', recalc); });
     $('#ep-tipo').addEventListener('change', recalc);
+    // crear cliente nuevo desde el selector
+    const epCli = $('#ep-cli');
+    if (epCli) epCli.addEventListener('change', () => {
+      if (epCli.value === '__nuevo') {
+        const nom = prompt('Nombre del nuevo cliente:'); 
+        if (nom) {
+          const nid = 'cli_' + Date.now().toString(36);
+          S().insert('clientes', { id: nid, nombre: nom, tipo: 'Persona', pais: pais, moneda: pais === 'CO' ? 'COP' : 'GTQ', asesorId: $('#ep-ase') ? $('#ep-ase').value : '', identificacion: '', email: '', telefono: '', fechaAlta: new Date().toISOString().slice(0, 10), etiquetas: [], notas: '', driveLink: '' });
+          const o = document.createElement('option'); o.value = nid; o.textContent = nom; o.selected = true; epCli.insertBefore(o, epCli.lastChild);
+        } else { epCli.value = p.clienteId || ''; }
+      }
+    });
+    // vigencia fin automática = inicio + 1 año (la renovación es anual)
+    const vini = $('#ep-vini'), vfin = $('#ep-vfin');
+    if (vini && vfin) vini.addEventListener('change', () => { if (vini.value) { const d = new Date(vini.value); d.setFullYear(d.getFullYear() + 1); vfin.value = d.toISOString().slice(0, 10); } });
     recalc();
     $('#ep-ok').addEventListener('click', () => {
       const dd = back._d, frecuencia = $('#ep-frec').value, formaPago = $('#ep-forma').value;
-      const cambioPago = frecuencia !== p.frecuencia || formaPago !== p.formaPago;
+      const cambioPago = frecuencia !== p.frecuencia || formaPago !== p.formaPago || ((+($('#ep-cuotas') ? $('#ep-cuotas').value : 0)) && (+$('#ep-cuotas').value !== (p.cuotas || Orbit.primas.cuotasDe(p.frecuencia))));
       S().update('polizas', polId, {
         numero: $('#ep-num').value || p.numero, aseguradoraId: $('#ep-asg').value, asesorId: $('#ep-ase').value,
+        clienteId: ($('#ep-cli') && $('#ep-cli').value && $('#ep-cli').value !== '__nuevo') ? $('#ep-cli').value : p.clienteId,
         ramo: $('#ep-ramo').value === '__otro' ? p.ramo : $('#ep-ramo').value,
         subramo: $('#ep-sub').value === '__otro' ? p.subramo : $('#ep-sub').value,
         tipoPoliza: $('#ep-tipo').value, concepto: $('#ep-concepto').value,
         vigenciaInicio: $('#ep-vini').value, vigenciaFin: $('#ep-vfin').value,
         frecuencia, forma: frecuencia, formaPago,
+        cuotas: (Orbit.primas.cuotasDe(frecuencia) > 1 && $('#ep-cuotas')) ? (Math.max(1, +$('#ep-cuotas').value || Orbit.primas.cuotasDe(frecuencia))) : Orbit.primas.cuotasDe(frecuencia),
         renovable: $('#ep-renov').checked, sumaAsegurada: +$('#ep-suma').value || p.sumaAsegurada,
         recargoFinModo: $('#ep-recmodo').value,
         primaNeta: dd.neta, gastosEmision: dd.gastosEmision, gastosFinan: dd.gastosFinan, otros: dd.otros,
@@ -1096,7 +1211,7 @@ Orbit.modules.cliente360 = (function () {
     const cobs = S().where('cobros', c => c.polizaId === polId);
     const pagados = cobs.filter(c => c.estado === 'Pagado');
     const dd = Orbit.primas.desglose(p.primaNeta, pais, { fraccionado: Orbit.primas.cuotasDe(p.frecuencia) > 1, gastosEmision: p.gastosEmision, otros: p.otros, recargoFinPct: p.recargoFinPct });
-    const nuevos = Orbit.primas.recibos(dd, { frecuencia: p.frecuencia, vigenciaInicio: p.vigenciaInicio, comAseguradoraPct: p.comAseguradoraPct, comVendedorPct: p.comVendedorPct });
+    const nuevos = Orbit.primas.recibos(dd, { frecuencia: p.frecuencia, cuotas: p.cuotas, vigenciaInicio: p.vigenciaInicio, comAseguradoraPct: p.comAseguradoraPct, comVendedorPct: p.comVendedorPct });
     // elimina los pendientes/vencidos actuales
     cobs.filter(c => c.estado !== 'Pagado').forEach(c => S().remove && S().remove('cobros', c.id));
     // agrega los nuevos que excedan los ya pagados (continúa la numeración)
@@ -1150,7 +1265,9 @@ Orbit.modules.cliente360 = (function () {
     const pais0 = paisDe(cid0), ramos0 = Orbit.cat.ramosDe(pais0);
     back.innerHTML = `<div class="card" style="width:min(680px,95vw);max-height:92vh;overflow:auto;padding:0">
       <div style="padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:17px">📑 Nueva póliza</b><button class="imp-x" id="np-x">✕</button></div>
+        <b style="font-family:var(--f-display);font-size:17px">📑 Nueva póliza</b>
+        <div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="np-imp" title="Importar varias pólizas desde un archivo">⬇ Importar</button><button class="imp-x" id="np-x">✕</button></div>
+      </div>
       <div style="padding:18px 20px;display:grid;gap:12px">
         <div class="cgrid">
           <label class="ce-l">Cliente<select id="np-cli" class="o-sel">${clientes.map(c => `<option value="${c.id}" ${c.id === cid0 ? 'selected' : ''}>${U.esc(c.nombre)}</option>`).join('')}</select></label>
@@ -1188,6 +1305,7 @@ Orbit.modules.cliente360 = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#np-x').addEventListener('click', close); $('#np-cancel').addEventListener('click', close);
+    { const ib = $('#np-imp'); if (ib) ib.addEventListener('click', () => { close(); Orbit.importa.open('polizas', { onDone: () => { location.hash = '#/cliente360?c=' + cid0; } }); }); }
     function pais() { return paisDe($('#np-cli').value); }
     function syncRamos() { const rs = Orbit.cat.ramosDe(pais()); $('#np-ramo').innerHTML = rs.map(r => `<option>${r}</option>`).join(''); syncSub(); }
     function syncSub() { $('#np-sub').innerHTML = Orbit.cat.subramosDe(pais(), $('#np-ramo').value).map(s => `<option>${s}</option>`).join(''); $('#np-veh').style.display = /Auto|vM|Veh/i.test($('#np-ramo').value) ? '' : 'none'; }
@@ -1223,7 +1341,7 @@ Orbit.modules.cliente360 = (function () {
         concepto: [$('#np-ramo').value, $('#np-sub').value].join(' · '), vigenciaInicio: '2026-06-24', vigenciaFin: fin.toISOString().slice(0, 10),
         renovable: true, contadorRenovaciones: 0, estado: 'Vigente', historial: [{ icon: '✳', fecha: '2026-06-24', t: 'Emisión de póliza', d: 'Alta manual' }]
       });
-      Orbit.primas.recibos(d, { frecuencia: $('#np-frec').value, vigenciaInicio: '2026-06-24', comAseguradoraPct: 12, comVendedorPct: 50 }).slice(0, back._cuotas).forEach((rec, i) => {
+      Orbit.primas.recibos(d, { frecuencia: $('#np-frec').value, cuotas: back._cuotas, vigenciaInicio: '2026-06-24', comAseguradoraPct: 12, comVendedorPct: 50 }).forEach((rec, i) => {
         S().insert('cobros', { id: 'cob' + Date.now() + i, polizaId: polId, clienteId: cid, asesorId: cli.asesorId, cuota: rec.n, monto: rec.total, moneda: cur, neta: rec.neta, gastosEmision: rec.gastosEmision, gastosFinan: rec.gastosFinan, otros: rec.otros, iva: rec.iva, comAseguradora: rec.comAseguradora, comVendedor: rec.comVendedor, vence: rec.vence, fechaLimite: rec.fechaLimite, fechaPago: null, estado: 'Pendiente', metodo: null, conducto: '', conciliado: false });
       });
       if (/Auto|Veh/i.test($('#np-ramo').value) && $('#np-vmarca').value) {
@@ -1245,5 +1363,118 @@ Orbit.modules.cliente360 = (function () {
     location.hash = '#/correo';
   }
 
-  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); } };
+  
+  function nuevoCliente() {
+    const asesores = S().all('asesores');
+    const paises = Orbit.PAISES || [{ id: 'GT', label: 'Guatemala' }, { id: 'CO', label: 'Colombia' }];
+    const geo = Orbit.GEO || {};
+    let back = document.getElementById('cli-nuevo'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'cli-nuevo'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center';
+    back.innerHTML = `<div class="card" style="width:min(720px,95vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center">
+        <b style="font-family:var(--f-display);font-size:17px;color:#fff">🧑‍💼 Nuevo cliente</b><button class="imp-x" id="nc-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:13px">
+        <div class="seg"><button class="seg-b active" data-nm="manual">✍️ Manual</button><button class="seg-b" data-nm="imp">✨ Importar documentos</button></div>
+        <div id="nc-imp-note" style="display:none"><div class="cfg-note">Carga DPI, RTU, póliza o cualquier documento — el motor extrae y completa los campos automáticamente. Luego revisa y guarda.</div><button class="btn ghost sm" id="nc-imp-btn">⬆ Seleccionar archivos</button></div>
+        <div class="cgrid" id="nc-form">
+          <label class="ce-l">Nombre / razón social *<input id="nc-nombre" class="o-sel" placeholder="Nombre completo o razón social"></label>
+          <label class="ce-l">Tipo<select id="nc-tipo" class="o-sel"><option>Persona</option><option>Empresa</option></select></label>
+          <label class="ce-l">País *<select id="nc-pais" class="o-sel">${paises.map(p => '<option value="' + p.id + '">' + p.label + '</option>').join('')}</select></label>
+          <label class="ce-l">Identificación (DPI/Cédula/NIT)<input id="nc-id" class="o-sel" placeholder="0000 00000 0000 0"></label>
+          <label class="ce-l">Teléfono (WhatsApp) *<input id="nc-tel" class="o-sel" placeholder="+502 1234 5678"></label>
+          <label class="ce-l">Correo electrónico<input id="nc-email" class="o-sel" type="email" placeholder="correo@dominio.com"></label>
+          <label class="ce-l">Departamento<select id="nc-dep" class="o-sel"><option value="">— Seleccionar —</option></select></label>
+          <label class="ce-l">Ciudad / Municipio<select id="nc-ciu" class="o-sel"><option value="">— Seleccionar —</option></select></label>
+          <label class="ce-l">Dirección<input id="nc-dir" class="o-sel" placeholder="Calle, zona, colonia..."></label>
+          <label class="ce-l">Sexo<select id="nc-sex" class="o-sel"><option value="">—</option><option>Masculino</option><option>Femenino</option><option>No especifica</option></select></label>
+          <label class="ce-l">Fecha de nacimiento<input id="nc-nac" class="o-sel" type="date"></label>
+          <label class="ce-l">Segmento<select id="nc-seg" class="o-sel">${['Nuevo','Activo','Premium','Inactivo','Prospecto'].map(s=>'<option>'+s+'</option>').join('')}</select></label>
+          <label class="ce-l">Canal de ingreso<select id="nc-canal" class="o-sel">${(Orbit.cat.get('canales')||[]).map(c=>'<option>'+c+'</option>').join('')}</select></label>
+          <label class="ce-l">Asesor responsable<select id="nc-ase" class="o-sel">${asesores.map(a=>'<option value="'+a.id+'">'+a.nombre+'</option>').join('')}</select></label>
+        </div>
+        <label class="ce-l">Notas<textarea id="nc-notas" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px" placeholder="Observaciones, referencia, etc."></textarea></label>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="nc-cancel">Cancelar</button>
+        <button class="btn primary" id="nc-ok">💾 Crear cliente</button>
+      </div></div>`;
+    document.body.appendChild(back);
+    const $ = s => back.querySelector(s);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#nc-x').addEventListener('click', close); $('#nc-cancel').addEventListener('click', close);
+    back.querySelectorAll('.seg-b').forEach(b => b.addEventListener('click', () => {
+      back.querySelectorAll('.seg-b').forEach(x => x.classList.remove('active')); b.classList.add('active');
+      $('#nc-imp-note').style.display = b.dataset.nm === 'imp' ? '' : 'none';
+    }));
+    const impBtn = $('#nc-imp-btn'); if (impBtn) impBtn.addEventListener('click', () => { close(); Orbit.importa.open('clientes'); });
+    const paisSel = $('#nc-pais'), depSel = $('#nc-dep'), ciuSel = $('#nc-ciu');
+    function loadGeo() { const ps = paisSel.value, deps = Object.keys(geo[ps]||{}); depSel.innerHTML = '<option value="">— Seleccionar —</option>' + deps.map(d=>'<option>'+d+'</option>').join(''); ciuSel.innerHTML = '<option value="">— Seleccionar —</option>'; }
+    depSel.addEventListener('change', () => { const cids = (geo[paisSel.value]||{})[depSel.value]||[]; ciuSel.innerHTML = '<option value="">— Seleccionar —</option>' + cids.map(c=>'<option>'+c+'</option>').join(''); });
+    paisSel.addEventListener('change', loadGeo); loadGeo();
+    $('#nc-ok').addEventListener('click', () => {
+      const nombre = $('#nc-nombre').value.trim(); if (!nombre) { $('#nc-nombre').focus(); return; }
+      const pais = paisSel.value;
+      const cli = { id: 'cli' + Date.now().toString().slice(-8), tipo: $('#nc-tipo').value, nombre, identificacion: $('#nc-id').value, pais, moneda: pais==='CO'?'COP':'GTQ', telefono: $('#nc-tel').value, email: $('#nc-email').value, departamento: depSel.value, ciudad: ciuSel.value, direccion: $('#nc-dir').value, sexo: $('#nc-sex').value, fechaNac: $('#nc-nac').value, segmento: $('#nc-seg').value, canal: $('#nc-canal').value, asesorId: $('#nc-ase').value, notas: $('#nc-notas').value, fechaAlta: new Date().toISOString().slice(0,10), etiquetas: ['Nuevo'], encuestasActivas: true };
+      S().insert('clientes', cli);
+      S().insert('actividades', { id: 'act'+Date.now(), clienteId: cli.id, asesorId: cli.asesorId, tipo: 'sistema', icon: '🧑‍💼', fecha: cli.fechaAlta, titulo: 'Cliente creado', detalle: 'Alta manual.' });
+      close(); location.hash = '#/cliente360?c=' + cli.id;
+    });
+  }
+
+  function c360toast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
+  function nuevoReclamo(cid) {
+    const cli = Orbit.store.get('clientes', cid); if (!cli) return;
+    const pols = Orbit.store.where('polizas', p => p.clienteId === cid && p.estado !== 'Cancelada');
+    const polOpts = pols.map(p => `<option value="${p.id}">${U.esc(p.numero)} · ${U.esc(p.ramo)}</option>`).join('') || '<option value="">(sin póliza)</option>';
+    let back = document.getElementById('c360-edit'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    back.innerHTML = `<div class="card" style="width:min(520px,94vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+        <b style="font-family:var(--f-display);font-size:16px">🚨 Nuevo reclamo · ${U.esc(cli.nombre)}</b>
+        <button class="btn ghost sm" id="nr-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:11px">
+        <label class="ce-l">Póliza<select id="nr-pol" class="o-sel" style="width:100%">${polOpts}</select></label>
+        <label class="ce-l">Tipo / causa<input id="nr-tipo" class="o-sel" style="width:100%" placeholder="Ej. Colisión, Robo, Hospitalización"></label>
+        <label class="ce-l">Monto reclamado<input id="nr-monto" type="number" class="o-sel" style="width:100%" value="0"></label>
+        <label class="ce-l">Descripción<textarea id="nr-desc" class="o-sel" style="width:100%;min-height:64px" placeholder="Detalle del siniestro"></textarea></label>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn ghost" id="nr-cancel">Cancelar</button><button class="btn primary" id="nr-ok">Crear reclamo</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.querySelector('#nr-x').onclick = close; back.querySelector('#nr-cancel').onclick = close;
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#nr-ok').onclick = () => {
+      const polId = back.querySelector('#nr-pol').value;
+      const pol = Orbit.store.get('polizas', polId);
+      const rec = {
+        id: 'rec_m' + Date.now().toString(36), polizaId: polId, clienteId: cid,
+        aseguradoraId: pol ? pol.aseguradoraId : '', asesorId: pol ? pol.asesorId : cli.asesorId,
+        ramo: pol ? pol.ramo : '', tipo: back.querySelector('#nr-tipo').value || 'Reclamo general',
+        estado: 'Reportado', numero: 'SIN-' + Math.floor(10000 + Math.random() * 89999),
+        fecha: new Date().toISOString().slice(0, 10), montoReclamado: +back.querySelector('#nr-monto').value || 0, montoAprobado: 0,
+        descripcion: back.querySelector('#nr-desc').value || '',
+        bitacora: [{ ts: new Date().toISOString().slice(0, 16).replace('T', ' '), user: 'Equipo', t: 'Reclamo registrado', d: 'Creado manualmente desde la ficha del cliente.' }],
+        correos: [], docs: [], actualizado: new Date().toISOString().slice(0, 10)
+      };
+      Orbit.store.insert('reclamos', rec);
+      c360toast('✓ Reclamo ' + rec.numero + ' creado');
+      close(); tab = 'siniestros'; detalle(cid);
+    };
+  }
+  function addBitacora(reclamoId, cid) {
+    const txt = prompt('Anotar movimiento en la bitácora del reclamo:', '');
+    if (!txt) return;
+    const rec = Orbit.store.get('reclamos', reclamoId); if (!rec) return;
+    const bit = (rec.bitacora || []).concat([{ ts: new Date().toISOString().slice(0, 16).replace('T', ' '), user: 'Equipo', t: 'Actualización', d: txt }]);
+    Orbit.store.update('reclamos', reclamoId, { bitacora: bit, actualizado: new Date().toISOString().slice(0, 10) });
+    c360toast('✓ Bitácora actualizada');
+    tab = 'siniestros'; detalle(cid);
+  }
+
+  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); }, nuevoCliente, nuevoReclamo, addBitacora };
 })();

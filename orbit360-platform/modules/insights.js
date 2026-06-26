@@ -285,24 +285,57 @@ Orbit.modules.insights = (function () {
     const s26 = serieAnual(YEAR), s25 = serieAnual(PREV);
     const acum26 = acumHasta(s26.arr, mesSel), acum25 = acumHasta(s25.arr, mesSel);
     const varPct = acum25 > 0 ? Math.round((acum26 - acum25) / acum25 * 100) : 0;
-    const nPol26 = s26.cnt.slice(0, mesSel + 1).reduce((s, v) => s + v, 0), nPol25 = s25.cnt.slice(0, mesSel + 1).reduce((s, v) => s + v, 0);
+    const nPol26 = s26.cnt.slice(0, mesSel + 1).reduce((s, v) => s + v, 0);
+    const nPol25 = s25.cnt.slice(0, mesSel + 1).reduce((s, v) => s + v, 0);
     const mesAct = s26.arr[mesSel], mesAnt = mesSel > 0 ? s26.arr[mesSel - 1] : 0;
     const varMes = mesAnt > 0 ? Math.round((mesAct - mesAnt) / mesAnt * 100) : 0;
     const rows = compBucket(criterio, mesSel);
-    const trend = (vp) => `<span style="color:${vp >= 0 ? 'var(--ok)' : 'var(--danger)'};font-weight:700">${vp >= 0 ? '▲' : '▼'} ${Math.abs(vp)}%</span>`;
-    const seg = `<div class="ins-seg">${[['general', 'General'], ['asesor', 'Por asesor'], ['ramo', 'Por ramo'], ['aseguradora', 'Por aseguradora']].map(o => `<button class="ins-seg-b ${criterio === o[0] ? 'active' : ''}" data-crit="${o[0]}">${o[1]}</button>`).join('')}</div>`;
+    const trend = (vp) => '<span style="color:' + (vp >= 0 ? 'var(--ok)' : 'var(--danger)') + ';font-weight:700">' + (vp >= 0 ? '▲' : '▼') + ' ' + Math.abs(vp) + '%</span>';
+    const seg = '<div class="ins-seg">' + [['general','General'],['asesor','Por asesor'],['ramo','Por ramo'],['aseguradora','Por aseguradora']].map(o => '<button class="ins-seg-b ' + (criterio === o[0] ? 'active' : '') + '" data-crit="' + o[0] + '">' + o[1] + '</button>').join('') + '</div>';
+
+    // New vs Renovated breakdown
+    const polizas = S().all('polizas').filter(p => p && p.vigenciaInicio && p.vigenciaInicio.startsWith(YEAR+''));
+    const nuevas26 = polizas.filter(p => !p.contadorRenovaciones || p.contadorRenovaciones === 0);
+    const renov26 = polizas.filter(p => p.contadorRenovaciones && p.contadorRenovaciones > 0);
+    const primaNuevas = nuevas26.reduce((s, p) => s + (p.primaTotal || p.prima || 0), 0);
+    const primaRenov = renov26.reduce((s, p) => s + (p.primaTotal || p.prima || 0), 0);
+
+    // 12-month comparison table
+    const tbl12 = '<table class="tbl" style="margin-top:12px"><thead><tr><th>Mes</th><th class="num">' + PREV + '</th><th class="num">' + YEAR + '</th><th class="num">Var %</th><th>Tendencia</th><th class="num">Pólizas</th></tr></thead><tbody>'
+      + MESES.map((m, i) => {
+        const v25 = s25.arr[i] || 0, v26 = s26.arr[i] || 0;
+        const vp = v25 > 0 ? Math.round((v26 - v25) / v25 * 100) : (v26 > 0 ? 100 : 0);
+        const np = s26.cnt[i] || 0;
+        const esAct = i === mesSel;
+        return '<tr class="clickable" style="' + (esAct ? 'background:rgba(197,22,46,.05)' : '') + '" data-drill-mes="' + i + '">'
+          + '<td><b' + (esAct ? ' style="color:var(--red)"' : '') + '>' + m + (esAct ? ' ←' : '') + '</b></td>'
+          + '<td class="num muted">' + M(v25) + '</td>'
+          + '<td class="num"><b>' + M(v26) + '</b></td>'
+          + '<td class="num">' + trend(vp) + '</td>'
+          + '<td style="width:22%"><div class="ins-meta-bar"><i style="width:' + Math.min(100, Math.abs(vp)) + '%;background:' + (vp >= 0 ? 'var(--ok)' : 'var(--danger)') + '"></i></div></td>'
+          + '<td class="num muted">' + np + '</td>'
+          + '</tr>';
+      }).join('') + '</tbody></table>';
+
     return insKpis([
-      { label: 'PN acum. ' + YEAR, val: M(acum26), color: 'var(--red)', foot: 'Ene→' + MESES[mesSel] },
-      { label: 'vs ' + PREV, val: (varPct >= 0 ? '+' : '') + varPct + '%', color: varPct >= 0 ? 'var(--ok)' : 'var(--danger)', foot: M(acum25) + ' en ' + PREV, footTone: varPct >= 0 ? 'up' : 'down' },
-      { label: 'Pólizas ' + YEAR, val: nPol26, color: 'var(--info)', foot: nPol25 + ' en ' + PREV + ' (mismos meses)' },
-      { label: 'Intermensual', val: (varMes >= 0 ? '+' : '') + varMes + '%', color: 'var(--warn)', foot: MESES[mesSel] + ' vs ' + (mesSel > 0 ? MESES[mesSel - 1] : '—'), footTone: varMes >= 0 ? 'up' : 'down' }
-    ]) + card('Comparativo de prima neta mensual · ' + PREV + ' vs ' + YEAR, colsDual(MESES, s25.arr, s26.arr, PREV + '', YEAR + ''), 'por mes') +
-      card('Comparativo ' + PREV + ' vs ' + YEAR + ' · acumulado Ene→' + MESES[mesSel], seg +
-        `<table class="tbl" style="margin-top:12px"><thead><tr><th>${criterio === 'general' ? 'Total' : criterio[0].toUpperCase() + criterio.slice(1)}</th><th class="num">${PREV}</th><th class="num">${YEAR}</th><th class="num">Var %</th><th>Tendencia</th></tr></thead>
-        <tbody>${rows.map(r => `<tr><td><span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${r.color}"></span>${U.esc(r.label)}</span></td>
-          <td class="num muted">${M(r.v25)}</td><td class="num"><b>${M(r.v26)}</b></td><td class="num">${trend(r.var)}</td>
-          <td style="width:24%"><div class="ins-meta-bar"><i style="width:${Math.min(100, Math.abs(r.var))}%;background:${r.var >= 0 ? 'var(--ok)' : 'var(--danger)'}"></i></div></td></tr>`).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin datos del período.</td></tr>'}</tbody></table>`, 'de lo general a lo particular');
+      { label: 'PN acum. ' + YEAR, val: M(acum26), color: 'var(--red)', foot: 'Ene→' + MESES[mesSel], detail: { titulo: 'Prima acumulada ' + YEAR, rows: MESES.map((m,i) => [m, M(s26.arr[i]||0)]) } },
+      { label: 'vs ' + PREV, val: (varPct >= 0 ? '+' : '') + varPct + '%', color: varPct >= 0 ? 'var(--ok)' : 'var(--danger)', foot: M(acum25) + ' en ' + PREV, footTone: varPct >= 0 ? 'up' : 'down', detail: { titulo: 'Comparativo ' + PREV + ' vs ' + YEAR, rows: MESES.map((m,i) => [m, M(s25.arr[i]||0), M(s26.arr[i]||0)]) } },
+      { label: 'Nuevas ' + YEAR, val: nuevas26.length, color: 'var(--info)', foot: M(primaNuevas) + ' prima', detail: { titulo: 'Pólizas nuevas ' + YEAR, rows: nuevas26.slice(0,20).map(p => [p.numero||'—', p.ramo||'—', M(p.primaTotal||p.prima||0)]) } },
+      { label: 'Renovadas ' + YEAR, val: renov26.length, color: 'var(--ok)', foot: M(primaRenov) + ' prima', footTone: 'up', detail: { titulo: 'Pólizas renovadas ' + YEAR, rows: renov26.slice(0,20).map(p => [p.numero||'—', p.ramo||'—', M(p.primaTotal||p.prima||0)]) } }
+    ])
+    + card('📅 Comparativo mensual ' + PREV + ' vs ' + YEAR + ' (clic en fila para ver el mes)', tbl12, 'todos los meses · haz clic en una fila para desglose')
+    + card('🔀 Desglose acumulado Ene→' + MESES[mesSel], seg
+      + '<table class="tbl" style="margin-top:12px"><thead><tr><th>' + (criterio === 'general' ? 'Total' : criterio[0].toUpperCase()+criterio.slice(1)) + '</th><th class="num">' + PREV + '</th><th class="num">' + YEAR + '</th><th class="num">Var %</th><th>Tendencia</th></tr></thead><tbody>'
+      + (rows.map(r => '<tr class="clickable" data-drill-label="' + U.esc(r.label) + '" data-drill-crit="' + criterio + '">'
+        + '<td><span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:' + r.color + '"></span>' + U.esc(r.label) + '</span></td>'
+        + '<td class="num muted">' + M(r.v25) + '</td><td class="num"><b>' + M(r.v26) + '</b></td><td class="num">' + trend(r.var) + '</td>'
+        + '<td style="width:24%"><div class="ins-meta-bar"><i style="width:' + Math.min(100,Math.abs(r.var)) + '%;background:' + (r.var >= 0 ? 'var(--ok)' : 'var(--danger)') + '"></i></div></td></tr>'
+      ).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin datos.</td></tr>')
+      + '</tbody></table>', 'de lo general a lo particular · haz clic en una fila')
+    + card('🆕 Nueva vs Renovada ' + YEAR, '<div class="grid2" style="margin-bottom:14px"><div class="ins-block"><div class="ins-block-t">🆕 Pólizas nuevas</div><div class="ins-block-v">' + nuevas26.length + '</div><div class="ins-block-sub">' + M(primaNuevas) + ' prima neta</div></div><div class="ins-block"><div class="ins-block-t">🔄 Pólizas renovadas</div><div class="ins-block-v">' + renov26.length + '</div><div class="ins-block-sub">' + M(primaRenov) + ' prima neta</div></div></div>'
+      + colsDual(['Nuevas','Renovadas'], [primaNuevas], [primaRenov], 'Nueva', 'Renov.'), 'producción por tipo');
   }
+
 
   /* ---- TOP CLIENTES con modal de detalle ---- */
   function vTopClientes() {
@@ -463,6 +496,8 @@ Orbit.modules.insights = (function () {
     const mSel = host.querySelector('#ins-mes'); if (mSel) mSel.addEventListener('change', () => { mesSel = +mSel.value; draw(); });
     const tSel = host.querySelector('#ins-top'); if (tSel) tSel.addEventListener('change', () => { topOrden = tSel.value; draw(); });
     host.querySelectorAll('[data-crit]').forEach(b => b.addEventListener('click', () => { criterio = b.dataset.crit; draw(); }));
+    host.querySelectorAll('[data-drill-mes]').forEach(b => b.addEventListener('click', () => Orbit.modules.insights._drillMes(+b.dataset.drillMes)));
+    host.querySelectorAll('[data-drill-label]').forEach(b => b.addEventListener('click', () => Orbit.modules.insights._drillRow(b.dataset.drillLabel, b.dataset.drillCrit)));
     host.querySelectorAll('[data-renovcrit]').forEach(b => b.addEventListener('click', () => { renovCrit = b.dataset.renovcrit; draw(); }));
     wireKpis();
   }
@@ -476,5 +511,25 @@ Orbit.modules.insights = (function () {
       unsub = () => { u1(); document.removeEventListener('orbit:pais', f); document.removeEventListener('orbit:ciclo', f); };
     }
   }
-  return { render, cliente };
+  return { render, cliente,
+    _drillMes: function(i) {
+      const s26 = serieAnual(YEAR); const s25 = serieAnual(PREV);
+      const m = MESES[i]; const v26 = s26.arr[i]||0; const v25 = s25.arr[i]||0;
+      const vp = v25>0 ? Math.round((v26-v25)/v25*100) : 0;
+      const pols = S().all('polizas').filter(p => p && p.vigenciaInicio && p.vigenciaInicio.startsWith(YEAR+'-'+String(i+1).padStart(2,'0')));
+      const rows = pols.slice(0,30).map(p => { const c=S().get('clientes',p.clienteId)||{}; return [p.numero||'—',U.esc(c.nombre||'—'),p.ramo||'—',U.money(p.primaTotal||p.prima||0,p.moneda||'GTQ')]; });
+      openKpiDetail({ titulo: m+' '+YEAR+' — Detalle de prima neta', rows, headers: ['Póliza','Cliente','Ramo','Prima'] });
+    },
+    _drillRow: function(label, crit) {
+      const pols = S().all('polizas').filter(p => {
+        if (!p||!p.vigenciaInicio||!p.vigenciaInicio.startsWith(YEAR+'')) return false;
+        if (crit==='asesor') { const a=S().get('asesores',p.asesorId)||{}; return (a.nombre||'—')===label; }
+        if (crit==='ramo') return (p.ramo||'—')===label;
+        if (crit==='aseguradora') { const a=S().all('aseguradoras').find(x=>x&&x.id===p.aseguradoraId)||{}; return (a.nombre||'—')===label; }
+        return true;
+      });
+      const rows = pols.slice(0,30).map(p => { const c=S().get('clientes',p.clienteId)||{}; return [p.numero||'—',U.esc(c.nombre||'—'),p.ramo||'—',U.money(p.primaTotal||p.prima||0,p.moneda||'GTQ')]; });
+      openKpiDetail({ titulo: label+' · '+YEAR+' ('+crit+')', rows, headers: ['Póliza','Cliente','Ramo','Prima'] });
+    }
+  };
 })();

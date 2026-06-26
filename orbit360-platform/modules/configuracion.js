@@ -56,10 +56,10 @@ Orbit.modules.configuracion = (function () {
     return `${sectionHead('Marca y apariencia', 'Logo, paleta y menú — white-label')}
       ${lock ? `<div class="cfg-lock">🔒 El plan <b>${plan.nombre}</b> usa plantillas estándar. La personalización de marca está disponible en planes Profesional y Personalizado.</div>` : ''}
       ${row('Nombre de la empresa', `<input class="o-sel" id="cf-empresa" value="${U.esc(t.empresa)}" ${lock ? 'disabled' : ''} style="min-width:240px">`)}
-      ${row('Logo del cliente', `<div style="display:flex;align-items:center;gap:10px"><span class="cfg-logo">${t.branding.logo ? `<img src="${U.esc(t.branding.logo)}">` : '🏢'}</span><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="alert('Demo: subir logo (PNG/SVG)')">Subir logo</button></div>`, 'Aparece en la cintilla y el login')}
+      ${row('Logo del cliente', `<div style="display:flex;align-items:center;gap:10px"><span class="cfg-logo">${t.branding.logo ? `<img src="${U.esc(t.branding.logo)}">` : '🏢'}</span><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="(function(){var fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.onchange=function(){var r=new FileReader();r.onload=function(e){try{localStorage.setItem('orbit360_logo',e.target.result);}catch(x){}try{var b=Orbit.tenant.get().branding||{};b.logo=e.target.result;Orbit.tenant.setDeep('branding',b);}catch(x){}if(Orbit.applyBrand)Orbit.applyBrand();var img=document.getElementById('cfg-logo-prev');if(img){img.src=e.target.result;img.style.display='inline-block';}var t=document.createElement('div');t.className='ciclo-toast';t.textContent='\u2713 Logo aplicado en cintilla y login';document.body.appendChild(t);setTimeout(function(){t.remove();},2600);};r.readAsDataURL(fi.files[0]);};fi.click();})()">Subir logo</button><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="(function(){try{localStorage.removeItem('orbit360_logo');var b=Orbit.tenant.get().branding||{};b.logo='';Orbit.tenant.setDeep('branding',b);}catch(x){}if(Orbit.applyBrand)Orbit.applyBrand();})()">Quitar</button><img id="cfg-logo-prev" style="height:36px;border-radius:6px;margin-left:8px;vertical-align:middle;display:none"></div>`, 'Se refleja en la cintilla y el login. Sube el logo del cliente para white-label.')}
       ${row('Paleta de marca', `<button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.theme.picker(this)">🎨 Elegir paleta</button>`, 'Cambia el acento en toda la plataforma')}
       ${row('Menú lateral', `<div class="cfg-seg" id="cf-sb">${['oscuro', 'claro'].map(m => `<button data-sb="${m}" class="${Orbit.theme.getSidebar() === m ? 'on' : ''}" ${lock ? 'disabled' : ''}>${m === 'oscuro' ? 'Oscuro' : 'Claro'}</button>`).join('')}</div>`)}
-      ${row('Auto-branding por IA', `<button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="alert('Demo: sube el manual de identidad / logo y la IA propone tipografía y colores corporativos.')">📄 Subir manual de marca</button>`, 'La IA adapta tipografía y colores corporativos (plan Personalizado)')}`;
+      ${row('Auto-branding por IA', `<button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.modules.configuracion.subirManualMarca()">📄 Subir manual de marca</button>`, 'La IA lee tu manual y propone tipografía y colores corporativos (plan Personalizado)')}`;
   }
 
   /* ---------- USUARIOS Y PERMISOS ---------- */
@@ -238,7 +238,7 @@ Orbit.modules.configuracion = (function () {
           <td>${p.addons ? '✓' : '—'}</td>
           <td>${p.apis ? '✓' : '—'}</td>
           <td class="muted" style="font-size:12.5px">${U.esc(p.desc)}</td>
-          <td style="text-align:right"><button class="btn ghost sm" onclick="alert('Demo: editar funcionalidades, precio y vigencia del plan — ajustable por acuerdos comerciales o promociones.')">Editar</button></td>
+          <td style="text-align:right"><button class="btn ghost sm" onclick="Orbit.modules.configuracion.editarPlan('${p.id}')">Editar</button></td>itar</button></td>
         </tr>`).join('')}</tbody>
       </table></div>
       <div class="cfg-note" style="margin-bottom:18px">💡 Al asignar un plan al cliente se configuran de una vez sus funcionalidades; podés <b>modificar más o menos según acuerdos o promociones</b> sin cambiar el catálogo base.</div>
@@ -301,9 +301,79 @@ Orbit.modules.configuracion = (function () {
   }
   function applyBrandToTopbar() {
     const t = T().get();
+    const logo = (t.branding && t.branding.logo) || (function () { try { return localStorage.getItem('orbit360_logo'); } catch (e) { return ''; } })();
     const cn = document.querySelector('.tb-logo .cn');
-    if (cn) cn.firstChild.textContent = t.empresa;
+    if (cn && cn.firstChild) cn.firstChild.textContent = t.empresa || 'Tu marca';
+    // logo en el slot del topbar
+    const slot = document.getElementById('client-logo');
+    if (slot) { if (logo) { slot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; } else { slot.textContent = '🏢'; } }
+    // logo en el login (slot inferior)
+    const lgSlot = document.querySelector('.lf-logoslot .slot');
+    if (lgSlot) { if (logo) lgSlot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; }
+  }
+  // exponer para que el shell lo invoque al cargar
+  Orbit.applyBrand = applyBrandToTopbar;
+
+  function editarPlan(id) {
+    const base = Object.values(Orbit.PLANES).concat(loadCustomPlans());
+    const p = base.find(x => x.id === id); if (!p) return;
+    let back = document.getElementById('cf-plan-ed'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'cf-plan-ed'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    back.innerHTML = '<div class="card" style="width:min(460px,94vw);padding:0">'
+      + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">⭐ Editar plan</b><button class="imp-x" id="pe-x">✕</button></div>'
+      + '<div style="padding:18px 20px;display:grid;gap:11px">'
+      + '<label class="ce-l">Nombre<input id="pe-nombre" class="o-sel" value="' + U.esc(p.nombre) + '"></label>'
+      + '<label class="ce-l">Precio / mes (opcional)<input id="pe-precio" class="o-sel" value="' + U.esc(p.precio || '') + '" placeholder="Ej. $99 / mes"></label>'
+      + '<label class="ce-l">Descripción<textarea id="pe-desc" class="o-sel" style="min-height:54px">' + U.esc(p.desc || '') + '</textarea></label>'
+      + '<label class="ce-l ck"><input type="checkbox" id="pe-marca" ' + (p.personalizacion ? 'checked' : '') + '> Marca configurable (white-label)</label>'
+      + '<label class="ce-l ck"><input type="checkbox" id="pe-addons" ' + (p.addons ? 'checked' : '') + '> Add-ons / integraciones</label>'
+      + '<label class="ce-l ck"><input type="checkbox" id="pe-apis" ' + (p.apis ? 'checked' : '') + '> APIs y auto-branding IA</label>'
+      + '</div>'
+      + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="pe-cancel">Cancelar</button><button class="btn primary" id="pe-ok">Guardar</button></div>'
+      + '</div>';
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#pe-x').onclick = close; back.querySelector('#pe-cancel').onclick = close;
+    back.querySelector('#pe-ok').onclick = () => {
+      const patch = { nombre: back.querySelector('#pe-nombre').value || p.nombre, precio: back.querySelector('#pe-precio').value, desc: back.querySelector('#pe-desc').value, personalizacion: back.querySelector('#pe-marca').checked, addons: back.querySelector('#pe-addons').checked, apis: back.querySelector('#pe-apis').checked };
+      if (p.custom) { const cp = loadCustomPlans().map(x => x.id === id ? Object.assign({}, x, patch) : x); saveCustomPlans(cp); }
+      else { Object.assign(Orbit.PLANES[id], patch); } // override en memoria (persistible en backend)
+      close(); const host = document.getElementById('host'); if (host) paint(host);
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Plan actualizado'; document.body.appendChild(t); setTimeout(() => t.remove(), 2400);
+    };
   }
 
-  return { render };
+  function subirManualMarca() {
+    const fi = document.createElement('input'); fi.type = 'file'; fi.accept = '.pdf,.txt,.docx,image/*';
+    fi.onchange = () => {
+      const f = fi.files[0]; if (!f) return;
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '🧠 Analizando manual de marca con IA…'; document.body.appendChild(t);
+      const finish = (sugerencia) => {
+        t.remove();
+        let back = document.getElementById('cf-brand-ai'); if (back) back.remove();
+        back = document.createElement('div'); back.id = 'cf-brand-ai'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+        back.innerHTML = '<div class="card" style="width:min(440px,94vw);padding:0">'
+          + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🎨 Auto-branding por IA</b><button class="imp-x" id="ba-x">✕</button></div>'
+          + '<div style="padding:18px 20px">' + sugerencia + '</div>'
+          + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px"><button class="btn ghost" id="ba-close">Cerrar</button><button class="btn primary" onclick="Orbit.theme.picker(this)">🎨 Elegir paleta</button></div></div>';
+        document.body.appendChild(back);
+        back.addEventListener('click', e => { if (e.target === back) back.remove(); });
+        back.querySelector('#ba-x').onclick = () => back.remove(); back.querySelector('#ba-close').onclick = () => back.remove();
+      };
+      const fallback = '<p style="font-size:13.5px;line-height:1.6">Manual <b>' + (f.name) + '</b> recibido. Sugerencia: usá la <b>paleta corporativa</b> de tu manual como acento, tipografía display tipo <b>Manrope/serif institucional</b>, y mantené el grafito para el chrome. Aplicá la paleta abajo.</p>';
+      if (window.claude && window.claude.complete && /\.(txt|md)$/i.test(f.name)) {
+        const r = new FileReader();
+        r.onload = async () => {
+          try { const out = await window.claude.complete({ messages: [{ role: 'user', content: 'Eres diseñador de marca. De este manual de identidad sugiere en 3-4 líneas: color primario (hex aproximado), tipografía y tono visual para una plataforma de seguros. Manual:\n' + String(r.result).slice(0, 4000) }] }); finish('<p style="font-size:13.5px;line-height:1.6">' + Orbit.ui.esc(String(out)) + '</p>'); }
+          catch (e) { finish(fallback); }
+        };
+        r.readAsText(f);
+      } else { setTimeout(() => finish(fallback), 900); }
+    };
+    fi.click();
+  }
+
+  return { render, editarPlan, subirManualMarca };
 })();

@@ -75,11 +75,22 @@ Orbit.PLANES = {
   personalizado: { id: 'personalizado', nombre: 'Personalizado', personalizacion: true, addons: true, apis: true, desc: 'White-label completo, auto-branding por manual de marca, APIs.' }
 };
 Orbit.ROLES = {
-  'Dirección': { nivel: 4, desc: 'Acceso total + configuración + comisión empresa.' },
-  'Admin':     { nivel: 3, desc: 'Operación completa + configuración self-service.' },
-  'Finanzas':  { nivel: 3, desc: 'Cobros, comisiones, finanzas, conciliación.' },
-  'Asesor':    { nivel: 2, desc: 'Su cartera; ve solo su comisión.' },
-  'Asistente': { nivel: 1, desc: 'Captura y gestión, sin comisiones ni config.' }
+  'Dirección':   { nivel: 5, desc: 'Acceso total + configuración + comisión empresa + análitica completa.', color: '#C5162E',
+    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','renovaciones','cancelaciones','siniestros','historial','comisiones','importar','calidad','plantillas','finanzas','insights','reportes','automatizaciones','correo','marketing','academia','portal','equipo','configuracion'] },
+  'Admin':       { nivel: 4, desc: 'Operación completa + configuración. Sin módulo Finanzas completo.', color: '#1f3a5f',
+    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','renovaciones','cancelaciones','siniestros','historial','comisiones','importar','calidad','plantillas','insights','reportes','automatizaciones','correo','academia','equipo','configuracion'] },
+  'Comercial':   { nivel: 3, desc: 'CRM + Ops/Leads + Cotizador. Sin Finanzas ni Config.', color: '#1f8a4c',
+    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo','marketing'] },
+  'Finanzas':    { nivel: 3, desc: 'Cobros, comisiones, finanzas, conciliación. Sin Ops/Leads.', color: '#c9821b',
+    modulos: ['inicio','cronograma','cliente360','polizas','cobros','renovaciones','cancelaciones','comisiones','historial','finanzas','reportes','correo'] },
+  'Marketing':   { nivel: 2, desc: 'Marketing, Academia, Reportes, CRM básico.', color: '#6b4ea0',
+    modulos: ['inicio','cronograma','marketing','academia','cliente360','correo','reportes'] },
+  'Operativo':   { nivel: 2, desc: 'Ops + CRM operativo. Sin Finanzas ni Config.', color: '#0f766e',
+    modulos: ['inicio','cronograma','ops','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo'] },
+  'Asesor':      { nivel: 2, desc: 'Su cartera; ve solo su comisión. Sin Ops ni Config.', color: '#2563a8',
+    modulos: ['inicio','cronograma','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','cotizador','correo'] },
+  'Asistente':   { nivel: 1, desc: 'Captura y gestión básica. Sin comisiones ni finanzas.', color: '#7a818e',
+    modulos: ['inicio','cronograma','cliente360','polizas','cobros','renovaciones','historial','importar','correo'] }
 };
 /* =========================================================
    CATÁLOGOS configurables (para que TODO sea desplegable →
@@ -193,7 +204,7 @@ Orbit.session = (function () {
     asesorId: () => d.asesorId,
     esAsesor,
     verEmpresa: () => ['Dirección', 'Admin', 'Finanzas'].includes(d.rol),
-    canSee: (route) => !(esAsesor() && route === 'ops'),
+    canSee: (route) => { const a = (d.asesorId && Orbit.store) ? Orbit.store.get('asesores', d.asesorId) : null; if (a && a.modulosOverride && a.modulosOverride.length) return a.modulosOverride.includes(route); const r = Orbit.ROLES[d.rol]; if (!r) return true; return !r.modulos || r.modulos.includes(route); },
     set: (rol, asesorId) => { d.rol = rol; if (asesorId) d.asesorId = asesorId; save(); document.dispatchEvent(new CustomEvent('orbit:session')); }
   };
 })();
@@ -207,7 +218,7 @@ Orbit.tenant = (function () {
     monedaBase: 'GTQ',
     branding: { logo: '', sidebar: 'oscuro', paleta: 'rojo', tipografia: 'Manrope' },
     // módulos activos (config INTERNA nuestra) — todos los del nav
-    modulosActivos: ['inicio', 'cronograma', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'siniestros', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
+    modulosActivos: ['inicio', 'cronograma', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'siniestros', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'automatizaciones', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
     addons: { make: false, drive: true, whatsapp: true, correo: true, metricool: false, facebook: false, linkedin: false, web: true, canva: false, gamma: false, heygen: false, ia: false, mailchimp: false, sheets: false },
     portalVisibility: { polizas: true, recibos: true, documentos: true, asesor: true, comisiones: false, drive: false },
     apis: []
@@ -272,7 +283,8 @@ Orbit.NAV = [
   {
     type: 'group', label: 'Comunicación', open: false, items: [
       { route: 'correo', icon: '✉', label: 'Correo', estado: 'beta' },
-      { route: 'notificaciones', icon: '💬', label: 'Notificaciones WA', estado: 'road' },
+      { route: 'automatizaciones', icon: '⚡', label: 'Automatizaciones', estado: 'beta' },
+      { route: 'notificaciones', icon: '💬', label: 'Notificaciones WA', estado: 'beta' },
       { route: 'marketing', icon: '📣', label: 'Orbit Marketing', estado: 'beta' },
       { route: 'portal', icon: '🚪', label: 'Portal del Cliente', estado: 'beta' }
     ]

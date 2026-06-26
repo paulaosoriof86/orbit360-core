@@ -2,6 +2,12 @@
    Orbit 360 · UI helpers compartidos
    ============================================================ */
 window.Orbit = window.Orbit || {};
+// Helper global: abrir el correo INTERNO de Orbit (no mailto del SO)
+Orbit.correoCompose = function (pre) {
+  window.__orbitCompose = pre || {};
+  if (location.hash !== '#/correo') location.hash = '#/correo';
+  else if (Orbit.modules && Orbit.modules.correo) { const p = window.__orbitCompose; window.__orbitCompose = null; Orbit.modules.correo.redactar(p); }
+};
 Orbit.ui = (function () {
   const NOW = new Date('2026-06-20');
 

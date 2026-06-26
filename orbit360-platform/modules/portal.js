@@ -62,6 +62,9 @@ Orbit.modules.portal = (function () {
     host.querySelectorAll('[data-pago]').forEach(b => b.addEventListener('click', () => reportarPago(b.dataset.pago)));
     host.querySelectorAll('[data-soporte]').forEach(b => b.addEventListener('click', () => soporteAsesor(cli)));
     host.querySelectorAll('[data-adddoc]').forEach(b => b.addEventListener('click', subirDoc));
+    host.querySelectorAll('[data-doc]').forEach(b => b.addEventListener('click', () => verDocPortal(b.dataset.doc)));
+    host.querySelectorAll('[data-curso]').forEach(b => b.addEventListener('click', () => verCursoPortal(b.dataset.curso)));
+    host.querySelectorAll('[data-glos]').forEach(b => b.addEventListener('click', () => { if (Orbit.modules.academia && Orbit.glosarioPortal) Orbit.glosarioPortal(); else verCursoPortal('demo'); }));
     host.querySelectorAll('[data-pol]').forEach(b => b.addEventListener('click', () => detPoliza(b.dataset.pol)));
     host.querySelectorAll('[data-rec]').forEach(b => b.addEventListener('click', () => detRecibo(b.dataset.rec)));
     host.querySelectorAll('[data-sin]').forEach(b => b.addEventListener('click', () => detSiniestro(b.dataset.sin)));
@@ -110,15 +113,17 @@ Orbit.modules.portal = (function () {
   function vDocs(cli) {
     const docs = S().where('documentos', d => d.clienteId === cli.id);
     const faltan = !cli.identificacion || !cli.email;
+    const rows = docs.length
+      ? docs.map(d => `<div class="pt-row pt-click" data-doc="${d.id}"><span class="pt-row-ic">📄</span><div style="flex:1"><b>${U.esc(d.nombre || d.tipo)}</b><div class="muted" style="font-size:11.5px">${U.esc(d.tipo || 'documento')} ›</div></div><span class="muted" style="font-size:11px">${U.fmtDate(d.fecha)}</span></div>`).join('')
+      : `<div class="pt-empty">Aún no tienes documentos en tu expediente.</div>`;
     return `${faltan ? `<div class="pt-alert">📋 Completa tu expediente para agilizar tus trámites. <button class="pt-link" data-adddoc="1">Subir documento →</button></div>` : ''}
-      ${(docs.length ? docs.map(d => `<div class="pt-row"><span class="pt-row-ic">📄</span><div style="flex:1"><b>${U.esc(d.nombre || d.tipo)}</b><div class="muted" style="font-size:11.5px">${d.tipo || 'documento'}</div></div><button class="btn ghost sm">Ver</button></div>`).join('')
-        : `<div class="pt-row"><span class="pt-row-ic">📄</span><div style="flex:1"><b>Carátula de póliza.pdf</b><div class="muted" style="font-size:11.5px">documento</div></div><button class="btn ghost sm">Ver</button></div>`)}
+      ${rows}
       <button class="pt-action" style="margin-top:12px" data-adddoc="1">⬆ Añadir un documento</button>`;
   }
   function vAprende() {
     const cursos = (S().all('cursos') || []).filter(c => c.cat === 'Producto' || c.cat === 'Educativo' || c.cat === 'Técnico').slice(0, 4);
     return `<div class="pt-empty" style="text-align:left;color:var(--ink-2);padding:0 0 12px">📚 Recursos para entender mejor tus seguros:</div>
-      ${(cursos.length ? cursos : [{ emoji: '🛡️', titulo: 'Conoce tu seguro', desc: 'Coberturas, deducible y cómo usarlo.' }, { emoji: '🚗', titulo: 'Tu seguro de Auto', desc: 'Qué hacer ante un choque o robo.' }]).map(c => `<div class="pt-row"><span class="pt-row-ic">${c.emoji || '📘'}</span><div style="flex:1"><b>${U.esc(c.titulo)}</b><div class="muted" style="font-size:11.5px">${U.esc(c.desc || '')}</div></div><button class="btn ghost sm">Ver</button></div>`).join('')}
+      ${(cursos.length ? cursos : [{ emoji: '🛡️', titulo: 'Conoce tu seguro', desc: 'Coberturas, deducible y cómo usarlo.' }, { emoji: '🚗', titulo: 'Tu seguro de Auto', desc: 'Qué hacer ante un choque o robo.' }]).map(c => `<div class="pt-row pt-click" ${c.id ? `data-curso="${c.id}"` : 'data-curso="demo"'}><span class="pt-row-ic">${c.emoji || '📘'}</span><div style="flex:1"><b>${U.esc(c.titulo)}</b><div class="muted" style="font-size:11.5px">${U.esc(c.desc || '')}</div></div><button class="btn ghost sm">Ver ›</button></div>`).join('')}
       <button class="pt-action" style="margin-top:12px" data-glos="1">📖 Ver glosario de seguros</button>`;
   }
 
@@ -170,7 +175,7 @@ Orbit.modules.portal = (function () {
       <div class="muted" style="font-size:12.5px">${ase ? ase.rol : ''}</div>
       <div style="display:flex;gap:8px;justify-content:center;margin-top:14px">
         <a class="btn primary sm" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>
-        <a class="btn ghost sm" href="mailto:${ase ? '' : ''}">✉ Correo</a>
+        ${ase && ase.email ? `<a class="btn ghost sm" href="mailto:${ase.email}?subject=Consulta%20desde%20mi%20portal" target="_blank" rel="noopener">✉ Correo</a>` : ''}
       </div></div>`, null, 'Cerrar');
   }
 
@@ -293,6 +298,38 @@ Orbit.modules.portal = (function () {
       <div id="gl-list">${terms.map(t => `<div class="pt-row" style="cursor:default"><div style="flex:1"><b>${U.esc(t.t)}</b><div class="muted" style="font-size:11.5px">${U.esc(t.d)}</div></div></div>`).join('')}</div>`, null, 'Cerrar');
     const dr = document.getElementById('pt-dr'); const inp = dr.querySelector('#gl-q');
     inp.addEventListener('input', () => { const v = inp.value.toLowerCase(); dr.querySelector('#gl-list').innerHTML = terms.filter(t => (t.t + t.d).toLowerCase().includes(v)).map(t => `<div class="pt-row" style="cursor:default"><div style="flex:1"><b>${U.esc(t.t)}</b><div class="muted" style="font-size:11.5px">${U.esc(t.d)}</div></div></div>`).join(''); });
+  }
+
+  function verDocPortal(docId) {
+    const d = S().get('documentos', docId); if (!d) return;
+    const src = d.src || d.url || d.iframeSrc || '';
+    let visor;
+    if (src && /^data:image|\.(png|jpe?g|webp|gif)/i.test(src)) visor = `<img src="${src}" style="max-width:100%;border-radius:8px">`;
+    else if (src) visor = `<div style="position:relative;width:100%;height:60vh;border-radius:8px;overflow:hidden;background:#f4f3ee"><iframe src="${src}" style="width:100%;height:100%;border:0"></iframe></div>`;
+    else visor = `<div style="text-align:center;padding:30px;color:var(--ink-3)"><div style="font-size:48px">📄</div><div style="margin-top:10px;font-weight:600">${U.esc(d.nombre || d.tipo)}</div><div style="font-size:12px;margin-top:6px">${U.esc(d.tipo || 'documento')} · ${U.fmtDate(d.fecha)}</div><div style="font-size:11.5px;margin-top:8px;color:var(--ink-3)">La vista previa se mostrará al conectar el almacenamiento (Drive/servidor).</div></div>`;
+    drawer('📄 ' + U.esc(d.nombre || d.tipo), visor, null, 'Cerrar');
+  }
+  function pmd(md) {
+    let s = U.esc(String(md || ''));
+    s = s.replace(/^## (.*)$/gm, '<h3 style="font-family:var(--f-display);font-size:16px;margin:14px 0 6px">$1</h3>');
+    s = s.replace(/^# (.*)$/gm, '<h2 style="font-family:var(--f-display);font-size:18px;margin:8px 0 8px">$1</h2>');
+    s = s.replace(/^\s*---\s*$/gm, '<hr style="border:0;border-top:1px solid var(--line);margin:12px 0">');
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+    s = s.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>');
+    return '<p style="line-height:1.7;font-size:14px">' + s + '</p>';
+  }
+  function verCursoPortal(cursoId) {
+    const c = cursoId !== 'demo' ? S().get('cursos', cursoId) : null;
+    const titulo = c ? c.titulo : 'Conoce tu seguro';
+    const lecs = (c && c.lecciones) ? c.lecciones : [{ t: 'Qué cubre tu póliza', tipo: 'lectura', texto: 'Tu póliza protege contra los riesgos detallados en la carátula. Revisá coberturas, deducible y vigencia.' }, { t: 'Cómo usar tu seguro', tipo: 'lectura', texto: 'Ante un siniestro, contactá a tu asesor, reuní la documentación y reportá el reclamo desde tu portal.' }];
+    const body = `<div style="display:grid;gap:14px">${lecs.map((l, i) => {
+      let inner;
+      if (l.secciones && l.secciones.length) inner = l.secciones.map(sx => `<div style="border-left:4px solid ${sx.color || 'var(--red)'};padding:8px 0 8px 12px;margin-bottom:8px"><div style="font-family:var(--f-display);font-weight:700;font-size:14px;color:${sx.color || 'var(--red)'}">${U.esc(sx.icon || '▸')} ${U.esc(sx.t || '')}</div><div style="font-size:13.5px;line-height:1.65;color:var(--ink-2);white-space:pre-wrap;margin-top:3px">${U.esc(sx.d || '')}</div></div>`).join('');
+      else if (l.tipo === 'video' && l.url) inner = `<div class="ac-video" style="border-radius:8px;overflow:hidden"><iframe src="${l.url}" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0"></iframe></div>`;
+      else inner = pmd(l.texto || 'Contenido del curso.');
+      return `<div><div style="font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--red);margin-bottom:6px">${i + 1}. ${U.esc(l.t)}</div>${inner}</div>`;
+    }).join('')}</div>`;
+    drawer('🎓 ' + U.esc(titulo), body, null, 'Cerrar');
   }
 
   /* ---- helper drawer ---- */

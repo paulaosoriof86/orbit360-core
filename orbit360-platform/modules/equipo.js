@@ -83,7 +83,7 @@ Orbit.modules.equipo = (function () {
   }
   function permisos() {
     const P = getPermisos();
-    const roles = Object.keys(Orbit.ROLES);
+    const roles = Object.keys(Orbit.ROLES || {'Dirección':1,'Admin':1,'Comercial':1,'Finanzas':1,'Marketing':1,'Operativo':1,'Asesor':1,'Asistente':1});
     return `<div class="cfg-note" style="margin-bottom:14px">🔐 Matriz de permisos por <b>rol × módulo</b>. Marca <b>Ver</b> y/o <b>Editar</b>. Se aplica en toda la plataforma. (El asesor, por diseño, solo ve su cartera y su comisión.)</div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl perm-tbl">
       <thead><tr><th>Módulo</th>${roles.map(r => `<th colspan="2" style="text-align:center;border-left:1px solid var(--line)">${r}</th>`).join('')}</tr>
@@ -151,24 +151,38 @@ Orbit.modules.equipo = (function () {
 
   /* ---------- editar usuario ---------- */
   function editarUsuario(id) {
-    const a = id ? S().get('asesores', id) : { id: '', nombre: '', rol: 'Asesor', color: '#1f3a5f', comModo: 'comision', shareCom: 50, metaPrima: 100000, metaRecaudo: 85000 };
+    const a = id ? S().get('asesores', id) : { id: '', nombre: '', rol: 'Asesor', roles: ['Asesor'], color: '#1f3a5f', comModo: 'comision', shareCom: 50, metaPrima: 100000, metaRecaudo: 85000 };
     const roles = Object.keys(Orbit.ROLES);
+    const rolesSel = a.roles && a.roles.length ? a.roles : [a.rol];
+    const TODOS_MOD = (Orbit.ROLES['Dirección'] && Orbit.ROLES['Dirección'].modulos) || [];
+    const modLabel = (Orbit.MODULE_TITLES) || {};
+    const modActual = (a.modulosOverride && a.modulosOverride.length) ? a.modulosOverride : null;
     let back = document.getElementById('eq-edit'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'eq-edit'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center';
-    back.innerHTML = `<div class="card" style="width:min(520px,94vw);max-height:92vh;overflow:auto;padding:0">
+    back.innerHTML = `<div class="card" style="width:min(560px,94vw);max-height:92vh;overflow:auto;padding:0">
       <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
         <b style="font-family:var(--f-display);font-size:16px">${id ? '✏ Editar usuario' : '+ Nuevo usuario'}</b><button class="imp-x" id="eu-x">✕</button></div>
       <div style="padding:18px 20px;display:grid;gap:13px">
         <div class="cgrid">
           <label class="ce-l">Nombre<input id="eu-nombre" class="o-sel" value="${U.esc(a.nombre)}"></label>
-          <label class="ce-l">Rol<select id="eu-rol" class="o-sel">${roles.map(r => `<option ${r === a.rol ? 'selected' : ''}>${r}</option>`).join('')}</select></label>
-          <label class="ce-l">Correo<input id="eu-email" class="o-sel" value="${U.esc(a.email || '')}" placeholder="nombre@correo.com"></label>
+          <label class="ce-l">Teléfono / WhatsApp<input id="eu-tel" class="o-sel" value="${U.esc(a.telefono || '')}" placeholder="+502 5555 5555"></label>
+          <label class="ce-l">Correo del usuario<input id="eu-email" class="o-sel" value="${U.esc(a.email || '')}" placeholder="nombre@tudominio.com"></label>
           <label class="ce-l">Color<input id="eu-color" class="o-sel" type="color" value="${a.color || '#1f3a5f'}" style="height:38px"></label>
           <label class="ce-l">Meta prima (mes)<input id="eu-meta" class="o-sel" type="number" value="${a.metaPrima || 0}"></label>
           <label class="ce-l">Meta recaudo<input id="eu-rec" class="o-sel" type="number" value="${a.metaRecaudo || 0}"></label>
         </div>
+        <div>
+          <div class="ce-l" style="margin-bottom:6px">Roles del usuario <span class="muted">(puede tener varios; el primero es el principal)</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">${roles.map(r => `<label class="chiprole"><input type="checkbox" class="eu-role" value="${r}" ${rolesSel.indexOf(r) >= 0 ? 'checked' : ''}> ${r}</label>`).join('')}</div>
+        </div>
+        <details>
+          <summary style="cursor:pointer;font-weight:700;font-size:13px;font-family:var(--f-display)">⚙ Módulos visibles para este usuario <span class="muted" style="font-weight:400">(opcional — por defecto los del rol)</span></summary>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px 12px;margin-top:10px">${TODOS_MOD.map(m => `<label class="ce-l ck" style="font-size:12.5px"><input type="checkbox" class="eu-mod" value="${m}" ${modActual ? (modActual.indexOf(m) >= 0 ? 'checked' : '') : 'checked'}> ${U.esc((modLabel[m] || m))}</label>`).join('')}</div>
+          <div class="muted" style="font-size:11.5px;margin-top:6px">Si dejás todos marcados, manda el rol. Desmarcá para restringir módulos a este usuario en particular.</div>
+        </details>
         <label class="ce-l ck"><input type="checkbox" id="eu-inact" ${a.inactivo ? 'checked' : ''}> Usuario inactivo</label>
+        <div class="cfg-note">🔐 Al guardar un usuario nuevo, se le envían sus <b>credenciales de acceso</b> al correo y WhatsApp indicados. El correo configurado acá será su usuario de ingreso y el que se asocia a su bandeja.</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
         <button class="btn ghost" id="eu-cancel">Cancelar</button><button class="btn primary" id="eu-ok">Guardar</button></div>
@@ -179,10 +193,14 @@ Orbit.modules.equipo = (function () {
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#eu-x').addEventListener('click', close); $('#eu-cancel').addEventListener('click', close);
     $('#eu-ok').addEventListener('click', () => {
-      const data = { nombre: $('#eu-nombre').value || 'Usuario', rol: $('#eu-rol').value, email: $('#eu-email').value, color: $('#eu-color').value, metaPrima: +$('#eu-meta').value || 0, metaRecaudo: +$('#eu-rec').value || 0, inactivo: $('#eu-inact').checked };
+      const rolesChecked = [...back.querySelectorAll('.eu-role:checked')].map(c => c.value);
+      const rolesFinal = rolesChecked.length ? rolesChecked : ['Asesor'];
+      const modsChecked = [...back.querySelectorAll('.eu-mod:checked')].map(c => c.value);
+      const modOverride = (modsChecked.length && modsChecked.length < TODOS_MOD.length) ? modsChecked : null;
+      const data = { nombre: $('#eu-nombre').value || 'Usuario', rol: rolesFinal[0], roles: rolesFinal, telefono: $('#eu-tel').value, email: $('#eu-email').value, color: $('#eu-color').value, metaPrima: +$('#eu-meta').value || 0, metaRecaudo: +$('#eu-rec').value || 0, inactivo: $('#eu-inact').checked, modulosOverride: modOverride };
       if (id) S().update('asesores', id, data);
-      else { data.id = 'ase' + Date.now().toString().slice(-5); data.iniciales = data.nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; S().insert('asesores', data); }
-      close(); render(document.getElementById('host'));
+      else { data.id = 'ase' + Date.now().toString().slice(-5); data.iniciales = data.nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; S().insert('asesores', data); const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Usuario creado · credenciales enviadas a ' + (data.email || 'su correo'); document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+      close(); render(document.getElementById('host') || document.getElementById('mod-host'));
     });
   }
 

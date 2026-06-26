@@ -9,9 +9,38 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.academia = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   let host, filtro = 'todas';
-  const TIPO_ICON = { video: '🎬', lectura: '📖', quiz: '✏️' };
+  const TIPO_ICON = { video: '🎬', lectura: '📖', quiz: '✏️', recurso: '📎' };
+  function mdToHtml(md) {
+    let s = U.esc(String(md || ''));
+    s = s.replace(/^### (.*)$/gm, '<h4 style="font-family:var(--f-display);font-size:15px;margin:14px 0 6px">$1</h4>');
+    s = s.replace(/^## (.*)$/gm, '<h3 style="font-family:var(--f-display);font-size:17px;margin:18px 0 8px">$1</h3>');
+    s = s.replace(/^# (.*)$/gm, '<h2 style="font-family:var(--f-display);font-size:20px;margin:8px 0 10px">$1</h2>');
+    s = s.replace(/^\s*---\s*$/gm, '<hr style="border:0;border-top:1px solid var(--line);margin:14px 0">');
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*]+)\*/g, '$1<i>$2</i>');
+    s = s.replace(/^\s*[-•]\s+(.*)$/gm, '<li>$1</li>').replace(/(<li>[\s\S]*?<\/li>)/g, '<ul style="margin:6px 0 6px 18px">$1</ul>');
+    s = s.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>');
+    return '<p>' + s + '</p>';
+  }
+  function fileToDataURL(f, cb) { if (!f) return; const r = new FileReader(); r.onload = () => cb(r.result); r.readAsDataURL(f); }
+  function fileToText(f, cb) { if (!f) return; if (/\.(txt|csv|md)$/i.test(f.name)) { const r = new FileReader(); r.onload = () => cb(String(r.result)); r.readAsText(f); } else { cb(''); } }
+  async function iaTextAsync(prompt, current) { if (window.claude && window.claude.complete) { try { const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt + (current ? '\n\nMejora y expande este borrador:\n' + current : '') }] }); return String(out).trim(); } catch (e) {} } return current || ('📘 Contenido de la lección.\n\nIntroducción, conceptos clave, ejemplos prácticos y cierre. Editá para ajustar el detalle.'); }
+  async function iaQuizAsync(tema, current) { if (window.claude && window.claude.complete) { try { const out = await window.claude.complete({ messages: [{ role: 'user', content: 'Genera 3 preguntas de opción múltiple sobre "' + (tema || 'seguros') + '". Formato EXACTO: enunciado en una línea, luego cada opción en su propia línea, la correcta con [x] al inicio y las demás con [ ]. Separa preguntas con una línea en blanco. Solo el texto, sin numeración.' }] }); return (current ? current + '\n\n' : '') + String(out).trim(); } catch (e) {} } const base = '¿Pregunta sobre ' + (tema || 'el tema') + '?\n[x] Respuesta correcta\n[ ] Distractor 1\n[ ] Distractor 2'; return (current ? current + '\n\n' : '') + base; }
+  async function iaQuizFromDoc(text) { if (window.claude && window.claude.complete && text) { try { const out = await window.claude.complete({ messages: [{ role: 'user', content: 'A partir de este documento genera 4 preguntas de opción múltiple. Formato: enunciado, opciones en líneas (correcta con [x], otras con [ ]), preguntas separadas por línea en blanco. Documento:\n' + String(text).slice(0, 4000) }] }); return String(out).trim(); } catch (e) {} } return '¿Pregunta basada en el documento?\n[x] Correcta\n[ ] Incorrecta\n[ ] Otra'; }
 
-  function cursos() { return S().all('cursos'); }
+  function cursos() {
+    const rol = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+    return S().all('cursos').filter(c => {
+      if (!c) return false;
+      const d = c.destinatarios || 'equipo';
+      if (d === 'clientes') return false; // solo para portal del cliente
+      if (d === 'ambos') return true;
+      if (d === 'equipo') return true;
+      if (d === rol) return true;
+      // Dirección/Admin ven todos los cursos de equipo
+      if (['Dirección','Admin'].includes(rol)) return true;
+      return false;
+    });
+  }
   function kpi(label, val, foot, color, fkey) {
     return `<button class="kpi kpi-click" data-kpi="${fkey}"><div class="k-accent" style="background:${color}"></div><div class="k-label">${label}</div><div class="k-val">${val}</div><div class="k-foot">${foot}</div></button>`;
   }
@@ -24,25 +53,38 @@ Orbit.modules.academia = (function () {
     const compl = arr.filter(c => c.progreso >= 100).length;
     const certs = arr.filter(c => c.certificado).length;
     const avg = arr.length ? Math.round(arr.reduce((s, c) => s + c.progreso, 0) / arr.length) : 0;
-    host.innerHTML = `<div class="page">
-      ${K.banner({ icon: '🎓', title: 'Orbit Academia', sub: 'Capacitación, certificaciones y recursos del equipo', features: [], actions: `<button class="btn ghost" id="ac-ia" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Crear con IA</button><button class="btn ghost" id="ac-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬆ Cargar recurso</button><button class="btn primary" id="ac-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Curso</button>` })}
-      <div class="kpi-row">
-        ${kpi('Cursos', arr.length, compl + ' completados', 'var(--red)', 'todas')}
-        ${kpi('Avance promedio', avg + '%', 'del equipo', 'var(--info)', '')}
-        ${kpi('Certificaciones', certs, 'obtenidas', 'var(--ok)', 'cert')}
-        ${kpi('Lecciones', arr.reduce((s, c) => s + (c.lecciones || []).length, 0), 'disponibles', 'var(--warn)', '')}
-      </div>
-      <div class="tabs" style="max-width:640px;margin-bottom:16px">
-        ${cats.map(c => `<div class="tab ${filtro === c ? 'active' : ''}" data-f="${c}">${c === 'todas' ? 'Todas' : c}</div>`).join('')}
-      </div>
-      <div class="ac-grid">${lista.map(card).join('')}</div>
-    </div>`;
+
+    const actions = '<button class="btn ghost" id="ac-ia" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Crear con IA</button>'
+      + '<button class="btn ghost" id="ac-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬆ Cargar recurso</button>'
+      + '<button class="btn primary" id="ac-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Curso</button>';
+
+    const catEmoji = { 'todas':'📚','Inducción':'🚀','Técnico':'⚙️','Comercial':'💼','Producto':'📦','Finanzas':'💰','Marketing':'📣','Servicio':'🤝','Cumplimiento':'🛡️','Liderazgo':'🌟','Clientes':'👥' };
+    const tabsHtml = cats.map(function(c){
+      var ico = catEmoji[c] || '🏷️';
+      var label = (c === 'todas' ? 'Todas' : c);
+      return '<div class="tab ac-tab' + (filtro === c ? ' active' : '') + '" data-f="' + c + '"><span class="ac-tab-ico">' + ico + '</span> ' + label + '</div>';
+    }).join('');
+
+    const kpisHtml = kpi('Cursos', arr.length, compl + ' completados', 'var(--red)', 'todas')
+      + kpi('Avance promedio', avg + '%', 'del equipo', 'var(--info)', '')
+      + kpi('Certificaciones', certs, 'obtenidas', 'var(--ok)', 'cert')
+      + kpi('Lecciones', arr.reduce((s, c) => s + (c.lecciones || []).length, 0), 'disponibles', 'var(--warn)', '');
+
+    host.innerHTML = '<div class="page">'
+      + K.banner({ icon: '🎓', title: 'Orbit Academia', sub: 'Capacitación, certificaciones y recursos del equipo', features: [], actions: actions })
+      + '<div class="kpi-row">' + kpisHtml + '</div>'
+      + '<div class="tabs" style="max-width:640px;margin-bottom:16px">' + tabsHtml + '</div>'
+      + '<div class="ac-grid">' + lista.map(card).join('') + '</div>'
+      + '</div>';
+
     host.querySelectorAll('.tab[data-f]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.f; render(host); }));
-    host.querySelectorAll('[data-cur]').forEach(el => el.addEventListener('click', () => abrir(el.dataset.cur)));
+    host.querySelectorAll('[data-cur]').forEach(el => el.addEventListener('click', (e) => { if (e.target.closest('.ac-act')) return; abrir(el.dataset.cur); }));
+    host.querySelectorAll('[data-edit]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); editar(el.dataset.edit); }));
+    host.querySelectorAll('[data-del]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); const c = S().get('cursos', el.dataset.del); if (c && confirm('¿Eliminar el curso "' + c.titulo + '"? Esta acción no se puede deshacer.')) { S().remove('cursos', el.dataset.del); render(host); } }));
     host.querySelectorAll('[data-kpi]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.kpi || 'todas'; render(host); }));
-    host.querySelector('#ac-imp').addEventListener('click', () => Orbit.importa.open('documentos', { onDone: () => render(host) }));
-    host.querySelector('#ac-new').addEventListener('click', () => editar(null));
-    host.querySelector('#ac-ia').addEventListener('click', crearIA);
+    const impBtn = host.querySelector('#ac-imp'); if (impBtn) impBtn.addEventListener('click', () => Orbit.importa.open('documentos', { onDone: () => render(host) }));
+    const newBtn = host.querySelector('#ac-new'); if (newBtn) newBtn.addEventListener('click', () => editar(null));
+    const iaBtn  = host.querySelector('#ac-ia');  if (iaBtn)  iaBtn.addEventListener('click', crearIA);
   }
 
   function card(c) {
@@ -52,6 +94,10 @@ Orbit.modules.academia = (function () {
         <span class="ac-emoji">${c.emoji}</span>
         <span class="badge" style="background:rgba(255,255,255,.18);color:#fff;border:none">${c.cat}</span>
         ${c.certificado ? '<span class="ac-cert">🏅 Certificado</span>' : ''}
+        <div class="ac-card-acts">
+          <button class="ac-act" data-edit="${c.id}" title="Editar curso">✏</button>
+          <button class="ac-act" data-del="${c.id}" title="Eliminar curso">🗑</button>
+        </div>
       </div>
       <div class="ac-card-b">
         <b style="font-family:var(--f-display);font-size:15px">${U.esc(c.titulo)}</b>
@@ -63,7 +109,160 @@ Orbit.modules.academia = (function () {
     </div>`;
   }
 
-  function abrir(id) {
+  function abrir(id) { verCurso(id); }
+
+  /* ---- Cuerpo de una lección (video / lectura / quiz interactivo) ---- */
+  function lessonBody(l) {
+    if (!l) return '';
+    if (l.iframeSrc) return `<div style="position:relative;width:100%;height:62vh;border-radius:12px;overflow:hidden;background:#f4f3ee"><iframe src="${l.iframeSrc}" style="width:100%;height:100%;border:0"></iframe></div>`;
+    if (l.tipo === 'video') {
+      if (!l.url) return `<div style="background:linear-gradient(135deg,#1a1f28,#0f1318);border-radius:12px;padding:56px 32px;text-align:center;color:#fff"><div style="font-size:56px;margin-bottom:16px">🎬</div><h3 style="font-family:var(--f-display);font-size:20px;font-weight:800;margin-bottom:10px">${U.esc(l.t)}</h3><p style="font-size:14px;color:rgba(255,255,255,.7);max-width:420px;margin:0 auto">Para agregar el video, usá <b>✏ Editar lección</b> y pegá la URL de YouTube/Vimeo o subí un archivo.</p></div>`;
+      // video subido (data URL o archivo)
+      if (/^data:video|^blob:|\.(mp4|webm|ogg|mov)(\?|$)/i.test(l.url)) return `<div class="ac-video"><video src="${l.url}" controls playsinline style="width:100%;height:100%;background:#000"></video></div>`;
+      // normalizar YouTube/Vimeo a formato embed
+      let emb = l.url;
+      const yt = l.url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
+      if (yt) emb = 'https://www.youtube.com/embed/' + yt[1] + '?rel=0&modestbranding=1';
+      else { const vm = l.url.match(/vimeo\.com\/(?:video\/)?(\d+)/); if (vm) emb = 'https://player.vimeo.com/video/' + vm[1]; }
+      return `<div class="ac-video"><iframe src="${emb}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>`;
+    }
+    if (l.tipo === 'lectura') {
+      const secs = l.secciones && l.secciones.length
+        ? l.secciones.map(s => `<div class="acv-sec" style="border-left:4px solid ${s.color || 'var(--red)'}"><div class="acv-sec-t" style="color:${s.color || 'var(--red)'}">${U.esc(s.icon || '▸')} ${U.esc(s.t || '')}</div><div class="acv-sec-b">${U.esc(s.d || '')}</div></div>`).join('')
+        : `<div class="ac-read ac-md">${mdToHtml(l.texto || 'Contenido pendiente de redactar. Usá ✏ Editar lección para agregarlo.')}</div>`;
+      const adj = l.docSrc ? (/^data:image|\.(png|jpe?g|webp|gif)/i.test(l.docSrc) ? `<img src="${l.docSrc}" style="max-width:100%;border-radius:10px;margin-top:14px">` : `<div style="position:relative;width:100%;height:60vh;border-radius:10px;overflow:hidden;background:#f4f3ee;margin-top:14px"><iframe src="${l.docSrc}" style="width:100%;height:100%;border:0"></iframe></div>`) : '';
+      return secs + adj;
+    }
+    if (l.tipo === 'quiz' && l.preguntas && l.preguntas.length) {
+      return '<div style="display:grid;gap:16px">' + l.preguntas.map(function (q, i) {
+        var ops = q.ops.map(function (o, j) { return '<label style="display:flex;align-items:center;gap:9px;padding:10px 13px;border:1px solid var(--line);border-radius:8px;cursor:pointer;margin-bottom:7px;background:var(--card);font-size:13.5px"><input type="radio" name="qz' + i + '" value="' + j + '" style="accent-color:var(--red)"> ' + U.esc(o) + '</label>'; }).join('');
+        var correcta = U.esc(q.ops[q.ok]);
+        var verifyFn = "(function(el,qi,ans,cor){var s=document.querySelector('input[name=qz'+qi+']:checked');var r=el.nextElementSibling;if(!s){r.textContent='\u26a0\ufe0f Selecciona una opci\u00f3n.';r.style.color='var(--warn)';r.style.display='block';return;}el.disabled=true;r.style.display='block';if(+s.value===ans){r.textContent='\u2705 \u00a1Correcto!';r.style.color='var(--ok)'}else{r.textContent='\u274c Incorrecto \u2014 la correcta es: '+cor;r.style.color='var(--danger)'}})(this," + i + "," + q.ok + ",'" + correcta.replace(/'/g, "\\'") + "')";
+        return '<div style="background:var(--surface);border-radius:10px;padding:18px 20px"><div style="font-family:var(--f-display);font-weight:700;font-size:14.5px;margin-bottom:12px">\u2753 ' + (i + 1) + '. ' + U.esc(q.p) + '</div>' + ops + '<button style="margin-top:6px;background:var(--red);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-weight:700;font-size:13px;cursor:pointer" onclick="' + verifyFn + '">Verificar</button><div style="display:none;font-weight:700;font-size:13px;margin-top:8px"></div></div>';
+      }).join('') + '</div>';
+    }
+    if (l.tipo === 'quiz') return `<div class="ac-read"><b style="font-family:var(--f-display)">Evaluación</b><p style="margin-top:10px">Agregá preguntas reales con ✏ Editar lección.</p></div>`;
+    return '';
+  }
+
+  /* ---- VISOR INTERACTIVO a pantalla completa (#130) ---- */
+  function verCurso(id, startIdx) {
+    const c = S().get('cursos', id); if (!c) return;
+    let lecs = (c.lecciones || []);
+    let idx = startIdx != null ? startIdx : Math.min(Math.max(0, lecs.length - 1), Math.round((c.progreso / 100) * lecs.length));
+    if (idx < 0 || isNaN(idx)) idx = 0;
+    let back = document.getElementById('ac-viewer'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'ac-viewer'; back.className = 'acv';
+    document.body.appendChild(back);
+    const close = () => { back.remove(); if (host) render(host); };
+    function doneCount() { return Math.round((c.progreso / 100) * lecs.length); }
+    function paint() {
+      lecs = S().get('cursos', id).lecciones || [];
+      const total = lecs.length, done = doneCount(), l = lecs[idx] || lecs[0];
+      back.innerHTML = `
+        <div class="acv-top" style="background:linear-gradient(120deg,${c.color},#10141a)">
+          <button class="acv-back" id="acv-back">← Volver</button>
+          <div class="acv-ttl">${c.emoji} ${U.esc(c.titulo)}</div>
+          <div class="acv-prg"><span>${total ? (idx + 1) : 0}/${total}</span><div class="acv-pbar"><i style="width:${total ? ((idx + 1) / total * 100) : 0}%"></i></div></div>
+        </div>
+        <div class="acv-body">
+          <aside class="acv-side">
+            ${lecs.map((le, i) => `<div class="acv-lec-wrap" style="display:flex;align-items:stretch;gap:2px"><button class="acv-lec ${i === idx ? 'active' : ''} ${i < done ? 'done' : ''}" data-go="${i}" style="flex:1"><span class="acv-lec-n">${i < done ? '✓' : (i + 1)}</span><span class="acv-lec-t">${U.esc(le.t)}<small>${TIPO_ICON[le.tipo] || '•'} ${le.tipo} · ${le.min || 0}m</small></span></button><div style="display:flex;flex-direction:column;justify-content:center;gap:1px"><button class="acv-ord" data-up="${i}" title="Subir" ${i === 0 ? 'disabled' : ''} style="border:1px solid var(--line);background:var(--surface);border-radius:5px;width:22px;height:18px;cursor:pointer;font-size:9px;opacity:${i === 0 ? '.3' : '1'}">▲</button><button class="acv-ord" data-down="${i}" title="Bajar" ${i === lecs.length - 1 ? 'disabled' : ''} style="border:1px solid var(--line);background:var(--surface);border-radius:5px;width:22px;height:18px;cursor:pointer;font-size:9px;opacity:${i === lecs.length - 1 ? '.3' : '1'}">▼</button></div></div>`).join('')}
+            <button class="acv-addlec" id="acv-addlec">+ Añadir lección</button>
+          </aside>
+          <main class="acv-main">
+            ${l ? `<div class="acv-lechead"><h2>${TIPO_ICON[l.tipo] || '📖'} ${U.esc(l.t)} <span class="muted" style="font-weight:400;font-size:13px">· ${l.min || 0} min</span></h2><button class="btn ghost sm" id="acv-editlec">✏ Editar lección</button></div>
+            <div class="acv-content">${lessonBody(l)}</div>
+            <div class="acv-nav"><button class="btn ghost" id="acv-prev" ${idx === 0 ? 'disabled style="opacity:.4"' : ''}>← Anterior</button><button class="btn primary" id="acv-next">${idx >= total - 1 ? '✓ Finalizar curso' : 'Siguiente →'}</button></div>` : '<div class="muted" style="padding:40px;text-align:center">Este curso aún no tiene lecciones. Usá <b>+ Añadir lección</b>.</div>'}
+          </main>
+        </div>`;
+      back.querySelector('#acv-back').onclick = close;
+      back.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { idx = +b.dataset.go; paint(); });
+      back.querySelectorAll('[data-up]').forEach(b => b.onclick = (e) => { e.stopPropagation(); const i = +b.dataset.up; const ls = (S().get('cursos', id).lecciones || []).slice(); if (i > 0) { const t = ls[i - 1]; ls[i - 1] = ls[i]; ls[i] = t; S().update('cursos', id, { lecciones: ls }); if (idx === i) idx = i - 1; else if (idx === i - 1) idx = i; paint(); } });
+      back.querySelectorAll('[data-down]').forEach(b => b.onclick = (e) => { e.stopPropagation(); const i = +b.dataset.down; const ls = (S().get('cursos', id).lecciones || []).slice(); if (i < ls.length - 1) { const t = ls[i + 1]; ls[i + 1] = ls[i]; ls[i] = t; S().update('cursos', id, { lecciones: ls }); if (idx === i) idx = i + 1; else if (idx === i + 1) idx = i; paint(); } });
+      const al = back.querySelector('#acv-addlec'); if (al) al.onclick = () => { const nl = (S().get('cursos', id).lecciones || []).concat([{ t: 'Nueva lección', tipo: 'lectura', min: 10, texto: '' }]); S().update('cursos', id, { lecciones: nl }); idx = nl.length - 1; paint(); editarLeccion(id, idx, () => paint()); };
+      const el = back.querySelector('#acv-editlec'); if (el) el.onclick = () => editarLeccion(id, idx, () => paint());
+      const pv = back.querySelector('#acv-prev'); if (pv) pv.onclick = () => { if (idx > 0) { idx--; paint(); } };
+      const nx = back.querySelector('#acv-next'); if (nx) nx.onclick = () => {
+        const total2 = lecs.length, reached = idx + 1, prog = Math.round(reached / total2 * 100);
+        if (prog > (c.progreso || 0)) { c.progreso = prog; S().update('cursos', id, { progreso: prog, certificado: prog >= 100 ? true : c.certificado }); if (prog >= 100) S().insert('actividades', { id: 'act' + Date.now(), clienteId: '', asesorId: 'ase001', tipo: 'sistema', icon: '🏅', fecha: '2026-06-24', titulo: 'Curso completado: ' + c.titulo, detalle: 'Certificación obtenida.' }); }
+        if (idx < total2 - 1) { idx++; paint(); } else { close(); }
+      };
+    }
+    paint();
+  }
+
+  /* ---- Editar una lección individual (contenido/quiz/recurso) ---- */
+  function editarLeccion(cursoId, i, cb) {
+    const c = S().get('cursos', cursoId); const l = (c.lecciones || [])[i]; if (!l) return;
+    let back = document.getElementById('ac-leced'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'ac-leced'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 260;
+    const tipos = ['video', 'lectura', 'quiz', 'recurso'];
+    back.innerHTML = `<div class="card" style="width:min(580px,95vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">✏ Editar lección</b><button class="imp-x" id="le-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">
+        <div class="cgrid">
+          <label class="ce-l">Título<input id="le-t" class="o-sel" value="${U.esc(l.t || '')}"></label>
+          <label class="ce-l">Tipo<select id="le-tipo" class="o-sel">${tipos.map(t => `<option ${t === l.tipo ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+          <label class="ce-l">Duración (min)<input id="le-min" type="number" class="o-sel" value="${l.min || 10}"></label>
+        </div>
+        <div id="le-dyn"></div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between">
+        <button class="btn ghost" id="le-del" style="color:var(--danger)">🗑 Borrar lección</button>
+        <div style="display:flex;gap:8px"><button class="btn ghost" id="le-cancel">Cancelar</button><button class="btn primary" id="le-ok">Guardar lección</button></div>
+      </div>
+    </div>`;
+    document.body.appendChild(back);
+    const $ = s => back.querySelector(s);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#le-x').addEventListener('click', close); $('#le-cancel').addEventListener('click', close);
+    $('#le-del').addEventListener('click', () => {
+      if (!confirm('¿Borrar esta lección?')) return;
+      const lecciones = (S().get('cursos', cursoId).lecciones || []).slice(); lecciones.splice(i, 1);
+      S().update('cursos', cursoId, { lecciones }); close(); if (cb) cb();
+    });
+    function iaText(prompt) {
+      // usa Orbit.ia si está; si no, heurística local
+      if (Orbit.ia && Orbit.ia.responder) { try { return Orbit.ia.responder(prompt); } catch (e) {} }
+      return '📘 ' + ($('#le-t').value || 'Lección') + '\n\nContenido generado: introducción, conceptos clave, ejemplos prácticos y cierre. Edítalo para ajustar el detalle.';
+    }
+    function dyn() {
+      const t = $('#le-tipo').value;
+      if (t === 'video') $('#le-dyn').innerHTML = `<label class="ce-l">URL del video (YouTube/Vimeo/HeyGen embed)<input id="le-url" class="o-sel" value="${U.esc(l.url || '')}" placeholder="https://www.youtube.com/embed/..."></label><div style="margin-top:8px"><label class="btn ghost sm" style="cursor:pointer">📎 Subir archivo de video<input type="file" id="le-vfile" accept="video/*" style="display:none"></label> <span class="muted" style="font-size:11.5px">o pegá el enlace embed arriba</span></div><div class="cfg-note">Pegá el enlace <b>embed</b> o subí un video. (Archivos grandes pueden no persistir tras recargar.)</div>`;
+      else if (t === 'lectura') $('#le-dyn').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><span class="ce-l">Contenido</span><button class="btn ghost sm" id="le-ia">✨ Generar / mejorar con IA</button></div><textarea id="le-texto" class="o-sel" style="min-height:140px;resize:vertical">${U.esc(l.texto || '')}</textarea><div style="margin-top:8px"><label class="btn ghost sm" style="cursor:pointer">📎 Adjuntar documento (.txt/.pdf/.docx/imagen)<input type="file" id="le-doc" accept=".txt,.pdf,.doc,.docx,image/*" style="display:none"></label> <span class="muted" id="le-doc-name" style="font-size:11.5px">${l.docSrc ? 'documento adjunto ✓' : ''}</span></div><div class="cfg-note">El texto se muestra en la lección. Si adjuntás un PDF/imagen, se <b>embebe</b> debajo del contenido.</div>`;
+      else if (t === 'recurso') $('#le-dyn').innerHTML = `<label class="ce-l">Documento embebido (PDF/Word/imagen) — URL o enlace de Drive<input id="le-iframe" class="o-sel" value="${U.esc(l.iframeSrc || '')}" placeholder="https://drive.google.com/.../preview"></label><div style="margin-top:8px"><label class="btn ghost sm" style="cursor:pointer">📎 Subir archivo (PDF/imagen)<input type="file" id="le-rfile" accept=".pdf,image/*" style="display:none"></label> <span class="muted" id="le-rfile-name" style="font-size:11.5px"></span></div><div class="cfg-note">📎 La lección muestra el documento <b>embebido a pantalla</b>. Pegá un enlace de Drive (terminado en <b>/preview</b>) o subí el archivo.</div>`;
+      else $('#le-dyn').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="ce-l">Preguntas</span><div style="display:flex;gap:6px"><button class="btn ghost sm" id="le-qadd">+ Pregunta</button><button class="btn ghost sm" id="le-qia">✨ Generar con IA</button></div></div><textarea id="le-quiz" class="o-sel" style="min-height:150px;resize:vertical;font-family:var(--f-mono);font-size:12px" placeholder="Enunciado de la pregunta\n[x] Opción correcta\n[ ] Opción incorrecta\n[ ] Otra opción">${U.esc((l.preguntas || []).map(q => q.p + '\n' + q.ops.map((o, j) => (j === q.ok ? '[x] ' : '[ ] ') + o).join('\n')).join('\n\n'))}</textarea><div style="margin-top:6px"><label class="btn ghost sm" style="cursor:pointer">📎 Generar quiz desde un documento (IA)<input type="file" id="le-qdoc" accept=".txt,.pdf,.docx,image/*" style="display:none"></label></div><div class="cfg-note">Cada pregunta: enunciado, luego opciones (una por línea), marcá la correcta con <b>[x]</b>. Separá preguntas con una línea en blanco. O subí un documento y la IA arma el quiz.</div>`;
+      // listeners IA
+      const iaB = $('#le-ia'); if (iaB) iaB.addEventListener('click', async () => { iaB.textContent = '🧠…'; $('#le-texto').value = await iaTextAsync('Redacta el contenido didáctico de la lección "' + $('#le-t').value + '" para un curso de seguros, con emojis y párrafos.', $('#le-texto').value); iaB.textContent = '✨ Generar / mejorar con IA'; });
+      const qadd = $('#le-qadd'); if (qadd) qadd.addEventListener('click', () => { const ta = $('#le-quiz'); ta.value = (ta.value ? ta.value + '\n\n' : '') + '¿Nueva pregunta?\n[x] Opción correcta\n[ ] Opción incorrecta'; });
+      const qia = $('#le-qia'); if (qia) qia.addEventListener('click', async () => { qia.textContent = '🧠…'; const ta = $('#le-quiz'); ta.value = await iaQuizAsync($('#le-t').value, ta.value); qia.textContent = '✨ Generar con IA'; });
+      // listeners archivo
+      const vfile = $('#le-vfile'); if (vfile) vfile.addEventListener('change', e => fileToDataURL(e.target.files[0], u => { $('#le-url').value = u; }));
+      const doc = $('#le-doc'); if (doc) doc.addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; if (/\.txt$/i.test(f.name)) fileToText(f, txt => { const ta = $('#le-texto'); ta.value = (ta.value ? ta.value + '\n\n' : '') + txt; }); else fileToDataURL(f, u => { l.docSrc = u; const n = $('#le-doc-name'); if (n) n.textContent = 'documento adjunto ✓'; }); });
+      const rfile = $('#le-rfile'); if (rfile) rfile.addEventListener('change', e => fileToDataURL(e.target.files[0], u => { $('#le-iframe').value = u; const n = $('#le-rfile-name'); if (n) n.textContent = 'archivo cargado ✓'; }));
+      const qdoc = $('#le-qdoc'); if (qdoc) qdoc.addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const ta = $('#le-quiz'); ta.value = '🧠 Generando quiz desde ' + f.name + '…'; fileToText(f, async txt => { ta.value = await iaQuizFromDoc(txt || f.name); }); });
+    }
+    $('#le-tipo').addEventListener('change', dyn); dyn();
+    $('#le-ok').addEventListener('click', () => {
+      const t = $('#le-tipo').value;
+      const nl = { t: $('#le-t').value || 'Lección', tipo: t, min: +$('#le-min').value || 10 };
+      if (t === 'video') nl.url = ($('#le-url') || {}).value || '';
+      else if (t === 'lectura') { nl.texto = ($('#le-texto') || {}).value || ''; if (l.docSrc) nl.docSrc = l.docSrc; const palabras = (nl.texto || '').split(/\s+/).filter(Boolean).length; if (palabras > 30) nl.min = Math.max(2, Math.round(palabras / 180)); }
+      else if (t === 'recurso') { nl.iframeSrc = ($('#le-iframe') || {}).value || ''; nl.tipo = 'recurso'; }
+      else {
+        const blocks = (($('#le-quiz') || {}).value || '').split(/\n\s*\n/).filter(b => b.trim());
+        nl.preguntas = blocks.map(b => { const lines = b.split('\n').filter(x => x.trim()); const p = lines.shift() || ''; let ok = 0; const ops = lines.map((ln, j) => { if (/^\[x\]/i.test(ln.trim())) ok = j; return ln.replace(/^\[[ x]\]\s*/i, '').trim(); }); return { p: p.trim(), ops, ok }; }).filter(q => q.ops.length);
+      }
+      const lecciones = (S().get('cursos', cursoId).lecciones || []).slice(); lecciones[i] = nl;
+      S().update('cursos', cursoId, { lecciones });
+      close(); if (cb) cb();
+    });
+  }
+
+  function abrirViejo(id) {
     const c = S().get('cursos', id); if (!c) return;
     const done = Math.round((c.progreso / 100) * (c.lecciones || []).length);
     let back = document.getElementById('ac-ficha'); if (back) back.remove();
@@ -111,7 +310,7 @@ Orbit.modules.academia = (function () {
     back.querySelectorAll('[data-play]').forEach(b => b.addEventListener('click', () => verLeccion(c, +b.dataset.play, avanzar)));
     back.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => verLeccion(c, +b.dataset.open, null)));
     const rs = back.querySelector('#ac-reset'); if (rs) rs.addEventListener('click', () => { S().update('cursos', id, { progreso: 0 }); abrir(id); });
-    back.querySelectorAll('[data-res]').forEach(b => b.addEventListener('click', () => verRecurso(b.dataset.res)));
+    back.querySelectorAll('[data-res]').forEach(b => b.addEventListener('click', () => verRecurso(b.dataset.res, b.dataset.iframe || '')));
   }
 
   function verRecurso(nombre, iframeSrc) {
@@ -148,20 +347,58 @@ Orbit.modules.academia = (function () {
 
   /* ---- Crear curso con IA (genera estructura editable e iterable) ---- */
   function crearIA() {
-    const html = `<label class="ce-l">¿Sobre qué tema?<input id="ai-tema" class="o-sel" placeholder="Ej. Seguro de Vida para familias"></label>
-      <label class="ce-l" style="margin-top:10px">Dirigido a<select id="ai-dest" class="o-sel"><option value="equipo">👥 Equipo (asesores)</option><option value="clientes">🧑 Clientes</option><option value="ambos">Ambos</option></select></label>
-      <label class="ce-l" style="margin-top:10px">Categoría<select id="ai-cat" class="o-sel">${['Inducción', 'Técnico', 'Comercial', 'Producto', 'Normativa', 'Educativo'].map(c => `<option>${c}</option>`).join('')}</select></label>
-      <div class="cfg-note" style="margin-top:10px">✨ La IA genera el curso (título, descripción y lecciones). Luego puedes <b>iterar, editar y completar</b> antes de publicar.</div>`;
-    const back = drawer('✨ Crear curso con IA', html, () => {
+    let back = document.getElementById('ac-ia'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'ac-ia'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 98;
+    back.innerHTML = `<div class="card" style="width:min(520px,94vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">✨ Crear curso con IA</b><button class="imp-x" id="ai-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">
+        <label class="ce-l">¿Sobre qué tema?<input id="ai-tema" class="o-sel" placeholder="Ej. Seguro de Vida para familias"></label>
+        <label class="ce-l">Dirigido a<select id="ai-dest" class="o-sel"><option value="equipo">👥 Equipo (asesores)</option><option value="clientes">🧑 Clientes</option><option value="ambos">Ambos</option></select></label>
+        <label class="ce-l">Categoría<select id="ai-cat" class="o-sel">${['Inducción', 'Técnico', 'Comercial', 'Producto', 'Normativa', 'Educativo'].map(c => `<option>${c}</option>`).join('')}<option value="__nueva">➕ Nueva categoría…</option></select></label>
+        <div><label class="btn ghost sm" style="cursor:pointer">📎 Adjuntar documentos base (la IA crea el curso a partir de ellos)<input type="file" id="ai-docs" accept=".txt,.csv,.md,.pdf,.docx" multiple style="display:none"></label> <span class="muted" id="ai-docs-name" style="font-size:11.5px"></span></div>
+        <div class="cfg-note">✨ La IA genera el curso interactivo (título, descripción, lecciones navegables y evaluación). Si adjuntás documentos, los usa como base. Luego podés <b>iterar, editar y completar</b> antes de publicar.</div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="ai-cancel">Cancelar</button><button class="btn primary" id="ai-ok">✨ Generar y editar</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#ai-x').addEventListener('click', close); back.querySelector('#ai-cancel').addEventListener('click', close);
+    let docsTexto = '';
+    const catSel = back.querySelector('#ai-cat');
+    catSel.addEventListener('change', () => { if (catSel.value === '__nueva') { const nv = prompt('Nombre de la nueva categoría:', ''); if (nv) { const o = document.createElement('option'); o.textContent = nv; o.selected = true; catSel.insertBefore(o, catSel.lastChild); } else catSel.selectedIndex = 0; } });
+    const docsInput = back.querySelector('#ai-docs');
+    if (docsInput) docsInput.addEventListener('change', e => { const files = [...e.target.files]; back.querySelector('#ai-docs-name').textContent = files.length + ' documento(s)'; docsTexto = ''; files.forEach(f => fileToText(f, txt => { if (txt) docsTexto += '\n### ' + f.name + '\n' + txt; })); });
+    back.querySelector('#ai-ok').addEventListener('click', async () => {
       const tema = back.querySelector('#ai-tema').value || 'Tema de seguros';
-      const dest = back.querySelector('#ai-dest').value, cat = back.querySelector('#ai-cat').value;
+      const dest = back.querySelector('#ai-dest').value, cat = back.querySelector('#ai-cat').value === '__nueva' ? 'General' : back.querySelector('#ai-cat').value;
       const emoji = { 'Producto': '🚗', 'Técnico': '🛡️', 'Comercial': '🎯', 'Normativa': '⚖️', 'Educativo': '📚', 'Inducción': '🚀' }[cat] || '🎓';
-      const nuevo = { id: 'cur' + Date.now().toString().slice(-6), titulo: tema, cat, emoji, color: '#C5162E', desc: 'Curso generado con IA sobre ' + tema.toLowerCase() + '. Revisa y ajusta el contenido.', destinatarios: dest,
-        lecciones: [{ t: 'Introducción a ' + tema, tipo: 'video', min: 8, url: '' }, { t: 'Conceptos clave', tipo: 'lectura', min: 12, texto: 'La IA redacta aquí los conceptos clave de ' + tema + '. Edítalo para ajustar el tono y el detalle.' }, { t: 'Casos prácticos', tipo: 'lectura', min: 10, texto: 'Ejemplos prácticos generados por IA.' }, { t: 'Evaluación', tipo: 'quiz', min: 10 }],
-        recursos: [{ nombre: 'Resumen ' + tema + '.pdf', tipo: 'pdf' }], progreso: 0, certificado: false };
+      const id = 'cur' + Date.now().toString().slice(-6);
+      let lecciones = null, desc = '';
+      const okBtn = back.querySelector('#ai-ok');
+      if (window.claude && window.claude.complete) {
+        okBtn.textContent = '🧠 Generando…'; okBtn.disabled = true;
+        try {
+          const prompt = 'Genera un curso de capacitación en seguros sobre "' + tema + '" para ' + dest + '. ' + (docsTexto ? 'Basate en estos documentos:\n' + docsTexto.slice(0, 5000) + '\n\n' : '') + 'Devuelve SOLO JSON válido sin markdown con esta forma: {"desc":"descripción breve","lecciones":[{"t":"título","tipo":"lectura","min":10,"texto":"contenido con emojis y párrafos"},{"t":"título","tipo":"quiz","min":8,"preguntas":[{"p":"pregunta","ops":["a","b","c"],"ok":0}]}]}. Incluye 3-4 lecciones de tipo lectura y 1 quiz con 3 preguntas. Texto en español, claro y práctico.';
+          const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt }] });
+          const m = String(out).match(/\{[\s\S]*\}/);
+          if (m) { const obj = JSON.parse(m[0]); if (obj.lecciones && obj.lecciones.length) { lecciones = obj.lecciones; desc = obj.desc || ''; } }
+        } catch (e) {}
+      }
+      if (!lecciones) {
+        desc = 'Curso sobre ' + tema.toLowerCase() + '. Revisá y ajustá el contenido.';
+        lecciones = [
+          { t: 'Introducción a ' + tema, tipo: 'lectura', min: 8, texto: '📘 ' + tema + '\n\nEn esta lección verás los fundamentos de ' + tema.toLowerCase() + ': qué es, por qué importa y cómo se aplica en el día a día del asesor. Editá este contenido para ajustar el detalle.' },
+          { t: 'Conceptos clave', tipo: 'lectura', min: 12, texto: '🔑 Conceptos clave\n\n• Concepto 1: definición y ejemplo.\n• Concepto 2: cómo se usa.\n• Concepto 3: errores comunes a evitar.' },
+          { t: 'Casos prácticos', tipo: 'lectura', min: 10, texto: '🧩 Casos prácticos\n\nCaso A: situación típica y cómo resolverla.\nCaso B: objeción frecuente del cliente y respuesta recomendada.' },
+          { t: 'Evaluación', tipo: 'quiz', min: 10, preguntas: [{ p: '¿Cuál es el objetivo principal de ' + tema + '?', ops: ['Proteger al asegurado', 'Aumentar trámites', 'Ninguno'], ok: 0 }] }
+        ];
+      }
+      const nuevo = { id, titulo: tema, cat, emoji, color: '#C5162E', desc, destinatarios: dest, lecciones, recursos: [], progreso: 0, certificado: false };
       S().insert('cursos', nuevo);
-      back.remove(); editar(nuevo.id); // abre para iterar/editar
-    }, '✨ Generar y editar');
+      close(); editar(id);
+    });
   }
 
   /* ---- Crear / editar curso (autoadministrable: emoji + lecciones + recursos) ---- */
@@ -196,7 +433,7 @@ Orbit.modules.academia = (function () {
       <div style="padding:18px 20px;display:grid;gap:13px">
         <div class="cgrid">
           <label class="ce-l">Título<input id="ae-titulo" class="o-sel" value="${U.esc(c.titulo)}"></label>
-          <label class="ce-l">Categoría<select id="ae-cat" class="o-sel">${cats.map(x => `<option ${x === c.cat ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+          <label class="ce-l">Categoría<select id="ae-cat" class="o-sel">${cats.map(x => `<option ${x === c.cat ? 'selected' : ''}>${x}</option>`).join('')}${cats.indexOf(c.cat) < 0 && c.cat ? `<option selected>${U.esc(c.cat)}</option>` : ''}<option value="__nueva">➕ Nueva categoría…</option></select></label>
         </div>
         <label class="ce-l">Dirigido a<select id="ae-dest" class="o-sel">${[['equipo', '👥 Equipo (asesores)'], ['clientes', '🧑 Clientes'], ['ambos', 'Ambos']].map(o => `<option value="${o[0]}" ${(c.destinatarios || 'equipo') === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></label>
         <label class="ce-l">Emoji<div style="display:flex;gap:5px;flex-wrap:wrap" id="ae-emojis">${emojis.map(e => `<button type="button" class="ac-emoji-pick ${e === c.emoji ? 'on' : ''}" data-emoji="${e}">${e}</button>`).join('')}</div></label>
@@ -220,6 +457,8 @@ Orbit.modules.academia = (function () {
     $('#ae-addlec').addEventListener('click', () => { snapLecs(); lecs.push({ t: '', tipo: 'video', min: 10, url: '' }); paint(); });
     $('#ae-addrec').addEventListener('click', () => { snapRecs(); recs.push({ nombre: '', tipo: 'pdf' }); paint(); });
     if ($('#ae-del')) $('#ae-del').addEventListener('click', () => { if (confirm('¿Borrar curso?')) { S().remove('cursos', id); close(); render(host); } });
+    const catSel = $('#ae-cat');
+    if (catSel) catSel.addEventListener('change', () => { if (catSel.value === '__nueva') { const nv = prompt('Nombre de la nueva categoría:', ''); if (nv) { const o = document.createElement('option'); o.textContent = nv; o.selected = true; catSel.insertBefore(o, catSel.lastChild); } else catSel.selectedIndex = 0; } });
     $('#ae-ok').addEventListener('click', () => {
       snapLecs(); snapRecs();
       const data = { titulo: $('#ae-titulo').value || 'Nuevo curso', cat: $('#ae-cat').value, emoji, color, desc: $('#ae-desc').value, destinatarios: ($('#ae-dest') || {}).value || 'equipo', lecciones: lecs.filter(l => l.t), recursos: recs.filter(r => r.nombre) };
@@ -240,12 +479,26 @@ Orbit.modules.academia = (function () {
       cuerpo = `<div style="position:relative;width:100%;height:72vh;border-radius:var(--r-md);overflow:hidden;background:#f4f3ee"><iframe src="${l.iframeSrc}" style="width:100%;height:100%;border:0"></iframe></div>`;
     } else if (l.tipo === 'video') {
       cuerpo = l.url
-        ? `<div class="ac-video"><iframe src="${l.url}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>`
-        : `<div class="ac-video ac-video-ph"><div style="text-align:center"><div style="font-size:40px">🎬</div><div class="muted" style="margin-top:8px">Video pendiente de cargar. Pega URL (YouTube/Vimeo) en la lección.</div></div></div>`;
+        ? `<div class="ac-video"><iframe src="${l.url.includes('youtube.com/embed/') ? l.url + (l.url.includes('?') ? '&' : '?') + 'rel=0&modestbranding=1' : l.url}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>`
+        : `<div style="background:linear-gradient(135deg,#1a1f28,#0f1318);border-radius:12px;padding:56px 32px;text-align:center;color:#fff">
+            <div style="font-size:56px;margin-bottom:16px">🎬</div>
+            <h3 style="font-family:var(--f-display);font-size:20px;font-weight:800;margin-bottom:10px">${U.esc(l.t)}</h3>
+            <p style="font-size:14px;color:rgba(255,255,255,.7);max-width:420px;margin:0 auto 20px">Para agregar el video, edita el curso y pega la URL de YouTube/Vimeo en esta lección.</p>
+            <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;display:inline-block;font-size:12px;color:rgba(255,255,255,.6)">🔧 Editar curso → Lección "${U.esc(l.t)}" → campo URL</div>
+          </div>`;
     } else if (l.tipo === 'lectura') {
       cuerpo = `<div class="ac-read" style="white-space:pre-wrap;line-height:1.7">${U.esc(l.texto || 'Contenido pendiente de redactar.')}</div>`;
-    } else {
-      cuerpo = `<div class="ac-read"><b style="font-family:var(--f-display)">Evaluación</b><p style="margin-top:10px">Responde para completar la lección.</p><label class="chk-row" style="margin-top:10px"><input type="checkbox"> Concepto 1 comprendido</label><label class="chk-row"><input type="checkbox"> Concepto 2 comprendido</label></div>`;
+    } else if (l.tipo === 'quiz' && l.preguntas && l.preguntas.length) {
+      cuerpo = '<div style="display:grid;gap:16px">' + l.preguntas.map(function(q, i) {
+        var ops = q.ops.map(function(o, j) {
+          return '<label style="display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer;margin-bottom:7px;background:var(--card);font-size:13.5px"><input type="radio" name="qz' + i + '" value="' + j + '" style="accent-color:var(--red)"> ' + U.esc(o) + '</label>';
+        }).join('');
+        var correcta = U.esc(q.ops[q.ok]);
+        var verifyFn = "(function(el,qi,ans,cor){var s=document.querySelector('input[name=qz'+qi+']:checked');var r=el.nextElementSibling;if(!s){r.textContent='\u26a0\ufe0f Selecciona una opci\u00f3n.';r.style.color='var(--warn)';r.style.display='block';return;}el.disabled=true;r.style.display='block';if(+s.value===ans){r.textContent='\u2705 \u00a1Correcto!';r.style.color='var(--ok)'}else{r.textContent='\u274c Incorrecto \u2014 la correcta es: '+cor;r.style.color='var(--danger)'}})(this," + i + "," + q.ok + ",'" + correcta.replace(/'/g, "\'") + "')";
+        return '<div style="background:var(--surface);border-radius:10px;padding:18px 20px"><div style="font-family:var(--f-display);font-weight:700;font-size:14.5px;margin-bottom:12px">\u2753 ' + (i + 1) + '. ' + U.esc(q.p) + '</div>' + ops + '<button style="margin-top:6px;background:var(--red);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-weight:700;font-size:13px;cursor:pointer" onclick="' + verifyFn + '">Verificar</button><div style="display:none;font-weight:700;font-size:13px;margin-top:8px"></div></div>';
+      }).join('') + '</div>';
+        } else if (l.tipo === 'quiz') {
+      cuerpo = `<div class="ac-read"><b style="font-family:var(--f-display)">Evaluación</b><p style="margin-top:10px">Responde para completar la lección. Agrega preguntas reales al editar el curso.</p></div>`;
     }
     back.innerHTML = `<div class="card" style="width:min(900px,96vw);max-height:94vh;overflow:auto;padding:0">
       <div style="padding:14px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--graph)">

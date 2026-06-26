@@ -63,9 +63,9 @@ Orbit.modules.finanzas = (function () {
     const pagado = sum(egr.filter(m => m.estado === 'pagado'), m => m.valor);
     const rows = list.slice().sort((a, b) => (b.dia || 0) - (a.dia || 0));
     return `${K.kpis([
-      { label: 'Ingresos del mes', val: M(tIng), color: 'var(--ok)', foot: M(recaudado) + ' recaudado', footTone: 'up' },
-      { label: 'Egresos del mes', val: M(tEgr), color: 'var(--danger)', foot: M(pagado) + ' pagado' },
-      { label: 'Resultado operativo', val: M(tIng - tEgr), color: 'var(--red)', foot: 'ingresos − egresos' },
+      { label: 'Ingresos del mes', val: M(tIng), color: 'var(--ok)', foot: M(recaudado) + ' recaudado', footTone: 'up', onclick: "location.hash='#/finanzas'" },
+      { label: 'Egresos del mes', val: M(tEgr), color: 'var(--danger)', foot: M(pagado) + ' pagado', onclick: "location.hash='#/finanzas'" },
+      { label: 'Resultado operativo', val: M(tIng - tEgr), color: 'var(--red)', foot: 'ingresos − egresos', onclick: "location.hash='#/finanzas'" },
       { label: 'Movimientos', val: list.length, color: 'var(--info)', foot: ing.length + ' ing · ' + egr.length + ' egr' }
     ])}
     <div class="card pad" style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">

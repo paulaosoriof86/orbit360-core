@@ -32,10 +32,10 @@ Orbit.modules.leads = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('leads', `<button class="btn ghost" id="ld-lists">⚙ Listas</button><button class="btn primary" id="ld-new">+ Nuevo lead</button>`)}
       ${K.kpis([
-        { label: 'Leads activos', val: m.activos, color: 'var(--red)', foot: esAse ? 'tu pipeline' : 'en pipeline' },
-        { label: 'Prima estimada', val: U.moneyShort(m.tot, 'GTQ'), color: 'var(--info)', foot: 'potencial' },
-        { label: 'Pronóstico ponderado', val: U.moneyShort(m.pond, 'GTQ'), color: 'var(--ok)', foot: 'por probabilidad', footTone: 'up' },
-        { label: 'Ganados (emitidos)', val: m.ganados, color: 'var(--warn)', foot: 'cierre del mes' }
+        { label: 'Leads activos', val: m.activos, color: 'var(--red)', foot: esAse ? 'tu pipeline' : 'en pipeline', onclick: 'location.hash=\'#/leads\'' },
+        { label: 'Prima estimada', val: U.moneyShort(m.tot, 'GTQ'), color: 'var(--info)', foot: 'potencial', onclick: 'location.hash=\'#/leads\'' },
+        { label: 'Pronóstico ponderado', val: U.moneyShort(m.pond, 'GTQ'), color: 'var(--ok)', foot: 'por probabilidad', footTone: 'up', onclick: 'location.hash=\'#/leads\'' },
+        { label: 'Ganados (emitidos)', val: m.ganados, color: 'var(--warn)', foot: 'cierre del mes', onclick: 'location.hash=\'#/cliente360\'' }
       ])}
       <div class="ops-legend">
         <span class="muted">🎯 Pipeline con <b>cadencias automáticas</b> al enviar propuesta · <span class="kmirror" style="position:static">🔗 en Ops</span> = el equipo lo está gestionando</span>

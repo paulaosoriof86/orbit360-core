@@ -59,22 +59,22 @@ Orbit.modules.inicio = (function () {
 
       <!-- KPIs clicables -->
       <div class="kpi-row" style="margin-top:18px">
-        <button class="kpi kpi-click" onclick="location.hash='#/cobros'" title="Ver cobros aplicados">
+        <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pagados')" title="Ver cobros aplicados">
           <div class="k-accent"></div>
           <div class="k-label">Cartera al día</div>
           <div class="k-val">${U.moneyShort(cart.alDia, 'GTQ')}</div>
           <div class="k-foot up">▲ cobros aplicados ›</div></button>
-        <button class="kpi kpi-click" onclick="location.hash='#/cobros'" title="Ver pendiente de cobro" style="border-color:var(--warn)">
+        <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pendientes')" title="Ver pendiente de cobro" style="border-color:var(--warn)">
           <div class="k-accent" style="background:var(--warn)"></div>
           <div class="k-label">Pendiente de cobro</div>
           <div class="k-val">${U.moneyShort(cart.pend, 'GTQ')}</div>
           <div class="k-foot muted">cuotas por vencer ›</div></button>
-        <button class="kpi kpi-click" onclick="location.hash='#/cobros'" title="Ver cartera vencida">
+        <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-vencidos')" title="Ver cartera vencida">
           <div class="k-accent" style="background:var(--danger)"></div>
           <div class="k-label">Cartera vencida</div>
           <div class="k-val">${U.moneyShort(cart.venc, 'GTQ')}</div>
           <div class="k-foot down">▼ requiere gestión ›</div></button>
-        <button class="kpi kpi-click" onclick="location.hash='#/renovaciones'" title="Ver renovaciones">
+        <button class="kpi kpi-click" onclick="Orbit.kpi('renov-proximas')" title="Ver renovaciones">
           <div class="k-accent" style="background:var(--info)"></div>
           <div class="k-label">Renovaciones ≤45 d</div>
           <div class="k-val">${renov.length}</div>
@@ -155,7 +155,7 @@ Orbit.modules.inicio = (function () {
               <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(n.nombre)} <span class="muted" style="font-weight:400">· ${U.esc(n.producto)}</span></div>
               <div class="muted" style="font-size:11.5px">${ase ? U.esc(ase.nombre) : ''} · ${d < 0 ? 'vencido' : d === 0 ? 'hoy' : 'mañana'} · ${Orbit.ciclo.etapaInfo(n.etapa).label}</div>
             </div>
-            ${wa ? `<a class="btn ghost sm" style="color:#1f8a4c" href="https://wa.me/${wa}?text=${msg}" target="_blank" rel="noopener">💬 WhatsApp</a>` : (n.email ? `<a class="btn ghost sm" href="mailto:${n.email}" target="_blank" rel="noopener">✉ Correo</a>` : '')}
+            ${wa ? `<a class="btn ghost sm" style="color:#1f8a4c" href="https://wa.me/${wa}?text=${msg}" target="_blank" rel="noopener">💬 WhatsApp</a>` : (n.email ? `<a class="btn ghost sm" style="cursor:pointer" onclick="Orbit.correoCompose({para:'${n.email}'})">✉ Correo</a>` : '')}
           </div>`;
         }).join('')}
       </div>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Capacitación Técnica · Orbit 360</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--red:#C5162E;--graph:#1E2227;--ink:#1E2227;--ink-2:#3d4350;--ink-3:#7a818e;--surface:#f4f3ee;--card:#fff;--line:#e4e2db;--r:14px}
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:var(--ink)}
+    .nav{background:var(--graph);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+    .nav-logo{font-size:20px;font-weight:800}.nav-logo span{color:var(--red)}
+    .nav-badge{background:#dc2626;color:#fff;font-size:10px;font-weight:700;border-radius:6px;padding:3px 10px;margin-left:auto}
+    .page{max-width:880px;margin:0 auto;padding:32px 20px;display:grid;gap:24px}
+    .hero{background:linear-gradient(120deg,#111820,#0a0d12);border-radius:var(--r);padding:44px 52px;color:#fff}
+    .hero .tag{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:10px}
+    .hero h1{font-size:32px;font-weight:800;line-height:1.15;margin-bottom:12px}.hero h1 span{color:var(--red)}
+    .hero p{font-size:15px;color:rgba(255,255,255,.75)}
+    .card{background:var(--card);border-radius:var(--r);padding:28px 32px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+    .card h2{font-size:20px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+    .card h3{font-size:15px;font-weight:700;margin:18px 0 8px;color:var(--ink)}
+    .card p{font-size:14px;color:var(--ink-2);margin-bottom:10px}
+    .card ul{list-style:none;display:grid;gap:7px;margin-bottom:14px}
+    .card ul li{display:flex;gap:10px;font-size:14px;color:var(--ink-2)}
+    .card ul li::before{content:'→';color:var(--red);flex-shrink:0}
+    .code{background:#0f172a;color:#a3e635;border-radius:8px;padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;margin:10px 0;white-space:pre-wrap}
+    .tip{background:#fff7ed;border-left:4px solid #c9821b;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13.5px;color:var(--ink-2);margin:12px 0}
+    .tip b{color:#c9821b}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .block{border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+    .block .ic{font-size:22px;margin-bottom:8px}.block b{display:block;font-size:14px;font-weight:700;margin-bottom:4px}.block p{font-size:12.5px;color:var(--ink-3);margin:0}
+    .step{display:flex;gap:14px;margin-bottom:18px}
+    .step-n{flex-shrink:0;width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;font-weight:800;font-size:14px;display:grid;place-items:center}
+    .step-t{font-size:15px;font-weight:700;margin-bottom:4px}
+    .step-d{font-size:13.5px;color:var(--ink-2)}
+    @media(max-width:700px){.grid2{grid-template-columns:1fr}.hero{padding:28px 24px}.hero h1{font-size:24px}}
+  </style>
+</head>
+<body>
+<div class="nav"><div><div class="nav-logo">Orbit <span>360</span></div></div><span class="nav-badge">🔒 USO INTERNO — EQUIPO TÉCNICO</span></div>
+<div class="page">
+  <div class="hero">
+    <div class="tag">🔧 Capacitación Técnica · Uso exclusivo del equipo</div>
+    <h1>Guía técnica completa<br><span>Orbit 360</span></h1>
+    <p>Configuración del backend, migración de datos, integraciones, despliegue y soporte. Documento confidencial — no compartir con clientes.</p>
+  </div>
+
+  <div class="card">
+    <h2>🏗 Arquitectura del sistema</h2>
+    <div class="grid2">
+      <div class="block"><div class="ic">🧑‍💻</div><b>Frontend (Hoy)</b><p>HTML + JS vanilla (Orbit.modules), CSS tokens, sin frameworks. 100% en el navegador con localStorage como capa de datos.</p></div>
+      <div class="block"><div class="ic">🗄</div><b>Backend (Migración)</b><p>Reemplazar Orbit.store por Firebase/Supabase/Postgres. Los módulos solo llaman a Orbit.store — no tocar nada más.</p></div>
+      <div class="block"><div class="ic">🏢</div><b>Multi-tenant</b><p>Orbit.tenant por cliente (branding, plan, módulos activos, roles). La personalización de A&S es solo config — no modificar el core.</p></div>
+      <div class="block"><div class="ic">⚡</div><b>Automatizaciones</b><p>Orbit.modules.automatizaciones.disparar(evId, datos) → Make webhook → WA/correo/Sheets. Sin Make: solo se loguea.</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🚀 Despliegue a producción</h2>
+    <h3>Opción 1 — GitHub Pages (más rápido)</h3>
+    <div class="code">1. git add . && git commit -m "v0.76" && git push
+2. Repositorio → Settings → Pages → main / root → Save
+3. URL: https://tu-usuario.github.io/orbit360-as/
+   (listo en 2 min)</div>
+    <h3>Opción 2 — Hosting propio (más robusto)</h3>
+    <div class="code"># Sube los archivos a tu servidor (FTP/cPanel/AWS S3)
+# index.html en la raíz
+# Configura el dominio: https://app.tuintermediaria.com
+# Habilita HTTPS (certificado SSL/TLS gratuito con Let's Encrypt)</div>
+    <div class="tip"><b>💡 Backend swap:</b> cuando quieras pasar a backend real, solo edita <code>orbit360-platform/data/store.js</code>. Los módulos no cambian.</div>
+  </div>
+
+  <div class="card">
+    <h2>🔄 Migración de datos de A&S</h2>
+    <div class="step"><div class="step-n">1</div><div><div class="step-t">Exportar los datos actuales</div><div class="step-d">Exporta clientes, pólizas, vehículos y estados de cuenta de la herramienta actual en Excel/CSV. Si tienes PDFs de pólizas, también inclúyelos.</div></div></div>
+    <div class="step"><div class="step-n">2</div><div><div class="step-t">Importar a Orbit 360</div><div class="step-d">Orbit 360 → Importación Inteligente → modo Inteligente → subir los archivos. El motor mapea clientes, pólizas y vehículos, cruza por identificación/N.º póliza y complementa sin duplicar.</div></div></div>
+    <div class="step"><div class="step-n">3</div><div><div class="step-t">Configurar aseguradoras reales</div><div class="step-d">Orbit Aseguradoras → activar las vinculadas a A&S → cargar NIT, tarifas, contactos y documentos de cada una.</div></div></div>
+    <div class="step"><div class="step-n">4</div><div><div class="step-t">Conectar integraciones</div><div class="step-d">Automatizaciones → pegar la API key de Gemini (IA real), la URL del webhook de Make, y vincular Outlook/Gmail con OAuth.</div></div></div>
+    <div class="step"><div class="step-n">5</div><div><div class="step-t">Verificar y lanzar</div><div class="step-d">Revisar 5 clientes de prueba end-to-end (crear, póliza, cobro, renovación). Cuando todo cuadre, compartir la URL con el equipo.</div></div></div>
+  </div>
+
+  <div class="card">
+    <h2>🔌 Conectar integraciones reales</h2>
+    <h3>Gemini IA (importador inteligente real)</h3>
+    <div class="code">1. Ir a aistudio.google.com → Get API key → Copiar
+2. Orbit 360 → Automatizaciones → Asistente IA → Pegar API key → Activar → Guardar
+3. El importador ya usará extracción real de PDFs en lugar de heurística.</div>
+    <h3>Make (automatizaciones)</h3>
+    <div class="code">1. make.com → Crear escenario → Webhook → Copiar URL
+2. Orbit 360 → Automatizaciones → Webhook Make → Pegar URL → Guardar
+3. Probar disparo → verificar en Make que llega el payload
+4. Desde Make: ramificar a WhatsApp Cloud / Gmail / Google Sheets</div>
+    <h3>Outlook / Microsoft 365</h3>
+    <div class="code">1. portal.azure.com → Registrar app → Permisos: Mail.ReadWrite, Mail.Send, Calendars.Read
+2. Copiar client_id + client_secret + tenant_id
+3. Orbit 360 → Configuración → Integraciones → Outlook → Configurar
+   (En producción, agregar estos parámetros al config del tenant)</div>
+    <h3>Backend Firebase (cuando escales)</h3>
+    <div class="code">// En orbit360-platform/data/store.js, reemplazar:
+// localStorage.getItem/setItem → Firestore collection reads/writes
+// La API: all(col), get(col, id), insert(col, obj), update(col, id, patch)
+// Orbit.store ya tiene exactamente esa interfaz — solo swappear la implementación</div>
+  </div>
+
+  <div class="card">
+    <h2>🩺 Soporte y troubleshooting</h2>
+    <ul>
+      <li><b>La app carga en blanco:</b> abre DevTools (F12) → Console → buscar el error. Más del 80% son problemas del seed (__v desactualizado) o un import faltante en index.html.</li>
+      <li><b>Los datos no aparecen:</b> verifica que seed.__v cambió correctamente. Si el store tiene una versión anterior, resetea con <code>Orbit.store.reseed(Orbit.SEED)</code> en la consola.</li>
+      <li><b>Un módulo no carga:</b> asegúrate de que el script esté en index.html DESPUÉS de sus dependencias (config.js → primas.js → ciclo.js → módulos).</li>
+      <li><b>El importador no abre el selector:</b> debe haber un fileInput dentro del drawer con id="imp-file". Verifica que el click listener esté en el input, no solo en el drop.</li>
+      <li><b>Error 153 en videos YouTube:</b> el video no permite embedding. Usa videos propios en Drive/Vimeo o el placeholder nativo de Orbit Academia.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>📋 Cómo agregar un nuevo cliente (tenant)</h2>
+    <div class="code">// 1. Copia la carpeta orbit360-platform/ con un nuevo nombre
+// 2. Edita core/config.js:
+Orbit.tenant = (function () {
+  const data = {
+    nombre: 'Mi Intermediaria S.A.',
+    modulos: [...todos los del plan...],
+    branding: { logo: '', paleta: 'rojo', tipografia: 'Manrope' }
+  };
+  ...
+});
+// 3. Personaliza seed.js: aseguradoras locales, metas, asesores
+// 4. Sube a GitHub Pages o hosting → URL lista</div>
+    <div class="tip"><b>💡 Regla de oro:</b> NUNCA modifiques el core para personalizar un cliente. Toda la personalización va en config.js y seed.js. Así puedes actualizar el core de todos los tenants sin romper nada.</div>
+  </div>
+</div>
+</body>
+</html>

@@ -11,6 +11,373 @@ window.Orbit = window.Orbit || {};
 Orbit.importa = (function () {
   const U = Orbit.ui;
 
+  /* ---- Motor de extracción REAL (CSV/TSV/TXT) ----------------------
+     Lee el archivo del cliente, detecta delimitador, mapea encabezados
+     a campos de Orbit por sinónimos difusos y escribe al store con
+     deduplicación (crea lo nuevo, actualiza lo existente). PDF/XLSX/
+     imagen requieren el extractor de backend (producción). */
+  function norm(s) { return String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+  function normPais(s) { const n = norm(s); if (n.indexOf('colomb') >= 0 || n === 'co') return 'CO'; if (n.indexOf('guate') >= 0 || n === 'gt') return 'GT'; return 'GT'; }
+  function parseNum(v) { if (v == null) return 0; let s = String(v).replace(/[^0-9,.\-]/g, ''); s = s.replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'); const n = parseFloat(s); return isNaN(n) ? 0 : n; }
+  function detectDelim(line) { const c = (line.match(/,/g) || []).length, sc = (line.match(/;/g) || []).length, t = (line.match(/\t/g) || []).length; if (t >= c && t >= sc) return '\t'; if (sc >= c) return ';'; return ','; }
+  function parseDelimited(text) {
+    const lines = text.replace(/\r/g, '').split('\n').filter(l => l.trim().length);
+    if (!lines.length) return { headers: [], rows: [] };
+    const d = detectDelim(lines[0]);
+    function split(line) { const out = []; let cur = '', q = false; for (let i = 0; i < line.length; i++) { const ch = line[i]; if (ch === '"') { if (q && line[i + 1] === '"') { cur += '"'; i++; } else q = !q; } else if (ch === d && !q) { out.push(cur); cur = ''; } else cur += ch; } out.push(cur); return out.map(s => s.trim()); }
+    return { headers: split(lines[0]), rows: lines.slice(1).map(split) };
+  }
+  /* Carga perezosa de librerías de parseo (solo cuando se usan) */
+  const _libs = {};
+  function loadLib(url, globalName) {
+    if (window[globalName]) return Promise.resolve(window[globalName]);
+    if (_libs[url]) return _libs[url];
+    _libs[url] = new Promise((res, rej) => { const s = document.createElement('script'); s.src = url; s.onload = () => res(window[globalName]); s.onerror = () => rej(new Error('load ' + url)); document.head.appendChild(s); });
+    return _libs[url];
+  }
+  /* matriz (Excel) -> {headers, rows} */
+  function matrixToParsed(mat) {
+    mat = (mat || []).filter(r => r && r.some(c => String(c).trim() !== ''));
+    if (!mat.length) return { headers: [], rows: [] };
+    return { headers: mat[0].map(c => String(c)), rows: mat.slice(1).map(r => r.map(c => String(c == null ? '' : c))) };
+  }
+  /* texto plano (PDF/Word/OCR) -> tabla delimitada o, si no, extracción etiquetada de UN registro */
+  function textToParsed(text, kind) {
+    const d = parseDelimited(text);
+    if (d.headers.length > 1 && d.rows.length) { const idx = mapHeaders(kind, d.headers); if (Object.keys(idx).length) return d; }
+    const cfg = IMPORT_MAP[kind]; if (!cfg) return d;
+    const flat = String(text).replace(/\s+/g, ' ');
+    const headers = [], values = [];
+    Object.keys(cfg.fields).forEach(field => {
+      for (let i = 0; i < cfg.fields[field].length; i++) {
+        const syn = cfg.fields[field][i];
+        const re = new RegExp(syn.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*[:#=-]?\\s*([^\\s].{0,50}?)(?=\\s{2,}|$|[A-ZÁÉÍÓÚ][a-z]+\\s*[:#=])', 'i');
+        const m = flat.match(re); if (m && m[1]) { headers.push(cfg.fields[field][0]); values.push(m[1].trim()); break; }
+      }
+    });
+    if (headers.length) return { headers, rows: [values] };
+    return d;
+  }
+  function showLoading(msg) { state.processing = msg; paint(); }
+  /* Extractor INTELIGENTE real: la IA lee el documento y devuelve registros estructurados
+     según el esquema del destino. Si no hay IA disponible, retorna null (fallback heurístico). */
+  async function aiExtract(text, kind) {
+    const cfg = IMPORT_MAP[kind];
+    if (!cfg || !text || text.replace(/\s/g, '').length < 12) return null;
+    if (!(window.claude && window.claude.complete)) return null;
+    const fields = Object.keys(cfg.fields);
+    const prompt = 'Eres un extractor de datos de seguros. Del siguiente documento extrae TODOS los registros de tipo "' + cfg.label + '". '
+      + 'Devuelve SOLO un JSON array válido, sin explicación ni markdown. Cada objeto usa exactamente estas claves (cadena vacía si el dato no está): '
+      + fields.join(', ') + '. '
+      + 'Si el documento describe un solo registro, devuelve un array de 1. Si hay varias secciones/hojas/filas, devuelve uno por cada registro real (no por línea de texto). '
+      + 'Limpia los valores (sin etiquetas, solo el dato). Documento:\n"""' + String(text).slice(0, 7000) + '"""';
+    try {
+      const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt }] });
+      const m = String(out).match(/\[[\s\S]*\]/); if (!m) return null;
+      const arr = JSON.parse(m[0]);
+      if (!Array.isArray(arr) || !arr.length) return null;
+      const rows = arr.map(o => fields.map(f => (o && o[f] != null) ? String(o[f]) : ''));
+      return { headers: fields.slice(), rows: rows.filter(r => r.some(v => v && v.trim())), ai: true };
+    } catch (e) { return null; }
+  }
+  /* Procesa texto de documento: intenta IA, si no, heurística. (async) */
+  async function procesarTexto(text) {
+    showLoading('🧠 Extracción inteligente con IA…');
+    let parsed = null;
+    try { parsed = await aiExtract(text, state.kind); } catch (e) { parsed = null; }
+    state.parsed = parsed || textToParsed(text, state.kind);
+    state.processing = null; if (state.kind === 'base-inicial' && state.parsed && state.parsed.headers && state.parsed.headers.length) { let best = 'clientes', score = -1;['clientes', 'polizas', 'vehiculos', 'movimientos-finanzas', 'estados-cuenta'].forEach(k => { const n = Object.keys(mapHeaders(k, state.parsed.headers)).length; if (n > score) { score = n; best = k; } }); state.kind = best; state.meta = KINDS[best] || state.meta; }
+    state.step = 2; paint();
+  }
+  const FIELD_LABEL = { nombre: 'Nombre', tipo: 'Tipo', identificacion: 'Identificación', asesorNombre: 'Asesor', email: 'Correo', telefono: 'Teléfono', pais: 'País', ciudad: 'Ciudad', departamento: 'Departamento', direccion: 'Dirección', segmento: 'Segmento', canal: 'Canal', numero: 'Póliza', ramo: 'Ramo', producto: 'Producto', aseguradoraNombre: 'Aseguradora', prima: 'Prima', clienteNombre: 'Cliente', vigenciaIni: 'Vig. inicio', vigenciaFin: 'Vig. fin', placa: 'Placa', marca: 'Marca', linea: 'Línea/Modelo', anio: 'Año', fecha: 'Fecha', concepto: 'Concepto', monto: 'Monto', tipoMov: 'Tipo' };
+  const IMPORT_MAP = {
+    'clientes': {
+      coll: 'clientes', label: 'Clientes 360', dedup: ['identificacion', 'nombre'],
+      fields: {
+        nombre: ['nombre', 'cliente', 'razon social', 'razonsocial', 'nombres', 'nombre completo', 'asegurado', 'contratante', 'tomador'],
+        tipo: ['tipo', 'tipo cliente', 'persona empresa'],
+        identificacion: ['identificacion', 'documento', 'dpi', 'nit', 'cedula', 'id', 'rut', 'cc', 'no documento', 'nro documento', 'numero documento', 'doc'],
+        asesorNombre: ['asesor', 'ejecutivo', 'agente', 'vendedor', 'productor'],
+        email: ['email', 'correo', 'e mail', 'mail', 'correo electronico'],
+        telefono: ['telefono', 'tel', 'celular', 'movil', 'whatsapp', 'contacto', 'numero telefono'],
+        pais: ['pais'], ciudad: ['ciudad', 'municipio'], departamento: ['departamento', 'depto', 'provincia', 'estado'],
+        direccion: ['direccion', 'domicilio'], segmento: ['segmento'], canal: ['canal', 'origen', 'fuente']
+      },
+      build(rec) {
+        const ne = norm(rec.tipo), nn = norm(rec.nombre);
+        rec.tipo = (ne.indexOf('emp') === 0 || ne.indexOf('jurid') >= 0 || /\b(sa|sas|ltda)\b/.test(nn)) ? 'Empresa' : 'Persona';
+        rec.pais = normPais(rec.pais); rec.moneda = rec.pais === 'CO' ? 'COP' : 'GTQ';
+        if (rec.asesorNombre) { const a = Orbit.store.all('asesores').find(x => norm(x.nombre).indexOf(norm(rec.asesorNombre)) >= 0 || norm(rec.asesorNombre).indexOf(norm(x.nombre)) >= 0); if (a) rec.asesorId = a.id; }
+        delete rec.asesorNombre;
+        rec.fechaAlta = rec.fechaAlta || new Date().toISOString().slice(0, 10);
+        rec.etiquetas = rec.etiquetas || []; rec.notas = rec.notas || ''; rec.driveLink = rec.driveLink || '';
+        return rec;
+      }
+    },
+    'polizas': {
+      coll: 'polizas', label: 'Pólizas', dedup: ['numero'],
+      fields: {
+        numero: ['poliza', 'numero poliza', 'no poliza', 'num poliza', 'nro poliza', 'numero', 'no', 'number'],
+        ramo: ['ramo', 'linea', 'tipo seguro', 'categoria'], producto: ['producto', 'subramo', 'plan', 'cobertura'],
+        aseguradoraNombre: ['aseguradora', 'compania', 'cia', 'asegurador'],
+        prima: ['prima', 'prima total', 'valor', 'monto', 'prima neta'],
+        clienteNombre: ['cliente', 'asegurado', 'contratante', 'tomador', 'nombre'],
+        vigenciaIni: ['vigencia inicio', 'inicio vigencia', 'desde', 'fecha inicio', 'vigencia desde'],
+        vigenciaFin: ['vigencia fin', 'fin vigencia', 'hasta', 'fecha fin', 'vencimiento', 'vigencia hasta'],
+        frecuencia: ['frecuencia', 'forma de pago', 'fraccionamiento', 'periodicidad', 'modo pago'],
+        formaPago: ['medio de pago', 'medio', 'metodo de pago', 'metodo pago', 'conducto'],
+        estadoPol: ['estado', 'status', 'situacion', 'vigente'],
+        sumaAsegurada: ['suma asegurada', 'suma', 'valor asegurado']
+      },
+      build(rec) {
+        rec.prima = parseNum(rec.prima); rec.primaNeta = rec.prima; rec.ramo = rec.ramo || 'Auto';
+        rec.sumaAsegurada = parseNum(rec.sumaAsegurada);
+        const ne = norm(rec.estadoPol);
+        rec.estado = ne.indexOf('cancel') >= 0 ? 'Cancelada' : ne.indexOf('venc') >= 0 ? 'Vencida' : ne.indexOf('renov') >= 0 ? 'Por renovar' : 'Vigente';
+        delete rec.estadoPol;
+        rec.frecuencia = rec.frecuencia || 'Contado'; rec.forma = rec.frecuencia; rec.formaPago = rec.formaPago || 'Transferencia';
+        rec.renovable = true;
+        if (rec.clienteNombre) { const c = Orbit.store.all('clientes').find(x => norm(x.nombre).indexOf(norm(rec.clienteNombre)) >= 0 || norm(rec.clienteNombre).indexOf(norm(x.nombre)) >= 0); if (c) { rec.clienteId = c.id; rec.pais = c.pais; rec.moneda = c.moneda; rec.asesorId = c.asesorId; } }
+        if (rec.aseguradoraNombre) { const a = Orbit.store.all('aseguradoras').find(x => norm(x.nombre).indexOf(norm(rec.aseguradoraNombre)) >= 0 || norm(rec.aseguradoraNombre).indexOf(norm(x.nombre)) >= 0); if (a) { rec.aseguradoraId = a.id; rec.comAseguradoraPct = (a.comisiones && a.comisiones[rec.ramo]) || a.comisionDefault || 12; } }
+        rec.comVendedorPct = rec.comVendedorPct || 50;
+        delete rec.clienteNombre; delete rec.aseguradoraNombre; return rec;
+      },
+      /* MIGRACIÓN: genera recibos automáticos por forma de pago SOLO si la póliza
+         está vigente o por renovar (este año). Cancelada/Vencida = histórico (no cartera). */
+      afterInsert(rec) {
+        if (!Orbit.primas || !rec.clienteId) return;
+        const generaCartera = (rec.estado === 'Vigente' || rec.estado === 'Por renovar');
+        if (!generaCartera) return; // histórico: cuenta en analítica por su prima, sin recibos en cartera
+        const pais = rec.pais || 'GT';
+        const frac = Orbit.primas.cuotasDe(rec.frecuencia) > 1;
+        const d = Orbit.primas.desglose(rec.primaNeta, pais, { fraccionado: frac });
+        Orbit.primas.recibos(d, { frecuencia: rec.frecuencia, vigenciaInicio: rec.vigenciaIni || new Date().toISOString().slice(0, 10), comAseguradoraPct: rec.comAseguradoraPct, comVendedorPct: rec.comVendedorPct }).forEach((r, i) => {
+          Orbit.store.insert('cobros', { id: 'cob_imp_' + rec.id + '_' + i, polizaId: rec.id, clienteId: rec.clienteId, asesorId: rec.asesorId, cuota: r.n, monto: r.total, moneda: rec.moneda || 'GTQ', neta: r.neta, gastosEmision: r.gastosEmision, gastosFinan: r.gastosFinan, otros: r.otros, iva: r.iva, comAseguradora: r.comAseguradora, comVendedor: r.comVendedor, vence: r.vence, fechaLimite: r.fechaLimite, fechaPago: null, estado: 'Pendiente', metodo: null, conducto: rec.formaPago, conciliado: false, importado: true });
+        });
+      }
+    },
+    'vehiculos': {
+      coll: 'vehiculos', label: 'Vehículos', dedup: ['placa'],
+      fields: {
+        placa: ['placa', 'matricula', 'patente', 'chapa'], marca: ['marca', 'fabricante'],
+        linea: ['linea', 'modelo', 'referencia', 'version'], anio: ['anio', 'ano', 'modelo año', 'year'],
+        clienteNombre: ['cliente', 'propietario', 'asegurado', 'nombre']
+      },
+      build(rec) {
+        rec.anio = parseNum(rec.anio) || rec.anio;
+        if (rec.clienteNombre) { const c = Orbit.store.all('clientes').find(x => norm(x.nombre).indexOf(norm(rec.clienteNombre)) >= 0 || norm(rec.clienteNombre).indexOf(norm(x.nombre)) >= 0); if (c) rec.clienteId = c.id; }
+        delete rec.clienteNombre; return rec;
+      }
+    },
+    'movimientos-finanzas': {
+      coll: 'finmovs', label: 'Movimientos', dedup: [],
+      fields: {
+        fecha: ['fecha', 'date', 'dia'], concepto: ['concepto', 'descripcion', 'detalle', 'glosa', 'referencia'],
+        monto: ['monto', 'valor', 'importe', 'amount', 'debito', 'credito'], tipoMov: ['tipo', 'tipo movimiento', 'clase', 'naturaleza']
+      },
+      build(rec) {
+        const mv = parseNum(rec.monto); rec.monto = Math.abs(mv);
+        rec.tipo = (norm(rec.tipoMov).indexOf('egr') === 0 || mv < 0) ? 'Egreso' : 'Ingreso';
+        delete rec.tipoMov; rec.fecha = rec.fecha || new Date().toISOString().slice(0, 10); rec.clasificacion = rec.clasificacion || 'Operativo'; return rec;
+      }
+    },
+    'documentos': {
+      coll: 'clientes', label: 'expediente del cliente', dedup: ['identificacion', 'nombre'], scopedUpdate: true,
+      fields: {
+        nombre: ['nombre', 'cliente', 'razon social', 'nombres', 'nombre completo', 'asegurado'],
+        identificacion: ['identificacion', 'documento', 'dpi', 'cui', 'nit', 'cedula', 'rut', 'cc', 'no documento', 'doc'],
+        direccion: ['direccion', 'domicilio', 'residencia'],
+        fechaNac: ['fecha de nacimiento', 'fecha nacimiento', 'nacimiento', 'fec nac', 'f nac'],
+        telefono: ['telefono', 'tel', 'celular', 'movil', 'whatsapp'],
+        email: ['email', 'correo', 'e mail'],
+        ciudad: ['ciudad', 'municipio'], departamento: ['departamento', 'depto', 'provincia']
+      },
+      build(rec) { return rec; }
+    },
+    'facturas': {
+      coll: 'facturas', label: 'Facturas', dedup: ['numero'],
+      fields: {
+        numero: ['factura', 'no factura', 'numero factura', 'nro factura', 'numero', 'serie'],
+        fecha: ['fecha', 'fecha emision', 'date'], monto: ['monto', 'total', 'valor', 'importe'],
+        polizaNumero: ['poliza', 'no poliza', 'numero poliza']
+      },
+      build(rec) { rec.monto = parseNum(rec.monto); if (rec.polizaNumero) { const p = Orbit.store.all('polizas').find(x => norm(x.numero) === norm(rec.polizaNumero)); if (p) { rec.polizaId = p.id; rec.clienteId = p.clienteId; } } delete rec.polizaNumero; return rec; }
+    },
+    'directorio-aseguradoras': {
+      coll: 'aseguradoras', label: 'Directorio de aseguradoras', dedup: ['nombre'],
+      fields: {
+        nombre: ['aseguradora', 'compania', 'cia', 'nombre', 'asegurador'],
+        ramosTxt: ['ramos', 'lineas', 'productos', 'ramos autorizados'],
+        email: ['contacto', 'correo', 'email', 'mesa', 'e mail'],
+        telefono: ['telefono', 'tel', 'conmutador'], pais: ['pais']
+      },
+      build(rec) {
+        rec.pais = normPais(rec.pais);
+        if (rec.ramosTxt) rec.ramos = String(rec.ramosTxt).split(/[,;/]+/).map(s => s.trim()).filter(Boolean);
+        delete rec.ramosTxt;
+        rec.comisionDefault = rec.comisionDefault || 12; rec.comisiones = rec.comisiones || {}; rec.comisionesProd = rec.comisionesProd || {};
+        rec.vinculada = rec.vinculada != null ? rec.vinculada : false; rec.color = rec.color || '#1f3a5f';
+        if (rec.email || rec.telefono) rec.contactos = [{ tipo: 'Comercial', nombre: 'Mesa de corredores', email: rec.email || '', tel: rec.telefono || '' }];
+        delete rec.email; delete rec.telefono; return rec;
+      }
+    },
+    'bitacora-reclamos': {
+      coll: 'reclamos', label: 'Siniestros / Reclamos', dedup: ['numero'],
+      fields: {
+        numero: ['siniestro', 'no siniestro', 'numero siniestro', 'reclamo', 'no reclamo', 'numero', 'expediente'],
+        polizaNumero: ['poliza', 'no poliza', 'numero poliza'],
+        tipo: ['tipo', 'causa', 'cobertura', 'motivo'], estado: ['estado', 'status', 'situacion'],
+        montoReclamado: ['monto', 'monto reclamado', 'valor', 'reclamado', 'importe'],
+        fecha: ['fecha', 'fecha siniestro', 'fecha reclamo', 'date'],
+        descripcion: ['descripcion', 'detalle', 'observacion', 'glosa']
+      },
+      build(rec) {
+        rec.montoReclamado = parseNum(rec.montoReclamado); rec.montoAprobado = 0;
+        rec.estado = rec.estado || 'Reportado'; rec.fecha = rec.fecha || new Date().toISOString().slice(0, 10);
+        rec.bitacora = [{ ts: new Date().toISOString().slice(0, 16).replace('T', ' '), user: 'Importación', t: 'Reclamo importado', d: 'Cargado desde bitácora de la aseguradora.' }];
+        rec.correos = []; rec.docs = []; rec.actualizado = new Date().toISOString().slice(0, 10);
+        if (rec.polizaNumero) { const p = Orbit.store.all('polizas').find(x => norm(x.numero) === norm(rec.polizaNumero)); if (p) { rec.polizaId = p.id; rec.clienteId = p.clienteId; rec.aseguradoraId = p.aseguradoraId; rec.asesorId = p.asesorId; rec.ramo = p.ramo; } }
+        delete rec.polizaNumero; return rec;
+      }
+    },
+    'calendario-marketing': {
+      coll: 'contenidos', label: 'Calendario de contenidos', dedup: [],
+      fields: {
+        fecha: ['fecha', 'dia', 'date'], titulo: ['contenido', 'titulo', 'tema', 'copy', 'pieza nombre'],
+        tipo: ['tipo', 'formato', 'pieza'], canal: ['canal', 'red', 'plataforma', 'red social'],
+        enfoque: ['enfoque', 'ramo', 'categoria', 'linea'], hora: ['hora', 'time']
+      },
+      build(rec) { rec.estado = rec.estado || 'Programado'; rec.hora = rec.hora || '08:00'; rec.canal = rec.canal || 'Instagram'; rec.tipo = rec.tipo || 'Texto'; rec.enfoque = rec.enfoque || 'Tendencias'; rec.stats = null; return rec; }
+    },
+    'estados-cuenta': {
+      coll: 'cobros', label: 'Recibos (estado de cuenta)', dedup: [], conciliacion: true,
+      fields: {
+        numeroRecibo: ['recibo', 'no recibo', 'numero recibo', 'nro recibo'],
+        polizaNumero: ['poliza', 'no poliza', 'numero poliza'],
+        monto: ['monto', 'prima', 'valor', 'total', 'importe'],
+        vence: ['vence', 'vencimiento', 'fecha limite', 'fecha', 'f limite'],
+        estadoPago: ['estado', 'pagado', 'status', 'pago']
+      },
+      build(rec) {
+        rec.monto = parseNum(rec.monto);
+        if (rec.polizaNumero) { const p = Orbit.store.all('polizas').find(x => norm(x.numero) === norm(rec.polizaNumero)); if (p) { rec.polizaId = p.id; rec.clienteId = p.clienteId; rec.asesorId = p.asesorId; rec.moneda = p.moneda; } }
+        const pago = norm(rec.estadoPago); rec.estado = (pago.indexOf('pag') >= 0 || pago === 'si' || pago === 'x') ? 'Pagado' : 'Pendiente';
+        if (rec.estado === 'Pagado') { rec.fechaPago = rec.vence; rec.conciliado = false; }
+        delete rec.polizaNumero; delete rec.estadoPago; rec.cuota = rec.cuota || 1; return rec;
+      }
+    },
+    'estados-banco': {
+      coll: 'finmovs', label: 'Movimientos bancarios', dedup: [],
+      fields: {
+        fecha: ['fecha', 'date', 'dia'], concepto: ['descripcion', 'concepto', 'detalle', 'referencia', 'glosa'],
+        monto: ['monto', 'valor', 'importe', 'debito', 'credito', 'amount']
+      },
+      build(rec) { const mv = parseNum(rec.monto); rec.monto = Math.abs(mv); rec.tipo = mv < 0 ? 'Egreso' : 'Ingreso'; rec.fecha = rec.fecha || new Date().toISOString().slice(0, 10); rec.clasificacion = 'Bancario'; rec.origen = 'conciliacion-banco'; return rec; }
+    }
+  };
+  function mapHeaders(kind, headers) {
+    const cfg = IMPORT_MAP[kind]; if (!cfg) return (state && state.manualMap) ? Object.assign({}, state.manualMap) : {};
+    const nh = headers.map(norm), idx = {};
+    Object.keys(cfg.fields).forEach(field => {
+      const syns = cfg.fields[field].map(norm);
+      let hi = nh.findIndex(h => syns.indexOf(h) >= 0);
+      if (hi < 0) hi = nh.findIndex(h => h && syns.some(s => h.indexOf(s) >= 0 || s.indexOf(h) >= 0));
+      if (hi >= 0) idx[field] = hi;
+    });
+    // overrides manuales del usuario (botón Iterar / mejorar)
+    if (state && state.manualMap) Object.keys(state.manualMap).forEach(f => { const v = state.manualMap[f]; if (v < 0) delete idx[f]; else idx[f] = v; });
+    return idx;
+  }
+  function impToast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
+  function renderRemap() {
+    const dr = document.getElementById('imp-drawer'); const kind = state.kind, cfg = IMPORT_MAP[kind];
+    const headers = state.parsed ? state.parsed.headers : [];
+    const cur = mapHeaders(kind, headers);
+    const fields = cfg ? Object.keys(cfg.fields) : [];
+    const body = dr.querySelector('.imp-body');
+    if (!cfg || !headers.length) { impToast('Carga un archivo primero para ajustar el mapeo'); return; }
+    body.innerHTML = `<div class="imp-note" style="margin-top:0">🔧 Ajustá el mapeo: conectá cada campo de Orbit con una columna de tu archivo. Lo que no se reconoció automáticamente, asignalo acá.</div>
+      <div class="card" style="overflow:hidden;margin-top:12px"><table class="tbl"><thead><tr><th>Campo de Orbit 360</th><th>Columna de tu archivo</th></tr></thead><tbody>
+      ${fields.map(f => `<tr><td><b>${U.esc(FIELD_LABEL[f] || f)}</b></td><td><select class="o-sel" data-remap="${f}" style="width:100%"><option value="-1">— (ignorar) —</option>${headers.map((h, i) => `<option value="${i}" ${cur[f] === i ? 'selected' : ''}>${U.esc(h || ('Columna ' + (i + 1)))}</option>`).join('')}</select></td></tr>`).join('')}
+      </tbody></table></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button class="btn ghost" id="rm-cancel">Volver</button><button class="btn primary" id="rm-apply">Aplicar mapeo →</button></div>`;
+    body.querySelector('#rm-cancel').addEventListener('click', () => paint());
+    body.querySelector('#rm-apply').addEventListener('click', () => {
+      state.manualMap = state.manualMap || {};
+      body.querySelectorAll('[data-remap]').forEach(sel => { state.manualMap[sel.dataset.remap] = +sel.value; });
+      state.iterado = (state.iterado || 1) + 1; paint(); impToast('🔧 Mapeo actualizado con tus ajustes');
+    });
+  }
+  function realPreview(kind) {
+    const p = state.parsed, idx = mapHeaders(kind, p.headers), fields = Object.keys(idx);
+    if (fields.length) return { cols: fields.map(f => FIELD_LABEL[f] || f), rows: p.rows.slice(0, 8).map(c => fields.map(f => (c[idx[f]] || '—'))), total: p.rows.length, mapped: fields.length, totalCols: p.headers.length };
+    // sin columnas reconocidas: mostrar lo realmente extraído (crudo), nunca datos de ejemplo
+    const cols = p.headers.length ? p.headers : ['Contenido extraído'];
+    const rows = (p.rows.length ? p.rows.slice(0, 8) : [['(no se detectó estructura tabular en el archivo)']]);
+    return { cols, rows, total: p.rows.length, mapped: 0, totalCols: p.headers.length, raw: true };
+  }
+  function applyImport(kind) {
+    const cfg = IMPORT_MAP[kind]; if (!cfg || !state.parsed) return { created: 0, updated: 0 };
+    const idx = mapHeaders(kind, state.parsed.headers); if (!Object.keys(idx).length) return { created: 0, updated: 0 };
+    // Modo expediente: completar el cliente abierto (no crear uno nuevo)
+    if (cfg.scopedUpdate && state.scope && state.scope.cid) {
+      const cells = state.parsed.rows[0] || [];
+      const rec = {}; Object.keys(idx).forEach(f => { const v = cells[idx[f]]; if (v != null && v !== '') rec[f] = v; });
+      if (cfg.build) cfg.build(rec);
+      if (Object.keys(rec).length) { Orbit.store.update(cfg.coll, state.scope.cid, rec); return { created: 0, updated: 1 }; }
+      return { created: 0, updated: 0 };
+    }
+    let created = 0, updated = 0;
+    state.parsed.rows.forEach((cells, ri) => {
+      const rec = {}; Object.keys(idx).forEach(f => { const v = cells[idx[f]]; if (v != null && v !== '') rec[f] = v; });
+      if (!Object.keys(rec).length) return;
+      if (cfg.build) cfg.build(rec);
+      let existing = null;
+      for (let j = 0; j < (cfg.dedup || []).length; j++) { const k = cfg.dedup[j]; if (rec[k]) { existing = Orbit.store.all(cfg.coll).find(r => norm(r[k]) === norm(rec[k])); if (existing) break; } }
+      if (existing) { Orbit.store.update(cfg.coll, existing.id, rec); updated++; }
+      else {
+        rec.id = cfg.coll.slice(0, 3) + '_imp_' + Date.now().toString(36) + ri; rec.importado = true;
+        if (state.scope && state.scope.cid && !rec.clienteId) rec.clienteId = state.scope.cid;
+        Orbit.store.insert(cfg.coll, rec);
+        if (cfg.afterInsert) { try { cfg.afterInsert(rec); } catch (e) {} }
+        // registrar actividad viva (aparece en Historial y en la ficha del cliente)
+        try {
+          if (cfg.coll === 'clientes') Orbit.store.insert('actividades', { id: 'act_imp_' + rec.id, clienteId: rec.id, asesorId: rec.asesorId || '', tipo: 'sistema', icon: '📥', fecha: new Date().toISOString().slice(0, 10), titulo: 'Cliente importado: ' + (rec.nombre || ''), detalle: 'Alta por importación inteligente.' });
+          else if (cfg.coll === 'polizas' && rec.clienteId) Orbit.store.insert('actividades', { id: 'act_imp_' + rec.id, clienteId: rec.clienteId, asesorId: rec.asesorId || '', tipo: 'sistema', icon: '📑', fecha: new Date().toISOString().slice(0, 10), titulo: 'Póliza importada: ' + (rec.numero || ''), detalle: (rec.ramo || '') + ' · ' + (rec.estado || 'Vigente') });
+          else if (cfg.coll === 'reclamos' && rec.clienteId) Orbit.store.insert('actividades', { id: 'act_imp_' + rec.id, clienteId: rec.clienteId, asesorId: rec.asesorId || '', tipo: 'sistema', icon: '🚨', fecha: new Date().toISOString().slice(0, 10), titulo: 'Siniestro importado: ' + (rec.numero || ''), detalle: (rec.tipo || '') + ' · ' + (rec.estado || '') });
+        } catch (e) {}
+        created++;
+      }
+    });
+    return { created, updated };
+  }
+
+  function conciliarRows(kind) {
+    const cfg = IMPORT_MAP[kind]; if (!cfg || !state.parsed) return { rows: [], noCreados: [], noAplicados: [] };
+    const idx = mapHeaders(kind, state.parsed.headers);
+    const rows = state.parsed.rows.map(cells => { const rec = {}; Object.keys(idx).forEach(f => { const v = cells[idx[f]]; if (v != null && v !== '') rec[f] = v; }); if (cfg.build) cfg.build(rec); return rec; }).filter(r => Object.keys(r).length);
+    const noCreados = [], noAplicados = [];
+    rows.forEach(r => {
+      if (kind === 'estados-cuenta') {
+        if (!r.polizaId) { r._motivo = 'Póliza no existe en Orbit'; noCreados.push(r); return; }
+        const existing = Orbit.store.where('cobros', c => c.polizaId === r.polizaId && Math.abs((c.monto || 0) - (r.monto || 0)) < 1);
+        if (!existing.length) { r._motivo = 'Recibo no creado'; noCreados.push(r); }
+        else if (r.estado === 'Pagado') { const pend = existing.find(c => c.estado !== 'Pagado'); if (pend) { r._aplicaA = pend.id; r._motivo = 'Pago en estado de cuenta, sin aplicar'; noAplicados.push(r); } }
+      } else if (kind === 'estados-banco') {
+        const existing = Orbit.store.where('finmovs', m => Math.abs((m.monto || 0) - (r.monto || 0)) < 1 && (m.fecha === r.fecha));
+        if (!existing.length) { r._motivo = 'Depósito sin movimiento en Orbit'; noCreados.push(r); }
+      }
+    });
+    return { rows, noCreados, noAplicados };
+  }
+  function applyConciliacion(kind) {
+    const { noCreados, noAplicados } = conciliarRows(kind);
+    let creados = 0, aplicados = 0;
+    noCreados.forEach((r, i) => { const rec = Object.assign({}, r); delete rec._motivo; delete rec._aplicaA; rec.id = (IMPORT_MAP[kind].coll).slice(0, 3) + '_cc_' + Date.now().toString(36) + i; rec.importado = true; Orbit.store.insert(IMPORT_MAP[kind].coll, rec); creados++; });
+    noAplicados.forEach(r => { if (r._aplicaA) { Orbit.store.update('cobros', r._aplicaA, { estado: 'Pagado', fechaPago: r.vence || new Date().toISOString().slice(0, 10), conciliado: true, metodo: 'Conciliación' }); aplicados++; } });
+    return { creados, aplicados };
+  }
+
   // Catálogo de secciones de importación (todas las requeridas)
   const KINDS = {
     'base-inicial': { icon: '🗄', title: 'Base de datos inicial', desc: 'Carga completa para arrancar la plataforma (clientes, pólizas, cobros, comisiones).', cols: ['Entidad', 'Registros', 'Estado'], sample: [['Clientes', '142', 'Listo'], ['Pólizas', '388', 'Listo'], ['Cobros', '1 920', 'Listo'], ['Comisiones', '1 510', 'Listo']] },
@@ -25,6 +392,7 @@ Orbit.importa = (function () {
     'calendario-marketing': { icon: '📣', title: 'Importar calendarización de contenidos', desc: 'Carga el calendario; se muestra como mes con cada día y sus piezas.', cols: ['Fecha', 'Contenido', 'Pieza', 'Canal'], sample: [['2026-06-03', 'Tip de renovación', 'Reel', 'Instagram'], ['2026-06-10', 'Beneficio Vida', 'Carrusel', 'Facebook'], ['2026-06-18', 'Caso de éxito', 'Post', 'LinkedIn']] },
     'facturas': { icon: '🧾', title: 'Importar facturas', desc: 'Adjunta facturas al expediente; se extraen número, fecha, monto y se vinculan a la póliza.', cols: ['Factura', 'Fecha', 'Monto', 'Póliza'], sample: [['FAC-2041', '2026-05-12', 'Q 8,400', 'GT-AT-48210'], ['FAC-2042', '2026-05-30', 'Q 700', 'GT-AT-48210']] },
     'documentos': { icon: '📎', title: 'Importar documentos', desc: 'Carga uno o varios documentos (DPI, RTU, patente, recibo de servicios, pólizas en PDF). El motor extrae datos y completa la ficha.', cols: ['Documento', 'Tipo detectado', 'Dato extraído'], sample: [['dpi_frente.jpg', 'DPI', 'Dirección, fecha nac.'], ['rtu_2026.pdf', 'RTU', 'Razón social, NIT'], ['poliza_auto.pdf', 'Póliza', 'Vehículo, vigencia']] },
+    'bitacora-reclamos': { icon: '🚨', title: 'Importar bitácora de siniestros', desc: 'Carga la bitácora de reclamos que envía la aseguradora (uno o varios clientes). Cada reclamo se vincula a su póliza y queda en la ficha del cliente correspondiente.', cols: ['Siniestro', 'Póliza', 'Tipo', 'Estado'], sample: [['SIN-48210', 'GT-AT-48210', 'Colisión', 'En análisis'], ['SIN-77310', 'GT-AT-77310', 'Robo parcial', 'Aprobado'], ['SIN-91733', 'CO-PA-91733', 'Daños a terceros', 'Documentación']] },
     'docs-aseguradora': { icon: '🏢', title: 'Importar documentos de aseguradora', desc: 'Carga tarifas, formularios, cotizaciones y pólizas de ejemplo. En modo inteligente, alimenta el Cotizador, el Comparativo y la IA; en modo documental, solo se almacenan para consulta.', cols: ['Documento', 'Categoría detectada', 'Uso'], sample: [['tarifario_2026.pdf', 'Tarifas', 'Cotizador / Comparativo'], ['formulario_auto.pdf', 'Formularios', 'Requisitos de emisión'], ['cotizacion_ejemplo.pdf', 'Cotización ejemplo', 'Entrenar IA']] }
   };
 
@@ -95,6 +463,7 @@ Orbit.importa = (function () {
   }
 
   function step1(m) {
+    if (state.processing) return `<div style="text-align:center;padding:48px 16px"><div class="imp-spinner"></div><div style="font-family:var(--f-display);font-weight:700;font-size:16px;margin-top:16px">${U.esc(state.processing)}</div><p class="muted" style="font-size:13px;margin-top:6px">Procesando <b>${U.esc(state.files[0] || '')}</b> en tu navegador…</p></div>`;
     return `<p class="imp-desc">${U.esc(m.desc)}</p>
       <div class="imp-mode" id="imp-mode">
         <button class="imp-mode-b ${state.modo !== 'documental' ? 'on' : ''}" data-modo="inteligente">✨ Inteligente<small>extrae y mapea a los módulos</small></button>
@@ -110,28 +479,45 @@ Orbit.importa = (function () {
       <div class="imp-note">${state.modo === 'documental' ? '📁 Modo documental: los archivos se <b>almacenan y quedan visibles</b> en el expediente/ficha, sin extraer datos.' : '🧠 Modo inteligente: reconoce el formato, <b>extrae los datos y los mapea</b> a Orbit 360 (cruza y complementa sin duplicar).'}</div>`;
   }
   function step2(m) {
+    // Base de datos inicial: si aún no se resolvió a una entidad real, hacerlo aquí (nunca mostrar la tabla de ejemplo)
+    if (state.kind === 'base-inicial' && state.parsed && state.parsed.headers && state.parsed.headers.length) {
+      let best = 'clientes', score = -1;['clientes', 'polizas', 'vehiculos', 'movimientos-finanzas', 'estados-cuenta'].forEach(k => { const n = Object.keys(mapHeaders(k, state.parsed.headers)).length; if (n > score) { score = n; best = k; } });
+      state.kind = best; state.meta = KINDS[best] || state.meta; m = state.meta;
+    }
     const scopeNote = state.scope ? `<div class="imp-note" style="margin-top:0;margin-bottom:12px">🔗 Se vinculará a <b>${U.esc(state.scope.nombre)}</b>.</div>` : '';
     const assoc = state.kind === 'vehiculos' ? `<div class="card pad" style="margin-top:12px"><b style="font-family:var(--f-display);font-size:13px">Asociar a</b>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px">
         <label class="ce-l">Cliente<select class="o-sel" style="width:100%">${Orbit.store.all('clientes').slice(0, 8).map(c => `<option ${state.scope && state.scope.cid === c.id ? 'selected' : ''}>${U.esc(c.nombre)}</option>`).join('')}</select></label>
         <label class="ce-l">Póliza de auto<select class="o-sel" style="width:100%">${Orbit.store.where('polizas', p => p.ramo === 'Auto').slice(0, 8).map(p => `<option>${p.numero}</option>`).join('') || '<option>—</option>'}</select></label>
       </div></div>` : '';
-    return `${scopeNote}<p class="imp-desc">Detectamos y mapeamos estos registros. Revisa antes de confirmar.</p>
-      <div class="imp-scan"><span class="imp-spark">🧠</span> Extracción ${state.iterado ? 'refinada (' + state.iterado + 'ª pasada)' : 'completada'} · <b>${m.sample.length}+ registros</b> reconocidos · 0 errores de formato.<button class="btn ghost sm" id="imp-iterar" style="margin-left:auto">🔄 Iterar / mejorar</button></div>
-      <div class="card" style="overflow:hidden;margin-top:12px"><table class="tbl"><thead><tr>${m.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
-        <tbody>${m.sample.map(row => `<tr>${row.map((cell, i) => `<td${i === 0 ? ' style="font-weight:600"' : ''}>${U.esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+    const real = (state.parsed && IMPORT_MAP[state.kind]) ? realPreview(state.kind) : null;
+    const cols = real ? real.cols : m.cols;
+    const sample = real ? real.rows : m.sample;
+    const nReg = real ? real.total : (m.sample.length + '+');
+    // Conciliación: computar desde datos REALES si hay archivo; si no, mostrar ejemplo
+    const det = (m.conciliacion || state.kind === 'estados-banco') ? (state.parsed ? conciliarRows(state.kind) : null) : null;
+    const detData = det ? { noCreados: det.noCreados.map(r => [r.numeroRecibo || r.concepto || '—', r.polizaNumero || (r.polizaId ? (Orbit.store.get('polizas', r.polizaId) || {}).numero : '') || '—', r._motivo || '', U.money ? U.money(r.monto || 0, r.moneda || 'GTQ') : (r.monto || 0)]), noAplicados: det.noAplicados.map(r => [r.numeroRecibo || '—', (Orbit.store.get('polizas', r.polizaId) || {}).numero || '—', r._motivo || '', U.money ? U.money(r.monto || 0, r.moneda || 'GTQ') : (r.monto || 0)]) } : (m.detect || null);
+    const isAI = state.parsed && state.parsed.ai;
+    const mapNote = real ? ('<div class="imp-note" style="margin-top:0;margin-bottom:10px">' + (isAI
+      ? ('🧠 <b>Extracción inteligente (IA):</b> leí el documento y estructuré <b>' + real.total + ' registros</b> de <b>' + U.esc(state.files[0] || 'tu archivo') + '</b> detectando los campos automáticamente.')
+      : ('🧠 Leí <b>' + real.total + ' registros</b> de <b>' + U.esc(state.files[0] || 'tu archivo') + '</b> y mapeé <b>' + real.mapped + '/' + real.totalCols + ' columnas</b> a Orbit 360.' + (real.mapped === 0 ? ' <b>No reconocí columnas</b> — usá <b>🔄 Iterar / mejorar</b> para asignarlas a mano, o modo documental.' : (real.mapped < real.totalCols ? ' Las columnas no reconocidas se ignoran.' : '')))
+    ) + '</div>') : (state.parsed && !IMPORT_MAP[state.kind] ? `<div class="imp-note" style="margin-top:0;margin-bottom:10px">📄 Archivo recibido. Esta sección usa el extractor de backend en producción; abajo se muestra un ejemplo del mapeo.</div>` : '');
+    return `${scopeNote}${mapNote}<p class="imp-desc">Detectamos y mapeamos estos registros. Revisa antes de confirmar.</p>
+      <div class="imp-scan"><span class="imp-spark">🧠</span> Extracción ${state.iterado ? 'refinada (' + state.iterado + 'ª pasada)' : 'completada'} · <b>${nReg} registros</b> reconocidos · 0 errores de formato.<button class="btn ghost sm" id="imp-iterar" style="margin-left:auto">🔄 Iterar / mejorar</button></div>
+      <div class="card" style="overflow:hidden;margin-top:12px"><div style="overflow-x:auto"><table class="tbl" style="min-width:max-content"><thead><tr>${cols.map(c => `<th style="white-space:nowrap">${U.esc(c)}</th>`).join('')}</tr></thead>
+        <tbody>${sample.map(row => `<tr>${row.map((cell, i) => `<td${i === 0 ? ' style="font-weight:600"' : ''}>${U.esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>
       ${assoc}
-      ${m.detect ? `
+      ${detData ? `
         <div class="imp-detect">
           <div class="imp-det-card warn">
-            <div class="idc-h"><span>🧩</span> Recibos no creados <b>${m.detect.noCreados.length}</b></div>
-            <div class="idc-sub">Aparecen en el estado de la aseguradora pero no existen aún en Orbit. Se crearán al confirmar.</div>
-            <table class="tbl" style="margin-top:8px"><tbody>${m.detect.noCreados.map(r => `<tr><td class="mono" style="font-size:12px">${r[0]}</td><td class="mono" style="font-size:12px">${r[1]}</td><td style="font-size:12px">${r[2]}</td><td class="num">${r[3]}</td></tr>`).join('')}</tbody></table>
+            <div class="idc-h"><span>🧩</span> ${state.kind === 'estados-banco' ? 'Depósitos sin movimiento' : 'Recibos no creados'} <b>${detData.noCreados.length}</b></div>
+            <div class="idc-sub">${det ? 'Detectados en tu archivo y ausentes en Orbit. Se crearán al confirmar.' : 'Ejemplo del cruce. Carga un archivo para ver la detección real.'}</div>
+            ${detData.noCreados.length ? `<table class="tbl" style="margin-top:8px"><tbody>${detData.noCreados.map(r => `<tr><td class="mono" style="font-size:12px">${U.esc(r[0])}</td><td class="mono" style="font-size:12px">${U.esc(r[1])}</td><td style="font-size:12px">${U.esc(r[2])}</td><td class="num">${U.esc(r[3])}</td></tr>`).join('')}</tbody></table>` : '<div class="muted" style="font-size:12px;margin-top:6px">Todo cuadra — nada por crear.</div>'}
           </div>
           <div class="imp-det-card info">
-            <div class="idc-h"><span>💸</span> Pagos no aplicados <b>${m.detect.noAplicados.length}</b></div>
-            <div class="idc-sub">Pagos detectados que aún no se aplicaron a su póliza. Se aplicarán sin duplicar lo ya conciliado.</div>
-            <table class="tbl" style="margin-top:8px"><tbody>${m.detect.noAplicados.map(r => `<tr><td class="mono" style="font-size:12px">${r[0]}</td><td class="mono" style="font-size:12px">${r[1]}</td><td style="font-size:12px">${r[2]}</td><td class="num">${r[3]}</td></tr>`).join('')}</tbody></table>
+            <div class="idc-h"><span>💸</span> Pagos no aplicados <b>${detData.noAplicados.length}</b></div>
+            <div class="idc-sub">${det ? 'Pagos del archivo aún no aplicados a su póliza. Se aplicarán sin duplicar.' : 'Ejemplo del cruce. Carga un archivo para ver la detección real.'}</div>
+            ${detData.noAplicados.length ? `<table class="tbl" style="margin-top:8px"><tbody>${detData.noAplicados.map(r => `<tr><td class="mono" style="font-size:12px">${U.esc(r[0])}</td><td class="mono" style="font-size:12px">${U.esc(r[1])}</td><td style="font-size:12px">${U.esc(r[2])}</td><td class="num">${U.esc(r[3])}</td></tr>`).join('')}</tbody></table>` : '<div class="muted" style="font-size:12px;margin-top:6px">Sin pagos pendientes de aplicar.</div>'}
           </div>
         </div>` : ''}
       ${state.kind === 'planillas-comision' ? tarifasDetect() : ''}
@@ -167,7 +553,7 @@ Orbit.importa = (function () {
     return `<div style="text-align:center;padding:24px 8px">
         <div style="font-size:52px">✅</div>
         <div style="font-family:var(--f-display);font-weight:800;font-size:20px;margin-top:8px">Importación lista para aplicar</div>
-        <p class="muted" style="max-width:380px;margin:10px auto 0">Los registros se integran a la capa de datos y quedan disponibles en todos los módulos relacionados.</p>
+        <p class="muted" style="max-width:380px;margin:10px auto 0">${(state.parsed && IMPORT_MAP[state.kind] && state.modo !== 'documental') ? '<b>' + state.parsed.rows.length + ' registros</b> de tu archivo se integrarán a <b>' + IMPORT_MAP[state.kind].label + '</b> — crea lo nuevo, actualiza lo existente, sin duplicar.' : 'Los registros se integran a la capa de datos y quedan disponibles en todos los módulos relacionados.'}</p>
         ${m.conciliacion ? `<button class="btn ghost" style="margin-top:16px">Aplicar pagos por póliza →</button>` : ''}
         <div style="margin-top:20px;display:flex;gap:8px;justify-content:center">
           <button class="btn ghost" id="imp-again">Importar otro</button>
@@ -182,11 +568,102 @@ Orbit.importa = (function () {
     dr.querySelectorAll('.imp-mode-b').forEach(b => b.addEventListener('click', () => { state.modo = b.dataset.modo; paint(); }));
     const fileInput = dr.querySelector('#imp-file');
     if (fileInput) fileInput.addEventListener('change', e => {
-      state.files = [...e.target.files].map(f => f.name);
-      state.filesReal = [...e.target.files];
+      const files = [...e.target.files];
+      state.files = files.map(f => f.name);
+      state.filesReal = files; state.parsed = null; state.processing = null;
       const fl = dr.querySelector('#imp-files');
       if (fl) fl.innerHTML = state.files.map(n => `<span class="mail-chip">📎 ${U.esc(n)}</span>`).join('');
-      if (state.files.length) setTimeout(() => { state.step = state.modo === 'documental' ? 3 : 2; paint(); }, 400);
+      if (!files.length) return;
+      const f0 = files[0];
+      const ext = (f0.name.split('.').pop() || '').toLowerCase();
+      const goPreview = () => {
+        state.processing = null;
+        // Base de datos inicial: detectar a qué entidad corresponde el archivo por sus columnas
+        if (state.kind === 'base-inicial' && state.parsed && state.parsed.headers && state.parsed.headers.length) {
+          let best = 'clientes', score = -1;
+          ['clientes', 'polizas', 'vehiculos', 'movimientos-finanzas', 'estados-cuenta'].forEach(k => { const n = Object.keys(mapHeaders(k, state.parsed.headers)).length; if (n > score) { score = n; best = k; } });
+          state.kind = best; state.meta = KINDS[best] || state.meta;
+        }
+        state.step = 2; paint();
+      };
+      const fail = (why) => { state.parsed = null; state.processing = null; state.step = 2; paint(); if (why && Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('⚠ ' + why); };
+      if (state.modo === 'documental') { setTimeout(() => { state.step = 3; paint(); }, 300); return; }
+      // CSV / TSV / TXT
+      if (ext === 'csv' || ext === 'tsv' || ext === 'txt') {
+        const rd = new FileReader();
+        rd.onload = () => { try { state.parsed = (ext === 'txt') ? textToParsed(String(rd.result), state.kind) : parseDelimited(String(rd.result)); } catch (err) { state.parsed = null; } goPreview(); };
+        rd.onerror = () => fail('No se pudo leer el archivo');
+        rd.readAsText(f0); return;
+      }
+      // EXCEL — lee TODAS las hojas y combina; si el mapeo es débil, IA sobre el volcado
+      if (ext === 'xlsx' || ext === 'xls') {
+        showLoading('📊 Leyendo Excel (todas las hojas)…');
+        loadLib('https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js', 'XLSX').then(() => {
+          const rd = new FileReader();
+          rd.onload = async () => {
+            try {
+              const wb = XLSX.read(rd.result, { type: 'array' });
+              // combinar filas de todas las hojas
+              let combined = [], headerRow = null, dump = '';
+              wb.SheetNames.forEach(sn => {
+                const ws = wb.Sheets[sn]; const mat = XLSX.utils.sheet_to_json(ws, { header: 1, blankrows: false, defval: '' });
+                dump += '### Hoja: ' + sn + '\n' + mat.map(r => r.join(' | ')).join('\n') + '\n\n';
+                const p = matrixToParsed(mat);
+                if (p.headers.length) { if (!headerRow) headerRow = p.headers; combined = combined.concat(p.rows); }
+              });
+              const parsedXls = { headers: headerRow || [], rows: combined };
+              const mapped = Object.keys(mapHeaders(state.kind, parsedXls.headers)).length;
+              if (mapped < 2 && window.claude && window.claude.complete) { showLoading('🧠 Extracción inteligente con IA…'); const ai = await aiExtract(dump, state.kind); state.parsed = ai || parsedXls; }
+              else state.parsed = parsedXls;
+              state.processing = null; state.step = 2; paint();
+            } catch (err) { fail('No se pudo leer el Excel'); }
+          };
+          rd.onerror = () => fail('No se pudo leer el Excel'); rd.readAsArrayBuffer(f0);
+        }).catch(() => fail('No se pudo cargar el lector de Excel (sin conexión?)')); return;
+      }
+      // PDF — texto nativo y, si está escaneado, OCR por render de página
+      if (ext === 'pdf') {
+        showLoading('📄 Extrayendo texto del PDF…');
+        loadLib('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js', 'pdfjsLib').then(async () => {
+          try {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            const buf = await f0.arrayBuffer(); const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+            let txt = '';
+            for (let i = 1; i <= pdf.numPages; i++) { const pg = await pdf.getPage(i); const tc = await pg.getTextContent(); txt += tc.items.map(it => it.str).join(' ') + '\n'; }
+            if (txt.replace(/\s/g, '').length < 30) {
+              // PDF escaneado (sin capa de texto) → OCR por render de cada página
+              showLoading('🔍 PDF escaneado · aplicando OCR…');
+              const Tess = await loadLib('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js', 'Tesseract');
+              let ocr = '';
+              const maxP = Math.min(pdf.numPages, 5);
+              for (let i = 1; i <= maxP; i++) {
+                const pg = await pdf.getPage(i); const vp = pg.getViewport({ scale: 2 });
+                const cv = document.createElement('canvas'); cv.width = vp.width; cv.height = vp.height;
+                await pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+                const out = await Tess.recognize(cv, 'spa+eng'); ocr += out.data.text + '\n';
+              }
+              txt = ocr;
+            }
+            await procesarTexto(txt);
+          } catch (err) { fail('No se pudo leer el PDF. Probá modo documental.'); }
+        }).catch(() => fail('No se pudo cargar el lector de PDF')); return;
+      }
+      // WORD
+      if (ext === 'docx' || ext === 'doc') {
+        showLoading('📝 Leyendo Word…');
+        loadLib('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js', 'mammoth').then(async () => {
+          try { const buf = await f0.arrayBuffer(); const r = await mammoth.extractRawText({ arrayBuffer: buf }); await procesarTexto(r.value); } catch (err) { fail('No se pudo leer el Word'); }
+        }).catch(() => fail('No se pudo cargar el lector de Word')); return;
+      }
+      // IMAGEN (OCR)
+      if (/^(png|jpe?g|webp|gif|bmp|tiff?)$/.test(ext)) {
+        showLoading('🖼️ OCR de la imagen… (puede tardar unos segundos)');
+        loadLib('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js', 'Tesseract').then(async () => {
+          try { const out = await Tesseract.recognize(f0, 'spa+eng'); state.parsed = textToParsed(out.data.text, state.kind); goPreview(); } catch (err) { fail('No se pudo procesar la imagen'); }
+        }).catch(() => fail('No se pudo cargar el OCR')); return;
+      }
+      // otro formato: vista de ejemplo
+      setTimeout(() => { state.step = 2; paint(); }, 300);
     });
     if (drop) {
       // clic en el área (no en el botón-label) abre el selector de archivo real
@@ -197,13 +674,7 @@ Orbit.importa = (function () {
     }
     if (state.step === 2) {
       const it = dr.querySelector('#imp-iterar');
-      if (it) it.addEventListener('click', () => {
-        const ins = prompt('¿Qué quieres mejorar de la extracción? (ej. "corrige las fechas", "separa nombre y apellido", "ignora filas vacías")', '');
-        if (ins === null) return;
-        state.iterado = (state.iterado || 1) + 1;
-        paint();
-        const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '🔄 Extracción refinada con tu instrucción'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
-      });
+      if (it) it.addEventListener('click', () => { renderRemap(); });
       // editar tarifas detectadas (planilla de comisiones)
       dr.querySelectorAll('[data-rate]').forEach(inp => inp.addEventListener('change', () => { state.detectedRates[+inp.dataset.rate].pct = +inp.value || 0; }));
       // botón continuar al pie
@@ -215,10 +686,21 @@ Orbit.importa = (function () {
       bar.querySelector('#imp-next2').addEventListener('click', () => { state.step = 3; paint(); });
     }
     const fin = dr.querySelector('#imp-finish'); if (fin) fin.addEventListener('click', () => {
-      if (state.kind === 'planillas-comision' && state.detectedRates && Orbit.comeng) {
-        const n = Orbit.comeng.aplicarPlanilla(state.detectedRates);
-        if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('✓ ' + n + ' tarifas de comisión actualizadas');
+      let msg = '';
+      const kind = state.kind;
+      const isConc = (state.meta.conciliacion || kind === 'estados-banco');
+      if (state.parsed && state.modo !== 'documental' && isConc) {
+        const r = applyConciliacion(kind);
+        msg = '✓ Conciliación: ' + r.creados + ' creados · ' + r.aplicados + ' pagos aplicados';
+      } else if (state.parsed && state.modo !== 'documental' && IMPORT_MAP[kind]) {
+        const r = applyImport(kind);
+        msg = '✓ ' + r.created + ' creados · ' + r.updated + ' actualizados en ' + IMPORT_MAP[kind].label;
       }
+      if (kind === 'planillas-comision' && state.detectedRates && Orbit.comeng) {
+        const n = Orbit.comeng.aplicarPlanilla(state.detectedRates);
+        msg = '✓ ' + n + ' tarifas de comisión actualizadas';
+      }
+      if (msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2800); }
       close(); if (state.opts.onDone) state.opts.onDone();
     });
     const again = dr.querySelector('#imp-again'); if (again) again.addEventListener('click', () => { state.step = 1; paint(); });

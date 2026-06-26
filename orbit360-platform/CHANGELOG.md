@@ -278,3 +278,41 @@ Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos
 ### Notes
 - Los módulos no construidos muestran una pantalla de estado honesta con su alcance objetivo.
 - Pendiente backend real: reimplementar `store` manteniendo la API.
+
+## v0.83–v0.86 (25 Jun 2026)
+### Nuevo
+- ✉️ Correo interno: helper Orbit.correoCompose — todos los botones de correo abren redactor interno (no mailto)
+- 🤖 Orbit IA: módulo completo con 3 contextos (equipo/asesor/cliente), respuestas sobre datos reales del CRM
+- 💬 Notificaciones WhatsApp: 6 plantillas, envío wa.me + API, historial en expediente del cliente
+- 🧮 Cotizador: campos dinámicos por ramo (Auto/Vida/GM/Hogar/Daños), historial tab, tabs con navegación
+- 💳 Cobros: aplicar pago con modal real (fecha + factura + conciliación automática al cargar factura)
+- 💳 Filtro por póliza en cobros de la ficha del cliente
+- 📊 Insights comparativo profundo: tabla 12 meses clicable, drill-down por mes y por segmento, nueva vs renovada
+- 🎓 Academia: bug de backticks anidados corregido, cursos sin null
+- ⚡ Automatizaciones: ruta añadida al NAV
+- 📊 Reportes: exportar Excel (.xls) y PDF además de CSV
+- 🎨 Paletas: Suave/Orbia (púrpura) + Coral cálido; selector de tipografía
+- 👥 Roles: 8 roles con módulos predeterminados (Dirección/Admin/Comercial/Finanzas/Marketing/Operativo/Asesor/Asistente)
+- 🔒 Confidencialidad doble vía en el portal del cliente
+- 📚 Cursos por rol: 4 cursos nuevos (Leads para Asesores, Finanzas para Directores, Marketing Digital, Portal del Cliente)
+- 🔧 Capacitación técnica interna (docs/capacitacion-tecnica-interna.html)
+- 📱 Responsive global CSS pass
+
+### Corregido
+- Academia: función cursos() usaba Orbit.session.rol() inexistente → Orbit.auth.user().rol
+- Academia: template literals anidados en quiz → concatenación pura
+- Academia: curso null por doble coma en seed → eliminado
+- Tipografía duplicada en theme.js → removida
+- KPIs clicables en 10 módulos (renovaciones, aseguradoras, finanzas, marketing, siniestros, historial, polizas, cobros, cancelaciones, comisiones)
+- Editor de novedades: reemplaza prompt() con modal real con emoji picker y formato
+- Configuración: logo y manual usan FileReader real (no alert)
+- Cotizador: syntax error onclick quotes → data-drill attributes
+- Insights: syntax error onclick quotes → data-drill-mes/label attributes
+
+### Pendiente (todo #121)
+- Cotizador: guardar en historial al cotizar; PDF upload propuestas
+- Conciliación Finanzas: widget estado bancario vs recibos
+- Ficha póliza: editar asesor + sustitución vehículo desde endosos
+- Demo interactivo: actualizar con módulos v0.83-v0.86
+- Academia: 14 cursos por módulo completos
+- Handoff A&S: actualizar con v0.86+

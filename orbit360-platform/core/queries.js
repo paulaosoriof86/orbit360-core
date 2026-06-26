@@ -15,7 +15,7 @@ Orbit.q = (function () {
   function cobrosDe(cliId) { return S().where('cobros', c => c.clienteId === cliId); }
   function comisionesDe(cliId) { return S().where('comisiones', c => c.clienteId === cliId); }
   function actividadesDe(cliId) {
-    return S().where('actividades', a => a.clienteId === cliId).sort((a, b) => b.fecha.localeCompare(a.fecha));
+    return S().where('actividades', a => a.clienteId === cliId).sort((a, b) => String(b.fecha||'').localeCompare(String(a.fecha||'')));
   }
   function cancelacionesDe(cliId) { return S().where('cancelaciones', c => c.clienteId === cliId); }
   function vehiculosDe(cliId) { return S().where('vehiculos', v => v.clienteId === cliId); }
@@ -67,10 +67,10 @@ Orbit.q = (function () {
     return S().where('polizas', p => {
       const d = U.daysFromNow(p.vigenciaFin);
       return p.estado !== 'Cancelada' && d != null && d >= 0 && d <= dias;
-    }).sort((a, b) => a.vigenciaFin.localeCompare(b.vigenciaFin));
+    }).sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
   }
   function cobrosVencidos() {
-    return S().where('cobros', c => c.estado === 'Vencido').sort((a, b) => a.vence.localeCompare(b.vence));
+    return S().where('cobros', c => c.estado === 'Vencido').sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
   }
   /** Avance por asesor (prima vigente vs meta). */
   function leaderboard() {

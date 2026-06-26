@@ -29,7 +29,7 @@ Orbit.modules.comisiones = (function () {
       ${K.kpis([
         { label: 'Comisión generada', val: U.moneyShort(tot, 'GTQ'), color: 'var(--red)', foot: 'total cartera' },
         { label: 'Liquidada', val: U.moneyShort(liq, 'GTQ'), color: 'var(--ok)', foot: 'pagada', footTone: 'up' },
-        { label: 'Por liquidar', val: U.moneyShort(tot - liq, 'GTQ'), color: 'var(--warn)', foot: 'devengada' },
+        { label: 'Por liquidar', onclick: "location.hash='#/finanzas'", val: U.moneyShort(tot - liq, 'GTQ'), color: 'var(--warn)', foot: 'devengada' },
         { label: 'Registros', val: all.length, color: 'var(--info)', foot: 'cuotas con comisión' }
       ])}
 

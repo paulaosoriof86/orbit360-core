@@ -25,13 +25,13 @@ Orbit.modules.cancelaciones = (function () {
     const rows = all.filter(c => {
       const p = S().get('polizas', c.polizaId);
       return (!st.fmot || c.motivo === st.fmot) && (!st.fase || (p && p.asesorId === st.fase));
-    }).sort((a, b) => b.fecha.localeCompare(a.fecha));
+    }).sort((a, b) => String(b.fecha||'').localeCompare(String(a.fecha||'')));
     st.__count = rows.length + ' de ' + all.length;
 
     host.innerHTML = `<div class="page">
       ${K.bannerFor('cancelaciones', '')}
       ${K.kpis([
-        { label: 'Canceladas', val: all.length, color: 'var(--danger)', foot: 'histórico' },
+        { label: 'Canceladas', onclick: "location.hash='#/cancelaciones'", val: all.length, color: 'var(--danger)', foot: 'histórico' },
         { label: 'Valor perdido', val: U.moneyShort(perdido, 'GTQ'), color: 'var(--danger)', foot: 'prima anual', footTone: 'down' },
         { label: 'Motivo principal', val: '<span style="font-size:16px">' + (Object.entries(porMotivo).sort((a, b) => b[1] - a[1])[0] || ['—'])[0] + '</span>', color: 'var(--warn)', foot: 'más frecuente' },
         { label: 'Tasa de fuga', val: Math.round(all.length / (S().all('polizas').length || 1) * 100) + '%', color: 'var(--info)', foot: 'sobre cartera total' }
@@ -122,7 +122,33 @@ Orbit.modules.cancelaciones = (function () {
     back.querySelector('#cx-x').addEventListener('click', close);
     back.querySelector('#cx-save').addEventListener('click', () => {
       const rec = back.querySelector('#cx-rec').value;
-      S().update('cancelaciones', canId, { recuperacion: rec, recuperada: rec === 'Recuperada', notaRecuperacion: back.querySelector('#cx-nota').value.trim() });
+      const nota = back.querySelector('#cx-nota').value.trim();
+      S().update('cancelaciones', canId, { recuperacion: rec, recuperada: rec === 'Recuperada', notaRecuperacion: nota });
+      const hoy = new Date().toISOString().slice(0, 10);
+      // 1) actividad visible en el historial del cliente / excliente
+      if (c.clienteId) S().insert('actividades', { id: 'act' + Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'recuperacion', icon: rec === 'Recuperada' ? '✅' : '♻', fecha: hoy, titulo: 'Recuperación: ' + rec, detalle: (p ? p.numero + ' · ' : '') + (nota || rec) });
+      // 2) recuperación comercial → NEGOCIO en Leads (no Ops). Aparece en Cronograma/Mi Día por proximoToque.
+      if (c.clienteId && rec !== 'Recuperada' && rec !== 'No recuperable') {
+        const prox = new Date(); prox.setDate(prox.getDate() + 2);
+        const etapaMap = { 'Pendiente de contacto': 'nuevo', 'Llamada de retención agendada': 'contactado', 'Oferta de mejora enviada': 'propuesta', 'En negociación': 'negociacion' };
+        const neg = {
+          id: 'neg' + Date.now().toString().slice(-7), nombre: (cli ? cli.nombre : 'Cliente') + ' · recuperación', tipo: cli ? cli.tipo : 'Persona',
+          etapa: etapaMap[rec] || 'contactado', prob: 30, asesorId: c.asesorId, canal: 'Cliente actual/antiguo',
+          pais: cli ? cli.pais : 'GT', moneda: cli ? cli.moneda : 'GTQ', producto: p ? p.producto : 'Por definir', ramo: p ? p.ramo : 'Auto',
+          aseguradoraId: c.aseguradoraId || (p ? p.aseguradoraId : ''), primaEst: p ? (p.prima || 0) : 0, prioridad: 'Alta',
+          clienteId: c.clienteId, polizaId: c.polizaId, proximoToque: prox.toISOString().slice(0, 10),
+          checklist: [], nota: nota || rec, notas: nota || '', descripcion: 'Recuperación de póliza cancelada ' + (p ? p.numero : ''),
+          bitacora: [{ ts: hoy + ' 09:00', user: 'Equipo', campo: 'Creación', de: '', a: 'Recuperación desde cancelación', origen: 'cancelaciones' }],
+          comentarios: [], origen: 'Recuperación', creado: hoy, actualizado: hoy, archivado: false
+        };
+        S().insert('negocios', neg);
+        // recordatorio en novedades/cronograma
+        if (Orbit.ciclo && Orbit.ciclo.notify) { try { Orbit.ciclo.notify({ titulo: 'Recuperación pendiente', para: cli ? cli.nombre : '', canal: 'in-app' }); } catch (e) {} }
+      } else if (c.clienteId && rec === 'Recuperada' && Orbit.ciclo && Orbit.ciclo.crearGestion) {
+        // recuperada → reemisión operativa en Ops
+        try { Orbit.ciclo.crearGestion({ tipo: 'Reemisión por recuperación', titulo: 'Reemisión: ' + (p ? p.numero : c.clienteId), clienteId: c.clienteId, polizaId: c.polizaId, asesorId: c.asesorId, nota: nota || 'Cliente recuperado', origen: 'cancelaciones' }); } catch (e) {}
+      }
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = rec === 'Recuperada' ? '✅ Cliente recuperado · registrado en su ficha' : '♻ Acción de recuperación guardada · visible en la ficha y en Ops'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
       close();
     });
   }

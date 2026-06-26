@@ -33,10 +33,10 @@ Orbit.modules.renovaciones = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('renovaciones', `<button class="btn primary" onclick="Orbit.modules.renovaciones.campana()">📤 Campaña de renovación</button>`)}
       ${K.kpis([
-        { label: 'Vencidas', val: cols[0].items.length, color: 'var(--danger)', foot: 'recuperar ya', footTone: 'down' },
-        { label: '≤15 días', val: cols[1].items.length, color: 'var(--danger)', foot: 'urgente' },
-        { label: '16–45 días', val: cols[2].items.length, color: 'var(--warn)', foot: 'planificar' },
-        { label: 'Prima en juego', val: U.moneyShort(totalPrima, 'GTQ'), color: 'var(--ok)', foot: 'a 90 días' }
+        { label: 'Vencidas', val: cols[0].items.length, color: 'var(--danger)', foot: 'recuperar ya', footTone: 'down', onclick: "location.hash='#/renovaciones'" },
+        { label: '≤15 días', val: cols[1].items.length, color: 'var(--danger)', foot: 'urgente', onclick: "location.hash='#/renovaciones'" },
+        { label: '16–45 días', val: cols[2].items.length, color: 'var(--warn)', foot: 'planificar', onclick: "location.hash='#/renovaciones'" },
+        { label: 'Prima en juego', val: U.moneyShort(totalPrima, 'GTQ'), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:start">
         ${cols.map(c => `<div class="card" style="overflow:hidden">

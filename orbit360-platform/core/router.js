@@ -130,6 +130,7 @@ Orbit.router = (function () {
     host = document.getElementById('host');
     sidebar = document.getElementById('sidebar');
     buildSidebar();
+    try { if (Orbit.applyBrand) Orbit.applyBrand(); } catch (e) {}
     document.getElementById('burger').addEventListener('click', openMobile);
     document.querySelector('.sb-overlay').addEventListener('click', closeMobile);
     document.querySelectorAll('[data-home]').forEach(el => el.addEventListener('click', () => go('inicio')));

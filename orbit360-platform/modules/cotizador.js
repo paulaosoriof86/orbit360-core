@@ -14,6 +14,28 @@ Orbit.modules.cotizador = (function () {
   const TASAS_DEF = { auto: [{ hasta: 50000, tasa: 3.1, min: 2500 }, { hasta: 150000, tasa: 3.0, min: 2600 }, { hasta: 300000, tasa: 2.7, min: 2600 }, { hasta: 600000, tasa: 2.5, min: 2600 }, { hasta: 1e12, tasa: 2.3, min: 2600 }] };
   const RECARGO_FRACC = { 1: 0, 2: 6.5, 4: 9.5, 6: 10.5, 12: 13.5 };
   let st = { pais: 'GT', ramo: 'Auto', valor: 120000, anio: 2022, fracc: 12, cliente: '', filas: [] };
+  let tabCot = 'cotizar';
+  const COT_LOG_KEY = 'orbit360_cot_hist';
+  function getCotLog(){ try{ return JSON.parse(localStorage.getItem(COT_LOG_KEY)||'[]'); }catch(e){ return []; } }
+  function saveCotLog(l){ try{ localStorage.setItem(COT_LOG_KEY, JSON.stringify(l)); }catch(e){} }
+
+
+  function camposPorRamo(ramo) {
+    if (ramo === 'Auto') return `<label class="ce-l">📅 Año del vehículo<input id="cz-anio" class="o-sel" type="number" value="${st.anio}" min="1990" max="2026"></label><label class="ce-l">🚗 Marca / Modelo<input id="cz-marca" class="o-sel" value="${U.esc(st.marca||'')}" placeholder="Toyota Corolla..."></label><label class="ce-l">🔢 Placa<input id="cz-placa" class="o-sel" value="${U.esc(st.placa||'')}" placeholder="P-123ABC"></label>`;
+    if (ramo === 'Vida') return `<label class="ce-l">🎂 Edad del asegurado<input id="cz-edad" class="o-sel" type="number" value="${st.edad||35}" min="18" max="80"></label><label class="ce-l">💰 Suma asegurada<input id="cz-suma" class="o-sel" type="number" value="${st.suma||100000}"></label>`;
+    if (ramo === 'Gastos Médicos') return `<label class="ce-l">👨‍👩‍👧 Tipo<select id="cz-gm-tipo" class="o-sel"><option ${st.gmTipo==='Individual'?'selected':''}>Individual</option><option ${st.gmTipo==='Familiar'?'selected':''}>Familiar</option></select></label><label class="ce-l">🎂 Edad<input id="cz-edad" class="o-sel" type="number" value="${st.edad||35}"></label><label class="ce-l">🏥 Suma máxima<input id="cz-suma" class="o-sel" type="number" value="${st.suma||500000}"></label>`;
+    if (ramo === 'Hogar') return `<label class="ce-l">🏠 Tipo de inmueble<select class="o-sel"><option>Residencia</option><option>Apartamento</option><option>Local comercial</option></select></label><label class="ce-l">📐 M² construidos<input id="cz-m2" class="o-sel" type="number" value="${st.m2||120}"></label>`;
+    if (ramo === 'Daños') return `<label class="ce-l">🏭 Giro / Actividad<input id="cz-giro" class="o-sel" value="${U.esc(st.giro||'')}" placeholder="Comercio, industria..."></label><label class="ce-l">📦 Bienes a asegurar<input id="cz-bienes" class="o-sel" value="${U.esc(st.bienes||'')}" placeholder="Inventario, maquinaria..."></label>`;
+    return '';
+  }
+  function vCotHistorial() {
+    const log = getCotLog();
+    if (!log.length) return '<div class="card pad" style="text-align:center;color:var(--ink-3);margin-bottom:16px">Sin cotizaciones guardadas aún.</div>';
+    return '<div class="card" style="overflow:hidden;margin-bottom:16px"><table class="tbl"><thead><tr><th>Fecha</th><th>Cliente</th><th>Ramo</th><th>País</th><th>Aseg.</th><th>Estado</th><th></th></tr></thead><tbody>'
+      + log.map(l => '<tr><td class="mono" style="font-size:11.5px">' + (l.fecha||'—') + '</td><td>' + U.esc(l.cliente||'—') + '</td><td><span class="badge info" style="font-size:10px">' + U.esc(l.ramo||'—') + '</span></td><td>' + U.esc(l.pais||'—') + '</td><td>' + (l.aseg||0) + '</td><td><span class="badge ' + (l.estado==='Emitida'?'ok':'warn') + '" style="font-size:10px">' + U.esc(l.estado||'Guardada') + '</span></td><td><button class="btn ghost sm" data-chl="' + U.esc(l.id) + '">Cargar →</button></td></tr>'
+      ).join('') + '</tbody></table></div>';
+  }
+  function cargarHistorial(id) { const log = getCotLog(); const e = log.find(x => x.id === id); if (e && e.state) { Object.assign(st, e.state); tabCot = 'cotizar'; render(host); } }
 
   function asegElegibles() { return S().all('aseguradoras').filter(a => a.vinculada !== false && (!st.pais || a.pais === st.pais)); }
   function ivaPais(p) { return (Orbit.primas && Orbit.primas.cfgPais) ? Orbit.primas.cfgPais(p).iva : (p === 'CO' ? 19 : 12); }
@@ -25,14 +47,14 @@ Orbit.modules.cotizador = (function () {
     if (!st.filas.length) st.filas = asg.slice(0, 3).map(a => ({ id: a.id, modo: 'tasas', prima: 0, sel: true, res: null }));
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '🧮', title: 'Cotizador', sub: 'Cotiza con tus aseguradoras y arma el comparativo', features: [] })}
-      <div class="cz-grid">
+      <div class="tabs" style="max-width:380px;margin-bottom:16px"><div class="tab ${tabCot==='cotizar'?'active ':''}tab" data-czt="cotizar">🧮 Cotizador</div><div class="tab ${tabCot==='historial'?'active ':''}tab" data-czt="historial">📋 Historial</div></div>${tabCot === 'historial' ? vCotHistorial() : ''}<div class="cz-grid" style="${tabCot==='historial'?'display:none':''}">
         <div class="card pad">
           <div class="asg-sec-t">📋 1 · Datos del riesgo</div>
           <div class="cgrid">
             <label class="ce-l">🌎 País<select id="cz-pais" class="o-sel"><option ${st.pais === 'GT' ? 'selected' : ''}>GT</option><option ${st.pais === 'CO' ? 'selected' : ''}>CO</option></select></label>
             <label class="ce-l">🛡️ Ramo<select id="cz-ramo" class="o-sel">${['Auto', 'Vida', 'Gastos Médicos', 'Hogar', 'Daños'].map(r => `<option ${r === st.ramo ? 'selected' : ''}>${r}</option>`).join('')}</select></label>
             <label class="ce-l">💰 Valor asegurado<input id="cz-valor" class="o-sel" type="number" value="${st.valor}"></label>
-            <label class="ce-l">📅 Año (si auto)<input id="cz-anio" class="o-sel" type="number" value="${st.anio}"></label>
+            ${camposPorRamo(st.ramo)}
             <label class="ce-l">💳 Pagos<select id="cz-fracc" class="o-sel">${[1, 2, 4, 6, 12].map(f => `<option value="${f}" ${f === st.fracc ? 'selected' : ''}>${f === 1 ? 'Contado' : f + ' pagos'}</option>`).join('')}</select></label>
             <label class="ce-l">🧑 Cliente<input id="cz-cliente" class="o-sel" value="${U.esc(st.cliente)}" placeholder="Nombre del prospecto"></label>
           </div>
@@ -48,8 +70,10 @@ Orbit.modules.cotizador = (function () {
     bind(); paintAsgs();
   }
   function bind() {
-    const set = (id, k, num) => { const el = host.querySelector(id); if (el) el.addEventListener('change', () => { st[k] = num ? +el.value : el.value; if (k === 'pais') { st.filas = []; render(host); } }); };
+    const set = (id, k, num) => { const el = host.querySelector(id); if (el) el.addEventListener('change', () => { st[k] = num ? +el.value : el.value; if (k === 'pais') { st.filas = []; render(host); } else if (k === 'ramo') { render(host); } }); };
     set('#cz-pais', 'pais'); set('#cz-ramo', 'ramo'); set('#cz-valor', 'valor', true); set('#cz-anio', 'anio', true); set('#cz-fracc', 'fracc', true); set('#cz-cliente', 'cliente');
+    host.querySelectorAll('[data-czt]').forEach(b => b.addEventListener('click', () => { tabCot = b.dataset.czt; render(host); }));
+    host.querySelectorAll('[data-chl]').forEach(b => b.addEventListener('click', () => cargarHistorial(b.dataset.chl)));
     host.querySelector('#cz-add').addEventListener('click', () => { const a = asegElegibles().find(x => !st.filas.some(f => f.id === x.id)); if (a) { st.filas.push({ id: a.id, modo: 'tasas', prima: 0, sel: true }); paintAsgs(); } });
     host.querySelector('#cz-gen').addEventListener('click', cotizar);
   }

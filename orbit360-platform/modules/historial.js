@@ -22,7 +22,7 @@ Orbit.modules.historial = (function () {
       return (!st.fq || txt.includes(st.fq.toLowerCase())) &&
         (!st.ftipo || a.tipo === st.ftipo) &&
         (!st.fase || a.asesorId === st.fase);
-    }).sort((a, b) => b.fecha.localeCompare(a.fecha));
+    }).sort((a, b) => String(b.fecha||'').localeCompare(String(a.fecha||'')));
   }
 
   function render(host) {
@@ -40,10 +40,10 @@ Orbit.modules.historial = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('historial', '')}
       ${K.kpis([
-        { label: 'Interacciones', val: all.length, color: 'var(--red)', foot: 'registradas' },
-        { label: 'Llamadas', val: porTipo.llamada || 0, color: 'var(--info)', foot: 'telefónicas' },
-        { label: 'WhatsApp', val: porTipo.whatsapp || 0, color: 'var(--ok)', foot: 'mensajes' },
-        { label: 'Reuniones', val: porTipo.reunion || 0, color: 'var(--warn)', foot: 'asesorías' }
+        { label: 'Interacciones', val: all.length, color: 'var(--red)', foot: 'registradas', onclick: "location.hash='#/historial'" },
+        { label: 'Llamadas', val: porTipo.llamada || 0, color: 'var(--info)', foot: 'telefónicas', onclick: "location.hash='#/historial'" },
+        { label: 'WhatsApp', val: porTipo.whatsapp || 0, color: 'var(--ok)', foot: 'mensajes', onclick: "location.hash='#/historial'" },
+        { label: 'Reuniones', val: porTipo.reunion || 0, color: 'var(--warn)', foot: 'asesorías', onclick: "location.hash='#/historial'" }
       ])}
       <div class="card" style="overflow:hidden">
         ${K.filterBar(FDEFS(), st)}

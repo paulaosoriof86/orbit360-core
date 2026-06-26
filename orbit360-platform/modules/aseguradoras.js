@@ -23,9 +23,9 @@ Orbit.modules.aseguradoras = (function () {
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '🏢', title: 'Orbit Aseguradoras', sub: 'Directorio, contactos, accesos, cuentas y documentos', features: [], actions: `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button><button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>` })}
       ${K.kpis([
-        { label: 'En directorio', val: all.length, color: 'var(--red)', foot: 'GT + CO' },
-        { label: 'Vinculadas', val: vinc.length, color: 'var(--ok)', foot: 'con vinculación activa', footTone: 'up' },
-        { label: 'Sin vincular', val: all.length - vinc.length, color: 'var(--ink-3)', foot: 'disponibles' }
+        { label: 'En directorio', val: all.length, color: 'var(--red)', foot: 'GT + CO', onclick: "location.hash='#/aseguradoras'" },
+        { label: 'Vinculadas', val: vinc.length, color: 'var(--ok)', foot: 'con vinculación activa', footTone: 'up', onclick: "location.hash='#/aseguradoras'" },
+        { label: 'Sin vincular', val: all.length - vinc.length, color: 'var(--ink-3)', foot: 'disponibles', onclick: "location.hash='#/aseguradoras'" }
       ])}
       <div class="cfg-note" style="margin-bottom:14px">Habilita/deshabilita cada aseguradora según las <b>vinculaciones</b> del intermediario (las deshabilitadas no aparecen al cotizar/emitir). <b>Importar</b> agrega o actualiza el directorio de forma inteligente, o solo almacena documentos. Quién puede ver este módulo se define en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/equipo'">Equipo y permisos</a>.</div>
       <div class="asg-grid">${all.map(a => card(a)).join('')}</div>

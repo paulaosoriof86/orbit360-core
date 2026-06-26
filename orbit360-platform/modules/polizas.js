@@ -25,7 +25,7 @@ Orbit.modules.polizas = (function () {
         (!st.fasg || p.aseguradoraId === st.fasg) &&
         (!st.fase || p.asesorId === st.fase) &&
         (!st.fest || p.estado === st.fest);
-    }).sort((a, b) => st.sort === 'prima' ? b.prima - a.prima : a.vigenciaFin.localeCompare(b.vigenciaFin));
+    }).sort((a, b) => st.sort === 'prima' ? ((b.prima || 0) - (a.prima || 0)) : String(a.vigenciaFin || '').localeCompare(String(b.vigenciaFin || '')));
   }
 
   function render(host) {
@@ -41,7 +41,7 @@ Orbit.modules.polizas = (function () {
         { label: 'Pólizas vigentes', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'activas en cartera' },
         { label: 'Prima vigente', val: U.moneyShort(primaVig, 'GTQ'), color: 'var(--ok)', foot: 'anualizada' },
         { label: 'Por renovar ≤45 d', val: all.filter(p => p.estado === 'Por renovar').length, color: 'var(--warn)', foot: 'requieren gestión' },
-        { label: 'Canceladas', val: all.filter(p => p.estado === 'Cancelada').length, color: 'var(--danger)', foot: 'histórico' }
+        { label: 'Canceladas', onclick: "location.hash='#/cancelaciones'", val: all.filter(p => p.estado === 'Cancelada').length, color: 'var(--danger)', foot: 'histórico' }
       ])}
       <div class="card" style="overflow:hidden">
         ${K.filterBar(FDEFS(), st)}

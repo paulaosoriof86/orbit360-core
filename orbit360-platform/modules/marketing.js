@@ -32,9 +32,9 @@ Orbit.modules.marketing = (function () {
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '📣', title: 'Orbit Marketing', sub: 'Calendario de contenidos · redes · automatización', features: [], actions: `<button class="btn ghost" id="mk-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬇ Importar calendario</button><button class="btn primary" id="mk-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Contenido</button>` })}
       ${K.kpis([
-        { label: 'Contenidos del mes', val: arr.length, color: 'var(--red)', foot: pub.length + ' publicados' },
-        { label: 'Alcance', val: alcance.toLocaleString('es'), color: 'var(--info)', foot: 'personas' },
-        { label: 'Interacciones', val: pub.reduce((s, c) => s + ((c.stats && c.stats.interac) || 0), 0), color: 'var(--ok)', foot: 'likes/coment/share' },
+        { label: 'Contenidos del mes', val: arr.length, color: 'var(--red)', foot: pub.length + ' publicados', onclick: "location.hash='#/marketing'" },
+        { label: 'Alcance', val: alcance.toLocaleString('es'), color: 'var(--info)', foot: 'personas', onclick: "location.hash='#/marketing'" },
+        { label: 'Interacciones', val: pub.reduce((s, c) => s + ((c.stats && c.stats.interac) || 0), 0), color: 'var(--ok)', foot: 'likes/coment/share', onclick: "location.hash='#/marketing'" },
         { label: 'Leads generados', val: leads, color: 'var(--warn)', foot: 'desde contenidos', footTone: 'up' }
       ])}
       <div class="mk-bar">
@@ -60,13 +60,7 @@ Orbit.modules.marketing = (function () {
     host.querySelector('#mk-new').addEventListener('click', () => ficha(null));
     host.querySelector('#mk-gen').addEventListener('click', () => { generarMes(); });
     host.querySelector('#mk-reprog').addEventListener('click', () => { reprogramar(); });
-    host.querySelector('#mk-imp').addEventListener('click', () => Orbit.importa.open('calendario-marketing', { onDone: () => {
-      // import demo: crea contenidos de ejemplo en el mes visible
-      const [yy, mm] = mes.split('-').map(Number);
-      const base = [['🚗 Auto: 5 preguntas antes de renovar', 'Auto', 'Instagram'], ['🏠 Hogar: qué cubre de verdad tu póliza', 'Hogar / Daños', 'Facebook'], ['📈 Tendencias 2026 en seguros', 'Tendencias', 'LinkedIn'], ['🔄 Renueva a tiempo y ahorra', 'Renovaciones', 'WhatsApp']];
-      base.forEach((b, i) => S().insert('contenidos', { id: 'mk' + Date.now().toString().slice(-6) + i, fecha: mes + '-' + String(4 + i * 6).padStart(2, '0'), hora: '08:10', canal: b[2], tipo: 'Texto', enfoque: b[1], estado: 'Programado', titulo: b[0], copy: 'Contenido importado del calendario. Revisa y ajusta antes de publicar.', cta: 'Escríbeme por WhatsApp', hashtags: '#Seguros #GestiónDeRiesgos', stats: null }));
-      toast('✓ Calendario importado · 4 contenidos agregados'); render(host);
-    } }));
+    host.querySelector('#mk-imp').addEventListener('click', () => Orbit.importa.open('calendario-marketing', { onDone: () => { render(host); } }));
     host.querySelectorAll('[data-day]').forEach(el => el.addEventListener('click', e => { if (e.target.closest('[data-c]') || e.target.closest('[data-add]')) return; ficha(null, el.dataset.day); }));
     host.querySelectorAll('[data-add]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); ficha(null, el.dataset.add); }));
     host.querySelectorAll('[data-c]').forEach(el => el.addEventListener('click', () => ficha(el.dataset.c)));
@@ -107,11 +101,21 @@ Orbit.modules.marketing = (function () {
   function enfColor(e) { return ENF_COLOR[e] || '#C5162E'; }
 
   /* generar mes con IA (demo: rellena días con ideas de seguros) */
-  function generarMes() {
-    const ideas = [['🚗 Auto: lo que tu póliza sí cubre', 'Auto', 'Instagram'], ['❤️ Vida: proteger a los tuyos en 3 pasos', 'Vida y GM', 'Facebook'], ['🏠 Hogar: riesgos que olvidamos', 'Hogar / Daños', 'LinkedIn'], ['📈 Tendencias 2026 en seguros', 'Tendencias', 'LinkedIn'], ['🔄 Renueva a tiempo y ahorra', 'Renovaciones', 'WhatsApp'], ['📚 ¿Qué es el deducible? En simple', 'Educativo', 'Instagram']];
+  async function generarMes() {
+    const fallback = [['🚗 Auto: lo que tu póliza sí cubre', 'Auto', 'Instagram'], ['❤️ Vida: proteger a los tuyos en 3 pasos', 'Vida y GM', 'Facebook'], ['🏠 Hogar: riesgos que olvidamos', 'Hogar / Daños', 'LinkedIn'], ['📈 Tendencias 2026 en seguros', 'Tendencias', 'LinkedIn'], ['🔄 Renueva a tiempo y ahorra', 'Renovaciones', 'WhatsApp'], ['📚 ¿Qué es el deducible? En simple', 'Educativo', 'Instagram']];
     const [y, mm] = mes.split('-').map(Number);
+    let ideas = null;
+    if (window.claude && window.claude.complete) {
+      toast('🧠 Generando ideas con IA…');
+      try {
+        const prompt = 'Genera 6 ideas de contenido de redes sociales para una correduría de seguros, para el mes de ' + MESES[mm - 1] + '. Devuelve SOLO un JSON array sin markdown, cada item: ["título con emoji","enfoque/ramo","canal (Instagram/Facebook/LinkedIn/WhatsApp)"]. Español, variado, útil.';
+        const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt }] });
+        const m = String(out).match(/\[[\s\S]*\]/); if (m) { const arr = JSON.parse(m[0]); if (Array.isArray(arr) && arr.length) ideas = arr.filter(x => Array.isArray(x) && x.length >= 3); }
+      } catch (e) {}
+    }
+    if (!ideas || !ideas.length) ideas = fallback;
     ideas.forEach((b, i) => { const dd = 3 + i * 4; if (dd <= new Date(y, mm, 0).getDate()) S().insert('contenidos', { id: 'mk' + Date.now().toString().slice(-6) + i, fecha: mes + '-' + String(dd).padStart(2, '0'), hora: '08:10', canal: b[2], tipo: 'Texto', enfoque: b[1], estado: 'Idea', titulo: b[0], copy: 'Borrador generado con IA — revisa el tono antes de programar.', cta: 'Escríbeme por WhatsApp', hashtags: '#Seguros #GestiónDeRiesgos', stats: null }); });
-    toast('✨ ' + ideas.length + ' ideas generadas con IA para ' + MESES[mm - 1]); render(host);
+    toast('✨ ' + ideas.length + ' ideas generadas para ' + MESES[mm - 1]); render(host);
   }
   /* reprogramar publicaciones atrasadas al siguiente día disponible */
   function reprogramar() {
@@ -165,14 +169,27 @@ Orbit.modules.marketing = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#mk-x').addEventListener('click', close); $('#mk-cancel').addEventListener('click', close);
-    $('#mk-ia').addEventListener('click', () => {
+    $('#mk-ia').addEventListener('click', async () => {
       const enf = $('#mk-enfoque').value, canal = $('#mk-canal').value;
       const emoji = enfEmoji(enf);
+      const iaB = $('#mk-ia');
+      if (window.claude && window.claude.complete) {
+        iaB.textContent = '🧠 Generando…'; iaB.disabled = true;
+        try {
+          const prompt = 'Eres community manager de una correduría de seguros. Escribe un post para ' + canal + ' sobre "' + enf + '". Devuelve SOLO JSON sin markdown: {"titulo":"...","copy":"cuerpo con emojis y 2-3 ideas","cta":"llamado a la acción","hashtags":"#... #..."}. Tono cercano, claro, en español.';
+          const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt }] });
+          const m = String(out).match(/\{[\s\S]*\}/);
+          if (m) { const o = JSON.parse(m[0]); if (o.titulo && !$('#mk-titulo').value) $('#mk-titulo').value = o.titulo; if (o.copy) $('#mk-copy').value = o.copy; if (o.cta) $('#mk-cta').value = o.cta; if (o.hashtags) $('#mk-hash').value = o.hashtags; }
+          iaB.textContent = '✨ Generar copy con IA'; iaB.disabled = false;
+          toast('✨ Copy generado con IA — revisá y ajustá el tono'); return;
+        } catch (e) { iaB.textContent = '✨ Generar copy con IA'; iaB.disabled = false; }
+      }
+      // fallback sin IA
       if (!$('#mk-titulo').value) $('#mk-titulo').value = emoji + ' ' + enf + ': 3 claves que sí valen la pena en 2026';
       $('#mk-copy').value = `${emoji} Te comparto en simple sobre ${enf.toLowerCase()}:\n\n1) ✅ Lo que más impacta a empresas y familias (sin tecnicismos).\n2) 📌 Un tip práctico que puedes aplicar hoy.\n3) 🤝 Cómo te acompañamos si necesitas revisarlo.\n\nLa idea no es complicar: es darte claridad y confianza.`;
       if (!$('#mk-cta').value) $('#mk-cta').value = 'Escríbeme REVISIÓN por WhatsApp y te ayudo sin compromiso';
       if (!$('#mk-hash').value) $('#mk-hash').value = '#Seguros #GestiónDeRiesgos #' + (canal === 'LinkedIn' ? 'Empresas' : 'Familias');
-      toast('✨ Copy generado con IA — revisa y ajusta el tono');
+      toast('✨ Copy generado — revisa y ajusta el tono');
     });
     $('#mk-pieza').addEventListener('click', () => {
       if (Orbit.cat && Orbit.cat.all().addons && !Orbit.cat.all().addons) {}

@@ -34,13 +34,17 @@ Orbit.kit = (function () {
     </div>`;
   }
   function kpis(items) {
-    return `<div class="kpi-row" style="margin-bottom:16px">${items.map(it => `
-      <div class="kpi"><div class="k-accent" style="background:${it.color || 'var(--red)'}"></div>
-        <div class="k-label">${it.label}</div>
-        <div class="k-val">${it.val}</div>
-        <div class="k-foot ${it.footTone || 'muted'}">${it.foot || ''}</div></div>`).join('')}</div>`;
+    return '<div class="kpi-row" style="margin-bottom:16px">' + items.map(function(it) {
+      var tag = it.onclick ? 'button' : 'div';
+      var btnAttr = it.onclick ? ' onclick="' + it.onclick + '" title="Ver detalle"' : '';
+      return '<' + tag + btnAttr + ' class="kpi' + (it.onclick ? ' kpi-click' : '') + '">'
+        + '<div class="k-accent" style="background:' + (it.color || 'var(--red)') + '"></div>'
+        + '<div class="k-label">' + it.label + '</div>'
+        + '<div class="k-val">' + it.val + '</div>'
+        + '<div class="k-foot ' + (it.footTone || 'muted') + '">' + (it.foot || '') + '</div>'
+        + '</' + tag + '>';
+    }).join('') + '</div>';
   }
-  /** celda cliente con avatar + deep-link al 360 */
   function clienteCell(cliId) {
     const c = S().get('clientes', cliId); if (!c) return '—';
     return `<a style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="event.stopPropagation();location.hash='#/cliente360?c=${c.id}'">
@@ -91,3 +95,59 @@ Orbit.kit = (function () {
 
   return { head, banner, bannerFor, kpis, clienteCell, asesorCell, aseguradoraCell, filterBar, wireFilters, ramoOptions, asesorOptions, aseguradoraOptions };
 })();
+
+/* ---------- KPI con detalle (modal con desglose de registros) ---------- */
+Orbit.kpi = function (preset, arg) {
+  const U = Orbit.ui, S = Orbit.store, q = Orbit.q;
+  const money = (n, m) => U.money(n || 0, m || 'GTQ');
+  // presets: cada uno devuelve { titulo, cols, rows:[{cells, go}] }
+  const P = {
+    'polizas-vigentes': () => mk('Pólizas vigentes', S.where('polizas', p => p.estado === 'Vigente'), 'poliza'),
+    'polizas-porrenovar': () => mk('Pólizas por renovar', S.where('polizas', p => p.estado === 'Por renovar'), 'poliza'),
+    'polizas-todas': () => mk('Todas las pólizas', S.all('polizas'), 'poliza'),
+    'cobros-pendientes': () => mk('Cobros pendientes', S.where('cobros', c => c.estado === 'Pendiente'), 'cobro'),
+    'cobros-vencidos': () => mk('Cobros vencidos', S.where('cobros', c => c.estado === 'Vencido'), 'cobro'),
+    'cobros-pagados': () => mk('Cobros aplicados', S.where('cobros', c => c.estado === 'Pagado'), 'cobro'),
+    'renov-proximas': () => mk('Renovaciones próximas', (q.renovacionesProximas ? q.renovacionesProximas(30) : []), 'poliza'),
+    'cancel-todas': () => mk('Cancelaciones', S.all('cancelaciones'), 'cancel'),
+    'clientes-todos': () => mk('Clientes', S.all('clientes'), 'cliente'),
+    'siniestros-todos': () => mk('Siniestros / reclamos', S.all('reclamos'), 'reclamo')
+  };
+  function mk(titulo, arr, tipo) {
+    let cols, rows;
+    if (tipo === 'poliza') {
+      cols = ['Cliente', 'Póliza', 'Ramo', 'Prima', 'Estado'];
+      rows = arr.map(p => ({ cells: [cliName(p.clienteId), p.numero || '—', p.ramo || '—', money(p.prima, p.moneda), badge(p.estado)], go: () => { location.hash = '#/cliente360?c=' + p.clienteId; } }));
+    } else if (tipo === 'cobro') {
+      cols = ['Cliente', 'Cuota', 'Monto', 'Vence', 'Estado'];
+      rows = arr.map(c => ({ cells: [cliName(c.clienteId), c.cuota || '—', money(c.monto, c.moneda), U.fmtDate(c.vence), badge(c.estado)], go: () => { location.hash = '#/cliente360?c=' + c.clienteId; } }));
+    } else if (tipo === 'cancel') {
+      cols = ['Cliente', 'Motivo', 'Valor perdido', 'Fecha'];
+      rows = arr.map(c => ({ cells: [cliName(c.clienteId), c.motivo || '—', money(c.valorPerdido, c.moneda), U.fmtDate(c.fecha)], go: () => { location.hash = '#/cliente360?c=' + c.clienteId; } }));
+    } else if (tipo === 'reclamo') {
+      cols = ['Cliente', 'N°', 'Tipo', 'Estado'];
+      rows = arr.map(r => ({ cells: [cliName(r.clienteId), r.numero || '—', r.tipo || '—', badge(r.estado)], go: () => { location.hash = '#/cliente360?c=' + r.clienteId; } }));
+    } else {
+      cols = ['Cliente', 'Tipo', 'País', 'Identificación'];
+      rows = arr.map(c => ({ cells: [U.esc(c.nombre), c.tipo || '—', c.pais || '—', c.identificacion || '—'], go: () => { location.hash = '#/cliente360?c=' + c.id; } }));
+    }
+    return { titulo, cols, rows };
+  }
+  function cliName(id) { const c = S.get('clientes', id); return c ? U.esc(c.nombre) : '—'; }
+  function badge(e) { const map = { Vigente: 'ok', Pagado: 'ok', Pendiente: 'warn', Vencido: 'danger', Cancelada: 'danger', 'Por renovar': 'info' }; return `<span class="badge ${map[e] || 'neutral'}">${U.esc(e || '—')}</span>`; }
+  const data = P[preset] ? P[preset]() : null;
+  if (!data) return;
+  let back = document.getElementById('kpi-modal'); if (back) back.remove();
+  back = document.createElement('div'); back.id = 'kpi-modal'; back.className = 'drawer-back open';
+  back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+  back.innerHTML = `<div class="card" style="width:min(760px,96vw);max-height:88vh;overflow:auto;padding:0">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">${data.titulo} · ${data.rows.length}</b><button class="imp-x" id="kpm-x">✕</button></div>
+    <div style="overflow-x:auto"><table class="tbl"><thead><tr>${data.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+      <tbody>${data.rows.length ? data.rows.map((r, i) => `<tr class="clickable" data-r="${i}">${r.cells.map(c => `<td>${c}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${data.cols.length}" class="muted" style="text-align:center;padding:24px">Sin registros.</td></tr>`}</tbody></table></div>
+  </div>`;
+  document.body.appendChild(back);
+  const close = () => back.remove();
+  back.addEventListener('click', e => { if (e.target === back) close(); });
+  back.querySelector('#kpm-x').onclick = close;
+  back.querySelectorAll('[data-r]').forEach(tr => tr.onclick = () => { const r = data.rows[+tr.dataset.r]; close(); if (r && r.go) r.go(); });
+};

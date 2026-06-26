@@ -33,7 +33,7 @@ Orbit.modules.reportes = (function () {
         <div class="rep-main">
           <div class="rep-head">
             <div><b style="font-family:var(--f-display);font-size:17px">${r.icon} ${r.t}</b><div class="muted" style="font-size:12.5px;margin-top:3px">${r.desc} · <b>${data.length}</b> registros</div></div>
-            <div style="display:flex;gap:8px"><button class="btn ghost sm" id="rep-mail">📧 Programar por correo</button><button class="btn primary sm" id="rep-exp">⬇ Exportar CSV</button></div>
+            <div style="display:flex;gap:8px"><button class="btn ghost sm" id="rep-mail">📧 Programar por correo</button><button class="btn ghost sm" id="rep-exp">⬇ CSV</button><button class="btn ghost sm" id="rep-excel">📊 Excel</button><button class="btn ghost sm" id="rep-pdf">🖨 PDF</button></div>
           </div>
           <div class="card" style="overflow:hidden;margin-top:14px"><div style="overflow-x:auto;max-height:540px"><table class="tbl">
             <thead><tr>${r.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
@@ -44,7 +44,9 @@ Orbit.modules.reportes = (function () {
     </div>`;
     host.querySelectorAll('[data-r]').forEach(b => b.addEventListener('click', () => { sel = b.dataset.r; render(host); }));
     host.querySelector('#rep-exp').addEventListener('click', () => exportCSV(r, data));
-    host.querySelector('#rep-mail').addEventListener('click', () => alert('Programar reporte: define frecuencia (diaria/semanal/mensual) y destinatarios. Se envía automáticamente vía la integración de correo.'));
+    host.querySelector('#rep-excel').addEventListener('click', () => exportExcel(r, data));
+    host.querySelector('#rep-pdf').addEventListener('click', () => exportPDF(r, data));
+    host.querySelector('#rep-mail').addEventListener('click', () => alert('Programar reporte: define frecuencia (diaria/semanal/mensual) y destinatarios. Se envía vía la integración de correo.'));
   }
 
   function exportCSV(r, data) {
@@ -52,8 +54,27 @@ Orbit.modules.reportes = (function () {
     const csv = [r.cols.map(esc).join(',')].concat(data.map(row => row.map(esc).join(','))).join('\n');
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Orbit_' + r.t.replace(/\s+/g, '_') + '.csv'; a.click();
-    const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Reporte exportado (CSV)'; document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
+    toast('✓ Reporte exportado (CSV)');
   }
+  function exportExcel(r, data) {
+    // HTML-table trick: Excel abre .xls con HTML table
+    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">'
+      + '<head><meta charset="UTF-8"><style>th{background:#1E2227;color:white}td,th{border:1px solid #ccc;padding:6px}</style></head>'
+      + '<body><table><thead><tr>' + r.cols.map(c => `<th>${esc(c)}</th>`).join('') + '</tr></thead>'
+      + '<tbody>' + data.map(row => '<tr>' + row.map(c => `<td>${esc(String(c))}</td>`).join('') + '</tr>').join('') + '</tbody></table></body></html>';
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Orbit_' + r.t.replace(/\s+/g, '_') + '.xls'; a.click();
+    toast('✓ Reporte exportado (Excel)');
+  }
+  function exportPDF(r, data) {
+    const w = window.open('', '_blank'); if (!w) return;
+    w.document.write(`<html><head><title>${r.t}</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:sans-serif;font-size:11px}table{width:100%;border-collapse:collapse}th{background:#1E2227;color:#fff;padding:7px;text-align:left}td{padding:6px;border-bottom:1px solid #eee}h2{color:#C5162E}</style></head><body><h2>${r.icon} ${r.t}</h2><table><thead><tr>${r.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${data.slice(0, 500).map(row => `<tr>${row.map(c => `<td>${String(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`);
+    w.document.close(); setTimeout(() => w.print(), 300);
+    toast('🖨 Abre el diálogo de impresión — selecciona "Guardar como PDF"');
+  }
+
+  function toast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
 
   return { render };
 })();

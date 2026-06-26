@@ -592,7 +592,7 @@ Orbit.ciclo = (function () {
     const t = document.createElement('div'); t.className = 'ciclo-toast notif';
     t.innerHTML = `<span>🔔 ${U.esc(o.titulo || 'Notificación')}${o.para ? ' · ' + U.esc(o.para) : ''}</span>` +
       (waNum ? `<a href="https://wa.me/${waNum}?text=${msg}" target="_blank" rel="noopener">💬 WhatsApp</a>` : '') +
-      (o.email ? `<a href="mailto:${o.email}?subject=${msg}" target="_blank" rel="noopener">✉ Correo</a>` : '');
+      (o.email ? `<a style="cursor:pointer" onclick="Orbit.correoCompose({para:'${o.email}',asunto:'${(o.titulo||'').replace(/'/g,'')}'})">✉ Correo</a>` : '');
     document.body.appendChild(t); setTimeout(() => t.remove(), 5600);
     document.dispatchEvent(new CustomEvent('orbit:notify'));
   }

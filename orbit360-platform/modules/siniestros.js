@@ -24,9 +24,9 @@ Orbit.modules.siniestros = (function () {
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '🚨', title: 'Orbit Siniestros', sub: 'Reclamos, bitácora y seguimiento con aseguradoras', features: [], actions: `<button class="btn ghost" id="si-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬇ Importar bitácora</button><button class="btn primary" id="si-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Reclamo</button>` })}
       ${K.kpis([
-        { label: 'Reclamos', val: arr.length, color: 'var(--red)', foot: abiertos.length + ' abiertos' },
-        { label: 'En proceso', val: abiertos.length, color: 'var(--warn)', foot: 'requieren gestión' },
-        { label: 'Indemnización pagada', val: U.moneyShort(pagado, 'GTQ'), color: 'var(--ok)', foot: 'a clientes', footTone: 'up' },
+        { label: 'Reclamos', val: arr.length, color: 'var(--red)', foot: abiertos.length + ' abiertos', onclick: "location.hash='#/siniestros'" },
+        { label: 'En proceso', val: abiertos.length, color: 'var(--warn)', foot: 'requieren gestión', onclick: "location.hash='#/siniestros'" },
+        { label: 'Indemnización pagada', val: U.moneyShort(pagado, 'GTQ'), color: 'var(--ok)', foot: 'a clientes', footTone: 'up', onclick: "location.hash='#/siniestros'" },
         { label: 'Tasa de aprobación', val: arr.length ? Math.round(arr.filter(r => ['Aprobado', 'Pagado'].includes(r.estado)).length / arr.length * 100) + '%' : '—', color: 'var(--info)', foot: 'aprobados / total' }
       ])}
       <div class="tabs" style="max-width:520px;margin-bottom:14px">

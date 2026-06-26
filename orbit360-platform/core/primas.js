@@ -73,7 +73,7 @@ Orbit.primas = (function () {
    */
   function recibos(d, opts) {
     opts = opts || {};
-    const n = Math.max(1, cuotasDe(opts.frecuencia || 'Contado'));
+    const n = Math.max(1, +opts.cuotas || cuotasDe(opts.frecuencia || 'Contado'));
     const inicio = opts.vigenciaInicio ? new Date(opts.vigenciaInicio) : new Date();
     const comAsegPct = +opts.comAseguradoraPct || 0;
     const comVendPct = +opts.comVendedorPct || 0;

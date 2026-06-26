@@ -9,6 +9,7 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.ops = (function () {
   const U = Orbit.ui, K = Orbit.kit, C = () => Orbit.ciclo;
   let host, unsub;
+  const st = { q: '', fAseg: '', fAse: '' };
 
   function render(h) {
     host = h;
@@ -35,11 +36,36 @@ Orbit.modules.ops = (function () {
   }
 
   function draw() {
-    const board = C().opsBoard();
+    let board = C().opsBoard();
+    // aplicar búsqueda + filtros
+    if (st.q || st.fAseg || st.fAse) {
+      const ql = (st.q || '').toLowerCase();
+      board = board.map(col => {
+        const items = col.items.filter(it => {
+          const r = it.rec;
+          const cli = r.clienteId ? Orbit.store.get('clientes', r.clienteId) : null;
+          const asg = r.aseguradoraId ? Orbit.store.get('aseguradoras', r.aseguradoraId) : null;
+          const txt = [(cli && cli.nombre) || r.titulo || r.nombre || '', r.numero || '', (asg && asg.nombre) || ''].join(' ').toLowerCase();
+          if (ql && txt.indexOf(ql) < 0) return false;
+          if (st.fAseg && r.aseguradoraId !== st.fAseg) return false;
+          if (st.fAse && r.asesorId !== st.fAse) return false;
+          return true;
+        });
+        return Object.assign({}, col, { items });
+      });
+    }
     const totNeg = board.filter(c => c.def.kind === 'negocio').reduce((s, c) => s + c.items.length, 0);
     const totGes = board.filter(c => c.def.kind === 'gestion').reduce((s, c) => s + c.items.length, 0);
+    const asegs = Orbit.store.all('aseguradoras').filter(a => a.vinculada !== false);
+    const ases = Orbit.store.all('asesores').filter(a => !a.inactivo);
     host.innerHTML = `<div class="page">
       ${K.bannerFor('ops', `<button class="btn ghost" id="op-lists">⚙ Listas</button><button class="btn ghost" id="op-new-ges">+ Gestión</button><button class="btn primary" id="op-new-neg">+ Nuevo ingreso</button>`)}
+      <div class="ops-toolbar">
+        <input id="op-q" class="o-sel ops-search" placeholder="🔎 Buscar cliente, póliza o aseguradora…" value="${U.esc(st.q || '')}">
+        <select id="op-faseg" class="o-sel"><option value="">Todas las aseguradoras</option>${asegs.map(a => `<option value="${a.id}" ${st.fAseg === a.id ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select>
+        <select id="op-fase" class="o-sel"><option value="">Todos los responsables</option>${ases.map(a => `<option value="${a.id}" ${st.fAse === a.id ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select>
+        ${(st.q || st.fAseg || st.fAse) ? '<button class="btn ghost sm" id="op-clear">✕ Limpiar</button>' : ''}
+      </div>
       <div class="ops-legend">
         <span class="muted">Tablero operativo en vivo · <b>${totNeg}</b> negocios en flujo · <b>${totGes}</b> gestiones</span>
         <span class="ops-sync">🔁 Sincronizado con Orbit Leads</span>
@@ -52,6 +78,10 @@ Orbit.modules.ops = (function () {
     host.querySelector('#op-lists').addEventListener('click', () => C().gestionarListas('opsListas'));
     host.querySelector('#op-new-ges').addEventListener('click', () => C().nuevaGestion());
     host.querySelector('#op-new-neg').addEventListener('click', () => C().nuevoNegocio());
+    const qi = host.querySelector('#op-q'); if (qi) { qi.addEventListener('input', () => { st.q = qi.value; const pos = qi.selectionStart; draw(); const nq = host.querySelector('#op-q'); if (nq) { nq.focus(); try { nq.setSelectionRange(pos, pos); } catch (e) {} } }); }
+    const fa = host.querySelector('#op-faseg'); if (fa) fa.addEventListener('change', () => { st.fAseg = fa.value; draw(); });
+    const fs = host.querySelector('#op-fase'); if (fs) fs.addEventListener('change', () => { st.fAse = fs.value; draw(); });
+    const cl = host.querySelector('#op-clear'); if (cl) cl.addEventListener('click', () => { st.q = ''; st.fAseg = ''; st.fAse = ''; draw(); });
     host.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
       b.dataset.add === 'gestion' ? C().nuevaGestion() : C().nuevoNegocio();
     }));
