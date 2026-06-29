@@ -13,7 +13,22 @@ Orbit.modules.cotizador = (function () {
   let host;
   const TASAS_DEF = { auto: [{ hasta: 50000, tasa: 3.1, min: 2500 }, { hasta: 150000, tasa: 3.0, min: 2600 }, { hasta: 300000, tasa: 2.7, min: 2600 }, { hasta: 600000, tasa: 2.5, min: 2600 }, { hasta: 1e12, tasa: 2.3, min: 2600 }] };
   const RECARGO_FRACC = { 1: 0, 2: 6.5, 4: 9.5, 6: 10.5, 12: 13.5 };
-  let st = { pais: 'GT', ramo: 'Auto', valor: 120000, anio: 2022, fracc: 12, cliente: '', filas: [] };
+  let st = { pais: 'GT', ramo: 'Auto', valor: 120000, anio: 2022, fracc: 12, cliente: '', clienteId: '', asesorId: '', marca: '', linea: '', filas: [] };
+  // Catálogo marca → líneas (genérico, editable por cliente en migración)
+  const VEH = {
+    'Toyota': ['Corolla', 'Hilux', 'RAV4', 'Yaris', 'Land Cruiser', 'Prado', 'Fortuner'],
+    'Hyundai': ['Tucson', 'Accent', 'Elantra', 'Santa Fe', 'Creta', 'i10'],
+    'Kia': ['Sportage', 'Rio', 'Picanto', 'Sorento', 'Seltos'],
+    'Nissan': ['Sentra', 'Frontier', 'Versa', 'Kicks', 'X-Trail'],
+    'Mazda': ['Mazda 3', 'CX-5', 'CX-30', 'Mazda 2', 'BT-50'],
+    'Chevrolet': ['Spark', 'Onix', 'Tracker', 'Captiva', 'D-Max'],
+    'Mitsubishi': ['L200', 'Montero', 'Outlander', 'ASX'],
+    'Honda': ['Civic', 'CR-V', 'HR-V', 'Fit'],
+    'Volkswagen': ['Jetta', 'Tiguan', 'Gol', 'Amarok', 'T-Cross'],
+    'Ford': ['Ranger', 'Escape', 'Explorer', 'F-150'],
+    'Suzuki': ['Swift', 'Vitara', 'Jimny', 'Baleno'],
+    'Otra': ['—']
+  };
   let tabCot = 'cotizar';
   const COT_LOG_KEY = 'orbit360_cot_hist';
   function getCotLog(){ try{ return JSON.parse(localStorage.getItem(COT_LOG_KEY)||'[]'); }catch(e){ return []; } }
@@ -21,7 +36,18 @@ Orbit.modules.cotizador = (function () {
 
 
   function camposPorRamo(ramo) {
-    if (ramo === 'Auto') return `<label class="ce-l">📅 Año del vehículo<input id="cz-anio" class="o-sel" type="number" value="${st.anio}" min="1990" max="2026"></label><label class="ce-l">🚗 Marca / Modelo<input id="cz-marca" class="o-sel" value="${U.esc(st.marca||'')}" placeholder="Toyota Corolla..."></label><label class="ce-l">🔢 Placa<input id="cz-placa" class="o-sel" value="${U.esc(st.placa||'')}" placeholder="P-123ABC"></label>`;
+    if (ramo === 'Auto') {
+      const marcas = Object.keys(VEH);
+      const lineas = VEH[st.marca] || [];
+      const subramo = st.pais === 'CO'
+        ? ['Todo riesgo', 'RC / SOAT+', 'Pérdidas totales', 'Pérdidas parciales', 'Por kilómetros', 'Pesado']
+        : ['Liviano', 'Responsabilidad Civil', 'Pesado', 'Pick-up / Comercial', 'Motocicleta', 'Grúa'];
+      return `<label class="ce-l">📅 Año<input id="cz-anio" class="o-sel" type="number" value="${st.anio}" min="1990" max="2026"></label>`
+        + `<label class="ce-l">🚙 Tipo / Subramo<select id="cz-sub" class="o-sel">${subramo.map(x => `<option ${x === st.sub ? 'selected' : ''}>${x}</option>`).join('')}</select></label>`
+        + `<label class="ce-l">🚗 Marca<select id="cz-marca" class="o-sel"><option value="">— Marca —</option>${marcas.map(m => `<option ${m === st.marca ? 'selected' : ''}>${m}</option>`).join('')}</select></label>`
+        + `<label class="ce-l">🔻 Línea<select id="cz-linea" class="o-sel" ${lineas.length ? '' : 'disabled'}><option value="">${lineas.length ? '— Línea —' : 'Elige marca primero'}</option>${lineas.map(l => `<option ${l === st.linea ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`
+        + `<label class="ce-l">🔢 Placa<input id="cz-placa" class="o-sel" value="${U.esc(st.placa || '')}" placeholder="P-123ABC"></label>`;
+    }
     if (ramo === 'Vida') return `<label class="ce-l">🎂 Edad del asegurado<input id="cz-edad" class="o-sel" type="number" value="${st.edad||35}" min="18" max="80"></label><label class="ce-l">💰 Suma asegurada<input id="cz-suma" class="o-sel" type="number" value="${st.suma||100000}"></label>`;
     if (ramo === 'Gastos Médicos') return `<label class="ce-l">👨‍👩‍👧 Tipo<select id="cz-gm-tipo" class="o-sel"><option ${st.gmTipo==='Individual'?'selected':''}>Individual</option><option ${st.gmTipo==='Familiar'?'selected':''}>Familiar</option></select></label><label class="ce-l">🎂 Edad<input id="cz-edad" class="o-sel" type="number" value="${st.edad||35}"></label><label class="ce-l">🏥 Suma máxima<input id="cz-suma" class="o-sel" type="number" value="${st.suma||500000}"></label>`;
     if (ramo === 'Hogar') return `<label class="ce-l">🏠 Tipo de inmueble<select class="o-sel"><option>Residencia</option><option>Apartamento</option><option>Local comercial</option></select></label><label class="ce-l">📐 M² construidos<input id="cz-m2" class="o-sel" type="number" value="${st.m2||120}"></label>`;
@@ -56,7 +82,9 @@ Orbit.modules.cotizador = (function () {
             <label class="ce-l">💰 Valor asegurado<input id="cz-valor" class="o-sel" type="number" value="${st.valor}"></label>
             ${camposPorRamo(st.ramo)}
             <label class="ce-l">💳 Pagos<select id="cz-fracc" class="o-sel">${[1, 2, 4, 6, 12].map(f => `<option value="${f}" ${f === st.fracc ? 'selected' : ''}>${f === 1 ? 'Contado' : f + ' pagos'}</option>`).join('')}</select></label>
-            <label class="ce-l">🧑 Cliente<input id="cz-cliente" class="o-sel" value="${U.esc(st.cliente)}" placeholder="Nombre del prospecto"></label>
+            <label class="ce-l">🧑 Cliente<select id="cz-cliid" class="o-sel"><option value="">— Prospecto nuevo —</option>${S().all('clientes').map(c => `<option value="${c.id}" ${c.id === st.clienteId ? 'selected' : ''}>${U.esc(c.nombre)}</option>`).join('')}</select></label>
+            <label class="ce-l" id="cz-clinom-wrap" style="${st.clienteId ? 'display:none' : ''}">✍️ Nombre del prospecto<input id="cz-cliente" class="o-sel" value="${U.esc(st.cliente)}" placeholder="Nombre del prospecto"></label>
+            <label class="ce-l">🧑‍💼 Asesor<select id="cz-ase" class="o-sel"><option value="">— Asignar —</option>${S().all('asesores').filter(a => !a.inactivo).map(a => `<option value="${a.id}" ${a.id === st.asesorId ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select></label>
           </div>
           <div class="asg-sec-t" style="margin-top:16px">🏢 2 · Aseguradoras</div>
           <div class="muted" style="font-size:11.5px;margin-bottom:9px">Modo <b>📊 tasas</b> calcula con tu tabla; <b>✍️ manual</b> ingresas la prima recibida. Marca ✅ las que quieras llevar al comparativo.</div>
@@ -72,9 +100,15 @@ Orbit.modules.cotizador = (function () {
   function bind() {
     const set = (id, k, num) => { const el = host.querySelector(id); if (el) el.addEventListener('change', () => { st[k] = num ? +el.value : el.value; if (k === 'pais') { st.filas = []; render(host); } else if (k === 'ramo') { render(host); } }); };
     set('#cz-pais', 'pais'); set('#cz-ramo', 'ramo'); set('#cz-valor', 'valor', true); set('#cz-anio', 'anio', true); set('#cz-fracc', 'fracc', true); set('#cz-cliente', 'cliente');
+    set('#cz-sub', 'sub'); set('#cz-ase', 'asesorId');
+    // marca → recarga líneas
+    const mk = host.querySelector('#cz-marca'); if (mk) mk.addEventListener('change', () => { st.marca = mk.value; st.linea = ''; render(host); });
+    const ln = host.querySelector('#cz-linea'); if (ln) ln.addEventListener('change', () => { st.linea = ln.value; });
+    // cliente existente → oculta nombre manual y precarga
+    const cli = host.querySelector('#cz-cliid'); if (cli) cli.addEventListener('change', () => { st.clienteId = cli.value; const c = cli.value ? S().get('clientes', cli.value) : null; if (c) { st.cliente = c.nombre; if (c.asesorId) st.asesorId = c.asesorId; if (c.pais) st.pais = c.pais; } render(host); });
     host.querySelectorAll('[data-czt]').forEach(b => b.addEventListener('click', () => { tabCot = b.dataset.czt; render(host); }));
     host.querySelectorAll('[data-chl]').forEach(b => b.addEventListener('click', () => cargarHistorial(b.dataset.chl)));
-    host.querySelector('#cz-add').addEventListener('click', () => { const a = asegElegibles().find(x => !st.filas.some(f => f.id === x.id)); if (a) { st.filas.push({ id: a.id, modo: 'tasas', prima: 0, sel: true }); paintAsgs(); } });
+    host.querySelector('#cz-add').addEventListener('click', () => { const a = asegElegibles().find(x => !st.filas.some(f => f.id === x.id)); if (a) { st.filas.push({ id: a.id, modo: 'tasas', prima: 0, sel: true }); paintAsgs(); } else { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = 'Ya agregaste todas las aseguradoras de ' + st.pais; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); } });
     host.querySelector('#cz-gen').addEventListener('click', cotizar);
   }
   function paintAsgs() {

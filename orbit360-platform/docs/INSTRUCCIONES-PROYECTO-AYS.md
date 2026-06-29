@@ -141,21 +141,119 @@ Cuando encuentres un error y mi capacidad esté agotada:
 Decir: *"Continúa Orbit 360. Lee docs/PLAN-INFRAESTRUCTURA.md, CHANGELOG.md y
 docs/INSTRUCCIONES-PROYECTO-AYS.md, y sigue con los pendientes priorizados."*
 
-## 10. Pendientes conocidos (estado a v0.94)
-**Listo y verificado:** importadores inteligentes (clientes, pólizas con recibos automáticos,
-vehículos, aseguradoras, bitácora siniestros, estados de cuenta con conciliación real, movimientos,
-calendario), re-mapeo manual (Iterar), cuotas en crear/editar/renovar, comparativo de renovación
-multi-aseguradora, Equipo multi-rol + correo + módulos por usuario, automatizaciones editables,
-cancelaciones→ficha+Ops, CxC/CxP autoadministrables, Academia visor interactivo + edición de
-curso/lección, Orbit IA, correo interno, notificaciones WA.
+## 10. Pendientes conocidos (estado a v1.09 — TODO el plan completado)
+**Listo y verificado (142/142 todos):** importadores inteligentes (clientes, pólizas con recibos
+automáticos por forma de pago, vehículos, aseguradoras, bitácora siniestros multi-cliente, estados
+de cuenta con conciliación real, movimientos, calendario), re-mapeo manual (Iterar), cuotas en
+crear/editar/renovar, comparativo de renovación multi-aseguradora, Equipo multi-rol + correo +
+módulos por usuario, automatizaciones editables, cancelaciones→ficha+Ops, CxC/CxP autoadministrables,
+Academia (visor interactivo, editar/borrar curso, categorías, reordenar lecciones, videos, markdown),
+Orbit IA, correo interno, notificaciones WA, **Cotizador** (marca→línea cascada, cliente/asesor,
+multi-ramo, historial, impresión por aseguradora, derivación a comparativo), **Comparativo**
+standalone (datos del riesgo con marca→línea, PDF, manual, historial), KPIs con modal de detalle,
+cursos profundos por módulo, importación→historial vivo, logo white-label, editar planes, auto-branding.
 
-**Pendiente (para próxima capacidad):**
-1. **Cotizador (#122)** — reconstruir con la lógica/UI del HTML real de A&S (sin tarifas hardcoded;
-   tarifas configurables por cliente; aseguradoras desde `Orbit.store`). **Readjuntar el HTML al inicio.**
-2. **Comparativo de cotizaciones (#123)** — reconstruir igual al HTML de A&S, acepta varios PDFs de
-   propuestas, con historial.
-3. **Cursos por módulo/rol profundos (#129)** y **generación IA de curso interactivo (#131)**.
-4. **Portal del cliente (#139)** — reportar pagos→Ops, gestiones en Ops, documentos visibles, Aprende.
-5. **KPIs con modal de detalle (#142)** — desglose de registros al clicar cada KPI.
-6. Verificar a fondo: campaña de actualización en Calidad de datos; emojis/pines en nueva plantilla;
-   reflejo del logo en login; edición/creación de planes en Config; sincronía movimientos↔Finanzas.
+**Ajustes finos opcionales (no bloquean migración):** extracción IA real de PDF en cotizador/comparativo
+(hoy estima), dropdowns marca/línea más extensos por país, integración Canva/Metricool real (hoy stub),
+embed nativo de Word (usar Drive /preview o convertir a PDF).
+
+---
+
+## 11. PROMPT para ChatGPT/Codex — corrección inmediata + documentar para mejorar el prototipo
+> Pega este texto como **instrucción del proyecto en ChatGPT/Codex** (el repo de A&S). Garantiza que
+> ChatGPT corrija sin romper y que documente para que Claude mejore el prototipo base.
+
+```
+Eres el ingeniero de mantenimiento de Orbit 360 (repo de Alianzas y Soluciones). Reglas innegociables:
+
+1. ARQUITECTURA: los módulos NUNCA tocan localStorage ni el DOM global directo. Solo leen/escriben
+   vía Orbit.store (all/get/where/insert/update/remove). Para conectar backend solo se reescribe
+   data/store.js manteniendo esa API. No cambies la firma de Orbit.store.
+2. NO PARCHES FRÁGILES: no dupliques lógica, no hardcodees datos, no rompas el patrón de cada módulo
+   (modales = drawer-back; KPIs = Orbit.kpi / K.kpis; banners = K.banner). Reutiliza helpers existentes.
+3. VERIFICA SIEMPRE: tras cada cambio de un .js, recarga la página completa y comprueba que el módulo
+   renderiza sin error de consola ANTES de dar por bueno el cambio. No afirmes que algo funciona sin verlo.
+4. ALCANCE MÍNIMO: corrige solo lo reportado. No rediseñes ni "mejores" lo que funciona.
+5. DOCUMENTA PARA EL PROTOTIPO BASE: por cada bug que corrijas, añade una entrada a
+   docs/BITACORA-ERRORES.md con: módulo, síntoma, causa raíz, archivo/función, fix aplicado, fecha y
+   estado. Esta bitácora es la fuente que se le pasa a Claude para mejorar el prototipo comercializable.
+6. DATOS FICTICIOS: si tocas seed.js, mantén datos ficticios (este repo es de A&S; los reales se
+   importan, no se hardcodean).
+
+Cuando te reporte un problema: (a) localiza el archivo y la función, (b) explícame en 2 líneas la causa,
+(c) aplica el fix mínimo, (d) recarga y verifica, (e) registra en docs/BITACORA-ERRORES.md, (f) confírmame
+qué archivos cambiaste para subir al repo.
+```
+
+### Prompt corto para reportar un problema puntual a ChatGPT
+```
+Bug en Orbit 360, módulo <X>: <qué hago> → <qué pasa> (esperaba <qué debería pasar>).
+Captura: <adjunta>. Corrige el fix mínimo sin romper el patrón del módulo ni Orbit.store, recarga y
+verifica que el módulo renderiza, y registra el fix en docs/BITACORA-ERRORES.md.
+```
+
+## 12. PROMPTS de conexión a BACKEND (por etapas) — para ChatGPT/Codex
+**Etapa 1 — Base de datos (Firestore):**
+```
+Reescribe data/store.js para usar Firebase Firestore manteniendo EXACTA la API actual
+(all/get/where/insert/update/remove/_emit). Cada "colección" del store = colección Firestore
+(clientes, polizas, cobros, comisiones, reclamos, gestiones, negocios, finmovs, contenidos, cursos,
+aseguradoras, asesores, vehiculos, acreedores, facturas, documentos, actividades). Usa onSnapshot
+para que _emit dispare el re-render en vivo. NO toques ningún módulo. Incluye config multi-tenant:
+prefija las colecciones por tenantId (Orbit.tenant).
+```
+**Etapa 2 — Autenticación y usuarios:**
+```
+Conecta core/auth.js a Firebase Auth. El login white-label usa el correo del usuario (campo email de
+asesores). Al crear un usuario en Equipo, crea su cuenta Auth y envía credenciales por correo/WA
+(vía Make). Respeta roles y módulos visibles por usuario (canSee). Mantén la cláusula de
+confidencialidad en primer ingreso (persistente en el perfil del usuario).
+```
+**Etapa 3 — Almacenamiento de documentos (Drive/Storage):**
+```
+Conecta la carga de documentos (importador documental, expediente cliente, lecciones Academia,
+docs de aseguradora) a Firebase Storage o Google Drive. Reemplaza los data URL por URLs reales.
+Estructura: carpeta por cliente (nombre completo); si no existe, créala y etiqueta el documento.
+```
+**Etapa 4 — Automatizaciones e integraciones (Make):**
+```
+Conecta el módulo Automatizaciones a webhooks de Make: cada evento activo (poliza_emitida,
+cobro_vence, solicitud_gestion, etc.) envía {evento, datos, plantilla} al webhook. Make ramifica a
+WhatsApp (Cloud API), correo (Outlook/Gmail) y Sheets. El diseño visual del correo se arma en Make;
+la plataforma envía la plantilla de texto con variables {nombre} {poliza} {link}...
+```
+**Etapa 5 — IA (Gemini/OpenAI):**
+```
+Conecta Orbit.ia y window.claude.complete a tu proveedor de IA (Gemini económico recomendado).
+Lo usan: extracción del importador inteligente, comparativo, análisis crítico de Insights/Finanzas,
+redacción de mensajes, generación de cursos y copy de marketing. Mantén el fallback si la IA falla.
+```
+
+## 13. Cómo actualizar A&S cuando MEJORE el prototipo base
+1. Aquí (Claude) evoluciona `orbit360-platform/` y entrega el ZIP nuevo.
+2. La lógica de negocio vive en `modules/` y `core/`; tu personalización de A&S vive en **datos y
+   configuración** (Orbit.tenant, paleta, logo, catálogos, aseguradoras, tarifas), NO en el código.
+3. Para actualizar A&S: reemplaza `modules/` y `core/` y `styles/` con los del ZIP nuevo. **Conserva**
+   tu `data/store.js` (ya conectado a backend) y tu configuración de tenant. Como los módulos solo
+   hablan con `Orbit.store`, la mejora entra sin tocar tus datos reales.
+4. Si una mejora cambia el ESQUEMA de datos, el ZIP traerá una nota de migración en CHANGELOG.md
+   (ej: "polizas ahora tiene campo X"). Aplica esa migración en tu Firestore.
+5. Registra en tu repo qué versión base del prototipo tienes (ej: "base v1.09") para saber qué traer.
+
+## 14. ¿Migrar en ChatGPT o Claude?
+- **Claude (aquí):** evoluciona el prototipo, ve el render, diseña. Ideal para nuevas funciones y UX.
+- **ChatGPT/Codex:** edita y hace push al repo de A&S, conecta backend, corrige incidencias con la
+  bitácora. No "ve" el render, pero es rápido para código y despliegue.
+- **Recomendado:** híbrido. Funciones nuevas y rediseños → Claude. Conexión backend, integraciones y
+  fixes técnicos urgentes → ChatGPT/Codex con la bitácora de errores como puente entre ambos.
+
+## 15. Documento maestro y fuentes a cargar en el proyecto nuevo
+Carga como fuentes/conocimiento del proyecto A&S (ChatGPT o Claude):
+1. **Este archivo** (`INSTRUCCIONES-PROYECTO-AYS.md`) como instrucción/CLAUDE.md.
+2. `docs/PLAN-INFRAESTRUCTURA.md` — plan maestro con todas las rondas de feedback.
+3. `CHANGELOG.md` — qué se construyó por versión (incluye notas de migración de esquema).
+4. `README.md` — arquitectura del build.
+5. `docs/capacitacion-tecnica-interna.html` — backend, integraciones, soporte, planes.
+6. El **ZIP del prototipo** (`orbit360-platform/`) como base de código.
+7. Tus **Excel reales** (clientes, pólizas, recibos, movimientos) — para importar, NO para hardcodear.
+

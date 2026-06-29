@@ -10,6 +10,39 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.comparativo = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   let host, props = [];
+  let meta = { cliente: '', ramo: 'Auto', marca: '', linea: '', anio: 2022, detalle: '' };
+  const VEH = {
+    'Toyota': ['Corolla', 'Hilux', 'RAV4', 'Yaris', 'Land Cruiser', 'Prado', 'Fortuner'],
+    'Hyundai': ['Tucson', 'Accent', 'Elantra', 'Santa Fe', 'Creta', 'i10'],
+    'Kia': ['Sportage', 'Rio', 'Picanto', 'Sorento', 'Seltos'],
+    'Nissan': ['Sentra', 'Frontier', 'Versa', 'Kicks', 'X-Trail'],
+    'Mazda': ['Mazda 3', 'CX-5', 'CX-30', 'Mazda 2', 'BT-50'],
+    'Chevrolet': ['Spark', 'Onix', 'Tracker', 'Captiva', 'D-Max'],
+    'Honda': ['Civic', 'CR-V', 'HR-V', 'Fit'],
+    'Volkswagen': ['Jetta', 'Tiguan', 'Gol', 'Amarok', 'T-Cross'],
+    'Otra': ['—']
+  };
+  function datosIniciales() {
+    const marcas = Object.keys(VEH), lineas = VEH[meta.marca] || [];
+    return `<div class="card pad" style="margin-bottom:14px">
+      <div class="asg-sec-t">📋 Datos del comparativo</div>
+      <div class="cgrid">
+        <label class="ce-l">🧑 Cliente / prospecto<input id="cp-cli" class="o-sel" value="${U.esc(meta.cliente)}" placeholder="Nombre"></label>
+        <label class="ce-l">🛡️ Ramo<select id="cp-ramo" class="o-sel">${['Auto', 'Vida', 'Gastos Médicos', 'Hogar', 'Daños'].map(r => `<option ${r === meta.ramo ? 'selected' : ''}>${r}</option>`).join('')}</select></label>
+        ${meta.ramo === 'Auto' ? `
+          <label class="ce-l">📅 Año<input id="cp-anio" class="o-sel" type="number" value="${meta.anio}"></label>
+          <label class="ce-l">🚗 Marca<select id="cp-marca" class="o-sel"><option value="">— Marca —</option>${marcas.map(m => `<option ${m === meta.marca ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+          <label class="ce-l">🔻 Línea<select id="cp-linea" class="o-sel" ${lineas.length ? '' : 'disabled'}><option value="">${lineas.length ? '— Línea —' : 'Elige marca'}</option>${lineas.map(l => `<option ${l === meta.linea ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`
+        : `<label class="ce-l">📝 Detalle del riesgo<input id="cp-det" class="o-sel" value="${U.esc(meta.detalle)}" placeholder="Suma, ubicación, edad…"></label>`}
+      </div>
+    </div>`;
+  }
+  function bindMeta() {
+    const set = (id, k, num) => { const el = host.querySelector(id); if (el) el.addEventListener('change', () => { meta[k] = num ? +el.value : el.value; if (k === 'ramo' || k === 'marca') render(host); }); };
+    set('#cp-cli', 'cliente'); set('#cp-ramo', 'ramo'); set('#cp-anio', 'anio', true); set('#cp-det', 'detalle');
+    const mk = host.querySelector('#cp-marca'); if (mk) mk.addEventListener('change', () => { meta.marca = mk.value; meta.linea = ''; render(host); });
+    const ln = host.querySelector('#cp-linea'); if (ln) ln.addEventListener('change', () => { meta.linea = ln.value; });
+  }
 
   function init() {
     if (Orbit._cots && Orbit._cots.length && !props.length) props = Orbit._cots.map(c => ({ nombre: c.nombre, color: c.color, total: c.total, neta: c.neta, iva: c.iva, cur: c.cur, ramo: c.ramo, cliente: c.cliente, fracc: c.fracc, origen: 'cotizador' }));
@@ -21,7 +54,8 @@ Orbit.modules.comparativo = (function () {
     const min = props.length ? Math.min(...props.map(p => p.total || 1e15)) : 0;
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '📋', title: 'Comparativo', sub: 'Compara propuestas (del cotizador o por PDF) y cierra con la mejor', features: [], actions: `<button class="btn ghost" id="cp-hist-b" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">🕘 Historial</button><button class="btn ghost" id="cp-pdf" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬆ Cargar propuestas (PDF)</button>` })}
-      ${props.length ? '' : '<div class="cfg-note" style="margin-bottom:14px">📋 El comparativo funciona <b>solo</b>: <b>⬆ carga PDFs</b> de propuestas (de aseguradoras sin tarifa) o <b>➕ agrégalas manual</b>. También puedes traerlas desde el <a style="color:var(--red);cursor:pointer" onclick="location.hash=\'#/cotizador\'">🧮 Cotizador</a> (opcional).</div>'}
+      ${props.length ? '' : '<div class="cfg-note" style="margin-bottom:14px">📋 El comparativo funciona <b>solo</b>: llena los <b>datos del riesgo</b> abajo, luego <b>⬆ carga PDFs</b> de propuestas o <b>➕ agrégalas manual</b>. También puedes traerlas desde el <a style="color:var(--red);cursor:pointer" onclick="location.hash=\'#/cotizador\'">🧮 Cotizador</a> (opcional).</div>'}
+      ${datosIniciales()}
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
         <b style="font-family:var(--f-display);font-size:16px">${props.length ? '⚖️ ' + props.length + ' propuestas · ' + ((props[0] || {}).ramo || '') : '⚖️ Nuevo comparativo'}</b>
         <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" id="cp-add">➕ Propuesta manual</button>${props.length ? `<button class="btn ghost sm" id="cp-save">💾 Guardar</button><button class="btn primary sm" id="cp-print">🖨 Imprimir</button>` : ''}</div>
@@ -31,6 +65,7 @@ Orbit.modules.comparativo = (function () {
     </div>`;
     host.querySelector('#cp-pdf').addEventListener('click', cargarPDF);
     host.querySelector('#cp-hist-b').addEventListener('click', verHist);
+    bindMeta();
     const add = host.querySelector('#cp-add'); if (add) add.addEventListener('click', manual);
     const sv = host.querySelector('#cp-save'); if (sv) sv.addEventListener('click', guardarHist);
     const pr = host.querySelector('#cp-print'); if (pr) pr.addEventListener('click', imprimir);

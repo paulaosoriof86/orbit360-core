@@ -74,13 +74,13 @@ Orbit.modules.configuracion = (function () {
           <td><select class="o-sel" data-role="${a.id}">${Object.keys(roles).map(r => `<option ${a.rol === r || (a.rol && a.rol.includes(r)) ? 'selected' : ''}>${r}</option>`).join('')}</select></td>
           <td>${a.comTipo ? `<span class="badge ${a.comTipo === 'variable' ? 'info' : 'neutral'}">${a.comTipo} · ${a.comPct}%</span>` : '—'}</td>
           <td class="num">${U.money(a.metaPrima, 'GTQ')}</td>
-          <td style="text-align:right"><button class="btn ghost sm" onclick="alert('Demo: editar permisos por módulo de ${U.esc(a.nombre)}')">Permisos</button></td>
+          <td style="text-align:right"><button class="btn ghost sm" onclick="Orbit.modules.equipo.editar('${a.id}')">Permisos</button></td>
         </tr>`).join('')}</tbody>
       </table></div>
       <div class="cfg-grid2">
         ${Object.entries(roles).map(([r, d]) => `<div class="cfg-rolecard"><b>${r}</b><span class="cfg-nivel">Nivel ${d.nivel}</span><p>${d.desc}</p></div>`).join('')}
       </div>
-      <button class="btn primary" style="margin-top:14px" onclick="alert('Demo: invitar usuario')">+ Invitar usuario</button>`;
+      <button class="btn primary" style="margin-top:14px" onclick="Orbit.modules.equipo.editar(null)">+ Invitar usuario</button>`;
   }
 
   /* ---------- PAÍSES Y MONEDAS ---------- */
@@ -100,7 +100,7 @@ Orbit.modules.configuracion = (function () {
         }).join('')}
       </div>
       <div class="cfg-note" style="margin-top:14px">💱 Las monedas <b>no se mezclan</b> entre países en ninguna sección: los totales se muestran por país o se normalizan explícitamente. Moneda base de reportes: <b>${t.monedaBase}</b>.</div>
-      <button class="btn ghost" style="margin-top:14px" onclick="alert('Demo: agregar país (catálogo configurable)')">+ Agregar país</button>`;
+      <button class="btn ghost" style="margin-top:14px" onclick="Orbit.modules.configuracion.agregarPais()">+ Agregar país</button>`;
   }
 
   /* ---------- INTEGRACIONES / ADD-ONS ---------- */
@@ -193,7 +193,7 @@ Orbit.modules.configuracion = (function () {
             <td><b>${r[0]}</b></td>
             <td><span class="badge ${r[1] === 'Conectado' ? 'ok' : r[1] === 'Pendiente' ? 'warn' : 'neutral'}">${r[1]}</span></td>
             <td>${r[2]}</td>
-            <td style="text-align:right"><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="alert('Demo: configurar credenciales (cifradas)')">Configurar</button></td>
+            <td style="text-align:right"><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.modules.configuracion.configIntegracion('${U.esc(r[0])}')">Configurar</button></td>
           </tr>`).join('')}
         </tbody>
       </table></div>`;
@@ -375,5 +375,48 @@ Orbit.modules.configuracion = (function () {
     fi.click();
   }
 
-  return { render, editarPlan, subirManualMarca };
+  function agregarPais() {
+    const nombre = prompt('Nombre del país:'); if (!nombre) return;
+    const code = (prompt('Código de 2 letras (ej. MX, PA, CR):', '') || '').toUpperCase().slice(0, 2); if (!code) return;
+    const iva = +prompt('IVA / impuesto de seguros (%) para ' + nombre + ':', '12') || 0;
+    const moneda = prompt('Moneda (ej. MXN, USD, PAB):', 'USD') || 'USD';
+    const gem = +prompt('Gastos de emisión por defecto (% sobre prima neta):', '0') || 0;
+    try {
+      const KEY = 'orbit360_paises';
+      const arr = JSON.parse(localStorage.getItem(KEY) || '[]');
+      arr.push({ code, nombre, iva, moneda, gastosEmisionPct: gem });
+      localStorage.setItem(KEY, JSON.stringify(arr));
+      if (Orbit.primas && Orbit.primas.registrarPais) Orbit.primas.registrarPais(code, { iva, moneda, gastosEmisionPct: gem });
+    } catch (e) {}
+    const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ País ' + nombre + ' agregado (IVA ' + iva + '%)'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
+    const host = document.getElementById('host'); if (host) render(host);
+  }
+  function configIntegracion(nombre) {
+    let back = document.getElementById('cf-integ'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'cf-integ'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    const saved = (() => { try { return JSON.parse(localStorage.getItem('orbit360_integ_' + nombre) || '{}'); } catch (e) { return {}; } })();
+    back.innerHTML = '<div class="card" style="width:min(460px,94vw);padding:0">'
+      + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🔌 Configurar ' + U.esc(nombre) + '</b><button class="imp-x" id="ci-x">✕</button></div>'
+      + '<div style="padding:18px 20px;display:grid;gap:11px">'
+      + '<label class="ce-l">API key / Token<input id="ci-key" class="o-sel" type="password" value="' + U.esc(saved.key || '') + '" placeholder="••••••••"></label>'
+      + '<label class="ce-l">Webhook / Endpoint (opcional)<input id="ci-url" class="o-sel" value="' + U.esc(saved.url || '') + '" placeholder="https://hook.make.com/..."></label>'
+      + '<label class="ce-l">Cuenta / usuario (opcional)<input id="ci-user" class="o-sel" value="' + U.esc(saved.user || '') + '"></label>'
+      + '<label class="ce-l ck"><input type="checkbox" id="ci-on" ' + (saved.activa ? 'checked' : '') + '> Integración activa</label>'
+      + '<div class="cfg-note">🔒 Las credenciales se guardan cifradas en el backend del cliente. En el prototipo quedan en este navegador.</div>'
+      + '</div>'
+      + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="ci-cancel">Cancelar</button><button class="btn primary" id="ci-ok">Guardar</button></div></div>';
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#ci-x').onclick = close; back.querySelector('#ci-cancel').onclick = close;
+    back.querySelector('#ci-ok').onclick = () => {
+      const data = { key: back.querySelector('#ci-key').value, url: back.querySelector('#ci-url').value, user: back.querySelector('#ci-user').value, activa: back.querySelector('#ci-on').checked };
+      try { localStorage.setItem('orbit360_integ_' + nombre, JSON.stringify(data)); } catch (e) {}
+      close(); const host = document.getElementById('host'); if (host) render(host);
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + nombre + (data.activa ? ' conectada' : ' guardada'); document.body.appendChild(t); setTimeout(() => t.remove(), 2400);
+    };
+  }
+
+  return { render, editarPlan, subirManualMarca, agregarPais, configIntegracion };
 })();

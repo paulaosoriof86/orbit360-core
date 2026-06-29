@@ -60,7 +60,7 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
 .lg-foot .lf-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;justify-content:center}
 .lg-foot .lf-chips span{font-family:var(--f-mono);font-size:9px;letter-spacing:.08em;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.6);padding:4px 8px;border-radius:5px;text-transform:uppercase}
 .lf-logoslot{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:11px;color:rgba(255,255,255,.45)}
-.lf-logoslot .slot{width:46px;height:46px;border-radius:8px;border:1px dashed rgba(255,255,255,.25);display:grid;place-items:center;font-size:18px;overflow:hidden}
+.lf-logoslot .slot{width:64px;height:64px;border-radius:10px;border:1px dashed rgba(255,255,255,.25);display:grid;place-items:center;font-size:26px;overflow:hidden}
 .lf-logoslot .slot img{width:100%;height:100%;object-fit:contain}
 
 /* panel derecho: formulario */

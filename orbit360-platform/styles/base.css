@@ -31,7 +31,7 @@ button{font-family:inherit}
 .brand{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none}
 /* slot de logo del cliente (white-label) */
 .tb-logo{display:flex;align-items:center;gap:10px;padding-right:14px;margin-right:4px;border-right:1px solid var(--line)}
-.tb-logo .slot{width:46px;height:46px;border-radius:8px;background:var(--surface);border:1px dashed var(--line);display:grid;place-items:center;font-size:18px;color:var(--ink-3);overflow:hidden}
+.tb-logo .slot{width:54px;height:54px;flex-shrink:0;border-radius:9px;background:var(--surface);border:1px dashed var(--line);display:grid;place-items:center;font-size:22px;color:var(--ink-3);overflow:hidden}
 .tb-logo .slot img{width:100%;height:100%;object-fit:contain}
 .tb-logo .cn{font-family:var(--f-display);font-weight:800;font-size:13.5px;line-height:1.05;letter-spacing:-.01em}
 .tb-logo .cn small{display:block;font-family:var(--f-mono);font-size:8px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;font-weight:400;margin-top:2px}
