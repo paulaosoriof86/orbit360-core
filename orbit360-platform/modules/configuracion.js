@@ -302,14 +302,18 @@ Orbit.modules.configuracion = (function () {
   function applyBrandToTopbar() {
     const t = T().get();
     const logo = (t.branding && t.branding.logo) || (function () { try { return localStorage.getItem('orbit360_logo'); } catch (e) { return ''; } })();
+    const tieneMarca = !!(t.empresa && t.empresa !== 'Tu marca') || !!logo;
     const cn = document.querySelector('.tb-logo .cn');
-    if (cn && cn.firstChild) cn.firstChild.textContent = t.empresa || 'Tu marca';
+    if (cn) { cn.innerHTML = (t.empresa && t.empresa !== 'Tu marca' ? U.esc(t.empresa) : 'Tu marca') + '<small>' + (tieneMarca ? 'Cliente' : 'White-label') + '</small>'; }
     // logo en el slot del topbar
     const slot = document.getElementById('client-logo');
-    if (slot) { if (logo) { slot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; } else { slot.textContent = '🏢'; } }
+    if (slot) { if (logo) { slot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; slot.style.borderStyle = 'solid'; } else { slot.textContent = '🏢'; slot.style.borderStyle = 'dashed'; } }
     // logo en el login (slot inferior)
     const lgSlot = document.querySelector('.lf-logoslot .slot');
-    if (lgSlot) { if (logo) lgSlot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; }
+    if (lgSlot) { if (logo) { lgSlot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; lgSlot.style.borderStyle = 'solid'; } }
+    // nombre de empresa en el login
+    const lgName = document.querySelector('.lf-logoslot .lf-cn');
+    if (lgName && t.empresa && t.empresa !== 'Tu marca') lgName.textContent = t.empresa;
   }
   // exponer para que el shell lo invoque al cargar
   Orbit.applyBrand = applyBrandToTopbar;

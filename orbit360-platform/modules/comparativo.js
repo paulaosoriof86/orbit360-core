@@ -10,7 +10,7 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.comparativo = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   let host, props = [];
-  let meta = { cliente: '', ramo: 'Auto', marca: '', linea: '', anio: 2022, detalle: '' };
+  let meta = { pais: 'GT', cliente: '', ramo: 'Auto', marca: '', linea: '', anio: 2022, sub: '', detalle: '' };
   const VEH = {
     'Toyota': ['Corolla', 'Hilux', 'RAV4', 'Yaris', 'Land Cruiser', 'Prado', 'Fortuner'],
     'Hyundai': ['Tucson', 'Accent', 'Elantra', 'Santa Fe', 'Creta', 'i10'],
@@ -24,22 +24,36 @@ Orbit.modules.comparativo = (function () {
   };
   function datosIniciales() {
     const marcas = Object.keys(VEH), lineas = VEH[meta.marca] || [];
+    const subAuto = meta.pais === 'CO'
+      ? ['Todo riesgo', 'RC / SOAT+', 'Pérdidas totales', 'Pérdidas parciales', 'Por kilómetros', 'Pesado']
+      : ['Liviano', 'Responsabilidad Civil', 'Pesado', 'Pick-up / Comercial', 'Motocicleta', 'Grúa'];
+    let campos;
+    if (meta.ramo === 'Auto') {
+      campos = `<label class="ce-l">🚙 Tipo<select id="cp-sub" class="o-sel">${subAuto.map(x => `<option ${x === meta.sub ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+        <label class="ce-l">📅 Año / modelo<input id="cp-anio" class="o-sel" type="number" value="${meta.anio}"></label>
+        <label class="ce-l">🚗 Marca<select id="cp-marca" class="o-sel"><option value="">— Marca —</option>${marcas.map(m => `<option ${m === meta.marca ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+        <label class="ce-l">🔻 Línea<select id="cp-linea" class="o-sel" ${lineas.length ? '' : 'disabled'}><option value="">${lineas.length ? '— Línea —' : 'Elige marca'}</option>${lineas.map(l => `<option ${l === meta.linea ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`;
+    } else if (meta.ramo === 'Gastos Médicos') {
+      campos = `<label class="ce-l">👨‍👩‍👧 Plan<select id="cp-sub" class="o-sel">${['Individual', 'Familiar', 'Colectivo'].map(x => `<option ${x === meta.sub ? 'selected' : ''}>${x}</option>`).join('')}</select></label><label class="ce-l">📝 Integrantes / edades<input id="cp-det" class="o-sel" value="${U.esc(meta.detalle)}" placeholder="Ej. 38, 35, 8, 5"></label>`;
+    } else if (meta.ramo === 'Vida') {
+      campos = `<label class="ce-l">💰 Suma asegurada<input id="cp-det" class="o-sel" value="${U.esc(meta.detalle)}" placeholder="Q…"></label><label class="ce-l">📝 Cobertura<select id="cp-sub" class="o-sel"><option>Vida</option><option>Vida + invalidez</option><option>Vida + ahorro</option></select></label>`;
+    } else {
+      const subOtro = meta.pais === 'CO' ? ['Multirriesgo', 'Cumplimiento', 'RC', 'Transporte'] : ['Incendio', 'Robo', 'RC', 'Equipo electrónico', 'Fianzas'];
+      campos = `<label class="ce-l">🏷️ Tipo<select id="cp-sub" class="o-sel">${subOtro.map(x => `<option ${x === meta.sub ? 'selected' : ''}>${x}</option>`).join('')}</select></label><label class="ce-l">📝 Detalle del riesgo<input id="cp-det" class="o-sel" value="${U.esc(meta.detalle)}" placeholder="Suma, ubicación…"></label>`;
+    }
     return `<div class="card pad" style="margin-bottom:14px">
       <div class="asg-sec-t">📋 Datos del comparativo</div>
       <div class="cgrid">
+        <label class="ce-l">🌎 País<select id="cp-pais" class="o-sel"><option ${meta.pais === 'GT' ? 'selected' : ''}>GT</option><option ${meta.pais === 'CO' ? 'selected' : ''}>CO</option></select></label>
         <label class="ce-l">🧑 Cliente / prospecto<input id="cp-cli" class="o-sel" value="${U.esc(meta.cliente)}" placeholder="Nombre"></label>
         <label class="ce-l">🛡️ Ramo<select id="cp-ramo" class="o-sel">${['Auto', 'Vida', 'Gastos Médicos', 'Hogar', 'Daños'].map(r => `<option ${r === meta.ramo ? 'selected' : ''}>${r}</option>`).join('')}</select></label>
-        ${meta.ramo === 'Auto' ? `
-          <label class="ce-l">📅 Año<input id="cp-anio" class="o-sel" type="number" value="${meta.anio}"></label>
-          <label class="ce-l">🚗 Marca<select id="cp-marca" class="o-sel"><option value="">— Marca —</option>${marcas.map(m => `<option ${m === meta.marca ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
-          <label class="ce-l">🔻 Línea<select id="cp-linea" class="o-sel" ${lineas.length ? '' : 'disabled'}><option value="">${lineas.length ? '— Línea —' : 'Elige marca'}</option>${lineas.map(l => `<option ${l === meta.linea ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`
-        : `<label class="ce-l">📝 Detalle del riesgo<input id="cp-det" class="o-sel" value="${U.esc(meta.detalle)}" placeholder="Suma, ubicación, edad…"></label>`}
+        ${campos}
       </div>
     </div>`;
   }
   function bindMeta() {
-    const set = (id, k, num) => { const el = host.querySelector(id); if (el) el.addEventListener('change', () => { meta[k] = num ? +el.value : el.value; if (k === 'ramo' || k === 'marca') render(host); }); };
-    set('#cp-cli', 'cliente'); set('#cp-ramo', 'ramo'); set('#cp-anio', 'anio', true); set('#cp-det', 'detalle');
+    const set = (id, k, num) => { const el = host.querySelector(id); if (el) el.addEventListener('change', () => { meta[k] = num ? +el.value : el.value; if (k === 'ramo' || k === 'marca' || k === 'pais') render(host); }); };
+    set('#cp-pais', 'pais'); set('#cp-cli', 'cliente'); set('#cp-ramo', 'ramo'); set('#cp-anio', 'anio', true); set('#cp-det', 'detalle'); set('#cp-sub', 'sub');
     const mk = host.querySelector('#cp-marca'); if (mk) mk.addEventListener('change', () => { meta.marca = mk.value; meta.linea = ''; render(host); });
     const ln = host.querySelector('#cp-linea'); if (ln) ln.addEventListener('change', () => { meta.linea = ln.value; });
   }
@@ -70,14 +84,46 @@ Orbit.modules.comparativo = (function () {
     const sv = host.querySelector('#cp-save'); if (sv) sv.addEventListener('click', guardarHist);
     const pr = host.querySelector('#cp-print'); if (pr) pr.addEventListener('click', imprimir);
     host.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { props.splice(+b.dataset.del, 1); render(host); }));
+    host.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editarProp(+b.dataset.edit)));
   }
   function card(p, win, i, cur) {
     return `<div class="cz-card ${win ? 'win' : ''}">
       ${win ? '<span class="cz-badge">🏆 Mejor opción</span>' : ''}
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="dot-s" style="background:${p.color || '#999'};width:11px;height:11px"></span><b style="font-family:var(--f-display);flex:1">${U.esc(p.nombre)}</b>${p.origen === 'pdf' ? '<span class="badge info" style="font-size:9px">📄 PDF</span>' : ''}<button class="asg-del" data-del="${i}">✕</button></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="dot-s" style="background:${p.color || '#999'};width:11px;height:11px"></span><b style="font-family:var(--f-display);flex:1">${U.esc(p.nombre)}</b>${p.origen === 'pdf' ? '<span class="badge info" style="font-size:9px">📄 PDF</span>' : ''}<button class="asg-del" data-edit="${i}" title="Editar valores">✏</button><button class="asg-del" data-del="${i}">✕</button></div>
       <div class="cz-total">${U.money(p.total || 0, cur)}</div>
-      <div class="muted" style="font-size:11.5px">💵 prima total${p.fracc > 1 ? ' · ' + U.money((p.total || 0) / p.fracc, cur) + '/pago' : ''}</div>
+      <div class="muted" style="font-size:11.5px">💵 prima total${p.fracc > 1 ? ' · ' + U.money((p.total || 0) / p.fracc, cur) + '/pago' : ''}${p.origen === 'pdf' ? ' · <span style="color:var(--warn)">revisar extracción</span>' : ''}</div>
     </div>`;
+  }
+  function editarProp(i) {
+    const p = props[i]; if (!p) return;
+    let back = document.getElementById('cp-edit'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'cp-edit'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = '<div class="card" style="width:min(420px,94vw);padding:0">'
+      + '<div style="padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display)">✏ Editar propuesta</b><button class="imp-x" id="pe-x">✕</button></div>'
+      + '<div style="padding:16px 18px;display:grid;gap:10px">'
+      + (p.origen === 'pdf' ? '<div class="cfg-note">📄 Valores extraídos del PDF — verifica y corrige antes de comparar.</div>' : '')
+      + '<label class="ce-l">Aseguradora / propuesta<input id="pe-nom" class="o-sel" value="' + U.esc(p.nombre) + '"></label>'
+      + '<div class="cgrid"><label class="ce-l">Prima neta<input id="pe-neta" type="number" class="o-sel" value="' + Math.round(p.neta || 0) + '"></label>'
+      + '<label class="ce-l">IVA<input id="pe-iva" type="number" class="o-sel" value="' + Math.round(p.iva || 0) + '"></label>'
+      + '<label class="ce-l">Prima total<input id="pe-total" type="number" class="o-sel" value="' + Math.round(p.total || 0) + '"></label>'
+      + '<label class="ce-l">Pagos<input id="pe-fracc" type="number" class="o-sel" value="' + (p.fracc || 1) + '"></label></div>'
+      + '<label class="ce-l">Deducible / nota<input id="pe-ded" class="o-sel" value="' + U.esc(p.deducible || '') + '" placeholder="1% · asistencia premium…"></label>'
+      + '</div>'
+      + '<div style="padding:13px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="pe-cancel">Cancelar</button><button class="btn primary" id="pe-ok">Guardar</button></div></div>';
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#pe-x').onclick = close; back.querySelector('#pe-cancel').onclick = close;
+    back.querySelector('#pe-ok').onclick = () => {
+      p.nombre = back.querySelector('#pe-nom').value || p.nombre;
+      p.neta = +back.querySelector('#pe-neta').value || 0;
+      p.iva = +back.querySelector('#pe-iva').value || 0;
+      p.total = +back.querySelector('#pe-total').value || (p.neta + p.iva);
+      p.fracc = +back.querySelector('#pe-fracc').value || 1;
+      p.deducible = back.querySelector('#pe-ded').value;
+      close(); render(host);
+    };
   }
   function tabla(cur, min) {
     const rows = [['Prima neta', p => p.neta], ['IVA', p => p.iva], ['Prima total', p => p.total]];

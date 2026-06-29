@@ -48,10 +48,38 @@ Orbit.modules.cotizador = (function () {
         + `<label class="ce-l">🔻 Línea<select id="cz-linea" class="o-sel" ${lineas.length ? '' : 'disabled'}><option value="">${lineas.length ? '— Línea —' : 'Elige marca primero'}</option>${lineas.map(l => `<option ${l === st.linea ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`
         + `<label class="ce-l">🔢 Placa<input id="cz-placa" class="o-sel" value="${U.esc(st.placa || '')}" placeholder="P-123ABC"></label>`;
     }
-    if (ramo === 'Vida') return `<label class="ce-l">🎂 Edad del asegurado<input id="cz-edad" class="o-sel" type="number" value="${st.edad||35}" min="18" max="80"></label><label class="ce-l">💰 Suma asegurada<input id="cz-suma" class="o-sel" type="number" value="${st.suma||100000}"></label>`;
-    if (ramo === 'Gastos Médicos') return `<label class="ce-l">👨‍👩‍👧 Tipo<select id="cz-gm-tipo" class="o-sel"><option ${st.gmTipo==='Individual'?'selected':''}>Individual</option><option ${st.gmTipo==='Familiar'?'selected':''}>Familiar</option></select></label><label class="ce-l">🎂 Edad<input id="cz-edad" class="o-sel" type="number" value="${st.edad||35}"></label><label class="ce-l">🏥 Suma máxima<input id="cz-suma" class="o-sel" type="number" value="${st.suma||500000}"></label>`;
-    if (ramo === 'Hogar') return `<label class="ce-l">🏠 Tipo de inmueble<select class="o-sel"><option>Residencia</option><option>Apartamento</option><option>Local comercial</option></select></label><label class="ce-l">📐 M² construidos<input id="cz-m2" class="o-sel" type="number" value="${st.m2||120}"></label>`;
-    if (ramo === 'Daños') return `<label class="ce-l">🏭 Giro / Actividad<input id="cz-giro" class="o-sel" value="${U.esc(st.giro||'')}" placeholder="Comercio, industria..."></label><label class="ce-l">📦 Bienes a asegurar<input id="cz-bienes" class="o-sel" value="${U.esc(st.bienes||'')}" placeholder="Inventario, maquinaria..."></label>`;
+    if (ramo === 'Vida') return `<label class="ce-l">🎂 Edad del asegurado<input id="cz-edad" class="o-sel" type="number" value="${st.edad||35}" min="18" max="80"></label>`
+      + `<label class="ce-l">💰 Suma asegurada<input id="cz-suma" class="o-sel" type="number" value="${st.suma||100000}"></label>`
+      + `<label class="ce-l">🚭 ¿Fumador?<select id="cz-fuma" class="o-sel"><option ${st.fuma==='No'?'selected':''}>No</option><option ${st.fuma==='Sí'?'selected':''}>Sí</option></select></label>`
+      + `<label class="ce-l">👨‍👩‍👧 Beneficiarios<input id="cz-benef" class="o-sel" type="number" value="${st.benef||1}" min="1"></label>`
+      + `<label class="ce-l">🏥 Cobertura<select id="cz-vcob" class="o-sel"><option ${st.vcob==='Vida'?'selected':''}>Vida</option><option ${st.vcob==='Vida + invalidez'?'selected':''}>Vida + invalidez</option><option ${st.vcob==='Vida + ahorro'?'selected':''}>Vida + ahorro</option></select></label>`;
+    if (ramo === 'Gastos Médicos') {
+      const tipo = st.gmTipo || 'Individual';
+      let extra = '';
+      if (tipo === 'Familiar') {
+        const n = st.gmIntegrantes || 2;
+        extra = `<label class="ce-l">👥 N.º de integrantes<input id="cz-gm-n" class="o-sel" type="number" min="2" max="12" value="${n}"></label>`
+          + `<div style="grid-column:1/-1" id="cz-gm-edades"><div class="ce-l" style="margin-bottom:6px">🎂 Edades de los integrantes</div><div style="display:flex;flex-wrap:wrap;gap:6px">${Array.from({length:n}).map((_,k)=>`<input class="o-sel cz-gm-edad" data-k="${k}" type="number" placeholder="${k===0?'Titular':'Int. '+(k+1)}" value="${(st.gmEdades&&st.gmEdades[k])||''}" style="width:88px">`).join('')}</div></div>`;
+      } else if (tipo === 'Colectivo') {
+        extra = `<label class="ce-l">🏢 N.º de empleados<input id="cz-gm-emp" class="o-sel" type="number" value="${st.gmEmpleados||10}"></label><label class="ce-l">📊 Edad promedio<input id="cz-edad" class="o-sel" type="number" value="${st.edad||38}"></label>`;
+      } else {
+        extra = `<label class="ce-l">🎂 Edad<input id="cz-edad" class="o-sel" type="number" value="${st.edad||35}"></label>`;
+      }
+      return `<label class="ce-l">👨‍👩‍👧 Tipo de plan<select id="cz-gm-tipo" class="o-sel"><option ${tipo==='Individual'?'selected':''}>Individual</option><option ${tipo==='Familiar'?'selected':''}>Familiar</option><option ${tipo==='Colectivo'?'selected':''}>Colectivo</option></select></label>`
+        + extra
+        + `<label class="ce-l">🏥 Suma máxima<input id="cz-suma" class="o-sel" type="number" value="${st.suma||500000}"></label>`
+        + `<label class="ce-l">🛏️ Habitación<select id="cz-gm-hab" class="o-sel"><option ${st.gmHab==='Estándar'?'selected':''}>Estándar</option><option ${st.gmHab==='Privada'?'selected':''}>Privada</option><option ${st.gmHab==='Suite'?'selected':''}>Suite</option></select></label>`
+        + `<label class="ce-l">💵 Deducible<input id="cz-gm-ded" class="o-sel" value="${U.esc(st.gmDed||'')}" placeholder="Ej. Q3,000"></label>`;
+    }
+    if (ramo === 'Hogar') return `<label class="ce-l">🏠 Tipo de inmueble<select id="cz-h-tipo" class="o-sel"><option ${st.hTipo==='Residencia'?'selected':''}>Residencia</option><option ${st.hTipo==='Apartamento'?'selected':''}>Apartamento</option><option ${st.hTipo==='Local comercial'?'selected':''}>Local comercial</option></select></label>`
+      + `<label class="ce-l">📐 M² construidos<input id="cz-m2" class="o-sel" type="number" value="${st.m2||120}"></label>`
+      + `<label class="ce-l">🏗️ Valor del inmueble<input id="cz-hval" class="o-sel" type="number" value="${st.hval||0}"></label>`
+      + `<label class="ce-l">📦 Valor del contenido<input id="cz-hcont" class="o-sel" type="number" value="${st.hcont||0}"></label>`
+      + `<label class="ce-l">🌎 Zona / riesgo<select id="cz-hzona" class="o-sel"><option>Urbana</option><option>Costa / sísmica</option><option>Rural</option></select></label>`;
+    if (ramo === 'Daños') return `<label class="ce-l">🏭 Giro / Actividad<input id="cz-giro" class="o-sel" value="${U.esc(st.giro||'')}" placeholder="Comercio, industria..."></label>`
+      + `<label class="ce-l">📦 Bienes a asegurar<input id="cz-bienes" class="o-sel" value="${U.esc(st.bienes||'')}" placeholder="Inventario, maquinaria..."></label>`
+      + `<label class="ce-l">💰 Suma asegurada<input id="cz-dsuma" class="o-sel" type="number" value="${st.dsuma||0}"></label>`
+      + `<label class="ce-l">🛡️ Coberturas<select id="cz-dcob" class="o-sel" multiple style="height:auto"><option>Incendio</option><option>Robo</option><option>Equipo electrónico</option><option>RC</option><option>Transporte</option></select></label>`;
     return '';
   }
   function vCotHistorial() {
@@ -101,6 +129,11 @@ Orbit.modules.cotizador = (function () {
     const set = (id, k, num) => { const el = host.querySelector(id); if (el) el.addEventListener('change', () => { st[k] = num ? +el.value : el.value; if (k === 'pais') { st.filas = []; render(host); } else if (k === 'ramo') { render(host); } }); };
     set('#cz-pais', 'pais'); set('#cz-ramo', 'ramo'); set('#cz-valor', 'valor', true); set('#cz-anio', 'anio', true); set('#cz-fracc', 'fracc', true); set('#cz-cliente', 'cliente');
     set('#cz-sub', 'sub'); set('#cz-ase', 'asesorId');
+    // Gastos Médicos: cambiar tipo re-renderiza (familiar→integrantes, colectivo→empleados)
+    const gmt = host.querySelector('#cz-gm-tipo'); if (gmt) gmt.addEventListener('change', () => { st.gmTipo = gmt.value; render(host); });
+    const gmn = host.querySelector('#cz-gm-n'); if (gmn) gmn.addEventListener('change', () => { st.gmIntegrantes = Math.max(2, +gmn.value || 2); render(host); });
+    host.querySelectorAll('.cz-gm-edad').forEach(el => el.addEventListener('change', () => { st.gmEdades = st.gmEdades || []; st.gmEdades[+el.dataset.k] = +el.value || ''; }));
+    ['#cz-suma','#cz-edad','#cz-m2','#cz-hval','#cz-hcont','#cz-dsuma','#cz-benef','#cz-gm-emp','#cz-gm-ded','#cz-gm-hab','#cz-fuma','#cz-vcob','#cz-h-tipo','#cz-hzona','#cz-giro','#cz-bienes','#cz-placa'].forEach(s => { const el = host.querySelector(s); if (el) el.addEventListener('change', () => { st[s.replace('#cz-','').replace(/-/g,'')] = el.value; }); });
     // marca → recarga líneas
     const mk = host.querySelector('#cz-marca'); if (mk) mk.addEventListener('change', () => { st.marca = mk.value; st.linea = ''; render(host); });
     const ln = host.querySelector('#cz-linea'); if (ln) ln.addEventListener('change', () => { st.linea = ln.value; });
