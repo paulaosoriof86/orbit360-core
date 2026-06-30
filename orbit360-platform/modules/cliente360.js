@@ -1293,6 +1293,7 @@ Orbit.modules.cliente360 = (function () {
             <label class="ce-l">Otros / asistencias<input id="np-otros" class="o-sel" type="number" value="0"></label>
             <label class="ce-l">Cantidad de pagos<input id="np-pagos" class="o-sel" type="number" value="1" title="Máximo según aseguradora"></label>
           </div>
+          <label class="ce-l" id="np-prorr-wrap" style="margin-top:10px">Cobro de gastos de emisión y recargo<select id="np-prorr" class="o-sel"><option value="todos">Prorratear en todos los recibos</option><option value="1">Cobrar todo en el 1.er recibo</option><option value="2">Cobrar en los 2 primeros recibos</option></select><span class="muted" style="font-size:11px;display:block;margin-top:3px">Algunas aseguradoras no prorratean: cobran emisión/recargo de una vez.</span></label>
           <table class="vp-dtbl" style="margin-top:10px" id="np-resumen"></table>
           <div id="np-recibos" style="margin-top:10px"></div>
         </div>
@@ -1312,14 +1313,15 @@ Orbit.modules.cliente360 = (function () {
     $('#np-cli').addEventListener('change', syncRamos);
     $('#np-ramo').addEventListener('change', syncSub);
     function recalc() {
+      const prorrEn = (cuotas) => { const v = $('#np-prorr') ? $('#np-prorr').value : 'todos'; return v === 'todos' ? cuotas : Math.min(cuotas, +v || 1); };
       const p = pais(), neta = +$('#np-neta').value || 0, frec = $('#np-frec').value;
       const cuotas = Math.max(1, +$('#np-pagos').value || Orbit.primas.cuotasDe(frec));
       const frac = cuotas > 1;
       const d = Orbit.primas.desglose(neta, p, { fraccionado: frac, gastosEmision: +$('#np-gem').value || 0, otros: +$('#np-otros').value || 0 });
       $('#np-iva').textContent = '(' + p + ' · IVA ' + d.ivaPct + '%)';
       $('#np-resumen').innerHTML = `<tr class="vp-tot"><td>Prima total</td><td class="num">${U.money(d.total, p === 'CO' ? 'COP' : 'GTQ')}</td></tr>`;
-      const recs = Orbit.primas.recibos(d, { frecuencia: frec, vigenciaInicio: '2026-06-24' });
-      const usar = recs.length === cuotas ? recs : Orbit.primas.recibos(d, { frecuencia: frec, vigenciaInicio: '2026-06-24' });
+      const recs = Orbit.primas.recibos(d, { frecuencia: frec, cuotas: cuotas, vigenciaInicio: '2026-06-24', emisionEn: prorrEn(cuotas), recargoEn: prorrEn(cuotas) });
+      const usar = recs;
       $('#np-recibos').innerHTML = `<div class="muted" style="font-size:12px;margin-bottom:5px">${cuotas} recibo(s):</div>` + usar.slice(0, cuotas).map(r => `<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--line-2)"><span class="mono">${r.n}</span><span>${U.fmtDate(r.vence)}</span><b>${U.money(r.total, p === 'CO' ? 'COP' : 'GTQ')}</b></div>`).join('');
       back._d = d; back._cuotas = cuotas;
     }

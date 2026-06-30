@@ -10,16 +10,38 @@ Orbit.modules.academia = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   let host, filtro = 'todas';
   const TIPO_ICON = { video: '🎬', lectura: '📖', quiz: '✏️', recurso: '📎' };
-  function mdToHtml(md) {
-    let s = U.esc(String(md || ''));
-    s = s.replace(/^### (.*)$/gm, '<h4 style="font-family:var(--f-display);font-size:15px;margin:14px 0 6px">$1</h4>');
-    s = s.replace(/^## (.*)$/gm, '<h3 style="font-family:var(--f-display);font-size:17px;margin:18px 0 8px">$1</h3>');
-    s = s.replace(/^# (.*)$/gm, '<h2 style="font-family:var(--f-display);font-size:20px;margin:8px 0 10px">$1</h2>');
-    s = s.replace(/^\s*---\s*$/gm, '<hr style="border:0;border-top:1px solid var(--line);margin:14px 0">');
+  // paleta para barras de color de las secciones (rota para dar ritmo visual tipo Orbit)
+  const SEC_COLORS = ['#2A6FDB', '#1F8A5B', '#D97757', '#7A5Bd9', '#C5162E', '#0E7C86'];
+  // formatea el cuerpo (negritas, itálicas, listas, párrafos) de un bloque de texto
+  function mdInline(block) {
+    let s = U.esc(String(block || '')).trim();
     s = s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*]+)\*/g, '$1<i>$2</i>');
-    s = s.replace(/^\s*[-•]\s+(.*)$/gm, '<li>$1</li>').replace(/(<li>[\s\S]*?<\/li>)/g, '<ul style="margin:6px 0 6px 18px">$1</ul>');
-    s = s.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>');
+    s = s.replace(/^\s*[-•]\s+(.*)$/gm, '<li>$1</li>');
+    s = s.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul style="margin:4px 0 4px 4px;padding-left:18px">$1</ul>');
+    s = s.replace(/\n{2,}/g, '</p><p>').replace(/\n(?!<\/?(ul|li))/g, '<br>');
     return '<p>' + s + '</p>';
+  }
+  // Convierte texto markdown/emoji en TARJETAS con barra de color (formato Orbit).
+  // Reconoce encabezados ##, ###, **Título**, o líneas cortas que arrancan con emoji.
+  function mdToHtml(md) {
+    const raw = String(md || '').trim();
+    if (!raw) return '<div class="ac-read ac-md"><p>Contenido pendiente. Usá ✏ Editar lección para agregarlo.</p></div>';
+    const lines = raw.split('\n');
+    const emojiHead = /^([\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u2190-\u21FF\u2B00-\u2BFF\u2705\u274C\u26A0\uFE0F]{1,3})\s+(.{2,64})$/u;
+    const secs = []; let cur = null;
+    const push = (title, icon, color) => { cur = { title: title || '', icon: icon || '▸', color: color || SEC_COLORS[secs.length % SEC_COLORS.length], body: [] }; secs.push(cur); };
+    lines.forEach(ln => {
+      let m;
+      if ((m = ln.match(/^#{1,3}\s+(.*)$/))) { const t = m[1].replace(/\*\*/g, '').trim(); const em = t.match(emojiHead); push(em ? em[2] : t, em ? em[1] : '▸'); }
+      else if ((m = ln.match(/^\*\*(.{2,64})\*\*:?\s*$/))) { push(m[1].trim(), '▸'); }
+      else if ((m = ln.match(emojiHead)) && ln.trim().length <= 66 && !/[.;]\s/.test(ln)) { push(m[2].trim(), m[1]); }
+      else { if (!cur) push('', '📘'); cur.body.push(ln); }
+    });
+    return secs.map(s => {
+      const body = mdInline(s.body.join('\n'));
+      const head = s.title ? `<div class="acv-sec-t" style="color:${s.color}">${U.esc(s.icon)} ${U.esc(s.title)}</div>` : '';
+      return `<div class="acv-sec ac-md" style="border-left:4px solid ${s.color}">${head}<div class="acv-sec-b">${body}</div></div>`;
+    }).join('');
   }
   function fileToDataURL(f, cb) { if (!f) return; const r = new FileReader(); r.onload = () => cb(r.result); r.readAsDataURL(f); }
   function fileToText(f, cb) { if (!f) return; if (/\.(txt|csv|md)$/i.test(f.name)) { const r = new FileReader(); r.onload = () => cb(String(r.result)); r.readAsText(f); } else { cb(''); } }
@@ -93,10 +115,13 @@ Orbit.modules.academia = (function () {
   function verManuales() {
     const rol = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
     const manuales = [
-      { t: 'Manual maestro (todos los módulos)', src: 'docs/manual-maestro.html', ico: '📘', sub: 'Super Admin · visión completa' },
-      { t: 'Capacitación técnica interna', src: 'docs/capacitacion-tecnica-interna.html', ico: '🛠', sub: 'Demo, backend, migración, soporte' },
-      { t: 'Capacitación CRM', src: 'docs/capacitacion-crm.html', ico: '🎯', sub: 'Operación diaria del CRM' }
+      { t: 'Manual maestro (todos los módulos)', src: 'docs/manual-maestro.html', ico: '📘', sub: 'Super Admin · visión completa', roles: ['Dirección', 'Admin'] },
+      { t: 'Capacitación técnica interna', src: 'docs/capacitacion-tecnica-interna.html', ico: '🛠', sub: 'Demo, backend, migración, soporte', roles: ['Dirección', 'Admin'] },
+      { t: 'Capacitación CRM', src: 'docs/capacitacion-crm.html', ico: '🎯', sub: 'Operación diaria del CRM', roles: ['Dirección', 'Admin', 'Operativo', 'Asesor', 'Comercial'] },
+      { t: 'Manual de integraciones', src: 'docs/manual-integraciones.html', ico: '🔌', sub: 'Configuración, utilidad y valor de cada integración', roles: ['Dirección', 'Admin'] },
+      { t: 'Comparativa de motores de IA', src: 'docs/comparativa-ia.html', ico: '🤖', sub: 'Gemini / ChatGPT / Claude — costo y calidad', roles: ['Dirección', 'Admin'] }
     ];
+    const visibles = manuales.filter(m => !m.roles || m.roles.indexOf(rol) >= 0 || rol === 'Dirección');
     let back = document.getElementById('ac-man-v'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'ac-man-v';
     back.style.cssText = 'position:fixed;inset:0;z-index:210;background:var(--surface);display:flex;flex-direction:column';
@@ -112,8 +137,8 @@ Orbit.modules.academia = (function () {
     const lista = () => {
       body.style.cssText = 'flex:1;overflow:auto;padding:24px';
       body.innerHTML = '<div style="max-width:720px;margin:0 auto">'
-        + '<div class="muted" style="font-size:12.5px;margin-bottom:14px">📖 Manuales de Orbit 360 — se leen aquí dentro. Rol activo: <b>' + U.esc(rol) + '</b></div>'
-        + '<div style="display:grid;gap:12px">' + manuales.map((m, i) => '<button class="card pad" data-m="' + i + '" style="text-align:left;cursor:pointer;display:flex;align-items:center;gap:14px">'
+        + '<div class="muted" style="font-size:12.5px;margin-bottom:14px">📖 Manuales de Orbit 360 — se leen aquí dentro. Rol activo: <b>' + U.esc(rol) + '</b> · mostrando los que aplican a tu rol</div>'
+        + '<div style="display:grid;gap:12px">' + visibles.map((m, i) => '<button class="card pad" data-m="' + manuales.indexOf(m) + '" style="text-align:left;cursor:pointer;display:flex;align-items:center;gap:14px">'
           + '<span style="font-size:28px">' + m.ico + '</span><span><b style="font-family:var(--f-display);font-size:15px;display:block">' + U.esc(m.t) + '</b><small class="muted">' + U.esc(m.sub) + '</small></span>'
           + '<span style="margin-left:auto;color:var(--red);font-weight:700">Leer →</span></button>').join('') + '</div></div>';
       body.querySelectorAll('[data-m]').forEach(b => b.onclick = () => open(manuales[+b.dataset.m]));
@@ -169,7 +194,7 @@ Orbit.modules.academia = (function () {
     if (l.tipo === 'lectura') {
       const secs = l.secciones && l.secciones.length
         ? l.secciones.map(s => `<div class="acv-sec" style="border-left:4px solid ${s.color || 'var(--red)'}"><div class="acv-sec-t" style="color:${s.color || 'var(--red)'}">${U.esc(s.icon || '▸')} ${U.esc(s.t || '')}</div><div class="acv-sec-b">${U.esc(s.d || '')}</div></div>`).join('')
-        : `<div class="ac-read ac-md">${mdToHtml(l.texto || 'Contenido pendiente de redactar. Usá ✏ Editar lección para agregarlo.')}</div>`;
+        : mdToHtml(l.texto || '');
       const adj = l.docSrc ? (/^data:image|\.(png|jpe?g|webp|gif)/i.test(l.docSrc) ? `<img src="${l.docSrc}" style="max-width:100%;border-radius:10px;margin-top:14px">` : `<div style="position:relative;width:100%;height:60vh;border-radius:10px;overflow:hidden;background:#f4f3ee;margin-top:14px"><iframe src="${l.docSrc}" style="width:100%;height:100%;border:0"></iframe></div>`) : '';
       return secs + adj;
     }

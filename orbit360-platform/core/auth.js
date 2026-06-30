@@ -48,7 +48,13 @@ Orbit.auth = (function () {
     const lg = document.getElementById('login');
     if (lg) { lg.classList.add('hidden'); setTimeout(() => lg.style.display = 'none', 480); }
     document.body.classList.remove('pre-auth');
-    setTimeout(gateConfidencialidad, 520);
+    setTimeout(function () {
+      const u = user() || {};
+      const tipo = u.tipo === 'socio' ? 'socio' : 'interno';
+      const scopeId = 'user:' + (u.email || 'demo');
+      if (Orbit.legal && Orbit.legal.gate) Orbit.legal.gate(tipo, scopeId);
+      else gateConfidencialidad();
+    }, 520);
   }
   function showLogin() {
     const lg = document.getElementById('login');

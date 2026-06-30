@@ -295,7 +295,16 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
 .acv-nav{display:flex;justify-content:space-between;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}
 .acv-sec{background:var(--card);border-radius:10px;padding:14px 18px;margin-bottom:12px}
 .acv-sec-t{font-family:var(--f-display);font-weight:700;font-size:15px;margin-bottom:6px}
-.acv-sec-b{font-size:14px;line-height:1.7;color:var(--ink-2);white-space:pre-wrap}
+.acv-sec-b{font-size:14px;line-height:1.7;color:var(--ink-2)}
+.acv-sec-b p{margin:0 0 9px}.acv-sec-b p:last-child{margin-bottom:0}
+.acv-sec-b ul{margin:4px 0;padding-left:18px}.acv-sec-b li{margin:3px 0}
+.acv-sec-b b{color:var(--ink);font-weight:700}
+/* cláusulas legales */
+.lg-clausula{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:10px}
+.lg-cl-t{font-family:var(--f-display);font-weight:700;font-size:14px;margin-bottom:6px}
+.lg-clausula p{font-size:13px;color:var(--ink-2);margin:0 0 7px}
+.lg-clausula ul{margin:0;padding-left:18px;font-size:12.5px;color:var(--ink-2)}
+.lg-clausula li{margin:3px 0}
 @media(max-width:760px){.acv-side{width:100%;position:absolute;height:auto;max-height:40vh;z-index:5;box-shadow:var(--sh-2)}.acv-main{padding:18px}}
 .ac-res{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:6px 11px;font-size:12.5px;cursor:pointer}
 .ac-res:hover{border-color:var(--red);color:var(--red)}

@@ -108,7 +108,7 @@ Orbit.modules.marketing = (function () {
     if (window.claude && window.claude.complete) {
       toast('🧠 Generando ideas con IA…');
       try {
-        const prompt = 'Genera 6 ideas de contenido de redes sociales para una correduría de seguros, para el mes de ' + MESES[mm - 1] + '. Devuelve SOLO un JSON array sin markdown, cada item: ["título con emoji","enfoque/ramo","canal (Instagram/Facebook/LinkedIn/WhatsApp)"]. Español, variado, útil.';
+        const prompt = 'Eres estratega de marketing de una correduría de seguros. Diseña un PLAN mensual de contenidos para ' + MESES[mm - 1] + ' con criterio estratégico: cubre las 4 semanas, mezcla objetivos (captación, educación, retención/renovación, prueba social/confianza), varía ramos (auto, vida/GM, hogar, pyme) y canales (Instagram, Facebook, LinkedIn, WhatsApp), e incluye fechas clave del mes si aplica. Devuelve SOLO un JSON array sin markdown de 8 items, cada item: ["título con emoji","enfoque/ramo","canal","objetivo (captación|educación|retención|confianza)","CTA breve"]. Español, útil, sin relleno.';
         const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt }] });
         const m = String(out).match(/\[[\s\S]*\]/); if (m) { const arr = JSON.parse(m[0]); if (Array.isArray(arr) && arr.length) ideas = arr.filter(x => Array.isArray(x) && x.length >= 3); }
       } catch (e) {}

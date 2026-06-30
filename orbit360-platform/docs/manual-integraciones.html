@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbit 360 · Manual de integraciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#C5162E;--graph:#1E2227;--ink:#1E2227;--ink2:#4b525c;--ink3:#8a929c;--line:#e4e2dc;--surface:#f5f4f0;--card:#fff;--ok:#1F8A5B;--blue:#2A6FDB}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Source Sans 3',sans-serif;color:var(--ink);background:var(--surface);line-height:1.6;padding:40px 24px}
+  .wrap{max-width:980px;margin:0 auto}
+  .hd{background:linear-gradient(120deg,var(--graph),#0f1318);color:#fff;border-radius:18px;padding:34px 38px;margin-bottom:24px}
+  .hd .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#ff9b8a;margin-bottom:10px}
+  .hd h1{font-family:'Manrope';font-size:30px;font-weight:800;letter-spacing:-.02em}
+  .hd p{color:rgba(255,255,255,.72);font-size:15px;margin-top:8px;max-width:680px}
+  h2{font-family:'Manrope';font-size:20px;font-weight:800;margin:26px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .int{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px;border-left:4px solid var(--c,#2A6FDB)}
+  .int h3{font-family:'Manrope';font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .int .what{font-size:13.5px;color:var(--ink2);margin:6px 0}
+  .int .cfg{font-size:12.5px;background:var(--surface);border-radius:8px;padding:8px 11px;margin-top:8px}
+  .int .cfg b{color:var(--ink)}
+  .int .val{font-size:12.5px;color:var(--ok);font-weight:600;margin-top:6px}
+  .step{background:#fff8f0;border:1px solid #f0d9bf;border-radius:10px;padding:13px 16px;font-size:13.5px;margin-bottom:14px}
+  .foot{text-align:center;color:var(--ink3);font-size:12px;margin-top:24px;font-family:'JetBrains Mono',monospace}
+  @media print{body{background:#fff;padding:0}.hd{border-radius:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div class="eyebrow">Orbit 360 · Manual de integraciones</div>
+    <h1>Integraciones: configuración y valor</h1>
+    <p>Cada integración se activa en <b>Configuración → Integraciones</b> (tarjeta con API key / webhook / OAuth + botón Probar) y, las de IA, en <b>Automatizaciones → Motor de IA</b>. Aquí: qué hace cada una, cómo se configura y qué valor aporta.</p>
+  </div>
+
+  <div class="step">🔧 <b>Cómo configurar (general):</b> Configuración → Integraciones → elige la tarjeta → "⚙ Configurar" → pega API key / webhook / OAuth / endpoint → "🔌 Probar conexión" → marca "Integración activa" → Guardar. Las credenciales persisten por cliente (tenant). La conexión real se valida al activar el backend en migración.</div>
+
+  <h2>📲 Comunicación y notificaciones</h2>
+  <div class="int" style="--c:#1F8A5B"><h3>🔗 Make (orquestador)</h3><div class="what">Hub central de automatización: recibe los eventos de Orbit (póliza emitida, cobro vence, solicitud de gestión) y los ramifica a WhatsApp, correo, Sheets, etc.</div><div class="cfg"><b>Config:</b> pega la URL del webhook del escenario Make.</div><div class="val">Valor: automatiza todo el ciclo de avisos sin programar.</div></div>
+  <div class="int" style="--c:#1F8A5B"><h3>💬 WhatsApp (Cloud API + wa.me)</h3><div class="what">Envío de cobros, renovaciones, bienvenida de póliza y seguimientos. wa.me para envío directo; Cloud API (vía Make) para automatización masiva.</div><div class="cfg"><b>Config:</b> token de WhatsApp Cloud API o número para wa.me.</div><div class="val">Valor: el canal preferido del cliente, con plantillas y trazabilidad.</div></div>
+  <div class="int" style="--c:#2A6FDB"><h3>✉️ Outlook / Gmail (IMAP/POP3 + OAuth)</h3><div class="what">Bandeja integrada en la plataforma. Asocia correos a cliente, póliza, gestión o reclamo; redacta con asunto patrón para la aseguradora. Soporta dominios propios.</div><div class="cfg"><b>Config:</b> OAuth (Microsoft 365 / Google) o IMAP/POP3 (servidor, puerto, usuario).</div><div class="val">Valor: trazabilidad total de la comunicación en el expediente del cliente.</div></div>
+  <div class="int" style="--c:#2A6FDB"><h3>📗 Green API · Telegram · SMS</h3><div class="what">Canales alternativos de mensajería para cobros y avisos.</div><div class="cfg"><b>Config:</b> API key del proveedor.</div></div>
+
+  <h2>📊 Marketing y contenido</h2>
+  <div class="int" style="--c:#D97757"><h3>📣 Metricool · Meta (FB/IG) · LinkedIn · TikTok · YouTube</h3><div class="what">Publicación y medición de contenido del calendario de Marketing en redes; programación y estadísticas.</div><div class="cfg"><b>Config:</b> OAuth de cada red o token de Metricool.</div><div class="val">Valor: del calendario Orbit a la publicación real, con métricas de vuelta.</div></div>
+  <div class="int" style="--c:#D97757"><h3>🎨 Canva · Gamma · HeyGen</h3><div class="what">Generación de piezas gráficas, presentaciones y videos con avatar para capacitación y campañas.</div><div class="cfg"><b>Config:</b> API key / cuenta conectada.</div></div>
+  <div class="int" style="--c:#D97757"><h3>📧 Mailchimp</h3><div class="what">Campañas de correo masivo segmentadas (renovaciones, novedades).</div><div class="cfg"><b>Config:</b> API key de Mailchimp.</div></div>
+
+  <h2>🗂️ Datos y productividad</h2>
+  <div class="int" style="--c:#2A6FDB"><h3>📁 Google Drive / Sheets / Calendar / Docs</h3><div class="what">Almacenamiento documental por cliente, exportación a hojas, agenda y documentos.</div><div class="cfg"><b>Config:</b> OAuth de Google Workspace.</div><div class="val">Valor: expediente documental real sin migrar archivos manualmente.</div></div>
+  <div class="int" style="--c:#7A5Bd9"><h3>🤖 IA — Gemini / ChatGPT / Claude / Endpoint propio</h3><div class="what">Potencia importadores (extracción/mapeo), comparativo de pólizas, análisis crítico, generación de cursos y copy. Selector sin sesgo en Automatizaciones → Motor de IA.</div><div class="cfg"><b>Config:</b> elige proveedor + modelo + API key. Ninguno preseleccionado.</div><div class="val">Valor: la inteligencia real de la plataforma. Ver comparativa-ia.html para elegir.</div></div>
+  <div class="int" style="--c:#7A5Bd9"><h3>📓 NotebookLM · Notion · Slack · Trello · Zapier · n8n</h3><div class="what">Conocimiento, gestión de tareas y automatización adicional según el flujo del cliente.</div><div class="cfg"><b>Config:</b> API key / OAuth según herramienta.</div></div>
+
+  <h2>🏛️ Facturación y normativa local</h2>
+  <div class="int" style="--c:#C5162E"><h3>🧾 FEL (SAT Guatemala) · DIAN (Colombia)</h3><div class="what">Facturación electrónica conforme a la normativa del país configurado. Los patrones de facturación por aseguradora (NIT, concepto) viven en la ficha de cada aseguradora.</div><div class="cfg"><b>Config:</b> credenciales del certificador / DIAN.</div><div class="val">Valor: factura con los datos correctos por aseguradora, sin buscar PDFs viejos.</div></div>
+  <div class="int" style="--c:#C5162E"><h3>🏦 Open Banking</h3><div class="what">Conciliación automática del estado bancario con los movimientos de Finanzas.</div><div class="cfg"><b>Config:</b> API del agregador bancario.</div></div>
+
+  <div class="foot">Orbit 360 · manual de integraciones · la conexión efectiva se activa en la migración (backend) · multipaís y configurable por cliente</div>
+</div>
+<button onclick="window.print()" style="position:fixed;bottom:20px;right:20px;z-index:60;background:var(--red);color:#fff;border:none;border-radius:99px;padding:12px 20px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2)">🖨 Imprimir / PDF</button>
+</body>
+</html>

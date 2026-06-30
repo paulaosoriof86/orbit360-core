@@ -644,7 +644,8 @@ Orbit.modules.finanzas = (function () {
         <li><b>Comercial:</b> campaña de recuperación de cartera vencida y cross-sell a top clientes.</li>
       </ul></div>
     </div>
-    <button class="btn primary" style="margin-top:14px" onclick="alert('Conecta tu API key de Gemini en Configuración › Integraciones para generar análisis en vivo.')">✨ Regenerar con IA</button>`;
+    <button class="btn primary" style="margin-top:14px" id="fin-ia-regen">✨ Regenerar análisis con IA</button>
+    <div id="fin-ia-out" class="cfg-note" style="margin-top:10px;display:none"></div>`;
   }
 
   /* ---- registrar financiamiento (sube deuda) o abono (baja deuda) ---- */
@@ -728,6 +729,22 @@ Orbit.modules.finanzas = (function () {
     detLiq(campo, key);
   }
 
-  function wire(host) {}
+  function wire(host) {
+    const rb = (host || document).querySelector('#fin-ia-regen');
+    if (rb) rb.addEventListener('click', async () => {
+      const out = document.getElementById('fin-ia-out'); if (!out) return;
+      out.style.display = 'block'; out.textContent = '🧠 Generando análisis financiero con IA…';
+      let txt = '';
+      try {
+        const movs = S().all('finmovs') || [];
+        const ing = movs.filter(m => m.tipo === 'ingreso').reduce((s, m) => s + (m.monto || 0), 0);
+        const eg = movs.filter(m => m.tipo === 'egreso').reduce((s, m) => s + (m.monto || 0), 0);
+        if (Orbit.ia && Orbit.ia.analisis) txt = await Orbit.ia.analisis('Analiza la salud financiera de una correduría de seguros con ingresos ' + ing + ' y egresos ' + eg + '. Da diagnóstico breve, 2 riesgos y 3 estrategias (medios, segmentación, comercial).');
+      } catch (e) {}
+      out.innerHTML = txt
+        ? ('<b>✨ Análisis IA</b><div style="margin-top:6px;white-space:pre-wrap">' + U.esc(txt) + '</div>')
+        : '⚠️ Conecta un proveedor de IA en Configuración → Automatizaciones → Motor de IA para análisis en vivo. (Sin IA, el análisis de arriba usa la heurística de la plataforma.)';
+    });
+  }
   return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, regFinanciacion, detLiq, toggleComEstado };
 })();

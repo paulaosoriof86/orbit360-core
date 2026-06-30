@@ -78,24 +78,28 @@ Orbit.primas = (function () {
     const comAsegPct = +opts.comAseguradoraPct || 0;
     const comVendPct = +opts.comVendedorPct || 0;
     const pasoMeses = 12 / n;
-    // reparto: el primer recibo lleva 100% de los gastos de emisión;
-    // los demás componentes se prorratean en partes iguales.
-    const split = (totalComp, idx, repartirEmisionEn1) => {
-      if (repartirEmisionEn1) return idx === 0 ? totalComp : 0;
-      const base = r2(totalComp / n);
-      // ajustar residuo en el último
-      if (idx === n - 1) return r2(totalComp - base * (n - 1));
+    // ¿En cuántos recibos se reparte cada cargo? Por defecto en TODOS (prorrateo).
+    // Algunas aseguradoras cobran gastos de emisión / recargo de una vez → emisionEn:1.
+    const clampK = k => Math.max(1, Math.min(n, +k || n));
+    const emisionEn = clampK(opts.emisionEn != null ? opts.emisionEn : n);
+    const recargoEn = clampK(opts.recargoEn != null ? opts.recargoEn : n);
+    // reparte `totalComp` en partes iguales entre los primeros `k` recibos (residuo en el k-ésimo)
+    const splitK = (totalComp, idx, k) => {
+      if (idx >= k) return 0;
+      const base = r2(totalComp / k);
+      if (idx === k - 1) return r2(totalComp - base * (k - 1));
       return base;
     };
+    const split = (totalComp, idx) => splitK(totalComp, idx, n); // prorrateo simple en todos
     const rows = [];
     for (let i = 0; i < n; i++) {
-      const neta = split(d.neta, i, false);
-      const gastosEmision = split(d.gastosEmision, i, true);
-      const gastosFinan = split(d.gastosFinan, i, false);
-      const otros = split(d.otros, i, false);
+      const neta = split(d.neta, i);
+      const gastosEmision = splitK(d.gastosEmision, i, emisionEn);
+      const gastosFinan = splitK(d.gastosFinan, i, recargoEn);
+      const otros = split(d.otros, i);
       const baseGrav = r2(neta + gastosEmision + gastosFinan + otros);
-      // IVA por recibo: prorrateo del IVA total para cuadrar exacto
-      const iva = i === n - 1 ? r2(d.iva - r2(d.iva / n) * (n - 1)) : r2(d.iva / n);
+      // IVA por recibo = 12%/19% sobre la base de ESE recibo (cuadra exacto al sumar)
+      const iva = i === n - 1 ? r2(d.iva - rows.reduce((s, r) => s + r.iva, 0)) : r2(baseGrav * (d.ivaPct || 0) / 100);
       const total = r2(baseGrav + iva);
       const venc = new Date(inicio); venc.setMonth(venc.getMonth() + Math.round(i * pasoMeses));
       const lim = new Date(venc); lim.setDate(lim.getDate() + 15);
@@ -104,7 +108,7 @@ Orbit.primas = (function () {
         n: (i + 1) + '/' + n,
         neta, gastosEmision, gastosFinan, otros, iva, total,
         comAseguradora,
-        comVendedor: r2(comAseguradora * comVendPct / 100), // comVendedorPct = participación sobre la comisión de la aseguradora
+        comVendedor: r2(comAseguradora * comVendPct / 100),
         vence: venc.toISOString().slice(0, 10),
         fechaLimite: lim.toISOString().slice(0, 10)
       });

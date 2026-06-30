@@ -9,7 +9,7 @@ Orbit.modules.cobros = (function () {
   let st = { fq: '', fest: '', fase: '', sort: 'vence' };
 
   const FDEFS = () => [
-    { id: 'fq', type: 'search', ph: 'Buscar cliente o póliza…' },
+    { id: 'fq', type: 'search', ph: 'Buscar cliente, póliza o placa…' },
     { id: 'fest', type: 'select', ph: 'Estado', options: ['Pagado', 'Pendiente', 'Vencido', 'Anulado'].map(v => ({ v, t: v })) },
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
   ];
@@ -18,7 +18,9 @@ Orbit.modules.cobros = (function () {
     return S().all('cobros').filter(c => {
       if (c.estado === 'Anulado' && st.fest !== 'Anulado') return false;
       const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
-      const txt = ((cli ? cli.nombre : '') + ' ' + (p ? p.numero : '')).toLowerCase();
+      let placa = '';
+      if (p) { const veh = S().all('vehiculos').find(v => v.polizaId === p.id) || (p.vehiculoId ? S().get('vehiculos', p.vehiculoId) : null); if (veh) placa = veh.placa || ''; }
+      const txt = ((cli ? cli.nombre : '') + ' ' + (p ? p.numero : '') + ' ' + placa).toLowerCase();
       return (!st.fq || txt.includes(st.fq.toLowerCase())) &&
         (!st.fest || c.estado === st.fest) &&
         (!st.fase || c.asesorId === st.fase);

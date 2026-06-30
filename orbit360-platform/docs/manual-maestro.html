@@ -118,7 +118,7 @@ body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:
   <section class="slide" id="s3">
     <div class="slide-body">
       <h2><span class="num">3</span>Pólizas, cobros y recibos</h2>
-      <p>La póliza guarda el desglose completo de prima (neta, gastos de emisión, recargo por fraccionamiento, otros/asistencias, IVA y prima total), configurable por país (GT IVA 12%, CO 19%).</p>
+      <p>La póliza guarda el desglose completo de prima (neta, gastos de emisión, recargo por fraccionamiento, otros/asistencias, IVA y prima total), configurable por país (cada país define su IVA y tasas al darse de alta; p. ej. los países demo cargados traen sus porcentajes).</p>
       <h3>Recibos automáticos por forma de pago</h3>
       <ul>
         <li><span class="li-em">💳</span>Contado o tarjeta de crédito sin cuotas = 1 recibo.</li>
@@ -189,7 +189,7 @@ body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:
       <h2><span class="num">7</span>Aseguradoras · Cotizador · Comparativo</h2>
       <h3>🏛️ Aseguradoras</h3>
       <ul>
-        <li><span class="li-em">✅</span>Directorio GT/CO con habilitar/deshabilitar según vinculaciones.</li>
+        <li><span class="li-em">✅</span>Directorio de aseguradoras por país (multipaís) con habilitar/deshabilitar según vinculaciones del intermediario.</li>
         <li><span class="li-em">👥</span>Ficha: contactos por tipo (comercial/técnico/admin/siniestros), accesos a portales (links + usuario/contraseña), Drive, cuentas bancarias y datos de facturación (NIT, patrón de concepto).</li>
         <li><span class="li-em">📄</span>Documentos por producto y tarifas de ejemplo que alimentan cotizador/comparativo.</li>
       </ul>
@@ -240,19 +240,33 @@ body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:
   <section class="slide" id="s10">
     <div class="slide-body">
       <h2><span class="num">10</span>Insights · Portal del cliente · IA</h2>
-      <h3>📊 Insights</h3>
+      <h3>📊 Insights — inteligencia de negocio</h3>
+      <p>Convierte la operación en decisiones. Todo dato es clicable y baja al detalle.</p>
       <ul>
-        <li><span class="li-em">🔢</span>KPIs clicables con detalle; selector de país y periodo.</li>
-        <li><span class="li-em">📈</span>Producción nueva vs renovada con metas; comparativos interanual e intermensual por asesor/ramo/aseguradora.</li>
-        <li><span class="li-em">🧠</span>Análisis crítico dinámico y top de clientes clasificable.</li>
+        <li><span class="li-em">🔢</span>KPIs clicables (cartera, producción, retención, siniestralidad) con selector de país y periodo; cada uno abre el desglose de registros.</li>
+        <li><span class="li-em">📈</span>Producción <b>nueva vs renovada</b> contra metas; comparativos <b>interanual e intermensual</b> por asesor, ramo, aseguradora y general.</li>
+        <li><span class="li-em">🏆</span>Top de clientes clasificable por volumen de prima, nº de pólizas, ramo, aseguradora, nuevos/antiguos.</li>
+        <li><span class="li-em">🧠</span>Análisis crítico dinámico con IA: diagnóstico, riesgos y recomendaciones por área (comercial, retención, finanzas).</li>
+        <li><span class="li-em">💎</span>Valor: detecta caídas de renovación, cartera vencida y oportunidades de cross-sell antes de que duelan.</li>
       </ul>
-      <h3>🌐 Portal del cliente</h3>
+      <h3>🌐 Portal del cliente — autoservicio 24/7</h3>
+      <p>El cliente ve y gestiona lo suyo; cada acción sincroniza en vivo con su expediente.</p>
       <ul>
-        <li><span class="li-em">📑</span>Pólizas, pagos, siniestros y documentos con detalle; reportar pago (sube soporte) → crea gestión en Ops.</li>
-        <li><span class="li-em">🔔</span>Notificaciones reales; solicita gestiones que llegan al equipo; soporte tipo chatbot + acceso al asesor.</li>
+        <li><span class="li-em">📑</span>Pólizas, pagos, siniestros y documentos con detalle amplio; descarga y consulta de cobertura.</li>
+        <li><span class="li-em">💳</span>Reportar pago subiendo el soporte → crea gestión en Ops y notifica al equipo.</li>
+        <li><span class="li-em">🔔</span>Notificaciones reales (admin envía a todos o a uno); avisos en cada gestión, pago y renovación, también por WhatsApp/correo.</li>
+        <li><span class="li-em">🆘</span>Solicita gestiones (con adjuntos) que llegan a Ops; soporte tipo chatbot con el nombre del cliente + acceso directo al asesor.</li>
+        <li><span class="li-em">📚</span>Sección "Aprende" y glosario propios; cláusula mutua de confidencialidad al primer ingreso.</li>
+        <li><span class="li-em">💎</span>Valor: reduce llamadas y correos repetitivos, profesionaliza la relación y deja trazabilidad de todo.</li>
       </ul>
-      <h3>🤖 Orbit IA</h3>
-      <p>Asistente transversal por contexto (equipo/asesor/cliente). Con la key de Gemini conectada, potencia extracción, análisis y redacción.</p>
+      <h3>🤖 Orbit IA — inteligencia transversal</h3>
+      <p>Asistente por contexto (equipo / asesor / cliente) y motor que potencia toda la plataforma.</p>
+      <ul>
+        <li><span class="li-em">🔍</span>Extracción de documentos (importadores, comparativo), análisis crítico (Insights, Finanzas), redacción de mensajes y generación de cursos/copy.</li>
+        <li><span class="li-em">⚙️</span>Multi-proveedor sin sesgo (Gemini / ChatGPT / Claude / endpoint propio) configurable en Automatizaciones → Motor de IA, con "Comparar modelos".</li>
+        <li><span class="li-em">♻️</span>Todo lo generado por IA es <b>iterable</b>: botón mejorar/cambiar en cada sección.</li>
+        <li><span class="li-em">💎</span>Valor: la inteligencia real del sistema — sin key conectada opera con heurística (sin costo); con key, extracción y análisis en vivo.</li>
+      </ul>
     </div>
   </section>
 
@@ -275,7 +289,7 @@ body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:
       <h2><span class="num">12</span>Configuración y white-label</h2>
       <ul>
         <li><span class="li-em">🎨</span>Marca: logo del cliente, paleta seleccionable y tipografía — se reflejan en login, cintilla y documentos.</li>
-        <li><span class="li-em">🌎</span>Países: agregar con sus tasas/impuestos (GT 12%, CO 19%), moneda y catálogos.</li>
+        <li><span class="li-em">🌎</span>Países: agregar tantos como se necesite, cada uno con sus tasas/impuestos (IVA, recargo financiero), moneda y catálogos. La plataforma es multipaís y configurable.</li>
         <li><span class="li-em">👥</span>Equipo: crear usuarios con teléfono, correo (su login y bandeja), multi-rol y módulos visibles por usuario; comisión por asesor.</li>
         <li><span class="li-em">🔌</span>Integraciones: Make, Outlook/Gmail (IMAP/POP3), WhatsApp, Sheets, Metricool, IA, etc. — listas para configurar credenciales.</li>
         <li><span class="li-em">📦</span>Planes comercializables editables.</li>

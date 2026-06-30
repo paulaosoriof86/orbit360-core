@@ -460,11 +460,20 @@ Orbit.ciclo = (function () {
     }));
     back.querySelector('#gs-save').addEventListener('click', () => {
       const v = sid => (back.querySelector('#' + sid) || {}).value;
+      const nuevoAse = v('gs-ase'), nuevaNota = v('gs-nota');
+      const cambioAse = nuevoAse && nuevoAse !== g.asesorId;
+      const cambioNota = (nuevaNota || '') !== (g.nota || g.notas || '');
+      if (cambioNota) { g.bitacora = g.bitacora || []; g.bitacora.push({ ts: '2026-06-20 ' + new Date().toTimeString().slice(0, 5), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Nota', de: '', a: 'Nota actualizada', origen: 'manual' }); }
       S().update('gestiones', id, {
         lista: v('gs-lista'), tipo: v('gs-tipo'), titulo: v('gs-tipo'), estado: v('gs-estado'), prioridad: v('gs-prio'),
-        asesorId: v('gs-ase'), aseguradoraId: v('gs-asg'), vence: v('gs-vence'), proximaAccion: v('gs-prox'),
-        polizaId: (back.querySelector('#gs-pol') || {}).value || g.polizaId, nota: v('gs-nota'), actualizado: '2026-06-20'
+        asesorId: nuevoAse, aseguradoraId: v('gs-asg'), vence: v('gs-vence'), proximaAccion: v('gs-prox'),
+        polizaId: (back.querySelector('#gs-pol') || {}).value || g.polizaId, nota: nuevaNota, bitacora: g.bitacora, actualizado: '2026-06-20'
       });
+      // notificar al responsable (cambio de asignación o nueva nota) por WA + correo
+      const resp = S().get('asesores', nuevoAse); const cl = S().get('clientes', g.clienteId);
+      if (resp && (cambioAse || cambioNota)) {
+        notify({ tipo: 'gestion', titulo: (cambioAse ? '👤 Gestión asignada · ' : '📝 Nota en gestión · ') + (v('gs-tipo') || g.titulo), detalle: cl ? cl.nombre : '', para: resp.nombre, tel: resp.telefono || (cl ? cl.telefono : ''), email: resp.email || (cl ? cl.email : '') });
+      }
       back.remove(); refresh();
     });
   }

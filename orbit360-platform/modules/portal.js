@@ -21,6 +21,8 @@ Orbit.modules.portal = (function () {
     if (!clienteId) clienteId = (clientes()[0] || {}).id;
     const cli = S().get('clientes', clienteId);
     if (!cli) { host.innerHTML = '<div class="page"><div class="modstate"><div class="ms-ico">🔒</div><h2>Portal del Cliente</h2><p>Sin clientes para previsualizar.</p></div></div>'; return; }
+    // cláusula mutua de confidencialidad + tratamiento de datos al primer ingreso del cliente
+    if (Orbit.legal && Orbit.legal.gate) Orbit.legal.gate('cliente', 'cliente:' + clienteId);
     const nl = noLeidas(clienteId);
     host.innerHTML = `<div class="page">
       <div class="pt-preview">👁 Vista previa del <b>Portal del Cliente</b> · viendo a

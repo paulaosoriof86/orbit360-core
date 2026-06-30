@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbit 360 · Comparativa de motores de IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#C5162E;--graph:#1E2227;--ink:#1E2227;--ink2:#4b525c;--ink3:#8a929c;--line:#e4e2dc;--surface:#f5f4f0;--card:#fff;--ok:#1F8A5B;--warn:#C77A12;--blue:#2A6FDB}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Source Sans 3',sans-serif;color:var(--ink);background:var(--surface);line-height:1.6;padding:40px 24px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .hd{background:linear-gradient(120deg,var(--graph),#0f1318);color:#fff;border-radius:18px;padding:34px 38px;margin-bottom:26px}
+  .hd .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#ff9b8a;margin-bottom:10px}
+  .hd h1{font-family:'Manrope';font-size:30px;font-weight:800;letter-spacing:-.02em}
+  .hd p{color:rgba(255,255,255,.72);font-size:15px;margin-top:8px;max-width:640px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:26px}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;border-top:4px solid var(--c)}
+  .pcard .ico{font-size:26px}
+  .pcard h3{font-family:'Manrope';font-size:18px;font-weight:800;margin:8px 0 2px}
+  .pcard .cost{font-size:13px;color:var(--ink3);font-weight:600;margin-bottom:10px}
+  .pcard ul{list-style:none;font-size:13.5px}
+  .pcard li{padding:4px 0 4px 20px;position:relative}
+  .pcard li::before{content:'•';position:absolute;left:4px;color:var(--c);font-weight:700}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:10px}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:13.5px;margin-bottom:24px}
+  th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:var(--graph);color:#fff;font-family:'Manrope';font-weight:700;font-size:12.5px}
+  td:first-child{font-weight:700;background:var(--surface)}
+  tr:last-child td{border-bottom:none}
+  .rec{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:12px;padding:18px 22px;font-size:14.5px}
+  .rec b{color:var(--ink)}
+  .foot{text-align:center;color:var(--ink3);font-size:12px;margin-top:24px;font-family:'JetBrains Mono',monospace}
+  @media print{body{background:#fff;padding:0}.hd{border-radius:0}}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div class="eyebrow">Orbit 360 · Guía de decisión</div>
+    <h1>Comparativa de motores de IA</h1>
+    <p>Referencia honesta para elegir el proveedor según tu prioridad: calidad de extracción vs costo. Ninguno viene preseleccionado — el cliente decide en Configuración → Automatizaciones → Motor de IA.</p>
+  </div>
+
+  <div class="grid">
+    <div class="pcard" style="--c:#1F8A5B">
+      <div class="ico">✦</div><h3>Gemini</h3><div class="cost">💲 Costo bajo · Google</div>
+      <ul><li>Excelente OCR y multimodal nativo</li><li>Ideal para volumen masivo</li><li>Flash: barato pero menos consistente en extracción matizada</li><li>Pro: mejora precisión, sube costo</li></ul>
+      <span class="tag" style="background:#e6f4ec;color:#1F8A5B">Mejor para volumen / costo</span>
+    </div>
+    <div class="pcard" style="--c:#2A6FDB">
+      <div class="ico">◎</div><h3>ChatGPT (OpenAI)</h3><div class="cost">💲💲 Costo medio</div>
+      <ul><li>Muy fiable en salida JSON estructurada</li><li>Function-calling robusto</li><li>Buena visión/OCR</li><li>Equilibrio calidad / costo</li></ul>
+      <span class="tag" style="background:#e6eefb;color:#2A6FDB">Equilibrio</span>
+    </div>
+    <div class="pcard" style="--c:#C5162E">
+      <div class="ico">✲</div><h3>Claude (Anthropic)</h3><div class="cost">💲💲💲 Costo alto</div>
+      <ul><li>Mejor comprensión de documentos complejos</li><li>Extracción cuidadosa, no "inventa"</li><li>Ideal para pólizas/comparativos difíciles</li><li>Lo que A&S validó como bueno</li></ul>
+      <span class="tag" style="background:#fbe7e9;color:#C5162E">Máxima calidad</span>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Criterio</th><th>✦ Gemini</th><th>◎ ChatGPT</th><th>✲ Claude</th><th>⚙ Endpoint propio</th></tr></thead>
+    <tbody>
+      <tr><td>Costo / token</td><td>Muy bajo</td><td>Medio</td><td>Alto</td><td>Tu tarifa</td></tr>
+      <tr><td>Extracción PDF de seguros</td><td>Buena (Pro)</td><td>Muy buena</td><td>Excelente</td><td>Depende</td></tr>
+      <tr><td>OCR / imagen escaneada</td><td>Excelente</td><td>Muy buena</td><td>Muy buena</td><td>Depende</td></tr>
+      <tr><td>Volumen masivo</td><td>Ideal</td><td>Bueno</td><td>Costoso</td><td>Depende</td></tr>
+      <tr><td>Salida JSON estructurada</td><td>Buena</td><td>Excelente</td><td>Excelente</td><td>Depende</td></tr>
+      <tr><td>Análisis crítico / redacción</td><td>Buena</td><td>Muy buena</td><td>Excelente</td><td>Depende</td></tr>
+      <tr><td>Ideal para</td><td>Importaciones masivas, OCR</td><td>Equilibrio calidad/costo</td><td>Comparativo y casos complejos</td><td>Control total / on-premise</td></tr>
+    </tbody>
+  </table>
+
+  <div class="rec">
+    💡 <b>Recomendación:</b> para <b>extracción de pólizas con garantía de calidad</b> (cotizador / comparativo de A&S), <b>Claude o ChatGPT</b> superan a Gemini Flash. Para <b>volumen y costo</b> (importaciones masivas, OCR de muchos documentos), <b>Gemini</b> es muy rentable validando muestras. En el producto comercial se ofrecen los tres + endpoint propio sin preseleccionar, para que cada cliente elija según su prioridad. <b>A&S: usar Claude o ChatGPT.</b> Para mantener el repo y conectar backend, <b>ChatGPT con Codex</b> es buena opción operativa.
+  </div>
+
+  <div class="foot">Orbit 360 · documento generado para decisión de motor de IA · valida siempre con una muestra real antes de decidir</div>
+</div>
+<button onclick="window.print()" style="position:fixed;bottom:20px;right:20px;z-index:60;background:var(--red);color:#fff;border:none;border-radius:99px;padding:12px 20px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2)">🖨 Imprimir / PDF</button>
+</body>
+</html>
