@@ -37,7 +37,13 @@ Orbit.modules.automatizaciones = (function () {
   function addCustom(ev) { cfg.customEvents = customEvents().concat([ev]); saveCfg(); }
   function updateCustom(id, patch) { cfg.customEvents = customEvents().map(e => e.id === id ? Object.assign({}, e, patch) : e); saveCfg(); }
   function removeCustom(id) { cfg.customEvents = customEvents().filter(e => e.id !== id); delete cfg['ev_' + id]; saveCfg(); }
-  function getIA() { return cfg.ia || { proveedor: 'Gemini', key: '', modelo: 'gemini-1.5-flash', activo: false }; }
+  const IA_PROVS = [
+    { id: 'Gemini',   nombre: 'Gemini',  ico: '✦', cost: '💲',     ideal: 'Económico · OCR y volumen masivo', modelos: ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash'], keylbl: 'API Key (Google AI Studio)' },
+    { id: 'ChatGPT',  nombre: 'ChatGPT', ico: '◎', cost: '💲💲',   ideal: 'Equilibrio · extracción estructurada fiable', modelos: ['gpt-4o-mini', 'gpt-4o', 'gpt-4.1'], keylbl: 'API Key (OpenAI)' },
+    { id: 'Claude',   nombre: 'Claude',  ico: '✲', cost: '💲💲💲', ideal: 'Máxima calidad · documentos de seguros complejos', modelos: ['claude-3-5-haiku', 'claude-3-5-sonnet', 'claude-3-7-sonnet'], keylbl: 'API Key (Anthropic)' },
+    { id: 'Endpoint', nombre: 'Endpoint propio', ico: '⚙', cost: '🏷️', ideal: 'Tu modelo / proxy interno', modelos: ['custom'], keylbl: 'URL del endpoint' }
+  ];
+  function getIA() { return cfg.ia || { proveedor: '', key: '', modelo: '', activo: false }; }
   function getWH() { return cfg.webhook || ''; }
 
   function render(h) {
@@ -115,16 +121,24 @@ Orbit.modules.automatizaciones = (function () {
             <button class="btn primary" style="margin-top:12px;width:100%" id="aut-scan">🔍 Escanear y notificar</button>
           </div>
 
-          <!-- Asistente IA -->
+          <!-- Asistente IA (multi-proveedor, sin sesgo) -->
           <div class="card pad" style="margin-bottom:14px">
-            <b style="font-family:var(--f-display);font-size:15px">🤖 Asistente IA (Gemini)</b>
-            <div class="muted" style="font-size:12px;margin-top:4px;margin-bottom:12px">Mapeo de columnas en importadores, extracción de documentos, generación de cotizaciones/propuestas y redacción de mensajes. Sin API key → heurística gratuita.</div>
-            <label class="ce-l">Proveedor<select id="ia-prov" class="o-sel">${['Gemini (Google IA)', 'ChatGPT (OpenAI)', 'Claude (Anthropic)'].map(p => `<option ${p.startsWith(getIA().proveedor.split(' ')[0]) ? 'selected' : ''}>${p}</option>`).join('')}</select></label>
-            <label class="ce-l" style="margin-top:8px">Modelo (económico)<select id="ia-mod" class="o-sel"><option ${getIA().modelo === 'gemini-1.5-flash' ? 'selected' : ''}>gemini-1.5-flash</option><option ${getIA().modelo === 'gemini-1.5-pro' ? 'selected' : ''}>gemini-1.5-pro</option><option ${getIA().modelo === 'gpt-4o-mini' ? 'selected' : ''}>gpt-4o-mini</option></select></label>
-            <label class="ce-l" style="margin-top:8px">API Key / Endpoint<input id="ia-key" class="o-sel" type="password" placeholder="Pega tu API key" value="${U.esc(getIA().key)}"></label>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <b style="font-family:var(--f-display);font-size:15px">🤖 Motor de IA</b>
+              <button class="btn ghost sm" id="ia-compare">📊 Comparar modelos</button>
+            </div>
+            <div class="muted" style="font-size:12px;margin-top:4px;margin-bottom:12px">Potencia importadores (mapeo/extracción), comparativo de pólizas, análisis crítico, generación de cursos y copy. Elige el proveedor que prefieras — <b>ninguno viene preseleccionado</b>. Sin API key → heurística gratuita.</div>
+            <div class="ia-cards">${IA_PROVS.map(p => `
+              <button class="ia-card ${getIA().proveedor === p.id ? 'on' : ''}" data-iap="${p.id}">
+                <div class="ia-card-top"><span class="ia-ico">${p.ico}</span><span class="ia-cost" title="Costo relativo">${p.cost}</span></div>
+                <b>${p.nombre}</b>
+                <small>${p.ideal}</small>
+              </button>`).join('')}</div>
+            <label class="ce-l" style="margin-top:12px">Modelo<select id="ia-mod" class="o-sel"></select></label>
+            <label class="ce-l" style="margin-top:8px"><span id="ia-keylbl">API Key</span><input id="ia-key" class="o-sel" type="password" placeholder="Pega tu API key" value="${U.esc(getIA().key)}"></label>
             <label class="ce-l ck" style="margin-top:10px"><input type="checkbox" id="ia-act" ${getIA().activo ? 'checked' : ''}> Activar IA como asistente</label>
-            <button class="btn primary" id="ia-save" style="margin-top:12px;width:100%">💾 Guardar IA</button>
-            <div class="cfg-note" style="margin-top:10px">Recomendado <b>Gemini Flash</b> por costo/token. La IA es opcional: sin ella, los importadores usan heurística (sin costo).</div>
+            <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="ia-save" style="flex:1">💾 Guardar</button><button class="btn ghost" id="ia-test">🔌 Probar</button></div>
+            <div class="cfg-note" style="margin-top:10px">La elección se guarda por cliente (tenant). La IA es opcional: sin ella, todo funciona con heurística (sin costo).</div>
           </div>
 
           <!-- Integraciones rápidas -->
@@ -168,13 +182,38 @@ Orbit.modules.automatizaciones = (function () {
     h.querySelectorAll('.aut-hook').forEach(i => i.addEventListener('change', () => setEvCfg(i.dataset.ev, 'hook', i.value)));
     h.querySelectorAll('.aut-del').forEach(b => b.addEventListener('click', () => { if (confirm('¿Eliminar esta automatización personalizada?')) { removeCustom(b.dataset.ev); render(h); } }));
     const nb = h.querySelector('#aut-new'); if (nb) nb.addEventListener('click', () => nuevaAuto(h));
-    // IA
+    // IA — selector de tarjetas
+    function refreshModelos() {
+      const cur = getIA();
+      const p = IA_PROVS.find(x => x.id === cur.proveedor);
+      const modSel = h.querySelector('#ia-mod'), keylbl = h.querySelector('#ia-keylbl');
+      if (modSel) modSel.innerHTML = p ? p.modelos.map(m => `<option ${cur.modelo === m ? 'selected' : ''}>${m}</option>`).join('') : '<option value="">— elige un proveedor —</option>';
+      if (keylbl) keylbl.textContent = p ? p.keylbl : 'API Key';
+    }
+    refreshModelos();
+    h.querySelectorAll('.ia-card').forEach(c => c.addEventListener('click', () => {
+      const id = c.dataset.iap; const p = IA_PROVS.find(x => x.id === id);
+      cfg.ia = Object.assign({}, getIA(), { proveedor: id, modelo: (p && p.modelos[0]) || '' });
+      saveCfg();
+      h.querySelectorAll('.ia-card').forEach(x => x.classList.toggle('on', x.dataset.iap === id));
+      refreshModelos();
+    }));
     h.querySelector('#ia-save').addEventListener('click', () => {
-      cfg.ia = { proveedor: h.querySelector('#ia-prov').value.split(' ')[0], key: h.querySelector('#ia-key').value.trim(), modelo: h.querySelector('#ia-mod').value, activo: h.querySelector('#ia-act').checked };
+      const cur = getIA();
+      if (!cur.proveedor) { toast('Elige primero un proveedor de IA'); return; }
+      cfg.ia = { proveedor: cur.proveedor, key: h.querySelector('#ia-key').value.trim(), modelo: h.querySelector('#ia-mod').value, activo: h.querySelector('#ia-act').checked };
       saveCfg();
       if (Orbit.ia && Orbit.ia.conectar) Orbit.ia.conectar(cfg.ia.proveedor, cfg.ia.key, cfg.ia.modelo);
-      toast('✓ Configuración de IA guardada');
+      try { const t = Orbit.tenant && Orbit.tenant.get(); if (t) { t.ia = { proveedor: cfg.ia.proveedor, modelo: cfg.ia.modelo, activo: cfg.ia.activo }; Orbit.tenant.save && Orbit.tenant.save(t); } } catch (e) {}
+      toast('✓ Motor de IA guardado (' + cfg.ia.proveedor + ')');
     });
+    const tb = h.querySelector('#ia-test'); if (tb) tb.addEventListener('click', () => {
+      const cur = getIA();
+      if (!cur.proveedor) { toast('Elige un proveedor primero'); return; }
+      const k = h.querySelector('#ia-key').value.trim();
+      toast(k ? ('🔌 ' + cur.proveedor + ': clave detectada — conexión real al migrar backend') : ('⚠️ ' + cur.proveedor + ' sin API key — opera en heurística gratuita'));
+    });
+    const cmp = h.querySelector('#ia-compare'); if (cmp) cmp.addEventListener('click', compararModelos);
     // Escanear
     h.querySelector('#aut-scan').addEventListener('click', () => {
       const a = alertasPendientes();
@@ -187,6 +226,32 @@ Orbit.modules.automatizaciones = (function () {
       alert('🔍 Escaneo completado:\n\n' + (msgs.length ? msgs.join('\n') : '✅ Todo al día — sin pendientes urgentes.'));
       render(h);
     });
+  }
+
+  function compararModelos() {
+    let back = document.getElementById('ia-cmp'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'ia-cmp'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    const rows = [
+      ['Costo / token', '💲 Muy bajo', '💲💲 Medio', '💲💲💲 Alto', '🏷️ Tu tarifa'],
+      ['Extracción de PDF de seguros', 'Buena (Pro)', 'Muy buena', 'Excelente', 'Depende'],
+      ['OCR / imagen', 'Excelente', 'Muy buena', 'Muy buena', 'Depende'],
+      ['Volumen masivo', 'Ideal', 'Bueno', 'Costoso', 'Depende'],
+      ['Salida JSON estructurada', 'Buena', 'Excelente', 'Excelente', 'Depende'],
+      ['Ideal para', 'Importaciones masivas, OCR', 'Equilibrio calidad/costo', 'Comparativo y casos complejos', 'Control total / on-premise']
+    ];
+    back.innerHTML = '<div class="card" style="width:min(720px,96vw);max-height:88vh;overflow:auto;padding:0">'
+      + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">📊 Comparar motores de IA</b><button class="imp-x" id="cmp-x">✕</button></div>'
+      + '<div style="padding:16px 20px">'
+      + '<div class="muted" style="font-size:12.5px;margin-bottom:12px">Referencia honesta para que <b>elijas según tu prioridad</b> (calidad vs costo). Ninguno está preseleccionado.</div>'
+      + '<table class="tbl" style="font-size:13px"><thead><tr><th></th><th>✦ Gemini</th><th>◎ ChatGPT</th><th>✲ Claude</th><th>⚙ Endpoint</th></tr></thead><tbody>'
+      + rows.map(r => '<tr><td style="font-weight:700">' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td><td>' + r[4] + '</td></tr>').join('')
+      + '</tbody></table>'
+      + '<div class="cfg-note" style="margin-top:14px">💡 Para <b>extracción de pólizas con garantía de calidad</b>, Claude o ChatGPT suelen superar a Gemini Flash. Para <b>volumen/costo</b>, Gemini es muy rentable. Valida con una muestra antes de decidir.</div>'
+      + '</div></div>';
+    document.body.appendChild(back);
+    back.addEventListener('click', e => { if (e.target === back) back.remove(); });
+    back.querySelector('#cmp-x').addEventListener('click', () => back.remove());
   }
 
   function toast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }

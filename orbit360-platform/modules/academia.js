@@ -55,6 +55,7 @@ Orbit.modules.academia = (function () {
     const avg = arr.length ? Math.round(arr.reduce((s, c) => s + c.progreso, 0) / arr.length) : 0;
 
     const actions = '<button class="btn ghost" id="ac-ia" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Crear con IA</button>'
+      + '<button class="btn ghost" id="ac-man" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">📖 Manuales</button>'
       + '<button class="btn ghost" id="ac-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬆ Cargar recurso</button>'
       + '<button class="btn primary" id="ac-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Curso</button>';
 
@@ -85,6 +86,45 @@ Orbit.modules.academia = (function () {
     const impBtn = host.querySelector('#ac-imp'); if (impBtn) impBtn.addEventListener('click', () => Orbit.importa.open('documentos', { onDone: () => render(host) }));
     const newBtn = host.querySelector('#ac-new'); if (newBtn) newBtn.addEventListener('click', () => editar(null));
     const iaBtn  = host.querySelector('#ac-ia');  if (iaBtn)  iaBtn.addEventListener('click', crearIA);
+    const manBtn = host.querySelector('#ac-man'); if (manBtn) manBtn.addEventListener('click', verManuales);
+  }
+
+  /* ---- Lector de manuales in-app (iframe, sin descarga) ---- */
+  function verManuales() {
+    const rol = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+    const manuales = [
+      { t: 'Manual maestro (todos los módulos)', src: 'docs/manual-maestro.html', ico: '📘', sub: 'Super Admin · visión completa' },
+      { t: 'Capacitación técnica interna', src: 'docs/capacitacion-tecnica-interna.html', ico: '🛠', sub: 'Demo, backend, migración, soporte' },
+      { t: 'Capacitación CRM', src: 'docs/capacitacion-crm.html', ico: '🎯', sub: 'Operación diaria del CRM' }
+    ];
+    let back = document.getElementById('ac-man-v'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'ac-man-v';
+    back.style.cssText = 'position:fixed;inset:0;z-index:210;background:var(--surface);display:flex;flex-direction:column';
+    const open = (m) => {
+      body.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--card)">'
+        + '<button class="btn ghost sm" id="mv-back">← Manuales</button>'
+        + '<b style="font-family:var(--f-display);font-size:14px">' + m.ico + ' ' + U.esc(m.t) + '</b>'
+        + '<a class="btn ghost sm" href="' + m.src + '" target="_blank" style="margin-left:auto">↗ Abrir aparte / imprimir</a></div>'
+        + '<iframe src="' + m.src + '" style="flex:1;width:100%;border:0;background:#fff"></iframe>';
+      body.style.cssText = 'flex:1;display:flex;flex-direction:column;min-height:0';
+      body.querySelector('#mv-back').onclick = lista;
+    };
+    const lista = () => {
+      body.style.cssText = 'flex:1;overflow:auto;padding:24px';
+      body.innerHTML = '<div style="max-width:720px;margin:0 auto">'
+        + '<div class="muted" style="font-size:12.5px;margin-bottom:14px">📖 Manuales de Orbit 360 — se leen aquí dentro. Rol activo: <b>' + U.esc(rol) + '</b></div>'
+        + '<div style="display:grid;gap:12px">' + manuales.map((m, i) => '<button class="card pad" data-m="' + i + '" style="text-align:left;cursor:pointer;display:flex;align-items:center;gap:14px">'
+          + '<span style="font-size:28px">' + m.ico + '</span><span><b style="font-family:var(--f-display);font-size:15px;display:block">' + U.esc(m.t) + '</b><small class="muted">' + U.esc(m.sub) + '</small></span>'
+          + '<span style="margin-left:auto;color:var(--red);font-weight:700">Leer →</span></button>').join('') + '</div></div>';
+      body.querySelectorAll('[data-m]').forEach(b => b.onclick = () => open(manuales[+b.dataset.m]));
+    };
+    back.innerHTML = '<div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);background:var(--card)">'
+      + '<button class="btn ghost" id="mv-close">✕ Cerrar</button>'
+      + '<b style="font-family:var(--f-display);font-size:16px">📖 Manuales Orbit</b></div>';
+    const body = document.createElement('div'); back.appendChild(body);
+    document.body.appendChild(back);
+    back.querySelector('#mv-close').onclick = () => back.remove();
+    lista();
   }
 
   function card(c) {

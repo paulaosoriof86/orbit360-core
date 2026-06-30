@@ -161,12 +161,18 @@ Orbit.importa = (function () {
       fields: {
         placa: ['placa', 'matricula', 'patente', 'chapa'], marca: ['marca', 'fabricante'],
         linea: ['linea', 'modelo', 'referencia', 'version'], anio: ['anio', 'ano', 'modelo año', 'year'],
-        clienteNombre: ['cliente', 'propietario', 'asegurado', 'nombre']
+        chasis: ['chasis', 'vin', 'serie', 'no chasis'], motor: ['motor', 'no motor', 'numero motor'],
+        clienteNombre: ['cliente', 'propietario', 'asegurado', 'nombre'],
+        polizaNumero: ['poliza', 'no poliza', 'numero poliza', 'nro poliza']
       },
       build(rec) {
         rec.anio = parseNum(rec.anio) || rec.anio;
         if (rec.clienteNombre) { const c = Orbit.store.all('clientes').find(x => norm(x.nombre).indexOf(norm(rec.clienteNombre)) >= 0 || norm(rec.clienteNombre).indexOf(norm(x.nombre)) >= 0); if (c) rec.clienteId = c.id; }
-        delete rec.clienteNombre; return rec;
+        // tarjeta de circulación: enlaza a la póliza (y hereda cliente de ella)
+        if (rec.polizaNumero) { const p = Orbit.store.all('polizas').find(x => norm(x.numero) === norm(rec.polizaNumero)); if (p) { rec.polizaId = p.id; if (!rec.clienteId) rec.clienteId = p.clienteId; } }
+        // si la importación va dentro de una póliza abierta (scope), enlazarla
+        if (!rec.polizaId && state && state.scope && state.scope.polId) { rec.polizaId = state.scope.polId; const p = Orbit.store.get('polizas', state.scope.polId); if (p && !rec.clienteId) rec.clienteId = p.clienteId; }
+        delete rec.clienteNombre; delete rec.polizaNumero; return rec;
       }
     },
     'movimientos-finanzas': {

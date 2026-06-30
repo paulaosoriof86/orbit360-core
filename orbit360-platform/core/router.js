@@ -134,8 +134,33 @@ Orbit.router = (function () {
     document.getElementById('burger').addEventListener('click', openMobile);
     document.querySelector('.sb-overlay').addEventListener('click', closeMobile);
     document.querySelectorAll('[data-home]').forEach(el => el.addEventListener('click', () => go('inicio')));
+    wireGlobalSearch();
     window.addEventListener('hashchange', onHash);
     onHash();
+  }
+
+  function wireGlobalSearch() {
+    const box = document.querySelector('.tb-search'); if (!box) return;
+    const inp = box.querySelector('input'); if (!inp) return;
+    let dd = document.getElementById('tb-search-dd');
+    if (!dd) { dd = document.createElement('div'); dd.id = 'tb-search-dd'; dd.className = 'tb-search-dd'; box.appendChild(dd); }
+    const S = Orbit.store, U = Orbit.ui;
+    function buscar(qstr) {
+      const t = qstr.trim().toLowerCase(); if (t.length < 2) { dd.classList.remove('open'); dd.innerHTML = ''; return; }
+      const res = [];
+      S.all('clientes').forEach(c => { if ((c.nombre + ' ' + (c.identificacion || '') + ' ' + (c.email || '')).toLowerCase().includes(t)) res.push({ ic: '🧑', t: c.nombre, s: 'Cliente · ' + (c.identificacion || c.tipo || ''), go: '#/cliente360?c=' + c.id }); });
+      S.all('polizas').forEach(p => { const veh = S.all('vehiculos').find(v => v.polizaId === p.id); const placa = (veh && veh.placa) || p.placa || ''; const cli = S.get('clientes', p.clienteId); if ((p.numero + ' ' + p.producto + ' ' + placa + ' ' + (cli ? cli.nombre : '') + ' ' + (veh ? veh.marca + ' ' + veh.linea : '')).toLowerCase().includes(t)) res.push({ ic: '📑', t: p.numero + (placa ? ' · ' + placa : ''), s: 'Póliza · ' + p.ramo + (cli ? ' · ' + cli.nombre : ''), go: '#/cliente360?c=' + p.clienteId }); });
+      S.all('vehiculos').forEach(v => { if (((v.placa || '') + ' ' + (v.marca || '') + ' ' + (v.linea || '')).toLowerCase().includes(t)) { const cli = S.get('clientes', v.clienteId); res.push({ ic: '🚗', t: (v.placa || (v.marca + ' ' + v.linea)), s: 'Vehículo · ' + v.marca + ' ' + v.linea + (cli ? ' · ' + cli.nombre : ''), go: '#/cliente360?c=' + v.clienteId }); } });
+      S.all('cobros').forEach(cb => { const cli = S.get('clientes', cb.clienteId); if (((cli ? cli.nombre : '') + ' ' + (cb.numeroRecibo || '')).toLowerCase().includes(t)) res.push({ ic: '💳', t: (cb.numeroRecibo || 'Recibo') + ' · ' + U.money(cb.monto || 0, cb.moneda), s: 'Cobro · ' + cb.estado + (cli ? ' · ' + cli.nombre : ''), go: '#/cliente360?c=' + cb.clienteId }); });
+      S.all('aseguradoras').forEach(a => { if ((a.nombre || '').toLowerCase().includes(t)) res.push({ ic: '🏛️', t: a.nombre, s: 'Aseguradora · ' + (a.pais || ''), go: '#/aseguradoras' }); });
+      const top = res.slice(0, 12);
+      dd.innerHTML = top.length ? top.map(r => `<button class="tb-sr" data-go="${r.go}"><span>${r.ic}</span><span class="tb-sr-t">${U.esc(r.t)}<small>${U.esc(r.s)}</small></span></button>`).join('') + (res.length > 12 ? `<div class="tb-sr-more">+${res.length - 12} más…</div>` : '') : '<div class="tb-sr-empty">Sin resultados para "' + U.esc(qstr) + '"</div>';
+      dd.classList.add('open');
+      dd.querySelectorAll('[data-go]').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); location.hash = b.dataset.go; dd.classList.remove('open'); inp.value = ''; }));
+    }
+    inp.addEventListener('input', () => buscar(inp.value));
+    inp.addEventListener('focus', () => { if (inp.value.trim().length >= 2) buscar(inp.value); });
+    inp.addEventListener('blur', () => setTimeout(() => dd.classList.remove('open'), 180));
   }
   return { init, go, rebuildSidebar: () => { try { buildSidebar(); setActive((Orbit.route && Orbit.route.key) || 'inicio'); } catch (e) {} } };
 })();

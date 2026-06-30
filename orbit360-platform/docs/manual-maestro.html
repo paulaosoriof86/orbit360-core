@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual Maestro · Orbit 360</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--red:#C5162E;--graph:#1E2227;--ink:#1E2227;--ink-2:#3d4350;--ink-3:#7a818e;--surface:#f4f3ee;--card:#fff;--line:#e4e2db;--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:var(--ink);line-height:1.65}
+.nav{position:sticky;top:0;z-index:50;background:var(--graph);color:#fff;display:flex;align-items:center;gap:14px;padding:14px 24px;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.nav-logo{font-size:20px;font-weight:800;letter-spacing:-.02em}.nav-logo span{color:var(--red)}
+.nav-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
+.nav-prog{margin-left:auto;display:flex;align-items:center;gap:10px}
+.prog-bar{width:120px;height:5px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}
+.prog-bar i{display:block;height:100%;background:var(--red);border-radius:99px;transition:.4s;width:0}
+.prog-lbl{font-size:11px;color:rgba(255,255,255,.6)}
+.layout{display:grid;grid-template-columns:250px 1fr;max-width:1080px;margin:0 auto;padding:24px 16px;gap:20px}
+.toc{position:sticky;top:66px;align-self:start;background:var(--card);border-radius:var(--r);padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);max-height:calc(100vh - 90px);overflow-y:auto}
+.toc-t{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:10px 0 8px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer;transition:.12s;margin-bottom:1px}
+.toc-item:hover{background:var(--surface)}.toc-item.active{background:var(--red);color:#fff}
+.content{display:grid;gap:22px}
+.slide{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);scroll-margin-top:80px}
+.slide-hero{background:linear-gradient(120deg,var(--graph),#111820);padding:34px 38px;color:#fff}
+.slide-hero .eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:10px}
+.slide-hero h1{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-bottom:10px}
+.slide-hero h1 span{color:var(--red)}
+.slide-hero p{font-size:14.5px;color:rgba(255,255,255,.8);max-width:560px}
+.slide-body{padding:30px 38px}
+.slide h2{font-size:18px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:9px}
+.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:13px;font-weight:800;flex-shrink:0}
+.slide h3{font-size:14.5px;font-weight:800;margin:18px 0 8px;color:var(--graph)}
+.slide p{font-size:14px;color:var(--ink-2);margin-bottom:11px}
+.slide ul{list-style:none;display:grid;gap:8px;margin-bottom:14px}
+.slide ul li{display:flex;gap:11px;align-items:flex-start;font-size:13.5px;color:var(--ink-2);padding:9px 13px;background:var(--surface);border-radius:8px}
+.slide ul li .li-em{font-size:17px;flex-shrink:0;margin-top:1px}
+.tip{background:#fff7ed;border-left:4px solid #c9821b;border-radius:0 10px 10px 0;padding:13px 17px;margin-top:14px}
+.tip b{display:block;font-size:13px;color:#c9821b;margin-bottom:4px}.tip p{font-size:13px;color:var(--ink-2);margin:0}
+.flow{background:#eef6ff;border-left:4px solid #2563eb;border-radius:0 10px 10px 0;padding:13px 17px;margin-top:14px}
+.flow b{display:block;font-size:13px;color:#2563eb;margin-bottom:4px}.flow p{font-size:13px;color:var(--ink-2);margin:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.info-card{border:1px solid var(--line);border-radius:10px;padding:15px 17px}
+.info-card .ic{font-size:21px;margin-bottom:6px}.info-card b{display:block;font-size:13.5px;font-weight:700;margin-bottom:4px}.info-card p{font-size:12.5px;color:var(--ink-3);margin:0}
+.step-list{display:grid;gap:9px;margin:12px 0}
+.step-item{display:flex;gap:12px;align-items:flex-start;padding:12px 15px;border:1px solid var(--line);border-radius:10px}
+.step-n{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--graph);color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center}
+.step-t{font-size:13.5px;font-weight:700;margin-bottom:2px}.step-d{font-size:13px;color:var(--ink-2)}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;padding:15px 38px;border-top:1px solid var(--line)}
+.btn-nav{display:inline-flex;align-items:center;gap:7px;background:var(--red);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none}
+.btn-ghost{background:none;color:var(--ink-2);border:1px solid var(--line)}
+.print-btn{position:fixed;bottom:20px;right:20px;z-index:60;background:var(--red);color:#fff;border:none;border-radius:99px;padding:12px 20px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.toc{position:static;max-height:none}.grid2{grid-template-columns:1fr}}
+@media print{.nav,.toc,.footer-nav,.print-btn{display:none}.layout{display:block;max-width:none}.slide{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid;margin-bottom:14px}}
+</style>
+</head>
+<body>
+<div class="nav">
+  <div><div class="nav-logo">Orbit <span>360</span></div><div class="nav-sub">📘 Manual Maestro · Super Admin</div></div>
+  <div class="nav-prog"><div class="prog-bar"><i id="progbar"></i></div><span class="prog-lbl" id="proglbl">0/12</span></div>
+</div>
+<div class="layout">
+  <aside class="toc" id="toc">
+    <div class="toc-t">Contenido</div>
+    <div class="toc-item active" data-go="s1">🌅 Introducción y roles</div>
+    <div class="toc-item" data-go="s2">🧑‍💼 CRM · Clientes 360</div>
+    <div class="toc-item" data-go="s3">📑 Pólizas, cobros y recibos</div>
+    <div class="toc-item" data-go="s4">🔄 Renovaciones y cancelaciones</div>
+    <div class="toc-item" data-go="s5">🚨 Siniestros y comisiones</div>
+    <div class="toc-item" data-go="s6">🗂️ Operación · Ops y Leads</div>
+    <div class="toc-item" data-go="s7">🏛️ Aseguradoras · Cotizador · Comparativo</div>
+    <div class="toc-item" data-go="s8">💰 Finanzas</div>
+    <div class="toc-item" data-go="s9">📣 Marketing y Academia</div>
+    <div class="toc-item" data-go="s10">📊 Insights · Portal · IA</div>
+    <div class="toc-item" data-go="s11">⬇ Importadores inteligentes</div>
+    <div class="toc-item" data-go="s12">⚙️ Configuración y white-label</div>
+  </aside>
+  <main class="content" id="content">
+
+  <section class="slide" id="s1">
+    <div class="slide-hero"><div class="eyebrow">Manual Maestro</div><h1>Bienvenido a <span>Orbit 360</span></h1><p>El sistema 360 inteligente e integral para intermediarios de seguros. Este manual es la guía completa para el Super Admin: cubre cada módulo, los flujos clave y cómo todo se conecta en vivo.</p></div>
+    <div class="slide-body">
+      <h2><span class="num">1</span>Qué es Orbit 360</h2>
+      <p>Orbit 360 centraliza la operación de una correduría: clientes, pólizas, cobros, renovaciones, siniestros, comisiones, finanzas, marketing, capacitación y portal del cliente — todo sincronizado en vivo desde una única capa de datos.</p>
+      <h3>Roles del sistema</h3>
+      <ul>
+        <li><span class="li-em">👑</span><b>Dirección / Super Admin:</b> ve todo, configura la plataforma, define metas y permisos.</li>
+        <li><span class="li-em">🛠️</span><b>Administrativo / Operativo:</b> gestiona Ops, pólizas, cobros, conciliación; no ve comisiones de empresa salvo permiso.</li>
+        <li><span class="li-em">💼</span><b>Comercial / Asesor:</b> trabaja sus Leads, clientes y renovaciones; ve sus propias comisiones, no las de la empresa.</li>
+        <li><span class="li-em">📣</span><b>Marketing:</b> calendario de contenidos, campañas y analítica de mercadeo.</li>
+        <li><span class="li-em">💰</span><b>Finanzas:</b> movimientos, liquidaciones, conciliación, presupuesto.</li>
+      </ul>
+      <div class="flow"><b>🔗 Principio clave: sincronía en vivo</b><p>Cada acción (aplicar un pago, cerrar un lead, registrar un siniestro) se refleja al instante en la ficha del cliente, en analítica y en finanzas. Nada se captura dos veces.</p></div>
+      <div class="tip"><b>💡 Multi-tenant white-label</b><p>La misma base se personaliza por cliente solo con configuración: logo, paleta, país por defecto, glosario y aseguradoras. El código no cambia entre clientes.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" id="s2">
+    <div class="slide-body">
+      <h2><span class="num">2</span>CRM · Clientes 360</h2>
+      <p>La ficha del cliente es el corazón del CRM. Reúne todo lo del cliente en pestañas: resumen, pólizas, vehículos, recibos y pagos, siniestros, comisiones, documentos, correos e historial.</p>
+      <h3>Acciones desde la ficha</h3>
+      <ul>
+        <li><span class="li-em">📞</span>Panel superior: WhatsApp, correo (vinculado a póliza), solicitar gestión y ver historial.</li>
+        <li><span class="li-em">🖱️</span>Todo registro es clicable: abre el detalle ampliado (póliza, recibo, siniestro, comisión).</li>
+        <li><span class="li-em">📊</span>Los KPIs de la ficha despliegan el desglose de registros al hacer clic.</li>
+        <li><span class="li-em">⬇</span>Importar al expediente: modo documental (guarda y visualiza) o inteligente (extrae y completa datos).</li>
+      </ul>
+      <div class="step-list">
+        <div class="step-item"><span class="step-n">1</span><div><div class="step-t">Crear cliente</div><div class="step-d">Manual (formulario con cascada país→depto→ciudad) o importando documentos (DPI/RTU) con extracción inteligente.</div></div></div>
+        <div class="step-item"><span class="step-n">2</span><div><div class="step-t">Solicitar gestión</div><div class="step-d">Genera una tarjeta en Ops asociada al cliente/póliza, con tipo seleccionable, nota y adjuntos. Notifica al equipo.</div></div></div>
+        <div class="step-item"><span class="step-n">3</span><div><div class="step-t">Recibos por póliza</div><div class="step-d">El filtro por póliza separa los recibos para que no se mezclen entre pólizas del mismo cliente.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="s3">
+    <div class="slide-body">
+      <h2><span class="num">3</span>Pólizas, cobros y recibos</h2>
+      <p>La póliza guarda el desglose completo de prima (neta, gastos de emisión, recargo por fraccionamiento, otros/asistencias, IVA y prima total), configurable por país (GT IVA 12%, CO 19%).</p>
+      <h3>Recibos automáticos por forma de pago</h3>
+      <ul>
+        <li><span class="li-em">💳</span>Contado o tarjeta de crédito sin cuotas = 1 recibo.</li>
+        <li><span class="li-em">📆</span>Fraccionado = N recibos según la cantidad de pagos elegida (preguntada al crear/editar/renovar, porque cada aseguradora permite un máximo distinto).</li>
+        <li><span class="li-em">🧮</span>El recargo por financiamiento se prorratea entre los recibos.</li>
+      </ul>
+      <h3>Aplicar pago y conciliar</h3>
+      <ul>
+        <li><span class="li-em">📅</span>Al aplicar pago se elige la fecha de envío a gestión (por defecto hoy, editable).</li>
+        <li><span class="li-em">🧾</span>Cargar la factura ajusta la fecha real en que pagó la aseguradora — es un medio adicional de conciliación.</li>
+        <li><span class="li-em">🔁</span>Estados Pendiente → Pagado → Conciliado, sincronizados con finanzas.</li>
+      </ul>
+      <div class="tip"><b>💡 Cambiar forma de pago</b><p>Si cambias la frecuencia en una póliza, los recibos de cuotas pendientes se regeneran automáticamente. También puedes cambiar el asesor de la póliza (cuando la vendió alguien distinto al del cliente).</p></div>
+    </div>
+  </section>
+
+  <section class="slide" id="s4">
+    <div class="slide-body">
+      <h2><span class="num">4</span>Renovaciones y cancelaciones</h2>
+      <p>Todas las pólizas se renuevan anualmente (salvo las marcadas como no renovables). El módulo prioriza vencidas y próximas a vencer.</p>
+      <h3>Renovar</h3>
+      <ul>
+        <li><span class="li-em">📋</span>Al renovar se pregunta la forma de pago para generar los nuevos recibos, no solo la prima.</li>
+        <li><span class="li-em">⚖️</span>Comparativo multi-aseguradora: carga propuestas (misma u otras aseguradoras) y compáralas lado a lado antes de cerrar.</li>
+      </ul>
+      <h3>Cancelaciones</h3>
+      <ul>
+        <li><span class="li-em">📉</span>El detalle muestra qué póliza se canceló, el motivo, cuánto duró activa y la comisión que generó.</li>
+        <li><span class="li-em">♻</span>La acción de recuperación queda registrada en la ficha del cliente y, según el caso, crea una gestión de recuperación en el flujo comercial (Leads/Ops).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide" id="s5">
+    <div class="slide-body">
+      <h2><span class="num">5</span>Siniestros y comisiones</h2>
+      <h3>🚨 Siniestros / reclamos</h3>
+      <ul>
+        <li><span class="li-em">📥</span>Se cargan manualmente o importando la bitácora de la aseguradora (un archivo con varios clientes se reparte a la ficha de cada uno por número de póliza).</li>
+        <li><span class="li-em">📨</span>Cada reclamo guarda estado, aseguradora, bitácora de avances y correos de respuesta.</li>
+      </ul>
+      <h3>💵 Comisiones</h3>
+      <ul>
+        <li><span class="li-em">🏛️</span>Comisión de aseguradora: % por ramo/producto, auto-calculada y editable; se puede actualizar importando la planilla de comisiones.</li>
+        <li><span class="li-em">🧑‍💼</span>Comisión del asesor: % sobre prima neta (o fija para algún asesor), configurable en Equipo.</li>
+        <li><span class="li-em">🔒</span>La sección de comisiones de empresa solo la ve el área administrativa. El asesor ve sus comisiones en la ficha del cliente.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide" id="s6">
+    <div class="slide-body">
+      <h2><span class="num">6</span>Operación · Ops y Leads</h2>
+      <p>Ops es el tablero del equipo operativo (gestiones administrativas y de emisión). Leads es el tablero comercial del asesor. Ambos se sincronizan en vivo.</p>
+      <div class="flow"><b>🔗 Ciclo completo</b><p>Ingreso → cotización (Ops) → negociación (Leads) → cierre → inspección/emisión (reaparece en Ops sin salir de Leads) → emisión crea el cliente/póliza o archiva.</p></div>
+      <ul>
+        <li><span class="li-em">📋</span>Listas editables: crear, renombrar, recolorear, reordenar y eliminar, con emoji.</li>
+        <li><span class="li-em">👤</span>Responsable por defecto: una persona en Ops; el asesor en Leads (seleccionable).</li>
+        <li><span class="li-em">🔔</span>Los seguimientos sin automatizar aparecen en "Mi Día" y en el Cronograma para gestionar por WhatsApp.</li>
+        <li><span class="li-em">🙈</span>El asesor no ve Ops; ve sus gestiones a través de Leads.</li>
+      </ul>
+      <div class="tip"><b>💡 Convertir lead → cliente</b><p>Al cerrar, hereda los datos y arranca la cadencia de encuestas de satisfacción.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" id="s7">
+    <div class="slide-body">
+      <h2><span class="num">7</span>Aseguradoras · Cotizador · Comparativo</h2>
+      <h3>🏛️ Aseguradoras</h3>
+      <ul>
+        <li><span class="li-em">✅</span>Directorio GT/CO con habilitar/deshabilitar según vinculaciones.</li>
+        <li><span class="li-em">👥</span>Ficha: contactos por tipo (comercial/técnico/admin/siniestros), accesos a portales (links + usuario/contraseña), Drive, cuentas bancarias y datos de facturación (NIT, patrón de concepto).</li>
+        <li><span class="li-em">📄</span>Documentos por producto y tarifas de ejemplo que alimentan cotizador/comparativo.</li>
+      </ul>
+      <h3>🧮 Cotizador y ⚖️ Comparativo</h3>
+      <ul>
+        <li><span class="li-em">🧮</span>Cotizador: campos por ramo (auto con marca→línea→versión, GM por integrantes, etc.), genera cotizaciones y deriva al comparativo (opcional).</li>
+        <li><span class="li-em">⚖️</span>Comparativo: funciona solo o desde el cotizador; carga PDFs de propuestas (extracción inteligente), tabla completa con logos y coberturas, recomendación replanteable (precio/cobertura/equilibrio) e impresión con la marca del cliente.</li>
+      </ul>
+      <div class="tip"><b>💡 Extracción de PDF</b><p>La lectura del PDF es real; la calidad de extracción de datos mejora notablemente al conectar el proveedor de IA (Gemini) en Configuración. Todo es editable antes de comparar.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" id="s8">
+    <div class="slide-body">
+      <h2><span class="num">8</span>Finanzas</h2>
+      <ul>
+        <li><span class="li-em">📊</span>Movimientos por mes (ingresos, egresos, saldos) — importables del histórico y del estado bancario; crear mes nuevo.</li>
+        <li><span class="li-em">📥</span>Cuentas por cobrar (desde planilla de comisiones) y por pagar; el cambio de estado se refleja en ingresos/egresos.</li>
+        <li><span class="li-em">🏦</span>Financiamientos: ingresos por financiación separados del operativo, con control de deuda y abonos.</li>
+        <li><span class="li-em">🧾</span>Liquidaciones (empresa y asesores) con preparar lote: ver detalle, retirar pagos, incluir CxP de meses pasados.</li>
+        <li><span class="li-em">🎯</span>Presupuesto con semáforos y % de cumplimiento; análisis crítico con IA y sugerencia de metas.</li>
+      </ul>
+      <div class="flow"><b>🔗 Conciliación y aplicación de pagos (flujo operativo)</b>
+        <p><b>Estado de cuenta de la aseguradora</b> (módulo Importar → "Conciliación con aseguradoras" → Estados de cuenta): trae el reporte de cartera (recibos pagados/pendientes). El sistema cruza contra Orbit y: si la póliza no existe la marca; si el recibo no está creado lo crea; si el archivo dice pagado pero en Orbit está pendiente, lo lista en "Pagos no aplicados" y <b>los aplica sin duplicar</b>. Aquí es donde se aplican los pagos pendientes.</p>
+        <p><b>Planilla de comisiones</b> (Aseguradoras → ficha → Importar planilla): lee las tarifas % por producto y actualiza el motor de comisiones. NO aplica pagos de recibos — esa es función del estado de cuenta.</p>
+        <p><b>Estado bancario</b> (Finanzas): cruza depósitos con movimientos y avisa desviaciones contra la liquidación.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" id="s9">
+    <div class="slide-body">
+      <h2><span class="num">9</span>Marketing y Academia</h2>
+      <h3>📣 Marketing</h3>
+      <ul>
+        <li><span class="li-em">📅</span>Calendario de contenidos con ficha por día (contenido, pieza, canal, estado), creación manual o con IA.</li>
+        <li><span class="li-em">🔁</span>Estados de publicación actualizables y reprogramación automática si no se cumplió.</li>
+        <li><span class="li-em">🔌</span>Integrable con redes (FB/IG/LinkedIn/TikTok), Metricool, Mailchimp vía automatizaciones.</li>
+      </ul>
+      <h3>🎓 Academia</h3>
+      <ul>
+        <li><span class="li-em">📚</span>Cursos por módulo y rol con visor interactivo a pantalla completa (lecciones navegables, quizzes, recursos embebidos).</li>
+        <li><span class="li-em">✏</span>Totalmente administrable: crear/editar/reordenar/borrar lecciones, categorías nuevas, generar con IA a partir de documentos.</li>
+        <li><span class="li-em">🎯</span>Bloques habilitables por rol; los clientes ven su propia sección "Aprende".</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide" id="s10">
+    <div class="slide-body">
+      <h2><span class="num">10</span>Insights · Portal del cliente · IA</h2>
+      <h3>📊 Insights</h3>
+      <ul>
+        <li><span class="li-em">🔢</span>KPIs clicables con detalle; selector de país y periodo.</li>
+        <li><span class="li-em">📈</span>Producción nueva vs renovada con metas; comparativos interanual e intermensual por asesor/ramo/aseguradora.</li>
+        <li><span class="li-em">🧠</span>Análisis crítico dinámico y top de clientes clasificable.</li>
+      </ul>
+      <h3>🌐 Portal del cliente</h3>
+      <ul>
+        <li><span class="li-em">📑</span>Pólizas, pagos, siniestros y documentos con detalle; reportar pago (sube soporte) → crea gestión en Ops.</li>
+        <li><span class="li-em">🔔</span>Notificaciones reales; solicita gestiones que llegan al equipo; soporte tipo chatbot + acceso al asesor.</li>
+      </ul>
+      <h3>🤖 Orbit IA</h3>
+      <p>Asistente transversal por contexto (equipo/asesor/cliente). Con la key de Gemini conectada, potencia extracción, análisis y redacción.</p>
+    </div>
+  </section>
+
+  <section class="slide" id="s11">
+    <div class="slide-body">
+      <h2><span class="num">11</span>Importadores inteligentes</h2>
+      <p>Son la base de la migración. Aceptan CSV, Excel, PDF, Word e imagen (OCR), mapean por sinónimos de encabezados y escriben a la capa de datos sin duplicar.</p>
+      <div class="step-list">
+        <div class="step-item"><span class="step-n">1</span><div><div class="step-t">Clientes / base inicial</div><div class="step-d">Detecta la entidad por sus columnas y crea/actualiza clientes.</div></div></div>
+        <div class="step-item"><span class="step-n">2</span><div><div class="step-t">Pólizas</div><div class="step-d">Genera recibos automáticos por forma de pago; vigentes → cartera, canceladas → histórico (sí cuentan en analítica).</div></div></div>
+        <div class="step-item"><span class="step-n">3</span><div><div class="step-t">Estados de cuenta / banco</div><div class="step-d">Concilian: crean recibos faltantes y aplican pagos reportados como cobrados.</div></div></div>
+        <div class="step-item"><span class="step-n">4</span><div><div class="step-t">Planillas, bitácora de siniestros, directorio, calendario</div><div class="step-d">Cada uno mapea a su colección. Botón "🔄 Iterar" para re-mapear columnas manualmente.</div></div></div>
+      </div>
+      <div class="tip"><b>💡 Regla de cartera</b><p>Solo queda en cobros pendientes lo de pólizas vigentes o por renovar de este año. El resto es histórico para estadística, recuperación y segmentación.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" id="s12">
+    <div class="slide-body">
+      <h2><span class="num">12</span>Configuración y white-label</h2>
+      <ul>
+        <li><span class="li-em">🎨</span>Marca: logo del cliente, paleta seleccionable y tipografía — se reflejan en login, cintilla y documentos.</li>
+        <li><span class="li-em">🌎</span>Países: agregar con sus tasas/impuestos (GT 12%, CO 19%), moneda y catálogos.</li>
+        <li><span class="li-em">👥</span>Equipo: crear usuarios con teléfono, correo (su login y bandeja), multi-rol y módulos visibles por usuario; comisión por asesor.</li>
+        <li><span class="li-em">🔌</span>Integraciones: Make, Outlook/Gmail (IMAP/POP3), WhatsApp, Sheets, Metricool, IA, etc. — listas para configurar credenciales.</li>
+        <li><span class="li-em">📦</span>Planes comercializables editables.</li>
+      </ul>
+      <div class="flow"><b>🔗 Conexión a backend</b><p>Toda lectura/escritura pasa por la capa de datos única. Migrar a backend (Firestore) solo requiere reescribir esa capa; ningún módulo cambia. Detalle en INSTRUCCIONES-PROYECTO-AYS.md.</p></div>
+      <div class="footer-nav"><span class="prog-lbl" style="color:var(--ink-3)">Fin del Manual Maestro · Orbit 360</span><a class="btn-nav" href="#s1">↑ Volver al inicio</a></div>
+    </div>
+  </section>
+
+  </main>
+</div>
+<button class="print-btn" onclick="window.print()">🖨 Imprimir / PDF</button>
+<script>
+(function(){
+  var items=[].slice.call(document.querySelectorAll('.toc-item'));
+  var secs=items.map(function(i){return document.getElementById(i.dataset.go);});
+  items.forEach(function(it){it.addEventListener('click',function(){var el=document.getElementById(it.dataset.go);if(el)el.scrollIntoView({behavior:'smooth'});});});
+  var seen={};
+  function onScroll(){
+    var y=window.scrollY+120, act=0;
+    secs.forEach(function(s,idx){if(s&&s.offsetTop<=y)act=idx;});
+    items.forEach(function(it,idx){it.classList.toggle('active',idx===act);});
+    secs.forEach(function(s,idx){if(s&&s.getBoundingClientRect().top<window.innerHeight*0.6)seen[idx]=1;});
+    var n=Object.keys(seen).length;
+    document.getElementById('progbar').style.width=Math.round(n/secs.length*100)+'%';
+    document.getElementById('proglbl').textContent=n+'/'+secs.length;
+  }
+  window.addEventListener('scroll',onScroll);onScroll();
+})();
+</script>
+</body>
+</html>

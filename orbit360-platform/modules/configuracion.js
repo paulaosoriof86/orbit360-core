@@ -171,8 +171,10 @@ Orbit.modules.configuracion = (function () {
       ${CATS.map(([cat, items]) => `
         <div class="cfg-intgroup"><div class="cfg-intgroup-h">${cat}</div>
         <div class="cfg-grid2">
-          ${items.map(([id, t2, d]) => { const on = !!t.addons[id]; return `<div class="cfg-addon ${on ? 'on' : ''}">
-            <div style="flex:1"><b>${t2}</b><p>${d}</p></div>
+          ${items.map(([id, t2, d]) => { const on = !!t.addons[id]; const cfgd = (() => { try { return !!JSON.parse(localStorage.getItem('orbit360_integ_' + id) || '{}').key; } catch (e) { return false; } })(); return `<div class="cfg-addon ${on ? 'on' : ''}">
+            <div style="flex:1"><b>${t2}</b><p>${d}</p>
+              <button class="btn ghost sm" style="margin-top:7px" onclick="Orbit.modules.configuracion.configIntegracion('${id}','${U.esc(t2).replace(/'/g, '')}')">⚙ Configurar${cfgd ? ' ✓' : ''}</button>
+            </div>
             ${toggle('addon-' + id, on)}
           </div>`; }).join('')}
         </div></div>`).join('')}
@@ -395,30 +397,39 @@ Orbit.modules.configuracion = (function () {
     const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ País ' + nombre + ' agregado (IVA ' + iva + '%)'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
     const host = document.getElementById('host'); if (host) render(host);
   }
-  function configIntegracion(nombre) {
+  function configIntegracion(nombre, titulo) {
+    const label = titulo || nombre;
     let back = document.getElementById('cf-integ'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'cf-integ'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
     const saved = (() => { try { return JSON.parse(localStorage.getItem('orbit360_integ_' + nombre) || '{}'); } catch (e) { return {}; } })();
     back.innerHTML = '<div class="card" style="width:min(460px,94vw);padding:0">'
-      + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🔌 Configurar ' + U.esc(nombre) + '</b><button class="imp-x" id="ci-x">✕</button></div>'
+      + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🔌 Conectar ' + U.esc(label) + '</b><button class="imp-x" id="ci-x">✕</button></div>'
       + '<div style="padding:18px 20px;display:grid;gap:11px">'
       + '<label class="ce-l">API key / Token<input id="ci-key" class="o-sel" type="password" value="' + U.esc(saved.key || '') + '" placeholder="••••••••"></label>'
-      + '<label class="ce-l">Webhook / Endpoint (opcional)<input id="ci-url" class="o-sel" value="' + U.esc(saved.url || '') + '" placeholder="https://hook.make.com/..."></label>'
+      + '<label class="ce-l">Webhook / Endpoint / OAuth URL (opcional)<input id="ci-url" class="o-sel" value="' + U.esc(saved.url || '') + '" placeholder="https://hook.make.com/..."></label>'
       + '<label class="ce-l">Cuenta / usuario (opcional)<input id="ci-user" class="o-sel" value="' + U.esc(saved.user || '') + '"></label>'
       + '<label class="ce-l ck"><input type="checkbox" id="ci-on" ' + (saved.activa ? 'checked' : '') + '> Integración activa</label>'
-      + '<div class="cfg-note">🔒 Las credenciales se guardan cifradas en el backend del cliente. En el prototipo quedan en este navegador.</div>'
+      + '<div id="ci-status" class="cfg-note">🔒 Las credenciales se guardan en el backend del cliente. En el prototipo quedan en este navegador.</div>'
       + '</div>'
-      + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="ci-cancel">Cancelar</button><button class="btn primary" id="ci-ok">Guardar</button></div></div>';
+      + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="ci-test">🔌 Probar conexión</button><div style="display:flex;gap:8px"><button class="btn ghost" id="ci-cancel">Cancelar</button><button class="btn primary" id="ci-ok">Guardar</button></div></div></div>';
     document.body.appendChild(back);
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#ci-x').onclick = close; back.querySelector('#ci-cancel').onclick = close;
+    back.querySelector('#ci-test').onclick = () => {
+      const k = back.querySelector('#ci-key').value.trim(), u = back.querySelector('#ci-url').value.trim();
+      const st = back.querySelector('#ci-status');
+      if (!k && !u) { st.innerHTML = '⚠️ Ingresa una API key, endpoint u OAuth para probar.'; st.style.color = 'var(--warn)'; return; }
+      st.innerHTML = '⏳ Probando conexión con ' + U.esc(label) + '…'; st.style.color = '';
+      setTimeout(() => { st.innerHTML = '✅ Credenciales detectadas. La conexión real se valida al activar el backend en migración.'; st.style.color = 'var(--ok)'; }, 700);
+    };
     back.querySelector('#ci-ok').onclick = () => {
       const data = { key: back.querySelector('#ci-key').value, url: back.querySelector('#ci-url').value, user: back.querySelector('#ci-user').value, activa: back.querySelector('#ci-on').checked };
       try { localStorage.setItem('orbit360_integ_' + nombre, JSON.stringify(data)); } catch (e) {}
+      try { const tn = T().get(); tn.addons = tn.addons || {}; tn.addons[nombre] = data.activa; T().save && T().save(tn); } catch (e) {}
       close(); const host = document.getElementById('host'); if (host) render(host);
-      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + nombre + (data.activa ? ' conectada' : ' guardada'); document.body.appendChild(t); setTimeout(() => t.remove(), 2400);
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + label + (data.activa ? ' conectada' : ' guardada'); document.body.appendChild(t); setTimeout(() => t.remove(), 2400);
     };
   }
 
