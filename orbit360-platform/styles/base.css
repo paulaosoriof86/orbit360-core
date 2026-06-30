@@ -28,12 +28,12 @@ button{font-family:inherit}
   display:none;border:none;background:var(--surface);color:var(--ink);
   width:36px;height:36px;border-radius:var(--r-sm);font-size:18px;cursor:pointer;
 }
-.brand{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none}
+.brand{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
 /* slot de logo del cliente (white-label) */
-.tb-logo{display:flex;align-items:center;gap:10px;padding-right:16px;margin-right:14px;border-right:1px solid var(--line);flex-shrink:0}
-.tb-logo .slot{width:54px;height:54px;flex-shrink:0;border-radius:9px;background:var(--surface);border:1px dashed var(--line);display:grid;place-items:center;font-size:22px;color:var(--ink-3);overflow:hidden}
+.tb-logo{display:flex;align-items:center;gap:10px;padding-right:14px;margin-right:12px;border-right:1px solid var(--line);flex-shrink:0}
+.tb-logo .slot{width:40px;height:40px;flex-shrink:0;border-radius:8px;background:var(--surface);border:1px dashed var(--line);display:grid;place-items:center;font-size:18px;color:var(--ink-3);overflow:hidden}
 /* cuando hay logo real (img dentro): ancho flexible, sin recuadro */
-.tb-logo .slot:has(img){width:auto;min-width:54px;max-width:160px;height:48px;background:transparent;border:none;border-radius:0;padding:0 2px}
+.tb-logo .slot:has(img){width:auto;min-width:40px;max-width:132px;height:38px;background:transparent;border:none;border-radius:0;padding:0 2px}
 .tb-logo .slot img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block}
 /* tarjetas selector de IA (multi-proveedor sin sesgo) */
 .ia-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:6px}
@@ -48,7 +48,7 @@ button{font-family:inherit}
 .tb-logo .cn{display:none}
 .tb-logo .cn small{display:block;font-family:var(--f-mono);font-size:8px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;font-weight:400;margin-top:2px}
 .brand-mark{
-  width:28px;height:28px;border-radius:50%;flex-shrink:0;position:relative;
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;position:relative;
   background:radial-gradient(circle at 32% 30%,#e8364c 0%,var(--red) 42%,var(--red-700) 100%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 3px 10px -4px rgba(197,22,46,.5);
 }
@@ -62,9 +62,9 @@ button{font-family:inherit}
   content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#fff;
   top:4px;right:7px;box-shadow:0 0 6px 1px rgba(255,255,255,.7);
 }
-.brand-name{font-family:var(--f-display);font-weight:800;font-size:16px;letter-spacing:-.01em;line-height:1}
+.brand-name{font-family:var(--f-display);font-weight:800;font-size:14px;letter-spacing:-.01em;line-height:1}
 .brand-name b{color:var(--red)}
-.brand-sub{font-family:var(--f-mono);font-size:8.5px;letter-spacing:.22em;color:var(--ink-3);text-transform:uppercase;margin-top:2px}
+.brand-sub{font-family:var(--f-mono);font-size:7.5px;letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase;margin-top:1px}
 .tb-spacer{flex:1}
 .tb-search{
   display:flex;align-items:center;gap:8px;background:var(--surface);

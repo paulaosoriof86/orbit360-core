@@ -16,6 +16,17 @@ Orbit.ia = (function () {
   function conectar(prov, key, modelo) { cfg = { proveedor: prov || 'Gemini', key: key || '', modelo: modelo || 'gemini-1.5-flash', conectado: !!key }; save(); document.dispatchEvent(new CustomEvent('orbit:ia')); }
   function desconectar() { cfg.conectado = false; cfg.key = ''; save(); document.dispatchEvent(new CustomEvent('orbit:ia')); }
   function activo() { return cfg.conectado; }
+  // Proveedor de IA para un módulo: si hay override por módulo (Configuración),
+  // lo devuelve; si no, el proveedor global. Permite usar un motor distinto por
+  // módulo según el comparativo (ej. extracción económica, redacción premium).
+  function proveedorDe(modulo) {
+    try {
+      var t = (Orbit.tenant && Orbit.tenant.get) ? Orbit.tenant.get() : null;
+      var pm = (t && t.iaPorModulo) || {};
+      if (modulo && pm[modulo]) return pm[modulo];
+    } catch (e) {}
+    return cfg.proveedor;
+  }
   function fmt(n) { return Orbit.ui ? Orbit.ui.moneyShort(n, 'GTQ') : n; }
 
   /* ---- redacción de mensajes (WhatsApp/correo) ---- */
@@ -195,5 +206,5 @@ Orbit.ia = (function () {
     return f;
   }
 
-  return { getCfg, conectar, desconectar, activo, redactar, analisis, sugerirMetas, extraer, extraerPDF, pdfTexto, parseMulti };
+  return { getCfg, conectar, desconectar, activo, proveedorDe, redactar, analisis, sugerirMetas, extraer, extraerPDF, pdfTexto, parseMulti };
 })();

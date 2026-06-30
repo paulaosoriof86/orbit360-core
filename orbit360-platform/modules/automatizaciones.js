@@ -139,6 +139,11 @@ Orbit.modules.automatizaciones = (function () {
             <label class="ce-l ck" style="margin-top:10px"><input type="checkbox" id="ia-act" ${getIA().activo ? 'checked' : ''}> Activar IA como asistente</label>
             <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="ia-save" style="flex:1">💾 Guardar</button><button class="btn ghost" id="ia-test">🔌 Probar</button></div>
             <div class="cfg-note" style="margin-top:10px">La elección se guarda por cliente (tenant). La IA es opcional: sin ella, todo funciona con heurística (sin costo).</div>
+            <details style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+              <summary style="cursor:pointer;font-weight:700;font-size:13px">🧩 IA por módulo (opcional)</summary>
+              <div class="muted" style="font-size:12px;margin:6px 0 10px">Por defecto todos los módulos usan el motor de arriba. Aquí puedes asignar un motor distinto a un módulo según el comparativo (ej. extracción con uno económico, redacción con otro). Vacío = usa el global.</div>
+              <div id="ia-mods" style="display:grid;gap:8px">${[['extraccion','📄 Extracción de documentos / importadores'],['comparativo','⚖️ Comparativo de pólizas'],['marketing','📣 Marketing (contenidos)'],['academia','🎓 Academia (cursos / quizzes)'],['insights','📈 Insights (análisis crítico)'],['redaccion','✍️ Redacción de mensajes']].map(function(m){ var sel=(cfg.iaPorModulo||{})[m[0]]||''; return '<label class="ce-l" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0"><span style="font-size:12.5px">'+m[1]+'</span><select class="o-sel ia-modsel" data-iam="'+m[0]+'" style="width:190px"><option value="">— usar global —</option>'+IA_PROVS.map(function(p){return '<option value="'+p.id+'" '+(sel===p.id?'selected':'')+'>'+p.nombre+'</option>';}).join('')+'</select></label>'; }).join('')}</div>
+            </details>
           </div>
 
           <!-- Integraciones rápidas -->
@@ -214,6 +219,13 @@ Orbit.modules.automatizaciones = (function () {
       toast(k ? ('🔌 ' + cur.proveedor + ': clave detectada — conexión real al migrar backend') : ('⚠️ ' + cur.proveedor + ' sin API key — opera en heurística gratuita'));
     });
     const cmp = h.querySelector('#ia-compare'); if (cmp) cmp.addEventListener('click', compararModelos);
+    h.querySelectorAll('.ia-modsel').forEach(s => s.addEventListener('change', () => {
+      cfg.iaPorModulo = cfg.iaPorModulo || {};
+      if (s.value) cfg.iaPorModulo[s.dataset.iam] = s.value; else delete cfg.iaPorModulo[s.dataset.iam];
+      saveCfg();
+      try { const t = Orbit.tenant && Orbit.tenant.get(); if (t) { t.iaPorModulo = cfg.iaPorModulo; Orbit.tenant.save && Orbit.tenant.save(t); } } catch (e) {}
+      toast('✓ Motor de ' + s.dataset.iam + ': ' + (s.value || 'global'));
+    }));
     // Escanear
     h.querySelector('#aut-scan').addEventListener('click', () => {
       const a = alertasPendientes();

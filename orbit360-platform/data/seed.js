@@ -689,42 +689,122 @@ Orbit.SEED = (function () {
       ] }
     ], progreso: 0, certificado: false, recursos: [{ nombre: 'Coberturas Auto por aseguradora.pdf', tipo: 'pdf' }] },
     
-    { id: 'cur6', titulo: 'Orbit Leads para Asesores', cat: 'Comercial', emoji: '🎯', color: '#2563a8', desc: 'Domina el pipeline comercial: prospectar, cotizar, negociar y cerrar.', destinatarios: 'Asesor',
+    { id: 'cur6', titulo: 'Orbit Leads para Asesores', cat: 'Comercial', emoji: '🎯', color: '#2563a8', desc: 'Domina el pipeline comercial: prospectar, cotizar, negociar y cerrar.', destinatarios: 'Asesor', progreso: 0, certificado: false,
+      recursos: [{ nombre: 'Guion de descubrimiento.pdf', tipo: 'pdf' }, { nombre: 'Manejo de objeciones.pdf', tipo: 'pdf' }],
       lecciones: [
-        { t: 'El ciclo del prospecto', min: 10, tipo: 'lectura', texto: '🎯 CICLO DEL PROSPECTO EN ORBIT 360\n\nCada prospecto (negocio) sigue un ciclo de 8 etapas:\n\n🌱 Nuevo → 📞 Contactado → 🧮 Cotizando → 📨 Propuesta enviada → 🤝 Negociación → 🔍 Inspección → 📝 Emisión → 🏆 Emitido\n\n¿CUÁNDO ENTRA UN PROSPECTO?\n• Leads directos: el cliente pide precio sin referencia al equipo → ingresa en "Nuevo"\n• Ops (cotización técnica): el equipo ya tiene todos los datos y cotiza → ingresa en "Cotizando"\n\n¿QUÉ HACE EL ASESOR EN CADA ETAPA?\n• Nuevo: agendar primer contacto (WA/llamada/visita)\n• Contactado: registrar el resultado y compromisos\n• Cotizando: solicitar cotización al equipo (Ops) o cotizar con el cotizador\n• Propuesta: enviar propuesta personalizada al cliente\n• Negociación: resolver objeciones, ajustar coberturas\n• Inspección: coordinar con la aseguradora\n• Emisión: revisar documentos y confirmar datos\n• Emitido: ¡GANADO! El cliente se crea automáticamente' },
-        { t: 'Cadencias de seguimiento automático', min: 8, tipo: 'lectura', texto: '🔁 CADENCIAS AUTOMÁTICAS\n\nCuando envías la propuesta (etapa Propuesta), Orbit 360 activa la cadencia automáticamente:\n\n• Día 1: ✅ WhatsApp de bienvenida "Hola {nombre}, adjunto la propuesta de {ramo}..."\n• Día 3: ✅ WhatsApp de seguimiento "¿Pudiste revisar la propuesta? ¿Tengo alguna duda que resolver?"\n• Día 7: ✅ Correo con propuesta "Adjunto nuevamente la propuesta con las mejoras solicitadas..."\n• Día 14: ✅ Mensaje de cierre "¿Podemos agendar 10 minutos esta semana para cerrar?"\n\n⚠️ IMPORTANTE:\n• Si el cliente tiene WhatsApp → se usa WA primero\n• Si no tiene WA → se usa correo\n• NO se generan llamadas automáticas (tú decides cuándo llamar)\n\n💡 TAMBIÉN PUEDES:\n• Agregar tareas manuales al cronograma para hacer seguimiento personalizado\n• Marcar como "Perdido" con motivo para analítica (te ayuda a mejorar)' },
-        { t: 'Manejo de objeciones y cierre', min: 9, tipo: 'lectura', texto: '🤝 NEGOCIAR Y CERRAR\n\nLas objeciones no son un "no": son una petición de más información. Trátalas con método.\n\n💬 OBJECIONES FRECUENTES Y RESPUESTA\n• "Está caro" → reencuadra a valor: ¿caro comparado con qué? Muestra qué cubre y el costo de no tenerlo.\n• "Lo voy a pensar" → ¿qué te falta resolver para decidir hoy? Agenda el siguiente paso con fecha.\n• "Ya tengo seguro" → ofrece una revisión gratuita de su póliza actual (casi siempre hay huecos de cobertura).\n• "No me alcanza" → ofrece fraccionamiento o una cobertura escalonada que sí entre en su presupuesto.\n\n🎯 TÉCNICAS DE CIERRE\n• Cierre por alternativa: ¿prefieres cobertura amplia o RC ampliada?\n• Cierre por urgencia real: la tarifa/condición vence el {fecha}.\n• Cierre por resumen: recapitula beneficios y pide la decisión.\n\n📌 EN ORBIT: registra cada objeción en la nota del negocio. La analítica de "motivos de pérdida" te dice dónde mejorar.' },
+        { t: 'El ciclo del prospecto', min: 10, tipo: 'lectura', secciones: [
+          { icon: '🎯', t: 'Las 8 etapas', color: '#2563a8', d: 'Cada prospecto recorre: Nuevo → Contactado → Cotizando → Propuesta enviada → Negociación → Inspección → Emisión → Emitido. El pipeline en Orbit Leads muestra en qué etapa está cada negocio y qué falta para avanzar.' },
+          { icon: '🚪', t: '¿Cómo entra un prospecto?', color: '#1f8a4c', d: 'Lead directo: el cliente pide precio sin datos completos → entra en "Nuevo". Desde Ops (cotización técnica): el equipo ya tiene los datos y cotiza → entra en "Cotizando". En ambos casos el asesor lo trabaja desde Leads.' },
+          { icon: '🏁', t: 'Qué hacer en cada etapa', color: '#C5162E', d: 'Nuevo: agenda el primer contacto. Contactado: registra resultado y compromisos. Cotizando: pide cotización a Ops o usa el Cotizador. Propuesta: envía la propuesta personalizada. Negociación: resuelve objeciones. Inspección/Emisión: coordina con la aseguradora. Emitido: ¡ganado! El cliente se crea automáticamente.' }
+        ]},
+        { t: 'Cadencias de seguimiento automático', min: 8, tipo: 'lectura', secciones: [
+          { icon: '🔁', t: 'Qué dispara la cadencia', color: '#2563a8', d: 'Al pasar a "Propuesta", Orbit activa la cadencia: Día 1 WhatsApp de bienvenida, Día 3 seguimiento, Día 7 correo con propuesta, Día 14 mensaje de cierre. Todo queda registrado en el negocio.' },
+          { icon: '📲', t: 'Canal inteligente', color: '#1f8a4c', d: 'Si el cliente tiene WhatsApp, se usa WA primero; si no, correo. No se generan llamadas automáticas: tú decides cuándo llamar. Puedes añadir tareas manuales al cronograma para un seguimiento más personal.' },
+          { icon: '📉', t: 'Aprende de lo perdido', color: '#C5162E', d: 'Marca un negocio como "Perdido" con su motivo. La analítica de motivos de pérdida te dice dónde mejorar (precio, tiempo de respuesta, cobertura).' }
+        ]},
+        { t: 'Manejo de objeciones y cierre', min: 9, tipo: 'lectura', secciones: [
+          { icon: '💬', t: 'La objeción es información', color: '#2563a8', d: 'No es un "no", es pedir más datos. "Está caro" → reencuadra a valor. "Lo voy a pensar" → ¿qué falta para decidir hoy? "Ya tengo seguro" → ofrece revisión gratuita. "No me alcanza" → fracciona o escalona la cobertura.' },
+          { icon: '🎯', t: 'Técnicas de cierre', color: '#1f8a4c', d: 'Cierre por alternativa (¿amplia o RC ampliada?), por urgencia real (la condición vence el {fecha}), por resumen (recapitula beneficios y pide la decisión).' },
+          { icon: '📝', t: 'Registra todo', color: '#C5162E', d: 'Cada objeción y compromiso va en la nota del negocio. Esa trazabilidad alimenta la analítica y te hace mejor vendedor con el tiempo.' }
+        ]},
         { t: 'Gestionar mi pipeline', min: 8, tipo: 'quiz', preguntas: [
           { p: '¿Dónde ve el asesor su pipeline comercial?', ops: ['En Orbit Ops', 'En Orbit Leads', 'En Clientes 360'], ok: 1 },
-          { p: '¿Qué activa automáticamente pasar a la etapa "Propuesta"?', ops: ['Una llamada telefónica', 'La cadencia automática de seguimiento (WA/correo)', 'Un email manual del asesor'], ok: 1 },
-          { p: '¿Qué pasa cuando el negocio llega a "Emitido"?', ops: ['Se archiva y no pasa nada', 'El asesor tiene que crear el cliente manualmente', 'Se crea el cliente automáticamente y se activa la cadencia de encuestas'], ok: 2 }
+          { p: '¿Qué activa pasar a la etapa "Propuesta"?', ops: ['Una llamada telefónica', 'La cadencia automática de seguimiento (WA/correo)', 'Un email manual'], ok: 1 },
+          { p: '¿Qué pasa cuando el negocio llega a "Emitido"?', ops: ['Se archiva y no pasa nada', 'Hay que crear el cliente a mano', 'Se crea el cliente automáticamente y arranca la cadencia de encuestas'], ok: 2 }
         ]}
-      ], progreso: 0, certificado: false, recursos: [] },
-    { id: 'cur7', titulo: 'Finanzas para Directores', cat: 'Finanzas', emoji: '💰', color: '#c9821b', desc: 'Control financiero completo: movimientos, liquidaciones, presupuesto e IA.', destinatarios: 'Dirección',
+      ] },
+    { id: 'cur7', titulo: 'Finanzas para Directores', cat: 'Finanzas', emoji: '💰', color: '#c9821b', desc: 'Control financiero completo: movimientos, liquidaciones, presupuesto e IA.', destinatarios: 'Dirección', progreso: 0, certificado: false,
+      recursos: [{ nombre: 'Plantilla de presupuesto.pdf', tipo: 'pdf' }],
       lecciones: [
-        { t: 'Módulo Finanzas — visión general', min: 12, tipo: 'lectura', texto: '💰 ORBIT FINANZAS — VISIÓN PARA DIRECCIÓN\n\nEl módulo Finanzas centraliza TODA la actividad financiera del intermediario en un solo lugar.\n\n🧾 MOVIMIENTOS\nRegistra ingresos (comisiones de aseguradoras, incentivos) y egresos (comisiones a asesores, gastos fijos, marketing) por mes y país. Puedes crear meses manualmente o importar el histórico.\n\n📊 DASHBOARD\nComparativo interanual e intermensual de ingresos vs egresos. Margen operativo, ratio gasto/ingreso y salud financiera en tiempo real.\n\n💳 CxC / CxP\n• Cuentas por Cobrar: comisiones facturadas pero no recaudadas aún\n• Cuentas por Pagar: liquidaciones de asesores pendientes (pasan al mes siguiente si no se pagan)\n\n🏦 FINANCIACIÓN\nControl de deuda por acreedor separado de los ingresos operativos. La deuda sube con cada financiación y baja con cada abono.\n\n📋 PRESUPUESTO\nPresupuesto mensual de egresos con semáforos (verde/ámbar/rojo). Alerta cuando una categoría se desvía.\n\n👥 LIQUIDACIONES\nLiquidación empresa y por asesor. Botón "Preparar Lote" para revisar, ajustar y aprobar pagos pendientes.' },
-        { t: 'Leer el dashboard financiero', min: 10, tipo: 'lectura', texto: '📊 INTERPRETAR TUS NÚMEROS\n\nUn director no necesita ser contador, pero sí leer 4 señales.\n\n📈 MARGEN OPERATIVO\nIngresos por comisión − egresos operativos. Si baja mes a mes, revisa gastos fijos y comisiones a asesores.\n\n💧 FLUJO DE CAJA\nNo confundas utilidad con caja: una comisión facturada (CxC) aún no es dinero en banco. Vigila el desfase entre facturar y recaudar.\n\n🔁 INTERANUAL vs INTERMENSUAL\n• Intermensual: detecta estacionalidad (meses fuertes de renovación).\n• Interanual: mide crecimiento real vs el mismo mes del año pasado.\n\n🚦 PRESUPUESTO\nLos semáforos avisan desviaciones. Ámbar = revisar; rojo = actuar. El análisis crítico con IA sugiere metas de ventas y recaudo, y estrategias por área.\n\n💡 DECISIÓN: cruza Insights (producción) con Finanzas (rentabilidad) antes de definir metas del próximo mes.' },
+        { t: 'Módulo Finanzas — visión general', min: 12, tipo: 'lectura', secciones: [
+          { icon: '🧾', t: 'Movimientos', color: '#c9821b', d: 'Registra ingresos (comisiones de aseguradoras, incentivos) y egresos (comisiones a asesores, gastos fijos, marketing) por mes y país. Crea meses manualmente o importa el histórico con el importador inteligente.' },
+          { icon: '💳', t: 'CxC / CxP y financiación', color: '#1f8a4c', d: 'Cuentas por Cobrar: comisiones facturadas sin recaudar. Cuentas por Pagar: liquidaciones de asesores pendientes (pasan al mes siguiente si no se pagan). La financiación se controla aparte para no inflar la utilidad operativa.' },
+          { icon: '👥', t: 'Liquidaciones y presupuesto', color: '#C5162E', d: 'Liquidación empresa y por asesor, con botón "Preparar Lote" para revisar, ajustar y aprobar. Presupuesto mensual con semáforos verde/ámbar/rojo que alertan desviaciones.' }
+        ]},
+        { t: 'Leer el dashboard financiero', min: 10, tipo: 'lectura', secciones: [
+          { icon: '📈', t: 'Margen operativo', color: '#c9821b', d: 'Ingresos por comisión menos egresos operativos. Si baja mes a mes, revisa gastos fijos y comisiones a asesores.' },
+          { icon: '💧', t: 'Caja vs utilidad', color: '#1f8a4c', d: 'Una comisión facturada (CxC) aún no es dinero en banco. Vigila el desfase entre facturar y recaudar para no quedarte sin caja.' },
+          { icon: '🔁', t: 'Comparativos', color: '#2563a8', d: 'Intermensual detecta estacionalidad (meses fuertes de renovación). Interanual mide crecimiento real vs el mismo mes del año pasado. El análisis crítico con IA sugiere metas y estrategias por área.' }
+        ]},
         { t: 'Evaluación del módulo', min: 10, tipo: 'quiz', preguntas: [
           { p: '¿Dónde se registran los ingresos por financiación para que NO inflen la utilidad operativa?', ops: ['En Movimientos → Ingresos', 'En Financiación (separado de operativo)', 'En CxC como ingreso esperado'], ok: 1 },
-          { p: '¿Qué son las CxP en Orbit Finanzas?', ops: ['Cobros que los clientes deben a la empresa', 'Liquidaciones de asesores y egresos pendientes de pago', 'Facturas de aseguradoras no cobradas'], ok: 1 }
+          { p: '¿Qué son las CxP en Orbit Finanzas?', ops: ['Cobros que los clientes deben', 'Liquidaciones de asesores y egresos pendientes de pago', 'Facturas de aseguradoras no cobradas'], ok: 1 }
         ]}
-      ], progreso: 0, certificado: false, recursos: [] },
-    { id: 'cur8', titulo: 'Marketing Digital para Seguros', cat: 'Marketing', emoji: '📣', color: '#6b4ea0', desc: 'Estrategia de contenidos, automatización y medición para intermediarios.', destinatarios: 'Marketing',
+      ] },
+    { id: 'cur8', titulo: 'Marketing Digital para Seguros', cat: 'Marketing', emoji: '📣', color: '#6b4ea0', desc: 'Estrategia de contenidos, automatización y medición para intermediarios.', destinatarios: 'Marketing', progreso: 0, certificado: false,
+      recursos: [{ nombre: 'Parrilla de contenidos.pdf', tipo: 'pdf' }],
       lecciones: [
-        { t: 'El calendario de contenidos', min: 10, tipo: 'lectura', texto: '📅 ORBIT MARKETING — CALENDARIO DE CONTENIDOS\n\nEl módulo Marketing centraliza TODA la estrategia de contenidos del intermediario.\n\n📋 CÓMO FUNCIONA\n1. Abre Orbit Marketing en el menú\n2. Navega el calendario mensual\n3. Haz clic en cualquier día para agregar contenido\n4. Cada publicación tiene: Canal, Tipo, Enfoque, Título, Copy, CTA y Hashtags\n\n🎨 TIPOS DE CONTENIDO\n• Texto: Post educativo, tips, normativa\n• Carrusel: Comparativos, listas, pasos\n• Reel: Videos cortos de 30-60 seg\n• Historia: Contenido efímero de 24h\n• Video: Contenido largo (HeyGen, grabación de pantalla)\n\n🤖 GENERAR CON IA\nBotón "✨ Generar mes con IA" → crea automáticamente un mes de ideas basadas en los enfoques configurados (Seguros, Educativo, Tendencias, etc.)\n\n🔁 AUTOMATIZAR\n• Metricool: programa y publica en todas las redes desde un solo lugar\n• Make: conecta Orbit Marketing → Canva → Metricool para un flujo completamente automatizado\n• Campañas de renovación: el sistema notifica automáticamente a clientes cuya póliza vence en 30 días' },
+        { t: 'El calendario de contenidos', min: 10, tipo: 'lectura', secciones: [
+          { icon: '📅', t: 'Cómo funciona', color: '#6b4ea0', d: 'Abre Orbit Marketing, navega el calendario mensual y haz clic en un día para agregar contenido. Cada publicación tiene canal, tipo, enfoque, título, copy, CTA y hashtags.' },
+          { icon: '🎨', t: 'Tipos de contenido', color: '#2563a8', d: 'Texto (educativo, tips, normativa), carrusel (comparativos, listas), reel (30-60s), historia (24h) y video largo (HeyGen o pantalla). Mezcla formatos para no aburrir.' },
+          { icon: '🤖', t: 'Generar y automatizar', color: '#1f8a4c', d: '"Generar mes con IA" crea un mes de ideas con criterios estratégicos (segmentación, objetivos por semana, fechas clave, CTA). Metricool programa y publica; Make conecta Orbit→Canva→Metricool; las campañas de renovación se disparan solas a 30 días del vencimiento.' }
+        ]},
         { t: 'Emojis, hashtags y copywriting', min: 8, tipo: 'quiz', preguntas: [
           { p: '¿Qué herramienta programa y publica en todas las redes desde un solo lugar?', ops: ['HeyGen', 'Metricool', 'Canva'], ok: 1 },
-          { p: '¿Qué herramienta conecta Orbit → Canva → Metricool para automatizar el flujo completo?', ops: ['Make', 'Google Sheets', 'WhatsApp API'], ok: 0 }
+          { p: '¿Qué herramienta conecta Orbit → Canva → Metricool para automatizar?', ops: ['Make', 'Google Sheets', 'WhatsApp API'], ok: 0 }
         ]}
-      ], progreso: 0, certificado: false, recursos: [] },
-    { id: 'cur9', titulo: 'Portal del Cliente', cat: 'Inducción', emoji: '🚪', color: '#0f766e', desc: 'Guía para clientes: cómo usar su portal, ver pólizas, pagar y solicitar gestiones.', destinatarios: 'clientes',
+      ] },
+    { id: 'cur9', titulo: 'Portal del Cliente', cat: 'Inducción', emoji: '🚪', color: '#0f766e', desc: 'Guía para clientes: cómo usar su portal, ver pólizas, pagar y solicitar gestiones.', destinatarios: 'clientes', progreso: 0, certificado: false,
+      recursos: [{ nombre: 'Guía rápida del portal.pdf', tipo: 'pdf' }],
       lecciones: [
-        { t: 'Bienvenida a tu portal', min: 5, tipo: 'lectura', texto: '🌟 BIENVENIDO/A A TU PORTAL PERSONAL\n\nÉste es tu espacio en Orbit 360 como cliente. Aquí puedes:\n\n📑 VER TUS PÓLIZAS\nConsulta el estado, coberturas, prima y vigencia de todos tus seguros en un solo lugar.\n\n💳 REVISAR TUS PAGOS\nVe el historial de pagos y los recibos pendientes. Puedes reportar un pago cuando lo hagas y tu asesor lo confirmará.\n\n🚨 SINIESTROS\nBusca el estado de cualquier reclamo que hayas reportado y su seguimiento actualizado.\n\n📁 DOCUMENTOS\nAccede a las carátulas de pólizas y documentos de tu expediente. También puedes subir documentos nuevos.\n\n🗂 SOLICITAR GESTIONES\n¿Necesitas actualizar algo? ¿Tienes una duda? Envía una solicitud directamente a tu asesor — responderá en menos de 24 horas.\n\n📖 APRENDE\nEncuentra recursos educativos sobre tus seguros y el glosario de términos.' },
+        { t: 'Bienvenida a tu portal', min: 6, tipo: 'lectura', secciones: [
+          { icon: '📑', t: 'Tus pólizas y pagos', color: '#0f766e', d: 'Consulta estado, coberturas, prima y vigencia de todos tus seguros. Revisa tu historial de pagos y los recibos pendientes; reporta un pago cuando lo hagas y tu asesor lo confirma.' },
+          { icon: '🚨', t: 'Siniestros y documentos', color: '#C5162E', d: 'Sigue el estado de cualquier reclamo que reportaste. Accede a las carátulas y documentos de tu expediente, y sube documentos nuevos cuando te los pidan.' },
+          { icon: '🗂', t: 'Solicitar gestiones y aprender', color: '#1f8a4c', d: '¿Necesitas un cambio o tienes una duda? Envía una solicitud directa a tu asesor desde el portal. En "Aprende" tienes recursos sobre tus seguros y un glosario de términos.' }
+        ]},
         { t: '¿Cómo reportar un pago?', min: 5, tipo: 'quiz', preguntas: [
-          { p: '¿Cómo puede un cliente reportar que hizo un pago en el portal?', ops: ['Llamando a la aseguradora directamente', 'En la sección "Mis pagos" → seleccionar recibo → botón "📤 Reportar pago"', 'Enviando un correo a la compañía'], ok: 1 }
+          { p: '¿Cómo reporta un cliente un pago en el portal?', ops: ['Llamando a la aseguradora', 'En "Mis pagos" → seleccionar recibo → "📤 Reportar pago"', 'Enviando un correo a la compañía'], ok: 1 }
         ]}
-      ], progreso: 0, certificado: false, recursos: [] },
-    { id: 'cur5', titulo: 'Cumplimiento y Confidencialidad', cat: 'Normativa', emoji: '⚖️', color: '#6b4ea0', desc: 'Protección de datos y conducta profesional.', lecciones: [{ t: 'Protección de datos', min: 10, tipo: 'lectura' }, { t: 'Conducta y confidencialidad', min: 8, tipo: 'video' }, { t: 'Evaluación', min: 10, tipo: 'quiz' }], progreso: 100, certificado: true }
+      ] },
+    { id: 'cur5', titulo: 'Cumplimiento y Confidencialidad', cat: 'Normativa', emoji: '⚖️', color: '#6b4ea0', desc: 'Protección de datos, Habeas Data, secreto profesional y conducta.', destinatarios: 'equipo', progreso: 0, certificado: false,
+      recursos: [{ nombre: 'Política de tratamiento de datos.pdf', tipo: 'pdf' }, { nombre: 'Acuerdo de confidencialidad.pdf', tipo: 'pdf' }],
+      lecciones: [
+        { t: 'Protección de datos personales', min: 12, tipo: 'lectura', secciones: [
+          { icon: '🛡️', t: '¿Qué protege la ley?', color: '#6b4ea0', d: 'Los datos personales de clientes (identidad, contacto, datos de pólizas, salud en GM, financieros) están protegidos por la normativa del país. En Colombia, la Ley 1581 de 2012 (Habeas Data); en Guatemala, las normas de protección de datos y confidencialidad de seguros. Tratar mal estos datos expone a la empresa a sanciones y a la pérdida de confianza.' },
+          { icon: '✅', t: 'Principios que debes cumplir', color: '#1f8a4c', d: 'Finalidad: usa los datos solo para gestionar los seguros del cliente. Necesidad: pide solo lo que necesitas. Seguridad: protege tus credenciales y no compartas información por canales inseguros. Circulación restringida: no envíes bases de datos por WhatsApp o correo personal.' },
+          { icon: '⚖️', t: 'Derechos del titular', color: '#C5162E', d: 'El cliente puede en cualquier momento conocer, actualizar, rectificar y solicitar la supresión de sus datos, y revocar la autorización. En el Portal del Cliente acepta la cláusula de tratamiento al primer ingreso; esa aceptación queda registrada con fecha.' }
+        ]},
+        { t: 'Confidencialidad y conducta profesional', min: 10, tipo: 'lectura', secciones: [
+          { icon: '🔒', t: 'Información Confidencial', color: '#1E2227', d: 'Es confidencial todo dato de clientes, cartera, tarifas, comisiones, y la propia plataforma (arquitectura, lógicas, know-how). No la copies, fotografíes ni extraigas fuera de Orbit 360. La obligación se mantiene incluso después de terminar tu relación con la empresa.' },
+          { icon: '🤝', t: 'Conducta esperada', color: '#2563a8', d: 'Actúa con honestidad con clientes y aseguradoras. No prometas coberturas que no existen. Registra todo en la plataforma (trazabilidad). Ante un conflicto de interés, decláralo. La cartera es de la empresa, no se traslada al salir.' },
+          { icon: '🤖', t: 'Uso responsable de la IA', color: '#c9821b', d: 'La IA de Orbit (extracción, redacción, análisis) es un apoyo. Verifica siempre antes de enviar a un cliente o tomar decisiones. Tú eres responsable del resultado final.' }
+        ]},
+        { t: 'Evaluación de cumplimiento', min: 8, tipo: 'quiz', preguntas: [
+          { p: '¿Hasta cuándo dura tu obligación de confidencialidad sobre los datos de clientes?', ops: ['Solo mientras trabajo en la empresa', 'Indefinidamente, incluso tras terminar la relación', 'Un año después de salir'], ok: 1 },
+          { p: '¿Cuál de estas prácticas SÍ es correcta?', ops: ['Enviar la base de clientes a mi correo personal para trabajar en casa', 'Usar los datos solo dentro de la plataforma y para gestionar sus seguros', 'Compartir tarifas con un conocido de otra correduría'], ok: 1 },
+          { p: '¿Qué debo hacer con un texto que generó la IA antes de enviarlo al cliente?', ops: ['Enviarlo tal cual, la IA no se equivoca', 'Verificarlo y ajustarlo con criterio profesional', 'Reenviarlo a la aseguradora sin leer'], ok: 1 }
+        ]}
+      ] },
+    { id: 'cur_master', titulo: 'Curso Maestro Orbit 360 — visión integral', cat: 'Inducción', emoji: '🌐', color: '#C5162E', desc: 'Recorrido completo por toda la plataforma: el ciclo 360, cada módulo, la sincronía en vivo y el valor para el negocio.', destinatarios: 'equipo', progreso: 0, certificado: false,
+      recursos: [{ nombre: 'Mapa integral Orbit 360.png', tipo: 'img' }, { nombre: 'Manual maestro.pdf', tipo: 'pdf' }],
+      lecciones: [
+        { t: 'Qué es Orbit 360 y el ciclo integral', min: 12, tipo: 'lectura', secciones: [
+          { icon: '🌐', t: 'Un sistema 360 para el intermediario', color: '#C5162E', d: 'Orbit 360 integra en un solo lugar todo el ciclo del intermediario de seguros: captar (Leads/Ops), vender (Cotizador/Comparativo), administrar (Pólizas/Cobros/Renovaciones/Cancelaciones), cobrar y liquidar (Finanzas/Comisiones), atender (Siniestros/Portal/Correo) y crecer (Marketing/Insights/Academia). Todo conectado, sin islas de información.' },
+          { icon: '🔗', t: 'Sincronía en vivo', color: '#1f8a4c', d: 'Cada acción se refleja al instante en todo el sistema: aplicar un pago baja la cartera y suma a Finanzas; cerrar un Lead crea el cliente y activa encuestas; cancelar una póliza crea una gestión de recuperación y queda en la ficha. No se duplica el trabajo: se registra una vez y vive en todos los módulos.' },
+          { icon: '🏢', t: 'Multi-tenant y white-label', color: '#1E2227', d: 'La plataforma es configurable por cliente (cada correduría): su logo, su paleta, sus países y monedas, sus aseguradoras, sus catálogos y los módulos que ve cada rol. Una sola base, muchas marcas.' }
+        ]},
+        { t: 'Los módulos comerciales', min: 12, tipo: 'lectura', secciones: [
+          { icon: '🎯', t: 'Leads y Ops', color: '#2563a8', d: 'Ops es el tablero interno del equipo (gestiones administrativas y de renovación); Leads es el pipeline del asesor. Comparten datos en vivo: lo que avanza en uno se ve en el otro. El asesor no ve Ops; ve sus gestiones por Leads.' },
+          { icon: '🧮', t: 'Cotizador y Comparativo', color: '#c9821b', d: 'El Cotizador arma cotizaciones con campos por ramo (auto con marca→línea→versión, GM por integrantes, etc.) y deriva al Comparativo. El Comparativo carga propuestas de varias aseguradoras (incluida extracción real de PDF) y las pone lado a lado con recomendación.' },
+          { icon: '👤', t: 'Cliente 360', color: '#1f8a4c', d: 'La ficha del cliente reúne pólizas, vehículos, recibos, siniestros, documentos, correos y actividad. Todo clicable, con detalle. Desde aquí se solicita una gestión, se envía WhatsApp/correo y se ve el historial completo.' }
+        ]},
+        { t: 'Administración, finanzas y atención', min: 12, tipo: 'lectura', secciones: [
+          { icon: '📋', t: 'Pólizas, Cobros, Renovaciones, Cancelaciones', color: '#C5162E', d: 'La póliza tiene desglose de prima (neta, gastos, recargo, IVA) y genera recibos automáticos según la forma de pago. Cobros gestiona la cartera y aplica pagos. Renovaciones propone y compara; Cancelaciones registra el motivo y dispara recuperación.' },
+          { icon: '💰', t: 'Finanzas y Comisiones', color: '#c9821b', d: 'Finanzas centraliza movimientos, CxC/CxP autoadministrables, liquidaciones por lote, presupuesto con semáforos y dashboard con comparativos. Comisiones calcula por aseguradora y reparte al vendedor, todo sobre prima neta recaudada.' },
+          { icon: '🚨', t: 'Siniestros, Portal y Correo', color: '#0f766e', d: 'Siniestros lleva la bitácora del reclamo con la aseguradora. El Portal da al cliente autoservicio (pólizas, pagos, gestiones, aprende). El Correo asocia hilos a cliente/póliza/gestión/reclamo, con trazabilidad.' }
+        ]},
+        { t: 'Crecimiento y configuración', min: 10, tipo: 'lectura', secciones: [
+          { icon: '📈', t: 'Insights, Marketing y Academia', color: '#2563a8', d: 'Insights mide producción nueva vs renovada contra metas, con comparativos y análisis crítico por IA. Marketing planifica contenidos (manual o con IA) e integra redes. Academia capacita al equipo y a los clientes con cursos, manuales y recursos.' },
+          { icon: '🤖', t: 'Orbit IA transversal', color: '#6b4ea0', d: 'Una capa de IA (proveedor configurable, sin sesgo) asiste en extracción de documentos, redacción de mensajes, análisis de datos y generación de contenido y cursos. Siempre con verificación humana.' },
+          { icon: '⚙️', t: 'Configuración y automatizaciones', color: '#1E2227', d: 'Todo es autoadministrable: marca, paleta, países, monedas, catálogos, aseguradoras, roles y módulos por usuario, integraciones (con API key/webhook) y automatizaciones (evento→canal→plantilla). Sin tocar código.' }
+        ]},
+        { t: 'Evaluación integral', min: 10, tipo: 'quiz', preguntas: [
+          { p: '¿Qué significa "sincronía en vivo" en Orbit 360?', ops: ['Que hay que actualizar manualmente cada módulo', 'Que una acción se refleja al instante en todos los módulos relacionados', 'Que solo se sincroniza al cerrar sesión'], ok: 1 },
+          { p: '¿Quién NO ve el tablero Ops?', ops: ['La dirección', 'El asesor (ve sus gestiones por Leads)', 'El área administrativa'], ok: 1 },
+          { p: '¿Sobre qué base se calculan producción, metas y comisiones?', ops: ['Prima total facturada', 'Prima neta recaudada', 'Número de pólizas'], ok: 1 },
+          { p: '¿Qué se puede configurar sin tocar código?', ops: ['Solo el logo', 'Marca, países, catálogos, aseguradoras, roles, integraciones y automatizaciones', 'Nada, todo requiere programador'], ok: 1 }
+        ]}
+      ] }
   ];
 
   // ====================================================================
@@ -739,7 +819,7 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 30,
+    __v: 32,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos, contenidos, reclamos, cursos, notifs
   };

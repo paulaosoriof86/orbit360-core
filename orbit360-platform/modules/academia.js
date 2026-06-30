@@ -46,7 +46,7 @@ Orbit.modules.academia = (function () {
   function fileToDataURL(f, cb) { if (!f) return; const r = new FileReader(); r.onload = () => cb(r.result); r.readAsDataURL(f); }
   function fileToText(f, cb) { if (!f) return; if (/\.(txt|csv|md)$/i.test(f.name)) { const r = new FileReader(); r.onload = () => cb(String(r.result)); r.readAsText(f); } else { cb(''); } }
   async function iaTextAsync(prompt, current) { if (window.claude && window.claude.complete) { try { const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt + (current ? '\n\nMejora y expande este borrador:\n' + current : '') }] }); return String(out).trim(); } catch (e) {} } return current || ('📘 Contenido de la lección.\n\nIntroducción, conceptos clave, ejemplos prácticos y cierre. Editá para ajustar el detalle.'); }
-  async function iaQuizAsync(tema, current) { if (window.claude && window.claude.complete) { try { const out = await window.claude.complete({ messages: [{ role: 'user', content: 'Genera 3 preguntas de opción múltiple sobre "' + (tema || 'seguros') + '". Formato EXACTO: enunciado en una línea, luego cada opción en su propia línea, la correcta con [x] al inicio y las demás con [ ]. Separa preguntas con una línea en blanco. Solo el texto, sin numeración.' }] }); return (current ? current + '\n\n' : '') + String(out).trim(); } catch (e) {} } const base = '¿Pregunta sobre ' + (tema || 'el tema') + '?\n[x] Respuesta correcta\n[ ] Distractor 1\n[ ] Distractor 2'; return (current ? current + '\n\n' : '') + base; }
+  async function iaQuizAsync(tema, current, count, replace) { count = count || 3; if (window.claude && window.claude.complete) { try { const out = await window.claude.complete({ messages: [{ role: 'user', content: 'Genera ' + count + ' preguntas de opción múltiple sobre "' + (tema || 'seguros') + '". Formato EXACTO: enunciado en una línea, luego cada opción en su propia línea, la correcta con [x] al inicio y las demás con [ ]. Separa preguntas con una línea en blanco. Solo el texto, sin numeración.' + (replace ? '' : ' Que sean DISTINTAS a estas:\n' + (current || '')) }] }); return (replace || !current ? '' : current + '\n\n') + String(out).trim(); } catch (e) {} } let base = []; for (let k = 0; k < count; k++) base.push('¿Pregunta ' + (k + 1) + ' sobre ' + (tema || 'el tema') + '?\n[x] Respuesta correcta\n[ ] Distractor 1\n[ ] Distractor 2'); return (replace || !current ? '' : current + '\n\n') + base.join('\n\n'); }
   async function iaQuizFromDoc(text) { if (window.claude && window.claude.complete && text) { try { const out = await window.claude.complete({ messages: [{ role: 'user', content: 'A partir de este documento genera 4 preguntas de opción múltiple. Formato: enunciado, opciones en líneas (correcta con [x], otras con [ ]), preguntas separadas por línea en blanco. Documento:\n' + String(text).slice(0, 4000) }] }); return String(out).trim(); } catch (e) {} } return '¿Pregunta basada en el documento?\n[x] Correcta\n[ ] Incorrecta\n[ ] Otra'; }
 
   function cursos() {
@@ -70,7 +70,9 @@ Orbit.modules.academia = (function () {
   function render(h) {
     host = h;
     const arr = cursos();
-    const cats = ['todas'].concat([...new Set(arr.map(c => c.cat))]);
+    // categorías = union de las guardadas (autoadministrables) + las que ya usan cursos
+    const guardadas = (Orbit.cat && Orbit.cat.get) ? Orbit.cat.get('academiaCats') : [];
+    const cats = ['todas'].concat([...new Set(guardadas.concat(arr.map(c => c.cat)).filter(Boolean))]);
     const lista = filtro === 'todas' ? arr : arr.filter(c => c.cat === filtro);
     const compl = arr.filter(c => c.progreso >= 100).length;
     const certs = arr.filter(c => c.certificado).length;
@@ -79,6 +81,7 @@ Orbit.modules.academia = (function () {
     const actions = '<button class="btn ghost" id="ac-ia" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Crear con IA</button>'
       + '<button class="btn ghost" id="ac-man" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">📖 Manuales</button>'
       + '<button class="btn ghost" id="ac-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬆ Cargar recurso</button>'
+      + '<button class="btn ghost" id="ac-cat" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">+ Categoría</button>'
       + '<button class="btn primary" id="ac-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Curso</button>';
 
     const catEmoji = { 'todas':'📚','Inducción':'🚀','Técnico':'⚙️','Comercial':'💼','Producto':'📦','Finanzas':'💰','Marketing':'📣','Servicio':'🤝','Cumplimiento':'🛡️','Liderazgo':'🌟','Clientes':'👥' };
@@ -108,6 +111,7 @@ Orbit.modules.academia = (function () {
     const impBtn = host.querySelector('#ac-imp'); if (impBtn) impBtn.addEventListener('click', () => Orbit.importa.open('documentos', { onDone: () => render(host) }));
     const newBtn = host.querySelector('#ac-new'); if (newBtn) newBtn.addEventListener('click', () => editar(null));
     const iaBtn  = host.querySelector('#ac-ia');  if (iaBtn)  iaBtn.addEventListener('click', crearIA);
+    const catBtn = host.querySelector('#ac-cat'); if (catBtn) catBtn.addEventListener('click', gestionCategorias);
     const manBtn = host.querySelector('#ac-man'); if (manBtn) manBtn.addEventListener('click', verManuales);
   }
 
@@ -299,11 +303,14 @@ Orbit.modules.academia = (function () {
       if (t === 'video') $('#le-dyn').innerHTML = `<label class="ce-l">URL del video (YouTube/Vimeo/HeyGen embed)<input id="le-url" class="o-sel" value="${U.esc(l.url || '')}" placeholder="https://www.youtube.com/embed/..."></label><div style="margin-top:8px"><label class="btn ghost sm" style="cursor:pointer">📎 Subir archivo de video<input type="file" id="le-vfile" accept="video/*" style="display:none"></label> <span class="muted" style="font-size:11.5px">o pegá el enlace embed arriba</span></div><div class="cfg-note">Pegá el enlace <b>embed</b> o subí un video. (Archivos grandes pueden no persistir tras recargar.)</div>`;
       else if (t === 'lectura') $('#le-dyn').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><span class="ce-l">Contenido</span><button class="btn ghost sm" id="le-ia">✨ Generar / mejorar con IA</button></div><textarea id="le-texto" class="o-sel" style="min-height:140px;resize:vertical">${U.esc(l.texto || '')}</textarea><div style="margin-top:8px"><label class="btn ghost sm" style="cursor:pointer">📎 Adjuntar documento (.txt/.pdf/.docx/imagen)<input type="file" id="le-doc" accept=".txt,.pdf,.doc,.docx,image/*" style="display:none"></label> <span class="muted" id="le-doc-name" style="font-size:11.5px">${l.docSrc ? 'documento adjunto ✓' : ''}</span></div><div class="cfg-note">El texto se muestra en la lección. Si adjuntás un PDF/imagen, se <b>embebe</b> debajo del contenido.</div>`;
       else if (t === 'recurso') $('#le-dyn').innerHTML = `<label class="ce-l">Documento embebido (PDF/Word/imagen) — URL o enlace de Drive<input id="le-iframe" class="o-sel" value="${U.esc(l.iframeSrc || '')}" placeholder="https://drive.google.com/.../preview"></label><div style="margin-top:8px"><label class="btn ghost sm" style="cursor:pointer">📎 Subir archivo (PDF/imagen)<input type="file" id="le-rfile" accept=".pdf,image/*" style="display:none"></label> <span class="muted" id="le-rfile-name" style="font-size:11.5px"></span></div><div class="cfg-note">📎 La lección muestra el documento <b>embebido a pantalla</b>. Pegá un enlace de Drive (terminado en <b>/preview</b>) o subí el archivo.</div>`;
-      else $('#le-dyn').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="ce-l">Preguntas</span><div style="display:flex;gap:6px"><button class="btn ghost sm" id="le-qadd">+ Pregunta</button><button class="btn ghost sm" id="le-qia">✨ Generar con IA</button></div></div><textarea id="le-quiz" class="o-sel" style="min-height:150px;resize:vertical;font-family:var(--f-mono);font-size:12px" placeholder="Enunciado de la pregunta\n[x] Opción correcta\n[ ] Opción incorrecta\n[ ] Otra opción">${U.esc((l.preguntas || []).map(q => q.p + '\n' + q.ops.map((o, j) => (j === q.ok ? '[x] ' : '[ ] ') + o).join('\n')).join('\n\n'))}</textarea><div style="margin-top:6px"><label class="btn ghost sm" style="cursor:pointer">📎 Generar quiz desde un documento (IA)<input type="file" id="le-qdoc" accept=".txt,.pdf,.docx,image/*" style="display:none"></label></div><div class="cfg-note">Cada pregunta: enunciado, luego opciones (una por línea), marcá la correcta con <b>[x]</b>. Separá preguntas con una línea en blanco. O subí un documento y la IA arma el quiz.</div>`;
+      else $('#le-dyn').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="ce-l">Preguntas</span><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><label class="muted" style="font-size:11.5px;display:flex;align-items:center;gap:4px">N.º<input id="le-qn" class="o-sel" type="number" min="1" max="20" value="${(l.preguntas || []).length || 3}" style="width:54px;padding:4px 6px"></label><button class="btn ghost sm" id="le-qadd">+ Pregunta</button><button class="btn ghost sm" id="le-qia">✨ Generar (N)</button><button class="btn ghost sm" id="le-qre">🔄 Replantear todas</button><button class="btn ghost sm" id="le-qre1">🔄 Replantear la última</button></div></div><textarea id="le-quiz" class="o-sel" style="min-height:150px;resize:vertical;font-family:var(--f-mono);font-size:12px" placeholder="Enunciado de la pregunta\n[x] Opción correcta\n[ ] Opción incorrecta\n[ ] Otra opción">${U.esc((l.preguntas || []).map(q => q.p + '\n' + q.ops.map((o, j) => (j === q.ok ? '[x] ' : '[ ] ') + o).join('\n')).join('\n\n'))}</textarea><div style="margin-top:6px"><label class="btn ghost sm" style="cursor:pointer">📎 Generar quiz desde un documento (IA)<input type="file" id="le-qdoc" accept=".txt,.pdf,.docx,image/*" style="display:none"></label></div><div class="cfg-note">Eligé la <b>cantidad</b> y generá/replanteá con IA (todas o solo la última). Cada pregunta: enunciado, opciones (una por línea), correcta con <b>[x]</b>; separá con línea en blanco.</div>`;
       // listeners IA
       const iaB = $('#le-ia'); if (iaB) iaB.addEventListener('click', async () => { iaB.textContent = '🧠…'; $('#le-texto').value = await iaTextAsync('Redacta el contenido didáctico de la lección "' + $('#le-t').value + '" para un curso de seguros, con emojis y párrafos.', $('#le-texto').value); iaB.textContent = '✨ Generar / mejorar con IA'; });
       const qadd = $('#le-qadd'); if (qadd) qadd.addEventListener('click', () => { const ta = $('#le-quiz'); ta.value = (ta.value ? ta.value + '\n\n' : '') + '¿Nueva pregunta?\n[x] Opción correcta\n[ ] Opción incorrecta'; });
-      const qia = $('#le-qia'); if (qia) qia.addEventListener('click', async () => { qia.textContent = '🧠…'; const ta = $('#le-quiz'); ta.value = await iaQuizAsync($('#le-t').value, ta.value); qia.textContent = '✨ Generar con IA'; });
+      const qn = () => Math.max(1, Math.min(20, +($('#le-qn') || {}).value || 3));
+      const qia = $('#le-qia'); if (qia) qia.addEventListener('click', async () => { qia.textContent = '🧠…'; const ta = $('#le-quiz'); ta.value = await iaQuizAsync($('#le-t').value, ta.value, qn(), false); qia.textContent = '✨ Generar (N)'; });
+      const qre = $('#le-qre'); if (qre) qre.addEventListener('click', async () => { if (!confirm('¿Replantear TODAS las preguntas con IA? Se reemplazan las actuales.')) return; qre.textContent = '🧠…'; const ta = $('#le-quiz'); ta.value = await iaQuizAsync($('#le-t').value, '', qn(), true); qre.textContent = '🔄 Replantear todas'; });
+      const qre1 = $('#le-qre1'); if (qre1) qre1.addEventListener('click', async () => { qre1.textContent = '🧠…'; const ta = $('#le-quiz'); const blocks = (ta.value || '').split(/\n\s*\n/).filter(b => b.trim()); const nueva = (await iaQuizAsync($('#le-t').value, ta.value, 1, false)).split(/\n\s*\n/).pop(); if (blocks.length) blocks[blocks.length - 1] = nueva; else blocks.push(nueva); ta.value = blocks.join('\n\n'); qre1.textContent = '🔄 Replantear la última'; });
       // listeners archivo
       const vfile = $('#le-vfile'); if (vfile) vfile.addEventListener('change', e => fileToDataURL(e.target.files[0], u => { $('#le-url').value = u; }));
       const doc = $('#le-doc'); if (doc) doc.addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; if (/\.txt$/i.test(f.name)) fileToText(f, txt => { const ta = $('#le-texto'); ta.value = (ta.value ? ta.value + '\n\n' : '') + txt; }); else fileToDataURL(f, u => { l.docSrc = u; const n = $('#le-doc-name'); if (n) n.textContent = 'documento adjunto ✓'; }); });
@@ -410,6 +417,60 @@ Orbit.modules.academia = (function () {
     back.querySelector('#ar-close').addEventListener('click', close);
   }
 
+  /* ---- Gestión de categorías (autoadministrable: crear / renombrar / eliminar) ---- */
+  function gestionCategorias() {
+    let back = document.getElementById('ac-cats'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'ac-cats'; back.className = 'drawer-back open';
+    back.style.cssText = 'display:grid;place-items:center;z-index:99';
+    function lista() {
+      const guardadas = (Orbit.cat && Orbit.cat.get) ? Orbit.cat.get('academiaCats') : [];
+      const enUso = [...new Set(cursos().map(c => c.cat).filter(Boolean))];
+      const todas = [...new Set(guardadas.concat(enUso))];
+      if (!todas.length) return '<div class="muted" style="padding:8px 0">Aún no hay categorías. Crea la primera.</div>';
+      return todas.map(c => {
+        const n = cursos().filter(x => x.cat === c).length;
+        return '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px">'
+          + '<span style="flex:1;font-weight:600">' + U.esc(c) + ' <span class="muted" style="font-weight:400">· ' + n + ' curso(s)</span></span>'
+          + '<button class="btn ghost sm" data-ren="' + U.esc(c) + '">✏️ Renombrar</button>'
+          + '<button class="btn ghost sm" data-elc="' + U.esc(c) + '">🗑️</button></div>';
+      }).join('');
+    }
+    function paint() {
+      back.innerHTML = '<div class="card" style="width:min(480px,94vw);max-height:90vh;overflow:auto;padding:0">'
+        + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🏷️ Categorías de Academia</b><button class="btn ghost sm" id="acc-x">✕</button></div>'
+        + '<div style="padding:16px 20px">'
+        + '<div style="display:flex;gap:8px;margin-bottom:14px"><input id="acc-nv" class="o-sel" placeholder="Nueva categoría (ej. Liderazgo)" style="flex:1"><button class="btn primary sm" id="acc-add">Crear</button></div>'
+        + '<div id="acc-list">' + lista() + '</div>'
+        + '</div></div>';
+      const $ = s => back.querySelector(s);
+      $('#acc-x').addEventListener('click', () => back.remove());
+      $('#acc-add').addEventListener('click', () => {
+        const v = $('#acc-nv').value.trim(); if (!v) return;
+        Orbit.cat.add('academiaCats', v); paint();
+      });
+      back.querySelectorAll('[data-ren]').forEach(b => b.addEventListener('click', () => {
+        const old = b.dataset.ren; const nv = prompt('Nuevo nombre de la categoría:', old);
+        if (!nv || nv === old) return;
+        // renombrar en la lista guardada
+        const g = Orbit.cat.get('academiaCats').map(x => x === old ? nv : x);
+        Orbit.cat.setList('academiaCats', [...new Set(g.concat(nv))]);
+        // y en los cursos que la usan
+        cursos().filter(c => c.cat === old).forEach(c => S().update('cursos', c.id, { cat: nv }));
+        paint();
+      }));
+      back.querySelectorAll('[data-elc]').forEach(b => b.addEventListener('click', () => {
+        const c = b.dataset.elc; const n = cursos().filter(x => x.cat === c).length;
+        if (n > 0) { alert('No se puede eliminar: hay ' + n + ' curso(s) en esta categoría. Reasígnalos primero.'); return; }
+        if (!confirm('¿Eliminar la categoría "' + c + '"?')) return;
+        Orbit.cat.setList('academiaCats', Orbit.cat.get('academiaCats').filter(x => x !== c));
+        paint();
+      }));
+    }
+    paint();
+    back.addEventListener('click', e => { if (e.target === back) back.remove(); });
+    document.body.appendChild(back);
+  }
+
   /* ---- Crear curso con IA (genera estructura editable e iterable) ---- */
   function crearIA() {
     let back = document.getElementById('ac-ia'); if (back) back.remove();
@@ -420,7 +481,7 @@ Orbit.modules.academia = (function () {
       <div style="padding:18px 20px;display:grid;gap:12px">
         <label class="ce-l">¿Sobre qué tema?<input id="ai-tema" class="o-sel" placeholder="Ej. Seguro de Vida para familias"></label>
         <label class="ce-l">Dirigido a<select id="ai-dest" class="o-sel"><option value="equipo">👥 Equipo (asesores)</option><option value="clientes">🧑 Clientes</option><option value="ambos">Ambos</option></select></label>
-        <label class="ce-l">Categoría<select id="ai-cat" class="o-sel">${['Inducción', 'Técnico', 'Comercial', 'Producto', 'Normativa', 'Educativo'].map(c => `<option>${c}</option>`).join('')}<option value="__nueva">➕ Nueva categoría…</option></select></label>
+        <label class="ce-l">Categoría<select id="ai-cat" class="o-sel">${[...new Set(['Inducción', 'Técnico', 'Comercial', 'Producto', 'Normativa', 'Educativo'].concat((Orbit.cat && Orbit.cat.get) ? Orbit.cat.get('academiaCats') : []))].map(c => `<option>${c}</option>`).join('')}<option value="__nueva">➕ Nueva categoría…</option></select></label>
         <div><label class="btn ghost sm" style="cursor:pointer">📎 Adjuntar documentos base (la IA crea el curso a partir de ellos)<input type="file" id="ai-docs" accept=".txt,.csv,.md,.pdf,.docx" multiple style="display:none"></label> <span class="muted" id="ai-docs-name" style="font-size:11.5px"></span></div>
         <div class="cfg-note">✨ La IA genera el curso interactivo (título, descripción, lecciones navegables y evaluación). Si adjuntás documentos, los usa como base. Luego podés <b>iterar, editar y completar</b> antes de publicar.</div>
       </div>
@@ -469,7 +530,7 @@ Orbit.modules.academia = (function () {
   /* ---- Crear / editar curso (autoadministrable: emoji + lecciones + recursos) ---- */
   function editar(id) {
     const c = id ? S().get('cursos', id) : { id: '', titulo: '', cat: 'Inducción', emoji: '🎓', color: '#C5162E', desc: '', lecciones: [], recursos: [], progreso: 0, certificado: false };
-    const cats = ['Inducción', 'Técnico', 'Comercial', 'Producto', 'Normativa'];
+    const cats = [...new Set(['Inducción', 'Técnico', 'Comercial', 'Producto', 'Normativa'].concat((Orbit.cat && Orbit.cat.get) ? Orbit.cat.get('academiaCats') : []))];
     const emojis = ['🎓', '🚀', '🛡️', '🎯', '🚗', '❤️', '🏠', '⚖️', '📈', '💼', '📚', '🔐'];
     const colores = ['#C5162E', '#1f3a5f', '#1f8a4c', '#c9821b', '#6b4ea0', '#0f766e'];
     let lecs = JSON.parse(JSON.stringify(c.lecciones || []));
