@@ -113,8 +113,8 @@ Orbit.modules.siniestros = (function () {
   function nuevo() {
     const clientes = S().all('clientes');
     const cid0 = clientes[0] && clientes[0].id;
-    let back = document.getElementById('si-new'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'si-new'; back.className = 'drawer-back open';
+    let back = document.getElementById('si-new-dr'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'si-new-dr'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center';
     function pols(cid) { return S().where('polizas', p => p.clienteId === cid); }
     back.innerHTML = `<div class="card" style="width:min(520px,94vw);padding:0">

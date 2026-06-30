@@ -14,7 +14,7 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
   background:linear-gradient(165deg,#f7f6f2 0%,#eceae4 100%);
   color:var(--ink);display:flex;flex-direction:column;border-right:1px solid var(--line);
 }
-.lg-left .lg-reg{position:absolute;top:26px;left:30px;font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;color:var(--ink-3);border:1px solid var(--line);padding:5px 10px;border-radius:6px;z-index:6}
+.lg-left .lg-reg{position:absolute;top:26px;left:30px;white-space:nowrap;font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;color:var(--ink-3);border:1px solid var(--line);padding:5px 10px;border-radius:6px;z-index:6}
 .lg-orbit{flex:1;display:grid;place-items:center;position:relative}
 .orbit-wrap{position:relative;width:340px;height:340px}
 .orbit-core{
@@ -59,8 +59,10 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
 .lg-foot .lf-desc{font-size:12.5px;color:rgba(255,255,255,.45);margin-top:12px;max-width:330px;line-height:1.55;margin-left:auto;margin-right:auto}
 .lg-foot .lf-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;justify-content:center}
 .lg-foot .lf-chips span{font-family:var(--f-mono);font-size:9px;letter-spacing:.08em;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.6);padding:4px 8px;border-radius:5px;text-transform:uppercase}
-.lf-logoslot{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:11px;color:rgba(255,255,255,.45)}
-.lf-logoslot .slot{width:64px;height:64px;border-radius:10px;border:1px dashed rgba(255,255,255,.25);display:grid;place-items:center;font-size:26px;overflow:hidden}
+/* franja blanca a sangre, separada del bloque oscuro por cintilla roja — el logo de cada cliente resalta */
+.lf-logoslot{display:flex;justify-content:center;align-items:center;background:#fff;border-top:3px solid var(--red);margin:24px -30px -30px;padding:20px 30px;min-height:84px}
+.lf-logoslot .slot{width:auto;min-width:64px;height:52px;display:grid;place-items:center;font-size:26px;overflow:hidden;background:transparent;border:none;color:var(--graph)}
+.lf-logoslot .slot:has(img){max-width:220px;padding:0}
 .lf-logoslot .slot img{width:100%;height:100%;object-fit:contain}
 
 /* panel derecho: formulario */
@@ -69,7 +71,7 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
 .lg-welcome{font-family:var(--f-display);font-weight:800;font-size:30px;letter-spacing:-.02em}
 .lg-welcome-sub{color:var(--ink-2);font-size:14.5px;margin-top:6px}
 .lg-box{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-2);padding:24px;margin-top:24px}
-.lg-box .lg-eyebrow{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.16em;color:var(--ink-3);border:1px solid var(--line);display:inline-block;padding:5px 9px;border-radius:6px;text-transform:uppercase}
+.lg-box .lg-eyebrow{white-space:nowrap;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.16em;color:var(--ink-3);border:1px solid var(--line);display:inline-block;padding:5px 9px;border-radius:6px;text-transform:uppercase}
 .lg-box h3{font-family:var(--f-display);font-weight:800;font-size:19px;margin:14px 0 2px}
 .lg-box .lg-hint{color:var(--ink-3);font-size:12.5px;margin-bottom:16px}
 .lg-field{width:100%;font-family:var(--f-text);font-size:14px;padding:13px 14px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card-2);outline:none;margin-bottom:11px;transition:.14s}

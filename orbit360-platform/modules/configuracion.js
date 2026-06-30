@@ -309,7 +309,7 @@ Orbit.modules.configuracion = (function () {
     if (cn) { cn.innerHTML = (t.empresa && t.empresa !== 'Tu marca' ? U.esc(t.empresa) : 'Tu marca') + '<small>' + (tieneMarca ? 'Cliente' : 'White-label') + '</small>'; }
     // logo en el slot del topbar
     const slot = document.getElementById('client-logo');
-    if (slot) { if (logo) { slot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; slot.style.borderStyle = 'solid'; } else { slot.textContent = '🏢'; slot.style.borderStyle = 'dashed'; } }
+    if (slot) { if (logo) { slot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; slot.style.border = 'none'; } else { slot.textContent = '🏢'; slot.style.borderStyle = 'dashed'; } }
     // logo en el login (slot inferior)
     const lgSlot = document.querySelector('.lf-logoslot .slot');
     if (lgSlot) { if (logo) { lgSlot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; lgSlot.style.borderStyle = 'solid'; } }
