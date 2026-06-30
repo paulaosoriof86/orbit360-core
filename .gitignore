@@ -1,0 +1,7 @@
+orbit360-platform/core/auth-firebase.config.local.js
+**/auth-firebase.config.local.js
+.env
+.env.*
+firebase-debug.log
+index-dev-auth.html
+orbit360-platform/index-dev-auth.html

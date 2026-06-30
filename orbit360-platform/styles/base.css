@@ -17,18 +17,20 @@ button{font-family:inherit}
 /* ---------- TOPBAR (cintilla blanca, para mostrar logo del cliente) ---------- */
 .topbar{
   position:fixed;top:0;left:0;right:0;height:var(--topbar-h);z-index:60;
-  display:flex;align-items:center;gap:var(--s-4);
+  display:flex;align-items:center;gap:var(--s-4);flex-wrap:nowrap;overflow:hidden;
   padding:0 var(--s-5);
   background:#ffffff;
   border-bottom:1px solid var(--line);
   box-shadow:0 1px 0 rgba(15,17,20,.03);
   color:var(--ink);
 }
+.brand{flex-shrink:0}
 .tb-burger{
   display:none;border:none;background:var(--surface);color:var(--ink);
   width:36px;height:36px;border-radius:var(--r-sm);font-size:18px;cursor:pointer;
 }
-.brand{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.brand{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;flex-shrink:0}
+.brand-text{display:flex;flex-direction:column;justify-content:center;line-height:1}
 /* slot de logo del cliente (white-label) */
 .tb-logo{display:flex;align-items:center;gap:10px;padding-right:14px;margin-right:12px;border-right:1px solid var(--line);flex-shrink:0}
 .tb-logo .slot{width:40px;height:40px;flex-shrink:0;border-radius:8px;background:var(--surface);border:1px dashed var(--line);display:grid;place-items:center;font-size:18px;color:var(--ink-3);overflow:hidden}
@@ -64,7 +66,7 @@ button{font-family:inherit}
 }
 .brand-name{font-family:var(--f-display);font-weight:800;font-size:14px;letter-spacing:-.01em;line-height:1}
 .brand-name b{color:var(--red)}
-.brand-sub{font-family:var(--f-mono);font-size:7.5px;letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase;margin-top:1px}
+.brand-sub{white-space:nowrap;font-family:var(--f-mono);font-size:7.5px;letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase;margin-top:2px}
 .tb-spacer{flex:1}
 .tb-search{
   display:flex;align-items:center;gap:8px;background:var(--surface);
@@ -317,9 +319,14 @@ select.o-sel{cursor:pointer;appearance:none;background-image:url("data:image/svg
   .kpi-row{grid-template-columns:repeat(2,1fr)}
   .page{padding:20px 16px 50px}
 }
+@media(max-width:880px){
+  /* en pantallas medianas/chicas el slot del cliente (white-label) compite por espacio: se oculta */
+  .tb-logo{display:none}
+}
 @media(max-width:560px){
   .kpi-row{grid-template-columns:1fr}
   .brand-sub{display:none}
+  .topbar{gap:8px;padding:0 12px}
 }
 
 /* ---- RESPONSIVE GLOBAL (pasada rápida 25-jun) ---- */

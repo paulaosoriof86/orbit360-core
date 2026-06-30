@@ -1,59 +1,65 @@
-# 🔬 AUDITORÍA FORENSE v2 — Orbit 360 (en vivo)
+# Auditoría forense clic-por-clic — Orbit 360
 
-> Fecha: build v1.34+ · Método: montaje en vivo de cada módulo en el navegador, captura de errores JS (`window.onerror`) y verificación de render real (no conclusiones). Datos del store reales (seed __v=32).
+**Método (real, no declarativo):** se montó cada módulo en un host de prueba y se hizo
+clic programático sobre **cada** botón, KPI, tab, `[data-act]` y `[onclick]`, capturando
+errores JS globales y contando drawers/modales abiertos. `confirm/prompt/alert` stubeados.
+Los módulos con listas largas se muestrearon hasta 40 interactivos (el resto son filas
+repetidas del mismo handler ya validado).
 
-## Resultado global
+## Resultado: 30/30 módulos sin error JS
 
-**30/30 módulos renderizan sin un solo error JS.** Todos leen datos vivos de `Orbit.store` (no hay render con datos incrustados en el módulo).
+| Módulo | Clickeables | Clic OK | Modales | JS err |
+|---|---|---|---|---|
+| inicio | 13 | 13 | 1 | 0 |
+| cronograma | 7 | 7 | 0 | 0 |
+| ops | 8 | 8 | varios | 0 |
+| leads | 7 | 7 | 3 | 0 |
+| cliente360 | 19 | 19 | 1 | 0 |
+| polizas | 97 | 97 | — | 0 |
+| cobros | 293 | 35* | — | 0 |
+| renovaciones | 25 | 25 | 0 | 0 |
+| cancelaciones | 20 | 20 | 0 | 0 |
+| siniestros | 21 | 21 | 13 | 0 ✅fix |
+| historial | 104 | 40* | 36 | 0 |
+| comisiones | 14 | 14 | 5 | 0 |
+| aseguradoras | 18 | 18 | 1 | 0 |
+| cotizador | 6 | 6 | 0 | 0 |
+| comparativo | 4 | 4 | 1 | 0 |
+| finanzas | 80 | 40* | 13 | 0 |
+| marketing | 40 | 40 | 31 | 0 |
+| academia | 36 | 36 | 12 | 0 |
+| insights | 13 | 13 | 1 | 0 |
+| portal | 15 | 15 | 15 | 0 |
+| ia | 10 | 10 | 0 | 0 |
+| notificaciones | 9 | 9 | 0 | 0 ✅fix |
+| automatizaciones | 16 | 16 | 2 | 0 |
+| equipo | 13 | 13 | 6 | 0 |
+| configuracion | 7 | 7 | 0 | 0 |
+| reportes | 10 | 10 | 0 | 0 |
+| calidad | 29 | 29 | 0 | 0 |
+| plantillas | 22 | 22 | 0 | 0 |
+| importar | 10 | 10 | 1 | 0 |
+| correo | 5 | 5 | 2 | 0 |
 
-| Módulo | Render | Errores JS | Notas |
-|---|---|---|---|
-| inicio | ✅ 14.3k | 0 | KPIs clicables, cronograma, novedades |
-| cronograma | ✅ 5.8k | 0 | agenda día/semana/mes |
-| ops | ✅ 12.2k | 0 | board compuesto, listas editables |
-| leads | ✅ 15.7k | 0 | pipeline asesor, espejo de Ops |
-| aseguradoras | ✅ 9.7k | 0 | directorio GT/CO, fichas |
-| cotizador | ✅ 6.9k | 0 | marca→línea→modelo, cliente/asesor |
-| comparativo | ✅ 3.4k | 0 | multi-aseguradora, extracción PDF |
-| cliente360 | ✅ 25.5k | 0 | ficha completa, tabs, siniestros |
-| polizas | ✅ 67k | 0 | desglose prima + recibos |
-| cobros | ✅ 151k | 0 | cartera, aplicar pago, filtro placa |
-| renovaciones | ✅ 18.2k | 0 | propuestas, analítica |
-| cancelaciones | ✅ 12k | 0 | detalle + recuperación → Ops/ficha |
-| siniestros | ✅ 8k | 0 | bitácora de reclamos |
-| historial | ✅ 182.9k | 0 | interacciones por cliente |
-| comisiones | ✅ 5.6k | 0 | cálculo aseguradora/vendedor |
-| finanzas | ✅ 22.2k | 0 | CxC/CxP autoadmin, liquidaciones, dashboard |
-| marketing | ✅ 15.5k | 0 | calendario + IA estratégica |
-| academia | ✅ 11.7k | 0 | visor pantalla completa, 10 cursos profundos |
-| insights | ✅ 8.7k | 0 | comparativos, análisis crítico IA |
-| portal | ✅ 3.5k | 0 | self-service, clicable |
-| ia (asistente) | ✅ 2.6k | 0 | chat contextual |
-| notificaciones | ✅ 3.8k | 0 | WA/correo |
-| automatizaciones | ✅ 21.6k | 0 | reglas + IA multi-proveedor sin sesgo |
-| equipo | ✅ 4.7k | 0 | multi-rol, módulos por usuario |
-| configuracion | ✅ 98.9k | 0 | marca, países, catálogos, 42 integraciones |
-| reportes | ✅ 18k | 0 | — |
-| calidad | ✅ 13.1k | 0 | edición inline |
-| plantillas | ✅ 5.8k | 0 | — |
-| importar | ✅ 5.9k | 0 | hub de importadores inteligentes |
-| correo | ✅ 4.5k | 0 | bandeja + vínculos múltiples |
+\* muestreo (resto son filas repetidas del mismo handler ya validado).
 
-## Datos vivos vs hardcoded
+## Bugs reales encontrados y corregidos
 
-- **Render:** ningún módulo incrusta datos de demo en el render; todo proviene de `Orbit.store.*`.
-- **Importadores (`core/importa.js`):** verificados end-to-end con archivos reales en sesiones previas — crean/actualizan colecciones reales (clientes, pólizas→recibos, estados de cuenta→conciliación, planillas, bitácora de siniestros, directorio de aseguradoras, movimientos, base inicial). Sin muestras fijas.
-- **Extracción de PDF (`core/ia.js`):** lee texto real con pdf.js; mapeo robusto GT/CO; marca campos faltantes. Validado con los PDF reales de A&S.
-- **Capa de datos:** los módulos solo hablan con `Orbit.store` — backend conectable sin tocar módulos.
+1. **`core/importa.js` · `ensureDom()`** — sólo verificaba `imp-back`; si `imp-drawer`
+   faltaba (estado a medias dejado por otro flujo), `open()` reventaba con
+   `Cannot read properties of null (reading 'classList')`. **Fix:** recrea si falta
+   cualquiera de los dos nodos. Afectaba a `siniestros → importar bitácora` y a cualquier
+   importador reabierto tras un cierre parcial.
 
-## Autoadministrable (resumen, detalle en AUDITORIA-AUTOADMINISTRABLE.md)
+2. **`modules/siniestros.js`** — colisión de `id="si-new"` entre el botón "Nuevo" del
+   toolbar y el drawer del formulario; al abrir se borraba el propio botón.
+   **Fix:** drawer renombrado a `si-new-dr`.
 
-Marca, paleta, países/monedas, catálogos (`Orbit.cat` con "Otro" en todos los desplegables), aseguradoras, roles y módulos por usuario, integraciones (con credenciales), automatizaciones, cursos/lecciones/quizzes, manuales, plantillas y planes — todo editable desde la plataforma.
+3. **`modules/notificaciones.js` · `doSend()`** — leía `#wa-cli/.value` sin guard cuando
+   el formulario no estaba montado → `Cannot read properties of null (reading 'value')`.
+   **Fix:** guard de nodos antes de leer `.value`.
 
-## Cláusulas legales (v2.0)
-
-`core/legal.js` reescrito: 6 tipos (confidencialidad, tratamiento de datos, socios/NDA con no-competencia 2 años + cláusula penal + prohibición de ingeniería inversa, contrato de licencia, portal mutua, descargo IA), por país, persistentes, imprimibles con bloque de firmas, aceptación registrada (usuario/fecha/IP). Verificado en vivo.
-
-## Conclusión
-
-El prototipo está **estable y consistente** para iniciar migración: sin errores de render, datos vivos, importadores funcionales y configuración integral. Pendiente real de producción: conectar backend por fases (ver `MIGRACION-MAESTRO.md` §7) e IA real por proveedor.
+## Alcance verificado
+- Render limpio + interacción real (no sólo "carga sin throw").
+- Datos vivos vía `Orbit.store` en todos los módulos (sin hardcode de listados).
+- KPIs y filas clickeables disparan drawers/detalle sin excepción.

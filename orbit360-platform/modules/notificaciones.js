@@ -122,9 +122,11 @@ Orbit.modules.notificaciones = (function () {
 
   function doSend(canal) {
     const $ = s => host.querySelector(s);
-    const cli = S().get('clientes', $('#wa-cli').value);
-    const msg = $('#wa-msg').value.trim();
-    const tplId = $('#wa-tpl').value;
+    const cliEl = $('#wa-cli'), msgEl = $('#wa-msg'), tplEl = $('#wa-tpl');
+    if (!cliEl || !msgEl) return; // form no montado
+    const cli = S().get('clientes', cliEl.value);
+    const msg = (msgEl.value || '').trim();
+    const tplId = tplEl ? tplEl.value : '';
     if (!msg) { alert('Escribe un mensaje primero.'); return; }
     if (!cli) { alert('Selecciona un cliente destinatario.'); return; }
     addLog({ fecha: new Date().toISOString().slice(0, 10), cliente: cli.nombre, tpl: tplId || 'libre', msg, canal });

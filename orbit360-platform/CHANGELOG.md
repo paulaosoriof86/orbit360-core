@@ -2,6 +2,14 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [1.41.0] — 2026-06-30 · Login limpio + doc de pendientes para migración
+### Changed — Login
+- Quitado el badge superior "PLATAFORMA SEGURA · ACCESO DEL EQUIPO".
+- Quitado el texto "Tu logo aquí · white-label" del footer; el slot del logo del cliente queda **centrado**.
+- En la versión comercializable el slot va vacío; el cliente carga su logo en Configuración.
+### Added
+- `docs/PENDIENTES-Y-MEJORAS.md` — estado honesto (listo vs requiere backend vs profundización), reglas de trabajo para ChatGPT y orden de migración. Adjuntar como fuente del proyecto.
+
 ## [0.23.0] — 2026-06-23 · Fixes de navegación
 ### Fixed
 - **Correo** ahora aparece en el menú (faltaba `'correo'` en `tenant.modulosActivos`; el sidebar filtra por esa lista).

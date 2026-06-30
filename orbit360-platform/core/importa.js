@@ -405,7 +405,10 @@ Orbit.importa = (function () {
   let state = null;
 
   function ensureDom() {
-    if (document.getElementById('imp-back')) return;
+    // robusto: recrear si falta CUALQUIERA de los dos (evita estado a medias)
+    if (document.getElementById('imp-back') && document.getElementById('imp-drawer')) return;
+    const stb = document.getElementById('imp-back'); if (stb) stb.remove();
+    const std = document.getElementById('imp-drawer'); if (std) std.remove();
     const back = document.createElement('div'); back.id = 'imp-back'; back.className = 'drawer-back';
     const dr = document.createElement('div'); dr.id = 'imp-drawer'; dr.className = 'drawer';
     document.body.appendChild(back); document.body.appendChild(dr);
