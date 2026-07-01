@@ -380,3 +380,14 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: smoke automatico sin escrituras, sin secretos y sin UI productiva.
 - Impacto en prototipo comercializable: mejora metodologia de validacion backend y evita falsos positivos por demo.
 - Estado: EN PROGRESO
+
+## 2026-07-01 03:32:10 - Fix raiz / separar preview visual y Backend LAB
+
+- Modulo: Operacion local / Backend LAB / Preview visual.
+- Sintoma/necesidad: se repetia el bloqueo de login LAB al intentar revisar avances visuales.
+- Esperado: usar entradas separadas para UX/prototipo y Backend LAB.
+- Causa raiz: mezcla de index.html e index-dev-firestore.html en la metodologia de validacion.
+- Archivo/funcion: core/auth-lab-preview-router.local.js, tools/orbit360-open-visual-preview.ps1, tools/orbit360-open-backend-lab.ps1.
+- Fix o mejora aplicada: router visual desde LAB, launchers separados y documentacion de decision.
+- Impacto en prototipo comercializable: evita reproceso y falsos bugs; mantiene backend sin fallback demo.
+- Estado: RESUELTO

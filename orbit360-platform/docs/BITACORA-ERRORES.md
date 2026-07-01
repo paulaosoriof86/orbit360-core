@@ -155,3 +155,14 @@ Estado: ABIERTO para UX tenant A&S / aplicar a prototipo base.
 - Fix o mejora aplicada: override LAB explicito solo en index-dev-firestore.html.
 - Impacto en prototipo comercializable: aplicar a base comercializable antes de produccion.
 - Estado: EN PROGRESO
+
+## 2026-07-01 03:32:10 - Reproceso por entrada incorrecta de validacion
+
+- Modulo: Metodologia local / Auth LAB.
+- Sintoma/necesidad: se intento corregir repetidamente el login LAB aunque el bloqueo era esperado.
+- Esperado: revisar prototipo desde index.html y backend desde index-dev-firestore.html.
+- Causa raiz: no habia separacion operativa clara entre preview visual y backend LAB.
+- Archivo/funcion: launchers locales y documentacion de decision.
+- Fix o mejora aplicada: separacion formal, guia rapida y router a preview visual.
+- Impacto en prototipo comercializable: reduce reproceso y evita parches innecesarios.
+- Estado: RESUELTO
