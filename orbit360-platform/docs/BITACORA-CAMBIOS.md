@@ -95,3 +95,13 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: se creo auditoria forense v93, se registro que modules/aseguradoras.js no cambio, y se reclasifico Aseguradoras visual premium como solicitud nueva.
 - Impacto en prototipo comercializable: mejora trazabilidad, evita falsos positivos y evita reprocesos con Claude.
 - Estado: RESUELTO.
+
+## 2026-06-30 21:53:47 - Backend LAB - Smoke test Orbit.store Firestore
+- Sintoma/necesidad: validar la API exacta de Orbit.store contra Firestore LAB sin tocar modulos.
+- Esperado: all, get, where, insert, update, remove y _emit funcionan en modo firestore-lab.
+- Archivo/funcion: data/store.js, index-dev-firestore.html.
+- Fix o mejora aplicada: se ejecuto smoke test temporal en navegador autenticado contra tenant alianzas-soluciones, coleccion actividades, con documento ficticio creado/actualizado/eliminado.
+- Resultado:
+- :  
+- Impacto en prototipo comercializable: confirma que la capa unica de datos mantiene API compatible para avanzar backend sin reescribir modulos.
+- Estado: RESUELTO.
