@@ -262,3 +262,13 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: carga autenticada en navegador LAB con verificacion de documentos escritos.
 - Impacto en prototipo comercializable: habilita pruebas visuales y funcionales sobre datos persistentes sin usar datos reales.
 - Estado: RESUELTO.
+
+## 2026-06-30 23:07:34 - Backend LAB - Lectura seed ficticio desde Orbit.store
+- Sintoma/necesidad: validar que el seed ficticio cargado en Firestore LAB se lea desde la API publica Orbit.store sin tocar modulos.
+- Esperado: all/get/where recuperan documentos lab_ persistentes desde tenant alianzas-soluciones.
+- Archivo/funcion: data/store.js, docs/RESULTADO-LECTURA-SEED-FICTICIO-ORBITSTORE-LAB-20260630.md.
+- Resultado:
+- : encontrados=, esperadoMin=
+- Fix o mejora aplicada: test temporal de lectura autenticada en navegador LAB.
+- Impacto en prototipo comercializable: confirma que la app puede consumir datos persistentes Firestore por la capa unica.
+- Estado: RESUELTO.
