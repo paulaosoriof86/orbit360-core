@@ -198,3 +198,21 @@ Estado: ABIERTO para UX tenant A&S / aplicar a prototipo base.
 - Fix aplicado: eliminar nombre Git y usar git.exe explicito dentro de Invoke-GitExe.
 - Impacto comercializable: evita bloqueo operativo y perdida de tiempo.
 - Estado: RESUELTO.
+
+## 2026-07-01 - Referencia localStorage en modulos detectada y corregida
+
+**Modulo:** Configuracion / Plantillas.
+
+**Sintoma:** El smoke backend encontro localStorage en modules/configuracion.js y una referencia textual heredada en modules/plantillas.js.
+
+**Esperado:** Ningun modulo debe tocar localStorage directamente.
+
+**Causa raiz:** Persistencia visual heredada para logo white-label y comentario de migracion anterior.
+
+**Archivo/funcion:** modules/configuracion.js, modules/plantillas.js.
+
+**Fix aplicado:** Se elimino localStorage del flujo del logo y se conserva Orbit.tenant.setDeep como mecanismo de configuracion. Se limpio la referencia textual heredada.
+
+**Impacto:** Aplica al prototipo base Orbit 360.
+
+**Estado:** RESUELTO.

@@ -433,3 +433,17 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 **Fix aplicado:** Instalacion local del ZIP limpio exacto, preservando backend LAB y documentacion clave. 
  
 **Estado:** RESUELTO LOCALMENTE - PENDIENTE VALIDACION VISUAL Y BACKEND. 
+
+## 2026-07-01 - Limpieza de localStorage en modulos y workflow backend protegido
+
+**Modulo:** Configuracion / Plantillas / Infraestructura backend.
+
+**Sintoma/necesidad:** La validacion backend detecto referencia a localStorage dentro de modules/configuracion.js y una referencia heredada en modules/plantillas.js.
+
+**Esperado:** Los modulos no deben tocar localStorage. La persistencia debe pasar por Orbit.tenant, Orbit.store o capa backend protegida.
+
+**Fix aplicado:** Se elimino el acceso directo a localStorage para logo white-label en configuracion y se normalizo el comentario heredado en plantillas. Se creo el documento WORKFLOW-ACTUALIZACION-CLAUDE-BACKEND-PROTEGIDO.md.
+
+**Impacto en prototipo comercializable:** Alto. Permite actualizar desde ZIP completo de Claude sin perder backend y mantiene regla multi-tenant.
+
+**Estado:** RESUELTO LOCALMENTE.
