@@ -8,28 +8,6 @@ window.Orbit = window.Orbit || {};
 Orbit.auth = (function () {
   const KEY = 'orbit360_session';
   const CKEY = 'orbit360_confidencialidad';
-  const AUTH_MODE_KEY = 'orbit360_auth_mode';
-  const LAB_PROJECT_ID = 'ays-orbit-360-lab';
-  let firebaseAuth = null;
-  let firebaseReady = false;
-
-  function queryMode() { try { return new URLSearchParams(location.search).get('orbitAuth') || ''; } catch (e) { return ''; } }
-  function localMode() { try { return localStorage.getItem(AUTH_MODE_KEY) || ''; } catch (e) { return ''; } }
-  function mode() { return (queryMode() || localMode() || 'demo').toLowerCase(); }
-  function useFirebase() { return mode() === 'firebase'; }
-  function ensureFirebase() {
-    if (!useFirebase()) return null;
-    const cfg = window.OrbitFirebaseAuthConfig || null;
-    if (!cfg || cfg.projectId !== LAB_PROJECT_ID) throw new Error('Firebase Auth LAB requiere auth-firebase.config.local.js de ' + LAB_PROJECT_ID + '.');
-    if (!window.firebase || !firebase.auth) throw new Error('Firebase SDK Auth no esta cargado para modo LAB.');
-    if (!firebase.apps.length) firebase.initializeApp(cfg);
-    firebaseAuth = firebase.auth();
-    firebaseReady = true;
-    return firebaseAuth;
-  }
-  function sessionFromFirebase(fbUser) {
-    return { nombre: fbUser.displayName || fbUser.email || 'Usuario LAB', rol: 'Direccion', email: fbUser.email || '', provider: 'firebase', projectId: LAB_PROJECT_ID };
-  }
 
   function aceptoConf() { try { return !!localStorage.getItem(CKEY); } catch (e) { return false; } }
   function gateConfidencialidad() {
@@ -59,18 +37,11 @@ Orbit.auth = (function () {
     });
   }
 
-  function authed() {
-    if (useFirebase()) return !!(firebaseAuth && firebaseAuth.currentUser);
-    try { return !!localStorage.getItem(KEY); } catch (e) { return false; }
-  }
+  function authed() { try { return !!localStorage.getItem(KEY); } catch (e) { return false; } }
   function login(user) {
     try { localStorage.setItem(KEY, JSON.stringify(user || { nombre: 'Paula Osorio', rol: 'Dirección', email: 'admin@demo.com' })); } catch (e) {}
   }
-  function logout() {
-    try { localStorage.removeItem(KEY); } catch (e) {}
-    if (useFirebase() && firebaseAuth) firebaseAuth.signOut().finally(function () { location.reload(); });
-    else location.reload();
-  }
+  function logout() { try { localStorage.removeItem(KEY); } catch (e) {} location.reload(); }
   function user() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
 
   function showApp() {
@@ -89,37 +60,8 @@ Orbit.auth = (function () {
     const lg = document.getElementById('login');
     if (lg) { lg.style.display = ''; lg.classList.remove('hidden'); }
     document.body.classList.add('pre-auth');
-  }
-
-  function firebaseLogin(email, pass) {
-    try {
-      const auth = ensureFirebase();
-      auth.signInWithEmailAndPassword(email, pass).catch(function (err) {
-        console.error('[Orbit Auth LAB] Login Firebase fallido:', err);
-        alert('No se pudo iniciar sesion en Firebase LAB: ' + (err && err.message ? err.message : err));
-      });
-    } catch (err) {
-      console.error('[Orbit Auth LAB] Configuracion Firebase invalida:', err);
-      alert(err.message || err);
-    }
-  }
-
-  function initFirebaseMode() {
-    try {
-      const auth = ensureFirebase();
-      auth.onAuthStateChanged(function (fbUser) {
-        if (fbUser) {
-          login(sessionFromFirebase(fbUser));
-          showApp();
-        } else {
-          try { localStorage.removeItem(KEY); } catch (e) {}
-          showLogin();
-        }
-      });
-    } catch (err) {
-      console.error('[Orbit Auth LAB] No se pudo activar Firebase Auth:', err);
-      showLogin();
-    }
+    // pintar logo/nombre del cliente en la franja del login (antes de entrar)
+    try { if (Orbit.applyBrand) Orbit.applyBrand(); } catch (e) {}
   }
 
   function init() {
@@ -127,22 +69,13 @@ Orbit.auth = (function () {
     if (form) form.addEventListener('submit', e => {
       e.preventDefault();
       const email = (document.getElementById('lg-user') || {}).value || 'admin@demo.com';
-      const pass = (document.getElementById('lg-pass') || {}).value || '';
-      if (useFirebase()) {
-        firebaseLogin(email, pass);
-        return;
-      }
       login({ nombre: 'Paula Osorio', rol: 'Dirección', email });
       showApp();
     });
     const reset = document.getElementById('lg-reset');
     if (reset) reset.addEventListener('click', e => { e.preventDefault(); logout(); });
 
-    if (useFirebase()) {
-      initFirebaseMode();
-      return;
-    }
     if (authed()) showApp(); else showLogin();
   }
-  return { init, authed, login, logout, user, showLogin, mode, firebaseReady: function () { return firebaseReady; } };
+  return { init, authed, login, logout, user, showLogin };
 })();

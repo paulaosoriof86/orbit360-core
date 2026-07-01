@@ -22,3 +22,76 @@ Archivo/función: core/auth.js, core/auth-firebase.config.example.js, core/auth-
 Fix o mejora aplicada: Validación funcional realizada; login, logout y modo demo confirmados. Config local ignorada por Git. Proyecto viejo no usado.
 Impacto en prototipo comercializable: Auth real queda preparado por bandera y tenant, conservando demo como default; A&S será primer tenant real sin bifurcar código.
 Estado: RESUELTO EN LAB / pendiente commit local de documentación.
+
+## 2026-06-30 - Fase 2C Store Firestore LAB (EN PROGRESO)
+
+- Modulo: data/store.js.
+- Necesidad: preparar backend Firestore LAB sin tocar modulos ni romper modo demo/local.
+- Esperado: Orbit.store mantiene API publica: init, reseed, all, get, where, find, insert, update, remove, on, raw.
+- Cambio aplicado: se agrego modo Firestore LAB activado solo por bandera explicita ?orbitBackend=firestore-lab&tenant=alianzas-soluciones.
+- Cambio aplicado: se mantiene localStorage demo como default y fallback.
+- Cambio aplicado: se agrega cache en memoria, snapshots por tenant/coleccion y escrituras insert/update/remove hacia Firestore solo en LAB.
+- Archivo/funcion: orbit360-platform/data/store.js; init, insert, update, remove, onSnapshot interno.
+- Impacto en prototipo comercializable: habilita backend multi-tenant sin reescribir modulos y sin hardcodear cliente.
+- Protecciones: no se toco modules/, no se hizo push, no se hizo deploy, no se uso ays-dashboard-4a575.
+- Estado: EN PROGRESO hasta validacion visual en navegador.
+## 2026-06-30 - Fase 2C Firestore LAB rules
+
+- Modulo: Backend / Firestore LAB.
+- Necesidad: permitir validacion read/write del adapter Orbit.store en Firebase LAB.
+- Esperado: Auth LAB + Firestore LAB funcionando por tenant lianzas-soluciones, sin tocar produccion ni datos reales.
+- Archivo/funcion: irestore.rules, irebase.json, data/store.js, core/auth.js, index-dev-firestore.html.
+- Cambio aplicado: reglas Firestore publicadas unicamente en proyecto LAB ys-orbit-360-lab; usuario DEV autorizado como miembro del tenant; prueba REST write/read OK.
+- Impacto: backend multi-tenant validado en LAB para continuar snapshots Orbit.store.
+- Estado: RESUELTO EN LAB / pendiente commit local.
+
+## 2026-06-30 - Fase 2C Backend LAB: reglas Firestore y membresia tenant
+- Modulo: Backend / data store Firestore LAB
+- Necesidad: habilitar acceso controlado por tenant para validar write-through de Orbit.store.
+- Mejora aplicada: reglas Firestore LAB tenant-aware, membresia DEV para orbit.lab@demo.com y prueba diagnostica tenants/alianzas-soluciones/data/_diagnostics/items/ping.
+- Archivo/funcion: firestore.rules, firebase.json, docs/BITACORA-ERRORES.md, docs/BITACORA-CAMBIOS.md.
+- Impacto en prototipo comercializable: valida el patron multi-tenant previo a seguir con pruebas visuales de index-dev-firestore.html.
+- Estado: RESUELTO.
+## 2026-06-30 - Fase 2C regeneracion limpia de index-dev-firestore.html
+- Modulo: Backend LAB / validacion visual
+- Mejora aplicada: copia DEV limpia desde index.html, Firebase compat SDK + config local + OrbitBackend LAB antes de data/store.js.
+- Archivo/funcion: index-dev-firestore.html.
+- Impacto en prototipo comercializable: permite continuar validacion Firestore LAB sin tocar frontend grande ni usar index-dev-auth.html.
+- Estado: RESUELTO.
+## 2026-06-30 - Fase 2C validacion visual servida con Node
+- Modulo: Backend LAB / validacion visual
+- Mejora aplicada: servidor local estatico con Node, sin instalar paquetes, para abrir index-dev-firestore.html.
+- Archivo/funcion: _orbit360_tmp/server-lab-firestore.js, docs/BITACORA-ERRORES.md, docs/BITACORA-CAMBIOS.md.
+- Impacto en prototipo comercializable: metodologia de validacion local mas estable para Paula.
+- Estado: RESUELTO.
+## 2026-06-30 21:18:44 - Infra/Backend LAB - Integracion prototipo Claude v93
+- Sintoma/necesidad: integrar ZIP nuevo del prototipo sin perder Auth LAB, Firestore rules LAB, store.js Firestore LAB ni index-dev-firestore.html limpio.
+- Esperado: tomar mejoras frontend/modulos/docs del prototipo nuevo y conservar backend LAB.
+- Archivo/funcion: index.html, modules/, styles/, docs/, core/* excepto auth.js, data/* excepto store.js, index-dev-firestore.html.
+- Fix o mejora aplicada: copia selectiva, preservacion de store.js LAB, preservacion/fusion minima de core/auth.js, regeneracion de index-dev-firestore.html desde index.html limpio.
+- Impacto en prototipo comercializable: permite seguir backend sobre la version visual mas completa sin perder avances LAB.
+- Estado: RESUELTO.
+
+## 2026-06-30 21:23:06 - Documentacion - Pendientes Claude acumulados v1.47
+- Sintoma/necesidad: consolidar en un solo documento los pendientes para Claude despues de integrar Prototype Development Request (93).
+- Esperado: separar mejoras del prototipo base, pendientes para Claude y pendientes de backend ChatGPT.
+- Archivo/funcion: docs/PENDIENTES-CLAUDE-ACUMULADO.md.
+- Fix o mejora aplicada: documento acumulado creado/actualizado con estado v1.47, mejoras incorporadas y pendientes por lote.
+- Impacto en prototipo comercializable: evita reprocesos y permite pasar a Claude un backlog claro sin mezclar backend con frontend.
+- Estado: RESUELTO.
+
+## 2026-06-30 21:38:43 - Documentacion - Hallazgos visuales post v93 acumulados para Claude
+- Sintoma/necesidad: despues de integrar v93, Paula valido visualmente en Chrome y detecto que varias mejoras documentadas por Claude no cumplen aun el nivel esperado.
+- Esperado: registrar como pendientes abiertos, no como cerrados, las mejoras de Novedades, Aseguradoras, Insights y Finanzas.
+- Archivo/funcion: docs/PENDIENTES-CLAUDE-ACUMULADO.md.
+- Fix o mejora aplicada: se agrego seccion de validacion visual Paula con hallazgos, esperado detallado, estado y criterio de cierre.
+- Impacto en prototipo comercializable: evita falsos positivos y reprocesos; permite pedir a Claude un lote claro de profundizacion visual/funcional.
+- Estado: RESUELTO.
+
+## 2026-06-30 21:43:35 - Documentacion - Correccion metodologica auditoria v93
+- Sintoma/necesidad: Paula indico que Aseguradoras visual premium no era un pendiente previo, sino una solicitud nueva actual.
+- Esperado: no asumir ni registrar como previo lo que no fue pedido; clasificar con base en auditoria real del ZIP v93.
+- Archivo/funcion: docs/AUDITORIA-ZIP-V93-CHATGPT-20260630.md, docs/PENDIENTES-CLAUDE-ACUMULADO.md.
+- Fix o mejora aplicada: se creo auditoria forense v93, se registro que modules/aseguradoras.js no cambio, y se reclasifico Aseguradoras visual premium como solicitud nueva.
+- Impacto en prototipo comercializable: mejora trazabilidad, evita falsos positivos y evita reprocesos con Claude.
+- Estado: RESUELTO.

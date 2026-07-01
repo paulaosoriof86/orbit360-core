@@ -32,10 +32,13 @@ Orbit.modules.inicio = (function () {
     const clientes = Orbit.store.all('clientes');
     const polizas = Orbit.store.all('polizas');
 
-    // metas mensuales (demo): % avance
-    const metaPrima = 820000, pctPrima = Math.min(100, Math.round(prima / metaPrima * 100));
-    const recaudo = cart.alDia, metaRec = 760000, pctRec = Math.min(100, Math.round(recaudo / metaRec * 100));
-    const diasMes = 30 - new Date(U.NOW).getDate();
+    // metas mensuales: autoadministrables desde la colección 'metas' (mes actual); fallback demo
+    const mesKey = U.monthKey();
+    const metasMes = (Orbit.store.all('metas') || []).filter(m => (m.mes || '') === mesKey);
+    const gMeta = (tipo, def) => { const r = metasMes.find(m => m.tipo === tipo && !m.asesorId); return r && r.valor ? +r.valor : def; };
+    const metaPrima = gMeta('prima', 820000), pctPrima = Math.min(100, Math.round(prima / metaPrima * 100));
+    const recaudo = cart.alDia, metaRec = gMeta('recaudo', 760000), pctRec = Math.min(100, Math.round(recaudo / metaRec * 100));
+    const diasMes = new Date(U.now().getFullYear(), U.now().getMonth() + 1, 0).getDate() - U.now().getDate();
 
     host.innerHTML = `<div class="page">
       ${Orbit.kit.banner({ icon: '🌅', title: 'Buen día', sub: 'esto es lo importante hoy', features: ['Metas del mes', 'Prioridades', 'Avance por asesor'], actions: `<button class="btn primary" onclick="location.hash='#/cliente360'">Abrir Cliente 360 →</button>` })}
@@ -43,7 +46,7 @@ Orbit.modules.inicio = (function () {
       <!-- Metas del mes -->
       <div class="card" style="margin-top:18px;padding:22px 24px;display:flex;gap:30px;align-items:center;flex-wrap:wrap;border-top:3px solid var(--red)">
         <div style="flex:1;min-width:200px">
-          <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · Junio 2026</div>
+          <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · ${U.monthLabel()}</div>
           <div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Vamos en camino</div>
           <div style="color:var(--ink-2);font-size:13.5px;margin-top:6px;line-height:1.5">
             Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. La prima vigente y el recaudo aplicado se calculan desde las pólizas y cobros reales del CRM.</div>

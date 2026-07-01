@@ -117,7 +117,19 @@
   <script src="core/config.js?v1236"></script>
   <script src="core/primas.js?v1236"></script>
   <script src="core/comisiones-eng.js?v1236"></script>
-  <!-- ============ DATA LAYER (depende de config + primas) ============ -->
+  <!-- ============ DATA LAYER (depende de config + primas) ============ -->  <!-- LAB FIRESTORE SDK - generado desde index.html limpio. No usar index-dev-auth.html. -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="core/auth-firebase.config.local.js?v=20260630_211837"></script>
+  <script>
+    window.OrbitBackend = {
+      mode: 'firestore-lab',
+      tenantId: 'alianzas-soluciones',
+      projectId: 'ays-orbit-360-lab'
+    };
+  </script>
+
   <script src="data/store.js?v1236"></script>
   <script src="data/seed.js?v1236"></script>
   <!-- CORE (resto) -->

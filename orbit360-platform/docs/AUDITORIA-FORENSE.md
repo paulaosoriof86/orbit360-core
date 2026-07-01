@@ -63,3 +63,16 @@ repetidas del mismo handler ya validado).
 - Render limpio + interacción real (no sólo "carga sin throw").
 - Datos vivos vía `Orbit.store` en todos los módulos (sin hardcode de listados).
 - KPIs y filas clickeables disparan drawers/detalle sin excepción.
+
+## Hallazgos P0 resueltos (v1.42 → v1.47)
+Correcciones sobre lo señalado por la revisión externa, verificadas en vivo con recarga completa:
+
+4. **Fecha/metas quemadas (Inicio)** — `Orbit.ui.now()/monthLabel()` ahora dinámicos; Inicio lee la colección `metas`. Se eliminó "Junio 2026" hardcodeado. (v1.43)
+5. **Logo no aparecía en el login** — `applyBrand()` sólo corría tras entrar; ahora también al mostrar el login. Franja del logo blanca a sangre + cintilla roja. (v1.42–1.43)
+6. **Finanzas · KPIs sin desglose** — KPIs de Movimientos/CxC/CxP/Presupuesto ahora clicables con modal de desglose (`drillKey`). (v1.44)
+7. **Finanzas · CxC/CxP no editables** — las filas abren el movimiento completo (ver/editar/eliminar/estado); presupuesto editable + replicar mes (se quitaron arrays quemados). (v1.44)
+8. **Cobros · tabla no refrescaba tras aplicar pago** — re-render apuntaba a `mod-host` inexistente; corregido a `host`. Añadido quick-pay desde la tabla y navegación cruzada a cliente/póliza. (v1.45)
+9. **Insights · metas sólo desde campo fijo** — la vista Metas lee la colección editable `metas` con fallback; botón "Sugerir metas del próximo mes" por tendencia. Comparativo general→particular verificado. (v1.46)
+10. **Cotizador · faltaba 3er nivel de vehículo** — añadido marca→línea→**modelo** (`VEH_MODELOS`), a la par del Comparativo. (v1.47)
+
+**Pendiente conocido (no bloquea migración):** unificar las 3 fuentes de metas (`asesor.metaPrima`, colección `metas`, `cat.metas`) en un solo modelo al pasar a backend.

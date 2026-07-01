@@ -22,3 +22,70 @@ Archivo/función: index-dev-auth.html temporal; core/config.js / renderer de nav
 Fix o mejora aplicada: Hallazgo documentado. La URL demo correcta no mostró caracteres raros y permitió login/logout. Pendiente aplicar ocultamiento de badges técnicos para tenant cliente.
 Impacto en prototipo comercializable: Aplicar como mejora al prototipo base: separar modo interno/desarrollo de modo cliente real; evitar señales de laboratorio en white-label.
 Estado: ABIERTO para UX tenant A&S / aplicar a prototipo base.
+
+## 2026-06-30 - Auth/Firestore LAB config mismatch
+
+- Modulo: Auth LAB / Store Firestore LAB.
+- Sintoma: index-dev-firestore.html limpio abrio sin mojibake, pero Auth mostro alerta: Firebase Auth LAB requiere config local de ys-orbit-360-lab.
+- Esperado: Auth y Store deben leer la configuracion local LAB ya existente.
+- Causa raiz: uth-firebase.config.local.js define window.Orbit.firebaseAuthConfig, mientras uth.js buscaba window.OrbitFirebaseAuthConfig.
+- Archivo/funcion: core/auth.js / ensureFirebase; data/store.js / inicializacion Firebase previa a Firestore.
+- Fix aplicado: compatibilidad con ambos nombres de configuracion: window.Orbit.firebaseAuthConfig y window.OrbitFirebaseAuthConfig.
+- Impacto: permite continuar validacion backend Firestore LAB sin tocar modulos ni frontend grande.
+- Estado: EN PROGRESO hasta validar login LAB limpio.
+
+## 2026-06-30 - Fase 2C Firestore rules LAB sin BOM
+- Modulo: Backend / Firestore rules LAB
+- Sintoma/necesidad: el deploy anterior fallo por BOM en firestore.rules con error token recognition at BOM.
+- Esperado: reglas publicadas solo en Firebase LAB ays-orbit-360-lab y validacion write/read autenticada.
+- Causa raiz: archivo firestore.rules generado con BOM y script previo no detuvo flujo tras fallo.
+- Archivo/funcion: firestore.rules, firebase.json, validacion REST Auth/Firestore.
+- Fix aplicado: reglas reescritas UTF-8 sin BOM, here-string single-quoted para preservar $(database), deploy detenido si Firebase CLI falla.
+- Impacto en prototipo comercializable: asegura base de reglas tenant-aware para conectar Orbit.store a Firestore sin tocar modulos.
+- Estado: RESUELTO.
+## 2026-06-30 - Fase 2C validacion visual LAB detenida por mojibake en copia dev
+- Modulo: Backend LAB / index-dev-firestore.html
+- Sintoma/necesidad: la validacion visual se detuvo antes de abrir navegador por marcadores de mojibake en la copia DEV.
+- Esperado: usar index.html aprobado o copia limpia index-dev-firestore.html, sin usar index-dev-auth.html.
+- Causa raiz: copia DEV generada o leida con riesgo de codificacion incorrecta; el control evito validar pantalla danada.
+- Archivo/funcion: index-dev-firestore.html.
+- Fix aplicado: regenerar index-dev-firestore.html desde index.html aprobado, UTF-8 sin BOM, con inyeccion LAB antes de data/store.js.
+- Impacto en prototipo comercializable: evita validar backend sobre una pantalla con caracteres danados y conserva el flujo LAB limpio.
+- Estado: RESUELTO.
+## 2026-06-30 - Fase 2C servidor local no abrio por Python ausente
+- Modulo: Backend LAB / validacion visual local
+- Sintoma/necesidad: Chrome mostro ERR_FAILED porque el servidor local no arranco; Windows reporto Python no instalado.
+- Esperado: abrir index-dev-firestore.html desde servidor local para validar Firestore LAB.
+- Causa raiz: dependencia local Python no disponible en Windows.
+- Archivo/funcion: servidor local de validacion.
+- Fix aplicado: usar servidor estatico Node sin dependencias externas en _orbit360_tmp/server-lab-firestore.js.
+- Impacto en prototipo comercializable: reduce reproceso de validacion local y evita depender de Python.
+- Estado: RESUELTO.
+## 2026-06-30 21:18:44 - Infra/Backend LAB - Riesgo de retroceso por store.js del ZIP
+- Sintoma/necesidad: el ZIP nuevo incluye data/store.js de prototipo local/demo, no Firestore LAB.
+- Esperado: no sobrescribir el store.js conectado a Firestore LAB.
+- Causa raiz: el prototipo de Claude sigue entregando store local para demo; backend vive en la rama LAB local.
+- Archivo/funcion: data/store.js.
+- Fix o mejora aplicada: se preservo el store.js local con Firestore LAB y se excluyo data/store.js del ZIP durante la copia.
+- Impacto en prototipo comercializable: evita perder la capa unica conectable al backend.
+- Estado: RESUELTO.
+
+## 2026-06-30 21:38:43 - Prototipo v93 - Falsos positivos de mejoras declaradas
+- Modulo: Novedades, Aseguradoras, Insights, Finanzas.
+- Sintoma/necesidad: el prototipo documenta avances en v1.43-v1.47, pero la validacion visual muestra que algunas mejoras no estan completas, no son suficientemente visibles o no cumplen profundidad requerida.
+- Esperado: no cerrar mejoras solo por CHANGELOG; cerrar solo con render real y flujo clickeable validado.
+- Causa raiz: documentacion del prototipo mezcla avances parciales de codigo con cierre funcional/visual.
+- Archivo/funcion: core/novedades.js, modules/aseguradoras.js, modules/insights.js, modules/finanzas.js, docs/PENDIENTES-CLAUDE-ACUMULADO.md.
+- Fix o mejora aplicada: se documenta como pendiente para Claude/prototipo base y se activa regla de validacion por render real.
+- Impacto en prototipo comercializable: protege la calidad del producto y evita entregar modulos superficiales como cerrados.
+- Estado: ABIERTO.
+
+## 2026-06-30 21:43:35 - Documentacion - Reclasificacion de hallazgo Aseguradoras
+- Modulo: Aseguradoras / documentacion.
+- Sintoma/necesidad: se documento Aseguradoras como si el rediseño premium fuera pendiente previo, cuando Paula lo solicito ahora.
+- Esperado: separar solicitud nueva actual de pendientes previos y de arquitectura ya definida.
+- Causa raiz: interpretacion demasiado amplia al documentar hallazgos visuales post v93.
+- Archivo/funcion: docs/PENDIENTES-CLAUDE-ACUMULADO.md.
+- Fix o mejora aplicada: se agrego correccion metodologica y auditoria real v93; Aseguradoras visual premium queda como solicitud nueva actual.
+- Impacto en prototipo comercializable: protege la precision del backlog para Claude.
+- Estado: RESUELTO.

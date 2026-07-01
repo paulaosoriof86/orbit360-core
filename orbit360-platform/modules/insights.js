@@ -186,9 +186,14 @@ Orbit.modules.insights = (function () {
     const nuevas = vig.filter(esNueva), renov = vig.filter(p => !esNueva(p));
     const netaNueva = nuevas.reduce((s, p) => s + netaDe(p), 0);
     const netaRenov = renov.reduce((s, p) => s + netaDe(p), 0);
-    // metas (configurables) — derivadas de metas por asesor, split nueva/renov
+    // metas (autoadministrables) — lee la colección 'metas' del mes seleccionado (empresa); fallback al split por asesor
+    const mesKey = YEAR + '-' + String(mesSel + 1).padStart(2, '0');
+    const metasCol = (S().all('metas') || []).filter(mm => (mm.mes || '') === mesKey && !mm.asesorId);
+    const gMeta = (tipo) => { const r = metasCol.find(mm => mm.tipo === tipo); return r && r.valor ? +r.valor : null; };
     const metaTotal = S().all('asesores').reduce((s, a) => s + (a.metaPrima || 0), 0);
-    const metaNueva = Math.round(metaTotal * 0.45), metaRenov = Math.round(metaTotal * 0.55);
+    const metaNueva = gMeta('nueva') != null ? gMeta('nueva') : Math.round(metaTotal * 0.45);
+    const metaRenov = gMeta('renovada') != null ? gMeta('renovada') : Math.round(metaTotal * 0.55);
+    const metaAuto = metasCol.length > 0;
     const pctN = Math.round(netaNueva / (metaNueva || 1) * 100), pctR = Math.round(netaRenov / (metaRenov || 1) * 100);
     // series mensuales nueva/renov para acumulado y mes seleccionado
     const sN = serieAnual(YEAR, 'nueva').arr, sR = serieAnual(YEAR, 'renov').arr;
@@ -207,7 +212,7 @@ Orbit.modules.insights = (function () {
       { label: 'PN RENOVADA · ' + MESES[mesSel], val: M(mesR), color: 'var(--info)', foot: 'acum. ' + M(acR), detail: { title: 'Pólizas renovadas (vigentes)', sub: renov.length + ' pólizas · ' + MM(netaRenov), html: () => tablaPolizas(renov.slice().sort((a, b) => netaDe(b) - netaDe(a))) } },
       { label: 'Cumplimiento nuevas', val: pctN + '%', color: 'var(--red)', foot: 'acum. vs meta', footTone: pctN >= 100 ? 'up' : 'down' },
       { label: 'Cumplimiento renov.', val: pctR + '%', color: 'var(--warn)', foot: 'acum. vs meta', footTone: pctR >= 100 ? 'up' : 'down' }
-    ]) + card('Avance de metas (acumulado del año · prima neta)', metaBar('Producción NUEVA', netaNueva, metaNueva, pctN, 'var(--red)') + metaBar('Producción RENOVADA', netaRenov, metaRenov, pctR, 'var(--red)'), 'metas separadas — se asignan en Equipo y permisos / Configuración') +
+    ]) + card('Avance de metas (acumulado del año · prima neta)', `<div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn primary sm" onclick="Orbit.modules.insights.sugerirMeta()">✨ Sugerir metas del próximo mes</button></div>` + metaBar('Producción NUEVA', netaNueva, metaNueva, pctN, 'var(--red)') + metaBar('Producción RENOVADA', netaRenov, metaRenov, pctR, 'var(--red)'), (metaAuto ? '✅ metas de ' + MESES[mesSel] + ' ' + YEAR + ' cargadas desde la colección editable' : 'usando metas base por asesor — asigna metas del mes en Equipo o con “Sugerir metas”') + ' · se asignan en Equipo y permisos / Configuración') +
       card('Producción mensual ' + YEAR + ' · nuevas vs renovadas', colsDual(MESES, sN, sR, 'Nuevas', 'Renovadas'), 'prima neta por mes · clic en Mes para acumular') +
       `<div class="ins-grid-2">
       ${card('Meta por asesor (prima neta)', `<table class="tbl"><thead><tr><th>Asesor</th><th>Avance</th><th class="num">Neta</th><th class="num">Meta</th></tr></thead><tbody>${asesorMetaRows()}</tbody></table>`)}
@@ -473,6 +478,52 @@ Orbit.modules.insights = (function () {
       `<div class="ins-grid-2">${card('Composición de cartera (prima neta)', donut(ramoParts.map(p => ({ ...p, pct: Math.round(p.val / (ramoParts.reduce((s, x) => s + x.val, 0) || 1) * 100) })), ramoParts.length, 'ramos'))}${card('Producción mensual ' + YEAR, barsH(serieAnual(YEAR).arr.slice(0, MES + 1).map((v, i) => ({ label: MESES[i], val: v, color: 'var(--red)' })), { money: true }))}</div>`;
   }
 
+  /* ---- META INTELIGENTE: sugiere metas del próximo mes por tendencia y las guarda ---- */
+  function sugerirMeta() {
+    const sTot = serieAnual(YEAR).arr, sN = serieAnual(YEAR, 'nueva').arr, sR = serieAnual(YEAR, 'renov').arr;
+    const idxs = [mesSel, mesSel - 1, mesSel - 2].filter(i => i >= 0);
+    const avg = arr => { const v = idxs.map(i => arr[i] || 0).filter(x => x > 0); return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : 0; };
+    const baseTot = avg(sTot), baseN = avg(sN), baseR = avg(sR), growth = 1.10;
+    const nextIdx = mesSel < 11 ? mesSel + 1 : 0, nextYear = mesSel < 11 ? YEAR : YEAR + 1;
+    const nextKey = nextYear + '-' + String(nextIdx + 1).padStart(2, '0');
+    const sug = { prima: Math.round(baseTot * growth), nueva: Math.round(baseN * growth), renovada: Math.round(baseR * growth) };
+    sug.recaudo = Math.round(sug.prima * 0.85);
+    let back = document.getElementById('ins-sug'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'ins-sug'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    const row = (l, k, v) => `<label class="ce-l">${l}<input id="sug-${k}" class="o-sel" type="number" value="${v}"></label>`;
+    back.innerHTML = `<div class="card" style="width:min(500px,95vw);padding:0">
+      <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Meta inteligente</div>
+          <b style="font-family:var(--f-display);font-size:17px;color:#fff">✨ Metas sugeridas · ${MESES[nextIdx]} ${nextYear}</b>
+          <div style="font-size:12px;margin-top:3px;color:rgba(255,255,255,.85)">Promedio de los últimos ${idxs.length} meses +10% de crecimiento. Ajusta y guarda.</div></div>
+        <button class="imp-x" id="sug-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">
+        <div class="cgrid">${row('Prima neta total', 'prima', sug.prima)}${row('Recaudo (85%)', 'recaudo', sug.recaudo)}</div>
+        <div class="cgrid">${row('Producción NUEVA', 'nueva', sug.nueva)}${row('Producción RENOVADA', 'renovada', sug.renovada)}</div>
+        <div class="cfg-note">Se guardan en la colección de metas del mes (editables luego en Equipo). Base: prom. ${M(baseTot)} → objetivo ${M(sug.prima)}.</div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="sug-cancel">Cancelar</button><button class="btn primary" id="sug-ok">Guardar metas de ${MESES[nextIdx]}</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#sug-x').addEventListener('click', close);
+    back.querySelector('#sug-cancel').addEventListener('click', close);
+    back.querySelector('#sug-ok').addEventListener('click', () => {
+      ['prima', 'recaudo', 'nueva', 'renovada'].forEach(tipo => {
+        const val = +back.querySelector('#sug-' + tipo).value || 0;
+        const ex = (S().all('metas') || []).find(mm => mm.mes === nextKey && mm.tipo === tipo && !mm.asesorId);
+        if (ex) S().update('metas', ex.id, { valor: val });
+        else S().insert('metas', { id: 'meta' + Date.now().toString().slice(-7) + tipo.slice(0, 2), mes: nextKey, tipo, valor: val });
+      });
+      close();
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Metas de ' + MESES[nextIdx] + ' guardadas'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
+      if (nextYear === YEAR) mesSel = nextIdx;
+      draw();
+    });
+  }
+
   const VISTAS = [['resumen', '📊 Resumen'], ['metas', '🎯 Metas'], ['produccion', '📈 Producción'], ['cartera', '💳 Cartera'], ['comparativo', '🔀 Comparativo'], ['topclientes', '🏆 Top clientes'], ['pipeline', '🎲 Pipeline'], ['renovaciones', '🔄 Renovaciones'], ['critico', '🔎 Análisis crítico']];
   const FN = { resumen: vResumen, metas: vMetas, produccion: vProduccion, cartera: vCartera, comparativo: vComparativo, topclientes: vTopClientes, pipeline: vPipeline, renovaciones: vRenovaciones, critico: vCritico };
 
@@ -511,7 +562,7 @@ Orbit.modules.insights = (function () {
       unsub = () => { u1(); document.removeEventListener('orbit:pais', f); document.removeEventListener('orbit:ciclo', f); };
     }
   }
-  return { render, cliente,
+  return { render, cliente, sugerirMeta,
     _drillMes: function(i) {
       const s26 = serieAnual(YEAR); const s25 = serieAnual(PREV);
       const m = MESES[i]; const v26 = s26.arr[i]||0; const v25 = s25.arr[i]||0;

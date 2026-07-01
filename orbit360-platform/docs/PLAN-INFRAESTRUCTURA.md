@@ -571,3 +571,28 @@ Feedback con capturas. **Confirmación al usuario: TODO lo de Insights/comparati
 "Continua Orbit 360 v0.86. Lee orbit360-platform/docs/PLAN-INFRAESTRUCTURA.md 
 y CHANGELOG.md. Retoma desde pendientes del todo #121."
 ```
+
+---
+
+## Estado al cierre de sesión · v1.47 (1 Jul 2026)
+> Sesión enfocada en cerrar los hallazgos P0 de la auditoría forense y la profundización opcional. **La usuaria YA migró**; lo que se traslada al backend son estas **mejoras** del prototipo (referencia de lógica/UX, no reescritura).
+
+### ✅ Completado (v1.42 → v1.47)
+- **v1.42–1.43 · Login + fecha**: franja blanca del logo a sangre + cintilla roja; `applyBrand()` se ejecuta también al mostrar el login (el logo del cliente ya aparece antes de entrar); `Orbit.ui.now()/monthLabel()` dinámicos (se eliminó "Junio 2026" quemado); Inicio lee metas de la colección `metas`. PWA (manifest+favicon dinámicos del logo, `beforeinstallprompt`) cableada — validar en hosting real.
+- **v1.44 · Finanzas profundo (audit §2.5)**: KPIs clicables con **desglose** (`drillKey`/`drillModal`) en Movimientos, CxC/CxP y Presupuesto; **CxC/CxP** abren el movimiento completo (ver/editar/eliminar/cambiar estado) y arrastran mes a mes; **Presupuesto editable** (`+ Partida`, editar/eliminar, **Replicar mes anterior**) leyendo/escribiendo la colección `presupuesto` (se quitaron arrays quemados).
+- **v1.45 · Cobros (navegación cruzada)**: botón **💳 Pagar** directo desde la tabla (modal `aplicarPago` reutilizable); nº de póliza y nombre de cliente enlazados; drawer del recibo con **Ver cliente** / **Ver póliza**. **Bug corregido**: la tabla no se refrescaba tras aplicar pago (re-render apuntaba a `mod-host` inexistente → `host`).
+- **v1.46 · Metas inteligentes (Insights)**: la vista Metas lee la colección editable `metas` del mes (empresa: prima/recaudo/nueva/renovada) con fallback por asesor; **✨ Sugerir metas del próximo mes** (promedio 3 meses +10 %, ajustable, upsert a `metas`). Comparativo general→particular (asesor/ramo/aseguradora + drill por mes/fila) verificado en vivo.
+- **v1.47 · Cotizador**: 3er nivel **marca→línea→modelo** (`VEH_MODELOS` + fallback de trims). El Comparativo ya lo tenía (incluido en su PDF). Academia ya embebe recursos en grande (iframe 62–74vh, imágenes 100%).
+
+### 🔲 Pendiente (no bloquea migración — profundización)
+1. Cotizador: guardar cotización en historial al cotizar; PDF upload de propuestas; plantilla de impresión visual por aseguradora (logo/color).
+2. Finanzas: conciliación bancaria con estado de cuenta real (widget cruce recibos↔depósitos).
+3. Academia: completar los 14 cursos con contenido profundo + videos HeyGen.
+4. Demo interactivo + handoff HTML: regenerar con módulos v1.47.
+5. Unificar las 3 fuentes de metas (campo `asesor.metaPrima`, colección `metas`, `cat.metas`) en un solo modelo al pasar a backend.
+
+### Para retomar (actualizado)
+```
+"Continúa Orbit 360 v1.47. Lee orbit360-platform/docs/PLAN-INFRAESTRUCTURA.md 
+(Estado al cierre v1.47) y CHANGELOG.md. Sigue con los pendientes de profundización."
+```

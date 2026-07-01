@@ -61,7 +61,7 @@ Orbit.modules.calidad = (function () {
               <td>${faltaTxt}</td>
               <td>${vig ? '<span class="badge ok">Sí</span>' : '<span class="muted">—</span>'}</td>
               <td>${canal}</td>
-              <td style="text-align:right">${accion}</td>
+              <td style="text-align:right;white-space:nowrap"><button class="btn primary sm" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}')" title="Completar datos faltantes">✏ Completar</button> ${accion}</td>
             </tr>`;
           }).join('') || `<tr><td colspan="6" class="muted" style="text-align:center;padding:30px">🎉 Todos los expedientes están completos.</td></tr>`}</tbody>
         </table></div>
@@ -73,10 +73,46 @@ Orbit.modules.calidad = (function () {
     document.getElementById('q-falta').addEventListener('change', e => { st.ffalta = e.target.value; render(host); });
   }
 
+  function editarInline(cid) {
+    const c = S().get('clientes', cid); if (!c) return;
+    const f = faltantes(c);
+    if (!f.length) { const h = document.getElementById('host'); if (h) render(h); return; }
+    const field = (x) => {
+      if (x.k === 'sexo') return `<label class="ce-l">${x.label}<select id="qi-${x.k}" class="o-sel"><option value="">—</option><option>Femenino</option><option>Masculino</option><option>Otro</option></select></label>`;
+      if (x.k === 'fechaNac') return `<label class="ce-l">${x.label}<input id="qi-${x.k}" class="o-sel" type="date"></label>`;
+      return `<label class="ce-l">${x.label}<input id="qi-${x.k}" class="o-sel" ${x.k === 'email' ? 'type="email"' : x.k === 'telefono' ? 'inputmode="tel" placeholder="+502 5555 5555"' : ''} value=""></label>`;
+    };
+    let back = document.getElementById('q-inline'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'q-inline'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+        <div><div class="crumb" style="margin-bottom:2px">Completar expediente</div><b style="font-family:var(--f-display);font-size:16px">${U.esc(c.nombre)}</b></div>
+        <button class="imp-x" id="qi-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">${f.sort((a, b) => a.pri - b.pri).map(field).join('')}
+        <div class="cfg-note">Al guardar, este cliente sale de la lista de incompletos.</div></div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="qi-cancel">Cancelar</button><button class="btn primary" id="qi-ok">Guardar datos</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#qi-x').addEventListener('click', close);
+    back.querySelector('#qi-cancel').addEventListener('click', close);
+    back.querySelector('#qi-ok').addEventListener('click', () => {
+      const patch = {};
+      f.forEach(x => { const el = back.querySelector('#qi-' + x.k); if (el && el.value) patch[x.k] = el.value; });
+      if (Object.keys(patch).length) S().update('clientes', cid, patch);
+      close();
+      const rest = faltantes(S().get('clientes', cid)).length;
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = rest ? '✓ Datos guardados · faltan ' + rest : '✓ Expediente completo'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
+      const h = document.getElementById('host'); if (h) render(h);
+    });
+  }
+
   function campana() {
     const all = S().all('clientes').map(c => ({ c, f: faltantes(c) })).filter(x => x.f.length && tieneVigente(x.c.id));
     const wa = all.filter(x => x.c.telefono).length, mail = all.filter(x => !x.c.telefono && x.c.email).length;
     alert('Campaña de actualización (demo):\n\n• ' + wa + ' por WhatsApp (tienen teléfono)\n• ' + mail + ' por correo (sin WhatsApp, con email)\n• ' + (all.length - wa - mail) + ' sin canal — requieren gestión manual.\n\nUsa la plantilla "Actualización de datos" con los campos pendientes de cada cliente.');
   }
-  return { render, campana };
+  return { render, campana, editarInline };
 })();

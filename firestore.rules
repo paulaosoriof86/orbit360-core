@@ -1,0 +1,68 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isLabTenant(tenantId) {
+      return tenantId == "alianzas-soluciones";
+    }
+
+    function isLabUser() {
+      return isSignedIn()
+        && request.auth.uid == "woJlxR1iFEeiQZvTscPj4qQ5Qc73"
+        && request.auth.token.email == "orbit.lab@demo.com";
+    }
+
+    function memberPath(tenantId) {
+      return /databases/$(database)/documents/tenants/$(tenantId)/members/$(request.auth.uid);
+    }
+
+    function isTenantMember(tenantId) {
+      return isSignedIn()
+        && isLabTenant(tenantId)
+        && exists(memberPath(tenantId));
+    }
+
+    match /tenants/{tenantId}/members/{memberUid} {
+      allow read: if isLabTenant(tenantId)
+        && isSignedIn()
+        && memberUid == request.auth.uid
+        && (isLabUser() || isTenantMember(tenantId));
+
+      allow create, update: if isLabTenant(tenantId)
+        && isLabUser()
+        && memberUid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.tenantId == tenantId
+        && request.resource.data.status == "active"
+        && request.resource.data.keys().hasOnly([
+          "uid",
+          "email",
+          "tenantId",
+          "displayName",
+          "role",
+          "status",
+          "labOnly",
+          "createdAt",
+          "updatedAt",
+          "createdBy",
+          "updatedBy"
+        ]);
+
+      allow delete: if false;
+    }
+
+    match /tenants/{tenantId}/data/{document=**} {
+      allow read, write: if isTenantMember(tenantId);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

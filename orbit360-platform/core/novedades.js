@@ -27,7 +27,7 @@ Orbit.novedades = (function () {
 
   // ---- modal grande al ingresar ----
   function maybeWelcome() {
-    const hoy = '2026-06-21';
+    const hoy = (Orbit.ui && Orbit.ui.now ? Orbit.ui.now() : new Date()).toISOString().slice(0, 10);
     let last = null; try { last = localStorage.getItem(MKEY); } catch (e) {}
     const nl = noLeidas();
     if (last === hoy || !nl.length) { actualizarContador(); return; }

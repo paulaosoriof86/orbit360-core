@@ -13,7 +13,7 @@ Orbit.modules.cotizador = (function () {
   let host;
   const TASAS_DEF = { auto: [{ hasta: 50000, tasa: 3.1, min: 2500 }, { hasta: 150000, tasa: 3.0, min: 2600 }, { hasta: 300000, tasa: 2.7, min: 2600 }, { hasta: 600000, tasa: 2.5, min: 2600 }, { hasta: 1e12, tasa: 2.3, min: 2600 }] };
   const RECARGO_FRACC = { 1: 0, 2: 6.5, 4: 9.5, 6: 10.5, 12: 13.5 };
-  let st = { pais: 'GT', ramo: 'Auto', valor: 120000, anio: 2022, fracc: 12, cliente: '', clienteId: '', asesorId: '', marca: '', linea: '', filas: [] };
+  let st = { pais: 'GT', ramo: 'Auto', valor: 120000, anio: 2022, fracc: 12, cliente: '', clienteId: '', asesorId: '', marca: '', linea: '', modelo: '', filas: [] };
   // Catálogo marca → líneas (genérico, editable por cliente en migración)
   const VEH = {
     'Toyota': ['Corolla', 'Hilux', 'RAV4', 'Yaris', 'Land Cruiser', 'Prado', 'Fortuner'],
@@ -29,6 +29,27 @@ Orbit.modules.cotizador = (function () {
     'Suzuki': ['Swift', 'Vitara', 'Jimny', 'Baleno'],
     'Otra': ['—']
   };
+  // Catálogo línea → modelos/versiones (3er nivel). Genérico + versiones específicas; editable por cliente en migración.
+  const TRIMS_DEF = ['Estándar', 'Full Extra', 'Sport', 'Limited', 'XL / XLS', '4x4', 'Híbrido'];
+  const VEH_MODELOS = {
+    'Toyota|Corolla': ['XLI', 'GLI', 'SE-G', 'Cross', 'Hybrid'],
+    'Toyota|Hilux': ['SR', 'SRV', 'SRX 4x4', 'GR-Sport'],
+    'Toyota|RAV4': ['LE', 'XLE', 'Limited', 'Adventure', 'Hybrid'],
+    'Toyota|Yaris': ['Core', 'Sport', 'XLS'],
+    'Hyundai|Tucson': ['GL', 'Limited', 'N-Line'],
+    'Hyundai|Accent': ['GL', 'GLS', 'Limited'],
+    'Kia|Sportage': ['LX', 'EX', 'SX'],
+    'Kia|Picanto': ['LX', 'EX', 'GT-Line'],
+    'Nissan|Frontier': ['S', 'SE', 'LE 4x4', 'Pro-4X'],
+    'Nissan|Sentra': ['Sense', 'Advance', 'Exclusive'],
+    'Mazda|CX-5': ['i Sport', 'i Grand Touring', 'Signature'],
+    'Mitsubishi|L200': ['GLX', 'GLS', 'Sportero 4x4'],
+    'Chevrolet|D-Max': ['LS', 'LT', 'High Country 4x4'],
+    'Honda|CR-V': ['LX', 'EX', 'Touring'],
+    'Volkswagen|Amarok': ['Trendline', 'Comfortline', 'Highline 4x4'],
+    'Ford|Ranger': ['XL', 'XLS', 'XLT', 'Limited 4x4']
+  };
+  const modelosDe = (marca, linea) => VEH_MODELOS[marca + '|' + linea] || (linea && linea !== '—' ? TRIMS_DEF : []);
   let tabCot = 'cotizar';
   const COT_LOG_KEY = 'orbit360_cot_hist';
   function getCotLog(){ try{ return JSON.parse(localStorage.getItem(COT_LOG_KEY)||'[]'); }catch(e){ return []; } }
@@ -39,6 +60,7 @@ Orbit.modules.cotizador = (function () {
     if (ramo === 'Auto') {
       const marcas = Object.keys(VEH);
       const lineas = VEH[st.marca] || [];
+      const modelos = modelosDe(st.marca, st.linea);
       const subramo = st.pais === 'CO'
         ? ['Todo riesgo', 'RC / SOAT+', 'Pérdidas totales', 'Pérdidas parciales', 'Por kilómetros', 'Pesado']
         : ['Liviano', 'Responsabilidad Civil', 'Pesado', 'Pick-up / Comercial', 'Motocicleta', 'Grúa'];
@@ -46,6 +68,7 @@ Orbit.modules.cotizador = (function () {
         + `<label class="ce-l">🚙 Tipo / Subramo<select id="cz-sub" class="o-sel">${subramo.map(x => `<option ${x === st.sub ? 'selected' : ''}>${x}</option>`).join('')}</select></label>`
         + `<label class="ce-l">🚗 Marca<select id="cz-marca" class="o-sel"><option value="">— Marca —</option>${marcas.map(m => `<option ${m === st.marca ? 'selected' : ''}>${m}</option>`).join('')}</select></label>`
         + `<label class="ce-l">🔻 Línea<select id="cz-linea" class="o-sel" ${lineas.length ? '' : 'disabled'}><option value="">${lineas.length ? '— Línea —' : 'Elige marca primero'}</option>${lineas.map(l => `<option ${l === st.linea ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`
+        + `<label class="ce-l">🏷️ Modelo / Versión<select id="cz-modelo" class="o-sel" ${modelos.length ? '' : 'disabled'}><option value="">${modelos.length ? '— Modelo —' : 'Elige línea primero'}</option>${modelos.map(m => `<option ${m === st.modelo ? 'selected' : ''}>${m}</option>`).join('')}</select></label>`
         + `<label class="ce-l">🔢 Placa<input id="cz-placa" class="o-sel" value="${U.esc(st.placa || '')}" placeholder="P-123ABC"></label>`;
     }
     if (ramo === 'Vida') return `<label class="ce-l">🎂 Edad del asegurado<input id="cz-edad" class="o-sel" type="number" value="${st.edad||35}" min="18" max="80"></label>`
@@ -134,9 +157,10 @@ Orbit.modules.cotizador = (function () {
     const gmn = host.querySelector('#cz-gm-n'); if (gmn) gmn.addEventListener('change', () => { st.gmIntegrantes = Math.max(2, +gmn.value || 2); render(host); });
     host.querySelectorAll('.cz-gm-edad').forEach(el => el.addEventListener('change', () => { st.gmEdades = st.gmEdades || []; st.gmEdades[+el.dataset.k] = +el.value || ''; }));
     ['#cz-suma','#cz-edad','#cz-m2','#cz-hval','#cz-hcont','#cz-dsuma','#cz-benef','#cz-gm-emp','#cz-gm-ded','#cz-gm-hab','#cz-fuma','#cz-vcob','#cz-h-tipo','#cz-hzona','#cz-giro','#cz-bienes','#cz-placa'].forEach(s => { const el = host.querySelector(s); if (el) el.addEventListener('change', () => { st[s.replace('#cz-','').replace(/-/g,'')] = el.value; }); });
-    // marca → recarga líneas
-    const mk = host.querySelector('#cz-marca'); if (mk) mk.addEventListener('change', () => { st.marca = mk.value; st.linea = ''; render(host); });
-    const ln = host.querySelector('#cz-linea'); if (ln) ln.addEventListener('change', () => { st.linea = ln.value; });
+    // marca → recarga líneas · línea → recarga modelos
+    const mk = host.querySelector('#cz-marca'); if (mk) mk.addEventListener('change', () => { st.marca = mk.value; st.linea = ''; st.modelo = ''; render(host); });
+    const ln = host.querySelector('#cz-linea'); if (ln) ln.addEventListener('change', () => { st.linea = ln.value; st.modelo = ''; render(host); });
+    const md = host.querySelector('#cz-modelo'); if (md) md.addEventListener('change', () => { st.modelo = md.value; });
     // cliente existente → oculta nombre manual y precarga
     const cli = host.querySelector('#cz-cliid'); if (cli) cli.addEventListener('change', () => { st.clienteId = cli.value; const c = cli.value ? S().get('clientes', cli.value) : null; if (c) { st.cliente = c.nombre; if (c.asesorId) st.asesorId = c.asesorId; if (c.pais) st.pais = c.pais; } render(host); });
     host.querySelectorAll('[data-czt]').forEach(b => b.addEventListener('click', () => { tabCot = b.dataset.czt; render(host); }));

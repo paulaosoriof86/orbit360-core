@@ -2,6 +2,43 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [1.47.0] — 2026-07-01 · Cotizador marca→línea→modelo (3er nivel)
+### Added — Cotizador
+- **3er nivel de vehículo**: además de marca→línea, ahora hay **Modelo / Versión** (`VEH_MODELOS` con versiones específicas por línea popular + fallback de trims genéricos, editable en migración). Al cambiar marca se reinicia línea+modelo; al cambiar línea se recargan los modelos. Paridad con el Comparativo, que ya tenía los 3 niveles (incluido en su PDF).
+
+## [1.46.0] — 2026-07-01 · Metas inteligentes en Insights
+### Added — Insights
+- **Metas autoadministrables**: la vista Metas lee la colección editable `metas` del mes seleccionado (empresa: prima/recaudo/nueva/renovada) con fallback al split por asesor. La nota indica si la meta viene de la colección o de la base.
+- **✨ Sugerir metas del próximo mes**: botón que calcula metas por tendencia (promedio de los últimos 3 meses +10 %), permite ajustarlas y las guarda en la colección `metas` (upsert por mes/tipo) — quedan editables luego en Equipo.
+### Verified
+- **Comparativo general→particular** funciona en vivo: segmentos general/asesor/ramo/aseguradora (4), drill por mes (12 filas) y drill por fila del criterio, todos clicables con desglose de pólizas.
+
+## [1.45.0] — 2026-07-01 · Navegación cruzada en Cobros
+### Added — Cobros
+- **Quick "💳 Pagar" en la tabla**: cada recibo pendiente/vencido tiene botón para aplicar el pago directo desde el listado, sin abrir la ficha del recibo (`aplicarPago` extraído a función reutilizable, exportada).
+- **Navegación cruzada por fila**: el número de póliza es un enlace que abre el detalle de la póliza; el nombre del cliente ya abría su ficha. El drawer del recibo ahora tiene botones **👤 Ver cliente** y **📑 Ver póliza**.
+### Fixed
+- **Bug: la tabla no se refrescaba tras aplicar un pago** — el flujo re-renderizaba `mod-host` (inexistente) en vez de `host`. Corregido; el recibo pasa a Pagado/Conciliado y la lista se actualiza en el acto.
+
+## [1.44.0] — 2026-07-01 · Finanzas profundo (audit P0 §2.5)
+### Added — Finanzas
+- **KPIs clicables con desglose**: en Movimientos, CxC/CxP y Presupuesto, clic en cada KPI abre un modal (`drillKey`) con los registros que lo componen; cada fila abre el movimiento para ver/editar.
+- **CxC/CxP con detalle completo**: las filas ahora abren el drawer de movimiento (ver/editar/eliminar/cambiar estado + adjuntar); el badge de estado sigue permitiendo cambio rápido con un clic. El desglose aclara que las partidas pendientes **arrastran mes a mes** (se listan de todos los periodos).
+- **Presupuesto editable**: `+ Partida`, editar/eliminar por fila y **Replicar mes anterior** (`editarPresup`/`replicarPresup`), leyendo/escribiendo la colección `presupuesto` del store (se eliminó la lectura de arrays quemados).
+### Fixed
+- El presupuesto ejecutado ahora normaliza moneda (`norm`) al sumar egresos.
+
+## [1.43.0] — 2026-07-01 · Fecha dinámica + logo en login + inicio del audit funcional
+### Fixed — Login white-label
+- La franja del logo del cliente ahora es **cintilla blanca a sangre** separada del bloque oscuro por línea roja (3px); el logo resalta sobre blanco.
+- `Orbit.applyBrand()` se invoca también en `auth.showLogin()` → el logo/nombre del cliente aparecen **en la pantalla de login** (antes solo tras entrar).
+### Changed — Fecha dinámica (audit P0 §2.1/2.2/2.3)
+- `core/ui.js`: la fecha deja de estar quemada. `Orbit.ui.now()/monthLabel()/monthKey()/monthProgressPct()` derivan de un **ancla configurable** (`Orbit.tenant.demoDate`); el backend pasa a fecha real con `demoDate='real'` sin tocar módulos.
+- `modules/inicio.js`: etiqueta de mes dinámica (no "Junio 2026" quemado); metas leen la colección autoadministrable `metas` (fallback demo); días del mes calculados por mes real.
+- `core/novedades.js`: fecha del modal de bienvenida dinámica.
+### Note
+- Recibida `AUDITORIA-FUNCIONAL-CLAUDE-20260630.md` (ChatGPT/Paula). Es un roadmap de profundización P0/P1 multi-sesión; ver `docs/PENDIENTES-Y-MEJORAS.md`.
+
 ## [1.41.0] — 2026-06-30 · Login limpio + doc de pendientes para migración
 ### Changed — Login
 - Quitado el badge superior "PLATAFORMA SEGURA · ACCESO DEL EQUIPO".
