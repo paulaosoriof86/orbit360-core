@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    Orbit 360 · Capa de datos — store
    Interfaz ÚNICA de acceso a datos. Hoy persiste en localStorage
    sobre un seed ficticio. Mañana: misma API apuntando a backend
@@ -26,8 +26,6 @@ Orbit.store = (function () {
   }
 
   const api = {
-    /** Emite cambios manualmente. API publica requerida por Orbit.store. */
-    _emit(collection) { try { _emit(collection || '*'); } catch (e) {} return api; },
     /** Inicializa: usa datos guardados o siembra desde seed (si cambia la versión). */
     init(seed) {
       const saved = _load();
@@ -66,14 +64,24 @@ Orbit.store = (function () {
     remove(c, id) {
       db[c] = (db[c] || []).filter(r => r.id !== id); _persist(); _emit(c);
     },
-    /** Emite cambios manualmente. Requerido por la API Orbit.store. */
-    _emit,
     /** Suscripción a cambios. Devuelve función para desuscribir. */
     on(fn) { listeners.push(fn); return () => { listeners = listeners.filter(l => l !== fn); }; },
+    /** Emite un evento de cambio manualmente (público para la capa backend). */
+    _emit(c) { _emit(c || '*'); },
+    /** Preferencia / config KV (backend-swappable). Los módulos usan esto en vez de localStorage directo. */
+    pref(key, def) {
+      if (!db) return def === undefined ? null : def;
+      db.__prefs = db.__prefs || {};
+      return (key in db.__prefs) ? db.__prefs[key] : (def === undefined ? null : def);
+    },
+    /** Guarda una preferencia / config KV y persiste. */
+    setPref(key, val) {
+      if (!db) return val;
+      db.__prefs = db.__prefs || {};
+      db.__prefs[key] = val; _persist(); return val;
+    },
     /** Acceso crudo (lectura). */
     raw() { return db; }
   };
   return api;
 })();
-
-

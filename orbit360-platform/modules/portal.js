@@ -145,7 +145,7 @@ Orbit.modules.portal = (function () {
     const back = drawer('📢 Enviar notificación', html, () => {
       const dest = back.querySelector('#an-dest').value, tit = back.querySelector('#an-tit').value || 'Aviso', msg = back.querySelector('#an-msg').value;
       const dests = dest === '__all' ? clientes() : [S().get('clientes', dest)];
-      dests.forEach(c => { if (!c) return; S().insert('notifs', { id: 'ntf' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.id, titulo: tit, cuerpo: msg, tipo: 'admin', fecha: '2026-06-24', leida: false }); });
+      dests.forEach(c => { if (!c) return; S().insert('notifs', { id: 'ntf' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.id, titulo: tit, cuerpo: msg, tipo: 'admin', fecha: Orbit.ui.today(), leida: false }); });
       back.remove(); toast('✓ Notificación enviada a ' + (dest === '__all' ? 'todos' : '1 cliente')); render(host);
     }, 'Enviar');
   }
@@ -160,8 +160,8 @@ Orbit.modules.portal = (function () {
       <label class="ce-l" style="margin-top:10px">Nota<input id="rp-nota" class="o-sel" placeholder="Banco, referencia…"></label>`;
     const back = drawer('📤 Reportar pago', html, () => {
       const f = back.querySelector('#rp-file').files[0];
-      S().update('cobros', cobroId, { reportado: '2026-06-24', soporteNombre: f ? f.name : '', notaReporte: back.querySelector('#rp-nota').value });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: (S().get('polizas', c.polizaId) || {}).asesorId || cli.asesorId, tipo: 'sistema', icon: '📤', fecha: '2026-06-24', titulo: 'Pago reportado por el cliente', detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (f ? ' · soporte: ' + f.name : '') + ' · pendiente de validar' });
+      S().update('cobros', cobroId, { reportado: Orbit.ui.today(), soporteNombre: f ? f.name : '', notaReporte: back.querySelector('#rp-nota').value });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: (S().get('polizas', c.polizaId) || {}).asesorId || cli.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Pago reportado por el cliente', detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (f ? ' · soporte: ' + f.name : '') + ' · pendiente de validar' });
       if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo: 'Validar pago reportado', titulo: 'Validar pago · ' + cli.nombre, clienteId, polizaId: c.polizaId, asesorId: cli.asesorId, prioridad: 'Alta', vence: '2026-06-26', nota: 'El cliente reportó el pago de la cuota ' + c.cuota, origen: 'Portal del cliente' });
       back.remove(); toast('✓ Pago reportado · el equipo lo validará'); render(host);
     }, 'Enviar reporte');
@@ -189,8 +189,8 @@ Orbit.modules.portal = (function () {
       <div class="cfg-note" style="margin-top:10px">Tu documento se guarda en tu expediente y el equipo lo verá al instante.</div>`;
     const back = drawer('⬆ Añadir documento', html, () => {
       const f = back.querySelector('#sd-file').files[0]; const tipo = back.querySelector('#sd-tipo').value;
-      S().insert('documentos', { id: 'doc' + Date.now(), clienteId, tipo, nombre: f ? f.name : tipo, fecha: '2026-06-24', origen: 'Portal del cliente' });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '📁', fecha: '2026-06-24', titulo: 'Documento subido por el cliente', detalle: tipo + (f ? ' · ' + f.name : '') });
+      S().insert('documentos', { id: 'doc' + Date.now(), clienteId, tipo, nombre: f ? f.name : tipo, fecha: Orbit.ui.today(), origen: 'Portal del cliente' });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '📁', fecha: Orbit.ui.today(), titulo: 'Documento subido por el cliente', detalle: tipo + (f ? ' · ' + f.name : '') });
       back.remove(); toast('✓ Documento añadido a tu expediente'); render(host);
     }, 'Subir');
   }
@@ -240,7 +240,7 @@ Orbit.modules.portal = (function () {
     const back = drawer('🗂 Solicitar una gestión', html, () => {
       const tipo = back.querySelector('#ps-tipo').value, det = back.querySelector('#ps-det').value.trim();
       if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo, titulo: tipo + ' · ' + cli.nombre, clienteId, asesorId: cli.asesorId, prioridad: 'Media', vence: '2026-06-30', nota: det, origen: 'Portal del cliente', checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'En gestión', done: false }] });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '🙋', fecha: '2026-06-24', titulo: 'Solicitud del cliente: ' + tipo, detalle: det + ' · Portal → Ops' });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '🙋', fecha: Orbit.ui.today(), titulo: 'Solicitud del cliente: ' + tipo, detalle: det + ' · Portal → Ops' });
       back.remove(); toast('✓ Solicitud enviada al equipo'); render(host);
     }, 'Enviar solicitud');
   }

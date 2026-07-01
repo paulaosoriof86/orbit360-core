@@ -610,7 +610,7 @@ Orbit.modules.cliente360 = (function () {
       const det = document.getElementById('na-det').value.trim() || '—';
       S().insert('actividades', {
         id: 'act' + Date.now(), clienteId: cid, asesorId: S().get('clientes', cid).asesorId,
-        tipo, icon, fecha: '2026-06-20', titulo: tit, detalle: det
+        tipo, icon, fecha: Orbit.ui.today(), titulo: tit, detalle: det
       });
       detalle(cid);
     });
@@ -754,7 +754,7 @@ Orbit.modules.cliente360 = (function () {
     back.querySelector('#rn-x').addEventListener('click', close);
     back.querySelector('#rn-cancel').addEventListener('click', close);
     back.querySelector('#rn-ok').addEventListener('click', () => {
-      const fin = new Date('2026-06-20'); fin.setFullYear(fin.getFullYear() + 1);
+      const fin = new Date(Orbit.ui.today()); fin.setFullYear(fin.getFullYear() + 1);
       const d = back._d, frec = back._frec;
       S().update('polizas', polId, {
         numero: $('#rn-num').value || p.numero, aseguradoraId: $('#rn-asg').value,
@@ -762,16 +762,16 @@ Orbit.modules.cliente360 = (function () {
         ivaPct: d.ivaPct, ivaMonto: d.iva, recargoFinPct: d.recargoPct, baseGravable: d.baseGravable,
         prima: d.total, primaTotal: d.total, producto: $('#rn-prod').value || p.producto,
         frecuencia: frec, forma: frec, formaPago: $('#rn-forma').value,
-        estado: 'Vigente', vigenciaInicio: '2026-06-20', vigenciaFin: fin.toISOString().slice(0, 10),
+        estado: 'Vigente', vigenciaInicio: Orbit.ui.today(), vigenciaFin: fin.toISOString().slice(0, 10),
         contadorRenovaciones: (p.contadorRenovaciones || 0) + 1,
-        historial: (p.historial || []).concat([{ icon: '🔄', fecha: '2026-06-20', t: 'Renovación', d: 'Recibos regenerados (' + frec + ')' }])
+        historial: (p.historial || []).concat([{ icon: '🔄', fecha: Orbit.ui.today(), t: 'Renovación', d: 'Recibos regenerados (' + frec + ')' }])
       });
       // regenerar recibos
       S().where('cobros', c => c.polizaId === polId && c.estado !== 'Pagado').forEach(c => S().remove('cobros', c.id));
-      Orbit.primas.recibos(d, { frecuencia: frec, cuotas: back._cuotas, vigenciaInicio: '2026-06-20', comAseguradoraPct: p.comAseguradoraPct, comVendedorPct: p.comVendedorPct }).forEach((rec, i) => {
+      Orbit.primas.recibos(d, { frecuencia: frec, cuotas: back._cuotas, vigenciaInicio: Orbit.ui.today(), comAseguradoraPct: p.comAseguradoraPct, comVendedorPct: p.comVendedorPct }).forEach((rec, i) => {
         S().insert('cobros', { id: 'cob' + Date.now() + i, polizaId: polId, clienteId: cid, asesorId: p.asesorId, cuota: rec.n, monto: rec.total, moneda: p.moneda, neta: rec.neta, gastosEmision: rec.gastosEmision, gastosFinan: rec.gastosFinan, otros: rec.otros, iva: rec.iva, comAseguradora: rec.comAseguradora, comVendedor: rec.comVendedor, vence: rec.vence, fechaLimite: rec.fechaLimite, fechaPago: null, estado: 'Pendiente', metodo: null, conducto: p.conducto, conciliado: false });
       });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: p.asesorId, tipo: 'sistema', icon: '🔄', fecha: '2026-06-20', titulo: 'Póliza renovada', detalle: 'Renovación de ' + p.numero + ' · recibos regenerados.' });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: p.asesorId, tipo: 'sistema', icon: '🔄', fecha: Orbit.ui.today(), titulo: 'Póliza renovada', detalle: 'Renovación de ' + p.numero + ' · recibos regenerados.' });
       close(); tab = 'renovaciones'; detalle(cid);
     });
   }
@@ -1135,12 +1135,12 @@ Orbit.modules.cliente360 = (function () {
     const $ = s => back.querySelector(s);
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#ep-x').addEventListener('click', close); $('#ep-cancel').addEventListener('click', close);
-    $('#ep-ramo').addEventListener('change', () => {
+    $('#ep-ramo').addEventListener('change', async () => {
       let r = $('#ep-ramo').value;
-      if (r === '__otro') { const nv = prompt('Nuevo ramo para ' + pais + ':', ''); if (nv) { Orbit.cat.addRamo(pais, nv); r = nv; } else { $('#ep-ramo').value = curRamo; r = curRamo; } }
+      if (r === '__otro') { const nv = await Orbit.ui.prompt('Nuevo ramo para ' + pais + ':', { title: 'Nuevo ramo' }); if (nv) { Orbit.cat.addRamo(pais, nv); r = nv; } else { $('#ep-ramo').value = curRamo; r = curRamo; } }
       $('#ep-sub').innerHTML = Orbit.cat.subramosDe(pais, r).map(s => `<option>${s}</option>`).join('') + '<option value="__otro">➕ Otro…</option>';
     });
-    $('#ep-sub').addEventListener('change', () => { if ($('#ep-sub').value === '__otro') { const nv = prompt('Nuevo subramo:', ''); const r = $('#ep-ramo').value; if (nv && r !== '__otro') { Orbit.cat.addSubramo(pais, r, nv); $('#ep-sub').innerHTML = Orbit.cat.subramosDe(pais, r).map(s => `<option ${s === nv ? 'selected' : ''}>${s}</option>`).join('') + '<option value="__otro">➕ Otro…</option>'; } else $('#ep-sub').selectedIndex = 0; } });
+    $('#ep-sub').addEventListener('change', async () => { if ($('#ep-sub').value === '__otro') { const nv = await Orbit.ui.prompt('Nuevo subramo:', { title: 'Nuevo subramo' }); const r = $('#ep-ramo').value; if (nv && r !== '__otro') { Orbit.cat.addSubramo(pais, r, nv); $('#ep-sub').innerHTML = Orbit.cat.subramosDe(pais, r).map(s => `<option ${s === nv ? 'selected' : ''}>${s}</option>`).join('') + '<option value="__otro">➕ Otro…</option>'; } else $('#ep-sub').selectedIndex = 0; } });
     function recalc() {
       const auto = $('#ep-auto').checked, neta = +$('#ep-neta').value || 0;
       if (auto && pais === 'GT') $('#ep-gem').value = Orbit.primas.r2(neta * 0.05);
@@ -1167,9 +1167,9 @@ Orbit.modules.cliente360 = (function () {
     $('#ep-tipo').addEventListener('change', recalc);
     // crear cliente nuevo desde el selector
     const epCli = $('#ep-cli');
-    if (epCli) epCli.addEventListener('change', () => {
+    if (epCli) epCli.addEventListener('change', async () => {
       if (epCli.value === '__nuevo') {
-        const nom = prompt('Nombre del nuevo cliente:'); 
+        const nom = await Orbit.ui.prompt('Nombre del nuevo cliente:', { title: 'Nuevo cliente' });
         if (nom) {
           const nid = 'cli_' + Date.now().toString(36);
           S().insert('clientes', { id: nid, nombre: nom, tipo: 'Persona', pais: pais, moneda: pais === 'CO' ? 'COP' : 'GTQ', asesorId: $('#ep-ase') ? $('#ep-ase').value : '', identificacion: '', email: '', telefono: '', fechaAlta: new Date().toISOString().slice(0, 10), etiquetas: [], notas: '', driveLink: '' });
@@ -1197,7 +1197,7 @@ Orbit.modules.cliente360 = (function () {
         recargoFinModo: $('#ep-recmodo').value,
         primaNeta: dd.neta, gastosEmision: dd.gastosEmision, gastosFinan: dd.gastosFinan, otros: dd.otros,
         ivaPct: dd.ivaPct, ivaMonto: dd.iva, recargoFinPct: dd.recargoPct, baseGravable: dd.baseGravable, prima: dd.total, primaTotal: dd.total,
-        historial: (p.historial || []).concat([{ icon: '✏', fecha: '2026-06-22', t: 'Edición de póliza', d: 'Datos/prima actualizados' + (cambioPago ? ' · recibos pendientes regenerados' : '') }])
+        historial: (p.historial || []).concat([{ icon: '✏', fecha: Orbit.ui.today(), t: 'Edición de póliza', d: 'Datos/prima actualizados' + (cambioPago ? ' · recibos pendientes regenerados' : '') }])
       });
       if (cambioPago) regenerarRecibosPendientes(polId);
       close(); verPoliza(polId);
@@ -1320,7 +1320,7 @@ Orbit.modules.cliente360 = (function () {
       const d = Orbit.primas.desglose(neta, p, { fraccionado: frac, gastosEmision: +$('#np-gem').value || 0, otros: +$('#np-otros').value || 0 });
       $('#np-iva').textContent = '(' + p + ' · IVA ' + d.ivaPct + '%)';
       $('#np-resumen').innerHTML = `<tr class="vp-tot"><td>Prima total</td><td class="num">${U.money(d.total, p === 'CO' ? 'COP' : 'GTQ')}</td></tr>`;
-      const recs = Orbit.primas.recibos(d, { frecuencia: frec, cuotas: cuotas, vigenciaInicio: '2026-06-24', emisionEn: prorrEn(cuotas), recargoEn: prorrEn(cuotas) });
+      const recs = Orbit.primas.recibos(d, { frecuencia: frec, cuotas: cuotas, vigenciaInicio: Orbit.ui.today(), emisionEn: prorrEn(cuotas), recargoEn: prorrEn(cuotas) });
       const usar = recs;
       $('#np-recibos').innerHTML = `<div class="muted" style="font-size:12px;margin-bottom:5px">${cuotas} recibo(s):</div>` + usar.slice(0, cuotas).map(r => `<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--line-2)"><span class="mono">${r.n}</span><span>${U.fmtDate(r.vence)}</span><b>${U.money(r.total, p === 'CO' ? 'COP' : 'GTQ')}</b></div>`).join('');
       back._d = d; back._cuotas = cuotas;
@@ -1331,7 +1331,7 @@ Orbit.modules.cliente360 = (function () {
       const cid = $('#np-cli').value, p = pais(), cur = p === 'CO' ? 'COP' : 'GTQ', d = back._d;
       const asg = S().get('aseguradoras', $('#np-asg').value);
       const num = $('#np-num').value || ((p === 'GT' ? 'GT-' : 'CO-') + (asg ? asg.id.slice(-2).toUpperCase() : 'XX') + '-' + Math.floor(10000 + Math.random() * 89999));
-      const fin = new Date('2026-06-24'); fin.setFullYear(fin.getFullYear() + 1);
+      const fin = new Date(Orbit.ui.today()); fin.setFullYear(fin.getFullYear() + 1);
       const cli = S().get('clientes', cid);
       const polId = 'pol' + Date.now().toString().slice(-7);
       S().insert('polizas', {
@@ -1340,16 +1340,16 @@ Orbit.modules.cliente360 = (function () {
         moneda: cur, divisa: cur, frecuencia: $('#np-frec').value, forma: $('#np-frec').value, formaPago: $('#np-forma').value,
         primaNeta: d.neta, gastosEmision: d.gastosEmision, gastosFinan: d.gastosFinan, otros: d.otros, ivaPct: d.ivaPct, ivaMonto: d.iva, recargoFinPct: d.recargoPct, baseGravable: d.baseGravable, prima: d.total, primaTotal: d.total,
         sumaAsegurada: +$('#np-suma').value || 0, comAseguradoraPct: (asg && asg.comisiones && asg.comisiones[$('#np-ramo').value]) || (asg && asg.comisionDefault) || 12, comVendedorPct: 50,
-        concepto: [$('#np-ramo').value, $('#np-sub').value].join(' · '), vigenciaInicio: '2026-06-24', vigenciaFin: fin.toISOString().slice(0, 10),
-        renovable: true, contadorRenovaciones: 0, estado: 'Vigente', historial: [{ icon: '✳', fecha: '2026-06-24', t: 'Emisión de póliza', d: 'Alta manual' }]
+        concepto: [$('#np-ramo').value, $('#np-sub').value].join(' · '), vigenciaInicio: Orbit.ui.today(), vigenciaFin: fin.toISOString().slice(0, 10),
+        renovable: true, contadorRenovaciones: 0, estado: 'Vigente', historial: [{ icon: '✳', fecha: Orbit.ui.today(), t: 'Emisión de póliza', d: 'Alta manual' }]
       });
-      Orbit.primas.recibos(d, { frecuencia: $('#np-frec').value, cuotas: back._cuotas, vigenciaInicio: '2026-06-24', comAseguradoraPct: 12, comVendedorPct: 50 }).forEach((rec, i) => {
+      Orbit.primas.recibos(d, { frecuencia: $('#np-frec').value, cuotas: back._cuotas, vigenciaInicio: Orbit.ui.today(), comAseguradoraPct: 12, comVendedorPct: 50 }).forEach((rec, i) => {
         S().insert('cobros', { id: 'cob' + Date.now() + i, polizaId: polId, clienteId: cid, asesorId: cli.asesorId, cuota: rec.n, monto: rec.total, moneda: cur, neta: rec.neta, gastosEmision: rec.gastosEmision, gastosFinan: rec.gastosFinan, otros: rec.otros, iva: rec.iva, comAseguradora: rec.comAseguradora, comVendedor: rec.comVendedor, vence: rec.vence, fechaLimite: rec.fechaLimite, fechaPago: null, estado: 'Pendiente', metodo: null, conducto: '', conciliado: false });
       });
       if (/Auto|Veh/i.test($('#np-ramo').value) && $('#np-vmarca').value) {
         S().insert('vehiculos', { id: 'veh' + Date.now(), clienteId: cid, polizaId: polId, marca: $('#np-vmarca').value, linea: '', anio: $('#np-vanio').value, placa: $('#np-vplaca').value, uso: $('#np-vuso').value, chasis: '', motor: '', sumaAsegurada: +$('#np-suma').value || 0 });
       }
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: cli.asesorId, tipo: 'sistema', icon: '📑', fecha: '2026-06-24', titulo: 'Póliza emitida: ' + num, detalle: $('#np-ramo').value + ' · ' + U.money(d.total, cur) });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: cli.asesorId, tipo: 'sistema', icon: '📑', fecha: Orbit.ui.today(), titulo: 'Póliza emitida: ' + num, detalle: $('#np-ramo').value + ' · ' + U.money(d.total, cur) });
       close(); location.hash = '#/cliente360?c=' + cid; tab = 'polizas'; setTimeout(() => detalle(cid), 30);
     });
   }
@@ -1468,8 +1468,8 @@ Orbit.modules.cliente360 = (function () {
       close(); tab = 'siniestros'; detalle(cid);
     };
   }
-  function addBitacora(reclamoId, cid) {
-    const txt = prompt('Anotar movimiento en la bitácora del reclamo:', '');
+  async function addBitacora(reclamoId, cid) {
+    const txt = await Orbit.ui.prompt('Anotar movimiento en la bitácora del reclamo:', { title: 'Bitácora del reclamo' });
     if (!txt) return;
     const rec = Orbit.store.get('reclamos', reclamoId); if (!rec) return;
     const bit = (rec.bitacora || []).concat([{ ts: new Date().toISOString().slice(0, 16).replace('T', ' '), user: 'Equipo', t: 'Actualización', d: txt }]);

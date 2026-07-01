@@ -40,10 +40,10 @@ Orbit.modules.historial = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('historial', '')}
       ${K.kpis([
-        { label: 'Interacciones', val: all.length, color: 'var(--red)', foot: 'registradas', onclick: "location.hash='#/historial'" },
-        { label: 'Llamadas', val: porTipo.llamada || 0, color: 'var(--info)', foot: 'telefónicas', onclick: "location.hash='#/historial'" },
-        { label: 'WhatsApp', val: porTipo.whatsapp || 0, color: 'var(--ok)', foot: 'mensajes', onclick: "location.hash='#/historial'" },
-        { label: 'Reuniones', val: porTipo.reunion || 0, color: 'var(--warn)', foot: 'asesorías', onclick: "location.hash='#/historial'" }
+        { label: 'Interacciones', val: all.length, color: 'var(--red)', foot: 'ver todas', onclick: "Orbit.modules.historial.filtrarTipo('')" },
+        { label: 'Llamadas', val: porTipo.llamada || 0, color: 'var(--info)', foot: 'telefónicas', onclick: "Orbit.modules.historial.filtrarTipo('llamada')" },
+        { label: 'WhatsApp', val: porTipo.whatsapp || 0, color: 'var(--ok)', foot: 'mensajes', onclick: "Orbit.modules.historial.filtrarTipo('whatsapp')" },
+        { label: 'Reuniones', val: porTipo.reunion || 0, color: 'var(--warn)', foot: 'asesorías', onclick: "Orbit.modules.historial.filtrarTipo('reunion')" }
       ])}
       <div class="card" style="overflow:hidden">
         ${K.filterBar(FDEFS(), st)}
@@ -109,5 +109,7 @@ Orbit.modules.historial = (function () {
     back.querySelector('#hd-ok').addEventListener('click', close);
   }
 
-  return { render, detalle };
+  return { render, detalle, filtrarTipo };
+
+  function filtrarTipo(t) { st.ftipo = t; const h = document.getElementById('host'); if (h) render(h); }
 })();

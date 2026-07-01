@@ -171,7 +171,7 @@ Orbit.modules.aseguradoras = (function () {
     $('#af-add-cta').addEventListener('click', () => push('cuentas', { banco: '', tipo: 'Monetaria', numero: '', moneda: a.pais === 'GT' ? 'GTQ' : 'COP' }));
     $('#af-add-doc').addEventListener('click', () => push('docs', { nombre: 'Documento.pdf', cat: 'Tarifas' }));
     $('#af-add-req').addEventListener('click', () => push('docsRequeridos', { producto: '', items: '' }));
-    $('#af-add-ramo').addEventListener('click', () => { const r = prompt('Nombre del ramo:', ''); if (!r) return; const rr = (S().get('aseguradoras', id).ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); const com = Object.assign({}, S().get('aseguradoras', id).comisiones); com[r] = a.comisionDefault || 12; up(id, { ramos: rr, comisiones: com }); ficha(id, true); });
+    $('#af-add-ramo').addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; const rr = (S().get('aseguradoras', id).ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); const com = Object.assign({}, S().get('aseguradoras', id).comisiones); com[r] = a.comisionDefault || 12; up(id, { ramos: rr, comisiones: com }); ficha(id, true); });
     // delete-row buttons
     back.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
       const [key, idx] = b.dataset.del.split(':'); const arr = (S().get('aseguradoras', id)[key] || []).slice(); arr.splice(+idx, 1); up(id, { [key]: arr }); ficha(id, true);
@@ -180,7 +180,7 @@ Orbit.modules.aseguradoras = (function () {
     $('#af-imp-doc').addEventListener('click', () => { close(); Orbit.importa.open('docs-aseguradora', { onDone: reload }); });
     $('#af-imp-com').addEventListener('click', () => { close(); Orbit.importa.open('planillas-comision', { onDone: reload }); });
     // delete aseguradora
-    $('#af-del').addEventListener('click', () => { if (confirm('¿Borrar esta aseguradora del directorio?')) { S().remove('aseguradoras', id); close(); reload(); } });
+    $('#af-del').addEventListener('click', async () => { if (!(await U.confirm('¿Borrar esta aseguradora del directorio?', { title: 'Eliminar aseguradora', ok: 'Eliminar' }))) return; S().remove('aseguradoras', id); close(); reload(); });
     // save
     $('#af-save').addEventListener('click', () => {
       const g = s => (back.querySelector(s) || {}).value || '';

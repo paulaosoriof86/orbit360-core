@@ -2,6 +2,55 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [1.55.0] — 2026-07-01 · Demo standalone + handoff regenerados
+### Changed
+- **`Orbit360-demo-standalone.html`** regenerado desde el estado actual (v1.54): incluye todos los módulos profundizados (Finanzas, Cobros, Metas, Plantillas, Reportes, Comisiones, Historial). Archivo único autocontenido para demo offline.
+- **`docs/handoff-migracion-as.html`**: marcador de versión actualizado a v1.54.
+
+## [1.54.0] — 2026-07-01 · Doc backend: ambientes + caché (P0 Codex)
+### Added
+- **`docs/BACKEND-AMBIENTES-Y-CACHE.md`**: guía para Codex sobre versionado de scripts (anti-caché), Service Worker seguro, y separación demo/LAB/producción con el adaptador `Orbit.store` (modo backend estricto sin fallback demo, validación de seed por IDs `lab_`, sin UI técnica al cliente). No modifica el prototipo.
+
+## [1.53.0] — 2026-07-01 · Historial: KPIs funcionales + cierre de módulos delgados
+### Added — Historial
+- **KPIs clicables** (Interacciones / Llamadas / WhatsApp / Reuniones) que ahora **filtran el feed por tipo** (antes eran rutas muertas).
+### Verified
+- **Historial** ya profundo: filtros (búsqueda/tipo/asesor), feed agrupado por fecha, detalle correcto por interacción + enlace a expediente.
+- **Cronograma** monta con vistas día/semana/mes.
+- **Thin-by-design confirmado**: leads/ops/polizas/importar delegan su lógica en `core/ciclo.js`, `crmkit.js`, `importa.js` y fichas compartidas — no requieren inflado.
+
+## [1.52.0] — 2026-07-01 · Comisiones: filtros + export + conciliación
+### Added — Comisiones
+- **Filtros** por año (2024/25/26) y estado (Liquidada / Por liquidar); la agregación por asesor/aseguradora/periodo respeta el filtro.
+- **Export CSV** del set filtrado (periodo, cliente, póliza, asesor, aseguradora, base, %, comisión, estado).
+- **Conciliación**: en el detalle, clic en el badge de estado alterna **Liquidada ↔ Devengada** (escribe al store); nº de póliza enlazado abre el detalle de la póliza.
+
+## [1.51.0] — 2026-07-01 · Reportes: agrupación + periodo + programación real
+### Added — Reportes
+- **Agrupar por** cualquier columna (general→particular): genera una **tabla resumen** con conteo por grupo + suma (Σ) de las columnas monetarias, encima del detalle. Ej: producción por asesor / por aseguradora / por ramo.
+- **Filtro de año** (2024/2025/2026) sobre los reportes con fecha.
+- **Programación real** (antes era un alert): modal con frecuencia (diaria/semanal/mensual), destinatarios y formato (PDF/Excel/CSV); persiste en la colección `reportes_prog`, se lista en la barra lateral y se puede quitar.
+### Preserved
+- Export CSV / Excel / PDF y filtro por país siguen funcionando.
+
+## [1.50.0] — 2026-07-01 · Plantillas profundizado + migrado al store
+### Changed — Plantillas
+- **Persistencia en `Orbit.store('plantillas')`** (antes localStorage propio — ahora respeta la capa de datos única; el backend hereda la colección). Migra automáticamente cualquier plantilla del localStorage viejo.
+### Added — Plantillas
+- **Editor completo** (drawer): emoji, nombre, canal (WhatsApp/Correo/Ambos/PDF), categoría, asunto (correo/PDF) y mensaje, con **9 chips de variables insertables** en el cursor.
+- **CRUD**: crear, editar, **duplicar** y eliminar.
+- **KPIs clicables** (total/WhatsApp/correo/PDF) que filtran por canal + buscador + filtros por canal/categoría.
+- **"Usar"**: elige un cliente real, **resuelve las variables** ({nombre}/{poliza}/{monto}/{vence}/{ramo}/{aseguradora}/{asesor}/{placa}) con datos del store, y enruta a **WhatsApp** (wa.me con teléfono del cliente) o **Redactar correo** (abre el compositor de Correo con asunto+cuerpo+cliente prellenados) o copiar.
+
+## [1.49.0] — 2026-07-01 · Contrato de datos + docs de migración (backend P0)
+### Added
+- **`Orbit.store._emit(collection)` público** — antes privado; permite a la capa backend emitir eventos de cambio manualmente. API pública confirmada: `all, get, where, find, insert, update, remove, on, _emit, init, reseed, raw`.
+- **Docs nuevos para el LAB backend** (solicitados por el doc de pendientes 2026-07-01): `MEJORAS-DETECTADAS.md` (contrato de datos + colecciones + mejoras a preservar), `BITACORA-ERRORES.md` (E-01..E-04 resueltos + plantilla), `BITACORA-CAMBIOS.md` (v1.42→v1.49), `REPORTE-SMOKE.md` (flujos críticos verificados).
+
+## [1.48.0] — 2026-07-01 · Calidad de datos: edición inline
+### Added — Calidad
+- **✏ Completar inline**: cada cliente incompleto abre solo sus campos faltantes; al guardar sale de la lista (re-render) con toast de conteo restante.
+
 ## [1.47.0] — 2026-07-01 · Cotizador marca→línea→modelo (3er nivel)
 ### Added — Cotizador
 - **3er nivel de vehículo**: además de marca→línea, ahora hay **Modelo / Versión** (`VEH_MODELOS` con versiones específicas por línea popular + fallback de trims genéricos, editable en migración). Al cambiar marca se reinicia línea+modelo; al cambiar línea se recargan los modelos. Paridad con el Comparativo, que ya tenía los 3 niveles (incluido en su PDF).

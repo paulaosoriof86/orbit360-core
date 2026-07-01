@@ -105,7 +105,7 @@ Orbit.modules.siniestros = (function () {
       if (nuevoEst !== r.estado) patch.bitacora = (r.bitacora || []).concat([{ ts: '2026-06-24 ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: 'Estado: ' + nuevoEst, d: '' }]);
       if (['Aprobado', 'Pagado'].includes(nuevoEst) && !r.montoAprobado) patch.montoAprobado = r.montoReclamado;
       S().update('reclamos', id, patch);
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: r.clienteId, asesorId: r.asesorId, tipo: 'sistema', icon: '🚨', fecha: '2026-06-24', titulo: 'Siniestro ' + r.numero + ': ' + nuevoEst, detalle: r.tipo + ' · ' + r.ramo });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: r.clienteId, asesorId: r.asesorId, tipo: 'sistema', icon: '🚨', fecha: Orbit.ui.today(), titulo: 'Siniestro ' + r.numero + ': ' + nuevoEst, detalle: r.tipo + ' · ' + r.ramo });
       close(); render(host);
     });
   }
@@ -138,8 +138,8 @@ Orbit.modules.siniestros = (function () {
     $('#sn-ok').addEventListener('click', () => {
       const cid = $('#sn-cli').value, polId = $('#sn-pol').value, p = polId ? S().get('polizas', polId) : null, cli = S().get('clientes', cid);
       const id = 'rec' + Date.now().toString().slice(-7);
-      S().insert('reclamos', { id, polizaId: polId, clienteId: cid, aseguradoraId: p ? p.aseguradoraId : '', asesorId: cli.asesorId, ramo: p ? p.ramo : '', tipo: $('#sn-tipo').value || 'Reclamo', estado: 'Reportado', numero: 'SIN-' + Math.floor(10000 + Math.random() * 89999), fecha: '2026-06-24', montoReclamado: +$('#sn-monto').value || 0, montoAprobado: 0, descripcion: $('#sn-desc').value, bitacora: [{ ts: '2026-06-24 ' + new Date().toTimeString().slice(0, 5), user: cli.nombre, t: 'Reclamo reportado', d: $('#sn-desc').value }], correos: [], docs: [] });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: cli.asesorId, tipo: 'sistema', icon: '🚨', fecha: '2026-06-24', titulo: 'Siniestro reportado', detalle: $('#sn-tipo').value });
+      S().insert('reclamos', { id, polizaId: polId, clienteId: cid, aseguradoraId: p ? p.aseguradoraId : '', asesorId: cli.asesorId, ramo: p ? p.ramo : '', tipo: $('#sn-tipo').value || 'Reclamo', estado: 'Reportado', numero: 'SIN-' + Math.floor(10000 + Math.random() * 89999), fecha: Orbit.ui.today(), montoReclamado: +$('#sn-monto').value || 0, montoAprobado: 0, descripcion: $('#sn-desc').value, bitacora: [{ ts: '2026-06-24 ' + new Date().toTimeString().slice(0, 5), user: cli.nombre, t: 'Reclamo reportado', d: $('#sn-desc').value }], correos: [], docs: [] });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: cli.asesorId, tipo: 'sistema', icon: '🚨', fecha: Orbit.ui.today(), titulo: 'Siniestro reportado', detalle: $('#sn-tipo').value });
       close(); ficha(id);
     });
   }

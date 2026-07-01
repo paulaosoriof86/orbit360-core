@@ -51,9 +51,8 @@ Orbit.modules.cotizador = (function () {
   };
   const modelosDe = (marca, linea) => VEH_MODELOS[marca + '|' + linea] || (linea && linea !== '—' ? TRIMS_DEF : []);
   let tabCot = 'cotizar';
-  const COT_LOG_KEY = 'orbit360_cot_hist';
-  function getCotLog(){ try{ return JSON.parse(localStorage.getItem(COT_LOG_KEY)||'[]'); }catch(e){ return []; } }
-  function saveCotLog(l){ try{ localStorage.setItem(COT_LOG_KEY, JSON.stringify(l)); }catch(e){} }
+  function getCotLog(){ return Orbit.store.pref('cot_hist', []) || []; }
+  function saveCotLog(l){ Orbit.store.setPref('cot_hist', l); }
 
 
   function camposPorRamo(ramo) {
@@ -66,9 +65,15 @@ Orbit.modules.cotizador = (function () {
         : ['Liviano', 'Responsabilidad Civil', 'Pesado', 'Pick-up / Comercial', 'Motocicleta', 'Grúa'];
       return `<label class="ce-l">📅 Año<input id="cz-anio" class="o-sel" type="number" value="${st.anio}" min="1990" max="2026"></label>`
         + `<label class="ce-l">🚙 Tipo / Subramo<select id="cz-sub" class="o-sel">${subramo.map(x => `<option ${x === st.sub ? 'selected' : ''}>${x}</option>`).join('')}</select></label>`
-        + `<label class="ce-l">🚗 Marca<select id="cz-marca" class="o-sel"><option value="">— Marca —</option>${marcas.map(m => `<option ${m === st.marca ? 'selected' : ''}>${m}</option>`).join('')}</select></label>`
-        + `<label class="ce-l">🔻 Línea<select id="cz-linea" class="o-sel" ${lineas.length ? '' : 'disabled'}><option value="">${lineas.length ? '— Línea —' : 'Elige marca primero'}</option>${lineas.map(l => `<option ${l === st.linea ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`
-        + `<label class="ce-l">🏷️ Modelo / Versión<select id="cz-modelo" class="o-sel" ${modelos.length ? '' : 'disabled'}><option value="">${modelos.length ? '— Modelo —' : 'Elige línea primero'}</option>${modelos.map(m => `<option ${m === st.modelo ? 'selected' : ''}>${m}</option>`).join('')}</select></label>`
+        + (st.marcaCustom
+          ? `<label class="ce-l">🚗 Marca<input id="cz-marca-t" class="o-sel" value="${U.esc(st.marca || '')}" placeholder="Escribe la marca" autofocus></label>`
+          : `<label class="ce-l">🚗 Marca<select id="cz-marca" class="o-sel"><option value="">— Marca —</option>${marcas.map(m => `<option ${m === st.marca ? 'selected' : ''}>${m}</option>`).join('')}<option value="__otro">➕ Otro…</option></select></label>`)
+        + (st.lineaCustom
+          ? `<label class="ce-l">🔻 Línea<input id="cz-linea-t" class="o-sel" value="${U.esc(st.linea || '')}" placeholder="Escribe la línea"></label>`
+          : `<label class="ce-l">🔻 Línea<select id="cz-linea" class="o-sel" ${(lineas.length || st.marca) ? '' : 'disabled'}><option value="">${st.marca ? '— Línea —' : 'Elige marca primero'}</option>${lineas.map(l => `<option ${l === st.linea ? 'selected' : ''}>${l}</option>`).join('')}${st.marca ? '<option value="__otro">➕ Otro…</option>' : ''}</select></label>`)
+        + (st.modeloCustom
+          ? `<label class="ce-l">🏷️ Modelo / Versión<input id="cz-modelo-t" class="o-sel" value="${U.esc(st.modelo || '')}" placeholder="Escribe el modelo"></label>`
+          : `<label class="ce-l">🏷️ Modelo / Versión<select id="cz-modelo" class="o-sel" ${(modelos.length || st.linea) ? '' : 'disabled'}><option value="">${st.linea ? '— Modelo —' : 'Elige línea primero'}</option>${modelos.map(m => `<option ${m === st.modelo ? 'selected' : ''}>${m}</option>`).join('')}${st.linea ? '<option value="__otro">➕ Otro…</option>' : ''}</select></label>`)
         + `<label class="ce-l">🔢 Placa<input id="cz-placa" class="o-sel" value="${U.esc(st.placa || '')}" placeholder="P-123ABC"></label>`;
     }
     if (ramo === 'Vida') return `<label class="ce-l">🎂 Edad del asegurado<input id="cz-edad" class="o-sel" type="number" value="${st.edad||35}" min="18" max="80"></label>`
@@ -157,10 +162,13 @@ Orbit.modules.cotizador = (function () {
     const gmn = host.querySelector('#cz-gm-n'); if (gmn) gmn.addEventListener('change', () => { st.gmIntegrantes = Math.max(2, +gmn.value || 2); render(host); });
     host.querySelectorAll('.cz-gm-edad').forEach(el => el.addEventListener('change', () => { st.gmEdades = st.gmEdades || []; st.gmEdades[+el.dataset.k] = +el.value || ''; }));
     ['#cz-suma','#cz-edad','#cz-m2','#cz-hval','#cz-hcont','#cz-dsuma','#cz-benef','#cz-gm-emp','#cz-gm-ded','#cz-gm-hab','#cz-fuma','#cz-vcob','#cz-h-tipo','#cz-hzona','#cz-giro','#cz-bienes','#cz-placa'].forEach(s => { const el = host.querySelector(s); if (el) el.addEventListener('change', () => { st[s.replace('#cz-','').replace(/-/g,'')] = el.value; }); });
-    // marca → recarga líneas · línea → recarga modelos
-    const mk = host.querySelector('#cz-marca'); if (mk) mk.addEventListener('change', () => { st.marca = mk.value; st.linea = ''; st.modelo = ''; render(host); });
-    const ln = host.querySelector('#cz-linea'); if (ln) ln.addEventListener('change', () => { st.linea = ln.value; st.modelo = ''; render(host); });
-    const md = host.querySelector('#cz-modelo'); if (md) md.addEventListener('change', () => { st.modelo = md.value; });
+    // marca → recarga líneas · línea → recarga modelos · "Otro" → entrada libre inline
+    const mk = host.querySelector('#cz-marca'); if (mk) mk.addEventListener('change', () => { if (mk.value === '__otro') { st.marcaCustom = true; st.marca = ''; st.linea = ''; st.modelo = ''; } else { st.marca = mk.value; st.linea = ''; st.modelo = ''; } render(host); });
+    const mkt = host.querySelector('#cz-marca-t'); if (mkt) mkt.addEventListener('input', () => { st.marca = mkt.value; });
+    const ln = host.querySelector('#cz-linea'); if (ln) ln.addEventListener('change', () => { if (ln.value === '__otro') { st.lineaCustom = true; st.linea = ''; st.modelo = ''; } else { st.linea = ln.value; st.modelo = ''; } render(host); });
+    const lnt = host.querySelector('#cz-linea-t'); if (lnt) lnt.addEventListener('input', () => { st.linea = lnt.value; });
+    const md = host.querySelector('#cz-modelo'); if (md) md.addEventListener('change', () => { if (md.value === '__otro') { st.modeloCustom = true; st.modelo = ''; render(host); } else { st.modelo = md.value; } });
+    const mdt = host.querySelector('#cz-modelo-t'); if (mdt) mdt.addEventListener('input', () => { st.modelo = mdt.value; });
     // cliente existente → oculta nombre manual y precarga
     const cli = host.querySelector('#cz-cliid'); if (cli) cli.addEventListener('change', () => { st.clienteId = cli.value; const c = cli.value ? S().get('clientes', cli.value) : null; if (c) { st.cliente = c.nombre; if (c.asesorId) st.asesorId = c.asesorId; if (c.pais) st.pais = c.pais; } render(host); });
     host.querySelectorAll('[data-czt]').forEach(b => b.addEventListener('click', () => { tabCot = b.dataset.czt; render(host); }));

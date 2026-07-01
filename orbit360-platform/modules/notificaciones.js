@@ -18,8 +18,8 @@ Orbit.modules.notificaciones = (function () {
     { id: 'cumple', icon: '🎂', nombre: 'Felicitación de cumpleaños', txt: '¡Feliz cumpleaños {nombre}! 🎂🎉 De parte de todo el equipo, te deseamos un día maravilloso.' }
   ];
 
-  function getLog() { try { return JSON.parse(localStorage.getItem('orbit360_wa_log') || '[]'); } catch (e) { return []; } }
-  function addLog(e) { const l = getLog(); l.unshift(e); if (l.length > 80) l.pop(); try { localStorage.setItem('orbit360_wa_log', JSON.stringify(l)); } catch (x) {} }
+  function getLog() { return Orbit.store.pref('wa_log', []) || []; }
+  function addLog(e) { const l = getLog(); l.unshift(e); if (l.length > 80) l.pop(); Orbit.store.setPref('wa_log', l); }
 
   function render(h) {
     host = h;
@@ -127,8 +127,8 @@ Orbit.modules.notificaciones = (function () {
     const cli = S().get('clientes', cliEl.value);
     const msg = (msgEl.value || '').trim();
     const tplId = tplEl ? tplEl.value : '';
-    if (!msg) { alert('Escribe un mensaje primero.'); return; }
-    if (!cli) { alert('Selecciona un cliente destinatario.'); return; }
+    if (!msg) { Orbit.ui.toast('Escribe un mensaje primero.'); return; }
+    if (!cli) { Orbit.ui.toast('Selecciona un cliente destinatario.'); return; }
     addLog({ fecha: new Date().toISOString().slice(0, 10), cliente: cli.nombre, tpl: tplId || 'libre', msg, canal });
     // registrar en historial del cliente
     S().insert('actividades', { id: 'act' + Date.now(), clienteId: cli.id, asesorId: cli.asesorId, tipo: 'whatsapp', icon: '💬', fecha: new Date().toISOString().slice(0, 10), titulo: 'Mensaje de WhatsApp enviado', detalle: msg.slice(0, 80) });

@@ -90,8 +90,8 @@ Orbit.modules.cronograma = (function () {
     return `<div class="cr-list">${out}</div>`;
   }
 
-  function nuevaTarea() {
-    const f = prompt('Tarea para hoy (o escribe la fecha como AAAA-MM-DD al inicio):', '');
+  async function nuevaTarea() {
+    const f = await U.prompt('Tarea para hoy (o escribe la fecha como AAAA-MM-DD al inicio):', { title: 'Nueva tarea' });
     if (!f) return;
     let fecha = iso(new Date(U.NOW || Date.now())), txt = f;
     const m = f.match(/^(\d{4}-\d{2}-\d{2})\s+(.*)$/); if (m) { fecha = m[1]; txt = m[2]; }

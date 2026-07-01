@@ -188,3 +188,13 @@ Estado: ABIERTO para UX tenant A&S / aplicar a prototipo base.
 - Fix o mejora aplicada: se audita antes de limpiar.
 - Impacto en prototipo comercializable: critico si esta en app activa; medio/bajo si solo esta en docs/backups.
 - Estado: ABIERTO
+
+## 2026-07-01 12:30:13 - CallDepthOverflow por funcion Git
+- Modulo/area: PowerShell / Git local.
+- Sintoma/necesidad: Error en el script a causa de un desbordamiento de profundidad de llamada.
+- Esperado: ejecutar git real sin recursion ni alias ambiguos.
+- Causa raiz: PowerShell no diferencia mayusculas/minusculas; la funcion Git intercepto llamadas a git.
+- Archivo/funcion: funcion Git del bloque anterior.
+- Fix aplicado: eliminar nombre Git y usar git.exe explicito dentro de Invoke-GitExe.
+- Impacto comercializable: evita bloqueo operativo y perdida de tiempo.
+- Estado: RESUELTO.

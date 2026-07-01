@@ -195,7 +195,7 @@ Orbit.modules.ia = (function () {
 
   function getIACfg() {
     try {
-      const c = JSON.parse(localStorage.getItem('orbit360_aut_cfg') || '{}');
+      const c = Orbit.store.pref('aut_cfg', {}) || {};
       return c.ia || { proveedor: 'Gemini', modelo: 'gemini-1.5-flash', activo: false };
     } catch (e) { return { proveedor: 'Gemini', modelo: 'gemini-1.5-flash', activo: false }; }
   }

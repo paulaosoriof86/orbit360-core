@@ -498,11 +498,11 @@ Feedback con capturas. **Confirmación al usuario: TODO lo de Insights/comparati
 - Crear usuarios **comercial / administrativo / marketing / operativo / asesor / dirección** con acceso a los módulos de su rol y **selección manual de módulos visibles** por usuario (override). En Equipo y permisos: por rol, qué módulos ve.
 - La visibilidad de módulos por rol alimenta también qué bloque de aprendizaje y qué navegación ve cada quien.
 
-## R10.2 · Paleta adicional suave (estilo Orbia) + elegir tipografía
-- Añadir (NO sustituir) una **paleta suave/clara** tipo Orbia manteniendo identidad Orbit; las paletas deben cambiar **también el fondo de los títulos/banners**, no solo líneas/letras. Selector de **tipografía** (Manrope, Segoe/corporativa, etc.).
+## R10.2 · Paleta adicional suave (estilo producto CX) + elegir tipografía
+- Añadir (NO sustituir) una **paleta suave/clara** tipo producto CX manteniendo identidad Orbit; las paletas deben cambiar **también el fondo de los títulos/banners**, no solo líneas/letras. Selector de **tipografía** (Manrope, Segoe/corporativa, etc.).
 
-## R10.3 · Módulo de Automatizaciones (evaluar Orbia, adaptar a Orbit)
-- Inspirado en CXOrbia: **Automatizaciones por evento** (evento → destino → canal → plantilla → webhook propio), webhook de Make por tenant, integraciones (Outlook/Gmail/Sheets/WhatsApp Cloud vía Make), **asistente IA (Gemini)** con API key + toggle, **alertas de pendientes** (escanear y notificar) y **registro de disparos**. Adaptar eventos a seguros (gestión creada, pago vencido, póliza emitida, renovación próxima, siniestro, solicitud de cliente…).
+## R10.3 · Módulo de Automatizaciones (evaluar producto CX, adaptar a Orbit)
+- Automatizaciones por evento: **Automatizaciones por evento** (evento → destino → canal → plantilla → webhook propio), webhook de Make por tenant, integraciones (Outlook/Gmail/Sheets/WhatsApp Cloud vía Make), **asistente IA (Gemini)** con API key + toggle, **alertas de pendientes** (escanear y notificar) y **registro de disparos**. Adaptar eventos a seguros (gestión creada, pago vencido, póliza emitida, renovación próxima, siniestro, solicitud de cliente…).
 
 ## R10.4 · Confidencialidad (doble vía) en primer ingreso
 - **Portal del cliente**: al abrir por primera vez, cláusula de confidencialidad **mutua** (nosotros↔cliente) a aceptar y almacenar.

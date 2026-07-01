@@ -413,3 +413,23 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: auditoria profunda sin borrar ni tocar backend.
 - Impacto en prototipo comercializable: evita mezclar Orbit con Orbia/CXOrbia y evita acusar al ZIP sin evidencia.
 - Estado: EN PROGRESO
+
+## 2026-07-01 12:30:13 - Recuperacion V99 con git.exe directo
+- Modulo/area: infraestructura, prototipo visual, Backend LAB.
+- Necesidad: recuperar V99 limpio y preservar avances Backend LAB.
+- Esperado: preview visual en 5178, Backend LAB preservado en 5177, data/store.js no sobrescrito si contiene Firestore/LAB.
+- Causa raiz si aplica: el bloque anterior uso una funcion Git que provoco CallDepthOverflow por colision con git en PowerShell.
+- Archivo/funcion: script de recuperacion local.
+- Fix aplicado: reemplazo por Invoke-GitExe usando git.exe directo, validacion de ZIP completo, backup, preservacion, auditoria, node --check.
+- Impacto comercializable: protege continuidad del backend y evita nuevos reprocesos.
+- Estado: RESUELTO si auditoria final queda OK.
+ 
+## 2026-07-01 - Instalacion de ultimo ZIP limpio Claude para continuar backend 
+ 
+**Modulo:** Infraestructura / Prototipo base / Backend LAB. 
+ 
+**Necesidad:** Continuar backend sobre la version mas reciente y limpia generada por Claude, no sobre una restauracion anterior. 
+ 
+**Fix aplicado:** Instalacion local del ZIP limpio exacto, preservando backend LAB y documentacion clave. 
+ 
+**Estado:** RESUELTO LOCALMENTE - PENDIENTE VALIDACION VISUAL Y BACKEND. 
