@@ -177,3 +177,14 @@ Estado: ABIERTO para UX tenant A&S / aplicar a prototipo base.
 - Fix o mejora aplicada: se documenta pendiente post V98 para Claude y se evita atribuir esto al backend.
 - Impacto en prototipo comercializable: no aprobar como version funcional completa para migraciones futuras.
 - Estado: ABIERTO
+
+## 2026-07-01 04:14:57 - Posible contaminacion cruzada Orbit / Orbia / CXOrbia
+
+- Modulo: Repositorio local / preview / documentacion.
+- Sintoma/necesidad: la usuaria reporta aparicion de Orbia al revisar Orbit normal.
+- Esperado: Orbit 360 debe mantenerse independiente, sin branding, modulos ni textos de Orbia/CXOrbia.
+- Causa raiz: pendiente segun auditoria; puede ser app activa, docs, cache, localStorage, tools, zip o backups.
+- Archivo/funcion: ver docs/AUDITORIA-CONTAMINACION-ORBIT-ORBIA-CXORBIA-20260701.md.
+- Fix o mejora aplicada: se audita antes de limpiar.
+- Impacto en prototipo comercializable: critico si esta en app activa; medio/bajo si solo esta en docs/backups.
+- Estado: ABIERTO

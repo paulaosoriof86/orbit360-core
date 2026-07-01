@@ -402,3 +402,14 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: integracion segura, preservacion backend, auditoria y actualizacion de pendientes post V98.
 - Impacto en prototipo comercializable: se evidencia que el paquete no debe considerarse cierre funcional completo.
 - Estado: EN PROGRESO
+
+## 2026-07-01 04:14:57 - Auditoria profunda contaminacion Orbit / Orbia / CXOrbia
+
+- Modulo: Auditoria / metodologia / separacion de productos.
+- Necesidad: evidenciar si la aparicion de Orbia proviene del prototipo, repo local, cache, herramientas o documentacion.
+- Esperado: distinguir app activa, docs, tools, backups/tmp y ZIP.
+- Causa raiz si aplica: pendiente segun hallazgos del reporte.
+- Archivo/funcion: docs/AUDITORIA-CONTAMINACION-ORBIT-ORBIA-CXORBIA-20260701.md.
+- Fix o mejora aplicada: auditoria profunda sin borrar ni tocar backend.
+- Impacto en prototipo comercializable: evita mezclar Orbit con Orbia/CXOrbia y evita acusar al ZIP sin evidencia.
+- Estado: EN PROGRESO
