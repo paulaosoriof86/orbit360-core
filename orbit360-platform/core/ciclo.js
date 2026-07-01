@@ -330,9 +330,9 @@ Orbit.ciclo = (function () {
     // stepper jump
     back.querySelectorAll('.cstep').forEach(b => b.addEventListener('click', () => { setEtapa(id, b.dataset.etapa); refresh(); openNegocio(id); }));
     // stage actions
-    back.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {
+    back.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', async () => {
       const a = b.dataset.act;
-      if (a === 'perder') { const m = prompt('Motivo de pérdida (opcional):', ''); if (m === null) return; perder(id, m); }
+      if (a === 'perder') { const m = await Orbit.ui.prompt('Motivo de pérdida (opcional):', { title: 'Marcar como perdido', ok: 'Marcar perdido' }); if (m === null) return; perder(id, m); }
       else if (a === 'archivar') { archivar(id); back.remove(); refresh(); return; }
       else if (a === 'insp') decidirCierre(id, 'inspeccion');
       else if (a === 'emis') decidirCierre(id, 'emision');
@@ -637,10 +637,10 @@ Orbit.ciclo = (function () {
       back.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { const a = Orbit.cat.get(boardKey).slice(); const i = +b.dataset.up; [a[i - 1], a[i]] = [a[i], a[i - 1]]; save(a); }));
       back.querySelectorAll('[data-down]').forEach(b => b.addEventListener('click', () => { const a = Orbit.cat.get(boardKey).slice(); const i = +b.dataset.down; [a[i + 1], a[i]] = [a[i], a[i + 1]]; save(a); }));
       back.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { const a = Orbit.cat.get(boardKey).slice(); if (a[+b.dataset.del].fixed) return; a.splice(+b.dataset.del, 1); save(a); }));
-      back.querySelector('#lm-add').addEventListener('click', () => {
+      back.querySelector('#lm-add').addEventListener('click', async () => {
         const a = Orbit.cat.get(boardKey).slice();
         const palette = ['#1f3a5f', '#c9821b', '#0f766e', '#6b4ea0', '#2563a8', '#b91c1c', '#15803d', '#7c3aed'];
-        const nombre = (prompt('Nombre de la nueva lista:') || '').trim(); if (!nombre) return;
+        const nombre = ((await Orbit.ui.prompt('Nombre de la nueva lista:', { title: 'Nueva lista' })) || '').trim(); if (!nombre) return;
         const base = { id: boardKey.slice(0, 2) + Date.now().toString().slice(-5), nombre, emoji: '🗂', color: palette[a.length % palette.length] };
         a.push(boardKey === 'opsListas' ? Object.assign(base, { kind: 'gestion' }) : Object.assign(base, { custom: true }));
         save(a);
@@ -696,13 +696,18 @@ if (!window.__orbitOtroSel) {
     var s = e.target;
     if (!s || !s.classList) return;
     if ((s.classList.contains('cat-sel') || s.classList.contains('free-sel')) && s.value === '__otro__') {
-      var v = (prompt('Escribe el nuevo valor:') || '').trim();
-      if (v) {
-        if (s.classList.contains('cat-sel') && s.dataset.cat) Orbit.cat.add(s.dataset.cat, v);
-        var opt = document.createElement('option'); opt.textContent = v; opt.selected = true;
-        s.insertBefore(opt, s.querySelector('option[value="__otro__"]'));
-        s.value = v;
-      } else { s.selectedIndex = 0; }
+      Orbit.ui.prompt('Escribe el nuevo valor:', { title: 'Nuevo valor' }).then(function (raw) {
+        var v = (raw || '').trim();
+        if (v) {
+          if (s.classList.contains('cat-sel') && s.dataset.cat) Orbit.cat.add(s.dataset.cat, v);
+          var opt = document.createElement('option'); opt.textContent = v; opt.selected = true;
+          s.insertBefore(opt, s.querySelector('option[value="__otro__"]'));
+          s.value = v;
+        } else { s.selectedIndex = 0; }
+      });
+      return;
+    }
+    if (false) {
     }
   });
 }

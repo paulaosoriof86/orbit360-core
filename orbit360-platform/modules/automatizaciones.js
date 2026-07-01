@@ -11,10 +11,10 @@ Orbit.modules.automatizaciones = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   const KEY_AUT = 'orbit360_aut_cfg';
   let cfg = {};
-  try { cfg = JSON.parse(localStorage.getItem(KEY_AUT) || '{}'); } catch(e) {}
-  function saveCfg() { try { localStorage.setItem(KEY_AUT, JSON.stringify(cfg)); } catch(e) {} }
-  const LOG = JSON.parse(localStorage.getItem('orbit360_aut_log') || '[]');
-  function addLog(ev, canal, msg) { LOG.unshift({ ts: new Date().toISOString().slice(0,16).replace('T',' '), ev, canal, msg }); if (LOG.length > 50) LOG.pop(); try { localStorage.setItem('orbit360_aut_log', JSON.stringify(LOG)); } catch(e) {} }
+  cfg = Orbit.store.pref('aut_cfg', {}) || {};
+  function saveCfg() { Orbit.store.setPref('aut_cfg', cfg); }
+  const LOG = Orbit.store.pref('aut_log', []) || [];
+  function addLog(ev, canal, msg) { LOG.unshift({ ts: new Date().toISOString().slice(0,16).replace('T',' '), ev, canal, msg }); if (LOG.length > 50) LOG.pop(); Orbit.store.setPref('aut_log', LOG); }
 
   const CANALES = ['WhatsApp (Make)', 'Correo (Outlook)', 'Notificación in-app', 'Google Sheets (Make)'];
   const EVENTOS = [
@@ -175,7 +175,7 @@ Orbit.modules.automatizaciones = (function () {
     h.querySelector('#aut-wh-save').addEventListener('click', () => { cfg.webhook = h.querySelector('#aut-wh').value.trim(); saveCfg(); toast('✓ Webhook guardado'); });
     h.querySelector('#aut-wh-test').addEventListener('click', () => {
       const wh = getWH();
-      if (!wh) { alert('Pega primero la URL del webhook de Make.'); return; }
+      if (!wh) { Orbit.ui.toast('Pega primero la URL del webhook de Make.'); return; }
       addLog('prueba_disparo', 'Make', 'Test de conexión desde Orbit 360');
       toast('🔄 Disparo de prueba enviado a Make. Verifica en tu escenario.');
       render(h);
@@ -185,7 +185,7 @@ Orbit.modules.automatizaciones = (function () {
     h.querySelectorAll('.aut-canal').forEach(s => s.addEventListener('change', () => setEvCfg(s.dataset.ev, 'canal', s.value)));
     h.querySelectorAll('.aut-tpl').forEach(i => i.addEventListener('change', () => setEvCfg(i.dataset.ev, 'tpl', i.value)));
     h.querySelectorAll('.aut-hook').forEach(i => i.addEventListener('change', () => setEvCfg(i.dataset.ev, 'hook', i.value)));
-    h.querySelectorAll('.aut-del').forEach(b => b.addEventListener('click', () => { if (confirm('¿Eliminar esta automatización personalizada?')) { removeCustom(b.dataset.ev); render(h); } }));
+    h.querySelectorAll('.aut-del').forEach(b => b.addEventListener('click', async () => { if (!(await U.confirm('¿Eliminar esta automatización personalizada?', { title: 'Eliminar automatización', ok: 'Eliminar' }))) return; removeCustom(b.dataset.ev); render(h); }));
     const nb = h.querySelector('#aut-new'); if (nb) nb.addEventListener('click', () => nuevaAuto(h));
     // IA — selector de tarjetas
     function refreshModelos() {
@@ -235,7 +235,7 @@ Orbit.modules.automatizaciones = (function () {
       if (a.gestAbiertas) msgs.push('🗂 ' + a.gestAbiertas + ' gestiones abiertas — notificado al equipo');
       if (a.leadsAtr) msgs.push('🎯 ' + a.leadsAtr + ' leads atrasados — recordatorio al asesor');
       msgs.forEach(m => addLog('escaneo_manual', getEvCfg('cobro_vence').canal || 'WhatsApp (Make)', m));
-      alert('🔍 Escaneo completado:\n\n' + (msgs.length ? msgs.join('\n') : '✅ Todo al día — sin pendientes urgentes.'));
+      Orbit.ui.toast('🔍 Escaneo completado:\n\n' + (msgs.length ? msgs.join('\n') : '✅ Todo al día — sin pendientes urgentes.'));
       render(h);
     });
   }

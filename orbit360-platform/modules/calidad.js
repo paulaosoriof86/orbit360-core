@@ -112,7 +112,7 @@ Orbit.modules.calidad = (function () {
   function campana() {
     const all = S().all('clientes').map(c => ({ c, f: faltantes(c) })).filter(x => x.f.length && tieneVigente(x.c.id));
     const wa = all.filter(x => x.c.telefono).length, mail = all.filter(x => !x.c.telefono && x.c.email).length;
-    alert('Campaña de actualización (demo):\n\n• ' + wa + ' por WhatsApp (tienen teléfono)\n• ' + mail + ' por correo (sin WhatsApp, con email)\n• ' + (all.length - wa - mail) + ' sin canal — requieren gestión manual.\n\nUsa la plantilla "Actualización de datos" con los campos pendientes de cada cliente.');
+    Orbit.ui.toast('Campaña de actualización (demo):\n\n• ' + wa + ' por WhatsApp (tienen teléfono)\n• ' + mail + ' por correo (sin WhatsApp, con email)\n• ' + (all.length - wa - mail) + ' sin canal — requieren gestión manual.\n\nUsa la plantilla "Actualización de datos" con los campos pendientes de cada cliente.');
   }
   return { render, campana, editarInline };
 })();

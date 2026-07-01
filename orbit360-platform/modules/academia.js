@@ -106,7 +106,7 @@ Orbit.modules.academia = (function () {
     host.querySelectorAll('.tab[data-f]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.f; render(host); }));
     host.querySelectorAll('[data-cur]').forEach(el => el.addEventListener('click', (e) => { if (e.target.closest('.ac-act')) return; abrir(el.dataset.cur); }));
     host.querySelectorAll('[data-edit]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); editar(el.dataset.edit); }));
-    host.querySelectorAll('[data-del]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); const c = S().get('cursos', el.dataset.del); if (c && confirm('¿Eliminar el curso "' + c.titulo + '"? Esta acción no se puede deshacer.')) { S().remove('cursos', el.dataset.del); render(host); } }));
+    host.querySelectorAll('[data-del]').forEach(el => el.addEventListener('click', async (e) => { e.stopPropagation(); const c = S().get('cursos', el.dataset.del); if (c && (await Orbit.ui.confirm('¿Eliminar el curso "' + c.titulo + '"? Esta acción no se puede deshacer.', { title: 'Eliminar curso', ok: 'Eliminar' }))) { S().remove('cursos', el.dataset.del); render(host); } }));
     host.querySelectorAll('[data-kpi]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.kpi || 'todas'; render(host); }));
     const impBtn = host.querySelector('#ac-imp'); if (impBtn) impBtn.addEventListener('click', () => Orbit.importa.open('documentos', { onDone: () => render(host) }));
     const newBtn = host.querySelector('#ac-new'); if (newBtn) newBtn.addEventListener('click', () => editar(null));
@@ -254,7 +254,7 @@ Orbit.modules.academia = (function () {
       const pv = back.querySelector('#acv-prev'); if (pv) pv.onclick = () => { if (idx > 0) { idx--; paint(); } };
       const nx = back.querySelector('#acv-next'); if (nx) nx.onclick = () => {
         const total2 = lecs.length, reached = idx + 1, prog = Math.round(reached / total2 * 100);
-        if (prog > (c.progreso || 0)) { c.progreso = prog; S().update('cursos', id, { progreso: prog, certificado: prog >= 100 ? true : c.certificado }); if (prog >= 100) S().insert('actividades', { id: 'act' + Date.now(), clienteId: '', asesorId: 'ase001', tipo: 'sistema', icon: '🏅', fecha: '2026-06-24', titulo: 'Curso completado: ' + c.titulo, detalle: 'Certificación obtenida.' }); }
+        if (prog > (c.progreso || 0)) { c.progreso = prog; S().update('cursos', id, { progreso: prog, certificado: prog >= 100 ? true : c.certificado }); if (prog >= 100) S().insert('actividades', { id: 'act' + Date.now(), clienteId: '', asesorId: 'ase001', tipo: 'sistema', icon: '🏅', fecha: Orbit.ui.today(), titulo: 'Curso completado: ' + c.titulo, detalle: 'Certificación obtenida.' }); }
         if (idx < total2 - 1) { idx++; paint(); } else { close(); }
       };
     }
@@ -288,8 +288,8 @@ Orbit.modules.academia = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#le-x').addEventListener('click', close); $('#le-cancel').addEventListener('click', close);
-    $('#le-del').addEventListener('click', () => {
-      if (!confirm('¿Borrar esta lección?')) return;
+    $('#le-del').addEventListener('click', async () => {
+      if (!(await Orbit.ui.confirm('¿Borrar esta lección?', { title: 'Eliminar lección', ok: 'Eliminar' }))) return;
       const lecciones = (S().get('cursos', cursoId).lecciones || []).slice(); lecciones.splice(i, 1);
       S().update('cursos', cursoId, { lecciones }); close(); if (cb) cb();
     });
@@ -309,7 +309,7 @@ Orbit.modules.academia = (function () {
       const qadd = $('#le-qadd'); if (qadd) qadd.addEventListener('click', () => { const ta = $('#le-quiz'); ta.value = (ta.value ? ta.value + '\n\n' : '') + '¿Nueva pregunta?\n[x] Opción correcta\n[ ] Opción incorrecta'; });
       const qn = () => Math.max(1, Math.min(20, +($('#le-qn') || {}).value || 3));
       const qia = $('#le-qia'); if (qia) qia.addEventListener('click', async () => { qia.textContent = '🧠…'; const ta = $('#le-quiz'); ta.value = await iaQuizAsync($('#le-t').value, ta.value, qn(), false); qia.textContent = '✨ Generar (N)'; });
-      const qre = $('#le-qre'); if (qre) qre.addEventListener('click', async () => { if (!confirm('¿Replantear TODAS las preguntas con IA? Se reemplazan las actuales.')) return; qre.textContent = '🧠…'; const ta = $('#le-quiz'); ta.value = await iaQuizAsync($('#le-t').value, '', qn(), true); qre.textContent = '🔄 Replantear todas'; });
+      const qre = $('#le-qre'); if (qre) qre.addEventListener('click', async () => { if (!(await Orbit.ui.confirm('¿Replantear TODAS las preguntas con IA? Se reemplazan las actuales.', { title: 'Replantear quiz', ok: 'Replantear', danger: false }))) return; qre.textContent = '🧠…'; const ta = $('#le-quiz'); ta.value = await iaQuizAsync($('#le-t').value, '', qn(), true); qre.textContent = '🔄 Replantear todas'; });
       const qre1 = $('#le-qre1'); if (qre1) qre1.addEventListener('click', async () => { qre1.textContent = '🧠…'; const ta = $('#le-quiz'); const blocks = (ta.value || '').split(/\n\s*\n/).filter(b => b.trim()); const nueva = (await iaQuizAsync($('#le-t').value, ta.value, 1, false)).split(/\n\s*\n/).pop(); if (blocks.length) blocks[blocks.length - 1] = nueva; else blocks.push(nueva); ta.value = blocks.join('\n\n'); qre1.textContent = '🔄 Replantear la última'; });
       // listeners archivo
       const vfile = $('#le-vfile'); if (vfile) vfile.addEventListener('change', e => fileToDataURL(e.target.files[0], u => { $('#le-url').value = u; }));
@@ -375,7 +375,7 @@ Orbit.modules.academia = (function () {
       const tot = (c.lecciones || []).length; const next = Math.min(tot, done + 1);
       const prog = Math.round(next / tot * 100);
       S().update('cursos', id, { progreso: prog, certificado: prog >= 100 ? true : c.certificado });
-      if (prog >= 100) S().insert('actividades', { id: 'act' + Date.now(), clienteId: '', asesorId: 'ase001', tipo: 'sistema', icon: '🏅', fecha: '2026-06-24', titulo: 'Curso completado: ' + c.titulo, detalle: 'Certificación obtenida.' });
+      if (prog >= 100) S().insert('actividades', { id: 'act' + Date.now(), clienteId: '', asesorId: 'ase001', tipo: 'sistema', icon: '🏅', fecha: Orbit.ui.today(), titulo: 'Curso completado: ' + c.titulo, detalle: 'Certificación obtenida.' });
       abrir(id);
     }
     const cont = back.querySelector('#ac-cont'); if (cont) cont.addEventListener('click', avanzar);
@@ -408,7 +408,7 @@ Orbit.modules.academia = (function () {
       ${visor}
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
         <button class="btn ghost" id="ar-close">Cerrar</button>
-        <button class="btn primary" onclick="alert('Descarga disponible al conectar el almacenamiento (Drive o servidor).')">⬇ Descargar</button>
+        <button class="btn primary" onclick="Orbit.ui.toast('Descarga disponible al conectar el almacenamiento (Drive o servidor).')">⬇ Descargar</button>
       </div></div>`;
     document.body.appendChild(back);
     const close = () => back.remove();
@@ -448,8 +448,8 @@ Orbit.modules.academia = (function () {
         const v = $('#acc-nv').value.trim(); if (!v) return;
         Orbit.cat.add('academiaCats', v); paint();
       });
-      back.querySelectorAll('[data-ren]').forEach(b => b.addEventListener('click', () => {
-        const old = b.dataset.ren; const nv = prompt('Nuevo nombre de la categoría:', old);
+      back.querySelectorAll('[data-ren]').forEach(b => b.addEventListener('click', async () => {
+        const old = b.dataset.ren; const nv = await Orbit.ui.prompt('Nuevo nombre de la categoría:', { title: 'Renombrar categoría', value: old });
         if (!nv || nv === old) return;
         // renombrar en la lista guardada
         const g = Orbit.cat.get('academiaCats').map(x => x === old ? nv : x);
@@ -458,10 +458,10 @@ Orbit.modules.academia = (function () {
         cursos().filter(c => c.cat === old).forEach(c => S().update('cursos', c.id, { cat: nv }));
         paint();
       }));
-      back.querySelectorAll('[data-elc]').forEach(b => b.addEventListener('click', () => {
+      back.querySelectorAll('[data-elc]').forEach(b => b.addEventListener('click', async () => {
         const c = b.dataset.elc; const n = cursos().filter(x => x.cat === c).length;
-        if (n > 0) { alert('No se puede eliminar: hay ' + n + ' curso(s) en esta categoría. Reasígnalos primero.'); return; }
-        if (!confirm('¿Eliminar la categoría "' + c + '"?')) return;
+        if (n > 0) { Orbit.ui.toast('No se puede eliminar: hay ' + n + ' curso(s) en esta categoría. Reasígnalos primero.'); return; }
+        if (!(await Orbit.ui.confirm('¿Eliminar la categoría "' + c + '"?', { title: 'Eliminar categoría', ok: 'Eliminar' }))) return;
         Orbit.cat.setList('academiaCats', Orbit.cat.get('academiaCats').filter(x => x !== c));
         paint();
       }));
@@ -493,7 +493,7 @@ Orbit.modules.academia = (function () {
     back.querySelector('#ai-x').addEventListener('click', close); back.querySelector('#ai-cancel').addEventListener('click', close);
     let docsTexto = '';
     const catSel = back.querySelector('#ai-cat');
-    catSel.addEventListener('change', () => { if (catSel.value === '__nueva') { const nv = prompt('Nombre de la nueva categoría:', ''); if (nv) { const o = document.createElement('option'); o.textContent = nv; o.selected = true; catSel.insertBefore(o, catSel.lastChild); } else catSel.selectedIndex = 0; } });
+    catSel.addEventListener('change', async () => { if (catSel.value === '__nueva') { const nv = await Orbit.ui.prompt('Nombre de la nueva categoría:', { title: 'Nueva categoría' }); if (nv) { const o = document.createElement('option'); o.textContent = nv; o.selected = true; catSel.insertBefore(o, catSel.lastChild); } else catSel.selectedIndex = 0; } });
     const docsInput = back.querySelector('#ai-docs');
     if (docsInput) docsInput.addEventListener('change', e => { const files = [...e.target.files]; back.querySelector('#ai-docs-name').textContent = files.length + ' documento(s)'; docsTexto = ''; files.forEach(f => fileToText(f, txt => { if (txt) docsTexto += '\n### ' + f.name + '\n' + txt; })); });
     back.querySelector('#ai-ok').addEventListener('click', async () => {
@@ -582,9 +582,9 @@ Orbit.modules.academia = (function () {
     back.querySelectorAll('[data-color]').forEach(b => b.addEventListener('click', () => { color = b.dataset.color; back.querySelectorAll('[data-color]').forEach(x => x.classList.toggle('on', x === b)); }));
     $('#ae-addlec').addEventListener('click', () => { snapLecs(); lecs.push({ t: '', tipo: 'video', min: 10, url: '' }); paint(); });
     $('#ae-addrec').addEventListener('click', () => { snapRecs(); recs.push({ nombre: '', tipo: 'pdf' }); paint(); });
-    if ($('#ae-del')) $('#ae-del').addEventListener('click', () => { if (confirm('¿Borrar curso?')) { S().remove('cursos', id); close(); render(host); } });
+    if ($('#ae-del')) $('#ae-del').addEventListener('click', async () => { if (await Orbit.ui.confirm('¿Borrar curso?', { title: 'Eliminar curso', ok: 'Eliminar' })) { S().remove('cursos', id); close(); render(host); } });
     const catSel = $('#ae-cat');
-    if (catSel) catSel.addEventListener('change', () => { if (catSel.value === '__nueva') { const nv = prompt('Nombre de la nueva categoría:', ''); if (nv) { const o = document.createElement('option'); o.textContent = nv; o.selected = true; catSel.insertBefore(o, catSel.lastChild); } else catSel.selectedIndex = 0; } });
+    if (catSel) catSel.addEventListener('change', async () => { if (catSel.value === '__nueva') { const nv = await Orbit.ui.prompt('Nombre de la nueva categoría:', { title: 'Nueva categoría' }); if (nv) { const o = document.createElement('option'); o.textContent = nv; o.selected = true; catSel.insertBefore(o, catSel.lastChild); } else catSel.selectedIndex = 0; } });
     $('#ae-ok').addEventListener('click', () => {
       snapLecs(); snapRecs();
       const data = { titulo: $('#ae-titulo').value || 'Nuevo curso', cat: $('#ae-cat').value, emoji, color, desc: $('#ae-desc').value, destinatarios: ($('#ae-dest') || {}).value || 'equipo', lecciones: lecs.filter(l => l.t), recursos: recs.filter(r => r.nombre) };

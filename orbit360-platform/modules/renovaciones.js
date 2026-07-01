@@ -103,7 +103,7 @@ Orbit.modules.renovaciones = (function () {
       sel.forEach(p => {
         const cli = S().get('clientes', p.clienteId);
         const msg = Orbit.ia ? Orbit.ia.redactar('renovacion', { nombre: cli ? cli.nombre.split(' ')[0] : '', poliza: p.numero, ramo: p.ramo, vence: U.fmtDate(p.vigenciaFin) }) : 'Renovación próxima';
-        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: p.clienteId, asesorId: p.asesorId, tipo: 'sistema', icon: '📤', fecha: '2026-06-24', titulo: 'Campaña de renovación enviada', detalle: 'WhatsApp + correo · ' + p.numero });
+        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: p.clienteId, asesorId: p.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Campaña de renovación enviada', detalle: 'WhatsApp + correo · ' + p.numero });
         if (Orbit.correo && cli) Orbit.correo.enviar({ para: cli.email || '', asunto: 'Renovación de tu póliza ' + p.numero, cuerpo: msg, clienteId: p.clienteId, vinculo: { tipo: 'poliza', id: p.id, label: p.numero } });
       });
       close();

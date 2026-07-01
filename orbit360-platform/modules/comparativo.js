@@ -294,9 +294,9 @@ Orbit.modules.comparativo = (function () {
       <p style="font-size:13.5px;margin:0;line-height:1.6">${texto}</p>
     </div>`;
   }
-  function manual() {
-    const nombre = prompt('Nombre de la aseguradora / propuesta:', ''); if (!nombre) return;
-    const total = +prompt('Prima total:', '0') || 0;
+  async function manual() {
+    const nombre = await Orbit.ui.prompt('Nombre de la aseguradora / propuesta:', { title: 'Propuesta manual' }); if (!nombre) return;
+    const total = +(await Orbit.ui.prompt('Prima total:', { title: 'Prima total', value: '0' })) || 0;
     props.push({ nombre, color: '#6b7280', total, neta: total / 1.12, iva: total - total / 1.12, cur: (props[0] || {}).cur || 'GTQ', fracc: (props[0] || {}).fracc || 1, ramo: meta.ramo, sumaAsegurada: 0, deducible: '', cob: {}, origen: 'manual' }); render(host);
   }
   function cargarPDF() {
@@ -336,7 +336,7 @@ Orbit.modules.comparativo = (function () {
   function guardarHist() {
     if (!props.length) return;
     const h = Orbit._compHist = Orbit._compHist || [];
-    h.unshift({ id: 'cmp' + Date.now(), fecha: '2026-06-24', ramo: meta.ramo, cliente: meta.cliente || 'Prospecto', n: props.length, mejor: (ranking()[0] || {}).p ? ranking()[0].p.nombre : props[0].nombre, criterio: meta.criterio, props: JSON.parse(JSON.stringify(props)), meta: JSON.parse(JSON.stringify(meta)) });
+    h.unshift({ id: 'cmp' + Date.now(), fecha: Orbit.ui.today(), ramo: meta.ramo, cliente: meta.cliente || 'Prospecto', n: props.length, mejor: (ranking()[0] || {}).p ? ranking()[0].p.nombre : props[0].nombre, criterio: meta.criterio, props: JSON.parse(JSON.stringify(props)), meta: JSON.parse(JSON.stringify(meta)) });
     const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Comparativo guardado en el historial'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
     render(host);
   }

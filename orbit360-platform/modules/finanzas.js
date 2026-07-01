@@ -140,13 +140,13 @@ Orbit.modules.finanzas = (function () {
     });
   }
   /* ---- crear el mes siguiente (copia categorías de presupuesto fijo, sin importes ejecutados) ---- */
-  function crearMes() {
+  async function crearMes() {
     const [y, mm] = mesSel.split('-').map(Number);
     const d = new Date(y, mm, 1); // mm es 1-based → siguiente mes
     const nuevo = d.toISOString().slice(0, 7);
     const existe = S().all('finmovs').some(x => x.periodo === nuevo);
     if (existe) { mesSel = nuevo; render(document.getElementById('host')); return; }
-    if (!confirm('¿Crear el mes ' + MESES[d.getMonth()] + ' ' + d.getFullYear() + '? Se generan las partidas de presupuesto fijo como egresos presupuestados.')) return;
+    if (!(await Orbit.ui.confirm('¿Crear el mes ' + MESES[d.getMonth()] + ' ' + d.getFullYear() + '? Se generan las partidas de presupuesto fijo como egresos presupuestados.', { title: 'Crear mes', ok: 'Crear mes', danger: false }))) return;
     const pais = paisFin() || 'GT', cur = pais === 'CO' ? 'COP' : 'GTQ';
     S().all('presupuesto').filter(p => p.pais === pais).forEach(p => {
       S().insert('finmovs', { id: 'fmv' + Date.now().toString().slice(-7) + Math.floor(Math.random() * 99), tipo: 'egreso', clase: p.clase, categoria: p.categoria, concepto: p.categoria, beneficiario: p.categoria, valor: p.monto, dia: 1, estado: 'presupuestado', periodo: nuevo, pais, moneda: cur, pendiente: p.monto, obs: '' });
@@ -313,7 +313,7 @@ Orbit.modules.finanzas = (function () {
       <b style="font-family:var(--f-display);font-size:15px;flex:1">Movimientos</b>
       <button class="btn ghost sm" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar histórico</button>
       <button class="btn ghost sm" onclick="Orbit.importa.open('estados-banco')">🏦 Estado bancario</button>
-      <button class="btn primary sm" onclick="alert('Demo: genera el cierre de movimientos del mes a partir de recaudo, liquidaciones y egresos.')">Generar mes</button>
+      <button class="btn primary sm" onclick="Orbit.modules.finanzas.crearMes()">Generar mes</button>
     </div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Fecha</th><th>Concepto</th><th class="num">Monto</th><th>Tipo</th><th>Estado</th></tr></thead>
@@ -440,16 +440,19 @@ Orbit.modules.finanzas = (function () {
   function metas() {
     const prod = produccionNeta();
     const board = q.leaderboard();
+    const p = paisFin() || 'GT', cur = p === 'CO' ? 'COP' : 'GTQ';
+    const mesKey = mesSel;
+    const metaEmp = (S().all('metas') || []).find(m => m.mes === mesKey && m.tipo === 'prima' && !m.asesorId);
+    const metaVal = metaEmp && metaEmp.valor ? +metaEmp.valor : 820000;
     return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas sobre <b>prima NETA</b> (no total). Por <b>asesor</b>, <b>empresa</b> y <b>aseguradora</b>, mensual o anual (para incentivos). De aquí derivan metas de recaudo y financieras.</div>
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn primary sm" onclick="alert('Demo: crear meta mensual/anual por asesor, empresa o aseguradora.')">+ Crear meta</button>
-      <select class="o-sel"><option>Mensual · Junio 2026</option><option>Anual · 2026</option></select>
-      <select class="o-sel"><option>Por asesor</option><option>Empresa</option><option>Por aseguradora</option></select>
+      <button class="btn primary sm" onclick="Orbit.modules.finanzas.crearMeta()">+ Crear meta</button>
+      <span class="badge ${metaEmp ? 'ok' : 'neutral'}" style="align-self:center">${metaEmp ? '✅ meta cargada para ' + mesKey : 'meta base (sin definir para ' + mesKey + ')'}</span>
     </div>
     <div class="card pad" style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">Meta de la empresa (prima neta)</b><span class="mono" style="font-size:13px">${U.moneyShort(prod.neta, 'GTQ')} / ${U.moneyShort(820000, 'GTQ')}</span></div>
-      <div class="bar" style="margin-top:10px;height:12px"><i style="width:${Math.min(100, Math.round(prod.neta / 820000 * 100))}%"></i></div>
-      <div class="muted" style="font-size:12px;margin-top:7px">Meta de recaudo derivada (78%): <b>${U.moneyShort(820000 * .78, 'GTQ')}</b> · ajuste por no devengado aplicado: −${U.moneyShort(prod.ajuste, 'GTQ')}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">Meta de la empresa (prima neta)</b><span class="mono" style="font-size:13px">${U.moneyShort(prod.neta, cur)} / ${U.moneyShort(metaVal, cur)}</span></div>
+      <div class="bar" style="margin-top:10px;height:12px"><i style="width:${Math.min(100, Math.round(prod.neta / metaVal * 100))}%"></i></div>
+      <div class="muted" style="font-size:12px;margin-top:7px">Meta de recaudo derivada (78%): <b>${U.moneyShort(metaVal * .78, cur)}</b> · ajuste por no devengado aplicado: −${U.moneyShort(prod.ajuste, cur)}</div>
     </div>
     <div class="card" style="overflow:hidden"><table class="tbl">
       <thead><tr><th>Asesor</th><th class="num">Meta neta</th><th class="num">Real neto</th><th>Avance</th><th class="num">Incentivo</th></tr></thead>
@@ -462,6 +465,40 @@ Orbit.modules.finanzas = (function () {
           <td class="num">${pct >= 100 ? '<span class="badge ok">🏆 Logrado</span>' : '<span class="muted">—</span>'}</td></tr>`;
       }).join('')}</tbody>
     </table></div>`;
+  }
+
+  function crearMeta() {
+    const p = paisFin() || 'GT', cur = p === 'CO' ? 'COP' : 'GTQ';
+    const asesores = S().all('asesores');
+    let back = document.getElementById('fin-meta'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-meta'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = `<div class="card" style="width:min(480px,94vw);padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🎯 Crear / editar meta</b><button class="imp-x" id="mt-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">
+        <div class="cgrid">
+          <label class="ce-l">Mes<input id="mt-mes" class="o-sel" type="month" value="${mesSel}"></label>
+          <label class="ce-l">Tipo<select id="mt-tipo" class="o-sel"><option value="prima">Prima neta (empresa)</option><option value="recaudo">Recaudo</option><option value="nueva">Producción nueva</option><option value="renovada">Producción renovada</option></select></label>
+        </div>
+        <label class="ce-l">Ámbito<select id="mt-ambito" class="o-sel"><option value="">Empresa (global)</option>${asesores.map(a => `<option value="${a.id}">Asesor · ${U.esc(a.nombre)}</option>`).join('')}</select></label>
+        <label class="ce-l">Valor meta (${cur})<input id="mt-val" class="o-sel" type="number" value="820000"></label>
+        <div class="cfg-note">Se guarda en la colección editable <b>metas</b> — alimenta Insights → Metas y el avance de la empresa. Un registro por mes+tipo+ámbito (upsert).</div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="mt-cancel">Cancelar</button><button class="btn primary" id="mt-ok">Guardar meta</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const $ = s => back.querySelector(s); const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#mt-x').addEventListener('click', close); $('#mt-cancel').addEventListener('click', close);
+    $('#mt-ok').addEventListener('click', () => {
+      const mes = $('#mt-mes').value || mesSel, tipo = $('#mt-tipo').value, asesorId = $('#mt-ambito').value || '', valor = +$('#mt-val').value || 0;
+      const ex = (S().all('metas') || []).find(m => m.mes === mes && m.tipo === tipo && (m.asesorId || '') === asesorId);
+      if (ex) S().update('metas', ex.id, { valor });
+      else S().insert('metas', { id: 'meta' + Date.now().toString().slice(-7), mes, tipo, asesorId, valor });
+      close();
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Meta guardada'; document.body.appendChild(t); setTimeout(() => t.remove(), 2400);
+      render(document.getElementById('host'));
+    });
   }
 
   /* ---------- LIQUIDACIÓN EMPRESA (cobrar a aseguradoras) ---------- */
@@ -703,11 +740,11 @@ Orbit.modules.finanzas = (function () {
     const [y, mm] = mesSel.split('-').map(Number);
     const prev = new Date(y, mm - 2, 1).toISOString().slice(0, 7);
     const src = S().all('presupuesto').filter(x => x.pais === p && x.periodo === prev);
-    if (!src.length) { alert('No hay presupuesto del mes anterior (' + prev + ') para replicar en ' + p + '.'); return; }
+    if (!src.length) { Orbit.ui.toast('No hay presupuesto del mes anterior (' + prev + ') para replicar en ' + p + '.'); return; }
     const yaTiene = new Set(S().all('presupuesto').filter(x => x.pais === p && x.periodo === mesSel).map(x => x.categoria));
     let n = 0;
     src.forEach(x => { if (yaTiene.has(x.categoria)) return; S().insert('presupuesto', { id: 'ppt' + Date.now().toString().slice(-7) + Math.floor(Math.random() * 99), categoria: x.categoria, clase: x.clase, monto: x.monto, pais: p, periodo: mesSel }); n++; });
-    if (!n) alert('El mes ya tiene todas las partidas del mes anterior.');
+    if (!n) Orbit.ui.toast('El mes ya tiene todas las partidas del mes anterior.');
     render(document.getElementById('host'));
   }
 
@@ -749,7 +786,7 @@ Orbit.modules.finanzas = (function () {
   function regFinanciacion(modo) {
     const p = paisFin() || 'GT';
     const acrs = S().all('acreedores').filter(a => a.pais === p);
-    if (!acrs.length) { alert('No hay acreedores para ' + p + '. Agrega uno primero.'); return; }
+    if (!acrs.length) { Orbit.ui.toast('No hay acreedores para ' + p + '. Agrega uno primero.'); return; }
     const cur = p === 'CO' ? 'COP' : 'GTQ';
     let back = document.getElementById('fin-fz'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'fin-fz'; back.className = 'drawer-back open';
@@ -843,5 +880,5 @@ Orbit.modules.finanzas = (function () {
         : '⚠️ Conecta un proveedor de IA en Configuración → Automatizaciones → Motor de IA para análisis en vivo. (Sin IA, el análisis de arriba usa la heurística de la plataforma.)';
     });
   }
-  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
+  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
 })();

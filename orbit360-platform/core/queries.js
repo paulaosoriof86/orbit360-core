@@ -50,17 +50,25 @@ Orbit.q = (function () {
   }
 
   // ---- globales ----
+  // Moneda por país: cuando hay un país activo, NO se convierte (montos nativos).
+  // Solo en la vista global mixta ('TODOS') se normaliza con una tasa DECLARADA (COP↔GTQ ≈ /1000).
+  const TC_COP_GTQ = 1000; // tasa de referencia declarada para vistas mixtas
+  function paisActivo() { const p = Orbit.pais; return (p && p !== 'TODOS') ? p : null; }
+  function monedaPais() { const p = paisActivo(); return p === 'CO' ? 'COP' : 'GTQ'; }
+  const norm = (m, cur) => { if (paisActivo()) return m; return cur === 'COP' ? m / TC_COP_GTQ : m; };
+  function cobPais(c) { const cli = S().get('clientes', c.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
+  function polPais(p2) { const cli = S().get('clientes', p2.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
+
   function carteraGlobal() {
-    const cob = S().all('cobros');
-    const norm = c => c.moneda === 'COP' ? c.monto / 1000 : c.monto; // normaliza a base GTQ aprox para totales mixtos
-    const alDia = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + norm(c), 0);
-    const pend = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + norm(c), 0);
-    const venc = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + norm(c), 0);
-    return { alDia, pend, venc };
+    const cob = S().all('cobros').filter(cobPais);
+    const alDia = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + norm(c.monto, c.moneda), 0);
+    const pend = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + norm(c.monto, c.moneda), 0);
+    const venc = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + norm(c.monto, c.moneda), 0);
+    return { alDia, pend, venc, moneda: monedaPais() };
   }
   function primaVigenteGlobal() {
-    return S().where('polizas', p => p.estado === 'Vigente' || p.estado === 'Por renovar')
-      .reduce((s, p) => s + (p.moneda === 'COP' ? p.prima / 1000 : p.prima), 0);
+    return S().where('polizas', p => (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p))
+      .reduce((s, p) => s + norm(p.prima, p.moneda), 0);
   }
   function renovacionesProximas(dias) {
     dias = dias || 45;
@@ -75,13 +83,12 @@ Orbit.q = (function () {
   /** Avance por asesor (prima vigente vs meta). */
   function leaderboard() {
     return S().all('asesores').map(a => {
-      const pol = S().where('polizas', p => p.asesorId === a.id && (p.estado === 'Vigente' || p.estado === 'Por renovar'));
-      const prima = pol.reduce((s, p) => s + (p.moneda === 'COP' ? p.prima / 1000 : p.prima), 0);
-      const com = S().where('comisiones', c => c.asesorId === a.id).reduce((s, c) => s + (c.moneda === 'COP' ? c.monto / 1000 : c.monto), 0);
+      const pol = S().where('polizas', p => p.asesorId === a.id && (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p));
+      const prima = pol.reduce((s, p) => s + norm(p.prima, p.moneda), 0);
+      const com = S().where('comisiones', c => c.asesorId === a.id).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
       return { asesor: a, prima, comision: com, pct: Math.min(140, Math.round(prima / a.metaPrima * 100)) };
     }).sort((x, y) => y.prima - x.prima);
   }
-  const norm = (m, cur) => cur === 'COP' ? m / 1000 : m; // a base GTQ aprox
 
   /** Aging de cartera vencida en tramos de días. */
   function agingVencido() {
@@ -113,6 +120,6 @@ Orbit.q = (function () {
   return {
     asesor, aseguradora, polizasDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, carteraGlobal, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
-    agingVencido, comisionesPor, clienteNombre, norm, vehiculosDe, vehiculoDePoliza
+    agingVencido, comisionesPor, clienteNombre, norm, monedaPais, vehiculosDe, vehiculoDePoliza
   };
 })();

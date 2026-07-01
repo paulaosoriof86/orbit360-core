@@ -33,7 +33,7 @@ Orbit.modules.plantillas = (function () {
   // ---- store bootstrap: siembra la colección si está vacía (migra localStorage viejo) ----
   function boot() {
     if (S().all('plantillas').length) return;
-    let old = null; try { const r = localStorage.getItem('orbit360_plantillas'); if (r) old = JSON.parse(r); } catch (e) {}
+    const old = S().pref('plantillas_legacy', null);
     (old && old.length ? old : SEED).forEach(p => S().insert('plantillas', Object.assign({ canal: 'Ambos', cat: 'General', asunto: '' }, p)));
   }
 
@@ -135,7 +135,7 @@ Orbit.modules.plantillas = (function () {
       const ta = $('#pe-texto'); const v = b.dataset.var;
       const s = ta.selectionStart || ta.value.length; ta.value = ta.value.slice(0, s) + v + ta.value.slice(ta.selectionEnd || s); ta.focus();
     }));
-    if ($('#pe-del')) $('#pe-del').addEventListener('click', () => { if (confirm('¿Eliminar esta plantilla?')) { S().remove('plantillas', id); close(); render(document.getElementById('host')); } });
+    if ($('#pe-del')) $('#pe-del').addEventListener('click', async () => { if (!(await U.confirm('¿Eliminar esta plantilla? Esta acción no se puede deshacer.', { title: 'Eliminar plantilla', ok: 'Eliminar' }))) return; S().remove('plantillas', id); close(); render(document.getElementById('host')); });
     $('#pe-ok').addEventListener('click', () => {
       const data = { icon: $('#pe-icon').value || '✉', nombre: $('#pe-nombre').value || 'Plantilla', canal: $('#pe-canal').value, cat: $('#pe-cat').value, asunto: $('#pe-asunto').value, texto: $('#pe-texto').value };
       if (id) S().update('plantillas', id, data);

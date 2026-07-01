@@ -21,6 +21,7 @@ Orbit.ui = (function () {
   const NOW = _anchor();
   const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
   function now() { return NOW; }
+  function today() { return NOW.toISOString().slice(0, 10); }
   function monthLabel() { return (MESES[NOW.getMonth()][0].toUpperCase() + MESES[NOW.getMonth()].slice(1)) + ' ' + NOW.getFullYear(); }
   function monthKey() { return NOW.getFullYear() + '-' + String(NOW.getMonth() + 1).padStart(2, '0'); }
   function monthProgressPct() { const dim = new Date(NOW.getFullYear(), NOW.getMonth() + 1, 0).getDate(); return NOW.getDate() / dim; }
@@ -88,5 +89,67 @@ Orbit.ui = (function () {
     const cls = map[estado] || 'neutral';
     return `<span class="badge ${cls}">${esc(estado)}</span>`;
   }
-  return { NOW, now, monthLabel, monthKey, monthProgressPct, money, moneyShort, esc, initials, fmtDate, daysFromNow, ago, avatar, shade, estadoBadge };
+  /* ---- Modales Orbit (reemplazo de alert/confirm/prompt nativos) ---- */
+  function _overlay() {
+    const b = document.createElement('div'); b.className = 'drawer-back open';
+    b.style.cssText = 'display:grid;place-items:center;z-index:9600'; return b;
+  }
+  function toast(msg, tone) {
+    const t = document.createElement('div'); t.className = 'ciclo-toast';
+    if (tone === 'danger') t.style.background = 'var(--danger,#C5162E)';
+    t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+  }
+  function alertm(msg, opts) {
+    opts = opts || {};
+    return new Promise(res => {
+      const b = _overlay();
+      b.innerHTML = `<div class="card" style="width:min(440px,93vw);padding:0">
+        <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px"><span style="font-size:20px">${opts.icon || 'ℹ️'}</span><b style="font-family:var(--f-display);font-size:16px">${esc(opts.title || 'Aviso')}</b></div>
+        <div style="padding:18px 20px;font-size:13.5px;line-height:1.55;white-space:pre-wrap">${esc(msg)}</div>
+        <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn primary" data-ok>${esc(opts.ok || 'Entendido')}</button></div>
+      </div>`;
+      document.body.appendChild(b);
+      const close = () => { b.remove(); res(true); };
+      b.querySelector('[data-ok]').addEventListener('click', close);
+      b.addEventListener('click', e => { if (e.target === b) close(); });
+    });
+  }
+  function confirmm(msg, opts) {
+    opts = opts || {};
+    return new Promise(res => {
+      const b = _overlay();
+      const danger = opts.danger !== false && (opts.danger || /elimin|borrar|quitar|cancelar la|desactiv/i.test(msg));
+      b.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
+        <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px"><span style="font-size:20px">${opts.icon || (danger ? '⚠️' : '❓')}</span><b style="font-family:var(--f-display);font-size:16px">${esc(opts.title || 'Confirmar')}</b></div>
+        <div style="padding:18px 20px;font-size:13.5px;line-height:1.55;white-space:pre-wrap">${esc(msg)}</div>
+        <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" data-no>${esc(opts.cancel || 'Cancelar')}</button><button class="btn ${danger ? '' : 'primary'}" data-yes style="${danger ? 'background:var(--danger,#C5162E);color:#fff' : ''}">${esc(opts.ok || 'Confirmar')}</button></div>
+      </div>`;
+      document.body.appendChild(b);
+      const done = v => { b.remove(); res(v); };
+      b.querySelector('[data-yes]').addEventListener('click', () => done(true));
+      b.querySelector('[data-no]').addEventListener('click', () => done(false));
+      b.addEventListener('click', e => { if (e.target === b) done(false); });
+    });
+  }
+  function promptm(msg, opts) {
+    opts = opts || {};
+    return new Promise(res => {
+      const b = _overlay();
+      b.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
+        <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px"><span style="font-size:20px">${opts.icon || '✏️'}</span><b style="font-family:var(--f-display);font-size:16px">${esc(opts.title || 'Escribe un valor')}</b></div>
+        <div style="padding:18px 20px;display:grid;gap:10px"><div style="font-size:13px">${esc(msg || '')}</div><input class="o-sel" data-in value="${esc(opts.value || '')}" placeholder="${esc(opts.placeholder || '')}"></div>
+        <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" data-no>Cancelar</button><button class="btn primary" data-yes>${esc(opts.ok || 'Guardar')}</button></div>
+      </div>`;
+      document.body.appendChild(b);
+      const inp = b.querySelector('[data-in]');
+      const done = v => { b.remove(); res(v); };
+      b.querySelector('[data-yes]').addEventListener('click', () => done(inp.value));
+      b.querySelector('[data-no]').addEventListener('click', () => done(null));
+      b.addEventListener('click', e => { if (e.target === b) done(null); });
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') done(inp.value); });
+      setTimeout(() => inp.focus(), 30);
+    });
+  }
+
+  return { NOW, now, monthLabel, monthKey, monthProgressPct, money, moneyShort, esc, initials, fmtDate, daysFromNow, ago, avatar, shade, estadoBadge, toast, alert: alertm, confirm: confirmm, prompt: promptm, today };
 })();

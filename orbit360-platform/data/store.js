@@ -68,6 +68,18 @@ Orbit.store = (function () {
     on(fn) { listeners.push(fn); return () => { listeners = listeners.filter(l => l !== fn); }; },
     /** Emite un evento de cambio manualmente (público para la capa backend). */
     _emit(c) { _emit(c || '*'); },
+    /** Preferencia / config KV (backend-swappable). Los módulos usan esto en vez de localStorage directo. */
+    pref(key, def) {
+      if (!db) return def === undefined ? null : def;
+      db.__prefs = db.__prefs || {};
+      return (key in db.__prefs) ? db.__prefs[key] : (def === undefined ? null : def);
+    },
+    /** Guarda una preferencia / config KV y persiste. */
+    setPref(key, val) {
+      if (!db) return val;
+      db.__prefs = db.__prefs || {};
+      db.__prefs[key] = val; _persist(); return val;
+    },
     /** Acceso crudo (lectura). */
     raw() { return db; }
   };

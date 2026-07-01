@@ -14,21 +14,24 @@ Orbit.modules.reportes = (function () {
   function paisOK(cid) { const c = S().get('clientes', cid); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }
 
   const REPORTES = {
-    produccion: { t: 'Producción', icon: '📈', desc: 'Pólizas emitidas con prima neta, por asesor y aseguradora.', cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Asesor', 'Prima neta', 'Estado'], build: () => S().all('polizas').filter(p => paisOK(p.clienteId)).map(p => [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', p.ramo, (q.aseguradora(p.aseguradoraId) || {}).nombre || '', (q.asesor(p.asesorId) || {}).nombre || '', U.money(p.primaNeta || p.prima, p.moneda), p.estado]) },
-    cartera: { t: 'Cartera y cobros', icon: '💳', desc: 'Recibos por estado, con vencimiento y conciliación.', cols: ['Recibo', 'Cliente', 'Cuota', 'Monto', 'Vence', 'Estado', 'Conciliado'], build: () => S().all('cobros').filter(c => c.estado !== 'Anulado' && paisOK(c.clienteId)).map(c => ['REC-' + c.id.slice(-5).toUpperCase(), (S().get('clientes', c.clienteId) || {}).nombre || '', c.cuota, U.money(c.monto, c.moneda), U.fmtDate(c.vence), c.estado, c.conciliado ? 'Sí' : 'No']) },
-    comisiones: { t: 'Comisiones', icon: '💵', desc: 'Comisión generada por póliza, periodo y estado.', cols: ['Periodo', 'Cliente', 'Póliza', 'Base neta', '%', 'Comisión', 'Estado'], build: () => S().all('comisiones').filter(c => paisOK(c.clienteId)).map(c => [c.periodo || '', (S().get('clientes', c.clienteId) || {}).nombre || '', (S().get('polizas', c.polizaId) || {}).numero || '', U.money(c.base, c.moneda), c.pct + '%', U.money(c.monto, c.moneda), c.estado]) },
-    renovaciones: { t: 'Renovaciones', icon: '🔄', desc: 'Pólizas por vencer en los próximos 60 días.', cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Prima', 'Vence'], build: () => q.renovacionesProximas(60).filter(p => paisOK(p.clienteId)).map(p => [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', p.ramo, (q.aseguradora(p.aseguradoraId) || {}).nombre || '', U.money(p.prima, p.moneda), U.fmtDate(p.vigenciaFin)]) },
-    siniestros: { t: 'Siniestros', icon: '🚨', desc: 'Reclamos con estado, montos y aseguradora.', cols: ['N.º', 'Cliente', 'Tipo', 'Aseguradora', 'Reclamado', 'Aprobado', 'Estado'], build: () => S().all('reclamos').filter(r => paisOK(r.clienteId)).map(r => [r.numero, (S().get('clientes', r.clienteId) || {}).nombre || '', r.tipo, (q.aseguradora(r.aseguradoraId) || {}).nombre || '', U.money(r.montoReclamado, 'GTQ'), U.money(r.montoAprobado || 0, 'GTQ'), r.estado]) },
-    cancelaciones: { t: 'Cancelaciones', icon: '✕', desc: 'Pólizas canceladas con motivo y valor perdido.', cols: ['Fecha', 'Cliente', 'Póliza', 'Motivo', 'Valor perdido'], build: () => S().all('cancelaciones').filter(c => paisOK(c.clienteId)).map(c => [U.fmtDate(c.fecha), (S().get('clientes', c.clienteId) || {}).nombre || '', (S().get('polizas', c.polizaId) || {}).numero || '', c.motivo, U.money(c.valorPerdido, 'GTQ')]) }
+    produccion: { t: 'Producción', icon: '📈', desc: 'Pólizas emitidas con prima neta, por asesor y aseguradora.', cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Asesor', 'Prima neta', 'Estado'], nav: id => `#/cliente360?c=${(S().get('polizas', id) || {}).clienteId || ''}`, rows: () => S().all('polizas').filter(p => paisOK(p.clienteId)).map(p => ({ id: p.id, cells: [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', p.ramo, (q.aseguradora(p.aseguradoraId) || {}).nombre || '', (q.asesor(p.asesorId) || {}).nombre || '', U.money(p.primaNeta || p.prima, p.moneda), p.estado] })) },
+    cartera: { t: 'Cartera y cobros', icon: '💳', desc: 'Recibos por estado, con vencimiento y conciliación.', cols: ['Recibo', 'Cliente', 'Cuota', 'Monto', 'Vence', 'Estado', 'Conciliado'], nav: id => { const c = S().get('cobros', id) || {}; return `#/cliente360?c=${c.clienteId || ''}`; }, act: id => Orbit.modules.cobros && Orbit.modules.cobros.detalle(id), rows: () => S().all('cobros').filter(c => c.estado !== 'Anulado' && paisOK(c.clienteId)).map(c => ({ id: c.id, cells: ['REC-' + c.id.slice(-5).toUpperCase(), (S().get('clientes', c.clienteId) || {}).nombre || '', c.cuota, U.money(c.monto, c.moneda), U.fmtDate(c.vence), c.estado, c.conciliado ? 'Sí' : 'No'] })) },
+    comisiones: { t: 'Comisiones', icon: '💵', desc: 'Comisión generada por póliza, periodo y estado.', cols: ['Periodo', 'Cliente', 'Póliza', 'Base neta', '%', 'Comisión', 'Estado'], nav: id => `#/cliente360?c=${(S().get('comisiones', id) || {}).clienteId || ''}`, rows: () => S().all('comisiones').filter(c => paisOK(c.clienteId)).map(c => ({ id: c.id, cells: [c.periodo || '', (S().get('clientes', c.clienteId) || {}).nombre || '', (S().get('polizas', c.polizaId) || {}).numero || '', U.money(c.base, c.moneda), c.pct + '%', U.money(c.monto, c.moneda), c.estado] })) },
+    renovaciones: { t: 'Renovaciones', icon: '🔄', desc: 'Pólizas por vencer en los próximos 60 días.', cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Prima', 'Vence'], nav: id => `#/cliente360?c=${(S().get('polizas', id) || {}).clienteId || ''}`, rows: () => q.renovacionesProximas(60).filter(p => paisOK(p.clienteId)).map(p => ({ id: p.id, cells: [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', p.ramo, (q.aseguradora(p.aseguradoraId) || {}).nombre || '', U.money(p.prima, p.moneda), U.fmtDate(p.vigenciaFin)] })) },
+    siniestros: { t: 'Siniestros', icon: '🚨', desc: 'Reclamos con estado, montos y aseguradora.', cols: ['N.º', 'Cliente', 'Tipo', 'Aseguradora', 'Reclamado', 'Aprobado', 'Estado'], nav: id => `#/cliente360?c=${(S().get('reclamos', id) || {}).clienteId || ''}`, rows: () => S().all('reclamos').filter(r => paisOK(r.clienteId)).map(r => ({ id: r.id, cells: [r.numero, (S().get('clientes', r.clienteId) || {}).nombre || '', r.tipo, (q.aseguradora(r.aseguradoraId) || {}).nombre || '', U.money(r.montoReclamado, 'GTQ'), U.money(r.montoAprobado || 0, 'GTQ'), r.estado] })) },
+    cancelaciones: { t: 'Cancelaciones', icon: '✕', desc: 'Pólizas canceladas con motivo y valor perdido.', cols: ['Fecha', 'Cliente', 'Póliza', 'Motivo', 'Valor perdido'], nav: id => `#/cliente360?c=${(S().get('cancelaciones', id) || {}).clienteId || ''}`, rows: () => S().all('cancelaciones').filter(c => paisOK(c.clienteId)).map(c => ({ id: c.id, cells: [U.fmtDate(c.fecha), (S().get('clientes', c.clienteId) || {}).nombre || '', (S().get('polizas', c.polizaId) || {}).numero || '', c.motivo, U.money(c.valorPerdido, 'GTQ')] })) }
   };
+  // compat: build() devuelve solo las celdas (para export)
+  Object.values(REPORTES).forEach(r => { r.build = () => r.rows().map(x => x.cells); });
 
   function render(h) {
     host = h;
     const r = REPORTES[sel];
-    let data = r.build();
+    let rows2 = r.rows();
+    let data = rows2.map(x => x.cells);
     const paisLbl = (Orbit.PAISES.find(p => p.id === (Orbit.pais || 'TODOS')) || {}).label || 'Todos los países';
     // filtro de periodo (año) — aplica si alguna columna contiene el año
-    if (anioSel) data = data.filter(row => row.some(c => String(c).includes(anioSel)));
+    if (anioSel) { rows2 = rows2.filter(x => x.cells.some(c => String(c).includes(anioSel))); data = rows2.map(x => x.cells); }
     // agrupación general→particular
     const gi = groupBy ? r.cols.indexOf(groupBy) : -1;
     let resumen = null;
@@ -61,7 +64,7 @@ Orbit.modules.reportes = (function () {
           ${resumen ? `<div class="card" style="overflow:hidden;margin-top:12px"><div style="padding:9px 13px;background:var(--soft);font-weight:700;font-size:13px">📊 Resumen por ${U.esc(groupBy)}</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>${U.esc(groupBy)}</th><th class="num">Registros</th>${resumen.numCols.map(ci => `<th class="num">Σ ${U.esc(r.cols[ci])}</th>`).join('')}</tr></thead><tbody>${resumen.rows.map(([k, v]) => `<tr><td><b>${U.esc(k)}</b></td><td class="num">${v.n}</td>${resumen.numCols.map(ci => `<td class="num">${v.sums[ci] ? U.money(v.sums[ci], 'GTQ') : '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>` : ''}
           <div class="card" style="overflow:hidden;margin-top:14px"><div style="overflow-x:auto;max-height:520px"><table class="tbl">
             <thead><tr>${r.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
-            <tbody>${data.slice(0, 200).map(row => `<tr>${row.map((cell, i) => `<td${i >= r.cols.length - 2 ? ' class="num"' : ''} style="font-size:12.5px">${U.esc(String(cell))}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${r.cols.length}" class="muted" style="text-align:center;padding:24px">Sin datos.</td></tr>`}</tbody>
+            <tbody>${rows2.slice(0, 200).map(x => `<tr class="clickable" onclick="Orbit.modules.reportes.verFila('${x.id}')" title="Ver detalle del registro">${x.cells.map((cell, i) => `<td${i >= r.cols.length - 2 ? ' class="num"' : ''} style="font-size:12.5px">${U.esc(String(cell))}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${r.cols.length}" class="muted" style="text-align:center;padding:24px">Sin datos.</td></tr>`}</tbody>
           </table></div>${data.length > 200 ? `<div class="muted" style="padding:10px 14px;font-size:12px">Mostrando 200 de ${data.length}. Exporta para ver todos.</div>` : ''}</div>
         </div>
       </div>
@@ -100,6 +103,14 @@ Orbit.modules.reportes = (function () {
   }
   function quitarProg(id) { S().remove('reportes_prog', id); render(host); }
 
+  function verFila(id) {
+    const r = REPORTES[sel];
+    if (r.act) { const done = r.act(id); if (done !== undefined || sel === 'cartera') return; }
+    const route = r.nav ? r.nav(id) : '';
+    if (route && !route.endsWith('c=')) location.hash = route;
+    else toast('Registro sin ficha asociada');
+  }
+
   function exportCSV(r, data) {
     const esc = s => '"' + String(s).replace(/"/g, '""') + '"';
     const csv = [r.cols.map(esc).join(',')].concat(data.map(row => row.map(esc).join(','))).join('\n');
@@ -127,5 +138,5 @@ Orbit.modules.reportes = (function () {
 
   function toast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
 
-  return { render, quitarProg };
+  return { render, quitarProg, verFila };
 })();

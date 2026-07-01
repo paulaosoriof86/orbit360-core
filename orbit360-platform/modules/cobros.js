@@ -128,6 +128,7 @@ Orbit.modules.cobros = (function () {
         ${cli ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();location.hash='#/cliente360?c=${cli.id}'">👤 Ver cliente</button>` : ''}
         ${p ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
         ${aplicable ? `<button class="btn primary" id="cd-apply">💳 Aplicar pago</button>` : ''}
+        ${(c.estado === 'Pagado' && !c.conciliado) ? `<button class="btn primary" id="cd-conc">📄 Cargar factura y conciliar</button>` : ''}
       </div>
     </div>`;
     document.body.appendChild(back);
@@ -136,6 +137,52 @@ Orbit.modules.cobros = (function () {
     back.querySelector('#cd-x').addEventListener('click', close);
     const ap = back.querySelector('#cd-apply');
     if (ap) ap.addEventListener('click', () => { back.remove(); aplicarPago(cobroId); });
+    const cc = back.querySelector('#cd-conc');
+    if (cc) cc.addEventListener('click', () => { back.remove(); conciliarFactura(cobroId); });
+  }
+
+  /* ---- Cargar factura y conciliar un recibo ya pagado (post-pago) ---- */
+  function conciliarFactura(cobroId) {
+    const c = S().get('cobros', cobroId); if (!c) return;
+    let pm = document.getElementById('cob-conc'); if (pm) pm.remove();
+    pm = document.createElement('div'); pm.id = 'cob-conc'; pm.className = 'drawer-back open';
+    pm.style.cssText = 'display:grid;place-items:center;z-index:210';
+    const hoy = new Date().toISOString().slice(0, 10);
+    pm.innerHTML = '<div class="card" style="width:min(460px,95vw);padding:0">'
+      + '<div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center">'
+      + '<b style="font-family:var(--f-display);font-size:16px;color:#fff">📄 Conciliar con factura</b>'
+      + '<button class="imp-x" id="cc-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
+      + '<div style="padding:18px 20px;display:grid;gap:12px">'
+      + '<div class="cfg-note">El recibo está <b>Pagado</b> pero pendiente de conciliación. Carga la factura de la aseguradora y registra la fecha real de pago.</div>'
+      + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">Factura de la aseguradora *</span>'
+      + '<div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="cc-btn">⬆ Seleccionar factura</button>'
+      + '<span id="cc-name" class="muted" style="font-size:12px">Sin factura</span></div></div>'
+      + '<label class="ce-l">Fecha real de pago (de la factura)<input id="cc-fecha" class="o-sel" type="date" value="' + (c.fechaPago || hoy) + '"></label>'
+      + '</div>'
+      + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">'
+      + '<button class="btn ghost" id="cc-cancel">Cancelar</button>'
+      + '<button class="btn primary" id="cc-ok" disabled style="opacity:.5">✅ Conciliar</button></div></div>';
+    document.body.appendChild(pm);
+    let factName = '';
+    const close = () => pm.remove();
+    pm.addEventListener('click', e => { if (e.target === pm) close(); });
+    pm.querySelector('#cc-x').addEventListener('click', close);
+    pm.querySelector('#cc-cancel').addEventListener('click', close);
+    const okBtn = pm.querySelector('#cc-ok');
+    pm.querySelector('#cc-btn').addEventListener('click', () => {
+      const fi = document.createElement('input'); fi.type = 'file'; fi.accept = '.pdf,image/*';
+      fi.onchange = () => { if (!fi.files[0]) return; factName = fi.files[0].name; pm.querySelector('#cc-name').textContent = '📄 ' + factName; okBtn.disabled = false; okBtn.style.opacity = '1'; };
+      fi.click();
+    });
+    okBtn.addEventListener('click', () => {
+      if (!factName) return;
+      const fechaReal = pm.querySelector('#cc-fecha').value || c.fechaPago;
+      S().update('cobros', cobroId, { conciliado: true, facturaNombre: factName, fechaReal });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'cobro', icon: '📄', fecha: fechaReal, titulo: 'Recibo conciliado', detalle: 'Factura ' + factName + ' · pago real ' + U.fmtDate(fechaReal) });
+      close();
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✅ Recibo conciliado'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
+      const host2 = document.getElementById('host'); if (host2) render(host2);
+    });
   }
 
   /* ---- Aplicar pago (modal reutilizable: desde la ficha del recibo y desde la tabla) ---- */
@@ -237,8 +284,8 @@ Orbit.modules.cobros = (function () {
       sel.forEach(c => {
         const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
         const msg = Orbit.ia ? Orbit.ia.redactar('cobro', { nombre: cli ? cli.nombre.split(' ')[0] : '', poliza: p ? p.numero : '', monto: U.money(c.monto, c.moneda), vence: U.fmtDate(c.vence) }) : 'Recordatorio de cobro';
-        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'sistema', icon: '📤', fecha: '2026-06-24', titulo: 'Recordatorio de cobro enviado', detalle: 'WhatsApp + correo · ' + (p ? p.numero : '') + ' · ' + U.money(c.monto, c.moneda) });
-        S().update('cobros', c.id, { notificado: '2026-06-24' });
+        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Recordatorio de cobro enviado', detalle: 'WhatsApp + correo · ' + (p ? p.numero : '') + ' · ' + U.money(c.monto, c.moneda) });
+        S().update('cobros', c.id, { notificado: Orbit.ui.today() });
         if (Orbit.correo && cli) Orbit.correo.enviar({ para: cli.email || '', asunto: 'Recordatorio de pago · ' + (p ? p.numero : ''), cuerpo: msg, clienteId: c.clienteId, vinculo: { tipo: 'cobro', id: c.id, label: 'Recibo ' + c.cuota } });
       });
       close();
@@ -248,5 +295,5 @@ Orbit.modules.cobros = (function () {
     paint();
   }
 
-  return { render, detalle, aplicarPago, lote };
+  return { render, detalle, aplicarPago, conciliarFactura, lote };
 })();

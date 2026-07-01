@@ -172,7 +172,7 @@ Orbit.modules.configuracion = (function () {
       ${CATS.map(([cat, items]) => `
         <div class="cfg-intgroup"><div class="cfg-intgroup-h">${cat}</div>
         <div class="cfg-grid2">
-          ${items.map(([id, t2, d]) => { const on = !!t.addons[id]; const cfgd = (() => { try { return !!JSON.parse(localStorage.getItem('orbit360_integ_' + id) || '{}').key; } catch (e) { return false; } })(); return `<div class="cfg-addon ${on ? 'on' : ''}">
+          ${items.map(([id, t2, d]) => { const on = !!t.addons[id]; const cfgd = (() => { const s = Orbit.store.pref('integ_' + id, {}) || {}; return !!s.key; })(); return `<div class="cfg-addon ${on ? 'on' : ''}">
             <div style="flex:1"><b>${t2}</b><p>${d}</p>
               <button class="btn ghost sm" style="margin-top:7px" onclick="Orbit.modules.configuracion.configIntegracion('${id}','${U.esc(t2).replace(/'/g, '')}')">⚙ Configurar${cfgd ? ' ✓' : ''}</button>
             </div>
@@ -256,13 +256,13 @@ Orbit.modules.configuracion = (function () {
       </div>
       <div style="display:flex;gap:8px;margin-top:16px">
         <button class="btn primary" id="cf-mods-save">Guardar módulos activos</button>
-        <button class="btn ghost" id="cf-reset" onclick="if(confirm('¿Restablecer configuración del cliente a valores por defecto?')){Orbit.tenant.reset();location.reload();}">Restablecer</button>
+        <button class="btn ghost" id="cf-reset" onclick="Orbit.ui.confirm('¿Restablecer configuración del cliente a valores por defecto?',{title:'Restablecer configuración',ok:'Restablecer'}).then(function(ok){if(ok){Orbit.tenant.reset();location.reload();}})">Restablecer</button>
       </div>`;
   }
   // planes propios (importados/creados), persistentes
   const PKEY = 'orbit360_planes';
-  function loadCustomPlans() { try { const r = localStorage.getItem(PKEY); if (r) return JSON.parse(r); } catch (e) {} return []; }
-  function saveCustomPlans(d) { try { localStorage.setItem(PKEY, JSON.stringify(d)); } catch (e) {} }
+  function loadCustomPlans() { return Orbit.store.pref('planes', []) || []; }
+  function saveCustomPlans(d) { Orbit.store.setPref('planes', d); }
 
   /* ---------- wiring ---------- */
   function wire(host) {
@@ -284,11 +284,11 @@ Orbit.modules.configuracion = (function () {
     if (pl) pl.addEventListener('change', () => { T().setDeep('plan', pl.value); paint(host); });
     // crear plan propio
     const np = document.getElementById('cf-plan-new');
-    if (np) np.addEventListener('click', () => {
-      const nombre = prompt('Nombre del nuevo plan comercializable:'); if (!nombre) return;
+    if (np) np.addEventListener('click', async () => {
+      const nombre = await Orbit.ui.prompt('Nombre del nuevo plan comercializable:', { title: 'Nuevo plan' }); if (!nombre) return;
       const cp = loadCustomPlans();
       const id = 'plan-' + Date.now();
-      cp.push({ id, nombre, personalizacion: confirm('¿Incluye personalización de marca?'), addons: confirm('¿Incluye add-ons/integraciones?'), apis: confirm('¿Incluye APIs y auto-branding?'), desc: 'Plan propio — editable por acuerdos comerciales.', custom: true });
+      cp.push({ id, nombre, personalizacion: await Orbit.ui.confirm('¿Incluye personalización de marca?', { title: 'Personalización de marca', danger: false }), addons: await Orbit.ui.confirm('¿Incluye add-ons / integraciones?', { title: 'Add-ons e integraciones', danger: false }), apis: await Orbit.ui.confirm('¿Incluye APIs y auto-branding?', { title: 'APIs y auto-branding', danger: false }), desc: 'Plan propio — editable por acuerdos comerciales.', custom: true });
       saveCustomPlans(cp);
       paint(host);
     });
@@ -299,13 +299,13 @@ Orbit.modules.configuracion = (function () {
       if (!mods.includes('configuracion')) mods.push('configuracion'); // nunca apagar config
       T().setDeep('modulosActivos', mods);
       if (Orbit.router && Orbit.router.rebuildSidebar) Orbit.router.rebuildSidebar();
-      alert('Módulos actualizados. El menú lateral se ajustó a esta cuenta.');
+      Orbit.ui.toast('Módulos actualizados. El menú lateral se ajustó a esta cuenta.');
     });
     host.querySelectorAll('.cfg-mod input').forEach(i => i.addEventListener('change', () => i.closest('.cfg-mod').classList.toggle('on', i.checked)));
   }
   function applyBrandToTopbar() {
     const t = T().get();
-    const logo = (t.branding && t.branding.logo) || (function () { try { return localStorage.getItem('orbit360_logo'); } catch (e) { return ''; } })();
+    const logo = (t.branding && t.branding.logo) || Orbit.store.pref('logo', '') || '';
     const tieneMarca = !!(t.empresa && t.empresa !== 'Tu marca') || !!logo;
     const cn = document.querySelector('.tb-logo .cn');
     if (cn) { cn.innerHTML = (t.empresa && t.empresa !== 'Tu marca' ? U.esc(t.empresa) : 'Tu marca') + '<small>' + (tieneMarca ? 'Cliente' : 'White-label') + '</small>'; }
@@ -384,27 +384,44 @@ Orbit.modules.configuracion = (function () {
   }
 
   function agregarPais() {
-    const nombre = prompt('Nombre del país:'); if (!nombre) return;
-    const code = (prompt('Código de 2 letras (ej. MX, PA, CR):', '') || '').toUpperCase().slice(0, 2); if (!code) return;
-    const iva = +prompt('IVA / impuesto de seguros (%) para ' + nombre + ':', '12') || 0;
-    const moneda = prompt('Moneda (ej. MXN, USD, PAB):', 'USD') || 'USD';
-    const gem = +prompt('Gastos de emisión por defecto (% sobre prima neta):', '0') || 0;
-    try {
-      const KEY = 'orbit360_paises';
-      const arr = JSON.parse(localStorage.getItem(KEY) || '[]');
-      arr.push({ code, nombre, iva, moneda, gastosEmisionPct: gem });
-      localStorage.setItem(KEY, JSON.stringify(arr));
-      if (Orbit.primas && Orbit.primas.registrarPais) Orbit.primas.registrarPais(code, { iva, moneda, gastosEmisionPct: gem });
-    } catch (e) {}
-    const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ País ' + nombre + ' agregado (IVA ' + iva + '%)'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
-    const host = document.getElementById('host'); if (host) render(host);
+    let back = document.getElementById('cf-pais'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'cf-pais'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = `<div class="card" style="width:min(480px,94vw);padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🌎 Agregar país</b><button class="imp-x" id="cp-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">
+        <div class="cgrid"><label class="ce-l">Nombre del país<input id="cp-nombre" class="o-sel" placeholder="México"></label><label class="ce-l">Código (2 letras)<input id="cp-code" class="o-sel" maxlength="2" placeholder="MX" style="text-transform:uppercase"></label></div>
+        <div class="cgrid"><label class="ce-l">IVA / impuesto seguros (%)<input id="cp-iva" class="o-sel" type="number" value="12"></label><label class="ce-l">Moneda<input id="cp-moneda" class="o-sel" placeholder="MXN" value="USD"></label></div>
+        <label class="ce-l">Gastos de emisión por defecto (% sobre prima neta)<input id="cp-gem" class="o-sel" type="number" value="0"></label>
+        <div class="cfg-note">Tasas e impuestos configurables por país. Al crear se registran en el motor de primas (Orbit.primas) y quedan disponibles para pólizas y cotizaciones.</div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="cp-cancel">Cancelar</button><button class="btn primary" id="cp-ok">Agregar país</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const $ = s => back.querySelector(s); const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#cp-x').addEventListener('click', close); $('#cp-cancel').addEventListener('click', close);
+    $('#cp-ok').addEventListener('click', () => {
+      const nombre = ($('#cp-nombre').value || '').trim(); if (!nombre) { Orbit.ui.toast('Escribe el nombre del país'); return; }
+      const code = ($('#cp-code').value || '').toUpperCase().slice(0, 2); if (!code) { Orbit.ui.toast('Escribe el código de 2 letras'); return; }
+      const iva = +$('#cp-iva').value || 0, moneda = ($('#cp-moneda').value || 'USD').toUpperCase(), gem = +$('#cp-gem').value || 0;
+      try {
+        const arr = Orbit.store.pref('paises', []) || [];
+        arr.push({ code, nombre, iva, moneda, gastosEmisionPct: gem });
+        Orbit.store.setPref('paises', arr);
+        if (Orbit.primas && Orbit.primas.registrarPais) Orbit.primas.registrarPais(code, { iva, moneda, gastosEmisionPct: gem });
+      } catch (e) {}
+      close();
+      Orbit.ui.toast('✓ País ' + nombre + ' agregado (IVA ' + iva + '%)');
+      const host = document.getElementById('host'); if (host) render(host);
+    });
   }
   function configIntegracion(nombre, titulo) {
     const label = titulo || nombre;
     let back = document.getElementById('cf-integ'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'cf-integ'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
-    const saved = (() => { try { return JSON.parse(localStorage.getItem('orbit360_integ_' + nombre) || '{}'); } catch (e) { return {}; } })();
+    const saved = Orbit.store.pref('integ_' + nombre, {}) || {};
     back.innerHTML = '<div class="card" style="width:min(460px,94vw);padding:0">'
       + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🔌 Conectar ' + U.esc(label) + '</b><button class="imp-x" id="ci-x">✕</button></div>'
       + '<div style="padding:18px 20px;display:grid;gap:11px">'
@@ -428,7 +445,7 @@ Orbit.modules.configuracion = (function () {
     };
     back.querySelector('#ci-ok').onclick = () => {
       const data = { key: back.querySelector('#ci-key').value, url: back.querySelector('#ci-url').value, user: back.querySelector('#ci-user').value, activa: back.querySelector('#ci-on').checked };
-      try { localStorage.setItem('orbit360_integ_' + nombre, JSON.stringify(data)); } catch (e) {}
+      Orbit.store.setPref('integ_' + nombre, data);
       try { const tn = T().get(); tn.addons = tn.addons || {}; tn.addons[nombre] = data.activa; T().save && T().save(tn); } catch (e) {}
       close(); const host = document.getElementById('host'); if (host) render(host);
       const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + label + (data.activa ? ' conectada' : ' guardada'); document.body.appendChild(t); setTimeout(() => t.remove(), 2400);

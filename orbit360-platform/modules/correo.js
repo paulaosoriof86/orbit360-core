@@ -141,9 +141,9 @@ Orbit.modules.correo = (function () {
     function paintAdj() { back.querySelector('#rd-adj').innerHTML = adj.map((a, i) => `<span class="mail-chip">📎 ${U.esc(a)} <span data-rm="${i}" style="cursor:pointer;color:var(--danger)">✕</span></span>`).join(''); back.querySelectorAll('[data-rm]').forEach(x => x.addEventListener('click', () => { adj.splice(+x.dataset.rm, 1); paintAdj(); })); }
     back.querySelector('#rd-file').addEventListener('change', e => { [...e.target.files].forEach(f => adj.push(f.name)); paintAdj(); });
     const dbtn = back.querySelector('#rd-docs');
-    if (dbtn) dbtn.addEventListener('click', () => {
+    if (dbtn) dbtn.addEventListener('click', async () => {
       if (!docs.length) { adj.push('(sin documentos en el expediente)'); paintAdj(); return; }
-      const pick = prompt('Documentos del cliente:\n' + docs.map((d, i) => (i + 1) + '. ' + (d.nombre || d.tipo)).join('\n') + '\n\nEscribe el número a adjuntar:', '1');
+      const pick = await Orbit.ui.prompt('Documentos del cliente:\n' + docs.map((d, i) => (i + 1) + '. ' + (d.nombre || d.tipo)).join('\n') + '\n\nEscribe el número a adjuntar:', { title: 'Adjuntar documento', value: '1' });
       const idx = parseInt(pick, 10) - 1; if (docs[idx]) { adj.push(docs[idx].nombre || docs[idx].tipo); paintAdj(); }
     });
   }
