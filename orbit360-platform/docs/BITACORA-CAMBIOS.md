@@ -213,3 +213,11 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: test temporal en navegador autenticado, recorriendo rutas hash sobre index-dev-firestore.html.
 - Impacto en prototipo comercializable: confirma compatibilidad inicial del render con backend LAB antes de seed ficticio y migracion de importadores.
 - Estado: RESUELTO.
+
+## 2026-06-30 22:46:13 - Backend LAB - Auditoria store.js Firestore LAB
+- Sintoma/necesidad: auditar data/store.js para confirmar API exacta y modo Firestore LAB antes de avanzar a seed/importadores.
+- Esperado: documentar API, modo LAB, rutas Firestore, riesgos y pendientes tecnicos.
+- Archivo/funcion: data/store.js, index-dev-firestore.html, docs/AUDITORIA-STORE-FIRESTORE-LAB-20260630.md.
+- Fix o mejora aplicada: se creo auditoria tecnica del store LAB y se confirmaron patrones clave de API, tenant, onSnapshot, fallback local y proyecto LAB.
+- Impacto en prototipo comercializable: protege la capa unica de datos antes de avanzar backend.
+- Estado: RESUELTO.
