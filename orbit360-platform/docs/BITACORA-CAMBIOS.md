@@ -123,3 +123,11 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: test temporal en navegador autenticado contra Firestore LAB; documento permitido creado y eliminado; intento cross-tenant denegado.
 - Impacto en prototipo comercializable: confirma aislamiento por tenant antes de avanzar con datos reales o integraciones.
 - Estado: RESUELTO.
+
+## 2026-06-30 22:30:55 - Backend LAB - Estado y matriz Firestore documentados
+- Sintoma/necesidad: despues de validar Orbit.store y aislamiento multi-tenant, documentar el estado tecnico y la matriz de colecciones antes de avanzar a persistencia real.
+- Esperado: tener un documento claro para continuar backend sin perder restricciones ni mezclar frontend/Claude.
+- Archivo/funcion: docs/ESTADO-BACKEND-LAB-20260630.md, docs/MATRIZ-COLECCIONES-FIRESTORE-LAB.md.
+- Fix o mejora aplicada: se documento estado Auth LAB, Firestore rules, Store LAB, aislamiento multi-tenant, integracion v93 y colecciones base.
+- Impacto en prototipo comercializable: establece la base de migracion Firestore multi-tenant sin tocar modulos ni datos reales.
+- Estado: RESUELTO.
