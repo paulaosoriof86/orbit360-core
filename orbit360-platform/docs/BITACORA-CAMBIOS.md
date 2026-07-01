@@ -337,3 +337,14 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: store Firestore LAB explicito, auth gate robusto por URL y no-fallback demo.
 - Impacto en prototipo comercializable: aplicar patron a prototipo base; backend real no debe disfrazar fallback demo como datos reales.
 - Estado: EN PROGRESO
+
+## 2026-07-01 01:49:32 - Auth LAB / login Firebase real
+
+- Modulo: Backend LAB / Auth.
+- Sintoma/necesidad: el gate bloqueaba sesion demo, pero el submit del login no intentaba Firebase Auth real.
+- Esperado: en irestore-lab, el formulario debe autenticar contra Firebase Auth LAB.
+- Causa raiz: el gate anterior interceptaba el submit solo para mostrar advertencia.
+- Archivo/funcion: core/auth-lab-gate.local.js / signInFromForm().
+- Fix o mejora aplicada: login Firebase real con signInWithEmailAndPassword, sin guardar secrets.
+- Impacto en prototipo comercializable: aplicar aprendizaje al backend real; Auth real nunca debe confundirse con sesión demo.
+- Estado: EN PROGRESO
