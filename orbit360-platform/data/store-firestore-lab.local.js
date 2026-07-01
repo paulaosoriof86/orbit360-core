@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    Orbit 360 - Store Firestore LAB explícito
    Uso: solo index-dev-firestore.html con ?orbitBackend=firestore-lab
    Regla: en LAB no usar seed/localStorage/demo como fuente de datos.
@@ -391,4 +391,122 @@
 
   state.status = hasLabAuth() ? 'ready' : 'auth-required';
   log('Store Firestore LAB explícito instalado. Tenant:', tenantId, 'Auth:', hasLabAuth());
+})();
+
+/* ============================================================
+   Orbit 360 - Firestore LAB collection registry + onSnapshot
+   Backend-only patch. No modules touched.
+   ============================================================ */
+(function(){
+  window.Orbit = window.Orbit || {};
+  window.OrbitBackend = window.OrbitBackend || {};
+
+  var params = new URLSearchParams(window.location.search || '');
+  var mode = params.get('orbitBackend') || window.OrbitBackend.mode || '';
+  var tenantId = params.get('tenant') || window.OrbitBackend.tenantId || 'alianzas-soluciones';
+
+  var ORBIT_LAB_COLLECTIONS = [
+    'clientes',
+    'polizas',
+    'cobros',
+    'comisiones',
+    'reclamos',
+    'gestiones',
+    'negocios',
+    'finmovs',
+    'contenidos',
+    'cursos',
+    'aseguradoras',
+    'asesores',
+    'vehiculos',
+    'acreedores',
+    'facturas',
+    'documentos',
+    'actividades'
+  ];
+
+  window.OrbitBackend.collections = ORBIT_LAB_COLLECTIONS.slice();
+
+  function emitCollection(collection){
+    try {
+      if (window.Orbit && window.Orbit.store && typeof window.Orbit.store._emit === 'function') {
+        window.Orbit.store._emit(collection || '*');
+      }
+    } catch(e) {
+      console.warn('[orbit-firestore-lab] emit failed', e);
+    }
+  }
+
+  function compatFirestore(){
+    try {
+      if (window.firebase && typeof window.firebase.firestore === 'function') {
+        return window.firebase.firestore();
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  function attachCompatSnapshots(){
+    var db = compatFirestore();
+    if (!db) return false;
+    window.OrbitBackend._labUnsubscribers = window.OrbitBackend._labUnsubscribers || [];
+    ORBIT_LAB_COLLECTIONS.forEach(function(collection){
+      try {
+        var ref = db.collection('tenantId').doc(tenantId).collection(collection);
+        var unsub = ref.onSnapshot(function(){
+          emitCollection(collection);
+        }, function(err){
+          console.warn('[orbit-firestore-lab] onSnapshot error', collection, err);
+        });
+        window.OrbitBackend._labUnsubscribers.push(unsub);
+      } catch(e) {
+        console.warn('[orbit-firestore-lab] compat snapshot failed', collection, e);
+      }
+    });
+    return true;
+  }
+
+  function attachModularSnapshots(){
+    try {
+      if (typeof window.onSnapshot !== 'function') return false;
+      if (typeof window.collection !== 'function') return false;
+      if (!window.db) return false;
+      window.OrbitBackend._labUnsubscribers = window.OrbitBackend._labUnsubscribers || [];
+      ORBIT_LAB_COLLECTIONS.forEach(function(collectionName){
+        try {
+          var ref = window.collection(window.db, 'tenantId', tenantId, collectionName);
+          var unsub = window.onSnapshot(ref, function(){
+            emitCollection(collectionName);
+          }, function(err){
+            console.warn('[orbit-firestore-lab] onSnapshot error', collectionName, err);
+          });
+          window.OrbitBackend._labUnsubscribers.push(unsub);
+        } catch(e) {
+          console.warn('[orbit-firestore-lab] modular snapshot failed', collectionName, e);
+        }
+      });
+      return true;
+    } catch(e) {
+      return false;
+    }
+  }
+
+  function attachLabSnapshots(){
+    if (mode !== 'firestore-lab') return;
+    if (tenantId !== 'alianzas-soluciones') return;
+    if (window.OrbitBackend._snapshotsAttached) return;
+
+    var ok = attachCompatSnapshots() || attachModularSnapshots();
+    window.OrbitBackend._snapshotsAttached = !!ok;
+
+    if (ok) {
+      console.info('[orbit-firestore-lab] onSnapshot listeners attached', tenantId, ORBIT_LAB_COLLECTIONS.length);
+    } else {
+      console.warn('[orbit-firestore-lab] onSnapshot not attached: Firebase SDK not detected yet.');
+    }
+  }
+
+  window.OrbitBackend.attachLabSnapshots = attachLabSnapshots;
+  setTimeout(attachLabSnapshots, 0);
+  setTimeout(attachLabSnapshots, 1200);
 })();

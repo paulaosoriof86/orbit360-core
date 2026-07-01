@@ -461,3 +461,17 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 **Impacto en prototipo comercializable:** Medio. Permite seguir validando Firestore LAB sin afectar la base visual ni los modulos.
 
 **Estado:** RESUELTO LOCALMENTE.
+
+## 2026-07-01 - Firestore LAB con onSnapshot y colecciones base
+
+**Modulo:** Backend LAB / Firestore / Orbit.store.
+
+**Necesidad:** El smoke de contrato detecto que store-firestore-lab.local.js no exponia literalmente onSnapshot ni el registro completo de colecciones base requeridas.
+
+**Esperado:** Firestore LAB debe soportar listeners onSnapshot, emitir cambios via Orbit.store._emit y reconocer las colecciones base multi-tenant.
+
+**Fix aplicado:** Se agrego registro ORBIT_LAB_COLLECTIONS, soporte de listeners onSnapshot compatible con Firebase compat/modular y emision por coleccion sin tocar modulos ni UI.
+
+**Impacto en prototipo comercializable:** Alto. Refuerza la capa backend multi-tenant y permite que los modulos sigan usando solo Orbit.store.
+
+**Estado:** RESUELTO LOCALMENTE.
