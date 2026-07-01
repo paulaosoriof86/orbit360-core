@@ -369,3 +369,14 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: documentacion y auditoria segura sin modificar modulos.
 - Impacto en prototipo comercializable: mantiene la regla de capa unica y evita mezclar demo/localStorage con backend.
 - Estado: EN PROGRESO
+
+## 2026-07-01 03:25:14 - Backend LAB / rutas Firestore y smoke automatico
+
+- Modulo: Backend LAB / Store / Smoke.
+- Necesidad: avanzar backend sin seguir parchando login visual y dejar validacion seed lista para cuando exista Auth LAB.
+- Esperado: auditoria de rutas Firestore y smoke no intrusivo que corra solo con Firebase Auth LAB.
+- Causa raiz: Auth real sigue pendiente; no debe bloquear auditoria de rutas ni preparacion de smoke.
+- Archivo/funcion: core/lab-smoke-firestore.local.js, data/store-firestore-lab.local.js, index-dev-firestore.html.
+- Fix o mejora aplicada: smoke automatico sin escrituras, sin secretos y sin UI productiva.
+- Impacto en prototipo comercializable: mejora metodologia de validacion backend y evita falsos positivos por demo.
+- Estado: EN PROGRESO
