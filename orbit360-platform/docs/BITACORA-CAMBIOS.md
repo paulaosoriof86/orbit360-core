@@ -105,3 +105,21 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - :  
 - Impacto en prototipo comercializable: confirma que la capa unica de datos mantiene API compatible para avanzar backend sin reescribir modulos.
 - Estado: RESUELTO.
+
+## 2026-06-30 22:15:23 - Backend LAB - Aislamiento multi-tenant Firestore
+- Sintoma/necesidad: validar que el usuario LAB pueda operar solo dentro del tenant autorizado y no en tenants ajenos.
+- Esperado: lectura/escritura/borrado permitidos en tenant alianzas-soluciones; lectura/escritura denegadas en tenant no autorizado.
+- Archivo/funcion: firestore.rules, core/auth-firebase.config.local.js, index-dev-firestore.html.
+- Resultado:
+- Firebase inicializado: OK ays-orbit-360-lab
+- Auth LAB login: OK orbit.lab@demo.com / woJlxR1iFEeiQZvTscPj4qQ5Qc73
+- Membership tenant autorizado: OK alianzas-soluciones
+- WRITE tenant autorizado: OK tenants/alianzas-soluciones/data/_diagnostics/items/isolation_allowed_20260630_221511
+- READ tenant autorizado: OK tenants/alianzas-soluciones/data/_diagnostics/items/isolation_allowed_20260630_221511
+- DELETE tenant autorizado: OK tenants/alianzas-soluciones/data/_diagnostics/items/isolation_allowed_20260630_221511
+- READ membership tenant no autorizado: OK denegado correctamente
+- WRITE tenant no autorizado: OK denegado correctamente
+- READ tenant no autorizado: OK denegado correctamente
+- Fix o mejora aplicada: test temporal en navegador autenticado contra Firestore LAB; documento permitido creado y eliminado; intento cross-tenant denegado.
+- Impacto en prototipo comercializable: confirma aislamiento por tenant antes de avanzar con datos reales o integraciones.
+- Estado: RESUELTO.
