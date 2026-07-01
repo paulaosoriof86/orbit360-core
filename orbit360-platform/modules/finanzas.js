@@ -63,10 +63,10 @@ Orbit.modules.finanzas = (function () {
     const pagado = sum(egr.filter(m => m.estado === 'pagado'), m => m.valor);
     const rows = list.slice().sort((a, b) => (b.dia || 0) - (a.dia || 0));
     return `${K.kpis([
-      { label: 'Ingresos del mes', val: M(tIng), color: 'var(--ok)', foot: M(recaudado) + ' recaudado', footTone: 'up', onclick: "location.hash='#/finanzas'" },
-      { label: 'Egresos del mes', val: M(tEgr), color: 'var(--danger)', foot: M(pagado) + ' pagado', onclick: "location.hash='#/finanzas'" },
-      { label: 'Resultado operativo', val: M(tIng - tEgr), color: 'var(--red)', foot: 'ingresos − egresos', onclick: "location.hash='#/finanzas'" },
-      { label: 'Movimientos', val: list.length, color: 'var(--info)', foot: ing.length + ' ing · ' + egr.length + ' egr' }
+      { label: 'Ingresos del mes', val: M(tIng), color: 'var(--ok)', foot: M(recaudado) + ' recaudado', footTone: 'up', onclick: "Orbit.modules.finanzas.drillKey('ing-mes')" },
+      { label: 'Egresos del mes', val: M(tEgr), color: 'var(--danger)', foot: M(pagado) + ' pagado', onclick: "Orbit.modules.finanzas.drillKey('egr-mes')" },
+      { label: 'Resultado operativo', val: M(tIng - tEgr), color: 'var(--red)', foot: 'ingresos − egresos', onclick: "Orbit.modules.finanzas.drillKey('res-mes')" },
+      { label: 'Movimientos', val: list.length, color: 'var(--info)', foot: ing.length + ' ing · ' + egr.length + ' egr', onclick: "Orbit.modules.finanzas.drillKey('mov-mes')" }
     ])}
     <div class="card pad" style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <b style="font-family:var(--f-display);font-size:15px;flex:1">Movimientos · ${MESES[+mesSel.slice(5) - 1]} ${mesSel.slice(0, 4)}</b>
@@ -166,6 +166,53 @@ Orbit.modules.finanzas = (function () {
     const host = document.getElementById('host'); if (host) render(host);
   }
 
+  /* ---------- DRILL-DOWN de KPIs (desglose clicable) ---------- */
+  function drillKey(key) {
+    const p = paisFin();
+    const all = S().all('finmovs').filter(m => !p || m.pais === p);
+    const inM = all.filter(m => m.periodo === mesSel && m.tipo !== 'financiacion');
+    const lbl = MESES[+mesSel.slice(5) - 1] + ' ' + mesSel.slice(0, 4);
+    const map = {
+      'ing-mes': ['Ingresos del mes', lbl, inM.filter(m => m.tipo === 'ingreso')],
+      'egr-mes': ['Egresos del mes', lbl, inM.filter(m => m.tipo === 'egreso')],
+      'res-mes': ['Resultado operativo', lbl + ' · ingresos y egresos', inM],
+      'mov-mes': ['Movimientos del mes', lbl, inM],
+      'cxc': ['Cuentas por cobrar', 'todas las pendientes de recaudo — arrastran mes a mes', all.filter(m => m.tipo === 'ingreso' && (m.estado === 'esperado' || m.estado === 'facturado'))],
+      'cxp': ['Cuentas por pagar', 'todas las pendientes de pago — arrastran mes a mes', all.filter(m => m.tipo === 'egreso' && (m.estado === 'pendiente' || (m.pendiente || 0) > 0))]
+    };
+    const cfg = map[key]; if (!cfg) return;
+    drillModal(cfg[0], cfg[1], cfg[2]);
+  }
+  function drillModal(titulo, sub, items) {
+    items = (items || []).slice().sort((a, b) => (b.periodo || '').localeCompare(a.periodo || '') || (b.dia || 0) - (a.dia || 0));
+    const tot = items.reduce((s, m) => s + norm(m.valor, m.moneda), 0);
+    let back = document.getElementById('fin-drill'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-drill'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = `<div class="card" style="width:min(760px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
+      <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Desglose</div>
+          <b style="font-family:var(--f-display);font-size:18px;color:#fff">${U.esc(titulo)}</b>
+          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${items.length} registros · ${U.money(tot, 'GTQ')} · ${U.esc(sub)} · clic en una fila para ver/editar</div></div>
+        <button class="imp-x" id="dr-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
+      <div style="overflow:auto;flex:1"><table class="tbl">
+        <thead><tr><th>Periodo</th><th>Día</th><th>Concepto</th><th>Clasificación</th><th>Quién</th><th class="num">Valor</th><th>Estado</th></tr></thead>
+        <tbody>${items.map(m => `<tr class="clickable" onclick="document.getElementById('fin-drill').remove();Orbit.modules.finanzas.editarMov('${m.id}')">
+          <td class="mono" style="font-size:11.5px">${m.periodo}</td><td class="mono" style="font-size:11.5px">${m.dia || '—'}</td>
+          <td><b>${U.esc(m.concepto)}</b></td><td style="font-size:12px">${U.esc(m.clase || '—')}</td>
+          <td style="font-size:12px">${U.esc(m.pagador || m.beneficiario || '—')}</td>
+          <td class="num" style="color:${m.tipo === 'egreso' ? 'var(--danger)' : 'var(--ok)'}">${m.tipo === 'egreso' ? '−' : ''}${U.money(m.valor, m.moneda)}</td>
+          <td>${estBadge(m.estado)}</td></tr>`).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody>
+      </table></div>
+      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn primary" id="dr-ok">Cerrar</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#dr-x').addEventListener('click', close);
+    back.querySelector('#dr-ok').addEventListener('click', close);
+  }
+
   /* ---------- CUENTAS POR COBRAR / POR PAGAR ---------- */
   function cxcp() {
     const all = movs(null);
@@ -174,8 +221,8 @@ Orbit.modules.finanzas = (function () {
     const tCxc = sum(cxc, m => m.valor), tCxp = cxp.reduce((s, m) => s + norm(m.pendiente || m.valor, m.moneda), 0);
     return `<div class="cfg-note" style="margin-bottom:14px">💳 <b>Cuentas por cobrar</b> = ingresos esperados/facturados aún no recaudados (ej. planilla de comisiones ya facturada). <b>Cuentas por pagar</b> = egresos pendientes (ej. liquidación de asesores no pagada); el saldo pasa al mes siguiente. Clic en una fila cambia su estado.</div>
     ${K.kpis([
-      { label: 'Por cobrar (CxC)', val: M(tCxc), color: 'var(--warn)', foot: cxc.length + ' partidas' },
-      { label: 'Por pagar (CxP)', val: M(tCxp), color: 'var(--danger)', foot: cxp.length + ' partidas' },
+      { label: 'Por cobrar (CxC)', val: M(tCxc), color: 'var(--warn)', foot: cxc.length + ' partidas', onclick: "Orbit.modules.finanzas.drillKey('cxc')" },
+      { label: 'Por pagar (CxP)', val: M(tCxp), color: 'var(--danger)', foot: cxp.length + ' partidas', onclick: "Orbit.modules.finanzas.drillKey('cxp')" },
       { label: 'Posición neta', val: M(tCxc - tCxp), color: 'var(--red)', foot: 'CxC − CxP' }
     ])}
     <div class="ins-grid-2">
@@ -186,9 +233,9 @@ Orbit.modules.finanzas = (function () {
   function cxcpTabla(titulo, rows, tone) {
     return `<div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">${titulo}</div>
       <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Periodo</th><th>Concepto</th><th class="num">Monto</th><th>Estado</th></tr></thead>
-      <tbody>${rows.slice(0, 14).map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.toggleEstado('${m.id}')">
+      <tbody>${rows.slice(0, 24).map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.editarMov('${m.id}')" title="Ver / editar / eliminar">
         <td class="mono" style="font-size:11.5px">${m.periodo}</td><td>${U.esc(m.concepto)}</td>
-        <td class="num"><b>${U.money(m.pendiente || m.valor, m.moneda)}</b></td><td>${estBadge(m.estado)}</td></tr>`).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:18px">Sin partidas.</td></tr>'}</tbody></table></div></div>`;
+        <td class="num"><b>${U.money(m.pendiente || m.valor, m.moneda)}</b></td><td onclick="event.stopPropagation();Orbit.modules.finanzas.toggleEstado('${m.id}')" style="cursor:pointer" title="Clic: cambia estado">${estBadge(m.estado)}</td></tr>`).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:18px">Sin partidas.</td></tr>'}</tbody></table></div></div>`;
   }
 
   /* ---------- FINANCIACIÓN (deuda separada de operativo) ---------- */
@@ -599,19 +646,69 @@ Orbit.modules.finanzas = (function () {
     const p = paisFin() || 'GT';
     const ppto = S().all('presupuesto').filter(x => x.pais === p && x.periodo === mesSel);
     const realPorCat = {};
-    S().all('finmovs').filter(m => m.pais === p && m.periodo === mesSel && m.tipo === 'egreso').forEach(m => { const k = m.categoria || m.clase; realPorCat[k] = (realPorCat[k] || 0) + m.valor; });
+    S().all('finmovs').filter(m => m.pais === p && m.periodo === mesSel && m.tipo === 'egreso').forEach(m => { const k = m.categoria || m.clase; realPorCat[k] = (realPorCat[k] || 0) + norm(m.valor, m.moneda); });
     const cur = p === 'GT' ? 'GTQ' : 'COP';
-    const rows = ppto.map(x => ({ cat: x.categoria, ppto: x.monto, real: realPorCat[x.categoria] || 0 }));
+    const rows = ppto.map(x => ({ id: x.id, cat: x.categoria, ppto: x.monto, real: realPorCat[x.categoria] || 0 }));
     const tP = rows.reduce((s, r) => s + r.ppto, 0), tR = rows.reduce((s, r) => s + r.real, 0);
     const sem = (pct) => pct <= 100 ? 'var(--ok)' : pct <= 115 ? 'var(--warn)' : 'var(--danger)';
-    return `<div class="cfg-note" style="margin-bottom:14px">📊 Presupuesto vs real del mes con <b>semáforos</b>: verde dentro de presupuesto, ámbar leve sobre-ejecución, rojo desviación alta. (${p})</div>
+    const lbl = MESES[+mesSel.slice(5) - 1] + ' ' + mesSel.slice(0, 4);
+    return `<div class="cfg-note" style="margin-bottom:14px">📊 Presupuesto vs real del mes con <b>semáforos</b>: verde dentro de presupuesto, ámbar leve sobre-ejecución, rojo desviación alta. Edita cada partida o replica el mes anterior. (${p} · ${lbl})</div>
     ${K.kpis([
       { label: 'Presupuesto', val: U.moneyShort(tP, cur), color: 'var(--info)', foot: 'egresos del mes' },
-      { label: 'Ejecutado', val: U.moneyShort(tR, cur), color: tR <= tP ? 'var(--ok)' : 'var(--danger)', foot: Math.round(tR / (tP || 1) * 100) + '% del ppto' },
+      { label: 'Ejecutado', val: U.moneyShort(tR, cur), color: tR <= tP ? 'var(--ok)' : 'var(--danger)', foot: Math.round(tR / (tP || 1) * 100) + '% del ppto', onclick: "Orbit.modules.finanzas.drillKey('egr-mes')" },
       { label: 'Disponible', val: U.moneyShort(tP - tR, cur), color: 'var(--red)', foot: tP - tR >= 0 ? 'dentro de meta' : 'sobre-ejecutado' }
     ])}
+    <div class="card pad" style="margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <b style="font-family:var(--f-display);font-size:15px;flex:1">Partidas · ${lbl}</b>
+      <button class="btn primary sm" onclick="Orbit.modules.finanzas.editarPresup(null)">+ Partida</button>
+      <button class="btn ghost sm" onclick="Orbit.modules.finanzas.replicarPresup()">📋 Replicar mes anterior</button>
+    </div>
     <div class="card" style="overflow:hidden"><table class="tbl"><thead><tr><th>Categoría</th><th class="num">Presupuesto</th><th class="num">Real</th><th class="num">%</th><th>Semáforo</th></tr></thead>
-      <tbody>${rows.map(r => { const pct = Math.round(r.real / (r.ppto || 1) * 100); return `<tr><td><b>${U.esc(r.cat)}</b></td><td class="num">${U.money(r.ppto, cur)}</td><td class="num">${U.money(r.real, cur)}</td><td class="num">${pct}%</td><td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${sem(pct)}"></span> ${pct <= 100 ? 'OK' : pct <= 115 ? 'Alerta' : 'Desviado'}</td></tr>`; }).join('')}</tbody></table></div>`;
+      <tbody>${rows.map(r => { const pct = Math.round(r.real / (r.ppto || 1) * 100); return `<tr class="clickable" onclick="Orbit.modules.finanzas.editarPresup('${r.id}')" title="Editar / eliminar partida"><td><b>${U.esc(r.cat)}</b></td><td class="num">${U.money(r.ppto, cur)}</td><td class="num">${U.money(r.real, cur)}</td><td class="num">${pct}%</td><td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${sem(pct)}"></span> ${pct <= 100 ? 'OK' : pct <= 115 ? 'Alerta' : 'Desviado'}</td></tr>`; }).join('') || `<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin partidas para ${lbl}. Usa “+ Partida” o “Replicar mes anterior”.</td></tr>`}</tbody></table></div>`;
+  }
+  function editarPresup(id) {
+    const p = paisFin() || 'GT', cur = p === 'GT' ? 'GTQ' : 'COP';
+    const rec = id ? S().get('presupuesto', id) : null;
+    const clases = ['Comisiones asesores', 'Gastos fijos', 'Marketing', 'Operación', 'Otros'];
+    let back = document.getElementById('fin-pp'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-pp'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
+      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+        <b style="font-family:var(--f-display);font-size:16px">${rec ? '✏ Editar partida' : '+ Partida de presupuesto'}</b><button class="imp-x" id="pp-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">
+        <label class="ce-l">Categoría<input id="pp-cat" class="o-sel" value="${rec ? U.esc(rec.categoria) : ''}"></label>
+        <div class="cgrid">
+          <label class="ce-l">Clasificación<select id="pp-clase" class="o-sel">${clases.map(c => `<option ${rec && rec.clase === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+          <label class="ce-l">Monto (${cur})<input id="pp-monto" class="o-sel" type="number" value="${rec ? rec.monto : 0}"></label>
+        </div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between">
+        ${rec ? '<button class="btn ghost" id="pp-del" style="color:var(--danger)">🗑 Eliminar</button>' : '<span></span>'}
+        <div style="display:flex;gap:8px"><button class="btn ghost" id="pp-cancel">Cancelar</button><button class="btn primary" id="pp-ok">Guardar</button></div>
+      </div></div>`;
+    document.body.appendChild(back);
+    const $ = s => back.querySelector(s); const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#pp-x').addEventListener('click', close); $('#pp-cancel').addEventListener('click', close);
+    if ($('#pp-del')) $('#pp-del').addEventListener('click', () => { S().remove('presupuesto', id); close(); render(document.getElementById('host')); });
+    $('#pp-ok').addEventListener('click', () => {
+      const data = { categoria: $('#pp-cat').value || 'Partida', clase: $('#pp-clase').value, monto: +$('#pp-monto').value || 0, pais: rec ? rec.pais : p, periodo: rec ? rec.periodo : mesSel };
+      if (rec) S().update('presupuesto', id, data); else S().insert('presupuesto', Object.assign({ id: 'ppt' + Date.now().toString().slice(-7) }, data));
+      close(); render(document.getElementById('host'));
+    });
+  }
+  function replicarPresup() {
+    const p = paisFin() || 'GT';
+    const [y, mm] = mesSel.split('-').map(Number);
+    const prev = new Date(y, mm - 2, 1).toISOString().slice(0, 7);
+    const src = S().all('presupuesto').filter(x => x.pais === p && x.periodo === prev);
+    if (!src.length) { alert('No hay presupuesto del mes anterior (' + prev + ') para replicar en ' + p + '.'); return; }
+    const yaTiene = new Set(S().all('presupuesto').filter(x => x.pais === p && x.periodo === mesSel).map(x => x.categoria));
+    let n = 0;
+    src.forEach(x => { if (yaTiene.has(x.categoria)) return; S().insert('presupuesto', { id: 'ppt' + Date.now().toString().slice(-7) + Math.floor(Math.random() * 99), categoria: x.categoria, clase: x.clase, monto: x.monto, pais: p, periodo: mesSel }); n++; });
+    if (!n) alert('El mes ya tiene todas las partidas del mes anterior.');
+    render(document.getElementById('host'));
   }
 
   /* ---------- ANÁLISIS IA (Gemini) ---------- */
@@ -746,5 +843,5 @@ Orbit.modules.finanzas = (function () {
         : '⚠️ Conecta un proveedor de IA en Configuración → Automatizaciones → Motor de IA para análisis en vivo. (Sin IA, el análisis de arriba usa la heurística de la plataforma.)';
     });
   }
-  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, regFinanciacion, detLiq, toggleComEstado };
+  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
 })();

@@ -1,20 +1,30 @@
-# Bitacora de Cambios
+# Bitácora de cambios · Orbit 360 (prototipo comercializable)
 
-## 2026-06-30 - Fase 1 Auth LAB correction
+> Registro cronológico de cambios del **prototipo** (Claude). El backend LAB (ChatGPT/Codex) mantiene su propia bitácora. Formato: versión · fecha · qué cambió · archivos.
 
-- Rama creada: `feat/ays-auth-lab-correction-20260630`.
-- Proyecto Firebase validado: `ays-orbit-360-lab`.
-- App ID Web obtenido por Firebase CLI: `1:646761409743:web:2ec4595ee9160f9d945bba`.
-- Se agrego config ejemplo versionada para Auth LAB.
-- Se creo config local ignorada para validacion local.
-- Se preparo `core/auth.js` para mantener demo por default y activar Firebase solo por bandera explicita.
-- Se creo `index-dev-auth.html` como archivo temporal LAB ignorado por Git.
-- Se documentaron activacion, validacion y rollback.
+## v1.49 — 2026-07-01
+- **store.js**: se expone `Orbit.store._emit(collection)` como método **público** (antes privado). Permite a la capa backend emitir eventos de cambio manualmente sin tocar internals. API pública confirmada: `all, get, where, find, insert, update, remove, on, _emit, init, reseed, raw`.
+- **Docs nuevos**: MEJORAS-DETECTADAS.md, BITACORA-ERRORES.md, BITACORA-CAMBIOS.md, REPORTE-SMOKE.md (solicitados por el doc de pendientes del backend 2026-07-01).
 
-## Protecciones
+## v1.48 — 2026-07-01
+- **calidad.js**: edición inline (`editarInline`) — botón "✏ Completar" abre solo los campos faltantes del cliente; al guardar, el registro sale de la lista de incompletos (re-render). Toast de confirmación con conteo restante.
 
-- No se modifico `data/store.js`.
-- No se modifico `modules/`.
-- No se modifico `styles/`.
-- No se uso `ays-dashboard-4a575`.
-- No se hizo deploy ni push.
+## v1.47 — 2026-07-01
+- **cotizador.js**: 3er nivel de vehículo marca→línea→**modelo/versión** (`VEH_MODELOS` + trims genéricos de fallback). Paridad con Comparativo.
+
+## v1.46 — 2026-07-01
+- **insights.js**: vista Metas lee colección editable `metas`; botón "✨ Sugerir metas del próximo mes" (tendencia 3m +10%, upsert a `metas`).
+
+## v1.45 — 2026-07-01
+- **cobros.js**: quick-pay "💳 Pagar" desde tabla (`aplicarPago` reutilizable); nº póliza y cliente enlazados; drawer con Ver cliente / Ver póliza. **Fix**: la tabla no refrescaba tras aplicar pago (re-render apuntaba a `mod-host` inexistente → `host`).
+
+## v1.44 — 2026-07-01
+- **finanzas.js**: KPIs con desglose (`drillKey`/`drillModal`); CxC/CxP abren movimiento completo (ver/editar/eliminar/estado) y arrastran mes a mes; Presupuesto editable (`editarPresup`/`replicarPresup`) desde store, sin arrays quemados.
+
+## v1.42–1.43 — 2026-07-01
+- **auth.js**: `applyBrand()` también al mostrar login (logo del cliente antes de entrar).
+- **infra.css**: franja del logo en login blanca a sangre + cintilla roja.
+- **ui.js**: `now()`/`monthLabel()` dinámicos (se elimina "Junio 2026" quemado).
+- **index.html**: login sin badge técnico ni "Tu logo aquí"; slot centrado.
+
+> Historial anterior (v0.1–v1.41): ver CHANGELOG.md.

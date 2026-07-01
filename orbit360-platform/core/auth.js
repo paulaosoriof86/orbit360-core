@@ -60,6 +60,8 @@ Orbit.auth = (function () {
     const lg = document.getElementById('login');
     if (lg) { lg.style.display = ''; lg.classList.remove('hidden'); }
     document.body.classList.add('pre-auth');
+    // pintar logo/nombre del cliente en la franja del login (antes de entrar)
+    try { if (Orbit.applyBrand) Orbit.applyBrand(); } catch (e) {}
   }
 
   function init() {

@@ -9,7 +9,21 @@ Orbit.correoCompose = function (pre) {
   else if (Orbit.modules && Orbit.modules.correo) { const p = window.__orbitCompose; window.__orbitCompose = null; Orbit.modules.correo.redactar(p); }
 };
 Orbit.ui = (function () {
-  const NOW = new Date('2026-06-20');
+  // Ancla temporal. Por defecto usa la fecha del set de datos de demostración para
+  // que renovaciones/vencimientos/aging luzcan coherentes. El backend puede pasar a
+  // fecha real poniendo Orbit.tenant.demoDate = 'real' (o una fecha ISO) — sin tocar módulos.
+  const DEMO_ANCHOR = '2026-06-20';
+  function _anchor() {
+    try { var d = (Orbit.tenant && Orbit.tenant.demoDate); if (d === 'real') return new Date(); if (d) return new Date(d + 'T00:00:00'); } catch (e) {}
+    try { var w = window.ORBIT_DEMO_DATE; if (w === 'real') return new Date(); if (w) return new Date(w + 'T00:00:00'); } catch (e) {}
+    return new Date(DEMO_ANCHOR + 'T00:00:00');
+  }
+  const NOW = _anchor();
+  const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  function now() { return NOW; }
+  function monthLabel() { return (MESES[NOW.getMonth()][0].toUpperCase() + MESES[NOW.getMonth()].slice(1)) + ' ' + NOW.getFullYear(); }
+  function monthKey() { return NOW.getFullYear() + '-' + String(NOW.getMonth() + 1).padStart(2, '0'); }
+  function monthProgressPct() { const dim = new Date(NOW.getFullYear(), NOW.getMonth() + 1, 0).getDate(); return NOW.getDate() / dim; }
 
   function money(n, cur) {
     if (n == null) return '—';
@@ -74,5 +88,5 @@ Orbit.ui = (function () {
     const cls = map[estado] || 'neutral';
     return `<span class="badge ${cls}">${esc(estado)}</span>`;
   }
-  return { NOW, money, moneyShort, esc, initials, fmtDate, daysFromNow, ago, avatar, shade, estadoBadge };
+  return { NOW, now, monthLabel, monthKey, monthProgressPct, money, moneyShort, esc, initials, fmtDate, daysFromNow, ago, avatar, shade, estadoBadge };
 })();

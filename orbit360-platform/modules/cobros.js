@@ -61,20 +61,22 @@ Orbit.modules.cobros = (function () {
       <div class="card" style="overflow:hidden">
         ${K.filterBar(FDEFS(), st)}
         <div style="overflow-x:auto"><table class="tbl">
-          <thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th></tr></thead>
+          <thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th><th></th></tr></thead>
           <tbody>${r.map(c => {
             const p = S().get('polizas', c.polizaId);
+            const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
             return `<tr class="clickable" onclick="Orbit.modules.cobros.detalle('${c.id}')">
               <td>${K.clienteCell(c.clienteId)}</td>
-              <td><span class="mono" style="font-size:12px">${p ? p.numero : '—'}</span></td>
+              <td>${p ? `<a class="mono" style="font-size:12px;color:var(--red);cursor:pointer" title="Ver póliza" onclick="event.stopPropagation();Orbit.modules.cliente360.verPoliza('${p.id}')">${p.numero}</a>` : '<span class="mono" style="font-size:12px">—</span>'}</td>
               <td>${c.cuota}</td>
               <td class="num">${U.money(c.monto, c.moneda)}</td>
               <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
               <td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">—</span>'}</td>
               <td>${U.estadoBadge(c.estado)}</td>
               <td>${c.estado === 'Pagado' ? (c.conciliado ? '<span style="color:var(--ok)" title="Aplicado a póliza">✓</span>' : '<span style="color:var(--warn)" title="Por conciliar">◷</span>') : '<span class="muted">—</span>'}</td>
+              <td style="text-align:right;white-space:nowrap">${aplicable ? `<button class="btn primary sm" title="Aplicar pago" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${c.id}')">💳 Pagar</button>` : ''}</td>
             </tr>`;
-          }).join('') || `<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">Sin cobros.</td></tr>`}</tbody>
+          }).join('') || `<tr><td colspan="9" class="muted" style="text-align:center;padding:30px">Sin cobros.</td></tr>`}</tbody>
         </table></div>
       </div></div>`;
 
@@ -123,6 +125,7 @@ Orbit.modules.cobros = (function () {
         ${c.facturaNombre ? `<div class="cfg-note">📄 Factura adjunta: <b>${U.esc(c.facturaNombre)}</b></div>` : ''}
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        ${cli ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();location.hash='#/cliente360?c=${cli.id}'">👤 Ver cliente</button>` : ''}
         ${p ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
         ${aplicable ? `<button class="btn primary" id="cd-apply">💳 Aplicar pago</button>` : ''}
       </div>
@@ -132,9 +135,13 @@ Orbit.modules.cobros = (function () {
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#cd-x').addEventListener('click', close);
     const ap = back.querySelector('#cd-apply');
-    if (ap) ap.addEventListener('click', () => {
-      // Remove detail modal and show payment modal
-      back.remove();
+    if (ap) ap.addEventListener('click', () => { back.remove(); aplicarPago(cobroId); });
+  }
+
+  /* ---- Aplicar pago (modal reutilizable: desde la ficha del recibo y desde la tabla) ---- */
+  function aplicarPago(cobroId) {
+      const c = S().get('cobros', cobroId); if (!c) return;
+      const cur = c.moneda;
       let pm = document.getElementById('cob-pay'); if (pm) pm.remove();
       pm = document.createElement('div'); pm.id = 'cob-pay'; pm.className = 'drawer-back open';
       pm.style.cssText = 'display:grid;place-items:center;z-index:210';
@@ -187,9 +194,8 @@ Orbit.modules.cobros = (function () {
         if (Orbit.modules.automatizaciones && cliObj) Orbit.modules.automatizaciones.disparar('pago_aplicado', { nombre: (cliObj.nombre||'').split(' ')[0], monto: U.money(c.monto, cur) });
         pmClose();
         const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✅ Pago aplicado' + (conciliado ? ' y conciliado' : ' — pendiente conciliación'); document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
-        const host2 = document.getElementById('mod-host'); if (host2) render(host2);
+        const host2 = document.getElementById('host'); if (host2) render(host2);
       });
-    });
   }
 
   /* ---- Notificación de cobro por LOTE (selecciona recibos pendientes/vencidos) ---- */
@@ -242,5 +248,5 @@ Orbit.modules.cobros = (function () {
     paint();
   }
 
-  return { render, detalle, lote };
+  return { render, detalle, aplicarPago, lote };
 })();

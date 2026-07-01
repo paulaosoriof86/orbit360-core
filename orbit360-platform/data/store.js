@@ -66,6 +66,8 @@ Orbit.store = (function () {
     },
     /** Suscripción a cambios. Devuelve función para desuscribir. */
     on(fn) { listeners.push(fn); return () => { listeners = listeners.filter(l => l !== fn); }; },
+    /** Emite un evento de cambio manualmente (público para la capa backend). */
+    _emit(c) { _emit(c || '*'); },
     /** Acceso crudo (lectura). */
     raw() { return db; }
   };
