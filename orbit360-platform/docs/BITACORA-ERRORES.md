@@ -144,3 +144,14 @@ Estado: ABIERTO para UX tenant A&S / aplicar a prototipo base.
 - Fix o mejora aplicada: gate LAB y contrato No-Fallback; pendiente endurecer data/store.js.
 - Impacto en prototipo comercializable: aplicar a prototipo base antes de producción.
 - Estado: EN PROGRESO
+
+## 2026-07-01 00:53:08 - Backend LAB / data.store sin modo LAB formal
+
+- Modulo: Backend LAB / Store.
+- Sintoma/necesidad: el store base contenia Firestore, localStorage y seed, pero no irestore-lab formal.
+- Esperado: los modos demo, LAB y produccion deben separarse explicitamente.
+- Causa raiz: store base mezclaba rutas/fallbacks durante migracion inicial.
+- Archivo/funcion: data/store.js, data/store-firestore-lab.local.js.
+- Fix o mejora aplicada: override LAB explicito solo en index-dev-firestore.html.
+- Impacto en prototipo comercializable: aplicar a base comercializable antes de produccion.
+- Estado: EN PROGRESO

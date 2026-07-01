@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    Orbit 360 · Capa de datos — store
    Interfaz ÚNICA de acceso a datos. Hoy persiste en localStorage
    sobre un seed ficticio. Mañana: misma API apuntando a backend
@@ -26,6 +26,8 @@ Orbit.store = (function () {
   }
 
   const api = {
+    /** Emite cambios manualmente. API publica requerida por Orbit.store. */
+    _emit(collection) { try { _emit(collection || '*'); } catch (e) {} return api; },
     /** Inicializa: usa datos guardados o siembra desde seed (si cambia la versión). */
     init(seed) {
       const saved = _load();
@@ -64,6 +66,8 @@ Orbit.store = (function () {
     remove(c, id) {
       db[c] = (db[c] || []).filter(r => r.id !== id); _persist(); _emit(c);
     },
+    /** Emite cambios manualmente. Requerido por la API Orbit.store. */
+    _emit,
     /** Suscripción a cambios. Devuelve función para desuscribir. */
     on(fn) { listeners.push(fn); return () => { listeners = listeners.filter(l => l !== fn); }; },
     /** Acceso crudo (lectura). */
@@ -71,3 +75,5 @@ Orbit.store = (function () {
   };
   return api;
 })();
+
+

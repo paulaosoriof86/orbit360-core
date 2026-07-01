@@ -7,19 +7,20 @@
 (function () {
   window.Orbit = window.Orbit || {};
 
-  function isLabMode() {
-    return !!(
-      window.OrbitBackend &&
-      window.OrbitBackend.mode === 'firestore-lab' &&
-      window.OrbitBackend.tenantId === 'alianzas-soluciones'
-    );
-  }
-
-  if (!isLabMode()) return;
-
   var EXPECTED_UID = 'woJlxR1iFEeiQZvTscPj4qQ5Qc73';
   var EXPECTED_EMAIL = 'orbit.lab@demo.com';
   var SESSION_KEY = 'orbit360_session';
+
+  function params() {
+    try { return new URLSearchParams(window.location.search || ''); } catch (e) { return new URLSearchParams(''); }
+  }
+
+  function isLabMode() {
+    var p = params();
+    var mode = p.get('orbitBackend') || (window.OrbitBackend && window.OrbitBackend.mode) || '';
+    var tenantId = p.get('tenant') || (window.OrbitBackend && window.OrbitBackend.tenantId) || '';
+    return mode === 'firestore-lab' && tenantId === 'alianzas-soluciones';
+  }
 
   function clearDemoSession() {
     try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
@@ -33,6 +34,8 @@
   }
 
   function syncSession(user) {
+    if (!isLabMode()) return null;
+
     if (!user || user.uid !== EXPECTED_UID) {
       clearDemoSession();
       return null;
@@ -54,6 +57,10 @@
   }
 
   function showLoginNotice() {
+    if (!isLabMode()) return;
+
+    clearDemoSession();
+
     var login = document.getElementById('login');
     if (login) {
       login.style.display = '';
@@ -82,6 +89,8 @@
   }
 
   function showAppIfReady(user) {
+    if (!isLabMode()) return false;
+
     var payload = syncSession(user);
     if (!payload) {
       showLoginNotice();
@@ -93,6 +102,9 @@
       login.classList.add('hidden');
       setTimeout(function () { login.style.display = 'none'; }, 200);
     }
+
+    var warning = document.getElementById('orbit-lab-auth-warning');
+    if (warning) warning.remove();
 
     document.body.classList.remove('pre-auth');
 
@@ -106,6 +118,7 @@
   }
 
   function installOverride() {
+    if (!isLabMode()) return;
     if (!window.Orbit.auth || window.Orbit.auth.__labGateInstalled) return;
 
     var original = window.Orbit.auth;
@@ -161,14 +174,29 @@
     });
   }
 
+  function tick() {
+    if (!isLabMode()) return;
+    clearDemoSession();
+    installOverride();
+
+    var user = firebaseUser();
+    if (!showAppIfReady(user)) showLoginNotice();
+  }
+
   installOverride();
 
   window.addEventListener('DOMContentLoaded', function () {
-    clearDemoSession();
-    installOverride();
-    setTimeout(function () {
-      var user = firebaseUser();
-      if (!showAppIfReady(user)) showLoginNotice();
-    }, 600);
+    setTimeout(tick, 300);
+    setTimeout(tick, 1000);
+    setTimeout(tick, 2200);
   });
+
+  try {
+    if (window.firebase && firebase.auth) {
+      firebase.auth().onAuthStateChanged(function (user) {
+        if (!isLabMode()) return;
+        if (!showAppIfReady(user)) showLoginNotice();
+      });
+    }
+  } catch (e) {}
 })();

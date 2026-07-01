@@ -326,3 +326,14 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: consolidación de gate local LAB, limpieza de validadores temporales y contrato No-Fallback.
 - Impacto en prototipo comercializable: aplicar a prototipo base/backend real; nunca mezclar demo y backend.
 - Estado: EN PROGRESO
+
+## 2026-07-01 00:53:08 - Backend LAB / Store Firestore explicito
+
+- Modulo: Backend LAB / Store / Auth.
+- Sintoma/necesidad: data/store.js no declaraba irestore-lab y mantenia seed/localStorage, con riesgo de fallback demo.
+- Esperado: en irestore-lab, Orbit.store debe usar Firestore LAB o bloquear por auth, nunca datos demo/locales.
+- Causa raiz: separacion incompleta entre store demo y store backend LAB.
+- Archivo/funcion: data/store-firestore-lab.local.js, core/auth-lab-gate.local.js, index-dev-firestore.html.
+- Fix o mejora aplicada: store Firestore LAB explicito, auth gate robusto por URL y no-fallback demo.
+- Impacto en prototipo comercializable: aplicar patron a prototipo base; backend real no debe disfrazar fallback demo como datos reales.
+- Estado: EN PROGRESO
