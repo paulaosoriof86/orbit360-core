@@ -131,3 +131,44 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: se documento estado Auth LAB, Firestore rules, Store LAB, aislamiento multi-tenant, integracion v93 y colecciones base.
 - Impacto en prototipo comercializable: establece la base de migracion Firestore multi-tenant sin tocar modulos ni datos reales.
 - Estado: RESUELTO.
+
+## 2026-06-30 22:34:03 - Backend LAB - Render smoke modulos Firestore
+- Sintoma/necesidad: validar que la app renderiza modulos en modo firestore-lab despues de integrar v93 y conectar Orbit.store a Firestore LAB.
+- Esperado: rutas principales cargan sin errores JS, sin tocar modulos, sin datos reales y sin usar index-dev-auth.html.
+- Archivo/funcion: index-dev-firestore.html, data/store.js, core/router.js, modules/*.
+- Resultado:
+- inicio: OK, textLength=2356
+- cronograma: OK, textLength=1427
+- ops: OK, textLength=2645
+- leads: OK, textLength=2913
+- aseguradoras: OK, textLength=2229
+- cotizador: OK, textLength=2426
+- comparativo: OK, textLength=1743
+- cliente360: OK, textLength=3397
+- polizas: OK, textLength=8270
+- cobros: OK, textLength=15079
+- renovaciones: OK, textLength=2094
+- cancelaciones: OK, textLength=2326
+- siniestros: OK, textLength=2408
+- historial: OK, textLength=14146
+- comisiones: OK, textLength=1652
+- finanzas: OK, textLength=3761
+- marketing: OK, textLength=2461
+- academia: OK, textLength=2202
+- insights: OK, textLength=2177
+- portal: OK, textLength=7835
+- ia: OK, textLength=7849
+- notificaciones: OK, textLength=8131
+- automatizaciones: OK, textLength=8544
+- equipo: OK, textLength=8957
+- configuracion: OK, textLength=9370
+- reportes: OK, textLength=9783
+- calidad: OK, textLength=10196
+- plantillas: OK, textLength=10609
+- importar: OK, textLength=11022
+- correo: OK, textLength=11435
+- Advertencias:
+- Sin advertencias.
+- Fix o mejora aplicada: test temporal en navegador autenticado, recorriendo rutas hash sobre index-dev-firestore.html.
+- Impacto en prototipo comercializable: confirma compatibilidad inicial del render con backend LAB antes de seed ficticio y migracion de importadores.
+- Estado: RESUELTO.
