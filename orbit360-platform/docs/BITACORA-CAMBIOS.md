@@ -447,3 +447,17 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 **Impacto en prototipo comercializable:** Alto. Permite actualizar desde ZIP completo de Claude sin perder backend y mantiene regla multi-tenant.
 
 **Estado:** RESUELTO LOCALMENTE.
+
+## 2026-07-01 - Restauracion de preview LAB Firestore sobre base limpia Claude
+
+**Modulo:** Backend LAB / Firestore / Infraestructura local.
+
+**Necesidad:** Recuperar index-dev-firestore.html y data/store-firestore-lab.local.js despues de instalar la base limpia de Claude, sin tocar modulos ni UI.
+
+**Esperado:** Mantener el prototipo visual aprobado en index.html y conservar una entrada LAB separada para validaciones Firestore.
+
+**Fix aplicado:** Se restauraron los dos archivos LAB desde backup local verificado.
+
+**Impacto en prototipo comercializable:** Medio. Permite seguir validando Firestore LAB sin afectar la base visual ni los modulos.
+
+**Estado:** RESUELTO LOCALMENTE.
