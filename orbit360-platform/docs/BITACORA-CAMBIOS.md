@@ -475,3 +475,17 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 **Impacto en prototipo comercializable:** Alto. Refuerza la capa backend multi-tenant y permite que los modulos sigan usando solo Orbit.store.
 
 **Estado:** RESUELTO LOCALMENTE.
+
+## 2026-07-01 - Backend LAB activable desde index principal
+
+**Modulo:** Backend / Shell / Orbit.store.
+
+**Necesidad:** Evitar reprocesos con index-dev-firestore.html y permitir que la base visual aprobada por Claude use backend LAB desde index.html.
+
+**Esperado:** El prototipo principal debe abrir normal en modo demo y activar Firestore LAB solo con ?orbitBackend=firestore-lab&tenant=alianzas-soluciones.
+
+**Fix aplicado:** Se agrego conmutador backend seguro en index.html que carga data/store-firestore-lab.local.js solo cuando el modo LAB esta activo.
+
+**Impacto en prototipo comercializable:** Alto. Permite continuar sobre la ultima version completa de Claude sin perder backend ni depender de previews separados.
+
+**Estado:** RESUELTO LOCALMENTE.
