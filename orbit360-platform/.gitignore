@@ -1,0 +1,21 @@
+# Dependencias / build (no hay — HTML/JS plano)
+node_modules/
+dist/
+.cache/
+
+# Entorno y secretos (¡nunca subir llaves reales!)
+.env
+.env.*
+*-firebase-adminsdk-*.json
+serviceAccountKey.json
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# Artefactos locales
+scraps/
+*.tmp

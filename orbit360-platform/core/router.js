@@ -1,166 +1,156 @@
 /* ============================================================
-   Orbit 360 · Router + Shell wiring
-   - Construye el sidebar desde Orbit.NAV
-   - Navegación por hash (#/route)
-   - Despacha a Orbit.modules[route].render(host) o a un placeholder
+   CXOrbia · Router + shell rendering (rail, topbar, mount)
    ============================================================ */
-window.Orbit = window.Orbit || {};
-Orbit.modules = Orbit.modules || {};
+window.CX = window.CX || {};
 
-Orbit.router = (function () {
-  const U = Orbit.ui;
-  let host, sidebar, current = null;
+CX.router = {
+  mount(){
+    const role=CX.session.role;
+    document.body.classList.toggle('role-shopper',role==='shopper');
+    if(role==='shopper'){ const ok=CX.data.projectsFor(role); if(ok.length && !ok.some(p=>p.id===CX.data.currentProjectId)) CX.data.currentProjectId=ok[0].id; }
+    this.buildRail(role);
+    const first=CX.NAV[role].flatMap(g=>g.items).find(id=>CX.moduleEnabled(id));
+    const start = (CX.session.view && CX.MODULES[CX.session.view] && CX.MODULES[CX.session.view].roles.includes(role) && CX.moduleEnabled(CX.session.view))
+      ? CX.session.view : first;
+    this.nav(start);
+  },
 
-  // ---- estado de badges ----
-  function badgeHtml(estado) {
-    if (!estado) return '';
-    const txt = { core: 'NÚCLEO', beta: 'BETA', road: 'PRÓX.' }[estado] || '';
-    return `<span class="nav-badge ${estado}">${txt}</span>`;
-  }
+  buildRail(role){
+    const d=CX.data, p=d.project();
+    const rail=document.getElementById('rail');
+    const u=CX.session.user||{};
+    const initials=(u.name||'CX').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
 
-  // ---- sidebar ----
-  function buildSidebar() {
-    let h = '';
-    const active = (r) => (!(Orbit.tenant && Orbit.tenant.isActive) || Orbit.tenant.isActive(r)) && (!(Orbit.session && Orbit.session.canSee) || Orbit.session.canSee(r));
-    Orbit.NAV.forEach(blk => {
-      if (blk.type === 'home') {
-        if (!active(blk.route)) return;
-        h += `<div class="nav-home"><div class="nav-link" data-route="${blk.route}">
-          <span class="nav-ico">${blk.icon}</span><span class="nav-txt">${blk.label}</span></div></div>`;
-      } else {
-        const items = blk.items.filter(it => active(it.route));
-        if (!items.length) return;
-        const gid = 'g-' + blk.label.replace(/\s+/g, '');
-        const col = blk.open ? '' : 'collapsed';
-        h += `<div class="nav-group">
-          <div class="nav-toggle" data-grp="${gid}">
-            <span class="nav-label">${blk.label}</span>
-            <span class="nav-arrow ${col}" id="${gid}-arr">▾</span>
-          </div>
-          <div class="nav-links ${col}" id="${gid}">`;
-        items.forEach(it => {
-          h += `<div class="nav-link" data-route="${it.route}">
-            <span class="nav-ico">${it.icon}</span>
-            <span class="nav-txt">${it.label}</span>
-            ${badgeHtml(it.estado)}
-          </div>`;
-        });
-        h += `</div></div>`;
+    /* project switcher: admin ve todos; shopper solo los de su país */
+    const visibleProjects = d.projectsFor(role);
+    const projOpts=visibleProjects.map(pr=>`<option value="${pr.id}" ${pr.id===d.currentProjectId?'selected':''}>${pr.name}</option>`).join('');
+    const projBlock = role==='admin'
+      ? `<div class="rail-proj"><div class="rail-proj-l">Proyecto activo</div>
+           <select id="projSel">${projOpts}</select></div>`
+      : (visibleProjects.length>1
+        ? `<div class="rail-proj"><div class="rail-proj-l">Proyecto · ${u.code||''}</div>
+             <select id="projSel">${projOpts}</select></div>`
+        : `<div class="rail-proj"><div class="rail-proj-l">Proyecto</div>
+             <div style="font-size:13px;font-weight:700">${p.name}</div>
+             <div style="font-size:10.5px;color:var(--t3)">${p.industry}</div></div>`);
+
+    const collapsed = (()=>{try{return JSON.parse(localStorage.getItem('cx_rail_col')||'{}')}catch(e){return {};}})();
+    const nav=CX.NAV[role].map(group=>{
+      const items=group.items.filter(id=>CX.moduleEnabled(id)).map(id=>{
+        const m=CX.MODULES[id]; if(!m)return '';
+        const badge = (m.badge && role==='admin') ? `<span class="n-badge">${d.kpis().postPend||''}</span>`
+          : (m.badgeNotif && CX.notif && CX.notif.unread(role)) ? `<span class="n-badge">${CX.notif.unread(role)}</span>` : '';
+        const soon  = m.status==='soon' ? `<span class="n-soon">pronto</span>` : '';
+        return `<div class="nav-i" id="nav-${id}" data-id="${id}">
+          <span class="n-ic">${m.icon}</span><span>${m.label}</span>${badge||soon}</div>`;
+      }).join('');
+      if(!items) return '';
+      const isc = collapsed[group.sec] || false;
+      return `<div class="nav-sec-wrap${isc?' nav-sec-col':''}" data-grp="${group.sec}">
+        <div class="nav-sec" data-sec="${group.sec}" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none">
+          <span>${group.sec}</span><span style="font-size:9px;opacity:.6;margin-left:6px">${isc?'›':'⌄'}</span></div>
+        <div class="nav-sec-items">${items}</div>
+      </div>`;
+    }).join('');
+
+    /* CXOrbia SIEMPRE en el sidebar (no se reemplaza). El logo del cliente va en el topbar blanco. */
+    const logoHTML = `<div class="logo-mark"><span class="dot"></span></div>
+         <div><div class="brand-name">CXOrbia</div><div class="brand-sub">Field Operations Platform</div></div>`;
+
+    rail.innerHTML=`
+      <div class="rail-brand">
+        ${logoHTML}
+      </div>
+      ${projBlock}
+      <nav class="rail-nav">${nav}</nav>
+      <div class="rail-foot">
+        <div class="rail-user"><div class="rail-av">${initials}</div>
+          <div><div style="font-size:12.5px;font-weight:700;color:#fff">${u.name||'Usuario demo'}</div>
+          <div style="font-size:10.5px;color:rgba(255,255,255,.5)">${role==='admin'?'Administración':role==='cliente'?'Portal del cliente':'Shopper · '+(p.countries.join('/'))}</div></div></div>
+        <button class="rail-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>`;
+
+    rail.querySelectorAll('.nav-i').forEach(n=>n.addEventListener('click',()=>this.nav(n.dataset.id)));
+    /* logo del cliente en topbar blanco */
+    if(CX.topbar&&CX.topbar.renderLogo)CX.topbar.renderLogo();
+    rail.querySelectorAll('.nav-sec').forEach(sec=>sec.addEventListener('click',e=>{
+      e.stopPropagation();
+      const wrap=sec.closest('.nav-sec-wrap'); if(!wrap)return;
+      const items=wrap.querySelector('.nav-sec-items'); if(!items)return;
+      const key=sec.dataset.sec;
+      const isNowCollapsed = items.style.display!=='none';
+      items.style.display = isNowCollapsed ? 'none' : '';
+      sec.querySelector('span:last-child').textContent = isNowCollapsed ? '›' : '⌄';
+      try{const cl=JSON.parse(localStorage.getItem('cx_rail_col')||'{}');cl[key]=isNowCollapsed;localStorage.setItem('cx_rail_col',JSON.stringify(cl));}catch(e){}
+    }));
+    /* restore collapsed state */
+    rail.querySelectorAll('.nav-sec-wrap').forEach(wrap=>{
+      const key=wrap.dataset.grp;
+      if(collapsed[key]){
+        const items=wrap.querySelector('.nav-sec-items');
+        const arrow=wrap.querySelector('.nav-sec span:last-child');
+        if(items)items.style.display='none';
+        if(arrow)arrow.textContent='›';
       }
     });
-    h += `<hr class="nav-divider">
-      <div class="nav-foot">
-        Marca de producto <b style="color:#fff">Orbit 360</b>.
-        <div class="pwa"><span>📲</span><span>Instalable como <b>app (PWA)</b></span></div>
-      </div>`;
-    sidebar.innerHTML = h;
+    const sel=document.getElementById('projSel');
+    if(sel)sel.addEventListener('change',()=>{d.setProject(sel.value);CX.ui.toast('Proyecto: '+d.project().name,'ok');});
+    document.getElementById('logoutBtn').addEventListener('click',()=>CX.app.logout());
+  },
 
-    sidebar.querySelectorAll('.nav-link').forEach(el =>
-      el.addEventListener('click', () => go(el.dataset.route)));
-    sidebar.querySelectorAll('.nav-toggle').forEach(el =>
-      el.addEventListener('click', () => {
-        const id = el.dataset.grp;
-        document.getElementById(id).classList.toggle('collapsed');
-        document.getElementById(id + '-arr').classList.toggle('collapsed');
-      }));
-  }
+  nav(id){
+    const role=CX.session.role, m=CX.MODULES[id];
+    if(!m||!m.roles.includes(role)||!CX.moduleEnabled(id)) return;
+    CX.session.view=id; CX.session.save();
+    document.querySelectorAll('.nav-i').forEach(n=>n.classList.toggle('active',n.dataset.id===id));
+    document.body.classList.remove('nav-open');
+    // crumb
+    const group=CX.NAV[role].find(g=>g.items.includes(id));
+    document.getElementById('crumb').innerHTML=`${group?group.sec:''} <span class="sep">/</span> <b>${m.label}</b>`;
+    this.render(id);
+    const c=document.querySelector('.content'); if(c)c.scrollTo({top:0});
+  },
 
-  function setActive(route) {
-    sidebar.querySelectorAll('.nav-link').forEach(el =>
-      el.classList.toggle('active', el.dataset.route === route));
-  }
-
-  // ---- placeholder para módulos no construidos ----
-  function placeholder(route) {
-    const m = Orbit.MODULE_META[route];
-    if (!m) return `<div class="page"><div class="modstate"><div class="ms-ico">🚧</div>
-      <h2>Módulo no encontrado</h2><p>La ruta <code>${U.esc(route)}</code> no existe.</p></div></div>`;
-    const tag = { core: 'Núcleo', beta: 'En estabilización (Beta)', road: 'En roadmap' }[m.estado];
-    return `<div class="page">
-      <div class="page-head"><div>
-        <div class="crumb"><b>Orbit 360</b> / ${U.esc(m.title)}</div>
-        <div class="page-title">${m.icon} ${U.esc(m.title)}</div>
-      </div><span class="badge ${m.estado === 'beta' ? 'info' : 'neutral'}">${tag}</span></div>
-      <div class="modstate">
-        <div class="ms-ico">${m.icon}</div>
-        <h2>${U.esc(m.title)}</h2>
-        <p>${U.esc(m.desc)}</p>
-        <ul class="scope">${m.scope.map(s => `<li>${U.esc(s)}</li>`).join('')}</ul>
-        <p style="margin-top:20px;font-size:13px" class="muted">Módulo en construcción según el plan del producto; el núcleo CRM está activo.</p>
-      </div></div>`;
-  }
-
-  // ---- navegación ----
-  function go(route) {
-    if (!route) route = 'inicio';
-    if (location.hash !== '#/' + route) { location.hash = '#/' + route; return; }
-    render(route);
-    closeMobile();
-  }
-  function parseQuery(qs) {
-    const out = {};
-    (qs || '').split('&').forEach(kv => { if (!kv) return; const [k, v] = kv.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v || ''); });
-    return out;
-  }
-  function render(raw) {
-    const [route, qs] = String(raw).split('?');
-    Orbit.route = { key: route, params: parseQuery(qs) };
-    current = route;
-    setActive(route);
-    const mod = Orbit.modules[route];
-    host.scrollTop = 0;
-    if (mod && typeof mod.render === 'function') {
-      host.innerHTML = '';
-      mod.render(host);
+  render(id){
+    const host=document.getElementById('view');
+    const fn=CX.modules[id];
+    host.classList.remove('view'); void host.offsetWidth; host.classList.add('view');
+    if(typeof fn==='function'){
+      const out=fn({data:CX.data, role:CX.session.role, ui:CX.ui});
+      if(typeof out==='string'){host.innerHTML=out;}
+      else if(out instanceof Node){host.innerHTML='';host.appendChild(out);}
+      else {host.innerHTML='';}
     } else {
-      host.innerHTML = placeholder(route);
+      host.innerHTML=CX.ui.scaffold(id);
     }
-    window.scrollTo(0, 0);
-  }
-  function onHash() {
-    const r = (location.hash || '').replace(/^#\/?/, '') || 'inicio';
-    render(r);
-  }
+  },
+};
 
-  // ---- mobile ----
-  function openMobile() { sidebar.classList.add('open'); document.querySelector('.sb-overlay').classList.add('show'); }
-  function closeMobile() { sidebar.classList.remove('open'); document.querySelector('.sb-overlay').classList.remove('show'); }
+/* re-render current view + rail badges when project changes */
+CX.bus.on('project',()=>{
+  if(!CX.session.role)return;
+  CX.router.buildRail(CX.session.role);
+  CX.router.nav(CX.session.view);
+});
 
-  function init() {
-    host = document.getElementById('host');
-    sidebar = document.getElementById('sidebar');
-    buildSidebar();
-    try { if (Orbit.applyBrand) Orbit.applyBrand(); } catch (e) {}
-    document.getElementById('burger').addEventListener('click', openMobile);
-    document.querySelector('.sb-overlay').addEventListener('click', closeMobile);
-    document.querySelectorAll('[data-home]').forEach(el => el.addEventListener('click', () => go('inicio')));
-    wireGlobalSearch();
-    window.addEventListener('hashchange', onHash);
-    onHash();
+/* ============================================================
+   SINCRONÍA CENTRAL · una sola fuente de re-render para toda la
+   plataforma. Cualquier mutación de datos re-renderiza la vista
+   activa + recalcula badges del rail. Registrado UNA vez aquí
+   (no en los módulos) para evitar fugas de listeners.
+   visit-flow → asignación, cuestionario/score, sync HR, agenda
+   shoppers   → alta/edición de evaluadores
+   clients    → alta/edición de clientes
+   programa   → edición de cuestionario ponderado (op ↔ cliente)
+   ============================================================ */
+(function(){
+  let _busy=false;
+  function reRender(){
+    if(_busy || !CX.session.role || !CX.session.view) return;
+    _busy=true;
+    try{ CX.router.buildRail(CX.session.role); CX.router.nav(CX.session.view); }
+    finally{ _busy=false; }
   }
-
-  function wireGlobalSearch() {
-    const box = document.querySelector('.tb-search'); if (!box) return;
-    const inp = box.querySelector('input'); if (!inp) return;
-    let dd = document.getElementById('tb-search-dd');
-    if (!dd) { dd = document.createElement('div'); dd.id = 'tb-search-dd'; dd.className = 'tb-search-dd'; box.appendChild(dd); }
-    const S = Orbit.store, U = Orbit.ui;
-    function buscar(qstr) {
-      const t = qstr.trim().toLowerCase(); if (t.length < 2) { dd.classList.remove('open'); dd.innerHTML = ''; return; }
-      const res = [];
-      S.all('clientes').forEach(c => { if ((c.nombre + ' ' + (c.identificacion || '') + ' ' + (c.email || '')).toLowerCase().includes(t)) res.push({ ic: '🧑', t: c.nombre, s: 'Cliente · ' + (c.identificacion || c.tipo || ''), go: '#/cliente360?c=' + c.id }); });
-      S.all('polizas').forEach(p => { const veh = S.all('vehiculos').find(v => v.polizaId === p.id); const placa = (veh && veh.placa) || p.placa || ''; const cli = S.get('clientes', p.clienteId); if ((p.numero + ' ' + p.producto + ' ' + placa + ' ' + (cli ? cli.nombre : '') + ' ' + (veh ? veh.marca + ' ' + veh.linea : '')).toLowerCase().includes(t)) res.push({ ic: '📑', t: p.numero + (placa ? ' · ' + placa : ''), s: 'Póliza · ' + p.ramo + (cli ? ' · ' + cli.nombre : ''), go: '#/cliente360?c=' + p.clienteId }); });
-      S.all('vehiculos').forEach(v => { if (((v.placa || '') + ' ' + (v.marca || '') + ' ' + (v.linea || '')).toLowerCase().includes(t)) { const cli = S.get('clientes', v.clienteId); res.push({ ic: '🚗', t: (v.placa || (v.marca + ' ' + v.linea)), s: 'Vehículo · ' + v.marca + ' ' + v.linea + (cli ? ' · ' + cli.nombre : ''), go: '#/cliente360?c=' + v.clienteId }); } });
-      S.all('cobros').forEach(cb => { const cli = S.get('clientes', cb.clienteId); if (((cli ? cli.nombre : '') + ' ' + (cb.numeroRecibo || '')).toLowerCase().includes(t)) res.push({ ic: '💳', t: (cb.numeroRecibo || 'Recibo') + ' · ' + U.money(cb.monto || 0, cb.moneda), s: 'Cobro · ' + cb.estado + (cli ? ' · ' + cli.nombre : ''), go: '#/cliente360?c=' + cb.clienteId }); });
-      S.all('aseguradoras').forEach(a => { if ((a.nombre || '').toLowerCase().includes(t)) res.push({ ic: '🏛️', t: a.nombre, s: 'Aseguradora · ' + (a.pais || ''), go: '#/aseguradoras' }); });
-      const top = res.slice(0, 12);
-      dd.innerHTML = top.length ? top.map(r => `<button class="tb-sr" data-go="${r.go}"><span>${r.ic}</span><span class="tb-sr-t">${U.esc(r.t)}<small>${U.esc(r.s)}</small></span></button>`).join('') + (res.length > 12 ? `<div class="tb-sr-more">+${res.length - 12} más…</div>` : '') : '<div class="tb-sr-empty">Sin resultados para "' + U.esc(qstr) + '"</div>';
-      dd.classList.add('open');
-      dd.querySelectorAll('[data-go]').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); location.hash = b.dataset.go; dd.classList.remove('open'); inp.value = ''; }));
-    }
-    inp.addEventListener('input', () => buscar(inp.value));
-    inp.addEventListener('focus', () => { if (inp.value.trim().length >= 2) buscar(inp.value); });
-    inp.addEventListener('blur', () => setTimeout(() => dd.classList.remove('open'), 180));
-  }
-  return { init, go, rebuildSidebar: () => { try { buildSidebar(); setActive((Orbit.route && Orbit.route.key) || 'inicio'); } catch (e) {} } };
+  ['visit-flow','shoppers','clients','programa'].forEach(ev=>CX.bus.on(ev, reRender));
+  CX.router._reRender = reRender;
 })();

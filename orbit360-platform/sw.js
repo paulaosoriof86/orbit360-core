@@ -1,16 +1,15 @@
-/* Orbit 360 · Service Worker — cache mínimo para instalabilidad/offline.
-   En el dominio real cachea el shell; en sandbox simplemente no registra. */
-var CACHE = 'orbit360-v1';
-self.addEventListener('install', function (e) { self.skipWaiting(); });
-self.addEventListener('activate', function (e) { e.waitUntil(self.clients.claim()); });
-self.addEventListener('fetch', function (e) {
+/* CXOrbia · Service Worker mínimo — habilita instalación PWA y caché básico offline */
+const CX_CACHE = 'cxorbia-v1';
+self.addEventListener('install', e => { self.skipWaiting(); });
+self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
+self.addEventListener('fetch', e => {
+  /* network-first: usa red, cae a caché si no hay conexión */
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.open(CACHE).then(function (cache) {
-      return cache.match(e.request).then(function (hit) {
-        var net = fetch(e.request).then(function (res) { try { cache.put(e.request, res.clone()); } catch (x) {} return res; }).catch(function () { return hit; });
-        return hit || net;
-      });
-    })
+    fetch(e.request).then(res => {
+      const copy = res.clone();
+      caches.open(CX_CACHE).then(c => c.put(e.request, copy)).catch(()=>{});
+      return res;
+    }).catch(() => caches.match(e.request))
   );
 });

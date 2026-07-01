@@ -1,318 +1,313 @@
 /* ============================================================
-   Orbit 360 · Configuración de navegación + metadatos de módulos
-   Una sola fuente de verdad para el sidebar y el router.
-   estado: 'core' (Núcleo) · 'beta' · 'road' (Roadmap)
+   CXOrbia · Core configuration (white-label + navigation)
+   Everything tenant-specific lives here. Re-theme and re-label
+   the whole product without touching module code.
    ============================================================ */
-window.Orbit = window.Orbit || {};
+window.CX = window.CX || {};
 
-/* Títulos de módulo (banda de header) — plantilla personalizable por cliente.
-   Cada cliente/plan puede sobreescribir icon, title, sub y features. */
-Orbit.MODULE_TITLES = {
-  ops:           { icon: '🗂', title: 'Orbit Ops', sub: 'Gestiones operativas', features: ['Kanban', 'Listas personalizables', 'Enlazado con Leads'] },
-  leads:         { icon: '🎯', title: 'Orbit Leads', sub: 'Pipeline comercial', features: ['Cadencias', 'Probabilidad', 'Convierte a cliente'] },
-  inicio:        { icon: '🌅', title: 'Orbit Inicio', sub: 'Mi día', features: ['Metas del mes', 'Prioridades', 'Avance por asesor'] },
-  cliente360:    { icon: '🧑‍💼', title: 'Orbit Clientes', sub: 'Base de asegurados', features: ['Expediente 360', 'Autogestionable', 'Importación inteligente'] },
-  polizas:       { icon: '📑', title: 'Orbit Pólizas', sub: 'Cartera completa', features: ['Multi-aseguradora', 'Vigencias', 'Ramos y productos'] },
-  cobros:        { icon: '💳', title: 'Orbit Cobros', sub: 'Cartera y conciliación', features: ['Aging', 'Recibos', 'Conciliación pago↔póliza'] },
-  renovaciones:  { icon: '🔄', title: 'Orbit Renovaciones', sub: 'Pipeline por vencer', features: ['90 días', 'Por urgencia', 'Gestión'] },
-  cancelaciones: { icon: '✕', title: 'Orbit Cancelaciones', sub: 'Fuga de cartera', features: ['Motivos', 'Valor perdido', 'Tasa de fuga'] },
-  comisiones:    { icon: '💼', title: 'Orbit Comisiones', sub: 'Devengado y liquidado', features: ['Por asesor', 'Por aseguradora', 'Por periodo'] },
-  historial:     { icon: '📝', title: 'Orbit Historial', sub: 'Actividades de la cartera', features: ['Llamadas', 'WhatsApp', 'Reuniones'] },
-  importar:      { icon: '⬇', title: 'Orbit Importa', sub: 'Importación inteligente', features: ['Cualquier formato', 'Mapeo automático', 'Adaptable'] },
-  calidad:       { icon: '🩺', title: 'Calidad de datos', sub: 'Expedientes a completar', features: ['Prioridad teléfono', 'Clientes con póliza vigente', 'Notificar por WA/correo'] },
-  plantillas:    { icon: '✉', title: 'Plantillas de mensajes', sub: 'WhatsApp y correo', features: ['Propuestas', 'Primas pendientes', 'Actualización de datos'] },
-  finanzas:      { icon: '💰', title: 'Orbit Finanzas', sub: 'Liquidaciones y conciliación', features: ['Movimientos', 'Liquidación empresa/asesores', 'Conciliación bancaria'] },
-  aseguradoras:  { icon: '🏢', title: 'Aseguradoras', sub: 'Directorio operativo', features: ['Fichas completas', 'Ejecutivos de cuenta', 'Documentos', 'Comisiones por ramo'] },
-  insights:      { icon: '📊', title: 'Orbit Insights', sub: 'Analítica del CRM', features: ['Producción', 'Cartera y aging', 'Pipeline', 'Renovaciones'] }
+/* ---------- Brand / white-label ---------- */
+CX.BRAND = {
+  name: 'CXOrbia',
+  tagline: 'Field Operations Platform',
+  // "Plataforma desarrollada para <client>" en el login. Vacío = marca propia.
+  clientName: '',
+  logoText: 'CX',     // fallback cuando no hay imagen de logo
+  logoUrl: '',        // data-URL o ruta de imagen del cliente
+  theme: 'cxorbia',   // id de CX.THEMES
+  demoMode: true,
+  showAITag: true,
+  // colors se sincroniza desde el tema activo (no editar a mano)
+  colors: {},
 };
 
-/* Operación multipaís — el cliente puede operar uno o varios países.
-   Cada país define moneda + impuestos/recargos configurables (se editan
-   al dar de alta el país). Demo: IVA GT 12% · CO 19%. */
-Orbit.PAISES = [
-  { id: 'TODOS', label: 'Todos los países' },
-  { id: 'GT', label: 'Guatemala', moneda: 'GTQ', iva: 12, recargoFinanciero: 5, gastosEmision: 0 },
-  { id: 'CO', label: 'Colombia', moneda: 'COP', iva: 19, recargoFinanciero: 6, gastosEmision: 0 }
+/* ---------- Temas (plantillas de marca seleccionables) ----------
+   Cada cliente puede partir de una plantilla y ajustarla. La de T&A
+   reproduce exactamente la plataforma actual (Segoe UI, azul/rojo, sidebar claro). */
+CX.THEMES = {
+  cxorbia: {
+    label: 'CXOrbia (oscuro)', font: "'Manrope', system-ui, sans-serif", railStyle:'dark',
+    colors:{ brand:'#2196d3', brandDark:'#1565a8', brandMid:'#4ab4e6', brandLight:'#e8f4fd',
+             navy:'#0d2740', navy2:'#123553', accent:'#c8232c' },
+  },
+  tya: {
+    label: 'Corporativo claro (Segoe UI)', font: "'Segoe UI', Tahoma, system-ui, sans-serif", railStyle:'light',
+    colors:{ brand:'#2196d3', brandDark:'#1565a8', brandMid:'#4ab4e6', brandLight:'#e8f4fd',
+             navy:'#ffffff', navy2:'#fafbfd', accent:'#c8232c' },
+  },
+  esmeralda: {
+    label: 'Esmeralda (banca)', font: "'Manrope', system-ui, sans-serif", railStyle:'dark',
+    colors:{ brand:'#0e9c6e', brandDark:'#0a7050', brandMid:'#3fbf93', brandLight:'#e2f7ef',
+             navy:'#0c2a22', navy2:'#123a30', accent:'#d97706' },
+  },
+  violeta: {
+    label: 'Violeta (retail/food)', font: "'Manrope', system-ui, sans-serif", railStyle:'dark',
+    colors:{ brand:'#7c3aed', brandDark:'#5b21b6', brandMid:'#a78bfa', brandLight:'#f3eeff',
+             navy:'#1e1530', navy2:'#2a1f42', accent:'#ec4899' },
+  },
+  grisOscuro: {
+    label: 'Corporativo gris oscuro', font: "'Manrope', system-ui, sans-serif", railStyle:'graydark',
+    colors:{ brand:'#2196d3', brandDark:'#1565a8', brandMid:'#4ab4e6', brandLight:'#e8f4fd',
+             navy:'#2b2f36', navy2:'#363b44', accent:'#c8232c' },
+  },
+  grisClaro: {
+    label: 'Corporativo gris claro', font: "'Manrope', system-ui, sans-serif", railStyle:'graylight',
+    colors:{ brand:'#2196d3', brandDark:'#1565a8', brandMid:'#4ab4e6', brandLight:'#e8f4fd',
+             navy:'#e4e7ec', navy2:'#d8dce3', accent:'#c8232c' },
+  },
+  indigo: {
+    label: 'Índigo (consultoría)', font: "'Manrope', system-ui, sans-serif", railStyle:'dark',
+    colors:{ brand:'#4f46e5', brandDark:'#3730a3', brandMid:'#818cf8', brandLight:'#eef0ff',
+             navy:'#161a36', navy2:'#1f244a', accent:'#f59e0b' },
+  },
+  teal: {
+    label: 'Teal (salud/servicios)', font: "'Manrope', system-ui, sans-serif", railStyle:'dark',
+    colors:{ brand:'#0d9488', brandDark:'#0a6e66', brandMid:'#2dd4bf', brandLight:'#e0f5f2',
+             navy:'#0c2522', navy2:'#123733', accent:'#f97316' },
+  },
+};
+
+/* Aplica un tema completo (colores + tipografía + estilo de sidebar) */
+CX.applyTheme = function(id){
+  const t = CX.THEMES[id] || CX.THEMES.cxorbia;
+  CX.BRAND.theme = id; CX.BRAND.colors = Object.assign({}, t.colors);
+  const r = document.documentElement.style, c = t.colors;
+  r.setProperty('--brand', c.brand);
+  r.setProperty('--brand-dark', c.brandDark);
+  r.setProperty('--brand-mid', c.brandMid);
+  r.setProperty('--brand-light', c.brandLight);
+  r.setProperty('--navy', c.navy);
+  r.setProperty('--navy-2', c.navy2);
+  r.setProperty('--accent', c.accent);
+  r.setProperty('--ui', t.font);
+  r.setProperty('--disp', t.font);
+  document.documentElement.setAttribute('data-rail', t.railStyle);
+  try{ localStorage.setItem('cx_theme', id); }catch(e){}
+};
+
+/* Compat: applyBrand reaplica el tema activo */
+CX.applyBrand = function(){
+  let id = CX.BRAND.theme;
+  try{ const saved = localStorage.getItem('cx_theme'); if(saved && CX.THEMES[saved]) id = saved; }catch(e){}
+  CX.applyTheme(id);
+  try{ const ten = JSON.parse(localStorage.getItem('cx_tenant')||'null'); if(ten){ Object.assign(CX.BRAND, ten); CX.applyTheme(CX.BRAND.theme); } }catch(e){}
+  /* leer identidad guardada por módulo Marca (cx_brand_identity) */
+  try{ const b = JSON.parse(localStorage.getItem('cx_brand_identity')||'null');
+    if(b){ Object.assign(CX.BRAND, b);
+      if(b.theme) CX.applyTheme(b.theme);
+    }
+  }catch(e){}
+};
+
+/* ---------- Módulos activos por tenant (nunca se eliminan, solo se ocultan) ---------- */
+CX.tenantModules = function(){
+  try{ const s = JSON.parse(localStorage.getItem('cx_modules')||'null'); if(s) return s; }catch(e){}
+  return null; // null = todos activos
+};
+CX.moduleEnabled = function(id){
+  /* módulos de administración/configuración: SIEMPRE activos para admin, ignorando el mapa de plan guardado */
+  const adminAlways=['cuestionarios','usuarios','config','automatizaciones','integraciones','correo','marca',
+    'clientes','proyectos','financiero','movimientos','liquidaciones','lotes','costos','crm','marketing',
+    'informes','soporte','tablon','documentos','aprendizaje','cert','rutas','postulaciones','shoppers',
+    'visitas','reservas','shoppers','dashboard','midia'];
+  if(adminAlways.includes(id)) return true;
+  const s = CX.tenantModules(); return !s || s[id] !== false;
+};
+CX.setModuleEnabled = function(id, on){
+  const s = CX.tenantModules() || {}; s[id] = on;
+  try{ localStorage.setItem('cx_modules', JSON.stringify(s)); }catch(e){}
+};
+
+/* ---------- Module registry metadata ----------
+   status: 'ready'  -> fully built
+           'beta'   -> functional, being deepened
+           'soon'   -> scaffold placeholder
+   The render fn is attached by each file in /app/modules via CX.module(id, fn).
+*/
+CX.MODULES = {
+  // Operación (admin + shopper)
+  midia:         { icon:'☀️', label:'Mi Día',              roles:['admin','shopper'], status:'ready' },
+  dashboard:     { icon:'📊', label:'Dashboard Operativo',  roles:['admin'],           status:'ready' },
+  clientes:      { icon:'🏢', label:'Clientes',             roles:['admin'],           status:'ready' },
+  importador:    { icon:'📥', label:'Importador',           roles:['admin'],           status:'ready' },
+  proyectos:     { icon:'🗂️', label:'Proyectos',            roles:['admin'],           status:'ready' },
+  visitas:       { icon:'📋', label:'Visitas Disponibles',  roles:['admin','shopper'], status:'ready' },
+  postulaciones: { icon:'📩', label:'Postulaciones',        roles:['admin'], badge:true, status:'ready' },
+  reservas:      { icon:'🙋', label:'Reservas & Asignación', roles:['admin','shopper'], status:'ready' },
+  misvisitas:    { icon:'🧭', label:'Mis Visitas',          roles:['shopper'],         status:'ready' },
+  shoppers:      { icon:'👥', label:'Shoppers',             roles:['admin'],           status:'ready' },
+  miperfil:      { icon:'👤', label:'Mi Perfil',            roles:['shopper'],         status:'ready' },
+  rutas:         { icon:'🗺️', label:'Hojas de Ruta',        roles:['admin'],           status:'ready' },
+  documentos:    { icon:'📎', label:'Recursos del proyecto', roles:['admin','shopper'], status:'ready' },
+  aprendizaje:   { icon:'📚', label:'Academia',          roles:['admin','shopper'], status:'ready' },
+  cert:          { icon:'🏆', label:'Certificación',        roles:['admin','shopper'], status:'ready' },
+  tablon:        { icon:'📢', label:'Tablón / Novedades',   roles:['admin','shopper'], badgeNotif:true, status:'ready' },
+  soporte:       { icon:'🤖', label:'Soporte IA',           roles:['admin','shopper'], status:'ready' },
+  informes:      { icon:'📑', label:'Reportes & KPIs',      roles:['admin'],           status:'ready' },
+  // Finanzas (admin)
+  financiero:    { icon:'💹', label:'Dashboard Financiero', roles:['admin'],           status:'ready' },
+  movimientos:   { icon:'🧾', label:'Movimientos',          roles:['admin'],           status:'ready' },
+  liquidaciones: { icon:'💸', label:'Liquidaciones',        roles:['admin'],           status:'ready' },
+  lotes:         { icon:'📦', label:'Lotes de Pago',        roles:['admin'],           status:'ready' },
+  beneficios:    { icon:'💰', label:'Mis Beneficios',       roles:['shopper'],         status:'ready' },
+  // Configuración (admin)
+  cuestionarios: { icon:'🧩', label:'Cuestionarios',        roles:['admin'],           status:'ready' },
+  usuarios:      { icon:'🔐', label:'Usuarios & Permisos',  roles:['admin'],           status:'ready' },
+  config:        { icon:'⚙️', label:'Configuración',         roles:['admin'],           status:'ready' },
+  automatizaciones: { icon:'⚡', label:'Automatizaciones',     roles:['admin'],           status:'ready' },
+  integraciones: { icon:'🔌', label:'Integraciones & Add-ons',roles:['admin'],           status:'ready' },
+  correo:        { icon:'✉️',  label:'Correo integrado',     roles:['admin'],           status:'ready' },
+  marca:         { icon:'🎨',  label:'Identidad de Marca',   roles:['admin'],           status:'ready' },
+  // Comercial / consultora (CRM + marketing) — roadmap del ecosistema
+  costos:        { icon:'🧮', label:'Costos & Propuestas',  roles:['admin'],           status:'ready' },
+  crm:           { icon:'🤝', label:'CRM Comercial',         roles:['admin'],           status:'ready' },
+  marketing:     { icon:'📣', label:'Marketing & Contenidos',roles:['admin'],           status:'ready' },
+  // Portal Estratégico del Cliente final (marca evaluada)
+  cli_dashboard:   { icon:'📈', label:'Panorama',             roles:['cliente'], status:'ready' },
+  cli_sucursales:  { icon:'🏬', label:'Sucursales & Score',   roles:['cliente'], status:'ready' },
+  cli_acciones:    { icon:'🎯', label:'Planes de Acción',     roles:['cliente'], status:'ready' },
+  cli_capacitacion:{ icon:'🎓', label:'Capacitación',         roles:['cliente'], status:'ready' },
+  cli_reportes:    { icon:'📤', label:'Reportes',             roles:['cliente'], status:'ready' },
+  cli_programa:    { icon:'🧮', label:'Mi Programa',          roles:['cliente'], status:'ready' },
+  cli_market:      { icon:'✨', label:'Servicios & Add-ons',  roles:['cliente'], status:'ready' },
+};
+
+/* ---------- Navigation layout per role ---------- */
+CX.NAV = {
+  admin: [
+    { sec:'Operación', items:['midia','dashboard','visitas','postulaciones','reservas','shoppers','informes'] },
+    { sec:'Admin del Proyecto', items:['clientes','proyectos','rutas','cuestionarios','importador'] },
+    { sec:'Capacitación & IA', items:['aprendizaje','cert','documentos','soporte'] },
+    { sec:'Finanzas',  items:['financiero','movimientos','liquidaciones','lotes'] },
+    { sec:'Comercial', items:['costos','crm','marketing'] },
+    { sec:'Configuración', items:['config','usuarios','automatizaciones','integraciones','correo','marca'] },
+  ],
+  shopper: [
+    { sec:'Operación', items:['midia','miperfil','visitas','reservas','misvisitas'] },
+    { sec:'Capacitación & IA', items:['aprendizaje','cert','documentos','soporte'] },
+    { sec:'Mis Beneficios', items:['beneficios'] },
+  ],
+  cliente: [
+    { sec:'Estrategia',  items:['cli_dashboard','cli_sucursales','cli_acciones'] },
+    { sec:'Desarrollo',  items:['cli_capacitacion','cli_reportes','cli_programa'] },
+    { sec:'Crecimiento', items:['cli_market'] },
+  ],
+};
+
+/* ---------- Roles del Portal del Cliente (scope de datos) ---------- */
+CX.CLIENTE_ROLES = [
+  { id:'director', label:'Director / C-level',        scope:'all',      desc:'Toda la marca' },
+  { id:'regional', label:'Gerente Regional',          scope:'region',   desc:'Su región' },
+  { id:'sucursal', label:'Responsable de Sucursal',   scope:'sucursal', desc:'Su sucursal' },
 ];
-Orbit.paisCfg = function (id) { return Orbit.PAISES.find(p => p.id === id) || { iva: 12, recargoFinanciero: 5, gastosEmision: 0 }; };
-Orbit.pais = 'TODOS';
 
-/* Glosario de seguros (colaboradores + clientes). Configurable. */
-Orbit.GLOSARIO = [
-  { t: 'Prima', d: 'El precio que pagas por tu seguro durante la vigencia.' },
-  { t: 'Prima neta', d: 'Valor base del seguro, antes de impuestos y gastos.' },
-  { t: 'Deducible', d: 'Monto que asumes tú antes de que la aseguradora pague un siniestro.' },
-  { t: 'Suma asegurada', d: 'Cantidad máxima que cubre la póliza ante una pérdida.' },
-  { t: 'Cobertura', d: 'Los riesgos y situaciones que tu póliza protege.' },
-  { t: 'Vigencia', d: 'Período en el que tu póliza está activa (inicio y fin).' },
-  { t: 'Siniestro', d: 'El evento cubierto que da lugar a un reclamo (choque, robo, etc.).' },
-  { t: 'Reclamo', d: 'La solicitud para que la aseguradora pague por un siniestro.' },
-  { t: 'Endoso', d: 'Modificación que se hace a una póliza ya emitida.' },
-  { t: 'Renovación', d: 'Extender la póliza por un nuevo período al vencer.' },
-  { t: 'Beneficiario', d: 'Persona que recibe la indemnización en caso de siniestro.' },
-  { t: 'Indemnización', d: 'Pago que hace la aseguradora tras un siniestro aprobado.' },
-  { t: 'Recargo por fraccionamiento', d: 'Costo adicional por pagar la prima en cuotas.' },
-  { t: 'Gastos de emisión', d: 'Cargo administrativo por emitir la póliza.' },
-  { t: 'Pérdida total', d: 'Cuando el daño supera cierto % del valor del bien asegurado.' },
-  { t: 'Asistencia', d: 'Servicios incluidos (grúa, médico, vial) además de la cobertura.' }
+/* ---------- Catálogo de rubros/industrias (compartido: Clientes, Proyectos, CRM) ---------- */
+CX.RUBROS = ['Retail · Cadena de tiendas','Banca · Red de agencias','Restaurantes · Multimarca','Salud · Clínicas','Telecomunicaciones','Automotriz · Concesionarios','Seguros','Combustibles · Estaciones','Hotelería','Educación','Supermercados','Farmacias','Belleza & Cuidado personal','Electrodomésticos','Moda & Calzado','Aerolíneas & Turismo','Inmobiliario','Gimnasios & Fitness','Entretenimiento','Otra'];
+
+/* ---------- Catálogo de países + moneda (lista larga, no limitar) ---------- */
+CX.COUNTRIES = [
+  {c:'GT',n:'Guatemala',cur:'Q'},   {c:'HN',n:'Honduras',cur:'L'},
+  {c:'SV',n:'El Salvador',cur:'$'}, {c:'NI',n:'Nicaragua',cur:'C$'},
+  {c:'CR',n:'Costa Rica',cur:'₡'},  {c:'PA',n:'Panamá',cur:'B/.'},
+  {c:'MX',n:'México',cur:'$'},      {c:'CO',n:'Colombia',cur:'$'},
+  {c:'PE',n:'Perú',cur:'S/'},       {c:'EC',n:'Ecuador',cur:'$'},
+  {c:'CL',n:'Chile',cur:'$'},       {c:'AR',n:'Argentina',cur:'$'},
+  {c:'DO',n:'Rep. Dominicana',cur:'RD$'}, {c:'US',n:'Estados Unidos',cur:'US$'},
+  {c:'ES',n:'España',cur:'€'},
 ];
+/* etiqueta de país genérica (bandera emoji desde el código ISO + nombre) — funciona para cualquier país */
+CX.paisName = function(c){ const f=CX.COUNTRIES.find(x=>x.c===c); return f?f.n:c; };
+CX.paisFlag = function(c){ if(!c||c.length!==2) return '🏳️'; try{return String.fromCodePoint(...[...c.toUpperCase()].map(ch=>0x1F1E6+ch.charCodeAt(0)-65));}catch(e){return '🏳️';} };
+CX.paisLabel = function(c){ return CX.paisFlag(c)+' '+CX.paisName(c); };
+CX.moneda = function(p,c){ return (p.currency&&p.currency[c]) || (CX.COUNTRIES.find(x=>x.c===c)||{}).cur || '$'; };
 
-/* Catálogo geográfico (departamentos → ciudades) por país. Configurable por cliente. */
-Orbit.GEO = {
-  GT: { 'Guatemala': ['Guatemala', 'Mixco', 'Villa Nueva', 'San Miguel Petapa', 'Amatitlán', 'Chinautla'], 'Quetzaltenango': ['Quetzaltenango', 'Coatepeque', 'Salcajá'], 'Escuintla': ['Escuintla', 'Santa Lucía Cotzumalguapa', 'Tiquisate', 'Puerto San José'], 'Sacatepéquez': ['Antigua Guatemala', 'Jocotenango', 'Ciudad Vieja'], 'Sololá': ['Sololá', 'Panajachel'], 'Chimaltenango': ['Chimaltenango', 'Tecpán'], 'Huehuetenango': ['Huehuetenango'], 'Petén': ['Flores', 'San Benito'], 'Izabal': ['Puerto Barrios', 'Morales'], 'Alta Verapaz': ['Cobán'] },
-  CO: { 'Cundinamarca': ['Bogotá', 'Soacha', 'Chía', 'Zipaquirá', 'Facatativá', 'Fusagasugá'], 'Antioquia': ['Medellín', 'Envigado', 'Itagüí', 'Bello', 'Rionegro', 'Sabaneta'], 'Valle del Cauca': ['Cali', 'Palmira', 'Buenaventura', 'Tuluá', 'Cartago'], 'Atlántico': ['Barranquilla', 'Soledad', 'Malambo'], 'Santander': ['Bucaramanga', 'Floridablanca', 'Girón'], 'Bolívar': ['Cartagena', 'Magangué'], 'Risaralda': ['Pereira', 'Dosquebradas'], 'Caldas': ['Manizales'], 'Norte de Santander': ['Cúcuta'], 'Magdalena': ['Santa Marta'] }
+/* ---------- Catálogo de tipografías seleccionables ---------- */
+CX.FONTS = [
+  { id:'segoe',   label:'Segoe UI (corporativa)', stack:"'Segoe UI', Tahoma, system-ui, sans-serif" },
+  { id:'manrope', label:'Manrope',                stack:"'Manrope', system-ui, sans-serif" },
+  { id:'inter',   label:'Inter',                  stack:"'Inter', system-ui, sans-serif" },
+  { id:'system',  label:'Sistema',                stack:"system-ui, -apple-system, sans-serif" },
+  { id:'georgia', label:'Georgia (serif)',        stack:"Georgia, 'Times New Roman', serif" },
+];
+CX.applyFont = function(id){
+  const f=CX.FONTS.find(x=>x.id===id); if(!f)return;
+  document.documentElement.style.setProperty('--ui', f.stack);
+  document.documentElement.style.setProperty('--disp', f.stack);
+  CX.BRAND.font=id; try{localStorage.setItem('cx_font',id);}catch(e){}
 };
 
-/* =========================================================
-   TENANT — configuración del cliente (white-label / plan).
-   Dos niveles: el cliente administra parte (según plan) y
-   nosotros administramos lo interno (módulos activos, plan).
-   Persistente. Una sola fuente de verdad para sidebar/router.
-   ========================================================= */
-Orbit.PLANES = {
-  estandar:      { id: 'estandar', nombre: 'Estándar', personalizacion: false, addons: false, apis: false, desc: 'Plantillas predefinidas, sin auto-branding.' },
-  profesional:   { id: 'profesional', nombre: 'Profesional', personalizacion: true, addons: true, apis: false, desc: 'Marca configurable + add-ons.' },
-  personalizado: { id: 'personalizado', nombre: 'Personalizado', personalizacion: true, addons: true, apis: true, desc: 'White-label completo, auto-branding por manual de marca, APIs.' }
+/* ---------- Patrón de credenciales (configurable por el cliente) ----------
+   Tokens disponibles en los patrones:
+     {nombre} {apellido}     → minúsculas sin tildes ni espacios
+     {Nombre} {Apellido}     → capitalizado
+     {inicial}               → primera letra del nombre (minúscula)
+   Por defecto: usuario = nombre.apellido · contraseña = Nombre123*  */
+CX.CREDS = {
+  userPattern: '{nombre}.{apellido}',
+  passPattern: '{Nombre}123*',
+  load(){ try{ const s=JSON.parse(localStorage.getItem('cx_creds')||'null'); if(s){ this.userPattern=s.userPattern||this.userPattern; this.passPattern=s.passPattern||this.passPattern; } }catch(e){} },
+  save(){ try{ localStorage.setItem('cx_creds',JSON.stringify({userPattern:this.userPattern,passPattern:this.passPattern})); }catch(e){} },
+  _slug(s){ return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,''); },
+  _cap(s){ const t=this._slug(s); return t.charAt(0).toUpperCase()+t.slice(1); },
+  _fill(pattern, nombre, apellido){
+    return (pattern||'')
+      .replace(/\{Nombre\}/g, this._cap(nombre))
+      .replace(/\{Apellido\}/g, this._cap(apellido))
+      .replace(/\{nombre\}/g, this._slug(nombre))
+      .replace(/\{apellido\}/g, this._slug(apellido))
+      .replace(/\{inicial\}/g, this._slug(nombre).charAt(0));
+  },
+  user(nombre, apellido){ return this._fill(this.userPattern, nombre, apellido) || 'usuario'; },
+  pass(nombre, apellido){ return this._fill(this.passPattern, nombre, apellido) || 'Cambiar123*'; },
+  /* descripción legible del patrón para la UI */
+  userExample(){ return this.user('Nombre','Apellido'); },
+  passExample(){ return this.pass('Nombre','Apellido'); },
 };
-Orbit.ROLES = {
-  'Dirección':   { nivel: 5, desc: 'Acceso total + configuración + comisión empresa + análitica completa.', color: '#C5162E',
-    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','renovaciones','cancelaciones','siniestros','historial','comisiones','importar','calidad','plantillas','finanzas','insights','reportes','automatizaciones','correo','marketing','academia','portal','equipo','configuracion'] },
-  'Admin':       { nivel: 4, desc: 'Operación completa + configuración. Sin módulo Finanzas completo.', color: '#1f3a5f',
-    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','renovaciones','cancelaciones','siniestros','historial','comisiones','importar','calidad','plantillas','insights','reportes','automatizaciones','correo','academia','equipo','configuracion'] },
-  'Comercial':   { nivel: 3, desc: 'CRM + Ops/Leads + Cotizador. Sin Finanzas ni Config.', color: '#1f8a4c',
-    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo','marketing'] },
-  'Finanzas':    { nivel: 3, desc: 'Cobros, comisiones, finanzas, conciliación. Sin Ops/Leads.', color: '#c9821b',
-    modulos: ['inicio','cronograma','cliente360','polizas','cobros','renovaciones','cancelaciones','comisiones','historial','finanzas','reportes','correo'] },
-  'Marketing':   { nivel: 2, desc: 'Marketing, Academia, Reportes, CRM básico.', color: '#6b4ea0',
-    modulos: ['inicio','cronograma','marketing','academia','cliente360','correo','reportes'] },
-  'Operativo':   { nivel: 2, desc: 'Ops + CRM operativo. Sin Finanzas ni Config.', color: '#0f766e',
-    modulos: ['inicio','cronograma','ops','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo'] },
-  'Asesor':      { nivel: 2, desc: 'Su cartera; ve solo su comisión. Sin Ops ni Config.', color: '#2563a8',
-    modulos: ['inicio','cronograma','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','cotizador','correo'] },
-  'Asistente':   { nivel: 1, desc: 'Captura y gestión básica. Sin comisiones ni finanzas.', color: '#7a818e',
-    modulos: ['inicio','cronograma','cliente360','polizas','cobros','renovaciones','historial','importar','correo'] }
+try{ CX.CREDS.load(); }catch(e){}
+
+/* ---------- Planes comerciales (preconfiguran el tenant) ---------- */
+CX.PLANS = {
+  basico:    { label:'Básico',     temas:['cxorbia','tya'], integraciones:['whatsapp_web','sheets_import'],
+               modulos:['midia','dashboard','proyectos','visitas','postulaciones','shoppers','misvisitas','miperfil','documentos','tablon','soporte','beneficios'] },
+  estandar:  { label:'Estándar',   temas:['cxorbia','tya','esmeralda','violeta'], integraciones:['whatsapp_web','sheets','excel_online','gmail'],
+               modulos:'+aprendizaje,cert,rutas,informes' },
+  pro:       { label:'Pro',        temas:'all', integraciones:['make','whatsapp_api','sheets','excel_online','gmail','outlook','mailchimp'],
+               modulos:'+financiero,movimientos,liquidaciones,lotes,cuestionarios' },
+  enterprise:{ label:'Enterprise', temas:'all', integraciones:'all', modulos:'all' },
 };
-/* =========================================================
-   CATÁLOGOS configurables (para que TODO sea desplegable →
-   analítica). Persistentes; editables desde Configuración.
-   Cualquier desplegable ofrece "➕ Otro…" que agrega aquí.
-   ========================================================= */
-Orbit.cat = (function () {
-  const KEY = 'orbit360_cat';
-  const DEF = {
-    canales: ['Referido', 'Conocido', 'Cliente actual', 'Cliente antiguo', 'Web / sitio', 'WhatsApp', 'Facebook', 'Instagram', 'TikTok', 'LinkedIn', 'YouTube', 'Campaña', 'Telemarketing', 'Evento / feria'],
-    ramos: ['Auto', 'Vida', 'Gastos Médicos', 'Hogar', 'Daños', 'Fianzas', 'Transporte', 'RC', 'Accidentes'],
-    // Ramos y subramos con LENGUAJE POR PAÍS (GT/CO) — fuente única para
-    // desplegables, analítica, trazabilidad y estandarización.
-    ramosPais: {
-      GT: {
-        'Automóviles': ['Vehículo Liviano', 'Vehículo Pesado', 'Motocicleta', 'Grúa / Equipo Especial', 'Pérdidas Totales', 'Pérdidas Parciales', 'Responsabilidad Civil Vehículos', 'Seguro por Kilómetros', 'Flotilla'],
-        'Vida': ['Vida Individual', 'Vida Colectivo', 'Vida Deudores', 'Vida Temporal', 'Dotal', 'Renta / Retiro'],
-        'Gastos Médicos': ['GM Individual', 'GM Familiar', 'GM Colectivo', 'GM Internacional', 'Enfermedades Graves'],
-        'Incendio y Líneas Aliadas': ['Hogar', 'Edificio / Comercio', 'Todo Riesgo Construcción', 'Lucro Cesante'],
-        'Daños': ['Multirriesgo PYME', 'Multirriesgo Hogar', 'Robo y Hurto', 'Rotura de Maquinaria', 'Equipo Electrónico', 'Dinero y Valores'],
-        'Fianzas': ['Fianza de Cumplimiento', 'Fianza de Anticipo', 'Fianza de Sostenimiento de Oferta', 'Fianza de Calidad / Conservación de Obra', 'Fianza Judicial', 'Fianza Aduanera'],
-        'Transporte': ['Carga Terrestre', 'Carga Marítima', 'Carga Aérea', 'Casco', 'Importación / Exportación'],
-        'Responsabilidad Civil': ['RC General', 'RC Profesional', 'RC Productos', 'RC Patronal', 'RC Directores y Funcionarios (D&O)'],
-        'Accidentes Personales': ['AP Individual', 'AP Colectivo', 'AP Escolar', 'Viajero / Asistencia']
-      },
-      CO: {
-        'Automóviles': ['Todo Riesgo Liviano', 'Todo Riesgo Pesado', 'Pérdidas Totales', 'Pérdidas Parciales', 'Responsabilidad Civil', 'Motos', 'Grúa / Maquinaria', 'Seguro por Kilómetros', 'SOAT', 'Flotas'],
-        'Vida': ['Vida Individual', 'Vida Grupo', 'Vida Deudores', 'Temporal', 'Exequias', 'Renta Voluntaria'],
-        'Salud': ['Salud Individual', 'Salud Familiar', 'Medicina Prepagada', 'Plan Complementario', 'Hospitalización y Cirugía', 'Salud Internacional'],
-        'Incendio y Terremoto': ['Hogar', 'PYME', 'Copropiedades', 'Todo Riesgo Daño Material', 'Lucro Cesante'],
-        'Daños': ['Multirriesgo Empresarial', 'Multirriesgo Hogar', 'Sustracción', 'Rotura de Maquinaria', 'Equipo y Maquinaria', 'Manejo'],
-        'Cumplimiento': ['Cumplimiento Particular', 'Cumplimiento Estatal', 'Seriedad de la Oferta', 'Buen Manejo de Anticipo', 'Estabilidad de Obra', 'Calidad del Servicio'],
-        'Transporte': ['Mercancías', 'Automotor de Carga', 'Casco Marítimo', 'Importación / Exportación'],
-        'Responsabilidad Civil': ['RC Extracontractual', 'RC Profesional', 'RC Directores y Administradores (D&O)', 'RC Clínicas y Hospitales', 'RC Contractual'],
-        'ARL / Riesgos Laborales': ['ARL', 'Accidentes Personales', 'AP Estudiantil', 'Viajero']
-      }
-    },
-    productos: ['Auto Total', 'Auto Plus', 'Auto Básico', 'Vida Entera', 'Vida Temporal', 'Salud Integral', 'Salud Familiar', 'Salud Premium', 'Hogar Protegido', 'Hogar Plus', 'Multirriesgo PYME', 'Responsabilidad Civil', 'Transporte de Carga', 'Fianza Cumplimiento', 'Accidentes Personales'],
-    prioridades: ['Alta', 'Media', 'Baja'],
-    tiposGestion: [
-      { t: 'Solicitar condiciones de renovación', lista: 'Renovaciones / Modif.' },
-      { t: 'Renovación de póliza', lista: 'Renovaciones / Modif.' },
-      { t: 'Modificar suma asegurada', lista: 'Renovaciones / Modif.' },
-      { t: 'Sustitución de vehículo', lista: 'Renovaciones / Modif.' },
-      { t: 'Cambio de propietario', lista: 'Renovaciones / Modif.' },
-      { t: 'Actualizar datos de cliente', lista: 'Gestiones Admin' },
-      { t: 'Endoso de beneficiario', lista: 'Gestiones Admin' },
-      { t: 'Solicitud de cancelación', lista: 'Gestiones Admin' },
-      { t: 'Carta de no adeudo', lista: 'Gestiones Admin' },
-      { t: 'Emisión de certificado', lista: 'Gestiones Admin' },
-      { t: 'Reclamo / Siniestro', lista: 'Gestiones Admin' }
-    ],
-    // Listas de los tableros — EDITABLES (crear/renombrar/recolor/reordenar/eliminar).
-    // Las marcadas fixed están atadas a una etapa del ciclo (no se eliminan, sí se renombran/recolor/reordenan).
-    opsListas: [
-      { id: 'l-admin', nombre: 'Gestiones Admin', emoji: '🗂', color: '#1f3a5f', kind: 'gestion' },
-      { id: 'l-cotiz', nombre: 'Cotizaciones', emoji: '🧮', color: '#c9821b', kind: 'negocio', etapa: 'cotizando', fixed: true },
-      { id: 'l-insp', nombre: 'Inspecciones', emoji: '🔍', color: '#0f766e', kind: 'negocio', etapa: 'inspeccion', fixed: true },
-      { id: 'l-emis', nombre: 'Emisiones', emoji: '📝', color: '#1f8a4c', kind: 'negocio', etapa: 'emision', fixed: true },
-      { id: 'l-renov', nombre: 'Renovaciones / Modif.', emoji: '🔄', color: '#6b4ea0', kind: 'gestion' }
-    ],
-    leadsListas: [
-      { id: 'q-nuevo', nombre: 'Nuevo', emoji: '🌱', color: '#6b7280', etapa: 'nuevo', fixed: true },
-      { id: 'q-cont', nombre: 'Contactado', emoji: '📞', color: '#1f3a5f', etapa: 'contactado', fixed: true },
-      { id: 'q-cotiz', nombre: 'Cotizando', emoji: '🧮', color: '#c9821b', etapa: 'cotizando', espejo: true, fixed: true },
-      { id: 'q-prop', nombre: 'Propuesta', emoji: '📨', color: '#6b4ea0', etapa: 'propuesta', fixed: true },
-      { id: 'q-nego', nombre: 'Negociación', emoji: '🤝', color: '#2563a8', etapa: 'negociacion', fixed: true },
-      { id: 'q-insp', nombre: 'Inspección', emoji: '🔍', color: '#0f766e', etapa: 'inspeccion', espejo: true, fixed: true },
-      { id: 'q-emis', nombre: 'Emisión', emoji: '📝', color: '#1f8a4c', etapa: 'emision', espejo: true, fixed: true },
-      { id: 'q-cierre', nombre: 'Cierre', emoji: '🏆', color: '#15803d', etapa: 'emitido', fixed: true }
-    ]
-  };
-  let d = null;
-  try { const r = localStorage.getItem(KEY); if (r) d = JSON.parse(r); } catch (e) {}
-  if (!d) d = JSON.parse(JSON.stringify(DEF));
-  // merge claves nuevas si la versión cambió en el código
-  Object.keys(DEF).forEach(k => { if (d[k] == null) d[k] = JSON.parse(JSON.stringify(DEF[k])); });
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} document.dispatchEvent(new CustomEvent('orbit:cat')); }
-  return {
-    get: (k) => d[k] || [],
-    all: () => d,
-    // Ramos/subramos por país (lenguaje local GT/CO) para listas desplegables y analítica
-    ramosDe: (pais) => { const m = (d.ramosPais || {})[pais]; return m ? Object.keys(m) : (d.ramos || []); },
-    subramosDe: (pais, ramo) => { const m = (d.ramosPais || {})[pais]; return (m && m[ramo]) ? m[ramo].slice() : []; },
-    addRamo: (pais, ramo) => { d.ramosPais = d.ramosPais || {}; d.ramosPais[pais] = d.ramosPais[pais] || {}; if (!d.ramosPais[pais][ramo]) { d.ramosPais[pais][ramo] = []; save(); } },
-    addSubramo: (pais, ramo, sub) => { d.ramosPais = d.ramosPais || {}; d.ramosPais[pais] = d.ramosPais[pais] || {}; d.ramosPais[pais][ramo] = d.ramosPais[pais][ramo] || []; if (d.ramosPais[pais][ramo].indexOf(sub) < 0) { d.ramosPais[pais][ramo].push(sub); save(); } },
-    add: (k, v) => { if (!v) return; d[k] = d[k] || []; if (d[k].indexOf(v) < 0) { d[k].push(v); save(); } },
-    setList: (k, arr) => { d[k] = arr; save(); },
-    save,
-    reset: () => { d = JSON.parse(JSON.stringify(DEF)); save(); },
-    DEF
-  };
-})();
-
-/* =========================================================
-   SESSION — vista activa del usuario (multi-rol "ver como").
-   Un usuario puede tener varios roles; elige cuál tablero ver.
-   El asesor NO ve Orbit Ops (interno del equipo); ve sus
-   gestiones vía Orbit Leads. Persistente.
-   ========================================================= */
-Orbit.session = (function () {
-  const KEY = 'orbit360_sessionview';
-  const def = { rol: 'Dirección', asesorId: 'ase001' };
-  let d = null;
-  try { const r = localStorage.getItem(KEY); if (r) d = JSON.parse(r); } catch (e) {}
-  if (!d) d = JSON.parse(JSON.stringify(def));
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
-  function esAsesor() { return d.rol === 'Asesor'; }
-  return {
-    rol: () => d.rol,
-    asesorId: () => d.asesorId,
-    esAsesor,
-    verEmpresa: () => ['Dirección', 'Admin', 'Finanzas'].includes(d.rol),
-    canSee: (route) => { const a = (d.asesorId && Orbit.store) ? Orbit.store.get('asesores', d.asesorId) : null; if (a && a.modulosOverride && a.modulosOverride.length) return a.modulosOverride.includes(route); const r = Orbit.ROLES[d.rol]; if (!r) return true; return !r.modulos || r.modulos.includes(route); },
-    set: (rol, asesorId) => { d.rol = rol; if (asesorId) d.asesorId = asesorId; save(); document.dispatchEvent(new CustomEvent('orbit:session')); }
-  };
-})();
-
-Orbit.tenant = (function () {
-  const KEY = 'orbit360_tenant';
-  const DEFAULT = {
-    empresa: 'Tu marca',
-    plan: 'personalizado',
-    paises: ['GT', 'CO'],
-    monedaBase: 'GTQ',
-    branding: { logo: '', sidebar: 'oscuro', paleta: 'rojo', tipografia: 'Manrope' },
-    // módulos activos (config INTERNA nuestra) — todos los del nav
-    modulosActivos: ['inicio', 'cronograma', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'siniestros', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'automatizaciones', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
-    addons: { make: false, drive: true, whatsapp: true, correo: true, metricool: false, facebook: false, linkedin: false, web: true, canva: false, gamma: false, heygen: false, ia: false, mailchimp: false, sheets: false },
-    portalVisibility: { polizas: true, recibos: true, documentos: true, asesor: true, comisiones: false, drive: false },
-    apis: []
-  };
-  let data = null;
-  try { const raw = localStorage.getItem(KEY); if (raw) data = JSON.parse(raw); } catch (e) {}
-  if (!data) data = JSON.parse(JSON.stringify(DEFAULT));
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
-  return {
-    get: () => data,
-    set: (patch) => { Object.assign(data, patch); save(); document.dispatchEvent(new CustomEvent('orbit:tenant')); },
-    setDeep: (k, v) => { data[k] = v; save(); document.dispatchEvent(new CustomEvent('orbit:tenant')); },
-    isActive: (route) => data.modulosActivos.includes(route),
-    reset: () => { data = JSON.parse(JSON.stringify(DEFAULT)); save(); document.dispatchEvent(new CustomEvent('orbit:tenant')); },
-    DEFAULT
-  };
-})();
-
-Orbit.NAV = [
-  { type: 'home', route: 'inicio', icon: '🌅', label: 'Orbit Inicio' },
-  {
-    type: 'group', label: 'Operación', open: true, items: [
-      { route: 'cronograma', icon: '📅', label: 'Cronograma', estado: 'beta' },
-      { route: 'ops', icon: '🗂', label: 'Orbit Ops', estado: 'beta' },
-      { route: 'leads', icon: '🎯', label: 'Orbit Leads', estado: 'beta' },
-      { route: 'aseguradoras', icon: '🏢', label: 'Orbit Aseguradoras', estado: 'beta' },
-      { route: 'cotizador', icon: '🧮', label: 'Cotizador', estado: 'beta' },
-      { route: 'comparativo', icon: '📋', label: 'Comparativo', estado: 'beta' }
-    ]
-  },
-  {
-    type: 'group', label: 'Orbit CRM', open: true, items: [
-      { route: 'cliente360', icon: '🧑‍💼', label: 'Clientes 360', estado: 'core' },
-      { route: 'polizas', icon: '📑', label: 'Pólizas', estado: 'core' },
-      { route: 'cobros', icon: '💳', label: 'Cobros y cartera', estado: 'core' },
-      { route: 'renovaciones', icon: '🔄', label: 'Renovaciones', estado: 'core' },
-      { route: 'cancelaciones', icon: '✕', label: 'Cancelaciones', estado: 'core' },
-      { route: 'siniestros', icon: '🚨', label: 'Siniestros', estado: 'beta' },
-      { route: 'historial', icon: '📝', label: 'Historial y actividades', estado: 'core' },
-      { route: 'comisiones', icon: '💼', label: 'Comisiones', estado: 'core' }
-    ]
-  },
-  {
-    type: 'group', label: 'Datos e importación', open: false, items: [
-      { route: 'importar', icon: '⬇', label: 'Importación inteligente', estado: 'beta' },
-      { route: 'calidad', icon: '🩺', label: 'Calidad de datos', estado: 'beta' },
-      { route: 'plantillas', icon: '✉', label: 'Plantillas de mensajes', estado: 'beta' },
-      { route: 'reportes', icon: '📈', label: 'Reportes', estado: 'beta' }
-    ]
-  },
-  {
-    type: 'group', label: 'Gestión y recursos', open: false, items: [
-      { route: 'ia', icon: '🤖', label: 'Orbit IA', estado: 'beta' },
-      { route: 'academia', icon: '🎓', label: 'Orbit Academia', estado: 'beta' }
-    ]
-  },
-  {
-    type: 'group', label: 'Analítica', open: false, items: [
-      { route: 'insights', icon: '📊', label: 'Orbit Insights', estado: 'beta' }
-    ]
-  },
-  {
-    type: 'group', label: 'Comunicación', open: false, items: [
-      { route: 'correo', icon: '✉', label: 'Correo', estado: 'beta' },
-      { route: 'automatizaciones', icon: '⚡', label: 'Automatizaciones', estado: 'beta' },
-      { route: 'notificaciones', icon: '💬', label: 'Notificaciones WA', estado: 'beta' },
-      { route: 'marketing', icon: '📣', label: 'Orbit Marketing', estado: 'beta' },
-      { route: 'portal', icon: '🚪', label: 'Portal del Cliente', estado: 'beta' }
-    ]
-  },
-  {
-    type: 'group', label: 'Administración', open: false, items: [
-      { route: 'finanzas', icon: '💰', label: 'Orbit Finanzas', estado: 'beta' },
-      { route: 'equipo', icon: '👥', label: 'Equipo y permisos', estado: 'beta' },
-      { route: 'configuracion', icon: '⚙', label: 'Configuración', estado: 'road' }
-    ]
+/* devuelve la lista de módulos habilitados por un plan */
+CX.planModules = function(planId){
+  const order=Object.keys(CX.PLANS), idx=order.indexOf(planId);
+  if(planId==='enterprise') return Object.keys(CX.MODULES);
+  let set=new Set(CX.PLANS.basico.modulos);
+  for(let i=1;i<=idx;i++){ const m=CX.PLANS[order[i]].modulos;
+    if(m==='all'){return Object.keys(CX.MODULES);}
+    if(typeof m==='string'&&m[0]==='+'){ m.slice(1).split(',').forEach(x=>set.add(x)); }
   }
+  return [...set];
+};
+CX.applyPlan = function(planId){
+  const mods=CX.planModules(planId), all=Object.keys(CX.MODULES), map={};
+  /* Módulos de administración/configuración: SIEMPRE disponibles para admin, independiente del plan */
+  const adminAlways=['cuestionarios','usuarios','config','automatizaciones','integraciones','correo','marca','clientes','proyectos','financiero','movimientos','liquidaciones','lotes','costos','crm','marketing','informes','soporte','tablon','documentos','aprendizaje','cert'];
+  all.forEach(id=>map[id]=mods.includes(id)||adminAlways.includes(id));
+  try{localStorage.setItem('cx_modules',JSON.stringify(map));localStorage.setItem('cx_plan',planId);}catch(e){}
+  CX.BRAND.plan=planId;
+};
+
+/* ---------- Roles (for Usuarios module) ---------- */
+CX.ROLES = [
+  { id:'super',  label:'Super Admin',     desc:'Acceso total a toda la plataforma' },
+  { id:'admin',  label:'Equipo administrativo', desc:'Operación + finanzas' },
+  { id:'ops',    label:'Equipo operativo', desc:'Solo operación' },
+  { id:'coordinador', label:'Coordinador / Representante', desc:'Administra proyectos y HR de su(s) país(es) asignado(s)', scopeCountry:true },
+  { id:'aliado', label:'Aliado / Franquiciado', desc:'Opera proyectos regionales delegados · su país y sus shoppers', scopeCountry:true },
+  { id:'shopper',label:'Shopper / Evaluador', desc:'Portal móvil' },
 ];
 
-/* Metadatos para módulos aún no construidos (pantalla placeholder honesta) */
-Orbit.MODULE_META = {
-  ops: { icon: '🗂', title: 'Orbit Ops', estado: 'beta', desc: 'Kanban colaborativo de gestiones del intermediario: cotizaciones, leads, inspecciones, emisiones, renovaciones y modificaciones — con ficha editable y flujos personalizables.', scope: ['6 columnas reales con color y conteo', 'Tarjeta con asesor, aseguradora, producto, prioridad y checklist documental', 'Ficha 360 editable por gestión', 'Flujos personalizables por tipo de actividad', 'Sincronía con Cliente 360 y Finanzas'] },
-  leads: { icon: '🎯', title: 'Orbit Leads', estado: 'beta', desc: 'Pipeline comercial con cadencias automáticas de seguimiento de prospectos.', scope: ['Embudo por etapa con probabilidad de cierre', 'Cadencias automáticas (toques programados)', 'Origen y canal de cada lead', 'Conversión de lead → cliente sin recapturar datos'] },
-  cotizador: { icon: '🧮', title: 'Cotizador multicompañía', estado: 'road', desc: 'Wizard Tipo → Cliente → Cotizaciones que consulta varias aseguradoras a la vez con tarifas oficiales. Útil para equipo, asesores y clientes.', scope: ['Multicompañía en paralelo', 'Wizard de 3 pasos integrado al shell', 'País GT / CO y tarifas oficiales', 'Resultado lleva directo a emisión y a Cliente 360'] },
-  comparativo: { icon: '📋', title: 'Comparativo IA', estado: 'road', desc: 'Extrae coberturas de PDFs y genera una recomendación consultiva — mucho más que una tabla.', scope: ['Lectura de coberturas desde PDF (IA)', 'Tabla visual lado a lado', 'Recomendación consultiva argumentada', 'Imprimir / enviar por WhatsApp'] },
-  aseguradoras: { icon: '🏢', title: 'Orbit Aseguradoras', estado: 'beta', desc: 'Directorio + repositorio por aseguradora (contactos, logos, cotizadores, clausulados, pólizas ejemplo) que además alimenta a Orbit IA.', scope: ['Directorio con contactos y accesos', 'Repositorio de clausulados y cotizadores', 'Pólizas ejemplo por ramo', 'Fuente de conocimiento para Orbit IA'] },
-  ia: { icon: '🤖', title: 'Orbit IA', estado: 'beta', desc: 'Un cerebro, tres usuarios: asesora al equipo interno, a los asesores (mejores argumentos de venta) y a los clientes, usando el repositorio y la biblioteca de conocimiento.', scope: ['Asesoría según tipo de usuario', 'Argumentos de venta por propuesta', 'Responde sobre una propuesta puntual', 'Usa repositorio de aseguradoras + biblioteca'] },
-  academia: { icon: '🎓', title: 'Orbit Academia', estado: 'road', desc: 'Centro de formación: certificación, inducción, capacitación técnica/comercial/blandas y piezas comerciales.', scope: ['Rutas de certificación e inducción', 'Capacitación técnica, comercial y habilidades blandas', 'Biblioteca de piezas comerciales', 'Progreso por asesor'] },
-  insights: { icon: '📊', title: 'Orbit Insights', estado: 'beta', desc: 'Analítica integral en 9 vistas sobre los datos del CRM.', scope: ['Resumen · Metas · Cumplimiento', 'Recaudo · Cartera · Devengado', 'Top clientes · Vencidas s/renovar · Análisis crítico', 'Se alimenta de Cliente 360, Cobros y Comisiones'] },
-  notificaciones: { icon: '💬', title: 'Notificaciones WhatsApp', estado: 'road', desc: 'Mensajería transaccional y de seguimiento por WhatsApp, automatizada por cadencia.', scope: ['Recordatorios de pago y renovación', 'Cadencias automáticas de seguimiento', 'Encuestas de satisfacción', 'Plantillas configurables'] },
-  marketing: { icon: '📣', title: 'Orbit Marketing', estado: 'beta', desc: 'Calendario real (cada día con sus piezas), creación/automatización de contenidos y segmentación desde la cartera real → campañas inteligentes.', scope: ['Calendario por día con piezas', 'Automatización de creación de piezas', 'Segmentación desde info real de clientes', 'Campañas inteligentes medibles'] },
-  finanzas: { icon: '💰', title: 'Orbit Finanzas', estado: 'beta', desc: 'Movimientos, liquidaciones (empresa + asesores), import de estados de cuenta y planillas, con DOBLE conciliación pago↔póliza.', scope: ['Movimientos mensuales', 'Liquidación de comisiones empresa y asesores', 'Importar estados de cuenta y planillas', 'Doble conciliación: pago aplicado a póliza creada'] },
-  equipo: { icon: '👥', title: 'Equipo y permisos', estado: 'road', desc: 'Gestión de usuarios, roles y permisos sin escribir código.', scope: ['Roles y permisos por módulo', 'Metas por asesor', 'Estructura por equipo / país', 'Sin código'] },
-  configuracion: { icon: '⚙', title: 'Configuración', estado: 'road', desc: 'Parámetros del intermediario: países, ramos, aseguradoras, plantillas y metas — todo sin código.', scope: ['Países y ramos', 'Catálogo de aseguradoras', 'Plantillas y metas', 'White-label / marca'] },
-  reportes: { icon: '📈', title: 'Reportes', estado: 'road', desc: 'Zona de reportes exportables sobre todos los datos del CRM y Finanzas.', scope: ['Reportes de cartera, recaudo y comisiones', 'Filtros por país, asesor, aseguradora y periodo', 'Exportar a Excel / PDF', 'Reportes programados por correo'] },
-  portal: { icon: '🚪', title: 'Portal del Cliente', estado: 'road', desc: 'Portal externo para el cliente final: sus pólizas, recibos, documentos y contacto directo con su asesor.', scope: ['Consulta de pólizas y vigencias', 'Recibos y estado de pagos', 'Documentos (enlace a Drive)', 'Contacto con su asesor y solicitudes'] }
+/* ---------- Firebase (optional) ----------
+   Leave blank to run fully on local mock data. Fill keys to connect
+   a real backend; the data layer auto-detects and switches.
+*/
+CX.FIREBASE = {
+  apiKey: '', authDomain: '', databaseURL: '', projectId: '', storageBucket: '', appId: ''
 };

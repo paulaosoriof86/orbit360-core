@@ -1,240 +1,111 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Orbit 360 · Plataforma</title>
-  <meta name="description" content="Orbit 360 — sistema 360 inteligente e integral para intermediarios de seguros.">
-  <meta name="theme-color" content="#1E2227">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/tokens.css?v1236">
-  <link rel="stylesheet" href="styles/base.css?v1236">
-  <link rel="stylesheet" href="styles/infra.css?v1236">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXOrbia · Plataforma Operativa de Campo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/theme.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2196d3">
 </head>
-<body class="pre-auth">
-  <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1E2227"/><circle cx="50" cy="50" r="20" fill="#C5162E"/><circle cx="50" cy="50" r="9" fill="#1E2227"/><text x="50" y="82" font-family="sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">Orbit 360</text></svg></template>
+<body>
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#0d2740"></rect><circle cx="50" cy="50" r="20" fill="none" stroke="#4ab4e6" stroke-width="5" stroke-dasharray="80 30"></circle><circle cx="66" cy="36" r="4.5" fill="#fff"></circle></svg>
+</template>
 
-  <!-- ============ LOGIN (white-label · palette-adaptive) ============ -->
-  <div id="login">
-    <div class="lg-left">
-      <div class="lg-orbit">
-        <div class="orbit-wrap">
-          <div class="orbit-ring r2"></div>
-          <div class="orbit-ring r1"></div>
-          <!-- etiquetas exteriores -->
-          <span class="outer-label" style="top:6%;left:50%;transform:translateX(-50%)">Velocidad</span>
-          <span class="outer-label" style="top:30%;left:2%">Automatización</span>
-          <span class="outer-label" style="top:30%;right:2%">Calidad</span>
-          <span class="outer-label" style="bottom:30%;left:4%">Escala</span>
-          <span class="outer-label" style="bottom:30%;right:2%">Datos</span>
-          <span class="outer-label" style="bottom:6%;left:50%;transform:translateX(-50%)">Integración</span>
-          <!-- nodos orbitando -->
-          <div class="orbit-r1-spin">
-            <div class="n n1"><div class="orbit-node accent">🧑‍💼<span class="nlabel">Clientes</span></div></div>
-            <div class="n n2"><div class="orbit-node">👥<span class="nlabel">Su equipo</span></div></div>
-            <div class="n n3"><div class="orbit-node">📑<span class="nlabel">Pólizas</span></div></div>
-          </div>
-          <!-- núcleo -->
-          <div class="orbit-core"><span class="oc-mark"></span><b>ORBIT</b></div>
-        </div>
-      </div>
-      <div class="lg-eco">Ecosistema centrado en el cliente</div>
-      <div class="lg-foot">
-        <div class="lf-eyebrow">Plataforma · Insurance OS</div>
-        <div class="lf-logo">Orbit<b>360°</b></div>
-        <div class="lf-tag">Gestión inteligente</div>
-        <div class="lf-desc"><b style="color:#fff">Gestión integral</b> · donde los datos se convierten en decisiones. Sistema 360 inteligente para intermediarios de seguros, multipaís y configurable.</div>
-        <div class="lf-chips"><span>CRM</span><span>Cotizador</span><span>Comparativo</span><span>Finanzas</span><span>Marketing</span><span>Portal cliente</span></div>
-        <div class="lf-logoslot"><span class="slot">🏢</span></div>
-      </div>
+<!-- LOGIN -->
+<div id="login"></div>
+
+<!-- APP SHELL -->
+<div id="app">
+  <aside class="rail" id="rail"></aside>
+  <div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+  <div class="canvas">
+    <div class="topbar">
+      <button class="btn btn-ghost btn-icon menu-btn" onclick="document.body.classList.toggle('nav-open')">☰</button>
+      <div class="tb-crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <div class="tb-client-logo" id="tbClientLogo" style="display:none"></div>
+      <button class="tb-bell" id="tbSupport" title="Soporte" aria-label="Soporte">
+        <span style="font-size:16px">🆘</span>
+      </button>
+      <button class="tb-bell" id="tbMail" title="Correo" aria-label="Correo">
+        <span style="font-size:16px">✉️</span>
+        <span class="tb-bell-badge" id="tbMailBadge" style="display:none">0</span>
+      </button>
+      <button class="tb-bell" id="tbBell" title="Novedades" aria-label="Novedades">
+        <span style="font-size:17px">🔔</span>
+        <span class="tb-bell-badge" id="tbBellBadge" style="display:none">0</span>
+      </button>
+      <div class="tb-demo"><span class="d"></span> Demo comercial</div>
     </div>
-    <div class="lg-right">
-      <div class="lg-card">
-        <div class="lg-welcome">Bienvenido de vuelta</div>
-        <div class="lg-welcome-sub">Ingresá con tus credenciales para acceder al Orbit 360.</div>
-        <form class="lg-box" id="login-form">
-          <span class="lg-eyebrow">Orbit 360 — Acceso del equipo</span>
-          <h3>Iniciar sesión</h3>
-          <div class="lg-hint">Ingresá con tu usuario y contraseña asignados por administración.</div>
-          <input class="lg-field" id="lg-user" type="email" value="admin@demo.com" autocomplete="username">
-          <input class="lg-field" id="lg-pass" type="password" value="demo123" autocomplete="current-password">
-          <button class="lg-submit" type="submit">Ingresar al Orbit 360</button>
-          <a class="lg-reset" id="lg-reset">¿Problemas al ingresar? → Limpiar sesión</a>
-        </form>
-        <div class="lg-themehint">
-          <span>Paleta:</span>
-          <span class="lg-sw" id="lg-sw"></span>
-        </div>
-      </div>
-    </div>
+    <main class="content"><div id="view"></div></main>
   </div>
+</div>
 
-  <!-- ============ TOPBAR ============ -->
-  <header class="topbar">
-    <button class="tb-burger" id="burger" aria-label="Menú">☰</button>
-    <div class="brand" data-home>
-      <span class="brand-mark"></span>
-      <span>
-        <span class="brand-text"><span class="brand-name">Orbit<b>360</b></span><span class="brand-sub">Insurance OS</span></span>
-      </span>
-    </div>
-    <div class="tb-logo" title="Logo del cliente (configurable / white-label)">
-      <span class="slot" id="client-logo">🏢</span>
-      <span class="cn">Tu marca<small>White-label</small></span>
-    </div>
-    <div class="tb-spacer"></div>
-    <div class="tb-search">
-      <span>🔍</span><input placeholder="Buscar clientes, pólizas, cobros…" aria-label="Buscar">
-    </div>
-    <div class="tb-switch" id="sw-pais" title="Operación multipaís">
-      <span>🌎</span>
-      <select id="pais-sel" aria-label="País"></select>
-    </div>
-    <div class="tb-rol" id="tb-rol" title="Ver como (rol activo)">
-      <span>👁</span><select id="rol-sel" aria-label="Ver como"></select>
-    </div>
-    <div class="tb-ico" id="sw-theme" title="Paleta de la marca"><span>🎨</span></div>
-    <div class="tb-ico" id="tb-mail" title="Correo"><span>✉</span><span id="mail-count" class="nov-count"></span></div>
-    <div class="tb-ico" id="nov-bell" title="Novedades"><span>🔔</span><span class="dot"></span><span id="nov-count" class="nov-count"></span></div>
-    <div class="tb-user" id="tb-user" title="Cuenta">
-      <span class="av" style="background:linear-gradient(135deg,var(--red),var(--red-700))">PO</span>
-      <span class="who"><b>Paula Osorio</b><br><span id="tb-rol-lbl">Dirección · salir</span></span>
-    </div>
-  </header>
+<!-- CORE -->
+<script src="core/config.js"></script>
+<script src="core/geo.js"></script>
+<script src="core/store.js"></script>
+<script src="core/data.js"></script>
+<script src="core/dedupe.js"></script>
+<script src="core/shoppers-store.js"></script>
+<script src="core/programa.js"></script>
+<script src="core/cliente-data.js"></script>
+<script src="core/hr.js"></script>
+<script src="core/costos.js"></script>
+<script src="core/automations.js"></script>
+<script src="core/manuales-data.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="core/importador.js"></script>
+<script src="core/ui.js"></script>
+<script src="core/liquidacion.js"></script>
+<script src="core/finanzas-core.js"></script>
+<script src="core/notif.js"></script>
+<script src="core/topbar.js"></script>
+<script src="core/pwa.js"></script>
+<script src="core/router.js"></script>
 
-  <!-- ============ SHELL ============ -->
-  <div id="shell">
-    <nav id="sidebar" aria-label="Navegación principal"></nav>
-    <div class="sb-overlay"></div>
-    <main id="main"><div id="host"></div></main>
-  </div>
+<!-- MODULES -->
+<script src="modules/midia.js"></script>
+<script src="modules/dashboard.js"></script>
+<script src="modules/proyectos.js"></script>
+<script src="modules/proyecto-wizard.js"></script>
+<script src="modules/visitas.js"></script>
+<script src="modules/visita-detalle.js"></script>
+<script src="modules/cuestionario-shopper.js"></script>
+<script src="modules/postulaciones.js"></script>
+<script src="modules/shoppers.js"></script>
+<script src="modules/misvisitas.js"></script>
+<script src="modules/beneficios.js"></script>
+<script src="modules/tablon.js"></script>
+<script src="modules/cert.js"></script>
+<script src="modules/documentos.js"></script>
+<script src="modules/academia.js"></script>
+<script src="modules/soporte.js"></script>
+<script src="modules/operacion-extra.js"></script>
+<script src="modules/finanzas.js"></script>
+<script src="modules/configuracion.js"></script>
+<script src="modules/cliente.js"></script>
+<script src="modules/cliente-extra.js"></script>
+<script src="modules/clientes.js"></script>
+<script src="modules/importador.js"></script>
+<script src="modules/comercial.js"></script>
+<script src="modules/crm.js"></script>
+<script src="modules/marketing.js"></script>
+<script src="modules/reservas.js"></script>
+<script src="modules/integraciones.js"></script>
+<script src="modules/rutas.js"></script>
+<script src="modules/automatizaciones.js"></script>
+<script src="modules/correo.js"></script>
+<script src="modules/marca.js"></script>
 
-  <!-- ============ CORE (base) ============ -->
-  <script src="core/theme.js?v1236"></script>
-  <script src="core/ui.js?v1236"></script>
-  <script src="core/config.js?v1236"></script>
-  <script src="core/primas.js?v1236"></script>
-  <script src="core/comisiones-eng.js?v1236"></script>
-  <!-- ============ DATA LAYER (depende de config + primas) ============ -->
-  <script src="data/store.js?v1236"></script>
-  <script src="data/seed.js?v1236"></script>
-  <!-- CORE (resto) -->
-  <script src="core/queries.js?v1236"></script>
-  <script src="core/crmkit.js?v1236"></script>
-  <script src="core/correo.js?v1236"></script>
-  <script src="core/ia.js?v1236"></script>
-  <script src="core/ciclo.js?v1236"></script>
-  <script src="core/importa.js?v1236"></script>
-  <script src="core/novedades.js?v1236"></script>
-  <script src="core/legal.js?v1236"></script>
-  <script src="core/auth.js?v1236"></script>
-  <script src="core/router.js?v1236"></script>
-  <script src="core/pwa.js?v1236"></script>
-  <!-- MODULES -->
-  <script src="modules/inicio.js?v1236"></script>
-  <script src="modules/ops.js?v1236"></script>
-  <script src="modules/leads.js?v1236"></script>
-  <script src="modules/cliente360.js?v1236"></script>
-  <script src="modules/polizas.js?v1236"></script>
-  <script src="modules/cobros.js?v1236"></script>
-  <script src="modules/renovaciones.js?v1236"></script>
-  <script src="modules/cancelaciones.js?v1236"></script>
-  <script src="modules/comisiones.js?v1236"></script>
-  <script src="modules/insights.js?v1236"></script>
-  <script src="modules/historial.js?v1236"></script>
-  <script src="modules/importar.js?v1236"></script>
-  <script src="modules/configuracion.js?v1236"></script>
-  <script src="modules/equipo.js?v1236"></script>
-  <script src="modules/correo.js?v1236"></script>
-  <script src="modules/aseguradoras.js?v1236"></script>
-  <script src="modules/marketing.js?v1236"></script>
-  <script src="modules/siniestros.js?v1236"></script>
-  <script src="modules/notificaciones.js?v1236"></script>
-  <script src="modules/ia.js?v1236"></script>
-  <script src="modules/academia.js?v1236"></script>
-  <script src="modules/reportes.js?v1236"></script>
-  <script src="modules/portal.js?v1236"></script>
-  <script src="modules/cronograma.js?v1236"></script>
-  <script src="modules/automatizaciones.js?v1236"></script>
-  <script src="modules/cotizador.js?v1236"></script>
-  <script src="modules/comparativo.js?v1236"></script>
-  <script src="modules/finanzas.js?v1236"></script>
-  <script src="modules/calidad.js?v1236"></script>
-  <script src="modules/plantillas.js?v1236"></script>
-  <!-- BOOT -->
-  <script>
-    Orbit.store.init(Orbit.SEED);
-    Orbit.router.init();
-    Orbit.auth.init();
-    if (Orbit.novedades) Orbit.novedades.init();
-
-    // país switcher
-    (function () {
-      var sel = document.getElementById('pais-sel');
-      var paises = (Orbit.PAISES || [{ id: 'TODOS', label: 'Todos los países' }]);
-      sel.innerHTML = paises.map(function (p) { return '<option value="' + p.id + '">' + p.label + '</option>'; }).join('');
-      sel.value = Orbit.pais || 'TODOS';
-      sel.addEventListener('change', function () { Orbit.pais = sel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); if (Orbit.router) location.hash = location.hash || '#/inicio'; window.dispatchEvent(new HashChangeEvent('hashchange')); });
-    })();
-
-    // theme picker
-    document.getElementById('sw-theme').addEventListener('click', function (e) { e.stopPropagation(); Orbit.theme.picker(this); });
-
-    // mostrar / ocultar sidebar (persistente)
-    (function () {
-      var b = document.getElementById('burger');
-      function paint() { document.body.classList.toggle('sb-hidden', localStorage.getItem('orbit360_sbhide') === '1'); }
-      b.addEventListener('click', function () {
-        var h = localStorage.getItem('orbit360_sbhide') === '1';
-        try { localStorage.setItem('orbit360_sbhide', h ? '0' : '1'); } catch (e) {}
-        paint();
-      });
-      paint();
-    })();
-
-    // correo (topbar) + badge de no leídos
-    (function () {
-      var mail = document.getElementById('tb-mail');
-      function paintMail() {
-        var n = (Orbit.correo && Orbit.correo.noLeidos) ? Orbit.correo.noLeidos() : 0;
-        var b = document.getElementById('mail-count');
-        if (b) { b.textContent = n || ''; b.style.display = n ? '' : 'none'; }
-      }
-      mail.addEventListener('click', function () { location.hash = '#/correo'; });
-      document.addEventListener('orbit:correo', paintMail);
-      document.addEventListener('orbit:store', paintMail);
-      setTimeout(paintMail, 300);
-    })();
-
-    // login palette swatches
-    (function () {
-      var sw = document.getElementById('lg-sw');
-      if (sw) sw.innerHTML = Orbit.theme.PALETTES.slice(0, 6).map(function (p) { return '<button title="' + p.name + '" data-p="' + p.id + '" style="background:' + p.primary + '"></button>'; }).join('');
-      sw && sw.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { Orbit.theme.apply(b.dataset.p); }); });
-    })();
-
-    // "ver como" — selector de rol activo (multi-rol)
-    (function () {
-      var sel = document.getElementById('rol-sel');
-      var lbl = document.getElementById('tb-rol-lbl');
-      var roles = Object.keys(Orbit.ROLES || { 'Dirección': 1 });
-      function paint() {
-        sel.innerHTML = roles.map(function (r) { return '<option' + (r === Orbit.session.rol() ? ' selected' : '') + '>' + r + '</option>'; }).join('');
-        if (lbl) lbl.textContent = Orbit.session.rol() + ' · salir';
-      }
-      paint();
-      sel.addEventListener('change', function (e) { e.stopPropagation(); Orbit.session.set(sel.value, 'ase001'); });
-      document.addEventListener('orbit:session', function () {
-        paint();
-        if (Orbit.router && Orbit.router.rebuildSidebar) Orbit.router.rebuildSidebar();
-        window.dispatchEvent(new HashChangeEvent('hashchange'));
-      });
-    })();
-
-    // logout
-    document.getElementById('tb-user').addEventListener('click', function () { if (confirm('¿Cerrar sesión?')) Orbit.auth.logout(); });
-  </script>
+<!-- BOOT -->
+<script src="app.js"></script>
 </body>
 </html>

@@ -1,92 +1,107 @@
 /* ============================================================
-   Orbit 360 · UI helpers compartidos
+   CXOrbia · Shared UI helpers (DOM builders, toast, modal)
+   Keep modules terse and consistent.
    ============================================================ */
-window.Orbit = window.Orbit || {};
-// Helper global: abrir el correo INTERNO de Orbit (no mailto del SO)
-Orbit.correoCompose = function (pre) {
-  window.__orbitCompose = pre || {};
-  if (location.hash !== '#/correo') location.hash = '#/correo';
-  else if (Orbit.modules && Orbit.modules.correo) { const p = window.__orbitCompose; window.__orbitCompose = null; Orbit.modules.correo.redactar(p); }
-};
-Orbit.ui = (function () {
-  // Ancla temporal. Por defecto usa la fecha del set de datos de demostración para
-  // que renovaciones/vencimientos/aging luzcan coherentes. El backend puede pasar a
-  // fecha real poniendo Orbit.tenant.demoDate = 'real' (o una fecha ISO) — sin tocar módulos.
-  const DEMO_ANCHOR = '2026-06-20';
-  function _anchor() {
-    try { var d = (Orbit.tenant && Orbit.tenant.demoDate); if (d === 'real') return new Date(); if (d) return new Date(d + 'T00:00:00'); } catch (e) {}
-    try { var w = window.ORBIT_DEMO_DATE; if (w === 'real') return new Date(); if (w) return new Date(w + 'T00:00:00'); } catch (e) {}
-    return new Date(DEMO_ANCHOR + 'T00:00:00');
-  }
-  const NOW = _anchor();
-  const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-  function now() { return NOW; }
-  function monthLabel() { return (MESES[NOW.getMonth()][0].toUpperCase() + MESES[NOW.getMonth()].slice(1)) + ' ' + NOW.getFullYear(); }
-  function monthKey() { return NOW.getFullYear() + '-' + String(NOW.getMonth() + 1).padStart(2, '0'); }
-  function monthProgressPct() { const dim = new Date(NOW.getFullYear(), NOW.getMonth() + 1, 0).getDate(); return NOW.getDate() / dim; }
+window.CX = window.CX || {};
 
-  function money(n, cur) {
-    if (n == null) return '—';
-    const sym = cur === 'COP' ? '$' : cur === 'USD' ? 'US$' : 'Q';
-    const v = Math.round(n);
-    return sym + ' ' + v.toLocaleString('es-GT');
-  }
-  function moneyShort(n, cur) {
-    if (n == null) return '—';
-    const sym = cur === 'COP' ? '$' : cur === 'USD' ? 'US$' : 'Q';
-    const a = Math.abs(n);
-    if (a >= 1e9) return sym + (n / 1e9).toFixed(1) + 'B';
-    if (a >= 1e6) return sym + (n / 1e6).toFixed(1) + 'M';
-    if (a >= 1e3) return sym + (n / 1e3).toFixed(0) + 'K';
-    return sym + Math.round(n);
-  }
-  function esc(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  }
-  function initials(name) {
-    return String(name || '').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
-  }
-  function fmtDate(iso) {
-    if (!iso) return '—';
-    const d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' });
-  }
-  function daysFromNow(iso) {
-    if (!iso) return null;
-    return Math.round((new Date(iso + 'T00:00:00') - NOW) / 86400000);
-  }
-  function ago(iso) {
-    const d = -daysFromNow(iso);
-    if (d <= 0) return 'hoy';
-    if (d === 1) return 'ayer';
-    if (d < 30) return 'hace ' + d + ' d';
-    if (d < 365) return 'hace ' + Math.round(d / 30) + ' m';
-    return 'hace ' + Math.round(d / 365) + ' a';
-  }
-  function avatar(name, color, size) {
-    const c = color || '#5a6472';
-    const s = size || 'md';
-    return `<span class="av ${s}" style="background:linear-gradient(135deg,${c},${shade(c, -28)})">${initials(name)}</span>`;
-  }
-  function shade(hex, amt) {
-    try {
-      let h = hex.replace('#', '');
-      if (h.length === 3) h = h.split('').map(x => x + x).join('');
-      const n = parseInt(h, 16);
-      let r = (n >> 16) + amt, g = ((n >> 8) & 255) + amt, b = (n & 255) + amt;
-      r = Math.max(0, Math.min(255, r)); g = Math.max(0, Math.min(255, g)); b = Math.max(0, Math.min(255, b));
-      return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    } catch (e) { return hex; }
-  }
-  function estadoBadge(estado) {
-    const map = {
-      'Vigente': 'ok', 'Pagado': 'ok', 'Liquidada': 'ok', 'Renovada': 'ok', 'Activo': 'ok',
-      'Por renovar': 'warn', 'Pendiente': 'warn', 'Devengada': 'warn', 'Gestionando': 'warn',
-      'Vencida': 'danger', 'Vencido': 'danger', 'Cancelada': 'danger', 'Perdida': 'danger', 'Anulado': 'neutral',
-      'Próxima': 'info'
-    };
-    const cls = map[estado] || 'neutral';
-    return `<span class="badge ${cls}">${esc(estado)}</span>`;
-  }
-  return { NOW, now, monthLabel, monthKey, monthProgressPct, money, moneyShort, esc, initials, fmtDate, daysFromNow, ago, avatar, shade, estadoBadge };
-})();
+CX.ui = {
+  /* hyperscript-ish element builder */
+  el(tag, attrs, children){
+    const e=document.createElement(tag);
+    if(attrs) for(const k in attrs){
+      const v=attrs[k];
+      if(k==='class') e.className=v;
+      else if(k==='html') e.innerHTML=v;
+      else if(k==='text') e.textContent=v;
+      else if(k.startsWith('on')&&typeof v==='function') e.addEventListener(k.slice(2),v);
+      else if(v!=null) e.setAttribute(k,v);
+    }
+    if(children!=null){
+      (Array.isArray(children)?children:[children]).forEach(c=>{
+        if(c==null||c===false) return;
+        e.appendChild(typeof c==='string'?document.createTextNode(c):c);
+      });
+    }
+    return e;
+  },
+
+  /* page header */
+  ph(title, sub){
+    return `<div class="ph"><div class="ph-acc"></div><div class="ph-t">${title}</div>${sub?`<div class="ph-s">${sub}</div>`:''}</div>`;
+  },
+
+  /* KPI tile */
+  kpi(label,value,tone='b',sub=''){
+    return `<div class="kpi ${tone}"><div class="k-l">${label}</div><div class="k-v">${value}</div>${sub?`<div class="k-s">${sub}</div>`:''}</div>`;
+  },
+
+  bar(pct,label,val){
+    return `<div class="flex" style="margin-bottom:9px"><span style="width:96px;font-size:11px;color:var(--t2);flex-shrink:0">${label}</span>
+      <div class="bar" style="flex:1"><i style="width:${pct}%"></i></div>
+      <b style="width:36px;text-align:right;font-size:11px;font-family:var(--disp);color:var(--t1)">${val??pct+'%'}</b></div>`;
+  },
+
+  bdg(text,tone='n'){ return `<span class="bdg bdg-${tone}">${text}</span>`; },
+
+  aiBox(text,label='Capa inteligente'){
+    if(!CX.BRAND.showAITag) return '';
+    return `<div class="ai-box"><div class="ai-l">✨ ${label}</div><p>${text}</p></div>`;
+  },
+
+  empty(icon,msg){ return `<div class="empty"><div class="e-ic">${icon}</div>${msg}</div>`; },
+
+  money(cur,n){ return `${cur} ${Number(n).toLocaleString('es-GT')}`; },
+
+  /* toast */
+  toast(msg,type='',ms=2800){
+    let host=document.getElementById('cx-toasts');
+    if(!host){host=document.createElement('div');host.id='cx-toasts';document.body.appendChild(host);}
+    const t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;
+    host.appendChild(t);
+    setTimeout(()=>{t.style.opacity='0';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},ms);
+  },
+
+  /* modal */
+  modal(title, bodyHTML, opts={}){
+    const ov=document.createElement('div');ov.className='cx-ov';
+    const cls='cx-modal'+(opts.full?' cx-modal-full':opts.wide?' cx-modal-wide':'');
+    ov.innerHTML=`<div class="${cls}"><div class="cx-modal-h"><div class="card-t" style="font-size:16px">${title}</div>
+      <button class="btn btn-ghost btn-icon" data-x>✕</button></div><div class="cx-modal-b">${bodyHTML}</div></div>`;
+    document.body.appendChild(ov);
+    const close=()=>ov.remove();
+    ov.addEventListener('click',e=>{if(e.target===ov)close();});
+    ov.querySelector('[data-x]').addEventListener('click',close);
+    if(opts.onMount)opts.onMount(ov,close);
+    return close;
+  },
+
+  /* status → badge tone for visits */
+  estadoBadge(est){
+    const m={disponible:['Disponible','b'],postulada:['Postulada','a'],asignada:['Asignada','b'],
+      agendada:['Agendada','t'],realizada:['Realizada','g'],cuestionario:['Pend. cuestionario','a'],
+      liquidada:['Liquidada','g'],fuera_rango:['Fuera de rango','r']};
+    const x=m[est]||[est,'n']; return `<span class="bdg bdg-${x[1]}">${x[0]}</span>`;
+  },
+
+  /* placeholder for not-yet-deepened modules */
+  scaffold(id){
+    const m=CX.MODULES[id];
+    return `${CX.ui.ph(m.label, 'Módulo en construcción · arquitectura y navegación listas')}
+      <div class="card card-p">
+        <div class="flex wrap" style="gap:14px">
+          <div style="font-size:40px">${m.icon}</div>
+          <div style="flex:1;min-width:220px">
+            <div class="card-t" style="font-size:16px;margin-bottom:6px">${m.label}</div>
+            <p style="font-size:13.5px;color:var(--t2);line-height:1.6">Este módulo ya existe en la plataforma y forma parte del producto.
+            Está agendado en la oleada de profundización; su comportamiento de referencia está documentado en
+            <span class="mono" style="font-size:12px">docs/MODULES.md</span>.</p>
+            <div style="margin-top:12px">${CX.ui.bdg('En desarrollo','a')} ${CX.ui.bdg(m.roles.join(' · '),'n')}</div>
+          </div>
+        </div>
+      </div>`;
+  },
+};
+
+/* module registration: CX.module('id', ctx => htmlString | (el)=>void ) */
+CX.modules = {};
+CX.module = function(id, fn){ CX.modules[id]=fn; };

@@ -166,3 +166,14 @@ Estado: ABIERTO para UX tenant A&S / aplicar a prototipo base.
 - Fix o mejora aplicada: separacion formal, guia rapida y router a preview visual.
 - Impacto en prototipo comercializable: reduce reproceso y evita parches innecesarios.
 - Estado: RESUELTO
+
+## 2026-07-01 03:52:58 - Prototipo V98 no resuelve pendientes profundos
+
+- Modulo: Prototipo general.
+- Sintoma/necesidad: la plataforma se ve igual y varios flujos siguen sin detalle, sincronizacion o edicion.
+- Esperado: cambios visibles y verificables en los modulos priorizados.
+- Causa raiz: el ZIP V98 atiende solo cambios puntuales y no el bloque profundo solicitado.
+- Archivo/funcion: Inicio, Plantillas, Reportes, Finanzas, Comisiones, Metas/Insights, Correo, Cotizador, Historial.
+- Fix o mejora aplicada: se documenta pendiente post V98 para Claude y se evita atribuir esto al backend.
+- Impacto en prototipo comercializable: no aprobar como version funcional completa para migraciones futuras.
+- Estado: ABIERTO

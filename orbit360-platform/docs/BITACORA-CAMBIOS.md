@@ -391,3 +391,14 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: router visual desde LAB, launchers separados y documentacion de decision.
 - Impacto en prototipo comercializable: evita reproceso y falsos bugs; mantiene backend sin fallback demo.
 - Estado: RESUELTO
+
+## 2026-07-01 03:52:58 - Integracion Claude V98 preservando Backend LAB
+
+- Modulo: Prototipo base + Backend LAB.
+- Necesidad: aplicar ZIP actualizado de Claude y verificar si realmente resuelve pendientes.
+- Esperado: integrar cambios sin perder Backend LAB ni herramientas locales.
+- Causa raiz si aplica: V98 trae cambios puntuales, pero no resuelve pendientes profundos de Inicio, Plantillas, Reportes, Finanzas, Comisiones, Metas, Correo, Cotizador e Historial.
+- Archivo/funcion: core/router.js, modules/configuracion.js, modules/inicio.js, index.html y docs de auditoria.
+- Fix o mejora aplicada: integracion segura, preservacion backend, auditoria y actualizacion de pendientes post V98.
+- Impacto en prototipo comercializable: se evidencia que el paquete no debe considerarse cierre funcional completo.
+- Estado: EN PROGRESO

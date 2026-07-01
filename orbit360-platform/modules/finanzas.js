@@ -1,847 +1,608 @@
-/* ============================================================
-   Orbit 360 · Finanzas  — BETA (núcleo financiero)
-   - Movimientos (históricos importables + generación mensual)
-   - Liquidación de comisiones a COBRAR a aseguradoras (empresa)
-   - Liquidación de comisiones a PAGAR a asesores (% fijo/variable)
-   - Conciliación bancaria (doble: pago↔póliza, depósito↔liquidación)
-   Comisión: sobre prima NETA, causada sobre prima RECAUDADA.
-   ============================================================ */
-window.Orbit = window.Orbit || {};
-Orbit.modules = Orbit.modules || {};
-Orbit.modules.finanzas = (function () {
-  const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
-  let tab = 'movimientos';
-  const ROLE = () => (Orbit.session && Orbit.session.rol && Orbit.session.rol()) || (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
-  // selector de mes (acumulado del año hasta el mes) + país
-  const NOW = U.NOW ? new Date(U.NOW) : new Date();
-  let mesSel = NOW.toISOString().slice(0, 7);        // 'YYYY-MM'
-  const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-  function periodos() { return [...new Set(S().all('finmovs').map(m => m.periodo))].sort().reverse(); }
-  function paisFin() { return (!Orbit.pais || Orbit.pais === 'TODOS') ? null : Orbit.pais; }
-  function movs(periodo) {
-    const p = paisFin();
-    return S().all('finmovs').filter(m => (!periodo || m.periodo === periodo) && (!p || m.pais === p));
-  }
-  const norm = (v, cur) => q.norm(v, cur);
-  const M = (n) => U.moneyShort(n, 'GTQ');
-  const MM = (n) => U.money(n, 'GTQ');
-  const sum = (arr, f) => arr.reduce((s, x) => s + norm(f(x), x.moneda), 0);
+/* CXOrbia · Finanzas (admin) — full fidelity
+   Dashboard Financiero · Movimientos · Liquidaciones · Lotes de Pago
+   Separación SIEMPRE por moneda y por país del proyecto (genérico, cualquier país). */
 
-  function render(host) {
-    const TABS = [['movimientos', '🧾 Movimientos'], ['dashboard', '📊 Dashboard'], ['cxcp', '💳 CxC / CxP'], ['financiacion', '🏦 Financiación'], ['presupuesto', '📋 Presupuesto'], ['empresa', '🏢 Liq. empresa'], ['asesores', '👥 Liq. asesores'], ['banco', '🔗 Conciliación'], ['ia', '✨ Análisis IA']];
-    const paisLbl = (Orbit.PAISES.find(p => p.id === (Orbit.pais || 'TODOS')) || {}).label || 'Todos los países';
-    host.innerHTML = `<div class="page">
-      ${K.banner({ icon: '💰', title: 'Orbit Finanzas', sub: 'Ingresos, egresos, financiación y presupuesto', features: [], actions: `<div class="ins-controls">
-        <select id="fin-pais" class="ins-ctl">${Orbit.PAISES.map(p => `<option value="${p.id}" ${p.id === (Orbit.pais || 'TODOS') ? 'selected' : ''}>🌎 ${p.label}</option>`).join('')}</select>
-        <select id="fin-mes" class="ins-ctl">${periodos().map(pr => `<option value="${pr}" ${pr === mesSel ? 'selected' : ''}>${MESES[+pr.slice(5) - 1]} ${pr.slice(0, 4)}</option>`).join('')}</select>
-      </div>` })}
-      <div class="tabs tabs-scroll" style="margin-bottom:16px">
-        ${TABS.map(t => `<div class="tab ${tab === t[0] ? 'active' : ''}" data-t="${t[0]}">${t[1]}</div>`).join('')}
-      </div>
-      <div id="fin-body"></div>
-    </div>`;
-    host.querySelectorAll('.tab[data-t]').forEach(el => el.addEventListener('click', () => {
-      tab = el.dataset.t;
-      host.querySelectorAll('.tab[data-t]').forEach(t => t.classList.toggle('active', t.dataset.t === tab));
-      const b = document.getElementById('fin-body');
-      b.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, ia }[tab] || movimientos)();
-      wire(host);
+function _fin(data){
+  const p=data.project(), out={};
+  p.countries.forEach(c=>{
+    const v=data.visitas().filter(x=>x.pais===c&&['realizada','cuestionario','liquidada'].includes(x.estado));
+    const hon=v.reduce((a,x)=>a+x.honorario,0);
+    const bol=v.reduce((a,x)=>a+(x.boleto||0),0);
+    const com=v.reduce((a,x)=>a+(x.comboAmt||0),0);
+    out[c]={cur:p.currency[c],vis:v.length,hon,bol,com,reemb:bol+com,total:hon+bol+com};
+  });
+  return out;
+}
+const _m=(cur,n)=>`${cur} ${Number(n).toLocaleString('es-GT')}`;
+
+CX.module('financiero', ({data,ui})=>{
+  const p=data.project();
+  const fp=CX.fin.porPais(data);
+  const modelLbl = p.modelo==='delegado' ? 'Delegado (franquicia)' : 'Facturado directamente';
+
+  const tile=(c)=>{const d=fp[c];return `<div class="card card-p">
+    <div class="between" style="margin-bottom:10px"><div class="card-t finDrill" data-c="${c}" style="cursor:pointer">${CX.paisLabel(c)} <span class="muted" style="font-weight:500">(${d.cur})</span> <span style="font-size:11px;color:var(--brand)">ver visitas →</span></div>${ui.bdg(d.margenPct+'% margen',d.margenPct>=30?'g':'a')}</div>
+    <div class="grid g2" style="gap:8px">
+      ${ui.kpi('Ingresos',d.cur+' '+d.ingreso.toLocaleString(),'g')}
+      ${ui.kpi('Honorarios',d.cur+' '+d.honPaga.toLocaleString(),'r')}
+      ${p.modelo==='directo'?ui.kpi('ISR ('+(p.isr||0)+'%)',d.cur+' '+d.isr.toLocaleString(),'a'):ui.kpi('Reembolsos',d.cur+' '+d.reemb.toLocaleString(),'n')}
+      ${p.modelo==='directo'?ui.kpi('Regalías ('+(p.regalias||0)+'%)',d.cur+' '+d.regal.toLocaleString(),'p'):ui.kpi('Por pagar (CxP)',d.cur+' '+d.cxp.toLocaleString(),'a')}
+    </div>
+    <div class="between" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border-2)">
+      <span style="font-size:12px;color:var(--t2)">Margen neto</span>
+      <b style="font-family:var(--disp);font-size:18px;color:${d.margen>=0?'var(--green)':'var(--red)'}">${d.cur} ${d.margen.toLocaleString()}</b></div>
+    <div class="flex" style="gap:14px;margin-top:8px;font-size:11px;color:var(--t3)">
+      <span>CxC: <b style="color:var(--t2)">${d.cur} ${d.cxc.toLocaleString()}</b></span>
+      <span>CxP: <b style="color:var(--t2)">${d.cur} ${d.cxp.toLocaleString()}</b></span>
+      <span>Gastos fijos: <b style="color:var(--t2)">${d.cur} ${d.fijos.toLocaleString()}</b></span></div>
+  </div>`;};
+
+  /* motor de análisis crítico inteligente: deriva hallazgos/estrategias de los datos */
+  const analizar=()=>{
+    const H=[]; const M=(cur,n)=>`${cur} ${Number(Math.round(n)).toLocaleString('es-GT')}`;
+    p.countries.forEach(c=>{
+      const d=fp[c], cur=d.cur;
+      if(d.margenPct<20) H.push({tono:'r',icon:'⚠',titulo:`Margen crítico en ${CX.paisLabel(c)} (${d.margenPct}%)`,txt:`Por debajo del 20% objetivo. Revisa honorarios pagados (${M(cur,d.honPaga)}) o renegocia la tarifa del programa.`,accion:'Revisar estructura de costos'});
+      else if(d.margenPct<30) H.push({tono:'a',icon:'⚑',titulo:`Margen ajustado en ${CX.paisLabel(c)} (${d.margenPct}%)`,txt:`Cerca del mínimo saludable (30%). Vigila los gastos fijos (${M(cur,d.fijos)}).`,accion:'Optimizar gastos fijos'});
+      else H.push({tono:'g',icon:'✓',titulo:`Margen sano en ${CX.paisLabel(c)} (${d.margenPct}%)`,txt:`Rentabilidad sobre el objetivo. Hay espacio para incentivos a shoppers o inversión comercial.`,accion:'Considerar incentivos'});
+      if(d.cxc>d.ingreso*0.4) H.push({tono:'a',icon:'⏳',titulo:`Cobranza alta en ${CX.paisLabel(c)}`,txt:`Por cobrar (${M(cur,d.cxc)}) supera el 40% del ingreso. Riesgo de liquidez; prioriza conciliación de reembolsos.`,accion:'Gestionar cobranza'});
+    });
+    const cur0=p.currency[p.countries[0]];
+    const fin=CX.finStore.cxp(p.id).filter(r=>/financ/i.test(r.concepto)).reduce((s,r)=>s+(r.saldo||0),0);
+    if(fin>0) H.push({tono:'a',icon:'🏦',titulo:'Financiamientos activos',txt:`Hay ${M(cur0,fin)} en financiamientos. No son utilidad operativa: van como CxP hasta devolverse. Vigila el calendario de devolución.`,accion:'Ver CxP'});
+    const store=CX.finStore.pres(p.id), pres=Object.keys(store).reduce((a,k)=>a+(+store[k]||0),0);
+    const fijReal=p.countries.reduce((a,c)=>a+(fp[c].fijos||0),0);
+    if(pres && fijReal>pres*1.05) H.push({tono:'r',icon:'📊',titulo:'Gasto fijo sobre presupuesto',txt:`El gasto fijo real (${M(cur0,fijReal)}) excede el presupuesto (${M(cur0,pres)}) en ${Math.round((fijReal/pres-1)*100)}%.`,accion:'Ajustar presupuesto'});
+    return H;
+  };
+
+  const html_fin = `
+  <div class="between" style="margin-bottom:12px"><div>${ui.ph('Dashboard Financiero', p.name+' · '+modelLbl+' · '+p.countries.map(c=>c+' ('+CX.moneda(p,c)+')').join(' y ')+' separados')}</div>
+    <div class="flex" style="gap:8px"><select id="finDashPer" class="sel" style="width:auto">${CX.finStore.periods(p.id).map(pp=>`<option ${pp===CX.finStore.curPeriod()?'selected':''}>${pp}</option>`).join('')}</select><span class="bdg ${p.modelo==='directo'?'bdg-b':'bdg-p'}">${modelLbl}</span><button class="btn btn-ghost btn-sm">⤓ Exportar</button></div></div>
+
+  <div class="card card-p" style="margin-bottom:16px;background:var(--brand-light);border-color:#cfe6f7">
+    <div style="font-size:12.5px;color:var(--brand-dark)">${p.modelo==='directo'
+      ? '<b>Modelo directo:</b> el margen descuenta honorarios + ISR ('+(p.isr||0)+'%) + regalías ('+(p.regalias||0)+'%). El reembolso (boleto+combo) es flujo de caja, no afecta utilidad.'
+      : '<b>Modelo delegado:</b> solo se netea el honorario recibido menos lo pagado al shopper; sin ISR ni regalías locales.'}</div>
+  </div>
+
+  <div class="grid ${p.countries.length>1?'g2':''}" style="margin-bottom:16px">${p.countries.map(tile).join('')}</div>
+
+  <div class="card card-p" style="margin-bottom:16px;border-color:#e3d9f5">
+    <div class="card-h"><div class="card-t">🧠 Análisis crítico inteligente</div><span class="bdg bdg-p">IA · hallazgos & estrategias</span></div>
+    <div class="grid g2" style="gap:10px">
+      ${analizar().map(h=>`<div style="display:flex;gap:10px;padding:11px 12px;background:var(--${h.tono}-bg);border-radius:10px">
+        <div style="font-size:17px;line-height:1">${h.icon}</div>
+        <div style="flex:1"><b style="font-size:12.5px;color:var(--${h.tono})">${h.titulo}</b>
+        <div style="font-size:11.5px;color:var(--t2);margin-top:3px">${h.txt}</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:7px;padding:3px 9px;font-size:11px">${h.accion} →</button></div></div>`).join('')}
+    </div>
+    <div style="margin-top:10px">${ui.aiBox('Leo márgenes por país, cobranza (CxC), financiamientos (que NO cuento como ingreso operativo) y presupuesto vs real para sugerir acciones. Con IA conectada (Gemini), el análisis se enriquece con tendencias del trimestre.','Decisiones, no solo números')}</div>
+  </div>
+
+  <div class="card card-p" id="presAvance" style="margin-bottom:16px">
+    <div class="card-h"><div class="card-t">🚦 Avance de presupuesto · semáforos</div><span class="muted" style="font-size:11px">real vs presupuestado por rubro</span></div>
+    <div id="presBars"></div>
+  </div>
+
+  <div class="grid g2" style="margin-bottom:16px">
+    <div class="card card-p">
+      <div class="card-h"><div class="card-t">📈 Comparativo intermensual (margen %)</div><span class="muted" style="font-size:11px">mes vs mes anterior</span></div>
+      ${p.countries.map(c=>{const mom=CX.fin.margenMoM(p,c);return `<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:8px">${CX.paisLabel(c)}</div>
+        <div class="flex" style="align-items:flex-end;gap:10px;height:84px">
+        ${mom.map(x=>`<div style="flex:1;text-align:center">
+          <div style="display:flex;flex-direction:column;justify-content:flex-end;height:60px"><div title="margen ${x.margenPct}%" style="height:${Math.round(x.margenPct/50*58)}px;background:var(--green);border-radius:3px 3px 0 0;opacity:.85"></div></div>
+          <div style="font-size:10px;color:var(--t3);margin-top:4px">${x.m}</div>
+          <div style="font-size:11px;font-weight:800;color:var(--t1)">${x.margenPct}%</div>
+          <div style="font-size:9.5px;font-weight:700;color:var(--${x.delta>=0?'green':'red'})">${x.delta>=0?'▲+'+x.delta:'▼'+x.delta}</div></div>`).join('')}
+        </div></div>`;}).join('')}
+    </div>
+    <div class="card card-p">
+      <div class="card-h"><div class="card-t">📅 Comparativo interanual (margen %)</div><span class="muted" style="font-size:11px">evolución por año</span></div>
+      ${p.countries.map(c=>{const ya=CX.fin.serieAnual(p,c),cur=p.currency[c];return `<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:8px">${CX.paisLabel(c)}</div>
+        ${ya.map((x,i)=>{const prev=i>0?ya[i-1].margenPct:x.margenPct;const d=x.margenPct-prev;return `<div class="between" style="padding:6px 0;border-bottom:1px solid var(--border-2)">
+          <span style="font-size:12.5px;font-weight:600">${x.y}</span>
+          <div class="flex" style="gap:10px"><span style="font-size:11.5px;color:var(--t3)">${cur} ${(x.ingreso/1000).toFixed(0)}k ing.</span>
+          <span style="font-size:12.5px;font-weight:800;color:var(--t1)">${x.margenPct}%</span>
+          <span style="font-size:10.5px;font-weight:700;color:var(--${d>=0?'green':'red'});min-width:34px;text-align:right">${i===0?'—':(d>=0?'▲+'+d:'▼'+d)}</span></div></div>`;}).join('')}</div>`;}).join('')}
+      <div style="margin-top:8px">${ui.aiBox('Margen interanual creciente (31%→36%→40%): la operación gana eficiencia. Vigila que la mezcla de país y los financiamientos no distorsionen el margen real.','Evolución del margen')}</div>
+    </div>
+  </div>
+    <div class="card card-p" id="presCard">
+      <div class="card-h"><div class="card-t">📋 Presupuesto de gastos fijos</div><button class="btn btn-soft btn-sm" id="addPres">＋ Rubro</button></div>
+      <div id="presList"></div>
+      <div style="margin-top:10px">${ui.aiBox('Los gastos fijos se presupuestan; los variables (honorarios) van según ejecución. El dashboard compara real vs presupuesto para decidir rentabilidad y honorarios.','Presupuesto vs real')}</div>
+    </div>
+  </div>
+
+  <div class="card card-p" style="margin-bottom:16px">
+    <div class="card-h"><div class="card-t">🎟️ Reembolsos mensuales · conciliación</div><span class="muted" style="font-size:11px">¿el cliente / casa matriz reembolsó bien?</span></div>
+    <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>País</th><th>Reembolso del periodo</th><th>Reembolsado por cliente</th><th>Diferencia</th><th>Estado</th></tr></thead><tbody>
+    ${p.countries.map(c=>{const d=fp[c];const reembolsado=Math.round(d.reemb*0.85);const dif=d.reemb-reembolsado;return `<tr class="hov" data-reembc="${c}" style="cursor:pointer"><td><b>${CX.paisLabel(c)}</b></td><td>${d.cur} ${d.reemb.toLocaleString()}</td><td>${d.cur} ${reembolsado.toLocaleString()}</td><td style="color:${dif>0?'var(--red)':'var(--green)'};font-weight:700">${dif>0?'falta ':''}${d.cur} ${Math.abs(dif).toLocaleString()}</td><td>${dif>0?ui.bdg('Pendiente conciliar','a'):ui.bdg('Conciliado','g')}</td></tr>`;}).join('')}
+    </tbody></table></div>
+    <div style="margin-top:10px">${ui.aiBox('Los reembolsos son flujo (no utilidad): el programa cubre consumos/boletos y el cliente o casa matriz los reintegra. Aquí concilias lo gastado vs lo reembolsado para no perder dinero.','Conciliación de reembolsos')}</div>
+  </div>`;
+
+  setTimeout(()=>{
+    document.getElementById('finDashPer')?.addEventListener('change',e=>{CX.finStore.setPeriod(e.target.value);CX.router.nav('financiero');});
+    document.querySelectorAll('.finDrill').forEach(el=>el.addEventListener('click',()=>{
+      const c=el.dataset.c, liqs=CX.liq.forProject(data).filter(l=>l.pais===c);
+      const d=fp[c];
+      ui.modal('Detalle financiero · '+CX.paisLabel(c),`
+        <div class="grid g2" style="gap:12px;margin-bottom:14px">
+          <div class="card card-p"><div class="card-t" style="font-size:12px;margin-bottom:6px">💰 Ingresos operativos</div><div style="font-size:20px;font-weight:800;color:var(--green);font-family:var(--disp)">${d.cur} ${d.ingreso.toLocaleString()}</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Facturado al cliente (sin financiamientos)</div></div>
+          <div class="card card-p"><div class="card-t" style="font-size:12px;margin-bottom:6px">💸 Honorarios pagados</div><div style="font-size:20px;font-weight:800;color:var(--red);font-family:var(--disp)">${d.cur} ${d.honPaga.toLocaleString()}</div><div style="font-size:11px;color:var(--t3);margin-top:4px">${liqs.length} liquidaciones en el periodo</div></div>
+          <div class="card card-p"><div class="card-t" style="font-size:12px;margin-bottom:6px">🟢 Margen neto</div><div style="font-size:20px;font-weight:800;color:${d.margen>=0?'var(--green)':'var(--red)'};font-family:var(--disp)">${d.cur} ${d.margen.toLocaleString()} <span style="font-size:13px;font-weight:600">(${d.margenPct}%)</span></div><div style="font-size:11px;color:var(--t3);margin-top:4px">${d.margenPct>=30?'✓ Sobre objetivo (30%)':'⚠ Bajo objetivo (30%)'}</div></div>
+          <div class="card card-p"><div class="card-t" style="font-size:12px;margin-bottom:6px">⏳ Cuentas por cobrar (CxC)</div><div style="font-size:20px;font-weight:800;color:var(--amber);font-family:var(--disp)">${d.cur} ${d.cxc.toLocaleString()}</div></div>
+        </div>
+        <b style="font-size:13px">Liquidaciones del periodo (${liqs.length})</b>
+        <div style="overflow-x:auto;margin-top:10px;max-height:260px;overflow-y:auto">${liqs.length?`<table class="tbl"><thead><tr><th>Visita</th><th>Shopper</th><th>Total</th><th>Estado</th></tr></thead><tbody>${liqs.map(l=>`<tr><td style="font-size:12px"><b>${l.sucursal||l.visitaId}</b></td><td style="font-size:12px">${l.shopper||'—'}</td><td>${d.cur} ${(l.total||0).toLocaleString()}</td><td>${ui.estadoBadge?ui.estadoBadge(l.estado):l.estado}</td></tr>`).join('')}</tbody></table>`:ui.empty('💸','Sin liquidaciones en este periodo.')}</div>`);
     }));
-    const pSel = host.querySelector('#fin-pais'); if (pSel) pSel.addEventListener('change', () => { Orbit.pais = pSel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); render(host); });
-    const mSel = host.querySelector('#fin-mes'); if (mSel) mSel.addEventListener('change', () => { mesSel = mSel.value; render(host); });
-    const body = document.getElementById('fin-body');
-    body.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, ia }[tab] || movimientos)();
-    wire(host);
-  }
-
-  /* ---------- MOVIMIENTOS (reales del periodo) ---------- */
-  function movimientos() {
-    const list = movs(mesSel).filter(m => m.tipo !== 'financiacion');
-    const ing = list.filter(m => m.tipo === 'ingreso'), egr = list.filter(m => m.tipo === 'egreso');
-    const tIng = sum(ing, m => m.valor), tEgr = sum(egr, m => m.valor);
-    const recaudado = sum(ing.filter(m => m.estado === 'recaudado'), m => m.valor);
-    const pagado = sum(egr.filter(m => m.estado === 'pagado'), m => m.valor);
-    const rows = list.slice().sort((a, b) => (b.dia || 0) - (a.dia || 0));
-    return `${K.kpis([
-      { label: 'Ingresos del mes', val: M(tIng), color: 'var(--ok)', foot: M(recaudado) + ' recaudado', footTone: 'up', onclick: "Orbit.modules.finanzas.drillKey('ing-mes')" },
-      { label: 'Egresos del mes', val: M(tEgr), color: 'var(--danger)', foot: M(pagado) + ' pagado', onclick: "Orbit.modules.finanzas.drillKey('egr-mes')" },
-      { label: 'Resultado operativo', val: M(tIng - tEgr), color: 'var(--red)', foot: 'ingresos − egresos', onclick: "Orbit.modules.finanzas.drillKey('res-mes')" },
-      { label: 'Movimientos', val: list.length, color: 'var(--info)', foot: ing.length + ' ing · ' + egr.length + ' egr', onclick: "Orbit.modules.finanzas.drillKey('mov-mes')" }
-    ])}
-    <div class="card pad" style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <b style="font-family:var(--f-display);font-size:15px;flex:1">Movimientos · ${MESES[+mesSel.slice(5) - 1]} ${mesSel.slice(0, 4)}</b>
-      <button class="btn primary sm" onclick="Orbit.modules.finanzas.nuevoMov('ingreso')">+ Ingreso</button>
-      <button class="btn primary sm" onclick="Orbit.modules.finanzas.nuevoMov('egreso')" style="background:var(--danger)">+ Egreso</button>
-      <button class="btn ghost sm" onclick="Orbit.modules.finanzas.crearMes()">📅 Crear mes</button>
-      <button class="btn ghost sm" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar</button>
-      <button class="btn ghost sm" onclick="Orbit.importa.open('estados-banco')">🏦 Estado de cuenta</button>
-    </div>
-    <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Día</th><th>Concepto</th><th>Clasificación</th><th>Pagador / Benef.</th><th class="num">Valor</th><th>Estado</th></tr></thead>
-      <tbody>${rows.map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.editarMov('${m.id}')" title="Ver / editar movimiento">
-        <td class="mono" style="font-size:12px">${m.dia || '—'}</td>
-        <td><b>${U.esc(m.concepto)}</b></td>
-        <td><span class="badge ${m.tipo === 'ingreso' ? 'ok' : 'neutral'}">${U.esc(m.clase)}</span></td>
-        <td style="font-size:12.5px">${U.esc(m.pagador || m.beneficiario || '—')}</td>
-        <td class="num" style="color:${m.tipo === 'egreso' ? 'var(--danger)' : 'var(--ok)'}">${m.tipo === 'egreso' ? '−' : ''}${U.money(m.valor, m.moneda)}</td>
-        <td onclick="event.stopPropagation();Orbit.modules.finanzas.toggleEstado('${m.id}')" style="cursor:pointer" title="Clic: cambia estado">${estBadge(m.estado)}</td></tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">Sin movimientos. Usa “+ Ingreso/Egreso” o “Crear mes”.</td></tr>'}</tbody>
-    </table></div></div>`;
-  }
-
-  const CLASES_ING = ['Comisiones aseguradora', 'Incentivos', 'Otros'];
-  const CLASES_EGR = ['Comisiones asesores', 'Gastos fijos', 'Marketing', 'Operación', 'Devolución de préstamo'];
-  /* ---- alta de movimiento (ingreso/egreso) ---- */
-  function nuevoMov(tipo) { editarMov(null, tipo); }
-  /* ---- editar / crear movimiento ---- */
-  function editarMov(id, tipoNuevo) {
-    const m = id ? S().get('finmovs', id) : null;
-    const tipo = m ? m.tipo : (tipoNuevo || 'ingreso');
-    const cur = paisFin() === 'CO' ? 'COP' : 'GTQ';
-    const clases = tipo === 'ingreso' ? CLASES_ING : CLASES_EGR;
-    const estados = tipo === 'ingreso' ? ['esperado', 'facturado', 'recaudado'] : ['presupuestado', 'pendiente', 'pagado'];
-    let back = document.getElementById('fin-mov'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'fin-mov'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
-    back.innerHTML = `<div class="card" style="width:min(520px,94vw);padding:0">
-      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:${tipo === 'ingreso' ? 'var(--ok-soft)' : 'var(--danger-soft)'}">
-        <b style="font-family:var(--f-display);font-size:16px">${m ? '✏ Editar' : (tipo === 'ingreso' ? '+ Ingreso' : '+ Egreso')} · ${MESES[+mesSel.slice(5) - 1]} ${mesSel.slice(0, 4)}</b>
-        <button class="imp-x" id="fm-x">✕</button></div>
-      <div style="padding:18px 20px;display:grid;gap:12px">
-        <div class="cgrid">
-          <label class="ce-l">Concepto<input id="fm-concepto" class="o-sel" value="${m ? U.esc(m.concepto) : ''}"></label>
-          <label class="ce-l">Clasificación<select id="fm-clase" class="o-sel">${clases.map(c => `<option ${m && m.clase === c ? 'selected' : ''}>${c}</option>`).join('')}<option value="__otro" ${m && clases.indexOf(m.clase) < 0 ? 'selected' : ''}>➕ Otro…</option></select><input id="fm-clase-otro" class="o-sel" placeholder="Nueva clasificación" style="margin-top:6px;display:${m && clases.indexOf(m.clase) < 0 ? '' : 'none'}" value="${m && clases.indexOf(m.clase) < 0 ? U.esc(m.clase) : ''}"></label>
-          <label class="ce-l">${tipo === 'ingreso' ? 'Pagador' : 'Beneficiario'}<input id="fm-quien" class="o-sel" value="${m ? U.esc(m.pagador || m.beneficiario || '') : ''}"></label>
-          <label class="ce-l">Día<input id="fm-dia" class="o-sel" type="number" min="1" max="31" value="${m ? m.dia : new Date().getDate()}"></label>
-          <label class="ce-l">Valor (${cur})<input id="fm-valor" class="o-sel" type="number" value="${m ? m.valor : 0}"></label>
-          <label class="ce-l">Estado<select id="fm-estado" class="o-sel">${estados.map(e => `<option ${m && m.estado === e ? 'selected' : ''}>${e}</option>`).join('')}</select></label>
-        </div>
-        <label class="ce-l">Observaciones<input id="fm-obs" class="o-sel" value="${m ? U.esc(m.obs || '') : ''}"></label>
-      </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between">
-        ${m ? '<button class="btn ghost" id="fm-del" style="color:var(--danger)">🗑 Eliminar</button>' : '<span></span>'}
-        <div style="display:flex;gap:8px"><button class="btn ghost" id="fm-cancel">Cancelar</button><button class="btn primary" id="fm-ok">Guardar</button></div>
-      </div></div>`;
-    document.body.appendChild(back);
-    const $ = s => back.querySelector(s);
-    const close = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    $('#fm-x').addEventListener('click', close); $('#fm-cancel').addEventListener('click', close);
-    if ($('#fm-del')) $('#fm-del').addEventListener('click', () => { S().remove('finmovs', id); close(); render(document.getElementById('host')); });
-    $('#fm-clase').addEventListener('change', () => { $('#fm-clase-otro').style.display = $('#fm-clase').value === '__otro' ? '' : 'none'; });
-    $('#fm-ok').addEventListener('click', () => {
-      const data = {
-        tipo, clase: $('#fm-clase').value === '__otro' ? ($('#fm-clase-otro').value || 'Otro') : $('#fm-clase').value, concepto: $('#fm-concepto').value || $('#fm-clase').value,
-        valor: +$('#fm-valor').value || 0, dia: +$('#fm-dia').value || 1, estado: $('#fm-estado').value,
-        obs: $('#fm-obs').value, periodo: m ? m.periodo : mesSel, pais: m ? m.pais : (paisFin() || 'GT'), moneda: m ? m.moneda : cur
-      };
-      data[tipo === 'ingreso' ? 'pagador' : 'beneficiario'] = $('#fm-quien').value;
-      if (m) S().update('finmovs', id, data); else S().insert('finmovs', Object.assign({ id: 'fmv' + Date.now().toString().slice(-7) }, data));
-      close(); render(document.getElementById('host'));
-    });
-  }
-  /* ---- crear el mes siguiente (copia categorías de presupuesto fijo, sin importes ejecutados) ---- */
-  function crearMes() {
-    const [y, mm] = mesSel.split('-').map(Number);
-    const d = new Date(y, mm, 1); // mm es 1-based → siguiente mes
-    const nuevo = d.toISOString().slice(0, 7);
-    const existe = S().all('finmovs').some(x => x.periodo === nuevo);
-    if (existe) { mesSel = nuevo; render(document.getElementById('host')); return; }
-    if (!confirm('¿Crear el mes ' + MESES[d.getMonth()] + ' ' + d.getFullYear() + '? Se generan las partidas de presupuesto fijo como egresos presupuestados.')) return;
-    const pais = paisFin() || 'GT', cur = pais === 'CO' ? 'COP' : 'GTQ';
-    S().all('presupuesto').filter(p => p.pais === pais).forEach(p => {
-      S().insert('finmovs', { id: 'fmv' + Date.now().toString().slice(-7) + Math.floor(Math.random() * 99), tipo: 'egreso', clase: p.clase, categoria: p.categoria, concepto: p.categoria, beneficiario: p.categoria, valor: p.monto, dia: 1, estado: 'presupuestado', periodo: nuevo, pais, moneda: cur, pendiente: p.monto, obs: '' });
-    });
-    mesSel = nuevo; render(document.getElementById('host'));
-  }
-  function estBadge(e) {
-    const map = { recaudado: 'ok', pagado: 'ok', facturado: 'info', esperado: 'warn', pendiente: 'warn', presupuestado: 'neutral' };
-    return `<span class="badge ${map[e] || 'neutral'}">${e}</span>`;
-  }
-  function toggleEstado(id) {
-    const m = S().get('finmovs', id); if (!m) return;
-    const next = m.tipo === 'ingreso'
-      ? { esperado: 'facturado', facturado: 'recaudado', recaudado: 'esperado' }
-      : { pendiente: 'pagado', pagado: 'pendiente', presupuestado: 'pendiente' };
-    S().update('finmovs', id, { estado: next[m.estado] || (m.tipo === 'ingreso' ? 'recaudado' : 'pagado') });
-    const host = document.getElementById('host'); if (host) render(host);
-  }
-
-  /* ---------- DRILL-DOWN de KPIs (desglose clicable) ---------- */
-  function drillKey(key) {
-    const p = paisFin();
-    const all = S().all('finmovs').filter(m => !p || m.pais === p);
-    const inM = all.filter(m => m.periodo === mesSel && m.tipo !== 'financiacion');
-    const lbl = MESES[+mesSel.slice(5) - 1] + ' ' + mesSel.slice(0, 4);
-    const map = {
-      'ing-mes': ['Ingresos del mes', lbl, inM.filter(m => m.tipo === 'ingreso')],
-      'egr-mes': ['Egresos del mes', lbl, inM.filter(m => m.tipo === 'egreso')],
-      'res-mes': ['Resultado operativo', lbl + ' · ingresos y egresos', inM],
-      'mov-mes': ['Movimientos del mes', lbl, inM],
-      'cxc': ['Cuentas por cobrar', 'todas las pendientes de recaudo — arrastran mes a mes', all.filter(m => m.tipo === 'ingreso' && (m.estado === 'esperado' || m.estado === 'facturado'))],
-      'cxp': ['Cuentas por pagar', 'todas las pendientes de pago — arrastran mes a mes', all.filter(m => m.tipo === 'egreso' && (m.estado === 'pendiente' || (m.pendiente || 0) > 0))]
+    /* KPIs adicionales dentro del tile — sólo responde si no es ya un finDrill */
+    document.querySelectorAll('[data-c]').forEach(el=>{ if(!el.classList.contains('finDrill')) return; });
+    const cur=p.currency[p.countries[0]];
+    const defaults={'Coordinación':4000,'Software/plataforma':1200,'Transporte':800};
+    const store=CX.finStore.pres(p.id);
+    if(!Object.keys(store).length) Object.assign(store,defaults);
+    const draw=()=>{
+      const list=document.getElementById('presList'); if(!list)return;
+      const ks=Object.keys(store); const tot=ks.reduce((a,k)=>a+(+store[k]||0),0);
+      list.innerHTML = (ks.length?ks.map(k=>`<div class="between" style="padding:7px 0;border-bottom:1px solid var(--border-2)">
+        <span style="font-size:12.5px;color:var(--t1)">${k}</span>
+        <div class="flex" style="gap:8px"><b style="font-size:12.5px">${cur} ${(+store[k]).toLocaleString()}</b><button class="btn btn-ghost btn-sm" data-delp="${k}" style="color:var(--red);padding:2px 7px">✕</button></div></div>`).join(''):'<div class="muted" style="font-size:12px;padding:8px 0">Sin rubros aún</div>')
+        + `<div class="between" style="padding:9px 0 0;font-weight:700"><span style="font-size:13px">Total fijo</span><b style="color:var(--t1)">${cur} ${tot.toLocaleString()}</b></div>`;
+      list.querySelectorAll('[data-delp]').forEach(b=>b.addEventListener('click',()=>{delete store[b.dataset.delp];draw();}));
     };
-    const cfg = map[key]; if (!cfg) return;
-    drillModal(cfg[0], cfg[1], cfg[2]);
-  }
-  function drillModal(titulo, sub, items) {
-    items = (items || []).slice().sort((a, b) => (b.periodo || '').localeCompare(a.periodo || '') || (b.dia || 0) - (a.dia || 0));
-    const tot = items.reduce((s, m) => s + norm(m.valor, m.moneda), 0);
-    let back = document.getElementById('fin-drill'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'fin-drill'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
-    back.innerHTML = `<div class="card" style="width:min(760px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
-      <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Desglose</div>
-          <b style="font-family:var(--f-display);font-size:18px;color:#fff">${U.esc(titulo)}</b>
-          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${items.length} registros · ${U.money(tot, 'GTQ')} · ${U.esc(sub)} · clic en una fila para ver/editar</div></div>
-        <button class="imp-x" id="dr-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
-      <div style="overflow:auto;flex:1"><table class="tbl">
-        <thead><tr><th>Periodo</th><th>Día</th><th>Concepto</th><th>Clasificación</th><th>Quién</th><th class="num">Valor</th><th>Estado</th></tr></thead>
-        <tbody>${items.map(m => `<tr class="clickable" onclick="document.getElementById('fin-drill').remove();Orbit.modules.finanzas.editarMov('${m.id}')">
-          <td class="mono" style="font-size:11.5px">${m.periodo}</td><td class="mono" style="font-size:11.5px">${m.dia || '—'}</td>
-          <td><b>${U.esc(m.concepto)}</b></td><td style="font-size:12px">${U.esc(m.clase || '—')}</td>
-          <td style="font-size:12px">${U.esc(m.pagador || m.beneficiario || '—')}</td>
-          <td class="num" style="color:${m.tipo === 'egreso' ? 'var(--danger)' : 'var(--ok)'}">${m.tipo === 'egreso' ? '−' : ''}${U.money(m.valor, m.moneda)}</td>
-          <td>${estBadge(m.estado)}</td></tr>`).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody>
-      </table></div>
-      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn primary" id="dr-ok">Cerrar</button></div>
+    draw();
+    // barras de avance de presupuesto con semáforos (real vs presupuestado)
+    const drawAvance=()=>{
+      const bars=document.getElementById('presBars'); if(!bars)return;
+      const fijReal=p.countries.reduce((a,c)=>a+(fp[c].fijos||0),0);
+      const ks=Object.keys(store);
+      const totalPres=ks.reduce((a,k)=>a+(+store[k]||0),0)||1;
+      // distribuye el real proporcional al peso presupuestado (demo) — en prod viene de movimientos por rubro
+      bars.innerHTML = ks.map(k=>{
+        const pres=+store[k]||0; const real=Math.round(fijReal*(pres/totalPres));
+        const pct=pres?Math.round(real/pres*100):0;
+        const tono=pct>105?'r':pct>90?'a':'g'; const lbl=pct>105?'Excedido':pct>90?'Al límite':'En rango';
+        return `<div style="margin-bottom:11px"><div class="between" style="margin-bottom:4px"><span style="font-size:12px;color:var(--t1)">${k}</span>
+          <span style="font-size:11.5px;color:var(--t2)">${cur} ${real.toLocaleString()} / ${cur} ${pres.toLocaleString()} ${ui.bdg(lbl,tono)}</span></div>
+          <div style="height:9px;background:var(--border-2);border-radius:5px;overflow:hidden"><div style="height:100%;width:${Math.min(100,pct)}%;background:var(--${tono});border-radius:5px"></div></div></div>`;
+      }).join('') + `<div class="between" style="margin-top:10px;padding-top:9px;border-top:1px solid var(--border-2);font-weight:700"><span style="font-size:12.5px">Total ejecutado</span><span style="font-size:12.5px">${cur} ${fijReal.toLocaleString()} / ${cur} ${(totalPres).toLocaleString()}</span></div>`;
+    };
+    drawAvance();
+    const ap=document.getElementById('addPres');
+    if(ap)ap.addEventListener('click',()=>ui.modal('Nuevo rubro de gasto fijo',`
+      <div style="margin-bottom:12px"><label class="lbl">Concepto</label><input class="inp" id="prK" placeholder="Ej. Renta oficina"></div>
+      <div style="margin-bottom:16px"><label class="lbl">Monto mensual (${cur})</label><input class="inp" id="prV" type="number" placeholder="0"></div>
+      <div style="text-align:right"><button class="btn btn-pr btn-sm" id="prSave">Agregar</button></div>
+    `,{onMount:(ov,close)=>{ov.querySelector('#prSave').addEventListener('click',()=>{const k=ov.querySelector('#prK').value||'Rubro';store[k]=+ov.querySelector('#prV').value||0;close();draw();ui.toast('Rubro agregado al presupuesto','ok');});}}));
+  },0);
+  return html_fin;
+});
+
+CX.module('movimientos', ({data,ui})=>{
+  const p=data.project(), cur=p.currency[p.countries[0]];
+  const seed=[
+    {tipo:'ingreso',cat:'Anticipo cliente',pais:p.countries[0],monto:40000,fecha:'2026-06-03',desc:'Anticipo del proyecto',estado:'Conciliado'},
+    {tipo:'egreso',cat:'Pago lote #L-204',pais:p.countries[0],monto:-18240,fecha:'2026-06-12',desc:'Pago a evaluadores',estado:'Pagado',origen:'lote'},
+    {tipo:'ingreso',cat:'Factura final cliente',pais:p.countries[0],monto:46400,fecha:'2026-06-20',desc:'Factura de cierre',estado:'Pendiente (CxC)'},
+  ];
+  const host=ui.el('div');
+  let scope='proyecto'; // 'proyecto' | 'global'
+  const pid=()=>scope==='global'?CX.finStore.GLOBAL:p.id;
+  const CAT=CX.finStore.CATEGORIAS, TI=CX.finStore.TIPOS_INGRESO, TE=CX.finStore.TIPOS_EGRESO;
+  const draw=()=>{
+    const isG=scope==='global';
+    const per=CX.finStore.curPeriod();
+    const movs=[...(isG?[]:seed),...CX.finStore.mov(pid()).filter(m=>!m.fecha||m.fecha.slice(0,7)===per)];
+    const ing=movs.filter(m=>m.monto>0).reduce((a,m)=>a+m.monto,0);
+    const egr=movs.filter(m=>m.monto<0).reduce((a,m)=>a+m.monto,0);
+    // ingresos por tipo (separar financiamiento del resto)
+    const porTipoIng={}; movs.filter(m=>m.monto>0).forEach(m=>{const t=m.tipoIngreso||'otro';porTipoIng[t]=(porTipoIng[t]||0)+m.monto;});
+    const financiamiento=porTipoIng.financiamiento||0;
+    const ingOper=movs.filter(m=>m.monto>0&&!m.noOperativo&&m.tipoIngreso!=='financiamiento').reduce((a,m)=>a+m.monto,0);
+    const remesas=movs.filter(m=>m.tipoIngreso==='remesa').reduce((a,m)=>a+m.monto,0);
+    // CxC/CxP: manuales (importación) + financiamiento + liquidaciones no pagadas (solo proyecto)
+    const cxpManual=CX.finStore.cxp(pid()).reduce((a,r)=>a+(r.saldo||0),0);
+    const cxpLiq=isG?0:CX.liq.forProject(data).filter(l=>l.estado!=='pagada').reduce((a,l)=>a+l.total,0);
+    const cxp=cxpManual+cxpLiq+financiamiento;
+    const cxc=CX.finStore.cxc(pid()).reduce((a,r)=>a+(r.saldo||0),0) + (isG?0:movs.filter(m=>(m.estado||'').includes('CxC')).reduce((a,m)=>a+Math.abs(m.monto),0));
+
+    host.innerHTML=`
+    <div class="between" style="margin-bottom:12px"><div>${ui.ph('Movimientos & Tesorería', 'Ingresos, egresos, CxC/CxP, financiamientos y remesas · por proyecto o globales')}</div>
+      <div class="flex"><span class="bdg bdg-g">● En vivo</span><button class="btn btn-ghost btn-sm">⤓ Exportar</button></div></div>
+
+    <div class="between" style="margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div class="flex" style="gap:0;border:1px solid var(--border);border-radius:9px;overflow:hidden;width:max-content">
+        <button class="btn btn-sm ${scope==='proyecto'?'btn-pr':'btn-ghost'}" data-scope="proyecto" style="border-radius:0">📁 ${p.name}</button>
+        <button class="btn btn-sm ${scope==='global'?'btn-pr':'btn-ghost'}" data-scope="global" style="border-radius:0">🌐 Global (administrativo)</button>
+      </div>
+      <div class="flex" style="gap:8px;align-items:center">
+        <label class="lbl" style="margin:0">Periodo</label>
+        <select class="sel" id="perSel" style="width:auto;padding:6px 10px">${CX.finStore.periods(pid()).map(pr=>`<option value="${pr}" ${pr===per?'selected':''}>${pr}</option>`).join('')}</select>
+        <button class="btn btn-soft btn-sm" id="nextMonth" title="Crear mes siguiente (replica presupuesto, movimientos en blanco)">＋ Mes siguiente</button>
+      </div>
+    </div>
+
+    <div class="flex wrap" style="gap:8px;margin-bottom:14px">
+      <button class="btn btn-green btn-sm" data-new="ingreso">＋ Ingreso</button>
+      <button class="btn btn-soft btn-sm" data-new="egreso">＋ Egreso</button>
+      <button class="btn btn-soft btn-sm" data-cuenta="cxc">＋ Cuenta por cobrar</button>
+      <button class="btn btn-soft btn-sm" data-cuenta="cxp">＋ Cuenta por pagar</button>
+      <button class="btn btn-soft btn-sm" id="autoCxp">⚙️ Generar CxC/CxP automáticas</button>
+      <button class="btn btn-soft btn-sm" data-new="remesa">＋ Remesa</button>
+      ${!isG?`<button class="btn btn-pr btn-sm" id="payLote">💳 Pagar lote</button>`:''}
+      <button class="btn btn-ghost btn-sm" id="impHist">⤒ Importar histórico</button>
+    </div>
+
+    <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px">
+      <div data-drill="ing" style="cursor:pointer">${ui.kpi('Ingresos oper.',ui.money(cur,ingOper),'g',financiamiento?'+ fin. aparte':'')}</div>
+      <div data-drill="egr" style="cursor:pointer">${ui.kpi('Egresos',ui.money(cur,Math.abs(egr)),'r')}</div>
+      <div data-drill="cxc" style="cursor:pointer">${ui.kpi('Por cobrar (CxC)',ui.money(cur,cxc),'a')}</div>
+      <div data-drill="cxp" style="cursor:pointer">${ui.kpi('Por pagar (CxP)',ui.money(cur,cxp),'a',financiamiento?'incl. financiamiento':'')}</div>
+      <div data-drill="rem" style="cursor:pointer">${ui.kpi('Remesas',ui.money(cur,remesas),'b','conciliación')}</div>
+    </div>
+
+    <div class="grid g2" style="gap:14px;margin-bottom:16px">
+      <div class="card card-p"><div class="card-h"><div class="card-t">Ingresos por tipo</div></div>
+        ${Object.keys(TI).map(t=>{const val=porTipoIng[t]||0;return val?`<div class="between" style="padding:6px 0;border-bottom:1px solid var(--border-2)"><span style="font-size:12px;color:var(--t2)">${TI[t]}${t==='financiamiento'?' <span class="bdg bdg-a" style="font-size:9px">→CxP</span>':''}</span><b style="font-size:12.5px;color:${t==='financiamiento'?'var(--amber)':'var(--green)'}">${ui.money(cur,val)}</b></div>`:'';}).join('')||'<div class="muted" style="font-size:12px;padding:8px 0">Sin ingresos registrados</div>'}
+        <div style="font-size:11px;color:var(--t3);margin-top:8px">Los <b>financiamientos</b> no son utilidad: se suman a CxP hasta devolverse.</div>
+      </div>
+      <div class="card card-p"><div class="card-h"><div class="card-t">Cuentas por pagar (CxP)</div></div>
+        ${CX.finStore.cxp(pid()).length?CX.finStore.cxp(pid()).map(r=>`<div class="between" style="padding:7px 0;border-bottom:1px solid var(--border-2)"><div style="cursor:pointer" data-cxdet="cxp:${r.id}"><b style="font-size:12px">${r.concepto}</b><div style="font-size:10px;color:var(--t3)">${r.pais||''} · ${r.estado||'pendiente'} · saldo ↗ ver detalle</div></div><div class="flex" style="gap:8px"><b style="font-size:12.5px;color:var(--amber)">${ui.money(cur,r.saldo||0)}</b><button class="btn btn-soft btn-sm" data-abono="${r.id}">Abonar</button></div></div>`).join(''):'<div class="muted" style="font-size:12px;padding:8px 0">Sin CxP registradas. Útil al importar saldos iniciales.</div>'}
+      </div>
+    </div>
+
+    <div class="grid g2" style="gap:14px;margin-bottom:16px">
+      <div class="card card-p" id="presMesCard">
+        <div class="between" style="margin-bottom:8px"><div class="card-t">📋 Presupuesto mensual <span class="bdg bdg-b">${per}</span></div><button class="btn btn-soft btn-sm" id="addPresMes">＋ Rubro</button></div>
+        <div id="presMesList"></div>
+        <div style="font-size:11px;color:var(--t3);margin-top:8px">Es <b>mensual</b>: alimenta el semáforo y el análisis del Dashboard. Con <b>＋ Mes siguiente</b> (arriba) se replica al mes nuevo y queda editable.</div>
+      </div>
+      <div class="card card-p" id="finCard">
+        <div class="between" style="margin-bottom:8px"><div class="card-t">🏦 Financiamientos</div><button class="btn btn-soft btn-sm" id="addFin">＋ Financiamiento</button></div>
+        <div id="finList"></div>
+        <div style="font-size:11px;color:var(--t3);margin-top:8px">No son ingreso operativo: entran como flujo + CxP y se controlan hasta su <b>devolución</b> (egreso).</div>
+      </div>
+    </div>
+
+    <div class="card card-p">
+      <div class="card-h"><div class="card-t">Movimientos${isG?' globales':' del proyecto'}</div><span class="muted" style="font-size:11px">conceptos categorizados · anti-duplicado al importar</span></div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Tipo</th><th>País</th><th style="text-align:right">Monto</th><th>Estado</th><th></th></tr></thead><tbody>
+        ${movs.map(m=>`<tr><td style="font-size:12px">${m.fecha}</td><td><b>${m.cat}</b><div style="font-size:10px;color:var(--t3)">${m.desc||''}</div></td>
+          <td style="font-size:11.5px">${m.categoria||(m.global?'Administrativo':'Proyecto')}</td>
+          <td style="font-size:11px">${TI[m.tipoIngreso]||TE[m.tipoEgreso]||m.tipo}</td><td>${m.pais||'—'}</td>
+          <td style="text-align:right;font-weight:700;color:var(--${m.monto<0?'red':'green'})">${m.monto<0?'− ':'+ '}${ui.money(cur,Math.abs(m.monto))}</td>
+          <td>${ui.bdg(m.estado||'—',(m.estado||'').includes('Cx')?'a':m.monto<0?'r':'g')}</td>
+          <td style="text-align:right">${m.id?`<button class="btn btn-ghost btn-sm" data-delm="${m.id}" style="color:var(--red);padding:2px 6px">✕</button>`:''}</td></tr>`).join('')}
+      </tbody></table></div>
+      <div style="margin-top:14px">${ui.aiBox('Separo ingresos por comisiones, honorarios, anticipos y facturación de los financiamientos (que van a CxP). Registro CxC/CxP iniciales en la importación y vinculo cada abono a su egreso. Las remesas recibidas se concilian aquí.','Tesorería completa, no solo gastos del proyecto')}</div>
     </div>`;
-    document.body.appendChild(back);
-    const close = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    back.querySelector('#dr-x').addEventListener('click', close);
-    back.querySelector('#dr-ok').addEventListener('click', close);
-  }
 
-  /* ---------- CUENTAS POR COBRAR / POR PAGAR ---------- */
-  function cxcp() {
-    const all = movs(null);
-    const cxc = all.filter(m => m.tipo === 'ingreso' && (m.estado === 'esperado' || m.estado === 'facturado'));
-    const cxp = all.filter(m => m.tipo === 'egreso' && (m.estado === 'pendiente' || (m.pendiente || 0) > 0));
-    const tCxc = sum(cxc, m => m.valor), tCxp = cxp.reduce((s, m) => s + norm(m.pendiente || m.valor, m.moneda), 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">💳 <b>Cuentas por cobrar</b> = ingresos esperados/facturados aún no recaudados (ej. planilla de comisiones ya facturada). <b>Cuentas por pagar</b> = egresos pendientes (ej. liquidación de asesores no pagada); el saldo pasa al mes siguiente. Clic en una fila cambia su estado.</div>
-    ${K.kpis([
-      { label: 'Por cobrar (CxC)', val: M(tCxc), color: 'var(--warn)', foot: cxc.length + ' partidas', onclick: "Orbit.modules.finanzas.drillKey('cxc')" },
-      { label: 'Por pagar (CxP)', val: M(tCxp), color: 'var(--danger)', foot: cxp.length + ' partidas', onclick: "Orbit.modules.finanzas.drillKey('cxp')" },
-      { label: 'Posición neta', val: M(tCxc - tCxp), color: 'var(--red)', foot: 'CxC − CxP' }
-    ])}
-    <div class="ins-grid-2">
-      ${cxcpTabla('Cuentas por cobrar', cxc, 'ok')}
-      ${cxcpTabla('Cuentas por pagar', cxp, 'danger')}
-    </div>`;
-  }
-  function cxcpTabla(titulo, rows, tone) {
-    return `<div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">${titulo}</div>
-      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Periodo</th><th>Concepto</th><th class="num">Monto</th><th>Estado</th></tr></thead>
-      <tbody>${rows.slice(0, 24).map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.editarMov('${m.id}')" title="Ver / editar / eliminar">
-        <td class="mono" style="font-size:11.5px">${m.periodo}</td><td>${U.esc(m.concepto)}</td>
-        <td class="num"><b>${U.money(m.pendiente || m.valor, m.moneda)}</b></td><td onclick="event.stopPropagation();Orbit.modules.finanzas.toggleEstado('${m.id}')" style="cursor:pointer" title="Clic: cambia estado">${estBadge(m.estado)}</td></tr>`).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:18px">Sin partidas.</td></tr>'}</tbody></table></div></div>`;
-  }
+    host.querySelectorAll('[data-scope]').forEach(b=>b.addEventListener('click',()=>{scope=b.dataset.scope;draw();}));
+    const ps=host.querySelector('#perSel'); if(ps)ps.addEventListener('change',()=>{CX.finStore.setPeriod(ps.value);draw();});
+    const nm=host.querySelector('#nextMonth'); if(nm)nm.addEventListener('click',()=>{const nx=CX.finStore.crearMesSiguiente(pid());draw();ui.toast('Mes '+nx+' creado · presupuesto replicado (editable) · movimientos en blanco','ok',3600);});
 
-  /* ---------- FINANCIACIÓN (deuda separada de operativo) ---------- */
-  function financiacion() {
-    const p = paisFin();
-    const acr = S().all('acreedores').filter(a => !p || a.pais === p);
-    const fin = S().all('finmovs').filter(m => (!p || m.pais === p) && (m.tipo === 'financiacion' || m.clase === 'Devolución de préstamo'));
-    const ingFin = sum(fin.filter(m => m.tipo === 'financiacion'), m => m.valor);
-    const abonos = sum(fin.filter(m => m.clase === 'Devolución de préstamo'), m => m.valor);
-    const deuda = acr.reduce((s, a) => s + norm(a.saldo, a.pais === 'GT' ? 'GTQ' : 'COP'), 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">🏦 La <b>financiación es ingreso NO operativo</b> (no infla producción ni utilidad). Los egresos hechos con ese dinero sí son egresos normales. La <b>deuda</b> sube con cada financiación y baja con cada <b>devolución de préstamo</b> al acreedor.</div>
-    ${K.kpis([
-      { label: 'Deuda vigente', val: M(deuda), color: 'var(--danger)', foot: acr.length + ' acreedores' },
-      { label: 'Financiación recibida', val: M(ingFin), color: 'var(--warn)', foot: 'no operativo' },
-      { label: 'Abonos / amortización', val: M(abonos), color: 'var(--ok)', foot: 'devoluciones', footTone: 'up' }
-    ])}
-    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <button class="btn primary sm" onclick="Orbit.modules.finanzas.regFinanciacion('ingreso')">+ Registrar financiamiento</button>
-      <button class="btn ghost sm" onclick="Orbit.modules.finanzas.regFinanciacion('abono')">− Registrar abono / pago</button>
-    </div>
-    <div class="card" style="overflow:hidden;margin-bottom:14px"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">Deuda por acreedor</div>
-      <table class="tbl"><thead><tr><th>Acreedor</th><th>País</th><th class="num">Saldo de deuda</th></tr></thead>
-      <tbody>${acr.map(a => `<tr><td><b>${U.esc(a.nombre)}</b></td><td>${a.pais}</td><td class="num" style="color:${a.saldo > 0 ? 'var(--danger)' : 'var(--ok)'}"><b>${U.money(a.saldo, a.pais === 'GT' ? 'GTQ' : 'COP')}</b></td></tr>`).join('')}</tbody></table></div>
-    <div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">Movimientos de financiación</div>
-      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Periodo</th><th>Concepto</th><th>Acreedor</th><th class="num">Monto</th><th>Tipo</th></tr></thead>
-      <tbody>${fin.slice().reverse().slice(0, 16).map(m => `<tr><td class="mono" style="font-size:11.5px">${m.periodo}</td><td>${U.esc(m.concepto)}</td><td style="font-size:12.5px">${U.esc(m.pagador || m.beneficiario || '—')}</td>
-        <td class="num" style="color:${m.tipo === 'financiacion' ? 'var(--warn)' : 'var(--ok)'}">${m.tipo === 'financiacion' ? '+' : '−'}${U.money(m.valor, m.moneda)}</td>
-        <td><span class="badge ${m.tipo === 'financiacion' ? 'warn' : 'ok'}">${m.tipo === 'financiacion' ? 'Financiación' : 'Abono'}</span></td></tr>`).join('')}</tbody></table></div></div>`;
-  }
-
-  // ---- agregados ----
-  function comisionEmpresaPorAseguradora() {
-    const map = {};
-    S().all('comisiones').forEach(c => {
-      const k = c.aseguradoraId;
-      if (!map[k]) map[k] = { devengada: 0, liquidada: 0, n: 0 };
-      const v = q.norm(c.monto, c.moneda);
-      map[k].n++;
-      if (c.estado === 'Liquidada') map[k].liquidada += v; else map[k].devengada += v;
-    });
-    return map;
-  }
-  function comisionAsesor() {
-    return S().all('asesores').map(a => {
-      const coms = S().where('comisiones', c => c.asesorId === a.id);
-      const baseRecaudada = coms.reduce((s, c) => s + q.norm(c.base, c.moneda), 0); // prima recaudada (cuota pagada)
-      const generada = coms.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-      const pct = a.comPct || 12;
-      const aPagar = Math.round(baseRecaudada * pct / 100); // % del asesor sobre prima neta recaudada
-      const liquidada = coms.filter(c => c.estado === 'Liquidada').reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-      return { a, baseRecaudada, generada, pct, tipo: a.comTipo || 'variable', aPagar, liquidada, pendiente: Math.max(0, aPagar - liquidada) };
-    }).sort((x, y) => y.aPagar - x.aPagar);
-  }
-
-  /* ---------- MOVIMIENTOS ---------- */
-  function resumen() {
-    const cart = q.carteraGlobal();
-    const comp = comisionEmpresaPorAseguradora();
-    const totalCobrar = Object.values(comp).reduce((s, v) => s + v.devengada, 0);
-    const asesoresPagar = comisionAsesor().reduce((s, r) => s + r.pendiente, 0);
-    const movs = [
-      ['2026-06-18', 'Liquidación Seguros Atlas (may)', 12400, 'Ingreso', 'Liquidada'],
-      ['2026-06-15', 'Pago asesor D. Marroquín', -3100, 'Egreso', 'Pagada'],
-      ['2026-06-12', 'Recaudo cliente · REC-00451', 700, 'Ingreso', 'Conciliado'],
-      ['2026-06-10', 'Pago asistencia / gastos', -1250, 'Egreso', 'Registrado'],
-      ['2026-06-05', 'Liquidación Pacífico (may)', 9800, 'Ingreso', 'Por conciliar']
-    ];
-    return `${K.kpis([
-      { label: 'Recaudo del mes', val: U.moneyShort(cart.alDia, 'GTQ'), color: 'var(--ok)', foot: 'prima recaudada', footTone: 'up' },
-      { label: 'Comisión a cobrar', val: U.moneyShort(totalCobrar, 'GTQ'), color: 'var(--red)', foot: 'a aseguradoras' },
-      { label: 'A pagar asesores', val: U.moneyShort(asesoresPagar, 'GTQ'), color: 'var(--warn)', foot: 'pendiente' },
-      { label: 'Cartera vencida', val: U.moneyShort(cart.venc, 'GTQ'), color: 'var(--danger)', foot: 'afecta recaudo', footTone: 'down' }
-    ])}
-    <div class="card pad" style="margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <b style="font-family:var(--f-display);font-size:15px;flex:1">Movimientos</b>
-      <button class="btn ghost sm" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar histórico</button>
-      <button class="btn ghost sm" onclick="Orbit.importa.open('estados-banco')">🏦 Estado bancario</button>
-      <button class="btn primary sm" onclick="alert('Demo: genera el cierre de movimientos del mes a partir de recaudo, liquidaciones y egresos.')">Generar mes</button>
-    </div>
-    <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Fecha</th><th>Concepto</th><th class="num">Monto</th><th>Tipo</th><th>Estado</th></tr></thead>
-      <tbody>${movs.map(m => `<tr>
-        <td style="font-size:12.5px">${U.fmtDate(m[0])}</td>
-        <td><b>${U.esc(m[1])}</b></td>
-        <td class="num" style="color:${m[2] < 0 ? 'var(--danger)' : 'var(--ok)'}">${U.money(m[2], 'GTQ')}</td>
-        <td><span class="badge ${m[3] === 'Ingreso' ? 'ok' : 'neutral'}">${m[3]}</span></td>
-        <td>${U.estadoBadge(m[4])}</td></tr>`).join('')}</tbody>
-    </table></div></div>`;
-  }
-
-  // ---- producción NETA con ajustes por no devengado (cancelaciones) ----
-  function produccionNeta() {
-    // prima neta vigente menos primas no devengadas por cancelación
-    const vig = S().where('polizas', p => p.estado === 'Vigente' || p.estado === 'Por renovar')
-      .reduce((s, p) => s + q.norm(p.prima, p.moneda), 0);
-    const noDeveng = S().all('cancelaciones').reduce((s, c) => {
-      const cli = S().get('clientes', c.clienteId);
-      return s + q.norm(c.valorPerdido, (cli && cli.moneda) || 'GTQ');
-    }, 0);
-    return { bruta: vig, ajuste: noDeveng, neta: Math.max(0, vig - noDeveng) };
-  }
-
-  /* ---------- DASHBOARD financiero (datos en vivo del store) ---------- */
-  function serieMensual(anio, tipo) {
-    const p = paisFin();
-    return MESES.map((_, i) => {
-      const ym = anio + '-' + String(i + 1).padStart(2, '0');
-      return sum(S().all('finmovs').filter(m => m.periodo === ym && (!p || m.pais === p) && (tipo === 'ingreso' ? m.tipo === 'ingreso' : m.tipo === 'egreso')), m => m.valor);
-    });
-  }
-  function dashboard() {
-    const prod = produccionNeta();
-    const anio = +mesSel.slice(0, 4), mi = +mesSel.slice(5) - 1;
-    const ingArr = serieMensual(anio, 'ingreso'), egrArr = serieMensual(anio, 'egreso');
-    const ingPrev = serieMensual(anio - 1, 'ingreso'), egrPrev = serieMensual(anio - 1, 'egreso');
-    // ventana de 6 meses hasta el mes seleccionado
-    const lo = Math.max(0, mi - 5);
-    const meses = MESES.slice(lo, mi + 1), ingresos = ingArr.slice(lo, mi + 1), egresos = egrArr.slice(lo, mi + 1);
-    const maxV = Math.max(1, ...ingresos, ...egresos);
-    const anioActual = ingArr.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const anioAnterior = ingPrev.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const varAnual = anioAnterior > 0 ? Math.round((anioActual / anioAnterior - 1) * 100) : 0;
-    const utilidad = (ingresos[ingresos.length - 1] || 0) - (egresos[egresos.length - 1] || 0);
-    const margen = ingresos[ingresos.length - 1] > 0 ? Math.round(utilidad / ingresos[ingresos.length - 1] * 100) : 0;
-    const egrAcum = egrArr.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const gastoRatio = anioActual > 0 ? Math.round(egrAcum / anioActual * 100) : 0;
-    return `${K.kpis([
-      { label: 'Producción neta', val: U.moneyShort(prod.neta, 'GTQ'), color: 'var(--red)', foot: 'prima neta vigente' },
-      { label: 'Utilidad del mes', val: U.moneyShort(utilidad, 'GTQ'), color: 'var(--ok)', foot: 'ingresos − egresos', footTone: utilidad >= 0 ? 'up' : 'down' },
-      { label: 'Var. interanual', val: (varAnual >= 0 ? '+' : '') + varAnual + '%', color: 'var(--info)', foot: 'vs ' + (anio - 1), footTone: varAnual >= 0 ? 'up' : 'down' },
-      { label: 'Ajuste no devengado', val: '−' + U.moneyShort(prod.ajuste, 'GTQ'), color: 'var(--warn)', foot: 'cancelaciones', footTone: 'down' }
-    ])}
-    <div class="card pad" style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <b style="font-family:var(--f-display);font-size:15px">Ingresos vs egresos · comparativo intermensual</b>
-        <span style="display:flex;gap:14px;font-size:12px"><span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:var(--ok)"></span>Ingresos</span><span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:var(--danger)"></span>Egresos</span></span>
-      </div>
-      <div style="display:flex;align-items:flex-end;gap:14px;height:180px;padding-top:10px">
-        ${meses.map((m, i) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end">
-          <div style="display:flex;gap:3px;align-items:flex-end;height:100%;width:100%;justify-content:center">
-            <div title="Ingresos ${U.money(ingresos[i], 'GTQ')}" style="width:42%;background:linear-gradient(180deg,#34b96a,#1f8a4c);border-radius:4px 4px 0 0;height:${ingresos[i] / maxV * 100}%"></div>
-            <div title="Egresos ${U.money(egresos[i], 'GTQ')}" style="width:42%;background:linear-gradient(180deg,#e0566a,#C5162E);border-radius:4px 4px 0 0;height:${egresos[i] / maxV * 100}%"></div>
-          </div>
-          <span style="font-size:11px;color:var(--ink-3);font-family:var(--f-mono)">${m}</span>
-        </div>`).join('')}
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div class="card pad">
-        <b style="font-family:var(--f-display);font-size:15px">Comparativo interanual · acum. Ene→${MESES[mi]}</b>
-        <div style="display:flex;align-items:flex-end;gap:24px;margin-top:16px">
-          ${[[anio - 1 + '', anioAnterior, '#9aa0a8'], [anio + '', anioActual, 'var(--red)']].map(([y, v, c]) => `<div style="flex:1;text-align:center">
-            <div style="height:120px;display:flex;align-items:flex-end;justify-content:center"><div style="width:60%;background:${c};border-radius:6px 6px 0 0;height:${Math.max(2, v / Math.max(anioActual, anioAnterior, 1) * 100)}%"></div></div>
-            <div style="font-family:var(--f-display);font-weight:800;margin-top:8px">${U.moneyShort(v, 'GTQ')}</div>
-            <div class="muted" style="font-size:12px">${y}</div></div>`).join('')}
-        </div>
-        <div class="cfg-note" style="margin-top:14px">${varAnual >= 0 ? 'Crecimiento' : 'Caída'} <b style="color:${varAnual >= 0 ? 'var(--ok)' : 'var(--danger)'}">${varAnual >= 0 ? '+' : ''}${varAnual}%</b> vs año anterior. Base para fijar metas realistas.</div>
-      </div>
-      <div class="card pad">
-        <b style="font-family:var(--f-display);font-size:15px">Salud financiera</b>
-        <div style="display:grid;gap:11px;margin-top:14px">
-          ${finRow('Margen operativo', margen + '%', margen >= 25 ? 'ok' : 'warn')}
-          ${finRow('Gasto / ingreso (acum.)', gastoRatio + '%', gastoRatio <= 60 ? 'ok' : 'warn')}
-          ${finRow('Ingreso acum. ' + anio, U.moneyShort(anioActual, 'GTQ'), 'info')}
-          ${finRow('Egreso acum. ' + anio, U.moneyShort(egrAcum, 'GTQ'), 'neutral')}
-        </div>
-        <button class="btn primary" style="margin-top:16px;width:100%" onclick="location.hash='#/equipo'">Fijar metas (Equipo y permisos) →</button>
-      </div>
-    </div>`;
-  }
-  function finRow(k, v, tone) {
-    const col = { ok: 'var(--ok)', warn: 'var(--warn)', info: 'var(--info)', neutral: 'var(--ink)' }[tone];
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line-2)"><span style="font-size:13px">${k}</span><b style="font-family:var(--f-display);color:${col}">${v}</b></div>`;
-  }
-
-  /* ---------- PRESUPUESTO ---------- */
-  function presupuesto() {
-    const ingresos = [['Comisiones de aseguradoras', 110000, 124000], ['Financiamiento de primas', 28000, 31500], ['Otros ingresos', 6000, 4200]];
-    const egresos = [['Comisiones a asesores', 38000, 41000], ['Gastos fijos (nómina, renta)', 32000, 32000], ['Operación y asistencia', 12000, 13800], ['Marketing', 8000, 6500]];
-    const tIngP = ingresos.reduce((s, r) => s + r[1], 0), tIngR = ingresos.reduce((s, r) => s + r[2], 0);
-    const tEgP = egresos.reduce((s, r) => s + r[1], 0), tEgR = egresos.reduce((s, r) => s + r[2], 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">📊 Presupuesto vs real del mes. Ingresos por <b>comisiones</b> y <b>financiamiento</b>; egresos por <b>comisiones</b>, <b>gastos fijos</b> y operación. Importable desde el histórico.</div>
-    ${K.kpis([
-      { label: 'Ingresos (real)', val: U.moneyShort(tIngR, 'GTQ'), color: 'var(--ok)', foot: 'ppto ' + U.moneyShort(tIngP, 'GTQ'), footTone: 'up' },
-      { label: 'Egresos (real)', val: U.moneyShort(tEgR, 'GTQ'), color: 'var(--danger)', foot: 'ppto ' + U.moneyShort(tEgP, 'GTQ') },
-      { label: 'Resultado', val: U.moneyShort(tIngR - tEgR, 'GTQ'), color: 'var(--red)', foot: 'utilidad real' },
-      { label: 'Cumpl. ingresos', val: Math.round(tIngR / tIngP * 100) + '%', color: 'var(--info)', foot: 'vs presupuesto' }
-    ])}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${presupTabla('Ingresos', ingresos, 'ok')}
-      ${presupTabla('Egresos', egresos, 'danger')}
-    </div>
-    <button class="btn ghost" style="margin-top:14px" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar histórico de movimientos</button>`;
-  }
-  function presupTabla(titulo, rows, tone) {
-    return `<div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">${titulo}</div>
-      <table class="tbl"><thead><tr><th>Categoría</th><th class="num">Ppto</th><th class="num">Real</th><th class="num">%</th></tr></thead>
-      <tbody>${rows.map(r => `<tr><td>${r[0]}</td><td class="num">${U.money(r[1], 'GTQ')}</td><td class="num"><b>${U.money(r[2], 'GTQ')}</b></td><td class="num" style="color:${r[2] >= r[1] ? (tone === 'ok' ? 'var(--ok)' : 'var(--danger)') : 'var(--ink-3)'}">${Math.round(r[2] / r[1] * 100)}%</td></tr>`).join('')}</tbody></table></div>`;
-  }
-
-  /* ---------- METAS ---------- */
-  function metas() {
-    const prod = produccionNeta();
-    const board = q.leaderboard();
-    return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas sobre <b>prima NETA</b> (no total). Por <b>asesor</b>, <b>empresa</b> y <b>aseguradora</b>, mensual o anual (para incentivos). De aquí derivan metas de recaudo y financieras.</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn primary sm" onclick="alert('Demo: crear meta mensual/anual por asesor, empresa o aseguradora.')">+ Crear meta</button>
-      <select class="o-sel"><option>Mensual · Junio 2026</option><option>Anual · 2026</option></select>
-      <select class="o-sel"><option>Por asesor</option><option>Empresa</option><option>Por aseguradora</option></select>
-    </div>
-    <div class="card pad" style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">Meta de la empresa (prima neta)</b><span class="mono" style="font-size:13px">${U.moneyShort(prod.neta, 'GTQ')} / ${U.moneyShort(820000, 'GTQ')}</span></div>
-      <div class="bar" style="margin-top:10px;height:12px"><i style="width:${Math.min(100, Math.round(prod.neta / 820000 * 100))}%"></i></div>
-      <div class="muted" style="font-size:12px;margin-top:7px">Meta de recaudo derivada (78%): <b>${U.moneyShort(820000 * .78, 'GTQ')}</b> · ajuste por no devengado aplicado: −${U.moneyShort(prod.ajuste, 'GTQ')}</div>
-    </div>
-    <div class="card" style="overflow:hidden"><table class="tbl">
-      <thead><tr><th>Asesor</th><th class="num">Meta neta</th><th class="num">Real neto</th><th>Avance</th><th class="num">Incentivo</th></tr></thead>
-      <tbody>${board.map(b => {
-        const meta = b.asesor.metaPrima, pct = Math.min(140, Math.round(b.prima / meta * 100));
-        return `<tr><td><div style="display:flex;align-items:center;gap:9px">${U.avatar(b.asesor.nombre, b.asesor.color, 'sm')}<b>${U.esc(b.asesor.nombre)}</b></div></td>
-          <td class="num">${U.money(meta, 'GTQ')}</td>
-          <td class="num">${U.money(b.prima, 'GTQ')}</td>
-          <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:90px"><i style="width:${Math.min(100, pct)}%;background:${pct >= 100 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div><span class="mono" style="font-size:12px">${pct}%</span></div></td>
-          <td class="num">${pct >= 100 ? '<span class="badge ok">🏆 Logrado</span>' : '<span class="muted">—</span>'}</td></tr>`;
-      }).join('')}</tbody>
-    </table></div>`;
-  }
-
-  /* ---------- LIQUIDACIÓN EMPRESA (cobrar a aseguradoras) ---------- */
-  function empresa() {
-    const comp = comisionEmpresaPorAseguradora();
-    const rows = Object.entries(comp).map(([id, v]) => ({ asg: q.aseguradora(id), ...v })).sort((a, b) => (b.devengada + b.liquidada) - (a.devengada + a.liquidada));
-    const totalCobrar = rows.reduce((s, r) => s + r.devengada, 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">🏢 Comisión que la <b>empresa cobra a cada aseguradora</b>, sobre <b>prima neta recaudada</b>. Se concilia contra la planilla que envía la aseguradora.</div>
-    ${K.kpis([
-      { label: 'Por cobrar', val: U.moneyShort(totalCobrar, 'GTQ'), color: 'var(--red)', foot: 'devengado' },
-      { label: 'Liquidado', val: U.moneyShort(rows.reduce((s, r) => s + r.liquidada, 0), 'GTQ'), color: 'var(--ok)', foot: 'ya cobrado', footTone: 'up' },
-      { label: 'Aseguradoras', val: rows.length, color: 'var(--info)', foot: 'con comisión' },
-      { label: 'Registros', val: rows.reduce((s, r) => s + r.n, 0), color: 'var(--graph)', foot: 'cuotas' }
-    ])}
-    <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Aseguradora</th><th class="num">Por cobrar</th><th class="num">Liquidado</th><th class="num">Total</th><th></th></tr></thead>
-      <tbody>${rows.map(r => `<tr>
-        <td>${r.asg ? `<span style="display:flex;align-items:center;gap:8px"><span class="dot-s" style="background:${r.asg.color}"></span><b>${U.esc(r.asg.nombre)}</b></span>` : '—'}</td>
-        <td class="num" style="color:var(--red)"><b>${U.money(r.devengada, 'GTQ')}</b></td>
-        <td class="num" style="color:var(--ok)">${U.money(r.liquidada, 'GTQ')}</td>
-        <td class="num">${U.money(r.devengada + r.liquidada, 'GTQ')}</td>
-        <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('aseguradoraId','${r.asg ? r.asg.id : ''}')">Ver detalle</button><button class="btn ghost sm" onclick="Orbit.importa.open('planillas-comision')">Conciliar planilla</button></td>
-      </tr>`).join('')}</tbody>
-    </table></div></div>`;
-  }
-
-  /* ---------- LIQUIDACIÓN ASESORES ---------- */
-  function asesores() {
-    const yo = (Orbit.auth && Orbit.auth.user()) || {};
-    const esAsesor = !['Dirección', 'Admin', 'Finanzas'].includes(ROLE());
-    let rows = comisionAsesor();
-    if (esAsesor) rows = rows.filter(r => r.a.nombre === yo.nombre); // el asesor solo ve lo suyo
-    const totalPagar = rows.reduce((s, r) => s + r.pendiente, 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">👥 Comisión a <b>pagar a cada asesor</b>: % (fijo o variable) sobre la <b>prima neta recaudada</b> de su cartera — no sobre venta. ${esAsesor ? 'Ves <b>tu</b> liquidación.' : 'El % se configura en Configuración › Usuarios.'} Los pagos se <b>cruzan con la liquidación</b> y son ajustables.</div>
-    ${K.kpis([
-      { label: esAsesor ? 'Mi comisión a cobrar' : 'Total a pagar', val: U.moneyShort(totalPagar, 'GTQ'), color: 'var(--warn)', foot: 'pendiente' },
-      { label: 'Ya liquidado', val: U.moneyShort(rows.reduce((s, r) => s + r.liquidada, 0), 'GTQ'), color: 'var(--ok)', foot: 'pagado', footTone: 'up' },
-      { label: esAsesor ? 'Mi base recaudada' : 'Asesores', val: esAsesor ? U.moneyShort(rows.reduce((s, r) => s + r.baseRecaudada, 0), 'GTQ') : rows.length, color: 'var(--info)', foot: esAsesor ? 'prima neta' : 'con comisión' },
-      { label: 'Base recaudada', val: U.moneyShort(rows.reduce((s, r) => s + r.baseRecaudada, 0), 'GTQ'), color: 'var(--graph)', foot: 'prima neta' }
-    ])}
-    <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Asesor</th><th>Esquema</th><th class="num">Base recaudada</th><th class="num">%</th><th class="num">A pagar</th><th class="num">Pagado</th><th class="num">Pendiente</th>${esAsesor ? '' : '<th></th>'}</tr></thead>
-      <tbody>${rows.map(r => `<tr>
-        <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(r.a.nombre, r.a.color, 'sm')}<b>${U.esc(r.a.nombre)}</b></div></td>
-        <td><span class="badge ${r.tipo === 'variable' ? 'info' : 'neutral'}">${r.tipo}</span></td>
-        <td class="num">${U.money(r.baseRecaudada, 'GTQ')}</td>
-        <td class="num">${r.pct}%</td>
-        <td class="num"><b>${U.money(r.aPagar, 'GTQ')}</b></td>
-        <td class="num" style="color:var(--ok)">${U.money(r.liquidada, 'GTQ')}</td>
-        <td class="num" style="color:${r.pendiente > 0 ? 'var(--warn)' : 'var(--ok)'}">${U.money(r.pendiente, 'GTQ')}</td>
-        ${esAsesor ? '' : `<td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('asesorId','${r.a.id}')">Detalle</button><button class="btn primary sm" onclick="Orbit.modules.finanzas.lote('${r.a.id}')">Preparar lote</button></td>`}
-      </tr>`).join('')}</tbody>
-    </table></div></div>
-    ${esAsesor ? `<div class="card pad" style="margin-top:14px"><b style="font-family:var(--f-display);font-size:14px">Mis ajustes de producción</b><div class="muted" style="font-size:12.5px;margin-top:6px">Las cancelaciones de tu cartera descuentan prima neta no devengada. Revisa el detalle en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/cancelaciones'">Cancelaciones</a>.</div></div>`
-      : `<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="Orbit.modules.finanzas.lote('')">📦 Preparar lote de pago (todos)</button></div>`}`;
-  }
-
-  /* ---------- PREPARAR LOTE DE LIQUIDACIÓN ---------- */
-  // Reúne pagos pendientes (comisión del mes + CxP de meses pasados); se pueden
-  // retirar partidas del lote antes de confirmar; muestra total en vivo.
-  function lote(asesorId) {
-    const rows = comisionAsesor().filter(r => r.pendiente > 0 && (!asesorId || r.a.id === asesorId));
-    // partidas del lote: comisión pendiente por asesor + CxP de finanzas (egresos comisiones asesores no pagados de meses pasados)
-    const partidas = [];
-    rows.forEach(r => partidas.push({ id: 'liq-' + r.a.id, tipo: 'Comisión del periodo', quien: r.a.nombre, color: r.a.color, monto: r.pendiente, cur: 'GTQ' }));
-    S().all('finmovs').filter(m => m.tipo === 'egreso' && m.clase === 'Comisiones asesores' && m.estado === 'pendiente').forEach(m => {
-      partidas.push({ id: m.id, tipo: 'CxP ' + m.periodo, quien: m.beneficiario, color: '#6b7280', monto: norm(m.pendiente || m.valor, m.moneda), cur: 'GTQ', cxp: true });
-    });
-    const incluidos = new Set(partidas.map(p => p.id));
-    let back = document.getElementById('fin-lote'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'fin-lote'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
-    function paint() {
-      const sel = partidas.filter(p => incluidos.has(p.id));
-      const total = sel.reduce((s, p) => s + p.monto, 0);
-      back.querySelector('#lote-body').innerHTML = partidas.map(p => `
-        <label class="lote-row ${incluidos.has(p.id) ? '' : 'off'}">
-          <input type="checkbox" data-lid="${p.id}" ${incluidos.has(p.id) ? 'checked' : ''}>
-          <span class="dot-s" style="background:${p.color}"></span>
-          <span style="flex:1"><b>${U.esc(p.quien)}</b><span class="muted" style="font-size:11.5px"> · ${p.tipo}</span>${p.cxp ? ' <span class="badge warn" style="font-size:9px">mes anterior</span>' : ''}</span>
-          <span class="mono">${U.money(p.monto, p.cur)}</span>
-        </label>`).join('') || '<div class="muted" style="padding:18px;text-align:center">No hay pagos pendientes.</div>';
-      back.querySelector('#lote-total').textContent = U.money(total, 'GTQ');
-      back.querySelector('#lote-count').textContent = sel.length + ' de ' + partidas.length + ' partidas';
-      back.querySelectorAll('[data-lid]').forEach(c => c.addEventListener('change', () => { c.checked ? incluidos.add(c.dataset.lid) : incluidos.delete(c.dataset.lid); paint(); }));
+    // ---- presupuesto mensual (period-keyed) ----
+    const pml=host.querySelector('#presMesList');
+    if(pml){ const store=CX.finStore.pres(p.id,per); const ks=Object.keys(store); const tot=ks.reduce((a,k)=>a+(+store[k]||0),0);
+      pml.innerHTML=(ks.length?ks.map(k=>`<div class="between" style="padding:6px 0;border-bottom:1px solid var(--border-2)"><span style="font-size:12.5px">${k}</span><div class="flex" style="gap:8px"><b style="font-size:12.5px">${cur} ${(+store[k]).toLocaleString()}</b><button class="btn btn-ghost btn-sm" data-delpm="${k}" style="color:var(--red);padding:2px 7px">✕</button></div></div>`).join(''):'<div class="muted" style="font-size:12px;padding:6px 0">Sin rubros este mes</div>')+`<div class="between" style="padding:8px 0 0;font-weight:700"><span style="font-size:12.5px">Total presupuestado</span><b>${cur} ${tot.toLocaleString()}</b></div>`;
+      pml.querySelectorAll('[data-delpm]').forEach(b=>b.addEventListener('click',()=>{CX.finStore.delPres(p.id,b.dataset.delpm,per);draw();}));
     }
-    back.innerHTML = `<div class="card" style="width:min(560px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
-      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:16px">📦 Lote de pago de comisiones</b><button class="imp-x" id="lt-x">✕</button></div>
-      <div class="cfg-note" style="margin:14px 16px 0">Revisá el lote: podés <b>retirar partidas</b> y se incluyen <b>cuentas por pagar de meses anteriores</b>. El total se actualiza en vivo.</div>
-      <div id="lote-body" style="padding:12px 16px;overflow:auto;flex:1;display:grid;gap:7px"></div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line)">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><span class="muted" id="lote-count"></span><span style="font-family:var(--f-display);font-weight:800;font-size:22px" id="lote-total"></span></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="lt-cancel">Cancelar</button><button class="btn primary" id="lt-ok">Confirmar pago del lote</button></div>
-      </div></div>`;
-    document.body.appendChild(back);
-    const close = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    back.querySelector('#lt-x').addEventListener('click', close);
-    back.querySelector('#lt-cancel').addEventListener('click', close);
-    back.querySelector('#lt-ok').addEventListener('click', () => {
-      // marca las CxP incluidas como pagadas (las de comisión del periodo son demo agregada)
-      partidas.filter(p => incluidos.has(p.id) && p.cxp).forEach(p => S().update('finmovs', p.id, { estado: 'pagado', pendiente: 0 }));
-      close(); const host = document.getElementById('host'); if (host) render(host);
-    });
-    paint();
-  }
+    const apm=host.querySelector('#addPresMes');
+    if(apm)apm.addEventListener('click',()=>ui.modal('Nuevo rubro de presupuesto · '+per,`
+      <label class="lbl">Concepto</label><input class="inp" id="pmK" placeholder="Ej. Coordinación, Transporte" style="margin-bottom:10px">
+      <label class="lbl">Monto mensual (${cur})</label><input class="inp" id="pmV" type="number" style="margin-bottom:14px">
+      <div style="text-align:right"><button class="btn btn-pr btn-sm" id="pmSave">Agregar</button></div>
+    `,{onMount:(ov,close)=>{ov.querySelector('#pmSave').addEventListener('click',()=>{const k=(ov.querySelector('#pmK').value||'').trim();if(!k){ui.toast('Escribe el concepto','warn');return;}CX.finStore.setPres(p.id,k,+ov.querySelector('#pmV').value||0,per);close();draw();ui.toast('Rubro agregado al presupuesto de '+per,'ok');});}}));
 
-  /* ---------- CONCILIACIÓN BANCARIA ---------- */
-  function banco() {
-    const pagados = S().where('cobros', c => c.estado === 'Pagado');
-    const conc = pagados.filter(c => c.conciliado).length;
-    const sinConc = pagados.length - conc;
-    return `<div class="cfg-note" style="margin-bottom:14px">🏦 <b>Doble conciliación</b>: (1) depósito bancario ↔ recaudo del cliente, y (2) pago aplicado ↔ póliza creada. Importa el estado bancario para cruzar automáticamente, sin duplicar.</div>
-    ${K.kpis([
-      { label: 'Pagos conciliados', val: conc, color: 'var(--ok)', foot: 'aplicados a póliza', footTone: 'up' },
-      { label: 'Por conciliar', val: sinConc, color: 'var(--warn)', foot: 'pago sin aplicar' },
-      { label: 'Depósitos sin asociar', val: 3, color: 'var(--danger)', foot: 'del banco' },
-      { label: 'Movimientos sin crear', val: 1, color: 'var(--info)', foot: 'detectados' }
-    ])}
-    <div class="card pad" style="margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <b style="font-family:var(--f-display);font-size:15px;flex:1">Conciliación</b>
-      <button class="btn primary sm" onclick="Orbit.importa.open('estados-banco')">⬇ Importar estado bancario</button>
-    </div>
-    <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Recibo</th><th>Cliente</th><th class="num">Monto</th><th>Pago</th><th>Banco</th><th>Póliza</th></tr></thead>
-      <tbody>${pagados.slice(0, 12).map(c => {
-        const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
-        return `<tr>
-          <td class="mono" style="font-size:12px">REC-${c.id.slice(-5).toUpperCase()}</td>
-          <td>${K.clienteCell(c.clienteId)}</td>
-          <td class="num">${U.money(c.monto, c.moneda)}</td>
-          <td><span style="color:var(--ok)">✓</span></td>
-          <td>${c.conciliado ? '<span style="color:var(--ok)" title="Depósito cruzado">✓</span>' : '<span style="color:var(--warn)" title="Sin depósito asociado">◷</span>'}</td>
-          <td><span style="color:var(--ok)" title="Aplicado a póliza">✓ ${p ? p.numero : ''}</span></td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table></div></div>`;
-  }
-
-  /* ---------- DASHBOARD (comparativo interanual/intermensual real) ---------- */
-  function serie(tipoFiltro) {
-    // serie mensual del año de mesSel y del anterior
-    const y = +mesSel.slice(0, 4), p = paisFin();
-    const arrFor = (yr) => MESES.map((_, i) => {
-      const ym = yr + '-' + String(i + 1).padStart(2, '0');
-      return sum(S().all('finmovs').filter(m => m.periodo === ym && (!p || m.pais === p) && tipoFiltro(m)), m => m.valor);
-    });
-    return { y, cur: arrFor(y), prev: arrFor(y - 1) };
-  }
-  function dashboard() {
-    const mi = +mesSel.slice(5) - 1;
-    const ingS = serie(m => m.tipo === 'ingreso'), egrS = serie(m => m.tipo === 'egreso');
-    const acumI = ingS.cur.slice(0, mi + 1).reduce((s, v) => s + v, 0), acumIp = ingS.prev.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const acumE = egrS.cur.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const varIA = acumIp > 0 ? Math.round((acumI - acumIp) / acumIp * 100) : 0;
-    const mesAnt = mi > 0 ? ingS.cur[mi - 1] : 0;
-    const varMM = mesAnt > 0 ? Math.round((ingS.cur[mi] - mesAnt) / mesAnt * 100) : 0;
-    const util = acumI - acumE;
-    return `${K.kpis([
-      { label: 'Ingresos acum.', val: M(acumI), color: 'var(--ok)', foot: 'Ene→' + MESES[mi] + ' ' + ingS.y },
-      { label: 'Utilidad operativa', val: M(util), color: 'var(--red)', foot: 'ingresos − egresos' },
-      { label: 'Var. interanual', val: (varIA >= 0 ? '+' : '') + varIA + '%', color: varIA >= 0 ? 'var(--ok)' : 'var(--danger)', foot: 'vs ' + (ingS.y - 1), footTone: varIA >= 0 ? 'up' : 'down' },
-      { label: 'Intermensual', val: (varMM >= 0 ? '+' : '') + varMM + '%', color: 'var(--info)', foot: MESES[mi] + ' vs ' + (mi > 0 ? MESES[mi - 1] : '—'), footTone: varMM >= 0 ? 'up' : 'down' }
-    ])}
-    ${card2('Ingresos vs egresos · ' + ingS.y + ' (intermensual)', dualBars(MESES, ingS.cur, egrS.cur, 'Ingresos', 'Egresos'))}
-    ${card2('Comparativo interanual de ingresos · ' + (ingS.y - 1) + ' vs ' + ingS.y, dualBars(MESES, ingS.prev, ingS.cur, ingS.y - 1 + '', ingS.y + ''))}`;
-  }
-  function card2(t, body) { return `<div class="card pad" style="margin-bottom:14px"><b style="font-family:var(--f-display);font-size:15px">${t}</b><div style="margin-top:14px">${body}</div></div>`; }
-  function dualBars(labels, a, b, la, lb) {
-    const max = Math.max(1, ...a, ...b);
-    return `<div style="display:flex;gap:14px;margin-bottom:10px;font-size:12px"><span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:#9aa0a8"></span>${la}</span><span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:var(--red)"></span>${lb}</span></div>
-    <div style="display:flex;align-items:flex-end;gap:8px;height:160px">${labels.map((l, i) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end">
-      <div style="display:flex;gap:2px;align-items:flex-end;height:100%;width:100%;justify-content:center">
-        <div title="${la}: ${M(a[i])}" style="width:44%;background:#c4c8cd;border-radius:3px 3px 0 0;height:${a[i] / max * 100}%"></div>
-        <div title="${lb}: ${M(b[i])}" style="width:44%;background:linear-gradient(180deg,#e0566a,#C5162E);border-radius:3px 3px 0 0;height:${b[i] / max * 100}%"></div>
-      </div><span style="font-size:10px;color:var(--ink-3);font-family:var(--f-mono)">${l}</span></div>`).join('')}</div>`;
-  }
-
-  /* ---------- PRESUPUESTO vs REAL (semáforos) ---------- */
-  function presupuesto() {
-    const p = paisFin() || 'GT';
-    const ppto = S().all('presupuesto').filter(x => x.pais === p && x.periodo === mesSel);
-    const realPorCat = {};
-    S().all('finmovs').filter(m => m.pais === p && m.periodo === mesSel && m.tipo === 'egreso').forEach(m => { const k = m.categoria || m.clase; realPorCat[k] = (realPorCat[k] || 0) + norm(m.valor, m.moneda); });
-    const cur = p === 'GT' ? 'GTQ' : 'COP';
-    const rows = ppto.map(x => ({ id: x.id, cat: x.categoria, ppto: x.monto, real: realPorCat[x.categoria] || 0 }));
-    const tP = rows.reduce((s, r) => s + r.ppto, 0), tR = rows.reduce((s, r) => s + r.real, 0);
-    const sem = (pct) => pct <= 100 ? 'var(--ok)' : pct <= 115 ? 'var(--warn)' : 'var(--danger)';
-    const lbl = MESES[+mesSel.slice(5) - 1] + ' ' + mesSel.slice(0, 4);
-    return `<div class="cfg-note" style="margin-bottom:14px">📊 Presupuesto vs real del mes con <b>semáforos</b>: verde dentro de presupuesto, ámbar leve sobre-ejecución, rojo desviación alta. Edita cada partida o replica el mes anterior. (${p} · ${lbl})</div>
-    ${K.kpis([
-      { label: 'Presupuesto', val: U.moneyShort(tP, cur), color: 'var(--info)', foot: 'egresos del mes' },
-      { label: 'Ejecutado', val: U.moneyShort(tR, cur), color: tR <= tP ? 'var(--ok)' : 'var(--danger)', foot: Math.round(tR / (tP || 1) * 100) + '% del ppto', onclick: "Orbit.modules.finanzas.drillKey('egr-mes')" },
-      { label: 'Disponible', val: U.moneyShort(tP - tR, cur), color: 'var(--red)', foot: tP - tR >= 0 ? 'dentro de meta' : 'sobre-ejecutado' }
-    ])}
-    <div class="card pad" style="margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <b style="font-family:var(--f-display);font-size:15px;flex:1">Partidas · ${lbl}</b>
-      <button class="btn primary sm" onclick="Orbit.modules.finanzas.editarPresup(null)">+ Partida</button>
-      <button class="btn ghost sm" onclick="Orbit.modules.finanzas.replicarPresup()">📋 Replicar mes anterior</button>
-    </div>
-    <div class="card" style="overflow:hidden"><table class="tbl"><thead><tr><th>Categoría</th><th class="num">Presupuesto</th><th class="num">Real</th><th class="num">%</th><th>Semáforo</th></tr></thead>
-      <tbody>${rows.map(r => { const pct = Math.round(r.real / (r.ppto || 1) * 100); return `<tr class="clickable" onclick="Orbit.modules.finanzas.editarPresup('${r.id}')" title="Editar / eliminar partida"><td><b>${U.esc(r.cat)}</b></td><td class="num">${U.money(r.ppto, cur)}</td><td class="num">${U.money(r.real, cur)}</td><td class="num">${pct}%</td><td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${sem(pct)}"></span> ${pct <= 100 ? 'OK' : pct <= 115 ? 'Alerta' : 'Desviado'}</td></tr>`; }).join('') || `<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin partidas para ${lbl}. Usa “+ Partida” o “Replicar mes anterior”.</td></tr>`}</tbody></table></div>`;
-  }
-  function editarPresup(id) {
-    const p = paisFin() || 'GT', cur = p === 'GT' ? 'GTQ' : 'COP';
-    const rec = id ? S().get('presupuesto', id) : null;
-    const clases = ['Comisiones asesores', 'Gastos fijos', 'Marketing', 'Operación', 'Otros'];
-    let back = document.getElementById('fin-pp'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'fin-pp'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
-    back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
-      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:16px">${rec ? '✏ Editar partida' : '+ Partida de presupuesto'}</b><button class="imp-x" id="pp-x">✕</button></div>
-      <div style="padding:18px 20px;display:grid;gap:12px">
-        <label class="ce-l">Categoría<input id="pp-cat" class="o-sel" value="${rec ? U.esc(rec.categoria) : ''}"></label>
-        <div class="cgrid">
-          <label class="ce-l">Clasificación<select id="pp-clase" class="o-sel">${clases.map(c => `<option ${rec && rec.clase === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
-          <label class="ce-l">Monto (${cur})<input id="pp-monto" class="o-sel" type="number" value="${rec ? rec.monto : 0}"></label>
+    // ---- financiamientos ----
+    const fl=host.querySelector('#finList');
+    if(fl){ const fins=CX.finStore.financiamientos(p.id);
+      fl.innerHTML=fins.length?fins.map(f=>`<div style="padding:8px 0;border-bottom:1px solid var(--border-2)"><div class="between"><div><b style="font-size:12.5px">${f.fuente||'Financiamiento'}</b><div style="font-size:10.5px;color:var(--t3)">${f.pais||''} · ${f.fecha} · devuelto ${ui.money(p.currency[f.pais]||cur,f.devuelto||0)}</div></div>
+        <div class="flex" style="gap:8px"><b style="font-size:12.5px;color:${(f.saldo||0)>0?'var(--amber)':'var(--green)'}">saldo ${ui.money(p.currency[f.pais]||cur,f.saldo||0)}</b>${(f.saldo||0)>0?`<button class="btn btn-soft btn-sm" data-devfin="${f.id}">Devolver</button>`:ui.bdg('saldado','g')}</div></div></div>`).join(''):'<div class="muted" style="font-size:12px;padding:6px 0">Sin financiamientos registrados</div>';
+      fl.querySelectorAll('[data-devfin]').forEach(b=>b.addEventListener('click',()=>{const f=CX.finStore.financiamientos(p.id).find(x=>x.id===b.dataset.devfin);
+        ui.modal('Devolver financiamiento · '+f.fuente,`<div style="font-size:12.5px;color:var(--t2);margin-bottom:10px">Saldo: <b>${ui.money(p.currency[f.pais]||cur,f.saldo||0)}</b></div><label class="lbl">Monto a devolver</label><input class="inp" id="dvM" type="number" value="${f.saldo||0}" style="margin-bottom:14px"><div style="text-align:right"><button class="btn btn-green btn-sm" id="dvOk">Registrar devolución</button></div>`,{onMount:(ov,close)=>{ov.querySelector('#dvOk').addEventListener('click',()=>{CX.finStore.devolverFinanciamiento(p.id,f.id,+ov.querySelector('#dvM').value||0);close();draw();ui.toast('Devolución registrada · egreso generado · CxP reducida','ok',3600);});}});
+      }));
+    }
+    const af=host.querySelector('#addFin');
+    if(af)af.addEventListener('click',()=>ui.modal('Registrar financiamiento',`
+      <p style="font-size:12px;color:var(--t2);margin-bottom:10px">Entra como <b>flujo</b> (no ingreso operativo) y como CxP hasta devolverse.</p>
+      <div class="grid g2" style="gap:10px 12px"><div style="grid-column:1/3"><label class="lbl">Fuente</label><input class="inp" id="fnF" placeholder="Banco / socio / casa matriz"></div>
+      <div style="grid-column:1/3"><label class="lbl">Concepto / destino</label><input class="inp" id="fnC" placeholder="Ej. capital de trabajo, anticipo de nómina"></div>
+      <div><label class="lbl">Monto (${cur})</label><input class="inp" id="fnM" type="number"></div>
+      <div><label class="lbl">País</label><select class="sel" id="fnP">${p.countries.map(c=>`<option>${c}</option>`).join('')}</select></div></div>
+      <div style="text-align:right;margin-top:14px"><button class="btn btn-pr btn-sm" id="fnSave">Registrar</button></div>
+    `,{onMount:(ov,close)=>{ov.querySelector('#fnSave').addEventListener('click',()=>{CX.finStore.addFinanciamiento(p.id,{fuente:(ov.querySelector('#fnF').value||'').trim(),concepto:(ov.querySelector('#fnC').value||'').trim(),monto:+ov.querySelector('#fnM').value||0,pais:ov.querySelector('#fnP').value});close();draw();ui.toast('Financiamiento registrado · flujo + CxP (no operativo)','ok',3600);});}}));
+    host.querySelectorAll('[data-delm]').forEach(b=>b.addEventListener('click',()=>{CX.finStore.delMov(pid(),b.dataset.delm);draw();ui.toast('Movimiento eliminado','');}));
+    host.querySelectorAll('[data-cxdet]').forEach(el=>el.addEventListener('click',()=>{
+      const [kind,id]=el.dataset.cxdet.split(':');
+      const arr=kind==='cxc'?CX.finStore.cxc(pid()):CX.finStore.cxp(pid());
+      const r=arr.find(x=>x.id===id); if(!r)return;
+      const estados=kind==='cxc'?['pendiente','parcial','cobrada','incobrable']:['pendiente','parcial','pagada','programada'];
+      ui.modal((kind==='cxc'?'⏳ Cuenta por cobrar':'💸 Cuenta por pagar')+' · '+r.concepto,`
+        <div style="font-size:12.5px;line-height:1.9;color:var(--t2);margin-bottom:12px">
+          <div><b>Concepto:</b> ${r.concepto}</div>
+          <div><b>País:</b> ${r.pais||'—'} · <b>Origen:</b> ${r.origen||'manual'}</div>
+          ${r.shopper?`<div><b>Shopper/Acreedor:</b> ${r.shopper}</div>`:''}
+          ${r.visitaId?`<div><b>Visita vinculada:</b> ${r.visitaId}</div>`:''}
         </div>
-      </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between">
-        ${rec ? '<button class="btn ghost" id="pp-del" style="color:var(--danger)">🗑 Eliminar</button>' : '<span></span>'}
-        <div style="display:flex;gap:8px"><button class="btn ghost" id="pp-cancel">Cancelar</button><button class="btn primary" id="pp-ok">Guardar</button></div>
-      </div></div>`;
-    document.body.appendChild(back);
-    const $ = s => back.querySelector(s); const close = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    $('#pp-x').addEventListener('click', close); $('#pp-cancel').addEventListener('click', close);
-    if ($('#pp-del')) $('#pp-del').addEventListener('click', () => { S().remove('presupuesto', id); close(); render(document.getElementById('host')); });
-    $('#pp-ok').addEventListener('click', () => {
-      const data = { categoria: $('#pp-cat').value || 'Partida', clase: $('#pp-clase').value, monto: +$('#pp-monto').value || 0, pais: rec ? rec.pais : p, periodo: rec ? rec.periodo : mesSel };
-      if (rec) S().update('presupuesto', id, data); else S().insert('presupuesto', Object.assign({ id: 'ppt' + Date.now().toString().slice(-7) }, data));
-      close(); render(document.getElementById('host'));
-    });
-  }
-  function replicarPresup() {
-    const p = paisFin() || 'GT';
-    const [y, mm] = mesSel.split('-').map(Number);
-    const prev = new Date(y, mm - 2, 1).toISOString().slice(0, 7);
-    const src = S().all('presupuesto').filter(x => x.pais === p && x.periodo === prev);
-    if (!src.length) { alert('No hay presupuesto del mes anterior (' + prev + ') para replicar en ' + p + '.'); return; }
-    const yaTiene = new Set(S().all('presupuesto').filter(x => x.pais === p && x.periodo === mesSel).map(x => x.categoria));
-    let n = 0;
-    src.forEach(x => { if (yaTiene.has(x.categoria)) return; S().insert('presupuesto', { id: 'ppt' + Date.now().toString().slice(-7) + Math.floor(Math.random() * 99), categoria: x.categoria, clase: x.clase, monto: x.monto, pais: p, periodo: mesSel }); n++; });
-    if (!n) alert('El mes ya tiene todas las partidas del mes anterior.');
-    render(document.getElementById('host'));
-  }
-
-  /* ---------- ANÁLISIS IA (Gemini) ---------- */
-  function ia() {
-    const mi = +mesSel.slice(5) - 1;
-    const ingS = serie(m => m.tipo === 'ingreso'), egrS = serie(m => m.tipo === 'egreso');
-    const acumI = ingS.cur.slice(0, mi + 1).reduce((s, v) => s + v, 0), acumIp = ingS.prev.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const varIA = acumIp > 0 ? Math.round((acumI - acumIp) / acumIp * 100) : 0;
-    const acumE = egrS.cur.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const margen = acumI > 0 ? Math.round((acumI - acumE) / acumI * 100) : 0;
-    const metaSugerida = Math.round(acumI / (mi + 1) * 1.12);
-    return `<div class="cfg-note" style="margin-bottom:14px">✨ Análisis crítico asistido por IA (Gemini) a partir de los resultados financieros. Genera diagnóstico, metas sugeridas y estrategias. <i>Conector configurable por tenant.</i></div>
-    <div class="card pad" style="margin-bottom:14px;border-left:3px solid var(--red)">
-      <b style="font-family:var(--f-display);font-size:15px">🧠 Diagnóstico del periodo</b>
-      <ul class="ins-recs" style="margin-top:10px;line-height:1.7">
-        <li>Ingresos acumulados <b>${M(acumI)}</b>, ${varIA >= 0 ? 'creciendo' : 'cayendo'} <b style="color:${varIA >= 0 ? 'var(--ok)' : 'var(--danger)'}">${varIA}%</b> interanual.</li>
-        <li>Margen operativo del <b>${margen}%</b> ${margen < 25 ? '— por debajo del objetivo sano (25–35%); revisar gastos fijos y marketing.' : '— saludable.'}</li>
-        <li>Mejor canal de ingreso: <b>Comisiones de aseguradora</b>; la financiación debe mantenerse fuera del operativo.</li>
-      </ul>
-    </div>
-    <div class="ins-grid-2">
-      <div class="card pad"><b style="font-family:var(--f-display);font-size:14px">🎯 Metas sugeridas</b><ul class="ins-recs" style="margin-top:9px;line-height:1.7">
-        <li>Ventas (prima neta) próximo mes: <b>${M(metaSugerida)}</b></li>
-        <li>Recaudo objetivo: <b>${M(metaSugerida * 0.85)}</b> (85%)</li>
-        <li>Tope de gasto fijo: <b>≤ ${M(acumE / (mi + 1) * 0.95)}</b>/mes</li>
-      </ul></div>
-      <div class="card pad"><b style="font-family:var(--f-display);font-size:14px">📈 Estrategias recomendadas</b><ul class="ins-recs" style="margin-top:9px;line-height:1.7">
-        <li><b>Medios:</b> reforzar pauta en redes con mejor CAC; medir por canal.</li>
-        <li><b>Segmentación:</b> priorizar ramos de mayor comisión y renovación.</li>
-        <li><b>Comercial:</b> campaña de recuperación de cartera vencida y cross-sell a top clientes.</li>
-      </ul></div>
-    </div>
-    <button class="btn primary" style="margin-top:14px" id="fin-ia-regen">✨ Regenerar análisis con IA</button>
-    <div id="fin-ia-out" class="cfg-note" style="margin-top:10px;display:none"></div>`;
-  }
-
-  /* ---- registrar financiamiento (sube deuda) o abono (baja deuda) ---- */
-  function regFinanciacion(modo) {
-    const p = paisFin() || 'GT';
-    const acrs = S().all('acreedores').filter(a => a.pais === p);
-    if (!acrs.length) { alert('No hay acreedores para ' + p + '. Agrega uno primero.'); return; }
-    const cur = p === 'CO' ? 'COP' : 'GTQ';
-    let back = document.getElementById('fin-fz'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'fin-fz'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
-    back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
-      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:16px">${modo === 'ingreso' ? '+ Financiamiento recibido' : '− Abono / devolución'}</b><button class="imp-x" id="fz-x">✕</button></div>
-      <div style="padding:18px 20px;display:grid;gap:12px">
-        <label class="ce-l">Acreedor<select id="fz-acr" class="o-sel">${acrs.map(a => `<option value="${a.id}">${U.esc(a.nombre)} · saldo ${U.money(a.saldo, cur)}</option>`).join('')}</select></label>
-        <div class="cgrid">
-          <label class="ce-l">Monto (${cur})<input id="fz-monto" class="o-sel" type="number" value="0"></label>
-          <label class="ce-l">Día<input id="fz-dia" class="o-sel" type="number" min="1" max="31" value="${new Date().getDate()}"></label>
+        <div class="grid g2" style="gap:10px 12px">
+          <div><label class="lbl">Saldo (${cur})</label><input class="inp" id="cxSaldo" type="number" value="${r.saldo||0}"></div>
+          <div><label class="lbl">Estado</label><select class="sel" id="cxEst">${estados.map(s=>`<option ${(r.estado||'pendiente')===s?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div style="grid-column:1/3"><label class="lbl">Nota</label><input class="inp" id="cxNota" value="${(r.nota||'').replace(/"/g,'&quot;')}" placeholder="Observación"></div>
         </div>
-        <label class="ce-l">Nota<input id="fz-obs" class="o-sel" value="${modo === 'ingreso' ? 'Capital de trabajo' : 'Amortización'}"></label>
-        <div class="cfg-note">${modo === 'ingreso' ? 'La financiación entra como <b>ingreso NO operativo</b> y <b>aumenta la deuda</b> del acreedor.' : 'El abono entra como <b>egreso</b> y <b>reduce la deuda</b> del acreedor.'}</div>
-      </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="fz-cancel">Cancelar</button><button class="btn primary" id="fz-ok">Registrar</button></div></div>`;
-    document.body.appendChild(back);
-    const $ = s => back.querySelector(s);
-    const close = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    $('#fz-x').addEventListener('click', close); $('#fz-cancel').addEventListener('click', close);
-    $('#fz-ok').addEventListener('click', () => {
-      const acr = S().get('acreedores', $('#fz-acr').value); const monto = +$('#fz-monto').value || 0;
-      if (!acr || monto <= 0) { close(); return; }
-      if (modo === 'ingreso') {
-        S().insert('finmovs', { id: 'fmv' + Date.now().toString().slice(-7), tipo: 'financiacion', clase: 'Financiamiento', concepto: 'Ingreso por financiación', pagador: acr.nombre, acreedorId: acr.id, valor: monto, dia: +$('#fz-dia').value || 1, estado: 'recaudado', periodo: mesSel, pais: p, moneda: cur, obs: $('#fz-obs').value });
-        S().update('acreedores', acr.id, { saldo: (acr.saldo || 0) + monto });
-      } else {
-        S().insert('finmovs', { id: 'fmv' + Date.now().toString().slice(-7), tipo: 'egreso', clase: 'Devolución de préstamo', concepto: 'Abono a financiación', beneficiario: acr.nombre, acreedorId: acr.id, valor: monto, dia: +$('#fz-dia').value || 1, estado: 'pagado', periodo: mesSel, pais: p, moneda: cur, pendiente: 0, obs: $('#fz-obs').value });
-        S().update('acreedores', acr.id, { saldo: Math.max(0, (acr.saldo || 0) - monto) });
-      }
-      close(); render(document.getElementById('host'));
-    });
-  }
+        <div class="between" style="margin-top:14px">
+          <button class="btn btn-ghost btn-sm" id="cxDel" style="color:var(--red)">🗑 Eliminar</button>
+          <button class="btn btn-pr btn-sm" id="cxSave">Guardar cambios</button>
+        </div>
+      `,{onMount:(ov,close)=>{
+        ov.querySelector('#cxSave').addEventListener('click',()=>{
+          CX.finStore.editCx(pid(),kind,id,{saldo:+ov.querySelector('#cxSaldo').value||0,estado:ov.querySelector('#cxEst').value,nota:ov.querySelector('#cxNota').value});
+          close();draw();ui.toast('Cuenta actualizada','ok');
+        });
+        ov.querySelector('#cxDel').addEventListener('click',()=>{CX.finStore.delCx(pid(),kind,id);close();draw();ui.toast('Cuenta eliminada','');});
+      }});
+    }));
 
-  /* ---------- DETALLE DE LIQUIDACIÓN (por aseguradora o asesor) ---------- */
-  function detLiq(campo, key) {
-    if (!key) return;
-    const regs = S().all('comisiones').filter(c => c[campo] === key).sort((a, b) => (b.periodo || '').localeCompare(a.periodo || ''));
-    const titulo = campo === 'aseguradoraId' ? (q.aseguradora(key) || {}).nombre : (q.asesor(key) || {}).nombre;
-    const tot = regs.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-    const liq = regs.filter(c => c.estado === 'Liquidada').reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-    let back = document.getElementById('fin-detliq'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'fin-detliq'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
-    back.innerHTML = `<div class="card" style="width:min(740px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
-      <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Detalle de liquidación</div>
-          <b style="font-family:var(--f-display);font-size:18px;color:#fff">${U.esc(titulo || '—')}</b>
-          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${regs.length} registros · ${U.money(tot, 'GTQ')} total · ${U.money(liq, 'GTQ')} liquidado · clic en estado para cambiar</div></div>
-        <button class="imp-x" id="dl-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
-      <div style="overflow:auto;flex:1"><table class="tbl">
-        <thead><tr><th>Periodo</th><th>Cliente</th><th>Póliza</th><th class="num">Base neta</th><th class="num">%</th><th class="num">Comisión</th><th>Estado</th></tr></thead>
-        <tbody>${regs.map(c => { const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId); return `<tr>
-          <td class="mono" style="font-size:11.5px">${c.periodo || '—'}</td>
-          <td style="font-size:12.5px">${cli ? U.esc(cli.nombre) : '—'}</td>
-          <td class="mono" style="font-size:11.5px">${p ? p.numero : '—'}</td>
-          <td class="num">${U.money(c.base, c.moneda)}</td><td class="num">${c.pct}%</td>
-          <td class="num"><b>${U.money(c.monto, c.moneda)}</b></td>
-          <td style="cursor:pointer" onclick="Orbit.modules.finanzas.toggleComEstado('${c.id}','${campo}','${key}')"><span class="badge ${c.estado === 'Liquidada' ? 'ok' : 'warn'}">${c.estado}</span></td></tr>`; }).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody>
-      </table></div>
-      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn primary" id="dl-ok">Cerrar</button></div>
+    host.querySelectorAll('[data-drill]').forEach(el=>el.addEventListener('click',()=>{
+      const k=el.dataset.drill; let title,rows;
+      if(k==='ing'||k==='egr'){const f=movs.filter(m=>k==='ing'?m.monto>0:m.monto<0);title=k==='ing'?'Ingresos':'Egresos';rows=f.map(m=>`<tr><td>${m.fecha}</td><td><b>${m.cat}</b></td><td>${TI[m.tipoIngreso]||TE[m.tipoEgreso]||m.tipo}</td><td style="text-align:right">${ui.money(cur,Math.abs(m.monto))}</td></tr>`).join('');}
+      else if(k==='rem'){const f=movs.filter(m=>m.tipoIngreso==='remesa');title='Remesas recibidas';rows=f.map(m=>`<tr><td>${m.fecha}</td><td><b>${m.cat}</b></td><td>${m.estado||''}</td><td style="text-align:right">${ui.money(cur,m.monto)}</td></tr>`).join('');}
+      else {const arr=k==='cxc'?CX.finStore.cxc(pid()):CX.finStore.cxp(pid());title=k==='cxc'?'Cuentas por cobrar':'Cuentas por pagar';rows=arr.map(r=>`<tr><td><b>${r.concepto}</b></td><td>${r.pais||''}</td><td style="text-align:right">${ui.money(cur,r.saldo||0)}</td></tr>`).join('');}
+      ui.modal(title,rows?`<table class="tbl"><tbody>${rows}</tbody></table>`:ui.empty('💰','Sin registros.'));
+    }));
+
+    host.querySelectorAll('[data-new]').forEach(b=>b.addEventListener('click',()=>{
+      const t=b.dataset.new; const esIng=t!=='egreso'; const tipos=esIng?TI:TE;
+      const defTipo=t==='remesa'?'remesa':Object.keys(tipos)[0];
+      ui.modal('Registrar '+(t==='remesa'?'remesa recibida':t),`
+        <div class="grid g2" style="gap:10px 12px">
+          <div style="grid-column:1/3"><label class="lbl">Concepto</label><input class="inp" id="mvCat" placeholder="Concepto del movimiento"></div>
+          <div><label class="lbl">Categoría</label><select class="sel" id="mvCateg">${CAT.map(c=>`<option ${(scope==='global'&&c==='Administrativo')?'selected':''}>${c}</option>`).join('')}</select></div>
+          <div><label class="lbl">Tipo de ${esIng?'ingreso':'egreso'}</label><select class="sel" id="mvTipo">${Object.keys(tipos).map(k=>`<option value="${k}" ${k===defTipo?'selected':''}>${tipos[k]}</option>`).join('')}</select></div>
+          <div><label class="lbl">Monto (${cur})</label><input class="inp" id="mvMonto" type="number"></div>
+          <div><label class="lbl">País</label><select class="sel" id="mvPais"><option value="">— global —</option>${p.countries.map(c=>`<option ${scope!=='global'?'selected':''}>${c}</option>`).join('')}</select></div>
+          <div><label class="lbl">Fecha (admite histórico)</label><input class="inp" id="mvFecha" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+          <div><label class="lbl">Estado</label><select class="sel" id="mvEstado">${(esIng?['Conciliado','Pendiente (CxC)','Por conciliar']:['Pagado','Programado']).map(s=>`<option>${s}</option>`).join('')}</select></div>
+          <div style="grid-column:1/3"><label class="lbl">Descripción</label><input class="inp" id="mvDesc" placeholder="Opcional"></div>
+        </div>
+        <div style="text-align:right;margin-top:14px"><button class="btn btn-pr btn-sm" id="mvSave">Registrar</button></div>
+      `,{onMount:(ov,close)=>{ov.querySelector('#mvSave').addEventListener('click',()=>{
+        const monto=Math.abs(+ov.querySelector('#mvMonto').value||0)*(esIng?1:-1);
+        const rec={tipo:esIng?'ingreso':'egreso',cat:ov.querySelector('#mvCat').value||t,categoria:ov.querySelector('#mvCateg').value,pais:ov.querySelector('#mvPais').value,monto,fecha:ov.querySelector('#mvFecha').value,desc:ov.querySelector('#mvDesc').value,estado:ov.querySelector('#mvEstado').value};
+        if(esIng)rec.tipoIngreso=ov.querySelector('#mvTipo').value; else rec.tipoEgreso=ov.querySelector('#mvTipo').value;
+        CX.finStore.addMov(pid(),rec);close();draw();ui.toast('Movimiento registrado','ok');});}});
+    }));
+
+    const acx=host.querySelector('#autoCxp');
+    if(acx)acx.addEventListener('click',()=>{
+      const liqPend=CX.liq.forProject(data).filter(l=>['validada','pendiente_submitir'].includes(l.estado));
+      const yaCxp=new Set(CX.finStore.cxp(pid()).map(r=>r.visitaId).filter(Boolean));
+      const nuevasCxp=liqPend.filter(l=>!yaCxp.has(l.visitaId));
+      // CxC: reembolsos del periodo no conciliados (85% conciliado en demo → 15% pendiente)
+      const cxcEst=p.countries.map(c=>{const d=fp[c];const pend=Math.round(d.reemb*0.15);return {c,cur:d.cur,monto:pend};}).filter(x=>x.monto>0);
+      ui.modal('⚙️ Generar CxC/CxP automáticas',`
+        <p style="font-size:12.5px;color:var(--t2);margin-bottom:12px">Deriva cuentas automáticamente del histórico operativo. Revisa y confirma:</p>
+        <div class="card-t" style="font-size:12.5px;margin-bottom:6px">📤 Cuentas por pagar (liquidaciones pendientes no pagadas)</div>
+        ${nuevasCxp.length?`<table class="tbl" style="margin-bottom:12px"><tbody>${nuevasCxp.slice(0,8).map(l=>`<tr><td><b>${l.shopper}</b><div style="font-size:10px;color:var(--t3)">${l.sucursal}</div></td><td style="text-align:right;font-weight:700">${ui.money(l.moneda,l.total)}</td></tr>`).join('')}${nuevasCxp.length>8?`<tr><td colspan="2" style="font-size:11px;color:var(--t3);text-align:center">+${nuevasCxp.length-8} más</td></tr>`:''}</tbody></table>`:'<div class="muted" style="font-size:12px;margin-bottom:12px">Sin liquidaciones pendientes nuevas.</div>'}
+        <div class="card-t" style="font-size:12.5px;margin-bottom:6px">📥 Cuentas por cobrar (reembolsos no conciliados)</div>
+        ${cxcEst.length?`<table class="tbl" style="margin-bottom:12px"><tbody>${cxcEst.map(x=>`<tr><td><b>Reembolso pendiente · ${CX.paisLabel(x.c)}</b></td><td style="text-align:right;font-weight:700">${x.cur} ${x.monto.toLocaleString()}</td></tr>`).join('')}</tbody></table>`:'<div class="muted" style="font-size:12px;margin-bottom:12px">Reembolsos conciliados.</div>'}
+        <div style="background:var(--brand-light);border-radius:9px;padding:9px 12px;font-size:11.5px;color:var(--brand-dark);margin-bottom:12px">Las CxP por liquidación se cruzan automáticamente con el egreso cuando se pagan; las CxC se descargan al conciliar el reembolso.</div>
+        <div style="text-align:right"><button class="btn btn-green btn-sm" id="acxOk">Generar ${nuevasCxp.length+cxcEst.length} cuenta(s)</button></div>
+      `,{onMount:(ov,close)=>{ov.querySelector('#acxOk').addEventListener('click',()=>{
+        nuevasCxp.forEach(l=>CX.finStore.addCxp(pid(),{concepto:'Liquidación pendiente · '+l.shopper+' ('+l.sucursal+')',monto:l.total,pais:l.pais,origen:'liquidacion',visitaId:l.visitaId,auto:true}));
+        cxcEst.forEach(x=>CX.finStore.addCxc(pid(),{concepto:'Reembolso pendiente de conciliar · '+CX.paisLabel(x.c),monto:x.monto,pais:x.c,origen:'reembolso',auto:true}));
+        close();draw();ui.toast((nuevasCxp.length+cxcEst.length)+' cuenta(s) generadas automáticamente del histórico','ok',4000);
+      });}});
+    });
+    host.querySelectorAll('[data-cuenta]').forEach(b=>b.addEventListener('click',()=>{
+      const k=b.dataset.cuenta;
+      ui.modal('Registrar cuenta por '+(k==='cxc'?'cobrar':'pagar'),`
+        <p style="font-size:12px;color:var(--t2);margin-bottom:10px">Útil para cargar saldos iniciales en la importación o registrar deudas/derechos del periodo.</p>
+        <div class="grid g2" style="gap:10px 12px">
+          <div style="grid-column:1/3"><label class="lbl">Concepto / contraparte</label><input class="inp" id="ctCon" list="ctConList" placeholder="${k==='cxc'?'Cliente / casa matriz':'Proveedor / financiamiento'}"></div><datalist id="ctConList">${(k==="cxc"?CX.finStore.cxc(pid()):CX.finStore.cxp(pid())).map(r=>`<option value="${r.concepto}">`).join("")}${CX.data._visitas.filter(v=>v.projectId===CX.data.currentProjectId).map(v=>v.shopper).filter((s,i,a)=>s&&a.indexOf(s)===i).map(s=>`<option value="${s}">`).join("")}</datalist>
+          <div><label class="lbl">Monto (${cur})</label><input class="inp" id="ctMonto" type="number"></div>
+          <div><label class="lbl">País</label><select class="sel" id="ctPais"><option value="">—</option>${p.countries.map(c=>`<option>${c}</option>`).join('')}</select></div>
+          <div style="grid-column:1/3"><label class="lbl">Vence</label><input class="inp" id="ctVence" type="date"></div>
+        </div>
+        <div style="text-align:right;margin-top:14px"><button class="btn btn-pr btn-sm" id="ctSave">Registrar</button></div>
+      `,{onMount:(ov,close)=>{ov.querySelector('#ctSave').addEventListener('click',()=>{
+        const r={concepto:ov.querySelector('#ctCon').value||'(sin concepto)',monto:+ov.querySelector('#ctMonto').value||0,pais:ov.querySelector('#ctPais').value,vence:ov.querySelector('#ctVence').value};
+        if(k==='cxc')CX.finStore.addCxc(pid(),r);else CX.finStore.addCxp(pid(),r);close();draw();ui.toast('Cuenta por '+(k==='cxc'?'cobrar':'pagar')+' registrada','ok');});}});
+    }));
+
+    host.querySelectorAll('[data-abono]').forEach(b=>b.addEventListener('click',()=>{
+      const r=CX.finStore.cxp(pid()).find(x=>x.id===b.dataset.abono);
+      ui.modal('Abonar a CxP · '+r.concepto,`
+        <div style="font-size:12.5px;color:var(--t2);margin-bottom:10px">Saldo actual: <b>${ui.money(cur,r.saldo||0)}</b></div>
+        <label class="lbl">Monto del abono (${cur})</label><input class="inp" id="abMonto" type="number" value="${r.saldo||0}" style="margin-bottom:14px">
+        <div style="text-align:right"><button class="btn btn-green btn-sm" id="abSave">Registrar abono</button></div>
+      `,{onMount:(ov,close)=>{ov.querySelector('#abSave').addEventListener('click',()=>{CX.finStore.abonarCxp(pid(),r.id,+ov.querySelector('#abMonto').value||0);close();draw();ui.toast('Abono registrado · egreso vinculado','ok');});}});
+    }));
+
+    const pl=host.querySelector('#payLote');
+    if(pl)pl.addEventListener('click',()=>{
+      const val=CX.liq.forProject(data).filter(l=>l.estado==='validada');
+      if(!val.length){ui.toast('No hay liquidaciones validadas para pagar','warn');return;}
+      const r=data.payVisits(val.map(l=>l.visitaId));
+      ui.toast(r.pagadas+' liquidaciones pagadas · egreso(s) automáticos · Beneficios y Finanzas sincronizados','ok',4200);
+    });
+    const ih=host.querySelector('#impHist');
+    if(ih)ih.addEventListener('click',()=>ui.modal('Importar histórico de movimientos',`
+      <p style="font-size:12.5px;color:var(--t2);margin-bottom:12px">Sube tu archivo (Excel/CSV) de movimientos, remesas, CxC/CxP. Vista previa + anti-duplicado por fecha+monto+concepto.</p>
+      <input type="file" class="inp" style="padding:7px;margin-bottom:12px">
+      <div style="background:var(--brand-light);border-radius:9px;padding:10px 12px;font-size:12px;color:var(--brand-dark)">Mapeo de columnas → tipo/categoría/monto/fecha/país/estado. Permite cargar <b>saldos iniciales</b> de CxC/CxP y remesas para conciliar.</div>
+      <div style="text-align:right;margin-top:14px"><button class="btn btn-pr btn-sm" onclick="CX.ui.toast('Vista previa lista (demo)','ok');this.closest('.cx-ov').remove()">Ver vista previa</button></div>
+    `));
+  };
+  draw();
+  CX.bus.on('fin',()=>draw());
+  return host;
+});
+
+CX.module('liquidaciones', ({data,ui})=>{
+  const p=data.project();
+
+  const host=ui.el('div');
+  const draw=()=>{
+    const all=CX.liq.forProject(data);
+    const res=CX.liq.resumen(all);
+    const draft=CX.finStore.draft(p.id).filter(vid=>all.some(l=>l.visitaId===vid&&l.estado==='validada'));
+    CX.finStore._draft[p.id]=draft; // limpia ids ya no validados
+    const oblig=p.countries.map(c=>{
+      const ls=all.filter(l=>l.pais===c);
+      const hon=ls.reduce((a,l)=>a+l.honorario,0), reemb=ls.reduce((a,l)=>a+l.reembolso,0), tot=ls.reduce((a,l)=>a+l.total,0);
+      const listo=ls.filter(l=>l.estado==='validada').reduce((a,l)=>a+l.total,0);
+      return `<tr><td><b>${c}</b></td><td>${p.currency[c]}</td><td>${ls.length}</td><td>${ui.money(p.currency[c],hon)}</td><td>${ui.money(p.currency[c],reemb)}</td><td><b>${ui.money(p.currency[c],tot)}</b></td><td>${ui.money(p.currency[c],listo)}</td></tr>`;
+    }).join('');
+
+    const lrow=(l,i)=>{const lb=CX.liq.label(l.estado); const inD=draft.includes(l.visitaId);
+      return `<tr data-li="${i}" style="${inD?'background:var(--brand-light)':''}"><td style="position:sticky;left:0;background:${inD?'#eaf4fc':'var(--panel)'};z-index:1">${l.estado==='validada'?(inD?`<button class="btn btn-soft btn-sm" data-rm="${l.visitaId}" style="padding:3px 9px;color:var(--red)">✕ Retirar</button>`:`<button class="btn btn-pr btn-sm" data-add="${l.visitaId}" style="padding:3px 10px">▶ Mover a lote</button>`):l.estado==='pendiente_cuestionario'?ui.bdg('espera shopper','n'):l.estado==='pagada'||l.estado==='liquidada'?ui.bdg('✓ pagada','g'):ui.bdg('—','n')}</td>
+        <td style="position:sticky;left:96px;background:${inD?'#eaf4fc':'var(--panel)'};z-index:1"><b>${l.shopper||'—'}</b><div style="font-size:10px;color:var(--t3)">${l.shopperCode||''}</div></td>
+        <td style="font-size:12px">${l.sucursal}</td><td style="font-size:12px">${l.freal||'—'}</td>
+        <td>${inD?ui.bdg('● en lote','p'):ui.bdg(lb[0],lb[1])}</td><td>${l.submit?'✅':'—'}</td>
+        <td>${ui.money(l.moneda,l.honorario)}</td><td>${l.reembolso?ui.money(l.moneda,l.reembolso):'—'}</td>
+        <td style="font-weight:700;color:var(--t1)">${ui.money(l.moneda,l.total)}</td>
+        <td style="font-size:12px">${l.fechaEstimadaPago||'—'}</td>
+        <td style="text-align:right"><button class="btn btn-ghost btn-sm" data-ledit="${l.visitaId}" title="Editar liquidación" style="padding:2px 7px">✎</button></td></tr>`;};
+
+    // panel del lote en construcción (carrito)
+    const draftLiqs=draft.map(vid=>all.find(l=>l.visitaId===vid)).filter(Boolean);
+    const porMon={}; draftLiqs.forEach(l=>{porMon[l.moneda]=(porMon[l.moneda]||0)+l.total;});
+    const multiMon=Object.keys(porMon).length>1;
+    const cart=`<div class="card card-p" style="margin-bottom:16px;border:1px solid ${draft.length?'var(--brand)':'var(--border)'};${draft.length?'background:linear-gradient(180deg,var(--brand-light),var(--surface))':''}">
+      <div class="between" style="margin-bottom:10px"><div class="card-t">📦 Lote en construcción ${draft.length?`<span class="bdg bdg-b">${draft.length}</span>`:''}</div>
+        <div class="flex" style="gap:8px">${CX.finStore.cxp(p.id).filter(r=>r.origen==='liquidacion').length?`<button class="btn btn-soft btn-sm" id="addCxp">➕ Incluir CxP meses anteriores (${CX.finStore.cxp(p.id).filter(r=>r.origen==='liquidacion').length})</button>`:''}
+        ${draft.length?`<button class="btn btn-ghost btn-sm" id="clearDraft" style="color:var(--red)">Vaciar</button>`:''}</div></div>
+      ${draft.length?`
+        <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Shopper</th><th>Sucursal</th><th>País</th><th style="text-align:right">Total</th><th></th></tr></thead><tbody>
+        ${draftLiqs.map(l=>`<tr><td><b>${l.shopper}</b></td><td style="font-size:12px">${l.sucursal}</td><td>${l.pais}</td><td style="text-align:right;font-weight:700">${ui.money(l.moneda,l.total)}</td><td style="text-align:right"><button class="btn btn-ghost btn-sm" data-rm="${l.visitaId}" style="color:var(--red);padding:2px 7px">✕</button></td></tr>`).join('')}
+        </tbody></table></div>
+        <div class="between" style="margin-top:12px;padding-top:11px;border-top:1px solid var(--border-2)">
+          <div>${Object.keys(porMon).map(m=>`<span style="font-family:var(--disp);font-size:17px;font-weight:800;color:var(--green);margin-right:14px">${ui.money(m,porMon[m])}</span>`).join('')}
+            ${multiMon?'<div style="font-size:11px;color:var(--red);margin-top:3px">⚠ Hay más de una moneda. Un lote debe ser de una sola moneda; retira las de otra moneda antes de pagar.</div>':''}</div>
+          <button class="btn btn-green btn-sm" id="payDraft" ${multiMon?'disabled':''}>💳 Pagar lote (${draft.length})</button></div>
+      `:`<div class="muted" style="font-size:12.5px;padding:6px 0">Aún no has movido liquidaciones al lote. Usa <b>▶ Mover a lote</b> en cada fila validada; aquí verás el total a pagar y podrás retirar.</div>`}
     </div>`;
-    document.body.appendChild(back);
-    const close = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    back.querySelector('#dl-x').addEventListener('click', close);
-    back.querySelector('#dl-ok').addEventListener('click', close);
-  }
-  function toggleComEstado(comId, campo, key) {
-    const c = S().get('comisiones', comId); if (!c) return;
-    S().update('comisiones', comId, { estado: c.estado === 'Liquidada' ? 'Devengada' : 'Liquidada' });
-    detLiq(campo, key);
-  }
 
-  function wire(host) {
-    const rb = (host || document).querySelector('#fin-ia-regen');
-    if (rb) rb.addEventListener('click', async () => {
-      const out = document.getElementById('fin-ia-out'); if (!out) return;
-      out.style.display = 'block'; out.textContent = '🧠 Generando análisis financiero con IA…';
-      let txt = '';
-      try {
-        const movs = S().all('finmovs') || [];
-        const ing = movs.filter(m => m.tipo === 'ingreso').reduce((s, m) => s + (m.monto || 0), 0);
-        const eg = movs.filter(m => m.tipo === 'egreso').reduce((s, m) => s + (m.monto || 0), 0);
-        if (Orbit.ia && Orbit.ia.analisis) txt = await Orbit.ia.analisis('Analiza la salud financiera de una correduría de seguros con ingresos ' + ing + ' y egresos ' + eg + '. Da diagnóstico breve, 2 riesgos y 3 estrategias (medios, segmentación, comercial).');
-      } catch (e) {}
-      out.innerHTML = txt
-        ? ('<b>✨ Análisis IA</b><div style="margin-top:6px;white-space:pre-wrap">' + U.esc(txt) + '</div>')
-        : '⚠️ Conecta un proveedor de IA en Configuración → Automatizaciones → Motor de IA para análisis en vivo. (Sin IA, el análisis de arriba usa la heurística de la plataforma.)';
+    host.innerHTML=`
+    <div class="between" style="margin-bottom:12px"><div>${ui.ph('Liquidaciones', p.name+' · sincronizadas con el avance de cada visita')}</div>
+      <div class="flex"><span class="bdg bdg-g">● En vivo</span><button class="btn btn-ghost btn-sm">⤓ Exportar</button></div></div>
+
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px" id="liqKpis">
+      <div data-lk="pc" style="cursor:pointer">${ui.kpi('Pend. cuestionario',res.pendiente_cuestionario||0,'a')}</div>
+      <div data-lk="pv" style="cursor:pointer">${ui.kpi('Pend./Validadas',(res.pendiente_submitir||0)+(res.validada||0),'b')}</div>
+      <div data-lk="val" style="cursor:pointer">${ui.kpi('Listas para lote',res.validada||0,'b')}</div>
+      <div data-lk="pag" style="cursor:pointer">${ui.kpi('Pagadas',res.pagada||0,'g')}</div>
+    </div>
+
+    ${cart}
+
+    <div class="card card-p" style="margin-bottom:16px">
+      <div class="card-t" style="margin-bottom:8px">📊 Obligaciones por país y moneda</div>
+      <div style="background:var(--amber-bg);border-radius:9px;padding:9px 12px;font-size:11.5px;color:#8a5b00;margin-bottom:12px">No se suman monedas distintas. Total = honorario + reembolso (boleto + combo). El estado y la <b>fecha estimada de pago</b> se derivan del avance de la visita.</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>País</th><th>Moneda</th><th>Visitas</th><th>Honorarios</th><th>Reembolsos</th><th>Total</th><th>Listo para lote</th></tr></thead><tbody>${oblig}</tbody></table></div>
+    </div>
+
+    <div class="card card-p">
+      <div class="between" style="margin-bottom:12px"><div><div class="card-t">💸 Liquidaciones operativas</div>
+        <div style="font-size:11px;color:var(--t3)">El estado avanza solo con la visita. Mueve las validadas al lote y págalas arriba.</div></div></div>
+      <div style="overflow-x:auto"><table class="tbl" style="min-width:800px"><thead><tr><th style="position:sticky;left:0;background:var(--panel);z-index:2"></th><th style="position:sticky;left:96px;background:var(--panel);z-index:2">Shopper</th><th>Sucursal</th><th>Realizada</th><th>Estado</th><th>Submit.</th><th>Honorario</th><th>Reembolso</th><th>Total</th><th>Pago est.</th><th></th></tr></thead>
+      <tbody>${all.map(lrow).join('')}</tbody></table></div>
+      <div style="margin-top:14px">${ui.aiBox('Cada liquidación nace del avance de la visita: realizada → pend. cuestionario → validada → en lote → pagada. Mueve al lote, revisa el total a pagar, retira lo que no entra (queda como CxP del mes) y paga: se generan los egresos automáticamente.','Liquidación sincronizada')}</div>
+    </div>`;
+
+    host.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>{CX.finStore.toggleDraft(p.id,b.dataset.add);}));
+    host.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>{CX.finStore.toggleDraft(p.id,b.dataset.rm);}));
+    // KPIs clickeables → listado filtrado
+    const lkMap={pc:['Pend. cuestionario',l=>l.estado==='pendiente_cuestionario'],pv:['Pendientes/Validadas',l=>['pendiente_submitir','validada'].includes(l.estado)],val:['Listas para lote',l=>l.estado==='validada'],pag:['Pagadas',l=>['pagada','liquidada'].includes(l.estado)]};
+    host.querySelectorAll('#liqKpis [data-lk]').forEach(el=>el.addEventListener('click',()=>{const m=lkMap[el.dataset.lk];const arr=all.filter(m[1]);
+      ui.modal(m[0]+' ('+arr.length+')',arr.length?`<table class="tbl"><thead><tr><th>Shopper</th><th>Sucursal</th><th>Total</th><th>Pago est.</th></tr></thead><tbody>${arr.map(l=>`<tr><td><b>${l.shopper||'—'}</b></td><td style="font-size:12px">${l.sucursal}</td><td style="font-weight:700">${ui.money(l.moneda,l.total)}</td><td style="font-size:12px">${l.fechaEstimadaPago||'—'}</td></tr>`).join('')}</tbody></table>`:ui.empty('💸','Sin liquidaciones en esta categoría.'));
+    }));
+    // editar liquidación (corregir honorario/reembolso/fecha)
+    host.querySelectorAll('[data-ledit]').forEach(b=>b.addEventListener('click',()=>{ const l=all.find(x=>x.visitaId===b.dataset.ledit); const v=data._visitas.find(x=>x.id===b.dataset.ledit); if(!l||!v)return;
+      ui.modal('Editar liquidación · '+(l.shopper||''),`
+        <div style="font-size:12px;color:var(--t2);margin-bottom:10px">📍 ${l.sucursal} · estado: ${l.estado}</div>
+        <div class="grid g2" style="gap:10px 12px">
+          <div><label class="lbl">Honorario (${l.moneda})</label><input class="inp" id="le_hon" type="number" value="${l.honorario||0}"></div>
+          <div><label class="lbl">Reembolso (${l.moneda})</label><input class="inp" id="le_re" type="number" value="${l.reembolso||0}"></div>
+          <div><label class="lbl">Fecha realizada</label><input class="inp" id="le_f" type="date" value="${v.realizada||''}"></div>
+          <div><label class="lbl">Estado</label><select class="sel" id="le_est">${['realizada','cuestionario','liquidada','pagada'].map(o=>`<option ${o===v.estado?'selected':''}>${o}</option>`).join('')}</select></div>
+        </div>
+        <div style="background:var(--amber-bg);border-radius:9px;padding:8px 11px;font-size:11px;color:#8a5b00;margin-top:12px">Corrige aquí errores de captura. El cambio se refleja en la liquidación y se sincroniza con Beneficios y Finanzas.</div>
+        <div style="text-align:right;margin-top:14px"><button class="btn btn-pr btn-sm" id="le_ok">Guardar corrección</button></div>
+      `,{onMount:(ov,close)=>{ov.querySelector('#le_ok').addEventListener('click',()=>{ v.honorario=+ov.querySelector('#le_hon').value||0; const re=+ov.querySelector('#le_re').value||0; v.boleto=re; v.comboAmt=0; v.realizada=ov.querySelector('#le_f').value||v.realizada; v.estado=ov.querySelector('#le_est').value; CX.bus&&CX.bus.emit('visit-flow'); close(); draw(); ui.toast('Liquidación corregida · sincronizada','ok',3200); });}});
+    }));
+    const cd=host.querySelector('#clearDraft'); if(cd)cd.addEventListener('click',()=>CX.finStore.clearDraft(p.id));
+    const ac=host.querySelector('#addCxp');
+    if(ac)ac.addEventListener('click',()=>{
+      const cxps=CX.finStore.cxp(p.id).filter(r=>r.origen==='liquidacion'&&(r.saldo||0)>0);
+      const rows=cxps.length?cxps.map((r,i)=>`<label class="between" style="padding:9px 11px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer">
+        <span><input type="checkbox" class="cxpChk" data-id="${r.id}" checked style="margin-right:8px"><b style="font-size:12.5px">${r.concepto}</b><div style="font-size:11px;color:var(--t3)">${r.pais||''} · pendiente de meses anteriores</div></span>
+        <b style="color:var(--amber)">${ui.money(p.currency[r.pais]||p.currency[p.countries[0]],r.saldo||0)}</b></label>`).join('')
+        : ui.empty('📭','No hay liquidaciones diferidas (CxP) pendientes.');
+      ui.modal('Incluir CxP de meses anteriores',`
+        <p style="font-size:12.5px;color:var(--t2);margin-bottom:12px">Estas son liquidaciones <b>diferidas</b> en cierres anteriores. Selecciona cuáles pagar ahora: se generará el egreso y se saldará la cuenta por pagar.</p>
+        ${rows}
+        <div style="text-align:right;margin-top:8px"><button class="btn btn-green btn-sm" id="payCxp" ${cxps.length?'':'disabled'}>Pagar seleccionadas</button></div>
+      `,{onMount:(ov,close)=>{const b=ov.querySelector('#payCxp'); if(b)b.addEventListener('click',()=>{
+        const ids=[...ov.querySelectorAll('.cxpChk:checked')].map(c=>c.dataset.id); let n=0;
+        ids.forEach(id=>{const r=CX.finStore.cxp(p.id).find(x=>x.id===id); if(r){CX.finStore.abonarCxp(p.id,id,r.saldo||0);n++;}});
+        close(); draw(); ui.toast(n+' CxP de meses anteriores pagada(s) · egreso(s) en Movimientos','ok',4000);
+      });}});
     });
-  }
-  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
-})();
+    const pay=host.querySelector('#payDraft');
+    if(pay)pay.addEventListener('click',()=>{
+      const validadas=all.filter(l=>l.estado==='validada');
+      const restantes=validadas.filter(l=>!draft.includes(l.visitaId));
+      ui.modal('Confirmar pago de lote',`
+        <p style="font-size:12.5px;color:var(--t2);margin-bottom:12px">Vas a pagar <b>${draft.length}</b> liquidación(es) por <b>${Object.keys(porMon).map(m=>ui.money(m,porMon[m])).join(' + ')}</b>. Se generarán los egresos en Movimientos y se sincronizará Beneficios.</p>
+        ${restantes.length?`<label class="flex" style="gap:8px;font-size:12px;color:var(--t1);background:var(--amber-bg);padding:9px 11px;border-radius:9px;cursor:pointer"><input type="checkbox" id="difCxp" checked> Diferir las <b>${restantes.length}</b> validada(s) no incluida(s) a Cuentas por Pagar (cierre de mes)</label>`:''}
+        <div style="text-align:right;margin-top:14px"><button class="btn btn-green btn-sm" id="confPay">Pagar lote</button></div>
+      `,{onMount:(ov,close)=>{ov.querySelector('#confPay').addEventListener('click',()=>{
+        let diferidas=0; const difBox=ov.querySelector('#difCxp');
+        if(difBox&&difBox.checked){restantes.forEach(l=>{CX.finStore.addCxp(p.id,{concepto:'Liquidación diferida · '+l.shopper+' ('+l.sucursal+')',monto:l.total,pais:l.pais,origen:'liquidacion',visitaId:l.visitaId});diferidas++;});}
+        const ids=[...draft]; close(); CX.finStore.clearDraft(p.id);
+        const r=data.payVisits(ids);
+        ui.toast('Lote pagado · '+r.pagadas+' visita(s) · fecha de pago '+r.fechaPago+(diferidas?' · '+diferidas+' diferida(s) a CxP':'')+' · egresos en Movimientos · Beneficios actualizado','ok',4600);
+      });}});
+    });
+  };
+  draw();
+  CX.bus.on('lote',()=>draw());
+  CX.bus.on('visit-flow',()=>draw());
+  return host;
+});
+
+CX.module('lotes', ({data,ui})=>{
+  const p=data.project(), cur=p.currency[p.countries[0]];
+  const curHN=p.currency[p.countries[p.countries.length-1]];
+  const lotes=[
+    {id:'#L-204',n:12,monto:18240,cur:cur,estado:'Pagado',tone:'g',fecha:'2026-06-05',visitas:[['Evaluador 03','Sucursal 01',1520],['Evaluador 07','Sucursal 04',1520],['Evaluador 12','Sucursal 09',1520]]},
+    {id:'#L-205',n:8,monto:42000,cur:curHN,estado:'En revisión',tone:'a',fecha:'2026-06-18',visitas:[['Evaluador 05','Sucursal 02',5250],['Evaluador 09','Sucursal 11',5250]]},
+    {id:'#L-206',n:5,monto:9300,cur:cur,estado:'Borrador',tone:'n',fecha:'—',visitas:[['Evaluador 01','Sucursal 03',1860],['Evaluador 14','Sucursal 07',1860]]},
+  ];
+  const html=`
+  ${ui.ph('Lotes de Pago', p.name+' · agrupa liquidaciones validadas y crea el egreso')}
+  <div class="grid g3" style="margin-bottom:16px">${lotes.map(r=>`<div class="card hov card-p" data-lote="${r.id}" style="cursor:pointer">
+    <div class="between" style="margin-bottom:8px"><b style="font-family:var(--disp);font-size:15px;color:var(--t1)">${r.id}</b>${ui.bdg(r.estado,r.tone)}</div>
+    <div style="font-size:12px;color:var(--t3)">${r.n} visitas · ${r.fecha}</div>
+    <div style="font-size:18px;font-weight:800;color:var(--green);font-family:var(--disp);margin-top:4px">${_m(r.cur,r.monto)}</div>
+    <div style="margin-top:10px"><button class="btn btn-ghost btn-sm" data-lote="${r.id}">Ver detalle →</button></div></div>`).join('')}</div>
+  <div class="card card-p">${ui.aiBox('Agrupo y concilio pagos automáticamente, evitando duplicidad. Cada lote crea su egreso asociado en Finanzas.','Conciliación')}</div>`;
+  setTimeout(()=>{
+    document.querySelectorAll('[data-lote]').forEach(b=>b.addEventListener('click',()=>{ const r=lotes.find(x=>x.id===b.dataset.lote); if(!r)return;
+      ui.modal('Lote '+r.id+' · '+r.estado,`
+        <div class="between" style="margin-bottom:12px"><div style="font-size:12.5px;color:var(--t2)">${r.n} visitas · ${r.fecha}</div><div style="font-size:17px;font-weight:800;color:var(--green);font-family:var(--disp)">${_m(r.cur,r.monto)}</div></div>
+        <table class="tbl"><thead><tr><th>Shopper</th><th>Sucursal</th><th style="text-align:right">Honorario</th></tr></thead><tbody>
+        ${r.visitas.map(v=>`<tr><td><b>${v[0]}</b></td><td style="font-size:12px">${v[1]}</td><td style="text-align:right;font-weight:700">${_m(r.cur,v[2])}</td></tr>`).join('')}
+        ${r.visitas.length<r.n?`<tr><td colspan="3" style="font-size:11px;color:var(--t3);text-align:center">+ ${r.n-r.visitas.length} visita(s) más en el lote</td></tr>`:''}
+        </tbody></table>
+        <div style="margin-top:14px;display:flex;justify-content:flex-end;gap:8px">${r.estado!=='Pagado'?`<button class="btn btn-green btn-sm" id="loteMark">Marcar pagado</button>`:ui.bdg('✓ Egreso generado en Finanzas','g')}<button class="btn btn-ghost btn-sm" id="loteExp">⤓ Exportar</button></div>
+      `,{onMount:(ov,close)=>{ const lm=ov.querySelector('#loteMark'); if(lm)lm.addEventListener('click',()=>{close();ui.toast('Lote '+r.id+' marcado pagado · egreso generado en Movimientos','ok',3600);}); ov.querySelector('#loteExp').addEventListener('click',()=>ui.toast('Exportando lote '+r.id+'…','ok')); }});
+    }));
+  },0);
+  return html;
+});

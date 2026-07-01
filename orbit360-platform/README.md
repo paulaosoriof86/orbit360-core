@@ -1,68 +1,103 @@
-# Orbit 360 · Plataforma
+# CXOrbia — Plataforma Operativa de Campo
 
-**Sistema 360 inteligente e integral para intermediarios de seguros.** No es un CRM común: cubre el ciclo completo (clientes, pólizas, cobros, renovaciones, comisiones), con IA y automatizaciones, en módulos que se alimentan entre sí.
+> Versión **comercial / white-label** de CXOrbia: mystery shopping, experiencia al cliente y auditoría de campo en una sola plataforma.
+> Esta base es el punto de partida arquitectónico para comercializar el producto, separada de la operación real de T&A Consultores (sin datos reales, marca neutral, multi-proyecto).
 
-> Marca de **producto** Orbit 360 (white-label ready). Esta es la **versión limpia comercializable**, construida desde cero — sin arrastrar deuda técnica del piloto. Datos de demostración **ficticios**.
+![estado](https://img.shields.io/badge/estado-MVP%20comercial-2196d3) ![datos](https://img.shields.io/badge/datos-ficticios-d97706) ![stack](https://img.shields.io/badge/stack-HTML%20%2F%20JS%20%2B%20Firebase%20opcional-16a05c)
 
-## Arranque
-Es una SPA estática sin build. Servir la carpeta y abrir `index.html`:
+---
+
+## ¿Qué es esto?
+
+Una **aplicación web modular** que reproduce el flujo operativo completo del negocio —configurar proyecto → publicar visitas → captar/asignar shoppers → instruir → certificar → agendar → ejecutar → liquidar → reportar— con **dos perfiles**:
+
+- 🖥️ **Consola Admin / Coordinación** — operación, proyectos, finanzas y configuración.
+- 📱 **Portal Shopper / Evaluador** — visitas, certificación, ejecución y pagos.
+
+Es **multi-proyecto e IA-adaptable**: al cambiar de proyecto, todo el dashboard, los KPIs, las reglas y los cuestionarios se reconfiguran para ese cliente sin tocar código.
+
+> ⚠️ **Demo comercial con datos ficticios.** No contiene datos ni marca reales de T&A. Pensada para presentar, pilotear y entregar a desarrollo.
+
+---
+
+## Cómo correrlo
+
+No requiere build ni instalación. Es HTML/CSS/JS plano.
 
 ```bash
-cd orbit360-platform
-python3 -m http.server 8080   # o cualquier servidor estático
-# http://localhost:8080
+# opción 1 — abrir directo
+abre app/index.html en el navegador
+
+# opción 2 — servidor local (recomendado, evita restricciones de file://)
+cd app
+npx serve .            # Node: sirve en http://localhost:3000
+# o:  npx http-server . -p 8080
+# luego abre la URL que muestre la consola
 ```
 
-No requiere dependencias ni bundler. (Las fuentes se cargan desde Google Fonts; offline usa fallback del sistema.)
+Corre **100% con datos locales** (mock). Para conectar un backend real, completa las llaves en `core/config.js → CX.FIREBASE` (ver [SECURITY.md](docs/SECURITY.md)).
 
-## Arquitectura
+---
+
+## Estructura
 
 ```
-orbit360-platform/
-├── index.html              Shell: topbar + sidebar + host de contenido
+.
+├── index.html              # Shell: login, rol, rail, topbar, router mount
+├── app.js                  # Boot + login / selección de rol
 ├── styles/
-│   ├── tokens.css          Design tokens (marca, color, tipo, espaciado, sombra)
-│   └── base.css            Shell + componentes compartidos
-├── data/
-│   ├── store.js            Capa de datos — API única (hoy localStorage, mañana backend)
-│   └── seed.js             Datos ficticios (universo relacional coherente)
+│   ├── theme.css           # Tokens de diseño + componentes (white-label)
+│   └── layout.css          # Layout del shell (login, rail, topbar)
 ├── core/
-│   ├── ui.js               Helpers de presentación (moneda, fechas, avatar, badges)
-│   ├── config.js           Navegación (Orbit.NAV) + metadatos de módulos
-│   ├── queries.js          Agregaciones de negocio sobre el store
-│   └── router.js           Sidebar + router por hash (#/ruta)
-└── modules/
-    ├── inicio.js           Orbit Inicio (Mi Día)
-    └── cliente360.js       CRM · Cliente 360  ← núcleo de oro
+│   ├── config.js           # ★ Marca, módulos, navegación, roles, Firebase
+│   ├── data.js             # Capa de datos mock (multi-proyecto, IA-adaptable)
+│   ├── store.js            # Sesión + event bus + persistencia
+│   ├── ui.js               # Helpers de UI (KPIs, tablas, toast, modal, IA)
+│   └── router.js           # Navegación, menú por rol, montaje de módulos
+├── modules/                # Un archivo por módulo (22 módulos)
+│   ├── dashboard.js  proyectos.js  visitas.js  postulaciones.js …
+└── docs/                   # Documentación de producto y arquitectura
+    ├── ARCHITECTURE.md  DATA-MODEL.md  SECURITY.md  ROADMAP.md  MODULES.md
+    ├── PLAN-DE-TRABAJO.md   # ★ backlog vivo (se actualiza cada sesión)
+    └── LOGICA-NEGOCIO.md    # ★ reglas de negocio parametrizables por proyecto
 ```
 
-### Capa de datos (clave del diseño)
-`Orbit.store` es la **interfaz única**. Los módulos nunca tocan `localStorage` directo. Cuando exista backend (Firestore/REST), se reimplementa `store` con la misma API y nada más cambia.
+---
+
+## White-label en 1 minuto
+
+Todo lo específico de marca vive en `core/config.js → CX.BRAND`:
 
 ```js
-Orbit.store.all('clientes')              // colección
-Orbit.store.get('clientes', 'cli001')    // por id
-Orbit.store.where('cobros', c => c.estado === 'Vencido')
-Orbit.store.insert('actividades', row)   // persiste + notifica
-Orbit.store.update('polizas', id, patch)
-Orbit.store.on(fn)                        // suscripción a cambios
+CX.BRAND = {
+  name: 'CXOrbia',
+  tagline: 'Field Operations Platform',
+  colors: { brand:'#2196d3', brandDark:'#1565a8', navy:'#0d2740', … },
+};
 ```
 
-`data/seed.js` genera de forma determinista: 20 clientes (personas + empresas, GT/CO), sus pólizas, cobros (cuotas), comisiones, actividades y cancelaciones — todo relacionado por `id`. Subir `__v` fuerza re-siembra.
+Cambia nombre y colores y **toda la plataforma se reskina** (los componentes usan variables CSS). Útil para vender instancias con la marca del cliente.
 
-### Estado de los módulos (honesto)
-Cada ítem del sidebar lleva su badge real:
+---
 
-| Badge | Significado |
-|---|---|
-| **NÚCLEO** | Construido y funcional |
-| **BETA** | En estabilización |
-| **PRÓX.** | En roadmap (pantalla con alcance documentado) |
+## Los 22 módulos
 
-Hoy: **Orbit Inicio** e **Cliente 360** (con Pólizas, Cobros, Renovaciones, Cancelaciones, Comisiones, Historial) están construidos. El resto muestra su alcance objetivo y se construye según el orden de `ORBIT360-BUILD.md`.
+Operación, Portal Shopper, Finanzas y Configuración. Detalle de cada uno (problema, función, capa IA, valor) en **[docs/MODULES.md](docs/MODULES.md)**.
 
-## Orden de construcción
-Ver `../orbit360/ORBIT360-BUILD.md` §4. Vamos en: **Paso 1 (Shell + datos + tokens)** ✅ y **CRM Cliente 360** ✅.
+| Operación (Admin) | Portal Shopper | Finanzas (Admin) | Configuración |
+|---|---|---|---|
+| Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
 
-## Documentación por módulo
-`docs/` — un archivo por módulo conforme se construye. Ver `docs/cliente360.md`.
+---
+
+## Estado y roadmap
+
+Esta entrega es el **MVP comercial navegable**: arquitectura, los 22 módulos y el flujo, con datos de ejemplo. La ruta a producción (hardening, multi-tenant real, Auth, integraciones) está en **[docs/ROADMAP.md](docs/ROADMAP.md)**.
+
+## Relación con la plataforma de T&A
+
+Esta base es **independiente** del HTML operativo actual de T&A. Recomendación: T&A sigue operando en su instancia; cuando este core esté sólido, T&A se migra como **"proyecto / tenant #1"** sobre esta arquitectura modular. Ver [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+---
+
+© 2026 — Material confidencial del equipo fundador. Versión comercial white-label.
