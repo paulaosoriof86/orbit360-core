@@ -221,3 +221,11 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: se creo auditoria tecnica del store LAB y se confirmaron patrones clave de API, tenant, onSnapshot, fallback local y proyecto LAB.
 - Impacto en prototipo comercializable: protege la capa unica de datos antes de avanzar backend.
 - Estado: RESUELTO.
+
+## 2026-06-30 22:51:54 - Backend LAB - Seed ficticio minimo preparado
+- Sintoma/necesidad: preparar estructura de datos ficticia para validar colecciones criticas en Firestore LAB sin usar datos reales.
+- Esperado: documentar plan y JSON ficticio sin ejecutar carga en Firestore.
+- Archivo/funcion: docs/PLAN-SEED-FICTICIO-FIRESTORE-LAB.md, docs/SEED-FICTICIO-FIRESTORE-LAB.json.
+- Fix o mejora aplicada: se preparo seed ficticio minimo con prefijo lab_ y separacion de pais/moneda.
+- Impacto en prototipo comercializable: deja lista la siguiente fase de persistencia real en LAB sin tocar produccion ni datos reales.
+- Estado: PREPARADO / NO EJECUTADO.

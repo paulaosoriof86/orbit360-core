@@ -1,0 +1,236 @@
+{
+  "clientes": [
+    {
+      "id": "lab_cliente_logistica_gt",
+      "nombre": "Logistica del Norte Demo",
+      "tipo": "Empresa",
+      "pais": "GT",
+      "moneda": "GTQ",
+      "identificacion": "LAB-GT-001",
+      "asesorId": "lab_asesor_paula",
+      "estado": "Activo",
+      "origen": "seed_ficticio_lab"
+    },
+    {
+      "id": "lab_cliente_familia_co",
+      "nombre": "Familia Ramirez Demo",
+      "tipo": "Persona",
+      "pais": "CO",
+      "moneda": "COP",
+      "identificacion": "LAB-CO-001",
+      "asesorId": "lab_asesor_diego",
+      "estado": "Activo",
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "asesores": [
+    {
+      "id": "lab_asesor_paula",
+      "nombre": "Paula Demo",
+      "pais": "GT",
+      "rol": "Direccion",
+      "email": "paula.demo@orbit.local",
+      "estado": "Activo",
+      "origen": "seed_ficticio_lab"
+    },
+    {
+      "id": "lab_asesor_diego",
+      "nombre": "Diego Demo",
+      "pais": "CO",
+      "rol": "Asesor",
+      "email": "diego.demo@orbit.local",
+      "estado": "Activo",
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "aseguradoras": [
+    {
+      "id": "lab_aseg_atlas_gt",
+      "nombre": "Seguros Atlas Demo",
+      "pais": "GT",
+      "moneda": "GTQ",
+      "ramos": ["Auto", "Transporte", "Vida"],
+      "vinculada": true,
+      "origen": "seed_ficticio_lab"
+    },
+    {
+      "id": "lab_aseg_andina_co",
+      "nombre": "Andina Seguros Demo",
+      "pais": "CO",
+      "moneda": "COP",
+      "ramos": ["Auto", "Hogar", "Salud"],
+      "vinculada": true,
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "vehiculos": [
+    {
+      "id": "lab_vehiculo_gt_001",
+      "clienteId": "lab_cliente_logistica_gt",
+      "pais": "GT",
+      "placa": "LAB123",
+      "marca": "Toyota",
+      "linea": "Hilux",
+      "modelo": 2024,
+      "uso": "Comercial",
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "polizas": [
+    {
+      "id": "lab_poliza_auto_gt",
+      "clienteId": "lab_cliente_logistica_gt",
+      "aseguradoraId": "lab_aseg_atlas_gt",
+      "asesorId": "lab_asesor_paula",
+      "ramo": "Auto",
+      "pais": "GT",
+      "moneda": "GTQ",
+      "numero": "LAB-AUTO-GT-001",
+      "estado": "Vigente",
+      "primaNeta": 12000,
+      "primaTotal": 13440,
+      "vigenciaDesde": "2026-01-01",
+      "vigenciaHasta": "2026-12-31",
+      "origen": "seed_ficticio_lab"
+    },
+    {
+      "id": "lab_poliza_hogar_co",
+      "clienteId": "lab_cliente_familia_co",
+      "aseguradoraId": "lab_aseg_andina_co",
+      "asesorId": "lab_asesor_diego",
+      "ramo": "Hogar",
+      "pais": "CO",
+      "moneda": "COP",
+      "numero": "LAB-HOGAR-CO-001",
+      "estado": "Por renovar",
+      "primaNeta": 1800000,
+      "primaTotal": 2142000,
+      "vigenciaDesde": "2026-02-01",
+      "vigenciaHasta": "2027-01-31",
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "cobros": [
+    {
+      "id": "lab_cobro_auto_gt_001",
+      "polizaId": "lab_poliza_auto_gt",
+      "clienteId": "lab_cliente_logistica_gt",
+      "pais": "GT",
+      "moneda": "GTQ",
+      "estado": "Pendiente",
+      "monto": 3360,
+      "vencimiento": "2026-07-15",
+      "origen": "seed_ficticio_lab"
+    },
+    {
+      "id": "lab_cobro_hogar_co_001",
+      "polizaId": "lab_poliza_hogar_co",
+      "clienteId": "lab_cliente_familia_co",
+      "pais": "CO",
+      "moneda": "COP",
+      "estado": "Pendiente",
+      "monto": 535500,
+      "vencimiento": "2026-07-20",
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "finmovs": [
+    {
+      "id": "lab_finmov_gt_001",
+      "pais": "GT",
+      "moneda": "GTQ",
+      "tipo": "Ingreso",
+      "categoria": "Prima recaudada",
+      "monto": 3360,
+      "fecha": "2026-07-15",
+      "clienteId": "lab_cliente_logistica_gt",
+      "polizaId": "lab_poliza_auto_gt",
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "comisiones": [
+    {
+      "id": "lab_comision_gt_001",
+      "pais": "GT",
+      "moneda": "GTQ",
+      "polizaId": "lab_poliza_auto_gt",
+      "asesorId": "lab_asesor_paula",
+      "aseguradoraId": "lab_aseg_atlas_gt",
+      "primaNetaRecaudada": 12000,
+      "porcentaje": 10,
+      "monto": 1200,
+      "estado": "Por cobrar",
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "reclamos": [
+    {
+      "id": "lab_reclamo_gt_001",
+      "clienteId": "lab_cliente_logistica_gt",
+      "polizaId": "lab_poliza_auto_gt",
+      "pais": "GT",
+      "estado": "En seguimiento",
+      "tipo": "Daño parcial",
+      "fecha": "2026-06-10",
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "negocios": [
+    {
+      "id": "lab_negocio_gt_001",
+      "clienteId": "lab_cliente_logistica_gt",
+      "asesorId": "lab_asesor_paula",
+      "pais": "GT",
+      "etapa": "Cotizacion",
+      "ramo": "Transporte",
+      "valorEstimado": 25000,
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "gestiones": [
+    {
+      "id": "lab_gestion_gt_001",
+      "clienteId": "lab_cliente_logistica_gt",
+      "asesorId": "lab_asesor_paula",
+      "pais": "GT",
+      "tipo": "Seguimiento",
+      "estado": "Pendiente",
+      "fecha": "2026-07-01",
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "actividades": [
+    {
+      "id": "lab_actividad_gt_001",
+      "clienteId": "lab_cliente_logistica_gt",
+      "pais": "GT",
+      "tipo": "Bitacora",
+      "titulo": "Contacto inicial demo",
+      "fecha": "2026-07-01",
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "metas": [
+    {
+      "id": "lab_meta_gt_202607",
+      "pais": "GT",
+      "moneda": "GTQ",
+      "mes": "2026-07",
+      "tipo": "Produccion neta recaudada",
+      "asesorId": "lab_asesor_paula",
+      "monto": 50000,
+      "origen": "seed_ficticio_lab"
+    }
+  ],
+  "documentos": [],
+  "contenidos": [],
+  "cursos": [],
+  "acreedores": [],
+  "facturas": [],
+  "notificaciones": [],
+  "automatizaciones": [],
+  "integraciones": [],
+  "plantillas": [],
+  "auditoria": [],
+  "configuracion": []
+}
