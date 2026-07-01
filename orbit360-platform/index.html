@@ -12,27 +12,6 @@
   <link rel="stylesheet" href="styles/tokens.css?v1255">
   <link rel="stylesheet" href="styles/base.css?v1255">
   <link rel="stylesheet" href="styles/infra.css?v1255">
-<script>
-(function(){
-  var params = new URLSearchParams(window.location.search || '');
-  var mode = params.get('orbitBackend') || '';
-  if (mode !== 'firestore-lab') return;
-
-  window.OrbitBackend = window.OrbitBackend || {};
-  window.OrbitBackend.mode = 'firestore-lab';
-  window.OrbitBackend.tenantId = params.get('tenant') || 'alianzas-soluciones';
-
-  function addScript(src){
-    if (document.querySelector('script[src="' + src + '"]')) return;
-    var s = document.createElement('script');
-    s.src = src;
-    s.defer = true;
-    document.head.appendChild(s);
-  }
-
-  addScript('data/store-firestore-lab.local.js?v=lab-store-index-20260701');
-})();
-</script>
 </head>
 <body class="pre-auth">
   <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1E2227"/><circle cx="50" cy="50" r="20" fill="#C5162E"/><circle cx="50" cy="50" r="9" fill="#1E2227"/><text x="50" y="82" font-family="sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">Orbit 360</text></svg></template>
@@ -140,6 +119,7 @@
   <script src="core/comisiones-eng.js?v1255"></script>
   <!-- ============ DATA LAYER (depende de config + primas) ============ -->
   <script src="data/store.js?v1255"></script>
+  <script src="data/store-firestore-lab.local.js?v=lab-store-main-20260701"></script>
   <script src="data/seed.js?v1255"></script>
   <!-- CORE (resto) -->
   <script src="core/queries.js?v1255"></script>

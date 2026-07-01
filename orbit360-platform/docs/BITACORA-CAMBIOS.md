@@ -489,3 +489,17 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 **Impacto en prototipo comercializable:** Alto. Permite continuar sobre la ultima version completa de Claude sin perder backend ni depender de previews separados.
 
 **Estado:** RESUELTO LOCALMENTE.
+
+## 2026-07-01 - Hook backend deterministico en index principal
+
+**Modulo:** Backend / Shell / Data layer.
+
+**Necesidad:** Evitar reprocesos con index-dev-firestore.html y evitar carga dinamica poco confiable desde <head>.
+
+**Esperado:** index.html debe cargar data/store-firestore-lab.local.js inmediatamente despues de data/store.js, para que el backend LAB pueda sobrescribir o complementar Orbit.store antes del boot y sin tocar modulos.
+
+**Fix aplicado:** Se removio el cargador dinamico anterior y se agrego carga deterministica de data/store-firestore-lab.local.js despues de data/store.js.
+
+**Impacto en prototipo comercializable:** Alto. Permite continuar usando siempre la ultima version completa de Claude y conservar backend como capa protegida.
+
+**Estado:** RESUELTO LOCALMENTE.
