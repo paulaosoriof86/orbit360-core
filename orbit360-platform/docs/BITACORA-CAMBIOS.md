@@ -348,3 +348,14 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: login Firebase real con signInWithEmailAndPassword, sin guardar secrets.
 - Impacto en prototipo comercializable: aplicar aprendizaje al backend real; Auth real nunca debe confundirse con sesión demo.
 - Estado: EN PROGRESO
+
+## 2026-07-01 02:04:12 - Auth LAB / bloqueo de usuario demo en login
+
+- Modulo: Backend LAB / Auth.
+- Sintoma/necesidad: el login LAB mostraba dmin@demo.com por autocompletado/demo.
+- Esperado: irestore-lab debe usar siempre orbit.lab@demo.com.
+- Causa raiz: navegador/core demo rellenaba usuario no LAB.
+- Archivo/funcion: core/auth-lab-login-helper.local.js, index-dev-firestore.html.
+- Fix o mejora aplicada: helper local fuerza correo LAB y agrega reset password Firebase sin secretos.
+- Impacto en prototipo comercializable: aplicar aprendizaje al backend real; no permitir usuarios demo en entorno backend.
+- Estado: EN PROGRESO
