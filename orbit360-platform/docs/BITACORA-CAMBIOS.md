@@ -272,3 +272,57 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: test temporal de lectura autenticada en navegador LAB.
 - Impacto en prototipo comercializable: confirma que la app puede consumir datos persistentes Firestore por la capa unica.
 - Estado: RESUELTO.
+
+## 2026-07-01 00:04:14 - Backend LAB / Seed ficticio
+
+- Modulo: Backend LAB / Orbit.store / Firestore.
+- Necesidad: validar lectura del seed ficticio persistente desde la app real index-dev-firestore.html, no desde runner aislado.
+- Esperado: Orbit.store disponible con API completa y lectura de colecciones seed sin escrituras.
+- Archivo/funcion: index-dev-firestore.html, data/store.js, Orbit.store.all/get/where.
+- Resultado: ABIERTO - lectura no validada; revisar resultado JSON.
+- Impacto: confirma continuidad del backend LAB sin tocar modulos ni produccion.
+- Estado: ABIERTO
+
+## 2026-07-01 00:13:31 - Backend LAB / Orbit.store
+
+- Modulo: Backend LAB / data.store.
+- Sintoma/necesidad: Orbit.store cargaba en la app real, pero faltaba _emit en la API publica.
+- Esperado: API exacta ll, get, where, insert, update, emove, _emit.
+- Causa raiz: _emit existia como mecanismo requerido por la migracion, pero no quedaba expuesto publicamente en la API usada por la app real.
+- Archivo/funcion: data/store.js / API publica Orbit.store.
+- Fix o mejora aplicada: exposicion minima de _emit sin cambiar la firma del store ni tocar modulos.
+- Impacto en prototipo comercializable: aplicar a prototipo base para evitar que integraciones y validadores encuentren API incompleta.
+- Estado: ABIERTO
+
+## 2026-07-01 00:17:02 - Backend LAB / Validacion seed V3
+
+- Modulo: Backend LAB / Orbit.store / Firestore.
+- Sintoma/necesidad: la validacion V2 marco fallo mientras la app estaba en login.
+- Esperado: validar seed solo despues de sesion Firebase LAB autorizada.
+- Causa raiz: validador anterior no diferenciaba correctamente login pendiente vs fallo real de lectura.
+- Archivo/funcion: validador temporal __validate_seed_lab_v3.html; app real index-dev-firestore.html; store data/store.js.
+- Fix o mejora aplicada: validador V3 espera UID LAB, API completa y tenant correcto antes de verificar documentos.
+- Impacto en prototipo comercializable: aprendizaje de metodologia; no marcar fallos de backend si la app sigue en login.
+- Estado: ABIERTO
+
+## 2026-07-01 00:24:13 - Backend LAB / Validacion seed V4 puerto 5177
+
+- Modulo: Backend LAB / Orbit.store / Firestore.
+- Sintoma/necesidad: V3 quedo esperando login por abrir en puerto diferente al de la sesion ya observada.
+- Esperado: validar seed desde app real reutilizando origen estable 127.0.0.1:5177.
+- Causa raiz: Firebase Auth persiste por origen/puerto; cambiar puerto puede perder sesion local.
+- Archivo/funcion: validador temporal V4, index-dev-firestore.html, data/store.js.
+- Fix o mejora aplicada: validacion con puerto fijo 5177, espera de sesion LAB y verificacion de documentos seed.
+- Impacto en prototipo comercializable: aprendizaje para smoke tests; usar puerto estable para pruebas con Auth.
+- Estado: ABIERTO
+
+## 2026-07-01 00:48:15 - Backend LAB / Auth Gate y No-Fallback
+
+- Modulo: Backend LAB / Auth / Store.
+- Sintoma/necesidad: V5 confirmó API completa pero sin sesión Firebase LAB; la UI visible correspondía a sesión demo/local.
+- Esperado: en irestore-lab, sin Firebase Auth LAB no debe abrir dashboard demo ni disfrazar seed/localStorage como backend.
+- Causa raíz: fallback demo/local seguía disponible durante pruebas LAB.
+- Archivo/funcion: core/auth-lab-gate.local.js, index-dev-firestore.html, data/store.js.
+- Fix o mejora aplicada: consolidación de gate local LAB, limpieza de validadores temporales y contrato No-Fallback.
+- Impacto en prototipo comercializable: aplicar a prototipo base/backend real; nunca mezclar demo y backend.
+- Estado: EN PROGRESO

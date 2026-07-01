@@ -89,3 +89,58 @@ Estado: ABIERTO para UX tenant A&S / aplicar a prototipo base.
 - Fix o mejora aplicada: se agrego correccion metodologica y auditoria real v93; Aseguradoras visual premium queda como solicitud nueva actual.
 - Impacto en prototipo comercializable: protege la precision del backlog para Claude.
 - Estado: RESUELTO.
+
+## 2026-07-01 00:04:14 - Backend LAB / Lectura seed
+
+- Modulo: Backend LAB / Orbit.store.
+- Sintoma/necesidad: la validacion de lectura del seed desde la app real no quedo OK.
+- Esperado: lectura de colecciones seed mediante Orbit.store desde index-dev-firestore.html.
+- Causa raiz: pendiente de confirmar; revisar autenticacion LAB, carga de scripts o resultado JSON.
+- Archivo/funcion: index-dev-firestore.html, data/store.js, core/auth.js.
+- Fix o mejora aplicada: se genero runner real en navegador y reporte JSON para diagnostico.
+- Impacto en prototipo comercializable: aplicar a prototipo base solo si se confirma bug de carga real, no si fue sesion/auth local.
+- Estado: ABIERTO
+
+## 2026-07-01 00:13:31 - Backend LAB / Validacion seed
+
+- Modulo: Backend LAB / Firestore seed.
+- Sintoma/necesidad: la validacion real de lectura del seed LAB no quedo OK.
+- Esperado: todos los documentos ficticios de docs/SEED-FICTICIO-FIRESTORE-LAB.json deben leerse desde Orbit.store en index-dev-firestore.html.
+- Causa raiz: pendiente de confirmar con esultado.json.
+- Archivo/funcion: index-dev-firestore.html, data/store.js, core/auth.js.
+- Fix o mejora aplicada: se corrigio _emit y se genero validador V2 con checks por documentos exactos.
+- Impacto en prototipo comercializable: aplicar a prototipo base solo el fix de API; revisar backend si los documentos LAB no aparecen.
+- Estado: ABIERTO
+
+## 2026-07-01 00:17:02 - Backend LAB / Seed Firestore
+
+- Modulo: Backend LAB / Firestore seed.
+- Sintoma/necesidad: la validacion V3 no quedo OK.
+- Esperado: sesion LAB autorizada, tenant lianzas-soluciones, API Orbit.store completa y documentos seed legibles.
+- Causa raiz: pendiente de confirmar con esultado.json.
+- Archivo/funcion: index-dev-firestore.html, data/store.js, core/auth.js, docs/SEED-FICTICIO-FIRESTORE-LAB.json.
+- Fix o mejora aplicada: se separo login pendiente de error real y se genero reporte JSON.
+- Impacto en prototipo comercializable: aplicar aprendizaje a validadores del backend.
+- Estado: ABIERTO
+
+## 2026-07-01 00:24:13 - Backend LAB / Validacion seed V4
+
+- Modulo: Backend LAB / Firestore seed.
+- Sintoma/necesidad: V4 no quedo OK.
+- Esperado: sesion LAB autorizada, tenant correcto, API completa y seed legible.
+- Causa raiz: pendiente de confirmar con esultado.json.
+- Archivo/funcion: index-dev-firestore.html, data/store.js, core/auth.js, docs/SEED-FICTICIO-FIRESTORE-LAB.json.
+- Fix o mejora aplicada: se valido en puerto estable 5177 y se genero reporte JSON.
+- Impacto en prototipo comercializable: mantener smoke tests con puerto estable y no pedir password manual.
+- Estado: ABIERTO
+
+## 2026-07-01 00:48:15 - Backend LAB / Fallback demo activo
+
+- Modulo: Backend LAB / Auth / Store.
+- Sintoma/necesidad: la app podía mostrar UI demo/local sin Firebase Auth LAB real.
+- Esperado: irestore-lab debe requerir Firebase Auth LAB y Firestore LAB por tenant.
+- Causa raíz: separación incompleta entre modo demo y modo backend LAB.
+- Archivo/funcion: core/auth.js, core/auth-lab-gate.local.js, data/store.js.
+- Fix o mejora aplicada: gate LAB y contrato No-Fallback; pendiente endurecer data/store.js.
+- Impacto en prototipo comercializable: aplicar a prototipo base antes de producción.
+- Estado: EN PROGRESO
