@@ -1,0 +1,12 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // LAB ficticio. Reglas de producción deben requerir autenticación y permisos por tenant.
+    match /tenants/{tenantId}/{collection}/{docId} {
+      allow read, write: if tenantId == 'alianzas-soluciones';
+    }
+    match /tenants/{tenantId}/_meta/{docId} {
+      allow read, write: if tenantId == 'alianzas-soluciones';
+    }
+  }
+}
