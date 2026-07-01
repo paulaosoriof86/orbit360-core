@@ -59,7 +59,8 @@ Orbit.modules.configuracion = (function () {
       ${row('Logo del cliente', `<div style="display:flex;align-items:center;gap:10px"><span class="cfg-logo">${t.branding.logo ? `<img src="${U.esc(t.branding.logo)}">` : '🏢'}</span><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="(function(){var fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.onchange=function(){var r=new FileReader();r.onload=function(e){try{localStorage.setItem('orbit360_logo',e.target.result);}catch(x){}try{var b=Orbit.tenant.get().branding||{};b.logo=e.target.result;Orbit.tenant.setDeep('branding',b);}catch(x){}if(Orbit.applyBrand)Orbit.applyBrand();var img=document.getElementById('cfg-logo-prev');if(img){img.src=e.target.result;img.style.display='inline-block';}var t=document.createElement('div');t.className='ciclo-toast';t.textContent='\u2713 Logo aplicado en cintilla y login';document.body.appendChild(t);setTimeout(function(){t.remove();},2600);};r.readAsDataURL(fi.files[0]);};fi.click();})()">Subir logo</button><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="(function(){try{localStorage.removeItem('orbit360_logo');var b=Orbit.tenant.get().branding||{};b.logo='';Orbit.tenant.setDeep('branding',b);}catch(x){}if(Orbit.applyBrand)Orbit.applyBrand();})()">Quitar</button><img id="cfg-logo-prev" style="height:36px;border-radius:6px;margin-left:8px;vertical-align:middle;display:none"></div>`, 'Se refleja en la cintilla y el login. Sube el logo del cliente para white-label.')}
       ${row('Paleta de marca', `<button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.theme.picker(this)">🎨 Elegir paleta</button>`, 'Cambia el acento en toda la plataforma')}
       ${row('Menú lateral', `<div class="cfg-seg" id="cf-sb">${['oscuro', 'claro'].map(m => `<button data-sb="${m}" class="${Orbit.theme.getSidebar() === m ? 'on' : ''}" ${lock ? 'disabled' : ''}>${m === 'oscuro' ? 'Oscuro' : 'Claro'}</button>`).join('')}</div>`)}
-      ${row('Auto-branding por IA', `<button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.modules.configuracion.subirManualMarca()">📄 Subir manual de marca</button>`, 'La IA lee tu manual y propone tipografía y colores corporativos (plan Personalizado)')}`;
+      ${row('Auto-branding por IA', `<button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.modules.configuracion.subirManualMarca()">📄 Subir manual de marca</button>`, 'La IA lee tu manual y propone tipografía y colores corporativos (plan Personalizado)')}
+      ${row('Ocultar etiquetas técnicas', toggle('hideTechnicalBadges', !!t.hideTechnicalBadges), 'Oculta los distintivos NÚCLEO/BETA/PRÓX. del menú para el modo cliente/implementación')}`;
   }
 
   /* ---------- USUARIOS Y PERMISOS ---------- */
@@ -270,6 +271,7 @@ Orbit.modules.configuracion = (function () {
       const key = b.dataset.tog, t = T().get();
       if (key.startsWith('pais-')) { const id = key.slice(5); const arr = new Set(t.paises); arr.has(id) ? arr.delete(id) : arr.add(id); T().setDeep('paises', [...arr]); }
       else if (key.startsWith('addon-')) { const id = key.slice(6); const a = Object.assign({}, t.addons); a[id] = !a[id]; T().setDeep('addons', a); }
+      else { T().setDeep(key, !t[key]); if (key === 'hideTechnicalBadges' && Orbit.router && Orbit.router.rebuildSidebar) Orbit.router.rebuildSidebar(); }
       paint(host);
     }));
     // sidebar seg

@@ -92,7 +92,7 @@ Orbit.modules.inicio = (function () {
             <span class="muted" style="font-size:12px">prima vigente vs meta</span>
           </div>
           ${board.map(b => `
-            <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-2)">
+            <div class="clickable" onclick="location.hash='#/insights'" title="Ver analítica de metas por asesor" style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-2);cursor:pointer">
               ${U.avatar(b.asesor.nombre, b.asesor.color, 'md')}
               <div style="flex:1;min-width:0">
                 <div style="display:flex;justify-content:space-between;font-size:13.5px">

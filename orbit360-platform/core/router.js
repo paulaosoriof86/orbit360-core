@@ -14,6 +14,9 @@ Orbit.router = (function () {
   // ---- estado de badges ----
   function badgeHtml(estado) {
     if (!estado) return '';
+    // Modo cliente/implementación: ocultar badges técnicos (NÚCLEO/BETA/PRÓX.)
+    let hide = false; try { hide = !!(Orbit.tenant && Orbit.tenant.get && Orbit.tenant.get().hideTechnicalBadges); } catch (e) {}
+    if (hide) return '';
     const txt = { core: 'NÚCLEO', beta: 'BETA', road: 'PRÓX.' }[estado] || '';
     return `<span class="nav-badge ${estado}">${txt}</span>`;
   }
