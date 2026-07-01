@@ -229,3 +229,36 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 - Fix o mejora aplicada: se preparo seed ficticio minimo con prefijo lab_ y separacion de pais/moneda.
 - Impacto en prototipo comercializable: deja lista la siguiente fase de persistencia real en LAB sin tocar produccion ni datos reales.
 - Estado: PREPARADO / NO EJECUTADO.
+
+## 2026-06-30 23:00:07 - Backend LAB - Seed ficticio minimo cargado
+- Sintoma/necesidad: cargar datos ficticios minimos en Firestore LAB para validar modulos con datos persistentes.
+- Esperado: escribir solo documentos lab_ en tenant alianzas-soluciones y verificar lectura.
+- Archivo/funcion: docs/SEED-FICTICIO-FIRESTORE-LAB.json, Firestore tenants/alianzas-soluciones/data/*/items/*.
+- Resultado:
+- clientes: escritos=2, verificados=2
+- asesores: escritos=2, verificados=2
+- aseguradoras: escritos=2, verificados=2
+- vehiculos: escritos=1, verificados=1
+- polizas: escritos=2, verificados=2
+- cobros: escritos=2, verificados=2
+- finmovs: escritos=1, verificados=1
+- comisiones: escritos=1, verificados=1
+- reclamos: escritos=1, verificados=1
+- negocios: escritos=1, verificados=1
+- gestiones: escritos=1, verificados=1
+- actividades: escritos=1, verificados=1
+- metas: escritos=1, verificados=1
+- documentos: escritos=0, verificados=0
+- contenidos: escritos=0, verificados=0
+- cursos: escritos=0, verificados=0
+- acreedores: escritos=0, verificados=0
+- facturas: escritos=0, verificados=0
+- notificaciones: escritos=0, verificados=0
+- automatizaciones: escritos=0, verificados=0
+- integraciones: escritos=0, verificados=0
+- plantillas: escritos=0, verificados=0
+- auditoria: escritos=0, verificados=0
+- configuracion: escritos=0, verificados=0
+- Fix o mejora aplicada: carga autenticada en navegador LAB con verificacion de documentos escritos.
+- Impacto en prototipo comercializable: habilita pruebas visuales y funcionales sobre datos persistentes sin usar datos reales.
+- Estado: RESUELTO.
