@@ -358,6 +358,32 @@ Orbit.importa = (function () {
     return { created, updated };
   }
 
+  /* Simulación pre-escritura (dry-run): calcula crear/actualizar/omitir + errores por fila
+     SIN tocar el store. Para el resumen de confirmación del importador. */
+  function dryRun(kind) {
+    const cfg = IMPORT_MAP[kind]; if (!cfg || !state.parsed) return null;
+    const idx = mapHeaders(kind, state.parsed.headers); if (!Object.keys(idx).length) return null;
+    let crear = 0, actualizar = 0, omitir = 0; const errores = []; const dupKeys = {};
+    (state.parsed.rows || []).forEach((cells, ri) => {
+      const rec = {}; Object.keys(idx).forEach(f => { const v = cells[idx[f]]; if (v != null && v !== '') rec[f] = v; });
+      if (!Object.keys(rec).length) { omitir++; return; }
+      if (cfg.build) { try { cfg.build(rec); } catch (e) {} }
+      // validación mínima: al menos una clave de dedup o campo requerido
+      const claveDedup = (cfg.dedup || []).find(k => rec[k]);
+      if ((cfg.required || cfg.dedup || []).length && !claveDedup && !(cfg.required || []).some(k => rec[k])) {
+        errores.push({ fila: ri + 2, motivo: 'faltan campos clave (' + (cfg.dedup || cfg.required || []).join('/') + ')' }); omitir++; return;
+      }
+      // dedup dentro del store + dentro del propio archivo
+      let existing = null;
+      for (let j = 0; j < (cfg.dedup || []).length; j++) { const k = cfg.dedup[j]; if (rec[k]) { existing = Orbit.store.all(cfg.coll).find(r => norm(r[k]) === norm(rec[k])); if (existing) break; } }
+      const fileKey = claveDedup ? norm(rec[claveDedup]) : null;
+      if (fileKey && dupKeys[fileKey]) { omitir++; errores.push({ fila: ri + 2, motivo: 'duplicado dentro del archivo (' + rec[claveDedup] + ')' }); return; }
+      if (fileKey) dupKeys[fileKey] = 1;
+      if (existing) actualizar++; else crear++;
+    });
+    return { crear, actualizar, omitir, errores, total: (state.parsed.rows || []).length, coll: cfg.coll };
+  }
+
   function conciliarRows(kind) {
     const cfg = IMPORT_MAP[kind]; if (!cfg || !state.parsed) return { rows: [], noCreados: [], noAplicados: [] };
     const idx = mapHeaders(kind, state.parsed.headers);
@@ -511,8 +537,20 @@ Orbit.importa = (function () {
       ? ('🧠 <b>Extracción inteligente (IA):</b> leí el documento y estructuré <b>' + real.total + ' registros</b> de <b>' + U.esc(state.files[0] || 'tu archivo') + '</b> detectando los campos automáticamente.')
       : ('🧠 Leí <b>' + real.total + ' registros</b> de <b>' + U.esc(state.files[0] || 'tu archivo') + '</b> y mapeé <b>' + real.mapped + '/' + real.totalCols + ' columnas</b> a Orbit 360.' + (real.mapped === 0 ? ' <b>No reconocí columnas</b> — usá <b>🔄 Iterar / mejorar</b> para asignarlas a mano, o modo documental.' : (real.mapped < real.totalCols ? ' Las columnas no reconocidas se ignoran.' : '')))
     ) + '</div>') : (state.parsed && !IMPORT_MAP[state.kind] ? `<div class="imp-note" style="margin-top:0;margin-bottom:10px">📄 Archivo recibido. Esta sección usa el extractor de backend en producción; abajo se muestra un ejemplo del mapeo.</div>` : '');
+    // Resumen pre-escritura (dry-run): crear / actualizar / omitir + errores por fila
+    const dr = (real && real.mapped > 0 && !det) ? dryRun(state.kind) : null;
+    const drCard = dr ? `<div class="card" style="overflow:hidden;margin:12px 0;border:1px solid var(--line)">
+      <div style="padding:9px 13px;background:var(--soft,#f5f5f5);font-family:var(--f-display);font-weight:700;font-size:13px">🔎 Resumen antes de guardar · ${dr.coll}</div>
+      <div style="display:flex;gap:0;text-align:center">
+        <div style="flex:1;padding:12px 6px;border-right:1px solid var(--line)"><div style="font-family:var(--f-display);font-size:22px;font-weight:800;color:var(--ok,#1F8A5B)">${dr.crear}</div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Crear nuevos</div></div>
+        <div style="flex:1;padding:12px 6px;border-right:1px solid var(--line)"><div style="font-family:var(--f-display);font-size:22px;font-weight:800;color:var(--info,#2A6FDB)">${dr.actualizar}</div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Actualizar</div></div>
+        <div style="flex:1;padding:12px 6px"><div style="font-family:var(--f-display);font-size:22px;font-weight:800;color:var(--muted,#888)">${dr.omitir}</div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Omitir</div></div>
+      </div>
+      ${dr.errores.length ? `<div style="padding:9px 13px;border-top:1px solid var(--line);background:rgba(197,22,46,.05)"><b style="font-size:12px;color:var(--danger,#C5162E)">⚠ ${dr.errores.length} fila(s) con avisos:</b><div style="max-height:120px;overflow:auto;margin-top:5px">${dr.errores.slice(0, 12).map(e => `<div style="font-size:11.5px;color:var(--ink-2)">Fila ${e.fila}: ${U.esc(e.motivo)}</div>`).join('')}${dr.errores.length > 12 ? `<div class="muted" style="font-size:11px">…y ${dr.errores.length - 12} más</div>` : ''}</div></div>` : '<div style="padding:8px 13px;border-top:1px solid var(--line);font-size:12px;color:var(--ok,#1F8A5B)">✓ Sin errores de formato. La dedup evita duplicados (actualiza en vez de duplicar).</div>'}
+    </div>` : '';
     return `${scopeNote}${mapNote}<p class="imp-desc">Detectamos y mapeamos estos registros. Revisa antes de confirmar.</p>
       <div class="imp-scan"><span class="imp-spark">🧠</span> Extracción ${state.iterado ? 'refinada (' + state.iterado + 'ª pasada)' : 'completada'} · <b>${nReg} registros</b> reconocidos · 0 errores de formato.<button class="btn ghost sm" id="imp-iterar" style="margin-left:auto">🔄 Iterar / mejorar</button></div>
+      ${drCard}
       <div class="card" style="overflow:hidden;margin-top:12px"><div style="overflow-x:auto"><table class="tbl" style="min-width:max-content"><thead><tr>${cols.map(c => `<th style="white-space:nowrap">${U.esc(c)}</th>`).join('')}</tr></thead>
         <tbody>${sample.map(row => `<tr>${row.map((cell, i) => `<td${i === 0 ? ' style="font-weight:600"' : ''}>${U.esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>
       ${assoc}

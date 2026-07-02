@@ -134,7 +134,16 @@ Orbit.modules.portal = (function () {
     const cli = S().get('clientes', clienteId);
     const arr = notifsDe(clienteId);
     arr.forEach(n => { if (!n.leida) S().update('notifs', n.id, { leida: true }); });
-    drawer('🔔 Notificaciones', arr.length ? arr.map(n => `<div class="pt-row"><span class="pt-row-ic">${n.tipo === 'cobro' ? '💳' : n.tipo === 'renovacion' ? '🔄' : '📢'}</span><div style="flex:1"><b>${U.esc(n.titulo)}</b><div class="muted" style="font-size:11.5px">${U.esc(n.cuerpo)}</div><div class="muted" style="font-size:10.5px;margin-top:3px">${U.fmtDate(n.fecha)}</div></div></div>`).join('') : '<div class="pt-empty">Sin notificaciones.</div>', null, 'Cerrar', () => render(host));
+    drawer('🔔 Notificaciones', arr.length ? arr.map(n => `<div class="pt-row pt-click" data-ntf="${n.id}"><span class="pt-row-ic">${n.tipo === 'cobro' ? '💳' : n.tipo === 'renovacion' ? '🔄' : '📢'}</span><div style="flex:1"><b>${U.esc(n.titulo)}</b><div class="muted" style="font-size:11.5px">${U.esc((n.cuerpo || '').slice(0, 70))}${(n.cuerpo || '').length > 70 ? '…' : ''}</div><div class="muted" style="font-size:10.5px;margin-top:3px">${U.fmtDate(n.fecha)} ›</div></div></div>`).join('') : '<div class="pt-empty">Sin notificaciones.</div>', null, 'Cerrar', () => render(host));
+    setTimeout(() => { document.querySelectorAll('[data-ntf]').forEach(b => b.addEventListener('click', () => { const n = S().get('notifs', b.dataset.ntf); if (n) verNotifDetalle(n); })); }, 40);
+  }
+  function verNotifDetalle(n) {
+    const icon = n.tipo === 'cobro' ? '💳' : n.tipo === 'renovacion' ? '🔄' : '📢';
+    const html = `<div style="text-align:center;font-size:40px">${icon}</div>
+      <h3 style="font-family:var(--f-display);text-align:center;margin:6px 0 2px">${U.esc(n.titulo)}</h3>
+      <div class="muted" style="text-align:center;font-size:12px;margin-bottom:14px">${U.fmtDate(n.fecha)} · ${n.tipo}</div>
+      <p style="line-height:1.65;font-size:14px;white-space:pre-wrap">${U.esc(n.cuerpo || '')}</p>`;
+    drawer('Notificación', html, null, 'Cerrar');
   }
   /* ---- Admin: enviar notificación a uno o a todos ---- */
   function adminNotif() {

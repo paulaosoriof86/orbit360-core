@@ -70,11 +70,18 @@ Orbit.modules.renovaciones = (function () {
   }
   /* ---- Campaña de renovación por LOTE ---- */
   function campana() {
-    const arr = q.renovacionesProximas(60).filter(p => { const c = S().get('clientes', p.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }).sort((a, b) => (a.vigenciaFin || '').localeCompare(b.vigenciaFin || ''));
+    const base = q.renovacionesProximas(60).filter(p => { const c = S().get('clientes', p.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }).sort((a, b) => (a.vigenciaFin || '').localeCompare(b.vigenciaFin || ''));
+    let fAse = '', fRamo = '';
+    let arr = base.slice();
     const incl = new Set(arr.map(p => p.id));
     let back = document.getElementById('ren-lote'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'ren-lote'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    function aplicaFiltro() {
+      arr = base.filter(p => (!fAse || p.asesorId === fAse) && (!fRamo || p.ramo === fRamo));
+      incl.clear(); arr.forEach(p => incl.add(p.id));
+      paint();
+    }
     function paint() {
       const sel = arr.filter(p => incl.has(p.id));
       back.querySelector('#rl-body').innerHTML = arr.map(p => {
@@ -90,6 +97,10 @@ Orbit.modules.renovaciones = (function () {
     back.innerHTML = `<div class="card" style="width:min(620px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
       <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">📤 Campaña de renovación</b><button class="imp-x" id="rl-x">✕</button></div>
       <div class="cfg-note" style="margin:14px 16px 0">Selecciona las pólizas a notificar. Se envía <b>WhatsApp + correo</b> con propuesta de renovación generada por IA y queda en el <b>historial de cada cliente</b>.</div>
+      <div style="padding:10px 16px 0;display:flex;gap:8px;flex-wrap:wrap">
+        <select id="rl-fase" class="o-sel" style="width:auto"><option value="">Todos los asesores</option>${S().all('asesores').map(a => `<option value="${a.id}">${U.esc(a.nombre)}</option>`).join('')}</select>
+        <select id="rl-framo" class="o-sel" style="width:auto"><option value="">Todos los ramos</option>${[...new Set(base.map(p => p.ramo))].map(r => `<option>${U.esc(r)}</option>`).join('')}</select>
+      </div>
       <div id="rl-body" style="padding:12px 16px;overflow:auto;flex:1;display:grid;gap:7px"></div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><span class="muted" id="rl-n"></span><div style="display:flex;gap:8px"><button class="btn ghost" id="rl-cancel">Cancelar</button><button class="btn primary" id="rl-ok">📲 Enviar campaña</button></div></div>
     </div>`;
@@ -98,6 +109,8 @@ Orbit.modules.renovaciones = (function () {
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#rl-x').addEventListener('click', close);
     back.querySelector('#rl-cancel').addEventListener('click', close);
+    const fa = back.querySelector('#rl-fase'); if (fa) fa.addEventListener('change', () => { fAse = fa.value; aplicaFiltro(); });
+    const fr = back.querySelector('#rl-framo'); if (fr) fr.addEventListener('change', () => { fRamo = fr.value; aplicaFiltro(); });
     back.querySelector('#rl-ok').addEventListener('click', () => {
       const sel = arr.filter(p => incl.has(p.id));
       sel.forEach(p => {

@@ -41,7 +41,7 @@ Orbit.modules.cancelaciones = (function () {
         <b style="font-family:var(--f-display);font-size:15px">Motivos de cancelación</b>
         <div style="margin-top:14px;display:grid;gap:10px">
           ${Object.entries(porMotivo).sort((a, b) => b[1] - a[1]).map(([m, n], i) => `
-            <div style="display:flex;align-items:center;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="Orbit.modules.cancelaciones.filtrarMotivo('${U.esc(m).replace(/'/g, '')}')" title="Ver solo estas cancelaciones">
               <span style="width:150px;font-size:13px;font-weight:600">${m}</span>
               <div class="bar" style="flex:1"><i style="width:${n / motTot * 100}%;background:${motCols[i % motCols.length]}"></i></div>
               <span class="mono" style="font-size:12px;width:60px;text-align:right">${n} · ${Math.round(n / motTot * 100)}%</span>
@@ -153,5 +153,6 @@ Orbit.modules.cancelaciones = (function () {
     });
   }
 
-  return { render, detalle };
+  function filtrarMotivo(m) { st.fmot = m; const host = document.getElementById('host'); if (host) render(host); }
+  return { render, detalle, filtrarMotivo };
 })();

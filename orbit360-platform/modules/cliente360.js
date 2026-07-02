@@ -514,6 +514,7 @@ Orbit.modules.cliente360 = (function () {
           <label class="ce-l" style="margin:0">📄 Factura de la aseguradora <span class="muted">(opcional)</span><input id="ap-file" type="file" class="o-sel" accept="image/*,application/pdf"></label>
           <label class="ce-l" id="ap-real-wrap" style="display:none;margin-top:9px">Fecha real en que pagó la aseguradora<input id="ap-real" class="o-sel" type="date" value="2026-06-20"></label>
           <div class="muted" style="font-size:11px;margin-top:7px">Cargar la factura fija la <b>fecha real</b> del pago y <b>concilia</b> el recibo (medio adicional de conciliación). Sin factura, el recibo queda <b>Pagado · por conciliar</b>.</div>
+          <label class="ce-l" style="margin-top:11px;display:flex;align-items:center;gap:8px;flex-direction:row;cursor:pointer"><input id="ap-avisar" type="checkbox" checked style="width:auto"> 📲 Avisar al cliente (WhatsApp / correo)</label>
         </div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
@@ -533,7 +534,16 @@ Orbit.modules.cliente360 = (function () {
         conciliado, facturaNombre: factura || '', fechaReal: conciliado ? $('#ap-real').value : ''
       });
       S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: (p && p.asesorId) || '', tipo: 'sistema', icon: '💳', fecha: $('#ap-fecha').value, titulo: 'Pago aplicado · ' + (p ? p.numero : ''), detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (conciliado ? ' · conciliado con factura (' + factura + ')' : ' · por conciliar') });
-      close(); detalle(cid);
+      const avisar = $('#ap-avisar') && $('#ap-avisar').checked;
+      close();
+      if (avisar) {
+        Orbit.notify.pedir(cid, {
+          tipo: 'Aviso de pago aplicado', icon: '💳',
+          asunto: 'Confirmación de pago · póliza ' + (p ? p.numero : ''),
+          mensaje: 'Hola ' + (r.cli.nombre || '') + ', confirmamos la aplicación de tu pago de ' + U.money(c.monto, c.moneda) + ' (cuota ' + c.cuota + ') de la póliza ' + (p ? p.numero : '') + '. ¡Gracias por tu confianza!',
+          onSent: () => detalle(cid)
+        });
+      } else { detalle(cid); }
     });
   }
 
