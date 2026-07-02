@@ -1,7 +1,7 @@
 # PENDIENTES CLAUDE POST V99 / V1.73 - Orbit 360
 
-Fecha actualización: 2026-07-01 19:38 local
-Estado: documento vivo tras recuperación V99, empalme visual Claude v1.73, Backend LAB protegido validado y Fase 8 preparada.
+Fecha actualización: 2026-07-01 19:42 local
+Estado: documento vivo tras recuperación V99, empalme visual Claude v1.73, Backend LAB protegido validado y Fase 8 completada.
 
 ## Regla de separación
 
@@ -28,18 +28,20 @@ Estado: documento vivo tras recuperación V99, empalme visual Claude v1.73, Back
 - Backend LAB detectado `firestore-lab`: COMPLETADO.
 - Tenant `alianzas-soluciones`: COMPLETADO.
 - Sin errores JS globales en smoke: COMPLETADO.
+- Fase 8 - Firestore LAB real por colecciones v1.73: COMPLETADO.
 
 ## Gate Fase 8
 
-- Fase 8 - Firestore LAB real por colecciones v1.73: PREPARADO EN GITHUB.
+- Fase 8 - Firestore LAB real por colecciones v1.73: COMPLETADO.
 - Cambio directo aplicado en `data/store-firestore-lab.local.js` sobre la rama `backend/v99-clean-claude-lab-20260701`.
 - Nuevo hook LAB v1.73: cache sincrónico, `onSnapshot` por colección, preferencias por tenant, diagnóstico `OrbitBackend.status()`, sin fallback a seed/localStorage/demo como fuente de verdad.
-- Documento técnico creado: `docs/GATE-FASE8-FIRESTORE-LAB-V173.md`.
-- Pendiente: ejecutar smoke local corto tras `git pull` para pasar Fase 8 de PREPARADO a COMPLETADO.
+- Documento técnico actualizado: `docs/GATE-FASE8-FIRESTORE-LAB-V173.md`.
+- Smoke local tras `git pull`: OK.
+- Rama local después del smoke: limpia.
 
 ## Resultado técnico validado para no repetir
 
-Fase 7D validó:
+Fase 7D validó después de Fase 8:
 
 - `window.Orbit`: true.
 - `Orbit.store`: true.
@@ -49,6 +51,7 @@ Fase 7D validó:
 - `backendTenant`: `alianzas-soluciones`.
 - Sin errores JS globales.
 - Resultado: `OK_CON_ADVERTENCIAS_SI_LAS_HAY`.
+- Git local: árbol limpio.
 
 ## Pendientes P0 para Claude / prototipo visual
 
@@ -75,10 +78,10 @@ Fase 7D validó:
 
 ## Pendientes técnicos para ChatGPT/Codex
 
-1. Ejecutar smoke local corto de Fase 8 después de `git pull`.
-2. Confirmar `OrbitBackend.apiVersion = v1.73-firestore-lab`.
-3. Confirmar `OrbitBackend.collections.length = 27`.
-4. Confirmar `OrbitBackend.status()` y `snapshotAttached/snapshotAttachedCount` según disponibilidad de Firebase SDK/Auth LAB.
+1. Fase 9: validar Auth/Firebase LAB sobre `index.html` central con usuario LAB y snapshots reales, sin `index-dev-firestore`.
+2. Confirmar `OrbitBackend.apiVersion = v1.73-firestore-lab` en smoke extendido.
+3. Confirmar `OrbitBackend.collections.length = 27` en smoke extendido.
+4. Confirmar `OrbitBackend.status()` y `snapshotAttached/snapshotAttachedCount` con Firebase SDK/Auth LAB.
 5. Mantener `index-dev-firestore` solo como legacy NO-USAR.
 6. Documentar cada cambio en bitácoras antes de cerrar gate.
 
