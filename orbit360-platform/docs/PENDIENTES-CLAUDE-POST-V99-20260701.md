@@ -1,24 +1,26 @@
 # PENDIENTES CLAUDE POST V99 / V1.73 - Orbit 360
 
-Fecha actualización: 2026-07-01 19:42 local
-Estado: documento vivo tras recuperación V99, empalme visual Claude v1.73, Backend LAB protegido validado y Fase 8 completada.
+Fecha actualización: 2026-07-02
+Estado: documento vivo para Claude tras empalme visual v1.73, Backend LAB Fase 8 completada y Fase 9 pausada.
 
 ## Regla de separación
 
 - Claude: prototipo, UX, módulos, configuración, pantallas, autoadministración, corrección visual, flujos clickeables, textos, encoding y experiencia comercial.
 - ChatGPT/Codex: backend, Firestore, Auth, Orbit.store, scripts LAB, validación técnica, PR, smoke contractual y documentación técnica.
 
+Claude no debe tocar `data/store-firestore-lab.local.js`, Auth/Firebase LAB, reglas Firestore ni configuración local. Si necesita datos, debe usar `Orbit.store`.
+
 ## Metodología ágil adoptada desde v1.73
 
 1. No más bloques largos pegados directo en PowerShell salvo emergencia.
-2. ChatGPT/Codex hará directo en GitHub todo lo que sea documentación, auditoría, PR, preparación de scripts y seguimiento.
-3. Si algo requiere equipo local, Firebase CLI o navegador local, se entregará un `.ps1` descargable o un comando corto de una línea.
+2. ChatGPT/Codex hará directo en GitHub lo que sea documentación, auditoría, PR, preparación de scripts y seguimiento.
+3. Si algo requiere equipo local, se usará `.ps1` descargable o comando corto.
 4. Cada gate debe tener estado claro: PREPARADO / EJECUTADO / FALLIDO / COMPLETADO.
 5. No repetir gates ya completados.
 6. Si Claude entrega ZIP nuevo, se trata como mini-release: auditar, aplicar solo si es seguro, preservar backend, documentar y smoke.
 7. Los scripts deben detenerse al primer error y no documentar éxito si fallan.
 
-## Gates completados v1.73
+## Gates técnicos cerrados o pausados
 
 - Instalación base visual v1.73: COMPLETADO.
 - Saneamiento funcional v1.73B: COMPLETADO.
@@ -29,66 +31,138 @@ Estado: documento vivo tras recuperación V99, empalme visual Claude v1.73, Back
 - Tenant `alianzas-soluciones`: COMPLETADO.
 - Sin errores JS globales en smoke: COMPLETADO.
 - Fase 8 - Firestore LAB real por colecciones v1.73: COMPLETADO.
+- Fase 9 - Auth/Firebase LAB: PAUSADO por configuración local y riesgo visual; no corresponde a Claude.
 
-## Gate Fase 8
+## P0 Claude - Regresión de encoding/mojibake
 
-- Fase 8 - Firestore LAB real por colecciones v1.73: COMPLETADO.
-- Cambio directo aplicado en `data/store-firestore-lab.local.js` sobre la rama `backend/v99-clean-claude-lab-20260701`.
-- Nuevo hook LAB v1.73: cache sincrónico, `onSnapshot` por colección, preferencias por tenant, diagnóstico `OrbitBackend.status()`, sin fallback a seed/localStorage/demo como fuente de verdad.
-- Documento técnico actualizado: `docs/GATE-FASE8-FIRESTORE-LAB-V173.md`.
-- Smoke local tras `git pull`: OK.
-- Rama local después del smoke: limpia.
+### Síntoma
 
-## Resultado técnico validado para no repetir
+Después del empalme v1.73 se evidenció regresión de encoding en UI. En el HEAD limpio `41ad868` los textos estaban correctos; en la rama posterior aparecieron textos como:
 
-Fase 7D validó después de Fase 8:
+- `IngresÃ¡` en lugar de `Ingresá`.
+- `sesiÃ³n` en lugar de `sesión`.
+- `paÃ­ses` en lugar de `países`.
+- `GestiÃ³n` en lugar de `Gestión`.
+- `PÃ³lizas` en lugar de `Pólizas`.
+- símbolos dañados como `Â·`, `â€”`, `â†’`, `ðŸ`.
 
-- `window.Orbit`: true.
-- `Orbit.store`: true.
-- API expandida completa: true.
-- `pref/setPref` roundtrip: true.
-- `backendMode`: `firestore-lab`.
-- `backendTenant`: `alianzas-soluciones`.
-- Sin errores JS globales.
-- Resultado: `OK_CON_ADVERTENCIAS_SI_LAS_HAY`.
-- Git local: árbol limpio.
+### Esperado
 
-## Pendientes P0 para Claude / prototipo visual
+Todos los HTML/JS/CSS y datos demo visibles deben mantenerse en UTF-8 correcto. Claude debe validar visualmente login, topbar, sidebar, modales y módulos.
 
-1. Corregir mojibake/encoding visible en UI: textos como `IngresÃ¡`, `sesiÃ³n`, `paÃ­ses`, símbolos y emojis dañados. Esto es visual/base, no backend.
-2. Ocultar badges técnicos/estado como `BETA`, `NUCLEO`, `PROX` en modo cliente/comercial. Pueden existir solo en modo interno/demo.
-3. Revisar textos de login, chrome visual, menú lateral y topbar tras empalme v1.73.
-4. Mantener la marca Orbit 360 en chrome y logo cliente solo en slot white-label.
-5. No mostrar notas técnicas en UI cliente.
+### Criterio de aceptación
 
-## Pendientes P1 para Claude / módulos y UX
+Deben verse correctamente: `Ingresá`, `Iniciar sesión`, `contraseña`, `administración`, `¿Problemas al ingresar? → Limpiar sesión`, `Gestión`, `Pólizas`, `países`, `Operación` e iconografía limpia.
 
-1. Configuración debe ser 100% autoadministrable: marca, países, monedas, impuestos, aseguradoras, catálogos, usuarios, roles, permisos, integraciones, APIs, planes, tarifas, comisiones, metas, presupuesto, plantillas, automatizaciones, correo y white-label.
-2. Inicio no debe quedar amarrado a junio 2026. Metas del mes debe leer fecha viva y datos vivos.
-3. Avance por asesor debe abrir analítica/metas filtrada por asesor.
-4. Tablón y prioridades deben ser clickeables y con detalle.
-5. Plantillas debe permitir crear, editar, eliminar, duplicar, usar sin alert nativo, seleccionar cliente/canal e historial.
-6. Reportes debe permitir crear, editar, borrar, duplicar, programar, exportar y abrir detalle.
-7. Finanzas requiere selector por país/moneda sin mezclar monedas, histórico, CxC, CxP, conciliación, movimientos, comisiones, presupuestos, metas y liquidaciones.
-8. Finanzas debe migrar a lectura desde `finmovs`; no debe depender de arreglos locales duros.
-9. Aseguradoras requiere fichas editables con contactos, accesos, Drive, cuentas, productos, clausulados, plantillas, tarifarios, facturación y vínculos al cotizador/comparativo.
-10. Marketing requiere calendario real editable, importación desde Excel, piezas por canal, estado, responsable, aprobación, programación e integraciones.
-11. Sustituir `alert/confirm/prompt` por modales Orbit.
-12. Revisar fechas vivas aún detectadas previamente en `core/ciclo.js`, `modules/portal.js`, `modules/siniestros.js`, `modules/cliente360.js`.
+## P0 Claude - Badges técnicos visibles
 
-## Pendientes técnicos para ChatGPT/Codex
+En modo cliente/comercial/white-label no deben verse badges como `BETA`, `NÚCLEO`, `PROX`, `ROAD` ni notas técnicas. Pueden existir solo en modo interno/demo controlado por configuración.
 
-1. Fase 9: validar Auth/Firebase LAB sobre `index.html` central con usuario LAB y snapshots reales, sin `index-dev-firestore`.
-2. Confirmar `OrbitBackend.apiVersion = v1.73-firestore-lab` en smoke extendido.
-3. Confirmar `OrbitBackend.collections.length = 27` en smoke extendido.
-4. Confirmar `OrbitBackend.status()` y `snapshotAttached/snapshotAttachedCount` con Firebase SDK/Auth LAB.
-5. Mantener `index-dev-firestore` solo como legacy NO-USAR.
-6. Documentar cada cambio en bitácoras antes de cerrar gate.
+## P0 Claude - Flujo Portal / Gestiones / Siniestros inconsistente
 
-## Regla de documentación permanente
+### Reporte de prueba
 
-Toda mejora o bug debe documentarse con fecha, módulo, síntoma/necesidad, esperado, causa raíz si aplica, archivo/función, fix/mejora, impacto comercializable y estado.
+Paula probó el Portal cliente:
+
+1. Solicitó una gestión desde Portal.
+2. Esa gestión apareció en Ops.
+3. Reportó un siniestro de prueba.
+4. El siniestro apareció en Ops y en Historial.
+5. No apareció en el módulo Siniestros.
+6. No apareció en la ficha de siniestros del cliente.
+
+### Dónde debe estar una Gestión
+
+Una gestión debe ser una actividad/solicitud operativa transversal. Debe quedar trazable en:
+
+- Portal cliente, como origen.
+- Ops, como bandeja de seguimiento.
+- Historial, como línea de tiempo.
+- Cliente 360, como actividad del expediente.
+- Siniestros, si la gestión corresponde a reporte de siniestro/reclamo.
+
+### Esperado para reporte de siniestro desde Portal
+
+Cuando un cliente reporta un siniestro desde Portal debe:
+
+- Crear un registro canónico de siniestro/reclamo.
+- Aparecer en módulo Siniestros.
+- Aparecer en Cliente 360, sección Siniestros.
+- Aparecer en Historial del cliente.
+- Crear o enlazar una gestión en Ops.
+- Compartir identificadores: `clienteId`, `polizaId` si aplica, `reclamoId/siniestroId`, estado, fecha, responsable, prioridad y origen `portal`.
+
+### Archivos/módulos a revisar por Claude
+
+- `modules/portal.js`.
+- `modules/siniestros.js`.
+- `modules/cliente360.js`.
+- `modules/ops.js`.
+- `modules/historial.js`.
+- `core/queries.js` si hay helpers.
+
+### Criterio de aceptación
+
+Caso mínimo:
+
+1. Reportar siniestro desde Portal cliente demo.
+2. Confirmar que aparece en Ops.
+3. Confirmar que aparece en Historial.
+4. Confirmar que aparece en módulo Siniestros.
+5. Confirmar que aparece en ficha Cliente 360 > Siniestros.
+6. Cambiar estado en Siniestros y verificar reflejo en Ops/Historial.
+7. Cerrar gestión en Ops sin borrar el siniestro.
+
+## P1 Claude - Inicio y tablero vivos
+
+Inicio no debe quedar amarrado a junio 2026. Debe leer fecha viva, metas actuales y permitir detalle clickeable en KPIs, tablón, prioridades y avance por asesor.
+
+## P1 Claude - Configuración autoadministrable
+
+Configuración debe permitir administrar sin tocar código: marca, logo, paleta, países, monedas, impuestos, aseguradoras, usuarios, roles, módulos visibles, glosario, tarifas, comisiones, metas, presupuesto, plantillas, automatizaciones, integraciones y portal cliente.
+
+## P1 Claude - Finanzas desde datos vivos
+
+Finanzas debe leer desde `finmovs` y colecciones relacionadas. No debe depender de arreglos locales duros. Debe incluir selector país/moneda, CxC, CxP, conciliación, movimientos, comisiones, presupuestos, metas, liquidaciones, periodos y semáforos.
+
+## P1 Claude - Plantillas, Reportes y Automatizaciones
+
+Plantillas: crear, editar, eliminar, duplicar, usar, seleccionar cliente/canal e historial, sin `alert/prompt/confirm` nativo.
+
+Reportes: crear, editar, borrar, duplicar, programar, exportar y abrir detalle.
+
+Automatizaciones: flujos configurables, sin referencias externas a CXOrbia, Orbia, TyA, shopper u otros proyectos.
+
+## P1 Claude - Aseguradoras
+
+Ficha editable por aseguradora con logo, contactos, accesos, Drive/documentos, cuentas, productos, ramos, clausulados, plantillas, tarifarios, facturación, comisiones, vínculo a cotizador/comparativo y estado activa/inactiva.
+
+## P1 Claude - Marketing
+
+Calendario real editable, importación Excel, piezas por canal, estado, responsable, aprobación, programación e integraciones futuras sin notas técnicas visibles.
+
+## P1 Claude - Fechas vivas
+
+Revisar fechas o ciclos hardcodeados en `core/ciclo.js`, `modules/portal.js`, `modules/siniestros.js`, `modules/cliente360.js` y cualquier módulo amarrado a un periodo fijo.
+
+## P1 Claude - Modales Orbit
+
+Sustituir `alert()`, `confirm()` y `prompt()` por patrones Orbit: `drawer-back`, `Orbit.ui.confirm`, banners y modales consistentes.
+
+## Criterios de entrega para Claude
+
+Claude debe entregar ZIP mini-release con cambios mínimos, sin tocar backend/Auth/Firestore, sin romper `Orbit.store`, sin `localStorage` directo en módulos, sin notas técnicas visibles, sin mojibake, sin referencias a proyectos ajenos, con validación visual real y bitácoras actualizadas.
+
+## Prioridad sugerida
+
+1. Encoding/mojibake.
+2. Ocultar badges técnicos en modo cliente.
+3. Portal -> Siniestros -> Cliente 360 -> Historial -> Ops.
+4. Configuración autoadministrable.
+5. Finanzas desde `finmovs`.
+6. Plantillas/Reportes/Automatizaciones clickeables.
+7. Aseguradoras y Marketing con profundidad comercial.
 
 ## Estado
 
-ABIERTO - aplicar a prototipo base Orbit 360 y mantener sincronizado con Backend LAB.
+ABIERTO - paquete curado para Claude/prototipo UX y módulos.
