@@ -27,8 +27,10 @@ Orbit.modules.finanzas = (function () {
   const MM = (n) => U.money(n, 'GTQ');
   const sum = (arr, f) => arr.reduce((s, x) => s + norm(f(x), x.moneda), 0);
 
+  let mesInit = false;
   function render(host) {
-    const TABS = [['movimientos', '🧾 Movimientos'], ['dashboard', '📊 Dashboard'], ['cxcp', '💳 CxC / CxP'], ['financiacion', '🏦 Financiación'], ['presupuesto', '📋 Presupuesto'], ['empresa', '🏢 Liq. empresa'], ['asesores', '👥 Liq. asesores'], ['banco', '🔗 Conciliación'], ['ia', '✨ Análisis IA']];
+    if (!mesInit) { const ps = periodos(); if (ps.length && !movs(mesSel).length) mesSel = ps[0]; mesInit = true; }
+    const TABS = [['movimientos', '🧾 Movimientos'], ['dashboard', '📊 Dashboard'], ['cxcp', '💳 CxC / CxP'], ['financiacion', '🏦 Financiación'], ['presupuesto', '📋 Presupuesto'], ['empresa', '🏢 Liq. empresa'], ['asesores', '👥 Liq. asesores'], ['banco', '🔗 Conciliación'], ['metas', '🎯 Metas'], ['ia', '✨ Análisis IA']];
     const paisLbl = (Orbit.PAISES.find(p => p.id === (Orbit.pais || 'TODOS')) || {}).label || 'Todos los países';
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '💰', title: 'Orbit Finanzas', sub: 'Ingresos, egresos, financiación y presupuesto', features: [], actions: `<div class="ins-controls">
@@ -44,13 +46,13 @@ Orbit.modules.finanzas = (function () {
       tab = el.dataset.t;
       host.querySelectorAll('.tab[data-t]').forEach(t => t.classList.toggle('active', t.dataset.t === tab));
       const b = document.getElementById('fin-body');
-      b.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, ia }[tab] || movimientos)();
+      b.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, metas, ia }[tab] || movimientos)();
       wire(host);
     }));
     const pSel = host.querySelector('#fin-pais'); if (pSel) pSel.addEventListener('change', () => { Orbit.pais = pSel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); render(host); });
     const mSel = host.querySelector('#fin-mes'); if (mSel) mSel.addEventListener('change', () => { mesSel = mSel.value; render(host); });
     const body = document.getElementById('fin-body');
-    body.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, ia }[tab] || movimientos)();
+    body.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, metas, ia }[tab] || movimientos)();
     wire(host);
   }
 
@@ -290,41 +292,8 @@ Orbit.modules.finanzas = (function () {
     }).sort((x, y) => y.aPagar - x.aPagar);
   }
 
-  /* ---------- MOVIMIENTOS ---------- */
-  function resumen() {
-    const cart = q.carteraGlobal();
-    const comp = comisionEmpresaPorAseguradora();
-    const totalCobrar = Object.values(comp).reduce((s, v) => s + v.devengada, 0);
-    const asesoresPagar = comisionAsesor().reduce((s, r) => s + r.pendiente, 0);
-    const movs = [
-      ['2026-06-18', 'Liquidación Seguros Atlas (may)', 12400, 'Ingreso', 'Liquidada'],
-      ['2026-06-15', 'Pago asesor D. Marroquín', -3100, 'Egreso', 'Pagada'],
-      ['2026-06-12', 'Recaudo cliente · REC-00451', 700, 'Ingreso', 'Conciliado'],
-      ['2026-06-10', 'Pago asistencia / gastos', -1250, 'Egreso', 'Registrado'],
-      ['2026-06-05', 'Liquidación Pacífico (may)', 9800, 'Ingreso', 'Por conciliar']
-    ];
-    return `${K.kpis([
-      { label: 'Recaudo del mes', val: U.moneyShort(cart.alDia, 'GTQ'), color: 'var(--ok)', foot: 'prima recaudada', footTone: 'up' },
-      { label: 'Comisión a cobrar', val: U.moneyShort(totalCobrar, 'GTQ'), color: 'var(--red)', foot: 'a aseguradoras' },
-      { label: 'A pagar asesores', val: U.moneyShort(asesoresPagar, 'GTQ'), color: 'var(--warn)', foot: 'pendiente' },
-      { label: 'Cartera vencida', val: U.moneyShort(cart.venc, 'GTQ'), color: 'var(--danger)', foot: 'afecta recaudo', footTone: 'down' }
-    ])}
-    <div class="card pad" style="margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <b style="font-family:var(--f-display);font-size:15px;flex:1">Movimientos</b>
-      <button class="btn ghost sm" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar histórico</button>
-      <button class="btn ghost sm" onclick="Orbit.importa.open('estados-banco')">🏦 Estado bancario</button>
-      <button class="btn primary sm" onclick="Orbit.modules.finanzas.crearMes()">Generar mes</button>
-    </div>
-    <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Fecha</th><th>Concepto</th><th class="num">Monto</th><th>Tipo</th><th>Estado</th></tr></thead>
-      <tbody>${movs.map(m => `<tr>
-        <td style="font-size:12.5px">${U.fmtDate(m[0])}</td>
-        <td><b>${U.esc(m[1])}</b></td>
-        <td class="num" style="color:${m[2] < 0 ? 'var(--danger)' : 'var(--ok)'}">${U.money(m[2], 'GTQ')}</td>
-        <td><span class="badge ${m[3] === 'Ingreso' ? 'ok' : 'neutral'}">${m[3]}</span></td>
-        <td>${U.estadoBadge(m[4])}</td></tr>`).join('')}</tbody>
-    </table></div></div>`;
-  }
+  /* (Eliminada la función muerta `resumen()` — tenía un array de movimientos HARDCODEADO
+     y nunca se invocaba: el dispatch de pestañas usa `movimientos()`, que lee del store.) */
 
   // ---- producción NETA con ajustes por no devengado (cancelaciones) ----
   function produccionNeta() {
@@ -346,126 +315,148 @@ Orbit.modules.finanzas = (function () {
       return sum(S().all('finmovs').filter(m => m.periodo === ym && (!p || m.pais === p) && (tipo === 'ingreso' ? m.tipo === 'ingreso' : m.tipo === 'egreso')), m => m.valor);
     });
   }
-  function dashboard() {
-    const prod = produccionNeta();
-    const anio = +mesSel.slice(0, 4), mi = +mesSel.slice(5) - 1;
-    const ingArr = serieMensual(anio, 'ingreso'), egrArr = serieMensual(anio, 'egreso');
-    const ingPrev = serieMensual(anio - 1, 'ingreso'), egrPrev = serieMensual(anio - 1, 'egreso');
-    // ventana de 6 meses hasta el mes seleccionado
-    const lo = Math.max(0, mi - 5);
-    const meses = MESES.slice(lo, mi + 1), ingresos = ingArr.slice(lo, mi + 1), egresos = egrArr.slice(lo, mi + 1);
-    const maxV = Math.max(1, ...ingresos, ...egresos);
-    const anioActual = ingArr.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const anioAnterior = ingPrev.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const varAnual = anioAnterior > 0 ? Math.round((anioActual / anioAnterior - 1) * 100) : 0;
-    const utilidad = (ingresos[ingresos.length - 1] || 0) - (egresos[egresos.length - 1] || 0);
-    const margen = ingresos[ingresos.length - 1] > 0 ? Math.round(utilidad / ingresos[ingresos.length - 1] * 100) : 0;
-    const egrAcum = egrArr.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const gastoRatio = anioActual > 0 ? Math.round(egrAcum / anioActual * 100) : 0;
-    return `${K.kpis([
-      { label: 'Producción neta', val: U.moneyShort(prod.neta, 'GTQ'), color: 'var(--red)', foot: 'prima neta vigente' },
-      { label: 'Utilidad del mes', val: U.moneyShort(utilidad, 'GTQ'), color: 'var(--ok)', foot: 'ingresos − egresos', footTone: utilidad >= 0 ? 'up' : 'down' },
-      { label: 'Var. interanual', val: (varAnual >= 0 ? '+' : '') + varAnual + '%', color: 'var(--info)', foot: 'vs ' + (anio - 1), footTone: varAnual >= 0 ? 'up' : 'down' },
-      { label: 'Ajuste no devengado', val: '−' + U.moneyShort(prod.ajuste, 'GTQ'), color: 'var(--warn)', foot: 'cancelaciones', footTone: 'down' }
-    ])}
-    <div class="card pad" style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <b style="font-family:var(--f-display);font-size:15px">Ingresos vs egresos · comparativo intermensual</b>
-        <span style="display:flex;gap:14px;font-size:12px"><span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:var(--ok)"></span>Ingresos</span><span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:var(--danger)"></span>Egresos</span></span>
-      </div>
-      <div style="display:flex;align-items:flex-end;gap:14px;height:180px;padding-top:10px">
-        ${meses.map((m, i) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end">
-          <div style="display:flex;gap:3px;align-items:flex-end;height:100%;width:100%;justify-content:center">
-            <div title="Ingresos ${U.money(ingresos[i], 'GTQ')}" style="width:42%;background:linear-gradient(180deg,#34b96a,#1f8a4c);border-radius:4px 4px 0 0;height:${ingresos[i] / maxV * 100}%"></div>
-            <div title="Egresos ${U.money(egresos[i], 'GTQ')}" style="width:42%;background:linear-gradient(180deg,#e0566a,#C5162E);border-radius:4px 4px 0 0;height:${egresos[i] / maxV * 100}%"></div>
-          </div>
-          <span style="font-size:11px;color:var(--ink-3);font-family:var(--f-mono)">${m}</span>
-        </div>`).join('')}
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div class="card pad">
-        <b style="font-family:var(--f-display);font-size:15px">Comparativo interanual · acum. Ene→${MESES[mi]}</b>
-        <div style="display:flex;align-items:flex-end;gap:24px;margin-top:16px">
-          ${[[anio - 1 + '', anioAnterior, '#9aa0a8'], [anio + '', anioActual, 'var(--red)']].map(([y, v, c]) => `<div style="flex:1;text-align:center">
-            <div style="height:120px;display:flex;align-items:flex-end;justify-content:center"><div style="width:60%;background:${c};border-radius:6px 6px 0 0;height:${Math.max(2, v / Math.max(anioActual, anioAnterior, 1) * 100)}%"></div></div>
-            <div style="font-family:var(--f-display);font-weight:800;margin-top:8px">${U.moneyShort(v, 'GTQ')}</div>
-            <div class="muted" style="font-size:12px">${y}</div></div>`).join('')}
-        </div>
-        <div class="cfg-note" style="margin-top:14px">${varAnual >= 0 ? 'Crecimiento' : 'Caída'} <b style="color:${varAnual >= 0 ? 'var(--ok)' : 'var(--danger)'}">${varAnual >= 0 ? '+' : ''}${varAnual}%</b> vs año anterior. Base para fijar metas realistas.</div>
-      </div>
-      <div class="card pad">
-        <b style="font-family:var(--f-display);font-size:15px">Salud financiera</b>
-        <div style="display:grid;gap:11px;margin-top:14px">
-          ${finRow('Margen operativo', margen + '%', margen >= 25 ? 'ok' : 'warn')}
-          ${finRow('Gasto / ingreso (acum.)', gastoRatio + '%', gastoRatio <= 60 ? 'ok' : 'warn')}
-          ${finRow('Ingreso acum. ' + anio, U.moneyShort(anioActual, 'GTQ'), 'info')}
-          ${finRow('Egreso acum. ' + anio, U.moneyShort(egrAcum, 'GTQ'), 'neutral')}
-        </div>
-        <button class="btn primary" style="margin-top:16px;width:100%" onclick="location.hash='#/equipo'">Fijar metas (Equipo y permisos) →</button>
-      </div>
-    </div>`;
-  }
-  function finRow(k, v, tone) {
-    const col = { ok: 'var(--ok)', warn: 'var(--warn)', info: 'var(--info)', neutral: 'var(--ink)' }[tone];
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line-2)"><span style="font-size:13px">${k}</span><b style="font-family:var(--f-display);color:${col}">${v}</b></div>`;
-  }
+  /* (Eliminadas las funciones muertas `dashboard()` y `presupuesto()` 1ª declaración +
+     sus helpers `finRow`/`presupTabla`: eran duplicados por hoisting con arrays
+     HARDCODEADOS y nunca se invocaban — ganan las versiones vivas de más abajo,
+     que leen del store.) */
 
-  /* ---------- PRESUPUESTO ---------- */
-  function presupuesto() {
-    const ingresos = [['Comisiones de aseguradoras', 110000, 124000], ['Financiamiento de primas', 28000, 31500], ['Otros ingresos', 6000, 4200]];
-    const egresos = [['Comisiones a asesores', 38000, 41000], ['Gastos fijos (nómina, renta)', 32000, 32000], ['Operación y asistencia', 12000, 13800], ['Marketing', 8000, 6500]];
-    const tIngP = ingresos.reduce((s, r) => s + r[1], 0), tIngR = ingresos.reduce((s, r) => s + r[2], 0);
-    const tEgP = egresos.reduce((s, r) => s + r[1], 0), tEgR = egresos.reduce((s, r) => s + r[2], 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">📊 Presupuesto vs real del mes. Ingresos por <b>comisiones</b> y <b>financiamiento</b>; egresos por <b>comisiones</b>, <b>gastos fijos</b> y operación. Importable desde el histórico.</div>
-    ${K.kpis([
-      { label: 'Ingresos (real)', val: U.moneyShort(tIngR, 'GTQ'), color: 'var(--ok)', foot: 'ppto ' + U.moneyShort(tIngP, 'GTQ'), footTone: 'up' },
-      { label: 'Egresos (real)', val: U.moneyShort(tEgR, 'GTQ'), color: 'var(--danger)', foot: 'ppto ' + U.moneyShort(tEgP, 'GTQ') },
-      { label: 'Resultado', val: U.moneyShort(tIngR - tEgR, 'GTQ'), color: 'var(--red)', foot: 'utilidad real' },
-      { label: 'Cumpl. ingresos', val: Math.round(tIngR / tIngP * 100) + '%', color: 'var(--info)', foot: 'vs presupuesto' }
-    ])}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${presupTabla('Ingresos', ingresos, 'ok')}
-      ${presupTabla('Egresos', egresos, 'danger')}
-    </div>
-    <button class="btn ghost" style="margin-top:14px" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar histórico de movimientos</button>`;
+  /* ---------- METAS (cumplimiento real vs ideal · empresa/asesor/aseguradora) ---------- */
+  // Medición mensual real, con datos vivos del store:
+  function primaNetaMes(mesKey, filt) {
+    return S().where('polizas', p => (p.vigenciaInicio || p.emision || '').slice(0, 7) === mesKey && (!filt || filt(p)))
+      .reduce((s, p) => s + norm(p.primaNeta || 0, p.moneda), 0);
   }
-  function presupTabla(titulo, rows, tone) {
-    return `<div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">${titulo}</div>
-      <table class="tbl"><thead><tr><th>Categoría</th><th class="num">Ppto</th><th class="num">Real</th><th class="num">%</th></tr></thead>
-      <tbody>${rows.map(r => `<tr><td>${r[0]}</td><td class="num">${U.money(r[1], 'GTQ')}</td><td class="num"><b>${U.money(r[2], 'GTQ')}</b></td><td class="num" style="color:${r[2] >= r[1] ? (tone === 'ok' ? 'var(--ok)' : 'var(--danger)') : 'var(--ink-3)'}">${Math.round(r[2] / r[1] * 100)}%</td></tr>`).join('')}</tbody></table></div>`;
+  function recaudoMes(mesKey, filt) {
+    return S().where('cobros', c => c.estado === 'Pagado' && (c.fechaPago || '').slice(0, 7) === mesKey)
+      .filter(c => { if (!filt) return true; const p = S().get('polizas', c.polizaId); return p && filt(p); })
+      .reduce((s, c) => s + norm(c.monto, c.moneda), 0);
   }
+  function promedioPrima(mesKey, filt, n) {
+    let tot = 0, cnt = 0, y = +mesKey.slice(0, 4), mo = +mesKey.slice(5) - 1;
+    for (let i = 1; i <= (n || 3); i++) { let mm = mo - i, yy = y; while (mm < 0) { mm += 12; yy--; } tot += primaNetaMes(yy + '-' + String(mm + 1).padStart(2, '0'), filt); cnt++; }
+    return cnt ? Math.round(tot / cnt) : 0;
+  }
+  const semaforo = pct => pct >= 100 ? '🟢' : pct >= 70 ? '🟡' : '🔴';
+  const semColor = pct => pct >= 100 ? 'var(--ok)' : pct >= 70 ? 'var(--warn)' : 'var(--danger)';
+  function metaGet(mesKey, tipo, ambitoId) { return (S().all('metas') || []).find(m => m.mes === mesKey && m.tipo === tipo && (m.asesorId || m.aseguradoraId || '') === (ambitoId || '')); }
+  function metaVal(mesKey, tipo, ambitoId, fallback) { const m = metaGet(mesKey, tipo, ambitoId); return (m && +m.valor) || fallback || 0; }
 
-  /* ---------- METAS ---------- */
   function metas() {
-    const prod = produccionNeta();
-    const board = q.leaderboard();
     const p = paisFin() || 'GT', cur = p === 'CO' ? 'COP' : 'GTQ';
-    const mesKey = mesSel;
-    const metaEmp = (S().all('metas') || []).find(m => m.mes === mesKey && m.tipo === 'prima' && !m.asesorId);
-    const metaBase = S().all('asesores').reduce((s, a) => s + (a.metaPrima || 0), 0) || Math.round(prod.neta * 1.1);
-    const metaVal = metaEmp && metaEmp.valor ? +metaEmp.valor : metaBase;
-    return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas sobre <b>prima NETA</b> (no total). Por <b>asesor</b>, <b>empresa</b> y <b>aseguradora</b>, mensual o anual (para incentivos). De aquí derivan metas de recaudo y financieras.</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn primary sm" onclick="Orbit.modules.finanzas.crearMeta()">+ Crear meta</button>
-      <span class="badge ${metaEmp ? 'ok' : 'neutral'}" style="align-self:center">${metaEmp ? '✅ meta cargada para ' + mesKey : 'meta base (sin definir para ' + mesKey + ')'}</span>
+    const mk = mesSel, lbl = MESES[+mk.slice(5) - 1] + ' ' + mk.slice(0, 4);
+    const M2 = n => U.money(n, cur);
+    // EMPRESA
+    const primaReal = primaNetaMes(mk), recReal = recaudoMes(mk);
+    const primaMeta = metaVal(mk, 'prima', '', promedioPrima(mk, null, 3) ? Math.round(promedioPrima(mk, null, 3) * 1.1) : 0);
+    const recMeta = metaVal(mk, 'recaudo', '', Math.round(primaMeta * 0.85));
+    const pP = primaMeta ? Math.round(primaReal / primaMeta * 100) : 0;
+    const pR = recMeta ? Math.round(recReal / recMeta * 100) : 0;
+    const barra = (real, meta, pct) => `<div class="bar" style="margin-top:8px;height:12px"><i style="width:${Math.min(100, pct)}%;background:${pct >= 100 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : pct >= 70 ? 'linear-gradient(90deg,#c9821b,#e0a53a)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div>`;
+    // ASESORES
+    const ases = S().all('asesores').map(a => {
+      const real = primaNetaMes(mk, po => po.asesorId === a.id);
+      const rec = recaudoMes(mk, po => po.asesorId === a.id);
+      const meta = metaVal(mk, 'prima', a.id, promedioPrima(mk, po => po.asesorId === a.id, 3) ? Math.round(promedioPrima(mk, po => po.asesorId === a.id, 3) * 1.1) : 0);
+      const prevReal = primaNetaMes((function () { let y = +mk.slice(0, 4), m = +mk.slice(5) - 2; while (m < 0) { m += 12; y--; } return y + '-' + String(m + 1).padStart(2, '0'); })(), po => po.asesorId === a.id);
+      const pct = meta ? Math.round(real / meta * 100) : 0;
+      const tend = prevReal ? Math.round((real / prevReal - 1) * 100) : 0;
+      return { a, real, rec, meta, pct, tend };
+    }).sort((x, y) => y.real - x.real);
+    // ASEGURADORAS
+    const asgs = S().all('aseguradoras').map(g => {
+      const real = primaNetaMes(mk, po => po.aseguradoraId === g.id);
+      const meta = metaVal(mk, 'prima', g.id, 0);
+      const pct = meta ? Math.round(real / meta * 100) : 0;
+      return { g, real, meta, pct };
+    }).filter(r => r.real > 0 || r.meta > 0).sort((x, y) => y.real - x.real);
+
+    return `<div class="cfg-note" style="margin-bottom:14px">🎯 <b>Cumplimiento real vs ideal</b> de ${lbl} — sobre <b>prima NETA</b> (ventas) y <b>recaudo</b>. De lo general (empresa) a lo particular (asesor · aseguradora). Semáforo: 🟢 ≥100% · 🟡 ≥70% · 🔴 &lt;70%.</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn primary sm" onclick="Orbit.modules.finanzas.crearMeta()">+ Establecer meta</button>
+      <button class="btn sm" style="background:var(--graph);color:#fff" onclick="Orbit.modules.finanzas.metasSugerir()">🤖 Sugerir metas (inteligente)</button>
     </div>
-    <div class="card pad" style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">Meta de la empresa (prima neta)</b><span class="mono" style="font-size:13px">${U.moneyShort(prod.neta, cur)} / ${U.moneyShort(metaVal, cur)}</span></div>
-      <div class="bar" style="margin-top:10px;height:12px"><i style="width:${Math.min(100, Math.round(prod.neta / metaVal * 100))}%"></i></div>
-      <div class="muted" style="font-size:12px;margin-top:7px">Meta de recaudo derivada (78%): <b>${U.moneyShort(metaVal * .78, cur)}</b> · ajuste por no devengado aplicado: −${U.moneyShort(prod.ajuste, cur)}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+      <div class="card pad">
+        <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">${semaforo(pP)} Ventas empresa (prima neta)</b><span class="mono" style="font-size:13px;color:${semColor(pP)}">${pP}%</span></div>
+        ${barra(primaReal, primaMeta, pP)}
+        <div class="muted" style="font-size:12.5px;margin-top:8px">Real <b>${M2(primaReal)}</b> · Meta <b>${M2(primaMeta)}</b> · ${primaMeta ? (primaReal >= primaMeta ? 'Superada por ' + M2(primaReal - primaMeta) : 'Faltan ' + M2(primaMeta - primaReal)) : 'sin meta — usa sugerir'}</div>
+      </div>
+      <div class="card pad">
+        <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">${semaforo(pR)} Recaudo empresa</b><span class="mono" style="font-size:13px;color:${semColor(pR)}">${pR}%</span></div>
+        ${barra(recReal, recMeta, pR)}
+        <div class="muted" style="font-size:12.5px;margin-top:8px">Real <b>${M2(recReal)}</b> · Meta <b>${M2(recMeta)}</b> · índice recaudo/venta <b>${primaReal ? Math.round(recReal / primaReal * 100) : 0}%</b></div>
+      </div>
     </div>
-    <div class="card" style="overflow:hidden"><table class="tbl">
-      <thead><tr><th>Asesor</th><th class="num">Meta neta</th><th class="num">Real neto</th><th>Avance</th><th class="num">Incentivo</th></tr></thead>
-      <tbody>${board.map(b => {
-        const meta = b.asesor.metaPrima, pct = Math.min(140, Math.round(b.prima / meta * 100));
-        return `<tr><td><div style="display:flex;align-items:center;gap:9px">${U.avatar(b.asesor.nombre, b.asesor.color, 'sm')}<b>${U.esc(b.asesor.nombre)}</b></div></td>
-          <td class="num">${U.money(meta, 'GTQ')}</td>
-          <td class="num">${U.money(b.prima, 'GTQ')}</td>
-          <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:90px"><i style="width:${Math.min(100, pct)}%;background:${pct >= 100 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div><span class="mono" style="font-size:12px">${pct}%</span></div></td>
-          <td class="num">${pct >= 100 ? '<span class="badge ok">🏆 Logrado</span>' : '<span class="muted">—</span>'}</td></tr>`;
-      }).join('')}</tbody>
-    </table></div>`;
+    <div class="card" style="overflow:hidden;margin-bottom:16px"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">👥 Cumplimiento por asesor · ${lbl}</div>
+      <div style="overflow-x:auto"><table class="tbl">
+      <thead><tr><th>Asesor</th><th class="num">Meta neta</th><th class="num">Real neto</th><th class="num">Recaudo</th><th>Avance</th><th class="num">vs mes ant.</th></tr></thead>
+      <tbody>${ases.map(r => `<tr>
+        <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(r.a.nombre, r.a.color, 'sm')}<b>${U.esc(r.a.nombre)}</b></div></td>
+        <td class="num">${r.meta ? M2(r.meta) : '<span class="muted">—</span>'}</td>
+        <td class="num"><b>${M2(r.real)}</b></td>
+        <td class="num" style="color:var(--info)">${M2(r.rec)}</td>
+        <td><div style="display:flex;align-items:center;gap:8px"><span>${semaforo(r.pct)}</span><div class="bar" style="width:80px"><i style="width:${Math.min(100, r.pct)}%;background:${semColor(r.pct)}"></i></div><span class="mono" style="font-size:12px;color:${semColor(r.pct)}">${r.pct}%</span></div></td>
+        <td class="num" style="color:${r.tend >= 0 ? 'var(--ok)' : 'var(--danger)'}">${r.tend >= 0 ? '▲' : '▼'} ${Math.abs(r.tend)}%</td></tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">Sin producción en el mes.</td></tr>'}</tbody>
+    </table></div></div>
+    <div class="card" style="overflow:hidden"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">🏛️ Cumplimiento por aseguradora · ${lbl}</div>
+      <div style="overflow-x:auto"><table class="tbl">
+      <thead><tr><th>Aseguradora</th><th class="num">Meta neta</th><th class="num">Real neto</th><th class="num">% del total</th><th>Avance</th></tr></thead>
+      <tbody>${asgs.map(r => { const share = primaReal ? Math.round(r.real / primaReal * 100) : 0; return `<tr>
+        <td>${r.g ? `<span style="display:flex;align-items:center;gap:8px"><span class="dot-s" style="background:${r.g.color || '#888'}"></span><b>${U.esc(r.g.nombre)}</b></span>` : '—'}</td>
+        <td class="num">${r.meta ? M2(r.meta) : '<span class="muted">—</span>'}</td>
+        <td class="num"><b>${M2(r.real)}</b></td>
+        <td class="num">${share}%</td>
+        <td>${r.meta ? `<div style="display:flex;align-items:center;gap:8px"><span>${semaforo(r.pct)}</span><span class="mono" style="font-size:12px;color:${semColor(r.pct)}">${r.pct}%</span></div>` : '<span class="muted">sin meta</span>'}</td></tr>`; }).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin producción en el mes.</td></tr>'}</tbody>
+    </table></div></div>`;
+  }
+
+  // Motor de sugerencia de metas: promedio 3 meses + crecimiento, coherente con presupuesto
+  function metasSugerir() {
+    const p = paisFin() || 'GT', cur = p === 'CO' ? 'COP' : 'GTQ', mk = mesSel;
+    const M2 = n => U.money(n, cur);
+    const promEmp = promedioPrima(mk, null, 3);
+    const crec = 1.1; // +10% sobre promedio (editable)
+    const sugPrima = Math.round(promEmp * crec);
+    const recRate = (function () { const pr = primaNetaMes((function () { let y = +mk.slice(0, 4), m = +mk.slice(5) - 2; while (m < 0) { m += 12; y--; } return y + '-' + String(m + 1).padStart(2, '0'); })()); const rc = recaudoMes((function () { let y = +mk.slice(0, 4), m = +mk.slice(5) - 2; while (m < 0) { m += 12; y--; } return y + '-' + String(m + 1).padStart(2, '0'); })()); return pr ? Math.min(1, rc / pr) : 0.85; })();
+    const sugRec = Math.round(sugPrima * recRate);
+    // coherencia con presupuesto: ingresos presupuestados del mes
+    const ppto = S().all('presupuesto').filter(x => x.pais === p && x.periodo === mk);
+    const pptoIng = ppto.filter(x => (x.tipo || '') === 'ingreso' || /comision|ingreso|financ/i.test(x.categoria || '')).reduce((s, x) => s + (x.monto || 0), 0);
+    const ases = S().all('asesores').map(a => ({ a, sug: Math.round(promedioPrima(mk, po => po.asesorId === a.id, 3) * crec) })).filter(r => r.sug > 0);
+    let back = document.getElementById('fin-sug'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-sug'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = `<div class="card" style="width:min(560px,95vw);padding:0;max-height:90vh;overflow:auto">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🤖 Metas sugeridas · ${MESES[+mk.slice(5) - 1]} ${mk.slice(0, 4)}</b><button class="imp-x" id="sg-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:14px">
+        <div class="cfg-note">Cálculo: promedio de los <b>últimos 3 meses</b> de prima neta (${M2(promEmp)}) × crecimiento <b>+10%</b>. Recaudo = índice histórico recaudo/venta (<b>${Math.round(recRate * 100)}%</b>). ${pptoIng ? 'Coherencia con presupuesto de ingresos del mes: <b>' + M2(pptoIng) + '</b>.' : ''}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <label class="ce-l">Meta ventas empresa (prima neta)<input id="sg-prima" class="o-sel" type="number" value="${sugPrima}"></label>
+          <label class="ce-l">Meta recaudo empresa<input id="sg-rec" class="o-sel" type="number" value="${sugRec}"></label>
+        </div>
+        ${pptoIng && sugPrima > pptoIng * 1.5 ? `<div class="cfg-note" style="border-left:3px solid var(--warn)">⚠️ La meta sugerida supera 1.5× el ingreso presupuestado — revisa coherencia con Presupuesto.</div>` : ''}
+        <div class="card" style="overflow:hidden"><div style="padding:9px 12px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px">Por asesor (editable)</div>
+          <table class="tbl"><tbody>${ases.map(r => `<tr><td><b>${U.esc(r.a.nombre)}</b></td><td class="num"><input class="o-sel sg-ase" data-ase="${r.a.id}" type="number" value="${r.sug}" style="width:120px;text-align:right"></td></tr>`).join('')}</tbody></table>
+        </div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="sg-cancel">Cancelar</button><button class="btn primary" id="sg-ok">✓ Establecer estas metas</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const $ = s => back.querySelector(s); const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#sg-x').addEventListener('click', close); $('#sg-cancel').addEventListener('click', close);
+    $('#sg-ok').addEventListener('click', () => {
+      const up = (tipo, ambitoKey, ambitoId, valor) => {
+        const ex = (S().all('metas') || []).find(m => m.mes === mk && m.tipo === tipo && (m.asesorId || m.aseguradoraId || '') === (ambitoId || ''));
+        const rec = { mes: mk, tipo, valor: +valor || 0 }; rec[ambitoKey] = ambitoId || '';
+        if (ex) S().update('metas', ex.id, { valor: +valor || 0 }); else S().insert('metas', Object.assign({ id: 'meta' + Date.now().toString(36) + Math.floor(Math.random() * 99) }, rec));
+      };
+      up('prima', 'asesorId', '', $('#sg-prima').value);
+      up('recaudo', 'asesorId', '', $('#sg-rec').value);
+      back.querySelectorAll('.sg-ase').forEach(inp => up('prima', 'asesorId', inp.dataset.ase, inp.value));
+      close();
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Metas establecidas — Inicio e Insights ya miden contra ellas'; document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
+      render(document.getElementById('host'));
+    });
   }
 
   function crearMeta() {
@@ -659,14 +650,49 @@ Orbit.modules.finanzas = (function () {
     const mesAnt = mi > 0 ? ingS.cur[mi - 1] : 0;
     const varMM = mesAnt > 0 ? Math.round((ingS.cur[mi] - mesAnt) / mesAnt * 100) : 0;
     const util = acumI - acumE;
+    // --- tablas de respaldo + general→particular (mes seleccionado) ---
+    const mk = mesSel, cur = paisFin() === 'CO' ? 'COP' : 'GTQ';
+    const primaMesEmp = primaNetaMes(mk);
+    // por VENDEDOR (prima neta del mes, recaudo, comisión generada, participación)
+    const board = q.leaderboard ? q.leaderboard() : [];
+    const vend = S().all('asesores').map(a => {
+      const prima = primaNetaMes(mk, po => po.asesorId === a.id);
+      const rec = recaudoMes(mk, po => po.asesorId === a.id);
+      const com = S().where('comisiones', c => c.asesorId === a.id).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
+      return { a, prima, rec, com };
+    }).filter(v => v.prima > 0 || v.rec > 0).sort((x, y) => y.prima - x.prima);
+    const vendTot = vend.reduce((s, v) => s + v.prima, 0) || 1;
+    // por ASEGURADORA
+    const asg = S().all('aseguradoras').map(g => {
+      const prima = primaNetaMes(mk, po => po.aseguradoraId === g.id);
+      const npol = S().where('polizas', po => po.aseguradoraId === g.id && (po.vigenciaInicio || '').slice(0, 7) === mk).length;
+      return { g, prima, npol };
+    }).filter(r => r.prima > 0).sort((x, y) => y.prima - x.prima);
+    const asgTot = asg.reduce((s, r) => s + r.prima, 0) || 1;
+    // intermensual: variación mes a mes
+    const momRows = MESES.slice(Math.max(0, mi - 5), mi + 1).map((m, idx) => { const real = mi - 5 + idx; const ing = ingS.cur[real] || 0, egr = egrS.cur[real] || 0, prev = real > 0 ? (ingS.cur[real - 1] || 0) : 0; return { m, ing, egr, mom: prev ? Math.round((ing - prev) / prev * 100) : 0 }; });
+    // análisis crítico (hallazgos reales)
+    const findings = [];
+    if (vend.length) { const top = vend[0]; findings.push(`<b>${U.esc(top.a.nombre)}</b> lidera la producción del mes con ${U.money(top.prima, cur)} (${Math.round(top.prima / vendTot * 100)}% del total).`); }
+    const bajo = vend.filter(v => v.prima > 0).sort((a, b) => (a.rec / (a.prima || 1)) - (b.rec / (b.prima || 1)))[0];
+    if (bajo && bajo.prima) findings.push(`<b>${U.esc(bajo.a.nombre)}</b> tiene el menor índice recaudo/venta (${Math.round(bajo.rec / bajo.prima * 100)}%) — priorizar cobranza de su cartera.`);
+    if (asg.length) { const c = asg[0]; const conc = Math.round(c.prima / asgTot * 100); if (conc >= 35) findings.push(`Concentración en <b>${U.esc(c.g.nombre)}</b>: ${conc}% de la prima del mes — riesgo de dependencia, diversificar.`); }
+    if (varIA < 0) findings.push(`Ingresos acumulados caen <b>${Math.abs(varIA)}%</b> vs ${ingS.y - 1} — revisar renovaciones y cartera vencida.`);
+    else findings.push(`Ingresos acumulados crecen <b>+${varIA}%</b> vs ${ingS.y - 1}; margen operativo del periodo: ${acumI ? Math.round(util / acumI * 100) : 0}%.`);
+    const recEmp = recaudoMes(mk); if (primaMesEmp && recEmp / primaMesEmp < 0.7) findings.push(`Recaudo del mes es ${Math.round(recEmp / primaMesEmp * 100)}% de la venta — brecha de cobranza a vigilar.`);
+    const tbl = (titulo, head, body) => `<div class="card" style="overflow:hidden;margin-bottom:14px"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">${titulo}</div><div style="overflow-x:auto"><table class="tbl"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>`;
     return `${K.kpis([
       { label: 'Ingresos acum.', val: M(acumI), color: 'var(--ok)', foot: 'Ene→' + MESES[mi] + ' ' + ingS.y },
       { label: 'Utilidad operativa', val: M(util), color: 'var(--red)', foot: 'ingresos − egresos' },
       { label: 'Var. interanual', val: (varIA >= 0 ? '+' : '') + varIA + '%', color: varIA >= 0 ? 'var(--ok)' : 'var(--danger)', foot: 'vs ' + (ingS.y - 1), footTone: varIA >= 0 ? 'up' : 'down' },
       { label: 'Intermensual', val: (varMM >= 0 ? '+' : '') + varMM + '%', color: 'var(--info)', foot: MESES[mi] + ' vs ' + (mi > 0 ? MESES[mi - 1] : '—'), footTone: varMM >= 0 ? 'up' : 'down' }
     ])}
+    <div class="card pad" style="margin-bottom:14px;border-left:3px solid var(--graph)"><b style="font-family:var(--f-display);font-size:15px">🤖 Análisis crítico · ${MESES[mi]} ${ingS.y}</b><ul class="ins-recs" style="margin:10px 0 0;padding-left:18px;line-height:1.7">${findings.map(f => '<li>' + f + '</li>').join('')}</ul></div>
     ${card2('Ingresos vs egresos · ' + ingS.y + ' (intermensual)', dualBars(MESES, ingS.cur, egrS.cur, 'Ingresos', 'Egresos'))}
-    ${card2('Comparativo interanual de ingresos · ' + (ingS.y - 1) + ' vs ' + ingS.y, dualBars(MESES, ingS.prev, ingS.cur, ingS.y - 1 + '', ingS.y + ''))}`;
+    ${tbl('Detalle intermensual (respaldo del gráfico)', '<th>Mes</th><th class="num">Ingresos</th><th class="num">Egresos</th><th class="num">Resultado</th><th class="num">Δ Ingresos MoM</th>', momRows.map(r => `<tr><td>${r.m} ${ingS.y}</td><td class="num" style="color:var(--ok)">${M(r.ing)}</td><td class="num" style="color:var(--danger)">${M(r.egr)}</td><td class="num"><b>${M(r.ing - r.egr)}</b></td><td class="num" style="color:${r.mom >= 0 ? 'var(--ok)' : 'var(--danger)'}">${r.mom >= 0 ? '▲' : '▼'} ${Math.abs(r.mom)}%</td></tr>`).join(''))}
+    ${card2('Comparativo interanual de ingresos · ' + (ingS.y - 1) + ' vs ' + ingS.y, dualBars(MESES, ingS.prev, ingS.cur, ingS.y - 1 + '', ingS.y + ''))}
+    ${tbl('📊 Producción por vendedor · ' + MESES[mi] + ' ' + ingS.y, '<th>Vendedor</th><th class="num">Prima neta</th><th class="num">% del total</th><th class="num">Recaudo</th><th class="num">Índice recaudo</th><th class="num">Comisión gen.</th>', vend.map(v => `<tr><td><div style="display:flex;align-items:center;gap:8px">${U.avatar(v.a.nombre, v.a.color, 'sm')}<b>${U.esc(v.a.nombre)}</b></div></td><td class="num"><b>${U.money(v.prima, cur)}</b></td><td class="num">${Math.round(v.prima / vendTot * 100)}%</td><td class="num" style="color:var(--info)">${U.money(v.rec, cur)}</td><td class="num" style="color:${v.prima && v.rec / v.prima >= 0.7 ? 'var(--ok)' : 'var(--warn)'}">${v.prima ? Math.round(v.rec / v.prima * 100) : 0}%</td><td class="num">${U.money(v.com, cur)}</td></tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:18px">Sin producción en el mes.</td></tr>')}
+    ${tbl('🏛️ Producción por aseguradora · ' + MESES[mi] + ' ' + ingS.y, '<th>Aseguradora</th><th class="num">Prima neta</th><th class="num">% del total</th><th class="num">Pólizas</th>', asg.map(r => `<tr><td><span style="display:flex;align-items:center;gap:8px"><span class="dot-s" style="background:${r.g.color || '#888'}"></span><b>${U.esc(r.g.nombre)}</b></span></td><td class="num"><b>${U.money(r.prima, cur)}</b></td><td class="num">${Math.round(r.prima / asgTot * 100)}%</td><td class="num">${r.npol}</td></tr>`).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:18px">Sin producción en el mes.</td></tr>')}`;
   }
   function card2(t, body) { return `<div class="card pad" style="margin-bottom:14px"><b style="font-family:var(--f-display);font-size:15px">${t}</b><div style="margin-top:14px">${body}</div></div>`; }
   function dualBars(labels, a, b, la, lb) {
@@ -881,5 +907,5 @@ Orbit.modules.finanzas = (function () {
         : '⚠️ Conecta un proveedor de IA en Configuración → Automatizaciones → Motor de IA para análisis en vivo. (Sin IA, el análisis de arriba usa la heurística de la plataforma.)';
     });
   }
-  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
+  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, metasSugerir, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
 })();

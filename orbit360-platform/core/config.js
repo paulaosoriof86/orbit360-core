@@ -217,6 +217,9 @@ Orbit.tenant = (function () {
     paises: ['GT', 'CO'],
     monedaBase: 'GTQ',
     branding: { logo: '', sidebar: 'oscuro', paleta: 'rojo', tipografia: 'Manrope' },
+    // Producto comercializable: etiquetas técnicas (NÚCLEO/BETA/PRÓX) ocultas por defecto.
+    // Poner en false SOLO en modo interno/demo desde Configuración → Marca.
+    hideTechnicalBadges: true,
     // módulos activos (config INTERNA nuestra) — todos los del nav
     modulosActivos: ['inicio', 'cronograma', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'siniestros', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'automatizaciones', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
     addons: { make: false, drive: true, whatsapp: true, correo: true, metricool: false, facebook: false, linkedin: false, web: true, canva: false, gamma: false, heygen: false, ia: false, mailchimp: false, sheets: false },
@@ -226,6 +229,9 @@ Orbit.tenant = (function () {
   let data = null;
   try { const raw = localStorage.getItem(KEY); if (raw) data = JSON.parse(raw); } catch (e) {}
   if (!data) data = JSON.parse(JSON.stringify(DEFAULT));
+  else { // heredar claves nuevas del DEFAULT sin pisar lo que el cliente ya configuró
+    for (const k in DEFAULT) { if (!(k in data)) data[k] = JSON.parse(JSON.stringify(DEFAULT[k])); }
+  }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
   return {
     get: () => data,

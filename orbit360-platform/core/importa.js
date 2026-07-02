@@ -406,7 +406,7 @@ Orbit.importa = (function () {
     const { noCreados, noAplicados } = conciliarRows(kind);
     let creados = 0, aplicados = 0;
     noCreados.forEach((r, i) => { const rec = Object.assign({}, r); delete rec._motivo; delete rec._aplicaA; rec.id = (IMPORT_MAP[kind].coll).slice(0, 3) + '_cc_' + Date.now().toString(36) + i; rec.importado = true; Orbit.store.insert(IMPORT_MAP[kind].coll, rec); creados++; });
-    noAplicados.forEach(r => { if (r._aplicaA) { Orbit.store.update('cobros', r._aplicaA, { estado: 'Pagado', fechaPago: r.vence || new Date().toISOString().slice(0, 10), conciliado: true, metodo: 'Conciliación' }); aplicados++; } });
+    noAplicados.forEach(r => { if (r._aplicaA) { const patchC = { estado: 'Pagado', fechaPago: r.vence || new Date().toISOString().slice(0, 10), conciliado: true, metodo: 'Conciliación' }; Orbit.store.update('cobros', r._aplicaA, patchC); const cob = Orbit.store.get('cobros', r._aplicaA); if (cob && Orbit.q && Orbit.q.postRecaudo) Orbit.q.postRecaudo(cob, patchC.fechaPago, 'Conciliación'); aplicados++; } });
     return { creados, aplicados };
   }
 

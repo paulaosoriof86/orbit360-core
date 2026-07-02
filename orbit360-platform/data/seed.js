@@ -542,19 +542,19 @@ Orbit.SEED = (function () {
   const contenidos = [];
   const MK_CANALES = ['LinkedIn', 'Facebook', 'Instagram', 'WhatsApp', 'TikTok'];
   const MK_TIPOS = ['Texto', 'Carrusel', 'Reel', 'Historia', 'Video'];
-  const MK_ENFOQUES = ['Seguros / Riesgos', 'CX / Mystery', 'Logística', 'Educativo', 'Tendencias', 'Normativa', 'Prospecting'];
+  const MK_ENFOQUES = ['Seguros / Riesgos', 'Servicio al cliente', 'Logística', 'Educativo', 'Tendencias', 'Normativa', 'Prospecting'];
   const MK_ESTADOS = ['Idea', 'Programado', 'Publicado'];
   const mkTitulos = [
     ['🚢 Más control en puerto: ¿y eso qué tiene que ver contigo?', 'Logística'],
     ['📈 Tendencias 2026 en seguros (LatAm): 3 decisiones', 'Tendencias'],
-    ['🕵️‍♀️ Mystery Shopping bien hecho = mejoras reales', 'CX / Mystery'],
+    ['🤝 Servicio al cliente que fideliza: 3 claves', 'Servicio al cliente'],
     ['🚚 Seguro de transporte: 5 preguntas que evitan sorpresas', 'Seguros / Riesgos'],
     ['⚖️ Por qué trabajar con un intermediario registrado', 'Normativa'],
     ['📜 Derecho + CX: una promesa clara evita conflictos', 'Educativo'],
     ['🔐 Riesgos 2026: ciber y AI ya están en el top', 'Prospecting'],
     ['🌧️ El clima ya es riesgo financiero', 'Seguros / Riesgos'],
     ['📡 Seguro paramétrico: pago rápido por evento', 'Tendencias'],
-    ['📦 E-commerce 2026: crece pero la lealtad se pierde', 'CX / Mystery']
+    ['📦 E-commerce 2026: crece pero la lealtad se pierde', 'Servicio al cliente']
   ];
   let mkn = 0;
   const NOWmk = NOW;
@@ -819,7 +819,7 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 33,
+    __v: 34,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos, contenidos, reclamos, cursos, notifs
   };

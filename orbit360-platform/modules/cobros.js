@@ -235,6 +235,7 @@ Orbit.modules.cobros = (function () {
         const patch = { estado: 'Pagado', fechaPago: fecha, metodo, conciliado };
         if (factName) { patch.facturaNombre = factName; patch.fechaReal = fechaReal || fecha; }
         S().update('cobros', cobroId, patch);
+        if (Orbit.q && Orbit.q.postRecaudo) Orbit.q.postRecaudo(Object.assign({}, c, patch), fecha, metodo);
         S().insert('actividades', { id: 'act'+Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'cobro', icon: '💳', fecha, titulo: 'Pago aplicado', detalle: U.money(c.monto, cur) + ' · ' + metodo + (conciliado ? ' · Conciliado' : '') });
         // Fire automations
         const cliObj = S().get('clientes', c.clienteId);

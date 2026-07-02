@@ -1,6 +1,6 @@
 /* ============================================================
    Orbit 360 · Automatizaciones (R10.3)
-   Inspirado en CXOrbia — adaptado a seguros.
+   Motor de automatizaciones para intermediarios de seguros.
    Tabla evento→destino→canal→plantilla→webhook propio.
    Webhook Make por tenant, asistente IA (Gemini), alertas de
    pendientes y registro de disparos.

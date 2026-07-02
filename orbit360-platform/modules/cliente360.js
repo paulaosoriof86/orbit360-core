@@ -529,10 +529,12 @@ Orbit.modules.cliente360 = (function () {
     $('#ap-file').addEventListener('change', e => { factura = e.target.files[0] ? e.target.files[0].name : null; $('#ap-real-wrap').style.display = factura ? '' : 'none'; });
     $('#ap-ok').addEventListener('click', () => {
       const conciliado = !!factura;
-      S().update('cobros', cobroId, {
+      const patchP = {
         estado: 'Pagado', fechaPago: $('#ap-fecha').value, metodo: $('#ap-metodo').value,
         conciliado, facturaNombre: factura || '', fechaReal: conciliado ? $('#ap-real').value : ''
-      });
+      };
+      S().update('cobros', cobroId, patchP);
+      if (Orbit.q && Orbit.q.postRecaudo) Orbit.q.postRecaudo(Object.assign({}, c, patchP), $('#ap-fecha').value, $('#ap-metodo').value);
       S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: (p && p.asesorId) || '', tipo: 'sistema', icon: '💳', fecha: $('#ap-fecha').value, titulo: 'Pago aplicado · ' + (p ? p.numero : ''), detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (conciliado ? ' · conciliado con factura (' + factura + ')' : ' · por conciliar') });
       const avisar = $('#ap-avisar') && $('#ap-avisar').checked;
       close();
