@@ -7,7 +7,7 @@
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.SEED = (function () {
-  const NOW = new Date('2026-06-20');
+  const NOW = new Date(); // fecha REAL del sistema — el demo sigue el calendario actual
   // PRNG determinista (mulberry32) → datos estables entre recargas
   let _s = 20260620;
   const rnd = () => { _s |= 0; _s = _s + 0x6D2B79F5 | 0; let t = Math.imul(_s ^ _s >>> 15, 1 | _s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
@@ -819,7 +819,7 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 32,
+    __v: 33,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos, contenidos, reclamos, cursos, notifs
   };

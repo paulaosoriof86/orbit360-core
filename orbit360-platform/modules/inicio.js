@@ -32,12 +32,14 @@ Orbit.modules.inicio = (function () {
     const clientes = Orbit.store.all('clientes');
     const polizas = Orbit.store.all('polizas');
 
-    // metas mensuales: autoadministrables desde la colección 'metas' (mes actual); fallback demo
+    // metas mensuales: autoadministrables desde la colección 'metas' (mes actual).
+    // Fallback SIN literales: meta de empresa = suma de metas por asesor (dato real); recaudo = 85% de esa meta.
     const mesKey = U.monthKey();
     const metasMes = (Orbit.store.all('metas') || []).filter(m => (m.mes || '') === mesKey);
     const gMeta = (tipo, def) => { const r = metasMes.find(m => m.tipo === tipo && !m.asesorId); return r && r.valor ? +r.valor : def; };
-    const metaPrima = gMeta('prima', 820000), pctPrima = Math.min(100, Math.round(prima / metaPrima * 100));
-    const recaudo = cart.alDia, metaRec = gMeta('recaudo', 760000), pctRec = Math.min(100, Math.round(recaudo / metaRec * 100));
+    const metaEmpresa = Orbit.store.all('asesores').reduce((s, a) => s + (a.metaPrima || 0), 0) || Math.round(prima * 1.1);
+    const metaPrima = gMeta('prima', metaEmpresa), pctPrima = metaPrima ? Math.min(100, Math.round(prima / metaPrima * 100)) : 0;
+    const recaudo = cart.alDia, metaRec = gMeta('recaudo', Math.round(metaPrima * 0.85)), pctRec = metaRec ? Math.min(100, Math.round(recaudo / metaRec * 100)) : 0;
     const diasMes = new Date(U.now().getFullYear(), U.now().getMonth() + 1, 0).getDate() - U.now().getDate();
 
     host.innerHTML = `<div class="page">

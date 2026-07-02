@@ -9,14 +9,14 @@ Orbit.correoCompose = function (pre) {
   else if (Orbit.modules && Orbit.modules.correo) { const p = window.__orbitCompose; window.__orbitCompose = null; Orbit.modules.correo.redactar(p); }
 };
 Orbit.ui = (function () {
-  // Ancla temporal. Por defecto usa la fecha del set de datos de demostración para
-  // que renovaciones/vencimientos/aging luzcan coherentes. El backend puede pasar a
-  // fecha real poniendo Orbit.tenant.demoDate = 'real' (o una fecha ISO) — sin tocar módulos.
+  // Ancla temporal. Por defecto usa la fecha REAL del sistema para que el mes,
+  // el conteo de días y los vencimientos reflejen el calendario actual. El backend
+  // puede fijarla poniendo Orbit.tenant.demoDate = 'YYYY-MM-DD' (o window.ORBIT_DEMO_DATE).
   const DEMO_ANCHOR = '2026-06-20';
   function _anchor() {
     try { var d = (Orbit.tenant && Orbit.tenant.demoDate); if (d === 'real') return new Date(); if (d) return new Date(d + 'T00:00:00'); } catch (e) {}
     try { var w = window.ORBIT_DEMO_DATE; if (w === 'real') return new Date(); if (w) return new Date(w + 'T00:00:00'); } catch (e) {}
-    return new Date(DEMO_ANCHOR + 'T00:00:00');
+    return new Date();
   }
   const NOW = _anchor();
   const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];

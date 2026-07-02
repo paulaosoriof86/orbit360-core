@@ -443,7 +443,8 @@ Orbit.modules.finanzas = (function () {
     const p = paisFin() || 'GT', cur = p === 'CO' ? 'COP' : 'GTQ';
     const mesKey = mesSel;
     const metaEmp = (S().all('metas') || []).find(m => m.mes === mesKey && m.tipo === 'prima' && !m.asesorId);
-    const metaVal = metaEmp && metaEmp.valor ? +metaEmp.valor : 820000;
+    const metaBase = S().all('asesores').reduce((s, a) => s + (a.metaPrima || 0), 0) || Math.round(prod.neta * 1.1);
+    const metaVal = metaEmp && metaEmp.valor ? +metaEmp.valor : metaBase;
     return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas sobre <b>prima NETA</b> (no total). Por <b>asesor</b>, <b>empresa</b> y <b>aseguradora</b>, mensual o anual (para incentivos). De aquí derivan metas de recaudo y financieras.</div>
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <button class="btn primary sm" onclick="Orbit.modules.finanzas.crearMeta()">+ Crear meta</button>
@@ -481,7 +482,7 @@ Orbit.modules.finanzas = (function () {
           <label class="ce-l">Tipo<select id="mt-tipo" class="o-sel"><option value="prima">Prima neta (empresa)</option><option value="recaudo">Recaudo</option><option value="nueva">Producción nueva</option><option value="renovada">Producción renovada</option></select></label>
         </div>
         <label class="ce-l">Ámbito<select id="mt-ambito" class="o-sel"><option value="">Empresa (global)</option>${asesores.map(a => `<option value="${a.id}">Asesor · ${U.esc(a.nombre)}</option>`).join('')}</select></label>
-        <label class="ce-l">Valor meta (${cur})<input id="mt-val" class="o-sel" type="number" value="820000"></label>
+        <label class="ce-l">Valor meta (${cur})<input id="mt-val" class="o-sel" type="number" value="${S().all('asesores').reduce((s, a) => s + (a.metaPrima || 0), 0) || 0}"></label>
         <div class="cfg-note">Se guarda en la colección editable <b>metas</b> — alimenta Insights → Metas y el avance de la empresa. Un registro por mes+tipo+ámbito (upsert).</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="mt-cancel">Cancelar</button><button class="btn primary" id="mt-ok">Guardar meta</button></div>
