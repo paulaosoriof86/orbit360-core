@@ -1,71 +1,76 @@
 # GATE FASE 9 - Auth/Firebase LAB sobre index.html central
 
-Fecha: 2026-07-01 19:48 local
-Estado: PREPARADO / BLOQUEADO POR AUTH DEMO EN CORE.
+Fecha actualización: 2026-07-01 20:04 local
+Estado: BLOQUEADO / PAUSADO POR CONFIG LOCAL NO INICIALIZABLE Y RIESGO VISUAL.
 
 ## Objetivo
 
 Validar Auth/Firebase LAB sobre `index.html` central, con usuario LAB y snapshots reales, sin usar `index-dev-firestore.html` y sin tocar módulos funcionales.
 
-## Diagnóstico directo en GitHub
+## Resultado acumulado
 
-### `core/auth.js`
+### Avances confirmados
 
-Estado actual: demo/localStorage.
+- Fase 8 sigue válida: `Orbit.store` existe, API expandida completa, `backendMode = firestore-lab`, `backendTenant = alianzas-soluciones`, 27 colecciones y sin errores JS globales.
+- `core/auth.js` fue preparado en rama para usar Firebase Auth solo cuando el backend sea `firestore-lab`, conservando demo/local fuera de LAB.
+- `core/backend-lab-loader.js` fue creado para cargar SDK/config solo en LAB.
+- `core/backend-lab-init.js` fue creado para intentar inicializar Firebase desde config local reconocida.
+- `tools/orbit360-fase9-auth-lab-index-central.ps1` y `tools/orbit360-fase9-auth-lab-index-central-v2.ps1` quedaron preparados para smoke local.
+- `core/auth-firebase.config.local.js` fue recuperado desde backup local y confirmado como ignorado por Git.
 
-Hallazgos:
+### Fallo Fase 9 V1
 
-- Usa `localStorage` para `orbit360_session` y `orbit360_confidencialidad`.
-- `authed()` depende de sesión local.
-- `login()` guarda usuario demo/local.
-- `logout()` borra sesión local.
-- `user()` lee sesión local.
-- No llama `firebase.auth().signInWithEmailAndPassword()`.
-- No usa `firebase.auth().currentUser` como fuente de sesión LAB.
+- `firebaseDetected = true`.
+- `firebaseApps = 0`.
+- `authUser = null`.
+- `snapshotAttached = false`.
+- `snapshotAttachedCount = 0`.
+- Estado: `waiting-firebase`.
 
-Conclusión: Auth LAB real no está conectado todavía en `core/auth.js`.
+Conclusión: SDK detectado, pero Firebase no inicializado.
 
-### `index.html`
+### Fallo Fase 9 V2
 
-Estado actual: ruta central con `store.js -> store-firestore-lab.local.js -> seed.js` correcto.
+- `firebaseDetected = true`.
+- `firebaseApps = 0`.
+- `firebaseInit = config-not-found`.
+- `firebaseInitError = Local config did not expose a recognized Firebase config object`.
+- `authUser = null`.
+- `snapshotAttached = false`.
+- `snapshotAttachedCount = 0`.
 
-Hallazgos:
+Conclusión: la config local existe, pero no expone un objeto Firebase reconocible por el inicializador. No se debe pegar ni subir esta config.
 
-- No carga Firebase SDK compat/modular.
-- No carga `core/auth-firebase.config.local.js`.
-- El hook LAB puede preparar Firestore, pero sin SDK/config/Auth no puede adjuntar snapshots reales.
+### Fase 9 V3 local
 
-Conclusión: `index.html` central aún requiere loader LAB seguro para Firebase/config local.
+Se agregó un puente local dentro de `auth-firebase.config.local.js`, archivo ignorado por Git. No se subieron secretos. Debe considerarse intervención local temporal.
 
-## Resultado previo que NO debe repetirse
+## Riesgo visual detectado
 
-Fase 8 ya validó:
+Durante Fase 9 se hizo visible nuevamente el problema de mojibake/encoding en UI:
 
-- `window.Orbit`: true.
-- `Orbit.store`: true.
-- API expandida completa: true.
-- `pref/setPref` roundtrip: true.
-- `backendMode`: `firestore-lab`.
-- `backendTenant`: `alianzas-soluciones`.
-- Sin errores JS globales.
+- `IngresÃ¡`, `sesiÃ³n`, `paÃ­ses`, `GestiÃ³n`, símbolos/emoji dañados.
+- También se ven badges `BETA` en sidebar.
 
-No repetir Fase 8 salvo después de cambiar Auth/loader.
+Este problema ya estaba detectado en smoke previo de v1.73 y debe pasar a Claude como P0 visual/base. No debe corregirse dentro del backend ni mezclarse con Auth.
 
-## Bloqueo real
+## Decisión metodológica
 
-Fase 9 no debe marcarse como completada hasta que:
+Fase 9 queda PAUSADA. No marcar como completada hasta resolver:
 
-1. `index.html` central cargue Firebase LAB solo cuando `?orbitBackend=firestore-lab`.
-2. La configuración local siga ignorada por Git y no se suban secretos.
-3. `core/auth.js` use Firebase Auth cuando el backend sea `firestore-lab`.
-4. Si no hay usuario Firebase autenticado, LAB no debe abrir dashboard con sesión demo/local.
-5. `OrbitBackend.status()` confirme Auth LAB y snapshots reales.
+1. Formato de config Firebase LAB local sin exponer secretos.
+2. Inicialización real `firebase.initializeApp(...)`.
+3. Login con usuario LAB.
+4. `OrbitBackend.status().auth.uid` con UID esperado.
+5. `snapshotAttached = true` y `snapshotAttachedCount > 0`.
+6. UI sin retrocesos visuales por encoding, o al menos documentada para Claude y no atribuida al backend.
 
 ## Criterio de cierre Fase 9
 
 - URL central: `index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones`.
 - Firebase SDK detectado.
 - Config local detectada, sin versionar secretos.
+- `firebaseApps > 0`.
 - Usuario LAB autenticado: `orbit.lab@demo.com` / UID esperado.
 - `OrbitBackend.status().auth.uid` coincide con el usuario LAB esperado.
 - `snapshotAttached = true`.
@@ -84,15 +89,10 @@ Fase 9 no debe marcarse como completada hasta que:
 - No secretos en GitHub.
 - No usar `index-dev-firestore.html` como ruta central.
 
-## Próximo cambio seguro
+## Acción segura inmediata
 
-Preparar fix mínimo en:
-
-1. `core/backend-lab-loader.js` nuevo: carga Firebase SDK + config local solo si `orbitBackend=firestore-lab`.
-2. `index.html`: incluir loader antes de `data/store.js`.
-3. `core/auth.js`: soportar Firebase Auth en modo LAB, conservando demo/local fuera de LAB.
-4. Smoke local único para confirmar Auth + snapshots.
+Restaurar `index.html` local si quedó modificado por scripts fallidos y mantener el gate pausado. La config local puede conservarse con backup, pero no debe subirse.
 
 ## Estado
 
-PREPARADO / BLOQUEADO - requiere fix Auth/loader antes de validar Fase 9.
+BLOQUEADO / PAUSADO - requiere revisión de config local Firebase LAB sin exponer secretos y corrección visual separada para Claude.
