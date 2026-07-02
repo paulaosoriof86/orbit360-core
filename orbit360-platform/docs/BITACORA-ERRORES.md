@@ -216,3 +216,33 @@ Estado: ABIERTO para UX tenant A&S / aplicar a prototipo base.
 **Impacto:** Aplica al prototipo base Orbit 360.
 
 **Estado:** RESUELTO.
+
+## 2026-07-01 18:56:05 - P0 arquitectura post v1.73: localStorage directo y documentación backend eliminada
+- Módulo: Configuración / documentación backend.
+- Síntoma/necesidad: el ZIP v1.73 reintrodujo localStorage directo para logo y eliminó docs backend/metodología no incluidos en la base visual.
+- Esperado: módulos solo usan Orbit.store/Orbit.tenant; la documentación de backend y continuidad no se pierde al instalar un ZIP visual.
+- Causa raíz: empalme de ZIP visual completo no incluía todos los docs backend protegidos y traía un remanente de persistencia local en Configuración.
+- Archivo/función: modules/configuracion.js, modules/automatizaciones.js, docs/*.
+- Fix aplicado: reemplazo mínimo por Orbit.store.setPref, preservación de Orbit.tenant, restauración documental desde backup y referencia funcional ajena eliminada.
+- Impacto en prototipo comercializable: evita romper la migración Firestore y reduce riesgo de contaminación funcional.
+- Estado: RESUELTO.
+
+## 2026-07-01 18:59:21 - Referencias funcionales ajenas post v1.73
+- Módulo: Automatizaciones / Marketing seed.
+- Síntoma/necesidad: aparecían términos funcionales de otro producto en módulo y datos demo.
+- Esperado: Orbit 360 debe mantener términos propios de seguros, sin referencias funcionales a otros productos.
+- Causa raíz: remanentes de inspiración/ejemplos heredados en comentario de módulo y seed de marketing.
+- Archivo/función: modules/automatizaciones.js, data/seed.js.
+- Fix aplicado: reemplazo por lenguaje propio de Orbit 360 y seguros.
+- Impacto en prototipo comercializable: reduce riesgo de contaminación visual, comercial y documental.
+- Estado: RESUELTO.
+
+## 2026-07-01 19:20:11 - Falla contractual Fase 7D: hook LAB con API incompleta
+- MÃ³dulo: Backend LAB / Orbit.store.
+- SÃ­ntoma/necesidad: smoke runtime detectÃ³ window.Orbit y Orbit.store, pero faltaban ind, pref, setPref, init, eseed, aw; pref/setPref no hacÃ­an roundtrip.
+- Esperado: backend LAB debe exponer la misma API expandida de data/store.js v1.73 sin tocar mÃ³dulos.
+- Causa raÃ­z: data/store-firestore-lab.local.js quedÃ³ en contrato anterior y reemplazaba Orbit.store con una API reducida.
+- Archivo/funciÃ³n: data/store-firestore-lab.local.js.
+- Fix aplicado: shim de compatibilidad v1.73 al final del hook LAB; conserva diagnÃ³stico OrbitBackend.
+- Impacto en prototipo comercializable: evita romper mÃ³dulos nuevos de v1.73 y mantiene migraciÃ³n Firestore por contrato.
+- Estado: EN VERIFICACIÃ“N.

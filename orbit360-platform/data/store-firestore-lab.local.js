@@ -1,5 +1,5 @@
-/* ============================================================
-   Orbit 360 - Store Firestore LAB explícito
+﻿/* ============================================================
+   Orbit 360 - Store Firestore LAB explÃ­cito
    Uso: solo index-dev-firestore.html con ?orbitBackend=firestore-lab
    Regla: en LAB no usar seed/localStorage/demo como fuente de datos.
    Mantiene API Orbit.store: all/get/where/insert/update/remove/_emit.
@@ -220,7 +220,7 @@
     var found = await tryAllDocs(collection, template);
 
     if (!found) {
-      err('No se pudo leer colección Firestore LAB: ' + collection);
+      err('No se pudo leer colecciÃ³n Firestore LAB: ' + collection);
       return [];
     }
 
@@ -390,7 +390,7 @@
   window.OrbitBackend.noFallback = true;
 
   state.status = hasLabAuth() ? 'ready' : 'auth-required';
-  log('Store Firestore LAB explícito instalado. Tenant:', tenantId, 'Auth:', hasLabAuth());
+  log('Store Firestore LAB explÃ­cito instalado. Tenant:', tenantId, 'Auth:', hasLabAuth());
 })();
 
 /* ============================================================
@@ -510,3 +510,279 @@
   setTimeout(attachLabSnapshots, 0);
   setTimeout(attachLabSnapshots, 1200);
 })();
+
+// ORBIT360_V173_LAB_API_COMPAT_START
+(function(){
+  'use strict';
+
+  var w = window;
+  w.Orbit = w.Orbit || {};
+
+  var query = {};
+  try {
+    var params = new URLSearchParams(w.location.search || '');
+    params.forEach(function(v,k){ query[k] = v; });
+  } catch(e) {}
+
+  var tenantId = query.tenant || (w.OrbitBackend && (w.OrbitBackend.tenantId || w.OrbitBackend.tenant)) || 'alianzas-soluciones';
+  var mode = query.orbitBackend || (w.OrbitBackend && w.OrbitBackend.mode) || 'firestore-lab';
+
+  var collections = [
+    'clientes','polizas','cobros','comisiones','reclamos','gestiones','negocios','finmovs',
+    'contenidos','cursos','aseguradoras','asesores','vehiculos','acreedores','facturas',
+    'documentos','actividades',
+    'metas','presupuesto','plantillas','reportes_prog','notifs','avisos','correos',
+    'cancelaciones','novedades','tareas'
+  ];
+
+  w.ORBIT_LAB_COLLECTIONS = collections.slice();
+
+  var previous = w.Orbit.store || {};
+  var listeners = [];
+  var cache = {};
+  var prefs = {};
+
+  collections.forEach(function(c){
+    cache[c] = [];
+    try {
+      if (previous && typeof previous.all === 'function') {
+        var prevRows = previous.all(c);
+        if (Array.isArray(prevRows)) cache[c] = prevRows.slice();
+      }
+    } catch(e) {}
+  });
+
+  function ensure(c){
+    if (!cache[c]) cache[c] = [];
+    return cache[c];
+  }
+
+  function cloneRow(row){
+    if (!row || typeof row !== 'object') return row;
+    try { return JSON.parse(JSON.stringify(row)); } catch(e) { return Object.assign({}, row); }
+  }
+
+  function rowId(row){
+    return row && (row.id || row.uid || row.codigo || row.numero || row.poliza || row.key);
+  }
+
+  function emit(collection){
+    try {
+      if (previous && typeof previous._emit === 'function') previous._emit(collection);
+    } catch(e) {}
+
+    listeners.slice().forEach(function(fn){
+      try { fn(collection); } catch(e) {}
+    });
+  }
+
+  function all(collection){
+    try {
+      if (previous && typeof previous.all === 'function') {
+        var rows = previous.all(collection);
+        if (Array.isArray(rows)) return rows;
+      }
+    } catch(e) {}
+
+    return ensure(collection);
+  }
+
+  function get(collection, id){
+    try {
+      if (previous && typeof previous.get === 'function') {
+        var found = previous.get(collection, id);
+        if (found !== undefined && found !== null) return found;
+      }
+    } catch(e) {}
+
+    return all(collection).find(function(row){ return rowId(row) === id; }) || null;
+  }
+
+  function where(collection, predicate){
+    try {
+      if (previous && typeof previous.where === 'function') {
+        var rows = previous.where(collection, predicate);
+        if (Array.isArray(rows)) return rows;
+      }
+    } catch(e) {}
+
+    return all(collection).filter(function(row){
+      try { return predicate(row); } catch(e) { return false; }
+    });
+  }
+
+  function find(collection, predicate){
+    try {
+      if (previous && typeof previous.find === 'function') {
+        var found = previous.find(collection, predicate);
+        if (found !== undefined) return found;
+      }
+    } catch(e) {}
+
+    return all(collection).find(function(row){
+      try { return predicate(row); } catch(e) { return false; }
+    }) || null;
+  }
+
+  function insert(collection, row){
+    try {
+      if (previous && typeof previous.insert === 'function') {
+        var result = previous.insert(collection, row);
+        if (result !== undefined) return result;
+      }
+    } catch(e) {}
+
+    var copy = cloneRow(row) || {};
+    if (!copy.id) copy.id = collection + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+    ensure(collection).push(copy);
+    emit(collection);
+    return copy;
+  }
+
+  function update(collection, id, patch){
+    try {
+      if (previous && typeof previous.update === 'function') {
+        var result = previous.update(collection, id, patch);
+        if (result !== undefined) return result;
+      }
+    } catch(e) {}
+
+    var rows = ensure(collection);
+    var idx = rows.findIndex(function(row){ return rowId(row) === id; });
+    if (idx < 0) return null;
+    rows[idx] = Object.assign({}, rows[idx], patch || {});
+    emit(collection);
+    return rows[idx];
+  }
+
+  function remove(collection, id){
+    try {
+      if (previous && typeof previous.remove === 'function') {
+        var result = previous.remove(collection, id);
+        if (result !== undefined) return result;
+      }
+    } catch(e) {}
+
+    var rows = ensure(collection);
+    var before = rows.length;
+    cache[collection] = rows.filter(function(row){ return rowId(row) !== id; });
+    if (cache[collection].length !== before) emit(collection);
+    return cache[collection].length !== before;
+  }
+
+  function on(fn){
+    try {
+      if (previous && typeof previous.on === 'function') {
+        var offPrev = previous.on(fn);
+        if (typeof offPrev === 'function') {
+          listeners.push(fn);
+          return function(){
+            try { offPrev(); } catch(e) {}
+            listeners = listeners.filter(function(x){ return x !== fn; });
+          };
+        }
+      }
+    } catch(e) {}
+
+    listeners.push(fn);
+    return function(){
+      listeners = listeners.filter(function(x){ return x !== fn; });
+    };
+  }
+
+  function pref(key, def){
+    try {
+      if (previous && typeof previous.pref === 'function') {
+        var value = previous.pref(key, def);
+        if (value !== undefined) return value;
+      }
+    } catch(e) {}
+
+    return Object.prototype.hasOwnProperty.call(prefs, key) ? prefs[key] : def;
+  }
+
+  function setPref(key, value){
+    try {
+      if (previous && typeof previous.setPref === 'function') {
+        previous.setPref(key, value);
+      }
+    } catch(e) {}
+
+    prefs[key] = value;
+    emit('__prefs');
+    return value;
+  }
+
+  function init(seed){
+    try {
+      if (previous && typeof previous.init === 'function') previous.init(seed);
+    } catch(e) {}
+
+    if (seed && typeof seed === 'object') {
+      Object.keys(seed).forEach(function(k){
+        if (Array.isArray(seed[k])) cache[k] = seed[k].slice();
+      });
+      if (seed.__prefs && typeof seed.__prefs === 'object') prefs = Object.assign({}, seed.__prefs);
+    }
+
+    emit('*');
+    return api;
+  }
+
+  function reseed(seed){
+    try {
+      if (previous && typeof previous.reseed === 'function') previous.reseed(seed);
+    } catch(e) {}
+
+    Object.keys(cache).forEach(function(k){ cache[k] = []; });
+    prefs = {};
+    return init(seed);
+  }
+
+  function raw(){
+    try {
+      if (previous && typeof previous.raw === 'function') {
+        var value = previous.raw();
+        if (value && typeof value === 'object') return value;
+      }
+    } catch(e) {}
+
+    var out = {};
+    Object.keys(cache).forEach(function(k){ out[k] = cache[k]; });
+    out.__prefs = prefs;
+    return out;
+  }
+
+  var api = Object.assign({}, previous, {
+    all: all,
+    get: get,
+    where: where,
+    find: find,
+    insert: insert,
+    update: update,
+    remove: remove,
+    on: on,
+    _emit: emit,
+    pref: pref,
+    setPref: setPref,
+    init: init,
+    reseed: reseed,
+    raw: raw
+  });
+
+  w.Orbit.store = api;
+
+  w.OrbitBackend = Object.assign({}, w.OrbitBackend || {}, {
+    mode: mode,
+    tenantId: tenantId,
+    tenant: tenantId,
+    collections: collections.slice(),
+    apiVersion: 'v1.73-compatible',
+    ready: true,
+    source: 'data/store-firestore-lab.local.js'
+  });
+
+  w.ORBIT_BACKEND = w.OrbitBackend;
+})();
+// ORBIT360_V173_LAB_API_COMPAT_END
+

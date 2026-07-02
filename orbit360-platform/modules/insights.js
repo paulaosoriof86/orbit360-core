@@ -19,15 +19,17 @@ Orbit.modules.insights = (function () {
   let criterio = 'general';    // comparativo: general | asesor | ramo | aseguradora
   let topOrden = 'volumen';    // top clientes: volumen | cantidad | nuevos | antiguos
   let renovCrit = 'aseguradora'; // renovaciones: aseguradora | asesor | ramo
+  let asesorSel = '';           // filtro global por asesor ('' = todos)
+  function aseOK(asId) { return !asesorSel || asId === asesorSel; }
   const MES = MES0;            // compat: algunos cálculos usan el mes actual base
 
   /* ---- país + accesos ---- */
   function paisOK(p) { return !Orbit.pais || Orbit.pais === 'TODOS' || p === Orbit.pais; }
   function clientePais(cliId) { const c = S().get('clientes', cliId); return c ? c.pais : 'GT'; }
-  function polizas() { return S().all('polizas').filter(p => paisOK(clientePais(p.clienteId))); }
+  function polizas() { return S().all('polizas').filter(p => paisOK(clientePais(p.clienteId)) && aseOK(p.asesorId)); }
   function vigentes() { return polizas().filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar'); }
-  function cobros() { return S().all('cobros').filter(c => paisOK(clientePais(c.clienteId))); }
-  function comisiones() { return S().all('comisiones').filter(c => paisOK(clientePais(c.clienteId))); }
+  function cobros() { return S().all('cobros').filter(c => paisOK(clientePais(c.clienteId)) && aseOK(c.asesorId)); }
+  function comisiones() { return S().all('comisiones').filter(c => paisOK(clientePais(c.clienteId)) && aseOK(c.asesorId)); }
   function negocios() { return (Orbit.ciclo ? Orbit.ciclo.negocios({ ignoreRol: true }) : []); }
   function cancelaciones() { return S().all('cancelaciones').filter(c => paisOK(clientePais(c.clienteId))); }
   function clientes() { return S().all('clientes').filter(c => paisOK(c.pais)); }
@@ -535,6 +537,7 @@ Orbit.modules.insights = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('insights', `<div class="ins-controls">
         <select id="ins-pais" class="ins-ctl" title="País">${Orbit.PAISES.map(p => `<option value="${p.id}" ${p.id === (Orbit.pais || 'TODOS') ? 'selected' : ''}>🌎 ${p.label}</option>`).join('')}</select>
+        <select id="ins-ase" class="ins-ctl" title="Asesor"><option value="">👥 Todos los asesores</option>${S().all('asesores').map(a => `<option value="${a.id}" ${a.id === asesorSel ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select>
         ${showMes ? `<select id="ins-mes" class="ins-ctl" title="Mes (acumulado Ene→mes)">${MESES.map((m, i) => `<option value="${i}" ${i === mesSel ? 'selected' : ''}>${m} ${YEAR}</option>`).join('')}</select>` : ''}
         ${showTop ? `<select id="ins-top" class="ins-ctl" title="Ordenar por">${[['volumen', 'Por volumen de prima'], ['cantidad', 'Por cantidad de pólizas'], ['nuevos', 'Clientes nuevos'], ['antiguos', 'Clientes antiguos']].map(o => `<option value="${o[0]}" ${o[0] === topOrden ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>` : ''}
       </div>`)}
@@ -544,6 +547,7 @@ Orbit.modules.insights = (function () {
     </div>`;
     host.querySelectorAll('.ins-tab').forEach(b => b.addEventListener('click', () => { vista = b.dataset.v; draw(); }));
     const pSel = host.querySelector('#ins-pais'); if (pSel) pSel.addEventListener('change', () => { Orbit.pais = pSel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); draw(); });
+    const aSel = host.querySelector('#ins-ase'); if (aSel) aSel.addEventListener('change', () => { asesorSel = aSel.value; draw(); });
     const mSel = host.querySelector('#ins-mes'); if (mSel) mSel.addEventListener('change', () => { mesSel = +mSel.value; draw(); });
     const tSel = host.querySelector('#ins-top'); if (tSel) tSel.addEventListener('change', () => { topOrden = tSel.value; draw(); });
     host.querySelectorAll('[data-crit]').forEach(b => b.addEventListener('click', () => { criterio = b.dataset.crit; draw(); }));

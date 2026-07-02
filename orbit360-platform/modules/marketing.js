@@ -12,7 +12,7 @@ Orbit.modules.marketing = (function () {
   const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
   const CANAL_ICON = { LinkedIn: '💼', Facebook: '📘', Instagram: '📸', WhatsApp: '💬', TikTok: '🎵', YouTube: '▶' };
-  const EST_TONE = { 'Idea': 'neutral', 'Programado': 'info', 'Publicado': 'ok' };
+  const EST_TONE = { 'Idea': 'neutral', 'Programado': 'info', 'Publicado': 'ok', 'Medido': 'ok' };
   const ENFOQUES = ['Seguros / Riesgos', 'Auto', 'Vida y GM', 'Hogar / Daños', 'Logística / Transporte', 'Educativo', 'Tendencias', 'Normativa', 'Prospecting', 'Renovaciones'];
   const ENF_EMOJI = { 'Seguros / Riesgos': '🛡️', 'Auto': '🚗', 'Vida y GM': '❤️', 'Hogar / Daños': '🏠', 'Logística / Transporte': '🚚', 'Educativo': '📚', 'Tendencias': '📈', 'Normativa': '⚖️', 'Prospecting': '🎯', 'Renovaciones': '🔄' };
   function enfEmoji(e) { return ENF_EMOJI[e] || '🛡️'; }
@@ -131,7 +131,8 @@ Orbit.modules.marketing = (function () {
     const canales = ['LinkedIn', 'Facebook', 'Instagram', 'WhatsApp', 'TikTok', 'YouTube'];
     const tipos = ['Texto', 'Carrusel', 'Reel', 'Historia', 'Video'];
     const enfoques = ENFOQUES;
-    const estados = ['Idea', 'Programado', 'Publicado'];
+    const estados = ['Idea', 'Programado', 'Publicado', 'Medido'];
+    const responsables = S().all('asesores');
     let back = document.getElementById('mk-ficha'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'mk-ficha'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center';
@@ -146,6 +147,10 @@ Orbit.modules.marketing = (function () {
           <label class="ce-l">Tipo<select id="mk-tipo" class="o-sel">${tipos.map(x => `<option ${c && c.tipo === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
           <label class="ce-l">Enfoque<select id="mk-enfoque" class="o-sel">${enfoques.map(x => `<option ${c && c.enfoque === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
           <label class="ce-l">Estado<select id="mk-estado" class="o-sel">${estados.map(x => `<option ${c && c.estado === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+        </div>
+        <div class="cgrid" style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+          <label class="ce-l">Responsable<select id="mk-resp" class="o-sel">${['— Sin asignar —'].concat(responsables.map(a => a.nombre)).map(n => `<option ${c && c.responsable === n ? 'selected' : ''}>${U.esc(n)}</option>`).join('')}</select></label>
+          <label class="ce-l">Aprobador<select id="mk-aprob" class="o-sel">${['— Pendiente —', 'Aprobado', 'Rechazado'].map(n => `<option ${c && c.aprobacion === n ? 'selected' : ''}>${U.esc(n)}</option>`).join('')}</select></label>
         </div>
         <label class="ce-l">Título<input id="mk-titulo" class="o-sel" value="${c ? U.esc(c.titulo) : ''}"></label>
         <label class="ce-l">Copy (cuerpo)<textarea id="mk-copy" class="o-sel" style="min-height:90px;resize:vertical;padding:9px 11px">${c ? U.esc(c.copy) : ''}</textarea></label>
@@ -203,7 +208,7 @@ Orbit.modules.marketing = (function () {
     });
     if ($('#mk-del')) $('#mk-del').addEventListener('click', () => { S().remove('contenidos', id); close(); render(host); });
     $('#mk-ok').addEventListener('click', () => {
-      const data = { fecha: $('#mk-fecha').value, hora: $('#mk-hora').value, canal: $('#mk-canal').value, tipo: $('#mk-tipo').value, enfoque: $('#mk-enfoque').value, estado: $('#mk-estado').value, titulo: $('#mk-titulo').value || '(sin título)', copy: $('#mk-copy').value, cta: $('#mk-cta').value, hashtags: $('#mk-hash').value };
+      const data = { fecha: $('#mk-fecha').value, hora: $('#mk-hora').value, canal: $('#mk-canal').value, tipo: $('#mk-tipo').value, enfoque: $('#mk-enfoque').value, estado: $('#mk-estado').value, responsable: $('#mk-resp') ? $('#mk-resp').value : '', aprobacion: $('#mk-aprob') ? $('#mk-aprob').value : '', titulo: $('#mk-titulo').value || '(sin título)', copy: $('#mk-copy').value, cta: $('#mk-cta').value, hashtags: $('#mk-hash').value };
       if (id) S().update('contenidos', id, data); else S().insert('contenidos', Object.assign({ id: 'mk' + Date.now().toString().slice(-7), stats: null }, data));
       close(); render(host);
     });

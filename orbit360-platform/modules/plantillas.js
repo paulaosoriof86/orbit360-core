@@ -30,7 +30,7 @@ Orbit.modules.plantillas = (function () {
   const CANALES = ['Ambos', 'WhatsApp', 'Correo', 'PDF'];
   const CATS = ['Comercial', 'Cobranza', 'Retención', 'Calidad', 'Onboarding', 'Siniestros', 'General'];
 
-  // ---- store bootstrap: siembra la colección si está vacía (migra almacenamiento heredado) ----
+  // ---- store bootstrap: siembra la colección si está vacía (migra localStorage viejo) ----
   function boot() {
     if (S().all('plantillas').length) return;
     const old = S().pref('plantillas_legacy', null);

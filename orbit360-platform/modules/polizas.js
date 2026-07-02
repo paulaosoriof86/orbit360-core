@@ -40,10 +40,10 @@ Orbit.modules.polizas = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('polizas', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevaPoliza()">+ Nueva póliza</button>`)}
       ${K.kpis([
-        { label: 'Pólizas vigentes', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'activas en cartera' },
-        { label: 'Prima vigente', val: U.moneyShort(primaVig, 'GTQ'), color: 'var(--ok)', foot: 'anualizada' },
-        { label: 'Por renovar ≤45 d', val: all.filter(p => p.estado === 'Por renovar').length, color: 'var(--warn)', foot: 'requieren gestión' },
-        { label: 'Canceladas', onclick: "location.hash='#/cancelaciones'", val: all.filter(p => p.estado === 'Cancelada').length, color: 'var(--danger)', foot: 'histórico' }
+        { label: 'Pólizas vigentes', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'activas en cartera', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
+        { label: 'Prima vigente', val: U.moneyShort(primaVig, 'GTQ'), color: 'var(--ok)', foot: 'anualizada', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
+        { label: 'Por renovar ≤45 d', val: all.filter(p => p.estado === 'Por renovar').length, color: 'var(--warn)', foot: 'requieren gestión', onclick: "Orbit.modules.polizas.filtrarEstado('Por renovar')" },
+        { label: 'Canceladas', onclick: "Orbit.modules.polizas.filtrarEstado('Cancelada')", val: all.filter(p => p.estado === 'Cancelada').length, color: 'var(--danger)', foot: 'histórico' }
       ])}
       <div class="card" style="overflow:hidden">
         ${K.filterBar(FDEFS(), st)}
@@ -68,5 +68,6 @@ Orbit.modules.polizas = (function () {
     });
   }
   function emptyRow(n) { return `<tr><td colspan="${n}" class="muted" style="text-align:center;padding:30px">Sin resultados.</td></tr>`; }
-  return { render };
+  function filtrarEstado(e) { st.fest = st.fest === e ? '' : e; const host = document.getElementById('host'); if (host) render(host); }
+  return { render, filtrarEstado };
 })();

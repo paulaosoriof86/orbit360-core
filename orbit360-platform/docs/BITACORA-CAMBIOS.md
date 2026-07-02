@@ -503,3 +503,34 @@ Estado: RESUELTO EN LAB / pendiente commit local de documentación.
 **Impacto en prototipo comercializable:** Alto. Permite continuar usando siempre la ultima version completa de Claude y conservar backend como capa protegida.
 
 **Estado:** RESUELTO LOCALMENTE.
+
+## backend/v99-clean-claude-lab-20260701 — 2026-07-01 18:32 · Empalme local v1.73 con backend protegido
+- **Base visual**: se instaló ZIP Claude v1.73 seleccionado manualmente.
+- **Backend protegido**: se preservó/reinyectó data/store-firestore-lab.local.js.
+- **Index**: hook LAB reinsertado después de data/store.js y antes de data/seed.js.
+- **Restricciones**: sin push, sin deploy, sin Hosting, sin datos reales.
+- **Pendiente**: correr smoke runtime Fase 7C y ajustar hook LAB a API expandida si aplica.
+
+## 2026-07-01 18:56:05 - Saneamiento post instalación v1.73 + preservación backend
+- Módulo/área: Configuración, Automatizaciones, documentación backend.
+- Necesidad: instalar base visual v1.73 sin perder backend/metodología ni romper capa única.
+- Mejora aplicada: se restauraron documentos backend/metodología eliminados por el ZIP; index-dev-firestore se preservó como legacy NO-USAR; se removió localStorage directo del logo en modules/configuracion.js; se quitó referencia funcional ajena en modules/automatizaciones.js.
+- Archivo/función: modules/configuracion.js, modules/automatizaciones.js, docs/*.
+- Impacto en prototipo comercializable: mantiene base v1.73 como visual más nueva y preserva el camino backend protegido.
+- Estado: RESUELTO.
+
+## 2026-07-01 18:59:21 - Saneamiento funcional v1.73B
+- Módulo/área: Automatizaciones y seed demo.
+- Necesidad: eliminar referencias funcionales ajenas a Orbit 360 antes del smoke backend.
+- Mejora aplicada: se eliminó referencia funcional a CXOrbia en modules/automatizaciones.js y se reemplazaron enfoques demo CX / Mystery por categorías de servicio/retención de seguros en data/seed.js.
+- Archivo/función: modules/automatizaciones.js, data/seed.js.
+- Impacto en prototipo comercializable: evita contaminación funcional visible o demo de otro producto.
+- Estado: RESUELTO.
+
+## 2026-07-01 19:20:11 - Fase 7D â†’ Fix LAB API v1.73
+- MÃ³dulo/Ã¡rea: Backend LAB / data/store-firestore-lab.local.js.
+- Necesidad: Fase 7D confirmÃ³ Orbit.store runtime con API vieja/incompleta tras instalar v1.73.
+- Mejora aplicada: se agregÃ³ shim de compatibilidad para API expandida (ind, pref, setPref, init, eseed, aw) y fallback seguro de colecciones.
+- Archivo/funciÃ³n: data/store-firestore-lab.local.js.
+- Impacto en prototipo comercializable: permite empalmar la base visual v1.73 sin tocar mÃ³dulos y manteniendo Orbit.store como contrato Ãºnico.
+- Estado: RESUELTO, pendiente re-ejecutar Fase 7D.

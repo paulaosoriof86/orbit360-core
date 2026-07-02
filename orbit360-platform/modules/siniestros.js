@@ -21,13 +21,23 @@ Orbit.modules.siniestros = (function () {
     const abiertos = arr.filter(r => !['Pagado', 'Rechazado'].includes(r.estado));
     const lista = filtro === 'todos' ? arr : filtro === 'abiertos' ? abiertos : arr.filter(r => r.estado === filtro);
     const pagado = arr.filter(r => r.estado === 'Pagado').reduce((s, r) => s + (r.montoAprobado || 0), 0);
+    // analítica de tiempos: días abiertos (reclamos en proceso) y días hasta pago (cerrados)
+    const hoy = new Date(U.NOW || Date.now());
+    const diasEntre = (f1, f2) => Math.max(0, Math.round((new Date(f2) - new Date(f1)) / 86400000));
+    const abiertosDias = abiertos.map(r => diasEntre(r.fecha, hoy)).filter(d => !isNaN(d));
+    const promAbierto = abiertosDias.length ? Math.round(abiertosDias.reduce((a, b) => a + b, 0) / abiertosDias.length) : 0;
+    const cerrados = arr.filter(r => r.estado === 'Pagado' && r.bitacora && r.bitacora.length);
+    const cierreDias = cerrados.map(r => { const pagoEv = (r.bitacora || []).slice().reverse().find(b => /pagad/i.test(b.t || '')); return pagoEv ? diasEntre(r.fecha, pagoEv.ts) : diasEntre(r.fecha, hoy); }).filter(d => !isNaN(d));
+    const promCierre = cierreDias.length ? Math.round(cierreDias.reduce((a, b) => a + b, 0) / cierreDias.length) : 0;
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '🚨', title: 'Orbit Siniestros', sub: 'Reclamos, bitácora y seguimiento con aseguradoras', features: [], actions: `<button class="btn ghost" id="si-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬇ Importar bitácora</button><button class="btn primary" id="si-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Reclamo</button>` })}
       ${K.kpis([
         { label: 'Reclamos', val: arr.length, color: 'var(--red)', foot: abiertos.length + ' abiertos', onclick: "location.hash='#/siniestros'" },
         { label: 'En proceso', val: abiertos.length, color: 'var(--warn)', foot: 'requieren gestión', onclick: "location.hash='#/siniestros'" },
         { label: 'Indemnización pagada', val: U.moneyShort(pagado, 'GTQ'), color: 'var(--ok)', foot: 'a clientes', footTone: 'up', onclick: "location.hash='#/siniestros'" },
-        { label: 'Tasa de aprobación', val: arr.length ? Math.round(arr.filter(r => ['Aprobado', 'Pagado'].includes(r.estado)).length / arr.length * 100) + '%' : '—', color: 'var(--info)', foot: 'aprobados / total' }
+        { label: 'Tasa de aprobación', val: arr.length ? Math.round(arr.filter(r => ['Aprobado', 'Pagado'].includes(r.estado)).length / arr.length * 100) + '%' : '—', color: 'var(--info)', foot: 'aprobados / total', onclick: "location.hash='#/siniestros'" },
+        { label: '⏱ Días abiertos (prom.)', val: promAbierto || '—', color: promAbierto > 30 ? 'var(--danger)' : 'var(--warn)', foot: abiertos.length + ' reclamos en proceso' },
+        { label: '✅ Días a pago (prom.)', val: promCierre || '—', color: 'var(--ok)', foot: cerrados.length + ' reclamos pagados' }
       ])}
       <div class="tabs" style="max-width:520px;margin-bottom:14px">
         ${[['todos', 'Todos'], ['abiertos', 'Abiertos'], ['Pagado', 'Pagados'], ['Rechazado', 'Rechazados']].map(f => `<div class="tab ${filtro === f[0] ? 'active' : ''}" data-f="${f[0]}">${f[1]}</div>`).join('')}
