@@ -1,13 +1,41 @@
 /* ============================================================
-   Orbit 360 · Auth (demo) — gate de sesión + login con órbita
-   Login white-label: marca de producto Orbit 360, palette-adaptive,
-   slot de logo del cliente. NO usa branding A&S.
-   Sesión demo persistida en localStorage (clave propia).
+   Orbit 360 · Auth
+   Demo/local por defecto. Firebase Auth solo en ?orbitBackend=firestore-lab.
+   No contiene secretos. No toca módulos.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.auth = (function () {
   const KEY = 'orbit360_session';
   const CKEY = 'orbit360_confidencialidad';
+
+  function isLab() {
+    try {
+      const q = new URLSearchParams(location.search || '');
+      return q.get('orbitBackend') === 'firestore-lab' || (window.OrbitBackend && window.OrbitBackend.mode === 'firestore-lab');
+    } catch (e) { return false; }
+  }
+
+  function fbAuth() {
+    try { if (window.firebase && firebase.auth) return firebase.auth(); } catch (e) {}
+    try { if (window.auth && typeof window.auth.signInWithEmailAndPassword === 'function') return window.auth; } catch (e) {}
+    return null;
+  }
+
+  function fbUser() {
+    try { const a = fbAuth(); return a && a.currentUser ? a.currentUser : null; } catch (e) { return null; }
+  }
+
+  function mapFbUser(u) {
+    if (!u) return null;
+    return {
+      nombre: u.displayName || (u.email || 'Usuario LAB'),
+      rol: 'Dirección',
+      email: u.email || '',
+      uid: u.uid || '',
+      tipo: 'interno',
+      backend: 'firestore-lab'
+    };
+  }
 
   function aceptoConf() { try { return !!localStorage.getItem(CKEY); } catch (e) { return false; } }
   function gateConfidencialidad() {
@@ -37,12 +65,36 @@ Orbit.auth = (function () {
     });
   }
 
-  function authed() { try { return !!localStorage.getItem(KEY); } catch (e) { return false; } }
-  function login(user) {
-    try { localStorage.setItem(KEY, JSON.stringify(user || { nombre: 'Paula Osorio', rol: 'Dirección', email: 'admin@demo.com' })); } catch (e) {}
+  function authed() {
+    if (isLab()) return !!fbUser();
+    try { return !!localStorage.getItem(KEY); } catch (e) { return false; }
   }
-  function logout() { try { localStorage.removeItem(KEY); } catch (e) {} location.reload(); }
-  function user() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+
+  function login(userObj) {
+    if (isLab()) return mapFbUser(fbUser());
+    try { localStorage.setItem(KEY, JSON.stringify(userObj || { nombre: 'Paula Osorio', rol: 'Dirección', email: 'admin@demo.com' })); } catch (e) {}
+    return user();
+  }
+
+  async function loginFirebase(email, pass) {
+    const auth = fbAuth();
+    if (!auth || typeof auth.signInWithEmailAndPassword !== 'function') throw new Error('Firebase Auth LAB no disponible. Verifica core/auth-firebase.config.local.js.');
+    const cred = await auth.signInWithEmailAndPassword(email, pass);
+    return mapFbUser(cred && cred.user ? cred.user : fbUser());
+  }
+
+  function logout() {
+    if (isLab()) {
+      try { const a = fbAuth(); if (a && a.signOut) a.signOut(); } catch (e) {}
+    }
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    location.reload();
+  }
+
+  function user() {
+    if (isLab()) return mapFbUser(fbUser());
+    try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; }
+  }
 
   function showApp() {
     const lg = document.getElementById('login');
@@ -56,26 +108,72 @@ Orbit.auth = (function () {
       else gateConfidencialidad();
     }, 520);
   }
+
   function showLogin() {
     const lg = document.getElementById('login');
     if (lg) { lg.style.display = ''; lg.classList.remove('hidden'); }
     document.body.classList.add('pre-auth');
-    // pintar logo/nombre del cliente en la franja del login (antes de entrar)
     try { if (Orbit.applyBrand) Orbit.applyBrand(); } catch (e) {}
   }
 
+  function paintLabDefaults() {
+    if (!isLab()) return;
+    const email = document.getElementById('lg-user');
+    const pass = document.getElementById('lg-pass');
+    if (email && (!email.value || email.value === 'admin@demo.com')) email.value = (window.OrbitBackend && window.OrbitBackend.expectedEmail) || 'orbit.lab@demo.com';
+    if (pass && pass.value === 'demo123') pass.value = '';
+  }
+
+  function paintError(message) {
+    const box = document.querySelector('.lg-box');
+    if (!box) return;
+    let el = document.getElementById('login-error');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'login-error';
+      el.className = 'hint error';
+      box.appendChild(el);
+    }
+    el.textContent = message || '';
+  }
+
   function init() {
+    paintLabDefaults();
+
     const form = document.getElementById('login-form');
-    if (form) form.addEventListener('submit', e => {
+    if (form) form.addEventListener('submit', async e => {
       e.preventDefault();
       const email = (document.getElementById('lg-user') || {}).value || 'admin@demo.com';
-      login({ nombre: 'Paula Osorio', rol: 'Dirección', email });
-      showApp();
+      const pass = (document.getElementById('lg-pass') || {}).value || '';
+      try {
+        if (isLab()) {
+          await loginFirebase(email, pass);
+        } else {
+          login({ nombre: 'Paula Osorio', rol: 'Dirección', email });
+        }
+        paintError('');
+        showApp();
+      } catch (err) {
+        paintError(err && err.message ? err.message : 'No se pudo iniciar sesión.');
+        showLogin();
+      }
     });
+
     const reset = document.getElementById('lg-reset');
     if (reset) reset.addEventListener('click', e => { e.preventDefault(); logout(); });
 
+    if (isLab()) {
+      const auth = fbAuth();
+      if (auth && typeof auth.onAuthStateChanged === 'function') {
+        auth.onAuthStateChanged(function(u){ if (u) showApp(); else showLogin(); });
+      } else {
+        showLogin();
+      }
+      return;
+    }
+
     if (authed()) showApp(); else showLogin();
   }
-  return { init, authed, login, logout, user, showLogin };
+
+  return { init, authed, login, loginFirebase, logout, user, showLogin, showApp };
 })();
