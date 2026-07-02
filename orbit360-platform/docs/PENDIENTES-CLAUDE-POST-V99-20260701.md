@@ -1,7 +1,7 @@
 # PENDIENTES CLAUDE POST V99 / V1.73 - Orbit 360
 
-Fecha actualización: 2026-07-01 19:32 local
-Estado: documento vivo tras recuperación V99, empalme visual Claude v1.73 y Backend LAB protegido validado.
+Fecha actualización: 2026-07-01 19:38 local
+Estado: documento vivo tras recuperación V99, empalme visual Claude v1.73, Backend LAB protegido validado y Fase 8 preparada.
 
 ## Regla de separación
 
@@ -28,6 +28,14 @@ Estado: documento vivo tras recuperación V99, empalme visual Claude v1.73 y Bac
 - Backend LAB detectado `firestore-lab`: COMPLETADO.
 - Tenant `alianzas-soluciones`: COMPLETADO.
 - Sin errores JS globales en smoke: COMPLETADO.
+
+## Gate Fase 8
+
+- Fase 8 - Firestore LAB real por colecciones v1.73: PREPARADO EN GITHUB.
+- Cambio directo aplicado en `data/store-firestore-lab.local.js` sobre la rama `backend/v99-clean-claude-lab-20260701`.
+- Nuevo hook LAB v1.73: cache sincrónico, `onSnapshot` por colección, preferencias por tenant, diagnóstico `OrbitBackend.status()`, sin fallback a seed/localStorage/demo como fuente de verdad.
+- Documento técnico creado: `docs/GATE-FASE8-FIRESTORE-LAB-V173.md`.
+- Pendiente: ejecutar smoke local corto tras `git pull` para pasar Fase 8 de PREPARADO a COMPLETADO.
 
 ## Resultado técnico validado para no repetir
 
@@ -67,10 +75,10 @@ Fase 7D validó:
 
 ## Pendientes técnicos para ChatGPT/Codex
 
-1. Fase 8: Firestore LAB real por colecciones v1.73, sin tocar módulos.
-2. Mantener API exacta de `Orbit.store`: `all`, `get`, `where`, `find`, `insert`, `update`, `remove`, `on`, `_emit`, `pref`, `setPref`, `init`, `reseed`, `raw`.
-3. Cargar datos por tenant `alianzas-soluciones` y colecciones v1.73.
-4. Evitar fallback silencioso a seed/demo como fuente de verdad cuando `orbitBackend=firestore-lab`.
+1. Ejecutar smoke local corto de Fase 8 después de `git pull`.
+2. Confirmar `OrbitBackend.apiVersion = v1.73-firestore-lab`.
+3. Confirmar `OrbitBackend.collections.length = 27`.
+4. Confirmar `OrbitBackend.status()` y `snapshotAttached/snapshotAttachedCount` según disponibilidad de Firebase SDK/Auth LAB.
 5. Mantener `index-dev-firestore` solo como legacy NO-USAR.
 6. Documentar cada cambio en bitácoras antes de cerrar gate.
 
