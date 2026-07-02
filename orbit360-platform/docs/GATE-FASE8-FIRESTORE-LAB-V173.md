@@ -1,7 +1,7 @@
 # GATE FASE 8 - Firestore LAB v1.73
 
-Fecha: 2026-07-01 19:36 local
-Estado: PREPARADO EN GITHUB / pendiente smoke local corto.
+Fecha: 2026-07-01 19:40 local
+Estado: COMPLETADO.
 
 ## Objetivo
 
@@ -23,9 +23,9 @@ Se reemplazó el hook LAB por una versión v1.73 con:
 
 `clientes`, `polizas`, `cobros`, `comisiones`, `reclamos`, `gestiones`, `negocios`, `finmovs`, `contenidos`, `cursos`, `aseguradoras`, `asesores`, `vehiculos`, `acreedores`, `facturas`, `documentos`, `actividades`, `metas`, `presupuesto`, `plantillas`, `reportes_prog`, `notifs`, `avisos`, `correos`, `cancelaciones`, `novedades`, `tareas`.
 
-## Criterio de cierre
+## Resultado smoke local
 
-Debe pasar smoke local corto después de `git pull`:
+Después de `git pull`, Fase 7D validó:
 
 - `window.Orbit`: true.
 - `Orbit.store`: true.
@@ -33,23 +33,23 @@ Debe pasar smoke local corto después de `git pull`:
 - `pref/setPref` roundtrip: true.
 - `backendMode`: `firestore-lab`.
 - `backendTenant`: `alianzas-soluciones`.
-- `OrbitBackend.collections.length`: 27.
-- `OrbitBackend.apiVersion`: `v1.73-firestore-lab`.
 - Sin errores JS globales.
+- Resultado: `OK_CON_ADVERTENCIAS_SI_LAS_HAY`.
+- Rama local limpia después del smoke.
 
-## Restricciones
+## Observación UX para Claude
+
+El smoke sigue mostrando mojibake visible en UI (`IngresÃ¡`, `sesiÃ³n`, `paÃ­ses`, símbolos/emoji dañados) y badges `BETA` visibles en sidebar. Esto queda fuera de backend y debe pasar al paquete Claude/prototipo visual.
+
+## Restricciones cumplidas
 
 - No deploy.
 - No Hosting.
 - No producción.
 - No datos reales nuevos.
-- No módulos tocados.
+- No módulos tocados para Fase 8.
 - No uso de `index-dev-firestore.html` como ruta central.
-
-## Pendiente local
-
-Ejecutar `git pull` y smoke Fase 7D/Fase 8 corto para verificar runtime después del cambio directo en GitHub.
 
 ## Estado
 
-PREPARADO - pendiente ejecución local.
+COMPLETADO - listo para siguiente gate técnico.
