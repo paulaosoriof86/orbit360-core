@@ -6,7 +6,7 @@
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.integraciones = (function () {
-  const API_VERSION = 'v0.2-demo-marketing-seed';
+  const API_VERSION = 'v0.3-diagnostico-eventos';
   const STRUCT_VERSION = 37;
 
   function extendSeed() {
@@ -136,15 +136,39 @@ Orbit.integraciones = (function () {
     try { if (S() && S()._emit) S()._emit('eventosIntegracion'); } catch (e) {}
     return row;
   }
+  function list(filter) {
+    filter = filter || {};
+    let rows = [];
+    try { rows = (S().all('eventosIntegracion') || []).slice(); } catch (e) { rows = []; }
+    if (filter.modulo) rows = rows.filter(r => r.modulo === filter.modulo);
+    if (filter.evento) rows = rows.filter(r => r.evento === filter.evento);
+    if (filter.proveedor) rows = rows.filter(r => r.proveedor === filter.proveedor);
+    if (filter.estado) rows = rows.filter(r => r.estado === filter.estado);
+    if (filter.entidad) rows = rows.filter(r => r.entidad === filter.entidad);
+    if (filter.entidadId) rows = rows.filter(r => r.entidadId === filter.entidadId);
+    rows.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+    const limit = Number(filter.limit || 50);
+    return rows.slice(0, limit).map(r => safe(Object.assign({}, r)));
+  }
+  function resumen() {
+    const rows = list({ limit: 10000 });
+    const byEstado = {}, byProveedor = {}, byEvento = {}, byModulo = {};
+    rows.forEach(r => {
+      byEstado[r.estado || 'sin_estado'] = (byEstado[r.estado || 'sin_estado'] || 0) + 1;
+      byProveedor[r.proveedor || 'sin_proveedor'] = (byProveedor[r.proveedor || 'sin_proveedor'] || 0) + 1;
+      byEvento[r.evento || 'sin_evento'] = (byEvento[r.evento || 'sin_evento'] || 0) + 1;
+      byModulo[r.modulo || 'general'] = (byModulo[r.modulo || 'general'] || 0) + 1;
+    });
+    return { apiVersion: API_VERSION, tenantId: tenantId(), total: rows.length, byEstado, byProveedor, byEvento, byModulo, ultimos: rows.slice(0, 10) };
+  }
   function status() {
-    let eventos = 0, pendientes = 0, errores = 0;
-    try {
-      const rows = S().all('eventosIntegracion') || [];
-      eventos = rows.length;
-      pendientes = rows.filter(r => r.estado === 'pendiente' || r.estado === 'pendiente_configuracion').length;
-      errores = rows.filter(r => r.estado === 'error' || r.error).length;
-    } catch (e) {}
-    return { apiVersion: API_VERSION, tenantId: tenantId(), eventos, pendientes, errores };
+    const r = resumen();
+    const pendientes = (r.byEstado.pendiente || 0) + (r.byEstado.pendiente_configuracion || 0);
+    const errores = (r.byEstado.error || 0) + r.ultimos.filter(x => x.error).length;
+    return { apiVersion: API_VERSION, tenantId: tenantId(), eventos: r.total, pendientes, errores };
+  }
+  function diagnostico(filter) {
+    return { status: status(), resumen: resumen(), eventos: list(filter || { limit: 25 }) };
   }
   function mark(idEvento, patch) {
     patch = patch || {};
@@ -152,5 +176,5 @@ Orbit.integraciones = (function () {
     try { return S().update('eventosIntegracion', idEvento, patch); }
     catch (e) { return null; }
   }
-  return { emit, status, mark, extendSeed, version: API_VERSION };
+  return { emit, status, list, resumen, diagnostico, mark, extendSeed, version: API_VERSION };
 })();
