@@ -7,3 +7,10 @@ index-dev-auth.html
 orbit360-platform/index-dev-auth.html
 _orbit360_backups/
 _orbit360_tmp/
+_orbit360_reports/
+_orbit360_imports/
+_orbit360_exports/
+*.local.csv
+*.local.json
+*.real.csv
+*.real.json
