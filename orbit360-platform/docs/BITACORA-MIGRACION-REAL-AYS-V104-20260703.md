@@ -104,3 +104,13 @@
 - **Fix o mejora aplicada:** Se creó diccionario de sinónimos por colección/campo, motor de mapeo con reporte de confianza y wrapper PowerShell. El primer ensayo ejecuta mapeo en dry-run antes de validar.
 - **Impacto en prototipo comercializable:** Acelera migraciones de otros clientes y reduce errores humanos sin saltar revisión previa a carga.
 - **Estado:** RESUELTO EN RAMA / pendiente probar con CSV reales locales.
+
+## 2026-07-03 — Auditoría de calidad y relaciones de datos
+
+- **Módulo/área:** Migración / Calidad de datos / Reglas de negocio.
+- **Síntoma/necesidad:** Antes de generar payload o escribir en LAB, se deben detectar relaciones rotas y reglas críticas de cartera.
+- **Esperado:** Bloquear archivos con pólizas sin cliente/aseguradora, cobros sin póliza/cliente, comisiones sin póliza/aseguradora, reclamos sin cliente/póliza, IDs duplicados o cobros pendientes ligados a pólizas canceladas/vencidas.
+- **Archivo/función:** `tools/orbit360-auditar-calidad-datos-ays-v104.mjs`, `tools/orbit360-auditar-calidad-datos-ays-v104.ps1`, `docs/AUDITORIA-CALIDAD-DATOS-AYS-V104-20260703.md`, `tools/orbit360-run-primer-ensayo-importacion-ays-v104.ps1`.
+- **Fix o mejora aplicada:** Se creó auditor local sin red/Firebase/escritura remota e integración al primer ensayo antes de generar payload.
+- **Impacto en prototipo comercializable:** Protege consistencia multi-tenant y evita que datos migrados dañen cartera, producción, comisiones o analítica.
+- **Estado:** RESUELTO EN RAMA / pendiente probar con datos reales locales.
