@@ -15,6 +15,13 @@ Orbit.integracionesPanel = (function () {
     if (estado === 'pendiente_configuracion') return 'warn';
     return 'info';
   }
+  function isLabMode() {
+    try {
+      const q = new URLSearchParams(location.search || '');
+      if (q.get('orbitBackend') === 'firestore-lab' || q.has('smoke')) return true;
+      return location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+    } catch (e) { return false; }
+  }
   function open(filter) {
     filter = filter || {};
     if (!Orbit.integraciones || !Orbit.integraciones.diagnostico) {
@@ -43,7 +50,9 @@ Orbit.integracionesPanel = (function () {
       const rows = diag.eventos || [];
       const resumen = diag.resumen || {};
       const byEstado = resumen.byEstado || {};
-      back.innerHTML = '<div class="card" style="width:min(980px,96vw);max-height:92vh;overflow:auto;padding:0">'
+      const lab = isLabMode() && Orbit.integraciones && Orbit.integraciones.labMock;
+      const actionHead = lab ? '<th>LAB</th>' : '';
+      back.innerHTML = '<div class="card" style="width:min(1080px,96vw);max-height:92vh;overflow:auto;padding:0">'
         + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">'
         + '<div><b style="font-family:var(--f-display);font-size:17px">🔌 Eventos de integración</b><div class="muted" style="font-size:12px;margin-top:3px">Trazabilidad demo/LAB. No envía APIs externas ni webhooks reales.</div></div>'
         + '<button class="imp-x" id="int-x">✕</button></div>'
@@ -62,10 +71,11 @@ Orbit.integracionesPanel = (function () {
         + '<label class="ce-l">Evento<input id="int-ev" class="o-sel" value="' + esc(state.evento) + '" placeholder="marketing_..."></label>'
         + '<button class="btn primary" id="int-apply">Aplicar filtros</button>'
         + '</div></div>'
+        + (lab ? '<div class="cfg-note">🧪 Modo LAB activo: puedes simular el ciclo de un evento ficticio. No se envía nada real.</div>' : '')
         + '<div class="card" style="overflow:hidden;box-shadow:none">'
         + '<div style="padding:11px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:14px">Últimos eventos</b><span class="muted" style="font-size:12px">' + rows.length + ' visibles</span></div>'
-        + '<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Fecha</th><th>Módulo</th><th>Evento</th><th>Proveedor</th><th>Estado</th><th>Entidad</th><th>Error</th></tr></thead><tbody>'
-        + (rows.length ? rows.map(row).join('') : '<tr><td colspan="7" class="muted" style="text-align:center;padding:22px">Sin eventos con estos filtros. En Marketing, usa Crear pieza, Programar o Importar calendario.</td></tr>')
+        + '<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Fecha</th><th>Módulo</th><th>Evento</th><th>Proveedor</th><th>Estado</th><th>Entidad</th><th>Error</th>' + actionHead + '</tr></thead><tbody>'
+        + (rows.length ? rows.map(function (r) { return row(r, lab); }).join('') : '<tr><td colspan="' + (lab ? '8' : '7') + '" class="muted" style="text-align:center;padding:22px">Sin eventos con estos filtros. En Marketing, usa Crear pieza, Programar o Importar calendario.</td></tr>')
         + '</tbody></table></div></div>'
         + '<div class="cfg-note">Este panel es diagnóstico seguro. Para envíos reales falta configurar backend/Make por tenant.</div>'
         + '</div></div>';
@@ -77,6 +87,15 @@ Orbit.integracionesPanel = (function () {
         state.evento = back.querySelector('#int-ev').value.trim();
         paint();
       });
+      back.querySelectorAll('[data-lab-cycle]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const id = btn.getAttribute('data-lab-cycle');
+          btn.disabled = true;
+          btn.textContent = 'Simulando…';
+          try { Orbit.integraciones.labMock('ciclo', id, { forzar: true }); } catch (e) {}
+          setTimeout(function () { paint(); }, 550);
+        });
+      });
     }
     function kpi(label, val, color, foot) {
       return '<div class="cx-kpi"><span>' + esc(label) + '</span><b style="color:' + color + '">' + esc(val) + '</b><small>' + esc(foot) + '</small></div>';
@@ -84,7 +103,7 @@ Orbit.integracionesPanel = (function () {
     function select(label, id, value, opts) {
       return '<label class="ce-l">' + esc(label) + '<select id="' + id + '" class="o-sel">' + opts.map(function (o) { return '<option value="' + esc(o) + '" ' + (o === value ? 'selected' : '') + '>' + esc(o || 'Todos') + '</option>'; }).join('') + '</select></label>';
     }
-    function row(r) {
+    function row(r, lab) {
       return '<tr>'
         + '<td class="mono" style="font-size:11px">' + esc((r.createdAt || '').slice(0, 16).replace('T', ' ')) + '</td>'
         + '<td>' + esc(r.modulo || '') + '</td>'
@@ -93,6 +112,7 @@ Orbit.integracionesPanel = (function () {
         + '<td><span class="badge ' + badgeTone(r.estado) + '" style="font-size:10px">' + esc(r.estado || '') + '</span></td>'
         + '<td style="font-size:12px">' + esc([r.entidad, r.entidadId].filter(Boolean).join(' · ')) + '</td>'
         + '<td style="font-size:11.5px;color:var(--danger)">' + esc(r.error || '') + '</td>'
+        + (lab ? '<td><button class="btn ghost sm" data-lab-cycle="' + esc(r.id || '') + '">🧪 Simular</button></td>' : '')
         + '</tr>';
     }
     back.addEventListener('click', function (e) { if (e.target === back) back.remove(); });
