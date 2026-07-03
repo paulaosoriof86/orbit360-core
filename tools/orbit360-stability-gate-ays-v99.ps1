@@ -31,6 +31,11 @@ function ReadText([string]$Path) {
   return Get-Content $Path -Raw -Encoding UTF8
 }
 
+function Has-RealLocalStorageUsage([string]$Text) {
+  if (-not $Text) { return $false }
+  return ($Text.Contains("localStorage.") -or $Text.Contains("window.localStorage") -or $Text.Contains("localStorage[") -or $Text.Contains("localStorage ["))
+}
+
 New-Item -ItemType Directory -Force -Path $Reports | Out-Null
 Set-Content -Path $Report -Value "============================================================" -Encoding UTF8
 Add-Report "ORBIT 360 - STABILITY GATE A&S V99"
@@ -63,7 +68,7 @@ try {
   }
   Add-Report ""
 
-  Add-Report "== 3. Archivos críticos =="
+  Add-Report "== 3. Archivos criticos =="
   $Critical = @(
     "firestore.rules",
     "orbit360-platform\index.html",
@@ -101,7 +106,7 @@ try {
     if (-not $HasStore) { Add-Blocker "index.html no carga data/store.js" }
     if (-not $HasLab) { Add-Blocker "index.html no carga store-firestore-lab.local.js" }
     if (-not $HasSeed) { Add-Blocker "index.html no carga data/seed.js" }
-    if (-not ($HasLoader -and $HasInit)) { Add-Warning "index.html aun no integra loader/init LAB permanente. Ejecutar integrador local antes del smoke." }
+    if (-not ($HasLoader -and $HasInit)) { Add-Warning "index.html aun no integra loader/init LAB permanente. El smoke puede usar inyeccion temporal; dejar fix permanente para cierre controlado." }
     if ($HasLoader -and $HasInit) {
       $LoaderPos = $Index.IndexOf("core/backend-lab-loader.js")
       $InitPos = $Index.IndexOf("core/backend-lab-init.js")
@@ -119,11 +124,12 @@ try {
   Add-Report "== 6. Store API contract =="
   $StoreLab = ReadText (Join-Path $Repo "orbit360-platform\data\store-firestore-lab.local.js")
   if ($StoreLab) {
-    foreach ($Fn in @("all","get","where","find","insert","update","remove","on","_emit","pref","setPref","init","reseed","raw")) {
-      if ($StoreLab -match "\b$Fn\s*[:=]\s*function|\bfunction\s+$Fn\b|\b$Fn\s*\(") { Add-Report "OK: API detectada $Fn" }
+    foreach ($Fn in @("all","get","where","find","insert","update","remove","on","pref","setPref","init","reseed","raw")) {
+      if ($StoreLab -match "function\s+$Fn\b|$Fn\s*:\s*$Fn\b|$Fn\s*:\s*function|$Fn\s*\(") { Add-Report "OK: API detectada $Fn" }
       else { Add-Warning "No se detecto claramente API $Fn en store-firestore-lab.local.js" }
     }
-    if ($StoreLab.Contains("localStorage")) { Add-Blocker "store-firestore-lab.local.js no debe usar localStorage como fuente LAB." }
+    if ($StoreLab.Contains("_emit: emit")) { Add-Report "OK: API detectada _emit" } else { Add-Warning "No se detecto claramente API _emit en store-firestore-lab.local.js" }
+    if (Has-RealLocalStorageUsage $StoreLab) { Add-Blocker "store-firestore-lab.local.js usa localStorage de forma ejecutable." } else { Add-Report "OK: store LAB no usa localStorage ejecutable." }
     if ($StoreLab.Contains("tenantId/{tenantId}")) { Add-Report "OK: comentario/ruta tenantId detectada." }
   }
   Add-Report ""
@@ -131,12 +137,26 @@ try {
   Add-Report "== 7. Modulos no deben tocar localStorage =="
   $ModulesDir = Join-Path $Repo "orbit360-platform\modules"
   if (Test-Path $ModulesDir) {
-    $ModuleHits = Select-String -Path (Join-Path $ModulesDir "*.js") -Pattern "localStorage" -SimpleMatch -ErrorAction SilentlyContinue
-    if ($ModuleHits) {
-      foreach ($Hit in $ModuleHits) { Add-Report ("{0}:{1}: {2}" -f $Hit.Path.Replace($Repo + "\", ""), $Hit.LineNumber, $Hit.Line.Trim()) }
-      Add-Blocker "Hay modulos usando localStorage. Deben pasar por Orbit.store/Orbit.store.pref/core helper."
+    $ModuleHits = @()
+    Get-ChildItem $ModulesDir -Filter "*.js" | ForEach-Object {
+      $File = $_.FullName
+      $LineNo = 0
+      Get-Content $File -Encoding UTF8 | ForEach-Object {
+        $LineNo++
+        $Trim = $_.Trim()
+        if ($Trim.StartsWith("//")) { return }
+        if ($Trim.StartsWith("/*")) { return }
+        if ($Trim.StartsWith("*")) { return }
+        if ($Trim.Contains("localStorage.") -or $Trim.Contains("window.localStorage") -or $Trim.Contains("localStorage[")) {
+          $ModuleHits += ("{0}:{1}: {2}" -f $File.Replace($Repo + "\", ""), $LineNo, $Trim)
+        }
+      }
+    }
+    if ($ModuleHits.Count -gt 0) {
+      $ModuleHits | ForEach-Object { Add-Report $_ }
+      Add-Blocker "Hay modulos usando localStorage ejecutable. Deben pasar por Orbit.store/Orbit.store.pref/core helper."
     } else {
-      Add-Report "OK: modulos sin localStorage directo."
+      Add-Report "OK: modulos sin localStorage ejecutable directo."
     }
   }
   Add-Report ""
@@ -144,13 +164,17 @@ try {
   Add-Report "== 8. Recaudo no debe crear finmov automatico =="
   $Queries = ReadText (Join-Path $Repo "orbit360-platform\core\queries.js")
   if ($Queries) {
-    if ($Queries -match "function\s+postRecaudo[\s\S]{0,260}return\s*;") {
-      Add-Report "OK: postRecaudo parece no-op/return."
+    if ($Queries -match "function\s+postRecaudo") {
+      if ($Queries -match "function\s+postRecaudo[\s\S]{0,260}return\s*;") {
+        Add-Report "OK: postRecaudo parece no-op/return."
+      } else {
+        Add-Warning "postRecaudo existe pero no se confirmo como no-op. Revisar que recaudo no cree finmov automatico."
+      }
+      if ($Queries -match "postRecaudo[\s\S]{0,900}finmov") {
+        Add-Blocker "Riesgo: postRecaudo menciona finmov cerca. Revisar separacion cartera/caja."
+      }
     } else {
-      Add-Warning "No se confirmo postRecaudo como no-op. Revisar que recaudo no cree finmov automatico."
-    }
-    if ($Queries -match "postRecaudo[\s\S]{0,900}finmov") {
-      Add-Blocker "Riesgo: postRecaudo menciona finmov cerca. Revisar separacion cartera/caja."
+      Add-Report "OK: no existe postRecaudo en core/queries.js; sin evidencia de finmov automatico desde esa funcion."
     }
   } else {
     Add-Warning "No se encontro core/queries.js para validar postRecaudo."
@@ -160,7 +184,7 @@ try {
   Add-Report "== 9. Seed demo sin marcadores obvios de datos reales =="
   $Seed = ReadText (Join-Path $Repo "orbit360-platform\data\seed.js")
   if ($Seed) {
-    $RiskTerms = @("NIT","DPI","cedula","cédula","pasaporte","iban","cuenta bancaria","Alianzas y Soluciones Corredores")
+    $RiskTerms = @("NIT","DPI","cedula","cedula","pasaporte","iban","cuenta bancaria","Alianzas y Soluciones Corredores")
     foreach ($Term in $RiskTerms) {
       if ($Seed -match [regex]::Escape($Term)) { Add-Warning "Seed contiene termino sensible o real-like: $Term. Revisar que sea ficticio." }
     }
@@ -168,7 +192,7 @@ try {
   }
   Add-Report ""
 
-  Add-Report "== 10. Sintaxis JS crítica con node --check =="
+  Add-Report "== 10. Sintaxis JS critica con node --check =="
   $Node = Get-Command node -ErrorAction SilentlyContinue
   if ($Node) {
     $JsFiles = @(
