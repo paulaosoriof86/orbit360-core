@@ -94,3 +94,13 @@
 - **Fix o mejora aplicada:** Se creó conversor Python con `openpyxl`, wrapper PowerShell que prepara venv local ignorado e integración al primer ensayo sin escritura.
 - **Impacto en prototipo comercializable:** Reduce fricción para migrar clientes desde Excel y conserva regla de no subir datos reales ni hardcodearlos.
 - **Estado:** RESUELTO EN RAMA / pendiente probar con Excel reales locales.
+
+## 2026-07-03 — Mapeo de columnas por sinónimos
+
+- **Módulo/área:** Migración / Mapeo inteligente / Reducción de trabajo manual.
+- **Síntoma/necesidad:** Los CSV generados desde Excel pueden traer encabezados distintos a los campos Orbit y no debe renombrarse todo manualmente.
+- **Esperado:** Sugerir colección y campos destino por sinónimos, con dry-run por defecto y normalización local solo con confirmación.
+- **Archivo/función:** `tools/orbit360-sinonimos-importacion-ays-v104.json`, `tools/orbit360-mapear-columnas-importacion-ays-v104.mjs`, `tools/orbit360-mapear-columnas-importacion-ays-v104.ps1`, `docs/MAPEO-COLUMNAS-IMPORTACION-AYS-V104-20260703.md`, `tools/orbit360-run-primer-ensayo-importacion-ays-v104.ps1`.
+- **Fix o mejora aplicada:** Se creó diccionario de sinónimos por colección/campo, motor de mapeo con reporte de confianza y wrapper PowerShell. El primer ensayo ejecuta mapeo en dry-run antes de validar.
+- **Impacto en prototipo comercializable:** Acelera migraciones de otros clientes y reduce errores humanos sin saltar revisión previa a carga.
+- **Estado:** RESUELTO EN RAMA / pendiente probar con CSV reales locales.
