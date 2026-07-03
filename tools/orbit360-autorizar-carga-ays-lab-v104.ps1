@@ -82,8 +82,18 @@ try {
   $Lister = Join-Path $Repo "tools\orbit360-listar-lotes-importacion-ays-v104.mjs"
   if (Test-Path $Lister) { node $Lister (Join-Path $Repo "_orbit360_exports") | ForEach-Object { Add-Report $_ } }
 
+  $Smoke = Join-Path $Repo "tools\orbit360-smoke-post-carga-ays-lab-v104.mjs"
+  if (Test-Path $Smoke) {
+    Add-Report ""
+    Add-Report "INICIO SMOKE POST CARGA LAB SOLO LECTURA"
+    node $Smoke --tenant alianzas-soluciones --project $ProjectId | ForEach-Object { Add-Report $_ }
+    $SmokeCode = $LASTEXITCODE
+    Add-Report "ExitCode smoke post carga: $SmokeCode"
+    if ($SmokeCode -ne 0) { throw "Smoke post carga fallo. No continuar a siguiente fase sin revisar/rollback." }
+  }
+
   Add-Report ""
-  Add-Report "RESULTADO: ESCRITURA_LAB_EJECUTADA"
+  Add-Report "RESULTADO: ESCRITURA_LAB_Y_SMOKE_EJECUTADOS"
   Add-Report "Revisar reportes, batchId y smoke antes de cualquier siguiente fase."
 } catch {
   Add-Report "ERROR GENERAL: $($_.Exception.Message)"
