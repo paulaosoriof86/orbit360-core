@@ -1,4 +1,4 @@
-# P0 Auth LAB · Config local faltante
+# P0 Auth LAB · Config local faltante / carga no confirmada
 
 **Fecha:** 2026-07-03  
 **Proyecto:** Orbit 360 / Backend LAB  
@@ -9,21 +9,45 @@
 
 ## 1. Sintoma
 
-Durante el smoke LAB, la pantalla de login muestra que Firebase Auth LAB no esta disponible y solicita verificar el archivo local de configuracion.
+Durante el smoke LAB, la pantalla de login mostro que Firebase Auth LAB no estaba disponible y solicito verificar el archivo local de configuracion.
 
 Esto ocurre antes de validar la clave. Por tanto, no se debe asumir que la contrasena sea incorrecta hasta confirmar que el SDK/config local cargo correctamente.
 
 ---
 
-## 2. Causa probable
+## 2. Diagnostico actualizado
 
-El archivo local protegido de configuracion Firebase no esta presente, no esta en la ruta esperada o no fue cargado por el shell local.
+Paula ejecuto diagnostico local y el resultado confirma:
 
-Este archivo es intencionalmente local y no debe subirse al repositorio porque puede contener configuracion operativa del backend LAB.
+- `core/auth-firebase.config.local.js` existe en destino.
+- Contiene `firebaseConfig`.
+- Contiene `apiKey`.
+- Contiene `authDomain`.
+- Contiene `projectId`.
+- Contiene `initializeApp`.
+- No se imprimieron claves ni contrasenas.
+
+Por tanto, el bloqueo ya no debe tratarse como archivo faltante. El siguiente paso es verificar carga en navegador:
+
+1. recarga dura `Ctrl + F5` en la pestaña LAB,
+2. confirmar que desaparece el mensaje `Firebase Auth LAB no disponible`,
+3. si persiste, validar por consola/HTTP que el navegador esta sirviendo el archivo local actualizado y que `firebase.auth()` queda disponible.
 
 ---
 
-## 3. Riesgo
+## 3. Causa probable actual
+
+Posibles causas restantes:
+
+- cache del navegador despues de restaurar/configurar archivo local,
+- servidor local corriendo antes de restaurar el archivo,
+- error JS dentro de la config local aunque tenga las claves esperadas,
+- configuracion Firebase incompatible con el SDK compat cargado,
+- orden de carga entre `backend-lab-loader`, `auth-firebase.config.local.js` y `core/auth.js`.
+
+---
+
+## 4. Riesgo
 
 - Bloquea el smoke LAB aunque demo normal funcione.
 - Puede generar confusion con credenciales si se intenta cambiar contrasena antes de verificar config.
@@ -31,7 +55,7 @@ Este archivo es intencionalmente local y no debe subirse al repositorio porque p
 
 ---
 
-## 4. Regla de no repeticion
+## 5. Regla de no repeticion
 
 Antes de pedir ingreso a LAB, el smoke debe verificar:
 
@@ -43,8 +67,16 @@ Antes de pedir ingreso a LAB, el smoke debe verificar:
 
 ---
 
-## 5. Estado
+## 6. Estado
 
-**ABIERTO / P0 operativo.**
+**EN PROGRESO / P0 operativo.**
 
-Pendiente restaurar o crear la config local fuera del repositorio, ejecutar smoke y validar login LAB.
+Pendiente inmediato:
+
+1. recargar LAB con `Ctrl + F5`,
+2. probar nuevamente login con la contrasena guardada,
+3. si falla, ejecutar diagnostico de navegador sin exponer secretos,
+4. completar smoke LAB:
+   - `OrbitBackend.status()`,
+   - prueba ficticia de escritura,
+   - `writeQueue/writeErrors`.
