@@ -104,7 +104,20 @@ if ($AllOk) {
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step "5. Ejecutar smoke A&S LAB v99" {
+  $AllOk = (Run-Step "5. Ejecutar stability gate A&S v99" {
+    $Script = Join-Path $Repo "tools\orbit360-stability-gate-ays-v99.ps1"
+    if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
+    $Code = $LASTEXITCODE
+    Add-Report "ExitCode stability gate: $Code"
+    if ($Code -eq 2) { throw "Stability gate bloqueado. Revisar reporte STABILITY-GATE-AYS-V99." }
+    if ($Code -eq 1) { Add-Report "Stability gate con advertencias. Se permite continuar, pero revisar reporte." }
+    if ($Code -eq 0) { Add-Report "Stability gate aprobado." }
+  }) -and $AllOk
+}
+
+if ($AllOk) {
+  $AllOk = (Run-Step "6. Ejecutar smoke A&S LAB v99" {
     $Script = Join-Path $Repo "tools\orbit360-smoke-ays-lab-v99.ps1"
     if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
     & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
@@ -112,7 +125,7 @@ if ($AllOk) {
   }) -and $AllOk
 }
 
-Run-Step "6. Estado Git posterior" {
+Run-Step "7. Estado Git posterior" {
   Set-Location $Repo
   $Branch = (git rev-parse --abbrev-ref HEAD).Trim()
   Add-Report "Rama final: $Branch"
@@ -128,7 +141,7 @@ Run-Step "6. Estado Git posterior" {
 Add-Report ""
 if ($AllOk) {
   Add-Report "RESULTADO FLUJO A&S LAB V99: EJECUTADO"
-  Add-Report "Revisar reportes individuales de integracion y smoke para confirmar si el smoke indica COMPLETADO."
+  Add-Report "Revisar reportes individuales de stability gate y smoke para confirmar aprobacion final."
 } else {
   Add-Report "RESULTADO FLUJO A&S LAB V99: BLOQUEADO_O_CON_ERRORES"
   Add-Report "No se hizo deploy, commit, push ni produccion. Revisar seccion de errores."
