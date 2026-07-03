@@ -89,7 +89,18 @@ $AllOk = (Run-Step "4. Validar empalme frontend v104" {
   if ($Code -ne 0) { throw "Validador empalme frontend fallo." }
 }) -and $AllOk
 
-$AllOk = (Run-Step "5. Verificar config Firebase LAB local" {
+$AllOk = (Run-Step "5. Validar carpeta de importacion A&S v104" {
+  Set-Location $Repo
+  $Validator = Join-Path $Repo "tools\orbit360-validar-importacion-ays-v104.mjs"
+  if (-not (Test-Path $Validator)) { throw "Falta validador: $Validator" }
+  $ImportDir = Join-Path $Repo "_orbit360_imports\ays_real"
+  node $Validator $ImportDir | ForEach-Object { Add-Report $_ }
+  $Code = $LASTEXITCODE
+  Add-Report "ExitCode validador importacion A&S: $Code"
+  if ($Code -ne 0) { throw "Validador importacion A&S fallo." }
+}) -and $AllOk
+
+$AllOk = (Run-Step "6. Verificar config Firebase LAB local" {
   $Config = Join-Path $Repo "orbit360-platform\core\auth-firebase.config.local.js"
   $PrepScript = Join-Path $Repo "tools\orbit360-preparar-config-firebase-lab-local.ps1"
 
@@ -115,7 +126,7 @@ $AllOk = (Run-Step "5. Verificar config Firebase LAB local" {
 }) -and $AllOk
 
 if ($AllOk) {
-  $AllOk = (Run-Step "6. Ejecutar integracion local backend LAB en index" {
+  $AllOk = (Run-Step "7. Ejecutar integracion local backend LAB en index" {
     $Script = Join-Path $Repo "tools\orbit360-integrar-backend-lab-index.ps1"
     if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
     & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
@@ -124,7 +135,7 @@ if ($AllOk) {
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step "7. Ejecutar stability gate A&S v99" {
+  $AllOk = (Run-Step "8. Ejecutar stability gate A&S v99" {
     $Script = Join-Path $Repo "tools\orbit360-stability-gate-ays-v99.ps1"
     if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
     & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
@@ -137,7 +148,7 @@ if ($AllOk) {
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step "8. Ejecutar smoke A&S LAB v99" {
+  $AllOk = (Run-Step "9. Ejecutar smoke A&S LAB v99" {
     $Script = Join-Path $Repo "tools\orbit360-smoke-ays-lab-v99.ps1"
     if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
     & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
@@ -145,7 +156,7 @@ if ($AllOk) {
   }) -and $AllOk
 }
 
-Run-Step "9. Estado Git posterior" {
+Run-Step "10. Estado Git posterior" {
   Set-Location $Repo
   $Branch = (git rev-parse --abbrev-ref HEAD).Trim()
   Add-Report "Rama final: $Branch"
