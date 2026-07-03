@@ -22,7 +22,7 @@ function Run-Step([string]$Name, [scriptblock]$Block) {
     Add-Report "OK: $Name"
     return $true
   } catch {
-    Add-Report "ERROR en $Name: $($_.Exception.Message)"
+    Add-Report ("ERROR en {0}: {1}" -f $Name, $_.Exception.Message)
     return $false
   }
 }
