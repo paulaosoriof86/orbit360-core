@@ -1,4 +1,4 @@
-# Suplemento puente Claude · Validador y Make seguro post v1.97
+# Suplemento puente Claude · Integraciones post v1.97
 
 **Fecha:** 2026-07-03  
 **Base:** Claude v1.97  
@@ -13,70 +13,123 @@ Este suplemento registra avances posteriores al documento puente principal para 
 
 ---
 
-## 2. Validador Marketing + Integraciones
+## 2. Archivos que Claude debe conservar
 
-Archivo nuevo:
+Claude debe conservar o migrar sin romper contrato:
 
+- `core/integraciones.js`
+- `core/integraciones-panel.js`
+- `core/integraciones-lab-mock.js`
+- `modules/marketing.js`
 - `tools/orbit360-validate-marketing-integraciones.mjs`
 
-Documento:
+---
 
-- `docs/AVANCE-VALIDADOR-MARKETING-INTEGRACIONES-20260703.md`
+## 3. Contratos de integración que no deben romperse
 
-Commit:
+`Orbit.integraciones` debe mantener:
 
-- `36c871186d058146383a48c6e6350a8a7dd110e1` · `tools: agregar validador marketing integraciones`
+- `emit(...)`
+- `configurar(...)`
+- `status()`
+- `list(...)`
+- `resumen()`
+- `diagnostico(...)`
+- `openPanel(...)`
+- `ensureLabMock(...)`
+- `labMock(...)`
+- `mark(...)`
 
-Qué valida:
+Regla base:
 
-- existencia de `core/integraciones.js`,
-- existencia de `core/integraciones-panel.js`,
-- carga de `core/integraciones.js` desde `index.html`,
-- presencia de eventos de Marketing,
-- contrato base de `Orbit.integraciones`.
-
-Claude no debe borrar este archivo ni reemplazarlo por instrucciones manuales. Es parte de la metodología incremental.
+```text
+Módulo funcional → Orbit.integraciones.emit(...) → eventosIntegracion → backend seguro por tenant → proveedor final
+```
 
 ---
 
-## 3. Especificación Make seguro
+## 4. Marketing
 
-Documento nuevo:
+Marketing ya emite eventos seguros para:
 
-- `docs/ESPEC-ADAPTADOR-MAKE-SEGURO-20260703.md`
+- `marketing_sync_sheets`
+- `marketing_generar_pieza`
+- `marketing_programar_publicacion`
+- `marketing_contenido_creado`
 
-Commit:
-
-- `bdef9ff5832ce84f5174b1265fd4fa21a94be85e` · `docs(make): especificar adaptador seguro`
-
-Reglas que Claude debe respetar:
-
-- los módulos no llaman Make directamente;
-- Marketing usa `Orbit.integraciones.emit(...)`;
-- los eventos se trazan en `eventosIntegracion`;
-- la activación real depende de backend seguro por tenant;
-- no se deben mostrar ni guardar credenciales reales en frontend;
-- demo/LAB debe operar con estado `pendiente_configuracion` cuando falte conexión real.
+Claude debe evitar regresar botones a simples `toast` sin trazabilidad.
 
 ---
 
-## 4. Impacto en UI Claude
+## 5. Panel diagnóstico
 
-Claude debe reflejar:
+El panel reutilizable debe mantenerse como acceso a eventos de integración.
 
-1. Botón o acceso a panel de eventos de integración.
-2. Estados claros: pendiente configuración, pendiente, enviado, confirmado, error.
-3. Mensajes de configuración pendiente sin notas técnicas visibles.
-4. Historial de eventos por contenido en Marketing.
-5. Configuración por tenant, no hardcodeada.
+Debe permitir ver:
+
+- total de eventos;
+- pendientes;
+- errores;
+- pendientes de configuración;
+- últimos eventos;
+- filtros por módulo, proveedor, evento y estado.
+
+También existe acción LAB de simulación. Debe mostrarse solo en demo/desarrollo, no en producción.
 
 ---
 
-## 5. Estado
+## 6. Configuración tenant-wide
 
-**ACTIVO COMO SUPLEMENTO PUENTE.**
+La configuración final debe ser ágil desde la plataforma, pero segura:
 
-Cuando Paula pida paquete para Claude, incluir este suplemento junto con:
+```text
+Configuración UI
+→ Orbit.integraciones.configurar(...)
+→ backend seguro
+→ referencia segura por tenant
+→ estado visible para todos los usuarios del tenant
+```
+
+Claude no debe diseñar una solución local por navegador. La configuración debe aplicar para el tenant completo.
+
+En demo/LAB, `configurar(...)` solo deja el estado como pendiente de backend. No debe presentar eso como conexión real.
+
+---
+
+## 7. Backend real
+
+Decisión tomada:
+
+- no activar backend real antes del próximo empalme de prototipo;
+- primero recibir nueva versión Claude;
+- auditarla;
+- empalmar sin perder backend;
+- luego conectar Firestore/Auth/Secret Manager/Make real por tenant.
+
+---
+
+## 8. Validador técnico
+
+El validador técnico ahora cubre:
+
+- contratos de `Orbit.integraciones`;
+- panel diagnóstico;
+- mock LAB;
+- eventos de Marketing;
+- reglas seguras;
+- sintaxis JS sin ejecutar plataforma;
+- contrato `configurar(...)`.
+
+Claude no debe eliminarlo.
+
+---
+
+## 9. Estado para paquete Claude
+
+**INCLUIR EN PAQUETE CLAUDE.**
+
+Cuando Paula pida el paquete, incluir este suplemento junto con:
 
 - `docs/MEJORAS-CHATGPT-PARA-CLAUDE-POST-V197-20260703.md`
 - `docs/RESUMEN-AVANCE-INTERNO-POST-V197-20260703.md`
+- `docs/CHECKLIST-VALIDACION-MARKETING-INTEGRACIONES-20260703.md`
