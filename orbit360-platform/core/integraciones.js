@@ -6,8 +6,9 @@
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.integraciones = (function () {
-  const API_VERSION = 'v0.3-diagnostico-eventos';
+  const API_VERSION = 'v0.4-panel-loader';
   const STRUCT_VERSION = 37;
+  let panelLoading = false;
 
   function extendSeed() {
     const seed = Orbit.SEED;
@@ -170,11 +171,26 @@ Orbit.integraciones = (function () {
   function diagnostico(filter) {
     return { status: status(), resumen: resumen(), eventos: list(filter || { limit: 25 }) };
   }
+  function ensurePanel(cb) {
+    if (Orbit.integracionesPanel && Orbit.integracionesPanel.open) { if (cb) cb(); return; }
+    if (panelLoading) { setTimeout(() => ensurePanel(cb), 180); return; }
+    panelLoading = true;
+    const s = document.createElement('script');
+    s.src = 'core/integraciones-panel.js?v1296';
+    s.onload = function () { panelLoading = false; if (cb) cb(); };
+    s.onerror = function () { panelLoading = false; try { Orbit.ui.toast('No se pudo cargar el panel de integraciones.'); } catch (e) {} };
+    document.head.appendChild(s);
+  }
+  function openPanel(filter) {
+    ensurePanel(function () {
+      if (Orbit.integracionesPanel && Orbit.integracionesPanel.open) Orbit.integracionesPanel.open(filter || {});
+    });
+  }
   function mark(idEvento, patch) {
     patch = patch || {};
     patch.updatedAt = nowIso();
     try { return S().update('eventosIntegracion', idEvento, patch); }
     catch (e) { return null; }
   }
-  return { emit, status, list, resumen, diagnostico, mark, extendSeed, version: API_VERSION };
+  return { emit, status, list, resumen, diagnostico, openPanel, mark, extendSeed, version: API_VERSION };
 })();
