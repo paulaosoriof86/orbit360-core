@@ -84,6 +84,35 @@ Debe incluir:
 - Actualizar docs que mencionan v0.86, v1.21, v1.34, v1.41, v1.55 si ya no son fuente de verdad.
 - Crear índice documental vivo.
 
+### P1-05 — Incorporar matriz de importación inicial A&S
+
+- **Origen:** `docs/MATRIZ-IMPORTACION-INICIAL-AYS-20260703.md`.
+- **Esperado en prototipo:** el módulo Importar debe reconocer como flujos prioritarios:
+  - Directorio Aseguradoras GT;
+  - Directorio Aseguradoras CO;
+  - Clientes base;
+  - Pólizas;
+  - Recibos/cobros;
+  - Comisiones;
+  - Movimientos financieros históricos;
+  - Calendario marketing.
+- **Impacto:** el prototipo debe acompañar el uso real interno A&S y no solo la demo genérica.
+- **Estado:** ABIERTO.
+
+### P1-06 — Reflejar smoke mínimo LAB en prototipo
+
+- **Origen:** `docs/SMOKE-MINIMO-LAB-AYS-20260703.md`.
+- **Esperado:** módulos críticos deben soportar el recorrido:
+  1. aseguradora;
+  2. cliente;
+  3. póliza;
+  4. cobro/recibo;
+  5. aplicar pago sin crear `finmov`;
+  6. registrar movimiento financiero real separado;
+  7. comisión base;
+  8. Cliente 360.
+- **Estado:** ABIERTO.
+
 ## P2 — UX/comercializable
 
 - Garantizar que notas técnicas no aparezcan en UI cliente.
@@ -99,8 +128,12 @@ Debe incluir:
 3. Errata sobre recaudo vs `finmovs`.
 4. Separación de carriles Claude / ChatGPT-Codex / A&S / Core.
 5. Compuerta de empalme para no reiniciar backend.
+6. Plan urgente de uso interno A&S.
+7. Matriz de importación inicial A&S.
+8. Smoke mínimo LAB A&S.
+9. Protocolo de ramas: backend A&S no va en rama de prototipo.
 
 ## Estado
 
 **Estado general:** ABIERTO.  
-**Próximo paquete Claude:** incluir este backlog completo junto con auditoría revisada, bitácoras y plan actualizado.
+**Próximo paquete Claude:** incluir este backlog completo junto con auditoría revisada, bitácoras, plan actualizado, matriz de importación y smoke mínimo.
