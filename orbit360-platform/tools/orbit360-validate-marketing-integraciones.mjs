@@ -63,6 +63,7 @@ log('');
   'core/integraciones-panel.js',
   'core/integraciones-lab-mock.js',
   'modules/marketing.js',
+  'modules/configuracion.js',
   'data/store.js',
   'data/seed.js'
 ].forEach(exists);
@@ -75,6 +76,10 @@ contains('core/integraciones.js', 'openPanel', 'openPanel');
 contains('core/integraciones.js', 'extendSeed', 'extendSeed');
 contains('core/integraciones.js', 'ensureLabMock', 'ensureLabMock');
 contains('core/integraciones.js', 'labMock', 'labMock');
+contains('core/integraciones.js', 'sanitizeIntegrationPref', 'sanitizeIntegrationPref');
+contains('core/integraciones.js', 'installSafePrefGuard', 'installSafePrefGuard');
+contains('core/integraciones.js', '__integracionesPrefGuard', 'guard pref instalado');
+contains('core/integraciones.js', 'backend_required', 'referencia backend para credenciales');
 contains('core/integraciones.js', 'core/integraciones-lab-mock.js', 'carga mock LAB bajo demanda');
 contains('core/integraciones-panel.js', 'Orbit.integracionesPanel', 'Orbit.integracionesPanel');
 contains('core/integraciones-panel.js', 'data-lab-cycle', 'boton LAB data-lab-cycle');
@@ -99,6 +104,7 @@ log('Validacion de reglas seguras:');
 contains('core/integraciones.js', 'Orbit.store', 'uso capa store en helper');
 contains('core/integraciones.js', 'S().insert', 'insert via store');
 contains('core/integraciones.js', 'S().update', 'update via store');
+contains('modules/configuracion.js', "Orbit.store.setPref('integ_", 'configuracion usa ruta sanitizada por pref guard');
 
 log('');
 log('Validacion sintactica JS sin ejecutar codigo:');
@@ -106,7 +112,8 @@ log('Validacion sintactica JS sin ejecutar codigo:');
   'core/integraciones.js',
   'core/integraciones-panel.js',
   'core/integraciones-lab-mock.js',
-  'modules/marketing.js'
+  'modules/marketing.js',
+  'modules/configuracion.js'
 ].forEach(syntax);
 
 log('');
