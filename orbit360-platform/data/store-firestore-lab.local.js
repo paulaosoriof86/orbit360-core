@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Store Firestore LAB v1.73
+   Orbit 360 - Store Firestore LAB v1.74
    Backend-only hook for index.html when ?orbitBackend=firestore-lab.
    No modules touched. No seed/localStorage fallback as source of truth.
    API contract:
@@ -43,11 +43,17 @@
     tenant: tenantId,
     expectedUid: EXPECTED_UID,
     expectedEmail: EXPECTED_EMAIL,
-    apiVersion: 'v1.73-firestore-lab',
+    apiVersion: 'v1.74-firestore-lab-write-status',
     source: 'data/store-firestore-lab.local.js',
     ready: true,
     status: 'booting',
     lastError: null,
+    lastExtra: null,
+    lastWriteAt: null,
+    lastWriteOkAt: null,
+    lastWriteErrorAt: null,
+    writeQueue: [],
+    writeErrors: [],
     collections: COLLECTIONS.slice(),
     collectionPaths: {},
     snapshotAttached: false,
@@ -61,7 +67,7 @@
   function log(){
     try {
       var args = Array.prototype.slice.call(arguments);
-      args.unshift('[Orbit Firestore LAB v1.73]');
+      args.unshift('[Orbit Firestore LAB v1.74]');
       console.log.apply(console, args);
     } catch(e) {}
   }
@@ -69,7 +75,71 @@
   function setError(message, extra){
     state.lastError = message || 'unknown';
     if (extra) state.lastExtra = String(extra && (extra.message || extra) || extra);
-    try { console.warn('[Orbit Firestore LAB v1.73]', message, extra || ''); } catch(e) {}
+    try { console.warn('[Orbit Firestore LAB v1.74]', message, extra || ''); } catch(e) {}
+  }
+
+  function emitBackendEvent(name, detail){
+    try {
+      w.dispatchEvent(new CustomEvent(name, {
+        detail: Object.assign({ mode: mode, tenantId: tenantId }, detail || {})
+      }));
+    } catch(e) {}
+  }
+
+  function writeKey(collection, id, op){
+    return [collection || '_', id || '_', op || '_'].join('::');
+  }
+
+  function markRowSync(collection, id, patch){
+    if (!collection || !id) return;
+    var row = get(collection, id);
+    if (!row || typeof row !== 'object') return;
+    Object.keys(patch || {}).forEach(function(k){
+      if (patch[k] === undefined) delete row[k];
+      else row[k] = patch[k];
+    });
+    emit(collection);
+  }
+
+  function markPending(collection, id, op){
+    var now = new Date().toISOString();
+    var key = writeKey(collection, id, op);
+    state.lastWriteAt = now;
+    state.writeQueue = state.writeQueue.filter(function(item){ return item.key !== key; });
+    state.writeQueue.push({ key: key, collection: collection, id: id, op: op, status: 'pending', at: now });
+    markRowSync(collection, id, { _syncStatus: 'pending', _syncOp: op, _syncError: undefined, _syncAt: now });
+    emitBackendEvent('orbit:backend:write-pending', { collection: collection, id: id, op: op, at: now });
+  }
+
+  function markSynced(collection, id, op){
+    var now = new Date().toISOString();
+    var key = writeKey(collection, id, op);
+    state.lastWriteOkAt = now;
+    state.writeQueue = state.writeQueue.filter(function(item){ return item.key !== key; });
+    markRowSync(collection, id, { _syncStatus: 'synced', _syncOp: op, _syncError: undefined, _syncAt: now });
+    emitBackendEvent('orbit:backend:write-ok', { collection: collection, id: id, op: op, at: now });
+  }
+
+  function markWriteFailed(collection, id, op, error){
+    var now = new Date().toISOString();
+    var key = writeKey(collection, id, op);
+    var message = String(error && (error.message || error) || error || 'unknown');
+    state.lastWriteErrorAt = now;
+    state.writeQueue = state.writeQueue.filter(function(item){ return item.key !== key; });
+    state.writeErrors.push({ key: key, collection: collection, id: id, op: op, status: 'failed', at: now, error: message });
+    if (state.writeErrors.length > 100) state.writeErrors = state.writeErrors.slice(-100);
+    markRowSync(collection, id, { _syncStatus: 'failed', _syncOp: op, _syncError: message, _syncAt: now });
+    setError(op + ' failed: ' + collection, error);
+    emitBackendEvent('orbit:backend:write-error', { collection: collection, id: id, op: op, at: now, error: message });
+  }
+
+  function cleanForWrite(row){
+    var out = clone(row) || {};
+    delete out._syncStatus;
+    delete out._syncOp;
+    delete out._syncError;
+    delete out._syncAt;
+    return out;
   }
 
   function db(){
@@ -273,16 +343,22 @@
       row.ownerEmail = row.ownerEmail || u.email || EXPECTED_EMAIL;
     }
 
+    row._syncStatus = 'pending';
+    row._syncOp = 'insert';
+    row._syncAt = new Date().toISOString();
     upsertCache(collection, row);
+    markPending(collection, row.id, 'insert');
 
     try {
       var ref = collectionRef(collection);
       if (!ref || typeof ref.doc !== 'function') throw new Error('firestore-not-ready');
-      ref.doc(row.id).set(row, { merge: true }).catch(function(e){
-        setError('insert failed: ' + collection, e);
+      ref.doc(row.id).set(cleanForWrite(row), { merge: true }).then(function(){
+        markSynced(collection, row.id, 'insert');
+      }).catch(function(e){
+        markWriteFailed(collection, row.id, 'insert', e);
       });
     } catch(e) {
-      setError('insert queued in cache only: ' + collection, e);
+      markWriteFailed(collection, row.id, 'insert', e);
     }
 
     return row;
@@ -294,33 +370,57 @@
     row.id = id;
     row.tenantId = row.tenantId || tenantId;
     row.updatedAt = new Date().toISOString();
+    row._syncStatus = 'pending';
+    row._syncOp = 'update';
+    row._syncAt = new Date().toISOString();
 
     upsertCache(collection, row);
+    markPending(collection, id, 'update');
 
     try {
       var ref = collectionRef(collection);
       if (!ref || typeof ref.doc !== 'function') throw new Error('firestore-not-ready');
-      ref.doc(id).set(row, { merge: true }).catch(function(e){
-        setError('update failed: ' + collection, e);
+      ref.doc(id).set(cleanForWrite(row), { merge: true }).then(function(){
+        markSynced(collection, id, 'update');
+      }).catch(function(e){
+        markWriteFailed(collection, id, 'update', e);
       });
     } catch(e) {
-      setError('update queued in cache only: ' + collection, e);
+      markWriteFailed(collection, id, 'update', e);
     }
 
     return row;
   }
 
   function remove(collection, id){
+    var previous = clone(get(collection, id));
+    markPending(collection, id, 'remove');
     removeCache(collection, id);
 
     try {
       var ref = collectionRef(collection);
       if (!ref || typeof ref.doc !== 'function') throw new Error('firestore-not-ready');
-      ref.doc(id).delete().catch(function(e){
-        setError('remove failed: ' + collection, e);
+      ref.doc(id).delete().then(function(){
+        markSynced(collection, id, 'remove');
+      }).catch(function(e){
+        if (previous) {
+          previous._syncStatus = 'failed';
+          previous._syncOp = 'remove';
+          previous._syncError = String(e && (e.message || e) || e);
+          previous._syncAt = new Date().toISOString();
+          upsertCache(collection, previous);
+        }
+        markWriteFailed(collection, id, 'remove', e);
       });
     } catch(e) {
-      setError('remove cache only: ' + collection, e);
+      if (previous) {
+        previous._syncStatus = 'failed';
+        previous._syncOp = 'remove';
+        previous._syncError = String(e && (e.message || e) || e);
+        previous._syncAt = new Date().toISOString();
+        upsertCache(collection, previous);
+      }
+      markWriteFailed(collection, id, 'remove', e);
     }
 
     return true;
@@ -351,6 +451,7 @@
 
   function setPref(key, value){
     prefs[key] = value;
+    markPending('__prefs', key, 'setPref');
     emit('__prefs');
 
     try {
@@ -360,11 +461,13 @@
       payload[key] = value;
       payload.updatedAt = new Date().toISOString();
       payload.tenantId = tenantId;
-      ref.set(payload, { merge: true }).catch(function(e){
-        setError('setPref failed: ' + key, e);
+      ref.set(payload, { merge: true }).then(function(){
+        markSynced('__prefs', key, 'setPref');
+      }).catch(function(e){
+        markWriteFailed('__prefs', key, 'setPref', e);
       });
     } catch(e) {
-      setError('setPref cache only: ' + key, e);
+      markWriteFailed('__prefs', key, 'setPref', e);
     }
 
     return value;
@@ -378,6 +481,8 @@
   function reseed(){
     COLLECTIONS.forEach(function(c){ cache[c] = []; });
     prefs = {};
+    state.writeQueue = [];
+    state.writeErrors = [];
     emit('*');
     return api;
   }
@@ -524,7 +629,7 @@
     noFallback: true,
     ready: true,
     source: 'data/store-firestore-lab.local.js',
-    apiVersion: 'v1.73-firestore-lab',
+    apiVersion: 'v1.74-firestore-lab-write-status',
     collections: COLLECTIONS.slice(),
     collectionPaths: state.collectionPaths,
     expectedUid: EXPECTED_UID,
@@ -545,5 +650,5 @@
   setTimeout(attachSnapshots, 1200);
   setTimeout(attachSnapshots, 3500);
 
-  log('Store Firestore LAB v1.73 instalado. Tenant:', tenantId);
+  log('Store Firestore LAB v1.74 instalado. Tenant:', tenantId);
 })();
