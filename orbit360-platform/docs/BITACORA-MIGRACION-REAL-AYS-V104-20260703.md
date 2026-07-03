@@ -84,3 +84,13 @@
 - **Fix o mejora aplicada:** Se creó script maestro de ensayo sin escritura, con reporte, portapapeles y Notepad. Verifica rama, sincroniza, prepara carpetas, valida CSV/JSON, genera payload, lista lotes y ejecuta rollback dry-run.
 - **Impacto en prototipo comercializable:** Permite probar el flujo completo con datos reales locales antes de cualquier escritura en LAB; reduce riesgo operativo para A&S y futuros tenants.
 - **Estado:** RESUELTO EN RAMA / pendiente ejecución local con archivos reales.
+
+## 2026-07-03 — Conversión Excel a CSV para importación real
+
+- **Módulo/área:** Migración / Excel / Reducción de trabajo manual.
+- **Síntoma/necesidad:** Los datos reales de A&S pueden venir en Excel y no debe pedirse conversión manual hoja por hoja.
+- **Esperado:** Convertir `.xlsx/.xlsm` locales a CSV UTF-8 en carpetas ignoradas por Git antes de validar.
+- **Archivo/función:** `tools/orbit360-convertir-excel-importacion-ays-v104.py`, `tools/orbit360-convertir-excel-importacion-ays-v104.ps1`, `docs/CONVERSION-EXCEL-IMPORTACION-AYS-V104-20260703.md`, `tools/orbit360-run-primer-ensayo-importacion-ays-v104.ps1`.
+- **Fix o mejora aplicada:** Se creó conversor Python con `openpyxl`, wrapper PowerShell que prepara venv local ignorado e integración al primer ensayo sin escritura.
+- **Impacto en prototipo comercializable:** Reduce fricción para migrar clientes desde Excel y conserva regla de no subir datos reales ni hardcodearlos.
+- **Estado:** RESUELTO EN RAMA / pendiente probar con Excel reales locales.
