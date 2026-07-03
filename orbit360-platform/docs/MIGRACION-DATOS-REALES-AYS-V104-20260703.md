@@ -2,11 +2,11 @@
 
 **Fecha:** 2026-07-03  
 **Rama:** `ays/backend-tenant-lab-v99-20260703`  
-**Estado:** preparación y validación local; sin carga real automática.
+**Estado:** preparación, validación, payload dry-run y cargador LAB controlado.
 
 ## 1. Objetivo
 
-Acercar Orbit 360 al uso real de A&S sin comprometer estabilidad ni escalabilidad. Este carril permite preparar y validar archivos reales localmente antes de cargarlos a Firestore LAB.
+Acercar Orbit 360 al uso real de A&S sin comprometer estabilidad ni escalabilidad. Este carril permite preparar, validar y ensayar carga de archivos reales localmente antes de escribir en Firestore LAB.
 
 ## 2. Regla principal
 
@@ -26,6 +26,7 @@ Esa carpeta está ignorada por Git.
 tools/orbit360-schema-importacion-ays-v104.json
 tools/orbit360-validar-importacion-ays-v104.mjs
 tools/orbit360-preparar-importacion-ays-v104.ps1
+tools/orbit360-cargar-importacion-ays-lab-v104.mjs
 ```
 
 También se actualizó:
@@ -41,8 +42,9 @@ tools/orbit360-run-flujo-ays-lab-v99.ps1
 2. Colocar CSV/JSON reales en `_orbit360_imports/ays_real`.
 3. Validar estructura y reglas mínimas.
 4. Corregir errores de columnas, ids, país o moneda.
-5. Ejecutar flujo maestro A&S LAB v104.
-6. Solo después crear cargador LAB controlado hacia Firestore.
+5. Ejecutar dry-run de payload.
+6. Ejecutar flujo maestro A&S LAB v104.
+7. Solo con autorización explícita, escribir en Firestore LAB.
 
 ## 5. Preparar carpetas locales
 
@@ -105,19 +107,30 @@ El validador revisa:
 - Pólizas vencidas/canceladas quedan como histórico, no cartera.
 - Cartera = cobros pendientes de pólizas vigentes/por renovar del año actual.
 
-## 9. Qué falta para cargar a Firestore LAB
+## 9. Dry-run y carga LAB controlada
 
-Todavía falta crear el cargador controlado. Debe cumplir:
+Dry-run, sin escritura:
 
-1. leer únicamente `_orbit360_imports/ays_real`;
-2. exigir validación OK previa;
-3. pedir confirmación explícita para escribir;
-4. escribir solo en tenant `alianzas-soluciones`;
-5. dejar reporte con conteos por colección;
-6. marcar cada registro con metadata de migración;
-7. no escribir secretos;
-8. no tocar producción.
+```txt
+node tools/orbit360-cargar-importacion-ays-lab-v104.mjs --input _orbit360_imports/ays_real --tenant alianzas-soluciones
+```
+
+Escritura LAB, solo con autorización explícita y configuración local:
+
+```txt
+node tools/orbit360-cargar-importacion-ays-lab-v104.mjs --input _orbit360_imports/ays_real --tenant alianzas-soluciones --project <PROJECT_ID_LAB> --write --confirm ESCRIBIR_LAB_AYS
+```
+
+El cargador:
+
+1. lee únicamente `_orbit360_imports/ays_real`;
+2. genera payload local en `_orbit360_exports`;
+3. escribe solo en `tenantId/alianzas-soluciones/{coleccion}/{id}` cuando se usan flags de escritura;
+4. deja reporte con conteos por colección;
+5. marca cada registro con metadata de migración;
+6. no toca producción;
+7. no debe usarse con datos en repo.
 
 ## 10. Estado
 
-Preparación y validación de importación real quedan listas en rama. El siguiente bloque debe crear el cargador LAB controlado, pero solo para LAB y con confirmación explícita antes de escribir.
+Carril técnico de migración real queda listo para preparar archivos, validar estructura, generar dry-run y cargar a Firestore LAB solo con confirmación explícita. Pendiente: ejecutar localmente con archivos reales y revisar reportes antes de cualquier escritura LAB.
