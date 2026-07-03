@@ -62,3 +62,13 @@
 - **Fix o mejora aplicada:** El servidor temporal del smoke inyecta loader/init solo en memoria cuando sirve `index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones`; no modifica el archivo real.
 - **Impacto en prototipo comercializable:** Permite validar backend ahora y deja pendiente el fix permanente del index central.
 - **Estado:** RESUELTO PARA SMOKE / PENDIENTE FIX PERMANENTE INDEX.
+
+## 2026-07-03 — Script seguro para integración permanente backend LAB en index
+
+- **Módulo/área:** Backend LAB / Index central / Metodología segura.
+- **Síntoma/necesidad:** Se requiere integrar permanentemente loader/init en `index.html`, pero editar el HTML grande directamente desde GitHub puede dañar codificación existente.
+- **Esperado:** Aplicar fix mínimo local con backup, verificación de rama, verificación de orden y reporte, sin commit/push/deploy automático.
+- **Archivo/función:** `tools/orbit360-integrar-backend-lab-index.ps1`, `orbit360-platform/docs/INTEGRAR-BACKEND-LAB-INDEX-20260703.md`.
+- **Fix o mejora aplicada:** Se creó script que inserta `core/backend-lab-loader.js` y `core/backend-lab-init.js` antes de `data/store.js` solo si faltan, verifica orden y deja reporte en Notepad/portapapeles.
+- **Impacto en prototipo comercializable:** Reduce riesgo de mojibake y deja camino controlado para activar index central LAB sin tocar producción.
+- **Estado:** LISTO PARA EJECUCIÓN LOCAL.
