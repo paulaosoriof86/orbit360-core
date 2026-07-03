@@ -94,6 +94,10 @@ Claude no debe diseñar una solución local por navegador. La configuración deb
 
 En demo/LAB, `configurar(...)` solo deja el estado como pendiente de backend. No debe presentar eso como conexión real.
 
+Documento adicional:
+
+- `docs/PENDIENTE-CLAUDE-CONFIG-INTEGRACIONES-UI-20260703.md`
+
 ---
 
 ## 7. Backend real
@@ -133,3 +137,4 @@ Cuando Paula pida el paquete, incluir este suplemento junto con:
 - `docs/MEJORAS-CHATGPT-PARA-CLAUDE-POST-V197-20260703.md`
 - `docs/RESUMEN-AVANCE-INTERNO-POST-V197-20260703.md`
 - `docs/CHECKLIST-VALIDACION-MARKETING-INTEGRACIONES-20260703.md`
+- `docs/PENDIENTE-CLAUDE-CONFIG-INTEGRACIONES-UI-20260703.md`
