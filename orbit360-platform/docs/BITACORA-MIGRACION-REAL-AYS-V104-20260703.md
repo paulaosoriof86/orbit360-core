@@ -74,3 +74,13 @@
 - **Fix o mejora aplicada:** Se creó listado de lotes locales y rollback LAB que borra documentos por `_migration.batchId` solo si se usa `--write --confirm ROLLBACK_LAB_AYS`. Sin flags, solo calcula candidatos.
 - **Impacto en prototipo comercializable:** Permite migraciones por lote con trazabilidad y reversión, requisito crítico antes de usar datos reales de cualquier tenant.
 - **Estado:** RESUELTO EN RAMA / pendiente probar con primer payload real local.
+
+## 2026-07-03 — Primer ensayo real sin escritura
+
+- **Módulo/área:** Migración / Ensayo operativo / QA.
+- **Síntoma/necesidad:** Paula necesita avanzar rápido hacia uso real, pero aún no debe escribirse en Firestore sin revisar reportes.
+- **Esperado:** Un solo script que ejecute preparación, validación, dry-run de carga, listado de lote y rollback dry-run, sin escribir en Firestore.
+- **Archivo/función:** `tools/orbit360-run-primer-ensayo-importacion-ays-v104.ps1`, `docs/PRIMER-ENSAYO-IMPORTACION-AYS-V104-20260703.md`.
+- **Fix o mejora aplicada:** Se creó script maestro de ensayo sin escritura, con reporte, portapapeles y Notepad. Verifica rama, sincroniza, prepara carpetas, valida CSV/JSON, genera payload, lista lotes y ejecuta rollback dry-run.
+- **Impacto en prototipo comercializable:** Permite probar el flujo completo con datos reales locales antes de cualquier escritura en LAB; reduce riesgo operativo para A&S y futuros tenants.
+- **Estado:** RESUELTO EN RAMA / pendiente ejecución local con archivos reales.
