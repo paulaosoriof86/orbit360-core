@@ -1,0 +1,188 @@
+{
+  "version": "v1.104",
+  "collections": {
+    "asesores": {
+      "requiredSignals": ["asesor", "agente", "ejecutivo", "email", "correo"],
+      "fields": {
+        "id": ["id", "codigo", "codigo_asesor", "asesor_id", "cod_asesor"],
+        "nombre": ["nombre", "asesor", "nombre_asesor", "agente", "ejecutivo"],
+        "email": ["email", "correo", "correo_electronico", "mail"],
+        "telefono": ["telefono", "tel", "celular", "movil"],
+        "whatsapp": ["whatsapp", "wa", "telefono_whatsapp"],
+        "rol": ["rol", "cargo", "puesto"],
+        "pais": ["pais", "country"],
+        "activo": ["activo", "estado"],
+        "metaMensual": ["meta", "meta_mensual", "objetivo"]
+      }
+    },
+    "aseguradoras": {
+      "requiredSignals": ["aseguradora", "compania", "cia", "portal"],
+      "fields": {
+        "id": ["id", "codigo", "codigo_aseguradora", "cod_cia"],
+        "nombre": ["nombre", "aseguradora", "compania", "cia", "empresa"],
+        "pais": ["pais", "country"],
+        "codigo": ["codigo", "cod", "codigo_cia"],
+        "contacto": ["contacto", "ejecutivo", "representante"],
+        "telefono": ["telefono", "tel", "pbx"],
+        "email": ["email", "correo", "mail"],
+        "portal": ["portal", "plataforma", "url", "link"],
+        "drive": ["drive", "carpeta", "folder"],
+        "nit": ["nit", "tax_id", "identificacion"],
+        "diasCredito": ["dias_credito", "credito", "dias_pago"]
+      }
+    },
+    "clientes": {
+      "requiredSignals": ["cliente", "asegurado", "contratante", "nit", "documento"],
+      "fields": {
+        "id": ["id", "cliente_id", "codigo_cliente", "cod_cliente"],
+        "nombre": ["nombre", "cliente", "asegurado", "contratante", "nombre_cliente", "razon_social"],
+        "pais": ["pais", "country"],
+        "tipo": ["tipo", "tipo_cliente", "persona"],
+        "documento": ["documento", "dpi", "cedula", "identificacion", "id_fiscal"],
+        "nit": ["nit", "nif", "tax_id"],
+        "email": ["email", "correo", "correo_electronico", "mail"],
+        "telefono": ["telefono", "tel", "celular", "movil"],
+        "whatsapp": ["whatsapp", "wa", "telefono_whatsapp"],
+        "direccion": ["direccion", "domicilio", "direccion_fiscal"],
+        "asesorId": ["asesor", "asesor_id", "ejecutivo", "agente"],
+        "estado": ["estado", "estatus", "status"],
+        "origen": ["origen", "fuente", "procedencia"],
+        "drive": ["drive", "carpeta", "folder"]
+      }
+    },
+    "vehiculos": {
+      "requiredSignals": ["placa", "vehiculo", "vin", "motor", "chasis"],
+      "fields": {
+        "id": ["id", "vehiculo_id", "codigo_vehiculo"],
+        "clienteId": ["cliente_id", "cliente", "asegurado", "propietario"],
+        "placa": ["placa", "matricula"],
+        "marca": ["marca"],
+        "linea": ["linea", "modelo_linea", "version"],
+        "modelo": ["modelo"],
+        "anio": ["anio", "año", "year"],
+        "vin": ["vin", "chasis", "serie"],
+        "motor": ["motor", "numero_motor"],
+        "uso": ["uso", "tipo_uso"],
+        "pais": ["pais"],
+        "estado": ["estado", "estatus"]
+      }
+    },
+    "polizas": {
+      "requiredSignals": ["poliza", "póliza", "ramo", "prima", "vigencia", "aseguradora"],
+      "fields": {
+        "id": ["id", "poliza_id", "codigo_poliza"],
+        "clienteId": ["cliente_id", "cliente", "asegurado", "contratante"],
+        "aseguradoraId": ["aseguradora_id", "aseguradora", "compania", "cia"],
+        "numero": ["numero", "numero_poliza", "poliza", "no_poliza", "póliza"],
+        "ramo": ["ramo", "producto", "tipo_seguro", "linea_negocio"],
+        "estado": ["estado", "estatus", "status", "situacion"],
+        "pais": ["pais"],
+        "moneda": ["moneda", "currency"],
+        "primaNeta": ["prima_neta", "prima", "prima_sin_iva", "prima_neta_recaudada"],
+        "fechaInicio": ["fecha_inicio", "inicio_vigencia", "desde", "vigencia_desde"],
+        "fechaFin": ["fecha_fin", "fin_vigencia", "hasta", "vigencia_hasta"],
+        "formaPago": ["forma_pago", "periodicidad", "pago"],
+        "asesorId": ["asesor", "asesor_id", "agente", "ejecutivo"],
+        "vehiculoId": ["vehiculo_id", "vehiculo", "placa"],
+        "primaTotal": ["prima_total", "total", "prima_con_iva"],
+        "iva": ["iva", "impuesto"],
+        "comisionPct": ["comision", "porcentaje_comision", "comision_pct"],
+        "renovable": ["renovable", "renovacion", "renovación"]
+      }
+    },
+    "cobros": {
+      "requiredSignals": ["recibo", "cobro", "vencimiento", "cuota", "pendiente"],
+      "fields": {
+        "id": ["id", "cobro_id", "recibo_id"],
+        "polizaId": ["poliza_id", "poliza", "póliza", "numero_poliza"],
+        "clienteId": ["cliente_id", "cliente", "asegurado"],
+        "estado": ["estado", "estatus", "status"],
+        "fechaVencimiento": ["fecha_vencimiento", "vencimiento", "fecha_pago", "vence"],
+        "monto": ["monto", "valor", "importe", "saldo", "total"],
+        "moneda": ["moneda"],
+        "pais": ["pais"],
+        "numeroRecibo": ["recibo", "numero_recibo", "no_recibo"],
+        "cuota": ["cuota", "numero_cuota"],
+        "formaPago": ["forma_pago", "periodicidad"],
+        "fechaPago": ["fecha_pago", "pagado", "fecha_cobro"],
+        "medioPago": ["medio_pago", "forma_cobro"],
+        "banco": ["banco", "cuenta"],
+        "referencia": ["referencia", "documento", "boleta"]
+      }
+    },
+    "comisiones": {
+      "requiredSignals": ["comision", "comisión", "planilla", "factura", "prima_neta"],
+      "fields": {
+        "id": ["id", "comision_id"],
+        "polizaId": ["poliza_id", "poliza", "póliza", "numero_poliza"],
+        "aseguradoraId": ["aseguradora_id", "aseguradora", "compania", "cia"],
+        "estado": ["estado", "estatus"],
+        "monto": ["monto", "comision", "comisión", "valor_comision"],
+        "moneda": ["moneda"],
+        "pais": ["pais"],
+        "facturaId": ["factura", "factura_id", "numero_factura"],
+        "fechaDevengo": ["fecha_devengo", "fecha", "fecha_planilla"],
+        "fechaCobro": ["fecha_cobro", "pagado", "fecha_pago"],
+        "asesorId": ["asesor", "asesor_id"],
+        "porcentaje": ["porcentaje", "porcentaje_comision", "comision_pct"],
+        "basePrimaNeta": ["prima_neta", "base", "prima_base"]
+      }
+    },
+    "facturas": {
+      "requiredSignals": ["factura", "serie", "numero_factura", "cxp", "cxc"],
+      "fields": {
+        "id": ["id", "factura_id"],
+        "tipo": ["tipo", "tipo_factura", "cxc", "cxp"],
+        "estado": ["estado", "estatus"],
+        "monto": ["monto", "valor", "total"],
+        "moneda": ["moneda"],
+        "pais": ["pais"],
+        "aseguradoraId": ["aseguradora", "aseguradora_id", "compania"],
+        "clienteId": ["cliente", "cliente_id"],
+        "numero": ["numero", "factura", "numero_factura", "no_factura"],
+        "fechaEmision": ["fecha_emision", "fecha", "emitida"],
+        "fechaVencimiento": ["fecha_vencimiento", "vence", "vencimiento"],
+        "fechaPago": ["fecha_pago", "pagada"],
+        "referencia": ["referencia", "documento"]
+      }
+    },
+    "finmovs": {
+      "requiredSignals": ["ingreso", "egreso", "movimiento", "banco", "cuenta"],
+      "fields": {
+        "id": ["id", "movimiento_id"],
+        "tipo": ["tipo", "ingreso_egreso", "movimiento"],
+        "fecha": ["fecha", "fecha_movimiento", "fecha_banco"],
+        "monto": ["monto", "valor", "importe"],
+        "moneda": ["moneda"],
+        "pais": ["pais"],
+        "categoria": ["categoria", "rubro", "concepto"],
+        "cuenta": ["cuenta", "cuenta_bancaria"],
+        "banco": ["banco"],
+        "referencia": ["referencia", "documento", "transaccion"],
+        "facturaId": ["factura", "factura_id"],
+        "polizaId": ["poliza", "poliza_id"],
+        "clienteId": ["cliente", "cliente_id"],
+        "descripcion": ["descripcion", "detalle", "observacion"]
+      }
+    },
+    "reclamos": {
+      "requiredSignals": ["reclamo", "siniestro", "expediente", "incidente"],
+      "fields": {
+        "id": ["id", "reclamo_id", "siniestro_id"],
+        "clienteId": ["cliente", "cliente_id", "asegurado"],
+        "polizaId": ["poliza", "poliza_id", "póliza"],
+        "estado": ["estado", "estatus"],
+        "fecha": ["fecha", "fecha_siniestro", "fecha_reclamo"],
+        "pais": ["pais"],
+        "numero": ["numero", "numero_reclamo", "siniestro"],
+        "ramo": ["ramo", "producto"],
+        "aseguradoraId": ["aseguradora", "aseguradora_id", "compania"],
+        "descripcion": ["descripcion", "detalle", "observacion"],
+        "montoEstimado": ["monto_estimado", "reserva", "estimado"],
+        "montoPagado": ["monto_pagado", "indemnizacion", "pagado"],
+        "responsable": ["responsable", "gestor"],
+        "bitacora": ["bitacora", "seguimiento", "historial"]
+      }
+    }
+  }
+}
