@@ -50,7 +50,7 @@ Orbit.modules.automatizaciones = (function () {
     const alertas = alertasPendientes();
     const logRows = LOG.slice(0, 12);
     h.innerHTML = `<div class="page">
-      ${K.banner({ icon: '⚡', title: 'Automatizaciones & Integraciones', sub: 'Conecta eventos de la operación con Make, WhatsApp, correo/Outlook y más · IA opcional', features: [] })}
+      ${K.banner({ icon: '⚡', title: 'Automatizaciones & Integraciones', sub: 'Conecta eventos de la operación con Make, WhatsApp, correo/Outlook y más · IA opcional', features: [], actions: '<button class="btn ghost" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)" onclick="Orbit.integraciones&&Orbit.integraciones.openPanel&&Orbit.integraciones.openPanel()">🔌 Eventos de integración</button>' })}
 
       <div class="aut-grid">
         <div class="aut-col-main">

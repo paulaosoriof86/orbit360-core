@@ -168,13 +168,14 @@ Orbit.modules.configuracion = (function () {
       ]]
     ];
     return `${sectionHead('Integraciones y add-ons', 'Conecta todo tu ecosistema — activables por plan')}
+      <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" onclick="Orbit.integraciones&&Orbit.integraciones.openPanel&&Orbit.integraciones.openPanel()">🔌 Ver eventos / diagnóstico de integraciones</button></div>
       ${lock ? `<div class="cfg-lock">🔒 Add-ons disponibles desde el plan Profesional.</div>` : ''}
       ${CATS.map(([cat, items]) => `
         <div class="cfg-intgroup"><div class="cfg-intgroup-h">${cat}</div>
         <div class="cfg-grid2">
-          ${items.map(([id, t2, d]) => { const on = !!t.addons[id]; const cfgd = (() => { const s = Orbit.store.pref('integ_' + id, {}) || {}; return !!s.key; })(); return `<div class="cfg-addon ${on ? 'on' : ''}">
-            <div style="flex:1"><b>${t2}</b><p>${d}</p>
-              <button class="btn ghost sm" style="margin-top:7px" onclick="Orbit.modules.configuracion.configIntegracion('${id}','${U.esc(t2).replace(/'/g, '')}')">⚙ Configurar${cfgd ? ' ✓' : ''}</button>
+          ${items.map(([id, t2, d]) => { const on = !!t.addons[id]; const st = integEstado(id); return `<div class="cfg-addon ${on ? 'on' : ''}">
+            <div style="flex:1"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><b>${t2}</b><span class="badge ${st.tone}" style="font-size:9.5px">${st.label}</span></div><p>${d}</p>
+              <button class="btn ghost sm" style="margin-top:7px" onclick="Orbit.modules.configuracion.configIntegracion('${id}','${U.esc(t2).replace(/'/g, '')}')">⚙ Configurar</button>
             </div>
             ${toggle('addon-' + id, on)}
           </div>`; }).join('')}
@@ -192,9 +193,9 @@ Orbit.modules.configuracion = (function () {
       <div class="card" style="overflow:hidden"><table class="tbl">
         <thead><tr><th>Servicio</th><th>Estado</th><th>Scope</th><th></th></tr></thead>
         <tbody>
-          ${[['WhatsApp Cloud API', 'Conectado', 'mensajería'], ['Aseguradora — Cotizador', 'Pendiente', 'tarifas'], ['SIGA / CRM externo', 'No configurado', 'importación']].map(r => `<tr>
+          ${[['WhatsApp Cloud API', 'Pendiente de backend', 'mensajería'], ['Aseguradora — Cotizador', 'Pendiente', 'tarifas'], ['SIGA / CRM externo', 'No configurado', 'importación']].map(r => `<tr>
             <td><b>${r[0]}</b></td>
-            <td><span class="badge ${r[1] === 'Conectado' ? 'ok' : r[1] === 'Pendiente' ? 'warn' : 'neutral'}">${r[1]}</span></td>
+            <td><span class="badge ${r[1] === 'Conectado' ? 'ok' : /Pendiente/.test(r[1]) ? 'warn' : 'neutral'}">${r[1]}</span></td>
             <td>${r[2]}</td>
             <td style="text-align:right"><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.modules.configuracion.configIntegracion('${U.esc(r[0])}')">Configurar</button></td>
           </tr>`).join('')}
@@ -421,39 +422,70 @@ Orbit.modules.configuracion = (function () {
       const host = document.getElementById('host'); if (host) render(host);
     });
   }
+  /* Estado claro por integración (tenant-wide). En demo/LAB NUNCA se presenta como
+     conexión real: si hay parámetros queda "Pendiente de backend". El sistema de
+     integraciones del lane backend (Orbit.integraciones) es la fuente de verdad cuando existe. */
+  function integEstado(id) {
+    const cfg = Orbit.store.pref('integ_' + id, {}) || {};
+    const tn = T().get();
+    const activo = !!(tn.addons && tn.addons[id]);
+    const configurado = !!(cfg.key || cfg.url || cfg.user || cfg.cuenta || cfg.permisos);
+    if (!configurado && !activo) return { label: 'No configurado', tone: 'neutral' };
+    return { label: 'Pendiente de backend', tone: 'warn' };
+  }
   function configIntegracion(nombre, titulo) {
     const label = titulo || nombre;
+    const esOutlook = nombre === 'correo';
     let back = document.getElementById('cf-integ'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'cf-integ'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
     const saved = Orbit.store.pref('integ_' + nombre, {}) || {};
-    back.innerHTML = '<div class="card" style="width:min(460px,94vw);padding:0">'
+    const perms = saved.permisos || {};
+    const body = esOutlook
+      ? '<label class="ce-l">Cuenta de correo (del usuario)<input id="ci-user" class="o-sel" value="' + U.esc(saved.cuenta || saved.user || '') + '" placeholder="nombre@tudominio.com"></label>'
+        + '<label class="ce-l">Tipo de buzón<select id="ci-tipo" class="o-sel"><option ' + (saved.tipo !== 'Compartido' ? 'selected' : '') + '>Personal</option><option ' + (saved.tipo === 'Compartido' ? 'selected' : '') + '>Compartido</option></select></label>'
+        + '<div class="ce-l">Permisos<div style="display:grid;gap:6px;margin-top:5px">'
+        + '<label class="ce-l ck" style="margin:0"><input type="checkbox" id="ci-p-leer" ' + (perms.leer !== false ? 'checked' : '') + '> Leer bandeja y asociar correos a clientes/pólizas/gestiones</label>'
+        + '<label class="ce-l ck" style="margin:0"><input type="checkbox" id="ci-p-enviar" ' + (perms.enviar !== false ? 'checked' : '') + '> Enviar en nombre del usuario</label>'
+        + '<label class="ce-l ck" style="margin:0"><input type="checkbox" id="ci-p-adj" ' + (perms.adjuntos ? 'checked' : '') + '> Guardar adjuntos como documentos del cliente</label>'
+        + '</div></div>'
+        + '<label class="ce-l">Patrón de asunto<input id="ci-pat" class="o-sel" value="' + U.esc(saved.patronAsunto || '{cliente} · {poliza} · {gestion}') + '"></label>'
+        + '<label class="ce-l">Client ID / Tenant (OAuth Microsoft 365, opcional)<input id="ci-url" class="o-sel" value="' + U.esc(saved.url || '') + '" placeholder="app registration / tenant id"></label>'
+      : '<label class="ce-l">API key / Token<input id="ci-key" class="o-sel" type="password" value="' + U.esc(saved.key || '') + '" placeholder="••••••••"></label>'
+        + '<label class="ce-l">Webhook / Endpoint / OAuth URL (opcional)<input id="ci-url" class="o-sel" value="' + U.esc(saved.url || '') + '" placeholder="https://hook.make.com/..."></label>'
+        + '<label class="ce-l">Cuenta / usuario (opcional)<input id="ci-user" class="o-sel" value="' + U.esc(saved.user || '') + '"></label>';
+    back.innerHTML = '<div class="card" style="width:min(480px,94vw);padding:0">'
       + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🔌 Conectar ' + U.esc(label) + '</b><button class="imp-x" id="ci-x">✕</button></div>'
       + '<div style="padding:18px 20px;display:grid;gap:11px">'
-      + '<label class="ce-l">API key / Token<input id="ci-key" class="o-sel" type="password" value="' + U.esc(saved.key || '') + '" placeholder="••••••••"></label>'
-      + '<label class="ce-l">Webhook / Endpoint / OAuth URL (opcional)<input id="ci-url" class="o-sel" value="' + U.esc(saved.url || '') + '" placeholder="https://hook.make.com/..."></label>'
-      + '<label class="ce-l">Cuenta / usuario (opcional)<input id="ci-user" class="o-sel" value="' + U.esc(saved.user || '') + '"></label>'
-      + '<label class="ce-l ck"><input type="checkbox" id="ci-on" ' + (saved.activa ? 'checked' : '') + '> Integración activa</label>'
-      + '<div id="ci-status" class="cfg-note">🔒 Las credenciales se guardan en el backend del cliente. En el prototipo quedan en este navegador.</div>'
+      + body
+      + '<label class="ce-l ck"><input type="checkbox" id="ci-on" ' + (saved.activa ? 'checked' : '') + '> Habilitar para el tenant</label>'
+      + '<div id="ci-status" class="cfg-note">La conexión se define a nivel <b>tenant</b> (no por navegador). En este entorno el estado queda <b>Pendiente de backend</b> hasta conectarlo; no se realizan conexiones reales.</div>'
       + '</div>'
-      + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="ci-test">🔌 Probar conexión</button><div style="display:flex;gap:8px"><button class="btn ghost" id="ci-cancel">Cancelar</button><button class="btn primary" id="ci-ok">Guardar</button></div></div></div>';
+      + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="ci-test">🔌 Validar parámetros</button><div style="display:flex;gap:8px"><button class="btn ghost" id="ci-cancel">Cancelar</button><button class="btn primary" id="ci-ok">Guardar</button></div></div></div>';
     document.body.appendChild(back);
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#ci-x').onclick = close; back.querySelector('#ci-cancel').onclick = close;
     back.querySelector('#ci-test').onclick = () => {
-      const k = back.querySelector('#ci-key').value.trim(), u = back.querySelector('#ci-url').value.trim();
+      const u = (back.querySelector('#ci-user') || {}).value || '';
+      const k = (back.querySelector('#ci-key') || {}).value || '';
+      const url = (back.querySelector('#ci-url') || {}).value || '';
       const st = back.querySelector('#ci-status');
-      if (!k && !u) { st.innerHTML = '⚠️ Ingresa una API key, endpoint u OAuth para probar.'; st.style.color = 'var(--warn)'; return; }
-      st.innerHTML = '⏳ Probando conexión con ' + U.esc(label) + '…'; st.style.color = '';
-      setTimeout(() => { st.innerHTML = '✅ Credenciales detectadas. La conexión real se valida al activar el backend en migración.'; st.style.color = 'var(--ok)'; }, 700);
+      if (!u && !k && !url) { st.innerHTML = '⚠️ Ingresa al menos la cuenta o credenciales para validar los parámetros.'; st.style.color = 'var(--warn)'; return; }
+      st.innerHTML = '✅ Parámetros completos. La conexión real se establece en el backend del tenant (queda <b>Pendiente de backend</b>).'; st.style.color = 'var(--ok)';
     };
     back.querySelector('#ci-ok').onclick = () => {
-      const data = { key: back.querySelector('#ci-key').value, url: back.querySelector('#ci-url').value, user: back.querySelector('#ci-user').value, activa: back.querySelector('#ci-on').checked };
+      const data = esOutlook
+        ? { cuenta: back.querySelector('#ci-user').value, tipo: back.querySelector('#ci-tipo').value, url: back.querySelector('#ci-url').value, patronAsunto: back.querySelector('#ci-pat').value, permisos: { leer: back.querySelector('#ci-p-leer').checked, enviar: back.querySelector('#ci-p-enviar').checked, adjuntos: back.querySelector('#ci-p-adj').checked }, activa: back.querySelector('#ci-on').checked }
+        : { key: back.querySelector('#ci-key').value, url: back.querySelector('#ci-url').value, user: (back.querySelector('#ci-user') || {}).value, activa: back.querySelector('#ci-on').checked };
+      // Contrato del sistema de integraciones (lane backend), si está presente: fuente de verdad tenant-wide.
+      try { if (window.Orbit && Orbit.integraciones && typeof Orbit.integraciones.configurar === 'function') Orbit.integraciones.configurar(nombre, data); } catch (x) {}
+      try { if (window.Orbit && Orbit.integraciones && typeof Orbit.integraciones.mark === 'function') Orbit.integraciones.mark(nombre, data.activa ? 'pendiente' : 'no_configurado'); } catch (x) {}
+      // Respaldo en el store del tenant (no localStorage crudo) para el prototipo.
       Orbit.store.setPref('integ_' + nombre, data);
       try { const tn = T().get(); tn.addons = tn.addons || {}; tn.addons[nombre] = data.activa; T().save && T().save(tn); } catch (e) {}
       close(); const host = document.getElementById('host'); if (host) render(host);
-      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + label + (data.activa ? ' conectada' : ' guardada'); document.body.appendChild(t); setTimeout(() => t.remove(), 2400);
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + label + (data.activa ? ' habilitada · Pendiente de backend' : ' guardada'); document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
     };
   }
 

@@ -52,7 +52,7 @@ Orbit.modules.reportes = (function () {
         <div class="rep-main">
           <div class="rep-head">
             <div><b style="font-family:var(--f-display);font-size:17px">${r.icon} ${r.t}</b><div class="muted" style="font-size:12.5px;margin-top:3px">${r.desc} · <b>${data.length}</b> registros</div></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" id="rep-mail">📧 Programar</button><button class="btn ghost sm" id="rep-exp">⬇ CSV</button><button class="btn ghost sm" id="rep-excel">📊 Excel</button><button class="btn ghost sm" id="rep-pdf">🖨 PDF</button></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary sm" id="rep-ia">🤖 Analizar con IA</button><button class="btn ghost sm" id="rep-mail">📧 Programar</button><button class="btn ghost sm" id="rep-exp">⬇ CSV</button><button class="btn ghost sm" id="rep-excel">📊 Excel</button><button class="btn ghost sm" id="rep-pdf">🖨 PDF</button></div>
           </div>
           <div class="card pad" style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <label style="font-size:12px;color:var(--muted)">Agrupar por</label>
@@ -76,6 +76,7 @@ Orbit.modules.reportes = (function () {
     host.querySelector('#rep-excel').addEventListener('click', () => exportExcel(r, data));
     host.querySelector('#rep-pdf').addEventListener('click', () => exportPDF(r, data));
     host.querySelector('#rep-mail').addEventListener('click', () => programar(r));
+    host.querySelector('#rep-ia').addEventListener('click', () => analizarIA(r, data));
   }
 
   function programar(r) {
@@ -134,6 +135,56 @@ Orbit.modules.reportes = (function () {
     w.document.write(`<html><head><title>${r.t}</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:sans-serif;font-size:11px}table{width:100%;border-collapse:collapse}th{background:#1E2227;color:#fff;padding:7px;text-align:left}td{padding:6px;border-bottom:1px solid #eee}h2{color:#C5162E}</style></head><body><h2>${r.icon} ${r.t}</h2><table><thead><tr>${r.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${data.slice(0, 500).map(row => `<tr>${row.map(c => `<td>${String(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`);
     w.document.close(); setTimeout(() => w.print(), 300);
     toast('🖨 Abre el diálogo de impresión — selecciona "Guardar como PDF"');
+  }
+
+  /* ---- Análisis IA del reporte: lectura ejecutiva + acciones (centralizado en Orbit.ia) ---- */
+  function ctxReporte(r, data) {
+    const numCols = r.cols.map((c, i) => data.some(row => parseNum(row[i]) !== null) ? i : -1).filter(i => i >= 0);
+    const totales = numCols.map(ci => ({ col: r.cols[ci], sum: data.reduce((s, row) => s + (parseNum(row[ci]) || 0), 0) }));
+    const catIdx = Math.max(0, r.cols.findIndex((c, i) => numCols.indexOf(i) < 0));
+    const grp = {}; data.forEach(row => { const k = row[catIdx] || '—'; grp[k] = (grp[k] || 0) + 1; });
+    const top = Object.entries(grp).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    return { numCols, totales, catIdx, top, catLbl: r.cols[catIdx] };
+  }
+  function fallbackAnalisis(r, data, ctx) {
+    const tot = ctx.totales.map(t => t.col + ' ≈ ' + U.money(t.sum, 'GTQ')).join(' · ');
+    const top = ctx.top.map(([k, n]) => k + ' (' + n + ')').join(', ');
+    const lider = ctx.top[0];
+    return '**Lectura ejecutiva**\n' + r.t + ': ' + data.length + ' registros. ' + (tot ? 'Totales: ' + tot + '. ' : '') + (lider ? 'Mayor concentración en **' + lider[0] + '** (' + lider[1] + ' registros, ' + Math.round(lider[1] / data.length * 100) + '%).' : '') +
+      '\n\n**Acciones sugeridas**\n' + '1. Revisar la concentración en ' + (lider ? lider[0] : 'el grupo principal') + ' y diversificar si supera el 35%.\n2. Priorizar seguimiento de los ' + ctx.catLbl.toLowerCase() + ' con mayor volumen (' + top + ').\n3. Exportar y contrastar contra el mes anterior para detectar desviaciones.';
+  }
+  function mdLite(s) {
+    let h = U.esc(String(s || '')).trim();
+    h = h.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+    h = h.replace(/^\s*(\d+)\.\s+(.*)$/gm, '<div style="margin:3px 0 3px 2px"><b>$1.</b> $2</div>');
+    h = h.replace(/^\s*[-•]\s+(.*)$/gm, '<div style="margin:3px 0 3px 10px">• $1</div>');
+    h = h.replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
+    return h;
+  }
+  async function analizarIA(r, data) {
+    let back = document.getElementById('rep-ia-p'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'rep-ia-p'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 98;
+    const disponible = !!(Orbit.ia && Orbit.ia.disponible && Orbit.ia.disponible());
+    back.innerHTML = `<div class="card" style="width:min(560px,95vw);max-height:90vh;display:flex;flex-direction:column;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🤖 Análisis IA · ${r.icon} ${U.esc(r.t)}</b><button class="imp-x" id="ria-x">✕</button></div>
+      <div style="padding:20px;overflow:auto;flex:1" id="ria-body"><div class="muted" style="display:flex;align-items:center;gap:8px"><span class="spin" style="display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite"></span> Analizando ${data.length} registros${disponible ? ' con IA' : ''}…</div></div>
+      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><span class="muted" style="font-size:11px">${disponible ? 'Generado por Orbit IA sobre datos en vivo' : 'Lectura automática (IA no conectada)'}</span><button class="btn ghost" id="ria-close">Cerrar</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    if (!document.getElementById('ria-spin-style')) { const st = document.createElement('style'); st.id = 'ria-spin-style'; st.textContent = '@keyframes spin{to{transform:rotate(360deg)}}'; document.head.appendChild(st); }
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#ria-x').onclick = close; back.querySelector('#ria-close').onclick = close;
+    const ctx = ctxReporte(r, data);
+    let out = '';
+    if (disponible) {
+      const resumen = 'Reporte: ' + r.t + '\nRegistros: ' + data.length + '\nTotales: ' + ctx.totales.map(t => t.col + '=' + Math.round(t.sum)).join(', ') + '\nTop ' + ctx.catLbl + ': ' + ctx.top.map(([k, n]) => k + '(' + n + ')').join(', ');
+      const prompt = 'Eres analista de un corredor de seguros. Con base en este resumen de un reporte en vivo, responde en español y en formato markdown con EXACTAMENTE dos secciones: "**Lectura ejecutiva**" (2-3 frases sobre qué está pasando y por qué importa) y "**Acciones sugeridas**" (3 acciones concretas y priorizadas, numeradas). Sé específico con los datos. Datos:\n' + resumen;
+      try { out = await Promise.race([Orbit.ia.complete(prompt), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 15000))]); } catch (e) {}
+    }
+    if (!out || !String(out).trim()) out = fallbackAnalisis(r, data, ctx);
+    const bodyEl = back.querySelector('#ria-body'); if (bodyEl) bodyEl.innerHTML = '<div style="font-size:13.5px;line-height:1.65">' + mdLite(out) + '</div>';
   }
 
   function toast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }

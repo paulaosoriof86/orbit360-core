@@ -2,6 +2,50 @@
 
 > Registro cronológico de cambios del **prototipo** (Claude). El backend LAB (ChatGPT/Codex) mantiene su propia bitácora. Formato: versión · fecha · qué cambió · archivos.
 
+## v1.102 — 2026-07-03 · Reportes: análisis IA (lectura ejecutiva + acciones sugeridas) · CL-009
+- **Nuevo botón 🤖 Analizar con IA** en cada reporte: arma un resumen en vivo (totales por columna numérica + concentración por la principal dimensión categórica) y pide a **`Orbit.ia.complete`** (IA centralizada) una **lectura ejecutiva** (qué pasa y por qué importa) + **3 acciones concretas priorizadas**, renderizadas en un panel. Con **timeout de resguardo (15s)** y **fallback determinista** (lectura + acciones calculadas de los datos) cuando la IA no está conectada — nunca se queda colgado.
+- Respeta el contrato: única llamada al modelo vía `Orbit.ia.complete`; si `Orbit.ia.disponible()` es falso, usa el análisis automático y lo indica en el panel.
+- Verificado por camino real: panel genera análisis real del reporte de Producción (1.2k chars, secciones Lectura/Acciones); 0 errores.
+- Cache-bust: `reportes.js` → `?v1297`.
+- Archivos: `modules/reportes.js`, `index.html`.
+
+
+## v1.101 — 2026-07-03 · FUSIÓN con lane ChatGPT/Codex (Integraciones + Marketing) + rebase v1.98–v1.100
+- **Base adoptada**: `ORBIT360-PLATFORM-FUSIONADO-CHATGPT-CODEX-POST-V197` (mi v1.97 + trabajo real de ChatGPT/Codex). **Conservado sin tocar**: `core/integraciones.js` (contratos `emit/configurar/status/list/resumen/diagnostico/openPanel/ensureLabMock/labMock/mark`), `core/integraciones-panel.js` y `core/integraciones-lab-mock.js` (se cargan on-demand desde `integraciones.js`), `modules/marketing.js` conectado a eventos (`marketing_sync_sheets/generar_pieza/programar_publicacion/contenido_creado`), `modules/automatizaciones.js` (banner "Automatizaciones & Integraciones"), `tools/orbit360-validate-marketing-integraciones.mjs`.
+- **Rebasado encima (aditivo, sin borrar contratos)**: mis 3 archivos post-v1.97 — `modules/renovaciones.js` (v1.98 comparativo multi-aseguradora + solicitar propuestas), `modules/configuracion.js` (v1.99 Outlook + estados tenant-wide; ya puentea a `Orbit.integraciones.configurar/mark` que ahora EXISTE de verdad), `modules/academia.js` (v1.100 rutas por rol + certificado imprimible).
+- **index.html**: base fusionada (con `core/integraciones.js?v1296`, `marketing.js?v1296`) + cache-bump de los 3 rebasados a `?v1297`.
+- Verificación pendiente en esta entrega: `Orbit.integraciones` presente y funciones de marketing/mis-features operativas (ver resumen).
+- Archivos tocados en la fusión: `modules/renovaciones.js`, `modules/configuracion.js`, `modules/academia.js`, `index.html`, `docs/BITACORA-CAMBIOS.md` (los demás provienen de la base fusionada).
+
+
+## v1.100 — 2026-07-03 · Academia: rutas de aprendizaje por rol + certificado imprimible (CL-008)
+- **Ruta por rol** (nuevo toggle 📚 Catálogo / 🧭 Ruta por rol): para el rol activo (o cualquiera vía selector) arma una **secuencia curada** de cursos ordenada por categoría (Inducción→Técnico→Producto→Comercial→…), con pasos numerados, barra de progreso por curso, **avance %/completados/certificados** de la ruta y botón **▶ Continuar ruta** (salta al primer curso pendiente). Reusa `destinatarios`/`progreso`/`certificado` — sin nuevo modelo de datos. El asesor ve su ruta (8 cursos) distinta de Dirección (10).
+- **Certificado imprimible** (`verCertificado`): botón 🏅 en cursos completados (catálogo + ruta) → documento de certificado (empresa/tenant, nombre del usuario, curso, categoría, **folio** y fecha viva) con Imprimir/PDF. Antes `certificado` era solo un flag sin documento.
+- Verificado por camino real: toggle de vista, selector de rol (10↔8 cursos), certificado renderiza "Certificado de finalización"; KPIs con valores; 0 errores.
+- Cache-bust: `academia.js` → `?v1294`.
+- Archivos: `modules/academia.js`, `index.html`.
+
+
+## v1.99 — 2026-07-03 · Integraciones tenant-wide + Outlook (CL-001/CL-006)
+- **Estados claros por integración** (`integEstado`): cada tarjeta muestra badge **No configurado / Pendiente de backend**. En demo/LAB **nunca** se presenta como conexión real (regla CL-001): guardar parámetros deja la integración en *Pendiente de backend*, no "conectada".
+- **Modal Outlook dedicado** (Microsoft 365): cuenta del usuario, tipo de buzón (personal/compartido), **permisos** (leer bandeja + asociar correos a clientes/pólizas/gestiones · enviar en nombre del usuario · guardar adjuntos como documentos del cliente), **patrón de asunto** `{cliente} · {poliza} · {gestion}`, y Client ID/Tenant OAuth. El resto de integraciones mantiene el modal genérico (API key/endpoint/cuenta).
+- **Puente al contrato del lane backend**: al guardar se llama `Orbit.integraciones.configurar(id, data)` y `Orbit.integraciones.mark(id, estado)` **si existen** (fuente de verdad tenant-wide); si no, respaldo en el **store del tenant** (`Orbit.store.setPref`, no localStorage crudo). **No** se crea un `core/integraciones.js` propio para no chocar con el del lane ChatGPT/Codex.
+- Quitada la nota técnica "quedan en este navegador" y el "Conectado" simulado en la tabla de APIs.
+- Verificado por camino real: modal Outlook guarda cuenta/permisos/patrón en store del tenant; lista muestra estados; 0 errores.
+- Cache-bust: `configuracion.js` → `?v1294`.
+- Archivos: `modules/configuracion.js`, `index.html`.
+- ⚠️ **Entrega/merge**: mi ZIP **no** incluye `core/integraciones.js` / `-panel.js` / `-lab-mock.js` (viven en el lane ChatGPT/Codex). Al consolidar, **conservar** esos archivos — no subir mi ZIP como reemplazo total si borra los del backend.
+
+
+## v1.98 — 2026-07-03 · Renovaciones: solicitar propuestas + comparativo MULTI-aseguradora
+- **Nuevo `solicitarPropuestas(polizaId)`** (botón 📋 Propuestas en cada tarjeta de renovación): antes solo existía la campaña por lote (WhatsApp) y no había comparativo — solo "simulaba la misma". Ahora abre un comparativo real con **elección de alcance**: 🔁 Solo la misma / 🏛️ Comparar con otras / ☑️ Seleccionar aseguradoras.
+- **Comparativo multi-aseguradora**: tabla con **prima estimada** por aseguradora (proyección determinista y estable — las tarifas oficiales se integran luego con el cotizador), **Δ vs prima actual** (color) y **comisión estimada** con el **% vigente por aseguradora/ramo** (`Orbit.comeng.pctAseguradora`). Ordenada por prima; se elige la ganadora con radio. Moneda del país, **sin mezclar** (candidatas filtradas por país del cliente).
+- **Acciones**: 📧 Enviar comparativo al cliente (correo + actividad en su expediente) y ✅ Registrar propuesta → crea gestión en **Ops · Renovaciones / Modif.** enlazada a cliente/póliza con checklist, notifica al asesor, y registra actividad. Todo con fecha viva.
+- Verificado por camino real: 6 aseguradoras comparadas, scope Seleccionar con candidatas, registrar → gestión creada en la lista correcta enlazada a la póliza (fecha de hoy); 0 errores.
+- Cache-bust: `renovaciones.js` → `?v1294`.
+- Archivos: `modules/renovaciones.js`, `index.html`.
+
+
 ## v1.97 — 2026-07-03 · Ciclo Ops↔Leads: fechas vivas (fin de fechas congeladas) + auditoría
 - **Defecto real corregido**: `core/ciclo.js` tenía `'2026-06-20'` (y `'2026-06-27'`, `'2026-06-22'`) **hardcodeado** en todos los flujos que CREAN datos — negocios, gestiones, actividades, bitácoras y clientes nacían con fecha congelada, violando la regla de "fechas vivas". Sustituido por helpers locales `today()` / `stamp()` / `inDays(n)` derivados de `Orbit.ui.today()/now()` (ancla real). 5 timestamps, 3 vencimientos (+7d), 1 próximo toque (+2d) y 12 fechas migrados.
 - **Auditoría del ciclo (sin cambios necesarios, confirmado sólido)**: registro único `negocio` proyectado a ambos tableros; `setEtapa` con automatizaciones (nº cotización, cadencia al pasar a Propuesta); `decidirCierre` → reaparece en Ops (Inspección/Emisión); `emitir` crea cliente heredando datos + cadencia de encuestas; `solicitarGestion` desde ficha/portal → Ops asociada a cliente/póliza (tipo seleccionable + crear nuevo + adjuntos + nota); listas editables/reordenables por tablero; sync en vivo (`orbit:ciclo`). **Rol Asesor NO ve Ops** (excluido en `ROLES.Asesor.modulos`; ve su trabajo por Leads) — verificado.
