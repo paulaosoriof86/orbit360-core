@@ -48,7 +48,14 @@ $AllOk = (Run-Step "2. Preparar carpetas y plantillas locales" {
   & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
 }) -and $AllOk
 
-$AllOk = (Run-Step "3. Validar estructura archivos reales locales" {
+$AllOk = (Run-Step "3. Convertir Excel locales a CSV si existen" {
+  $Script = Join-Path $Repo "tools\orbit360-convertir-excel-importacion-ays-v104.ps1"
+  if (-not (Test-Path $Script)) { throw "Falta conversor Excel: $Script" }
+  & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
+  Add-Report "Nota: los CSV convertidos quedan en _orbit360_imports\ays_real\_convertidos. Revisa/renombra si corresponde a una coleccion antes de carga final."
+}) -and $AllOk
+
+$AllOk = (Run-Step "4. Validar estructura archivos reales locales" {
   Set-Location $Repo
   $Validator = Join-Path $Repo "tools\orbit360-validar-importacion-ays-v104.mjs"
   if (-not (Test-Path $Validator)) { throw "Falta validador: $Validator" }
@@ -57,7 +64,7 @@ $AllOk = (Run-Step "3. Validar estructura archivos reales locales" {
   if ($LASTEXITCODE -ne 0) { throw "Validador importacion fallo." }
 }) -and $AllOk
 
-$AllOk = (Run-Step "4. Generar payload dry-run sin escritura" {
+$AllOk = (Run-Step "5. Generar payload dry-run sin escritura" {
   Set-Location $Repo
   $Loader = Join-Path $Repo "tools\orbit360-cargar-importacion-ays-lab-v104.mjs"
   if (-not (Test-Path $Loader)) { throw "Falta cargador: $Loader" }
@@ -66,7 +73,7 @@ $AllOk = (Run-Step "4. Generar payload dry-run sin escritura" {
   if ($LASTEXITCODE -ne 0) { throw "Dry-run importacion fallo." }
 }) -and $AllOk
 
-$AllOk = (Run-Step "5. Listar lotes locales generados" {
+$AllOk = (Run-Step "6. Listar lotes locales generados" {
   Set-Location $Repo
   $Lister = Join-Path $Repo "tools\orbit360-listar-lotes-importacion-ays-v104.mjs"
   if (-not (Test-Path $Lister)) { throw "Falta listador: $Lister" }
@@ -77,7 +84,7 @@ $AllOk = (Run-Step "5. Listar lotes locales generados" {
   else { Add-Report "ADVERTENCIA: no se encontro payload para rollback dry-run." }
 }) -and $AllOk
 
-$AllOk = (Run-Step "6. Rollback dry-run desde payload mas reciente" {
+$AllOk = (Run-Step "7. Rollback dry-run desde payload mas reciente" {
   if (-not $LatestPayload) { Add-Report "Sin payload: paso omitido sin error."; return }
   Set-Location $Repo
   $Rollback = Join-Path $Repo "tools\orbit360-rollback-importacion-ays-lab-v104.mjs"
@@ -86,7 +93,7 @@ $AllOk = (Run-Step "6. Rollback dry-run desde payload mas reciente" {
   if ($LASTEXITCODE -ne 0) { throw "Rollback dry-run fallo." }
 }) -and $AllOk
 
-Run-Step "7. Estado Git posterior" {
+Run-Step "8. Estado Git posterior" {
   Set-Location $Repo
   $Branch = (git rev-parse --abbrev-ref HEAD).Trim()
   Add-Report "Rama final: $Branch"
@@ -94,7 +101,7 @@ Run-Step "7. Estado Git posterior" {
   if ($Status) {
     Add-Report "Cambios locales despues del ensayo:"
     $Status | ForEach-Object { Add-Report $_ }
-    Add-Report "Nota: cambios esperados solo en carpetas ignoradas (_orbit360_imports/_exports/_reports) si hay archivos locales."
+    Add-Report "Nota: cambios esperados solo en carpetas ignoradas (_orbit360_imports/_exports/_reports/_tmp) si hay archivos locales."
   } else {
     Add-Report "Sin cambios locales."
   }
