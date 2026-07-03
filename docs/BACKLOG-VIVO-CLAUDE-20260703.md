@@ -48,6 +48,14 @@
 - **Impacto:** mejora SaaS comercializable.
 - **Estado:** ABIERTO.
 
+### P0-07 — CRUD manual completo en módulos críticos
+
+- **Origen:** `docs/VALIDACION-CRUD-MANUAL-ANTES-DE-MIGRAR-AYS-20260703.md`.
+- **Problema:** la plataforma no puede depender solo de importadores.
+- **Esperado:** desde UI se debe poder crear y editar manualmente cliente, póliza, cobro, pago, aseguradora, comisión, movimiento financiero real y actividad.
+- **Impacto:** operación diaria posterior a la migración.
+- **Estado:** ABIERTO.
+
 ## P1 — Mejoras funcionales prototipo
 
 ### P1-01 — Importador A&S completo
@@ -113,6 +121,13 @@ Debe incluir:
   8. Cliente 360.
 - **Estado:** ABIERTO.
 
+### P1-07 — Diferenciar datos demo, LAB real y producción
+
+- **Origen:** `docs/POLITICA-DATOS-REALES-AYS-LAB-20260703.md`.
+- **Esperado:** prototipo Claude mantiene datos ficticios; LAB interno A&S puede consumir backend con datos reales; producción requiere Auth/seguridad.
+- **Impacto:** evita contaminar demo comercializable y permite uso interno real.
+- **Estado:** ABIERTO.
+
 ## P2 — UX/comercializable
 
 - Garantizar que notas técnicas no aparezcan en UI cliente.
@@ -132,8 +147,11 @@ Debe incluir:
 7. Matriz de importación inicial A&S.
 8. Smoke mínimo LAB A&S.
 9. Protocolo de ramas: backend A&S no va en rama de prototipo.
+10. Política de datos reales A&S LAB.
+11. Plan de migración CRM real A&S por bloques.
+12. Validación CRUD manual obligatoria antes/durante migración.
 
 ## Estado
 
 **Estado general:** ABIERTO.  
-**Próximo paquete Claude:** incluir este backlog completo junto con auditoría revisada, bitácoras, plan actualizado, matriz de importación y smoke mínimo.
+**Próximo paquete Claude:** incluir este backlog completo junto con auditoría revisada, bitácoras, plan actualizado, matriz de importación, smoke mínimo, política de datos reales, plan de migración CRM y validación CRUD manual.
