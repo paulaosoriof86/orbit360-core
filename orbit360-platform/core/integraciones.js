@@ -6,9 +6,10 @@
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.integraciones = (function () {
-  const API_VERSION = 'v0.4-panel-loader';
+  const API_VERSION = 'v0.5-lab-mock-loader';
   const STRUCT_VERSION = 37;
   let panelLoading = false;
+  let labMockLoading = false;
 
   function extendSeed() {
     const seed = Orbit.SEED;
@@ -186,11 +187,28 @@ Orbit.integraciones = (function () {
       if (Orbit.integracionesPanel && Orbit.integracionesPanel.open) Orbit.integracionesPanel.open(filter || {});
     });
   }
+  function ensureLabMock(cb) {
+    if (Orbit.integracionesLabMock) { if (cb) cb(Orbit.integracionesLabMock); return; }
+    if (labMockLoading) { setTimeout(() => ensureLabMock(cb), 180); return; }
+    labMockLoading = true;
+    const s = document.createElement('script');
+    s.src = 'core/integraciones-lab-mock.js?v1296';
+    s.onload = function () { labMockLoading = false; if (cb) cb(Orbit.integracionesLabMock); };
+    s.onerror = function () { labMockLoading = false; try { Orbit.ui.toast('No se pudo cargar la simulación LAB.'); } catch (e) {} };
+    document.head.appendChild(s);
+  }
+  function labMock(action, idEvento, opts) {
+    ensureLabMock(function (mock) {
+      if (!mock) return;
+      const fn = mock[action || 'ciclo'];
+      if (typeof fn === 'function') fn(idEvento, opts || {});
+    });
+  }
   function mark(idEvento, patch) {
     patch = patch || {};
     patch.updatedAt = nowIso();
     try { return S().update('eventosIntegracion', idEvento, patch); }
     catch (e) { return null; }
   }
-  return { emit, status, list, resumen, diagnostico, openPanel, mark, extendSeed, version: API_VERSION };
+  return { emit, status, list, resumen, diagnostico, openPanel, ensureLabMock, labMock, mark, extendSeed, version: API_VERSION };
 })();
