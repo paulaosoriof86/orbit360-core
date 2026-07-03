@@ -17,6 +17,20 @@ Orbit.modules.marketing = (function () {
   const ENF_EMOJI = { 'Seguros / Riesgos': '🛡️', 'Auto': '🚗', 'Vida y GM': '❤️', 'Hogar / Daños': '🏠', 'Logística / Transporte': '🚚', 'Educativo': '📚', 'Tendencias': '📈', 'Normativa': '⚖️', 'Prospecting': '🎯', 'Renovaciones': '🔄' };
   function enfEmoji(e) { return ENF_EMOJI[e] || '🛡️'; }
   function toast(msg) { let t = document.getElementById('mk-toast'); if (t) t.remove(); t = document.createElement('div'); t.id = 'mk-toast'; t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2800); }
+  function emitMarketing(evento, payload, opts) {
+    if (!Orbit.integraciones || !Orbit.integraciones.emit) return null;
+    try {
+      return Orbit.integraciones.emit(evento, Object.assign({ modulo: 'marketing' }, payload || {}), Object.assign({ modulo: 'marketing' }, opts || {}));
+    } catch (e) {
+      try { console.warn('[marketing] integración no registrada', e); } catch (_) {}
+      return null;
+    }
+  }
+  function integrationMsg(ev, okMsg, pendingMsg) {
+    if (!ev) return null;
+    if (ev.estado === 'pendiente_configuracion') return pendingMsg || 'Evento registrado. Falta configurar la integración en Configuración.';
+    return okMsg || 'Evento de integración registrado.';
+  }
 
   function init() { if (!mes) { const n = U.NOW ? new Date(U.NOW) : new Date(); mes = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0'); } }
   function todos() { return S().all('contenidos'); }
@@ -60,7 +74,10 @@ Orbit.modules.marketing = (function () {
     host.querySelector('#mk-new').addEventListener('click', () => ficha(null));
     host.querySelector('#mk-gen').addEventListener('click', () => { generarMes(); });
     host.querySelector('#mk-reprog').addEventListener('click', () => { reprogramar(); });
-    host.querySelector('#mk-imp').addEventListener('click', () => Orbit.importa.open('calendario-marketing', { onDone: () => { render(host); } }));
+    host.querySelector('#mk-imp').addEventListener('click', () => {
+      emitMarketing('marketing_sync_sheets', { periodo: mes, fuente: 'importador', destino: 'contenidos', modo: 'importar' }, { proveedorPreferido: 'google_sheets', entidad: 'contenidos' });
+      Orbit.importa.open('calendario-marketing', { onDone: () => { render(host); } });
+    });
     host.querySelectorAll('[data-day]').forEach(el => el.addEventListener('click', e => { if (e.target.closest('[data-c]') || e.target.closest('[data-add]')) return; ficha(null, el.dataset.day); }));
     host.querySelectorAll('[data-add]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); ficha(null, el.dataset.add); }));
     host.querySelectorAll('[data-c]').forEach(el => el.addEventListener('click', () => ficha(el.dataset.c)));
@@ -172,6 +189,7 @@ Orbit.modules.marketing = (function () {
     document.body.appendChild(back);
     const $ = s => back.querySelector(s);
     const close = () => back.remove();
+    const dataActual = () => ({ fecha: $('#mk-fecha').value, hora: $('#mk-hora').value, canal: $('#mk-canal').value, tipo: $('#mk-tipo').value, enfoque: $('#mk-enfoque').value, estado: $('#mk-estado').value, responsable: $('#mk-resp') ? $('#mk-resp').value : '', aprobacion: $('#mk-aprob') ? $('#mk-aprob').value : '', titulo: $('#mk-titulo').value || '(sin título)', copy: $('#mk-copy').value, cta: $('#mk-cta').value, hashtags: $('#mk-hash').value });
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#mk-x').addEventListener('click', close); $('#mk-cancel').addEventListener('click', close);
     $('#mk-ia').addEventListener('click', async () => {
@@ -197,19 +215,29 @@ Orbit.modules.marketing = (function () {
       toast('✨ Copy generado — revisa y ajusta el tono');
     });
     $('#mk-pieza').addEventListener('click', () => {
-      if (Orbit.cat && Orbit.cat.all().addons && !Orbit.cat.all().addons) {}
-      const on = (Orbit.tenant && Orbit.tenant.get && Orbit.tenant.get().addons && Orbit.tenant.get().addons.canva);
-      toast(on ? '🎨 Enviando a Canva para generar la pieza…' : '🎨 Activa Canva en Configuración › Integraciones para generar piezas');
+      const data = dataActual();
+      const ev = emitMarketing('marketing_generar_pieza', {
+        entidad: 'contenidos', entidadId: id || '', proveedorPreferido: 'canva', contenidoId: id || '', titulo: data.titulo,
+        copy: data.copy, canal: data.canal, tipo: data.tipo, formato: data.tipo, enfoque: data.enfoque, fecha: data.fecha
+      }, { proveedorPreferido: 'canva', entidad: 'contenidos', entidadId: id || '' });
+      toast(integrationMsg(ev, '🎨 Solicitud de pieza registrada para Canva/Make.', '🎨 Solicitud registrada. Activa Canva/Make en Configuración para generar piezas.') || '🎨 Activa Canva en Configuración › Integraciones para generar piezas');
     });
     $('#mk-prog').addEventListener('click', () => {
-      const f = $('#mk-fecha').value, h = $('#mk-hora').value;
+      const data = dataActual();
       $('#mk-estado').value = 'Programado';
-      toast('📅 Programado para ' + f + ' ' + h + ' · se publicará vía Metricool');
+      const ev = emitMarketing('marketing_programar_publicacion', {
+        entidad: 'contenidos', entidadId: id || '', proveedorPreferido: 'metricool', contenidoId: id || '', contenido: data,
+        programacion: { fecha: data.fecha, hora: data.hora, canal: data.canal }
+      }, { proveedorPreferido: 'metricool', entidad: 'contenidos', entidadId: id || '' });
+      toast(integrationMsg(ev, '📅 Programación registrada para Metricool/Make.', '📅 Programación registrada. Activa Metricool/Make en Configuración para publicar.') || ('📅 Programado para ' + data.fecha + ' ' + data.hora + ' · pendiente integración Metricool'));
     });
     if ($('#mk-del')) $('#mk-del').addEventListener('click', () => { S().remove('contenidos', id); close(); render(host); });
     $('#mk-ok').addEventListener('click', () => {
-      const data = { fecha: $('#mk-fecha').value, hora: $('#mk-hora').value, canal: $('#mk-canal').value, tipo: $('#mk-tipo').value, enfoque: $('#mk-enfoque').value, estado: $('#mk-estado').value, responsable: $('#mk-resp') ? $('#mk-resp').value : '', aprobacion: $('#mk-aprob') ? $('#mk-aprob').value : '', titulo: $('#mk-titulo').value || '(sin título)', copy: $('#mk-copy').value, cta: $('#mk-cta').value, hashtags: $('#mk-hash').value };
-      if (id) S().update('contenidos', id, data); else S().insert('contenidos', Object.assign({ id: 'mk' + Date.now().toString().slice(-7), stats: null }, data));
+      const data = dataActual();
+      let saved;
+      if (id) saved = S().update('contenidos', id, data);
+      else saved = S().insert('contenidos', Object.assign({ id: 'mk' + Date.now().toString().slice(-7), stats: null }, data));
+      emitMarketing('marketing_contenido_creado', { entidad: 'contenidos', entidadId: saved && saved.id, contenido: saved }, { entidad: 'contenidos', entidadId: saved && saved.id });
       close(); render(host);
     });
   }
