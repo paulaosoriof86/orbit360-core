@@ -57,7 +57,14 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Ruta documental/futura normalizada: tenants/{tenantId}/data/...
     match /tenants/{tenantId}/data/{document=**} {
+      allow read, write: if isTenantMember(tenantId);
+    }
+
+    // Ruta usada por el adapter LAB v1.73: tenantId/{tenantId}/{coleccion}/{docId}
+    // Se mantiene para no romper Fase 8 ni módulos ya validados mientras se normaliza el adapter.
+    match /tenantId/{tenantId}/{document=**} {
       allow read, write: if isTenantMember(tenantId);
     }
 
