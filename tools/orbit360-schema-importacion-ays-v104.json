@@ -1,0 +1,67 @@
+{
+  "version": "v1.104",
+  "tenantId": "alianzas-soluciones",
+  "currencyPolicy": "country_isolated",
+  "collections": {
+    "asesores": {
+      "required": ["id", "nombre", "email"],
+      "optional": ["telefono", "whatsapp", "rol", "pais", "activo", "modulos", "metaMensual"]
+    },
+    "aseguradoras": {
+      "required": ["id", "nombre", "pais"],
+      "optional": ["codigo", "contacto", "telefono", "email", "portal", "drive", "nit", "diasCredito", "activo"]
+    },
+    "clientes": {
+      "required": ["id", "nombre", "pais"],
+      "optional": ["tipo", "documento", "nit", "email", "telefono", "whatsapp", "direccion", "asesorId", "estado", "origen", "drive"]
+    },
+    "vehiculos": {
+      "required": ["id", "clienteId"],
+      "optional": ["placa", "marca", "linea", "modelo", "anio", "vin", "motor", "uso", "pais", "estado"]
+    },
+    "polizas": {
+      "required": ["id", "clienteId", "aseguradoraId", "numero", "ramo", "estado", "pais", "moneda", "primaNeta"],
+      "optional": ["fechaInicio", "fechaFin", "formaPago", "asesorId", "vehiculoId", "primaTotal", "iva", "comisionPct", "renovable", "documentoUrl"]
+    },
+    "cobros": {
+      "required": ["id", "polizaId", "clienteId", "estado", "fechaVencimiento", "monto", "moneda", "pais"],
+      "optional": ["numeroRecibo", "cuota", "formaPago", "fechaPago", "medioPago", "banco", "referencia"]
+    },
+    "comisiones": {
+      "required": ["id", "polizaId", "aseguradoraId", "estado", "monto", "moneda", "pais"],
+      "optional": ["facturaId", "fechaDevengo", "fechaCobro", "asesorId", "porcentaje", "basePrimaNeta"]
+    },
+    "facturas": {
+      "required": ["id", "tipo", "estado", "monto", "moneda", "pais"],
+      "optional": ["aseguradoraId", "clienteId", "numero", "fechaEmision", "fechaVencimiento", "fechaPago", "referencia"]
+    },
+    "finmovs": {
+      "required": ["id", "tipo", "fecha", "monto", "moneda", "pais", "categoria"],
+      "optional": ["cuenta", "banco", "referencia", "facturaId", "polizaId", "clienteId", "descripcion"]
+    },
+    "reclamos": {
+      "required": ["id", "clienteId", "polizaId", "estado", "fecha", "pais"],
+      "optional": ["numero", "ramo", "aseguradoraId", "descripcion", "montoEstimado", "montoPagado", "responsable", "bitacora"]
+    },
+    "documentos": {
+      "required": ["id", "entidad", "entidadId", "tipo", "url"],
+      "optional": ["nombre", "fecha", "pais", "estado", "origen"]
+    },
+    "gestiones": {
+      "required": ["id", "tipo", "estado", "clienteId", "fecha"],
+      "optional": ["asesorId", "polizaId", "ramo", "prioridad", "canal", "descripcion", "proximaAccion"]
+    },
+    "negocios": {
+      "required": ["id", "clienteId", "estado", "etapa", "fecha"],
+      "optional": ["asesorId", "ramo", "primaEstimada", "moneda", "pais", "origen", "probabilidad"]
+    }
+  },
+  "businessRules": {
+    "portfolioRule": "solo cobros pendientes de polizas vigentes o por renovar del anio actual",
+    "historicalPolicyRule": "canceladas y vencidas no generan cartera; quedan para analitica y campañas",
+    "cashRule": "finmov solo cuando entra o sale dinero real",
+    "invoiceRule": "factura a aseguradora por comision crea CxC; no crea finmov hasta cobro",
+    "commissionBase": "prima neta recaudada",
+    "currencyRule": "no sumar monedas distintas en bruto; separar por pais o normalizar explicitamente"
+  }
+}
