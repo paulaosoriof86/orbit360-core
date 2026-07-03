@@ -110,6 +110,11 @@ Decisión tomada:
 - empalmar sin perder backend;
 - luego conectar Firestore/Auth/Secret Manager/Make real por tenant.
 
+Documentos de apoyo:
+
+- `docs/CRITERIOS-BACKEND-REAL-POST-EMPALME-20260703.md`
+- `docs/PLAN-BACKEND-REAL-INTEGRACIONES-POST-EMPALME-20260703.md`
+
 ---
 
 ## 8. Validador técnico
@@ -128,7 +133,16 @@ Claude no debe eliminarlo.
 
 ---
 
-## 9. Estado para paquete Claude
+## 9. Inventario y empalme
+
+Para no perder backend en el próximo ZIP Claude, usar:
+
+- `docs/INVENTARIO-INTEGRACIONES-MARKETING-POST-V197-20260703.md`
+- `docs/CHECKLIST-EMPALME-POST-CLAUDE-BACKEND-20260703.md`
+
+---
+
+## 10. Estado para paquete Claude
 
 **INCLUIR EN PAQUETE CLAUDE.**
 
@@ -142,3 +156,6 @@ Cuando Paula pida el paquete, incluir este suplemento junto con:
 - `docs/BITACORA-BACKEND-CHATGPT-20260703.md`
 - `docs/MANIFIESTO-PAQUETE-CLAUDE-POST-V197-20260703.md`
 - `docs/CHECKLIST-EMPALME-POST-CLAUDE-BACKEND-20260703.md`
+- `docs/CRITERIOS-BACKEND-REAL-POST-EMPALME-20260703.md`
+- `docs/PLAN-BACKEND-REAL-INTEGRACIONES-POST-EMPALME-20260703.md`
+- `docs/INVENTARIO-INTEGRACIONES-MARKETING-POST-V197-20260703.md`
