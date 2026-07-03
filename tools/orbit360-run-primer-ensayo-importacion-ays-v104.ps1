@@ -112,7 +112,17 @@ $AllOk = (Run-Step "9. Rollback dry-run desde payload mas reciente" {
   if ($LASTEXITCODE -ne 0) { throw "Rollback dry-run fallo." }
 }) -and $AllOk
 
-Run-Step "10. Estado Git posterior" {
+Run-Step "10. Resumen ejecutivo de importacion" {
+  Set-Location $Repo
+  $Summary = Join-Path $Repo "tools\orbit360-resumen-ejecutivo-importacion-ays-v104.mjs"
+  if (-not (Test-Path $Summary)) { throw "Falta resumen ejecutivo: $Summary" }
+  node $Summary --reports $Reports | ForEach-Object { Add-Report $_ }
+  $SummaryCode = $LASTEXITCODE
+  Add-Report "ExitCode resumen ejecutivo: $SummaryCode"
+  if ($SummaryCode -ne 0) { Add-Report "Resumen ejecutivo indica NO autorizar escritura LAB todavia." }
+}
+
+Run-Step "11. Estado Git posterior" {
   Set-Location $Repo
   $Branch = (git rev-parse --abbrev-ref HEAD).Trim()
   Add-Report "Rama final: $Branch"
@@ -129,7 +139,7 @@ Run-Step "10. Estado Git posterior" {
 Add-Report ""
 if ($AllOk) {
   Add-Report "RESULTADO PRIMER ENSAYO IMPORTACION A&S V104: EJECUTADO_SIN_ESCRITURA"
-  Add-Report "Siguiente paso: revisar reportes y, si todo esta correcto, solicitar autorizacion explicita para escribir en Firestore LAB."
+  Add-Report "Siguiente paso: revisar resumen ejecutivo y, si todo esta correcto, solicitar autorizacion explicita para escribir en Firestore LAB."
 } else {
   Add-Report "RESULTADO PRIMER ENSAYO IMPORTACION A&S V104: BLOQUEADO_O_CON_ERRORES"
   Add-Report "No se escribio en Firestore, no se hizo deploy, no se hizo commit y no se hizo push."
