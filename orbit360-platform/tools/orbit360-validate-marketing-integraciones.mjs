@@ -3,6 +3,7 @@
    Seguro: no git, no deploy, no servidor, no navegador, no produccion. */
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -23,6 +24,14 @@ function exists(rel) { fs.existsSync(file(rel)) ? ok(`existe ${rel}`) : bad(`no 
 function contains(rel, needle, label = needle) {
   try { read(rel).includes(needle) ? ok(`${rel} contiene ${label}`) : bad(`${rel} no contiene ${label}`); }
   catch (e) { bad(`no se pudo leer ${rel}: ${e.message}`); }
+}
+function syntax(rel) {
+  try {
+    new vm.Script(read(rel), { filename: rel, displayErrors: true });
+    ok(`sintaxis JS valida ${rel}`);
+  } catch (e) {
+    bad(`sintaxis JS invalida ${rel}: ${e.message}`);
+  }
 }
 
 log('ORBIT 360 - VALIDACION MARKETING + INTEGRACIONES');
@@ -67,7 +76,16 @@ contains('modules/marketing.js', 'marketing_contenido_creado', 'marketing_conten
 contains('modules/marketing.js', 'Orbit.integraciones.emit', 'uso de Orbit.integraciones.emit');
 
 log('');
-log(errors ? `RESULTADO: FALLAS ${errors}` : 'RESULTADO: OK tecnico de contratos');
+log('Validacion sintactica JS sin ejecutar codigo:');
+[
+  'core/integraciones.js',
+  'core/integraciones-panel.js',
+  'core/integraciones-lab-mock.js',
+  'modules/marketing.js'
+].forEach(syntax);
+
+log('');
+log(errors ? `RESULTADO: FALLAS ${errors}` : 'RESULTADO: OK tecnico de contratos y sintaxis');
 fs.mkdirSync(reportDir, { recursive: true });
 fs.writeFileSync(reportPath, lines.join('\n'), 'utf8');
 log(`Reporte: ${reportPath}`);
