@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 $ExpectedBranch = "ays/backend-tenant-lab-v99-20260703"
 $Reports = Join-Path $Repo "_orbit360_reports"
 $Stamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$Report = Join-Path $Reports "RUN-FLUJO-AYS-LAB-V99-$Stamp.txt"
+$Report = Join-Path $Reports "RUN-FLUJO-AYS-LAB-V104-$Stamp.txt"
 
 function Add-Report([string]$Text) {
   Add-Content -Path $Report -Value $Text -Encoding UTF8
@@ -29,7 +29,7 @@ function Run-Step([string]$Name, [scriptblock]$Block) {
 
 New-Item -ItemType Directory -Force -Path $Reports | Out-Null
 Set-Content -Path $Report -Value "============================================================" -Encoding UTF8
-Add-Report "ORBIT 360 - RUN FLUJO A&S LAB V99"
+Add-Report "ORBIT 360 - RUN FLUJO A&S LAB V104"
 Add-Report "Fecha local: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 Add-Report "Repo: $Repo"
 Add-Report "Rama obligatoria: $ExpectedBranch"
@@ -69,7 +69,27 @@ $AllOk = (Run-Step "2. Sincronizar rama obligatoria" {
   if ($After -ne $ExpectedBranch) { throw "No quedo en la rama obligatoria." }
 }) -and $AllOk
 
-$AllOk = (Run-Step "3. Verificar config Firebase LAB local" {
+$AllOk = (Run-Step "3. Validar contrato backend LAB v104" {
+  Set-Location $Repo
+  $Validator = Join-Path $Repo "tools\orbit360-validar-backend-lab-contrato.mjs"
+  if (-not (Test-Path $Validator)) { throw "Falta validador: $Validator" }
+  node $Validator | ForEach-Object { Add-Report $_ }
+  $Code = $LASTEXITCODE
+  Add-Report "ExitCode validador backend LAB: $Code"
+  if ($Code -ne 0) { throw "Validador backend LAB fallo." }
+}) -and $AllOk
+
+$AllOk = (Run-Step "4. Validar empalme frontend v104" {
+  Set-Location $Repo
+  $Validator = Join-Path $Repo "tools\orbit360-validar-empalme-frontend-v104.mjs"
+  if (-not (Test-Path $Validator)) { throw "Falta validador: $Validator" }
+  node $Validator | ForEach-Object { Add-Report $_ }
+  $Code = $LASTEXITCODE
+  Add-Report "ExitCode validador empalme frontend: $Code"
+  if ($Code -ne 0) { throw "Validador empalme frontend fallo." }
+}) -and $AllOk
+
+$AllOk = (Run-Step "5. Verificar config Firebase LAB local" {
   $Config = Join-Path $Repo "orbit360-platform\core\auth-firebase.config.local.js"
   $PrepScript = Join-Path $Repo "tools\orbit360-preparar-config-firebase-lab-local.ps1"
 
@@ -95,7 +115,7 @@ $AllOk = (Run-Step "3. Verificar config Firebase LAB local" {
 }) -and $AllOk
 
 if ($AllOk) {
-  $AllOk = (Run-Step "4. Ejecutar integracion local backend LAB en index" {
+  $AllOk = (Run-Step "6. Ejecutar integracion local backend LAB en index" {
     $Script = Join-Path $Repo "tools\orbit360-integrar-backend-lab-index.ps1"
     if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
     & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
@@ -104,7 +124,7 @@ if ($AllOk) {
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step "5. Ejecutar stability gate A&S v99" {
+  $AllOk = (Run-Step "7. Ejecutar stability gate A&S v99" {
     $Script = Join-Path $Repo "tools\orbit360-stability-gate-ays-v99.ps1"
     if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
     & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
@@ -117,7 +137,7 @@ if ($AllOk) {
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step "6. Ejecutar smoke A&S LAB v99" {
+  $AllOk = (Run-Step "8. Ejecutar smoke A&S LAB v99" {
     $Script = Join-Path $Repo "tools\orbit360-smoke-ays-lab-v99.ps1"
     if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
     & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
@@ -125,7 +145,7 @@ if ($AllOk) {
   }) -and $AllOk
 }
 
-Run-Step "7. Estado Git posterior" {
+Run-Step "9. Estado Git posterior" {
   Set-Location $Repo
   $Branch = (git rev-parse --abbrev-ref HEAD).Trim()
   Add-Report "Rama final: $Branch"
@@ -140,10 +160,10 @@ Run-Step "7. Estado Git posterior" {
 
 Add-Report ""
 if ($AllOk) {
-  Add-Report "RESULTADO FLUJO A&S LAB V99: EJECUTADO"
-  Add-Report "Revisar reportes individuales de stability gate y smoke para confirmar aprobacion final."
+  Add-Report "RESULTADO FLUJO A&S LAB V104: EJECUTADO"
+  Add-Report "Revisar reportes individuales de validadores, stability gate y smoke para confirmar aprobacion final."
 } else {
-  Add-Report "RESULTADO FLUJO A&S LAB V99: BLOQUEADO_O_CON_ERRORES"
+  Add-Report "RESULTADO FLUJO A&S LAB V104: BLOQUEADO_O_CON_ERRORES"
   Add-Report "No se hizo deploy, commit, push ni produccion. Revisar seccion de errores."
 }
 
