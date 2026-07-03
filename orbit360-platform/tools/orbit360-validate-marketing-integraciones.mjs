@@ -35,6 +35,7 @@ log('');
   'index.html',
   'core/integraciones.js',
   'core/integraciones-panel.js',
+  'core/integraciones-lab-mock.js',
   'modules/marketing.js',
   'data/store.js',
   'data/seed.js'
@@ -46,7 +47,19 @@ contains('core/integraciones.js', 'emit(', 'emit');
 contains('core/integraciones.js', 'diagnostico', 'diagnostico');
 contains('core/integraciones.js', 'openPanel', 'openPanel');
 contains('core/integraciones.js', 'extendSeed', 'extendSeed');
+contains('core/integraciones.js', 'ensureLabMock', 'ensureLabMock');
+contains('core/integraciones.js', 'labMock', 'labMock');
+contains('core/integraciones.js', 'core/integraciones-lab-mock.js', 'carga mock LAB bajo demanda');
 contains('core/integraciones-panel.js', 'Orbit.integracionesPanel', 'Orbit.integracionesPanel');
+contains('core/integraciones-panel.js', 'data-lab-cycle', 'boton LAB data-lab-cycle');
+contains('core/integraciones-panel.js', 'Simular', 'boton Simular LAB');
+contains('core/integraciones-panel.js', 'orbitBackend', 'deteccion orbitBackend LAB');
+contains('core/integraciones-lab-mock.js', 'Orbit.integracionesLabMock', 'Orbit.integracionesLabMock');
+contains('core/integraciones-lab-mock.js', 'enviar', 'mock enviar');
+contains('core/integraciones-lab-mock.js', 'confirmar', 'mock confirmar');
+contains('core/integraciones-lab-mock.js', 'fallar', 'mock fallar');
+contains('core/integraciones-lab-mock.js', 'ciclo', 'mock ciclo');
+contains('core/integraciones-lab-mock.js', 'No se envio a ningun proveedor externo', 'mensaje no envio real');
 contains('modules/marketing.js', 'marketing_sync_sheets', 'marketing_sync_sheets');
 contains('modules/marketing.js', 'marketing_generar_pieza', 'marketing_generar_pieza');
 contains('modules/marketing.js', 'marketing_programar_publicacion', 'marketing_programar_publicacion');
