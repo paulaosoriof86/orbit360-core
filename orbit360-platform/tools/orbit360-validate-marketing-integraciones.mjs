@@ -25,6 +25,10 @@ function contains(rel, needle, label = needle) {
   try { read(rel).includes(needle) ? ok(`${rel} contiene ${label}`) : bad(`${rel} no contiene ${label}`); }
   catch (e) { bad(`no se pudo leer ${rel}: ${e.message}`); }
 }
+function notContains(rel, needle, label = needle) {
+  try { read(rel).includes(needle) ? bad(`${rel} contiene prohibido ${label}`) : ok(`${rel} no contiene ${label}`); }
+  catch (e) { bad(`no se pudo leer ${rel}: ${e.message}`); }
+}
 function syntax(rel) {
   try {
     new vm.Script(read(rel), { filename: rel, displayErrors: true });
@@ -32,6 +36,19 @@ function syntax(rel) {
   } catch (e) {
     bad(`sintaxis JS invalida ${rel}: ${e.message}`);
   }
+}
+function guardNoExternalCalls(rel) {
+  notContains(rel, 'fetch(', 'fetch directo');
+  notContains(rel, 'XMLHttpRequest', 'XMLHttpRequest directo');
+  notContains(rel, 'axios', 'axios directo');
+  notContains(rel, 'webhook', 'webhook directo');
+  notContains(rel, 'apiKey', 'apiKey');
+  notContains(rel, 'secret', 'secret');
+  notContains(rel, 'token', 'token');
+}
+function guardNoDirectStorage(rel) {
+  notContains(rel, 'localStorage', 'localStorage directo');
+  notContains(rel, 'sessionStorage', 'sessionStorage directo');
 }
 
 log('ORBIT 360 - VALIDACION MARKETING + INTEGRACIONES');
@@ -76,6 +93,14 @@ contains('modules/marketing.js', 'marketing_contenido_creado', 'marketing_conten
 contains('modules/marketing.js', 'Orbit.integraciones.emit', 'uso de Orbit.integraciones.emit');
 
 log('');
+log('Validacion de reglas seguras:');
+['modules/marketing.js', 'core/integraciones-panel.js', 'core/integraciones-lab-mock.js'].forEach(guardNoExternalCalls);
+['modules/marketing.js', 'core/integraciones-panel.js', 'core/integraciones-lab-mock.js'].forEach(guardNoDirectStorage);
+contains('core/integraciones.js', 'Orbit.store', 'uso capa store en helper');
+contains('core/integraciones.js', 'S().insert', 'insert via store');
+contains('core/integraciones.js', 'S().update', 'update via store');
+
+log('');
 log('Validacion sintactica JS sin ejecutar codigo:');
 [
   'core/integraciones.js',
@@ -85,7 +110,7 @@ log('Validacion sintactica JS sin ejecutar codigo:');
 ].forEach(syntax);
 
 log('');
-log(errors ? `RESULTADO: FALLAS ${errors}` : 'RESULTADO: OK tecnico de contratos y sintaxis');
+log(errors ? `RESULTADO: FALLAS ${errors}` : 'RESULTADO: OK tecnico de contratos, reglas seguras y sintaxis');
 fs.mkdirSync(reportDir, { recursive: true });
 fs.writeFileSync(reportPath, lines.join('\n'), 'utf8');
 log(`Reporte: ${reportPath}`);
