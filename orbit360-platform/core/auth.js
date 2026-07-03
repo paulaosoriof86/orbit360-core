@@ -8,12 +8,19 @@ window.Orbit = window.Orbit || {};
 Orbit.auth = (function () {
   const KEY = 'orbit360_session';
   const CKEY = 'orbit360_confidencialidad';
+  const DEMO_EMAIL = 'admin@demo.com';
+  const DEMO_PASS = 'demo123';
+  const LAB_EMAIL = 'orbit.lab@demo.com';
 
   function isLab() {
     try {
       const q = new URLSearchParams(location.search || '');
       return q.get('orbitBackend') === 'firestore-lab' || (window.OrbitBackend && window.OrbitBackend.mode === 'firestore-lab');
     } catch (e) { return false; }
+  }
+
+  function expectedLabEmail() {
+    return (window.OrbitBackend && window.OrbitBackend.expectedEmail) || LAB_EMAIL;
   }
 
   function fbAuth() {
@@ -73,7 +80,7 @@ Orbit.auth = (function () {
 
   function login(userObj) {
     if (isLab()) return mapFbUser(fbUser());
-    try { localStorage.setItem(KEY, JSON.stringify(userObj || { nombre: 'Andrea Beltrán', rol: 'Dirección', email: 'admin@demo.com' })); } catch (e) {}
+    try { localStorage.setItem(KEY, JSON.stringify(userObj || { nombre: 'Andrea Beltrán', rol: 'Dirección', email: DEMO_EMAIL })); } catch (e) {}
     return user();
   }
 
@@ -115,14 +122,38 @@ Orbit.auth = (function () {
     if (lg) { lg.style.display = ''; lg.classList.remove('hidden'); }
     document.body.classList.add('pre-auth');
     try { if (Orbit.applyBrand) Orbit.applyBrand(); } catch (e) {}
+    setTimeout(paintLoginDefaults, 0);
   }
 
-  function paintLabDefaults() {
-    if (!isLab()) return;
+  function paintLoginDefaults() {
+    const labMode = isLab();
+    const form = document.getElementById('login-form');
     const email = document.getElementById('lg-user');
     const pass = document.getElementById('lg-pass');
-    if (email && (!email.value || email.value === 'admin@demo.com')) email.value = (window.OrbitBackend && window.OrbitBackend.expectedEmail) || 'orbit.lab@demo.com';
-    if (pass && pass.value === 'demo123') pass.value = '';
+    const labEmail = expectedLabEmail();
+
+    if (form) form.dataset.authMode = labMode ? 'firestore-lab' : 'demo';
+    if (email) email.dataset.authMode = labMode ? 'firestore-lab' : 'demo';
+    if (pass) pass.dataset.authMode = labMode ? 'firestore-lab' : 'demo';
+
+    function forceLabFields() {
+      if (!isLab()) return;
+      if (email && (!email.value || email.value === DEMO_EMAIL)) email.value = labEmail;
+      if (pass && pass.value === DEMO_PASS) pass.value = '';
+    }
+
+    if (labMode) {
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      if (email) email.value = (!email.value || email.value === DEMO_EMAIL) ? labEmail : email.value;
+      if (pass && pass.value === DEMO_PASS) pass.value = '';
+      setTimeout(forceLabFields, 60);
+      setTimeout(forceLabFields, 250);
+      setTimeout(forceLabFields, 700);
+      return;
+    }
+
+    if (email && (!email.value || email.value === labEmail)) email.value = DEMO_EMAIL;
+    if (pass && !pass.value) pass.value = DEMO_PASS;
   }
 
   function paintError(message) {
@@ -139,15 +170,25 @@ Orbit.auth = (function () {
   }
 
   function init() {
-    paintLabDefaults();
+    paintLoginDefaults();
 
     const form = document.getElementById('login-form');
     if (form) form.addEventListener('submit', async e => {
       e.preventDefault();
-      const email = (document.getElementById('lg-user') || {}).value || 'admin@demo.com';
-      const pass = (document.getElementById('lg-pass') || {}).value || '';
+      const labMode = isLab();
+      const emailEl = document.getElementById('lg-user');
+      const passEl = document.getElementById('lg-pass');
+      let email = (emailEl || {}).value || DEMO_EMAIL;
+      const pass = (passEl || {}).value || '';
+
+      if (labMode && (!email || email === DEMO_EMAIL)) {
+        email = expectedLabEmail();
+        if (emailEl) emailEl.value = email;
+      }
+
       try {
-        if (isLab()) {
+        if (labMode) {
+          if (pass === DEMO_PASS) throw new Error('Modo Firestore LAB activo: usa la contraseña LAB guardada, no la contraseña demo.');
           await loginFirebase(email, pass);
         } else {
           login({ nombre: 'Andrea Beltrán', rol: 'Dirección', email });
