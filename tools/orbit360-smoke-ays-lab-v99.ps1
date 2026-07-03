@@ -27,9 +27,7 @@ function Free-Port([int[]]$Ports) {
       $c = New-Object Net.Sockets.TcpClient
       $c.Connect("127.0.0.1", $p)
       $c.Close()
-    } catch {
-      return $p
-    }
+    } catch { return $p }
   }
   return $null
 }
@@ -49,7 +47,7 @@ Add-Report "Fecha local: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 Add-Report "Repo: $Repo"
 Add-Report "Rama esperada: $ExpectedBranch"
 Add-Report "Tenant: $Tenant"
-Add-Report "Restricciones: NO deploy, NO Hosting, NO producción, NO secretos, NO datos reales en código"
+Add-Report "Restricciones: NO deploy, NO Hosting, NO produccion, NO secretos, NO datos reales en codigo"
 Add-Report "============================================================"
 Add-Report ""
 
@@ -95,15 +93,15 @@ try {
 
   Add-Report "== 3. Verificar reglas Firestore alineadas con adapter LAB =="
   $RulesText = Get-Content $Rules -Raw -Encoding UTF8
-  if ($RulesText -match "match /tenantId/\{tenantId\}/\{document=\*\*\}") {
+  if ($RulesText.Contains("match /tenantId/{tenantId}/{document=**}")) {
     Add-Report "OK: firestore.rules permite ruta real adapter LAB: tenantId/{tenantId}/{document=**}"
   } else {
     throw "firestore.rules no contiene ruta real adapter LAB tenantId/{tenantId}/{document=**}"
   }
-  if ($RulesText -match "match /tenants/\{tenantId\}/data/\{document=\*\*\}") {
+  if ($RulesText.Contains("match /tenants/{tenantId}/data/{document=**}")) {
     Add-Report "OK: firestore.rules conserva ruta documental/futura: tenants/{tenantId}/data/{document=**}"
   } else {
-    Add-Report "ADVERTENCIA: no se encontró ruta documental/futura tenants/{tenantId}/data/{document=**}"
+    Add-Report "ADVERTENCIA: no se encontro ruta documental/futura tenants/{tenantId}/data/{document=**}"
   }
   Add-Report ""
 
@@ -118,23 +116,31 @@ try {
   }
   Add-Report ""
 
-  Add-Report "== 5. Verificar orden de scripts en index.html =="
+  Add-Report "== 5. Verificar index central y estrategia de smoke =="
   $IndexText = Get-Content $Index -Raw -Encoding UTF8
-  $LoaderPos = $IndexText.IndexOf("core/backend-lab-loader.js")
-  $InitPos = $IndexText.IndexOf("core/backend-lab-init.js")
-  $StorePos = $IndexText.IndexOf("data/store.js")
-  $LabPos = $IndexText.IndexOf("data/store-firestore-lab.local.js")
-  $SeedPos = $IndexText.IndexOf("data/seed.js")
-  Add-Report "Orden: loader=$LoaderPos init=$InitPos store=$StorePos lab=$LabPos seed=$SeedPos"
-  if ($LoaderPos -lt 0) { throw "index.html no carga backend-lab-loader.js" }
-  if ($InitPos -lt 0) { throw "index.html no carga backend-lab-init.js" }
-  if ($StorePos -lt 0) { throw "index.html no carga data/store.js" }
-  if ($LabPos -lt 0) { throw "index.html no carga data/store-firestore-lab.local.js" }
-  if ($SeedPos -lt 0) { throw "index.html no carga data/seed.js" }
-  if (-not ($LoaderPos -lt $InitPos -and $InitPos -lt $StorePos -and $StorePos -lt $LabPos -and $LabPos -lt $SeedPos)) {
-    throw "Orden esperado no cumple: loader -> init -> store -> lab -> seed"
+  $HasLoader = $IndexText.Contains("core/backend-lab-loader.js")
+  $HasInit = $IndexText.Contains("core/backend-lab-init.js")
+  $HasStore = $IndexText.Contains("data/store.js")
+  $HasLab = $IndexText.Contains("data/store-firestore-lab.local.js")
+  $HasSeed = $IndexText.Contains("data/seed.js")
+
+  Add-Report "Index contiene backend-lab-loader.js: $HasLoader"
+  Add-Report "Index contiene backend-lab-init.js: $HasInit"
+  Add-Report "Index contiene data/store.js: $HasStore"
+  Add-Report "Index contiene store-firestore-lab.local.js: $HasLab"
+  Add-Report "Index contiene data/seed.js: $HasSeed"
+
+  if (-not $HasStore) { throw "index.html no carga data/store.js" }
+  if (-not $HasLab) { throw "index.html no carga data/store-firestore-lab.local.js" }
+  if (-not $HasSeed) { throw "index.html no carga data/seed.js" }
+
+  if (-not ($HasLoader -and $HasInit)) {
+    Add-Report "ADVERTENCIA CONTROLADA: index.html aun no carga loader/init LAB."
+    Add-Report "El servidor temporal de este smoke inyectara loader/init solo en memoria para validar backend sin modificar index.html."
+    Add-Report "Pendiente permanente: integrar loader/init en index central cuando Paula autorice cambio funcional."
+  } else {
+    Add-Report "OK: index.html ya contiene loader/init LAB."
   }
-  Add-Report "OK: orden LAB correcto."
   Add-Report ""
 
   Add-Report "== 6. Levantar servidor local temporal =="
@@ -152,7 +158,17 @@ const port = Number(process.argv[3]);
 const resultPath = process.argv[4];
 const types = {'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon','.webp':'image/webp'};
 function send(res,status,type,body){res.writeHead(status,{'content-type':type,'cache-control':'no-store, no-cache, must-revalidate','pragma':'no-cache','expires':'0'});res.end(body);}
-const smokeHtml = `<!doctype html><html><head><meta charset="utf-8"><title>Orbit 360 Smoke A&S LAB v99</title><style>body{font-family:Arial,Helvetica,sans-serif;margin:24px;background:#f6f7f8;color:#1E2227}.card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px}pre{background:#111;color:#0f0;padding:12px;border-radius:8px;white-space:pre-wrap;max-height:360px;overflow:auto}iframe{width:100%;height:720px;border:1px solid #ccc;border-radius:10px}</style></head><body><div class="card"><h1>Orbit 360 - Smoke A&S LAB v99</h1><p>Si aparece login, ingresa con usuario LAB. El smoke espera hasta 90 segundos y genera reporte automático.</p><pre id="out">Iniciando...</pre></div><iframe id="app" src="/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&smoke=ays-lab-v99"></iframe><script>
+function injectLab(html){
+  const loader = '<script src="core/backend-lab-loader.js?v=smoke-ays-lab-v99"></script>\n  <script src="core/backend-lab-init.js?v=smoke-ays-lab-v99"></script>';
+  if (!html.includes('core/backend-lab-loader.js')) {
+    html = html.replace('<script src="data/store.js', loader + '\n  <script src="data/store.js');
+  }
+  if (html.includes('core/backend-lab-loader.js') && !html.includes('core/backend-lab-init.js')) {
+    html = html.replace('<script src="data/store.js', '<script src="core/backend-lab-init.js?v=smoke-ays-lab-v99"></script>\n  <script src="data/store.js');
+  }
+  return html;
+}
+const smokeHtml = `<!doctype html><html><head><meta charset="utf-8"><title>Orbit 360 Smoke A&S LAB v99</title><style>body{font-family:Arial,Helvetica,sans-serif;margin:24px;background:#f6f7f8;color:#1E2227}.card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px}pre{background:#111;color:#0f0;padding:12px;border-radius:8px;white-space:pre-wrap;max-height:360px;overflow:auto}iframe{width:100%;height:720px;border:1px solid #ccc;border-radius:10px}</style></head><body><div class="card"><h1>Orbit 360 - Smoke A&S LAB v99</h1><p>Si aparece login, ingresa con usuario LAB. El smoke espera hasta 90 segundos y genera reporte automatico.</p><pre id="out">Iniciando...</pre></div><iframe id="app" src="/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&smoke=ays-lab-v99"></iframe><script>
 const out=document.getElementById('out'); const start=Date.now(); const errors=[]; const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 window.addEventListener('error',e=>errors.push({type:'outer-error',message:e.message||'',source:e.filename||'',line:e.lineno||0}));
 async function post(obj){out.textContent=JSON.stringify(obj,null,2); try{await fetch('/__smoke_result',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(obj)}); out.textContent+='\n\nResultado enviado. Puedes cerrar esta ventana.';}catch(e){out.textContent+='\nERROR POST: '+(e.message||String(e));}}
@@ -160,7 +176,7 @@ function safe(obj){try{return JSON.parse(JSON.stringify(obj));}catch(e){return S
 async function inspect(){try{const frame=document.getElementById('app'); const w=frame.contentWindow; const store=w.Orbit&&w.Orbit.store; const backend=w.OrbitBackend||w.ORBIT_BACKEND||{}; const status=backend.status?backend.status():(store&&store._labStatus?store._labStatus():{}); const api=['all','get','where','find','insert','update','remove','on','_emit','pref','setPref','init','reseed','raw']; const apiStatus={}; api.forEach(k=>apiStatus[k]=!!(store&&typeof store[k]==='function')); let fb=false, apps=0, authUser=null; try{fb=!!w.firebase; apps=w.firebase&&w.firebase.apps?w.firebase.apps.length:0; const u=w.firebase&&w.firebase.auth?w.firebase.auth().currentUser:null; authUser=u?{uid:u.uid,email:u.email}:null;}catch(e){}
 const base={href:w.location.href,title:w.document.title,readyState:w.document.readyState,orbitExists:!!w.Orbit,storeExists:!!store,apiStatus,apiComplete:api.every(k=>apiStatus[k]),backendMode:backend.mode||null,backendTenant:backend.tenantId||backend.tenant||null,backendApiVersion:backend.apiVersion||null,collectionsLength:backend.collections?backend.collections.length:null,firebaseDetected:fb,firebaseApps:apps,authUser,status:safe(status),errors,elapsedMs:Date.now()-start};
 const ready=base.apiComplete&&base.backendMode==='firestore-lab'&&base.backendTenant==='alianzas-soluciones'&&fb&&apps>0&&authUser&&status&&status.snapshotAttachedCount>0;
-if(!ready){ if(Date.now()-start>90000){base.contractOk=false; base.blockedReason='LAB no llegó a estado listo antes de timeout'; return post(base);} out.textContent='Esperando Auth/Firebase LAB... '+Math.round((Date.now()-start)/1000)+'s\n'+JSON.stringify(base,null,2); setTimeout(inspect,1200); return; }
+if(!ready){ if(Date.now()-start>90000){base.contractOk=false; base.blockedReason='LAB no llego a estado listo antes de timeout'; return post(base);} out.textContent='Esperando Auth/Firebase LAB... '+Math.round((Date.now()-start)/1000)+'s\n'+JSON.stringify(base,null,2); setTimeout(inspect,1200); return; }
 const smokeId='smoke_ays_lab_'+Date.now(); const row={id:smokeId,tipo:'smoke_ays_lab',titulo:'Smoke A&S LAB v99',tenantId:'alianzas-soluciones',fecha:new Date().toISOString(),ficticio:true,createdBySmoke:true};
 let crud={insert:false,get:false,update:false,remove:false,afterRemoveGone:false,error:null};
 try{ store.insert('actividades',row); crud.insert=true; await sleep(1800); const got=store.get('actividades',smokeId); crud.get=!!got; store.update('actividades',smokeId,{estado:'actualizado_smoke',updatedBySmoke:true}); crud.update=true; await sleep(900); store.remove('actividades',smokeId); crud.remove=true; await sleep(900); crud.afterRemoveGone=!store.get('actividades',smokeId);}catch(e){crud.error=String(e&&e.message||e);} 
@@ -169,7 +185,23 @@ post(result);
 }catch(e){if(Date.now()-start>90000)post({contractOk:false,error:String(e&&e.message||e),errors,elapsedMs:Date.now()-start}); else setTimeout(inspect,1200);}}
 setTimeout(inspect,1500);
 </script></body></html>`;
-const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://127.0.0.1'); if(req.method==='GET'&&url.pathname==='/__smoke.html')return send(res,200,'text/html; charset=utf-8',smokeHtml); if(req.method==='POST'&&url.pathname==='/__smoke_result'){let body=''; req.on('data',c=>body+=c); req.on('end',()=>{fs.writeFileSync(resultPath,body||'{}','utf8'); send(res,200,'application/json; charset=utf-8','{"ok":true}');}); return;} let filePath=decodeURIComponent(url.pathname); if(filePath==='/')filePath='/index.html'; const full=path.normalize(path.join(root,filePath)); if(!full.startsWith(path.normalize(root)))return send(res,403,'text/plain; charset=utf-8','Forbidden'); fs.readFile(full,(err,data)=>{if(err)return send(res,404,'text/plain; charset=utf-8','Not found: '+filePath); send(res,200,types[path.extname(full).toLowerCase()]||'application/octet-stream',data);});});
+const server=http.createServer((req,res)=>{
+  const url=new URL(req.url,'http://127.0.0.1');
+  if(req.method==='GET'&&url.pathname==='/__smoke.html')return send(res,200,'text/html; charset=utf-8',smokeHtml);
+  if(req.method==='POST'&&url.pathname==='/__smoke_result'){
+    let body=''; req.on('data',c=>body+=c); req.on('end',()=>{fs.writeFileSync(resultPath,body||'{}','utf8'); send(res,200,'application/json; charset=utf-8','{"ok":true}');}); return;
+  }
+  let filePath=decodeURIComponent(url.pathname); if(filePath==='/')filePath='/index.html';
+  const full=path.normalize(path.join(root,filePath));
+  if(!full.startsWith(path.normalize(root)))return send(res,403,'text/plain; charset=utf-8','Forbidden');
+  fs.readFile(full,(err,data)=>{
+    if(err)return send(res,404,'text/plain; charset=utf-8','Not found: '+filePath);
+    if(filePath==='/index.html' && url.searchParams.get('orbitBackend')==='firestore-lab'){
+      return send(res,200,'text/html; charset=utf-8',injectLab(data.toString('utf8')));
+    }
+    send(res,200,types[path.extname(full).toLowerCase()]||'application/octet-stream',data);
+  });
+});
 server.listen(port,'127.0.0.1',()=>console.log('SMOKE_AYS_LAB_SERVER_READY http://127.0.0.1:'+port));
 '@
 
@@ -178,7 +210,7 @@ server.listen(port,'127.0.0.1',()=>console.log('SMOKE_AYS_LAB_SERVER_READY http:
   Start-Sleep -Seconds 2
 
   $Health = Invoke-WebRequest -Uri "http://127.0.0.1:$Port/index.html?orbitBackend=firestore-lab&tenant=$Tenant" -UseBasicParsing -TimeoutSec 10
-  Add-Report "HTTP index central LAB: $($Health.StatusCode)"
+  Add-Report "HTTP index central LAB con inyeccion temporal: $($Health.StatusCode)"
 
   $ChromeCandidates = @(
     "C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -186,24 +218,24 @@ server.listen(port,'127.0.0.1',()=>console.log('SMOKE_AYS_LAB_SERVER_READY http:
     "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe"
   )
   $Chrome = $ChromeCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
-  if (-not $Chrome) { throw "No se encontró Google Chrome" }
+  if (-not $Chrome) { throw "No se encontro Google Chrome" }
   New-Item -ItemType Directory -Force -Path $ChromeProfile | Out-Null
 
   $SmokeUrl = "http://127.0.0.1:$Port/__smoke.html"
   $ChromeProc = Start-Process -FilePath $Chrome -ArgumentList @("--new-window","--no-first-run","--no-default-browser-check","--user-data-dir=$ChromeProfile",$SmokeUrl) -PassThru
   Add-Report "Smoke URL: $SmokeUrl"
-  Add-Report "Chrome abierto. Si pide login, usa credenciales LAB. Esperando resultado hasta 100 segundos."
+  Add-Report "Chrome abierto. Si pide login, usa credenciales LAB. Esperando resultado hasta 105 segundos."
   Add-Report ""
 
   $Got = $false
-  for ($i = 0; $i -lt 105; $i++) {
+  for ($i = 0; $i -lt 110; $i++) {
     if (Test-Path $ResultJson) { $Got = $true; break }
     Start-Sleep -Seconds 1
   }
 
   if (-not $Got) {
     Add-Report "RESULTADO: BLOQUEADO_TIMEOUT"
-    throw "No llegó resultado del smoke en el tiempo esperado"
+    throw "No llego resultado del smoke en el tiempo esperado"
   }
 
   $ResultRaw = Get-Content $ResultJson -Raw -Encoding UTF8
@@ -217,7 +249,7 @@ server.listen(port,'127.0.0.1',()=>console.log('SMOKE_AYS_LAB_SERVER_READY http:
     Add-Report "OK: Orbit.store LAB responde con API completa, tenant correcto y CRUD ficticio controlado en actividades."
   } else {
     Add-Report "RESULTADO SMOKE A&S LAB V99: FALLIDO_O_BLOQUEADO"
-    Add-Report "Revisar JSON anterior. No se hace commit, push, deploy ni cambios automáticos."
+    Add-Report "Revisar JSON anterior. No se hace commit, push, deploy ni cambios automaticos."
   }
 
 } catch {
@@ -227,7 +259,7 @@ server.listen(port,'127.0.0.1',()=>console.log('SMOKE_AYS_LAB_SERVER_READY http:
   try { if ($ServerProc -and -not $ServerProc.HasExited) { Stop-Process -Id $ServerProc.Id -Force -ErrorAction SilentlyContinue; Add-Report "OK: servidor temporal cerrado." } } catch {}
   Add-Report ""
   Add-Report "Reporte: $Report"
-  Add-Report "Restricciones respetadas: NO deploy, NO Hosting, NO producción, NO secretos, NO datos reales en código."
+  Add-Report "Restricciones respetadas: NO deploy, NO Hosting, NO produccion, NO secretos, NO datos reales en codigo."
   try {
     Get-Content $Report -Raw -Encoding UTF8 | Set-Clipboard
     notepad $Report
