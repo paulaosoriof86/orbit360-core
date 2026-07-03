@@ -124,3 +124,13 @@
 - **Fix o mejora aplicada:** Se creó consolidador de reportes locales que entrega `APTO_PARA_SOLICITAR_AUTORIZACION_LAB`, `NO_AUTORIZAR_ESCRITURA_LAB` o `PENDIENTE_COMPLETAR_ENSAYO`. El primer ensayo lo ejecuta al final aunque haya bloqueo previo.
 - **Impacto en prototipo comercializable:** Reduce carga manual y formaliza la puerta de decisión antes de cualquier escritura real por tenant.
 - **Estado:** RESUELTO EN RAMA / pendiente probar con reportes reales locales.
+
+## 2026-07-03 — Autorización controlada de primera carga LAB
+
+- **Módulo/área:** Migración / Firestore LAB / Control de autorización.
+- **Síntoma/necesidad:** Después de un ensayo apto, la primera escritura LAB debe estar preparada pero no debe quedar abierta ni accidental.
+- **Esperado:** Script con preflight por defecto y escritura solo con autorización explícita, confirmación exacta, ProjectId y credencial local.
+- **Archivo/función:** `tools/orbit360-autorizar-carga-ays-lab-v104.ps1`, `docs/AUTORIZACION-CARGA-AYS-LAB-V104-20260703.md`.
+- **Fix o mejora aplicada:** Se creó script que primero exige resumen ejecutivo `APTO_PARA_SOLICITAR_AUTORIZACION_LAB`. Sin `-EscribirLab` solo reporta preflight. Con escritura exige `-Confirmacion ESCRIBIR_LAB_AYS`, `-ProjectId` y `GOOGLE_APPLICATION_CREDENTIALS` local.
+- **Impacto en prototipo comercializable:** Añade control de autorización por tenant antes de escribir datos reales en LAB, evitando cargas accidentales y preservando trazabilidad.
+- **Estado:** RESUELTO EN RAMA / pendiente ejecución local de preflight y autorización explícita de Paula para escritura LAB.
