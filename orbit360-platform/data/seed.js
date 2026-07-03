@@ -739,9 +739,21 @@ Orbit.SEED = (function () {
           { icon: '🎨', t: 'Tipos de contenido', color: '#2563a8', d: 'Texto (educativo, tips, normativa), carrusel (comparativos, listas), reel (30-60s), historia (24h) y video largo (HeyGen o pantalla). Mezcla formatos para no aburrir.' },
           { icon: '🤖', t: 'Generar y automatizar', color: '#1f8a4c', d: '"Generar mes con IA" crea un mes de ideas con criterios estratégicos (segmentación, objetivos por semana, fechas clave, CTA). Metricool programa y publica; Make conecta Orbit→Canva→Metricool; las campañas de renovación se disparan solas a 30 días del vencimiento.' }
         ]},
+        { t: 'Estrategia por embudo y segmento', min: 10, tipo: 'lectura', secciones: [
+          { icon: '🎯', t: 'Contenido por etapa del embudo', color: '#6b4ea0', d: 'TOFU (descubrimiento): educa sobre riesgos y por qué asegurarse — reels y tips. MOFU (consideración): comparativos, casos y testimonios que generan confianza. BOFU (decisión): oferta concreta, urgencia real (vigencia), CTA de cotización. Balancea el mes: ~50% TOFU, 30% MOFU, 20% BOFU.' },
+          { icon: '👥', t: 'Segmenta por perfil', color: '#2563a8', d: 'No hables igual a un dueño de auto que a una empresa. Define segmentos (auto particular, pyme, familia con GM, flotas) y adapta el mensaje, el canal y la oferta. Orbit deja etiquetar cada pieza por segmento para medir qué funciona con quién.' },
+          { icon: '📆', t: 'Fechas clave y estacionalidad', color: '#1f8a4c', d: 'Anticipa: temporada de lluvias (auto/hogar), inicio de año escolar (vida/GM), cierre fiscal (empresas), fechas de renovación masiva. El calendario deja marcar campañas recurrentes que se repiten cada año.' }
+        ]},
+        { t: 'Medición: qué mirar y cómo mejorar', min: 9, tipo: 'lectura', secciones: [
+          { icon: '📊', t: 'Métricas que importan', color: '#6b4ea0', d: 'Alcance e impresiones (visibilidad), engagement (interacción real), clics y CTR (interés), y sobre todo leads generados y costo por lead. La vanidad (likes) no paga pólizas; el pipeline sí.' },
+          { icon: '🔁', t: 'Del contenido al pipeline', color: '#2563a8', d: 'Cada pieza BOFU debe llevar a una acción medible: cotizar, agendar, escribir por WhatsApp. Esos leads entran a Orbit Leads y puedes atribuir qué campaña los originó (canal de ingreso), cerrando el círculo marketing→ventas.' },
+          { icon: '📈', t: 'Iterar con datos', color: '#1f8a4c', d: 'Revisa mensualmente qué formato, enfoque y segmento rindieron. Duplica lo que funciona, ajusta lo que no. El estado de cada pieza (idea→publicado→medido) te da el histórico para decidir con evidencia, no con corazonadas.' }
+        ]},
         { t: 'Emojis, hashtags y copywriting', min: 8, tipo: 'quiz', preguntas: [
           { p: '¿Qué herramienta programa y publica en todas las redes desde un solo lugar?', ops: ['HeyGen', 'Metricool', 'Canva'], ok: 1 },
-          { p: '¿Qué herramienta conecta Orbit → Canva → Metricool para automatizar?', ops: ['Make', 'Google Sheets', 'WhatsApp API'], ok: 0 }
+          { p: '¿Qué herramienta conecta Orbit → Canva → Metricool para automatizar?', ops: ['Make', 'Google Sheets', 'WhatsApp API'], ok: 0 },
+          { p: '¿Qué mezcla de embudo es más sana para el mes?', ops: ['100% oferta y descuento', '~50% descubrimiento, 30% consideración, 20% decisión', 'Solo memes para viralizar'], ok: 1 },
+          { p: '¿Cuál es la métrica que de verdad importa para el negocio?', ops: ['Cantidad de likes', 'Leads generados y costo por lead', 'Número de hashtags usados'], ok: 1 }
         ]}
       ] },
     { id: 'cur9', titulo: 'Portal del Cliente', cat: 'Inducción', emoji: '🚪', color: '#0f766e', desc: 'Guía para clientes: cómo usar su portal, ver pólizas, pagar y solicitar gestiones.', destinatarios: 'clientes', progreso: 0, certificado: false,
@@ -752,8 +764,20 @@ Orbit.SEED = (function () {
           { icon: '🚨', t: 'Siniestros y documentos', color: '#C5162E', d: 'Sigue el estado de cualquier reclamo que reportaste. Accede a las carátulas y documentos de tu expediente, y sube documentos nuevos cuando te los pidan.' },
           { icon: '🗂', t: 'Solicitar gestiones y aprender', color: '#1f8a4c', d: '¿Necesitas un cambio o tienes una duda? Envía una solicitud directa a tu asesor desde el portal. En "Aprende" tienes recursos sobre tus seguros y un glosario de términos.' }
         ]},
+        { t: 'Reportar pagos y reclamos paso a paso', min: 7, tipo: 'lectura', secciones: [
+          { icon: '📤', t: 'Reportar un pago', color: '#0f766e', d: 'Entra a "Mis pagos", elige el recibo que pagaste y toca "Reportar pago". Adjunta el comprobante (foto o PDF) y confirma. Tu asesor recibe la notificación al instante, valida contra el estado de cuenta de la aseguradora y marca el recibo como pagado. Tú ves el cambio de estado en tiempo real.' },
+          { icon: '🚨', t: 'Abrir un reclamo', color: '#C5162E', d: 'En "Siniestros" toca "Reportar siniestro", describe qué pasó, la fecha y adjunta fotos o documentos. Se crea el caso, tu asesor y el equipo lo reciben, y a partir de ahí sigues cada avance (reportado → en análisis → aprobado → pagado) sin llamar a nadie.' },
+          { icon: '🔔', t: 'Notificaciones', color: '#1f8a4c', d: 'Cada avance importante —pago confirmado, respuesta a una gestión, recordatorio de renovación o vencimiento— te llega como notificación en el portal y por WhatsApp/correo. Toca la campana para ver el detalle de cada una.' }
+        ]},
+        { t: 'Tu expediente y tu asesor', min: 6, tipo: 'lectura', secciones: [
+          { icon: '📁', t: 'Completa tu expediente', color: '#0f766e', d: 'Mientras más completo esté tu expediente (documento de identidad, datos de contacto, documentos del bien asegurado), más rápido se gestionan tus trámites. El portal te invita a subir lo que falte y todo queda seguro y disponible.' },
+          { icon: '💬', t: 'Habla con tu asesor', color: '#2563a8', d: 'Tienes un botón directo para escribir a tu asesor, y un asistente que responde tus dudas frecuentes al instante (horarios, coberturas, cómo pagar). Si necesitas a una persona, el asistente te conecta con tu asesor.' },
+          { icon: '🔒', t: 'Tu información está protegida', color: '#C5162E', d: 'Al ingresar por primera vez aceptas el aviso de tratamiento de datos. Tu información se usa solo para gestionar tus seguros; nunca se comparte sin tu consentimiento. Puedes consultar la política cuando quieras.' }
+        ]},
         { t: '¿Cómo reportar un pago?', min: 5, tipo: 'quiz', preguntas: [
-          { p: '¿Cómo reporta un cliente un pago en el portal?', ops: ['Llamando a la aseguradora', 'En "Mis pagos" → seleccionar recibo → "📤 Reportar pago"', 'Enviando un correo a la compañía'], ok: 1 }
+          { p: '¿Cómo reporta un cliente un pago en el portal?', ops: ['Llamando a la aseguradora', 'En "Mis pagos" → seleccionar recibo → "📤 Reportar pago"', 'Enviando un correo a la compañía'], ok: 1 },
+          { p: '¿Qué puedes hacer al abrir un reclamo desde el portal?', ops: ['Solo ver un teléfono de contacto', 'Describir el caso, adjuntar fotos y seguir cada avance', 'Nada, hay que ir presencialmente'], ok: 1 },
+          { p: '¿Para qué sirve completar tu expediente?', ops: ['Para nada, es opcional y sin efecto', 'Para que tus trámites se gestionen más rápido', 'Para pagar más caro'], ok: 1 }
         ]}
       ] },
     { id: 'cur5', titulo: 'Cumplimiento y Confidencialidad', cat: 'Normativa', emoji: '⚖️', color: '#6b4ea0', desc: 'Protección de datos, Habeas Data, secreto profesional y conducta.', destinatarios: 'equipo', progreso: 0, certificado: false,
@@ -819,7 +843,7 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 34,
+    __v: 35,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos, contenidos, reclamos, cursos, notifs
   };

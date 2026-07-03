@@ -216,6 +216,12 @@ Orbit.tenant = (function () {
     plan: 'personalizado',
     paises: ['GT', 'CO'],
     monedaBase: 'GTQ',
+    // Config fiscal por país (fuente ÚNICA multi-tenant): IVA, moneda, gastos de emisión.
+    // La leen facturaAseg (Finanzas), el motor de primas y la creación de pólizas.
+    paisesCfg: {
+      GT: { iva: 12, moneda: 'GTQ', gastosEmisionPct: 5 },
+      CO: { iva: 19, moneda: 'COP', gastosEmisionPct: 0 }
+    },
     branding: { logo: '', sidebar: 'oscuro', paleta: 'rojo', tipografia: 'Manrope' },
     // Producto comercializable: etiquetas técnicas (NÚCLEO/BETA/PRÓX) ocultas por defecto.
     // Poner en false SOLO en modo interno/demo desde Configuración → Marca.

@@ -409,6 +409,8 @@ Orbit.modules.configuracion = (function () {
         const arr = Orbit.store.pref('paises', []) || [];
         arr.push({ code, nombre, iva, moneda, gastosEmisionPct: gem });
         Orbit.store.setPref('paises', arr);
+        // fuente ÚNICA multi-tenant: guardar la config fiscal en tenant.paisesCfg
+        try { const tn = T().get(); tn.paisesCfg = tn.paisesCfg || {}; tn.paisesCfg[code] = { iva, moneda, gastosEmisionPct: gem }; T().set ? T().set({ paisesCfg: tn.paisesCfg }) : (T().save && T().save(tn)); } catch (e) {}
         if (Orbit.primas && Orbit.primas.registrarPais) Orbit.primas.registrarPais(code, { iva, moneda, gastosEmisionPct: gem });
       } catch (e) {}
       close();

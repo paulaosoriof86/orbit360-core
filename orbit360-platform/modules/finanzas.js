@@ -512,9 +512,68 @@ Orbit.modules.finanzas = (function () {
         <td class="num" style="color:var(--red)"><b>${U.money(r.devengada, 'GTQ')}</b></td>
         <td class="num" style="color:var(--ok)">${U.money(r.liquidada, 'GTQ')}</td>
         <td class="num">${U.money(r.devengada + r.liquidada, 'GTQ')}</td>
-        <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('aseguradoraId','${r.asg ? r.asg.id : ''}')">Ver detalle</button><button class="btn ghost sm" onclick="Orbit.importa.open('planillas-comision')">Conciliar planilla</button></td>
+        <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('aseguradoraId','${r.asg ? r.asg.id : ''}')">Ver detalle</button><button class="btn ghost sm" onclick="Orbit.modules.finanzas.facturaAseg('${r.asg ? r.asg.id : ''}')">🧾 Factura</button><button class="btn ghost sm" onclick="Orbit.importa.open('planillas-comision')">Conciliar planilla</button></td>
       </tr>`).join('')}</tbody>
     </table></div></div>`;
+  }
+
+  /* ---------- FACTURA a aseguradora (control, NO reemplazo fiscal) ---------- */
+  function facturaAseg(asgId) {
+    const asg = q.aseguradora(asgId) || {};
+    const comp = comisionEmpresaPorAseguradora()[asgId] || { devengada: 0, liquidada: 0, n: 0 };
+    const cur = paisFin() === 'CO' ? 'COP' : 'GTQ';
+    const base = comp.devengada || 0;
+    const t = Orbit.tenant.get();
+    const pais = asg.pais || paisFin() || 'GT';
+    // IVA del país configurado (tasas por país en tenant)
+    const ivaPct = (t.paisesCfg && t.paisesCfg[pais] && t.paisesCfg[pais].iva != null) ? t.paisesCfg[pais].iva : (pais === 'CO' ? 19 : 12);
+    const iva = Math.round(base * ivaPct) / 100;
+    const total = base + iva;
+    const fact = asg.facturacion || {};
+    const num = 'FAC-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
+    const concepto = (fact.patronConcepto || 'Comisiones por intermediación de seguros')
+      .replace('{mes}', MESES[+mesSel.slice(5) - 1] + ' ' + mesSel.slice(0, 4))
+      .replace('{aseguradora}', asg.nombre || '');
+    const M = n => U.money(n, cur);
+    let back = document.getElementById('fin-fac'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-fac'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 98;
+    back.innerHTML = `<div class="card" style="width:min(620px,96vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🧾 Factura de comisiones · ${U.esc(asg.nombre || '')}</b><button class="imp-x" id="ff-x">✕</button></div>
+      <div style="padding:20px" id="ff-doc">
+        <div class="cfg-note" style="margin-bottom:14px">Documento de <b>control interno</b> de facturación (no sustituye la factura fiscal/electrónica; alimenta el registro para emitir en tu sistema fiscal o integrar factura electrónica).</div>
+        <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+          <div><div class="muted" style="font-size:11px">EMISOR</div><b>${U.esc(t.empresa || 'Tu empresa')}</b>${t.nit ? '<div style="font-size:12px">NIT: ' + U.esc(t.nit) + '</div>' : ''}</div>
+          <div style="text-align:right"><div class="muted" style="font-size:11px">FACTURA</div><b class="mono">${num}</b><div style="font-size:12px">${U.fmtDate(Orbit.ui.today())}</div></div>
+        </div>
+        <div style="background:var(--surface);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+          <div class="muted" style="font-size:11px">FACTURAR A</div>
+          <b>${U.esc(fact.razonSocial || asg.nombre || '')}</b>
+          <div style="font-size:12.5px">NIT/ID: <b>${U.esc(fact.nit || '—')}</b></div>
+          ${fact.dirFiscal ? '<div style="font-size:12.5px">' + U.esc(fact.dirFiscal) + '</div>' : ''}
+        </div>
+        <table class="tbl"><thead><tr><th>Concepto</th><th class="num">Valor</th></tr></thead><tbody>
+          <tr><td>${U.esc(concepto)}<div class="muted" style="font-size:11.5px">${comp.n} cuotas · prima neta recaudada del periodo</div></td><td class="num"><b>${M(base)}</b></td></tr>
+          <tr><td>IVA (${ivaPct}%)</td><td class="num">${M(iva)}</td></tr>
+          <tr style="border-top:2px solid var(--ink)"><td><b>TOTAL A COBRAR</b></td><td class="num"><b style="font-size:16px;color:var(--red)">${M(total)}</b></td></tr>
+        </tbody></table>
+        ${!fact.nit ? '<div class="cfg-note" style="margin-top:12px;border-left:3px solid var(--warn)">⚠️ Esta aseguradora no tiene datos de facturación (NIT, razón social, patrón de concepto). Complétalos en su ficha (Aseguradoras) para autocompletar la factura.</div>' : ''}
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="ff-print">🖨 Imprimir / PDF</button>
+        <button class="btn primary" id="ff-emit">✓ Registrar emitida</button>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#ff-x').addEventListener('click', close);
+    back.querySelector('#ff-print').addEventListener('click', () => { const w = window.open('', '_blank'); w.document.write('<html><head><title>' + num + '</title></head><body>' + back.querySelector('#ff-doc').innerHTML + '</body></html>'); w.document.close(); w.print(); });
+    back.querySelector('#ff-emit').addEventListener('click', () => {
+      // registra un movimiento de ingreso ESPERADO (factura emitida, por cobrar) — esto SÍ es finmov real
+      S().insert('finmovs', { id: 'fmv_fac_' + Date.now(), periodo: mesSel, dia: +Orbit.ui.today().slice(8, 10) || 1, tipo: 'ingreso', clase: 'Comisión facturada', categoria: 'Comisión facturada', concepto: 'Factura ' + num + ' · ' + (asg.nombre || ''), valor: total, moneda: cur, pais, estado: 'facturado', aseguradoraId: asgId, facturaNum: num });
+      close();
+      const tt = document.createElement('div'); tt.className = 'ciclo-toast'; tt.textContent = '✓ Factura ' + num + ' registrada como ingreso por cobrar (CxC)'; document.body.appendChild(tt); setTimeout(() => tt.remove(), 3200);
+      render(document.getElementById('host'));
+    });
   }
 
   /* ---------- LIQUIDACIÓN ASESORES ---------- */
@@ -909,5 +968,5 @@ Orbit.modules.finanzas = (function () {
         : '⚠️ Conecta un proveedor de IA en Configuración → Automatizaciones → Motor de IA para análisis en vivo. (Sin IA, el análisis de arriba usa la heurística de la plataforma.)';
     });
   }
-  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, metasSugerir, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
+  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, metasSugerir, facturaAseg, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
 })();
