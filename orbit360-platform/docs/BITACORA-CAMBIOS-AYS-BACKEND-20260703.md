@@ -82,3 +82,14 @@
 - **Fix o mejora aplicada:** Se creó script maestro sin deploy/commit/push que ejecuta `orbit360-integrar-backend-lab-index.ps1` y `orbit360-smoke-ays-lab-v99.ps1`, copia reporte al portapapeles y abre Notepad.
 - **Impacto en prototipo comercializable:** Facilita validar backend LAB completo antes de cargar datos reales.
 - **Estado:** LISTO PARA EJECUCIÓN LOCAL.
+
+## 2026-07-03 — Backend LAB v1.104: guard de secretos, tenant y auth
+
+- **Módulo/área:** Backend LAB / Seguridad / Firestore / Integraciones.
+- **Síntoma/necesidad:** El candidato Claude y el backend LAB ya habían reducido exposición de credenciales, pero seguía existiendo riesgo de que una pantalla o preferencia futura intentara guardar API keys, webhooks, tokens o secretos desde frontend/Firestore.
+- **Esperado:** La rama backend debe bloquear persistencia de secretos desde frontend y dejar claro que producción usará backend seguro/secret manager por tenant.
+- **Causa raíz:** El prototipo nació en navegador y algunas integraciones capturan credenciales en UI; sin guard transversal, cualquier módulo nuevo podría reintroducir persistencia insegura.
+- **Archivo/función:** `core/backend-lab-loader.js`, `core/backend-lab-init.js`, `core/backend-lab-security-guard.js`, `tools/orbit360-integrar-backend-lab-index.ps1`, `tools/orbit360-validar-backend-lab-contrato.mjs`.
+- **Fix o mejora aplicada:** Se endureció loader/init a v1.104, se agregó guard runtime que bloquea `setPref` sensible, limpia campos sensibles antes de `insert/update`, bloquea writes si no está el usuario LAB esperado y emite eventos de seguridad. El script de integración ahora inserta el guard después del store LAB y antes de `seed.js`.
+- **Impacto en prototipo comercializable:** Aprendizaje obligatorio para prototipo base: ninguna integración comercial debe persistir secretos en frontend; Claude debe conservar copy comercial sin pedir credenciales expuestas y backend debe proveer conectores seguros.
+- **Estado:** RESUELTO EN RAMA / pendiente ejecutar smoke local y empalme visual definitivo.
