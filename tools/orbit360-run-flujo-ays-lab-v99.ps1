@@ -1,5 +1,6 @@
 param(
-  [string]$Repo = "C:\Users\paula\OneDrive\Documentos\GitHub\orbit360-core"
+  [string]$Repo = "C:\Users\paula\OneDrive\Documentos\GitHub\orbit360-core",
+  [switch]$PrepararConfig
 )
 
 $ErrorActionPreference = "Stop"
@@ -32,6 +33,7 @@ Add-Report "ORBIT 360 - RUN FLUJO A&S LAB V99"
 Add-Report "Fecha local: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 Add-Report "Repo: $Repo"
 Add-Report "Rama obligatoria: $ExpectedBranch"
+Add-Report "Preparar config local si falta: $PrepararConfig"
 Add-Report "Restricciones: NO deploy, NO Hosting, NO produccion, NO secretos, NO datos reales, NO commit automatico, NO push automatico"
 Add-Report "============================================================"
 
@@ -67,21 +69,50 @@ $AllOk = (Run-Step "2. Sincronizar rama obligatoria" {
   if ($After -ne $ExpectedBranch) { throw "No quedo en la rama obligatoria." }
 }) -and $AllOk
 
-$AllOk = (Run-Step "3. Ejecutar integracion local backend LAB en index" {
-  $Script = Join-Path $Repo "tools\orbit360-integrar-backend-lab-index.ps1"
-  if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
-  & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
-  Add-Report "Script integracion ejecutado. Revisa su reporte detallado en _orbit360_reports."
+$AllOk = (Run-Step "3. Verificar config Firebase LAB local" {
+  $Config = Join-Path $Repo "orbit360-platform\core\auth-firebase.config.local.js"
+  $PrepScript = Join-Path $Repo "tools\orbit360-preparar-config-firebase-lab-local.ps1"
+
+  if (-not (Test-Path $Config)) {
+    Add-Report "BLOQUEO: no existe config local: $Config"
+    if ($PrepararConfig) {
+      if (-not (Test-Path $PrepScript)) { throw "Falta preparador: $PrepScript" }
+      Add-Report "Se ejecutara preparador local para crear plantilla y abrir Notepad."
+      & powershell -NoProfile -ExecutionPolicy Bypass -File $PrepScript -Repo $Repo | ForEach-Object { Add-Report $_ }
+      Add-Report "Config local preparada. Reemplaza placeholders y vuelve a ejecutar este flujo sin -PrepararConfig."
+      throw "Config local preparada, pendiente reemplazar valores LAB autorizados."
+    } else {
+      throw "Ejecuta este flujo con -PrepararConfig o crea auth-firebase.config.local.js con valores LAB autorizados."
+    }
+  }
+
+  $ConfigText = Get-Content $Config -Raw -Encoding UTF8
+  if ($ConfigText -match "REEMPLAZAR_") {
+    throw "Config local existe pero aun tiene placeholders REEMPLAZAR_. Abre el archivo local, completa config LAB y vuelve a ejecutar."
+  }
+
+  Add-Report "OK: config local existe y no muestra placeholders visibles. No se imprime contenido por seguridad."
 }) -and $AllOk
 
-$AllOk = (Run-Step "4. Ejecutar smoke A&S LAB v99" {
-  $Script = Join-Path $Repo "tools\orbit360-smoke-ays-lab-v99.ps1"
-  if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
-  & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
-  Add-Report "Script smoke ejecutado. Revisa su reporte detallado en _orbit360_reports."
-}) -and $AllOk
+if ($AllOk) {
+  $AllOk = (Run-Step "4. Ejecutar integracion local backend LAB en index" {
+    $Script = Join-Path $Repo "tools\orbit360-integrar-backend-lab-index.ps1"
+    if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
+    Add-Report "Script integracion ejecutado. Revisa su reporte detallado en _orbit360_reports."
+  }) -and $AllOk
+}
 
-Run-Step "5. Estado Git posterior" {
+if ($AllOk) {
+  $AllOk = (Run-Step "5. Ejecutar smoke A&S LAB v99" {
+    $Script = Join-Path $Repo "tools\orbit360-smoke-ays-lab-v99.ps1"
+    if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
+    Add-Report "Script smoke ejecutado. Revisa su reporte detallado en _orbit360_reports."
+  }) -and $AllOk
+}
+
+Run-Step "6. Estado Git posterior" {
   Set-Location $Repo
   $Branch = (git rev-parse --abbrev-ref HEAD).Trim()
   Add-Report "Rama final: $Branch"
