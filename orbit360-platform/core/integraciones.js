@@ -6,7 +6,52 @@
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.integraciones = (function () {
-  const API_VERSION = 'v0.1-demo-event-log';
+  const API_VERSION = 'v0.2-demo-marketing-seed';
+  const STRUCT_VERSION = 37;
+
+  function extendSeed() {
+    const seed = Orbit.SEED;
+    if (!seed || seed.__integracionesSeedApplied) return;
+    seed.integraciones = seed.integraciones || [
+      { id: 'int_make_demo', tenantId: 'demo', proveedor: 'make', nombre: 'Make · Puente de automatizaciones', estado: 'pendiente_configuracion', modo: 'webhook', eventos: ['marketing_programar_publicacion', 'marketing_generar_pieza', 'marketing_sync_sheets', 'marketing_campana_email', 'marketing_whatsapp_broadcast', 'marketing_metricas_actualizadas'], webhookRef: '', scopes: [], paises: ['GT', 'CO'], modulos: ['marketing'], ultimaPruebaAt: '', ultimoError: '', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' },
+      { id: 'int_metricool_demo', tenantId: 'demo', proveedor: 'metricool', nombre: 'Metricool · Programación y métricas', estado: 'pendiente_configuracion', modo: 'externo', eventos: ['marketing_programar_publicacion', 'marketing_publicacion_programada', 'marketing_metricas_actualizadas'], webhookRef: '', scopes: [], paises: ['GT', 'CO'], modulos: ['marketing'], ultimaPruebaAt: '', ultimoError: '', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' },
+      { id: 'int_canva_demo', tenantId: 'demo', proveedor: 'canva', nombre: 'Canva · Piezas visuales', estado: 'pendiente_configuracion', modo: 'externo', eventos: ['marketing_generar_pieza'], webhookRef: '', scopes: [], paises: ['GT', 'CO'], modulos: ['marketing'], ultimaPruebaAt: '', ultimoError: '', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' },
+      { id: 'int_sheets_demo', tenantId: 'demo', proveedor: 'google_sheets', nombre: 'Google Sheets · Calendario de contenidos', estado: 'pendiente_configuracion', modo: 'externo', eventos: ['marketing_sync_sheets'], webhookRef: '', scopes: [], paises: ['GT', 'CO'], modulos: ['marketing'], ultimaPruebaAt: '', ultimoError: '', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' }
+    ];
+    seed.eventosIntegracion = seed.eventosIntegracion || [];
+    seed.campanas = seed.campanas || [
+      { id: 'cmp_demo_1', tenantId: 'demo', nombre: 'Educación y confianza · Riesgos cotidianos', objetivo: 'educación', pais: 'GT', segmento: 'familias y profesionales', ramo: 'Auto / Vida / Hogar', estado: 'activa', fechaInicio: '2026-01-01', fechaFin: '2026-01-31', presupuesto: 0, responsable: 'Equipo Marketing', tags: ['educativo', 'confianza'], createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' },
+      { id: 'cmp_demo_2', tenantId: 'demo', nombre: 'Renovaciones con valor', objetivo: 'retención', pais: 'CO', segmento: 'clientes con póliza por vencer', ramo: 'Renovaciones', estado: 'planificada', fechaInicio: '2026-01-01', fechaFin: '2026-02-15', presupuesto: 0, responsable: 'Equipo Comercial', tags: ['renovacion', 'retencion'], createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' }
+    ];
+    seed.piezas = seed.piezas || [];
+    seed.metricasMarketing = seed.metricasMarketing || [];
+    if (Array.isArray(seed.contenidos)) {
+      seed.contenidos.forEach((c, idx) => {
+        if (!c.tenantId) c.tenantId = 'demo';
+        if (!c.campanaId) c.campanaId = idx % 2 === 0 ? 'cmp_demo_1' : 'cmp_demo_2';
+        if (!c.objetivo) c.objetivo = c.estado === 'Publicado' ? 'confianza' : 'educación';
+        if (!c.publico) c.publico = idx % 2 === 0 ? 'familias' : 'empresas';
+        if (!c.pais) c.pais = idx % 2 === 0 ? 'GT' : 'CO';
+        if (!Array.isArray(c.piezaIds)) c.piezaIds = [];
+        if (!c.programacion) c.programacion = { proveedor: 'metricool', estado: c.estado === 'Programado' ? 'pendiente_configuracion' : '', fecha: c.fecha, hora: c.hora };
+        if (c.stats) {
+          const mid = 'mkm_' + c.id;
+          if (!seed.metricasMarketing.find(m => m.id === mid)) seed.metricasMarketing.push({ id: mid, tenantId: 'demo', contenidoId: c.id, piezaId: '', campanaId: c.campanaId, canal: c.canal, fecha: c.fecha, alcance: c.stats.alcance || 0, impresiones: c.stats.impresiones || c.stats.alcance || 0, interacciones: c.stats.interac || 0, clics: c.stats.clics || 0, leads: c.stats.leads || 0, conversiones: 0, fuente: 'demo', raw: {}, createdAt: c.fecha + 'T00:00:00.000Z' });
+        }
+        if (idx < 4) {
+          const pid = 'pieza_' + c.id;
+          if (!seed.piezas.find(p => p.id === pid)) {
+            c.piezaIds.push(pid);
+            seed.piezas.push({ id: pid, tenantId: 'demo', contenidoId: c.id, campanaId: c.campanaId, tipo: c.tipo, canal: c.canal, formato: c.tipo, titulo: c.titulo, copy: c.copy, urlCanva: '', urlDrive: '', assetUrl: '', estado: c.estado === 'Publicado' ? 'publicada' : 'pendiente_diseno', responsable: c.responsable || 'Equipo Marketing', createdAt: c.fecha + 'T00:00:00.000Z', updatedAt: c.fecha + 'T00:00:00.000Z' });
+          }
+        }
+      });
+    }
+    seed.__v = Math.max(seed.__v || 0, STRUCT_VERSION);
+    seed.__integracionesSeedApplied = true;
+  }
+
+  extendSeed();
 
   function S() { return Orbit.store; }
   function nowIso() {
@@ -107,5 +152,5 @@ Orbit.integraciones = (function () {
     try { return S().update('eventosIntegracion', idEvento, patch); }
     catch (e) { return null; }
   }
-  return { emit, status, mark, version: API_VERSION };
+  return { emit, status, mark, extendSeed, version: API_VERSION };
 })();
