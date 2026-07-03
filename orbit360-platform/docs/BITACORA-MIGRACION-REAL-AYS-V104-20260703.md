@@ -114,3 +114,13 @@
 - **Fix o mejora aplicada:** Se creó auditor local sin red/Firebase/escritura remota e integración al primer ensayo antes de generar payload.
 - **Impacto en prototipo comercializable:** Protege consistencia multi-tenant y evita que datos migrados dañen cartera, producción, comisiones o analítica.
 - **Estado:** RESUELTO EN RAMA / pendiente probar con datos reales locales.
+
+## 2026-07-03 — Resumen ejecutivo de importación
+
+- **Módulo/área:** Migración / Reporte ejecutivo / Decisión previa a escritura LAB.
+- **Síntoma/necesidad:** El primer ensayo genera varios reportes y Paula necesita una decisión clara sin revisar archivo por archivo.
+- **Esperado:** Consolidar conversión, mapeo, validación, auditoría, payload, lotes y rollback en una decisión única.
+- **Archivo/función:** `tools/orbit360-resumen-ejecutivo-importacion-ays-v104.mjs`, `tools/orbit360-resumen-ejecutivo-importacion-ays-v104.ps1`, `docs/RESUMEN-EJECUTIVO-IMPORTACION-AYS-V104-20260703.md`, `tools/orbit360-run-primer-ensayo-importacion-ays-v104.ps1`.
+- **Fix o mejora aplicada:** Se creó consolidador de reportes locales que entrega `APTO_PARA_SOLICITAR_AUTORIZACION_LAB`, `NO_AUTORIZAR_ESCRITURA_LAB` o `PENDIENTE_COMPLETAR_ENSAYO`. El primer ensayo lo ejecuta al final aunque haya bloqueo previo.
+- **Impacto en prototipo comercializable:** Reduce carga manual y formaliza la puerta de decisión antes de cualquier escritura real por tenant.
+- **Estado:** RESUELTO EN RAMA / pendiente probar con reportes reales locales.
