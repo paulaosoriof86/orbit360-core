@@ -6,10 +6,11 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.comisiones = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
-  let vista = 'asesor'; // asesor | aseguradora | periodo
+  let vista = 'asesor'; // asesor | aseguradora | periodo | conciliacion
   let fAnio = '', fEstado = '';
 
   function render(host) {
+    if (vista === 'conciliacion') return renderConciliacion(host);
     let all = S().all('comisiones');
     if (fAnio) all = all.filter(c => (c.periodo || '').startsWith(fAnio));
     if (fEstado) all = all.filter(c => fEstado === 'Liquidada' ? c.estado === 'Liquidada' : c.estado !== 'Liquidada');
@@ -40,7 +41,7 @@ Orbit.modules.comisiones = (function () {
 
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
         <div class="tabs" style="max-width:440px;margin:0">
-          ${[['asesor', 'Por asesor'], ['aseguradora', 'Por aseguradora'], ['periodo', 'Por periodo']].map(v =>
+          ${[['asesor', 'Por asesor'], ['aseguradora', 'Por aseguradora'], ['periodo', 'Por periodo'], ['conciliacion', '🔄 Conciliación']].map(v =>
             `<div class="tab ${vista === v[0] ? 'active' : ''}" data-v="${v[0]}">${v[1]}</div>`).join('')}
         </div>
         <select id="cm-anio" class="o-sel" style="width:auto;margin-left:auto"><option value="">Todos los años</option>${['2024', '2025', '2026'].map(y => `<option ${fAnio === y ? 'selected' : ''}>${y}</option>`).join('')}</select>
@@ -66,6 +67,41 @@ Orbit.modules.comisiones = (function () {
     host.querySelector('#cm-anio').addEventListener('change', e => { fAnio = e.target.value; render(host); });
     host.querySelector('#cm-est').addEventListener('change', e => { fEstado = e.target.value; render(host); });
     host.querySelector('#cm-csv').addEventListener('click', () => exportCSV(all));
+  }
+
+  /* ---- Conciliación de statement: esperado (tarifa vigente) vs pagado/registrado ---- */
+  function renderConciliacion(host) {
+    const c = Orbit.comeng.conciliarStatement();
+    const M = n => U.money(n, 'GTQ'), MS = n => U.moneyShort(n, 'GTQ');
+    const desvColor = d => Math.abs(d) < 0.5 ? 'var(--ok)' : d < 0 ? 'var(--danger)' : 'var(--warn)';
+    const conDesv = c.rows.filter(r => Math.abs(r.desv) >= 0.5).sort((a, b) => Math.abs(b.desv) - Math.abs(a.desv));
+    host.innerHTML = `<div class="page">
+      ${K.bannerFor('comisiones', `<button class="btn ghost" onclick="Orbit.importa.open('planillas-comision')" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📄 Importar planilla</button>`)}
+      ${K.kpis([
+        { label: 'Comisión esperada', val: MS(c.totEsperado), color: 'var(--info)', foot: 'según tarifa vigente' },
+        { label: 'Registrada / pagada', val: MS(c.totPagado), color: 'var(--red)', foot: c.n + ' registros' },
+        { label: 'Desviación', val: (c.desviacion >= 0 ? '+' : '') + MS(c.desviacion), color: desvColor(c.desviacion), foot: c.desviacion < 0 ? 'pagan de menos' : c.desviacion > 0 ? 'pagan de más' : 'cuadra', footTone: c.desviacion < 0 ? 'down' : 'up' },
+        { label: 'Con desviación', val: c.conDesviacion, color: c.conDesviacion ? 'var(--warn)' : 'var(--ok)', foot: 'de ' + c.n + ' pólizas' }
+      ])}
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+        <div class="tabs" style="max-width:560px;margin:0">
+          ${[['asesor', 'Por asesor'], ['aseguradora', 'Por aseguradora'], ['periodo', 'Por periodo'], ['conciliacion', '🔄 Conciliación']].map(v => `<div class="tab ${vista === v[0] ? 'active' : ''}" data-v="${v[0]}">${v[1]}</div>`).join('')}
+        </div>
+      </div>
+      <div class="cfg-note" style="margin-bottom:12px">Compara la <b>comisión esperada</b> (recomputada con las tarifas vigentes por ramo/producto de cada aseguradora) contra la <b>registrada</b>. Detecta <b>desviaciones</b> (tarifa cambiada, pago incompleto de la aseguradora o error de dato). Importa la planilla para conciliar contra lo realmente pagado.</div>
+      <div class="card" style="overflow:hidden"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">⚠️ Pólizas con desviación (${conDesv.length})</div>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>Póliza</th><th class="num">Base neta</th><th class="num">Esperado</th><th class="num">Registrado</th><th class="num">Desviación</th><th class="num">%</th></tr></thead>
+        <tbody>${conDesv.slice(0, 40).map(r => `<tr class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${r.polizaId}')">
+          <td class="mono" style="font-size:11.5px"><b>${U.esc(r.ref)}</b></td>
+          <td class="num">${M(r.base)}</td>
+          <td class="num" style="color:var(--info)">${M(r.esperado)}</td>
+          <td class="num">${M(r.pagado)}</td>
+          <td class="num" style="color:${desvColor(r.desv)}"><b>${r.desv >= 0 ? '+' : ''}${M(r.desv)}</b></td>
+          <td class="num" style="color:${desvColor(r.desv)}">${r.pct >= 0 ? '+' : ''}${r.pct}%</td></tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">✅ Todo cuadra con las tarifas vigentes — sin desviaciones.</td></tr>'}</tbody>
+      </table></div></div>
+    </div>`;
+    host.querySelectorAll('.tab[data-v]').forEach(el => el.addEventListener('click', () => { vista = el.dataset.v; render(host); }));
   }
 
   function exportCSV(regs) {
@@ -117,7 +153,7 @@ Orbit.modules.comisiones = (function () {
     back.querySelector('#cd-ok').addEventListener('click', close);
   }
 
-  return { render, detalle, toggleEstado };
+  return { render, detalle, toggleEstado, renderConciliacion };
 
   function toggleEstado(id, campo, key) {
     const c = S().get('comisiones', id); if (!c) return;

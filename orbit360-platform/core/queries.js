@@ -117,26 +117,14 @@ Orbit.q = (function () {
   }
   function clienteNombre(id) { const c = S().get('clientes', id); return c ? c.nombre : '—'; }
 
-  /** Postea (idempotente) un movimiento de RECAUDO en Finanzas al aplicar el pago de un recibo.
-   *  Keyed por el id del cobro: si el recibo se re-aplica, actualiza en vez de duplicar.
-   *  Así "Ingresos/recaudo del mes" de Finanzas refleja los pagos aplicados en Cobros. */
-  function postRecaudo(cobro, fecha, metodo) {
-    if (!cobro || !cobro.id) return;
-    const f = fecha || cobro.fechaPago || (Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10));
-    const cli = S().get('clientes', cobro.clienteId) || {};
-    const pol = S().get('polizas', cobro.polizaId) || {};
-    const pais = cli.pais || pol.pais || (Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : 'GT');
-    const rec = {
-      id: 'fmv_cob_' + cobro.id,
-      periodo: (f || '').slice(0, 7),
-      dia: +((f || '').slice(8, 10)) || 1,
-      tipo: 'ingreso', clase: 'Recaudo de primas', categoria: 'Recaudo de primas',
-      concepto: 'Recaudo recibo ' + (cobro.numero || cobro.cuota || cobro.id) + (pol.numero ? ' · ' + pol.numero : ''),
-      valor: cobro.monto || 0, moneda: cobro.moneda || cli.moneda || 'GTQ', pais,
-      estado: 'recaudado', pagador: cli.nombre || '', origen: 'cobro', cobroId: cobro.id, metodo: metodo || cobro.metodo || ''
-    };
-    if (S().get('finmovs', rec.id)) S().update('finmovs', rec.id, rec); else S().insert('finmovs', rec);
-  }
+  /** REGLA DE NEGOCIO (multi-tenant, no solo A&S): el pago aplicado por el cliente a un
+   *  recibo/póliza NO es un movimiento financiero real de la empresa — es RECAUDO COMERCIAL.
+   *  Afecta cartera, recibos, metas de recaudo y producción recaudada (todo derivado de `cobros`),
+   *  NO la colección `finmovs`. A `finmovs` solo van ingresos/egresos REALES de la empresa
+   *  (comisión recibida, factura cobrada, liquidación pagada por aseguradora, pago a asesor, gasto).
+   *  Por eso este helper NO escribe en finmovs (prevención de regresión). Se conserva la firma
+   *  para no romper llamadas existentes. */
+  function postRecaudo(/* cobro, fecha, metodo */) { return; }
 
   return {
     asesor, aseguradora, polizasDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,

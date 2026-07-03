@@ -727,8 +727,8 @@ Orbit.modules.finanzas = (function () {
       <button class="btn primary sm" onclick="Orbit.modules.finanzas.editarPresup(null)">+ Partida</button>
       <button class="btn ghost sm" onclick="Orbit.modules.finanzas.replicarPresup()">📋 Replicar mes anterior</button>
     </div>
-    <div class="card" style="overflow:hidden"><table class="tbl"><thead><tr><th>Categoría</th><th class="num">Presupuesto</th><th class="num">Real</th><th class="num">%</th><th>Semáforo</th></tr></thead>
-      <tbody>${rows.map(r => { const pct = Math.round(r.real / (r.ppto || 1) * 100); return `<tr class="clickable" onclick="Orbit.modules.finanzas.editarPresup('${r.id}')" title="Editar / eliminar partida"><td><b>${U.esc(r.cat)}</b></td><td class="num">${U.money(r.ppto, cur)}</td><td class="num">${U.money(r.real, cur)}</td><td class="num">${pct}%</td><td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${sem(pct)}"></span> ${pct <= 100 ? 'OK' : pct <= 115 ? 'Alerta' : 'Desviado'}</td></tr>`; }).join('') || `<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin partidas para ${lbl}. Usa “+ Partida” o “Replicar mes anterior”.</td></tr>`}</tbody></table></div>`;
+    <div class="card" style="overflow:hidden"><table class="tbl"><thead><tr><th>Categoría</th><th class="num">Presupuesto</th><th class="num">Real</th><th class="num">%</th><th>Semáforo</th><th>Pago</th></tr></thead>
+      <tbody>${rows.map(r => { const pct = Math.round(r.real / (r.ppto || 1) * 100); const src = S().get('presupuesto', r.id) || {}; const fp = src.fechaPago || ''; const pagado = r.real >= r.ppto; const atrasado = fp && !pagado && fp < Orbit.ui.today(); const estP = pagado ? '<span class="badge ok">✅ pagado</span>' : atrasado ? '<span class="badge danger">⏰ atrasado</span>' : fp ? '<span class="badge info">🕓 en tiempo</span>' : '<span class="muted">—</span>'; return `<tr class="clickable" onclick="Orbit.modules.finanzas.editarPresup('${r.id}')" title="Editar / eliminar partida"><td><b>${U.esc(r.cat)}</b></td><td class="num">${U.money(r.ppto, cur)}</td><td class="num">${U.money(r.real, cur)}</td><td class="num">${pct}%</td><td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${sem(pct)}"></span> ${pct <= 100 ? 'OK' : pct <= 115 ? 'Alerta' : 'Desviado'}</td><td>${estP}${fp ? ' <span class="muted" style="font-size:11px">' + U.fmtDate(fp) + '</span>' : ''}</td></tr>`; }).join('') || `<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">Sin partidas para ${lbl}. Usa “+ Partida” o “Replicar mes anterior”.</td></tr>`}</tbody></table></div>`;
   }
   function editarPresup(id) {
     const p = paisFin() || 'GT', cur = p === 'GT' ? 'GTQ' : 'COP';
@@ -746,6 +746,8 @@ Orbit.modules.finanzas = (function () {
           <label class="ce-l">Clasificación<select id="pp-clase" class="o-sel">${clases.map(c => `<option ${rec && rec.clase === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
           <label class="ce-l">Monto (${cur})<input id="pp-monto" class="o-sel" type="number" value="${rec ? rec.monto : 0}"></label>
         </div>
+        <label class="ce-l">Fecha de pago<input id="pp-fpago" class="o-sel" type="date" value="${rec && rec.fechaPago ? rec.fechaPago : (mesSel + '-05')}"></label>
+        <div class="cfg-note">La fecha de pago define si la partida está <b>en tiempo</b> o <b>atrasada</b> y alimenta las notificaciones de pago.</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between">
         ${rec ? '<button class="btn ghost" id="pp-del" style="color:var(--danger)">🗑 Eliminar</button>' : '<span></span>'}
@@ -757,7 +759,7 @@ Orbit.modules.finanzas = (function () {
     $('#pp-x').addEventListener('click', close); $('#pp-cancel').addEventListener('click', close);
     if ($('#pp-del')) $('#pp-del').addEventListener('click', () => { S().remove('presupuesto', id); close(); render(document.getElementById('host')); });
     $('#pp-ok').addEventListener('click', () => {
-      const data = { categoria: $('#pp-cat').value || 'Partida', clase: $('#pp-clase').value, monto: +$('#pp-monto').value || 0, pais: rec ? rec.pais : p, periodo: rec ? rec.periodo : mesSel };
+      const data = { categoria: $('#pp-cat').value || 'Partida', clase: $('#pp-clase').value, monto: +$('#pp-monto').value || 0, fechaPago: $('#pp-fpago').value || '', pais: rec ? rec.pais : p, periodo: rec ? rec.periodo : mesSel };
       if (rec) S().update('presupuesto', id, data); else S().insert('presupuesto', Object.assign({ id: 'ppt' + Date.now().toString().slice(-7) }, data));
       close(); render(document.getElementById('host'));
     });

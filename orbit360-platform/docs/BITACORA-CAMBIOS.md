@@ -2,6 +2,33 @@
 
 > Registro cronológico de cambios del **prototipo** (Claude). El backend LAB (ChatGPT/Codex) mantiene su propia bitácora. Formato: versión · fecha · qué cambió · archivos.
 
+## v1.85 — 2026-07-03 · Academia: visor unificado (fix video YouTube + secciones ricas)
+- **BUG raíz del visor de lecciones** (`verLeccion`): duplicaba la lógica de render con dos fallos — (1) los videos de YouTube en formato `watch?v=`/`youtu.be` NO se normalizaban a `/embed/` (causa del "error 153 / no reproduce"); (2) la rama `lectura` mostraba `l.texto` plano e **ignoraba `l.secciones`**, por lo que los cursos del seed (que usan `secciones`) se veían vacíos ("Contenido pendiente").
+- **Fix**: `verLeccion` ahora delega el cuerpo a **`lessonBody(l)`** — el renderizador completo y ya probado que maneja iframeSrc, video (normaliza YouTube/Vimeo + `<video>` para archivos subidos), lectura con secciones de barra de color, y quiz interactivo. Un solo path, sin duplicación. Verificado: 0 errores JS de carga.
+- Nota: la profundización de los 14 cursos (contenido lección por lección + videos HeyGen reales) sigue como frente para sesión dedicada; este cambio corrige que el contenido YA existente se vea correctamente en el visor.
+- Archivos: `modules/academia.js`, `index.html`.
+
+## v1.84 — 2026-07-03 · Motor de conciliación de planillas/statements de comisión
+- **`Orbit.comeng.conciliarStatement(filas?)`**: compara la comisión **esperada** (recomputada con las tarifas vigentes por ramo/producto de cada aseguradora, vía `calcSobre`) contra la **registrada/pagada**. Dos modos: (A) con statement importado `[{aseguradoraId, polizaId|polizaNumero, montoPagado}]` → concilia contra lo realmente pagado; (B) sin archivo → recomputa cada registro `comisiones` y detecta **drift** de tarifa o error de dato. Devuelve filas con desviación (monto y %) + totales.
+- **Comisiones → pestaña 🔄 Conciliación**: KPIs (esperada / registrada-pagada / desviación con dirección "pagan de menos/más" / nº con desviación) + tabla de pólizas con desviación (base, esperado, registrado, desviación, %) clicable a la póliza. Botón "📄 Importar planilla" abre el importador de planillas-comisión.
+- Verificado en vivo (v1.283): 90 registros conciliados (esperado=registrado en seed limpio, 0 desviaciones = coherente), y **prueba de detección**: al duplicar una comisión, "con desviación" pasó 0→1; al restaurar, vuelve a cuadrar. 0 errores.
+- Archivos: `core/comisiones-eng.js`, `modules/comisiones.js`, `index.html`.
+
+## v1.83 — 2026-07-03 · Regla de negocio recaudo≠finmov (paquete v1.81 ChatGPT) + prevención de regresión
+- **CORRECCIÓN de regla contable** (del paquete v1.81): el pago aplicado por el cliente a un recibo/póliza **NO es movimiento financiero real** de la empresa — es **recaudo comercial**. Afecta cartera, recibos, metas de recaudo y producción recaudada (todo derivado de `cobros`), **NO** la colección `finmovs`. A `finmovs` solo van ingresos/egresos reales (comisión recibida, factura cobrada, liquidación pagada por aseguradora, pago a asesor, gasto).
+- **Revertido `Orbit.q.postRecaudo`** (introducido en v1.78): ya **no escribe en finmovs** (era una regresión respecto a esta regla). Se conserva la firma para no romper llamadas (Cobros, Cliente360, Importador). Regla aplicada al **prototipo base multi-tenant**, no solo A&S. Verificado en vivo: aplicar pago no incrementa finmovs, 0 errores.
+- Integrado el paquete v1.81 al plan (pendientes abiertos): motor de planillas/commission statements, facturas a aseguradoras (control factura electrónica), config SaaS multi-tenant profunda + portal mejorado, Academia profunda. Se trabajarán con verificación por código real y sin regresión.
+- Archivos: `core/queries.js`, `index.html`.
+
+## v1.82 — 2026-07-03 · Insights: análisis crítico con concentración por aseguradora
+- **Insights → Análisis crítico**: añadido hallazgo de **concentración por aseguradora** (alerta + recomendación de diversificar si una aseguradora ≥35% de la prima vigente), a la par del dashboard de Finanzas. Ya tenía var. interanual, tasa de recaudo, tasa de cancelación, vencimientos ≤30d, asesor líder y composición de cartera. El hallazgo de concentración es condicional (solo si supera umbral). Verificado en vivo: alertas + recomendaciones renderizan, 0 errores.
+- Archivos: `modules/insights.js`, `index.html`.
+
+## v1.81 — 2026-07-02 · Presupuesto con fecha de pago (en tiempo / atrasado)
+- **Presupuesto**: al crear/editar una partida ahora se captura **Fecha de pago** (`fechaPago`). La tabla muestra el estado: ✅ pagado (real ≥ presupuesto), ⏰ atrasado (fecha vencida sin pagar) o 🕓 en tiempo, con la fecha. Base para las notificaciones de pago de gastos.
+- Verificado en vivo (v1.280): columna Pago en la tabla + campo Fecha de pago en el editor. 0 errores.
+- Archivos: `modules/finanzas.js`, `index.html`.
+
 ## v1.80 — 2026-07-02 · Finanzas PROFUNDO: dashboard analítico + metas real vs ideal + sugeridor inteligente
 - **Requerimiento documentado** en `docs/REQ-FINANZAS-PROFUNDO.md` (pedido repetido de la usuaria, para no perder el nivel de detalle).
 - **Metas ahora es pestaña visible** (`🎯 Metas`): antes la función `metas()` existía pero NO estaba en el tab bar ni en el dispatch — por eso no se veía. Añadida a TABS + dispatch.
