@@ -17,7 +17,7 @@ function Add-Report([string]$Text) {
 
 New-Item -ItemType Directory -Force -Path $Reports, $Backups | Out-Null
 Set-Content -Path $Report -Value "============================================================" -Encoding UTF8
-Add-Report "ORBIT 360 - INTEGRAR BACKEND LAB EN INDEX CENTRAL"
+Add-Report "ORBIT 360 - INTEGRAR BACKEND LAB EN INDEX CENTRAL v1.104"
 Add-Report "Fecha local: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 Add-Report "Repo: $Repo"
 Add-Report "Rama esperada: $ExpectedBranch"
@@ -46,10 +46,11 @@ try {
   $Index = Join-Path $App "index.html"
   $Loader = Join-Path $App "core\backend-lab-loader.js"
   $Init = Join-Path $App "core\backend-lab-init.js"
+  $Guard = Join-Path $App "core\backend-lab-security-guard.js"
   $Store = Join-Path $App "data\store.js"
   $StoreLab = Join-Path $App "data\store-firestore-lab.local.js"
 
-  foreach ($Path in @($Index, $Loader, $Init, $Store, $StoreLab)) {
+  foreach ($Path in @($Index, $Loader, $Init, $Guard, $Store, $StoreLab)) {
     if (Test-Path $Path) { Add-Report "OK: existe $Path" }
     else { throw "Falta archivo requerido: $Path" }
   }
@@ -61,13 +62,15 @@ try {
   Add-Report "Backup creado: $BackupIndex"
   Add-Report ""
 
-  Add-Report "== 4. Insertar loader/init si faltan =="
+  Add-Report "== 4. Insertar loader/init/guard si faltan =="
   $Text = Get-Content $Index -Raw -Encoding UTF8
   $Original = $Text
 
-  $LoaderTag = '  <script src="core/backend-lab-loader.js?v=lab-v99"></script>'
-  $InitTag = '  <script src="core/backend-lab-init.js?v=lab-v99"></script>'
+  $LoaderTag = '  <script src="core/backend-lab-loader.js?v=lab-v104"></script>'
+  $InitTag = '  <script src="core/backend-lab-init.js?v=lab-v104"></script>'
+  $GuardTag = '  <script src="core/backend-lab-security-guard.js?v=lab-v104"></script>'
   $StoreNeedle = '  <script src="data/store.js?v1268"></script>'
+  $StoreLabNeedle = '  <script src="data/store-firestore-lab.local.js?v=lab-v99"></script>'
 
   if (-not $Text.Contains($StoreNeedle)) {
     throw "No se encontro punto de insercion exacto: $StoreNeedle"
@@ -81,6 +84,21 @@ try {
     Add-Report "OK: backend-lab-init.js insertado antes de data/store.js."
   } else {
     Add-Report "OK: index.html ya tenia loader/init LAB. No se insertaron duplicados."
+  }
+
+  if (-not $Text.Contains('data/store-firestore-lab.local.js')) {
+    throw "No se encontro data/store-firestore-lab.local.js en index. Este script no insertara el store LAB para evitar orden incorrecto."
+  }
+
+  if (-not $Text.Contains('core/backend-lab-security-guard.js')) {
+    if ($Text.Contains($StoreLabNeedle)) {
+      $Text = $Text.Replace($StoreLabNeedle, "$StoreLabNeedle`r`n$GuardTag")
+    } else {
+      $Text = $Text.Replace('  <script src="data/store-firestore-lab.local.js', "$GuardTag`r`n  <script src=\"data/store-firestore-lab.local.js")
+    }
+    Add-Report "OK: backend-lab-security-guard.js insertado despues del store LAB."
+  } else {
+    Add-Report "OK: index.html ya tenia backend-lab-security-guard.js."
   }
 
   if ($Text -ne $Original) {
@@ -97,11 +115,12 @@ try {
   $InitPos = $Final.IndexOf('core/backend-lab-init.js')
   $StorePos = $Final.IndexOf('data/store.js')
   $LabPos = $Final.IndexOf('data/store-firestore-lab.local.js')
+  $GuardPos = $Final.IndexOf('core/backend-lab-security-guard.js')
   $SeedPos = $Final.IndexOf('data/seed.js')
-  Add-Report "Orden: loader=$LoaderPos init=$InitPos store=$StorePos lab=$LabPos seed=$SeedPos"
+  Add-Report "Orden: loader=$LoaderPos init=$InitPos store=$StorePos lab=$LabPos guard=$GuardPos seed=$SeedPos"
 
-  if (-not ($LoaderPos -ge 0 -and $InitPos -gt $LoaderPos -and $StorePos -gt $InitPos -and $LabPos -gt $StorePos -and $SeedPos -gt $LabPos)) {
-    throw "Orden final incorrecto. Esperado: loader -> init -> store -> store-firestore-lab -> seed"
+  if (-not ($LoaderPos -ge 0 -and $InitPos -gt $LoaderPos -and $StorePos -gt $InitPos -and $LabPos -gt $StorePos -and $GuardPos -gt $LabPos -and $SeedPos -gt $GuardPos)) {
+    throw "Orden final incorrecto. Esperado: loader -> init -> store -> store-firestore-lab -> security-guard -> seed"
   }
   Add-Report "OK: orden final correcto."
   Add-Report ""
@@ -116,8 +135,8 @@ try {
   }
   Add-Report ""
 
-  Add-Report "RESULTADO: INDEX LAB INTEGRADO_LOCALMENTE"
-  Add-Report "Siguiente paso recomendado: ejecutar tools/orbit360-smoke-ays-lab-v99.ps1."
+  Add-Report "RESULTADO: INDEX LAB INTEGRADO_LOCALMENTE_V104"
+  Add-Report "Siguiente paso recomendado: ejecutar tools/orbit360-validar-backend-lab-contrato.mjs y tools/orbit360-smoke-ays-lab-v99.ps1."
 
 } catch {
   Add-Report "ERROR GENERAL: $($_.Exception.Message)"
