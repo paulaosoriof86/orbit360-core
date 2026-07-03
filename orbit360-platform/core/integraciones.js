@@ -6,7 +6,7 @@
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.integraciones = (function () {
-  const API_VERSION = 'v0.6-safe-pref-guard';
+  const API_VERSION = 'v0.7-configurar-tenant-contract';
   const STRUCT_VERSION = 37;
   let panelLoading = false;
   let labMockLoading = false;
@@ -88,17 +88,19 @@ Orbit.integraciones = (function () {
     }
     return clean(obj || {}, '');
   }
+  function providerId(x) { return String(x || 'make').toLowerCase().replace(/[^a-z0-9_\-]/g, '_').replace(/^_+|_+$/g, '') || 'make'; }
+  function sensitiveInput(v) { return !!(v && (v.key || v.url || v.token || v.oauthUrl || v.endpoint)); }
   function sanitizeIntegrationPref(prefKey, value) {
     const v = value && typeof value === 'object' ? value : {};
-    const hasInput = !!(v.key || v.url || v.user || v.activa);
+    const hasInput = !!(v.key || v.url || v.user || v.activa || v.token || v.oauthUrl || v.endpoint);
     return {
       id: String(prefKey || '').replace(/^integ_/, ''),
       activa: !!v.activa,
       configured: hasInput,
       estado: v.activa ? 'pendiente_backend' : 'pendiente_configuracion',
       userRef: v.user ? 'capturado_no_sensible' : '',
-      credentialRef: (v.key || v.url) ? 'backend_required' : '',
-      webhookRef: v.url ? 'backend_required' : '',
+      credentialRef: sensitiveInput(v) ? 'backend_required' : '',
+      webhookRef: (v.url || v.endpoint) ? 'backend_required' : '',
       updatedAt: new Date().toISOString(),
       note: 'Configuracion sanitizada: no se guardan credenciales ni endpoints reales en frontend.'
     };
@@ -113,6 +115,49 @@ Orbit.integraciones = (function () {
       };
       Orbit.__integracionesPrefGuard = true;
     } catch (e) {}
+  }
+  function integrationId(tid, proveedor) { return 'intcfg_' + providerId(tid) + '_' + providerId(proveedor); }
+  function upsertIntegration(row) {
+    try {
+      const rows = S().all('integraciones') || [];
+      const found = rows.find(x => x && (x.id === row.id || (x.tenantId === row.tenantId && x.proveedor === row.proveedor)));
+      if (found) return S().update('integraciones', found.id, Object.assign({}, found, row, { updatedAt: nowIso() }));
+      return S().insert('integraciones', row);
+    } catch (e) { return row; }
+  }
+  function configurar(proveedor, datos, opts) {
+    opts = opts || {};
+    datos = datos || {};
+    const p = providerId(proveedor || datos.proveedor || opts.proveedor || 'make');
+    const tid = opts.tenantId || datos.tenantId || tenantId();
+    const hasSensitive = sensitiveInput(datos);
+    const activa = !!(datos.activa || opts.activa);
+    const row = {
+      id: opts.id || integrationId(tid, p),
+      tenantId: tid,
+      proveedor: p,
+      nombre: datos.nombre || opts.nombre || p,
+      estado: activa ? 'pendiente_backend' : 'pendiente_configuracion',
+      modo: datos.modo || opts.modo || 'backend_seguro',
+      eventos: Array.isArray(datos.eventos) ? datos.eventos : (Array.isArray(opts.eventos) ? opts.eventos : []),
+      scopes: Array.isArray(datos.scopes) ? datos.scopes : [],
+      paises: Array.isArray(datos.paises) ? datos.paises : [],
+      modulos: Array.isArray(datos.modulos) ? datos.modulos : [],
+      activa,
+      configured: !!(hasSensitive || datos.user || activa),
+      credentialRef: hasSensitive ? 'backend_required' : '',
+      webhookRef: (datos.url || datos.endpoint) ? 'backend_required' : '',
+      userRef: datos.user ? 'capturado_no_sensible' : '',
+      backendRequired: true,
+      lastConfigAttemptAt: nowIso(),
+      ultimoError: activa ? 'Pendiente backend seguro para persistencia tenant-wide.' : '',
+      createdAt: datos.createdAt || nowIso(),
+      updatedAt: nowIso(),
+      apiVersion: API_VERSION
+    };
+    const saved = upsertIntegration(row);
+    try { if (S() && S()._emit) S()._emit('integraciones'); } catch (e) {}
+    return safe(Object.assign({}, saved || row, { inputCaptured: hasSensitive, inputPersistedInFrontend: false }));
   }
   function findAutomation(evento) {
     try {
@@ -237,5 +282,5 @@ Orbit.integraciones = (function () {
     try { return S().update('eventosIntegracion', idEvento, patch); }
     catch (e) { return null; }
   }
-  return { emit, status, list, resumen, diagnostico, openPanel, ensureLabMock, labMock, mark, extendSeed, sanitizeIntegrationPref, version: API_VERSION };
+  return { emit, configurar, status, list, resumen, diagnostico, openPanel, ensureLabMock, labMock, mark, extendSeed, sanitizeIntegrationPref, version: API_VERSION };
 })();
