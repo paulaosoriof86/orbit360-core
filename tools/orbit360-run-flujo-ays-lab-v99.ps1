@@ -10,21 +10,12 @@ $Reports = Join-Path $Repo "_orbit360_reports"
 $Stamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $Report = Join-Path $Reports "RUN-FLUJO-AYS-LAB-V104-$Stamp.txt"
 
-function Add-Report([string]$Text) {
-  Add-Content -Path $Report -Value $Text -Encoding UTF8
-}
-
+function Add-Report([string]$Text) { Add-Content -Path $Report -Value $Text -Encoding UTF8 }
 function Run-Step([string]$Name, [scriptblock]$Block) {
   Add-Report ""
   Add-Report "== $Name =="
-  try {
-    & $Block
-    Add-Report "OK: $Name"
-    return $true
-  } catch {
-    Add-Report ("ERROR en {0}: {1}" -f $Name, $_.Exception.Message)
-    return $false
-  }
+  try { & $Block; Add-Report "OK: $Name"; return $true }
+  catch { Add-Report ("ERROR en {0}: {1}" -f $Name, $_.Exception.Message); return $false }
 }
 
 New-Item -ItemType Directory -Force -Path $Reports | Out-Null
@@ -48,20 +39,16 @@ $AllOk = (Run-Step "1. Verificar repo" {
 $AllOk = (Run-Step "2. Sincronizar rama obligatoria" {
   Set-Location $Repo
   git fetch origin $ExpectedBranch | ForEach-Object { Add-Report $_ }
-
   $Current = (git rev-parse --abbrev-ref HEAD).Trim()
   Add-Report "Rama actual antes: $Current"
-
   $Status = (git status --porcelain)
   if ($Status) {
     Add-Report "ADVERTENCIA: hay cambios locales antes de cambiar/pullar:"
     $Status | ForEach-Object { Add-Report $_ }
     Add-Report "No se descartan cambios locales. Si hay conflicto, Git bloqueara y el reporte lo indicara."
   }
-
   git checkout $ExpectedBranch | ForEach-Object { Add-Report $_ }
   git pull --ff-only origin $ExpectedBranch | ForEach-Object { Add-Report $_ }
-
   $After = (git rev-parse --abbrev-ref HEAD).Trim()
   $Head = (git rev-parse HEAD).Trim()
   Add-Report "Rama actual despues: $After"
@@ -74,9 +61,7 @@ $AllOk = (Run-Step "3. Validar contrato backend LAB v104" {
   $Validator = Join-Path $Repo "tools\orbit360-validar-backend-lab-contrato.mjs"
   if (-not (Test-Path $Validator)) { throw "Falta validador: $Validator" }
   node $Validator | ForEach-Object { Add-Report $_ }
-  $Code = $LASTEXITCODE
-  Add-Report "ExitCode validador backend LAB: $Code"
-  if ($Code -ne 0) { throw "Validador backend LAB fallo." }
+  if ($LASTEXITCODE -ne 0) { throw "Validador backend LAB fallo." }
 }) -and $AllOk
 
 $AllOk = (Run-Step "4. Validar empalme frontend v104" {
@@ -84,9 +69,7 @@ $AllOk = (Run-Step "4. Validar empalme frontend v104" {
   $Validator = Join-Path $Repo "tools\orbit360-validar-empalme-frontend-v104.mjs"
   if (-not (Test-Path $Validator)) { throw "Falta validador: $Validator" }
   node $Validator | ForEach-Object { Add-Report $_ }
-  $Code = $LASTEXITCODE
-  Add-Report "ExitCode validador empalme frontend: $Code"
-  if ($Code -ne 0) { throw "Validador empalme frontend fallo." }
+  if ($LASTEXITCODE -ne 0) { throw "Validador empalme frontend fallo." }
 }) -and $AllOk
 
 $AllOk = (Run-Step "5. Validar carpeta de importacion A&S v104" {
@@ -95,38 +78,36 @@ $AllOk = (Run-Step "5. Validar carpeta de importacion A&S v104" {
   if (-not (Test-Path $Validator)) { throw "Falta validador: $Validator" }
   $ImportDir = Join-Path $Repo "_orbit360_imports\ays_real"
   node $Validator $ImportDir | ForEach-Object { Add-Report $_ }
-  $Code = $LASTEXITCODE
-  Add-Report "ExitCode validador importacion A&S: $Code"
-  if ($Code -ne 0) { throw "Validador importacion A&S fallo." }
+  if ($LASTEXITCODE -ne 0) { throw "Validador importacion A&S fallo." }
 }) -and $AllOk
 
-$AllOk = (Run-Step "6. Verificar config Firebase LAB local" {
+$AllOk = (Run-Step "6. Preparar payload importacion A&S dry-run" {
+  Set-Location $Repo
+  $Loader = Join-Path $Repo "tools\orbit360-cargar-importacion-ays-lab-v104.mjs"
+  if (-not (Test-Path $Loader)) { throw "Falta cargador: $Loader" }
+  $ImportDir = Join-Path $Repo "_orbit360_imports\ays_real"
+  node $Loader --input $ImportDir --tenant alianzas-soluciones | ForEach-Object { Add-Report $_ }
+  if ($LASTEXITCODE -ne 0) { throw "Dry-run importacion A&S fallo." }
+}) -and $AllOk
+
+$AllOk = (Run-Step "7. Verificar config Firebase LAB local" {
   $Config = Join-Path $Repo "orbit360-platform\core\auth-firebase.config.local.js"
   $PrepScript = Join-Path $Repo "tools\orbit360-preparar-config-firebase-lab-local.ps1"
-
   if (-not (Test-Path $Config)) {
     Add-Report "BLOQUEO: no existe config local: $Config"
     if ($PrepararConfig) {
       if (-not (Test-Path $PrepScript)) { throw "Falta preparador: $PrepScript" }
-      Add-Report "Se ejecutara preparador local para crear plantilla y abrir Notepad."
       & powershell -NoProfile -ExecutionPolicy Bypass -File $PrepScript -Repo $Repo | ForEach-Object { Add-Report $_ }
-      Add-Report "Config local preparada. Reemplaza placeholders y vuelve a ejecutar este flujo sin -PrepararConfig."
       throw "Config local preparada, pendiente reemplazar valores LAB autorizados."
-    } else {
-      throw "Ejecuta este flujo con -PrepararConfig o crea auth-firebase.config.local.js con valores LAB autorizados."
-    }
+    } else { throw "Ejecuta este flujo con -PrepararConfig o crea auth-firebase.config.local.js con valores LAB autorizados." }
   }
-
   $ConfigText = Get-Content $Config -Raw -Encoding UTF8
-  if ($ConfigText -match "REEMPLAZAR_") {
-    throw "Config local existe pero aun tiene placeholders REEMPLAZAR_. Abre el archivo local, completa config LAB y vuelve a ejecutar."
-  }
-
+  if ($ConfigText -match "REEMPLAZAR_") { throw "Config local aun tiene placeholders REEMPLAZAR_." }
   Add-Report "OK: config local existe y no muestra placeholders visibles. No se imprime contenido por seguridad."
 }) -and $AllOk
 
 if ($AllOk) {
-  $AllOk = (Run-Step "7. Ejecutar integracion local backend LAB en index" {
+  $AllOk = (Run-Step "8. Ejecutar integracion local backend LAB en index" {
     $Script = Join-Path $Repo "tools\orbit360-integrar-backend-lab-index.ps1"
     if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
     & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
@@ -135,7 +116,7 @@ if ($AllOk) {
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step "8. Ejecutar stability gate A&S v99" {
+  $AllOk = (Run-Step "9. Ejecutar stability gate A&S v99" {
     $Script = Join-Path $Repo "tools\orbit360-stability-gate-ays-v99.ps1"
     if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
     & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
@@ -148,7 +129,7 @@ if ($AllOk) {
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step "9. Ejecutar smoke A&S LAB v99" {
+  $AllOk = (Run-Step "10. Ejecutar smoke A&S LAB v99" {
     $Script = Join-Path $Repo "tools\orbit360-smoke-ays-lab-v99.ps1"
     if (-not (Test-Path $Script)) { throw "Falta script: $Script" }
     & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo | ForEach-Object { Add-Report $_ }
@@ -156,33 +137,19 @@ if ($AllOk) {
   }) -and $AllOk
 }
 
-Run-Step "10. Estado Git posterior" {
+Run-Step "11. Estado Git posterior" {
   Set-Location $Repo
   $Branch = (git rev-parse --abbrev-ref HEAD).Trim()
   Add-Report "Rama final: $Branch"
   $Status = (git status --short)
-  if ($Status) {
-    Add-Report "Cambios locales despues del flujo:"
-    $Status | ForEach-Object { Add-Report $_ }
-  } else {
-    Add-Report "Sin cambios locales."
-  }
+  if ($Status) { Add-Report "Cambios locales despues del flujo:"; $Status | ForEach-Object { Add-Report $_ } }
+  else { Add-Report "Sin cambios locales." }
 }
 
 Add-Report ""
-if ($AllOk) {
-  Add-Report "RESULTADO FLUJO A&S LAB V104: EJECUTADO"
-  Add-Report "Revisar reportes individuales de validadores, stability gate y smoke para confirmar aprobacion final."
-} else {
-  Add-Report "RESULTADO FLUJO A&S LAB V104: BLOQUEADO_O_CON_ERRORES"
-  Add-Report "No se hizo deploy, commit, push ni produccion. Revisar seccion de errores."
-}
-
+if ($AllOk) { Add-Report "RESULTADO FLUJO A&S LAB V104: EJECUTADO"; Add-Report "Revisar reportes individuales de validadores, payload, stability gate y smoke para confirmar aprobacion final." }
+else { Add-Report "RESULTADO FLUJO A&S LAB V104: BLOQUEADO_O_CON_ERRORES"; Add-Report "No se hizo deploy, commit, push ni produccion. Revisar seccion de errores." }
 Add-Report ""
 Add-Report "Reporte maestro: $Report"
 Add-Report "Restricciones respetadas: NO deploy, NO Hosting, NO produccion, NO secretos, NO datos reales, NO commit automatico, NO push automatico."
-
-try {
-  Get-Content $Report -Raw -Encoding UTF8 | Set-Clipboard
-  notepad $Report
-} catch {}
+try { Get-Content $Report -Raw -Encoding UTF8 | Set-Clipboard; notepad $Report } catch {}
