@@ -31,3 +31,23 @@
 - **Fix o mejora aplicada:** Se generó plantilla Excel con hojas por entidad: asesores, aseguradoras, clientes, pólizas, cobros, históricos, vehículos, siniestros, comisiones/facturas y finmovs.
 - **Impacto en prototipo comercializable:** Define estructura que el módulo Importar debe soportar, pero sin meter datos reales en demo.
 - **Estado:** RESUELTO DOCUMENTALMENTE / archivo generado en sandbox.
+
+## 2026-07-03 — Rama activa obligatoria A&S/backend
+
+- **Módulo/área:** GitHub / metodología / continuidad.
+- **Síntoma/necesidad:** Paula pidió que quedara documentado cuál rama debe actualizarse siempre para evitar que otra conversación actualice una rama incorrecta.
+- **Esperado:** Toda continuidad A&S/backend debe actualizar `ays/backend-tenant-lab-v99-20260703`.
+- **Archivo/función:** `orbit360-platform/docs/RAMA-ACTIVA-OBLIGATORIA-AYS-BACKEND.md`, PR #5.
+- **Fix o mejora aplicada:** Se creó documento de control y se actualizó el cuerpo del PR #5 con la rama obligatoria desde la primera línea.
+- **Impacto en prototipo comercializable:** Evita pérdida de contexto y evita mezclar backend real A&S con ramas Claude/prototipo.
+- **Estado:** RESUELTO.
+
+## 2026-07-03 — Smoke ejecutable A&S LAB v99
+
+- **Módulo/área:** Backend LAB / QA / Smoke.
+- **Síntoma/necesidad:** Validar backend LAB A&S con reporte automático y mínima carga manual para Paula.
+- **Esperado:** Script que confirme rama correcta, archivos LAB, reglas Firestore, sintaxis JS, orden de scripts, Auth/Firebase, API `Orbit.store`, tenant y CRUD ficticio controlado.
+- **Archivo/función:** `tools/orbit360-smoke-ays-lab-v99.ps1`, `orbit360-platform/docs/SMOKE-AYS-LAB-V99-EJECUTABLE-20260703.md`.
+- **Fix o mejora aplicada:** Se creó script sin deploy/commit/push que genera reporte `.txt`, copia al portapapeles y abre Notepad.
+- **Impacto en prototipo comercializable:** Permite verificar backend antes de migrar datos reales o empalmar nuevas entregas Claude.
+- **Estado:** LISTO PARA EJECUCIÓN LOCAL.
