@@ -46,8 +46,19 @@
 
 - **Módulo/área:** Backend LAB / QA / Smoke.
 - **Síntoma/necesidad:** Validar backend LAB A&S con reporte automático y mínima carga manual para Paula.
-- **Esperado:** Script que confirme rama correcta, archivos LAB, reglas Firestore, sintaxis JS, orden de scripts, Auth/Firebase, API `Orbit.store`, tenant y CRUD ficticio controlado.
+- **Esperado:** Script que confirme rama correcta, archivos LAB, reglas Firestore, sintaxis JS, Auth/Firebase, API `Orbit.store`, tenant y CRUD ficticio controlado.
 - **Archivo/función:** `tools/orbit360-smoke-ays-lab-v99.ps1`, `orbit360-platform/docs/SMOKE-AYS-LAB-V99-EJECUTABLE-20260703.md`.
 - **Fix o mejora aplicada:** Se creó script sin deploy/commit/push que genera reporte `.txt`, copia al portapapeles y abre Notepad.
 - **Impacto en prototipo comercializable:** Permite verificar backend antes de migrar datos reales o empalmar nuevas entregas Claude.
 - **Estado:** LISTO PARA EJECUCIÓN LOCAL.
+
+## 2026-07-03 — Smoke tolerante a index sin loader/init permanente
+
+- **Módulo/área:** Backend LAB / QA / Smoke / Index central.
+- **Síntoma/necesidad:** Al revisar `index.html`, se detectó que todavía no carga permanentemente `core/backend-lab-loader.js` ni `core/backend-lab-init.js`.
+- **Esperado:** El smoke debe poder validar backend LAB sin hacer modificación funcional permanente en `index.html` antes de autorización.
+- **Causa raíz:** Fase 9 estaba pausada y el index central aún no integra loader/init LAB como cambio final.
+- **Archivo/función:** `tools/orbit360-smoke-ays-lab-v99.ps1`, `orbit360-platform/docs/SMOKE-AYS-LAB-V99-EJECUTABLE-20260703.md`, `orbit360-platform/index.html`.
+- **Fix o mejora aplicada:** El servidor temporal del smoke inyecta loader/init solo en memoria cuando sirve `index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones`; no modifica el archivo real.
+- **Impacto en prototipo comercializable:** Permite validar backend ahora y deja pendiente el fix permanente del index central.
+- **Estado:** RESUELTO PARA SMOKE / PENDIENTE FIX PERMANENTE INDEX.
