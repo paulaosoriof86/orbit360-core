@@ -64,3 +64,13 @@
 - **Fix o mejora aplicada:** Se agregó validación de carpeta `_orbit360_imports/ays_real` y dry-run del cargador LAB antes de config/smoke.
 - **Impacto en prototipo comercializable:** Acelera uso real sin saltar controles críticos.
 - **Estado:** RESUELTO EN RAMA.
+
+## 2026-07-03 — Listado de lotes y rollback LAB por batchId
+
+- **Módulo/área:** Migración / Rollback / Firestore LAB.
+- **Síntoma/necesidad:** Antes de cargar datos reales en LAB debe existir una salida segura si el lote queda mal mapeado o incompleto.
+- **Esperado:** Poder listar payloads locales y revertir por `batchId`, con dry-run por defecto y escritura solo con confirmación explícita.
+- **Archivo/función:** `tools/orbit360-listar-lotes-importacion-ays-v104.mjs`, `tools/orbit360-rollback-importacion-ays-lab-v104.mjs`, `docs/ROLLBACK-IMPORTACION-AYS-LAB-V104-20260703.md`.
+- **Fix o mejora aplicada:** Se creó listado de lotes locales y rollback LAB que borra documentos por `_migration.batchId` solo si se usa `--write --confirm ROLLBACK_LAB_AYS`. Sin flags, solo calcula candidatos.
+- **Impacto en prototipo comercializable:** Permite migraciones por lote con trazabilidad y reversión, requisito crítico antes de usar datos reales de cualquier tenant.
+- **Estado:** RESUELTO EN RAMA / pendiente probar con primer payload real local.
