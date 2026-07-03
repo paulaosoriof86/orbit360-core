@@ -45,9 +45,9 @@ Orbit.modules.academia = (function () {
   }
   function fileToDataURL(f, cb) { if (!f) return; const r = new FileReader(); r.onload = () => cb(r.result); r.readAsDataURL(f); }
   function fileToText(f, cb) { if (!f) return; if (/\.(txt|csv|md)$/i.test(f.name)) { const r = new FileReader(); r.onload = () => cb(String(r.result)); r.readAsText(f); } else { cb(''); } }
-  async function iaTextAsync(prompt, current) { if (window.claude && window.claude.complete) { try { const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt + (current ? '\n\nMejora y expande este borrador:\n' + current : '') }] }); return String(out).trim(); } catch (e) {} } return current || ('📘 Contenido de la lección.\n\nIntroducción, conceptos clave, ejemplos prácticos y cierre. Editá para ajustar el detalle.'); }
-  async function iaQuizAsync(tema, current, count, replace) { count = count || 3; if (window.claude && window.claude.complete) { try { const out = await window.claude.complete({ messages: [{ role: 'user', content: 'Genera ' + count + ' preguntas de opción múltiple sobre "' + (tema || 'seguros') + '". Formato EXACTO: enunciado en una línea, luego cada opción en su propia línea, la correcta con [x] al inicio y las demás con [ ]. Separa preguntas con una línea en blanco. Solo el texto, sin numeración.' + (replace ? '' : ' Que sean DISTINTAS a estas:\n' + (current || '')) }] }); return (replace || !current ? '' : current + '\n\n') + String(out).trim(); } catch (e) {} } let base = []; for (let k = 0; k < count; k++) base.push('¿Pregunta ' + (k + 1) + ' sobre ' + (tema || 'el tema') + '?\n[x] Respuesta correcta\n[ ] Distractor 1\n[ ] Distractor 2'); return (replace || !current ? '' : current + '\n\n') + base.join('\n\n'); }
-  async function iaQuizFromDoc(text) { if (window.claude && window.claude.complete && text) { try { const out = await window.claude.complete({ messages: [{ role: 'user', content: 'A partir de este documento genera 4 preguntas de opción múltiple. Formato: enunciado, opciones en líneas (correcta con [x], otras con [ ]), preguntas separadas por línea en blanco. Documento:\n' + String(text).slice(0, 4000) }] }); return String(out).trim(); } catch (e) {} } return '¿Pregunta basada en el documento?\n[x] Correcta\n[ ] Incorrecta\n[ ] Otra'; }
+  async function iaTextAsync(prompt, current) { if (Orbit.ia.disponible()) { try { const out = await Orbit.ia.complete(prompt + (current ? '\n\nMejora y expande este borrador:\n' + current : '')); return String(out).trim(); } catch (e) {} } return current || ('📘 Contenido de la lección.\n\nIntroducción, conceptos clave, ejemplos prácticos y cierre. Editá para ajustar el detalle.'); }
+  async function iaQuizAsync(tema, current, count, replace) { count = count || 3; if (Orbit.ia.disponible()) { try { const out = await Orbit.ia.complete('Genera ' + count + ' preguntas de opción múltiple sobre "' + (tema || 'seguros') + '". Formato EXACTO: enunciado en una línea, luego cada opción en su propia línea, la correcta con [x] al inicio y las demás con [ ]. Separa preguntas con una línea en blanco. Solo el texto, sin numeración.' + (replace ? '' : ' Que sean DISTINTAS a estas:\n' + (current || ''))); return (replace || !current ? '' : current + '\n\n') + String(out).trim(); } catch (e) {} } let base = []; for (let k = 0; k < count; k++) base.push('¿Pregunta ' + (k + 1) + ' sobre ' + (tema || 'el tema') + '?\n[x] Respuesta correcta\n[ ] Distractor 1\n[ ] Distractor 2'); return (replace || !current ? '' : current + '\n\n') + base.join('\n\n'); }
+  async function iaQuizFromDoc(text) { if (Orbit.ia.disponible() && text) { try { const out = await Orbit.ia.complete('A partir de este documento genera 4 preguntas de opción múltiple. Formato: enunciado, opciones en líneas (correcta con [x], otras con [ ]), preguntas separadas por línea en blanco. Documento:\n' + String(text).slice(0, 4000)); return String(out).trim(); } catch (e) {} } return '¿Pregunta basada en el documento?\n[x] Correcta\n[ ] Incorrecta\n[ ] Otra'; }
 
   function cursos() {
     const rol = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
@@ -503,11 +503,11 @@ Orbit.modules.academia = (function () {
       const id = 'cur' + Date.now().toString().slice(-6);
       let lecciones = null, desc = '';
       const okBtn = back.querySelector('#ai-ok');
-      if (window.claude && window.claude.complete) {
+      if (Orbit.ia.disponible()) {
         okBtn.textContent = '🧠 Generando…'; okBtn.disabled = true;
         try {
           const prompt = 'Genera un curso de capacitación en seguros sobre "' + tema + '" para ' + dest + '. ' + (docsTexto ? 'Basate en estos documentos:\n' + docsTexto.slice(0, 5000) + '\n\n' : '') + 'Devuelve SOLO JSON válido sin markdown con esta forma: {"desc":"descripción breve","lecciones":[{"t":"título","tipo":"lectura","min":10,"texto":"contenido con emojis y párrafos"},{"t":"título","tipo":"quiz","min":8,"preguntas":[{"p":"pregunta","ops":["a","b","c"],"ok":0}]}]}. Incluye 3-4 lecciones de tipo lectura y 1 quiz con 3 preguntas. Texto en español, claro y práctico.';
-          const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt }] });
+          const out = await Orbit.ia.complete(prompt);
           const m = String(out).match(/\{[\s\S]*\}/);
           if (m) { const obj = JSON.parse(m[0]); if (obj.lecciones && obj.lecciones.length) { lecciones = obj.lecciones; desc = obj.desc || ''; } }
         } catch (e) {}
@@ -600,32 +600,7 @@ Orbit.modules.academia = (function () {
     let back = document.getElementById('ac-lec'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'ac-lec'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
-    let cuerpo = '';
-    if (l.iframeSrc) {
-      cuerpo = `<div style="position:relative;width:100%;height:72vh;border-radius:var(--r-md);overflow:hidden;background:#f4f3ee"><iframe src="${l.iframeSrc}" style="width:100%;height:100%;border:0"></iframe></div>`;
-    } else if (l.tipo === 'video') {
-      cuerpo = l.url
-        ? `<div class="ac-video"><iframe src="${l.url.includes('youtube.com/embed/') ? l.url + (l.url.includes('?') ? '&' : '?') + 'rel=0&modestbranding=1' : l.url}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>`
-        : `<div style="background:linear-gradient(135deg,#1a1f28,#0f1318);border-radius:12px;padding:56px 32px;text-align:center;color:#fff">
-            <div style="font-size:56px;margin-bottom:16px">🎬</div>
-            <h3 style="font-family:var(--f-display);font-size:20px;font-weight:800;margin-bottom:10px">${U.esc(l.t)}</h3>
-            <p style="font-size:14px;color:rgba(255,255,255,.7);max-width:420px;margin:0 auto 20px">Para agregar el video, edita el curso y pega la URL de YouTube/Vimeo en esta lección.</p>
-            <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;display:inline-block;font-size:12px;color:rgba(255,255,255,.6)">🔧 Editar curso → Lección "${U.esc(l.t)}" → campo URL</div>
-          </div>`;
-    } else if (l.tipo === 'lectura') {
-      cuerpo = `<div class="ac-read" style="white-space:pre-wrap;line-height:1.7">${U.esc(l.texto || 'Contenido pendiente de redactar.')}</div>`;
-    } else if (l.tipo === 'quiz' && l.preguntas && l.preguntas.length) {
-      cuerpo = '<div style="display:grid;gap:16px">' + l.preguntas.map(function(q, i) {
-        var ops = q.ops.map(function(o, j) {
-          return '<label style="display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer;margin-bottom:7px;background:var(--card);font-size:13.5px"><input type="radio" name="qz' + i + '" value="' + j + '" style="accent-color:var(--red)"> ' + U.esc(o) + '</label>';
-        }).join('');
-        var correcta = U.esc(q.ops[q.ok]);
-        var verifyFn = "(function(el,qi,ans,cor){var s=document.querySelector('input[name=qz'+qi+']:checked');var r=el.nextElementSibling;if(!s){r.textContent='\u26a0\ufe0f Selecciona una opci\u00f3n.';r.style.color='var(--warn)';r.style.display='block';return;}el.disabled=true;r.style.display='block';if(+s.value===ans){r.textContent='\u2705 \u00a1Correcto!';r.style.color='var(--ok)'}else{r.textContent='\u274c Incorrecto \u2014 la correcta es: '+cor;r.style.color='var(--danger)'}})(this," + i + "," + q.ok + ",'" + correcta.replace(/'/g, "\'") + "')";
-        return '<div style="background:var(--surface);border-radius:10px;padding:18px 20px"><div style="font-family:var(--f-display);font-weight:700;font-size:14.5px;margin-bottom:12px">\u2753 ' + (i + 1) + '. ' + U.esc(q.p) + '</div>' + ops + '<button style="margin-top:6px;background:var(--red);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-weight:700;font-size:13px;cursor:pointer" onclick="' + verifyFn + '">Verificar</button><div style="display:none;font-weight:700;font-size:13px;margin-top:8px"></div></div>';
-      }).join('') + '</div>';
-        } else if (l.tipo === 'quiz') {
-      cuerpo = `<div class="ac-read"><b style="font-family:var(--f-display)">Evaluación</b><p style="margin-top:10px">Responde para completar la lección. Agrega preguntas reales al editar el curso.</p></div>`;
-    }
+    let cuerpo = lessonBody(l) || `<div class="ac-read"><b style="font-family:var(--f-display)">Evaluación</b><p style="margin-top:10px">Responde para completar la lección. Agrega preguntas reales al editar el curso.</p></div>`;
     back.innerHTML = `<div class="card" style="width:min(900px,96vw);max-height:94vh;overflow:auto;padding:0">
       <div style="padding:14px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--graph)">
         <b style="font-family:var(--f-display);font-size:15px;color:#fff">${TIPO_ICON[l.tipo] || '📖'} ${U.esc(l.t)} <span style="font-weight:400;font-size:12px;color:rgba(255,255,255,.6)">· ${l.min} min</span></b>

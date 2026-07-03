@@ -27,8 +27,10 @@ Orbit.modules.finanzas = (function () {
   const MM = (n) => U.money(n, 'GTQ');
   const sum = (arr, f) => arr.reduce((s, x) => s + norm(f(x), x.moneda), 0);
 
+  let mesInit = false;
   function render(host) {
-    const TABS = [['movimientos', '🧾 Movimientos'], ['dashboard', '📊 Dashboard'], ['cxcp', '💳 CxC / CxP'], ['financiacion', '🏦 Financiación'], ['presupuesto', '📋 Presupuesto'], ['empresa', '🏢 Liq. empresa'], ['asesores', '👥 Liq. asesores'], ['banco', '🔗 Conciliación'], ['ia', '✨ Análisis IA']];
+    if (!mesInit) { const ps = periodos(); if (ps.length && !movs(mesSel).length) mesSel = ps[0]; mesInit = true; }
+    const TABS = [['movimientos', '🧾 Movimientos'], ['dashboard', '📊 Dashboard'], ['cxcp', '💳 CxC / CxP'], ['financiacion', '🏦 Financiación'], ['presupuesto', '📋 Presupuesto'], ['empresa', '🏢 Liq. empresa'], ['asesores', '👥 Liq. asesores'], ['banco', '🔗 Conciliación'], ['metas', '🎯 Metas'], ['ia', '✨ Análisis IA']];
     const paisLbl = (Orbit.PAISES.find(p => p.id === (Orbit.pais || 'TODOS')) || {}).label || 'Todos los países';
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '💰', title: 'Orbit Finanzas', sub: 'Ingresos, egresos, financiación y presupuesto', features: [], actions: `<div class="ins-controls">
@@ -44,13 +46,13 @@ Orbit.modules.finanzas = (function () {
       tab = el.dataset.t;
       host.querySelectorAll('.tab[data-t]').forEach(t => t.classList.toggle('active', t.dataset.t === tab));
       const b = document.getElementById('fin-body');
-      b.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, ia }[tab] || movimientos)();
+      b.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, metas, ia }[tab] || movimientos)();
       wire(host);
     }));
     const pSel = host.querySelector('#fin-pais'); if (pSel) pSel.addEventListener('change', () => { Orbit.pais = pSel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); render(host); });
     const mSel = host.querySelector('#fin-mes'); if (mSel) mSel.addEventListener('change', () => { mesSel = mSel.value; render(host); });
     const body = document.getElementById('fin-body');
-    body.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, ia }[tab] || movimientos)();
+    body.innerHTML = ({ movimientos, dashboard, cxcp, financiacion, presupuesto, empresa, asesores, banco, metas, ia }[tab] || movimientos)();
     wire(host);
   }
 
@@ -177,7 +179,7 @@ Orbit.modules.finanzas = (function () {
       'egr-mes': ['Egresos del mes', lbl, inM.filter(m => m.tipo === 'egreso')],
       'res-mes': ['Resultado operativo', lbl + ' · ingresos y egresos', inM],
       'mov-mes': ['Movimientos del mes', lbl, inM],
-      'cxc': ['Cuentas por cobrar', 'todas las pendientes de recaudo — arrastran mes a mes', all.filter(m => m.tipo === 'ingreso' && (m.estado === 'esperado' || m.estado === 'facturado'))],
+      'cxc': ['Cuentas por cobrar', 'todas las pendientes de recaudo — arrastran mes a mes', all.filter(m => m.tipo === 'ingreso' && (m.estado === 'esperado' || m.estado === 'facturado')).concat((S().all('facturas') || []).filter(f => f.estado === 'por_cobrar' && (!p || f.pais === p)).map(f => ({ id: f.id, periodo: f.periodo, dia: +((f.fecha || '').slice(8, 10)) || 1, concepto: (f.concepto || ('Factura ' + f.numero)), clase: 'Comisión facturada', pagador: (q.aseguradora(f.aseguradoraId) || {}).nombre || '', valor: f.total, moneda: f.moneda, tipo: 'ingreso', estado: 'facturado', __factura: true })))],
       'cxp': ['Cuentas por pagar', 'todas las pendientes de pago — arrastran mes a mes', all.filter(m => m.tipo === 'egreso' && (m.estado === 'pendiente' || (m.pendiente || 0) > 0))]
     };
     const cfg = map[key]; if (!cfg) return;
@@ -197,7 +199,7 @@ Orbit.modules.finanzas = (function () {
         <button class="imp-x" id="dr-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
       <div style="overflow:auto;flex:1"><table class="tbl">
         <thead><tr><th>Periodo</th><th>Día</th><th>Concepto</th><th>Clasificación</th><th>Quién</th><th class="num">Valor</th><th>Estado</th></tr></thead>
-        <tbody>${items.map(m => `<tr class="clickable" onclick="document.getElementById('fin-drill').remove();Orbit.modules.finanzas.editarMov('${m.id}')">
+        <tbody>${items.map(m => `<tr class="clickable" onclick="document.getElementById('fin-drill').remove();Orbit.modules.finanzas.${m.__factura ? 'verFactura' : 'editarMov'}('${m.id}')">
           <td class="mono" style="font-size:11.5px">${m.periodo}</td><td class="mono" style="font-size:11.5px">${m.dia || '—'}</td>
           <td><b>${U.esc(m.concepto)}</b></td><td style="font-size:12px">${U.esc(m.clase || '—')}</td>
           <td style="font-size:12px">${U.esc(m.pagador || m.beneficiario || '—')}</td>
@@ -215,20 +217,35 @@ Orbit.modules.finanzas = (function () {
 
   /* ---------- CUENTAS POR COBRAR / POR PAGAR ---------- */
   function cxcp() {
+    const p = paisFin();
     const all = movs(null);
     const cxc = all.filter(m => m.tipo === 'ingreso' && (m.estado === 'esperado' || m.estado === 'facturado'));
     const cxp = all.filter(m => m.tipo === 'egreso' && (m.estado === 'pendiente' || (m.pendiente || 0) > 0));
-    const tCxc = sum(cxc, m => m.valor), tCxp = cxp.reduce((s, m) => s + norm(m.pendiente || m.valor, m.moneda), 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">💳 <b>Cuentas por cobrar</b> = ingresos esperados/facturados aún no recaudados (ej. planilla de comisiones ya facturada). <b>Cuentas por pagar</b> = egresos pendientes (ej. liquidación de asesores no pagada); el saldo pasa al mes siguiente. Clic en una fila cambia su estado.</div>
+    const facs = (S().all('facturas') || []).filter(f => f.estado === 'por_cobrar' && (!p || f.pais === p));
+    const tFac = facs.reduce((s, f) => s + norm(f.total, f.moneda), 0);
+    const tCxc = sum(cxc, m => m.valor) + tFac, tCxp = cxp.reduce((s, m) => s + norm(m.pendiente || m.valor, m.moneda), 0);
+    return `<div class="cfg-note" style="margin-bottom:14px">💳 <b>Cuentas por cobrar</b> = ingresos esperados/facturados aún no recaudados, incluidas las <b>facturas de comisión emitidas</b> (por cobrar). <b>Cuentas por pagar</b> = egresos pendientes (ej. liquidación de asesores no pagada); el saldo pasa al mes siguiente. Clic en una fila: factura → ver documento; movimiento → editar / cambiar estado.</div>
     ${K.kpis([
-      { label: 'Por cobrar (CxC)', val: M(tCxc), color: 'var(--warn)', foot: cxc.length + ' partidas', onclick: "Orbit.modules.finanzas.drillKey('cxc')" },
+      { label: 'Por cobrar (CxC)', val: M(tCxc), color: 'var(--warn)', foot: (cxc.length + facs.length) + ' partidas', onclick: "Orbit.modules.finanzas.drillKey('cxc')" },
       { label: 'Por pagar (CxP)', val: M(tCxp), color: 'var(--danger)', foot: cxp.length + ' partidas', onclick: "Orbit.modules.finanzas.drillKey('cxp')" },
       { label: 'Posición neta', val: M(tCxc - tCxp), color: 'var(--red)', foot: 'CxC − CxP' }
     ])}
     <div class="ins-grid-2">
-      ${cxcpTabla('Cuentas por cobrar', cxc, 'ok')}
+      ${cxcCard(cxc, facs)}
       ${cxcpTabla('Cuentas por pagar', cxp, 'danger')}
     </div>`;
+  }
+  function cxcCard(rows, facs) {
+    const facRows = (facs || []).map(f => `<tr class="clickable" onclick="Orbit.modules.finanzas.verFactura('${f.id}')" title="Ver factura de comisión">
+      <td class="mono" style="font-size:11.5px">${f.periodo}</td><td>🧾 ${U.esc(f.concepto || ('Factura ' + f.numero))}<div class="muted" style="font-size:10.5px">${U.esc(f.numero)}${(f.comisionIds && f.comisionIds.length) ? ' · ' + f.comisionIds.length + ' com.' : ''}</div></td>
+      <td class="num"><b>${U.money(f.total, f.moneda)}</b></td><td><span class="badge warn">🧾 por cobrar</span></td></tr>`).join('');
+    const finRows = (rows || []).slice(0, 24).map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.editarMov('${m.id}')" title="Ver / editar / eliminar">
+      <td class="mono" style="font-size:11.5px">${m.periodo}</td><td>${U.esc(m.concepto)}</td>
+      <td class="num"><b>${U.money(m.pendiente || m.valor, m.moneda)}</b></td><td onclick="event.stopPropagation();Orbit.modules.finanzas.toggleEstado('${m.id}')" style="cursor:pointer" title="Clic: cambia estado">${estBadge(m.estado)}</td></tr>`).join('');
+    const body = facRows + finRows;
+    return `<div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">Cuentas por cobrar</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Periodo</th><th>Concepto</th><th class="num">Monto</th><th>Estado</th></tr></thead>
+      <tbody>${body || '<tr><td colspan="4" class="muted" style="text-align:center;padding:18px">Sin partidas.</td></tr>'}</tbody></table></div></div>`;
   }
   function cxcpTabla(titulo, rows, tone) {
     return `<div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">${titulo}</div>
@@ -281,50 +298,27 @@ Orbit.modules.finanzas = (function () {
   function comisionAsesor() {
     return S().all('asesores').map(a => {
       const coms = S().where('comisiones', c => c.asesorId === a.id);
-      const baseRecaudada = coms.reduce((s, c) => s + q.norm(c.base, c.moneda), 0); // prima recaudada (cuota pagada)
-      const generada = coms.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-      const pct = a.comPct || 12;
-      const aPagar = Math.round(baseRecaudada * pct / 100); // % del asesor sobre prima neta recaudada
+      const baseRecaudada = coms.reduce((s, c) => s + q.norm(c.base, c.moneda), 0); // prima neta recaudada (cuota pagada)
+      const generada = coms.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0); // comisión de aseguradora sobre lo recaudado
+      // MODELO UNIFICADO con el motor de comisiones (comeng): respeta el modo del asesor
+      // (comision % sobre comisión aseguradora · neta % sobre prima neta · fijo monto) y su shareCom.
+      // Antes usaba una fórmula simple comPct×base que contradecía Equipo/core.
+      const m = (Orbit.comeng && Orbit.comeng.modeloVendedor) ? Orbit.comeng.modeloVendedor(a.id) : { modo: 'comision', pct: a.comPct || 12, valor: 0 };
+      let aPagar;
+      if (Orbit.comeng && Orbit.comeng.comVendedorDe) {
+        // suma por cuota: comisión del vendedor sobre la comisión de aseguradora y base neta de cada recibo
+        aPagar = Math.round(coms.reduce((s, c) => s + Orbit.comeng.comVendedorDe(q.norm(c.monto, c.moneda), q.norm(c.base, c.moneda), a.id), 0));
+      } else {
+        aPagar = m.modo === 'fijo' ? Math.round(m.valor) : m.modo === 'neta' ? Math.round(baseRecaudada * m.pct / 100) : Math.round(generada * m.pct / 100);
+      }
+      const pctLbl = m.modo === 'fijo' ? 0 : m.pct;
       const liquidada = coms.filter(c => c.estado === 'Liquidada').reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-      return { a, baseRecaudada, generada, pct, tipo: a.comTipo || 'variable', aPagar, liquidada, pendiente: Math.max(0, aPagar - liquidada) };
+      return { a, baseRecaudada, generada, pct: pctLbl, modo: m.modo, tipo: a.comTipo || 'variable', aPagar, liquidada, pendiente: Math.max(0, aPagar - liquidada) };
     }).sort((x, y) => y.aPagar - x.aPagar);
   }
 
-  /* ---------- MOVIMIENTOS ---------- */
-  function resumen() {
-    const cart = q.carteraGlobal();
-    const comp = comisionEmpresaPorAseguradora();
-    const totalCobrar = Object.values(comp).reduce((s, v) => s + v.devengada, 0);
-    const asesoresPagar = comisionAsesor().reduce((s, r) => s + r.pendiente, 0);
-    const movs = [
-      ['2026-06-18', 'Liquidación Seguros Atlas (may)', 12400, 'Ingreso', 'Liquidada'],
-      ['2026-06-15', 'Pago asesor D. Marroquín', -3100, 'Egreso', 'Pagada'],
-      ['2026-06-12', 'Recaudo cliente · REC-00451', 700, 'Ingreso', 'Conciliado'],
-      ['2026-06-10', 'Pago asistencia / gastos', -1250, 'Egreso', 'Registrado'],
-      ['2026-06-05', 'Liquidación Pacífico (may)', 9800, 'Ingreso', 'Por conciliar']
-    ];
-    return `${K.kpis([
-      { label: 'Recaudo del mes', val: U.moneyShort(cart.alDia, 'GTQ'), color: 'var(--ok)', foot: 'prima recaudada', footTone: 'up' },
-      { label: 'Comisión a cobrar', val: U.moneyShort(totalCobrar, 'GTQ'), color: 'var(--red)', foot: 'a aseguradoras' },
-      { label: 'A pagar asesores', val: U.moneyShort(asesoresPagar, 'GTQ'), color: 'var(--warn)', foot: 'pendiente' },
-      { label: 'Cartera vencida', val: U.moneyShort(cart.venc, 'GTQ'), color: 'var(--danger)', foot: 'afecta recaudo', footTone: 'down' }
-    ])}
-    <div class="card pad" style="margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <b style="font-family:var(--f-display);font-size:15px;flex:1">Movimientos</b>
-      <button class="btn ghost sm" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar histórico</button>
-      <button class="btn ghost sm" onclick="Orbit.importa.open('estados-banco')">🏦 Estado bancario</button>
-      <button class="btn primary sm" onclick="Orbit.modules.finanzas.crearMes()">Generar mes</button>
-    </div>
-    <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Fecha</th><th>Concepto</th><th class="num">Monto</th><th>Tipo</th><th>Estado</th></tr></thead>
-      <tbody>${movs.map(m => `<tr>
-        <td style="font-size:12.5px">${U.fmtDate(m[0])}</td>
-        <td><b>${U.esc(m[1])}</b></td>
-        <td class="num" style="color:${m[2] < 0 ? 'var(--danger)' : 'var(--ok)'}">${U.money(m[2], 'GTQ')}</td>
-        <td><span class="badge ${m[3] === 'Ingreso' ? 'ok' : 'neutral'}">${m[3]}</span></td>
-        <td>${U.estadoBadge(m[4])}</td></tr>`).join('')}</tbody>
-    </table></div></div>`;
-  }
+  /* (Eliminada la función muerta `resumen()` — tenía un array de movimientos HARDCODEADO
+     y nunca se invocaba: el dispatch de pestañas usa `movimientos()`, que lee del store.) */
 
   // ---- producción NETA con ajustes por no devengado (cancelaciones) ----
   function produccionNeta() {
@@ -346,125 +340,148 @@ Orbit.modules.finanzas = (function () {
       return sum(S().all('finmovs').filter(m => m.periodo === ym && (!p || m.pais === p) && (tipo === 'ingreso' ? m.tipo === 'ingreso' : m.tipo === 'egreso')), m => m.valor);
     });
   }
-  function dashboard() {
-    const prod = produccionNeta();
-    const anio = +mesSel.slice(0, 4), mi = +mesSel.slice(5) - 1;
-    const ingArr = serieMensual(anio, 'ingreso'), egrArr = serieMensual(anio, 'egreso');
-    const ingPrev = serieMensual(anio - 1, 'ingreso'), egrPrev = serieMensual(anio - 1, 'egreso');
-    // ventana de 6 meses hasta el mes seleccionado
-    const lo = Math.max(0, mi - 5);
-    const meses = MESES.slice(lo, mi + 1), ingresos = ingArr.slice(lo, mi + 1), egresos = egrArr.slice(lo, mi + 1);
-    const maxV = Math.max(1, ...ingresos, ...egresos);
-    const anioActual = ingArr.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const anioAnterior = ingPrev.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const varAnual = anioAnterior > 0 ? Math.round((anioActual / anioAnterior - 1) * 100) : 0;
-    const utilidad = (ingresos[ingresos.length - 1] || 0) - (egresos[egresos.length - 1] || 0);
-    const margen = ingresos[ingresos.length - 1] > 0 ? Math.round(utilidad / ingresos[ingresos.length - 1] * 100) : 0;
-    const egrAcum = egrArr.slice(0, mi + 1).reduce((s, v) => s + v, 0);
-    const gastoRatio = anioActual > 0 ? Math.round(egrAcum / anioActual * 100) : 0;
-    return `${K.kpis([
-      { label: 'Producción neta', val: U.moneyShort(prod.neta, 'GTQ'), color: 'var(--red)', foot: 'prima neta vigente' },
-      { label: 'Utilidad del mes', val: U.moneyShort(utilidad, 'GTQ'), color: 'var(--ok)', foot: 'ingresos − egresos', footTone: utilidad >= 0 ? 'up' : 'down' },
-      { label: 'Var. interanual', val: (varAnual >= 0 ? '+' : '') + varAnual + '%', color: 'var(--info)', foot: 'vs ' + (anio - 1), footTone: varAnual >= 0 ? 'up' : 'down' },
-      { label: 'Ajuste no devengado', val: '−' + U.moneyShort(prod.ajuste, 'GTQ'), color: 'var(--warn)', foot: 'cancelaciones', footTone: 'down' }
-    ])}
-    <div class="card pad" style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <b style="font-family:var(--f-display);font-size:15px">Ingresos vs egresos · comparativo intermensual</b>
-        <span style="display:flex;gap:14px;font-size:12px"><span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:var(--ok)"></span>Ingresos</span><span style="display:flex;align-items:center;gap:5px"><span class="dot-s" style="background:var(--danger)"></span>Egresos</span></span>
-      </div>
-      <div style="display:flex;align-items:flex-end;gap:14px;height:180px;padding-top:10px">
-        ${meses.map((m, i) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end">
-          <div style="display:flex;gap:3px;align-items:flex-end;height:100%;width:100%;justify-content:center">
-            <div title="Ingresos ${U.money(ingresos[i], 'GTQ')}" style="width:42%;background:linear-gradient(180deg,#34b96a,#1f8a4c);border-radius:4px 4px 0 0;height:${ingresos[i] / maxV * 100}%"></div>
-            <div title="Egresos ${U.money(egresos[i], 'GTQ')}" style="width:42%;background:linear-gradient(180deg,#e0566a,#C5162E);border-radius:4px 4px 0 0;height:${egresos[i] / maxV * 100}%"></div>
-          </div>
-          <span style="font-size:11px;color:var(--ink-3);font-family:var(--f-mono)">${m}</span>
-        </div>`).join('')}
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div class="card pad">
-        <b style="font-family:var(--f-display);font-size:15px">Comparativo interanual · acum. Ene→${MESES[mi]}</b>
-        <div style="display:flex;align-items:flex-end;gap:24px;margin-top:16px">
-          ${[[anio - 1 + '', anioAnterior, '#9aa0a8'], [anio + '', anioActual, 'var(--red)']].map(([y, v, c]) => `<div style="flex:1;text-align:center">
-            <div style="height:120px;display:flex;align-items:flex-end;justify-content:center"><div style="width:60%;background:${c};border-radius:6px 6px 0 0;height:${Math.max(2, v / Math.max(anioActual, anioAnterior, 1) * 100)}%"></div></div>
-            <div style="font-family:var(--f-display);font-weight:800;margin-top:8px">${U.moneyShort(v, 'GTQ')}</div>
-            <div class="muted" style="font-size:12px">${y}</div></div>`).join('')}
-        </div>
-        <div class="cfg-note" style="margin-top:14px">${varAnual >= 0 ? 'Crecimiento' : 'Caída'} <b style="color:${varAnual >= 0 ? 'var(--ok)' : 'var(--danger)'}">${varAnual >= 0 ? '+' : ''}${varAnual}%</b> vs año anterior. Base para fijar metas realistas.</div>
-      </div>
-      <div class="card pad">
-        <b style="font-family:var(--f-display);font-size:15px">Salud financiera</b>
-        <div style="display:grid;gap:11px;margin-top:14px">
-          ${finRow('Margen operativo', margen + '%', margen >= 25 ? 'ok' : 'warn')}
-          ${finRow('Gasto / ingreso (acum.)', gastoRatio + '%', gastoRatio <= 60 ? 'ok' : 'warn')}
-          ${finRow('Ingreso acum. ' + anio, U.moneyShort(anioActual, 'GTQ'), 'info')}
-          ${finRow('Egreso acum. ' + anio, U.moneyShort(egrAcum, 'GTQ'), 'neutral')}
-        </div>
-        <button class="btn primary" style="margin-top:16px;width:100%" onclick="location.hash='#/equipo'">Fijar metas (Equipo y permisos) →</button>
-      </div>
-    </div>`;
-  }
-  function finRow(k, v, tone) {
-    const col = { ok: 'var(--ok)', warn: 'var(--warn)', info: 'var(--info)', neutral: 'var(--ink)' }[tone];
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line-2)"><span style="font-size:13px">${k}</span><b style="font-family:var(--f-display);color:${col}">${v}</b></div>`;
-  }
+  /* (Eliminadas las funciones muertas `dashboard()` y `presupuesto()` 1ª declaración +
+     sus helpers `finRow`/`presupTabla`: eran duplicados por hoisting con arrays
+     HARDCODEADOS y nunca se invocaban — ganan las versiones vivas de más abajo,
+     que leen del store.) */
 
-  /* ---------- PRESUPUESTO ---------- */
-  function presupuesto() {
-    const ingresos = [['Comisiones de aseguradoras', 110000, 124000], ['Financiamiento de primas', 28000, 31500], ['Otros ingresos', 6000, 4200]];
-    const egresos = [['Comisiones a asesores', 38000, 41000], ['Gastos fijos (nómina, renta)', 32000, 32000], ['Operación y asistencia', 12000, 13800], ['Marketing', 8000, 6500]];
-    const tIngP = ingresos.reduce((s, r) => s + r[1], 0), tIngR = ingresos.reduce((s, r) => s + r[2], 0);
-    const tEgP = egresos.reduce((s, r) => s + r[1], 0), tEgR = egresos.reduce((s, r) => s + r[2], 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">📊 Presupuesto vs real del mes. Ingresos por <b>comisiones</b> y <b>financiamiento</b>; egresos por <b>comisiones</b>, <b>gastos fijos</b> y operación. Importable desde el histórico.</div>
-    ${K.kpis([
-      { label: 'Ingresos (real)', val: U.moneyShort(tIngR, 'GTQ'), color: 'var(--ok)', foot: 'ppto ' + U.moneyShort(tIngP, 'GTQ'), footTone: 'up' },
-      { label: 'Egresos (real)', val: U.moneyShort(tEgR, 'GTQ'), color: 'var(--danger)', foot: 'ppto ' + U.moneyShort(tEgP, 'GTQ') },
-      { label: 'Resultado', val: U.moneyShort(tIngR - tEgR, 'GTQ'), color: 'var(--red)', foot: 'utilidad real' },
-      { label: 'Cumpl. ingresos', val: Math.round(tIngR / tIngP * 100) + '%', color: 'var(--info)', foot: 'vs presupuesto' }
-    ])}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${presupTabla('Ingresos', ingresos, 'ok')}
-      ${presupTabla('Egresos', egresos, 'danger')}
-    </div>
-    <button class="btn ghost" style="margin-top:14px" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar histórico de movimientos</button>`;
+  /* ---------- METAS (cumplimiento real vs ideal · empresa/asesor/aseguradora) ---------- */
+  // Medición mensual real, con datos vivos del store:
+  function primaNetaMes(mesKey, filt) {
+    return S().where('polizas', p => (p.vigenciaInicio || p.emision || '').slice(0, 7) === mesKey && (!filt || filt(p)))
+      .reduce((s, p) => s + norm(p.primaNeta || 0, p.moneda), 0);
   }
-  function presupTabla(titulo, rows, tone) {
-    return `<div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">${titulo}</div>
-      <table class="tbl"><thead><tr><th>Categoría</th><th class="num">Ppto</th><th class="num">Real</th><th class="num">%</th></tr></thead>
-      <tbody>${rows.map(r => `<tr><td>${r[0]}</td><td class="num">${U.money(r[1], 'GTQ')}</td><td class="num"><b>${U.money(r[2], 'GTQ')}</b></td><td class="num" style="color:${r[2] >= r[1] ? (tone === 'ok' ? 'var(--ok)' : 'var(--danger)') : 'var(--ink-3)'}">${Math.round(r[2] / r[1] * 100)}%</td></tr>`).join('')}</tbody></table></div>`;
+  function recaudoMes(mesKey, filt) {
+    return S().where('cobros', c => c.estado === 'Pagado' && (c.fechaPago || '').slice(0, 7) === mesKey)
+      .filter(c => { if (!filt) return true; const p = S().get('polizas', c.polizaId); return p && filt(p); })
+      .reduce((s, c) => s + norm(c.monto, c.moneda), 0);
   }
+  function promedioPrima(mesKey, filt, n) {
+    let tot = 0, cnt = 0, y = +mesKey.slice(0, 4), mo = +mesKey.slice(5) - 1;
+    for (let i = 1; i <= (n || 3); i++) { let mm = mo - i, yy = y; while (mm < 0) { mm += 12; yy--; } tot += primaNetaMes(yy + '-' + String(mm + 1).padStart(2, '0'), filt); cnt++; }
+    return cnt ? Math.round(tot / cnt) : 0;
+  }
+  const semaforo = pct => pct >= 100 ? '🟢' : pct >= 70 ? '🟡' : '🔴';
+  const semColor = pct => pct >= 100 ? 'var(--ok)' : pct >= 70 ? 'var(--warn)' : 'var(--danger)';
+  function metaGet(mesKey, tipo, ambitoId) { return (S().all('metas') || []).find(m => m.mes === mesKey && m.tipo === tipo && (m.asesorId || m.aseguradoraId || '') === (ambitoId || '')); }
+  function metaVal(mesKey, tipo, ambitoId, fallback) { const m = metaGet(mesKey, tipo, ambitoId); return (m && +m.valor) || fallback || 0; }
 
-  /* ---------- METAS ---------- */
   function metas() {
-    const prod = produccionNeta();
-    const board = q.leaderboard();
     const p = paisFin() || 'GT', cur = p === 'CO' ? 'COP' : 'GTQ';
-    const mesKey = mesSel;
-    const metaEmp = (S().all('metas') || []).find(m => m.mes === mesKey && m.tipo === 'prima' && !m.asesorId);
-    const metaVal = metaEmp && metaEmp.valor ? +metaEmp.valor : 820000;
-    return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas sobre <b>prima NETA</b> (no total). Por <b>asesor</b>, <b>empresa</b> y <b>aseguradora</b>, mensual o anual (para incentivos). De aquí derivan metas de recaudo y financieras.</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn primary sm" onclick="Orbit.modules.finanzas.crearMeta()">+ Crear meta</button>
-      <span class="badge ${metaEmp ? 'ok' : 'neutral'}" style="align-self:center">${metaEmp ? '✅ meta cargada para ' + mesKey : 'meta base (sin definir para ' + mesKey + ')'}</span>
+    const mk = mesSel, lbl = MESES[+mk.slice(5) - 1] + ' ' + mk.slice(0, 4);
+    const M2 = n => U.money(n, cur);
+    // EMPRESA
+    const primaReal = primaNetaMes(mk), recReal = recaudoMes(mk);
+    const primaMeta = metaVal(mk, 'prima', '', promedioPrima(mk, null, 3) ? Math.round(promedioPrima(mk, null, 3) * 1.1) : 0);
+    const recMeta = metaVal(mk, 'recaudo', '', Math.round(primaMeta * 0.85));
+    const pP = primaMeta ? Math.round(primaReal / primaMeta * 100) : 0;
+    const pR = recMeta ? Math.round(recReal / recMeta * 100) : 0;
+    const barra = (real, meta, pct) => `<div class="bar" style="margin-top:8px;height:12px"><i style="width:${Math.min(100, pct)}%;background:${pct >= 100 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : pct >= 70 ? 'linear-gradient(90deg,#c9821b,#e0a53a)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div>`;
+    // ASESORES
+    const ases = S().all('asesores').map(a => {
+      const real = primaNetaMes(mk, po => po.asesorId === a.id);
+      const rec = recaudoMes(mk, po => po.asesorId === a.id);
+      const meta = metaVal(mk, 'prima', a.id, promedioPrima(mk, po => po.asesorId === a.id, 3) ? Math.round(promedioPrima(mk, po => po.asesorId === a.id, 3) * 1.1) : 0);
+      const prevReal = primaNetaMes((function () { let y = +mk.slice(0, 4), m = +mk.slice(5) - 2; while (m < 0) { m += 12; y--; } return y + '-' + String(m + 1).padStart(2, '0'); })(), po => po.asesorId === a.id);
+      const pct = meta ? Math.round(real / meta * 100) : 0;
+      const tend = prevReal ? Math.round((real / prevReal - 1) * 100) : 0;
+      return { a, real, rec, meta, pct, tend };
+    }).sort((x, y) => y.real - x.real);
+    // ASEGURADORAS
+    const asgs = S().all('aseguradoras').map(g => {
+      const real = primaNetaMes(mk, po => po.aseguradoraId === g.id);
+      const meta = metaVal(mk, 'prima', g.id, 0);
+      const pct = meta ? Math.round(real / meta * 100) : 0;
+      return { g, real, meta, pct };
+    }).filter(r => r.real > 0 || r.meta > 0).sort((x, y) => y.real - x.real);
+
+    return `<div class="cfg-note" style="margin-bottom:14px">🎯 <b>Cumplimiento real vs ideal</b> de ${lbl} — sobre <b>prima NETA</b> (ventas) y <b>recaudo</b>. De lo general (empresa) a lo particular (asesor · aseguradora). Semáforo: 🟢 ≥100% · 🟡 ≥70% · 🔴 &lt;70%.</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn primary sm" onclick="Orbit.modules.finanzas.crearMeta()">+ Establecer meta</button>
+      <button class="btn sm" style="background:var(--graph);color:#fff" onclick="Orbit.modules.finanzas.metasSugerir()">🤖 Sugerir metas (inteligente)</button>
     </div>
-    <div class="card pad" style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">Meta de la empresa (prima neta)</b><span class="mono" style="font-size:13px">${U.moneyShort(prod.neta, cur)} / ${U.moneyShort(metaVal, cur)}</span></div>
-      <div class="bar" style="margin-top:10px;height:12px"><i style="width:${Math.min(100, Math.round(prod.neta / metaVal * 100))}%"></i></div>
-      <div class="muted" style="font-size:12px;margin-top:7px">Meta de recaudo derivada (78%): <b>${U.moneyShort(metaVal * .78, cur)}</b> · ajuste por no devengado aplicado: −${U.moneyShort(prod.ajuste, cur)}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+      <div class="card pad">
+        <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">${semaforo(pP)} Ventas empresa (prima neta)</b><span class="mono" style="font-size:13px;color:${semColor(pP)}">${pP}%</span></div>
+        ${barra(primaReal, primaMeta, pP)}
+        <div class="muted" style="font-size:12.5px;margin-top:8px">Real <b>${M2(primaReal)}</b> · Meta <b>${M2(primaMeta)}</b> · ${primaMeta ? (primaReal >= primaMeta ? 'Superada por ' + M2(primaReal - primaMeta) : 'Faltan ' + M2(primaMeta - primaReal)) : 'sin meta — usa sugerir'}</div>
+      </div>
+      <div class="card pad">
+        <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">${semaforo(pR)} Recaudo empresa</b><span class="mono" style="font-size:13px;color:${semColor(pR)}">${pR}%</span></div>
+        ${barra(recReal, recMeta, pR)}
+        <div class="muted" style="font-size:12.5px;margin-top:8px">Real <b>${M2(recReal)}</b> · Meta <b>${M2(recMeta)}</b> · índice recaudo/venta <b>${primaReal ? Math.round(recReal / primaReal * 100) : 0}%</b></div>
+      </div>
     </div>
-    <div class="card" style="overflow:hidden"><table class="tbl">
-      <thead><tr><th>Asesor</th><th class="num">Meta neta</th><th class="num">Real neto</th><th>Avance</th><th class="num">Incentivo</th></tr></thead>
-      <tbody>${board.map(b => {
-        const meta = b.asesor.metaPrima, pct = Math.min(140, Math.round(b.prima / meta * 100));
-        return `<tr><td><div style="display:flex;align-items:center;gap:9px">${U.avatar(b.asesor.nombre, b.asesor.color, 'sm')}<b>${U.esc(b.asesor.nombre)}</b></div></td>
-          <td class="num">${U.money(meta, 'GTQ')}</td>
-          <td class="num">${U.money(b.prima, 'GTQ')}</td>
-          <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:90px"><i style="width:${Math.min(100, pct)}%;background:${pct >= 100 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div><span class="mono" style="font-size:12px">${pct}%</span></div></td>
-          <td class="num">${pct >= 100 ? '<span class="badge ok">🏆 Logrado</span>' : '<span class="muted">—</span>'}</td></tr>`;
-      }).join('')}</tbody>
-    </table></div>`;
+    <div class="card" style="overflow:hidden;margin-bottom:16px"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">👥 Cumplimiento por asesor · ${lbl}</div>
+      <div style="overflow-x:auto"><table class="tbl">
+      <thead><tr><th>Asesor</th><th class="num">Meta neta</th><th class="num">Real neto</th><th class="num">Recaudo</th><th>Avance</th><th class="num">vs mes ant.</th></tr></thead>
+      <tbody>${ases.map(r => `<tr>
+        <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(r.a.nombre, r.a.color, 'sm')}<b>${U.esc(r.a.nombre)}</b></div></td>
+        <td class="num">${r.meta ? M2(r.meta) : '<span class="muted">—</span>'}</td>
+        <td class="num"><b>${M2(r.real)}</b></td>
+        <td class="num" style="color:var(--info)">${M2(r.rec)}</td>
+        <td><div style="display:flex;align-items:center;gap:8px"><span>${semaforo(r.pct)}</span><div class="bar" style="width:80px"><i style="width:${Math.min(100, r.pct)}%;background:${semColor(r.pct)}"></i></div><span class="mono" style="font-size:12px;color:${semColor(r.pct)}">${r.pct}%</span></div></td>
+        <td class="num" style="color:${r.tend >= 0 ? 'var(--ok)' : 'var(--danger)'}">${r.tend >= 0 ? '▲' : '▼'} ${Math.abs(r.tend)}%</td></tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">Sin producción en el mes.</td></tr>'}</tbody>
+    </table></div></div>
+    <div class="card" style="overflow:hidden"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">🏛️ Cumplimiento por aseguradora · ${lbl}</div>
+      <div style="overflow-x:auto"><table class="tbl">
+      <thead><tr><th>Aseguradora</th><th class="num">Meta neta</th><th class="num">Real neto</th><th class="num">% del total</th><th>Avance</th></tr></thead>
+      <tbody>${asgs.map(r => { const share = primaReal ? Math.round(r.real / primaReal * 100) : 0; return `<tr>
+        <td>${r.g ? `<span style="display:flex;align-items:center;gap:8px"><span class="dot-s" style="background:${r.g.color || '#888'}"></span><b>${U.esc(r.g.nombre)}</b></span>` : '—'}</td>
+        <td class="num">${r.meta ? M2(r.meta) : '<span class="muted">—</span>'}</td>
+        <td class="num"><b>${M2(r.real)}</b></td>
+        <td class="num">${share}%</td>
+        <td>${r.meta ? `<div style="display:flex;align-items:center;gap:8px"><span>${semaforo(r.pct)}</span><span class="mono" style="font-size:12px;color:${semColor(r.pct)}">${r.pct}%</span></div>` : '<span class="muted">sin meta</span>'}</td></tr>`; }).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin producción en el mes.</td></tr>'}</tbody>
+    </table></div></div>`;
+  }
+
+  // Motor de sugerencia de metas: promedio 3 meses + crecimiento, coherente con presupuesto
+  function metasSugerir() {
+    const p = paisFin() || 'GT', cur = p === 'CO' ? 'COP' : 'GTQ', mk = mesSel;
+    const M2 = n => U.money(n, cur);
+    const promEmp = promedioPrima(mk, null, 3);
+    const crec = 1.1; // +10% sobre promedio (editable)
+    const sugPrima = Math.round(promEmp * crec);
+    const recRate = (function () { const pr = primaNetaMes((function () { let y = +mk.slice(0, 4), m = +mk.slice(5) - 2; while (m < 0) { m += 12; y--; } return y + '-' + String(m + 1).padStart(2, '0'); })()); const rc = recaudoMes((function () { let y = +mk.slice(0, 4), m = +mk.slice(5) - 2; while (m < 0) { m += 12; y--; } return y + '-' + String(m + 1).padStart(2, '0'); })()); return pr ? Math.min(1, rc / pr) : 0.85; })();
+    const sugRec = Math.round(sugPrima * recRate);
+    // coherencia con presupuesto: ingresos presupuestados del mes
+    const ppto = S().all('presupuesto').filter(x => x.pais === p && x.periodo === mk);
+    const pptoIng = ppto.filter(x => (x.tipo || '') === 'ingreso' || /comision|ingreso|financ/i.test(x.categoria || '')).reduce((s, x) => s + (x.monto || 0), 0);
+    const ases = S().all('asesores').map(a => ({ a, sug: Math.round(promedioPrima(mk, po => po.asesorId === a.id, 3) * crec) })).filter(r => r.sug > 0);
+    let back = document.getElementById('fin-sug'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-sug'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = `<div class="card" style="width:min(560px,95vw);padding:0;max-height:90vh;overflow:auto">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🤖 Metas sugeridas · ${MESES[+mk.slice(5) - 1]} ${mk.slice(0, 4)}</b><button class="imp-x" id="sg-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:14px">
+        <div class="cfg-note">Cálculo: promedio de los <b>últimos 3 meses</b> de prima neta (${M2(promEmp)}) × crecimiento <b>+10%</b>. Recaudo = índice histórico recaudo/venta (<b>${Math.round(recRate * 100)}%</b>). ${pptoIng ? 'Coherencia con presupuesto de ingresos del mes: <b>' + M2(pptoIng) + '</b>.' : ''}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <label class="ce-l">Meta ventas empresa (prima neta)<input id="sg-prima" class="o-sel" type="number" value="${sugPrima}"></label>
+          <label class="ce-l">Meta recaudo empresa<input id="sg-rec" class="o-sel" type="number" value="${sugRec}"></label>
+        </div>
+        ${pptoIng && sugPrima > pptoIng * 1.5 ? `<div class="cfg-note" style="border-left:3px solid var(--warn)">⚠️ La meta sugerida supera 1.5× el ingreso presupuestado — revisa coherencia con Presupuesto.</div>` : ''}
+        <div class="card" style="overflow:hidden"><div style="padding:9px 12px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px">Por asesor (editable)</div>
+          <table class="tbl"><tbody>${ases.map(r => `<tr><td><b>${U.esc(r.a.nombre)}</b></td><td class="num"><input class="o-sel sg-ase" data-ase="${r.a.id}" type="number" value="${r.sug}" style="width:120px;text-align:right"></td></tr>`).join('')}</tbody></table>
+        </div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="sg-cancel">Cancelar</button><button class="btn primary" id="sg-ok">✓ Establecer estas metas</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const $ = s => back.querySelector(s); const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    $('#sg-x').addEventListener('click', close); $('#sg-cancel').addEventListener('click', close);
+    $('#sg-ok').addEventListener('click', () => {
+      const up = (tipo, ambitoKey, ambitoId, valor) => {
+        const ex = (S().all('metas') || []).find(m => m.mes === mk && m.tipo === tipo && (m.asesorId || m.aseguradoraId || '') === (ambitoId || ''));
+        const rec = { mes: mk, tipo, valor: +valor || 0 }; rec[ambitoKey] = ambitoId || '';
+        if (ex) S().update('metas', ex.id, { valor: +valor || 0 }); else S().insert('metas', Object.assign({ id: 'meta' + Date.now().toString(36) + Math.floor(Math.random() * 99) }, rec));
+      };
+      up('prima', 'asesorId', '', $('#sg-prima').value);
+      up('recaudo', 'asesorId', '', $('#sg-rec').value);
+      back.querySelectorAll('.sg-ase').forEach(inp => up('prima', 'asesorId', inp.dataset.ase, inp.value));
+      close();
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Metas establecidas — Inicio e Insights ya miden contra ellas'; document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
+      render(document.getElementById('host'));
+    });
   }
 
   function crearMeta() {
@@ -481,7 +498,7 @@ Orbit.modules.finanzas = (function () {
           <label class="ce-l">Tipo<select id="mt-tipo" class="o-sel"><option value="prima">Prima neta (empresa)</option><option value="recaudo">Recaudo</option><option value="nueva">Producción nueva</option><option value="renovada">Producción renovada</option></select></label>
         </div>
         <label class="ce-l">Ámbito<select id="mt-ambito" class="o-sel"><option value="">Empresa (global)</option>${asesores.map(a => `<option value="${a.id}">Asesor · ${U.esc(a.nombre)}</option>`).join('')}</select></label>
-        <label class="ce-l">Valor meta (${cur})<input id="mt-val" class="o-sel" type="number" value="820000"></label>
+        <label class="ce-l">Valor meta (${cur})<input id="mt-val" class="o-sel" type="number" value="${S().all('asesores').reduce((s, a) => s + (a.metaPrima || 0), 0) || 0}"></label>
         <div class="cfg-note">Se guarda en la colección editable <b>metas</b> — alimenta Insights → Metas y el avance de la empresa. Un registro por mes+tipo+ámbito (upsert).</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="mt-cancel">Cancelar</button><button class="btn primary" id="mt-ok">Guardar meta</button></div>
@@ -520,9 +537,199 @@ Orbit.modules.finanzas = (function () {
         <td class="num" style="color:var(--red)"><b>${U.money(r.devengada, 'GTQ')}</b></td>
         <td class="num" style="color:var(--ok)">${U.money(r.liquidada, 'GTQ')}</td>
         <td class="num">${U.money(r.devengada + r.liquidada, 'GTQ')}</td>
-        <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('aseguradoraId','${r.asg ? r.asg.id : ''}')">Ver detalle</button><button class="btn ghost sm" onclick="Orbit.importa.open('planillas-comision')">Conciliar planilla</button></td>
+        <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('aseguradoraId','${r.asg ? r.asg.id : ''}')">Ver detalle</button><button class="btn ghost sm" onclick="Orbit.modules.finanzas.facturaAseg('${r.asg ? r.asg.id : ''}')">🧾 Factura</button><button class="btn ghost sm" onclick="Orbit.importa.open('planillas-comision')">Conciliar planilla</button></td>
       </tr>`).join('')}</tbody>
-    </table></div></div>`;
+    </table></div></div>
+    ${(function () {
+      const facs = (S().all('facturas') || []).filter(f => f.estado !== 'anulada').sort((a, b) => (b.numero || '').localeCompare(a.numero || ''));
+      if (!facs.length) return '<div class="cfg-note" style="margin-top:14px">🧾 Aún no has emitido facturas de comisión. Usa <b>🧾 Factura</b> en una aseguradora. Las facturas emitidas son <b>cuentas por cobrar</b> — no entran a caja hasta que se cobran.</div>';
+      const M = n => U.money(n, 'GTQ');
+      return `<div class="card" style="overflow:hidden;margin-top:16px"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">🧾 Facturas de comisión emitidas (CxC)</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>N.º</th><th>Aseguradora</th><th>Periodo</th><th class="num">Total</th><th>Estado</th><th></th></tr></thead>
+      <tbody>${facs.map(f => { const a = q.aseguradora(f.aseguradoraId); return `<tr>
+        <td class="mono" style="font-size:11.5px"><b>${U.esc(f.numero)}</b>${(f.comisionIds && f.comisionIds.length) ? `<div class="muted" style="font-size:10.5px">cubre ${f.comisionIds.length} com.</div>` : ''}</td>
+        <td>${a ? U.esc(a.nombre) : '—'}</td>
+        <td class="mono" style="font-size:11.5px">${f.periodo}</td>
+        <td class="num"><b>${M(f.total)}</b></td>
+        <td><span class="badge ${f.estado === 'cobrada' ? 'ok' : 'warn'}">${f.estado === 'cobrada' ? '✅ cobrada' : '🕓 por cobrar'}</span>${(f.estado === 'cobrada' && f.cobro && (f.cobro.banco || f.cobro.ref)) ? `<div class="muted" style="font-size:10.5px">${U.esc(f.cobro.banco || '')}${f.cobro.ref ? ' · ' + U.esc(f.cobro.ref) : ''}</div>` : ''}</td>
+        <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.verFactura('${f.id}')">🖨 Ver</button>${f.estado !== 'cobrada' ? `<button class="btn ghost sm" onclick="Orbit.modules.finanzas.facturaAccion('${f.id}','cobrar')">💵 Registrar cobro</button>` : ''}<button class="btn ghost sm" onclick="Orbit.modules.finanzas.facturaAccion('${f.id}','anular')" style="color:var(--danger)">Anular</button></td>
+      </tr>`; }).join('')}</tbody></table></div></div>`;
+    })()}`;
+  }
+  function facturaAseg(asgId) {
+    const asg = q.aseguradora(asgId) || {};
+    const comp = comisionEmpresaPorAseguradora()[asgId] || { devengada: 0, liquidada: 0, n: 0 };
+    const t = Orbit.tenant.get();
+    // P1-03: país y moneda se derivan de la ASEGURADORA (no del filtro global) para no mezclar monedas.
+    const pais = asg.pais || (Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : paisFin()) || 'GT';
+    const cur = (t.paisesCfg && t.paisesCfg[pais] && t.paisesCfg[pais].moneda) || (pais === 'CO' ? 'COP' : 'GTQ');
+    const base = comp.devengada || 0;
+    // IVA del país configurado (tasas por país en tenant)
+    const ivaPct = (t.paisesCfg && t.paisesCfg[pais] && t.paisesCfg[pais].iva != null) ? t.paisesCfg[pais].iva : (pais === 'CO' ? 19 : 12);
+    const iva = Math.round(base * ivaPct) / 100;
+    const total = base + iva;
+    const fact = asg.facturacion || {};
+    // Idempotencia: si ya existe factura para esta aseguradora+periodo (no anulada), la reutilizamos
+    const periodoFac = mesSel;
+    const existente = (S().all('facturas') || []).find(f => f.aseguradoraId === asgId && f.periodo === periodoFac && f.estado !== 'anulada');
+    // Número secuencial por año (no aleatorio)
+    const anio = new Date().getFullYear();
+    const nSeq = (S().all('facturas') || []).filter(f => (f.numero || '').includes('FAC-' + anio)).length + 1;
+    const num = existente ? existente.numero : ('FAC-' + anio + '-' + String(nSeq).padStart(4, '0'));
+    const concepto = (fact.patronConcepto || 'Comisiones por intermediación de seguros')
+      .replace('{mes}', MESES[+mesSel.slice(5) - 1] + ' ' + mesSel.slice(0, 4))
+      .replace('{aseguradora}', asg.nombre || '');
+    const M = n => U.money(n, cur);
+    let back = document.getElementById('fin-fac'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-fac'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 98;
+    back.innerHTML = `<div class="card" style="width:min(620px,96vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🧾 Factura de comisiones · ${U.esc(asg.nombre || '')}</b><button class="imp-x" id="ff-x">✕</button></div>
+      <div style="padding:20px" id="ff-doc">
+        <div class="cfg-note" style="margin-bottom:14px">Documento de <b>control interno</b> de facturación (no sustituye la factura fiscal/electrónica; alimenta el registro para emitir en tu sistema fiscal o integrar factura electrónica).</div>
+        <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+          <div><div class="muted" style="font-size:11px">EMISOR</div><b>${U.esc(t.empresa || 'Tu empresa')}</b>${t.nit ? '<div style="font-size:12px">NIT: ' + U.esc(t.nit) + '</div>' : ''}</div>
+          <div style="text-align:right"><div class="muted" style="font-size:11px">FACTURA</div><b class="mono">${num}</b><div style="font-size:12px">${U.fmtDate(Orbit.ui.today())}</div></div>
+        </div>
+        <div style="background:var(--surface);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+          <div class="muted" style="font-size:11px">FACTURAR A</div>
+          <b>${U.esc(fact.razonSocial || asg.nombre || '')}</b>
+          <div style="font-size:12.5px">NIT/ID: <b>${U.esc(fact.nit || '—')}</b></div>
+          ${fact.dirFiscal ? '<div style="font-size:12.5px">' + U.esc(fact.dirFiscal) + '</div>' : ''}
+        </div>
+        <table class="tbl"><thead><tr><th>Concepto</th><th class="num">Valor</th></tr></thead><tbody>
+          <tr><td>${U.esc(concepto)}<div class="muted" style="font-size:11.5px">${comp.n} cuotas · prima neta recaudada del periodo</div></td><td class="num"><b>${M(base)}</b></td></tr>
+          <tr><td>IVA (${ivaPct}%)</td><td class="num">${M(iva)}</td></tr>
+          <tr style="border-top:2px solid var(--ink)"><td><b>TOTAL A COBRAR</b></td><td class="num"><b style="font-size:16px;color:var(--red)">${M(total)}</b></td></tr>
+        </tbody></table>
+        ${!fact.nit ? '<div class="cfg-note" style="margin-top:12px;border-left:3px solid var(--warn)">⚠️ Esta aseguradora no tiene datos de facturación (NIT, razón social, patrón de concepto). Complétalos en su ficha (Aseguradoras) para autocompletar la factura.</div>' : ''}
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="ff-print">🖨 Imprimir / PDF</button>
+        <button class="btn primary" id="ff-emit">✓ Registrar emitida</button>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#ff-x').addEventListener('click', close);
+    back.querySelector('#ff-print').addEventListener('click', () => { const w = window.open('', '_blank'); w.document.write('<html><head><title>' + num + '</title></head><body>' + back.querySelector('#ff-doc').innerHTML + '</body></html>'); w.document.close(); w.print(); });
+    back.querySelector('#ff-emit').addEventListener('click', () => {
+      // REGLA CONTABLE Orbit 360: una factura emitida es CUENTA POR COBRAR, NO caja/banco.
+      // Se registra en la colección `facturas` con estado 'por_cobrar'. NO se crea `finmov`
+      // hasta que el dinero entra realmente (se cobra / concilia banco). Idempotente por
+      // aseguradora+periodo: si ya existe (no anulada), no se duplica.
+      if (existente) {
+        close();
+        const tt0 = document.createElement('div'); tt0.className = 'ciclo-toast'; tt0.textContent = 'ℹ️ Ya existía la factura ' + num + ' para este periodo (no se duplica)'; document.body.appendChild(tt0); setTimeout(() => tt0.remove(), 3200);
+        return;
+      }
+      S().insert('facturas', {
+        id: 'fac_' + Date.now(), numero: num, aseguradoraId: asgId, periodo: periodoFac,
+        fecha: Orbit.ui.today(), base, iva, ivaPct, total, moneda: cur, pais,
+        concepto, razonSocial: fact.razonSocial || asg.nombre || '', nit: fact.nit || '',
+        estado: 'por_cobrar', cuotas: comp.n,
+        comisionIds: S().all('comisiones').filter(c => c.aseguradoraId === asgId && c.estado !== 'Liquidada').map(c => c.id),
+        bitacora: [{ ts: Orbit.ui.today(), t: 'Factura emitida (por cobrar)', quien: (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Equipo' }]
+      });
+      close();
+      const tt = document.createElement('div'); tt.className = 'ciclo-toast'; tt.textContent = '✓ Factura ' + num + ' emitida como CUENTA POR COBRAR (no es caja hasta el cobro)'; document.body.appendChild(tt); setTimeout(() => tt.remove(), 3600);
+      render(document.getElementById('host'));
+    });
+  }
+
+  /* ---------- FACTURAS emitidas (CxC de comisión) — cobrar / anular ---------- */
+  function facturaAccion(facId, accion) {
+    const f = S().get('facturas', facId); if (!f) return;
+    if (accion === 'cobrar') {
+      if (f.estado === 'cobrada') return;
+      cobrarFacturaModal(f); // captura respaldo bancario antes de registrar el ingreso real
+      return;
+    }
+    if (accion === 'anular') {
+      const bit = (f.bitacora || []).slice();
+      bit.push({ ts: Orbit.ui.today(), t: 'Factura anulada', quien: 'Equipo' });
+      S().update('facturas', facId, { estado: 'anulada', bitacora: bit });
+      const fmid = 'fmv_fac_' + facId; if (S().get('finmovs', fmid)) S().remove('finmovs', fmid);
+      Orbit.ui.toast('Factura ' + f.numero + ' anulada');
+      render(document.getElementById('host'));
+    }
+  }
+
+  /* Cobro con RESPALDO BANCARIO: enlaza la factura y el finmov con el banco/nº de depósito
+     que respalda el ingreso real. El finmov solo nace aquí (dinero que entró de verdad). */
+  function cobrarFacturaModal(f) {
+    const M = n => U.money(n, f.moneda);
+    let back = document.getElementById('fin-cobro'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-cobro'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 99;
+    back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
+      <div style="padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">💵 Registrar cobro · ${U.esc(f.numero)}</b><button class="imp-x" id="fc-x">✕</button></div>
+      <div style="padding:18px;display:grid;gap:12px">
+        <div class="cfg-note">Al confirmar, la factura pasa a <b>cobrada</b> y se genera el ingreso real (<b>${M(f.total)}</b>). Indica el respaldo bancario para la conciliación.</div>
+        <label style="display:grid;gap:4px;font-size:12px"><span class="muted">Banco / cuenta</span><input class="o-sel" id="fc-banco" placeholder="Ej. Banco Industrial · Cta 001-…"></label>
+        <label style="display:grid;gap:4px;font-size:12px"><span class="muted">Referencia / N.º de depósito</span><input class="o-sel" id="fc-ref" placeholder="Ej. DEP-48213"></label>
+        <label style="display:grid;gap:4px;font-size:12px"><span class="muted">Fecha de cobro</span><input class="o-sel" type="date" id="fc-fecha" value="${Orbit.ui.today()}"></label>
+      </div>
+      <div style="padding:13px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="fc-cancel">Cancelar</button>
+        <button class="btn primary" id="fc-ok">✓ Confirmar cobro</button>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#fc-x').addEventListener('click', close);
+    back.querySelector('#fc-cancel').addEventListener('click', close);
+    back.querySelector('#fc-ok').addEventListener('click', () => {
+      const banco = back.querySelector('#fc-banco').value.trim();
+      const ref = back.querySelector('#fc-ref').value.trim();
+      const fecha = back.querySelector('#fc-fecha').value || Orbit.ui.today();
+      const bit = (f.bitacora || []).slice();
+      bit.push({ ts: fecha, t: 'Factura cobrada — ingreso real registrado' + (ref ? ' · ref ' + ref : '') + (banco ? ' · ' + banco : ''), quien: (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Equipo' });
+      S().update('facturas', f.id, { estado: 'cobrada', bitacora: bit, fechaCobro: fecha, cobro: { banco, ref, fecha } });
+      const fmid = 'fmv_fac_' + f.id;
+      if (!S().get('finmovs', fmid)) S().insert('finmovs', { id: fmid, periodo: (fecha || '').slice(0, 7), dia: +fecha.slice(8, 10) || 1, tipo: 'ingreso', clase: 'Comisión cobrada', categoria: 'Comisión cobrada', concepto: 'Cobro factura ' + f.numero + ' · ' + ((q.aseguradora(f.aseguradoraId) || {}).nombre || ''), valor: f.total, moneda: f.moneda, pais: f.pais, estado: 'recaudado', aseguradoraId: f.aseguradoraId, facturaId: f.id, facturaNum: f.numero, banco, refBanco: ref });
+      close();
+      Orbit.ui.toast('✓ Factura ' + f.numero + ' cobrada' + (ref ? ' · ref ' + ref : '') + ' — ingreso real registrado');
+      render(document.getElementById('host'));
+    });
+  }
+
+  /* Ver / reimprimir una factura YA emitida (documento de solo lectura desde el store). */
+  function verFactura(facId) {
+    const f = S().get('facturas', facId); if (!f) return;
+    const asg = q.aseguradora(f.aseguradoraId) || {};
+    const t = Orbit.tenant.get();
+    const M = n => U.money(n, f.moneda);
+    const estadoLbl = f.estado === 'cobrada' ? '✅ Cobrada' : f.estado === 'anulada' ? '— Anulada' : '🕓 Por cobrar';
+    let back = document.getElementById('fin-verfac'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-verfac'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 98;
+    back.innerHTML = `<div class="card" style="width:min(620px,96vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🧾 Factura ${U.esc(f.numero)} · ${U.esc(asg.nombre || '')}</b><button class="imp-x" id="vf-x">✕</button></div>
+      <div style="padding:20px" id="vf-doc">
+        <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+          <div><div class="muted" style="font-size:11px">EMISOR</div><b>${U.esc(t.empresa || 'Tu empresa')}</b>${t.nit ? '<div style="font-size:12px">NIT: ' + U.esc(t.nit) + '</div>' : ''}</div>
+          <div style="text-align:right"><div class="muted" style="font-size:11px">FACTURA</div><b class="mono">${U.esc(f.numero)}</b><div style="font-size:12px">${U.fmtDate(f.fecha)}</div><div style="font-size:11.5px;margin-top:3px">${estadoLbl}</div></div>
+        </div>
+        <div style="background:var(--surface);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+          <div class="muted" style="font-size:11px">FACTURAR A</div>
+          <b>${U.esc(f.razonSocial || asg.nombre || '')}</b>
+          ${f.nit ? '<div style="font-size:12.5px">NIT/ID: <b>' + U.esc(f.nit) + '</b></div>' : ''}
+        </div>
+        <table class="tbl"><thead><tr><th>Concepto</th><th class="num">Valor</th></tr></thead><tbody>
+          <tr><td>${U.esc(f.concepto || 'Comisiones por intermediación de seguros')}<div class="muted" style="font-size:11.5px">${f.cuotas || (f.comisionIds ? f.comisionIds.length : 0)} cuotas · prima neta recaudada del periodo</div></td><td class="num"><b>${M(f.base)}</b></td></tr>
+          <tr><td>IVA (${f.ivaPct}%)</td><td class="num">${M(f.iva)}</td></tr>
+          <tr style="border-top:2px solid var(--ink)"><td><b>TOTAL A COBRAR</b></td><td class="num"><b style="font-size:16px;color:var(--red)">${M(f.total)}</b></td></tr>
+        </tbody></table>
+        ${(f.estado === 'cobrada' && f.cobro) ? `<div class="cfg-note" style="margin-top:12px;border-left:3px solid var(--ok)">💵 Cobrada el ${U.fmtDate(f.cobro.fecha)}${f.cobro.banco ? ' · ' + U.esc(f.cobro.banco) : ''}${f.cobro.ref ? ' · ref ' + U.esc(f.cobro.ref) : ''}.</div>` : ''}
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="vf-print">🖨 Imprimir / PDF</button>
+        <button class="btn primary" id="vf-close">Cerrar</button>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#vf-x').addEventListener('click', close);
+    back.querySelector('#vf-close').addEventListener('click', close);
+    back.querySelector('#vf-print').addEventListener('click', () => { const w = window.open('', '_blank'); w.document.write('<html><head><title>' + f.numero + '</title></head><body>' + back.querySelector('#vf-doc').innerHTML + '</body></html>'); w.document.close(); w.print(); });
   }
 
   /* ---------- LIQUIDACIÓN ASESORES ---------- */
@@ -658,14 +865,49 @@ Orbit.modules.finanzas = (function () {
     const mesAnt = mi > 0 ? ingS.cur[mi - 1] : 0;
     const varMM = mesAnt > 0 ? Math.round((ingS.cur[mi] - mesAnt) / mesAnt * 100) : 0;
     const util = acumI - acumE;
+    // --- tablas de respaldo + general→particular (mes seleccionado) ---
+    const mk = mesSel, cur = paisFin() === 'CO' ? 'COP' : 'GTQ';
+    const primaMesEmp = primaNetaMes(mk);
+    // por VENDEDOR (prima neta del mes, recaudo, comisión generada, participación)
+    const board = q.leaderboard ? q.leaderboard() : [];
+    const vend = S().all('asesores').map(a => {
+      const prima = primaNetaMes(mk, po => po.asesorId === a.id);
+      const rec = recaudoMes(mk, po => po.asesorId === a.id);
+      const com = S().where('comisiones', c => c.asesorId === a.id).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
+      return { a, prima, rec, com };
+    }).filter(v => v.prima > 0 || v.rec > 0).sort((x, y) => y.prima - x.prima);
+    const vendTot = vend.reduce((s, v) => s + v.prima, 0) || 1;
+    // por ASEGURADORA
+    const asg = S().all('aseguradoras').map(g => {
+      const prima = primaNetaMes(mk, po => po.aseguradoraId === g.id);
+      const npol = S().where('polizas', po => po.aseguradoraId === g.id && (po.vigenciaInicio || '').slice(0, 7) === mk).length;
+      return { g, prima, npol };
+    }).filter(r => r.prima > 0).sort((x, y) => y.prima - x.prima);
+    const asgTot = asg.reduce((s, r) => s + r.prima, 0) || 1;
+    // intermensual: variación mes a mes
+    const momRows = MESES.slice(Math.max(0, mi - 5), mi + 1).map((m, idx) => { const real = mi - 5 + idx; const ing = ingS.cur[real] || 0, egr = egrS.cur[real] || 0, prev = real > 0 ? (ingS.cur[real - 1] || 0) : 0; return { m, ing, egr, mom: prev ? Math.round((ing - prev) / prev * 100) : 0 }; });
+    // análisis crítico (hallazgos reales)
+    const findings = [];
+    if (vend.length) { const top = vend[0]; findings.push(`<b>${U.esc(top.a.nombre)}</b> lidera la producción del mes con ${U.money(top.prima, cur)} (${Math.round(top.prima / vendTot * 100)}% del total).`); }
+    const bajo = vend.filter(v => v.prima > 0).sort((a, b) => (a.rec / (a.prima || 1)) - (b.rec / (b.prima || 1)))[0];
+    if (bajo && bajo.prima) findings.push(`<b>${U.esc(bajo.a.nombre)}</b> tiene el menor índice recaudo/venta (${Math.round(bajo.rec / bajo.prima * 100)}%) — priorizar cobranza de su cartera.`);
+    if (asg.length) { const c = asg[0]; const conc = Math.round(c.prima / asgTot * 100); if (conc >= 35) findings.push(`Concentración en <b>${U.esc(c.g.nombre)}</b>: ${conc}% de la prima del mes — riesgo de dependencia, diversificar.`); }
+    if (varIA < 0) findings.push(`Ingresos acumulados caen <b>${Math.abs(varIA)}%</b> vs ${ingS.y - 1} — revisar renovaciones y cartera vencida.`);
+    else findings.push(`Ingresos acumulados crecen <b>+${varIA}%</b> vs ${ingS.y - 1}; margen operativo del periodo: ${acumI ? Math.round(util / acumI * 100) : 0}%.`);
+    const recEmp = recaudoMes(mk); if (primaMesEmp && recEmp / primaMesEmp < 0.7) findings.push(`Recaudo del mes es ${Math.round(recEmp / primaMesEmp * 100)}% de la venta — brecha de cobranza a vigilar.`);
+    const tbl = (titulo, head, body) => `<div class="card" style="overflow:hidden;margin-bottom:14px"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">${titulo}</div><div style="overflow-x:auto"><table class="tbl"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>`;
     return `${K.kpis([
       { label: 'Ingresos acum.', val: M(acumI), color: 'var(--ok)', foot: 'Ene→' + MESES[mi] + ' ' + ingS.y },
       { label: 'Utilidad operativa', val: M(util), color: 'var(--red)', foot: 'ingresos − egresos' },
       { label: 'Var. interanual', val: (varIA >= 0 ? '+' : '') + varIA + '%', color: varIA >= 0 ? 'var(--ok)' : 'var(--danger)', foot: 'vs ' + (ingS.y - 1), footTone: varIA >= 0 ? 'up' : 'down' },
       { label: 'Intermensual', val: (varMM >= 0 ? '+' : '') + varMM + '%', color: 'var(--info)', foot: MESES[mi] + ' vs ' + (mi > 0 ? MESES[mi - 1] : '—'), footTone: varMM >= 0 ? 'up' : 'down' }
     ])}
+    <div class="card pad" style="margin-bottom:14px;border-left:3px solid var(--graph)"><b style="font-family:var(--f-display);font-size:15px">🤖 Análisis crítico · ${MESES[mi]} ${ingS.y}</b><ul class="ins-recs" style="margin:10px 0 0;padding-left:18px;line-height:1.7">${findings.map(f => '<li>' + f + '</li>').join('')}</ul></div>
     ${card2('Ingresos vs egresos · ' + ingS.y + ' (intermensual)', dualBars(MESES, ingS.cur, egrS.cur, 'Ingresos', 'Egresos'))}
-    ${card2('Comparativo interanual de ingresos · ' + (ingS.y - 1) + ' vs ' + ingS.y, dualBars(MESES, ingS.prev, ingS.cur, ingS.y - 1 + '', ingS.y + ''))}`;
+    ${tbl('Detalle intermensual (respaldo del gráfico)', '<th>Mes</th><th class="num">Ingresos</th><th class="num">Egresos</th><th class="num">Resultado</th><th class="num">Δ Ingresos MoM</th>', momRows.map(r => `<tr><td>${r.m} ${ingS.y}</td><td class="num" style="color:var(--ok)">${M(r.ing)}</td><td class="num" style="color:var(--danger)">${M(r.egr)}</td><td class="num"><b>${M(r.ing - r.egr)}</b></td><td class="num" style="color:${r.mom >= 0 ? 'var(--ok)' : 'var(--danger)'}">${r.mom >= 0 ? '▲' : '▼'} ${Math.abs(r.mom)}%</td></tr>`).join(''))}
+    ${card2('Comparativo interanual de ingresos · ' + (ingS.y - 1) + ' vs ' + ingS.y, dualBars(MESES, ingS.prev, ingS.cur, ingS.y - 1 + '', ingS.y + ''))}
+    ${tbl('📊 Producción por vendedor · ' + MESES[mi] + ' ' + ingS.y, '<th>Vendedor</th><th class="num">Prima neta</th><th class="num">% del total</th><th class="num">Recaudo</th><th class="num">Índice recaudo</th><th class="num">Comisión gen.</th>', vend.map(v => `<tr><td><div style="display:flex;align-items:center;gap:8px">${U.avatar(v.a.nombre, v.a.color, 'sm')}<b>${U.esc(v.a.nombre)}</b></div></td><td class="num"><b>${U.money(v.prima, cur)}</b></td><td class="num">${Math.round(v.prima / vendTot * 100)}%</td><td class="num" style="color:var(--info)">${U.money(v.rec, cur)}</td><td class="num" style="color:${v.prima && v.rec / v.prima >= 0.7 ? 'var(--ok)' : 'var(--warn)'}">${v.prima ? Math.round(v.rec / v.prima * 100) : 0}%</td><td class="num">${U.money(v.com, cur)}</td></tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:18px">Sin producción en el mes.</td></tr>')}
+    ${tbl('🏛️ Producción por aseguradora · ' + MESES[mi] + ' ' + ingS.y, '<th>Aseguradora</th><th class="num">Prima neta</th><th class="num">% del total</th><th class="num">Pólizas</th>', asg.map(r => `<tr><td><span style="display:flex;align-items:center;gap:8px"><span class="dot-s" style="background:${r.g.color || '#888'}"></span><b>${U.esc(r.g.nombre)}</b></span></td><td class="num"><b>${U.money(r.prima, cur)}</b></td><td class="num">${Math.round(r.prima / asgTot * 100)}%</td><td class="num">${r.npol}</td></tr>`).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:18px">Sin producción en el mes.</td></tr>')}`;
   }
   function card2(t, body) { return `<div class="card pad" style="margin-bottom:14px"><b style="font-family:var(--f-display);font-size:15px">${t}</b><div style="margin-top:14px">${body}</div></div>`; }
   function dualBars(labels, a, b, la, lb) {
@@ -700,8 +942,8 @@ Orbit.modules.finanzas = (function () {
       <button class="btn primary sm" onclick="Orbit.modules.finanzas.editarPresup(null)">+ Partida</button>
       <button class="btn ghost sm" onclick="Orbit.modules.finanzas.replicarPresup()">📋 Replicar mes anterior</button>
     </div>
-    <div class="card" style="overflow:hidden"><table class="tbl"><thead><tr><th>Categoría</th><th class="num">Presupuesto</th><th class="num">Real</th><th class="num">%</th><th>Semáforo</th></tr></thead>
-      <tbody>${rows.map(r => { const pct = Math.round(r.real / (r.ppto || 1) * 100); return `<tr class="clickable" onclick="Orbit.modules.finanzas.editarPresup('${r.id}')" title="Editar / eliminar partida"><td><b>${U.esc(r.cat)}</b></td><td class="num">${U.money(r.ppto, cur)}</td><td class="num">${U.money(r.real, cur)}</td><td class="num">${pct}%</td><td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${sem(pct)}"></span> ${pct <= 100 ? 'OK' : pct <= 115 ? 'Alerta' : 'Desviado'}</td></tr>`; }).join('') || `<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin partidas para ${lbl}. Usa “+ Partida” o “Replicar mes anterior”.</td></tr>`}</tbody></table></div>`;
+    <div class="card" style="overflow:hidden"><table class="tbl"><thead><tr><th>Categoría</th><th class="num">Presupuesto</th><th class="num">Real</th><th class="num">%</th><th>Semáforo</th><th>Pago</th></tr></thead>
+      <tbody>${rows.map(r => { const pct = Math.round(r.real / (r.ppto || 1) * 100); const src = S().get('presupuesto', r.id) || {}; const fp = src.fechaPago || ''; const pagado = r.real >= r.ppto; const atrasado = fp && !pagado && fp < Orbit.ui.today(); const estP = pagado ? '<span class="badge ok">✅ pagado</span>' : atrasado ? '<span class="badge danger">⏰ atrasado</span>' : fp ? '<span class="badge info">🕓 en tiempo</span>' : '<span class="muted">—</span>'; return `<tr class="clickable" onclick="Orbit.modules.finanzas.editarPresup('${r.id}')" title="Editar / eliminar partida"><td><b>${U.esc(r.cat)}</b></td><td class="num">${U.money(r.ppto, cur)}</td><td class="num">${U.money(r.real, cur)}</td><td class="num">${pct}%</td><td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${sem(pct)}"></span> ${pct <= 100 ? 'OK' : pct <= 115 ? 'Alerta' : 'Desviado'}</td><td>${estP}${fp ? ' <span class="muted" style="font-size:11px">' + U.fmtDate(fp) + '</span>' : ''}</td></tr>`; }).join('') || `<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">Sin partidas para ${lbl}. Usa “+ Partida” o “Replicar mes anterior”.</td></tr>`}</tbody></table></div>`;
   }
   function editarPresup(id) {
     const p = paisFin() || 'GT', cur = p === 'GT' ? 'GTQ' : 'COP';
@@ -719,6 +961,8 @@ Orbit.modules.finanzas = (function () {
           <label class="ce-l">Clasificación<select id="pp-clase" class="o-sel">${clases.map(c => `<option ${rec && rec.clase === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
           <label class="ce-l">Monto (${cur})<input id="pp-monto" class="o-sel" type="number" value="${rec ? rec.monto : 0}"></label>
         </div>
+        <label class="ce-l">Fecha de pago<input id="pp-fpago" class="o-sel" type="date" value="${rec && rec.fechaPago ? rec.fechaPago : (mesSel + '-05')}"></label>
+        <div class="cfg-note">La fecha de pago define si la partida está <b>en tiempo</b> o <b>atrasada</b> y alimenta las notificaciones de pago.</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between">
         ${rec ? '<button class="btn ghost" id="pp-del" style="color:var(--danger)">🗑 Eliminar</button>' : '<span></span>'}
@@ -730,7 +974,7 @@ Orbit.modules.finanzas = (function () {
     $('#pp-x').addEventListener('click', close); $('#pp-cancel').addEventListener('click', close);
     if ($('#pp-del')) $('#pp-del').addEventListener('click', () => { S().remove('presupuesto', id); close(); render(document.getElementById('host')); });
     $('#pp-ok').addEventListener('click', () => {
-      const data = { categoria: $('#pp-cat').value || 'Partida', clase: $('#pp-clase').value, monto: +$('#pp-monto').value || 0, pais: rec ? rec.pais : p, periodo: rec ? rec.periodo : mesSel };
+      const data = { categoria: $('#pp-cat').value || 'Partida', clase: $('#pp-clase').value, monto: +$('#pp-monto').value || 0, fechaPago: $('#pp-fpago').value || '', pais: rec ? rec.pais : p, periodo: rec ? rec.periodo : mesSel };
       if (rec) S().update('presupuesto', id, data); else S().insert('presupuesto', Object.assign({ id: 'ppt' + Date.now().toString().slice(-7) }, data));
       close(); render(document.getElementById('host'));
     });
@@ -880,5 +1124,5 @@ Orbit.modules.finanzas = (function () {
         : '⚠️ Conecta un proveedor de IA en Configuración → Automatizaciones → Motor de IA para análisis en vivo. (Sin IA, el análisis de arriba usa la heurística de la plataforma.)';
     });
   }
-  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
+  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, metasSugerir, facturaAseg, facturaAccion, verFactura, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
 })();

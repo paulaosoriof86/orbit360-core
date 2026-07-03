@@ -2,6 +2,30 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [1.93.0] — 2026-07-03 · Consolidado v1.56–v1.93 (auditorías P0/P1 + profundización de módulos)
+> Entrada consolidada para realinear el CHANGELOG con la bitácora viva (`docs/BITACORA-CAMBIOS.md`), que tiene el detalle versión por versión.
+
+### Contabilidad y Finanzas
+- **Regla contable recaudo ≠ `finmov`** (v1.83): el pago de póliza del cliente es recaudo comercial, no movimiento de caja; se revirtió el `postRecaudo`→finmovs.
+- **Factura a aseguradora = CxC, no caja** (v1.86, v1.89, v1.92): la factura de comisiones se emite a la colección `facturas` (estado `por_cobrar`), con número **secuencial**, idempotencia por aseguradora+periodo, anulación/reversión y bitácora. El `finmov` (ingreso real) solo nace al **cobrar**. v1.92 añadió trazabilidad: enlace a las **comisiones** que factura (`comisionIds`) y **respaldo bancario** (banco/referencia/fecha) en el cobro.
+- **Conciliación de planillas/statements de comisión** (v1.84): compara esperado (tarifas vigentes) vs registrado; detecta drift.
+- **Finanzas profundo** (v1.80–v1.82): dashboard analítico, metas real vs ideal, presupuesto con fecha de pago, insights de concentración por aseguradora.
+- **Config fiscal multi-tenant** (v1.87): `tenant.paisesCfg` como fuente única de IVA/moneda/gastos por país. Moneda por país sin mezclar (v1.62).
+- **Modelo de comisión de asesor unificado** con `Orbit.comeng` (v1.91).
+
+### Arquitectura y saneamiento
+- **Sin `localStorage` directo en módulos** (v1.61, v1.89): capa `pref/setPref`; logo white-label vía `Orbit.tenant`. 
+- **IA centralizada** en `Orbit.ia.complete` (v1.90): punto único de llamada al modelo.
+- **Fechas vivas** (v1.64, v1.75): el demo sigue la fecha real del sistema; sin literales quemados (v1.74).
+- **Auditoría de salud de render 28/28** (v1.79) + limpieza de código muerto.
+- **Seed 100% ficticio / identidad ficticia** (v1.89, v1.93): sin nombres reales (asesor demo "Valeria Morán"; usuario de sesión "Andrea Beltrán").
+
+### Módulos (profundización §4)
+- **Portal → Ops/Siniestro canónico** (v1.63, v1.76–v1.77); **notify** cliente por WhatsApp/correo (v1.65).
+- **Importadores** con dry-run + dedupe visible (v1.66).
+- Cancelaciones (v1.68), Marketing (v1.69), Siniestros (v1.70), Renovaciones (v1.71), Insights (v1.72, v1.82), Pólizas (v1.73), Historial/Reportes/Comisiones profundizados.
+- **Academia**: visor unificado (v1.85) + cursos profundizados (v1.88).
+
 ## [1.55.0] — 2026-07-01 · Demo standalone + handoff regenerados
 ### Changed
 - **`Orbit360-demo-standalone.html`** regenerado desde el estado actual (v1.54): incluye todos los módulos profundizados (Finanzas, Cobros, Metas, Plantillas, Reportes, Comisiones, Historial). Archivo único autocontenido para demo offline.
