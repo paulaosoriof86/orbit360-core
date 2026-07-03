@@ -72,6 +72,7 @@ Si no está en esa rama, debe detenerse y corregir el carril antes de tocar arch
 - Auth LAB cuando corresponda.
 - Documentación técnica backend A&S.
 - Backlog para Claude derivado de hallazgos backend.
+- Empalme aditivo del nuevo prototipo solo si conserva backend LAB, `Orbit.store`, tenant, scripts y documentación.
 
 ## 7. Qué no se debe hacer sin autorización explícita
 
@@ -82,6 +83,7 @@ Si no está en esa rama, debe detenerse y corregir el carril antes de tocar arch
 - Cargar datos reales en código, `seed.js` o prototipo demo.
 - Usar rama de prototipo para backend.
 - Reemplazar backend validado por ZIP nuevo de Claude.
+- Entregar ZIPs/paquetes descargables a Paula si no los pide expresamente.
 
 ## 8. Regla para nuevos prototipos Claude
 
@@ -92,10 +94,12 @@ Cuando Claude entregue un ZIP nuevo:
 3. No se cambia esta rama backend automáticamente.
 4. Solo se empalma frontend si no rompe `Orbit.store`, tenant, Auth, reglas ni datos reales.
 5. Todo hallazgo que Claude deba absorber se registra en backlog Claude.
+6. Todo ajuste hecho por ChatGPT/Codex también se documenta para que Claude lo conserve en el prototipo base.
 
-## 9. Estado
+## 9. Estado v1.104
 
 **Estado:** ACTIVO Y OBLIGATORIO.  
 **Rama vigente:** `ays/backend-tenant-lab-v99-20260703`.  
 **PR vigente:** `#5`.  
-**Siguiente paso:** continuar smoke LAB A&S y migración real por bloques sobre esta rama.
+**Último bloque aplicado:** Backend LAB v1.104 — loader/init endurecidos, guard de seguridad para secretos/auth, script de integración local actualizado y validador estático agregado.  
+**Siguiente paso:** empalme completo/aditivo del candidato Claude final sin reemplazar backend LAB; luego smoke local real y continuidad Firestore/Auth por fases.
