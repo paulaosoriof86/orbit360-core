@@ -72,3 +72,13 @@
 - **Fix o mejora aplicada:** Se creó script que inserta `core/backend-lab-loader.js` y `core/backend-lab-init.js` antes de `data/store.js` solo si faltan, verifica orden y deja reporte en Notepad/portapapeles.
 - **Impacto en prototipo comercializable:** Reduce riesgo de mojibake y deja camino controlado para activar index central LAB sin tocar producción.
 - **Estado:** LISTO PARA EJECUCIÓN LOCAL.
+
+## 2026-07-03 — Run maestro A&S LAB v99
+
+- **Módulo/área:** Backend LAB / QA / automatización local.
+- **Síntoma/necesidad:** Reducir trabajo manual de Paula y evitar ejecutar scripts en orden incorrecto.
+- **Esperado:** Un único flujo que sincronice rama obligatoria, ejecute integración local del index y ejecute smoke LAB, generando reporte maestro.
+- **Archivo/función:** `tools/orbit360-run-flujo-ays-lab-v99.ps1`, `orbit360-platform/docs/RUN-FLUJO-AYS-LAB-V99-20260703.md`.
+- **Fix o mejora aplicada:** Se creó script maestro sin deploy/commit/push que ejecuta `orbit360-integrar-backend-lab-index.ps1` y `orbit360-smoke-ays-lab-v99.ps1`, copia reporte al portapapeles y abre Notepad.
+- **Impacto en prototipo comercializable:** Facilita validar backend LAB completo antes de cargar datos reales.
+- **Estado:** LISTO PARA EJECUCIÓN LOCAL.
