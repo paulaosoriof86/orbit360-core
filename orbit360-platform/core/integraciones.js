@@ -6,7 +6,7 @@
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.integraciones = (function () {
-  const API_VERSION = 'v0.5-lab-mock-loader';
+  const API_VERSION = 'v0.6-safe-pref-guard';
   const STRUCT_VERSION = 37;
   let panelLoading = false;
   let labMockLoading = false;
@@ -54,6 +54,7 @@ Orbit.integraciones = (function () {
   }
 
   extendSeed();
+  installSafePrefGuard();
 
   function S() { return Orbit.store; }
   function nowIso() {
@@ -86,6 +87,32 @@ Orbit.integraciones = (function () {
       return v;
     }
     return clean(obj || {}, '');
+  }
+  function sanitizeIntegrationPref(prefKey, value) {
+    const v = value && typeof value === 'object' ? value : {};
+    const hasInput = !!(v.key || v.url || v.user || v.activa);
+    return {
+      id: String(prefKey || '').replace(/^integ_/, ''),
+      activa: !!v.activa,
+      configured: hasInput,
+      estado: v.activa ? 'pendiente_backend' : 'pendiente_configuracion',
+      userRef: v.user ? 'capturado_no_sensible' : '',
+      credentialRef: (v.key || v.url) ? 'backend_required' : '',
+      webhookRef: v.url ? 'backend_required' : '',
+      updatedAt: new Date().toISOString(),
+      note: 'Configuracion sanitizada: no se guardan credenciales ni endpoints reales en frontend.'
+    };
+  }
+  function installSafePrefGuard() {
+    try {
+      if (!Orbit.store || !Orbit.store.setPref || Orbit.__integracionesPrefGuard) return;
+      const original = Orbit.store.setPref.bind(Orbit.store);
+      Orbit.store.setPref = function (key, value) {
+        if (/^integ_/.test(String(key || ''))) value = sanitizeIntegrationPref(key, value);
+        return original(key, value);
+      };
+      Orbit.__integracionesPrefGuard = true;
+    } catch (e) {}
   }
   function findAutomation(evento) {
     try {
@@ -210,5 +237,5 @@ Orbit.integraciones = (function () {
     try { return S().update('eventosIntegracion', idEvento, patch); }
     catch (e) { return null; }
   }
-  return { emit, status, list, resumen, diagnostico, openPanel, ensureLabMock, labMock, mark, extendSeed, version: API_VERSION };
+  return { emit, status, list, resumen, diagnostico, openPanel, ensureLabMock, labMock, mark, extendSeed, sanitizeIntegrationPref, version: API_VERSION };
 })();
