@@ -39,7 +39,7 @@ Orbit.auth = (function () {
 
   function authed() { try { return !!localStorage.getItem(KEY); } catch (e) { return false; } }
   function login(user) {
-    try { localStorage.setItem(KEY, JSON.stringify(user || { nombre: 'Paula Osorio', rol: 'Dirección', email: 'admin@demo.com' })); } catch (e) {}
+    try { localStorage.setItem(KEY, JSON.stringify(user || { nombre: 'Andrea Beltrán', rol: 'Dirección', email: 'admin@demo.com' })); } catch (e) {}
   }
   function logout() { try { localStorage.removeItem(KEY); } catch (e) {} location.reload(); }
   function user() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
@@ -69,7 +69,7 @@ Orbit.auth = (function () {
     if (form) form.addEventListener('submit', e => {
       e.preventDefault();
       const email = (document.getElementById('lg-user') || {}).value || 'admin@demo.com';
-      login({ nombre: 'Paula Osorio', rol: 'Dirección', email });
+      login({ nombre: 'Andrea Beltrán', rol: 'Dirección', email });
       showApp();
     });
     const reset = document.getElementById('lg-reset');

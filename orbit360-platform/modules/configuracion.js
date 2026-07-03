@@ -56,7 +56,7 @@ Orbit.modules.configuracion = (function () {
     return `${sectionHead('Marca y apariencia', 'Logo, paleta y menú — white-label')}
       ${lock ? `<div class="cfg-lock">🔒 El plan <b>${plan.nombre}</b> usa plantillas estándar. La personalización de marca está disponible en planes Profesional y Personalizado.</div>` : ''}
       ${row('Nombre de la empresa', `<input class="o-sel" id="cf-empresa" value="${U.esc(t.empresa)}" ${lock ? 'disabled' : ''} style="min-width:240px">`)}
-      ${row('Logo del cliente', `<div style="display:flex;align-items:center;gap:10px"><span class="cfg-logo">${t.branding.logo ? `<img src="${U.esc(t.branding.logo)}">` : '🏢'}</span><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="(function(){var fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.onchange=function(){var r=new FileReader();r.onload=function(e){try{localStorage.setItem('orbit360_logo',e.target.result);}catch(x){}try{var b=Orbit.tenant.get().branding||{};b.logo=e.target.result;Orbit.tenant.setDeep('branding',b);}catch(x){}if(Orbit.applyBrand)Orbit.applyBrand();var img=document.getElementById('cfg-logo-prev');if(img){img.src=e.target.result;img.style.display='inline-block';}var t=document.createElement('div');t.className='ciclo-toast';t.textContent='\u2713 Logo aplicado en cintilla y login';document.body.appendChild(t);setTimeout(function(){t.remove();},2600);};r.readAsDataURL(fi.files[0]);};fi.click();})()">Subir logo</button><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="(function(){try{localStorage.removeItem('orbit360_logo');var b=Orbit.tenant.get().branding||{};b.logo='';Orbit.tenant.setDeep('branding',b);}catch(x){}if(Orbit.applyBrand)Orbit.applyBrand();})()">Quitar</button><img id="cfg-logo-prev" style="height:36px;border-radius:6px;margin-left:8px;vertical-align:middle;display:none"></div>`, 'Se refleja en la cintilla y el login. Sube el logo del cliente para white-label.')}
+      ${row('Logo del cliente', `<div style="display:flex;align-items:center;gap:10px"><span class="cfg-logo">${t.branding.logo ? `<img src="${U.esc(t.branding.logo)}">` : '🏢'}</span><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="(function(){var fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.onchange=function(){var r=new FileReader();r.onload=function(e){try{Orbit.store.setPref('logo',e.target.result);}catch(x){}try{var b=Orbit.tenant.get().branding||{};b.logo=e.target.result;Orbit.tenant.setDeep('branding',b);}catch(x){}if(Orbit.applyBrand)Orbit.applyBrand();var img=document.getElementById('cfg-logo-prev');if(img){img.src=e.target.result;img.style.display='inline-block';}var t=document.createElement('div');t.className='ciclo-toast';t.textContent='\u2713 Logo aplicado en cintilla y login';document.body.appendChild(t);setTimeout(function(){t.remove();},2600);};r.readAsDataURL(fi.files[0]);};fi.click();})()">Subir logo</button><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="(function(){try{Orbit.store.setPref('logo','');var b=Orbit.tenant.get().branding||{};b.logo='';Orbit.tenant.setDeep('branding',b);}catch(x){}if(Orbit.applyBrand)Orbit.applyBrand();})()">Quitar</button><img id="cfg-logo-prev" style="height:36px;border-radius:6px;margin-left:8px;vertical-align:middle;display:none"></div>`, 'Se refleja en la cintilla y el login. Sube el logo del cliente para white-label.')}
       ${row('Paleta de marca', `<button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.theme.picker(this)">🎨 Elegir paleta</button>`, 'Cambia el acento en toda la plataforma')}
       ${row('Menú lateral', `<div class="cfg-seg" id="cf-sb">${['oscuro', 'claro'].map(m => `<button data-sb="${m}" class="${Orbit.theme.getSidebar() === m ? 'on' : ''}" ${lock ? 'disabled' : ''}>${m === 'oscuro' ? 'Oscuro' : 'Claro'}</button>`).join('')}</div>`)}
       ${row('Auto-branding por IA', `<button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.modules.configuracion.subirManualMarca()">📄 Subir manual de marca</button>`, 'La IA lee tu manual y propone tipografía y colores corporativos (plan Personalizado)')}
@@ -371,10 +371,10 @@ Orbit.modules.configuracion = (function () {
         back.querySelector('#ba-x').onclick = () => back.remove(); back.querySelector('#ba-close').onclick = () => back.remove();
       };
       const fallback = '<p style="font-size:13.5px;line-height:1.6">Manual <b>' + (f.name) + '</b> recibido. Sugerencia: usá la <b>paleta corporativa</b> de tu manual como acento, tipografía display tipo <b>Manrope/serif institucional</b>, y mantené el grafito para el chrome. Aplicá la paleta abajo.</p>';
-      if (window.claude && window.claude.complete && /\.(txt|md)$/i.test(f.name)) {
+      if (Orbit.ia.disponible() && /\.(txt|md)$/i.test(f.name)) {
         const r = new FileReader();
         r.onload = async () => {
-          try { const out = await window.claude.complete({ messages: [{ role: 'user', content: 'Eres diseñador de marca. De este manual de identidad sugiere en 3-4 líneas: color primario (hex aproximado), tipografía y tono visual para una plataforma de seguros. Manual:\n' + String(r.result).slice(0, 4000) }] }); finish('<p style="font-size:13.5px;line-height:1.6">' + Orbit.ui.esc(String(out)) + '</p>'); }
+          try { const out = await Orbit.ia.complete('Eres diseñador de marca. De este manual de identidad sugiere en 3-4 líneas: color primario (hex aproximado), tipografía y tono visual para una plataforma de seguros. Manual:\n' + String(r.result).slice(0, 4000)); finish('<p style="font-size:13.5px;line-height:1.6">' + Orbit.ui.esc(String(out)) + '</p>'); }
           catch (e) { finish(fallback); }
         };
         r.readAsText(f);
@@ -407,11 +407,14 @@ Orbit.modules.configuracion = (function () {
       const iva = +$('#cp-iva').value || 0, moneda = ($('#cp-moneda').value || 'USD').toUpperCase(), gem = +$('#cp-gem').value || 0;
       try {
         const arr = Orbit.store.pref('paises', []) || [];
-        arr.push({ code, nombre, iva, moneda, gastosEmisionPct: gem });
+        const ix = arr.findIndex(p => (p.code || '').toUpperCase() === code);
+        if (ix >= 0) arr[ix] = { code, nombre, iva, moneda, gastosEmisionPct: gem };
+        else arr.push({ code, nombre, iva, moneda, gastosEmisionPct: gem });
         Orbit.store.setPref('paises', arr);
-        // fuente ÚNICA multi-tenant: guardar la config fiscal en tenant.paisesCfg
+        // fuente ÚNICA multi-tenant: guardar la config fiscal en tenant.paisesCfg (update o insert)
         try { const tn = T().get(); tn.paisesCfg = tn.paisesCfg || {}; tn.paisesCfg[code] = { iva, moneda, gastosEmisionPct: gem }; T().set ? T().set({ paisesCfg: tn.paisesCfg }) : (T().save && T().save(tn)); } catch (e) {}
         if (Orbit.primas && Orbit.primas.registrarPais) Orbit.primas.registrarPais(code, { iva, moneda, gastosEmisionPct: gem });
+        Orbit.ui.toast((ix >= 0 ? '✓ País ' + nombre + ' actualizado' : '✓ País ' + nombre + ' agregado') + ' (IVA ' + iva + '%)');
       } catch (e) {}
       close();
       Orbit.ui.toast('✓ País ' + nombre + ' agregado (IVA ' + iva + '%)');

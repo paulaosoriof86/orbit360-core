@@ -2,6 +2,74 @@
 
 > Registro cronológico de cambios del **prototipo** (Claude). El backend LAB (ChatGPT/Codex) mantiene su propia bitácora. Formato: versión · fecha · qué cambió · archivos.
 
+## v1.97 — 2026-07-03 · Ciclo Ops↔Leads: fechas vivas (fin de fechas congeladas) + auditoría
+- **Defecto real corregido**: `core/ciclo.js` tenía `'2026-06-20'` (y `'2026-06-27'`, `'2026-06-22'`) **hardcodeado** en todos los flujos que CREAN datos — negocios, gestiones, actividades, bitácoras y clientes nacían con fecha congelada, violando la regla de "fechas vivas". Sustituido por helpers locales `today()` / `stamp()` / `inDays(n)` derivados de `Orbit.ui.today()/now()` (ancla real). 5 timestamps, 3 vencimientos (+7d), 1 próximo toque (+2d) y 12 fechas migrados.
+- **Auditoría del ciclo (sin cambios necesarios, confirmado sólido)**: registro único `negocio` proyectado a ambos tableros; `setEtapa` con automatizaciones (nº cotización, cadencia al pasar a Propuesta); `decidirCierre` → reaparece en Ops (Inspección/Emisión); `emitir` crea cliente heredando datos + cadencia de encuestas; `solicitarGestion` desde ficha/portal → Ops asociada a cliente/póliza (tipo seleccionable + crear nuevo + adjuntos + nota); listas editables/reordenables por tablero; sync en vivo (`orbit:ciclo`). **Rol Asesor NO ve Ops** (excluido en `ROLES.Asesor.modulos`; ve su trabajo por Leads) — verificado.
+- Verificado por camino real: gestión y cliente creados hoy (2026-07-03), bitácora con hora real; 0 errores.
+- Cache-bust: `ciclo.js` → `?v1294`.
+- Archivos: `core/ciclo.js`, `index.html`.
+
+
+## v1.96 — 2026-07-03 · Finanzas CxC unificado (incluye facturas de comisión emitidas)
+- **Inconsistencia corregida**: desde v1.89 las facturas de comisión viven en la colección `facturas` (fuera de `finmovs`), así que **no contaban** en el KPI/tab "Por cobrar (CxC)" — solo aparecían en su tabla aparte de Liq. empresa. Ahora el tab **CxC/CxP** suma las facturas `por_cobrar` al **KPI "Por cobrar"** (monto + nº de partidas), las lista en la tarjeta **Cuentas por cobrar** (fila 🧾 con nº y nº de comisiones) y las incluye en el **drill** de CxC.
+- **Interacción coherente**: clic en fila de factura → **ver documento** (`verFactura`); clic en fila de movimiento → editar / cambiar estado (como antes). Moneda respetada por país (`norm`).
+- Verificado por camino real: emitir factura → aparece en CxC con su número, la fila abre el visor; 0 errores.
+- Cache-bust: `finanzas.js` → `?v1294`.
+- Archivos: `modules/finanzas.js`, `index.html`.
+
+
+## v1.95 — 2026-07-03 · Facturas CxC: ver / reimprimir factura emitida
+- **Nuevo `verFactura(facId)`**: reabre una factura ya emitida como **documento de solo lectura** reconstruido desde el store (emisor, facturar-a, base/IVA/total, estado, y — si cobrada — banco/ref/fecha del cobro), con **Imprimir / PDF**. Antes solo se podía imprimir en el momento de emitir; ahora se reimprime/reenvía cuando haga falta.
+- Botón **🖨 Ver** añadido en cada fila de la tabla de facturas de comisión (CxC), junto a Registrar cobro / Anular.
+- Verificado por camino real: emitir → 🖨 Ver abre el documento con número/total/impresión; 0 errores.
+- Cache-bust: `finanzas.js` → `?v1293`.
+- Archivos: `modules/finanzas.js`, `index.html`.
+
+
+## v1.94 — 2026-07-03 · Cierre P0 paquete V188 (CHANGELOG alineado + limpieza)
+- **P0.1 — `CHANGELOG.md` realineado**: estaba en [1.55.0] mientras la bitácora iba en v1.93. Añadida **entrada consolidada [1.93.0]** que cubre v1.56→v1.93 agrupada por área (Contabilidad/Finanzas, Arquitectura, Módulos), remitiendo a la bitácora para el detalle.
+- **P0.7 — sin duplicados**: verificado (sin `.bak/.old/.tmp`, sin `index-copy/dev`, sin `orbit360-platform` anidado). Eliminado artefacto suelto `.verify-academia.png`.
+- **Estado P0 V188**: P0.1 ✅ · P0.2 ✅ (regla recaudo≠finmov) · P0.3 ✅ (factura CxC + trazabilidad v1.92) · P0.4 ✅ (sin localStorage en módulos) · P0.5 ✅ (seed + identidad ficticia v1.93) · P0.6 ✅ (sin notas técnicas en UI) · P0.7 ✅.
+- Archivos: `CHANGELOG.md`, `docs/BITACORA-CAMBIOS.md`.
+
+
+## v1.93 — 2026-07-03 · P0.5 identidad de sesión ficticia (sin nombres reales en el chrome)
+- **"Paula Osorio" seguía hardcodeado** como usuario logueado en el chrome: `index.html` (topbar `<b>Paula Osorio</b>` + avatar "PO", estáticos — nada los sobrescribía) y `core/auth.js` (nombre por defecto del login, 2 ocurrencias). El seed ya se había saneado (v1.89 → "Valeria Morán"), pero la **identidad de sesión** no.
+- **Reemplazado por director ficticio**: **"Andrea Beltrán"** · avatar "AB" · Dirección. Distinto del asesor demo (Valeria Morán) para no confundir roles. Migración suave: si la sesión persistida traía el nombre viejo, se actualiza al ficticio.
+- Verificado en vivo: topbar "Andrea Beltrán"/"AB", 0 ocurrencias de "Paula" en el render, 0 errores. Sin notas técnicas (Firebase/Firestore/LAB) visibles en módulos.
+- Cache-bust: `auth.js` → `?v1292`.
+- Archivos: `index.html`, `core/auth.js`.
+
+
+## v1.92 — 2026-07-03 · P0.3 factura de comisión: trazabilidad (enlace planilla + respaldo bancario)
+- **Enlace factura ↔ comisiones (planilla/statement)**: al emitir, `facturaAseg()` guarda `comisionIds[]` — snapshot de las comisiones devengadas (no liquidadas) de esa aseguradora que la factura factura. La tabla de CxC muestra **"cubre N com."** bajo el número. Da trazabilidad: qué líneas de comisión respalda cada factura (sin entidad `statements` persistida, el set de comisiones ES la planilla).
+- **Enlace factura ↔ banco (respaldo del cobro)**: `facturaAccion(id,'cobrar')` ahora abre un modal (`cobrarFacturaModal`) que captura **banco/cuenta**, **referencia/N.º de depósito** y **fecha de cobro**. Se guardan en la factura (`cobro:{banco,ref,fecha}`) y en el `finmov` `recaudado` (`banco`, `refBanco`); el `finmov` deriva su periodo de la **fecha de cobro** (base caja). La tabla de CxC muestra banco·ref bajo el badge "cobrada". La bitácora de la factura registra el ref.
+- **Regla intacta**: emitir factura = CxC sin `finmov`; el `finmov` (dinero real) solo nace al cobrar; anular revierte el `finmov`. Verificado por camino real (emit→por_cobrar, comisionIds=2, cobro con banco/ref→`finmov` recaudado con `refBanco`, moneda sin mezclar), 0 errores.
+- Cache-bust: `finanzas.js` → `?v1292`.
+- Archivos: `modules/finanzas.js`, `index.html`.
+
+
+## v1.91 — 2026-07-03 · P1-08 modelo de comisión de asesor unificado (Finanzas ↔ comeng)
+- **`comisionAsesor()` en Finanzas** usaba una fórmula simple (`a.comPct × baseRecaudada / 100`) que **contradecía el motor** `Orbit.comeng`. Ahora calcula con **`comeng.comVendedorDe(comisiónAseg, baseNeta, asesorId)`** por cada cuota, respetando el **modo del asesor**: `comision` (% sobre la comisión de la aseguradora), `neta` (% sobre prima neta recaudada) o `fijo` (monto), más su `shareCom`. Un solo modelo entre Equipo/Configuración, el core y Finanzas.
+- Verificado en vivo (v1.291): ase003 (modo `neta` 10%) → a pagar = 10% de la base neta recaudada (coincide con `comeng`), la pestaña Liq. asesores renderiza (5.6k chars), 0 errores. La tabla ahora expone `modo` además del %.
+- Archivos: `modules/finanzas.js`, `index.html`.
+
+## v1.90 — 2026-07-03 · P1-01 IA centralizada en Orbit.ia.complete
+- **Punto único de llamada al modelo**: nuevo `Orbit.ia.complete(prompt, modulo)` + `Orbit.ia.disponible()` en `core/ia.js`. Es el ÚNICO sitio que invoca `window.claude.complete`; enruta al proveedor configurado (por módulo o global vía `proveedorDe`) y devuelve `null` si no hay motor → cada módulo aplica su fallback local.
+- **Módulos migrados** (ya no llaman `window.claude.complete` directo): `core/importa.js` (aiExtract), `modules/marketing.js` (generar mes + copy con IA), `modules/academia.js` (iaText/iaQuiz/iaQuizFromDoc + crear curso con IA), `modules/configuracion.js` (auto-branding por manual). Total ~10 llamadas + guards centralizados.
+- Verificado en vivo (v1.290): `Orbit.ia.complete('test')` devuelve respuesta del modelo sin recursión, `disponible()=true`, y marketing/academia/configuracion/importar montan sin errores. (Se corrigió una recursión que el reemplazo masivo introdujo momentáneamente en el propio wrapper.)
+- Para migración: el backend solo cambia el interior de `Orbit.ia.complete` para enrutar a Gemini/OpenAI/Claude según `cfg`; los módulos no se tocan.
+- Archivos: `core/ia.js`, `core/importa.js`, `modules/marketing.js`, `modules/academia.js`, `modules/configuracion.js`, `index.html`.
+
+## v1.89 — 2026-07-03 · P0/P1 de la auditoría ChatGPT v1287 (contabilidad, seed, localStorage)
+- **P0-01 + P1-02 — Factura a aseguradora = CxC, NO caja hasta cobro**: `facturaAseg()` ya no crea `finmov` al emitir. Emite a la colección `facturas` con estado `por_cobrar`, número **secuencial por año** (`FAC-AAAA-####`, no aleatorio), e **idempotente por aseguradora+periodo** (no duplica). El `finmov` real (ingreso `recaudado`) se crea **solo al pulsar "💵 Registrar cobro"** en la nueva lista de facturas (Liq. empresa), con acciones cobrar/anular y bitácora. Verificado en vivo: emitir no crea finmov, idempotente, cobrar sí crea finmov.
+- **P0-02 — Sin `localStorage` ejecutable en módulos**: los botones inline de subir/quitar logo en `configuracion.js` usaban `localStorage.setItem/removeItem`; ahora usan `Orbit.store.setPref('logo', …)` + `Orbit.tenant`. Grep confirma 0 `localStorage.setItem/removeItem` en el módulo.
+- **P0-04 — Seed sin nombres reales**: `Paula Osorio` (asesor demo `ase001` + autor de novedad) → **`Valeria Morán`** (ficticio comercial). 2 reemplazos. NIT/DPI/cédula se mantienen como tipos documentales ficticios. `seed.__v` → 36.
+- **P1-04 — `agregarPais` con dedupe**: si el código de país ya existe, **actualiza** (país + `tenant.paisesCfg`); si no, inserta. Antes hacía `push` ciego (duplicaba). Toast diferenciado agregar/actualizar.
+- Verificado en vivo (v1.289): ase001='Valeria Morán', sin Paula, sin localStorage ejecutable, dedupe OK. 0 errores.
+- **NO tocado** (respetando separación de la auditoría): backend LAB, `Orbit.store` API, Auth/Firestore/reglas. Sin datos reales nuevos. Sin `localStorage` ejecutable nuevo.
+- Archivos: `modules/finanzas.js`, `modules/configuracion.js`, `data/seed.js`, `index.html`.
+
 ## v1.88 — 2026-07-03 · Academia: profundización de cursos delgados (Marketing + Portal)
 - **Auditoría de profundidad por datos** (secciones/quizzes por curso): los cursos sólidos ya eran cur2 (17 secc.), cur3 (12), cur_master (12), cur6 (9). cur1 Inducción usa `texto` largo (4591 chars/lección) — profundo aunque con 0 `secciones`. Los delgados eran **cur8 Marketing** (2 lecc./3 secc.) y **cur9 Portal** (2 lecc./3 secc.).
 - **cur8 Marketing profundizado**: 2→**4 lecciones**, 3→**9 secciones**, quiz 2→**4 preguntas**. Nuevas lecciones: "Estrategia por embudo y segmento" (TOFU/MOFU/BOFU, segmentación por perfil, estacionalidad) y "Medición: qué mirar y cómo mejorar" (métricas que importan, del contenido al pipeline, iterar con datos).

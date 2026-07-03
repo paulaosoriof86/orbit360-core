@@ -64,7 +64,7 @@ Orbit.importa = (function () {
   async function aiExtract(text, kind) {
     const cfg = IMPORT_MAP[kind];
     if (!cfg || !text || text.replace(/\s/g, '').length < 12) return null;
-    if (!(window.claude && window.claude.complete)) return null;
+    if (!(Orbit.ia.disponible())) return null;
     const fields = Object.keys(cfg.fields);
     const prompt = 'Eres un extractor de datos de seguros. Del siguiente documento extrae TODOS los registros de tipo "' + cfg.label + '". '
       + 'Devuelve SOLO un JSON array válido, sin explicación ni markdown. Cada objeto usa exactamente estas claves (cadena vacía si el dato no está): '
@@ -72,7 +72,7 @@ Orbit.importa = (function () {
       + 'Si el documento describe un solo registro, devuelve un array de 1. Si hay varias secciones/hojas/filas, devuelve uno por cada registro real (no por línea de texto). '
       + 'Limpia los valores (sin etiquetas, solo el dato). Documento:\n"""' + String(text).slice(0, 7000) + '"""';
     try {
-      const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt }] });
+      const out = await Orbit.ia.complete(prompt);
       const m = String(out).match(/\[[\s\S]*\]/); if (!m) return null;
       const arr = JSON.parse(m[0]);
       if (!Array.isArray(arr) || !arr.length) return null;
@@ -660,7 +660,7 @@ Orbit.importa = (function () {
               });
               const parsedXls = { headers: headerRow || [], rows: combined };
               const mapped = Object.keys(mapHeaders(state.kind, parsedXls.headers)).length;
-              if (mapped < 2 && window.claude && window.claude.complete) { showLoading('🧠 Extracción inteligente con IA…'); const ai = await aiExtract(dump, state.kind); state.parsed = ai || parsedXls; }
+              if (mapped < 2 && Orbit.ia.disponible()) { showLoading('🧠 Extracción inteligente con IA…'); const ai = await aiExtract(dump, state.kind); state.parsed = ai || parsedXls; }
               else state.parsed = parsedXls;
               state.processing = null; state.step = 2; paint();
             } catch (err) { fail('No se pudo leer el Excel'); }

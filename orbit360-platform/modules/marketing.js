@@ -105,11 +105,11 @@ Orbit.modules.marketing = (function () {
     const fallback = [['🚗 Auto: lo que tu póliza sí cubre', 'Auto', 'Instagram'], ['❤️ Vida: proteger a los tuyos en 3 pasos', 'Vida y GM', 'Facebook'], ['🏠 Hogar: riesgos que olvidamos', 'Hogar / Daños', 'LinkedIn'], ['📈 Tendencias 2026 en seguros', 'Tendencias', 'LinkedIn'], ['🔄 Renueva a tiempo y ahorra', 'Renovaciones', 'WhatsApp'], ['📚 ¿Qué es el deducible? En simple', 'Educativo', 'Instagram']];
     const [y, mm] = mes.split('-').map(Number);
     let ideas = null;
-    if (window.claude && window.claude.complete) {
+    if (Orbit.ia.disponible()) {
       toast('🧠 Generando ideas con IA…');
       try {
         const prompt = 'Eres estratega de marketing de una correduría de seguros. Diseña un PLAN mensual de contenidos para ' + MESES[mm - 1] + ' con criterio estratégico: cubre las 4 semanas, mezcla objetivos (captación, educación, retención/renovación, prueba social/confianza), varía ramos (auto, vida/GM, hogar, pyme) y canales (Instagram, Facebook, LinkedIn, WhatsApp), e incluye fechas clave del mes si aplica. Devuelve SOLO un JSON array sin markdown de 8 items, cada item: ["título con emoji","enfoque/ramo","canal","objetivo (captación|educación|retención|confianza)","CTA breve"]. Español, útil, sin relleno.';
-        const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt }] });
+        const out = await Orbit.ia.complete(prompt);
         const m = String(out).match(/\[[\s\S]*\]/); if (m) { const arr = JSON.parse(m[0]); if (Array.isArray(arr) && arr.length) ideas = arr.filter(x => Array.isArray(x) && x.length >= 3); }
       } catch (e) {}
     }
@@ -178,11 +178,11 @@ Orbit.modules.marketing = (function () {
       const enf = $('#mk-enfoque').value, canal = $('#mk-canal').value;
       const emoji = enfEmoji(enf);
       const iaB = $('#mk-ia');
-      if (window.claude && window.claude.complete) {
+      if (Orbit.ia.disponible()) {
         iaB.textContent = '🧠 Generando…'; iaB.disabled = true;
         try {
           const prompt = 'Eres community manager de una correduría de seguros. Escribe un post para ' + canal + ' sobre "' + enf + '". Devuelve SOLO JSON sin markdown: {"titulo":"...","copy":"cuerpo con emojis y 2-3 ideas","cta":"llamado a la acción","hashtags":"#... #..."}. Tono cercano, claro, en español.';
-          const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt }] });
+          const out = await Orbit.ia.complete(prompt);
           const m = String(out).match(/\{[\s\S]*\}/);
           if (m) { const o = JSON.parse(m[0]); if (o.titulo && !$('#mk-titulo').value) $('#mk-titulo').value = o.titulo; if (o.copy) $('#mk-copy').value = o.copy; if (o.cta) $('#mk-cta').value = o.cta; if (o.hashtags) $('#mk-hash').value = o.hashtags; }
           iaB.textContent = '✨ Generar copy con IA'; iaB.disabled = false;

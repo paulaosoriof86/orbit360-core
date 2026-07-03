@@ -178,10 +178,10 @@ Orbit.ia = (function () {
     const fallbackNombre = file.name.replace(/\.(pdf|png|jpe?g)$/i, '').replace(/[_-]+/g, ' ');
     if (!txt) return Object.assign(parseLocal('', fallbackNombre), { _texto: '', _via: 'sin-texto' });
     // IA real si window.claude está disponible
-    if (window.claude && window.claude.complete) {
+    if (Orbit.ia.disponible()) {
       try {
         const prompt = 'Extrae de esta póliza/cotización de seguro los datos en JSON EXACTO sin markdown. Montos solo números sin símbolos ni separadores de miles. Si no encuentras un dato usa 0 o "". Esquema: {"nombre":"aseguradora","numero":"no. póliza","moneda":"GTQ|USD|COP","vigIni":"dd/mm/aaaa","vigFin":"dd/mm/aaaa","asegurado":"nombre completo","dpi":"","nit":"","neta":num,"iva":num,"gastosEmision":num,"asistencia":num,"recargoFrac":num,"total":num,"sumaAsegurada":num,"deducible":"texto","fracc":num,"ramo":"","placa":"","marca":"","linea":"","anioVeh":"","cob":{"cob_rc":num,"cob_gmo":num,"cob_robo":true/false,"cob_asist":"texto"}}. Texto:\n' + txt.slice(0, 7000);
-        const out = await window.claude.complete({ messages: [{ role: 'user', content: prompt }] });
+        const out = await Orbit.ia.complete(prompt);
         const m = String(out).match(/\{[\s\S]*\}/); if (m) { const d = JSON.parse(m[0]); d.nombre = d.nombre || fallbackNombre; d.cob = d.cob || {}; d._texto = txt; d._via = 'ia';
           // completar con heurística lo que la IA dejó vacío
           const loc = parseLocal(txt, fallbackNombre);
@@ -206,5 +206,22 @@ Orbit.ia = (function () {
     return f;
   }
 
-  return { getCfg, conectar, desconectar, activo, proveedorDe, redactar, analisis, sugerirMetas, extraer, extraerPDF, pdfTexto, parseMulti };
+  /* Punto ÚNICO de llamada al modelo. Los módulos NUNCA llaman window.claude.complete
+     directo: usan Orbit.ia.complete(prompt, modulo). Enruta al proveedor configurado
+     (por módulo o global) y, si no hay motor disponible, devuelve null → el módulo aplica
+     su fallback local. En backend real aquí se enruta a Gemini/OpenAI/Claude según cfg. */
+  async function complete(prompt, modulo) {
+    if (!prompt) return null;
+    // (multi-proveedor: el backend enruta por proveedorDe(modulo); en prototipo el motor
+    //  disponible es window.claude.complete — ESTE es el ÚNICO sitio que lo llama directo)
+    try {
+      if (window.claude && window.claude.complete) {
+        return await window.claude.complete({ messages: [{ role: 'user', content: String(prompt) }] });
+      }
+    } catch (e) { return null; }
+    return null;
+  }
+  function disponible() { return !!(window.claude && window.claude.complete); }
+
+  return { getCfg, conectar, desconectar, activo, proveedorDe, complete, disponible, redactar, analisis, sugerirMetas, extraer, extraerPDF, pdfTexto, parseMulti };
 })();

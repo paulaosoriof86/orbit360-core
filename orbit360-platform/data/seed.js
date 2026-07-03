@@ -21,7 +21,7 @@ Orbit.SEED = (function () {
   // ---- Asesores (equipo) ----
   // shareCom = participación del vendedor sobre la comisión de la aseguradora (%)
   const asesores = [
-    { id: 'ase001', nombre: 'Paula Osorio', rol: 'Dirección', iniciales: 'PO', color: '#C5162E', metaPrima: 220000, metaRecaudo: 180000, comTipo: 'variable', comPct: 18, shareCom: 60, comModo: 'comision' },
+    { id: 'ase001', nombre: 'Valeria Morán', rol: 'Dirección', iniciales: 'PO', color: '#C5162E', metaPrima: 220000, metaRecaudo: 180000, comTipo: 'variable', comPct: 18, shareCom: 60, comModo: 'comision' },
     { id: 'ase002', nombre: 'Diego Marroquín', rol: 'Asesor Sr.', iniciales: 'DM', color: '#1f3a5f', metaPrima: 160000, metaRecaudo: 140000, comTipo: 'variable', comPct: 15, shareCom: 55, comModo: 'comision' },
     { id: 'ase003', nombre: 'Lucía Herrera', rol: 'Asesora', iniciales: 'LH', color: '#1f8a4c', metaPrima: 140000, metaRecaudo: 120000, comTipo: 'variable', comPct: 12, shareCom: 10, comModo: 'neta' },
     { id: 'ase004', nombre: 'Marco Villatoro', rol: 'Asesor', iniciales: 'MV', color: '#c9821b', metaPrima: 120000, metaRecaudo: 100000, comTipo: 'fija', comPct: 10, shareCom: 45, comModo: 'comision' },
@@ -531,7 +531,7 @@ Orbit.SEED = (function () {
 
   // novedades / incentivos
   const novedades = [
-    { id: 'nov1', tipo: 'incentivo', titulo: '🏆 Incentivo de junio: bono por 10 pólizas Auto', detalle: 'Cierra 10 pólizas de Auto este mes y gana un bono del 5% adicional sobre comisión.', autor: 'Paula Osorio', fecha: iso(addDays(NOW, -2)), prioridad: true },
+    { id: 'nov1', tipo: 'incentivo', titulo: '🏆 Incentivo de junio: bono por 10 pólizas Auto', detalle: 'Cierra 10 pólizas de Auto este mes y gana un bono del 5% adicional sobre comisión.', autor: 'Valeria Morán', fecha: iso(addDays(NOW, -2)), prioridad: true },
     { id: 'nov2', tipo: 'producto', titulo: '🆕 Nuevo producto: Salud Premium de MundoSeguro', detalle: 'Cobertura internacional y sin deducible en red preferente. Material comercial en Academia.', autor: 'Dirección', fecha: iso(addDays(NOW, -5)), prioridad: false },
     { id: 'nov3', tipo: 'aviso', titulo: '📢 Cierre de mes: subir gestiones antes del 30', detalle: 'Recuerden dejar todas las gestiones y recaudos cargados antes del cierre.', autor: 'Finanzas', fecha: iso(addDays(NOW, -1)), prioridad: false }
   ];
@@ -843,7 +843,7 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 35,
+    __v: 36,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos, contenidos, reclamos, cursos, notifs
   };

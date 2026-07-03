@@ -179,7 +179,7 @@ Orbit.modules.finanzas = (function () {
       'egr-mes': ['Egresos del mes', lbl, inM.filter(m => m.tipo === 'egreso')],
       'res-mes': ['Resultado operativo', lbl + ' · ingresos y egresos', inM],
       'mov-mes': ['Movimientos del mes', lbl, inM],
-      'cxc': ['Cuentas por cobrar', 'todas las pendientes de recaudo — arrastran mes a mes', all.filter(m => m.tipo === 'ingreso' && (m.estado === 'esperado' || m.estado === 'facturado'))],
+      'cxc': ['Cuentas por cobrar', 'todas las pendientes de recaudo — arrastran mes a mes', all.filter(m => m.tipo === 'ingreso' && (m.estado === 'esperado' || m.estado === 'facturado')).concat((S().all('facturas') || []).filter(f => f.estado === 'por_cobrar' && (!p || f.pais === p)).map(f => ({ id: f.id, periodo: f.periodo, dia: +((f.fecha || '').slice(8, 10)) || 1, concepto: (f.concepto || ('Factura ' + f.numero)), clase: 'Comisión facturada', pagador: (q.aseguradora(f.aseguradoraId) || {}).nombre || '', valor: f.total, moneda: f.moneda, tipo: 'ingreso', estado: 'facturado', __factura: true })))],
       'cxp': ['Cuentas por pagar', 'todas las pendientes de pago — arrastran mes a mes', all.filter(m => m.tipo === 'egreso' && (m.estado === 'pendiente' || (m.pendiente || 0) > 0))]
     };
     const cfg = map[key]; if (!cfg) return;
@@ -199,7 +199,7 @@ Orbit.modules.finanzas = (function () {
         <button class="imp-x" id="dr-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
       <div style="overflow:auto;flex:1"><table class="tbl">
         <thead><tr><th>Periodo</th><th>Día</th><th>Concepto</th><th>Clasificación</th><th>Quién</th><th class="num">Valor</th><th>Estado</th></tr></thead>
-        <tbody>${items.map(m => `<tr class="clickable" onclick="document.getElementById('fin-drill').remove();Orbit.modules.finanzas.editarMov('${m.id}')">
+        <tbody>${items.map(m => `<tr class="clickable" onclick="document.getElementById('fin-drill').remove();Orbit.modules.finanzas.${m.__factura ? 'verFactura' : 'editarMov'}('${m.id}')">
           <td class="mono" style="font-size:11.5px">${m.periodo}</td><td class="mono" style="font-size:11.5px">${m.dia || '—'}</td>
           <td><b>${U.esc(m.concepto)}</b></td><td style="font-size:12px">${U.esc(m.clase || '—')}</td>
           <td style="font-size:12px">${U.esc(m.pagador || m.beneficiario || '—')}</td>
@@ -217,20 +217,35 @@ Orbit.modules.finanzas = (function () {
 
   /* ---------- CUENTAS POR COBRAR / POR PAGAR ---------- */
   function cxcp() {
+    const p = paisFin();
     const all = movs(null);
     const cxc = all.filter(m => m.tipo === 'ingreso' && (m.estado === 'esperado' || m.estado === 'facturado'));
     const cxp = all.filter(m => m.tipo === 'egreso' && (m.estado === 'pendiente' || (m.pendiente || 0) > 0));
-    const tCxc = sum(cxc, m => m.valor), tCxp = cxp.reduce((s, m) => s + norm(m.pendiente || m.valor, m.moneda), 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">💳 <b>Cuentas por cobrar</b> = ingresos esperados/facturados aún no recaudados (ej. planilla de comisiones ya facturada). <b>Cuentas por pagar</b> = egresos pendientes (ej. liquidación de asesores no pagada); el saldo pasa al mes siguiente. Clic en una fila cambia su estado.</div>
+    const facs = (S().all('facturas') || []).filter(f => f.estado === 'por_cobrar' && (!p || f.pais === p));
+    const tFac = facs.reduce((s, f) => s + norm(f.total, f.moneda), 0);
+    const tCxc = sum(cxc, m => m.valor) + tFac, tCxp = cxp.reduce((s, m) => s + norm(m.pendiente || m.valor, m.moneda), 0);
+    return `<div class="cfg-note" style="margin-bottom:14px">💳 <b>Cuentas por cobrar</b> = ingresos esperados/facturados aún no recaudados, incluidas las <b>facturas de comisión emitidas</b> (por cobrar). <b>Cuentas por pagar</b> = egresos pendientes (ej. liquidación de asesores no pagada); el saldo pasa al mes siguiente. Clic en una fila: factura → ver documento; movimiento → editar / cambiar estado.</div>
     ${K.kpis([
-      { label: 'Por cobrar (CxC)', val: M(tCxc), color: 'var(--warn)', foot: cxc.length + ' partidas', onclick: "Orbit.modules.finanzas.drillKey('cxc')" },
+      { label: 'Por cobrar (CxC)', val: M(tCxc), color: 'var(--warn)', foot: (cxc.length + facs.length) + ' partidas', onclick: "Orbit.modules.finanzas.drillKey('cxc')" },
       { label: 'Por pagar (CxP)', val: M(tCxp), color: 'var(--danger)', foot: cxp.length + ' partidas', onclick: "Orbit.modules.finanzas.drillKey('cxp')" },
       { label: 'Posición neta', val: M(tCxc - tCxp), color: 'var(--red)', foot: 'CxC − CxP' }
     ])}
     <div class="ins-grid-2">
-      ${cxcpTabla('Cuentas por cobrar', cxc, 'ok')}
+      ${cxcCard(cxc, facs)}
       ${cxcpTabla('Cuentas por pagar', cxp, 'danger')}
     </div>`;
+  }
+  function cxcCard(rows, facs) {
+    const facRows = (facs || []).map(f => `<tr class="clickable" onclick="Orbit.modules.finanzas.verFactura('${f.id}')" title="Ver factura de comisión">
+      <td class="mono" style="font-size:11.5px">${f.periodo}</td><td>🧾 ${U.esc(f.concepto || ('Factura ' + f.numero))}<div class="muted" style="font-size:10.5px">${U.esc(f.numero)}${(f.comisionIds && f.comisionIds.length) ? ' · ' + f.comisionIds.length + ' com.' : ''}</div></td>
+      <td class="num"><b>${U.money(f.total, f.moneda)}</b></td><td><span class="badge warn">🧾 por cobrar</span></td></tr>`).join('');
+    const finRows = (rows || []).slice(0, 24).map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.editarMov('${m.id}')" title="Ver / editar / eliminar">
+      <td class="mono" style="font-size:11.5px">${m.periodo}</td><td>${U.esc(m.concepto)}</td>
+      <td class="num"><b>${U.money(m.pendiente || m.valor, m.moneda)}</b></td><td onclick="event.stopPropagation();Orbit.modules.finanzas.toggleEstado('${m.id}')" style="cursor:pointer" title="Clic: cambia estado">${estBadge(m.estado)}</td></tr>`).join('');
+    const body = facRows + finRows;
+    return `<div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">Cuentas por cobrar</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Periodo</th><th>Concepto</th><th class="num">Monto</th><th>Estado</th></tr></thead>
+      <tbody>${body || '<tr><td colspan="4" class="muted" style="text-align:center;padding:18px">Sin partidas.</td></tr>'}</tbody></table></div></div>`;
   }
   function cxcpTabla(titulo, rows, tone) {
     return `<div class="card" style="overflow:hidden"><div style="padding:11px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">${titulo}</div>
@@ -283,12 +298,22 @@ Orbit.modules.finanzas = (function () {
   function comisionAsesor() {
     return S().all('asesores').map(a => {
       const coms = S().where('comisiones', c => c.asesorId === a.id);
-      const baseRecaudada = coms.reduce((s, c) => s + q.norm(c.base, c.moneda), 0); // prima recaudada (cuota pagada)
-      const generada = coms.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-      const pct = a.comPct || 12;
-      const aPagar = Math.round(baseRecaudada * pct / 100); // % del asesor sobre prima neta recaudada
+      const baseRecaudada = coms.reduce((s, c) => s + q.norm(c.base, c.moneda), 0); // prima neta recaudada (cuota pagada)
+      const generada = coms.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0); // comisión de aseguradora sobre lo recaudado
+      // MODELO UNIFICADO con el motor de comisiones (comeng): respeta el modo del asesor
+      // (comision % sobre comisión aseguradora · neta % sobre prima neta · fijo monto) y su shareCom.
+      // Antes usaba una fórmula simple comPct×base que contradecía Equipo/core.
+      const m = (Orbit.comeng && Orbit.comeng.modeloVendedor) ? Orbit.comeng.modeloVendedor(a.id) : { modo: 'comision', pct: a.comPct || 12, valor: 0 };
+      let aPagar;
+      if (Orbit.comeng && Orbit.comeng.comVendedorDe) {
+        // suma por cuota: comisión del vendedor sobre la comisión de aseguradora y base neta de cada recibo
+        aPagar = Math.round(coms.reduce((s, c) => s + Orbit.comeng.comVendedorDe(q.norm(c.monto, c.moneda), q.norm(c.base, c.moneda), a.id), 0));
+      } else {
+        aPagar = m.modo === 'fijo' ? Math.round(m.valor) : m.modo === 'neta' ? Math.round(baseRecaudada * m.pct / 100) : Math.round(generada * m.pct / 100);
+      }
+      const pctLbl = m.modo === 'fijo' ? 0 : m.pct;
       const liquidada = coms.filter(c => c.estado === 'Liquidada').reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-      return { a, baseRecaudada, generada, pct, tipo: a.comTipo || 'variable', aPagar, liquidada, pendiente: Math.max(0, aPagar - liquidada) };
+      return { a, baseRecaudada, generada, pct: pctLbl, modo: m.modo, tipo: a.comTipo || 'variable', aPagar, liquidada, pendiente: Math.max(0, aPagar - liquidada) };
     }).sort((x, y) => y.aPagar - x.aPagar);
   }
 
@@ -514,23 +539,43 @@ Orbit.modules.finanzas = (function () {
         <td class="num">${U.money(r.devengada + r.liquidada, 'GTQ')}</td>
         <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('aseguradoraId','${r.asg ? r.asg.id : ''}')">Ver detalle</button><button class="btn ghost sm" onclick="Orbit.modules.finanzas.facturaAseg('${r.asg ? r.asg.id : ''}')">🧾 Factura</button><button class="btn ghost sm" onclick="Orbit.importa.open('planillas-comision')">Conciliar planilla</button></td>
       </tr>`).join('')}</tbody>
-    </table></div></div>`;
+    </table></div></div>
+    ${(function () {
+      const facs = (S().all('facturas') || []).filter(f => f.estado !== 'anulada').sort((a, b) => (b.numero || '').localeCompare(a.numero || ''));
+      if (!facs.length) return '<div class="cfg-note" style="margin-top:14px">🧾 Aún no has emitido facturas de comisión. Usa <b>🧾 Factura</b> en una aseguradora. Las facturas emitidas son <b>cuentas por cobrar</b> — no entran a caja hasta que se cobran.</div>';
+      const M = n => U.money(n, 'GTQ');
+      return `<div class="card" style="overflow:hidden;margin-top:16px"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">🧾 Facturas de comisión emitidas (CxC)</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>N.º</th><th>Aseguradora</th><th>Periodo</th><th class="num">Total</th><th>Estado</th><th></th></tr></thead>
+      <tbody>${facs.map(f => { const a = q.aseguradora(f.aseguradoraId); return `<tr>
+        <td class="mono" style="font-size:11.5px"><b>${U.esc(f.numero)}</b>${(f.comisionIds && f.comisionIds.length) ? `<div class="muted" style="font-size:10.5px">cubre ${f.comisionIds.length} com.</div>` : ''}</td>
+        <td>${a ? U.esc(a.nombre) : '—'}</td>
+        <td class="mono" style="font-size:11.5px">${f.periodo}</td>
+        <td class="num"><b>${M(f.total)}</b></td>
+        <td><span class="badge ${f.estado === 'cobrada' ? 'ok' : 'warn'}">${f.estado === 'cobrada' ? '✅ cobrada' : '🕓 por cobrar'}</span>${(f.estado === 'cobrada' && f.cobro && (f.cobro.banco || f.cobro.ref)) ? `<div class="muted" style="font-size:10.5px">${U.esc(f.cobro.banco || '')}${f.cobro.ref ? ' · ' + U.esc(f.cobro.ref) : ''}</div>` : ''}</td>
+        <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.verFactura('${f.id}')">🖨 Ver</button>${f.estado !== 'cobrada' ? `<button class="btn ghost sm" onclick="Orbit.modules.finanzas.facturaAccion('${f.id}','cobrar')">💵 Registrar cobro</button>` : ''}<button class="btn ghost sm" onclick="Orbit.modules.finanzas.facturaAccion('${f.id}','anular')" style="color:var(--danger)">Anular</button></td>
+      </tr>`; }).join('')}</tbody></table></div></div>`;
+    })()}`;
   }
-
-  /* ---------- FACTURA a aseguradora (control, NO reemplazo fiscal) ---------- */
   function facturaAseg(asgId) {
     const asg = q.aseguradora(asgId) || {};
     const comp = comisionEmpresaPorAseguradora()[asgId] || { devengada: 0, liquidada: 0, n: 0 };
-    const cur = paisFin() === 'CO' ? 'COP' : 'GTQ';
-    const base = comp.devengada || 0;
     const t = Orbit.tenant.get();
-    const pais = asg.pais || paisFin() || 'GT';
+    // P1-03: país y moneda se derivan de la ASEGURADORA (no del filtro global) para no mezclar monedas.
+    const pais = asg.pais || (Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : paisFin()) || 'GT';
+    const cur = (t.paisesCfg && t.paisesCfg[pais] && t.paisesCfg[pais].moneda) || (pais === 'CO' ? 'COP' : 'GTQ');
+    const base = comp.devengada || 0;
     // IVA del país configurado (tasas por país en tenant)
     const ivaPct = (t.paisesCfg && t.paisesCfg[pais] && t.paisesCfg[pais].iva != null) ? t.paisesCfg[pais].iva : (pais === 'CO' ? 19 : 12);
     const iva = Math.round(base * ivaPct) / 100;
     const total = base + iva;
     const fact = asg.facturacion || {};
-    const num = 'FAC-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
+    // Idempotencia: si ya existe factura para esta aseguradora+periodo (no anulada), la reutilizamos
+    const periodoFac = mesSel;
+    const existente = (S().all('facturas') || []).find(f => f.aseguradoraId === asgId && f.periodo === periodoFac && f.estado !== 'anulada');
+    // Número secuencial por año (no aleatorio)
+    const anio = new Date().getFullYear();
+    const nSeq = (S().all('facturas') || []).filter(f => (f.numero || '').includes('FAC-' + anio)).length + 1;
+    const num = existente ? existente.numero : ('FAC-' + anio + '-' + String(nSeq).padStart(4, '0'));
     const concepto = (fact.patronConcepto || 'Comisiones por intermediación de seguros')
       .replace('{mes}', MESES[+mesSel.slice(5) - 1] + ' ' + mesSel.slice(0, 4))
       .replace('{aseguradora}', asg.nombre || '');
@@ -568,12 +613,123 @@ Orbit.modules.finanzas = (function () {
     back.querySelector('#ff-x').addEventListener('click', close);
     back.querySelector('#ff-print').addEventListener('click', () => { const w = window.open('', '_blank'); w.document.write('<html><head><title>' + num + '</title></head><body>' + back.querySelector('#ff-doc').innerHTML + '</body></html>'); w.document.close(); w.print(); });
     back.querySelector('#ff-emit').addEventListener('click', () => {
-      // registra un movimiento de ingreso ESPERADO (factura emitida, por cobrar) — esto SÍ es finmov real
-      S().insert('finmovs', { id: 'fmv_fac_' + Date.now(), periodo: mesSel, dia: +Orbit.ui.today().slice(8, 10) || 1, tipo: 'ingreso', clase: 'Comisión facturada', categoria: 'Comisión facturada', concepto: 'Factura ' + num + ' · ' + (asg.nombre || ''), valor: total, moneda: cur, pais, estado: 'facturado', aseguradoraId: asgId, facturaNum: num });
+      // REGLA CONTABLE Orbit 360: una factura emitida es CUENTA POR COBRAR, NO caja/banco.
+      // Se registra en la colección `facturas` con estado 'por_cobrar'. NO se crea `finmov`
+      // hasta que el dinero entra realmente (se cobra / concilia banco). Idempotente por
+      // aseguradora+periodo: si ya existe (no anulada), no se duplica.
+      if (existente) {
+        close();
+        const tt0 = document.createElement('div'); tt0.className = 'ciclo-toast'; tt0.textContent = 'ℹ️ Ya existía la factura ' + num + ' para este periodo (no se duplica)'; document.body.appendChild(tt0); setTimeout(() => tt0.remove(), 3200);
+        return;
+      }
+      S().insert('facturas', {
+        id: 'fac_' + Date.now(), numero: num, aseguradoraId: asgId, periodo: periodoFac,
+        fecha: Orbit.ui.today(), base, iva, ivaPct, total, moneda: cur, pais,
+        concepto, razonSocial: fact.razonSocial || asg.nombre || '', nit: fact.nit || '',
+        estado: 'por_cobrar', cuotas: comp.n,
+        comisionIds: S().all('comisiones').filter(c => c.aseguradoraId === asgId && c.estado !== 'Liquidada').map(c => c.id),
+        bitacora: [{ ts: Orbit.ui.today(), t: 'Factura emitida (por cobrar)', quien: (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Equipo' }]
+      });
       close();
-      const tt = document.createElement('div'); tt.className = 'ciclo-toast'; tt.textContent = '✓ Factura ' + num + ' registrada como ingreso por cobrar (CxC)'; document.body.appendChild(tt); setTimeout(() => tt.remove(), 3200);
+      const tt = document.createElement('div'); tt.className = 'ciclo-toast'; tt.textContent = '✓ Factura ' + num + ' emitida como CUENTA POR COBRAR (no es caja hasta el cobro)'; document.body.appendChild(tt); setTimeout(() => tt.remove(), 3600);
       render(document.getElementById('host'));
     });
+  }
+
+  /* ---------- FACTURAS emitidas (CxC de comisión) — cobrar / anular ---------- */
+  function facturaAccion(facId, accion) {
+    const f = S().get('facturas', facId); if (!f) return;
+    if (accion === 'cobrar') {
+      if (f.estado === 'cobrada') return;
+      cobrarFacturaModal(f); // captura respaldo bancario antes de registrar el ingreso real
+      return;
+    }
+    if (accion === 'anular') {
+      const bit = (f.bitacora || []).slice();
+      bit.push({ ts: Orbit.ui.today(), t: 'Factura anulada', quien: 'Equipo' });
+      S().update('facturas', facId, { estado: 'anulada', bitacora: bit });
+      const fmid = 'fmv_fac_' + facId; if (S().get('finmovs', fmid)) S().remove('finmovs', fmid);
+      Orbit.ui.toast('Factura ' + f.numero + ' anulada');
+      render(document.getElementById('host'));
+    }
+  }
+
+  /* Cobro con RESPALDO BANCARIO: enlaza la factura y el finmov con el banco/nº de depósito
+     que respalda el ingreso real. El finmov solo nace aquí (dinero que entró de verdad). */
+  function cobrarFacturaModal(f) {
+    const M = n => U.money(n, f.moneda);
+    let back = document.getElementById('fin-cobro'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-cobro'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 99;
+    back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
+      <div style="padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">💵 Registrar cobro · ${U.esc(f.numero)}</b><button class="imp-x" id="fc-x">✕</button></div>
+      <div style="padding:18px;display:grid;gap:12px">
+        <div class="cfg-note">Al confirmar, la factura pasa a <b>cobrada</b> y se genera el ingreso real (<b>${M(f.total)}</b>). Indica el respaldo bancario para la conciliación.</div>
+        <label style="display:grid;gap:4px;font-size:12px"><span class="muted">Banco / cuenta</span><input class="o-sel" id="fc-banco" placeholder="Ej. Banco Industrial · Cta 001-…"></label>
+        <label style="display:grid;gap:4px;font-size:12px"><span class="muted">Referencia / N.º de depósito</span><input class="o-sel" id="fc-ref" placeholder="Ej. DEP-48213"></label>
+        <label style="display:grid;gap:4px;font-size:12px"><span class="muted">Fecha de cobro</span><input class="o-sel" type="date" id="fc-fecha" value="${Orbit.ui.today()}"></label>
+      </div>
+      <div style="padding:13px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="fc-cancel">Cancelar</button>
+        <button class="btn primary" id="fc-ok">✓ Confirmar cobro</button>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#fc-x').addEventListener('click', close);
+    back.querySelector('#fc-cancel').addEventListener('click', close);
+    back.querySelector('#fc-ok').addEventListener('click', () => {
+      const banco = back.querySelector('#fc-banco').value.trim();
+      const ref = back.querySelector('#fc-ref').value.trim();
+      const fecha = back.querySelector('#fc-fecha').value || Orbit.ui.today();
+      const bit = (f.bitacora || []).slice();
+      bit.push({ ts: fecha, t: 'Factura cobrada — ingreso real registrado' + (ref ? ' · ref ' + ref : '') + (banco ? ' · ' + banco : ''), quien: (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Equipo' });
+      S().update('facturas', f.id, { estado: 'cobrada', bitacora: bit, fechaCobro: fecha, cobro: { banco, ref, fecha } });
+      const fmid = 'fmv_fac_' + f.id;
+      if (!S().get('finmovs', fmid)) S().insert('finmovs', { id: fmid, periodo: (fecha || '').slice(0, 7), dia: +fecha.slice(8, 10) || 1, tipo: 'ingreso', clase: 'Comisión cobrada', categoria: 'Comisión cobrada', concepto: 'Cobro factura ' + f.numero + ' · ' + ((q.aseguradora(f.aseguradoraId) || {}).nombre || ''), valor: f.total, moneda: f.moneda, pais: f.pais, estado: 'recaudado', aseguradoraId: f.aseguradoraId, facturaId: f.id, facturaNum: f.numero, banco, refBanco: ref });
+      close();
+      Orbit.ui.toast('✓ Factura ' + f.numero + ' cobrada' + (ref ? ' · ref ' + ref : '') + ' — ingreso real registrado');
+      render(document.getElementById('host'));
+    });
+  }
+
+  /* Ver / reimprimir una factura YA emitida (documento de solo lectura desde el store). */
+  function verFactura(facId) {
+    const f = S().get('facturas', facId); if (!f) return;
+    const asg = q.aseguradora(f.aseguradoraId) || {};
+    const t = Orbit.tenant.get();
+    const M = n => U.money(n, f.moneda);
+    const estadoLbl = f.estado === 'cobrada' ? '✅ Cobrada' : f.estado === 'anulada' ? '— Anulada' : '🕓 Por cobrar';
+    let back = document.getElementById('fin-verfac'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-verfac'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 98;
+    back.innerHTML = `<div class="card" style="width:min(620px,96vw);max-height:92vh;overflow:auto;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🧾 Factura ${U.esc(f.numero)} · ${U.esc(asg.nombre || '')}</b><button class="imp-x" id="vf-x">✕</button></div>
+      <div style="padding:20px" id="vf-doc">
+        <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+          <div><div class="muted" style="font-size:11px">EMISOR</div><b>${U.esc(t.empresa || 'Tu empresa')}</b>${t.nit ? '<div style="font-size:12px">NIT: ' + U.esc(t.nit) + '</div>' : ''}</div>
+          <div style="text-align:right"><div class="muted" style="font-size:11px">FACTURA</div><b class="mono">${U.esc(f.numero)}</b><div style="font-size:12px">${U.fmtDate(f.fecha)}</div><div style="font-size:11.5px;margin-top:3px">${estadoLbl}</div></div>
+        </div>
+        <div style="background:var(--surface);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+          <div class="muted" style="font-size:11px">FACTURAR A</div>
+          <b>${U.esc(f.razonSocial || asg.nombre || '')}</b>
+          ${f.nit ? '<div style="font-size:12.5px">NIT/ID: <b>' + U.esc(f.nit) + '</b></div>' : ''}
+        </div>
+        <table class="tbl"><thead><tr><th>Concepto</th><th class="num">Valor</th></tr></thead><tbody>
+          <tr><td>${U.esc(f.concepto || 'Comisiones por intermediación de seguros')}<div class="muted" style="font-size:11.5px">${f.cuotas || (f.comisionIds ? f.comisionIds.length : 0)} cuotas · prima neta recaudada del periodo</div></td><td class="num"><b>${M(f.base)}</b></td></tr>
+          <tr><td>IVA (${f.ivaPct}%)</td><td class="num">${M(f.iva)}</td></tr>
+          <tr style="border-top:2px solid var(--ink)"><td><b>TOTAL A COBRAR</b></td><td class="num"><b style="font-size:16px;color:var(--red)">${M(f.total)}</b></td></tr>
+        </tbody></table>
+        ${(f.estado === 'cobrada' && f.cobro) ? `<div class="cfg-note" style="margin-top:12px;border-left:3px solid var(--ok)">💵 Cobrada el ${U.fmtDate(f.cobro.fecha)}${f.cobro.banco ? ' · ' + U.esc(f.cobro.banco) : ''}${f.cobro.ref ? ' · ref ' + U.esc(f.cobro.ref) : ''}.</div>` : ''}
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="vf-print">🖨 Imprimir / PDF</button>
+        <button class="btn primary" id="vf-close">Cerrar</button>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#vf-x').addEventListener('click', close);
+    back.querySelector('#vf-close').addEventListener('click', close);
+    back.querySelector('#vf-print').addEventListener('click', () => { const w = window.open('', '_blank'); w.document.write('<html><head><title>' + f.numero + '</title></head><body>' + back.querySelector('#vf-doc').innerHTML + '</body></html>'); w.document.close(); w.print(); });
   }
 
   /* ---------- LIQUIDACIÓN ASESORES ---------- */
@@ -968,5 +1124,5 @@ Orbit.modules.finanzas = (function () {
         : '⚠️ Conecta un proveedor de IA en Configuración → Automatizaciones → Motor de IA para análisis en vivo. (Sin IA, el análisis de arriba usa la heurística de la plataforma.)';
     });
   }
-  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, metasSugerir, facturaAseg, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
+  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, metasSugerir, facturaAseg, facturaAccion, verFactura, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
 })();

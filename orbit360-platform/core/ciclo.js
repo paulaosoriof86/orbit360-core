@@ -13,6 +13,10 @@
 window.Orbit = window.Orbit || {};
 Orbit.ciclo = (function () {
   const U = Orbit.ui, q = Orbit.q, S = () => Orbit.store;
+  // Fechas VIVAS (regla Orbit): nada de literales quemados en flujos que crean datos.
+  const today = () => (U.today ? U.today() : new Date().toISOString().slice(0, 10));
+  const stamp = () => today() + ' ' + new Date().toTimeString().slice(0, 5);
+  const inDays = (d) => { const base = (U.now ? U.now() : new Date()); return new Date(base.getTime() + d * 86400000).toISOString().slice(0, 10); };
 
   /* ---- Etapas canónicas del ciclo ---- */
   const ETAPAS = [
@@ -63,7 +67,7 @@ Orbit.ciclo = (function () {
   /* ===================== transiciones ===================== */
   function log(rec, campo, de, a, origen) {
     rec.bitacora = rec.bitacora || [];
-    rec.bitacora.push({ ts: '2026-06-20 ' + new Date().toTimeString().slice(0, 5), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo, de: de || '', a: a || '', origen: origen || 'manual' });
+    rec.bitacora.push({ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo, de: de || '', a: a || '', origen: origen || 'manual' });
   }
   const PROB = { nuevo: 10, contactado: 25, cotizando: 45, propuesta: 65, negociacion: 78, inspeccion: 85, emision: 92, emitido: 100, perdido: 0 };
 
@@ -71,7 +75,7 @@ Orbit.ciclo = (function () {
   function setEtapa(id, etapaId) {
     const n = S().get('negocios', id); if (!n || n.etapa === etapaId) return n;
     const de = n.etapa;
-    const patch = { etapa: etapaId, prob: PROB[etapaId], actualizado: '2026-06-20' };
+    const patch = { etapa: etapaId, prob: PROB[etapaId], actualizado: today() };
     // automatización: cadencia de seguimiento al entrar a Propuesta
     if (etapaId === 'propuesta' && !n.cadenciaActiva) {
       patch.cadenciaActiva = true; patch.cadencia = CADENCIA[1];
@@ -93,7 +97,7 @@ Orbit.ciclo = (function () {
   function perder(id, motivo) {
     const n = S().get('negocios', id); if (!n) return;
     log(n, 'Resultado', n.etapa, 'Perdido' + (motivo ? ' · ' + motivo : ''), 'manual');
-    S().update('negocios', id, { etapa: 'perdido', prob: 0, motivoPerdido: motivo || '', actualizado: '2026-06-20' });
+    S().update('negocios', id, { etapa: 'perdido', prob: 0, motivoPerdido: motivo || '', actualizado: today() });
   }
   function archivar(id) {
     const n = S().get('negocios', id); if (!n) return;
@@ -111,12 +115,12 @@ Orbit.ciclo = (function () {
       moneda: n.moneda, ciudad: '', departamento: '', direccion: '',
       identificacion: '', email: n.email || '', telefono: n.telefono || '',
       asesorId: n.asesorId, segmento: 'Nuevo', canal: n.canal || 'Leads', sexo: '', fechaNac: '',
-      contactoAlt: '', fechaAlta: '2026-06-20', cumple: '', etiquetas: ['Nuevo'],
+      contactoAlt: '', fechaAlta: today(), cumple: '', etiquetas: ['Nuevo'],
       driveLink: '', notas: 'Cliente creado desde el ciclo comercial (negocio ' + n.id + ').',
       encuestasActivas: true
     };
     S().insert('clientes', cli);
-    S().insert('actividades', { id: 'act' + Date.now(), clienteId: nuevoId, asesorId: n.asesorId, tipo: 'sistema', icon: '🏆', fecha: '2026-06-20', titulo: 'Cliente creado al emitir', detalle: 'Negocio ganado: ' + n.producto + '. Cadencia de encuestas de satisfacción activada.' });
+    S().insert('actividades', { id: 'act' + Date.now(), clienteId: nuevoId, asesorId: n.asesorId, tipo: 'sistema', icon: '🏆', fecha: today(), titulo: 'Cliente creado al emitir', detalle: 'Negocio ganado: ' + n.producto + '. Cadencia de encuestas de satisfacción activada.' });
     log(n, 'Automatización', '', 'Cliente creado + cadencia de encuestas', 'auto');
     S().update('negocios', id, { clienteIdCreado: nuevoId, etapa: 'emitido', prob: 100, bitacora: n.bitacora });
   }
@@ -128,8 +132,8 @@ Orbit.ciclo = (function () {
       clienteId: '', polizaId: '', asesorId: 'ase001', aseguradoraId: '', ramo: '',
       estado: 'Pendiente', prioridad: 'Media', vence: '', proximaAccion: 'Pendiente de definir',
       checklist: [], nota: '', notas: '', origen: 'manual',
-      bitacora: [{ ts: '2026-06-20 ' + new Date().toTimeString().slice(0, 5), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Gestión creada', origen: 'manual' }],
-      comentarios: [], creado: '2026-06-20', actualizado: '2026-06-20', archivado: false
+      bitacora: [{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Gestión creada', origen: 'manual' }],
+      comentarios: [], creado: today(), actualizado: today(), archivado: false
     };
     return S().insert('gestiones', Object.assign(base, g));
   }
@@ -346,7 +350,7 @@ Orbit.ciclo = (function () {
     const cadd = back.querySelector('#ng-chk-add');
     if (cadd) cadd.addEventListener('click', () => { const v = back.querySelector('#ng-chk-new').value.trim(); if (!v) return; n.checklist = n.checklist || []; n.checklist.push({ t: v, done: false }); S().update('negocios', id, { checklist: n.checklist }); openNegocio(id); });
     const comadd = back.querySelector('#ng-com-add');
-    if (comadd) comadd.addEventListener('click', () => { const v = back.querySelector('#ng-com-new').value.trim(); if (!v) return; n.comentarios = n.comentarios || []; n.comentarios.push({ ts: '2026-06-20 ' + new Date().toTimeString().slice(0, 5), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), texto: v }); S().update('negocios', id, { comentarios: n.comentarios }); openNegocio(id); });
+    if (comadd) comadd.addEventListener('click', () => { const v = back.querySelector('#ng-com-new').value.trim(); if (!v) return; n.comentarios = n.comentarios || []; n.comentarios.push({ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), texto: v }); S().update('negocios', id, { comentarios: n.comentarios }); openNegocio(id); });
     // save
     back.querySelector('#ng-save').addEventListener('click', () => {
       const g = sid => (back.querySelector('#' + sid) || {}).value;
@@ -355,7 +359,7 @@ Orbit.ciclo = (function () {
         pais: g('ng-pais'), moneda: g('ng-pais') === 'CO' ? 'COP' : 'GTQ', canal: g('ng-canal'),
         producto: g('ng-prod'), ramo: g('ng-ramo'), aseguradoraId: g('ng-asg'), asesorId: g('ng-ase'),
         primaEst: +g('ng-prima') || n.primaEst, prioridad: g('ng-prio'), nroCotizacion: g('ng-cot'),
-        proximoToque: g('ng-toque') || n.proximoToque, descripcion: g('ng-desc'), colLeads: (back.querySelector('#ng-col') || {}).value || '', actualizado: '2026-06-20'
+        proximoToque: g('ng-toque') || n.proximoToque, descripcion: g('ng-desc'), colLeads: (back.querySelector('#ng-col') || {}).value || '', actualizado: today()
       });
       back.remove(); refresh();
     });
@@ -463,11 +467,11 @@ Orbit.ciclo = (function () {
       const nuevoAse = v('gs-ase'), nuevaNota = v('gs-nota');
       const cambioAse = nuevoAse && nuevoAse !== g.asesorId;
       const cambioNota = (nuevaNota || '') !== (g.nota || g.notas || '');
-      if (cambioNota) { g.bitacora = g.bitacora || []; g.bitacora.push({ ts: '2026-06-20 ' + new Date().toTimeString().slice(0, 5), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Nota', de: '', a: 'Nota actualizada', origen: 'manual' }); }
+      if (cambioNota) { g.bitacora = g.bitacora || []; g.bitacora.push({ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Nota', de: '', a: 'Nota actualizada', origen: 'manual' }); }
       S().update('gestiones', id, {
         lista: v('gs-lista'), tipo: v('gs-tipo'), titulo: v('gs-tipo'), estado: v('gs-estado'), prioridad: v('gs-prio'),
         asesorId: nuevoAse, aseguradoraId: v('gs-asg'), vence: v('gs-vence'), proximaAccion: v('gs-prox'),
-        polizaId: (back.querySelector('#gs-pol') || {}).value || g.polizaId, nota: nuevaNota, bitacora: g.bitacora, actualizado: '2026-06-20'
+        polizaId: (back.querySelector('#gs-pol') || {}).value || g.polizaId, nota: nuevaNota, bitacora: g.bitacora, actualizado: today()
       });
       // notificar al responsable (cambio de asignación o nueva nota) por WA + correo
       const resp = S().get('asesores', nuevoAse); const cl = S().get('clientes', g.clienteId);
@@ -527,12 +531,12 @@ Orbit.ciclo = (function () {
       crearGestion({
         lista, tipo: titulo, titulo, clienteId, polizaId: polId,
         asesorId: cli.asesorId, aseguradoraId: pol ? pol.aseguradoraId : '', ramo: pol ? pol.ramo : '',
-        prioridad: back.querySelector('#sg-prio').value, vence: '2026-06-27',
+        prioridad: back.querySelector('#sg-prio').value, vence: inDays(7),
         nota: back.querySelector('#sg-nota').value.trim(), origen: desdeCliente ? 'Solicitud del cliente' : 'Ficha cliente',
         adjuntos: adjuntos.slice(),
         checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'Documentación completa', done: !!adjuntos.length }, { t: 'Enviado a aseguradora', done: false }]
       });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '🗂', fecha: '2026-06-20', titulo: (desdeCliente ? 'Cliente solicitó: ' : 'Gestión solicitada: ') + titulo, detalle: 'Enviada a Orbit Ops (' + lista + ')' + (adjuntos.length ? ' · ' + adjuntos.length + ' adjunto(s)' : '') });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '🗂', fecha: today(), titulo: (desdeCliente ? 'Cliente solicitó: ' : 'Gestión solicitada: ') + titulo, detalle: 'Enviada a Orbit Ops (' + lista + ')' + (adjuntos.length ? ' · ' + adjuntos.length + ' adjunto(s)' : '') });
       const ase = q.asesor(cli.asesorId);
       notify({ tipo: 'gestion', titulo: (desdeCliente ? 'Solicitud de cliente · ' : 'Nueva gestión · ') + titulo, detalle: cli.nombre + ' → ' + lista, para: ase ? ase.nombre : '', tel: cli.telefono, email: cli.email });
       back.remove(); refresh();
@@ -577,25 +581,25 @@ Orbit.ciclo = (function () {
         producto: v('nn-prod') || 'Por definir', ramo: v('nn-ramo') || 'Auto', aseguradoraId: '',
         telefono: v('nn-tel'), email: v('nn-email'), primaEst: +v('nn-prima') || 0,
         descripcion: v('nn-desc'), notas: '', cadencia: '', cadenciaActiva: false,
-        proximoToque: '2026-06-22', vence: '2026-06-27', prioridad: 'Media',
+        proximoToque: inDays(2), vence: inDays(7), prioridad: 'Media',
         decision: '', nroCotizacion: ingresoOps ? 'COT-' + Math.floor(1000 + Math.random() * 9000) : '', nroPoliza: '',
         checklist: [{ t: 'Datos completos para cotizar', done: ingresoOps }, { t: 'Cotización enviada al cliente', done: false }, { t: 'Documentos del riesgo recibidos', done: false }, { t: 'Inspección / avalúo realizado', done: false }],
         clienteIdCreado: '', archivado: false, etiquetas: [],
-        bitacora: [{ ts: '2026-06-20 ' + new Date().toTimeString().slice(0, 5), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Ingreso (' + (ingresoOps ? 'Ops' : 'Leads') + ')', origen: 'manual' }],
-        comentarios: [], origen: ingresoOps ? 'Ops' : 'Leads', creado: '2026-06-20', actualizado: '2026-06-20'
+        bitacora: [{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Ingreso (' + (ingresoOps ? 'Ops' : 'Leads') + ')', origen: 'manual' }],
+        comentarios: [], origen: ingresoOps ? 'Ops' : 'Leads', creado: today(), actualizado: today()
       };
       S().insert('negocios', n); back.remove(); refresh(); openNegocio(n.id);
     });
   }
   function nuevaGestion() {
-    const g = crearGestion({ titulo: 'Nueva gestión', tipo: 'Actualizar datos de cliente', vence: '2026-06-27' });
+    const g = crearGestion({ titulo: 'Nueva gestión', tipo: 'Actualizar datos de cliente', vence: inDays(7) });
     refresh(); openGestion(g.id);
   }
 
   /* ===================== notificaciones (WhatsApp / correo) ===================== */
   function notify(o) {
     o = o || {};
-    try { S().insert('avisos', { id: 'av' + Date.now() + Math.floor(Math.random() * 99), tipo: o.tipo || 'aviso', titulo: o.titulo || 'Notificación', detalle: o.detalle || '', para: o.para || '', tel: o.tel || '', email: o.email || '', fecha: '2026-06-20', leida: false }); } catch (e) {}
+    try { S().insert('avisos', { id: 'av' + Date.now() + Math.floor(Math.random() * 99), tipo: o.tipo || 'aviso', titulo: o.titulo || 'Notificación', detalle: o.detalle || '', para: o.para || '', tel: o.tel || '', email: o.email || '', fecha: today(), leida: false }); } catch (e) {}
     const waNum = (o.tel || '').replace(/[^0-9]/g, '');
     const msg = encodeURIComponent((o.titulo || '') + (o.detalle ? ' — ' + o.detalle : ''));
     const t = document.createElement('div'); t.className = 'ciclo-toast notif';
