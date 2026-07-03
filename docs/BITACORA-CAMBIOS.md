@@ -81,3 +81,33 @@ Registro vivo de mejoras, ajustes UX, cambios de módulo, cambios de esquema y p
 - **Mejora aplicada:** Se creó checklist S1–S8 para aprobar o rechazar Corte 1.
 - **Impacto en prototipo comercializable:** Evita afirmar avance sin prueba real.
 - **Estado:** LISTO PARA EJECUTAR.
+
+## 2026-07-03 — Política de datos reales A&S LAB
+
+- **Módulo/área:** Datos reales / Tenant A&S / Seguridad.
+- **Necesidad:** Aclarar que el dataset mínimo era solo smoke y que A&S puede avanzar con datos reales vivos si no se hardcodean.
+- **Esperado:** Datos reales solo en backend/tenant LAB o producción controlada, nunca en prototipo demo ni `seed.js`.
+- **Archivo/función:** `docs/POLITICA-DATOS-REALES-AYS-LAB-20260703.md`.
+- **Mejora aplicada:** Se definió diferencia entre prototipo Claude, LAB interno A&S y producción A&S.
+- **Impacto en prototipo comercializable:** Protege confidencialidad y evita contaminar demo comercializable.
+- **Estado:** ACTIVO.
+
+## 2026-07-03 — Plan de migración CRM real A&S
+
+- **Módulo/área:** Migración CRM / Backend / Importadores.
+- **Necesidad:** Migrar clientes, pólizas, cobros efectuados y demás desde el CRM actual por bloques.
+- **Esperado:** Pedir archivos uno por uno, mapear, importar, validar y reportar.
+- **Archivo/función:** `docs/PLAN-MIGRACION-CRM-REAL-AYS-20260703.md`.
+- **Mejora aplicada:** Se definieron bloques: configuración, clientes, pólizas, cartera, cobros históricos, vehículos/documentos, siniestros, comisiones/facturas, marketing.
+- **Impacto en prototipo comercializable:** Define qué debe soportar Importar y qué debe persistir backend.
+- **Estado:** ACTIVO.
+
+## 2026-07-03 — Validación CRUD manual antes de migrar
+
+- **Módulo/área:** UX operativa / Backend / QA.
+- **Necesidad:** Garantizar que la plataforma funcione manualmente para operación diaria, no solo por importación.
+- **Esperado:** Crear/editar clientes, pólizas, cobros, pagos, aseguradoras, comisiones y movimientos desde UI.
+- **Archivo/función:** `docs/VALIDACION-CRUD-MANUAL-ANTES-DE-MIGRAR-AYS-20260703.md`.
+- **Mejora aplicada:** Se creó checklist CRUD manual por módulos críticos.
+- **Impacto en prototipo comercializable:** Asegura operación posterior a la migración y debe ser implementado por Claude en UX si falta.
+- **Estado:** LISTO PARA VALIDAR.
