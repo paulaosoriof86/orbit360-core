@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* Orbit 360 · Synthetic tests for A&S safe overlay pipeline
-   Creates a synthetic candidate in _orbit360_tmp only.
+   Creates synthetic candidates in _orbit360_tmp only.
    No real data, no deploy, no merge, no backend writes.
 */
 import fs from 'node:fs';
@@ -26,7 +26,26 @@ function setupCandidate(id, opts = {}) {
   write(path.join(candidate, 'index.html'), '<!doctype html><script src="modules/inicio.js"></script>');
   write(path.join(candidate, 'modules', 'inicio.js'), 'window.Orbit = window.Orbit || {};');
   write(path.join(candidate, 'modules', 'clientes.js'), opts.storage ? 'localStorage.setItem("x","y");' : 'window.Clientes = true;');
+  write(path.join(candidate, 'modules', 'configuracion.js'), 'window.Configuracion = true;');
+  write(path.join(candidate, 'modules', 'correo.js'), 'window.Correo = true;');
   write(path.join(candidate, 'core', 'app.js'), 'window.Orbit = window.Orbit || {};');
+  write(path.join(candidate, 'core', 'importa.js'), opts.badImporter ? `
+    function monedaDe(pais){ return pais === 'CO' ? 'COP' : 'GTQ'; }
+    const paisHoja = 'GT', sn = 'GT Enero';
+    const monedaHoja = detectaMoneda(sn) || monedaDe(paisHoja);
+    const SCOPE = { 'documentos': { crea: ['clientes'] } };
+  ` : `
+    function monedaDe(pais){ return pais === 'CO' ? 'COP' : pais === 'GT' ? 'GTQ' : ''; }
+    function copyRowMeta(cells, rec){ return rec; }
+    const IMPORT_MAP = { clientes: { fields: { nombre:['nombre'], pais:['pais'], moneda:['moneda'] } } };
+    const SCOPE = { 'documentos': { crea: ['parchesPendientes'] } };
+  `);
+  write(path.join(candidate, 'core', 'integraciones-panel.js'), 'window.Panel = true;');
+  write(path.join(candidate, 'core', 'config.js'), 'window.Config = true;');
+  write(path.join(candidate, 'core', 'integraciones.js'), 'window.Int = true;');
+  write(path.join(candidate, 'core', 'ui.js'), 'window.UI = true;');
+  write(path.join(candidate, 'modules', 'portal.js'), 'window.Portal = true;');
+  write(path.join(candidate, 'modules', 'siniestros.js'), 'window.Siniestros = true;');
   write(path.join(candidate, 'styles', 'base.css'), ':root{--red:#C5162E}');
   return candidate;
 }
@@ -45,8 +64,9 @@ if (!fs.existsSync(pipeline)) {
   process.exit(1);
 }
 
-run('pipeline-basico', {}, 0, ['PIPELINE', 'preflight:', 'plan:', 'preview:', 'diff:']);
+run('pipeline-basico', {}, 0, ['PIPELINE', 'preflight:', 'importer-audit:', 'residual-114805:', 'plan:', 'preview:', 'diff:']);
 run('pipeline-storage-review', { storage: true }, 0, ['PIPELINE_REQUIERE_REVISION', 'direct-storage-pattern']);
+run('pipeline-importer-block', { badImporter: true }, 1, ['PIPELINE_BLOQUEADO', 'residual-114805', 'MONEDA_HOJA_INFERIDA_POR_PAIS']);
 
 const output = [
   '============================================================',
