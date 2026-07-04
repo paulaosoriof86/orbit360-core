@@ -1,0 +1,26 @@
+{
+  "source_type": "clientes",
+  "file_name": "clientes_actualizados.xlsx",
+  "declared_country": "GT",
+  "declared_currency": "NO_APLICA",
+  "contains_real_data": true,
+  "contains_real_payload": false,
+  "requested_targets": ["clientes"],
+  "notes": "Plantilla estructural sin filas reales. Cambiar source_type y columns según la fuente.",
+  "sheets": [
+    {
+      "name": "Clientes",
+      "country": "GT",
+      "currency": "NO_APLICA",
+      "rows_detected": 0,
+      "columns": [
+        "nombre_cliente",
+        "documento_numero",
+        "pais",
+        "telefono",
+        "correo",
+        "asesor_responsable"
+      ]
+    }
+  ]
+}
