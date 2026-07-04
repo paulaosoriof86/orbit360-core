@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* Orbit 360 · A&S safe Claude candidate overlay pipeline
    Runs the safe sequence only:
-   preflight -> plan -> preview -> diff.
+   preflight -> importer audits -> plan -> preview -> diff.
 
    It never applies overlay changes, never deploys, never merges, never writes Firestore.
 
@@ -20,10 +20,12 @@ import { spawnSync } from 'node:child_process';
 const root = process.cwd();
 const args = process.argv.slice(2);
 const REPORT_DIR = path.join(root, '_orbit360_reports');
-const VERSION = 'v1.0.0-ays-overlay-pipeline';
+const VERSION = 'v1.1.0-ays-overlay-pipeline-importer-guards';
 
 const stageFiles = {
   preflight: path.join(root, 'tools', 'orbit360-preflight-candidato-claude-ays.mjs'),
+  importerAudit: path.join(root, 'tools', 'orbit360-auditar-importador-candidato-claude-ays.mjs'),
+  residual114805: path.join(root, 'tools', 'orbit360-auditar-residuos-candidato-114805-ays.mjs'),
   plan: path.join(root, 'tools', 'orbit360-plan-empalme-candidato-claude-ays.mjs'),
   preview: path.join(root, 'tools', 'orbit360-preview-overlay-candidato-claude-ays.mjs'),
   diff: path.join(root, 'tools', 'orbit360-diff-preview-overlay-ays.mjs')
@@ -76,7 +78,7 @@ function runStage(name, commandArgs, allowNonZero = false) {
     exit_code: res.status,
     ok,
     command: ['node', ...commandArgs.map((a) => a.includes(root) ? rel(a) : a)].join(' '),
-    output_tail: output.split(/\r?\n/).slice(-80).join('\n')
+    output_tail: output.split(/\r?\n/).slice(-120).join('\n')
   };
 }
 
@@ -98,32 +100,42 @@ if (!errors.length) {
   const preflight = runStage('preflight', [stageFiles.preflight, '--candidate', candidate], true);
   stages.push(preflight);
 
-  const plan = runStage('plan', [stageFiles.plan, '--candidate', candidate], true);
-  stages.push(plan);
+  const importerAudit = runStage('importer-audit', [stageFiles.importerAudit, '--candidate', candidate], false);
+  stages.push(importerAudit);
 
-  const planJson = newestFile('PLAN-EMPALME-CANDIDATO-CLAUDE-AYS-', '.json');
-  if (!planJson) {
-    errors.push('No se encontró plan JSON después de la etapa plan.');
-  } else {
-    const previewArgs = [stageFiles.preview, '--plan', planJson, '--candidate', candidate];
-    if (includeDocs) previewArgs.push('--include-docs');
-    if (includeAssets) previewArgs.push('--include-assets');
-    if (includeManual) previewArgs.push('--include-manual');
-    const preview = runStage('preview', previewArgs, false);
-    stages.push(preview);
+  const residual114805 = runStage('residual-114805', [stageFiles.residual114805, '--candidate', candidate], false);
+  stages.push(residual114805);
 
-    const previewDir = newestPreviewDir();
-    if (!previewDir) {
-      errors.push('No se encontró carpeta de preview después de la etapa preview.');
+  if (importerAudit.ok && residual114805.ok) {
+    const plan = runStage('plan', [stageFiles.plan, '--candidate', candidate], true);
+    stages.push(plan);
+
+    const planJson = newestFile('PLAN-EMPALME-CANDIDATO-CLAUDE-AYS-', '.json');
+    if (!planJson) {
+      errors.push('No se encontró plan JSON después de la etapa plan.');
     } else {
-      const diff = runStage('diff', [stageFiles.diff, '--preview', previewDir], false);
-      stages.push(diff);
+      const previewArgs = [stageFiles.preview, '--plan', planJson, '--candidate', candidate];
+      if (includeDocs) previewArgs.push('--include-docs');
+      if (includeAssets) previewArgs.push('--include-assets');
+      if (includeManual) previewArgs.push('--include-manual');
+      const preview = runStage('preview', previewArgs, false);
+      stages.push(preview);
+
+      const previewDir = newestPreviewDir();
+      if (!previewDir) {
+        errors.push('No se encontró carpeta de preview después de la etapa preview.');
+      } else {
+        const diff = runStage('diff', [stageFiles.diff, '--preview', previewDir], false);
+        stages.push(diff);
+      }
     }
+  } else {
+    errors.push('Auditoría de importador/residuos bloqueó el pipeline antes de plan/preview/diff.');
   }
 }
 
 const hardFail = errors.length > 0 || stages.some((s) => !s.ok);
-const highReview = stages.some((s) => /REQUIERE_REVISION_ALTA|BLOQUEADO|FAIL/.test(s.output_tail));
+const highReview = stages.some((s) => /REQUIERE_REVISION_ALTA|BLOQUEADO|FAIL|REQUIERE_REVISION/.test(s.output_tail));
 const decision = hardFail ? 'PIPELINE_BLOQUEADO' : (highReview ? 'PIPELINE_REQUIERE_REVISION' : 'PIPELINE_OK_CON_REVISION');
 
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -148,6 +160,7 @@ const txt = [
   `Candidato: ${candidate || 'S/D'}`,
   `Decision: ${decision}`,
   'Restricciones: no aplica overlay, no deploy, no merge, no carga LAB.',
+  'Guards: preflight + auditor importador + auditor residual 114805 + plan + preview + diff.',
   '============================================================',
   '',
   `Errores: ${errors.length}`,
