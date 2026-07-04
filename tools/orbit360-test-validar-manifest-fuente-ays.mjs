@@ -60,11 +60,23 @@ run('financiero-bloquea-clientes', {
   destinations: ['finmovs', 'clientes']
 }, 1, ['Decision: BLOQUEADO', 'financiero_historico no puede escribir en clientes']);
 
+run('banco-no-finmovs', {
+  ...baseManifest('estado_cuenta_bancario'),
+  schema: { fields: ['fecha', 'descripcion', 'monto', 'moneda', 'pais'] },
+  destinations: ['finmovs']
+}, 1, ['Decision: BLOQUEADO', 'estado_cuenta_bancario no puede escribir finmovs']);
+
+run('banco-listo-conciliacion', {
+  ...baseManifest('estado_cuenta_bancario'),
+  schema: { fields: ['fecha', 'descripcion', 'monto', 'moneda', 'pais'] },
+  destinations: ['conciliacionBanco']
+}, 0, ['Decision: LISTO_DRYRUN', 'Destinos permitidos: conciliacionBanco']);
+
 run('pais-moneda-incoherente', {
   ...baseManifest('estado_cuenta_bancario'),
   currency: 'COP',
   schema: { fields: ['fecha', 'descripcion', 'monto', 'moneda', 'pais'] },
-  destinations: ['finmovs']
+  destinations: ['conciliacionBanco']
 }, 1, ['Decision: BLOQUEADO', 'Moneda incoherente']);
 
 run('payload-prohibido', {
@@ -79,6 +91,12 @@ run('polizas-campos-faltantes', {
   schema: { fields: ['numero_poliza', 'cliente'] },
   destinations: ['polizas']
 }, 1, ['Decision: BLOQUEADO', 'Campos mínimos faltantes']);
+
+run('documentos-no-clientes', {
+  ...baseManifest('documentos_soporte'),
+  schema: { fields: ['tipo_documento', 'archivo'] },
+  destinations: ['clientes']
+}, 1, ['Decision: BLOQUEADO', 'documentos_soporte no puede escribir clientes directo']);
 
 const output = [
   '============================================================',
