@@ -12,6 +12,24 @@ Estado: documento vivo hasta que Paula pida el próximo paquete Claude.
 - Planillas de comisión: ya tienen campos de comisión esperada/pagada y conciliación.
 - Financiero histórico: marca posibles recaudos/cobros como `requiere_validacion`.
 
+## Mejoras backend realizadas por ChatGPT/Codex que Claude debe conservar
+
+- Pipeline de empalme ahora corre auditorías de importador antes de plan/preview/diff.
+- Se creó contrato canónico de fuentes de migración A&S.
+- Se creó validador de manifest contra contrato canónico.
+- Se alineó el validador principal de manifest con el contrato canónico.
+- Se creó prevalidación unificada de fuente separada.
+
+Archivos backend/documentación que Claude debe respetar:
+
+```txt
+tools/orbit360-generar-contrato-fuentes-ays.mjs
+tools/orbit360-validar-manifest-contra-contrato-fuentes-ays.mjs
+tools/orbit360-prevalidar-fuente-ays.mjs
+tools/orbit360-validar-manifest-fuente-ays.mjs
+orbit360-platform/docs/CONTRATO-CANONICO-FUENTES-MIGRACION-AYS-20260704.md
+```
+
 ## P0 abiertos para corregir antes de cerrar empalme
 
 ### P0-01 — Moneda de hoja no debe inferirse por país
