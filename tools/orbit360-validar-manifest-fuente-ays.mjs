@@ -12,7 +12,7 @@ import path from 'node:path';
 const root = process.cwd();
 const args = process.argv.slice(2);
 const REPORT_DIR = path.join(root, '_orbit360_reports');
-const VERSION = 'v1.0.0-ays-manifest-validator';
+const VERSION = 'v1.1.0-ays-manifest-validator-canonical-contract';
 
 const SOURCE_TYPES = new Set([
   'clientes',
@@ -36,17 +36,17 @@ const COUNTRY_CURRENCY = {
 
 const REQUIRED_BY_SOURCE = {
   clientes: ['nombre'],
-  aseguradoras: ['nombre'],
-  polizas: ['numero_poliza', 'cliente', 'aseguradora', 'estado', 'pais', 'moneda'],
-  vehiculos: ['placa', 'cliente'],
+  aseguradoras: ['nombre', 'pais'],
+  polizas: ['numero_poliza', 'cliente', 'aseguradora', 'estado', 'pais', 'moneda', 'prima_neta'],
+  vehiculos: ['placa'],
   cobros_realizados: ['fecha', 'monto', 'moneda', 'pais'],
-  planilla_aseguradora: ['aseguradora', 'periodo', 'prima_neta', 'comision', 'moneda', 'pais'],
-  planilla_comisiones: ['aseguradora', 'periodo', 'comision_esperada', 'comision_pagada', 'moneda', 'pais'],
+  planilla_aseguradora: ['aseguradora', 'periodo', 'moneda', 'pais'],
+  planilla_comisiones: ['aseguradora', 'periodo', 'comision_pagada', 'moneda', 'pais'],
   estado_cuenta_bancario: ['fecha', 'descripcion', 'monto', 'moneda', 'pais'],
   financiero_historico: ['fecha', 'concepto', 'monto', 'tipo_movimiento', 'moneda', 'pais'],
-  siniestros: ['cliente', 'poliza', 'fecha', 'estado'],
-  documentos_soporte: ['tipo_documento', 'archivo', 'cliente_o_poliza_referencia'],
-  configuracion_catalogo: ['catalogo', 'clave', 'valor']
+  siniestros: ['cliente', 'fecha', 'estado'],
+  documentos_soporte: ['tipo_documento', 'archivo'],
+  configuracion_catalogo: ['tipo_catalogo']
 };
 
 const ALLOWED_DESTINATIONS = {
@@ -55,13 +55,22 @@ const ALLOWED_DESTINATIONS = {
   polizas: ['polizas', 'cobros'],
   vehiculos: ['vehiculos'],
   cobros_realizados: ['cobros'],
-  planilla_aseguradora: ['comisiones', 'cobros'],
+  planilla_aseguradora: ['cobros'],
   planilla_comisiones: ['comisiones'],
-  estado_cuenta_bancario: ['finmovs'],
+  estado_cuenta_bancario: ['conciliacionBanco'],
   financiero_historico: ['finmovs'],
   siniestros: ['reclamos'],
-  documentos_soporte: ['documentos'],
-  configuracion_catalogo: ['aseguradoras', 'contenidos', 'cursos']
+  documentos_soporte: ['documentos', 'parchesPendientes'],
+  configuracion_catalogo: ['configuracion', 'catalogos']
+};
+
+const NEVER_DIRECT_DESTINATIONS = {
+  financiero_historico: ['clientes', 'polizas', 'cobros', 'cartera', 'produccion', 'comisiones'],
+  estado_cuenta_bancario: ['clientes', 'polizas', 'cobros', 'cartera', 'produccion'],
+  documentos_soporte: ['clientes', 'polizas', 'cobros'],
+  cobros_realizados: ['finmovs'],
+  planilla_comisiones: ['finmovs', 'clientes', 'polizas'],
+  configuracion_catalogo: ['clientes', 'polizas', 'cobros', 'finmovs']
 };
 
 const FORBIDDEN_PAYLOAD_KEYS = new Set([
@@ -160,18 +169,17 @@ if (manifest) {
   if (!destinations.length) errors.push('Faltan colecciones destino explícitas.');
   const allowed = new Set(ALLOWED_DESTINATIONS[sourceType] || []);
   forbiddenDestinations = destinations.filter((d) => !allowed.has(d));
-  if (forbiddenDestinations.length) errors.push(`Colecciones destino no permitidas para ${sourceType}: ${forbiddenDestinations.join(', ')}`);
+  if (forbiddenDestinations.length) errors.push(`Colecciones destino no permitidas para ${sourceType}: ${forbiddenDestinations.join(', ')}. Permitidas: ${[...allowed].join(', ')}`);
 
-  if (sourceType === 'financiero_historico') {
-    for (const forbidden of ['clientes', 'polizas', 'cobros', 'aseguradoras']) {
-      if (destinations.includes(forbidden)) errors.push(`financiero_historico no puede escribir en ${forbidden}.`);
-    }
+  for (const forbidden of NEVER_DIRECT_DESTINATIONS[sourceType] || []) {
+    if (destinations.includes(forbidden)) errors.push(`${sourceType} no puede escribir en ${forbidden}.`);
   }
-  if (sourceType === 'estado_cuenta_bancario' && destinations.some((d) => ['clientes', 'polizas', 'cobros'].includes(d))) {
-    errors.push('estado_cuenta_bancario no puede crear clientes, pólizas ni cobros directamente.');
+
+  if (sourceType === 'estado_cuenta_bancario' && destinations.includes('finmovs')) {
+    errors.push('estado_cuenta_bancario no puede escribir finmovs; debe ir a conciliacionBanco.');
   }
-  if (sourceType === 'documentos_soporte' && destinations.some((d) => ['clientes', 'polizas'].includes(d))) {
-    errors.push('documentos_soporte no puede escribir directamente clientes/pólizas sin confirmación posterior.');
+  if (sourceType === 'documentos_soporte' && destinations.includes('clientes')) {
+    errors.push('documentos_soporte no puede escribir clientes directo; debe ir a documentos/parchesPendientes.');
   }
 
   if (manifest.write_enabled === true || manifest.writeEnabled === true) {
@@ -197,6 +205,7 @@ const result = {
   source_type: sourceType,
   fields_count: fields.length,
   destinations,
+  allowed_destinations: ALLOWED_DESTINATIONS[sourceType] || [],
   missing_fields: missingFields,
   forbidden_destinations: forbiddenDestinations,
   forbidden_payload_keys: forbiddenKeys,
@@ -212,11 +221,13 @@ const txt = [
   `Manifest: ${manifestArg || 'S/D'}`,
   `Decision: ${decision}`,
   'Restricciones: no lee filas, no escribe store/Firestore, no deploy.',
+  'Contrato: fuentes separadas A&S v1.0.',
   '============================================================',
   '',
   `Tipo fuente: ${sourceType || 'S/D'}`,
   `Campos declarados: ${fields.length}`,
   `Destinos: ${destinations.join(', ') || 'S/D'}`,
+  `Destinos permitidos: ${(ALLOWED_DESTINATIONS[sourceType] || []).join(', ') || 'S/D'}`,
   '',
   `Errores: ${errors.length}`,
   ...errors.map((e) => `ERROR: ${e}`),
