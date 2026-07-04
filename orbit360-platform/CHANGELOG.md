@@ -2,6 +2,25 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos a `main`.
 
+## [1.115.0] — 2026-07-04 · Reauditoría 072304 (trazabilidad real, moneda, comisiones, documentos, textos)
+> Detalle fix por fix en `docs/BITACORA-CAMBIOS.md` (v1.115). P0: `copyRowMeta` lleva la trazabilidad al registro final; moneda solo explícita (`monedaSugerida` no se escribe); contrato real de planilla de comisiones (esperada vs pagada, tarifas solo con diff confirmado); documentos → `parchesPendientes` con diff. P1: cierre relativo a fecha viva; textos técnicos suavizados; financiero histórico bloquea conceptos de cobro/recaudo.
+
+## [1.114.0] — 2026-07-04 · Candidato corregido (auditoría ampliada A&S · P0/P1/P2)
+> Candidato **v1.114** = versión unificada de esta entrega (README/CHANGELOG/bitácoras/pendientes/smoke coinciden). Detalle fix por fix en `docs/BITACORA-CAMBIOS.md` y `docs/BITACORA-ERRORES.md`. Auditoría en `docs/AUDITORIA-CANDIDATO-CLAUDE-POST-FIX.md`; smoke en `docs/REPORTE-SMOKE.md`.
+
+### Importador (P0-02 a P0-06)
+- Excel **multihoja con trazabilidad** por fila (`_origenHoja/_paisHoja/_monedaHoja/_periodoHoja/_bloqueOrigen/_numeroFila`) + **exclusión de hojas soporte** por nombre (dashboard/resumen/presupuesto/producción) con conteo en el reporte.
+- **`normPais` ya no asume GT**: país/moneda desconocidos → `requiere_validacion` (no se asume GTQ).
+- **Pólizas**: país/moneda como campos; sin estado explícito → `Requiere validación`; **recibos/cartera solo** para Vigente/Por renovar con país+moneda+forma de pago confiables. Separación **primaNeta/gastos/iva/primaTotal**.
+- **Planillas de comisión**: se leen de **filas reales**; sin extracción confiable **no se actualizan tarifas** (referencia).
+- **Todo tipo visible tiene contrato**: `planillas-comision` con mapeo a `comisiones`; `docs-aseguradora` forzado a **documental** (solo almacena).
+- **Documentos** no crean/modifican clientes sin expediente abierto (confirmación).
+
+### UI comercializable (P1-05/07, P1-06, P2-01)
+- Login **sin credenciales demo** precargadas; textos técnicos del panel de integraciones suavizados; "White-label para Alianzas" removido del selector de paleta.
+- **Fechas quemadas operativas** reemplazadas por fecha viva (portal, cliente360, correo).
+- **PWA** con 3 estados: instalada (`✓ App instalada`) / iOS (guía) / otros navegadores (instalar).
+
 ## [1.93.0] — 2026-07-03 · Consolidado v1.56–v1.93 (auditorías P0/P1 + profundización de módulos)
 > Entrada consolidada para realinear el CHANGELOG con la bitácora viva (`docs/BITACORA-CAMBIOS.md`), que tiene el detalle versión por versión.
 

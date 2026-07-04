@@ -68,8 +68,8 @@ Orbit.auth = (function () {
     const form = document.getElementById('login-form');
     if (form) form.addEventListener('submit', e => {
       e.preventDefault();
-      const email = (document.getElementById('lg-user') || {}).value || 'admin@demo.com';
-      login({ nombre: 'Andrea Beltrán', rol: 'Dirección', email });
+      const email = (document.getElementById('lg-user') || {}).value || '';
+      login({ nombre: 'Andrea Beltrán', rol: 'Dirección', email: email || 'usuario@empresa.com' });
       showApp();
     });
     const reset = document.getElementById('lg-reset');

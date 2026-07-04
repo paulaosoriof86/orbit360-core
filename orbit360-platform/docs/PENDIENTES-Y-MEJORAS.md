@@ -1,4 +1,4 @@
-# PENDIENTES Y MEJORAS — Orbit 360 (estado al v1.41)
+# PENDIENTES Y MEJORAS — Orbit 360 (candidato v1.114 · 2026-07-04)
 
 > Documento puente para **ChatGPT (migración / backend)**. Lista honesta de lo que
 > **funciona como prototipo** vs lo que **requiere backend real** o **profundización**.

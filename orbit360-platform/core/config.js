@@ -230,6 +230,19 @@ Orbit.tenant = (function () {
     modulosActivos: ['inicio', 'cronograma', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'siniestros', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'automatizaciones', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
     addons: { make: false, drive: true, whatsapp: true, correo: true, metricool: false, facebook: false, linkedin: false, web: true, canva: false, gamma: false, heygen: false, ia: false, mailchimp: false, sheets: false },
     portalVisibility: { polizas: true, recibos: true, documentos: true, asesor: true, comisiones: false, drive: false },
+    // Glosario/localización POR TENANT: sobreescribe términos por clave (opcional, por país).
+    // Formato: { GT: { poliza: 'Póliza', ... }, CO: {...}, '*': {...} }. Vacío = usa defaults de Orbit.TERMINOS.
+    glosario: {},
+    // Catálogo financiero editable por tenant (P6): categorías de ingresos/egresos + especiales.
+    // Incluye las clases usadas por el seed para no romper movimientos existentes.
+    catalogoFinanciero: {
+      ingresos: ['Comisiones aseguradora', 'Incentivos', 'Honorarios', 'Reintegros', 'Aportes', 'Otros'],
+      egresos: ['Comisiones asesores', 'Gastos fijos', 'Marketing', 'Operación', 'Tecnología', 'Administración', 'Impuestos', 'Bancos', 'Devolución de préstamo', 'Otros'],
+      especiales: ['Saldo inicial', 'Transferencia interna', 'Ajuste', 'Sin clasificar']
+    },
+    // Cierre financiero por tenant (P5): último periodo consolidado. Vacío = se calcula
+    // relativo a la fecha viva (2 meses atrás). Configurable por país en Configuración.
+    cierreFinanciero: {},
     apis: []
   };
   let data = null;
@@ -248,6 +261,39 @@ Orbit.tenant = (function () {
     DEFAULT
   };
 })();
+
+/* ============================================================
+   Localización por país — términos configurables por tenant.
+   Uso en módulos:  Orbit.termino('poliza')  ó  Orbit.termino('poliza', 'CO')
+   Resolución:  tenant.glosario[pais][clave]  →  tenant.glosario['*'][clave]
+                →  Orbit.TERMINOS[pais][clave]  →  Orbit.TERMINOS['*'][clave]  →  clave
+   Todo es override opcional; sin config usa los defaults de abajo. NO rompe textos existentes.
+   ============================================================ */
+Orbit.TERMINOS = {
+  '*': {
+    poliza: 'Póliza', recibo: 'Recibo', prima: 'Prima', prima_neta: 'Prima neta',
+    cliente: 'Cliente', asegurado: 'Asegurado', aseguradora: 'Aseguradora',
+    comision: 'Comisión', ramo: 'Ramo', vigencia: 'Vigencia', deducible: 'Deducible',
+    siniestro: 'Siniestro', cobro: 'Cobro', tomador: 'Tomador', id_fiscal: 'ID fiscal',
+    corredor: 'Corredor', gestion: 'Gestión'
+  },
+  GT: { id_fiscal: 'NIT', tomador: 'Contratante', corredor: 'Corredor de seguros' },
+  CO: { id_fiscal: 'NIT', tomador: 'Tomador', corredor: 'Intermediario de seguros', comision: 'Comisión de intermediación' },
+  MX: { id_fiscal: 'RFC', tomador: 'Contratante', corredor: 'Agente de seguros' },
+  PA: { id_fiscal: 'RUC', poliza: 'Póliza' },
+  CR: { id_fiscal: 'Cédula jurídica', corredor: 'Corredor de seguros' }
+};
+Orbit.termino = function (clave, pais) {
+  if (!clave) return '';
+  try {
+    const t = (Orbit.tenant && Orbit.tenant.get) ? Orbit.tenant.get() : {};
+    const p = pais || Orbit.pais || (t.paises && t.paises[0]) || '*';
+    const g = t.glosario || {};
+    const src = [ g[p], g['*'], Orbit.TERMINOS[p], Orbit.TERMINOS['*'] ];
+    for (const o of src) { if (o && o[clave] != null && o[clave] !== '') return o[clave]; }
+  } catch (e) {}
+  return clave;
+};
 
 Orbit.NAV = [
   { type: 'home', route: 'inicio', icon: '🌅', label: 'Orbit Inicio' },

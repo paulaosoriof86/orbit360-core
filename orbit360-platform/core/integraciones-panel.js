@@ -26,7 +26,7 @@ Orbit.integracionesPanel = (function () {
     const lab = isLabMode();
     back.innerHTML = `<div class="card" style="width:min(980px,96vw);max-height:92vh;overflow:auto;padding:0">
       <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <div><b style="font-family:var(--f-display);font-size:17px">🔌 Eventos de integración</b><div class="muted" style="font-size:12px">Diagnóstico por tenant · demo/LAB seguro</div></div>
+        <div><b style="font-family:var(--f-display);font-size:17px">🔌 Eventos de integración</b><div class="muted" style="font-size:12px">Estado de integraciones por tenant</div></div>
         <button class="imp-x" id="intp-x">✕</button>
       </div>
       <div style="padding:18px 20px;display:grid;gap:14px">
@@ -49,10 +49,10 @@ Orbit.integracionesPanel = (function () {
             <td><b>${esc(ev.evento)}</b>${ev.error ? '<div class="muted" style="font-size:12px;color:var(--danger)">' + esc(ev.error) + '</div>' : ''}</td>
             <td>${esc(ev.modulo || '')}</td><td>${esc(ev.proveedor || '')}</td><td>${badge(ev.estado)}</td>
             <td class="muted" style="font-size:12px">${esc(ev.entidad || '')}${ev.entidadId ? ' · ' + esc(ev.entidadId) : ''}</td>
-            ${lab ? '<td><button class="btn ghost sm" data-lab-cycle="' + esc(ev.id) + '">🧪 Simular</button></td>' : ''}
+            ${lab ? '<td><button class="btn ghost sm" data-lab-cycle="' + esc(ev.id) + '">▶ Probar</button></td>' : ''}
           </tr>`).join('') || '<tr><td colspan="7" class="muted">Sin eventos todavía.</td></tr>'}</tbody>
         </table></div>
-        <div class="cfg-note">LAB/demo registra trazabilidad sin enviar a proveedores reales. En producción no debe mostrarse como conexión activa.</div>
+        <div class="cfg-note">Registra la trazabilidad de cada evento. Mientras una integración no esté activa, no se envía a proveedores externos.</div>
       </div>
     </div>`;
     back.querySelector('#intp-x').onclick = () => back.remove();

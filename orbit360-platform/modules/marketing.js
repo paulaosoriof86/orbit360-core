@@ -27,7 +27,7 @@ Orbit.modules.marketing = (function () {
   function integrationMsg(row, fallback) {
     if (!row) return fallback || 'Evento registrado localmente.';
     if (row.estado === 'pendiente_configuracion') return '⚠ Evento registrado: falta configurar ' + (row.proveedor || 'integración') + '.';
-    if (row.estado === 'pendiente_backend') return '⚠ Configuración pendiente de backend seguro.';
+    if (row.estado === 'pendiente_backend') return '⚠ Configuración pendiente de conexión.';
     return fallback || '✓ Evento de integración registrado.';
   }
 
@@ -143,6 +143,22 @@ Orbit.modules.marketing = (function () {
     toast('🔁 ' + atras.length + ' publicación(es) reprogramada(s) automáticamente'); render(host);
   }
 
+  const EVT_LBL = { marketing_generar_pieza: '🎨 Pieza solicitada (Canva)', marketing_programar_publicacion: '📅 Programación (Metricool)', marketing_contenido_creado: '📝 Contenido guardado (Make)', marketing_sync_sheets: '🔄 Sincronización (Sheets)' };
+  const EVT_TONE = { pendiente: 'info', pendiente_configuracion: 'warn', pendiente_backend: 'warn', ok: 'ok', error: 'danger' };
+  function histHtml(id) {
+    let rows = [];
+    try { if (Orbit.integraciones && Orbit.integraciones.list) rows = Orbit.integraciones.list({ entidad: 'contenidos', entidadId: id, limit: 12 }) || []; } catch (e) {}
+    const inner = rows.length ? rows.map(r => {
+      const t = (r.createdAt || '').replace('T', ' ').slice(0, 16);
+      const est = (r.estado || '').replace(/_/g, ' ');
+      return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)">
+        <span style="flex:1;font-size:12.5px">${EVT_LBL[r.evento] || U.esc(r.evento)}</span>
+        <span class="badge ${EVT_TONE[r.estado] || 'neutral'}" style="font-size:9.5px">${U.esc(est)}</span>
+        <span class="muted mono" style="font-size:10.5px">${t}</span></div>`;
+    }).join('') : '<div class="muted" style="font-size:12px;padding:6px 0">Aún no hay eventos. Al crear pieza, programar o guardar se registran aquí.</div>';
+    return `<div style="margin-top:4px"><div style="font-family:var(--f-display);font-weight:700;font-size:12.5px;margin-bottom:4px;display:flex;align-items:center;gap:6px">🧾 Historial de eventos${rows.length ? ' <span class="badge neutral" style="font-size:9.5px">' + rows.length + '</span>' : ''}</div>${inner}</div>`;
+  }
+
   function ficha(id, fecha) {
     const c = id ? S().get('contenidos', id) : null;
     const canales = ['LinkedIn', 'Facebook', 'Instagram', 'WhatsApp', 'TikTok', 'YouTube'];
@@ -181,6 +197,7 @@ Orbit.modules.marketing = (function () {
           <button class="btn ghost sm" id="mk-prog">📅 Programar (Metricool)</button>
         </div>
         ${c && c.stats ? `<div class="cfg-note">📊 Alcance <b>${c.stats.alcance.toLocaleString('es')}</b> · interacciones <b>${c.stats.interac}</b> · leads <b>${c.stats.leads}</b></div>` : ''}
+        ${id ? `<div id="mk-hist">${histHtml(id)}</div>` : ''}
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between">
         ${c ? '<button class="btn ghost" id="mk-del" style="color:var(--danger)">🗑 Eliminar</button>' : '<span></span>'}
@@ -220,6 +237,7 @@ Orbit.modules.marketing = (function () {
       const data = dataActual();
       const row = emitMarketing('marketing_generar_pieza', { entidad: 'contenidos', entidadId: id || '', contenido: data, proveedorPreferido: 'canva' }, { proveedorPreferido: 'canva', entidad: 'contenidos', entidadId: id || '' });
       toast(integrationMsg(row, '🎨 Solicitud de pieza registrada para Canva.'));
+      refrescarHist(id);
     });
     $('#mk-prog').addEventListener('click', () => {
       const f = $('#mk-fecha').value, h = $('#mk-hora').value;
@@ -227,7 +245,9 @@ Orbit.modules.marketing = (function () {
       const data = dataActual();
       const row = emitMarketing('marketing_programar_publicacion', { entidad: 'contenidos', entidadId: id || '', contenido: data, fecha: f, hora: h, proveedorPreferido: 'metricool' }, { proveedorPreferido: 'metricool', entidad: 'contenidos', entidadId: id || '' });
       toast(integrationMsg(row, '📅 Programación registrada para ' + f + ' ' + h + '.'));
+      refrescarHist(id);
     });
+    function refrescarHist(cid) { if (!cid) return; const box = $('#mk-hist'); if (box) box.innerHTML = histHtml(cid); }
     if ($('#mk-del')) $('#mk-del').addEventListener('click', () => { S().remove('contenidos', id); close(); render(host); });
     $('#mk-ok').addEventListener('click', () => {
       const data = dataActual();

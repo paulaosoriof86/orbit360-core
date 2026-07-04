@@ -2,6 +2,143 @@
 
 > Registro cronológico de cambios del **prototipo** (Claude). El backend LAB (ChatGPT/Codex) mantiene su propia bitácora. Formato: versión · fecha · qué cambió · archivos.
 
+## v1.115 — 2026-07-04 · Reauditoría 072304: trazabilidad real, moneda no autocompletada, comisiones, documentos, textos
+> Sin tocar backend/LAB, `data/store.js` backend, Firestore, ni deploy. Sin datos reales.
+- **P0-01 Trazabilidad a `rec`** (`core/importa.js`): helper `copyRowMeta(cells, rec)` llamado en `applyImport`, `dryRun`, `conciliarRows` y el flujo scoped → `_origenHoja/_paisHoja/_monedaHoja/_periodoHoja/_bloqueOrigen/_numeroFila` llegan al registro final (`finmovs`). Verificado: `_numeroFila` presente en el finmov creado.
+- **P0-02 Moneda no autocompletada**: `finmovShape` y pólizas separan `moneda` (solo **explícita** de fila/hoja) de `monedaSugerida` (`monedaDe(pais)`, no se escribe). País reconocido pero sin moneda explícita → `requiere_validacion`. Verificado: GT sin moneda → `requiere_validacion`, `monedaSugerida:GTQ`.
+- **P0-03 Contrato real de planillas de comisión**: campos aseguradora/póliza/recibo/asesor/ramo/producto/**primaNeta**/**comEsperada**/**comPagada**/pais/moneda/periodo; conciliación esperada vs pagada (`difComision`); falta país/moneda/periodo/aseguradora → `requiere_validacion`. Tarifas **solo** se aplican con **diff confirmado** (checkbox "Aplicar estos % al tarifario" + columna % actual vs nuevo con Δ).
+- **P0-04 Documentos → parches con diff**: `documentos` escribe a `parchesPendientes` (nunca a `clientes` directo). Con expediente abierto genera un parche con el **diff** (campo: actual→propuesto) pendiente de confirmación; sin expediente, no hace nada.
+- **P1-05 Fechas fijas**: cierre financiero por defecto **relativo** a la fecha viva (2 meses atrás) en `modules/finanzas.js`; `core/config.js` `cierreFinanciero:{}`; vigencia de ejemplo en `core/ia.js` relativa a hoy. (Seeds de `core/integraciones.js` son tenant demo aislado — permitido.)
+- **P1-06 Textos técnicos**: "Pendiente de backend"→"Pendiente de conexión" (configuración ×5); "backend del tenant" removido; panel "Diagnóstico…"→"Estado de integraciones", "🧪 Simular"→"▶ Probar"; marketing "backend seguro"→"conexión"; correo "modo demo"→"sin cuenta conectada".
+- **P1-07 Financiero histórico**: conceptos ingreso que parecen cobro/recaudo de cliente (pago cliente/recibo/póliza/prima/cuota/recaudo/abono) → `requiere_validacion` (no entran a caja). Verificado: "Pago cliente REC-99" bloqueado.
+- Cache-bust: `importa.js`→`?v1305`, `config.js`/`ia.js`→`?v1305`, `finanzas.js`/`configuracion.js`/`correo.js`/`marketing.js`→`?v1305`.
+
+
+## v1.114 — 2026-07-04 · Candidato corregido · auditoría ampliada A&S (P0/P1/P2)
+> No se tocó backend/LAB, `data/store.js` backend, Firestore, ni se hizo deploy. Sin datos reales. A&S solo desde config/tenant demo. Detalle de estado P0/P1 en `docs/BITACORA-ERRORES.md`; smoke en `docs/REPORTE-SMOKE.md`.
+
+**Importador (`core/importa.js`, `modules/importar.js`)**
+- **P0-02** Excel multihoja con trazabilidad por fila: `_origenHoja/_paisHoja/_monedaHoja/_periodoHoja/_bloqueOrigen/_numeroFila`. Cada hoja infiere país/moneda/periodo de su nombre (sin asumir GT). Resumen de hojas procesadas/excluidas en el paso 2 y en el reporte CSV.
+- **P1-02** Exclusión de **hojas soporte** por patrón de nombre (dashboard, resumen, presupuesto, análisis, producción, metas…) antes de mapear, con conteo y motivo.
+- **P0-03** `normPais()` devuelve `''` cuando no reconoce país (antes: GT). `finmovShape` usa país de fila→hoja; sin país/moneda confiables marca `estado:'requiere_validacion'` y `requiereValidacion:true`. **No se asume GTQ.**
+- **P0-04** Pólizas: nuevos campos `pais`/`moneda`; estado sin evidencia → `Requiere validación` (no `Vigente`). `afterInsert` genera recibos/cartera **solo** si Vigente/Por renovar **y** país+moneda+forma de pago confiables **y** sin `requiereValidacion`.
+- **P1-04** Pólizas separan `primaNeta`/`gastos`/`iva`/`primaTotal`; si no se puede determinar la neta → `requiere_validacion` (producción/comisiones deben usar neta recaudada).
+- **P0-05** `tarifasDetect()` lee **filas reales** (aseguradora/ramo/producto/%/base) del archivo; sin aseguradora reconocida y % válido, `tarifasConfiables=false` → **no** actualiza tarifas (referencia). Nuevo contrato `IMPORT_MAP['planillas-comision']` → colección `comisiones`.
+- **P0-06** `docs-aseguradora` forzado a **modo documental** (solo almacena; SCOPE `crea:[]`). Todo tipo visible tiene contrato o queda documental/bloqueado.
+- **P1-01** Ejemplo y descripción de `movimientos-finanzas` aclara que pagos de clientes NO van a caja (van a cobros/conciliación).
+- **P1-03** `documentos` sin expediente abierto (scope) **no crea ni modifica clientes**: avisa y requiere abrir el expediente.
+
+**UI comercializable**
+- **P1-05** (`index.html`, `core/auth.js`) Login sin credenciales demo (`admin@demo.com`/`demo123`) → placeholders. (`core/integraciones-panel.js`) textos "demo/LAB" suavizados a lenguaje de usuario (sin tocar lógica ni contratos).
+- **P1-06** Fechas quemadas operativas → fecha viva: `modules/portal.js`, `modules/cliente360.js` (×2), `core/correo.js` (×2).
+- **P1-07** (`core/theme.js`) "White-label para Alianzas" → "Se aplica a toda la plataforma y al login". A&S solo desde tenant demo (slot white-label).
+- **P2-01** (`core/pwa.js`) 3 estados: instalada (`✓ App instalada`, verde, auto-oculta), iOS (guía Compartir→Agregar a inicio), otros navegadores (`⬇ Instalar como app`).
+
+**Verificado en vivo**: financiero-histórico excluye `TOTALES`; finmov sin país → `requiere_validacion` sin GT/GTQ; documentos = documental y no crea clientes; app carga sin errores de consola.
+- Cache-bust: `importa.js`→`?v1304`, `config.js`/`finanzas.js`→`?v1300`, `theme.js`/`auth.js`/`correo.js`/`pwa.js`/`cliente360.js`/`portal.js`→`?v1304`, `configuracion.js`→`?v1301`.
+
+
+## v1.113 — 2026-07-03 · Cierre opcionales: reporte de exclusiones descargable + cierre/catálogo por país
+- **Reporte de importación descargable (CSV)**: nuevo botón **⬇ Reporte** en el paso 2 del importador. Exporta tipo de fuente, archivo, alcance (crea/actualiza y bloqueado), **estado del archivo** (`listo`/`requiere_validacion`/`sin_datos`), resumen dry-run (crear/actualizar/omitir/total) y el **detalle de filas excluidas con su motivo**. Trazabilidad completa de cada importación. Verificado: botón presente tras cargar archivo.
+- **Cierre financiero por país** (`periodoEstado(ym, pais)`): `tenant.cierreFinanciero` admite ahora override por país `{ cerradoHasta:'2026-04', CO:{cerradoHasta:'2026-02'} }` con fallback al cierre global. El badge de estado del mes en Finanzas usa el país activo. Verificado: con CO cerrado hasta feb, marzo-2026 muestra "Referencia" (mientras el global GT lo daría "Cerrado").
+- **Catálogo financiero por país** (`catFin`): admite `catalogoFinanciero.{GT|CO}.{ingresos,egresos}` con fallback al catálogo global del tenant. Backward-compatible con el catálogo plano existente.
+- Reglas respetadas: sin backend/`store.js`, sin datos reales, sin hardcode A&S, sin notas técnicas.
+- Con esto se cierran los opcionales pendientes del paquete A&S; el prototipo queda listo para el carril de backend.
+- Cache-bust: `importa.js` → `?v1303`, `finanzas.js` → `?v1303`.
+- Archivos: `core/importa.js`, `modules/finanzas.js`, `index.html`.
+
+
+## v1.112 — 2026-07-03 · Fix: movimientos importados ahora suman en Finanzas (forma real de finmovs)
+- **Bug corregido** (pendiente #1 de la auditoría): los builds del importador para finmovs producían `{ monto, tipo:'Ingreso', clasificacion, fecha }`, forma que **no coincide** con la del seed que lee Finanzas (`{ tipo:'ingreso'|'egreso', clase, pais, moneda, periodo, dia, valor, estado }`), por lo que los movimientos importados **no sumaban** en KPIs/dashboard.
+- **Solución**: nuevo normalizador `finmovShape(rec, clase)` en `core/importa.js` que emite la forma real del seed (deriva `periodo`/`dia` de la fecha, `valor` absoluto, `tipo` en minúsculas, `pais`/`moneda` sin mezclar, `estado` recaudado/pagado, y `saldo_inicial`/`referencia` para saldo anterior). Aplicado a las 3 fuentes finmovs: `movimientos-finanzas`, `estados-banco`, `financiero-historico` (mutando `rec`, que es lo que consume `applyImport`).
+- Verificado por importación real: CSV con fila `TOTALES` (excluida) + comisión GT 3.500 → el movimiento se crea con forma correcta y el total de ingresos GT del mes pasa de 15.503 a 19.003 (+3.500).
+- Actualizado `docs/BITACORA-ERRORES.md`: el hallazgo del casing/forma queda **RESUELTO**.
+- Cache-bust: `importa.js` → `?v1302`.
+- Archivos: `core/importa.js`, `index.html`, `docs/BITACORA-ERRORES.md`.
+
+
+## v1.111 — 2026-07-03 · Auditoría clic-por-clic (base 1.0) + limpieza de notas técnicas (P9)
+- **Auditoría runtime de las 30 rutas del NAV**: navegación programática módulo por módulo → **0 pantallas en blanco, 0 errores de consola**; todos los `#host` con contenido. (Ver `docs/BITACORA-ERRORES.md`.)
+- **Higiene de datos (checklist del paquete)**: `localStorage` directo en `modules/` = **0** (todo pasa por `Orbit.store`). Sin `Firestore/Firebase/localhost` en UI de módulos.
+- **P9 · Notas técnicas visibles eliminadas**: quitadas de la UI las menciones "Demo: motor simulado / en producción se conecta el extractor real" (Importar hub y pasos del importador) y "(demo: solo la UI de gestión)" (Configuración → APIs). Reemplazadas por copy orientado al usuario. Verificado en vivo.
+- Reglas respetadas: sin backend/`store.js`, sin datos reales, sin hardcode A&S.
+- Cache-bust: `importa.js`, `importar.js`, `configuracion.js` → `?v1301`.
+- Archivos: `core/importa.js`, `modules/importar.js`, `modules/configuracion.js`, `index.html`, `docs/BITACORA-ERRORES.md` (nuevo).
+
+
+## v1.110 — 2026-07-03 · Estados de cierre por periodo (paquete A&S · P5)
+- **`tenant.cierreFinanciero.cerradoHasta`** (nuevo, default `2026-04`): último periodo consolidado, configurable por tenant (sin hardcode A&S).
+- **`periodoEstado(ym)`** en Finanzas clasifica cada mes: `≤ cerradoHasta` → **🔒 Cerrado**; mes siguiente → **◷ Referencia** (requiere conciliación manual, no es cierre); meses posteriores pasados → **✎ Captura y conciliación**; mes actual/futuro → **● Abierto / en validación** ("no se cierra sin planillas, estados de cuenta o respaldo").
+- **UI**: badge de estado junto al título de Movimientos + nota explicativa (oculta cuando el mes está cerrado). Verificado cambiando de mes: abril=Cerrado, mayo=Referencia, junio=Captura, julio=Abierto — exactamente los cortes del paquete.
+- No-destructivo; sin backend/`store.js`, sin datos reales, sin notas técnicas.
+- Con esto quedan implementadas del paquete A&S: **P1, P2, P4, P5, P6, P7** (importador con alcance/guarda/saldo/histórico + catálogo financiero + cierres). Pendiente opcional: catálogo/cierre por **país** (hoy por tenant) y reporte de exclusiones descargable.
+- Cache-bust: `config.js` y `finanzas.js` → `?v1300`.
+- Archivos: `core/config.js`, `modules/finanzas.js`, `index.html`.
+
+
+## v1.109 — 2026-07-03 · Catálogo financiero editable por tenant (paquete A&S · P6)
+- **`tenant.catalogoFinanciero`** (nuevo en DEFAULT): `{ ingresos, egresos, especiales }` — precargado con las clases del seed (para no romper movimientos existentes) más las categorías sugeridas del paquete (honorarios, reintegros, aportes, tecnología, administración, impuestos, bancos…). Heredable, por tenant, sin hardcode A&S.
+- **Finanzas lee del catálogo**: `catFin('ingreso'|'egreso')` reemplaza los arrays fijos `CLASES_ING/EGR`; el alta/edición de movimiento y el presupuesto usan las categorías del tenant (fallback a los valores previos si no hay catálogo).
+- **Editor "⚙ Categorías"** en la barra de Movimientos: agrega/quita categorías por grupo (💰 Ingresos / 💸 Egresos / 🔖 Especiales), persiste en `tenant.catalogoFinanciero`. Verificado: agregar "Consultoría" persiste y aparece de inmediato en el dropdown de alta de ingreso.
+- No-destructivo; sin backend/`store.js`, sin datos reales, sin notas técnicas.
+- **Pendiente del paquete que queda**: P5 (cierres mayo/junio/julio como referencia/captura/abierto) y catálogo por **país** (hoy es por tenant; puede extenderse a por-país si se requiere).
+- Cache-bust: `config.js` → `?v1299`, `finanzas.js` → `?v1299`.
+- Archivos: `core/config.js`, `modules/finanzas.js`, `index.html`.
+
+
+## v1.108 — 2026-07-03 · Importador: fuente dedicada `financiero-historico` (P4) + alcance primero (P1)
+- **Fuente `financiero-historico`** (nueva tarjeta en Importar → Finanzas): carga movimientos financieros históricos GT/CO. En `build`: **excluye filas no-movimiento** (títulos, subtotales, `TOTALES`/`Total general`, dashboards, presupuestos, producción) marcándolas `_excluir` con motivo; **separa país/moneda** (GTQ/COP, sin mezclar); trata **saldo anterior** como `SaldoInicial`/`referencia`/`requiereValidacion` (no suma). Las filas excluidas se **omiten** en `applyImport` y aparecen listadas como "excluida: …" en el resumen dry-run. Verificado con CSV real (TOTALES y Subtotal excluidos; comisión GT y nómina CO reconocidas).
+- **P1 alcance-primero (satisfecho)**: el flujo ya obliga a elegir el **tipo de fuente** (tarjeta del hub Importar) antes de procesar, y el nuevo **banner "🔒 Alcance de esta fuente"** (v1.107) declara en el paso 1 qué crea/actualiza y qué queda bloqueado, antes de subir el archivo. La guarda `scopeGuard` impide escrituras fuera del alcance. Queda como mejora opcional cambiar el tipo dentro del propio drawer.
+- Reglas respetadas: sin backend/`store.js`, sin datos reales, sin hardcode A&S, sin notas técnicas en UI.
+- Cache-bust: `importa.js` → `?v1299`, `importar.js` → `?v1299`.
+- Archivos: `core/importa.js`, `modules/importar.js`, `index.html`.
+
+
+## v1.107 — 2026-07-03 · Importador: alcance por fuente + guarda anti-inferencia + regla de saldo anterior (paquete A&S P1/P2/P4/P7)
+- **Alcance visible por fuente** (`core/importa.js`): cada tipo de importación muestra un **banner "🔒 Alcance de esta fuente"** en el paso 1 y 2 con lo que **crea/actualiza** y lo que **NO crea (bloqueado)**. Ej.: movimientos-finanzas / estados-banco → crean solo `finmovs`, **bloquean** clientes, pólizas, cobros y cartera. Verificado: el banner aparece y lista los bloqueos.
+- **Guarda anti-inferencia cruzada** (`scopeGuard`): `applyImport` rechaza escribir en cualquier colección fuera del alcance declarado de la fuente (defensa además de que cada fuente ya escribía solo a su colección). Si se intenta, avisa "⛔ Bloqueado por alcance".
+- **Regla de SALDO ANTERIOR** (build de `movimientos-finanzas`): conceptos "saldo anterior/inicial" ya **no** se cargan como ingreso/egreso operativo — se marcan `tipo:'SaldoInicial'`, `signo:0`, `estado:'referencia'`, `requiereValidacion:true`. Finanzas filtra estrictamente `ingreso`/`egreso`, por lo que estos **no suman** en totales (verificado por lectura del filtro).
+- **Pendientes del importador (abiertos, documentados)**: (a) selector de tipo de fuente como **primer paso obligatorio** con lista de tipos del paquete (clientes/polizas/cobros_realizados/planilla_aseguradora/estado_cuenta/financiero_historico/siniestros/documentos_soporte/configuracion_catalogo); (b) modo **financiero_historico** dedicado con detección de hojas mensuales por país/mes/año y exclusión de títulos/subtotales/dashboards; (c) reporte de exclusiones y estados por archivo (listo/requiere_validacion/bloqueado/superado); (d) catálogo financiero editable por tenant. Estos quedan para la próxima sesión.
+- Reglas respetadas: sin tocar backend/`data/store.js`, sin datos reales, sin hardcode A&S, sin notas técnicas en UI.
+- Cache-bust: `importa.js` → `?v1298`.
+- Archivos: `core/importa.js`, `index.html`.
+
+
+## v1.106 — 2026-07-03 · Localización cableada en módulos internos (cobros, cliente360) + fix fecha congelada
+- **Cobros · detalle del recibo** (`modules/cobros.js`): helper `TT(k)` resuelve por el país del cliente del recibo; el crumb "Recibo", el título "Desglose del recibo", "Prima neta" y "Total del recibo" ahora usan `Orbit.termino()`. Verificado: con override CO `recibo→Comprobante` / `prima_neta→Prima neta base`, el detalle refleja ambos.
+- **Cliente360 · alta de cliente**: el label del campo de identificación usa `Orbit.termino('id_fiscal')` (NIT/RFC/RUC/… según país) en vez del texto fijo "DPI/Cédula/NIT".
+- **Fix fecha congelada**: el endoso tenía `value="2026-06-22"` quemado; ahora `Orbit.ui.today()` (fecha viva).
+- No-destructivo: sin overrides, los términos por defecto quedan idénticos.
+- **Pendiente menor**: cablear encabezados de tablas analíticas de comisiones (país mixto — requiere criterio); el resto de localización queda cerrado.
+- Cache-bust: `cobros.js`, `cliente360.js` → `?v1298`.
+- Archivos: `modules/cobros.js`, `modules/cliente360.js`, `index.html`.
+
+
+## v1.105 — 2026-07-03 · Marketing historial de eventos + responsive global (endurecimiento)
+- **Marketing · historial de eventos por contenido**: la ficha de contenido ahora muestra **🧾 Historial de eventos** (leído de `Orbit.integraciones.list({entidad:'contenidos', entidadId})`) con evento (pieza/programación/guardado/sync), estado (badge) y fecha-hora. Se **refresca en vivo** al Crear pieza / Programar. Verificado: al emitir, los eventos aparecen al instante.
+- **Responsive global (endurecimiento)** en `styles/base.css`: tablas `.tbl` con scroll horizontal ≤900px (no desbordan el viewport); Configuración `.cfg-wrap`/`.cfg-side` pasan a columna con navegación horizontal ≤820px; portal `.pt-cards` compactas y formularios a 1 col ≤560px; **calendario de marketing** con scroll horizontal (min-width 560px) en vez de aplastar 7 columnas ≤640px; drawers `max-width:96vw`; `.page{overflow-x:hidden}`. Verificado a ~390px: sin desbordes horizontales.
+- Cache-bust: `marketing.js` → `?v1298`, `base.css` → `?v1298`.
+- Archivos: `modules/marketing.js`, `styles/base.css`, `index.html`.
+
+
+## v1.104 — 2026-07-03 · Localización por país: editor de glosario + cableado en portal
+- **Editor de glosario** en Configuración → Países y monedas: selector de país (entre los activos del tenant) + 17 campos (póliza, recibo, prima, prima neta, cliente, asegurado, aseguradora, comisión, ramo, vigencia, deducible, siniestro, cobro, tomador, **id fiscal**, corredor, gestión). Cada campo muestra el valor por defecto como placeholder; vacío = usa default. Botones **Guardar** (escribe `tenant.glosario[pais]`) y **Restablecer a defaults**. Verificado: guardar GT `poliza→Contrato` hace que `Orbit.termino('poliza','GT')` devuelva "Contrato"; restablecer vuelve a "Póliza".
+- **Cableado en Portal del Cliente** (`modules/portal.js`): helper `TT(k)` resuelve por el país del cliente activo; labels de detalle de póliza (N.º de póliza, prima total), recibo (título, póliza, prima neta) ahora usan `Orbit.termino()`. Así el cliente ve la terminología de su país.
+- No-destructivo: sin overrides, todos los textos quedan idénticos.
+- **Pendiente localización**: cablear términos en más módulos internos (cliente360, cobros, comisiones, aseguradoras) — el editor y el helper ya están listos para ello.
+- Cache-bust: `configuracion.js` y `portal.js` → `?v1298`.
+- Archivos: `modules/configuracion.js`, `modules/portal.js`, `index.html`.
+
+
+## v1.103 — 2026-07-03 · Localización por país: base `Orbit.termino()` + glosario por tenant
+- **Nuevo helper `Orbit.termino(clave, pais)`** en `core/config.js`: resuelve términos de seguros con prioridad `tenant.glosario[pais]` → `tenant.glosario['*']` → `Orbit.TERMINOS[pais]` → `Orbit.TERMINOS['*']` → la clave literal. Todo override es **opcional y no-destructivo**: sin config usa los defaults, así que ningún texto existente cambia.
+- **`Orbit.TERMINOS`** con defaults por país para las claves clave (poliza, recibo, prima, prima_neta, cliente, asegurado, aseguradora, comision, ramo, vigencia, deducible, siniestro, cobro, tomador, **id_fiscal**, corredor, gestion). Ej.: `id_fiscal` = NIT (GT/CO), RFC (MX), RUC (PA), Cédula jurídica (CR); `corredor` varía (Corredor / Intermediario / Agente).
+- **`tenant.glosario: {}`** añadido al DEFAULT (heredable), para que cada cliente sobreescriba términos por país desde Configuración (editor de glosario = pendiente de UI).
+- **Alcance de esta entrega**: base transversal lista y probada de forma aislada. **Pendiente (próxima sesión)**: (a) editor de glosario en Configuración → Localización; (b) cablear `Orbit.termino()` en los textos de módulos (póliza, recibo, prima, id fiscal, comisión) y en el portal del cliente.
+- Cache-bust: `config.js` → `?v1297`.
+- Archivos: `core/config.js`, `index.html`.
+
+
 ## v1.102 — 2026-07-03 · Reportes: análisis IA (lectura ejecutiva + acciones sugeridas) · CL-009
 - **Nuevo botón 🤖 Analizar con IA** en cada reporte: arma un resumen en vivo (totales por columna numérica + concentración por la principal dimensión categórica) y pide a **`Orbit.ia.complete`** (IA centralizada) una **lectura ejecutiva** (qué pasa y por qué importa) + **3 acciones concretas priorizadas**, renderizadas en un panel. Con **timeout de resguardo (15s)** y **fallback determinista** (lectura + acciones calculadas de los datos) cuando la IA no está conectada — nunca se queda colgado.
 - Respeta el contrato: única llamada al modelo vía `Orbit.ia.complete`; si `Orbit.ia.disponible()` es falso, usa el análisis automático y lo indica en el panel.

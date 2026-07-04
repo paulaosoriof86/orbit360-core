@@ -68,8 +68,10 @@ Orbit.ia = (function () {
 
   /* ---- extracción simulada de un documento (para importador) ---- */
   function extraer(tipo) {
+    var hoy = (Orbit.ui && Orbit.ui.today) ? Orbit.ui.today() : new Date().toISOString().slice(0, 10);
+    var y1 = (parseInt(hoy.slice(0, 4), 10) + 1) + hoy.slice(4);
     const M = {
-      poliza: { numero: 'GT-XX-' + Math.floor(10000 + Math.random() * 89999), ramo: 'Automóviles', primaNeta: 4800, vigencia: '2026-06-24 → 2027-06-24' },
+      poliza: { numero: 'GT-XX-' + Math.floor(10000 + Math.random() * 89999), ramo: 'Automóviles', primaNeta: 4800, vigencia: hoy + ' → ' + y1 },
       cliente: { nombre: 'Cliente Detectado', identificacion: '—', telefono: '+502 ', email: '' },
       factura: { nit: '—', concepto: 'Comisiones de intermediación', total: 0 }
     };

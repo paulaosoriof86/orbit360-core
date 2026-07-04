@@ -71,13 +71,17 @@ Orbit.modules.finanzas = (function () {
       { label: 'Movimientos', val: list.length, color: 'var(--info)', foot: ing.length + ' ing · ' + egr.length + ' egr', onclick: "Orbit.modules.finanzas.drillKey('mov-mes')" }
     ])}
     <div class="card pad" style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <b style="font-family:var(--f-display);font-size:15px;flex:1">Movimientos · ${MESES[+mesSel.slice(5) - 1]} ${mesSel.slice(0, 4)}</b>
+      <b style="font-family:var(--f-display);font-size:15px">Movimientos · ${MESES[+mesSel.slice(5) - 1]} ${mesSel.slice(0, 4)}</b>
+      ${(() => { const e = periodoEstado(mesSel, paisFin()); return `<span class="badge ${e.tone}" title="${U.esc(e.hint)}" style="font-size:10.5px">${e.lbl}</span>`; })()}
+      <span style="flex:1"></span>
       <button class="btn primary sm" onclick="Orbit.modules.finanzas.nuevoMov('ingreso')">+ Ingreso</button>
       <button class="btn primary sm" onclick="Orbit.modules.finanzas.nuevoMov('egreso')" style="background:var(--danger)">+ Egreso</button>
       <button class="btn ghost sm" onclick="Orbit.modules.finanzas.crearMes()">📅 Crear mes</button>
+      <button class="btn ghost sm" onclick="Orbit.modules.finanzas.editarCategorias()">⚙ Categorías</button>
       <button class="btn ghost sm" onclick="Orbit.importa.open('movimientos-finanzas')">⬇ Importar</button>
       <button class="btn ghost sm" onclick="Orbit.importa.open('estados-banco')">🏦 Estado de cuenta</button>
     </div>
+    ${(() => { const e = periodoEstado(mesSel, paisFin()); return e.k === 'cerrado' ? '' : `<div class="cfg-note" style="margin:-6px 0 14px;border-left:3px solid var(--${e.tone === 'neutral' ? 'ink-3' : e.tone})">${e.lbl.replace(/^\S+\s/, '')}: ${U.esc(e.hint)}</div>`; })()}
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Día</th><th>Concepto</th><th>Clasificación</th><th>Pagador / Benef.</th><th class="num">Valor</th><th>Estado</th></tr></thead>
       <tbody>${rows.map(m => `<tr class="clickable" onclick="Orbit.modules.finanzas.editarMov('${m.id}')" title="Ver / editar movimiento">
@@ -90,8 +94,34 @@ Orbit.modules.finanzas = (function () {
     </table></div></div>`;
   }
 
-  const CLASES_ING = ['Comisiones aseguradora', 'Incentivos', 'Otros'];
-  const CLASES_EGR = ['Comisiones asesores', 'Gastos fijos', 'Marketing', 'Operación', 'Devolución de préstamo'];
+  function catFin(tipo) {
+    try {
+      const c = (Orbit.tenant && Orbit.tenant.get && Orbit.tenant.get().catalogoFinanciero) || {};
+      const p = paisFin();
+      const src = (p && c[p]) ? c[p] : c;                 // catálogo por país si existe, si no el global
+      const arr = tipo === 'ingreso' ? src.ingresos : src.egresos;
+      if (arr && arr.length) return arr.slice();
+    } catch (e) {}
+    return tipo === 'ingreso' ? ['Comisiones aseguradora', 'Incentivos', 'Otros'] : ['Comisiones asesores', 'Gastos fijos', 'Marketing', 'Operación', 'Devolución de préstamo'];
+  }
+  function nextYm(ym) { let [y, m] = ym.split('-').map(Number); m++; if (m > 12) { m = 1; y++; } return y + '-' + String(m).padStart(2, '0'); }
+  function periodoEstado(ym, pais) {
+    // Cierre por defecto RELATIVO a la fecha viva (2 meses atrás), no una fecha quemada (P1-05).
+    var base = (Orbit.ui.now ? Orbit.ui.now() : new Date());
+    var d = new Date(base.getFullYear(), base.getMonth() - 2, 1);
+    var cerr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    try {
+      const c = Orbit.tenant.get().cierreFinanciero || {};
+      const p = pais || paisFin();
+      if (p && c[p] && c[p].cerradoHasta) cerr = c[p].cerradoHasta;      // cierre por país
+      else if (c.cerradoHasta) cerr = c.cerradoHasta;                     // cierre global (config tenant)
+    } catch (e) {}
+    const hoy = (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)).slice(0, 7);
+    if (ym <= cerr) return { k: 'cerrado', lbl: '🔒 Cerrado', tone: 'ok', hint: 'Periodo consolidado con respaldo (planillas / estados de cuenta).' };
+    if (ym === nextYm(cerr)) return { k: 'referencia', lbl: '◷ Referencia', tone: 'info', hint: 'Primer mes tras el cierre: es referencia, requiere conciliación manual. No es cierre.' };
+    if (ym < hoy) return { k: 'captura', lbl: '✎ Captura y conciliación', tone: 'warn', hint: 'Captura y conciliación manual pendientes antes de poder cerrar.' };
+    return { k: 'abierto', lbl: '● Abierto / en validación', tone: 'neutral', hint: 'Periodo abierto. No se cierra sin planillas, estados de cuenta o respaldo.' };
+  }
   /* ---- alta de movimiento (ingreso/egreso) ---- */
   function nuevoMov(tipo) { editarMov(null, tipo); }
   /* ---- editar / crear movimiento ---- */
@@ -99,7 +129,7 @@ Orbit.modules.finanzas = (function () {
     const m = id ? S().get('finmovs', id) : null;
     const tipo = m ? m.tipo : (tipoNuevo || 'ingreso');
     const cur = paisFin() === 'CO' ? 'COP' : 'GTQ';
-    const clases = tipo === 'ingreso' ? CLASES_ING : CLASES_EGR;
+    const clases = tipo === 'ingreso' ? catFin('ingreso') : catFin('egreso');
     const estados = tipo === 'ingreso' ? ['esperado', 'facturado', 'recaudado'] : ['presupuestado', 'pendiente', 'pagado'];
     let back = document.getElementById('fin-mov'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'fin-mov'; back.className = 'drawer-back open';
@@ -948,7 +978,7 @@ Orbit.modules.finanzas = (function () {
   function editarPresup(id) {
     const p = paisFin() || 'GT', cur = p === 'GT' ? 'GTQ' : 'COP';
     const rec = id ? S().get('presupuesto', id) : null;
-    const clases = ['Comisiones asesores', 'Gastos fijos', 'Marketing', 'Operación', 'Otros'];
+    const clases = catFin('egreso').concat(['Otros']).filter((v, i, a) => a.indexOf(v) === i);
     let back = document.getElementById('fin-pp'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'fin-pp'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
@@ -1124,5 +1154,35 @@ Orbit.modules.finanzas = (function () {
         : '⚠️ Conecta un proveedor de IA en Configuración → Automatizaciones → Motor de IA para análisis en vivo. (Sin IA, el análisis de arriba usa la heurística de la plataforma.)';
     });
   }
-  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, metasSugerir, facturaAseg, facturaAccion, verFactura, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup };
+  /* ---- Catálogo financiero editable por tenant (P6) ---- */
+  function editarCategorias() {
+    const t = Orbit.tenant.get();
+    const cat = Object.assign({ ingresos: [], egresos: [], especiales: [] }, t.catalogoFinanciero || {});
+    let back = document.getElementById('fin-cat'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'fin-cat'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
+    const chips = (arr, grupo) => (arr || []).map((c, i) => `<span class="mail-chip" style="display:inline-flex;align-items:center;gap:6px">${U.esc(c)} <b data-del="${grupo}:${i}" style="cursor:pointer;color:var(--danger)" title="Quitar">✕</b></span>`).join('') || '<span class="muted" style="font-size:12px">Sin categorías.</span>';
+    const bloque = (titulo, grupo, arr) => `<div style="margin-bottom:14px"><div style="font-family:var(--f-display);font-weight:800;font-size:13px;margin-bottom:7px">${titulo}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px" id="cat-${grupo}">${chips(arr, grupo)}</div>
+      <div style="display:flex;gap:7px"><input class="o-sel" data-add="${grupo}" placeholder="Nueva categoría…" style="flex:1"><button class="btn ghost sm" data-addbtn="${grupo}">+ Agregar</button></div></div>`;
+    back.innerHTML = `<div class="card" style="width:min(560px,95vw);max-height:90vh;overflow:auto;padding:0">
+      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">⚙ Categorías financieras</b><button class="imp-x" id="cat-x">✕</button></div>
+      <div style="padding:18px 20px">
+        <div class="cfg-note" style="margin-bottom:14px">Configurables por cliente. Aplican a los movimientos de ingresos, egresos y casos especiales — sin hardcode.</div>
+        ${bloque('💰 Ingresos', 'ingresos', cat.ingresos)}
+        ${bloque('💸 Egresos', 'egresos', cat.egresos)}
+        ${bloque('🔖 Especiales', 'especiales', cat.especiales)}
+      </div>
+      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px"><button class="btn primary" id="cat-save">Guardar cambios</button></div></div>`;
+    document.body.appendChild(back);
+    const rerender = () => { editarCategorias(); };
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#cat-x').onclick = close;
+    back.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { const [g, i] = b.dataset.del.split(':'); cat[g].splice(+i, 1); Orbit.tenant.setDeep('catalogoFinanciero', cat); rerender(); }));
+    back.querySelectorAll('[data-addbtn]').forEach(b => b.addEventListener('click', () => { const g = b.dataset.addbtn; const inp = back.querySelector('[data-add="' + g + '"]'); const v = (inp.value || '').trim(); if (!v) return; cat[g] = cat[g] || []; if (cat[g].indexOf(v) < 0) cat[g].push(v); Orbit.tenant.setDeep('catalogoFinanciero', cat); rerender(); }));
+    back.querySelector('#cat-save').onclick = () => { Orbit.tenant.setDeep('catalogoFinanciero', cat); close(); const el = document.createElement('div'); el.className = 'ciclo-toast'; el.textContent = '✓ Categorías guardadas'; document.body.appendChild(el); setTimeout(() => el.remove(), 2200); const h = document.getElementById('host'); if (h) render(h); };
+  }
+
+  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, metasSugerir, facturaAseg, facturaAccion, verFactura, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup, editarCategorias };
 })();

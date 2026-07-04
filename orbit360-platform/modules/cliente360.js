@@ -508,11 +508,11 @@ Orbit.modules.cliente360 = (function () {
           ${vrow('Recibo', 'REC-' + c.id.slice(-5).toUpperCase())}${vrow('Cuota', c.cuota)}
           ${vrow('Póliza', p ? p.numero : '—')}${vrow('Monto', U.money(c.monto, c.moneda))}
         </div>
-        <label class="ce-l">Fecha de envío a gestión <span class="muted">(día en que se aplica)</span><input id="ap-fecha" class="o-sel" type="date" value="2026-06-22"></label>
+        <label class="ce-l">Fecha de envío a gestión <span class="muted">(día en que se aplica)</span><input id="ap-fecha" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
         <label class="ce-l">Forma de pago<select id="ap-metodo" class="o-sel">${(Orbit.primas ? Orbit.primas.FORMAS_PAGO : ['Transferencia', 'Tarjeta de crédito', 'Efectivo']).map(m => `<option ${m === (p && p.formaPago) ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
         <div class="ap-fact">
           <label class="ce-l" style="margin:0">📄 Factura de la aseguradora <span class="muted">(opcional)</span><input id="ap-file" type="file" class="o-sel" accept="image/*,application/pdf"></label>
-          <label class="ce-l" id="ap-real-wrap" style="display:none;margin-top:9px">Fecha real en que pagó la aseguradora<input id="ap-real" class="o-sel" type="date" value="2026-06-20"></label>
+          <label class="ce-l" id="ap-real-wrap" style="display:none;margin-top:9px">Fecha real en que pagó la aseguradora<input id="ap-real" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
           <div class="muted" style="font-size:11px;margin-top:7px">Cargar la factura fija la <b>fecha real</b> del pago y <b>concilia</b> el recibo (medio adicional de conciliación). Sin factura, el recibo queda <b>Pagado · por conciliar</b>.</div>
           <label class="ce-l" style="margin-top:11px;display:flex;align-items:center;gap:8px;flex-direction:row;cursor:pointer"><input id="ap-avisar" type="checkbox" checked style="width:auto"> 📲 Avisar al cliente (WhatsApp / correo)</label>
         </div>
@@ -1070,7 +1070,7 @@ Orbit.modules.cliente360 = (function () {
         <div class="seg"><button class="seg-b active" data-mode="manual">✍ Manual</button><button class="seg-b" data-mode="import">⬇ Importar</button><button class="seg-b" data-mode="ia">✨ Inteligente</button></div>
         <div id="en-import" style="display:none"><div class="cfg-note">Cargá el documento del endoso (PDF/imagen). El extractor leerá tipo, fecha y montos, y <b>señalará lo que no pueda leer</b>. Quedará en el Drive del cliente.</div><input type="file" id="en-file" class="o-sel" style="margin-top:9px"></div>
         <label class="ce-l">Tipo de endoso<select id="en-tipo" class="o-sel">${tipos.map(t => `<option>${t}</option>`).join('')}</select></label>
-        <label class="ce-l">Fecha<input id="en-fecha" class="o-sel" type="date" value="2026-06-22"></label>
+        <label class="ce-l">Fecha<input id="en-fecha" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
         <label class="ce-l">Detalle<textarea id="en-det" class="o-sel" style="min-height:56px;resize:vertical;padding:9px 11px" placeholder="Descripción del cambio que aplica a la póliza…"></textarea></label>
         <div class="cfg-note">Queda registrado en el <b>historial de la póliza</b> y del cliente.</div>
       </div>
@@ -1395,7 +1395,7 @@ Orbit.modules.cliente360 = (function () {
           <label class="ce-l">Nombre / razón social *<input id="nc-nombre" class="o-sel" placeholder="Nombre completo o razón social"></label>
           <label class="ce-l">Tipo<select id="nc-tipo" class="o-sel"><option>Persona</option><option>Empresa</option></select></label>
           <label class="ce-l">País *<select id="nc-pais" class="o-sel">${paises.map(p => '<option value="' + p.id + '">' + p.label + '</option>').join('')}</select></label>
-          <label class="ce-l">Identificación (DPI/Cédula/NIT)<input id="nc-id" class="o-sel" placeholder="0000 00000 0000 0"></label>
+          <label class="ce-l">Identificación (${Orbit.termino ? Orbit.termino('id_fiscal') : 'ID fiscal'})<input id="nc-id" class="o-sel" placeholder="0000 00000 0000 0"></label>
           <label class="ce-l">Teléfono (WhatsApp) *<input id="nc-tel" class="o-sel" placeholder="+502 1234 5678"></label>
           <label class="ce-l">Correo electrónico<input id="nc-email" class="o-sel" type="email" placeholder="correo@dominio.com"></label>
           <label class="ce-l">Departamento<select id="nc-dep" class="o-sel"><option value="">— Seleccionar —</option></select></label>

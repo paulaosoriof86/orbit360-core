@@ -91,6 +91,7 @@ Orbit.modules.cobros = (function () {
     const c = S().get('cobros', cobroId); if (!c) return;
     const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId), asg = p ? q.aseguradora(p.aseguradoraId) : null, ase = q.asesor(c.asesorId);
     const cur = c.moneda; const m2 = n => U.money(n, cur);
+    const TT = k => (Orbit.termino ? Orbit.termino(k, cli && cli.pais) : k);
     const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
     let back = document.getElementById('cob-det'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'cob-det'; back.className = 'drawer-back open';
@@ -98,7 +99,7 @@ Orbit.modules.cobros = (function () {
     const vr = (l, v) => `<div class="vp-row"><span class="vp-l">${l}</span><span class="vp-v">${v}</span></div>`;
     back.innerHTML = `<div class="card" style="width:min(560px,95vw);max-height:92vh;overflow:auto;padding:0">
       <div style="padding:18px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Recibo · cuota ${c.cuota}</div>
+        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">${TT('recibo')} · cuota ${c.cuota}</div>
           <b style="font-family:var(--f-display);font-size:18px;color:#fff">REC-${c.id.slice(-5).toUpperCase()}</b>
           <div class="mono" style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${cli ? U.esc(cli.nombre) : '—'} · ${p ? p.numero : '—'}</div></div>
         <button class="imp-x" id="cd-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
@@ -112,14 +113,14 @@ Orbit.modules.cobros = (function () {
           ${vr('Fecha de pago', c.fechaPago ? U.fmtDate(c.fechaPago) : '—')}${vr('Fecha real (factura)', c.fechaReal ? U.fmtDate(c.fechaReal) : '—')}
         </div>
         <div class="vp-desglose">
-          <div class="vp-sec-t">🧾 Desglose del recibo</div>
+          <div class="vp-sec-t">🧾 Desglose del ${TT('recibo').toLowerCase()}</div>
           <table class="vp-dtbl">
-            <tr><td>Prima neta</td><td class="num">${m2(c.neta != null ? c.neta : c.monto)}</td></tr>
+            <tr><td>${TT('prima_neta')}</td><td class="num">${m2(c.neta != null ? c.neta : c.monto)}</td></tr>
             <tr><td>Gastos de expedición</td><td class="num">${m2(c.gastosEmision || 0)}</td></tr>
             <tr><td>Gastos financieros</td><td class="num">${m2(c.gastosFinan || 0)}</td></tr>
             <tr><td>Otros / asistencias</td><td class="num">${m2(c.otros || 0)}</td></tr>
             <tr><td>IVA</td><td class="num">${m2(c.iva || 0)}</td></tr>
-            <tr class="vp-tot"><td>Total del recibo</td><td class="num">${m2(c.monto)}</td></tr>
+            <tr class="vp-tot"><td>Total del ${TT('recibo').toLowerCase()}</td><td class="num">${m2(c.monto)}</td></tr>
           </table>
         </div>
         ${c.facturaNombre ? `<div class="cfg-note">📄 Factura adjunta: <b>${U.esc(c.facturaNombre)}</b></div>` : ''}

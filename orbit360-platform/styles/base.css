@@ -356,3 +356,33 @@ select.o-sel{cursor:pointer;appearance:none;background-image:url("data:image/svg
 button.kpi-click{cursor:pointer;border:none;text-align:left;transition:transform .12s,box-shadow .12s}
 button.kpi-click:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
 button.kpi-click:active{transform:translateY(0)}
+
+/* ==== RESPONSIVE — endurecimiento global (v1.105) ==== */
+/* Tablas: nunca desbordan el viewport; scroll horizontal dentro de su tarjeta */
+.card{max-width:100%}
+@media(max-width:900px){
+  .tbl{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+}
+/* Configuración: panel lateral pasa arriba en tablet/móvil */
+@media(max-width:820px){
+  .cfg-wrap{grid-template-columns:1fr}
+  .cfg-side{position:static;grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto;padding-bottom:6px}
+  .cfg-grid2{grid-template-columns:1fr}
+}
+/* Portal del cliente: 3 KPIs → siguen en fila pero compactos; formularios a 1 col */
+@media(max-width:560px){
+  .pt-cards{grid-template-columns:repeat(3,1fr);gap:7px}
+  .pt-kpi{padding:10px 5px}
+  .ia-cards{grid-template-columns:1fr}
+  .cgrid{grid-template-columns:1fr!important}
+}
+/* Calendario de marketing: en móvil permite scroll horizontal en vez de aplastar 7 columnas */
+@media(max-width:640px){
+  .mk-cal{overflow-x:auto}
+  .mk-week,.mk-grid{min-width:560px}
+}
+/* Drawers/modales centrados: respetan el ancho del viewport */
+.drawer-back>.card{max-width:96vw}
+/* Banners y cabeceras: acciones bajan de línea sin romper */
+.page{overflow-x:hidden}

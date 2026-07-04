@@ -34,12 +34,12 @@ Orbit.correo = (function () {
       id: 'eml' + Date.now().toString().slice(-7),
       asunto: asunto || '(sin asunto)', de: cfg.cuenta || 'equipo@democorredores.com', para: para || '',
       remitenteNombre: 'Equipo Orbit', direccion: 'saliente',
-      fecha: '2026-06-23', hora: new Date().toTimeString().slice(0, 5),
+      fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), hora: new Date().toTimeString().slice(0, 5),
       leido: true, destacado: false, cuerpo: cuerpo || '', clienteId: clienteId || '',
       adjuntos: adjuntos || [], vinculo: vinculo || null, carpeta: 'enviados'
     };
     S().insert('correos', c);
-    if (clienteId) S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: '', tipo: 'sistema', icon: '✉', fecha: '2026-06-23', titulo: 'Correo enviado: ' + c.asunto, detalle: 'Para ' + c.para });
+    if (clienteId) S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: '', tipo: 'sistema', icon: '✉', fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), titulo: 'Correo enviado: ' + c.asunto, detalle: 'Para ' + c.para });
     return c;
   }
 

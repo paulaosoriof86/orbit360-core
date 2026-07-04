@@ -70,7 +70,7 @@ Orbit.theme = (function () {
         <button class="tp-sw ${get() === p.id ? 'on' : ''}" data-p="${p.id}" title="${p.name}">
           <span style="background:${p.primary}"></span>${p.name}${p.brand ? ' ·' : ''}
         </button>`).join('')}</div>
-      <div class="tp-foot">Se aplica a toda la plataforma y al login. White-label para Alianzas.</div>
+      <div class="tp-foot">Se aplica a toda la plataforma y al login.</div>
       </div>
       <div class="tp-title" style="margin-top:12px">Tipografía</div>
       <div class="tp-grid">${[['Manrope', 'Manrope (display)'], ['Segoe UI', 'Segoe (corporativa)'], ['Inter', 'Inter (moderna)']].map(f => `<button class="tp-sw ${(document.documentElement.style.getPropertyValue('--f-display') || '').includes(f[0]) ? 'on' : ''}" data-font="${f[0]}" title="${f[1]}"><span style="font-family:${f[0]};font-size:11px;background:none;width:auto;height:auto;padding:0">${f[1].split(' ')[0]}</span></button>`).join('')}</div>

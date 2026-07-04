@@ -11,6 +11,8 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.portal = (function () {
   const U = Orbit.ui, S = () => Orbit.store, q = Orbit.q;
   let host, clienteId, tab = 'inicio';
+  // Localización: término por país del cliente activo
+  function TT(k) { try { const c = S().get('clientes', clienteId) || {}; return (Orbit.termino ? Orbit.termino(k, c.pais) : k); } catch (e) { return k; } }
 
   function clientes() { return S().all('clientes'); }
   function notifsDe(cid) { return S().where('notifs', n => n.clienteId === cid).sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')); }
@@ -164,7 +166,7 @@ Orbit.modules.portal = (function () {
     const c = S().get('cobros', cobroId); if (!c) return;
     const cli = S().get('clientes', clienteId);
     const html = `<div class="cfg-note">Reporta tu pago de la cuota <b>${c.cuota}</b> por <b>${U.money(c.monto, c.moneda)}</b>. El equipo lo valida y te confirma.</div>
-      <label class="ce-l" style="margin-top:10px">Fecha del pago<input id="rp-fecha" class="o-sel" type="date" value="2026-06-24"></label>
+      <label class="ce-l" style="margin-top:10px">Fecha del pago<input id="rp-fecha" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
       <label class="ce-l" style="margin-top:10px">Soporte de pago (comprobante)<input id="rp-file" type="file" class="o-sel" accept="image/*,application/pdf"></label>
       <label class="ce-l" style="margin-top:10px">Nota<input id="rp-nota" class="o-sel" placeholder="Banco, referencia…"></label>`;
     const back = drawer('📤 Reportar pago', html, () => {
@@ -274,11 +276,11 @@ Orbit.modules.portal = (function () {
     const asg = q.aseguradora(p.aseguradoraId), veh = (S().where('vehiculos', v => v.polizaId === polId) || [])[0];
     drawer('📑 ' + (p.producto || p.ramo), `
       <div class="pt-det-grid">
-        <div class="pt-det"><span>N.º de póliza</span><b>${p.numero}</b></div>
+        <div class="pt-det"><span>N.º de ${TT('poliza').toLowerCase()}</span><b>${p.numero}</b></div>
         <div class="pt-det"><span>Aseguradora</span><b>${asg ? U.esc(asg.nombre) : '—'}</b></div>
         <div class="pt-det"><span>Ramo</span><b>${p.ramo}${p.subramo ? ' · ' + p.subramo : ''}</b></div>
         <div class="pt-det"><span>Suma asegurada</span><b>${U.money(p.sumaAsegurada || 0, p.moneda)}</b></div>
-        <div class="pt-det"><span>Prima total</span><b>${U.money(p.prima, p.moneda)}</b></div>
+        <div class="pt-det"><span>${TT('prima')} total</span><b>${U.money(p.prima, p.moneda)}</b></div>
         <div class="pt-det"><span>Forma de pago</span><b>${p.formaPago || p.frecuencia || '—'}</b></div>
         <div class="pt-det"><span>Vigencia</span><b>${U.fmtDate(p.vigenciaInicio)} → ${U.fmtDate(p.vigenciaFin)}</b></div>
         <div class="pt-det"><span>Estado</span><b>${p.estado}</b></div>
@@ -290,13 +292,13 @@ Orbit.modules.portal = (function () {
   function detRecibo(cobId) {
     const c = S().get('cobros', cobId); if (!c) return;
     const p = S().get('polizas', c.polizaId);
-    drawer('💳 Recibo · cuota ' + c.cuota, `
+    drawer('💳 ' + TT('recibo') + ' · cuota ' + c.cuota, `
       <div class="pt-det-grid">
-        <div class="pt-det"><span>Póliza</span><b>${p ? p.numero : '—'}</b></div>
+        <div class="pt-det"><span>${TT('poliza')}</span><b>${p ? p.numero : '—'}</b></div>
         <div class="pt-det"><span>Monto</span><b>${U.money(c.monto, c.moneda)}</b></div>
         <div class="pt-det"><span>Vence</span><b>${U.fmtDate(c.vence)}</b></div>
         <div class="pt-det"><span>Estado</span><b>${c.estado}</b></div>
-        ${c.neta != null ? `<div class="pt-det"><span>Prima neta</span><b>${U.money(c.neta, c.moneda)}</b></div><div class="pt-det"><span>IVA</span><b>${U.money(c.iva || 0, c.moneda)}</b></div>` : ''}
+        ${c.neta != null ? `<div class="pt-det"><span>${TT('prima_neta')}</span><b>${U.money(c.neta, c.moneda)}</b></div><div class="pt-det"><span>IVA</span><b>${U.money(c.iva || 0, c.moneda)}</b></div>` : ''}
         ${c.fechaPago ? `<div class="pt-det"><span>Pagado el</span><b>${U.fmtDate(c.fechaPago)}</b></div>` : ''}
         ${c.reportado ? `<div class="pt-det"><span>Reportado</span><b>${U.fmtDate(c.reportado)}</b></div>` : ''}
       </div>

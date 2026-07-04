@@ -11,6 +11,7 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.configuracion = (function () {
   const U = Orbit.ui, K = Orbit.kit, T = () => Orbit.tenant;
   let tab = 'marca';
+  let glosPais = null;
 
   const TABS = [
     ['marca', '🎨 Marca', 'cli'],
@@ -101,7 +102,35 @@ Orbit.modules.configuracion = (function () {
         }).join('')}
       </div>
       <div class="cfg-note" style="margin-top:14px">💱 Las monedas <b>no se mezclan</b> entre países en ninguna sección: los totales se muestran por país o se normalizan explícitamente. Moneda base de reportes: <b>${t.monedaBase}</b>.</div>
-      <button class="btn ghost" style="margin-top:14px" onclick="Orbit.modules.configuracion.agregarPais()">+ Agregar país</button>`;
+      <button class="btn ghost" style="margin-top:14px" onclick="Orbit.modules.configuracion.agregarPais()">+ Agregar país</button>
+      ${glosarioEditor()}`;
+  }
+
+  /* ---------- LOCALIZACIÓN / GLOSARIO POR PAÍS ---------- */
+  function glosarioEditor() {
+    const t = T().get();
+    const activos = (t.paises || []).length ? t.paises : ['GT'];
+    const pais = glosPais && activos.includes(glosPais) ? glosPais : activos[0];
+    const claves = Object.keys((Orbit.TERMINOS && Orbit.TERMINOS['*']) || {});
+    const LBL = {
+      poliza: 'Póliza', recibo: 'Recibo', prima: 'Prima', prima_neta: 'Prima neta', cliente: 'Cliente',
+      asegurado: 'Asegurado', aseguradora: 'Aseguradora', comision: 'Comisión', ramo: 'Ramo', vigencia: 'Vigencia',
+      deducible: 'Deducible', siniestro: 'Siniestro', cobro: 'Cobro', tomador: 'Tomador', id_fiscal: 'ID fiscal',
+      corredor: 'Corredor', gestion: 'Gestión'
+    };
+    const g = (t.glosario && t.glosario[pais]) || {};
+    const sel = `<select class="o-sel" style="width:auto" onchange="Orbit.modules.configuracion.setGlosPais(this.value)">${activos.map(p => `<option value="${p}" ${p === pais ? 'selected' : ''}>${U.esc((Orbit.PAISES.find(x => x.id === p) || {}).label || p)}</option>`).join('')}</select>`;
+    const campos = claves.map(k => {
+      const def = Orbit.termino ? Orbit.termino(k, pais) : k;
+      const val = g[k] != null ? g[k] : '';
+      return `<div class="cfg-row"><div class="cfg-lab">${LBL[k] || k}<small>por defecto: ${U.esc(def)}</small></div>
+        <div class="cfg-ctrl"><input class="o-sel gloss-in" data-gk="${k}" value="${U.esc(val)}" placeholder="${U.esc(def)}" style="min-width:220px"></div></div>`;
+    }).join('');
+    return `<div style="margin-top:26px">${sectionHead('Localización · glosario por país', 'Renombra los términos del sistema para cada país (opcional). Vacío = usa el término por defecto.')}
+      ${row('País', sel, 'La póliza, recibo, prima, ID fiscal, etc. usarán estos términos en todo el sistema y el portal del cliente.')}
+      ${campos}
+      <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" onclick="Orbit.modules.configuracion.guardarGlosario('${pais}')">Guardar glosario de ${U.esc((Orbit.PAISES.find(x => x.id === pais) || {}).label || pais)}</button>
+      <button class="btn ghost" onclick="Orbit.modules.configuracion.limpiarGlosario('${pais}')">Restablecer a defaults</button></div></div>`;
   }
 
   /* ---------- INTEGRACIONES / ADD-ONS ---------- */
@@ -189,11 +218,11 @@ Orbit.modules.configuracion = (function () {
     const lock = !plan.apis;
     return `${sectionHead('APIs y credenciales', 'Conexiones seguras con el nivel de seguridad correcto')}
       ${lock ? `<div class="cfg-lock">🔒 Gestión de APIs disponible en el plan Personalizado.</div>` : ''}
-      <div class="cfg-note" style="margin-bottom:14px">🔐 Las credenciales se guardan <b>cifradas</b>, con <b>scopes mínimos</b> y visibilidad por rol. Nunca se exponen en el front (demo: solo la UI de gestión).</div>
+      <div class="cfg-note" style="margin-bottom:14px">🔐 Las credenciales se guardan <b>cifradas</b>, con <b>scopes mínimos</b> y visibilidad por rol. Nunca se exponen en el front.</div>
       <div class="card" style="overflow:hidden"><table class="tbl">
         <thead><tr><th>Servicio</th><th>Estado</th><th>Scope</th><th></th></tr></thead>
         <tbody>
-          ${[['WhatsApp Cloud API', 'Pendiente de backend', 'mensajería'], ['Aseguradora — Cotizador', 'Pendiente', 'tarifas'], ['SIGA / CRM externo', 'No configurado', 'importación']].map(r => `<tr>
+          ${[['WhatsApp Cloud API', 'Pendiente de conexión', 'mensajería'], ['Aseguradora — Cotizador', 'Pendiente', 'tarifas'], ['SIGA / CRM externo', 'No configurado', 'importación']].map(r => `<tr>
             <td><b>${r[0]}</b></td>
             <td><span class="badge ${r[1] === 'Conectado' ? 'ok' : /Pendiente/.test(r[1]) ? 'warn' : 'neutral'}">${r[1]}</span></td>
             <td>${r[2]}</td>
@@ -431,7 +460,7 @@ Orbit.modules.configuracion = (function () {
     const activo = !!(tn.addons && tn.addons[id]);
     const configurado = !!(cfg.key || cfg.url || cfg.user || cfg.cuenta || cfg.permisos);
     if (!configurado && !activo) return { label: 'No configurado', tone: 'neutral' };
-    return { label: 'Pendiente de backend', tone: 'warn' };
+    return { label: 'Pendiente de conexión', tone: 'warn' };
   }
   function configIntegracion(nombre, titulo) {
     const label = titulo || nombre;
@@ -459,7 +488,7 @@ Orbit.modules.configuracion = (function () {
       + '<div style="padding:18px 20px;display:grid;gap:11px">'
       + body
       + '<label class="ce-l ck"><input type="checkbox" id="ci-on" ' + (saved.activa ? 'checked' : '') + '> Habilitar para el tenant</label>'
-      + '<div id="ci-status" class="cfg-note">La conexión se define a nivel <b>tenant</b> (no por navegador). En este entorno el estado queda <b>Pendiente de backend</b> hasta conectarlo; no se realizan conexiones reales.</div>'
+      + '<div id="ci-status" class="cfg-note">La conexión se define a nivel <b>tenant</b> (no por navegador). En este entorno el estado queda <b>Pendiente de conexión</b> hasta activarlo; no se realizazan conexiones reales.</div>'
       + '</div>'
       + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="ci-test">🔌 Validar parámetros</button><div style="display:flex;gap:8px"><button class="btn ghost" id="ci-cancel">Cancelar</button><button class="btn primary" id="ci-ok">Guardar</button></div></div></div>';
     document.body.appendChild(back);
@@ -472,7 +501,7 @@ Orbit.modules.configuracion = (function () {
       const url = (back.querySelector('#ci-url') || {}).value || '';
       const st = back.querySelector('#ci-status');
       if (!u && !k && !url) { st.innerHTML = '⚠️ Ingresa al menos la cuenta o credenciales para validar los parámetros.'; st.style.color = 'var(--warn)'; return; }
-      st.innerHTML = '✅ Parámetros completos. La conexión real se establece en el backend del tenant (queda <b>Pendiente de backend</b>).'; st.style.color = 'var(--ok)';
+      st.innerHTML = '✅ Parámetros completos. La conexión se activa a nivel del tenant (queda <b>Pendiente de conexión</b>).'; st.style.color = 'var(--ok)';
     };
     back.querySelector('#ci-ok').onclick = () => {
       const data = esOutlook
@@ -485,9 +514,25 @@ Orbit.modules.configuracion = (function () {
       Orbit.store.setPref('integ_' + nombre, data);
       try { const tn = T().get(); tn.addons = tn.addons || {}; tn.addons[nombre] = data.activa; T().save && T().save(tn); } catch (e) {}
       close(); const host = document.getElementById('host'); if (host) render(host);
-      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + label + (data.activa ? ' habilitada · Pendiente de backend' : ' guardada'); document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + label + (data.activa ? ' habilitada · Pendiente de conexión' : ' guardada'); document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
     };
   }
 
-  return { render, editarPlan, subirManualMarca, agregarPais, configIntegracion };
+  function setGlosPais(p) { glosPais = p; const host = document.getElementById('host'); if (host) render(host); }
+  function guardarGlosario(pais) {
+    const t = T().get(); const g = Object.assign({}, t.glosario || {});
+    const obj = {};
+    document.querySelectorAll('#cfg-body .gloss-in').forEach(inp => { const v = (inp.value || '').trim(); if (v) obj[inp.dataset.gk] = v; });
+    if (Object.keys(obj).length) g[pais] = obj; else delete g[pais];
+    T().setDeep('glosario', g);
+    const host = document.getElementById('host'); if (host) render(host);
+    const el = document.createElement('div'); el.className = 'ciclo-toast'; el.textContent = '✓ Glosario de ' + pais + ' guardado'; document.body.appendChild(el); setTimeout(() => el.remove(), 2400);
+  }
+  function limpiarGlosario(pais) {
+    const t = T().get(); const g = Object.assign({}, t.glosario || {}); delete g[pais]; T().setDeep('glosario', g);
+    const host = document.getElementById('host'); if (host) render(host);
+    const el = document.createElement('div'); el.className = 'ciclo-toast'; el.textContent = '↺ ' + pais + ' restablecido a defaults'; document.body.appendChild(el); setTimeout(() => el.remove(), 2400);
+  }
+
+  return { render, editarPlan, subirManualMarca, agregarPais, configIntegracion, setGlosPais, guardarGlosario, limpiarGlosario };
 })();

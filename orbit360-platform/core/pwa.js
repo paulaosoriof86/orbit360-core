@@ -51,18 +51,24 @@
   }
 
   var deferredPrompt = null;
-  function showInstall() {
-    if (document.getElementById('pwa-install')) return;
+  function showInstall(estado) {
+    var prev = document.getElementById('pwa-install'); if (prev) prev.remove();
     var btn = document.createElement('button');
     btn.id = 'pwa-install';
-    btn.textContent = '⬇ Instalar app';
-    btn.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:300;background:var(--red,#C5162E);color:#fff;border:none;border-radius:30px;padding:11px 20px;font-weight:700;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer;font-family:var(--f-display,sans-serif)';
+    // 3 estados (P2-01): instalada / iOS (guía) / otros navegadores (instalar)
+    if (estado === 'instalada') { btn.textContent = '✓ App instalada'; btn.setAttribute('data-state', 'instalada'); }
+    else if (estado === 'ios') { btn.textContent = '📲 Instalar en iPhone/iPad'; btn.setAttribute('data-state', 'ios'); }
+    else { btn.textContent = '⬇ Instalar como app'; btn.setAttribute('data-state', 'instalar'); }
+    var bg = estado === 'instalada' ? 'var(--ok,#1F8A5B)' : 'var(--red,#C5162E)';
+    btn.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:300;background:' + bg + ';color:#fff;border:none;border-radius:30px;padding:11px 20px;font-weight:700;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer;font-family:var(--f-display,sans-serif);transition:opacity .3s';
     btn.onclick = function () {
+      if (estado === 'instalada') { btn.style.opacity = '0'; setTimeout(function () { btn.remove(); }, 300); return; }
       if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; btn.remove(); }); }
       else { iosHint(); }
     };
     document.body.appendChild(btn);
-    setTimeout(function () { if (document.getElementById('pwa-install')) btn.style.opacity = '0.85'; }, 8000);
+    if (estado === 'instalada') setTimeout(function () { if (btn.parentNode) { btn.style.opacity = '0'; setTimeout(function () { btn.remove(); }, 300); } }, 4000);
+    else setTimeout(function () { if (document.getElementById('pwa-install')) btn.style.opacity = '0.85'; }, 8000);
   }
   function iosHint() {
     var d = document.createElement('div');
@@ -76,12 +82,13 @@
     // re-aplicar marca cuando cambie el logo
     var _ab = Orbit.applyBrand;
     if (_ab) Orbit.applyBrand = function () { try { _ab.apply(this, arguments); } catch (e) {} try { setFavicons(); buildManifest(); } catch (e) {} };
-    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; showInstall(); });
-    window.addEventListener('appinstalled', function () { var b = document.getElementById('pwa-install'); if (b) b.remove(); });
-    // iOS standalone-capable: mostrar hint de instalación tras login
+    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)) showInstall('instalar'); });
+    window.addEventListener('appinstalled', function () { deferredPrompt = null; showInstall('instalada'); });
+    // 3 estados tras login: instalada / iOS guía / otros navegadores
     var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    if (isIOS && !standalone) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall(); }, 4000); }
+    if (standalone) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('instalada'); }, 2500); }
+    else if (isIOS) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('ios'); }, 4000); }
     // service worker (no-op si el origen no lo permite, ej. sandbox)
     if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {} }
     Orbit.pwa = { refresh: function () { try { setFavicons(); buildManifest(); } catch (e) {} }, install: showInstall };

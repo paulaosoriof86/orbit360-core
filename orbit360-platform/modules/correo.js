@@ -16,7 +16,7 @@ Orbit.modules.correo = (function () {
       ${K.banner({ icon: '✉', title: 'Correo', sub: 'Bandeja integrada · vincula correos a clientes, pólizas y gestiones', features: [], actions: `<button class="btn primary" id="cr-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">✏ Redactar</button>` })}
       ${cfg.conectado
         ? `<div class="cfg-note" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><span>🔗 Conectado a <b>${U.esc(cfg.proveedor)}</b> · ${U.esc(cfg.cuenta)}</span><button class="btn ghost sm" id="cr-disc">Desconectar</button></div>`
-        : `<div class="cfg-note" style="margin-bottom:14px;border-left:3px solid var(--warn);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><span>📭 Bandeja en <b>modo demo</b>. Conecta tu cuenta para sincronizar correos reales.</span><button class="btn primary sm" id="cr-conn">Conectar Outlook / Gmail</button></div>`}
+        : `<div class="cfg-note" style="margin-bottom:14px;border-left:3px solid var(--warn);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><span>📭 Bandeja <b>sin cuenta conectada</b>. Conecta tu cuenta para sincronizar correos reales.</span><button class="btn primary sm" id="cr-conn">Conectar Outlook / Gmail</button></div>`}
       <div class="mail-wrap">
         <div class="mail-side">
           ${[['recibidos', '📥 Recibidos'], ['enviados', '📤 Enviados'], ['destacados', '⭐ Destacados']].map(f => `<button class="mail-folder ${carpeta === f[0] ? 'on' : ''}" data-f="${f[0]}">${f[1]}${f[0] === 'recibidos' ? `<span class="mail-badge">${C().noLeidos() || ''}</span>` : ''}</button>`).join('')}
