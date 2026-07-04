@@ -11,7 +11,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const REPORT_DIR = path.join(root, '_orbit360_reports');
-const VERSION = 'v1.0.0-ays-manifest-contract-check';
+const VERSION = 'v1.0.1-ays-manifest-contract-check';
 const args = process.argv.slice(2);
 function arg(flag){ const i = args.indexOf(flag); return i >= 0 ? args[i+1] : ''; }
 function arr(v){ return Array.isArray(v) ? v : (v ? [v] : []); }
@@ -19,13 +19,13 @@ function uniq(v){ return [...new Set(v.filter(Boolean))]; }
 
 const CONTRACT = {
   clientes: { writes:['clientes'], forbids:['polizas','cobros','finmovs','comisiones'], required:['nombre'] },
-  aseguradoras: { writes:['aseguradoras'], forbids:['clientes','polizas','cobros','finmovs'], required:['nombre','pais'] },
+  aseguradoras: { writes:['aseguradoras'], forbids:['clientes','polizas','cobros','cartera','finmovs','produccion','comisiones'], required:['nombre','pais','moneda'] },
   polizas: { writes:['polizas','cobros'], forbids:['finmovs'], required:['cliente','aseguradora','numeroPoliza','estado','pais','moneda','primaNeta'] },
   vehiculos: { writes:['vehiculos'], forbids:['finmovs','cobros'], required:['placa'] },
   cobros_realizados: { writes:['cobros'], forbids:['finmovs'], required:['fecha','monto','moneda','pais'] },
   planilla_aseguradora: { writes:['cobros'], forbids:['finmovs'], required:['aseguradora','periodo','pais','moneda'] },
   planilla_comisiones: { writes:['comisiones'], forbids:['finmovs','clientes','polizas'], required:['aseguradora','periodo','pais','moneda','comisionPagada'] },
-  estado_cuenta_bancario: { writes:['conciliacionBanco'], forbids:['clientes','polizas','cobros','cartera','produccion'], required:['fecha','monto','moneda','pais'] },
+  estado_cuenta_bancario: { writes:['conciliacionBanco'], forbids:['clientes','polizas','cobros','cartera','produccion','finmovs'], required:['fecha','monto','moneda','pais'] },
   financiero_historico: { writes:['finmovs'], forbids:['clientes','polizas','cobros','cartera','produccion','comisiones'], required:['fecha','monto','moneda','pais','concepto'] },
   siniestros: { writes:['reclamos'], forbids:['finmovs','cobros'], required:['fecha','cliente','estado'] },
   documentos_soporte: { writes:['documentos','parchesPendientes'], forbids:['clientes','polizas','cobros'], required:['tipoDocumento','archivo'] },
