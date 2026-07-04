@@ -12,7 +12,7 @@ import path from 'node:path';
 const root = process.cwd();
 const args = process.argv.slice(2);
 const REPORT_DIR = path.join(root, '_orbit360_reports');
-const VERSION = 'v1.1.0-ays-manifest-validator-canonical-contract';
+const VERSION = 'v1.1.1-ays-manifest-validator-canonical-contract';
 
 const SOURCE_TYPES = new Set([
   'clientes',
@@ -36,7 +36,7 @@ const COUNTRY_CURRENCY = {
 
 const REQUIRED_BY_SOURCE = {
   clientes: ['nombre'],
-  aseguradoras: ['nombre', 'pais'],
+  aseguradoras: ['nombre', 'pais', 'moneda'],
   polizas: ['numero_poliza', 'cliente', 'aseguradora', 'estado', 'pais', 'moneda', 'prima_neta'],
   vehiculos: ['placa'],
   cobros_realizados: ['fecha', 'monto', 'moneda', 'pais'],
@@ -65,8 +65,9 @@ const ALLOWED_DESTINATIONS = {
 };
 
 const NEVER_DIRECT_DESTINATIONS = {
+  aseguradoras: ['clientes', 'polizas', 'cobros', 'cartera', 'finmovs', 'produccion', 'comisiones'],
   financiero_historico: ['clientes', 'polizas', 'cobros', 'cartera', 'produccion', 'comisiones'],
-  estado_cuenta_bancario: ['clientes', 'polizas', 'cobros', 'cartera', 'produccion'],
+  estado_cuenta_bancario: ['clientes', 'polizas', 'cobros', 'cartera', 'produccion', 'finmovs'],
   documentos_soporte: ['clientes', 'polizas', 'cobros'],
   cobros_realizados: ['finmovs'],
   planilla_comisiones: ['finmovs', 'clientes', 'polizas'],
