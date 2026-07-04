@@ -8,14 +8,14 @@ import crypto from 'node:crypto';
 const root = process.cwd();
 const args = process.argv.slice(2);
 const REPORT_DIR = path.join(root, '_orbit360_reports');
-const VERSION = 'v1.1.0-ays-separated-source-dryrun-canonical';
+const VERSION = 'v1.1.1-ays-separated-source-dryrun-canonical';
 const COUNTRY_CURRENCY = { GT:'GTQ', CO:'COP' };
 const errors = [];
 const warnings = [];
 
 const CONTRACT = {
   clientes: { target:['clientes'], required:[['nombre_cliente','cliente','nombre','razon_social'], ['documento_numero','nit','dpi','cedula','documento'], ['pais','country']], blocked:['polizas','cobros','cartera','finmovs'] },
-  aseguradoras: { target:['aseguradoras'], required:[['nombre','aseguradora','compania'], ['pais','country']], blocked:['clientes','polizas','cobros','cartera','finmovs'] },
+  aseguradoras: { target:['aseguradoras'], required:[['nombre','aseguradora','compania'], ['pais','country'], ['moneda','currency']], blocked:['clientes','polizas','cobros','cartera','finmovs','produccion','comisiones'] },
   polizas: { target:['polizas','cobros'], required:[['numero_poliza','poliza','no_poliza','numero'], ['cliente','nombre_cliente','asegurado'], ['aseguradora','compania'], ['estado'], ['pais','country'], ['moneda','currency'], ['prima_neta','prima']], blocked:['finmovs'] },
   vehiculos: { target:['vehiculos'], required:[['placa']], blocked:['finmovs','cobros'] },
   cobros_realizados: { target:['cobros'], required:[['fecha_pago','fecha','fecha_cobro'], ['monto_pagado','monto','valor','importe'], ['moneda','currency'], ['pais','country']], blocked:['finmovs','cartera'] },
