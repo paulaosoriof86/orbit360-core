@@ -14,7 +14,7 @@ import { spawnSync } from 'node:child_process';
 const root = process.cwd();
 const args = process.argv.slice(2);
 const REPORT_DIR = path.join(root, '_orbit360_reports');
-const VERSION = 'v1.0.0-ays-source-prevalidation';
+const VERSION = 'v1.1.0-ays-source-prevalidation-canonical-dryrun';
 
 function argValue(flag){ const i = args.indexOf(flag); return i >= 0 ? args[i+1] : null; }
 function rel(p){ return path.relative(root, p).replace(/\\/g, '/'); }
@@ -34,11 +34,13 @@ function run(name, cmdArgs, allowNonZero=false){
 }
 
 const manifest = argValue('--manifest') || argValue('-m');
+const dryrunV2 = path.join(root, 'tools', 'orbit360-dryrun-fuente-separada-ays-v2.mjs');
+const dryrunV1 = path.join(root, 'tools', 'orbit360-dryrun-fuente-separada-ays.mjs');
 const scripts = {
   contract: path.join(root, 'tools', 'orbit360-generar-contrato-fuentes-ays.mjs'),
   validator: path.join(root, 'tools', 'orbit360-validar-manifest-fuente-ays.mjs'),
   contractValidator: path.join(root, 'tools', 'orbit360-validar-manifest-contra-contrato-fuentes-ays.mjs'),
-  dryrun: path.join(root, 'tools', 'orbit360-dryrun-fuente-separada-ays.mjs')
+  dryrun: fs.existsSync(dryrunV2) ? dryrunV2 : dryrunV1
 };
 const errors = [];
 const stages = [];
@@ -73,6 +75,7 @@ const txt = [
   `Manifest: ${manifest || 'S/D'}`,
   `Decision: ${decision}`,
   'Restricciones: sin filas reales, sin store, sin Firestore, sin red, sin secretos.',
+  'Dry-run: usa orbit360-dryrun-fuente-separada-ays-v2.mjs si existe; si no, cae a v1.',
   '============================================================',
   '',
   `Errores: ${errors.length}`,
