@@ -11,7 +11,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const REPORT_DIR = path.join(root, '_orbit360_reports');
-const VERSION = 'v1.0.0-ays-source-contract';
+const VERSION = 'v1.0.1-ays-source-contract';
 
 const COUNTRY_CURRENCY = { GT: 'GTQ', CO: 'COP' };
 const COMMON_META = ['source_type','file_name','file_hash','sheet_name','row_number','block_id','period','country','currency','tenant_id'];
@@ -21,7 +21,7 @@ const CONTRACTS = {
     writes: ['clientes'], forbids: ['polizas','cobros','finmovs','comisiones'], required: ['nombre'], recommended: ['nit','dpi','telefono','email','pais','moneda'], rule: 'Si falta pais/moneda confiable, requiere validacion; no default GT/GTQ.'
   },
   aseguradoras: {
-    writes: ['aseguradoras'], forbids: ['clientes','polizas','cobros','finmovs'], required: ['nombre','pais'], recommended: ['contacto','telefono','email','portal','codigo'], rule: 'Directorio por pais; no mezclar GT/CO.'
+    writes: ['aseguradoras'], forbids: ['clientes','polizas','cobros','finmovs','cartera','produccion','comisiones'], required: ['nombre','pais','moneda'], recommended: ['contacto','telefono','email','portal','codigo'], rule: 'Directorio por pais y moneda; GT valida GTQ, CO valida COP; no mezclar GT/CO ni asumir valores por defecto.'
   },
   polizas: {
     writes: ['polizas','cobros'], forbids: ['finmovs'], required: ['cliente','aseguradora','numeroPoliza','estado','pais','moneda','primaNeta'], recommended: ['ramo','vigenciaInicio','vigenciaFin','formaPago','primaTotal','iva','gastos'], rule: 'Solo Vigente/Por renovar con pais/moneda/formaPago confiable genera cobros/cartera.'
@@ -39,7 +39,7 @@ const CONTRACTS = {
     writes: ['comisiones'], forbids: ['finmovs','clientes','polizas'], required: ['aseguradora','periodo','pais','moneda','comisionPagada'], recommended: ['poliza','recibo','asesor','primaNeta','comisionEsperada','diferencia'], rule: 'Debe leerse de filas reales; no simular tarifas ni actualizar tarifario sin diff.'
   },
   estado_cuenta_bancario: {
-    writes: ['conciliacionBanco'], forbids: ['clientes','polizas','cobros','cartera','produccion'], required: ['fecha','monto','moneda','pais'], recommended: ['descripcion','referencia','cuenta'], rule: 'Banco solo concilia; no escribe cobros sin confirmacion.'
+    writes: ['conciliacionBanco'], forbids: ['clientes','polizas','cobros','cartera','produccion','finmovs'], required: ['fecha','monto','moneda','pais'], recommended: ['descripcion','referencia','cuenta'], rule: 'Banco solo concilia; no escribe cobros ni finmovs sin confirmacion.'
   },
   financiero_historico: {
     writes: ['finmovs'], forbids: ['clientes','polizas','cobros','cartera','produccion','comisiones'], required: ['fecha','monto','moneda','pais','concepto'], recommended: ['categoria','cuenta','tipoMov'], rule: 'Historico financiero no infiere clientes, polizas, cobros ni cartera.'
