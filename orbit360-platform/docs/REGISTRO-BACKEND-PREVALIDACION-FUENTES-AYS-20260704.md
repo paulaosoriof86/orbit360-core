@@ -31,25 +31,37 @@ tools/orbit360-dryrun-fuente-separada-ays-v2.mjs
 tools/orbit360-prevalidar-fuente-ays.mjs
 ```
 
-## Hallazgo relevante
+### CERRADO-BE-105-03 — Corrección de alcance: ignorar `Listado producción 2025-2026`
 
-El archivo de movimientos no es una sola fuente pura: contiene hojas financieras mensuales, hojas de soporte/análisis/presupuesto y una hoja `Listado producción 2025-2026`.
+Paula ya había indicado en sesiones previas que la hoja `Listado producción 2025-2026` debe ignorarse para esta migración. La fuente real de pólizas será entregada por Paula después, como archivo separado, cuando corresponda dentro del proceso.
 
-Decisión segura:
+Decisión corregida:
+
+- No crear manifest para `Listado producción 2025-2026`.
+- No usar esa hoja como fuente de pólizas.
+- No usar esa hoja como financiero histórico.
+- No pedir archivo de pólizas todavía por este hallazgo.
+- Mantener la migración por fuentes separadas: la fuente de pólizas se trabajará solo cuando Paula la entregue explícitamente.
+
+## Hallazgo relevante corregido
+
+El archivo de movimientos no es una sola fuente pura: contiene hojas financieras mensuales y hojas de soporte/análisis/presupuesto. La hoja `Listado producción 2025-2026` existe dentro del archivo, pero queda ignorada por instrucción previa de Paula.
+
+Decisión segura vigente:
 
 - Las hojas financieras mensuales pueden seguir como `financiero_historico` → `finmovs`.
-- `Listado producción 2025-2026` queda excluida de financiero histórico y debe tener manifest separado tipo `polizas`.
+- `Listado producción 2025-2026` queda ignorada.
 - Las hojas de análisis, dashboard, presupuesto y salarios quedan excluidas de escritura operativa.
 
 ## Pendientes abiertos
 
-### ABIERTO-BE-105-01 — Manifest separado de producción/pólizas
-
-Crear manifest separado para `Listado producción 2025-2026` como fuente `polizas`, con validación de país, moneda, vigencia, estado, prima neta y prima total.
-
-### ABIERTO-BE-105-02 — Preview normalizado previo a LAB
+### ABIERTO-BE-105-01 — Preview normalizado previo a LAB
 
 Implementar preview normalizado por fuente antes de cualquier `writeToStore`, con estados `LISTO`, `REQUIERE_VALIDACION`, `BLOQUEADO`, `OMITIDO` y `DUPLICADO_PROBABLE`.
+
+### ABIERTO-BE-105-02 — Fuente real de pólizas pendiente por recibir en fase posterior
+
+La fuente de pólizas no se toma del archivo de movimientos. Paula la entregará más adelante, como archivo separado, cuando corresponda en el proceso. Hasta ese momento no se crea manifest de pólizas ni cartera.
 
 ## Documento asociado
 
