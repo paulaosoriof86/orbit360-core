@@ -94,12 +94,19 @@
 
 ### CERRADO-BE-104-15 — Smoke E2E sintético de conciliaciones LAB
 - **Área:** Backend / QA / conciliaciones / LAB readiness.
-- **Aplicado:**
-  - `tools/orbit360-smoke-conciliaciones-lab-e2e-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-SMOKE-CONCILIACIONES-LAB-E2E-AYS-20260704.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-SMOKE-CONCILIACIONES-LAB-E2E.md`.
+- **Aplicado:** `tools/orbit360-smoke-conciliaciones-lab-e2e-ays.mjs`, contrato y bitácora.
 - **Regla:** smoke sintético encadena propuestas -> plan persistencia -> ejecutor dry-run -> ejecutor local mirror -> transición validada -> adapter/readiness; no datos reales, no Firestore writes, no pagos, no mutación de `cobros`.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local real y readiness UI/bandeja.
+
+### CERRADO-BE-104-16 — Readiness UI/Bandeja `conciliaciones`
+- **Área:** Backend/frontend bridge / conciliaciones / UI readiness.
+- **Aplicado:**
+  - `tools/orbit360-generar-readiness-bandeja-conciliaciones-ays.mjs`.
+  - `tools/orbit360-test-generar-readiness-bandeja-conciliaciones-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-READINESS-UI-BANDEJA-CONCILIACIONES-AYS-20260704.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-READINESS-BANDEJA-CONCILIACIONES.md`.
+- **Regla:** define columnas obligatorias, estados, score, fuente, trazabilidad, acciones permitidas y bloqueos permanentes para futura bandeja. Prohíbe aplicar pagos directos, marcar cobros pagados desde bandeja, mutar cobros sin transición y mezclar fuentes.
+- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local y construcción UI/bandeja.
 
 ---
 
@@ -166,17 +173,16 @@
 - **Esperado:** `SMOKE_OK` o `SMOKE_OK_CON_READINESS_PENDIENTE` antes de UI/bandeja.
 - **Estado:** ABIERTO / requiere entorno local.
 
-### ABIERTO-BE-104-12 — Readiness UI/Bandeja `conciliaciones`
-- **Área:** Frontend/Backend bridge.
-- **Necesidad:** generar reporte de readiness UI a partir de `conciliaciones/auditLog`: columnas, estados, score, fuente, trazabilidad, acciones permitidas, bloqueos y pendientes.
-- **Restricción:** no aplicar pagos desde la bandeja hasta fase autorizada.
-- **Estado:** ABIERTO.
+### ABIERTO-BE-104-12 — Ejecutar readiness UI/Bandeja en entorno local
+- **Área:** Backend/frontend bridge.
+- **Necesidad:** ejecutar `tools/orbit360-generar-readiness-bandeja-conciliaciones-ays.mjs` con mirror real/sintético para producir reporte de columnas, estados, acciones y bloqueos.
+- **Estado:** ABIERTO / requiere entorno local o mirror generado.
 
 ### ABIERTO-BE-104-13 — UI/Bandeja `conciliaciones`
-- **Área:** Frontend/Backend bridge.
-- **Necesidad:** mostrar propuestas separadas en bandeja `conciliaciones`, con estado, score, fuente, trazabilidad, decisión y acción controlada.
+- **Área:** Frontend/Backend bridge / Claude.
+- **Necesidad:** construir módulo/bandeja visual con tabla segura, detalle y acciones de revisión según contrato readiness.
 - **Restricción:** no aplicar pagos desde la bandeja hasta fase autorizada.
-- **Estado:** ABIERTO / puede coordinarse con Claude cuando vuelva capacidad.
+- **Estado:** ABIERTO / recomendado para Claude cuando se le entregue paquete actualizado.
 
 ### ABIERTO-BE-104-14 — Flujo de aplicación controlada
 - **Área:** Backend / cobros / comisiones / auditLog / notificaciones.
@@ -196,13 +202,14 @@
 6. Corregir copy de planilla: no “Pendiente de aplicar”; debe ser “Propuesta pendiente” o “Pendiente de validación”.
 7. Documentar que `conciliacionPropuesta` en cobro es visual/prototipo; persistencia real en `conciliaciones` queda para backend ChatGPT/Codex.
 8. Academia profunda por ramo/producto: Vida, Gastos médicos, Hogar, Fianzas, Responsabilidad Civil, Transporte/Carga.
-9. No declarar “todos los P0 cerrados” si sigue pendiente bandeja real `conciliaciones` y smoke visual real.
+9. Construir UI/Bandeja `conciliaciones` con el contrato `CONTRATO-READINESS-UI-BANDEJA-CONCILIACIONES-AYS-20260704.md`, sin aplicar pagos directos.
+10. No declarar “todos los P0 cerrados” si sigue pendiente bandeja real, smoke visual real y aplicación controlada.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada como avance incremental, no como cierre final. Quedan pendientes Claude documentales y de copy hasta próximo paquete. Se agregó pipeline de empalme seguro para no pisar backend protegido. Backend continúa por fases sobre conciliación: parser real, persistencia LAB local controlada en `conciliaciones/auditLog`, transiciones auditadas, adapter Firestore LAB preparado por tooling local, smoke E2E sintético preparado, readiness UI/bandeja y flujo de aplicación controlada.
+Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada como avance incremental, no como cierre final. Quedan pendientes Claude documentales, copy residual, Academia por ramo y nueva UI/Bandeja `conciliaciones` hasta próximo paquete. Backend continúa por fases sobre conciliación: parser real, persistencia LAB local controlada en `conciliaciones/auditLog`, transiciones auditadas, adapter Firestore LAB preparado por tooling local, smoke E2E sintético preparado, readiness UI/bandeja preparado y flujo de aplicación controlada.
 
 ---
 
@@ -220,6 +227,8 @@ Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada co
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-ADAPTER-FIRESTORE-LAB-CONCILIACIONES.md`
 - `orbit360-platform/docs/CONTRATO-SMOKE-CONCILIACIONES-LAB-E2E-AYS-20260704.md`
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-SMOKE-CONCILIACIONES-LAB-E2E.md`
+- `orbit360-platform/docs/CONTRATO-READINESS-UI-BANDEJA-CONCILIACIONES-AYS-20260704.md`
+- `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-READINESS-BANDEJA-CONCILIACIONES.md`
 - `tools/orbit360-empalmar-candidato-claude-211525-ays.ps1`
 - `tools/orbit360-validar-transicion-conciliacion-ays.mjs`
 - `tools/orbit360-test-validar-transicion-conciliacion-ays.mjs`
@@ -229,3 +238,5 @@ Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada co
 - `tools/orbit360-validar-adapter-conciliaciones-firestore-lab-ays.mjs`
 - `tools/orbit360-test-validar-adapter-conciliaciones-firestore-lab-ays.mjs`
 - `tools/orbit360-smoke-conciliaciones-lab-e2e-ays.mjs`
+- `tools/orbit360-generar-readiness-bandeja-conciliaciones-ays.mjs`
+- `tools/orbit360-test-generar-readiness-bandeja-conciliaciones-ays.mjs`
