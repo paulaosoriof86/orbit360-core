@@ -73,6 +73,17 @@
 - **Intermedio agregado:** paso entre constructor dryRunReport y score/propuestas conciliaciones.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente orquestador metadata-only.
 
+### CERRADO-BE-104-22 — Orquestador de pipeline metadata-only
+- **Área:** Backend / importador / parser / dryRunReport / QA.
+- **Aplicado:**
+  - `tools/orbit360-orquestar-pipeline-metadata-ays.mjs`.
+  - `tools/orbit360-test-orquestar-pipeline-metadata-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-ORQUESTADOR-PIPELINE-METADATA-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-ORQUESTADOR-PIPELINE-METADATA.md`.
+- **Regla:** encadena perfil, dryRun envelope, candidatos metadata-only y validación final dryRun; no usa datos reales, no escribe, no ejecuta score/propuestas reales.
+- **Intermedio agregado:** verificación de extremo a extremo metadata-only antes de score/propuestas.
+- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente orquestador score-propuestas plan-only.
+
 ---
 
 ## B. Pendientes abiertos
@@ -131,9 +142,9 @@
 - **Restricción:** no construir ejecutor real sin autorización explícita de Paula.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-15 — Orquestador de pipeline metadata-only
-- **Área:** Backend / importador / parser / QA / conciliaciones.
-- **Necesidad:** encadenar manifest -> perfil -> dryRun envelope -> candidates metadata-only -> validar dryRun -> score -> propuestas conciliaciones, sin datos reales ni writes.
+### ABIERTO-BE-104-15 — Orquestador score/propuestas plan-only
+- **Área:** Backend / importador / score / propuestas / persistencia planificada.
+- **Necesidad:** encadenar dryRun validado -> score -> propuestas conciliaciones -> plan de persistencia, sin datos reales, sin writes y sin aplicación controlada.
 - **Estado:** ABIERTO.
 
 ---
@@ -150,4 +161,4 @@
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport sin payload real y adaptador de candidatos metadata-only como intermedios entre manifest y score/propuestas. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, orquestador metadata-only, score real y futuro ejecutor autorizado.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only y orquestador metadata-only como intermedios entre manifest y score/propuestas. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, orquestador score/propuestas plan-only, score real y futuro ejecutor autorizado.
