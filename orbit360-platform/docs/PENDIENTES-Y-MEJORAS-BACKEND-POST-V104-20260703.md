@@ -51,6 +51,17 @@
 - **Intermedio agregado:** paso explícito entre manifest validado y constructor de `dryRunReport`.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local e integración con constructor de dryRunReport.
 
+### CERRADO-BE-104-20 — Constructor de dryRunReport sin payload real
+- **Área:** Backend / importador / parser / dryRunReport.
+- **Aplicado:**
+  - `tools/orbit360-construir-dryrun-report-fuente-ays.mjs`.
+  - `tools/orbit360-test-construir-dryrun-report-fuente-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-CONSTRUCTOR-DRYRUN-REPORT-FUENTE-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-CONSTRUCTOR-DRYRUN-REPORT.md`.
+- **Regla:** construye sobre seguro de `dryRunReport` desde manifest + perfil + fuente separada; no lee filas reales, no escribe, no aplica pagos y no inventa candidatos de conciliación por fila.
+- **Intermedio agregado:** paso entre perfilador de columnas y candidatos metadata-only/validador final dryRunReport.
+- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente adaptador de candidatos metadata-only.
+
 ---
 
 ## B. Pendientes abiertos
@@ -109,9 +120,9 @@
 - **Restricción:** no construir ejecutor real sin autorización explícita de Paula.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-15 — Constructor de dryRunReport sin payload real
-- **Área:** Backend / importador / parser / QA.
-- **Necesidad:** generar un `dryRunReport` desde manifest validado + perfil de columnas + fuente separada, sin filas reales y sin writes.
+### ABIERTO-BE-104-15 — Adaptador de candidatos metadata-only para dryRunReport
+- **Área:** Backend / importador / parser / QA / conciliaciones.
+- **Necesidad:** producir `candidates` metadata-only compatibles con `tools/orbit360-validar-dryrun-report-ays.mjs` sin filas reales ni writes.
 - **Estado:** ABIERTO.
 
 ---
@@ -128,4 +139,4 @@
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente como intermedio entre manifest y dryRunReport. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, constructor de dryRunReport, score real y futuro ejecutor autorizado.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente y constructor de dryRunReport sin payload real como intermedios entre manifest y score/propuestas. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, adaptador de candidatos metadata-only, score real y futuro ejecutor autorizado.
