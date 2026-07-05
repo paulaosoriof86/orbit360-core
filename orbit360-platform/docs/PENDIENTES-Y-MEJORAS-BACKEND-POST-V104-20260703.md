@@ -127,6 +127,15 @@
 - **Regla:** define precondiciones, roles Dirección/Admin/Finanzas, estado vacío honesto, copy seguro, acciones sin mutar cobros/pólizas/comisiones/finmovs/cartera/producción y evidencia requerida.
 - **Estado:** CERRADO COMO TOOLING/DOCUMENTACIÓN EN RAMA / pendiente ejecución local y visual.
 
+### CERRADO-BE-104-28 — Modelo clientes + asesor + portal + calidad de datos
+- **Área:** Backend / clientes / asesor / portal / calidad de datos.
+- **Aplicado:**
+  - `tools/orbit360-validar-modelo-clientes-ays.mjs`.
+  - `tools/orbit360-test-validar-modelo-clientes-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-MODELO-CLIENTES-ASESOR-PORTAL-CALIDAD-AYS-20260705.md`.
+- **Regla:** define colecciones `clientes`, `clienteAsesorRelaciones`, `portalUsuarios`, `calidadDatosSolicitudes` y `auditLog`; mantiene plan-only, tenant, fuentes separadas, portal cliente sin opción de correo y calidad con `REQUIERE_VALIDACION`.
+- **Estado:** CERRADO COMO CONTRATO/TOOLING EN RAMA / pendiente ejecución local.
+
 ---
 
 ## B. Pendientes abiertos
@@ -196,6 +205,11 @@
 - **Necesidad:** ejecutar `tools/orbit360-run-validaciones-locales-conciliaciones-ays.ps1` o `node tools/orbit360-run-validaciones-locales-conciliaciones-ays.mjs` en entorno local, revisar `_orbit360_reports` y confirmar que no hubo cambios en archivos protegidos.
 - **Estado:** ABIERTO.
 
+### ABIERTO-BE-104-19 — Ejecutar tests sintéticos modelo clientes
+- **Área:** Backend / clientes / calidad / portal.
+- **Necesidad:** ejecutar `node tools/orbit360-test-validar-modelo-clientes-ays.mjs` y revisar reportes antes de usar el modelo para parser o persistencia LAB.
+- **Estado:** ABIERTO.
+
 ---
 
 ## C. Pendientes para reportar a Claude cuando Paula pida paquete
@@ -210,9 +224,10 @@
 8. Debe conservar el runner local como paso de QA previo a cualquier cambio que afecte Conciliaciones.
 9. Debe conservar los criterios de bloqueo/no bloqueo y no reinterpretar OK de runner como autorización de backend real.
 10. Debe conservar el checklist visual por roles y estado vacío honesto.
+11. Debe respetar modelo clientes: portal cliente sin opción de correo, calidad de datos y no creación desde fuentes financieras.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell y checklist/helper de smoke visual como intermedios entre manifest y futura persistencia LAB. Quedan abiertos ejecución local del runner/smoke visual, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y modelos backend de clientes/pólizas/cobros/documentos.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell, checklist/helper de smoke visual y contrato/modelo clientes como base para modelos de pólizas/cobros/documentos. Quedan abiertos ejecución local del runner/smoke visual, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y modelos backend de pólizas/cobros/documentos.
