@@ -12,7 +12,8 @@ import path from 'node:path';
 const root = process.cwd();
 const args = process.argv.slice(2);
 const REPORT_DIR = path.join(root, '_orbit360_reports');
-const VERSION = 'v1.1.1-ays-manifest-validator-canonical-contract';
+const VERSION = 'v1.2.0-ays-manifest-validator-fuentes-separadas-conciliaciones';
+const TENANT = 'alianzas-soluciones';
 
 const SOURCE_TYPES = new Set([
   'clientes',
@@ -29,10 +30,7 @@ const SOURCE_TYPES = new Set([
   'configuracion_catalogo'
 ]);
 
-const COUNTRY_CURRENCY = {
-  GT: 'GTQ',
-  CO: 'COP'
-};
+const COUNTRY_CURRENCY = { GT: 'GTQ', CO: 'COP' };
 
 const REQUIRED_BY_SOURCE = {
   clientes: ['nombre'],
@@ -52,31 +50,31 @@ const REQUIRED_BY_SOURCE = {
 const ALLOWED_DESTINATIONS = {
   clientes: ['clientes'],
   aseguradoras: ['aseguradoras'],
-  polizas: ['polizas', 'cobros'],
+  polizas: ['polizas', 'recibos_propuestos'],
   vehiculos: ['vehiculos'],
-  cobros_realizados: ['cobros'],
-  planilla_aseguradora: ['cobros'],
-  planilla_comisiones: ['comisiones'],
-  estado_cuenta_bancario: ['conciliacionBanco'],
+  cobros_realizados: ['conciliaciones'],
+  planilla_aseguradora: ['conciliaciones'],
+  planilla_comisiones: ['conciliaciones'],
+  estado_cuenta_bancario: ['conciliaciones'],
   financiero_historico: ['finmovs'],
-  siniestros: ['reclamos'],
-  documentos_soporte: ['documentos', 'parchesPendientes'],
+  siniestros: ['siniestros'],
+  documentos_soporte: ['documentos_soporte', 'parches_pendientes'],
   configuracion_catalogo: ['configuracion', 'catalogos']
 };
 
 const NEVER_DIRECT_DESTINATIONS = {
   aseguradoras: ['clientes', 'polizas', 'cobros', 'cartera', 'finmovs', 'produccion', 'comisiones'],
-  financiero_historico: ['clientes', 'polizas', 'cobros', 'cartera', 'produccion', 'comisiones'],
+  financiero_historico: ['clientes', 'polizas', 'cobros', 'cartera', 'produccion', 'comisiones', 'conciliaciones'],
   estado_cuenta_bancario: ['clientes', 'polizas', 'cobros', 'cartera', 'produccion', 'finmovs'],
-  documentos_soporte: ['clientes', 'polizas', 'cobros'],
-  cobros_realizados: ['finmovs'],
-  planilla_comisiones: ['finmovs', 'clientes', 'polizas'],
+  documentos_soporte: ['clientes', 'polizas', 'cobros', 'finmovs'],
+  cobros_realizados: ['finmovs', 'clientes', 'polizas', 'cobros'],
+  planilla_comisiones: ['finmovs', 'clientes', 'polizas', 'cobros'],
+  planilla_aseguradora: ['finmovs', 'clientes', 'polizas', 'cobros'],
   configuracion_catalogo: ['clientes', 'polizas', 'cobros', 'finmovs']
 };
 
-const FORBIDDEN_PAYLOAD_KEYS = new Set([
-  'rows', 'row', 'records', 'items', 'data', 'payload', 'sampleRows', 'previewRows', 'normalizedRows', 'rawRows'
-]);
+const FORBIDDEN_PAYLOAD_KEYS = new Set(['rows', 'row', 'records', 'items', 'data', 'payload', 'sampleRows', 'previewRows', 'normalizedRows', 'rawRows']);
+const FORBIDDEN_WRITE_FLAGS = new Set(['write_enabled', 'writeEnabled', 'apply_payment', 'applyPayment', 'aplicar_pago', 'execute', 'executed', 'commit']);
 
 function argValue(flag) {
   const i = args.indexOf(flag);
@@ -101,11 +99,8 @@ function listKeysDeep(obj, prefix = '', out = []) {
   return out;
 }
 
-function hasForbiddenPayload(manifest) {
-  return listKeysDeep(manifest).filter((keyPath) => {
-    const last = keyPath.split('.').pop();
-    return FORBIDDEN_PAYLOAD_KEYS.has(last);
-  });
+function keysByLastName(manifest, set) {
+  return listKeysDeep(manifest).filter((keyPath) => set.has(keyPath.split('.').pop()));
 }
 
 function asArray(v) {
@@ -139,16 +134,23 @@ let destinations = [];
 let missingFields = [];
 let forbiddenDestinations = [];
 let forbiddenKeys = [];
+let forbiddenWriteFlags = [];
 
 if (manifest) {
   sourceType = manifest.source_type || manifest.sourceType || manifest.tipo_fuente || manifest.type;
   if (!SOURCE_TYPES.has(sourceType)) errors.push(`Tipo de fuente inválido o faltante: ${sourceType || 'S/D'}`);
 
-  forbiddenKeys = hasForbiddenPayload(manifest);
+  forbiddenKeys = keysByLastName(manifest, FORBIDDEN_PAYLOAD_KEYS);
   if (forbiddenKeys.length) errors.push(`El manifest contiene payload de filas prohibido: ${forbiddenKeys.join(', ')}`);
 
-  if (!manifest.tenant_id && !manifest.tenantId) errors.push('Falta tenant_id/tenantId.');
+  forbiddenWriteFlags = keysByLastName(manifest, FORBIDDEN_WRITE_FLAGS);
+  if (forbiddenWriteFlags.length) errors.push(`El manifest contiene banderas de escritura/aplicación: ${forbiddenWriteFlags.join(', ')}`);
+
+  const tenant = manifest.tenant_id || manifest.tenantId;
+  if (!tenant) errors.push('Falta tenant_id/tenantId.');
+  if (tenant && tenant !== TENANT) errors.push(`Tenant inválido: ${tenant}.`);
   if (!manifest.file && !manifest.files && !manifest.source_file && !manifest.source_files) errors.push('Falta referencia estructural de archivo fuente.');
+  if (!manifest.file_hash && !manifest.fileHash && !manifest.sha256 && !manifest.hash) warnings.push('Falta huella del archivo; se recomienda hash para trazabilidad.');
 
   const country = manifest.country || manifest.pais;
   const currency = manifest.currency || manifest.moneda;
@@ -176,20 +178,12 @@ if (manifest) {
     if (destinations.includes(forbidden)) errors.push(`${sourceType} no puede escribir en ${forbidden}.`);
   }
 
-  if (sourceType === 'estado_cuenta_bancario' && destinations.includes('finmovs')) {
-    errors.push('estado_cuenta_bancario no puede escribir finmovs; debe ir a conciliacionBanco.');
+  if (['estado_cuenta_bancario','cobros_realizados','planilla_aseguradora','planilla_comisiones'].includes(sourceType) && !destinations.includes('conciliaciones')) {
+    errors.push(`${sourceType} debe proponer hacia conciliaciones, no a cobros/comisiones directos.`);
   }
-  if (sourceType === 'documentos_soporte' && destinations.includes('clientes')) {
-    errors.push('documentos_soporte no puede escribir clientes directo; debe ir a documentos/parchesPendientes.');
-  }
-
-  if (manifest.write_enabled === true || manifest.writeEnabled === true) {
-    errors.push('write_enabled=true no permitido en esta etapa. Solo dry-run/preview.');
-  }
-
-  if (manifest.confidence !== undefined && Number(manifest.confidence) < 0.85 && !requiresValidation) {
-    warnings.push('Confianza menor a 0.85 debería requerir validación.');
-  }
+  if (sourceType === 'financiero_historico') warnings.push('financiero_historico no alimenta cartera, cobros ni producción; solo finmovs/histórico.');
+  if (sourceType === 'documentos_soporte') warnings.push('documentos_soporte solo propone datos; requiere confirmación/diff antes de modificar entidades.');
+  if (manifest.confidence !== undefined && Number(manifest.confidence) < 0.85 && !requiresValidation) warnings.push('Confianza menor a 0.85 debería requerir validación.');
 }
 
 const decision = errors.length ? 'BLOQUEADO' : (warnings.length ? 'REQUIERE_REVISION' : 'LISTO_DRYRUN');
@@ -210,8 +204,10 @@ const result = {
   missing_fields: missingFields,
   forbidden_destinations: forbiddenDestinations,
   forbidden_payload_keys: forbiddenKeys,
+  forbidden_write_flags: forbiddenWriteFlags,
   errors,
-  warnings
+  warnings,
+  restrictions: ['manifest-only', 'no-row-payload', 'no-writes', 'no-direct-operational-mutation', 'no-deploy']
 };
 
 const txt = [
@@ -222,7 +218,7 @@ const txt = [
   `Manifest: ${manifestArg || 'S/D'}`,
   `Decision: ${decision}`,
   'Restricciones: no lee filas, no escribe store/Firestore, no deploy.',
-  'Contrato: fuentes separadas A&S v1.0.',
+  'Contrato: fuentes separadas A&S con conciliaciones como bandeja operativa.',
   '============================================================',
   '',
   `Tipo fuente: ${sourceType || 'S/D'}`,
