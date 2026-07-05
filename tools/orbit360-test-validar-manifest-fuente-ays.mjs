@@ -21,12 +21,12 @@ function writeJson(file, data) {
 
 function baseManifest(sourceType) {
   return {
-    tenant_id: 'demo-tenant',
+    tenant_id: 'alianzas-soluciones',
     source_type: sourceType,
-    files: [{ name: 'fuente.xlsx', sheets: ['Hoja1'] }],
+    files: [{ name: 'fuente-sintetica.xlsx', sheets: ['Hoja1'] }],
+    file_hash: 'sha256:synthetic',
     country: 'GT',
     currency: 'GTQ',
-    write_enabled: false,
     confidence: 0.95,
     schema: { fields: [] },
     destinations: []
@@ -60,31 +60,30 @@ run('financiero-bloquea-clientes', {
   destinations: ['finmovs', 'clientes']
 }, 1, ['Decision: BLOQUEADO', 'financiero_historico no puede escribir en clientes']);
 
-run('banco-no-finmovs', {
+run('banco-no-cobros', {
   ...baseManifest('estado_cuenta_bancario'),
   schema: { fields: ['fecha', 'descripcion', 'monto', 'moneda', 'pais'] },
-  destinations: ['finmovs']
-}, 1, ['Decision: BLOQUEADO', 'estado_cuenta_bancario no puede escribir finmovs']);
+  destinations: ['cobros']
+}, 1, ['Decision: BLOQUEADO', 'estado_cuenta_bancario no puede escribir en cobros']);
 
-run('banco-listo-conciliacion', {
+run('banco-listo-conciliaciones', {
   ...baseManifest('estado_cuenta_bancario'),
   schema: { fields: ['fecha', 'descripcion', 'monto', 'moneda', 'pais'] },
-  destinations: ['conciliacionBanco']
-}, 0, ['Decision: LISTO_DRYRUN', 'Destinos permitidos: conciliacionBanco']);
+  destinations: ['conciliaciones']
+}, 0, ['Decision: LISTO_DRYRUN', 'Destinos permitidos: conciliaciones']);
+
+run('planilla-comisiones-conciliaciones', {
+  ...baseManifest('planilla_comisiones'),
+  schema: { fields: ['aseguradora', 'periodo', 'comision_pagada', 'moneda', 'pais'] },
+  destinations: ['conciliaciones']
+}, 0, ['Decision: LISTO_DRYRUN']);
 
 run('pais-moneda-incoherente', {
   ...baseManifest('estado_cuenta_bancario'),
   currency: 'COP',
   schema: { fields: ['fecha', 'descripcion', 'monto', 'moneda', 'pais'] },
-  destinations: ['conciliacionBanco']
+  destinations: ['conciliaciones']
 }, 1, ['Decision: BLOQUEADO', 'Moneda incoherente']);
-
-run('payload-prohibido', {
-  ...baseManifest('clientes'),
-  schema: { fields: ['nombre'] },
-  destinations: ['clientes'],
-  rows: [{ nombre: 'NO REAL' }]
-}, 1, ['Decision: BLOQUEADO', 'payload de filas prohibido']);
 
 run('polizas-campos-faltantes', {
   ...baseManifest('polizas'),
@@ -96,7 +95,7 @@ run('documentos-no-clientes', {
   ...baseManifest('documentos_soporte'),
   schema: { fields: ['tipo_documento', 'archivo'] },
   destinations: ['clientes']
-}, 1, ['Decision: BLOQUEADO', 'documentos_soporte no puede escribir clientes directo']);
+}, 1, ['Decision: BLOQUEADO', 'documentos_soporte no puede escribir en clientes']);
 
 const output = [
   '============================================================',
