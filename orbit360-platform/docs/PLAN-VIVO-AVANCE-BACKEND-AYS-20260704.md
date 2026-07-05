@@ -39,6 +39,7 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | Canales/correo por usuario autorizado | Avanzado documental | Correo por usuario interno autorizado, no por tenant/rol; cliente sin opción de correo. |
 | Conciliaciones frontend 062855 | Empalmado en GitHub | `modules/conciliaciones.js` agregado e `index.html` híbrido preservando LAB. |
 | Smoke estático empalme Conciliaciones | Tooling agregado | Validador estático para confirmar index híbrido, carga única del módulo, roles y acciones seguras. |
+| Perfilador de columnas por fuente | Tooling agregado | Manifest validado ahora puede producir perfil de columnas, campos obligatorios/opcionales, matches probables y readiness para dryRunReport. |
 | Seguimiento de bloques | Agregado intermedio | Este plan vivo se mantiene actualizado después de cada bloque largo. |
 
 ## 4. Bloques pendientes principales
@@ -52,7 +53,7 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | P0 | Contrato/modelo `cobros` + pagos reportados + conciliación | Pendiente de integración con Cliente360/Ops. |
 | P0 | Contrato/modelo `documentos` + Storage futuro | Pendiente backend real. |
 | P0 | Smokes de roles: cliente/asesor/cobros/admin | Pendiente. |
-| P1 | Perfilador de columnas por fuente | Pendiente tras manifest por fuentes separadas. |
+| P1 | Constructor de dryRunReport sin payload real | Pendiente tras perfilador de columnas. |
 | P1 | Manuales y Academia actualizados por cambio | Pendiente para Claude/prototipo; debe documentarse cada cambio de módulo. |
 
 ## 5. Intermedios agregados
@@ -85,43 +86,57 @@ Relación con plan principal: puente entre empalme frontend y smoke visual/backe
 
 Estado: tooling agregado.
 
-Próximo paso: ejecutar smoke visual/local y continuar con perfilador de columnas por fuente.
+### Intermedio 5 — Perfilador de columnas por fuente
 
-## 6. Formato de cierre de cada bloque
+Motivo: el manifest validado no era suficiente para generar `dryRunReport`; faltaba un paso que verificara campos obligatorios, aliases y columnas no mapeadas por fuente.
+
+Riesgo si no se atiende: parser real improvisaría mapeos, mezclaría fuentes o avanzaría sin columnas mínimas.
+
+Relación con plan principal: puente entre manifest por fuentes separadas y constructor de `dryRunReport`.
+
+Estado: tooling agregado.
+
+## 6. Formato obligatorio de cierre de cada bloque
 
 Cada respuesta de continuidad debe cerrar con:
 
 ```txt
 Avance del bloque
+- Qué adelanté:
 - Bloque trabajado:
 - Plan/área impactada:
 - Documentos creados/actualizados:
 - Decisiones agregadas:
+- ¿Se agregó algo intermedio al plan?:
 - Intermedios agregados:
 - Pendientes que siguen:
+- Qué sigue en el plan:
 - Próximo bloque recomendado:
 - Estado PR/rama:
 ```
+
+Regla fija solicitada por Paula: siempre indicar qué se adelantó, si se agregó un intermedio del plan de trabajo y qué sigue en el plan.
 
 ## 7. Próximo bloque recomendado
 
 Continuar con:
 
 ```txt
-Perfilador de columnas por fuente.
+Constructor de dryRunReport sin payload real.
 ```
 
 Este bloque debe conectar:
 
 - manifest validado;
+- perfil de columnas;
 - fuente separada;
-- campos mínimos;
-- columnas reales declaradas sin payload;
-- mapeo candidato;
-- advertencias por país/moneda/periodo;
-- readiness para dryRunReport;
+- estructura de dryRunReport;
+- conteos agregados;
+- advertencias;
+- readiness para score/propuestas;
+- cero filas reales;
 - cero writes.
 
 ## 8. Estado
 
-Plan vivo actualizado después del empalme y smoke estático de Conciliaciones. No avanzar a datos reales, aplicación controlada ni deploy sin smoke y autorización.
+Plan vivo actualizado después del empalme, smoke estático de Conciliaciones y perfilador de columnas por fuente. No avanzar a datos reales, aplicación controlada ni deploy sin smoke y autorización.
