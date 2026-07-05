@@ -40,14 +40,18 @@ function keysDeep(obj, prefix='', out=[]){
 function lastKey(pathName){ return pathName.replace(/\[\d+\]/g, '').split('.').pop(); }
 function forbiddenKeys(obj){ return keysDeep(obj).filter(p => FORBIDDEN_KEYS.has(lastKey(p))); }
 function enabledWriteFlags(obj){
-  return keysDeep(obj).filter((p) => {
-    if(!WRITE_FLAGS.has(lastKey(p))) return false;
-    const value = p.split('.').reduce((acc, part) => {
-      const clean = part.replace(/\[\d+\]/g, '');
-      return acc && typeof acc === 'object' ? acc[clean] : undefined;
-    }, obj);
-    return value === true || value === 'true' || value === 1 || value === '1';
-  });
+  const hits = [];
+  function visit(value, trail=''){
+    if(!value || typeof value !== 'object') return;
+    if(Array.isArray(value)){ value.forEach((item, i) => visit(item, `${trail}[${i}]`)); return; }
+    for(const [key, child] of Object.entries(value)){
+      const pathName = trail ? `${trail}.${key}` : key;
+      if(WRITE_FLAGS.has(key) && (child === true || child === 'true' || child === 1 || child === '1')) hits.push(pathName);
+      visit(child, pathName);
+    }
+  }
+  visit(obj);
+  return hits;
 }
 function sourceRefOk(ref){ return Boolean(ref && str(ref.file || ref.archivo) && str(ref.row_ref || ref.fila || ref.row_hash)); }
 function countryCurrencyOk(country, currency){ return Boolean(country && currency && COUNTRY_CURRENCY[country] && COUNTRY_CURRENCY[country] === currency); }
