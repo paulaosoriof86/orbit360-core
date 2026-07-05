@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/tokens.css?v1291">
-  <link rel="stylesheet" href="styles/base.css?v1291">
-  <link rel="stylesheet" href="styles/infra.css?v1291">
+  <link rel="stylesheet" href="styles/base.css?v1312">
+  <link rel="stylesheet" href="styles/infra.css?v1311">
 </head>
 <body class="pre-auth">
   <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1E2227"/><circle cx="50" cy="50" r="20" fill="#C5162E"/><circle cx="50" cy="50" r="9" fill="#1E2227"/><text x="50" y="82" font-family="sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">Orbit 360</text></svg></template>
@@ -23,20 +23,17 @@
         <div class="orbit-wrap">
           <div class="orbit-ring r2"></div>
           <div class="orbit-ring r1"></div>
-          <!-- etiquetas exteriores -->
           <span class="outer-label" style="top:6%;left:50%;transform:translateX(-50%)">Velocidad</span>
           <span class="outer-label" style="top:30%;left:2%">Automatización</span>
           <span class="outer-label" style="top:30%;right:2%">Calidad</span>
           <span class="outer-label" style="bottom:30%;left:4%">Escala</span>
           <span class="outer-label" style="bottom:30%;right:2%">Datos</span>
           <span class="outer-label" style="bottom:6%;left:50%;transform:translateX(-50%)">Integración</span>
-          <!-- nodos orbitando -->
           <div class="orbit-r1-spin">
             <div class="n n1"><div class="orbit-node accent">🧑‍💼<span class="nlabel">Clientes</span></div></div>
             <div class="n n2"><div class="orbit-node">👥<span class="nlabel">Su equipo</span></div></div>
             <div class="n n3"><div class="orbit-node">📑<span class="nlabel">Pólizas</span></div></div>
           </div>
-          <!-- núcleo -->
           <div class="orbit-core"><span class="oc-mark"></span><b>ORBIT</b></div>
         </div>
       </div>
@@ -58,8 +55,8 @@
           <span class="lg-eyebrow">Orbit 360 — Acceso del equipo</span>
           <h3>Iniciar sesión</h3>
           <div class="lg-hint">Ingresá con tu usuario y contraseña asignados por administración.</div>
-          <input class="lg-field" id="lg-user" type="email" value="" autocomplete="username">
-          <input class="lg-field" id="lg-pass" type="password" value="" autocomplete="current-password">
+          <input class="lg-field" id="lg-user" type="email" placeholder="tu.correo@empresa.com" autocomplete="username">
+          <input class="lg-field" id="lg-pass" type="password" placeholder="Contraseña" autocomplete="current-password">
           <button class="lg-submit" type="submit">Ingresar al Orbit 360</button>
           <a class="lg-reset" id="lg-reset">¿Problemas al ingresar? → Limpiar sesión</a>
         </form>
@@ -112,11 +109,11 @@
   </div>
 
   <!-- ============ CORE (base) ============ -->
-  <script src="core/theme.js?v1291"></script>
+  <script src="core/theme.js?v1304"></script>
   <script src="core/ui.js?v1291"></script>
-  <script src="core/config.js?v1291"></script>
+  <script src="core/config.js?v1324"></script>
   <script src="core/primas.js?v1291"></script>
-  <script src="core/comisiones-eng.js?v1291"></script>
+  <script src="core/comisiones-eng.js?v1317"></script>
   <!-- ============ DATA LAYER (depende de config + primas) ============ -->
   <script src="core/backend-lab-loader.js?v=lab-20260703"></script>
   <script src="core/backend-lab-init.js?v=lab-20260703"></script>
@@ -124,48 +121,49 @@
   <script src="data/store-firestore-lab.local.js?v=lab-store-20260703"></script>
   <script src="data/seed.js?v1291"></script>
   <!-- CORE (resto) -->
-  <script src="core/queries.js?v1291"></script>
+  <script src="core/queries.js?v1316"></script>
   <script src="core/crmkit.js?v1291"></script>
-  <script src="core/correo.js?v1291"></script>
+  <script src="core/correo.js?v1304"></script>
   <script src="core/notify.js?v1291"></script>
-  <script src="core/ia.js?v1291"></script>
-  <script src="core/integraciones.js?v1295"></script>
+  <script src="core/ia.js?v1305"></script>
+  <script src="core/integraciones.js?v1296"></script>
   <script src="core/ciclo.js?v1294"></script>
-  <script src="core/importa.js?v1291"></script>
+  <script src="core/importa.js?v1323"></script>
   <script src="core/novedades.js?v1291"></script>
   <script src="core/legal.js?v1291"></script>
   <script src="core/auth.js?v1295-labfix-20260703"></script>
   <script src="core/router.js?v1291"></script>
-  <script src="core/pwa.js?v1291"></script>
+  <script src="core/pwa.js?v1304"></script>
   <!-- MODULES -->
-  <script src="modules/inicio.js?v1291"></script>
+  <script src="modules/inicio.js?v1313"></script>
   <script src="modules/ops.js?v1291"></script>
-  <script src="modules/leads.js?v1291"></script>
-  <script src="modules/cliente360.js?v1291"></script>
-  <script src="modules/polizas.js?v1291"></script>
-  <script src="modules/cobros.js?v1291"></script>
-  <script src="modules/renovaciones.js?v1291"></script>
-  <script src="modules/cancelaciones.js?v1291"></script>
-  <script src="modules/comisiones.js?v1291"></script>
-  <script src="modules/insights.js?v1291"></script>
+  <script src="modules/leads.js?v1315"></script>
+  <script src="modules/cliente360.js?v1322"></script>
+  <script src="modules/polizas.js?v1318"></script>
+  <script src="modules/cobros.js?v1322"></script>
+  <script src="modules/conciliaciones.js?v1322"></script>
+  <script src="modules/renovaciones.js?v1315"></script>
+  <script src="modules/cancelaciones.js?v1313"></script>
+  <script src="modules/comisiones.js?v1318"></script>
+  <script src="modules/insights.js?v1313"></script>
   <script src="modules/historial.js?v1291"></script>
-  <script src="modules/importar.js?v1291"></script>
-  <script src="modules/configuracion.js?v1291"></script>
-  <script src="modules/equipo.js?v1291"></script>
-  <script src="modules/correo.js?v1291"></script>
+  <script src="modules/importar.js?v1301"></script>
+  <script src="modules/configuracion.js?v1320"></script>
+  <script src="modules/equipo.js?v1313"></script>
+  <script src="modules/correo.js?v1305"></script>
   <script src="modules/aseguradoras.js?v1291"></script>
-  <script src="modules/marketing.js?v1291"></script>
-  <script src="modules/siniestros.js?v1291"></script>
+  <script src="modules/marketing.js?v1305"></script>
+  <script src="modules/siniestros.js?v1315"></script>
   <script src="modules/notificaciones.js?v1291"></script>
   <script src="modules/ia.js?v1291"></script>
-  <script src="modules/academia.js?v1291"></script>
-  <script src="modules/reportes.js?v1291"></script>
-  <script src="modules/portal.js?v1291"></script>
+  <script src="modules/academia.js?v1312"></script>
+  <script src="modules/reportes.js?v1313"></script>
+  <script src="modules/portal.js?v1315"></script>
   <script src="modules/cronograma.js?v1291"></script>
-  <script src="modules/automatizaciones.js?v1291"></script>
+  <script src="modules/automatizaciones.js?v1297"></script>
   <script src="modules/cotizador.js?v1291"></script>
   <script src="modules/comparativo.js?v1291"></script>
-  <script src="modules/finanzas.js?v1294"></script>
+  <script src="modules/finanzas.js?v1313"></script>
   <script src="modules/calidad.js?v1291"></script>
   <script src="modules/plantillas.js?v1291"></script>
   <!-- BOOT -->
