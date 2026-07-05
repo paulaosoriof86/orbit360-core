@@ -39,7 +39,8 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | Canales/correo por usuario autorizado | Avanzado documental | Correo por usuario interno autorizado, no por tenant/rol; cliente sin opción de correo. |
 | Conciliaciones frontend 062855 | Empalmado en GitHub | `modules/conciliaciones.js` agregado e `index.html` híbrido preservando LAB. |
 | Smoke estático empalme Conciliaciones | Tooling agregado | Validador estático para confirmar index híbrido, carga única del módulo, roles y acciones seguras. |
-| Perfilador de columnas por fuente | Tooling agregado | Manifest validado ahora puede producir perfil de columnas, campos obligatorios/opcionales, matches probables y readiness para dryRunReport. |
+| Perfilador de columnas por fuente | Tooling agregado | Manifest validado produce perfil de columnas, campos obligatorios/opcionales, matches probables y readiness para dryRunReport. |
+| Constructor dryRunReport sin filas | Tooling agregado | Construye sobre seguro de dryRunReport desde manifest + perfil; no inventa candidatos de conciliación. |
 | Seguimiento de bloques | Agregado intermedio | Este plan vivo se mantiene actualizado después de cada bloque largo. |
 
 ## 4. Bloques pendientes principales
@@ -53,7 +54,7 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | P0 | Contrato/modelo `cobros` + pagos reportados + conciliación | Pendiente de integración con Cliente360/Ops. |
 | P0 | Contrato/modelo `documentos` + Storage futuro | Pendiente backend real. |
 | P0 | Smokes de roles: cliente/asesor/cobros/admin | Pendiente. |
-| P1 | Constructor de dryRunReport sin payload real | Pendiente tras perfilador de columnas. |
+| P1 | Adaptador de candidatos metadata-only para dryRunReport | Pendiente tras constructor de dryRunReport. |
 | P1 | Manuales y Academia actualizados por cambio | Pendiente para Claude/prototipo; debe documentarse cada cambio de módulo. |
 
 ## 5. Intermedios agregados
@@ -96,6 +97,16 @@ Relación con plan principal: puente entre manifest por fuentes separadas y cons
 
 Estado: tooling agregado.
 
+### Intermedio 6 — Constructor de dryRunReport sin filas
+
+Motivo: después del perfilador, faltaba un sobre seguro de dryRunReport para conectar manifest + perfil sin simular filas ni resultados operativos.
+
+Riesgo si no se atiende: saltar directo a score/propuestas sin estructura validable o inventar candidatos de conciliación.
+
+Relación con plan principal: puente entre perfilador y adaptador de candidatos metadata-only compatible con el validador dryRunReport.
+
+Estado: tooling agregado.
+
 ## 6. Formato obligatorio de cierre de cada bloque
 
 Cada respuesta de continuidad debe cerrar con:
@@ -122,21 +133,20 @@ Regla fija solicitada por Paula: siempre indicar qué se adelantó, si se agreg�
 Continuar con:
 
 ```txt
-Constructor de dryRunReport sin payload real.
+Adaptador de candidatos metadata-only para dryRunReport.
 ```
 
 Este bloque debe conectar:
 
 - manifest validado;
 - perfil de columnas;
-- fuente separada;
-- estructura de dryRunReport;
-- conteos agregados;
-- advertencias;
-- readiness para score/propuestas;
-- cero filas reales;
+- dryRunReport envelope;
+- referencias de fuente metadata-only;
+- candidatos sin payload real;
+- validación con `tools/orbit360-validar-dryrun-report-ays.mjs`;
+- readiness para score;
 - cero writes.
 
 ## 8. Estado
 
-Plan vivo actualizado después del empalme, smoke estático de Conciliaciones y perfilador de columnas por fuente. No avanzar a datos reales, aplicación controlada ni deploy sin smoke y autorización.
+Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas y constructor de dryRunReport sin filas. No avanzar a datos reales, aplicación controlada ni deploy sin smoke y autorización.
