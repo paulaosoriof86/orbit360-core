@@ -85,6 +85,20 @@
 - **Impacto:** deja lista la bandeja conceptual para propuestas auditables antes de aplicación controlada.
 - **Estado:** CERRADO EN RAMA / pendiente implementación Firestore LAB y flujo de aplicación controlada.
 
+### CERRADO-BE-104-09 — Generador dryRunReport → propuestas `conciliaciones`
+
+- **Área:** Backend importador / dry-run / conciliación / bandeja.
+- **Necesidad:** convertir candidatos validados del `dryRunReport` en propuestas estructuradas listas para la bandeja `conciliaciones`, sin persistir ni aplicar pagos.
+- **Aplicado:**
+  - `tools/orbit360-generar-propuestas-conciliacion-ays.mjs`.
+  - `tools/orbit360-test-generar-propuestas-conciliacion-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-GENERACION-PROPUESTAS-CONCILIACION-AYS-20260704.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-GENERADOR-PROPUESTAS-CONCILIACION.md`.
+- **Regla:** solo genera propuestas desde fuentes autorizadas; bloquea `write_enabled=true`, payload/filas reales, fuente no autorizada y país/moneda incoherente; genera IDs estables y estados derivados del score.
+- **Prueba local sintética:** 5 casos, 0 fallos.
+- **Impacto:** conecta el dry-run con la bandeja conceptual, reduciendo trabajo manual y manteniendo separación entre propuesta y aplicación real.
+- **Estado:** CERRADO EN RAMA / pendiente persistencia Firestore LAB.
+
 ## B. Pendientes abiertos
 
 ### ABIERTO-BE-104-01 — Empalme completo del candidato Claude final en GitHub
@@ -153,11 +167,11 @@
 - **Resultado:** auditoría de archivos reales realizada. No se aceptó resumen sin verificar.
 - **Estado:** CERRADO COMO DOCUMENTACIÓN / ABIERTO PARA EJECUCIÓN DE CLAUDE.
 
-### ABIERTO-BE-104-09 — Integrar manifest + dryRunReport + score + conciliaciones al parser/importador real
+### ABIERTO-BE-104-09 — Integrar parser real + generador de propuestas
 
 - **Área:** Backend importador / conciliaciones.
-- **Necesidad:** conectar los validadores seguros con el flujo real de parser/importador para que cada fuente derive en reporte trazable y bandeja de conciliación.
-- **Esperado:** `manifest validado -> dryRunReport validado -> score -> propuesta conciliaciones`, sin escritura automática.
+- **Necesidad:** conectar el parser/importador real para que cada fuente genere `manifest validado -> dryRunReport validado -> score -> propuestas conciliaciones`.
+- **Esperado:** integración de extremo a extremo sin escritura automática y con reportes para revisión.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-10 — Implementar colección `conciliaciones` en Firestore LAB
@@ -191,10 +205,11 @@
 13. Mostrar en Importar/Comisiones/Cobros los estados de score: exacto, probable, requiere validación y bloqueado.
 14. Mostrar salida de dry-run antes de cualquier escritura o aplicación.
 15. Mostrar bandeja `conciliaciones` como propuestas separadas, no como pagos aplicados.
+16. Mostrar que las propuestas salen de un dry-run validado, no de un pago aplicado.
 
 ## D. Estado general
 
-Backend LAB reforzado. Candidata activa Claude `193658.630` auditada. Score de conciliación, validador `dryRunReport` y contrato de bandeja `conciliaciones` agregados como herramientas seguras. Aún falta empalme completo GitHub, smoke real, implementación Firestore LAB de conciliaciones y continuidad Auth/importadores por fases.
+Backend LAB reforzado. Candidata activa Claude `193658.630` auditada. Score de conciliación, validador `dryRunReport`, contrato de bandeja `conciliaciones` y generador dry-run → propuestas agregados como herramientas seguras. Aún falta empalme completo GitHub, smoke real, implementación Firestore LAB de conciliaciones y continuidad Auth/importadores por fases.
 
 ## E. Documentos agregados después del bloque pólizas/cartera y auditoría actual
 
@@ -210,3 +225,5 @@ Backend LAB reforzado. Candidata activa Claude `193658.630` auditada. Score de c
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-DRYRUN-REPORT.md`
 - `orbit360-platform/docs/CONTRATO-BANDEJA-CONCILIACIONES-AYS-20260704.md`
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-BANDEJA-CONCILIACIONES.md`
+- `orbit360-platform/docs/CONTRATO-GENERACION-PROPUESTAS-CONCILIACION-AYS-20260704.md`
+- `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-GENERADOR-PROPUESTAS-CONCILIACION.md`
