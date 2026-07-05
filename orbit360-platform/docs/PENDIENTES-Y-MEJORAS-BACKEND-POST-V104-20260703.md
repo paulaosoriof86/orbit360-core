@@ -81,14 +81,21 @@
 
 ### CERRADO-BE-104-13 — Ejecutor LAB local de persistencia `conciliaciones`
 - **Área:** Backend / conciliaciones / auditLog / persistencia LAB.
-- **Aplicado:**
-  - `tools/orbit360-ejecutar-persistencia-conciliaciones-lab-ays.mjs`.
-  - `tools/orbit360-test-ejecutar-persistencia-conciliaciones-lab-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-EJECUTOR-PERSISTENCIA-CONCILIACIONES-LAB-AYS-20260704.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-EJECUTOR-PERSISTENCIA-CONCILIACIONES-LAB.md`.
+- **Aplicado:** `tools/orbit360-ejecutar-persistencia-conciliaciones-lab-ays.mjs`, tests, contrato y bitácora.
 - **Regla:** ejecutor deshabilitado por defecto; en `dry-run` solo reporta, en `local-mirror` exige `CONFIRMO_ESCRITURA_LAB_CONCILIACIONES`; materializa `conciliaciones` + `auditLog` en mirror local; nunca toca `cobros`, `comisiones`, `polizas`, `finmovs` ni aplica pagos.
 - **Prueba local sintética:** 8 casos, 0 fallos.
 - **Estado:** CERRADO EN RAMA / pendiente adapter Firestore LAB directo y UI/bandeja.
+
+### CERRADO-BE-104-14 — Adapter Firestore LAB para `conciliaciones/auditLog` preparado
+- **Área:** Backend / Firestore LAB / conciliaciones / auditLog.
+- **Aplicado:**
+  - `tools/orbit360-integrar-adapter-conciliaciones-firestore-lab-ays.ps1`.
+  - `tools/orbit360-validar-adapter-conciliaciones-firestore-lab-ays.mjs`.
+  - `tools/orbit360-test-validar-adapter-conciliaciones-firestore-lab-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-ADAPTER-FIRESTORE-LAB-CONCILIACIONES-AUDITLOG-AYS-20260704.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-ADAPTER-FIRESTORE-LAB-CONCILIACIONES.md`.
+- **Regla:** integración local protegida con backup; agrega/verifica `conciliaciones` y `auditLog` en `COLLECTIONS`; valida gate `firestore-lab`, tenant `alianzas-soluciones`, path `tenantId/{tenantId}/{collection}`, `onSnapshot`, API compatible y ausencia de textos de aplicación directa.
+- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecutar `-Apply` local y smoke de extremo a extremo.
 
 ---
 
@@ -143,19 +150,24 @@
 - **Necesidad:** conectar el parser/importador real para que cada fuente genere `manifest validado -> dryRunReport validado -> score -> propuestas conciliaciones -> plan persistencia`.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-10 — Adapter Firestore LAB directo para `conciliaciones/auditLog`
+### ABIERTO-BE-104-10 — Ejecutar integración local del adapter Firestore LAB
 - **Área:** Backend / Firestore LAB / conciliaciones.
-- **Necesidad:** conectar el ejecutor a escritura Firestore LAB real usando tenant isolation, sin secretos en repo y sin mutar `cobros`.
-- **Esperado:** `plan validado -> conciliaciones/auditLog en Firestore LAB -> onSnapshot -> UI/bandeja`, con ejecución deshabilitada por defecto.
+- **Necesidad:** correr `tools/orbit360-integrar-adapter-conciliaciones-firestore-lab-ays.ps1 -DryRun` y luego `-Apply` en repo local para agregar `conciliaciones/auditLog` al store protegido con backup.
+- **Esperado:** store Firestore LAB validado con colecciones nuevas, sin deploy y sin writes.
+- **Estado:** ABIERTO / requiere entorno local.
+
+### ABIERTO-BE-104-11 — Smoke extremo a extremo conciliaciones LAB
+- **Área:** QA backend / conciliaciones.
+- **Necesidad:** ejecutar flujo completo sintético: propuestas -> plan persistencia -> ejecutor local mirror -> adapter validado -> readiness UI/bandeja.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-11 — Flujo de aplicación controlada
+### ABIERTO-BE-104-12 — Flujo de aplicación controlada
 - **Área:** Backend / cobros / comisiones / auditLog / notificaciones.
 - **Necesidad:** diseñar el paso posterior donde una propuesta `VALIDADA` puede aplicar cobro/comisión con auditoría.
 - **Esperado:** `propuesta VALIDADA -> validar transición -> aplicar cobro/comisión -> auditLog -> notificación -> actualización Portal/Cliente360/Cobros`, sin saltarse revisión.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-12 — UI/Bandeja `conciliaciones`
+### ABIERTO-BE-104-13 — UI/Bandeja `conciliaciones`
 - **Área:** Frontend/Backend bridge.
 - **Necesidad:** mostrar propuestas separadas en bandeja `conciliaciones`, con estado, score, fuente, trazabilidad, decisión y acción controlada.
 - **Restricción:** no aplicar pagos desde la bandeja hasta fase autorizada.
@@ -179,7 +191,7 @@
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada como avance incremental, no como cierre final. Quedan pendientes Claude documentales y de copy hasta próximo paquete. Se agregó pipeline de empalme seguro para no pisar backend protegido. Backend continúa por fases sobre conciliación: parser real, persistencia LAB local controlada en `conciliaciones/auditLog`, transiciones auditadas, adapter Firestore LAB y flujo de aplicación controlada.
+Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada como avance incremental, no como cierre final. Quedan pendientes Claude documentales y de copy hasta próximo paquete. Se agregó pipeline de empalme seguro para no pisar backend protegido. Backend continúa por fases sobre conciliación: parser real, persistencia LAB local controlada en `conciliaciones/auditLog`, transiciones auditadas, adapter Firestore LAB preparado por tooling local, smoke extremo a extremo y flujo de aplicación controlada.
 
 ---
 
@@ -193,8 +205,13 @@ Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada co
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-TRANSICIONES-CONCILIACIONES.md`
 - `orbit360-platform/docs/CONTRATO-EJECUTOR-PERSISTENCIA-CONCILIACIONES-LAB-AYS-20260704.md`
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-EJECUTOR-PERSISTENCIA-CONCILIACIONES-LAB.md`
+- `orbit360-platform/docs/CONTRATO-ADAPTER-FIRESTORE-LAB-CONCILIACIONES-AUDITLOG-AYS-20260704.md`
+- `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-ADAPTER-FIRESTORE-LAB-CONCILIACIONES.md`
 - `tools/orbit360-empalmar-candidato-claude-211525-ays.ps1`
 - `tools/orbit360-validar-transicion-conciliacion-ays.mjs`
 - `tools/orbit360-test-validar-transicion-conciliacion-ays.mjs`
 - `tools/orbit360-ejecutar-persistencia-conciliaciones-lab-ays.mjs`
 - `tools/orbit360-test-ejecutar-persistencia-conciliaciones-lab-ays.mjs`
+- `tools/orbit360-integrar-adapter-conciliaciones-firestore-lab-ays.ps1`
+- `tools/orbit360-validar-adapter-conciliaciones-firestore-lab-ays.mjs`
+- `tools/orbit360-test-validar-adapter-conciliaciones-firestore-lab-ays.mjs`
