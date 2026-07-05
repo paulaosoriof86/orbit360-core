@@ -9,6 +9,27 @@
 
 ---
 
+## 0. Actualización post auditoría de la candidata activa
+
+Después de auditar archivos reales de `Prototype Development Request - 2026-07-04T152321.882.zip`, se confirma que la candidata activa ya resolvió varios puntos que antes estaban como pendientes:
+
+- importador con fuentes separadas;
+- país/moneda sin default operativo peligroso en rutas principales;
+- trazabilidad por hoja/fila/bloque/periodo;
+- estado bancario hacia `conciliacionBanco`;
+- documentos hacia `parchesPendientes`;
+- planillas de comisión en `IMPORT_MAP`;
+- Academia ampliada v1.118-v1.123.
+
+Por tanto, el próximo trabajo de Claude debe **conservar** esos avances y enfocarse en los pendientes restantes documentados en:
+
+```txt
+orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md
+orbit360-platform/docs/PAQUETE-COMPLETO-CLAUDE-ACTUALIZADO-POST-AUDITORIA-20260704.md
+```
+
+---
+
 ## 1. Regla inicial
 
 Claude debe trabajar solo frontend/prototipo/documentación frontend. No debe tocar backend protegido ni entregar ZIP que reemplace backend LAB.
@@ -121,7 +142,7 @@ El cliente reporta pagos; el equipo valida. No decir que quedó aplicado si solo
 
 ## 6. Importador inteligente
 
-Debe diferenciar fuentes separadas:
+Debe conservar fuentes separadas:
 
 ```txt
 clientes
@@ -234,9 +255,3 @@ Cuando Paula entregue un nuevo candidato, ChatGPT/Codex debe:
 11. Documentar mejoras, regresiones, pendientes y riesgos.
 12. Actualizar pendientes Claude.
 13. Empalmar solo con pipeline seguro y sin pisar backend protegido.
-
----
-
-## 11. Cuándo pedir nuevo candidato
-
-No es indispensable pedirlo mientras se cierren contratos backend/documentación. Sí conviene pedirlo cuando Paula quiera auditar visualmente el estado actual de módulos y preparar el paquete final de trabajo para Claude con base en archivos reales.
