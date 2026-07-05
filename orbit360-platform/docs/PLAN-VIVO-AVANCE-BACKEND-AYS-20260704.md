@@ -44,6 +44,7 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | Adaptador candidatos metadata-only | Tooling agregado | Combina dryRun envelope con candidatos estructurados y readiness para validador/score/propuestas. |
 | Orquestador pipeline metadata-only | Tooling agregado | Encadena perfil, dryRun envelope, candidatos metadata-only y validación final dryRun. |
 | Orquestador score/propuestas plan-only | Tooling agregado | Encadena pipeline metadata-only, score gate, generación de propuestas `conciliaciones` y plan de persistencia sin writes. |
+| Readiness plan de persistencia LAB | Tooling agregado | Valida que el plan de persistencia sea tenant-safe, sin payload real, sin banderas de escritura/aplicación y listo solo para revisión LAB. |
 | Seguimiento de bloques | Agregado intermedio | Este plan vivo se mantiene actualizado después de cada bloque largo. |
 
 ## 4. Bloques pendientes principales
@@ -51,13 +52,14 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | Prioridad | Bloque | Estado esperado |
 |---|---|---|
 | P0 | Smoke visual/operativo real de Conciliaciones | Pendiente en navegador/local. |
-| P0 | Adapter Firestore LAB real para `conciliaciones/auditLog` | Pendiente de ejecución local/entorno LAB. |
+| P0 | Adapter Firestore LAB real para `conciliaciones/auditLog` | Pendiente de ejecución local/entorno LAB y autorización. |
 | P0 | Contrato/modelo `clientes` + relación asesor + portal + calidad datos | Pendiente. |
 | P0 | Contrato/modelo `polizas` + recibos/cartera | Pendiente. |
 | P0 | Contrato/modelo `cobros` + pagos reportados + conciliación | Pendiente. |
 | P0 | Contrato/modelo `documentos` + Storage futuro | Pendiente. |
 | P0 | Smokes de roles: cliente/asesor/cobros/admin | Pendiente. |
 | P1 | Validación local del orquestador score/propuestas plan-only | Pendiente de ejecución local. |
+| P1 | Validación local de readiness plan persistencia LAB | Pendiente de ejecución local. |
 | P1 | Manuales y Academia actualizados por cambio | Pendiente para Claude/prototipo. |
 
 ## 5. Intermedios agregados
@@ -128,6 +130,14 @@ Relación con plan principal: puente entre dryRun validado y futura persistencia
 
 Estado: tooling agregado; pendiente ejecución local.
 
+### Intermedio 10 — Readiness plan de persistencia LAB
+
+Motivo: antes de cualquier adapter LAB real faltaba validar que el plan de persistencia no contenga payload, filas reales, secretos, banderas de writes ni estados aplicados.
+
+Relación con plan principal: puente entre orquestador score/propuestas plan-only y adapter Firestore LAB futuro.
+
+Estado: tooling agregado; pendiente ejecución local.
+
 ## 6. Formato obligatorio de cierre de cada bloque
 
 Cada respuesta de continuidad debe cerrar con:
@@ -154,19 +164,20 @@ Regla fija solicitada por Paula: siempre indicar qué se adelantó, si se agreg�
 Continuar con:
 
 ```txt
-Validación local / smoke del orquestador score-propuestas-plan y revisión del plan de persistencia antes de adapter Firestore LAB real.
+Ejecución local agrupada de tests sintéticos y revisión de reportes antes de cualquier adapter Firestore LAB real.
 ```
 
 Ese bloque debe conectar:
 
-- ejecución local de tests sintéticos;
+- test del orquestador score/propuestas plan-only;
+- test del readiness plan persistencia LAB;
 - revisión de reportes `_orbit360_reports`;
-- validación de que el plan no incluya writes;
-- preparación de readiness para adapter Firestore LAB;
+- confirmación de cero writes;
+- smoke visual/operativo de Conciliaciones cuando haya navegador local;
 - cero datos reales;
 - cero aplicación de pagos;
 - cero generación de cartera o producción.
 
 ## 8. Estado
 
-Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only y orquestador score/propuestas plan-only. No avanzar a datos reales, aplicación controlada, Firestore writes ni deploy sin smoke local y autorización.
+Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only y readiness plan de persistencia LAB. No avanzar a datos reales, aplicación controlada, Firestore writes ni deploy sin smoke local y autorización.
