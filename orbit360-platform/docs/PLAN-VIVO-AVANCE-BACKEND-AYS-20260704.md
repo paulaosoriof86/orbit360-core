@@ -45,6 +45,7 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | Orquestador pipeline metadata-only | Tooling agregado | Encadena perfil, dryRun envelope, candidatos metadata-only y validación final dryRun. |
 | Orquestador score/propuestas plan-only | Tooling agregado | Encadena pipeline metadata-only, score gate, generación de propuestas `conciliaciones` y plan de persistencia sin writes. |
 | Readiness plan de persistencia LAB | Tooling agregado | Valida que el plan de persistencia sea tenant-safe, sin payload real, sin banderas de escritura/aplicación y listo solo para revisión LAB. |
+| Runner validaciones locales Conciliaciones | Tooling agregado | Agrupa smoke estático, test orquestador, test readiness, sintaxis y hash de archivos protegidos en un reporte único local. |
 | Seguimiento de bloques | Agregado intermedio | Este plan vivo se mantiene actualizado después de cada bloque largo. |
 
 ## 4. Bloques pendientes principales
@@ -58,8 +59,9 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | P0 | Contrato/modelo `cobros` + pagos reportados + conciliación | Pendiente. |
 | P0 | Contrato/modelo `documentos` + Storage futuro | Pendiente. |
 | P0 | Smokes de roles: cliente/asesor/cobros/admin | Pendiente. |
-| P1 | Validación local del orquestador score/propuestas plan-only | Pendiente de ejecución local. |
-| P1 | Validación local de readiness plan persistencia LAB | Pendiente de ejecución local. |
+| P1 | Ejecución local agrupada del runner Conciliaciones | Pendiente de ejecución local. |
+| P1 | Validación local del orquestador score/propuestas plan-only | Pendiente de ejecución local; agrupada en runner. |
+| P1 | Validación local de readiness plan persistencia LAB | Pendiente de ejecución local; agrupada en runner. |
 | P1 | Manuales y Academia actualizados por cambio | Pendiente para Claude/prototipo. |
 
 ## 5. Intermedios agregados
@@ -138,6 +140,14 @@ Relación con plan principal: puente entre orquestador score/propuestas plan-onl
 
 Estado: tooling agregado; pendiente ejecución local.
 
+### Intermedio 11 — Runner agrupado de validaciones locales Conciliaciones
+
+Motivo: reducir pasos manuales y evitar ejecutar validadores sueltos sin reporte único antes de adapter LAB.
+
+Relación con plan principal: puente entre tooling sintético/estático y smoke visual/operativo local.
+
+Estado: tooling agregado; pendiente ejecución local.
+
 ## 6. Formato obligatorio de cierre de cada bloque
 
 Cada respuesta de continuidad debe cerrar con:
@@ -164,20 +174,19 @@ Regla fija solicitada por Paula: siempre indicar qué se adelantó, si se agreg�
 Continuar con:
 
 ```txt
-Ejecución local agrupada de tests sintéticos y revisión de reportes antes de cualquier adapter Firestore LAB real.
+Preparar guía mínima de ejecución/revisión local del runner y criterios de bloqueo antes del smoke visual/operativo.
 ```
 
 Ese bloque debe conectar:
 
-- test del orquestador score/propuestas plan-only;
-- test del readiness plan persistencia LAB;
-- revisión de reportes `_orbit360_reports`;
-- confirmación de cero writes;
-- smoke visual/operativo de Conciliaciones cuando haya navegador local;
+- comando único local;
+- checklist de lectura de `_orbit360_reports`;
+- criterios de bloqueo/no bloqueo;
 - cero datos reales;
 - cero aplicación de pagos;
-- cero generación de cartera o producción.
+- cero generación de cartera o producción;
+- no pasar a adapter LAB real sin autorización.
 
 ## 8. Estado
 
-Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only y readiness plan de persistencia LAB. No avanzar a datos reales, aplicación controlada, Firestore writes ni deploy sin smoke local y autorización.
+Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB y runner agrupado de validaciones locales. No avanzar a datos reales, aplicación controlada, Firestore writes ni deploy sin smoke local y autorización.
