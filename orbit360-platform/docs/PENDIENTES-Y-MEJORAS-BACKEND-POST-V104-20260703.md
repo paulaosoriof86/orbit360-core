@@ -72,6 +72,19 @@
 - **Impacto:** puente seguro entre manifest validado, preview, score y bandeja de conciliación sin escritura automática.
 - **Estado:** CERRADO EN RAMA / pendiente integración al parser/importador real.
 
+### CERRADO-BE-104-08 — Contrato y validador de bandeja `conciliaciones`
+
+- **Área:** Backend / Firestore LAB / conciliaciones.
+- **Necesidad:** definir una estructura segura para guardar propuestas de conciliación sin modificar `cobros`, `comisiones`, `polizas`, `finmovs`, `cartera` ni `Portal` antes de validación.
+- **Aplicado:**
+  - `tools/orbit360-validar-conciliacion-propuesta-ays.mjs`.
+  - `tools/orbit360-test-validar-conciliacion-propuesta-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-BANDEJA-CONCILIACIONES-AYS-20260704.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-BANDEJA-CONCILIACIONES.md`.
+- **Regla:** una propuesta no puede venir como `APLICADA`, no puede traer `write_enabled=true`, no puede traer `apply_payment=true`, no puede traer payload/filas reales y no puede modificar cobros directamente.
+- **Impacto:** deja lista la bandeja conceptual para propuestas auditables antes de aplicación controlada.
+- **Estado:** CERRADO EN RAMA / pendiente implementación Firestore LAB y flujo de aplicación controlada.
+
 ## B. Pendientes abiertos
 
 ### ABIERTO-BE-104-01 — Empalme completo del candidato Claude final en GitHub
@@ -140,18 +153,25 @@
 - **Resultado:** auditoría de archivos reales realizada. No se aceptó resumen sin verificar.
 - **Estado:** CERRADO COMO DOCUMENTACIÓN / ABIERTO PARA EJECUCIÓN DE CLAUDE.
 
-### ABIERTO-BE-104-09 — Integrar manifest + dryRunReport + score al parser/importador real
+### ABIERTO-BE-104-09 — Integrar manifest + dryRunReport + score + conciliaciones al parser/importador real
 
 - **Área:** Backend importador / conciliaciones.
 - **Necesidad:** conectar los validadores seguros con el flujo real de parser/importador para que cada fuente derive en reporte trazable y bandeja de conciliación.
-- **Esperado:** `manifest validado -> dryRunReport validado -> bandeja de conciliación trazable`, sin escritura automática.
+- **Esperado:** `manifest validado -> dryRunReport validado -> score -> propuesta conciliaciones`, sin escritura automática.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-10 — Bandeja de conciliación backend/Firestore LAB
+### ABIERTO-BE-104-10 — Implementar colección `conciliaciones` en Firestore LAB
 
 - **Área:** Backend / Firestore LAB / conciliaciones.
-- **Necesidad:** definir colección o estructura `conciliaciones` con score, decisión, acción propuesta, fuente, hoja/fila/bloque/periodo, país, moneda, cobroId/polizaId/comisionId y estado de revisión.
-- **Esperado:** no modificar `cobros` hasta confirmación aprobada; guardar propuestas separadas y auditables.
+- **Necesidad:** crear persistencia LAB para propuestas en `conciliaciones` con tenant isolation, sin aplicar pagos.
+- **Esperado:** guardar propuestas como registros separados y auditables; no modificar `cobros` hasta confirmación aprobada.
+- **Estado:** ABIERTO.
+
+### ABIERTO-BE-104-11 — Flujo de aplicación controlada
+
+- **Área:** Backend / cobros / comisiones / auditLog / notificaciones.
+- **Necesidad:** diseñar el paso posterior donde una propuesta `VALIDADA` puede aplicar cobro/comisión con auditoría.
+- **Esperado:** `propuesta VALIDADA -> aplicar cobro/comisión -> auditLog -> notificación -> actualización Portal/Cliente360/Cobros`, sin saltarse revisión.
 - **Estado:** ABIERTO.
 
 ## C. Pendientes para reportar a Claude cuando Paula pida paquete
@@ -170,10 +190,11 @@
 12. Academia debe conservar avances v1.125 e incorporar evaluación aplicada sobre pólizas, cobros, planillas, Portal y score de conciliación.
 13. Mostrar en Importar/Comisiones/Cobros los estados de score: exacto, probable, requiere validación y bloqueado.
 14. Mostrar salida de dry-run antes de cualquier escritura o aplicación.
+15. Mostrar bandeja `conciliaciones` como propuestas separadas, no como pagos aplicados.
 
 ## D. Estado general
 
-Backend LAB reforzado. Candidata activa Claude `193658.630` auditada. Score de conciliación y validador `dryRunReport` agregados como herramientas seguras. Aún falta empalme completo GitHub, smoke real y continuidad Firestore/Auth/importadores por fases.
+Backend LAB reforzado. Candidata activa Claude `193658.630` auditada. Score de conciliación, validador `dryRunReport` y contrato de bandeja `conciliaciones` agregados como herramientas seguras. Aún falta empalme completo GitHub, smoke real, implementación Firestore LAB de conciliaciones y continuidad Auth/importadores por fases.
 
 ## E. Documentos agregados después del bloque pólizas/cartera y auditoría actual
 
@@ -187,3 +208,5 @@ Backend LAB reforzado. Candidata activa Claude `193658.630` auditada. Score de c
 - `orbit360-platform/docs/PAQUETE-CLAUDE-ACTUALIZADO-CANDIDATO-193658-20260704.md`
 - `orbit360-platform/docs/CONTRATO-DRYRUN-REPORT-IMPORTADOR-AYS-20260704.md`
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-DRYRUN-REPORT.md`
+- `orbit360-platform/docs/CONTRATO-BANDEJA-CONCILIACIONES-AYS-20260704.md`
+- `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-BANDEJA-CONCILIACIONES.md`
