@@ -118,13 +118,22 @@
 - **Regla:** define comando único PowerShell, criterios de avance/bloqueo, revisión de reportes y qué compartir de vuelta; no autoriza adapter LAB ni pagos.
 - **Estado:** CERRADO COMO TOOLING/DOCUMENTACIÓN EN RAMA / pendiente ejecución local.
 
+### CERRADO-BE-104-27 — Checklist smoke visual/operativo Conciliaciones
+- **Área:** QA visual / navegador / roles / acciones seguras.
+- **Aplicado:**
+  - `tools/orbit360-preparar-smoke-visual-conciliaciones-ays.ps1`.
+  - `orbit360-platform/docs/CHECKLIST-SMOKE-VISUAL-CONCILIACIONES-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-CHECKLIST-SMOKE-VISUAL-CONCILIACIONES.md`.
+- **Regla:** define precondiciones, roles Dirección/Admin/Finanzas, estado vacío honesto, copy seguro, acciones sin mutar cobros/pólizas/comisiones/finmovs/cartera/producción y evidencia requerida.
+- **Estado:** CERRADO COMO TOOLING/DOCUMENTACIÓN EN RAMA / pendiente ejecución local y visual.
+
 ---
 
 ## B. Pendientes abiertos
 
-### ABIERTO-BE-104-02 — Smoke visual/operativo real sobre rama empalmada
+### ABIERTO-BE-104-02 — Ejecutar runner + smoke visual/operativo real sobre rama empalmada
 - **Área:** QA / Navegador.
-- **Necesidad:** abrir la plataforma y validar que Conciliaciones aparezca para Dirección/Admin/Finanzas, que renderice vacío honestamente y que acciones no toquen cobros.
+- **Necesidad:** ejecutar runner local, abrir la plataforma y validar que Conciliaciones aparezca para Dirección/Admin/Finanzas, que renderice vacío honestamente y que acciones no toquen cobros.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-03 — Decisión sobre `index.html` permanente
@@ -157,7 +166,7 @@
 
 ### ABIERTO-BE-104-10 — Ejecutar integración local del adapter Firestore LAB
 - **Área:** Backend / Firestore LAB / conciliaciones.
-- **Estado:** ABIERTO / requiere entorno local.
+- **Estado:** ABIERTO / requiere entorno local y autorización explícita.
 
 ### ABIERTO-BE-104-11 — Ejecutar smoke E2E conciliaciones LAB en entorno local
 - **Área:** QA backend / conciliaciones.
@@ -166,10 +175,6 @@
 ### ABIERTO-BE-104-12 — Ejecutar readiness UI/Bandeja en entorno local
 - **Área:** Backend/frontend bridge.
 - **Estado:** ABIERTO / requiere entorno local o mirror generado.
-
-### ABIERTO-BE-104-13 — Smoke UI/Bandeja `conciliaciones`
-- **Área:** Frontend/Backend bridge.
-- **Estado:** EMPALMADO / smoke estático preparado / pendiente smoke visual.
 
 ### ABIERTO-BE-104-14 — Futuro ejecutor autorizado de aplicación controlada
 - **Área:** Backend / cobros / comisiones / auditLog / notificaciones.
@@ -191,11 +196,6 @@
 - **Necesidad:** ejecutar `tools/orbit360-run-validaciones-locales-conciliaciones-ays.ps1` o `node tools/orbit360-run-validaciones-locales-conciliaciones-ays.mjs` en entorno local, revisar `_orbit360_reports` y confirmar que no hubo cambios en archivos protegidos.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-19 — Checklist smoke visual/operativo Conciliaciones
-- **Área:** QA visual / navegador / roles.
-- **Necesidad:** preparar checklist de smoke visual para Dirección/Admin/Finanzas, estado vacío honesto, acciones seguras y no mutación de cobros antes de adapter LAB.
-- **Estado:** ABIERTO.
-
 ---
 
 ## C. Pendientes para reportar a Claude cuando Paula pida paquete
@@ -209,9 +209,10 @@
 7. Debe conservar el lenguaje de readiness: plan listo no equivale a persistencia ni a pago aplicado.
 8. Debe conservar el runner local como paso de QA previo a cualquier cambio que afecte Conciliaciones.
 9. Debe conservar los criterios de bloqueo/no bloqueo y no reinterpretar OK de runner como autorización de backend real.
+10. Debe conservar el checklist visual por roles y estado vacío honesto.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales y guía/wrapper PowerShell como intermedios entre manifest y futura persistencia LAB. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y ejecución local del runner agrupado.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell y checklist/helper de smoke visual como intermedios entre manifest y futura persistencia LAB. Quedan abiertos ejecución local del runner/smoke visual, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y modelos backend de clientes/pólizas/cobros/documentos.
