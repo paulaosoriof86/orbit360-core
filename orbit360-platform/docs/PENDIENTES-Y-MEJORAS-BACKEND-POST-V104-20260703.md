@@ -51,16 +51,17 @@
 ### ABIERTO-BE-104-01 — Empalme completo del candidato Claude final en GitHub
 
 - **Área:** Empalme frontend/backend.
-- **Necesidad:** el candidato fue auditado y preparado localmente, pero aún no está aplicado completo en GitHub.
+- **Necesidad:** el candidato activo fue auditado localmente, pero aún no está aplicado completo en GitHub.
+- **Candidato auditado:** `Prototype Development Request - 2026-07-04T152321.882.zip`.
 - **Esperado:** empalme aditivo, no reemplazo total.
 - **Archivos protegidos:** backend LAB, `data/store.js`, rules, tools, docs backend.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-02 — Smoke visual/operativo real
+### ABIERTO-BE-104-02 — Smoke visual/operativo real sobre rama empalmada
 
 - **Área:** QA / Navegador.
-- **Necesidad:** validar render real con el backend LAB y guard activo.
-- **Bloqueo:** el entorno actual no permite Chromium/smoke visual.
+- **Necesidad:** validar render real con backend LAB y guard activo después del empalme.
+- **Bloqueo:** el entorno actual no permite Chromium/smoke visual completo de la rama empalmada.
 - **Esperado:** ejecutar en equipo local o ambiente con navegador.
 - **Estado:** ABIERTO.
 
@@ -82,7 +83,7 @@
 
 - **Área:** Auth / Equipo / Roles.
 - **Necesidad:** pasar de usuario LAB a creación y control real de usuarios por asesor/correo/rol.
-- **Esperado:** Equipo crea usuario Auth y envía credenciales por Make; roles y módulos visibles se respetan.
+- **Esperado:** Equipo crea usuario Auth y envía acceso por canal autorizado; roles y módulos visibles se respetan.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-06 — Contrato pólizas/recibos/cartera/conciliación
@@ -90,13 +91,8 @@
 - **Área:** Backend importador / pólizas / cobros / comisiones / finanzas.
 - **Necesidad:** alinear generación de recibos, cartera activa, estados de póliza, país/moneda, planillas de comisiones y conciliación con aseguradoras.
 - **Documento agregado:** `orbit360-platform/docs/CONTRATO-POLIZAS-RECIBOS-CARTERA-CONCILIACION-AYS-20260704.md`.
-- **Hallazgos:**
-  - `core/importa.js` aún tiene default peligroso de país hacia GT en rutas de prototipo.
-  - `afterInsert` de pólizas usa `rec.pais || 'GT'` para generar recibos.
-  - varios KPIs muestran GTQ fijo aunque el documento maestro exige moneda por país o separación por país.
-  - conciliación actual por estado de cuenta es útil como prototipo, pero insuficiente para producción por depender demasiado de póliza+monto.
-  - `KINDS` ya menciona planillas de comisión, pero falta contrato real completo de normalización/escritura segura.
-- **Esperado:** implementar backend/parser con `REQUIERE_VALIDACION` si falta país/moneda, score de confianza por fuente y dry-run antes de escritura.
+- **Estado del ZIP auditado:** la candidata activa ya corrige parte de este bloque en `core/importa.js`.
+- **Pendiente real:** empalmar sin pisar backend protegido y completar backend/parser real con manifest, score, dry-run y validación.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-07 — Junio/julio 2026 como caso especial de conciliación
@@ -106,24 +102,38 @@
 - **Esperado:** documentar regla como configuración de migración, no hardcode productivo; planillas pueden confirmar pagos aplicados si la fila real lo respalda y hay coincidencia confiable.
 - **Estado:** ABIERTO.
 
+### ABIERTO-BE-104-08 — Auditoría y paquete Claude de candidata activa
+
+- **Área:** Coordinación Claude / Backend.
+- **Necesidad:** Paula no puede pedir nuevo candidato sin primero auditar el actual y entregar paquete Claude actualizado.
+- **Documentos agregados:**
+  - `orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md`.
+  - `orbit360-platform/docs/PAQUETE-COMPLETO-CLAUDE-ACTUALIZADO-POST-AUDITORIA-20260704.md`.
+- **Resultado:** auditoría de archivos reales realizada. No se aceptó resumen sin verificar.
+- **Estado:** CERRADO COMO DOCUMENTACIÓN / ABIERTO PARA EJECUCIÓN DE CLAUDE.
+
 ## C. Pendientes para reportar a Claude cuando Paula pida paquete
 
-1. Mantener copy de Integraciones/Automatizaciones sin pedir ni mostrar API keys o webhooks como valores reales.
-2. Usar “conexión segura”, “proveedor seguro”, “referencia segura” y no “pega tu secreto aquí” en UI final.
-3. No reintroducir persistencia de credenciales en `Orbit.store`, localStorage ni Firestore directo.
+1. Mantener copy de Integraciones/Automatizaciones sin mostrar secretos ni referencias internas como conexión real.
+2. Usar lenguaje de conexión segura/pendiente, no presentar integraciones como activas si no están conectadas.
+3. No reintroducir persistencia sensible en `Orbit.store`, localStorage ni Firestore directo.
 4. Conservar el aprendizaje del guard v1.104 dentro del prototipo base.
 5. No reemplazar backend LAB ni scripts de validación al entregar nuevos ZIPs.
-6. Alinear Importar con fuentes separadas y con el contrato pólizas/recibos/cartera/conciliación.
-7. No usar GT/GTQ como default de escritura si falta país/moneda.
-8. En UI de Pólizas, Cobros, Cliente360, Portal, Comisiones y Finanzas, separar prima neta/gastos/IVA/total y mostrar trazabilidad.
-9. Planilla de comisiones debe poder actuar como fuente de conciliación de pagos aplicados solo cuando la fila real lo confirme.
-10. Portal Cliente debe mostrar pago reportado/en revisión/aplicado/conciliado sin confundir estados.
+6. Conservar mejoras del candidato activo: importador con fuentes separadas, país/moneda sin default, planillas de comisión, documentos como parches y estado bancario como conciliación.
+7. Corregir versionado documental v1.114/v1.117/v1.123.
+8. Corregir `GTQ` fijo en KPIs/totales agregados.
+9. En UI de Pólizas, Cobros, Cliente360, Portal, Comisiones y Finanzas, separar prima neta/gastos/IVA/total y mostrar trazabilidad.
+10. Planilla de comisiones debe poder actuar como fuente de conciliación de pagos aplicados solo cuando la fila real lo confirme.
+11. Portal Cliente debe mostrar pago reportado/en revisión/aplicado/conciliado sin confundir estados.
+12. Academia debe conservar avances v1.118-v1.123 e incorporar evaluación aplicada sobre pólizas, cobros, planillas y Portal.
 
 ## D. Estado general
 
-Backend LAB reforzado. Aún falta empalme completo GitHub del candidato Claude final, smoke real y continuidad Firestore/Auth por fases.
+Backend LAB reforzado. Candidata activa Claude auditada. Aún falta empalme completo GitHub, smoke real y continuidad Firestore/Auth por fases.
 
-## E. Documentos agregados después del bloque pólizas/cartera
+## E. Documentos agregados después del bloque pólizas/cartera y auditoría actual
 
 - `orbit360-platform/docs/CONTRATO-POLIZAS-RECIBOS-CARTERA-CONCILIACION-AYS-20260704.md`
 - `orbit360-platform/docs/PAQUETE-CLAUDE-BLOQUE-POLIZAS-RECIBOS-CARTERA-20260704.md`
+- `orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md`
+- `orbit360-platform/docs/PAQUETE-COMPLETO-CLAUDE-ACTUALIZADO-POST-AUDITORIA-20260704.md`
