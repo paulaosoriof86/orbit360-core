@@ -145,13 +145,17 @@ Orbit.importa = (function () {
         asesorNombre: ['asesor', 'ejecutivo', 'agente', 'vendedor', 'productor'],
         email: ['email', 'correo', 'e mail', 'mail', 'correo electronico'],
         telefono: ['telefono', 'tel', 'celular', 'movil', 'whatsapp', 'contacto', 'numero telefono'],
-        pais: ['pais'], ciudad: ['ciudad', 'municipio'], departamento: ['departamento', 'depto', 'provincia', 'estado'],
+        pais: ['pais'], moneda: ['moneda', 'divisa', 'currency'], ciudad: ['ciudad', 'municipio'], departamento: ['departamento', 'depto', 'provincia', 'estado'],
         direccion: ['direccion', 'domicilio'], segmento: ['segmento'], canal: ['canal', 'origen', 'fuente']
       },
       build(rec) {
         const ne = norm(rec.tipo), nn = norm(rec.nombre);
         rec.tipo = (ne.indexOf('emp') === 0 || ne.indexOf('jurid') >= 0 || /\b(sa|sas|ltda)\b/.test(nn)) ? 'Empresa' : 'Persona';
-        rec.pais = normPais(rec.pais); rec.moneda = rec.pais === 'CO' ? 'COP' : 'GTQ';
+        // P0-02: país de la fila; NUNCA default GTQ. Moneda solo explícita; si no, requiere validación.
+        rec.pais = normPais(rec.pais);
+        rec.monedaSugerida = monedaDe(rec.pais);
+        rec.moneda = (norm(rec.moneda) === 'cop' ? 'COP' : norm(rec.moneda) === 'gtq' ? 'GTQ' : norm(rec.moneda) === 'usd' ? 'USD' : '');
+        if (!rec.pais || !rec.moneda) { rec.requiereValidacion = true; rec.estado = 'requiere_validacion'; rec._motivoValidacion = (!rec.pais ? 'país' : '') + (!rec.pais && !rec.moneda ? ' y ' : '') + (!rec.moneda ? 'moneda' : '') + ' no confiables' + (rec.monedaSugerida && !rec.moneda ? ' (sugerida: ' + rec.monedaSugerida + ')' : ''); }
         if (rec.asesorNombre) { const a = Orbit.store.all('asesores').find(x => norm(x.nombre).indexOf(norm(rec.asesorNombre)) >= 0 || norm(rec.asesorNombre).indexOf(norm(x.nombre)) >= 0); if (a) rec.asesorId = a.id; }
         delete rec.asesorNombre;
         rec.fechaAlta = rec.fechaAlta || new Date().toISOString().slice(0, 10);
@@ -383,12 +387,26 @@ Orbit.importa = (function () {
       }
     },
     'estados-banco': {
-      coll: 'finmovs', label: 'Movimientos bancarios', dedup: [],
+      coll: 'conciliacionBanco', label: 'Conciliación bancaria', dedup: [], conciliacionBanco: true,
       fields: {
         fecha: ['fecha', 'date', 'dia'], concepto: ['descripcion', 'concepto', 'detalle', 'referencia', 'glosa'],
-        monto: ['monto', 'valor', 'importe', 'debito', 'credito', 'amount']
+        monto: ['monto', 'valor', 'importe', 'debito', 'credito', 'amount'],
+        pais: ['pais', 'país', 'country'], moneda: ['moneda', 'divisa', 'currency']
       },
-      build(rec) { const s = finmovShape(rec, 'Bancario'); s.origen = 'conciliacion-banco'; Object.keys(rec).forEach(k => delete rec[k]); Object.assign(rec, s); return rec; }
+      /* P0-134907-02: el estado de cuenta bancario va a una BANDEJA DE CONCILIACIÓN.
+         NO escribe finmovs, cobros, clientes ni pólizas hasta validarse. */
+      build(rec) {
+        rec.monto = parseNum(rec.monto);
+        rec.pais = normPais(rec.pais);
+        rec.monedaSugerida = monedaDe(rec.pais);
+        rec.moneda = (norm(rec.moneda) === 'cop' ? 'COP' : norm(rec.moneda) === 'gtq' ? 'GTQ' : norm(rec.moneda) === 'usd' ? 'USD' : '');
+        rec.tipo = rec.monto < 0 ? 'cargo' : 'abono';
+        rec.monto = Math.abs(rec.monto);
+        rec.estado = 'pendiente_conciliacion';
+        rec.requiereValidacion = true;
+        rec.origen = 'estado-cuenta-banco';
+        return rec;
+      }
     },
     'financiero-historico': {
       coll: 'finmovs', label: 'Movimientos financieros históricos', dedup: [],
@@ -548,7 +566,7 @@ Orbit.importa = (function () {
   }
 
   // P0-01: copia la trazabilidad de hoja/fila (propiedades puestas en el array de celdas) al rec.
-  var ROW_META = ['_origenHoja', '_paisHoja', '_monedaHoja', '_periodoHoja', '_bloqueOrigen', '_numeroFila'];
+  var ROW_META = ['_origenHoja', '_paisHoja', '_monedaHoja', '_monedaSugeridaHoja', '_periodoHoja', '_bloqueOrigen', '_numeroFila'];
   function copyRowMeta(cells, rec) { if (!cells) return rec; ROW_META.forEach(function (k) { if (cells[k] != null) rec[k] = cells[k]; }); return rec; }
 
   /* Simulación pre-escritura (dry-run): calcula crear/actualizar/omitir + errores por fila
@@ -598,10 +616,17 @@ Orbit.importa = (function () {
   }
   function applyConciliacion(kind) {
     const { noCreados, noAplicados } = conciliarRows(kind);
-    let creados = 0, aplicados = 0;
+    let creados = 0, propuestas = 0;
+    // Registros que faltan: se crean como referencia importada (no aplican pagos).
     noCreados.forEach((r, i) => { const rec = Object.assign({}, r); delete rec._motivo; delete rec._aplicaA; rec.id = (IMPORT_MAP[kind].coll).slice(0, 3) + '_cc_' + Date.now().toString(36) + i; rec.importado = true; Orbit.store.insert(IMPORT_MAP[kind].coll, rec); creados++; });
-    noAplicados.forEach(r => { if (r._aplicaA) { const patchC = { estado: 'Pagado', fechaPago: r.vence || new Date().toISOString().slice(0, 10), conciliado: true, metodo: 'Conciliación' }; Orbit.store.update('cobros', r._aplicaA, patchC); const cob = Orbit.store.get('cobros', r._aplicaA); if (cob && Orbit.q && Orbit.q.postRecaudo) Orbit.q.postRecaudo(cob, patchC.fechaPago, 'Conciliación'); aplicados++; } });
-    return { creados, aplicados };
+    // P0-2: la conciliación NO aplica pagos directo. Marca PROPUESTA pendiente de validación sobre el recibo.
+    noAplicados.forEach(r => {
+      if (r._aplicaA) {
+        const cob = Orbit.store.get('cobros', r._aplicaA);
+        if (cob) { Orbit.store.update('cobros', r._aplicaA, { conciliacionPropuesta: { fuente: kind, monto: r.monto, fecha: r.vence || (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), estado: 'REQUIERE_VALIDACION' } }); propuestas++; }
+      }
+    });
+    return { creados, propuestas };
   }
 
   // Catálogo de secciones de importación (todas las requeridas)
@@ -615,10 +640,10 @@ Orbit.importa = (function () {
     'planillas-comision': { icon: '💼', title: 'Importar planillas de comisiones', desc: 'Lee la planilla de comisiones que envía la aseguradora en CUALQUIER formato y la cruza contra las comisiones devengadas: detecta pagos no aplicados a póliza y valida que la liquidación de cada asesor sea la correcta.', cols: ['Aseguradora', 'Periodo', 'Comisión', 'Cruce'], sample: [['Seguros Atlas', '2026-05', 'Q 12,400', '✓ concilia'], ['Pacífico Seguros', '2026-05', '$ 3,1M', '◷ revisar'], ['Vértice', '2026-05', 'Q 6,900', '✓ concilia']], detect: { noCreados: [['Atlas · GT-AT-77310', 'Póliza no creada en Orbit', 'Comisión huérfana', 'Q 410']], noAplicados: [['Pacífico · CO-PA-91733', 'Comisión cobrada, pago no aplicado', 'Recaudo sin conciliar', '$ 92K'], ['Atlas · GT-AT-48210', 'Liquidación asesor difiere 2%', 'Ajuste de % asesor', 'Q 58']] } },
     'movimientos-finanzas': { icon: '💰', title: 'Importar movimientos / estados de cuenta (Finanzas)', desc: 'Histórico de movimientos reales de caja/banco de la empresa para generar mensuales y conciliar. Los pagos de clientes NO van aquí: se importan como recibos/cobros y se concilian aparte.', cols: ['Fecha', 'Concepto', 'Monto', 'Tipo'], sample: [['2026-05-31', 'Liquidación Atlas', 'Q 12,400', 'Ingreso'], ['2026-05-28', 'Comisión asesor DM', 'Q -3,100', 'Egreso'], ['2026-05-15', 'Pago de renta oficina', 'Q -2,800', 'Egreso']] },
     'financiero-historico': { icon: '📚', title: 'Importar histórico financiero (GT/CO)', desc: 'Carga los movimientos financieros históricos por país y mes. Excluye títulos, subtotales, totales y dashboards; separa GTQ/COP sin mezclar; trata “saldo anterior” como referencia. No crea clientes, pólizas ni cartera.', cols: ['Fecha', 'Concepto', 'Monto', 'Tipo'], sample: [['2025-11', 'Saldo anterior', '—', 'Referencia'], ['2026-01-15', 'Comisión aseguradora', 'Q 8,200', 'Ingreso'], ['2026-01-20', 'Nómina', 'Q -4,100', 'Egreso']] },
-    'estados-banco': { icon: '🏦', title: 'Importar estado de cuenta bancario', desc: 'Lee el estado bancario en cualquier formato (PDF, Excel, CSV) para conciliar finanzas: cruza depósitos con recaudo y egresos con liquidaciones.', cols: ['Fecha', 'Descripción', 'Monto', 'Conciliación'], sample: [['2026-05-31', 'Depósito Atlas', 'Q 12,400', '✓ liquidación'], ['2026-05-15', 'Transf. cliente', 'Q 700', '✓ REC-00451'], ['2026-05-12', 'Comisión NETxxx', 'Q 4,210', '◷ sin asociar']], detect: { noCreados: [['MOV-5521', 'Depósito sin movimiento en Orbit', 'Crear movimiento', 'Q 1,900']], noAplicados: [['Transf. 0455', 'Depósito de cliente no aplicado', 'Aplicar a recibo', 'Q 700']] } },
+    'estados-banco': { icon: '🏦', title: 'Importar estado de cuenta bancario', desc: 'Se carga para conciliación bancaria. No crea cobros ni movimientos financieros hasta que se valide: cada línea queda en la bandeja de conciliación para cruzarla con recaudos y egresos.', cols: ['Fecha', 'Descripción', 'Monto', 'Conciliación'], sample: [['2026-05-31', 'Depósito Atlas', 'Q 12,400', '◷ por conciliar'], ['2026-05-15', 'Transf. cliente', 'Q 700', '◷ por conciliar'], ['2026-05-12', 'Comisión NETxxx', 'Q 4,210', '◷ por conciliar']] },
     'calendario-marketing': { icon: '📣', title: 'Importar calendarización de contenidos', desc: 'Carga el calendario; se muestra como mes con cada día y sus piezas.', cols: ['Fecha', 'Contenido', 'Pieza', 'Canal'], sample: [['2026-06-03', 'Tip de renovación', 'Reel', 'Instagram'], ['2026-06-10', 'Beneficio Vida', 'Carrusel', 'Facebook'], ['2026-06-18', 'Caso de éxito', 'Post', 'LinkedIn']] },
     'facturas': { icon: '🧾', title: 'Importar facturas', desc: 'Adjunta facturas al expediente; se extraen número, fecha, monto y se vinculan a la póliza.', cols: ['Factura', 'Fecha', 'Monto', 'Póliza'], sample: [['FAC-2041', '2026-05-12', 'Q 8,400', 'GT-AT-48210'], ['FAC-2042', '2026-05-30', 'Q 700', 'GT-AT-48210']] },
-    'documentos': { icon: '📎', title: 'Importar documentos', desc: 'Carga uno o varios documentos (DPI, RTU, patente, recibo de servicios, pólizas en PDF). El motor extrae datos y completa la ficha.', cols: ['Documento', 'Tipo detectado', 'Dato extraído'], sample: [['dpi_frente.jpg', 'DPI', 'Dirección, fecha nac.'], ['rtu_2026.pdf', 'RTU', 'Razón social, NIT'], ['poliza_auto.pdf', 'Póliza', 'Vehículo, vigencia']] },
+    'documentos': { icon: '📎', title: 'Importar documentos', desc: 'Carga documentos del expediente. El sistema extrae posibles datos y propone cambios para revisión/aprobación; no modifica clientes ni pólizas directamente.', cols: ['Documento', 'Tipo detectado', 'Dato extraído'], sample: [['dpi_frente.jpg', 'DPI', 'Dirección, fecha nac.'], ['rtu_2026.pdf', 'RTU', 'Razón social, NIT'], ['poliza_auto.pdf', 'Póliza', 'Vehículo, vigencia']] },
     'bitacora-reclamos': { icon: '🚨', title: 'Importar bitácora de siniestros', desc: 'Carga la bitácora de reclamos que envía la aseguradora (uno o varios clientes). Cada reclamo se vincula a su póliza y queda en la ficha del cliente correspondiente.', cols: ['Siniestro', 'Póliza', 'Tipo', 'Estado'], sample: [['SIN-48210', 'GT-AT-48210', 'Colisión', 'En análisis'], ['SIN-77310', 'GT-AT-77310', 'Robo parcial', 'Aprobado'], ['SIN-91733', 'CO-PA-91733', 'Daños a terceros', 'Documentación']] },
     'docs-aseguradora': { icon: '🏢', title: 'Importar documentos de aseguradora', desc: 'Carga tarifas, formularios, cotizaciones y pólizas de ejemplo. En modo inteligente, alimenta el Cotizador, el Comparativo y la IA; en modo documental, solo se almacenan para consulta.', cols: ['Documento', 'Categoría detectada', 'Uso'], sample: [['tarifario_2026.pdf', 'Tarifas', 'Cotizador / Comparativo'], ['formulario_auto.pdf', 'Formularios', 'Requisitos de emisión'], ['cotizacion_ejemplo.pdf', 'Cotización ejemplo', 'Entrenar IA']] }
   };
@@ -634,13 +659,13 @@ Orbit.importa = (function () {
     'vehiculos': { crea: ['vehiculos'], label: ['Vehículos'], no: ['Clientes', 'Pólizas'] },
     'estados-cuenta': { crea: ['cobros'], label: ['Recibos / cobros + conciliación'], no: ['Pólizas', 'Clientes'] },
     'planillas-comision': { crea: ['comisiones'], label: ['Comisiones + conciliación'], no: ['Clientes', 'Pólizas', 'Cobros'] },
-    'estados-banco': { crea: ['finmovs'], label: ['Movimientos financieros (conciliación)'], no: ['Clientes', 'Pólizas', 'Cobros', 'Cartera'] },
+    'estados-banco': { crea: ['conciliacionBanco'], label: ['Conciliación bancaria (bandeja de validación)'], no: ['Movimientos financieros', 'Cobros', 'Clientes', 'Pólizas', 'Cartera'] },
     'movimientos-finanzas': { crea: ['finmovs'], label: ['Movimientos financieros (histórico)'], no: ['Clientes', 'Pólizas', 'Cobros', 'Cartera'] },
     'financiero-historico': { crea: ['finmovs'], label: ['Movimientos financieros históricos GT/CO (referencia/conciliación)'], no: ['Clientes', 'Pólizas', 'Cobros', 'Cartera', 'Producción real'] },
     'bitacora-reclamos': { crea: ['reclamos'], label: ['Siniestros / reclamos'], no: ['Clientes', 'Pólizas'] },
     'directorio-aseguradoras': { crea: ['aseguradoras'], label: ['Aseguradoras'], no: ['Clientes', 'Pólizas'] },
     'facturas': { crea: ['facturas'], label: ['Facturas'], no: ['Clientes', 'Pólizas', 'Cobros'] },
-    'documentos': { crea: ['clientes'], label: ['Documentos en el expediente abierto'], no: ['Clientes nuevos', 'Pólizas'] },
+    'documentos': { crea: ['parchesPendientes'], label: ['Propuestas de actualización del expediente (pendientes de aprobación)'], no: ['Clientes directos', 'Pólizas directas', 'Cobros'] },
     'calendario-marketing': { crea: ['contenidos'], label: ['Contenidos de marketing'], no: ['Datos operativos'] },
     'docs-aseguradora': { crea: [], label: ['Documentos de aseguradora (solo almacenamiento)'], no: ['Clientes', 'Pólizas', 'Cobros', 'Tarifas sin validar'] }
   };
@@ -847,6 +872,41 @@ Orbit.importa = (function () {
         <td class="num muted">${act != null ? act + '%' : '—'}</td>
         <td class="num"><input type="number" min="0" max="100" step="0.5" value="${r.pct}" data-rate="${i}" style="width:64px;text-align:right;padding:4px 6px;border:1px solid var(--line);border-radius:6px;${cambia ? 'border-color:var(--warn);font-weight:700' : ''}">%${cambia ? ' <span class="badge warn" style="font-size:8.5px">Δ</span>' : ''}</td></tr>`; }).join('')}</tbody></table>
       <label class="ce-l" style="display:flex;flex-direction:row;align-items:center;gap:8px;padding:11px 13px;margin:0;border-top:1px solid var(--line);cursor:pointer"><input type="checkbox" id="imp-aplicar-tarifas" ${state.aplicarTarifas ? 'checked' : ''} style="width:auto"> <b>Aplicar estos % al tarifario</b> <span class="muted" style="font-weight:400;font-size:11.5px">— si lo dejás sin marcar, la planilla se importa como referencia y las tarifas no cambian.</span></label>
+    </div>${planillaFlujo()}`;
+  }
+  /* P0-07-FIX: flujo visual de la planilla (fila real → esperada/pagada/dif/retención/ajuste → score → acción → estado → impacto). Es PROPUESTA: no aplica a cobros/comisiones automáticamente. */
+  function planillaFlujo() {
+    let rows = [];
+    try {
+      const parsed = state.parsed || { headers: [], rows: [] };
+      const idx = mapHeaders('planillas-comision', parsed.headers);
+      rows = (parsed.rows || []).slice(0, 40).map(cells => {
+        const rec = {}; Object.keys(idx).forEach(f => { const v = cells[idx[f]]; if (v != null && v !== '') rec[f] = v; });
+        if (IMPORT_MAP['planillas-comision'].build) IMPORT_MAP['planillas-comision'].build(rec);
+        return rec;
+      });
+    } catch (e) {}
+    if (!rows.length) return '';
+    const score = (r) => {
+      if (r.requiereValidacion || !r.moneda) return { t: 'REQUIERE_VALIDACION', tone: 'warn' };
+      const base = Math.abs(r.comEsperada || 0) || 1, rel = Math.abs((r.difComision || 0)) / base;
+      if (Math.abs(r.difComision || 0) < 0.5) return { t: 'MATCH_EXACTO', tone: 'ok' };
+      if (rel <= 0.05) return { t: 'MATCH_PROBABLE', tone: 'info' };
+      if (rel > 0.25) return { t: 'BLOQUEADO', tone: 'danger' };
+      return { t: 'REQUIERE_VALIDACION', tone: 'warn' };
+    };
+    const M = (n, cur) => (n == null || !cur) ? '<span class="muted">moneda requerida</span>' : U.money(n, cur);
+    return `<div class="card" style="overflow:hidden;margin-top:14px;border:1px solid var(--line)">
+      <div style="padding:10px 13px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:13px">🧾 Flujo de conciliación de la planilla <span class="muted" style="font-weight:400;font-size:11.5px">— propuesta; no impacta cobros/comisiones hasta validar</span></div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Fila</th><th>Aseguradora</th><th>Periodo</th><th class="num">Esperada</th><th class="num">Pagada</th><th class="num">Dif.</th><th class="num">Ret.</th><th class="num">Ajuste</th><th>Score</th><th>Acción propuesta</th><th>Estado</th></tr></thead>
+      <tbody>${rows.map(r => { const s = score(r); const cur = r.moneda; const asg = r.aseguradoraId ? (Orbit.q.aseguradora(r.aseguradoraId) || {}).nombre : (r._asgTxt || '—'); const accion = (r.requiereValidacion || !r.moneda) ? 'Revisar y completar' : (Math.abs(r.difComision || 0) < 0.5 ? 'Confirmar conciliación' : 'Ajustar / validar diferencia'); return `<tr>
+        <td class="mono" style="font-size:11px">${r._numeroFila || '—'}</td><td style="font-size:12px">${U.esc(asg || '—')}</td><td class="mono" style="font-size:11px">${U.esc(r.periodo || '—')}</td>
+        <td class="num">${M(r.comEsperada, cur)}</td><td class="num">${M(r.comPagada, cur)}</td>
+        <td class="num" style="color:${Math.abs(r.difComision||0)<0.5?'var(--ok)':(r.difComision<0?'var(--danger)':'var(--warn)')}">${r.difComision ? (r.difComision>0?'+':'')+M(r.difComision,cur) : '—'}</td>
+        <td class="num muted">${r.retencion ? M(r.retencion,cur) : '—'}</td><td class="num muted">${r.ajuste ? M(r.ajuste,cur) : '—'}</td>
+        <td><span class="badge ${s.tone}">${s.t}</span></td><td style="font-size:12px">${accion}</td>
+        <td><span class="badge ${r.requiereValidacion || !r.moneda ?'warn':'info'}">${r.requiereValidacion || !r.moneda ?'Requiere validación':'Pendiente de aplicar'}</span></td></tr>`; }).join('')}</tbody></table></div>
+      <div class="imp-note" style="margin:0;border-radius:0">Ninguna fila impacta cobros/comisiones/liquidaciones hasta que un usuario la valide. El importe se muestra en la moneda del país (no se mezcla).</div>
     </div>`;
   }
   function step3(m) {
@@ -914,9 +974,11 @@ Orbit.importa = (function () {
                 const p = matrixToParsed(mat);
                 if (!p.headers.length) { hojas.excluidas.push({ hoja: sn, motivo: 'sin encabezado reconocible' }); return; }
                 // Traza por hoja: país/moneda/periodo inferidos del NOMBRE de hoja (sin asumir GT)
-                const paisHoja = detectaPais(sn), monedaHoja = detectaMoneda(sn) || monedaDe(paisHoja), periodoHoja = detectaPeriodo(sn);
+                // Traza por hoja: país/moneda/periodo del NOMBRE de hoja. Moneda SOLO explícita (P0-01);
+                // monedaDe(paisHoja) es SUGERENCIA, no se escribe como moneda de la fila.
+                const paisHoja = detectaPais(sn), monedaHoja = detectaMoneda(sn), monedaSugeridaHoja = monedaDe(paisHoja), periodoHoja = detectaPeriodo(sn);
                 p.rows.forEach((row, ri) => {
-                  row._origenHoja = sn; row._paisHoja = paisHoja; row._monedaHoja = monedaHoja;
+                  row._origenHoja = sn; row._paisHoja = paisHoja; row._monedaHoja = monedaHoja; row._monedaSugeridaHoja = monedaSugeridaHoja;
                   row._periodoHoja = periodoHoja; row._bloqueOrigen = sn; row._numeroFila = ri + 2;
                 });
                 if (!headerRow) headerRow = p.headers;
@@ -1004,10 +1066,10 @@ Orbit.importa = (function () {
     const fin = dr.querySelector('#imp-finish'); if (fin) fin.addEventListener('click', () => {
       let msg = '';
       const kind = state.kind;
-      const isConc = (state.meta.conciliacion || kind === 'estados-banco');
+      const isConc = (state.meta.conciliacion === true);
       if (state.parsed && state.modo !== 'documental' && isConc) {
         const r = applyConciliacion(kind);
-        msg = '✓ Conciliación: ' + r.creados + ' creados · ' + r.aplicados + ' pagos aplicados';
+        msg = '✓ Conciliación: ' + r.creados + ' referencias creadas · ' + r.propuestas + ' propuestas para revisión (pendiente de validación · no impacta cobros hasta aprobación)';
       } else if (state.parsed && state.modo !== 'documental' && IMPORT_MAP[kind]) {
         const r = applyImport(kind);
         msg = '✓ ' + r.created + ' creados · ' + r.updated + ' actualizados en ' + IMPORT_MAP[kind].label;

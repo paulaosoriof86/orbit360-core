@@ -312,7 +312,7 @@ Orbit.modules.portal = (function () {
         <div class="pt-det"><span>N.º</span><b>${r.numero}</b></div>
         <div class="pt-det"><span>Estado</span><b>${r.estado}</b></div>
         <div class="pt-det"><span>Reportado</span><b>${U.fmtDate(r.fecha)}</b></div>
-        <div class="pt-det"><span>Monto reclamado</span><b>${U.money(r.montoReclamado, 'GTQ')}</b></div>
+        <div class="pt-det"><span>Monto reclamado</span><b>${U.money(r.montoReclamado, (S().get('clientes', clienteId) || {}).moneda || Orbit.q.monedaPais())}</b></div>
       </div>
       <div class="asg-sec-t" style="margin-top:14px">Seguimiento</div>
       <div class="pol-hist">${(r.bitacora || []).slice().reverse().map(b => `<div class="pol-hev"><div class="pol-hev-i">📌</div><div><div class="pol-hev-t">${U.esc(b.t)}</div><div class="pol-hev-d">${U.esc(b.ts || '')}</div></div></div>`).join('') || '<div class="muted" style="font-size:12px">Sin movimientos aún.</div>'}</div>`, null, 'Cerrar');

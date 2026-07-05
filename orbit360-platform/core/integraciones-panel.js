@@ -10,7 +10,9 @@ Orbit.integracionesPanel = (function () {
   function tone(estado) {
     return estado === 'confirmado' ? 'ok' : estado === 'enviado' || estado === 'pendiente' ? 'info' : estado === 'error' ? 'danger' : estado === 'pendiente_backend' || estado === 'pendiente_configuracion' ? 'warn' : 'neutral';
   }
-  function badge(estado) { return '<span class="badge ' + tone(estado) + '">' + esc(estado || 'sin_estado') + '</span>'; }
+  var ESTADO_LABEL = { pendiente_backend: 'Pendiente de conexión', pendiente_configuracion: 'Pendiente de configuración', sin_estado: 'Sin estado', pendiente: 'Pendiente', enviado: 'Enviado', confirmado: 'Confirmado', error: 'Error' };
+  function estadoLabel(estado) { return ESTADO_LABEL[estado] || (estado ? String(estado).replace(/_/g, ' ') : 'Sin estado'); }
+  function badge(estado) { return '<span class="badge ' + tone(estado) + '">' + esc(estadoLabel(estado)) + '</span>'; }
   function open(filter) {
     filter = filter || {};
     let back = document.getElementById('int-panel'); if (back) back.remove();
@@ -43,7 +45,7 @@ Orbit.integracionesPanel = (function () {
           <button class="btn ghost sm" id="intp-clear">Limpiar filtros</button>
         </div>
         <div class="card" style="overflow:hidden;padding:0"><table class="tbl">
-          <thead><tr><th>Fecha</th><th>Evento</th><th>Módulo</th><th>Proveedor</th><th>Estado</th><th>Entidad</th>${lab ? '<th>LAB</th>' : ''}</tr></thead>
+          <thead><tr><th>Fecha</th><th>Evento</th><th>Módulo</th><th>Proveedor</th><th>Estado</th><th>Entidad</th>${lab ? '<th>Prueba</th>' : ''}</tr></thead>
           <tbody>${eventos.map(ev => `<tr>
             <td class="muted" style="font-size:12px">${esc((ev.createdAt || '').replace('T',' ').slice(0,16))}</td>
             <td><b>${esc(ev.evento)}</b>${ev.error ? '<div class="muted" style="font-size:12px;color:var(--danger)">' + esc(ev.error) + '</div>' : ''}</td>
@@ -64,12 +66,12 @@ Orbit.integracionesPanel = (function () {
       render(back, f);
     }));
     back.querySelectorAll('[data-lab-cycle]').forEach(btn => btn.addEventListener('click', () => {
-      btn.textContent = 'Simulando…'; btn.disabled = true;
+      btn.textContent = 'Probando…'; btn.disabled = true;
       if (Orbit.integraciones && Orbit.integraciones.labMock) Orbit.integraciones.labMock('ciclo', btn.dataset.labCycle, { forzar: true });
       setTimeout(() => render(back, filter || {}), 650);
     }));
   }
   function kpi(label, val, foot) { return `<div class="kpi"><div class="kpi-l">${esc(label)}</div><div class="kpi-v">${esc(val)}</div><div class="kpi-f">${esc(foot)}</div></div>`; }
-  function sel(name, opts, value) { return `<label class="ce-l" style="min-width:170px">${esc(name)}<select class="o-sel" data-filter="${esc(name)}">${opts.map(o => `<option value="${esc(o)}" ${String(value||'')===String(o)?'selected':''}>${esc(o || 'Todos')}</option>`).join('')}</select></label>`; }
+  function sel(name, opts, value) { return `<label class="ce-l" style="min-width:170px">${esc(name)}<select class="o-sel" data-filter="${esc(name)}">${opts.map(o => `<option value="${esc(o)}" ${String(value||'')===String(o)?'selected':''}>${o === '' ? 'Todos' : esc(name === 'estado' ? estadoLabel(o) : o)}</option>`).join('')}</select></label>`; }
   return { open };
 })();

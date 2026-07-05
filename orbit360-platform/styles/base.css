@@ -353,7 +353,8 @@ select.o-sel{cursor:pointer;appearance:none;background-image:url("data:image/svg
   .grid2{grid-template-columns:1fr}
 }
 /* ---- KPI clickable ---- */
-button.kpi-click{cursor:pointer;border:none;text-align:left;transition:transform .12s,box-shadow .12s}
+button.kpi-click{cursor:pointer;border:none;text-align:left;transition:transform .12s,box-shadow .12s;color:inherit;font:inherit}
+button.kpi-click .k-val{color:var(--ink)}
 button.kpi-click:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
 button.kpi-click:active{transform:translateY(0)}
 

@@ -1,4 +1,8 @@
-# PENDIENTES Y MEJORAS — Orbit 360 (candidato v1.114 · 2026-07-04)
+# PENDIENTES Y MEJORAS — Orbit 360 (candidata activa 2026-07-04T193658.630)
+
+> Versión unificada: candidata activa **2026-07-04T193658.630** · base frontend congelada **v1.117** · importador/documentos/comisiones **v1.118–v1.123** · moneda por país **v1.124/v1.126** · Academia paso a paso + `CONTENT_V=3` **v1.125**.
+>
+> **Pendientes P0 abiertos**: P0-03 desglose de prima visible en Pólizas (neta/gastos/IVA/total/recibos/fuente/validación); P0-04 estados Anulada/Rechazada en filtros; P0-05 estados de validación en Cobros/Portal/Cliente360 (reportado/en revisión/pagado/conciliado/requiere validación/bloqueado); P0-06 score de conciliación (MATCH_EXACTO/PROBABLE/REQUIERE_VALIDACION/BLOQUEADO); P0-07 planillas comisión esperada/pagada/diferencia; P0-08 textos técnicos por rol; profundizar "Paso a paso" en cursos restantes de Academia.
 
 > Documento puente para **ChatGPT (migración / backend)**. Lista honesta de lo que
 > **funciona como prototipo** vs lo que **requiere backend real** o **profundización**.

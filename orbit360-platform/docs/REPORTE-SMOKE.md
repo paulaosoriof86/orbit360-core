@@ -1,3 +1,53 @@
+# Reporte de smoke · Orbit 360 · candidata activa 2026-07-04T193658.630 (v1.126)
+
+**Fecha:** 2026-07-04 · datos ficticios del seed. Smoke visual/prototipo local (no backend/Firestore/LAB/datos reales).
+- ✅ App carga sin errores de consola.
+- ✅ **Moneda por país** verificada: país GT muestra `Q` (GTQ), país CO muestra `$` (COP) en KPIs de Pólizas, Cobros, Comisiones, Finanzas, Inicio, Insights, Leads, Renovaciones, Siniestros, Portal; vista global (TODOS) normaliza con tasa declarada (`queries.js`) sin suma cruda.
+- ✅ Academia v1.125 con lecciones "Paso a paso"; `CONTENT_V=3` actualiza contenido conservando progreso.
+- ✅ Backend protegido intacto.
+
+---
+
+# Reporte de smoke · Orbit 360 · candidato v1.117 (CONGELADA · base frontend aprobada)
+
+**Fecha:** 2026-07-04 · datos ficticios del seed.
+> **Smoke visual/prototipo local de Claude.** No corresponde a smoke backend, Firestore, LAB real ni carga de datos reales. Valida render, navegación y lógica del prototipo en el navegador; la validación de backend/Firestore la ejecuta el lane de ChatGPT/Codex.
+
+- ✅ App carga sin errores de consola (verificado en navegador local).
+- ✅ Las 6 correcciones 134907 confirmadas (ver bloque v1.117 abajo).
+- ✅ Backend protegido intacto — no se ejecutó ni tocó backend/Firestore/LAB.
+- ⚠ Recorrido masivo de 30 rutas excede el timeout del evaluador; verificado por lotes + auditoría runtime previa (0 pantallas en blanco / 0 errores).
+
+---
+
+## Alcance del smoke (aclaración)
+> **Smoke visual/prototipo local de Claude.** No corresponde a smoke backend, Firestore, LAB real ni carga de datos reales. Valida render, navegación y lógica del prototipo en el navegador; la validación de backend/Firestore la ejecuta el lane de ChatGPT/Codex.
+
+# Reporte de smoke · Orbit 360 · candidato v1.117
+
+**Fecha:** 2026-07-04 · datos ficticios del seed. Smoke visual/prototipo local (no backend/Firestore/LAB).
+- ✅ App carga sin errores de consola.
+- ✅ **P0-134907-01** `clientes.fields` mapea `moneda` (moneda/divisa/currency); con moneda explícita se respeta, sin ella queda `''` + `requiere_validacion` (no GTQ).
+- ✅ **P0-134907-02** `estados-banco` → colección `conciliacionBanco` (`estado:'pendiente_conciliacion'`), NO escribe `finmovs`/cobros/clientes/pólizas. Copy: "Se cargará para conciliación bancaria. No crea cobros ni movimientos financieros hasta que se valide."
+- ✅ **P1-134907-03** Copy de documentos: "propone cambios para revisión/aprobación; no modifica clientes ni pólizas directamente".
+- ✅ **P1-134907-04** Sin "diff" en UI (label → "Propuestas de actualización del expediente (pendientes de aprobación)").
+- ✅ **P1-134907-05** Panel: estados técnicos mapeados (Pendiente de conexión / Pendiente de configuración / Sin estado / Probando…).
+- ✅ Backend protegido intacto.
+
+---
+
+# Reporte de smoke · Orbit 360 · candidato v1.116
+
+**Fecha:** 2026-07-04 · datos ficticios del seed.
+- ✅ App carga sin errores de consola.
+- ✅ **P0-01/P0-02** Cliente importado sin país → `pais:''`, `moneda:''`, `requiereValidacion:true`, `monedaSugerida` aparte (NO se asume GTQ). Verificado en vivo.
+- ✅ **P0-03** `SCOPE.documentos` = `parchesPendientes` (no crea clientes/pólizas directos).
+- ✅ **Regla** `Listado producción 2025-2026` excluida por `HOJA_SOPORTE` (verificado con y sin tilde).
+- ✅ **P1-04** Panel sin "LAB" visible (→ "Prueba", solo en modo prueba interno).
+- ✅ Backend protegido intacto (no se tocó `data/store.js`, loaders/guards, `firestore.rules`, tools `orbit360-*`).
+
+---
+
 # Reporte de smoke · Orbit 360 · candidato v1.115
 
 **Fecha:** 2026-07-04

@@ -5,6 +5,12 @@ Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos
 ## [1.115.0] — 2026-07-04 · Reauditoría 072304 (trazabilidad real, moneda, comisiones, documentos, textos)
 > Detalle fix por fix en `docs/BITACORA-CAMBIOS.md` (v1.115). P0: `copyRowMeta` lleva la trazabilidad al registro final; moneda solo explícita (`monedaSugerida` no se escribe); contrato real de planilla de comisiones (esperada vs pagada, tarifas solo con diff confirmado); documentos → `parchesPendientes` con diff. P1: cierre relativo a fecha viva; textos técnicos suavizados; financiero histórico bloquea conceptos de cobro/recaudo.
 
+## [1.139.0] — 2026-07-04 · Candidata activa 2026-07-04T205210.456 — conciliación como propuesta + validar≠aplicar
+> Base comparada `202655.833`. Academia CONTENT_V=5. P0-2 conciliación no aplica pagos directo (propuestas). P0-3 validación en dos pasos (validar reporte → aplicar pago) en Cobros y Cliente360. P0-4 planilla sin fallback GTQ + labels backend (MATCH_EXACTO/PROBABLE/REQUIERE_VALIDACION/BLOQUEADO). P0-5 moneda residual clasificada. Pendiente: persistencia/UI de conciliaciones backend. Detalle en `docs/BITACORA-CAMBIOS.md` (v1.139). Sin tocar backend protegido.
+
+## [1.126.0] — 2026-07-04 · Candidata activa 2026-07-04T193658.630 — moneda por país completa + docs unificadas
+> Base activa `2026-07-04T193658.630`. P0-02 (moneda por país) completada en display de todos los módulos de KPIs/agregados (últimos: leads, renovaciones, siniestros, portal). Academia v1.125 (paso a paso + CONTENT_V=3) conservada. Docs unificadas (README/CHANGELOG/PENDIENTES/SMOKE/BITACORA). Sin tocar backend protegido. Detalle en `docs/BITACORA-CAMBIOS.md` (v1.124–v1.126).
+
 ## [1.114.0] — 2026-07-04 · Candidato corregido (auditoría ampliada A&S · P0/P1/P2)
 > Candidato **v1.114** = versión unificada de esta entrega (README/CHANGELOG/bitácoras/pendientes/smoke coinciden). Detalle fix por fix en `docs/BITACORA-CAMBIOS.md` y `docs/BITACORA-ERRORES.md`. Auditoría en `docs/AUDITORIA-CANDIDATO-CLAUDE-POST-FIX.md`; smoke en `docs/REPORTE-SMOKE.md`.
 

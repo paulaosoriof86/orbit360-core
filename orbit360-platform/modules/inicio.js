@@ -58,8 +58,8 @@ Orbit.modules.inicio = (function () {
             <span class="badge danger">${venc.length} cobros vencidos</span>
           </div>
         </div>
-        ${dial(pctPrima, 'Prima vigente', U.moneyShort(prima, 'GTQ'))}
-        ${dial(pctRec, 'Recaudo aplicado', U.moneyShort(recaudo, 'GTQ'))}
+        ${dial(pctPrima, 'Prima vigente', U.moneyShort(prima, Orbit.q.monedaPais()))}
+        ${dial(pctRec, 'Recaudo aplicado', U.moneyShort(recaudo, Orbit.q.monedaPais()))}
       </div>
 
       <!-- KPIs clicables -->
@@ -67,17 +67,17 @@ Orbit.modules.inicio = (function () {
         <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pagados')" title="Ver cobros aplicados">
           <div class="k-accent"></div>
           <div class="k-label">Cartera al día</div>
-          <div class="k-val">${U.moneyShort(cart.alDia, 'GTQ')}</div>
+          <div class="k-val">${U.moneyShort(cart.alDia, Orbit.q.monedaPais())}</div>
           <div class="k-foot up">▲ cobros aplicados ›</div></button>
         <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pendientes')" title="Ver pendiente de cobro" style="border-color:var(--warn)">
           <div class="k-accent" style="background:var(--warn)"></div>
           <div class="k-label">Pendiente de cobro</div>
-          <div class="k-val">${U.moneyShort(cart.pend, 'GTQ')}</div>
+          <div class="k-val">${U.moneyShort(cart.pend, Orbit.q.monedaPais())}</div>
           <div class="k-foot muted">cuotas por vencer ›</div></button>
         <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-vencidos')" title="Ver cartera vencida">
           <div class="k-accent" style="background:var(--danger)"></div>
           <div class="k-label">Cartera vencida</div>
-          <div class="k-val">${U.moneyShort(cart.venc, 'GTQ')}</div>
+          <div class="k-val">${U.moneyShort(cart.venc, Orbit.q.monedaPais())}</div>
           <div class="k-foot down">▼ requiere gestión ›</div></button>
         <button class="kpi kpi-click" onclick="Orbit.kpi('renov-proximas')" title="Ver renovaciones">
           <div class="k-accent" style="background:var(--info)"></div>
@@ -98,7 +98,7 @@ Orbit.modules.inicio = (function () {
               ${U.avatar(b.asesor.nombre, b.asesor.color, 'md')}
               <div style="flex:1;min-width:0">
                 <div style="display:flex;justify-content:space-between;font-size:13.5px">
-                  <b>${U.esc(b.asesor.nombre)}</b><span class="mono">${U.moneyShort(b.prima, 'GTQ')}</span>
+                  <b>${U.esc(b.asesor.nombre)}</b><span class="mono">${U.moneyShort(b.prima, Orbit.q.monedaPais())}</span>
                 </div>
                 <div class="bar" style="margin-top:6px"><i style="width:${Math.min(100, b.pct)}%"></i></div>
               </div>

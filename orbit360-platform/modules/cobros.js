@@ -10,13 +10,19 @@ Orbit.modules.cobros = (function () {
 
   const FDEFS = () => [
     { id: 'fq', type: 'search', ph: 'Buscar cliente, póliza o placa…' },
-    { id: 'fest', type: 'select', ph: 'Estado', options: ['Pagado', 'Pendiente', 'Vencido', 'Anulado'].map(v => ({ v, t: v })) },
+    { id: 'fest', type: 'select', ph: 'Estado', options: ['Pagado', 'Pendiente', 'Vencido', 'Reportado por cliente', 'Conciliado', 'Requiere validación', 'Bloqueado', 'Anulado'].map(v => ({ v, t: v })) },
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
   ];
 
   function rows() {
     return S().all('cobros').filter(c => {
       if (c.estado === 'Anulado' && st.fest !== 'Anulado') return false;
+      // Estados de validación derivados (P0-05): reportado por cliente / conciliado / requiere validación
+      const estV = estadoValidacion(c);
+      if (st.fest === 'Reportado por cliente') return estV === 'Reportado por cliente' && matchTxt(c);
+      if (st.fest === 'Conciliado') return c.conciliado && matchTxt(c);
+      if (st.fest === 'Requiere validación') return (c.requiereValidacion || estV === 'Requiere validación') && matchTxt(c);
+      if (st.fest === 'Bloqueado') return c.estado === 'Bloqueado' && matchTxt(c);
       const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
       let placa = '';
       if (p) { const veh = S().all('vehiculos').find(v => v.polizaId === p.id) || (p.vehiculoId ? S().get('vehiculos', p.vehiculoId) : null); if (veh) placa = veh.placa || ''; }
@@ -27,6 +33,26 @@ Orbit.modules.cobros = (function () {
     }).sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
   }
 
+  function matchTxt(c) {
+    const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
+    let placa = ''; try { const v = S().all('vehiculos').find(x => x.polizaId === (p && p.id)); placa = v ? v.placa : ''; } catch (e) {}
+    const txt = ((cli ? cli.nombre : '') + ' ' + (p ? p.numero : '') + ' ' + placa).toLowerCase();
+    return (!st.fq || txt.includes(st.fq.toLowerCase())) && (!st.fase || c.asesorId === st.fase);
+  }
+  // Estado de validación visible (no confundir reportado con aplicado)
+  function estadoValidacion(c) {
+    if (c.estado === 'Pagado') return c.conciliado ? 'Conciliado' : 'Pagado (por conciliar)';
+    if (c.validadoReporte && (c.estado === 'Pendiente' || c.estado === 'Vencido')) return 'Validada (por aplicar)';
+    if (c.requiereValidacion) return 'Requiere validación';
+    if (c.estado === 'Bloqueado') return 'Bloqueado';
+    if (c.reportado && (c.estado === 'Pendiente' || c.estado === 'Vencido')) return c.enRevision ? 'En revisión' : 'Reportado por cliente';
+    return c.estado;
+  }
+  function badgeValidacion(c) {
+    const e = estadoValidacion(c);
+    const tone = e === 'Conciliado' ? 'ok' : /Pagado/.test(e) ? 'ok' : e === 'Validada (por aplicar)' ? 'ok' : e === 'Reportado por cliente' ? 'info' : e === 'En revisión' ? 'info' : e === 'Requiere validación' ? 'warn' : e === 'Bloqueado' ? 'danger' : e === 'Vencido' ? 'danger' : 'warn';
+    return '<span class="badge ' + tone + '">' + e + '</span>';
+  }
   function render(host) {
     const cart = q.carteraGlobal();
     const aging = q.agingVencido();
@@ -39,22 +65,22 @@ Orbit.modules.cobros = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('cobros', `<button class="btn ghost" onclick="Orbit.modules.cobros.lote()" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📤 Notificar por lote</button>`)}
       ${K.kpis([
-        { label: 'Cartera al día', val: U.moneyShort(cart.alDia, 'GTQ'), color: 'var(--ok)', foot: 'cobros aplicados', footTone: 'up' },
-        { label: 'Pendiente', val: U.moneyShort(cart.pend, 'GTQ'), color: 'var(--warn)', foot: 'por vencer' },
-        { label: 'Vencido', val: U.moneyShort(cart.venc, 'GTQ'), color: 'var(--danger)', foot: 'en gestión', footTone: 'down' },
+        { label: 'Cartera al día', val: U.moneyShort(cart.alDia, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'cobros aplicados', footTone: 'up' },
+        { label: 'Pendiente', val: U.moneyShort(cart.pend, Orbit.q.monedaPais()), color: 'var(--warn)', foot: 'por vencer' },
+        { label: 'Vencido', val: U.moneyShort(cart.venc, Orbit.q.monedaPais()), color: 'var(--danger)', foot: 'en gestión', footTone: 'down' },
         { label: 'Por conciliar', onclick: "location.hash='#/cobros'", val: porConciliar, color: 'var(--info)', foot: 'pagos sin aplicar' }
       ])}
 
       <div class="card pad" style="margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <b style="font-family:var(--f-display);font-size:15px">Antigüedad de cartera vencida (aging)</b>
-          <span class="muted" style="font-size:12px">total ${U.money(agingTot, 'GTQ')}</span>
+          <span class="muted" style="font-size:12px">total ${U.money(agingTot, Orbit.q.monedaPais())}</span>
         </div>
         <div style="height:13px;border-radius:99px;overflow:hidden;display:flex;margin:14px 0 12px">
           ${Object.entries(aging).map(([k, v]) => `<div title="${k} días" style="width:${v / agingTot * 100}%;background:${agingCols[k]}"></div>`).join('')}
         </div>
         <div style="display:flex;gap:18px;flex-wrap:wrap">
-          ${Object.entries(aging).map(([k, v]) => `<span style="display:flex;align-items:center;gap:7px;font-size:12.5px"><span class="dot-s" style="background:${agingCols[k]}"></span>${k} d · <b>${U.money(v, 'GTQ')}</b></span>`).join('')}
+          ${Object.entries(aging).map(([k, v]) => `<span style="display:flex;align-items:center;gap:7px;font-size:12.5px"><span class="dot-s" style="background:${agingCols[k]}"></span>${k} d · <b>${U.money(v, Orbit.q.monedaPais())}</b></span>`).join('')}
         </div>
       </div>
 
@@ -72,9 +98,9 @@ Orbit.modules.cobros = (function () {
               <td class="num">${U.money(c.monto, c.moneda)}</td>
               <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
               <td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">—</span>'}</td>
-              <td>${U.estadoBadge(c.estado)}</td>
+              <td>${badgeValidacion(c)}</td>
               <td>${c.estado === 'Pagado' ? (c.conciliado ? '<span style="color:var(--ok)" title="Aplicado a póliza">✓</span>' : '<span style="color:var(--warn)" title="Por conciliar">◷</span>') : '<span class="muted">—</span>'}</td>
-              <td style="text-align:right;white-space:nowrap">${aplicable ? `<button class="btn primary sm" title="Aplicar pago" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${c.id}')">💳 Pagar</button>` : ''}</td>
+              <td style="text-align:right;white-space:nowrap">${c.reportado && !c.validadoReporte && (c.estado === 'Pendiente' || c.estado === 'Vencido') ? `<button class="btn primary sm" title="Validar pago reportado por el cliente" onclick="event.stopPropagation();Orbit.modules.cobros.validarReporte('${c.id}')">Validar</button>` : (aplicable ? `<button class="btn primary sm" title="Aplicar pago" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${c.id}')">💳 Pagar</button>` : '')}</td>
             </tr>`;
           }).join('') || `<tr><td colspan="9" class="muted" style="text-align:center;padding:30px">Sin cobros.</td></tr>`}</tbody>
         </table></div>
@@ -105,7 +131,7 @@ Orbit.modules.cobros = (function () {
         <button class="imp-x" id="cd-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
       </div>
       <div style="padding:18px 20px;display:grid;gap:16px">
-        <div class="vp-tags">${U.estadoBadge(c.estado)}${c.estado === 'Pagado' ? (c.conciliado ? '<span class="badge ok">Conciliado</span>' : '<span class="badge warn">Por conciliar</span>') : ''}</div>
+        <div class="vp-tags">${badgeValidacion(c)}${c.reportado && (c.estado === 'Pendiente' || c.estado === 'Vencido') ? '<span class="badge info">Soporte: ' + U.esc(c.soporteNombre || 'reportado') + '</span>' : ''}</div>
         <div class="vp-grid">
           ${vr('Aseguradora', asg ? U.esc(asg.nombre) : '—')}${vr('Asesor', ase ? U.esc(ase.nombre) : '—')}
           ${vr('Forma de pago', (p && p.formaPago) || c.metodo || '—')}${vr('Conducto', (p && p.conducto) || '—')}
@@ -128,7 +154,7 @@ Orbit.modules.cobros = (function () {
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
         ${cli ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();location.hash='#/cliente360?c=${cli.id}'">👤 Ver cliente</button>` : ''}
         ${p ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
-        ${aplicable ? `<button class="btn primary" id="cd-apply">💳 Aplicar pago</button>` : ''}
+        ${c.reportado && aplicable ? `<button class="btn primary" id="cd-val">🔎 Validar pago reportado</button>` : (aplicable ? `<button class="btn primary" id="cd-apply">💳 Aplicar pago</button>` : '')}
         ${(c.estado === 'Pagado' && !c.conciliado) ? `<button class="btn primary" id="cd-conc">📄 Cargar factura y conciliar</button>` : ''}
       </div>
     </div>`;
@@ -138,6 +164,8 @@ Orbit.modules.cobros = (function () {
     back.querySelector('#cd-x').addEventListener('click', close);
     const ap = back.querySelector('#cd-apply');
     if (ap) ap.addEventListener('click', () => { back.remove(); aplicarPago(cobroId); });
+    const av = back.querySelector('#cd-val');
+    if (av) av.addEventListener('click', () => { back.remove(); validarReporte(cobroId); });
     const cc = back.querySelector('#cd-conc');
     if (cc) cc.addEventListener('click', () => { back.remove(); conciliarFactura(cobroId); });
   }
@@ -184,6 +212,35 @@ Orbit.modules.cobros = (function () {
       const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✅ Recibo conciliado'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
       const host2 = document.getElementById('host'); if (host2) render(host2);
     });
+  }
+
+  /* ---- Validar un pago REPORTADO por el cliente (paso previo a aplicar) ---- */
+  function validarReporte(cobroId) {
+    const c = S().get('cobros', cobroId); if (!c) return;
+    const cli = S().get('clientes', c.clienteId) || {};
+    let pm = document.getElementById('cob-val'); if (pm) pm.remove();
+    pm = document.createElement('div'); pm.id = 'cob-val'; pm.className = 'drawer-back open';
+    pm.style.cssText = 'display:grid;place-items:center;z-index:210';
+    pm.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🔎 Validar pago reportado</b><button class="imp-x" id="cv-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:12px">
+        <div class="cfg-note">El cliente <b>${U.esc(cli.nombre || '')}</b> reportó este pago (cuota ${c.cuota}, ${U.money(c.monto, c.moneda)}) el ${U.fmtDate(c.reportado)}. ${c.soporteNombre ? 'Soporte: <b>' + U.esc(c.soporteNombre) + '</b>.' : 'Sin soporte adjunto.'} Revisa contra el estado de cuenta antes de aplicar.</div>
+        ${c.notaReporte ? `<div style="font-size:12.5px"><b>Nota del cliente:</b> ${U.esc(c.notaReporte)}</div>` : ''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn ghost sm" id="cv-rev">◷ Marcar en revisión</button>
+          <button class="btn ghost sm" id="cv-rej" style="color:var(--danger)">✕ Rechazar reporte</button>
+        </div>
+      </div>
+      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn ghost" id="cv-close">Cerrar</button>
+        <button class="btn primary" id="cv-ok">✓ Validar reporte</button></div></div>`;
+    document.body.appendChild(pm);
+    const close = () => pm.remove();
+    pm.addEventListener('click', e => { if (e.target === pm) close(); });
+    pm.querySelector('#cv-x').onclick = close; pm.querySelector('#cv-close').onclick = close;
+    pm.querySelector('#cv-rev').onclick = () => { S().update('cobros', cobroId, { enRevision: true }); close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('◷ Pago en revisión'); };
+    pm.querySelector('#cv-rej').onclick = () => { S().update('cobros', cobroId, { reportado: null, enRevision: false, notaReporte: '' }); close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('✕ Reporte rechazado — recibo vuelve a pendiente'); };
+    pm.querySelector('#cv-ok').onclick = () => { S().update('cobros', cobroId, { validadoReporte: true, enRevision: false }); close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('✓ Reporte validado — ahora podés aplicar el pago'); };
   }
 
   /* ---- Aplicar pago (modal reutilizable: desde la ficha del recibo y desde la tabla) ---- */
@@ -264,7 +321,7 @@ Orbit.modules.cobros = (function () {
           <span style="flex:1;min-width:0"><b>${cli ? U.esc(cli.nombre) : '—'}</b> <span class="muted" style="font-size:11.5px">· ${p ? p.numero : ''} · ${c.cuota}</span><br><span class="muted" style="font-size:11px">${d < 0 ? 'venció hace ' + (-d) + 'd' : 'vence en ' + d + 'd'}</span></span>
           <span class="mono">${U.money(c.monto, c.moneda)}</span></label>`;
       }).join('') || '<div class="muted" style="padding:18px;text-align:center">Sin recibos pendientes.</div>';
-      back.querySelector('#lo-tot').textContent = U.money(tot, 'GTQ');
+      back.querySelector('#lo-tot').textContent = U.money(tot, Orbit.q.monedaPais());
       back.querySelector('#lo-n').textContent = sel.length + ' de ' + arr.length + ' recibos';
       back.querySelectorAll('[data-lo]').forEach(x => x.addEventListener('change', () => { x.checked ? incl.add(x.dataset.lo) : incl.delete(x.dataset.lo); paint(); }));
     }
@@ -297,5 +354,5 @@ Orbit.modules.cobros = (function () {
     paint();
   }
 
-  return { render, detalle, aplicarPago, conciliarFactura, lote };
+  return { render, detalle, aplicarPago, validarReporte, conciliarFactura, lote };
 })();

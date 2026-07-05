@@ -11,8 +11,8 @@ Orbit.modules.insights = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
   let vista = 'resumen', host, unsub;
   const norm = (m, cur) => q.norm(m, cur);
-  const M = (n) => U.moneyShort(n, 'GTQ');
-  const MM = (n) => U.money(n, 'GTQ');
+  const M = (n) => U.moneyShort(n, Orbit.q.monedaPais());
+  const MM = (n) => U.money(n, Orbit.q.monedaPais());
   const YEAR = 2026, PREV = 2025;
   const MES0 = U.NOW ? new Date(U.NOW).getMonth() : 5; // mes actual
   let mesSel = MES0;           // mes seleccionado (acumulado Ene→mesSel)

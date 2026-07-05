@@ -34,7 +34,7 @@ Orbit.modules.siniestros = (function () {
       ${K.kpis([
         { label: 'Reclamos', val: arr.length, color: 'var(--red)', foot: abiertos.length + ' abiertos', onclick: "location.hash='#/siniestros'" },
         { label: 'En proceso', val: abiertos.length, color: 'var(--warn)', foot: 'requieren gestión', onclick: "location.hash='#/siniestros'" },
-        { label: 'Indemnización pagada', val: U.moneyShort(pagado, 'GTQ'), color: 'var(--ok)', foot: 'a clientes', footTone: 'up', onclick: "location.hash='#/siniestros'" },
+        { label: 'Indemnización pagada', val: U.moneyShort(pagado, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a clientes', footTone: 'up', onclick: "location.hash='#/siniestros'" },
         { label: 'Tasa de aprobación', val: arr.length ? Math.round(arr.filter(r => ['Aprobado', 'Pagado'].includes(r.estado)).length / arr.length * 100) + '%' : '—', color: 'var(--info)', foot: 'aprobados / total', onclick: "location.hash='#/siniestros'" },
         { label: '⏱ Días abiertos (prom.)', val: promAbierto || '—', color: promAbierto > 30 ? 'var(--danger)' : 'var(--warn)', foot: abiertos.length + ' reclamos en proceso' },
         { label: '✅ Días a pago (prom.)', val: promCierre || '—', color: 'var(--ok)', foot: cerrados.length + ' reclamos pagados' }

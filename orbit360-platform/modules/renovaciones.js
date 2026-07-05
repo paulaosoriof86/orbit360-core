@@ -36,7 +36,7 @@ Orbit.modules.renovaciones = (function () {
         { label: 'Vencidas', val: cols[0].items.length, color: 'var(--danger)', foot: 'recuperar ya', footTone: 'down', onclick: "location.hash='#/renovaciones'" },
         { label: '≤15 días', val: cols[1].items.length, color: 'var(--danger)', foot: 'urgente', onclick: "location.hash='#/renovaciones'" },
         { label: '16–45 días', val: cols[2].items.length, color: 'var(--warn)', foot: 'planificar', onclick: "location.hash='#/renovaciones'" },
-        { label: 'Prima en juego', val: U.moneyShort(totalPrima, 'GTQ'), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
+        { label: 'Prima en juego', val: U.moneyShort(totalPrima, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:start">
         ${cols.map(c => `<div class="card" style="overflow:hidden">

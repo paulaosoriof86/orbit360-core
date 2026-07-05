@@ -122,7 +122,7 @@ Orbit.modules.academia = (function () {
     host.querySelectorAll('[data-cur]').forEach(el => el.addEventListener('click', (e) => { if (e.target.closest('.ac-act')) return; abrir(el.dataset.cur); }));
     host.querySelectorAll('[data-edit]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); editar(el.dataset.edit); }));
     host.querySelectorAll('[data-del]').forEach(el => el.addEventListener('click', async (e) => { e.stopPropagation(); const c = S().get('cursos', el.dataset.del); if (c && (await Orbit.ui.confirm('¿Eliminar el curso "' + c.titulo + '"? Esta acción no se puede deshacer.', { title: 'Eliminar curso', ok: 'Eliminar' }))) { S().remove('cursos', el.dataset.del); render(host); } }));
-    host.querySelectorAll('[data-kpi]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.kpi || 'todas'; render(host); }));
+    host.querySelectorAll('[data-kpi]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.kpi || 'todas'; vista = 'catalogo'; render(host); }));
     const impBtn = host.querySelector('#ac-imp'); if (impBtn) impBtn.addEventListener('click', () => Orbit.importa.open('documentos', { onDone: () => render(host) }));
     const newBtn = host.querySelector('#ac-new'); if (newBtn) newBtn.addEventListener('click', () => editar(null));
     const iaBtn  = host.querySelector('#ac-ia');  if (iaBtn)  iaBtn.addEventListener('click', crearIA);
@@ -197,6 +197,12 @@ Orbit.modules.academia = (function () {
   function abrir(id) { verCurso(id); }
 
   /* ---- Cuerpo de una lección (video / lectura / quiz interactivo) ---- */
+  function fmtSec(s) {
+    var h = U.esc(String(s == null ? '' : s));
+    h = h.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+    h = h.replace(/\n/g, '<br>');
+    return h;
+  }
   function lessonBody(l) {
     if (!l) return '';
     if (l.iframeSrc) return `<div style="position:relative;width:100%;height:62vh;border-radius:12px;overflow:hidden;background:#f4f3ee"><iframe src="${l.iframeSrc}" style="width:100%;height:100%;border:0"></iframe></div>`;
@@ -213,7 +219,7 @@ Orbit.modules.academia = (function () {
     }
     if (l.tipo === 'lectura') {
       const secs = l.secciones && l.secciones.length
-        ? l.secciones.map(s => `<div class="acv-sec" style="border-left:4px solid ${s.color || 'var(--red)'}"><div class="acv-sec-t" style="color:${s.color || 'var(--red)'}">${U.esc(s.icon || '▸')} ${U.esc(s.t || '')}</div><div class="acv-sec-b">${U.esc(s.d || '')}</div></div>`).join('')
+        ? l.secciones.map(s => `<div class="acv-sec" style="border-left:4px solid ${s.color || 'var(--red)'}"><div class="acv-sec-t" style="color:${s.color || 'var(--red)'}">${U.esc(s.icon || '▸')} ${U.esc(s.t || '')}</div><div class="acv-sec-b">${fmtSec(s.d || '')}</div></div>`).join('')
         : mdToHtml(l.texto || '');
       const adj = l.docSrc ? (/^data:image|\.(png|jpe?g|webp|gif)/i.test(l.docSrc) ? `<img src="${l.docSrc}" style="max-width:100%;border-radius:10px;margin-top:14px">` : `<div style="position:relative;width:100%;height:60vh;border-radius:10px;overflow:hidden;background:#f4f3ee;margin-top:14px"><iframe src="${l.docSrc}" style="width:100%;height:100%;border:0"></iframe></div>`) : '';
       return secs + adj;

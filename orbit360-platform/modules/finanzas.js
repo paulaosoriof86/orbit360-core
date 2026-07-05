@@ -23,8 +23,8 @@ Orbit.modules.finanzas = (function () {
     return S().all('finmovs').filter(m => (!periodo || m.periodo === periodo) && (!p || m.pais === p));
   }
   const norm = (v, cur) => q.norm(v, cur);
-  const M = (n) => U.moneyShort(n, 'GTQ');
-  const MM = (n) => U.money(n, 'GTQ');
+  const M = (n) => U.moneyShort(n, Orbit.q.monedaPais());
+  const MM = (n) => U.money(n, Orbit.q.monedaPais());
   const sum = (arr, f) => arr.reduce((s, x) => s + norm(f(x), x.moneda), 0);
 
   let mesInit = false;
@@ -225,7 +225,7 @@ Orbit.modules.finanzas = (function () {
       <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Desglose</div>
           <b style="font-family:var(--f-display);font-size:18px;color:#fff">${U.esc(titulo)}</b>
-          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${items.length} registros · ${U.money(tot, 'GTQ')} · ${U.esc(sub)} · clic en una fila para ver/editar</div></div>
+          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${items.length} registros · ${U.money(tot, Orbit.q.monedaPais())} · ${U.esc(sub)} · clic en una fila para ver/editar</div></div>
         <button class="imp-x" id="dr-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
       <div style="overflow:auto;flex:1"><table class="tbl">
         <thead><tr><th>Periodo</th><th>Día</th><th>Concepto</th><th>Clasificación</th><th>Quién</th><th class="num">Valor</th><th>Estado</th></tr></thead>
@@ -555,8 +555,8 @@ Orbit.modules.finanzas = (function () {
     const totalCobrar = rows.reduce((s, r) => s + r.devengada, 0);
     return `<div class="cfg-note" style="margin-bottom:14px">🏢 Comisión que la <b>empresa cobra a cada aseguradora</b>, sobre <b>prima neta recaudada</b>. Se concilia contra la planilla que envía la aseguradora.</div>
     ${K.kpis([
-      { label: 'Por cobrar', val: U.moneyShort(totalCobrar, 'GTQ'), color: 'var(--red)', foot: 'devengado' },
-      { label: 'Liquidado', val: U.moneyShort(rows.reduce((s, r) => s + r.liquidada, 0), 'GTQ'), color: 'var(--ok)', foot: 'ya cobrado', footTone: 'up' },
+      { label: 'Por cobrar', val: U.moneyShort(totalCobrar, Orbit.q.monedaPais()), color: 'var(--red)', foot: 'devengado' },
+      { label: 'Liquidado', val: U.moneyShort(rows.reduce((s, r) => s + r.liquidada, 0), Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'ya cobrado', footTone: 'up' },
       { label: 'Aseguradoras', val: rows.length, color: 'var(--info)', foot: 'con comisión' },
       { label: 'Registros', val: rows.reduce((s, r) => s + r.n, 0), color: 'var(--graph)', foot: 'cuotas' }
     ])}
@@ -564,16 +564,16 @@ Orbit.modules.finanzas = (function () {
       <thead><tr><th>Aseguradora</th><th class="num">Por cobrar</th><th class="num">Liquidado</th><th class="num">Total</th><th></th></tr></thead>
       <tbody>${rows.map(r => `<tr>
         <td>${r.asg ? `<span style="display:flex;align-items:center;gap:8px"><span class="dot-s" style="background:${r.asg.color}"></span><b>${U.esc(r.asg.nombre)}</b></span>` : '—'}</td>
-        <td class="num" style="color:var(--red)"><b>${U.money(r.devengada, 'GTQ')}</b></td>
-        <td class="num" style="color:var(--ok)">${U.money(r.liquidada, 'GTQ')}</td>
-        <td class="num">${U.money(r.devengada + r.liquidada, 'GTQ')}</td>
+        <td class="num" style="color:var(--red)"><b>${U.money(r.devengada, Orbit.q.monedaPais())}</b></td>
+        <td class="num" style="color:var(--ok)">${U.money(r.liquidada, Orbit.q.monedaPais())}</td>
+        <td class="num">${U.money(r.devengada + r.liquidada, Orbit.q.monedaPais())}</td>
         <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('aseguradoraId','${r.asg ? r.asg.id : ''}')">Ver detalle</button><button class="btn ghost sm" onclick="Orbit.modules.finanzas.facturaAseg('${r.asg ? r.asg.id : ''}')">🧾 Factura</button><button class="btn ghost sm" onclick="Orbit.importa.open('planillas-comision')">Conciliar planilla</button></td>
       </tr>`).join('')}</tbody>
     </table></div></div>
     ${(function () {
       const facs = (S().all('facturas') || []).filter(f => f.estado !== 'anulada').sort((a, b) => (b.numero || '').localeCompare(a.numero || ''));
       if (!facs.length) return '<div class="cfg-note" style="margin-top:14px">🧾 Aún no has emitido facturas de comisión. Usa <b>🧾 Factura</b> en una aseguradora. Las facturas emitidas son <b>cuentas por cobrar</b> — no entran a caja hasta que se cobran.</div>';
-      const M = n => U.money(n, 'GTQ');
+      const M = n => U.money(n, Orbit.q.monedaPais());
       return `<div class="card" style="overflow:hidden;margin-top:16px"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">🧾 Facturas de comisión emitidas (CxC)</div>
       <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>N.º</th><th>Aseguradora</th><th>Periodo</th><th class="num">Total</th><th>Estado</th><th></th></tr></thead>
       <tbody>${facs.map(f => { const a = q.aseguradora(f.aseguradoraId); return `<tr>
@@ -771,21 +771,21 @@ Orbit.modules.finanzas = (function () {
     const totalPagar = rows.reduce((s, r) => s + r.pendiente, 0);
     return `<div class="cfg-note" style="margin-bottom:14px">👥 Comisión a <b>pagar a cada asesor</b>: % (fijo o variable) sobre la <b>prima neta recaudada</b> de su cartera — no sobre venta. ${esAsesor ? 'Ves <b>tu</b> liquidación.' : 'El % se configura en Configuración › Usuarios.'} Los pagos se <b>cruzan con la liquidación</b> y son ajustables.</div>
     ${K.kpis([
-      { label: esAsesor ? 'Mi comisión a cobrar' : 'Total a pagar', val: U.moneyShort(totalPagar, 'GTQ'), color: 'var(--warn)', foot: 'pendiente' },
-      { label: 'Ya liquidado', val: U.moneyShort(rows.reduce((s, r) => s + r.liquidada, 0), 'GTQ'), color: 'var(--ok)', foot: 'pagado', footTone: 'up' },
-      { label: esAsesor ? 'Mi base recaudada' : 'Asesores', val: esAsesor ? U.moneyShort(rows.reduce((s, r) => s + r.baseRecaudada, 0), 'GTQ') : rows.length, color: 'var(--info)', foot: esAsesor ? 'prima neta' : 'con comisión' },
-      { label: 'Base recaudada', val: U.moneyShort(rows.reduce((s, r) => s + r.baseRecaudada, 0), 'GTQ'), color: 'var(--graph)', foot: 'prima neta' }
+      { label: esAsesor ? 'Mi comisión a cobrar' : 'Total a pagar', val: U.moneyShort(totalPagar, Orbit.q.monedaPais()), color: 'var(--warn)', foot: 'pendiente' },
+      { label: 'Ya liquidado', val: U.moneyShort(rows.reduce((s, r) => s + r.liquidada, 0), Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'pagado', footTone: 'up' },
+      { label: esAsesor ? 'Mi base recaudada' : 'Asesores', val: esAsesor ? U.moneyShort(rows.reduce((s, r) => s + r.baseRecaudada, 0), Orbit.q.monedaPais()) : rows.length, color: 'var(--info)', foot: esAsesor ? 'prima neta' : 'con comisión' },
+      { label: 'Base recaudada', val: U.moneyShort(rows.reduce((s, r) => s + r.baseRecaudada, 0), Orbit.q.monedaPais()), color: 'var(--graph)', foot: 'prima neta' }
     ])}
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Asesor</th><th>Esquema</th><th class="num">Base recaudada</th><th class="num">%</th><th class="num">A pagar</th><th class="num">Pagado</th><th class="num">Pendiente</th>${esAsesor ? '' : '<th></th>'}</tr></thead>
       <tbody>${rows.map(r => `<tr>
         <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(r.a.nombre, r.a.color, 'sm')}<b>${U.esc(r.a.nombre)}</b></div></td>
         <td><span class="badge ${r.tipo === 'variable' ? 'info' : 'neutral'}">${r.tipo}</span></td>
-        <td class="num">${U.money(r.baseRecaudada, 'GTQ')}</td>
+        <td class="num">${U.money(r.baseRecaudada, Orbit.q.monedaPais())}</td>
         <td class="num">${r.pct}%</td>
-        <td class="num"><b>${U.money(r.aPagar, 'GTQ')}</b></td>
-        <td class="num" style="color:var(--ok)">${U.money(r.liquidada, 'GTQ')}</td>
-        <td class="num" style="color:${r.pendiente > 0 ? 'var(--warn)' : 'var(--ok)'}">${U.money(r.pendiente, 'GTQ')}</td>
+        <td class="num"><b>${U.money(r.aPagar, Orbit.q.monedaPais())}</b></td>
+        <td class="num" style="color:var(--ok)">${U.money(r.liquidada, Orbit.q.monedaPais())}</td>
+        <td class="num" style="color:${r.pendiente > 0 ? 'var(--warn)' : 'var(--ok)'}">${U.money(r.pendiente, Orbit.q.monedaPais())}</td>
         ${esAsesor ? '' : `<td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('asesorId','${r.a.id}')">Detalle</button><button class="btn primary sm" onclick="Orbit.modules.finanzas.lote('${r.a.id}')">Preparar lote</button></td>`}
       </tr>`).join('')}</tbody>
     </table></div></div>
@@ -818,7 +818,7 @@ Orbit.modules.finanzas = (function () {
           <span style="flex:1"><b>${U.esc(p.quien)}</b><span class="muted" style="font-size:11.5px"> · ${p.tipo}</span>${p.cxp ? ' <span class="badge warn" style="font-size:9px">mes anterior</span>' : ''}</span>
           <span class="mono">${U.money(p.monto, p.cur)}</span>
         </label>`).join('') || '<div class="muted" style="padding:18px;text-align:center">No hay pagos pendientes.</div>';
-      back.querySelector('#lote-total').textContent = U.money(total, 'GTQ');
+      back.querySelector('#lote-total').textContent = U.money(total, Orbit.q.monedaPais());
       back.querySelector('#lote-count').textContent = sel.length + ' de ' + partidas.length + ' partidas';
       back.querySelectorAll('[data-lid]').forEach(c => c.addEventListener('change', () => { c.checked ? incluidos.add(c.dataset.lid) : incluidos.delete(c.dataset.lid); paint(); }));
     }
@@ -1111,7 +1111,7 @@ Orbit.modules.finanzas = (function () {
       <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Detalle de liquidación</div>
           <b style="font-family:var(--f-display);font-size:18px;color:#fff">${U.esc(titulo || '—')}</b>
-          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${regs.length} registros · ${U.money(tot, 'GTQ')} total · ${U.money(liq, 'GTQ')} liquidado · clic en estado para cambiar</div></div>
+          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${regs.length} registros · ${U.money(tot, Orbit.q.monedaPais())} total · ${U.money(liq, Orbit.q.monedaPais())} liquidado · clic en estado para cambiar</div></div>
         <button class="imp-x" id="dl-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
       <div style="overflow:auto;flex:1"><table class="tbl">
         <thead><tr><th>Periodo</th><th>Cliente</th><th>Póliza</th><th class="num">Base neta</th><th class="num">%</th><th class="num">Comisión</th><th>Estado</th></tr></thead>

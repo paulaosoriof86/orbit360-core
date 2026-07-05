@@ -75,7 +75,7 @@ Orbit.modules.configuracion = (function () {
           <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(a.nombre, a.color, 'sm')}<b>${U.esc(a.nombre)}</b></div></td>
           <td><select class="o-sel" data-role="${a.id}">${Object.keys(roles).map(r => `<option ${a.rol === r || (a.rol && a.rol.includes(r)) ? 'selected' : ''}>${r}</option>`).join('')}</select></td>
           <td>${a.comTipo ? `<span class="badge ${a.comTipo === 'variable' ? 'info' : 'neutral'}">${a.comTipo} · ${a.comPct}%</span>` : '—'}</td>
-          <td class="num">${U.money(a.metaPrima, 'GTQ')}</td>
+          <td class="num">${U.money(a.metaPrima, (a.pais === 'CO' ? 'COP' : a.pais === 'GT' ? 'GTQ' : Orbit.q.monedaPais()))}</td>
           <td style="text-align:right"><button class="btn ghost sm" onclick="Orbit.modules.equipo.editar('${a.id}')">Permisos</button></td>
         </tr>`).join('')}</tbody>
       </table></div>

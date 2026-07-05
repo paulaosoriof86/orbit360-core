@@ -33,9 +33,9 @@ Orbit.modules.comisiones = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('comisiones', `<button class="btn ghost" onclick="location.hash='#/equipo'" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">⚙ Tarifas y % (en Equipo)</button>`)}
       ${K.kpis([
-        { label: 'Comisión generada', val: U.moneyShort(tot, 'GTQ'), color: 'var(--red)', foot: 'total cartera' },
-        { label: 'Liquidada', val: U.moneyShort(liq, 'GTQ'), color: 'var(--ok)', foot: 'pagada', footTone: 'up' },
-        { label: 'Por liquidar', onclick: "location.hash='#/finanzas'", val: U.moneyShort(tot - liq, 'GTQ'), color: 'var(--warn)', foot: 'devengada' },
+        { label: 'Comisión generada', val: U.moneyShort(tot, Orbit.q.monedaPais()), color: 'var(--red)', foot: 'total cartera' },
+        { label: 'Liquidada', val: U.moneyShort(liq, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'pagada', footTone: 'up' },
+        { label: 'Por liquidar', onclick: "location.hash='#/finanzas'", val: U.moneyShort(tot - liq, Orbit.q.monedaPais()), color: 'var(--warn)', foot: 'devengada' },
         { label: 'Registros', val: all.length, color: 'var(--info)', foot: 'cuotas con comisión' }
       ])}
 
@@ -54,9 +54,9 @@ Orbit.modules.comisiones = (function () {
         <tbody>${entries.map(([k, v]) => `<tr class="clickable" onclick="Orbit.modules.comisiones.detalle('${campo}','${k}')">
           <td style="min-width:180px">${labelOf(k)}</td>
           <td style="width:34%"><div class="bar"><i style="width:${v.total / max * 100}%"></i></div></td>
-          <td class="num" style="color:var(--ok)">${U.moneyShort(v.liquidada, 'GTQ')}</td>
-          <td class="num" style="color:var(--warn)">${U.moneyShort(v.devengada, 'GTQ')}</td>
-          <td class="num"><b>${U.money(v.total, 'GTQ')}</b></td>
+          <td class="num" style="color:var(--ok)">${U.moneyShort(v.liquidada, Orbit.q.monedaPais())}</td>
+          <td class="num" style="color:var(--warn)">${U.moneyShort(v.devengada, Orbit.q.monedaPais())}</td>
+          <td class="num"><b>${U.money(v.total, Orbit.q.monedaPais())}</b></td>
           <td style="text-align:right;color:var(--ink-3)">›</td>
         </tr>`).join('')}</tbody>
       </table></div></div>
@@ -72,7 +72,7 @@ Orbit.modules.comisiones = (function () {
   /* ---- Conciliación de statement: esperado (tarifa vigente) vs pagado/registrado ---- */
   function renderConciliacion(host) {
     const c = Orbit.comeng.conciliarStatement();
-    const M = n => U.money(n, 'GTQ'), MS = n => U.moneyShort(n, 'GTQ');
+    const M = n => U.money(n, Orbit.q.monedaPais()), MS = n => U.moneyShort(n, Orbit.q.monedaPais());
     const desvColor = d => Math.abs(d) < 0.5 ? 'var(--ok)' : d < 0 ? 'var(--danger)' : 'var(--warn)';
     const conDesv = c.rows.filter(r => Math.abs(r.desv) >= 0.5).sort((a, b) => Math.abs(b.desv) - Math.abs(a.desv));
     host.innerHTML = `<div class="page">
@@ -91,14 +91,18 @@ Orbit.modules.comisiones = (function () {
       <div class="cfg-note" style="margin-bottom:12px">Compara la <b>comisión esperada</b> (recomputada con las tarifas vigentes por ramo/producto de cada aseguradora) contra la <b>registrada</b>. Detecta <b>desviaciones</b> (tarifa cambiada, pago incompleto de la aseguradora o error de dato). Importa la planilla para conciliar contra lo realmente pagado.</div>
       <div class="card" style="overflow:hidden"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">⚠️ Pólizas con desviación (${conDesv.length})</div>
       <div style="overflow-x:auto"><table class="tbl">
-        <thead><tr><th>Póliza</th><th class="num">Base neta</th><th class="num">Esperado</th><th class="num">Registrado</th><th class="num">Desviación</th><th class="num">%</th></tr></thead>
+        <thead><tr><th>Póliza</th><th>Periodo</th><th class="num">Base neta</th><th class="num">Esperado</th><th class="num">Registrado</th><th class="num">Retención</th><th class="num">Ajuste</th><th class="num">Desviación</th><th class="num">%</th><th>Conciliación</th></tr></thead>
         <tbody>${conDesv.slice(0, 40).map(r => `<tr class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${r.polizaId}')">
           <td class="mono" style="font-size:11.5px"><b>${U.esc(r.ref)}</b></td>
+          <td class="mono" style="font-size:11px">${U.esc(r.periodo || '—')}</td>
           <td class="num">${M(r.base)}</td>
           <td class="num" style="color:var(--info)">${M(r.esperado)}</td>
           <td class="num">${M(r.pagado)}</td>
+          <td class="num muted">${r.retencion ? M(r.retencion) : '—'}</td>
+          <td class="num muted">${r.ajuste ? M(r.ajuste) : '—'}</td>
           <td class="num" style="color:${desvColor(r.desv)}"><b>${r.desv >= 0 ? '+' : ''}${M(r.desv)}</b></td>
-          <td class="num" style="color:${desvColor(r.desv)}">${r.pct >= 0 ? '+' : ''}${r.pct}%</td></tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">✅ Todo cuadra con las tarifas vigentes — sin desviaciones.</td></tr>'}</tbody>
+          <td class="num" style="color:${desvColor(r.desv)}">${r.pct >= 0 ? '+' : ''}${r.pct}%</td>
+          <td>${scoreBadge(r)}</td></tr>`).join('') || '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px">✅ Todo cuadra con las tarifas vigentes — sin desviaciones.</td></tr>'}</tbody>
       </table></div></div>
     </div>`;
     host.querySelectorAll('.tab[data-v]').forEach(el => el.addEventListener('click', () => { vista = el.dataset.v; render(host); }));
@@ -130,7 +134,7 @@ Orbit.modules.comisiones = (function () {
       <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Detalle de comisiones</div>
           <b style="font-family:var(--f-display);font-size:18px;color:#fff">${U.esc(titulo)}</b>
-          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${regs.length} registros · ${U.money(tot, 'GTQ')} total · ${U.money(liq, 'GTQ')} liquidada</div></div>
+          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${regs.length} registros · ${U.money(tot, Orbit.q.monedaPais())} total · ${U.money(liq, Orbit.q.monedaPais())} liquidada</div></div>
         <button class="imp-x" id="cd-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
       </div>
       <div style="overflow:auto;flex:1"><table class="tbl">
@@ -152,6 +156,18 @@ Orbit.modules.comisiones = (function () {
     back.querySelector('#cd-x').addEventListener('click', close);
     back.querySelector('#cd-ok').addEventListener('click', close);
   }
+
+  /* Score de conciliación visible (P0-06): mapea desviación → estado validable, no aplica nada solo. */
+  function scoreConciliacion(r) {
+    const base = Math.abs(r.esperado || r.base || 0) || 1;
+    const rel = Math.abs(r.desv || 0) / base;
+    if (!r.pagado && r.esperado) return { k: 'REQUIERE_VALIDACION', t: '🔎 Requiere validación', tone: 'warn' };
+    if (Math.abs(r.desv) < 0.5) return { k: 'MATCH_EXACTO', t: '✓ Coincide', tone: 'ok' };
+    if (rel <= 0.05) return { k: 'MATCH_PROBABLE', t: '≈ Probable', tone: 'info' };
+    if (rel > 0.25) return { k: 'BLOQUEADO', t: '⛔ Bloqueado', tone: 'danger' };
+    return { k: 'REQUIERE_VALIDACION', t: '🔎 Requiere validación', tone: 'warn' };
+  }
+  function scoreBadge(r) { const s = scoreConciliacion(r); return '<span class="badge ' + s.tone + '" title="Propuesta de conciliación — requiere validación antes de aplicar">' + s.t + '</span>'; }
 
   return { render, detalle, toggleEstado, renderConciliacion };
 

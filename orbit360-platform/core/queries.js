@@ -74,7 +74,7 @@ Orbit.q = (function () {
     dias = dias || 45;
     return S().where('polizas', p => {
       const d = U.daysFromNow(p.vigenciaFin);
-      return p.estado !== 'Cancelada' && d != null && d >= 0 && d <= dias;
+      return (p.estado === 'Vigente' || p.estado === 'Por renovar') && d != null && d >= 0 && d <= dias;
     }).sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
   }
   function cobrosVencidos() {
