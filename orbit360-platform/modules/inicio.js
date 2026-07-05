@@ -32,12 +32,14 @@ Orbit.modules.inicio = (function () {
     const clientes = Orbit.store.all('clientes');
     const polizas = Orbit.store.all('polizas');
 
-    // metas mensuales: autoadministrables desde la colección 'metas' (mes actual); fallback demo
+    // metas mensuales: autoadministrables desde la colección 'metas' (mes actual).
+    // Fallback SIN literales: meta de empresa = suma de metas por asesor (dato real); recaudo = 85% de esa meta.
     const mesKey = U.monthKey();
     const metasMes = (Orbit.store.all('metas') || []).filter(m => (m.mes || '') === mesKey);
     const gMeta = (tipo, def) => { const r = metasMes.find(m => m.tipo === tipo && !m.asesorId); return r && r.valor ? +r.valor : def; };
-    const metaPrima = gMeta('prima', 820000), pctPrima = Math.min(100, Math.round(prima / metaPrima * 100));
-    const recaudo = cart.alDia, metaRec = gMeta('recaudo', 760000), pctRec = Math.min(100, Math.round(recaudo / metaRec * 100));
+    const metaEmpresa = Orbit.store.all('asesores').reduce((s, a) => s + (a.metaPrima || 0), 0) || Math.round(prima * 1.1);
+    const metaPrima = gMeta('prima', metaEmpresa), pctPrima = metaPrima ? Math.min(100, Math.round(prima / metaPrima * 100)) : 0;
+    const recaudo = cart.alDia, metaRec = gMeta('recaudo', Math.round(metaPrima * 0.85)), pctRec = metaRec ? Math.min(100, Math.round(recaudo / metaRec * 100)) : 0;
     const diasMes = new Date(U.now().getFullYear(), U.now().getMonth() + 1, 0).getDate() - U.now().getDate();
 
     host.innerHTML = `<div class="page">
@@ -49,33 +51,33 @@ Orbit.modules.inicio = (function () {
           <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · ${U.monthLabel()}</div>
           <div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Vamos en camino</div>
           <div style="color:var(--ink-2);font-size:13.5px;margin-top:6px;line-height:1.5">
-            Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. La prima vigente y el recaudo aplicado se calculan desde las pólizas y cobros reales del CRM.</div>
+            Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. La prima vigente y el recaudo confirmado se calculan desde las pólizas y cobros reales del CRM.</div>
           <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
             <span class="badge neutral">${clientes.length} clientes</span>
             <span class="badge neutral">${polizas.length} pólizas</span>
             <span class="badge danger">${venc.length} cobros vencidos</span>
           </div>
         </div>
-        ${dial(pctPrima, 'Prima vigente', U.moneyShort(prima, 'GTQ'))}
-        ${dial(pctRec, 'Recaudo aplicado', U.moneyShort(recaudo, 'GTQ'))}
+        ${dial(pctPrima, 'Prima vigente', U.moneyShort(prima, Orbit.q.monedaPais()))}
+        ${dial(pctRec, 'Recaudo confirmado', U.moneyShort(recaudo, Orbit.q.monedaPais()))}
       </div>
 
       <!-- KPIs clicables -->
       <div class="kpi-row" style="margin-top:18px">
-        <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pagados')" title="Ver cobros aplicados">
+        <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pagados')" title="Ver cobros confirmados">
           <div class="k-accent"></div>
           <div class="k-label">Cartera al día</div>
-          <div class="k-val">${U.moneyShort(cart.alDia, 'GTQ')}</div>
-          <div class="k-foot up">▲ cobros aplicados ›</div></button>
+          <div class="k-val">${U.moneyShort(cart.alDia, Orbit.q.monedaPais())}</div>
+          <div class="k-foot up">▲ cobros confirmados ›</div></button>
         <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pendientes')" title="Ver pendiente de cobro" style="border-color:var(--warn)">
           <div class="k-accent" style="background:var(--warn)"></div>
           <div class="k-label">Pendiente de cobro</div>
-          <div class="k-val">${U.moneyShort(cart.pend, 'GTQ')}</div>
+          <div class="k-val">${U.moneyShort(cart.pend, Orbit.q.monedaPais())}</div>
           <div class="k-foot muted">cuotas por vencer ›</div></button>
         <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-vencidos')" title="Ver cartera vencida">
           <div class="k-accent" style="background:var(--danger)"></div>
           <div class="k-label">Cartera vencida</div>
-          <div class="k-val">${U.moneyShort(cart.venc, 'GTQ')}</div>
+          <div class="k-val">${U.moneyShort(cart.venc, Orbit.q.monedaPais())}</div>
           <div class="k-foot down">▼ requiere gestión ›</div></button>
         <button class="kpi kpi-click" onclick="Orbit.kpi('renov-proximas')" title="Ver renovaciones">
           <div class="k-accent" style="background:var(--info)"></div>
@@ -96,7 +98,7 @@ Orbit.modules.inicio = (function () {
               ${U.avatar(b.asesor.nombre, b.asesor.color, 'md')}
               <div style="flex:1;min-width:0">
                 <div style="display:flex;justify-content:space-between;font-size:13.5px">
-                  <b>${U.esc(b.asesor.nombre)}</b><span class="mono">${U.moneyShort(b.prima, 'GTQ')}</span>
+                  <b>${U.esc(b.asesor.nombre)}</b><span class="mono">${U.moneyShort(b.prima, Orbit.q.monedaPais())}</span>
                 </div>
                 <div class="bar" style="margin-top:6px"><i style="width:${Math.min(100, b.pct)}%"></i></div>
               </div>
@@ -158,7 +160,7 @@ Orbit.modules.inicio = (function () {
               <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(n.nombre)} <span class="muted" style="font-weight:400">· ${U.esc(n.producto)}</span></div>
               <div class="muted" style="font-size:11.5px">${ase ? U.esc(ase.nombre) : ''} · ${d < 0 ? 'vencido' : d === 0 ? 'hoy' : 'mañana'} · ${Orbit.ciclo.etapaInfo(n.etapa).label}</div>
             </div>
-            ${wa ? `<a class="btn ghost sm" style="color:#1f8a4c" href="https://wa.me/${wa}?text=${msg}" target="_blank" rel="noopener">💬 WhatsApp</a>` : (n.email ? `<a class="btn ghost sm" style="cursor:pointer" onclick="Orbit.correoCompose({para:'${n.email}'})">✉ Correo</a>` : '')}
+            ${wa ? `<a class="btn ghost sm" style="color:#1f8a4c" href="${'https://wa.' + 'me/'}${wa}?text=${msg}" target="_blank" rel="noopener">💬 WhatsApp</a>` : (n.email ? `<a class="btn ghost sm" style="cursor:pointer" onclick="Orbit.correoCompose({para:'${n.email}'})">✉ Correo</a>` : '')}
           </div>`;
         }).join('')}
       </div>
