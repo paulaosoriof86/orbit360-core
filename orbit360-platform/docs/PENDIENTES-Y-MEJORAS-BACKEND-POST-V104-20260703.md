@@ -24,20 +24,15 @@
 
 ### CERRADO-FRONT-062855-EMPALME — Empalme frontend aplicado en GitHub
 - **Área:** Empalme frontend/backend.
-- **Aplicado:**
-  - `orbit360-platform/modules/conciliaciones.js` agregado.
-  - `orbit360-platform/index.html` actualizado como híbrido LAB.
-- **Regla aplicada:** no se copió `index.html` bruto del ZIP; se preservaron `backend-lab-loader`, `backend-lab-init`, `data/store-firestore-lab.local.js` y `auth labfix`.
-- **Regla operativa del módulo:** `Conciliaciones` lee y actualiza solo `Orbit.store('conciliaciones')`; no toca `cobros`, `comisiones`, `finmovs`, cartera ni producción.
+- **Aplicado:** `modules/conciliaciones.js` e `index.html` híbrido LAB.
+- **Regla aplicada:** no se copió `index.html` bruto del ZIP; se preservó Backend LAB.
+- **Regla operativa:** `Conciliaciones` lee y actualiza solo `Orbit.store('conciliaciones')`; no toca `cobros`, `comisiones`, `finmovs`, cartera ni producción.
 - **Estado:** CERRADO EN RAMA / pendiente smoke visual y validación local.
 
 ### CERRADO-FRONT-062855-SMOKE-STATIC — Smoke estático de empalme Conciliaciones
 - **Área:** QA frontend/backend bridge / Conciliaciones.
-- **Aplicado:**
-  - `tools/orbit360-validar-empalme-conciliaciones-062855-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-SMOKE-EMPALME-CONCILIACIONES-062855-AYS-20260705.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-SMOKE-EMPALME-CONCILIACIONES.md`.
-- **Regla:** valida index híbrido, carga única del módulo, visibilidad Dirección/Admin/Finanzas, actualización solo de propuestas y estado honesto validado no equivale a pagado.
+- **Aplicado:** `tools/orbit360-validar-empalme-conciliaciones-062855-ays.mjs` y documentación asociada.
+- **Regla:** valida index híbrido, carga única del módulo, roles y acciones seguras.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local y smoke visual.
 
 ### CERRADO-BE-104-19 — Perfilador de columnas por fuente
@@ -113,6 +108,16 @@
 - **Regla:** define `polizas`, `recibos`, `carteraItems`, `polizaClienteRelaciones` y `auditLog`; estados vigentes/por renovar, históricos, cartera del año actual, prima separada y producción sobre prima neta recaudada.
 - **Estado:** CERRADO COMO CONTRATO/TOOLING EN RAMA / pendiente ejecución local.
 
+### CERRADO-BE-104-30 — Modelo cobros + pagos reportados + conciliación
+- **Área:** Backend / cobros / portal pagos / conciliación / producción.
+- **Aplicado:**
+  - `tools/orbit360-validar-modelo-cobros-pagos-conciliacion-ays.mjs`.
+  - `tools/orbit360-test-validar-modelo-cobros-pagos-conciliacion-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-MODELO-COBROS-PAGOS-CONCILIACION-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-MODELO-COBROS-PAGOS-CONCILIACION.md`.
+- **Regla:** define `cobros`, `pagosReportados`, `conciliacionesCobros`, `cobroReciboRelaciones` y `auditLog`; separa cobros de `finmovs`, pagos reportados de pagos aplicados, conciliación de aplicación, cartera de banco y producción sobre prima neta recaudada.
+- **Estado:** CERRADO COMO CONTRATO/TOOLING EN RAMA / pendiente ejecución local.
+
 ---
 
 ## B. Pendientes abiertos
@@ -134,8 +139,8 @@
 - **Área:** Auth / Equipo / Roles.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-06 — Contrato cobros/pagos reportados/conciliación
-- **Área:** Backend importador / cobros / comisiones / finanzas.
+### ABIERTO-BE-104-06 — Contrato documentos/Storage/adjuntos
+- **Área:** Backend documentos / adjuntos / portal / cobros.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-07 — Junio/julio 2026 como caso especial de conciliación
@@ -189,6 +194,11 @@
 - **Necesidad:** ejecutar `node tools/orbit360-test-validar-modelo-polizas-recibos-cartera-ays.mjs`.
 - **Estado:** ABIERTO.
 
+### ABIERTO-BE-104-21 — Ejecutar tests sintéticos modelo cobros/pagos/conciliación
+- **Área:** Backend / cobros / pagos reportados / conciliación.
+- **Necesidad:** ejecutar `node tools/orbit360-test-validar-modelo-cobros-pagos-conciliacion-ays.mjs`.
+- **Estado:** ABIERTO.
+
 ---
 
 ## C. Pendientes para reportar a Claude cuando Paula pida paquete
@@ -205,9 +215,11 @@
 10. Debe conservar el checklist visual por roles y estado vacío honesto.
 11. Debe respetar modelo clientes: portal cliente sin opción de correo, calidad de datos y no creación desde fuentes financieras.
 12. Debe respetar modelo pólizas: estados, prima separada, cartera del año actual y producción sobre prima neta recaudada.
+13. Debe respetar modelo cobros: pago reportado no es cobro aplicado, conciliación validada no aplica pago por sí sola, y `finmovs` no son cobros.
+14. Debe conservar pendiente de Portal/Cobros/Documentos: adjunto de pago reportado visible y conciliable desde Cobros.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell, checklist/helper de smoke visual, contrato/modelo clientes y contrato/modelo pólizas/recibos/cartera como base para modelos de cobros/documentos. Quedan abiertos ejecución local del runner/smoke visual, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y modelos backend de cobros/documentos.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell, checklist/helper de smoke visual, contrato/modelo clientes, contrato/modelo pólizas/recibos/cartera y contrato/modelo cobros/pagos/conciliación como base para modelo de documentos/adjuntos. Quedan abiertos ejecución local del runner/smoke visual, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y modelo backend de documentos/Storage/adjuntos.
