@@ -1,148 +1,154 @@
 /* ============================================================
-   Orbit 360 · Bandeja de Conciliaciones
-   Lee y actualiza SOLO propuestas en Orbit.store('conciliaciones').
-   No toca cobros, comisiones, cartera, producción ni finmovs.
+   Orbit 360 · Bandeja de Conciliaciones (UI/prototipo)
+   Lee SOLO de Orbit.store('conciliaciones'). No toca cobros.
+   Las acciones cambian estado de la propuesta vía Orbit.store.update.
+   La aplicación real de pagos queda para backend (ChatGPT/Codex).
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
-
-(function setupConciliacionesRoute() {
-  function addAfter(arr, value, after) {
-    if (!Array.isArray(arr) || arr.indexOf(value) >= 0) return;
-    var i = arr.indexOf(after);
-    if (i >= 0) arr.splice(i + 1, 0, value); else arr.push(value);
-  }
-  function addRoute() {
-    Orbit.MODULE_TITLES = Orbit.MODULE_TITLES || {};
-    Orbit.MODULE_TITLES.conciliaciones = Orbit.MODULE_TITLES.conciliaciones || {
-      icon: '🔗', title: 'Orbit Conciliaciones', sub: 'Bandeja de propuestas',
-      features: ['Score', 'Validación', 'No aplica pagos']
-    };
-    if (Orbit.ROLES) {
-      ['Dirección', 'Admin', 'Finanzas'].forEach(function (r) {
-        if (Orbit.ROLES[r]) addAfter(Orbit.ROLES[r].modulos, 'conciliaciones', 'cobros');
-      });
-    }
-    if (Orbit.tenant) {
-      try { addAfter(Orbit.tenant.DEFAULT && Orbit.tenant.DEFAULT.modulosActivos, 'conciliaciones', 'cobros'); } catch (e) {}
-      try { addAfter(Orbit.tenant.get && Orbit.tenant.get().modulosActivos, 'conciliaciones', 'cobros'); } catch (e) {}
-    }
-    if (Array.isArray(Orbit.NAV)) {
-      var exists = false;
-      Orbit.NAV.forEach(function (g) { (g.items || []).forEach(function (it) { if (it.route === 'conciliaciones') exists = true; }); });
-      if (!exists) {
-        var crm = Orbit.NAV.find(function (g) { return g.label === 'Orbit CRM'; }) || Orbit.NAV.find(function (g) { return (g.items || []).some(function (it) { return it.route === 'cobros'; }); });
-        if (crm && Array.isArray(crm.items)) {
-          var pos = crm.items.findIndex(function (it) { return it.route === 'cobros'; });
-          crm.items.splice(pos >= 0 ? pos + 1 : crm.items.length, 0, { route: 'conciliaciones', icon: '🔗', label: 'Conciliaciones', estado: 'core' });
-        }
-      }
-    }
-  }
-  addRoute();
-
-  function sanitizeCopy() {
-    try {
-      var root = document.body;
-      if (!root) return;
-      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-      var n;
-      while ((n = walker.nextNode())) {
-        var t = n.nodeValue;
-        var r = t
-          .replace(/En el paso siguiente podés aplicar pagos por póliza\./g, 'En el paso siguiente podrás revisar propuestas de conciliación por póliza. No aplica pagos por sí sola.')
-          .replace(/En el paso siguiente puedes aplicar pagos por póliza\./g, 'En el paso siguiente podrás revisar propuestas de conciliación por póliza. No aplica pagos por sí sola.')
-          .replace(/Se aplicarán sin duplicar\./g, 'Se propondrán para validación sin duplicar.')
-          .replace(/Sin pagos pendientes de aplicar\./g, 'Sin pagos pendientes de validación.')
-          .replace(/Pendiente de aplicar/g, 'Propuesta pendiente');
-        if (r !== t) n.nodeValue = r;
-      }
-    } catch (e) {}
-  }
-  document.addEventListener('click', function () { setTimeout(sanitizeCopy, 80); }, true);
-  document.addEventListener('orbit:store', function () { setTimeout(sanitizeCopy, 80); });
-  document.addEventListener('DOMContentLoaded', sanitizeCopy);
-})();
-
 Orbit.modules.conciliaciones = (function () {
-  var ESTADOS = ['PROPUESTA', 'EN_REVISION', 'VALIDADA', 'RECHAZADA', 'BLOQUEADA', 'ANULADA', 'APLICADA'];
-  var LABELS = {
-    PROPUESTA: 'Propuesta pendiente', EN_REVISION: 'En revisión', VALIDADA: 'Validada para aplicación controlada',
-    RECHAZADA: 'Rechazada', BLOQUEADA: 'Bloqueada', ANULADA: 'Anulada', APLICADA: 'Aplicada con auditoría'
+  const U = Orbit.ui, S = () => Orbit.store, q = Orbit.q, K = Orbit.kit;
+  let fEstado = '', fFuente = '';
+
+  const ESTADOS = ['PROPUESTA', 'EN_REVISION', 'VALIDADA', 'RECHAZADA', 'BLOQUEADA', 'ANULADA', 'APLICADA'];
+  const TONE = { PROPUESTA: 'info', EN_REVISION: 'info', VALIDADA: 'ok', RECHAZADA: 'danger', BLOQUEADA: 'danger', ANULADA: 'neutral', APLICADA: 'ok' };
+  // Acciones permitidas por estado (contrato readiness)
+  const ACCIONES = {
+    PROPUESTA: ['ver_detalle', 'tomar_en_revision', 'bloquear', 'anular'],
+    EN_REVISION: ['ver_detalle', 'validar', 'rechazar', 'bloquear', 'anular'],
+    VALIDADA: ['ver_detalle', 'preparar_aplicacion_controlada', 'rechazar', 'anular'],
+    RECHAZADA: ['ver_detalle'], BLOQUEADA: ['ver_detalle'], ANULADA: ['ver_detalle'], APLICADA: ['ver_detalle']
   };
-  var ACTIONS = {
-    PROPUESTA: ['tomar_en_revision', 'bloquear', 'anular'],
-    EN_REVISION: ['validar', 'rechazar', 'bloquear', 'anular'],
-    VALIDADA: ['preparar_aplicacion_controlada', 'rechazar', 'anular'],
-    RECHAZADA: [], BLOQUEADA: [], ANULADA: [], APLICADA: []
-  };
-  var NEXT = { tomar_en_revision: 'EN_REVISION', validar: 'VALIDADA', rechazar: 'RECHAZADA', bloquear: 'BLOQUEADA', anular: 'ANULADA' };
-  var AL = { tomar_en_revision: 'Tomar en revisión', validar: 'Validar', rechazar: 'Rechazar', bloquear: 'Bloquear', anular: 'Anular', preparar_aplicacion_controlada: 'Preparar aplicación' };
-  var filtro = '';
+  const ACC_LBL = { ver_detalle: 'Ver', tomar_en_revision: 'Tomar en revisión', validar: 'Validar', rechazar: 'Rechazar', bloquear: 'Bloquear', anular: 'Anular', preparar_aplicacion_controlada: 'Preparar aplicación' };
+  // Transiciones de estado (solo cambian la propuesta, nunca cobros)
+  const TRANS = { tomar_en_revision: 'EN_REVISION', validar: 'VALIDADA', rechazar: 'RECHAZADA', bloquear: 'BLOQUEADA', anular: 'ANULADA' };
 
-  function esc(v) { return (Orbit.ui && Orbit.ui.esc) ? Orbit.ui.esc(v == null ? '' : v) : String(v == null ? '' : v).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
-  function all() { try { return (Orbit.store && Orbit.store.all && Orbit.store.all('conciliaciones')) || []; } catch (e) { return []; } }
-  function src(p) { var s = p.source_ref || p.sourceRef || {}; return [p.source_type || p.fuente || 'Fuente', s.file || s.archivo || '', s.sheet || s.hoja || '', s.row_ref || s.fila || ''].filter(Boolean).join(' · '); }
-  function link(p) { var l = p.links || {}; return [l.cliente_id && ('cliente ' + l.cliente_id), l.poliza_id && ('póliza ' + l.poliza_id), l.cobro_id && ('cobro ' + l.cobro_id), l.comision_id && ('comisión ' + l.comision_id)].filter(Boolean).join(' · ') || 'Sin vínculo operativo'; }
-  function monto(p) { var a = p.amount || {}; var v = a.value || p.amount_value || p.monto; var m = a.currency || p.currency || p.moneda || ''; return v ? (m + ' ' + v).trim() : '—'; }
-  function state(p) { return p.queue_state || p.estado_bandeja || p.estado || 'PROPUESTA'; }
-  function score(p) { return p.score_decision || p.decision || p.resultado_score || 'REQUIERE_VALIDACION'; }
-
-  function patch(id, data) {
-    try {
-      if (!Orbit.store || !Orbit.store.update) throw new Error('Store no disponible');
-      Orbit.store.update('conciliaciones', id, Object.assign({}, data, { updatedAt: new Date().toISOString() }));
-      if (Orbit.notify && Orbit.notify.ok) Orbit.notify.ok('Propuesta actualizada. No se aplicó ningún pago.');
-      render();
-    } catch (e) {
-      if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('No se pudo actualizar la propuesta: ' + e.message, 'danger');
-    }
+  function all() { try { return S().all('conciliaciones') || []; } catch (e) { return []; } }
+  function scoreBadge(sc) {
+    const t = (sc || '').toUpperCase();
+    const tone = t === 'MATCH_EXACTO' ? 'ok' : t === 'MATCH_PROBABLE' ? 'info' : t === 'BLOQUEADO' ? 'danger' : 'warn';
+    return t ? '<span class="badge ' + tone + '" style="font-size:9.5px">' + U.esc(t) + '</span>' : '—';
   }
 
-  function action(id, act) {
-    if (act === 'preparar_aplicacion_controlada') {
-      if (Orbit.ui && Orbit.ui.alert) return Orbit.ui.alert('Esta acción requiere validación backend y ejecutor autorizado. No aplica pagos ni modifica cobros.', { title: 'Aplicación controlada' });
-      alert('Requiere validación backend. No aplica pagos.');
-      return;
-    }
-    var next = NEXT[act];
-    if (!next) return;
-    patch(id, { queue_state: next, review_state: next === 'VALIDADA' ? 'VALIDADA' : (next === 'RECHAZADA' || next === 'BLOQUEADA' ? next : 'PENDIENTE') });
+  function render(host) {
+    const rows = all().filter(r => (!fEstado || (r.estado_bandeja || r.estado) === fEstado) && (!fFuente || r.fuente === fFuente));
+    const total = all();
+    const cont = {};
+    ESTADOS.forEach(e => cont[e] = total.filter(r => (r.estado_bandeja || r.estado) === e).length);
+    const fuentes = [...new Set(total.map(r => r.fuente).filter(Boolean))];
+
+    const kpis = K.kpis([
+      { label: 'Propuestas', val: cont.PROPUESTA + cont.EN_REVISION, color: 'var(--info)', foot: 'por revisar' },
+      { label: 'Validadas', val: cont.VALIDADA, color: 'var(--ok)', foot: 'listas p/ backend' },
+      { label: 'Bloqueadas / rechazadas', val: cont.BLOQUEADA + cont.RECHAZADA, color: 'var(--danger)', foot: 'requieren atención' },
+      { label: 'Aplicadas', val: cont.APLICADA, color: 'var(--ink-3)', foot: 'histórico' }
+    ]);
+
+    const chips = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 14px">'
+      + `<button class="btn ${fEstado === '' ? 'primary' : 'ghost'} sm" onclick="Orbit.modules.conciliaciones.filtro('','estado')">Todos</button>`
+      + ESTADOS.map(e => `<button class="btn ${fEstado === e ? 'primary' : 'ghost'} sm" onclick="Orbit.modules.conciliaciones.filtro('${e}','estado')">${e.replace('_', ' ')} <span class="muted">${cont[e]}</span></button>`).join('')
+      + '</div>';
+
+    const tabla = rows.length ? `<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
+      <thead><tr><th>Estado</th><th>Revisión</th><th>Score</th><th>Fuente</th><th>Archivo · fila</th><th>País/Moneda</th><th>Cliente · Póliza · Recibo</th><th class="num">Monto</th><th>Acción propuesta</th><th>Responsable</th><th>Actualizado</th><th>Acciones</th></tr></thead>
+      <tbody>${rows.map(rowHtml).join('')}</tbody></table></div></div>`
+      : `<div class="card pad" style="text-align:center;padding:44px 20px"><div style="font-size:34px;margin-bottom:8px">🗂️</div><div style="font-family:var(--f-display);font-weight:800;font-size:16px">Sin propuestas de conciliación todavía</div><p class="muted" style="font-size:13px;margin-top:6px;max-width:460px;margin-left:auto;margin-right:auto">Cuando importes un estado de cuenta o una planilla de comisión, las coincidencias aparecerán aquí como propuestas para revisar y validar. Ninguna aplica pagos por sí sola.</p></div>`;
+
+    host.innerHTML = '<div class="page">'
+      + K.banner({ icon: '🔗', title: 'Bandeja de conciliaciones', sub: 'Propuestas de cruce (banco / aseguradora / comisiones) — revisar, validar o rechazar. No aplica pagos.', features: [] })
+      + '<div class="kpi-row">' + kpis + '</div>'
+      + (fuentes.length ? `<div class="cfg-note" style="margin-bottom:10px">Fuentes: ${fuentes.map(f => `<b>${U.esc(f)}</b>`).join(' · ')} · <span class="muted">las monedas no se mezclan; cada propuesta conserva su país/moneda origen.</span></div>` : '')
+      + chips
+      + tabla
+      + '</div>';
   }
 
-  function detail(id) {
-    var p = null;
-    try { p = Orbit.store.get('conciliaciones', id); } catch (e) {}
-    if (!p) p = all().find(function (x) { return (x.id || x.proposal_id) === id; });
-    if (!p) return;
-    var html = '<div class="grid2">'
-      + '<div class="card"><h3>Propuesta</h3><p><b>Estado:</b> ' + esc(LABELS[state(p)] || state(p)) + '</p><p><b>Score:</b> ' + esc(score(p)) + '</p><p><b>Fuente:</b> ' + esc(src(p)) + '</p></div>'
-      + '<div class="card"><h3>Vínculos</h3><p>' + esc(link(p)) + '</p><p><b>Monto:</b> ' + esc(monto(p)) + '</p><p><b>País/moneda:</b> ' + esc((p.country || p.pais || '—') + '/' + (p.currency || p.moneda || '—')) + '</p></div>'
-      + '</div><div class="note warn" style="margin-top:12px">Validada no significa pagada. Esta bandeja no modifica cobros ni comisiones; solo cambia el estado de la propuesta.</div>';
-    if (Orbit.ui && Orbit.ui.drawer) Orbit.ui.drawer(html, { title: 'Detalle de conciliación', wide: true });
-    else alert(html.replace(/<[^>]+>/g, ' '));
+  function rowHtml(r) {
+    const est = r.estado_bandeja || r.estado || 'PROPUESTA';
+    const acciones = (r.acciones_permitidas || ACCIONES[est] || ['ver_detalle']);
+    const pm = (r.pais_moneda) || ((r.pais || '') + (r.moneda ? ' / ' + r.moneda : '')) || '—';
+    const cpr = r.cliente_poliza_recibo || [r.cliente, r.poliza, r.recibo].filter(Boolean).join(' · ') || '—';
+    const monto = (r.monto != null && r.moneda) ? U.money(r.monto, r.moneda) : (r.monto != null ? '<span class="muted" title="Moneda requerida">' + r.monto + ' ⚠</span>' : '—');
+    const btns = acciones.map(a => {
+      if (a === 'ver_detalle') return `<button class="btn ghost sm" onclick="Orbit.modules.conciliaciones.detalle('${r.id}')">Ver</button>`;
+      if (a === 'preparar_aplicacion_controlada') return `<button class="btn ghost sm" onclick="Orbit.modules.conciliaciones.prepararAplicacion('${r.id}')">${ACC_LBL[a]}</button>`;
+      const danger = (a === 'rechazar' || a === 'bloquear' || a === 'anular') ? ' style="color:var(--danger)"' : '';
+      return `<button class="btn ghost sm"${danger} onclick="Orbit.modules.conciliaciones.accion('${r.id}','${a}')">${ACC_LBL[a] || a}</button>`;
+    }).join(' ');
+    const bloqueos = (r.bloqueos && r.bloqueos.length) ? `<div class="muted" style="font-size:10px;color:var(--danger)">⛔ ${r.bloqueos.map(U.esc).join(', ')}</div>` : '';
+    return `<tr>
+      <td><span class="badge ${TONE[est] || 'neutral'}">${est.replace('_', ' ')}</span></td>
+      <td style="font-size:11.5px">${U.esc(r.estado_revision || '—')}</td>
+      <td>${scoreBadge(r.score || r.decision_score)}${r.decision_score && r.decision_score !== r.score ? ' <span class="muted" style="font-size:9px">' + U.esc(r.decision_score) + '</span>' : ''}</td>
+      <td style="font-size:11.5px">${U.esc(r.fuente || '—')}</td>
+      <td class="mono" style="font-size:10.5px">${U.esc(r.archivo || '—')}${r.fila ? ' · f' + r.fila : ''}</td>
+      <td class="mono" style="font-size:11px">${U.esc(pm)}</td>
+      <td style="font-size:11.5px">${U.esc(cpr)}</td>
+      <td class="num">${monto}</td>
+      <td style="font-size:11.5px">${U.esc(r.accion_propuesta || '—')}</td>
+      <td style="font-size:11.5px">${U.esc(r.responsable || '—')}</td>
+      <td class="mono" style="font-size:10.5px">${U.esc((r.ultima_actualizacion || '').toString().slice(0, 16).replace('T', ' ') || '—')}</td>
+      <td style="white-space:nowrap">${btns}${bloqueos}</td></tr>`;
   }
 
-  function row(p) {
-    var id = p.id || p.proposal_id || p.proposalId;
-    var st = state(p);
-    var acts = (ACTIONS[st] || []).map(function (a) { return '<button class="btn tiny" data-act="' + a + '" data-id="' + esc(id) + '">' + esc(AL[a]) + '</button>'; }).join(' ');
-    return '<tr><td><span class="badge info">' + esc(LABELS[st] || st) + '</span></td><td>' + esc(score(p)) + '</td><td>' + esc(src(p)) + '</td><td>' + esc((p.country || p.pais || '—') + '/' + (p.currency || p.moneda || '—')) + '</td><td>' + esc(link(p)) + '</td><td class="num">' + esc(monto(p)) + '</td><td><button class="btn tiny ghost" data-detail="' + esc(id) + '">Ver</button> ' + acts + '</td></tr>';
+  function accion(id, a) {
+    const r = S().get('conciliaciones', id); if (!r) return;
+    const permitidas = r.acciones_permitidas || ACCIONES[r.estado_bandeja || r.estado] || [];
+    if (permitidas.indexOf(a) < 0) { U.toast('Acción no permitida en este estado'); return; }
+    const nuevo = TRANS[a];
+    if (!nuevo) return;
+    // Solo muta la PROPUESTA, nunca cobros.
+    S().update('conciliaciones', id, {
+      estado_bandeja: nuevo,
+      estado_revision: a === 'validar' ? 'Validada por usuario' : a === 'rechazar' ? 'Rechazada' : a === 'tomar_en_revision' ? 'En revisión' : a === 'bloquear' ? 'Bloqueada' : 'Anulada',
+      ultima_actualizacion: new Date().toISOString(),
+      responsable: (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Usuario'
+    });
+    U.toast('✓ Propuesta → ' + nuevo.replace('_', ' '));
+    const h = document.getElementById('host'); if (h) render(h);
   }
 
-  function render() {
-    var host = document.getElementById('host');
-    if (!host) return;
-    var items = all().filter(function (p) { return !filtro || state(p) === filtro; });
-    host.innerHTML = '<section class="page"><div class="page-h"><div><div class="eyebrow">Cobros · validación</div><h1>Conciliaciones</h1><p class="muted">Bandeja de propuestas. No aplica pagos ni modifica cobros.</p></div><select id="conc-estado"><option value="">Todos los estados</option>' + ESTADOS.map(function (e) { return '<option value="' + e + '"' + (filtro === e ? ' selected' : '') + '>' + (LABELS[e] || e) + '</option>'; }).join('') + '</select></div>'
-      + (!items.length ? '<div class="empty"><b>No hay propuestas de conciliación.</b><p class="muted">Cuando el importador genere propuestas validadas, aparecerán aquí para revisión. Estado honesto: la persistencia real/auditLog sigue en backend.</p></div>'
-      : '<div class="card"><table class="tbl"><thead><tr><th>Estado</th><th>Score</th><th>Fuente</th><th>País/moneda</th><th>Vínculo</th><th>Monto</th><th>Acciones</th></tr></thead><tbody>' + items.map(row).join('') + '</tbody></table></div>')
-      + '</section>';
-    var sel = document.getElementById('conc-estado');
-    if (sel) sel.addEventListener('change', function () { filtro = sel.value; render(); });
-    host.querySelectorAll('[data-detail]').forEach(function (b) { b.addEventListener('click', function () { detail(b.dataset.detail); }); });
-    host.querySelectorAll('[data-act]').forEach(function (b) { b.addEventListener('click', function () { action(b.dataset.id, b.dataset.act); }); });
+  function prepararAplicacion(id) {
+    const r = S().get('conciliaciones', id); if (!r) return;
+    modal('⏳ Preparar aplicación controlada', `<div class="cfg-note" style="margin:0">Esta propuesta está <b>validada</b>. La aplicación real del pago (afectación de cobros y recaudo) se ejecuta mediante <b>validación controlada</b> — no se aplica desde esta bandeja.</div>
+      <div style="font-size:12.5px;margin-top:12px;line-height:1.6">Cruce propuesto:<br>• ${U.esc(r.cliente_poliza_recibo || '—')}<br>• Monto: ${(r.monto != null && r.moneda) ? U.money(r.monto, r.moneda) : (r.monto || '—')}<br>• Fuente: ${U.esc(r.fuente || '—')} · fila ${U.esc((r.fila || '—').toString())}</div>
+      <div class="muted" style="font-size:11.5px;margin-top:12px">Estado: requiere validación controlada · no aplica pago todavía.</div>`);
   }
 
-  return { render: render };
+  function detalle(id) {
+    const r = S().get('conciliaciones', id); if (!r) return;
+    const rowKV = (k, v) => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><span class="muted" style="font-size:12px">${k}</span><b style="font-size:12.5px;text-align:right">${v}</b></div>`;
+    modal('🔗 Detalle de propuesta', [
+      rowKV('Estado bandeja', U.esc(r.estado_bandeja || r.estado || '—')),
+      rowKV('Estado revisión', U.esc(r.estado_revision || '—')),
+      rowKV('Score', U.esc(r.score || r.decision_score || '—')),
+      rowKV('Fuente', U.esc(r.fuente || '—')),
+      rowKV('Archivo · fila', U.esc(r.archivo || '—') + (r.fila ? ' · ' + r.fila : '')),
+      rowKV('País / moneda', U.esc(r.pais_moneda || ((r.pais || '') + ' / ' + (r.moneda || '')) || '—')),
+      rowKV('Cliente · Póliza · Recibo', U.esc(r.cliente_poliza_recibo || '—')),
+      rowKV('Monto', (r.monto != null && r.moneda) ? U.money(r.monto, r.moneda) : (r.monto || '—')),
+      rowKV('Acción propuesta', U.esc(r.accion_propuesta || '—')),
+      rowKV('Responsable', U.esc(r.responsable || '—')),
+      rowKV('Última actualización', U.esc((r.ultima_actualizacion || '—').toString().slice(0, 16).replace('T', ' '))),
+      (r.bloqueos && r.bloqueos.length) ? `<div class="cfg-note" style="margin-top:10px;border-left:3px solid var(--danger)">⛔ Bloqueos: ${r.bloqueos.map(U.esc).join(', ')}</div>` : ''
+    ].join(''));
+  }
+
+  function modal(titulo, inner) {
+    let b = document.getElementById('conc-modal'); if (b) b.remove();
+    b = document.createElement('div'); b.id = 'conc-modal'; b.className = 'drawer-back open';
+    b.style.cssText = 'display:grid;place-items:center;z-index:210';
+    b.innerHTML = `<div class="card" style="width:min(500px,94vw);max-height:88vh;overflow:auto;padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">${titulo}</b><button class="imp-x" id="cm-x">✕</button></div>
+      <div style="padding:18px 20px">${inner}</div>
+      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn ghost" id="cm-c">Cerrar</button></div></div>`;
+    document.body.appendChild(b);
+    const close = () => b.remove();
+    b.addEventListener('click', e => { if (e.target === b) close(); });
+    b.querySelector('#cm-x').onclick = close; b.querySelector('#cm-c').onclick = close;
+  }
+
+  function filtro(v, tipo) { if (tipo === 'estado') fEstado = v; else fFuente = v; const h = document.getElementById('host'); if (h) render(h); }
+
+  return { render, accion, detalle, prepararAplicacion, filtro };
 })();
