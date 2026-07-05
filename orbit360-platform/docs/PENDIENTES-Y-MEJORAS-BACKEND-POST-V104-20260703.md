@@ -46,6 +46,19 @@
 - **Impacto:** reduce trabajo manual y permite verificar contratos antes del smoke.
 - **Estado:** CERRADO EN RAMA.
 
+### CERRADO-BE-104-06 — Score de confianza para conciliación
+
+- **Área:** Backend importador / conciliación / planillas / cobros.
+- **Necesidad:** evitar aplicación de pagos por coincidencias débiles, especialmente al cruzar planillas de comisiones, estados de cuenta de aseguradora o estado bancario.
+- **Aplicado:**
+  - `tools/orbit360-calcular-score-conciliacion-ays.mjs`.
+  - `tools/orbit360-test-score-conciliacion-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-SCORE-CONFIANZA-CONCILIACION-AYS-20260704.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-SCORE-CONCILIACION.md`.
+- **Regla:** match exacto/probable/validación/bloqueado con evidencia de póliza, recibo/cuota, cliente, aseguradora, país/moneda, monto y periodo/fecha.
+- **Impacto:** permite que planillas y estados generen propuestas trazables antes de impactar Cobros, Cliente360, Portal, Comisiones, Finanzas o Liquidaciones.
+- **Estado:** CERRADO EN RAMA / pendiente ejecución local en repo completo.
+
 ## B. Pendientes abiertos
 
 ### ABIERTO-BE-104-01 — Empalme completo del candidato Claude final en GitHub
@@ -112,6 +125,13 @@
 - **Resultado:** auditoría de archivos reales realizada. No se aceptó resumen sin verificar.
 - **Estado:** CERRADO COMO DOCUMENTACIÓN / ABIERTO PARA EJECUCIÓN DE CLAUDE.
 
+### ABIERTO-BE-104-09 — Integrar score a dry-run/manifest y bandeja de conciliación
+
+- **Área:** Backend importador / conciliaciones.
+- **Necesidad:** conectar el score seguro con el flujo de manifest/dry-run para que cada fila de planilla o estado derive en conciliación trazable.
+- **Esperado:** `dryRunReport` debe incluir score, decisión, acción propuesta, fuente, hoja/fila/bloque/periodo, país, moneda y motivo de bloqueo/validación.
+- **Estado:** ABIERTO.
+
 ## C. Pendientes para reportar a Claude cuando Paula pida paquete
 
 1. Mantener copy de Integraciones/Automatizaciones sin mostrar secretos ni referencias internas como conexión real.
@@ -126,10 +146,11 @@
 10. Planilla de comisiones debe poder actuar como fuente de conciliación de pagos aplicados solo cuando la fila real lo confirme.
 11. Portal Cliente debe mostrar pago reportado/en revisión/aplicado/conciliado sin confundir estados.
 12. Academia debe conservar avances v1.118-v1.123 e incorporar evaluación aplicada sobre pólizas, cobros, planillas y Portal.
+13. Mostrar en Importar/Comisiones/Cobros los estados de score: exacto, probable, requiere validación y bloqueado.
 
 ## D. Estado general
 
-Backend LAB reforzado. Candidata activa Claude auditada. Aún falta empalme completo GitHub, smoke real y continuidad Firestore/Auth por fases.
+Backend LAB reforzado. Candidata activa Claude auditada. Score de conciliación agregado como herramienta segura. Aún falta empalme completo GitHub, smoke real y continuidad Firestore/Auth/importadores por fases.
 
 ## E. Documentos agregados después del bloque pólizas/cartera y auditoría actual
 
@@ -137,3 +158,5 @@ Backend LAB reforzado. Candidata activa Claude auditada. Aún falta empalme comp
 - `orbit360-platform/docs/PAQUETE-CLAUDE-BLOQUE-POLIZAS-RECIBOS-CARTERA-20260704.md`
 - `orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md`
 - `orbit360-platform/docs/PAQUETE-COMPLETO-CLAUDE-ACTUALIZADO-POST-AUDITORIA-20260704.md`
+- `orbit360-platform/docs/CONTRATO-SCORE-CONFIANZA-CONCILIACION-AYS-20260704.md`
+- `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-SCORE-CONCILIACION.md`
