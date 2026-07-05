@@ -49,6 +49,7 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | Guía runner local y criterios de bloqueo | Documentado + wrapper PS | Agrega comando PowerShell, revisión de reportes, criterios de avance/bloqueo y resumen copiable al portapapeles. |
 | Checklist smoke visual Conciliaciones | Documentado + helper PS | Agrega checklist por rol, estado vacío, acciones seguras, trazabilidad y plantilla de reporte visual. |
 | Modelo clientes + asesor + portal + calidad | Contrato + tooling agregado | Define colecciones, campos, reglas de fuente, portal cliente, relación asesor y validador plan-only. |
+| Modelo pólizas + recibos + cartera | Contrato + tooling agregado | Define estados, prima separada, cartera pendiente año actual, reglas de país/moneda y validador plan-only. |
 | Seguimiento de bloques | Agregado intermedio | Este plan vivo se mantiene actualizado después de cada bloque largo. |
 
 ## 4. Bloques pendientes principales
@@ -58,7 +59,7 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | P0 | Ejecutar runner local + smoke visual/operativo Conciliaciones | Pendiente en entorno local/navegador. |
 | P0 | Adapter Firestore LAB real para `conciliaciones/auditLog` | Pendiente de ejecución local/entorno LAB y autorización. |
 | P0 | Ejecutar tests sintéticos modelo clientes | Pendiente de ejecución local. |
-| P0 | Contrato/modelo `polizas` + recibos/cartera | Pendiente. |
+| P0 | Ejecutar tests sintéticos modelo pólizas/recibos/cartera | Pendiente de ejecución local. |
 | P0 | Contrato/modelo `cobros` + pagos reportados + conciliación | Pendiente. |
 | P0 | Contrato/modelo `documentos` + Storage futuro | Pendiente. |
 | P0 | Smokes de roles: cliente/asesor/cobros/admin | Pendiente. |
@@ -174,6 +175,14 @@ Relación con plan principal: base para contratos posteriores de pólizas, cobro
 
 Estado: contrato y tooling agregados; pendiente ejecución local.
 
+### Intermedio 15 — Validador modelo pólizas/recibos/cartera plan-only
+
+Motivo: antes de cobros y conciliación faltaba fijar contrato de pólizas, recibos, cartera, estados y primas separadas.
+
+Relación con plan principal: base para contrato posterior de cobros, pagos reportados y conciliación.
+
+Estado: contrato y tooling agregados; pendiente ejecución local.
+
 ## 6. Formato obligatorio de cierre de cada bloque
 
 Cada respuesta de continuidad debe cerrar con:
@@ -200,22 +209,23 @@ Regla fija solicitada por Paula: siempre indicar qué se adelantó, si se agreg�
 Continuar con:
 
 ```txt
-Preparar contrato/modelo backend de polizas + recibos + cartera.
+Preparar contrato/modelo backend de cobros + pagos reportados + conciliación.
 ```
 
 Condición: no avanzar a adapter Firestore LAB real hasta que el runner local y el smoke visual de Conciliaciones estén ejecutados/revisados.
 
-El nuevo bloque de pólizas debe mantener:
+El nuevo bloque de cobros debe mantener:
 
 - tenant isolation;
 - fuentes separadas;
-- no crear clientes sin contrato validado;
-- pólizas Vigente/Por renovar generan recibos/cartera cuando país/moneda/estado sean confiables;
-- Cancelada/Vencida/Anulada/Rechazada como histórico;
-- cartera solo pendiente del año actual;
-- prima neta/gastos/impuestos/total separados;
+- cobros/recaudos no son `finmovs`;
+- estado bancario solo propone conciliación;
+- pagos reportados quedan pendientes de aprobación/conciliación;
+- producción sobre prima neta recaudada;
+- no modificar cartera sin conciliación;
+- trazabilidad fuente/archivo/hoja/fila/período;
 - impacto en Academia/manuales.
 
 ## 8. Estado
 
-Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper de ejecución local, checklist/helper de smoke visual y contrato/modelo clientes. No avanzar a datos reales, aplicación controlada, Firestore writes ni deploy sin smoke local y autorización.
+Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper de ejecución local, checklist/helper de smoke visual, contrato/modelo clientes y contrato/modelo pólizas/recibos/cartera. No avanzar a datos reales, aplicación controlada, Firestore writes ni deploy sin smoke local y autorización.
