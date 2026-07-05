@@ -36,66 +36,52 @@
 
 ### CERRADO-BE-104-06 — Score de confianza para conciliación
 - **Área:** Backend importador / conciliación / planillas / cobros.
-- **Aplicado:**
-  - `tools/orbit360-calcular-score-conciliacion-ays.mjs`.
-  - `tools/orbit360-test-score-conciliacion-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-SCORE-CONFIANZA-CONCILIACION-AYS-20260704.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-SCORE-CONCILIACION.md`.
+- **Aplicado:** `tools/orbit360-calcular-score-conciliacion-ays.mjs`, tests y contrato.
 - **Regla:** match exacto/probable/validación/bloqueado con evidencia de póliza, recibo/cuota, cliente, aseguradora, país/moneda, monto y periodo/fecha.
 - **Estado:** CERRADO EN RAMA / pendiente ejecución local en repo completo.
 
 ### CERRADO-BE-104-07 — Contrato y validador dryRunReport importador
 - **Área:** Backend importador / parser / dry-run / conciliación.
-- **Aplicado:**
-  - `tools/orbit360-validar-dryrun-report-ays.mjs`.
-  - `tools/orbit360-test-validar-dryrun-report-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-DRYRUN-REPORT-IMPORTADOR-AYS-20260704.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-DRYRUN-REPORT.md`.
+- **Aplicado:** `tools/orbit360-validar-dryrun-report-ays.mjs`, tests, contrato y bitácora.
 - **Regla:** no se permite `write_enabled=true`, payload/filas reales, conteos inconsistentes ni país/moneda incoherente.
 - **Estado:** CERRADO EN RAMA / pendiente integración al parser/importador real.
 
 ### CERRADO-BE-104-08 — Contrato y validador de bandeja `conciliaciones`
 - **Área:** Backend / Firestore LAB / conciliaciones.
-- **Aplicado:**
-  - `tools/orbit360-validar-conciliacion-propuesta-ays.mjs`.
-  - `tools/orbit360-test-validar-conciliacion-propuesta-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-BANDEJA-CONCILIACIONES-AYS-20260704.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-BANDEJA-CONCILIACIONES.md`.
+- **Aplicado:** `tools/orbit360-validar-conciliacion-propuesta-ays.mjs`, tests, contrato y bitácora.
 - **Regla:** una propuesta no puede venir como `APLICADA`, no puede traer `write_enabled=true`, no puede traer `apply_payment=true`, no puede traer payload/filas reales y no puede modificar cobros directamente.
 - **Estado:** CERRADO EN RAMA / pendiente implementación Firestore LAB y flujo de aplicación controlada.
 
 ### CERRADO-BE-104-09 — Generador dryRunReport → propuestas `conciliaciones`
 - **Área:** Backend importador / dry-run / conciliación / bandeja.
-- **Aplicado:**
-  - `tools/orbit360-generar-propuestas-conciliacion-ays.mjs`.
-  - `tools/orbit360-test-generar-propuestas-conciliacion-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-GENERACION-PROPUESTAS-CONCILIACION-AYS-20260704.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-GENERADOR-PROPUESTAS-CONCILIACION.md`.
+- **Aplicado:** `tools/orbit360-generar-propuestas-conciliacion-ays.mjs`, tests, contrato y bitácora.
 - **Regla:** convierte candidatos validados del dry-run en propuestas estructuradas, sin persistir ni aplicar pagos.
 - **Prueba local sintética:** 5 casos, 0 fallos.
 - **Estado:** CERRADO EN RAMA / pendiente persistencia Firestore LAB.
 
 ### CERRADO-BE-104-10 — Plan de persistencia LAB para `conciliaciones`
 - **Área:** Backend / Firestore LAB / conciliaciones.
-- **Aplicado:**
-  - `tools/orbit360-preparar-persistencia-conciliaciones-lab-ays.mjs`.
-  - `tools/orbit360-test-preparar-persistencia-conciliaciones-lab-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-PLAN-PERSISTENCIA-CONCILIACIONES-LAB-AYS-20260704.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-PLAN-PERSISTENCIA-CONCILIACIONES.md`.
+- **Aplicado:** `tools/orbit360-preparar-persistencia-conciliaciones-lab-ays.mjs`, tests, contrato y bitácora.
 - **Regla:** genera operaciones `upsert_conciliacion_propuesta` plan-only; bloquea lote con payload real, tenant mezclado, banderas de escritura/aplicación; bloquea operaciones con estado `APLICADA`, fuente inválida, ID duplicado o país/moneda incoherente.
 - **Prueba local sintética:** 6 casos, 0 fallos.
 - **Estado:** CERRADO EN RAMA / pendiente ejecutor LAB aprobado.
 
 ### CERRADO-BE-104-11 — Auditoría y documentación candidato Claude `211525.464`
 - **Área:** Auditoría Claude / continuidad frontend-backend.
-- **Aplicado:**
-  - `orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-211525.md`.
-  - `orbit360-platform/docs/PROMPT-CLAUDE-CANDIDATO-211525-CIERRE-PENDIENTES-20260704.md`.
-  - `orbit360-platform/docs/NOTA-PARA-CLAUDE-PENDIENTES-CANDIDATO-211525-NO-ATENDIDO-20260704.md`.
-  - `orbit360-platform/docs/PLAN-EMPALME-SEGURO-CANDIDATO-CLAUDE-211525-20260704.md`.
-  - `tools/orbit360-empalmar-candidato-claude-211525-ays.ps1`.
+- **Aplicado:** auditoría forense, prompt de cierre, nota de pendientes no atendidos, plan de empalme seguro y pipeline PowerShell de empalme.
 - **Regla:** Claude perdió capacidad; sus pendientes quedan vivos hasta nuevo paquete. El empalme debe ser por pipeline seguro, excluyendo backend protegido y preservando loader/init/store LAB.
 - **Estado:** CERRADO COMO DOCUMENTACIÓN Y PIPELINE / pendiente ejecución local de empalme y smoke.
+
+### CERRADO-BE-104-12 — Validador de transiciones `conciliaciones`
+- **Área:** Backend / conciliaciones / auditLog / aplicación controlada.
+- **Aplicado:**
+  - `tools/orbit360-validar-transicion-conciliacion-ays.mjs`.
+  - `tools/orbit360-test-validar-transicion-conciliacion-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-TRANSICIONES-CONCILIACIONES-AYS-20260704.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-TRANSICIONES-CONCILIACIONES.md`.
+- **Regla:** valida `PROPUESTA -> EN_REVISION -> VALIDADA -> APLICADA` sin saltos, exige actor/rol/motivo, país/moneda coherente, target para aplicación y bloquea payload/secrets.
+- **Prueba local sintética:** 8 casos, 0 fallos.
+- **Estado:** CERRADO EN RAMA / pendiente ejecutor LAB e integración con auditLog real.
 
 ---
 
@@ -132,7 +118,6 @@
 ### ABIERTO-BE-104-06 — Contrato pólizas/recibos/cartera/conciliación
 - **Área:** Backend importador / pólizas / cobros / comisiones / finanzas.
 - **Necesidad:** alinear generación de recibos, cartera activa, estados de póliza, país/moneda, planillas de comisiones y conciliación con aseguradoras.
-- **Documento:** `orbit360-platform/docs/CONTRATO-POLIZAS-RECIBOS-CARTERA-CONCILIACION-AYS-20260704.md`.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-07 — Junio/julio 2026 como caso especial de conciliación
@@ -142,7 +127,6 @@
 
 ### ABIERTO-BE-104-08 — Pendientes Claude acumulados hasta próximo paquete
 - **Área:** Coordinación Claude / Frontend / Academia.
-- **Necesidad:** mantener vivos pendientes no atendidos por pérdida de capacidad.
 - **Documento:** `orbit360-platform/docs/NOTA-PARA-CLAUDE-PENDIENTES-CANDIDATO-211525-NO-ATENDIDO-20260704.md`.
 - **Pendientes vivos:** documentación global, copy residual de importador/planilla, nota sobre `conciliacionPropuesta`, Academia por ramo.
 - **Estado:** ABIERTO hasta que Paula pida nuevo paquete Claude.
@@ -161,7 +145,7 @@
 ### ABIERTO-BE-104-11 — Flujo de aplicación controlada
 - **Área:** Backend / cobros / comisiones / auditLog / notificaciones.
 - **Necesidad:** diseñar el paso posterior donde una propuesta `VALIDADA` puede aplicar cobro/comisión con auditoría.
-- **Esperado:** `propuesta VALIDADA -> aplicar cobro/comisión -> auditLog -> notificación -> actualización Portal/Cliente360/Cobros`, sin saltarse revisión.
+- **Esperado:** `propuesta VALIDADA -> validar transición -> aplicar cobro/comisión -> auditLog -> notificación -> actualización Portal/Cliente360/Cobros`, sin saltarse revisión.
 - **Estado:** ABIERTO.
 
 ---
@@ -182,7 +166,7 @@
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada como avance incremental, no como cierre final. Quedan pendientes Claude documentales y de copy hasta próximo paquete. Se agregó pipeline de empalme seguro para no pisar backend protegido. Backend continúa por fases sobre conciliación: parser real, persistencia LAB en `conciliaciones` y flujo de aplicación controlada.
+Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada como avance incremental, no como cierre final. Quedan pendientes Claude documentales y de copy hasta próximo paquete. Se agregó pipeline de empalme seguro para no pisar backend protegido. Backend continúa por fases sobre conciliación: parser real, persistencia LAB en `conciliaciones`, transiciones auditadas y flujo de aplicación controlada.
 
 ---
 
@@ -192,4 +176,8 @@ Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada co
 - `orbit360-platform/docs/PROMPT-CLAUDE-CANDIDATO-211525-CIERRE-PENDIENTES-20260704.md`
 - `orbit360-platform/docs/NOTA-PARA-CLAUDE-PENDIENTES-CANDIDATO-211525-NO-ATENDIDO-20260704.md`
 - `orbit360-platform/docs/PLAN-EMPALME-SEGURO-CANDIDATO-CLAUDE-211525-20260704.md`
+- `orbit360-platform/docs/CONTRATO-TRANSICIONES-CONCILIACIONES-AYS-20260704.md`
+- `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-TRANSICIONES-CONCILIACIONES.md`
 - `tools/orbit360-empalmar-candidato-claude-211525-ays.ps1`
+- `tools/orbit360-validar-transicion-conciliacion-ays.mjs`
+- `tools/orbit360-test-validar-transicion-conciliacion-ays.mjs`
