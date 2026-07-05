@@ -100,6 +100,15 @@
 - **Regla:** valida plan de persistencia antes de adapter LAB; bloquea payload/filas reales, secretos, banderas de escritura/aplicación, tenants mezclados, estados `APLICADA`, moneda incoherente o rutas sin aislamiento tenant.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local.
 
+### CERRADO-BE-104-25 — Runner agrupado de validaciones locales Conciliaciones
+- **Área:** QA backend/frontend bridge / conciliaciones / validaciones locales.
+- **Aplicado:**
+  - `tools/orbit360-run-validaciones-locales-conciliaciones-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-RUNNER-VALIDACIONES-LOCALES-CONCILIACIONES-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-RUNNER-VALIDACIONES-LOCALES-CONCILIACIONES.md`.
+- **Regla:** agrupa smoke estático, test orquestador, test readiness y `node --check`; calcula hash antes/después de archivos protegidos y bloquea si cambian.
+- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local.
+
 ---
 
 ## B. Pendientes abiertos
@@ -161,11 +170,16 @@
 ### ABIERTO-BE-104-16 — Ejecución local del orquestador score/propuestas plan-only
 - **Área:** Backend / importador / score / propuestas / persistencia planificada.
 - **Necesidad:** ejecutar `tools/orbit360-test-orquestar-score-propuestas-plan-ays.mjs` en entorno local/repo completo y revisar reportes antes de cualquier persistencia LAB.
-- **Estado:** ABIERTO.
+- **Estado:** ABIERTO / agrupado en runner.
 
 ### ABIERTO-BE-104-17 — Ejecución local del readiness plan persistencia LAB
 - **Área:** Backend / conciliaciones / adapter LAB futuro.
 - **Necesidad:** ejecutar `tools/orbit360-test-validar-readiness-plan-persistencia-lab-ays.mjs` y revisar reportes antes de cualquier adapter Firestore LAB.
+- **Estado:** ABIERTO / agrupado en runner.
+
+### ABIERTO-BE-104-18 — Ejecución local del runner agrupado Conciliaciones
+- **Área:** QA local / conciliaciones / reportes.
+- **Necesidad:** ejecutar `node tools/orbit360-run-validaciones-locales-conciliaciones-ays.mjs` en entorno local, revisar `_orbit360_reports` y confirmar que no hubo cambios en archivos protegidos.
 - **Estado:** ABIERTO.
 
 ---
@@ -179,9 +193,10 @@
 5. Si Claude vuelve a modificar Conciliaciones, debe revisar manuales, Academia, rutas por rol y evaluaciones relacionadas.
 6. Debe mostrar como estado honesto: propuesta/lista para revisión/pendiente de validación, no pago aplicado.
 7. Debe conservar el lenguaje de readiness: plan listo no equivale a persistencia ni a pago aplicado.
+8. Debe conservar el runner local como paso de QA previo a cualquier cambio que afecte Conciliaciones.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only y readiness plan de persistencia LAB como intermedios entre manifest y futura persistencia LAB. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y ejecución local de los tests de orquestador/readiness.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB y runner agrupado de validaciones locales como intermedios entre manifest y futura persistencia LAB. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y ejecución local del runner agrupado.
