@@ -119,19 +119,26 @@ Define:
 - tratamiento especial de junio/julio 2026 como caso de migración, no hardcode productivo;
 - impacto en Cliente360, Portal, analíticas, metas, comisiones, liquidaciones, notificaciones y reportes.
 
-Hallazgos que Claude debe respetar:
+### 6. Auditoría real de la candidata activa Claude
 
-- `core/importa.js` del prototipo aún contiene defaults de país que no son aceptables para escritura real.
-- `modules/polizas.js`, `modules/cobros.js`, `modules/cliente360.js` y `modules/comisiones.js` tienen áreas con moneda fija GTQ en KPIs o totales.
-- la conciliación actual es útil como prototipo, pero insuficiente para producción si solo cruza por póliza/monto.
-- `KINDS` muestra planillas de comisión, pero falta contrato técnico completo en `IMPORT_MAP`/backend real.
-- Portal reporta pagos correctamente como pendientes de validación, pero debe reforzar estados visibles para cliente y equipo.
+Archivos agregados:
+
+- `orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md`
+- `orbit360-platform/docs/PAQUETE-COMPLETO-CLAUDE-ACTUALIZADO-POST-AUDITORIA-20260704.md`
+
+Resultado:
+
+- El candidato activo `Prototype Development Request - 2026-07-04T152321.882.zip` fue auditado sobre archivos reales.
+- Tiene 97 archivos, 54 JS y 30 módulos.
+- Los 54 JS pasaron validación sintáctica.
+- Se comparó contra el ZIP anterior disponible.
+- La candidata actual ya resolvió parte de los hallazgos que estaban abiertos en la rama GitHub, especialmente en importador, país/moneda, planillas de comisión, documentos como parches y estado bancario como conciliación.
 
 Implicación para Claude:
 
-- El próximo candidato debe reforzar UX honesta: propuesta, en revisión, aplicado, conciliado, bloqueado o requiere validación.
-- No debe presentar aplicación real si backend/conector no está activo.
-- No debe perder avances de Academia profunda, especialmente rutas Administrativo/Operativo y Cliente nuevo.
+- El próximo trabajo debe partir de esa candidata, no de una versión anterior.
+- No se debe pedir que corrija algo que ya está corregido; debe conservar esas mejoras y completar lo pendiente.
+- Debe unificar documentación de versión: v1.114/v1.117/v1.123.
 
 ## Backend protegido que Claude no debe tocar
 
@@ -153,6 +160,7 @@ Implicación para Claude:
 6. Actualizar smoke visual real clic por clic.
 7. Alinear Importar con fuentes separadas, manifests, país/moneda y contratos reales.
 8. Alinear Pólizas/Cobros/Cliente360/Portal/Comisiones/Finanzas con el contrato de cartera y conciliación.
+9. Conservar avances ya verificados de la candidata activa 2026-07-04T152321.882.
 
 ## Criterio de aceptación post-Claude
 
