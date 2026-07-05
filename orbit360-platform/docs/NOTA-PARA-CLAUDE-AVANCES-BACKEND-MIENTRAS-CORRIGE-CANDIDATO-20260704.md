@@ -102,6 +102,37 @@ Implicación para Claude:
 - El UI puede sugerir país/moneda, pero debe dejar claro si requiere validación.
 - No generar cartera, cobros, pólizas ni producción si falta país/moneda confiable.
 
+### 5. Contrato pólizas, recibos/cartera y conciliación
+
+Archivos agregados:
+
+- `orbit360-platform/docs/CONTRATO-POLIZAS-RECIBOS-CARTERA-CONCILIACION-AYS-20260704.md`
+- `orbit360-platform/docs/PAQUETE-CLAUDE-BLOQUE-POLIZAS-RECIBOS-CARTERA-20260704.md`
+
+Define:
+
+- estados de póliza que generan cartera y estados históricos;
+- campos mínimos para `polizas`, `cobros` y `conciliaciones`;
+- reglas de prima neta/gastos/IVA/total;
+- conciliación con aseguradoras;
+- conciliación con planillas de comisiones;
+- tratamiento especial de junio/julio 2026 como caso de migración, no hardcode productivo;
+- impacto en Cliente360, Portal, analíticas, metas, comisiones, liquidaciones, notificaciones y reportes.
+
+Hallazgos que Claude debe respetar:
+
+- `core/importa.js` del prototipo aún contiene defaults de país que no son aceptables para escritura real.
+- `modules/polizas.js`, `modules/cobros.js`, `modules/cliente360.js` y `modules/comisiones.js` tienen áreas con moneda fija GTQ en KPIs o totales.
+- la conciliación actual es útil como prototipo, pero insuficiente para producción si solo cruza por póliza/monto.
+- `KINDS` muestra planillas de comisión, pero falta contrato técnico completo en `IMPORT_MAP`/backend real.
+- Portal reporta pagos correctamente como pendientes de validación, pero debe reforzar estados visibles para cliente y equipo.
+
+Implicación para Claude:
+
+- El próximo candidato debe reforzar UX honesta: propuesta, en revisión, aplicado, conciliado, bloqueado o requiere validación.
+- No debe presentar aplicación real si backend/conector no está activo.
+- No debe perder avances de Academia profunda, especialmente rutas Administrativo/Operativo y Cliente nuevo.
+
 ## Backend protegido que Claude no debe tocar
 
 - `orbit360-platform/data/store.js`
@@ -121,6 +152,7 @@ Implicación para Claude:
 5. Documentar cada corrección en bitácoras.
 6. Actualizar smoke visual real clic por clic.
 7. Alinear Importar con fuentes separadas, manifests, país/moneda y contratos reales.
+8. Alinear Pólizas/Cobros/Cliente360/Portal/Comisiones/Finanzas con el contrato de cartera y conciliación.
 
 ## Criterio de aceptación post-Claude
 
@@ -133,4 +165,4 @@ El candidato será revisado por ChatGPT/Codex con pipeline seguro:
 5. revisión manual;
 6. empalme aditivo solo si no pisa backend protegido.
 
-No habrá merge, deploy, carga LAB ni datos reales sin autorización explícita.
+No habrá merge, deploy, carga LAB ni datos reales sin autorización explícita de Paula.
