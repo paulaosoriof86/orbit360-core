@@ -7,104 +7,37 @@
 
 ---
 
-## A. Pendientes cerrados / avances backend ya documentados
+## A. Pendientes cerrados / avances documentados
 
-### CERRADO-BE-104-01 — Loader LAB con tenant allowlist
-- **Área:** Backend LAB / Seguridad tenant.
-- **Estado:** CERRADO EN RAMA.
+### CERRADO-BE-104-01 a CERRADO-BE-104-18 — Backend LAB, conciliaciones y fuentes separadas
+- **Área:** Backend LAB / Firestore LAB / conciliaciones / importadores.
+- **Estado:** CERRADO COMO TOOLING EN RAMA.
+- **Resumen:** loader/init/guard LAB, validadores, score conciliación, dryRunReport, propuestas `conciliaciones`, plan de persistencia, transiciones, ejecutor local mirror, adapter Firestore LAB preparado, smoke E2E sintético, readiness UI, planificador de aplicación controlada y manifest por fuentes separadas alineado a `conciliaciones`.
+- **Restricción vigente:** no hay backend productivo ni writes reales de pagos; todo sigue protegido hasta ejecución/smoke autorizado.
 
-### CERRADO-BE-104-02 — Init Firebase LAB con validación de config
-- **Área:** Backend LAB / Firebase init.
-- **Estado:** CERRADO EN RAMA.
-
-### CERRADO-BE-104-03 — Guard runtime contra secretos y auth incorrecta
-- **Área:** Backend LAB / Integraciones / Auth.
-- **Estado:** CERRADO EN RAMA / pendiente smoke real.
-
-### CERRADO-BE-104-04 — Script de integración local v104
-- **Área:** Tools / Index central.
-- **Estado:** CERRADO EN RAMA.
-
-### CERRADO-BE-104-05 — Validador estático backend LAB
-- **Área:** QA backend.
-- **Estado:** CERRADO EN RAMA.
-
-### CERRADO-BE-104-06 — Score de confianza para conciliación
-- **Área:** Backend importador / conciliación / planillas / cobros.
-- **Estado:** CERRADO EN RAMA / pendiente ejecución local en repo completo.
-
-### CERRADO-BE-104-07 — Contrato y validador dryRunReport importador
-- **Área:** Backend importador / parser / dry-run / conciliación.
-- **Estado:** CERRADO EN RAMA / pendiente integración al parser/importador real.
-
-### CERRADO-BE-104-08 — Contrato y validador de bandeja `conciliaciones`
-- **Área:** Backend / Firestore LAB / conciliaciones.
-- **Estado:** CERRADO EN RAMA / pendiente implementación Firestore LAB y flujo de aplicación controlada.
-
-### CERRADO-BE-104-09 — Generador dryRunReport → propuestas `conciliaciones`
-- **Área:** Backend importador / dry-run / conciliación / bandeja.
-- **Estado:** CERRADO EN RAMA / pendiente persistencia Firestore LAB.
-
-### CERRADO-BE-104-10 — Plan de persistencia LAB para `conciliaciones`
-- **Área:** Backend / Firestore LAB / conciliaciones.
-- **Estado:** CERRADO EN RAMA / pendiente ejecutor LAB aprobado.
-
-### CERRADO-BE-104-11 — Auditoría y documentación candidato Claude `211525.464`
-- **Área:** Auditoría Claude / continuidad frontend-backend.
-- **Estado:** CERRADO COMO DOCUMENTACIÓN Y PIPELINE / pendiente ejecución local de empalme y smoke.
-
-### CERRADO-BE-104-12 — Validador de transiciones `conciliaciones`
-- **Área:** Backend / conciliaciones / auditLog / aplicación controlada.
-- **Estado:** CERRADO EN RAMA / pendiente ejecutor LAB e integración con auditLog real.
-
-### CERRADO-BE-104-13 — Ejecutor LAB local de persistencia `conciliaciones`
-- **Área:** Backend / conciliaciones / auditLog / persistencia LAB.
-- **Estado:** CERRADO EN RAMA / pendiente adapter Firestore LAB directo y UI/bandeja.
-
-### CERRADO-BE-104-14 — Adapter Firestore LAB para `conciliaciones/auditLog` preparado
-- **Área:** Backend / Firestore LAB / conciliaciones / auditLog.
-- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecutar `-Apply` local y smoke de extremo a extremo.
-
-### CERRADO-BE-104-15 — Smoke E2E sintético de conciliaciones LAB
-- **Área:** Backend / QA / conciliaciones / LAB readiness.
-- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local real y readiness UI/bandeja.
-
-### CERRADO-BE-104-16 — Readiness UI/Bandeja `conciliaciones`
-- **Área:** Backend/frontend bridge / conciliaciones / UI readiness.
-- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local y construcción UI/bandeja.
-
-### CERRADO-BE-104-17 — Planificador de aplicación controlada desde `conciliaciones`
-- **Área:** Backend / conciliaciones / cobros / comisiones / auditLog.
-- **Regla:** herramienta plan-only; valida propuesta `VALIDADA`, actor, trazabilidad, país/moneda, monto y target; no escribe Firestore, no toca `cobros/comisiones`, no aplica pagos y no genera producción.
-- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente conectar a UI/Bandeja y futuro ejecutor autorizado.
-
-### CERRADO-BE-104-18 — Manifest por fuentes separadas alineado a `conciliaciones`
-- **Área:** Backend / importador / parser / fuentes separadas / conciliación.
-- **Regla:** banco, planillas y cobros realizados proponen hacia `conciliaciones`, no a `cobros`; financiero histórico solo a `finmovs`; documentos soporte solo a documentos/parches pendientes; no filas reales ni banderas de escritura en manifest.
-- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local y perfilador de columnas por fuente.
-
-### CERRADO-FRONT-062855 — Candidata Claude `062855.313` auditada y apta para empalme seguro
+### CERRADO-FRONT-062855 — Candidata Claude `062855.313` auditada
 - **Área:** Auditoría Claude / frontend / bandeja conciliaciones.
 - **Archivo auditado:** `Prototype Development Request - 2026-07-05T062855.313.zip`.
-- **Aplicado/documentado:**
-  - `orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260705-062855.md`.
-  - `tools/orbit360-empalmar-candidato-claude-062855-ays.ps1`.
+- **Documento:** `orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260705-062855.md`.
 - **Resultado:** no hay crítico. Corrigió ruta `conciliaciones` en tenant, rol Admin y copy residual de importador.
-- **Regla de empalme:** no copiar `index.html` bruto; usar index híbrido que preserva backend LAB.
-- **Estado:** CERRADO COMO AUDITORÍA / listo para empalme seguro local y smoke.
+- **Estado:** CERRADO COMO AUDITORÍA.
+
+### CERRADO-FRONT-062855-EMPALME — Empalme frontend aplicado en GitHub
+- **Área:** Empalme frontend/backend.
+- **Aplicado:**
+  - `orbit360-platform/modules/conciliaciones.js` agregado.
+  - `orbit360-platform/index.html` actualizado como híbrido LAB.
+- **Regla aplicada:** no se copió `index.html` bruto del ZIP; se preservaron `backend-lab-loader`, `backend-lab-init`, `data/store-firestore-lab.local.js` y `auth labfix`.
+- **Regla operativa del módulo:** `Conciliaciones` lee y actualiza solo `Orbit.store('conciliaciones')`; no toca `cobros`, `comisiones`, `finmovs`, cartera ni producción.
+- **Estado:** CERRADO EN RAMA / pendiente smoke visual y validación local.
 
 ---
 
 ## B. Pendientes abiertos
 
-### ABIERTO-BE-104-01 — Ejecutar empalme seguro del candidato `062855.313`
-- **Área:** Empalme frontend/backend.
-- **Herramienta:** `tools/orbit360-empalmar-candidato-claude-062855-ays.ps1`.
-- **Necesidad:** ejecutar sobre repo local con backup, exclusión de backend protegido e index híbrido LAB.
-- **Estado:** ABIERTO / requiere entorno local o ejecución Codex con acceso al repo.
-
 ### ABIERTO-BE-104-02 — Smoke visual/operativo real sobre rama empalmada
 - **Área:** QA / Navegador.
+- **Necesidad:** abrir la plataforma y validar que Conciliaciones aparezca para Dirección/Admin/Finanzas, que renderice vacío honestamente y que acciones no toquen cobros.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-03 — Decisión sobre `index.html` permanente
@@ -147,9 +80,9 @@
 - **Área:** Backend/frontend bridge.
 - **Estado:** ABIERTO / requiere entorno local o mirror generado.
 
-### ABIERTO-BE-104-13 — UI/Bandeja `conciliaciones`
-- **Área:** Frontend/Backend bridge / Claude.
-- **Estado:** EN CANDIDATA 062855 / pendiente empalme y smoke.
+### ABIERTO-BE-104-13 — Smoke UI/Bandeja `conciliaciones`
+- **Área:** Frontend/Backend bridge.
+- **Estado:** EMPALMADO / pendiente smoke visual.
 
 ### ABIERTO-BE-104-14 — Futuro ejecutor autorizado de aplicación controlada
 - **Área:** Backend / cobros / comisiones / auditLog / notificaciones.
@@ -173,4 +106,4 @@
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` no tiene críticos y queda apta para empalme seguro, con la condición de preservar backend LAB e index híbrido. Backend continúa por fases: parser real, manifest por fuente, perfilador de columnas, dryRunReport, score, propuestas, persistencia LAB, smoke local, bandeja y futuro ejecutor autorizado pendiente.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, perfilador de columnas, score real y futuro ejecutor autorizado.
