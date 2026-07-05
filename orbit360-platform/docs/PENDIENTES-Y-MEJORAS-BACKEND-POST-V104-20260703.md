@@ -42,89 +42,56 @@
 
 ### CERRADO-BE-104-19 — Perfilador de columnas por fuente
 - **Área:** Backend / importador / parser / fuentes separadas.
-- **Aplicado:**
-  - `tools/orbit360-perfilar-columnas-fuente-ays.mjs`.
-  - `tools/orbit360-test-perfilar-columnas-fuente-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-PERFILADOR-COLUMNAS-FUENTE-AYS-20260705.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-PERFILADOR-COLUMNAS-FUENTE.md`.
+- **Aplicado:** `tools/orbit360-perfilar-columnas-fuente-ays.mjs`, test y documentación asociada.
 - **Regla:** perfila metadata de columnas por fuente; no lee filas reales, no escribe, no aplica pagos y no genera cartera/producción.
 - **Estado:** CERRADO COMO TOOLING EN RAMA.
 
 ### CERRADO-BE-104-20 — Constructor de dryRunReport sin payload real
 - **Área:** Backend / importador / parser / dryRunReport.
-- **Aplicado:**
-  - `tools/orbit360-construir-dryrun-report-fuente-ays.mjs`.
-  - `tools/orbit360-test-construir-dryrun-report-fuente-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-CONSTRUCTOR-DRYRUN-REPORT-FUENTE-AYS-20260705.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-CONSTRUCTOR-DRYRUN-REPORT.md`.
-- **Regla:** construye sobre seguro de `dryRunReport` desde manifest + perfil + fuente separada; no lee filas reales, no escribe, no aplica pagos y no inventa candidatos de conciliación por fila.
+- **Aplicado:** `tools/orbit360-construir-dryrun-report-fuente-ays.mjs`, test y documentación asociada.
+- **Regla:** construye sobre seguro de `dryRunReport`; no lee filas reales ni escribe.
 - **Estado:** CERRADO COMO TOOLING EN RAMA.
 
 ### CERRADO-BE-104-21 — Adaptador de candidatos metadata-only para dryRunReport
 - **Área:** Backend / importador / parser / dryRunReport / conciliaciones.
-- **Aplicado:**
-  - `tools/orbit360-adaptar-candidatos-dryrun-metadata-ays.mjs`.
-  - `tools/orbit360-test-adaptar-candidatos-dryrun-metadata-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-ADAPTADOR-CANDIDATOS-DRYRUN-METADATA-AYS-20260705.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-ADAPTADOR-CANDIDATOS-DRYRUN.md`.
-- **Regla:** combina dryRun envelope con candidatos metadata-only compatibles con el validador `tools/orbit360-validar-dryrun-report-ays.mjs`; no lee filas reales, no escribe, no aplica pagos, no genera conciliaciones reales.
+- **Aplicado:** `tools/orbit360-adaptar-candidatos-dryrun-metadata-ays.mjs`, test y documentación asociada.
+- **Regla:** candidatos metadata-only; no genera conciliaciones reales.
 - **Estado:** CERRADO COMO TOOLING EN RAMA.
 
 ### CERRADO-BE-104-22 — Orquestador de pipeline metadata-only
 - **Área:** Backend / importador / parser / dryRunReport / QA.
-- **Aplicado:**
-  - `tools/orbit360-orquestar-pipeline-metadata-ays.mjs`.
-  - `tools/orbit360-test-orquestar-pipeline-metadata-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-ORQUESTADOR-PIPELINE-METADATA-AYS-20260705.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-ORQUESTADOR-PIPELINE-METADATA.md`.
-- **Regla:** encadena perfil, dryRun envelope, candidatos metadata-only y validación final dryRun; no usa datos reales, no escribe, no ejecuta score/propuestas reales.
+- **Aplicado:** `tools/orbit360-orquestar-pipeline-metadata-ays.mjs`, test y documentación asociada.
+- **Regla:** pipeline metadata-only sin score/propuestas reales.
 - **Estado:** CERRADO COMO TOOLING EN RAMA.
 
 ### CERRADO-BE-104-23 — Orquestador score/propuestas plan-only
 - **Área:** Backend / importador / parser / score / propuestas / plan de persistencia.
-- **Aplicado:**
-  - `tools/orbit360-orquestar-score-propuestas-plan-ays.mjs`.
-  - `tools/orbit360-test-orquestar-score-propuestas-plan-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-ORQUESTADOR-SCORE-PROPUESTAS-PLAN-AYS-20260705.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-ORQUESTADOR-SCORE-PROPUESTAS-PLAN.md`.
-- **Regla:** encadena pipeline metadata-only, score gate, propuestas `conciliaciones` y plan de persistencia; no usa datos reales, no escribe, no aplica pagos, no genera cartera ni producción.
+- **Aplicado:** `tools/orbit360-orquestar-score-propuestas-plan-ays.mjs`, test y documentación asociada.
+- **Regla:** score/propuestas/plan de persistencia sin writes.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local.
 
 ### CERRADO-BE-104-24 — Readiness plan de persistencia LAB
 - **Área:** Backend / conciliaciones / plan persistencia / adapter LAB futuro.
-- **Aplicado:**
-  - `tools/orbit360-validar-readiness-plan-persistencia-lab-ays.mjs`.
-  - `tools/orbit360-test-validar-readiness-plan-persistencia-lab-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-READINESS-PLAN-PERSISTENCIA-LAB-AYS-20260705.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-READINESS-PLAN-PERSISTENCIA-LAB.md`.
-- **Regla:** valida plan de persistencia antes de adapter LAB; bloquea payload/filas reales, secretos, banderas de escritura/aplicación, tenants mezclados, estados `APLICADA`, moneda incoherente o rutas sin aislamiento tenant.
+- **Aplicado:** `tools/orbit360-validar-readiness-plan-persistencia-lab-ays.mjs`, test y documentación asociada.
+- **Regla:** valida plan antes de adapter LAB; bloquea payload, filas reales y banderas de escritura/aplicación.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local.
 
 ### CERRADO-BE-104-25 — Runner agrupado de validaciones locales Conciliaciones
 - **Área:** QA backend/frontend bridge / conciliaciones / validaciones locales.
-- **Aplicado:**
-  - `tools/orbit360-run-validaciones-locales-conciliaciones-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-RUNNER-VALIDACIONES-LOCALES-CONCILIACIONES-AYS-20260705.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-RUNNER-VALIDACIONES-LOCALES-CONCILIACIONES.md`.
-- **Regla:** agrupa smoke estático, test orquestador, test readiness y `node --check`; calcula hash antes/después de archivos protegidos y bloquea si cambian.
+- **Aplicado:** `tools/orbit360-run-validaciones-locales-conciliaciones-ays.mjs` y documentación asociada.
+- **Regla:** agrupa smoke estático, test orquestador, test readiness y hash de archivos protegidos.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local.
 
 ### CERRADO-BE-104-26 — Guía runner local y criterios de bloqueo
 - **Área:** QA local / continuidad operativa / reducción de pasos manuales.
-- **Aplicado:**
-  - `tools/orbit360-run-validaciones-locales-conciliaciones-ays.ps1`.
-  - `orbit360-platform/docs/GUIA-EJECUCION-REVISION-RUNNER-CONCILIACIONES-AYS-20260705.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-GUIA-RUNNER-CONCILIACIONES.md`.
-- **Regla:** define comando único PowerShell, criterios de avance/bloqueo, revisión de reportes y qué compartir de vuelta; no autoriza adapter LAB ni pagos.
+- **Aplicado:** `tools/orbit360-run-validaciones-locales-conciliaciones-ays.ps1` y guía asociada.
+- **Regla:** comando único, criterios de avance/bloqueo y resumen copiable.
 - **Estado:** CERRADO COMO TOOLING/DOCUMENTACIÓN EN RAMA / pendiente ejecución local.
 
 ### CERRADO-BE-104-27 — Checklist smoke visual/operativo Conciliaciones
 - **Área:** QA visual / navegador / roles / acciones seguras.
-- **Aplicado:**
-  - `tools/orbit360-preparar-smoke-visual-conciliaciones-ays.ps1`.
-  - `orbit360-platform/docs/CHECKLIST-SMOKE-VISUAL-CONCILIACIONES-AYS-20260705.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-CHECKLIST-SMOKE-VISUAL-CONCILIACIONES.md`.
-- **Regla:** define precondiciones, roles Dirección/Admin/Finanzas, estado vacío honesto, copy seguro, acciones sin mutar cobros/pólizas/comisiones/finmovs/cartera/producción y evidencia requerida.
+- **Aplicado:** `tools/orbit360-preparar-smoke-visual-conciliaciones-ays.ps1` y checklist asociado.
+- **Regla:** roles Dirección/Admin/Finanzas, estado vacío honesto, copy seguro y acciones sin mutar cobros/pólizas/comisiones/finmovs/cartera/producción.
 - **Estado:** CERRADO COMO TOOLING/DOCUMENTACIÓN EN RAMA / pendiente ejecución local y visual.
 
 ### CERRADO-BE-104-28 — Modelo clientes + asesor + portal + calidad de datos
@@ -133,7 +100,17 @@
   - `tools/orbit360-validar-modelo-clientes-ays.mjs`.
   - `tools/orbit360-test-validar-modelo-clientes-ays.mjs`.
   - `orbit360-platform/docs/CONTRATO-MODELO-CLIENTES-ASESOR-PORTAL-CALIDAD-AYS-20260705.md`.
-- **Regla:** define colecciones `clientes`, `clienteAsesorRelaciones`, `portalUsuarios`, `calidadDatosSolicitudes` y `auditLog`; mantiene plan-only, tenant, fuentes separadas, portal cliente sin opción de correo y calidad con `REQUIERE_VALIDACION`.
+- **Regla:** colecciones `clientes`, `clienteAsesorRelaciones`, `portalUsuarios`, `calidadDatosSolicitudes` y `auditLog`; mantiene plan-only, tenant, fuentes separadas, portal cliente sin opción de correo y calidad con `REQUIERE_VALIDACION`.
+- **Estado:** CERRADO COMO CONTRATO/TOOLING EN RAMA / pendiente ejecución local.
+
+### CERRADO-BE-104-29 — Modelo pólizas + recibos + cartera
+- **Área:** Backend / pólizas / recibos / cartera.
+- **Aplicado:**
+  - `tools/orbit360-validar-modelo-polizas-recibos-cartera-ays.mjs`.
+  - `tools/orbit360-test-validar-modelo-polizas-recibos-cartera-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-MODELO-POLIZAS-RECIBOS-CARTERA-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-MODELO-POLIZAS-RECIBOS-CARTERA.md`.
+- **Regla:** define `polizas`, `recibos`, `carteraItems`, `polizaClienteRelaciones` y `auditLog`; estados vigentes/por renovar, históricos, cartera del año actual, prima separada y producción sobre prima neta recaudada.
 - **Estado:** CERRADO COMO CONTRATO/TOOLING EN RAMA / pendiente ejecución local.
 
 ---
@@ -142,7 +119,7 @@
 
 ### ABIERTO-BE-104-02 — Ejecutar runner + smoke visual/operativo real sobre rama empalmada
 - **Área:** QA / Navegador.
-- **Necesidad:** ejecutar runner local, abrir la plataforma y validar que Conciliaciones aparezca para Dirección/Admin/Finanzas, que renderice vacío honestamente y que acciones no toquen cobros.
+- **Necesidad:** ejecutar runner local, abrir la plataforma y validar Conciliaciones.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-03 — Decisión sobre `index.html` permanente
@@ -157,8 +134,8 @@
 - **Área:** Auth / Equipo / Roles.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-06 — Contrato pólizas/recibos/cartera/conciliación
-- **Área:** Backend importador / pólizas / cobros / comisiones / finanzas.
+### ABIERTO-BE-104-06 — Contrato cobros/pagos reportados/conciliación
+- **Área:** Backend importador / cobros / comisiones / finanzas.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-07 — Junio/julio 2026 como caso especial de conciliación
@@ -192,22 +169,24 @@
 
 ### ABIERTO-BE-104-16 — Ejecución local del orquestador score/propuestas plan-only
 - **Área:** Backend / importador / score / propuestas / persistencia planificada.
-- **Necesidad:** ejecutar `tools/orbit360-test-orquestar-score-propuestas-plan-ays.mjs` en entorno local/repo completo y revisar reportes antes de cualquier persistencia LAB.
 - **Estado:** ABIERTO / agrupado en runner.
 
 ### ABIERTO-BE-104-17 — Ejecución local del readiness plan persistencia LAB
 - **Área:** Backend / conciliaciones / adapter LAB futuro.
-- **Necesidad:** ejecutar `tools/orbit360-test-validar-readiness-plan-persistencia-lab-ays.mjs` y revisar reportes antes de cualquier adapter Firestore LAB.
 - **Estado:** ABIERTO / agrupado en runner.
 
 ### ABIERTO-BE-104-18 — Ejecución local del runner agrupado Conciliaciones
 - **Área:** QA local / conciliaciones / reportes.
-- **Necesidad:** ejecutar `tools/orbit360-run-validaciones-locales-conciliaciones-ays.ps1` o `node tools/orbit360-run-validaciones-locales-conciliaciones-ays.mjs` en entorno local, revisar `_orbit360_reports` y confirmar que no hubo cambios en archivos protegidos.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-19 — Ejecutar tests sintéticos modelo clientes
 - **Área:** Backend / clientes / calidad / portal.
-- **Necesidad:** ejecutar `node tools/orbit360-test-validar-modelo-clientes-ays.mjs` y revisar reportes antes de usar el modelo para parser o persistencia LAB.
+- **Necesidad:** ejecutar `node tools/orbit360-test-validar-modelo-clientes-ays.mjs`.
+- **Estado:** ABIERTO.
+
+### ABIERTO-BE-104-20 — Ejecutar tests sintéticos modelo pólizas/recibos/cartera
+- **Área:** Backend / pólizas / recibos / cartera.
+- **Necesidad:** ejecutar `node tools/orbit360-test-validar-modelo-polizas-recibos-cartera-ays.mjs`.
 - **Estado:** ABIERTO.
 
 ---
@@ -225,9 +204,10 @@
 9. Debe conservar los criterios de bloqueo/no bloqueo y no reinterpretar OK de runner como autorización de backend real.
 10. Debe conservar el checklist visual por roles y estado vacío honesto.
 11. Debe respetar modelo clientes: portal cliente sin opción de correo, calidad de datos y no creación desde fuentes financieras.
+12. Debe respetar modelo pólizas: estados, prima separada, cartera del año actual y producción sobre prima neta recaudada.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell, checklist/helper de smoke visual y contrato/modelo clientes como base para modelos de pólizas/cobros/documentos. Quedan abiertos ejecución local del runner/smoke visual, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y modelos backend de pólizas/cobros/documentos.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell, checklist/helper de smoke visual, contrato/modelo clientes y contrato/modelo pólizas/recibos/cartera como base para modelos de cobros/documentos. Quedan abiertos ejecución local del runner/smoke visual, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y modelos backend de cobros/documentos.
