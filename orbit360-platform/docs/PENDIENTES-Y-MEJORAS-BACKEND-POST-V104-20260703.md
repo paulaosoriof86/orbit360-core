@@ -88,14 +88,18 @@
 
 ### CERRADO-BE-104-14 — Adapter Firestore LAB para `conciliaciones/auditLog` preparado
 - **Área:** Backend / Firestore LAB / conciliaciones / auditLog.
-- **Aplicado:**
-  - `tools/orbit360-integrar-adapter-conciliaciones-firestore-lab-ays.ps1`.
-  - `tools/orbit360-validar-adapter-conciliaciones-firestore-lab-ays.mjs`.
-  - `tools/orbit360-test-validar-adapter-conciliaciones-firestore-lab-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-ADAPTER-FIRESTORE-LAB-CONCILIACIONES-AUDITLOG-AYS-20260704.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-ADAPTER-FIRESTORE-LAB-CONCILIACIONES.md`.
+- **Aplicado:** `tools/orbit360-integrar-adapter-conciliaciones-firestore-lab-ays.ps1`, `tools/orbit360-validar-adapter-conciliaciones-firestore-lab-ays.mjs`, `tools/orbit360-test-validar-adapter-conciliaciones-firestore-lab-ays.mjs`, contrato y bitácora.
 - **Regla:** integración local protegida con backup; agrega/verifica `conciliaciones` y `auditLog` en `COLLECTIONS`; valida gate `firestore-lab`, tenant `alianzas-soluciones`, path `tenantId/{tenantId}/{collection}`, `onSnapshot`, API compatible y ausencia de textos de aplicación directa.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecutar `-Apply` local y smoke de extremo a extremo.
+
+### CERRADO-BE-104-15 — Smoke E2E sintético de conciliaciones LAB
+- **Área:** Backend / QA / conciliaciones / LAB readiness.
+- **Aplicado:**
+  - `tools/orbit360-smoke-conciliaciones-lab-e2e-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-SMOKE-CONCILIACIONES-LAB-E2E-AYS-20260704.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-SMOKE-CONCILIACIONES-LAB-E2E.md`.
+- **Regla:** smoke sintético encadena propuestas -> plan persistencia -> ejecutor dry-run -> ejecutor local mirror -> transición validada -> adapter/readiness; no datos reales, no Firestore writes, no pagos, no mutación de `cobros`.
+- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local real y readiness UI/bandeja.
 
 ---
 
@@ -156,15 +160,16 @@
 - **Esperado:** store Firestore LAB validado con colecciones nuevas, sin deploy y sin writes.
 - **Estado:** ABIERTO / requiere entorno local.
 
-### ABIERTO-BE-104-11 — Smoke extremo a extremo conciliaciones LAB
+### ABIERTO-BE-104-11 — Ejecutar smoke E2E conciliaciones LAB en entorno local
 - **Área:** QA backend / conciliaciones.
-- **Necesidad:** ejecutar flujo completo sintético: propuestas -> plan persistencia -> ejecutor local mirror -> adapter validado -> readiness UI/bandeja.
-- **Estado:** ABIERTO.
+- **Necesidad:** ejecutar `tools/orbit360-smoke-conciliaciones-lab-e2e-ays.mjs` en repo local, primero normal y luego `--strict-adapter` después de aplicar adapter.
+- **Esperado:** `SMOKE_OK` o `SMOKE_OK_CON_READINESS_PENDIENTE` antes de UI/bandeja.
+- **Estado:** ABIERTO / requiere entorno local.
 
-### ABIERTO-BE-104-12 — Flujo de aplicación controlada
-- **Área:** Backend / cobros / comisiones / auditLog / notificaciones.
-- **Necesidad:** diseñar el paso posterior donde una propuesta `VALIDADA` puede aplicar cobro/comisión con auditoría.
-- **Esperado:** `propuesta VALIDADA -> validar transición -> aplicar cobro/comisión -> auditLog -> notificación -> actualización Portal/Cliente360/Cobros`, sin saltarse revisión.
+### ABIERTO-BE-104-12 — Readiness UI/Bandeja `conciliaciones`
+- **Área:** Frontend/Backend bridge.
+- **Necesidad:** generar reporte de readiness UI a partir de `conciliaciones/auditLog`: columnas, estados, score, fuente, trazabilidad, acciones permitidas, bloqueos y pendientes.
+- **Restricción:** no aplicar pagos desde la bandeja hasta fase autorizada.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-13 — UI/Bandeja `conciliaciones`
@@ -172,6 +177,12 @@
 - **Necesidad:** mostrar propuestas separadas en bandeja `conciliaciones`, con estado, score, fuente, trazabilidad, decisión y acción controlada.
 - **Restricción:** no aplicar pagos desde la bandeja hasta fase autorizada.
 - **Estado:** ABIERTO / puede coordinarse con Claude cuando vuelva capacidad.
+
+### ABIERTO-BE-104-14 — Flujo de aplicación controlada
+- **Área:** Backend / cobros / comisiones / auditLog / notificaciones.
+- **Necesidad:** diseñar el paso posterior donde una propuesta `VALIDADA` puede aplicar cobro/comisión con auditoría.
+- **Esperado:** `propuesta VALIDADA -> validar transición -> aplicar cobro/comisión -> auditLog -> notificación -> actualización Portal/Cliente360/Cobros`, sin saltarse revisión.
+- **Estado:** ABIERTO.
 
 ---
 
@@ -191,7 +202,7 @@
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada como avance incremental, no como cierre final. Quedan pendientes Claude documentales y de copy hasta próximo paquete. Se agregó pipeline de empalme seguro para no pisar backend protegido. Backend continúa por fases sobre conciliación: parser real, persistencia LAB local controlada en `conciliaciones/auditLog`, transiciones auditadas, adapter Firestore LAB preparado por tooling local, smoke extremo a extremo y flujo de aplicación controlada.
+Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada como avance incremental, no como cierre final. Quedan pendientes Claude documentales y de copy hasta próximo paquete. Se agregó pipeline de empalme seguro para no pisar backend protegido. Backend continúa por fases sobre conciliación: parser real, persistencia LAB local controlada en `conciliaciones/auditLog`, transiciones auditadas, adapter Firestore LAB preparado por tooling local, smoke E2E sintético preparado, readiness UI/bandeja y flujo de aplicación controlada.
 
 ---
 
@@ -207,6 +218,8 @@ Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada co
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-EJECUTOR-PERSISTENCIA-CONCILIACIONES-LAB.md`
 - `orbit360-platform/docs/CONTRATO-ADAPTER-FIRESTORE-LAB-CONCILIACIONES-AUDITLOG-AYS-20260704.md`
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-ADAPTER-FIRESTORE-LAB-CONCILIACIONES.md`
+- `orbit360-platform/docs/CONTRATO-SMOKE-CONCILIACIONES-LAB-E2E-AYS-20260704.md`
+- `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-SMOKE-CONCILIACIONES-LAB-E2E.md`
 - `tools/orbit360-empalmar-candidato-claude-211525-ays.ps1`
 - `tools/orbit360-validar-transicion-conciliacion-ays.mjs`
 - `tools/orbit360-test-validar-transicion-conciliacion-ays.mjs`
@@ -215,3 +228,4 @@ Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada co
 - `tools/orbit360-integrar-adapter-conciliaciones-firestore-lab-ays.ps1`
 - `tools/orbit360-validar-adapter-conciliaciones-firestore-lab-ays.mjs`
 - `tools/orbit360-test-validar-adapter-conciliaciones-firestore-lab-ays.mjs`
+- `tools/orbit360-smoke-conciliaciones-lab-e2e-ays.mjs`
