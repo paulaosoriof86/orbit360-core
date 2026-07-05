@@ -74,14 +74,21 @@
 
 ### CERRADO-BE-104-12 — Validador de transiciones `conciliaciones`
 - **Área:** Backend / conciliaciones / auditLog / aplicación controlada.
-- **Aplicado:**
-  - `tools/orbit360-validar-transicion-conciliacion-ays.mjs`.
-  - `tools/orbit360-test-validar-transicion-conciliacion-ays.mjs`.
-  - `orbit360-platform/docs/CONTRATO-TRANSICIONES-CONCILIACIONES-AYS-20260704.md`.
-  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-TRANSICIONES-CONCILIACIONES.md`.
+- **Aplicado:** `tools/orbit360-validar-transicion-conciliacion-ays.mjs`, tests, contrato y bitácora.
 - **Regla:** valida `PROPUESTA -> EN_REVISION -> VALIDADA -> APLICADA` sin saltos, exige actor/rol/motivo, país/moneda coherente, target para aplicación y bloquea payload/secrets.
 - **Prueba local sintética:** 8 casos, 0 fallos.
 - **Estado:** CERRADO EN RAMA / pendiente ejecutor LAB e integración con auditLog real.
+
+### CERRADO-BE-104-13 — Ejecutor LAB local de persistencia `conciliaciones`
+- **Área:** Backend / conciliaciones / auditLog / persistencia LAB.
+- **Aplicado:**
+  - `tools/orbit360-ejecutar-persistencia-conciliaciones-lab-ays.mjs`.
+  - `tools/orbit360-test-ejecutar-persistencia-conciliaciones-lab-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-EJECUTOR-PERSISTENCIA-CONCILIACIONES-LAB-AYS-20260704.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-EJECUTOR-PERSISTENCIA-CONCILIACIONES-LAB.md`.
+- **Regla:** ejecutor deshabilitado por defecto; en `dry-run` solo reporta, en `local-mirror` exige `CONFIRMO_ESCRITURA_LAB_CONCILIACIONES`; materializa `conciliaciones` + `auditLog` en mirror local; nunca toca `cobros`, `comisiones`, `polizas`, `finmovs` ni aplica pagos.
+- **Prueba local sintética:** 8 casos, 0 fallos.
+- **Estado:** CERRADO EN RAMA / pendiente adapter Firestore LAB directo y UI/bandeja.
 
 ---
 
@@ -136,10 +143,10 @@
 - **Necesidad:** conectar el parser/importador real para que cada fuente genere `manifest validado -> dryRunReport validado -> score -> propuestas conciliaciones -> plan persistencia`.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-10 — Ejecutar persistencia LAB en colección `conciliaciones`
+### ABIERTO-BE-104-10 — Adapter Firestore LAB directo para `conciliaciones/auditLog`
 - **Área:** Backend / Firestore LAB / conciliaciones.
-- **Necesidad:** crear ejecutor LAB deshabilitado por defecto para guardar propuestas en `conciliaciones` con tenant isolation.
-- **Esperado:** guardar propuestas como registros separados y auditables; no modificar `cobros` hasta confirmación aprobada.
+- **Necesidad:** conectar el ejecutor a escritura Firestore LAB real usando tenant isolation, sin secretos en repo y sin mutar `cobros`.
+- **Esperado:** `plan validado -> conciliaciones/auditLog en Firestore LAB -> onSnapshot -> UI/bandeja`, con ejecución deshabilitada por defecto.
 - **Estado:** ABIERTO.
 
 ### ABIERTO-BE-104-11 — Flujo de aplicación controlada
@@ -147,6 +154,12 @@
 - **Necesidad:** diseñar el paso posterior donde una propuesta `VALIDADA` puede aplicar cobro/comisión con auditoría.
 - **Esperado:** `propuesta VALIDADA -> validar transición -> aplicar cobro/comisión -> auditLog -> notificación -> actualización Portal/Cliente360/Cobros`, sin saltarse revisión.
 - **Estado:** ABIERTO.
+
+### ABIERTO-BE-104-12 — UI/Bandeja `conciliaciones`
+- **Área:** Frontend/Backend bridge.
+- **Necesidad:** mostrar propuestas separadas en bandeja `conciliaciones`, con estado, score, fuente, trazabilidad, decisión y acción controlada.
+- **Restricción:** no aplicar pagos desde la bandeja hasta fase autorizada.
+- **Estado:** ABIERTO / puede coordinarse con Claude cuando vuelva capacidad.
 
 ---
 
@@ -166,7 +179,7 @@
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada como avance incremental, no como cierre final. Quedan pendientes Claude documentales y de copy hasta próximo paquete. Se agregó pipeline de empalme seguro para no pisar backend protegido. Backend continúa por fases sobre conciliación: parser real, persistencia LAB en `conciliaciones`, transiciones auditadas y flujo de aplicación controlada.
+Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada como avance incremental, no como cierre final. Quedan pendientes Claude documentales y de copy hasta próximo paquete. Se agregó pipeline de empalme seguro para no pisar backend protegido. Backend continúa por fases sobre conciliación: parser real, persistencia LAB local controlada en `conciliaciones/auditLog`, transiciones auditadas, adapter Firestore LAB y flujo de aplicación controlada.
 
 ---
 
@@ -178,6 +191,10 @@ Backend LAB reforzado. Candidata viva Claude `211525.464` auditada y aceptada co
 - `orbit360-platform/docs/PLAN-EMPALME-SEGURO-CANDIDATO-CLAUDE-211525-20260704.md`
 - `orbit360-platform/docs/CONTRATO-TRANSICIONES-CONCILIACIONES-AYS-20260704.md`
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-TRANSICIONES-CONCILIACIONES.md`
+- `orbit360-platform/docs/CONTRATO-EJECUTOR-PERSISTENCIA-CONCILIACIONES-LAB-AYS-20260704.md`
+- `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-EJECUTOR-PERSISTENCIA-CONCILIACIONES-LAB.md`
 - `tools/orbit360-empalmar-candidato-claude-211525-ays.ps1`
 - `tools/orbit360-validar-transicion-conciliacion-ays.mjs`
 - `tools/orbit360-test-validar-transicion-conciliacion-ays.mjs`
+- `tools/orbit360-ejecutar-persistencia-conciliaciones-lab-ays.mjs`
+- `tools/orbit360-test-ejecutar-persistencia-conciliaciones-lab-ays.mjs`
