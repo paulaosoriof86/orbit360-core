@@ -2,7 +2,7 @@
    Orbit 360 · Bandeja de Conciliaciones (UI/prototipo)
    Lee SOLO de Orbit.store('conciliaciones'). No toca cobros.
    Las acciones cambian estado de la propuesta vía Orbit.store.update.
-   La aplicación real de pagos queda para backend (ChatGPT/Codex).
+   La aplicación real de pagos queda para proceso autorizado posterior.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
@@ -39,7 +39,7 @@ Orbit.modules.conciliaciones = (function () {
 
     const kpis = K.kpis([
       { label: 'Propuestas', val: cont.PROPUESTA + cont.EN_REVISION, color: 'var(--info)', foot: 'por revisar' },
-      { label: 'Validadas', val: cont.VALIDADA, color: 'var(--ok)', foot: 'listas p/ backend' },
+      { label: 'Validadas', val: cont.VALIDADA, color: 'var(--ok)', foot: 'listas para revisión técnica' },
       { label: 'Bloqueadas / rechazadas', val: cont.BLOQUEADA + cont.RECHAZADA, color: 'var(--danger)', foot: 'requieren atención' },
       { label: 'Aplicadas', val: cont.APLICADA, color: 'var(--ink-3)', foot: 'histórico' }
     ]);
