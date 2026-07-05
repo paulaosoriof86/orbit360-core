@@ -31,6 +31,15 @@
 - **Regla operativa del módulo:** `Conciliaciones` lee y actualiza solo `Orbit.store('conciliaciones')`; no toca `cobros`, `comisiones`, `finmovs`, cartera ni producción.
 - **Estado:** CERRADO EN RAMA / pendiente smoke visual y validación local.
 
+### CERRADO-FRONT-062855-SMOKE-STATIC — Smoke estático de empalme Conciliaciones
+- **Área:** QA frontend/backend bridge / Conciliaciones.
+- **Aplicado:**
+  - `tools/orbit360-validar-empalme-conciliaciones-062855-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-SMOKE-EMPALME-CONCILIACIONES-062855-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-SMOKE-EMPALME-CONCILIACIONES.md`.
+- **Regla:** valida index híbrido, carga única del módulo, visibilidad Dirección/Admin/Finanzas, actualización solo de propuestas y estado honesto validado no equivale a pagado.
+- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local y smoke visual.
+
 ---
 
 ## B. Pendientes abiertos
@@ -82,7 +91,7 @@
 
 ### ABIERTO-BE-104-13 — Smoke UI/Bandeja `conciliaciones`
 - **Área:** Frontend/Backend bridge.
-- **Estado:** EMPALMADO / pendiente smoke visual.
+- **Estado:** EMPALMADO / smoke estático preparado / pendiente smoke visual.
 
 ### ABIERTO-BE-104-14 — Futuro ejecutor autorizado de aplicación controlada
 - **Área:** Backend / cobros / comisiones / auditLog / notificaciones.
@@ -101,9 +110,10 @@
 2. No reemplazar backend LAB ni scripts de validación al entregar nuevos ZIPs.
 3. Mantener `CONTENT_V=5` y lección de conciliación.
 4. No declarar cerrado backend real de `conciliaciones/auditLog`, score real, aplicación controlada ni smoke visual hasta ejecución ChatGPT/Codex.
+5. Si Claude vuelve a modificar Conciliaciones, debe revisar manuales, Academia, rutas por rol y evaluaciones relacionadas.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, perfilador de columnas, score real y futuro ejecutor autorizado.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, perfilador de columnas, score real y futuro ejecutor autorizado.
