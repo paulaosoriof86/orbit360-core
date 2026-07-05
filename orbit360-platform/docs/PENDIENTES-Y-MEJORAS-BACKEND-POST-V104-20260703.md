@@ -47,9 +47,8 @@
   - `tools/orbit360-test-perfilar-columnas-fuente-ays.mjs`.
   - `orbit360-platform/docs/CONTRATO-PERFILADOR-COLUMNAS-FUENTE-AYS-20260705.md`.
   - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-PERFILADOR-COLUMNAS-FUENTE.md`.
-- **Regla:** perfila metadata de columnas por fuente, identifica campos obligatorios/opcionales, matches probables, faltantes y columnas no mapeadas; no lee filas reales, no escribe, no aplica pagos y no genera cartera/producción.
-- **Intermedio agregado:** paso explícito entre manifest validado y constructor de `dryRunReport`.
-- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local e integración con constructor de dryRunReport.
+- **Regla:** perfila metadata de columnas por fuente; no lee filas reales, no escribe, no aplica pagos y no genera cartera/producción.
+- **Estado:** CERRADO COMO TOOLING EN RAMA.
 
 ### CERRADO-BE-104-20 — Constructor de dryRunReport sin payload real
 - **Área:** Backend / importador / parser / dryRunReport.
@@ -59,8 +58,7 @@
   - `orbit360-platform/docs/CONTRATO-CONSTRUCTOR-DRYRUN-REPORT-FUENTE-AYS-20260705.md`.
   - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-CONSTRUCTOR-DRYRUN-REPORT.md`.
 - **Regla:** construye sobre seguro de `dryRunReport` desde manifest + perfil + fuente separada; no lee filas reales, no escribe, no aplica pagos y no inventa candidatos de conciliación por fila.
-- **Intermedio agregado:** paso entre perfilador de columnas y candidatos metadata-only/validador final dryRunReport.
-- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente adaptador de candidatos metadata-only.
+- **Estado:** CERRADO COMO TOOLING EN RAMA.
 
 ### CERRADO-BE-104-21 — Adaptador de candidatos metadata-only para dryRunReport
 - **Área:** Backend / importador / parser / dryRunReport / conciliaciones.
@@ -70,8 +68,7 @@
   - `orbit360-platform/docs/CONTRATO-ADAPTADOR-CANDIDATOS-DRYRUN-METADATA-AYS-20260705.md`.
   - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-ADAPTADOR-CANDIDATOS-DRYRUN.md`.
 - **Regla:** combina dryRun envelope con candidatos metadata-only compatibles con el validador `tools/orbit360-validar-dryrun-report-ays.mjs`; no lee filas reales, no escribe, no aplica pagos, no genera conciliaciones reales.
-- **Intermedio agregado:** paso entre constructor dryRunReport y score/propuestas conciliaciones.
-- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente orquestador metadata-only.
+- **Estado:** CERRADO COMO TOOLING EN RAMA.
 
 ### CERRADO-BE-104-22 — Orquestador de pipeline metadata-only
 - **Área:** Backend / importador / parser / dryRunReport / QA.
@@ -81,8 +78,17 @@
   - `orbit360-platform/docs/CONTRATO-ORQUESTADOR-PIPELINE-METADATA-AYS-20260705.md`.
   - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-ORQUESTADOR-PIPELINE-METADATA.md`.
 - **Regla:** encadena perfil, dryRun envelope, candidatos metadata-only y validación final dryRun; no usa datos reales, no escribe, no ejecuta score/propuestas reales.
-- **Intermedio agregado:** verificación de extremo a extremo metadata-only antes de score/propuestas.
-- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente orquestador score-propuestas plan-only.
+- **Estado:** CERRADO COMO TOOLING EN RAMA.
+
+### CERRADO-BE-104-23 — Orquestador score/propuestas plan-only
+- **Área:** Backend / importador / parser / score / propuestas / plan de persistencia.
+- **Aplicado:**
+  - `tools/orbit360-orquestar-score-propuestas-plan-ays.mjs`.
+  - `tools/orbit360-test-orquestar-score-propuestas-plan-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-ORQUESTADOR-SCORE-PROPUESTAS-PLAN-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-ORQUESTADOR-SCORE-PROPUESTAS-PLAN.md`.
+- **Regla:** encadena pipeline metadata-only, score gate, propuestas `conciliaciones` y plan de persistencia; no usa datos reales, no escribe, no aplica pagos, no genera cartera ni producción.
+- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local.
 
 ---
 
@@ -142,9 +148,9 @@
 - **Restricción:** no construir ejecutor real sin autorización explícita de Paula.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-15 — Orquestador score/propuestas plan-only
+### ABIERTO-BE-104-16 — Ejecución local del orquestador score/propuestas plan-only
 - **Área:** Backend / importador / score / propuestas / persistencia planificada.
-- **Necesidad:** encadenar dryRun validado -> score -> propuestas conciliaciones -> plan de persistencia, sin datos reales, sin writes y sin aplicación controlada.
+- **Necesidad:** ejecutar `tools/orbit360-test-orquestar-score-propuestas-plan-ays.mjs` en entorno local/repo completo y revisar reportes antes de cualquier persistencia LAB.
 - **Estado:** ABIERTO.
 
 ---
@@ -156,9 +162,10 @@
 3. Mantener `CONTENT_V=5` y lección de conciliación.
 4. No declarar cerrado backend real de `conciliaciones/auditLog`, score real, aplicación controlada ni smoke visual hasta ejecución ChatGPT/Codex.
 5. Si Claude vuelve a modificar Conciliaciones, debe revisar manuales, Academia, rutas por rol y evaluaciones relacionadas.
+6. Debe mostrar como estado honesto: propuesta/lista para revisión/pendiente de validación, no pago aplicado.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only y orquestador metadata-only como intermedios entre manifest y score/propuestas. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, orquestador score/propuestas plan-only, score real y futuro ejecutor autorizado.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only y orquestador score/propuestas plan-only como intermedios entre manifest y futura persistencia LAB. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y ejecución local de los tests del nuevo orquestador.
