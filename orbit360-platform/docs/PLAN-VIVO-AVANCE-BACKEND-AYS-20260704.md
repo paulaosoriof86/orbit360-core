@@ -47,21 +47,20 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | Readiness plan de persistencia LAB | Tooling agregado | Valida que el plan de persistencia sea tenant-safe, sin payload real, sin banderas de escritura/aplicación y listo solo para revisión LAB. |
 | Runner validaciones locales Conciliaciones | Tooling agregado | Agrupa smoke estático, test orquestador, test readiness, sintaxis y hash de archivos protegidos en un reporte único local. |
 | Guía runner local y criterios de bloqueo | Documentado + wrapper PS | Agrega comando PowerShell, revisión de reportes, criterios de avance/bloqueo y resumen copiable al portapapeles. |
+| Checklist smoke visual Conciliaciones | Documentado + helper PS | Agrega checklist por rol, estado vacío, acciones seguras, trazabilidad y plantilla de reporte visual. |
 | Seguimiento de bloques | Agregado intermedio | Este plan vivo se mantiene actualizado después de cada bloque largo. |
 
 ## 4. Bloques pendientes principales
 
 | Prioridad | Bloque | Estado esperado |
 |---|---|---|
-| P0 | Smoke visual/operativo real de Conciliaciones | Pendiente en navegador/local. |
+| P0 | Ejecutar runner local + smoke visual/operativo Conciliaciones | Pendiente en entorno local/navegador. |
 | P0 | Adapter Firestore LAB real para `conciliaciones/auditLog` | Pendiente de ejecución local/entorno LAB y autorización. |
 | P0 | Contrato/modelo `clientes` + relación asesor + portal + calidad datos | Pendiente. |
 | P0 | Contrato/modelo `polizas` + recibos/cartera | Pendiente. |
 | P0 | Contrato/modelo `cobros` + pagos reportados + conciliación | Pendiente. |
 | P0 | Contrato/modelo `documentos` + Storage futuro | Pendiente. |
 | P0 | Smokes de roles: cliente/asesor/cobros/admin | Pendiente. |
-| P1 | Ejecución local agrupada del runner Conciliaciones | Pendiente de ejecución local. |
-| P1 | Smoke visual/operativo Conciliaciones con checklist | Pendiente. |
 | P1 | Validación local del orquestador score/propuestas plan-only | Pendiente de ejecución local; agrupada en runner. |
 | P1 | Validación local de readiness plan persistencia LAB | Pendiente de ejecución local; agrupada en runner. |
 | P1 | Manuales y Academia actualizados por cambio | Pendiente para Claude/prototipo. |
@@ -158,6 +157,14 @@ Relación con plan principal: puente entre runner local y smoke visual/operativo
 
 Estado: documentación y wrapper PowerShell agregados; pendiente ejecución local.
 
+### Intermedio 13 — Checklist smoke visual/operativo Conciliaciones
+
+Motivo: faltaba una lista de aceptación visual por rol, copy, estado vacío, acciones seguras y trazabilidad antes de adapter LAB.
+
+Relación con plan principal: puente entre ejecución local del runner y revisión técnica posterior a smoke visual.
+
+Estado: documentación y helper PowerShell agregados; pendiente ejecución local/visual.
+
 ## 6. Formato obligatorio de cierre de cada bloque
 
 Cada respuesta de continuidad debe cerrar con:
@@ -184,20 +191,22 @@ Regla fija solicitada por Paula: siempre indicar qué se adelantó, si se agreg�
 Continuar con:
 
 ```txt
-Preparar checklist de smoke visual/operativo de Conciliaciones y criterios de aceptación antes de adapter Firestore LAB.
+Preparar contrato/modelo backend de clientes + relación asesor + portal + calidad de datos.
 ```
 
-Ese bloque debe conectar:
+Condición: no avanzar a adapter Firestore LAB real hasta que el runner local y el smoke visual de Conciliaciones estén ejecutados/revisados.
 
-- validaciones visibles por rol Dirección/Admin/Finanzas;
-- estado vacío honesto;
-- revisión de acciones sin mutar cobros;
-- no mostrar pago aplicado sin backend real;
-- trazabilidad de reportes del runner;
-- cero datos reales;
-- cero aplicación de pagos;
-- no pasar a adapter LAB real sin autorización.
+El nuevo bloque de modelo debe mantener:
+
+- tenant isolation;
+- fuentes separadas;
+- no inferir clientes desde movimientos financieros;
+- no datos reales en código;
+- calidad de datos con estado honesto;
+- portal cliente sin opción de correo;
+- relación asesor/cliente documentada;
+- impacto en Academia/manuales.
 
 ## 8. Estado
 
-Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales y guía/wrapper de ejecución local. No avanzar a datos reales, aplicación controlada, Firestore writes ni deploy sin smoke local y autorización.
+Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper de ejecución local y checklist/helper de smoke visual. No avanzar a datos reales, aplicación controlada, Firestore writes ni deploy sin smoke local y autorización.
