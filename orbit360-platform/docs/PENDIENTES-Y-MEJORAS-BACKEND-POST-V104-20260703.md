@@ -90,6 +90,16 @@
 - **Regla:** encadena pipeline metadata-only, score gate, propuestas `conciliaciones` y plan de persistencia; no usa datos reales, no escribe, no aplica pagos, no genera cartera ni producción.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local.
 
+### CERRADO-BE-104-24 — Readiness plan de persistencia LAB
+- **Área:** Backend / conciliaciones / plan persistencia / adapter LAB futuro.
+- **Aplicado:**
+  - `tools/orbit360-validar-readiness-plan-persistencia-lab-ays.mjs`.
+  - `tools/orbit360-test-validar-readiness-plan-persistencia-lab-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-READINESS-PLAN-PERSISTENCIA-LAB-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-READINESS-PLAN-PERSISTENCIA-LAB.md`.
+- **Regla:** valida plan de persistencia antes de adapter LAB; bloquea payload/filas reales, secretos, banderas de escritura/aplicación, tenants mezclados, estados `APLICADA`, moneda incoherente o rutas sin aislamiento tenant.
+- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local.
+
 ---
 
 ## B. Pendientes abiertos
@@ -153,6 +163,11 @@
 - **Necesidad:** ejecutar `tools/orbit360-test-orquestar-score-propuestas-plan-ays.mjs` en entorno local/repo completo y revisar reportes antes de cualquier persistencia LAB.
 - **Estado:** ABIERTO.
 
+### ABIERTO-BE-104-17 — Ejecución local del readiness plan persistencia LAB
+- **Área:** Backend / conciliaciones / adapter LAB futuro.
+- **Necesidad:** ejecutar `tools/orbit360-test-validar-readiness-plan-persistencia-lab-ays.mjs` y revisar reportes antes de cualquier adapter Firestore LAB.
+- **Estado:** ABIERTO.
+
 ---
 
 ## C. Pendientes para reportar a Claude cuando Paula pida paquete
@@ -163,9 +178,10 @@
 4. No declarar cerrado backend real de `conciliaciones/auditLog`, score real, aplicación controlada ni smoke visual hasta ejecución ChatGPT/Codex.
 5. Si Claude vuelve a modificar Conciliaciones, debe revisar manuales, Academia, rutas por rol y evaluaciones relacionadas.
 6. Debe mostrar como estado honesto: propuesta/lista para revisión/pendiente de validación, no pago aplicado.
+7. Debe conservar el lenguaje de readiness: plan listo no equivale a persistencia ni a pago aplicado.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only y orquestador score/propuestas plan-only como intermedios entre manifest y futura persistencia LAB. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y ejecución local de los tests del nuevo orquestador.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only y readiness plan de persistencia LAB como intermedios entre manifest y futura persistencia LAB. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y ejecución local de los tests de orquestador/readiness.
