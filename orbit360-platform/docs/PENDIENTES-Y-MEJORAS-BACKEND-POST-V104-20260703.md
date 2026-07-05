@@ -59,13 +59,26 @@
 - **Impacto:** permite que planillas y estados generen propuestas trazables antes de impactar Cobros, Cliente360, Portal, Comisiones, Finanzas o Liquidaciones.
 - **Estado:** CERRADO EN RAMA / pendiente ejecución local en repo completo.
 
+### CERRADO-BE-104-07 — Contrato y validador dryRunReport importador
+
+- **Área:** Backend importador / parser / dry-run / conciliación.
+- **Necesidad:** que cada importación produzca un `dryRunReport` validable antes de escritura, con conteos, fuente, trazabilidad, país/moneda y score/acción cuando aplique.
+- **Aplicado:**
+  - `tools/orbit360-validar-dryrun-report-ays.mjs`.
+  - `tools/orbit360-test-validar-dryrun-report-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-DRYRUN-REPORT-IMPORTADOR-AYS-20260704.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-DRYRUN-REPORT.md`.
+- **Regla:** no se permite `write_enabled=true`, payload/filas reales, conteos inconsistentes ni país/moneda incoherente; las fuentes de conciliación deben traer candidatos con score, decisión y acción propuesta.
+- **Impacto:** puente seguro entre manifest validado, preview, score y bandeja de conciliación sin escritura automática.
+- **Estado:** CERRADO EN RAMA / pendiente integración al parser/importador real.
+
 ## B. Pendientes abiertos
 
 ### ABIERTO-BE-104-01 — Empalme completo del candidato Claude final en GitHub
 
 - **Área:** Empalme frontend/backend.
 - **Necesidad:** el candidato activo fue auditado localmente, pero aún no está aplicado completo en GitHub.
-- **Candidato auditado:** `Prototype Development Request - 2026-07-04T152321.882.zip`.
+- **Candidato auditado:** `Prototype Development Request - 2026-07-04T193658.630.zip`.
 - **Esperado:** empalme aditivo, no reemplazo total.
 - **Archivos protegidos:** backend LAB, `data/store.js`, rules, tools, docs backend.
 - **Estado:** ABIERTO.
@@ -115,21 +128,30 @@
 - **Esperado:** documentar regla como configuración de migración, no hardcode productivo; planillas pueden confirmar pagos aplicados si la fila real lo respalda y hay coincidencia confiable.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-08 — Auditoría y paquete Claude de candidata activa
+### ABIERTO-BE-104-08 — Auditorías y paquetes Claude de candidatas activas
 
 - **Área:** Coordinación Claude / Backend.
 - **Necesidad:** Paula no puede pedir nuevo candidato sin primero auditar el actual y entregar paquete Claude actualizado.
 - **Documentos agregados:**
   - `orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md`.
   - `orbit360-platform/docs/PAQUETE-COMPLETO-CLAUDE-ACTUALIZADO-POST-AUDITORIA-20260704.md`.
+  - `orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-193658.md`.
+  - `orbit360-platform/docs/PAQUETE-CLAUDE-ACTUALIZADO-CANDIDATO-193658-20260704.md`.
 - **Resultado:** auditoría de archivos reales realizada. No se aceptó resumen sin verificar.
 - **Estado:** CERRADO COMO DOCUMENTACIÓN / ABIERTO PARA EJECUCIÓN DE CLAUDE.
 
-### ABIERTO-BE-104-09 — Integrar score a dry-run/manifest y bandeja de conciliación
+### ABIERTO-BE-104-09 — Integrar manifest + dryRunReport + score al parser/importador real
 
 - **Área:** Backend importador / conciliaciones.
-- **Necesidad:** conectar el score seguro con el flujo de manifest/dry-run para que cada fila de planilla o estado derive en conciliación trazable.
-- **Esperado:** `dryRunReport` debe incluir score, decisión, acción propuesta, fuente, hoja/fila/bloque/periodo, país, moneda y motivo de bloqueo/validación.
+- **Necesidad:** conectar los validadores seguros con el flujo real de parser/importador para que cada fuente derive en reporte trazable y bandeja de conciliación.
+- **Esperado:** `manifest validado -> dryRunReport validado -> bandeja de conciliación trazable`, sin escritura automática.
+- **Estado:** ABIERTO.
+
+### ABIERTO-BE-104-10 — Bandeja de conciliación backend/Firestore LAB
+
+- **Área:** Backend / Firestore LAB / conciliaciones.
+- **Necesidad:** definir colección o estructura `conciliaciones` con score, decisión, acción propuesta, fuente, hoja/fila/bloque/periodo, país, moneda, cobroId/polizaId/comisionId y estado de revisión.
+- **Esperado:** no modificar `cobros` hasta confirmación aprobada; guardar propuestas separadas y auditables.
 - **Estado:** ABIERTO.
 
 ## C. Pendientes para reportar a Claude cuando Paula pida paquete
@@ -140,17 +162,18 @@
 4. Conservar el aprendizaje del guard v1.104 dentro del prototipo base.
 5. No reemplazar backend LAB ni scripts de validación al entregar nuevos ZIPs.
 6. Conservar mejoras del candidato activo: importador con fuentes separadas, país/moneda sin default, planillas de comisión, documentos como parches y estado bancario como conciliación.
-7. Corregir versionado documental v1.114/v1.117/v1.123.
-8. Corregir `GTQ` fijo en KPIs/totales agregados.
+7. Corregir versionado documental v1.114/v1.117/v1.123/v1.125.
+8. Corregir `GTQ` fijo en KPIs/totales agregados restantes.
 9. En UI de Pólizas, Cobros, Cliente360, Portal, Comisiones y Finanzas, separar prima neta/gastos/IVA/total y mostrar trazabilidad.
 10. Planilla de comisiones debe poder actuar como fuente de conciliación de pagos aplicados solo cuando la fila real lo confirme.
 11. Portal Cliente debe mostrar pago reportado/en revisión/aplicado/conciliado sin confundir estados.
-12. Academia debe conservar avances v1.118-v1.123 e incorporar evaluación aplicada sobre pólizas, cobros, planillas y Portal.
+12. Academia debe conservar avances v1.125 e incorporar evaluación aplicada sobre pólizas, cobros, planillas, Portal y score de conciliación.
 13. Mostrar en Importar/Comisiones/Cobros los estados de score: exacto, probable, requiere validación y bloqueado.
+14. Mostrar salida de dry-run antes de cualquier escritura o aplicación.
 
 ## D. Estado general
 
-Backend LAB reforzado. Candidata activa Claude auditada. Score de conciliación agregado como herramienta segura. Aún falta empalme completo GitHub, smoke real y continuidad Firestore/Auth/importadores por fases.
+Backend LAB reforzado. Candidata activa Claude `193658.630` auditada. Score de conciliación y validador `dryRunReport` agregados como herramientas seguras. Aún falta empalme completo GitHub, smoke real y continuidad Firestore/Auth/importadores por fases.
 
 ## E. Documentos agregados después del bloque pólizas/cartera y auditoría actual
 
@@ -160,3 +183,7 @@ Backend LAB reforzado. Candidata activa Claude auditada. Score de conciliación 
 - `orbit360-platform/docs/PAQUETE-COMPLETO-CLAUDE-ACTUALIZADO-POST-AUDITORIA-20260704.md`
 - `orbit360-platform/docs/CONTRATO-SCORE-CONFIANZA-CONCILIACION-AYS-20260704.md`
 - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-SCORE-CONCILIACION.md`
+- `orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-193658.md`
+- `orbit360-platform/docs/PAQUETE-CLAUDE-ACTUALIZADO-CANDIDATO-193658-20260704.md`
+- `orbit360-platform/docs/CONTRATO-DRYRUN-REPORT-IMPORTADOR-AYS-20260704.md`
+- `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260704-DRYRUN-REPORT.md`
