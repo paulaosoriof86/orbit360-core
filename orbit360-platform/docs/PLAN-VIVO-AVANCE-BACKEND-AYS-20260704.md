@@ -42,6 +42,7 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | Perfilador de columnas por fuente | Tooling agregado | Manifest validado produce perfil de columnas y readiness para dryRunReport. |
 | Constructor dryRunReport sin filas | Tooling agregado | Construye sobre seguro de dryRunReport desde manifest + perfil. |
 | Adaptador candidatos metadata-only | Tooling agregado | Combina dryRun envelope con candidatos estructurados y readiness para validador/score/propuestas. |
+| Orquestador pipeline metadata-only | Tooling agregado | Encadena perfil, dryRun envelope, candidatos metadata-only y validación final dryRun. |
 | Seguimiento de bloques | Agregado intermedio | Este plan vivo se mantiene actualizado después de cada bloque largo. |
 
 ## 4. Bloques pendientes principales
@@ -55,7 +56,7 @@ Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avan
 | P0 | Contrato/modelo `cobros` + pagos reportados + conciliación | Pendiente. |
 | P0 | Contrato/modelo `documentos` + Storage futuro | Pendiente. |
 | P0 | Smokes de roles: cliente/asesor/cobros/admin | Pendiente. |
-| P1 | Orquestador de pipeline metadata-only | Pendiente tras adaptador de candidatos. |
+| P1 | Orquestador score/propuestas plan-only | Pendiente tras pipeline metadata-only. |
 | P1 | Manuales y Academia actualizados por cambio | Pendiente para Claude/prototipo. |
 
 ## 5. Intermedios agregados
@@ -68,7 +69,7 @@ Estado: agregado mediante este documento y addendum maestro.
 
 ### Intermedio 2 — Correo por usuario autorizado
 
-Motivo: Paula aclaró que el correo no es por tenant ni rol; puede crearlo el tenant/admin para cada usuario al darlo de alta o dar instrucciones para crearlo.
+Motivo: Paula aclaró que el correo no es por tenant ni rol.
 
 Estado: documentado en contratos y matriz de canales por usuario.
 
@@ -80,7 +81,7 @@ Estado: documentado. Debe mantenerse en frontend, backend y manuales.
 
 ### Intermedio 4 — Smoke estático post-empalme Conciliaciones
 
-Motivo: después de empalmar candidata `062855.313`, era necesario validar el empalme sin esperar navegador local.
+Motivo: validar el empalme sin esperar navegador local.
 
 Relación con plan principal: puente entre empalme frontend y smoke visual/backend real.
 
@@ -110,6 +111,14 @@ Relación con plan principal: puente entre constructor dryRunReport y orquestado
 
 Estado: tooling agregado.
 
+### Intermedio 8 — Orquestador de pipeline metadata-only
+
+Motivo: faltaba ejecutar el tramo metadata-only completo en orden y con reporte único.
+
+Relación con plan principal: puente entre validación metadata-only y score/propuestas plan-only.
+
+Estado: tooling agregado.
+
 ## 6. Formato obligatorio de cierre de cada bloque
 
 Cada respuesta de continuidad debe cerrar con:
@@ -136,22 +145,19 @@ Regla fija solicitada por Paula: siempre indicar qué se adelantó, si se agreg�
 Continuar con:
 
 ```txt
-Orquestador de pipeline metadata-only.
+Orquestador score/propuestas plan-only.
 ```
 
 Este bloque debe conectar:
 
-- manifest;
-- perfil;
-- dryRun envelope;
-- candidates metadata-only;
-- validación dryRun;
+- dryRun validado;
 - score;
 - propuestas conciliaciones;
 - plan de persistencia;
 - cero datos reales;
-- cero writes.
+- cero writes;
+- cero aplicación controlada.
 
 ## 8. Estado
 
-Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport y adaptador de candidatos metadata-only. No avanzar a datos reales, aplicación controlada ni deploy sin smoke y autorización.
+Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport, adaptador de candidatos metadata-only y orquestador metadata-only. No avanzar a datos reales, aplicación controlada ni deploy sin smoke y autorización.
