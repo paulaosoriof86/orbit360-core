@@ -109,6 +109,15 @@
 - **Regla:** agrupa smoke estático, test orquestador, test readiness y `node --check`; calcula hash antes/después de archivos protegidos y bloquea si cambian.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local.
 
+### CERRADO-BE-104-26 — Guía runner local y criterios de bloqueo
+- **Área:** QA local / continuidad operativa / reducción de pasos manuales.
+- **Aplicado:**
+  - `tools/orbit360-run-validaciones-locales-conciliaciones-ays.ps1`.
+  - `orbit360-platform/docs/GUIA-EJECUCION-REVISION-RUNNER-CONCILIACIONES-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-GUIA-RUNNER-CONCILIACIONES.md`.
+- **Regla:** define comando único PowerShell, criterios de avance/bloqueo, revisión de reportes y qué compartir de vuelta; no autoriza adapter LAB ni pagos.
+- **Estado:** CERRADO COMO TOOLING/DOCUMENTACIÓN EN RAMA / pendiente ejecución local.
+
 ---
 
 ## B. Pendientes abiertos
@@ -179,7 +188,12 @@
 
 ### ABIERTO-BE-104-18 — Ejecución local del runner agrupado Conciliaciones
 - **Área:** QA local / conciliaciones / reportes.
-- **Necesidad:** ejecutar `node tools/orbit360-run-validaciones-locales-conciliaciones-ays.mjs` en entorno local, revisar `_orbit360_reports` y confirmar que no hubo cambios en archivos protegidos.
+- **Necesidad:** ejecutar `tools/orbit360-run-validaciones-locales-conciliaciones-ays.ps1` o `node tools/orbit360-run-validaciones-locales-conciliaciones-ays.mjs` en entorno local, revisar `_orbit360_reports` y confirmar que no hubo cambios en archivos protegidos.
+- **Estado:** ABIERTO.
+
+### ABIERTO-BE-104-19 — Checklist smoke visual/operativo Conciliaciones
+- **Área:** QA visual / navegador / roles.
+- **Necesidad:** preparar checklist de smoke visual para Dirección/Admin/Finanzas, estado vacío honesto, acciones seguras y no mutación de cobros antes de adapter LAB.
 - **Estado:** ABIERTO.
 
 ---
@@ -194,9 +208,10 @@
 6. Debe mostrar como estado honesto: propuesta/lista para revisión/pendiente de validación, no pago aplicado.
 7. Debe conservar el lenguaje de readiness: plan listo no equivale a persistencia ni a pago aplicado.
 8. Debe conservar el runner local como paso de QA previo a cualquier cambio que afecte Conciliaciones.
+9. Debe conservar los criterios de bloqueo/no bloqueo y no reinterpretar OK de runner como autorización de backend real.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB y runner agrupado de validaciones locales como intermedios entre manifest y futura persistencia LAB. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y ejecución local del runner agrupado.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales y guía/wrapper PowerShell como intermedios entre manifest y futura persistencia LAB. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y ejecución local del runner agrupado.
