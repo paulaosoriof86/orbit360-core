@@ -40,6 +40,17 @@
 - **Regla:** valida index híbrido, carga única del módulo, visibilidad Dirección/Admin/Finanzas, actualización solo de propuestas y estado honesto validado no equivale a pagado.
 - **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local y smoke visual.
 
+### CERRADO-BE-104-19 — Perfilador de columnas por fuente
+- **Área:** Backend / importador / parser / fuentes separadas.
+- **Aplicado:**
+  - `tools/orbit360-perfilar-columnas-fuente-ays.mjs`.
+  - `tools/orbit360-test-perfilar-columnas-fuente-ays.mjs`.
+  - `orbit360-platform/docs/CONTRATO-PERFILADOR-COLUMNAS-FUENTE-AYS-20260705.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260705-PERFILADOR-COLUMNAS-FUENTE.md`.
+- **Regla:** perfila metadata de columnas por fuente, identifica campos obligatorios/opcionales, matches probables, faltantes y columnas no mapeadas; no lee filas reales, no escribe, no aplica pagos y no genera cartera/producción.
+- **Intermedio agregado:** paso explícito entre manifest validado y constructor de `dryRunReport`.
+- **Estado:** CERRADO COMO TOOLING EN RAMA / pendiente ejecución local e integración con constructor de dryRunReport.
+
 ---
 
 ## B. Pendientes abiertos
@@ -98,8 +109,9 @@
 - **Restricción:** no construir ejecutor real sin autorización explícita de Paula.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-15 — Perfilador de columnas por fuente
-- **Área:** Backend / importador / parser.
+### ABIERTO-BE-104-15 — Constructor de dryRunReport sin payload real
+- **Área:** Backend / importador / parser / QA.
+- **Necesidad:** generar un `dryRunReport` desde manifest validado + perfil de columnas + fuente separada, sin filas reales y sin writes.
 - **Estado:** ABIERTO.
 
 ---
@@ -116,4 +128,4 @@
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, perfilador de columnas, score real y futuro ejecutor autorizado.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente como intermedio entre manifest y dryRunReport. Quedan abiertos smoke visual/local, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, constructor de dryRunReport, score real y futuro ejecutor autorizado.
