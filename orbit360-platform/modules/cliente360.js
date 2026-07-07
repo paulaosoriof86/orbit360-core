@@ -184,8 +184,8 @@ Orbit.modules.cliente360 = (function () {
             </div>
             <div style="margin-top:11px;display:flex;gap:8px;flex-wrap:wrap">
               ${c.driveLink
-                ? `<a href="${U.esc(c.driveLink)}" target="_blank" rel="noopener" class="fh-drive">📁 Expediente en Drive <span style="opacity:.6">↗</span></a>`
-                : `<span class="fh-drive ghost" onclick="Orbit.modules.cliente360.edit('${cid}')">📁 Agregar link de Drive</span>`}
+                ? `<a href="${U.esc(c.driveLink)}" target="_blank" rel="noopener" class="fh-drive">📁 Expediente vinculado <span style="opacity:.6">↗</span></a>`
+                : `<span class="fh-drive ghost" onclick="Orbit.modules.cliente360.edit('${cid}')">📁 Agregar enlace de expediente</span>`}
               <span class="fh-drive ghost" onclick="Orbit.importa.openFor('${cid}')">⬇ Importar a este expediente</span>
             </div>
           </div>
@@ -844,7 +844,7 @@ Orbit.modules.cliente360 = (function () {
             <button class="btn ghost" id="cmp-add">+ Agregar propuesta</button>
             <button class="btn ghost" id="cmp-pdf">⬇ Cargar propuesta (PDF/imagen)</button>
             <button class="btn ghost" id="cmp-solicitar">🗂 Solicitar a aseguradoras</button>
-            <button class="btn primary" id="cmp-enviar" style="margin-left:auto" ${props.length ? '' : 'disabled style="opacity:.4"'}>Enviar comparativo al cliente</button>
+            <button class="btn primary" id="cmp-enviar" style="margin-left:auto" ${props.length ? '' : 'disabled style="opacity:.4"'}>Preparar comparativo para cliente</button>
           </div>
         </div>
       </div>`;
@@ -852,7 +852,12 @@ Orbit.modules.cliente360 = (function () {
       back.querySelector('#cmp-add').addEventListener('click', addProp);
       back.querySelector('#cmp-pdf').addEventListener('click', () => { Orbit.importa.open('documentos', { scope: { cid: p.clienteId, nombre: (S().get('clientes', p.clienteId) || {}).nombre }, onDone: () => {} }); });
       back.querySelector('#cmp-solicitar').addEventListener('click', () => { Orbit.ciclo.solicitarGestion(p.clienteId, polId); });
-      const env = back.querySelector('#cmp-enviar'); if (env && !env.disabled) env.addEventListener('click', () => { Orbit.correo && Orbit.correo.enviar && Orbit.correo.enviar({ para: (S().get('clientes', p.clienteId) || {}).email || '', asunto: 'Comparativo de renovación · ' + p.numero, cuerpo: 'Adjunto el comparativo de tu renovación con ' + props.length + ' opción(es).', clienteId: p.clienteId }); const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Comparativo preparado para enviar al cliente'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); });
+      const env = back.querySelector('#cmp-enviar'); if (env && !env.disabled) env.addEventListener('click', () => {
+        const cli = S().get('clientes', p.clienteId) || {};
+        window.__orbitCompose = { para: cli.email || '', asunto: 'Comparativo de renovación · ' + p.numero, cuerpo: 'Adjunto el comparativo de tu renovación con ' + props.length + ' opción(es).', clienteId: p.clienteId, vinculo: { tipo: 'poliza', id: polId, label: p.numero } };
+        location.hash = '#/correo';
+        const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = 'Comparativo preparado en Correo; envío real requiere cuenta conectada'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
+      });
       back.querySelectorAll('.cmp-del').forEach(b => b.addEventListener('click', () => { p.propuestasRenov = p.propuestasRenov.filter(x => x.id !== b.dataset.id); S().update('polizas', polId, { propuestasRenov: p.propuestasRenov }); paint(); }));
     }
     function addProp() {
@@ -1022,7 +1027,7 @@ Orbit.modules.cliente360 = (function () {
         ${s.descripcion ? `<p style="font-size:13px;color:var(--ink-2);margin:0 0 10px">${U.esc(s.descripcion)}</p>` : ''}
         ${docs ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${docs}</div>` : ''}
         <b style="font-family:var(--f-display);font-size:12.5px">Bitácora</b>${bit || '<div class="muted" style="font-size:12px">Sin movimientos.</div>'}
-        <div style="margin-top:10px;display:flex;gap:8px"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.addBitacora('${s.id}','${cid}')">+ Anotar movimiento</button><button class="btn ghost sm" onclick="Orbit.correo.enviar({para:'',asunto:'${U.esc((s.numero || '') + ' · ' + r.cli.nombre)}',cuerpo:'',clienteId:'${cid}',vinculo:{tipo:'reclamo',id:'${s.id}',label:'${U.esc(s.numero || s.id)}'}})">✉ Correo a aseguradora</button></div>
+        <div style="margin-top:10px;display:flex;gap:8px"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.addBitacora('${s.id}','${cid}')">+ Anotar movimiento</button><button class="btn ghost sm" onclick="window.__orbitCompose={para:'',asunto:'${U.esc((s.numero || '') + ' · ' + r.cli.nombre)}',cuerpo:'',clienteId:'${cid}',vinculo:{tipo:'reclamo',id:'${s.id}',label:'${U.esc(s.numero || s.id)}'}};location.hash='#/correo'">✉ Preparar correo aseguradora</button></div>
       </div></details>`;
     }).join('');
   }
@@ -1032,7 +1037,7 @@ Orbit.modules.cliente360 = (function () {
     const arr = (Orbit.correo ? Orbit.correo.deCliente(cid) : []).sort((a, b) => (b.fecha + b.hora).localeCompare(a.fecha + a.hora));
     return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
       <b style="font-family:var(--f-display);font-size:15px">Correos de ${U.esc(r.cli.nombre)}</b>
-      <div style="display:flex;gap:8px"><button class="btn ghost sm" onclick="location.hash='#/correo'">Abrir bandeja</button><button class="btn primary sm" onclick="Orbit.correo.enviar({para:'${U.esc(r.cli.email || '')}',asunto:'',cuerpo:'',clienteId:'${cid}',vinculo:{tipo:'cliente',id:'${cid}',label:'${U.esc(r.cli.nombre)}'}});Orbit.modules.cliente360.reabrir('${cid}','correos')">✏ Redactar</button></div>
+      <div style="display:flex;gap:8px"><button class="btn ghost sm" onclick="location.hash='#/correo'">Abrir bandeja</button><button class="btn primary sm" onclick="window.__orbitCompose={para:'${U.esc(r.cli.email || '')}',asunto:'',cuerpo:'',clienteId:'${cid}',vinculo:{tipo:'cliente',id:'${cid}',label:'${U.esc(r.cli.nombre)}'}};location.hash='#/correo'">✏ Redactar</button></div>
     </div>
     ${arr.length ? `<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th></th><th>Asunto</th><th>De / Para</th><th>Vínculo</th><th>Fecha</th></tr></thead>
