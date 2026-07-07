@@ -11,19 +11,18 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.portal = (function () {
   const U = Orbit.ui, S = () => Orbit.store, q = Orbit.q;
   let host, clienteId, tab = 'inicio';
-  // Localización: término por país del cliente activo
-  function TT(k) { try { const c = S().get('clientes', clienteId) || {}; return (Orbit.termino ? Orbit.termino(k, c.pais) : k); } catch (e) { return k; } }
 
+  function TT(k) { try { const c = S().get('clientes', clienteId) || {}; return (Orbit.termino ? Orbit.termino(k, c.pais) : k); } catch (e) { return k; } }
   function clientes() { return S().all('clientes'); }
   function notifsDe(cid) { return S().where('notifs', n => n.clienteId === cid).sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')); }
   function noLeidas(cid) { return notifsDe(cid).filter(n => !n.leida).length; }
+  function esPolizaActivaPortal(p) { return p && (p.estado === 'Vigente' || p.estado === 'Por renovar'); }
 
   function render(h) {
     host = h;
     if (!clienteId) clienteId = (clientes()[0] || {}).id;
     const cli = S().get('clientes', clienteId);
     if (!cli) { host.innerHTML = '<div class="page"><div class="modstate"><div class="ms-ico">🔒</div><h2>Portal del Cliente</h2><p>Sin clientes para previsualizar.</p></div></div>'; return; }
-    // cláusula mutua de confidencialidad + tratamiento de datos al primer ingreso del cliente
     if (Orbit.legal && Orbit.legal.gate) Orbit.legal.gate('cliente', 'cliente:' + clienteId);
     const nl = noLeidas(clienteId);
     host.innerHTML = `<div class="page">
@@ -45,7 +44,7 @@ Orbit.modules.portal = (function () {
       </div>
     </div>`;
     const cob = q.cobrosDe(clienteId);
-    const pols = q.polizasDe(clienteId).filter(p => p.estado !== 'Cancelada');
+    const pols = q.polizasDe(clienteId).filter(esPolizaActivaPortal);
     const pend = cob.filter(c => c.estado === 'Pendiente' || c.estado === 'Vencido');
     const recl = S().where('reclamos', r => r.clienteId === clienteId);
     const body = document.getElementById('pt-body');
@@ -55,7 +54,6 @@ Orbit.modules.portal = (function () {
     else if (tab === 'siniestros') body.innerHTML = vSiniestros(recl);
     else if (tab === 'docs') body.innerHTML = vDocs(cli);
     else body.innerHTML = vAprende();
-    // wiring
     host.querySelector('#pt-cli').addEventListener('change', e => { clienteId = e.target.value; tab = 'inicio'; render(host); });
     host.querySelector('#pt-admin').addEventListener('click', adminNotif);
     host.querySelector('#pt-bell').addEventListener('click', verNotifs);
@@ -131,9 +129,7 @@ Orbit.modules.portal = (function () {
       <button class="pt-action" style="margin-top:12px" data-glos="1">📖 Ver glosario de seguros</button>`;
   }
 
-  /* ---- Notificaciones (campana) ---- */
   function verNotifs() {
-    const cli = S().get('clientes', clienteId);
     const arr = notifsDe(clienteId);
     arr.forEach(n => { if (!n.leida) S().update('notifs', n.id, { leida: true }); });
     drawer('🔔 Notificaciones', arr.length ? arr.map(n => `<div class="pt-row pt-click" data-ntf="${n.id}"><span class="pt-row-ic">${n.tipo === 'cobro' ? '💳' : n.tipo === 'renovacion' ? '🔄' : '📢'}</span><div style="flex:1"><b>${U.esc(n.titulo)}</b><div class="muted" style="font-size:11.5px">${U.esc((n.cuerpo || '').slice(0, 70))}${(n.cuerpo || '').length > 70 ? '…' : ''}</div><div class="muted" style="font-size:10.5px;margin-top:3px">${U.fmtDate(n.fecha)} ›</div></div></div>`).join('') : '<div class="pt-empty">Sin notificaciones.</div>', null, 'Cerrar', () => render(host));
@@ -147,21 +143,20 @@ Orbit.modules.portal = (function () {
       <p style="line-height:1.65;font-size:14px;white-space:pre-wrap">${U.esc(n.cuerpo || '')}</p>`;
     drawer('Notificación', html, null, 'Cerrar');
   }
-  /* ---- Admin: enviar notificación a uno o a todos ---- */
+
   function adminNotif() {
     const html = `<label class="ce-l">Destinatario<select id="an-dest" class="o-sel"><option value="__all">📢 Todos los clientes</option>${clientes().map(c => `<option value="${c.id}">${U.esc(c.nombre)}</option>`).join('')}</select></label>
       <label class="ce-l" style="margin-top:10px">Título<input id="an-tit" class="o-sel" placeholder="Ej. Aviso importante"></label>
       <label class="ce-l" style="margin-top:10px">Mensaje<textarea id="an-msg" class="o-sel" style="min-height:64px;resize:vertical;padding:9px 11px"></textarea></label>
-      <div class="cfg-note" style="margin-top:10px">La notificación aparece en el portal del cliente y se envía por WhatsApp/correo.</div>`;
+      <div class="cfg-note" style="margin-top:10px">La notificación aparece en el portal del cliente. WhatsApp/correo quedan pendientes de integración o canal conectado.</div>`;
     const back = drawer('📢 Enviar notificación', html, () => {
       const dest = back.querySelector('#an-dest').value, tit = back.querySelector('#an-tit').value || 'Aviso', msg = back.querySelector('#an-msg').value;
       const dests = dest === '__all' ? clientes() : [S().get('clientes', dest)];
       dests.forEach(c => { if (!c) return; S().insert('notifs', { id: 'ntf' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.id, titulo: tit, cuerpo: msg, tipo: 'admin', fecha: Orbit.ui.today(), leida: false }); });
-      back.remove(); toast('✓ Notificación enviada a ' + (dest === '__all' ? 'todos' : '1 cliente')); render(host);
-    }, 'Enviar');
+      back.remove(); toast('✓ Notificación registrada en portal para ' + (dest === '__all' ? 'todos' : '1 cliente')); render(host);
+    }, 'Registrar');
   }
 
-  /* ---- Reportar pago (sube soporte → notifica al equipo) ---- */
   function reportarPago(cobroId) {
     const c = S().get('cobros', cobroId); if (!c) return;
     const cli = S().get('clientes', clienteId);
@@ -173,40 +168,37 @@ Orbit.modules.portal = (function () {
       const f = back.querySelector('#rp-file').files[0];
       S().update('cobros', cobroId, { reportado: Orbit.ui.today(), soporteNombre: f ? f.name : '', notaReporte: back.querySelector('#rp-nota').value });
       S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: (S().get('polizas', c.polizaId) || {}).asesorId || cli.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Pago reportado por el cliente', detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (f ? ' · soporte: ' + f.name : '') + ' · pendiente de validar' });
-      if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo: 'Validar pago reportado', titulo: 'Validar pago · ' + cli.nombre, clienteId, polizaId: c.polizaId, asesorId: cli.asesorId, prioridad: 'Alta', vence: '2026-06-26', nota: 'El cliente reportó el pago de la cuota ' + c.cuota, origen: 'Portal del cliente' });
+      if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo: 'Validar pago reportado', titulo: 'Validar pago · ' + cli.nombre, clienteId, polizaId: c.polizaId, asesorId: cli.asesorId, prioridad: 'Alta', vence: Orbit.ui.today(), nota: 'El cliente reportó el pago de la cuota ' + c.cuota, origen: 'Portal del cliente' });
       back.remove(); toast('✓ Recibimos tu reporte · pendiente de revisión/conciliación'); render(host);
     }, 'Enviar reporte');
   }
 
-  /* ---- Soporte directo al asesor ---- */
   function soporteAsesor(cli) {
     const ase = q.asesor(cli.asesorId);
-    const wa = (cli.telefono || '').replace(/\D/g, '');
+    const wa = String((ase && (ase.telefono || ase.whatsapp)) || '').replace(/\D/g, '');
     drawer('🧑‍💼 Tu asesor', `<div style="text-align:center;padding:8px 0">
       <div style="width:60px;height:60px;border-radius:50%;margin:0 auto;background:${ase ? ase.color : '#999'};display:grid;place-items:center;color:#fff;font-family:var(--f-display);font-weight:800;font-size:22px">${ase ? ase.iniciales : '?'}</div>
       <b style="display:block;margin-top:10px;font-family:var(--f-display);font-size:16px">${ase ? U.esc(ase.nombre) : 'Tu asesor'}</b>
       <div class="muted" style="font-size:12.5px">${ase ? ase.rol : ''}</div>
       <div style="display:flex;gap:8px;justify-content:center;margin-top:14px">
-        <a class="btn primary sm" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>
+        ${wa ? `<a class="btn primary sm" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>` : '<span class="badge warn">Canal pendiente de configuración</span>'}
         ${ase && ase.email ? `<a class="btn ghost sm" href="mailto:${ase.email}?subject=Consulta%20desde%20mi%20portal" target="_blank" rel="noopener">✉ Correo</a>` : ''}
       </div></div>`, null, 'Cerrar');
   }
 
-  /* ---- Subir documento al expediente ---- */
   function subirDoc() {
     const cli = S().get('clientes', clienteId);
     const html = `<label class="ce-l">Tipo de documento<select id="sd-tipo" class="o-sel">${['DPI / Cédula', 'RTU / RUT', 'Licencia', 'Comprobante de domicilio', 'Otro'].map(t => `<option>${t}</option>`).join('')}</select></label>
       <label class="ce-l" style="margin-top:10px">Archivo<input id="sd-file" type="file" class="o-sel"></label>
-      <div class="cfg-note" style="margin-top:10px">Tu documento se guarda en tu expediente y el equipo lo verá al instante.</div>`;
+      <div class="cfg-note" style="margin-top:10px">Tu documento queda registrado en el expediente para revisión del equipo. La carga real del archivo requiere Storage/backend conectado.</div>`;
     const back = drawer('⬆ Añadir documento', html, () => {
       const f = back.querySelector('#sd-file').files[0]; const tipo = back.querySelector('#sd-tipo').value;
-      S().insert('documentos', { id: 'doc' + Date.now(), clienteId, tipo, nombre: f ? f.name : tipo, fecha: Orbit.ui.today(), origen: 'Portal del cliente' });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '📁', fecha: Orbit.ui.today(), titulo: 'Documento subido por el cliente', detalle: tipo + (f ? ' · ' + f.name : '') });
-      back.remove(); toast('✓ Documento añadido a tu expediente'); render(host);
-    }, 'Subir');
+      S().insert('documentos', { id: 'doc' + Date.now(), clienteId, tipo, nombre: f ? f.name : tipo, fecha: Orbit.ui.today(), origen: 'Portal del cliente', archivoPendienteStorage: true });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '📁', fecha: Orbit.ui.today(), titulo: 'Documento registrado por el cliente', detalle: tipo + (f ? ' · ' + f.name : '') + ' · revisión pendiente / Storage pendiente' });
+      back.remove(); toast('✓ Documento registrado en expediente · revisión pendiente'); render(host);
+    }, 'Registrar');
   }
 
-  /* ---- Asistente de chat (no se menciona IA) ---- */
   function chat(cli) {
     const nombre = cli.nombre.split(' ')[0];
     const botName = 'Asistente de ' + nombre;
@@ -241,20 +233,18 @@ Orbit.modules.portal = (function () {
     back.querySelector('#pc-x').addEventListener('click', close);
   }
 
-  /* ---- Solicitud del cliente → Ops + notifica ---- */
   function solicitar(tipoPre) {
     const cli = S().get('clientes', clienteId); if (!cli) return;
     const tipos = ['Actualizar mis datos', 'Solicitar copia de póliza', 'Consulta de cobertura', 'Reclamo / Siniestro', 'Cancelar póliza', 'Otra solicitud'];
     const html = `<label class="ce-l">Tipo de solicitud<select id="ps-tipo" class="o-sel">${tipos.map(t => `<option ${t === tipoPre ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
       <label class="ce-l" style="margin-top:10px">Detalle<textarea id="ps-det" class="o-sel" style="min-height:70px;resize:vertical;padding:9px 11px" placeholder="Cuéntanos qué necesitas…"></textarea></label>
-      <div class="cfg-note" style="margin-top:10px">Tu solicitud llega al equipo (Orbit Ops) y te avisaremos por WhatsApp/correo.</div>`;
+      <div class="cfg-note" style="margin-top:10px">Tu solicitud llega al equipo (Orbit Ops). WhatsApp/correo quedan pendientes de canal conectado.</div>`;
     const back = drawer('🗂 Solicitar una gestión', html, () => {
       const tipo = back.querySelector('#ps-tipo').value, det = back.querySelector('#ps-det').value.trim();
       const esSiniestro = /reclamo|siniestro/i.test(tipo);
       let reclamoId = '';
       if (esSiniestro) {
-        // Alta CANÓNICA del reclamo en el store (aparece en módulo Siniestros + ficha Cliente360)
-        const pol = q.polizasDe(clienteId).filter(p => p.estado !== 'Cancelada')[0];
+        const pol = q.polizasDe(clienteId).filter(esPolizaActivaPortal)[0];
         reclamoId = 'rcl' + Date.now();
         const num = 'SIN-' + new Date().getFullYear() + '-' + String(S().all('reclamos').length + 1).padStart(4, '0');
         S().insert('reclamos', {
@@ -266,11 +256,10 @@ Orbit.modules.portal = (function () {
       }
       if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo, titulo: tipo + ' · ' + cli.nombre, clienteId, asesorId: cli.asesorId, prioridad: esSiniestro ? 'Alta' : 'Media', vence: Orbit.ui.today(), nota: det, origen: 'Portal del cliente', reclamoId, checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'En gestión', done: false }] });
       S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: esSiniestro ? 'siniestro' : 'sistema', icon: esSiniestro ? '🚨' : '🙋', fecha: Orbit.ui.today(), titulo: esSiniestro ? 'Siniestro reportado por el cliente' : ('Solicitud del cliente: ' + tipo), detalle: det + ' · Portal → Ops' + (reclamoId ? ' + Siniestros' : ''), reclamoId });
-      back.remove(); toast(esSiniestro ? '✓ Siniestro reportado · el equipo le dará seguimiento' : '✓ Solicitud enviada al equipo'); render(host);
+      back.remove(); toast(esSiniestro ? '✓ Siniestro reportado · el equipo le dará seguimiento' : '✓ Solicitud registrada para el equipo'); render(host);
     }, 'Enviar solicitud');
   }
 
-  /* ---- Detalles amplios para el cliente ---- */
   function detPoliza(polId) {
     const p = S().get('polizas', polId); if (!p) return;
     const asg = q.aseguradora(p.aseguradoraId), veh = (S().where('vehiculos', v => v.polizaId === polId) || [])[0];
@@ -318,7 +307,6 @@ Orbit.modules.portal = (function () {
       <div class="pol-hist">${(r.bitacora || []).slice().reverse().map(b => `<div class="pol-hev"><div class="pol-hev-i">📌</div><div><div class="pol-hev-t">${U.esc(b.t)}</div><div class="pol-hev-d">${U.esc(b.ts || '')}</div></div></div>`).join('') || '<div class="muted" style="font-size:12px">Sin movimientos aún.</div>'}</div>`, null, 'Cerrar');
   }
 
-  /* ---- Glosario propio del cliente ---- */
   function glosario() {
     const terms = (Orbit.GLOSARIO || []).slice();
     drawer('📖 Glosario de seguros', `<input id="gl-q" class="o-sel" placeholder="Buscar término…" style="margin-bottom:10px">
@@ -326,7 +314,6 @@ Orbit.modules.portal = (function () {
     const dr = document.getElementById('pt-dr'); const inp = dr.querySelector('#gl-q');
     inp.addEventListener('input', () => { const v = inp.value.toLowerCase(); dr.querySelector('#gl-list').innerHTML = terms.filter(t => (t.t + t.d).toLowerCase().includes(v)).map(t => `<div class="pt-row" style="cursor:default"><div style="flex:1"><b>${U.esc(t.t)}</b><div class="muted" style="font-size:11.5px">${U.esc(t.d)}</div></div></div>`).join(''); });
   }
-
   function verDocPortal(docId) {
     const d = S().get('documentos', docId); if (!d) return;
     const src = d.src || d.url || d.iframeSrc || '';
@@ -359,7 +346,6 @@ Orbit.modules.portal = (function () {
     drawer('🎓 ' + U.esc(titulo), body, null, 'Cerrar');
   }
 
-  /* ---- helper drawer ---- */
   function drawer(titulo, bodyHtml, onOk, okLabel, onClose) {
     let back = document.getElementById('pt-dr'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'pt-dr'; back.className = 'drawer-back open';
