@@ -8,6 +8,7 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.cliente360 = (function () {
   const U = Orbit.ui, q = Orbit.q, S = () => Orbit.store;
+  const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');
 
   let host;
   let filtros = { q: '', pais: '', tipo: '', asesor: '', seg: '' };
@@ -285,7 +286,7 @@ Orbit.modules.cliente360 = (function () {
     const proxCobro = r.cob.filter(c => c.estado === 'Pendiente').sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')))[0];
     // distribución por ramo
     const porRamo = {};
-    r.pol.filter(p => p.estado !== 'Cancelada').forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + p.prima);
+    r.pol.filter(esRenovable).forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + p.prima);
     const totalRamo = Object.values(porRamo).reduce((s, v) => s + v, 0) || 1;
     const ramoCols = ['#C5162E', '#1E2227', '#1f3a5f', '#1f8a4c', '#c9821b', '#6b4ea0', '#0f766e'];
 
@@ -397,7 +398,7 @@ Orbit.modules.cliente360 = (function () {
 
   /* ---- Renovaciones ---- */
   function tabRenov(cid, r) {
-    const items = r.pol.filter(p => p.estado !== 'Cancelada').slice().sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
+    const items = r.pol.filter(esRenovable).slice().sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
     return `<div class="card pad">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <b style="font-family:var(--f-display);font-size:15px">Línea de renovaciones</b>

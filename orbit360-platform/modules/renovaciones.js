@@ -6,6 +6,7 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.renovaciones = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
+  const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');
 
   function buckets() {
     const cols = [
@@ -14,7 +15,7 @@ Orbit.modules.renovaciones = (function () {
       { key: 'd45', label: 'Próximas (16–45 d)', tone: 'warn', test: d => d > 15 && d <= 45 },
       { key: 'd90', label: 'En el horizonte (46–90 d)', tone: 'info', test: d => d > 45 && d <= 90 }
     ];
-    const pols = S().where('polizas', p => p.estado !== 'Cancelada');
+    const pols = S().where('polizas', esRenovable);
     cols.forEach(c => c.items = []);
     pols.forEach(p => {
       const d = U.daysFromNow(p.vigenciaFin);
@@ -140,6 +141,10 @@ Orbit.modules.renovaciones = (function () {
   /* ---- Solicitar propuestas de renovación con comparativo MULTI-ASEGURADORA ---- */
   function solicitarPropuestas(polizaId) {
     const p = S().get('polizas', polizaId); if (!p) return;
+    if (!esRenovable(p)) {
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = 'Poliza no renovable: usar historico/recuperacion.'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+      return;
+    }
     const cli = S().get('clientes', p.clienteId) || {};
     const primaBase = +(p.primaNeta != null ? p.primaNeta : p.prima) || 0;
     const cur = p.moneda || (cli.pais === 'CO' ? 'COP' : 'GTQ');

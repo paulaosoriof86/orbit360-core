@@ -354,7 +354,7 @@ Orbit.modules.finanzas = (function () {
   function produccionNeta() {
     // prima neta vigente menos primas no devengadas por cancelación
     const vig = S().where('polizas', p => p.estado === 'Vigente' || p.estado === 'Por renovar')
-      .reduce((s, p) => s + q.norm(p.prima, p.moneda), 0);
+      .reduce((s, p) => s + q.norm(p.primaNeta != null ? p.primaNeta : 0, p.moneda), 0);
     const noDeveng = S().all('cancelaciones').reduce((s, c) => {
       const cli = S().get('clientes', c.clienteId);
       return s + q.norm(c.valorPerdido, (cli && cli.moneda) || 'GTQ');
@@ -849,12 +849,17 @@ Orbit.modules.finanzas = (function () {
     const pagados = S().where('cobros', c => c.estado === 'Pagado');
     const conc = pagados.filter(c => c.conciliado).length;
     const sinConc = pagados.length - conc;
+    const pais = paisFin();
+    const bancoRows = (S().all('conciliacionBanco') || []).filter(x => !pais || x.pais === pais);
+    const depSin = bancoRows.filter(x => x.estado === 'sin_asociar' || x.estado === 'pendiente' || x.estado === 'pendiente_conciliacion').length;
+    const movSin = bancoRows.filter(x => x.requiereMovimiento === true || x.estado === 'movimiento_pendiente').length;
+    const footBanco = bancoRows.length ? 'segun conciliacionBanco' : 'pendiente de importacion';
     return `<div class="cfg-note" style="margin-bottom:14px">🏦 <b>Doble conciliación</b>: (1) depósito bancario ↔ recaudo del cliente, y (2) cobro confirmado ↔ póliza creada. Importa el estado bancario para cruzar automáticamente, sin duplicar.</div>
     ${K.kpis([
       { label: 'Pagos conciliados', val: conc, color: 'var(--ok)', foot: 'confirmados a póliza', footTone: 'up' },
       { label: 'Por conciliar', val: sinConc, color: 'var(--warn)', foot: 'pendiente de conciliación' },
-      { label: 'Depósitos sin asociar', val: 3, color: 'var(--danger)', foot: 'del banco' },
-      { label: 'Movimientos sin crear', val: 1, color: 'var(--info)', foot: 'detectados' }
+      { label: 'Depósitos sin asociar', val: depSin, color: 'var(--danger)', foot: footBanco },
+      { label: 'Movimientos sin crear', val: movSin, color: 'var(--info)', foot: footBanco }
     ])}
     <div class="card pad" style="margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
       <b style="font-family:var(--f-display);font-size:15px;flex:1">Conciliación</b>

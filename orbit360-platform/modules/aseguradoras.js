@@ -15,6 +15,16 @@ Orbit.modules.aseguradoras = (function () {
   function paisOK(p) { return !Orbit.pais || Orbit.pais === 'TODOS' || p === Orbit.pais; }
   function up(id, patch) { S().update('aseguradoras', id, patch); }
   function reload() { if (host) render(host); }
+  function portalSnapshot(row) {
+    const passInput = row.querySelector('[data-pp]');
+    const credentialRef = passInput && passInput.value ? 'backend_required' : (row.dataset.cred || '');
+    return {
+      nombre: row.querySelector('[data-pn]').value,
+      url: row.querySelector('[data-pu]').value,
+      usuario: row.querySelector('[data-pus]').value,
+      credentialRef
+    };
+  }
 
   function render(h) {
     host = h;
@@ -63,7 +73,7 @@ Orbit.modules.aseguradoras = (function () {
     const f = a.facturacion || {};
     const cont = a.contactos || [], cuentas = a.cuentas || [];
     // portales: migrar el portal único viejo a array
-    const portales = a.portales && a.portales.length ? a.portales : (a.portal ? [{ nombre: 'Portal principal', url: a.portal, usuario: '', pass: '' }] : []);
+    const portales = a.portales && a.portales.length ? a.portales : (a.portal ? [{ nombre: 'Portal principal', url: a.portal, usuario: '', credentialRef: '' }] : []);
     const docs = a.docs || [], reqs = a.docsRequeridos || [];
     const ramos = a.ramos || [];
     const toneTipo = { 'Comercial / Técnico': 'info', 'Comercial': 'info', 'Técnico': 'info', 'Administrativo': 'neutral', 'Siniestros': 'danger' };
@@ -156,7 +166,7 @@ Orbit.modules.aseguradoras = (function () {
     // snapshot: guarda lo escrito en el formulario ANTES de re-renderizar (evita perder filas no guardadas)
     function snapshot() {
       const g = s => (back.querySelector(s) || {}).value || '';
-      const portalesNew = [...back.querySelectorAll('[data-portal]')].map(row => ({ nombre: row.querySelector('[data-pn]').value, url: row.querySelector('[data-pu]').value, usuario: row.querySelector('[data-pus]').value, pass: row.querySelector('[data-pp]').value }));
+      const portalesNew = [...back.querySelectorAll('[data-portal]')].map(portalSnapshot);
       const contNew = [...back.querySelectorAll('[data-cont]')].map(row => ({ tipo: row.querySelector('[data-ct]').value, nombre: row.querySelector('[data-cn]').value, email: row.querySelector('[data-ce]').value, tel: row.querySelector('[data-cl]').value }));
       const ctaNew = [...back.querySelectorAll('[data-cta]')].map(row => ({ banco: row.querySelector('[data-cb]').value, tipo: row.querySelector('[data-ctt]').value, numero: row.querySelector('[data-ccn]').value, moneda: row.querySelector('[data-cm]').value }));
       const docNew = [...back.querySelectorAll('[data-doc]')].map(row => ({ nombre: row.querySelector('[data-dn]').value, cat: row.querySelector('[data-dc]').value }));
@@ -166,7 +176,7 @@ Orbit.modules.aseguradoras = (function () {
       up(id, { nombre: g('#af-nombre') || a.nombre, drive: g('#af-drive'), nit: g('#af-nit'), facturacion: { razonSocial: g('#af-rs'), patronConcepto: g('#af-patron'), dirFiscal: g('#af-dir') }, portales: portalesNew, contactos: contNew, cuentas: ctaNew, docs: docNew, docsRequeridos: reqNew, comisiones: comNew });
     }
     const push = (key, obj) => { snapshot(); const arr = (S().get('aseguradoras', id)[key] || []).slice(); arr.push(obj); up(id, { [key]: arr }); ficha(id, true); };
-    $('#af-add-portal').addEventListener('click', () => push('portales', { nombre: 'Portal', url: '', usuario: '', pass: '' }));
+    $('#af-add-portal').addEventListener('click', () => push('portales', { nombre: 'Portal', url: '', usuario: '', credentialRef: '' }));
     $('#af-add-cont').addEventListener('click', () => push('contactos', { tipo: 'Comercial / Técnico', nombre: '', email: '', tel: '' }));
     $('#af-add-cta').addEventListener('click', () => push('cuentas', { banco: '', tipo: 'Monetaria', numero: '', moneda: a.pais === 'GT' ? 'GTQ' : 'COP' }));
     $('#af-add-doc').addEventListener('click', () => push('docs', { nombre: 'Documento.pdf', cat: 'Tarifas' }));
@@ -184,7 +194,7 @@ Orbit.modules.aseguradoras = (function () {
     // save
     $('#af-save').addEventListener('click', () => {
       const g = s => (back.querySelector(s) || {}).value || '';
-      const portalesNew = [...back.querySelectorAll('[data-portal]')].map(row => ({ nombre: row.querySelector('[data-pn]').value, url: row.querySelector('[data-pu]').value, usuario: row.querySelector('[data-pus]').value, pass: row.querySelector('[data-pp]').value }));
+      const portalesNew = [...back.querySelectorAll('[data-portal]')].map(portalSnapshot);
       const contNew = [...back.querySelectorAll('[data-cont]')].map(row => ({ tipo: row.querySelector('[data-ct]').value, nombre: row.querySelector('[data-cn]').value, email: row.querySelector('[data-ce]').value, tel: row.querySelector('[data-cl]').value }));
       const ctaNew = [...back.querySelectorAll('[data-cta]')].map(row => ({ banco: row.querySelector('[data-cb]').value, tipo: row.querySelector('[data-ctt]').value, numero: row.querySelector('[data-ccn]').value, moneda: row.querySelector('[data-cm]').value }));
       const docNew = [...back.querySelectorAll('[data-doc]')].map(row => ({ nombre: row.querySelector('[data-dn]').value, cat: row.querySelector('[data-dc]').value }));
@@ -202,11 +212,13 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ---- filas editables ---- */
   function portalRow(p, i) {
-    return `<div class="asg-row" data-portal="${i}">
+    const credentialRef = p.credentialRef || (p.pass ? 'backend_required' : '');
+    return `<div class="asg-row" data-portal="${i}" data-cred="${U.esc(credentialRef)}">
       <input class="o-sel" data-pn placeholder="Nombre del portal" value="${U.esc(p.nombre || '')}" style="flex:1.2">
       <input class="o-sel" data-pu placeholder="https://…" value="${U.esc(p.url || '')}" style="flex:1.5">
       <input class="o-sel" data-pus placeholder="Usuario" value="${U.esc(p.usuario || '')}" style="flex:1">
-      <input class="o-sel" data-pp type="password" placeholder="Contraseña" value="${U.esc(p.pass || '')}" style="flex:1">
+      <input class="o-sel" data-pp type="password" placeholder="Pendiente de boveda segura" value="" style="flex:1">
+      <span class="muted" style="font-size:11px;flex:.9">${credentialRef ? 'Credencial pendiente de boveda segura' : 'Sin credencial guardada'}</span>
       ${p.url ? `<a class="asg-link" href="${p.url.match(/^https?:/) ? p.url : 'https://' + p.url}" target="_blank" rel="noopener" title="Abrir portal">↗</a>` : ''}
       <button class="asg-del" data-del="portales:${i}" title="Quitar">✕</button></div>`;
   }
