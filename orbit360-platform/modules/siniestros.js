@@ -10,11 +10,18 @@ Orbit.modules.siniestros = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store, q = Orbit.q;
   let host, filtro = 'todos';
   const ESTADOS = ['Reportado', 'En análisis', 'Documentación', 'Aprobado', 'Pagado', 'Rechazado'];
+  const FINALES = ['Aprobado', 'Pagado', 'Rechazado'];
   const TONE = { 'Reportado': 'warn', 'En análisis': 'info', 'Documentación': 'info', 'Aprobado': 'ok', 'Pagado': 'ok', 'Rechazado': 'danger' };
 
   function paisOK(cid) { const c = S().get('clientes', cid); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }
   function monedaReclamo(r) { const c = S().get('clientes', r.clienteId) || {}; return c.moneda || Orbit.q.monedaPais(); }
   function todos() { return S().all('reclamos').filter(r => paisOK(r.clienteId)); }
+  function ts() { return Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5); }
+  function adminAct(r, titulo, detalle) {
+    try {
+      S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: r.clienteId, asesorId: r.asesorId, tipo: 'siniestro', icon: '🚨', fecha: Orbit.ui.today(), titulo, detalle, reclamoId: r.id });
+    } catch (e) {}
+  }
 
   function render(h) {
     host = h;
@@ -79,7 +86,7 @@ Orbit.modules.siniestros = (function () {
         <button class="imp-x" id="si-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
       <div style="padding:18px 22px;display:grid;gap:16px">
         <div class="cx-kpis">
-          <div class="cx-kpi"><span>Estado</span><b><select id="si-estado" class="o-sel" style="font-size:13px;padding:3px 6px">${ESTADOS.map(e => `<option ${e === r.estado ? 'selected' : ''}>${e}</option>`).join('')}</select></b><small>cambia y guarda bitácora</small></div>
+          <div class="cx-kpi"><span>Estado</span><b><select id="si-estado" class="o-sel" style="font-size:13px;padding:3px 6px">${ESTADOS.map(e => `<option ${e === r.estado ? 'selected' : ''}>${e}</option>`).join('')}</select></b><small>estados finales requieren motivo</small></div>
           <div class="cx-kpi"><span>Reclamado</span><b>${U.money(r.montoReclamado, cur)}</b><small>monto solicitado</small></div>
           <div class="cx-kpi"><span>Aprobado</span><b style="color:var(--ok)">${r.montoAprobado ? U.money(r.montoAprobado, cur) : 'Pendiente'}</b><small>${r.montoAprobadoPendiente ? 'monto aprobado por confirmar' : 'indemnización'}</small></div>
         </div>
@@ -108,27 +115,35 @@ Orbit.modules.siniestros = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#si-x').addEventListener('click', close);
-    $('#si-add').addEventListener('click', () => { const v = $('#si-nota').value.trim(); if (!v) return; const bit = (r.bitacora || []).concat([{ ts: Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: v, d: '' }]); S().update('reclamos', id, { bitacora: bit }); ficha(id); });
-    $('#si-save').addEventListener('click', () => {
+    $('#si-add').addEventListener('click', () => { const v = $('#si-nota').value.trim(); if (!v) return; const bit = (r.bitacora || []).concat([{ ts: ts(), user: 'Equipo', t: v, d: '' }]); S().update('reclamos', id, { bitacora: bit }); ficha(id); });
+    $('#si-save').addEventListener('click', async () => {
       const nuevoEst = $('#si-estado').value;
       const cambioEstado = nuevoEst !== r.estado;
       const patch = { estado: nuevoEst };
       if (cambioEstado) {
-        const bit = (r.bitacora || []).concat([{ ts: Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: 'Estado: ' + nuevoEst, d: '' }]);
+        let motivo = '';
+        if (FINALES.includes(nuevoEst)) {
+          motivo = await Orbit.ui.prompt('Motivo obligatorio para cambiar el siniestro a ' + nuevoEst + ':', { title: 'Estado final de siniestro' });
+          if (!motivo) return;
+          const ok = await U.confirm('Cambiar siniestro de ' + r.estado + ' a ' + nuevoEst + '. Se registrará bitácora y auditoría. ¿Continuar?', { title: 'Confirmar estado final', ok: 'Confirmar' });
+          if (!ok) return;
+        }
+        const bit = (r.bitacora || []).concat([{ ts: ts(), user: 'Equipo', t: 'Estado: ' + r.estado + ' → ' + nuevoEst, d: motivo || 'Cambio operativo' }]);
         if (['Aprobado', 'Pagado'].includes(nuevoEst) && !r.montoAprobado) {
           patch.montoAprobadoPendiente = true;
-          bit.push({ ts: Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: 'Monto aprobado pendiente de confirmar', d: '' });
+          bit.push({ ts: ts(), user: 'Equipo', t: 'Monto aprobado pendiente de confirmar', d: 'Estado ' + nuevoEst + ' sin monto aprobado registrado' });
         }
         patch.bitacora = bit;
+        if (motivo) patch.motivoEstadoFinal = motivo;
       }
       S().update('reclamos', id, patch);
       if (cambioEstado) {
-        S().insert('actividades', { id: 'act' + Date.now(), clienteId: r.clienteId, asesorId: r.asesorId, tipo: 'siniestro', icon: '🚨', fecha: Orbit.ui.today(), titulo: 'Siniestro ' + r.numero + ': ' + nuevoEst, detalle: r.tipo + ' · ' + (r.ramo || ''), reclamoId: id });
+        adminAct(r, 'Siniestro ' + r.numero + ': ' + nuevoEst, r.tipo + ' · ' + (r.ramo || '') + (patch.motivoEstadoFinal ? ' · Motivo: ' + patch.motivoEstadoFinal : ''));
         var gs = (S().all('gestiones') || []).filter(function (g) { return g.reclamoId === id; });
         gs.forEach(function (g) {
-          var nota = (g.notas ? g.notas + '\n' : '') + '[' + Orbit.ui.today() + '] Siniestro ' + r.numero + ' → ' + nuevoEst;
+          var nota = (g.notas ? g.notas + '\n' : '') + '[' + Orbit.ui.today() + '] Siniestro ' + r.numero + ' → ' + nuevoEst + (patch.motivoEstadoFinal ? ' · ' + patch.motivoEstadoFinal : '');
           var patchG = { notas: nota };
-          if (['Pagado', 'Rechazado'].includes(nuevoEst)) patchG.estado = 'Resuelta';
+          if (['Pagado', 'Rechazado'].includes(nuevoEst) && g.estado !== 'Resuelta') patchG.estado = 'Resuelta';
           S().update('gestiones', g.id, patchG);
         });
       }
@@ -164,7 +179,7 @@ Orbit.modules.siniestros = (function () {
     $('#sn-ok').addEventListener('click', () => {
       const cid = $('#sn-cli').value, polId = $('#sn-pol').value, p = polId ? S().get('polizas', polId) : null, cli = S().get('clientes', cid);
       const id = 'rec' + Date.now().toString().slice(-7);
-      S().insert('reclamos', { id, polizaId: polId, clienteId: cid, aseguradoraId: p ? p.aseguradoraId : '', asesorId: cli.asesorId, ramo: p ? p.ramo : '', tipo: $('#sn-tipo').value || 'Reclamo', estado: 'Reportado', numero: 'SIN-' + Math.floor(10000 + Math.random() * 89999), fecha: Orbit.ui.today(), montoReclamado: +$('#sn-monto').value || 0, montoAprobado: 0, descripcion: $('#sn-desc').value, bitacora: [{ ts: Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5), user: cli.nombre, t: 'Reclamo reportado', d: $('#sn-desc').value }], correos: [], docs: [] });
+      S().insert('reclamos', { id, polizaId: polId, clienteId: cid, aseguradoraId: p ? p.aseguradoraId : '', asesorId: cli.asesorId, ramo: p ? p.ramo : '', tipo: $('#sn-tipo').value || 'Reclamo', estado: 'Reportado', numero: 'SIN-' + Math.floor(10000 + Math.random() * 89999), fecha: Orbit.ui.today(), montoReclamado: +$('#sn-monto').value || 0, montoAprobado: 0, descripcion: $('#sn-desc').value, bitacora: [{ ts: ts(), user: cli.nombre, t: 'Reclamo reportado', d: $('#sn-desc').value }], correos: [], docs: [] });
       S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: cli.asesorId, tipo: 'sistema', icon: '🚨', fecha: Orbit.ui.today(), titulo: 'Siniestro reportado', detalle: $('#sn-tipo').value });
       close(); ficha(id);
     });
