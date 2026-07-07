@@ -28,10 +28,10 @@ Orbit.modules.notificaciones = (function () {
     host.innerHTML = '<div class="page">'
       + K.banner({ icon: '💬', title: 'Notificaciones WhatsApp', sub: 'Mensajería saliente · plantillas, envíos por lote y registro', features: [] })
       + K.kpis([
-          { label: 'Enviados hoy', val: hoy, color: 'var(--ok)', foot: 'mensajes', onclick: "Orbit.modules.notificaciones&&0" },
+          { label: 'Preparados hoy', val: hoy, color: 'var(--ok)', foot: 'chats/eventos', onclick: "Orbit.modules.notificaciones&&0" },
           { label: 'Total registrados', val: log.length, color: 'var(--info)', foot: 'historial' },
           { label: 'Plantillas', val: PLANTILLAS.length, color: 'var(--red)', foot: 'disponibles' },
-          { label: 'Canal', val: 'wa.me + API', color: 'var(--warn)', foot: 'WhatsApp Web o Cloud' }
+          { label: 'Canal', val: 'wa.me / API', color: 'var(--warn)', foot: 'Web abierto / Cloud pendiente' }
         ])
       + '<div class="tabs" style="max-width:420px;margin-bottom:16px">'
       +   '<div class="tab' + (tab === 'enviar' ? ' active' : '') + '" data-t="enviar">✍️ Enviar</div>'
@@ -55,10 +55,10 @@ Orbit.modules.notificaciones = (function () {
       +     clientes.map(c => '<option value="' + c.id + '">' + U.esc(c.nombre) + ' · ' + U.esc(c.telefono) + '</option>').join('') + '</select></label>'
       + '</div>'
       + '<label class="ce-l" style="margin-top:12px">Mensaje<textarea id="wa-msg" class="o-sel" style="min-height:120px;resize:vertical;padding:11px 13px;line-height:1.6" placeholder="Escribe el mensaje o elige una plantilla..."></textarea></label>'
-      + '<div class="muted" style="font-size:11.5px;margin-top:6px">Variables: {nombre} {poliza} {ramo} {fecha} {monto} {medios} — se reemplazan con los datos del cliente al enviar.</div>'
+      + '<div class="muted" style="font-size:11.5px;margin-top:6px">Variables: {nombre} {poliza} {ramo} {fecha} {monto} {medios} — se reemplazan con los datos del cliente al preparar el mensaje.</div>'
       + '<div style="display:flex;gap:8px;margin-top:14px">'
       +   '<button class="btn primary" id="wa-send">💬 Abrir en WhatsApp Web</button>'
-      +   '<button class="btn ghost" id="wa-api">📡 Enviar por API</button>'
+      +   '<button class="btn ghost" id="wa-api">📡 Registrar para API</button>'
       + '</div></div>';
   }
 
@@ -74,14 +74,14 @@ Orbit.modules.notificaciones = (function () {
   }
 
   function vHistorial(log) {
-    if (!log.length) return '<div class="card pad" style="text-align:center;color:var(--ink-3)">Sin envíos registrados todavía. Envía tu primer mensaje desde la pestaña "Enviar".</div>';
+    if (!log.length) return '<div class="card pad" style="text-align:center;color:var(--ink-3)">Sin mensajes preparados todavía. Prepara tu primer mensaje desde la pestaña "Enviar".</div>';
     return '<div class="card" style="overflow:hidden"><table class="tbl"><thead><tr><th>Fecha</th><th>Cliente</th><th>Plantilla</th><th>Mensaje</th><th>Canal</th></tr></thead><tbody>'
       + log.map(l => '<tr>'
         + '<td class="mono" style="font-size:11.5px">' + U.esc(l.fecha) + '</td>'
         + '<td style="font-size:12.5px"><b>' + U.esc(l.cliente || '—') + '</b></td>'
         + '<td><span class="badge info" style="font-size:10px">' + U.esc(l.tpl || 'libre') + '</span></td>'
         + '<td style="font-size:12px;color:var(--ink-2);max-width:280px">' + U.esc((l.msg || '').slice(0, 70)) + '…</td>'
-        + '<td><span class="badge" style="font-size:10px">' + U.esc(l.canal || 'wa.me') + '</span></td>'
+        + '<td><span class="badge" style="font-size:10px">' + U.esc(l.canal || 'wa.me abierto') + '</span></td>'
         + '</tr>').join('')
       + '</tbody></table></div>';
   }
@@ -129,14 +129,16 @@ Orbit.modules.notificaciones = (function () {
     const tplId = tplEl ? tplEl.value : '';
     if (!msg) { Orbit.ui.toast('Escribe un mensaje primero.'); return; }
     if (!cli) { Orbit.ui.toast('Selecciona un cliente destinatario.'); return; }
-    addLog({ fecha: new Date().toISOString().slice(0, 10), cliente: cli.nombre, tpl: tplId || 'libre', msg, canal });
-    // registrar en historial del cliente
-    S().insert('actividades', { id: 'act' + Date.now(), clienteId: cli.id, asesorId: cli.asesorId, tipo: 'whatsapp', icon: '💬', fecha: new Date().toISOString().slice(0, 10), titulo: 'Mensaje de WhatsApp enviado', detalle: msg.slice(0, 80) });
+    const canalLog = canal === 'API' ? 'API pendiente de conexión' : 'wa.me abierto';
+    addLog({ fecha: new Date().toISOString().slice(0, 10), cliente: cli.nombre, tpl: tplId || 'libre', msg, canal: canalLog });
+    // registrar en historial del cliente sin afirmar entrega confirmada
+    S().insert('actividades', { id: 'act' + Date.now(), clienteId: cli.id, asesorId: cli.asesorId, tipo: 'whatsapp', icon: '💬', fecha: new Date().toISOString().slice(0, 10), titulo: 'Mensaje de WhatsApp preparado', detalle: msg.slice(0, 80) });
     if (canal === 'wa.me') {
       const tel = (cli.telefono || '').replace(/\D/g, '');
       window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(msg), '_blank');
+      Orbit.ui.toast('Chat abierto en WhatsApp Web; confirma el envío en WhatsApp.');
     } else {
-      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '📡 Mensaje encolado vía API de WhatsApp Cloud'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = 'WhatsApp API pendiente de conexión. Evento registrado para integración.'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
     }
     tab = 'historial'; render(host);
   }
