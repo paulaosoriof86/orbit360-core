@@ -13,22 +13,22 @@ Orbit.notify = (function () {
 
   function _tel(cli) { return String(cli.telefono || cli.whatsapp || '').replace(/[^0-9]/g, ''); }
 
-  /* Entrega real (swappable por backend). Devuelve el canal usado. */
+  /* Entrega actual sin proveedor confirmado. Devuelve el estado preparado/abierto. */
   function _deliver(cli, canal, asunto, mensaje, adjunto) {
     if (canal === 'whatsapp') {
       window.open('https://wa.me/' + _tel(cli) + '?text=' + encodeURIComponent(mensaje), '_blank');
-      return 'WhatsApp';
+      return 'WhatsApp Web abierto';
     }
     // correo: usa el compositor Orbit si existe
     if (Orbit.modules && Orbit.modules.correo && Orbit.modules.correo.redactar) {
       Orbit.modules.correo.redactar({ para: cli.email || '', clienteId: cli.id, asunto: asunto || '', cuerpo: mensaje, adjunto: adjunto || '' });
-      return 'Correo';
+      return 'Correo preparado';
     }
     window.open('mailto:' + (cli.email || '') + '?subject=' + encodeURIComponent(asunto || '') + '&body=' + encodeURIComponent(mensaje), '_blank');
-    return 'Correo';
+    return 'Correo abierto';
   }
 
-  /* Notifica al cliente y registra en su expediente.
+  /* Prepara/abre notificación al cliente y registra en su expediente.
      opts: { canal:'whatsapp'|'correo'|'auto', asunto, mensaje, tipo, icon, adjunto, silent } */
   function cliente(clienteId, opts) {
     opts = opts || {};
@@ -37,17 +37,17 @@ Orbit.notify = (function () {
     let canal = opts.canal || 'auto';
     if (canal === 'auto') canal = _tel(cli) ? 'whatsapp' : 'correo';
     const usado = _deliver(cli, canal, opts.asunto, opts.mensaje || '', opts.adjunto);
-    // traza en expediente
+    // traza en expediente sin afirmar entrega confirmada por proveedor
     S().insert('actividades', {
       id: 'act' + Date.now() + Math.floor(Math.random() * 99),
       clienteId: cli.id, asesorId: cli.asesorId || '',
       tipo: canal === 'whatsapp' ? 'whatsapp' : 'correo',
       icon: opts.icon || (canal === 'whatsapp' ? '💬' : '✉'),
       fecha: (Orbit.ui && Orbit.ui.today) ? Orbit.ui.today() : new Date().toISOString().slice(0, 10),
-      titulo: opts.tipo || 'Notificación al cliente',
+      titulo: opts.tipo || 'Notificación preparada para cliente',
       detalle: (opts.asunto ? opts.asunto + ' · ' : '') + (opts.mensaje || '').slice(0, 120)
     });
-    if (!opts.silent && Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('✓ Notificado al cliente por ' + usado);
+    if (!opts.silent && Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('✓ Comunicación preparada: ' + usado + '. Confirma el envío en el proveedor.');
     return { canal: usado };
   }
 
@@ -77,7 +77,7 @@ Orbit.notify = (function () {
         ${opts.adjunto ? `<div class="cfg-note">📎 Adjunto: ${U.esc(opts.adjunto)}</div>` : ''}
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn ghost" id="nc-cancel">Cancelar</button><button class="btn primary" id="nc-send">Enviar</button></div>
+        <button class="btn ghost" id="nc-cancel">Cancelar</button><button class="btn primary" id="nc-send">Preparar / abrir</button></div>
     </div>`;
     document.body.appendChild(back);
     const $ = s => back.querySelector(s), close = () => back.remove();
