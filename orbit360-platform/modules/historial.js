@@ -8,7 +8,7 @@ Orbit.modules.historial = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
   let st = { fq: '', ftipo: '', fase: '' };
 
-  const TIPOS = { llamada: 'Llamada', whatsapp: 'WhatsApp', email: 'Correo', reunion: 'Reunión', nota: 'Nota', sistema: 'Sistema' };
+  const TIPOS = { llamada: 'Llamada', whatsapp: 'WhatsApp', email: 'Correo', correo: 'Correo', reunion: 'Reunión', nota: 'Nota', sistema: 'Sistema', recuperacion: 'Recuperación', siniestro: 'Siniestro' };
   const FDEFS = () => [
     { id: 'fq', type: 'search', ph: 'Buscar en el historial…' },
     { id: 'ftipo', type: 'select', ph: 'Tipo', options: Object.entries(TIPOS).map(([v, t]) => ({ v, t })) },
