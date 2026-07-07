@@ -71,7 +71,7 @@ Orbit.modules.conciliaciones = (function () {
     const monto = (r.monto != null && r.moneda) ? U.money(r.monto, r.moneda) : (r.monto != null ? '<span class="muted" title="Moneda requerida">' + r.monto + ' ⚠</span>' : '—');
     const btns = acciones.map(a => {
       if (a === 'ver_detalle') return `<button class="btn ghost sm" onclick="Orbit.modules.conciliaciones.detalle('${r.id}')">Ver</button>`;
-      const danger = (a === 'rechazar' || a === 'bloquear' || a === 'anular') ? ' style="color:var(--danger)' : '';
+      const danger = (a === 'rechazar' || a === 'bloquear' || a === 'anular') ? ' style="color:var(--danger)"' : '';
       return `<button class="btn ghost sm"${danger} onclick="Orbit.modules.conciliaciones.accion('${r.id}','${a}')">${ACC_LBL[a] || a}</button>`;
     }).join(' ');
     const bloqueos = (r.bloqueos && r.bloqueos.length) ? `<div class="muted" style="font-size:10px;color:var(--danger)">⛔ ${r.bloqueos.map(U.esc).join(', ')}</div>` : '';
