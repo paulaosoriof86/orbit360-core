@@ -2,7 +2,7 @@
    Orbit 360 · Bandeja de Conciliaciones (UI/prototipo)
    Lee SOLO de Orbit.store('conciliaciones'). No toca cobros.
    Las acciones cambian estado de la propuesta vía Orbit.store.update.
-   La aplicación real de pagos queda para proceso autorizado posterior.
+   La aplicación real de pagos queda para backend (ChatGPT/Codex).
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
@@ -10,16 +10,16 @@ Orbit.modules.conciliaciones = (function () {
   const U = Orbit.ui, S = () => Orbit.store, q = Orbit.q, K = Orbit.kit;
   let fEstado = '', fFuente = '';
 
-  const ESTADOS = ['PROPUESTA', 'EN_REVISION', 'VALIDADA', 'RECHAZADA', 'BLOQUEADA', 'ANULADA', 'APLICADA'];
-  const TONE = { PROPUESTA: 'info', EN_REVISION: 'info', VALIDADA: 'ok', RECHAZADA: 'danger', BLOQUEADA: 'danger', ANULADA: 'neutral', APLICADA: 'ok' };
-  // Acciones permitidas por estado (contrato readiness)
+  const ESTADOS = ['PROPUESTA', 'EN_REVISION', 'VALIDADA', 'RECHAZADA', 'BLOQUEADA', 'ANULADA'];
+  const TONE = { PROPUESTA: 'info', EN_REVISION: 'info', VALIDADA: 'ok', RECHAZADA: 'danger', BLOQUEADA: 'danger', ANULADA: 'neutral' };
+  // Acciones permitidas por estado (solo cambian la propuesta; NUNCA aplican pagos ni tocan cobros)
   const ACCIONES = {
     PROPUESTA: ['ver_detalle', 'tomar_en_revision', 'bloquear', 'anular'],
     EN_REVISION: ['ver_detalle', 'validar', 'rechazar', 'bloquear', 'anular'],
-    VALIDADA: ['ver_detalle', 'preparar_aplicacion_controlada', 'rechazar', 'anular'],
-    RECHAZADA: ['ver_detalle'], BLOQUEADA: ['ver_detalle'], ANULADA: ['ver_detalle'], APLICADA: ['ver_detalle']
+    VALIDADA: ['ver_detalle', 'rechazar', 'anular'],
+    RECHAZADA: ['ver_detalle'], BLOQUEADA: ['ver_detalle'], ANULADA: ['ver_detalle']
   };
-  const ACC_LBL = { ver_detalle: 'Ver', tomar_en_revision: 'Tomar en revisión', validar: 'Validar', rechazar: 'Rechazar', bloquear: 'Bloquear', anular: 'Anular', preparar_aplicacion_controlada: 'Preparar aplicación' };
+  const ACC_LBL = { ver_detalle: 'Ver', tomar_en_revision: 'Tomar en revisión', validar: 'Validar', rechazar: 'Rechazar', bloquear: 'Bloquear', anular: 'Anular' };
   // Transiciones de estado (solo cambian la propuesta, nunca cobros)
   const TRANS = { tomar_en_revision: 'EN_REVISION', validar: 'VALIDADA', rechazar: 'RECHAZADA', bloquear: 'BLOQUEADA', anular: 'ANULADA' };
 
@@ -39,9 +39,9 @@ Orbit.modules.conciliaciones = (function () {
 
     const kpis = K.kpis([
       { label: 'Propuestas', val: cont.PROPUESTA + cont.EN_REVISION, color: 'var(--info)', foot: 'por revisar' },
-      { label: 'Validadas', val: cont.VALIDADA, color: 'var(--ok)', foot: 'listas para revisión técnica' },
+      { label: 'Validadas', val: cont.VALIDADA, color: 'var(--ok)', foot: 'para proceso posterior autorizado' },
       { label: 'Bloqueadas / rechazadas', val: cont.BLOQUEADA + cont.RECHAZADA, color: 'var(--danger)', foot: 'requieren atención' },
-      { label: 'Aplicadas', val: cont.APLICADA, color: 'var(--ink-3)', foot: 'histórico' }
+      { label: 'En revisión', val: cont.EN_REVISION, color: 'var(--ink-3)', foot: 'en curso' }
     ]);
 
     const chips = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 14px">'
@@ -55,7 +55,7 @@ Orbit.modules.conciliaciones = (function () {
       : `<div class="card pad" style="text-align:center;padding:44px 20px"><div style="font-size:34px;margin-bottom:8px">🗂️</div><div style="font-family:var(--f-display);font-weight:800;font-size:16px">Sin propuestas de conciliación todavía</div><p class="muted" style="font-size:13px;margin-top:6px;max-width:460px;margin-left:auto;margin-right:auto">Cuando importes un estado de cuenta o una planilla de comisión, las coincidencias aparecerán aquí como propuestas para revisar y validar. Ninguna aplica pagos por sí sola.</p></div>`;
 
     host.innerHTML = '<div class="page">'
-      + K.banner({ icon: '🔗', title: 'Bandeja de conciliaciones', sub: 'Propuestas de cruce (banco / aseguradora / comisiones) — revisar, validar o rechazar. No aplica pagos.', features: [] })
+      + K.banner({ icon: '🔗', title: 'Bandeja de conciliaciones', sub: 'Propuestas de cruce (banco / aseguradora / comisiones) para revisión técnica. No aplica pagos ni modifica cobros desde esta bandeja.', features: [] })
       + '<div class="kpi-row">' + kpis + '</div>'
       + (fuentes.length ? `<div class="cfg-note" style="margin-bottom:10px">Fuentes: ${fuentes.map(f => `<b>${U.esc(f)}</b>`).join(' · ')} · <span class="muted">las monedas no se mezclan; cada propuesta conserva su país/moneda origen.</span></div>` : '')
       + chips
@@ -71,8 +71,7 @@ Orbit.modules.conciliaciones = (function () {
     const monto = (r.monto != null && r.moneda) ? U.money(r.monto, r.moneda) : (r.monto != null ? '<span class="muted" title="Moneda requerida">' + r.monto + ' ⚠</span>' : '—');
     const btns = acciones.map(a => {
       if (a === 'ver_detalle') return `<button class="btn ghost sm" onclick="Orbit.modules.conciliaciones.detalle('${r.id}')">Ver</button>`;
-      if (a === 'preparar_aplicacion_controlada') return `<button class="btn ghost sm" onclick="Orbit.modules.conciliaciones.prepararAplicacion('${r.id}')">${ACC_LBL[a]}</button>`;
-      const danger = (a === 'rechazar' || a === 'bloquear' || a === 'anular') ? ' style="color:var(--danger)"' : '';
+      const danger = (a === 'rechazar' || a === 'bloquear' || a === 'anular') ? ' style="color:var(--danger)' : '';
       return `<button class="btn ghost sm"${danger} onclick="Orbit.modules.conciliaciones.accion('${r.id}','${a}')">${ACC_LBL[a] || a}</button>`;
     }).join(' ');
     const bloqueos = (r.bloqueos && r.bloqueos.length) ? `<div class="muted" style="font-size:10px;color:var(--danger)">⛔ ${r.bloqueos.map(U.esc).join(', ')}</div>` : '';
@@ -106,13 +105,6 @@ Orbit.modules.conciliaciones = (function () {
     });
     U.toast('✓ Propuesta → ' + nuevo.replace('_', ' '));
     const h = document.getElementById('host'); if (h) render(h);
-  }
-
-  function prepararAplicacion(id) {
-    const r = S().get('conciliaciones', id); if (!r) return;
-    modal('⏳ Preparar aplicación controlada', `<div class="cfg-note" style="margin:0">Esta propuesta está <b>validada</b>. La aplicación real del pago (afectación de cobros y recaudo) se ejecuta mediante <b>validación controlada</b> — no se aplica desde esta bandeja.</div>
-      <div style="font-size:12.5px;margin-top:12px;line-height:1.6">Cruce propuesto:<br>• ${U.esc(r.cliente_poliza_recibo || '—')}<br>• Monto: ${(r.monto != null && r.moneda) ? U.money(r.monto, r.moneda) : (r.monto || '—')}<br>• Fuente: ${U.esc(r.fuente || '—')} · fila ${U.esc((r.fila || '—').toString())}</div>
-      <div class="muted" style="font-size:11.5px;margin-top:12px">Estado: requiere validación controlada · no aplica pago todavía.</div>`);
   }
 
   function detalle(id) {
@@ -150,5 +142,5 @@ Orbit.modules.conciliaciones = (function () {
 
   function filtro(v, tipo) { if (tipo === 'estado') fEstado = v; else fFuente = v; const h = document.getElementById('host'); if (h) render(h); }
 
-  return { render, accion, detalle, prepararAplicacion, filtro };
+  return { render, accion, detalle, filtro };
 })();
