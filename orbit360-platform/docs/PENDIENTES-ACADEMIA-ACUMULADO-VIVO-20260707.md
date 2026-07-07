@@ -74,6 +74,9 @@ Pendiente pasar a fuente formal en data/academia-plus.js y data/seed.js.
 | 2026-07-07 | Documentos soporte | Soportes solo proponen datos; no actualizan clientes/pólizas sin diff | Lección para usuarios operativos y administración sobre propuestas/diff/confirmación | Curso mínimo runtime | Claude fuente; backend documentos después |
 | 2026-07-07 | País/moneda | GT=GTQ, CO=COP, REQUIERE_VALIDACION si falta país/moneda | Evaluación corta de moneda, país y no sumar crudo | Curso mínimo runtime | Claude profundiza |
 | 2026-07-07 | Portal cliente | Pago reportado queda pendiente de revisión/conciliación | Microlección interna para responder al cliente y explicar estados | Hotfix aplicado | Claude fuente/UX |
+| 2026-07-07 | Phase A backend | Contrato de persistencia para `conciliaciones`, `auditLog`, `documentosAdjuntos` y `storageRefs` | Lección por rol sobre transición propuesta→revisión→validada→autorizada→confirmada; el usuario debe entender que validar conciliación no aplica cobro | Contrato/documentación creado | ChatGPT/Codex implementará backend cuando corresponda; Claude debe reflejarlo en Academia fuente |
+| 2026-07-07 | Storage/adjuntos | Un soporte de portal o documento importado queda como metadata/adjunto y solo propone datos | Ruta para Cobros/Operaciones/Portal: cómo revisar soporte, cuándo pedir validación y cuándo responder al cliente | Contrato/documentación creado | Backend pendiente; Claude fuente pendiente |
+| 2026-07-07 | AuditLog | Toda confirmación/reversión sensible debe quedar auditada con actor, motivo, hashes y correlationId | Ruta Dirección/Superadmin/Auditoría: trazabilidad, reversión y responsabilidad por confirmaciones | Contrato/documentación creado | Backend pendiente; Academia evaluaciones pendiente |
 
 ---
 
@@ -97,6 +100,35 @@ Pendiente pasar a fuente formal en data/academia-plus.js y data/seed.js.
 **Necesidad:** no basta texto de lectura.  
 **Esperado:** evaluación por casos: banco, estado cliente, planilla comisión, financiero histórico, documentos soporte.  
 **Estado:** contenido mínimo creado; evaluación pendiente.
+
+### ACD-P0-004 — Profundizar Phase A: conciliaciones, auditLog y adjuntos
+
+**Necesidad:** el contrato Phase A ya define estados y colecciones, pero Academia aún no lo enseña como ruta aplicada por rol.  
+**Esperado:** crear lecciones/evaluaciones para Cobros, Operaciones, Administración, Dirección/Superadmin, Auditoría/migración y Portal cliente sobre:
+
+```txt
+propuesta
+en_revision
+validada
+rechazada
+requiere_validacion
+autorizada_para_confirmar
+confirmada
+revertida
+```
+
+**Casos de evaluación obligatorios:**
+
+```txt
+1. cliente adjunta comprobante en portal;
+2. banco muestra depósito sin póliza relacionada;
+3. planilla de comisión refleja pago aplicado;
+4. financiero histórico tiene ingreso genérico;
+5. falta moneda o país en archivo;
+6. se requiere reversión auditada de una confirmación.
+```
+
+**Estado:** contrato creado; fuente Academia pendiente.
 
 ---
 
@@ -141,6 +173,21 @@ Documentos
 Portal cliente
 Configuración/roles
 Automatizaciones
+```
+
+### ACD-P1-004 — Ruta Auditoría/migración
+
+Crear ruta específica para quien revise migración y conciliaciones:
+
+```txt
+manifest de fuentes
+trazabilidad archivo/hoja/fila/bloque
+idempotencyKey
+correlationId
+auditLog
+beforeHash/afterHash
+reversión autorizada
+bloqueos por REQUIERE_VALIDACION
 ```
 
 ---
