@@ -11,21 +11,31 @@ Carpeta: `orbit360-platform/`
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open, sin merge, sin deploy.
 
-## Base de empalme
+## Base de empalme correcta
 
-Usar como base de candidata:
+Usar como base de candidata más reciente:
 
 ```txt
-Prototype Development Request - 2026-07-05T062855.313.zip
+Prototype Development Request - 2026-07-06T182633.902.zip
+```
+
+Verificación local de esta candidata:
+
+```txt
+archivos: 98
+index: versión interna máxima v1330
+incluye modules/conciliaciones.js: sí
+incluye data/academia-plus.js: sí
 ```
 
 No usar como base completa:
 
 ```txt
+Prototype Development Request - 2026-07-05T062855.313.zip
 Prototype Development Request (89).zip
 ```
 
-Motivo: esa ZIP usa versión interna v1217 y omite piezas ya vigentes como `modules/conciliaciones.js` y `data/academia-plus.js`.
+Motivo: la primera es anterior a la fuente más reciente; la segunda usa versión interna v1217 y omite piezas vigentes como `modules/conciliaciones.js` y `data/academia-plus.js`.
 
 ## Prohibido sobrescribir
 
@@ -56,7 +66,7 @@ orbit360-platform/docs relevantes del prototipo
 
 Excepto los protegidos listados arriba.
 
-Preservar archivos existentes no presentes en ZIP, especialmente:
+Preservar archivos existentes no presentes o más nuevos en ZIP, especialmente:
 
 ```txt
 modules/portal-v1142-copyfix.js
