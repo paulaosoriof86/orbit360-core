@@ -15,6 +15,40 @@ Orbit.modules.aseguradoras = (function () {
   function paisOK(p) { return !Orbit.pais || Orbit.pais === 'TODOS' || p === Orbit.pais; }
   function up(id, patch) { S().update('aseguradoras', id, patch); }
   function reload() { if (host) render(host); }
+  function safeAll(col) { try { return S().all(col) || []; } catch (e) { return []; } }
+  function vinculos(id) {
+    const polizas = safeAll('polizas').filter(p => p.aseguradoraId === id);
+    const polIds = new Set(polizas.map(p => p.id));
+    const cobros = safeAll('cobros').filter(c => c.aseguradoraId === id || polIds.has(c.polizaId));
+    const siniestros = safeAll('siniestros').filter(s => s.aseguradoraId === id || polIds.has(s.polizaId));
+    const reclamos = safeAll('reclamos').filter(r => r.aseguradoraId === id || polIds.has(r.polizaId));
+    const documentos = safeAll('documentos').filter(d => d.aseguradoraId === id || polIds.has(d.polizaId));
+    const comisiones = safeAll('comisiones').filter(c => c.aseguradoraId === id || polIds.has(c.polizaId));
+    const total = polizas.length + cobros.length + siniestros.length + reclamos.length + documentos.length + comisiones.length;
+    return { polizas, cobros, siniestros, reclamos, documentos, comisiones, total };
+  }
+  function vinculosTxt(v) {
+    const parts = [];
+    if (v.polizas.length) parts.push(v.polizas.length + ' pólizas');
+    if (v.cobros.length) parts.push(v.cobros.length + ' cobros');
+    if (v.siniestros.length) parts.push(v.siniestros.length + ' siniestros');
+    if (v.reclamos.length) parts.push(v.reclamos.length + ' reclamos');
+    if (v.documentos.length) parts.push(v.documentos.length + ' documentos');
+    if (v.comisiones.length) parts.push(v.comisiones.length + ' comisiones');
+    return parts.join(', ') || 'sin vínculos operativos';
+  }
+  function adminAct(titulo, detalle, asg) {
+    try {
+      S().insert('actividades', {
+        id: 'act' + Date.now() + Math.floor(Math.random() * 999),
+        tipo: 'admin',
+        icon: '🔐',
+        fecha: Orbit.ui.today(),
+        titulo,
+        detalle: (asg ? asg.nombre + ' · ' : '') + detalle
+      });
+    } catch (e) {}
+  }
   function portalSnapshot(row) {
     const passInput = row.querySelector('[data-pp]');
     const credentialRef = passInput && passInput.value ? 'backend_required' : (row.dataset.cred || '');
@@ -37,13 +71,27 @@ Orbit.modules.aseguradoras = (function () {
         { label: 'Vinculadas', val: vinc.length, color: 'var(--ok)', foot: 'con vinculación activa', footTone: 'up', onclick: "location.hash='#/aseguradoras'" },
         { label: 'Sin vincular', val: all.length - vinc.length, color: 'var(--ink-3)', foot: 'disponibles', onclick: "location.hash='#/aseguradoras'" }
       ])}
-      <div class="cfg-note" style="margin-bottom:14px">Habilita/deshabilita cada aseguradora según las <b>vinculaciones</b> del intermediario (las deshabilitadas no aparecen al cotizar/emitir). <b>Importar</b> agrega o actualiza el directorio de forma inteligente, o solo almacena documentos. Quién puede ver este módulo se define en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/equipo'">Equipo y permisos</a>.</div>
+      <div class="cfg-note" style="margin-bottom:14px">Habilita/deshabilita cada aseguradora según las <b>vinculaciones</b> del intermediario. Desactivar conserva historial; borrar solo se permite si no hay pólizas, cobros, reclamos, documentos ni comisiones vinculadas. Quién puede ver este módulo se define en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/equipo'">Equipo y permisos</a>.</div>
       <div class="asg-grid">${all.map(a => card(a)).join('')}</div>
     </div>`;
     host.querySelector('#asg-new').addEventListener('click', nueva);
     host.querySelector('#asg-imp').addEventListener('click', () => Orbit.importa.open('directorio-aseguradoras', { onDone: reload }));
     host.querySelectorAll('[data-asg]').forEach(el => el.addEventListener('click', e => { if (e.target.closest('.asg-switch')) return; ficha(el.dataset.asg); }));
-    host.querySelectorAll('[data-toggle]').forEach(t => t.addEventListener('change', e => { e.stopPropagation(); up(t.dataset.toggle, { vinculada: t.checked }); render(host); }));
+    host.querySelectorAll('[data-toggle]').forEach(t => t.addEventListener('change', async e => {
+      e.stopPropagation();
+      const id = t.dataset.toggle;
+      const a = S().get('aseguradoras', id);
+      const deseado = t.checked;
+      if (!a) return;
+      if (!deseado) {
+        const v = vinculos(id);
+        const ok = await U.confirm('Desactivar la vinculación conserva el histórico y evita que aparezca al cotizar/emitir. Vínculos actuales: ' + vinculosTxt(v) + '. ¿Continuar?', { title: 'Desactivar vinculación', ok: 'Desactivar' });
+        if (!ok) { t.checked = true; return; }
+      }
+      up(id, { vinculada: deseado });
+      adminAct('Vinculación de aseguradora actualizada', deseado ? 'Vinculación activada' : 'Vinculación desactivada', a);
+      render(host);
+    }));
   }
 
   function card(a) {
@@ -64,6 +112,7 @@ Orbit.modules.aseguradoras = (function () {
     const pais = (Orbit.pais && Orbit.pais !== 'TODOS') ? Orbit.pais : 'GT';
     const id = 'asg' + Date.now().toString().slice(-6);
     S().insert('aseguradoras', { id, nombre: 'Nueva aseguradora', color: '#1f3a5f', pais, ramos: [], comisionDefault: 12, comisiones: {}, comisionesProd: {}, vinculada: false, contactos: [], cuentas: [], portales: [], docs: [], docsRequeridos: [], facturacion: {} });
+    adminAct('Aseguradora creada', 'Nueva aseguradora creada sin vincular', { nombre: 'Nueva aseguradora' });
     ficha(id);
   }
 
@@ -72,7 +121,6 @@ Orbit.modules.aseguradoras = (function () {
     const a = S().get('aseguradoras', id); if (!a) return;
     const f = a.facturacion || {};
     const cont = a.contactos || [], cuentas = a.cuentas || [];
-    // portales: migrar el portal único viejo a array
     const portales = a.portales && a.portales.length ? a.portales : (a.portal ? [{ nombre: 'Portal principal', url: a.portal, usuario: '', credentialRef: '' }] : []);
     const docs = a.docs || [], reqs = a.docsRequeridos || [];
     const ramos = a.ramos || [];
@@ -92,18 +140,15 @@ Orbit.modules.aseguradoras = (function () {
         <button class="imp-x" id="af-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
       </div>
       <div style="padding:18px 22px;display:grid;gap:16px">
-
         <div class="asg-sec">
           <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">🔗 Accesos / portales <button class="btn ghost sm" id="af-add-portal">+ Portal</button></div>
           <div id="af-portales">${portales.map((p, i) => portalRow(p, i)).join('') || '<div class="muted" style="font-size:12px">Sin portales. Algunas aseguradoras tienen varios — agrégalos arriba.</div>'}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px;align-items:flex-end"><label class="ce-l" style="flex:1">📁 Drive / repositorio<input id="af-drive" class="o-sel" value="${U.esc(a.drive || '')}"></label>${a.drive ? `<a class="asg-link" href="${a.drive.match(/^https?:/) ? a.drive : 'https://' + a.drive}" target="_blank" rel="noopener" title="Abrir Drive">↗ Abrir</a>` : ''}</div>
         </div>
-
         <div class="asg-sec">
           <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">👤 Contactos <button class="btn ghost sm" id="af-add-cont">+ Contacto</button></div>
           <div id="af-contactos">${cont.map((c, i) => contRow(c, i, toneTipo)).join('') || '<div class="muted" style="font-size:12px">Sin contactos.</div>'}</div>
         </div>
-
         <div class="asg-grid2">
           <div class="asg-sec">
             <div class="asg-sec-t">🧾 Datos de facturación</div>
@@ -117,21 +162,18 @@ Orbit.modules.aseguradoras = (function () {
             <div id="af-cuentas">${cuentas.map((c, i) => ctaRow(c, i)).join('') || '<div class="muted" style="font-size:12px">Sin cuentas.</div>'}</div>
           </div>
         </div>
-
         <div class="asg-sec">
           <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">📎 Documentos <button class="btn ghost sm" id="af-add-doc">+ Documento</button></div>
           <div class="muted" style="font-size:11.5px;margin-bottom:9px">Tarifas, cotizaciones de ejemplo y PDFs de pólizas <b>alimentan la IA, el Cotizador y el Comparativo</b>.</div>
           <div id="af-docs">${docs.map((d, i) => docRow(d, i, catTone)).join('') || '<div class="muted" style="font-size:12px">Sin documentos.</div>'}</div>
           <button class="btn ghost sm" style="margin-top:9px" id="af-imp-doc">✨ Importar documentos (mapeo inteligente)</button>
         </div>
-
         <div class="asg-sec">
           <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">💵 Comisiones por ramo <button class="btn ghost sm" id="af-add-ramo">+ Ramo</button></div>
           <div class="muted" style="font-size:11.5px;margin-bottom:9px">Editable a mano o por <b>importación de la planilla de comisiones</b>.</div>
           <div id="af-ramos" class="ct-grid">${ramos.map((r, i) => ramoRow(a, r, i)).join('') || '<div class="muted" style="font-size:12px">Sin ramos.</div>'}</div>
           <button class="btn ghost sm" style="margin-top:9px" id="af-imp-com">⬇ Importar planilla de comisiones</button>
         </div>
-
         <div class="asg-sec">
           <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">📋 Documentos requeridos para emisión (por producto) <button class="btn ghost sm" id="af-add-req">+ Requisito</button></div>
           <div id="af-reqs">${reqs.map((r, i) => reqRow(r, i)).join('') || '<div class="muted" style="font-size:12px">Sin requisitos.</div>'}</div>
@@ -145,7 +187,6 @@ Orbit.modules.aseguradoras = (function () {
     document.body.appendChild(back);
     const $ = s => back.querySelector(s);
     const close = () => back.remove();
-    // modo vista por defecto: deshabilita controles y oculta botones de edición
     const card = back.querySelector('.card');
     function setEdit(on) {
       back.querySelectorAll('input, select, textarea').forEach(el => { if (el.type !== 'file') el.disabled = !on; });
@@ -159,11 +200,7 @@ Orbit.modules.aseguradoras = (function () {
     setEdit(!!startEdit);
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#af-x').addEventListener('click', close); back.querySelector('[data-close]').addEventListener('click', close);
-
-    // logo
-    $('#af-logo').addEventListener('change', e => { const file = e.target.files[0]; if (!file) return; const rd = new FileReader(); rd.onload = () => { up(id, { logo: rd.result }); ficha(id); reload(); }; rd.readAsDataURL(file); });
-    // add-rows (persisten y reabren la ficha)
-    // snapshot: guarda lo escrito en el formulario ANTES de re-renderizar (evita perder filas no guardadas)
+    $('#af-logo').addEventListener('change', e => { const file = e.target.files[0]; if (!file) return; const rd = new FileReader(); rd.onload = () => { up(id, { logo: rd.result }); adminAct('Logo de aseguradora actualizado', 'Logo actualizado', a); ficha(id); reload(); }; rd.readAsDataURL(file); });
     function snapshot() {
       const g = s => (back.querySelector(s) || {}).value || '';
       const portalesNew = [...back.querySelectorAll('[data-portal]')].map(portalSnapshot);
@@ -181,18 +218,20 @@ Orbit.modules.aseguradoras = (function () {
     $('#af-add-cta').addEventListener('click', () => push('cuentas', { banco: '', tipo: 'Monetaria', numero: '', moneda: a.pais === 'GT' ? 'GTQ' : 'COP' }));
     $('#af-add-doc').addEventListener('click', () => push('docs', { nombre: 'Documento.pdf', cat: 'Tarifas' }));
     $('#af-add-req').addEventListener('click', () => push('docsRequeridos', { producto: '', items: '' }));
-    $('#af-add-ramo').addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; const rr = (S().get('aseguradoras', id).ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); const com = Object.assign({}, S().get('aseguradoras', id).comisiones); com[r] = a.comisionDefault || 12; up(id, { ramos: rr, comisiones: com }); ficha(id, true); });
-    // delete-row buttons
-    back.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
-      const [key, idx] = b.dataset.del.split(':'); const arr = (S().get('aseguradoras', id)[key] || []).slice(); arr.splice(+idx, 1); up(id, { [key]: arr }); ficha(id, true);
+    $('#af-add-ramo').addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; const rr = (S().get('aseguradoras', id).ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); const com = Object.assign({}, S().get('aseguradoras', id).comisiones); com[r] = a.comisionDefault || 12; up(id, { ramos: rr, comisiones: com }); adminAct('Ramo/comisión de aseguradora actualizado', 'Ramo agregado: ' + r, a); ficha(id, true); });
+    back.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
+      const [key, idx] = b.dataset.del.split(':');
+      const ok = await U.confirm('Quitar esta fila de ' + key + '. Se conservará la aseguradora y su histórico. ¿Continuar?', { title: 'Quitar fila', ok: 'Quitar' });
+      if (!ok) return;
+      const arr = (S().get('aseguradoras', id)[key] || []).slice(); arr.splice(+idx, 1); up(id, { [key]: arr }); adminAct('Dato de aseguradora eliminado', 'Fila removida de ' + key, a); ficha(id, true);
     }));
-    // importers
     $('#af-imp-doc').addEventListener('click', () => { close(); Orbit.importa.open('docs-aseguradora', { onDone: reload }); });
     $('#af-imp-com').addEventListener('click', () => { close(); Orbit.importa.open('planillas-comision', { onDone: reload }); });
-    // delete aseguradora
-    $('#af-del').addEventListener('click', async () => { if (!(await U.confirm('¿Borrar esta aseguradora del directorio?', { title: 'Eliminar aseguradora', ok: 'Eliminar' }))) return; S().remove('aseguradoras', id); close(); reload(); });
-    // save
-    $('#af-save').addEventListener('click', () => {
+    $('#af-del').addEventListener('click', async () => borrarAseguradora(id, close));
+    $('#af-save').addEventListener('click', async () => {
+      const motivo = await Orbit.ui.prompt('Motivo del cambio en esta aseguradora:', { title: 'Guardar cambios administrativos' });
+      if (!motivo) return;
+      if (!(await U.confirm('Guardar cambios administrativos de esta aseguradora. Los portales conservan solo referencia de credencial; no se guardan contraseñas reales. ¿Continuar?', { title: 'Guardar aseguradora', ok: 'Guardar' }))) return;
       const g = s => (back.querySelector(s) || {}).value || '';
       const portalesNew = [...back.querySelectorAll('[data-portal]')].map(portalSnapshot);
       const contNew = [...back.querySelectorAll('[data-cont]')].map(row => ({ tipo: row.querySelector('[data-ct]').value, nombre: row.querySelector('[data-cn]').value, email: row.querySelector('[data-ce]').value, tel: row.querySelector('[data-cl]').value }));
@@ -206,8 +245,26 @@ Orbit.modules.aseguradoras = (function () {
         facturacion: { razonSocial: g('#af-rs'), patronConcepto: g('#af-patron'), dirFiscal: g('#af-dir') },
         portales: portalesNew, contactos: contNew, cuentas: ctaNew, docs: docNew, docsRequeridos: reqNew, comisiones: comNew
       });
+      adminAct('Ficha aseguradora actualizada', 'Motivo: ' + motivo, a);
       close(); reload();
     });
+  }
+
+  async function borrarAseguradora(id, close) {
+    const a = S().get('aseguradoras', id); if (!a) return;
+    const v = vinculos(id);
+    if (v.total > 0) {
+      const ok = await U.confirm('No se puede borrar esta aseguradora porque tiene vínculos operativos: ' + vinculosTxt(v) + '. La acción segura es desactivar la vinculación y conservar el histórico. ¿Desactivar vinculación?', { title: 'Borrado bloqueado', ok: 'Desactivar vinculación' });
+      if (ok) { up(id, { vinculada: false }); adminAct('Borrado de aseguradora bloqueado', 'Se desactivó vinculación por vínculos: ' + vinculosTxt(v), a); close(); reload(); }
+      return;
+    }
+    const motivo = await Orbit.ui.prompt('Motivo para borrar esta aseguradora sin vínculos operativos:', { title: 'Motivo obligatorio' });
+    if (!motivo) return;
+    const ok = await U.confirm('Esta aseguradora no tiene vínculos operativos detectados. ¿Borrar del directorio?', { title: 'Eliminar aseguradora', ok: 'Eliminar' });
+    if (!ok) return;
+    adminAct('Aseguradora borrada', 'Motivo: ' + motivo, a);
+    S().remove('aseguradoras', id);
+    close(); reload();
   }
 
   /* ---- filas editables ---- */
@@ -217,8 +274,8 @@ Orbit.modules.aseguradoras = (function () {
       <input class="o-sel" data-pn placeholder="Nombre del portal" value="${U.esc(p.nombre || '')}" style="flex:1.2">
       <input class="o-sel" data-pu placeholder="https://…" value="${U.esc(p.url || '')}" style="flex:1.5">
       <input class="o-sel" data-pus placeholder="Usuario" value="${U.esc(p.usuario || '')}" style="flex:1">
-      <input class="o-sel" data-pp type="password" placeholder="Pendiente de boveda segura" value="" style="flex:1">
-      <span class="muted" style="font-size:11px;flex:.9">${credentialRef ? 'Credencial pendiente de boveda segura' : 'Sin credencial guardada'}</span>
+      <input class="o-sel" data-pp type="password" placeholder="Pendiente de bóveda segura" value="" style="flex:1">
+      <span class="muted" style="font-size:11px;flex:.9">${credentialRef ? 'Credencial pendiente de bóveda segura' : 'Sin credencial guardada'}</span>
       ${p.url ? `<a class="asg-link" href="${p.url.match(/^https?:/) ? p.url : 'https://' + p.url}" target="_blank" rel="noopener" title="Abrir portal">↗</a>` : ''}
       <button class="asg-del" data-del="portales:${i}" title="Quitar">✕</button></div>`;
   }
