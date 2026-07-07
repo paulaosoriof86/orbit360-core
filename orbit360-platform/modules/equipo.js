@@ -182,7 +182,7 @@ Orbit.modules.equipo = (function () {
           <div class="muted" style="font-size:11.5px;margin-top:6px">Si dejás todos marcados, manda el rol. Desmarcá para restringir módulos a este usuario en particular.</div>
         </details>
         <label class="ce-l ck"><input type="checkbox" id="eu-inact" ${a.inactivo ? 'checked' : ''}> Usuario inactivo</label>
-        <div class="cfg-note">🔐 Al guardar un usuario nuevo, se le envían sus <b>credenciales de acceso</b> al correo y WhatsApp indicados. El correo configurado acá será su usuario de ingreso y el que se asocia a su bandeja.</div>
+        <div class="cfg-note">🔐 Al guardar un usuario, queda creado en el equipo. La invitación y credenciales de acceso quedan pendientes de Auth backend/canal conectado. El correo configurado acá será su usuario cuando la autenticación real esté activa.</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
         <button class="btn ghost" id="eu-cancel">Cancelar</button><button class="btn primary" id="eu-ok">Guardar</button></div>
@@ -199,7 +199,7 @@ Orbit.modules.equipo = (function () {
       const modOverride = (modsChecked.length && modsChecked.length < TODOS_MOD.length) ? modsChecked : null;
       const data = { nombre: $('#eu-nombre').value || 'Usuario', rol: rolesFinal[0], roles: rolesFinal, telefono: $('#eu-tel').value, email: $('#eu-email').value, color: $('#eu-color').value, metaPrima: +$('#eu-meta').value || 0, metaRecaudo: +$('#eu-rec').value || 0, inactivo: $('#eu-inact').checked, modulosOverride: modOverride };
       if (id) S().update('asesores', id, data);
-      else { data.id = 'ase' + Date.now().toString().slice(-5); data.iniciales = data.nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; S().insert('asesores', data); const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Usuario creado · credenciales enviadas a ' + (data.email || 'su correo'); document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+      else { data.id = 'ase' + Date.now().toString().slice(-5); data.iniciales = data.nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; S().insert('asesores', data); const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Usuario creado en equipo · invitación pendiente de Auth backend para ' + (data.email || 'su correo'); document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
       close(); render(document.getElementById('host') || document.getElementById('mod-host'));
     });
   }
