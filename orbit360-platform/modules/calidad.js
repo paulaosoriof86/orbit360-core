@@ -3,7 +3,8 @@
    Reporte de clientes con información incompleta y campaña de
    actualización. Prioridad: teléfono › dirección › resto.
    Foco en clientes con PÓLIZA VIGENTE (históricos que migran).
-   Notificar por WhatsApp (si tiene tel) o correo (si tiene email).
+   Preparar contacto por WhatsApp Web o correo; entrega real depende
+   de integración/canal conectado.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
@@ -52,8 +53,8 @@ Orbit.modules.calidad = (function () {
             const canal = c.telefono ? '<span class="badge ok">💬 WhatsApp</span>' : c.email ? '<span class="badge info">✉ Correo</span>' : '<span class="badge danger">Sin contacto</span>';
             const faltaTxt = f.sort((a, b) => a.pri - b.pri).map(x => `<span class="badge ${x.pri === 1 ? 'danger' : x.pri === 2 ? 'warn' : 'neutral'}">${x.label}</span>`).join(' ');
             const accion = c.telefono
-              ? `<a class="btn ghost sm" style="color:#1f8a4c" href="https://wa.me/${wa}?text=${encodeURIComponent('Hola ' + c.nombre.split(' ')[0] + ', para mantener tu póliza al día necesitamos actualizar algunos datos. ¿Nos ayudás?')}" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 WA</a>`
-              : c.email ? `<button class="btn ghost sm" onclick="event.stopPropagation();window.__orbitCompose={para:'${U.esc(c.email)}',asunto:'Actualización de datos · ${U.esc(c.nombre)}',cuerpo:'',clienteId:'${c.id}',vinculo:{tipo:'cliente',id:'${c.id}',label:'${U.esc(c.nombre)}'}};location.hash='#/correo'">✉ Correo</button>`
+              ? `<a class="btn ghost sm" style="color:#1f8a4c" href="https://wa.me/${wa}?text=${encodeURIComponent('Hola ' + c.nombre.split(' ')[0] + ', para mantener tu póliza al día necesitamos actualizar algunos datos. ¿Nos ayudás?')}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abre WhatsApp Web con mensaje preparado; la entrega no se confirma desde Orbit.">💬 Preparar WA</a>`
+              : c.email ? `<button class="btn ghost sm" onclick="event.stopPropagation();window.__orbitCompose={para:'${U.esc(c.email)}',asunto:'Actualización de datos · ${U.esc(c.nombre)}',cuerpo:'',clienteId:'${c.id}',vinculo:{tipo:'cliente',id:'${c.id}',label:'${U.esc(c.nombre)}'}};location.hash='#/correo'" title="Preparar correo; envío real depende de cuenta conectada.">✉ Preparar correo</button>`
               : `<button class="btn ghost sm" disabled style="opacity:.5">Sin canal</button>`;
             return `<tr class="clickable" onclick="location.hash='#/cliente360?c=${c.id}&t=resumen'">
               <td>${K.clienteCell(c.id)}</td>
@@ -112,7 +113,7 @@ Orbit.modules.calidad = (function () {
   function campana() {
     const all = S().all('clientes').map(c => ({ c, f: faltantes(c) })).filter(x => x.f.length && tieneVigente(x.c.id));
     const wa = all.filter(x => x.c.telefono).length, mail = all.filter(x => !x.c.telefono && x.c.email).length;
-    Orbit.ui.toast('Campaña de actualización (demo):\n\n• ' + wa + ' por WhatsApp (tienen teléfono)\n• ' + mail + ' por correo (sin WhatsApp, con email)\n• ' + (all.length - wa - mail) + ' sin canal — requieren gestión manual.\n\nUsa la plantilla "Actualización de datos" con los campos pendientes de cada cliente.');
+    Orbit.ui.toast('Campaña de actualización preparada:\n\n• ' + wa + ' por WhatsApp Web/API pendiente de conexión real\n• ' + mail + ' por correo preparado\n• ' + (all.length - wa - mail) + ' sin canal — requieren gestión manual.\n\nUsa la plantilla "Actualización de datos" con los campos pendientes de cada cliente.');
   }
   return { render, campana, editarInline };
 })();
