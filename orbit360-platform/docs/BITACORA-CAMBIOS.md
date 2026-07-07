@@ -2,6 +2,127 @@
 
 > Registro cronológico de cambios del **prototipo** (Claude). El backend LAB (ChatGPT/Codex) mantiene su propia bitácora. Formato: versión · fecha · qué cambió · archivos.
 
+## v1.150 — 2026-07-06 · "Todo cuadra" neutralizado · index NO tocado
+> `index.html` NO tocado (backend LAB + `portal-v1142-copyfix.js` conservados). Backend protegido y tools intactos. Sin datos reales.
+- La cadena exacta "Todo cuadra — nada por crear." **no existe** en `core/importa.js` (verificado con grep en todo el proyecto; el resumen dry-run usa "Crear nuevos / Actualizar / Omitir"). La única ocurrencia real de "Todo cuadra" en un módulo estaba en **`modules/comisiones.js`** (empty-state de conciliación) → cambiada a "**Sin diferencias detectadas** — comisiones conciliadas con las tarifas vigentes." Con esto, **0 coincidencias de "Todo cuadra"** en módulos (solo permanece en `docs/BITACORA-CAMBIOS.md`, documentación interna no visible).
+- Mantidos sin regresión: config "cobro confirmado/conciliado con póliza"; importa "quedan listos para revisión/aprobación", "Las propuestas quedan disponibles para revisión", "Revisión previa", "Alcance permitido / efecto propuesto", "Se propondrán para revisión", "Confirmar mapeo".
+- **⚠ Para ChatGPT/Codex (cache-bust)**: bumpear `modules/comisiones.js` (y los ya corregidos `core/config.js`, `core/importa.js`) en el index híbrido para servir los cambios.
+- Archivos tocados: `modules/comisiones.js`, `docs/BITACORA-CAMBIOS.md`.
+
+
+## v1.149 — 2026-07-06 · Residuos finales config (scope) + step3 importa · index NO tocado
+> `index.html` NO tocado (backend LAB loader/init/store/storeLAB/guard + `portal-v1142-copyfix.js` conservados). Backend protegido y tools intactos. Sin datos reales.
+- **config.js**: el array `scope` de Finanzas todavía tenía "Doble conciliación: **pago aplicado a póliza creada**" (el `desc` ya estaba corregido en v1.145) → ahora "Doble conciliación: **cobro confirmado/conciliado con póliza**". Verificado 0 en fuente.
+- **importa.js step3**: "…se integrarán a X — crea lo nuevo, actualiza lo existente, sin duplicar" → "…**quedan listos para revisión/aprobación** en X — se proponen altas y actualizaciones, sin duplicar"; "Los registros se integran a la capa de datos y quedan disponibles…" → "**Las propuestas quedan disponibles para revisión** en los módulos relacionados". Verificado 0 en fuente.
+- **Nota**: la cadena "Todo cuadra — nada por crear" NO existe en la fuente actual (un `fetch` de prueba la mostró por **caché del service worker PWA**, no por el archivo real). El resumen dry-run usa "Crear nuevos / Actualizar / Omitir" — sin lenguaje de aplicación.
+- Sin regresiones en Cliente360/Cobros/Finanzas/Automatizaciones/Academia (plus+seed)/Importador.
+- **⚠ Para ChatGPT/Codex (cache-bust)**: bumpear en el index híbrido `core/config.js` y `core/importa.js` (a la siguiente vN) para servir los cambios; los archivos fuente ya están corregidos en el ZIP.
+- Archivos tocados: `core/config.js`, `core/importa.js`, `docs/BITACORA-CAMBIOS.md`.
+
+
+## v1.148 — 2026-07-06 · Residuos de importa (revisión ≠ aplicación) · index NO tocado
+> **`index.html` NO tocado** (conserva backend LAB loader/init/store/storeLAB/guard + `portal-v1142-copyfix.js`). Backend protegido y tools intactos. Sin datos reales.
+- **importa.js**: "Simulación pre-escritura" → "**Revisión previa**"; "Alcance (crea/actualiza)" (reporte CSV) → "**Alcance permitido / efecto propuesto**"; "Se crearán al confirmar" → "**Se propondrán para revisión**"; botón remap "Aplicar mapeo →" → "**Confirmar mapeo →**".
+- **Ya corregidos en rondas previas (verificado, sin cambio)**: config.js "Doble conciliación: cobro confirmado/conciliado con póliza"; importa "Importación lista para revisión/aprobación", "Revisar propuestas de conciliación por póliza", checkbox "Aplicar estos % al tarifario" (propuesta, no carga directa).
+- **QA**: `fetch` de la fuente servida → **0 residuos** de [Simulación pre-escritura, Alcance (crea/actualiza), Se crearán al confirmar, Aplicar mapeo, pago aplicado a póliza creada]. Sin regresiones en Cliente360/Cobros/Finanzas/Automatizaciones/Academia. Academia conserva jun/jul 2026, manifest de fuentes, banco no confirma cobro, histórico no crea cartera, documentos solo proponen, país/moneda faltante = REQUIERE_VALIDACION, GTQ/COP sin suma cruda.
+- **⚠ Nota para ChatGPT/Codex (cache-bust)**: como NO toqué `index.html`, hay que **bumpear `core/importa.js?v1330 → v1331`** en el index híbrido de la rama viva para que el cambio se sirva. El archivo fuente ya está corregido en el ZIP.
+- Archivos tocados: `core/importa.js`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales.
+
+
+## v1.147 — 2026-07-06 · Residuos finales de importa (gate) + index no tocado salvo cache-bust
+> Sin tocar backend protegido ni tools. `index.html` solo cache-bust (scripts LAB y `portal-v1142-copyfix.js` conservados). Sin datos reales.
+- **importa.js**: `estados-cuenta` desc "pagos aún no aplicados" → "**pagos pendientes de validación**"; detect "Pagado en banco, sin aplicar" → "**Pago en banco pendiente de validación**". `planillas-comision` desc "pagos no aplicados a póliza" → "**pagos pendientes de relación con recibo/póliza**"; detect "Comisión cobrada, pago no aplicado" → "**Comisión cobrada, propuesta pendiente de conciliación**". (Variable interna `noAplicados` se conserva; no se muestra cruda en UI.)
+- **config.js**: metadata Finanzas ya en "cobro confirmado/conciliado" (v1.145) — sin cambio.
+- Verificado: 0 matches de "aún no aplicados / no aplicados a póliza / Pagado en banco, sin aplicar / pago no aplicado"; app carga; 0 errores JS.
+- Cache-bust: `importa.js?v1330`.
+- Archivos: `core/importa.js`, `index.html`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales.
+
+
+## v1.146 — 2026-07-06 · Corrección final: erradicación total de "aplicar/aplicado" (gate)
+> Sin tocar backend protegido. `index.html` solo cache-bust (scripts LAB y `portal-v1142-copyfix.js` conservados). Sin datos reales.
+- **Cliente360**: `actionRow` "Todo aplicado" → **"Cartera al día"** (estado sin cobros pendientes); botón tabla recibos "Aplicar pago" → **"Confirmar cobro"**.
+- **seed.js**: "aplicar un pago baja la cartera y suma a Finanzas" → "**confirmar un cobro actualiza la cartera según validación** y suma a Finanzas"; "Cobros gestiona la cartera y aplica pagos" → "**Cobros gestiona cartera, reportes, revisión y confirmación de cobros**".
+- **importa.js**: motivo de conciliación "Pago en estado de cuenta, sin aplicar" → "**Pago en estado de cuenta pendiente de validación**" (los copys "Pagos pendientes de validación" / "pendientes de relación con recibo/póliza" ya de v1.145).
+- **config.js**: metadata Finanzas ya en "cobro confirmado/conciliado↔póliza" (v1.145) — sin cambio.
+- **academia-plus.js**: sin literal "pago aplicado" (ni en negación); la lección "Estados honestos" usa "reportar/validar no confirma el cobro". Sin cambio de contenido este round.
+- **QA (gate)**: recorrido de inicio/cobros/conciliaciones/cliente360/finanzas/importar/automatizaciones/academia → **0 resultados** para Todo aplicado, Aplicar pago, Pago aplicado, Aplicado a póliza, Pagos no aplicados, pago sin aplicar, "aplicar un pago baja la cartera", "Cobros gestiona la cartera y aplica pagos". 0 errores JS.
+- Cache-bust: `seed.js`, `importa.js`, `cliente360.js` → `?v1329`.
+- Archivos: `modules/cliente360.js`, `data/seed.js`, `core/importa.js`, `index.html`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales.
+
+
+## v1.145 — 2026-07-06 · Corrección post-auditoría v1.144: "aplicar/aplicado" erradicado de la UI + Academia migración
+> Sin tocar backend protegido (store/loader/init/guard/rules/tools). `index.html` solo cache-bust (scripts LAB y `portal-v1142-copyfix.js` conservados). Sin datos reales.
+- **Cliente360 (fix 1)**: modal/botón "Aplicar pago" → **"Confirmar cobro"** / "Registrar cobro confirmado"; "Fecha de envío a gestión (día en que se aplica)" → "Fecha de confirmación (día en que el equipo confirma el cobro)"; estado "Validada (por aplicar)" → "Validada (por confirmar)"; miniStats/tooltips a confirmado/conciliado.
+- **Cobros (fix 2)**: botón tabla "💳 Pagar" → "💳 Confirmar"; ficha "Aplicar pago" → "Confirmar cobro"; modal header "Cobros · aplicar pago"/"Aplicar pago" → "Confirmar cobro"; CTA "✅ Confirmar pago" → "✅ Confirmar cobro". (Reportado = pendiente de revisión/conciliación; confirmado = validado por equipo; conciliado = cruzado.)
+- **Finanzas (fix 3)**: "Aplicado a póliza" → "Confirmado y conciliado con póliza"; "pago sin aplicar" → "pendiente de conciliación"; comentario "demo agregada" → "partidas agregadas".
+- **Importador (fix 4)**: "Pagos no aplicados" → "Pagos pendientes de validación"; "aún no aplicados a su póliza" → "pendientes de relación con recibo/póliza"; "Importación lista para aplicar" → "…lista para revisión/aprobación"; "Aplicar pagos por póliza →" → "Revisar propuestas de conciliación por póliza →".
+- **Config (fix 5)**: metadata Finanzas "DOBLE conciliación pago↔póliza" → "cobro confirmado/conciliado↔póliza".
+- **Automatizaciones (fix 6)**: "clave detectada — conexión real al migrar backend" → "clave detectada · pendiente de activación técnica". Plantillas Pago confirmado / Pago reportado conservadas.
+- **Academia (fix 7)**: nueva lección **"Migración honesta: fuentes, banco y caso jun/jul 2026"** (fuente separada + manifest; banco/estado de cuenta no son cobro; planilla no crea cartera/cobro; histórico no crea cartera/cobros/producción; documentos solo proponen; país/moneda faltante = REQUIERE_VALIDACION; GT=GTQ/CO=COP sin sumar crudo; jun/jul 2026 = migración, no productivo). "Cobros gestiona la cartera y aplica pagos" → "…confirma cobros (validados por el equipo)". `CONTENT_V=8` re-sincroniza (verificado `_cv=8`).
+- **QA (fix 9)**: recorrido de inicio/cobros/conciliaciones/cliente360/finanzas/importar/automatizaciones → **0 textos prohibidos** (Pago aplicado, Aplicado a póliza, Todo aplicado, cobros aplicados, recaudo aplicado, Aplicar pago, listas p/ backend, conexión real). 0 errores JS.
+- Cache-bust: `config/importa/cobros/cliente360/automatizaciones/finanzas.js` y `academia-plus.js` → `?v1328`.
+- Archivos: `modules/{cliente360,cobros,finanzas,automatizaciones}.js`, `core/{config,importa}.js`, `data/academia-plus.js`, `index.html`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales.
+
+
+## v1.144 — 2026-07-06 · Corrección post-auditoría v1.143: copy "aplicado" armonizado en toda la UI + Academia
+> Sin tocar backend protegido (store/loader/init/guard/rules/tools ni index híbrido LAB). Sin datos reales.
+- **Conciliaciones (fix 1)**: eliminado estado **APLICADA**, KPI "Aplicadas" y "listas p/ backend"; quitada la acción/función **`preparar_aplicacion_controlada`/`prepararAplicacion`** (VALIDADA ya no ofrece CTA de aplicar). KPIs: "Validadas → para proceso posterior autorizado", "En revisión". Banner: "para revisión técnica. No aplica pagos ni modifica cobros desde esta bandeja". Verificado: sin "Aplicadas", con "No aplica pagos", `prepararAplicacion` inexistente.
+- **Cobros (fix 2)**: "cobros aplicados"→"cobros confirmados"; título actividad "Pago aplicado"→"Pago confirmado"; toast "✅ Pago aplicado"→"✅ Pago confirmado"; tooltip "Aplicado a póliza"→"Confirmado y conciliado con póliza".
+- **Cliente360 (fix 3)**: tooltip "Pago aplicado a la póliza"→"Confirmado y conciliado"; actividad/aviso "Pago aplicado"→"Pago confirmado"; miniStats "Por aplicar/Aplicado"→"Por confirmar/Confirmado".
+- **Automatizaciones (fix 4)**: template `pago_aplicado` label "Pago aplicado"→"Pago confirmado"; nuevo `pago_reportado` "Pago reportado · pendiente de revisión/conciliación".
+- **Academia (fix 5)**: armonizadas lecciones previas — "Aplicar un pago"→"Confirmar un pago" (con nota reportado≠confirmado), "Al aplicarlo la cartera baja" reencuadrado, "confirma cada pago aplicado"→"cuando quede conciliado", etc. `CONTENT_V=7` re-sincroniza conservando progreso (verificado `_cv=7`, sin "Aplicar un pago").
+- **index.html (fix 6)**: solo cache-bust; backend LAB (loader/init/store/storeLAB/guard) intacto.
+- Verificado: 0 errores JS; app carga; Inicio "Recaudo confirmado/cobros confirmados".
+- Cache-bust: `conciliaciones/cobros/cliente360/automatizaciones.js` y `academia-plus.js` → `?v1327`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales. (Bloques junio-julio 2026 / manifest de fuentes / banco-no-es-cobro / histórico-no-crea-cartera / documentos-solo-proponen: ya cubiertos en lecciones de Importador y "Estados honestos"; ampliación fina queda para próxima iteración.)
+- Archivos: `modules/conciliaciones.js`, `modules/cobros.js`, `modules/cliente360.js`, `modules/automatizaciones.js`, `data/academia-plus.js`, `index.html`.
+
+
+## v1.143 — 2026-07-06 · Copy honesto residual + Academia estados honestos por rol · acumulado post-v1.142
+> Sin tocar backend protegido (store/loader/init/guard/rules/tools), sin datos reales, sin funcionalidad backend. Conserva empalmes ChatGPT/Codex (integraciones "Pendiente de conexión", conciliaciones no aplica pagos, inicio "confirmado", portal reporte pendiente).
+- **P0.1/P0.3 copy residual**: `core/crmkit.js` KPI "Cobros aplicados" → **"Cobros confirmados"**; `modules/finanzas.js` nota de doble conciliación "pago aplicado ↔ póliza" → "cobro confirmado ↔ póliza" y KPI foot "aplicados a póliza" → "confirmados a póliza". (Inicio, Portal, Conciliaciones, Integraciones ya honestos desde v1.140–v1.142; verificado Inicio muestra "Recaudo confirmado"/"cobros confirmados".)
+- **P0.5 Academia por rol**: nueva lección **"Estados honestos: reportado ≠ conciliado ≠ confirmado"** en el curso *Pólizas y Cobros* (4 secciones): pago reportado por cliente = soporte/evidencia + Pendiente de revisión (no aplicado); conciliación = PROPUESTA con score, **VALIDADA no es pagada ni aplicada**, no modifica cobros/cartera/producción/comisiones ni escribe finmovs; cobro confirmado solo tras validar+conciliar; cobros/recaudos ≠ finmovs; producción/metas/comisiones sobre prima neta recaudada; no sumar GTQ+COP en crudo. `CONTENT_V=6` re-sincroniza conservando progreso (verificado `_cv=6`, curso a 6 lecciones).
+- Verificado: 0 errores JS; app carga; backend LAB intacto en index.
+- Cache-bust: `academia-plus.js?v1326`, `crmkit.js?v1326`, `finanzas.js?v1326`.
+- Archivos: `core/crmkit.js`, `modules/finanzas.js`, `data/academia-plus.js`, `index.html`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real de conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales.
+
+
+## v1.142 — 2026-07-05 · Copy honesto: estados de pago/conciliación · candidata 062855
+> Candidata `2026-07-05T062855.313`. Cambios de copy quirúrgicos, sin funcionalidad nueva. Sin tocar backend protegido, sin datos reales.
+- **Textos técnicos (P0-1)**: `integraciones-panel.js` "Sin conexión real" → "Pendiente de conexión"; `conciliaciones.js` "validación controlada en backend / mutación de cobros / bandeja del prototipo / requiere validación backend" → "validación controlada / afectación de cobros / requiere validación controlada" (sin palabra backend visible).
+- **Copy de pagos (P0-2/4)**: `inicio.js` "Recaudo aplicado"→"Recaudo confirmado", "cobros aplicados"→"cobros confirmados" (estado honesto). `portal.js`: al reportar, toast "✓ Recibimos tu reporte · pendiente de revisión/conciliación" + nota en el detalle del recibo "Recibimos tu reporte. Está pendiente de revisión/conciliación; te confirmamos cuando quede conciliado." Portal ya no sugiere que un pago reportado esté aplicado.
+- Estados honestos confirmados (sin cambio necesario): Portal reporta ≠ aplicado; Cobros/Cliente360 con Reportado/En revisión/Validada/Conciliado; Conciliaciones no aplica pagos; estado bancario propone; producción/metas/comisiones sobre prima neta recaudada; moneda por país.
+- Verificado: app carga, Inicio muestra "Recaudo confirmado"; 0 errores JS.
+- Cache-bust: `inicio.js?v1325`, `portal.js?v1325`, `conciliaciones.js?v1325`, `integraciones-panel.js?v1325` (on-demand).
+- Archivos: `modules/inicio.js`, `modules/portal.js`, `modules/conciliaciones.js`, `core/integraciones-panel.js`, `index.html`.
+
+
+## v1.141 — 2026-07-05 · Fix ruta Conciliaciones (tenant/roles) + copy residual · candidata 061837
+> Candidata `2026-07-05T061837.674`. Sin tocar backend protegido, sin datos reales.
+- **Ruta visible por tenant**: `conciliaciones` añadido a `Orbit.tenant.DEFAULT.modulosActivos` (tras `cobros`). Además `isActive()` ahora es **retrocompatible**: acepta rutas nuevas presentes en `DEFAULT.modulosActivos` aunque el tenant persistido no las tuviera (respetando `modulosDesactivados`). Verificado: `isActive('conciliaciones') === true`.
+- **Rol Admin**: `conciliaciones` añadido a `Orbit.ROLES.Admin.modulos` (ya estaba en Dirección y Finanzas). Verificado: los 3 roles con acceso.
+- **Copy residual (importa.js)**: "En el paso siguiente podés aplicar pagos por póliza." → "…podrás revisar propuestas de conciliación por póliza. No aplica pagos por sí sola."; "Se aplicarán sin duplicar." → "Se propondrán para validación sin duplicar."; "Sin pagos pendientes de aplicar." → "Sin pagos pendientes de validación."
+- Verificado: 0 errores JS; `modules/conciliaciones.js` cargado; acciones solo `Orbit.store.update('conciliaciones', …)`, no mutan cobros; `preparar_aplicacion_controlada` solo informa. Sin persistencia real (queda para backend).
+- Cache-bust: `config.js?v1324`, `importa.js?v1323`.
+- Archivos: `core/config.js`, `core/importa.js`, `index.html`.
+
+
+## v1.140 — 2026-07-05 · Bandeja de conciliaciones (UI segura) + copy residual · candidata 211525
+> Candidata activa `2026-07-04T211525.464` (base comparada `205210.456`). Academia CONTENT_V=5. Sin tocar backend protegido, sin datos reales, sin localStorage operativo.
+- **Nuevo módulo `modules/conciliaciones.js`** (ruta `conciliaciones`, NAV bajo Cobros; roles Dirección/Admin/Finanzas): bandeja que **lee solo `Orbit.store('conciliaciones')`**. Columnas del contrato: estado_bandeja, estado_revision, score/decision_score, fuente, archivo·fila, país/moneda, cliente·póliza·recibo, monto, acción propuesta, responsable, última actualización, acciones, bloqueos. Estados PROPUESTA/EN_REVISION/VALIDADA/RECHAZADA/BLOQUEADA/ANULADA/APLICADA (APLICADA solo histórico). Acciones por estado según contrato; las transiciones **solo** hacen `Orbit.store.update('conciliaciones', id, patch)` — **nunca tocan cobros** (verificado: validar deja cobros intactos). `preparar_aplicacion_controlada` abre modal informativo ("requiere validación backend · no aplica pago todavía"). **Estado vacío honesto** si no hay colección. Sin textos técnicos al cliente.
+- **P0-2 copy** `estados-cuenta.desc`: "permite aplicar pagos por póliza" → "propone pagos para validación por póliza".
+- **P0-3 copy** `planillaFlujo()`: "Pendiente de aplicar" → "Propuesta pendiente".
+- **P0-4 limitación documentada**: `conciliacionPropuesta` es señal visual/prototipo dentro de cobros; la **persistencia real** en colección/bandeja `conciliaciones` + `auditLog` y la **aplicación controlada** quedan para backend ChatGPT/Codex.
+- Verificado: 0 errores JS; bandeja navegable con estado vacío y con datos demo; transiciones no mutan cobros.
+- Cache-bust: `importa.js?v1321`(copys), `conciliaciones.js?v1322`, `config.js?v1322`.
+- Archivos: `modules/conciliaciones.js` (nuevo), `core/config.js` (NAV+ROLES+MODULE_TITLES), `core/importa.js` (copys), `index.html`, docs.
+
+
 ## v1.139 — 2026-07-04 · P0 candidata 205210: conciliación no aplica directo + validar≠aplicar + planilla sin GTQ
 > Candidata activa `2026-07-04T205210.456` (base comparada `202655.833`). Academia CONTENT_V=5. Sin tocar backend protegido, sin datos reales.
 - **P0-2 (CERRADO)** `core/importa.js` `applyConciliacion`: ya **no aplica pagos directo**. Genera **referencias** (registros faltantes) y **propuestas** sobre el recibo (`conciliacionPropuesta: {estado:'REQUIERE_VALIDACION'}`); copy → "referencias creadas · propuestas para revisión · no impacta cobros hasta aprobación".

@@ -14,6 +14,7 @@ Orbit.MODULE_TITLES = {
   cliente360:    { icon: '🧑‍💼', title: 'Orbit Clientes', sub: 'Base de asegurados', features: ['Expediente 360', 'Autogestionable', 'Importación inteligente'] },
   polizas:       { icon: '📑', title: 'Orbit Pólizas', sub: 'Cartera completa', features: ['Multi-aseguradora', 'Vigencias', 'Ramos y productos'] },
   cobros:        { icon: '💳', title: 'Orbit Cobros', sub: 'Cartera y conciliación', features: ['Aging', 'Recibos', 'Conciliación pago↔póliza'] },
+  conciliaciones: { icon: '🔗', title: 'Orbit Conciliaciones', sub: 'Bandeja de propuestas', features: ['Score', 'Validación', 'No aplica pagos'] },
   renovaciones:  { icon: '🔄', title: 'Orbit Renovaciones', sub: 'Pipeline por vencer', features: ['90 días', 'Por urgencia', 'Gestión'] },
   cancelaciones: { icon: '✕', title: 'Orbit Cancelaciones', sub: 'Fuga de cartera', features: ['Motivos', 'Valor perdido', 'Tasa de fuga'] },
   comisiones:    { icon: '💼', title: 'Orbit Comisiones', sub: 'Devengado y liquidado', features: ['Por asesor', 'Por aseguradora', 'Por periodo'] },
@@ -76,13 +77,13 @@ Orbit.PLANES = {
 };
 Orbit.ROLES = {
   'Dirección':   { nivel: 5, desc: 'Acceso total + configuración + comisión empresa + análitica completa.', color: '#C5162E',
-    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','renovaciones','cancelaciones','siniestros','historial','comisiones','importar','calidad','plantillas','finanzas','insights','reportes','automatizaciones','correo','marketing','academia','portal','equipo','configuracion'] },
+    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','conciliaciones','renovaciones','cancelaciones','siniestros','historial','comisiones','importar','calidad','plantillas','finanzas','insights','reportes','automatizaciones','correo','marketing','academia','portal','equipo','configuracion'] },
   'Admin':       { nivel: 4, desc: 'Operación completa + configuración. Sin módulo Finanzas completo.', color: '#1f3a5f',
-    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','renovaciones','cancelaciones','siniestros','historial','comisiones','importar','calidad','plantillas','insights','reportes','automatizaciones','correo','academia','equipo','configuracion'] },
+    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','conciliaciones','renovaciones','cancelaciones','siniestros','historial','comisiones','importar','calidad','plantillas','insights','reportes','automatizaciones','correo','academia','equipo','configuracion'] },
   'Comercial':   { nivel: 3, desc: 'CRM + Ops/Leads + Cotizador. Sin Finanzas ni Config.', color: '#1f8a4c',
     modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo','marketing'] },
   'Finanzas':    { nivel: 3, desc: 'Cobros, comisiones, finanzas, conciliación. Sin Ops/Leads.', color: '#c9821b',
-    modulos: ['inicio','cronograma','cliente360','polizas','cobros','renovaciones','cancelaciones','comisiones','historial','finanzas','reportes','correo'] },
+    modulos: ['inicio','cronograma','cliente360','polizas','cobros','conciliaciones','renovaciones','cancelaciones','comisiones','historial','finanzas','reportes','correo'] },
   'Marketing':   { nivel: 2, desc: 'Marketing, Academia, Reportes, CRM básico.', color: '#6b4ea0',
     modulos: ['inicio','cronograma','marketing','academia','cliente360','correo','reportes'] },
   'Operativo':   { nivel: 2, desc: 'Ops + CRM operativo. Sin Finanzas ni Config.', color: '#0f766e',
@@ -227,7 +228,7 @@ Orbit.tenant = (function () {
     // Poner en false SOLO en modo interno/demo desde Configuración → Marca.
     hideTechnicalBadges: true,
     // módulos activos (config INTERNA nuestra) — todos los del nav
-    modulosActivos: ['inicio', 'cronograma', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'siniestros', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'automatizaciones', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
+    modulosActivos: ['inicio', 'cronograma', 'ops', 'leads', 'aseguradoras', 'cotizador', 'comparativo', 'cliente360', 'polizas', 'cobros', 'conciliaciones', 'renovaciones', 'cancelaciones', 'siniestros', 'historial', 'comisiones', 'importar', 'calidad', 'plantillas', 'reportes', 'ia', 'academia', 'insights', 'correo', 'automatizaciones', 'notificaciones', 'marketing', 'portal', 'finanzas', 'equipo', 'configuracion'],
     addons: { make: false, drive: true, whatsapp: true, correo: true, metricool: false, facebook: false, linkedin: false, web: true, canva: false, gamma: false, heygen: false, ia: false, mailchimp: false, sheets: false },
     portalVisibility: { polizas: true, recibos: true, documentos: true, asesor: true, comisiones: false, drive: false },
     // Glosario/localización POR TENANT: sobreescribe términos por clave (opcional, por país).
@@ -256,7 +257,7 @@ Orbit.tenant = (function () {
     get: () => data,
     set: (patch) => { Object.assign(data, patch); save(); document.dispatchEvent(new CustomEvent('orbit:tenant')); },
     setDeep: (k, v) => { data[k] = v; save(); document.dispatchEvent(new CustomEvent('orbit:tenant')); },
-    isActive: (route) => data.modulosActivos.includes(route),
+    isActive: (route) => (data.modulosActivos.includes(route) || (DEFAULT.modulosActivos.indexOf(route) >= 0 && !(data.modulosDesactivados || []).includes(route))),
     reset: () => { data = JSON.parse(JSON.stringify(DEFAULT)); save(); document.dispatchEvent(new CustomEvent('orbit:tenant')); },
     DEFAULT
   };
@@ -312,6 +313,7 @@ Orbit.NAV = [
       { route: 'cliente360', icon: '🧑‍💼', label: 'Clientes 360', estado: 'core' },
       { route: 'polizas', icon: '📑', label: 'Pólizas', estado: 'core' },
       { route: 'cobros', icon: '💳', label: 'Cobros y cartera', estado: 'core' },
+      { route: 'conciliaciones', icon: '🔗', label: 'Conciliaciones', estado: 'core' },
       { route: 'renovaciones', icon: '🔄', label: 'Renovaciones', estado: 'core' },
       { route: 'cancelaciones', icon: '✕', label: 'Cancelaciones', estado: 'core' },
       { route: 'siniestros', icon: '🚨', label: 'Siniestros', estado: 'beta' },
@@ -368,7 +370,7 @@ Orbit.MODULE_META = {
   insights: { icon: '📊', title: 'Orbit Insights', estado: 'beta', desc: 'Analítica integral en 9 vistas sobre los datos del CRM.', scope: ['Resumen · Metas · Cumplimiento', 'Recaudo · Cartera · Devengado', 'Top clientes · Vencidas s/renovar · Análisis crítico', 'Se alimenta de Cliente 360, Cobros y Comisiones'] },
   notificaciones: { icon: '💬', title: 'Notificaciones WhatsApp', estado: 'road', desc: 'Mensajería transaccional y de seguimiento por WhatsApp, automatizada por cadencia.', scope: ['Recordatorios de pago y renovación', 'Cadencias automáticas de seguimiento', 'Encuestas de satisfacción', 'Plantillas configurables'] },
   marketing: { icon: '📣', title: 'Orbit Marketing', estado: 'beta', desc: 'Calendario real (cada día con sus piezas), creación/automatización de contenidos y segmentación desde la cartera real → campañas inteligentes.', scope: ['Calendario por día con piezas', 'Automatización de creación de piezas', 'Segmentación desde info real de clientes', 'Campañas inteligentes medibles'] },
-  finanzas: { icon: '💰', title: 'Orbit Finanzas', estado: 'beta', desc: 'Movimientos, liquidaciones (empresa + asesores), import de estados de cuenta y planillas, con DOBLE conciliación pago↔póliza.', scope: ['Movimientos mensuales', 'Liquidación de comisiones empresa y asesores', 'Importar estados de cuenta y planillas', 'Doble conciliación: pago aplicado a póliza creada'] },
+  finanzas: { icon: '💰', title: 'Orbit Finanzas', estado: 'beta', desc: 'Movimientos, liquidaciones (empresa + asesores), import de estados de cuenta y planillas, con DOBLE conciliación cobro confirmado/conciliado↔póliza.', scope: ['Movimientos mensuales', 'Liquidación de comisiones empresa y asesores', 'Importar estados de cuenta y planillas', 'Doble conciliación: cobro confirmado/conciliado con póliza'] },
   equipo: { icon: '👥', title: 'Equipo y permisos', estado: 'road', desc: 'Gestión de usuarios, roles y permisos sin escribir código.', scope: ['Roles y permisos por módulo', 'Metas por asesor', 'Estructura por equipo / país', 'Sin código'] },
   configuracion: { icon: '⚙', title: 'Configuración', estado: 'road', desc: 'Parámetros del intermediario: países, ramos, aseguradoras, plantillas y metas — todo sin código.', scope: ['Países y ramos', 'Catálogo de aseguradoras', 'Plantillas y metas', 'White-label / marca'] },
   reportes: { icon: '📈', title: 'Reportes', estado: 'road', desc: 'Zona de reportes exportables sobre todos los datos del CRM y Finanzas.', scope: ['Reportes de cartera, recaudo y comisiones', 'Filtros por país, asesor, aseguradora y periodo', 'Exportar a Excel / PDF', 'Reportes programados por correo'] },

@@ -25,7 +25,7 @@ Orbit.ACADEMIA_PLUS = (function () {
         L('Anatomía del expediente 360', 12, [
           S('🗂', 'Las pestañas del cliente', C.azul, 'Cada cliente tiene un expediente único con **Resumen**, **Pólizas**, **Cobros**, **Siniestros**, **Actividades**, **Correos** y **Documentos**. Recórrelas de izquierda a derecha antes de llamar: en 30 segundos sabes qué tiene, qué debe y qué pendientes hay.'),
           S('📇', 'Datos que definen todo', C.verde, 'Nombre/razón social, tipo (Persona/Empresa), **identificación fiscal** (NIT/DPI/RFC/RUC según país), teléfono con WhatsApp, correo, país y ciudad. El país determina moneda e impuestos; nunca lo dejes vacío. Un dato de contacto errado rompe cadencias y cobros.'),
-          S('🔗', 'Todo está enlazado', C.terra, 'Desde el expediente abres la póliza, el recibo, el siniestro o el correo sin salir del cliente. Cada acción (pago aplicado, gestión creada, correo enviado) queda registrada en **Actividades** con fecha viva y autor.')
+          S('🔗', 'Todo está enlazado', C.terra, 'Desde el expediente abres la póliza, el recibo, el siniestro o el correo sin salir del cliente. Cada acción (pago confirmado, gestión creada, correo enviado) queda registrada en **Actividades** con fecha viva y autor.')
         ]),
         L('Calidad de datos: por qué es tu prioridad #1', 10, [
           S('🩺', 'El módulo Calidad', C.red, 'Orbit detecta expedientes incompletos y los prioriza por impacto: primero clientes con **póliza vigente** sin teléfono o sin correo. Un cliente sin WhatsApp no recibe recordatorios de cobro ni renovación: cada dato faltante es plata que se fuga.'),
@@ -60,20 +60,26 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('💵', 'Prima: neta, gastos, IVA, total', C.verde, 'La **prima neta recaudada** es la base de producción, metas y comisiones — no la prima total. Gastos de emisión e IVA se separan. Confundirlas infla la producción y te hace liquidar comisiones de más.'),
           S('🗓', 'Formas de pago y recibos', C.azul, 'Contado, mensual, trimestral, semestral, anual: cada frecuencia genera su calendario de recibos con vencimientos y posible recargo por fraccionamiento. El conducto (transferencia, tarjeta, efectivo) define cómo se concilia.')
         ]),
-        L('Cobros: aplicar pagos y leer el aging', 11, [
-          S('💳', 'Aplicar un pago', C.verde, 'Desde Cobros o desde la póliza, marca el recibo como pagado con fecha y método. Al aplicarlo, la cartera baja y Finanzas recibe el recaudo: es una sola acción con efecto en todo el sistema (sincronía en vivo).'),
+        L('Cobros: confirmar pagos y leer el aging', 11, [
+          S('💳', 'Confirmar un pago', C.verde, 'Un pago **reportado** por el cliente queda pendiente de revisión/conciliación (no es cobro). Solo cuando el equipo lo valida y concilia, marca el recibo como **confirmado** con fecha y método: ahí baja la cartera y Finanzas recibe el recaudo. Reportado ≠ confirmado: sola acción con efecto en todo el sistema (sincronía en vivo).'),
           S('📊', 'Aging = antigüedad del vencido', C.ocre, 'El aging agrupa lo vencido por tramos (1-30, 31-60, 61-90, +90 días). Ataca primero el tramo de mayor riesgo: mientras más viejo el vencido, menos probable el recaudo. Cartera sana = pólizas vigentes con recibos al día.'),
           S('🔁', 'Cobros ≠ movimientos de caja', C.graf, 'El pago de un cliente es un **cobro/recaudo**, no un movimiento financiero de la empresa. Se concilian aparte: no mandes recaudos de clientes directo a caja/Finanzas.')
         ]),
         L('Conciliación: cruzar lo que dice el banco', 10, [
           S('🏦', 'Estado de cuenta bancario', C.teal, 'El estado bancario se importa a una **bandeja de conciliación**: cada línea queda pendiente de validar y cruzar con un recibo o un egreso. No crea cobros ni movimientos automáticamente — primero se valida.'),
-          S('🧾', 'Estado de cuenta de aseguradora', C.violeta, 'La aseguradora envía su cartera; Orbit detecta recibos que faltan crear y pagos que no se han aplicado. Concilia para que tu cartera y la de la aseguradora coincidan mes a mes.')
+          S('🧾', 'Estado de cuenta de aseguradora', C.violeta, 'La aseguradora envía su cartera; Orbit detecta recibos que faltan crear y pagos que no se han confirmado. Concilia para que tu cartera y la de la aseguradora coincidan mes a mes.')
         ]),
         L('Paso a paso: de la póliza al recibo cobrado', 13, [
           S('📑', 'Abrir una póliza', '#C5162E', 'Módulo **Pólizas** → filtra por estado/ramo/aseguradora con los selectores superiores, o busca. Clic en la fila → ficha con **desglose**: prima neta, gastos, IVA, prima total, frecuencia, forma de pago, estado de validación y **recibos generados**. Los KPIs de arriba (Prima vigente, Por renovar, Canceladas) son clicables y filtran la lista.'),
-          S('💳', 'Aplicar un pago', '#1F8A5B', 'Desde **Cobros** o desde la póliza, ubica el recibo pendiente y usa **"Registrar pago"**: fecha, método y conducto. Al confirmar, el recibo pasa a **Pagado/Conciliado**, la cartera baja y el recaudo llega a Finanzas — una sola acción, efecto en todo el sistema. Un pago solo **reportado por el cliente** queda "recibido para validación" hasta que el equipo lo valide.'),
+          S('💳', 'Confirmar un pago', '#1F8A5B', 'Un pago **reportado** por el cliente queda pendiente de revisión/conciliación. Solo el equipo, tras validar/conciliar, usa **"Registrar pago"** (fecha, método, conducto) y el recibo pasa a **confirmado**. Reportar no confirma: **Pagado/Conciliado**, la cartera baja y el recaudo llega a Finanzas — una sola acción, efecto en todo el sistema. Un pago solo **reportado por el cliente** queda "recibido para validación" hasta que el equipo lo valide.'),
           S('📊', 'Leer y atacar el aging', '#C9821B', 'En Cobros, el **aging** agrupa el vencido por tramos (1-30…+90 días). Ordena por antigüedad y trabaja primero el tramo más viejo (mayor riesgo). Botón de recordatorio envía la plantilla de cobro por WhatsApp — hazlo **antes** del vencimiento.'),
           S('🏦', 'Conciliar', '#0E7C86', 'El estado de cuenta (banco/aseguradora) se importa a una **bandeja de conciliación**: cada línea es una **propuesta** (encontrado exacto / probable / requiere validación) que cruza póliza, recibo, cliente, aseguradora, país, moneda, periodo y monto. Validas antes de aplicar; nunca se aplica productivo automático.')
+        ]),
+        L('Estados honestos: reportado ≠ conciliado ≠ confirmado', 13, [
+          S('📤', 'Pago REPORTADO por el cliente', '#2A6FDB', 'Cuando el cliente reporta un pago desde el Portal, adjunta un **soporte/evidencia** y el recibo queda **Pendiente de revisión/conciliación** — NO es un cobro confirmado ni un pago aplicado. El adjunto es evidencia, no comprobante de aplicación. El equipo debe revisar y conciliar antes de confirmar.'),
+          S('🔗', 'Conciliación = PROPUESTA', '#7A5BD9', 'La bandeja de conciliaciones cruza banco/aseguradora contra recibos y genera **propuestas** con score (MATCH_EXACTO / MATCH_PROBABLE / REQUIERE_VALIDACION / BLOQUEADO). **VALIDADA no significa pagada ni aplicada**: la bandeja no aplica pagos, no modifica cobros, no toca cartera, producción ni comisiones, y no escribe finmovs. Es una lista para revisión técnica; la aplicación real es una fase posterior autorizada.'),
+          S('✅', 'Cobro CONFIRMADO', '#1F8A5B', 'Solo cuando un pago se valida y concilia pasa a **cobro confirmado**, baja la cartera y el recaudo cuenta. El flujo honesto: Reportado → Pendiente de revisión → Propuesta de conciliación → Validado para revisión → Conciliado → Cobro confirmado.'),
+          S('💰', 'Cobros/recaudos NO son finmovs', '#C9821B', 'El pago de un cliente es un **cobro/recaudo**, no un movimiento financiero de caja de la empresa (finmov). Se concilian aparte. Producción, metas y comisiones se calculan sobre **prima neta recaudada**, nunca sobre prima total ni sobre pagos solo reportados. No se suman GTQ y COP en crudo: cada país su moneda.')
         ]),
         Q('Evaluación · Pólizas y Cobros', [
           { p: '¿Sobre qué base se calculan producción y comisiones?', ops: ['Prima total', 'Prima neta recaudada', 'Suma asegurada'], ok: 1 },
@@ -178,6 +184,11 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🔎', 'La conciliación es una propuesta, no una aplicación', '#7A5BD9', 'Cuando importas un estado de cuenta o una planilla de comisión, Orbit **cruza** cada fila (póliza, recibo, cliente, aseguradora, país, moneda, periodo, monto) y propone un resultado. Nada se aplica a cobros/comisiones hasta que un usuario lo **valida**.'),
           S('🎯', 'El score de coincidencia', '#1F8A5B', '**✓ MATCH_EXACTO**: coincide, listo para confirmar. **≈ MATCH_PROBABLE**: coincide con diferencia mínima (≤5%). **🔎 REQUIERE_VALIDACIÓN**: falta dato confiable (país/moneda/periodo) o hay diferencia media. **⛔ BLOQUEADO**: diferencia grande (>25%) o inconsistencia — no se aplica.'),
           S('✅', 'El flujo correcto', '#C9821B', 'Importar fuente → dry-run → **score** → propuesta de conciliación → **validación** del usuario → aplicación controlada. En planillas de comisión ves esperada vs pagada, diferencia, retención y ajuste; validas y solo entonces impacta liquidaciones. Nunca confirmes en lote sin revisar los BLOQUEADO y REQUIERE_VALIDACIÓN.')
+        ]),
+        L('Migración honesta: fuentes, banco y caso jun/jul 2026', 13, [
+          S('🗂️', 'Fuente separada antes de leer', '#0E7C86', 'Cada fuente se declara en un **manifest/catálogo de fuentes reales** y se importa **por separado** (clientes, pólizas, cobros, planilla de comisión, estado de cuenta, financiero histórico, documentos). No se mezclan; cada tipo declara qué crea y qué NO. Nunca se infieren clientes desde finanzas.'),
+          S('🏦', 'Banco y estado de cuenta NO son cobro', '#C5162E', '**Banco no crea cobro confirmado.** El **estado de cuenta del cliente no marca pago realizado** — solo propone conciliación. La **planilla de comisión no crea cartera ni cobro**. El **financiero histórico no crea cartera, cobros ni producción**: es referencia. Los **documentos soporte solo proponen** datos (diferencia revisable + confirmación).'),
+          S('🌎', 'País/moneda y caso jun/jul 2026', '#C9821B', 'Si falta **país o moneda**, la fila queda **REQUIERE_VALIDACION** (no se asume). **GT=GTQ, CO=COP**, no se suman en crudo. **Caso especial junio/julio 2026**: es data de migración/transición — se trata como referencia a conciliar, no como lógica productiva fija; requiere validación antes de contar en cartera o producción.')
         ]),
         Q('Evaluación · Importador', [
           { p: 'Si una fuente no trae país ni moneda confiables…', ops: ['Se asume Guatemala/GTQ', 'Queda en REQUIERE_VALIDACIÓN', 'Se descarta en silencio'], ok: 1 },
@@ -356,7 +367,7 @@ Orbit.ACADEMIA_PLUS = (function () {
       lecciones: [
         L('Los momentos que deciden la relación', 12, [
           S('🗺', 'El viaje del cliente', C.terra, 'Cotización, emisión, primer cobro, un siniestro, la renovación: cada momento suma o resta confianza. Identifica los **momentos de la verdad** (sobre todo el siniestro y el primer cobro) y sé impecable ahí; el resto se perdona, esos no.'),
-          S('📲', 'Comunicación proactiva', C.azul, 'El cliente valora que le avises **antes** del vencimiento, que le confirmes el pago aplicado y que le expliques su cobertura sin que lo pida. Orbit automatiza recordatorios y encuestas de satisfacción tras la emisión: úsalos, no dependas de la memoria.'),
+          S('📲', 'Comunicación proactiva', C.azul, 'El cliente valora que le avises **antes** del vencimiento, que le confirmes el pago cuando quede confirmado/conciliado y que le expliques su cobertura sin que lo pida. Orbit automatiza recordatorios y encuestas de satisfacción tras la emisión: úsalos, no dependas de la memoria.'),
           S('⭐', 'Encuestas y NPS', C.verde, 'La cadencia de satisfacción mide si recomendarían tu servicio. Un promotor refiere; un detractor cancela y advierte a otros. Cierra el ciclo: agradece al promotor y llama al detractor antes de perderlo.')
         ]),
         L('Recuperar a un cliente molesto', 10, [
@@ -364,7 +375,7 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🤝', 'Lenguaje que suma', C.ocre, 'Evita jerga técnica y "no se puede". Traduce a beneficios, ofrece opciones y compromete plazos que cumplas. La forma de decir las cosas es parte del producto que vendes.')
         ]),
         L('Paso a paso: cuidar los momentos clave', 11, [
-          S('📲', 'Comunicación proactiva', '#D97757', 'Confirma cada pago aplicado, avisa antes del vencimiento y explica coberturas sin que las pidan. Usa plantillas de WhatsApp/correo desde Orbit; personaliza nombre y dato clave.'),
+          S('📲', 'Comunicación proactiva', '#D97757', 'Confirma cada pago cuando quede conciliado (no cuando solo lo reportan), avisa antes del vencimiento y explica coberturas sin que las pidan. Usa plantillas de WhatsApp/correo desde Orbit; personaliza nombre y dato clave.'),
           S('⭐', 'Actuar sobre la encuesta', '#1F8A5B', 'Tras la emisión arranca la cadencia de satisfacción. Agradece al promotor y pídele un referido; llama al detractor de inmediato para recuperar antes de que cancele.'),
           S('🔥', 'Recuperar al molesto', '#C5162E', 'Escucha sin defenderte, reconoce, resuelve rápido y da un paso extra. Un problema bien resuelto genera más lealtad que si nunca hubiera pasado.')
         ]),
@@ -560,11 +571,11 @@ Orbit.ACADEMIA_PLUS = (function () {
         L('Bienvenida y tu ruta operativa', 10, [
           S('👋', 'Tu rol sostiene la operación', '#0E7C86', 'El área administrativa/operativa es la columna vertebral: sin datos limpios, cobros al día y gestiones resueltas, la correduría no funciona. Orbit te da las herramientas; esta ruta te enseña a usarlas todas con criterio.'),
           S('🧭', 'Tu ruta por módulos', '#2A6FDB', 'En orden: **Orbit Clientes** (expediente y calidad de datos) → **Pólizas y Cobros** (cartera y conciliación) → **Ops + Leads** (gestiones) → **Importador** (migración y cargas) → **Renovaciones/Cancelaciones** → **Finanzas** (operativo) → **Cumplimiento**. Cada uno es un curso de esta Academia.'),
-          S('💡', 'Cómo te ayuda Orbit', '#1F8A5B', 'La sincronía en vivo hace que una acción tuya (aplicar un pago, completar un dato, crear una gestión) se refleje en todo el sistema al instante. Menos doble digitación, menos errores, más control. Tu trabajo se vuelve trazable y auditable.')
+          S('💡', 'Cómo te ayuda Orbit', '#1F8A5B', 'La sincronía en vivo hace que una acción tuya (confirmar un pago conciliado, completar un dato, crear una gestión) se refleje en todo el sistema al instante. Menos doble digitación, menos errores, más control. Tu trabajo se vuelve trazable y auditable.')
         ]),
         L('Qué hacer en cada módulo', 12, [
           S('🩺', 'Calidad de datos primero', '#C5162E', 'Empieza el día por el módulo **Calidad**: completa los expedientes con póliza vigente que no tienen teléfono o correo. Es la rutina de mayor retorno: un cliente sin WhatsApp no recibe recordatorios de cobro ni renovación.'),
-          S('💳', 'Cobros y conciliación', '#C9821B', 'Aplica pagos, vigila el aging del vencido y concilia los estados de cuenta (banco y aseguradora) en su bandeja. Recuerda: el pago de un cliente es un **cobro**, no un movimiento de caja; se concilian aparte.'),
+          S('💳', 'Cobros y conciliación', '#C9821B', 'Confirma cobros validados, vigila el aging del vencido y concilia los estados de cuenta (banco y aseguradora) en su bandeja. Recuerda: el pago de un cliente es un **cobro**, no un movimiento de caja; se concilian aparte.'),
           S('⬇', 'Cargas sin ensuciar', '#2A6FDB', 'En el Importador, cada fuente tiene un propósito y un alcance visible. Revisa siempre el **dry-run** antes de escribir; si algo queda en *requiere_validación*, corrige la fuente. No mezcles países ni monedas.')
         ]),
         L('Gestiones, valor agregado y cierre', 10, [
@@ -751,7 +762,7 @@ Orbit.ACADEMIA_PLUS = (function () {
   ];
 
   // Versión de contenido: súbela cuando cambies texto/lecciones para que se re-sincronice.
-  var CONTENT_V = 5;
+  var CONTENT_V = 8;
   function apply() {
     try {
       if (!window.Orbit || !Orbit.store || !Orbit.store.all) return false;

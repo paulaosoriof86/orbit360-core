@@ -51,7 +51,7 @@ Orbit.modules.inicio = (function () {
           <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · ${U.monthLabel()}</div>
           <div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Vamos en camino</div>
           <div style="color:var(--ink-2);font-size:13.5px;margin-top:6px;line-height:1.5">
-            Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. La prima vigente y el recaudo aplicado se calculan desde las pólizas y cobros reales del CRM.</div>
+            Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. La prima vigente y el recaudo confirmado se calculan desde las pólizas y cobros reales del CRM.</div>
           <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
             <span class="badge neutral">${clientes.length} clientes</span>
             <span class="badge neutral">${polizas.length} pólizas</span>
@@ -59,16 +59,16 @@ Orbit.modules.inicio = (function () {
           </div>
         </div>
         ${dial(pctPrima, 'Prima vigente', U.moneyShort(prima, Orbit.q.monedaPais()))}
-        ${dial(pctRec, 'Recaudo aplicado', U.moneyShort(recaudo, Orbit.q.monedaPais()))}
+        ${dial(pctRec, 'Recaudo confirmado', U.moneyShort(recaudo, Orbit.q.monedaPais()))}
       </div>
 
       <!-- KPIs clicables -->
       <div class="kpi-row" style="margin-top:18px">
-        <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pagados')" title="Ver cobros aplicados">
+        <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pagados')" title="Ver cobros confirmados">
           <div class="k-accent"></div>
           <div class="k-label">Cartera al día</div>
           <div class="k-val">${U.moneyShort(cart.alDia, Orbit.q.monedaPais())}</div>
-          <div class="k-foot up">▲ cobros aplicados ›</div></button>
+          <div class="k-foot up">▲ cobros confirmados ›</div></button>
         <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pendientes')" title="Ver pendiente de cobro" style="border-color:var(--warn)">
           <div class="k-accent" style="background:var(--warn)"></div>
           <div class="k-label">Pendiente de cobro</div>

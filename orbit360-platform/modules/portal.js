@@ -174,7 +174,7 @@ Orbit.modules.portal = (function () {
       S().update('cobros', cobroId, { reportado: Orbit.ui.today(), soporteNombre: f ? f.name : '', notaReporte: back.querySelector('#rp-nota').value });
       S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: (S().get('polizas', c.polizaId) || {}).asesorId || cli.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Pago reportado por el cliente', detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (f ? ' · soporte: ' + f.name : '') + ' · pendiente de validar' });
       if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo: 'Validar pago reportado', titulo: 'Validar pago · ' + cli.nombre, clienteId, polizaId: c.polizaId, asesorId: cli.asesorId, prioridad: 'Alta', vence: '2026-06-26', nota: 'El cliente reportó el pago de la cuota ' + c.cuota, origen: 'Portal del cliente' });
-      back.remove(); toast('✓ Pago reportado · el equipo lo validará'); render(host);
+      back.remove(); toast('✓ Recibimos tu reporte · pendiente de revisión/conciliación'); render(host);
     }, 'Enviar reporte');
   }
 
@@ -300,7 +300,7 @@ Orbit.modules.portal = (function () {
         <div class="pt-det"><span>Estado</span><b>${c.estado}</b></div>
         ${c.neta != null ? `<div class="pt-det"><span>${TT('prima_neta')}</span><b>${U.money(c.neta, c.moneda)}</b></div><div class="pt-det"><span>IVA</span><b>${U.money(c.iva || 0, c.moneda)}</b></div>` : ''}
         ${c.fechaPago ? `<div class="pt-det"><span>Pagado el</span><b>${U.fmtDate(c.fechaPago)}</b></div>` : ''}
-        ${c.reportado ? `<div class="pt-det"><span>Reportado</span><b>${U.fmtDate(c.reportado)}</b></div>` : ''}
+        ${c.reportado ? `<div class="pt-det"><span>Reportado</span><b>${U.fmtDate(c.reportado)}</b></div><div class="cfg-note" style="margin-top:8px;font-size:11.5px">📤 Recibimos tu reporte. Está <b>pendiente de revisión/conciliación</b>; te confirmamos cuando quede conciliado.</div>` : ''}
       </div>
       ${(c.estado === 'Pendiente' || c.estado === 'Vencido') && !c.reportado ? '<button class="btn primary sm" style="margin-top:12px" data-x-pago="' + c.id + '">📤 Reportar mi pago</button>' : ''}`, null, 'Cerrar');
     document.querySelectorAll('[data-x-pago]').forEach(b => b.addEventListener('click', () => { document.getElementById('pt-dr').remove(); reportarPago(b.dataset.xPago); }));

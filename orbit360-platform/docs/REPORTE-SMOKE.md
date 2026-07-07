@@ -1,3 +1,14 @@
+# Reporte de smoke · Orbit 360 · candidata activa 2026-07-04T211525.464 (v1.140)
+
+**Fecha:** 2026-07-05 · datos ficticios del seed. Smoke visual/prototipo local (no backend/Firestore/LAB/datos reales).
+- ✅ App carga sin errores de consola. Academia CONTENT_V=5.
+- ✅ **Bandeja de conciliaciones** (nuevo módulo, ruta `conciliaciones`): estado vacío honesto ("Sin propuestas…"); con datos demo muestra columnas del contrato (estado/score/fuente/país-moneda/cliente-póliza-recibo/monto/acciones); las transiciones (tomar en revisión → validar) cambian solo la propuesta y **no mutan cobros** (verificado); `preparar_aplicacion_controlada` solo informa.
+- ✅ **Pólizas** desglose con `gastosFinan`; **Cobros** validar≠aplicar (validadoReporte); **Cliente360** "Validada (por aplicar)"; **Importador** planilla sin fallback GTQ + labels backend; copys "propone pagos para validación" / "Propuesta pendiente".
+- ✅ Backend protegido intacto.
+- ⚠ Pendiente backend: persistencia real de `conciliaciones`/`auditLog` y aplicación controlada (ChatGPT/Codex).
+
+---
+
 # Reporte de smoke · Orbit 360 · candidata activa 2026-07-04T193658.630 (v1.126)
 
 **Fecha:** 2026-07-04 · datos ficticios del seed. Smoke visual/prototipo local (no backend/Firestore/LAB/datos reales).

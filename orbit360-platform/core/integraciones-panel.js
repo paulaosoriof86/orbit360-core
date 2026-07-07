@@ -36,7 +36,7 @@ Orbit.integracionesPanel = (function () {
           ${kpi('Eventos', s.eventos || 0, 'Registrados')}
           ${kpi('Pendientes', s.pendientes || 0, 'Por configurar/enviar')}
           ${kpi('Errores', s.errores || 0, 'Revisar')}
-          ${kpi('Pend. config', estados.pendiente_configuracion || 0, 'Sin conexión real')}
+          ${kpi('Pend. config', estados.pendiente_configuracion || 0, 'Pendiente de conexión')}
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           ${sel('modulo', ['','marketing','general'], filter.modulo)}

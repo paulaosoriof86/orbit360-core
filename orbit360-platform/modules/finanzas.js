@@ -837,7 +837,7 @@ Orbit.modules.finanzas = (function () {
     back.querySelector('#lt-x').addEventListener('click', close);
     back.querySelector('#lt-cancel').addEventListener('click', close);
     back.querySelector('#lt-ok').addEventListener('click', () => {
-      // marca las CxP incluidas como pagadas (las de comisión del periodo son demo agregada)
+      // marca las CxP incluidas como pagadas (las de comisión del periodo son partidas agregadas)
       partidas.filter(p => incluidos.has(p.id) && p.cxp).forEach(p => S().update('finmovs', p.id, { estado: 'pagado', pendiente: 0 }));
       close(); const host = document.getElementById('host'); if (host) render(host);
     });
@@ -849,10 +849,10 @@ Orbit.modules.finanzas = (function () {
     const pagados = S().where('cobros', c => c.estado === 'Pagado');
     const conc = pagados.filter(c => c.conciliado).length;
     const sinConc = pagados.length - conc;
-    return `<div class="cfg-note" style="margin-bottom:14px">🏦 <b>Doble conciliación</b>: (1) depósito bancario ↔ recaudo del cliente, y (2) pago aplicado ↔ póliza creada. Importa el estado bancario para cruzar automáticamente, sin duplicar.</div>
+    return `<div class="cfg-note" style="margin-bottom:14px">🏦 <b>Doble conciliación</b>: (1) depósito bancario ↔ recaudo del cliente, y (2) cobro confirmado ↔ póliza creada. Importa el estado bancario para cruzar automáticamente, sin duplicar.</div>
     ${K.kpis([
-      { label: 'Pagos conciliados', val: conc, color: 'var(--ok)', foot: 'aplicados a póliza', footTone: 'up' },
-      { label: 'Por conciliar', val: sinConc, color: 'var(--warn)', foot: 'pago sin aplicar' },
+      { label: 'Pagos conciliados', val: conc, color: 'var(--ok)', foot: 'confirmados a póliza', footTone: 'up' },
+      { label: 'Por conciliar', val: sinConc, color: 'var(--warn)', foot: 'pendiente de conciliación' },
       { label: 'Depósitos sin asociar', val: 3, color: 'var(--danger)', foot: 'del banco' },
       { label: 'Movimientos sin crear', val: 1, color: 'var(--info)', foot: 'detectados' }
     ])}
@@ -870,7 +870,7 @@ Orbit.modules.finanzas = (function () {
           <td class="num">${U.money(c.monto, c.moneda)}</td>
           <td><span style="color:var(--ok)">✓</span></td>
           <td>${c.conciliado ? '<span style="color:var(--ok)" title="Depósito cruzado">✓</span>' : '<span style="color:var(--warn)" title="Sin depósito asociado">◷</span>'}</td>
-          <td><span style="color:var(--ok)" title="Aplicado a póliza">✓ ${p ? p.numero : ''}</span></td>
+          <td><span style="color:var(--ok)" title="Confirmado y conciliado con póliza">✓ ${p ? p.numero : ''}</span></td>
         </tr>`;
       }).join('')}</tbody>
     </table></div></div>`;

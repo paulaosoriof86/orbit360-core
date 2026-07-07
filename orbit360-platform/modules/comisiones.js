@@ -102,7 +102,7 @@ Orbit.modules.comisiones = (function () {
           <td class="num muted">${r.ajuste ? M(r.ajuste) : '—'}</td>
           <td class="num" style="color:${desvColor(r.desv)}"><b>${r.desv >= 0 ? '+' : ''}${M(r.desv)}</b></td>
           <td class="num" style="color:${desvColor(r.desv)}">${r.pct >= 0 ? '+' : ''}${r.pct}%</td>
-          <td>${scoreBadge(r)}</td></tr>`).join('') || '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px">✅ Todo cuadra con las tarifas vigentes — sin desviaciones.</td></tr>'}</tbody>
+          <td>${scoreBadge(r)}</td></tr>`).join('') || '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px">Sin diferencias detectadas — comisiones conciliadas con las tarifas vigentes.</td></tr>'}</tbody>
       </table></div></div>
     </div>`;
     host.querySelectorAll('.tab[data-v]').forEach(el => el.addEventListener('click', () => { vista = el.dataset.v; render(host); }));

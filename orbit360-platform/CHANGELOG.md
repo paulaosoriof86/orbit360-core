@@ -5,6 +5,9 @@ Formato basado en *Keep a Changelog*. Construcción greenfield, commits directos
 ## [1.115.0] — 2026-07-04 · Reauditoría 072304 (trazabilidad real, moneda, comisiones, documentos, textos)
 > Detalle fix por fix en `docs/BITACORA-CAMBIOS.md` (v1.115). P0: `copyRowMeta` lleva la trazabilidad al registro final; moneda solo explícita (`monedaSugerida` no se escribe); contrato real de planilla de comisiones (esperada vs pagada, tarifas solo con diff confirmado); documentos → `parchesPendientes` con diff. P1: cierre relativo a fecha viva; textos técnicos suavizados; financiero histórico bloquea conceptos de cobro/recaudo.
 
+## [1.140.0] — 2026-07-05 · Candidata activa 2026-07-04T211525.464 — bandeja de conciliaciones (UI segura) + copy residual
+> Base comparada `205210.456`. Academia CONTENT_V=5. Nuevo módulo Conciliaciones (lee solo `Orbit.store`, no aplica pagos, estados/acciones por contrato). Copy residual corregido (estados-cuenta, planilla). Limitación documentada: persistencia real de conciliaciones/auditLog y aplicación controlada = backend ChatGPT/Codex. Detalle en `docs/BITACORA-CAMBIOS.md` (v1.140). Sin tocar backend protegido.
+
 ## [1.139.0] — 2026-07-04 · Candidata activa 2026-07-04T205210.456 — conciliación como propuesta + validar≠aplicar
 > Base comparada `202655.833`. Academia CONTENT_V=5. P0-2 conciliación no aplica pagos directo (propuestas). P0-3 validación en dos pasos (validar reporte → aplicar pago) en Cobros y Cliente360. P0-4 planilla sin fallback GTQ + labels backend (MATCH_EXACTO/PROBABLE/REQUIERE_VALIDACION/BLOQUEADO). P0-5 moneda residual clasificada. Pendiente: persistencia/UI de conciliaciones backend. Detalle en `docs/BITACORA-CAMBIOS.md` (v1.139). Sin tocar backend protegido.
 

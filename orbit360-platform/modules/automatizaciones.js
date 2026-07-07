@@ -25,7 +25,8 @@ Orbit.modules.automatizaciones = (function () {
     { id: 'poliza_emitida',   icon: '🏆', label: 'Póliza emitida / cliente creado', dest: 'Cliente',  tpl: '¡Bienvenido/a {nombre}! Tu póliza {poliza} fue emitida. Aquí tu acceso al portal: {link}' },
     { id: 'siniestro_creado', icon: '🚨', label: 'Siniestro reportado',            dest: 'Equipo',   tpl: 'Reclamo {numero} de {cliente} recibido. Asignar a aseguradora.' },
     { id: 'sol_cliente',      icon: '🙋', label: 'Solicitud desde el portal',      dest: 'Asesor',   tpl: '{cliente} solicitó: {tipo}. Ver en Orbit Ops.' },
-    { id: 'pago_aplicado',    icon: '✅', label: 'Pago aplicado',                  dest: 'Cliente',  tpl: 'Hola {nombre}, confirmamos tu pago de {monto}. ¡Gracias!' },
+    { id: 'pago_aplicado',    icon: '✅', label: 'Pago confirmado',                dest: 'Cliente',  tpl: 'Hola {nombre}, confirmamos tu pago de {monto}. ¡Gracias!' },
+    { id: 'pago_reportado',   icon: '📤', label: 'Pago reportado por cliente',     dest: 'Cliente',  tpl: 'Hola {nombre}, recibimos tu reporte de pago de {monto}. Está pendiente de revisión/conciliación; te confirmamos pronto.' },
     { id: 'lead_propuesta',   icon: '📨', label: 'Propuesta enviada (Leads)',       dest: 'Lead',     tpl: 'Hola {nombre}, adjunto la propuesta de {ramo}. ¿Podemos agendar 10 min?' },
     { id: 'cumple',           icon: '🎂', label: 'Cumpleaños del cliente',          dest: 'Cliente',  tpl: '¡Feliz cumpleaños {nombre}! De parte de todo el equipo. 🎉' }
   ];
@@ -216,7 +217,7 @@ Orbit.modules.automatizaciones = (function () {
       const cur = getIA();
       if (!cur.proveedor) { toast('Elige un proveedor primero'); return; }
       const k = h.querySelector('#ia-key').value.trim();
-      toast(k ? ('🔌 ' + cur.proveedor + ': clave detectada — conexión real al migrar backend') : ('⚠️ ' + cur.proveedor + ' sin API key — opera en heurística gratuita'));
+      toast(k ? ('🔌 ' + cur.proveedor + ': clave detectada · pendiente de activación técnica') : ('⚠️ ' + cur.proveedor + ' sin API key — opera en heurística gratuita'));
     });
     const cmp = h.querySelector('#ia-compare'); if (cmp) cmp.addEventListener('click', compararModelos);
     h.querySelectorAll('.ia-modsel').forEach(s => s.addEventListener('change', () => {

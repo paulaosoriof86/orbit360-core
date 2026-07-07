@@ -804,7 +804,7 @@ Orbit.SEED = (function () {
       lecciones: [
         { t: 'Qué es Orbit 360 y el ciclo integral', min: 12, tipo: 'lectura', secciones: [
           { icon: '🌐', t: 'Un sistema 360 para el intermediario', color: '#C5162E', d: 'Orbit 360 integra en un solo lugar todo el ciclo del intermediario de seguros: captar (Leads/Ops), vender (Cotizador/Comparativo), administrar (Pólizas/Cobros/Renovaciones/Cancelaciones), cobrar y liquidar (Finanzas/Comisiones), atender (Siniestros/Portal/Correo) y crecer (Marketing/Insights/Academia). Todo conectado, sin islas de información.' },
-          { icon: '🔗', t: 'Sincronía en vivo', color: '#1f8a4c', d: 'Cada acción se refleja al instante en todo el sistema: aplicar un pago baja la cartera y suma a Finanzas; cerrar un Lead crea el cliente y activa encuestas; cancelar una póliza crea una gestión de recuperación y queda en la ficha. No se duplica el trabajo: se registra una vez y vive en todos los módulos.' },
+          { icon: '🔗', t: 'Sincronía en vivo', color: '#1f8a4c', d: 'Cada acción se refleja al instante en todo el sistema: confirmar un cobro actualiza la cartera según validación y suma a Finanzas; cerrar un Lead crea el cliente y activa encuestas; cancelar una póliza crea una gestión de recuperación y queda en la ficha. No se duplica el trabajo: se registra una vez y vive en todos los módulos.' },
           { icon: '🏢', t: 'Multi-tenant y white-label', color: '#1E2227', d: 'La plataforma es configurable por cliente (cada correduría): su logo, su paleta, sus países y monedas, sus aseguradoras, sus catálogos y los módulos que ve cada rol. Una sola base, muchas marcas.' }
         ]},
         { t: 'Los módulos comerciales', min: 12, tipo: 'lectura', secciones: [
@@ -813,7 +813,7 @@ Orbit.SEED = (function () {
           { icon: '👤', t: 'Cliente 360', color: '#1f8a4c', d: 'La ficha del cliente reúne pólizas, vehículos, recibos, siniestros, documentos, correos y actividad. Todo clicable, con detalle. Desde aquí se solicita una gestión, se envía WhatsApp/correo y se ve el historial completo.' }
         ]},
         { t: 'Administración, finanzas y atención', min: 12, tipo: 'lectura', secciones: [
-          { icon: '📋', t: 'Pólizas, Cobros, Renovaciones, Cancelaciones', color: '#C5162E', d: 'La póliza tiene desglose de prima (neta, gastos, recargo, IVA) y genera recibos automáticos según la forma de pago. Cobros gestiona la cartera y aplica pagos. Renovaciones propone y compara; Cancelaciones registra el motivo y dispara recuperación.' },
+          { icon: '📋', t: 'Pólizas, Cobros, Renovaciones, Cancelaciones', color: '#C5162E', d: 'La póliza tiene desglose de prima (neta, gastos, recargo, IVA) y genera recibos automáticos según la forma de pago. Cobros gestiona cartera, reportes, revisión y confirmación de cobros. Renovaciones propone y compara; Cancelaciones registra el motivo y dispara recuperación.' },
           { icon: '💰', t: 'Finanzas y Comisiones', color: '#c9821b', d: 'Finanzas centraliza movimientos, CxC/CxP autoadministrables, liquidaciones por lote, presupuesto con semáforos y dashboard con comparativos. Comisiones calcula por aseguradora y reparte al vendedor, todo sobre prima neta recaudada.' },
           { icon: '🚨', t: 'Siniestros, Portal y Correo', color: '#0f766e', d: 'Siniestros lleva la bitácora del reclamo con la aseguradora. El Portal da al cliente autoservicio (pólizas, pagos, gestiones, aprende). El Correo asocia hilos a cliente/póliza/gestión/reclamo, con trazabilidad.' }
         ]},
