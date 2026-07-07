@@ -2,7 +2,7 @@
    Orbit 360 · Capa de correo (transversal)
    Bandeja integrada (Outlook/Gmail) + vínculo de correos a
    entidades (cliente, póliza, cobro, gestión, reclamo, aseguradora).
-   Conector configurable: hoy opera sobre datos demo del store;
+   Conector configurable: hoy opera sobre datos del store;
    al conectar la cuenta real, esta capa es el único punto a cablear.
    ============================================================ */
 window.Orbit = window.Orbit || {};
@@ -32,14 +32,14 @@ Orbit.correo = (function () {
   function enviar({ para, asunto, cuerpo, clienteId, vinculo, adjuntos }) {
     const c = {
       id: 'eml' + Date.now().toString().slice(-7),
-      asunto: asunto || '(sin asunto)', de: cfg.cuenta || 'equipo@democorredores.com', para: para || '',
-      remitenteNombre: 'Equipo Orbit', direccion: 'saliente',
+      asunto: asunto || '(sin asunto)', de: cfg.cuenta || '', para: para || '',
+      remitenteNombre: cfg.conectado ? 'Equipo Orbit' : 'Cuenta no conectada', direccion: 'saliente',
       fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), hora: new Date().toTimeString().slice(0, 5),
       leido: true, destacado: false, cuerpo: cuerpo || '', clienteId: clienteId || '',
       adjuntos: adjuntos || [], vinculo: vinculo || null, carpeta: 'enviados'
     };
     S().insert('correos', c);
-    if (clienteId) S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: '', tipo: 'sistema', icon: '✉', fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), titulo: 'Correo enviado: ' + c.asunto, detalle: 'Para ' + c.para });
+    if (clienteId) S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: '', tipo: 'sistema', icon: '✉', fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), titulo: 'Correo preparado: ' + c.asunto, detalle: 'Para ' + c.para });
     return c;
   }
 
