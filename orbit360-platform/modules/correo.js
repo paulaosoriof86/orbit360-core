@@ -1,7 +1,7 @@
 /* ============================================================
    Orbit 360 · Correo (bandeja integrada)
-   Lista recibidos/enviados/destacados, lectura, redacción y
-   vínculo a entidades. Usa la capa Orbit.correo.
+   Lista recibidos/enviados-preparados/destacados, lectura,
+   redacción y vínculo a entidades. Usa la capa Orbit.correo.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
@@ -12,14 +12,15 @@ Orbit.modules.correo = (function () {
   function render(h) {
     host = h;
     const cfg = C().getCfg();
+    const prepLabel = cfg.conectado ? '📤 Enviados' : '📤 Preparados';
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '✉', title: 'Correo', sub: 'Bandeja integrada · vincula correos a clientes, pólizas y gestiones', features: [], actions: `<button class="btn primary" id="cr-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">✏ Redactar</button>` })}
       ${cfg.conectado
-        ? `<div class="cfg-note" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><span>🔗 Conectado a <b>${U.esc(cfg.proveedor)}</b> · ${U.esc(cfg.cuenta)}</span><button class="btn ghost sm" id="cr-disc">Desconectar</button></div>`
-        : `<div class="cfg-note" style="margin-bottom:14px;border-left:3px solid var(--warn);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><span>📭 Bandeja <b>sin cuenta conectada</b>. Conecta tu cuenta para sincronizar correos reales.</span><button class="btn primary sm" id="cr-conn">Conectar Outlook / Gmail</button></div>`}
+        ? `<div class="cfg-note" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><span>🔗 Cuenta configurada: <b>${U.esc(cfg.proveedor)}</b> · ${U.esc(cfg.cuenta)}. La confirmación de entrega depende del proveedor conectado.</span><button class="btn ghost sm" id="cr-disc">Desconectar</button></div>`
+        : `<div class="cfg-note" style="margin-bottom:14px;border-left:3px solid var(--warn);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><span>📭 Bandeja <b>sin cuenta conectada</b>. Puedes preparar correos y vincularlos al expediente; el envío real requiere backend/OAuth conectado.</span><button class="btn primary sm" id="cr-conn">Configurar Outlook / Gmail</button></div>`}
       <div class="mail-wrap">
         <div class="mail-side">
-          ${[['recibidos', '📥 Recibidos'], ['enviados', '📤 Enviados'], ['destacados', '⭐ Destacados']].map(f => `<button class="mail-folder ${carpeta === f[0] ? 'on' : ''}" data-f="${f[0]}">${f[1]}${f[0] === 'recibidos' ? `<span class="mail-badge">${C().noLeidos() || ''}</span>` : ''}</button>`).join('')}
+          ${[['recibidos', '📥 Recibidos'], ['enviados', prepLabel], ['destacados', '⭐ Destacados']].map(f => `<button class="mail-folder ${carpeta === f[0] ? 'on' : ''}" data-f="${f[0]}">${f[1]}${f[0] === 'recibidos' ? `<span class="mail-badge">${C().noLeidos() || ''}</span>` : ''}</button>`).join('')}
         </div>
         <div class="mail-list" id="mail-list"></div>
         <div class="mail-read" id="mail-read"></div>
@@ -30,7 +31,6 @@ Orbit.modules.correo = (function () {
     const cc = host.querySelector('#cr-conn'); if (cc) cc.addEventListener('click', conectar);
     const cd = host.querySelector('#cr-disc'); if (cd) cd.addEventListener('click', () => { C().desconectar(); render(host); });
     paint();
-    // compose pendiente (p. ej. desde la ficha del cliente)
     if (window.__orbitCompose) { const pre = window.__orbitCompose; window.__orbitCompose = null; setTimeout(() => redactar(pre), 60); }
   }
 
@@ -70,6 +70,7 @@ Orbit.modules.correo = (function () {
           ${c.vinculo ? `🔗 Vinculado a <b>${U.esc(c.vinculo.label)}</b> ${linkAbrir(c.vinculo)}` : '<span class="muted">Sin vincular</span>'}
           <button class="btn ghost sm" id="mr-link">${c.vinculo ? 'Cambiar' : '🔗 Vincular'}</button>
         </div>
+        ${c.direccion === 'saliente' ? '<div class="cfg-note" style="margin-top:8px;font-size:11.5px">Correo preparado/registrado en Orbit. La entrega real requiere proveedor conectado.</div>' : ''}
       </div>
       <div class="mail-body">${U.esc(c.cuerpo)}</div>
       ${(c.adjuntos || []).length ? `<div class="mail-adj">${c.adjuntos.map(a => `<span class="mail-chip">📎 ${U.esc(a)}</span>`).join('')}</div>` : ''}
@@ -106,7 +107,6 @@ Orbit.modules.correo = (function () {
       if (!id) { C().vincular(c.id, null); back.remove(); paint(); return; }
       const label = (opciones[tipo].find(o => o[0] === id) || [, ''])[1];
       C().vincular(c.id, { tipo, id, label });
-      // si es cliente o se puede derivar el cliente, set clienteId
       if (tipo === 'cliente') S().update('correos', c.id, { clienteId: id });
       else { const rec = S().get(tipo === 'poliza' ? 'polizas' : tipo === 'gestion' ? 'gestiones' : tipo === 'reclamo' ? 'reclamos' : 'aseguradoras', id); if (rec && rec.clienteId) S().update('correos', c.id, { clienteId: rec.clienteId }); }
       back.remove(); paint();
@@ -115,7 +115,7 @@ Orbit.modules.correo = (function () {
   }
 
   function redactar(pre) {
-    // asunto por patrón para envío a aseguradora si viene de un cliente sin asunto
+    const cfg = C().getCfg();
     let asuntoDef = pre.asunto || '';
     if (!asuntoDef && pre.vinculo && pre.vinculo.tipo === 'cliente') asuntoDef = 'Gestión · ' + pre.vinculo.label + (pre.poliza ? ' · Póliza ' + pre.poliza : '');
     const docs = pre.clienteId ? (Orbit.store.where('documentos', d => d.clienteId === pre.clienteId) || []) : [];
@@ -132,11 +132,11 @@ Orbit.modules.correo = (function () {
         <div id="rd-adj" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
       </div>
       ${pre.vinculo ? `<div class="cfg-note" style="margin-top:10px">🔗 Se vinculará a <b>${U.esc(pre.vinculo.label)}</b> · queda en el expediente.</div>` : ''}
-      <div class="muted" style="font-size:11px;margin-top:8px">El editor de diseño completo es el de tu proveedor (Outlook/Gmail) al conectar la cuenta; aquí redactas y adjuntas, asociado al expediente.</div>`;
+      <div class="muted" style="font-size:11px;margin-top:8px">${cfg.conectado ? 'El correo queda registrado para envío; la confirmación depende del proveedor.' : 'Sin cuenta conectada: el correo queda preparado y vinculado al expediente, pero no enviado.'}</div>`;
     const back = drawer('✏ Redactar correo', html, () => {
       C().enviar({ para: back.querySelector('#rd-para').value, asunto: back.querySelector('#rd-asunto').value, cuerpo: back.querySelector('#rd-cuerpo').value, clienteId: pre.clienteId, vinculo: pre.vinculo, adjuntos: adj.slice() });
-      back.remove(); carpeta = 'enviados'; selId = null; render(host);
-    }, 'Enviar');
+      back.remove(); carpeta = 'enviados'; selId = null; toast(cfg.conectado ? '✓ Correo registrado para proveedor conectado' : '✓ Correo preparado · envío pendiente de cuenta conectada'); render(host);
+    }, cfg.conectado ? 'Registrar para envío' : 'Preparar correo');
     const adj = [];
     function paintAdj() { back.querySelector('#rd-adj').innerHTML = adj.map((a, i) => `<span class="mail-chip">📎 ${U.esc(a)} <span data-rm="${i}" style="cursor:pointer;color:var(--danger)">✕</span></span>`).join(''); back.querySelectorAll('[data-rm]').forEach(x => x.addEventListener('click', () => { adj.splice(+x.dataset.rm, 1); paintAdj(); })); }
     back.querySelector('#rd-file').addEventListener('change', e => { [...e.target.files].forEach(f => adj.push(f.name)); paintAdj(); });
@@ -151,11 +151,14 @@ Orbit.modules.correo = (function () {
   function conectar() {
     const html = `<label class="ce-l">Proveedor<select id="cn-prov" class="o-sel"><option>Outlook (Microsoft 365)</option><option>Gmail (Google Workspace)</option></select></label>
       <label class="ce-l" style="margin-top:11px">Cuenta de correo<input id="cn-cuenta" class="o-sel" placeholder="tucorreo@empresa.com"></label>
-      <div class="cfg-note" style="margin-top:11px">Esta es la versión comercializable: la UI queda lista y, al personalizar, se conecta la cuenta real vía OAuth en Configuración › Integraciones.</div>`;
-    const back = drawer('🔗 Conectar correo', html, () => {
-      C().conectar(back.querySelector('#cn-prov').value, back.querySelector('#cn-cuenta').value || 'cuenta@empresa.com');
-      back.remove(); render(host);
-    }, 'Conectar');
+      <div class="cfg-note" style="margin-top:11px">La cuenta queda registrada como solicitud de conexión. El envío real requiere OAuth/backend conectado desde Configuración › Integraciones.</div>`;
+    const back = drawer('🔗 Configurar correo', html, () => {
+      const proveedor = back.querySelector('#cn-prov').value;
+      const cuenta = back.querySelector('#cn-cuenta').value || '';
+      back.remove();
+      toast('Cuenta de correo registrada como pendiente de conexión: ' + (cuenta || proveedor));
+      render(host);
+    }, 'Registrar pendiente');
   }
 
   function drawer(titulo, bodyHtml, onOk, okLabel) {
@@ -175,6 +178,8 @@ Orbit.modules.correo = (function () {
     back.querySelector('#dr-ok').addEventListener('click', onOk);
     return back;
   }
+
+  function toast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
 
   return { render, redactar: (pre) => redactar(pre || {}) };
 })();
