@@ -8,11 +8,21 @@ Orbit.modules.cancelaciones = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
   let st = { fmot: '', fase: '' };
   const hoy = () => (Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10));
+  const ACTIVAS = ['Pendiente de contacto', 'Llamada de retención agendada', 'Oferta de mejora enviada', 'En negociación'];
+  const FINALES = ['Recuperada', 'No recuperable'];
 
   const FDEFS = () => [
     { id: 'fmot', type: 'select', ph: 'Motivo', options: [...new Set(S().all('cancelaciones').map(c => c.motivo))].map(v => ({ v, t: v })) },
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
   ];
+
+  function allSafe(col) { try { return S().all(col) || []; } catch (e) { return []; } }
+  function findNegocio(c) {
+    return allSafe('negocios').find(n => n.cancelacionId === c.id || (n.origen === 'Recuperación' && n.clienteId === c.clienteId && n.polizaId === c.polizaId && !n.archivado));
+  }
+  function findGestion(c) {
+    return allSafe('gestiones').find(g => g.cancelacionId === c.id || (g.origen === 'cancelaciones' && g.clienteId === c.clienteId && g.polizaId === c.polizaId && !g.archivado));
+  }
 
   function render(host) {
     const all = S().all('cancelaciones');
@@ -36,7 +46,6 @@ Orbit.modules.cancelaciones = (function () {
         { label: 'Motivo principal', val: '<span style="font-size:16px">' + (Object.entries(porMotivo).sort((a, b) => b[1] - a[1])[0] || ['—'])[0] + '</span>', color: 'var(--warn)', foot: 'más frecuente' },
         { label: 'Tasa de fuga', val: Math.round(all.length / (S().all('polizas').length || 1) * 100) + '%', color: 'var(--info)', foot: 'sobre cartera total' }
       ])}
-
       <div class="card pad" style="margin-bottom:16px">
         <b style="font-family:var(--f-display);font-size:15px">Motivos de cancelación</b>
         <div style="margin-top:14px;display:grid;gap:10px">
@@ -48,7 +57,6 @@ Orbit.modules.cancelaciones = (function () {
             </div>`).join('')}
         </div>
       </div>
-
       <div class="card" style="overflow:hidden">
         ${K.filterBar(FDEFS(), st)}
         <div style="overflow-x:auto"><table class="tbl">
@@ -66,11 +74,9 @@ Orbit.modules.cancelaciones = (function () {
           }).join('') || `<tr><td colspan="6" class="muted" style="text-align:center;padding:30px">Sin cancelaciones.</td></tr>`}</tbody>
         </table></div>
       </div></div>`;
-
     K.wireFilters(FDEFS(), st, () => render(host));
   }
 
-  /* ---- Detalle de cancelación (deriva días activa y comisión generada en vivo) ---- */
   function detalle(canId) {
     const c = S().get('cancelaciones', canId); if (!c) return;
     const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
@@ -120,31 +126,55 @@ Orbit.modules.cancelaciones = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#cx-x').addEventListener('click', close);
-    back.querySelector('#cx-save').addEventListener('click', () => {
+    back.querySelector('#cx-save').addEventListener('click', async () => {
       const rec = back.querySelector('#cx-rec').value;
       const nota = back.querySelector('#cx-nota').value.trim();
-      S().update('cancelaciones', canId, { recuperacion: rec, recuperada: rec === 'Recuperada', notaRecuperacion: nota });
-      const fecha = hoy();
-      if (c.clienteId) S().insert('actividades', { id: 'act' + Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'recuperacion', icon: rec === 'Recuperada' ? '✅' : '♻', fecha, titulo: 'Recuperación: ' + rec, detalle: (p ? p.numero + ' · ' : '') + (nota || rec) });
-      if (c.clienteId && rec !== 'Recuperada' && rec !== 'No recuperable') {
-        const prox = new Date(); prox.setDate(prox.getDate() + 2);
-        const etapaMap = { 'Pendiente de contacto': 'nuevo', 'Llamada de retención agendada': 'contactado', 'Oferta de mejora enviada': 'propuesta', 'En negociación': 'negociacion' };
-        const neg = {
-          id: 'neg' + Date.now().toString().slice(-7), nombre: (cli ? cli.nombre : 'Cliente') + ' · recuperación', tipo: cli ? cli.tipo : 'Persona',
-          etapa: etapaMap[rec] || 'contactado', prob: 30, asesorId: c.asesorId, canal: 'Cliente actual/antiguo',
-          pais: cli ? cli.pais : 'GT', moneda: cli ? cli.moneda : 'GTQ', producto: p ? p.producto : 'Por definir', ramo: p ? p.ramo : 'Auto',
-          aseguradoraId: c.aseguradoraId || (p ? p.aseguradoraId : ''), primaEst: p ? (p.prima || 0) : 0, prioridad: 'Alta',
-          clienteId: c.clienteId, polizaId: c.polizaId, proximoToque: prox.toISOString().slice(0, 10),
-          checklist: [], nota: nota || rec, notas: nota || '', descripcion: 'Recuperación de póliza cancelada ' + (p ? p.numero : ''),
-          bitacora: [{ ts: fecha + ' 09:00', user: 'Equipo', campo: 'Creación', de: '', a: 'Recuperación desde cancelación', origen: 'cancelaciones' }],
-          comentarios: [], origen: 'Recuperación', creado: fecha, actualizado: fecha, archivado: false
-        };
-        S().insert('negocios', neg);
-        if (Orbit.ciclo && Orbit.ciclo.notify) { try { Orbit.ciclo.notify({ titulo: 'Recuperación pendiente', para: cli ? cli.nombre : '', canal: 'in-app' }); } catch (e) {} }
-      } else if (c.clienteId && rec === 'Recuperada' && Orbit.ciclo && Orbit.ciclo.crearGestion) {
-        try { Orbit.ciclo.crearGestion({ tipo: 'Reemisión por recuperación', titulo: 'Reemisión: ' + (p ? p.numero : c.clienteId), clienteId: c.clienteId, polizaId: c.polizaId, asesorId: c.asesorId, nota: nota || 'Cliente recuperado', origen: 'cancelaciones' }); } catch (e) {}
+      let motivo = nota;
+      if (FINALES.includes(rec) && !motivo) {
+        motivo = await Orbit.ui.prompt('Motivo obligatorio para marcar la recuperación como ' + rec + ':', { title: 'Motivo de recuperación' });
+        if (!motivo) return;
       }
-      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = rec === 'Recuperada' ? '✅ Cliente recuperado · reemisión operativa creada en Ops' : '♻ Acción de recuperación guardada · visible en ficha y Leads'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+      const fecha = hoy();
+      const patch = { recuperacion: rec, recuperada: rec === 'Recuperada', notaRecuperacion: nota || motivo };
+      S().update('cancelaciones', canId, patch);
+      if (c.clienteId) S().insert('actividades', { id: 'act' + Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'recuperacion', icon: rec === 'Recuperada' ? '✅' : '♻', fecha, titulo: 'Recuperación: ' + rec, detalle: (p ? p.numero + ' · ' : '') + (nota || motivo || rec) });
+      if (c.clienteId && ACTIVAS.includes(rec)) {
+        const existente = findNegocio(Object.assign({}, c, patch));
+        if (existente) {
+          const notas = (existente.notas ? existente.notas + '\n' : '') + '[' + fecha + '] ' + (nota || rec);
+          S().update('negocios', existente.id, { etapa: existente.etapa, nota: nota || rec, notas, actualizado: fecha, cancelacionId: canId });
+          S().update('cancelaciones', canId, { recuperacionNegocioId: existente.id });
+        } else {
+          const prox = new Date(); prox.setDate(prox.getDate() + 2);
+          const etapaMap = { 'Pendiente de contacto': 'nuevo', 'Llamada de retención agendada': 'contactado', 'Oferta de mejora enviada': 'propuesta', 'En negociación': 'negociacion' };
+          const neg = {
+            id: 'neg' + Date.now().toString().slice(-7), nombre: (cli ? cli.nombre : 'Cliente') + ' · recuperación', tipo: cli ? cli.tipo : 'Persona',
+            etapa: etapaMap[rec] || 'contactado', prob: 30, asesorId: c.asesorId, canal: 'Cliente actual/antiguo',
+            pais: cli ? cli.pais : 'GT', moneda: cli ? cli.moneda : 'GTQ', producto: p ? p.producto : 'Por definir', ramo: p ? p.ramo : 'Auto',
+            aseguradoraId: c.aseguradoraId || (p ? p.aseguradoraId : ''), primaEst: p ? (p.prima || 0) : 0, prioridad: 'Alta',
+            clienteId: c.clienteId, polizaId: c.polizaId, cancelacionId: canId, proximoToque: prox.toISOString().slice(0, 10),
+            checklist: [], nota: nota || rec, notas: nota || '', descripcion: 'Recuperación de póliza cancelada ' + (p ? p.numero : ''),
+            bitacora: [{ ts: fecha + ' 09:00', user: 'Equipo', campo: 'Creación', de: '', a: 'Recuperación desde cancelación', origen: 'cancelaciones' }],
+            comentarios: [], origen: 'Recuperación', creado: fecha, actualizado: fecha, archivado: false
+          };
+          S().insert('negocios', neg);
+          S().update('cancelaciones', canId, { recuperacionNegocioId: neg.id });
+          if (Orbit.ciclo && Orbit.ciclo.notify) { try { Orbit.ciclo.notify({ titulo: 'Recuperación pendiente', para: cli ? cli.nombre : '', canal: 'in-app' }); } catch (e) {} }
+        }
+      } else if (c.clienteId && rec === 'Recuperada') {
+        const existenteG = findGestion(Object.assign({}, c, patch));
+        if (existenteG) {
+          const notas = (existenteG.notas ? existenteG.notas + '\n' : '') + '[' + fecha + '] Recuperación confirmada · ' + (motivo || nota || 'Cliente recuperado');
+          S().update('gestiones', existenteG.id, { notas, estado: existenteG.estado || 'Pendiente', cancelacionId: canId });
+          S().update('cancelaciones', canId, { recuperacionGestionId: existenteG.id });
+        } else if (Orbit.ciclo && Orbit.ciclo.crearGestion) {
+          try {
+            const res = Orbit.ciclo.crearGestion({ tipo: 'Reemisión por recuperación', titulo: 'Reemisión: ' + (p ? p.numero : c.clienteId), clienteId: c.clienteId, polizaId: c.polizaId, asesorId: c.asesorId, nota: motivo || nota || 'Cliente recuperado', origen: 'cancelaciones', cancelacionId: canId });
+            if (res && res.id) S().update('cancelaciones', canId, { recuperacionGestionId: res.id });
+          } catch (e) {}
+        }
+      }
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = rec === 'Recuperada' ? '✅ Cliente recuperado · reemisión preparada en Ops' : rec === 'No recuperable' ? '⛔ Recuperación cerrada con motivo' : '♻ Acción de recuperación guardada sin duplicar seguimiento'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
       close();
     });
   }
