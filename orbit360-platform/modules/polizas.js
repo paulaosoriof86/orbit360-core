@@ -33,7 +33,7 @@ Orbit.modules.polizas = (function () {
   function render(host) {
     const all = S().all('polizas');
     const vig = all.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
-    const primaVig = vig.reduce((s, p) => s + q.norm(p.prima, p.moneda), 0);
+    const primaVig = vig.reduce((s, p) => s + q.norm((p.primaNeta != null ? p.primaNeta : p.prima), p.moneda), 0);
     const r = rows();
     st.__count = r.length + ' de ' + all.length;
 
@@ -41,7 +41,7 @@ Orbit.modules.polizas = (function () {
       ${K.bannerFor('polizas', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevaPoliza()">+ Nueva póliza</button>`)}
       ${K.kpis([
         { label: 'Pólizas vigentes', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'activas en cartera', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
-        { label: 'Prima vigente', val: U.moneyShort(primaVig, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'anualizada', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
+        { label: 'Prima neta vigente', val: U.moneyShort(primaVig, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'anualizada · no producción', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
         { label: 'Por renovar ≤45 d', val: all.filter(p => p.estado === 'Por renovar').length, color: 'var(--warn)', foot: 'requieren gestión', onclick: "Orbit.modules.polizas.filtrarEstado('Por renovar')" },
         { label: 'Histórico / sin cartera', onclick: "Orbit.modules.polizas.filtrarEstado('Cancelada')", val: all.filter(p => ['Cancelada', 'Vencida', 'Anulada', 'Rechazada'].includes(p.estado)).length, color: 'var(--danger)', foot: 'cancel./venc./anul./rech.' }
       ])}
