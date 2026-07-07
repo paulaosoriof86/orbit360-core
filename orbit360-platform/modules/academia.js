@@ -8,7 +8,7 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.academia = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
-  let host, filtro = 'todas';
+  let host, filtro = 'todas', vista = 'catalogo', rutaRol = null;
   const TIPO_ICON = { video: '🎬', lectura: '📖', quiz: '✏️', recurso: '📎' };
   // paleta para barras de color de las secciones (rota para dar ritmo visual tipo Orbit)
   const SEC_COLORS = ['#2A6FDB', '#1F8A5B', '#D97757', '#7A5Bd9', '#C5162E', '#0E7C86'];
@@ -49,8 +49,8 @@ Orbit.modules.academia = (function () {
   async function iaQuizAsync(tema, current, count, replace) { count = count || 3; if (Orbit.ia.disponible()) { try { const out = await Orbit.ia.complete('Genera ' + count + ' preguntas de opción múltiple sobre "' + (tema || 'seguros') + '". Formato EXACTO: enunciado en una línea, luego cada opción en su propia línea, la correcta con [x] al inicio y las demás con [ ]. Separa preguntas con una línea en blanco. Solo el texto, sin numeración.' + (replace ? '' : ' Que sean DISTINTAS a estas:\n' + (current || ''))); return (replace || !current ? '' : current + '\n\n') + String(out).trim(); } catch (e) {} } let base = []; for (let k = 0; k < count; k++) base.push('¿Pregunta ' + (k + 1) + ' sobre ' + (tema || 'el tema') + '?\n[x] Respuesta correcta\n[ ] Distractor 1\n[ ] Distractor 2'); return (replace || !current ? '' : current + '\n\n') + base.join('\n\n'); }
   async function iaQuizFromDoc(text) { if (Orbit.ia.disponible() && text) { try { const out = await Orbit.ia.complete('A partir de este documento genera 4 preguntas de opción múltiple. Formato: enunciado, opciones en líneas (correcta con [x], otras con [ ]), preguntas separadas por línea en blanco. Documento:\n' + String(text).slice(0, 4000)); return String(out).trim(); } catch (e) {} } return '¿Pregunta basada en el documento?\n[x] Correcta\n[ ] Incorrecta\n[ ] Otra'; }
 
-  function cursos() {
-    const rol = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+  function cursosPorRol(rol) {
+    rol = rol || (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
     return S().all('cursos').filter(c => {
       if (!c) return false;
       const d = c.destinatarios || 'equipo';
@@ -59,10 +59,11 @@ Orbit.modules.academia = (function () {
       if (d === 'equipo') return true;
       if (d === rol) return true;
       // Dirección/Admin ven todos los cursos de equipo
-      if (['Dirección','Admin'].includes(rol)) return true;
+      if (['Dirección', 'Admin'].includes(rol)) return true;
       return false;
     });
   }
+  function cursos() { return cursosPorRol(); }
   function kpi(label, val, foot, color, fkey) {
     return `<button class="kpi kpi-click" data-kpi="${fkey}"><div class="k-accent" style="background:${color}"></div><div class="k-label">${label}</div><div class="k-val">${val}</div><div class="k-foot">${foot}</div></button>`;
   }
@@ -96,18 +97,32 @@ Orbit.modules.academia = (function () {
       + kpi('Certificaciones', certs, 'obtenidas', 'var(--ok)', 'cert')
       + kpi('Lecciones', arr.reduce((s, c) => s + (c.lecciones || []).length, 0), 'disponibles', 'var(--warn)', '');
 
+    const viewToggle = '<div class="tabs" style="max-width:340px;margin-bottom:14px">'
+      + '<div class="tab' + (vista === 'catalogo' ? ' active' : '') + '" data-vista="catalogo">📚 Catálogo</div>'
+      + '<div class="tab' + (vista === 'ruta' ? ' active' : '') + '" data-vista="ruta">🧭 Ruta por rol</div>'
+      + '</div>';
+    const bodyHtml = vista === 'ruta'
+      ? rutaView()
+      : ('<div class="tabs" style="max-width:640px;margin-bottom:16px">' + tabsHtml + '</div><div class="ac-grid">' + lista.map(card).join('') + '</div>');
     host.innerHTML = '<div class="page">'
       + K.banner({ icon: '🎓', title: 'Orbit Academia', sub: 'Capacitación, certificaciones y recursos del equipo', features: [], actions: actions })
       + '<div class="kpi-row">' + kpisHtml + '</div>'
-      + '<div class="tabs" style="max-width:640px;margin-bottom:16px">' + tabsHtml + '</div>'
-      + '<div class="ac-grid">' + lista.map(card).join('') + '</div>'
+      + viewToggle
+      + bodyHtml
       + '</div>';
+
+    host.querySelectorAll('[data-vista]').forEach(el => el.addEventListener('click', () => { vista = el.dataset.vista; render(host); }));
+    if (vista === 'ruta') {
+      const rs = host.querySelector('#ruta-rol'); if (rs) rs.addEventListener('change', () => { rutaRol = rs.value; render(host); });
+      host.querySelectorAll('[data-abrir]').forEach(b => b.addEventListener('click', () => verCurso(b.dataset.abrir)));
+    }
+    host.querySelectorAll('[data-cert]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); verCertificado(b.dataset.cert); }));
 
     host.querySelectorAll('.tab[data-f]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.f; render(host); }));
     host.querySelectorAll('[data-cur]').forEach(el => el.addEventListener('click', (e) => { if (e.target.closest('.ac-act')) return; abrir(el.dataset.cur); }));
     host.querySelectorAll('[data-edit]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); editar(el.dataset.edit); }));
     host.querySelectorAll('[data-del]').forEach(el => el.addEventListener('click', async (e) => { e.stopPropagation(); const c = S().get('cursos', el.dataset.del); if (c && (await Orbit.ui.confirm('¿Eliminar el curso "' + c.titulo + '"? Esta acción no se puede deshacer.', { title: 'Eliminar curso', ok: 'Eliminar' }))) { S().remove('cursos', el.dataset.del); render(host); } }));
-    host.querySelectorAll('[data-kpi]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.kpi || 'todas'; render(host); }));
+    host.querySelectorAll('[data-kpi]').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.kpi || 'todas'; vista = 'catalogo'; render(host); }));
     const impBtn = host.querySelector('#ac-imp'); if (impBtn) impBtn.addEventListener('click', () => Orbit.importa.open('documentos', { onDone: () => render(host) }));
     const newBtn = host.querySelector('#ac-new'); if (newBtn) newBtn.addEventListener('click', () => editar(null));
     const iaBtn  = host.querySelector('#ac-ia');  if (iaBtn)  iaBtn.addEventListener('click', crearIA);
@@ -174,6 +189,7 @@ Orbit.modules.academia = (function () {
         <div class="ac-meta">${lec} lecciones · ${min} min</div>
         <div class="ac-bar"><i style="width:${c.progreso}%;background:${c.progreso >= 100 ? 'var(--ok)' : c.color}"></i></div>
         <div class="ac-prog">${c.progreso}% completado</div>
+        ${c.certificado ? `<button class="btn ghost sm" data-cert="${c.id}" style="margin-top:8px">🏅 Ver certificado</button>` : ''}
       </div>
     </div>`;
   }
@@ -181,6 +197,12 @@ Orbit.modules.academia = (function () {
   function abrir(id) { verCurso(id); }
 
   /* ---- Cuerpo de una lección (video / lectura / quiz interactivo) ---- */
+  function fmtSec(s) {
+    var h = U.esc(String(s == null ? '' : s));
+    h = h.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+    h = h.replace(/\n/g, '<br>');
+    return h;
+  }
   function lessonBody(l) {
     if (!l) return '';
     if (l.iframeSrc) return `<div style="position:relative;width:100%;height:62vh;border-radius:12px;overflow:hidden;background:#f4f3ee"><iframe src="${l.iframeSrc}" style="width:100%;height:100%;border:0"></iframe></div>`;
@@ -197,7 +219,7 @@ Orbit.modules.academia = (function () {
     }
     if (l.tipo === 'lectura') {
       const secs = l.secciones && l.secciones.length
-        ? l.secciones.map(s => `<div class="acv-sec" style="border-left:4px solid ${s.color || 'var(--red)'}"><div class="acv-sec-t" style="color:${s.color || 'var(--red)'}">${U.esc(s.icon || '▸')} ${U.esc(s.t || '')}</div><div class="acv-sec-b">${U.esc(s.d || '')}</div></div>`).join('')
+        ? l.secciones.map(s => `<div class="acv-sec" style="border-left:4px solid ${s.color || 'var(--red)'}"><div class="acv-sec-t" style="color:${s.color || 'var(--red)'}">${U.esc(s.icon || '▸')} ${U.esc(s.t || '')}</div><div class="acv-sec-b">${fmtSec(s.d || '')}</div></div>`).join('')
         : mdToHtml(l.texto || '');
       const adj = l.docSrc ? (/^data:image|\.(png|jpe?g|webp|gif)/i.test(l.docSrc) ? `<img src="${l.docSrc}" style="max-width:100%;border-radius:10px;margin-top:14px">` : `<div style="position:relative;width:100%;height:60vh;border-radius:10px;overflow:hidden;background:#f4f3ee;margin-top:14px"><iframe src="${l.docSrc}" style="width:100%;height:100%;border:0"></iframe></div>`) : '';
       return secs + adj;
@@ -619,6 +641,80 @@ Orbit.modules.academia = (function () {
     // escuchar mensaje de leccion completada desde el iframe interactivo
     function msgHandler(ev) { if (ev.data && ev.data.orbit === 'leccion_completada') { window.removeEventListener('message', msgHandler); close(); if (onDone) onDone(); } }
     window.addEventListener('message', msgHandler);
+  }
+
+  /* ---- Ruta de aprendizaje por ROL (secuencia curada de cursos) ---- */
+  function rutaView() {
+    const roles = (Orbit.ROLES ? Object.keys(Orbit.ROLES) : ['Dirección']);
+    const activo = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+    const rol = rutaRol || activo;
+    const ORDEN = ['Inducción', 'Técnico', 'Producto', 'Comercial', 'Servicio', 'Cumplimiento', 'Normativa', 'Finanzas', 'Marketing', 'Liderazgo'];
+    const arr = cursosPorRol(rol).slice().sort((a, b) => {
+      const ia = ORDEN.indexOf(a.cat), ib = ORDEN.indexOf(b.cat);
+      return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || (a.titulo || '').localeCompare(b.titulo || '');
+    });
+    const total = arr.length, comp = arr.filter(c => c.progreso >= 100).length, certs = arr.filter(c => c.certificado).length;
+    const avg = total ? Math.round(arr.reduce((s, c) => s + c.progreso, 0) / total) : 0;
+    const selector = '<select id="ruta-rol" class="o-sel" style="width:auto">' + roles.map(r => `<option ${r === rol ? 'selected' : ''}>${U.esc(r)}</option>`).join('') + '</select>';
+    const primerPend = arr.find(c => c.progreso < 100);
+    const pasos = arr.map((c, i) => {
+      const hecho = c.progreso >= 100;
+      return `<div class="card" style="display:flex;align-items:center;gap:14px;padding:13px 16px;margin-bottom:10px;border-left:4px solid ${hecho ? 'var(--ok)' : c.color}">
+        <div style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;background:${hecho ? 'var(--ok)' : 'var(--surface)'};color:${hecho ? '#fff' : 'var(--ink-3)'};flex-shrink:0">${hecho ? '✓' : (i + 1)}</div>
+        <span style="font-size:22px">${c.emoji}</span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-family:var(--f-display);font-size:14.5px">${U.esc(c.titulo)}</b><span class="badge neutral" style="font-size:9.5px">${U.esc(c.cat || '')}</span>${c.certificado ? '<span class="badge ok" style="font-size:9.5px">🏅 Certificado</span>' : ''}</div>
+          <div class="ac-bar" style="margin-top:7px"><i style="width:${c.progreso}%;background:${hecho ? 'var(--ok)' : c.color}"></i></div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">${c.certificado ? `<button class="btn ghost sm" data-cert="${c.id}">🏅</button>` : ''}<button class="btn ${hecho ? 'ghost' : 'primary'} sm" data-abrir="${c.id}">${c.progreso === 0 ? 'Comenzar' : hecho ? 'Repasar' : 'Continuar'}</button></div>
+      </div>`;
+    }).join('') || '<div class="muted" style="padding:30px;text-align:center">No hay cursos en la ruta de este rol todavía. Creá cursos y asigná su destinatario por rol.</div>';
+    return `<div class="card pad" style="margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div><div class="muted" style="font-size:12px">Ruta de aprendizaje para el rol</div><div style="margin-top:5px">${selector}</div></div>
+        <div style="flex:1;min-width:20px"></div>
+        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+          <div><div style="font-family:var(--f-display);font-size:20px;font-weight:800">${avg}%</div><div class="muted" style="font-size:11px">avance</div></div>
+          <div><div style="font-family:var(--f-display);font-size:20px;font-weight:800">${comp}/${total}</div><div class="muted" style="font-size:11px">completados</div></div>
+          <div><div style="font-family:var(--f-display);font-size:20px;font-weight:800">${certs}</div><div class="muted" style="font-size:11px">certificados</div></div>
+          ${primerPend ? `<button class="btn primary" data-abrir="${primerPend.id}">▶ Continuar ruta</button>` : '<span class="badge ok">🎉 Ruta completa</span>'}
+        </div>
+      </div>${pasos}`;
+  }
+
+  /* ---- Certificado imprimible (documento) ---- */
+  function verCertificado(cursoId) {
+    const c = S().get('cursos', cursoId); if (!c) return;
+    const u = (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) || {};
+    const nombre = u.nombre || 'Colaborador';
+    const t = (Orbit.tenant && Orbit.tenant.get) ? Orbit.tenant.get() : {};
+    const folio = 'ORB-' + cursoId.replace(/[^a-z0-9]/gi, '').slice(-5).toUpperCase() + '-' + (Orbit.ui.today() || '').replace(/-/g, '').slice(2);
+    let back = document.getElementById('ac-cert'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'ac-cert'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 260;
+    back.innerHTML = `<div class="card" style="width:min(720px,96vw);padding:0;overflow:hidden">
+      <div id="cert-doc" style="padding:42px 46px;background:#fff;border:9px solid ${c.color}">
+        <div style="text-align:center">
+          <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:${c.color}">${U.esc(t.empresa || 'Orbit 360')} · Academia</div>
+          <div style="font-family:var(--f-display);font-weight:800;font-size:30px;margin:14px 0 6px">Certificado de finalización</div>
+          <div class="muted" style="font-size:13px">Se otorga a</div>
+          <div style="font-family:var(--f-display);font-weight:800;font-size:26px;margin:10px 0;color:${c.color}">${U.esc(nombre)}</div>
+          <div style="font-size:13.5px;max-width:470px;margin:0 auto;line-height:1.6">por completar satisfactoriamente el curso <b>${U.esc(c.titulo)}</b>${c.cat ? ' (' + U.esc(c.cat) + ')' : ''} de la Academia Orbit 360.</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:38px;gap:20px">
+            <div style="text-align:left"><div style="font-family:var(--f-mono);font-size:11px;color:var(--ink-3)">FOLIO</div><b class="mono" style="font-size:12.5px">${folio}</b></div>
+            <div style="font-size:44px">${c.emoji}</div>
+            <div style="text-align:right"><div style="font-family:var(--f-mono);font-size:11px;color:var(--ink-3)">FECHA</div><b style="font-size:12.5px">${U.fmtDate(Orbit.ui.today())}</b></div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn ghost" id="cert-close">Cerrar</button>
+        <button class="btn primary" id="cert-print">🖨 Imprimir / PDF</button>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#cert-close').onclick = close;
+    back.querySelector('#cert-print').onclick = () => { const w = window.open('', '_blank'); w.document.write('<html><head><title>Certificado · ' + U.esc(c.titulo) + '</title></head><body style="margin:0">' + back.querySelector('#cert-doc').outerHTML + '</body></html>'); w.document.close(); w.print(); };
   }
 
   return { render };

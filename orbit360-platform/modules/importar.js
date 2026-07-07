@@ -20,7 +20,7 @@ Orbit.modules.importar = (function () {
     },
     {
       title: 'Finanzas y Marketing', sub: 'Histórico y operación continua',
-      items: ['movimientos-finanzas', 'estados-banco', 'calendario-marketing']
+      items: ['financiero-historico', 'movimientos-finanzas', 'estados-banco', 'calendario-marketing']
     }
   ];
 
@@ -51,7 +51,7 @@ Orbit.modules.importar = (function () {
       <div class="card pad" style="margin-top:22px;display:flex;gap:14px;align-items:flex-start">
         <span style="font-size:26px">🧠</span>
         <div><b style="font-family:var(--f-display);font-size:15px">Motor de extracción adaptable</b>
-        <p class="muted" style="font-size:13.5px;margin:6px 0 0;line-height:1.55;max-width:760px">El cliente entrega su base como la tenga. El motor detecta estructura y formato, propone el mapeo y lo deja listo para confirmar. Toda la información importada <b>alimenta a todos los módulos</b> (CRM, Finanzas, Insights, Marketing) y mantiene la <b>sincronía</b> entre ellos. <span class="muted">Demo: motor simulado; en producción se conecta el extractor real.</span></p></div>
+        <p class="muted" style="font-size:13.5px;margin:6px 0 0;line-height:1.55;max-width:760px">El cliente entrega su base como la tenga. El motor detecta estructura y formato, propone el mapeo y lo deja listo para confirmar. Toda la información importada <b>alimenta a todos los módulos</b> (CRM, Finanzas, Insights, Marketing) y mantiene la <b>sincronía</b> entre ellos.</p></div>
       </div>
     </div>`;
 

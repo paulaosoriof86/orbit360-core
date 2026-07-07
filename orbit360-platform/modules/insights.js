@@ -11,8 +11,8 @@ Orbit.modules.insights = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
   let vista = 'resumen', host, unsub;
   const norm = (m, cur) => q.norm(m, cur);
-  const M = (n) => U.moneyShort(n, 'GTQ');
-  const MM = (n) => U.money(n, 'GTQ');
+  const M = (n) => U.moneyShort(n, Orbit.q.monedaPais());
+  const MM = (n) => U.money(n, Orbit.q.monedaPais());
   const YEAR = 2026, PREV = 2025;
   const MES0 = U.NOW ? new Date(U.NOW).getMonth() : 5; // mes actual
   let mesSel = MES0;           // mes seleccionado (acumulado Ene→mesSel)
@@ -456,10 +456,15 @@ Orbit.modules.insights = (function () {
     const tasaCancel = pols.length ? Math.round(cancel.length / (pols.length + cancel.length) * 100) : 0;
     const venc30 = q.renovacionesProximas(30).filter(p => paisOK(clientePais(p.clienteId)));
     const vencPrima = venc30.reduce((s, p) => s + netaDe(p), 0);
+    // concentración por aseguradora + vendedor con menor índice de recaudo (hallazgos tipo Finanzas)
+    const asgAgg = Object.entries(aggBy(vig, p => (q.aseguradora(p.aseguradoraId) || {}).nombre || '—', p => netaDe(p))).sort((a, b) => b[1] - a[1]);
+    const asgTot = asgAgg.reduce((s, e) => s + e[1], 0) || 1;
+    const asgTop = asgAgg[0]; const asgConc = asgTop ? Math.round(asgTop[1] / asgTot * 100) : 0;
     const alerts = [];
     if (varPct < 0) alerts.push({ t: 'danger', txt: `Caída del ${Math.abs(varPct)}% en prima neta vs mismo período ${PREV} — ${MM(netaAcum25 - netaAcum26)} menos.` });
     if (tasaCancel > 8) alerts.push({ t: 'warn', txt: `Tasa de cancelación del ${tasaCancel}% — por encima del umbral saludable (8%). Revisar causas por aseguradora.` });
     if (tasaRecaudo < 70) alerts.push({ t: 'danger', txt: `Recaudo en ${tasaRecaudo}% de la cartera — gestionar cobros pendientes y vencidos.` });
+    if (asgTop && asgConc >= 35) alerts.push({ t: 'warn', txt: `Concentración en ${asgTop[0]}: ${asgConc}% de la prima vigente — riesgo de dependencia, conviene diversificar aseguradoras.` });
     if (venc30.length) alerts.push({ t: 'warn', txt: `${venc30.length} pólizas vencen en los próximos 30 días (${M(vencPrima)} de prima neta expuesta).` });
     if (!alerts.length) alerts.push({ t: 'ok', txt: 'Indicadores dentro de rangos saludables para el período analizado.' });
     const recs = [];
@@ -468,6 +473,7 @@ Orbit.modules.insights = (function () {
     if (tasaRecaudo < 80) recs.push(`Gestionar la cartera pendiente — ${MM(totalCart - recaudado)} por recuperar.`);
     const topAse = q.leaderboard()[0];
     if (topAse) recs.push(`Replicar prácticas del asesor líder (${topAse.asesor.nombre}) en el resto del equipo.`);
+    if (asgTop && asgConc >= 35) recs.push(`Diversificar cartera: ${asgTop[0]} concentra ${asgConc}% — abrir producción con otras aseguradoras para reducir dependencia.`);
     const ramoParts = Object.entries(aggBy(vig, p => p.ramo, p => netaDe(p))).sort((a, b) => b[1] - a[1]).map((e, i) => ({ label: e[0], val: e[1], color: RAMO_COLORS[e[0]] || palette[i % palette.length] }));
     return insKpis([
       { label: 'Prima neta acum.', val: M(netaAcum26), color: 'var(--red)', foot: (varPct >= 0 ? '▲ ' : '▼ ') + Math.abs(varPct) + '% vs ' + PREV, footTone: varPct >= 0 ? 'up' : 'down' },

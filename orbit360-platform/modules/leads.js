@@ -33,8 +33,8 @@ Orbit.modules.leads = (function () {
       ${K.bannerFor('leads', `<button class="btn ghost" id="ld-lists">⚙ Listas</button><button class="btn primary" id="ld-new">+ Nuevo lead</button>`)}
       ${K.kpis([
         { label: 'Leads activos', val: m.activos, color: 'var(--red)', foot: esAse ? 'tu pipeline' : 'en pipeline', onclick: 'location.hash=\'#/leads\'' },
-        { label: 'Prima estimada', val: U.moneyShort(m.tot, 'GTQ'), color: 'var(--info)', foot: 'potencial', onclick: 'location.hash=\'#/leads\'' },
-        { label: 'Pronóstico ponderado', val: U.moneyShort(m.pond, 'GTQ'), color: 'var(--ok)', foot: 'por probabilidad', footTone: 'up', onclick: 'location.hash=\'#/leads\'' },
+        { label: 'Prima estimada', val: U.moneyShort(m.tot, Orbit.q.monedaPais()), color: 'var(--info)', foot: 'potencial', onclick: 'location.hash=\'#/leads\'' },
+        { label: 'Pronóstico ponderado', val: U.moneyShort(m.pond, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'por probabilidad', footTone: 'up', onclick: 'location.hash=\'#/leads\'' },
         { label: 'Ganados (emitidos)', val: m.ganados, color: 'var(--warn)', foot: 'cierre del mes', onclick: 'location.hash=\'#/cliente360\'' }
       ])}
       <div class="ops-legend">
@@ -59,7 +59,7 @@ Orbit.modules.leads = (function () {
       <div class="kcol-h2" style="--lc:${L.color}">
         <span class="kcol-emoji">${L.emoji}</span><b>${L.nombre}</b><span class="kcount">${col.items.length}</span>
       </div>
-      <div class="ksub">${U.moneyShort(subt, 'GTQ')}${L.espejo ? ' · <span style="color:var(--ink-3)">operativo</span>' : ''}</div>
+      <div class="ksub">${U.moneyShort(subt, Orbit.q.monedaPais())}${L.espejo ? ' · <span style="color:var(--ink-3)">operativo</span>' : ''}</div>
       <div class="kcol-body">
         ${cards || '<div class="kempty">—</div>'}
         ${!L.espejo && L.etapa === 'nuevo' ? '<button class="kadd" data-add="neg">+ Nuevo lead</button>' : ''}

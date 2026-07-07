@@ -11,6 +11,8 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.portal = (function () {
   const U = Orbit.ui, S = () => Orbit.store, q = Orbit.q;
   let host, clienteId, tab = 'inicio';
+  // Localización: término por país del cliente activo
+  function TT(k) { try { const c = S().get('clientes', clienteId) || {}; return (Orbit.termino ? Orbit.termino(k, c.pais) : k); } catch (e) { return k; } }
 
   function clientes() { return S().all('clientes'); }
   function notifsDe(cid) { return S().where('notifs', n => n.clienteId === cid).sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')); }
@@ -164,7 +166,7 @@ Orbit.modules.portal = (function () {
     const c = S().get('cobros', cobroId); if (!c) return;
     const cli = S().get('clientes', clienteId);
     const html = `<div class="cfg-note">Reporta tu pago de la cuota <b>${c.cuota}</b> por <b>${U.money(c.monto, c.moneda)}</b>. El equipo lo valida y te confirma.</div>
-      <label class="ce-l" style="margin-top:10px">Fecha del pago<input id="rp-fecha" class="o-sel" type="date" value="2026-06-24"></label>
+      <label class="ce-l" style="margin-top:10px">Fecha del pago<input id="rp-fecha" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
       <label class="ce-l" style="margin-top:10px">Soporte de pago (comprobante)<input id="rp-file" type="file" class="o-sel" accept="image/*,application/pdf"></label>
       <label class="ce-l" style="margin-top:10px">Nota<input id="rp-nota" class="o-sel" placeholder="Banco, referencia…"></label>`;
     const back = drawer('📤 Reportar pago', html, () => {
@@ -172,7 +174,7 @@ Orbit.modules.portal = (function () {
       S().update('cobros', cobroId, { reportado: Orbit.ui.today(), soporteNombre: f ? f.name : '', notaReporte: back.querySelector('#rp-nota').value });
       S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: (S().get('polizas', c.polizaId) || {}).asesorId || cli.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Pago reportado por el cliente', detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (f ? ' · soporte: ' + f.name : '') + ' · pendiente de validar' });
       if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo: 'Validar pago reportado', titulo: 'Validar pago · ' + cli.nombre, clienteId, polizaId: c.polizaId, asesorId: cli.asesorId, prioridad: 'Alta', vence: '2026-06-26', nota: 'El cliente reportó el pago de la cuota ' + c.cuota, origen: 'Portal del cliente' });
-      back.remove(); toast('✓ Pago reportado · el equipo lo validará'); render(host);
+      back.remove(); toast('✓ Recibimos tu reporte · pendiente de revisión/conciliación'); render(host);
     }, 'Enviar reporte');
   }
 
@@ -248,9 +250,23 @@ Orbit.modules.portal = (function () {
       <div class="cfg-note" style="margin-top:10px">Tu solicitud llega al equipo (Orbit Ops) y te avisaremos por WhatsApp/correo.</div>`;
     const back = drawer('🗂 Solicitar una gestión', html, () => {
       const tipo = back.querySelector('#ps-tipo').value, det = back.querySelector('#ps-det').value.trim();
-      if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo, titulo: tipo + ' · ' + cli.nombre, clienteId, asesorId: cli.asesorId, prioridad: 'Media', vence: '2026-06-30', nota: det, origen: 'Portal del cliente', checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'En gestión', done: false }] });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '🙋', fecha: Orbit.ui.today(), titulo: 'Solicitud del cliente: ' + tipo, detalle: det + ' · Portal → Ops' });
-      back.remove(); toast('✓ Solicitud enviada al equipo'); render(host);
+      const esSiniestro = /reclamo|siniestro/i.test(tipo);
+      let reclamoId = '';
+      if (esSiniestro) {
+        // Alta CANÓNICA del reclamo en el store (aparece en módulo Siniestros + ficha Cliente360)
+        const pol = q.polizasDe(clienteId).filter(p => p.estado !== 'Cancelada')[0];
+        reclamoId = 'rcl' + Date.now();
+        const num = 'SIN-' + new Date().getFullYear() + '-' + String(S().all('reclamos').length + 1).padStart(4, '0');
+        S().insert('reclamos', {
+          id: reclamoId, numero: num, clienteId, polizaId: pol ? pol.id : '', aseguradoraId: pol ? pol.aseguradoraId : '',
+          tipo: 'Reclamo reportado', estado: 'Reportado', prioridad: 'Media', origen: 'portal',
+          fecha: Orbit.ui.today(), responsable: cli.asesorId || '', montoReclamado: 0, montoAprobado: 0,
+          descripcion: det, bitacora: [{ ts: Orbit.ui.today(), t: 'Reportado por el cliente desde el Portal', quien: cli.nombre }]
+        });
+      }
+      if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo, titulo: tipo + ' · ' + cli.nombre, clienteId, asesorId: cli.asesorId, prioridad: esSiniestro ? 'Alta' : 'Media', vence: Orbit.ui.today(), nota: det, origen: 'Portal del cliente', reclamoId, checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'En gestión', done: false }] });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: esSiniestro ? 'siniestro' : 'sistema', icon: esSiniestro ? '🚨' : '🙋', fecha: Orbit.ui.today(), titulo: esSiniestro ? 'Siniestro reportado por el cliente' : ('Solicitud del cliente: ' + tipo), detalle: det + ' · Portal → Ops' + (reclamoId ? ' + Siniestros' : ''), reclamoId });
+      back.remove(); toast(esSiniestro ? '✓ Siniestro reportado · el equipo le dará seguimiento' : '✓ Solicitud enviada al equipo'); render(host);
     }, 'Enviar solicitud');
   }
 
@@ -260,11 +276,11 @@ Orbit.modules.portal = (function () {
     const asg = q.aseguradora(p.aseguradoraId), veh = (S().where('vehiculos', v => v.polizaId === polId) || [])[0];
     drawer('📑 ' + (p.producto || p.ramo), `
       <div class="pt-det-grid">
-        <div class="pt-det"><span>N.º de póliza</span><b>${p.numero}</b></div>
+        <div class="pt-det"><span>N.º de ${TT('poliza').toLowerCase()}</span><b>${p.numero}</b></div>
         <div class="pt-det"><span>Aseguradora</span><b>${asg ? U.esc(asg.nombre) : '—'}</b></div>
         <div class="pt-det"><span>Ramo</span><b>${p.ramo}${p.subramo ? ' · ' + p.subramo : ''}</b></div>
         <div class="pt-det"><span>Suma asegurada</span><b>${U.money(p.sumaAsegurada || 0, p.moneda)}</b></div>
-        <div class="pt-det"><span>Prima total</span><b>${U.money(p.prima, p.moneda)}</b></div>
+        <div class="pt-det"><span>${TT('prima')} total</span><b>${U.money(p.prima, p.moneda)}</b></div>
         <div class="pt-det"><span>Forma de pago</span><b>${p.formaPago || p.frecuencia || '—'}</b></div>
         <div class="pt-det"><span>Vigencia</span><b>${U.fmtDate(p.vigenciaInicio)} → ${U.fmtDate(p.vigenciaFin)}</b></div>
         <div class="pt-det"><span>Estado</span><b>${p.estado}</b></div>
@@ -276,15 +292,15 @@ Orbit.modules.portal = (function () {
   function detRecibo(cobId) {
     const c = S().get('cobros', cobId); if (!c) return;
     const p = S().get('polizas', c.polizaId);
-    drawer('💳 Recibo · cuota ' + c.cuota, `
+    drawer('💳 ' + TT('recibo') + ' · cuota ' + c.cuota, `
       <div class="pt-det-grid">
-        <div class="pt-det"><span>Póliza</span><b>${p ? p.numero : '—'}</b></div>
+        <div class="pt-det"><span>${TT('poliza')}</span><b>${p ? p.numero : '—'}</b></div>
         <div class="pt-det"><span>Monto</span><b>${U.money(c.monto, c.moneda)}</b></div>
         <div class="pt-det"><span>Vence</span><b>${U.fmtDate(c.vence)}</b></div>
         <div class="pt-det"><span>Estado</span><b>${c.estado}</b></div>
-        ${c.neta != null ? `<div class="pt-det"><span>Prima neta</span><b>${U.money(c.neta, c.moneda)}</b></div><div class="pt-det"><span>IVA</span><b>${U.money(c.iva || 0, c.moneda)}</b></div>` : ''}
+        ${c.neta != null ? `<div class="pt-det"><span>${TT('prima_neta')}</span><b>${U.money(c.neta, c.moneda)}</b></div><div class="pt-det"><span>IVA</span><b>${U.money(c.iva || 0, c.moneda)}</b></div>` : ''}
         ${c.fechaPago ? `<div class="pt-det"><span>Pagado el</span><b>${U.fmtDate(c.fechaPago)}</b></div>` : ''}
-        ${c.reportado ? `<div class="pt-det"><span>Reportado</span><b>${U.fmtDate(c.reportado)}</b></div>` : ''}
+        ${c.reportado ? `<div class="pt-det"><span>Reportado</span><b>${U.fmtDate(c.reportado)}</b></div><div class="cfg-note" style="margin-top:8px;font-size:11.5px">📤 Recibimos tu reporte. Está <b>pendiente de revisión/conciliación</b>; te confirmamos cuando quede conciliado.</div>` : ''}
       </div>
       ${(c.estado === 'Pendiente' || c.estado === 'Vencido') && !c.reportado ? '<button class="btn primary sm" style="margin-top:12px" data-x-pago="' + c.id + '">📤 Reportar mi pago</button>' : ''}`, null, 'Cerrar');
     document.querySelectorAll('[data-x-pago]').forEach(b => b.addEventListener('click', () => { document.getElementById('pt-dr').remove(); reportarPago(b.dataset.xPago); }));
@@ -296,7 +312,7 @@ Orbit.modules.portal = (function () {
         <div class="pt-det"><span>N.º</span><b>${r.numero}</b></div>
         <div class="pt-det"><span>Estado</span><b>${r.estado}</b></div>
         <div class="pt-det"><span>Reportado</span><b>${U.fmtDate(r.fecha)}</b></div>
-        <div class="pt-det"><span>Monto reclamado</span><b>${U.money(r.montoReclamado, 'GTQ')}</b></div>
+        <div class="pt-det"><span>Monto reclamado</span><b>${U.money(r.montoReclamado, (S().get('clientes', clienteId) || {}).moneda || Orbit.q.monedaPais())}</b></div>
       </div>
       <div class="asg-sec-t" style="margin-top:14px">Seguimiento</div>
       <div class="pol-hist">${(r.bitacora || []).slice().reverse().map(b => `<div class="pol-hev"><div class="pol-hev-i">📌</div><div><div class="pol-hev-t">${U.esc(b.t)}</div><div class="pol-hev-d">${U.esc(b.ts || '')}</div></div></div>`).join('') || '<div class="muted" style="font-size:12px">Sin movimientos aún.</div>'}</div>`, null, 'Cerrar');

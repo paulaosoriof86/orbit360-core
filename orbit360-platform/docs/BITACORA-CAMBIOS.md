@@ -2,6 +2,534 @@
 
 > Registro cronológico de cambios del **prototipo** (Claude). El backend LAB (ChatGPT/Codex) mantiene su propia bitácora. Formato: versión · fecha · qué cambió · archivos.
 
+## v1.150 — 2026-07-06 · "Todo cuadra" neutralizado · index NO tocado
+> `index.html` NO tocado (backend LAB + `portal-v1142-copyfix.js` conservados). Backend protegido y tools intactos. Sin datos reales.
+- La cadena exacta "Todo cuadra — nada por crear." **no existe** en `core/importa.js` (verificado con grep en todo el proyecto; el resumen dry-run usa "Crear nuevos / Actualizar / Omitir"). La única ocurrencia real de "Todo cuadra" en un módulo estaba en **`modules/comisiones.js`** (empty-state de conciliación) → cambiada a "**Sin diferencias detectadas** — comisiones conciliadas con las tarifas vigentes." Con esto, **0 coincidencias de "Todo cuadra"** en módulos (solo permanece en `docs/BITACORA-CAMBIOS.md`, documentación interna no visible).
+- Mantidos sin regresión: config "cobro confirmado/conciliado con póliza"; importa "quedan listos para revisión/aprobación", "Las propuestas quedan disponibles para revisión", "Revisión previa", "Alcance permitido / efecto propuesto", "Se propondrán para revisión", "Confirmar mapeo".
+- **⚠ Para ChatGPT/Codex (cache-bust)**: bumpear `modules/comisiones.js` (y los ya corregidos `core/config.js`, `core/importa.js`) en el index híbrido para servir los cambios.
+- Archivos tocados: `modules/comisiones.js`, `docs/BITACORA-CAMBIOS.md`.
+
+
+## v1.149 — 2026-07-06 · Residuos finales config (scope) + step3 importa · index NO tocado
+> `index.html` NO tocado (backend LAB loader/init/store/storeLAB/guard + `portal-v1142-copyfix.js` conservados). Backend protegido y tools intactos. Sin datos reales.
+- **config.js**: el array `scope` de Finanzas todavía tenía "Doble conciliación: **pago aplicado a póliza creada**" (el `desc` ya estaba corregido en v1.145) → ahora "Doble conciliación: **cobro confirmado/conciliado con póliza**". Verificado 0 en fuente.
+- **importa.js step3**: "…se integrarán a X — crea lo nuevo, actualiza lo existente, sin duplicar" → "…**quedan listos para revisión/aprobación** en X — se proponen altas y actualizaciones, sin duplicar"; "Los registros se integran a la capa de datos y quedan disponibles…" → "**Las propuestas quedan disponibles para revisión** en los módulos relacionados". Verificado 0 en fuente.
+- **Nota**: la cadena "Todo cuadra — nada por crear" NO existe en la fuente actual (un `fetch` de prueba la mostró por **caché del service worker PWA**, no por el archivo real). El resumen dry-run usa "Crear nuevos / Actualizar / Omitir" — sin lenguaje de aplicación.
+- Sin regresiones en Cliente360/Cobros/Finanzas/Automatizaciones/Academia (plus+seed)/Importador.
+- **⚠ Para ChatGPT/Codex (cache-bust)**: bumpear en el index híbrido `core/config.js` y `core/importa.js` (a la siguiente vN) para servir los cambios; los archivos fuente ya están corregidos en el ZIP.
+- Archivos tocados: `core/config.js`, `core/importa.js`, `docs/BITACORA-CAMBIOS.md`.
+
+
+## v1.148 — 2026-07-06 · Residuos de importa (revisión ≠ aplicación) · index NO tocado
+> **`index.html` NO tocado** (conserva backend LAB loader/init/store/storeLAB/guard + `portal-v1142-copyfix.js`). Backend protegido y tools intactos. Sin datos reales.
+- **importa.js**: "Simulación pre-escritura" → "**Revisión previa**"; "Alcance (crea/actualiza)" (reporte CSV) → "**Alcance permitido / efecto propuesto**"; "Se crearán al confirmar" → "**Se propondrán para revisión**"; botón remap "Aplicar mapeo →" → "**Confirmar mapeo →**".
+- **Ya corregidos en rondas previas (verificado, sin cambio)**: config.js "Doble conciliación: cobro confirmado/conciliado con póliza"; importa "Importación lista para revisión/aprobación", "Revisar propuestas de conciliación por póliza", checkbox "Aplicar estos % al tarifario" (propuesta, no carga directa).
+- **QA**: `fetch` de la fuente servida → **0 residuos** de [Simulación pre-escritura, Alcance (crea/actualiza), Se crearán al confirmar, Aplicar mapeo, pago aplicado a póliza creada]. Sin regresiones en Cliente360/Cobros/Finanzas/Automatizaciones/Academia. Academia conserva jun/jul 2026, manifest de fuentes, banco no confirma cobro, histórico no crea cartera, documentos solo proponen, país/moneda faltante = REQUIERE_VALIDACION, GTQ/COP sin suma cruda.
+- **⚠ Nota para ChatGPT/Codex (cache-bust)**: como NO toqué `index.html`, hay que **bumpear `core/importa.js?v1330 → v1331`** en el index híbrido de la rama viva para que el cambio se sirva. El archivo fuente ya está corregido en el ZIP.
+- Archivos tocados: `core/importa.js`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales.
+
+
+## v1.147 — 2026-07-06 · Residuos finales de importa (gate) + index no tocado salvo cache-bust
+> Sin tocar backend protegido ni tools. `index.html` solo cache-bust (scripts LAB y `portal-v1142-copyfix.js` conservados). Sin datos reales.
+- **importa.js**: `estados-cuenta` desc "pagos aún no aplicados" → "**pagos pendientes de validación**"; detect "Pagado en banco, sin aplicar" → "**Pago en banco pendiente de validación**". `planillas-comision` desc "pagos no aplicados a póliza" → "**pagos pendientes de relación con recibo/póliza**"; detect "Comisión cobrada, pago no aplicado" → "**Comisión cobrada, propuesta pendiente de conciliación**". (Variable interna `noAplicados` se conserva; no se muestra cruda en UI.)
+- **config.js**: metadata Finanzas ya en "cobro confirmado/conciliado" (v1.145) — sin cambio.
+- Verificado: 0 matches de "aún no aplicados / no aplicados a póliza / Pagado en banco, sin aplicar / pago no aplicado"; app carga; 0 errores JS.
+- Cache-bust: `importa.js?v1330`.
+- Archivos: `core/importa.js`, `index.html`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales.
+
+
+## v1.146 — 2026-07-06 · Corrección final: erradicación total de "aplicar/aplicado" (gate)
+> Sin tocar backend protegido. `index.html` solo cache-bust (scripts LAB y `portal-v1142-copyfix.js` conservados). Sin datos reales.
+- **Cliente360**: `actionRow` "Todo aplicado" → **"Cartera al día"** (estado sin cobros pendientes); botón tabla recibos "Aplicar pago" → **"Confirmar cobro"**.
+- **seed.js**: "aplicar un pago baja la cartera y suma a Finanzas" → "**confirmar un cobro actualiza la cartera según validación** y suma a Finanzas"; "Cobros gestiona la cartera y aplica pagos" → "**Cobros gestiona cartera, reportes, revisión y confirmación de cobros**".
+- **importa.js**: motivo de conciliación "Pago en estado de cuenta, sin aplicar" → "**Pago en estado de cuenta pendiente de validación**" (los copys "Pagos pendientes de validación" / "pendientes de relación con recibo/póliza" ya de v1.145).
+- **config.js**: metadata Finanzas ya en "cobro confirmado/conciliado↔póliza" (v1.145) — sin cambio.
+- **academia-plus.js**: sin literal "pago aplicado" (ni en negación); la lección "Estados honestos" usa "reportar/validar no confirma el cobro". Sin cambio de contenido este round.
+- **QA (gate)**: recorrido de inicio/cobros/conciliaciones/cliente360/finanzas/importar/automatizaciones/academia → **0 resultados** para Todo aplicado, Aplicar pago, Pago aplicado, Aplicado a póliza, Pagos no aplicados, pago sin aplicar, "aplicar un pago baja la cartera", "Cobros gestiona la cartera y aplica pagos". 0 errores JS.
+- Cache-bust: `seed.js`, `importa.js`, `cliente360.js` → `?v1329`.
+- Archivos: `modules/cliente360.js`, `data/seed.js`, `core/importa.js`, `index.html`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales.
+
+
+## v1.145 — 2026-07-06 · Corrección post-auditoría v1.144: "aplicar/aplicado" erradicado de la UI + Academia migración
+> Sin tocar backend protegido (store/loader/init/guard/rules/tools). `index.html` solo cache-bust (scripts LAB y `portal-v1142-copyfix.js` conservados). Sin datos reales.
+- **Cliente360 (fix 1)**: modal/botón "Aplicar pago" → **"Confirmar cobro"** / "Registrar cobro confirmado"; "Fecha de envío a gestión (día en que se aplica)" → "Fecha de confirmación (día en que el equipo confirma el cobro)"; estado "Validada (por aplicar)" → "Validada (por confirmar)"; miniStats/tooltips a confirmado/conciliado.
+- **Cobros (fix 2)**: botón tabla "💳 Pagar" → "💳 Confirmar"; ficha "Aplicar pago" → "Confirmar cobro"; modal header "Cobros · aplicar pago"/"Aplicar pago" → "Confirmar cobro"; CTA "✅ Confirmar pago" → "✅ Confirmar cobro". (Reportado = pendiente de revisión/conciliación; confirmado = validado por equipo; conciliado = cruzado.)
+- **Finanzas (fix 3)**: "Aplicado a póliza" → "Confirmado y conciliado con póliza"; "pago sin aplicar" → "pendiente de conciliación"; comentario "demo agregada" → "partidas agregadas".
+- **Importador (fix 4)**: "Pagos no aplicados" → "Pagos pendientes de validación"; "aún no aplicados a su póliza" → "pendientes de relación con recibo/póliza"; "Importación lista para aplicar" → "…lista para revisión/aprobación"; "Aplicar pagos por póliza →" → "Revisar propuestas de conciliación por póliza →".
+- **Config (fix 5)**: metadata Finanzas "DOBLE conciliación pago↔póliza" → "cobro confirmado/conciliado↔póliza".
+- **Automatizaciones (fix 6)**: "clave detectada — conexión real al migrar backend" → "clave detectada · pendiente de activación técnica". Plantillas Pago confirmado / Pago reportado conservadas.
+- **Academia (fix 7)**: nueva lección **"Migración honesta: fuentes, banco y caso jun/jul 2026"** (fuente separada + manifest; banco/estado de cuenta no son cobro; planilla no crea cartera/cobro; histórico no crea cartera/cobros/producción; documentos solo proponen; país/moneda faltante = REQUIERE_VALIDACION; GT=GTQ/CO=COP sin sumar crudo; jun/jul 2026 = migración, no productivo). "Cobros gestiona la cartera y aplica pagos" → "…confirma cobros (validados por el equipo)". `CONTENT_V=8` re-sincroniza (verificado `_cv=8`).
+- **QA (fix 9)**: recorrido de inicio/cobros/conciliaciones/cliente360/finanzas/importar/automatizaciones → **0 textos prohibidos** (Pago aplicado, Aplicado a póliza, Todo aplicado, cobros aplicados, recaudo aplicado, Aplicar pago, listas p/ backend, conexión real). 0 errores JS.
+- Cache-bust: `config/importa/cobros/cliente360/automatizaciones/finanzas.js` y `academia-plus.js` → `?v1328`.
+- Archivos: `modules/{cliente360,cobros,finanzas,automatizaciones}.js`, `core/{config,importa}.js`, `data/academia-plus.js`, `index.html`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales.
+
+
+## v1.144 — 2026-07-06 · Corrección post-auditoría v1.143: copy "aplicado" armonizado en toda la UI + Academia
+> Sin tocar backend protegido (store/loader/init/guard/rules/tools ni index híbrido LAB). Sin datos reales.
+- **Conciliaciones (fix 1)**: eliminado estado **APLICADA**, KPI "Aplicadas" y "listas p/ backend"; quitada la acción/función **`preparar_aplicacion_controlada`/`prepararAplicacion`** (VALIDADA ya no ofrece CTA de aplicar). KPIs: "Validadas → para proceso posterior autorizado", "En revisión". Banner: "para revisión técnica. No aplica pagos ni modifica cobros desde esta bandeja". Verificado: sin "Aplicadas", con "No aplica pagos", `prepararAplicacion` inexistente.
+- **Cobros (fix 2)**: "cobros aplicados"→"cobros confirmados"; título actividad "Pago aplicado"→"Pago confirmado"; toast "✅ Pago aplicado"→"✅ Pago confirmado"; tooltip "Aplicado a póliza"→"Confirmado y conciliado con póliza".
+- **Cliente360 (fix 3)**: tooltip "Pago aplicado a la póliza"→"Confirmado y conciliado"; actividad/aviso "Pago aplicado"→"Pago confirmado"; miniStats "Por aplicar/Aplicado"→"Por confirmar/Confirmado".
+- **Automatizaciones (fix 4)**: template `pago_aplicado` label "Pago aplicado"→"Pago confirmado"; nuevo `pago_reportado` "Pago reportado · pendiente de revisión/conciliación".
+- **Academia (fix 5)**: armonizadas lecciones previas — "Aplicar un pago"→"Confirmar un pago" (con nota reportado≠confirmado), "Al aplicarlo la cartera baja" reencuadrado, "confirma cada pago aplicado"→"cuando quede conciliado", etc. `CONTENT_V=7` re-sincroniza conservando progreso (verificado `_cv=7`, sin "Aplicar un pago").
+- **index.html (fix 6)**: solo cache-bust; backend LAB (loader/init/store/storeLAB/guard) intacto.
+- Verificado: 0 errores JS; app carga; Inicio "Recaudo confirmado/cobros confirmados".
+- Cache-bust: `conciliaciones/cobros/cliente360/automatizaciones.js` y `academia-plus.js` → `?v1327`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales. (Bloques junio-julio 2026 / manifest de fuentes / banco-no-es-cobro / histórico-no-crea-cartera / documentos-solo-proponen: ya cubiertos en lecciones de Importador y "Estados honestos"; ampliación fina queda para próxima iteración.)
+- Archivos: `modules/conciliaciones.js`, `modules/cobros.js`, `modules/cliente360.js`, `modules/automatizaciones.js`, `data/academia-plus.js`, `index.html`.
+
+
+## v1.143 — 2026-07-06 · Copy honesto residual + Academia estados honestos por rol · acumulado post-v1.142
+> Sin tocar backend protegido (store/loader/init/guard/rules/tools), sin datos reales, sin funcionalidad backend. Conserva empalmes ChatGPT/Codex (integraciones "Pendiente de conexión", conciliaciones no aplica pagos, inicio "confirmado", portal reporte pendiente).
+- **P0.1/P0.3 copy residual**: `core/crmkit.js` KPI "Cobros aplicados" → **"Cobros confirmados"**; `modules/finanzas.js` nota de doble conciliación "pago aplicado ↔ póliza" → "cobro confirmado ↔ póliza" y KPI foot "aplicados a póliza" → "confirmados a póliza". (Inicio, Portal, Conciliaciones, Integraciones ya honestos desde v1.140–v1.142; verificado Inicio muestra "Recaudo confirmado"/"cobros confirmados".)
+- **P0.5 Academia por rol**: nueva lección **"Estados honestos: reportado ≠ conciliado ≠ confirmado"** en el curso *Pólizas y Cobros* (4 secciones): pago reportado por cliente = soporte/evidencia + Pendiente de revisión (no aplicado); conciliación = PROPUESTA con score, **VALIDADA no es pagada ni aplicada**, no modifica cobros/cartera/producción/comisiones ni escribe finmovs; cobro confirmado solo tras validar+conciliar; cobros/recaudos ≠ finmovs; producción/metas/comisiones sobre prima neta recaudada; no sumar GTQ+COP en crudo. `CONTENT_V=6` re-sincroniza conservando progreso (verificado `_cv=6`, curso a 6 lecciones).
+- Verificado: 0 errores JS; app carga; backend LAB intacto en index.
+- Cache-bust: `academia-plus.js?v1326`, `crmkit.js?v1326`, `finanzas.js?v1326`.
+- Archivos: `core/crmkit.js`, `modules/finanzas.js`, `data/academia-plus.js`, `index.html`.
+- **Pendiente honesto (backend ChatGPT/Codex)**: persistencia real de conciliaciones/auditLog, aplicación controlada de pagos, Storage/adjuntos reales.
+
+
+## v1.142 — 2026-07-05 · Copy honesto: estados de pago/conciliación · candidata 062855
+> Candidata `2026-07-05T062855.313`. Cambios de copy quirúrgicos, sin funcionalidad nueva. Sin tocar backend protegido, sin datos reales.
+- **Textos técnicos (P0-1)**: `integraciones-panel.js` "Sin conexión real" → "Pendiente de conexión"; `conciliaciones.js` "validación controlada en backend / mutación de cobros / bandeja del prototipo / requiere validación backend" → "validación controlada / afectación de cobros / requiere validación controlada" (sin palabra backend visible).
+- **Copy de pagos (P0-2/4)**: `inicio.js` "Recaudo aplicado"→"Recaudo confirmado", "cobros aplicados"→"cobros confirmados" (estado honesto). `portal.js`: al reportar, toast "✓ Recibimos tu reporte · pendiente de revisión/conciliación" + nota en el detalle del recibo "Recibimos tu reporte. Está pendiente de revisión/conciliación; te confirmamos cuando quede conciliado." Portal ya no sugiere que un pago reportado esté aplicado.
+- Estados honestos confirmados (sin cambio necesario): Portal reporta ≠ aplicado; Cobros/Cliente360 con Reportado/En revisión/Validada/Conciliado; Conciliaciones no aplica pagos; estado bancario propone; producción/metas/comisiones sobre prima neta recaudada; moneda por país.
+- Verificado: app carga, Inicio muestra "Recaudo confirmado"; 0 errores JS.
+- Cache-bust: `inicio.js?v1325`, `portal.js?v1325`, `conciliaciones.js?v1325`, `integraciones-panel.js?v1325` (on-demand).
+- Archivos: `modules/inicio.js`, `modules/portal.js`, `modules/conciliaciones.js`, `core/integraciones-panel.js`, `index.html`.
+
+
+## v1.141 — 2026-07-05 · Fix ruta Conciliaciones (tenant/roles) + copy residual · candidata 061837
+> Candidata `2026-07-05T061837.674`. Sin tocar backend protegido, sin datos reales.
+- **Ruta visible por tenant**: `conciliaciones` añadido a `Orbit.tenant.DEFAULT.modulosActivos` (tras `cobros`). Además `isActive()` ahora es **retrocompatible**: acepta rutas nuevas presentes en `DEFAULT.modulosActivos` aunque el tenant persistido no las tuviera (respetando `modulosDesactivados`). Verificado: `isActive('conciliaciones') === true`.
+- **Rol Admin**: `conciliaciones` añadido a `Orbit.ROLES.Admin.modulos` (ya estaba en Dirección y Finanzas). Verificado: los 3 roles con acceso.
+- **Copy residual (importa.js)**: "En el paso siguiente podés aplicar pagos por póliza." → "…podrás revisar propuestas de conciliación por póliza. No aplica pagos por sí sola."; "Se aplicarán sin duplicar." → "Se propondrán para validación sin duplicar."; "Sin pagos pendientes de aplicar." → "Sin pagos pendientes de validación."
+- Verificado: 0 errores JS; `modules/conciliaciones.js` cargado; acciones solo `Orbit.store.update('conciliaciones', …)`, no mutan cobros; `preparar_aplicacion_controlada` solo informa. Sin persistencia real (queda para backend).
+- Cache-bust: `config.js?v1324`, `importa.js?v1323`.
+- Archivos: `core/config.js`, `core/importa.js`, `index.html`.
+
+
+## v1.140 — 2026-07-05 · Bandeja de conciliaciones (UI segura) + copy residual · candidata 211525
+> Candidata activa `2026-07-04T211525.464` (base comparada `205210.456`). Academia CONTENT_V=5. Sin tocar backend protegido, sin datos reales, sin localStorage operativo.
+- **Nuevo módulo `modules/conciliaciones.js`** (ruta `conciliaciones`, NAV bajo Cobros; roles Dirección/Admin/Finanzas): bandeja que **lee solo `Orbit.store('conciliaciones')`**. Columnas del contrato: estado_bandeja, estado_revision, score/decision_score, fuente, archivo·fila, país/moneda, cliente·póliza·recibo, monto, acción propuesta, responsable, última actualización, acciones, bloqueos. Estados PROPUESTA/EN_REVISION/VALIDADA/RECHAZADA/BLOQUEADA/ANULADA/APLICADA (APLICADA solo histórico). Acciones por estado según contrato; las transiciones **solo** hacen `Orbit.store.update('conciliaciones', id, patch)` — **nunca tocan cobros** (verificado: validar deja cobros intactos). `preparar_aplicacion_controlada` abre modal informativo ("requiere validación backend · no aplica pago todavía"). **Estado vacío honesto** si no hay colección. Sin textos técnicos al cliente.
+- **P0-2 copy** `estados-cuenta.desc`: "permite aplicar pagos por póliza" → "propone pagos para validación por póliza".
+- **P0-3 copy** `planillaFlujo()`: "Pendiente de aplicar" → "Propuesta pendiente".
+- **P0-4 limitación documentada**: `conciliacionPropuesta` es señal visual/prototipo dentro de cobros; la **persistencia real** en colección/bandeja `conciliaciones` + `auditLog` y la **aplicación controlada** quedan para backend ChatGPT/Codex.
+- Verificado: 0 errores JS; bandeja navegable con estado vacío y con datos demo; transiciones no mutan cobros.
+- Cache-bust: `importa.js?v1321`(copys), `conciliaciones.js?v1322`, `config.js?v1322`.
+- Archivos: `modules/conciliaciones.js` (nuevo), `core/config.js` (NAV+ROLES+MODULE_TITLES), `core/importa.js` (copys), `index.html`, docs.
+
+
+## v1.139 — 2026-07-04 · P0 candidata 205210: conciliación no aplica directo + validar≠aplicar + planilla sin GTQ
+> Candidata activa `2026-07-04T205210.456` (base comparada `202655.833`). Academia CONTENT_V=5. Sin tocar backend protegido, sin datos reales.
+- **P0-2 (CERRADO)** `core/importa.js` `applyConciliacion`: ya **no aplica pagos directo**. Genera **referencias** (registros faltantes) y **propuestas** sobre el recibo (`conciliacionPropuesta: {estado:'REQUIERE_VALIDACION'}`); copy → "referencias creadas · propuestas para revisión · no impacta cobros hasta aprobación".
+- **P0-3 (CERRADO en Cobros+Cliente360; Portal ya correcto)** `cobros.js`: el modal de validación ahora es de **dos pasos** — "✓ Validar reporte" marca `validadoReporte:true` (estado "Validada (por aplicar)") **sin** poner Pagado; luego aparece "Aplicar pago" por separado. `cliente360.js` refleja "Validada (por aplicar)" y el botón cambia de 🔎 Validar → Aplicar pago. Verificado: validar no pone Pagado.
+- **P0-4 (CERRADO)** `planillaFlujo()`: sin fallback `'GTQ'` — si falta moneda muestra "moneda requerida" y score **REQUIERE_VALIDACION**; etiquetas backend-compatibles **MATCH_EXACTO / MATCH_PROBABLE / REQUIERE_VALIDACION / BLOQUEADO**.
+- **P0-1 (docs)** alineadas a la candidata activa (esta bitácora + CHANGELOG/PENDIENTES/SMOKE).
+- **P0-5 (moneda residual — clasificación)**: **corregidos** los agregados de UII (metaPrima v1.135, KPIs v1.124/1.126). **Válidos por diseño** (cotización/comparativo manual y por-registro nativo `registro.moneda||'GTQ'`): `crmkit` (helper fallback), `comparativo`/`cotizador` (moneda del ejercicio), `cancelaciones`/`siniestros`/`insights`/`cliente360` (fallback por-registro), `finanzas` (moneda por país del movimiento). **Escrituras** basadas en país seleccionado (no asumen): altas de cliente/póliza/movimiento. Ninguno suma monedas en crudo; la vista global normaliza con tasa declarada.
+- **Pendiente no cerrado (honesto)**: persistencia real de conciliaciones y conexión UI con la bandeja de conciliaciones del backend (score real desde `dryRunReport`); reflejar `conciliacionPropuesta` como fila visible en Cobros.
+- Cache-bust: `importa.js?v1321`, `cobros.js?v1322`, `cliente360.js?v1322`.
+- Archivos: `core/importa.js`, `modules/cobros.js`, `modules/cliente360.js`, `index.html`, docs.
+
+
+## v1.138 — 2026-07-04 · Academia: lección de conciliación (score/propuesta/validación) · CONTENT_V=5
+- Nueva lección **"Conciliación: score, propuesta y validación"** en el curso *Importador y migración*: explica que la conciliación es **propuesta no aplicada**, el **score** (MATCH_EXACTO / MATCH_PROBABLE / REQUIERE_VALIDACIÓN / BLOQUEADO) y el **flujo correcto** (importar → dry-run → score → propuesta → validación → aplicación controlada), incl. planilla de comisión (esperada vs pagada, diferencia, retención, ajuste). Alinea la formación con el comportamiento real del importador (v1.131/v1.137).
+- **`CONTENT_V=5`** re-sincroniza conservando progreso/certificado. Verificado: curso Importador con la lección (`_cv=5`); 0 errores.
+- Cache-bust: `academia-plus.js?v1317`.
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+
+## v1.137 — 2026-07-04 · P0-07-FIX Flujo visual completo de planilla de comisión
+- En el importador de **planillas-comision** (paso 2), tras la tabla de tarifas, se añade el **🧾 Flujo de conciliación de la planilla**: por fila real muestra Fila · Aseguradora · Periodo · **Esperada · Pagada · Diferencia · Retención · Ajuste · Score (✓ Coincide/≈ Probable/🔎 Requiere validación/⛔ Bloqueado) · Acción propuesta · Estado (Requiere validación / Pendiente de aplicar)**.
+- **Es propuesta**: la nota deja claro que ninguna fila impacta cobros/comisiones/liquidaciones hasta validar; el importe usa la moneda del país (no mezcla).
+- Verificado en vivo con planilla CSV: flujo con score presente, no impacta hasta validar; 0 errores.
+- Cache-bust: `importa.js?v1320`.
+- Archivos: `core/importa.js`, `index.html`.
+
+
+## v1.136 — 2026-07-04 · P0-05 punto 4: estados de validación reflejados en Cliente360
+- **Cliente360** (pestañas Cobros y Recibos) ahora usa `cobBadge(c)` con los mismos estados de validación que Cobros: **Reportado por cliente / En revisión / Pagado (por conciliar) / Conciliado / Requiere validación / Bloqueado / Vencido / Pendiente**. Un pago reportado por el cliente muestra el botón **🔎 Validar** (→ `Orbit.modules.cobros.validarReporte`), no "Aplicar pago" directo — coherente con el flujo de Cobros y el Portal.
+- Verificado en vivo: la pestaña Cobros del expediente muestra "Reportado por cliente"; 0 errores.
+- Cache-bust: `cliente360.js?v1321`.
+- Archivos: `modules/cliente360.js`, `index.html`.
+
+
+## v1.135 — 2026-07-04 · P0-02-REV Auditoría de moneda residual
+- **Auditados los `U.money(... 'GTQ')` residuales** en crmkit, importa, cancelaciones, cliente360, configuracion, finanzas, ia, insights, notificaciones, siniestros. Resultado: la gran mayoría son **por-registro nativos** (`registro.moneda || 'GTQ'` como fallback, que respeta la moneda real del dato) o **escrituras según país seleccionado** (`pais==='CO'?'COP':'GTQ'` al crear cliente/póliza/movimiento) — **correctos**, no mezclan moneda.
+- **Corregido** el único agregado de display fijo: **`metaPrima` en Equipo/Configuración** → usa la moneda del país del asesor o la del país activo (`monedaPais()`).
+- Regla confirmada: por-registro usa moneda nativa; agregados usan país activo; vista global normaliza con tasa declarada (`queries.norm`), sin suma cruda. Verificado: Equipo carga en CO sin errores.
+- Cache-bust: `configuracion.js?v1320`.
+- Archivos: `modules/configuracion.js`, `index.html`.
+
+
+## v1.134 — 2026-07-04 · P0-FIX candidata 202655: flujo de validación de pago + gastos financieros
+> Base activa `2026-07-04T202655.833`. Sin tocar backend protegido. Sin datos reales. Conserva todo lo previo (Academia CONTENT_V=4, moneda por país, desglose, estados, score, planillas).
+- **P0-05-FIX** Cobros: nueva acción **`validarReporte()`** separada de `aplicarPago()`. Un pago **reportado por el cliente** ya no aplica directo — el botón "Validar" abre un modal con **◷ Marcar en revisión / ✕ Rechazar reporte / ✓ Validar y aplicar pago**. Solo tras validación explícita se abre el modal de aplicar. Flujo: Reportado por cliente → (En revisión) → Validar/Rechazar → Aplicado/Conciliado. En el detalle del recibo, si está reportado el botón es "🔎 Validar pago reportado". Verificado: modal de validación con los 3 caminos, sin decir "aplicado" hasta confirmar.
+- **P0-03-FIX** Pólizas: el desglose usaba `p.gastosFinancieros` (campo inexistente) → corregido a **`p.gastosFinan`** (el nombre real del modelo de cobros/primas). Verificado: drawer abre y suma gastos correctamente.
+- Cache-bust: `cobros.js?v1320`, `polizas.js?v1318`.
+- **Pendientes** (próxima): reflejar mismos estados de validación en Cliente360 (P0-05 punto 4), score de conciliación también en Importar/Cobros/bandeja (P0-06-FIX), flujo visual completo de planilla de comisión (P0-07-FIX), moneda residual (P0-02-REV: crmkit/importa/cancelaciones/cliente360/config/finanzas/ia/insights/notificaciones/siniestros), y lección de conciliación + productos en Academia.
+- Archivos: `modules/cobros.js`, `modules/polizas.js`, `index.html`.
+
+
+## v1.133 — 2026-07-04 · P0-07 Planillas de comisión: columnas retención/ajuste/periodo (cierre de P0)
+- La conciliación de comisiones ahora muestra por fila: **Póliza · Periodo · Base neta · Esperado · Registrado · Retención · Ajuste · Desviación · % · Conciliación (score)**. `conciliarStatement` incluye `periodo`, `retencion`, `ajuste`, `aseguradoraId`, `asesorId` en cada fila (desde la planilla importada o el registro de comisión).
+- Verificado: los 10 encabezados presentes en la tabla; 0 errores.
+- **Cierre**: con esto quedan cerrados **todos los P0** del paquete 193658 (P0-01→P0-08). Junio/julio 2026 se tratan como caso de migración (no lógica productiva fija). Pendientes menores/P1: reflejar el score del backend real cuando se empalme, vista de conciliación por aseguradora/periodo, y profundizar producto-por-ramo en Academia.
+- Cache-bust: `comisiones-eng.js?v1317`, `comisiones.js?v1318`.
+- Archivos: `core/comisiones-eng.js`, `modules/comisiones.js`, `index.html`.
+
+
+## v1.132 — 2026-07-04 · P0-08 Textos técnicos por rol (verificación) + estado de P0
+- **P0-08 verificado**: los módulos con lenguaje técnico interno (**Automatizaciones** —Make/webhook/payload—, **Configuración** —conexiones/APIs—, **panel de integraciones**) están gated por rol en `Orbit.ROLES`: solo **Dirección** y **Admin** los tienen en `modulos`. **Comercial, Asesor, Operativo, Marketing y Asistente NO los ven** (ni en NAV ni por ruta, vía `session.canSee`). Los textos cliente-facing (login, correo, integraciones-panel) ya se neutralizaron en v1.115–v1.117 (sin backend/LAB/demo/mock/credenciales). Conclusión: los términos técnicos quedan restringidos a roles internos, como pide el contrato. Sin cambios de código necesarios.
+- **Estado de los P0 del paquete 193658**: P0-01 docs unificadas ✓ (v1.126), P0-02 moneda por país ✓ (v1.124/v1.126), P0-03 desglose de prima en Pólizas ✓ (v1.128), P0-04 estados históricos ✓ (v1.129), P0-05 estados de validación en Cobros ✓ (v1.130), P0-06 score de conciliación ✓ (v1.131), P0-08 textos por rol ✓ (v1.132). **Pendiente P0-07**: columnas de retención/ajuste/periodo en planillas de comisión (la conciliación ya muestra esperada/pagada/diferencia + score).
+- Archivos: `docs/BITACORA-CAMBIOS.md` (documentación; sin cambios de código).
+
+
+## v1.131 — 2026-07-04 · P0-06 Score de conciliación visible en Comisiones
+- La conciliación de comisiones (esperada vs registrada/pagada + desviación) ahora muestra una columna **"Conciliación"** con el **score validable**: `scoreConciliacion()` mapea la desviación relativa a **✓ Coincide (MATCH_EXACTO)**, **≈ Probable (MATCH_PROBABLE)**, **🔎 Requiere validación** (incl. esperado sin pago registrado) y **⛔ Bloqueado** (desviación > 25%). El badge aclara que es **propuesta que requiere validación antes de aplicar** — no aplica pagos automáticamente.
+- Verificado: columna Conciliación presente; carga sin errores. (Las badges se muestran por fila cuando hay desviación; si todo cuadra, "✅ Todo cuadra".)
+- Cache-bust: `comisiones.js?v1317`.
+- Archivos: `modules/comisiones.js`, `index.html`.
+
+
+## v1.130 — 2026-07-04 · P0-05 Estados de validación en Cobros (reportado ≠ aplicado)
+- **Cobros** ahora distingue el estado de validación: helper `estadoValidacion()` + `badgeValidacion()` muestran **Reportado por cliente / En revisión / Pagado (por conciliar) / Conciliado / Requiere validación / Bloqueado / Vencido / Pendiente**. Un pago **reportado por el cliente** NO se muestra como aplicado: aparece como "Reportado por cliente" con acción **"Validar"** (en vez de "Pagar"), y la ficha muestra el soporte adjunto.
+- **Filtro de estado** ampliado con los estados de validación; `matchTxt()` centraliza el match de texto/asesor.
+- **Portal** ya era correcto (reporta con "el equipo lo validará", badge Reportado, no dice aplicado) — se conserva.
+- Verificado en vivo: cobro reportado muestra "Reportado por cliente" + botón "Validar"; filtro con los 4 estados nuevos; 0 errores.
+- Cache-bust: `cobros.js?v1319`.
+- Archivos: `modules/cobros.js`, `index.html`.
+
+
+## v1.129 — 2026-07-04 · P0-04 Estados históricos completos en Pólizas
+- **Filtro de estado** ahora incluye Vigente, Por renovar, Vencida, Cancelada, **Anulada, Rechazada, Requiere validación**.
+- **KPI** "Canceladas" → **"Histórico / sin cartera"** (agrupa Cancelada/Vencida/Anulada/Rechazada).
+- **Regla cartera/histórico reforzada en `queries.js`**: `renovacionesProximas` ahora solo considera Vigente/Por renovar (antes excluía solo Cancelada), así Anulada/Rechazada/Vencida no entran a renovación ni cartera. `primaVigenteGlobal`/`leaderboard` ya filtraban correctamente.
+- Verificado en vivo: opciones Anulada/Rechazada/Requiere validación en el filtro; KPI histórico presente; 0 errores.
+- Cache-bust: `polizas.js?v1317`, `queries.js?v1316`.
+- Archivos: `modules/polizas.js`, `core/queries.js`, `index.html`.
+
+
+## v1.128 — 2026-07-04 · P0-03 Desglose de prima visible en Pólizas
+- **Botón "Desglose"** en cada fila de Pólizas → drawer autocontenido (`verDesglose`) con: **prima neta / gastos (emisión+financieros+otros) / IVA / prima total** en la moneda de la póliza; frecuencia, forma de pago, vigencia, suma asegurada; **recibos generados** (cuota, monto, vence, estado) o aviso de histórico sin cartera; **fuente de importación** (sourceRef/hoja/fila o carga manual); y **estado de validación** (Validada / ⚠ Requiere validación) + si genera cartera. Botón para abrir en Cliente 360.
+- Verificado en vivo: el drawer muestra las 7 secciones requeridas; 0 errores.
+- Cache-bust: `polizas.js?v1316`.
+- Archivos: `modules/polizas.js`, `index.html`.
+
+
+## v1.127 — 2026-07-04 · Academia: "Paso a paso" completado en cursos restantes (CONTENT_V=4)
+- Se añadió lección **"Paso a paso"** (cómo se hace, botones, flujo) a 8 cursos más: Insights, Técnico avanzado, Siniestros, Venta consultiva, Liderazgo, Cumplimiento, Servicio/CX y Digital/IA. Con esto **todos los cursos de módulo, técnico, comercial, liderazgo, cumplimiento, servicio y digital** tienen su guía operativa concreta (además de los 5 de v1.125).
+- **`CONTENT_V=4`**: re-sincroniza el contenido conservando progreso/certificado del usuario (verificado `_cv=4`).
+- Verificado en vivo: los 8 cursos muestran "Paso a paso"; 0 errores.
+- Pendiente menor: profundizar producto-por-ramo (Vida/GM/Hogar/Fianzas/RC/Transporte) con paso a paso si se requiere; agregar lección de score de conciliación cuando se integre P0-06.
+- Cache-bust: `academia-plus.js?v1316`.
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+
+## v1.126 — 2026-07-04 · P0-02 moneda por país completada en módulos restantes · candidata 2026-07-04T193658.630
+> Base activa: `2026-07-04T193658.630`. Sin tocar backend protegido. Sin datos reales. Conserva Academia v1.125 (paso a paso + `CONTENT_V`), moneda v1.124, importador (fuentes separadas, país/moneda sin default, planillas, documentos como parches, banco→conciliación) e integraciones/marketing.
+- **P0-02 completada**: los KPIs/agregados de display con `GTQ` fijo restantes → `Orbit.q.monedaPais()` en **leads** (prima estimada, pronóstico ponderado, subtotal de columna), **renovaciones** (prima en juego), **siniestros** (indemnización pagada) y **portal** (monto reclamado usa moneda del cliente). Los importes **por-registro** (siniestros montoReclamado en tabla/ficha, renovaciones `cur`) ya usaban la moneda nativa del registro con fallback — se conservan (correcto). Verificado: CO muestra `$` en Leads, GT muestra `Q` en Siniestros; vista global normaliza con tasa declarada (queries.js), sin suma cruda.
+- Versión unificada: candidata activa `2026-07-04T193658.630` · base frontend v1.117 · importador/documentos/comisiones v1.118–v1.123 · moneda por país v1.124/v1.126 · Academia paso a paso + `CONTENT_V=3` v1.125.
+- **Pendientes P0** (próxima sesión): P0-03 desglose de prima visible en Pólizas; P0-04 estados Anulada/Rechazada en filtros; P0-05 estados de validación (reportado/en revisión/conciliado/requiere validación/bloqueado) en Cobros/Portal/Cliente360; P0-06 score de conciliación (MATCH_EXACTO/PROBABLE/REQUIERE_VALIDACION/BLOQUEADO); P0-07 planillas comisión esperada/pagada/diferencia visual; P0-08 textos técnicos por rol; profundizar "Paso a paso" en cursos restantes de Academia.
+- Cache-bust: `leads.js`, `renovaciones.js`, `siniestros.js`, `portal.js` → `?v1315`.
+- Archivos: `modules/{leads,renovaciones,siniestros,portal}.js`, `index.html`.
+
+
+## v1.125 — 2026-07-04 · Academia: lecciones "Paso a paso" (cómo se hace, botones, flujos) + re-sync de contenido
+- **Profundización**: se agregó una lección **"Paso a paso"** con instrucciones concretas (módulo, botones, flujo, estados) a 5 cursos de módulo: Orbit Clientes (crear/buscar/editar/adjuntar-propuesta), Pólizas y Cobros (abrir póliza con desglose, aplicar pago vs reportado, aging, conciliar), Ops+Leads (lead→cotiza→emitir→crea cliente, "Ver como"), Finanzas (registrar/clasificar, estados de cierre, liquidar comisión esperada vs pagada), Importador (elegir fuente, banner de alcance, dry-run, reporte, estados de validación).
+- **Mecanismo `CONTENT_V`** en `data/academia-plus.js`: `apply()` ahora **actualiza** el contenido de los cursos PLUS cuando cambia la versión de contenido, **conservando `progreso` y `certificado`** del usuario (antes solo insertaba si no existían, por lo que las mejoras no se propagaban a un store ya poblado). Base para seguir profundizando sin duplicar ni perder progreso.
+- Verificado en vivo: Clientes pasa a 5 lecciones con "Paso a paso"; Pólizas idem; `_cv=3`; 0 errores.
+- Cache-bust: `academia-plus.js?v1314`.
+- **Pendiente**: profundizar con "Paso a paso" el resto (técnico del sector, comercial, liderazgo, producto por ramo, servicio, digital/IA).
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+
+## v1.124 — 2026-07-04 · P0-02 Moneda por país en KPIs/totales (fin de GTQ fijo) · candidata 2026-07-04T152321.882
+> Sin tocar backend protegido (`data/store.js`, `store-firestore-lab.local.js`, `core/backend-lab-*`, `firestore.rules`, `tools/orbit360-*`). Sin datos reales. Conserva avances de la candidata (importador con fuentes separadas, país/moneda sin default, trazabilidad, conciliación bancaria, parches de documentos, planillas de comisión, integraciones/marketing, Academia v1.118–v1.123).
+- **P0-02 Moneda fija corregida**: 57 literales de display `, 'GTQ')` → `, Orbit.q.monedaPais())` en `polizas, cobros, comisiones, finanzas, insights, inicio, cancelaciones, equipo, cliente360, reportes`. `monedaPais()` devuelve GTQ (GT), COP (CO) según país activo; en vista global mixta se mantiene la normalización declarada de `queries.js` (no suma cruda). Solo cambió **display**, no escrituras (país/moneda no se asumen al escribir).
+- Verificado en vivo: país CO muestra `$` (COP), país GT muestra `Q` (GTQ), vista global normaliza; app carga sin errores.
+- **Versión unificada**: candidata activa `2026-07-04T152321.882` · base frontend congelada v1.117 · Academia acumulada v1.118–v1.123 · esta corrección v1.124.
+- **Pendientes P0 abiertos** (documentados, próxima sesión): P0-03 desglose de prima en Pólizas (neta/gastos/IVA/total/frecuencia/forma pago/recibos/fuente/validación), P0-04 estados históricos completos (Anulada/Rechazada), P0-05 estados de validación en Cobros/Portal/Cliente360 ("recibido para validación" ≠ "pagado"), P0-06 conciliación como propuesta con score, P0-07 planillas comisión esperada/pagada/diferencia, P0-08 textos técnicos por rol, y profundización de contenido de Academia.
+- Archivos: `modules/{polizas,cobros,comisiones,finanzas,insights,inicio,cancelaciones,equipo,cliente360,reportes}.js`, `index.html`.
+
+
+## v1.123 — 2026-07-04 · Fix legibilidad Academia (título de lección + formato de secciones)
+- **Título de lección ilegible corregido**: en el visor de curso, el ítem activo (fondo rojo claro) mostraba el título en blanco → ahora `color:var(--ink)` (oscuro, legible) en `.acv-lec-t`/`.acv-lec.active`. `styles/infra.css`.
+- **Secciones sin formato corregidas**: el cuerpo de sección (`s.d`) se mostraba con `**` literales y sin saltos → nuevo helper `fmtSec()` que renderiza **negritas** (`**texto**`→`<b>`) y saltos de línea. `modules/academia.js`. Verificado: título activo oscuro, negritas renderizan, 0 asteriscos literales.
+- Cache-bust: `infra.css` y `academia.js` → `?v1311`.
+- **Pendiente**: revisar "Manuales" (manual-maestro) por posible texto blanco ilegible reportado por la usuaria — a verificar en próxima sesión.
+- Archivos: `modules/academia.js`, `styles/infra.css`, `index.html`.
+
+
+## v1.122 — 2026-07-04 · Academia: ruta de inducción IT / Superadmin · total 40 cursos
+> Solo agrega contenido de cursos (data layer). Sin tocar backend protegido, sin Firestore, sin datos reales. Editable con el editor existente.
+- **⚙️ Inducción IT / Superadmin — configurar la plataforma** (destinatarios `Dirección` → visible para Dirección/Admin/superadmin en la Ruta por rol; verificado). 6 lecciones que cubren la **puesta en marcha completa** en orden: (1) Configuración — marca/paleta/white-label, países/monedas/glosario, catálogo financiero, planes y módulos por tenant/usuario; (2) Usuarios y roles (multi-rol, restricción por usuario, asesor no ve Ops); (3) Carga de base de datos inicial + Importador inteligente (fuentes separadas, dry-run, trazabilidad, estados honestos, no mezclar país/moneda); (4) Correos (permisos mínimos, pendiente de conexión), Integraciones (panel/eventos por tenant) y Automatizaciones + **addons por plan** (contratar y configurar); (5) Academia (crear cursos con IA/desde documento, asignar a rol, rutas y certificado); (6) mantenimiento trimestral. Con evaluación de 4 preguntas.
+- Refuerza los principios del producto: todo autoadministrable por configuración (nada hardcodeado), integraciones/addons honestos (pendiente de conexión, nunca simular activo), país/moneda sin mezclar, datos ficticios en pruebas.
+- Verificado en vivo: curso presente (total 40); Dirección/superadmin lo ve en su ruta; 0 errores.
+- Cache-bust: `academia-plus.js?v1311`.
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+
+## v1.121 — 2026-07-04 · Academia: cierre de cobertura de módulos + habilidades blandas + inducción Marketing · total 39 cursos
+> Solo agrega contenido de cursos (data layer). Sin tocar backend protegido, sin Firestore, sin datos reales. Todo editable con el editor existente.
+- **Módulos que faltaban (autocapacitación)**: "Aseguradoras, Cotizador y Comparativo" (directorio/ficha, cotización multicompañía, comparativo consultivo) y "Comunicación con el Cliente: Correo, WhatsApp y Plantillas" (bandeja vinculada, plantillas, notificaciones del portal, integraciones honestas).
+- **Habilidades blandas**: "Productividad, Agenda y Gestión del Tiempo" (módulo Cronograma + priorización por impacto) y "Negociación Efectiva para Intermediarios" (preparación, crear valor, precio con criterio, acuerdos que duran).
+- **🎯 Inducción del Rol Marketing — ruta completa** (destinatarios `Marketing`): bienvenida + ruta guiada (empresa/marca → Marketing Digital → Digital e IA → Comunicación → Cumplimiento), calendario de contenidos, integraciones honestas, medición por leads y colaboración con Comercial. **Visible para el rol Marketing y para Dirección/Admin (superadmin)** en la Ruta por rol — verificado en ambos.
+- Con esto la Academia cubre **todos los módulos** de la plataforma + técnico del sector + producto por ramo + comercial + liderazgo + cumplimiento + servicio + digital/IA + habilidades blandas + rutas de inducción por rol (asesor, operativo, marketing, cliente). Total: 39 cursos, todos autoeditables (IA, desde documento, complementar/eliminar/reordenar) con Ruta por rol y certificado.
+- Verificado en vivo: 5 cursos nuevos presentes; ruta de Marketing y de Dirección incluyen la inducción; 0 errores.
+- Cache-bust: `academia-plus.js?v1310`.
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+
+## v1.120 — 2026-07-04 · Rutas de inducción guiadas (asesor, administrativo/operativo, cliente) · total 34 cursos
+> Solo agrega contenido de cursos (data layer). Sin tocar backend protegido, sin Firestore, sin datos reales. Todo editable con el editor existente.
+- **🚀 Inducción del Asesor Nuevo — ruta completa** (destinatarios Asesor): bienvenida + ruta de aprendizaje explícita en 3 tramos (empresa → comercial → plataforma) con **ritmo de 30 días** y lista ordenada de cursos a tomar; incluye empresa/valores, ética/marca, lo comercial en Leads y cierre con Cumplimiento. Verificado: aparece en la **Ruta por rol** del Asesor.
+- **🗂️ Inducción Administrativa y Operativa — ruta completa** (equipo): ruta por módulos en orden (Clientes → Pólizas/Cobros → Ops/Leads → Importador → Renovaciones → Finanzas → Cumplimiento), qué hacer en cada uno, sincronía en vivo y valores agregados.
+- **🎉 Bienvenido a tu Portal — guía y seguros básicos** (destinatarios clientes, cat Producto → visible en el **portal → Aprende**): bienvenida, recorrido del portal en 4 pasos, y conceptos básicos por ramo (prima/cobertura/deducible, Auto, Vida, GM, Hogar/RC) con evaluación. Verificado: se muestra en el portal del cliente.
+- Las rutas se apoyan en la **Ruta por rol** existente (ordena por categoría, Inducción primero) y el **certificado imprimible** al completar. Todo editable: regenerar/complementar con IA, cargar desde documento, eliminar/reordenar.
+- Verificado en vivo: 3 cursos presentes (total 34); Asesor ve su inducción en la ruta; portal muestra la bienvenida; 0 errores.
+- Cache-bust: `academia-plus.js?v1309`.
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+
+## v1.119 — 2026-07-04 · Academia PLUS: cursos por producto/ramo + guía del editor (21 cursos, total 31)
+> Solo agrega contenido de cursos (data layer). Sin tocar backend protegido, sin Firestore, sin datos reales. Todo **editable** con el editor existente.
+- **Por producto/ramo (6 cursos, categoría Producto)**: Vida e Invalidez (suma asegurada por necesidad, declaración de salud), Gastos Médicos/Salud (deducible/coaseguro/red/tope, preexistencias), Hogar y Patrimonio (reposición vs valor real, multiventa), Fianzas y Cumplimiento (3 partes, recuperación del fiado, tipos, afianzamiento), Responsabilidad Civil (RC general/profesional/D&O), Transporte y Carga (viaje vs flotante, Incoterms). Cada uno con lecciones por secciones + evaluación.
+- **Guía del editor (1 curso)**: "Cómo crear y editar cursos en la Academia" — documenta para administradores los 4 tipos de lección (video/lectura/quiz/recurso), **regenerar/complementar con IA**, **crear desde documento** (PDF/Word/imagen/texto → extracción y quiz), eliminar/reordenar, y cómo las **rutas por rol** + **certificado** funcionan.
+- **Editabilidad confirmada**: los cursos inyectados son cursos normales del store, por lo que TODO el editor aplica — ✏ Editar lección, ✨/🧠 IA (redactar/expandir/replantear quiz), 📎 cargar desde documento/recurso, agregar/eliminar/reordenar lecciones, marcar certificado. Verificado: acciones "+ Curso" y "Crear con IA" presentes; cursos nuevos con quiz editable.
+- Verificado en vivo: 21 cursos PLUS (total 31), los 7 nuevos presentes; 0 errores de consola.
+- Cache-bust: `academia-plus.js?v1308`.
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+
+## v1.118 — 2026-07-04 · Academia PLUS: autocapacitación por módulo + técnico/liderazgo/comercial/servicio en profundidad
+> Solo agrega contenido de cursos (data layer). Sin tocar backend protegido, sin Firestore, sin datos reales.
+- **Nuevo `data/academia-plus.js`** (cargado tras `seed.js`): inyecta **14 cursos** nuevos de forma **idempotente** (clave = id; no duplica; sobrevive a reseed vía `Orbit.SEED.cursos` + reintento hasta que el store esté listo). Total de cursos: 24.
+- **Autocapacitación por módulo** (7 cursos, categoría Producto/Técnico/Comercial/Finanzas): Orbit Clientes (Expediente 360 + Calidad de datos), Pólizas/Cobros/Cartera, Renovaciones/Cancelaciones/Retención, Ops+Leads (ciclo comercial), Finanzas/Comisiones/Conciliación operativo, Importador y migración, Insights/Reportes/IA. Cada uno con 2-3 lecciones de lectura por secciones + quiz con respuestas correctas.
+- **Técnico del sector (profundo)**: "Técnico de Seguros Avanzado" (suscripción/underwriting, tarificación —prima pura, frecuencia×severidad, ley de grandes números—, reaseguro proporcional/no proporcional) y "Gestión Profesional de Siniestros".
+- **Comercial avanzado**: "Venta Consultiva Avanzada y Manejo de Objeciones" (diagnóstico, valor, objeciones, multiventa, cierre).
+- **Liderazgo**: "Liderazgo de Equipos Comerciales" (metas sobre neta recaudada, cadencia de gestión, coaching, cultura, retención) — destinatarios Dirección.
+- **Otros sugeridos**: "Cumplimiento, PLD/LAFT y Protección de Datos" (KYC/beneficiario final, señales de alerta, Habeas Data), "Servicio y Experiencia del Cliente (CX)" (momentos de la verdad, NPS, recuperación) y "Habilidades Digitales e IA para Intermediarios" (automatización, integraciones honestas, IA responsable).
+- Todo el contenido respeta reglas del producto (prima **neta recaudada**, país/moneda sin mezclar, integraciones "pendiente de conexión", documentos que proponen y no imponen). Cada curso trae recurso(s) y evaluación.
+- Verificado en vivo: 14 cursos presentes, Academia renderiza, categoría Liderazgo visible, lecciones + quiz operativos; 0 errores de consola. La **Ruta por rol** ordena estos cursos por categoría y el **certificado imprimible** aplica al completarlos.
+- Cache-bust: nuevo `academia-plus.js?v1307`.
+- Archivos: `data/academia-plus.js` (nuevo), `index.html`.
+
+
+## v1.117 (congelada) — 2026-07-04 · Base frontend aprobada · cierre de documentación
+> Candidata **congelada** como base frontend v1.117. Las 6 correcciones 134907 pasaron auditoría. **Sin cambios funcionales nuevos** en esta entrega — solo documentación.
+- **Confirmado por auditoría**: clientes mapea moneda explícita; `estados-banco`→`conciliacionBanco`; documentos solo proponen cambios; UI sin "diff"; integraciones mapea estados técnicos a lenguaje usuario; smoke aclarado como visual/prototipo local; `Listado producción 2025-2026` ignorado.
+- **Backend protegido INTACTO** (no tocado en ninguna versión de Claude): `data/store.js`, `data/store-firestore-lab.local.js`, `core/backend-lab-loader.js`, `core/backend-lab-init.js`, `core/backend-lab-security-guard.js`, `firestore.rules`, `tools/orbit360-*`. Sin Firestore, sin datos reales, sin merge/deploy.
+- Entrega: ZIP completo de `orbit360-platform/` sin cambios funcionales nuevos.
+
+
+## v1.117 — 2026-07-04 · Correcciones puntuales 134907 (moneda clientes, banco→conciliación, copy, estados)
+> Sin tocar backend protegido (`data/store.js`, `data/store-firestore-lab.local.js`, `core/backend-lab-*`, `firestore.rules`, `tools/orbit360-*`), sin Firestore, sin datos reales, sin merge/deploy.
+- **P0-134907-01** `IMPORT_MAP.clientes.fields` ahora mapea `moneda: ['moneda','divisa','currency']`. Con moneda explícita (GTQ/COP/USD) se respeta; sin ella queda `''` + `requiere_validacion`; `monedaSugerida` no sustituye. Verificado: cliente CO con `moneda=COP` → se acepta sin validación.
+- **P0-134907-02** `estados-banco` ya **no escribe `finmovs`**: colección `conciliacionBanco` (flag `conciliacionBanco:true`), `estado:'pendiente_conciliacion'`, `requiereValidacion:true`; SCOPE `crea:['conciliacionBanco']`. Se sacó `estados-banco` del enrutado `applyConciliacion` (que creaba finmovs) → ahora va por `applyImport`. Copy: "Se cargará para conciliación bancaria. No crea cobros ni movimientos financieros hasta que se valide." Verificado: 0 finmovs creados; registro en `conciliacionBanco`.
+- **P1-134907-03** `KINDS.documentos.desc`: "Carga documentos del expediente. El sistema extrae posibles datos y propone cambios para revisión/aprobación; no modifica clientes ni pólizas directamente."
+- **P1-134907-04** `SCOPE.documentos.label` sin "diff" → "Propuestas de actualización del expediente (pendientes de aprobación)".
+- **P1-134907-05** `core/integraciones-panel.js`: estados técnicos mapeados a etiqueta legible (`pendiente_backend`→"Pendiente de conexión", `pendiente_configuracion`→"Pendiente de configuración", `sin_estado`→"Sin estado", botón `Simulando…`→"Probando…") en badges y filtro; el valor interno se conserva.
+- **P1-134907-06** `docs/REPORTE-SMOKE.md`: aclarado que es smoke visual/prototipo local (no backend/Firestore/LAB/datos reales).
+- **Regla**: `Listado producción 2025-2026` sigue ignorada (excluida por hojas soporte).
+- Cache-bust: `importa.js`→`?v1307`. (`integraciones-panel.js` se carga on-demand.)
+
+
+## v1.116 — 2026-07-04 · Paquete completo A&S: P0 finales de moneda/documentos + regla "Listado producción"
+> Sin tocar backend protegido (`data/store.js`, loaders/guards, `firestore.rules`, tools `orbit360-*`), sin `Orbit.store`, sin Firestore, sin deploy, sin datos reales. A&S solo desde tenant demo.
+- **P0-01 (moneda de hoja)** `core/importa.js`: el parseo Excel ya NO infiere moneda por país. `monedaHoja = detectaMoneda(sn)` (explícita) y `_monedaSugeridaHoja = monedaDe(paisHoja)` aparte (sugerencia, no se escribe). Trazabilidad extendida con `_monedaSugeridaHoja`.
+- **P0-02 (clientes sin default GTQ)** `IMPORT_MAP.clientes.build`: eliminado `rec.moneda = pais==='CO'?'COP':'GTQ'`. Ahora: país normalizado, `monedaSugerida` aparte, moneda solo explícita; sin país o moneda → `requiere_validacion`. Verificado: cliente sin país → `pais:''`, `moneda:''`, `requiereValidacion:true` (no GTQ).
+- **P0-03 (SCOPE.documentos)** cambiado de `crea:['clientes']` a `crea:['parchesPendientes']` (label "Propuestas de cambio al expediente (diff)"; bloquea clientes/pólizas/cobros directos). Coherente con el flujo docPatch de v1.115.
+- **Regla de alcance confirmada**: la hoja **`Listado producción 2025-2026` se ignora** — no es fuente de pólizas ni financiero histórico, no genera manifest/preview/cartera. Ya queda cubierta por la exclusión de hojas soporte (`HOJA_SOPORTE` matchea "produccion/producción"); verificado que el nombre se excluye. La fuente real de pólizas la entregará Paula como archivo separado.
+- **P1-04 (texto técnico)** `core/integraciones-panel.js`: columna `LAB` → `Prueba` (solo visible en modo prueba interno). Junto con lo ya suavizado en v1.115 (Pendiente de conexión / Estado de integraciones / Probar / sin cuenta conectada).
+- Cache-bust: `importa.js` → `?v1306`.
+- **Backend protegido NO tocado** (confirmado): `data/store.js`, `data/store-firestore-lab.local.js`, `core/backend-lab-*`, `firestore.rules`, `tools/orbit360-*`.
+
+
+## v1.115 — 2026-07-04 · Reauditoría 072304: trazabilidad real, moneda no autocompletada, comisiones, documentos, textos
+> Sin tocar backend/LAB, `data/store.js` backend, Firestore, ni deploy. Sin datos reales.
+- **P0-01 Trazabilidad a `rec`** (`core/importa.js`): helper `copyRowMeta(cells, rec)` llamado en `applyImport`, `dryRun`, `conciliarRows` y el flujo scoped → `_origenHoja/_paisHoja/_monedaHoja/_periodoHoja/_bloqueOrigen/_numeroFila` llegan al registro final (`finmovs`). Verificado: `_numeroFila` presente en el finmov creado.
+- **P0-02 Moneda no autocompletada**: `finmovShape` y pólizas separan `moneda` (solo **explícita** de fila/hoja) de `monedaSugerida` (`monedaDe(pais)`, no se escribe). País reconocido pero sin moneda explícita → `requiere_validacion`. Verificado: GT sin moneda → `requiere_validacion`, `monedaSugerida:GTQ`.
+- **P0-03 Contrato real de planillas de comisión**: campos aseguradora/póliza/recibo/asesor/ramo/producto/**primaNeta**/**comEsperada**/**comPagada**/pais/moneda/periodo; conciliación esperada vs pagada (`difComision`); falta país/moneda/periodo/aseguradora → `requiere_validacion`. Tarifas **solo** se aplican con **diff confirmado** (checkbox "Aplicar estos % al tarifario" + columna % actual vs nuevo con Δ).
+- **P0-04 Documentos → parches con diff**: `documentos` escribe a `parchesPendientes` (nunca a `clientes` directo). Con expediente abierto genera un parche con el **diff** (campo: actual→propuesto) pendiente de confirmación; sin expediente, no hace nada.
+- **P1-05 Fechas fijas**: cierre financiero por defecto **relativo** a la fecha viva (2 meses atrás) en `modules/finanzas.js`; `core/config.js` `cierreFinanciero:{}`; vigencia de ejemplo en `core/ia.js` relativa a hoy. (Seeds de `core/integraciones.js` son tenant demo aislado — permitido.)
+- **P1-06 Textos técnicos**: "Pendiente de backend"→"Pendiente de conexión" (configuración ×5); "backend del tenant" removido; panel "Diagnóstico…"→"Estado de integraciones", "🧪 Simular"→"▶ Probar"; marketing "backend seguro"→"conexión"; correo "modo demo"→"sin cuenta conectada".
+- **P1-07 Financiero histórico**: conceptos ingreso que parecen cobro/recaudo de cliente (pago cliente/recibo/póliza/prima/cuota/recaudo/abono) → `requiere_validacion` (no entran a caja). Verificado: "Pago cliente REC-99" bloqueado.
+- Cache-bust: `importa.js`→`?v1305`, `config.js`/`ia.js`→`?v1305`, `finanzas.js`/`configuracion.js`/`correo.js`/`marketing.js`→`?v1305`.
+
+
+## v1.114 — 2026-07-04 · Candidato corregido · auditoría ampliada A&S (P0/P1/P2)
+> No se tocó backend/LAB, `data/store.js` backend, Firestore, ni se hizo deploy. Sin datos reales. A&S solo desde config/tenant demo. Detalle de estado P0/P1 en `docs/BITACORA-ERRORES.md`; smoke en `docs/REPORTE-SMOKE.md`.
+
+**Importador (`core/importa.js`, `modules/importar.js`)**
+- **P0-02** Excel multihoja con trazabilidad por fila: `_origenHoja/_paisHoja/_monedaHoja/_periodoHoja/_bloqueOrigen/_numeroFila`. Cada hoja infiere país/moneda/periodo de su nombre (sin asumir GT). Resumen de hojas procesadas/excluidas en el paso 2 y en el reporte CSV.
+- **P1-02** Exclusión de **hojas soporte** por patrón de nombre (dashboard, resumen, presupuesto, análisis, producción, metas…) antes de mapear, con conteo y motivo.
+- **P0-03** `normPais()` devuelve `''` cuando no reconoce país (antes: GT). `finmovShape` usa país de fila→hoja; sin país/moneda confiables marca `estado:'requiere_validacion'` y `requiereValidacion:true`. **No se asume GTQ.**
+- **P0-04** Pólizas: nuevos campos `pais`/`moneda`; estado sin evidencia → `Requiere validación` (no `Vigente`). `afterInsert` genera recibos/cartera **solo** si Vigente/Por renovar **y** país+moneda+forma de pago confiables **y** sin `requiereValidacion`.
+- **P1-04** Pólizas separan `primaNeta`/`gastos`/`iva`/`primaTotal`; si no se puede determinar la neta → `requiere_validacion` (producción/comisiones deben usar neta recaudada).
+- **P0-05** `tarifasDetect()` lee **filas reales** (aseguradora/ramo/producto/%/base) del archivo; sin aseguradora reconocida y % válido, `tarifasConfiables=false` → **no** actualiza tarifas (referencia). Nuevo contrato `IMPORT_MAP['planillas-comision']` → colección `comisiones`.
+- **P0-06** `docs-aseguradora` forzado a **modo documental** (solo almacena; SCOPE `crea:[]`). Todo tipo visible tiene contrato o queda documental/bloqueado.
+- **P1-01** Ejemplo y descripción de `movimientos-finanzas` aclara que pagos de clientes NO van a caja (van a cobros/conciliación).
+- **P1-03** `documentos` sin expediente abierto (scope) **no crea ni modifica clientes**: avisa y requiere abrir el expediente.
+
+**UI comercializable**
+- **P1-05** (`index.html`, `core/auth.js`) Login sin credenciales demo (`admin@demo.com`/`demo123`) → placeholders. (`core/integraciones-panel.js`) textos "demo/LAB" suavizados a lenguaje de usuario (sin tocar lógica ni contratos).
+- **P1-06** Fechas quemadas operativas → fecha viva: `modules/portal.js`, `modules/cliente360.js` (×2), `core/correo.js` (×2).
+- **P1-07** (`core/theme.js`) "White-label para Alianzas" → "Se aplica a toda la plataforma y al login". A&S solo desde tenant demo (slot white-label).
+- **P2-01** (`core/pwa.js`) 3 estados: instalada (`✓ App instalada`, verde, auto-oculta), iOS (guía Compartir→Agregar a inicio), otros navegadores (`⬇ Instalar como app`).
+
+**Verificado en vivo**: financiero-histórico excluye `TOTALES`; finmov sin país → `requiere_validacion` sin GT/GTQ; documentos = documental y no crea clientes; app carga sin errores de consola.
+- Cache-bust: `importa.js`→`?v1304`, `config.js`/`finanzas.js`→`?v1300`, `theme.js`/`auth.js`/`correo.js`/`pwa.js`/`cliente360.js`/`portal.js`→`?v1304`, `configuracion.js`→`?v1301`.
+
+
+## v1.113 — 2026-07-03 · Cierre opcionales: reporte de exclusiones descargable + cierre/catálogo por país
+- **Reporte de importación descargable (CSV)**: nuevo botón **⬇ Reporte** en el paso 2 del importador. Exporta tipo de fuente, archivo, alcance (crea/actualiza y bloqueado), **estado del archivo** (`listo`/`requiere_validacion`/`sin_datos`), resumen dry-run (crear/actualizar/omitir/total) y el **detalle de filas excluidas con su motivo**. Trazabilidad completa de cada importación. Verificado: botón presente tras cargar archivo.
+- **Cierre financiero por país** (`periodoEstado(ym, pais)`): `tenant.cierreFinanciero` admite ahora override por país `{ cerradoHasta:'2026-04', CO:{cerradoHasta:'2026-02'} }` con fallback al cierre global. El badge de estado del mes en Finanzas usa el país activo. Verificado: con CO cerrado hasta feb, marzo-2026 muestra "Referencia" (mientras el global GT lo daría "Cerrado").
+- **Catálogo financiero por país** (`catFin`): admite `catalogoFinanciero.{GT|CO}.{ingresos,egresos}` con fallback al catálogo global del tenant. Backward-compatible con el catálogo plano existente.
+- Reglas respetadas: sin backend/`store.js`, sin datos reales, sin hardcode A&S, sin notas técnicas.
+- Con esto se cierran los opcionales pendientes del paquete A&S; el prototipo queda listo para el carril de backend.
+- Cache-bust: `importa.js` → `?v1303`, `finanzas.js` → `?v1303`.
+- Archivos: `core/importa.js`, `modules/finanzas.js`, `index.html`.
+
+
+## v1.112 — 2026-07-03 · Fix: movimientos importados ahora suman en Finanzas (forma real de finmovs)
+- **Bug corregido** (pendiente #1 de la auditoría): los builds del importador para finmovs producían `{ monto, tipo:'Ingreso', clasificacion, fecha }`, forma que **no coincide** con la del seed que lee Finanzas (`{ tipo:'ingreso'|'egreso', clase, pais, moneda, periodo, dia, valor, estado }`), por lo que los movimientos importados **no sumaban** en KPIs/dashboard.
+- **Solución**: nuevo normalizador `finmovShape(rec, clase)` en `core/importa.js` que emite la forma real del seed (deriva `periodo`/`dia` de la fecha, `valor` absoluto, `tipo` en minúsculas, `pais`/`moneda` sin mezclar, `estado` recaudado/pagado, y `saldo_inicial`/`referencia` para saldo anterior). Aplicado a las 3 fuentes finmovs: `movimientos-finanzas`, `estados-banco`, `financiero-historico` (mutando `rec`, que es lo que consume `applyImport`).
+- Verificado por importación real: CSV con fila `TOTALES` (excluida) + comisión GT 3.500 → el movimiento se crea con forma correcta y el total de ingresos GT del mes pasa de 15.503 a 19.003 (+3.500).
+- Actualizado `docs/BITACORA-ERRORES.md`: el hallazgo del casing/forma queda **RESUELTO**.
+- Cache-bust: `importa.js` → `?v1302`.
+- Archivos: `core/importa.js`, `index.html`, `docs/BITACORA-ERRORES.md`.
+
+
+## v1.111 — 2026-07-03 · Auditoría clic-por-clic (base 1.0) + limpieza de notas técnicas (P9)
+- **Auditoría runtime de las 30 rutas del NAV**: navegación programática módulo por módulo → **0 pantallas en blanco, 0 errores de consola**; todos los `#host` con contenido. (Ver `docs/BITACORA-ERRORES.md`.)
+- **Higiene de datos (checklist del paquete)**: `localStorage` directo en `modules/` = **0** (todo pasa por `Orbit.store`). Sin `Firestore/Firebase/localhost` en UI de módulos.
+- **P9 · Notas técnicas visibles eliminadas**: quitadas de la UI las menciones "Demo: motor simulado / en producción se conecta el extractor real" (Importar hub y pasos del importador) y "(demo: solo la UI de gestión)" (Configuración → APIs). Reemplazadas por copy orientado al usuario. Verificado en vivo.
+- Reglas respetadas: sin backend/`store.js`, sin datos reales, sin hardcode A&S.
+- Cache-bust: `importa.js`, `importar.js`, `configuracion.js` → `?v1301`.
+- Archivos: `core/importa.js`, `modules/importar.js`, `modules/configuracion.js`, `index.html`, `docs/BITACORA-ERRORES.md` (nuevo).
+
+
+## v1.110 — 2026-07-03 · Estados de cierre por periodo (paquete A&S · P5)
+- **`tenant.cierreFinanciero.cerradoHasta`** (nuevo, default `2026-04`): último periodo consolidado, configurable por tenant (sin hardcode A&S).
+- **`periodoEstado(ym)`** en Finanzas clasifica cada mes: `≤ cerradoHasta` → **🔒 Cerrado**; mes siguiente → **◷ Referencia** (requiere conciliación manual, no es cierre); meses posteriores pasados → **✎ Captura y conciliación**; mes actual/futuro → **● Abierto / en validación** ("no se cierra sin planillas, estados de cuenta o respaldo").
+- **UI**: badge de estado junto al título de Movimientos + nota explicativa (oculta cuando el mes está cerrado). Verificado cambiando de mes: abril=Cerrado, mayo=Referencia, junio=Captura, julio=Abierto — exactamente los cortes del paquete.
+- No-destructivo; sin backend/`store.js`, sin datos reales, sin notas técnicas.
+- Con esto quedan implementadas del paquete A&S: **P1, P2, P4, P5, P6, P7** (importador con alcance/guarda/saldo/histórico + catálogo financiero + cierres). Pendiente opcional: catálogo/cierre por **país** (hoy por tenant) y reporte de exclusiones descargable.
+- Cache-bust: `config.js` y `finanzas.js` → `?v1300`.
+- Archivos: `core/config.js`, `modules/finanzas.js`, `index.html`.
+
+
+## v1.109 — 2026-07-03 · Catálogo financiero editable por tenant (paquete A&S · P6)
+- **`tenant.catalogoFinanciero`** (nuevo en DEFAULT): `{ ingresos, egresos, especiales }` — precargado con las clases del seed (para no romper movimientos existentes) más las categorías sugeridas del paquete (honorarios, reintegros, aportes, tecnología, administración, impuestos, bancos…). Heredable, por tenant, sin hardcode A&S.
+- **Finanzas lee del catálogo**: `catFin('ingreso'|'egreso')` reemplaza los arrays fijos `CLASES_ING/EGR`; el alta/edición de movimiento y el presupuesto usan las categorías del tenant (fallback a los valores previos si no hay catálogo).
+- **Editor "⚙ Categorías"** en la barra de Movimientos: agrega/quita categorías por grupo (💰 Ingresos / 💸 Egresos / 🔖 Especiales), persiste en `tenant.catalogoFinanciero`. Verificado: agregar "Consultoría" persiste y aparece de inmediato en el dropdown de alta de ingreso.
+- No-destructivo; sin backend/`store.js`, sin datos reales, sin notas técnicas.
+- **Pendiente del paquete que queda**: P5 (cierres mayo/junio/julio como referencia/captura/abierto) y catálogo por **país** (hoy es por tenant; puede extenderse a por-país si se requiere).
+- Cache-bust: `config.js` → `?v1299`, `finanzas.js` → `?v1299`.
+- Archivos: `core/config.js`, `modules/finanzas.js`, `index.html`.
+
+
+## v1.108 — 2026-07-03 · Importador: fuente dedicada `financiero-historico` (P4) + alcance primero (P1)
+- **Fuente `financiero-historico`** (nueva tarjeta en Importar → Finanzas): carga movimientos financieros históricos GT/CO. En `build`: **excluye filas no-movimiento** (títulos, subtotales, `TOTALES`/`Total general`, dashboards, presupuestos, producción) marcándolas `_excluir` con motivo; **separa país/moneda** (GTQ/COP, sin mezclar); trata **saldo anterior** como `SaldoInicial`/`referencia`/`requiereValidacion` (no suma). Las filas excluidas se **omiten** en `applyImport` y aparecen listadas como "excluida: …" en el resumen dry-run. Verificado con CSV real (TOTALES y Subtotal excluidos; comisión GT y nómina CO reconocidas).
+- **P1 alcance-primero (satisfecho)**: el flujo ya obliga a elegir el **tipo de fuente** (tarjeta del hub Importar) antes de procesar, y el nuevo **banner "🔒 Alcance de esta fuente"** (v1.107) declara en el paso 1 qué crea/actualiza y qué queda bloqueado, antes de subir el archivo. La guarda `scopeGuard` impide escrituras fuera del alcance. Queda como mejora opcional cambiar el tipo dentro del propio drawer.
+- Reglas respetadas: sin backend/`store.js`, sin datos reales, sin hardcode A&S, sin notas técnicas en UI.
+- Cache-bust: `importa.js` → `?v1299`, `importar.js` → `?v1299`.
+- Archivos: `core/importa.js`, `modules/importar.js`, `index.html`.
+
+
+## v1.107 — 2026-07-03 · Importador: alcance por fuente + guarda anti-inferencia + regla de saldo anterior (paquete A&S P1/P2/P4/P7)
+- **Alcance visible por fuente** (`core/importa.js`): cada tipo de importación muestra un **banner "🔒 Alcance de esta fuente"** en el paso 1 y 2 con lo que **crea/actualiza** y lo que **NO crea (bloqueado)**. Ej.: movimientos-finanzas / estados-banco → crean solo `finmovs`, **bloquean** clientes, pólizas, cobros y cartera. Verificado: el banner aparece y lista los bloqueos.
+- **Guarda anti-inferencia cruzada** (`scopeGuard`): `applyImport` rechaza escribir en cualquier colección fuera del alcance declarado de la fuente (defensa además de que cada fuente ya escribía solo a su colección). Si se intenta, avisa "⛔ Bloqueado por alcance".
+- **Regla de SALDO ANTERIOR** (build de `movimientos-finanzas`): conceptos "saldo anterior/inicial" ya **no** se cargan como ingreso/egreso operativo — se marcan `tipo:'SaldoInicial'`, `signo:0`, `estado:'referencia'`, `requiereValidacion:true`. Finanzas filtra estrictamente `ingreso`/`egreso`, por lo que estos **no suman** en totales (verificado por lectura del filtro).
+- **Pendientes del importador (abiertos, documentados)**: (a) selector de tipo de fuente como **primer paso obligatorio** con lista de tipos del paquete (clientes/polizas/cobros_realizados/planilla_aseguradora/estado_cuenta/financiero_historico/siniestros/documentos_soporte/configuracion_catalogo); (b) modo **financiero_historico** dedicado con detección de hojas mensuales por país/mes/año y exclusión de títulos/subtotales/dashboards; (c) reporte de exclusiones y estados por archivo (listo/requiere_validacion/bloqueado/superado); (d) catálogo financiero editable por tenant. Estos quedan para la próxima sesión.
+- Reglas respetadas: sin tocar backend/`data/store.js`, sin datos reales, sin hardcode A&S, sin notas técnicas en UI.
+- Cache-bust: `importa.js` → `?v1298`.
+- Archivos: `core/importa.js`, `index.html`.
+
+
+## v1.106 — 2026-07-03 · Localización cableada en módulos internos (cobros, cliente360) + fix fecha congelada
+- **Cobros · detalle del recibo** (`modules/cobros.js`): helper `TT(k)` resuelve por el país del cliente del recibo; el crumb "Recibo", el título "Desglose del recibo", "Prima neta" y "Total del recibo" ahora usan `Orbit.termino()`. Verificado: con override CO `recibo→Comprobante` / `prima_neta→Prima neta base`, el detalle refleja ambos.
+- **Cliente360 · alta de cliente**: el label del campo de identificación usa `Orbit.termino('id_fiscal')` (NIT/RFC/RUC/… según país) en vez del texto fijo "DPI/Cédula/NIT".
+- **Fix fecha congelada**: el endoso tenía `value="2026-06-22"` quemado; ahora `Orbit.ui.today()` (fecha viva).
+- No-destructivo: sin overrides, los términos por defecto quedan idénticos.
+- **Pendiente menor**: cablear encabezados de tablas analíticas de comisiones (país mixto — requiere criterio); el resto de localización queda cerrado.
+- Cache-bust: `cobros.js`, `cliente360.js` → `?v1298`.
+- Archivos: `modules/cobros.js`, `modules/cliente360.js`, `index.html`.
+
+
+## v1.105 — 2026-07-03 · Marketing historial de eventos + responsive global (endurecimiento)
+- **Marketing · historial de eventos por contenido**: la ficha de contenido ahora muestra **🧾 Historial de eventos** (leído de `Orbit.integraciones.list({entidad:'contenidos', entidadId})`) con evento (pieza/programación/guardado/sync), estado (badge) y fecha-hora. Se **refresca en vivo** al Crear pieza / Programar. Verificado: al emitir, los eventos aparecen al instante.
+- **Responsive global (endurecimiento)** en `styles/base.css`: tablas `.tbl` con scroll horizontal ≤900px (no desbordan el viewport); Configuración `.cfg-wrap`/`.cfg-side` pasan a columna con navegación horizontal ≤820px; portal `.pt-cards` compactas y formularios a 1 col ≤560px; **calendario de marketing** con scroll horizontal (min-width 560px) en vez de aplastar 7 columnas ≤640px; drawers `max-width:96vw`; `.page{overflow-x:hidden}`. Verificado a ~390px: sin desbordes horizontales.
+- Cache-bust: `marketing.js` → `?v1298`, `base.css` → `?v1298`.
+- Archivos: `modules/marketing.js`, `styles/base.css`, `index.html`.
+
+
+## v1.104 — 2026-07-03 · Localización por país: editor de glosario + cableado en portal
+- **Editor de glosario** en Configuración → Países y monedas: selector de país (entre los activos del tenant) + 17 campos (póliza, recibo, prima, prima neta, cliente, asegurado, aseguradora, comisión, ramo, vigencia, deducible, siniestro, cobro, tomador, **id fiscal**, corredor, gestión). Cada campo muestra el valor por defecto como placeholder; vacío = usa default. Botones **Guardar** (escribe `tenant.glosario[pais]`) y **Restablecer a defaults**. Verificado: guardar GT `poliza→Contrato` hace que `Orbit.termino('poliza','GT')` devuelva "Contrato"; restablecer vuelve a "Póliza".
+- **Cableado en Portal del Cliente** (`modules/portal.js`): helper `TT(k)` resuelve por el país del cliente activo; labels de detalle de póliza (N.º de póliza, prima total), recibo (título, póliza, prima neta) ahora usan `Orbit.termino()`. Así el cliente ve la terminología de su país.
+- No-destructivo: sin overrides, todos los textos quedan idénticos.
+- **Pendiente localización**: cablear términos en más módulos internos (cliente360, cobros, comisiones, aseguradoras) — el editor y el helper ya están listos para ello.
+- Cache-bust: `configuracion.js` y `portal.js` → `?v1298`.
+- Archivos: `modules/configuracion.js`, `modules/portal.js`, `index.html`.
+
+
+## v1.103 — 2026-07-03 · Localización por país: base `Orbit.termino()` + glosario por tenant
+- **Nuevo helper `Orbit.termino(clave, pais)`** en `core/config.js`: resuelve términos de seguros con prioridad `tenant.glosario[pais]` → `tenant.glosario['*']` → `Orbit.TERMINOS[pais]` → `Orbit.TERMINOS['*']` → la clave literal. Todo override es **opcional y no-destructivo**: sin config usa los defaults, así que ningún texto existente cambia.
+- **`Orbit.TERMINOS`** con defaults por país para las claves clave (poliza, recibo, prima, prima_neta, cliente, asegurado, aseguradora, comision, ramo, vigencia, deducible, siniestro, cobro, tomador, **id_fiscal**, corredor, gestion). Ej.: `id_fiscal` = NIT (GT/CO), RFC (MX), RUC (PA), Cédula jurídica (CR); `corredor` varía (Corredor / Intermediario / Agente).
+- **`tenant.glosario: {}`** añadido al DEFAULT (heredable), para que cada cliente sobreescriba términos por país desde Configuración (editor de glosario = pendiente de UI).
+- **Alcance de esta entrega**: base transversal lista y probada de forma aislada. **Pendiente (próxima sesión)**: (a) editor de glosario en Configuración → Localización; (b) cablear `Orbit.termino()` en los textos de módulos (póliza, recibo, prima, id fiscal, comisión) y en el portal del cliente.
+- Cache-bust: `config.js` → `?v1297`.
+- Archivos: `core/config.js`, `index.html`.
+
+
+## v1.102 — 2026-07-03 · Reportes: análisis IA (lectura ejecutiva + acciones sugeridas) · CL-009
+- **Nuevo botón 🤖 Analizar con IA** en cada reporte: arma un resumen en vivo (totales por columna numérica + concentración por la principal dimensión categórica) y pide a **`Orbit.ia.complete`** (IA centralizada) una **lectura ejecutiva** (qué pasa y por qué importa) + **3 acciones concretas priorizadas**, renderizadas en un panel. Con **timeout de resguardo (15s)** y **fallback determinista** (lectura + acciones calculadas de los datos) cuando la IA no está conectada — nunca se queda colgado.
+- Respeta el contrato: única llamada al modelo vía `Orbit.ia.complete`; si `Orbit.ia.disponible()` es falso, usa el análisis automático y lo indica en el panel.
+- Verificado por camino real: panel genera análisis real del reporte de Producción (1.2k chars, secciones Lectura/Acciones); 0 errores.
+- Cache-bust: `reportes.js` → `?v1297`.
+- Archivos: `modules/reportes.js`, `index.html`.
+
+
+## v1.101 — 2026-07-03 · FUSIÓN con lane ChatGPT/Codex (Integraciones + Marketing) + rebase v1.98–v1.100
+- **Base adoptada**: `ORBIT360-PLATFORM-FUSIONADO-CHATGPT-CODEX-POST-V197` (mi v1.97 + trabajo real de ChatGPT/Codex). **Conservado sin tocar**: `core/integraciones.js` (contratos `emit/configurar/status/list/resumen/diagnostico/openPanel/ensureLabMock/labMock/mark`), `core/integraciones-panel.js` y `core/integraciones-lab-mock.js` (se cargan on-demand desde `integraciones.js`), `modules/marketing.js` conectado a eventos (`marketing_sync_sheets/generar_pieza/programar_publicacion/contenido_creado`), `modules/automatizaciones.js` (banner "Automatizaciones & Integraciones"), `tools/orbit360-validate-marketing-integraciones.mjs`.
+- **Rebasado encima (aditivo, sin borrar contratos)**: mis 3 archivos post-v1.97 — `modules/renovaciones.js` (v1.98 comparativo multi-aseguradora + solicitar propuestas), `modules/configuracion.js` (v1.99 Outlook + estados tenant-wide; ya puentea a `Orbit.integraciones.configurar/mark` que ahora EXISTE de verdad), `modules/academia.js` (v1.100 rutas por rol + certificado imprimible).
+- **index.html**: base fusionada (con `core/integraciones.js?v1296`, `marketing.js?v1296`) + cache-bump de los 3 rebasados a `?v1297`.
+- Verificación pendiente en esta entrega: `Orbit.integraciones` presente y funciones de marketing/mis-features operativas (ver resumen).
+- Archivos tocados en la fusión: `modules/renovaciones.js`, `modules/configuracion.js`, `modules/academia.js`, `index.html`, `docs/BITACORA-CAMBIOS.md` (los demás provienen de la base fusionada).
+
+
+## v1.100 — 2026-07-03 · Academia: rutas de aprendizaje por rol + certificado imprimible (CL-008)
+- **Ruta por rol** (nuevo toggle 📚 Catálogo / 🧭 Ruta por rol): para el rol activo (o cualquiera vía selector) arma una **secuencia curada** de cursos ordenada por categoría (Inducción→Técnico→Producto→Comercial→…), con pasos numerados, barra de progreso por curso, **avance %/completados/certificados** de la ruta y botón **▶ Continuar ruta** (salta al primer curso pendiente). Reusa `destinatarios`/`progreso`/`certificado` — sin nuevo modelo de datos. El asesor ve su ruta (8 cursos) distinta de Dirección (10).
+- **Certificado imprimible** (`verCertificado`): botón 🏅 en cursos completados (catálogo + ruta) → documento de certificado (empresa/tenant, nombre del usuario, curso, categoría, **folio** y fecha viva) con Imprimir/PDF. Antes `certificado` era solo un flag sin documento.
+- Verificado por camino real: toggle de vista, selector de rol (10↔8 cursos), certificado renderiza "Certificado de finalización"; KPIs con valores; 0 errores.
+- Cache-bust: `academia.js` → `?v1294`.
+- Archivos: `modules/academia.js`, `index.html`.
+
+
+## v1.99 — 2026-07-03 · Integraciones tenant-wide + Outlook (CL-001/CL-006)
+- **Estados claros por integración** (`integEstado`): cada tarjeta muestra badge **No configurado / Pendiente de backend**. En demo/LAB **nunca** se presenta como conexión real (regla CL-001): guardar parámetros deja la integración en *Pendiente de backend*, no "conectada".
+- **Modal Outlook dedicado** (Microsoft 365): cuenta del usuario, tipo de buzón (personal/compartido), **permisos** (leer bandeja + asociar correos a clientes/pólizas/gestiones · enviar en nombre del usuario · guardar adjuntos como documentos del cliente), **patrón de asunto** `{cliente} · {poliza} · {gestion}`, y Client ID/Tenant OAuth. El resto de integraciones mantiene el modal genérico (API key/endpoint/cuenta).
+- **Puente al contrato del lane backend**: al guardar se llama `Orbit.integraciones.configurar(id, data)` y `Orbit.integraciones.mark(id, estado)` **si existen** (fuente de verdad tenant-wide); si no, respaldo en el **store del tenant** (`Orbit.store.setPref`, no localStorage crudo). **No** se crea un `core/integraciones.js` propio para no chocar con el del lane ChatGPT/Codex.
+- Quitada la nota técnica "quedan en este navegador" y el "Conectado" simulado en la tabla de APIs.
+- Verificado por camino real: modal Outlook guarda cuenta/permisos/patrón en store del tenant; lista muestra estados; 0 errores.
+- Cache-bust: `configuracion.js` → `?v1294`.
+- Archivos: `modules/configuracion.js`, `index.html`.
+- ⚠️ **Entrega/merge**: mi ZIP **no** incluye `core/integraciones.js` / `-panel.js` / `-lab-mock.js` (viven en el lane ChatGPT/Codex). Al consolidar, **conservar** esos archivos — no subir mi ZIP como reemplazo total si borra los del backend.
+
+
+## v1.98 — 2026-07-03 · Renovaciones: solicitar propuestas + comparativo MULTI-aseguradora
+- **Nuevo `solicitarPropuestas(polizaId)`** (botón 📋 Propuestas en cada tarjeta de renovación): antes solo existía la campaña por lote (WhatsApp) y no había comparativo — solo "simulaba la misma". Ahora abre un comparativo real con **elección de alcance**: 🔁 Solo la misma / 🏛️ Comparar con otras / ☑️ Seleccionar aseguradoras.
+- **Comparativo multi-aseguradora**: tabla con **prima estimada** por aseguradora (proyección determinista y estable — las tarifas oficiales se integran luego con el cotizador), **Δ vs prima actual** (color) y **comisión estimada** con el **% vigente por aseguradora/ramo** (`Orbit.comeng.pctAseguradora`). Ordenada por prima; se elige la ganadora con radio. Moneda del país, **sin mezclar** (candidatas filtradas por país del cliente).
+- **Acciones**: 📧 Enviar comparativo al cliente (correo + actividad en su expediente) y ✅ Registrar propuesta → crea gestión en **Ops · Renovaciones / Modif.** enlazada a cliente/póliza con checklist, notifica al asesor, y registra actividad. Todo con fecha viva.
+- Verificado por camino real: 6 aseguradoras comparadas, scope Seleccionar con candidatas, registrar → gestión creada en la lista correcta enlazada a la póliza (fecha de hoy); 0 errores.
+- Cache-bust: `renovaciones.js` → `?v1294`.
+- Archivos: `modules/renovaciones.js`, `index.html`.
+
+
 ## v1.97 — 2026-07-03 · Ciclo Ops↔Leads: fechas vivas (fin de fechas congeladas) + auditoría
 - **Defecto real corregido**: `core/ciclo.js` tenía `'2026-06-20'` (y `'2026-06-27'`, `'2026-06-22'`) **hardcodeado** en todos los flujos que CREAN datos — negocios, gestiones, actividades, bitácoras y clientes nacían con fecha congelada, violando la regla de "fechas vivas". Sustituido por helpers locales `today()` / `stamp()` / `inDays(n)` derivados de `Orbit.ui.today()/now()` (ancla real). 5 timestamps, 3 vencimientos (+7d), 1 próximo toque (+2d) y 12 fechas migrados.
 - **Auditoría del ciclo (sin cambios necesarios, confirmado sólido)**: registro único `negocio` proyectado a ambos tableros; `setEtapa` con automatizaciones (nº cotización, cadencia al pasar a Propuesta); `decidirCierre` → reaparece en Ops (Inspección/Emisión); `emitir` crea cliente heredando datos + cadencia de encuestas; `solicitarGestion` desde ficha/portal → Ops asociada a cliente/póliza (tipo seleccionable + crear nuevo + adjuntos + nota); listas editables/reordenables por tablero; sync en vivo (`orbit:ciclo`). **Rol Asesor NO ve Ops** (excluido en `ROLES.Asesor.modulos`; ve su trabajo por Leads) — verificado.

@@ -8,9 +8,12 @@
 2. Mantener `aseguradoras` como fuente separada y catálogo/directorio por país.
 3. No mezclar Guatemala y Colombia en totales ni catálogos sin país/moneda explícitos.
 4. No procesar `Movimientos Ing y Eg Alianzas Guate y Col 2026.xlsx` como una sola fuente pura: contiene financiero histórico y hojas que deben excluirse.
-5. No usar la hoja `Listado producción 2025-2026` como financiero histórico. Debe tratarse como fuente separada tipo `polizas`.
-6. Mantener `financiero_historico` limitado a `finmovs`; nunca crear desde ahí clientes, pólizas, cobros, cartera, producción ni comisiones.
-7. Conservar el aprendizaje de dry-run canónico v2 para `aseguradoras` y `estado_cuenta_bancario`.
+5. Ignorar la hoja `Listado produccion 2025-2026` por instruccion previa de Paula.
+6. No usar `Listado produccion 2025-2026` como polizas.
+7. No usar `Listado produccion 2025-2026` como financiero historico.
+8. La fuente real de polizas sera entregada por Paula despues, como archivo separado.
+9. Mantener `financiero_historico` limitado a `finmovs`; nunca crear desde ahi clientes, polizas, cobros, cartera, produccion ni comisiones.
+10. Conservar el aprendizaje de dry-run canonico v2 para `aseguradoras` y `estado_cuenta_bancario`.
 
 ## Archivos backend nuevos o actualizados
 

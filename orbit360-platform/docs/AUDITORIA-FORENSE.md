@@ -1,6 +1,51 @@
 # Auditoría forense clic-por-clic — Orbit 360
 
-**Método (real, no declarativo):** se montó cada módulo en un host de prueba y se hizo
+## v1.79 — 2026-07-02 · Barrido de salud de render (28/28 módulos) + limpieza de código muerto
+**Método:** `Orbit.router.go(route)` real + espera del render async (hashchange) + medición del `#host`:
+longitud de render, nº de botones/`[onclick]`, nº de KPIs, y captura de **errores JS globales** (`window.onerror`).
+Se descartó el clic-masivo a ciegas (contaminaba el DOM/store con navegaciones en cascada y daba métricas falsas).
+
+**Resultado: los 28 módulos renderizan sin ningún error JS y con contenido real (datos vivos del store):**
+
+| Módulo | render (chars) | botones | KPIs | errores |
+|---|---|---|---|---|
+| inicio, cronograma, ops, leads | (verificados sesiones previas, #180) | | | 0 |
+| aseguradoras | 9 709 | 18 | 4 | 0 |
+| cotizador | 7 070 | 5 | 0* | 0 |
+| comparativo | 3 366 | 4 | 0* | 0 |
+| cliente360 | 25 556 | 23 | 5 | 0 |
+| polizas | 68 868 | 99 | 5 | 0 |
+| cobros | 216 584 | 576 | 5 | 0 |
+| renovaciones | 19 726 | 27 | 5 | 0 |
+| cancelaciones | 7 348 | 11 | 5 | 0 |
+| siniestros | 9 487 | 19 | 7 | 0 |
+| historial | 193 851 | 110 | 5 | 0 |
+| comisiones | 6 162 | 9 | 5 | 0 |
+| finanzas | shell + `#fin-body` (dashboard 16 590 / presupuesto 4 035) | | 4 | 0 |
+| marketing | 15 900 | 40 | 5 | 0 |
+| academia | 11 982 | 27 | 5 | 0 |
+| insights | 9 094 | 9 | 9 | 0 |
+| portal | 3 477 | 15 | 3 | 0 |
+| ia | 2 578 | 10 | 0* | 0 |
+| notificaciones | 3 813 | 3 | 5 | 0 |
+| automatizaciones | 23 624 | 16 | 4 | 0 |
+| equipo | 4 672 | 6 | 4 | 0 |
+| configuracion | 99 185 | 14 | 0* | 0 |
+| reportes | 24 000 | 57 | 0* | 0 |
+| calidad | 14 576 | 33 | 5 | 0 |
+| plantillas | 8 837 | 29 | 5 | 0 |
+| importar | 5 913 | 10 | 0* | 0 |
+| correo | 5 298 | 5 | 0* | 0 |
+
+\* Sin KPIs **por diseño** (formularios/asistentes: cotizador, comparativo, ia, configuración, reportes, importar, correo). Los flujos interactivos clave (Portal→Siniestro, pago→Finanzas, cambio de estado siniestro→Ops/Historial) se verificaron aparte por camino de código real — ver `AUDITORIA-SINCRONIAS.md`.
+
+**Limpieza de código muerto (v1.78–1.79):** se eliminaron 3 funciones muertas con datos HARDCODEADOS de `finanzas.js` — `resumen()` (array de movimientos) y las 1ª declaraciones duplicadas de `dashboard()`/`presupuesto()` (más sus helpers `finRow`/`presupTabla`), que por hoisting nunca se invocaban. Verificado que las versiones vivas (dashboard/presupuesto que leen del store) siguen renderizando.
+
+**Nota:** `finanzas` abre en el mes actual; si ese mes tiene pocos movimientos en el seed, la pestaña Movimientos se ve corta — es dato vivo, no un fallo. (Mejora UX opcional: abrir en el último mes con datos.)
+
+---
+
+**Método previo (clic-por-clic):** se montó cada módulo en un host de prueba y se hizo
 clic programático sobre **cada** botón, KPI, tab, `[data-act]` y `[onclick]`, capturando
 errores JS globales y contando drawers/modales abiertos. `confirm/prompt/alert` stubeados.
 Los módulos con listas largas se muestrearon hasta 40 interactivos (el resto son filas

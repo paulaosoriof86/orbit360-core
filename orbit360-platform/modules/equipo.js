@@ -53,7 +53,7 @@ Orbit.modules.equipo = (function () {
           <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(a.nombre, a.color, 'sm')}<b>${U.esc(a.nombre)}</b></div></td>
           <td><span class="badge ${/Direcci/.test(a.rol) ? 'danger' : /Asesor/.test(a.rol) ? 'info' : 'neutral'}">${U.esc(a.rol)}</span></td>
           <td style="font-size:12.5px">${esquema}</td>
-          <td class="num">${U.money(a.metaPrima || 0, 'GTQ')}</td>
+          <td class="num">${U.money(a.metaPrima || 0, Orbit.q.monedaPais())}</td>
           <td><span class="badge ${a.inactivo ? 'neutral' : 'ok'}">${a.inactivo ? 'Inactivo' : 'Activo'}</span></td>
           <td style="text-align:right;color:var(--ink-3)">›</td></tr>`;
       }).join('')}</tbody>
@@ -113,7 +113,7 @@ Orbit.modules.equipo = (function () {
           <td class="num"><div class="ct-inp" style="justify-content:flex-end">${modo === 'fijo'
             ? `<input type="number" min="0" value="${a.comValor || 0}" data-vval="${a.id}" style="width:80px"><span>Q</span>`
             : `<input type="number" min="0" max="100" value="${a.shareCom != null ? a.shareCom : 50}" data-vend="${a.id}"><span>%</span>`}</div></td>
-          <td class="num">${U.money(a.metaRecaudo || 0, 'GTQ')}</td></tr>`;
+          <td class="num">${U.money(a.metaRecaudo || 0, Orbit.q.monedaPais())}</td></tr>`;
       }).join('')}</tbody>
     </table></div></div>`;
   }
@@ -137,7 +137,7 @@ Orbit.modules.equipo = (function () {
     return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas por asesor, <b>mes</b> y <b>tipo</b> (nueva vs renovada), sobre prima neta. Es la <b>fuente única</b> que leen Insights y Finanzas.</div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
       <select id="meta-mes" class="o-sel">${MESES.map((m, i) => `<option value="${i}" ${i === mesMeta ? 'selected' : ''}>${m} 2026</option>`).join('')}</select>
-      <span class="muted" style="font-size:12.5px">Meta total del mes: <b style="color:var(--ok)">${U.moneyShort(totN, 'GTQ')}</b> nuevas · <b style="color:var(--info)">${U.moneyShort(totR, 'GTQ')}</b> renovadas</span>
+      <span class="muted" style="font-size:12.5px">Meta total del mes: <b style="color:var(--ok)">${U.moneyShort(totN, Orbit.q.monedaPais())}</b> nuevas · <b style="color:var(--info)">${U.moneyShort(totR, Orbit.q.monedaPais())}</b> renovadas</span>
     </div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Asesor</th><th class="num">Meta NUEVA</th><th class="num">Meta RENOVADA</th><th class="num">Meta total</th></tr></thead>
@@ -145,7 +145,7 @@ Orbit.modules.equipo = (function () {
         <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(a.nombre, a.color, 'sm')}<b>${U.esc(a.nombre)}</b></div></td>
         <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>Q</span><input type="number" min="0" value="${m.nueva}" data-meta="${a.id}|nueva" style="width:100px"></div></td>
         <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>Q</span><input type="number" min="0" value="${m.renovada}" data-meta="${a.id}|renovada" style="width:100px"></div></td>
-        <td class="num"><b>${U.money(m.nueva + m.renovada, 'GTQ')}</b></td></tr>`; }).join('')}</tbody>
+        <td class="num"><b>${U.money(m.nueva + m.renovada, Orbit.q.monedaPais())}</b></td></tr>`; }).join('')}</tbody>
     </table></div></div>`;
   }
 

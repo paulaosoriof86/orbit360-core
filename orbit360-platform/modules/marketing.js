@@ -17,19 +17,18 @@ Orbit.modules.marketing = (function () {
   const ENF_EMOJI = { 'Seguros / Riesgos': '🛡️', 'Auto': '🚗', 'Vida y GM': '❤️', 'Hogar / Daños': '🏠', 'Logística / Transporte': '🚚', 'Educativo': '📚', 'Tendencias': '📈', 'Normativa': '⚖️', 'Prospecting': '🎯', 'Renovaciones': '🔄' };
   function enfEmoji(e) { return ENF_EMOJI[e] || '🛡️'; }
   function toast(msg) { let t = document.getElementById('mk-toast'); if (t) t.remove(); t = document.createElement('div'); t.id = 'mk-toast'; t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2800); }
+
   function emitMarketing(evento, payload, opts) {
-    if (!Orbit.integraciones || !Orbit.integraciones.emit) return null;
     try {
+      if (!Orbit.integraciones || !Orbit.integraciones.emit) return null;
       return Orbit.integraciones.emit(evento, Object.assign({ modulo: 'marketing' }, payload || {}), Object.assign({ modulo: 'marketing' }, opts || {}));
-    } catch (e) {
-      try { console.warn('[marketing] integración no registrada', e); } catch (_) {}
-      return null;
-    }
+    } catch (e) { try { console.warn('[Marketing] evento integración no registrado', e); } catch (_) {} return null; }
   }
-  function integrationMsg(ev, okMsg, pendingMsg) {
-    if (!ev) return null;
-    if (ev.estado === 'pendiente_configuracion') return pendingMsg || 'Evento registrado. Falta configurar la integración en Configuración.';
-    return okMsg || 'Evento de integración registrado.';
+  function integrationMsg(row, fallback) {
+    if (!row) return fallback || 'Evento registrado localmente.';
+    if (row.estado === 'pendiente_configuracion') return '⚠ Evento registrado: falta configurar ' + (row.proveedor || 'integración') + '.';
+    if (row.estado === 'pendiente_backend') return '⚠ Configuración pendiente de conexión.';
+    return fallback || '✓ Evento de integración registrado.';
   }
 
   function init() { if (!mes) { const n = U.NOW ? new Date(U.NOW) : new Date(); mes = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0'); } }
@@ -75,7 +74,8 @@ Orbit.modules.marketing = (function () {
     host.querySelector('#mk-gen').addEventListener('click', () => { generarMes(); });
     host.querySelector('#mk-reprog').addEventListener('click', () => { reprogramar(); });
     host.querySelector('#mk-imp').addEventListener('click', () => {
-      emitMarketing('marketing_sync_sheets', { periodo: mes, fuente: 'importador', destino: 'contenidos', modo: 'importar' }, { proveedorPreferido: 'google_sheets', entidad: 'contenidos' });
+      const row = emitMarketing('marketing_sync_sheets', { periodo: mes, fuente: 'importador', destino: 'contenidos', modo: 'importar' }, { proveedorPreferido: 'google_sheets', entidad: 'contenidos' });
+      toast(integrationMsg(row, '⬇ Importador abierto y evento de sincronización registrado.'));
       Orbit.importa.open('calendario-marketing', { onDone: () => { render(host); } });
     });
     host.querySelectorAll('[data-day]').forEach(el => el.addEventListener('click', e => { if (e.target.closest('[data-c]') || e.target.closest('[data-add]')) return; ficha(null, el.dataset.day); }));
@@ -143,6 +143,22 @@ Orbit.modules.marketing = (function () {
     toast('🔁 ' + atras.length + ' publicación(es) reprogramada(s) automáticamente'); render(host);
   }
 
+  const EVT_LBL = { marketing_generar_pieza: '🎨 Pieza solicitada (Canva)', marketing_programar_publicacion: '📅 Programación (Metricool)', marketing_contenido_creado: '📝 Contenido guardado (Make)', marketing_sync_sheets: '🔄 Sincronización (Sheets)' };
+  const EVT_TONE = { pendiente: 'info', pendiente_configuracion: 'warn', pendiente_backend: 'warn', ok: 'ok', error: 'danger' };
+  function histHtml(id) {
+    let rows = [];
+    try { if (Orbit.integraciones && Orbit.integraciones.list) rows = Orbit.integraciones.list({ entidad: 'contenidos', entidadId: id, limit: 12 }) || []; } catch (e) {}
+    const inner = rows.length ? rows.map(r => {
+      const t = (r.createdAt || '').replace('T', ' ').slice(0, 16);
+      const est = (r.estado || '').replace(/_/g, ' ');
+      return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)">
+        <span style="flex:1;font-size:12.5px">${EVT_LBL[r.evento] || U.esc(r.evento)}</span>
+        <span class="badge ${EVT_TONE[r.estado] || 'neutral'}" style="font-size:9.5px">${U.esc(est)}</span>
+        <span class="muted mono" style="font-size:10.5px">${t}</span></div>`;
+    }).join('') : '<div class="muted" style="font-size:12px;padding:6px 0">Aún no hay eventos. Al crear pieza, programar o guardar se registran aquí.</div>';
+    return `<div style="margin-top:4px"><div style="font-family:var(--f-display);font-weight:700;font-size:12.5px;margin-bottom:4px;display:flex;align-items:center;gap:6px">🧾 Historial de eventos${rows.length ? ' <span class="badge neutral" style="font-size:9.5px">' + rows.length + '</span>' : ''}</div>${inner}</div>`;
+  }
+
   function ficha(id, fecha) {
     const c = id ? S().get('contenidos', id) : null;
     const canales = ['LinkedIn', 'Facebook', 'Instagram', 'WhatsApp', 'TikTok', 'YouTube'];
@@ -181,6 +197,7 @@ Orbit.modules.marketing = (function () {
           <button class="btn ghost sm" id="mk-prog">📅 Programar (Metricool)</button>
         </div>
         ${c && c.stats ? `<div class="cfg-note">📊 Alcance <b>${c.stats.alcance.toLocaleString('es')}</b> · interacciones <b>${c.stats.interac}</b> · leads <b>${c.stats.leads}</b></div>` : ''}
+        ${id ? `<div id="mk-hist">${histHtml(id)}</div>` : ''}
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between">
         ${c ? '<button class="btn ghost" id="mk-del" style="color:var(--danger)">🗑 Eliminar</button>' : '<span></span>'}
@@ -189,7 +206,9 @@ Orbit.modules.marketing = (function () {
     document.body.appendChild(back);
     const $ = s => back.querySelector(s);
     const close = () => back.remove();
-    const dataActual = () => ({ fecha: $('#mk-fecha').value, hora: $('#mk-hora').value, canal: $('#mk-canal').value, tipo: $('#mk-tipo').value, enfoque: $('#mk-enfoque').value, estado: $('#mk-estado').value, responsable: $('#mk-resp') ? $('#mk-resp').value : '', aprobacion: $('#mk-aprob') ? $('#mk-aprob').value : '', titulo: $('#mk-titulo').value || '(sin título)', copy: $('#mk-copy').value, cta: $('#mk-cta').value, hashtags: $('#mk-hash').value });
+    function dataActual() {
+      return { fecha: $('#mk-fecha').value, hora: $('#mk-hora').value, canal: $('#mk-canal').value, tipo: $('#mk-tipo').value, enfoque: $('#mk-enfoque').value, estado: $('#mk-estado').value, responsable: $('#mk-resp') ? $('#mk-resp').value : '', aprobacion: $('#mk-aprob') ? $('#mk-aprob').value : '', titulo: $('#mk-titulo').value || '(sin título)', copy: $('#mk-copy').value, cta: $('#mk-cta').value, hashtags: $('#mk-hash').value };
+    }
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#mk-x').addEventListener('click', close); $('#mk-cancel').addEventListener('click', close);
     $('#mk-ia').addEventListener('click', async () => {
@@ -216,28 +235,25 @@ Orbit.modules.marketing = (function () {
     });
     $('#mk-pieza').addEventListener('click', () => {
       const data = dataActual();
-      const ev = emitMarketing('marketing_generar_pieza', {
-        entidad: 'contenidos', entidadId: id || '', proveedorPreferido: 'canva', contenidoId: id || '', titulo: data.titulo,
-        copy: data.copy, canal: data.canal, tipo: data.tipo, formato: data.tipo, enfoque: data.enfoque, fecha: data.fecha
-      }, { proveedorPreferido: 'canva', entidad: 'contenidos', entidadId: id || '' });
-      toast(integrationMsg(ev, '🎨 Solicitud de pieza registrada para Canva/Make.', '🎨 Solicitud registrada. Activa Canva/Make en Configuración para generar piezas.') || '🎨 Activa Canva en Configuración › Integraciones para generar piezas');
+      const row = emitMarketing('marketing_generar_pieza', { entidad: 'contenidos', entidadId: id || '', contenido: data, proveedorPreferido: 'canva' }, { proveedorPreferido: 'canva', entidad: 'contenidos', entidadId: id || '' });
+      toast(integrationMsg(row, '🎨 Solicitud de pieza registrada para Canva.'));
+      refrescarHist(id);
     });
     $('#mk-prog').addEventListener('click', () => {
-      const data = dataActual();
+      const f = $('#mk-fecha').value, h = $('#mk-hora').value;
       $('#mk-estado').value = 'Programado';
-      const ev = emitMarketing('marketing_programar_publicacion', {
-        entidad: 'contenidos', entidadId: id || '', proveedorPreferido: 'metricool', contenidoId: id || '', contenido: data,
-        programacion: { fecha: data.fecha, hora: data.hora, canal: data.canal }
-      }, { proveedorPreferido: 'metricool', entidad: 'contenidos', entidadId: id || '' });
-      toast(integrationMsg(ev, '📅 Programación registrada para Metricool/Make.', '📅 Programación registrada. Activa Metricool/Make en Configuración para publicar.') || ('📅 Programado para ' + data.fecha + ' ' + data.hora + ' · pendiente integración Metricool'));
+      const data = dataActual();
+      const row = emitMarketing('marketing_programar_publicacion', { entidad: 'contenidos', entidadId: id || '', contenido: data, fecha: f, hora: h, proveedorPreferido: 'metricool' }, { proveedorPreferido: 'metricool', entidad: 'contenidos', entidadId: id || '' });
+      toast(integrationMsg(row, '📅 Programación registrada para ' + f + ' ' + h + '.'));
+      refrescarHist(id);
     });
+    function refrescarHist(cid) { if (!cid) return; const box = $('#mk-hist'); if (box) box.innerHTML = histHtml(cid); }
     if ($('#mk-del')) $('#mk-del').addEventListener('click', () => { S().remove('contenidos', id); close(); render(host); });
     $('#mk-ok').addEventListener('click', () => {
       const data = dataActual();
-      let saved;
-      if (id) saved = S().update('contenidos', id, data);
-      else saved = S().insert('contenidos', Object.assign({ id: 'mk' + Date.now().toString().slice(-7), stats: null }, data));
-      emitMarketing('marketing_contenido_creado', { entidad: 'contenidos', entidadId: saved && saved.id, contenido: saved }, { entidad: 'contenidos', entidadId: saved && saved.id });
+      let savedId = id;
+      if (id) S().update('contenidos', id, data); else { savedId = 'mk' + Date.now().toString().slice(-7); S().insert('contenidos', Object.assign({ id: savedId, stats: null }, data)); }
+      emitMarketing('marketing_contenido_creado', { entidad: 'contenidos', entidadId: savedId, contenido: data }, { proveedorPreferido: 'make', entidad: 'contenidos', entidadId: savedId });
       close(); render(host);
     });
   }

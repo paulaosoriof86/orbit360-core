@@ -32,7 +32,7 @@ Orbit.modules.cancelaciones = (function () {
       ${K.bannerFor('cancelaciones', '')}
       ${K.kpis([
         { label: 'Canceladas', onclick: "location.hash='#/cancelaciones'", val: all.length, color: 'var(--danger)', foot: 'histórico' },
-        { label: 'Valor perdido', val: U.moneyShort(perdido, 'GTQ'), color: 'var(--danger)', foot: 'prima anual', footTone: 'down' },
+        { label: 'Valor perdido', val: U.moneyShort(perdido, Orbit.q.monedaPais()), color: 'var(--danger)', foot: 'prima anual', footTone: 'down' },
         { label: 'Motivo principal', val: '<span style="font-size:16px">' + (Object.entries(porMotivo).sort((a, b) => b[1] - a[1])[0] || ['—'])[0] + '</span>', color: 'var(--warn)', foot: 'más frecuente' },
         { label: 'Tasa de fuga', val: Math.round(all.length / (S().all('polizas').length || 1) * 100) + '%', color: 'var(--info)', foot: 'sobre cartera total' }
       ])}

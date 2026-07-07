@@ -74,7 +74,7 @@ Orbit.q = (function () {
     dias = dias || 45;
     return S().where('polizas', p => {
       const d = U.daysFromNow(p.vigenciaFin);
-      return p.estado !== 'Cancelada' && d != null && d >= 0 && d <= dias;
+      return (p.estado === 'Vigente' || p.estado === 'Por renovar') && d != null && d >= 0 && d <= dias;
     }).sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
   }
   function cobrosVencidos() {
@@ -117,9 +117,18 @@ Orbit.q = (function () {
   }
   function clienteNombre(id) { const c = S().get('clientes', id); return c ? c.nombre : '—'; }
 
+  /** REGLA DE NEGOCIO (multi-tenant, no solo A&S): el pago aplicado por el cliente a un
+   *  recibo/póliza NO es un movimiento financiero real de la empresa — es RECAUDO COMERCIAL.
+   *  Afecta cartera, recibos, metas de recaudo y producción recaudada (todo derivado de `cobros`),
+   *  NO la colección `finmovs`. A `finmovs` solo van ingresos/egresos REALES de la empresa
+   *  (comisión recibida, factura cobrada, liquidación pagada por aseguradora, pago a asesor, gasto).
+   *  Por eso este helper NO escribe en finmovs (prevención de regresión). Se conserva la firma
+   *  para no romper llamadas existentes. */
+  function postRecaudo(/* cobro, fecha, metodo */) { return; }
+
   return {
     asesor, aseguradora, polizasDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, carteraGlobal, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
-    agingVencido, comisionesPor, clienteNombre, norm, monedaPais, vehiculosDe, vehiculoDePoliza
+    agingVencido, comisionesPor, clienteNombre, norm, monedaPais, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();

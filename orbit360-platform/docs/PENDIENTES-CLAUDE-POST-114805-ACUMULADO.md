@@ -19,6 +19,10 @@ Estado: documento vivo hasta que Paula pida el próximo paquete Claude.
 - Se creó validador de manifest contra contrato canónico.
 - Se alineó el validador principal de manifest con el contrato canónico.
 - Se creó prevalidación unificada de fuente separada.
+- Se creó dry-run canónico v2 de fuente separada.
+- Se creó reporte de prevalidación de fuentes A&S.
+- Se creó registro backend de prevalidación de fuentes A&S.
+- Se creó adenda de fuentes A&S.
 
 Archivos backend/documentación que Claude debe respetar:
 
@@ -27,8 +31,21 @@ tools/orbit360-generar-contrato-fuentes-ays.mjs
 tools/orbit360-validar-manifest-contra-contrato-fuentes-ays.mjs
 tools/orbit360-prevalidar-fuente-ays.mjs
 tools/orbit360-validar-manifest-fuente-ays.mjs
+tools/orbit360-dryrun-fuente-separada-ays-v2.mjs
 orbit360-platform/docs/CONTRATO-CANONICO-FUENTES-MIGRACION-AYS-20260704.md
+orbit360-platform/docs/REPORTE-PREVALIDACION-FUENTES-AYS-20260704.md
+orbit360-platform/docs/REGISTRO-BACKEND-PREVALIDACION-FUENTES-AYS-20260704.md
+orbit360-platform/docs/ADENDA-FUENTES-AYS-20260704.md
 ```
+
+## Regla de alcance confirmada por Paula - ignorar Listado produccion 2025-2026
+
+- `Listado produccion 2025-2026` queda fuera del proceso actual.
+- No se usa como fuente de polizas.
+- No se usa como financiero historico.
+- La fuente real de polizas sera entregada por Paula despues como archivo separado, cuando corresponda dentro del proceso.
+- Claude debe conservar esta regla y no reabrir esa hoja como pendiente.
+- No crear manifest, cartera ni preview de cartera a partir de `Listado produccion 2025-2026`.
 
 ## P0 abiertos para corregir antes de cerrar empalme
 

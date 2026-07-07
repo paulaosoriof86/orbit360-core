@@ -75,8 +75,10 @@ Validación aplicada:
 - No inferir clientes, pólizas ni cobros desde financiero histórico.
 - No escribir cartera desde movimientos financieros.
 - No duplicar recaudos/cobros en `finmovs`.
-- Hojas de dashboard, análisis, presupuesto, salario y producción se excluyen de esta fuente.
-- La hoja `Listado producción 2025-2026` se detectó dentro del archivo, pero se excluye del manifest financiero. Debe tratarse en manifest separado tipo `polizas`, no como financiero histórico.
+- Las hojas financieras mensuales pueden seguir como `financiero_historico -> finmovs`.
+- Las hojas de analisis, dashboard, presupuesto y salarios quedan excluidas.
+- `Listado produccion 2025-2026` queda ignorado por instruccion previa de Paula.
+- No debe quedar como pendiente crear manifest de polizas desde esa hoja.
 
 ## Ajuste técnico identificado
 
@@ -86,9 +88,8 @@ El dry-run anterior no cubría todos los tipos del contrato canónico, especialm
 
 1. Confirmar que los directorios de aseguradoras se cargarán primero como catálogo/directorio, no como contactos operativos con credenciales visibles.
 2. Mantener excluidas las hojas de presupuesto/dashboard/análisis/salarios del archivo financiero.
-3. Crear manifest separado para `Listado producción 2025-2026` como fuente `polizas`, antes de cualquier intento de cargar pólizas/cartera.
-4. Definir fase de preview normalizado antes de `writeToStore`.
-5. Mantener `write_enabled=false` hasta autorización explícita de Paula para LAB.
+3. Definir fase de preview normalizado antes de `writeToStore`.
+4. Mantener `write_enabled=false` hasta autorizacion explicita de Paula para LAB.
 
 ## Decisión
 

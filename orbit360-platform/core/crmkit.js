@@ -107,7 +107,7 @@ Orbit.kpi = function (preset, arg) {
     'polizas-todas': () => mk('Todas las pólizas', S.all('polizas'), 'poliza'),
     'cobros-pendientes': () => mk('Cobros pendientes', S.where('cobros', c => c.estado === 'Pendiente'), 'cobro'),
     'cobros-vencidos': () => mk('Cobros vencidos', S.where('cobros', c => c.estado === 'Vencido'), 'cobro'),
-    'cobros-pagados': () => mk('Cobros aplicados', S.where('cobros', c => c.estado === 'Pagado'), 'cobro'),
+    'cobros-pagados': () => mk('Cobros confirmados', S.where('cobros', c => c.estado === 'Pagado'), 'cobro'),
     'renov-proximas': () => mk('Renovaciones próximas', (q.renovacionesProximas ? q.renovacionesProximas(30) : []), 'poliza'),
     'cancel-todas': () => mk('Cancelaciones', S.all('cancelaciones'), 'cancel'),
     'clientes-todos': () => mk('Clientes', S.all('clientes'), 'cliente'),

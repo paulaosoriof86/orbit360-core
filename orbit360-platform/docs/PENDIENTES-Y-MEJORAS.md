@@ -1,4 +1,9 @@
-# PENDIENTES Y MEJORAS — Orbit 360 (estado al v1.41)
+# PENDIENTES Y MEJORAS — Orbit 360 (candidata activa 2026-07-04T211525.464)
+
+> Versión unificada: candidata activa **2026-07-04T211525.464** (base comparada `205210.456`) · Academia **CONTENT_V=5**.
+>
+> **P0 cerrados (prototipo)**: Pólizas `gastosFinan`; Cobros validar≠aplicar; Cliente360 "Validada (por aplicar)"; Importador no aplica pagos directo (propuestas); planilla sin fallback GTQ (labels MATCH_EXACTO/MATCH_PROBABLE/REQUIERE_VALIDACION/BLOQUEADO); **bandeja de conciliaciones** UI segura (no muta cobros); copys residuales corregidos; moneda por país en agregados.
+> **Pendiente backend (ChatGPT/Codex)**: persistencia real de `conciliaciones`/`auditLog`, aplicación controlada de pagos con transición auditada, conexión de la bandeja al score real del `dryRunReport`; Portal reflejar "validado ≠ pagado" (Cobros/Cliente360 ya correctos).
 
 > Documento puente para **ChatGPT (migración / backend)**. Lista honesta de lo que
 > **funciona como prototipo** vs lo que **requiere backend real** o **profundización**.

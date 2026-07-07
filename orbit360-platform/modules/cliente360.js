@@ -16,6 +16,18 @@ Orbit.modules.cliente360 = (function () {
   // visibilidad por rol (la comisión de empresa es interna/configurable)
   const ROLE = () => (Orbit.session && Orbit.session.rol && Orbit.session.rol()) || (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
   const verEmpresa = () => ['Dirección', 'Admin', 'Finanzas'].includes(ROLE());
+  // Estado de validación del cobro (coherente con Cobros): reportado ≠ aplicado
+  function cobBadge(c) {
+    let e, tone;
+    if (c.estado === 'Pagado') { e = c.conciliado ? 'Conciliado' : 'Pagado (por conciliar)'; tone = 'ok'; }
+    else if (c.validadoReporte && (c.estado === 'Pendiente' || c.estado === 'Vencido')) { e = 'Validada (por confirmar)'; tone = 'ok'; }
+    else if (c.requiereValidacion) { e = 'Requiere validación'; tone = 'warn'; }
+    else if (c.estado === 'Bloqueado') { e = 'Bloqueado'; tone = 'danger'; }
+    else if (c.reportado && (c.estado === 'Pendiente' || c.estado === 'Vencido')) { e = c.enRevision ? 'En revisión' : 'Reportado por cliente'; tone = 'info'; }
+    else if (c.estado === 'Vencido') { e = 'Vencido'; tone = 'danger'; }
+    else { e = c.estado || 'Pendiente'; tone = 'warn'; }
+    return '<span class="badge ' + tone + '">' + e + '</span>';
+  }
 
   const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'siniestros', 'comisiones', 'correos', 'historial'];
 
@@ -58,7 +70,7 @@ Orbit.modules.cliente360 = (function () {
       <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
         <button class="kpi kpi-click" onclick="Orbit.modules.cliente360.render(document.getElementById('mod-host'))" title="Ver todos"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${clientes.length}</div><div class="k-foot muted">${clientes.filter(c => c.tipo === 'Empresa').length} empresas · ${clientes.filter(c => c.tipo === 'Persona').length} personas</div></button>
         <button class="kpi kpi-click" onclick="Orbit.kpi('polizas-vigentes')" title="Ver pólizas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${S().where('polizas', p => p.estado === 'Vigente' || p.estado === 'Por renovar').length}</div><div class="k-foot muted">de ${S().all('polizas').length} históricas</div></button>
-        <div class="kpi"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima vigente</div><div class="k-val">${U.moneyShort(totPrima, 'GTQ')}</div><div class="k-foot muted">cartera total estimada</div></div>
+        <div class="kpi"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima vigente</div><div class="k-val">${U.moneyShort(totPrima, Orbit.q.monedaPais())}</div><div class="k-foot muted">cartera total estimada</div></div>
         <div class="kpi"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Por renovar ≤45 d</div><div class="k-val">${q.renovacionesProximas(45).length}</div><div class="k-foot muted">requieren gestión</div></div>
       </div>
 
@@ -284,7 +296,7 @@ Orbit.modules.cliente360 = (function () {
           <b style="font-family:var(--f-display);font-size:15px">Próximas acciones</b>
           <div style="margin-top:12px;display:grid;gap:10px">
             ${proxRenov ? actionRow('🔄', 'Renovación', `${proxRenov.ramo} · ${proxRenov.numero}`, U.fmtDate(proxRenov.vigenciaFin), 'warn') : actionRow('✓', 'Sin renovaciones próximas', 'Cartera al día', '', 'ok')}
-            ${proxCobro ? actionRow('💳', 'Próximo cobro', `Cuota ${proxCobro.cuota} · ${U.money(proxCobro.monto, proxCobro.moneda)}`, U.fmtDate(proxCobro.vence), 'info') : actionRow('✓', 'Sin cobros pendientes', 'Todo aplicado', '', 'ok')}
+            ${proxCobro ? actionRow('💳', 'Próximo cobro', `Cuota ${proxCobro.cuota} · ${U.money(proxCobro.monto, proxCobro.moneda)}`, U.fmtDate(proxCobro.vence), 'info') : actionRow('✓', 'Sin cobros pendientes', 'Cartera al día', '', 'ok')}
             ${r.vencido > 0 ? actionRow('⚠', 'Cartera vencida', U.money(r.vencido, r.moneda) + ' por gestionar', 'urgente', 'danger') : ''}
           </div>
         </div>
@@ -368,8 +380,8 @@ Orbit.modules.cliente360 = (function () {
           <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
           <td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">—</span>'}</td>
           <td style="font-size:12.5px">${c.metodo || '<span class="muted">—</span>'}</td>
-          <td>${U.estadoBadge(c.estado)}</td>
-          <td>${c.estado === 'Pagado' ? (c.conciliado ? '<span title="Pago aplicado a la póliza" style="color:var(--ok)">✓</span>' : '<span title="Pendiente de conciliar (Finanzas)" style="color:var(--warn)">◷</span>') : '<span class="muted">—</span>'}</td>
+          <td>${cobBadge(c)}</td>
+          <td>${c.estado === 'Pagado' ? (c.conciliado ? '<span title="Confirmado y conciliado con la póliza" style="color:var(--ok)">✓</span>' : '<span title="Pendiente de conciliar (Finanzas)" style="color:var(--warn)">◷</span>') : '<span class="muted">—</span>'}</td>
         </tr>`;
       }).join('')}${cob.length === 0 ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:28px">Sin cobros.</td></tr>' : ''}</tbody>
     </table></div>
@@ -441,7 +453,7 @@ Orbit.modules.cliente360 = (function () {
   }
   function vrow(k, v) { return `<div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">${k}</div><div style="font-weight:600;margin-top:1px">${U.esc(v)}</div></div>`; }
 
-  /* ---- Recibos y pagos (filtro por póliza + aplicar pago) ---- */
+  /* ---- Recibos y cobros (filtro por póliza + confirmar cobro) ---- */
   let recPolFiltro = {};  // por cliente: polizaId seleccionada
   function tabRecibos(cid, r) {
     const cobAll = r.cob.slice().sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
@@ -458,8 +470,8 @@ Orbit.modules.cliente360 = (function () {
       polis.map(p => `<option value="${p.id}" ${sel === p.id ? 'selected' : ''}>${p.numero} · ${(q.aseguradora(p.aseguradoraId) || {}).nombre || ''} · ${U.esc(ident(p))}</option>`).join('');
     return `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
       ${miniStat('Recibos' + (sel === 'todas' ? ' del cliente' : ' de la póliza'), String(cob.length), '')}
-      ${miniStat('Por aplicar', String(pend.length), pend.length ? 'warn' : 'ok')}
-      ${miniStat('Aplicado', U.money(cobrado, r.moneda), 'ok')}
+      ${miniStat('Por confirmar', String(pend.length), pend.length ? 'warn' : 'ok')}
+      ${miniStat('Confirmado', U.money(cobrado, r.moneda), 'ok')}
     </div>
     <div class="card" style="overflow:hidden">
       <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
@@ -479,21 +491,22 @@ Orbit.modules.cliente360 = (function () {
             <td>${c.cuota}</td>
             <td class="num">${U.money(c.monto, c.moneda)}</td>
             <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
-            <td>${U.estadoBadge(c.estado)}</td>
-            <td style="text-align:right" onclick="event.stopPropagation()">${aplicable ? `<button class="btn primary sm" data-apply="${c.id}">Aplicar pago</button>` : (c.estado === 'Pagado' ? `<span class="badge ${c.conciliado ? 'ok' : 'warn'}">${c.conciliado ? 'Conciliado' : 'Por conciliar'}</span>` : '<span class="muted">—</span>')}</td>
+            <td>${cobBadge(c)}</td>
+            <td style="text-align:right" onclick="event.stopPropagation()">${c.reportado && !c.validadoReporte && aplicable ? `<button class="btn primary sm" data-validar="${c.id}">🔎 Validar</button>` : (aplicable ? `<button class="btn primary sm" data-apply="${c.id}">Confirmar cobro</button>` : (c.estado === 'Pagado' ? `<span class="badge ${c.conciliado ? 'ok' : 'warn'}">${c.conciliado ? 'Conciliado' : 'Por conciliar'}</span>` : '<span class="muted">—</span>'))}</td>
           </tr>`;
         }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">Sin recibos para esta póliza.</td></tr>'}</tbody>
       </table></div>
-      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Filtra por póliza para no mezclar recibos. <b>Aplicar pago</b> concilia el recibo con su póliza; clic en la fila abre el detalle. Los estados de cuenta se cargan en <b>Orbit Finanzas</b>.</div>
+      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Filtra por póliza para no mezclar recibos. <b>Confirmar cobro</b> concilia el recibo con su póliza; clic en la fila abre el detalle. Los estados de cuenta se cargan en <b>Orbit Finanzas</b>.</div>
     </div>`;
   }
   function wireRecibos(cid) {
     document.querySelectorAll('[data-apply]').forEach(b => b.addEventListener('click', () => aplicarPago(b.dataset.apply, cid)));
+    document.querySelectorAll('[data-validar]').forEach(b => b.addEventListener('click', () => { if (Orbit.modules.cobros && Orbit.modules.cobros.validarReporte) Orbit.modules.cobros.validarReporte(b.dataset.validar); }));
     const f = document.getElementById('rec-pol-filtro');
     if (f) f.addEventListener('change', () => { recPolFiltro[cid] = f.value; tab = 'recibos'; detalle(cid); });
   }
 
-  /* ---- Aplicar pago: fecha de envío a gestión (default hoy, editable) + factura (fecha real) ---- */
+  /* ---- Confirmar cobro: fecha de confirmación (default hoy, editable) + factura (fecha real) ---- */
   function aplicarPago(cobroId, cid) {
     const c = S().get('cobros', cobroId); if (!c) return;
     const p = S().get('polizas', c.polizaId);
@@ -502,23 +515,23 @@ Orbit.modules.cliente360 = (function () {
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
     back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
       <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:16px">💳 Aplicar pago</b><button class="imp-x" id="ap-x">✕</button></div>
+        <b style="font-family:var(--f-display);font-size:16px">💳 Confirmar cobro</b><button class="imp-x" id="ap-x">✕</button></div>
       <div style="padding:18px 20px;display:grid;gap:13px">
         <div class="vp-grid">
           ${vrow('Recibo', 'REC-' + c.id.slice(-5).toUpperCase())}${vrow('Cuota', c.cuota)}
           ${vrow('Póliza', p ? p.numero : '—')}${vrow('Monto', U.money(c.monto, c.moneda))}
         </div>
-        <label class="ce-l">Fecha de envío a gestión <span class="muted">(día en que se aplica)</span><input id="ap-fecha" class="o-sel" type="date" value="2026-06-22"></label>
+        <label class="ce-l">Fecha de confirmación <span class="muted">(día en que el equipo confirma el cobro)</span><input id="ap-fecha" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
         <label class="ce-l">Forma de pago<select id="ap-metodo" class="o-sel">${(Orbit.primas ? Orbit.primas.FORMAS_PAGO : ['Transferencia', 'Tarjeta de crédito', 'Efectivo']).map(m => `<option ${m === (p && p.formaPago) ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
         <div class="ap-fact">
           <label class="ce-l" style="margin:0">📄 Factura de la aseguradora <span class="muted">(opcional)</span><input id="ap-file" type="file" class="o-sel" accept="image/*,application/pdf"></label>
-          <label class="ce-l" id="ap-real-wrap" style="display:none;margin-top:9px">Fecha real en que pagó la aseguradora<input id="ap-real" class="o-sel" type="date" value="2026-06-20"></label>
+          <label class="ce-l" id="ap-real-wrap" style="display:none;margin-top:9px">Fecha real en que pagó la aseguradora<input id="ap-real" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
           <div class="muted" style="font-size:11px;margin-top:7px">Cargar la factura fija la <b>fecha real</b> del pago y <b>concilia</b> el recibo (medio adicional de conciliación). Sin factura, el recibo queda <b>Pagado · por conciliar</b>.</div>
           <label class="ce-l" style="margin-top:11px;display:flex;align-items:center;gap:8px;flex-direction:row;cursor:pointer"><input id="ap-avisar" type="checkbox" checked style="width:auto"> 📲 Avisar al cliente (WhatsApp / correo)</label>
         </div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn ghost" id="ap-cancel">Cancelar</button><button class="btn primary" id="ap-ok">Aplicar pago</button></div>
+        <button class="btn ghost" id="ap-cancel">Cancelar</button><button class="btn primary" id="ap-ok">Registrar cobro confirmado</button></div>
     </div>`;
     document.body.appendChild(back);
     const close = () => back.remove();
@@ -529,18 +542,20 @@ Orbit.modules.cliente360 = (function () {
     $('#ap-file').addEventListener('change', e => { factura = e.target.files[0] ? e.target.files[0].name : null; $('#ap-real-wrap').style.display = factura ? '' : 'none'; });
     $('#ap-ok').addEventListener('click', () => {
       const conciliado = !!factura;
-      S().update('cobros', cobroId, {
+      const patchP = {
         estado: 'Pagado', fechaPago: $('#ap-fecha').value, metodo: $('#ap-metodo').value,
         conciliado, facturaNombre: factura || '', fechaReal: conciliado ? $('#ap-real').value : ''
-      });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: (p && p.asesorId) || '', tipo: 'sistema', icon: '💳', fecha: $('#ap-fecha').value, titulo: 'Pago aplicado · ' + (p ? p.numero : ''), detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (conciliado ? ' · conciliado con factura (' + factura + ')' : ' · por conciliar') });
+      };
+      S().update('cobros', cobroId, patchP);
+      if (Orbit.q && Orbit.q.postRecaudo) Orbit.q.postRecaudo(Object.assign({}, c, patchP), $('#ap-fecha').value, $('#ap-metodo').value);
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: (p && p.asesorId) || '', tipo: 'sistema', icon: '💳', fecha: $('#ap-fecha').value, titulo: 'Pago confirmado · ' + (p ? p.numero : ''), detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (conciliado ? ' · conciliado con factura (' + factura + ')' : ' · por conciliar') });
       const avisar = $('#ap-avisar') && $('#ap-avisar').checked;
       close();
       if (avisar) {
         Orbit.notify.pedir(cid, {
-          tipo: 'Aviso de pago aplicado', icon: '💳',
+          tipo: 'Aviso de pago confirmado', icon: '💳',
           asunto: 'Confirmación de pago · póliza ' + (p ? p.numero : ''),
-          mensaje: 'Hola ' + (r.cli.nombre || '') + ', confirmamos la aplicación de tu pago de ' + U.money(c.monto, c.moneda) + ' (cuota ' + c.cuota + ') de la póliza ' + (p ? p.numero : '') + '. ¡Gracias por tu confianza!',
+          mensaje: 'Hola ' + (r.cli.nombre || '') + ', confirmamos tu pago de ' + U.money(c.monto, c.moneda) + ' (cuota ' + c.cuota + ') de la póliza ' + (p ? p.numero : '') + '. ¡Gracias por tu confianza!',
           onSent: () => detalle(cid)
         });
       } else { detalle(cid); }
@@ -1068,7 +1083,7 @@ Orbit.modules.cliente360 = (function () {
         <div class="seg"><button class="seg-b active" data-mode="manual">✍ Manual</button><button class="seg-b" data-mode="import">⬇ Importar</button><button class="seg-b" data-mode="ia">✨ Inteligente</button></div>
         <div id="en-import" style="display:none"><div class="cfg-note">Cargá el documento del endoso (PDF/imagen). El extractor leerá tipo, fecha y montos, y <b>señalará lo que no pueda leer</b>. Quedará en el Drive del cliente.</div><input type="file" id="en-file" class="o-sel" style="margin-top:9px"></div>
         <label class="ce-l">Tipo de endoso<select id="en-tipo" class="o-sel">${tipos.map(t => `<option>${t}</option>`).join('')}</select></label>
-        <label class="ce-l">Fecha<input id="en-fecha" class="o-sel" type="date" value="2026-06-22"></label>
+        <label class="ce-l">Fecha<input id="en-fecha" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
         <label class="ce-l">Detalle<textarea id="en-det" class="o-sel" style="min-height:56px;resize:vertical;padding:9px 11px" placeholder="Descripción del cambio que aplica a la póliza…"></textarea></label>
         <div class="cfg-note">Queda registrado en el <b>historial de la póliza</b> y del cliente.</div>
       </div>
@@ -1393,7 +1408,7 @@ Orbit.modules.cliente360 = (function () {
           <label class="ce-l">Nombre / razón social *<input id="nc-nombre" class="o-sel" placeholder="Nombre completo o razón social"></label>
           <label class="ce-l">Tipo<select id="nc-tipo" class="o-sel"><option>Persona</option><option>Empresa</option></select></label>
           <label class="ce-l">País *<select id="nc-pais" class="o-sel">${paises.map(p => '<option value="' + p.id + '">' + p.label + '</option>').join('')}</select></label>
-          <label class="ce-l">Identificación (DPI/Cédula/NIT)<input id="nc-id" class="o-sel" placeholder="0000 00000 0000 0"></label>
+          <label class="ce-l">Identificación (${Orbit.termino ? Orbit.termino('id_fiscal') : 'ID fiscal'})<input id="nc-id" class="o-sel" placeholder="0000 00000 0000 0"></label>
           <label class="ce-l">Teléfono (WhatsApp) *<input id="nc-tel" class="o-sel" placeholder="+502 1234 5678"></label>
           <label class="ce-l">Correo electrónico<input id="nc-email" class="o-sel" type="email" placeholder="correo@dominio.com"></label>
           <label class="ce-l">Departamento<select id="nc-dep" class="o-sel"><option value="">— Seleccionar —</option></select></label>

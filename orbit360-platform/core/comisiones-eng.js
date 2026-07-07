@@ -98,5 +98,37 @@ Orbit.comeng = (function () {
     return n;
   }
 
-  return { pctAseguradora, shareVendedor, modeloVendedor, comVendedorDe, calc, calcSobre, setRamoPct, setProdPct, setVendShare, setVendModo, setVendValor, aplicarPlanilla, DEFAULT_ASEG, DEFAULT_VEND };
+  /* Conciliación de STATEMENT (planilla de comisiones que envía la aseguradora):
+     compara lo PAGADO por la aseguradora contra lo ESPERADO según las tarifas vigentes.
+     Modo A (con statement importado): filas = [{ aseguradoraId, polizaId|polizaNumero, montoPagado }].
+     Modo B (sin archivo): recomputa el ESPERADO de cada registro `comisiones` con la
+     tarifa vigente y lo compara con el monto REGISTRADO — detecta "drift" de tarifa/errores. */
+  function conciliarStatement(filas) {
+    const rows = [];
+    if (filas && filas.length) {
+      filas.forEach(f => {
+        const pol = f.polizaId ? S().get('polizas', f.polizaId)
+          : S().all('polizas').find(p => (p.numero || '') === (f.polizaNumero || ''));
+        if (!pol) { rows.push({ ref: f.polizaNumero || f.polizaId || '—', sinPoliza: true, pagado: +f.montoPagado || 0, esperado: 0, desv: 0 }); return; }
+        const base = +(pol.primaNeta != null ? pol.primaNeta : pol.prima) || 0;
+        const esp = calcSobre(base, pol).comAseguradora;
+        const pag = +f.montoPagado || 0;
+        rows.push({ ref: pol.numero, polizaId: pol.id, base, esperado: esp, pagado: pag, desv: r2(pag - esp), pct: esp ? r2((pag - esp) / esp * 100) : 0, periodo: f.periodo || '', retencion: +f.retencion || 0, ajuste: +f.ajuste || 0, aseguradoraId: pol.aseguradoraId, asesorId: pol.asesorId });
+      });
+    } else {
+      S().all('comisiones').forEach(c => {
+        const pol = S().get('polizas', c.polizaId); if (!pol) return;
+        const base = +c.base || 0;
+        const esp = calcSobre(base, pol).comAseguradora;
+        const reg = +c.monto || 0;
+        rows.push({ ref: pol.numero, polizaId: pol.id, base, esperado: esp, pagado: reg, desv: r2(reg - esp), pct: esp ? r2((reg - esp) / esp * 100) : 0, comId: c.id, periodo: c.periodo || '', retencion: +c.retencion || 0, ajuste: +c.ajuste || 0, aseguradoraId: pol.aseguradoraId, asesorId: pol.asesorId });
+      });
+    }
+    const totEsp = r2(rows.reduce((s, r) => s + r.esperado, 0));
+    const totPag = r2(rows.reduce((s, r) => s + r.pagado, 0));
+    const conDesv = rows.filter(r => Math.abs(r.desv) >= 0.5);
+    return { rows, totEsperado: totEsp, totPagado: totPag, desviacion: r2(totPag - totEsp), conDesviacion: conDesv.length, n: rows.length };
+  }
+
+  return { pctAseguradora, shareVendedor, modeloVendedor, comVendedorDe, calc, calcSobre, setRamoPct, setProdPct, setVendShare, setVendModo, setVendValor, aplicarPlanilla, conciliarStatement, DEFAULT_ASEG, DEFAULT_VEND };
 })();

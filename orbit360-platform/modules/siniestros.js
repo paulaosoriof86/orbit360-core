@@ -34,7 +34,7 @@ Orbit.modules.siniestros = (function () {
       ${K.kpis([
         { label: 'Reclamos', val: arr.length, color: 'var(--red)', foot: abiertos.length + ' abiertos', onclick: "location.hash='#/siniestros'" },
         { label: 'En proceso', val: abiertos.length, color: 'var(--warn)', foot: 'requieren gestión', onclick: "location.hash='#/siniestros'" },
-        { label: 'Indemnización pagada', val: U.moneyShort(pagado, 'GTQ'), color: 'var(--ok)', foot: 'a clientes', footTone: 'up', onclick: "location.hash='#/siniestros'" },
+        { label: 'Indemnización pagada', val: U.moneyShort(pagado, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a clientes', footTone: 'up', onclick: "location.hash='#/siniestros'" },
         { label: 'Tasa de aprobación', val: arr.length ? Math.round(arr.filter(r => ['Aprobado', 'Pagado'].includes(r.estado)).length / arr.length * 100) + '%' : '—', color: 'var(--info)', foot: 'aprobados / total', onclick: "location.hash='#/siniestros'" },
         { label: '⏱ Días abiertos (prom.)', val: promAbierto || '—', color: promAbierto > 30 ? 'var(--danger)' : 'var(--warn)', foot: abiertos.length + ' reclamos en proceso' },
         { label: '✅ Días a pago (prom.)', val: promCierre || '—', color: 'var(--ok)', foot: cerrados.length + ' reclamos pagados' }
@@ -108,14 +108,25 @@ Orbit.modules.siniestros = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#si-x').addEventListener('click', close);
-    $('#si-add').addEventListener('click', () => { const v = $('#si-nota').value.trim(); if (!v) return; const bit = (r.bitacora || []).concat([{ ts: '2026-06-24 ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: v, d: '' }]); S().update('reclamos', id, { bitacora: bit }); ficha(id); });
+    $('#si-add').addEventListener('click', () => { const v = $('#si-nota').value.trim(); if (!v) return; const bit = (r.bitacora || []).concat([{ ts: Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: v, d: '' }]); S().update('reclamos', id, { bitacora: bit }); ficha(id); });
     $('#si-save').addEventListener('click', () => {
       const nuevoEst = $('#si-estado').value;
+      const cambioEstado = nuevoEst !== r.estado;
       const patch = { estado: nuevoEst };
-      if (nuevoEst !== r.estado) patch.bitacora = (r.bitacora || []).concat([{ ts: '2026-06-24 ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: 'Estado: ' + nuevoEst, d: '' }]);
+      if (cambioEstado) patch.bitacora = (r.bitacora || []).concat([{ ts: Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: 'Estado: ' + nuevoEst, d: '' }]);
       if (['Aprobado', 'Pagado'].includes(nuevoEst) && !r.montoAprobado) patch.montoAprobado = r.montoReclamado;
       S().update('reclamos', id, patch);
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: r.clienteId, asesorId: r.asesorId, tipo: 'sistema', icon: '🚨', fecha: Orbit.ui.today(), titulo: 'Siniestro ' + r.numero + ': ' + nuevoEst, detalle: r.tipo + ' · ' + r.ramo });
+      if (cambioEstado) {
+        S().insert('actividades', { id: 'act' + Date.now(), clienteId: r.clienteId, asesorId: r.asesorId, tipo: 'siniestro', icon: '🚨', fecha: Orbit.ui.today(), titulo: 'Siniestro ' + r.numero + ': ' + nuevoEst, detalle: r.tipo + ' · ' + (r.ramo || ''), reclamoId: id });
+        // reflejar en la gestión de Ops enlazada a este reclamo (paso 8 del flujo Portal→Siniestro)
+        var gs = (S().all('gestiones') || []).filter(function (g) { return g.reclamoId === id; });
+        gs.forEach(function (g) {
+          var nota = (g.notas ? g.notas + '\n' : '') + '[' + Orbit.ui.today() + '] Siniestro ' + r.numero + ' → ' + nuevoEst;
+          var patchG = { notas: nota };
+          if (['Pagado', 'Rechazado'].includes(nuevoEst)) patchG.estado = 'Resuelta';
+          S().update('gestiones', g.id, patchG);
+        });
+      }
       close(); render(host);
     });
   }
