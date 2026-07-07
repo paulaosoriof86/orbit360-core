@@ -13,6 +13,7 @@ Orbit.modules.siniestros = (function () {
   const TONE = { 'Reportado': 'warn', 'En análisis': 'info', 'Documentación': 'info', 'Aprobado': 'ok', 'Pagado': 'ok', 'Rechazado': 'danger' };
 
   function paisOK(cid) { const c = S().get('clientes', cid); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }
+  function monedaReclamo(r) { const c = S().get('clientes', r.clienteId) || {}; return c.moneda || Orbit.q.monedaPais(); }
   function todos() { return S().all('reclamos').filter(r => paisOK(r.clienteId)); }
 
   function render(h) {
@@ -20,8 +21,7 @@ Orbit.modules.siniestros = (function () {
     const arr = todos();
     const abiertos = arr.filter(r => !['Pagado', 'Rechazado'].includes(r.estado));
     const lista = filtro === 'todos' ? arr : filtro === 'abiertos' ? abiertos : arr.filter(r => r.estado === filtro);
-    const pagado = arr.filter(r => r.estado === 'Pagado').reduce((s, r) => s + (r.montoAprobado || 0), 0);
-    // analítica de tiempos: días abiertos (reclamos en proceso) y días hasta pago (cerrados)
+    const pagado = arr.filter(r => r.estado === 'Pagado').reduce((s, r) => s + q.norm(r.montoAprobado || 0, monedaReclamo(r)), 0);
     const hoy = new Date(U.NOW || Date.now());
     const diasEntre = (f1, f2) => Math.max(0, Math.round((new Date(f2) - new Date(f1)) / 86400000));
     const abiertosDias = abiertos.map(r => diasEntre(r.fecha, hoy)).filter(d => !isNaN(d));
@@ -34,7 +34,7 @@ Orbit.modules.siniestros = (function () {
       ${K.kpis([
         { label: 'Reclamos', val: arr.length, color: 'var(--red)', foot: abiertos.length + ' abiertos', onclick: "location.hash='#/siniestros'" },
         { label: 'En proceso', val: abiertos.length, color: 'var(--warn)', foot: 'requieren gestión', onclick: "location.hash='#/siniestros'" },
-        { label: 'Indemnización pagada', val: U.moneyShort(pagado, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a clientes', footTone: 'up', onclick: "location.hash='#/siniestros'" },
+        { label: 'Indemnización pagada', val: U.moneyShort(pagado, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'normalizado / no mezclar monedas', footTone: 'up', onclick: "location.hash='#/siniestros'" },
         { label: 'Tasa de aprobación', val: arr.length ? Math.round(arr.filter(r => ['Aprobado', 'Pagado'].includes(r.estado)).length / arr.length * 100) + '%' : '—', color: 'var(--info)', foot: 'aprobados / total', onclick: "location.hash='#/siniestros'" },
         { label: '⏱ Días abiertos (prom.)', val: promAbierto || '—', color: promAbierto > 30 ? 'var(--danger)' : 'var(--warn)', foot: abiertos.length + ' reclamos en proceso' },
         { label: '✅ Días a pago (prom.)', val: promCierre || '—', color: 'var(--ok)', foot: cerrados.length + ' reclamos pagados' }
@@ -52,7 +52,7 @@ Orbit.modules.siniestros = (function () {
             <td class="mono" style="font-size:11.5px">${p ? p.numero : '—'}</td>
             <td>${U.esc(r.tipo)}</td>
             <td style="font-size:12.5px">${asg ? U.esc(asg.nombre) : '—'}</td>
-            <td class="num">${U.money(r.montoReclamado, (cli && cli.moneda) || 'GTQ')}</td>
+            <td class="num">${U.money(r.montoReclamado, (cli && cli.moneda) || Orbit.q.monedaPais())}</td>
             <td style="font-size:12px">${U.fmtDate(r.fecha)}</td>
             <td><span class="badge ${TONE[r.estado]}">${r.estado}</span></td></tr>`;
         }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:22px">Sin reclamos.</td></tr>'}</tbody>
@@ -65,8 +65,8 @@ Orbit.modules.siniestros = (function () {
 
   function ficha(id) {
     const r = S().get('reclamos', id); if (!r) return;
-    const cli = S().get('clientes', r.clienteId), p = S().get('polizas', r.polizaId), asg = q.aseguradora(r.aseguradoraId), ase = q.asesor(r.asesorId);
-    const cur = (cli && cli.moneda) || 'GTQ';
+    const cli = S().get('clientes', r.clienteId), p = S().get('polizas', r.polizaId), asg = q.aseguradora(r.aseguradoraId);
+    const cur = monedaReclamo(r);
     const correos = (Orbit.correo ? Orbit.correo.deEntidad('reclamo', id, r.clienteId) : []);
     let back = document.getElementById('si-ficha'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'si-ficha'; back.className = 'drawer-back open';
@@ -74,14 +74,14 @@ Orbit.modules.siniestros = (function () {
     back.innerHTML = `<div class="card" style="width:min(720px,96vw);max-height:92vh;overflow:auto;padding:0">
       <div style="padding:20px 24px;background:linear-gradient(120deg,#7e1220,#b5253b);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.82)">Siniestro · ${r.numero}</div>
-          <h2 style="font-family:var(--f-display);font-weight:800;font-size:20px;margin:0;color:#fff">${U.esc(r.tipo)} · ${r.ramo}</h2>
+          <h2 style="font-family:var(--f-display);font-weight:800;font-size:20px;margin:0;color:#fff">${U.esc(r.tipo)} · ${r.ramo || ''}</h2>
           <div style="font-size:12.5px;margin-top:4px;color:rgba(255,255,255,.85)">${cli ? U.esc(cli.nombre) : '—'} · ${p ? p.numero : '—'} · ${asg ? U.esc(asg.nombre) : '—'}</div></div>
         <button class="imp-x" id="si-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
       <div style="padding:18px 22px;display:grid;gap:16px">
         <div class="cx-kpis">
           <div class="cx-kpi"><span>Estado</span><b><select id="si-estado" class="o-sel" style="font-size:13px;padding:3px 6px">${ESTADOS.map(e => `<option ${e === r.estado ? 'selected' : ''}>${e}</option>`).join('')}</select></b><small>cambia y guarda bitácora</small></div>
           <div class="cx-kpi"><span>Reclamado</span><b>${U.money(r.montoReclamado, cur)}</b><small>monto solicitado</small></div>
-          <div class="cx-kpi"><span>Aprobado</span><b style="color:var(--ok)">${U.money(r.montoAprobado || 0, cur)}</b><small>indemnización</small></div>
+          <div class="cx-kpi"><span>Aprobado</span><b style="color:var(--ok)">${r.montoAprobado ? U.money(r.montoAprobado, cur) : 'Pendiente'}</b><small>${r.montoAprobadoPendiente ? 'monto aprobado por confirmar' : 'indemnización'}</small></div>
         </div>
         <div class="asg-sec">
           <div class="asg-sec-t">📋 Bitácora del reclamo</div>
@@ -113,12 +113,17 @@ Orbit.modules.siniestros = (function () {
       const nuevoEst = $('#si-estado').value;
       const cambioEstado = nuevoEst !== r.estado;
       const patch = { estado: nuevoEst };
-      if (cambioEstado) patch.bitacora = (r.bitacora || []).concat([{ ts: Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: 'Estado: ' + nuevoEst, d: '' }]);
-      if (['Aprobado', 'Pagado'].includes(nuevoEst) && !r.montoAprobado) patch.montoAprobado = r.montoReclamado;
+      if (cambioEstado) {
+        const bit = (r.bitacora || []).concat([{ ts: Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: 'Estado: ' + nuevoEst, d: '' }]);
+        if (['Aprobado', 'Pagado'].includes(nuevoEst) && !r.montoAprobado) {
+          patch.montoAprobadoPendiente = true;
+          bit.push({ ts: Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5), user: 'Equipo', t: 'Monto aprobado pendiente de confirmar', d: '' });
+        }
+        patch.bitacora = bit;
+      }
       S().update('reclamos', id, patch);
       if (cambioEstado) {
         S().insert('actividades', { id: 'act' + Date.now(), clienteId: r.clienteId, asesorId: r.asesorId, tipo: 'siniestro', icon: '🚨', fecha: Orbit.ui.today(), titulo: 'Siniestro ' + r.numero + ': ' + nuevoEst, detalle: r.tipo + ' · ' + (r.ramo || ''), reclamoId: id });
-        // reflejar en la gestión de Ops enlazada a este reclamo (paso 8 del flujo Portal→Siniestro)
         var gs = (S().all('gestiones') || []).filter(function (g) { return g.reclamoId === id; });
         gs.forEach(function (g) {
           var nota = (g.notas ? g.notas + '\n' : '') + '[' + Orbit.ui.today() + '] Siniestro ' + r.numero + ' → ' + nuevoEst;
@@ -159,7 +164,7 @@ Orbit.modules.siniestros = (function () {
     $('#sn-ok').addEventListener('click', () => {
       const cid = $('#sn-cli').value, polId = $('#sn-pol').value, p = polId ? S().get('polizas', polId) : null, cli = S().get('clientes', cid);
       const id = 'rec' + Date.now().toString().slice(-7);
-      S().insert('reclamos', { id, polizaId: polId, clienteId: cid, aseguradoraId: p ? p.aseguradoraId : '', asesorId: cli.asesorId, ramo: p ? p.ramo : '', tipo: $('#sn-tipo').value || 'Reclamo', estado: 'Reportado', numero: 'SIN-' + Math.floor(10000 + Math.random() * 89999), fecha: Orbit.ui.today(), montoReclamado: +$('#sn-monto').value || 0, montoAprobado: 0, descripcion: $('#sn-desc').value, bitacora: [{ ts: '2026-06-24 ' + new Date().toTimeString().slice(0, 5), user: cli.nombre, t: 'Reclamo reportado', d: $('#sn-desc').value }], correos: [], docs: [] });
+      S().insert('reclamos', { id, polizaId: polId, clienteId: cid, aseguradoraId: p ? p.aseguradoraId : '', asesorId: cli.asesorId, ramo: p ? p.ramo : '', tipo: $('#sn-tipo').value || 'Reclamo', estado: 'Reportado', numero: 'SIN-' + Math.floor(10000 + Math.random() * 89999), fecha: Orbit.ui.today(), montoReclamado: +$('#sn-monto').value || 0, montoAprobado: 0, descripcion: $('#sn-desc').value, bitacora: [{ ts: Orbit.ui.today() + ' ' + new Date().toTimeString().slice(0, 5), user: cli.nombre, t: 'Reclamo reportado', d: $('#sn-desc').value }], correos: [], docs: [] });
       S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: cli.asesorId, tipo: 'sistema', icon: '🚨', fecha: Orbit.ui.today(), titulo: 'Siniestro reportado', detalle: $('#sn-tipo').value });
       close(); ficha(id);
     });
