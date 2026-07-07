@@ -381,8 +381,15 @@ Orbit.importa = (function () {
       build(rec) {
         rec.monto = parseNum(rec.monto);
         if (rec.polizaNumero) { const p = Orbit.store.all('polizas').find(x => norm(x.numero) === norm(rec.polizaNumero)); if (p) { rec.polizaId = p.id; rec.clienteId = p.clienteId; rec.asesorId = p.asesorId; rec.moneda = p.moneda; } }
-        const pago = norm(rec.estadoPago); rec.estado = (pago.indexOf('pag') >= 0 || pago === 'si' || pago === 'x') ? 'Pagado' : 'Pendiente';
-        if (rec.estado === 'Pagado') { rec.fechaPago = rec.vence; rec.conciliado = false; }
+        const pago = norm(rec.estadoPago);
+        if (pago.indexOf('pag') >= 0 || pago === 'si' || pago === 'x') {
+          rec.estadoCuentaPago = 'reportado_pagado';
+          rec.requiereValidacion = true;
+          rec._motivoValidacion = 'Pago reportado en estado de cuenta; requiere conciliación';
+        }
+        rec.estado = 'Pendiente';
+        rec.conciliado = false;
+        rec.conciliacionEstado = 'pendiente_validacion';
         delete rec.polizaNumero; delete rec.estadoPago; rec.cuota = rec.cuota || 1; return rec;
       }
     },
@@ -606,7 +613,7 @@ Orbit.importa = (function () {
         if (!r.polizaId) { r._motivo = 'Póliza no existe en Orbit'; noCreados.push(r); return; }
         const existing = Orbit.store.where('cobros', c => c.polizaId === r.polizaId && Math.abs((c.monto || 0) - (r.monto || 0)) < 1);
         if (!existing.length) { r._motivo = 'Recibo no creado'; noCreados.push(r); }
-        else if (r.estado === 'Pagado') { const pend = existing.find(c => c.estado !== 'Pagado'); if (pend) { r._aplicaA = pend.id; r._motivo = 'Pago en estado de cuenta pendiente de validación'; noAplicados.push(r); } }
+        else if (r.estadoCuentaPago === 'reportado_pagado') { const pend = existing.find(c => c.estado !== 'Pagado'); if (pend) { r._aplicaA = pend.id; r._motivo = 'Pago en estado de cuenta pendiente de validación'; noAplicados.push(r); } }
       } else if (kind === 'estados-banco') {
         const existing = Orbit.store.where('finmovs', m => Math.abs((m.monto || 0) - (r.monto || 0)) < 1 && (m.fecha === r.fecha));
         if (!existing.length) { r._motivo = 'Depósito sin movimiento en Orbit'; noCreados.push(r); }
@@ -618,7 +625,19 @@ Orbit.importa = (function () {
     const { noCreados, noAplicados } = conciliarRows(kind);
     let creados = 0, propuestas = 0;
     // Registros que faltan: se crean como referencia importada (no aplican pagos).
-    noCreados.forEach((r, i) => { const rec = Object.assign({}, r); delete rec._motivo; delete rec._aplicaA; rec.id = (IMPORT_MAP[kind].coll).slice(0, 3) + '_cc_' + Date.now().toString(36) + i; rec.importado = true; Orbit.store.insert(IMPORT_MAP[kind].coll, rec); creados++; });
+    noCreados.forEach((r, i) => {
+      const rec = Object.assign({}, r);
+      delete rec._motivo; delete rec._aplicaA;
+      if (kind === 'estados-cuenta') {
+        rec.estado = 'Pendiente';
+        rec.fechaPago = null;
+        rec.conciliado = false;
+        rec.requiereValidacion = true;
+        rec.conciliacionEstado = 'pendiente_validacion';
+        rec.conciliacionPropuesta = { fuente: kind, monto: rec.monto, fecha: rec.vence || (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), estado: 'REQUIERE_VALIDACION', tipo: 'referencia_estado_cuenta' };
+      }
+      rec.id = (IMPORT_MAP[kind].coll).slice(0, 3) + '_cc_' + Date.now().toString(36) + i; rec.importado = true; Orbit.store.insert(IMPORT_MAP[kind].coll, rec); creados++;
+    });
     // P0-2: la conciliación NO aplica pagos directo. Marca PROPUESTA pendiente de validación sobre el recibo.
     noAplicados.forEach(r => {
       if (r._aplicaA) {
@@ -1066,7 +1085,8 @@ Orbit.importa = (function () {
     const fin = dr.querySelector('#imp-finish'); if (fin) fin.addEventListener('click', () => {
       let msg = '';
       const kind = state.kind;
-      const isConc = (state.meta.conciliacion === true);
+      const cfgFin = IMPORT_MAP[kind];
+      const isConc = !!(cfgFin && cfgFin.conciliacion === true);
       if (state.parsed && state.modo !== 'documental' && isConc) {
         const r = applyConciliacion(kind);
         msg = '✓ Conciliación: ' + r.creados + ' referencias creadas · ' + r.propuestas + ' propuestas para revisión (pendiente de validación · no impacta cobros hasta aprobación)';
