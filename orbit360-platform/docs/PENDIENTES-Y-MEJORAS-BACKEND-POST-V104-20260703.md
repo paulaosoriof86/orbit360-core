@@ -1,7 +1,7 @@
 # Pendientes y mejoras backend post v1.104 — Orbit 360 A&S
 
 **Fecha base:** 2026-07-03  
-**Actualización:** 2026-07-05  
+**Actualización:** 2026-07-07  
 **Rama:** `ays/backend-tenant-lab-v99-20260703`  
 **Uso:** registro acumulado para no perder hallazgos antes de pedir paquete formal para Claude.
 
@@ -118,6 +118,14 @@
 - **Regla:** define `cobros`, `pagosReportados`, `conciliacionesCobros`, `cobroReciboRelaciones` y `auditLog`; separa cobros de `finmovs`, pagos reportados de pagos aplicados, conciliación de aplicación, cartera de banco y producción sobre prima neta recaudada.
 - **Estado:** CERRADO COMO CONTRATO/TOOLING EN RAMA / pendiente ejecución local.
 
+### CERRADO-BE-104-31 — Contrato Phase A persistencia conciliaciones + auditLog + Storage/adjuntos
+- **Área:** Backend / conciliaciones / auditLog / documentos / portal / Storage.
+- **Aplicado:**
+  - `orbit360-platform/docs/CONTRATO-PHASE-A-PERSISTENCIA-CONCILIACIONES-AUDITLOG-STORAGE-AYS-20260707.md`.
+  - `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260707-PHASEA-CONCILIACIONES-AUDITLOG-STORAGE.md`.
+- **Regla:** define `conciliaciones`, `auditLog`, `documentosAdjuntos` y `storageRefs`; fija estados `propuesta/en_revision/validada/autorizada_para_confirmar/confirmada/revertida`; documenta que adjunto no confirma cobro y conciliación validada no aplica pago por sí sola.
+- **Estado:** CERRADO COMO CONTRATO/DOCUMENTACIÓN EN RAMA / pendiente adapter LAB, validadores y ejecución local.
+
 ---
 
 ## B. Pendientes abiertos
@@ -139,9 +147,10 @@
 - **Área:** Auth / Equipo / Roles.
 - **Estado:** ABIERTO.
 
-### ABIERTO-BE-104-06 — Contrato documentos/Storage/adjuntos
+### ABIERTO-BE-104-06 — Adapter documentos/Storage/adjuntos real
 - **Área:** Backend documentos / adjuntos / portal / cobros.
 - **Estado:** ABIERTO.
+- **Nota 2026-07-07:** contrato cerrado en CERRADO-BE-104-31; queda pendiente implementación LAB/real, reglas de acceso, URL temporal y validadores.
 
 ### ABIERTO-BE-104-07 — Junio/julio 2026 como caso especial de conciliación
 - **Área:** Migración A&S / planillas / conciliación.
@@ -199,6 +208,21 @@
 - **Necesidad:** ejecutar `node tools/orbit360-test-validar-modelo-cobros-pagos-conciliacion-ays.mjs`.
 - **Estado:** ABIERTO.
 
+### ABIERTO-BE-104-22 — Diseñar adapter LAB para persistencia `conciliaciones` + `auditLog`
+- **Área:** Backend / Firestore LAB / conciliaciones / auditoría.
+- **Necesidad:** convertir el contrato Phase A en adapter seguro sin tocar backend protegido hasta autorización y sin aplicar cobros.
+- **Estado:** ABIERTO.
+
+### ABIERTO-BE-104-23 — Diseñar reglas de acceso para `documentosAdjuntos` y `storageRefs`
+- **Área:** Backend / Storage / Seguridad / Portal.
+- **Necesidad:** definir reglas tenant-isolated, rutas opacas, checks MIME/tamaño/checksum y acceso temporal.
+- **Estado:** ABIERTO.
+
+### ABIERTO-BE-104-24 — Validador estático Phase A sin modificar tools existentes
+- **Área:** QA / contrato backend.
+- **Necesidad:** crear, cuando se autorice tocar tooling, un validador que revise contrato de estados, colecciones, fuente, moneda, idempotencyKey, correlationId y auditLog.
+- **Estado:** ABIERTO.
+
 ---
 
 ## C. Pendientes para reportar a Claude cuando Paula pida paquete
@@ -217,9 +241,12 @@
 12. Debe respetar modelo pólizas: estados, prima separada, cartera del año actual y producción sobre prima neta recaudada.
 13. Debe respetar modelo cobros: pago reportado no es cobro aplicado, conciliación validada no aplica pago por sí sola, y `finmovs` no son cobros.
 14. Debe conservar pendiente de Portal/Cobros/Documentos: adjunto de pago reportado visible y conciliable desde Cobros.
+15. Debe enseñar en Academia/UX que `validada` no significa `confirmada`; `autorizada_para_confirmar` es un estado previo y auditable.
+16. Debe conservar la separación de `documentosAdjuntos`/`storageRefs`: adjunto solo propone datos, no escribe entidades operativas sin diff/autorización/auditLog.
+17. Debe reflejar que auditLog requiere actor, motivo, before/after hash, correlationId e idempotencyKey.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell, checklist/helper de smoke visual, contrato/modelo clientes, contrato/modelo pólizas/recibos/cartera y contrato/modelo cobros/pagos/conciliación como base para modelo de documentos/adjuntos. Quedan abiertos ejecución local del runner/smoke visual, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado y modelo backend de documentos/Storage/adjuntos.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell, checklist/helper de smoke visual, contrato/modelo clientes, contrato/modelo pólizas/recibos/cartera, contrato/modelo cobros/pagos/conciliación y contrato Phase A para `conciliaciones`, `auditLog`, `documentosAdjuntos` y `storageRefs`. Quedan abiertos ejecución local del runner/smoke visual, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado, adapter Storage/adjuntos, reglas de acceso y validadores Phase A.
