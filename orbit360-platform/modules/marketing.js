@@ -117,22 +117,24 @@ Orbit.modules.marketing = (function () {
   const ENF_COLOR = { 'Seguros / Riesgos': '#C5162E', 'Auto': '#2563a8', 'Vida y GM': '#be185d', 'Hogar / Daños': '#c9821b', 'Logística / Transporte': '#0e7490', 'Educativo': '#6b4ea0', 'Tendencias': '#1f8a4c', 'Normativa': '#475569', 'Prospecting': '#b45309', 'Renovaciones': '#0f766e' };
   function enfColor(e) { return ENF_COLOR[e] || '#C5162E'; }
 
-  /* generar mes con IA (demo: rellena días con ideas de seguros) */
+  /* generar mes: IA real si está conectada; si no, usa plantilla local */
   async function generarMes() {
     const fallback = [['🚗 Auto: lo que tu póliza sí cubre', 'Auto', 'Instagram'], ['❤️ Vida: proteger a los tuyos en 3 pasos', 'Vida y GM', 'Facebook'], ['🏠 Hogar: riesgos que olvidamos', 'Hogar / Daños', 'LinkedIn'], ['📈 Tendencias 2026 en seguros', 'Tendencias', 'LinkedIn'], ['🔄 Renueva a tiempo y ahorra', 'Renovaciones', 'WhatsApp'], ['📚 ¿Qué es el deducible? En simple', 'Educativo', 'Instagram']];
     const [y, mm] = mes.split('-').map(Number);
     let ideas = null;
-    if (Orbit.ia.disponible()) {
+    let generadoConIA = false;
+    if (Orbit.ia && Orbit.ia.disponible && Orbit.ia.disponible()) {
       toast('🧠 Generando ideas con IA…');
       try {
         const prompt = 'Eres estratega de marketing de una correduría de seguros. Diseña un PLAN mensual de contenidos para ' + MESES[mm - 1] + ' con criterio estratégico: cubre las 4 semanas, mezcla objetivos (captación, educación, retención/renovación, prueba social/confianza), varía ramos (auto, vida/GM, hogar, pyme) y canales (Instagram, Facebook, LinkedIn, WhatsApp), e incluye fechas clave del mes si aplica. Devuelve SOLO un JSON array sin markdown de 8 items, cada item: ["título con emoji","enfoque/ramo","canal","objetivo (captación|educación|retención|confianza)","CTA breve"]. Español, útil, sin relleno.';
         const out = await Orbit.ia.complete(prompt);
-        const m = String(out).match(/\[[\s\S]*\]/); if (m) { const arr = JSON.parse(m[0]); if (Array.isArray(arr) && arr.length) ideas = arr.filter(x => Array.isArray(x) && x.length >= 3); }
+        const m = String(out).match(/\[[\s\S]*\]/); if (m) { const arr = JSON.parse(m[0]); if (Array.isArray(arr) && arr.length) { ideas = arr.filter(x => Array.isArray(x) && x.length >= 3); generadoConIA = ideas.length > 0; } }
       } catch (e) {}
     }
-    if (!ideas || !ideas.length) ideas = fallback;
-    ideas.forEach((b, i) => { const dd = 3 + i * 4; if (dd <= new Date(y, mm, 0).getDate()) S().insert('contenidos', { id: 'mk' + Date.now().toString().slice(-6) + i, fecha: mes + '-' + String(dd).padStart(2, '0'), hora: '08:10', canal: b[2], tipo: 'Texto', enfoque: b[1], estado: 'Idea', titulo: b[0], copy: 'Borrador generado con IA — revisa el tono antes de programar.', cta: 'Escríbeme por WhatsApp', hashtags: '#Seguros #GestiónDeRiesgos', stats: null }); });
-    toast('✨ ' + ideas.length + ' ideas generadas para ' + MESES[mm - 1]); render(host);
+    if (!ideas || !ideas.length) { ideas = fallback; generadoConIA = false; }
+    const copyBase = generadoConIA ? 'Borrador generado con IA — revisa el tono antes de programar.' : 'Borrador sugerido por plantilla — revisa el tono antes de programar.';
+    ideas.forEach((b, i) => { const dd = 3 + i * 4; if (dd <= new Date(y, mm, 0).getDate()) S().insert('contenidos', { id: 'mk' + Date.now().toString().slice(-6) + i, fecha: mes + '-' + String(dd).padStart(2, '0'), hora: '08:10', canal: b[2], tipo: 'Texto', enfoque: b[1], estado: 'Idea', titulo: b[0], copy: copyBase, cta: 'Escríbeme por WhatsApp', hashtags: '#Seguros #GestiónDeRiesgos', stats: null }); });
+    toast((generadoConIA ? '✨ ' : '📌 ') + ideas.length + (generadoConIA ? ' ideas generadas con IA para ' : ' ideas sugeridas por plantilla para ') + MESES[mm - 1]); render(host);
   }
   /* reprogramar publicaciones atrasadas al siguiente día disponible */
   function reprogramar() {
@@ -140,7 +142,7 @@ Orbit.modules.marketing = (function () {
     const atras = todos().filter(c => c.estado !== 'Publicado' && c.fecha < hoy);
     if (!atras.length) { toast('✓ No hay publicaciones atrasadas'); return; }
     atras.forEach((c, i) => { const d = new Date(hoy); d.setDate(d.getDate() + 1 + i); S().update('contenidos', c.id, { fecha: d.toISOString().slice(0, 10), estado: 'Programado' }); });
-    toast('🔁 ' + atras.length + ' publicación(es) reprogramada(s) automáticamente'); render(host);
+    toast('🔁 ' + atras.length + ' publicación(es) reprogramada(s) en Orbit; publicación real requiere proveedor conectado'); render(host);
   }
 
   const EVT_LBL = { marketing_generar_pieza: '🎨 Pieza solicitada (Canva)', marketing_programar_publicacion: '📅 Programación (Metricool)', marketing_contenido_creado: '📝 Contenido guardado (Make)', marketing_sync_sheets: '🔄 Sincronización (Sheets)' };
@@ -215,7 +217,7 @@ Orbit.modules.marketing = (function () {
       const enf = $('#mk-enfoque').value, canal = $('#mk-canal').value;
       const emoji = enfEmoji(enf);
       const iaB = $('#mk-ia');
-      if (Orbit.ia.disponible()) {
+      if (Orbit.ia && Orbit.ia.disponible && Orbit.ia.disponible()) {
         iaB.textContent = '🧠 Generando…'; iaB.disabled = true;
         try {
           const prompt = 'Eres community manager de una correduría de seguros. Escribe un post para ' + canal + ' sobre "' + enf + '". Devuelve SOLO JSON sin markdown: {"titulo":"...","copy":"cuerpo con emojis y 2-3 ideas","cta":"llamado a la acción","hashtags":"#... #..."}. Tono cercano, claro, en español.';
@@ -231,12 +233,12 @@ Orbit.modules.marketing = (function () {
       $('#mk-copy').value = `${emoji} Te comparto en simple sobre ${enf.toLowerCase()}:\n\n1) ✅ Lo que más impacta a empresas y familias (sin tecnicismos).\n2) 📌 Un tip práctico que puedes aplicar hoy.\n3) 🤝 Cómo te acompañamos si necesitas revisarlo.\n\nLa idea no es complicar: es darte claridad y confianza.`;
       if (!$('#mk-cta').value) $('#mk-cta').value = 'Escríbeme REVISIÓN por WhatsApp y te ayudo sin compromiso';
       if (!$('#mk-hash').value) $('#mk-hash').value = '#Seguros #GestiónDeRiesgos #' + (canal === 'LinkedIn' ? 'Empresas' : 'Familias');
-      toast('✨ Copy generado — revisa y ajusta el tono');
+      toast('📌 Copy sugerido por plantilla — revisa y ajusta el tono');
     });
     $('#mk-pieza').addEventListener('click', () => {
       const data = dataActual();
       const row = emitMarketing('marketing_generar_pieza', { entidad: 'contenidos', entidadId: id || '', contenido: data, proveedorPreferido: 'canva' }, { proveedorPreferido: 'canva', entidad: 'contenidos', entidadId: id || '' });
-      toast(integrationMsg(row, '🎨 Solicitud de pieza registrada para Canva.'));
+      toast(integrationMsg(row, '🎨 Solicitud de pieza preparada para Canva; creación real requiere integración activa.'));
       refrescarHist(id);
     });
     $('#mk-prog').addEventListener('click', () => {
@@ -244,7 +246,7 @@ Orbit.modules.marketing = (function () {
       $('#mk-estado').value = 'Programado';
       const data = dataActual();
       const row = emitMarketing('marketing_programar_publicacion', { entidad: 'contenidos', entidadId: id || '', contenido: data, fecha: f, hora: h, proveedorPreferido: 'metricool' }, { proveedorPreferido: 'metricool', entidad: 'contenidos', entidadId: id || '' });
-      toast(integrationMsg(row, '📅 Programación registrada para ' + f + ' ' + h + '.'));
+      toast(integrationMsg(row, '📅 Programación preparada en Orbit para ' + f + ' ' + h + '; publicación real requiere Metricool/Make conectado.'));
       refrescarHist(id);
     });
     function refrescarHist(cid) { if (!cid) return; const box = $('#mk-hist'); if (box) box.innerHTML = histHtml(cid); }
