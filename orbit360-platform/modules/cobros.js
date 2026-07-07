@@ -63,7 +63,7 @@ Orbit.modules.cobros = (function () {
     const agingCols = { '1-30': '#c9821b', '31-60': '#d9602e', '61-90': '#b5253b', '90+': '#7e1220' };
 
     host.innerHTML = `<div class="page">
-      ${K.bannerFor('cobros', `<button class="btn ghost" onclick="Orbit.modules.cobros.lote()" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📤 Notificar por lote</button>`)}
+      ${K.bannerFor('cobros', `<button class="btn ghost" onclick="Orbit.modules.cobros.lote()" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📤 Preparar lote</button>`)}
       ${K.kpis([
         { label: 'Cartera al día', val: U.moneyShort(cart.alDia, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'cobros confirmados', footTone: 'up' },
         { label: 'Pendiente', val: U.moneyShort(cart.pend, Orbit.q.monedaPais()), color: 'var(--warn)', foot: 'por vencer' },
@@ -304,7 +304,7 @@ Orbit.modules.cobros = (function () {
       });
   }
 
-  /* ---- Notificación de cobro por LOTE (selecciona recibos pendientes/vencidos) ---- */
+  /* ---- Preparación de cobro por LOTE (selecciona recibos pendientes/vencidos) ---- */
   function lote() {
     const arr = S().all('cobros').filter(c => { if (c.estado !== 'Pendiente' && c.estado !== 'Vencido') return false; const cli = S().get('clientes', c.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (cli && cli.pais === Orbit.pais); }).sort((a, b) => (a.vence || '').localeCompare(b.vence || ''));
     const incl = new Set(arr.map(c => c.id));
@@ -326,12 +326,12 @@ Orbit.modules.cobros = (function () {
       back.querySelectorAll('[data-lo]').forEach(x => x.addEventListener('change', () => { x.checked ? incl.add(x.dataset.lo) : incl.delete(x.dataset.lo); paint(); }));
     }
     back.innerHTML = `<div class="card" style="width:min(620px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
-      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">📤 Notificación de cobro por lote</b><button class="imp-x" id="lo-x">✕</button></div>
-      <div class="cfg-note" style="margin:14px 16px 0">Selecciona los recibos a notificar. Se envía <b>WhatsApp + correo</b> con mensaje generado por IA, queda en el <b>historial de cada cliente</b> y baja de acciones pendientes.</div>
+      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">📤 Preparación de cobro por lote</b><button class="imp-x" id="lo-x">✕</button></div>
+      <div class="cfg-note" style="margin:14px 16px 0">Selecciona los recibos para preparar recordatorios. Se registran en el historial y se preparan correos en la bandeja central. WhatsApp/correo reales requieren canal conectado y confirmación del proveedor.</div>
       <div id="lo-body" style="padding:12px 16px;overflow:auto;flex:1;display:grid;gap:7px"></div>
       <div style="padding:14px 20px;border-top:1px solid var(--line)">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><span class="muted" id="lo-n"></span><span style="font-family:var(--f-display);font-weight:800;font-size:20px" id="lo-tot"></span></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="lo-cancel">Cancelar</button><button class="btn primary" id="lo-ok">📲 Enviar recordatorios</button></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="lo-cancel">Cancelar</button><button class="btn primary" id="lo-ok">📲 Preparar recordatorios</button></div>
       </div></div>`;
     document.body.appendChild(back);
     const close = () => back.remove();
@@ -343,12 +343,12 @@ Orbit.modules.cobros = (function () {
       sel.forEach(c => {
         const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
         const msg = Orbit.ia ? Orbit.ia.redactar('cobro', { nombre: cli ? cli.nombre.split(' ')[0] : '', poliza: p ? p.numero : '', monto: U.money(c.monto, c.moneda), vence: U.fmtDate(c.vence) }) : 'Recordatorio de cobro';
-        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Recordatorio de cobro enviado', detalle: 'WhatsApp + correo · ' + (p ? p.numero : '') + ' · ' + U.money(c.monto, c.moneda) });
-        S().update('cobros', c.id, { notificado: Orbit.ui.today() });
+        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Recordatorio de cobro preparado', detalle: 'Pendiente de canal conectado · ' + (p ? p.numero : '') + ' · ' + U.money(c.monto, c.moneda) });
+        S().update('cobros', c.id, { recordatorioPreparado: Orbit.ui.today() });
         if (Orbit.correo && cli) Orbit.correo.enviar({ para: cli.email || '', asunto: 'Recordatorio de pago · ' + (p ? p.numero : ''), cuerpo: msg, clienteId: c.clienteId, vinculo: { tipo: 'cobro', id: c.id, label: 'Recibo ' + c.cuota } });
       });
       close();
-      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + sel.length + ' recordatorios enviados (WhatsApp + correo)'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + sel.length + ' recordatorios preparados; envío real requiere canal conectado'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
       render(document.getElementById('host'));
     });
     paint();
