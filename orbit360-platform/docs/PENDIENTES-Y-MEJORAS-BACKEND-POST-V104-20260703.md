@@ -1,7 +1,7 @@
 # Pendientes y mejoras backend post v1.104 — Orbit 360 A&S
 
 **Fecha base:** 2026-07-03  
-**Actualización:** 2026-07-07  
+**Actualización:** 2026-07-08  
 **Rama:** `ays/backend-tenant-lab-v99-20260703`  
 **Uso:** registro acumulado para no perder hallazgos antes de pedir paquete formal para Claude.
 
@@ -126,6 +126,16 @@
 - **Regla:** define `conciliaciones`, `auditLog`, `documentosAdjuntos` y `storageRefs`; fija estados `propuesta/en_revision/validada/autorizada_para_confirmar/confirmada/revertida`; documenta que adjunto no confirma cobro y conciliación validada no aplica pago por sí sola.
 - **Estado:** CERRADO COMO CONTRATO/DOCUMENTACIÓN EN RAMA / pendiente adapter LAB, validadores y ejecución local.
 
+### CERRADO-DOC-1330-01 — Avance celular, auditoría módulos visibles y plan actualizado
+- **Área:** Documentación viva / continuidad / UX honesta / Academia.
+- **Aplicado:**
+  - `orbit360-platform/docs/AVANCE-CELULAR-EQUIPO-CONFIG-V1330-20260708.md`.
+  - `orbit360-platform/docs/AUDITORIA-CELULAR-MODULOS-VISIBLES-V1330-20260708.md`.
+  - `orbit360-platform/docs/REGISTRO-ACCIONES-CELULAR-V1330-20260708.md`.
+  - `orbit360-platform/docs/PLAN-TRABAJO-ACTUALIZADO-V1330-20260708.md`.
+- **Regla:** desde celular se documenta y audita; no se parchea código funcional sin PowerShell/Node local. Se confirmó que el bloqueo real es Equipo/Configuración gates y que Portal/Correo/Notificaciones/Automatizaciones/Plantillas/Marketing no bloquean M2/M3/M4 si no se presentan como producción conectada.
+- **Estado:** CERRADO COMO DOCUMENTACIÓN EN RAMA / pendiente ejecución local de patch y smokes.
+
 ---
 
 ## B. Pendientes abiertos
@@ -223,6 +233,51 @@
 - **Necesidad:** crear, cuando se autorice tocar tooling, un validador que revise contrato de estados, colecciones, fuente, moneda, idempotencyKey, correlationId y auditLog.
 - **Estado:** ABIERTO.
 
+### ABIERTO-V1330-01 — Sincronizar HEAD local contra PR remoto antes de parchar
+- **Área:** Git/GitHub / continuidad local.
+- **Necesidad:** el worktree local reportó HEAD `36d3afad316e3ecc4bf4ca46aa5227d87e3bd0d3`, mientras el PR remoto avanzó con documentación v1330. Antes de aplicar patches debe confirmarse rama/head y traer documentos recientes sin pisar protegidos.
+- **Estado:** ABIERTO / requiere computador.
+
+### ABIERTO-V1330-02 — Patch Equipo gates v2 tolerante
+- **Área:** Equipo / usuarios / roles / permisos.
+- **Necesidad:** crear/editar/inactivar usuario, cambios de permisos y reset deben pedir motivo, confirmación y auditoría; debe bloquearse dejar la cuenta sin administrador activo.
+- **Estado:** ABIERTO / requiere PowerShell + `node --check` local.
+
+### ABIERTO-V1330-03 — Patch Configuración gates v2 tolerante
+- **Área:** Configuración / tenant / plan / módulos / integraciones.
+- **Necesidad:** cambio de plan, módulos activos, reset y sección interna deben tener gate/rol/motivo; corregir copy técnico y residual visual `itar</button></td>`.
+- **Estado:** ABIERTO / requiere PowerShell + `node --check` local.
+
+### ABIERTO-V1330-04 — Portal copy honesto
+- **Área:** Portal cliente / documentos / asistente / solicitudes.
+- **Necesidad:** reemplazar `Storage/backend`, `Orbit Ops`, `Portal → Ops` y copy de asistente que sugiera disponibilidad real por lenguaje de canal/documento/gestión pendiente.
+- **Estado:** ABIERTO / no bloquea M2/M3/M4.
+
+### ABIERTO-V1330-05 — Correo copy + verificación `Orbit.correo.enviar`
+- **Área:** Correo / integraciones.
+- **Necesidad:** reemplazar `backend/OAuth` por canal seguro autorizado y verificar localmente que sin proveedor conectado no haya despacho real.
+- **Estado:** ABIERTO / no bloquea M2/M3/M4.
+
+### ABIERTO-V1330-06 — Automatizaciones secretos/webhooks + gates custom
+- **Área:** Automatizaciones / IA / Make / webhooks / secretos.
+- **Necesidad:** no tratar API keys/webhooks como secretos productivos guardables en frontend; crear/eliminar automatizaciones custom debe pedir motivo/confirmación.
+- **Estado:** ABIERTO / no bloquea M2/M3/M4 si no hay integración real.
+
+### ABIERTO-V1330-07 — Plantillas gate menor edición/eliminación
+- **Área:** Plantillas / Marketing / comunicaciones.
+- **Necesidad:** eliminar/editar/duplicar plantillas debe dejar trazabilidad si son activos del tenant.
+- **Estado:** ABIERTO / no bloquea M2/M3/M4.
+
+### ABIERTO-V1330-08 — Marketing estados y gates menores
+- **Área:** Marketing / calendario / Canva / Metricool.
+- **Necesidad:** distinguir `Programado` interno vs publicación real, reforzar `Publicado/Medido`, y pedir confirmación/motivo al eliminar o marcar estados sensibles.
+- **Estado:** ABIERTO / no bloquea M2; revisar durante smoke M2.
+
+### ABIERTO-V1330-09 — Conciliaciones gates antes de M5
+- **Área:** Conciliaciones / finanzas sensibles.
+- **Necesidad:** validar/rechazar/bloquear/anular propuesta debe pedir motivo y guardar bitácora; `VALIDADA` debe aclarar que no aplica pagos; si falta país/moneda o hay bloqueos no debe permitir validar.
+- **Estado:** ABIERTO / bloquea M5, no bloquea M2/M3/M4.
+
 ---
 
 ## C. Pendientes para reportar a Claude cuando Paula pida paquete
@@ -244,9 +299,16 @@
 15. Debe enseñar en Academia/UX que `validada` no significa `confirmada`; `autorizada_para_confirmar` es un estado previo y auditable.
 16. Debe conservar la separación de `documentosAdjuntos`/`storageRefs`: adjunto solo propone datos, no escribe entidades operativas sin diff/autorización/auditLog.
 17. Debe reflejar que auditLog requiere actor, motivo, before/after hash, correlationId e idempotencyKey.
+18. Debe conservar copy honesto en Portal/Correo/Notificaciones/Automatizaciones/Plantillas/Marketing: preparado/registrado/abierto no equivale a enviado/publicado/confirmado.
+19. Debe ocultar o neutralizar términos técnicos visibles en UI cliente/admin comercial: `Storage`, `backend`, `OAuth`, `Orbit Ops`, `LAB`, `mock`, `demo`, credenciales.
+20. Debe diseñar gates administrativos para usuarios, permisos, plan, módulos, integraciones, plantillas y marketing sin tocar backend protegido.
+21. Debe actualizar Academia con microlecciones de Equipo/Config, Marketing, Finanzas, Portal y Conciliaciones.
+22. Debe conservar que M2/M3/M4 pueden avanzar tras Equipo/Config, mientras Conciliaciones M5 requiere gates adicionales.
 
 ---
 
 ## D. Estado general actualizado
 
-Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell, checklist/helper de smoke visual, contrato/modelo clientes, contrato/modelo pólizas/recibos/cartera, contrato/modelo cobros/pagos/conciliación y contrato Phase A para `conciliaciones`, `auditLog`, `documentosAdjuntos` y `storageRefs`. Quedan abiertos ejecución local del runner/smoke visual, adapter Firestore LAB real, parser real, persistencia `conciliaciones/auditLog`, score real contra datos validados, futuro ejecutor autorizado, adapter Storage/adjuntos, reglas de acceso y validadores Phase A.
+Backend LAB reforzado. Candidata Claude `062855.313` auditada y empalmada de forma segura en GitHub para la UI/Bandeja de `conciliaciones`, preservando backend LAB. Se agregó smoke estático de empalme. Se agregó perfilador de columnas por fuente, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper PowerShell, checklist/helper de smoke visual, contrato/modelo clientes, contrato/modelo pólizas/recibos/cartera, contrato/modelo cobros/pagos/conciliación y contrato Phase A para `conciliaciones`, `auditLog`, `documentosAdjuntos` y `storageRefs`.
+
+Actualización v1330 desde celular: se documentó el check local favorable, el patch Equipo/Config v1 fallido sin cambios, la auditoría de módulos visibles y el plan actualizado. El bloqueo real queda en Equipo/Config gates + sincronización HEAD local. Portal, Correo, Notificaciones, Automatizaciones, Plantillas y Marketing tienen pendientes de copy/gates menores que no bloquean M2/M3/M4 si no se presentan como integración real. Conciliaciones está aislado y no toca cobros, pero sus gates bloquean M5. No se necesita Claude todavía; Claude se activa cuando se requiera UX/copy/Academia/prototipo después del cierre operativo local.
