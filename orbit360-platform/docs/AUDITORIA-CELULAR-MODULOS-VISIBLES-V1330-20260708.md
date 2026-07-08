@@ -31,7 +31,7 @@ Cada modulo se clasifica como:
 - Equipo y Configuracion siguen pendientes de gates administrativos.
 - Portal tiene riesgo de copy tecnico visible si menciona Storage/backend.
 - Correo, notificaciones y automatizaciones deben evitar simular envios reales.
-- Conciliacion es sensible y no debe ejecutarse antes de M2/M3/M4.
+- Conciliacion es sensible y no debe ejecutar pagos ni tocar cobros.
 
 ## Portal
 
@@ -141,7 +141,7 @@ Patch recomendado:
 
 Impacto Academia:
 
-- Microleccion: wa.me abre conversación, pero la confirmacion final de envio ocurre en WhatsApp.
+- Microleccion: wa.me abre conversacion, pero la confirmacion final de envio ocurre en WhatsApp.
 
 Impacto Claude:
 
@@ -163,7 +163,7 @@ Hallazgos:
 1. Configuracion de IA permite escribir API key en pantalla y guardar en preferencia local. Esto no debe considerarse backend real ni produccion.
 2. Copy `API Key` visible es aceptable solo como prototipo interno, pero en producto debe ir a canal seguro.
 3. `Webhook de Make` permite pegar URL en UI; debe ser tratado como configuracion sensible por tenant y no como secreto definitivo en frontend.
-4. Crear automatizaciones personalizadas no pide motivo administrativo ni auditoria formal.
+4. Crear/eliminar automatizaciones custom no pide motivo administrativo ni auditoria formal.
 
 Clasificacion:
 
@@ -187,7 +187,131 @@ Impacto Claude:
 
 - Claude puede mejorar UX, pero debe conservar lenguaje honesto y no diseñar ingreso de secretos como si fuera produccion.
 
-## Resumen de clasificacion actual
+## Plantillas
+
+Modulo: `orbit360-platform/modules/plantillas.js`.
+
+Estado observado:
+
+- Cabecera del modulo ya documenta que WhatsApp Web abierto no equivale a mensaje entregado y que se registra como comunicacion preparada.
+- KPIs usan lenguaje de canal preparado.
+- La vista de uso aclara que WhatsApp abre el chat y que el envio debe confirmarse en WhatsApp.
+- Al usar WhatsApp, registra actividad como `Mensaje de plantilla preparado` y abre `wa.me`.
+- Redactar correo delega a modulo Correo, que ya diferencia preparado/enviado segun conexion.
+
+Hallazgos:
+
+1. Editar/eliminar plantillas no exige motivo administrativo.
+2. Duplicar plantillas tampoco registra motivo/auditoria.
+3. No hay riesgo critico de simulacion de envio real.
+
+Clasificacion:
+
+- Casi cerrado para honestidad operativa.
+- Requiere gate menor para edicion/eliminacion de plantillas si quedan como activo administrativo del tenant.
+- No bloquea M2/M3/M4.
+
+Patch recomendado:
+
+- Eliminar plantilla: confirmacion reforzada + motivo.
+- Guardar cambios de plantilla: motivo si cambia canal/texto/asunto.
+- Duplicar plantilla: registrar actividad administrativa simple.
+
+Impacto Academia:
+
+- Microleccion Marketing/Admin: plantillas aprobadas vs borradores; ediciones deben conservar trazabilidad.
+
+Impacto Claude:
+
+- Mantener `WhatsApp abierto no equivale a entregado` y `confirmar envio en WhatsApp`.
+
+## Marketing
+
+Modulo: `orbit360-platform/modules/marketing.js`.
+
+Estado observado:
+
+- Calendario mensual con contenidos, estado, canal, ficha, IA opcional e integraciones.
+- Importar calendario registra evento de sincronizacion y abre importador.
+- Generar mes con IA cae a plantilla local si no hay IA disponible.
+- El copy generado/sugerido indica revisar y ajustar tono.
+- Crear pieza y programar publicacion usan eventos de integracion con copy honesto: la creacion/publicacion real requiere integracion activa.
+- Reprogramar atrasados dice que la publicacion real requiere proveedor conectado.
+
+Hallazgos:
+
+1. Estados `Publicado` y `Medido` se pueden seleccionar manualmente; debe distinguir publicacion real confirmada vs estado interno.
+2. Eliminar contenido no exige confirmacion reforzada ni motivo.
+3. Programar publicacion cambia estado a `Programado` sin gate/motivo.
+4. Acciones Canva/Metricool estan bien descritas como preparadas, pero deben quedar auditadas por integracion.
+
+Clasificacion:
+
+- Requiere gate administrativo menor.
+- No bloquea M2/M3/M4, especialmente porque M2 justamente es smoke de Marketing.
+- Antes de demo comercial, conviene reforzar estados `Publicado`/`Medido` para no parecer confirmacion externa si no hay proveedor conectado.
+
+Patch recomendado:
+
+- Cambiar etiqueta o ayuda de `Publicado`: `Publicado/confirmado` solo si hay proveedor conectado; si no, `Marcado como publicado`.
+- Programar: confirmacion ligera cuando no hay Metricool/Make conectado.
+- Eliminar: confirmacion + motivo.
+- Guardar con estado `Publicado` o `Medido`: advertencia si no hay evento confirmado.
+
+Impacto Academia:
+
+- Microleccion Marketing: diferencia entre idea, programado interno, publicado real y medido.
+- Microleccion Admin: integraciones de contenido preparan eventos, no publican sin proveedor conectado.
+
+Impacto Claude:
+
+- Puede mejorar UX del calendario, pero debe conservar estados honestos y no simular Metricool/Make activo.
+
+## Conciliaciones / finanzas sensibles
+
+Modulo: `orbit360-platform/modules/conciliaciones.js`.
+
+Estado observado:
+
+- La cabecera declara que lee solo de `Orbit.store('conciliaciones')`.
+- Declara que no toca cobros.
+- Declara que las acciones solo cambian estado de propuesta.
+- La aplicacion real de pagos queda para backend ChatGPT/Codex.
+- Banner indica que la bandeja no aplica pagos ni modifica cobros.
+- KPIs y tabla conservan fuente, archivo/fila, pais/moneda, cliente/poliza/recibo, monto y accion propuesta.
+- La funcion `accion` solo actualiza `conciliaciones` y no toca `cobros`.
+
+Hallazgos:
+
+1. Validar/rechazar/bloquear/anular propuesta no exige motivo.
+2. No registra bitacora de cambio de estado dentro de la propuesta.
+3. `VALIDADA` podria interpretarse como pago aplicado si el usuario no lee el banner; debe reforzarse como `validada para proceso posterior autorizado`.
+4. No bloquea estados si falta pais/moneda, aunque muestra advertencia visual de moneda requerida.
+
+Clasificacion:
+
+- Muy buen aislamiento: no toca cobros.
+- Requiere gate/motivo para cambios de estado.
+- Bloquea M5, pero no bloquea M2/M3/M4.
+
+Patch recomendado:
+
+- Cambios de estado deben pedir motivo.
+- Guardar historial/bitacora de revision por usuario, fecha y motivo.
+- Reforzar copy: `Validada como propuesta; no aplicada a cobros`.
+- Si falta pais/moneda o hay bloqueos, impedir `validar`.
+
+Impacto Academia:
+
+- Microleccion Finanzas: conciliacion valida propuesta, no aplica pago.
+- Microleccion Finanzas: pais/moneda obligatorios; no mezclar monedas.
+- Evaluacion: banco/aseguradora/comisiones son fuentes separadas.
+
+Impacto Claude:
+
+- Si Claude toca esta bandeja, debe conservar aislamiento: no crear cobros, no aplicar pagos, no escribir cartera.
+
+## Resumen de clasificacion final de esta auditoria
 
 | Modulo | Estado | Bloquea M2/M3/M4 | Accion |
 |---|---|---:|---|
@@ -195,9 +319,20 @@ Impacto Claude:
 | Correo | Requiere copy + verificacion local | No | Patch copy y revisar `Orbit.correo.enviar` |
 | Notificaciones | Casi cerrado | No | Copy menor |
 | Automatizaciones | Requiere gate/copy sensible | No si no hay integracion real | Gate y copy antes de demo comercial/productiva |
+| Plantillas | Casi cerrado | No | Gate menor para editar/eliminar |
+| Marketing | Requiere gate menor | No | Smoke M2 puede avanzar; reforzar estados antes de demo comercial |
+| Conciliaciones | Aislado, requiere gate | No para M2/M3/M4; si para M5 | Motivo/bitacora antes de M5 |
 | Equipo | Requiere gate | Si, por orden metodologico | Patch local v2 |
 | Configuracion | Requiere gate | Si, por orden metodologico | Patch local v2 |
-| Conciliacion | Pendiente revisar | Si para M5 | Revisar despues de M2/M3/M4 |
+
+## Conclusion operativa
+
+La auditoria confirma que varios modulos ya habian sido trabajados con el proposito de honestidad operativa. El bloqueo principal para continuar el plan no son Portal/Correo/Notificaciones/Automatizaciones/Plantillas/Marketing, sino:
+
+1. Equipo gates.
+2. Configuracion gates.
+3. Luego smoke M2/M3/M4.
+4. M5 Conciliacion solo despues, con gates adicionales.
 
 ## Impacto Claude
 
@@ -205,14 +340,21 @@ Claude debe conservar copy honesto, sin terminos tecnicos visibles para cliente/
 
 ## Impacto Academia
 
-Academia debe incluir lecciones para roles Admin/Direccion sobre gates, trazabilidad y diferencia entre accion preparada y accion ejecutada por canal conectado.
+Academia debe incluir lecciones para roles Admin/Direccion/Finanzas/Marketing sobre gates, trazabilidad y diferencia entre accion preparada y accion ejecutada por canal conectado.
 
 ## Estado
 
-Actualizado con hallazgos de Portal, Correo, Notificaciones y Automatizaciones.
+Auditoria celular completada para:
 
-Pendiente completar:
-
+- Portal.
+- Correo.
+- Notificaciones.
+- Automatizaciones.
 - Plantillas.
 - Marketing.
-- Conciliacion / finanzas sensibles.
+- Conciliaciones.
+
+Pendiente de siguiente bloque:
+
+- Preparar parche local v2 Equipo/Config.
+- Luego smoke M2/M3/M4.
