@@ -1,8 +1,9 @@
 # Nota para Claude — avances backend mientras corrige candidato
 
-Fecha: 2026-07-04
-Rama backend activa: `ays/backend-tenant-lab-v99-20260703`
-PR backend: #5
+Fecha: 2026-07-04  
+Actualización: 2026-07-08  
+Rama backend activa: `ays/backend-tenant-lab-v99-20260703`  
+PR backend: #5  
 Estado: documentación de coordinación Claude / ChatGPT-Codex.
 
 ## Propósito
@@ -140,6 +141,37 @@ Implicación para Claude:
 - No se debe pedir que corrija algo que ya está corregido; debe conservar esas mejoras y completar lo pendiente.
 - Debe unificar documentación de versión: v1.114/v1.117/v1.123.
 
+### 7. Avance v1330 desde celular: gates, copy honesto y Academia
+
+Archivos agregados/actualizados:
+
+- `orbit360-platform/docs/AVANCE-CELULAR-EQUIPO-CONFIG-V1330-20260708.md`.
+- `orbit360-platform/docs/AUDITORIA-CELULAR-MODULOS-VISIBLES-V1330-20260708.md`.
+- `orbit360-platform/docs/REGISTRO-ACCIONES-CELULAR-V1330-20260708.md`.
+- `orbit360-platform/docs/PLAN-TRABAJO-ACTUALIZADO-V1330-20260708.md`.
+- `orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260703.md`.
+- `orbit360-platform/docs/PENDIENTES-Y-MEJORAS-BACKEND-POST-V104-20260703.md`.
+
+Resultado:
+
+- Se documentó que Equipo y Configuración son el bloqueo real antes de M2/M3/M4.
+- Se auditó Portal, Correo, Notificaciones, Automatizaciones, Plantillas, Marketing y Conciliaciones.
+- Se separó qué bloquea ahora, qué no bloquea M2/M3/M4 y qué bloquea solo M5.
+- Se documentó que el patch Equipo/Config v1 falló sin cambios por usar reemplazos exactos largos.
+- Se dejó instrucción de patch v2 tolerante, validación Node y contrato backend LAB.
+
+Implicación para Claude:
+
+- No debe tratar estos pendientes como backend de Claude; Equipo/Config gates son cierre operativo ChatGPT/Codex.
+- Sí debe conservar los patrones UX reutilizables:
+  - copy honesto;
+  - preparado/registrado/abierto no equivale a enviado/publicado/confirmado;
+  - no mostrar tecnicismos visibles al cliente/admin comercial;
+  - no simular integraciones activas;
+  - no pedir ni guardar secretos reales en frontend;
+  - acciones administrativas con motivo, confirmación y trazabilidad;
+  - sección interna Orbit oculta por rol.
+
 ## Backend protegido que Claude no debe tocar
 
 - `orbit360-platform/data/store.js`
@@ -161,6 +193,9 @@ Implicación para Claude:
 7. Alinear Importar con fuentes separadas, manifests, país/moneda y contratos reales.
 8. Alinear Pólizas/Cobros/Cliente360/Portal/Comisiones/Finanzas con el contrato de cartera y conciliación.
 9. Conservar avances ya verificados de la candidata activa 2026-07-04T152321.882.
+10. Conservar la auditoría v1330: Portal/Correo/Notificaciones/Automatizaciones/Plantillas/Marketing tienen pendientes de copy/gate menor, pero no bloquean M2/M3/M4.
+11. No tocar Conciliaciones como M5 sin conservar aislamiento: no cobros, no cartera, no producción, no aplicación de pagos.
+12. Actualizar Academia con rutas por rol para gates administrativos, copy honesto, marketing, finanzas y conciliaciones.
 
 ## Criterio de aceptación post-Claude
 
