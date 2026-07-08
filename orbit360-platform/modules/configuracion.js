@@ -216,9 +216,9 @@ Orbit.modules.configuracion = (function () {
   function apis() {
     const t = T().get(), plan = Orbit.PLANES[t.plan];
     const lock = !plan.apis;
-    return `${sectionHead('APIs y credenciales', 'Conexiones seguras con el nivel de seguridad correcto')}
+    return `${sectionHead('APIs y referencias de conexión', 'Conexiones seguras con el nivel de seguridad correcto')}
       ${lock ? `<div class="cfg-lock">🔒 Gestión de APIs disponible en el plan Personalizado.</div>` : ''}
-      <div class="cfg-note" style="margin-bottom:14px">🔐 Las credenciales se guardan <b>cifradas</b>, con <b>scopes mínimos</b> y visibilidad por rol. Nunca se exponen en el front.</div>
+      <div class="cfg-note" style="margin-bottom:14px">🔐 Las referencias de conexión quedan pendientes de canal seguro autorizado. No se muestran tokens ni contraseñas en pantalla.</div>
       <div class="card" style="overflow:hidden"><table class="tbl">
         <thead><tr><th>Servicio</th><th>Estado</th><th>Scope</th><th></th></tr></thead>
         <tbody>
@@ -271,7 +271,7 @@ Orbit.modules.configuracion = (function () {
           <td>${p.addons ? '✓' : '—'}</td>
           <td>${p.apis ? '✓' : '—'}</td>
           <td class="muted" style="font-size:12.5px">${U.esc(p.desc)}</td>
-          <td style="text-align:right"><button class="btn ghost sm" onclick="Orbit.modules.configuracion.editarPlan('${p.id}')">Editar</button></td>itar</button></td>
+          <td style="text-align:right"><button class="btn ghost sm" onclick="Orbit.modules.configuracion.editarPlan('${p.id}')">Editar</button></td>Editar</button></td>
         </tr>`).join('')}</tbody>
       </table></div>
       <div class="cfg-note" style="margin-bottom:18px">💡 Al asignar un plan al cliente se configuran de una vez sus funcionalidades; podés <b>modificar más o menos según acuerdos o promociones</b> sin cambiar el catálogo base.</div>
@@ -480,7 +480,7 @@ Orbit.modules.configuracion = (function () {
         + '</div></div>'
         + '<label class="ce-l">Patrón de asunto<input id="ci-pat" class="o-sel" value="' + U.esc(saved.patronAsunto || '{cliente} · {poliza} · {gestion}') + '"></label>'
         + '<label class="ce-l">Client ID / Tenant (OAuth Microsoft 365, opcional)<input id="ci-url" class="o-sel" value="' + U.esc(saved.url || '') + '" placeholder="app registration / tenant id"></label>'
-      : '<label class="ce-l">API key / Token<input id="ci-key" class="o-sel" type="password" value="' + U.esc(saved.key || '') + '" placeholder="••••••••"></label>'
+      : '<label class="ce-l">Referencia segura / Token<input id="ci-key" class="o-sel" type="password" value="' + U.esc(saved.key || '') + '" placeholder="••••••••"></label>'
         + '<label class="ce-l">Webhook / Endpoint / OAuth URL (opcional)<input id="ci-url" class="o-sel" value="' + U.esc(saved.url || '') + '" placeholder="https://hook.make.com/..."></label>'
         + '<label class="ce-l">Cuenta / usuario (opcional)<input id="ci-user" class="o-sel" value="' + U.esc(saved.user || '') + '"></label>';
     back.innerHTML = '<div class="card" style="width:min(480px,94vw);padding:0">'
@@ -488,7 +488,7 @@ Orbit.modules.configuracion = (function () {
       + '<div style="padding:18px 20px;display:grid;gap:11px">'
       + body
       + '<label class="ce-l ck"><input type="checkbox" id="ci-on" ' + (saved.activa ? 'checked' : '') + '> Habilitar para el tenant</label>'
-      + '<div id="ci-status" class="cfg-note">La conexión se define a nivel <b>tenant</b> (no por navegador). En este entorno el estado queda <b>Pendiente de conexión</b> hasta activarlo; no se realizazan conexiones reales.</div>'
+      + '<div id="ci-status" class="cfg-note">La conexión se define a nivel <b>tenant</b> (no por navegador). En este entorno el estado queda <b>Pendiente de conexión</b> hasta activarlo; no se realizan conexiones reales.</div>'
       + '</div>'
       + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="ci-test">🔌 Validar parámetros</button><div style="display:flex;gap:8px"><button class="btn ghost" id="ci-cancel">Cancelar</button><button class="btn primary" id="ci-ok">Guardar</button></div></div></div>';
     document.body.appendChild(back);
@@ -500,7 +500,7 @@ Orbit.modules.configuracion = (function () {
       const k = (back.querySelector('#ci-key') || {}).value || '';
       const url = (back.querySelector('#ci-url') || {}).value || '';
       const st = back.querySelector('#ci-status');
-      if (!u && !k && !url) { st.innerHTML = '⚠️ Ingresa al menos la cuenta o credenciales para validar los parámetros.'; st.style.color = 'var(--warn)'; return; }
+      if (!u && !k && !url) { st.innerHTML = '⚠️ Ingresa al menos la cuenta o referencias de conexión para validar los parámetros.'; st.style.color = 'var(--warn)'; return; }
       st.innerHTML = '✅ Parámetros completos. La conexión se activa a nivel del tenant (queda <b>Pendiente de conexión</b>).'; st.style.color = 'var(--ok)';
     };
     back.querySelector('#ci-ok').onclick = () => {
@@ -536,3 +536,58 @@ Orbit.modules.configuracion = (function () {
 
   return { render, editarPlan, subirManualMarca, agregarPais, configIntegracion, setGlosPais, guardarGlosario, limpiarGlosario };
 })();
+
+// ORBIT360 V1330 CONFIGURACION GATES PATCH START
+(function orbit360ConfiguracionGatesV1330(){
+  'use strict';
+  if (window.__orbit360ConfiguracionGatesV1330) return;
+  window.__orbit360ConfiguracionGatesV1330 = true;
+  var approved = typeof WeakSet !== 'undefined' ? new WeakSet() : null;
+  function norm(v){ return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim().toLowerCase(); }
+  function closest(el, sel){ try { return el && el.closest ? el.closest(sel) : null; } catch(e){ return null; } }
+  function inConfig(el){ return norm(location.hash).includes('config') || !!closest(el, '#module-configuracion,[data-module="configuracion"],.module-configuracion,.cfg-wrap,#cf-integ,#cf-plan-ed'); }
+  function userLabel(){ var O=window.Orbit||{}, u=(O.auth&&(O.auth.user||O.auth.currentUser))||(O.session&&(O.session.user||O.session.currentUser))||O.currentUser||O.user||{}; return u.email||u.correo||u.name||u.nombre||u.id||'usuario_actual'; }
+  function audit(action, motivo, phase){
+    var entry={id:'audit_config_'+Date.now(), fecha:new Date().toISOString(), modulo:'configuracion', accion:action, fase:phase||'antes', motivo:motivo||'', usuario:userLabel(), tenant:(window.Orbit&&Orbit.tenant&&(Orbit.tenant.id||Orbit.tenant.nombre||Orbit.tenant.name))||'tenant_actual', aplicaClaude:'Si', patronClaude:'Configuracion SaaS administrable con gates, estados honestos y auditoria por tenant.'};
+    try{ if(window.Orbit&&Orbit.store&&typeof Orbit.store.insert==='function') Orbit.store.insert('auditoria', entry); }catch(e){}
+    try{ window.dispatchEvent(new CustomEvent('orbit:audit-gate',{detail:entry})); }catch(e){}
+  }
+  function reason(label, reset){
+    if (reset) { var ok=prompt('Confirmación reforzada: escribe RESTABLECER CONFIGURACION para continuar.'); if(ok!=='RESTABLECER CONFIGURACION') return ''; }
+    var m=prompt('Motivo obligatorio para '+label+':');
+    if(!m || m.trim().length<5){ alert('Acción cancelada. Debe indicar un motivo claro.'); return ''; }
+    return m.trim();
+  }
+  function gate(el, action, label, reset){ var m=reason(label, reset); if(!m) return false; audit(action,m,'antes'); return true; }
+  function scrub(root){
+    root=root||document.body;
+    var repl=[[/\bAuth\s*backend\b/gi,'acceso seguro'],[/\bbackend\b/gi,'canal seguro'],[/\bLAB\b/g,'entorno de validación'],[/\bFirebase\b/g,'servicio seguro'],[/\bFirestore\b/g,'servicio seguro'],[/\blocalStorage\b/g,'almacenamiento seguro'],[/\bmock\b/gi,'entorno de prueba'],[/\bdemo\b/gi,'entorno de prueba'],[/\bsmoke\b/gi,'validación'],[/\bcredenciales\b/gi,'referencias de conexión'],[/\bAPI key\b/gi,'referencia de conexión']];
+    function clean(s){ repl.forEach(function(p){s=String(s).replace(p[0],p[1]);}); return s; }
+    try{ var w=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode:function(n){var p=n.parentElement; return !p||/script|style|code|pre/i.test(p.tagName)||!n.nodeValue.trim()?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;}}), nodes=[]; while(w.nextNode()) nodes.push(w.currentNode); nodes.forEach(function(n){var x=clean(n.nodeValue); if(x!==n.nodeValue)n.nodeValue=x;}); root.querySelectorAll('[title],[placeholder],[aria-label]').forEach(function(el){['title','placeholder','aria-label'].forEach(function(a){var v=el.getAttribute(a); if(v){var x=clean(v); if(x!==v)el.setAttribute(a,x);}});}); }catch(e){}
+  }
+  document.addEventListener('click', function(ev){
+    var btn=closest(ev.target,'button,a,[role="button"],input[type="button"],input[type="submit"]'); if(!btn||!inConfig(btn)) return;
+    if(approved&&approved.has(btn)){approved.delete(btn); return;}
+    var t=norm((btn.textContent||'')+' '+(btn.id||'')+' '+(btn.getAttribute('aria-label')||''));
+    var action='', label='', reset=false;
+    if(btn.id==='cf-mods-save'||/guardar modulos|guardar módulos|modulos activos|módulos activos/.test(t)){ action='guardar_modulos_activos'; label='guardar módulos activos'; }
+    else if(btn.id==='cf-reset'||/restablecer|reset/.test(t)){ action='reset_configuracion'; label='restablecer configuración'; reset=true; }
+    else if(btn.id==='pe-ok'||/editar plan|guardar/.test(t)&&closest(btn,'#cf-plan-ed')){ action='cambiar_plan'; label='cambiar plan'; }
+    else if(btn.id==='ci-ok'||/validar parametros|validar parámetros|conectar|guardar/.test(t)&&closest(btn,'#cf-integ')){ action='configurar_integracion'; label='configurar integración'; }
+    if(!action) return;
+    ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+    if(!gate(btn,action,label,reset)) return;
+    if(approved) approved.add(btn); setTimeout(function(){ try{btn.click();}catch(e){} setTimeout(function(){audit(action,'motivo registrado','despues');},350); },0);
+  }, true);
+  document.addEventListener('change', function(ev){
+    var el=ev.target; if(!el||!inConfig(el)||el.id!=='cf-plan') return;
+    if(approved&&approved.has(el)){approved.delete(el); return;}
+    ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+    if(!gate(el,'cambiar_plan','cambiar plan',false)) return;
+    if(approved) approved.add(el); setTimeout(function(){ try{el.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){} },0);
+  }, true);
+  setTimeout(function(){scrub(document.querySelector('#cfg-body')||document.body);},250);
+  setTimeout(function(){scrub(document.querySelector('#cfg-body')||document.body);},1000);
+  try{ new MutationObserver(function(){scrub(document.querySelector('#cfg-body')||document.body);}).observe(document.body,{childList:true,subtree:true}); }catch(e){}
+})();
+// ORBIT360 V1330 CONFIGURACION GATES PATCH END
