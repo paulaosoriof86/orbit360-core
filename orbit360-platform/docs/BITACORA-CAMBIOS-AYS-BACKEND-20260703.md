@@ -93,3 +93,20 @@
 - **Fix o mejora aplicada:** Se endureció loader/init a v1.104, se agregó guard runtime que bloquea `setPref` sensible, limpia campos sensibles antes de `insert/update`, bloquea writes si no está el usuario LAB esperado y emite eventos de seguridad. El script de integración ahora inserta el guard después del store LAB y antes de `seed.js`.
 - **Impacto en prototipo comercializable:** Aprendizaje obligatorio para prototipo base: ninguna integración comercial debe persistir secretos en frontend; Claude debe conservar copy comercial sin pedir credenciales expuestas y backend debe proveer conectores seguros.
 - **Estado:** RESUELTO EN RAMA / pendiente ejecutar smoke local y empalme visual definitivo.
+
+## 2026-07-08 — Avance celular v1330: auditoría documental, módulos visibles y plan actualizado
+
+- **Módulo/área:** Documentación viva / metodología / gates administrativos / coordinación Claude-Academia.
+- **Síntoma/necesidad:** Paula estaba sin PowerShell desde celular y pidió continuar sin rellenar, documentando avances, pendientes, patrones replicables y Academia para no perder tiempo ni repetir auditorías al volver al computador.
+- **Esperado:** Persistir en la rama activa el avance celular, separar bloqueadores reales de pendientes no bloqueantes, actualizar documentos vivos y evitar tocar código funcional sin `node --check` local.
+- **Causa raíz:** El patch local Equipo/Configuración v1 falló sin aplicar cambios por depender de reemplazos textuales largos que no coincidían con el worktree local; además el HEAD local reportado quedó detrás del head remoto documental posterior.
+- **Archivo/función:**
+  - `orbit360-platform/docs/AVANCE-CELULAR-EQUIPO-CONFIG-V1330-20260708.md`.
+  - `orbit360-platform/docs/AUDITORIA-CELULAR-MODULOS-VISIBLES-V1330-20260708.md`.
+  - `orbit360-platform/docs/REGISTRO-ACCIONES-CELULAR-V1330-20260708.md`.
+  - `orbit360-platform/docs/PLAN-TRABAJO-ACTUALIZADO-V1330-20260708.md`.
+- **Fix o mejora aplicada:** Se documentó que Equipo/Configuración son el bloqueo real por gates administrativos; se auditó Portal, Correo, Notificaciones, Automatizaciones, Plantillas, Marketing y Conciliaciones; se separaron pendientes críticos, no bloqueantes y bloqueantes solo para M5.
+- **Impacto en prototipo comercializable:** Evita repetir trabajo, conserva lenguaje honesto sobre acciones preparadas/no enviadas/no conectadas, y deja claro que M2/M3/M4 pueden seguir tras cerrar Equipo/Config sin sobredimensionar pendientes de copy.
+- **Impacto Academia:** Se agregan rutas/microlecciones pendientes para Dirección/Admin, Marketing, Finanzas y Portal: motivos administrativos, último admin activo, preparado vs enviado/conectado, reportar pago no equivale a conciliar, conciliación validada no aplica pago.
+- **¿Aplica a Claude/prototipo?:** Sí. Claude debe conservar copy honesto, no mostrar textos técnicos visibles, no simular integraciones activas, no reintroducir secretos en frontend y mantener gates/UX de confirmación en acciones administrativas.
+- **Estado:** DOCUMENTADO EN RAMA / pendiente patch local Equipo-Config v2, validación Node y smokes M2/M3/M4.
