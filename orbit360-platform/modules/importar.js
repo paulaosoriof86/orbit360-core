@@ -9,6 +9,25 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.importar = (function () {
   const U = Orbit.ui;
 
+  function loadP0PolicyRules() {
+    if (Orbit.__importaPolizasP0Loader) return;
+    Orbit.__importaPolizasP0Loader = true;
+    function add(src, onload) {
+      const s = document.createElement('script');
+      s.src = src;
+      if (onload) s.onload = onload;
+      document.head.appendChild(s);
+    }
+    if (!Orbit.importaPolizasP0) {
+      add('core/importa-polizas-p0.js?v=20260709', function () {
+        if (!Orbit.__importaPolizasP0Wired) add('core/importa-polizas-p0-wire.js?v=20260709');
+      });
+    } else if (!Orbit.__importaPolizasP0Wired) {
+      add('core/importa-polizas-p0-wire.js?v=20260709');
+    }
+  }
+  loadP0PolicyRules();
+
   const GROUPS = [
     {
       title: 'Arranque', sub: 'Carga inicial para poner a operar la plataforma',
@@ -34,6 +53,7 @@ Orbit.modules.importar = (function () {
   }
 
   function render(host) {
+    loadP0PolicyRules();
     host.innerHTML = `<div class="page">
       ${Orbit.kit.bannerFor('importar', '')}
       <div class="page-head" style="margin-top:-6px"><div><div class="page-sub" style="margin-top:0">Sube <b>cualquier formato</b> (PDF, Excel, CSV, imagen, planilla) y Orbit 360 reconoce y mapea los datos a la plataforma. Pensado para <b>adaptarse a la base de cada cliente</b> — sin reformatear nada a mano.</div></div></div>
