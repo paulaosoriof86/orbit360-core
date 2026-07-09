@@ -52,10 +52,23 @@ Orbit.modules.importar = (function () {
     }
   }
 
+  function loadP0BancoComisionesRules() {
+    if (Orbit.__importaBancoComisionesP0Loader) return;
+    Orbit.__importaBancoComisionesP0Loader = true;
+    if (!Orbit.importaBancoComisionesP0) {
+      addScript('core/importa-banco-comisiones-p0.js?v=20260709', function () {
+        if (!Orbit.__importaBancoComisionesP0Wired) addScript('core/importa-banco-comisiones-p0-wire.js?v=20260709');
+      });
+    } else if (!Orbit.__importaBancoComisionesP0Wired) {
+      addScript('core/importa-banco-comisiones-p0-wire.js?v=20260709');
+    }
+  }
+
   function loadP0Rules() {
     loadP0PolicyRules();
     loadP0CarteraRules();
     loadP0ComisionesRules();
+    loadP0BancoComisionesRules();
   }
   loadP0Rules();
 
