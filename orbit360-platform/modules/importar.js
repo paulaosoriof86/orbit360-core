@@ -64,6 +64,13 @@ Orbit.modules.importar = (function () {
     }
   }
 
+  function loadP0Dashboard(onload) {
+    if (Orbit.importarP0Dashboard) { if (onload) onload(); return; }
+    if (Orbit.__importarP0DashboardLoader) return;
+    Orbit.__importarP0DashboardLoader = true;
+    addScript('modules/importar-p0-dashboard.js?v=20260709', onload);
+  }
+
   function loadP0Rules() {
     loadP0PolicyRules();
     loadP0CarteraRules();
@@ -71,6 +78,7 @@ Orbit.modules.importar = (function () {
     loadP0BancoComisionesRules();
   }
   loadP0Rules();
+  loadP0Dashboard();
 
   const GROUPS = [
     {
@@ -96,6 +104,13 @@ Orbit.modules.importar = (function () {
     </button>`;
   }
 
+  function mountP0Dashboard(host) {
+    const dash = host.querySelector('#importar-p0-dashboard');
+    if (!dash) return;
+    if (Orbit.importarP0Dashboard) Orbit.importarP0Dashboard.mount(dash);
+    else loadP0Dashboard(function () { if (Orbit.importarP0Dashboard) Orbit.importarP0Dashboard.mount(dash); });
+  }
+
   function render(host) {
     loadP0Rules();
     host.innerHTML = `<div class="page">
@@ -117,9 +132,12 @@ Orbit.modules.importar = (function () {
         <div><b style="font-family:var(--f-display);font-size:15px">Motor de extracción adaptable</b>
         <p class="muted" style="font-size:13.5px;margin:6px 0 0;line-height:1.55;max-width:760px">El cliente entrega su base como la tenga. El motor detecta estructura y formato, propone el mapeo y lo deja listo para confirmar. Toda la información importada <b>alimenta a todos los módulos</b> (CRM, Finanzas, Insights, Marketing) y mantiene la <b>sincronía</b> entre ellos.</p></div>
       </div>
+
+      <div id="importar-p0-dashboard"></div>
     </div>`;
 
     host.querySelectorAll('.imp-card').forEach(el => el.addEventListener('click', () => Orbit.importa.open(el.dataset.k)));
+    mountP0Dashboard(host);
   }
   return { render };
 })();
