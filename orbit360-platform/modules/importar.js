@@ -40,9 +40,22 @@ Orbit.modules.importar = (function () {
     }
   }
 
+  function loadP0ComisionesRules() {
+    if (Orbit.__importaComisionesP0Loader) return;
+    Orbit.__importaComisionesP0Loader = true;
+    if (!Orbit.importaComisionesP0) {
+      addScript('core/importa-comisiones-p0.js?v=20260709', function () {
+        if (!Orbit.__importaComisionesP0Wired) addScript('core/importa-comisiones-p0-wire.js?v=20260709');
+      });
+    } else if (!Orbit.__importaComisionesP0Wired) {
+      addScript('core/importa-comisiones-p0-wire.js?v=20260709');
+    }
+  }
+
   function loadP0Rules() {
     loadP0PolicyRules();
     loadP0CarteraRules();
+    loadP0ComisionesRules();
   }
   loadP0Rules();
 
