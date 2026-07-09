@@ -222,7 +222,7 @@ Orbit.modules.configuracion = (function () {
       <div class="card" style="overflow:hidden"><table class="tbl">
         <thead><tr><th>Servicio</th><th>Estado</th><th>Scope</th><th></th></tr></thead>
         <tbody>
-          ${[['WhatsApp Cloud API', 'Pendiente de conexión', 'mensajería'], ['Aseguradora — Cotizador', 'Pendiente', 'tarifas'], ['SIGA / CRM externo', 'No configurado', 'importación']].map(r => `<tr>
+          ${[['WhatsApp Cloud API', 'Pendiente de conexión', 'mensajería'], ['Aseguradora — Cotizador', 'Pendiente', 'tarifas'], ['CRM externo / fuente externa', 'No configurado', 'importación']].map(r => `<tr>
             <td><b>${r[0]}</b></td>
             <td><span class="badge ${r[1] === 'Conectado' ? 'ok' : /Pendiente/.test(r[1]) ? 'warn' : 'neutral'}">${r[1]}</span></td>
             <td>${r[2]}</td>
