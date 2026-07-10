@@ -86,6 +86,19 @@
   async function resolveBatchReferences(input) {
     return request('POST', '/references', input || {});
   }
+  function loadCopyHotfix() {
+    if (Orbit.aseguradorasBatchAdminCopyP09l) return;
+    var wanted = 'modules/aseguradoras-batch-admin-copy-p09l.js';
+    var exists = Array.prototype.some.call(document.querySelectorAll('script[src]'), function (script) {
+      return clean(script.getAttribute('src') || script.src).split('?')[0].replace(/^https?:\/\/[^/]+\//i, '') === wanted;
+    });
+    if (exists) return;
+    var script = document.createElement('script');
+    script.src = wanted + '?v=' + encodeURIComponent(VERSION);
+    script.async = false;
+    script.dataset.orbitP09lCopy = VERSION;
+    (document.head || document.documentElement).appendChild(script);
+  }
 
   var bridge = {
     VERSION: VERSION,
@@ -103,4 +116,5 @@
 
   window.OrbitBackendDocumentBridge = bridge;
   Orbit.backendDocumentBridge = bridge;
+  loadCopyHotfix();
 })();
