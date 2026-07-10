@@ -1,0 +1,86 @@
+name: Orbit 360 Document Backend Capability P09k
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-document-reference-registry-p09k.mjs'
+      - 'tools/orbit360-document-backend-capability-p09k.mjs'
+      - 'tools/orbit360-document-backend-command-p09k.mjs'
+      - 'tools/orbit360-test-document-backend-capability-p09k.mjs'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-source-catalog-p09k.json'
+      - '.github/workflows/orbit360-document-backend-capability-p09k-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/orbit360-document-reference-registry-p09k.mjs'
+      - 'tools/orbit360-document-backend-capability-p09k.mjs'
+      - 'tools/orbit360-document-backend-command-p09k.mjs'
+      - 'tools/orbit360-test-document-backend-capability-p09k.mjs'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-source-catalog-p09k.json'
+      - '.github/workflows/orbit360-document-backend-capability-p09k-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  p09k:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check tools/orbit360-document-reference-registry-p09k.mjs
+          node --check tools/orbit360-document-backend-capability-p09k.mjs
+          node --check tools/orbit360-document-backend-command-p09k.mjs
+          node --check tools/orbit360-test-document-backend-capability-p09k.mjs
+          node -e "JSON.parse(require('fs').readFileSync('orbit360-platform/data/tenant-alianzas-soluciones-source-catalog-p09k.json','utf8'))"
+
+      - name: Run P09k smoke
+        run: node tools/orbit360-test-document-backend-capability-p09k.mjs
+
+      - name: Guard catalog safety
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const p='orbit360-platform/data/tenant-alianzas-soluciones-source-catalog-p09k.json';
+          const x=JSON.parse(fs.readFileSync(p,'utf8'));
+          if(!Array.isArray(x.sources)||x.sources.length!==11) throw new Error('A&S catalog must contain 11 sources');
+          const raw=JSON.stringify(x);
+          if(/(?:localPath|mountedPath|privateKey|clientSecret|apiKey|password|token)/i.test(raw)) throw new Error('Sensitive/path field in catalog');
+          if(x.containsPaths!==false||x.containsSecrets!==false) throw new Error('Catalog safety flags missing');
+          NODE
+
+      - name: Guard no direct network or client storage
+        run: |
+          if grep -RniE '(localStorage|sessionStorage|fetch\(|XMLHttpRequest|eval\(|new Function|firebase deploy|git commit)' \
+            tools/orbit360-document-reference-registry-p09k.mjs \
+            tools/orbit360-document-backend-capability-p09k.mjs \
+            tools/orbit360-document-backend-command-p09k.mjs; then
+            echo 'Forbidden direct network/client storage/executable path detected'
+            exit 1
+          fi
+
+      - name: Guard opaque references and zero enablement
+        run: |
+          grep -q 'backend-ref://' tools/orbit360-document-reference-registry-p09k.mjs
+          grep -q 'containsLocalPaths:false' tools/orbit360-document-reference-registry-p09k.mjs
+          if grep -RniE '(enabledCotizador|enabledComparativo|enablesCotizador|enablesComparativo)[[:space:]]*:[[:space:]]*true' \
+            tools/orbit360-document-reference-registry-p09k.mjs \
+            tools/orbit360-document-backend-capability-p09k.mjs \
+            tools/orbit360-document-backend-command-p09k.mjs; then
+            echo 'Enablement detected in P09k'
+            exit 1
+          fi
+
+      - name: Run backend LAB validator
+        run: node tools/orbit360-validar-backend-lab-contrato.mjs
