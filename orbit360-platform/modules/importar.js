@@ -70,6 +70,12 @@ Orbit.modules.importar = (function () {
     addScript('core/importa-write-p0.js?v=20260709');
   }
 
+  function loadP0DryRunBuilder() {
+    if (Orbit.importaDryRunP0 || Orbit.__importaDryRunP0Loader) return;
+    Orbit.__importaDryRunP0Loader = true;
+    addScript('core/importa-dryrun-p0.js?v=20260709');
+  }
+
   function loadP0Dashboard(onload) {
     if (Orbit.importarP0Dashboard) { if (onload) onload(); return; }
     if (Orbit.__importarP0DashboardLoader) return;
@@ -90,6 +96,7 @@ Orbit.modules.importar = (function () {
     loadP0ComisionesRules();
     loadP0BancoComisionesRules();
     loadP0WriteContract();
+    loadP0DryRunBuilder();
   }
   loadP0Rules();
   loadP0Dashboard();
