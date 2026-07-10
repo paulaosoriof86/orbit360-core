@@ -12,6 +12,10 @@ const HOST = '127.0.0.1';
 const MAX_BODY_BYTES = 1024 * 1024;
 const COOKIE_NAME = 'orbit360_p09l_session';
 const ALLOWED_ROLES = new Set(['superadmin','super_admin','direccion','admin','admintenant','admin_tenant','operativo']);
+const REQUIRED_CLAUDE_GATES = Object.freeze([
+  'runtime_ready','panel_mounted','form_mounted','auth_role','source_connection','preview','training_read',
+  'history_persisted','history_after_reload','read_model','responsive_structure','copy_clean','module_boundary'
+]);
 const MIME = Object.freeze({
   '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.mjs':'text/javascript; charset=utf-8',
   '.css':'text/css; charset=utf-8', '.json':'application/json; charset=utf-8', '.svg':'image/svg+xml',
@@ -152,7 +156,9 @@ function normalizeRuntimeReportP09n(input={}){
   const gates=[].concat(source.gates||[]).slice(0,40).map(item=>({
     id:short(item?.id,60), state:safeState(item?.state,['approved','pending','blocked']), reason:short(item?.reason,100)
   })).filter(item=>item.id);
-  const pending=[].concat(source.claudeGate?.pending||[]).slice(0,40).map(item=>short(item,60)).filter(Boolean);
+  const gateById=Object.fromEntries(gates.map(item=>[item.id,item]));
+  const pending=REQUIRED_CLAUDE_GATES.filter(id=>!gateById[id]||gateById[id].state!=='approved');
+  const ready=pending.length===0;
   return {
     version:'p09n-v1', generatedAt:short(source.generatedAt,40)||new Date().toISOString(), reason:short(source.reason,80),
     tenantId:short(source.tenantId,80), route:safeState(source.route,['aseguradoras'],'aseguradoras'),
@@ -164,7 +170,7 @@ function normalizeRuntimeReportP09n(input={}){
     navigationReloaded:bool(source.navigationReloaded),
     counts:{sources:finite(counts.sources,10000),manifests:finite(counts.manifests,100000),proposals:finite(counts.proposals,100000),rules:finite(counts.rules,100000),presentations:finite(counts.presentations,100000),bindings:finite(counts.bindings,100000),reviews:finite(counts.reviews,100000)},
     gates,
-    claudeGate:{ready:bool(source.claudeGate?.ready)&&pending.length===0,status:safeState(source.claudeGate?.status,['not_ready','ready_for_super_accumulated_claude_package'],'not_ready'),pending,packageMode:'super_accumulated_from_candidate_20260708'},
+    claudeGate:{ready,status:ready?'ready_for_super_accumulated_claude_package':'not_ready',pending,packageMode:'super_accumulated_from_candidate_20260708'},
     containsPii:false,containsDocumentText:false,containsLocalPaths:false,containsReferences:false,containsSecrets:false,writeAllowed:false,enablesCotizador:false,enablesComparativo:false
   };
 }
