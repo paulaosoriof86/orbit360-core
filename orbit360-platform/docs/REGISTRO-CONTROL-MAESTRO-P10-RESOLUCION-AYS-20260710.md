@@ -3,7 +3,7 @@
 Fecha: 2026-07-10  
 Rama: `ays/backend-tenant-lab-v99-20260703`  
 PR: `#5 draft/open`  
-Estado: `IDENTIDADES_RESUELTAS / PERFIL_FINANCIERO_ASEGUATE_CONFIRMADO / RUNTIME_LAB_PENDIENTE`
+Estado: `IDENTIDADES_RESUELTAS / PERFIL_FINANCIERO_ASEGUATE_CONFIRMADO / WIRE_P09_IMPLEMENTADO / RUNTIME_LAB_PENDIENTE`
 
 ## Fuente real usada
 
@@ -51,12 +51,14 @@ core/tenant-source-batch-adapter-p10.js
 data/tenant-alianzas-soluciones-insurers-p10.js
 tools/orbit360-test-tenant-insurer-config-p10.mjs
 tools/orbit360-test-tenant-source-batch-adapter-p10.mjs
+tools/orbit360-test-aseguradoras-knowledge-p10-wire.mjs
 .github/workflows/orbit360-tenant-insurer-config-p10-smoke.yml
 ```
 
 También se actualizó:
 
 ```text
+modules/aseguradoras-knowledge-p09.js
 tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs
 tools/orbit360-test-integrar-aseguradoras-knowledge-p09-index.mjs
 ```
@@ -72,6 +74,9 @@ Cerrado:
 - aplicación aditiva;
 - prevención de duplicados;
 - once fuentes → seis aseguradoras;
+- resolución automática antes del provider;
+- contexto reducido sin ficha sensible;
+- enriquecimiento financiero antes del plan P0.9;
 - orden seguro de scripts;
 - cero escritura/habilitación.
 
@@ -129,6 +134,18 @@ No volver a preguntar:
 
 Son generadas por backend al cargar/seleccionar archivos. No son un dato manual pendiente del usuario.
 
+## Wire P0.10b
+
+El servicio P0.9 ahora:
+
+1. resuelve la aseguradora por tenant/directorio/alias;
+2. bloquea fuentes desconocidas antes del provider;
+3. entrega al provider el ID resuelto;
+4. conserva un contexto sin contactos, cuentas o accesos;
+5. aplica el perfil financiero tenant a reglas revisadas;
+6. construye el plan metadata-only;
+7. mantiene Cotizador y Comparativo deshabilitados.
+
 ## Estado del empalme
 
 ```text
@@ -144,7 +161,7 @@ Comparativo habilitado: no
 
 ## Próxima acción
 
-P0.9e/P0.10b:
+P0.9e/P0.10c:
 
 1. ejecutar dry-run del integrador contra checkout completo;
 2. validar orden y UTF-8;
