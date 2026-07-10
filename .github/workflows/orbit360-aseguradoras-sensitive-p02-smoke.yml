@@ -1,0 +1,64 @@
+name: Orbit 360 Aseguradoras Sensitive P02 Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/aseguradoras-sensitive-p02.js'
+      - 'orbit360-platform/modules/aseguradoras-p02-sensitive.js'
+      - 'tools/orbit360-test-aseguradoras-sensitive-p02.mjs'
+      - '.github/workflows/orbit360-aseguradoras-sensitive-p02-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/aseguradoras-sensitive-p02.js'
+      - 'orbit360-platform/modules/aseguradoras-p02-sensitive.js'
+      - 'tools/orbit360-test-aseguradoras-sensitive-p02.mjs'
+      - '.github/workflows/orbit360-aseguradoras-sensitive-p02-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  aseguradoras-sensitive-p02:
+    name: Accesos y cuentas sensibles P0.2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check sensitive contract syntax
+        run: node --check orbit360-platform/core/aseguradoras-sensitive-p02.js
+
+      - name: Check sensitive UI patch syntax
+        run: node --check orbit360-platform/modules/aseguradoras-p02-sensitive.js
+
+      - name: Check smoke syntax
+        run: node --check tools/orbit360-test-aseguradoras-sensitive-p02.mjs
+
+      - name: Run sensitive access smoke
+        run: node tools/orbit360-test-aseguradoras-sensitive-p02.mjs
+
+      - name: Guard against embedded secrets
+        run: |
+          if grep -RniE "(password|contrase(n|ñ)a|token|secret)[[:space:]]*[:=][[:space:]]*['\"][^'\"]{4,}" \
+            orbit360-platform/core/aseguradoras-sensitive-p02.js \
+            orbit360-platform/modules/aseguradoras-p02-sensitive.js; then
+            echo "Potential embedded secret detected"
+            exit 1
+          fi
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo "Validator not present; skipping."
+          fi
