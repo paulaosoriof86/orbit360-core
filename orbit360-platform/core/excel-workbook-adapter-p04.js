@@ -45,9 +45,12 @@
   function normalizeFormulaFunctions(values) {
     return unique(safeArray(values, 200).map(function (value) { return clean(value).toUpperCase(); }).filter(Boolean));
   }
-  function keywordScore(text, pattern) {
-    var matches = clean(text).match(pattern);
-    return matches ? Math.min(50, matches.length * 18) : 0;
+  function keywordScore(text, pattern) { return pattern.test(clean(text)) ? 18 : 0; }
+  function externalLabel(item) {
+    var raw = clean(item && (item.name || item.target || item.fileName) || item);
+    if (!raw) return '';
+    raw = raw.split(/[\\/]/).pop();
+    return C() ? C().redactSample(raw) : raw;
   }
 
   function classifySheet(sheet) {
@@ -86,8 +89,8 @@
       fitToHeight: number(input.fitToHeight),
       scale: number(input.scale),
       margins: C() ? C().sanitize(input.margins || {}, {}, 0) : {},
-      header: clean(input.header),
-      footer: clean(input.footer),
+      header: C() ? C().redactSample(input.header) : clean(input.header),
+      footer: C() ? C().redactSample(input.footer) : clean(input.footer),
       centerHorizontally: bool(input.centerHorizontally),
       centerVertically: bool(input.centerVertically)
     };
@@ -95,12 +98,12 @@
 
   function normalizeSheet(input, index) {
     input = input || {};
-    var functions = normalizeFormulaFunctions(input.formulaFunctions || input.functions);
     var print = normalizePrintProfile(input.print || {});
+    var name = clean(input.name || input.nombre || ('Hoja ' + (index + 1)));
     var normalized = {
       id: clean(input.id) || 'sheet_' + (index + 1),
       index: number(input.index != null ? input.index : index),
-      name: clean(input.name || input.nombre || ('Hoja ' + (index + 1))),
+      name: name,
       visibility: visibility(input.visibility || input.estado),
       usedRange: clean(input.usedRange || input.rangoUsado),
       rowCount: number(input.rowCount || input.rows),
@@ -109,7 +112,7 @@
       numericConstantCount: number(input.numericConstantCount),
       textConstantCount: number(input.textConstantCount),
       blankCellCount: number(input.blankCellCount),
-      formulaFunctions: functions,
+      formulaFunctions: normalizeFormulaFunctions(input.formulaFunctions || input.functions),
       formulaFingerprint: clean(input.formulaFingerprint),
       formulaErrorCount: number(input.formulaErrorCount),
       circularReferenceCount: number(input.circularReferenceCount),
@@ -119,13 +122,13 @@
       tableNames: safeArray(input.tableNames || input.tables, 100).map(function (item) { return clean(item.name || item); }).filter(Boolean),
       namedRanges: safeArray(input.namedRanges, 100).map(function (item) { return clean(item.name || item); }).filter(Boolean),
       labels: safeArray(input.labels || input.sampleLabels, 100).map(function (item) { return C() ? C().redactSample(item) : clean(item); }).filter(Boolean),
-      sectionLabels: safeArray(input.sectionLabels, 100).map(clean).filter(Boolean),
+      sectionLabels: safeArray(input.sectionLabels, 100).map(function (item) { return C() ? C().redactSample(item) : clean(item); }).filter(Boolean),
       print: print,
       printAreaCount: print.areas.length,
       hasExternalReferences: bool(input.hasExternalReferences),
       protected: bool(input.protected),
       roleProposal: null,
-      sourceLocation: { sheet: clean(input.name || input.nombre || ('Hoja ' + (index + 1))), index: number(input.index != null ? input.index : index) }
+      sourceLocation: { sheet: name, index: number(input.index != null ? input.index : index) }
     };
     normalized.roleProposal = classifySheet(normalized);
     return normalized;
@@ -133,13 +136,14 @@
 
   function normalizeDefinedName(input, index) {
     input = input || {};
+    var refersTo = clean(input.refersTo);
     return {
       id: clean(input.id) || 'name_' + (index + 1),
       name: clean(input.name),
       scopeSheet: clean(input.scopeSheet),
-      refersTo: clean(input.refersTo),
+      refersTo: refersTo.length > 300 ? '[referencia_omitida]' : refersTo,
       hidden: bool(input.hidden),
-      externalReference: bool(input.externalReference) || /\[[^\]]+\]/.test(clean(input.refersTo))
+      externalReference: bool(input.externalReference) || /\[[^\]]+\]/.test(refersTo)
     };
   }
 
@@ -148,6 +152,7 @@
     ctx = ctx || {};
     var sheets = safeArray(input.worksheets || input.sheets, 500).map(normalizeSheet);
     var definedNames = safeArray(input.definedNames || input.names, 500).map(normalizeDefinedName);
+    var links = safeArray(input.externalLinks, 100).map(externalLabel).filter(Boolean);
     return {
       format: clean(input.format || input.extension).toLowerCase(),
       workbookFingerprint: clean(input.workbookFingerprint || input.fingerprint),
@@ -160,9 +165,9 @@
       hasMacros: bool(input.hasMacros || input.vbaProjectPresent),
       macrosExecuted: false,
       formulasExecuted: false,
-      externalLinks: safeArray(input.externalLinks, 100).map(function (item) { return clean(item.name || item.target || item); }).filter(Boolean),
-      externalLinkCount: number(input.externalLinkCount || safeArray(input.externalLinks, 100).length),
-      connectionCount: number(input.connectionCount || safeArray(input.connections, 100).length),
+      externalLinks: links,
+      externalLinkCount: number(input.externalLinkCount != null ? input.externalLinkCount : links.length),
+      connectionCount: number(input.connectionCount != null ? input.connectionCount : safeArray(input.connections, 100).length),
       protectedWorkbook: bool(input.protectedWorkbook),
       customXmlCount: number(input.customXmlCount),
       warningsFromParser: safeArray(input.warnings, 100).map(clean).filter(Boolean),
@@ -172,19 +177,6 @@
         generatedAt: clean(input.parser && input.parser.generatedAt || input.generatedAt)
       }
     };
-  }
-
-  function workbookWarnings(workbook) {
-    var warnings = safeArray(workbook.warningsFromParser, 100).slice();
-    if (workbook.hasMacros) warnings.push('MACROS_DETECTADAS_NO_EJECUTADAS');
-    if (workbook.externalLinkCount) warnings.push('VINCULOS_EXTERNOS_REQUIEREN_VALIDACION');
-    if (workbook.connectionCount) warnings.push('CONEXIONES_EXTERNAS_REQUIEREN_VALIDACION');
-    if (workbook.protectedWorkbook) warnings.push('LIBRO_PROTEGIDO');
-    if (workbook.worksheets.some(function (sheet) { return sheet.visibility === 'veryHidden'; })) warnings.push('HOJAS_MUY_OCULTAS_REQUIEREN_REVISION');
-    if (workbook.worksheets.some(function (sheet) { return sheet.circularReferenceCount > 0; })) warnings.push('REFERENCIAS_CIRCULARES_DETECTADAS');
-    if (workbook.worksheets.some(function (sheet) { return sheet.formulaErrorCount > 0; })) warnings.push('ERRORES_DE_FORMULA_DETECTADOS');
-    if (workbook.definedNames.some(function (name) { return name.externalReference; })) warnings.push('NOMBRES_CON_REFERENCIA_EXTERNA');
-    return unique(warnings);
   }
 
   function summarizeRoles(workbook) {
@@ -238,6 +230,22 @@
     };
   }
 
+  function workbookWarnings(workbook, capabilities) {
+    capabilities = capabilities || proposeCapabilities(workbook);
+    var warnings = safeArray(workbook.warningsFromParser, 100).slice();
+    if (workbook.hasMacros) warnings.push('MACROS_DETECTADAS_NO_EJECUTADAS');
+    if (workbook.externalLinkCount) warnings.push('VINCULOS_EXTERNOS_REQUIEREN_VALIDACION');
+    if (workbook.connectionCount) warnings.push('CONEXIONES_EXTERNAS_REQUIEREN_VALIDACION');
+    if (workbook.protectedWorkbook) warnings.push('LIBRO_PROTEGIDO');
+    if (workbook.worksheets.some(function (sheet) { return sheet.visibility === 'veryHidden'; })) warnings.push('HOJAS_MUY_OCULTAS_REQUIEREN_REVISION');
+    if (workbook.worksheets.some(function (sheet) { return sheet.circularReferenceCount > 0; })) warnings.push('REFERENCIAS_CIRCULARES_DETECTADAS');
+    if (workbook.worksheets.some(function (sheet) { return sheet.formulaErrorCount > 0; })) warnings.push('ERRORES_DE_FORMULA_DETECTADOS');
+    if (workbook.definedNames.some(function (name) { return name.externalReference; })) warnings.push('NOMBRES_CON_REFERENCIA_EXTERNA');
+    if (capabilities.volatileFunctions.length) warnings.push('FUNCIONES_VOLATILES_REQUIEREN_PRUEBA');
+    if (capabilities.externalFunctions.length) warnings.push('FUNCIONES_EXTERNAS_REQUIEREN_REVISION');
+    return unique(warnings);
+  }
+
   function buildPresentationProposal(workbook, envelope) {
     var outputSheets = workbook.worksheets.filter(function (sheet) {
       return sheet.roleProposal.role === 'salida_cotizacion' || sheet.printAreaCount > 0;
@@ -267,8 +275,24 @@
     };
   }
 
+  function dimensionFields(envelope) {
+    var d = envelope.dimensiones || {};
+    return {
+      ramo: clean(d.ramo),
+      producto: clean(d.producto),
+      familiaProducto: clean(d.familiaProducto || d.familia),
+      subtipoProducto: clean(d.subtipoProducto || d.subtipo),
+      segmento: clean(d.segmento),
+      tipoRiesgo: clean(d.tipoRiesgo),
+      tipoVehiculo: clean(d.tipoVehiculo),
+      usoVehiculo: clean(d.usoVehiculo),
+      plan: clean(d.plan)
+    };
+  }
+
   function buildTrainingSourceProposal(workbook, envelope, capabilities) {
-    var proposal = {
+    var dimensions = dimensionFields(envelope);
+    var proposal = Object.assign({
       id: 'src_' + envelope.id,
       tenantId: envelope.tenantId,
       aseguradoraId: envelope.aseguradoraId,
@@ -279,7 +303,7 @@
       version: envelope.version.label,
       pais: envelope.pais,
       moneda: envelope.moneda,
-      dimensiones: envelope.dimensiones,
+      dimensiones: Object.assign({}, envelope.dimensiones || {}, dimensions),
       contieneTarifas: capabilities.containsRatesProposal,
       contieneReglasCalculo: capabilities.containsCalculationRulesProposal,
       contieneHojaSalida: capabilities.containsOutputSheetProposal,
@@ -296,7 +320,7 @@
       estado: 'requiere_validacion',
       approved: false,
       trazabilidad: { documentId: envelope.id, adapter: 'excel_workbook_p04', workbookFingerprint: workbook.workbookFingerprint }
-    };
+    }, dimensions);
     var schema = Orbit.cotizacionEsquemaAseguradoraP0;
     return schema && typeof schema.normalizeTrainingSource === 'function'
       ? schema.normalizeTrainingSource(proposal, proposal)
@@ -346,11 +370,8 @@
     var validation = contract.validateEnvelope(envelope);
     var workbook = normalizeWorkbookSnapshot(input.workbook || input.snapshot || {}, ctx);
     var previousWorkbook = input.previousWorkbook ? normalizeWorkbookSnapshot(input.previousWorkbook, ctx) : null;
-    var warnings = workbookWarnings(workbook);
     var capabilities = proposeCapabilities(workbook);
-    var sourceProposal = buildTrainingSourceProposal(workbook, envelope, capabilities);
-    var presentationProposal = buildPresentationProposal(workbook, envelope);
-    var versionProposal = compareWorkbookSnapshots(workbook, previousWorkbook);
+    var warnings = workbookWarnings(workbook, capabilities);
     var issues = validation.errors.concat(validation.warnings, warnings);
     if (!workbook.worksheetCount) issues.push('LIBRO_SIN_HOJAS_INVENTARIADAS');
     if (!capabilities.containsRatesProposal && !capabilities.containsCalculationRulesProposal && !capabilities.containsOutputSheetProposal) issues.push('CAPACIDAD_NO_DETERMINADA');
@@ -361,10 +382,10 @@
       envelope: envelope,
       workbook: workbook,
       capabilities: capabilities,
-      sourceProposal: sourceProposal,
-      presentationProposal: presentationProposal,
-      versionProposal: versionProposal,
-      warnings: unique(warnings),
+      sourceProposal: buildTrainingSourceProposal(workbook, envelope, capabilities),
+      presentationProposal: buildPresentationProposal(workbook, envelope),
+      versionProposal: compareWorkbookSnapshots(workbook, previousWorkbook),
+      warnings: warnings,
       validationIssues: unique(issues),
       summary: {
         worksheets: workbook.worksheetCount,
@@ -397,7 +418,8 @@
         sourceHash: clean(input.sourceHash || input.file && input.file.hash),
         executeMacros: false,
         calculateFormulas: false,
-        includeCellValues: false
+        includeCellValues: false,
+        includeBinaryPayload: false
       });
       return buildDryRun(Object.assign({}, input, { workbook: snapshot }), ctx);
     } catch (error) {
