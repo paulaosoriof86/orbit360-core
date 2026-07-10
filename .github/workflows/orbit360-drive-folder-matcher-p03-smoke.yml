@@ -1,0 +1,59 @@
+name: Orbit 360 Drive Folder Matcher P03 Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/drive-folder-matcher-p03.js'
+      - 'tools/orbit360-test-drive-folder-matcher-p03.mjs'
+      - '.github/workflows/orbit360-drive-folder-matcher-p03-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/drive-folder-matcher-p03.js'
+      - 'tools/orbit360-test-drive-folder-matcher-p03.mjs'
+      - '.github/workflows/orbit360-drive-folder-matcher-p03-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  drive-folder-matcher-p03:
+    name: Matching Drive por entidad P0.3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check matcher syntax
+        run: node --check orbit360-platform/core/drive-folder-matcher-p03.js
+
+      - name: Check smoke syntax
+        run: node --check tools/orbit360-test-drive-folder-matcher-p03.mjs
+
+      - name: Run matcher smoke
+        run: node tools/orbit360-test-drive-folder-matcher-p03.mjs
+
+      - name: Guard against direct Drive API and tokens
+        run: |
+          if grep -RniE "(drive\.googleapis\.com|Authorization: Bearer|access_token|refresh_token|client_secret)" \
+            orbit360-platform/core/drive-folder-matcher-p03.js \
+            tools/orbit360-test-drive-folder-matcher-p03.mjs; then
+            echo "Direct Drive API or token reference detected"
+            exit 1
+          fi
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo "Validator not present; skipping."
+          fi
