@@ -10,9 +10,9 @@
   window.Orbit = window.Orbit || {};
 
   var params = new URLSearchParams(window.location.search || '');
-  var requested = params.get('orbitValidation') === 'aseguradoras';
   var loopback = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
   var hostSession = window.__ORBIT_VALIDATION_SESSION__ && window.__ORBIT_VALIDATION_SESSION__.authorized === true;
+  var requested = params.get('orbitValidation') === 'aseguradoras' || hostSession;
   if (!requested || !loopback || !hostSession || !Orbit.auth) return;
 
   var VALIDATION_USER = Object.freeze({
@@ -29,6 +29,7 @@
     roles: ['Dirección', 'AdminTenant', 'Asesor'],
     rolesAsignados: ['Dirección', 'AdminTenant', 'Asesor'],
     tipo: 'interno',
+    scope: 'todos',
     validationOnly: true
   });
 
