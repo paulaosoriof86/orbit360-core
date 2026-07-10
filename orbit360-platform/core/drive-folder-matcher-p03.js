@@ -207,7 +207,11 @@
 
   function applyManualOverride(proposal, override, folderMap) {
     if (!override) return proposal;
-    if (override.action === 'omit') return Object.assign({}, proposal, { status: 'omitido_manual', selected: null, manual: true, motivo: clean(override.motivo) });
+    if (override.action === 'omit') {
+      if (!clean(override.motivo)) return Object.assign({}, proposal, { status: 'requiere_validacion', manual: true, error: 'MOTIVO_OBLIGATORIO' });
+      return Object.assign({}, proposal, { status: 'omitido_manual', selected: null, manual: true, motivo: clean(override.motivo) });
+    }
+    if (!clean(override.motivo)) return Object.assign({}, proposal, { status: 'requiere_validacion', manual: true, error: 'MOTIVO_OBLIGATORIO' });
     var folder = folderMap[clean(override.folderId)];
     if (!folder || !isFolder(folder)) return Object.assign({}, proposal, { status: 'requiere_validacion', manual: true, error: 'CARPETA_OVERRIDE_NO_EXISTE' });
     return Object.assign({}, proposal, {
@@ -222,9 +226,10 @@
     input = input || {};
     ctx = ctx || {};
     var entities = (input.entidades || input.entities || []).map(function (entity) { return normalizeEntity(entity, ctx); });
-    var folders = (input.carpetas || input.folders || []).map(function (folder) { return normalizeFolder(folder, ctx); });
+    var allItems = (input.carpetas || input.folders || []).map(function (folder) { return normalizeFolder(folder, ctx); });
+    var folders = allItems.filter(isFolder);
     var folderMap = {};
-    folders.filter(isFolder).forEach(function (folder) { folderMap[folder.id] = folder; });
+    folders.forEach(function (folder) { folderMap[folder.id] = folder; });
     var overrides = input.overrides || {};
 
     var proposals = entities.map(function (entity) {
@@ -271,6 +276,8 @@
         score: selected ? selected.score : 0,
         reasons: selected ? selected.reasons.slice() : [],
         warnings: selected ? selected.warnings.slice() : [],
+        error: proposal.error || '',
+        motivo: proposal.motivo || '',
         requiresHumanConfirmation: action !== 'omit_existing' && action !== 'omit',
         trace: {
           source: clean(input.source || 'google_drive_folder_metadata'),
@@ -287,11 +294,14 @@
       parentFolderId: clean(input.parentFolderId),
       entities: entities,
       folders: folders,
+      ignoredItems: allItems.filter(function (item) { return !isFolder(item); }),
       proposals: proposals,
       operations: operations,
       summary: {
         totalEntities: entities.length,
+        totalItems: allItems.length,
         totalFolders: folders.length,
+        ignoredNonFolders: allItems.length - folders.length,
         linkProposed: operations.filter(function (op) { return op.action === 'link_proposed'; }).length,
         linkManualProposed: operations.filter(function (op) { return op.action === 'link_manual_proposed'; }).length,
         updateProposed: operations.filter(function (op) { return op.action === 'update_proposed'; }).length,
