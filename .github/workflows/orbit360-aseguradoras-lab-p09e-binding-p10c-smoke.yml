@@ -12,6 +12,7 @@ on:
       - 'tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs'
       - 'tools/orbit360-test-aseguradoras-lab-persistence-p09e.mjs'
       - 'tools/orbit360-test-tenant-binding-plan-p10c.mjs'
+      - 'tools/orbit360-test-integrar-aseguradoras-knowledge-p09-index.mjs'
       - 'tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs'
       - 'orbit360-platform/index.html'
       - '.github/workflows/orbit360-aseguradoras-lab-p09e-binding-p10c-smoke.yml'
@@ -26,6 +27,7 @@ on:
       - 'tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs'
       - 'tools/orbit360-test-aseguradoras-lab-persistence-p09e.mjs'
       - 'tools/orbit360-test-tenant-binding-plan-p10c.mjs'
+      - 'tools/orbit360-test-integrar-aseguradoras-knowledge-p09-index.mjs'
       - 'tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs'
       - 'orbit360-platform/index.html'
       - '.github/workflows/orbit360-aseguradoras-lab-p09e-binding-p10c-smoke.yml'
@@ -54,6 +56,7 @@ jobs:
           node --check tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs
           node --check tools/orbit360-test-aseguradoras-lab-persistence-p09e.mjs
           node --check tools/orbit360-test-tenant-binding-plan-p10c.mjs
+          node --check tools/orbit360-test-integrar-aseguradoras-knowledge-p09-index.mjs
           node --check tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs
 
       - name: Run LAB collection snapshots smoke
@@ -64,6 +67,9 @@ jobs:
 
       - name: Run tenant binding plan smoke
         run: node tools/orbit360-test-tenant-binding-plan-p10c.mjs
+
+      - name: Run synthetic integrator smoke
+        run: node tools/orbit360-test-integrar-aseguradoras-knowledge-p09-index.mjs
 
       - name: Dry-run integrator against real index
         run: |
