@@ -47,9 +47,13 @@ function binding(currency) {
   return gate.buildBindings({ rules: [rule], profiles: [profile] }).bindings[0];
 }
 
+assert(policy.authoritative === true, 'La política estricta debe declararse autoritativa');
+
 const missing = binding('');
 const missingEval = policy.evaluateBinding(missing, 'cotizador_automatico', {});
 assert(!missingEval.ready && missingEval.errors.includes('MONEDA_REQUIERE_VALIDACION'), 'Moneda faltante debe bloquear');
+const missingViaPublicGate = gate.evaluateBinding(missing, 'cotizador_automatico', {});
+assert(!missingViaPublicGate.ready && missingViaPublicGate.errors.includes('MONEDA_REQUIERE_VALIDACION'), 'El método público base debe quedar endurecido');
 
 const gtq = binding('GTQ');
 assert(policy.evaluateBinding(gtq, 'cotizador_automatico', {}).ready, 'GTQ debe ser moneda default válida para GT');
@@ -63,13 +67,13 @@ const usdConfigured = policy.evaluateBinding(usd, 'cotizador_automatico', {
 });
 assert(usdConfigured.ready, 'Tenant puede habilitar USD expresamente para un producto/país');
 
-const deniedPlan = policy.buildEnablementPlan(
+const deniedPlan = gate.buildEnablementPlan(
   missing,
   { target: 'cotizador_automatico', reason: 'Prueba', confirmed: true },
   { id: 'admin-demo', activeRole: 'AdminTenant', roles: ['AdminTenant'] },
   {}
 );
-assert(!deniedPlan.ok && deniedPlan.plan === null, 'Gate estricto no debe emitir plan sin moneda');
+assert(!deniedPlan.ok && deniedPlan.plan === null, 'Gate público estricto no debe emitir plan sin moneda');
 
 const approvedPlan = policy.buildEnablementPlan(
   gtq,
