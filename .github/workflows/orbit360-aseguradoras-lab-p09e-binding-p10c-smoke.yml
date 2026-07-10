@@ -1,0 +1,97 @@
+name: Orbit 360 Aseguradoras LAB P09e Binding P10c
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/aseguradoras-lab-collections-p09e.js'
+      - 'orbit360-platform/core/aseguradoras-lab-persistence-p09e.js'
+      - 'orbit360-platform/core/tenant-binding-plan-p10c.js'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js'
+      - 'tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs'
+      - 'tools/orbit360-test-aseguradoras-lab-persistence-p09e.mjs'
+      - 'tools/orbit360-test-tenant-binding-plan-p10c.mjs'
+      - 'tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs'
+      - 'orbit360-platform/index.html'
+      - '.github/workflows/orbit360-aseguradoras-lab-p09e-binding-p10c-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/aseguradoras-lab-collections-p09e.js'
+      - 'orbit360-platform/core/aseguradoras-lab-persistence-p09e.js'
+      - 'orbit360-platform/core/tenant-binding-plan-p10c.js'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js'
+      - 'tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs'
+      - 'tools/orbit360-test-aseguradoras-lab-persistence-p09e.mjs'
+      - 'tools/orbit360-test-tenant-binding-plan-p10c.mjs'
+      - 'tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs'
+      - 'orbit360-platform/index.html'
+      - '.github/workflows/orbit360-aseguradoras-lab-p09e-binding-p10c-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  p09e-p10c:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/aseguradoras-lab-collections-p09e.js
+          node --check orbit360-platform/core/aseguradoras-lab-persistence-p09e.js
+          node --check orbit360-platform/core/tenant-binding-plan-p10c.js
+          node --check orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js
+          node --check tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs
+          node --check tools/orbit360-test-aseguradoras-lab-persistence-p09e.mjs
+          node --check tools/orbit360-test-tenant-binding-plan-p10c.mjs
+          node --check tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs
+
+      - name: Run LAB collection snapshots smoke
+        run: node tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs
+
+      - name: Run strict LAB persistence smoke
+        run: node tools/orbit360-test-aseguradoras-lab-persistence-p09e.mjs
+
+      - name: Run tenant binding plan smoke
+        run: node tools/orbit360-test-tenant-binding-plan-p10c.mjs
+
+      - name: Dry-run integrator against real index
+        run: |
+          node tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs > /tmp/orbit-p09e-integrator.json
+          cat /tmp/orbit-p09e-integrator.json
+          grep -q '"mode": "dry-run"' /tmp/orbit-p09e-integrator.json
+          grep -q '"protectedFilesTouched": false' /tmp/orbit-p09e-integrator.json
+          grep -q '"labPersistenceGuarded": true' /tmp/orbit-p09e-integrator.json
+          git diff --exit-code -- orbit360-platform/index.html
+
+      - name: Guard no direct operational writes in adapters
+        run: |
+          if grep -RniE '(localStorage|sessionStorage|fetch\(|XMLHttpRequest|eval\(|new Function|firebase deploy|git commit)' \
+            orbit360-platform/core/aseguradoras-lab-collections-p09e.js \
+            orbit360-platform/core/aseguradoras-lab-persistence-p09e.js \
+            orbit360-platform/core/tenant-binding-plan-p10c.js \
+            orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js; then
+            echo 'Forbidden direct storage/network/executable path detected'
+            exit 1
+          fi
+
+      - name: Guard zero enablement
+        run: |
+          grep -q 'enabledCotizadorAutomatico: false' orbit360-platform/core/tenant-binding-plan-p10c.js
+          grep -q 'enabledCotizadorPdfExterno: false' orbit360-platform/core/tenant-binding-plan-p10c.js
+          grep -q 'enabledComparativo: false' orbit360-platform/core/tenant-binding-plan-p10c.js
+          grep -q 'enablesCotizador: false' orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js
+          grep -q 'enablesComparativo: false' orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js
+
+      - name: Run backend LAB validator
+        run: node tools/orbit360-validar-backend-lab-contrato.mjs
