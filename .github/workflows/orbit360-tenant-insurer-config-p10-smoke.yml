@@ -6,18 +6,24 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - 'orbit360-platform/core/tenant-insurer-config-p10.js'
+      - 'orbit360-platform/core/tenant-source-batch-adapter-p10.js'
       - 'orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js'
       - 'orbit360-platform/core/tariff-quote-reconciliation-p06c.js'
+      - 'tools/orbit360-document-batch-plan-p09d.mjs'
       - 'tools/orbit360-test-tenant-insurer-config-p10.mjs'
+      - 'tools/orbit360-test-tenant-source-batch-adapter-p10.mjs'
       - '.github/workflows/orbit360-tenant-insurer-config-p10-smoke.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'orbit360-platform/core/tenant-insurer-config-p10.js'
+      - 'orbit360-platform/core/tenant-source-batch-adapter-p10.js'
       - 'orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js'
       - 'orbit360-platform/core/tariff-quote-reconciliation-p06c.js'
+      - 'tools/orbit360-document-batch-plan-p09d.mjs'
       - 'tools/orbit360-test-tenant-insurer-config-p10.mjs'
+      - 'tools/orbit360-test-tenant-source-batch-adapter-p10.mjs'
       - '.github/workflows/orbit360-tenant-insurer-config-p10-smoke.yml'
 
 permissions:
@@ -39,16 +45,22 @@ jobs:
       - name: Check syntax
         run: |
           node --check orbit360-platform/core/tenant-insurer-config-p10.js
+          node --check orbit360-platform/core/tenant-source-batch-adapter-p10.js
           node --check orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
           node --check tools/orbit360-test-tenant-insurer-config-p10.mjs
+          node --check tools/orbit360-test-tenant-source-batch-adapter-p10.mjs
 
       - name: Run alias and financial profile smoke
         run: node tools/orbit360-test-tenant-insurer-config-p10.mjs
 
+      - name: Run automatic eleven-source batch resolution smoke
+        run: node tools/orbit360-test-tenant-source-batch-adapter-p10.mjs
+
       - name: Guard generic core remains tenant neutral
         run: |
           if grep -RniE '(AseGuate|Aseguradora Guatemalteca|Banrural|Aseguradora Rural|Columna|BAM|Bantrab|Universales|alianzas-soluciones)' \
-            orbit360-platform/core/tenant-insurer-config-p10.js; then
+            orbit360-platform/core/tenant-insurer-config-p10.js \
+            orbit360-platform/core/tenant-source-batch-adapter-p10.js; then
             echo 'Tenant-specific value detected in reusable core'
             exit 1
           fi
@@ -65,6 +77,7 @@ jobs:
         run: |
           if grep -RniE '(Orbit\.store\.(insert|update|remove|setPref)|localStorage|sessionStorage|fetch\(|XMLHttpRequest|eval\(|new Function)' \
             orbit360-platform/core/tenant-insurer-config-p10.js \
+            orbit360-platform/core/tenant-source-batch-adapter-p10.js \
             orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js; then
             echo 'Direct write, storage, network, or executable path detected'
             exit 1
@@ -72,8 +85,11 @@ jobs:
           grep -q 'enabledCotizador = false' orbit360-platform/core/tenant-insurer-config-p10.js
           grep -q 'enabledComparativo = false' orbit360-platform/core/tenant-insurer-config-p10.js
           grep -q 'requiresSecondGateForEnablement = true' orbit360-platform/core/tenant-insurer-config-p10.js
+          grep -q 'applyAllowed: false' orbit360-platform/core/tenant-source-batch-adapter-p10.js
+          grep -q 'enablesCotizador: false' orbit360-platform/core/tenant-source-batch-adapter-p10.js
+          grep -q 'enablesComparativo: false' orbit360-platform/core/tenant-source-batch-adapter-p10.js
 
-      - name: Guard confirmed AseGuate financial bases
+      - name: Guard confirmed AseGuate financial bases and aliases
         run: |
           grep -q "rate: 0.05" orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
           grep -q "base: 'base_premium'" orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
