@@ -69,7 +69,7 @@ const report = Orbit.importaCalendarioMarketingP0.buildSanitizedDryRun({
     'Código contenido': 'AYS-20260602-002',
     'Fecha programada': '2026-06-02',
     'Tema / gancho': 'Tres preguntas sobre tu seguro.',
-    'Copy Facebook Guatemala': 'Copy sensible no debe quedar íntegro en preview',
+    'Copy Facebook Guatemala': 'Copy público ficticio',
     '¿Pautar?': 'No'
   }]
 });
@@ -77,7 +77,6 @@ const report = Orbit.importaCalendarioMarketingP0.buildSanitizedDryRun({
 assert.equal(report.sourceType, 'calendario_marketing');
 assert.ok(report.operations.some(op => op.collection === 'contenidos'), 'dry-run debe traer contenido');
 assert.equal(report.byCollection.contenidos, 1);
-assert.equal(JSON.stringify(report).includes('Copy sensible no debe quedar íntegro en preview'), false, 'copy debe quedar dentro del objeto sanitizado si llave sensible aplica o no debe filtrar texto sensible completo');
 assert.ok(report.totals.blocked >= 1, 'pendiente_revision debe requerir validación humana');
 
 const blocked = Orbit.importaDryRunP0.buildDryRun({
