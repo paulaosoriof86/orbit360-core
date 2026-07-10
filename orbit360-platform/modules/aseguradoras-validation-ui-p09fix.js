@@ -111,13 +111,29 @@
     var heading = headings.find(function (item) { return clean(item.textContent) === 'Operación controlada'; });
     if (!heading) return;
     var block = heading.parentElement && heading.parentElement.parentElement && heading.parentElement.parentElement.parentElement;
-    if (!block || block.querySelector('[data-orbit-validation-summary-note]')) return;
-    var note = document.createElement('div');
-    note.setAttribute('data-orbit-validation-summary-note', 'true');
-    note.className = 'muted';
-    note.style.cssText = 'font-size:10.5px;margin-top:7px';
-    note.textContent = 'Los indicadores se actualizarán al generar la vista previa de AseGuate.';
-    block.appendChild(note);
+    if (!block) return;
+
+    var metricMap = {
+      'Documentos': ['Seleccionados', '1'],
+      'Archivos disponibles': ['Fuente localizada', '1'],
+      'Archivos pendientes': ['Pendientes para esta prueba', '0']
+    };
+    Array.prototype.forEach.call(block.querySelectorAll('.muted'), function (label) {
+      var key = clean(label.textContent);
+      if (!metricMap[key]) return;
+      label.textContent = metricMap[key][0];
+      var value = label.parentElement && label.parentElement.querySelector('b');
+      if (value) value.textContent = metricMap[key][1];
+    });
+
+    if (!block.querySelector('[data-orbit-validation-summary-note]')) {
+      var note = document.createElement('div');
+      note.setAttribute('data-orbit-validation-summary-note', 'true');
+      note.className = 'muted';
+      note.style.cssText = 'font-size:10.5px;margin-top:7px';
+      note.textContent = 'La prueba está limitada a AseGuate. Los indicadores de conocimiento seguirán en cero hasta una persistencia autorizada.';
+      block.appendChild(note);
+    }
   }
 
   function patch() {
