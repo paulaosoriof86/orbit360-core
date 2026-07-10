@@ -70,10 +70,19 @@ Orbit.modules.importar = (function () {
     addScript('core/importa-write-p0.js?v=20260709');
   }
 
-  function loadP0DryRunBuilder() {
-    if (Orbit.importaDryRunP0 || Orbit.__importaDryRunP0Loader) return;
+  function loadP0DryRunBuilder(onload) {
+    if (Orbit.importaDryRunP0) { if (onload) onload(); return; }
+    if (Orbit.__importaDryRunP0Loader) return;
     Orbit.__importaDryRunP0Loader = true;
-    addScript('core/importa-dryrun-p0.js?v=20260709');
+    addScript('core/importa-dryrun-p0.js?v=20260709', onload);
+  }
+
+  function loadP0DryRunWire() {
+    if (Orbit.importaDryRunP0Wire || Orbit.__importaDryRunP0WireLoader) return;
+    Orbit.__importaDryRunP0WireLoader = true;
+    loadP0DryRunBuilder(function () {
+      if (!Orbit.importaDryRunP0Wire) addScript('core/importa-dryrun-p0-wire.js?v=20260709');
+    });
   }
 
   function loadP0Dashboard(onload) {
@@ -97,6 +106,7 @@ Orbit.modules.importar = (function () {
     loadP0BancoComisionesRules();
     loadP0WriteContract();
     loadP0DryRunBuilder();
+    loadP0DryRunWire();
   }
   loadP0Rules();
   loadP0Dashboard();
