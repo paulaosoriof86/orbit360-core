@@ -1,0 +1,91 @@
+name: Orbit360 Aseguradoras first flow P09M
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'tools/orbit360-run-aseguradoras-first-flow-p09m.mjs'
+      - 'tools/orbit360-run-aseguradoras-first-flow-p09m-cli.mjs'
+      - 'tools/orbit360-ejecutar-primer-flujo-aseguradoras-p09m.ps1'
+      - 'tools/orbit360-aseguradoras-same-origin-host-p09l.mjs'
+      - 'tools/orbit360-document-**'
+      - 'orbit360-platform/core/aseguradoras-**'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-source-catalog-p09k.json'
+      - '.github/workflows/orbit360-aseguradoras-first-flow-p09m-smoke.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deterministic Excel dependency
+        run: python -m pip install --disable-pip-version-check openpyxl
+      - name: Create fictional AseGuate-shaped fixture outside repository
+        run: |
+          mkdir -p /tmp/orbit360-p09m-sources /tmp/orbit360-p09m-reports
+          python - <<'PY'
+          from openpyxl import Workbook
+          path='/tmp/orbit360-p09m-sources/Tasas AseGuate.xlsx'
+          wb=Workbook()
+          ws=wb.active
+          ws.title='Tarifario'
+          ws.append(['Plan','Tipo vehículo','Tasa','Prima mínima','Asistencia'])
+          ws.append(['Plan Alfa','Automóvil',0.025,1200,300])
+          ws.append(['Plan Beta','Microbús',0.031,1500,350])
+          wb.save(path)
+          PY
+      - name: Syntax
+        run: |
+          node --check tools/orbit360-run-aseguradoras-first-flow-p09m.mjs
+          node --check tools/orbit360-run-aseguradoras-first-flow-p09m-cli.mjs
+      - name: Run first-flow technical preflight
+        run: |
+          node tools/orbit360-run-aseguradoras-first-flow-p09m-cli.mjs \
+            --app orbit360-platform \
+            --catalog orbit360-platform/data/tenant-alianzas-soluciones-source-catalog-p09k.json \
+            --root /tmp/orbit360-p09m-sources \
+            --report-dir /tmp/orbit360-p09m-reports \
+            --document-id ays_aseguate_tarifario_2026_v1 \
+            --insurer-id ins_gt_aseguradora_guatemalteca
+      - name: Validate sanitized report and honest Claude gate
+        run: |
+          python - <<'PY'
+          import json, glob, pathlib
+          files=sorted(glob.glob('/tmp/orbit360-p09m-reports/P09M-FIRST-FLOW-*.json'))
+          assert files, 'missing P09M report'
+          data=json.load(open(files[-1],encoding='utf-8'))
+          assert data['technical']['hostConnected'] is True
+          assert data['technical']['sessionReady'] is True
+          assert data['technical']['indexInjected'] is True
+          assert data['technical']['indexDiskUnchanged'] is True
+          assert data['source']['referenceAvailable'] is True
+          assert data['source']['referenceExposed'] is False
+          assert data['manifest']['ready'] is True
+          assert data['manifest']['containsCustomerPayload'] is False
+          assert data['writeAllowed'] is False
+          assert data['enablesCotizador'] is False
+          assert data['enablesComparativo'] is False
+          assert data['claudeGate']['ready'] is False
+          assert data['claudeGate']['status']=='not_ready'
+          assert 'browser_preview' in data['claudeGate']['pending']
+          assert 'history_reload' in data['claudeGate']['pending']
+          assert 'visual_smoke' in data['claudeGate']['pending']
+          text=pathlib.Path(files[-1]).read_text(encoding='utf-8')
+          forbidden=['/tmp/orbit360-p09m-sources','backend-ref://','Tasas AseGuate.xlsx\"','apiKey','password','credential']
+          for value in forbidden:
+              assert value not in text, f'forbidden value leaked: {value}'
+          PY
+      - name: Index remains untouched
+        run: git diff --exit-code -- orbit360-platform/index.html
+      - name: Protected backend contract
+        run: node tools/orbit360-validar-backend-lab-contrato.mjs
