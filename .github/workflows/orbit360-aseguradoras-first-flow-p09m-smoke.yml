@@ -21,6 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ays/backend-tenant-lab-v99-20260703
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
@@ -81,7 +82,7 @@ jobs:
           assert 'history_reload' in data['claudeGate']['pending']
           assert 'visual_smoke' in data['claudeGate']['pending']
           text=pathlib.Path(files[-1]).read_text(encoding='utf-8')
-          forbidden=['/tmp/orbit360-p09m-sources','backend-ref://','Tasas AseGuate.xlsx\"','apiKey','password','credential']
+          forbidden=['/tmp/orbit360-p09m-sources','backend-ref://','Tasas AseGuate.xlsx"','apiKey','password','credential']
           for value in forbidden:
               assert value not in text, f'forbidden value leaked: {value}'
           PY
