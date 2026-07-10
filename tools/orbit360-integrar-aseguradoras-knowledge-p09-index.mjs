@@ -7,7 +7,7 @@ const APPLY = process.argv.includes('--apply');
 const ROOT = process.cwd();
 const INDEX = path.join(ROOT, 'orbit360-platform', 'index.html');
 const REQUIRED_BRANCH = 'ays/backend-tenant-lab-v99-20260703';
-const MODULE_TAG = '<script src="modules/aseguradoras.js"></script>';
+const MODULE_RE = /<script\s+src=["']modules\/aseguradoras\.js(?:\?[^"']*)?["']\s*><\/script>/;
 const CORE_SCRIPTS = [
   'core/document-source-contract-p04.js',
   'core/cotizacion-esquema-aseguradora-p0.js',
@@ -28,8 +28,9 @@ function branch() {
 function validate(text) {
   const errors = [];
   if (!text.includes('<meta charset="UTF-8">')) errors.push('UTF8_META_REQUIRED');
-  if (!text.includes(MODULE_TAG)) errors.push('ASEGURADORAS_MODULE_TAG_REQUIRED');
-  if (count(text, 'modules/aseguradoras.js') > 1) errors.push('DUPLICATE_SCRIPT:modules/aseguradoras.js');
+  const moduleMatches = text.match(new RegExp(MODULE_RE.source, 'g')) || [];
+  if (!moduleMatches.length) errors.push('ASEGURADORAS_MODULE_TAG_REQUIRED');
+  if (moduleMatches.length > 1) errors.push('DUPLICATE_SCRIPT:modules/aseguradoras.js');
   if (!text.includes('data/store.js')) errors.push('ORBIT_STORE_TAG_REQUIRED');
   if (/Ã.|Â.|â€|ðŸ/.test(text)) errors.push('MOJIBAKE_DETECTED');
   [...CORE_SCRIPTS, SERVICE_SCRIPT].forEach(src => { if (count(text, src) > 1) errors.push(`DUPLICATE_SCRIPT:${src}`); });
@@ -37,12 +38,14 @@ function validate(text) {
 }
 function integrate(text) {
   let out = text;
+  const moduleTag = (out.match(MODULE_RE) || [])[0];
+  if (!moduleTag) return out;
   const missingCore = CORE_SCRIPTS.filter(src => !out.includes(src));
   if (missingCore.length) {
-    const block = missingCore.map(tag).join('\n') + '\n  ' + MODULE_TAG;
-    out = out.replace(MODULE_TAG, block);
+    const block = missingCore.map(tag).join('\n') + '\n  ' + moduleTag;
+    out = out.replace(moduleTag, block);
   }
-  if (!out.includes(SERVICE_SCRIPT)) out = out.replace(MODULE_TAG, MODULE_TAG + '\n' + tag(SERVICE_SCRIPT));
+  if (!out.includes(SERVICE_SCRIPT)) out = out.replace(moduleTag, moduleTag + '\n' + tag(SERVICE_SCRIPT));
   return out;
 }
 function validateOrder(text) {
