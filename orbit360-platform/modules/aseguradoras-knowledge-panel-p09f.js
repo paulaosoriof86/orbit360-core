@@ -1,9 +1,9 @@
 /* ============================================================
-   Orbit 360 · P0.9f · Panel aditivo de conocimiento en Aseguradoras
+   Orbit 360 · P0.9f/P0.9g · Panel aditivo de conocimiento en Aseguradoras
    Fecha: 2026-07-10
 
-   Muestra estado de provider, snapshots, fuentes y conocimiento por tenant.
-   No escribe store, no contiene datos reales y no habilita módulos.
+   Muestra provider, snapshots, conocimiento y lote por tenant. No escribe
+   store, no ejecuta lotes y no habilita Cotizador/Comparativo.
    ============================================================ */
 (function () {
   'use strict';
@@ -30,6 +30,14 @@
   function countTenant(collection, tenant) {
     return all(collection).filter(function (row) { return !row || !row.tenantId || clean(row.tenantId) === tenant; }).length;
   }
+  function batchState(tenant) {
+    var api = Orbit.aseguradorasBatchOrchestratorP09g;
+    if (!api) return { batches: [], latest: null };
+    var batches = typeof api.listBatches === 'function' ? api.listBatches(tenant) : [];
+    var first = batches[0] || null;
+    var latest = first && typeof api.latest === 'function' ? api.latest(tenant, first.id) : null;
+    return { batches: batches, latest: latest };
+  }
   function state() {
     var tenant = tenantId();
     var bootstrap = Orbit.aseguradorasRuntimeBootstrapP09f;
@@ -43,7 +51,7 @@
     var sources = all('aseguradoras').reduce(function (total, insurer) { return total + [].concat(insurer && insurer.docs || []).length; }, 0);
     return {
       tenantId: tenant, bootstrap: boot, preflight: preflight, provider: provider,
-      snapshots: snapshots, firstPlans: firstPlans,
+      snapshots: snapshots, firstPlans: firstPlans, batch: batchState(tenant),
       counts: {
         sources: sources,
         manifests: countTenant('aseguradora_manifiestos', tenant),
@@ -62,6 +70,40 @@
     return '<div style="min-width:92px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface)">' +
       '<div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.05em">' + esc(label) + '</div>' +
       '<b style="font-size:18px">' + esc(value) + '</b></div>';
+  }
+  function bindingRows(latest) {
+    var rows = latest && latest.bindingSets || [];
+    if (!rows.length) return '<div class="muted" style="font-size:11px">Bindings: pendientes de ejecutar el dry-run documental.</div>';
+    return '<div style="display:grid;gap:5px">' + rows.map(function (row) {
+      var ready = row.status === 'ready_for_binding_review';
+      var missing = [].concat(row.missingKnowledge || []).join(', ');
+      return '<div style="display:flex;gap:7px;align-items:center;justify-content:space-between;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface)">' +
+        '<span style="font-size:11px"><b>' + esc(row.insurerName || row.id) + '</b> · ' + esc(row.variant && (row.variant.tipoVehiculo || row.variant.plan || row.variant.producto) || 'variante') + '</span>' +
+        '<span class="badge ' + (ready ? 'ok' : 'warn') + '" title="' + esc(missing) + '">' + esc(row.status) + '</span>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+  function batchHtml(model) {
+    var summary = model.batch && model.batch.batches && model.batch.batches[0];
+    var latest = model.batch && model.batch.latest;
+    if (!summary) return '<div style="margin-top:10px;padding:9px 10px;border-radius:9px;background:var(--surface);font-size:11.5px"><b>Lote inicial:</b> no cargado.</div>';
+    var runSummary = latest && latest.summary || {};
+    return '<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:10px">' +
+      '<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px">' +
+        '<div style="flex:1;min-width:220px"><b style="font-size:11.5px">Lote inicial A&S</b><div class="muted" style="font-size:11px">' +
+          esc(summary.totalSources) + ' fuentes · ' + esc(summary.totalInsurers) + ' aseguradoras · ' + esc(summary.totalExcel) + ' Excel · ' + esc(summary.totalPdf) + ' PDF</div></div>' +
+        '<span class="badge neutral">' + esc(latest && latest.status || 'sin ejecutar') + '</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px">' +
+        metric('Dry-run listo', runSummary.dryRunReady || 0) +
+        metric('Persistidas', runSummary.persisted || 0) +
+        metric('Sin referencia', runSummary.waitingReference || 0) +
+        metric('Fallidas', runSummary.failed || 0) +
+        metric('Bindings listos', runSummary.bindingsReadyForReview || 0) +
+        metric('Bindings incompletos', runSummary.bindingsIncomplete || summary.bindingSets || 0) +
+      '</div>' + bindingRows(latest) +
+      '<div class="muted" style="font-size:10.5px;margin-top:7px">El panel es solo lectura. Ejecutar o persistir requiere referencias backend, actor, motivo y confirmaciones administrativas.</div>' +
+    '</div>';
   }
   function html(model) {
     var providerReady = model.provider && model.provider.ok === true;
@@ -87,7 +129,7 @@
       '<div style="margin-top:10px;padding:9px 10px;border-radius:9px;background:var(--surface);font-size:11.5px">' +
         '<b>Primera fuente LAB:</b> ' + esc(firstPlan && firstPlan.source && firstPlan.source.nombre || 'Plan no cargado') + ' · ' +
         '<span class="muted">' + esc(firstPlan ? 'requiere referencia backend y validación humana' : 'pendiente') + '</span>' +
-      '</div>' +
+      '</div>' + batchHtml(model) +
     '</section>';
   }
   function mount() {
@@ -123,6 +165,8 @@
   window.addEventListener('hashchange', schedule);
   window.addEventListener('orbit:aseguradoras:knowledge-ready', schedule);
   window.addEventListener('orbit:aseguradoras:lab-snapshot', schedule);
+  window.addEventListener('orbit:aseguradoras:batch-state', schedule);
+  window.addEventListener('orbit:aseguradoras:batch-item', schedule);
   document.addEventListener('orbit:store', schedule);
   schedule();
 })();
