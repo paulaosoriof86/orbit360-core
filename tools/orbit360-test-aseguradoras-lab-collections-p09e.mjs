@@ -56,9 +56,12 @@ vm.runInContext(fs.readFileSync('orbit360-platform/core/aseguradoras-lab-collect
 const api = orbit.aseguradorasLabCollectionsP09e;
 const status = api.status();
 assert(status.installed, 'adapter LAB debe instalarse');
-assert(status.snapshotAttachedCount === 6, 'debe adjuntar seis colecciones profundas');
+assert(status.snapshotAttachedCount === 8, 'debe adjuntar seis colecciones de conocimiento y dos de historial');
+assert(status.collections.includes('aseguradora_batch_runs') && status.collections.includes('aseguradora_batch_items'), 'debe incluir historial del lote');
 assert(orbit.store.all('aseguradora_manifiestos').length === 1, 'snapshot debe alimentar lectura');
 assert(orbit.store.get('aseguradora_bindings', 'aseguradora_bindings-1').kind === 'aseguradora_bindings', 'get debe leer cache profunda');
+assert(orbit.store.get('aseguradora_batch_runs', 'aseguradora_batch_runs-1').kind === 'aseguradora_batch_runs', 'debe leer runs del lote');
+assert(orbit.store.get('aseguradora_batch_items', 'aseguradora_batch_items-1').kind === 'aseguradora_batch_items', 'debe leer items del lote');
 assert(orbit.store.all('clientes') === rowsByCollection.clientes || Array.isArray(orbit.store.all('clientes')), 'colecciones legacy siguen delegadas');
 assert(orbit.store.insert === originalStore.insert, 'adapter no debe reemplazar escrituras');
 assert(orbit.store.raw().__aseguradorasKnowledgeLab.snapshotAttached, 'raw debe exponer estado sanitizado');
