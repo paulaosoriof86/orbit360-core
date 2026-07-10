@@ -8,7 +8,9 @@ on:
       - 'orbit360-platform/core/document-source-contract-p04.js'
       - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
       - 'orbit360-platform/core/knowledge-binding-gate-p08.js'
+      - 'orbit360-platform/core/knowledge-binding-policy-p08.js'
       - 'tools/orbit360-test-knowledge-binding-gate-p08.mjs'
+      - 'tools/orbit360-test-knowledge-binding-policy-p08.mjs'
       - '.github/workflows/orbit360-knowledge-binding-gate-p08-smoke.yml'
   pull_request:
     branches:
@@ -17,7 +19,9 @@ on:
       - 'orbit360-platform/core/document-source-contract-p04.js'
       - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
       - 'orbit360-platform/core/knowledge-binding-gate-p08.js'
+      - 'orbit360-platform/core/knowledge-binding-policy-p08.js'
       - 'tools/orbit360-test-knowledge-binding-gate-p08.mjs'
+      - 'tools/orbit360-test-knowledge-binding-policy-p08.mjs'
       - '.github/workflows/orbit360-knowledge-binding-gate-p08-smoke.yml'
 
 permissions:
@@ -39,15 +43,21 @@ jobs:
       - name: Check syntax
         run: |
           node --check orbit360-platform/core/knowledge-binding-gate-p08.js
+          node --check orbit360-platform/core/knowledge-binding-policy-p08.js
           node --check tools/orbit360-test-knowledge-binding-gate-p08.mjs
+          node --check tools/orbit360-test-knowledge-binding-policy-p08.mjs
 
       - name: Run binding and gate smoke
         run: node tools/orbit360-test-knowledge-binding-gate-p08.mjs
 
+      - name: Run strict country-currency policy smoke
+        run: node tools/orbit360-test-knowledge-binding-policy-p08.mjs
+
       - name: Guard no operational writes, storage or network
         run: |
           if grep -RniE '(Orbit\.store\.(insert|update|remove|setPref)|localStorage|sessionStorage|fetch\(|XMLHttpRequest|eval\(|new Function)' \
-            orbit360-platform/core/knowledge-binding-gate-p08.js; then
+            orbit360-platform/core/knowledge-binding-gate-p08.js \
+            orbit360-platform/core/knowledge-binding-policy-p08.js; then
             echo 'Direct write, storage, network, or executable path detected'
             exit 1
           fi
@@ -60,12 +70,16 @@ jobs:
           grep -q 'MODULO_DESHABILITADO_POR_TENANT' orbit360-platform/core/knowledge-binding-gate-p08.js
           grep -q 'BINDING_CAMBIO_REEJECUTAR_GATE' orbit360-platform/core/knowledge-binding-gate-p08.js
           grep -q 'PRESENTACION_SIN_TARIFA_AUTOMATICA' orbit360-platform/core/knowledge-binding-gate-p08.js
+          grep -q 'MONEDA_REQUIERE_VALIDACION' orbit360-platform/core/knowledge-binding-policy-p08.js
+          grep -q 'MONEDA_NO_HABILITADA_PARA_PAIS' orbit360-platform/core/knowledge-binding-policy-p08.js
 
       - name: Guard no tenant-specific insurer data
         run: |
           if grep -RniE '(Aseguradora Guatemalteca|Aseguate|Seguros Universales|Banrural|Bantrab|BAM|Columna|Alianzas y Soluciones)' \
             orbit360-platform/core/knowledge-binding-gate-p08.js \
-            tools/orbit360-test-knowledge-binding-gate-p08.mjs; then
+            orbit360-platform/core/knowledge-binding-policy-p08.js \
+            tools/orbit360-test-knowledge-binding-gate-p08.mjs \
+            tools/orbit360-test-knowledge-binding-policy-p08.mjs; then
             echo 'Tenant or insurer-specific data detected'
             exit 1
           fi
