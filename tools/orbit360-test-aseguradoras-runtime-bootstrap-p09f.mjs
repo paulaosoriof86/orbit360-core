@@ -36,6 +36,7 @@ const globalByPath = {
   'core/aseguradoras-first-source-orchestrator-p09f.js': ['aseguradorasFirstSourceP09f', {}],
   'core/aseguradoras-batch-orchestrator-p09g.js': ['aseguradorasBatchOrchestratorP09g', { run: async () => ({}) }],
   'core/aseguradoras-batch-history-p09h.js': ['aseguradorasBatchHistoryP09h', { install: () => true, status: () => ({ installed: true }) }],
+  'core/aseguradoras-batch-admin-actions-p09i.js': ['aseguradorasBatchAdminActionsP09i', { status: () => ({ version: 'p09i-v1' }) }],
   'modules/aseguradoras-knowledge-panel-p09f.js': ['aseguradorasKnowledgePanelP09f', { schedule: () => true }]
 };
 const document = {
@@ -80,15 +81,17 @@ const api = Orbit.aseguradorasRuntimeBootstrapP09f;
 assert(api, 'bootstrap debe registrarse');
 const result = await api.start();
 assert(result.status === 'ready', `bootstrap LAB debe quedar ready: ${JSON.stringify(result.errors)}`);
-assert(result.requiredScripts.length === 25, 'debe declarar contratos, lote P09g, historial P09h y panel');
+assert(result.requiredScripts.length === 26, 'debe declarar contratos, lote, historial, acciones P09i y panel');
 assert(result.loaded.includes('data/tenant-alianzas-soluciones-source-batch-p09g.js'), 'debe cargar lote tenant A&S');
 assert(result.loaded.includes('core/aseguradoras-batch-orchestrator-p09g.js'), 'debe cargar orquestador P09g');
 assert(result.loaded.includes('core/aseguradoras-batch-history-p09h.js'), 'debe cargar historial P09h');
+assert(result.loaded.includes('core/aseguradoras-batch-admin-actions-p09i.js'), 'debe cargar acciones administrativas P09i');
 assert(result.loaded.includes('core/aseguradoras-lab-persistence-p09e.js'), 'debe cargar gate de persistencia');
 assert(result.loaded.includes('core/aseguradoras-first-source-orchestrator-p09f.js'), 'debe cargar orquestador primera fuente');
 assert(result.loaded.includes('modules/aseguradoras-knowledge-panel-p09f.js'), 'debe cargar panel visible');
 assert(result.bridge && result.bridge.code === 'BACKEND_REQUIRED', 'provider ausente debe permanecer honesto sin bloquear contratos');
-assert(api.preflight().ok && api.preflight().batchRuntimeReady && api.preflight().batchHistoryReady, 'preflight LAB debe incluir lote e historial');
+const preflight = api.preflight();
+assert(preflight.ok && preflight.batchRuntimeReady && preflight.batchHistoryReady && preflight.batchAdminActionsReady, 'preflight LAB debe incluir lote, historial y acciones admin');
 const firstCount = scripts.length;
 await api.start();
 assert(scripts.length === firstCount, 'segunda llamada no debe duplicar scripts');
