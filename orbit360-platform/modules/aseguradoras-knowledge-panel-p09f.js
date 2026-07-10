@@ -1,9 +1,9 @@
 /* ============================================================
-   Orbit 360 · P0.9f/P0.9g/P0.9h/P0.9i · Panel aditivo de conocimiento
+   Orbit 360 · P0.9f–P0.9l · Panel aditivo de conocimiento
    Fecha: 2026-07-10
 
-   Muestra provider, snapshots, conocimiento, lote, historial y estado admin.
-   No escribe store, no ejecuta lotes y no habilita Cotizador/Comparativo.
+   Muestra fuentes, conocimiento, lote, historial y preparación operativa con
+   lenguaje de usuario. No escribe store, no ejecuta lotes ni habilita módulos.
    ============================================================ */
 (function () {
   'use strict';
@@ -19,13 +19,28 @@
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
     });
   }
+  function friendly(value) {
+    var key = clean(value).toLowerCase();
+    var labels = {
+      ready: 'Lista', connected: 'Conectada', backend_required: 'Pendiente de conexión', not_loaded: 'Pendiente',
+      requires_runtime_preflight: 'Requiere preparación', loading: 'Preparando', load_failed: 'Requiere revisión',
+      batch_admin_preview_ready: 'Vista previa lista', batch_dry_run_complete: 'Lectura terminada',
+      source_dry_run_ready: 'Documento procesado', waiting_reference: 'Archivo pendiente', failed: 'Requiere revisión',
+      blocked: 'Bloqueado', incomplete: 'Incompleto', verified: 'Verificado', persisted: 'Guardado',
+      ready_for_binding_review: 'Listo para revisión', documents_ready_knowledge_incomplete: 'Documentos listos; conocimiento incompleto',
+      incomplete_known_missing_knowledge: 'Falta información', waiting_sources: 'Esperando documentos',
+      waiting_or_blocked_sources: 'Documentos pendientes o bloqueados', invalid_missing_documents: 'Faltan documentos',
+      dry_run: 'Lectura de prueba', resume: 'Reanudar pendientes'
+    };
+    return labels[key] || clean(value).replace(/_/g, ' ') || 'Pendiente';
+  }
   function all(collection) {
     try { return Orbit.store && typeof Orbit.store.all === 'function' ? Orbit.store.all(collection) || [] : []; }
     catch (error) { return []; }
   }
   function tenantId() {
-    var backend = window.OrbitBackend || window.ORBIT_BACKEND || {};
-    return clean(backend.tenantId || backend.tenant || '');
+    var runtime = window.OrbitBackend || window.ORBIT_BACKEND || {};
+    return clean(runtime.tenantId || runtime.tenant || '');
   }
   function countTenant(collection, tenant) {
     return all(collection).filter(function (row) { return !row || !row.tenantId || clean(row.tenantId) === tenant; }).length;
@@ -41,49 +56,36 @@
   function historyState(tenant, batch) {
     var api = Orbit.aseguradorasBatchHistoryP09h;
     var first = batch && batch.batches && batch.batches[0];
-    if (!api || typeof api.readModel !== 'function' || !first) {
-      return { runs: [], items: [], latest: null, latestItems: [], resumableDocumentIds: [] };
-    }
+    if (!api || typeof api.readModel !== 'function' || !first) return { runs: [], items: [], latest: null, latestItems: [], resumableDocumentIds: [] };
     return api.readModel(tenant, first.id);
   }
   function adminState() {
     var api = Orbit.aseguradorasBatchAdminActionsP09i;
-    if (!api || typeof api.status !== 'function') return {
-      version: '', lastPlan: null, lastExecution: null,
-      knowledgePersistenceAllowed: false, referencesExposed: false
-    };
+    if (!api || typeof api.status !== 'function') return { version: '', lastPlan: null, lastExecution: null, knowledgePersistenceAllowed: false, referencesExposed: false };
     return api.status();
   }
   function state() {
     var tenant = tenantId();
     var bootstrap = Orbit.aseguradorasRuntimeBootstrapP09f;
     var boot = bootstrap && typeof bootstrap.status === 'function' ? bootstrap.status() : { status: 'not_loaded', bridge: null };
-    var preflight = bootstrap && typeof bootstrap.preflight === 'function' ? bootstrap.preflight() : { ok: false, errors: ['BOOTSTRAP_NOT_LOADED'] };
+    var preflight = bootstrap && typeof bootstrap.preflight === 'function' ? bootstrap.preflight() : { ok: false, errors: ['PREPARATION_PENDING'] };
     var knowledge = Orbit.aseguradorasLabCollectionsP09e;
     var snapshots = knowledge && typeof knowledge.status === 'function' ? knowledge.status() : { installed: false, snapshotAttachedCount: 0, collections: [] };
     var firstSource = Orbit.aseguradorasFirstSourceP09f;
     var firstPlans = firstSource && typeof firstSource.listPlans === 'function' ? firstSource.listPlans(tenant) : [];
     var provider = boot.bridge || { ok: false, code: 'BACKEND_REQUIRED', status: 'backend_required' };
-    var sources = all('aseguradoras').filter(function (insurer) {
-      return !insurer || !insurer.tenantId || clean(insurer.tenantId) === tenant;
-    }).reduce(function (total, insurer) {
-      return total + [].concat(insurer && insurer.docs || []).length;
-    }, 0);
+    var sources = all('aseguradoras').filter(function (insurer) { return !insurer || !insurer.tenantId || clean(insurer.tenantId) === tenant; })
+      .reduce(function (total, insurer) { return total + [].concat(insurer && insurer.docs || []).length; }, 0);
     var batch = batchState(tenant);
     return {
-      tenantId: tenant, bootstrap: boot, preflight: preflight, provider: provider,
-      snapshots: snapshots, firstPlans: firstPlans, batch: batch,
-      history: historyState(tenant, batch), admin: adminState(),
+      tenantId: tenant, bootstrap: boot, preflight: preflight, provider: provider, snapshots: snapshots,
+      firstPlans: firstPlans, batch: batch, history: historyState(tenant, batch), admin: adminState(),
       counts: {
         sources: sources,
-        manifests: countTenant('aseguradora_manifiestos', tenant),
-        proposals: countTenant('aseguradora_propuestas', tenant),
-        rules: countTenant('aseguradora_reglas_tarifarias', tenant),
-        presentations: countTenant('aseguradora_presentaciones', tenant),
-        bindings: countTenant('aseguradora_bindings', tenant),
-        reviews: countTenant('aseguradora_revisiones', tenant),
-        batchRuns: countTenant('aseguradora_batch_runs', tenant),
-        batchItems: countTenant('aseguradora_batch_items', tenant)
+        manifests: countTenant('aseguradora_manifiestos', tenant), proposals: countTenant('aseguradora_propuestas', tenant),
+        rules: countTenant('aseguradora_reglas_tarifarias', tenant), presentations: countTenant('aseguradora_presentaciones', tenant),
+        bindings: countTenant('aseguradora_bindings', tenant), reviews: countTenant('aseguradora_revisiones', tenant),
+        batchRuns: countTenant('aseguradora_batch_runs', tenant), batchItems: countTenant('aseguradora_batch_items', tenant)
       }
     };
   }
@@ -97,13 +99,13 @@
   }
   function bindingRows(latest) {
     var rows = latest && latest.bindingSets || [];
-    if (!rows.length) return '<div class="muted" style="font-size:11px">Bindings: pendientes de ejecutar el dry-run documental.</div>';
+    if (!rows.length) return '<div class="muted" style="font-size:11px">Relaciones entre tarifas y presentaciones pendientes de lectura.</div>';
     return '<div style="display:grid;gap:5px">' + rows.map(function (row) {
       var ready = row.status === 'ready_for_binding_review';
       var missing = [].concat(row.missingKnowledge || []).join(', ');
       return '<div style="display:flex;gap:7px;align-items:center;justify-content:space-between;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface)">' +
         '<span style="font-size:11px"><b>' + esc(row.insurerName || row.id) + '</b> · ' + esc(row.variant && (row.variant.tipoVehiculo || row.variant.plan || row.variant.producto) || 'variante') + '</span>' +
-        '<span class="badge ' + (ready ? 'ok' : 'warn') + '" title="' + esc(missing) + '">' + esc(row.status) + '</span>' +
+        '<span class="badge ' + (ready ? 'ok' : 'warn') + '" title="' + esc(missing) + '">' + esc(friendly(row.status)) + '</span>' +
       '</div>';
     }).join('') + '</div>';
   }
@@ -112,54 +114,49 @@
     var resumable = [].concat(history.resumableDocumentIds || []);
     return '<div style="margin-top:9px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface)">' +
       '<div style="display:flex;gap:7px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap">' +
-        '<div><b style="font-size:11.5px">Historial del lote</b><div class="muted" style="font-size:10.5px;margin-top:2px">Runs e ítems metadata-only, sin referencias backend.</div></div>' +
-        '<span class="badge neutral">' + esc(latest && latest.status || 'sin historial persistido') + '</span>' +
+        '<div><b style="font-size:11.5px">Historial del lote</b><div class="muted" style="font-size:10.5px;margin-top:2px">Registro de ejecuciones sin guardar el contenido de los archivos.</div></div>' +
+        '<span class="badge neutral">' + esc(latest ? friendly(latest.status) : 'Sin historial guardado') + '</span>' +
       '</div>' +
       '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">' +
-        metric('Runs', model.counts.batchRuns) + metric('Ítems históricos', model.counts.batchItems) + metric('Reanudables', resumable.length) +
+        metric('Ejecuciones', model.counts.batchRuns) + metric('Documentos revisados', model.counts.batchItems) + metric('Reanudables', resumable.length) +
       '</div>' +
       (resumable.length ? '<div class="muted" style="font-size:10.5px;margin-top:7px">Pendientes para reanudar: ' + esc(resumable.join(', ')) + '</div>' : '') +
     '</div>';
   }
   function adminHtml(model) {
     var admin = model.admin || {}, plan = admin.lastPlan || null, execution = admin.lastExecution || null;
-    var refs = plan && plan.referenceContract || {};
-    var documents = [].concat(plan && plan.documents || []);
-    var ready = !!(plan && plan.ok);
+    var refs = plan && plan.referenceContract || {}, documents = [].concat(plan && plan.documents || []), ready = !!(plan && plan.ok);
     return '<div style="margin-top:9px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface)">' +
       '<div style="display:flex;gap:7px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap">' +
-        '<div><b style="font-size:11.5px">Acción administrativa</b><div class="muted" style="font-size:10.5px;margin-top:2px">Preview y ejecución separados de la persistencia del historial.</div></div>' +
-        '<span class="badge ' + (ready ? 'ok' : 'neutral') + '">' + esc(plan && plan.code || 'sin preview') + '</span>' +
+        '<div><b style="font-size:11.5px">Operación controlada</b><div class="muted" style="font-size:10.5px;margin-top:2px">La lectura y el guardado del historial son pasos separados.</div></div>' +
+        '<span class="badge ' + (ready ? 'ok' : 'neutral') + '">' + esc(plan ? friendly(plan.code) : 'Sin vista previa') + '</span>' +
       '</div>' +
       '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">' +
-        metric('Documentos', documents.length) + metric('Refs disponibles', Number(refs.provided || 0)) + metric('Refs faltantes', [].concat(refs.missing || []).length) +
+        metric('Documentos', documents.length) + metric('Archivos disponibles', Number(refs.provided || 0)) + metric('Archivos pendientes', [].concat(refs.missing || []).length) +
       '</div>' +
-      (plan ? '<div class="muted" style="font-size:10.5px;margin-top:7px">Acción: ' + esc(plan.action) + ' · Confirmación requerida: ' + esc(plan.requiredConfirmation) + '</div>' : '') +
-      (execution ? '<div class="muted" style="font-size:10.5px;margin-top:5px">Última ejecución: ' + esc(execution.code) + ' · Conocimiento persistido: no · Historial persistido: ' + esc(execution.historyPersisted === true ? 'sí' : 'no') + '</div>' : '') +
-      '<div class="muted" style="font-size:10.5px;margin-top:7px">Solo lectura. Ejecutar requiere actor, motivo, fingerprint y confirmación reforzada; guardar historial exige una segunda confirmación administrativa.</div>' +
+      (plan ? '<div class="muted" style="font-size:10.5px;margin-top:7px">Acción: ' + esc(friendly(plan.action)) + ' · Confirmación requerida: ' + esc(plan.requiredConfirmation) + '</div>' : '') +
+      (execution ? '<div class="muted" style="font-size:10.5px;margin-top:5px">Última ejecución: ' + esc(friendly(execution.code)) + ' · Conocimiento guardado: no · Historial guardado: ' + esc(execution.historyPersisted === true ? 'sí' : 'no') + '</div>' : '') +
+      '<div class="muted" style="font-size:10.5px;margin-top:7px">Solo lectura. Ejecutar requiere usuario autorizado, motivo, código de control y confirmación reforzada.</div>' +
     '</div>';
   }
   function batchHtml(model) {
     var summary = model.batch && model.batch.batches && model.batch.batches[0];
     var latest = model.batch && model.batch.latest;
-    if (!summary) return '<div style="margin-top:10px;padding:9px 10px;border-radius:9px;background:var(--surface);font-size:11.5px"><b>Lote inicial:</b> no cargado.</div>';
+    if (!summary) return '<div style="margin-top:10px;padding:9px 10px;border-radius:9px;background:var(--surface);font-size:11.5px"><b>Lote inicial:</b> pendiente de preparación.</div>';
     var runSummary = latest && latest.summary || {};
     var incompleteBindings = latest ? Number(runSummary.bindingsIncomplete || 0) : Number(summary.bindingSets || 0);
     return '<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:10px">' +
       '<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px">' +
         '<div style="flex:1;min-width:220px"><b style="font-size:11.5px">Lote inicial A&S</b><div class="muted" style="font-size:11px">' +
           esc(summary.totalSources) + ' fuentes · ' + esc(summary.totalInsurers) + ' aseguradoras · ' + esc(summary.totalExcel) + ' Excel · ' + esc(summary.totalPdf) + ' PDF</div></div>' +
-        '<span class="badge neutral">' + esc(latest && latest.status || 'sin ejecutar') + '</span>' +
+        '<span class="badge neutral">' + esc(latest ? friendly(latest.status) : 'Sin ejecutar') + '</span>' +
       '</div>' +
       '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px">' +
-        metric('Dry-run listo', runSummary.dryRunReady || 0) +
-        metric('Persistidas', runSummary.persisted || 0) +
-        metric('Sin referencia', runSummary.waitingReference || 0) +
-        metric('Fallidas', runSummary.failed || 0) +
-        metric('Bindings listos', runSummary.bindingsReadyForReview || 0) +
-        metric('Bindings incompletos', incompleteBindings) +
+        metric('Lecturas listas', runSummary.dryRunReady || 0) + metric('Guardadas', runSummary.persisted || 0) +
+        metric('Archivo pendiente', runSummary.waitingReference || 0) + metric('Requieren revisión', runSummary.failed || 0) +
+        metric('Relaciones listas', runSummary.bindingsReadyForReview || 0) + metric('Relaciones incompletas', incompleteBindings) +
       '</div>' + bindingRows(latest) + historyHtml(model) + adminHtml(model) +
-      '<div class="muted" style="font-size:10.5px;margin-top:7px">El panel es solo lectura. Ejecutar, reanudar o persistir requiere referencias backend, actor, motivo y confirmaciones administrativas.</div>' +
+      '<div class="muted" style="font-size:10.5px;margin-top:7px">El panel es de consulta. La operación requiere archivos autorizados, usuario, motivo y confirmaciones.</div>' +
     '</div>';
   }
   function html(model) {
@@ -171,23 +168,23 @@
     return '<section id="' + PANEL_ID + '" style="margin:0 0 14px;border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--card)">' +
       '<div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">' +
         '<div style="flex:1;min-width:240px"><div style="font-size:12px;font-weight:800">Conocimiento documental de Aseguradoras</div>' +
-        '<div class="muted" style="font-size:11.5px;margin-top:3px">Fuentes, manifiestos, reglas, presentaciones, bindings e historial separados por tenant. Registrar metadata no habilita Cotizador ni Comparativo.</div></div>' +
+        '<div class="muted" style="font-size:11.5px;margin-top:3px">Fuentes, reglas, presentaciones, relaciones e historial separados por cuenta. Registrar información no habilita Cotizador ni Comparativo.</div></div>' +
         '<button class="btn ghost" type="button" data-p09f-refresh>Actualizar estado</button>' +
       '</div>' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0">' +
-        badge('Runtime ' + clean(model.bootstrap.status || 'pendiente'), model.bootstrap.status === 'ready', (model.bootstrap.errors || []).join(', ')) +
-        badge('Provider ' + clean(model.provider.code || model.provider.status || 'pendiente'), providerReady, 'El backend debe confirmar capacidades reales') +
-        badge('Snapshots ' + Number(model.snapshots.snapshotAttachedCount || 0) + '/' + Number((model.snapshots.collections || []).length), snapshotReady, 'Colecciones profundas') +
-        badge('Preflight LAB', preflightReady, (model.preflight.errors || []).join(', ')) +
-        badge('Acciones admin', adminReady, 'Preview, dry-run y persistencia separada del historial') +
+        badge('Motor documental: ' + friendly(model.bootstrap.status || 'pendiente'), model.bootstrap.status === 'ready', '') +
+        badge('Conexión de archivos: ' + friendly(model.provider.code || model.provider.status || 'pendiente'), providerReady, '') +
+        badge('Sincronización: ' + (snapshotReady ? 'Lista' : 'Pendiente'), snapshotReady, '') +
+        badge('Preparación: ' + (preflightReady ? 'Lista' : 'Requiere revisión'), preflightReady, '') +
+        badge('Operación controlada: ' + (adminReady ? 'Lista' : 'Pendiente'), adminReady, '') +
       '</div>' +
       '<div style="display:flex;gap:7px;flex-wrap:wrap">' +
         metric('Fuentes', model.counts.sources) + metric('Manifiestos', model.counts.manifests) + metric('Propuestas', model.counts.proposals) +
-        metric('Reglas', model.counts.rules) + metric('Presentaciones', model.counts.presentations) + metric('Bindings', model.counts.bindings) + metric('Revisiones', model.counts.reviews) +
+        metric('Reglas', model.counts.rules) + metric('Presentaciones', model.counts.presentations) + metric('Relaciones', model.counts.bindings) + metric('Revisiones', model.counts.reviews) +
       '</div>' +
       '<div style="margin-top:10px;padding:9px 10px;border-radius:9px;background:var(--surface);font-size:11.5px">' +
-        '<b>Primera fuente LAB:</b> ' + esc(firstPlan && firstPlan.source && firstPlan.source.nombre || 'Plan no cargado') + ' · ' +
-        '<span class="muted">' + esc(firstPlan ? 'requiere referencia backend y validación humana' : 'pendiente') + '</span>' +
+        '<b>Primera fuente:</b> ' + esc(firstPlan && firstPlan.source && firstPlan.source.nombre || 'Plan no cargado') + ' · ' +
+        '<span class="muted">' + esc(firstPlan ? 'requiere archivo autorizado y validación humana' : 'pendiente') + '</span>' +
       '</div>' + batchHtml(model) +
     '</section>';
   }
@@ -195,8 +192,7 @@
     if (!window.location || clean(window.location.hash).indexOf('#/aseguradoras') !== 0) return false;
     var host = document.querySelector('#host .page');
     if (!host) return false;
-    var existing = document.getElementById(PANEL_ID);
-    var markup = html(state());
+    var existing = document.getElementById(PANEL_ID), markup = html(state());
     if (existing) existing.outerHTML = markup;
     else {
       var anchor = host.querySelector('.cfg-note') || host.firstElementChild;
@@ -227,6 +223,7 @@
   window.addEventListener('orbit:aseguradoras:batch-state', schedule);
   window.addEventListener('orbit:aseguradoras:batch-item', schedule);
   window.addEventListener('orbit:aseguradoras:batch-admin-state', schedule);
+  window.addEventListener('orbit:aseguradoras:source-reference-state', schedule);
   document.addEventListener('orbit:store', schedule);
   schedule();
 })();
