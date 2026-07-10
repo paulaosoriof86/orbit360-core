@@ -46,7 +46,9 @@ const dryRun = api.buildDryRun({
 }, { tipo: 'aseguradora' });
 
 assert(dryRun.writeAllowed === false && dryRun.requiresConfirmation === true, 'El motor nunca debe escribir automáticamente');
-assert(dryRun.summary.totalEntities === 5 && dryRun.summary.totalFolders === 6, 'Debe conservar totales de dry-run');
+assert(dryRun.summary.totalEntities === 5, 'Debe conservar total de entidades');
+assert(dryRun.summary.totalItems === 6 && dryRun.summary.totalFolders === 5 && dryRun.summary.ignoredNonFolders === 1, 'Debe separar carpetas válidas de archivos ignorados');
+assert(dryRun.ignoredItems.length === 1 && dryRun.ignoredItems[0].id === 'not-folder', 'Debe reportar el archivo ignorado');
 const op1 = dryRun.operations.find(op => op.entityId === 'asg1');
 const op2 = dryRun.operations.find(op => op.entityId === 'asg2');
 const op3 = dryRun.operations.find(op => op.entityId === 'asg3');
@@ -85,10 +87,18 @@ const manual = api.buildDryRun({
   overrides: { m1: { folderId: 'manual-folder', motivo: 'Validado por administración' } }
 });
 assert(manual.operations[0].action === 'link_manual_proposed', 'Selección manual debe quedar como propuesta explícita');
+assert(manual.operations[0].motivo === 'Validado por administración', 'Debe conservar motivo manual');
 const links = api.buildConfirmedLinks(manual, ['m1']);
 assert(links.length === 1 && links[0].driveFolder.folderId === 'manual-folder', 'Debe construir vínculo confirmado solo para IDs autorizados');
 assert(links[0].driveFolder.matchedBy === 'manual', 'Debe conservar origen manual');
 assert(links[0].audit.containsFileBytes === false && links[0].audit.containsAccessToken === false, 'El vínculo no debe incluir bytes ni tokens');
+
+const missingReason = api.buildDryRun({
+  entidades: [{ id: 'mr1', nombre: 'Nombre difícil', pais: 'CO' }],
+  carpetas: [{ id: 'mr-folder', name: 'Archivo Corporativo', path: 'Colombia/Archivo Corporativo' }],
+  overrides: { mr1: { folderId: 'mr-folder' } }
+});
+assert(missingReason.operations[0].action === 'requires_validation' && missingReason.operations[0].error === 'MOTIVO_OBLIGATORIO', 'Selección manual sin motivo debe bloquearse');
 
 const invalidManual = api.buildDryRun({
   entidades: [{ id: 'bad1', nombre: 'Entidad demo', pais: 'GT' }],
@@ -96,7 +106,7 @@ const invalidManual = api.buildDryRun({
   overrides: { bad1: { folderId: 'file1', motivo: 'No debe aceptarse' } }
 });
 assert(invalidManual.operations[0].action === 'requires_validation', 'Override hacia archivo debe quedar bloqueado');
-assert(invalidManual.proposals[0].error === 'CARPETA_OVERRIDE_NO_EXISTE', 'Debe explicar que el override no corresponde a carpeta válida');
+assert(invalidManual.operations[0].error === 'CARPETA_OVERRIDE_NO_EXISTE', 'Debe explicar que el override no corresponde a carpeta válida');
 
 const notConfirmed = api.buildConfirmedLinks(dryRun, []);
 assert(notConfirmed.length === 0, 'Sin confirmación no se generan enlaces');
