@@ -84,15 +84,48 @@ Impacto:
 
 Mantiene estados honestos y respeta la política de datos sin fingir suficiencia.
 
-## Test afectado
+## H-09 — Política estricta no era autoritativa
+
+Necesidad:
+
+Evitar que un módulo invoque accidentalmente el método base del gate y omita la validación estricta de país/moneda.
+
+Causa raíz:
+
+La primera versión exponía la política como wrapper separado, pero dejaba disponibles los métodos base originales.
+
+Archivo/función:
+
+```text
+core/knowledge-binding-policy-p08.js
+strictEvaluate()
+strictEnablementPlan()
+```
+
+Fix:
+
+- se conservan referencias internas a los métodos originales;
+- al cargar la política, reemplaza `knowledgeBindingGateP08.evaluateBinding` y `buildEnablementPlan` por las versiones estrictas;
+- se declara `authoritative: true`;
+- el smoke valida tanto el wrapper como el método público base endurecido.
+
+Impacto:
+
+País/moneda obligatorios y monedas configuradas se aplican aunque el consumidor use directamente el gate público.
+
+## Tests afectados
 
 ```text
 tools/orbit360-test-document-intelligence-router-p08.mjs
+tools/orbit360-test-knowledge-binding-policy-p08.mjs
 ```
 
-Verifica:
+Verifican:
 
 - metadata del provider preservada;
 - `routeKey` preservado;
 - `apiKey` eliminado;
-- resultado incompleto con IA/OCR bloqueados sigue en validación.
+- resultado incompleto con IA/OCR bloqueados sigue en validación;
+- política estricta autoritativa;
+- moneda faltante bloqueada desde el gate público;
+- moneda adicional solo por configuración tenant.
