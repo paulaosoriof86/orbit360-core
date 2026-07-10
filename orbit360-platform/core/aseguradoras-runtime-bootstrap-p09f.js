@@ -32,7 +32,8 @@
     { src: 'core/aseguradoras-lab-collections-p09e.js', global: 'aseguradorasLabCollectionsP09e' },
     { src: 'core/aseguradoras-lab-persistence-p09e.js', global: 'aseguradorasLabPersistenceP09e' },
     { src: 'modules/aseguradoras-knowledge-p09.js', service: 'aseguradorasKnowledgeP09' },
-    { src: 'core/aseguradoras-first-source-orchestrator-p09f.js', global: 'aseguradorasFirstSourceP09f' }
+    { src: 'core/aseguradoras-first-source-orchestrator-p09f.js', global: 'aseguradorasFirstSourceP09f' },
+    { src: 'modules/aseguradoras-knowledge-panel-p09f.js', global: 'aseguradorasKnowledgePanelP09f' }
   ];
 
   var state = {
@@ -193,6 +194,11 @@
       state.completedAt = new Date().toISOString();
       state.status = check.ok ? 'ready' : 'requires_runtime_preflight';
       emit('orbit:aseguradoras:knowledge-ready', { status: state.status, preflight: check });
+      try {
+        if (Orbit.aseguradorasKnowledgePanelP09f && typeof Orbit.aseguradorasKnowledgePanelP09f.schedule === 'function') {
+          Orbit.aseguradorasKnowledgePanelP09f.schedule();
+        }
+      } catch (error) {}
       return status();
     })();
     return state.promise;
@@ -235,4 +241,9 @@
     status: status,
     resetForTest: resetForTest
   };
+
+  setTimeout(function () {
+    var ctx = runtimeContext();
+    if (ctx.mode === 'firestore-lab' && ctx.tenantId === 'alianzas-soluciones') start();
+  }, 0);
 })();
