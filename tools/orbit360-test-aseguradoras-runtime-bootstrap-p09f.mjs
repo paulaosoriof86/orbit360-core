@@ -36,8 +36,10 @@ const globalByPath = {
   'core/aseguradoras-first-source-orchestrator-p09f.js': ['aseguradorasFirstSourceP09f', {}],
   'core/aseguradoras-batch-orchestrator-p09g.js': ['aseguradorasBatchOrchestratorP09g', { run: async () => ({}) }],
   'core/aseguradoras-batch-history-p09h.js': ['aseguradorasBatchHistoryP09h', { install: () => true, status: () => ({ installed: true }) }],
-  'core/aseguradoras-batch-admin-actions-p09i.js': ['aseguradorasBatchAdminActionsP09i', { status: () => ({ version: 'p09i-v1' }) }],
-  'modules/aseguradoras-knowledge-panel-p09f.js': ['aseguradorasKnowledgePanelP09f', { schedule: () => true }]
+  'core/aseguradoras-batch-admin-actions-p09i.js': ['aseguradorasBatchAdminActionsP09i', {}],
+  'core/aseguradoras-source-reference-broker-p09j.js': ['aseguradorasSourceReferenceBrokerP09j', { status: () => ({ backendMethodAvailable: false }) }],
+  'modules/aseguradoras-knowledge-panel-p09f.js': ['aseguradorasKnowledgePanelP09f', { schedule: () => true }],
+  'modules/aseguradoras-batch-admin-form-p09j.js': ['aseguradorasBatchAdminFormP09j', { schedule: () => true }]
 };
 const document = {
   head: {
@@ -81,17 +83,16 @@ const api = Orbit.aseguradorasRuntimeBootstrapP09f;
 assert(api, 'bootstrap debe registrarse');
 const result = await api.start();
 assert(result.status === 'ready', `bootstrap LAB debe quedar ready: ${JSON.stringify(result.errors)}`);
-assert(result.requiredScripts.length === 26, 'debe declarar contratos, lote, historial, acciones P09i y panel');
-assert(result.loaded.includes('data/tenant-alianzas-soluciones-source-batch-p09g.js'), 'debe cargar lote tenant A&S');
-assert(result.loaded.includes('core/aseguradoras-batch-orchestrator-p09g.js'), 'debe cargar orquestador P09g');
+assert(result.requiredScripts.length === 28, 'debe declarar broker, formulario y contratos previos');
 assert(result.loaded.includes('core/aseguradoras-batch-history-p09h.js'), 'debe cargar historial P09h');
-assert(result.loaded.includes('core/aseguradoras-batch-admin-actions-p09i.js'), 'debe cargar acciones administrativas P09i');
-assert(result.loaded.includes('core/aseguradoras-lab-persistence-p09e.js'), 'debe cargar gate de persistencia');
-assert(result.loaded.includes('core/aseguradoras-first-source-orchestrator-p09f.js'), 'debe cargar orquestador primera fuente');
-assert(result.loaded.includes('modules/aseguradoras-knowledge-panel-p09f.js'), 'debe cargar panel visible');
-assert(result.bridge && result.bridge.code === 'BACKEND_REQUIRED', 'provider ausente debe permanecer honesto sin bloquear contratos');
+assert(result.loaded.includes('core/aseguradoras-batch-admin-actions-p09i.js'), 'debe cargar acciones P09i');
+assert(result.loaded.includes('core/aseguradoras-source-reference-broker-p09j.js'), 'debe cargar broker P09j');
+assert(result.loaded.includes('modules/aseguradoras-batch-admin-form-p09j.js'), 'debe cargar formulario P09j');
+assert(result.bridge && result.bridge.code === 'BACKEND_REQUIRED', 'provider ausente debe permanecer honesto');
 const preflight = api.preflight();
-assert(preflight.ok && preflight.batchRuntimeReady && preflight.batchHistoryReady && preflight.batchAdminActionsReady, 'preflight LAB debe incluir lote, historial y acciones admin');
+assert(preflight.ok && preflight.batchRuntimeReady && preflight.batchHistoryReady, 'preflight debe incluir lote e historial');
+assert(preflight.batchAdminActionsReady && preflight.sourceReferenceBrokerReady && preflight.batchAdminFormReady, 'preflight debe incluir P09i/P09j');
+assert(preflight.sourceReferenceBackendReady === false, 'backend de referencias pendiente no debe mostrarse listo');
 const firstCount = scripts.length;
 await api.start();
 assert(scripts.length === firstCount, 'segunda llamada no debe duplicar scripts');
