@@ -1,0 +1,83 @@
+name: Orbit 360 Aseguradoras Knowledge P09 Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/document-provider-registry-p09.js'
+      - 'orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-p09.js'
+      - 'tools/orbit360-test-aseguradoras-knowledge-p09.mjs'
+      - '.github/workflows/orbit360-aseguradoras-knowledge-p09-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/document-provider-registry-p09.js'
+      - 'orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-p09.js'
+      - 'tools/orbit360-test-aseguradoras-knowledge-p09.mjs'
+      - '.github/workflows/orbit360-aseguradoras-knowledge-p09-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  knowledge-runtime-p09:
+    name: Provider registry, writer and read model P0.9
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/document-provider-registry-p09.js
+          node --check orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js
+          node --check orbit360-platform/modules/aseguradoras-knowledge-p09.js
+          node --check tools/orbit360-test-aseguradoras-knowledge-p09.mjs
+
+      - name: Run P09 smoke
+        run: node tools/orbit360-test-aseguradoras-knowledge-p09.mjs
+
+      - name: Guard provider and runtime boundaries
+        run: |
+          if grep -RniE '(localStorage|sessionStorage|XMLHttpRequest|fetch\(|eval\(|new Function)' \
+            orbit360-platform/core/document-provider-registry-p09.js \
+            orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js \
+            orbit360-platform/modules/aseguradoras-knowledge-p09.js; then
+            echo 'Forbidden frontend storage, network or executable path detected'
+            exit 1
+          fi
+          if grep -RniE '(Aseguradora Guatemalteca|AseGuate|BAM|Banrural|Bantrab|Columna|Seguros Universales|Alianzas y Soluciones)' \
+            orbit360-platform/core/document-provider-registry-p09.js \
+            orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js \
+            orbit360-platform/modules/aseguradoras-knowledge-p09.js \
+            tools/orbit360-test-aseguradoras-knowledge-p09.mjs; then
+            echo 'Tenant or insurer hardcode detected'
+            exit 1
+          fi
+
+      - name: Guard metadata-only and tenant isolation
+        run: |
+          grep -q 'containsRawPayload:false' orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js
+          grep -q 'containsCustomerPayload:false' orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js
+          grep -q 'enablesCotizador:false' orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js
+          grep -q 'enablesComparativo:false' orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js
+          grep -q 'ACTOR_TENANT_MISMATCH' orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js
+          grep -q 'STATE_CHANGED_REBUILD_PLAN' orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js
+          grep -q 'BACKEND_REQUIRED' orbit360-platform/core/document-provider-registry-p09.js
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
