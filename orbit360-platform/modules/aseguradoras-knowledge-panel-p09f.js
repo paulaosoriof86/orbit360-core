@@ -42,12 +42,8 @@
     var provider = boot.bridge || { ok: false, code: 'BACKEND_REQUIRED', status: 'backend_required' };
     var sources = all('aseguradoras').reduce(function (total, insurer) { return total + [].concat(insurer && insurer.docs || []).length; }, 0);
     return {
-      tenantId: tenant,
-      bootstrap: boot,
-      preflight: preflight,
-      provider: provider,
-      snapshots: snapshots,
-      firstPlans: firstPlans,
+      tenantId: tenant, bootstrap: boot, preflight: preflight, provider: provider,
+      snapshots: snapshots, firstPlans: firstPlans,
       counts: {
         sources: sources,
         manifests: countTenant('aseguradora_manifiestos', tenant),
@@ -110,7 +106,8 @@
     var refresh = panel && panel.querySelector('[data-p09f-refresh]');
     if (refresh) refresh.addEventListener('click', function () {
       var bootstrap = Orbit.aseguradorasRuntimeBootstrapP09f;
-      Promise.resolve(bootstrap && typeof bootstrap.start === 'function' ? bootstrap.start() : null).then(schedule);
+      var action = bootstrap && typeof bootstrap.retry === 'function' ? bootstrap.retry() : (bootstrap && typeof bootstrap.start === 'function' ? bootstrap.start() : null);
+      Promise.resolve(action).then(schedule);
     });
     return true;
   }
