@@ -7,40 +7,100 @@ PR: #5 draft/open, sin merge, sin deploy, sin main.
 
 ## Motivo
 
-Paula alertó que el proyecto acumuló demasiadas sesiones de arquitectura, auditoría, empalmes y documentación sin volver oportunamente al carril de datos reales que ya había sido acordado: pedir fuentes una por una, perfilar clientes, pólizas, cobros y operar lo antes posible.
+Paula alertó que el proyecto acumuló sesiones de arquitectura, auditoría, empalmes y documentación sin mantener visible el carril operativo real de A&S. Posteriormente ocurrió una segunda desviación: después de cerrar el trabajo extenso de Clientes, Pólizas, Vehículos, Recibos, Cobros, Cartera y Comisiones, se continuó con fuentes periféricas y la documentación viva siguió describiendo etapas ya superadas como trabajo futuro.
 
-Este protocolo se crea para que esa desviación no vuelva a ocurrir.
+Este protocolo se actualiza para impedir ambas regresiones.
 
 ## Reconocimiento
 
-Sí hubo una desviación parcial. El trabajo backend realizado es útil y necesario, pero se perdió visibilidad del carril operativo de migración real.
+Sí hubo desviación parcial. El backend, los contratos y los importadores construidos son útiles, pero el plan vivo no reflejó con suficiente precisión qué cruces ya estaban cerrados y cuál era el siguiente delta real.
 
-La solución no es abandonar backend ni dejar de auditar. La solución es obligar tres carriles simultáneos y un checkpoint antes de cada bloque.
+La solución obligatoria es mantener tres carriles, un baseline de no repetición y un checkpoint antes de cada bloque.
 
-## Regla maestra nueva
+## Regla maestra
 
-A partir de este documento, toda continuidad de Orbit 360 A&S debe responder a tres carriles, siempre:
+Toda continuidad de Orbit 360 A&S debe trabajar con tres carriles:
 
 ```txt
-Carril A — Última candidata/prototipo/empalme.
-Carril B — Backend protegido/seguridad/Orbit.store.
+Carril A — Última candidata/prototipo/empalme UX.
+Carril B — Backend protegido/seguridad/Orbit.store/importadores.
 Carril C — Datos reales/migración operativa A&S.
 ```
 
-Ningún bloque puede avanzar más de una sesión sin decir explícitamente qué pasó en cada carril.
+Ningún bloque puede avanzar más de una sesión sin indicar qué ocurrió en los carriles aplicables.
+
+## Baseline operativo obligatorio — no repetir
+
+A fecha 2026-07-09 se considera baseline aceptado y no se vuelve a iniciar desde cero:
+
+```txt
+1. Clientes Siga CRM:
+   - fuente leída y auditada;
+   - 440 registros;
+   - reglas de normalización y asesores cerradas;
+   - deduplicación exacta/probable definida;
+   - calidad de datos calculada;
+   - dry-run sanitizado ejecutado:
+     crear 414 / actualizar 0 / omitir 0 / requiere_validacion 26.
+
+2. Pólizas:
+   - fuentes principales y complementarias perfiladas;
+   - cruce con clientes, aseguradoras, vigencias y estados realizado;
+   - llave canónica de póliza definida;
+   - reglas de Renovada, Cancelada e histórico cerradas;
+   - prima neta/gastos/IVA/total separadas;
+   - motor P0 y wire implementados.
+
+3. Vehículos:
+   - fuente Auto tratada como complemento de pólizas, no pólizas adicionales;
+   - relación cliente/póliza/vehículo definida.
+
+4. Recibos, Cobros y Cartera:
+   - fuentes perfiladas y cruzadas;
+   - forma de pago y recibos esperados modelados;
+   - cartera diferenciada de financiero histórico;
+   - cobros/recaudos diferenciados de finmovs;
+   - motores P0 y wires implementados;
+   - conciliación propuesta, no aplicación automática.
+
+5. Comisiones y Finanzas relacionadas:
+   - planillas/facturas/banco modelados;
+   - flujo comisión devengada -> factura -> CxC -> recaudo -> liquidación -> CxP -> pago definido;
+   - motores P0 de comisiones y banco implementados;
+   - primas pendientes excluidas de CxC/CxP financieras.
+
+6. Dry-run/importación segura:
+   - builder sanitizado;
+   - manifest;
+   - confirmación reforzada;
+   - escritura controlada bloqueada;
+   - dashboard y confirmación P0;
+   - tests y workflow creados.
+```
+
+Regla de no repetición:
+
+```txt
+No volver a auditar, rediseñar o recalcular estos bloques sin una fuente nueva,
+un cambio explícito de regla o una evidencia concreta de fallo.
+El trabajo siguiente es integración, cierre documental, smoke y uso operativo del modelo ya creado.
+```
 
 ## Checkpoint obligatorio antes de responder o actuar
 
-Antes de cada bloque, el asistente debe verificar internamente y reflejar en la respuesta cuando aplique:
+Antes de cada bloque se debe verificar:
 
 ```txt
 1. ¿Cuál es la última candidata auditada/aceptada?
-2. ¿Qué carril estoy trabajando ahora: A, B, C o mixto?
-3. ¿Qué avance visible produce este bloque?
-4. ¿Qué fuente real ya recibida estoy usando o qué fuente real falta pedir?
-5. ¿Estoy repitiendo auditoría ya hecha o estoy convirtiendo auditoría en acción?
-6. ¿Qué documento/registro se actualiza?
-7. ¿Hay algo que bloquee operación real?
+2. ¿Qué carril estoy trabajando: A, B, C o mixto?
+3. ¿Qué avance visible y verificable produce el bloque?
+4. ¿Qué parte exacta del plan operativo avanza?
+5. ¿Estoy reabriendo un bloque del baseline sin evidencia nueva?
+6. ¿Qué fuente real ya recibida se usa?
+7. ¿Qué documento/registro se actualiza?
+8. ¿Qué impacto reusable debe recibir Claude/prototipo/Academia?
+9. ¿Qué queda cerrado al terminar?
+10. ¿Cuál es la siguiente acción concreta?
 ```
 
 ## Circuit breaker anti-vueltas
@@ -48,209 +108,230 @@ Antes de cada bloque, el asistente debe verificar internamente y reflejar en la 
 Detener y corregir rumbo si ocurre cualquiera:
 
 ```txt
-- Se hacen 2 bloques seguidos sin avance visible ni script ejecutable ni matriz de datos.
-- Se crean documentos sin una acción siguiente concreta.
-- Se pide otra auditoría de algo ya auditado sin nuevo insumo.
-- Se habla de backend sin indicar cómo afecta operación real.
-- Se habla de Claude/prototipo sin actualizar pendientes o empalme.
-- Se trabaja más de 1 bloque sin mencionar fuentes reales recibidas/faltantes.
-- Se usa la palabra “pendiente” sin asignar: responsable, carril, siguiente acción y condición de cierre.
+- Dos bloques seguidos sin avance visible, código, test, smoke, matriz o cierre operativo.
+- Creación de documentos sin acción siguiente concreta.
+- Auditoría repetida sin nuevo insumo.
+- Presentar como pendiente un cruce incluido en el baseline.
+- Hablar de backend sin indicar efecto en operación real A&S.
+- Hablar de Claude/prototipo sin actualizar pendientes, patrones replicables o Academia.
+- Trabajar más de un bloque sin mencionar el carril C cuando aplique.
+- Usar “pendiente” sin responsable, carril, acción y condición de cierre.
+- Abrir fuentes periféricas antes de cerrar el siguiente módulo del orden operativo.
 ```
 
-Cuando se active el circuit breaker, el siguiente mensaje debe contener solo:
+Cuando se active el circuit breaker, el siguiente bloque debe contener únicamente:
 
 ```txt
 Estado real
-Bloqueador
+Desviación detectada
+Corrección aplicada
 Siguiente acción concreta
-Dato/fuente que falta pedir a Paula si aplica
+Fuente o evidencia usada
 ```
 
-## Orden operativo obligatorio desde ahora
+## Plan operativo vivo reencarrilado
 
-### Etapa 0 — Retomar rumbo inmediato
-
-```txt
-1. Mantener última candidata como base incremental.
-2. Ejecutar empalme seguro preparado.
-3. Crear matriz real de fuentes recibidas/faltantes.
-4. Pedir a Paula el siguiente archivo real: CLIENTES.
-```
-
-### Etapa 1 — Clientes
+### Fase actual P0 — Cierre CRM/Clientes sobre cruce ya realizado
 
 Objetivo:
 
 ```txt
-Crear mapeo de clientes sin escribir producción.
+Cerrar integración y trazabilidad de CRM/Clientes usando el modelo de pólizas,
+recibos, cartera, cobros y comisiones ya construido, sin recalcularlo.
 ```
 
-Acciones:
+Acciones permitidas:
 
 ```txt
-- recibir archivo clientes;
-- inventariar hojas/columnas;
-- normalizar país/moneda si aplica;
-- detectar duplicados;
-- producir dry-run crear/actualizar/omitir;
-- no escribir sin confirmación.
+- actualizar la documentación del dry-run ejecutado;
+- verificar el delta mínimo del importador reusable de clientes;
+- conectar el resultado sanitizado al pipeline P0 sin payload real;
+- validar estados derivados ya calculados en el cruce;
+- validar Cliente360, calidad de datos y scopes por asesor;
+- añadir test sanitizado y cobertura de workflow si falta;
+- mantener escritura real bloqueada.
 ```
 
-Salida esperada:
+Condición de cierre:
 
 ```txt
-Matriz clientes validada + reporte de calidad.
+CRM/Clientes queda alineado con el dry-run real y con el modelo cruzado existente,
+con tests/smoke documentados y sin escritura de datos reales.
 ```
 
-### Etapa 2 — Pólizas
+### Fase siguiente P0/P1 — Aseguradoras operativas
 
-Objetivo:
+Baseline ya existente:
 
 ```txt
-Mapear pólizas contra clientes ya perfilados.
+- directorios GT/CO procesados;
+- importador P0 implementado;
+- deduplicación corregida;
+- contactos y credentialRef modelados;
+- dry-run sanitizado realizado.
 ```
 
-Acciones:
+Trabajo restante:
 
 ```txt
-- recibir archivo pólizas;
-- mapear cliente/aseguradora/ramo/vigencia/estado/prima;
-- separar prima neta, gastos, IVA/impuestos, total;
-- validar país/moneda;
-- Vigente/Por renovar genera cartera futura solo cuando reglas estén completas;
-- Cancelada/Vencida/Anulada/Rechazada queda histórico.
+- validar módulo real Aseguradoras;
+- conectar contactos, país, moneda, productos/ramos y configuración;
+- validar desactivar vs borrar;
+- preparar vínculo con tarifas, Cotizador y Comparativo;
+- smoke técnico y visual.
 ```
 
-Salida esperada:
+### Fase siguiente P1 — Cotizador/Comparativo configurable
+
+Baseline:
 
 ```txt
-Dry-run pólizas + errores por validar.
+- módulos existentes;
+- fuente avanzada comparativo_final_v110.html disponible;
+- auditoría previa documentada;
+- no se debe reescribir desde cero.
 ```
 
-### Etapa 3 — Vehículos
-
-Objetivo:
+Trabajo restante:
 
 ```txt
-Relacionar vehículos con cliente/póliza cuando la fuente lo permita.
+- extraer patrones funcionales reutilizables;
+- retirar dependencias y configuración Firebase directa;
+- parametrizar aseguradora/plan/cobertura/deducible/prima/condiciones/exclusiones;
+- integrar con Aseguradoras y Orbit.store;
+- separar país/moneda;
+- documentar y enseñar en Academia.
 ```
 
-Bloqueos:
+### Fase siguiente P1 — Pólizas/Cartera/Recibos/Comisiones: validación transversal
+
+No es una reconstrucción ni nuevo cruce.
+
+Trabajo permitido:
 
 ```txt
-No inferir vehículo desde documentos sin confirmación y diff.
+- smoke del modelo ya implementado;
+- verificar integración con CRM y Aseguradoras;
+- corregir únicamente fallos concretos encontrados;
+- validar estados, scopes y trazabilidad;
+- mantener bloqueada escritura real hasta autorización.
 ```
 
-### Etapa 4 — Recibos/cobros realizados
+### Fase transversal — Academia/Claude
 
-Objetivo:
+En cada bloque se debe registrar obligatoriamente:
 
 ```txt
-Mapear cobros realizados con trazabilidad.
+1. Pendientes Claude/prototipo/UX.
+2. Modificaciones locales o backend que Claude debe replicar visualmente.
+3. Patrones backend reutilizables para futuros tenants.
+4. Reglas, flujos y lógicas replicables.
+5. Impacto en Academia por rol/vista activa.
+6. Manual/operación que debe actualizarse.
+7. Elementos que no se comparten: secretos, datos reales y lógica interna protegida.
 ```
 
-Regla:
+## Fuentes reales y estado
 
 ```txt
-Cobros/recaudos no son finmovs.
+Clientes Siga CRM -> procesada, cruzada y con dry-run sanitizado.
+Pólizas y complementos -> procesadas y cruzadas; no repetir.
+Vehículos Auto -> complemento procesado.
+Recibos/cobros/cartera -> procesados y cruzados; no repetir.
+Comisiones/facturas/banco -> modelados y cruzados; no repetir.
+Directorios aseguradoras GT/CO -> procesados; siguiente módulo operativo.
+Movimientos GT/CO -> financiero_historico/finmovs; no clientes/pólizas/cartera.
+Calendario Marketing -> procesado y congelado por ahora.
+Manual/logo -> procesados y congelados por ahora.
+comparativo_final_v110.html -> fuente activa para Cotizador/Comparativo después de Aseguradoras.
 ```
 
-### Etapa 5 — Estado bancario conciliable
+## Formato obligatorio de cada bloque
 
-Objetivo:
-
-```txt
-Conciliación propuesta, no escritura automática.
-```
-
-Regla:
-
-```txt
-No escribir cobros desde banco sin conciliación validada.
-```
-
-### Etapa 6 — Planillas aseguradora/comisiones
-
-Objetivo:
-
-```txt
-Leer filas reales de planillas, no simular tarifas.
-```
-
-### Etapa 7 — Documentos soporte / siniestros
-
-Objetivo:
-
-```txt
-Crear propuestas/diffs, no cambios automáticos.
-```
-
-## Fuentes reales ya recibidas y carril correcto
-
-```txt
-Directorio Aseguradoras Guatemala 2026.xlsx -> configuracion_catalogo / aseguradoras / contactos.
-Directorio - Aseguradoras Colombia 2024.xlsx -> aseguradoras / contactos CO.
-Movimientos Ing y Eg Alianzas Guate y Col 2026.xlsx -> financiero_historico / finmovs.
-AyS — Calendario Maestro Contenidos 2026 — Flujo híbrido.xlsx -> marketing / calendario.
-Manual de Identidad Básica – Versión 1 – Vigente.docx -> configuración marca / Academia Marketing.
-Logo V. 2026.jpeg -> configuración marca / slot white-label.
-comparativo_final_v110.html -> Cotizador/Comparativo avanzado, integrar como módulo aislado/configurable.
-```
-
-## Fuentes faltantes que deben pedirse una a una
-
-Orden de solicitud a Paula:
-
-```txt
-1. Clientes.
-2. Pólizas.
-3. Vehículos si no vienen en pólizas.
-4. Recibos/cobros realizados.
-5. Planillas aseguradora.
-6. Planillas comisiones.
-7. Estado de cuenta bancario conciliable.
-8. Siniestros.
-9. Documentos soporte.
-```
-
-## Regla de respuesta desde ahora
-
-Toda respuesta de continuidad debe incluir, aunque sea breve:
+Toda respuesta de continuidad debe incluir exactamente:
 
 ```txt
 Carril actual:
-Avance visible:
-Fuente real usada o siguiente fuente a pedir:
-Pendiente documentado:
+Qué parte del plan avanzó:
+Paso intermedio, si hubo:
+Qué quedó cerrado:
+Qué falta:
 Siguiente acción:
+Acción manual requerida:
 ```
 
-## Regla anti-auditoría redundante
-
-No pedir ni repetir auditoría si ya existe una auditoría válida y no hay archivo nuevo.
-
-En ese caso, pasar a acción:
+Para Acción manual requerida usar únicamente:
 
 ```txt
-- empalmar;
-- ejecutar validador;
-- crear matriz;
-- pedir fuente real siguiente;
-- preparar script;
-- documentar decisión.
+No requerida.
 ```
 
-## Regla de tiempo
-
-Si Paula pregunta “¿vamos bien?” o “¿cuánto falta?”, responder con semáforo:
+o
 
 ```txt
-Verde: protegido/estable.
-Amarillo: preparado pero no ejecutado.
-Rojo: bloquea operación real.
-Siguiente desbloqueo concreto.
+Sí, indispensable por [motivo concreto].
+```
+
+Además debe incluir una tabla breve:
+
+```txt
+Hecho | Evidencia | Estado | Riesgo | Siguiente acción
+```
+
+## Registro obligatorio por bloque
+
+Toda mejora, bug, hallazgo, cambio o decisión debe registrar:
+
+```txt
+fecha
+módulo
+necesidad
+esperado
+causa raíz si aplica
+archivo/función
+fix/mejora
+impacto
+estado
+```
+
+Separar siempre:
+
+```txt
+A. Claude/prototipo/UX/Academia.
+B. ChatGPT/Codex/backend/Auth/Firestore/Orbit.store/importadores.
+```
+
+## Semáforo de avance
+
+```txt
+Verde: cerrado/protegido/estable y no se repite.
+Amarillo: implementado o documentado, pendiente de smoke/CI/integración.
+Rojo: bloquea operación real o representa regresión.
+```
+
+Estado al actualizar este protocolo:
+
+```txt
+Verde:
+- arquitectura y backend protegido;
+- modelos y cruces Clientes/Pólizas/Vehículos/Recibos/Cobros/Cartera/Comisiones;
+- reglas de fuentes separadas;
+- dry-run seguro y escritura bloqueada.
+
+Amarillo:
+- cierre documental y pipeline reusable de Clientes;
+- smoke CRM/Calidad/scopes;
+- Aseguradoras operativo;
+- Cotizador/Comparativo configurable;
+- CI visible.
+
+Rojo:
+- repetir cruces ya cerrados;
+- escribir datos reales;
+- tocar main/deploy/producción;
+- abrir fuentes periféricas antes de completar el orden operativo.
 ```
 
 ## Estado
 
-Protocolo anti-desviación creado. Debe aplicarse en toda conversación siguiente y en cualquier continuidad del proyecto.
+Protocolo actualizado y reencarrilado. Este documento prevalece para el orden operativo actual cuando documentos anteriores describan Clientes, Pólizas, Recibos, Cobros, Cartera o Comisiones como etapas no iniciadas.
