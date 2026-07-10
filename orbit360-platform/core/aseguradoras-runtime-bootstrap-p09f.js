@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 · P0.9f/P0.9g/P0.9h/P0.9i/P0.9j · Bootstrap seguro
+   Orbit 360 · P0.9f/P0.9g/P0.9h/P0.9i/P0.9j/P0.9n · Bootstrap seguro
    Fecha: 2026-07-10
 
    Carga contratos aditivos solo en Firestore LAB para A&S. No modifica
@@ -9,7 +9,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p09j-v1';
+  var VERSION = 'p09n-v1';
   var REQUIRED = [
     { src: 'core/document-source-contract-p04.js', global: 'documentSourceContractP04' },
     { src: 'core/cotizacion-esquema-aseguradora-p0.js', global: 'cotizacionEsquemaAseguradoraP0' },
@@ -38,7 +38,8 @@
     { src: 'core/aseguradoras-batch-admin-actions-p09i.js', global: 'aseguradorasBatchAdminActionsP09i' },
     { src: 'core/aseguradoras-source-reference-broker-p09j.js', global: 'aseguradorasSourceReferenceBrokerP09j' },
     { src: 'modules/aseguradoras-knowledge-panel-p09f.js', global: 'aseguradorasKnowledgePanelP09f' },
-    { src: 'modules/aseguradoras-batch-admin-form-p09j.js', global: 'aseguradorasBatchAdminFormP09j' }
+    { src: 'modules/aseguradoras-batch-admin-form-p09j.js', global: 'aseguradorasBatchAdminFormP09j' },
+    { src: 'core/aseguradoras-runtime-observer-p09n.js', global: 'aseguradorasRuntimeObserverP09n' }
   ];
 
   var state = {
@@ -137,6 +138,7 @@
       sourceReferenceBrokerReady: !!Orbit.aseguradorasSourceReferenceBrokerP09j,
       sourceReferenceBackendReady: brokerStatus.backendMethodAvailable === true,
       batchAdminFormReady: !!Orbit.aseguradorasBatchAdminFormP09j,
+      runtimeObserverReady: !!Orbit.aseguradorasRuntimeObserverP09n,
       bridgeStatus: clone(state.bridge), enablesCotizador: false, enablesComparativo: false
     };
   }
@@ -184,6 +186,7 @@
     emit('orbit:aseguradoras:knowledge-ready', { status: state.status, preflight: check });
     try { if (Orbit.aseguradorasKnowledgePanelP09f) Orbit.aseguradorasKnowledgePanelP09f.schedule(); } catch (error) {}
     try { if (Orbit.aseguradorasBatchAdminFormP09j) Orbit.aseguradorasBatchAdminFormP09j.schedule(); } catch (error) {}
+    try { if (Orbit.aseguradorasRuntimeObserverP09n) Orbit.aseguradorasRuntimeObserverP09n.schedule('bootstrap_ready'); } catch (error) {}
     return status();
   }
   function start() {
