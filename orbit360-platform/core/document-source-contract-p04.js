@@ -12,8 +12,9 @@
   var BLOCKED_KEYS = [
     'bytes', 'bytearray', 'arraybuffer', 'buffer', 'binary', 'blob', 'base64',
     'filecontent', 'rawcontent', 'contentbytes', 'password', 'pass', 'contrasena',
-    'secret', 'token', 'credential', 'apikey', 'api_key', 'authorization'
+    'secret', 'token', 'credentialvalue', 'credentials', 'apikey', 'api_key', 'authorization'
   ];
+  var SAFE_REFERENCE_KEYS = ['credentialref', 'secretref', 'fileref', 'documentref', 'archivoref', 'accountref'];
   var COUNTRY_CURRENCY = { GT: 'GTQ', CO: 'COP' };
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
@@ -35,10 +36,9 @@
     return prefix + '_' + Math.abs(hash).toString(36);
   }
   function blockedKey(key) {
-    var n = norm(key);
-    return BLOCKED_KEYS.some(function (item) {
-      return n === item || n.indexOf(item + '_') === 0 || n.endsWith('_' + item);
-    });
+    var n = norm(key).replace(/_/g, '');
+    if (SAFE_REFERENCE_KEYS.some(function (safe) { return n === safe; })) return false;
+    return BLOCKED_KEYS.some(function (item) { return n.indexOf(item.replace(/_/g, '')) >= 0; });
   }
   function redactSample(value) {
     var text = clean(value);
