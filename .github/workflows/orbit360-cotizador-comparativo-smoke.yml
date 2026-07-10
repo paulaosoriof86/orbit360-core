@@ -1,0 +1,65 @@
+name: Orbit 360 Cotizador Comparativo Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/cotizador-comparativo-contrato-p0.js'
+      - 'tools/orbit360-test-cotizador-comparativo-contrato-p0.mjs'
+      - 'orbit360-platform/modules/cotizador.js'
+      - 'orbit360-platform/modules/comparativo.js'
+      - 'orbit360-platform/modules/aseguradoras.js'
+      - '.github/workflows/orbit360-cotizador-comparativo-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/cotizador-comparativo-contrato-p0.js'
+      - 'tools/orbit360-test-cotizador-comparativo-contrato-p0.mjs'
+      - 'orbit360-platform/modules/cotizador.js'
+      - 'orbit360-platform/modules/comparativo.js'
+      - 'orbit360-platform/modules/aseguradoras.js'
+      - '.github/workflows/orbit360-cotizador-comparativo-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  cotizador-comparativo-smoke:
+    name: Contrato canónico Cotizador Comparativo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check canonical contract syntax
+        run: node --check orbit360-platform/core/cotizador-comparativo-contrato-p0.js
+
+      - name: Check canonical contract smoke syntax
+        run: node --check tools/orbit360-test-cotizador-comparativo-contrato-p0.mjs
+
+      - name: Check insurer module syntax
+        run: node --check orbit360-platform/modules/aseguradoras.js
+
+      - name: Check quote module syntax
+        run: node --check orbit360-platform/modules/cotizador.js
+
+      - name: Check comparative module syntax
+        run: node --check orbit360-platform/modules/comparativo.js
+
+      - name: Run canonical contract smoke
+        run: node tools/orbit360-test-cotizador-comparativo-contrato-p0.mjs
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo "Validator not present; skipping."
+          fi
