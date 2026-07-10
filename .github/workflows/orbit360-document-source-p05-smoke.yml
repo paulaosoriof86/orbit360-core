@@ -1,0 +1,103 @@
+name: Orbit 360 Document Source P05 Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/document-source-contract-p04.js'
+      - 'orbit360-platform/core/excel-workbook-adapter-p04.js'
+      - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'orbit360-platform/core/document-source-wire-p05.js'
+      - 'orbit360-platform/core/extraction-proposal-p05.js'
+      - 'tools/orbit360-test-document-source-wire-p05.mjs'
+      - 'tools/orbit360-test-extraction-proposal-p05.mjs'
+      - 'tools/orbit360-test-document-source-p05-e2e.mjs'
+      - '.github/workflows/orbit360-document-source-p05-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/document-source-contract-p04.js'
+      - 'orbit360-platform/core/excel-workbook-adapter-p04.js'
+      - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'orbit360-platform/core/document-source-wire-p05.js'
+      - 'orbit360-platform/core/extraction-proposal-p05.js'
+      - 'tools/orbit360-test-document-source-wire-p05.mjs'
+      - 'tools/orbit360-test-extraction-proposal-p05.mjs'
+      - 'tools/orbit360-test-document-source-p05-e2e.mjs'
+      - '.github/workflows/orbit360-document-source-p05-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  document-source-p05:
+    name: Wire y extracción documental P0.5
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/document-source-wire-p05.js
+          node --check orbit360-platform/core/extraction-proposal-p05.js
+          node --check tools/orbit360-test-document-source-wire-p05.mjs
+          node --check tools/orbit360-test-extraction-proposal-p05.mjs
+          node --check tools/orbit360-test-document-source-p05-e2e.mjs
+
+      - name: Run metadata-only wire smoke
+        run: node tools/orbit360-test-document-source-wire-p05.mjs
+
+      - name: Run extraction proposal and diff smoke
+        run: node tools/orbit360-test-extraction-proposal-p05.mjs
+
+      - name: Run P04 to P05 interoperability smoke
+        run: node tools/orbit360-test-document-source-p05-e2e.mjs
+
+      - name: Guard no operational writes or executable paths
+        run: |
+          if grep -RniE '(localStorage|sessionStorage|Orbit\.store\.(update|remove|setPref)|eval\(|new Function|XMLHttpRequest|fetch\()' \
+            orbit360-platform/core/document-source-wire-p05.js \
+            orbit360-platform/core/extraction-proposal-p05.js; then
+            echo 'Direct operational storage or executable/network path detected'
+            exit 1
+          fi
+
+      - name: Guard metadata-only and second gate
+        run: |
+          grep -q 'includeCellValues: false' orbit360-platform/core/document-source-wire-p05.js
+          grep -q 'includeBinaryPayload: false' orbit360-platform/core/document-source-wire-p05.js
+          grep -q 'includeRawCells: false' orbit360-platform/core/extraction-proposal-p05.js
+          grep -q 'includeWorkbookPayload: false' orbit360-platform/core/extraction-proposal-p05.js
+          grep -q 'executeMacros: false' orbit360-platform/core/extraction-proposal-p05.js
+          grep -q 'calculateFormulas: false' orbit360-platform/core/extraction-proposal-p05.js
+          grep -q 'validado_pendiente_habilitacion' orbit360-platform/core/extraction-proposal-p05.js
+          grep -q 'requiresSecondGateForEnablement: true' orbit360-platform/core/extraction-proposal-p05.js
+          grep -q 'applyFunctionProvided: false' orbit360-platform/core/document-source-wire-p05.js
+
+      - name: Guard no embedded sensitive payload
+        run: |
+          if grep -RniE '(password|contrase(n|ñ)a|token|secret)[[:space:]]*[:=][[:space:]]*["'"'][^"'"']{4,}' \
+            orbit360-platform/core/document-source-wire-p05.js \
+            orbit360-platform/core/extraction-proposal-p05.js \
+            tools/orbit360-test-document-source-wire-p05.mjs \
+            tools/orbit360-test-extraction-proposal-p05.mjs \
+            tools/orbit360-test-document-source-p05-e2e.mjs; then
+            echo 'Potential embedded secret detected'
+            exit 1
+          fi
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
