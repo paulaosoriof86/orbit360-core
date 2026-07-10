@@ -1,0 +1,102 @@
+name: Orbit 360 Excel Rules and Reconciliation P06b P06c Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-extract-excel-rule-facts-p06b.py'
+      - 'tools/orbit360-test-excel-rule-facts-p06b.py'
+      - 'orbit360-platform/core/excel-rule-proposal-adapter-p06b.js'
+      - 'tools/orbit360-test-excel-rule-proposal-adapter-p06b.mjs'
+      - 'orbit360-platform/core/tariff-quote-reconciliation-p06c.js'
+      - 'tools/orbit360-test-tariff-quote-reconciliation-p06c.mjs'
+      - '.github/workflows/orbit360-excel-rules-reconciliation-p06b-p06c-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/orbit360-extract-excel-rule-facts-p06b.py'
+      - 'tools/orbit360-test-excel-rule-facts-p06b.py'
+      - 'orbit360-platform/core/excel-rule-proposal-adapter-p06b.js'
+      - 'tools/orbit360-test-excel-rule-proposal-adapter-p06b.mjs'
+      - 'orbit360-platform/core/tariff-quote-reconciliation-p06c.js'
+      - 'tools/orbit360-test-tariff-quote-reconciliation-p06c.mjs'
+      - '.github/workflows/orbit360-excel-rules-reconciliation-p06b-p06c-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  excel-rules-p06b-p06c:
+    name: Extracción y reconciliación tarifaria P0.6b/P0.6c
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          python -m py_compile tools/orbit360-extract-excel-rule-facts-p06b.py
+          python -m py_compile tools/orbit360-test-excel-rule-facts-p06b.py
+          node --check orbit360-platform/core/excel-rule-proposal-adapter-p06b.js
+          node --check tools/orbit360-test-excel-rule-proposal-adapter-p06b.mjs
+          node --check orbit360-platform/core/tariff-quote-reconciliation-p06c.js
+          node --check tools/orbit360-test-tariff-quote-reconciliation-p06c.mjs
+
+      - name: Run smokes
+        run: |
+          python tools/orbit360-test-excel-rule-facts-p06b.py
+          node tools/orbit360-test-excel-rule-proposal-adapter-p06b.mjs
+          node tools/orbit360-test-tariff-quote-reconciliation-p06c.mjs
+
+      - name: Guard no execution, network, storage or operational writes
+        run: |
+          if grep -RniE '(Orbit\.store\.(insert|update|remove|setPref)|localStorage|sessionStorage|fetch\(|XMLHttpRequest|subprocess|os\.system|LibreOffice|win32com|xlwings|eval\(|new Function)' \
+            tools/orbit360-extract-excel-rule-facts-p06b.py \
+            orbit360-platform/core/excel-rule-proposal-adapter-p06b.js \
+            orbit360-platform/core/tariff-quote-reconciliation-p06c.js; then
+            echo 'Execution, network, storage, or direct write path detected'
+            exit 1
+          fi
+
+      - name: Guard no tenant or insurer hardcode
+        run: |
+          if grep -RniE '(Aseguradora Guatemalteca|AseGuate|Seguros Universales|Banrural|Bantrab|BAM|Columna|Alianzas y Soluciones)' \
+            tools/orbit360-extract-excel-rule-facts-p06b.py \
+            orbit360-platform/core/excel-rule-proposal-adapter-p06b.js \
+            orbit360-platform/core/tariff-quote-reconciliation-p06c.js \
+            tools/orbit360-test-excel-rule-facts-p06b.py \
+            tools/orbit360-test-excel-rule-proposal-adapter-p06b.mjs \
+            tools/orbit360-test-tariff-quote-reconciliation-p06c.mjs; then
+            echo 'Tenant or insurer-specific data detected'
+            exit 1
+          fi
+
+      - name: Guard evidence and enablement invariants
+        run: |
+          grep -q 'requiresSecondGateForEnablement' tools/orbit360-extract-excel-rule-facts-p06b.py
+          grep -q 'FINANCING_SCOPE_REQUIRES_MAPPING' orbit360-platform/core/excel-rule-proposal-adapter-p06b.js
+          grep -q 'enabledCotizador = false' orbit360-platform/core/excel-rule-proposal-adapter-p06b.js
+          grep -q 'mismatch_requires_validation' orbit360-platform/core/tariff-quote-reconciliation-p06c.js
+          grep -q 'incomplete_requires_validation' orbit360-platform/core/tariff-quote-reconciliation-p06c.js
+          grep -q 'BASE_COMPONENTE_REQUERIDA' orbit360-platform/core/tariff-quote-reconciliation-p06c.js
+          grep -q 'EVIDENCIA_MUESTRA_REQUERIDA' orbit360-platform/core/tariff-quote-reconciliation-p06c.js
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
