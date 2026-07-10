@@ -19,7 +19,12 @@ const rows = {
   aseguradora_reglas_tarifarias: [{ id: 'r1', tenantId: 'alianzas-soluciones' }, { id: 'r2', tenantId: 'otro' }],
   aseguradora_presentaciones: [{ id: 'q1', tenantId: 'alianzas-soluciones' }],
   aseguradora_bindings: [],
-  aseguradora_revisiones: [{ id: 'v1', tenantId: 'alianzas-soluciones' }]
+  aseguradora_revisiones: [{ id: 'v1', tenantId: 'alianzas-soluciones' }],
+  aseguradora_batch_runs: [{ id: 'run-1', tenantId: 'alianzas-soluciones', batchId: 'batch-a', status: 'incomplete' }],
+  aseguradora_batch_items: [
+    { id: 'item-1', tenantId: 'alianzas-soluciones', batchId: 'batch-a', runId: 'run-1', documentId: 'doc-pendiente', status: 'failed', retryEligible: true },
+    { id: 'item-2', tenantId: 'otro', batchId: 'batch-a', runId: 'run-x', documentId: 'otro', status: 'failed', retryEligible: true }
+  ]
 };
 const Orbit = {
   ui: { esc: value => String(value) },
@@ -30,15 +35,13 @@ const Orbit = {
     retry: async () => ({ status: 'ready' })
   },
   aseguradorasLabCollectionsP09e: {
-    status: () => ({ installed: true, snapshotAttachedCount: 6, collections: ['a','b','c','d','e','f'] })
+    status: () => ({ installed: true, snapshotAttachedCount: 8, collections: ['a','b','c','d','e','f','g','h'] })
   },
   aseguradorasFirstSourceP09f: {
     listPlans: () => [{ source: { nombre: 'Tasas ejemplo.xlsx' } }]
   },
   aseguradorasBatchOrchestratorP09g: {
-    listBatches: () => [{
-      id: 'batch-a', totalSources: 11, totalInsurers: 6, totalExcel: 8, totalPdf: 3, bindingSets: 3
-    }],
+    listBatches: () => [{ id: 'batch-a', totalSources: 11, totalInsurers: 6, totalExcel: 8, totalPdf: 3, bindingSets: 3 }],
     latest: () => ({
       status: 'incomplete',
       summary: {
@@ -49,6 +52,15 @@ const Orbit = {
         { id: 'b1', insurerName: 'Compañía Alfa', variant: { tipoVehiculo: 'Automóvil' }, status: 'ready_for_binding_review', missingKnowledge: [] },
         { id: 'b2', insurerName: 'Compañía Beta', variant: { plan: 'Plan demo' }, status: 'documents_ready_knowledge_incomplete', missingKnowledge: ['tariff_rule'] }
       ]
+    })
+  },
+  aseguradorasBatchHistoryP09h: {
+    readModel: () => ({
+      runs: [rows.aseguradora_batch_runs[0]],
+      items: [rows.aseguradora_batch_items[0]],
+      latest: rows.aseguradora_batch_runs[0],
+      latestItems: [rows.aseguradora_batch_items[0]],
+      resumableDocumentIds: ['doc-pendiente']
     })
   }
 };
@@ -73,6 +85,8 @@ const api = Orbit.aseguradorasKnowledgePanelP09f;
 const state = api.state();
 assert(state.counts.sources === 2, 'debe contar fuentes visibles');
 assert(state.counts.manifests === 1 && state.counts.rules === 1, 'debe filtrar colecciones por tenant');
+assert(state.counts.batchRuns === 1 && state.counts.batchItems === 1, 'debe contar historial por tenant');
+assert(state.history.resumableDocumentIds.includes('doc-pendiente'), 'debe exponer documento reanudable');
 assert(state.provider.code === 'BACKEND_REQUIRED', 'provider no conectado debe mostrarse honestamente');
 assert(state.batch.batches[0].totalSources === 11, 'debe exponer lote de once fuentes');
 assert(state.batch.latest.summary.waitingReference === 2, 'debe exponer referencias pendientes');
@@ -83,8 +97,10 @@ assert(markup.includes('Tasas ejemplo.xlsx'), 'panel debe mostrar primera fuente
 assert(markup.includes('11 fuentes') && markup.includes('6 aseguradoras'), 'panel debe mostrar resumen del lote');
 assert(markup.includes('ready_for_binding_review'), 'panel debe mostrar estado de binding');
 assert(markup.includes('documents_ready_knowledge_incomplete'), 'panel debe mostrar conocimiento incompleto');
+assert(markup.includes('Historial del lote') && markup.includes('doc-pendiente'), 'panel debe mostrar historial y reanudables');
 assert(listeners.some(item => item.type === 'click'), 'botón de actualización debe ser funcional');
 const source = fs.readFileSync('orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js', 'utf8');
 assert(!/\.insert\(|\.update\(|\.remove\(|setPref\(/.test(source), 'panel no debe escribir Orbit.store');
 assert(!/aseguradorasBatchOrchestratorP09g\.run\(/.test(source), 'panel no debe ejecutar lote');
+assert(!/aseguradorasBatchOrchestratorP09g\.resume\(/.test(source), 'panel no debe reanudar lote');
 console.log('OK orbit360-test-aseguradoras-knowledge-panel-p09f');
