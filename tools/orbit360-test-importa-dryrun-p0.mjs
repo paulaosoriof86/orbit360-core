@@ -46,4 +46,25 @@ assert.ok(blocked.blockers.some(x => x.code.includes('collection_no_permitida'))
 const notApproved = Orbit.importaDryRunP0.approveDryRun(blocked, { approved: true, phrase: 'CONFIRMO DRY RUN', userId: 'paula', reason: 'no debe aprobar' });
 assert.equal(notApproved.status, 'dry_run_no_aprobable');
 
+const directoryOk = Orbit.importaDryRunP0.buildDryRun({
+  batchId: 'batch_directorio_ok',
+  sourceType: 'directorio_aseguradoras',
+  operations: [{ action: 'insert', collection: 'aseguradoras', data: { nombre: 'Aseguradora Demo', pais: 'GT', credentialRef: 'backend_required' } }]
+});
+assert.equal(directoryOk.hasBlockingErrors, false, 'directorio aseguradoras debe permitir aseguradoras con credentialRef no sensible');
+assert.equal(directoryOk.operations[0].data.nombre.includes('***'), true, 'nombre debe sanitizarse en preview');
+
+const directoryBlocked = Orbit.importaDryRunP0.buildDryRun({
+  batchId: 'batch_directorio_blocked',
+  sourceType: 'directorio_aseguradoras',
+  operations: [
+    { action: 'insert', collection: 'credenciales', data: { nombre: 'Sistema Demo', pais: 'GT', password: 'NO-DEBE-IMPORTARSE' } },
+    { action: 'insert', collection: 'aseguradoras', data: { nombre: 'Aseguradora Demo', pais: 'GT', password: 'NO-DEBE-IMPORTARSE' } }
+  ]
+});
+assert.equal(directoryBlocked.hasBlockingErrors, true, 'credenciales reales deben bloquear dry-run');
+assert.ok(directoryBlocked.blockers.some(x => x.code.includes('credencial_no_importable')), 'debe bloquear claves/credenciales reales');
+assert.ok(directoryBlocked.blockers.some(x => x.code.includes('collection_no_permitida') || x.code.includes('collection_prohibida')), 'debe bloquear coleccion de credenciales');
+assert.equal(directoryBlocked.operations[1].data.password.includes('***'), true, 'password debe sanitizarse en preview aunque este bloqueado');
+
 console.log('OK P0 sanitized dry-run builder smoke passed');
