@@ -64,6 +64,12 @@ Orbit.modules.importar = (function () {
     }
   }
 
+  function loadP0WriteContract() {
+    if (Orbit.importaWriteP0 || Orbit.__importaWriteP0Loader) return;
+    Orbit.__importaWriteP0Loader = true;
+    addScript('core/importa-write-p0.js?v=20260709');
+  }
+
   function loadP0Dashboard(onload) {
     if (Orbit.importarP0Dashboard) { if (onload) onload(); return; }
     if (Orbit.__importarP0DashboardLoader) return;
@@ -76,6 +82,7 @@ Orbit.modules.importar = (function () {
     loadP0CarteraRules();
     loadP0ComisionesRules();
     loadP0BancoComisionesRules();
+    loadP0WriteContract();
   }
   loadP0Rules();
   loadP0Dashboard();
