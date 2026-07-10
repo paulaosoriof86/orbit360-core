@@ -100,6 +100,34 @@
     }
     return { ok: false, code: 'LAB_WRITE_TIMEOUT', status: backendStatus(), errors: [] };
   }
+  function modelVisibility(model, plan) {
+    var sourceVisible = !!(model && model.insurer && [].concat(model.insurer.docs || []).some(function (doc) {
+      return clean(doc.id) === clean(plan.sourceDocumentId);
+    }));
+    var manifestVisible = !!(model && [].concat(model.manifests || []).some(function (item) {
+      return clean(item.documentId) === clean(plan.sourceDocumentId);
+    }));
+    return { sourceVisible: sourceVisible, manifestVisible: manifestVisible };
+  }
+  async function waitForReadModel(service, plan, timeoutMs) {
+    var started = Date.now(), timeout = Number(timeoutMs || 12000), lastModel = null;
+    while (Date.now() - started <= timeout) {
+      lastModel = service.read({ tenantId: plan.tenantId, aseguradoraId: plan.aseguradoraId });
+      var visibility = modelVisibility(lastModel, plan);
+      if (visibility.sourceVisible && visibility.manifestVisible) {
+        return { ok: true, code: 'LAB_READ_MODEL_CONFIRMED', model: lastModel, visibility: visibility };
+      }
+      await sleep(120);
+    }
+    var finalVisibility = modelVisibility(lastModel, plan);
+    return {
+      ok: false,
+      code: 'LAB_READ_MODEL_NOT_CONFIRMED',
+      model: lastModel,
+      visibility: finalVisibility,
+      errors: [!finalVisibility.sourceVisible ? 'SOURCE_NOT_VISIBLE' : '', !finalVisibility.manifestVisible ? 'MANIFEST_NOT_VISIBLE' : ''].filter(Boolean)
+    };
+  }
   async function persist(plan, actor, options) {
     options = options || {};
     var check = preflight(plan, actor);
@@ -122,24 +150,21 @@
       persisted: false, code: settled.code, errors: settled.errors || [settled.code],
       result: result, backendStatus: settled.status, writeAllowed: false
     };
-    var model = service.read({ tenantId: plan.tenantId, aseguradoraId: plan.aseguradoraId });
-    var sourceVisible = !!(model && model.insurer && [].concat(model.insurer.docs || []).some(function (doc) {
-      return clean(doc.id) === clean(plan.sourceDocumentId);
-    }));
-    var manifestVisible = !!(model && [].concat(model.manifests || []).some(function (item) {
-      return clean(item.documentId) === clean(plan.sourceDocumentId);
-    }));
-    if (!sourceVisible || !manifestVisible) return {
+    var confirmed = await waitForReadModel(service, plan, options.readModelTimeoutMs || options.timeoutMs);
+    if (!confirmed.ok) return {
       persisted: false,
-      code: 'LAB_READ_MODEL_NOT_CONFIRMED',
-      errors: [!sourceVisible ? 'SOURCE_NOT_VISIBLE' : '', !manifestVisible ? 'MANIFEST_NOT_VISIBLE' : ''].filter(Boolean),
-      result: result, model: model, writeAllowed: false
+      code: confirmed.code,
+      errors: confirmed.errors,
+      result: result,
+      model: confirmed.model,
+      backendStatus: settled.status,
+      writeAllowed: false
     };
     return {
       persisted: true,
       code: 'LAB_METADATA_PERSISTED_PENDING_VALIDATION',
       result: result,
-      model: model,
+      model: confirmed.model,
       backendStatus: settled.status,
       enablesCotizador: false,
       enablesComparativo: false,
@@ -153,6 +178,7 @@
     planSafe: planSafe,
     preflight: preflight,
     waitForSettlement: waitForSettlement,
+    waitForReadModel: waitForReadModel,
     persist: persist
   };
 })();
