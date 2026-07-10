@@ -65,10 +65,16 @@
       blocking: ['pais']
     },
     calendario_marketing: {
-      allowed: ['contenidos', 'campanasMarketing', 'gestiones'],
+      allowed: ['contenidos', 'campanasMarketing', 'configuracionCatalogo', 'documentos', 'gestiones'],
       forbidden: ['clientes', 'polizas', 'cobros', 'recibosEsperados', 'carteraPrimas', 'finmovs', 'cxcComisiones', 'cxpAsesores', 'usuarios', 'roles', 'permisos', 'secrets', 'credenciales'],
       required: ['codigoContenido', 'fechaProgramada', 'tema'],
       blocking: []
+    },
+    identidad_marca: {
+      allowed: ['configuracionCatalogo', 'documentos', 'gestiones'],
+      forbidden: ['clientes', 'polizas', 'cobros', 'recibosEsperados', 'carteraPrimas', 'finmovs', 'cxcComisiones', 'cxpAsesores', 'usuarios', 'roles', 'permisos', 'secrets', 'credenciales'],
+      required: ['clave'],
+      blocking: ['tenantId']
     },
     configuracion_catalogo: {
       allowed: ['configuracionCatalogo', 'gestiones'],
@@ -78,7 +84,7 @@
     }
   };
 
-  const SENSITIVE_KEYS = /nombre|razon|correo|email|telefono|whatsapp|direccion|dpi|cedula|nit|documento|placa|chasis|motor|cuenta|iban|token|password|secret|credential/i;
+  const SENSITIVE_KEYS = /nombre|razon|correo|email|telefono|whatsapp|direccion|dpi|cedula|nit|documento|placa|chasis|motor|cuenta|iban|token|password|secret|credential|copy|texto|prompt|gancho|desarrollo|cta|hashtag|audiencia|utm/i;
   const CREDENTIAL_KEYS = /password|contraseña|contrasena|token|secret|credential|credencial|usuarioSistema|claveAcceso|accessKey|apiKey/i;
 
   function nowIso() { return new Date().toISOString(); }
