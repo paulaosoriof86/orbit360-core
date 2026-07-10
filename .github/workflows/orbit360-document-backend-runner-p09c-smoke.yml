@@ -1,0 +1,161 @@
+name: Orbit 360 Document Backend Runner P09c Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-document-backend-runner-p09c.mjs'
+      - 'tools/orbit360-document-backend-bridge-p09c.mjs'
+      - 'tools/orbit360-test-document-backend-runner-p09c.mjs'
+      - 'tools/orbit360-test-document-backend-bridge-p09c.mjs'
+      - 'tools/orbit360-test-document-pipeline-p09c.mjs'
+      - 'tools/orbit360-extract-excel-rule-facts-p06b.py'
+      - 'tools/orbit360-extract-pdf-manifest-p07b.py'
+      - 'tools/orbit360-create-excel-p04-fixture.py'
+      - 'orbit360-platform/core/document-provider-registry-p09.js'
+      - 'orbit360-platform/core/document-provider-bridge-p09b.js'
+      - 'orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-p09.js'
+      - '.github/workflows/orbit360-document-backend-runner-p09c-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/orbit360-document-backend-runner-p09c.mjs'
+      - 'tools/orbit360-document-backend-bridge-p09c.mjs'
+      - 'tools/orbit360-test-document-backend-runner-p09c.mjs'
+      - 'tools/orbit360-test-document-backend-bridge-p09c.mjs'
+      - 'tools/orbit360-test-document-pipeline-p09c.mjs'
+      - 'tools/orbit360-extract-excel-rule-facts-p06b.py'
+      - 'tools/orbit360-extract-pdf-manifest-p07b.py'
+      - 'tools/orbit360-create-excel-p04-fixture.py'
+      - 'orbit360-platform/core/document-provider-registry-p09.js'
+      - 'orbit360-platform/core/document-provider-bridge-p09b.js'
+      - 'orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-p09.js'
+      - '.github/workflows/orbit360-document-backend-runner-p09c-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  document-backend-runner-p09c:
+    name: Secure runner, bridge and metadata persistence P0.9c
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PDF parser dependency
+        run: python -m pip install --disable-pip-version-check --no-cache-dir pymupdf
+
+      - name: Check syntax
+        run: |
+          node --check tools/orbit360-document-backend-runner-p09c.mjs
+          node --check tools/orbit360-document-backend-bridge-p09c.mjs
+          node --check tools/orbit360-test-document-backend-runner-p09c.mjs
+          node --check tools/orbit360-test-document-backend-bridge-p09c.mjs
+          node --check tools/orbit360-test-document-pipeline-p09c.mjs
+          python -m py_compile tools/orbit360-extract-excel-rule-facts-p06b.py
+          python -m py_compile tools/orbit360-extract-pdf-manifest-p07b.py
+
+      - name: Run isolated runner and bridge smokes
+        run: |
+          node tools/orbit360-test-document-backend-runner-p09c.mjs
+          node tools/orbit360-test-document-backend-bridge-p09c.mjs
+          node tools/orbit360-test-document-pipeline-p09c.mjs
+
+      - name: Generate fictitious Excel and PDF sources
+        run: |
+          RUNNER_ROOT="$RUNNER_TEMP/orbit-p09c-sources"
+          mkdir -p "$RUNNER_ROOT"
+          python tools/orbit360-create-excel-p04-fixture.py "$RUNNER_ROOT/sample.xlsm"
+          RUNNER_ROOT="$RUNNER_ROOT" python - <<'PY'
+          import os
+          from pathlib import Path
+          import fitz
+          root = Path(os.environ['RUNNER_ROOT'])
+          doc = fitz.open()
+          page = doc.new_page(width=595, height=842)
+          page.insert_text((45, 55), 'COTIZACIÓN FICTICIA', fontsize=18)
+          page.insert_text((45, 90), 'Compañía Demo', fontsize=14)
+          page.insert_text((45, 125), 'Cliente:', fontsize=10)
+          page.insert_text((45, 145), 'Persona Ficticia', fontsize=10)
+          page.insert_text((45, 180), 'Tipo: Automóvil', fontsize=10)
+          page.insert_text((45, 215), 'FORMAS DE PAGO', fontsize=15)
+          page.insert_text((45, 245), 'Pago de contado Q 1,000.00', fontsize=10)
+          doc.save(root / 'sample.pdf')
+          doc.close()
+          PY
+
+      - name: Run actual extractors through backend runner
+        run: |
+          RUNNER_ROOT="$RUNNER_TEMP/orbit-p09c-sources"
+          RUNNER_ROOT="$RUNNER_ROOT" python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_ROOT'])
+          common = {'tenantId':'tenant-demo','aseguradoraId':'insurer-demo','purpose':'training','dimensiones':{'pais':'GT','moneda':'GTQ','producto':'Auto'}}
+          excel = dict(common, task='excel_manifest', documentId='doc-excel', fileRef='drive://demo/excel', localPath=str(root/'sample.xlsm'))
+          pdf = dict(common, task='pdf_manifest', documentId='doc-pdf', fileRef='drive://demo/pdf', localPath=str(root/'sample.pdf'), directory=[{'id':'insurer-demo','nombre':'Compañía Demo'}])
+          (root/'excel-request.json').write_text(json.dumps(excel), encoding='utf-8')
+          (root/'pdf-request.json').write_text(json.dumps(pdf), encoding='utf-8')
+          PY
+          node tools/orbit360-document-backend-runner-p09c.mjs --request "$RUNNER_ROOT/excel-request.json" --output "$RUNNER_ROOT/excel-result.json" --allowed-root "$RUNNER_ROOT" --tools-root tools
+          node tools/orbit360-document-backend-runner-p09c.mjs --request "$RUNNER_ROOT/pdf-request.json" --output "$RUNNER_ROOT/pdf-result.json" --allowed-root "$RUNNER_ROOT" --tools-root tools
+          RUNNER_ROOT="$RUNNER_ROOT" node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const root = process.env.RUNNER_ROOT;
+          const excel = JSON.parse(fs.readFileSync(path.join(root, 'excel-result.json'), 'utf8'));
+          const pdf = JSON.parse(fs.readFileSync(path.join(root, 'pdf-result.json'), 'utf8'));
+          function assert(c, m) { if (!c) throw new Error(m); }
+          assert(excel.ok && excel.code === 'EXCEL_MANIFEST_READY_FOR_REVIEW', 'excel runner failed');
+          assert(pdf.ok && pdf.code === 'PDF_MANIFEST_READY_FOR_REVIEW', 'pdf runner failed');
+          assert(excel.result.flags.containsRawPayload === false && pdf.result.flags.containsRawPayload === false, 'raw payload forbidden');
+          assert(excel.enablesCotizador === false && pdf.enablesComparativo === false, 'modules must stay disabled');
+          assert(!JSON.stringify({excel,pdf}).includes('Persona Ficticia'), 'training PII must be redacted');
+          NODE
+
+      - name: Guard runner boundaries
+        run: |
+          if grep -RniE '(localStorage|sessionStorage|XMLHttpRequest|fetch\(|eval\(|new Function)' \
+            tools/orbit360-document-backend-runner-p09c.mjs \
+            tools/orbit360-document-backend-bridge-p09c.mjs; then
+            echo 'Frontend storage, direct network or executable code detected'
+            exit 1
+          fi
+          if grep -RniE '(Aseguradora Guatemalteca|AseGuate|BAM|Banrural|Bantrab|Columna|Seguros Universales|Alianzas y Soluciones)' \
+            tools/orbit360-document-backend-runner-p09c.mjs \
+            tools/orbit360-document-backend-bridge-p09c.mjs \
+            tools/orbit360-test-document-backend-runner-p09c.mjs \
+            tools/orbit360-test-document-backend-bridge-p09c.mjs \
+            tools/orbit360-test-document-pipeline-p09c.mjs; then
+            echo 'Tenant or insurer hardcode detected'
+            exit 1
+          fi
+          grep -q 'SOURCE_OUTSIDE_ALLOWED_ROOT' tools/orbit360-document-backend-runner-p09c.mjs
+          grep -q 'SOURCE_HASH_MISMATCH' tools/orbit360-document-backend-runner-p09c.mjs
+          grep -q 'SENSITIVE_VALUES_REQUIRE_BACKEND_AUTHORIZATION' tools/orbit360-document-backend-runner-p09c.mjs
+          grep -q 'containsRawPayload: false' tools/orbit360-document-backend-runner-p09c.mjs
+          grep -q 'enablesCotizador: false' tools/orbit360-document-backend-runner-p09c.mjs
+          grep -q 'runnerExecution' tools/orbit360-document-backend-bridge-p09c.mjs
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
