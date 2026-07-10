@@ -1,0 +1,79 @@
+name: Orbit 360 Knowledge Binding Gate P08 Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/document-source-contract-p04.js'
+      - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'orbit360-platform/core/knowledge-binding-gate-p08.js'
+      - 'tools/orbit360-test-knowledge-binding-gate-p08.mjs'
+      - '.github/workflows/orbit360-knowledge-binding-gate-p08-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/document-source-contract-p04.js'
+      - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'orbit360-platform/core/knowledge-binding-gate-p08.js'
+      - 'tools/orbit360-test-knowledge-binding-gate-p08.mjs'
+      - '.github/workflows/orbit360-knowledge-binding-gate-p08-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  knowledge-binding-gate-p08:
+    name: Vínculo tarifa-presentación y segundo gate P0.8
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/knowledge-binding-gate-p08.js
+          node --check tools/orbit360-test-knowledge-binding-gate-p08.mjs
+
+      - name: Run binding and gate smoke
+        run: node tools/orbit360-test-knowledge-binding-gate-p08.mjs
+
+      - name: Guard no operational writes, storage or network
+        run: |
+          if grep -RniE '(Orbit\.store\.(insert|update|remove|setPref)|localStorage|sessionStorage|fetch\(|XMLHttpRequest|eval\(|new Function)' \
+            orbit360-platform/core/knowledge-binding-gate-p08.js; then
+            echo 'Direct write, storage, network, or executable path detected'
+            exit 1
+          fi
+
+      - name: Guard multi-tenant and second gate invariants
+        run: |
+          grep -q 'requiresSecondGateForEnablement: true' orbit360-platform/core/knowledge-binding-gate-p08.js
+          grep -q 'approved_pending_external_write' orbit360-platform/core/knowledge-binding-gate-p08.js
+          grep -q 'requiresExternalWriter: true' orbit360-platform/core/knowledge-binding-gate-p08.js
+          grep -q 'MODULO_DESHABILITADO_POR_TENANT' orbit360-platform/core/knowledge-binding-gate-p08.js
+          grep -q 'BINDING_CAMBIO_REEJECUTAR_GATE' orbit360-platform/core/knowledge-binding-gate-p08.js
+          grep -q 'PRESENTACION_SIN_TARIFA_AUTOMATICA' orbit360-platform/core/knowledge-binding-gate-p08.js
+
+      - name: Guard no tenant-specific insurer data
+        run: |
+          if grep -RniE '(Aseguradora Guatemalteca|Aseguate|Seguros Universales|Banrural|Bantrab|BAM|Columna|Alianzas y Soluciones)' \
+            orbit360-platform/core/knowledge-binding-gate-p08.js \
+            tools/orbit360-test-knowledge-binding-gate-p08.mjs; then
+            echo 'Tenant or insurer-specific data detected'
+            exit 1
+          fi
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
