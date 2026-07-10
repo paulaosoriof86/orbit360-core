@@ -204,6 +204,8 @@
     var envelope = inspection.envelope || {};
     var workbook = inspection.workbook || {};
     var summary = inspection.summary || {};
+    var source = inspection.sourceProposal || {};
+    var dims = source.dimensiones || {};
     return {
       id: clean(envelope.id),
       tenantId: clean(envelope.tenantId),
@@ -212,9 +214,19 @@
       aseguradoraId: clean(envelope.aseguradoraId),
       nombre: clean(envelope.file && envelope.file.name),
       tipo: 'fuente_conocimiento_aseguradora',
-      tipoFuente: clean(inspection.sourceProposal && inspection.sourceProposal.tipoFuente || summary.sourceTypeProposal || envelope.sourceType),
+      tipoFuente: clean(source.tipoFuente || summary.sourceTypeProposal || envelope.sourceType),
       pais: clean(envelope.pais),
       moneda: clean(envelope.moneda),
+      ramo: clean(source.ramo || dims.ramo),
+      producto: clean(source.producto || dims.producto),
+      familiaProducto: clean(source.familiaProducto || dims.familiaProducto),
+      subtipoProducto: clean(source.subtipoProducto || dims.subtipoProducto),
+      segmento: clean(source.segmento || dims.segmento),
+      tipoRiesgo: clean(source.tipoRiesgo || dims.tipoRiesgo),
+      tipoVehiculo: clean(source.tipoVehiculo || dims.tipoVehiculo),
+      usoVehiculo: clean(source.usoVehiculo || dims.usoVehiculo),
+      plan: clean(source.plan || dims.plan),
+      dimensiones: sanitize(dims),
       version: clean(envelope.version && envelope.version.label),
       archivoRef: clean(envelope.file && envelope.file.fileRef),
       sourceHash: clean(envelope.file && envelope.file.hash),
