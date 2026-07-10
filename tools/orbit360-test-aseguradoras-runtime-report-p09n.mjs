@@ -38,7 +38,7 @@ try {
     counts: { sources: 2, manifests: 1, proposals: 1, rules: 0, presentations: 0, bindings: 0, reviews: 1 },
     gates: [
       { id: 'runtime_ready', state: 'approved' },
-      { id: 'visual_smoke', state: 'pending', reason: 'visual_pending' }
+      { id: 'module_boundary', state: 'pending', reason: 'visual_boundary_review_pending' }
     ],
     claudeGate: { ready: true, status: 'ready_for_super_accumulated_claude_package', pending: [] },
     localPath: 'C:/forbidden/private/source.xlsx',
@@ -59,7 +59,7 @@ try {
   assert(jsonFiles.length === 1 && mdFiles.length === 1, 'debe persistir JSON y Markdown privados');
   const saved = JSON.parse(fs.readFileSync(path.join(reportDir, jsonFiles[0]), 'utf8'));
   const text = fs.readFileSync(path.join(reportDir, mdFiles[0]), 'utf8');
-  assert(saved.claudeGate.ready === false && saved.claudeGate.pending.includes('visual_smoke'), 'gate persistido debe derivarse de gates');
+  assert(saved.claudeGate.ready === false && saved.claudeGate.pending.includes('module_boundary'), 'gate persistido debe derivarse de gates oficiales');
   assert(saved.actor.activeRole === 'Dirección' && !('email' in saved.actor), 'debe conservar rol sin identidad');
   const serialized = JSON.stringify(saved) + text;
   for (const forbidden of ['forbidden@example.test', 'forbidden customer payload', 'C:/forbidden', 'backend-ref://']) {
