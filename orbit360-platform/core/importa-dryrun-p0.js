@@ -64,6 +64,12 @@
       required: ['nombre'],
       blocking: ['pais']
     },
+    calendario_marketing: {
+      allowed: ['contenidos', 'campanasMarketing', 'gestiones'],
+      forbidden: ['clientes', 'polizas', 'cobros', 'recibosEsperados', 'carteraPrimas', 'finmovs', 'cxcComisiones', 'cxpAsesores', 'usuarios', 'roles', 'permisos', 'secrets', 'credenciales'],
+      required: ['codigoContenido', 'fechaProgramada', 'tema'],
+      blocking: []
+    },
     configuracion_catalogo: {
       allowed: ['configuracionCatalogo', 'gestiones'],
       forbidden: ['clientes', 'polizas', 'cobros', 'finmovs', 'usuarios', 'roles', 'permisos', 'secrets', 'credenciales'],
