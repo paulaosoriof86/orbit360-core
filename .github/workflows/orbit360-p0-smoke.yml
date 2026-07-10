@@ -10,11 +10,13 @@ on:
       - 'orbit360-platform/core/importa-comisiones-p0.js'
       - 'orbit360-platform/core/importa-banco-comisiones-p0.js'
       - 'orbit360-platform/modules/importar-p0-dashboard.js'
+      - 'tools/orbit360-p0-dryrun-manifest-20260709.mjs'
       - 'tools/orbit360-test-importa-polizas-p0.mjs'
       - 'tools/orbit360-test-importa-cartera-p0.mjs'
       - 'tools/orbit360-test-importa-comisiones-p0.mjs'
       - 'tools/orbit360-test-importa-banco-comisiones-p0.mjs'
       - 'tools/orbit360-test-importar-p0-dashboard.mjs'
+      - 'tools/orbit360-test-p0-dryrun-manifest.mjs'
       - 'tools/orbit360-validar-backend-lab-contrato.mjs'
       - '.github/workflows/orbit360-p0-smoke.yml'
   pull_request:
@@ -26,11 +28,13 @@ on:
       - 'orbit360-platform/core/importa-comisiones-p0.js'
       - 'orbit360-platform/core/importa-banco-comisiones-p0.js'
       - 'orbit360-platform/modules/importar-p0-dashboard.js'
+      - 'tools/orbit360-p0-dryrun-manifest-20260709.mjs'
       - 'tools/orbit360-test-importa-polizas-p0.mjs'
       - 'tools/orbit360-test-importa-cartera-p0.mjs'
       - 'tools/orbit360-test-importa-comisiones-p0.mjs'
       - 'tools/orbit360-test-importa-banco-comisiones-p0.mjs'
       - 'tools/orbit360-test-importar-p0-dashboard.mjs'
+      - 'tools/orbit360-test-p0-dryrun-manifest.mjs'
       - 'tools/orbit360-validar-backend-lab-contrato.mjs'
       - '.github/workflows/orbit360-p0-smoke.yml'
 
@@ -65,6 +69,9 @@ jobs:
       - name: Check dashboard syntax
         run: node --check orbit360-platform/modules/importar-p0-dashboard.js
 
+      - name: Check dry-run manifest syntax
+        run: node --check tools/orbit360-p0-dryrun-manifest-20260709.mjs
+
       - name: Check policy smoke syntax
         run: node --check tools/orbit360-test-importa-polizas-p0.mjs
 
@@ -80,6 +87,9 @@ jobs:
       - name: Check dashboard smoke syntax
         run: node --check tools/orbit360-test-importar-p0-dashboard.mjs
 
+      - name: Check dry-run manifest smoke syntax
+        run: node --check tools/orbit360-test-p0-dryrun-manifest.mjs
+
       - name: Run policy smoke
         run: node tools/orbit360-test-importa-polizas-p0.mjs
 
@@ -94,6 +104,9 @@ jobs:
 
       - name: Run dashboard smoke
         run: node tools/orbit360-test-importar-p0-dashboard.mjs
+
+      - name: Run dry-run manifest smoke
+        run: node tools/orbit360-test-p0-dryrun-manifest.mjs
 
       - name: Run backend LAB validator if available
         run: |
