@@ -1,0 +1,111 @@
+name: Orbit 360 Aseguradoras Runtime P09f Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
+      - 'orbit360-platform/core/aseguradoras-first-source-orchestrator-p09f.js'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-first-source-p09f.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js'
+      - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
+      - 'tools/orbit360-test-aseguradoras-first-source-p09f.mjs'
+      - 'tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs'
+      - 'tools/orbit360-test-integrar-aseguradoras-knowledge-p09-index.mjs'
+      - 'tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs'
+      - 'orbit360-platform/index.html'
+      - '.github/workflows/orbit360-aseguradoras-runtime-p09f-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
+      - 'orbit360-platform/core/aseguradoras-first-source-orchestrator-p09f.js'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-first-source-p09f.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js'
+      - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
+      - 'tools/orbit360-test-aseguradoras-first-source-p09f.mjs'
+      - 'tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs'
+      - 'tools/orbit360-test-integrar-aseguradoras-knowledge-p09-index.mjs'
+      - 'tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs'
+      - 'orbit360-platform/index.html'
+      - '.github/workflows/orbit360-aseguradoras-runtime-p09f-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-p09f:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js
+          node --check orbit360-platform/core/aseguradoras-first-source-orchestrator-p09f.js
+          node --check orbit360-platform/data/tenant-alianzas-soluciones-first-source-p09f.js
+          node --check orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js
+          node --check tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs
+          node --check tools/orbit360-test-aseguradoras-first-source-p09f.mjs
+          node --check tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs
+          node --check tools/orbit360-test-integrar-aseguradoras-knowledge-p09-index.mjs
+          node --check tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs
+
+      - name: Run runtime bootstrap smoke
+        run: node tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs
+
+      - name: Run first source orchestrator smoke
+        run: node tools/orbit360-test-aseguradoras-first-source-p09f.mjs
+
+      - name: Run visible knowledge panel smoke
+        run: node tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs
+
+      - name: Run index integrator smoke
+        run: node tools/orbit360-test-integrar-aseguradoras-knowledge-p09-index.mjs
+
+      - name: Dry-run integrator against real index
+        run: |
+          node tools/orbit360-integrar-aseguradoras-knowledge-p09-index.mjs > /tmp/orbit-p09f-integrator.json
+          cat /tmp/orbit-p09f-integrator.json
+          grep -q '"mode": "dry-run"' /tmp/orbit-p09f-integrator.json
+          grep -q '"runtimeEntrypoint": "core/aseguradoras-runtime-bootstrap-p09f.js"' /tmp/orbit-p09f-integrator.json
+          grep -q '"runtimeLoadsDependenciesDynamically": true' /tmp/orbit-p09f-integrator.json
+          grep -q '"protectedFilesTouched": false' /tmp/orbit-p09f-integrator.json
+          git diff --exit-code -- orbit360-platform/index.html
+
+      - name: Guard panel and bootstrap boundaries
+        run: |
+          if grep -RniE '(localStorage|sessionStorage|XMLHttpRequest|eval\(|new Function|firebase deploy|git commit)' \
+            orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js \
+            orbit360-platform/core/aseguradoras-first-source-orchestrator-p09f.js \
+            orbit360-platform/data/tenant-alianzas-soluciones-first-source-p09f.js \
+            orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js; then
+            echo 'Forbidden storage, executable, deploy, or commit path detected'
+            exit 1
+          fi
+          if grep -nE '(\.insert\(|\.update\(|\.remove\(|setPref\()' orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js; then
+            echo 'Knowledge panel must remain read-only'
+            exit 1
+          fi
+
+      - name: Guard zero enablement and no real paths
+        run: |
+          grep -q 'enablesCotizador: false' orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js
+          grep -q 'enablesComparativo: false' orbit360-platform/core/aseguradoras-first-source-orchestrator-p09f.js
+          grep -q 'requiresSecondGateForEnablement: true' orbit360-platform/data/tenant-alianzas-soluciones-first-source-p09f.js
+          if grep -RniE '([A-Za-z]:\\|/home/|/Users/|api[_-]?key|client[_-]?secret|password\s*:)' \
+            orbit360-platform/data/tenant-alianzas-soluciones-first-source-p09f.js; then
+            echo 'Local path or secret-like value detected in tenant source plan'
+            exit 1
+          fi
+
+      - name: Run backend LAB validator
+        run: node tools/orbit360-validar-backend-lab-contrato.mjs
