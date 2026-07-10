@@ -87,21 +87,20 @@
     const country = input.country || '';
     const operations = [];
     const warnings = [];
-    const seen = {};
+    const insurers = {};
+    const seenContacts = {};
+    const seenCatalog = {};
+    const seenNotes = {};
+    const seenCredentialGestion = {};
 
-    rows.forEach(function (row, i) {
-      const n = normalizeRow(row, { country });
-      if (!n.nombre) {
-        warnings.push({ row: i + 1, code: 'aseguradora_sin_nombre' });
-        return;
-      }
+    function ensureInsurer(n, rowIndex) {
       const key = [n.country || 'REQUIERE_VALIDACION', n.nombre].map(norm).join('|');
-      if (seen[key]) {
-        warnings.push({ row: i + 1, code: 'duplicado_probable_aseguradora', insurerKey: key });
-        return;
+      if (insurers[key]) {
+        warnings.push({ row: rowIndex + 1, code: 'duplicado_probable_aseguradora', insurerKey: key });
+        return insurers[key];
       }
-      seen[key] = true;
       const aseguradoraId = stableId('asg', [n.country, n.nombre, n.nit]);
+      insurers[key] = aseguradoraId;
       operations.push({
         action: 'insert',
         collection: 'aseguradoras',
@@ -120,28 +119,45 @@
           requiereValidacion: !n.country
         }
       });
+      return aseguradoraId;
+    }
+
+    rows.forEach(function (row, i) {
+      const n = normalizeRow(row, { country });
+      if (!n.nombre) {
+        warnings.push({ row: i + 1, code: 'aseguradora_sin_nombre' });
+        return;
+      }
+      const aseguradoraId = ensureInsurer(n, i);
 
       if (n.email || n.telefono || n.contacto) {
-        operations.push({
-          action: 'insert',
-          collection: 'contactosAseguradora',
-          data: {
-            id: stableId('asg_cto', [aseguradoraId, n.contacto, n.email, n.telefono]),
-            aseguradoraId,
-            pais: n.country || 'REQUIERE_VALIDACION',
-            nombre: n.contacto || 'Mesa de corredores',
-            cargo: n.cargo || 'Comercial / servicio',
-            email: EMAIL_RE.test(n.email) ? n.email : '',
-            telefono: n.telefono,
-            origen: 'directorio_aseguradoras',
-            archivoFuente: sourceFileName,
-            validationStatus: 'pendiente_revision',
-            requiereValidacion: !n.country || (!!n.email && !EMAIL_RE.test(n.email))
-          }
-        });
+        const contactKey = [aseguradoraId, n.contacto || 'Mesa de corredores', n.email, n.telefono].map(norm).join('|');
+        if (!seenContacts[contactKey]) {
+          seenContacts[contactKey] = true;
+          operations.push({
+            action: 'insert',
+            collection: 'contactosAseguradora',
+            data: {
+              id: stableId('asg_cto', [aseguradoraId, n.contacto, n.email, n.telefono]),
+              aseguradoraId,
+              pais: n.country || 'REQUIERE_VALIDACION',
+              nombre: n.contacto || 'Mesa de corredores',
+              cargo: n.cargo || 'Comercial / servicio',
+              email: EMAIL_RE.test(n.email) ? n.email : '',
+              telefono: n.telefono,
+              origen: 'directorio_aseguradoras',
+              archivoFuente: sourceFileName,
+              validationStatus: 'pendiente_revision',
+              requiereValidacion: !n.country || (!!n.email && !EMAIL_RE.test(n.email))
+            }
+          });
+        }
       }
 
       n.ramos.forEach(function (ramo) {
+        const catKey = [aseguradoraId, ramo].map(norm).join('|');
+        if (seenCatalog[catKey]) return;
+        seenCatalog[catKey] = true;
         operations.push({
           action: 'insert',
           collection: 'configuracionCatalogo',
@@ -160,42 +176,50 @@
       });
 
       if (n.notas) {
-        operations.push({
-          action: 'insert',
-          collection: 'gestiones',
-          data: {
-            id: stableId('ges_asg', [aseguradoraId, n.notas]),
-            tipo: 'nota_directorio_aseguradora',
-            entidad: 'aseguradora',
-            entidadId: aseguradoraId,
-            pais: n.country || 'REQUIERE_VALIDACION',
-            detalle: n.notas,
-            origen: 'directorio_aseguradoras',
-            archivoFuente: sourceFileName,
-            validationStatus: 'pendiente_revision',
-            requiereValidacion: !n.country
-          }
-        });
+        const noteKey = [aseguradoraId, n.notas].map(norm).join('|');
+        if (!seenNotes[noteKey]) {
+          seenNotes[noteKey] = true;
+          operations.push({
+            action: 'insert',
+            collection: 'gestiones',
+            data: {
+              id: stableId('ges_asg', [aseguradoraId, n.notas]),
+              tipo: 'nota_directorio_aseguradora',
+              entidad: 'aseguradora',
+              entidadId: aseguradoraId,
+              pais: n.country || 'REQUIERE_VALIDACION',
+              detalle: n.notas,
+              origen: 'directorio_aseguradoras',
+              archivoFuente: sourceFileName,
+              validationStatus: 'pendiente_revision',
+              requiereValidacion: !n.country
+            }
+          });
+        }
       }
 
       if (n.secretDetected) {
-        operations.push({
-          action: 'insert',
-          collection: 'gestiones',
-          data: {
-            id: stableId('ges_cred_asg', [aseguradoraId, sourceFileName]),
-            tipo: 'acceso_requiere_backend',
-            entidad: 'aseguradora',
-            entidadId: aseguradoraId,
-            pais: n.country || 'REQUIERE_VALIDACION',
-            detalle: 'Fuente contiene acceso/credencial. No importar valor. Configurar referencia segura en backend.',
-            credentialRef: 'backend_required',
-            origen: 'directorio_aseguradoras',
-            archivoFuente: sourceFileName,
-            validationStatus: 'pendiente_revision',
-            requiereValidacion: true
-          }
-        });
+        const credKey = [aseguradoraId, sourceFileName].map(norm).join('|');
+        if (!seenCredentialGestion[credKey]) {
+          seenCredentialGestion[credKey] = true;
+          operations.push({
+            action: 'insert',
+            collection: 'gestiones',
+            data: {
+              id: stableId('ges_cred_asg', [aseguradoraId, sourceFileName]),
+              tipo: 'acceso_requiere_backend',
+              entidad: 'aseguradora',
+              entidadId: aseguradoraId,
+              pais: n.country || 'REQUIERE_VALIDACION',
+              detalle: 'Fuente contiene acceso/credencial. No importar valor. Configurar referencia segura en backend.',
+              credentialRef: 'backend_required',
+              origen: 'directorio_aseguradoras',
+              archivoFuente: sourceFileName,
+              validationStatus: 'pendiente_revision',
+              requiereValidacion: true
+            }
+          });
+        }
       }
     });
 
