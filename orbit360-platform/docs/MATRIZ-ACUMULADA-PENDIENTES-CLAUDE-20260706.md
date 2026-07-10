@@ -2,18 +2,25 @@
 
 **Proyecto:** Orbit 360 A&S  
 **Rama:** `ays/backend-tenant-lab-v99-20260703`  
-**PR:** #5 draft, sin merge y sin deploy  
-**Objetivo:** evitar paquetes parciales y mantener backlog completo para Claude.
+**PR:** #5 draft, sin merge y sin deploy
 
----
+> **CONTROL DE VIGENCIA — 2026-07-09**  
+> Esta matriz conserva valor histórico para candidatas v1.144/v1.145, pero ya no es el backlog exhaustivo vigente.  
+> El control acumulado obligatorio y actualizado es:
+>
+> `CONTROL-MAESTRO-ACUMULADO-CLAUDE-BACKEND-UX-ACADEMIA-ORBIT360-AYS-20260709.md`
+>
+> No preparar paquetes Claude usando solamente este archivo.
 
-## Estado general
+## Objetivo histórico
 
-El paquete anterior fue acumulado en enfoque P0, pero no era backlog exhaustivo por registro. Esta matriz consolida pendientes de frontend/UX/prototipo/Academia que Claude debe respetar o corregir.
+Evitar paquetes parciales y mantener backlog para Claude durante la fase v1.144/v1.145.
 
----
+## Estado general histórico
 
-## Pendientes por módulo
+El paquete anterior fue acumulado en enfoque P0, pero no era backlog exhaustivo por registro. Esta matriz consolidó pendientes de frontend/UX/prototipo/Academia identificados hasta el 6 de julio de 2026.
+
+## Pendientes por módulo registrados en ese corte
 
 | Área | Pendiente | Prioridad | Estado v1.144 |
 |---|---|---:|---|
@@ -46,11 +53,9 @@ El paquete anterior fue acumulado en enfoque P0, pero no era backlog exhaustivo 
 | Documentos | Soporte solo propone, no escribe entidad directa | P0 | Debe reflejarse en Academia/copy |
 | Bitácora | Documentar cambios v1.145 y archivos tocados | P1 | Pendiente v1.145 |
 
----
+## Regla de aceptación histórica que sigue vigente
 
-## Regla de aceptación
-
-No aceptar candidata Claude si queda cualquiera de estos textos visibles en módulos activos sin justificación interna:
+No aceptar candidata Claude si queda cualquiera de estos textos visibles en módulos activos sin justificación:
 
 ```txt
 Pago aplicado
@@ -68,15 +73,11 @@ LAB visible en UI cliente
 mock/demo visible en UI cliente
 ```
 
----
+## Regla Academia vigente
 
-## Regla Academia
+Academia debe sincronizarse entre `data/academia-plus.js`, `data/seed.js`, módulos, manuales y control maestro. No basta agregar una lección aislada si los cursos base conservan copy o reglas antiguas.
 
-Academia debe estar sincronizada en `data/academia-plus.js` y `data/seed.js`. No basta agregar lección nueva si cursos base conservan copy anterior.
-
----
-
-## Regla index
+## Regla index vigente
 
 Claude no debe entregar index que pierda:
 
@@ -88,8 +89,6 @@ core/backend-lab-security-guard.js
 modules/portal-v1142-copyfix.js
 ```
 
----
-
 ## Estado
 
-Matriz acumulada creada. Usar como checklist vivo para v1.145 y siguientes.
+Documento histórico preservado. Para continuidad, usar obligatoriamente el control maestro del 2026-07-09.
