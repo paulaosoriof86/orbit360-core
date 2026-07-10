@@ -10,9 +10,11 @@
   window.Orbit = window.Orbit || {};
 
   var CONCEPTS = [
-    'tasa', 'prima_minima', 'recargo_fraccionamiento', 'gasto_emision',
-    'impuesto', 'numero_cuotas', 'forma_pago', 'asistencia', 'catalogo',
-    'cobertura', 'limite', 'deducible', 'beneficio', 'exclusion',
+    'tasa', 'factor', 'rango', 'prima_minima', 'prima_neta', 'prima_total',
+    'recargo_fraccionamiento', 'gasto_emision', 'gasto_expedicion', 'iva',
+    'impuesto', 'numero_cuotas', 'cuota', 'plazo', 'forma_pago', 'visa_cuotas',
+    'asistencia', 'catalogo', 'tipo_vehiculo', 'uso_vehiculo', 'edad', 'sexo',
+    'maternidad', 'cobertura', 'limite', 'deducible', 'beneficio', 'exclusion',
     'condicion', 'regla_calculo', 'seccion_presentacion', 'otro'
   ];
   var STATUSES = [
@@ -285,6 +287,16 @@
       });
       audit.push({ proposalId: proposal.id, action: action === 'correct' ? 'corregir_propuesta' : 'confirmar_propuesta', motivo: reason, containsRawPayload: false });
     });
+    var groupedRecords = {};
+    records.forEach(function (record) {
+      groupedRecords[record.clave] = groupedRecords[record.clave] || [];
+      groupedRecords[record.clave].push(record);
+    });
+    Object.keys(groupedRecords).forEach(function (key) {
+      var values = unique(groupedRecords[key].map(function (record) { return JSON.stringify(sanitize(record.valor)); }));
+      if (values.length > 1) errors.push({ clave: key, code: 'CONFLICTO_NO_RESUELTO' });
+    });
+    if (errors.length) records = [];
     return {
       ok: errors.length === 0,
       records: records,
