@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 · P0.9f · Bootstrap seguro del runtime de conocimiento
+   Orbit 360 · P0.9f/P0.9g · Bootstrap seguro del runtime de conocimiento
    Fecha: 2026-07-10
 
    Carga contratos aditivos solo en Firestore LAB para A&S. No modifica
@@ -9,7 +9,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p09f-v1';
+  var VERSION = 'p09g-v1';
   var REQUIRED = [
     { src: 'core/document-source-contract-p04.js', global: 'documentSourceContractP04' },
     { src: 'core/cotizacion-esquema-aseguradora-p0.js', global: 'cotizacionEsquemaAseguradoraP0' },
@@ -25,6 +25,7 @@
     { src: 'core/tenant-binding-plan-p10c.js', global: 'tenantBindingPlanP10c' },
     { src: 'data/tenant-alianzas-soluciones-binding-plan-p10c.js', dataOnly: true },
     { src: 'data/tenant-alianzas-soluciones-first-source-p09f.js', dataOnly: true },
+    { src: 'data/tenant-alianzas-soluciones-source-batch-p09g.js', dataOnly: true },
     { src: 'core/document-provider-registry-p09.js', global: 'documentProviderRegistryP09' },
     { src: 'core/document-provider-bridge-p09b.js', global: 'documentProviderBridgeP09b' },
     { src: 'core/aseguradoras-knowledge-runtime-p09.js', global: 'aseguradorasKnowledgeRuntimeP09' },
@@ -32,6 +33,7 @@
     { src: 'core/aseguradoras-lab-persistence-p09e.js', global: 'aseguradorasLabPersistenceP09e' },
     { src: 'modules/aseguradoras-knowledge-p09.js', service: 'aseguradorasKnowledgeP09' },
     { src: 'core/aseguradoras-first-source-orchestrator-p09f.js', global: 'aseguradorasFirstSourceP09f' },
+    { src: 'core/aseguradoras-batch-orchestrator-p09g.js', global: 'aseguradorasBatchOrchestratorP09g' },
     { src: 'modules/aseguradoras-knowledge-panel-p09f.js', global: 'aseguradorasKnowledgePanelP09f' }
   ];
 
@@ -123,6 +125,7 @@
       securityGuardReady: !!(b.securityGuard && b.securityGuard.installed),
       baseSnapshotsReady: labStatus.snapshotAttached === true,
       knowledgeSnapshotsReady: !!(Orbit.aseguradorasLabCollectionsP09e && Orbit.aseguradorasLabCollectionsP09e.status().installed),
+      batchRuntimeReady: !!Orbit.aseguradorasBatchOrchestratorP09g,
       bridgeStatus: clone(state.bridge), enablesCotizador: false, enablesComparativo: false
     };
   }
