@@ -13,6 +13,7 @@ on:
       - 'orbit360-platform/core/importa-dryrun-p0.js'
       - 'orbit360-platform/core/importa-dryrun-p0-wire.js'
       - 'orbit360-platform/core/importa-directorio-aseguradoras-p0.js'
+      - 'orbit360-platform/core/importa-calendario-marketing-p0.js'
       - 'orbit360-platform/modules/importar-p0-dashboard.js'
       - 'orbit360-platform/modules/importar-p0-confirmacion.js'
       - 'tools/orbit360-p0-dryrun-manifest-20260709.mjs'
@@ -24,6 +25,7 @@ on:
       - 'tools/orbit360-test-importa-dryrun-p0.mjs'
       - 'tools/orbit360-test-importa-dryrun-p0-wire.mjs'
       - 'tools/orbit360-test-importa-directorio-aseguradoras-p0.mjs'
+      - 'tools/orbit360-test-importa-calendario-marketing-p0.mjs'
       - 'tools/orbit360-test-importar-p0-dashboard.mjs'
       - 'tools/orbit360-test-importar-p0-confirmacion.mjs'
       - 'tools/orbit360-test-p0-dryrun-manifest.mjs'
@@ -41,6 +43,7 @@ on:
       - 'orbit360-platform/core/importa-dryrun-p0.js'
       - 'orbit360-platform/core/importa-dryrun-p0-wire.js'
       - 'orbit360-platform/core/importa-directorio-aseguradoras-p0.js'
+      - 'orbit360-platform/core/importa-calendario-marketing-p0.js'
       - 'orbit360-platform/modules/importar-p0-dashboard.js'
       - 'orbit360-platform/modules/importar-p0-confirmacion.js'
       - 'tools/orbit360-p0-dryrun-manifest-20260709.mjs'
@@ -52,6 +55,7 @@ on:
       - 'tools/orbit360-test-importa-dryrun-p0.mjs'
       - 'tools/orbit360-test-importa-dryrun-p0-wire.mjs'
       - 'tools/orbit360-test-importa-directorio-aseguradoras-p0.mjs'
+      - 'tools/orbit360-test-importa-calendario-marketing-p0.mjs'
       - 'tools/orbit360-test-importar-p0-dashboard.mjs'
       - 'tools/orbit360-test-importar-p0-confirmacion.mjs'
       - 'tools/orbit360-test-p0-dryrun-manifest.mjs'
@@ -98,6 +102,9 @@ jobs:
       - name: Check insurer directory builder syntax
         run: node --check orbit360-platform/core/importa-directorio-aseguradoras-p0.js
 
+      - name: Check marketing calendar builder syntax
+        run: node --check orbit360-platform/core/importa-calendario-marketing-p0.js
+
       - name: Check dashboard syntax
         run: node --check orbit360-platform/modules/importar-p0-dashboard.js
 
@@ -131,6 +138,9 @@ jobs:
       - name: Check insurer directory smoke syntax
         run: node --check tools/orbit360-test-importa-directorio-aseguradoras-p0.mjs
 
+      - name: Check marketing calendar smoke syntax
+        run: node --check tools/orbit360-test-importa-calendario-marketing-p0.mjs
+
       - name: Check dashboard smoke syntax
         run: node --check tools/orbit360-test-importar-p0-dashboard.mjs
 
@@ -163,6 +173,9 @@ jobs:
 
       - name: Run insurer directory smoke
         run: node tools/orbit360-test-importa-directorio-aseguradoras-p0.mjs
+
+      - name: Run marketing calendar smoke
+        run: node tools/orbit360-test-importa-calendario-marketing-p0.mjs
 
       - name: Run dashboard smoke
         run: node tools/orbit360-test-importar-p0-dashboard.mjs
