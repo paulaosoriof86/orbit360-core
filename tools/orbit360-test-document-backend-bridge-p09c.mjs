@@ -27,5 +27,9 @@ const result = await bridge.execute('excel_manifest', { tenantId: 'tenant-a', as
 assert(result.documentId === 'doc-a' && result.runnerExecution.code === 'EXCEL_MANIFEST_READY_FOR_REVIEW', 'bridge debe devolver manifiesto directo al registry');
 const unresolved = createDocumentBackendBridgeP09c({ allowedRoots: [allowed], toolsRoot: tools, resolveSource: async () => null });
 assert((await unresolved.execute('excel_manifest', { tenantId: 't', aseguradoraId: 'i', documentId: 'd', fileRef: 'drive://none' })).code === 'SOURCE_REFERENCE_NOT_RESOLVED', 'referencia no resuelta debe bloquear');
+const rejected = createDocumentBackendBridgeP09c({ allowedRoots: [allowed], toolsRoot: tools, resolveSource: async () => ({ ok:false, code:'REFERENCE_TENANT_MISMATCH', errors:['REFERENCE_TENANT_MISMATCH'] }) });
+let propagated = '';
+try { await rejected.execute('excel_manifest', { tenantId:'t', aseguradoraId:'i', documentId:'d', fileRef:'drive://cross' }); } catch (error) { propagated = error.code; }
+assert(propagated === 'REFERENCE_TENANT_MISMATCH', 'bridge debe conservar código exacto del resolver');
 fs.rmSync(temp, { recursive: true, force: true });
 console.log('OK orbit360-test-document-backend-bridge-p09c');
