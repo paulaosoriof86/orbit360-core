@@ -80,7 +80,7 @@ jobs:
             echo 'Direct write, network, or local storage detected'
             exit 1
           fi
-          if grep -RniE '(apiKey|clientSecret|privateKey|signedUrl)[[:space:]]*[:=][[:space:]]*["'"'][^"'"']+["'"']' \
+          if grep -RniE "(apiKey|clientSecret|privateKey|signedUrl)[[:space:]]*[:=][[:space:]]*['\"][^'\"]+['\"]" \
             orbit360-platform/core/aseguradoras-batch-orchestrator-p09g.js \
             orbit360-platform/data/tenant-alianzas-soluciones-source-batch-p09g.js; then
             echo 'Assigned secret or signed URL value detected'
