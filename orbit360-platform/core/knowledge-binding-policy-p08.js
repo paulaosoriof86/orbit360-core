@@ -11,6 +11,10 @@
   window.Orbit = window.Orbit || {};
 
   var DEFAULT_ALLOWED = { GT: ['GTQ'], CO: ['COP'] };
+  var baseGate = Orbit.knowledgeBindingGateP08 || null;
+  var baseEvaluate = baseGate && baseGate.evaluateBinding;
+  var baseEnablementPlan = baseGate && baseGate.buildEnablementPlan;
+  var baseRuntimePackage = baseGate && baseGate.buildRuntimePackage;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function upper(value) { return clean(value).toUpperCase(); }
@@ -59,11 +63,10 @@
   }
 
   function strictEvaluate(binding, target, config) {
-    var base = Orbit.knowledgeBindingGateP08;
-    if (!base || typeof base.evaluateBinding !== 'function') {
+    if (!baseGate || typeof baseEvaluate !== 'function') {
       return { ready: false, target: target, errors: ['KNOWLEDGE_BINDING_GATE_P08_REQUIRED'], warnings: [], writeAllowed: false };
     }
-    var result = clone(base.evaluateBinding(binding, target, config)) || {};
+    var result = clone(baseEvaluate.call(baseGate, binding, target, config)) || {};
     var policy = validateCountryCurrency(binding, config);
     result.errors = unique([].concat(result.errors || [], policy.errors));
     result.ready = result.errors.length === 0;
@@ -79,12 +82,11 @@
   }
 
   function strictEnablementPlan(binding, decision, actor, config) {
-    var base = Orbit.knowledgeBindingGateP08;
-    if (!base || typeof base.buildEnablementPlan !== 'function') {
+    if (!baseGate || typeof baseEnablementPlan !== 'function') {
       return { ok: false, plan: null, errors: ['KNOWLEDGE_BINDING_GATE_P08_REQUIRED'], writeAllowed: false };
     }
     var evaluation = strictEvaluate(binding, clean(decision && decision.target), config);
-    var result = clone(base.buildEnablementPlan(binding, decision, actor, config)) || {};
+    var result = clone(baseEnablementPlan.call(baseGate, binding, decision, actor, config)) || {};
     if (!evaluation.ready) {
       result.ok = false;
       result.plan = null;
@@ -96,17 +98,24 @@
     return result;
   }
 
+  function strictRuntimePackage(bindings, plans) {
+    return typeof baseRuntimePackage === 'function'
+      ? baseRuntimePackage.call(baseGate, bindings, plans)
+      : { ok: false, records: [], errors: ['KNOWLEDGE_BINDING_GATE_P08_REQUIRED'], writeAllowed: false };
+  }
+
   Orbit.knowledgeBindingPolicyP08 = {
     DEFAULT_ALLOWED: clone(DEFAULT_ALLOWED),
     configuredCurrencies: configuredCurrencies,
     validateCountryCurrency: validateCountryCurrency,
     evaluateBinding: strictEvaluate,
     buildEnablementPlan: strictEnablementPlan,
-    buildRuntimePackage: function (bindings, plans) {
-      var base = Orbit.knowledgeBindingGateP08;
-      return base && typeof base.buildRuntimePackage === 'function'
-        ? base.buildRuntimePackage(bindings, plans)
-        : { ok: false, records: [], errors: ['KNOWLEDGE_BINDING_GATE_P08_REQUIRED'], writeAllowed: false };
-    }
+    buildRuntimePackage: strictRuntimePackage,
+    authoritative: true
   };
+
+  if (baseGate) {
+    baseGate.evaluateBinding = strictEvaluate;
+    baseGate.buildEnablementPlan = strictEnablementPlan;
+  }
 })();
