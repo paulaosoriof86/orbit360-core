@@ -18,7 +18,7 @@ function Add-Report([string]$Text) { Add-Content -Path $Report -Value $Text -Enc
 
 New-Item -ItemType Directory -Force -Path $Reports | Out-Null
 Set-Content -Path $Report -Value "============================================================" -Encoding UTF8
-Add-Report "ORBIT 360 - INICIAR ASEGURADORAS LAB P0.9L"
+Add-Report "ORBIT 360 - INICIAR ASEGURADORAS LAB P0.9L/P0.9N"
 Add-Report "Fecha local: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 Add-Report "Rama obligatoria: $ExpectedBranch"
 Add-Report "Restricciones: loopback, sin deploy, sin commit, sin push, sin produccion, sin rutas en UI, sin habilitar Cotizador/Comparativo"
@@ -37,7 +37,7 @@ try {
   $App = Join-Path $Repo "orbit360-platform"
   $Catalog = Join-Path $App "data\tenant-alianzas-soluciones-source-catalog-p09k.json"
   $Config = Join-Path $App "core\auth-firebase.config.local.js"
-  foreach ($Path in @($HostTool, $App, $Catalog)) { if (-not (Test-Path $Path)) { throw "Falta un componente P0.9L requerido." } }
+  foreach ($Path in @($HostTool, $App, $Catalog)) { if (-not (Test-Path $Path)) { throw "Falta un componente P0.9L/P0.9N requerido." } }
   if (-not (Test-Path $Config)) { throw "Falta la configuración Firebase LAB local ignorada por Git." }
 
   if (-not $SourceRoot) {
@@ -71,6 +71,7 @@ try {
     "--app", $App,
     "--catalog", $Catalog,
     "--root", $SourceRoot,
+    "--report-dir", $Reports,
     "--port", $Port,
     "--ready-file", $ReadyFile
   )
@@ -94,17 +95,19 @@ try {
   Add-Report "PID: $($Process.Id)"
   Add-Report "Fuentes localizadas: $($Ready.discovery.records)"
   Add-Report "Fuentes pendientes: $($Ready.discovery.issues)"
-  Add-Report "La URL de sesión y las rutas permanecen en archivos privados ignorados por Git."
+  Add-Report "Observador P0.9N: activo; guardará solo estructura, estados y conteos sanitizados."
+  Add-Report "La URL de sesión, rutas y referencias permanecen en archivos privados ignorados por Git."
   Add-Report "Se abrirá Aseguradoras en el navegador."
   Start-Process $Ready.bootstrapUrl
 
   Add-Report ""
-  Add-Report "RESULTADO: HOST_P09L_INICIADO"
+  Add-Report "RESULTADO: HOST_P09L_P09N_INICIADO"
   Add-Report "El formulario debe mostrar disponibilidad de archivos y permitir preview/dry-run sin persistir conocimiento."
+  Add-Report "Los reportes P09N se guardarán en la carpeta privada de reportes."
   Add-Report "Cotizador y Comparativo permanecen deshabilitados."
 } catch {
   Add-Report "ERROR: $($_.Exception.Message)"
-  Add-Report "RESULTADO: HOST_P09L_BLOQUEADO"
+  Add-Report "RESULTADO: HOST_P09L_P09N_BLOQUEADO"
 } finally {
   Add-Report ""
   Add-Report "Reporte privado: $Report"
