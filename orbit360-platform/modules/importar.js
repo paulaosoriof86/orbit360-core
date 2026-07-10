@@ -85,6 +85,14 @@ Orbit.modules.importar = (function () {
     });
   }
 
+  function loadP0DirectorioAseguradoras() {
+    if (Orbit.importaDirectorioAseguradorasP0 || Orbit.__importaDirectorioAseguradorasP0Loader) return;
+    Orbit.__importaDirectorioAseguradorasP0Loader = true;
+    loadP0DryRunBuilder(function () {
+      if (!Orbit.importaDirectorioAseguradorasP0) addScript('core/importa-directorio-aseguradoras-p0.js?v=20260709');
+    });
+  }
+
   function loadP0Dashboard(onload) {
     if (Orbit.importarP0Dashboard) { if (onload) onload(); return; }
     if (Orbit.__importarP0DashboardLoader) return;
@@ -107,6 +115,7 @@ Orbit.modules.importar = (function () {
     loadP0WriteContract();
     loadP0DryRunBuilder();
     loadP0DryRunWire();
+    loadP0DirectorioAseguradoras();
   }
   loadP0Rules();
   loadP0Dashboard();
