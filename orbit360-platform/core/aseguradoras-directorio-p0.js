@@ -5,22 +5,20 @@
    Contrato reusable y multi-tenant para:
    - acceso por rol a credenciales y cuentas bancarias;
    - ocultamiento/revelado bajo demanda con auditoria;
-   - planes, tarifas y documentos de entrenamiento;
+   - PDF/Excel como unica fuente de planes, tarifas y conocimiento;
+   - extraccion propuesta + validacion humana + versionado;
    - cero datos reales hardcodeados.
    ============================================================ */
 (function () {
   window.Orbit = window.Orbit || {};
 
   const ROLES_SENSIBLES = ['superadmin', 'admin', 'admintenant', 'direccion', 'operativo'];
+  const FORMATOS_DOCUMENTALES = ['pdf', 'xls', 'xlsx', 'csv', 'png', 'jpg', 'jpeg'];
 
   function norm(value) {
     return String(value == null ? '' : value)
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9 ]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
+      .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
   function rolesOf(user) {
@@ -42,112 +40,137 @@
   function maskSecret(value) {
     const s = String(value == null ? '' : value);
     if (!s) return '';
-    if (s.length <= 4) return '••••';
-    return s.slice(0, 2) + '••••••' + s.slice(-2);
+    return s.length <= 4 ? '••••' : s.slice(0, 2) + '••••••' + s.slice(-2);
   }
 
   function maskAccount(value) {
     const s = String(value == null ? '' : value).replace(/\s+/g, '');
     if (!s) return '';
-    if (s.length <= 4) return '••••';
-    return '•••• ' + s.slice(-4);
+    return s.length <= 4 ? '••••' : '•••• ' + s.slice(-4);
   }
 
   function sensitiveView(value, user, revealed, kind) {
     if (!canViewSensitive(user)) return { visible: false, value: '', label: 'Acceso restringido' };
     if (revealed) return { visible: true, value: String(value || ''), label: 'Visible' };
-    return {
-      visible: true,
-      value: kind === 'account' ? maskAccount(value) : maskSecret(value),
-      label: 'Oculto · mostrar bajo demanda'
-    };
+    return { visible: true, value: kind === 'account' ? maskAccount(value) : maskSecret(value), label: 'Oculto · mostrar bajo demanda' };
   }
 
   function auditEvent(input) {
     return {
-      id: 'aud_asg_' + Date.now().toString(36),
-      tipo: 'consulta_dato_sensible',
-      modulo: 'aseguradoras',
-      aseguradoraId: input && input.aseguradoraId || '',
-      campo: input && input.campo || '',
-      accion: input && input.accion || 'visualizar',
-      motivo: input && input.motivo || 'Acceso operativo a directorio',
-      usuarioId: input && input.usuarioId || '',
-      fecha: new Date().toISOString(),
+      id: 'aud_asg_' + Date.now().toString(36), tipo: 'consulta_dato_sensible', modulo: 'aseguradoras',
+      aseguradoraId: input && input.aseguradoraId || '', campo: input && input.campo || '',
+      accion: input && input.accion || 'visualizar', motivo: input && input.motivo || 'Acceso operativo a directorio',
+      usuarioId: input && input.usuarioId || '', fecha: new Date().toISOString(),
       resultado: input && input.resultado || 'permitido'
     };
   }
 
+  function fileExtension(name) {
+    const p = String(name || '').toLowerCase().split('.');
+    return p.length > 1 ? p.pop() : '';
+  }
+
+  function documentKind(doc) {
+    const tipo = norm(doc && (doc.tipo || doc.categoria || doc.cat || doc.nombre));
+    if (tipo.includes('tarifa') || tipo.includes('tarifario')) return 'tarifario';
+    if (tipo.includes('cotizacion')) return 'cotizacion_ejemplo';
+    if (tipo.includes('poliza')) return 'poliza_ejemplo';
+    if (tipo.includes('condicion')) return 'condiciones';
+    if (tipo.includes('circular')) return 'circular';
+    return 'otro';
+  }
+
   function normalizeDocument(doc) {
-    const tipo = norm(doc && (doc.tipo || doc.categoria || doc.cat));
-    let category = 'otro';
-    if (tipo.includes('tarifa')) category = 'tarifa';
-    else if (tipo.includes('cotizacion')) category = 'cotizacion_ejemplo';
-    else if (tipo.includes('poliza')) category = 'poliza_ejemplo';
-    else if (tipo.includes('condicion')) category = 'condiciones';
-    else if (tipo.includes('formulario')) category = 'formulario';
     return {
       id: doc && doc.id || 'doc_asg_' + Date.now().toString(36),
+      aseguradoraId: String(doc && doc.aseguradoraId || ''),
       nombre: String(doc && doc.nombre || ''),
-      categoria: category,
+      extension: fileExtension(doc && doc.nombre),
+      categoria: documentKind(doc),
       archivoRef: doc && (doc.archivoRef || doc.storageRef || doc.documentRef) || '',
-      pais: String(doc && doc.pais || ''),
-      moneda: String(doc && doc.moneda || ''),
-      ramo: String(doc && doc.ramo || ''),
-      producto: String(doc && doc.producto || ''),
-      plan: String(doc && doc.plan || ''),
-      vigenciaDesde: String(doc && doc.vigenciaDesde || ''),
-      vigenciaHasta: String(doc && doc.vigenciaHasta || ''),
+      archivoHash: String(doc && doc.archivoHash || ''),
+      pais: String(doc && doc.pais || ''), moneda: String(doc && doc.moneda || ''),
+      ramo: String(doc && doc.ramo || ''), producto: String(doc && doc.producto || ''),
+      version: Number(doc && doc.version || 1),
       estadoLectura: doc && doc.estadoLectura || 'pendiente_lectura',
       estadoValidacion: doc && doc.estadoValidacion || 'requiere_validacion',
-      fuente: doc && doc.fuente || 'aseguradora',
-      trazabilidad: doc && doc.trazabilidad || {}
+      usoDestino: Array.isArray(doc && doc.usoDestino) ? doc.usoDestino : [],
+      fuente: doc && doc.fuente || 'aseguradora', trazabilidad: doc && doc.trazabilidad || {}
     };
   }
 
-  function normalizePlan(plan) {
-    return {
-      id: plan && plan.id || 'plan_asg_' + Date.now().toString(36),
-      ramo: String(plan && plan.ramo || ''),
-      producto: String(plan && plan.producto || ''),
-      nombre: String(plan && (plan.nombre || plan.plan) || ''),
-      pais: String(plan && plan.pais || ''),
-      moneda: String(plan && plan.moneda || ''),
-      coberturas: Array.isArray(plan && plan.coberturas) ? plan.coberturas : [],
-      deducibles: Array.isArray(plan && plan.deducibles) ? plan.deducibles : [],
-      condiciones: Array.isArray(plan && plan.condiciones) ? plan.condiciones : [],
-      exclusiones: Array.isArray(plan && plan.exclusiones) ? plan.exclusiones : [],
-      tarifa: plan && plan.tarifa != null ? plan.tarifa : null,
-      primaReferencia: plan && plan.primaReferencia != null ? plan.primaReferencia : null,
-      vigenciaDesde: String(plan && plan.vigenciaDesde || ''),
-      vigenciaHasta: String(plan && plan.vigenciaHasta || ''),
-      fuenteDocumentoId: String(plan && plan.fuenteDocumentoId || ''),
-      estadoValidacion: plan && plan.estadoValidacion || 'requiere_validacion',
-      activo: plan && plan.activo !== false
-    };
-  }
-
-  function validatePlan(plan) {
+  function validateDocument(doc) {
     const errors = [];
-    if (!plan.ramo) errors.push('ramo');
-    if (!plan.producto) errors.push('producto');
-    if (!plan.nombre) errors.push('plan');
-    if (!plan.pais) errors.push('pais');
-    if (!plan.moneda) errors.push('moneda');
-    if (!plan.fuenteDocumentoId) errors.push('fuente_documento');
+    if (!doc.aseguradoraId) errors.push('aseguradora');
+    if (!doc.nombre) errors.push('nombre_archivo');
+    if (!doc.archivoRef) errors.push('archivo_ref');
+    if (!FORMATOS_DOCUMENTALES.includes(doc.extension)) errors.push('formato_no_soportado');
+    if (!doc.pais) errors.push('pais');
     return { valid: errors.length === 0, errors: errors };
   }
 
+  function extractionTarget(doc) {
+    if (doc.categoria === 'tarifario') return ['cotizador'];
+    if (doc.categoria === 'cotizacion_ejemplo' || doc.categoria === 'poliza_ejemplo') return ['comparativo', 'conocimiento_aseguradora'];
+    if (doc.categoria === 'condiciones' || doc.categoria === 'circular') return ['comparativo', 'conocimiento_aseguradora'];
+    return ['conocimiento_aseguradora'];
+  }
+
+  function normalizeExtractedProposal(input) {
+    return {
+      id: input && input.id || 'prop_asg_' + Date.now().toString(36),
+      aseguradoraId: String(input && input.aseguradoraId || ''),
+      sourceDocumentId: String(input && input.sourceDocumentId || ''),
+      sourceDocumentVersion: Number(input && input.sourceDocumentVersion || 1),
+      sourceLocation: input && input.sourceLocation || {},
+      destino: input && input.destino || '',
+      pais: String(input && input.pais || ''), moneda: String(input && input.moneda || ''),
+      ramo: String(input && input.ramo || ''), producto: String(input && input.producto || ''),
+      nombrePlan: String(input && input.nombrePlan || ''),
+      tipoCalculo: String(input && input.tipoCalculo || ''),
+      reglasTarifa: input && input.reglasTarifa || {},
+      coberturas: Array.isArray(input && input.coberturas) ? input.coberturas : [],
+      deducibles: Array.isArray(input && input.deducibles) ? input.deducibles : [],
+      condiciones: Array.isArray(input && input.condiciones) ? input.condiciones : [],
+      exclusiones: Array.isArray(input && input.exclusiones) ? input.exclusiones : [],
+      formasPago: Array.isArray(input && input.formasPago) ? input.formasPago : [],
+      instruccionesExtraccion: String(input && input.instruccionesExtraccion || ''),
+      formatoCotizacion: String(input && input.formatoCotizacion || ''),
+      estado: input && input.estado || 'propuesta_pendiente_validacion',
+      editableManual: false,
+      createdAt: input && input.createdAt || new Date().toISOString()
+    };
+  }
+
+  function validateExtractedProposal(proposal) {
+    const errors = [];
+    if (!proposal.aseguradoraId) errors.push('aseguradora');
+    if (!proposal.sourceDocumentId) errors.push('fuente_documento');
+    if (!proposal.destino) errors.push('destino');
+    if (!proposal.pais) errors.push('pais');
+    if (proposal.destino === 'cotizador' && !proposal.moneda) errors.push('moneda');
+    if (proposal.destino === 'cotizador' && !proposal.producto) errors.push('producto');
+    if (proposal.destino === 'cotizador' && !proposal.tipoCalculo) errors.push('tipo_calculo');
+    return { valid: errors.length === 0, errors: errors };
+  }
+
+  function activateProposal(proposal, approval) {
+    const check = validateExtractedProposal(proposal);
+    if (!check.valid) return { activated: false, errors: check.errors, record: proposal };
+    if (!approval || approval.confirmed !== true || !approval.userId) {
+      return { activated: false, errors: ['validacion_humana'], record: proposal };
+    }
+    return {
+      activated: true, errors: [],
+      record: Object.assign({}, proposal, {
+        estado: 'validado_habilitado', validatedAt: new Date().toISOString(), validatedBy: approval.userId
+      })
+    };
+  }
+
   window.Orbit.aseguradorasDirectorioP0 = {
-    ROLES_SENSIBLES: ROLES_SENSIBLES,
-    rolesOf: rolesOf,
-    canViewSensitive: canViewSensitive,
-    maskSecret: maskSecret,
-    maskAccount: maskAccount,
-    sensitiveView: sensitiveView,
-    auditEvent: auditEvent,
-    normalizeDocument: normalizeDocument,
-    normalizePlan: normalizePlan,
-    validatePlan: validatePlan
+    ROLES_SENSIBLES, FORMATOS_DOCUMENTALES, rolesOf, canViewSensitive, maskSecret, maskAccount,
+    sensitiveView, auditEvent, fileExtension, documentKind, normalizeDocument, validateDocument,
+    extractionTarget, normalizeExtractedProposal, validateExtractedProposal, activateProposal
   };
 })();
