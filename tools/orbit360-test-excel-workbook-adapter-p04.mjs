@@ -36,10 +36,12 @@ function assert(condition, message) { if (!condition) throw new Error(message); 
 
 const sanitized = contract.sanitize({
   fileBytes: 'NO', base64: 'NO', password: 'NO', token: 'NO',
+  credentialRef: 'backend_required',
   labels: ['cliente@example.com', '+502 5555 1234', 'Prima neta']
 }, { redactSamples: true });
 assert(!('fileBytes' in sanitized) && !('base64' in sanitized), 'Debe eliminar bytes/base64');
 assert(!('password' in sanitized) && !('token' in sanitized), 'Debe eliminar secretos');
+assert(sanitized.credentialRef === 'backend_required', 'Debe conservar referencias seguras sin conservar valores');
 assert(sanitized.labels[0] === '[correo_oculto]' && sanitized.labels[1] === '[numero_oculto]', 'Debe sanear muestras personales');
 
 const envelope = contract.createEnvelope({
@@ -54,7 +56,7 @@ const fullWorkbook = {
   format: 'xlsm',
   workbookFingerprint: 'wb-full-v1',
   hasMacros: true,
-  externalLinks: ['[TarifasExternas.xlsx]Tasas'],
+  externalLinks: ['C:/Usuarios/Paula/TarifasExternas.xlsx'],
   connectionCount: 1,
   definedNames: [
     { name: 'TasaBase', refersTo: '=Tarifas!$B$2' },
@@ -106,13 +108,16 @@ assert(fullDryRun.capabilities.containsRatesProposal, 'Debe detectar tarifas pro
 assert(fullDryRun.capabilities.containsCalculationRulesProposal, 'Debe detectar reglas propuestas');
 assert(fullDryRun.capabilities.containsPresentationProposal, 'Debe detectar presentación e impresión');
 assert(fullDryRun.presentationProposal.outputSheets.some(sheet => sheet.sheet === 'Cotización'), 'Debe conservar hoja de salida');
-assert(fullDryRun.presentationProposal.outputSheets[0].print.areas.length >= 1, 'Debe conservar área de impresión');
+assert(fullDryRun.presentationProposal.outputSheets.find(sheet => sheet.sheet === 'Cotización').print.areas.length >= 1, 'Debe conservar área de impresión');
 assert(fullDryRun.sourceProposal.normalizedBySchemaP0 === true, 'Debe integrarse con esquema P0 existente');
+assert(fullDryRun.sourceProposal.ramo === 'Automóviles' && fullDryRun.sourceProposal.producto === 'Autos', 'Debe conservar dimensiones también en nivel superior para el esquema P0');
 assert(fullDryRun.warnings.includes('MACROS_DETECTADAS_NO_EJECUTADAS'), 'Debe advertir macros sin ejecutarlas');
 assert(fullDryRun.warnings.includes('VINCULOS_EXTERNOS_REQUIEREN_VALIDACION'), 'Debe advertir vínculos externos');
+assert(fullDryRun.warnings.includes('FUNCIONES_VOLATILES_REQUIEREN_PRUEBA'), 'Debe advertir funciones volátiles');
 assert(fullDryRun.workbook.macrosExecuted === false && fullDryRun.workbook.formulasExecuted === false, 'Nunca debe ejecutar macros/fórmulas');
-assert(fullDryRun.workbook.worksheets[0].labels.includes('[correo_oculto]'), 'Debe sanear correo en etiquetas de muestra');
-assert(fullDryRun.workbook.worksheets[0].labels.includes('[numero_oculto]'), 'Debe sanear teléfono en etiquetas de muestra');
+assert(fullDryRun.workbook.externalLinks[0] === 'TarifasExternas.xlsx', 'Debe omitir ruta local y conservar solo nombre externo');
+assert(fullDryRun.workbook.worksheets[0].labels.some(label => label.includes('[correo_oculto]')), 'Debe sanear correo en etiquetas de muestra');
+assert(fullDryRun.workbook.worksheets[0].labels.some(label => label.includes('[numero_oculto]')), 'Debe sanear teléfono en etiquetas de muestra');
 
 const ratesOnly = adapter.buildDryRun({
   tenantId: 'tenant-demo', aseguradoraId: 'asg-rates', pais: 'GT',
@@ -189,11 +194,13 @@ const providerResult = await adapter.inspectWithProvider({
   }
 });
 assert(providerResult.ok, 'Proveedor seguro debe producir dry-run');
-assert(providerRequest.executeMacros === false && providerRequest.calculateFormulas === false && providerRequest.includeCellValues === false, 'Proveedor debe recibir límites de seguridad');
+assert(providerRequest.executeMacros === false && providerRequest.calculateFormulas === false && providerRequest.includeCellValues === false && providerRequest.includeBinaryPayload === false, 'Proveedor debe recibir límites de seguridad');
 
 const serialized = JSON.stringify(fullDryRun);
 assert(!serialized.includes('cliente@example.com'), 'Dry-run no debe filtrar correo de muestra');
 assert(!serialized.includes('+502 5555 1234'), 'Dry-run no debe filtrar teléfono de muestra');
-assert(!serialized.includes('fileBytes') && !serialized.includes('base64'), 'Dry-run no debe contener payload binario');
+assert(!serialized.includes('C:/Usuarios/Paula'), 'Dry-run no debe filtrar rutas locales');
+assert(!serialized.includes('fileBytes') && !serialized.includes('NO'), 'Dry-run no debe contener payload de prueba');
+assert(fullDryRun.envelope.file.containsBase64 === false, 'Debe declarar ausencia de base64');
 
 console.log('OK orbit360-test-excel-workbook-adapter-p04');
