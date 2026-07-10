@@ -1,0 +1,83 @@
+name: Orbit 360 PDF Quote Adapter P07 Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/document-source-contract-p04.js'
+      - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'orbit360-platform/core/pdf-quote-adapter-p07.js'
+      - 'tools/orbit360-test-pdf-quote-adapter-p07.mjs'
+      - '.github/workflows/orbit360-pdf-quote-adapter-p07-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/document-source-contract-p04.js'
+      - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'orbit360-platform/core/pdf-quote-adapter-p07.js'
+      - 'tools/orbit360-test-pdf-quote-adapter-p07.mjs'
+      - '.github/workflows/orbit360-pdf-quote-adapter-p07-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  pdf-quote-adapter-p07:
+    name: Adapter reusable de cotizaciones PDF P0.7
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/pdf-quote-adapter-p07.js
+          node --check tools/orbit360-test-pdf-quote-adapter-p07.mjs
+
+      - name: Run synthetic PDF quote smoke
+        run: node tools/orbit360-test-pdf-quote-adapter-p07.mjs
+
+      - name: Guard no writes, network, hardcoded insurers or real PII
+        run: |
+          if grep -RniE '(Orbit\.store\.(insert|update|remove|setPref)|localStorage|sessionStorage|fetch\(|XMLHttpRequest|eval\(|new Function)' \
+            orbit360-platform/core/pdf-quote-adapter-p07.js; then
+            echo 'Direct write, network, local storage, or executable path detected'
+            exit 1
+          fi
+          if grep -RniE '(Aseguradora Guatemalteca|Aseguate|Seguros Universales|Universales|BAM|Banrural|Bantrab|Columna)' \
+            orbit360-platform/core/pdf-quote-adapter-p07.js \
+            tools/orbit360-test-pdf-quote-adapter-p07.mjs; then
+            echo 'Tenant/insurer-specific names detected in reusable adapter or smoke'
+            exit 1
+          fi
+          if grep -RniE '([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|[0-9]{8,})' \
+            tools/orbit360-test-pdf-quote-adapter-p07.mjs; then
+            echo 'Potential real PII detected in smoke'
+            exit 1
+          fi
+
+      - name: Guard layout fidelity, redaction and enablement gates
+        run: |
+          grep -q 'preserveOriginalOrder: true' orbit360-platform/core/pdf-quote-adapter-p07.js
+          grep -q 'preserveOriginalLabels: true' orbit360-platform/core/pdf-quote-adapter-p07.js
+          grep -q 'preserveTablesAndIconGroups: true' orbit360-platform/core/pdf-quote-adapter-p07.js
+          grep -q 'includeSensitiveValues: purpose ===' orbit360-platform/core/pdf-quote-adapter-p07.js
+          grep -q 'enabledCotizador: false' orbit360-platform/core/pdf-quote-adapter-p07.js
+          grep -q 'enabledComparativo: false' orbit360-platform/core/pdf-quote-adapter-p07.js
+          grep -q 'requiresSecondGateForEnablement: true' orbit360-platform/core/pdf-quote-adapter-p07.js
+          grep -q 'mergeProfiles: false' orbit360-platform/core/pdf-quote-adapter-p07.js
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
