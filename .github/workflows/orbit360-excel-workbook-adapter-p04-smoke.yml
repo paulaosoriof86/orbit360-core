@@ -8,6 +8,8 @@ on:
       - 'orbit360-platform/core/document-source-contract-p04.js'
       - 'orbit360-platform/core/excel-workbook-adapter-p04.js'
       - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'tools/orbit360-inspect-excel-p04.py'
+      - 'tools/orbit360-test-inspect-excel-p04.py'
       - 'tools/orbit360-test-excel-workbook-adapter-p04.mjs'
       - 'tools/orbit360-test-excel-workbook-adapter-p04-schema.mjs'
       - '.github/workflows/orbit360-excel-workbook-adapter-p04-smoke.yml'
@@ -18,6 +20,8 @@ on:
       - 'orbit360-platform/core/document-source-contract-p04.js'
       - 'orbit360-platform/core/excel-workbook-adapter-p04.js'
       - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'tools/orbit360-inspect-excel-p04.py'
+      - 'tools/orbit360-test-inspect-excel-p04.py'
       - 'tools/orbit360-test-excel-workbook-adapter-p04.mjs'
       - 'tools/orbit360-test-excel-workbook-adapter-p04-schema.mjs'
       - '.github/workflows/orbit360-excel-workbook-adapter-p04-smoke.yml'
@@ -38,12 +42,22 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Check syntax
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check JavaScript syntax
         run: |
           node --check orbit360-platform/core/document-source-contract-p04.js
           node --check orbit360-platform/core/excel-workbook-adapter-p04.js
           node --check tools/orbit360-test-excel-workbook-adapter-p04.mjs
           node --check tools/orbit360-test-excel-workbook-adapter-p04-schema.mjs
+
+      - name: Check Python syntax
+        run: |
+          python -m py_compile tools/orbit360-inspect-excel-p04.py
+          python -m py_compile tools/orbit360-test-inspect-excel-p04.py
 
       - name: Run isolated adapter smoke
         run: node tools/orbit360-test-excel-workbook-adapter-p04.mjs
@@ -51,7 +65,10 @@ jobs:
       - name: Run real schema compatibility smoke
         run: node tools/orbit360-test-excel-workbook-adapter-p04-schema.mjs
 
-      - name: Guard no direct parser or storage writes
+      - name: Run safe OOXML inspector smoke
+        run: python tools/orbit360-test-inspect-excel-p04.py
+
+      - name: Guard no direct parser or storage writes in browser core
         run: |
           if grep -RniE '(XLSX\.read|ExcelJS|SheetJS|localStorage|sessionStorage|Orbit\.store\.(insert|update|remove)|eval\(|new Function|XMLHttpRequest|fetch\()' \
             orbit360-platform/core/document-source-contract-p04.js \
@@ -60,12 +77,28 @@ jobs:
             exit 1
           fi
 
-      - name: Guard macros and formulas remain disabled
+      - name: Guard inspector isolation
+        run: |
+          if grep -niE '(subprocess|os\.system|eval\(|exec\(|win32com|xlwings|libreoffice|requests|urllib\.request|http\.client|socket\.)' \
+            tools/orbit360-inspect-excel-p04.py; then
+            echo 'Executable, desktop automation, or network path detected in inspector'
+            exit 1
+          fi
+          if grep -niE '(openpyxl|pandas|polars|sheetjs|exceljs)' tools/orbit360-inspect-excel-p04.py; then
+            echo 'Unexpected third-party parser dependency detected'
+            exit 1
+          fi
+
+      - name: Guard macros formulas and values remain disabled
         run: |
           grep -q 'executeMacros: false' orbit360-platform/core/excel-workbook-adapter-p04.js
           grep -q 'calculateFormulas: false' orbit360-platform/core/excel-workbook-adapter-p04.js
           grep -q 'includeCellValues: false' orbit360-platform/core/excel-workbook-adapter-p04.js
           grep -q 'includeBinaryPayload: false' orbit360-platform/core/excel-workbook-adapter-p04.js
+          grep -q '"macrosExecuted": False' tools/orbit360-inspect-excel-p04.py
+          grep -q '"formulasExecuted": False' tools/orbit360-inspect-excel-p04.py
+          grep -q '"containsCellValues": False' tools/orbit360-inspect-excel-p04.py
+          grep -q '"containsBinaryPayload": False' tools/orbit360-inspect-excel-p04.py
 
       - name: Run backend LAB validator if available
         run: |
