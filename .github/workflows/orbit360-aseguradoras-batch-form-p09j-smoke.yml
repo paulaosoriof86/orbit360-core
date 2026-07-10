@@ -1,0 +1,107 @@
+name: Orbit 360 Aseguradoras Batch Form P09j
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/aseguradoras-source-reference-broker-p09j.js'
+      - 'orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js'
+      - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
+      - 'tools/orbit360-test-aseguradoras-source-reference-broker-p09j.mjs'
+      - 'tools/orbit360-test-aseguradoras-batch-admin-form-p09j.mjs'
+      - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
+      - 'tools/orbit360-test-aseguradoras-batch-admin-actions-p09i.mjs'
+      - '.github/workflows/orbit360-aseguradoras-batch-form-p09j-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/aseguradoras-source-reference-broker-p09j.js'
+      - 'orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js'
+      - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
+      - 'tools/orbit360-test-aseguradoras-source-reference-broker-p09j.mjs'
+      - 'tools/orbit360-test-aseguradoras-batch-admin-form-p09j.mjs'
+      - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
+      - 'tools/orbit360-test-aseguradoras-batch-admin-actions-p09i.mjs'
+      - '.github/workflows/orbit360-aseguradoras-batch-form-p09j-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  batch-form-p09j:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/aseguradoras-source-reference-broker-p09j.js
+          node --check orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js
+          node --check orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js
+          node --check tools/orbit360-test-aseguradoras-source-reference-broker-p09j.mjs
+          node --check tools/orbit360-test-aseguradoras-batch-admin-form-p09j.mjs
+          node --check tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs
+
+      - name: Run reference broker smoke
+        run: node tools/orbit360-test-aseguradoras-source-reference-broker-p09j.mjs
+
+      - name: Run admin form smoke
+        run: node tools/orbit360-test-aseguradoras-batch-admin-form-p09j.mjs
+
+      - name: Run admin contract smoke
+        run: node tools/orbit360-test-aseguradoras-batch-admin-actions-p09i.mjs
+
+      - name: Run bootstrap smoke
+        run: node tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs
+
+      - name: Guard opaque references and ephemeral tickets
+        run: |
+          grep -q "SOURCE_REFERENCE_TICKET_CONSUMED" orbit360-platform/core/aseguradoras-source-reference-broker-p09j.js
+          grep -q "referenceValueExposed: false" orbit360-platform/core/aseguradoras-source-reference-broker-p09j.js
+          grep -q "referencesExposed: false" orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js
+          grep -q "GUARDAR HISTORIAL" orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js
+          grep -q "EJECUTAR DRY-RUN" orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js
+          grep -q "REANUDAR DRY-RUN" orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js
+
+      - name: Guard no direct writes, network or client storage
+        run: |
+          if grep -RniE '(Orbit\.store\.(insert|update|remove)|localStorage|sessionStorage|fetch\(|XMLHttpRequest|eval\(|new Function|firebase deploy|git commit)' \
+            orbit360-platform/core/aseguradoras-source-reference-broker-p09j.js \
+            orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js; then
+            echo 'Forbidden direct write/network/storage path detected'
+            exit 1
+          fi
+
+      - name: Guard no references in DOM or public state
+        run: |
+          if grep -nE '(backend-ref://|drive://|upload://|mountedPath|localPath|signedUrl|downloadUrl)' \
+            orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js; then
+            echo 'Technical reference or path detected in form source'
+            exit 1
+          fi
+          if grep -nE 'innerHTML.*(fileRef|sourceRef|reference)' \
+            orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js; then
+            echo 'Reference rendering path detected'
+            exit 1
+          fi
+
+      - name: Guard zero enablement and knowledge persistence
+        run: |
+          if grep -RniE '(enabledCotizador|enabledComparativo|enablesCotizador|enablesComparativo)[[:space:]]*:[[:space:]]*true' \
+            orbit360-platform/core/aseguradoras-source-reference-broker-p09j.js \
+            orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js; then
+            echo 'Enablement detected in P09j'
+            exit 1
+          fi
+          grep -q 'knowledgePersistenceAllowed: false' orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js
+
+      - name: Run backend LAB validator
+        run: node tools/orbit360-validar-backend-lab-contrato.mjs
