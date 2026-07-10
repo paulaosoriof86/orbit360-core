@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 · P0.9l · Bridge documental same-origin
+   Orbit 360 · P0.9l/P0.9n · Bridge documental same-origin
    Fecha: 2026-07-10
 
    Cliente LAB para el host local controlado. No contiene endpoints externos,
@@ -9,7 +9,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p09l-v1';
+  var VERSION = 'p09n-v1';
   var BASE = '/__orbit360';
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
@@ -20,7 +20,7 @@
     if (typeof value !== 'object') return value;
     var out = {};
     Object.keys(value).forEach(function (key) {
-      if (!/^(?:localPath|path|mountedPath|raw|rawBytes|bytes|binary|base64|apiKey|token|secret|password|credential|authorization)$/i.test(key)) {
+      if (!/^(?:localPath|path|mountedPath|resolvedPath|root|roots|allowedRoots|fileRef|sourceRef|archivoRef|url|signedUrl|raw|rawBytes|bytes|binary|base64|fullText|apiKey|token|secret|password|credential|authorization)$/i.test(key)) {
         out[key] = sanitize(value[key], depth + 1);
       }
     });
@@ -49,7 +49,7 @@
     };
     if (body !== undefined) {
       options.headers['Content-Type'] = 'application/json';
-      options.body = JSON.stringify(body || {});
+      options.body = JSON.stringify(sanitize(body || {}));
     }
     return parseResponse(await fetch(BASE + path, options));
   }
@@ -86,6 +86,9 @@
   async function resolveBatchReferences(input) {
     return request('POST', '/references', input || {});
   }
+  async function submitRuntimeReport(report) {
+    return request('POST', '/runtime-report', { report: sanitize(report || {}) });
+  }
   function loadCopyHotfix() {
     if (Orbit.aseguradorasBatchAdminCopyP09l) return;
     var wanted = 'modules/aseguradoras-batch-admin-copy-p09l.js';
@@ -108,6 +111,7 @@
     prepareBatchReferences: resolveBatchReferences,
     resolveSourceReferences: resolveBatchReferences,
     referencesForBatch: resolveBatchReferences,
+    submitRuntimeReport: submitRuntimeReport,
     sameOrigin: true,
     containsLocalPaths: false,
     containsSecrets: false,
