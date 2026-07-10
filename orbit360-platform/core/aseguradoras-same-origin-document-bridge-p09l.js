@@ -9,7 +9,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p09n-v1';
+  var VERSION = 'p09n-visual-fix-v1';
   var BASE = '/__orbit360';
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
@@ -89,6 +89,22 @@
   async function submitRuntimeReport(report) {
     return request('POST', '/runtime-report', { report: sanitize(report || {}) });
   }
+  function loadValidationSession() {
+    var loopback = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+    if (!loopback) return;
+    window.__ORBIT_VALIDATION_SESSION__ = Object.freeze({
+      authorized: true,
+      mode: 'visual-only',
+      tenantId: 'alianzas-soluciones',
+      writeAllowed: false
+    });
+    var wanted = 'core/aseguradoras-validation-session-p09fix.js';
+    var exists = Array.prototype.some.call(document.querySelectorAll('script[src]'), function (script) {
+      return clean(script.getAttribute('src') || script.src).split('?')[0].replace(/^https?:\/\/[^/]+\//i, '') === wanted;
+    });
+    if (exists) return;
+    document.write('<script src="' + wanted + '?v=' + encodeURIComponent(VERSION) + '"><\/script>');
+  }
   function loadCopyHotfix() {
     if (Orbit.aseguradorasBatchAdminCopyP09l) return;
     var wanted = 'modules/aseguradoras-batch-admin-copy-p09l.js';
@@ -120,5 +136,6 @@
 
   window.OrbitBackendDocumentBridge = bridge;
   Orbit.backendDocumentBridge = bridge;
+  loadValidationSession();
   loadCopyHotfix();
 })();
