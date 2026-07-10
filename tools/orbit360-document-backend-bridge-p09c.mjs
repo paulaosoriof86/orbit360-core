@@ -4,6 +4,10 @@ function clean(value) { return String(value == null ? '' : value).trim(); }
 function sanitizeReferenceResult(value) {
   if (!value || typeof value !== 'object') return value;
   return {
+    ok: value.ok !== false,
+    code: clean(value.code),
+    errors: Array.isArray(value.errors) ? value.errors.map(clean).filter(Boolean) : [],
+    audit: value.audit && typeof value.audit === 'object' ? value.audit : undefined,
     localPath: clean(value.localPath || value.path),
     fileRef: clean(value.fileRef),
     sourceHash: clean(value.sourceHash),
@@ -41,6 +45,13 @@ export function createDocumentBackendBridgeP09c(options = {}) {
         purpose: clean(request && request.purpose || 'training'),
         task: clean(task)
       }));
+      if (resolved && resolved.ok === false) {
+        const error = new Error(resolved.code || 'SOURCE_REFERENCE_NOT_RESOLVED');
+        error.code = resolved.code || 'SOURCE_REFERENCE_NOT_RESOLVED';
+        error.details = resolved.errors || [];
+        error.audit = resolved.audit;
+        throw error;
+      }
       if (!resolved || !resolved.localPath) return { ok: false, code: 'SOURCE_REFERENCE_NOT_RESOLVED', writeAllowed: false };
       const outcome = await runAuthorizedDocumentTask(Object.assign({}, request || {}, {
         task: clean(task),
