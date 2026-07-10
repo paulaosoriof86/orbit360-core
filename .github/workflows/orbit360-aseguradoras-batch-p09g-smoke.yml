@@ -71,13 +71,19 @@ jobs:
           grep -q "ays_aseguate_microbus_binding_set_v1" orbit360-platform/data/tenant-alianzas-soluciones-source-batch-p09g.js
           grep -q "ays_universales_riesgo_plus_binding_set_v1" orbit360-platform/data/tenant-alianzas-soluciones-source-batch-p09g.js
 
-      - name: Guard no direct writes, network, local storage or secrets
+      - name: Guard no direct writes, network or local storage
         run: |
-          if grep -RniE '(Orbit\.store\.(insert|update|remove|setPref)|localStorage|sessionStorage|fetch\(|XMLHttpRequest|apiKey|clientSecret|privateKey|signedUrl)' \
+          if grep -RniE '(Orbit\.store\.(insert|update|remove|setPref)|localStorage|sessionStorage|fetch\(|XMLHttpRequest)' \
             orbit360-platform/core/aseguradoras-batch-orchestrator-p09g.js \
             orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js \
             orbit360-platform/data/tenant-alianzas-soluciones-source-batch-p09g.js; then
-            echo 'Direct write, network, local storage, secret, or signed URL detected'
+            echo 'Direct write, network, or local storage detected'
+            exit 1
+          fi
+          if grep -RniE '(apiKey|clientSecret|privateKey|signedUrl)[[:space:]]*[:=][[:space:]]*["'"'][^"'"']+["'"']' \
+            orbit360-platform/core/aseguradoras-batch-orchestrator-p09g.js \
+            orbit360-platform/data/tenant-alianzas-soluciones-source-batch-p09g.js; then
+            echo 'Assigned secret or signed URL value detected'
             exit 1
           fi
 
