@@ -101,6 +101,14 @@ Orbit.modules.importar = (function () {
     });
   }
 
+  function loadP0IdentidadMarca() {
+    if (Orbit.importaIdentidadMarcaP0 || Orbit.__importaIdentidadMarcaP0Loader) return;
+    Orbit.__importaIdentidadMarcaP0Loader = true;
+    loadP0DryRunBuilder(function () {
+      if (!Orbit.importaIdentidadMarcaP0) addScript('core/importa-identidad-marca-p0.js?v=20260709');
+    });
+  }
+
   function loadP0Dashboard(onload) {
     if (Orbit.importarP0Dashboard) { if (onload) onload(); return; }
     if (Orbit.__importarP0DashboardLoader) return;
@@ -125,6 +133,7 @@ Orbit.modules.importar = (function () {
     loadP0DryRunWire();
     loadP0DirectorioAseguradoras();
     loadP0CalendarioMarketing();
+    loadP0IdentidadMarca();
   }
   loadP0Rules();
   loadP0Dashboard();
