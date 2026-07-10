@@ -40,6 +40,22 @@
     });
   }
 
+  function paintIdentity() {
+    var name = document.querySelector('#tb-user .who b');
+    var role = document.getElementById('tb-rol-lbl');
+    var avatar = document.querySelector('#tb-user .av');
+    var roleSelect = document.getElementById('rol-sel');
+    if (name) name.textContent = 'Validación visual';
+    if (role) role.textContent = 'Dirección · sesión temporal';
+    if (avatar) avatar.textContent = 'VV';
+    if (roleSelect) {
+      var option = Array.prototype.find.call(roleSelect.options || [], function (item) {
+        return String(item.value || item.textContent || '').toLowerCase().indexOf('direcci') >= 0;
+      });
+      if (option) roleSelect.value = option.value;
+    }
+  }
+
   function showApp() {
     var login = document.getElementById('login');
     if (login) {
@@ -58,6 +74,9 @@
       document.body.appendChild(note);
     }
 
+    paintIdentity();
+    setTimeout(paintIdentity, 100);
+    setTimeout(paintIdentity, 500);
     setTimeout(function () {
       try { window.dispatchEvent(new HashChangeEvent('hashchange')); }
       catch (error) { window.dispatchEvent(new Event('hashchange')); }
