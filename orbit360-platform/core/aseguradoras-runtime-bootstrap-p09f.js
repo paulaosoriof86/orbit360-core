@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 · P0.9f/P0.9g/P0.9h · Bootstrap seguro del runtime de conocimiento
+   Orbit 360 · P0.9f/P0.9g/P0.9h/P0.9i · Bootstrap seguro del runtime de conocimiento
    Fecha: 2026-07-10
 
    Carga contratos aditivos solo en Firestore LAB para A&S. No modifica
@@ -9,7 +9,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p09h-v1';
+  var VERSION = 'p09i-v1';
   var REQUIRED = [
     { src: 'core/document-source-contract-p04.js', global: 'documentSourceContractP04' },
     { src: 'core/cotizacion-esquema-aseguradora-p0.js', global: 'cotizacionEsquemaAseguradoraP0' },
@@ -35,6 +35,7 @@
     { src: 'core/aseguradoras-first-source-orchestrator-p09f.js', global: 'aseguradorasFirstSourceP09f' },
     { src: 'core/aseguradoras-batch-orchestrator-p09g.js', global: 'aseguradorasBatchOrchestratorP09g' },
     { src: 'core/aseguradoras-batch-history-p09h.js', global: 'aseguradorasBatchHistoryP09h' },
+    { src: 'core/aseguradoras-batch-admin-actions-p09i.js', global: 'aseguradorasBatchAdminActionsP09i' },
     { src: 'modules/aseguradoras-knowledge-panel-p09f.js', global: 'aseguradorasKnowledgePanelP09f' }
   ];
 
@@ -128,6 +129,7 @@
       knowledgeSnapshotsReady: !!(Orbit.aseguradorasLabCollectionsP09e && Orbit.aseguradorasLabCollectionsP09e.status().installed),
       batchRuntimeReady: !!Orbit.aseguradorasBatchOrchestratorP09g,
       batchHistoryReady: !!(Orbit.aseguradorasBatchHistoryP09h && Orbit.aseguradorasBatchHistoryP09h.status().installed),
+      batchAdminActionsReady: !!Orbit.aseguradorasBatchAdminActionsP09i,
       bridgeStatus: clone(state.bridge), enablesCotizador: false, enablesComparativo: false
     };
   }
