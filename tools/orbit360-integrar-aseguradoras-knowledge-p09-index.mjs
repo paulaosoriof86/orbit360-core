@@ -9,16 +9,24 @@ const INDEX = path.join(ROOT, 'orbit360-platform', 'index.html');
 const REQUIRED_BRANCH = 'ays/backend-tenant-lab-v99-20260703';
 const MODULE_RE = /<script\s+src=["']modules\/aseguradoras\.js(?:\?[^"']*)?["']\s*><\/script>/;
 const CORE_SCRIPTS = [
+  'core/backend-lab-security-guard.js',
   'core/document-source-contract-p04.js',
   'core/cotizacion-esquema-aseguradora-p0.js',
-  'core/excel-rule-proposal-adapter-p06b.js',
-  'core/pdf-quote-adapter-p07.js',
+  'core/tariff-quote-reconciliation-p06c.js',
+  'core/knowledge-binding-gate-p08.js',
+  'core/knowledge-binding-policy-p08.js',
   'core/tenant-insurer-config-p10.js',
   'data/tenant-alianzas-soluciones-insurers-p10.js',
   'core/tenant-source-batch-adapter-p10.js',
+  'core/tenant-binding-plan-p10c.js',
+  'data/tenant-alianzas-soluciones-binding-plan-p10c.js',
+  'core/excel-rule-proposal-adapter-p06b.js',
+  'core/pdf-quote-adapter-p07.js',
   'core/document-provider-registry-p09.js',
   'core/document-provider-bridge-p09b.js',
-  'core/aseguradoras-knowledge-runtime-p09.js'
+  'core/aseguradoras-knowledge-runtime-p09.js',
+  'core/aseguradoras-lab-collections-p09e.js',
+  'core/aseguradoras-lab-persistence-p09e.js'
 ];
 const SERVICE_SCRIPT = 'modules/aseguradoras-knowledge-p09.js';
 
@@ -64,7 +72,13 @@ function validateOrder(text) {
   const tenantCore = text.indexOf('core/tenant-insurer-config-p10.js');
   const tenantData = text.indexOf('data/tenant-alianzas-soluciones-insurers-p10.js');
   const tenantBatch = text.indexOf('core/tenant-source-batch-adapter-p10.js');
+  const bindingCore = text.indexOf('core/tenant-binding-plan-p10c.js');
+  const bindingData = text.indexOf('data/tenant-alianzas-soluciones-binding-plan-p10c.js');
+  const labCollections = text.indexOf('core/aseguradoras-lab-collections-p09e.js');
+  const labPersistence = text.indexOf('core/aseguradoras-lab-persistence-p09e.js');
   if (!(tenantCore >= 0 && tenantData > tenantCore && tenantBatch > tenantData)) errors.push('TENANT_CONFIG_ORDER_INVALID');
+  if (!(bindingCore > tenantBatch && bindingData > bindingCore)) errors.push('TENANT_BINDING_ORDER_INVALID');
+  if (!(labCollections > 0 && labPersistence > labCollections)) errors.push('LAB_PERSISTENCE_ORDER_INVALID');
   return errors;
 }
 
@@ -84,6 +98,7 @@ const report = {
   scripts: [...CORE_SCRIPTS, SERVICE_SCRIPT],
   tenantConfig: 'alianzas-soluciones',
   tenantConfigLoadedBeforeRuntime: true,
+  labPersistenceGuarded: true,
   protectedFilesTouched: false,
   commit: false,
   deploy: false
