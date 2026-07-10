@@ -207,7 +207,7 @@ export function createSameOriginHostP09l(options={}){
     const requestUrl=new URL(req.url||'/',origin||`http://${HOST}`);
     if(req.method==='GET' && requestUrl.pathname===`/__orbit360/session/${bootstrapNonce}`){
       res.setHeader('Set-Cookie',`${COOKIE_NAME}=${sessionId}; Path=/; HttpOnly; SameSite=Strict; Max-Age=14400`);
-      res.writeHead(302,{Location:'/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones#/aseguradoras'}); res.end(); return;
+      res.writeHead(302,{Location:'/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&orbitValidation=aseguradoras#/aseguradoras'}); res.end(); return;
     }
     if(!authorized(req)){ safeJson(res,401,{ok:false,code:'P09L_SESSION_REQUIRED'}); return; }
     if(requestUrl.pathname.startsWith('/__orbit360/')){
