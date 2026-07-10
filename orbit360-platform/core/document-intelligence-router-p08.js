@@ -27,7 +27,12 @@
   function unique(values) { return Array.from(new Set((values || []).filter(Boolean))); }
   function secretKey(key) {
     var value = norm(key).replace(/_/g, '');
-    return SECRET_KEYS.some(function (item) { return value.indexOf(item.replace(/_/g, '')) >= 0; });
+    if (value === 'key') return true;
+    return [
+      'apikey', 'secret', 'token', 'password', 'credential', 'authorization'
+    ].some(function (item) {
+      return value === item || value.endsWith(item) || value.indexOf(item) >= 0;
+    });
   }
   function sanitize(value, depth) {
     depth = depth || 0;
@@ -179,24 +184,29 @@
   }
   function decideFallback(manifest, request, config) {
     var signals = manifestSignals(manifest), policy = request.policy || dataPolicy(request, config);
-    var needOcr = request.mediaKind === 'pdf' && policy.allowOcr && !signals.parserOcrExecuted && (signals.contentPages === 0 || signals.textChars < 120);
-    var needSemantic = (
+    var ocrRecommended = request.mediaKind === 'pdf' && !signals.parserOcrExecuted && (signals.contentPages === 0 || signals.textChars < 120);
+    var semanticRecommended = (
       signals.confidence < 85 || !signals.hasInsurer || !signals.hasProduct || !signals.hasSections ||
       signals.warnings.indexOf('ASEGURADORA_REQUIERE_VALIDACION') >= 0 ||
       signals.warnings.indexOf('PRODUCTO_REQUIERE_VALIDACION') >= 0 ||
       signals.warnings.indexOf('SECCIONES_REQUIEREN_VALIDACION') >= 0
     );
-    if (!policy.allowExternalAi) needSemantic = false;
+    var needOcr = policy.allowOcr && ocrRecommended;
+    var needSemantic = policy.allowExternalAi && semanticRecommended;
     return {
       needOcr: needOcr,
       needSemantic: needSemantic,
+      ocrRecommended: ocrRecommended,
+      semanticRecommended: semanticRecommended,
       signals: signals,
       reasons: unique([].concat(
-        needOcr ? ['TEXTO_INSUFICIENTE_REQUIERE_OCR'] : [],
+        ocrRecommended ? ['TEXTO_INSUFICIENTE_REQUIERE_OCR'] : [],
+        ocrRecommended && !policy.allowOcr ? ['OCR_BLOQUEADO_POR_POLITICA'] : [],
         !signals.hasInsurer ? ['ASEGURADORA_REQUIERE_MATCHING'] : [],
         !signals.hasProduct ? ['PRODUCTO_REQUIERE_ANALISIS'] : [],
         !signals.hasSections ? ['SECCIONES_REQUIEREN_ANALISIS'] : [],
-        signals.confidence < 85 ? ['CONFIANZA_INSUFICIENTE'] : []
+        signals.confidence < 85 ? ['CONFIANZA_INSUFICIENTE'] : [],
+        semanticRecommended && !policy.allowExternalAi ? ['ANALISIS_SEMANTICO_BLOQUEADO_POR_POLITICA'] : []
       )),
       writeAllowed: false
     };
@@ -211,7 +221,7 @@
   function mergeManifest(base, addition, stage) {
     base = sanitize(base || {}, 0) || {};
     addition = sanitize(addition || {}, 0) || {};
-    var merged = Object.assign({}, base);
+    var merged = Object.assign({}, base, addition);
     ['pages', 'sections', 'insurerCandidates', 'dimensiones'].forEach(function (key) {
       if (addition[key] != null) merged[key] = addition[key];
     });
@@ -269,7 +279,7 @@
     var finalFallback = decideFallback(manifest, request, config);
     return {
       ok: true,
-      code: finalFallback.needOcr || finalFallback.needSemantic ? 'MANIFEST_REQUIRES_VALIDATION' : 'MANIFEST_READY_FOR_REVIEW',
+      code: finalFallback.reasons.length ? 'MANIFEST_REQUIRES_VALIDATION' : 'MANIFEST_READY_FOR_REVIEW',
       plan: plan,
       stages: stages,
       manifest: manifest,
