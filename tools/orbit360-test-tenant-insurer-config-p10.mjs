@@ -65,6 +65,18 @@ assert(issuance.rate === 0.05 && issuance.formulaModel.base === 'base_premium', 
 assert(tax.rate === 0.12 && tax.formulaModel.base === 'subtotal_before_tax', 'IVA debe ser 12% sobre la base gravable previa al impuesto');
 assert(applied.rule.enabledCotizador === false && applied.rule.enabledComparativo === false && applied.rule.writeAllowed === false, 'Configurar no debe habilitar ni escribir');
 
+const profileByDirectoryId = api.getFinancialProfile({
+  tenantId: 'alianzas-soluciones', aseguradoraId: 'dir-aseguate', pais: 'GT', moneda: 'GTQ',
+  ramo: 'Vehículos', producto: 'Seguro de vehículo', directory
+});
+assert(profileByDirectoryId.found && profileByDirectoryId.resolution.insurerId === 'dir-aseguate', 'Runtime debe resolver el perfil usando solo el ID del directorio');
+
+const profileByInternalId = api.getFinancialProfile({
+  tenantId: 'alianzas-soluciones', aseguradoraId: 'ins_gt_aseguradora_guatemalteca', pais: 'GT', moneda: 'GTQ',
+  ramo: 'Vehículos', producto: 'Seguro de vehículo', directory: []
+});
+assert(profileByInternalId.found, 'Runtime debe resolver el perfil usando el ID interno estable');
+
 const microbus = calc.calculateRule(applied.rule, { pais: 'GT', moneda: 'GTQ', producto: 'Seguro de vehículo', tipoVehiculo: 'Microbús', valorAsegurado: 35000 });
 assert(microbus.ok, `La fórmula configurada debe calcular: ${microbus.blockers}`);
 assert(microbus.totals.basePremium === 1800 && microbus.totals.fees === 90 && microbus.totals.assistance === 350, 'Debe separar prima, gasto y asistencia');
@@ -84,6 +96,6 @@ assert(!duplicateApply.applied && duplicateApply.code === 'TENANT_FINANCIAL_COMP
 assert(duplicateApply.rule.components.filter(item => item.tipo === 'tax').length === 1, 'Debe conservar un solo IVA');
 assert(api.getFinancialProfile({ tenantId: 'tenant-other', name: 'AseGuate', pais: 'GT' }).found === false, 'Otro tenant no debe heredar configuración A&S');
 
-const serialized = JSON.stringify({ ruralLegal, ruralCommon, columna, applied, autoApplied });
+const serialized = JSON.stringify({ ruralLegal, ruralCommon, columna, applied, autoApplied, profileByDirectoryId, profileByInternalId });
 assert(!/password|credential|token|correo@|telefono/i.test(serialized), 'Configuración no debe contener secretos ni PII');
 console.log('OK orbit360-test-tenant-insurer-config-p10');
