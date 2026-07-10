@@ -1,9 +1,9 @@
 /* ============================================================
-   Orbit 360 · P0.9f/P0.9g · Panel aditivo de conocimiento en Aseguradoras
+   Orbit 360 · P0.9f/P0.9g/P0.9h · Panel aditivo de conocimiento en Aseguradoras
    Fecha: 2026-07-10
 
-   Muestra provider, snapshots, conocimiento y lote por tenant. No escribe
-   store, no ejecuta lotes y no habilita Cotizador/Comparativo.
+   Muestra provider, snapshots, conocimiento, lote e historial por tenant.
+   No escribe store, no ejecuta lotes y no habilita Cotizador/Comparativo.
    ============================================================ */
 (function () {
   'use strict';
@@ -38,6 +38,14 @@
     var latest = first && typeof api.latest === 'function' ? api.latest(tenant, first.id) : null;
     return { batches: batches, latest: latest };
   }
+  function historyState(tenant, batch) {
+    var api = Orbit.aseguradorasBatchHistoryP09h;
+    var first = batch && batch.batches && batch.batches[0];
+    if (!api || typeof api.readModel !== 'function' || !first) {
+      return { runs: [], items: [], latest: null, latestItems: [], resumableDocumentIds: [] };
+    }
+    return api.readModel(tenant, first.id);
+  }
   function state() {
     var tenant = tenantId();
     var bootstrap = Orbit.aseguradorasRuntimeBootstrapP09f;
@@ -53,9 +61,10 @@
     }).reduce(function (total, insurer) {
       return total + [].concat(insurer && insurer.docs || []).length;
     }, 0);
+    var batch = batchState(tenant);
     return {
       tenantId: tenant, bootstrap: boot, preflight: preflight, provider: provider,
-      snapshots: snapshots, firstPlans: firstPlans, batch: batchState(tenant),
+      snapshots: snapshots, firstPlans: firstPlans, batch: batch, history: historyState(tenant, batch),
       counts: {
         sources: sources,
         manifests: countTenant('aseguradora_manifiestos', tenant),
@@ -63,7 +72,9 @@
         rules: countTenant('aseguradora_reglas_tarifarias', tenant),
         presentations: countTenant('aseguradora_presentaciones', tenant),
         bindings: countTenant('aseguradora_bindings', tenant),
-        reviews: countTenant('aseguradora_revisiones', tenant)
+        reviews: countTenant('aseguradora_revisiones', tenant),
+        batchRuns: countTenant('aseguradora_batch_runs', tenant),
+        batchItems: countTenant('aseguradora_batch_items', tenant)
       }
     };
   }
@@ -87,6 +98,20 @@
       '</div>';
     }).join('') + '</div>';
   }
+  function historyHtml(model) {
+    var history = model.history || {}, latest = history.latest || null;
+    var resumable = [].concat(history.resumableDocumentIds || []);
+    return '<div style="margin-top:9px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface)">' +
+      '<div style="display:flex;gap:7px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap">' +
+        '<div><b style="font-size:11.5px">Historial del lote</b><div class="muted" style="font-size:10.5px;margin-top:2px">Runs e ítems metadata-only, sin referencias backend.</div></div>' +
+        '<span class="badge neutral">' + esc(latest && latest.status || 'sin historial persistido') + '</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">' +
+        metric('Runs', model.counts.batchRuns) + metric('Ítems históricos', model.counts.batchItems) + metric('Reanudables', resumable.length) +
+      '</div>' +
+      (resumable.length ? '<div class="muted" style="font-size:10.5px;margin-top:7px">Pendientes para reanudar: ' + esc(resumable.join(', ')) + '</div>' : '') +
+    '</div>';
+  }
   function batchHtml(model) {
     var summary = model.batch && model.batch.batches && model.batch.batches[0];
     var latest = model.batch && model.batch.latest;
@@ -106,8 +131,8 @@
         metric('Fallidas', runSummary.failed || 0) +
         metric('Bindings listos', runSummary.bindingsReadyForReview || 0) +
         metric('Bindings incompletos', incompleteBindings) +
-      '</div>' + bindingRows(latest) +
-      '<div class="muted" style="font-size:10.5px;margin-top:7px">El panel es solo lectura. Ejecutar o persistir requiere referencias backend, actor, motivo y confirmaciones administrativas.</div>' +
+      '</div>' + bindingRows(latest) + historyHtml(model) +
+      '<div class="muted" style="font-size:10.5px;margin-top:7px">El panel es solo lectura. Ejecutar, reanudar o persistir requiere referencias backend, actor, motivo y confirmaciones administrativas.</div>' +
     '</div>';
   }
   function html(model) {
@@ -118,7 +143,7 @@
     return '<section id="' + PANEL_ID + '" style="margin:0 0 14px;border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--card)">' +
       '<div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">' +
         '<div style="flex:1;min-width:240px"><div style="font-size:12px;font-weight:800">Conocimiento documental de Aseguradoras</div>' +
-        '<div class="muted" style="font-size:11.5px;margin-top:3px">Fuentes, manifiestos, reglas, presentaciones y bindings separados por tenant. Registrar metadata no habilita Cotizador ni Comparativo.</div></div>' +
+        '<div class="muted" style="font-size:11.5px;margin-top:3px">Fuentes, manifiestos, reglas, presentaciones, bindings e historial separados por tenant. Registrar metadata no habilita Cotizador ni Comparativo.</div></div>' +
         '<button class="btn ghost" type="button" data-p09f-refresh>Actualizar estado</button>' +
       '</div>' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0">' +
