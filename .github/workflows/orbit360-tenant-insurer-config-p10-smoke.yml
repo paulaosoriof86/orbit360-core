@@ -1,0 +1,91 @@
+name: Orbit 360 Tenant Insurer Config P10 Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/tenant-insurer-config-p10.js'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js'
+      - 'orbit360-platform/core/tariff-quote-reconciliation-p06c.js'
+      - 'tools/orbit360-test-tenant-insurer-config-p10.mjs'
+      - '.github/workflows/orbit360-tenant-insurer-config-p10-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/tenant-insurer-config-p10.js'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js'
+      - 'orbit360-platform/core/tariff-quote-reconciliation-p06c.js'
+      - 'tools/orbit360-test-tenant-insurer-config-p10.mjs'
+      - '.github/workflows/orbit360-tenant-insurer-config-p10-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  tenant-insurer-config-p10:
+    name: Configuración tenant Aseguradoras P0.10
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/tenant-insurer-config-p10.js
+          node --check orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
+          node --check tools/orbit360-test-tenant-insurer-config-p10.mjs
+
+      - name: Run alias and financial profile smoke
+        run: node tools/orbit360-test-tenant-insurer-config-p10.mjs
+
+      - name: Guard generic core remains tenant neutral
+        run: |
+          if grep -RniE '(AseGuate|Aseguradora Guatemalteca|Banrural|Aseguradora Rural|Columna|BAM|Bantrab|Universales|alianzas-soluciones)' \
+            orbit360-platform/core/tenant-insurer-config-p10.js; then
+            echo 'Tenant-specific value detected in reusable core'
+            exit 1
+          fi
+
+      - name: Guard tenant config has no secrets or customer payload
+        run: |
+          if grep -RniE '(password|passwd|contraseña|apiKey|accessToken|refreshToken|credentialRef|privateKey|clientSecret|https?://|@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|[0-9]{8,})' \
+            orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js; then
+            echo 'Secret, URL, PII, or account-like value detected in tenant config'
+            exit 1
+          fi
+
+      - name: Guard no direct writes or enablement
+        run: |
+          if grep -RniE '(Orbit\.store\.(insert|update|remove|setPref)|localStorage|sessionStorage|fetch\(|XMLHttpRequest|eval\(|new Function)' \
+            orbit360-platform/core/tenant-insurer-config-p10.js \
+            orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js; then
+            echo 'Direct write, storage, network, or executable path detected'
+            exit 1
+          fi
+          grep -q 'enabledCotizador = false' orbit360-platform/core/tenant-insurer-config-p10.js
+          grep -q 'enabledComparativo = false' orbit360-platform/core/tenant-insurer-config-p10.js
+          grep -q 'requiresSecondGateForEnablement = true' orbit360-platform/core/tenant-insurer-config-p10.js
+
+      - name: Guard confirmed AseGuate financial bases
+        run: |
+          grep -q "rate: 0.05" orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
+          grep -q "base: 'base_premium'" orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
+          grep -q "rate: 0.12" orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
+          grep -q "base: 'subtotal_before_tax'" orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
+          grep -q "Aseguradora Rural (Banrural)" orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
+          grep -q "Seguros Columna" orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
