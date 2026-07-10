@@ -93,6 +93,14 @@ Orbit.modules.importar = (function () {
     });
   }
 
+  function loadP0CalendarioMarketing() {
+    if (Orbit.importaCalendarioMarketingP0 || Orbit.__importaCalendarioMarketingP0Loader) return;
+    Orbit.__importaCalendarioMarketingP0Loader = true;
+    loadP0DryRunBuilder(function () {
+      if (!Orbit.importaCalendarioMarketingP0) addScript('core/importa-calendario-marketing-p0.js?v=20260709');
+    });
+  }
+
   function loadP0Dashboard(onload) {
     if (Orbit.importarP0Dashboard) { if (onload) onload(); return; }
     if (Orbit.__importarP0DashboardLoader) return;
@@ -116,6 +124,7 @@ Orbit.modules.importar = (function () {
     loadP0DryRunBuilder();
     loadP0DryRunWire();
     loadP0DirectorioAseguradoras();
+    loadP0CalendarioMarketing();
   }
   loadP0Rules();
   loadP0Dashboard();
