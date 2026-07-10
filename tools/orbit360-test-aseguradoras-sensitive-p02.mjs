@@ -86,16 +86,25 @@ const copied = await api.copySensitive({
 });
 assert(copied.ok && fallbackCopied === 'dato-operativo', 'La copia fallback debe funcionar');
 
+let forbiddenFallbackCalled = false;
+const deniedCopy = await api.copySensitive({
+  store, value: 'no-copiar', aseguradoraId: 'asg1', resourceType: 'portal', resourceId: 'p1', field: 'password',
+  actor: { roles: ['Asesor'] }, copyFallback: () => { forbiddenFallbackCalled = true; return true; }
+});
+assert(!deniedCopy.ok && deniedCopy.code === 'FORBIDDEN_ROLE', 'Asesor no puede copiar datos sensibles');
+assert(forbiddenFallbackCalled === false, 'No debe tocar el portapapeles si el rol está bloqueado');
+
 const neutral = api.neutralSourceDraft('GT');
 assert(neutral.tipoFuente === 'otro', 'La fuente nueva debe iniciar neutral');
 assert(!neutral.contieneTarifas && !neutral.contieneReglasCalculo && !neutral.contieneHojaSalida, 'No debe declarar capacidades sin clasificar');
 assert(neutral.moneda === 'GTQ', 'GT debe heredar GTQ');
 
-assert(auditRows.length >= 5, 'Consultas y copias deben generar auditoría');
+assert(auditRows.length >= 6, 'Consultas, denegaciones y copias deben generar auditoría');
 auditRows.forEach(row => {
   const serialized = JSON.stringify(row);
   assert(!serialized.includes('clave-segura'), 'Auditoría no incluye contraseña');
   assert(!serialized.includes('9988776655'), 'Auditoría no incluye cuenta completa');
+  assert(!serialized.includes('no-copiar'), 'Auditoría no incluye valor de copia denegada');
 });
 
 console.log('OK orbit360-test-aseguradoras-sensitive-p02');
