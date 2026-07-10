@@ -27,13 +27,29 @@ const Orbit = {
   aseguradorasRuntimeBootstrapP09f: {
     status: () => ({ status: 'ready', bridge: { ok: false, code: 'BACKEND_REQUIRED' }, errors: [] }),
     preflight: () => ({ ok: true, errors: [] }),
-    start: async () => ({ status: 'ready' })
+    retry: async () => ({ status: 'ready' })
   },
   aseguradorasLabCollectionsP09e: {
     status: () => ({ installed: true, snapshotAttachedCount: 6, collections: ['a','b','c','d','e','f'] })
   },
   aseguradorasFirstSourceP09f: {
     listPlans: () => [{ source: { nombre: 'Tasas ejemplo.xlsx' } }]
+  },
+  aseguradorasBatchOrchestratorP09g: {
+    listBatches: () => [{
+      id: 'batch-a', totalSources: 11, totalInsurers: 6, totalExcel: 8, totalPdf: 3, bindingSets: 3
+    }],
+    latest: () => ({
+      status: 'incomplete',
+      summary: {
+        dryRunReady: 9, persisted: 0, waitingReference: 2, failed: 0,
+        bindingsReadyForReview: 1, bindingsIncomplete: 2
+      },
+      bindingSets: [
+        { id: 'b1', insurerName: 'Compañía Alfa', variant: { tipoVehiculo: 'Automóvil' }, status: 'ready_for_binding_review', missingKnowledge: [] },
+        { id: 'b2', insurerName: 'Compañía Beta', variant: { plan: 'Plan demo' }, status: 'documents_ready_knowledge_incomplete', missingKnowledge: ['tariff_rule'] }
+      ]
+    })
   }
 };
 const document = {
@@ -58,11 +74,17 @@ const state = api.state();
 assert(state.counts.sources === 2, 'debe contar fuentes visibles');
 assert(state.counts.manifests === 1 && state.counts.rules === 1, 'debe filtrar colecciones por tenant');
 assert(state.provider.code === 'BACKEND_REQUIRED', 'provider no conectado debe mostrarse honestamente');
+assert(state.batch.batches[0].totalSources === 11, 'debe exponer lote de once fuentes');
+assert(state.batch.latest.summary.waitingReference === 2, 'debe exponer referencias pendientes');
 assert(api.mount() === true, 'panel debe montarse en ruta Aseguradoras');
 assert(markup.includes('Conocimiento documental de Aseguradoras'), 'panel debe mostrar título');
 assert(markup.includes('BACKEND_REQUIRED'), 'panel debe mostrar provider pendiente');
 assert(markup.includes('Tasas ejemplo.xlsx'), 'panel debe mostrar primera fuente planificada');
+assert(markup.includes('11 fuentes') && markup.includes('6 aseguradoras'), 'panel debe mostrar resumen del lote');
+assert(markup.includes('ready_for_binding_review'), 'panel debe mostrar estado de binding');
+assert(markup.includes('documents_ready_knowledge_incomplete'), 'panel debe mostrar conocimiento incompleto');
 assert(listeners.some(item => item.type === 'click'), 'botón de actualización debe ser funcional');
 const source = fs.readFileSync('orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js', 'utf8');
 assert(!/\.insert\(|\.update\(|\.remove\(|setPref\(/.test(source), 'panel no debe escribir Orbit.store');
+assert(!/aseguradorasBatchOrchestratorP09g\.run\(/.test(source), 'panel no debe ejecutar lote');
 console.log('OK orbit360-test-aseguradoras-knowledge-panel-p09f');
