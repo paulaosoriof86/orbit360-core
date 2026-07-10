@@ -11,8 +11,8 @@ const indexPath=path.join(appRoot,'index.html');
 const original=fs.readFileSync(indexPath,'utf8');
 const transformed=transformIndexP09l(original);
 assert(transformed.includes('core/backend-lab-security-guard.js?v=p09l'),'debe inyectar security guard sin modificar disco');
-assert(transformed.includes('core/aseguradoras-same-origin-document-bridge-p09l.js?v=p09l'),'debe inyectar bridge same-origin');
-assert(transformed.includes('core/aseguradoras-runtime-bootstrap-p09f.js?v=p09l'),'debe inyectar bootstrap');
+assert(transformed.includes('core/aseguradoras-same-origin-document-bridge-p09l.js?v=p09n'),'debe inyectar bridge same-origin P09n');
+assert(transformed.includes('core/aseguradoras-runtime-bootstrap-p09f.js?v=p09n'),'debe inyectar bootstrap con observador P09n');
 const order=['data/store-firestore-lab.local.js','core/backend-lab-security-guard.js','core/aseguradoras-same-origin-document-bridge-p09l.js','core/aseguradoras-runtime-bootstrap-p09f.js','modules/aseguradoras.js'];
 let last=-1;
 for(const item of order){ const at=transformed.indexOf(item); assert(at>last,`orden inválido: ${item}`); last=at; }
@@ -38,6 +38,7 @@ const capability={
 const host=createSameOriginHostP09l({appRoot,capability,discovery:{records:[{documentId:'doc-1'}],issues:[]}});
 const ready=await host.start();
 assert(ready.host==='127.0.0.1' && ready.sameOrigin===true,'host debe limitarse a loopback same-origin');
+assert(ready.runtimeReportReady===true,'host debe declarar reporte runtime disponible');
 try{
   let response=await fetch(`${ready.origin}/__orbit360/status`);
   assert(response.status===401,'API sin sesión debe bloquearse');
@@ -54,16 +55,18 @@ try{
   response=await fetch(`${ready.origin}${location}`,{headers:{Cookie:cookie}});
   assert(response.status===200,'index autenticado debe servirse');
   const html=await response.text();
-  assert(html.includes('aseguradoras-same-origin-document-bridge-p09l.js'),'index servido debe incluir bridge temporal');
+  assert(html.includes('aseguradoras-same-origin-document-bridge-p09l.js?v=p09n'),'index servido debe incluir bridge temporal P09n');
   assert(hash(fs.readFileSync(indexPath,'utf8'))===hash(original),'index en disco debe permanecer intacto');
 
   response=await fetch(`${ready.origin}/core/aseguradoras-same-origin-document-bridge-p09l.js`,{headers:{Cookie:cookie}});
   const bridgeText=await response.text();
   assert(response.status===200 && bridgeText.includes('OrbitBackendDocumentBridge'),'debe servir cliente bridge same-origin');
+  assert(bridgeText.includes('submitRuntimeReport'),'bridge debe exponer reporte runtime sanitizado');
 
   response=await fetch(`${ready.origin}/__orbit360/status`,{headers:{Cookie:cookie}});
   const status=await response.json();
   assert(status.connected===true && status.containsLocalPaths===false,'status debe ser seguro y conectado');
+  assert(status.runtimeReportReady===true,'status debe confirmar observador disponible');
   assert(!JSON.stringify(status).includes(appRoot),'status no debe exponer rutas');
 
   response=await fetch(`${ready.origin}/__orbit360/references`,{
