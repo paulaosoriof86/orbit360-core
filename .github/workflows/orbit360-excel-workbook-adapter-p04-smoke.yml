@@ -1,0 +1,76 @@
+name: Orbit 360 Excel Workbook Adapter P04 Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/document-source-contract-p04.js'
+      - 'orbit360-platform/core/excel-workbook-adapter-p04.js'
+      - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'tools/orbit360-test-excel-workbook-adapter-p04.mjs'
+      - 'tools/orbit360-test-excel-workbook-adapter-p04-schema.mjs'
+      - '.github/workflows/orbit360-excel-workbook-adapter-p04-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/document-source-contract-p04.js'
+      - 'orbit360-platform/core/excel-workbook-adapter-p04.js'
+      - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'tools/orbit360-test-excel-workbook-adapter-p04.mjs'
+      - 'tools/orbit360-test-excel-workbook-adapter-p04-schema.mjs'
+      - '.github/workflows/orbit360-excel-workbook-adapter-p04-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  excel-workbook-adapter-p04:
+    name: Inventario Excel Aseguradoras P0.4
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/document-source-contract-p04.js
+          node --check orbit360-platform/core/excel-workbook-adapter-p04.js
+          node --check tools/orbit360-test-excel-workbook-adapter-p04.mjs
+          node --check tools/orbit360-test-excel-workbook-adapter-p04-schema.mjs
+
+      - name: Run isolated adapter smoke
+        run: node tools/orbit360-test-excel-workbook-adapter-p04.mjs
+
+      - name: Run real schema compatibility smoke
+        run: node tools/orbit360-test-excel-workbook-adapter-p04-schema.mjs
+
+      - name: Guard no direct parser or storage writes
+        run: |
+          if grep -RniE '(XLSX\.read|ExcelJS|SheetJS|localStorage|sessionStorage|Orbit\.store\.(insert|update|remove)|eval\(|new Function|XMLHttpRequest|fetch\()' \
+            orbit360-platform/core/document-source-contract-p04.js \
+            orbit360-platform/core/excel-workbook-adapter-p04.js; then
+            echo 'Direct parser, direct storage, or executable code path detected'
+            exit 1
+          fi
+
+      - name: Guard macros and formulas remain disabled
+        run: |
+          grep -q 'executeMacros: false' orbit360-platform/core/excel-workbook-adapter-p04.js
+          grep -q 'calculateFormulas: false' orbit360-platform/core/excel-workbook-adapter-p04.js
+          grep -q 'includeCellValues: false' orbit360-platform/core/excel-workbook-adapter-p04.js
+          grep -q 'includeBinaryPayload: false' orbit360-platform/core/excel-workbook-adapter-p04.js
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
