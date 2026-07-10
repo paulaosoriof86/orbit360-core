@@ -1,8 +1,8 @@
 /* ============================================================
-   Orbit 360 · P0.9f/P0.9g/P0.9h · Panel aditivo de conocimiento en Aseguradoras
+   Orbit 360 · P0.9f/P0.9g/P0.9h/P0.9i · Panel aditivo de conocimiento
    Fecha: 2026-07-10
 
-   Muestra provider, snapshots, conocimiento, lote e historial por tenant.
+   Muestra provider, snapshots, conocimiento, lote, historial y estado admin.
    No escribe store, no ejecuta lotes y no habilita Cotizador/Comparativo.
    ============================================================ */
 (function () {
@@ -46,6 +46,14 @@
     }
     return api.readModel(tenant, first.id);
   }
+  function adminState() {
+    var api = Orbit.aseguradorasBatchAdminActionsP09i;
+    if (!api || typeof api.status !== 'function') return {
+      version: '', lastPlan: null, lastExecution: null,
+      knowledgePersistenceAllowed: false, referencesExposed: false
+    };
+    return api.status();
+  }
   function state() {
     var tenant = tenantId();
     var bootstrap = Orbit.aseguradorasRuntimeBootstrapP09f;
@@ -64,7 +72,8 @@
     var batch = batchState(tenant);
     return {
       tenantId: tenant, bootstrap: boot, preflight: preflight, provider: provider,
-      snapshots: snapshots, firstPlans: firstPlans, batch: batch, history: historyState(tenant, batch),
+      snapshots: snapshots, firstPlans: firstPlans, batch: batch,
+      history: historyState(tenant, batch), admin: adminState(),
       counts: {
         sources: sources,
         manifests: countTenant('aseguradora_manifiestos', tenant),
@@ -112,6 +121,24 @@
       (resumable.length ? '<div class="muted" style="font-size:10.5px;margin-top:7px">Pendientes para reanudar: ' + esc(resumable.join(', ')) + '</div>' : '') +
     '</div>';
   }
+  function adminHtml(model) {
+    var admin = model.admin || {}, plan = admin.lastPlan || null, execution = admin.lastExecution || null;
+    var refs = plan && plan.referenceContract || {};
+    var documents = [].concat(plan && plan.documents || []);
+    var ready = !!(plan && plan.ok);
+    return '<div style="margin-top:9px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface)">' +
+      '<div style="display:flex;gap:7px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap">' +
+        '<div><b style="font-size:11.5px">Acción administrativa</b><div class="muted" style="font-size:10.5px;margin-top:2px">Preview y ejecución separados de la persistencia del historial.</div></div>' +
+        '<span class="badge ' + (ready ? 'ok' : 'neutral') + '">' + esc(plan && plan.code || 'sin preview') + '</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">' +
+        metric('Documentos', documents.length) + metric('Refs disponibles', Number(refs.provided || 0)) + metric('Refs faltantes', [].concat(refs.missing || []).length) +
+      '</div>' +
+      (plan ? '<div class="muted" style="font-size:10.5px;margin-top:7px">Acción: ' + esc(plan.action) + ' · Confirmación requerida: ' + esc(plan.requiredConfirmation) + '</div>' : '') +
+      (execution ? '<div class="muted" style="font-size:10.5px;margin-top:5px">Última ejecución: ' + esc(execution.code) + ' · Conocimiento persistido: no · Historial persistido: ' + esc(execution.historyPersisted === true ? 'sí' : 'no') + '</div>' : '') +
+      '<div class="muted" style="font-size:10.5px;margin-top:7px">Solo lectura. Ejecutar requiere actor, motivo, fingerprint y confirmación reforzada; guardar historial exige una segunda confirmación administrativa.</div>' +
+    '</div>';
+  }
   function batchHtml(model) {
     var summary = model.batch && model.batch.batches && model.batch.batches[0];
     var latest = model.batch && model.batch.latest;
@@ -131,7 +158,7 @@
         metric('Fallidas', runSummary.failed || 0) +
         metric('Bindings listos', runSummary.bindingsReadyForReview || 0) +
         metric('Bindings incompletos', incompleteBindings) +
-      '</div>' + bindingRows(latest) + historyHtml(model) +
+      '</div>' + bindingRows(latest) + historyHtml(model) + adminHtml(model) +
       '<div class="muted" style="font-size:10.5px;margin-top:7px">El panel es solo lectura. Ejecutar, reanudar o persistir requiere referencias backend, actor, motivo y confirmaciones administrativas.</div>' +
     '</div>';
   }
@@ -139,6 +166,7 @@
     var providerReady = model.provider && model.provider.ok === true;
     var snapshotReady = model.snapshots && model.snapshots.installed === true;
     var preflightReady = model.preflight && model.preflight.ok === true;
+    var adminReady = !!Orbit.aseguradorasBatchAdminActionsP09i;
     var firstPlan = model.firstPlans[0] || null;
     return '<section id="' + PANEL_ID + '" style="margin:0 0 14px;border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--card)">' +
       '<div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">' +
@@ -151,6 +179,7 @@
         badge('Provider ' + clean(model.provider.code || model.provider.status || 'pendiente'), providerReady, 'El backend debe confirmar capacidades reales') +
         badge('Snapshots ' + Number(model.snapshots.snapshotAttachedCount || 0) + '/' + Number((model.snapshots.collections || []).length), snapshotReady, 'Colecciones profundas') +
         badge('Preflight LAB', preflightReady, (model.preflight.errors || []).join(', ')) +
+        badge('Acciones admin', adminReady, 'Preview, dry-run y persistencia separada del historial') +
       '</div>' +
       '<div style="display:flex;gap:7px;flex-wrap:wrap">' +
         metric('Fuentes', model.counts.sources) + metric('Manifiestos', model.counts.manifests) + metric('Propuestas', model.counts.proposals) +
@@ -197,6 +226,7 @@
   window.addEventListener('orbit:aseguradoras:lab-snapshot', schedule);
   window.addEventListener('orbit:aseguradoras:batch-state', schedule);
   window.addEventListener('orbit:aseguradoras:batch-item', schedule);
+  window.addEventListener('orbit:aseguradoras:batch-admin-state', schedule);
   document.addEventListener('orbit:store', schedule);
   schedule();
 })();
