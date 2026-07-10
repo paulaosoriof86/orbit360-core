@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 · P0.9f/P0.9g · Bootstrap seguro del runtime de conocimiento
+   Orbit 360 · P0.9f/P0.9g/P0.9h · Bootstrap seguro del runtime de conocimiento
    Fecha: 2026-07-10
 
    Carga contratos aditivos solo en Firestore LAB para A&S. No modifica
@@ -9,7 +9,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p09g-v1';
+  var VERSION = 'p09h-v1';
   var REQUIRED = [
     { src: 'core/document-source-contract-p04.js', global: 'documentSourceContractP04' },
     { src: 'core/cotizacion-esquema-aseguradora-p0.js', global: 'cotizacionEsquemaAseguradoraP0' },
@@ -34,6 +34,7 @@
     { src: 'modules/aseguradoras-knowledge-p09.js', service: 'aseguradorasKnowledgeP09' },
     { src: 'core/aseguradoras-first-source-orchestrator-p09f.js', global: 'aseguradorasFirstSourceP09f' },
     { src: 'core/aseguradoras-batch-orchestrator-p09g.js', global: 'aseguradorasBatchOrchestratorP09g' },
+    { src: 'core/aseguradoras-batch-history-p09h.js', global: 'aseguradorasBatchHistoryP09h' },
     { src: 'modules/aseguradoras-knowledge-panel-p09f.js', global: 'aseguradorasKnowledgePanelP09f' }
   ];
 
@@ -126,6 +127,7 @@
       baseSnapshotsReady: labStatus.snapshotAttached === true,
       knowledgeSnapshotsReady: !!(Orbit.aseguradorasLabCollectionsP09e && Orbit.aseguradorasLabCollectionsP09e.status().installed),
       batchRuntimeReady: !!Orbit.aseguradorasBatchOrchestratorP09g,
+      batchHistoryReady: !!(Orbit.aseguradorasBatchHistoryP09h && Orbit.aseguradorasBatchHistoryP09h.status().installed),
       bridgeStatus: clone(state.bridge), enablesCotizador: false, enablesComparativo: false
     };
   }
@@ -163,6 +165,9 @@
     try {
       if (Orbit.aseguradorasLabCollectionsP09e && typeof Orbit.aseguradorasLabCollectionsP09e.install === 'function') Orbit.aseguradorasLabCollectionsP09e.install();
     } catch (error) { state.errors.push('KNOWLEDGE_SNAPSHOT_INSTALL_FAILED'); }
+    try {
+      if (Orbit.aseguradorasBatchHistoryP09h && typeof Orbit.aseguradorasBatchHistoryP09h.install === 'function') Orbit.aseguradorasBatchHistoryP09h.install();
+    } catch (error) { state.errors.push('BATCH_HISTORY_INSTALL_FAILED'); }
     await registerBridge();
     var check = preflight();
     state.completedAt = new Date().toISOString();
