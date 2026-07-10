@@ -16,6 +16,18 @@ Orbit.modules.importar = (function () {
     document.head.appendChild(s);
   }
 
+  function loadP0ClientRules() {
+    if (Orbit.__importaClientesP0Loader) return;
+    Orbit.__importaClientesP0Loader = true;
+    if (!Orbit.importaClientesP0) {
+      addScript('core/importa-clientes-p0.js?v=20260709', function () {
+        if (!Orbit.__importaClientesP0Wired) addScript('core/importa-clientes-p0-wire.js?v=20260709');
+      });
+    } else if (!Orbit.__importaClientesP0Wired) {
+      addScript('core/importa-clientes-p0-wire.js?v=20260709');
+    }
+  }
+
   function loadP0PolicyRules() {
     if (Orbit.__importaPolizasP0Loader) return;
     Orbit.__importaPolizasP0Loader = true;
@@ -124,6 +136,7 @@ Orbit.modules.importar = (function () {
   }
 
   function loadP0Rules() {
+    loadP0ClientRules();
     loadP0PolicyRules();
     loadP0CarteraRules();
     loadP0ComisionesRules();
