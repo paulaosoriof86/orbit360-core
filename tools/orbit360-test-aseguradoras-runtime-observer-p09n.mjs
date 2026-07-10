@@ -5,6 +5,11 @@ function assert(condition, message) { if (!condition) throw new Error(message); 
 
 const queued = [];
 let submitted = null;
+let formState = { hasPreview: true, hasExecution: true, historyPersisted: true };
+let adminState = {
+  lastPlan: { ok: true, fingerprint: 'control-safe', referenceContract: { provided: 1, missing: [] } },
+  lastExecution: { ok: true, code: 'BATCH_DRY_RUN_COMPLETE', historyPersisted: true }
+};
 const visibleElement = (text, controls = {}) => ({
   textContent: text,
   getBoundingClientRect: () => ({ width: 900, height: 320 }),
@@ -26,9 +31,16 @@ const rows = {
   aseguradora_presentaciones: [],
   aseguradora_bindings: [],
   aseguradora_revisiones: [{ id: 'r1', tenantId: 'alianzas-soluciones' }],
-  aseguradora_batch_runs: [{ id: 'run1', tenantId: 'alianzas-soluciones' }],
-  aseguradora_batch_items: [{ id: 'item1', tenantId: 'alianzas-soluciones' }]
+  aseguradora_batch_runs: [{ id: 'run1', tenantId: 'alianzas-soluciones', status: 'completed' }],
+  aseguradora_batch_items: [{ id: 'item1', tenantId: 'alianzas-soluciones', runId: 'run1', status: 'dry_run_ready' }]
 };
+const historyModel = () => ({
+  runs: rows.aseguradora_batch_runs,
+  items: rows.aseguradora_batch_items,
+  latest: rows.aseguradora_batch_runs[0],
+  latestItems: rows.aseguradora_batch_items,
+  resumableDocumentIds: []
+});
 const Orbit = {
   tenant: { get: () => ({ id: 'alianzas-soluciones' }) },
   auth: { user: () => ({ id: 'user-private', email: 'private@example.test', tenantId: 'alianzas-soluciones', activeRole: 'Dirección', roles: ['Dirección', 'Asesor'] }) },
@@ -39,16 +51,9 @@ const Orbit = {
   },
   aseguradorasSourceReferenceBrokerP09j: { status: () => ({ backendMethodAvailable: true }) },
   aseguradorasLabCollectionsP09e: { status: () => ({ installed: true }) },
-  aseguradorasBatchAdminFormP09j: { status: () => ({ hasPreview: true, hasExecution: true, historyPersisted: true }) },
-  aseguradorasBatchAdminActionsP09i: {
-    status: () => ({
-      lastPlan: { ok: true, fingerprint: 'control-safe', referenceContract: { provided: 1, missing: [] } },
-      lastExecution: { ok: true, code: 'BATCH_DRY_RUN_COMPLETE', historyPersisted: true }
-    })
-  },
-  aseguradorasBatchHistoryP09h: {
-    readModel: () => ({ runs: rows.aseguradora_batch_runs, items: rows.aseguradora_batch_items, resumableDocumentIds: [] })
-  }
+  aseguradorasBatchAdminFormP09j: { status: () => formState },
+  aseguradorasBatchAdminActionsP09i: { status: () => adminState },
+  aseguradorasBatchHistoryP09h: { readModel: historyModel }
 };
 const document = {
   documentElement: { clientWidth: 1280, clientHeight: 800, scrollWidth: 1280 },
@@ -108,6 +113,14 @@ assert(report.claudeGate.ready === false && report.claudeGate.pending.includes('
 const serialized = JSON.stringify(report);
 assert(!serialized.includes('private@example.test') && !serialized.includes('user-private'), 'reporte no debe exponer identidad');
 assert(report.containsPii === false && report.containsLocalPaths === false && report.containsReferences === false, 'flags de seguridad deben permanecer cerrados');
+
+formState = { hasPreview: false, hasExecution: false, historyPersisted: false };
+adminState = { lastPlan: null, lastExecution: null };
+const reloadedReport = api.capture('reload_rebuild');
+assert(reloadedReport.flow.historyPersisted === true, 'debe reconstruir historial desde runs persistidos');
+assert(reloadedReport.flow.executionCompleted === true && reloadedReport.flow.executionOk === true, 'debe reconstruir lectura desde latest/latestItems');
+assert(reloadedReport.gates.find(item => item.id === 'read_model').state === 'approved', 'read model persistido debe aprobarse tras recarga');
+
 const response = await api.submit('synthetic_submit');
 assert(response.accepted === true && submitted, 'debe enviar el reporte por bridge');
 assert(!JSON.stringify(submitted).includes('private@example.test'), 'bridge no debe recibir PII');
