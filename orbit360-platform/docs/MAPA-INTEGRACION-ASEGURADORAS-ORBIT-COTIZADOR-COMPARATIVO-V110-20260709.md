@@ -42,7 +42,7 @@ documentoId
 aseguradoraId
 nombre
 tipo
-a rchivoRef
+archivoRef
 hash
 versión
 país
