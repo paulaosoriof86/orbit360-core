@@ -5,6 +5,7 @@ on:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
+      - 'orbit360-platform/core/importa-clientes-p0.js'
       - 'orbit360-platform/core/importa-polizas-p0.js'
       - 'orbit360-platform/core/importa-cartera-p0.js'
       - 'orbit360-platform/core/importa-comisiones-p0.js'
@@ -18,6 +19,7 @@ on:
       - 'orbit360-platform/modules/importar-p0-dashboard.js'
       - 'orbit360-platform/modules/importar-p0-confirmacion.js'
       - 'tools/orbit360-p0-dryrun-manifest-20260709.mjs'
+      - 'tools/orbit360-test-importa-clientes-p0.mjs'
       - 'tools/orbit360-test-importa-polizas-p0.mjs'
       - 'tools/orbit360-test-importa-cartera-p0.mjs'
       - 'tools/orbit360-test-importa-comisiones-p0.mjs'
@@ -37,6 +39,7 @@ on:
     branches:
       - main
     paths:
+      - 'orbit360-platform/core/importa-clientes-p0.js'
       - 'orbit360-platform/core/importa-polizas-p0.js'
       - 'orbit360-platform/core/importa-cartera-p0.js'
       - 'orbit360-platform/core/importa-comisiones-p0.js'
@@ -50,6 +53,7 @@ on:
       - 'orbit360-platform/modules/importar-p0-dashboard.js'
       - 'orbit360-platform/modules/importar-p0-confirmacion.js'
       - 'tools/orbit360-p0-dryrun-manifest-20260709.mjs'
+      - 'tools/orbit360-test-importa-clientes-p0.mjs'
       - 'tools/orbit360-test-importa-polizas-p0.mjs'
       - 'tools/orbit360-test-importa-cartera-p0.mjs'
       - 'tools/orbit360-test-importa-comisiones-p0.mjs'
@@ -81,6 +85,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Check client rules syntax
+        run: node --check orbit360-platform/core/importa-clientes-p0.js
 
       - name: Check policy rules syntax
         run: node --check orbit360-platform/core/importa-polizas-p0.js
@@ -121,6 +128,9 @@ jobs:
       - name: Check dry-run manifest syntax
         run: node --check tools/orbit360-p0-dryrun-manifest-20260709.mjs
 
+      - name: Check client smoke syntax
+        run: node --check tools/orbit360-test-importa-clientes-p0.mjs
+
       - name: Check policy smoke syntax
         run: node --check tools/orbit360-test-importa-polizas-p0.mjs
 
@@ -159,6 +169,9 @@ jobs:
 
       - name: Check dry-run manifest smoke syntax
         run: node --check tools/orbit360-test-p0-dryrun-manifest.mjs
+
+      - name: Run client smoke
+        run: node tools/orbit360-test-importa-clientes-p0.mjs
 
       - name: Run policy smoke
         run: node tools/orbit360-test-importa-polizas-p0.mjs
