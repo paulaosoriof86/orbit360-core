@@ -34,7 +34,7 @@ const auto = api.buildQuoteProfile({
   sections: [
     { title: 'Datos del vehículo', page: 1, order: 1, fields: [
       { label: 'Cliente', value: 'Persona de ejemplo', sourceLocation: loc(1, 'cliente') },
-      { label: 'Teléfono', value: '00000000', sourceLocation: loc(1, 'telefono') },
+      { label: 'Teléfono', value: 'phone-demo', sourceLocation: loc(1, 'telefono') },
       { label: 'Tipo', value: 'Automóvil', sourceLocation: loc(1, 'tipo') },
       { label: 'Suma Asegurada', value: 'Q 35,000.00', sourceLocation: loc(1, 'suma') }
     ] },
@@ -131,6 +131,6 @@ assert(request.includeSensitiveValues === false && request.returnRawBytes === fa
 const diff = api.buildProfileDiff(auto, microbus);
 assert(Array.isArray(diff) && diff.length > 0, 'Variantes diferentes deben producir diff');
 const serialized = JSON.stringify({ auto, microbus, otherInsurer, families });
-assert(!/Persona de ejemplo|00000000/.test(serialized), 'No debe quedar PII de entrenamiento en el perfil');
+assert(!/Persona de ejemplo|phone-demo/.test(serialized), 'No debe quedar PII de entrenamiento en el perfil');
 assert(!/"password"\s*:|"token"\s*:|"rawPayload"\s*:|"binaryPayload"\s*:/.test(serialized), 'No debe incorporar valores de secretos ni payloads binarios');
 console.log('OK orbit360-test-pdf-quote-adapter-p07');
