@@ -2,9 +2,8 @@
    Orbit 360 · P0.9f · Bootstrap seguro del runtime de conocimiento
    Fecha: 2026-07-10
 
-   Carga secuencialmente contratos aditivos de Aseguradoras únicamente en
-   Firestore LAB para tenant alianzas-soluciones. No modifica backend
-   protegido, no registra secretos y no habilita Cotizador/Comparativo.
+   Carga contratos aditivos solo en Firestore LAB para A&S. No modifica
+   backend protegido, no registra secretos y no habilita módulos.
    ============================================================ */
 (function () {
   'use strict';
@@ -37,38 +36,24 @@
   ];
 
   var state = {
-    version: VERSION,
-    status: 'idle',
-    startedAt: '',
-    completedAt: '',
-    loaded: [],
-    skipped: [],
-    errors: [],
-    bridge: null,
-    tenantId: '',
-    mode: '',
-    promise: null
+    version: VERSION, status: 'idle', startedAt: '', completedAt: '',
+    loaded: [], skipped: [], errors: [], bridge: null,
+    tenantId: '', mode: '', promise: null
   };
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
-  function clone(value) {
-    try { return JSON.parse(JSON.stringify(value == null ? null : value)); }
-    catch (error) { return value; }
-  }
+  function clone(value) { try { return JSON.parse(JSON.stringify(value == null ? null : value)); } catch (error) { return value; } }
   function backend() { return window.OrbitBackend || window.ORBIT_BACKEND || {}; }
-  function params() {
-    try { return new URLSearchParams(window.location && window.location.search || ''); }
-    catch (error) { return new URLSearchParams(''); }
-  }
+  function params() { try { return new URLSearchParams(window.location && window.location.search || ''); } catch (error) { return new URLSearchParams(''); } }
   function runtimeContext() {
     var query = params(), b = backend();
-    var mode = clean(query.get('orbitBackend') || b.mode);
-    var tenantId = clean(query.get('tenant') || b.tenantId || b.tenant);
-    return { mode: mode, tenantId: tenantId };
+    return {
+      mode: clean(query.get('orbitBackend') || b.mode),
+      tenantId: clean(query.get('tenant') || b.tenantId || b.tenant)
+    };
   }
   function pathOnly(value) {
-    value = clean(value).replace(/^https?:\/\/[^/]+\//i, '');
-    return value.split('?')[0].replace(/^\.\//, '');
+    return clean(value).replace(/^https?:\/\/[^/]+\//i, '').split('?')[0].replace(/^\.\//, '');
   }
   function hasScript(src) {
     var wanted = pathOnly(src);
@@ -83,9 +68,7 @@
     return hasScript(item.src);
   }
   function emit(name, detail) {
-    try {
-      window.dispatchEvent(new CustomEvent(name, { detail: Object.assign({ version: VERSION }, detail || {}) }));
-    } catch (error) {}
+    try { window.dispatchEvent(new CustomEvent(name, { detail: Object.assign({ version: VERSION }, detail || {}) })); } catch (error) {}
   }
   function loadScript(item) {
     return new Promise(function (resolve, reject) {
@@ -96,7 +79,7 @@
       }
       if (hasScript(item.src)) {
         var started = Date.now();
-        var wait = function () {
+        (function wait() {
           if (requirementReady(item) || item.dataOnly || item.optionalGlobal) {
             state.skipped.push(item.src);
             resolve({ src: item.src, status: 'existing_script_ready' });
@@ -107,8 +90,7 @@
             return;
           }
           setTimeout(wait, 80);
-        };
-        wait();
+        })();
         return;
       }
       var script = document.createElement('script');
@@ -128,8 +110,7 @@
     });
   }
   function preflight() {
-    var ctx = runtimeContext(), b = backend(), s = Orbit.store, errors = [];
-    var labStatus = {};
+    var ctx = runtimeContext(), b = backend(), s = Orbit.store, errors = [], labStatus = {};
     try { if (s && typeof s._labStatus === 'function') labStatus = s._labStatus() || {}; } catch (error) {}
     if (ctx.mode !== 'firestore-lab') errors.push('FIRESTORE_LAB_REQUIRED');
     if (ctx.tenantId !== 'alianzas-soluciones') errors.push('LAB_TENANT_NOT_ALLOWED');
@@ -137,109 +118,82 @@
     if (!b.securityGuard || b.securityGuard.installed !== true) errors.push('BACKEND_SECURITY_GUARD_REQUIRED');
     if (!labStatus.snapshotAttached) errors.push('BASE_SNAPSHOTS_REQUIRED');
     return {
-      ok: errors.length === 0,
-      errors: errors,
-      mode: ctx.mode,
-      tenantId: ctx.tenantId,
+      ok: errors.length === 0, errors: errors, mode: ctx.mode, tenantId: ctx.tenantId,
       storeReady: !!(s && s.__firestoreLabExplicit),
       securityGuardReady: !!(b.securityGuard && b.securityGuard.installed),
       baseSnapshotsReady: labStatus.snapshotAttached === true,
       knowledgeSnapshotsReady: !!(Orbit.aseguradorasLabCollectionsP09e && Orbit.aseguradorasLabCollectionsP09e.status().installed),
-      bridgeStatus: clone(state.bridge),
-      enablesCotizador: false,
-      enablesComparativo: false
+      bridgeStatus: clone(state.bridge), enablesCotizador: false, enablesComparativo: false
     };
   }
   async function registerBridge() {
     var api = Orbit.documentProviderBridgeP09b;
     if (!api || typeof api.registerAvailable !== 'function') return { ok: false, code: 'PROVIDER_BRIDGE_REQUIRED', status: 'backend_required' };
-    var result = await api.registerAvailable();
-    state.bridge = clone(result);
-    return result;
+    state.bridge = clone(await api.registerAvailable());
+    return state.bridge;
   }
-  async function start(options) {
-    options = options || {};
-    if (state.promise) return state.promise;
-    state.promise = (async function () {
-      var ctx = runtimeContext();
-      state.mode = ctx.mode;
-      state.tenantId = ctx.tenantId;
-      state.startedAt = new Date().toISOString();
-      state.status = 'loading';
-      state.loaded = [];
-      state.skipped = [];
-      state.errors = [];
-      if (ctx.mode !== 'firestore-lab' || ctx.tenantId !== 'alianzas-soluciones') {
-        state.status = 'blocked_context';
-        state.errors = [ctx.mode !== 'firestore-lab' ? 'FIRESTORE_LAB_REQUIRED' : 'LAB_TENANT_NOT_ALLOWED'];
-        return status();
-      }
-      emit('orbit:aseguradoras:knowledge-loading', { tenantId: ctx.tenantId });
-      for (var i = 0; i < REQUIRED.length; i += 1) {
-        try { await loadScript(REQUIRED[i]); }
-        catch (error) {
-          state.errors.push(clean(error && error.message || error));
-          state.status = 'load_failed';
-          emit('orbit:aseguradoras:knowledge-error', { error: state.errors[state.errors.length - 1] });
-          return status();
-        }
-      }
-      try {
-        if (Orbit.aseguradorasLabCollectionsP09e && typeof Orbit.aseguradorasLabCollectionsP09e.install === 'function') {
-          Orbit.aseguradorasLabCollectionsP09e.install();
-        }
-      } catch (error) { state.errors.push('KNOWLEDGE_SNAPSHOT_INSTALL_FAILED'); }
-      await registerBridge();
-      var check = preflight();
-      state.completedAt = new Date().toISOString();
-      state.status = check.ok ? 'ready' : 'requires_runtime_preflight';
-      emit('orbit:aseguradoras:knowledge-ready', { status: state.status, preflight: check });
-      try {
-        if (Orbit.aseguradorasKnowledgePanelP09f && typeof Orbit.aseguradorasKnowledgePanelP09f.schedule === 'function') {
-          Orbit.aseguradorasKnowledgePanelP09f.schedule();
-        }
-      } catch (error) {}
-      return status();
-    })();
-    return state.promise;
-  }
-  function resetForTest() {
-    state.promise = null;
-    state.status = 'idle';
-    state.startedAt = '';
+  async function executeStart() {
+    var ctx = runtimeContext();
+    state.mode = ctx.mode;
+    state.tenantId = ctx.tenantId;
+    state.startedAt = new Date().toISOString();
     state.completedAt = '';
+    state.status = 'loading';
     state.loaded = [];
     state.skipped = [];
     state.errors = [];
-    state.bridge = null;
+    if (ctx.mode !== 'firestore-lab' || ctx.tenantId !== 'alianzas-soluciones') {
+      state.status = 'blocked_context';
+      state.errors = [ctx.mode !== 'firestore-lab' ? 'FIRESTORE_LAB_REQUIRED' : 'LAB_TENANT_NOT_ALLOWED'];
+      return status();
+    }
+    emit('orbit:aseguradoras:knowledge-loading', { tenantId: ctx.tenantId });
+    for (var i = 0; i < REQUIRED.length; i += 1) {
+      try { await loadScript(REQUIRED[i]); }
+      catch (error) {
+        state.errors.push(clean(error && error.message || error));
+        state.status = 'load_failed';
+        emit('orbit:aseguradoras:knowledge-error', { error: state.errors[state.errors.length - 1] });
+        return status();
+      }
+    }
+    try {
+      if (Orbit.aseguradorasLabCollectionsP09e && typeof Orbit.aseguradorasLabCollectionsP09e.install === 'function') Orbit.aseguradorasLabCollectionsP09e.install();
+    } catch (error) { state.errors.push('KNOWLEDGE_SNAPSHOT_INSTALL_FAILED'); }
+    await registerBridge();
+    var check = preflight();
+    state.completedAt = new Date().toISOString();
+    state.status = check.ok ? 'ready' : 'requires_runtime_preflight';
+    emit('orbit:aseguradoras:knowledge-ready', { status: state.status, preflight: check });
+    try { if (Orbit.aseguradorasKnowledgePanelP09f) Orbit.aseguradorasKnowledgePanelP09f.schedule(); } catch (error) {}
+    return status();
+  }
+  function start() {
+    if (!state.promise) state.promise = executeStart();
+    return state.promise;
+  }
+  function retry() {
+    if (state.status === 'loading' && state.promise) return state.promise;
+    state.promise = null;
+    return start();
+  }
+  function resetForTest() {
+    state.promise = null; state.status = 'idle'; state.startedAt = ''; state.completedAt = '';
+    state.loaded = []; state.skipped = []; state.errors = []; state.bridge = null;
   }
   function status() {
     return {
-      version: VERSION,
-      status: state.status,
-      mode: state.mode,
-      tenantId: state.tenantId,
-      startedAt: state.startedAt,
-      completedAt: state.completedAt,
-      loaded: state.loaded.slice(),
-      skipped: state.skipped.slice(),
-      errors: state.errors.slice(),
-      bridge: clone(state.bridge),
-      requiredScripts: REQUIRED.map(function (item) { return item.src; }),
-      enablesCotizador: false,
-      enablesComparativo: false,
-      writesDirectly: false
+      version: VERSION, status: state.status, mode: state.mode, tenantId: state.tenantId,
+      startedAt: state.startedAt, completedAt: state.completedAt,
+      loaded: state.loaded.slice(), skipped: state.skipped.slice(), errors: state.errors.slice(),
+      bridge: clone(state.bridge), requiredScripts: REQUIRED.map(function (item) { return item.src; }),
+      enablesCotizador: false, enablesComparativo: false, writesDirectly: false
     };
   }
 
   Orbit.aseguradorasRuntimeBootstrapP09f = {
-    VERSION: VERSION,
-    REQUIRED: clone(REQUIRED),
-    runtimeContext: runtimeContext,
-    preflight: preflight,
-    start: start,
-    status: status,
-    resetForTest: resetForTest
+    VERSION: VERSION, REQUIRED: clone(REQUIRED), runtimeContext: runtimeContext,
+    preflight: preflight, start: start, retry: retry, status: status, resetForTest: resetForTest
   };
 
   setTimeout(function () {
