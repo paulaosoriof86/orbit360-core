@@ -77,6 +77,13 @@ Orbit.modules.importar = (function () {
     addScript('modules/importar-p0-dashboard.js?v=20260709', onload);
   }
 
+  function loadP0Confirmacion(onload) {
+    if (Orbit.importarP0Confirmacion) { if (onload) onload(); return; }
+    if (Orbit.__importarP0ConfirmacionLoader) return;
+    Orbit.__importarP0ConfirmacionLoader = true;
+    addScript('modules/importar-p0-confirmacion.js?v=20260709', onload);
+  }
+
   function loadP0Rules() {
     loadP0PolicyRules();
     loadP0CarteraRules();
@@ -86,6 +93,7 @@ Orbit.modules.importar = (function () {
   }
   loadP0Rules();
   loadP0Dashboard();
+  loadP0Confirmacion();
 
   const GROUPS = [
     {
@@ -118,6 +126,14 @@ Orbit.modules.importar = (function () {
     else loadP0Dashboard(function () { if (Orbit.importarP0Dashboard) Orbit.importarP0Dashboard.mount(dash); });
   }
 
+  function mountP0Confirmacion(host) {
+    const conf = host.querySelector('#importar-p0-confirmacion');
+    if (!conf) return;
+    const sampleBatch = { status: 'sin_lote', operations: [] };
+    if (Orbit.importarP0Confirmacion) Orbit.importarP0Confirmacion.mount(conf, sampleBatch);
+    else loadP0Confirmacion(function () { if (Orbit.importarP0Confirmacion) Orbit.importarP0Confirmacion.mount(conf, sampleBatch); });
+  }
+
   function render(host) {
     loadP0Rules();
     host.innerHTML = `<div class="page">
@@ -141,10 +157,12 @@ Orbit.modules.importar = (function () {
       </div>
 
       <div id="importar-p0-dashboard"></div>
+      <div id="importar-p0-confirmacion"></div>
     </div>`;
 
     host.querySelectorAll('.imp-card').forEach(el => el.addEventListener('click', () => Orbit.importa.open(el.dataset.k)));
     mountP0Dashboard(host);
+    mountP0Confirmacion(host);
   }
   return { render };
 })();
