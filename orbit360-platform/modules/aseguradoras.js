@@ -4,10 +4,11 @@
    contactos, cuentas, facturación, Drive, fuentes documentales,
    comisiones y requisitos de emisión.
 
-   P0.1 2026-07-10:
-   - inventario de fuentes para Cotizador/Comparativo;
-   - país/ramo/producto/plan/versión/estado;
-   - disponibilidad de tarifa y presentación;
+   P0.1 / P0.1b 2026-07-10:
+   - inventario multifuentе para Cotizador/Comparativo;
+   - país/moneda/ramo/producto/segmento/tipo de riesgo/vehículo/plan;
+   - agrupación y suficiencia por combinación, no por aseguradora completa;
+   - disponibilidad de tarifas, reglas, presentación y casos de prueba;
    - compatibilidad con docs legacy nombre/categoría;
    - cero almacenamiento directo fuera de Orbit.store.
    ============================================================ */
@@ -23,7 +24,7 @@ Orbit.modules.aseguradoras = (function () {
     ['tarifario_excel', 'Tarifario Excel'],
     ['tarifario_pdf', 'Tarifario PDF'],
     ['poliza_ejemplo', 'Póliza ejemplo'],
-    ['condiciones', 'Condiciones'],
+    ['condiciones', 'Condiciones / beneficios'],
     ['circular', 'Circular / actualización'],
     ['ajuste_validado', 'Ajuste validado'],
     ['cotizador_linea_asistido', 'Cotizador en línea asistido'],
@@ -42,6 +43,11 @@ Orbit.modules.aseguradoras = (function () {
     'reemplazado_por_version',
     'bloqueado'
   ];
+  const DIMENSION_KEYS = [
+    'pais', 'moneda', 'ramo', 'producto', 'familiaProducto',
+    'subtipoProducto', 'segmento', 'tipoRiesgo', 'tipoVehiculo',
+    'usoVehiculo', 'plan'
+  ];
 
   function paisOK(p) { return !Orbit.pais || Orbit.pais === 'TODOS' || p === Orbit.pais; }
   function up(id, patch) { S().update('aseguradoras', id, patch); }
@@ -49,6 +55,7 @@ Orbit.modules.aseguradoras = (function () {
   function safeAll(col) { try { return S().all(col) || []; } catch (e) { return []; } }
   function clean(v) { return String(v == null ? '' : v).trim(); }
   function slug(v) { return clean(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, ''); }
+  function unique(values) { return Array.from(new Set((values || []).map(clean).filter(Boolean))); }
   function extension(name) {
     const parts = clean(name).toLowerCase().split('.');
     return parts.length > 1 ? parts.pop() : '';
@@ -61,7 +68,7 @@ Orbit.modules.aseguradoras = (function () {
     if (cat.includes('cotizador')) return 'cotizador_linea_asistido';
     if (cat.includes('cotiz')) return 'cotizacion_pdf_oficial';
     if (cat.includes('póliza') || cat.includes('poliza')) return 'poliza_ejemplo';
-    if (cat.includes('condicion')) return 'condiciones';
+    if (cat.includes('condicion') || cat.includes('beneficio')) return 'condiciones';
     if (cat.includes('circular')) return 'circular';
     if (cat.includes('ajuste')) return 'ajuste_validado';
     if (cat.includes('formulario')) return 'formulario';
@@ -86,10 +93,37 @@ Orbit.modules.aseguradoras = (function () {
     if (type === 'otro') return 'Otro';
     return 'Tarifas';
   }
+  function defaultCurrency(country) {
+    if (clean(country).toUpperCase() === 'GT') return 'GTQ';
+    if (clean(country).toUpperCase() === 'CO') return 'COP';
+    return '';
+  }
+  function sourceDimensions(d, aseguradora) {
+    d = d || {};
+    const pais = clean(d.pais || (aseguradora && aseguradora.pais)).toUpperCase();
+    return {
+      pais,
+      moneda: clean(d.moneda || defaultCurrency(pais)).toUpperCase(),
+      ramo: clean(d.ramo),
+      producto: clean(d.producto),
+      familiaProducto: clean(d.familiaProducto || d.familia),
+      subtipoProducto: clean(d.subtipoProducto || d.subtipo),
+      segmento: clean(d.segmento),
+      tipoRiesgo: clean(d.tipoRiesgo),
+      tipoVehiculo: clean(d.tipoVehiculo),
+      usoVehiculo: clean(d.usoVehiculo),
+      plan: clean(d.plan)
+    };
+  }
+  function sourceCombinationKey(input, aseguradora) {
+    const d = sourceDimensions(input, aseguradora);
+    return DIMENSION_KEYS.map(k => slug(d[k]) || '*').join('|');
+  }
   function normalizarFuente(d, aseguradora) {
     d = d || {};
     const tipoFuente = legacyType(d);
     const nombre = clean(d.nombre || d.archivo || 'Documento');
+    const dims = sourceDimensions(d, aseguradora);
     const outputDefault = tipoFuente === 'cotizador_excel_salida';
     const rateDefault = tipoFuente === 'cotizador_excel_salida' || tipoFuente === 'tarifario_excel' || tipoFuente === 'tarifario_pdf' || tipoFuente === 'ajuste_validado';
     return {
@@ -97,10 +131,18 @@ Orbit.modules.aseguradoras = (function () {
       nombre,
       cat: clean(d.cat || d.categoria) || legacyCat(tipoFuente),
       tipoFuente,
-      pais: clean(d.pais || (aseguradora && aseguradora.pais)).toUpperCase(),
-      ramo: clean(d.ramo),
-      producto: clean(d.producto),
-      plan: clean(d.plan),
+      pais: dims.pais,
+      moneda: dims.moneda,
+      ramo: dims.ramo,
+      producto: dims.producto,
+      familiaProducto: dims.familiaProducto,
+      subtipoProducto: dims.subtipoProducto,
+      segmento: dims.segmento,
+      tipoRiesgo: dims.tipoRiesgo,
+      tipoVehiculo: dims.tipoVehiculo,
+      usoVehiculo: dims.usoVehiculo,
+      plan: dims.plan,
+      claveCobertura: sourceCombinationKey(d, aseguradora),
       version: clean(d.version || 'v1'),
       archivoRef: clean(d.archivoRef || d.documentRef || d.driveUrl || d.url),
       contieneTarifas: d.contieneTarifas != null ? d.contieneTarifas === true : rateDefault,
@@ -108,6 +150,7 @@ Orbit.modules.aseguradoras = (function () {
       contieneHojaSalida: d.contieneHojaSalida != null ? d.contieneHojaSalida === true : outputDefault,
       contieneFormatoCotizacion: d.contieneFormatoCotizacion != null ? d.contieneFormatoCotizacion === true : tipoFuente === 'cotizacion_pdf_oficial',
       contieneAreaImpresion: d.contieneAreaImpresion != null ? d.contieneAreaImpresion === true : outputDefault,
+      usos: Array.isArray(d.usos) ? d.usos.slice() : [],
       estado: clean(d.estado || 'inventario_fuentes'),
       vigenciaDesde: clean(d.vigenciaDesde),
       vigenciaHasta: clean(d.vigenciaHasta),
@@ -122,28 +165,105 @@ Orbit.modules.aseguradoras = (function () {
       return api.inspectTrainingSource(d);
     }
     const hasOutput = d.contieneHojaSalida || d.contieneFormatoCotizacion || d.contieneAreaImpresion;
-    const hasRates = d.contieneTarifas || d.contieneReglasCalculo;
-    const presentationComplete = d.tipoFuente === 'cotizacion_pdf_oficial' || ((d.tipoFuente === 'cotizador_excel_salida' || d.tipoFuente === 'cotizador_linea_asistido') && hasOutput);
-    const needsExample = !presentationComplete && (d.tipoFuente === 'tarifario_excel' || d.tipoFuente === 'tarifario_pdf' || hasRates);
+    const hasRates = d.contieneTarifas;
+    const hasRules = d.contieneReglasCalculo;
+    const officialQuote = d.tipoFuente === 'cotizacion_pdf_oficial';
+    const excelCalculator = d.tipoFuente === 'cotizador_excel_salida';
+    const policyExample = d.tipoFuente === 'poliza_ejemplo';
+    const conditionSource = d.tipoFuente === 'condiciones' || d.tipoFuente === 'circular';
+    const tariffSource = d.tipoFuente === 'tarifario_excel' || d.tipoFuente === 'tarifario_pdf';
+    const sirveParaTarifas = hasRates || tariffSource || excelCalculator || d.tipoFuente === 'ajuste_validado';
+    const sirveParaReglas = hasRules || excelCalculator || d.tipoFuente === 'ajuste_validado';
+    const sirveParaPresentacion = officialQuote || ((excelCalculator || d.tipoFuente === 'cotizador_linea_asistido') && hasOutput);
+    const sirveParaComparativo = officialQuote || policyExample || conditionSource || sirveParaPresentacion;
+    const sirveParaCondiciones = policyExample || conditionSource || officialQuote;
+    const sirveParaCasosPrueba = officialQuote || policyExample || (excelCalculator && hasOutput);
+    const usos = unique([].concat(
+      d.usos || [],
+      sirveParaTarifas ? ['tarifas'] : [],
+      sirveParaReglas ? ['reglas_calculo'] : [],
+      sirveParaPresentacion ? ['presentacion_cotizacion'] : [],
+      sirveParaComparativo ? ['extraccion_comparativo'] : [],
+      sirveParaCondiciones ? ['condiciones_beneficios'] : [],
+      sirveParaCasosPrueba ? ['casos_prueba'] : []
+    ));
     return {
       tipoFuente: d.tipoFuente,
-      sirveParaTarifas: hasRates || d.tipoFuente === 'cotizador_excel_salida' || d.tipoFuente === 'ajuste_validado',
-      sirveParaPresentacion: presentationComplete,
+      usos,
+      sirveParaTarifas,
+      sirveParaReglas,
+      sirveParaPresentacion,
+      sirveParaComparativo,
+      sirveParaCondiciones,
+      sirveParaCasosPrueba,
       sirveParaExtraccion: true,
-      requiereEjemploCotizacion: needsExample
+      requiereEjemploCotizacion: (sirveParaTarifas || sirveParaReglas) && !sirveParaPresentacion
     };
   }
   function resumenFuentes(docs, aseguradora) {
     const fuentes = (docs || []).map(d => normalizarFuente(d, aseguradora));
     const evaluaciones = fuentes.map(evaluarFuente);
     const tieneTarifa = evaluaciones.some(e => e.sirveParaTarifas);
+    const tieneReglas = evaluaciones.some(e => e.sirveParaReglas);
     const tienePresentacion = evaluaciones.some(e => e.sirveParaPresentacion);
-    const requiereEjemplo = tieneTarifa && !tienePresentacion;
+    const requiereEjemplo = (tieneTarifa || tieneReglas) && !tienePresentacion;
     let estado = 'inventario_fuentes';
     if (fuentes.length && requiereEjemplo) estado = 'fuentes_incompletas';
-    if (fuentes.length && tienePresentacion && tieneTarifa) estado = 'requiere_validacion';
+    if (fuentes.length && tienePresentacion && (tieneTarifa || tieneReglas)) estado = 'requiere_validacion';
     if (fuentes.some(f => f.estado === 'validado_habilitado')) estado = 'validado_habilitado';
-    return { total: fuentes.length, fuentes, evaluaciones, tieneTarifa, tienePresentacion, requiereEjemplo, estado };
+    return { total: fuentes.length, fuentes, evaluaciones, tieneTarifa, tieneReglas, tienePresentacion, requiereEjemplo, estado };
+  }
+  function resumenGrupos(docs, aseguradora) {
+    const fuentes = (docs || []).map(d => normalizarFuente(d, aseguradora));
+    const grouped = {};
+    fuentes.forEach(f => {
+      grouped[f.claveCobertura] = grouped[f.claveCobertura] || [];
+      grouped[f.claveCobertura].push(f);
+    });
+    const grupos = Object.keys(grouped).map(clave => {
+      const list = grouped[clave];
+      const evals = list.map(evaluarFuente);
+      const counts = {};
+      list.forEach(f => { counts[f.tipoFuente] = (counts[f.tipoFuente] || 0) + 1; });
+      const tieneTarifa = evals.some(e => e.sirveParaTarifas);
+      const tieneReglas = evals.some(e => e.sirveParaReglas);
+      const tienePresentacion = evals.some(e => e.sirveParaPresentacion);
+      const tieneCasosPrueba = evals.some(e => e.sirveParaCasosPrueba);
+      const tieneCondiciones = evals.some(e => e.sirveParaCondiciones);
+      let estado = 'conocimiento_parcial';
+      if ((tieneTarifa || tieneReglas) && !tienePresentacion) estado = 'requiere_cotizacion_ejemplo';
+      if (!(tieneTarifa || tieneReglas) && tienePresentacion) estado = 'presentacion_sin_tarifa';
+      if ((tieneTarifa || tieneReglas) && tienePresentacion) estado = 'fuentes_completas_requiere_validacion';
+      if (list.some(f => f.estado === 'validado_habilitado')) estado = 'validado_habilitado';
+      return {
+        clave,
+        dimensiones: sourceDimensions(list[0], aseguradora),
+        fuentes: list,
+        total: list.length,
+        cantidadesPorTipo: counts,
+        cotizacionesEjemplo: counts.cotizacion_pdf_oficial || 0,
+        polizasEjemplo: counts.poliza_ejemplo || 0,
+        cotizadoresExcel: counts.cotizador_excel_salida || 0,
+        tieneTarifa,
+        tieneReglas,
+        tienePresentacion,
+        tieneCasosPrueba,
+        tieneCondiciones,
+        requiereEjemplo: (tieneTarifa || tieneReglas) && !tienePresentacion,
+        estado
+      };
+    }).sort((a, b) => groupLabel(a).localeCompare(groupLabel(b)));
+    return {
+      grupos,
+      total: grupos.length,
+      completos: grupos.filter(g => g.estado === 'fuentes_completas_requiere_validacion' || g.estado === 'validado_habilitado').length,
+      incompletos: grupos.filter(g => g.estado !== 'fuentes_completas_requiere_validacion' && g.estado !== 'validado_habilitado').length,
+      requierenEjemplo: grupos.filter(g => g.requiereEjemplo).length
+    };
+  }
+  function groupLabel(group) {
+    const d = group && group.dimensiones ? group.dimensiones : sourceDimensions(group || {});
+    return [d.pais, d.ramo, d.producto, d.familiaProducto, d.subtipoProducto, d.segmento, d.tipoRiesgo, d.tipoVehiculo, d.usoVehiculo, d.plan].filter(Boolean).join(' · ') || 'Combinación sin clasificar';
   }
   function sourceBadges(summary) {
     const out = [];
@@ -151,6 +271,36 @@ Orbit.modules.aseguradoras = (function () {
     out.push(`<span class="badge ${summary.tienePresentacion ? 'ok' : 'neutral'}">${summary.tienePresentacion ? '✓' : '—'} Presentación</span>`);
     if (summary.requiereEjemplo) out.push('<span class="badge warn">⚠ Requiere cotización ejemplo</span>');
     return out.join('');
+  }
+  function groupBadges(group) {
+    return [
+      `<span class="badge ${group.tieneTarifa ? 'ok' : 'neutral'}">${group.tieneTarifa ? '✓' : '—'} tarifa</span>`,
+      `<span class="badge ${group.tieneReglas ? 'ok' : 'neutral'}">${group.tieneReglas ? '✓' : '—'} reglas</span>`,
+      `<span class="badge ${group.tienePresentacion ? 'ok' : 'neutral'}">${group.tienePresentacion ? '✓' : '—'} presentación</span>`,
+      `<span class="badge ${group.tieneCasosPrueba ? 'ok' : 'neutral'}">${group.tieneCasosPrueba ? '✓' : '—'} casos</span>`,
+      group.requiereEjemplo ? '<span class="badge warn">⚠ ejemplo requerido</span>' : ''
+    ].join('');
+  }
+  function groupsHtml(groupsSummary) {
+    if (!groupsSummary.grupos.length) return '<div class="muted" style="font-size:12px">Aún no hay combinaciones clasificadas.</div>';
+    return `<div style="display:grid;gap:7px">${groupsSummary.grupos.map(g => `<details style="border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--surface)">
+      <summary style="cursor:pointer;font-size:12px;font-weight:700">${U.esc(groupLabel(g))} · ${g.total} fuente(s)</summary>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin:8px 0">${groupBadges(g)}<span class="badge neutral">${U.esc(g.estado)}</span></div>
+      <div class="muted" style="font-size:11px">${Object.keys(g.cantidadesPorTipo).map(k => `${U.esc(typeLabel(k))}: ${g.cantidadesPorTipo[k]}`).join(' · ')}</div>
+    </details>`).join('')}</div>`;
+  }
+  function datalistHtml(id, values) {
+    return `<datalist id="${id}">${unique(values).map(v => `<option value="${U.esc(v)}"></option>`).join('')}</datalist>`;
+  }
+  function catalogosFuentes(docs, aseguradora) {
+    const fuentes = (docs || []).map(d => normalizarFuente(d, aseguradora));
+    const pick = key => unique(fuentes.map(f => f[key]));
+    return {
+      ramos: unique([].concat((aseguradora && aseguradora.ramos) || [], pick('ramo'))),
+      productos: pick('producto'), familias: pick('familiaProducto'), subtipos: pick('subtipoProducto'),
+      segmentos: pick('segmento'), riesgos: pick('tipoRiesgo'), vehiculos: pick('tipoVehiculo'),
+      usosVehiculo: pick('usoVehiculo'), planes: pick('plan')
+    };
   }
 
   function vinculos(id) {
@@ -206,7 +356,7 @@ Orbit.modules.aseguradoras = (function () {
         { label: 'Con tarifas', val: conTarifa, color: 'var(--ok)', foot: 'fuente identificada', footTone: 'up', onclick: "location.hash='#/aseguradoras'" },
         { label: 'Con presentación', val: conPresentacion, color: 'var(--info)', foot: 'cotización o salida', onclick: "location.hash='#/aseguradoras'" }
       ])}
-      <div class="cfg-note" style="margin-bottom:14px">Aseguradoras es la fuente maestra para directorio, accesos, cuentas, documentos, tarifas y formatos de cotización. <b>Tarifas disponibles</b> y <b>presentación disponible</b> son estados distintos; una tabla de tasas puede requerir una cotización oficial de ejemplo.</div>
+      <div class="cfg-note" style="margin-bottom:14px">Aseguradoras es la fuente maestra para directorio, accesos, cuentas, documentos, tarifas y formatos de cotización. La cobertura se evalúa por <b>país, producto, segmento, tipo de riesgo/vehículo y plan</b>; una combinación completa no completa las demás.</div>
       <div class="asg-grid">${all.map(a => card(a)).join('')}</div>
     </div>`;
     host.querySelector('#asg-new').addEventListener('click', nueva);
@@ -233,14 +383,15 @@ Orbit.modules.aseguradoras = (function () {
     const on = a.vinculada !== false;
     const nPol = S().where('polizas', p => p.aseguradoraId === a.id).length;
     const summary = resumenFuentes(a.docs, a);
+    const groups = resumenGrupos(a.docs, a);
     const logo = a.logo ? `<span class="asg-dot" style="padding:0;overflow:hidden"><img src="${a.logo}" style="width:100%;height:100%;object-fit:contain"></span>` : `<span class="asg-dot" style="background:${a.color}">${U.esc((a.nombre || '?')[0])}</span>`;
     return `<div class="asg-card ${on ? '' : 'off'}" data-asg="${a.id}">
       <div class="asg-card-h">
         ${logo}
-        <div style="flex:1;min-width:0"><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11.5px">${a.pais} · ${(a.ramos || []).length} ramos · ${nPol} pólizas · ${summary.total} fuentes</div></div>
+        <div style="flex:1;min-width:0"><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11.5px">${a.pais} · ${(a.ramos || []).length} ramos · ${nPol} pólizas · ${summary.total} fuentes · ${groups.total} combinaciones</div></div>
         <label class="asg-switch" title="Vinculación" onclick="event.stopPropagation()"><input type="checkbox" data-toggle="${a.id}" ${on ? 'checked' : ''}><span></span></label>
       </div>
-      <div class="asg-card-tags">${sourceBadges(summary)}${(a.ramos || []).slice(0, 2).map(r => `<span class="badge neutral">${U.esc(r)}</span>`).join('')}</div>
+      <div class="asg-card-tags">${sourceBadges(summary)}${groups.requierenEjemplo ? `<span class="badge warn">${groups.requierenEjemplo} grupo(s) incompletos</span>` : ''}${(a.ramos || []).slice(0, 2).map(r => `<span class="badge neutral">${U.esc(r)}</span>`).join('')}</div>
     </div>`;
   }
 
@@ -259,19 +410,22 @@ Orbit.modules.aseguradoras = (function () {
     const portales = a.portales && a.portales.length ? a.portales : (a.portal ? [{ nombre: 'Portal principal', url: a.portal, usuario: '', credentialRef: '' }] : []);
     const docs = (a.docs || []).map(d => normalizarFuente(d, a));
     const summary = resumenFuentes(docs, a);
+    const groups = resumenGrupos(docs, a);
+    const catalogs = catalogosFuentes(docs, a);
     const reqs = a.docsRequeridos || [];
     const ramos = a.ramos || [];
     const toneTipo = { 'Comercial / Técnico': 'info', 'Comercial': 'info', 'Técnico': 'info', 'Administrativo': 'neutral', 'Siniestros': 'danger' };
     let back = document.getElementById('asg-ficha'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'asg-ficha'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center';
-    back.innerHTML = `<div class="card" style="width:min(980px,97vw);max-height:92vh;overflow:auto;padding:0">
+    back.innerHTML = `<div class="card" style="width:min(1060px,97vw);max-height:92vh;overflow:auto;padding:0">
+      ${datalistHtml('af-ramos-list', catalogs.ramos)}${datalistHtml('af-productos-list', catalogs.productos)}${datalistHtml('af-familias-list', catalogs.familias)}${datalistHtml('af-subtipos-list', catalogs.subtipos)}${datalistHtml('af-segmentos-list', catalogs.segmentos)}${datalistHtml('af-riesgos-list', catalogs.riesgos)}${datalistHtml('af-vehiculos-list', catalogs.vehiculos)}${datalistHtml('af-usos-list', catalogs.usosVehiculo)}${datalistHtml('af-planes-list', catalogs.planes)}
       <div style="padding:20px 24px;background:linear-gradient(120deg,${a.color},#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <div style="display:flex;gap:13px;align-items:center">
           <label class="asg-logo" title="Cargar logo">${a.logo ? `<img src="${a.logo}">` : '<span>🏢<br><small>logo</small></span>'}<input type="file" id="af-logo" accept="image/*" style="display:none"></label>
           <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Aseguradora · ${a.pais}</div>
             <input id="af-nombre" value="${U.esc(a.nombre)}" style="font-family:var(--f-display);font-weight:800;font-size:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;padding:4px 10px">
-            <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'} · ${summary.total} fuentes</div></div>
+            <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'} · ${summary.total} fuentes · ${groups.total} combinaciones</div></div>
         </div>
         <button class="imp-x" id="af-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
       </div>
@@ -299,9 +453,15 @@ Orbit.modules.aseguradoras = (function () {
           </div>
         </div>
         <div class="asg-sec">
+          <div class="asg-sec-t">🧩 Cobertura de conocimiento por combinación</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin:7px 0 10px"><span class="badge neutral">${groups.total} combinaciones</span><span class="badge ok">${groups.completos} completas</span><span class="badge ${groups.incompletos ? 'warn' : 'neutral'}">${groups.incompletos} incompletas</span>${groups.requierenEjemplo ? `<span class="badge warn">${groups.requierenEjemplo} requieren cotización ejemplo</span>` : ''}</div>
+          <div class="muted" style="font-size:11.5px;margin-bottom:9px">Cada grupo se evalúa por país, ramo, producto, familia, segmento, tipo de riesgo/vehículo, uso y plan. Autos no completa Motos; Individual no completa Familiar.</div>
+          ${groupsHtml(groups)}
+        </div>
+        <div class="asg-sec">
           <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">🧠 Fuentes para Cotizador / Comparativo <button class="btn ghost sm" id="af-add-doc">+ Fuente</button></div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin:7px 0 10px">${sourceBadges(summary)}<span class="badge neutral">${summary.total} fuente(s)</span><span class="badge neutral">Estado: ${U.esc(summary.estado)}</span></div>
-          <div class="muted" style="font-size:11.5px;margin-bottom:9px">Cotizadores Excel, tarifarios, cotizaciones oficiales, pólizas y condiciones se versionan por aseguradora, país y producto. Una fuente tarifaria sin formato de salida queda marcada como <b>requiere cotización ejemplo</b>.</div>
+          <div class="muted" style="font-size:11.5px;margin-bottom:9px">Puede haber muchas pólizas, cotizaciones, cotizadores, tarifarios y condiciones por combinación. Un cotizador Excel puede aportar simultáneamente tarifas, reglas, presentación y casos de prueba.</div>
           <div id="af-docs">${docs.map((d, i) => docRow(d, i, a)).join('') || '<div class="muted" style="font-size:12px">Sin fuentes registradas.</div>'}</div>
           <button class="btn ghost sm" style="margin-top:9px" id="af-imp-doc">✨ Importar fuentes (PDF / Excel / imagen)</button>
         </div>
@@ -349,8 +509,15 @@ Orbit.modules.aseguradoras = (function () {
         cat: legacyCat(type),
         tipoFuente: type,
         pais: get('[data-dpais]'),
+        moneda: get('[data-dmon]'),
         ramo: get('[data-dramo]'),
         producto: get('[data-dprod]'),
+        familiaProducto: get('[data-dfam]'),
+        subtipoProducto: get('[data-dsub]'),
+        segmento: get('[data-dseg]'),
+        tipoRiesgo: get('[data-drisk]'),
+        tipoVehiculo: get('[data-dveh]'),
+        usoVehiculo: get('[data-duse]'),
         plan: get('[data-dplan]'),
         version: get('[data-dver]'),
         archivoRef: get('[data-dref]'),
@@ -380,7 +547,7 @@ Orbit.modules.aseguradoras = (function () {
     $('#af-add-portal').addEventListener('click', () => push('portales', { nombre: 'Portal', url: '', usuario: '', credentialRef: '' }));
     $('#af-add-cont').addEventListener('click', () => push('contactos', { tipo: 'Comercial / Técnico', nombre: '', email: '', tel: '' }));
     $('#af-add-cta').addEventListener('click', () => push('cuentas', { banco: '', tipo: 'Monetaria', numero: '', moneda: a.pais === 'GT' ? 'GTQ' : 'COP' }));
-    $('#af-add-doc').addEventListener('click', () => push('docs', normalizarFuente({ nombre: 'Nueva fuente.xlsx', tipoFuente: 'cotizador_excel_salida', pais: a.pais, version: 'v1', estado: 'inventario_fuentes' }, a)));
+    $('#af-add-doc').addEventListener('click', () => push('docs', normalizarFuente({ nombre: 'Nueva fuente.xlsx', tipoFuente: 'cotizador_excel_salida', pais: a.pais, moneda: defaultCurrency(a.pais), version: 'v1', estado: 'inventario_fuentes' }, a)));
     $('#af-add-req').addEventListener('click', () => push('docsRequeridos', { producto: '', items: '' }));
     $('#af-add-ramo').addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; const rr = (S().get('aseguradoras', id).ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); const com = Object.assign({}, S().get('aseguradoras', id).comisiones); com[r] = a.comisionDefault || 12; up(id, { ramos: rr, comisiones: com }); adminAct('Ramo/comisión de aseguradora actualizado', 'Ramo agregado: ' + r, a); ficha(id, true); });
     back.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
@@ -395,9 +562,9 @@ Orbit.modules.aseguradoras = (function () {
     $('#af-save').addEventListener('click', async () => {
       const motivo = await Orbit.ui.prompt('Motivo del cambio en esta aseguradora:', { title: 'Guardar cambios administrativos' });
       if (!motivo) return;
-      if (!(await U.confirm('Guardar cambios administrativos, inventario de fuentes y versiones de esta aseguradora. ¿Continuar?', { title: 'Guardar aseguradora', ok: 'Guardar' }))) return;
+      if (!(await U.confirm('Guardar cambios administrativos, inventario multifuentе y cobertura por combinación. ¿Continuar?', { title: 'Guardar aseguradora', ok: 'Guardar' }))) return;
       snapshot();
-      adminAct('Ficha aseguradora actualizada', 'Motivo: ' + motivo + ' · fuentes: ' + back.querySelectorAll('[data-doc]').length, a);
+      adminAct('Ficha aseguradora actualizada', 'Motivo: ' + motivo + ' · fuentes: ' + back.querySelectorAll('[data-doc]').length + ' · combinaciones: ' + resumenGrupos([...back.querySelectorAll('[data-doc]')].map(sourceFromRow), a).total, a);
       close(); reload();
     });
   }
@@ -447,11 +614,16 @@ Orbit.modules.aseguradoras = (function () {
       <input class="o-sel" data-cm placeholder="Moneda" value="${U.esc(c.moneda || '')}" style="width:72px">
       <button class="asg-del" data-del="cuentas:${i}">✕</button></div>`;
   }
+  function currencyOptions(value) {
+    const vals = unique([value, 'GTQ', 'COP', 'USD']);
+    return vals.map(v => `<option value="${U.esc(v)}" ${v === value ? 'selected' : ''}>${U.esc(v)}</option>`).join('') + `<option value="" ${!value ? 'selected' : ''}>Moneda</option>`;
+  }
   function docRow(raw, i, aseguradora) {
     const d = normalizarFuente(raw, aseguradora);
     const ev = evaluarFuente(d);
     const stateOptions = SOURCE_STATES.map(s => `<option value="${s}" ${s === d.estado ? 'selected' : ''}>${s.replace(/_/g, ' ')}</option>`).join('');
     const typeOptions = SOURCE_TYPES.map(t => `<option value="${t[0]}" ${t[0] === d.tipoFuente ? 'selected' : ''}>${t[1]}</option>`).join('');
+    const useBadges = (ev.usos || []).slice(0, 6).map(use => `<span class="badge neutral">${U.esc(use.replace(/_/g, ' '))}</span>`).join('');
     return `<div data-doc="${i}" data-source-id="${U.esc(d.id)}" style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:9px;background:var(--surface)">
       <div class="asg-row" style="margin:0 0 7px">
         <span style="font-size:15px">📎</span>
@@ -463,10 +635,19 @@ Orbit.modules.aseguradoras = (function () {
       </div>
       <div class="asg-row" style="margin:0 0 7px">
         <select class="o-sel" data-dpais style="width:76px"><option value="GT" ${d.pais === 'GT' ? 'selected' : ''}>GT</option><option value="CO" ${d.pais === 'CO' ? 'selected' : ''}>CO</option><option value="" ${!d.pais ? 'selected' : ''}>País</option></select>
-        <input class="o-sel" data-dramo value="${U.esc(d.ramo)}" placeholder="Ramo" style="flex:1">
-        <input class="o-sel" data-dprod value="${U.esc(d.producto)}" placeholder="Producto" style="flex:1">
-        <input class="o-sel" data-dplan value="${U.esc(d.plan)}" placeholder="Plan / familia" style="flex:1">
-        <input class="o-sel" data-dref value="${U.esc(d.archivoRef)}" placeholder="Drive / documento / referencia" style="flex:1.7">
+        <select class="o-sel" data-dmon style="width:84px">${currencyOptions(d.moneda)}</select>
+        <input class="o-sel" list="af-ramos-list" data-dramo value="${U.esc(d.ramo)}" placeholder="Ramo" style="flex:1">
+        <input class="o-sel" list="af-productos-list" data-dprod value="${U.esc(d.producto)}" placeholder="Producto" style="flex:1">
+        <input class="o-sel" list="af-familias-list" data-dfam value="${U.esc(d.familiaProducto)}" placeholder="Familia" style="flex:1">
+        <input class="o-sel" list="af-subtipos-list" data-dsub value="${U.esc(d.subtipoProducto)}" placeholder="Subtipo" style="flex:1">
+      </div>
+      <div class="asg-row" style="margin:0 0 7px">
+        <input class="o-sel" list="af-segmentos-list" data-dseg value="${U.esc(d.segmento)}" placeholder="Segmento" style="flex:1">
+        <input class="o-sel" list="af-riesgos-list" data-drisk value="${U.esc(d.tipoRiesgo)}" placeholder="Tipo de riesgo" style="flex:1">
+        <input class="o-sel" list="af-vehiculos-list" data-dveh value="${U.esc(d.tipoVehiculo)}" placeholder="Tipo vehículo" style="flex:1">
+        <input class="o-sel" list="af-usos-list" data-duse value="${U.esc(d.usoVehiculo)}" placeholder="Uso vehículo" style="flex:1">
+        <input class="o-sel" list="af-planes-list" data-dplan value="${U.esc(d.plan)}" placeholder="Plan" style="flex:1">
+        <input class="o-sel" data-dref value="${U.esc(d.archivoRef)}" placeholder="Drive / documento / referencia" style="flex:1.5">
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:11.5px">
         <label><input type="checkbox" data-dtar ${d.contieneTarifas ? 'checked' : ''}> tarifas</label>
@@ -478,6 +659,7 @@ Orbit.modules.aseguradoras = (function () {
         <span class="badge ${ev.sirveParaPresentacion ? 'ok' : 'neutral'}">${ev.sirveParaPresentacion ? '✓' : '—'} presentación</span>
         ${ev.requiereEjemploCotizacion ? '<span class="badge warn">⚠ ejemplo requerido</span>' : ''}
       </div>
+      ${useBadges ? `<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px">${useBadges}</div>` : ''}
       <div class="asg-row" style="margin:7px 0 0">
         <input class="o-sel" type="date" data-dvd value="${U.esc(d.vigenciaDesde)}" title="Vigencia desde" style="width:145px">
         <input class="o-sel" type="date" data-dvh value="${U.esc(d.vigenciaHasta)}" title="Vigencia hasta" style="width:145px">
@@ -503,9 +685,14 @@ Orbit.modules.aseguradoras = (function () {
       normalizarFuente,
       evaluarFuente,
       resumenFuentes,
+      resumenGrupos,
+      sourceDimensions,
+      sourceCombinationKey,
+      groupLabel,
       legacyType,
       SOURCE_TYPES,
-      SOURCE_STATES
+      SOURCE_STATES,
+      DIMENSION_KEYS
     }
   };
 })();
