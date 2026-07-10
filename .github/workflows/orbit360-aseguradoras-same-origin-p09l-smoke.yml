@@ -1,0 +1,107 @@
+name: Orbit 360 Aseguradoras Same Origin P09l
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-aseguradoras-same-origin-host-p09l.mjs'
+      - 'tools/orbit360-test-aseguradoras-same-origin-host-p09l.mjs'
+      - 'tools/orbit360-iniciar-aseguradoras-lab-p09l.ps1'
+      - 'tools/orbit360-detener-aseguradoras-lab-p09l.ps1'
+      - 'orbit360-platform/core/aseguradoras-same-origin-document-bridge-p09l.js'
+      - 'orbit360-platform/modules/aseguradoras-batch-admin-copy-p09l.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js'
+      - 'tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs'
+      - '.github/workflows/orbit360-aseguradoras-same-origin-p09l-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/orbit360-aseguradoras-same-origin-host-p09l.mjs'
+      - 'tools/orbit360-test-aseguradoras-same-origin-host-p09l.mjs'
+      - 'orbit360-platform/core/aseguradoras-same-origin-document-bridge-p09l.js'
+      - 'orbit360-platform/modules/aseguradoras-batch-admin-copy-p09l.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js'
+      - 'tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs'
+      - '.github/workflows/orbit360-aseguradoras-same-origin-p09l-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  same-origin-p09l:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check tools/orbit360-aseguradoras-same-origin-host-p09l.mjs
+          node --check tools/orbit360-test-aseguradoras-same-origin-host-p09l.mjs
+          node --check orbit360-platform/core/aseguradoras-same-origin-document-bridge-p09l.js
+          node --check orbit360-platform/modules/aseguradoras-batch-admin-copy-p09l.js
+          node --check orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js
+          node --check tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs
+
+      - name: Run loopback host smoke
+        run: node tools/orbit360-test-aseguradoras-same-origin-host-p09l.mjs
+
+      - name: Run user-facing panel smoke
+        run: node tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs
+
+      - name: Guard loopback and session security
+        run: |
+          grep -q "const HOST = '127.0.0.1'" tools/orbit360-aseguradoras-same-origin-host-p09l.mjs
+          grep -q 'HttpOnly; SameSite=Strict' tools/orbit360-aseguradoras-same-origin-host-p09l.mjs
+          grep -q 'P09L_ORIGIN_FORBIDDEN' tools/orbit360-aseguradoras-same-origin-host-p09l.mjs
+          if grep -nE "listen\([^)]*0\.0\.0\.0|HOST[[:space:]]*=[[:space:]]*['\"]0\.0\.0\.0" tools/orbit360-aseguradoras-same-origin-host-p09l.mjs; then
+            echo 'Host must not bind to all interfaces'
+            exit 1
+          fi
+
+      - name: Guard index remains runtime-only
+        run: |
+          grep -q 'transformIndexP09l' tools/orbit360-aseguradoras-same-origin-host-p09l.mjs
+          if grep -n 'aseguradoras-same-origin-document-bridge-p09l.js' orbit360-platform/index.html; then
+            echo 'P09l bridge must not be committed into index.html'
+            exit 1
+          fi
+
+      - name: Guard no client storage or external endpoint
+        run: |
+          if grep -RniE '(localStorage|sessionStorage|indexedDB|https?://[^/]|XMLHttpRequest|eval\(|new Function)' \
+            orbit360-platform/core/aseguradoras-same-origin-document-bridge-p09l.js \
+            orbit360-platform/modules/aseguradoras-batch-admin-copy-p09l.js; then
+            echo 'Forbidden client storage or external execution path detected'
+            exit 1
+          fi
+
+      - name: Guard user-facing copy
+        run: |
+          node tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs
+          grep -q 'Orbit localiza los archivos autorizados automáticamente' orbit360-platform/modules/aseguradoras-batch-admin-copy-p09l.js
+          grep -q 'Pendiente de conexión' orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js
+
+      - name: Guard zero enablement and no deployment
+        run: |
+          if grep -RniE '(enabledCotizador|enabledComparativo|enablesCotizador|enablesComparativo)[[:space:]]*:[[:space:]]*true|firebase deploy|git commit|git push' \
+            tools/orbit360-aseguradoras-same-origin-host-p09l.mjs \
+            orbit360-platform/core/aseguradoras-same-origin-document-bridge-p09l.js \
+            orbit360-platform/modules/aseguradoras-batch-admin-copy-p09l.js \
+            tools/orbit360-iniciar-aseguradoras-lab-p09l.ps1; then
+            echo 'Enablement or deployment command detected'
+            exit 1
+          fi
+
+      - name: Run backend capability smoke
+        run: node tools/orbit360-test-document-backend-capability-p09k.mjs
+
+      - name: Run backend LAB validator
+        run: node tools/orbit360-validar-backend-lab-contrato.mjs
