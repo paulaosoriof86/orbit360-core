@@ -1,0 +1,76 @@
+name: Orbit 360 Document Intelligence Router P08 Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/document-intelligence-router-p08.js'
+      - 'tools/orbit360-test-document-intelligence-router-p08.mjs'
+      - '.github/workflows/orbit360-document-intelligence-router-p08-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/document-intelligence-router-p08.js'
+      - 'tools/orbit360-test-document-intelligence-router-p08.mjs'
+      - '.github/workflows/orbit360-document-intelligence-router-p08-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  document-intelligence-router-p08:
+    name: Router inteligencia documental P0.8
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/document-intelligence-router-p08.js
+          node --check tools/orbit360-test-document-intelligence-router-p08.mjs
+
+      - name: Run provider routing smoke
+        run: node tools/orbit360-test-document-intelligence-router-p08.mjs
+
+      - name: Guard no keys, network, storage or operational writes
+        run: |
+          if grep -RniE '(Orbit\.store\.(insert|update|remove|setPref)|localStorage|sessionStorage|fetch\(|XMLHttpRequest|eval\(|new Function|apiKey\s*[:=]\s*["'"'][^"'"']+)' \
+            orbit360-platform/core/document-intelligence-router-p08.js; then
+            echo 'Direct write, storage, network, executable path, or key detected'
+            exit 1
+          fi
+
+      - name: Guard deterministic-first and tenant policies
+        run: |
+          grep -q "deterministic_pdf_p07b" orbit360-platform/core/document-intelligence-router-p08.js
+          grep -q "deterministic_excel_p04" orbit360-platform/core/document-intelligence-router-p08.js
+          grep -q "allowExternalAi" orbit360-platform/core/document-intelligence-router-p08.js
+          grep -q "allowOcr" orbit360-platform/core/document-intelligence-router-p08.js
+          grep -q "includeCellValues: false" orbit360-platform/core/document-intelligence-router-p08.js
+          grep -q "executeMacros: false" orbit360-platform/core/document-intelligence-router-p08.js
+          grep -q "requiresSecondGateForEnablement: true" orbit360-platform/core/document-intelligence-router-p08.js
+
+      - name: Guard no insurer or tenant hardcode
+        run: |
+          if grep -RniE '(Aseguradora Guatemalteca|Aseguate|Seguros Universales|Banrural|Bantrab|BAM|Columna|Alianzas y Soluciones)' \
+            orbit360-platform/core/document-intelligence-router-p08.js \
+            tools/orbit360-test-document-intelligence-router-p08.mjs; then
+            echo 'Tenant or insurer-specific data detected'
+            exit 1
+          fi
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
