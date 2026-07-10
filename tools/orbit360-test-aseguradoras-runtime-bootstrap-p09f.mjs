@@ -33,7 +33,8 @@ const globalByPath = {
   'core/aseguradoras-knowledge-runtime-p09.js': ['aseguradorasKnowledgeRuntimeP09', {}],
   'core/aseguradoras-lab-collections-p09e.js': ['aseguradorasLabCollectionsP09e', { install: () => ({ installed: true }), status: () => ({ installed: true, collections: ['a'], snapshotAttachedCount: 1 }) }],
   'core/aseguradoras-lab-persistence-p09e.js': ['aseguradorasLabPersistenceP09e', {}],
-  'core/aseguradoras-first-source-orchestrator-p09f.js': ['aseguradorasFirstSourceP09f', {}]
+  'core/aseguradoras-first-source-orchestrator-p09f.js': ['aseguradorasFirstSourceP09f', {}],
+  'modules/aseguradoras-knowledge-panel-p09f.js': ['aseguradorasKnowledgePanelP09f', { schedule: () => true }]
 };
 const document = {
   head: {
@@ -72,9 +73,10 @@ const api = Orbit.aseguradorasRuntimeBootstrapP09f;
 assert(api, 'bootstrap debe registrarse');
 const result = await api.start();
 assert(result.status === 'ready', `bootstrap LAB debe quedar ready: ${JSON.stringify(result.errors)}`);
-assert(result.requiredScripts.length === 21, 'debe declarar toda la cadena aditiva');
+assert(result.requiredScripts.length === 22, 'debe declarar toda la cadena aditiva y panel');
 assert(result.loaded.includes('core/aseguradoras-lab-persistence-p09e.js'), 'debe cargar gate de persistencia');
 assert(result.loaded.includes('core/aseguradoras-first-source-orchestrator-p09f.js'), 'debe cargar orquestador primera fuente');
+assert(result.loaded.includes('modules/aseguradoras-knowledge-panel-p09f.js'), 'debe cargar panel visible');
 assert(result.bridge && result.bridge.code === 'BACKEND_REQUIRED', 'provider ausente debe permanecer honesto sin bloquear contratos');
 assert(api.preflight().ok, 'preflight LAB debe pasar con store, guard y snapshots');
 const firstCount = scripts.length;
