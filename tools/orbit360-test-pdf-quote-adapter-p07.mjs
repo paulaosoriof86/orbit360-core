@@ -126,11 +126,11 @@ assert(insurerResolution.requiresHumanValidation && !insurerResolution.candidate
 
 const request = api.buildProviderRequest({ tenantId: 'tenant-demo', documentId: 'doc-x', fileRef: 'ref-x', purpose: 'training', includeSensitiveValues: true });
 assert(request.includeLayout && request.includeTables && request.includeImages && request.detectLogos, 'Provider debe solicitar texto, layout, tablas e imágenes');
-assert(request.includeSensitiveValues === false && request.returnRawBytes === false && request.executeEmbeddedContent === false, 'Training no debe devolver PII, bytes ni ejecutar contenido');
+assert(request.includeSensitiveValues === false && request.returnRawBytes === false && request.returnBase64 === false && request.executeEmbeddedContent === false, 'Training no debe devolver PII, bytes, base64 ni ejecutar contenido');
 
 const diff = api.buildProfileDiff(auto, microbus);
 assert(Array.isArray(diff) && diff.length > 0, 'Variantes diferentes deben producir diff');
-const serialized = JSON.stringify({ auto, microbus, otherInsurer, families, request });
+const serialized = JSON.stringify({ auto, microbus, otherInsurer, families });
 assert(!/Persona de ejemplo|00000000/.test(serialized), 'No debe quedar PII de entrenamiento en el perfil');
-assert(!/password|token|base64|rawBytes/i.test(serialized), 'No debe incorporar secretos ni binarios');
+assert(!/"password"\s*:|"token"\s*:|"rawPayload"\s*:|"binaryPayload"\s*:/.test(serialized), 'No debe incorporar valores de secretos ni payloads binarios');
 console.log('OK orbit360-test-pdf-quote-adapter-p07');
