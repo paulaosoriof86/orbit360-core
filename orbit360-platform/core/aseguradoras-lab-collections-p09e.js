@@ -1,10 +1,10 @@
 /* ============================================================
-   Orbit 360 · P0.9e · Colecciones profundas Aseguradoras en Firestore LAB
+   Orbit 360 · P0.9e/P0.9h · Colecciones profundas Aseguradoras en Firestore LAB
    Fecha: 2026-07-10
 
    Extensión aditiva del store LAB. No reemplaza data/store.js ni
    data/store-firestore-lab.local.js. Solo añade lectura/snapshots para las
-   colecciones de conocimiento que no forman parte del listado histórico.
+   colecciones de conocimiento e historial que no forman parte del listado histórico.
    ============================================================ */
 (function () {
   'use strict';
@@ -16,10 +16,12 @@
     'aseguradora_reglas_tarifarias',
     'aseguradora_presentaciones',
     'aseguradora_bindings',
-    'aseguradora_revisiones'
+    'aseguradora_revisiones',
+    'aseguradora_batch_runs',
+    'aseguradora_batch_items'
   ];
   var state = {
-    version: 'p09e-v1', installed: false, installing: false,
+    version: 'p09h-v1', installed: false, installing: false,
     mode: '', tenantId: '', snapshotAttached: false,
     snapshotAttachedCount: 0, snapshotErrors: {}, cache: {}, unsubscribers: []
   };
