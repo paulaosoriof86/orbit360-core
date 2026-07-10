@@ -34,6 +34,7 @@ const globalByPath = {
   'core/aseguradoras-lab-collections-p09e.js': ['aseguradorasLabCollectionsP09e', { install: () => ({ installed: true }), status: () => ({ installed: true, collections: ['a'], snapshotAttachedCount: 1 }) }],
   'core/aseguradoras-lab-persistence-p09e.js': ['aseguradorasLabPersistenceP09e', {}],
   'core/aseguradoras-first-source-orchestrator-p09f.js': ['aseguradorasFirstSourceP09f', {}],
+  'core/aseguradoras-batch-orchestrator-p09g.js': ['aseguradorasBatchOrchestratorP09g', {}],
   'modules/aseguradoras-knowledge-panel-p09f.js': ['aseguradorasKnowledgePanelP09f', { schedule: () => true }]
 };
 const document = {
@@ -78,12 +79,14 @@ const api = Orbit.aseguradorasRuntimeBootstrapP09f;
 assert(api, 'bootstrap debe registrarse');
 const result = await api.start();
 assert(result.status === 'ready', `bootstrap LAB debe quedar ready: ${JSON.stringify(result.errors)}`);
-assert(result.requiredScripts.length === 22, 'debe declarar toda la cadena aditiva y panel');
+assert(result.requiredScripts.length === 24, 'debe declarar contratos, lote P09g y panel');
+assert(result.loaded.includes('data/tenant-alianzas-soluciones-source-batch-p09g.js'), 'debe cargar lote tenant A&S');
+assert(result.loaded.includes('core/aseguradoras-batch-orchestrator-p09g.js'), 'debe cargar orquestador P09g');
 assert(result.loaded.includes('core/aseguradoras-lab-persistence-p09e.js'), 'debe cargar gate de persistencia');
 assert(result.loaded.includes('core/aseguradoras-first-source-orchestrator-p09f.js'), 'debe cargar orquestador primera fuente');
 assert(result.loaded.includes('modules/aseguradoras-knowledge-panel-p09f.js'), 'debe cargar panel visible');
 assert(result.bridge && result.bridge.code === 'BACKEND_REQUIRED', 'provider ausente debe permanecer honesto sin bloquear contratos');
-assert(api.preflight().ok, 'preflight LAB debe pasar con store, guard y snapshots');
+assert(api.preflight().ok && api.preflight().batchRuntimeReady, 'preflight LAB debe incluir runtime de lote');
 const firstCount = scripts.length;
 await api.start();
 assert(scripts.length === firstCount, 'segunda llamada no debe duplicar scripts');
