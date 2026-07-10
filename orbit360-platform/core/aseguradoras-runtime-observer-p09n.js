@@ -14,6 +14,7 @@
     'BACKEND_REQUIRED', 'Firestore', 'Firebase', 'Preflight LAB',
     'Provider', 'Snapshots', 'metadata-only', 'fileRef', 'sourceRef', 'localPath'
   ];
+  var SUCCESS_ITEM_STATES = ['dry_run_ready', 'persisted', 'verified'];
   var state = {
     lastReport: null,
     lastSubmission: null,
@@ -113,14 +114,24 @@
     var execution = adminStatus.lastExecution || {};
     var referenceContract = preview.referenceContract || {};
     var missingCount = [].concat(referenceContract.missing || []).length;
+    var runs = [].concat(historyModel.runs || []);
+    var items = [].concat(historyModel.items || []);
+    var latest = historyModel.latest || runs[0] || null;
+    var latestItems = [].concat(historyModel.latestItems || []);
+    if (!latestItems.length && latest) latestItems = items.filter(function (item) { return clean(item && item.runId) === clean(latest.id); });
+    var runCompleted = !!latest && clean(latest.status) !== 'running';
+    var successfulHistoryItem = latestItems.some(function (item) { return SUCCESS_ITEM_STATES.indexOf(clean(item && item.status)) >= 0; });
+    var historyPersisted = bool(formStatus.historyPersisted) || bool(execution.historyPersisted) || runs.length > 0;
+    var executionCompleted = bool(formStatus.hasExecution) || !!clean(execution.code) || runCompleted;
+    var executionOk = execution.ok === true || clean(execution.code) === 'BATCH_DRY_RUN_COMPLETE' || (runCompleted && successfulHistoryItem);
     return {
       previewGenerated: bool(formStatus.hasPreview) || !!preview.fingerprint,
       previewExecutable: bool(preview.ok) && missingCount === 0 && number(referenceContract.provided) > 0,
-      executionCompleted: bool(formStatus.hasExecution) || !!clean(execution.code),
-      executionOk: execution.ok === true || clean(execution.code) === 'BATCH_DRY_RUN_COMPLETE',
-      historyPersisted: bool(formStatus.historyPersisted) || bool(execution.historyPersisted),
-      historyRuns: number(historyModel.runs && historyModel.runs.length) || countStore('aseguradora_batch_runs'),
-      historyItems: number(historyModel.items && historyModel.items.length) || countStore('aseguradora_batch_items'),
+      executionCompleted: executionCompleted,
+      executionOk: executionOk,
+      historyPersisted: historyPersisted,
+      historyRuns: runs.length || countStore('aseguradora_batch_runs'),
+      historyItems: items.length || countStore('aseguradora_batch_items'),
       resumableDocuments: number(historyModel.resumableDocumentIds && historyModel.resumableDocumentIds.length),
       knowledgePersisted: false,
       cotizadorEnabled: false,
