@@ -48,7 +48,11 @@
     var firstSource = Orbit.aseguradorasFirstSourceP09f;
     var firstPlans = firstSource && typeof firstSource.listPlans === 'function' ? firstSource.listPlans(tenant) : [];
     var provider = boot.bridge || { ok: false, code: 'BACKEND_REQUIRED', status: 'backend_required' };
-    var sources = all('aseguradoras').reduce(function (total, insurer) { return total + [].concat(insurer && insurer.docs || []).length; }, 0);
+    var sources = all('aseguradoras').filter(function (insurer) {
+      return !insurer || !insurer.tenantId || clean(insurer.tenantId) === tenant;
+    }).reduce(function (total, insurer) {
+      return total + [].concat(insurer && insurer.docs || []).length;
+    }, 0);
     return {
       tenantId: tenant, bootstrap: boot, preflight: preflight, provider: provider,
       snapshots: snapshots, firstPlans: firstPlans, batch: batchState(tenant),
@@ -88,6 +92,7 @@
     var latest = model.batch && model.batch.latest;
     if (!summary) return '<div style="margin-top:10px;padding:9px 10px;border-radius:9px;background:var(--surface);font-size:11.5px"><b>Lote inicial:</b> no cargado.</div>';
     var runSummary = latest && latest.summary || {};
+    var incompleteBindings = latest ? Number(runSummary.bindingsIncomplete || 0) : Number(summary.bindingSets || 0);
     return '<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:10px">' +
       '<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px">' +
         '<div style="flex:1;min-width:220px"><b style="font-size:11.5px">Lote inicial A&S</b><div class="muted" style="font-size:11px">' +
@@ -100,7 +105,7 @@
         metric('Sin referencia', runSummary.waitingReference || 0) +
         metric('Fallidas', runSummary.failed || 0) +
         metric('Bindings listos', runSummary.bindingsReadyForReview || 0) +
-        metric('Bindings incompletos', runSummary.bindingsIncomplete || summary.bindingSets || 0) +
+        metric('Bindings incompletos', incompleteBindings) +
       '</div>' + bindingRows(latest) +
       '<div class="muted" style="font-size:10.5px;margin-top:7px">El panel es solo lectura. Ejecutar o persistir requiere referencias backend, actor, motivo y confirmaciones administrativas.</div>' +
     '</div>';
