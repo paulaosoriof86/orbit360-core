@@ -52,7 +52,12 @@ const document = {
     }
   },
   documentElement: { appendChild() {} },
-  createElement() { return { dataset: {}, async: true, src: '', onload: null, onerror: null }; },
+  createElement() {
+    return {
+      dataset: {}, async: true, src: '', onload: null, onerror: null,
+      getAttribute(name) { return name === 'src' ? this.src : ''; }
+    };
+  },
   querySelectorAll(selector) { return selector === 'script[src]' ? scripts : []; }
 };
 const window = {
@@ -82,6 +87,8 @@ assert(api.preflight().ok, 'preflight LAB debe pasar con store, guard y snapshot
 const firstCount = scripts.length;
 await api.start();
 assert(scripts.length === firstCount, 'segunda llamada no debe duplicar scripts');
+const retried = await api.retry();
+assert(retried.status === 'ready' && scripts.length === firstCount, 'retry debe reevaluar sin duplicar scripts');
 assert(events.some(event => event.type === 'orbit:aseguradoras:knowledge-ready'), 'debe emitir evento ready');
 
 api.resetForTest();
