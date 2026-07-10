@@ -9,14 +9,15 @@
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var LEGAL_SUFFIXES = [
-    'sa', 's_a', 's_a_s', 'sas', 'ltda', 'limitada', 'sociedad_anonima',
+  var LEGAL_WORDS = [
+    'sa', 'sas', 'ltda', 'limitada', 'sociedad', 'anonima',
     'compania', 'cia', 'seguros', 'aseguradora', 'insurance', 'corredores'
   ];
   var COUNTRY_ALIASES = {
     GT: ['gt', 'guatemala', 'guate'],
     CO: ['co', 'colombia']
   };
+  var FOLDER_MIME = 'application/vnd.google-apps.folder';
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function normalize(value) {
@@ -28,8 +29,13 @@
   function words(value) { return unique(normalize(value).split('_').filter(function (part) { return part.length > 1; })); }
 
   function withoutLegalSuffixes(value, extraSuffixes) {
-    var suffixes = LEGAL_SUFFIXES.concat(extraSuffixes || []).map(normalize);
-    return normalize(value).split('_').filter(function (part) { return suffixes.indexOf(part) < 0; }).join('_');
+    var base = normalize(value)
+      .replace(/_(s_a_s|s_a|srl|s_r_l)$/g, '')
+      .replace(/^(s_a_s|s_a|srl|s_r_l)_/g, '');
+    var blocked = LEGAL_WORDS.concat(extraSuffixes || []).map(normalize);
+    return base.split('_').filter(function (part) {
+      return part && blocked.indexOf(part) < 0 && part !== 's' && part !== 'a';
+    }).join('_');
   }
 
   function normalizeCountry(value) {
@@ -43,12 +49,11 @@
   }
 
   function countryFromPath(path) {
-    var normalizedPath = normalize(path);
+    var parts = normalize(path).split('_');
     var keys = Object.keys(COUNTRY_ALIASES);
     for (var i = 0; i < keys.length; i += 1) {
       var key = keys[i];
-      var aliases = COUNTRY_ALIASES[key];
-      if (aliases.some(function (alias) { return normalizedPath.split('_').indexOf(alias) >= 0; })) return key;
+      if (COUNTRY_ALIASES[key].some(function (alias) { return parts.indexOf(alias) >= 0; })) return key;
     }
     return '';
   }
@@ -101,10 +106,12 @@
       webViewLink: clean(input.webViewLink || input.url),
       parentId: clean(input.parentId),
       identificacion: normalize(input.identificacion || input.nit || input.taxId),
-      mimeType: clean(input.mimeType || 'application/vnd.google-apps.folder'),
+      mimeType: clean(input.mimeType || FOLDER_MIME),
       raw: clone(input)
     };
   }
+
+  function isFolder(folder) { return folder && folder.mimeType === FOLDER_MIME; }
 
   function exactNameMatch(entity, folder) {
     var names = unique([entity.nombreNormalizado, entity.nombreBase].concat(entity.aliasesNormalizados, entity.aliasesBase));
@@ -126,18 +133,16 @@
 
     if (!entity.id) warnings.push('ENTIDAD_SIN_ID');
     if (!folder.id) warnings.push('CARPETA_SIN_ID');
-    if (folder.mimeType && folder.mimeType !== 'application/vnd.google-apps.folder') warnings.push('NO_ES_CARPETA');
+    if (!isFolder(folder)) warnings.push('NO_ES_CARPETA');
 
     if (entity.driveFolderRef && entity.driveFolderRef === folder.id) {
       score += 100;
       reasons.push('MISMA_REFERENCIA_EXISTENTE');
     }
-
     if (entity.identificacion && folder.identificacion && entity.identificacion === folder.identificacion) {
       score += 45;
       reasons.push('IDENTIFICACION_EXACTA');
     }
-
     if (exactNameMatch(entity, folder)) {
       score += 65;
       reasons.push('NOMBRE_O_ALIAS_EXACTO');
@@ -147,12 +152,10 @@
       if (similarity >= 0.8) reasons.push('NOMBRE_MUY_SIMILAR');
       else if (similarity >= 0.55) reasons.push('NOMBRE_PARCIAL');
     }
-
     if (entity.nombreBase && folder.pathNormalizado && folder.pathNormalizado.indexOf(entity.nombreBase) >= 0) {
       score += 15;
       reasons.push('NOMBRE_EN_RUTA');
     }
-
     if (entity.pais && folder.pais) {
       if (entity.pais === folder.pais) {
         score += 12;
@@ -161,9 +164,7 @@
         score -= 45;
         warnings.push('PAIS_NO_COINCIDE');
       }
-    } else if (entity.pais && !folder.pais) {
-      warnings.push('CARPETA_SIN_PAIS');
-    }
+    } else if (entity.pais && !folder.pais) warnings.push('CARPETA_SIN_PAIS');
 
     if (entity.locked && entity.driveFolderRef && entity.driveFolderRef !== folder.id) {
       score -= 100;
@@ -208,7 +209,7 @@
     if (!override) return proposal;
     if (override.action === 'omit') return Object.assign({}, proposal, { status: 'omitido_manual', selected: null, manual: true, motivo: clean(override.motivo) });
     var folder = folderMap[clean(override.folderId)];
-    if (!folder) return Object.assign({}, proposal, { status: 'requiere_validacion', manual: true, error: 'CARPETA_OVERRIDE_NO_EXISTE' });
+    if (!folder || !isFolder(folder)) return Object.assign({}, proposal, { status: 'requiere_validacion', manual: true, error: 'CARPETA_OVERRIDE_NO_EXISTE' });
     return Object.assign({}, proposal, {
       status: 'seleccion_manual',
       selected: { entityId: proposal.entity.id, folderId: folder.id, score: 100, confidence: 'manual', reasons: ['SELECCION_MANUAL'], warnings: [], entity: proposal.entity, folder: folder },
@@ -223,7 +224,7 @@
     var entities = (input.entidades || input.entities || []).map(function (entity) { return normalizeEntity(entity, ctx); });
     var folders = (input.carpetas || input.folders || []).map(function (folder) { return normalizeFolder(folder, ctx); });
     var folderMap = {};
-    folders.forEach(function (folder) { folderMap[folder.id] = folder; });
+    folders.filter(isFolder).forEach(function (folder) { folderMap[folder.id] = folder; });
     var overrides = input.overrides || {};
 
     var proposals = entities.map(function (entity) {
@@ -253,8 +254,7 @@
       var entity = proposal.entity;
       var selected = proposal.selected;
       var action = 'requires_validation';
-      if (proposal.status === 'sin_coincidencia') action = 'omit';
-      if (proposal.status === 'omitido_manual') action = 'omit';
+      if (proposal.status === 'sin_coincidencia' || proposal.status === 'omitido_manual') action = 'omit';
       if (proposal.status === 'conflicto_carpeta_compartida') action = 'requires_validation';
       if (selected && entity.driveFolderRef === selected.folderId) action = 'omit_existing';
       else if (selected && entity.driveFolderRef && entity.driveFolderRef !== selected.folderId) action = 'update_proposed';
@@ -282,18 +282,6 @@
       };
     });
 
-    var summary = {
-      totalEntities: entities.length,
-      totalFolders: folders.length,
-      linkProposed: operations.filter(function (op) { return op.action === 'link_proposed'; }).length,
-      linkManualProposed: operations.filter(function (op) { return op.action === 'link_manual_proposed'; }).length,
-      updateProposed: operations.filter(function (op) { return op.action === 'update_proposed'; }).length,
-      omitExisting: operations.filter(function (op) { return op.action === 'omit_existing'; }).length,
-      omit: operations.filter(function (op) { return op.action === 'omit'; }).length,
-      requiresValidation: operations.filter(function (op) { return op.action === 'requires_validation'; }).length,
-      conflicts: proposals.filter(function (p) { return p.status === 'conflicto_carpeta_compartida'; }).length
-    };
-
     return {
       source: clean(input.source || 'google_drive_folder_metadata'),
       parentFolderId: clean(input.parentFolderId),
@@ -301,7 +289,17 @@
       folders: folders,
       proposals: proposals,
       operations: operations,
-      summary: summary,
+      summary: {
+        totalEntities: entities.length,
+        totalFolders: folders.length,
+        linkProposed: operations.filter(function (op) { return op.action === 'link_proposed'; }).length,
+        linkManualProposed: operations.filter(function (op) { return op.action === 'link_manual_proposed'; }).length,
+        updateProposed: operations.filter(function (op) { return op.action === 'update_proposed'; }).length,
+        omitExisting: operations.filter(function (op) { return op.action === 'omit_existing'; }).length,
+        omit: operations.filter(function (op) { return op.action === 'omit'; }).length,
+        requiresValidation: operations.filter(function (op) { return op.action === 'requires_validation'; }).length,
+        conflicts: proposals.filter(function (p) { return p.status === 'conflicto_carpeta_compartida'; }).length
+      },
       writeAllowed: false,
       requiresConfirmation: true
     };
