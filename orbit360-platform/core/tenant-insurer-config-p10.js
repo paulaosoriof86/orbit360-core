@@ -127,14 +127,21 @@
   }
   function getTenantConfig(tenantId) { return clone(registry[clean(tenantId)] || null); }
   function insurerByConfig(config, input) {
-    var queries = unique([input && input.name, input && input.nombre, input && input.fileName, input && input.sourceName]
-      .concat(input && input.aliases || []).map(norm).filter(Boolean));
+    input = input || {};
+    var idQuery = clean(input.aseguradoraId || input.insurerId);
+    var directoryById = (input.directory || []).find(function (item) { return clean(item && item.id) === idQuery; });
+    var queries = unique([input.name, input.nombre, input.fileName, input.sourceName]
+      .concat(input.aliases || [], directoryById ? [directoryById.nombre, directoryById.name, directoryById.razonSocial, directoryById.displayName].concat(directoryById.aliases || []) : [])
+      .map(norm).filter(Boolean));
     var candidates = [];
     (config.insurers || []).forEach(function (insurer) {
       if (!insurer.active) return;
       var aliases = normalizedNames(insurer);
       var sourceHints = (insurer.sourceHints || []).map(norm).filter(Boolean);
       var score = 0, reasons = [];
+      if (idQuery && (idQuery === insurer.internalId || idQuery === insurer.canonicalKey)) {
+        score = 110; reasons.push('internal_id');
+      }
       queries.forEach(function (query) {
         if (aliases.indexOf(query) >= 0) { score = Math.max(score, 100); reasons.push('exact_alias'); }
         aliases.forEach(function (alias) {
