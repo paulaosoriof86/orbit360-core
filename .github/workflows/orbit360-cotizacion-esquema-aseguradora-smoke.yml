@@ -1,0 +1,50 @@
+name: Orbit 360 Cotizacion Esquema Aseguradora Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'tools/orbit360-test-cotizacion-esquema-aseguradora-p0.mjs'
+      - '.github/workflows/orbit360-cotizacion-esquema-aseguradora-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js'
+      - 'tools/orbit360-test-cotizacion-esquema-aseguradora-p0.mjs'
+      - '.github/workflows/orbit360-cotizacion-esquema-aseguradora-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  cotizacion-esquema-aseguradora-smoke:
+    name: Esquema de cotizacion por aseguradora
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check schema syntax
+        run: node --check orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js
+
+      - name: Check smoke syntax
+        run: node --check tools/orbit360-test-cotizacion-esquema-aseguradora-p0.mjs
+
+      - name: Run insurer quote schema smoke
+        run: node tools/orbit360-test-cotizacion-esquema-aseguradora-p0.mjs
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo "Validator not present; skipping."
+          fi
