@@ -1,0 +1,113 @@
+name: Orbit 360 Aseguradoras Batch History P09h Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/aseguradoras-batch-history-p09h.js'
+      - 'orbit360-platform/core/aseguradoras-lab-collections-p09e.js'
+      - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js'
+      - 'tools/orbit360-test-aseguradoras-batch-history-p09h.mjs'
+      - 'tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs'
+      - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
+      - 'tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs'
+      - '.github/workflows/orbit360-aseguradoras-batch-history-p09h-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/aseguradoras-batch-history-p09h.js'
+      - 'orbit360-platform/core/aseguradoras-lab-collections-p09e.js'
+      - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js'
+      - 'tools/orbit360-test-aseguradoras-batch-history-p09h.mjs'
+      - 'tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs'
+      - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
+      - 'tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs'
+      - '.github/workflows/orbit360-aseguradoras-batch-history-p09h-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  batch-history-p09h:
+    name: Historial reanudable metadata-only P0.9h
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/aseguradoras-batch-history-p09h.js
+          node --check orbit360-platform/core/aseguradoras-lab-collections-p09e.js
+          node --check orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js
+          node --check orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js
+          node --check tools/orbit360-test-aseguradoras-batch-history-p09h.mjs
+          node --check tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs
+          node --check tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs
+          node --check tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs
+
+      - name: Run resumable history smoke
+        run: node tools/orbit360-test-aseguradoras-batch-history-p09h.mjs
+
+      - name: Run LAB collection smoke
+        run: node tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs
+
+      - name: Run bootstrap smoke
+        run: node tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs
+
+      - name: Run read-only panel smoke
+        run: node tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs
+
+      - name: Guard history collections and resume contract
+        run: |
+          grep -q "aseguradora_batch_runs" orbit360-platform/core/aseguradoras-batch-history-p09h.js
+          grep -q "aseguradora_batch_items" orbit360-platform/core/aseguradoras-batch-history-p09h.js
+          grep -q "HISTORY_WRITE_FAILED_ROLLED_BACK" orbit360-platform/core/aseguradoras-batch-history-p09h.js
+          grep -q "resumeDocumentIds" orbit360-platform/core/aseguradoras-batch-history-p09h.js
+          grep -q "referenceValueExposed: false" orbit360-platform/core/aseguradoras-batch-history-p09h.js
+          grep -q "batchHistoryReady" orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js
+          grep -q "Historial del lote" orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js
+
+      - name: Guard no network, local storage, references or enablement
+        run: |
+          if grep -RniE '(localStorage|sessionStorage|fetch\(|XMLHttpRequest)' \
+            orbit360-platform/core/aseguradoras-batch-history-p09h.js \
+            orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js; then
+            echo 'Unexpected network or local storage path detected'
+            exit 1
+          fi
+          if grep -RniE '(backend-ref://|drive://|upload://|signedUrl[[:space:]]*:[[:space:]]*["'"'][^"'"']+)' \
+            orbit360-platform/core/aseguradoras-batch-history-p09h.js \
+            orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js; then
+            echo 'Reference value or signed URL detected in reusable runtime'
+            exit 1
+          fi
+          if grep -RniE '(enabledCotizador|enabledComparativo|enablesCotizador|enablesComparativo)[[:space:]]*:[[:space:]]*true' \
+            orbit360-platform/core/aseguradoras-batch-history-p09h.js \
+            orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js; then
+            echo 'Unexpected module enablement detected'
+            exit 1
+          fi
+
+      - name: Guard eight deep snapshots
+        run: |
+          grep -q "aseguradora_batch_runs" orbit360-platform/core/aseguradoras-lab-collections-p09e.js
+          grep -q "aseguradora_batch_items" orbit360-platform/core/aseguradoras-lab-collections-p09e.js
+          grep -q "snapshotAttachedCount === 8" tools/orbit360-test-aseguradoras-lab-collections-p09e.mjs
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
