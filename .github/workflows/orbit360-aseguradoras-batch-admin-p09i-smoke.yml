@@ -1,0 +1,94 @@
+name: Orbit 360 Aseguradoras Batch Admin P09i
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js'
+      - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js'
+      - 'tools/orbit360-test-aseguradoras-batch-admin-actions-p09i.mjs'
+      - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
+      - 'tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs'
+      - '.github/workflows/orbit360-aseguradoras-batch-admin-p09i-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js'
+      - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
+      - 'orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js'
+      - 'tools/orbit360-test-aseguradoras-batch-admin-actions-p09i.mjs'
+      - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
+      - 'tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs'
+      - '.github/workflows/orbit360-aseguradoras-batch-admin-p09i-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  batch-admin-p09i:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js
+          node --check orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js
+          node --check orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js
+          node --check tools/orbit360-test-aseguradoras-batch-admin-actions-p09i.mjs
+          node --check tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs
+          node --check tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs
+
+      - name: Run P09i admin actions smoke
+        run: node tools/orbit360-test-aseguradoras-batch-admin-actions-p09i.mjs
+
+      - name: Run bootstrap smoke
+        run: node tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs
+
+      - name: Run read-only panel smoke
+        run: node tools/orbit360-test-aseguradoras-knowledge-panel-p09f.mjs
+
+      - name: Guard dry-run and separate history persistence
+        run: |
+          grep -q "executionMode: 'dry_run'" orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js
+          grep -q "mode: 'dry_run'" orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js
+          grep -q "knowledgePersistenceAllowed: false" orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js
+          grep -q "historyPersistenceSeparate: true" orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js
+          grep -q "HISTORY_DOUBLE_CONFIRMATION_REQUIRED" orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js
+          grep -q "EJECUTAR DRY-RUN" orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js
+          grep -q "REANUDAR DRY-RUN" orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js
+
+      - name: Guard no direct writes, network or client storage
+        run: |
+          if grep -RniE '(Orbit\.store\.(insert|update|remove)|localStorage|sessionStorage|fetch\(|XMLHttpRequest|eval\(|new Function|firebase deploy|git commit)' \
+            orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js \
+            orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js; then
+            echo 'Forbidden direct write/network/storage path detected'
+            exit 1
+          fi
+          if grep -nE 'aseguradorasBatchAdminActionsP09i\.(execute|persistHistory)\(' \
+            orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js; then
+            echo 'Read-only panel must not execute admin actions'
+            exit 1
+          fi
+
+      - name: Guard zero enablement
+        run: |
+          if grep -RniE '(enabledCotizador|enabledComparativo|enablesCotizador|enablesComparativo)[[:space:]]*:[[:space:]]*true' \
+            orbit360-platform/core/aseguradoras-batch-admin-actions-p09i.js \
+            orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js; then
+            echo 'Enablement detected in P09i'
+            exit 1
+          fi
+
+      - name: Run backend LAB validator
+        run: node tools/orbit360-validar-backend-lab-contrato.mjs
