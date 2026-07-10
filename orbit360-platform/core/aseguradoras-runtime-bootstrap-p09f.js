@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 · P0.9f/P0.9g/P0.9h/P0.9i · Bootstrap seguro del runtime de conocimiento
+   Orbit 360 · P0.9f/P0.9g/P0.9h/P0.9i/P0.9j · Bootstrap seguro
    Fecha: 2026-07-10
 
    Carga contratos aditivos solo en Firestore LAB para A&S. No modifica
@@ -9,7 +9,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p09i-v1';
+  var VERSION = 'p09j-v1';
   var REQUIRED = [
     { src: 'core/document-source-contract-p04.js', global: 'documentSourceContractP04' },
     { src: 'core/cotizacion-esquema-aseguradora-p0.js', global: 'cotizacionEsquemaAseguradoraP0' },
@@ -36,7 +36,9 @@
     { src: 'core/aseguradoras-batch-orchestrator-p09g.js', global: 'aseguradorasBatchOrchestratorP09g' },
     { src: 'core/aseguradoras-batch-history-p09h.js', global: 'aseguradorasBatchHistoryP09h' },
     { src: 'core/aseguradoras-batch-admin-actions-p09i.js', global: 'aseguradorasBatchAdminActionsP09i' },
-    { src: 'modules/aseguradoras-knowledge-panel-p09f.js', global: 'aseguradorasKnowledgePanelP09f' }
+    { src: 'core/aseguradoras-source-reference-broker-p09j.js', global: 'aseguradorasSourceReferenceBrokerP09j' },
+    { src: 'modules/aseguradoras-knowledge-panel-p09f.js', global: 'aseguradorasKnowledgePanelP09f' },
+    { src: 'modules/aseguradoras-batch-admin-form-p09j.js', global: 'aseguradorasBatchAdminFormP09j' }
   ];
 
   var state = {
@@ -121,6 +123,8 @@
     if (!s || s.__firestoreLabExplicit !== true) errors.push('EXPLICIT_LAB_STORE_REQUIRED');
     if (!b.securityGuard || b.securityGuard.installed !== true) errors.push('BACKEND_SECURITY_GUARD_REQUIRED');
     if (!labStatus.snapshotAttached) errors.push('BASE_SNAPSHOTS_REQUIRED');
+    var brokerStatus = Orbit.aseguradorasSourceReferenceBrokerP09j && typeof Orbit.aseguradorasSourceReferenceBrokerP09j.status === 'function'
+      ? Orbit.aseguradorasSourceReferenceBrokerP09j.status() : {};
     return {
       ok: errors.length === 0, errors: errors, mode: ctx.mode, tenantId: ctx.tenantId,
       storeReady: !!(s && s.__firestoreLabExplicit),
@@ -130,6 +134,9 @@
       batchRuntimeReady: !!Orbit.aseguradorasBatchOrchestratorP09g,
       batchHistoryReady: !!(Orbit.aseguradorasBatchHistoryP09h && Orbit.aseguradorasBatchHistoryP09h.status().installed),
       batchAdminActionsReady: !!Orbit.aseguradorasBatchAdminActionsP09i,
+      sourceReferenceBrokerReady: !!Orbit.aseguradorasSourceReferenceBrokerP09j,
+      sourceReferenceBackendReady: brokerStatus.backendMethodAvailable === true,
+      batchAdminFormReady: !!Orbit.aseguradorasBatchAdminFormP09j,
       bridgeStatus: clone(state.bridge), enablesCotizador: false, enablesComparativo: false
     };
   }
@@ -176,6 +183,7 @@
     state.status = check.ok ? 'ready' : 'requires_runtime_preflight';
     emit('orbit:aseguradoras:knowledge-ready', { status: state.status, preflight: check });
     try { if (Orbit.aseguradorasKnowledgePanelP09f) Orbit.aseguradorasKnowledgePanelP09f.schedule(); } catch (error) {}
+    try { if (Orbit.aseguradorasBatchAdminFormP09j) Orbit.aseguradorasBatchAdminFormP09j.schedule(); } catch (error) {}
     return status();
   }
   function start() {
