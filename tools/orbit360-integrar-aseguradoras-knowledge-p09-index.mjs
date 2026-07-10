@@ -14,6 +14,7 @@ const CORE_SCRIPTS = [
   'core/excel-rule-proposal-adapter-p06b.js',
   'core/pdf-quote-adapter-p07.js',
   'core/document-provider-registry-p09.js',
+  'core/document-provider-bridge-p09b.js',
   'core/aseguradoras-knowledge-runtime-p09.js'
 ];
 const SERVICE_SCRIPT = 'modules/aseguradoras-knowledge-p09.js';
