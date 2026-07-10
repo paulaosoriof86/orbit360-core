@@ -11,6 +11,7 @@ on:
       - 'orbit360-platform/core/importa-banco-comisiones-p0.js'
       - 'orbit360-platform/core/importa-write-p0.js'
       - 'orbit360-platform/modules/importar-p0-dashboard.js'
+      - 'orbit360-platform/modules/importar-p0-confirmacion.js'
       - 'tools/orbit360-p0-dryrun-manifest-20260709.mjs'
       - 'tools/orbit360-test-importa-polizas-p0.mjs'
       - 'tools/orbit360-test-importa-cartera-p0.mjs'
@@ -18,6 +19,7 @@ on:
       - 'tools/orbit360-test-importa-banco-comisiones-p0.mjs'
       - 'tools/orbit360-test-importa-write-p0.mjs'
       - 'tools/orbit360-test-importar-p0-dashboard.mjs'
+      - 'tools/orbit360-test-importar-p0-confirmacion.mjs'
       - 'tools/orbit360-test-p0-dryrun-manifest.mjs'
       - 'tools/orbit360-validar-backend-lab-contrato.mjs'
       - '.github/workflows/orbit360-p0-smoke.yml'
@@ -31,6 +33,7 @@ on:
       - 'orbit360-platform/core/importa-banco-comisiones-p0.js'
       - 'orbit360-platform/core/importa-write-p0.js'
       - 'orbit360-platform/modules/importar-p0-dashboard.js'
+      - 'orbit360-platform/modules/importar-p0-confirmacion.js'
       - 'tools/orbit360-p0-dryrun-manifest-20260709.mjs'
       - 'tools/orbit360-test-importa-polizas-p0.mjs'
       - 'tools/orbit360-test-importa-cartera-p0.mjs'
@@ -38,6 +41,7 @@ on:
       - 'tools/orbit360-test-importa-banco-comisiones-p0.mjs'
       - 'tools/orbit360-test-importa-write-p0.mjs'
       - 'tools/orbit360-test-importar-p0-dashboard.mjs'
+      - 'tools/orbit360-test-importar-p0-confirmacion.mjs'
       - 'tools/orbit360-test-p0-dryrun-manifest.mjs'
       - 'tools/orbit360-validar-backend-lab-contrato.mjs'
       - '.github/workflows/orbit360-p0-smoke.yml'
@@ -76,6 +80,9 @@ jobs:
       - name: Check dashboard syntax
         run: node --check orbit360-platform/modules/importar-p0-dashboard.js
 
+      - name: Check confirmation UI syntax
+        run: node --check orbit360-platform/modules/importar-p0-confirmacion.js
+
       - name: Check dry-run manifest syntax
         run: node --check tools/orbit360-p0-dryrun-manifest-20260709.mjs
 
@@ -97,6 +104,9 @@ jobs:
       - name: Check dashboard smoke syntax
         run: node --check tools/orbit360-test-importar-p0-dashboard.mjs
 
+      - name: Check confirmation UI smoke syntax
+        run: node --check tools/orbit360-test-importar-p0-confirmacion.mjs
+
       - name: Check dry-run manifest smoke syntax
         run: node --check tools/orbit360-test-p0-dryrun-manifest.mjs
 
@@ -117,6 +127,9 @@ jobs:
 
       - name: Run dashboard smoke
         run: node tools/orbit360-test-importar-p0-dashboard.mjs
+
+      - name: Run confirmation UI smoke
+        run: node tools/orbit360-test-importar-p0-confirmacion.mjs
 
       - name: Run dry-run manifest smoke
         run: node tools/orbit360-test-p0-dryrun-manifest.mjs
