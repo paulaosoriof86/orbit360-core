@@ -18,6 +18,8 @@ const api = Orbit.documentIntelligenceRouterP08;
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 
 const sufficient = {
+  documentId: 'doc-provider',
+  file: { fileRef: 'ref-provider' },
   confidence: 92,
   pages: [{ blank: false, contentChars: 800, tableCount: 1 }],
   sections: [{ title: 'Coberturas' }],
@@ -79,6 +81,7 @@ const ready = await api.run(input, registry, config);
 assert(ready.ok && ready.stages.length === 1, 'No debe invocar IA si el parser determinístico es suficiente');
 assert(ready.code === 'MANIFEST_READY_FOR_REVIEW', 'Debe quedar listo para revisión, no habilitado');
 assert(ready.writeAllowed === false && ready.enabled === false, 'No debe escribir ni habilitar');
+assert(ready.manifest.documentId === 'doc-provider' && ready.manifest.file.fileRef === 'ref-provider', 'Debe conservar metadata estructural del provider');
 
 const lowConfig = {
   iaPorTarea: {
@@ -104,14 +107,20 @@ const noAi = await api.run(input, registry, {
   dataPolicy: { allowExternalAi: false, allowOcr: false }
 });
 assert(noAi.ok && noAi.stages.length === 1, 'La política tenant puede impedir OCR e IA externa');
+assert(noAi.code === 'MANIFEST_REQUIRES_VALIDATION', 'Política restrictiva no debe fingir suficiencia');
 assert(!noAi.stages.some(item => item.task === 'pdf_semantic'), 'No debe saltarse la política de datos');
+assert(noAi.fallback.reasons.includes('OCR_BLOQUEADO_POR_POLITICA'), 'Debe explicar el fallback bloqueado');
 
 const secretPlan = api.buildPlan(input, {
   iaPorTarea: {
-    pdf_manifest: { providerId: 'deterministic_ok', apiKey: 'secret-fixture' }
+    pdf_manifest: { providerId: 'deterministic_ok', apiKey: 'secret-fixture', routeKey: 'safe-route' }
   }
 });
 assert(!JSON.stringify(secretPlan).includes('secret-fixture'), 'No debe conservar secretos de provider');
+const safeTask = api.taskConfig('pdf_manifest', {
+  iaPorTarea: { pdf_manifest: { providerId: 'deterministic_ok', routeKey: 'safe-route' } }
+});
+assert(JSON.stringify(safeTask).includes('safe-route'), 'No debe eliminar claves funcionales como routeKey');
 
 const invalid = await api.run(
   { tenantId: 'tenant-demo', documentId: 'doc-demo', fileName: 'quote.pdf' },
