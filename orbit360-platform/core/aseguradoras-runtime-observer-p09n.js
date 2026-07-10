@@ -20,7 +20,8 @@
     lastFingerprint: '',
     scheduled: null,
     submitting: false,
-    captures: 0
+    captures: 0,
+    viewportBuckets: Object.create(null)
   };
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
@@ -63,11 +64,8 @@
     var style = safeCall(function () { return window.getComputedStyle && window.getComputedStyle(element); }, {}) || {};
     return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity == null ? 1 : style.opacity) !== 0;
   }
-  function rootText(element) {
-    return clean(element && element.textContent).slice(0, 50000);
-  }
   function visibleTerms(panel, form) {
-    var text = rootText(panel) + '\n' + rootText(form);
+    var text = clean(panel && panel.textContent).slice(0, 50000) + '\n' + clean(form && form.textContent).slice(0, 50000);
     return FORBIDDEN_VISIBLE.filter(function (term) { return text.toLowerCase().indexOf(term.toLowerCase()) >= 0; });
   }
   function navigationReloaded() {
@@ -81,17 +79,26 @@
     var width = number(window.innerWidth || document.documentElement && document.documentElement.clientWidth);
     var height = number(window.innerHeight || document.documentElement && document.documentElement.clientHeight);
     var root = document.documentElement || {};
+    var bucket = width < 640 ? 'mobile' : (width < 1024 ? 'tablet' : 'desktop');
+    state.viewportBuckets[bucket] = true;
     return {
       width: width,
       height: height,
-      bucket: width < 640 ? 'mobile' : (width < 1024 ? 'tablet' : 'desktop'),
+      bucket: bucket,
+      observedBuckets: Object.keys(state.viewportBuckets).sort(),
       devicePixelRatio: Math.min(number(window.devicePixelRatio || 1), 8),
       horizontalOverflow: number(root.scrollWidth) > width + 2
     };
   }
-  function countStore(collection) {
+  function tenantRows(collection) {
     var rows = safeCall(function () { return Orbit.store && Orbit.store.all && Orbit.store.all(collection); }, []) || [];
-    return [].concat(rows).filter(function (row) { return !row || !row.tenantId || clean(row.tenantId) === tenantId(); }).length;
+    return [].concat(rows).filter(function (row) { return !row || !row.tenantId || clean(row.tenantId) === tenantId(); });
+  }
+  function countStore(collection) { return tenantRows(collection).length; }
+  function countSources() {
+    return tenantRows('aseguradoras').reduce(function (total, insurer) {
+      return total + [].concat(insurer && insurer.docs || []).filter(function (doc) { return !doc || !doc.tenantId || clean(doc.tenantId) === tenantId(); }).length;
+    }, 0);
   }
   function flowState() {
     var form = Orbit.aseguradorasBatchAdminFormP09j;
@@ -104,9 +111,11 @@
     }, {}) || {};
     var preview = adminStatus.lastPlan || {};
     var execution = adminStatus.lastExecution || {};
+    var referenceContract = preview.referenceContract || {};
+    var missingCount = [].concat(referenceContract.missing || []).length;
     return {
       previewGenerated: bool(formStatus.hasPreview) || !!preview.fingerprint,
-      previewExecutable: bool(preview.ok) && number(preview.referenceContract && preview.referenceContract.missing && preview.referenceContract.missing.length) === 0,
+      previewExecutable: bool(preview.ok) && missingCount === 0 && number(referenceContract.provided) > 0,
       executionCompleted: bool(formStatus.hasExecution) || !!clean(execution.code),
       executionOk: execution.ok === true || clean(execution.code) === 'BATCH_DRY_RUN_COMPLETE',
       historyPersisted: bool(formStatus.historyPersisted) || bool(execution.historyPersisted),
@@ -139,10 +148,11 @@
   }
   function controlsState(form) {
     if (!form || typeof form.querySelectorAll !== 'function') return { buttons: 0, inputs: 0, disabled: 0 };
-    var buttons = form.querySelectorAll('button');
-    var inputs = form.querySelectorAll('input,select,textarea');
-    var disabled = form.querySelectorAll('button:disabled,input:disabled,select:disabled,textarea:disabled');
-    return { buttons: number(buttons.length), inputs: number(inputs.length), disabled: number(disabled.length) };
+    return {
+      buttons: number(form.querySelectorAll('button').length),
+      inputs: number(form.querySelectorAll('input,select,textarea').length),
+      disabled: number(form.querySelectorAll('button:disabled,input:disabled,select:disabled,textarea:disabled').length)
+    };
   }
   function gate(id, approved, pendingReason) {
     return { id: id, state: approved ? 'approved' : 'pending', reason: approved ? '' : clean(pendingReason) };
@@ -166,8 +176,9 @@
       controls: controlsState(form)
     };
     var reloaded = navigationReloaded();
-    var historyAfterReload = reloaded && flow.historyRuns > 0 && flow.historyItems > 0;
-    var readModelReady = runtime.snapshotsReady && flow.historyRuns >= 0 && flow.historyItems >= 0;
+    var historyAfterReload = reloaded && flow.historyPersisted && flow.historyRuns > 0 && flow.historyItems > 0;
+    var readModelReady = runtime.snapshotsReady && flow.historyPersisted && flow.historyRuns > 0 && flow.historyItems > 0;
+    var responsiveReady = !viewport.horizontalOverflow && ui.panelVisible && ui.formVisible && state.viewportBuckets.mobile === true && state.viewportBuckets.desktop === true;
     var gates = [
       gate('runtime_ready', runtime.bootstrapReady && runtime.preflightReady, 'runtime_pending'),
       gate('panel_mounted', ui.panelMounted && ui.panelVisible, 'panel_pending'),
@@ -179,7 +190,7 @@
       gate('history_persisted', flow.historyPersisted && flow.historyRuns > 0, 'history_pending'),
       gate('history_after_reload', historyAfterReload, 'reload_verification_pending'),
       gate('read_model', readModelReady, 'read_model_pending'),
-      gate('responsive_structure', !viewport.horizontalOverflow && ui.panelVisible && ui.formVisible, 'responsive_check_pending'),
+      gate('responsive_structure', responsiveReady, 'mobile_and_desktop_check_pending'),
       gate('copy_clean', forbidden.length === 0, 'technical_copy_visible'),
       gate('module_boundary', false, 'visual_boundary_review_pending')
     ];
@@ -197,7 +208,7 @@
       flow: flow,
       navigationReloaded: reloaded,
       counts: {
-        sources: countStore('aseguradoras'),
+        sources: countSources(),
         manifests: countStore('aseguradora_manifiestos'),
         proposals: countStore('aseguradora_propuestas'),
         rules: countStore('aseguradora_reglas_tarifarias'),
@@ -230,9 +241,7 @@
     try { return JSON.stringify({ reason: report.reason, runtime: report.runtime, actor: report.actor, viewport: report.viewport, ui: report.ui, flow: report.flow, counts: report.counts, pending: report.claudeGate.pending }); }
     catch (error) { return String(Date.now()); }
   }
-  function reportBridge() {
-    return window.OrbitBackendDocumentBridge || Orbit.backendDocumentBridge || {};
-  }
+  function reportBridge() { return window.OrbitBackendDocumentBridge || Orbit.backendDocumentBridge || {}; }
   async function submit(reason) {
     if (state.submitting) return clone(state.lastSubmission || { ok: false, code: 'REPORT_SUBMISSION_BUSY' });
     var report = capture(reason || 'submit');
@@ -269,6 +278,7 @@
       hasReport: !!state.lastReport,
       hasSubmission: !!state.lastSubmission,
       submitting: state.submitting,
+      viewportBuckets: Object.keys(state.viewportBuckets).sort(),
       claudeGate: clone(state.lastReport && state.lastReport.claudeGate),
       referencesExposed: false,
       containsPii: false,
@@ -279,7 +289,7 @@
   }
   function resetForTest() {
     if (state.scheduled) clearTimeout(state.scheduled);
-    state.lastReport = null; state.lastSubmission = null; state.lastFingerprint = ''; state.scheduled = null; state.submitting = false; state.captures = 0;
+    state.lastReport = null; state.lastSubmission = null; state.lastFingerprint = ''; state.scheduled = null; state.submitting = false; state.captures = 0; state.viewportBuckets = Object.create(null);
   }
 
   Orbit.aseguradorasRuntimeObserverP09n = {
@@ -292,8 +302,8 @@
   };
 
   ['hashchange', 'load', 'orbit:aseguradoras:knowledge-ready', 'orbit:aseguradoras:source-reference-state',
-    'orbit:aseguradoras:batch-admin-state', 'orbit:aseguradoras:batch-state', 'orbit:aseguradoras:runtime-observed']
-    .forEach(function (name) { if (name !== 'orbit:aseguradoras:runtime-observed') window.addEventListener(name, function () { schedule(name); }); });
+    'orbit:aseguradoras:batch-admin-state', 'orbit:aseguradoras:batch-state']
+    .forEach(function (name) { window.addEventListener(name, function () { schedule(name); }); });
   document.addEventListener('orbit:store', function () { schedule('store'); });
   schedule('initial');
 })();
