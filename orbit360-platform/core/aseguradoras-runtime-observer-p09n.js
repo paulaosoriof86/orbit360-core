@@ -249,7 +249,7 @@
     return clone(report);
   }
   function fingerprint(report) {
-    try { return JSON.stringify({ reason: report.reason, runtime: report.runtime, actor: report.actor, viewport: report.viewport, ui: report.ui, flow: report.flow, counts: report.counts, pending: report.claudeGate.pending }); }
+    try { return JSON.stringify({ runtime: report.runtime, actor: report.actor, viewport: report.viewport, ui: report.ui, flow: report.flow, counts: report.counts, pending: report.claudeGate.pending }); }
     catch (error) { return String(Date.now()); }
   }
   function reportBridge() { return window.OrbitBackendDocumentBridge || Orbit.backendDocumentBridge || {}; }
