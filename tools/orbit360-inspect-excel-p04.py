@@ -25,6 +25,11 @@ FORMULA_FUNCTION_RE = re.compile(r"(?<![A-Z0-9_.])(?:_xlfn\.)?([A-Z][A-Z0-9_.]*)
 EMAIL_RE = re.compile(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.I)
 PHONE_RE = re.compile(r"\+?\d[\d\s().-]{7,}\d")
 SUPPORTED = {".xlsx", ".xlsm"}
+MAX_FILE_BYTES = 150 * 1024 * 1024
+MAX_XML_ENTRY_BYTES = 80 * 1024 * 1024
+MAX_ARCHIVE_UNCOMPRESSED_BYTES = 750 * 1024 * 1024
+MAX_ARCHIVE_ENTRIES = 20_000
+MAX_SHEETS = 500
 
 
 def utc_now() -> str:
@@ -44,6 +49,20 @@ def safe_text(value: Any, limit: int = 300) -> str:
     return text
 
 
+def safe_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(float(str(value or default)))
+    except (TypeError, ValueError):
+        return default
+
+
+def safe_float(value: Any) -> float | None:
+    try:
+        return float(str(value))
+    except (TypeError, ValueError):
+        return None
+
+
 def normalize_formula(formula: str) -> str:
     return re.sub(r"\s+", "", formula or "").upper()
 
@@ -56,12 +75,43 @@ def sha256_text(parts: list[str]) -> str:
     return digest.hexdigest()
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_archive(archive: zipfile.ZipFile) -> None:
+    entries = archive.infolist()
+    if len(entries) > MAX_ARCHIVE_ENTRIES:
+        raise ValueError("ARCHIVE_ENTRY_LIMIT_EXCEEDED")
+    total = sum(max(0, item.file_size) for item in entries)
+    if total > MAX_ARCHIVE_UNCOMPRESSED_BYTES:
+        raise ValueError("ARCHIVE_UNCOMPRESSED_LIMIT_EXCEEDED")
+    for item in entries:
+        normalized = PurePosixPath(item.filename)
+        if normalized.is_absolute() or ".." in normalized.parts:
+            raise ValueError("ARCHIVE_UNSAFE_PATH")
+
+
 def parse_xml(archive: zipfile.ZipFile, name: str) -> ET.Element | None:
     try:
-        with archive.open(name) as handle:
-            return ET.parse(handle).getroot()
+        info = archive.getinfo(name)
     except KeyError:
         return None
+    if info.file_size > MAX_XML_ENTRY_BYTES:
+        raise ValueError(f"XML_ENTRY_LIMIT_EXCEEDED:{name}")
+    try:
+        with archive.open(info) as handle:
+            payload = handle.read(MAX_XML_ENTRY_BYTES + 1)
+        if len(payload) > MAX_XML_ENTRY_BYTES:
+            raise ValueError(f"XML_ENTRY_LIMIT_EXCEEDED:{name}")
+        probe = payload[:4096].upper()
+        if b"<!DOCTYPE" in probe or b"<!ENTITY" in probe:
+            raise ValueError(f"XML_DTD_FORBIDDEN:{name}")
+        return ET.fromstring(payload)
     except ET.ParseError as exc:
         raise ValueError(f"XML_INVALIDO:{name}:{exc}") from exc
 
@@ -106,14 +156,14 @@ def defined_names(workbook_root: ET.Element | None) -> list[dict[str, Any]]:
     parent = workbook_root.find("m:definedNames", NS)
     if parent is None:
         return output
-    for index, node in enumerate(parent.findall("m:definedName", NS)):
+    for index, node in enumerate(parent.findall("m:definedName", NS)[:2000]):
         raw = (node.text or "").strip()
         external = bool(re.search(r"\[[^\]]+\]", raw)) or "file:///" in raw.lower()
         output.append(
             {
                 "id": f"name_{index + 1}",
-                "name": node.attrib.get("name", ""),
-                "localSheetId": int(node.attrib["localSheetId"]) if node.attrib.get("localSheetId", "").isdigit() else None,
+                "name": safe_text(node.attrib.get("name", ""), 150),
+                "localSheetId": safe_int(node.attrib.get("localSheetId"), -1) if node.attrib.get("localSheetId") is not None else None,
                 "scopeSheet": "",
                 "refersTo": "[referencia_externa_omitida]" if external else safe_text(raw, 300),
                 "hidden": node.attrib.get("hidden") in {"1", "true", "True"},
@@ -133,7 +183,7 @@ def print_names(names: list[dict[str, Any]], sheet_index: int) -> tuple[list[str
         value = str(item.get("refersTo") or "")
         name = str(item.get("name") or "")
         if name == "_xlnm.Print_Area":
-            areas.extend([part.strip() for part in value.split(",") if part.strip()])
+            areas.extend([part.strip() for part in value.split(",") if part.strip()][:50])
         elif name == "_xlnm.Print_Titles":
             for part in [part.strip() for part in value.split(",") if part.strip()]:
                 if re.search(r"\$\d+:\$\d+", part):
@@ -156,7 +206,27 @@ def table_names(archive: zipfile.ZipFile, sheet_path: str) -> list[str]:
             value = root.attrib.get("displayName") or root.attrib.get("name")
             if value:
                 names.append(safe_text(value, 100))
-    return sorted(set(names))
+    return sorted(set(names))[:200]
+
+
+def column_number(reference: str) -> int:
+    letters = re.match(r"\$?([A-Z]+)", reference.upper())
+    if not letters:
+        return 0
+    total = 0
+    for char in letters.group(1):
+        total = total * 26 + (ord(char) - 64)
+    return total
+
+
+def range_size(reference: str) -> tuple[int, int]:
+    if not reference:
+        return 0, 0
+    last = reference.split(":")[-1].replace("$", "")
+    match = re.match(r"([A-Z]+)(\d+)", last, re.I)
+    if not match:
+        return 0, 0
+    return safe_int(match.group(2)), column_number(match.group(1))
 
 
 def inspect_sheet(
@@ -179,11 +249,7 @@ def inspect_sheet(
 
     dimension = root.find("m:dimension", NS)
     used_range = dimension.attrib.get("ref", "") if dimension is not None else ""
-    formula_count = 0
-    numeric_count = 0
-    text_count = 0
-    blank_count = 0
-    formula_errors = 0
+    formula_count = numeric_count = text_count = blank_count = formula_errors = 0
     functions: set[str] = set()
     formula_fingerprint_parts: list[str] = []
 
@@ -195,8 +261,7 @@ def inspect_sheet(
         inline_node = cell.find("m:is", NS)
         if formula_node is not None:
             formula_count += 1
-            formula = formula_node.text or ""
-            normalized = normalize_formula(formula)
+            normalized = normalize_formula(formula_node.text or "")
             formula_fingerprint_parts.append(f"{ref}:{normalized}")
             functions.update(match.upper() for match in FORMULA_FUNCTION_RE.findall(normalized))
         elif cell_type in {"s", "inlineStr", "str"}:
@@ -211,14 +276,14 @@ def inspect_sheet(
     data_validations = root.find("m:dataValidations", NS)
     validation_count = 0
     if data_validations is not None:
-        raw_count = data_validations.attrib.get("count", "")
-        validation_count = int(raw_count) if raw_count.isdigit() else len(data_validations.findall("m:dataValidation", NS))
+        validation_count = safe_int(data_validations.attrib.get("count"), len(data_validations.findall("m:dataValidation", NS)))
 
     conditional_count = len(root.findall("m:conditionalFormatting", NS))
     merged_ranges = [node.attrib.get("ref", "") for node in root.findall(".//m:mergeCell", NS) if node.attrib.get("ref")][:100]
     page_setup = root.find("m:pageSetup", NS)
     page_margins = root.find("m:pageMargins", NS)
     header_footer = root.find("m:headerFooter", NS)
+    print_options = root.find("m:printOptions", NS)
     areas, titles_rows, titles_columns = print_names(names, sheet_index)
 
     headers: list[str] = []
@@ -230,8 +295,15 @@ def inspect_sheet(
                 continue
             if "Header" in local_name(child.tag):
                 headers.append(text)
-            if "Footer" in local_name(child.tag):
+            elif "Footer" in local_name(child.tag):
                 footers.append(text)
+
+    margins: dict[str, float] = {}
+    if page_margins is not None:
+        for key, value in page_margins.attrib.items():
+            parsed = safe_float(value)
+            if parsed is not None:
+                margins[key] = parsed
 
     print_profile = {
         "areas": areas,
@@ -239,14 +311,14 @@ def inspect_sheet(
         "titlesColumns": titles_columns,
         "orientation": page_setup.attrib.get("orientation", "") if page_setup is not None else "",
         "paperSize": page_setup.attrib.get("paperSize", "") if page_setup is not None else "",
-        "fitToWidth": int(page_setup.attrib.get("fitToWidth", "0") or 0) if page_setup is not None else 0,
-        "fitToHeight": int(page_setup.attrib.get("fitToHeight", "0") or 0) if page_setup is not None else 0,
-        "scale": int(page_setup.attrib.get("scale", "0") or 0) if page_setup is not None else 0,
-        "margins": {key: float(value) for key, value in (page_margins.attrib.items() if page_margins is not None else []) if _is_number(value)},
+        "fitToWidth": safe_int(page_setup.attrib.get("fitToWidth")) if page_setup is not None else 0,
+        "fitToHeight": safe_int(page_setup.attrib.get("fitToHeight")) if page_setup is not None else 0,
+        "scale": safe_int(page_setup.attrib.get("scale")) if page_setup is not None else 0,
+        "margins": margins,
         "header": " | ".join(headers),
         "footer": " | ".join(footers),
-        "centerHorizontally": root.find("m:printOptions", NS) is not None and root.find("m:printOptions", NS).attrib.get("horizontalCentered") in {"1", "true"},
-        "centerVertically": root.find("m:printOptions", NS) is not None and root.find("m:printOptions", NS).attrib.get("verticalCentered") in {"1", "true"},
+        "centerHorizontally": print_options is not None and print_options.attrib.get("horizontalCentered") in {"1", "true"},
+        "centerVertically": print_options is not None and print_options.attrib.get("verticalCentered") in {"1", "true"},
     }
 
     row_count, column_count = range_size(used_range)
@@ -271,41 +343,13 @@ def inspect_sheet(
         "conditionalFormatCount": conditional_count,
         "mergedRanges": merged_ranges,
         "tableNames": table_names(archive, sheet_path),
-        "namedRanges": [item["name"] for item in names if item.get("localSheetId") == sheet_index],
+        "namedRanges": [item["name"] for item in names if item.get("localSheetId") == sheet_index][:200],
         "labels": [],
         "sectionLabels": [],
         "print": print_profile,
         "hasExternalReferences": any(item.get("externalReference") for item in names if item.get("localSheetId") == sheet_index),
         "protected": root.find("m:sheetProtection", NS) is not None,
     }
-
-
-def _is_number(value: str) -> bool:
-    try:
-        float(value)
-        return True
-    except (TypeError, ValueError):
-        return False
-
-
-def column_number(reference: str) -> int:
-    letters = re.match(r"\$?([A-Z]+)", reference.upper())
-    if not letters:
-        return 0
-    total = 0
-    for char in letters.group(1):
-        total = total * 26 + (ord(char) - 64)
-    return total
-
-
-def range_size(reference: str) -> tuple[int, int]:
-    if not reference:
-        return 0, 0
-    last = reference.split(":")[-1].replace("$", "")
-    match = re.match(r"([A-Z]+)(\d+)", last, re.I)
-    if not match:
-        return 0, 0
-    return int(match.group(2)), column_number(match.group(1))
 
 
 def inspect_workbook(file_path: Path) -> dict[str, Any]:
@@ -320,10 +364,13 @@ def inspect_workbook(file_path: Path) -> dict[str, Any]:
         }
     if not file_path.exists() or not file_path.is_file():
         return {"ok": False, "code": "FILE_NOT_FOUND", "writeAllowed": False}
+    if file_path.stat().st_size > MAX_FILE_BYTES:
+        return {"ok": False, "code": "FILE_SIZE_LIMIT_EXCEEDED", "writeAllowed": False}
 
     try:
-        file_hash = hashlib.sha256(file_path.read_bytes()).hexdigest()
+        file_hash = sha256_file(file_path)
         with zipfile.ZipFile(file_path, "r") as archive:
+            validate_archive(archive)
             names_in_zip = set(archive.namelist())
             workbook_root = parse_xml(archive, "xl/workbook.xml")
             if workbook_root is None:
@@ -334,7 +381,10 @@ def inspect_workbook(file_path: Path) -> dict[str, Any]:
             worksheets: list[dict[str, Any]] = []
             sheet_names: list[str] = []
             if sheets_parent is not None:
-                for index, node in enumerate(sheets_parent.findall("m:sheet", NS)):
+                nodes = sheets_parent.findall("m:sheet", NS)
+                if len(nodes) > MAX_SHEETS:
+                    raise ValueError("WORKSHEET_LIMIT_EXCEEDED")
+                for index, node in enumerate(nodes):
                     sheet_name = safe_text(node.attrib.get("name", ""), 120)
                     sheet_names.append(sheet_name)
                     rid = node.attrib.get(f"{{{NS_REL}}}id", "")
@@ -349,7 +399,11 @@ def inspect_workbook(file_path: Path) -> dict[str, Any]:
             workbook_pr = workbook_root.find("m:workbookPr", NS)
             calc_pr = workbook_root.find("m:calcPr", NS)
             external_ref_nodes = workbook_root.findall(".//m:externalReference", NS)
-            external_files = sorted(PurePosixPath(name).name for name in names_in_zip if name.startswith("xl/externalLinks/") and name.endswith(".xml"))
+            external_files = sorted(
+                PurePosixPath(name).name
+                for name in names_in_zip
+                if name.startswith("xl/externalLinks/") and name.endswith(".xml")
+            )[:200]
             connection_root = parse_xml(archive, "xl/connections.xml")
             connection_count = len(connection_root) if connection_root is not None else 0
             has_macros = "xl/vbaProject.bin" in names_in_zip
@@ -401,7 +455,7 @@ def inspect_workbook(file_path: Path) -> dict[str, Any]:
                 "warnings": warnings,
                 "parser": {
                     "provider": "orbit360_python_stdlib_ooxml",
-                    "version": "p04.1",
+                    "version": "p04.2",
                     "generatedAt": utc_now(),
                 },
                 "containsCellValues": False,
