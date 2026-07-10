@@ -1,0 +1,74 @@
+name: Orbit 360 PDF Manifest P07b Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-extract-pdf-manifest-p07b.py'
+      - 'tools/orbit360-test-extract-pdf-manifest-p07b.py'
+      - '.github/workflows/orbit360-pdf-manifest-p07b-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/orbit360-extract-pdf-manifest-p07b.py'
+      - 'tools/orbit360-test-extract-pdf-manifest-p07b.py'
+      - '.github/workflows/orbit360-pdf-manifest-p07b-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  pdf-manifest-p07b:
+    name: Manifiesto PDF determinístico P0.7b
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned PDF parser
+        run: python -m pip install --disable-pip-version-check 'pymupdf==1.26.7'
+
+      - name: Compile
+        run: |
+          python -m py_compile tools/orbit360-extract-pdf-manifest-p07b.py
+          python -m py_compile tools/orbit360-test-extract-pdf-manifest-p07b.py
+
+      - name: Run deterministic smoke
+        run: python tools/orbit360-test-extract-pdf-manifest-p07b.py
+
+      - name: Guard no network, subprocess or desktop automation
+        run: |
+          if grep -RniE '(requests\.|urllib\.|httpx\.|subprocess|os\.system|win32com|libreoffice|soffice|selenium|playwright)' \
+            tools/orbit360-extract-pdf-manifest-p07b.py; then
+            echo 'Network, subprocess, or desktop automation detected'
+            exit 1
+          fi
+
+      - name: Guard no real insurers, PII or source payload
+        run: |
+          if grep -RniE '(Aseguradora Guatemalteca|Aseguate|Seguros Universales|Banrural|Bantrab|BAM|Columna)' \
+            tools/orbit360-extract-pdf-manifest-p07b.py \
+            tools/orbit360-test-extract-pdf-manifest-p07b.py; then
+            echo 'Real insurer name detected in reusable parser or smoke'
+            exit 1
+          fi
+          grep -q 'containsRawPayload.*False' tools/orbit360-extract-pdf-manifest-p07b.py
+          grep -q 'containsBytes.*False' tools/orbit360-extract-pdf-manifest-p07b.py
+          grep -q 'embeddedContentExecuted.*False' tools/orbit360-extract-pdf-manifest-p07b.py
+          grep -q 'externalLinksFollowed.*False' tools/orbit360-extract-pdf-manifest-p07b.py
+          grep -q 'writeAllowed.*False' tools/orbit360-extract-pdf-manifest-p07b.py
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
