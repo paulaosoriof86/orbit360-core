@@ -44,10 +44,7 @@ const Orbit = {
     listBatches: () => [{ id: 'batch-a', totalSources: 11, totalInsurers: 6, totalExcel: 8, totalPdf: 3, bindingSets: 3 }],
     latest: () => ({
       status: 'incomplete',
-      summary: {
-        dryRunReady: 9, persisted: 0, waitingReference: 2, failed: 0,
-        bindingsReadyForReview: 1, bindingsIncomplete: 2
-      },
+      summary: { dryRunReady: 9, persisted: 0, waitingReference: 2, failed: 0, bindingsReadyForReview: 1, bindingsIncomplete: 2 },
       bindingSets: [
         { id: 'b1', insurerName: 'Compañía Alfa', variant: { tipoVehiculo: 'Automóvil' }, status: 'ready_for_binding_review', missingKnowledge: [] },
         { id: 'b2', insurerName: 'Compañía Beta', variant: { plan: 'Plan demo' }, status: 'documents_ready_knowledge_incomplete', missingKnowledge: ['tariff_rule'] }
@@ -56,28 +53,19 @@ const Orbit = {
   },
   aseguradorasBatchHistoryP09h: {
     readModel: () => ({
-      runs: [rows.aseguradora_batch_runs[0]],
-      items: [rows.aseguradora_batch_items[0]],
-      latest: rows.aseguradora_batch_runs[0],
-      latestItems: [rows.aseguradora_batch_items[0]],
-      resumableDocumentIds: ['doc-pendiente']
+      runs: [rows.aseguradora_batch_runs[0]], items: [rows.aseguradora_batch_items[0]], latest: rows.aseguradora_batch_runs[0],
+      latestItems: [rows.aseguradora_batch_items[0]], resumableDocumentIds: ['doc-pendiente']
     })
   },
   aseguradorasBatchAdminActionsP09i: {
     status: () => ({
       version: 'p09i-v1',
       lastPlan: {
-        ok: true, code: 'BATCH_ADMIN_PREVIEW_READY', action: 'dry_run',
-        requiredConfirmation: 'EJECUTAR DRY-RUN',
-        documents: [{ documentId: 'doc-1' }, { documentId: 'doc-2' }],
-        referenceContract: { provided: 1, missing: ['doc-2'] }
+        ok: true, code: 'BATCH_ADMIN_PREVIEW_READY', action: 'dry_run', requiredConfirmation: 'EJECUTAR DRY-RUN',
+        documents: [{ documentId: 'doc-1' }, { documentId: 'doc-2' }], referenceContract: { provided: 1, missing: ['doc-2'] }
       },
-      lastExecution: {
-        code: 'BATCH_DRY_RUN_COMPLETE', historyPersisted: false,
-        knowledgePersisted: false
-      },
-      knowledgePersistenceAllowed: false,
-      referencesExposed: false
+      lastExecution: { code: 'BATCH_DRY_RUN_COMPLETE', historyPersisted: false, knowledgePersisted: false },
+      knowledgePersistenceAllowed: false, referencesExposed: false
     })
   }
 };
@@ -87,11 +75,8 @@ const document = {
   addEventListener() {}
 };
 const window = {
-  Orbit,
-  OrbitBackend: { tenantId: 'alianzas-soluciones' },
-  location: { hash: '#/aseguradoras' },
-  addEventListener() {},
-  dispatchEvent() {}
+  Orbit, OrbitBackend: { tenantId: 'alianzas-soluciones' }, location: { hash: '#/aseguradoras' },
+  addEventListener() {}, dispatchEvent() {}
 };
 window.window = window;
 const context = { window, document, Orbit, console, Date, Math, Set, Array, String, Object, JSON, Number, Promise, setTimeout, clearTimeout };
@@ -104,20 +89,21 @@ assert(state.counts.sources === 2, 'debe contar fuentes visibles');
 assert(state.counts.manifests === 1 && state.counts.rules === 1, 'debe filtrar colecciones por tenant');
 assert(state.counts.batchRuns === 1 && state.counts.batchItems === 1, 'debe contar historial por tenant');
 assert(state.history.resumableDocumentIds.includes('doc-pendiente'), 'debe exponer documento reanudable');
-assert(state.provider.code === 'BACKEND_REQUIRED', 'provider no conectado debe mostrarse honestamente');
+assert(state.provider.code === 'BACKEND_REQUIRED', 'código interno debe conservarse para diagnóstico');
 assert(state.batch.batches[0].totalSources === 11, 'debe exponer lote de once fuentes');
-assert(state.batch.latest.summary.waitingReference === 2, 'debe exponer referencias pendientes');
-assert(state.admin.lastPlan.referenceContract.missing.includes('doc-2'), 'debe exponer refs faltantes sin valor');
+assert(state.batch.latest.summary.waitingReference === 2, 'debe exponer archivos pendientes');
+assert(state.admin.lastPlan.referenceContract.missing.includes('doc-2'), 'debe conservar faltantes sin exponer valor');
 assert(api.mount() === true, 'panel debe montarse en ruta Aseguradoras');
 assert(markup.includes('Conocimiento documental de Aseguradoras'), 'panel debe mostrar título');
-assert(markup.includes('BACKEND_REQUIRED'), 'panel debe mostrar provider pendiente');
+assert(markup.includes('Conexión de archivos: Pendiente de conexión'), 'debe traducir conexión pendiente a lenguaje de usuario');
 assert(markup.includes('Tasas ejemplo.xlsx'), 'panel debe mostrar primera fuente planificada');
 assert(markup.includes('11 fuentes') && markup.includes('6 aseguradoras'), 'panel debe mostrar resumen del lote');
-assert(markup.includes('ready_for_binding_review'), 'panel debe mostrar estado de binding');
-assert(markup.includes('documents_ready_knowledge_incomplete'), 'panel debe mostrar conocimiento incompleto');
+assert(markup.includes('Listo para revisión'), 'debe traducir estado de relación lista');
+assert(markup.includes('Documentos listos; conocimiento incompleto'), 'debe traducir conocimiento incompleto');
 assert(markup.includes('Historial del lote') && markup.includes('doc-pendiente'), 'panel debe mostrar historial y reanudables');
-assert(markup.includes('Acción administrativa') && markup.includes('EJECUTAR DRY-RUN'), 'panel debe mostrar preview administrativo');
-assert(markup.includes('Refs faltantes') && markup.includes('BATCH_DRY_RUN_COMPLETE'), 'panel debe mostrar refs y última ejecución');
+assert(markup.includes('Operación controlada') && markup.includes('EJECUTAR DRY-RUN'), 'panel debe mostrar operación administrativa con confirmación');
+assert(markup.includes('Archivos pendientes') && markup.includes('Lectura terminada'), 'panel debe traducir faltantes y última ejecución');
+assert(!/BACKEND_REQUIRED|Preflight LAB|Provider |Snapshots |metadata-only|referencias backend/i.test(markup), 'UI no debe mostrar términos técnicos internos');
 assert(listeners.some(item => item.type === 'click'), 'botón de actualización debe ser funcional');
 const source = fs.readFileSync('orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js', 'utf8');
 assert(!/\.insert\(|\.update\(|\.remove\(|setPref\(/.test(source), 'panel no debe escribir Orbit.store');
