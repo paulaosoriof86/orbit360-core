@@ -13,6 +13,9 @@ const CORE_SCRIPTS = [
   'core/cotizacion-esquema-aseguradora-p0.js',
   'core/excel-rule-proposal-adapter-p06b.js',
   'core/pdf-quote-adapter-p07.js',
+  'core/tenant-insurer-config-p10.js',
+  'data/tenant-alianzas-soluciones-insurers-p10.js',
+  'core/tenant-source-batch-adapter-p10.js',
   'core/document-provider-registry-p09.js',
   'core/document-provider-bridge-p09b.js',
   'core/aseguradoras-knowledge-runtime-p09.js'
@@ -58,6 +61,10 @@ function validateOrder(text) {
   const servicePos = text.indexOf(SERVICE_SCRIPT);
   if (positions.some(pos => pos > modulePos)) errors.push('CORE_MUST_LOAD_BEFORE_ASEGURADORAS');
   if (servicePos < modulePos) errors.push('SERVICE_MUST_LOAD_AFTER_ASEGURADORAS');
+  const tenantCore = text.indexOf('core/tenant-insurer-config-p10.js');
+  const tenantData = text.indexOf('data/tenant-alianzas-soluciones-insurers-p10.js');
+  const tenantBatch = text.indexOf('core/tenant-source-batch-adapter-p10.js');
+  if (!(tenantCore >= 0 && tenantData > tenantCore && tenantBatch > tenantData)) errors.push('TENANT_CONFIG_ORDER_INVALID');
   return errors;
 }
 
@@ -75,6 +82,8 @@ const report = {
   index: path.relative(ROOT, INDEX),
   changed: next !== current,
   scripts: [...CORE_SCRIPTS, SERVICE_SCRIPT],
+  tenantConfig: 'alianzas-soluciones',
+  tenantConfigLoadedBeforeRuntime: true,
   protectedFilesTouched: false,
   commit: false,
   deploy: false
