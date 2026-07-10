@@ -4,7 +4,7 @@ Fecha: 2026-07-10
 Proyecto: Orbit 360 A&S  
 Rama: `ays/backend-tenant-lab-v99-20260703`  
 Estado de envío a Claude: `NO_ENVIADO`  
-Estado técnico: `CONTRATO_IMPLEMENTADO / RUNTIME_DIMENSIONES_PENDIENTE`
+Estado técnico: `CONTRATO_IMPLEMENTADO / RUNTIME_P01B_IMPLEMENTADO / PENDIENTE_UX_FINAL`
 
 ## 1. Motivo del addendum
 
@@ -16,7 +16,8 @@ Debe leerse junto con:
 - `AUDITORIA-FORENSE-PROFUNDA-COTIZADOR-COMPARATIVO-V110-CONTRATO-AYS-20260709.md`;
 - `DECISION-MAESTRA-ASEGURADORAS-COTIZADOR-COMPARATIVO-HISTORIALES-IA-TARIFAS-20260710.md`;
 - `DECISION-MAESTRA-COTIZACIONES-POR-ASEGURADORA-SECCIONES-FIDELIDAD-FUENTES-20260710.md`;
-- `DECISION-MAESTRA-ASEGURADORAS-MULTIPLES-FUENTES-USOS-COMBINATION-20260710.md`.
+- `DECISION-MAESTRA-ASEGURADORAS-MULTIPLES-FUENTES-USOS-COMBINATION-20260710.md`;
+- `IMPLEMENTACION-P01B-ASEGURADORAS-COBERTURA-POR-COMBINACION-20260710.md`.
 
 ## 2. Registro acumulado del cambio
 
@@ -25,17 +26,18 @@ Fecha: 2026-07-10
 Carril: A + B
 Módulo: Aseguradoras / Fuentes / Cotizador / Comparativo
 Necesidad: admitir muchas pólizas, cotizaciones, cotizadores, tarifarios, condiciones y beneficios por aseguradora y producto.
-Causa raíz: el inventario inicial permitía múltiples filas, pero el contrato evaluaba suficiencia demasiado cerca del nivel aseguradora/producto general y podía interpretarse como una fuente por tipo.
+Causa raíz: el inventario inicial permitía múltiples filas, pero evaluaba suficiencia demasiado cerca del nivel aseguradora general.
 Esperado: cobertura por combinación y múltiples usos por fuente.
 Backend reusable: matriz de dimensiones, agrupación, conteos y usos.
-Archivo principal: core/cotizacion-esquema-aseguradora-p0.js
-Test: tools/orbit360-test-cotizacion-esquema-aseguradora-p0.mjs
+Archivo contrato: core/cotizacion-esquema-aseguradora-p0.js
+Archivo runtime: modules/aseguradoras.js
+Tests: tools/orbit360-test-cotizacion-esquema-aseguradora-p0.mjs + tools/orbit360-test-aseguradoras-fuentes-runtime-p0.mjs
 Impacto UX Claude: alto.
 Impacto Academia: alto.
-Estado backend: implementado y smoke local aprobado.
-Estado runtime: inventario básico implementado; dimensiones avanzadas pendientes de UI.
+Estado contrato: implementado y smoke local aprobado.
+Estado runtime: P0.1b implementado; grupos, dimensiones y faltantes visibles.
 Estado Claude: documentado, no enviado.
-Condición de cierre: runtime muestra grupos y faltantes por combinación; Claude consolida UX sin simplificar.
+Condición de cierre: Claude consolida UX sin simplificar después de accesos, Drive y adapters.
 ```
 
 ## 3. Reglas obligatorias para Claude
@@ -52,6 +54,7 @@ Condición de cierre: runtime muestra grupos y faltantes por combinación; Claud
 Claude debe prever desplegables y filtros para:
 
 - país;
+- moneda;
 - ramo;
 - producto;
 - familia de producto;
@@ -111,9 +114,27 @@ Cada grupo debe tener su propio estado:
 
 Una fuente de Autos no puede ocultar el faltante de Motos.
 
-## 4. UX requerida
+## 4. Implementación runtime ya existente que Claude debe preservar
 
-Claude deberá diseñar posteriormente:
+P0.1b ya implementó en `modules/aseguradoras.js`:
+
+- contador de fuentes y combinaciones en tarjetas;
+- alerta de grupos incompletos;
+- bloque `Cobertura de conocimiento por combinación`;
+- grupos desplegables;
+- conteos por tipo documental;
+- badges de tarifa, reglas, presentación y casos;
+- campos de país, moneda, ramo, producto, familia, subtipo, segmento, riesgo, vehículo, uso y plan;
+- `datalist` construidos desde la información existente;
+- persistencia incremental dentro de `aseguradora.docs[]`;
+- compatibilidad con registros legacy;
+- resumen y clave de combinación expuestos en `_fuentes`.
+
+Claude no debe eliminar esta semántica al rediseñar la interfaz.
+
+## 5. UX final requerida
+
+Claude deberá mejorar posteriormente:
 
 - resumen por grupo;
 - filtros y búsqueda;
@@ -127,7 +148,8 @@ Claude deberá diseñar posteriormente:
 - alerta de fuente insuficiente;
 - historial de sustitución;
 - vínculo a Drive;
-- estados honestos de lectura y validación.
+- estados honestos de lectura y validación;
+- responsive y densidad visual de la ficha.
 
 No se necesita que el prototipo ejecute IA real, pero sí debe representar correctamente:
 
@@ -138,7 +160,7 @@ No se necesita que el prototipo ejecute IA real, pero sí debe representar corre
 - validado/habilitado;
 - reemplazado por versión.
 
-## 5. Integración con Cotizador
+## 6. Integración con Cotizador
 
 Claude debe mostrar que Cotizador consume únicamente la combinación aplicable.
 
@@ -147,9 +169,9 @@ Ejemplos:
 - una tasa para Automóvil no aparece al cotizar Motocicleta;
 - un cotizador de Gastos Médicos individual no se usa automáticamente para familiar;
 - una versión vencida no se ofrece como vigente;
-- el asesor puede consultar qué fuente/version produjo el resultado.
+- el asesor puede consultar qué fuente/versión produjo el resultado.
 
-## 6. Integración con Comparativo
+## 7. Integración con Comparativo
 
 Comparativo debe:
 
@@ -159,18 +181,19 @@ Comparativo debe:
 - no descartar campos no comunes;
 - explicar faltantes o baja confianza.
 
-## 7. Academia requerida
+## 8. Academia requerida
 
 ### Dirección/Admin/Operativo
 
-- crear grupos de cobertura;
+- crear y revisar grupos de cobertura;
 - cargar varias fuentes;
 - marcar usos;
 - revisar inferencias;
 - completar faltantes;
 - validar versiones;
 - reemplazar sin borrar;
-- identificar cuando un cotizador Excel sirve como tarifario inferido.
+- identificar cuándo un cotizador Excel sirve como tarifario inferido;
+- interpretar los estados de grupo del runtime P0.1b.
 
 ### Asesor
 
@@ -187,7 +210,7 @@ Comparativo debe:
 - Drive/Storage;
 - permisos y auditoría.
 
-## 8. Prohibiciones
+## 9. Prohibiciones
 
 Claude no debe:
 
@@ -200,18 +223,26 @@ Claude no debe:
 - hardcodear aseguradoras o productos A&S en la base reusable;
 - sustituir `Orbit.store`;
 - tocar backend protegido;
-- copiar el directorio de aseguradoras de v110.
+- copiar el directorio de aseguradoras de v110;
+- revertir los grupos runtime ya implementados.
 
-## 9. Momento de intervención de Claude
+## 10. Momento de intervención de Claude
 
 Claude no es indispensable todavía.
 
-Se solicitará intervención cuando estén listos:
+Ya está listo:
 
-1. dimensiones avanzadas en runtime;
-2. accesos/cuentas sensibles;
-3. matching Drive;
-4. adapter de inventario Excel/PDF;
-5. primer flujo de propuesta/diff.
+```txt
+1. dimensiones avanzadas y grupos en runtime P0.1b
+```
 
-En ese punto deberá recibir el paquete acumulado completo y no un resumen parcial.
+Falta antes de pedir nueva candidata:
+
+```txt
+2. accesos/cuentas sensibles
+3. matching Drive
+4. adapter de inventario Excel/PDF
+5. primer flujo de propuesta/diff
+```
+
+En ese punto Claude deberá recibir el paquete acumulado completo y no un resumen parcial.
