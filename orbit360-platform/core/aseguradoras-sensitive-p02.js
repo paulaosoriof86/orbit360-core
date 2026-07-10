@@ -206,16 +206,20 @@
 
   async function copySensitive(input) {
     input = input || {};
+    var actor = currentActor(input.actor), store = input.store || Orbit.store;
+    var base = baseAudit(input, actor, clean(input.resourceType), clean(input.resourceId), clean(input.field));
+    if (!canViewSensitive(actor)) {
+      writeAudit(store, Object.assign({}, base, { action: 'denegar_copia_dato_sensible', result: 'denegado' }));
+      return { ok: false, code: 'FORBIDDEN_ROLE' };
+    }
     var value = clean(input.value), copied = false;
     if (!value) return { ok: false, code: 'EMPTY_VALUE' };
     try { if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') { await navigator.clipboard.writeText(value); copied = true; } } catch (e) {}
     if (!copied && typeof input.copyFallback === 'function') copied = input.copyFallback(value) !== false;
-    writeAudit(input.store || Orbit.store, {
-      tenantId: input.tenantId, aseguradoraId: input.aseguradoraId,
-      resourceType: input.resourceType, resourceId: input.resourceId, field: input.field,
-      actor: input.actor, reason: input.reason, action: 'copiar_dato_sensible',
-      result: copied ? 'copiado' : 'fallo_copia', metadata: safeMetadata(input.metadata)
-    });
+    writeAudit(store, Object.assign({}, base, {
+      action: 'copiar_dato_sensible', result: copied ? 'copiado' : 'fallo_copia',
+      metadata: safeMetadata(input.metadata)
+    }));
     return { ok: copied, code: copied ? 'OK' : 'COPY_FAILED' };
   }
 
