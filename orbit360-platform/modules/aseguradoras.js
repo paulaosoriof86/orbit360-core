@@ -1,21 +1,158 @@
 /* ============================================================
    Orbit 360 · Orbit Aseguradoras (directorio operativo) — editable
-   Directorio GT/CO habilitable; ficha editable: logo, accesos
-   múltiples con usuario/contraseña, contactos por tipo, cuentas,
-   facturación (NIT/patrón), documentos (tarifas/cotizaciones/PDF
-   que alimentan IA y Cotizador), docs requeridos por producto,
-   comisiones por ramo. Importador inteligente + documental. Borrar.
-   La visibilidad por rol se controla en Equipo y permisos.
+   Directorio GT/CO habilitable; ficha editable: logo, accesos,
+   contactos, cuentas, facturación, Drive, fuentes documentales,
+   comisiones y requisitos de emisión.
+
+   P0.1 2026-07-10:
+   - inventario de fuentes para Cotizador/Comparativo;
+   - país/ramo/producto/plan/versión/estado;
+   - disponibilidad de tarifa y presentación;
+   - compatibilidad con docs legacy nombre/categoría;
+   - cero almacenamiento directo fuera de Orbit.store.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.aseguradoras = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   let host;
+
+  const SOURCE_TYPES = [
+    ['cotizador_excel_salida', 'Cotizador Excel con salida'],
+    ['cotizacion_pdf_oficial', 'Cotización PDF oficial'],
+    ['tarifario_excel', 'Tarifario Excel'],
+    ['tarifario_pdf', 'Tarifario PDF'],
+    ['poliza_ejemplo', 'Póliza ejemplo'],
+    ['condiciones', 'Condiciones'],
+    ['circular', 'Circular / actualización'],
+    ['ajuste_validado', 'Ajuste validado'],
+    ['cotizador_linea_asistido', 'Cotizador en línea asistido'],
+    ['formulario', 'Formulario'],
+    ['documento_comercial', 'Documento comercial'],
+    ['otro', 'Otro documento']
+  ];
+  const SOURCE_STATES = [
+    'inventario_fuentes',
+    'fuentes_incompletas',
+    'lectura_pendiente',
+    'extraccion_en_prueba',
+    'requiere_validacion',
+    'calibrado',
+    'validado_habilitado',
+    'reemplazado_por_version',
+    'bloqueado'
+  ];
+
   function paisOK(p) { return !Orbit.pais || Orbit.pais === 'TODOS' || p === Orbit.pais; }
   function up(id, patch) { S().update('aseguradoras', id, patch); }
   function reload() { if (host) render(host); }
   function safeAll(col) { try { return S().all(col) || []; } catch (e) { return []; } }
+  function clean(v) { return String(v == null ? '' : v).trim(); }
+  function slug(v) { return clean(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, ''); }
+  function extension(name) {
+    const parts = clean(name).toLowerCase().split('.');
+    return parts.length > 1 ? parts.pop() : '';
+  }
+  function legacyType(d) {
+    if (d && d.tipoFuente) return d.tipoFuente;
+    const cat = clean(d && (d.cat || d.categoria)).toLowerCase();
+    const ext = extension(d && d.nombre);
+    if (cat.includes('cotizador') && ['xls', 'xlsx', 'csv'].includes(ext)) return 'cotizador_excel_salida';
+    if (cat.includes('cotizador')) return 'cotizador_linea_asistido';
+    if (cat.includes('cotiz')) return 'cotizacion_pdf_oficial';
+    if (cat.includes('póliza') || cat.includes('poliza')) return 'poliza_ejemplo';
+    if (cat.includes('condicion')) return 'condiciones';
+    if (cat.includes('circular')) return 'circular';
+    if (cat.includes('ajuste')) return 'ajuste_validado';
+    if (cat.includes('formulario')) return 'formulario';
+    if (cat.includes('comercial')) return 'documento_comercial';
+    if (cat.includes('tarifa')) return ['xls', 'xlsx', 'csv'].includes(ext) ? 'tarifario_excel' : 'tarifario_pdf';
+    return 'otro';
+  }
+  function typeLabel(type) {
+    const found = SOURCE_TYPES.find(x => x[0] === type);
+    return found ? found[1] : type || 'Fuente';
+  }
+  function legacyCat(type) {
+    if (type === 'cotizador_excel_salida') return 'Cotizador Excel';
+    if (type === 'cotizacion_pdf_oficial') return 'Cotización ejemplo';
+    if (type === 'poliza_ejemplo') return 'Póliza ejemplo';
+    if (type === 'condiciones') return 'Condiciones';
+    if (type === 'circular') return 'Circular';
+    if (type === 'ajuste_validado') return 'Ajuste validado';
+    if (type === 'cotizador_linea_asistido') return 'Cotizador en línea';
+    if (type === 'formulario') return 'Formularios';
+    if (type === 'documento_comercial') return 'Comercial';
+    if (type === 'otro') return 'Otro';
+    return 'Tarifas';
+  }
+  function normalizarFuente(d, aseguradora) {
+    d = d || {};
+    const tipoFuente = legacyType(d);
+    const nombre = clean(d.nombre || d.archivo || 'Documento');
+    const outputDefault = tipoFuente === 'cotizador_excel_salida';
+    const rateDefault = tipoFuente === 'cotizador_excel_salida' || tipoFuente === 'tarifario_excel' || tipoFuente === 'tarifario_pdf' || tipoFuente === 'ajuste_validado';
+    return {
+      id: clean(d.id) || 'src_' + (slug(nombre + '_' + tipoFuente + '_' + clean(d.version || 'v1')) || Date.now().toString(36)),
+      nombre,
+      cat: clean(d.cat || d.categoria) || legacyCat(tipoFuente),
+      tipoFuente,
+      pais: clean(d.pais || (aseguradora && aseguradora.pais)).toUpperCase(),
+      ramo: clean(d.ramo),
+      producto: clean(d.producto),
+      plan: clean(d.plan),
+      version: clean(d.version || 'v1'),
+      archivoRef: clean(d.archivoRef || d.documentRef || d.driveUrl || d.url),
+      contieneTarifas: d.contieneTarifas != null ? d.contieneTarifas === true : rateDefault,
+      contieneReglasCalculo: d.contieneReglasCalculo != null ? d.contieneReglasCalculo === true : tipoFuente === 'cotizador_excel_salida',
+      contieneHojaSalida: d.contieneHojaSalida != null ? d.contieneHojaSalida === true : outputDefault,
+      contieneFormatoCotizacion: d.contieneFormatoCotizacion != null ? d.contieneFormatoCotizacion === true : tipoFuente === 'cotizacion_pdf_oficial',
+      contieneAreaImpresion: d.contieneAreaImpresion != null ? d.contieneAreaImpresion === true : outputDefault,
+      estado: clean(d.estado || 'inventario_fuentes'),
+      vigenciaDesde: clean(d.vigenciaDesde),
+      vigenciaHasta: clean(d.vigenciaHasta),
+      notas: clean(d.notas),
+      trazabilidad: Object.assign({}, d.trazabilidad || {})
+    };
+  }
+  function evaluarFuente(input) {
+    const d = normalizarFuente(input);
+    const api = Orbit.cotizacionEsquemaAseguradoraP0;
+    if (api && typeof api.inspectTrainingSource === 'function') {
+      return api.inspectTrainingSource(d);
+    }
+    const hasOutput = d.contieneHojaSalida || d.contieneFormatoCotizacion || d.contieneAreaImpresion;
+    const hasRates = d.contieneTarifas || d.contieneReglasCalculo;
+    const presentationComplete = d.tipoFuente === 'cotizacion_pdf_oficial' || ((d.tipoFuente === 'cotizador_excel_salida' || d.tipoFuente === 'cotizador_linea_asistido') && hasOutput);
+    const needsExample = !presentationComplete && (d.tipoFuente === 'tarifario_excel' || d.tipoFuente === 'tarifario_pdf' || hasRates);
+    return {
+      tipoFuente: d.tipoFuente,
+      sirveParaTarifas: hasRates || d.tipoFuente === 'cotizador_excel_salida' || d.tipoFuente === 'ajuste_validado',
+      sirveParaPresentacion: presentationComplete,
+      sirveParaExtraccion: true,
+      requiereEjemploCotizacion: needsExample
+    };
+  }
+  function resumenFuentes(docs, aseguradora) {
+    const fuentes = (docs || []).map(d => normalizarFuente(d, aseguradora));
+    const evaluaciones = fuentes.map(evaluarFuente);
+    const tieneTarifa = evaluaciones.some(e => e.sirveParaTarifas);
+    const tienePresentacion = evaluaciones.some(e => e.sirveParaPresentacion);
+    const requiereEjemplo = tieneTarifa && !tienePresentacion;
+    let estado = 'inventario_fuentes';
+    if (fuentes.length && requiereEjemplo) estado = 'fuentes_incompletas';
+    if (fuentes.length && tienePresentacion && tieneTarifa) estado = 'requiere_validacion';
+    if (fuentes.some(f => f.estado === 'validado_habilitado')) estado = 'validado_habilitado';
+    return { total: fuentes.length, fuentes, evaluaciones, tieneTarifa, tienePresentacion, requiereEjemplo, estado };
+  }
+  function sourceBadges(summary) {
+    const out = [];
+    out.push(`<span class="badge ${summary.tieneTarifa ? 'ok' : 'neutral'}">${summary.tieneTarifa ? '✓' : '—'} Tarifas</span>`);
+    out.push(`<span class="badge ${summary.tienePresentacion ? 'ok' : 'neutral'}">${summary.tienePresentacion ? '✓' : '—'} Presentación</span>`);
+    if (summary.requiereEjemplo) out.push('<span class="badge warn">⚠ Requiere cotización ejemplo</span>');
+    return out.join('');
+  }
+
   function vinculos(id) {
     const polizas = safeAll('polizas').filter(p => p.aseguradoraId === id);
     const polIds = new Set(polizas.map(p => p.id));
@@ -41,10 +178,7 @@ Orbit.modules.aseguradoras = (function () {
     try {
       S().insert('actividades', {
         id: 'act' + Date.now() + Math.floor(Math.random() * 999),
-        tipo: 'admin',
-        icon: '🔐',
-        fecha: Orbit.ui.today(),
-        titulo,
+        tipo: 'admin', icon: '🔐', fecha: Orbit.ui.today(), titulo,
         detalle: (asg ? asg.nombre + ' · ' : '') + detalle
       });
     } catch (e) {}
@@ -63,15 +197,16 @@ Orbit.modules.aseguradoras = (function () {
   function render(h) {
     host = h;
     const all = S().all('aseguradoras').filter(a => paisOK(a.pais));
-    const vinc = all.filter(a => a.vinculada !== false);
+    const conTarifa = all.filter(a => resumenFuentes(a.docs, a).tieneTarifa).length;
+    const conPresentacion = all.filter(a => resumenFuentes(a.docs, a).tienePresentacion).length;
     host.innerHTML = `<div class="page">
-      ${K.banner({ icon: '🏢', title: 'Orbit Aseguradoras', sub: 'Directorio, contactos, accesos, cuentas y documentos', features: [], actions: `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button><button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>` })}
+      ${K.banner({ icon: '🏢', title: 'Orbit Aseguradoras', sub: 'Directorio operativo y base de conocimiento para Cotizador/Comparativo', features: [], actions: `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button><button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>` })}
       ${K.kpis([
         { label: 'En directorio', val: all.length, color: 'var(--red)', foot: 'GT + CO', onclick: "location.hash='#/aseguradoras'" },
-        { label: 'Vinculadas', val: vinc.length, color: 'var(--ok)', foot: 'con vinculación activa', footTone: 'up', onclick: "location.hash='#/aseguradoras'" },
-        { label: 'Sin vincular', val: all.length - vinc.length, color: 'var(--ink-3)', foot: 'disponibles', onclick: "location.hash='#/aseguradoras'" }
+        { label: 'Con tarifas', val: conTarifa, color: 'var(--ok)', foot: 'fuente identificada', footTone: 'up', onclick: "location.hash='#/aseguradoras'" },
+        { label: 'Con presentación', val: conPresentacion, color: 'var(--info)', foot: 'cotización o salida', onclick: "location.hash='#/aseguradoras'" }
       ])}
-      <div class="cfg-note" style="margin-bottom:14px">Habilita/deshabilita cada aseguradora según las <b>vinculaciones</b> del intermediario. Desactivar conserva historial; borrar solo se permite si no hay pólizas, cobros, reclamos, documentos ni comisiones vinculadas. Quién puede ver este módulo se define en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/equipo'">Equipo y permisos</a>.</div>
+      <div class="cfg-note" style="margin-bottom:14px">Aseguradoras es la fuente maestra para directorio, accesos, cuentas, documentos, tarifas y formatos de cotización. <b>Tarifas disponibles</b> y <b>presentación disponible</b> son estados distintos; una tabla de tasas puede requerir una cotización oficial de ejemplo.</div>
       <div class="asg-grid">${all.map(a => card(a)).join('')}</div>
     </div>`;
     host.querySelector('#asg-new').addEventListener('click', nueva);
@@ -97,14 +232,15 @@ Orbit.modules.aseguradoras = (function () {
   function card(a) {
     const on = a.vinculada !== false;
     const nPol = S().where('polizas', p => p.aseguradoraId === a.id).length;
-    const logo = a.logo ? `<span class="asg-dot" style="padding:0;overflow:hidden"><img src="${a.logo}" style="width:100%;height:100%;object-fit:contain"></span>` : `<span class="asg-dot" style="background:${a.color}">${U.esc(a.nombre[0])}</span>`;
+    const summary = resumenFuentes(a.docs, a);
+    const logo = a.logo ? `<span class="asg-dot" style="padding:0;overflow:hidden"><img src="${a.logo}" style="width:100%;height:100%;object-fit:contain"></span>` : `<span class="asg-dot" style="background:${a.color}">${U.esc((a.nombre || '?')[0])}</span>`;
     return `<div class="asg-card ${on ? '' : 'off'}" data-asg="${a.id}">
       <div class="asg-card-h">
         ${logo}
-        <div style="flex:1;min-width:0"><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11.5px">${a.pais} · ${(a.ramos || []).length} ramos · ${nPol} pólizas</div></div>
+        <div style="flex:1;min-width:0"><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11.5px">${a.pais} · ${(a.ramos || []).length} ramos · ${nPol} pólizas · ${summary.total} fuentes</div></div>
         <label class="asg-switch" title="Vinculación" onclick="event.stopPropagation()"><input type="checkbox" data-toggle="${a.id}" ${on ? 'checked' : ''}><span></span></label>
       </div>
-      <div class="asg-card-tags">${(a.ramos || []).slice(0, 4).map(r => `<span class="badge neutral">${r}</span>`).join('')}</div>
+      <div class="asg-card-tags">${sourceBadges(summary)}${(a.ramos || []).slice(0, 2).map(r => `<span class="badge neutral">${U.esc(r)}</span>`).join('')}</div>
     </div>`;
   }
 
@@ -116,26 +252,26 @@ Orbit.modules.aseguradoras = (function () {
     ficha(id);
   }
 
-  /* ===================== FICHA EDITABLE ===================== */
   function ficha(id, startEdit) {
     const a = S().get('aseguradoras', id); if (!a) return;
     const f = a.facturacion || {};
     const cont = a.contactos || [], cuentas = a.cuentas || [];
     const portales = a.portales && a.portales.length ? a.portales : (a.portal ? [{ nombre: 'Portal principal', url: a.portal, usuario: '', credentialRef: '' }] : []);
-    const docs = a.docs || [], reqs = a.docsRequeridos || [];
+    const docs = (a.docs || []).map(d => normalizarFuente(d, a));
+    const summary = resumenFuentes(docs, a);
+    const reqs = a.docsRequeridos || [];
     const ramos = a.ramos || [];
     const toneTipo = { 'Comercial / Técnico': 'info', 'Comercial': 'info', 'Técnico': 'info', 'Administrativo': 'neutral', 'Siniestros': 'danger' };
-    const catTone = { 'Tarifas': 'warn', 'Cotización ejemplo': 'info', 'Póliza ejemplo': 'ok', 'Formularios': 'neutral', 'Comercial': 'neutral' };
     let back = document.getElementById('asg-ficha'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'asg-ficha'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center';
-    back.innerHTML = `<div class="card" style="width:min(860px,96vw);max-height:92vh;overflow:auto;padding:0">
+    back.innerHTML = `<div class="card" style="width:min(980px,97vw);max-height:92vh;overflow:auto;padding:0">
       <div style="padding:20px 24px;background:linear-gradient(120deg,${a.color},#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <div style="display:flex;gap:13px;align-items:center">
           <label class="asg-logo" title="Cargar logo">${a.logo ? `<img src="${a.logo}">` : '<span>🏢<br><small>logo</small></span>'}<input type="file" id="af-logo" accept="image/*" style="display:none"></label>
           <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Aseguradora · ${a.pais}</div>
             <input id="af-nombre" value="${U.esc(a.nombre)}" style="font-family:var(--f-display);font-weight:800;font-size:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;padding:4px 10px">
-            <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'}</div></div>
+            <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'} · ${summary.total} fuentes</div></div>
         </div>
         <button class="imp-x" id="af-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
       </div>
@@ -163,10 +299,11 @@ Orbit.modules.aseguradoras = (function () {
           </div>
         </div>
         <div class="asg-sec">
-          <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">📎 Documentos <button class="btn ghost sm" id="af-add-doc">+ Documento</button></div>
-          <div class="muted" style="font-size:11.5px;margin-bottom:9px">Tarifas, cotizaciones de ejemplo y PDFs de pólizas <b>alimentan la IA, el Cotizador y el Comparativo</b>.</div>
-          <div id="af-docs">${docs.map((d, i) => docRow(d, i, catTone)).join('') || '<div class="muted" style="font-size:12px">Sin documentos.</div>'}</div>
-          <button class="btn ghost sm" style="margin-top:9px" id="af-imp-doc">✨ Importar documentos (mapeo inteligente)</button>
+          <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">🧠 Fuentes para Cotizador / Comparativo <button class="btn ghost sm" id="af-add-doc">+ Fuente</button></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin:7px 0 10px">${sourceBadges(summary)}<span class="badge neutral">${summary.total} fuente(s)</span><span class="badge neutral">Estado: ${U.esc(summary.estado)}</span></div>
+          <div class="muted" style="font-size:11.5px;margin-bottom:9px">Cotizadores Excel, tarifarios, cotizaciones oficiales, pólizas y condiciones se versionan por aseguradora, país y producto. Una fuente tarifaria sin formato de salida queda marcada como <b>requiere cotización ejemplo</b>.</div>
+          <div id="af-docs">${docs.map((d, i) => docRow(d, i, a)).join('') || '<div class="muted" style="font-size:12px">Sin fuentes registradas.</div>'}</div>
+          <button class="btn ghost sm" style="margin-top:9px" id="af-imp-doc">✨ Importar fuentes (PDF / Excel / imagen)</button>
         </div>
         <div class="asg-sec">
           <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">💵 Comisiones por ramo <button class="btn ghost sm" id="af-add-ramo">+ Ramo</button></div>
@@ -187,26 +324,53 @@ Orbit.modules.aseguradoras = (function () {
     document.body.appendChild(back);
     const $ = s => back.querySelector(s);
     const close = () => back.remove();
-    const card = back.querySelector('.card');
+    const cardNode = back.querySelector('.card');
     function setEdit(on) {
       back.querySelectorAll('input, select, textarea').forEach(el => { if (el.type !== 'file') el.disabled = !on; });
       back.querySelectorAll('.btn.sm, .asg-del, #af-add-portal, #af-add-cont, #af-add-cta, #af-add-doc, #af-add-req, #af-add-ramo').forEach(b => b.style.display = on ? '' : 'none');
       $('#af-save').style.display = on ? '' : 'none';
       $('#af-editar').style.display = on ? 'none' : '';
       $('#af-del').style.visibility = on ? '' : 'hidden';
-      card.classList.toggle('asg-view', !on);
+      cardNode.classList.toggle('asg-view', !on);
     }
     $('#af-editar').addEventListener('click', () => setEdit(true));
     setEdit(!!startEdit);
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#af-x').addEventListener('click', close); back.querySelector('[data-close]').addEventListener('click', close);
     $('#af-logo').addEventListener('change', e => { const file = e.target.files[0]; if (!file) return; const rd = new FileReader(); rd.onload = () => { up(id, { logo: rd.result }); adminAct('Logo de aseguradora actualizado', 'Logo actualizado', a); ficha(id); reload(); }; rd.readAsDataURL(file); });
+
+    function sourceFromRow(row) {
+      const get = key => { const el = row.querySelector(key); return el ? el.value : ''; };
+      const check = key => { const el = row.querySelector(key); return !!(el && el.checked); };
+      const type = get('[data-dt]');
+      return normalizarFuente({
+        id: row.dataset.sourceId,
+        nombre: get('[data-dn]'),
+        cat: legacyCat(type),
+        tipoFuente: type,
+        pais: get('[data-dpais]'),
+        ramo: get('[data-dramo]'),
+        producto: get('[data-dprod]'),
+        plan: get('[data-dplan]'),
+        version: get('[data-dver]'),
+        archivoRef: get('[data-dref]'),
+        contieneTarifas: check('[data-dtar]'),
+        contieneReglasCalculo: check('[data-dreg]'),
+        contieneHojaSalida: check('[data-dsal]'),
+        contieneFormatoCotizacion: check('[data-dfmt]'),
+        contieneAreaImpresion: check('[data-dimp]'),
+        estado: get('[data-destado]'),
+        vigenciaDesde: get('[data-dvd]'),
+        vigenciaHasta: get('[data-dvh]'),
+        notas: get('[data-dnotas]')
+      }, a);
+    }
     function snapshot() {
       const g = s => (back.querySelector(s) || {}).value || '';
       const portalesNew = [...back.querySelectorAll('[data-portal]')].map(portalSnapshot);
       const contNew = [...back.querySelectorAll('[data-cont]')].map(row => ({ tipo: row.querySelector('[data-ct]').value, nombre: row.querySelector('[data-cn]').value, email: row.querySelector('[data-ce]').value, tel: row.querySelector('[data-cl]').value }));
       const ctaNew = [...back.querySelectorAll('[data-cta]')].map(row => ({ banco: row.querySelector('[data-cb]').value, tipo: row.querySelector('[data-ctt]').value, numero: row.querySelector('[data-ccn]').value, moneda: row.querySelector('[data-cm]').value }));
-      const docNew = [...back.querySelectorAll('[data-doc]')].map(row => ({ nombre: row.querySelector('[data-dn]').value, cat: row.querySelector('[data-dc]').value }));
+      const docNew = [...back.querySelectorAll('[data-doc]')].map(sourceFromRow);
       const reqNew = [...back.querySelectorAll('[data-req]')].map(row => ({ producto: row.querySelector('[data-rp]').value, items: row.querySelector('[data-ri]').value }));
       const comNew = Object.assign({}, S().get('aseguradoras', id).comisiones);
       back.querySelectorAll('[data-ramopct]').forEach(inp => { comNew[inp.dataset.ramopct] = +inp.value || 0; });
@@ -216,7 +380,7 @@ Orbit.modules.aseguradoras = (function () {
     $('#af-add-portal').addEventListener('click', () => push('portales', { nombre: 'Portal', url: '', usuario: '', credentialRef: '' }));
     $('#af-add-cont').addEventListener('click', () => push('contactos', { tipo: 'Comercial / Técnico', nombre: '', email: '', tel: '' }));
     $('#af-add-cta').addEventListener('click', () => push('cuentas', { banco: '', tipo: 'Monetaria', numero: '', moneda: a.pais === 'GT' ? 'GTQ' : 'COP' }));
-    $('#af-add-doc').addEventListener('click', () => push('docs', { nombre: 'Documento.pdf', cat: 'Tarifas' }));
+    $('#af-add-doc').addEventListener('click', () => push('docs', normalizarFuente({ nombre: 'Nueva fuente.xlsx', tipoFuente: 'cotizador_excel_salida', pais: a.pais, version: 'v1', estado: 'inventario_fuentes' }, a)));
     $('#af-add-req').addEventListener('click', () => push('docsRequeridos', { producto: '', items: '' }));
     $('#af-add-ramo').addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; const rr = (S().get('aseguradoras', id).ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); const com = Object.assign({}, S().get('aseguradoras', id).comisiones); com[r] = a.comisionDefault || 12; up(id, { ramos: rr, comisiones: com }); adminAct('Ramo/comisión de aseguradora actualizado', 'Ramo agregado: ' + r, a); ficha(id, true); });
     back.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
@@ -231,21 +395,9 @@ Orbit.modules.aseguradoras = (function () {
     $('#af-save').addEventListener('click', async () => {
       const motivo = await Orbit.ui.prompt('Motivo del cambio en esta aseguradora:', { title: 'Guardar cambios administrativos' });
       if (!motivo) return;
-      if (!(await U.confirm('Guardar cambios administrativos de esta aseguradora. Los portales conservan solo referencia de credencial; no se guardan contraseñas reales. ¿Continuar?', { title: 'Guardar aseguradora', ok: 'Guardar' }))) return;
-      const g = s => (back.querySelector(s) || {}).value || '';
-      const portalesNew = [...back.querySelectorAll('[data-portal]')].map(portalSnapshot);
-      const contNew = [...back.querySelectorAll('[data-cont]')].map(row => ({ tipo: row.querySelector('[data-ct]').value, nombre: row.querySelector('[data-cn]').value, email: row.querySelector('[data-ce]').value, tel: row.querySelector('[data-cl]').value }));
-      const ctaNew = [...back.querySelectorAll('[data-cta]')].map(row => ({ banco: row.querySelector('[data-cb]').value, tipo: row.querySelector('[data-ctt]').value, numero: row.querySelector('[data-ccn]').value, moneda: row.querySelector('[data-cm]').value }));
-      const docNew = [...back.querySelectorAll('[data-doc]')].map(row => ({ nombre: row.querySelector('[data-dn]').value, cat: row.querySelector('[data-dc]').value }));
-      const reqNew = [...back.querySelectorAll('[data-req]')].map(row => ({ producto: row.querySelector('[data-rp]').value, items: row.querySelector('[data-ri]').value }));
-      const comNew = Object.assign({}, S().get('aseguradoras', id).comisiones);
-      back.querySelectorAll('[data-ramopct]').forEach(inp => { comNew[inp.dataset.ramopct] = +inp.value || 0; });
-      up(id, {
-        nombre: g('#af-nombre') || a.nombre, drive: g('#af-drive'), nit: g('#af-nit'),
-        facturacion: { razonSocial: g('#af-rs'), patronConcepto: g('#af-patron'), dirFiscal: g('#af-dir') },
-        portales: portalesNew, contactos: contNew, cuentas: ctaNew, docs: docNew, docsRequeridos: reqNew, comisiones: comNew
-      });
-      adminAct('Ficha aseguradora actualizada', 'Motivo: ' + motivo, a);
+      if (!(await U.confirm('Guardar cambios administrativos, inventario de fuentes y versiones de esta aseguradora. ¿Continuar?', { title: 'Guardar aseguradora', ok: 'Guardar' }))) return;
+      snapshot();
+      adminAct('Ficha aseguradora actualizada', 'Motivo: ' + motivo + ' · fuentes: ' + back.querySelectorAll('[data-doc]').length, a);
       close(); reload();
     });
   }
@@ -267,19 +419,18 @@ Orbit.modules.aseguradoras = (function () {
     close(); reload();
   }
 
-  /* ---- filas editables ---- */
   function portalRow(p, i) {
     const credentialRef = p.credentialRef || (p.pass ? 'backend_required' : '');
     return `<div class="asg-row" data-portal="${i}" data-cred="${U.esc(credentialRef)}">
       <input class="o-sel" data-pn placeholder="Nombre del portal" value="${U.esc(p.nombre || '')}" style="flex:1.2">
       <input class="o-sel" data-pu placeholder="https://…" value="${U.esc(p.url || '')}" style="flex:1.5">
       <input class="o-sel" data-pus placeholder="Usuario" value="${U.esc(p.usuario || '')}" style="flex:1">
-      <input class="o-sel" data-pp type="password" placeholder="Pendiente de bóveda segura" value="" style="flex:1">
-      <span class="muted" style="font-size:11px;flex:.9">${credentialRef ? 'Credencial pendiente de bóveda segura' : 'Sin credencial guardada'}</span>
+      <input class="o-sel" data-pp type="password" placeholder="Credencial segura" value="" style="flex:1">
+      <span class="muted" style="font-size:11px;flex:.9">${credentialRef ? 'Credencial registrada' : 'Sin credencial guardada'}</span>
       ${p.url ? `<a class="asg-link" href="${p.url.match(/^https?:/) ? p.url : 'https://' + p.url}" target="_blank" rel="noopener" title="Abrir portal">↗</a>` : ''}
       <button class="asg-del" data-del="portales:${i}" title="Quitar">✕</button></div>`;
   }
-  function contRow(c, i, tone) {
+  function contRow(c, i) {
     const tipos = ['Comercial / Técnico', 'Administrativo', 'Siniestros', 'Cobranzas', 'Dirección'];
     return `<div class="asg-row" data-cont="${i}">
       <select class="o-sel" data-ct style="flex:1">${tipos.map(t => `<option ${t === c.tipo ? 'selected' : ''}>${t}</option>`).join('')}</select>
@@ -293,16 +444,46 @@ Orbit.modules.aseguradoras = (function () {
       <input class="o-sel" data-cb placeholder="Banco" value="${U.esc(c.banco || '')}" style="flex:1.3">
       <input class="o-sel" data-ctt placeholder="Tipo" value="${U.esc(c.tipo || '')}" style="flex:1">
       <input class="o-sel" data-ccn placeholder="N.º cuenta" value="${U.esc(c.numero || '')}" style="flex:1">
-      <input class="o-sel" data-cm placeholder="Moneda" value="${U.esc(c.moneda || '')}" style="width:64px">
+      <input class="o-sel" data-cm placeholder="Moneda" value="${U.esc(c.moneda || '')}" style="width:72px">
       <button class="asg-del" data-del="cuentas:${i}">✕</button></div>`;
   }
-  function docRow(d, i, tone) {
-    const cats = ['Tarifas', 'Cotización ejemplo', 'Póliza ejemplo', 'Formularios', 'Comercial'];
-    return `<div class="asg-row" data-doc="${i}">
-      <span style="font-size:14px">📎</span>
-      <input class="o-sel" data-dn value="${U.esc(d.nombre || '')}" style="flex:1.5">
-      <select class="o-sel" data-dc style="flex:1">${cats.map(c => `<option ${c === d.cat ? 'selected' : ''}>${c}</option>`).join('')}</select>
-      <button class="asg-del" data-del="docs:${i}">✕</button></div>`;
+  function docRow(raw, i, aseguradora) {
+    const d = normalizarFuente(raw, aseguradora);
+    const ev = evaluarFuente(d);
+    const stateOptions = SOURCE_STATES.map(s => `<option value="${s}" ${s === d.estado ? 'selected' : ''}>${s.replace(/_/g, ' ')}</option>`).join('');
+    const typeOptions = SOURCE_TYPES.map(t => `<option value="${t[0]}" ${t[0] === d.tipoFuente ? 'selected' : ''}>${t[1]}</option>`).join('');
+    return `<div data-doc="${i}" data-source-id="${U.esc(d.id)}" style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:9px;background:var(--surface)">
+      <div class="asg-row" style="margin:0 0 7px">
+        <span style="font-size:15px">📎</span>
+        <input class="o-sel" data-dn value="${U.esc(d.nombre)}" placeholder="Nombre del archivo" style="flex:1.5">
+        <select class="o-sel" data-dt style="flex:1.25">${typeOptions}</select>
+        <input class="o-sel" data-dver value="${U.esc(d.version)}" placeholder="v1" style="width:68px">
+        <select class="o-sel" data-destado style="flex:1.1">${stateOptions}</select>
+        <button class="asg-del" data-del="docs:${i}">✕</button>
+      </div>
+      <div class="asg-row" style="margin:0 0 7px">
+        <select class="o-sel" data-dpais style="width:76px"><option value="GT" ${d.pais === 'GT' ? 'selected' : ''}>GT</option><option value="CO" ${d.pais === 'CO' ? 'selected' : ''}>CO</option><option value="" ${!d.pais ? 'selected' : ''}>País</option></select>
+        <input class="o-sel" data-dramo value="${U.esc(d.ramo)}" placeholder="Ramo" style="flex:1">
+        <input class="o-sel" data-dprod value="${U.esc(d.producto)}" placeholder="Producto" style="flex:1">
+        <input class="o-sel" data-dplan value="${U.esc(d.plan)}" placeholder="Plan / familia" style="flex:1">
+        <input class="o-sel" data-dref value="${U.esc(d.archivoRef)}" placeholder="Drive / documento / referencia" style="flex:1.7">
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:11.5px">
+        <label><input type="checkbox" data-dtar ${d.contieneTarifas ? 'checked' : ''}> tarifas</label>
+        <label><input type="checkbox" data-dreg ${d.contieneReglasCalculo ? 'checked' : ''}> reglas</label>
+        <label><input type="checkbox" data-dsal ${d.contieneHojaSalida ? 'checked' : ''}> hoja salida</label>
+        <label><input type="checkbox" data-dfmt ${d.contieneFormatoCotizacion ? 'checked' : ''}> formato cotización</label>
+        <label><input type="checkbox" data-dimp ${d.contieneAreaImpresion ? 'checked' : ''}> área impresión</label>
+        <span class="badge ${ev.sirveParaTarifas ? 'ok' : 'neutral'}">${ev.sirveParaTarifas ? '✓' : '—'} tarifa</span>
+        <span class="badge ${ev.sirveParaPresentacion ? 'ok' : 'neutral'}">${ev.sirveParaPresentacion ? '✓' : '—'} presentación</span>
+        ${ev.requiereEjemploCotizacion ? '<span class="badge warn">⚠ ejemplo requerido</span>' : ''}
+      </div>
+      <div class="asg-row" style="margin:7px 0 0">
+        <input class="o-sel" type="date" data-dvd value="${U.esc(d.vigenciaDesde)}" title="Vigencia desde" style="width:145px">
+        <input class="o-sel" type="date" data-dvh value="${U.esc(d.vigenciaHasta)}" title="Vigencia hasta" style="width:145px">
+        <input class="o-sel" data-dnotas value="${U.esc(d.notas)}" placeholder="Notas de lectura, formato o calibración" style="flex:1">
+      </div>
+    </div>`;
   }
   function reqRow(r, i) {
     return `<div class="asg-row" data-req="${i}">
@@ -310,10 +491,21 @@ Orbit.modules.aseguradoras = (function () {
       <input class="o-sel" data-ri placeholder="Requisitos" value="${U.esc(r.items || '')}" style="flex:2.2">
       <button class="asg-del" data-del="docsRequeridos:${i}">✕</button></div>`;
   }
-  function ramoRow(a, r, i) {
+  function ramoRow(a, r) {
     const pct = (a.comisiones && a.comisiones[r] != null) ? a.comisiones[r] : (a.comisionDefault || 12);
     return `<div class="ct-cell"><span>${U.esc(r)}</span><div class="ct-inp"><input type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}"><span>%</span></div></div>`;
   }
 
-  return { render, ficha };
+  return {
+    render,
+    ficha,
+    _fuentes: {
+      normalizarFuente,
+      evaluarFuente,
+      resumenFuentes,
+      legacyType,
+      SOURCE_TYPES,
+      SOURCE_STATES
+    }
+  };
 })();
