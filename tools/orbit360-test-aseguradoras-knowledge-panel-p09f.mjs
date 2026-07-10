@@ -62,6 +62,23 @@ const Orbit = {
       latestItems: [rows.aseguradora_batch_items[0]],
       resumableDocumentIds: ['doc-pendiente']
     })
+  },
+  aseguradorasBatchAdminActionsP09i: {
+    status: () => ({
+      version: 'p09i-v1',
+      lastPlan: {
+        ok: true, code: 'BATCH_ADMIN_PREVIEW_READY', action: 'dry_run',
+        requiredConfirmation: 'EJECUTAR DRY-RUN',
+        documents: [{ documentId: 'doc-1' }, { documentId: 'doc-2' }],
+        referenceContract: { provided: 1, missing: ['doc-2'] }
+      },
+      lastExecution: {
+        code: 'BATCH_DRY_RUN_COMPLETE', historyPersisted: false,
+        knowledgePersisted: false
+      },
+      knowledgePersistenceAllowed: false,
+      referencesExposed: false
+    })
   }
 };
 const document = {
@@ -90,6 +107,7 @@ assert(state.history.resumableDocumentIds.includes('doc-pendiente'), 'debe expon
 assert(state.provider.code === 'BACKEND_REQUIRED', 'provider no conectado debe mostrarse honestamente');
 assert(state.batch.batches[0].totalSources === 11, 'debe exponer lote de once fuentes');
 assert(state.batch.latest.summary.waitingReference === 2, 'debe exponer referencias pendientes');
+assert(state.admin.lastPlan.referenceContract.missing.includes('doc-2'), 'debe exponer refs faltantes sin valor');
 assert(api.mount() === true, 'panel debe montarse en ruta Aseguradoras');
 assert(markup.includes('Conocimiento documental de Aseguradoras'), 'panel debe mostrar título');
 assert(markup.includes('BACKEND_REQUIRED'), 'panel debe mostrar provider pendiente');
@@ -98,9 +116,12 @@ assert(markup.includes('11 fuentes') && markup.includes('6 aseguradoras'), 'pane
 assert(markup.includes('ready_for_binding_review'), 'panel debe mostrar estado de binding');
 assert(markup.includes('documents_ready_knowledge_incomplete'), 'panel debe mostrar conocimiento incompleto');
 assert(markup.includes('Historial del lote') && markup.includes('doc-pendiente'), 'panel debe mostrar historial y reanudables');
+assert(markup.includes('Acción administrativa') && markup.includes('EJECUTAR DRY-RUN'), 'panel debe mostrar preview administrativo');
+assert(markup.includes('Refs faltantes') && markup.includes('BATCH_DRY_RUN_COMPLETE'), 'panel debe mostrar refs y última ejecución');
 assert(listeners.some(item => item.type === 'click'), 'botón de actualización debe ser funcional');
 const source = fs.readFileSync('orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js', 'utf8');
 assert(!/\.insert\(|\.update\(|\.remove\(|setPref\(/.test(source), 'panel no debe escribir Orbit.store');
 assert(!/aseguradorasBatchOrchestratorP09g\.run\(/.test(source), 'panel no debe ejecutar lote');
 assert(!/aseguradorasBatchOrchestratorP09g\.resume\(/.test(source), 'panel no debe reanudar lote');
+assert(!/aseguradorasBatchAdminActionsP09i\.(?:execute|persistHistory)\(/.test(source), 'panel no debe ejecutar acciones administrativas');
 console.log('OK orbit360-test-aseguradoras-knowledge-panel-p09f');
