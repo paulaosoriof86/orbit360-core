@@ -1,0 +1,82 @@
+name: Orbit 360 Document Source Resolver P09d Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-document-source-resolver-p09d.mjs'
+      - 'tools/orbit360-document-batch-plan-p09d.mjs'
+      - 'tools/orbit360-test-document-source-resolver-p09d.mjs'
+      - 'tools/orbit360-test-document-batch-plan-p09d.mjs'
+      - '.github/workflows/orbit360-document-source-resolver-p09d-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/orbit360-document-source-resolver-p09d.mjs'
+      - 'tools/orbit360-document-batch-plan-p09d.mjs'
+      - 'tools/orbit360-test-document-source-resolver-p09d.mjs'
+      - 'tools/orbit360-test-document-batch-plan-p09d.mjs'
+      - '.github/workflows/orbit360-document-source-resolver-p09d-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  source-resolver-p09d:
+    name: Tenant-scoped reference resolver and batch dry-run P0.9d
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: |
+          node --check tools/orbit360-document-source-resolver-p09d.mjs
+          node --check tools/orbit360-document-batch-plan-p09d.mjs
+          node --check tools/orbit360-test-document-source-resolver-p09d.mjs
+          node --check tools/orbit360-test-document-batch-plan-p09d.mjs
+
+      - name: Run resolver and batch smokes
+        run: |
+          node tools/orbit360-test-document-source-resolver-p09d.mjs
+          node tools/orbit360-test-document-batch-plan-p09d.mjs
+
+      - name: Guard tenant isolation and dry-run only
+        run: |
+          if grep -RniE '(localStorage|sessionStorage|XMLHttpRequest|fetch\(|eval\(|new Function)' \
+            tools/orbit360-document-source-resolver-p09d.mjs \
+            tools/orbit360-document-batch-plan-p09d.mjs; then
+            echo 'Frontend storage, direct network or executable path detected'
+            exit 1
+          fi
+          if grep -RniE '(Aseguradora Guatemalteca|AseGuate|BAM|Banrural|Bantrab|Columna|Seguros Universales|Alianzas y Soluciones)' \
+            tools/orbit360-document-source-resolver-p09d.mjs \
+            tools/orbit360-document-batch-plan-p09d.mjs \
+            tools/orbit360-test-document-source-resolver-p09d.mjs \
+            tools/orbit360-test-document-batch-plan-p09d.mjs; then
+            echo 'Tenant or insurer hardcode detected'
+            exit 1
+          fi
+          grep -q 'CLIENT_PATH_FORBIDDEN' tools/orbit360-document-source-resolver-p09d.mjs
+          grep -q 'REFERENCE_TENANT_MISMATCH' tools/orbit360-document-source-resolver-p09d.mjs
+          grep -q 'REFERENCE_TASK_NOT_ALLOWED' tools/orbit360-document-source-resolver-p09d.mjs
+          grep -q 'containsLocalPath: false' tools/orbit360-document-source-resolver-p09d.mjs
+          grep -q 'DUPLICATE_DOCUMENT_VERSION' tools/orbit360-document-batch-plan-p09d.mjs
+          grep -q 'applyAllowed: false' tools/orbit360-document-batch-plan-p09d.mjs
+          grep -q 'enablesCotizador: false' tools/orbit360-document-batch-plan-p09d.mjs
+          grep -q 'enablesComparativo: false' tools/orbit360-document-batch-plan-p09d.mjs
+
+      - name: Run backend LAB validator if available
+        run: |
+          if [ -f tools/orbit360-validar-backend-lab-contrato.mjs ]; then
+            node tools/orbit360-validar-backend-lab-contrato.mjs
+          else
+            echo 'Validator not present; skipping.'
+          fi
