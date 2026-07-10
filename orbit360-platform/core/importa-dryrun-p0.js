@@ -57,10 +57,23 @@
       forbidden: ['finmovs', 'cobros', 'clientes', 'polizas'],
       required: ['fecha', 'monto'],
       blocking: ['moneda']
+    },
+    directorio_aseguradoras: {
+      allowed: ['aseguradoras', 'contactosAseguradora', 'configuracionCatalogo', 'documentos', 'gestiones'],
+      forbidden: ['clientes', 'polizas', 'cobros', 'recibosEsperados', 'carteraPrimas', 'finmovs', 'cxcComisiones', 'cxpAsesores', 'usuarios', 'roles', 'permisos', 'secrets', 'credenciales'],
+      required: ['nombre'],
+      blocking: ['pais']
+    },
+    configuracion_catalogo: {
+      allowed: ['configuracionCatalogo', 'gestiones'],
+      forbidden: ['clientes', 'polizas', 'cobros', 'finmovs', 'usuarios', 'roles', 'permisos', 'secrets', 'credenciales'],
+      required: ['clave'],
+      blocking: ['tenantId']
     }
   };
 
   const SENSITIVE_KEYS = /nombre|razon|correo|email|telefono|whatsapp|direccion|dpi|cedula|nit|documento|placa|chasis|motor|cuenta|iban|token|password|secret|credential/i;
+  const CREDENTIAL_KEYS = /password|contraseña|contrasena|token|secret|credential|credencial|usuarioSistema|claveAcceso|accessKey|apiKey/i;
 
   function nowIso() { return new Date().toISOString(); }
 
@@ -96,6 +109,21 @@
 
   function isBlank(v) { return v == null || v === '' || v === 'REQUIERE_VALIDACION'; }
 
+  function hasRawCredential(data) {
+    let found = false;
+    function walk(obj) {
+      if (!obj || found) return;
+      Object.keys(obj).forEach(function (k) {
+        if (found) return;
+        const v = obj[k];
+        if (CREDENTIAL_KEYS.test(k) && !isBlank(v)) { found = true; return; }
+        if (v && typeof v === 'object') walk(v);
+      });
+    }
+    walk(data || {});
+    return found;
+  }
+
   function validateOperation(sourceType, op) {
     const c = SOURCE_CONTRACTS[sourceType];
     const errors = [];
@@ -110,6 +138,7 @@
     if (op && op.action === 'update' && !op.id) errors.push('id_requerido_update');
     (c ? c.required : []).forEach(function (k) { if (isBlank(data[k])) warnings.push('campo_recomendado_faltante:' + k); });
     (c ? c.blocking : []).forEach(function (k) { if (isBlank(data[k])) errors.push('campo_bloqueante_faltante:' + k); });
+    if (hasRawCredential(data)) errors.push('credencial_no_importable_usar_credentialRef_backend_required');
     if (data.requiereValidacion) errors.push('registro_requiere_validacion');
     if (data.validationStatus && data.validationStatus !== 'validado') errors.push('validationStatus_no_validado');
     if (data.estado === 'requiere_validacion') errors.push('estado_requiere_validacion');
