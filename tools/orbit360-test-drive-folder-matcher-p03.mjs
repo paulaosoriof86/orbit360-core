@@ -90,6 +90,14 @@ assert(links.length === 1 && links[0].driveFolder.folderId === 'manual-folder', 
 assert(links[0].driveFolder.matchedBy === 'manual', 'Debe conservar origen manual');
 assert(links[0].audit.containsFileBytes === false && links[0].audit.containsAccessToken === false, 'El vínculo no debe incluir bytes ni tokens');
 
+const invalidManual = api.buildDryRun({
+  entidades: [{ id: 'bad1', nombre: 'Entidad demo', pais: 'GT' }],
+  carpetas: [{ id: 'file1', name: 'Entidad demo.pdf', mimeType: 'application/pdf', path: 'Guatemala/Entidad demo.pdf' }],
+  overrides: { bad1: { folderId: 'file1', motivo: 'No debe aceptarse' } }
+});
+assert(invalidManual.operations[0].action === 'requires_validation', 'Override hacia archivo debe quedar bloqueado');
+assert(invalidManual.proposals[0].error === 'CARPETA_OVERRIDE_NO_EXISTE', 'Debe explicar que el override no corresponde a carpeta válida');
+
 const notConfirmed = api.buildConfirmedLinks(dryRun, []);
 assert(notConfirmed.length === 0, 'Sin confirmación no se generan enlaces');
 
