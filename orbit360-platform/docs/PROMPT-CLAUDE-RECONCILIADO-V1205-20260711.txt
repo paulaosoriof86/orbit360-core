@@ -1,0 +1,63 @@
+Continúa sobre tu candidata visual v1.198 actual. No vuelvas a v1.197 y no pierdas el fix de los dos banners/cache-bust v1368 ni el flujo “Registrar cotización recibida”.
+
+Este paquete v1.205 SUSTITUYE el paquete v1.204 y resuelve el desajuste de línea base: ahora incluye físicamente, bajo CODIGO_RAMA_VIVA_REFERENCIA_SOLO_LECTURA, los contratos, bridges, Academia, pruebas y snapshots reales v1.198–v1.203 de la rama viva.
+
+Lee primero:
+1. 00_LEER_PRIMERO.md
+2. PAQUETE-CLAUDE-RECONCILIADO-CODIGO-REAL-V1205-20260711.md
+3. MANIFIESTO-ARCHIVOS-FISICOS-CLAUDE-V1205-20260711.md
+
+No digas nuevamente que los contratos no existen: están adjuntos físicamente. Tampoco los reimplementes ni los copies sobre tu candidata. Úsalos en solo lectura para conocer APIs, estados, eventos, IDs, permisos y dependencias y construir UX compatible.
+
+Tu responsabilidad sigue siendo Carril A: prototipo/UX, responsive, copy cliente, Academia, manuales y evidencia. No implementes Firestore, Auth, Storage, bóveda, OAuth, Drive real, migración, datos reales o deploy.
+
+PRIORIDAD OBLIGATORIA:
+
+P0.1 Aseguradoras
+- Recuperar ficha rica dentro de página navegable con Regresar.
+- Recuperar logos, degradados, iconos/emoticones, tarjetas, pestañas, jerarquía y acciones.
+- Nueva/Edita aseguradora deben ser editores integrales con todas las secciones de la ficha.
+- Mantener KPI con detalle, fix de banners y cache-bust v1368.
+- Eliminar copy técnico y corregir responsive.
+
+P0.2 Cotizador
+- Reconstruir experiencia profunda usando comparativo_final_v110.html solo como referencia visual/funcional.
+- Flujo guiado, datos precargados, aseguradoras elegibles, productos/planes, fuentes, coberturas, deducibles, pagos, historial y tarjetas completas.
+- Sin fuente validada no hay cálculo automático; no inventar tarifas.
+
+P0.3 Comparativo
+- Profundidad visual/funcional: prima desglosada, coberturas, deducibles, diferencias, criterio, recomendación explicable, justificación y trazabilidad.
+- Conservar y completar “Registrar cotización recibida”; nunca volver a “Propuesta manual”.
+- Minimizar digitación con extracción/propuesta/diff/revisión humana.
+
+P0.4 Propuesta aceptada
+- Solo abrir desde propuesta seleccionada y validada.
+- Autocompletar cliente, aseguradora, ramo, producto/plan, país/moneda, prima desglosada, pagos, fuente, documento, fechas, riesgo, cotizacionId y comparativoId.
+- Manual solo confirmación/evidencia/faltantes/motivo de excepción.
+- Representar Solicitud de emisión en Ops; no crear póliza ni recibos.
+
+P0.5 Academia
+- Actualizar Dirección, Operativo, Asesor y Portal para Aseguradoras, Cotizador, Comparativo, cotización recibida, aceptación, emisión, endosos, recursos seguros, multirol/scopes y calidad.
+- Conservar progreso/evaluaciones/certificados.
+
+P1 en la misma candidata
+- #66 limpieza transversal de copy técnico.
+- #67 ficha-página Cliente360/Póliza.
+- KPI con detalle.
+- visor documental transversal.
+- multirol/scopes y handlers bloqueados.
+- responsive 1440/1024/390.
+
+Entrega UNA sola candidata grande posterior a v1.198, no mini-versiones:
+- ZIP completo;
+- inventario y diff;
+- node --check;
+- matriz P0/P1;
+- bitácora;
+- Academia/manuales;
+- evidencia 1440/1024/390 y por roles;
+- dependencias Carril B/C separadas;
+- protegidos sin cambios;
+- tareas #66/#67 cerradas o documentadas con precisión.
+
+No trabajes P2 hasta cerrar P0/P1. No declares completo lo que no esté implementado y verificado.
