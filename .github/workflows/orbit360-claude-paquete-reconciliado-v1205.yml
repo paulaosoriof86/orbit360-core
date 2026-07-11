@@ -1,0 +1,158 @@
+name: Orbit 360 Claude package reconciliado v1205
+
+on:
+  pull_request:
+    types: [synchronize, opened, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-package:
+    if: github.head_ref == 'ays/backend-tenant-lab-v99-20260703' || github.ref_name == 'ays/backend-tenant-lab-v99-20260703'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout rama viva
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+
+      - name: Construir paquete de referencia
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="ORBIT360_CLAUDE_RECONCILIADO_V1205_20260711"
+          CODE="$ROOT/CODIGO_RAMA_VIVA_REFERENCIA_SOLO_LECTURA"
+          DOCS="$ROOT/DOCUMENTACION_RAMA_VIVA"
+          TESTS="$ROOT/PRUEBAS_Y_VALIDADORES_REFERENCIA"
+          mkdir -p "$CODE" "$DOCS" "$TESTS"
+
+          cp orbit360-platform/docs/PAQUETE-CLAUDE-RECONCILIADO-CODIGO-REAL-V1205-20260711.md "$ROOT/00_LEER_PRIMERO.md"
+          cp orbit360-platform/docs/PAQUETE-CLAUDE-RECONCILIADO-CODIGO-REAL-V1205-20260711.md "$ROOT/PAQUETE-CLAUDE-RECONCILIADO-CODIGO-REAL-V1205-20260711.md"
+          cp orbit360-platform/docs/MANIFIESTO-ARCHIVOS-FISICOS-CLAUDE-V1205-20260711.md "$ROOT/MANIFIESTO-ARCHIVOS-FISICOS-CLAUDE-V1205-20260711.md"
+          cp orbit360-platform/docs/PROMPT-CLAUDE-RECONCILIADO-V1205-20260711.txt "$ROOT/PROMPT-PARA-PEGAR-EN-CLAUDE.txt"
+
+          copy_code() {
+            local src="$1"
+            mkdir -p "$CODE/$(dirname "$src")"
+            cp "$src" "$CODE/$src"
+          }
+
+          code_files=(
+            orbit360-platform/core/access-scope.js
+            orbit360-platform/core/access-ceilings-v1199.js
+            orbit360-platform/core/policy-receipts-engine.js
+            orbit360-platform/core/policy-receipts-v1199-refinements.js
+            orbit360-platform/core/issuance-workflow-v1201.js
+            orbit360-platform/core/issuance-workflow-v1201-refinements.js
+            orbit360-platform/core/endorsement-workflow-v1201.js
+            orbit360-platform/core/importa-dryrun-p0.js
+            orbit360-platform/core/insurer-directory-import-v1202.js
+            orbit360-platform/core/insurer-directory-import-v1202-security.js
+            orbit360-platform/core/secure-resource-fields-v1202.js
+            orbit360-platform/core/backend-resource-contracts.js
+            orbit360-platform/core/document-viewer.js
+            orbit360-platform/core/credential-vault.js
+            orbit360-platform/core/quote-comparison-contracts-v1203.js
+            orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js
+            orbit360-platform/modules/crm-v1198-operational-bridge.js
+            orbit360-platform/modules/portal-v1198-scope-viewer-bridge.js
+            orbit360-platform/modules/policy-receipts-v1199-bridge.js
+            orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+            orbit360-platform/modules/renewals-v1200-operational-bridge.js
+            orbit360-platform/modules/renewals-v1200-permission-guard.js
+            orbit360-platform/modules/issuance-endosos-v1201-bridge.js
+            orbit360-platform/modules/issuance-endosos-v1201-refinements.js
+            orbit360-platform/modules/ops-workflows-v1201-bridge.js
+            orbit360-platform/modules/renewals-v1201-issued-filter.js
+            orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js
+            orbit360-platform/modules/aseguradoras-v1202-import-bridge.js
+            orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js
+            orbit360-platform/modules/cotizador-v1203-source-gate.js
+            orbit360-platform/modules/comparativo-v1203-operational-bridge.js
+            orbit360-platform/data/academia-v1197-bridge.js
+            orbit360-platform/data/academia-v1199-policy-receipts.js
+            orbit360-platform/data/academia-v1200-renewals.js
+            orbit360-platform/data/academia-v1201-emision-endosos.js
+            orbit360-platform/data/academia-v1202-directorios-aseguradoras.js
+            orbit360-platform/data/academia-v1203-cotizador-comparativo.js
+            orbit360-platform/index.html
+            orbit360-platform/modules/aseguradoras.js
+            orbit360-platform/modules/cotizador.js
+            orbit360-platform/modules/comparativo.js
+            orbit360-platform/modules/cliente360.js
+            orbit360-platform/modules/polizas.js
+            orbit360-platform/modules/academia.js
+            orbit360-platform/styles/base.css
+            orbit360-platform/styles/infra.css
+            orbit360-platform/styles/v1197-empalme.css
+          )
+          for file in "${code_files[@]}"; do
+            test -f "$file"
+            copy_code "$file"
+          done
+
+          doc_files=(
+            orbit360-platform/docs/INSTRUCCIONES-MAESTRAS-CONTINUIDAD-ORBIT360-AYS-20260704.md
+            orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md
+            orbit360-platform/docs/ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md
+            orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md
+            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-CRM-V1198-20260711.md
+            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-POLIZA-RECIBOS-V1199-20260711.md
+            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-RENOVACIONES-V1200-20260711.md
+            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-CRM-V1201-20260711.md
+            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-ASEGURADORAS-V1202-20260711.md
+            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-COTIZADOR-COMPARATIVO-V1203-20260711.md
+            orbit360-platform/docs/AUDITORIA-CIERRE-CRM-TRANSVERSAL-V1198-20260711.md
+            orbit360-platform/docs/AUDITORIA-CIERRE-POLIZA-RECIBOS-COBROS-V1199-20260711.md
+            orbit360-platform/docs/AUDITORIA-Y-CORRECCION-RENOVACIONES-V1200-20260711.md
+            orbit360-platform/docs/AUDITORIA-CIERRE-RENOVACION-EMISION-ENDOSOS-V1201-20260711.md
+            orbit360-platform/docs/AUDITORIA-OPERATIVA-DIRECTORIOS-ASEGURADORAS-GT-CO-V1202-20260711.md
+            orbit360-platform/docs/AUDITORIA-OPERATIVA-COTIZADOR-COMPARATIVO-V1203-20260711.md
+            orbit360-platform/docs/AUDITORIA-VISUAL-REAPERTURA-ASEGURADORAS-COTIZADOR-COMPARATIVO-V1203-20260711.md
+            orbit360-platform/docs/CONTROL-CONTINUIDAD-OPERATIVA-HASTA-V1203-20260711.md
+            orbit360-platform/docs/DECISION-FRONTERA-V110-ASEGURADORAS-ORBIT-COTIZADOR-COMPARATIVO-20260709.md
+            orbit360-platform/docs/MAPA-INTEGRACION-ASEGURADORAS-ORBIT-COTIZADOR-COMPARATIVO-V110-20260709.md
+            orbit360-platform/docs/MATRIZ-EMPALME-COTIZADOR-COMPARATIVO-ORBIT-V110-20260710.md
+            orbit360-platform/docs/AUDITORIA-FORENSE-PROFUNDA-COTIZADOR-COMPARATIVO-V110-CONTRATO-AYS-20260709.md
+          )
+          for file in "${doc_files[@]}"; do
+            test -f "$file"
+            cp "$file" "$DOCS/$(basename "$file")"
+          done
+
+          test_files=(
+            orbit360-platform/tools/orbit360-test-access-scope-v1198.mjs
+            orbit360-platform/tools/orbit360-validar-cierre-crm-v1198.mjs
+            orbit360-platform/tools/orbit360-test-policy-receipts-v1199b.mjs
+            orbit360-platform/tools/orbit360-validar-policy-receipts-v1199b.mjs
+            orbit360-platform/tools/orbit360-validar-renovaciones-v1200b.mjs
+            orbit360-platform/tools/orbit360-test-issuance-endosos-v1201.mjs
+            orbit360-platform/tools/orbit360-validar-emision-endosos-v1201.mjs
+            orbit360-platform/tools/orbit360-test-directorio-aseguradoras-v1202.mjs
+            orbit360-platform/tools/orbit360-validar-directorio-aseguradoras-v1202.mjs
+            orbit360-platform/tools/orbit360-test-cotizador-comparativo-v1203.mjs
+            orbit360-platform/tools/orbit360-validar-cotizador-comparativo-v1203.mjs
+          )
+          for file in "${test_files[@]}"; do
+            test -f "$file"
+            cp "$file" "$TESTS/$(basename "$file")"
+          done
+
+          cat > "$ROOT/README-CODIGO-REAL.txt" <<'EOF'
+Este paquete contiene físicamente los archivos v1.198–v1.203 que faltaban en el espacio de Claude.
+No es una base para sobrescribir la candidata visual v1.198.
+Lea 00_LEER_PRIMERO.md y el manifiesto antes de modificar cualquier archivo.
+EOF
+
+          find "$ROOT" -type f -print0 | sort -z | xargs -0 sha256sum > "$ROOT/MANIFIESTO-SHA256.txt"
+          zip -qr "${ROOT}.zip" "$ROOT"
+
+      - name: Subir artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: ORBIT360_CLAUDE_RECONCILIADO_V1205_20260711
+          path: ORBIT360_CLAUDE_RECONCILIADO_V1205_20260711.zip
+          if-no-files-found: error
+          retention-days: 7
