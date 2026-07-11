@@ -3,6 +3,14 @@ param(
 )
 
 $ErrorActionPreference = 'Continue'
+try {
+  $utf8 = [Text.UTF8Encoding]::new($false)
+  [Console]::InputEncoding = $utf8
+  [Console]::OutputEncoding = $utf8
+  $OutputEncoding = $utf8
+  chcp 65001 | Out-Null
+} catch {}
+
 $Repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 $App = Join-Path $Repo 'orbit360-platform'
 $BranchRequired = 'ays/backend-tenant-lab-v99-20260703'
@@ -14,6 +22,8 @@ $LauncherPath = Join-Path $ReportDir 'orbit360-static-server-v1203-launcher.ps1'
 New-Item -ItemType Directory -Force -Path $ReportDir | Out-Null
 
 $lines = [System.Collections.Generic.List[string]]::new()
+$failedChecks = [System.Collections.Generic.List[string]]::new()
+$passedChecks = [System.Collections.Generic.List[string]]::new()
 function Add-Line([string]$Text = '') { $lines.Add($Text); Write-Host $Text }
 function Save-Report {
   [IO.File]::WriteAllLines($ReportPath, $lines, [Text.UTF8Encoding]::new($false))
@@ -23,23 +33,43 @@ function Fail([string]$Cause) {
   Add-Line ''
   Add-Line 'RESULTADO: BLOQUEADO'
   Add-Line ("CAUSA: " + $Cause)
+  if ($failedChecks.Count) {
+    Add-Line 'CHECKS FALLIDOS:'
+    $failedChecks | ForEach-Object { Add-Line ("  - " + $_) }
+  }
   Add-Line ("Reporte: " + $ReportPath)
+  Add-Line 'No repita Git ni todos los validadores. Diagnostique este reporte y corrija solo la causa indicada.'
   Save-Report
   exit 1
 }
 function Run-Node([string]$RelativePath, [switch]$CheckOnly) {
   $full = Join-Path $Repo $RelativePath
-  if (-not (Test-Path $full)) { Add-Line ("BLOQUEADO: no existe " + $RelativePath); return $false }
+  $label = if ($CheckOnly) { "node --check $RelativePath" } else { "node $RelativePath" }
+  if (-not (Test-Path $full)) {
+    Add-Line ("[FALLO] " + $label + " · archivo inexistente")
+    $failedChecks.Add($label + ' · archivo inexistente')
+    return $false
+  }
   Add-Line ''
-  if ($CheckOnly) {
-    Add-Line ("=== node --check " + $RelativePath + " ===")
-    $output = & node --check $full 2>&1
-  } else {
-    Add-Line ("=== node " + $RelativePath + " ===")
-    $output = & node $full 2>&1
+  Add-Line ("=== " + $label + " ===")
+  $exitCode = 1
+  try {
+    if ($CheckOnly) { $output = & node --check $full 2>&1 }
+    else { $output = & node $full 2>&1 }
+    $exitCode = $LASTEXITCODE
+  } catch {
+    $output = @($_.Exception.Message)
+    $exitCode = 1
   }
   $output | ForEach-Object { Add-Line ([string]$_) }
-  return ($LASTEXITCODE -eq 0)
+  if ($exitCode -eq 0) {
+    Add-Line ("[OK] " + $label + " · exit 0")
+    $passedChecks.Add($label)
+    return $true
+  }
+  Add-Line ("[FALLO] " + $label + " · exit " + $exitCode)
+  $failedChecks.Add($label + " · exit " + $exitCode)
+  return $false
 }
 
 Add-Line '============================================================'
@@ -88,9 +118,15 @@ $checks = @(
 foreach ($check in $checks) {
   if (Test-Path (Join-Path $Repo $check)) {
     if (-not (Run-Node $check)) { $ok = $false }
+  } else {
+    Add-Line ("[FALLO] node " + $check + " · archivo inexistente")
+    $failedChecks.Add("node $check · archivo inexistente")
+    $ok = $false
   }
 }
-if (-not $ok) { Fail 'Uno o mas validadores fallaron. No se levanto el servidor.' }
+Add-Line ''
+Add-Line ("RESUMEN VALIDADORES: " + $passedChecks.Count + " OK · " + $failedChecks.Count + " fallido(s)")
+if (-not $ok) { Fail 'Uno o mas validadores fallaron. El servidor no se intento iniciar.' }
 
 try {
   Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | ForEach-Object {
@@ -130,6 +166,13 @@ server.listen(port,'127.0.0.1',()=>{
 [IO.File]::WriteAllText($ServerPath, $serverCode, [Text.UTF8Encoding]::new($false))
 
 $launcherCode = @"
+try {
+  `$utf8 = [Text.UTF8Encoding]::new(`$false)
+  [Console]::InputEncoding = `$utf8
+  [Console]::OutputEncoding = `$utf8
+  `$OutputEncoding = `$utf8
+  chcp 65001 | Out-Null
+} catch {}
 `$Host.UI.RawUI.WindowTitle = 'ORBIT 360 - SERVIDOR LOCAL v1.203'
 Write-Host 'Iniciando servidor local Orbit 360...' -ForegroundColor Cyan
 & node '$($ServerPath.Replace("'","''"))' $Port '$($App.Replace("'","''"))'
