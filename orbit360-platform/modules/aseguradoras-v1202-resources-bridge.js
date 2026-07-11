@@ -92,16 +92,30 @@ Orbit.modules = Orbit.modules || {};
       if (tabs && tabs.parentNode) tabs.parentNode.insertBefore(section, tabs.nextSibling);
     }
     if (state().tab === 'bancos') {
-      body.innerHTML = accountHtml(a);
-      wireAccounts(body, a);
-      if (Orbit.vault) Orbit.vault.wire(body);
+      if (body.dataset.secureBanksV1202 !== a.id) {
+        body.dataset.secureBanksV1202 = a.id;
+        body.innerHTML = accountHtml(a);
+        wireAccounts(body, a);
+        if (Orbit.vault) Orbit.vault.wire(body);
+      }
     } else if (state().tab === 'plataformas') enhancePlatforms(body, a);
+  }
+  function observe(host) {
+    if (!host || host.__resourcesObserverV1202 || !window.MutationObserver) return;
+    let queued = false;
+    const observer = new MutationObserver(() => {
+      if (queued) return;
+      queued = true;
+      setTimeout(() => { queued = false; enhance(host); }, 0);
+    });
+    observer.observe(host, { childList: true, subtree: true });
+    host.__resourcesObserverV1202 = observer;
   }
 
   const originalRender = mod.render.bind(mod);
   mod.render = function (host) {
     const out = originalRender(host);
-    setTimeout(() => enhance(host), 10);
+    setTimeout(() => { enhance(host); observe(host); }, 10);
     return out;
   };
   mod.__resourcesV1202 = { originalRender };
