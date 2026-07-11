@@ -27,7 +27,7 @@ Orbit.modules = Orbit.modules || {};
           if (!ok) return;
           const result = I.advanceRequest(request.id, 'PENDIENTE_EMISION', {
             documentosCompletos: true,
-            inspeccionAprobada: !request.requiereInspeccion || true
+            inspeccionAprobada: request.requiereInspeccion ? true : false
           }, { motivo: 'Requisitos de emisión verificados por usuario autorizado' });
           if (!result.ok) return toast('No se pudo avanzar: ' + (result.errors || []).join(', '));
           Orbit.ciclo.openGestion(request.id);
