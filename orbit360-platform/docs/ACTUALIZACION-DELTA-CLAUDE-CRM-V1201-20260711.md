@@ -33,6 +33,8 @@ La gestión usa:
 workflowType = issuance_request
 ```
 
+La columna `Emisiones` existente era originalmente una proyección de `negocios`. El bridge v1.201 la convierte en una columna mixta capaz de mostrar también solicitudes de emisión tipadas. No crear otra pantalla ni otra colección.
+
 ### Emisión real
 
 Solo se habilita cuando existen:
@@ -81,7 +83,9 @@ No editar directamente la póliza desde un prototipo para simular un endoso.
 
 - botón “Registrar opción aceptada” en Comparativo;
 - explicación visible de que no crea póliza provisional;
+- solicitud visible en la columna `Emisiones` del tablero Ops;
 - ficha de Solicitud de emisión dentro de Ops;
+- lista/tipo/estado controlados por el workflow, no por edición libre;
 - etapas documentos/inspección/emisión;
 - alta final con número y documento reales;
 - vínculo de la nueva póliza con la anterior;
@@ -123,6 +127,7 @@ core/issuance-workflow-v1201-refinements.js
 core/endorsement-workflow-v1201.js
 modules/issuance-endosos-v1201-bridge.js
 modules/issuance-endosos-v1201-refinements.js
+modules/ops-workflows-v1201-bridge.js
 modules/renewals-v1201-issued-filter.js
 data/academia-v1201-emision-endosos.js
 ```
@@ -147,6 +152,7 @@ Rechazar si:
 - inventa número provisional;
 - genera recibos antes de emitir;
 - crea módulos separados para Emisiones/Inspecciones/Endosos fuera de Ops;
+- no muestra la solicitud en la columna `Emisiones` existente;
 - borra la póliza o vehículo anterior;
 - aplica endosos sin aprobación/documento;
 - permite al Asesor modificar pólizas;
