@@ -67,6 +67,35 @@ Orbit.modules = Orbit.modules || {};
     if (event.target && event.target.closest && event.target.closest('#cmp-accept-v1201 [data-accept]')) setTimeout(refineAcceptedModal, 0);
   });
 
+  function correctLegend(host) {
+    if (!host || !host.querySelector) return;
+    const label = host.querySelector('.ops-legend .muted');
+    if (!label) return;
+    const businesses = host.querySelectorAll('[data-neg]').length;
+    const managements = host.querySelectorAll('[data-ges]').length;
+    const html = `Tablero operativo en vivo · <b>${businesses}</b> negocios en flujo · <b>${managements}</b> gestiones`;
+    if (label.innerHTML !== html) label.innerHTML = html;
+  }
+  const ops = Orbit.modules.ops;
+  if (ops && typeof ops.render === 'function') {
+    const originalRender = ops.render.bind(ops);
+    ops.render = function (host) {
+      const out = originalRender(host);
+      setTimeout(() => correctLegend(host), 20);
+      if (host && !host.__opsWorkflowObserverV1201 && window.MutationObserver) {
+        let queued = false;
+        const observer = new MutationObserver(() => {
+          if (queued) return; queued = true;
+          setTimeout(() => { queued = false; correctLegend(host); }, 0);
+        });
+        observer.observe(host, { childList: true, subtree: true });
+        host.__opsWorkflowObserverV1201 = observer;
+      }
+      return out;
+    };
+    ops.__workflowRenderV1201 = { originalRender };
+  }
+
   function maybeOpen() {
     if (!window.__orbitOpenGestion || !String(location.hash || '').startsWith('#/ops')) return;
     const id = window.__orbitOpenGestion; window.__orbitOpenGestion = '';
