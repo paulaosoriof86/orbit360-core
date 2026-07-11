@@ -9,13 +9,13 @@ const warnings = [];
 const required = [
   'core/access-scope.js',
   'modules/crm-v1198-operational-bridge.js',
-  'modules/portal.js',
+  'modules/portal-v1198-scope-viewer-bridge.js',
   'tools/orbit360-validar-cierre-crm-v1198.mjs'
 ];
 for (const rel of required) if (!exists(rel)) errors.push(`Falta ${rel}`);
 
 const index = read('index.html');
-for (const rel of ['core/access-scope.js','modules/crm-v1198-operational-bridge.js']) {
+for (const rel of ['core/access-scope.js','modules/crm-v1198-operational-bridge.js','modules/portal-v1198-scope-viewer-bridge.js']) {
   if (!index.includes(rel)) errors.push(`index.html no carga ${rel}`);
 }
 for (const rel of ['core/backend-lab-loader.js','core/backend-lab-init.js','data/store.js','data/store-firestore-lab.local.js','core/auth.js','core/importa.js','modules/portal-v1142-copyfix.js']) {
@@ -39,12 +39,12 @@ for (const token of ['Prima neta vigente','Separada por moneda','duplicateCandid
 }
 if (/localStorage|sessionStorage|firebase\.|initializeApp\(/.test(bridge.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) errors.push('bridge CRM accede a almacenamiento/proveedor directo');
 if (bridge.includes('admin@') || bridge.includes('demo123')) errors.push('bridge CRM contiene credenciales demo');
+if (!bridge.includes("removeAttribute('onclick')")) errors.push('bridge CRM no neutraliza KPI legacy de Cliente360');
 
-const c360 = read('modules/cliente360.js');
-if (c360.includes("document.getElementById('mod-host')")) errors.push('Cliente360 conserva host roto mod-host');
-const portal = read('modules/portal.js');
-if (!portal.includes('Orbit.documentViewer.open')) errors.push('Portal no usa visor documental transversal');
-if (!portal.includes("Orbit.access.can('portal','edit')")) warnings.push('Portal no condiciona acción administrativa con Orbit.access');
+const portalBridge = read('modules/portal-v1198-scope-viewer-bridge.js');
+if (!portalBridge.includes('Orbit.documentViewer.open')) errors.push('Portal no usa visor documental transversal');
+if (!portalBridge.includes("Orbit.access.can('portal', 'edit')")) errors.push('Portal no condiciona acción administrativa con Orbit.access');
+if (/firebase\.|initializeApp\(|localStorage|sessionStorage/.test(portalBridge)) errors.push('Portal bridge accede a proveedor/almacenamiento directo');
 
 const targetModules = ['modules/cliente360.js','modules/polizas.js','modules/cobros.js','modules/conciliaciones.js','modules/calidad.js','modules/renovaciones.js','modules/cancelaciones.js','modules/comisiones.js','modules/historial.js','modules/portal.js'];
 for (const rel of targetModules) {
