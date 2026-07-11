@@ -48,7 +48,7 @@ Orbit.modules = Orbit.modules || {};
       usoVehiculo: read(host, '#cz-uso'),
       clienteId, prospectoNombre: cli ? cli.nombre : read(host, '#cz-cliente'),
       asesorId: read(host, '#cz-ase') || (cli && cli.asesorId) || '',
-      cuotas: Math.max(1, num(read(host, '#cz-fracc') || 1)
+      cuotas: Math.max(1, num(read(host, '#cz-fracc') || 1))
     };
     const risk = {
       valorAsegurado: num(read(host, '#cz-valor')),
