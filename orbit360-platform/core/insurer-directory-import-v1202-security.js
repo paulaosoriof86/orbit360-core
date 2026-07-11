@@ -1,7 +1,7 @@
 /* ============================================================
    Orbit 360 · Guard de escritura Directorios Aseguradoras v1.202
-   El análisis/dry-run puede operar en prototipo. La aplicación de
-   contactos reales exige un adapter backend sin fallback local.
+   El análisis puede operar sin conexión operativa. La aplicación de
+   contactos reales exige un servicio seguro del tenant sin fallback.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 (function () {
@@ -30,7 +30,7 @@ window.Orbit = window.Orbit || {};
   }
   function explain() {
     try {
-      if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('El dry-run está disponible. Para aplicar información real conecta el backend operativo del tenant.');
+      if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('El análisis está disponible. Para confirmar cambios reales se necesita la conexión segura de la organización.');
     } catch (e) {}
   }
   function guardApproveButton(root) {
@@ -41,18 +41,27 @@ window.Orbit = window.Orbit || {};
     const replacement = button.cloneNode(true);
     replacement.disabled = true;
     replacement.classList.remove('primary'); replacement.classList.add('ghost');
-    replacement.textContent = 'Backend operativo requerido para aplicar';
-    replacement.title = 'El análisis es seguro; la escritura de datos reales no se permite en el store local del prototipo.';
+    replacement.textContent = 'Conexión segura requerida para aplicar';
+    replacement.title = 'Puedes revisar el resultado. La confirmación se habilita cuando la conexión segura esté disponible.';
     replacement.onclick = explain;
     button.replaceWith(replacement);
+  }
+  function cleanVisibleCopy(root) {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll('.cfg-note,#idir-status').forEach(node => {
+      const text = String(node.textContent || '');
+      if (/Orbit\.store|credentialRef|accountRef|backend_required|repositorio|navegador/i.test(text)) {
+        node.innerHTML = 'Los datos sensibles permanecen protegidos. La plataforma mostrará únicamente referencias autorizadas hasta completar la conexión segura.';
+      }
+    });
   }
   function watchModal() {
     const modal = document.getElementById('ins-dir-import-v1202');
     if (!modal || modal.__backendGuardV1202) return;
     modal.__backendGuardV1202 = true;
-    guardApproveButton(modal);
+    guardApproveButton(modal); cleanVisibleCopy(modal);
     if (window.MutationObserver) {
-      const observer = new MutationObserver(() => guardApproveButton(modal));
+      const observer = new MutationObserver(() => { guardApproveButton(modal); cleanVisibleCopy(modal); });
       observer.observe(modal, { childList: true, subtree: true });
       modal.__backendGuardObserverV1202 = observer;
     }
