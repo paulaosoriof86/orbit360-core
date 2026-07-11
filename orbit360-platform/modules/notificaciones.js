@@ -28,9 +28,9 @@ Orbit.modules.notificaciones = (function () {
     host.innerHTML = '<div class="page">'
       + K.banner({ icon: '💬', title: 'Notificaciones WhatsApp', sub: 'Mensajería saliente · plantillas, envíos por lote y registro', features: [] })
       + K.kpis([
-          { label: 'Enviados hoy', val: hoy, color: 'var(--ok)', foot: 'mensajes', onclick: "Orbit.modules.notificaciones&&0" },
-          { label: 'Total registrados', val: log.length, color: 'var(--info)', foot: 'historial' },
-          { label: 'Plantillas', val: PLANTILLAS.length, color: 'var(--red)', foot: 'disponibles' },
+          { label: 'Enviados hoy', val: hoy, color: 'var(--ok)', foot: 'mensajes', onclick: "Orbit.modules.notificaciones.irA('historial')" },
+          { label: 'Total registrados', val: log.length, color: 'var(--info)', foot: 'historial', onclick: "Orbit.modules.notificaciones.irA('historial')" },
+          { label: 'Plantillas', val: PLANTILLAS.length, color: 'var(--red)', foot: 'disponibles', onclick: "Orbit.modules.notificaciones.irA('plantillas')" },
           { label: 'Canal', val: 'wa.me + API', color: 'var(--warn)', foot: 'WhatsApp Web o Cloud' }
         ])
       + '<div class="tabs" style="max-width:420px;margin-bottom:16px">'
@@ -141,5 +141,7 @@ Orbit.modules.notificaciones = (function () {
     tab = 'historial'; render(host);
   }
 
-  return { render };
+  function irA(t) { tab = t; render(host); }
+
+  return { render, irA };
 })();

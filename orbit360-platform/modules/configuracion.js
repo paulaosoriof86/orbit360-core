@@ -286,7 +286,7 @@ Orbit.modules.configuracion = (function () {
       </div>
       <div style="display:flex;gap:8px;margin-top:16px">
         <button class="btn primary" id="cf-mods-save">Guardar módulos activos</button>
-        <button class="btn ghost" id="cf-reset" onclick="Orbit.ui.confirm('¿Restablecer configuración del cliente a valores por defecto?',{title:'Restablecer configuración',ok:'Restablecer'}).then(function(ok){if(ok){Orbit.tenant.reset();location.reload();}})">Restablecer</button>
+        <button class="btn ghost" id="cf-reset" onclick="(function(){var v=window.prompt('Esta acción restablece TODA la configuración del cliente a valores por defecto. Escribí RESTABLECER para confirmar:','');if((v||'').trim().toUpperCase()==='RESTABLECER'){Orbit.tenant.reset();location.reload();}else if(v!==null){Orbit.ui.toast('Confirmación incorrecta — no se restableció');}})()">Restablecer</button>
       </div>`;
   }
   // planes propios (importados/creados), persistentes
@@ -332,6 +332,28 @@ Orbit.modules.configuracion = (function () {
       Orbit.ui.toast('Módulos actualizados. El menú lateral se ajustó a esta cuenta.');
     });
     host.querySelectorAll('.cfg-mod input').forEach(i => i.addEventListener('change', () => i.closest('.cfg-mod').classList.toggle('on', i.checked)));
+    // Gate de cambio de rol (item 6): confirmación con motivo + no dejar el tenant sin administrador.
+    host.querySelectorAll('[data-role]').forEach(sel => {
+      sel.dataset.prev = sel.value;
+      sel.addEventListener('change', () => {
+        const id = sel.dataset.role, nuevo = sel.value, anterior = sel.dataset.prev;
+        const team = Orbit.store.all('asesores');
+        const ADMIN = ['Dirección', 'Admin'];
+        const esAdmin = (r) => ADMIN.indexOf(r) >= 0;
+        // ¿Quedaría el tenant sin ningún admin?
+        if (esAdmin(anterior) && !esAdmin(nuevo)) {
+          const otrosAdmin = team.filter(a => a.id !== id && esAdmin(a.rol));
+          if (!otrosAdmin.length) { Orbit.ui.toast('⛔ No podés dejar la cuenta sin administrador. Asigná otro Dirección/Admin primero.'); sel.value = anterior; return; }
+        }
+        const motivo = (window.prompt('Cambiar rol de este usuario a "' + nuevo + '".\nMotivo del cambio (obligatorio · queda en la trazabilidad):', '') || '').trim();
+        if (!motivo) { Orbit.ui.toast('Se requiere un motivo para cambiar el rol'); sel.value = anterior; return; }
+        const a = Orbit.store.get('asesores', id) || {};
+        const hist = (a.historialRol || []).concat([{ de: anterior, a: nuevo, motivo, responsable: (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Usuario', ts: new Date().toISOString() }]);
+        Orbit.store.update('asesores', id, { rol: nuevo, historialRol: hist });
+        sel.dataset.prev = nuevo;
+        Orbit.ui.toast('✓ Rol actualizado · motivo registrado');
+      });
+    });
   }
   function applyBrandToTopbar() {
     const t = T().get();
@@ -458,7 +480,7 @@ Orbit.modules.configuracion = (function () {
     const cfg = Orbit.store.pref('integ_' + id, {}) || {};
     const tn = T().get();
     const activo = !!(tn.addons && tn.addons[id]);
-    const configurado = !!(cfg.key || cfg.url || cfg.user || cfg.cuenta || cfg.permisos);
+    const configurado = !!(cfg.credentialRef || cfg.key || cfg.url || cfg.user || cfg.cuenta || cfg.permisos);
     if (!configurado && !activo) return { label: 'No configurado', tone: 'neutral' };
     return { label: 'Pendiente de conexión', tone: 'warn' };
   }
@@ -480,7 +502,8 @@ Orbit.modules.configuracion = (function () {
         + '</div></div>'
         + '<label class="ce-l">Patrón de asunto<input id="ci-pat" class="o-sel" value="' + U.esc(saved.patronAsunto || '{cliente} · {poliza} · {gestion}') + '"></label>'
         + '<label class="ce-l">Client ID / Tenant (OAuth Microsoft 365, opcional)<input id="ci-url" class="o-sel" value="' + U.esc(saved.url || '') + '" placeholder="app registration / tenant id"></label>'
-      : '<label class="ce-l">API key / Token<input id="ci-key" class="o-sel" type="password" value="' + U.esc(saved.key || '') + '" placeholder="••••••••"></label>'
+      : '<label class="ce-l">Referencia de credencial (no se guarda el secreto)<input id="ci-key" class="o-sel" value="' + U.esc(saved.credentialRef || '') + '" placeholder="ej.: make_prod_key (alias)"></label>'
+        + '<div class="cfg-note" style="font-size:11px;margin-top:4px">🔐 Orbit nunca guarda el secreto real (API key/token). Aquí solo se registra una <b>referencia</b>; nunca se almacena la clave en el navegador.</div>'
         + '<label class="ce-l">Webhook / Endpoint / OAuth URL (opcional)<input id="ci-url" class="o-sel" value="' + U.esc(saved.url || '') + '" placeholder="https://hook.make.com/..."></label>'
         + '<label class="ce-l">Cuenta / usuario (opcional)<input id="ci-user" class="o-sel" value="' + U.esc(saved.user || '') + '"></label>';
     back.innerHTML = '<div class="card" style="width:min(480px,94vw);padding:0">'
@@ -506,7 +529,7 @@ Orbit.modules.configuracion = (function () {
     back.querySelector('#ci-ok').onclick = () => {
       const data = esOutlook
         ? { cuenta: back.querySelector('#ci-user').value, tipo: back.querySelector('#ci-tipo').value, url: back.querySelector('#ci-url').value, patronAsunto: back.querySelector('#ci-pat').value, permisos: { leer: back.querySelector('#ci-p-leer').checked, enviar: back.querySelector('#ci-p-enviar').checked, adjuntos: back.querySelector('#ci-p-adj').checked }, activa: back.querySelector('#ci-on').checked }
-        : { key: back.querySelector('#ci-key').value, url: back.querySelector('#ci-url').value, user: (back.querySelector('#ci-user') || {}).value, activa: back.querySelector('#ci-on').checked };
+        : { credentialRef: back.querySelector('#ci-key').value, backend_required: true, url: back.querySelector('#ci-url').value, user: (back.querySelector('#ci-user') || {}).value, activa: back.querySelector('#ci-on').checked };
       // Contrato del sistema de integraciones (lane backend), si está presente: fuente de verdad tenant-wide.
       try { if (window.Orbit && Orbit.integraciones && typeof Orbit.integraciones.configurar === 'function') Orbit.integraciones.configurar(nombre, data); } catch (x) {}
       try { if (window.Orbit && Orbit.integraciones && typeof Orbit.integraciones.mark === 'function') Orbit.integraciones.mark(nombre, data.activa ? 'pendiente' : 'no_configurado'); } catch (x) {}

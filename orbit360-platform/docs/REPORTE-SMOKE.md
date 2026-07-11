@@ -1,3 +1,34 @@
+# Reporte de smoke · Orbit 360 · candidata post-hotfixes v1.163 (frontend v1330 cerrado)
+
+**Fecha:** 2026-07-08 · datos ficticios del seed. Smoke visual/prototipo local (no backend/Firestore/LAB/datos reales).
+
+## Vocabulario canónico de estados (Frente 2 — implementado por módulo)
+Badges/copy coherentes usados en Portal, Cobros, Conciliaciones (M5), Cliente360 y Config/Equipo (tonos `.badge ok/info/warn/danger/neutral`):
+- **Pago reportado / Reportado · en revisión** (info) — el cliente reportó con soporte; NO es pago aplicado.
+- **En validación / Validada (por confirmar)** (ok) — el equipo validó el reporte; aún no confirma el cobro.
+- **Reporte no aceptado** (danger) — rechazado con motivo; conserva evidencia; el cliente puede reportar de nuevo.
+- **Pagado (por conciliar) / Cobro confirmado** (ok) — cobro asentado; baja cartera.
+- **Conciliado** (ok) — cruzado contra soporte/banco/aseguradora.
+- **VALIDADA · no aplicada** (M5, ok) — propuesta validada; no aplica pago ni toca cobros.
+- **Requiere validación / Bloqueado por país-moneda** (warn/danger) — falta país/moneda confiable (GT=GTQ, CO=COP; sin suma cruda).
+- **Documento metadata-only** — adjunto solo referencia (sin base64/URL).
+- **Integración pendiente de conexión** — nunca "conexión real" si no existe.
+
+## Smoke visual por flujo (v1.163)
+- ✅ **Portal**: reportar pago → "Recibimos tu reporte · pendiente de revisión/conciliación"; soporte visible como adjunto; estados Reportado·en revisión / En validación / Reporte no aceptado; re-reportar tras rechazo. Subir documento = metadata-only.
+- ✅ **Cobros**: validar reporte (motivo) ≠ confirmar cobro; rechazar con motivo conserva evidencia (historial); badges de validación.
+- ✅ **Conciliaciones (M5)**: validar/rechazar/anular con **motivo obligatorio** + historial acumulativo; no aplica pagos ni muta cobros; "VALIDADA · para proceso posterior autorizado".
+- ✅ **Cliente360 → Documentos**: soportes de pago en revisión, documentos del expediente, propuestas/diffs con **Aprobar/Rechazar/Solicitar aclaración** (motivo obligatorio, visibilidad por rol); aprobar aplica el diff con historial interno.
+- ✅ **Config/Equipo**: cambio de rol con motivo + bloqueo de "dejar el tenant sin admin"; integraciones "pendiente de conexión".
+- ✅ **Academia**: 44 cursos, rutas por rol (Cliente/Cobros/Asesor/Dirección-IT) con quizzes de decisión; `CONTENT_V=9`.
+- ✅ **Login**: scroll único, columnas 100vh, logo del cliente a tamaño real.
+- ✅ App carga sin errores de consola.
+
+## Criterios de rechazo — verificados NO presentes
+- No se aplica pago desde reporte del cliente · validación M5 no es pago aplicado · sin readAsDataURL/base64 · adjuntos metadata-only · sin key/token en UI · sin textos técnicos (Firebase/Firestore/LAB/mock/demo) al cliente · no mezcla monedas · backend protegido intacto.
+
+---
+
 # Reporte de smoke · Orbit 360 · candidata activa 2026-07-04T211525.464 (v1.140)
 
 **Fecha:** 2026-07-05 · datos ficticios del seed. Smoke visual/prototipo local (no backend/Firestore/LAB/datos reales).

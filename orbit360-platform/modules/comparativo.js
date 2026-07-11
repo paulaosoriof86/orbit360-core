@@ -142,7 +142,7 @@ Orbit.modules.comparativo = (function () {
   }
 
   function init() {
-    if (Orbit._cots && Orbit._cots.length && !props.length) props = Orbit._cots.map(c => ({ nombre: c.nombre, color: c.color, total: c.total, neta: c.neta, iva: c.iva, cur: c.cur, ramo: c.ramo, cliente: c.cliente, fracc: c.fracc, sumaAsegurada: c.sumaAsegurada || 0, deducible: c.deducible || '', cob: c.cob || {}, origen: 'cotizador' }));
+    if (Orbit._cots && Orbit._cots.length && !props.length) props = Orbit._cots.map(c => Object.assign({ nombre: c.nombre, color: c.color, total: c.total, neta: c.neta, iva: c.iva, cur: c.cur, ramo: c.ramo, cliente: c.cliente, fracc: c.fracc, sumaAsegurada: c.sumaAsegurada || 0, deducible: c.deducible || '', cob: c.cob || {}, origen: 'cotizador' }));
   }
 
   /* ---- score consultivo por criterio elegido ---- */
@@ -172,6 +172,7 @@ Orbit.modules.comparativo = (function () {
     const winI = rk.length ? rk[0].i : -1;
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '📋', title: 'Comparativo', sub: 'Compara aseguradoras a fondo (del cotizador o por PDF) y cierra con la mejor', features: [], actions: `<button class="btn ghost" id="cp-hist-b" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">🕘 Historial</button><button class="btn ghost" id="cp-pdf" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬆ Cargar propuestas (PDF)</button>` })}
+      <div class="cfg-note" style="margin-bottom:14px">🔗 Compara cotizaciones traídas del <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/cotizador'">Cotizador</a> o PDFs externos por aseguradora — el directorio y las tarifas viven en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/aseguradoras'">Aseguradoras</a>.</div>
       ${props.length ? '' : '<div class="cfg-note" style="margin-bottom:14px">📋 El comparativo funciona <b>solo</b>: llena los <b>datos del riesgo</b> abajo, luego <b>⬆ carga PDFs</b> de propuestas (extracción inteligente) o <b>➕ agrégalas manual</b>. También puedes traerlas desde el <a style="color:var(--red);cursor:pointer" onclick="location.hash=\'#/cotizador\'">🧮 Cotizador</a>.</div>'}
       ${datosIniciales()}
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
@@ -298,7 +299,7 @@ Orbit.modules.comparativo = (function () {
   async function manual() {
     const nombre = await Orbit.ui.prompt('Nombre de la aseguradora / propuesta:', { title: 'Propuesta manual' }); if (!nombre) return;
     const total = +(await Orbit.ui.prompt('Prima total:', { title: 'Prima total', value: '0' })) || 0;
-    props.push({ nombre, color: '#6b7280', total, neta: total / 1.12, iva: total - total / 1.12, cur: (props[0] || {}).cur || 'GTQ', fracc: (props[0] || {}).fracc || 1, ramo: meta.ramo, sumaAsegurada: 0, deducible: '', cob: {}, origen: 'manual' }); render(host);
+    props.push(Orbit.dto.cotizacionNormalizada({ nombre, color: '#6b7280', total, neta: total / 1.12, iva: total - total / 1.12, cur: (props[0] || {}).cur || 'GTQ', fracc: (props[0] || {}).fracc || 1, ramo: meta.ramo, sumaAsegurada: 0, deducible: '', origen: 'manual' })); props[props.length-1].cob = {}; render(host);
   }
   function cargarPDF() {
     const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/pdf,image/*'; inp.multiple = true;
@@ -313,7 +314,7 @@ Orbit.modules.comparativo = (function () {
             // 1) intentar multi-aseguradora (PDF comparativo con varias)
             const multi = (Orbit.ia.parseMulti ? Orbit.ia.parseMulti(txt) : []);
             if (multi.length >= 2) {
-              multi.forEach(d => props.push({ nombre: d.nombre, color: '#1f3a5f', total: d.total, neta: d.neta, iva: d.iva, cur: (props[0] || {}).cur || 'GTQ', fracc: 1, ramo: meta.ramo, sumaAsegurada: d.sumaAsegurada || 0, deducible: d.deducible || '', cob: d.cob || {}, origen: 'pdf', archivo: f.name, via: 'pdf-multi', plan: d.plan }));
+              multi.forEach(d => { const p = Orbit.dto.cotizacionNormalizada({ nombre: d.nombre, color: '#1f3a5f', total: d.total, neta: d.neta, iva: d.iva, cur: (props[0] || {}).cur || 'GTQ', fracc: 1, ramo: meta.ramo, sumaAsegurada: d.sumaAsegurada || 0, deducible: d.deducible || '', origen: 'pdf' }); p.cob = d.cob || {}; p.archivo = f.name; p.via = 'pdf-multi'; p.plan = d.plan; props.push(p); });
               usados = true;
             }
           }
@@ -323,9 +324,11 @@ Orbit.modules.comparativo = (function () {
         try { if (Orbit.ia && Orbit.ia.extraerPDF) d = await Orbit.ia.extraerPDF(f); } catch (x) { d = null; }
         if (d && (d.total || d.neta)) {
           const total = d.total || (d.neta + (d.iva || 0));
-          props.push({ nombre: d.nombre || f.name.replace(/\.(pdf|png|jpe?g)$/i, ''), color: '#1f3a5f', total: Math.round(total), neta: Math.round(d.neta || total / 1.12), iva: Math.round(d.iva || total - total / 1.12), cur: (props[0] || {}).cur || 'GTQ', fracc: d.fracc || 1, ramo: meta.ramo, sumaAsegurada: Math.round(d.sumaAsegurada || 0), deducible: d.deducible || '', cob: d.cob || {}, origen: 'pdf', archivo: f.name, via: d._via || 'local' });
+          const p = Orbit.dto.cotizacionNormalizada({ nombre: d.nombre || f.name.replace(/\.(pdf|png|jpe?g)$/i, ''), color: '#1f3a5f', total: Math.round(total), neta: Math.round(d.neta || total / 1.12), iva: Math.round(d.iva || total - total / 1.12), cur: (props[0] || {}).cur || 'GTQ', fracc: d.fracc || 1, ramo: meta.ramo, sumaAsegurada: Math.round(d.sumaAsegurada || 0), deducible: d.deducible || '', origen: 'pdf' });
+          p.cob = d.cob || {}; p.archivo = f.name; p.via = d._via || 'local'; props.push(p);
         } else {
-          props.push({ nombre: f.name.replace(/\.(pdf|png|jpe?g)$/i, '').replace(/[_-]+/g, ' '), color: '#6b7280', total: 0, neta: 0, iva: 0, cur: (props[0] || {}).cur || 'GTQ', fracc: 1, ramo: meta.ramo, sumaAsegurada: 0, deducible: '', cob: {}, origen: 'pdf', archivo: f.name, via: 'manual' });
+          const p = Orbit.dto.cotizacionNormalizada({ nombre: f.name.replace(/\.(pdf|png|jpe?g)$/i, '').replace(/[_-]+/g, ' '), color: '#6b7280', total: 0, neta: 0, iva: 0, cur: (props[0] || {}).cur || 'GTQ', fracc: 1, ramo: meta.ramo, sumaAsegurada: 0, deducible: '', origen: 'pdf' });
+          p.cob = {}; p.archivo = f.name; p.via = 'manual'; props.push(p);
         }
       }
       t.remove(); render(host);

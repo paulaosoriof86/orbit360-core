@@ -98,12 +98,12 @@ Orbit.modules.portal = (function () {
   function vRecibos(cob) {
     return (cob.filter(c => c.estado !== 'Anulado').sort((a, b) => (a.vence || '').localeCompare(b.vence || '')).map(c => {
       const tone = c.estado === 'Pagado' ? 'ok' : c.estado === 'Vencido' ? 'danger' : 'warn';
-      const rep = c.reportado ? '<span class="badge info" style="font-size:9px">Reportado</span>' : '';
+      const rep = c.reporteRechazado ? '<span class="badge danger" style="font-size:9px">Reporte no aceptado</span>' : (c.validadoReporte ? '<span class="badge ok" style="font-size:9px">En validación</span>' : (c.reportado ? '<span class="badge info" style="font-size:9px">Reportado · en revisión</span>' : ''));
       return `<div class="pt-row pt-click" data-rec="${c.id}">
         <span class="pt-row-ic">${c.estado === 'Pagado' ? '✅' : '💳'}</span>
         <div style="flex:1"><b>Cuota ${c.cuota}</b><div class="muted" style="font-size:11.5px">vence ${U.fmtDate(c.vence)} ${rep}</div></div>
         <div style="text-align:right"><div style="font-family:var(--f-display);font-weight:700;font-size:13px">${U.money(c.monto, c.moneda)}</div>
-          ${(c.estado === 'Pendiente' || c.estado === 'Vencido') && !c.reportado ? `<button class="pt-mini" data-pago="${c.id}" onclick="event.stopPropagation()">📤 Reportar pago</button>` : `<span class="badge ${tone}" style="font-size:10px">${c.estado}</span>`}</div>
+          ${(c.estado === 'Pendiente' || c.estado === 'Vencido') && (!c.reportado || c.reporteRechazado) ? `<button class="pt-mini" data-pago="${c.id}" onclick="event.stopPropagation()">📤 ${c.reporteRechazado ? 'Reportar de nuevo' : 'Reportar pago'}</button>` : `<span class="badge ${tone}" style="font-size:10px">${c.estado}</span>`}</div>
       </div>`;
     }).join('') || '<div class="pt-empty">Sin pagos registrados.</div>');
   }
@@ -171,9 +171,15 @@ Orbit.modules.portal = (function () {
       <label class="ce-l" style="margin-top:10px">Nota<input id="rp-nota" class="o-sel" placeholder="Banco, referencia…"></label>`;
     const back = drawer('📤 Reportar pago', html, () => {
       const f = back.querySelector('#rp-file').files[0];
-      S().update('cobros', cobroId, { reportado: Orbit.ui.today(), soporteNombre: f ? f.name : '', notaReporte: back.querySelector('#rp-nota').value });
+      // Soporte de pago = documento METADATA-ONLY vinculado al cobro (sin binario/base64).
+      let soporteDocumentoId = '';
+      if (f) {
+        soporteDocumentoId = 'doc_sop_' + Date.now();
+        S().insert('documentos', { id: soporteDocumentoId, clienteId, tipo: 'Soporte de pago', nombre: f.name, tamano: f.size, metaOnly: true, storageEstado: 'pendiente_storage', vinculoCobroId: cobroId, estado: 'en_revision', fecha: Orbit.ui.today(), origen: 'Portal del cliente' });
+      }
+      S().update('cobros', cobroId, { reportado: Orbit.ui.today(), reporteRechazado: false, reporteRechazoMotivo: '', enRevision: false, soporteNombre: f ? f.name : '', soporteDocumentoId: soporteDocumentoId, notaReporte: back.querySelector('#rp-nota').value, historial: (c.historial || []).concat([{ accion: 'reportado_cliente', motivo: f ? ('soporte: ' + f.name) : '', responsable: cli.nombre, ts: new Date().toISOString() }]) });
       S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: (S().get('polizas', c.polizaId) || {}).asesorId || cli.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Pago reportado por el cliente', detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (f ? ' · soporte: ' + f.name : '') + ' · pendiente de validar' });
-      if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo: 'Validar pago reportado', titulo: 'Validar pago · ' + cli.nombre, clienteId, polizaId: c.polizaId, asesorId: cli.asesorId, prioridad: 'Alta', vence: '2026-06-26', nota: 'El cliente reportó el pago de la cuota ' + c.cuota, origen: 'Portal del cliente' });
+      if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo: 'Validar pago reportado', titulo: 'Validar pago · ' + cli.nombre, clienteId, polizaId: c.polizaId, asesorId: cli.asesorId, prioridad: 'Alta', vence: Orbit.ui.inDays ? Orbit.ui.inDays(2) : Orbit.ui.today(), nota: 'El cliente reportó el pago de la cuota ' + c.cuota, origen: 'Portal del cliente' });
       back.remove(); toast('✓ Recibimos tu reporte · pendiente de revisión/conciliación'); render(host);
     }, 'Enviar reporte');
   }
@@ -196,11 +202,12 @@ Orbit.modules.portal = (function () {
   function subirDoc() {
     const cli = S().get('clientes', clienteId);
     const html = `<label class="ce-l">Tipo de documento<select id="sd-tipo" class="o-sel">${['DPI / Cédula', 'RTU / RUT', 'Licencia', 'Comprobante de domicilio', 'Otro'].map(t => `<option>${t}</option>`).join('')}</select></label>
-      <label class="ce-l" style="margin-top:10px">Archivo<input id="sd-file" type="file" class="o-sel"></label>
-      <div class="cfg-note" style="margin-top:10px">Tu documento se guarda en tu expediente y el equipo lo verá al instante.</div>`;
+      <label class="ce-l" style="margin-top:10px">Archivo<input id="sd-file" type="file"></label>
+      <div class="cfg-note" style="margin-top:10px;font-size:11.5px">📎 Se registra el <b>documento como referencia</b> (nombre, tipo, fecha) para revisión del equipo. El archivo no reemplaza datos de tu expediente por sí solo.</div>`;
     const back = drawer('⬆ Añadir documento', html, () => {
       const f = back.querySelector('#sd-file').files[0]; const tipo = back.querySelector('#sd-tipo').value;
-      S().insert('documentos', { id: 'doc' + Date.now(), clienteId, tipo, nombre: f ? f.name : tipo, fecha: Orbit.ui.today(), origen: 'Portal del cliente' });
+      // METADATA-ONLY (item 4): solo referencia — sin base64, sin URL, sin binario.
+      S().insert('documentos', { id: 'doc' + Date.now(), clienteId, tipo, nombre: f ? f.name : tipo, tamano: f ? f.size : 0, metaOnly: true, estado: 'en_revision', fecha: Orbit.ui.today(), origen: 'Portal del cliente' });
       S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '📁', fecha: Orbit.ui.today(), titulo: 'Documento subido por el cliente', detalle: tipo + (f ? ' · ' + f.name : '') });
       back.remove(); toast('✓ Documento añadido a tu expediente'); render(host);
     }, 'Subir');
@@ -300,9 +307,10 @@ Orbit.modules.portal = (function () {
         <div class="pt-det"><span>Estado</span><b>${c.estado}</b></div>
         ${c.neta != null ? `<div class="pt-det"><span>${TT('prima_neta')}</span><b>${U.money(c.neta, c.moneda)}</b></div><div class="pt-det"><span>IVA</span><b>${U.money(c.iva || 0, c.moneda)}</b></div>` : ''}
         ${c.fechaPago ? `<div class="pt-det"><span>Pagado el</span><b>${U.fmtDate(c.fechaPago)}</b></div>` : ''}
-        ${c.reportado ? `<div class="pt-det"><span>Reportado</span><b>${U.fmtDate(c.reportado)}</b></div><div class="cfg-note" style="margin-top:8px;font-size:11.5px">📤 Recibimos tu reporte. Está <b>pendiente de revisión/conciliación</b>; te confirmamos cuando quede conciliado.</div>` : ''}
+        ${c.soporteNombre ? `<div class="pt-det"><span>Soporte adjunto</span><b>📎 ${U.esc(c.soporteNombre)}</b></div>` : ''}
+        ${c.reporteRechazado ? `<div class="cfg-note" style="margin-top:8px;font-size:11.5px;border-left:3px solid var(--danger)">✕ Tu reporte <b>no fue aceptado</b>${c.reporteRechazoMotivo ? ': ' + U.esc(c.reporteRechazoMotivo) : ''}. Podés volver a reportar con el soporte correcto.</div>` : (c.validadoReporte ? `<div class="cfg-note" style="margin-top:8px;font-size:11.5px;border-left:3px solid var(--ok)">✓ Tu reporte fue <b>validado</b> y está en conciliación. Te confirmamos cuando quede conciliado.</div>` : (c.reportado ? `<div class="pt-det"><span>Reportado</span><b>${U.fmtDate(c.reportado)}</b></div><div class="cfg-note" style="margin-top:8px;font-size:11.5px">📤 Recibimos tu reporte. Está <b>pendiente de revisión/conciliación</b>; te confirmamos cuando quede conciliado.</div>` : ''))}
       </div>
-      ${(c.estado === 'Pendiente' || c.estado === 'Vencido') && !c.reportado ? '<button class="btn primary sm" style="margin-top:12px" data-x-pago="' + c.id + '">📤 Reportar mi pago</button>' : ''}`, null, 'Cerrar');
+      ${(c.estado === 'Pendiente' || c.estado === 'Vencido') && (!c.reportado || c.reporteRechazado) ? '<button class="btn primary sm" style="margin-top:12px" data-x-pago="' + c.id + '">📤 Reportar mi pago</button>' : ''}`, null, 'Cerrar');
     document.querySelectorAll('[data-x-pago]').forEach(b => b.addEventListener('click', () => { document.getElementById('pt-dr').remove(); reportarPago(b.dataset.xPago); }));
   }
   function detSiniestro(id) {

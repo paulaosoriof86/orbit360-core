@@ -44,7 +44,7 @@ Orbit.modules.automatizaciones = (function () {
     { id: 'Claude',   nombre: 'Claude',  ico: '✲', cost: '💲💲💲', ideal: 'Máxima calidad · documentos de seguros complejos', modelos: ['claude-3-5-haiku', 'claude-3-5-sonnet', 'claude-3-7-sonnet'], keylbl: 'API Key (Anthropic)' },
     { id: 'Endpoint', nombre: 'Endpoint propio', ico: '⚙', cost: '🏷️', ideal: 'Tu modelo / proxy interno', modelos: ['custom'], keylbl: 'URL del endpoint' }
   ];
-  function getIA() { return cfg.ia || { proveedor: '', key: '', modelo: '', activo: false }; }
+  function getIA() { return cfg.ia || { proveedor: '', credentialRef: '', modelo: '', activo: false }; }
   function getWH() { return cfg.webhook || ''; }
 
   function render(h) {
@@ -136,8 +136,8 @@ Orbit.modules.automatizaciones = (function () {
                 <small>${p.ideal}</small>
               </button>`).join('')}</div>
             <label class="ce-l" style="margin-top:12px">Modelo<select id="ia-mod" class="o-sel"></select></label>
-            <label class="ce-l" style="margin-top:8px"><span id="ia-keylbl">API Key</span><input id="ia-key" class="o-sel" type="password" placeholder="Pega tu API key" value="${U.esc(getIA().key)}"></label>
-            <label class="ce-l ck" style="margin-top:10px"><input type="checkbox" id="ia-act" ${getIA().activo ? 'checked' : ''}> Activar IA como asistente</label>
+            <label class="ce-l" style="margin-top:8px"><span id="ia-keylbl">Credencial</span><div class="badge ${Orbit.ia && Orbit.ia.estado && Orbit.ia.estado()==='configurado_pendiente_boveda' ? "warn" : "neutral"}" style="display:inline-block">${Orbit.ia && Orbit.ia.estado ? ({sin_configurar:'Sin configurar', configurado_pendiente_boveda:'Referencia guardada', conectado_verificado:'Conectado y verificado'}[Orbit.ia.estado()]||'Sin configurar') : 'Sin configurar'}</div><input id="ia-key" class="o-sel" type="hidden" value="backend_required"></label>
+            <label class="ce-l ck" style="margin-top:10px"><input type="checkbox" id="ia-act" ${getIA().activo ? 'checked' : ''}> Activar IA como asistente (heurística sin credencial)</label>
             <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="ia-save" style="flex:1">💾 Guardar</button><button class="btn ghost" id="ia-test">🔌 Probar</button></div>
             <div class="cfg-note" style="margin-top:10px">La elección se guarda por cliente (tenant). La IA es opcional: sin ella, todo funciona con heurística (sin costo).</div>
             <details style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
@@ -207,17 +207,17 @@ Orbit.modules.automatizaciones = (function () {
     h.querySelector('#ia-save').addEventListener('click', () => {
       const cur = getIA();
       if (!cur.proveedor) { toast('Elige primero un proveedor de IA'); return; }
-      cfg.ia = { proveedor: cur.proveedor, key: h.querySelector('#ia-key').value.trim(), modelo: h.querySelector('#ia-mod').value, activo: h.querySelector('#ia-act').checked };
+      cfg.ia = { proveedor: cur.proveedor, credentialRef: 'backend_required', modelo: h.querySelector('#ia-mod').value, activo: h.querySelector('#ia-act').checked };
       saveCfg();
-      if (Orbit.ia && Orbit.ia.conectar) Orbit.ia.conectar(cfg.ia.proveedor, cfg.ia.key, cfg.ia.modelo);
+      if (Orbit.ia && Orbit.ia.configurar) Orbit.ia.configurar(cfg.ia.proveedor, cfg.ia.modelo);
       try { const t = Orbit.tenant && Orbit.tenant.get(); if (t) { t.ia = { proveedor: cfg.ia.proveedor, modelo: cfg.ia.modelo, activo: cfg.ia.activo }; Orbit.tenant.save && Orbit.tenant.save(t); } } catch (e) {}
-      toast('✓ Motor de IA guardado (' + cfg.ia.proveedor + ')');
+      toast('✓ Motor de IA configurado (' + cfg.ia.proveedor + ') · pendiente de conexión segura por bóveda');
+      render(h);
     });
     const tb = h.querySelector('#ia-test'); if (tb) tb.addEventListener('click', () => {
       const cur = getIA();
       if (!cur.proveedor) { toast('Elige un proveedor primero'); return; }
-      const k = h.querySelector('#ia-key').value.trim();
-      toast(k ? ('🔌 ' + cur.proveedor + ': clave detectada · pendiente de activación técnica') : ('⚠️ ' + cur.proveedor + ' sin API key — opera en heurística gratuita'));
+      toast('🔌 ' + cur.proveedor + ': pendiente de conexión segura (bóveda de credenciales) — opera en heurística gratuita mientras tanto');
     });
     const cmp = h.querySelector('#ia-compare'); if (cmp) cmp.addEventListener('click', compararModelos);
     h.querySelectorAll('.ia-modsel').forEach(s => s.addEventListener('change', () => {

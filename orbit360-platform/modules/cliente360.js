@@ -29,7 +29,7 @@ Orbit.modules.cliente360 = (function () {
     return '<span class="badge ' + tone + '">' + e + '</span>';
   }
 
-  const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'siniestros', 'comisiones', 'correos', 'historial'];
+  const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'siniestros', 'comisiones', 'correos', 'documentos', 'historial'];
 
   // ---------- entry ----------
   function render(h) {
@@ -145,7 +145,7 @@ Orbit.modules.cliente360 = (function () {
     const c = r.cli, ase = q.asesor(c.asesorId);
     const tabs = [
       ['resumen', 'Resumen', '📊'], ['polizas', 'Pólizas', '📑'], ['vehiculos', 'Vehículos', '🚗'], ['cobros', 'Cobros', '💳'],
-      ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']
+      ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['documentos', 'Documentos', '📂'], ['historial', 'Historial', '📝']
     ];
     const saludCol = r.salud >= 70 ? '#1f8a4c' : r.salud >= 45 ? '#c9821b' : '#C5162E';
     const waNum = (c.telefono || '').replace(/[^0-9]/g, '');
@@ -275,6 +275,7 @@ Orbit.modules.cliente360 = (function () {
     else if (tab === 'comisiones') body.innerHTML = tabComis(cid, r);
     else if (tab === 'correos') { body.innerHTML = tabCorreos(cid, r); }
     else if (tab === 'siniestros') { body.innerHTML = tabSiniestros(cid, r); }
+    else if (tab === 'documentos') { body.innerHTML = tabDocumentos(cid, r); }
     else if (tab === 'historial') { body.innerHTML = tabHistorial(cid, r); wireHistorial(cid); }
   }
 
@@ -595,6 +596,33 @@ Orbit.modules.cliente360 = (function () {
   }
 
   /* ---- Historial + agregar nota ---- */
+  function tabDocumentos(cid, r) {
+    const S2 = S();
+    const cli = r.cli;
+    // 1) Soportes de pago en revisión / rechazados (evidencia adjunta por el cliente)
+    const cobros = S2.all('cobros').filter(c => c.clienteId === cid && (c.reportado || c.reporteRechazado || c.validadoReporte) && c.estado !== 'Pagado');
+    // 2) Parches / diffs pendientes de aprobación (documentos que proponen cambios)
+    const parches = (S2.all('parchesPendientes') || []).filter(p => p.clienteId === cid && p.estado === 'pendiente');
+    // 3) Documentos soporte adjuntos al expediente
+    const docs = (S2.all('documentos') || []).filter(d => d.clienteId === cid);
+    const estadoSop = (c) => c.reporteRechazado ? '<span class="badge danger">No aceptado</span>' : (c.validadoReporte ? '<span class="badge ok">Validado · en conciliación</span>' : '<span class="badge info">En revisión</span>');
+    const sopHtml = cobros.length ? cobros.map(c => `<div class="pt-det" style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);cursor:${c.soporteNombre ? 'pointer' : 'default'}" ${c.soporteNombre ? `onclick="Orbit.documentViewer.open({nombre:'${U.esc(c.soporteNombre)}',tipo:'Soporte de pago',fecha:'${c.reportado || ''}',origen:'Reportado por cliente',estado:c.reporteRechazado?'No aceptado':(c.validadoReporte?'Validado':'En revisión'),estadoTone:c.reporteRechazado?'danger':(c.validadoReporte?'ok':'info'),notas:'Cuota ${c.cuota} · ${U.esc(U.money(c.monto, c.moneda))}',motivo:'${U.esc(c.reporteRechazoMotivo || '')}',storageEstado:'pendiente_storage'})"` : ''}>
+        <div><b style="font-size:13px">Cuota ${c.cuota} · ${U.money(c.monto, c.moneda)}</b><div class="muted" style="font-size:11px">${c.soporteNombre ? '📎 ' + U.esc(c.soporteNombre) : 'sin adjunto'} · reportado ${U.fmtDate(c.reportado)}${c.reporteRechazoMotivo ? ' · motivo: ' + U.esc(c.reporteRechazoMotivo) : ''}</div></div>
+        ${estadoSop(c)}</div>`).join('') : '<div class="muted" style="font-size:12.5px;padding:8px 0">Sin soportes de pago en revisión.</div>';
+    const puedeActuar = ['Dirección', 'Admin', 'IT', 'Finanzas', 'Operativo'].includes(ROLE());
+    const parchHtml = parches.length ? parches.map(p => `<div class="pt-det" style="padding:9px 0;border-bottom:1px solid var(--line)">
+        <div style="display:flex;justify-content:space-between"><b style="font-size:13px">${U.esc(p.origen || 'Documento')} · ${Object.keys(p.diff || {}).length} cambio(s) propuesto(s)</b><span class="badge warn">Pendiente de aprobación</span></div>
+        <div class="muted" style="font-size:11px;margin-top:3px">${Object.entries(p.diff || {}).slice(0, 4).map(([k, v]) => k + ': ' + U.esc(String(v.actual || '—')) + ' → ' + U.esc(String(v.propuesto || ''))).join(' · ')}</div>
+        ${puedeActuar ? `<div style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap"><button class="btn primary sm" onclick="Orbit.modules.cliente360.aprobarPropuesta('${p.id}','${cid}')">✓ Aprobar</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.rechazarPropuesta('${p.id}','${cid}')">✕ Rechazar</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.aclararPropuesta('${p.id}','${cid}')">❔ Solicitar aclaración</button></div>` : '<div class="muted" style="font-size:10.5px;margin-top:5px">Solo lectura para tu rol.</div>'}</div>`).join('') : '<div class="muted" style="font-size:12.5px;padding:8px 0">Sin cambios propuestos pendientes.</div>';
+    const docsHtml = docs.length ? docs.slice(0, 20).map(d => `<div class="pt-det" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="Orbit.documentViewer.open({nombre:'${U.esc(d.nombre || d.tipo || 'Documento')}',tipo:'${U.esc(d.tipo || 'Documento')}',tamano:'${U.esc(d.tamano || '')}',fecha:'${d.fecha || ''}',origen:'${U.esc(d.origen || 'Expediente del cliente')}',storageEstado:'${d.storageEstado || 'pendiente_storage'}'})"><span style="font-size:12.5px">📎 ${U.esc(d.nombre || d.tipo || 'Documento')}</span><span class="muted" style="font-size:11px">${U.esc(d.fecha || '')}</span></div>`).join('') : '<div class="muted" style="font-size:12.5px;padding:8px 0">Sin documentos en el expediente.</div>';
+    const card = (t, sub, inner) => `<div class="card" style="margin-bottom:14px;overflow:hidden"><div style="padding:12px 15px;border-bottom:1px solid var(--line)"><b style="font-family:var(--f-display);font-size:14px">${t}</b>${sub ? `<div class="muted" style="font-size:11.5px">${sub}</div>` : ''}</div><div style="padding:6px 15px 12px">${inner}</div></div>`;
+    return `<div class="cfg-note" style="margin-bottom:14px">📂 Expediente documental de <b>${U.esc(cli.nombre)}</b>. Los soportes y documentos son <b>evidencia/propuesta</b>: no modifican el expediente ni confirman pagos sin revisión y aprobación del equipo.</div>
+      ${card('💳 Soportes de pago en revisión', 'Reportados por el cliente — evidencia, no pago confirmado', sopHtml)}
+      ${card('📝 Cambios propuestos (documentos)', 'Diffs pendientes de aprobación — el documento propone, el equipo confirma', parchHtml)}
+      ${card('📎 Documentos del expediente', 'Soportes adjuntos', docsHtml)}
+      <button class="btn ghost sm" onclick="Orbit.importa.open('documentos',{scope:{cid:'${cid}',nombre:'${U.esc(cli.nombre)}'},onDone:()=>Orbit.modules.cliente360.reabrir('${cid}','documentos')})">📎 Adjuntar documento (propone cambios)</button>`;
+  }
+
   function tabHistorial(cid, r) {
     const acts = q.actividadesDe(cid);
     return `<div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px">
@@ -1503,5 +1531,37 @@ Orbit.modules.cliente360 = (function () {
     tab = 'siniestros'; detalle(cid);
   }
 
-  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); }, nuevoCliente, nuevoReclamo, addBitacora };
+  function _quien() { return (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Usuario'; }
+  function _histInterno(p, accion, motivo) { return (p.historialInterno || []).concat([{ accion, motivo: motivo || '', responsable: _quien(), ts: new Date().toISOString() }]); }
+  function aprobarPropuesta(pid, cid) {
+    const p = S().get('parchesPendientes', pid); if (!p) return;
+    const motivo = (window.prompt('Motivo de la aprobación (obligatorio · queda en la trazabilidad interna):', '') || '').trim();
+    if (!motivo) { Orbit.ui.toast('Se requiere motivo para aprobar'); return; }
+    // La aprobación ES la autorización: recién aquí se aplica el diff al cliente.
+    const upd = {}; Object.entries(p.diff || {}).forEach(([k, v]) => { if (v && v.propuesto != null) upd[k] = v.propuesto; });
+    if (Object.keys(upd).length) S().update('clientes', cid, upd);
+    S().update('parchesPendientes', pid, { estado: 'aprobado', motivo, aprobadoPor: _quien(), aprobadoFecha: Orbit.ui.today(), historialInterno: _histInterno(p, 'aprobar', motivo) });
+    Orbit.ui.toast('✓ Propuesta aprobada · ' + Object.keys(upd).length + ' dato(s) actualizado(s)');
+    reabrir(cid, 'documentos');
+  }
+  function rechazarPropuesta(pid, cid) {
+    const p = S().get('parchesPendientes', pid); if (!p) return;
+    const motivo = (window.prompt('Motivo del rechazo (obligatorio · no se aplican los cambios):', '') || '').trim();
+    if (!motivo) { Orbit.ui.toast('Se requiere motivo para rechazar'); return; }
+    S().update('parchesPendientes', pid, { estado: 'rechazado', motivo, historialInterno: _histInterno(p, 'rechazar', motivo) });
+    Orbit.ui.toast('✕ Propuesta rechazada · motivo registrado');
+    reabrir(cid, 'documentos');
+  }
+  function aclararPropuesta(pid, cid) {
+    const p = S().get('parchesPendientes', pid); if (!p) return;
+    const motivo = (window.prompt('¿Qué aclaración necesitás? (queda en la trazabilidad):', '') || '').trim();
+    if (!motivo) { Orbit.ui.toast('Escribí la aclaración solicitada'); return; }
+    S().update('parchesPendientes', pid, { estado: 'aclaracion_solicitada', motivo, historialInterno: _histInterno(p, 'solicitar_aclaracion', motivo) });
+    if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo: 'Aclaración de documento', titulo: 'Aclaración · ' + ((S().get('clientes', cid) || {}).nombre || ''), clienteId: cid });
+    Orbit.ui.toast('❔ Aclaración solicitada · gestión creada');
+    reabrir(cid, 'documentos');
+  }
+  function reabrir(cid, t) { tab = t || 'resumen'; detalle(cid); }
+
+  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir, nuevoCliente, nuevoReclamo, addBitacora, aprobarPropuesta, rechazarPropuesta, aclararPropuesta };
 })();

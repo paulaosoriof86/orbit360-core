@@ -119,9 +119,31 @@ Orbit.modules.cotizador = (function () {
   }
   function cargarHistorial(id) { const log = getCotLog(); const e = log.find(x => x.id === id); if (e && e.state) { Object.assign(st, e.state); tabCot = 'cotizar'; render(host); } }
 
-  function asegElegibles() { return S().all('aseguradoras').filter(a => a.vinculada !== false && (!st.pais || a.pais === st.pais)); }
+  function asegElegibles() {
+    const ramo = st.ramo;
+    return S().all('aseguradoras').filter(a => {
+      if (a.vinculada === false) return false;
+      if (st.pais && a.pais !== st.pais) return false;
+      if (ramo && (a.ramos || []).indexOf(ramo) < 0) return false;
+      // gate real DEFAULT-DENY: el ramo debe estar HABILITADO EXPLÍCITAMENTE (=== true) para Cotizador; ausencia de configuración = no disponible
+      if (!ramo) return true;
+      return !!(a.ramosHabilitados && a.ramosHabilitados[ramo] && a.ramosHabilitados[ramo].cotizador === true);
+    });
+  }
   function ivaPais(p) { return (Orbit.primas && Orbit.primas.cfgPais) ? Orbit.primas.cfgPais(p).iva : (p === 'CO' ? 19 : 12); }
   function cotsGuardadas() { return Orbit._cots = Orbit._cots || []; }
+  /* ---- DTO canónico CotizacionNormalizada: usado por Cotizador (origen=cotizador) y Comparativo (origen=pdf/manual) ---- */
+  Orbit.dto = Orbit.dto || {};
+  Orbit.dto.cotizacionNormalizada = function (f) {
+    return {
+      _dto: 'CotizacionNormalizada', origen: f.origen || 'cotizador', // 'cotizador' | 'pdf' | 'manual'
+      nombre: f.nombre || '', color: f.color || '#6b7280',
+      pais: f.pais || 'GT', cur: f.cur || (f.pais === 'CO' ? 'COP' : 'GTQ'),
+      ramo: f.ramo || '', neta: f.neta || 0, iva: f.iva || 0, total: f.total || (f.neta || 0) + (f.iva || 0),
+      fracc: f.fracc || 1, sumaAsegurada: f.sumaAsegurada || 0, deducible: f.deducible || '', exclusiones: f.exclusiones || '',
+      aseguradoraId: f.aseguradoraId || '', clienteId: f.clienteId || '', cliente: f.cliente || '', asesorId: f.asesorId || ''
+    };
+  };
 
   function render(h) {
     host = h;
@@ -129,6 +151,7 @@ Orbit.modules.cotizador = (function () {
     if (!st.filas.length) st.filas = asg.slice(0, 3).map(a => ({ id: a.id, modo: 'tasas', prima: 0, sel: true, res: null }));
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '🧮', title: 'Cotizador', sub: 'Cotiza con tus aseguradoras y arma el comparativo', features: [] })}
+      <div class="cfg-note" style="margin-bottom:14px">🔗 Consume solo aseguradoras cuyo ramo está <b>habilitado para Cotizador</b> en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/aseguradoras'">Aseguradoras</a> (pestaña Productos/Tarifas). Si desactivás un ramo ahí, deja de aparecer aquí. Envía la cotización al <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/comparativo'">Comparativo</a> para cerrar con el cliente.</div>
       <div class="tabs" style="max-width:380px;margin-bottom:16px"><div class="tab ${tabCot==='cotizar'?'active ':''}tab" data-czt="cotizar">🧮 Cotizador</div><div class="tab ${tabCot==='historial'?'active ':''}tab" data-czt="historial">📋 Historial</div></div>${tabCot === 'historial' ? vCotHistorial() : ''}<div class="cz-grid" style="${tabCot==='historial'?'display:none':''}">
         <div class="card pad">
           <div class="asg-sec-t">📋 1 · Datos del riesgo</div>
@@ -236,7 +259,7 @@ Orbit.modules.cotizador = (function () {
     host.querySelectorAll('[data-csel]').forEach(c => c.addEventListener('change', e => con[+c.dataset.csel].sel = e.target.checked));
     host.querySelectorAll('[data-cprint]').forEach(b => b.addEventListener('click', () => imprimirCot(con[+b.dataset.cprint], cur)));
     host.querySelectorAll('[data-csend]').forEach(b => b.addEventListener('click', () => enviarCot(con[+b.dataset.csend], cur)));
-    host.querySelector('#cz-comp').addEventListener('click', () => { Orbit._cots = con.filter(f => f.sel).map(f => ({ nombre: f.nombre, color: f.color, total: f.res.total, neta: f.res.neta, iva: f.res.iva, cur, ramo: st.ramo, cliente: st.cliente, fracc: st.fracc })); location.hash = '#/comparativo'; });
+    host.querySelector('#cz-comp').addEventListener('click', () => { Orbit._cots = con.filter(f => f.sel).map(f => Orbit.dto.cotizacionNormalizada({ origen: 'cotizador', nombre: f.nombre, color: f.color, total: f.res.total, neta: f.res.neta, iva: f.res.iva, cur, pais: st.pais, ramo: st.ramo, aseguradoraId: f.id, clienteId: st.clienteId, cliente: st.cliente, fracc: st.fracc, sumaAsegurada: st.suma || st.valor || st.dsuma || st.hval || 0, deducible: st.gmDed || '', asesorId: st.asesorId })); location.hash = '#/comparativo'; });
   }
   function imprimirCot(f, cur) {
     const w = window.open('', '_blank'); if (!w) return;

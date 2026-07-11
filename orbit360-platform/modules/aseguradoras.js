@@ -1,250 +1,671 @@
 /* ============================================================
    Orbit 360 · Orbit Aseguradoras (directorio operativo) — editable
-   Directorio GT/CO habilitable; ficha editable: logo, accesos
-   múltiples con usuario/contraseña, contactos por tipo, cuentas,
-   facturación (NIT/patrón), documentos (tarifas/cotizaciones/PDF
-   que alimentan IA y Cotizador), docs requeridos por producto,
-   comisiones por ramo. Importador inteligente + documental. Borrar.
-   La visibilidad por rol se controla en Equipo y permisos.
+   Directorio GT/CO buscable y filtrable; ficha por pestañas con
+   DRAFT real: editar → revisar → motivo → Guardar/Cancelar (cancelar
+   nunca escribe al store). Rol activo vía Orbit.session.rol().
+   Motor de fuentes/conocimiento (_fuentes) con dimensiones extendidas
+   y capacidades por fuente (tarifas/reglas/presentación/comparativo/
+   condiciones/casos de prueba). Gate Cotizador/Comparativo default-
+   deny: un ramo solo se ofrece si fue HABILITADO explícitamente.
+   Seguridad: nunca contraseñas reales — credentialRef:'backend_required'
+   + estado honesto. Logo nunca se persiste como Data URL nueva.
+   Borrado: normal = desactivar con motivo; borrado físico solo si
+   cero vínculos y deja auditoría externa antes de eliminar.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.aseguradoras = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
-  let host;
+  let host, q = '', fPais = 'TODOS', fRamo = '', fEstado = 'TODAS';
   function paisOK(p) { return !Orbit.pais || Orbit.pais === 'TODOS' || p === Orbit.pais; }
   function up(id, patch) { S().update('aseguradoras', id, patch); }
   function reload() { if (host) render(host); }
+  const ACCESO_ESTADOS = ['Sin verificar', 'Acceso disponible', 'Requiere actualización', 'Sin acceso registrado'];
+  const ACCESO_TONE = { 'Sin verificar': 'warn', 'Acceso disponible': 'ok', 'Requiere actualización': 'danger', 'Sin acceso registrado': 'neutral' };
 
+  /* ---- Rol ACTIVO (no el rol base de Auth): usa Orbit.session.rol() si existe ---- */
+  function activeRole() {
+    try { if (Orbit.session && Orbit.session.rol) return Orbit.session.rol(); } catch (e) {}
+    try { if (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) return Orbit.auth.user().rol || 'Asesor'; } catch (e) {}
+    return 'Asesor';
+  }
+  function actorNombre() { const u = (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) || {}; return u.nombre || 'usuario'; }
+  /* Extras/restricciones granulares por asesor (además del rol activo): un asesor puede
+     tener 'aseguradoras_editar' en permisosExtra (extra) o en restricciones (revoca aunque
+     el rol activo lo permitiría). No requiere tocar core/config.js — vive en el registro
+     del asesor vinculado a la sesión activa. */
+  function asesorActivo() {
+    try { const asesorId = Orbit.session && Orbit.session.asesorId && Orbit.session.asesorId(); return asesorId ? (S().get('asesores', asesorId) || {}) : {}; } catch (e) { return {}; }
+  }
+  function canEdit() {
+    const a = asesorActivo();
+    if ((a.restricciones || []).indexOf('aseguradoras_editar') >= 0) return false;
+    if ((a.permisosExtra || []).indexOf('aseguradoras_editar') >= 0) return true;
+    return ['Dirección', 'Admin'].indexOf(activeRole()) >= 0;
+  }
+  function log(a, entrada) {
+    const hist = (a.actividad || []).slice();
+    hist.unshift(Object.assign({ fecha: new Date().toISOString(), responsable: actorNombre() + ' · ' + activeRole() }, entrada));
+    return hist.slice(0, 60);
+  }
+  /* auditoría EXTERNA (sobrevive aunque se borre la entidad) */
+  function auditExterna(entrada) {
+    try { S().insert('auditoriaAseguradoras', Object.assign({ id: 'audasg' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), fecha: new Date().toISOString(), responsable: actorNombre() + ' · ' + activeRole() }, entrada)); } catch (e) {}
+  }
+
+  /* ===================== MOTOR DE FUENTES/CONOCIMIENTO (Tarifas) ===================== */
+  const SOURCE_TYPES = ['tarifario', 'cotizacion_ejemplo', 'poliza_ejemplo', 'formulario', 'manual', 'circular'];
+  const SOURCE_STATES = ['Documento recibido', 'Lectura preparada', 'Propuesta lista para revisar', 'Requiere validación', 'Conocimiento incompleto', 'Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'];
+  // dimensiones extendidas — no todas se capturan en la UI de docs aún (país/moneda/ramo sí);
+  // el resto queda disponible en el contrato para consumidores/importadores futuros.
+  const DIMENSION_KEYS = ['pais', 'moneda', 'ramo', 'producto', 'familiaProducto', 'subtipoProducto', 'segmento', 'tipoRiesgo', 'tipoVehiculo', 'usoVehiculo', 'plan'];
+  const CAT_TO_TYPE = { 'Cotización ejemplo': 'cotizacion_ejemplo', 'Póliza ejemplo': 'poliza_ejemplo', 'Formulario': 'formulario', 'Clausulado': 'formulario', 'Condiciones': 'formulario', 'Manual': 'manual', 'Circular': 'circular' };
+  function legacyType(cat) { return CAT_TO_TYPE[cat] || 'tarifario'; }
+  function normalizarFuente(d, a) {
+    return Object.assign({
+      id: d.id, // estable: se asigna en alta, NUNCA en render (ver addDoc)
+      nombre: d.nombre || 'Documento', cat: d.cat || 'Formulario', tipo: d.tipo || legacyType(d.cat),
+      pais: d.pais || a.pais, moneda: d.moneda || (a.pais === 'GT' ? 'GTQ' : 'COP'),
+      ramo: d.ramo || '', producto: d.producto || '', familiaProducto: d.familiaProducto || '', subtipoProducto: d.subtipoProducto || '',
+      segmento: d.segmento || '', tipoRiesgo: d.tipoRiesgo || '', tipoVehiculo: d.tipoVehiculo || '', usoVehiculo: d.usoVehiculo || '', plan: d.plan || '',
+      estado: d.estado || 'Documento recibido', version: d.version || 1, vigencia: d.vigencia || ''
+    }, {});
+  }
+  function sourceDimensions(d) { const o = {}; DIMENSION_KEYS.forEach(k => { if (d[k]) o[k] = d[k]; }); return o; }
+  function sourceCombinationKey(d) { return DIMENSION_KEYS.map(k => d[k] || '—').join(' · '); }
+  function groupLabel(key) { return key; }
+  /* Evalúa una fuente y devuelve estado + capacidades de consumo (no solo texto).
+     Suficiencia mínima: país + moneda + ramo. Sin eso, "Conocimiento incompleto"
+     sin importar el estado que el usuario haya declarado — y NINGUNA capacidad. */
+  function evaluarFuente(d) {
+    const completa = !!(d.pais && d.moneda && d.ramo);
+    const estado = completa ? (d.estado || 'Documento recibido') : 'Conocimiento incompleto';
+    const habCot = completa && estado === 'Habilitado para Cotizador';
+    const habComp = completa && (estado === 'Habilitado para Comparativo' || estado === 'Habilitado para Cotizador');
+    return {
+      estado,
+      sirveParaTarifas: completa && ['Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'].indexOf(estado) >= 0,
+      sirveParaReglas: completa && d.tipo === 'tarifario' && estado !== 'Requiere validación',
+      sirveParaPresentacion: completa && (d.tipo === 'cotizacion_ejemplo' || d.tipo === 'poliza_ejemplo'),
+      sirveParaComparativo: habComp,
+      sirveParaCondiciones: completa && ['formulario', 'manual', 'circular'].indexOf(d.tipo) >= 0,
+      sirveParaCasosPrueba: completa && d.tipo === 'cotizacion_ejemplo',
+      requiereEjemploCotizacion: d.tipo === 'tarifario' && !completa,
+      habilitadoCotizador: habCot
+    };
+  }
+  function resumenFuentes(a) {
+    const docs = (a.docs || []).map(d => normalizarFuente(d, a));
+    const out = {}; SOURCE_STATES.concat(['Conocimiento incompleto']).forEach(s => out[s] = 0);
+    docs.forEach(d => { const e = evaluarFuente(d).estado; out[e] = (out[e] || 0) + 1; });
+    return out;
+  }
+  function resumenGrupos(a) {
+    const docs = (a.docs || []).map(d => normalizarFuente(d, a));
+    const g = {};
+    docs.forEach(d => { const k = sourceCombinationKey(d); (g[k] = g[k] || []).push(d); });
+    return Object.keys(g).map(k => {
+      const evs = g[k].map(evaluarFuente);
+      const incompleto = evs.some(e => e.estado === 'Conocimiento incompleto');
+      // habilitado de grupo exige CONJUNTO suficiente: al menos una fuente con tarifas/reglas Y ninguna incompleta
+      const habilitado = !incompleto && evs.some(e => e.sirveParaTarifas) && evs.some(e => e.sirveParaReglas || e.sirveParaPresentacion);
+      return { key: k, label: groupLabel(k), docs: g[k], estado: incompleto ? 'Conocimiento incompleto' : (habilitado ? 'Habilitado' : 'Pendiente') };
+    });
+  }
+
+  /* ===================== DIRECTORIO ===================== */
   function render(h) {
     host = h;
-    const all = S().all('aseguradoras').filter(a => paisOK(a.pais));
-    const vinc = all.filter(a => a.vinculada !== false);
+    const todas = S().all('aseguradoras');
+    let all = todas.filter(a => paisOK(a.pais));
+    if (fPais !== 'TODOS') all = all.filter(a => a.pais === fPais);
+    if (fRamo) all = all.filter(a => (a.ramos || []).includes(fRamo));
+    if (fEstado === 'ACTIVAS') all = all.filter(a => a.vinculada !== false);
+    if (fEstado === 'INACTIVAS') all = all.filter(a => a.vinculada === false);
+    if (q.trim()) {
+      const t = q.trim().toLowerCase();
+      all = all.filter(a => (a.nombre || '').toLowerCase().includes(t) || (a.nit || '').toLowerCase().includes(t)
+        || (a.contactos || []).some(c => (c.nombre || '').toLowerCase().includes(t))
+        || (a.ramos || []).some(r => r.toLowerCase().includes(t)));
+    }
+    const ramosAll = Array.from(new Set(todas.reduce((acc, a) => acc.concat(a.ramos || []), []))).sort();
+    const base = todas.filter(a => paisOK(a.pais));
+    const vinc = base.filter(a => a.vinculada !== false);
+    const conContactoPpal = base.filter(a => (a.contactos || []).some(c => c.principal));
+    const conAcceso = base.filter(a => (a.portales || []).some(p => p.estadoAcceso === 'Acceso disponible'));
+    const conDocs = base.filter(a => (a.docs || []).length);
+    const pendActualizar = base.filter(a => (a.portales || []).some(p => p.estadoAcceso === 'Requiere actualización'));
+    const puedeEditar = canEdit();
+
     host.innerHTML = `<div class="page">
-      ${K.banner({ icon: '🏢', title: 'Orbit Aseguradoras', sub: 'Directorio, contactos, accesos, cuentas y documentos', features: [], actions: `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button><button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>` })}
+      ${K.banner({ icon: '🏢', title: 'Orbit Aseguradoras', sub: 'Directorio operativo: contactos, accesos, cuentas, productos y documentos', features: [], actions: `${puedeEditar ? `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button>` : ''}${puedeEditar ? '<button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>' : ''}` })}
       ${K.kpis([
-        { label: 'En directorio', val: all.length, color: 'var(--red)', foot: 'GT + CO', onclick: "location.hash='#/aseguradoras'" },
-        { label: 'Vinculadas', val: vinc.length, color: 'var(--ok)', foot: 'con vinculación activa', footTone: 'up', onclick: "location.hash='#/aseguradoras'" },
-        { label: 'Sin vincular', val: all.length - vinc.length, color: 'var(--ink-3)', foot: 'disponibles', onclick: "location.hash='#/aseguradoras'" }
+        { label: 'Activas', val: vinc.length, color: 'var(--ok)', foot: 'de ' + base.length + ' en directorio', footTone: 'up', onclick: "Orbit.modules.aseguradoras.kpi('activas')" },
+        { label: 'Con contacto principal', val: conContactoPpal.length, color: 'var(--red)', foot: 'marcado como principal', onclick: "Orbit.modules.aseguradoras.kpi('contacto')" },
+        { label: 'Con acceso disponible', val: conAcceso.length, color: 'var(--info)', foot: 'según último registro', onclick: "Orbit.modules.aseguradoras.kpi('acceso')" },
+        { label: 'Con documentación', val: conDocs.length, color: 'var(--ink-3)', foot: 'con documentos cargados', onclick: "Orbit.modules.aseguradoras.kpi('docs')" },
+        { label: 'Requieren actualización', val: pendActualizar.length, color: 'var(--warn)', foot: 'revisar acceso', footTone: pendActualizar.length ? 'down' : undefined, onclick: "Orbit.modules.aseguradoras.kpi('pend')" }
       ])}
-      <div class="cfg-note" style="margin-bottom:14px">Habilita/deshabilita cada aseguradora según las <b>vinculaciones</b> del intermediario (las deshabilitadas no aparecen al cotizar/emitir). <b>Importar</b> agrega o actualiza el directorio de forma inteligente, o solo almacena documentos. Quién puede ver este módulo se define en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/equipo'">Equipo y permisos</a>.</div>
-      <div class="asg-grid">${all.map(a => card(a)).join('')}</div>
+      <div class="cfg-note" style="margin-bottom:12px">${puedeEditar ? 'Activa o desactiva cada aseguradora según tus <b>vinculaciones</b> vigentes (las desactivadas no aparecen al cotizar ni al emitir). <b>Importar</b> agrega o actualiza el directorio.' : `Vista de solo lectura para tu rol (<b>${U.esc(activeRole())}</b>) — la edición y la importación las hace Dirección/Admin.`} Quién puede ver este módulo se define en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/equipo'">Equipo y permisos</a>.</div>
+      <div class="cfg-note" style="margin-bottom:14px">🔗 Este directorio alimenta al <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/cotizador'">Cotizador</a> (solo cotiza los ramos que actives por aseguradora) y al <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/comparativo'">Comparativo</a> (compara esas cotizaciones o propuestas en PDF).</div>
+      <div class="card pad" style="margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input id="asg-q" class="o-sel" style="flex:1.5;min-width:200px" placeholder="🔎 Buscar por nombre, NIT, contacto o ramo…" value="${U.esc(q)}">
+        <select id="asg-fpais" class="o-sel" style="width:120px"><option value="TODOS" ${fPais === 'TODOS' ? 'selected' : ''}>Todo país</option><option value="GT" ${fPais === 'GT' ? 'selected' : ''}>GT</option><option value="CO" ${fPais === 'CO' ? 'selected' : ''}>CO</option></select>
+        <select id="asg-fram" class="o-sel" style="width:160px"><option value="">Todo ramo</option>${ramosAll.map(r => `<option ${r === fRamo ? 'selected' : ''}>${r}</option>`).join('')}</select>
+        <select id="asg-fest" class="o-sel" style="width:140px"><option value="TODAS" ${fEstado === 'TODAS' ? 'selected' : ''}>Todas</option><option value="ACTIVAS" ${fEstado === 'ACTIVAS' ? 'selected' : ''}>Activas</option><option value="INACTIVAS" ${fEstado === 'INACTIVAS' ? 'selected' : ''}>Inactivas</option></select>
+      </div>
+      <div class="asg-grid">${all.map(a => card(a)).join('') || '<div class="muted" style="padding:16px">Sin resultados para este filtro.</div>'}</div>
     </div>`;
-    host.querySelector('#asg-new').addEventListener('click', nueva);
-    host.querySelector('#asg-imp').addEventListener('click', () => Orbit.importa.open('directorio-aseguradoras', { onDone: reload }));
-    host.querySelectorAll('[data-asg]').forEach(el => el.addEventListener('click', e => { if (e.target.closest('.asg-switch')) return; ficha(el.dataset.asg); }));
-    host.querySelectorAll('[data-toggle]').forEach(t => t.addEventListener('change', e => { e.stopPropagation(); up(t.dataset.toggle, { vinculada: t.checked }); render(host); }));
+    if (host.querySelector('#asg-new')) host.querySelector('#asg-new').addEventListener('click', nueva);
+    if (host.querySelector('#asg-imp')) host.querySelector('#asg-imp').addEventListener('click', () => { if (!canEdit()) { U.toast('Solo Dirección/Admin puede importar.'); return; } Orbit.importa.open('directorio-aseguradoras', { onDone: reload }); });
+    host.querySelector('#asg-q').addEventListener('input', e => { q = e.target.value; render(host); });
+    host.querySelector('#asg-fpais').addEventListener('change', e => { fPais = e.target.value; render(host); });
+    host.querySelector('#asg-fram').addEventListener('change', e => { fRamo = e.target.value; render(host); });
+    host.querySelector('#asg-fest').addEventListener('change', e => { fEstado = e.target.value; render(host); });
+    host.querySelectorAll('[data-asg]').forEach(el => el.addEventListener('click', e => { if (e.target.closest('.asg-switch') || e.target.closest('[data-act]')) return; ficha(el.dataset.asg); }));
+    host.querySelectorAll('[data-toggle]').forEach(t => t.addEventListener('change', async e => {
+      e.stopPropagation();
+      if (!canEdit()) { e.target.checked = !e.target.checked; U.toast('Solo Dirección/Admin puede cambiar la vinculación.'); return; }
+      const id = t.dataset.toggle, next = t.checked;
+      const motivo = await U.prompt('Motivo del cambio de vinculación:', { title: next ? 'Activar aseguradora' : 'Desactivar aseguradora' });
+      if (motivo == null) { e.target.checked = !next; return; }
+      const cur = S().get('aseguradoras', id);
+      up(id, { vinculada: next, actividad: log(cur, { cambio: (next ? 'Activada' : 'Desactivada') + ' la vinculación', motivo }) });
+      render(host);
+    }));
+    host.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', e => {
+      e.stopPropagation();
+      const [act, id] = [b.dataset.act, b.dataset.id];
+      const a = S().get('aseguradoras', id); if (!a) return;
+      if (act === 'contactar') { ficha(id); setTimeout(() => selectTab('contactos'), 0); }
+      if (act === 'plataforma') { ficha(id); setTimeout(() => selectTab('plataformas'), 0); }
+      if (act === 'drive') { if (a.drive) window.open(a.drive.match(/^https?:/) ? a.drive : 'https://' + a.drive, '_blank', 'noopener'); }
+    }));
+    const deepId = Orbit.route && Orbit.route.params && Orbit.route.params.ficha;
+    if (deepId && S().get('aseguradoras', deepId)) ficha(deepId);
   }
 
   function card(a) {
     const on = a.vinculada !== false;
     const nPol = S().where('polizas', p => p.aseguradoraId === a.id).length;
+    const contactoP = (a.contactos || []).find(c => c.principal) || (a.contactos || [])[0];
+    const portales = a.portales || [];
+    const estAcc = portales.length ? (portales.some(p => p.estadoAcceso === 'Acceso disponible') ? 'Acceso disponible' : portales.some(p => p.estadoAcceso === 'Requiere actualización') ? 'Requiere actualización' : 'Pendiente de conexión segura') : 'Sin acceso registrado';
+    const estDoc = (a.docs || []).length ? ((a.docs || []).length + ' documentos') : 'Sin documentos';
+    const productos = (a.ramos || []).slice(0, 3);
     const logo = a.logo ? `<span class="asg-dot" style="padding:0;overflow:hidden"><img src="${a.logo}" style="width:100%;height:100%;object-fit:contain"></span>` : `<span class="asg-dot" style="background:${a.color}">${U.esc(a.nombre[0])}</span>`;
     return `<div class="asg-card ${on ? '' : 'off'}" data-asg="${a.id}">
       <div class="asg-card-h">
         ${logo}
         <div style="flex:1;min-width:0"><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11.5px">${a.pais} · ${(a.ramos || []).length} ramos · ${nPol} pólizas</div></div>
-        <label class="asg-switch" title="Vinculación" onclick="event.stopPropagation()"><input type="checkbox" data-toggle="${a.id}" ${on ? 'checked' : ''}><span></span></label>
+        <label class="asg-switch" title="Vinculación" onclick="event.stopPropagation()"><input type="checkbox" data-toggle="${a.id}" ${on ? 'checked' : ''} ${canEdit() ? '' : 'disabled'}><span></span></label>
       </div>
-      <div class="asg-card-tags">${(a.ramos || []).slice(0, 4).map(r => `<span class="badge neutral">${r}</span>`).join('')}</div>
+      <div class="asg-card-tags">${productos.map(r => `<span class="badge neutral">${r}</span>`).join('')}</div>
+      <div style="font-size:11.5px;color:var(--ink-2);margin-top:8px;display:grid;gap:3px">
+        <div>👤 ${contactoP ? U.esc(contactoP.nombre || contactoP.area) + (contactoP.tel ? ' · ' + U.esc(contactoP.tel) : '') : 'Sin contacto registrado'}</div>
+        <div>🔗 <span class="badge ${ACCESO_TONE[estAcc] || 'neutral'}" style="font-size:10.5px">${estAcc}</span> · 📎 ${estDoc}</div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn ghost sm" data-act="contactar" data-id="${a.id}">👤 Contactar</button>
+        <button class="btn ghost sm" data-act="plataforma" data-id="${a.id}">🔗 Plataforma</button>
+        ${a.drive ? `<button class="btn ghost sm" data-act="drive" data-id="${a.id}">📁 Drive</button>` : ''}
+      </div>
     </div>`;
   }
 
   function nueva() {
+    if (!canEdit()) { U.toast('Solo Dirección/Admin puede crear aseguradoras.'); return; }
     const pais = (Orbit.pais && Orbit.pais !== 'TODOS') ? Orbit.pais : 'GT';
     const id = 'asg' + Date.now().toString().slice(-6);
-    S().insert('aseguradoras', { id, nombre: 'Nueva aseguradora', color: '#1f3a5f', pais, ramos: [], comisionDefault: 12, comisiones: {}, comisionesProd: {}, vinculada: false, contactos: [], cuentas: [], portales: [], docs: [], docsRequeridos: [], facturacion: {} });
-    ficha(id);
+    const ent = {
+      id, nombre: 'Nueva aseguradora', color: '#1f3a5f', pais, ramos: [], comisionDefault: 12, comisiones: {}, comisionesProd: {}, ramosHabilitados: {}, ramosDetalle: {},
+      vinculada: false, contactos: [], cuentas: [], portales: [], docs: [], docsRequeridos: [], productos: [], facturacion: {}, actividad: [], creadaEnSesion: true
+    };
+    ent.actividad = log(ent, { cambio: 'Aseguradora creada' });
+    S().insert('aseguradoras', ent);
+    ficha(id, true);
   }
 
-  /* ===================== FICHA EDITABLE ===================== */
+  /* ===================== FICHA POR PESTAÑAS (DRAFT REAL) ===================== */
+  const TABS = [
+    ['resumen', '📋 Resumen'], ['contactos', '👤 Contactos'], ['plataformas', '🔗 Plataformas'],
+    ['bancos', '🏦 Bancos y pagos'], ['productos', '📦 Productos y planes'], ['documentos', '📁 Documentos y Drive'],
+    ['tarifas', '🧮 Tarifas y conocimiento'], ['actividad', '🕒 Actividad']
+  ];
+  // por-id: { tab, editing, draft } — draft es una copia editable; SOLO se escribe al store en "Guardar cambios"
+  const fichaState = {};
+  function cloneEnt(a) { return JSON.parse(JSON.stringify(a)); }
+
+  function selectTab(t) {
+    const back = document.getElementById('asg-ficha'); if (!back) return;
+    const id = back.dataset.id;
+    fichaState[id].tab = t;
+    back.querySelectorAll('[data-tab]').forEach(b => { const on = b.dataset.tab === t; b.classList.toggle('active', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    const body = back.querySelector('#af-body');
+    const st = fichaState[id]; const data = st.editing ? st.draft : S().get('aseguradoras', id);
+    if (!data || !body) return;
+    body.innerHTML = tabBody(data, t, st.editing);
+    wireBody(back, data, t);
+  }
+
   function ficha(id, startEdit) {
     const a = S().get('aseguradoras', id); if (!a) return;
-    const f = a.facturacion || {};
-    const cont = a.contactos || [], cuentas = a.cuentas || [];
-    // portales: migrar el portal único viejo a array
-    const portales = a.portales && a.portales.length ? a.portales : (a.portal ? [{ nombre: 'Portal principal', url: a.portal, usuario: '', pass: '' }] : []);
-    const docs = a.docs || [], reqs = a.docsRequeridos || [];
-    const ramos = a.ramos || [];
-    const toneTipo = { 'Comercial / Técnico': 'info', 'Comercial': 'info', 'Técnico': 'info', 'Administrativo': 'neutral', 'Siniestros': 'danger' };
-    const catTone = { 'Tarifas': 'warn', 'Cotización ejemplo': 'info', 'Póliza ejemplo': 'ok', 'Formularios': 'neutral', 'Comercial': 'neutral' };
+    const wantEdit = !!startEdit && canEdit();
+    if ((Orbit.route && Orbit.route.params && Orbit.route.params.ficha) !== id) { history.replaceState(null, '', '#/aseguradoras?ficha=' + id); if (Orbit.route) Orbit.route.params = Object.assign({}, Orbit.route.params, { ficha: id }); }
+    fichaState[id] = { tab: (fichaState[id] || {}).tab || 'resumen', editing: wantEdit, draft: wantEdit ? cloneEnt(a) : null };
+    const st = fichaState[id];
+    const data = st.editing ? st.draft : a;
     let back = document.getElementById('asg-ficha'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'asg-ficha'; back.className = 'drawer-back open';
+    back = document.createElement('div'); back.id = 'asg-ficha'; back.className = 'drawer-back open'; back.dataset.id = id;
     back.style.display = 'grid'; back.style.placeItems = 'center';
-    back.innerHTML = `<div class="card" style="width:min(860px,96vw);max-height:92vh;overflow:auto;padding:0">
+    back.innerHTML = `<div class="card" style="width:min(920px,96vw);max-height:92vh;overflow:hidden;padding:0;display:flex;flex-direction:column">
       <div style="padding:20px 24px;background:linear-gradient(120deg,${a.color},#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <div style="display:flex;gap:13px;align-items:center">
-          <label class="asg-logo" title="Cargar logo">${a.logo ? `<img src="${a.logo}">` : '<span>🏢<br><small>logo</small></span>'}<input type="file" id="af-logo" accept="image/*" style="display:none"></label>
+          <span class="asg-logo">${a.logo ? `<img src="${a.logo}">` : '<span>🏢<br><small>logo</small></span>'}</span>
           <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Aseguradora · ${a.pais}</div>
-            <input id="af-nombre" value="${U.esc(a.nombre)}" style="font-family:var(--f-display);font-weight:800;font-size:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;padding:4px 10px">
-            <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'}</div></div>
+            <div style="font-family:var(--f-display);font-weight:800;font-size:20px;color:#fff">${U.esc(a.nombre)}</div>
+            <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'}${st.editing ? ' · <b>Editando</b>' : ''}</div></div>
         </div>
-        <button class="imp-x" id="af-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
-      </div>
-      <div style="padding:18px 22px;display:grid;gap:16px">
-
-        <div class="asg-sec">
-          <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">🔗 Accesos / portales <button class="btn ghost sm" id="af-add-portal">+ Portal</button></div>
-          <div id="af-portales">${portales.map((p, i) => portalRow(p, i)).join('') || '<div class="muted" style="font-size:12px">Sin portales. Algunas aseguradoras tienen varios — agrégalos arriba.</div>'}</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px;align-items:flex-end"><label class="ce-l" style="flex:1">📁 Drive / repositorio<input id="af-drive" class="o-sel" value="${U.esc(a.drive || '')}"></label>${a.drive ? `<a class="asg-link" href="${a.drive.match(/^https?:/) ? a.drive : 'https://' + a.drive}" target="_blank" rel="noopener" title="Abrir Drive">↗ Abrir</a>` : ''}</div>
-        </div>
-
-        <div class="asg-sec">
-          <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">👤 Contactos <button class="btn ghost sm" id="af-add-cont">+ Contacto</button></div>
-          <div id="af-contactos">${cont.map((c, i) => contRow(c, i, toneTipo)).join('') || '<div class="muted" style="font-size:12px">Sin contactos.</div>'}</div>
-        </div>
-
-        <div class="asg-grid2">
-          <div class="asg-sec">
-            <div class="asg-sec-t">🧾 Datos de facturación</div>
-            <label class="ce-l">NIT<input id="af-nit" class="o-sel" value="${U.esc(a.nit || '')}"></label>
-            <label class="ce-l" style="margin-top:8px">Razón social<input id="af-rs" class="o-sel" value="${U.esc(f.razonSocial || '')}"></label>
-            <label class="ce-l" style="margin-top:8px">Patrón de concepto<input id="af-patron" class="o-sel" value="${U.esc(f.patronConcepto || '')}"></label>
-            <label class="ce-l" style="margin-top:8px">Dirección fiscal<input id="af-dir" class="o-sel" value="${U.esc(f.dirFiscal || '')}"></label>
-          </div>
-          <div class="asg-sec">
-            <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">🏦 Cuentas <button class="btn ghost sm" id="af-add-cta">+ Cuenta</button></div>
-            <div id="af-cuentas">${cuentas.map((c, i) => ctaRow(c, i)).join('') || '<div class="muted" style="font-size:12px">Sin cuentas.</div>'}</div>
-          </div>
-        </div>
-
-        <div class="asg-sec">
-          <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">📎 Documentos <button class="btn ghost sm" id="af-add-doc">+ Documento</button></div>
-          <div class="muted" style="font-size:11.5px;margin-bottom:9px">Tarifas, cotizaciones de ejemplo y PDFs de pólizas <b>alimentan la IA, el Cotizador y el Comparativo</b>.</div>
-          <div id="af-docs">${docs.map((d, i) => docRow(d, i, catTone)).join('') || '<div class="muted" style="font-size:12px">Sin documentos.</div>'}</div>
-          <button class="btn ghost sm" style="margin-top:9px" id="af-imp-doc">✨ Importar documentos (mapeo inteligente)</button>
-        </div>
-
-        <div class="asg-sec">
-          <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">💵 Comisiones por ramo <button class="btn ghost sm" id="af-add-ramo">+ Ramo</button></div>
-          <div class="muted" style="font-size:11.5px;margin-bottom:9px">Editable a mano o por <b>importación de la planilla de comisiones</b>.</div>
-          <div id="af-ramos" class="ct-grid">${ramos.map((r, i) => ramoRow(a, r, i)).join('') || '<div class="muted" style="font-size:12px">Sin ramos.</div>'}</div>
-          <button class="btn ghost sm" style="margin-top:9px" id="af-imp-com">⬇ Importar planilla de comisiones</button>
-        </div>
-
-        <div class="asg-sec">
-          <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">📋 Documentos requeridos para emisión (por producto) <button class="btn ghost sm" id="af-add-req">+ Requisito</button></div>
-          <div id="af-reqs">${reqs.map((r, i) => reqRow(r, i)).join('') || '<div class="muted" style="font-size:12px">Sin requisitos.</div>'}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${canEdit() ? (st.editing ? '' : `<button class="btn ghost sm" id="af-editar" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff">✏ Editar</button>`) : '<span class="badge neutral" style="background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)">Solo lectura</span>'}
+          <button class="imp-x" id="af-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
         </div>
       </div>
-      <div style="padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card)">
-        <button class="btn ghost" id="af-del" style="color:var(--danger)">🗑 Borrar aseguradora</button>
-        <div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cerrar</button><button class="btn ghost" id="af-editar">✏ Editar</button><button class="btn primary" id="af-save" style="display:none">Guardar cambios</button></div>
+      <div class="asg-tabbar" role="tablist">${TABS.map(([k, l]) => `<button class="asg-tab ${k === st.tab ? 'active' : ''}" role="tab" aria-selected="${k === st.tab}" data-tab="${k}">${l}</button>`).join('')}</div>
+      <div id="af-body" role="tabpanel" style="padding:18px 22px;overflow:auto;flex:1">${tabBody(data, st.tab, st.editing)}</div>
+      <div style="padding:12px 22px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
+        ${st.editing
+          ? `<div style="display:flex;gap:8px"><button class="btn primary" id="af-guardar">💾 Guardar cambios</button><button class="btn ghost" id="af-cancelar">✕ Cancelar</button></div>`
+          : (canEdit() ? '<button class="btn ghost" id="af-del" style="color:var(--danger)">🗑 Borrar / desactivar</button>' : '<span></span>')}
+        <button class="btn ghost" data-close>Cerrar</button>
       </div>
     </div>`;
     document.body.appendChild(back);
-    const $ = s => back.querySelector(s);
-    const close = () => back.remove();
-    // modo vista por defecto: deshabilita controles y oculta botones de edición
-    const card = back.querySelector('.card');
-    function setEdit(on) {
-      back.querySelectorAll('input, select, textarea').forEach(el => { if (el.type !== 'file') el.disabled = !on; });
-      back.querySelectorAll('.btn.sm, .asg-del, #af-add-portal, #af-add-cont, #af-add-cta, #af-add-doc, #af-add-req, #af-add-ramo').forEach(b => b.style.display = on ? '' : 'none');
-      $('#af-save').style.display = on ? '' : 'none';
-      $('#af-editar').style.display = on ? 'none' : '';
-      $('#af-del').style.visibility = on ? '' : 'hidden';
-      card.classList.toggle('asg-view', !on);
-    }
-    $('#af-editar').addEventListener('click', () => setEdit(true));
-    setEdit(!!startEdit);
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    $('#af-x').addEventListener('click', close); back.querySelector('[data-close]').addEventListener('click', close);
-
-    // logo
-    $('#af-logo').addEventListener('change', e => { const file = e.target.files[0]; if (!file) return; const rd = new FileReader(); rd.onload = () => { up(id, { logo: rd.result }); ficha(id); reload(); }; rd.readAsDataURL(file); });
-    // add-rows (persisten y reabren la ficha)
-    // snapshot: guarda lo escrito en el formulario ANTES de re-renderizar (evita perder filas no guardadas)
-    function snapshot() {
-      const g = s => (back.querySelector(s) || {}).value || '';
-      const portalesNew = [...back.querySelectorAll('[data-portal]')].map(row => ({ nombre: row.querySelector('[data-pn]').value, url: row.querySelector('[data-pu]').value, usuario: row.querySelector('[data-pus]').value, pass: row.querySelector('[data-pp]').value }));
-      const contNew = [...back.querySelectorAll('[data-cont]')].map(row => ({ tipo: row.querySelector('[data-ct]').value, nombre: row.querySelector('[data-cn]').value, email: row.querySelector('[data-ce]').value, tel: row.querySelector('[data-cl]').value }));
-      const ctaNew = [...back.querySelectorAll('[data-cta]')].map(row => ({ banco: row.querySelector('[data-cb]').value, tipo: row.querySelector('[data-ctt]').value, numero: row.querySelector('[data-ccn]').value, moneda: row.querySelector('[data-cm]').value }));
-      const docNew = [...back.querySelectorAll('[data-doc]')].map(row => ({ nombre: row.querySelector('[data-dn]').value, cat: row.querySelector('[data-dc]').value }));
-      const reqNew = [...back.querySelectorAll('[data-req]')].map(row => ({ producto: row.querySelector('[data-rp]').value, items: row.querySelector('[data-ri]').value }));
-      const comNew = Object.assign({}, S().get('aseguradoras', id).comisiones);
-      back.querySelectorAll('[data-ramopct]').forEach(inp => { comNew[inp.dataset.ramopct] = +inp.value || 0; });
-      up(id, { nombre: g('#af-nombre') || a.nombre, drive: g('#af-drive'), nit: g('#af-nit'), facturacion: { razonSocial: g('#af-rs'), patronConcepto: g('#af-patron'), dirFiscal: g('#af-dir') }, portales: portalesNew, contactos: contNew, cuentas: ctaNew, docs: docNew, docsRequeridos: reqNew, comisiones: comNew });
-    }
-    const push = (key, obj) => { snapshot(); const arr = (S().get('aseguradoras', id)[key] || []).slice(); arr.push(obj); up(id, { [key]: arr }); ficha(id, true); };
-    $('#af-add-portal').addEventListener('click', () => push('portales', { nombre: 'Portal', url: '', usuario: '', pass: '' }));
-    $('#af-add-cont').addEventListener('click', () => push('contactos', { tipo: 'Comercial / Técnico', nombre: '', email: '', tel: '' }));
-    $('#af-add-cta').addEventListener('click', () => push('cuentas', { banco: '', tipo: 'Monetaria', numero: '', moneda: a.pais === 'GT' ? 'GTQ' : 'COP' }));
-    $('#af-add-doc').addEventListener('click', () => push('docs', { nombre: 'Documento.pdf', cat: 'Tarifas' }));
-    $('#af-add-req').addEventListener('click', () => push('docsRequeridos', { producto: '', items: '' }));
-    $('#af-add-ramo').addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; const rr = (S().get('aseguradoras', id).ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); const com = Object.assign({}, S().get('aseguradoras', id).comisiones); com[r] = a.comisionDefault || 12; up(id, { ramos: rr, comisiones: com }); ficha(id, true); });
-    // delete-row buttons
-    back.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
-      const [key, idx] = b.dataset.del.split(':'); const arr = (S().get('aseguradoras', id)[key] || []).slice(); arr.splice(+idx, 1); up(id, { [key]: arr }); ficha(id, true);
-    }));
-    // importers
-    $('#af-imp-doc').addEventListener('click', () => { close(); Orbit.importa.open('docs-aseguradora', { onDone: reload }); });
-    $('#af-imp-com').addEventListener('click', () => { close(); Orbit.importa.open('planillas-comision', { onDone: reload }); });
-    // delete aseguradora
-    $('#af-del').addEventListener('click', async () => { if (!(await U.confirm('¿Borrar esta aseguradora del directorio?', { title: 'Eliminar aseguradora', ok: 'Eliminar' }))) return; S().remove('aseguradoras', id); close(); reload(); });
-    // save
-    $('#af-save').addEventListener('click', () => {
-      const g = s => (back.querySelector(s) || {}).value || '';
-      const portalesNew = [...back.querySelectorAll('[data-portal]')].map(row => ({ nombre: row.querySelector('[data-pn]').value, url: row.querySelector('[data-pu]').value, usuario: row.querySelector('[data-pus]').value, pass: row.querySelector('[data-pp]').value }));
-      const contNew = [...back.querySelectorAll('[data-cont]')].map(row => ({ tipo: row.querySelector('[data-ct]').value, nombre: row.querySelector('[data-cn]').value, email: row.querySelector('[data-ce]').value, tel: row.querySelector('[data-cl]').value }));
-      const ctaNew = [...back.querySelectorAll('[data-cta]')].map(row => ({ banco: row.querySelector('[data-cb]').value, tipo: row.querySelector('[data-ctt]').value, numero: row.querySelector('[data-ccn]').value, moneda: row.querySelector('[data-cm]').value }));
-      const docNew = [...back.querySelectorAll('[data-doc]')].map(row => ({ nombre: row.querySelector('[data-dn]').value, cat: row.querySelector('[data-dc]').value }));
-      const reqNew = [...back.querySelectorAll('[data-req]')].map(row => ({ producto: row.querySelector('[data-rp]').value, items: row.querySelector('[data-ri]').value }));
-      const comNew = Object.assign({}, S().get('aseguradoras', id).comisiones);
-      back.querySelectorAll('[data-ramopct]').forEach(inp => { comNew[inp.dataset.ramopct] = +inp.value || 0; });
-      up(id, {
-        nombre: g('#af-nombre') || a.nombre, drive: g('#af-drive'), nit: g('#af-nit'),
-        facturacion: { razonSocial: g('#af-rs'), patronConcepto: g('#af-patron'), dirFiscal: g('#af-dir') },
-        portales: portalesNew, contactos: contNew, cuentas: ctaNew, docs: docNew, docsRequeridos: reqNew, comisiones: comNew
-      });
-      close(); reload();
-    });
+    Orbit.vault.wire(back);
+    back.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
+    if (back.querySelector('#af-editar')) back.querySelector('#af-editar').addEventListener('click', () => ficha(id, true));
+    if (back.querySelector('#af-guardar')) back.querySelector('#af-guardar').addEventListener('click', () => guardarDraft(id, back));
+    if (back.querySelector('#af-cancelar')) back.querySelector('#af-cancelar').addEventListener('click', () => { fichaState[id].editing = false; fichaState[id].draft = null; ficha(id); });
+    const cerrarFicha = () => { if (st.editing) { fichaState[id].editing = false; fichaState[id].draft = null; } back.remove(); history.replaceState(null, '', '#/aseguradoras'); if (Orbit.route) { const p = Object.assign({}, Orbit.route.params); delete p.ficha; Orbit.route.params = p; } };
+    back.querySelector('#af-x').addEventListener('click', cerrarFicha);
+    back.querySelector('[data-close]').addEventListener('click', cerrarFicha);
+    back.addEventListener('click', e => { if (e.target === back) cerrarFicha(); });
+    if (back.querySelector('#af-del')) back.querySelector('#af-del').addEventListener('click', () => borrarOdesactivar(id, back));
+    wireBody(back, data, st.tab);
   }
 
-  /* ---- filas editables ---- */
-  function portalRow(p, i) {
-    return `<div class="asg-row" data-portal="${i}">
-      <input class="o-sel" data-pn placeholder="Nombre del portal" value="${U.esc(p.nombre || '')}" style="flex:1.2">
-      <input class="o-sel" data-pu placeholder="https://…" value="${U.esc(p.url || '')}" style="flex:1.5">
-      <input class="o-sel" data-pus placeholder="Usuario" value="${U.esc(p.usuario || '')}" style="flex:1">
-      <input class="o-sel" data-pp type="password" placeholder="Contraseña" value="${U.esc(p.pass || '')}" style="flex:1">
-      ${p.url ? `<a class="asg-link" href="${p.url.match(/^https?:/) ? p.url : 'https://' + p.url}" target="_blank" rel="noopener" title="Abrir portal">↗</a>` : ''}
-      <button class="asg-del" data-del="portales:${i}" title="Quitar">✕</button></div>`;
+  /* ---- diff simple (top-level) para trazabilidad antes/después ---- */
+  function diffResumen(before, after) {
+    const claves = ['nombre', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada'];
+    const cambios = [];
+    claves.forEach(k => { const b = JSON.stringify(before[k]), a2 = JSON.stringify(after[k]); if (b !== a2) cambios.push(k); });
+    return cambios;
   }
-  function contRow(c, i, tone) {
-    const tipos = ['Comercial / Técnico', 'Administrativo', 'Siniestros', 'Cobranzas', 'Dirección'];
-    return `<div class="asg-row" data-cont="${i}">
-      <select class="o-sel" data-ct style="flex:1">${tipos.map(t => `<option ${t === c.tipo ? 'selected' : ''}>${t}</option>`).join('')}</select>
-      <input class="o-sel" data-cn placeholder="Nombre" value="${U.esc(c.nombre || '')}" style="flex:1">
-      <input class="o-sel" data-ce placeholder="Correo" value="${U.esc(c.email || '')}" style="flex:1.3">
-      <input class="o-sel" data-cl placeholder="Teléfono" value="${U.esc(c.tel || '')}" style="flex:1">
-      <button class="asg-del" data-del="contactos:${i}">✕</button></div>`;
+
+  async function guardarDraft(id, back) {
+    const st = fichaState[id]; if (!st || !st.draft) return;
+    const before = S().get('aseguradoras', id); if (!before) return;
+    const cambios = diffResumen(before, st.draft);
+    if (!cambios.length) { st.editing = false; st.draft = null; ficha(id); return; }
+    const motivo = await U.prompt('Se detectaron cambios en: ' + cambios.join(', ') + '.\n\nMotivo del cambio:', { title: 'Guardar cambios' });
+    if (motivo == null) return; // cancelar no escribe nada
+    const patch = Object.assign({}, st.draft, { actividad: log(before, { cambio: 'Actualización de ficha (' + cambios.join(', ') + ')', motivo, camposCambiados: cambios }) });
+    delete patch.id;
+    up(id, patch);
+    st.editing = false; st.draft = null;
+    ficha(id); reload();
   }
-  function ctaRow(c, i) {
-    return `<div class="asg-row" data-cta="${i}">
-      <input class="o-sel" data-cb placeholder="Banco" value="${U.esc(c.banco || '')}" style="flex:1.3">
-      <input class="o-sel" data-ctt placeholder="Tipo" value="${U.esc(c.tipo || '')}" style="flex:1">
-      <input class="o-sel" data-ccn placeholder="N.º cuenta" value="${U.esc(c.numero || '')}" style="flex:1">
-      <input class="o-sel" data-cm placeholder="Moneda" value="${U.esc(c.moneda || '')}" style="width:64px">
-      <button class="asg-del" data-del="cuentas:${i}">✕</button></div>`;
+
+  /* ---- borrado seguro: normal = SOLO desactivar; borrado físico exige cero vínculos + auditoría externa previa ---- */
+  function vinculos(id) {
+    return {
+      polizas: S().where('polizas', p => p.aseguradoraId === id).length,
+      cobros: S().where('cobros', c => { const p = S().get('polizas', c.polizaId); return p && p.aseguradoraId === id; }).length,
+      comisiones: (S().all('comisiones') || []).filter(c => c.aseguradoraId === id).length,
+      reclamos: (S().all('reclamos') || []).filter(r => r.aseguradoraId === id).length,
+      gestiones: (S().all('gestiones') || []).filter(g => g.aseguradoraId === id).length,
+      negocios: (S().all('negocios') || []).filter(n => n.aseguradoraId === id).length
+    };
   }
-  function docRow(d, i, tone) {
-    const cats = ['Tarifas', 'Cotización ejemplo', 'Póliza ejemplo', 'Formularios', 'Comercial'];
-    return `<div class="asg-row" data-doc="${i}">
-      <span style="font-size:14px">📎</span>
-      <input class="o-sel" data-dn value="${U.esc(d.nombre || '')}" style="flex:1.5">
-      <select class="o-sel" data-dc style="flex:1">${cats.map(c => `<option ${c === d.cat ? 'selected' : ''}>${c}</option>`).join('')}</select>
-      <button class="asg-del" data-del="docs:${i}">✕</button></div>`;
+  async function borrarOdesactivar(id, back) {
+    const a = S().get('aseguradoras', id); if (!a) return;
+    const v = vinculos(id);
+    const total = Object.keys(v).reduce((s, k) => s + v[k], 0);
+    if (total > 0) {
+      const detalle = Object.keys(v).filter(k => v[k] > 0).map(k => v[k] + ' ' + k).join(', ');
+      const motivo = await U.prompt(`Esta aseguradora tiene vínculos activos: ${detalle}. No se ofrece borrado — solo desactivar (conserva histórico).\n\nMotivo de la desactivación:`, { title: 'Desactivar aseguradora' });
+      if (motivo == null) return;
+      up(id, { vinculada: false, actividad: log(a, { cambio: 'Desactivada (tiene vínculos activos)', motivo, antes: v }) });
+      back.remove(); reload(); return;
+    }
+    // sin vínculos: aun así, por defecto solo se ofrece desactivar. Borrado físico requiere confirmación reforzada explícita.
+    const opcion = await U.confirm('Sin vínculos activos. ¿Querés desactivar (recomendado, reversible) o borrar físicamente (irreversible)?', { title: 'Sin vínculos', ok: 'Desactivar', cancel: 'Borrar físicamente…' });
+    const motivo = await U.prompt('Motivo:', { title: opcion ? 'Desactivar' : 'Borrar físicamente' });
+    if (motivo == null) return;
+    if (opcion) { up(id, { vinculada: false, actividad: log(a, { cambio: 'Desactivada (sin vínculos)', motivo }) }); back.remove(); reload(); return; }
+    if (!(await U.confirm('Esta acción es irreversible y no se puede deshacer. ¿Confirmás el borrado físico de "' + a.nombre + '"?', { title: 'Confirmación reforzada', ok: 'Sí, borrar físicamente' }))) return;
+    // auditoría EXTERNA antes de eliminar (sobrevive al borrado de la entidad)
+    auditExterna({ cambio: 'Borrado físico de aseguradora', aseguradoraId: id, nombre: a.nombre, motivo, snapshot: { pais: a.pais, ramos: a.ramos, nit: a.nit } });
+    S().remove('aseguradoras', id);
+    back.remove(); reload();
   }
-  function reqRow(r, i) {
-    return `<div class="asg-row" data-req="${i}">
-      <input class="o-sel" data-rp placeholder="Producto" value="${U.esc(r.producto || '')}" style="flex:1">
-      <input class="o-sel" data-ri placeholder="Requisitos" value="${U.esc(r.items || '')}" style="flex:2.2">
-      <button class="asg-del" data-del="docsRequeridos:${i}">✕</button></div>`;
+
+  function tabBody(a, t, editing) {
+    if (t === 'resumen') return tabResumen(a, editing);
+    if (t === 'contactos') return tabContactos(a, editing);
+    if (t === 'plataformas') return tabPlataformas(a, editing);
+    if (t === 'bancos') return tabBancos(a, editing);
+    if (t === 'productos') return tabProductos(a, editing);
+    if (t === 'documentos') return tabDocumentos(a, editing);
+    if (t === 'tarifas') return tabTarifas(a, editing);
+    if (t === 'actividad') return tabActividad(a);
+    return '';
   }
-  function ramoRow(a, r, i) {
+
+  /* ---- Resumen ---- */
+  function tabResumen(a, editing) {
+    const f = a.facturacion || {};
+    const ro = editing ? '' : 'disabled';
+    return `<div class="asg-sec"><div class="asg-sec-t">Identidad</div>
+      <div class="cgrid">
+        <label class="ce-l">Nombre comercial<input id="af-nombre" class="o-sel" value="${U.esc(a.nombre || '')}" ${ro}></label>
+        <label class="ce-l">Razón social<input id="af-rs" class="o-sel" value="${U.esc(f.razonSocial || '')}" ${ro}></label>
+        <label class="ce-l">NIT / identificación fiscal<input id="af-nit" class="o-sel" value="${U.esc(a.nit || '')}" ${ro}></label>
+        <label class="ce-l">Código de intermediario<input id="af-cod" class="o-sel" value="${U.esc(a.codigoIntermediario || '')}" ${ro}></label>
+        <label class="ce-l">Sitio web / app<input id="af-web" class="o-sel" value="${U.esc(a.web || '')}" ${ro}></label>
+        <label class="ce-l">Responsable interno<input id="af-resp" class="o-sel" value="${U.esc(a.responsable || '')}" ${ro}></label>
+      </div>
+      <div class="cgrid" style="margin-top:10px">
+        <label class="ce-l">Dirección / oficina<input id="af-dir" class="o-sel" value="${U.esc(f.dirFiscal || '')}" ${ro}></label>
+        <label class="ce-l">Teléfono general<input id="af-tel" class="o-sel" value="${U.esc(a.telGeneral || '')}" ${ro}></label>
+        <label class="ce-l">Emergencia / asistencia<input id="af-emer" class="o-sel" value="${U.esc(a.emergencia || '')}" ${ro}></label>
+        <label class="ce-l">Última revisión<input id="af-rev" class="o-sel" type="date" value="${a.ultimaRevision || ''}" ${ro}></label>
+      </div>
+      <label class="ce-l" style="margin-top:10px">Observaciones<textarea id="af-obs" class="o-sel" rows="2" ${ro}>${U.esc(a.observaciones || '')}</textarea></label>
+      ${editing ? '<div class="cfg-note" style="margin-top:10px">Los cambios de esta y todas las pestañas se aplican al pulsar <b>Guardar cambios</b> abajo (con motivo). <b>Cancelar</b> descarta todo sin tocar el registro.</div>' : ''}
+    </div>`;
+  }
+
+  /* ---- Contactos ---- */
+  const AREAS = ['Comercial', 'Cotizaciones', 'Emisiones', 'Inspecciones', 'Endosos/modificaciones', 'Renovaciones', 'Cobros', 'Aplicación de pagos', 'Siniestros', 'Facturación', 'Comisiones', 'Soporte de plataforma'];
+  function tabContactos(a, editing) {
+    const cont = a.contactos || [];
+    return `<div class="asg-sec">
+      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Contactos ${editing ? '<button class="btn ghost sm" id="af-add-cont">+ Contacto</button>' : ''}</div>
+      <div id="af-contactos">${cont.map((c, i) => contRow(c, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin contactos registrados.</div>'}</div>
+    </div>`;
+  }
+  function contRow(c, i, editing) {
+    const ro = editing ? '' : 'disabled';
+    return `<div class="asg-row" data-cont="${i}" style="flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:4px;font-size:11px" title="Contacto principal"><input type="checkbox" data-cppal ${c.principal ? 'checked' : ''} ${ro}>Ppal.</label>
+      <input class="o-sel" data-cn placeholder="Nombre" value="${U.esc(c.nombre || '')}" style="flex:1" ${ro}>
+      <select class="o-sel" data-ca style="flex:1" ${ro}>${AREAS.map(ar => `<option ${ar === c.area ? 'selected' : ''}>${ar}</option>`).join('')}</select>
+      <input class="o-sel" data-ce placeholder="Correo" value="${U.esc(c.email || '')}" style="flex:1.2" ${ro}>
+      <input class="o-sel" data-cl placeholder="Celular" value="${U.esc(c.tel || '')}" style="flex:1" ${ro}>
+      <input class="o-sel" data-cext placeholder="Ext." value="${U.esc(c.ext || '')}" style="width:60px" ${ro}>
+      <input class="o-sel" data-cargo placeholder="Cargo" value="${U.esc(c.cargo || '')}" style="flex:1" ${ro}>
+      <select class="o-sel" data-cpais style="width:70px" ${ro}><option ${c.pais === 'GT' ? 'selected' : ''}>GT</option><option ${c.pais === 'CO' ? 'selected' : ''}>CO</option></select>
+      <select class="o-sel" data-cchan style="width:110px" ${ro}><option ${c.canal === 'Correo' ? 'selected' : ''}>Correo</option><option ${c.canal === 'WhatsApp' ? 'selected' : ''}>WhatsApp</option><option ${c.canal === 'Teléfono' ? 'selected' : ''}>Teléfono</option></select>
+      <select class="o-sel" data-cvig style="width:100px" ${ro}><option ${c.vigencia === 'Vigente' || !c.vigencia ? 'selected' : ''}>Vigente</option><option ${c.vigencia === 'Por confirmar' ? 'selected' : ''}>Por confirmar</option><option ${c.vigencia === 'Dado de baja' ? 'selected' : ''}>Dado de baja</option></select>
+      <input class="o-sel" data-cgest placeholder="Gestión preferida" value="${U.esc(c.gestionPreferida || '')}" style="flex:1" ${ro}>
+      ${editing ? `<button class="asg-del" data-del="contactos:${i}">✕</button>` : ''}
+    </div>`;
+  }
+
+  /* ---- Plataformas y accesos (sin contraseñas) ---- */
+  function tabPlataformas(a, editing) {
+    const portales = a.portales && a.portales.length ? a.portales : (a.portal ? [{ nombre: 'Portal principal', url: a.portal, estadoAcceso: 'Sin verificar', credentialRef: 'backend_required' }] : []);
+    return `<div class="asg-sec">
+      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Plataformas y accesos ${editing ? '<button class="btn ghost sm" id="af-add-portal">+ Portal</button>' : ''}</div>
+      <div class="cfg-note" style="margin-bottom:9px">Orbit nunca guarda ni muestra contraseñas. El equipo declara el estado de acceso a cada plataforma para mantener el directorio al día.</div>
+      <div id="af-portales">${portales.map((p, i) => portalRow(p, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin plataformas registradas.</div>'}</div>
+      <label class="ce-l" style="margin-top:9px">📁 Drive / repositorio<input id="af-drive" class="o-sel" value="${U.esc(a.drive || '')}" ${editing ? '' : 'disabled'}></label>
+    </div>`;
+  }
+  function portalRow(p, i, editing) {
+    const ro = editing ? '' : 'disabled';
+    const estado = p.estadoAcceso || 'Sin verificar';
+    return `<div class="asg-row" data-portal="${i}" style="flex-wrap:wrap">
+      <input class="o-sel" data-pn placeholder="Producto / sistema" value="${U.esc(p.nombre || '')}" style="flex:1.1" ${ro}>
+      <select class="o-sel" data-ptipo style="width:110px" ${ro}><option ${p.tipo === 'Cotizador' ? 'selected' : ''}>Cotizador</option><option ${p.tipo === 'Emisión' ? 'selected' : ''}>Emisión</option><option ${p.tipo === 'Cobros' ? 'selected' : ''}>Cobros</option><option ${p.tipo === 'Siniestros' ? 'selected' : ''}>Siniestros</option><option ${p.tipo === 'Portal general' || !p.tipo ? 'selected' : ''}>Portal general</option></select>
+      <input class="o-sel" data-pu placeholder="https://…" value="${U.esc(p.url || '')}" style="flex:1.2" ${ro}>
+      <select class="o-sel" data-ppais style="width:70px" ${ro}><option ${p.pais === 'GT' ? 'selected' : ''}>GT</option><option ${p.pais === 'CO' ? 'selected' : ''}>CO</option><option ${p.pais === 'Ambos' || !p.pais ? 'selected' : ''}>Ambos</option></select>
+      <select class="o-sel" data-pest style="flex:1" ${ro}>${ACCESO_ESTADOS.map(e => `<option ${e === estado ? 'selected' : ''}>${e}</option>`).join('')}</select>
+      <input class="o-sel" data-presp placeholder="Responsable" value="${U.esc(p.responsable || '')}" style="flex:1" ${ro}>
+      <input class="o-sel" data-pver type="date" title="Última verificación" value="${p.ultimaVerificacion || ''}" style="width:130px" ${ro}>
+      <span class="badge ${ACCESO_TONE[estado] || 'neutral'}" style="align-self:center">${estado}</span>
+      ${p.url ? `<button class="btn ghost sm" data-open-portal="${U.esc(p.url)}">↗ Abrir</button>` : ''}
+      ${editing ? `<button class="asg-del" data-del="portales:${i}">✕</button>` : ''}
+    </div>`;
+  }
+
+  /* ---- Bancos y pagos ---- */
+  function tabBancos(a, editing) {
+    const cuentas = a.cuentas || [];
+    return `<div class="asg-sec">
+      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Bancos y pagos ${editing ? '<button class="btn ghost sm" id="af-add-cta">+ Cuenta</button>' : ''}</div>
+      <div class="cfg-note" style="margin-bottom:9px">Cuentas ficticias, número enmascarado. Nunca cargar cuentas reales.</div>
+      <div id="af-cuentas">${cuentas.map((c, i) => ctaRow(c, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin cuentas registradas.</div>'}</div>
+    </div>`;
+  }
+  function ctaRow(c, i, editing) {
+    if (!editing) {
+      return `<div class="asg-row" data-cta="${i}" style="flex-wrap:wrap;align-items:center">
+        <span style="flex:1.2;font-size:12.5px">${U.esc(c.banco || '—')}</span>
+        <span style="flex:1;font-size:12.5px">${U.esc(c.tipo || '—')}</span>
+        <span style="flex:1">${Orbit.vault.field(c.numero || '', { mask: 'right4' })}</span>
+        <span style="width:70px;font-size:12.5px">${U.esc(c.moneda || '—')}</span>
+        <span style="flex:1;font-size:12.5px">${U.esc(c.titular || '—')}</span>
+        <span style="flex:1;font-size:12.5px">${U.esc(c.uso || '—')}</span>
+        <span style="flex:1;font-size:11.5px" class="muted">${c.linkPago ? '🔗 link de pago' : ''}</span>
+        <span style="width:130px;font-size:11.5px" class="muted">${c.ultimaVerificacion ? U.fmtDate(c.ultimaVerificacion) : 'sin verificar'}</span>
+      </div>`;
+    }
+    const ro = '';
+    return `<div class="asg-row" data-cta="${i}" style="flex-wrap:wrap">
+      <input class="o-sel" data-cb placeholder="Banco" value="${U.esc(c.banco || '')}" style="flex:1.2" ${ro}>
+      <input class="o-sel" data-ctt placeholder="Tipo de cuenta" value="${U.esc(c.tipo || '')}" style="flex:1" ${ro}>
+      <input class="o-sel" data-ccn placeholder="N.º enmascarado" value="${U.esc(c.numero || '')}" style="flex:1" ${ro}>
+      <input class="o-sel" data-cm placeholder="Moneda" value="${U.esc(c.moneda || '')}" style="width:70px" ${ro}>
+      <input class="o-sel" data-ctit placeholder="Titular" value="${U.esc(c.titular || '')}" style="flex:1" ${ro}>
+      <input class="o-sel" data-cuso placeholder="Uso (prima/gastos/comisión)" value="${U.esc(c.uso || '')}" style="flex:1" ${ro}>
+      <input class="o-sel" data-clink placeholder="Link de pago (opcional)" value="${U.esc(c.linkPago || '')}" style="flex:1" ${ro}>
+      <input class="o-sel" data-cver type="date" title="Última verificación" value="${c.ultimaVerificacion || ''}" style="width:130px" ${ro}>
+      ${editing ? `<button class="asg-del" data-del="cuentas:${i}">✕</button>` : ''}
+    </div>`;
+  }
+
+  /* ---- Productos y planes ---- */
+  function tabProductos(a, editing) {
+    const ramos = a.ramos || [];
+    return `<div class="asg-sec">
+      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Productos, ramos y planes ${editing ? '<button class="btn ghost sm" id="af-add-ramo">+ Ramo</button>' : ''}</div>
+      <div class="ct-grid">${ramos.map((r, i) => ramoRow(a, r, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin ramos habilitados.</div>'}</div>
+      <div class="cfg-note" style="margin-top:9px">Un ramo NO se ofrece en Cotizador hasta que lo marqués explícitamente "Habilitado p/ Cotizador" aquí. La ausencia de configuración significa <b>no disponible</b>, no lo contrario.</div>
+      <div class="asg-sec-t" style="margin-top:16px">Documentos requeridos para emisión ${editing ? '<button class="btn ghost sm" id="af-add-req">+ Requisito</button>' : ''}</div>
+      <div id="af-reqs">${(a.docsRequeridos || []).map((r, i) => reqRow(r, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin requisitos registrados.</div>'}</div>
+    </div>`;
+  }
+  function ramoRow(a, r, i, editing) {
     const pct = (a.comisiones && a.comisiones[r] != null) ? a.comisiones[r] : (a.comisionDefault || 12);
-    return `<div class="ct-cell"><span>${U.esc(r)}</span><div class="ct-inp"><input type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}"><span>%</span></div></div>`;
+    const hab = !!(a.ramosHabilitados && a.ramosHabilitados[r] && a.ramosHabilitados[r].cotizador === true);
+    const det = (a.ramosDetalle && a.ramosDetalle[r]) || {};
+    return `<div class="ct-cell"><span>${U.esc(r)}</span><div class="ct-inp"><input type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}" ${editing ? '' : 'disabled'}><span>%</span></div>
+      <input class="o-sel" data-ramoseg="${U.esc(r)}" placeholder="Segmento (Individual/Flota/Colectivo)" value="${U.esc(det.segmento || '')}" style="font-size:11px;margin-top:4px" ${editing ? '' : 'disabled'}>
+      <input class="o-sel" data-ramoplan="${U.esc(r)}" placeholder="Plan (Básico/Amplio/Premium)" value="${U.esc(det.plan || '')}" style="font-size:11px;margin-top:4px" ${editing ? '' : 'disabled'}>
+      <label style="display:flex;align-items:center;gap:4px;font-size:10.5px;margin-top:4px"><input type="checkbox" data-ramohab="${U.esc(r)}" ${hab ? 'checked' : ''} ${editing ? '' : 'disabled'}><b>${hab ? 'Habilitado' : 'NO habilitado'}</b> p/ Cotizador</label></div>`;
+  }
+  function reqRow(r, i, editing) {
+    const ro = editing ? '' : 'disabled';
+    return `<div class="asg-row" data-req="${i}">
+      <input class="o-sel" data-rp placeholder="Producto" value="${U.esc(r.producto || '')}" style="flex:1" ${ro}>
+      <input class="o-sel" data-ri placeholder="Requisitos" value="${U.esc(r.items || '')}" style="flex:2.2" ${ro}>
+      ${editing ? `<button class="asg-del" data-del="docsRequeridos:${i}">✕</button>` : ''}
+    </div>`;
   }
 
-  return { render, ficha };
+  /* ---- Documentos y Drive ---- */
+  const CATS_DOC = ['Formulario', 'Clausulado', 'Condiciones', 'Póliza ejemplo', 'Cotización ejemplo', 'Anexo', 'Manual', 'Circular'];
+  function tabDocumentos(a, editing) {
+    const docs = a.docs || [];
+    return `<div class="asg-sec">
+      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Documentos y Drive ${editing ? '<button class="btn ghost sm" id="af-add-doc">+ Documento</button>' : ''}</div>
+      <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="muted" style="font-size:12px">Sin documentos cargados.</div>'}</div>
+      ${editing ? '<button class="btn ghost sm" id="af-imp-doc" style="margin-top:9px">✨ Importar documentos (mapeo inteligente)</button>' : ''}
+    </div>`;
+  }
+  function docRow(d, i, editing, a) {
+    const ro = editing ? '' : 'disabled';
+    const nd = normalizarFuente(Object.assign({ id: d.id || ('doc' + i) }, d), a);
+    const ev = evaluarFuente(nd);
+    return `<div class="asg-row" data-doc="${i}" style="flex-wrap:wrap">
+      <span style="font-size:14px">📎</span>
+      <input class="o-sel" data-dn value="${U.esc(d.nombre || '')}" style="flex:1.1" ${ro}>
+      <select class="o-sel" data-dc style="flex:1" ${ro}>${CATS_DOC.map(c => `<option ${c === d.cat ? 'selected' : ''}>${c}</option>`).join('')}</select>
+      <select class="o-sel" data-dr style="width:100px" ${ro}><option value="">Ramo…</option>${(a.ramos || []).map(r => `<option ${r === d.ramo ? 'selected' : ''}>${r}</option>`).join('')}</select>
+      <select class="o-sel" data-dpais style="width:65px" ${ro}><option ${(d.pais || a.pais) === 'GT' ? 'selected' : ''}>GT</option><option ${(d.pais || a.pais) === 'CO' ? 'selected' : ''}>CO</option></select>
+      <select class="o-sel" data-dmon style="width:75px" ${ro}><option ${(d.moneda || nd.moneda) === 'GTQ' ? 'selected' : ''}>GTQ</option><option ${(d.moneda || nd.moneda) === 'COP' ? 'selected' : ''}>COP</option><option ${(d.moneda || nd.moneda) === 'USD' ? 'selected' : ''}>USD</option></select>
+      <input class="o-sel" data-dseg placeholder="Segmento" value="${U.esc(d.segmento || '')}" style="width:110px" ${ro}>
+      <span class="badge ${ev.estado.indexOf('incompleto') >= 0 ? 'danger' : ev.estado.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10px">${ev.estado}</span>
+      ${editing ? `<button class="asg-del" data-del="docs:${i}">✕</button>` : ''}
+    </div>`;
+  }
+
+  /* ---- Tarifas y conocimiento (secundaria, motor real) ---- */
+  function tabTarifas(a, editing) {
+    const resumen = resumenFuentes(a);
+    const grupos = resumenGrupos(a);
+    return `<div class="asg-sec">
+      <div class="asg-sec-t">🧮 Tarifas y conocimiento — sección administrativa avanzada</div>
+      <div class="cfg-note" style="margin-bottom:9px">Motor de fuentes: cada documento se normaliza por país/moneda/ramo/producto (+segmento/plan/tipo de riesgo cuando aplica) y expone capacidades (sirve para tarifas, reglas, presentación, comparativo, condiciones, casos de prueba). <b>Procesar un documento nunca habilita automáticamente</b> Cotizador/Comparativo.</div>
+      <div class="asg-tarifas-est">${Object.keys(resumen).filter(k => resumen[k] > 0).map(k => `<span class="badge ${k.indexOf('incompleto') >= 0 ? 'danger' : k.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10.5px">${k} (${resumen[k]})</span>`).join('') || '<span class="muted" style="font-size:12px">Sin fuentes cargadas todavía.</span>'}</div>
+      <div style="margin-top:12px;display:grid;gap:8px">
+        ${grupos.map(g => `<div class="asg-row" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><span style="flex:1;font-size:12px">${U.esc(g.label)}</span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}" style="font-size:10px">${g.estado}</span><span class="muted" style="font-size:11px">${g.docs.length} doc(s)</span></div>`).join('') || ''}
+      </div>
+      ${editing ? '<button class="btn ghost sm" id="af-imp-doc2" style="margin-top:12px">✨ Importar documento tarifario</button>' : ''}
+    </div>`;
+  }
+
+  /* ---- Actividad ---- */
+  function tabActividad(a) {
+    const hist = a.actividad || [];
+    return `<div class="asg-sec">
+      <div class="asg-sec-t">🕒 Actividad</div>
+      <div class="cfg-note" style="margin-bottom:9px">Cambios visibles de esta ficha, con actor real y motivo. Los registros internos de soporte no se muestran separada (\`auditoriaAseguradoras\`) que sobrevive aunque la aseguradora se elimine.</div>
+      ${hist.length ? hist.map(h => `<div style="font-size:12px;padding:7px 0;border-bottom:1px dashed var(--line-2)"><b>${U.esc(h.cambio || 'Actualización')}</b> · ${U.esc(h.responsable || 'equipo')} · <span class="muted">${h.fecha ? new Date(h.fecha).toLocaleString() : ''}</span>${h.motivo ? '<div class="muted">Motivo: ' + U.esc(h.motivo) + '</div>' : ''}${h.camposCambiados ? '<div class="muted">Campos: ' + h.camposCambiados.join(', ') + '</div>' : ''}</div>`).join('') : '<div class="muted" style="font-size:12px">Sin actividad registrada.</div>'}
+    </div>`;
+  }
+
+  /* ---- wiring: todo muta el DRAFT en memoria; nada llama up() salvo Guardar cambios ---- */
+  function wireBody(back, data, t) {
+    const body = back.querySelector('#af-body');
+    const id = back.dataset.id;
+    const st = fichaState[id];
+    const editing = st.editing;
+    const draft = st.draft; // objeto mutable cuando editing=true
+
+    body.querySelectorAll('[data-open-portal]').forEach(b => b.addEventListener('click', () => window.open(b.dataset.openPortal.match(/^https?:/) ? b.dataset.openPortal : 'https://' + b.dataset.openPortal, '_blank', 'noopener')));
+
+    if (!editing) return; // en modo vista no hay nada que mutar
+
+    body.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+      const [key, idx] = b.dataset.del.split(':');
+      draft[key] = (draft[key] || []).slice(); draft[key].splice(+idx, 1);
+      selectTab(t);
+    }));
+    const syncField = () => { /* no-op: se lee directamente del DOM al guardar la pestaña vía snapshot() abajo */ };
+
+    function snapshotTab() {
+      // vuelca lo que hay en el DOM de esta pestaña hacia el draft ANTES de repintar/cambiar de tab
+      if (t === 'resumen') {
+        const g = s => (body.querySelector(s) || {}).value || '';
+        Object.assign(draft, { nombre: g('#af-nombre') || draft.nombre, nit: g('#af-nit'), codigoIntermediario: g('#af-cod'), web: g('#af-web'), responsable: g('#af-resp'), telGeneral: g('#af-tel'), emergencia: g('#af-emer'), ultimaRevision: g('#af-rev'), observaciones: g('#af-obs') });
+        draft.facturacion = Object.assign({}, draft.facturacion, { razonSocial: g('#af-rs'), dirFiscal: g('#af-dir') });
+      }
+      if (t === 'contactos') {
+        draft.contactos = [...body.querySelectorAll('[data-cont]')].map(r => ({ nombre: r.querySelector('[data-cn]').value, area: r.querySelector('[data-ca]').value, email: r.querySelector('[data-ce]').value, tel: r.querySelector('[data-cl]').value, ext: r.querySelector('[data-cext]').value, cargo: r.querySelector('[data-cargo]').value, pais: r.querySelector('[data-cpais]').value, canal: r.querySelector('[data-cchan]').value, vigencia: r.querySelector('[data-cvig]').value, gestionPreferida: r.querySelector('[data-cgest]').value, principal: r.querySelector('[data-cppal]').checked }));
+      }
+      if (t === 'plataformas') {
+        draft.portales = [...body.querySelectorAll('[data-portal]')].map(r => ({ nombre: r.querySelector('[data-pn]').value, tipo: r.querySelector('[data-ptipo]').value, url: r.querySelector('[data-pu]').value, pais: r.querySelector('[data-ppais]').value, estadoAcceso: r.querySelector('[data-pest]').value, responsable: r.querySelector('[data-presp]').value, ultimaVerificacion: r.querySelector('[data-pver]').value, credentialRef: 'backend_required' }));
+        draft.drive = (body.querySelector('#af-drive') || {}).value || draft.drive || '';
+      }
+      if (t === 'bancos') {
+        draft.cuentas = [...body.querySelectorAll('[data-cta]')].map(r => ({ banco: r.querySelector('[data-cb]').value, tipo: r.querySelector('[data-ctt]').value, numero: r.querySelector('[data-ccn]').value, moneda: r.querySelector('[data-cm]').value, titular: r.querySelector('[data-ctit]').value, uso: r.querySelector('[data-cuso]').value, linkPago: r.querySelector('[data-clink]').value, ultimaVerificacion: r.querySelector('[data-cver]').value }));
+      }
+      if (t === 'productos') {
+        body.querySelectorAll('[data-ramopct]').forEach(inp => { draft.comisiones = draft.comisiones || {}; draft.comisiones[inp.dataset.ramopct] = +inp.value || 0; });
+        body.querySelectorAll('[data-ramoseg],[data-ramoplan]').forEach(inp => {
+          const r = inp.dataset.ramoseg || inp.dataset.ramoplan; draft.ramosDetalle = draft.ramosDetalle || {}; draft.ramosDetalle[r] = draft.ramosDetalle[r] || {};
+        });
+        (draft.ramos || []).forEach(r => {
+          const segEl = body.querySelector(`[data-ramoseg="${CSS.escape(r)}"]`), planEl = body.querySelector(`[data-ramoplan="${CSS.escape(r)}"]`), habEl = body.querySelector(`[data-ramohab="${CSS.escape(r)}"]`);
+          draft.ramosDetalle = draft.ramosDetalle || {}; draft.ramosDetalle[r] = draft.ramosDetalle[r] || {};
+          if (segEl) draft.ramosDetalle[r].segmento = segEl.value; if (planEl) draft.ramosDetalle[r].plan = planEl.value;
+          draft.ramosHabilitados = draft.ramosHabilitados || {}; draft.ramosHabilitados[r] = Object.assign({}, draft.ramosHabilitados[r], { cotizador: habEl ? habEl.checked : false });
+        });
+        draft.docsRequeridos = [...body.querySelectorAll('[data-req]')].map(r => ({ producto: r.querySelector('[data-rp]').value, items: r.querySelector('[data-ri]').value }));
+      }
+      if (t === 'documentos') {
+        const prevDocs = draft.docs || [];
+        draft.docs = [...body.querySelectorAll('[data-doc]')].map((r, idx) => Object.assign({}, prevDocs[idx] || {}, { nombre: r.querySelector('[data-dn]').value, cat: r.querySelector('[data-dc]').value, ramo: r.querySelector('[data-dr]').value, pais: r.querySelector('[data-dpais]').value, moneda: r.querySelector('[data-dmon]').value, segmento: r.querySelector('[data-dseg]').value }));
+      }
+    }
+
+    // cualquier cambio de input snapshotea la pestaña actual al draft (sin escribir al store)
+    body.querySelectorAll('input,select,textarea').forEach(el => el.addEventListener('change', snapshotTab));
+
+    if (t === 'contactos') { const add = body.querySelector('#af-add-cont'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.contactos = (draft.contactos || []).concat([{ nombre: '', area: 'Comercial', email: '', tel: '', cargo: '', canal: 'Correo', principal: false }]); selectTab('contactos'); }); }
+    if (t === 'plataformas') { const add = body.querySelector('#af-add-portal'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.portales = (draft.portales || []).concat([{ nombre: '', url: '', estadoAcceso: 'Pendiente de conexión segura', credentialRef: 'backend_required' }]); selectTab('plataformas'); }); }
+    if (t === 'bancos') { const add = body.querySelector('#af-add-cta'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.cuentas = (draft.cuentas || []).concat([{ banco: '', tipo: 'Monetaria', numero: '****' + Math.floor(1000 + Math.random() * 8999), moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', titular: '' }]); selectTab('bancos'); }); }
+    if (t === 'productos') {
+      const addRamo = body.querySelector('#af-add-ramo'); if (addRamo) addRamo.addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; snapshotTab(); const rr = (draft.ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); draft.ramos = rr; draft.comisiones = Object.assign({}, draft.comisiones); draft.comisiones[r] = draft.comisionDefault || 12; selectTab('productos'); });
+      const addReq = body.querySelector('#af-add-req'); if (addReq) addReq.addEventListener('click', () => { snapshotTab(); draft.docsRequeridos = (draft.docsRequeridos || []).concat([{ producto: '', items: '' }]); selectTab('productos'); });
+      const impCom = body.querySelector('#af-imp-com'); if (impCom) impCom.addEventListener('click', () => { if (!canEdit()) return; document.getElementById('asg-ficha').remove(); Orbit.importa.open('planillas-comision', { onDone: reload }); });
+    }
+    if (t === 'documentos') {
+      const add = body.querySelector('#af-add-doc'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.docs = (draft.docs || []).concat([{ id: 'doc' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), nombre: 'Documento.pdf', cat: 'Formulario', estado: 'Documento recibido', pais: draft.pais, moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', ramo: '' }]); selectTab('documentos'); });
+      const imp = body.querySelector('#af-imp-doc'); if (imp) imp.addEventListener('click', () => { if (!canEdit()) return; document.getElementById('asg-ficha').remove(); Orbit.importa.open('docs-aseguradora', { onDone: reload }); });
+    }
+    if (t === 'tarifas') { const imp = body.querySelector('#af-imp-doc2'); if (imp) imp.addEventListener('click', () => { if (!canEdit()) return; document.getElementById('asg-ficha').remove(); Orbit.importa.open('docs-aseguradora', { onDone: reload }); }); }
+  }
+
+  /* ===================== KPI CON DETALLE ===================== */
+  function kpi(tipo) {
+    const base = S().all('aseguradoras').filter(a => paisOK(a.pais));
+    let title = '', rows = [];
+    if (tipo === 'activas') {
+      title = 'Aseguradoras activas';
+      rows = base.filter(a => a.vinculada !== false).map(a => ({ a, detalle: `${a.pais} · ${(a.ramos || []).length} ramos` }));
+    } else if (tipo === 'contacto') {
+      title = 'Con contacto principal';
+      rows = base.map(a => { const c = (a.contactos || []).find(x => x.principal); return { a, detalle: c ? `👤 ${U.esc(c.nombre || c.area)}` : '⚠ Sin contacto principal — requiere asignar', falta: !c }; });
+      rows.sort((x, y) => (x.falta === y.falta) ? 0 : (x.falta ? -1 : 1));
+    } else if (tipo === 'acceso') {
+      title = 'Con acceso disponible';
+      base.forEach(a => (a.portales || []).forEach(p => rows.push({ a, detalle: `${U.esc(p.nombre || 'Plataforma')} · <span class="badge ${ACCESO_TONE[p.estadoAcceso] || 'neutral'}" style="font-size:10.5px">${p.estadoAcceso || 'Sin registrar'}</span> · última verificación: ${p.ultimaVerificacion || 'sin registrar'}` })));
+      if (!rows.length) title += ' — sin plataformas registradas';
+    } else if (tipo === 'docs') {
+      title = 'Con documentación';
+      base.forEach(a => (a.docs || []).forEach(d => rows.push({ a, detalle: `${U.esc(d.nombre || d.tipo || 'Documento')} · ${d.tipo || ''} · v${d.version || '1'} · vigencia: ${d.vigencia || 'sin definir'} · ${d.estado || 'pendiente'}` })));
+    } else if (tipo === 'pend') {
+      title = 'Requieren actualización';
+      base.forEach(a => (a.portales || []).filter(p => p.estadoAcceso === 'Requiere actualización').forEach(p => rows.push({ a, detalle: `${U.esc(p.nombre || 'Plataforma')} · acción recomendada: reverificar acceso y actualizar credencial` })));
+    }
+    let back = document.getElementById('asg-kpi'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'asg-kpi'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center';
+    back.innerHTML = `<div class="card" style="width:min(640px,94vw);max-height:86vh;overflow:auto;padding:20px 22px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="font-size:16px">${title}</b><button class="btn ghost sm" data-close>✕</button></div>
+      <div class="muted" style="font-size:12px;margin-bottom:12px">${rows.length} registro(s) · país: ${Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : 'todos'}</div>
+      <div style="display:grid;gap:8px">${rows.length ? rows.map(r => `<div class="card pad" style="cursor:pointer" data-goto="${r.a.id}"><b>${U.esc(r.a.nombre)}</b><div class="muted" style="font-size:12px;margin-top:3px">${r.detalle}</div></div>`).join('') : '<div class="muted" style="padding:16px;text-align:center">Sin registros para este filtro.</div>'}</div>
+    </div>`;
+    document.body.appendChild(back);
+    back.addEventListener('click', e => { if (e.target === back || e.target.closest('[data-close]')) back.remove(); });
+    back.querySelectorAll('[data-goto]').forEach(el => el.addEventListener('click', () => { back.remove(); ficha(el.dataset.goto); }));
+  }
+
+  return {
+    render, ficha, kpi,
+    _fuentes: { SOURCE_TYPES, SOURCE_STATES, DIMENSION_KEYS, normalizarFuente, evaluarFuente, resumenFuentes, resumenGrupos, sourceDimensions, sourceCombinationKey, groupLabel, legacyType }
+  };
 })();

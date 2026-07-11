@@ -9,13 +9,19 @@
 window.Orbit = window.Orbit || {};
 Orbit.ia = (function () {
   const KEY = 'orbit360_ia_cfg';
-  let cfg = { proveedor: 'Gemini', key: '', modelo: 'gemini-1.5-flash', conectado: false };
+  let cfg = { proveedor: 'Gemini', key: '', modelo: 'gemini-1.5-flash', conectado: false, estado: 'sin_configurar' };
   try { const r = localStorage.getItem(KEY); if (r) cfg = Object.assign(cfg, JSON.parse(r)); } catch (e) {}
   function save() { try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch (e) {} }
   function getCfg() { return cfg; }
-  function conectar(prov, key, modelo) { cfg = { proveedor: prov || 'Gemini', key: key || '', modelo: modelo || 'gemini-1.5-flash', conectado: !!key }; save(); document.dispatchEvent(new CustomEvent('orbit:ia')); }
-  function desconectar() { cfg.conectado = false; cfg.key = ''; save(); document.dispatchEvent(new CustomEvent('orbit:ia')); }
-  function activo() { return cfg.conectado; }
+  /* Configura el proveedor SIN declarar conexión real (no acepta ni persiste secretos).
+     Estados honestos: 'sin_configurar' | 'configurado_pendiente_boveda' | 'conectado_verificado'.
+     'conectado_verificado' solo lo puede setear un backend real (no existe en este prototipo). */
+  function configurar(prov, modelo) { cfg = { proveedor: prov || 'Gemini', key: '', modelo: modelo || 'gemini-1.5-flash', conectado: false, estado: 'configurado_pendiente_boveda' }; save(); document.dispatchEvent(new CustomEvent('orbit:ia')); }
+  // conectar() se conserva por compatibilidad de firma pero NUNCA debe invocarse con un secreto/placeholder de frontend.
+  function conectar(prov, key, modelo) { return configurar(prov, modelo); }
+  function desconectar() { cfg.conectado = false; cfg.key = ''; cfg.estado = 'sin_configurar'; save(); document.dispatchEvent(new CustomEvent('orbit:ia')); }
+  function activo() { return false; /* honesto: el frontend nunca puede confirmar conexión real sin backend */ }
+  function estado() { return cfg.estado || 'sin_configurar'; }
   // Proveedor de IA para un módulo: si hay override por módulo (Configuración),
   // lo devuelve; si no, el proveedor global. Permite usar un motor distinto por
   // módulo según el comparativo (ej. extracción económica, redacción premium).
@@ -225,5 +231,5 @@ Orbit.ia = (function () {
   }
   function disponible() { return !!(window.claude && window.claude.complete); }
 
-  return { getCfg, conectar, desconectar, activo, proveedorDe, complete, disponible, redactar, analisis, sugerirMetas, extraer, extraerPDF, pdfTexto, parseMulti };
+  return { getCfg, conectar, configurar, desconectar, activo, estado, proveedorDe, complete, disponible, redactar, analisis, sugerirMetas, extraer, extraerPDF, pdfTexto, parseMulti };
 })();

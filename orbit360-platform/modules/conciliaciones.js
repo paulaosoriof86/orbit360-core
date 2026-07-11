@@ -96,14 +96,27 @@ Orbit.modules.conciliaciones = (function () {
     if (permitidas.indexOf(a) < 0) { U.toast('Acción no permitida en este estado'); return; }
     const nuevo = TRANS[a];
     if (!nuevo) return;
+    // Rechazar / bloquear / anular requieren MOTIVO (no se borra trazabilidad).
+    const requiereMotivo = (a === 'rechazar' || a === 'bloquear' || a === 'anular');
+    let motivo = '';
+    if (requiereMotivo) {
+      motivo = (window.prompt('Motivo de ' + (a === 'rechazar' ? 'rechazo' : a === 'bloquear' ? 'bloqueo' : 'anulación') + ' (obligatorio · queda en la trazabilidad):', '') || '').trim();
+      if (!motivo) { U.toast('Se requiere un motivo para ' + a); return; }
+    }
+    const quien = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Usuario';
+    const estadoRev = a === 'validar' ? 'Validada por usuario' : a === 'rechazar' ? 'Rechazada' : a === 'tomar_en_revision' ? 'En revisión' : a === 'bloquear' ? 'Bloqueada' : 'Anulada';
+    // Historial acumulativo (nunca se borra): cada transición queda registrada.
+    const hist = (r.historial || []).concat([{ accion: a, estado: nuevo, motivo: motivo || '', responsable: quien, ts: new Date().toISOString() }]);
     // Solo muta la PROPUESTA, nunca cobros.
     S().update('conciliaciones', id, {
       estado_bandeja: nuevo,
-      estado_revision: a === 'validar' ? 'Validada por usuario' : a === 'rechazar' ? 'Rechazada' : a === 'tomar_en_revision' ? 'En revisión' : a === 'bloquear' ? 'Bloqueada' : 'Anulada',
+      estado_revision: estadoRev,
+      motivo: motivo || r.motivo || '',
+      historial: hist,
       ultima_actualizacion: new Date().toISOString(),
-      responsable: (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Usuario'
+      responsable: quien
     });
-    U.toast('✓ Propuesta → ' + nuevo.replace('_', ' '));
+    U.toast('✓ Propuesta → ' + nuevo.replace('_', ' ') + (motivo ? ' · motivo registrado' : ''));
     const h = document.getElementById('host'); if (h) render(h);
   }
 
@@ -122,6 +135,8 @@ Orbit.modules.conciliaciones = (function () {
       rowKV('Acción propuesta', U.esc(r.accion_propuesta || '—')),
       rowKV('Responsable', U.esc(r.responsable || '—')),
       rowKV('Última actualización', U.esc((r.ultima_actualizacion || '—').toString().slice(0, 16).replace('T', ' '))),
+      (r.motivo ? rowKV('Motivo', U.esc(r.motivo)) : ''),
+      ((r.historial && r.historial.length) ? `<div style="margin-top:10px"><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Trazabilidad</div>${r.historial.slice().reverse().map(h => `<div style="font-size:11.5px;padding:5px 0;border-bottom:1px solid var(--line)"><b>${U.esc(h.accion)}</b> → ${U.esc(h.estado)}${h.motivo ? ' · ' + U.esc(h.motivo) : ''}<div class="muted" style="font-size:10.5px">${U.esc(h.responsable || '')} · ${U.esc((h.ts || '').slice(0, 16).replace('T', ' '))}</div></div>`).join('')}</div>` : ''),
       (r.bloqueos && r.bloqueos.length) ? `<div class="cfg-note" style="margin-top:10px;border-left:3px solid var(--danger)">⛔ Bloqueos: ${r.bloqueos.map(U.esc).join(', ')}</div>` : ''
     ].join(''));
   }

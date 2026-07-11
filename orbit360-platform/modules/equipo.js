@@ -182,6 +182,14 @@ Orbit.modules.equipo = (function () {
           <div class="muted" style="font-size:11.5px;margin-top:6px">Si dejás todos marcados, manda el rol. Desmarcá para restringir módulos a este usuario en particular.</div>
         </details>
         <label class="ce-l ck"><input type="checkbox" id="eu-inact" ${a.inactivo ? 'checked' : ''}> Usuario inactivo</label>
+        <details>
+          <summary style="cursor:pointer;font-weight:700;font-size:13px;font-family:var(--f-display)">🔐 Permisos avanzados <span class="muted" style="font-weight:400">(extras/restricciones puntuales, además del rol)</span></summary>
+          <div style="display:grid;gap:6px;margin-top:10px;font-size:12.5px">
+            <label class="ce-l ck"><input type="checkbox" id="eu-perm-asg-extra" ${(a.permisosExtra || []).indexOf('aseguradoras_editar') >= 0 ? 'checked' : ''}> Extra: puede <b>editar Aseguradoras</b> aunque su rol no lo permita</label>
+            <label class="ce-l ck"><input type="checkbox" id="eu-perm-asg-restr" ${(a.restricciones || []).indexOf('aseguradoras_editar') >= 0 ? 'checked' : ''}> Restricción: <b>no puede editar Aseguradoras</b> aunque su rol sí lo permita</label>
+          </div>
+          <div class="muted" style="font-size:11.5px;margin-top:6px">Estas casillas anulan puntualmente lo que el rol define, sin cambiarle el rol al usuario. La restricción siempre gana sobre el extra.</div>
+        </details>
         <div class="cfg-note">🔐 Al guardar un usuario nuevo, se le envían sus <b>credenciales de acceso</b> al correo y WhatsApp indicados. El correo configurado acá será su usuario de ingreso y el que se asocia a su bandeja.</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
@@ -197,7 +205,9 @@ Orbit.modules.equipo = (function () {
       const rolesFinal = rolesChecked.length ? rolesChecked : ['Asesor'];
       const modsChecked = [...back.querySelectorAll('.eu-mod:checked')].map(c => c.value);
       const modOverride = (modsChecked.length && modsChecked.length < TODOS_MOD.length) ? modsChecked : null;
-      const data = { nombre: $('#eu-nombre').value || 'Usuario', rol: rolesFinal[0], roles: rolesFinal, telefono: $('#eu-tel').value, email: $('#eu-email').value, color: $('#eu-color').value, metaPrima: +$('#eu-meta').value || 0, metaRecaudo: +$('#eu-rec').value || 0, inactivo: $('#eu-inact').checked, modulosOverride: modOverride };
+      const permisosExtra = $('#eu-perm-asg-extra').checked ? ['aseguradoras_editar'] : [];
+      const restricciones = $('#eu-perm-asg-restr').checked ? ['aseguradoras_editar'] : [];
+      const data = { nombre: $('#eu-nombre').value || 'Usuario', rol: rolesFinal[0], roles: rolesFinal, telefono: $('#eu-tel').value, email: $('#eu-email').value, color: $('#eu-color').value, metaPrima: +$('#eu-meta').value || 0, metaRecaudo: +$('#eu-rec').value || 0, inactivo: $('#eu-inact').checked, modulosOverride: modOverride, permisosExtra, restricciones };
       if (id) S().update('asesores', id, data);
       else { data.id = 'ase' + Date.now().toString().slice(-5); data.iniciales = data.nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; S().insert('asesores', data); const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Usuario creado · credenciales enviadas a ' + (data.email || 'su correo'); document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
       close(); render(document.getElementById('host') || document.getElementById('mod-host'));

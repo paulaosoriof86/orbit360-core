@@ -50,12 +50,12 @@ Orbit.modules.academia = (function () {
   async function iaQuizFromDoc(text) { if (Orbit.ia.disponible() && text) { try { const out = await Orbit.ia.complete('A partir de este documento genera 4 preguntas de opción múltiple. Formato: enunciado, opciones en líneas (correcta con [x], otras con [ ]), preguntas separadas por línea en blanco. Documento:\n' + String(text).slice(0, 4000)); return String(out).trim(); } catch (e) {} } return '¿Pregunta basada en el documento?\n[x] Correcta\n[ ] Incorrecta\n[ ] Otra'; }
 
   function cursosPorRol(rol) {
-    rol = rol || (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+    rol = rol || (Orbit.session && Orbit.session.rol && Orbit.session.rol()) || (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
     return S().all('cursos').filter(c => {
       if (!c) return false;
       const d = c.destinatarios || 'equipo';
       if (d === 'clientes') return false; // solo para portal del cliente
-      if (d === 'ambos') return true;
+      if (d === 'ambos' || d === 'Todos' || d === 'todos') return true;
       if (d === 'equipo') return true;
       if (d === rol) return true;
       // Dirección/Admin ven todos los cursos de equipo
@@ -135,7 +135,7 @@ Orbit.modules.academia = (function () {
     const rol = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
     const manuales = [
       { t: 'Manual maestro (todos los módulos)', src: 'docs/manual-maestro.html', ico: '📘', sub: 'Super Admin · visión completa', roles: ['Dirección', 'Admin'] },
-      { t: 'Capacitación técnica interna', src: 'docs/capacitacion-tecnica-interna.html', ico: '🛠', sub: 'Demo, backend, migración, soporte', roles: ['Dirección', 'Admin'] },
+      { t: 'Capacitación técnica interna', src: 'docs/capacitacion-tecnica-interna.html', ico: '🛠', sub: 'Configuración avanzada, migración de datos, soporte', roles: ['Dirección', 'Admin'] },
       { t: 'Capacitación CRM', src: 'docs/capacitacion-crm.html', ico: '🎯', sub: 'Operación diaria del CRM', roles: ['Dirección', 'Admin', 'Operativo', 'Asesor', 'Comercial'] },
       { t: 'Manual de integraciones', src: 'docs/manual-integraciones.html', ico: '🔌', sub: 'Configuración, utilidad y valor de cada integración', roles: ['Dirección', 'Admin'] },
       { t: 'Comparativa de motores de IA', src: 'docs/comparativa-ia.html', ico: '🤖', sub: 'Gemini / ChatGPT / Claude — costo y calidad', roles: ['Dirección', 'Admin'] }
@@ -382,6 +382,19 @@ Orbit.modules.academia = (function () {
         </div>`).join('')}</div>
         ${c.certificado ? '<div class="cfg-note" style="margin-top:14px;border-left:3px solid var(--ok)">🏅 <b>Certificado obtenido.</b> Disponible para descarga en el perfil del asesor.</div>' : ''}
         ${(c.recursos || []).length ? `<div class="asg-sec-t" style="margin-top:18px">📎 Recursos del curso</div><div style="display:flex;gap:7px;flex-wrap:wrap">${c.recursos.map(rc => `<button class="ac-res" data-res="${U.esc(rc.nombre)}">${rc.tipo === 'pdf' ? '📄' : rc.tipo === 'img' ? '🖼️' : '📎'} ${U.esc(rc.nombre)}</button>`).join('')}</div>` : ''}
+        ${c.metaLeccion ? `<div class="asg-sec-t" style="margin-top:18px">🧭 Ficha de la lección</div><div class="cfg-note" style="display:grid;gap:5px;font-size:12px">
+          ${c.metaLeccion.porQueExiste ? `<div><b>¿Por qué existe?</b> ${U.esc(c.metaLeccion.porQueExiste)}</div>` : ''}
+          ${c.metaLeccion.problemaResuelve ? `<div><b>¿Qué problema resuelve?</b> ${U.esc(c.metaLeccion.problemaResuelve)}</div>` : ''}
+          ${c.metaLeccion.sinEsto ? `<div><b>¿Qué pasa si no lo usas?</b> ${U.esc(c.metaLeccion.sinEsto)}</div>` : ''}
+          <div><b>Objetivo:</b> ${U.esc(c.metaLeccion.objetivo || '')}</div>
+          <div><b>Rol objetivo:</b> ${U.esc(c.metaLeccion.rol || '')} · <b>Módulo:</b> ${U.esc(c.metaLeccion.modulo || '')}</div>
+          <div><b>Datos que lee:</b> ${U.esc(c.metaLeccion.datosLee || '')}</div>
+          <div><b>Datos que escribe:</b> ${U.esc(c.metaLeccion.datosEscribe || '')}</div>
+          <div><b>Acciones permitidas:</b> ${U.esc(c.metaLeccion.accionesPermitidas || '')}</div>
+          <div><b>Errores a evitar:</b> ${U.esc(c.metaLeccion.erroresEvitar || '')}</div>
+          <div><b>Caso práctico:</b> ${U.esc(c.metaLeccion.casoPractico || '')}</div>
+          <div class="muted">Evidencia: ${U.esc(c.metaLeccion.evidencia || '')} · Última actualización: ${U.esc(c.metaLeccion.actualizado || '')}</div>
+        </div>` : ''}
       </div>
       <div style="padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
         <button class="btn ghost" data-close>Cerrar</button>
@@ -430,7 +443,7 @@ Orbit.modules.academia = (function () {
       ${visor}
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
         <button class="btn ghost" id="ar-close">Cerrar</button>
-        <button class="btn primary" onclick="Orbit.ui.toast('Descarga disponible al conectar el almacenamiento (Drive o servidor).')">⬇ Descargar</button>
+        <button class="btn primary" onclick="Orbit.ui.toast('La descarga se habilita al adjuntar el archivo real.')">⬇ Descargar</button>
       </div></div>`;
     document.body.appendChild(back);
     const close = () => back.remove();

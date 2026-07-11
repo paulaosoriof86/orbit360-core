@@ -42,7 +42,8 @@ Orbit.modules.cobros = (function () {
   // Estado de validación visible (no confundir reportado con aplicado)
   function estadoValidacion(c) {
     if (c.estado === 'Pagado') return c.conciliado ? 'Conciliado' : 'Pagado (por conciliar)';
-    if (c.validadoReporte && (c.estado === 'Pendiente' || c.estado === 'Vencido')) return 'Validada (por aplicar)';
+    if (c.validadoReporte && (c.estado === 'Pendiente' || c.estado === 'Vencido')) return 'Validada (por confirmar)';
+    if (c.reporteRechazado) return 'Reporte rechazado';
     if (c.requiereValidacion) return 'Requiere validación';
     if (c.estado === 'Bloqueado') return 'Bloqueado';
     if (c.reportado && (c.estado === 'Pendiente' || c.estado === 'Vencido')) return c.enRevision ? 'En revisión' : 'Reportado por cliente';
@@ -50,7 +51,7 @@ Orbit.modules.cobros = (function () {
   }
   function badgeValidacion(c) {
     const e = estadoValidacion(c);
-    const tone = e === 'Conciliado' ? 'ok' : /Pagado/.test(e) ? 'ok' : e === 'Validada (por aplicar)' ? 'ok' : e === 'Reportado por cliente' ? 'info' : e === 'En revisión' ? 'info' : e === 'Requiere validación' ? 'warn' : e === 'Bloqueado' ? 'danger' : e === 'Vencido' ? 'danger' : 'warn';
+    const tone = e === 'Conciliado' ? 'ok' : /Pagado/.test(e) ? 'ok' : e === 'Validada (por confirmar)' ? 'ok' : e === 'Reportado por cliente' ? 'info' : e === 'En revisión' ? 'info' : e === 'Requiere validación' ? 'warn' : e === 'Reporte rechazado' ? 'danger' : e === 'Bloqueado' ? 'danger' : e === 'Vencido' ? 'danger' : 'warn';
     return '<span class="badge ' + tone + '">' + e + '</span>';
   }
   function render(host) {
@@ -238,9 +239,21 @@ Orbit.modules.cobros = (function () {
     const close = () => pm.remove();
     pm.addEventListener('click', e => { if (e.target === pm) close(); });
     pm.querySelector('#cv-x').onclick = close; pm.querySelector('#cv-close').onclick = close;
-    pm.querySelector('#cv-rev').onclick = () => { S().update('cobros', cobroId, { enRevision: true }); close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('◷ Pago en revisión'); };
-    pm.querySelector('#cv-rej').onclick = () => { S().update('cobros', cobroId, { reportado: null, enRevision: false, notaReporte: '' }); close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('✕ Reporte rechazado — recibo vuelve a pendiente'); };
-    pm.querySelector('#cv-ok').onclick = () => { S().update('cobros', cobroId, { validadoReporte: true, enRevision: false }); close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('✓ Reporte validado — ahora podés aplicar el pago'); };
+    const quien = () => (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Usuario';
+    const addHist = (accion, motivo) => (c.historial || []).concat([{ accion, motivo: motivo || '', responsable: quien(), ts: new Date().toISOString() }]);
+    pm.querySelector('#cv-rev').onclick = () => { S().update('cobros', cobroId, { enRevision: true, historial: addHist('en_revision', '') }); close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('◷ Pago en revisión'); };
+    pm.querySelector('#cv-rej').onclick = () => {
+      const motivo = (window.prompt('Motivo del rechazo (obligatorio · queda en la trazabilidad):', '') || '').trim();
+      if (!motivo) { Orbit.ui.toast('Se requiere un motivo para rechazar'); return; }
+      // No se borra la trazabilidad: el reporte queda marcado como rechazado con su soporte y motivo.
+      S().update('cobros', cobroId, { reporteRechazado: true, reporteRechazoMotivo: motivo, enRevision: false, validadoReporte: false, historial: addHist('rechazar', motivo) });
+      close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('✕ Reporte rechazado · motivo registrado (soporte conservado)');
+    };
+    pm.querySelector('#cv-ok').onclick = () => {
+      const motivo = (window.prompt('Nota de validación (opcional):', '') || '').trim();
+      S().update('cobros', cobroId, { validadoReporte: true, enRevision: false, reporteRechazado: false, validadoPor: quien(), validadoFecha: Orbit.ui.today(), historial: addHist('validar', motivo) });
+      close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('✓ Reporte validado — ahora podés confirmar el cobro');
+    };
   }
 
   /* ---- Confirmar cobro (modal reutilizable: desde la ficha del recibo y desde la tabla) ---- */
@@ -257,7 +270,7 @@ Orbit.modules.cobros = (function () {
         + '<b style="font-family:var(--f-display);font-size:16px;color:#fff">💳 Confirmar cobro — ' + U.money(c.monto, cur) + '</b></div>'
         + '<button class="imp-x" id="pm-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
         + '<div style="padding:18px 20px;display:grid;gap:12px">'
-        + '<label class="ce-l">Fecha de envío a gestión *<input id="pm-fecha" class="o-sel" type="date" value="' + hoy + '"></label>'
+        + '<label class="ce-l">Fecha de confirmación del cobro *<input id="pm-fecha" class="o-sel" type="date" value="' + hoy + '"></label>'
         + '<label class="ce-l">Método de pago<select id="pm-metodo" class="o-sel"><option>Transferencia bancaria</option><option>Tarjeta de crédito</option><option>Tarjeta de débito</option><option>Cheque</option><option>Efectivo</option><option>Visa cuotas</option></select></label>'
         + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">📄 Factura de la aseguradora (opcional)</span>'
         + '<div style="display:flex;gap:8px;align-items:center">'
@@ -270,7 +283,7 @@ Orbit.modules.cobros = (function () {
         + '<button class="btn ghost" id="pm-cancel">Cancelar</button>'
         + '<button class="btn primary" id="pm-ok">✅ Confirmar cobro</button></div></div>';
       document.body.appendChild(pm);
-      let factName = '', factData = '';
+      let factName = '';
       const pmClose = () => pm.remove();
       pm.addEventListener('click', e => { if (e.target === pm) pmClose(); });
       pm.querySelector('#pm-x').addEventListener('click', pmClose);
@@ -281,17 +294,24 @@ Orbit.modules.cobros = (function () {
           if (!fi.files[0]) return;
           factName = fi.files[0].name;
           pm.querySelector('#pm-fact-name').textContent = '📄 ' + factName;
-          const r = new FileReader(); r.onload = e2 => { factData = e2.target.result; }; r.readAsDataURL(fi.files[0]);
+          // METADATA-ONLY: no se lee el binario (sin readAsDataURL/base64). Solo la referencia.
         };
         fi.click();
       });
       pm.querySelector('#pm-ok').addEventListener('click', () => {
+        // Guard país/moneda (P0): no se confirma sin país+moneda coherentes (GT=GTQ, CO=COP).
+        const cli0 = S().get('clientes', c.clienteId) || {};
+        const pais = c.pais || cli0.pais || '';
+        const okMoneda = (pais === 'GT' && cur === 'GTQ') || (pais === 'CO' && cur === 'COP') || (!!pais && !!cur && pais !== 'GT' && pais !== 'CO');
+        if (!pais || !cur || !okMoneda) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '⛔ No se puede confirmar: país/moneda faltante o incoherente (GT=GTQ, CO=COP)'; document.body.appendChild(t); setTimeout(() => t.remove(), 3200); return; }
+        const motivo = (window.prompt('Motivo/nota de la confirmación del cobro (obligatorio · queda en la trazabilidad):', '') || '').trim();
+        if (!motivo) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = 'Se requiere un motivo para confirmar el cobro'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); return; }
         const fecha = pm.querySelector('#pm-fecha').value;
         const metodo = pm.querySelector('#pm-metodo').value;
         const fechaReal = pm.querySelector('#pm-fecha-real').value;
         const conciliado = !!factName;
-        const patch = { estado: 'Pagado', fechaPago: fecha, metodo, conciliado };
-        if (factName) { patch.facturaNombre = factName; patch.fechaReal = fechaReal || fecha; }
+        const patch = { estado: 'Pagado', fechaPago: fecha, metodo, conciliado, motivoConfirmacion: motivo, confirmadoPor: (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Usuario', historial: (c.historial || []).concat([{ accion: 'confirmar_cobro', motivo, responsable: (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Usuario', ts: new Date().toISOString() }]) };
+        if (factName) { patch.facturaNombre = factName; patch.facturaMetaOnly = true; patch.fechaReal = fechaReal || fecha; }
         S().update('cobros', cobroId, patch);
         if (Orbit.q && Orbit.q.postRecaudo) Orbit.q.postRecaudo(Object.assign({}, c, patch), fecha, metodo);
         S().insert('actividades', { id: 'act'+Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'cobro', icon: '💳', fecha, titulo: 'Pago confirmado', detalle: U.money(c.monto, cur) + ' · ' + metodo + (conciliado ? ' · Conciliado' : '') });

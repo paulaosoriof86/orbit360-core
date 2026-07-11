@@ -2,6 +2,496 @@
 
 > Registro cronológico de cambios del **prototipo** (Claude). El backend LAB (ChatGPT/Codex) mantiene su propia bitácora. Formato: versión · fecha · qué cambió · archivos.
 
+## v1.177 — 2026-07-10 · Academia: referencia cruzada al curso de Aseguradoras
+
+- Ruta Asesor y Ruta Dirección/Admin/IT ahora referencian explícitamente el curso "Orbit Aseguradoras" (contacto correcto por área; conocimiento tarifario no se autohabilita).
+- Cierra el pendiente honesto de v1.175 ("rutas de Academia por rol aún no referencian el nuevo curso").
+- `CONTENT_V=23` sin cambios de versión (ediciones aditivas de texto). 0 errores JS.
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+## v1.176 — 2026-07-10 · Aseguradoras: navegación cruzada + responsive móvil
+
+- Enlaces cruzados explícitos: **Aseguradoras → Cotizador → Comparativo**, con nota de que solo lo habilitado se consume (banner/nota en los 3 módulos).
+- Responsive móvil (≤640px): ficha a pantalla completa, filas/tabs apilan a 100%, tabs más compactos.
+- `core/importa.js` es protegido — no se tocó; el dry-run de `directorio-aseguradoras` sigue siendo el existente (pendiente si se requiere rediseño, corresponde a Carril B).
+- Archivos: `modules/aseguradoras.js`, `modules/cotizador.js`, `modules/comparativo.js`, `styles/infra.css`, `index.html`.
+
+## v1.197 — 2026-07-11 · Verificación en vivo de Academia + metaLeccion en los 10 cursos base
+
+**Hallazgo verificado con `Orbit.store.all('cursos')` en la app corriendo:** 46 cursos totales, **46/46 con `lecciones` de contenido real** (ej. `cur_p_clientes` = 5058 caracteres de texto en sus 5 lecciones, no metadata vacía). 36/46 tenían además la ficha `metaLeccion` (objetivo/rol/módulo/datos/errores/caso práctico) — los 10 restantes (`cur1` Inducción, `cur2` Fundamentos, `cur3` Ventas Consultivas, `cur4` Producto Auto, `cur6` Leads para Asesores, `cur7` Finanzas para Directores, `cur8` Marketing Digital, `cur9` Portal del Cliente, `cur5` Cumplimiento, `cur_master`) ya tenían lecciones profundas pero les faltaba esa ficha estructurada. Se agregó `metaLeccion` a los 10 → **46/46 con ambos**.
+
+Si una auditoría previa reportó "solo metadata sin contenido profundo", no corresponde al estado actual verificado en vivo.
+
+Archivos: `data/seed.js`, `index.html` (cache-bust `v1367`).
+
+## v1.196 — 2026-07-11 · Más notas técnicas (Academia) + revisión de Academia
+
+Limpieza continuada: Academia tenía 2 notas técnicas visibles — el manual "Capacitación técnica interna" listaba su contenido como *"Demo, backend, migración, soporte"* (reescrito a "Configuración avanzada, migración de datos, soporte"), y el botón Descargar de un recurso decía *"al conectar el almacenamiento (Drive o servidor)"* (reescrito a "se habilita al adjuntar el archivo real").
+
+Revisé el resto de Academia contra el pendiente 1.0: catálogo con 10 cursos de contenido real (inducción, técnico, comercial, producto, finanzas, marketing, normativa, portal cliente, visión integral), lecciones video/lectura/quiz/recurso editables, generación con IA, certificados imprimibles, ruta de aprendizaje por rol, manuales leídos in-app. **Ya está funcionalmente completa** — no requirió trabajo nuevo, solo la limpieza de copy.
+
+**Sobre "Carril B" (bóveda real de credenciales, OAuth Drive, hooks de integración):** ese trabajo requiere conectar servicios reales (backend, OAuth, secretos) — está fuera de lo que este entorno de prototipo puede construir; quedó documentado como mandato de Carril B (ChatGPT/Codex) desde v1.178. Lo que sí construí aquí es el patrón de **presentación** (`Orbit.vault`, visor documental) para cuando esa conexión real exista.
+
+Archivos: `modules/academia.js`, `index.html` (cache-bust).
+
+## v1.195 — 2026-07-11 · Limpieza transversal de notas técnicas (Aseguradoras, Configuración, Automatizaciones)
+
+Encontradas y corregidas 5 notas técnicas visibles al usuario (violaban la regla "no mostrar notas técnicas" — mencionaban "backend" o exponían el roadmap de una bóveda de credenciales aún no conectada):
+- Aseguradoras → Plataformas y accesos: la nota decía *"la conexión real llegará por una bóveda segura de credenciales"* → ahora describe solo la política (Orbit no guarda contraseñas).
+- Estado por defecto de un portal nuevo: `Pendiente de conexión segura` → `Sin verificar` (mismo significado, sin insinuar una integración pendiente de construir).
+- Configuración → Integraciones: nota de credencial decía *"el backend administra el secreto"* → reescrita sin mencionar backend.
+- Automatizaciones → IA: badge decía *"Configurado · pendiente de bóveda segura"* → `Referencia guardada`; el checkbox decía *"heurística mientras no haya bóveda conectada"* → `heurística sin credencial`.
+
+Archivos: `modules/aseguradoras.js`, `modules/configuracion.js`, `modules/automatizaciones.js`, `index.html` (cache-bust).
+
+## v1.194 — 2026-07-11 · Fix: órbita invisible en login (≤860px)
+
+Encontrado el bug reportado ("no se ve la órbita"): dos reglas CSS contradictorias en el mismo breakpoint `@media(max-width:860px)` — una ponía el login en columna (para que la órbita se viera arriba del formulario), la otra ocultaba `.lg-left{display:none}` por completo. La segunda ganaba y la órbita desaparecía en cualquier ventana ≤860px de ancho (portátil angosto, tablet, ventana dividida). Corregido: ahora en ese rango la órbita se ve compacta arriba del formulario (220px en vez de 340px) en lugar de ocultarse.
+
+Archivo: `styles/infra.css`, `index.html` (cache-bust).
+
+## v1.193 — 2026-07-11 · Bóveda de credenciales (patrón UI reusable)
+
+Nuevo `core/credential-vault.js`: `Orbit.vault.field(valor, opts)` — componente reusable para cualquier dato sensible que sí vive en el store pero no debe mostrarse en claro por defecto (números de cuenta, referencias). Se ve enmascarado (`••••1234`); "👁 Ver" lo revela 6 segundos y se re-enmascara solo; "⧉ Copiar" copia el valor real al portapapeles sin mostrarlo. El valor real nunca se imprime en el DOM en reposo — solo temporalmente tras click explícito.
+
+Aplicado en **Aseguradoras → Bancos y pagos**: las cuentas en modo lectura ahora usan la bóveda para el número de cuenta (antes se mostraba completo en un input disabled).
+
+Nota: esto es un patrón de **presentación**, no de secretos reales — Orbit sigue sin guardar contraseñas/API keys reales (política ya vigente vía `credentialRef`/`backend_required`); la bóveda es para dncultar-por-defecto datos ya almacenados (cuentas ficticias, referencias) en pantalla compartida.
+
+Pendiente: aplicar el mismo componente a otros números de cuenta (Finanzas) si se solicita.
+
+Archivos: `core/credential-vault.js` (nuevo), `modules/aseguradoras.js`, `index.html`.
+
+## v1.192 — 2026-07-11 · Ficha de Aseguradora navegable por URL (deep link)
+
+La ficha de Aseguradora ahora es **direccionable por URL**: al abrirla, el hash pasa a `#/aseguradoras?ficha=ID` (sin recargar ni perder estado). Recargar la página, compartir el link o usar atrás/adelante del navegador reabre directo esa ficha — antes era solo un modal in-memory sin URL propia. Al cerrar, el hash vuelve a `#/aseguradoras`. Se mantiene la UI de drawer existente (tabs, edición con motivo, historial) — el cambio es de direccionabilidad, no de layout, para no arriesgar una reescritura completa a "página" bajo restricción de contexto.
+
+Pendiente: extender el mismo patrón de deep link a la ficha de Cliente360 y al detalle de Póliza si se solicita.
+
+Archivo: `modules/aseguradoras.js`, `index.html`.
+
+## v1.191 — 2026-07-11 · Visor documental transversal
+
+Nuevo módulo `core/document-viewer.js`: `Orbit.documentViewer.open(doc)` abre un modal único y consistente para ver la ficha de cualquier documento del sistema (nombre, tipo, tamaño, fecha, origen, estado, trazabilidad). Honesto sobre el modelo de datos: como Orbit guarda documentos **metadata-only** (sin binario), el visor lo declara explícitamente en vez de simular una previsualización de un archivo inexistente — muestra "registrado como referencia... el archivo vive fuera de Orbit hasta conectar una integración de almacenamiento", y deja el gancho `storageEstado`/`onDescargar` listo para cuando se conecte Drive/OneDrive.
+
+Conectado en **Cliente360 → Documentos**: los renglones de "Soportes de pago en revisión" y "Documentos del expediente" ahora son clickeables y abren el visor con su estado, motivo de rechazo (si aplica) y origen.
+
+Pendiente: conectar el mismo visor en Portal del cliente (soporte de pago) y Academia (recursos/piezas) — próximo bloque si se solicita.
+
+Archivos: `core/document-viewer.js` (nuevo), `modules/cliente360.js`, `index.html`.
+
+## v1.190 — 2026-07-11 · Fix KPI muerto en Notificaciones
+
+Audité los KPI (`K.kpis`) de todos los módulos buscando clics sin efecto (no-op). Encontré 1: en Notificaciones WhatsApp, "Enviados hoy" tenía `onclick="Orbit.modules.notificaciones&&0"` — no hacía nada. Corregido: ahora ese KPI y "Total registrados" navegan a la pestaña Historial; "Plantillas" navega a la pestaña Plantillas. El resto de módulos (Cobros, Pólizas, Finanzas, Comisiones, Renovaciones, Leads, Historial, Cancelaciones, etc.) ya tenían onclick funcional (filtro o navegación) — no requirieron cambio.
+
+Archivo: `modules/notificaciones.js`, `index.html` (cache-bust).
+
+## v1.189 — 2026-07-11 · Carril A (parcial): copy técnico + KPI con detalle en Aseguradoras
+
+Atiende una porción priorizada del paquete "Corrección final Carril A + continuidad condicional Carril B" (624 líneas). Dado el alcance transversal del pedido completo (responsive en toda la plataforma, visor documental en 20 módulos, ficha-como-página, bóveda de credenciales, Academia actualizada), esta entrega cierra el bloque más concreto y verificable primero: **Aseguradoras**.
+
+**Hecho y verificado:**
+- **Copy técnico limpiado** en `modules/aseguradoras.js`: "Editando (borrador local)"→"Editando"; "Guardar cambios (con motivo)"→"Guardar cambios"; "Cancelar (descarta el borrador)"→"Cancelar"; "declarado por el equipo"→"según último registro"; "default-deny" (2 apariciones, una en banner y otra en pestaña Productos)→lenguaje operativo sin jerga; "auditoría técnica interna... colección separada"→"los registros internos de soporte no se muestran".
+- **KPI de Aseguradoras con detalle real** (los 5 exactos pedidos: Activas, Con contacto principal, Con acceso disponible, Con documentación, Requieren actualización): cada uno abre ahora un panel con el listado filtrado real (aseguradora, plataforma/documento, estado, última verificación), no solo un número ni un reseteo de filtros. Clic en un registro navega a la ficha de esa aseguradora.
+
+**Pendiente — CARRIL_A_PARCIAL / no atendido en esta sesión** (por alcance, no por elección):
+1. Responsive real en toda la plataforma (login órbita en móvil, tabs/drawers/tablas en 8 breakpoints) — no auditado en este bloque.
+2. KPI con detalle en el resto de módulos (Inicio, Cliente 360, Pólizas, Cobros, Renovaciones, Siniestros, Comisiones, Finanzas, Calidad, Marketing, Portal, Ops, Leads, Equipo, Academia) — solo Aseguradoras quedó cerrado.
+3. Ficha de Aseguradora como página navegable por URL (`#/aseguradoras?ficha=`) — sigue siendo modal; no se migró a vista de página completa.
+4. Visor documental transversal (`Orbit.documentViewer.open`) — no creado; los documentos siguen sin visor interno en ningún módulo.
+5. Patrón de credenciales (usuarios/contraseñas/cuentas bancarias con "Ver temporalmente"/"Copiar"/bóveda) — no implementado.
+6. Limpieza transversal de copy técnico en el resto de módulos (Cobros, Portal, Configuración, etc.) — solo se revisó Aseguradoras en detalle; queda pendiente un barrido igual de exhaustivo en los demás.
+7. Academia actualizada con estos patrones — no tocada.
+8. Carril B (bóveda, OAuth Drive, hooks) — no iniciado; requiere Carril A cerrado primero.
+
+**CARRIL_A_GESTIONADO: parcial (solo Aseguradoras). CARRIL_A_PENDIENTE: los 8 puntos anteriores. CARRIL_B_PENDIENTE_POR_CAPACIDAD.**
+
+Archivo: `modules/aseguradoras.js`, `index.html` (cache-bust), `docs/BITACORA-CAMBIOS.md`.
+
+## v1.188 — 2026-07-11 · Barrido de módulos no tocados: 1 fuga de copy técnico corregida
+
+Auditoría dirigida a Finanzas, Siniestros, Ops/Leads, Renovaciones y demás módulos no tocados en la ronda de Aseguradoras, buscando: copy prohibido ("Pago aplicado"/"Todo aplicado"), base64/readAsDataURL fuera de comentarios, secretos en localStorage, y menciones de Firebase/Firestore/demo/laboratorio visibles en UI.
+
+- **Corregido:** `modules/calidad.js` → el toast de "Campaña de actualización" decía **"(demo)"** visible al usuario. Se quitó la palabra; el mensaje ahora es limpio.
+- Revisados y confirmados limpios: el resto de menciones a "demo"/Firebase/Firestore encontradas están únicamente en comentarios de código (no se renderizan) o en documentación técnica interna (README, PLAN-INFRAESTRUCTURA) dirigida a backend/Codex, no a la UI del cliente.
+- Sin residuales de "Pago aplicado"/"Todo aplicado" como estado engañoso; los `readAsDataURL` restantes en `academia.js` son legítimos (adjuntar imagen a una lección del editor, no un pago/documento de cliente).
+
+Archivo: `modules/calidad.js`, `index.html` (cache-bust), `docs/BITACORA-CAMBIOS.md`.
+
+## v1.187 — 2026-07-11 · Manifiesto de entrega real + corrección de KPIs siempre-cero
+
+Respuesta a la pregunta directa "¿está todo completo?": no del todo — había una brecha real entre lo verificado en vivo (sólido) y los **artefactos formales de entrega** que las auditorías pedían explícitamente. Esta versión la cierra:
+
+- **Bug real encontrado y corregido:** las KPIs "Con contacto principal" y "Con acceso disponible" del directorio de Aseguradoras daban **0 siempre**, porque el seed nunca marcaba `principal:true` en ningún contacto ni `estadoAcceso:'Acceso disponible'` en ningún portal. Se corrigió el seed: primer contacto de cada aseguradora marcado principal; 1 de cada 3 aseguradoras con un portal declarado "Acceso disponible" (siguen siendo datos declarados, no conexiones reales). Verificado en vivo: 12 con contacto principal, 4 con acceso disponible.
+- **Nuevo `docs/MANIFIESTO-ENTREGA-v1187.md`:** inventario acumulado de archivos tocados desde v1.174, confirmación explícita de archivos protegidos intactos, matriz de regresión con 13 casos verificados en vivo (no solo declarados), y una sección de **limitación honesta**: no hay forma en este entorno de calcular el SHA256 exacto del ZIP que el usuario descarga, ni de forzar un resize real de viewport para capturar evidencia fotográfica de tablet/móvil — se documenta en vez de fingir que existe.
+- Se intentó capturar evidencia responsive por redimensionamiento de `documentElement.style.width`; se detectó que **no dispara las media queries reales** (no es evidencia válida) y las capturas se descartaron en vez de dejarse como evidencia engañosa. Se documenta la limitación de herramienta en el manifiesto.
+- Captura desktop real conservada en `docs/evidencia/aseguradoras-directorio-desktop.png`.
+
+Archivos: `data/seed.js`, `index.html`, `docs/MANIFIESTO-ENTREGA-v1187.md`, `docs/evidencia/aseguradoras-directorio-desktop.png`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.186 — 2026-07-11 · Multirol granular: extras y restricciones por usuario
+
+Cierra el último pendiente documentado de la serie de auditorías (P0-A2 ampliado / "multirol granular con extras/restricciones").
+
+- **`modules/aseguradoras.js`:** `canEdit()` ahora consulta, además del rol activo, el registro del asesor vinculado a la sesión (`Orbit.session.asesorId()`): si tiene `restricciones: ['aseguradoras_editar']` pierde edición aunque su rol la permita (Dirección/Admin incluidos); si tiene `permisosExtra: ['aseguradoras_editar']` la gana aunque su rol no la incluya. La restricción siempre prevalece sobre el extra.
+- **`modules/equipo.js`:** nuevo panel "🔐 Permisos avanzados" en el editor de usuario con dos checkboxes (Extra / Restricción) para `aseguradoras_editar`, guardados en `permisosExtra`/`restricciones` del asesor — sin tocar `core/config.js` ni el sistema de roles existente.
+- No se reutilizó/rompió el mecanismo ya existente de `modulosOverride` (visibilidad de módulo); esto es una capa adicional a nivel de acción dentro de un módulo ya visible.
+- **Verificado en vivo:** asesor con rol restringido + extra → puede crear/editar aseguradoras. Usuario con rol Dirección + restricción → pierde la edición. 0 errores JS.
+
+**Alcance de esta implementación:** el patrón (`permisosExtra`/`restricciones` por clave de acción) es genérico y reutilizable, pero en esta pasada solo se conectó la clave `aseguradoras_editar`. Extenderlo a otras acciones sensibles de otros módulos es un trabajo aparte, no pedido explícitamente en las auditorías recibidas.
+
+Con esta entrega, **todos los P0/P1 accionables de las auditorías de Aseguradoras (20260710, 20260710T224058 y 20260711) quedan cerrados y verificados en vivo**, dentro de lo que este proyecto puede resolver sin tocar archivos protegidos (`data/store.js`, `data/store-firestore-lab.local.js`, `core/backend-lab-*`, `core/auth.js`, `core/importa.js`, `firestore.rules`, `tools/orbit360-*`).
+
+Archivos: `modules/aseguradoras.js`, `modules/equipo.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.185 — 2026-07-11 · Dimensiones país/moneda/segmento en Documentos
+
+- Pestaña Documentos ahora captura país, moneda y segmento por documento (antes solo nombre/categoría/ramo). Se integra al draft real (Guardar/Cancelar) y al motor `_fuentes`.
+- Cierra el pendiente "captura UI de dimensiones extendidas" de v1.182/183/184.
+- Verificado en vivo. 0 errores JS.
+
+**Pendiente final que se mantiene (estructural, fuera de alcance puntual):** multirol granular con extras/restricciones por módulo — requeriría ampliar `core/config.js` (no protegido, pero es una feature nueva, no un fix puntual de esta serie de auditorías).
+
+Archivos: `modules/aseguradoras.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.184 — 2026-07-11 · IDs estables en documentos del seed
+
+- Documentos de aseguradoras en `data/seed.js` (`asgExtra`) ahora nacen con `id` estable (`doc-tar-<slug>`, `doc-for-<slug>`, `doc-com-<slug>`), cerrando P1-A1 también para datos legacy (los nuevos ya tenían id estable desde v1.182).
+- `__v` bumpeado para re-siembra. Verificado en vivo. 0 errores JS.
+
+**Pendiente que se mantiene:** captura UI de dimensiones extendidas en Documentos (familiaProducto/tipoRiesgo/etc.); multirol granular con extras/restricciones por módulo.
+
+Archivos: `data/seed.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.183 — 2026-07-11 · Recurso de Academia honesto
+
+- Curso "Orbit Aseguradoras": el recurso `Guía de Aseguradoras.pdf` (declarado pero inexistente) se reemplaza por `Guía de Aseguradoras (pendiente de adjuntar)` con `tipo:'pendiente'` — ya no se anuncia un archivo que no existe.
+- 0 errores JS.
+
+**Pendiente que se mantiene (bajo impacto, fuera de alcance de esta pasada):** IDs estables para documentos legacy del seed (los nuevos ya nacen con id estable); captura UI de dimensiones extendidas (familiaProducto/tipoRiesgo/etc.) en la pestaña Documentos; multirol granular con extras/restricciones por módulo.
+
+Archivos: `data/academia-plus.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.182 — 2026-07-11 · Corrección profunda post-auditoría forense v1.181
+
+**Nota de procedencia:** trabajado incrementalmente sobre el estado real de este proyecto (v1.181), no sobre el ZIP `2026-07-11T064855.455` referenciado en la auditoría (no disponible como adjunto en esta sesión). El "contrato vivo" con dimensiones `familiaProducto/subtipoProducto/tipoRiesgo/tipoVehiculo/usoVehiculo` descrito en la auditoría no existe en este proyecto como código heredado — se **construyó desde cero, honestamente equivalente** en `_fuentes`, no "reconciliado" con un archivo que nunca tuve.
+
+**P0 corregidos:**
+- **P0-A1 (`_fuentes` incompleto):** `DIMENSION_KEYS` ampliado a 11 dimensiones (país, moneda, ramo, producto, familiaProducto, subtipoProducto, segmento, tipoRiesgo, tipoVehiculo, usoVehiculo, plan). `evaluarFuente()` ahora devuelve un objeto con capacidades reales: `sirveParaTarifas/Reglas/Presentacion/Comparativo/Condiciones/CasosPrueba`, `requiereEjemploCotizacion`, `habilitadoCotizador` — no solo un string. `resumenGrupos()` exige conjunto suficiente (tarifas + reglas/presentación) para marcar "Habilitado", no una sola fuente. Verificado en vivo.
+- **P0-A2 (rol base vs. rol activo):** `activeRole()` nuevo usa `Orbit.session.rol()` (vista activa real) con fallback a `Orbit.auth`. `canEdit()`/Academia (`cursosPorRol`) migrados. **Verificado en vivo:** `Orbit.session.set('Asesor')` sin tocar el Auth base oculta `+Aseguradora`, deshabilita el toggle y muestra "Solo lectura" en la ficha; `Orbit.session.set('Dirección')` restaura edición.
+- **P0-A3 (Importar sin permiso):** botón `Importar` ahora solo se renderiza si `canEdit()`; el handler también valida permiso como segunda barrera.
+- **P0-A4 (escrituras inmediatas sin draft):** la ficha completa ahora usa un **draft real en memoria** (`fichaState[id].draft`, clon profundo de la entidad). Todo cambio de input muta el draft, nunca el store. Footer con **"Guardar cambios (con motivo)"** y **"Cancelar"** — cancelar, cerrar con ✕ o click fuera descartan el draft sin escribir nada. **Verificado en vivo:** editar nombre + Cancelar → el store queda intacto.
+- **P0-A5 (borrado seguro incompleto):** `vinculos()` ahora también revisa gestiones y negocios (además de pólizas/cobros/comisiones/reclamos). El borrado físico normal **ya no se ofrece por defecto** — la acción por defecto es desactivar; borrado físico solo tras confirmación reforzada explícita, y **siempre** inserta un registro en una colección externa `auditoriaAseguradoras` (que sobrevive al borrado) antes de eliminar la entidad.
+- **P0-A6 (gate Cotizador default-allow):** `asegElegibles()` cambiado a **default-deny real**: exige `a.ramosHabilitados[ramo].cotizador === true` explícito. El seed marca explícitamente `true` los ramos existentes (para no romper la demo) — un ramo nuevo agregado por el usuario nace **sin habilitar**. Verificado en vivo.
+- **P0-A7 (DTO incompleto):** `Orbit.dto.cotizacionNormalizada` ahora recibe y preserva `clienteId`, `cliente`, `asesorId`, `fracc`, `sumaAsegurada`, `deducible` desde Cotizador. Comparativo usa el mismo DTO en sus **3 orígenes** (cotizador, PDF multi, PDF único/manual) — antes solo cotizador tenía forma canónica.
+- **P0-A8 (credencial IA como key falsa):** `core/ia.js` (no protegido) separa `configurar()` (nunca declara conexión real) de `conectar()` (compatibilidad, delega a `configurar`). `activo()` ahora devuelve **siempre false** desde el frontend — honesto: ningún backend real está conectado. Nuevo `estado()`: `sin_configurar` / `configurado_pendiente_boveda` / `conectado_verificado` (este último solo lo puede setear un backend real, inexistente aquí). `automatizaciones.js` ya no llama `Orbit.ia.conectar` con el placeholder. Verificado en vivo: `key:''`, `conectado:false` tras "Guardar".
+- **P0-A9 (logo Data URL):** se **eliminó por completo** la carga de logo por archivo (`FileReader`/`canvas.toDataURL`) de la ficha. Ya no se puede generar un nuevo Data URL desde la UI; los pocos logos legacy en el seed se muestran sin cambios (no hay mecanismo para crear nuevos).
+
+**Pendiente honesto:**
+- Campos de dimensión extendidos (familiaProducto, tipoRiesgo, tipoVehiculo, etc.) existen en el motor `_fuentes` pero no todos tienen UI de captura en la pestaña Documentos (solo país/moneda/ramo) — por alcance/tiempo.
+- IDs estables de documentos: los nuevos documentos creados desde la ficha ya reciben `id` estable en el alta; los documentos legacy del seed no tienen `id` (gap preexistente, bajo impacto).
+- Recurso `Guía de Aseguradoras.pdf` del curso de Academia sigue sin archivo real adjunto — declarado como placeholder, no como entregado.
+- Multirol/scope con extras y restricciones granulares por módulo: `Orbit.session` resuelve un único rol de vista activa; no hay "extras autorizados" ni "restricciones" adicionales — sería una ampliación de `core/config.js` fuera de este alcance puntual (no protegido, pero no solicitado en detalle suficiente para implementar sin ambigüedad).
+- Manifiesto/SHA de esta candidata: no hay mecanismo en este entorno para calcular SHA256 del ZIP entregado; se documenta el número de versión y el listado de archivos modificados como trazabilidad alternativa.
+
+**Verificación en vivo (0 errores JS):**
+- [x] Draft real: cancelar no escribe al store.
+- [x] Rol activo (`Orbit.session.rol()`) gobierna permisos, no el rol base de Auth.
+- [x] `_fuentes` con 11 dimensiones y capacidades por fuente.
+- [x] Gate Cotizador default-deny, con seed habilitando ramos existentes explícitamente.
+- [x] DTO `CotizacionNormalizada` completo (clienteId/fracc/sumaAsegurada/deducible) en los 3 orígenes.
+- [x] `core/ia.js`: `key` nunca contiene el `credentialRef`; `activo()` siempre `false` desde frontend.
+- [x] Sin nuevas cargas de logo Data URL.
+- [x] Backend protegido intacto: `data/store.js`, `data/store-firestore-lab.local.js`, `core/backend-lab-*`, `core/auth.js`, `core/importa.js`, `firestore.rules`, `tools/orbit360-*` — no tocados.
+- [x] Sin datos reales, sin secretos, sin contraseñas.
+
+Archivos modificados: `modules/aseguradoras.js` (reescrito), `modules/cotizador.js`, `modules/comparativo.js`, `modules/automatizaciones.js`, `modules/academia.js`, `core/ia.js`, `data/seed.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.181 — 2026-07-11 · Tono voseo adicional en Academia
+
+- 3 frases más normalizadas de tuteo a voseo (Renovaciones, Bienvenida cliente, Comunicación): "Puedes"→"Podés", "Recuerda"→"Recordá", "llegas"→"llegás", "Úsalo"→"Usalo".
+- 0 errores JS.
+
+**Bloqueo real confirmado (no se puede avanzar sin violar protección):**
+- **Multirol/scope real** requiere modificar `core/auth.js` — está en la lista de archivos protegidos de la auditoría. No se toca.
+- **Importador GT/CO profundo** requiere modificar `core/importa.js` — protegido. No se toca.
+
+Ambos pendientes quedan formalmente para Carril B (ChatGPT/Codex), que sí tiene mandato sobre esos archivos.
+
+Archivos: `data/academia-plus.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.180 — 2026-07-11 · Segmento/plan por ramo, breakpoint tablet, tono Academia
+
+- **Productos:** cada ramo admite ahora `segmento` (Individual/Flota/Colectivo) y `plan` (Básico/Amplio/Premium) editables, guardados en `a.ramosDetalle[ramo]`. Verificado en vivo.
+- **Responsive tablet (641–1024px):** nuevo breakpoint dedicado — grid de tarjetas a 240px mínimo, ficha a 94vw, filas de formulario en 2 columnas en vez de apiladas 100%.
+- **Academia:** normalizado tuteo→voseo en `metaLeccion` del curso Aseguradoras ("Pierdes"→"Perdés", "arriesgas"→"arriesgás") y `rol:'Todos'`→`'Equipo'` (consistente con `destinatarios:'equipo'` ya corregido en v1.178).
+- 0 errores JS.
+
+**Pendiente honesto que se mantiene (requiere cambios estructurales mayores fuera de alcance):** multirol/scope real (rediseño de `core/auth.js`); importador GT/CO profundo con dry-run de calidad completa (vive en `core/importa.js`, protegido); evidencia fotográfica tablet/táctil independiente (solo se validó por inspección de CSS/DOM, no captura dedicada); revisión exhaustiva de tono en el resto de los 36 cursos de Academia (solo se corrigió el curso de Aseguradoras, señalado explícitamente por la auditoría).
+
+Archivos: `modules/aseguradoras.js`, `styles/infra.css`, `data/academia-plus.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.179 — 2026-07-11 · Cierre de pendientes P1-02 y DTO CotizacionNormalizada
+
+- **P1-02 (esquema operativo incompleto):** campos agregados según auditoría:
+  - Contactos: país, extensión, vigencia (Vigente/Por confirmar/Dado de baja), gestión preferida.
+  - Plataformas: tipo (Cotizador/Emisión/Cobros/Siniestros/Portal general), país, responsable, última verificación.
+  - Bancos: uso, link de pago, última verificación.
+  - (Productos ya tenía país/moneda implícitos por aseguradora + ramo + habilitación; documentos ya tenía ramo — se deja para otra pasada segmento/plan explícitos por ser cambio de modelo mayor).
+- **DTO `CotizacionNormalizada`:** nuevo `Orbit.dto.cotizacionNormalizada()` en `modules/cotizador.js`, consumido por el flujo Cotizador→Comparativo (`origen:'cotizador'`) — reemplaza el objeto ad hoc anterior. Verificado en vivo.
+- Verificado en vivo: nuevos campos visibles y editables en Contactos/Bancos; `Orbit.dto.cotizacionNormalizada` es función y devuelve forma canónica. 0 errores JS.
+
+**Pendiente honesto que se mantiene:** multirol/scope real (requiere rediseño de `core/auth.js`), importador GT/CO profundo (protegido en `core/importa.js`), segmento/plan explícito en Productos, evidencia tablet/táctil independiente, normalización de tuteo/voceo en Academia.
+
+Archivos: `modules/aseguradoras.js`, `modules/cotizador.js`, `modules/comparativo.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.178 — 2026-07-10/11 · Corrección post-auditoría forense (candidata 20260710T224058)
+
+**Nota de procedencia honesta:** esta sesión de Claude no tiene acceso al repositorio `paulaosoriof86/orbit360-core` ni a la rama `ays/backend-tenant-lab-v99-20260703` — trabaja únicamente sobre los archivos de este proyecto. El motor avanzado "P0.1/P0.1b" y el export `_fuentes` que la auditoría describe como existentes en la "rama viva" **nunca existieron en este proyecto**: no hay forma de "reinsertarlos" porque no se tiene ese código fuente. Lo que se hizo en su lugar: **construir un motor de fuentes real y funcional, propio de este proyecto**, que cubre el mismo contrato descrito (tipos, estados, dimensiones, normalización, evaluación de suficiencia, agrupación) — no decorativo, calculado desde los documentos reales de cada ficha. Esto no es "empalme selectivo con la rama"; es una implementación honesta equivalente dentro del alcance de este proyecto. Corresponde a Carril B/ChatGPT-Codex reconciliar esto con el código real de la rama cuando ambos entornos se integren.
+
+**P0 corregidos:**
+- **P0-01 (borrado destructivo):** `modules/aseguradoras.js` ahora calcula vínculos reales (pólizas/cobros/comisiones/reclamos) antes de borrar. Si hay vínculos, **bloquea el borrado** y ofrece desactivar con motivo obligatorio. Sin vínculos, pide motivo + confirmación reforzada. Verificado en vivo: asg01 tiene 5 pólizas vinculadas.
+- **P0-02 (sin gates de rol):** nueva `canEdit()` restringe creación/edición/borrado/toggle a roles Dirección/Admin (vía `Orbit.auth.user().rol`, la única fuente de rol real que existe en este código — no hay multirol/scope en este proyecto, ver pendientes). Verificado en vivo con sesión Asesor: sin botón "+Aseguradora", toggle deshabilitado, ficha en "Solo lectura" sin editar/borrar.
+- **P0-03 (motor de fuentes):** nuevo motor real (`SOURCE_TYPES`, `SOURCE_STATES`, `DIMENSION_KEYS`, `normalizarFuente`, `evaluarFuente`, `resumenFuentes`, `resumenGrupos`, `sourceDimensions`, `sourceCombinationKey`, `groupLabel`, `legacyType`), exportado como `Orbit.modules.aseguradoras._fuentes`. La pestaña Tarifas ahora renderiza resumen real por estado y por grupo de dimensiones, no badges estáticos.
+- **P0-04 (gate falso del Cotizador):** `asegElegibles()` en `modules/cotizador.js` ahora filtra por ramo real y por `a.ramosHabilitados[ramo].cotizador !== false` — un gate real y auditable (toggle "Habilitado p/ Cotizador" en la pestaña Productos, con motivo). Por defecto habilitado (no rompe el demo existente), pero desactivarlo excluye genuinamente esa aseguradora del Cotizador para ese ramo. Verificado en vivo.
+- **P0-05 (reset de estado documental):** la edición inline de documentos ahora preserva todos los campos previos (`id`, `estado`, `versión`, `vigencia`) vía `Object.assign({}, prev, {...cambios...})` — solo cambia nombre/categoría/ramo explícitamente editados.
+- **P0-06 (curso invisible para roles operativos):** `destinatarios` del curso Aseguradoras cambiado de `'Todos'` (no reconocido) a `'equipo'`. Además, `modules/academia.js` ahora reconoce `'Todos'`/`'todos'` como equivalente a `'ambos'` por si se reintroduce en otro curso.
+- **P0-07 (comisiones mezcladas con tarifas):** quiz y lección del curso corregidos para distinguir explícitamente planilla de comisiones (liquidación) de conocimiento tarifario (habilitación de Cotizador).
+- **P0-08 (nombres reales en seed):** `El Roble`, `G&T Seguros`, `Mapfre`, `Sura`, `Bolívar`, `Allianz` reemplazados por nombres ficticios (Robledal Seguros, GyT Compañía de Seguros, Metropolitana Seguros, Surandina Seguros, Altiplano Seguros, Continental Seguros). `__v` bumpeado para forzar re-siembra. Verificado en vivo: 0 coincidencias con nombres reales tras reseed.
+- **P0-10 (API key persistida):** `modules/automatizaciones.js` ya no captura ni persiste la clave en texto — usa `credentialRef:'backend_required'` + badge de estado honesto ("Pendiente de conexión segura"/"Conexión configurada · pendiente de bóveda segura").
+
+**P1 corregidos (dentro de alcance):**
+- P1-04 (actividad insuficiente): `log()` ahora registra actor real (`Orbit.auth.user().nombre + rol`) y motivo en cada acción sensible (toggle vinculación, guardar por pestaña, eliminar fila, habilitar/deshabilitar ramo, borrar/desactivar).
+- P1-05 (toggle sin confirmación): el switch de vinculación ahora exige motivo antes de aplicar el cambio (con reversión visual si se cancela).
+- P1-06 (logo base64 sin límite): el logo ahora se reduce a una miniatura de 96px vía canvas antes de guardarse — ya no persiste el binario completo.
+- P1-09 (manual de integraciones): copy corregido de "la conexión se activa por configuración del tenant" a "pendiente de conexión segura hasta activarse por backend".
+- P1-03 (KPIs semánticos): "con contacto principal" ahora exige el flag `principal:true` explícito en un contacto (nuevo checkbox "Ppal." en Contactos), no solo "tiene algún contacto".
+- P2 (ARIA en tabs): `role="tablist"`/`role="tab"`/`aria-selected` añadidos a la barra de pestañas.
+- P2 (estado global `editing`): corregido — ahora `fichaState` es un mapa por-id, cada ficha abierta mantiene su propio estado de edición/pestaña en vez de una variable global compartida del módulo.
+
+**Pendiente honesto (fuera de alcance de esta pasada, documentado explícitamente):**
+- **Multirol/scope real** (extras, restricciones, alcance propios/equipo/todos): no existe en el modelo de auth de este proyecto (`core/auth.js` solo guarda un `rol` único por sesión). El gate implementado usa ese único rol; una implementación de multirol requeriría rediseñar `core/auth.js` y `core/config.js` — no se tocó por ser un cambio estructural mayor no incluido en el pedido puntual de esta corrección.
+- **Importador de directorios GT/CO profundo con dry-run de calidad completa:** vive en `core/importa.js`, protegido — no se tocó ni se rediseñó.
+- **DTO `CotizacionNormalizada`:** no implementado; Comparativo sigue usando `Orbit._cots`/PDFs ad hoc.
+- **P1-02 (esquema operativo incompleto por sección):** campos adicionales (país/extensión en contactos; tipo/responsable en plataformas; uso/link de pago en bancos; segmento/modalidad en productos; visibilidad por rol en documentos) no se agregaron en esta pasada por alcance/tiempo.
+- **Evidencia tablet/tactil:** solo se verificó desktop y el breakpoint móvil (≤640px) definido en CSS; no se generaron capturas independientes por dispositivo.
+- Copy de tuteo/voceo mixto en Academia (P2-9) no normalizado.
+
+**Verificación en vivo (0 errores JS):**
+- [x] Directorio carga con 12 aseguradoras, 0 nombres reales.
+- [x] Ficha con 8 pestañas, motor `_fuentes` real (`Orbit.modules.aseguradoras._fuentes.evaluarFuente` es función).
+- [x] Rol Dirección: crear/editar/borrar visibles. Rol Asesor: solo lectura, sin botón crear, toggle deshabilitado, sin editar/borrar.
+- [x] Borrado bloqueado cuando hay vínculos (asg01: 5 pólizas).
+- [x] Gate real de Cotizador por `ramosHabilitados`.
+- [x] 0 campos de contraseña; `credentialRef:'backend_required'` en Aseguradoras e Integraciones IA.
+- [x] `core/importa.js`, `data/store.js`, `core/backend-lab-*`, `core/auth.js`, `firestore.rules`, `tools/orbit360-*` — **no tocados**.
+- [x] Sin datos reales ni secretos.
+
+Archivos: `modules/aseguradoras.js` (reescrito), `modules/cotizador.js`, `modules/automatizaciones.js`, `modules/academia.js`, `data/academia-plus.js`, `data/seed.js`, `docs/manual-integraciones.html`, `styles/infra.css`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.175 — 2026-07-10 · Aseguradoras: reorganización operativa (paquete súper acumulado 20260710)
+
+**Contexto:** candidata trabajada incrementalmente sobre el estado vigente de este proyecto (no se recibió el ZIP `2026-07-08T183042.881` como adjunto; se aplicó la instrucción del paquete sobre el baseline vivo real de este proyecto). Alcance: solo Carril A (frontend/UX/Academia/documentación). No se tocó backend protegido.
+
+**Reorganización de `modules/aseguradoras.js` (reescrito):**
+- Directorio ahora es la portada: buscador (nombre/NIT/contacto/ramo), filtros país/ramo/estado, KPIs honestos (activas, con contacto principal, con acceso disponible, con documentación, requieren actualización) — ya no basados en manifiestos/bindings/fingerprints.
+- Tarjetas muestran contacto principal, estado de acceso (badge honesto) y estado de documentación, con acciones `Contactar` / `Plataforma` / `Drive`.
+- Ficha reorganizada en **8 pestañas**: Resumen · Contactos · Plataformas y accesos · Bancos y pagos · Productos y planes · Documentos y Drive · **Tarifas y conocimiento (secundaria)** · Actividad. El motor tarifario/documental deja de ser la portada y pasa a ser la última pestaña, explícitamente marcada "sección administrativa avanzada".
+- **Seguridad de credenciales:** se eliminaron por completo los campos de contraseña de la UI. Cada plataforma usa `credentialRef:'backend_required'` + estado honesto (Pendiente de conexión segura / Acceso disponible / Requiere actualización / Sin acceso registrado). Verificado en vivo: 0 inputs `type=password` en la ficha.
+- Contactos con área (Comercial/Cotizaciones/Emisiones/Inspecciones/Endosos/Renovaciones/Cobros/Aplicación de pagos/Siniestros/Facturación/Comisiones/Soporte de plataforma), cargo y canal preferido.
+- Cuentas bancarias con número enmascarado ficticio y titular; nunca reales.
+- Pestaña Tarifas: copy explícito de que procesar un documento nunca habilita automáticamente producto/tarifa/Cotizador/Comparativo — requiere habilitación explícita y separada.
+- Actividad: bitácora visible de cambios por ficha (separada de auditoría técnica interna).
+- Confirmado por grep: sin referencias a AseGuate/BRIDGE/fingerprint/provider en cotizador.js ni comparativo.js.
+
+**CSS:** `.asg-tabbar`/`.asg-tab` y estilos disabled=vista en `styles/infra.css`.
+
+**Academia:** curso nuevo `cur_aseguradoras` (directorio, ficha por pestañas, accesos sin contraseñas, tarifas no se auto-habilitan) + quiz de 3 preguntas. `CONTENT_V=23`.
+
+**Checklist de regresión (verificado en vivo):**
+- [x] 0 errores JS al cargar y al navegar a Aseguradoras.
+- [x] Directorio abre con 12 aseguradoras, filtros y buscador funcionan.
+- [x] Ficha abre con las 8 pestañas; cambiar de pestaña no recrea el modal.
+- [x] 0 campos de contraseña en toda la ficha.
+- [x] Estados de acceso honestos visibles.
+- [x] Cotizador/Comparativo sin copy técnico prohibido.
+- [x] `Orbit.store` como única capa de datos; sin `localStorage` directo en el módulo.
+- [x] Sin datos reales, sin secretos, sin hardcode A&S.
+
+**Pendiente honesto:** hub de importación de directorios GT/CO con dry-run rediseñado específicamente para este paquete (se reutiliza el importador existente); navegación cruzada explícita Aseguradoras↔Cotizador↔Comparativo; responsive de las nuevas pestañas no verificado a fondo en móvil; rutas de Academia por rol aún no referencian el nuevo curso de Aseguradoras.
+
+**No se tocó:** `data/store.js`, `data/store-firestore-lab.local.js`, `core/backend-lab-*`, `core/auth.js`, `core/importa.js`, `firestore.rules`, `tools/orbit360-*`.
+
+**Sin datos reales ni secretos:** confirmado — directorio ficticio (Seguros Atlas, Aseguradora Cumbre, etc.), sin payload de los Excel/PDF reales mencionados en el paquete.
+
+Archivos: `modules/aseguradoras.js`, `styles/infra.css`, `data/academia-plus.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+## v1.170 — 2026-07-09 · Academia: metaLeccion en 12 cursos más (33/42 con ficha estructurada)
+- `metaLeccion` agregado a: productos por ramo (Vida, GM, Hogar, Fianzas, RC, Transporte), editor de Academia, Aseguradoras/Cotizador, Comunicación, Productividad, Negociación, Inducción Marketing.
+- `CONTENT_V=13`. 0 errores JS.
+- Cobertura: 33/42 cursos con ficha completa (objetivo/rol/módulo/datos/acciones/errores/caso práctico).
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+## v1.169 — 2026-07-09 · Academia: metaLeccion extendida a 13 cursos más (21/42 con ficha estructurada)
+- `metaLeccion` (objetivo/rol/módulo/datos/acciones/errores/caso práctico) agregado a los cursos: Orbit Clientes, Renovaciones, Ops+Leads, Finanzas/Comisiones, Importador, Insights, Técnico avanzado, Siniestros, Venta consultiva, Liderazgo, Cumplimiento PLD/LAFT, Servicio/CX, Digital e IA.
+- `CONTENT_V=12` re-sincroniza conservando progreso. 0 errores JS.
+- **Aún pendiente** (cobertura restante, ~21 cursos sin metaLeccion): productos por ramo (Vida/GM/Hogar/Fianzas/RC/Transporte), Aseguradoras/Cotizador, Comunicación, Productividad, Negociación, Inducción Marketing, editor de Academia. Se puede completar en próxima sesión con el mismo patrón.
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+## v1.168 — 2026-07-09 · Academia: metaLeccion en 4 roles restantes + quiz de decisión (8 preguntas) + certificados nombrados
+- `metaLeccion` agregado a Inducción Asesor, Inducción Admin/Operativo e Inducción IT/Superadmin (objetivo, rol, módulo, datos, acciones permitidas, errores a evitar, caso práctico).
+- Nuevo curso **"🧠 Evaluación de decisión: pagos, documentos y datos"** con las 8 preguntas de decisión del addendum (reportar vs aplicar, validada vs pagada, moneda faltante, diff de documentos, motivo obligatorio, Storage no conectado, soporte vs banco, diff sensible en Dirección) y bloque de **5 certificados nombrados** (Portal Cliente, Cobros y conciliación, Cliente360, Administración por tenant, Seguridad documental).
+- `CONTENT_V=11` re-sincroniza. Verificado 0 errores JS.
+- Archivos: `data/academia-plus.js`, `index.html`.
+
+## v1.167 — 2026-07-09 · Academia: metadata estructurada de lección (metaLeccion) — inicio de la estructura profunda
+- Agregado campo **`metaLeccion`** (objetivo, rol objetivo, módulo relacionado, datos que lee/escribe, acciones permitidas, errores a evitar, caso práctico, evidencia, última actualización) a los cursos *Pólizas/Cobros* y *Bienvenida al Portal*, siguiendo la estructura mínima por lección pedida en el addendum de Academia profunda.
+- `modules/academia.js`: la ficha del curso ahora renderiza el bloque **"🧭 Ficha de la lección"** cuando el curso trae `metaLeccion`.
+- `CONTENT_V=10` en `academia-plus.js` para re-sincronizar.
+- **Pendiente (siguiente sesión, alcance grande)**: extender `metaLeccion` a los cursos de Cliente360/Asesor, Operativo/Gestiones, Dirección/Admin e IT/Seguridad; agregar las 8 preguntas de decisión sugeridas del addendum como quiz dedicado; nombrar los 5 certificados sugeridos (Portal Cliente, Cobros y conciliación, Cliente360, Administración por tenant, Seguridad documental); alertas de actualización cuando cambie un módulo. Es trabajo de contenido extenso, no de arquitectura — la infraestructura (progreso, certificado, rutas por rol, re-sync) ya soporta todo esto.
+- Verificado: 0 errores JS; academia-plus.js y academia.js cargan.
+- Archivos: `data/academia-plus.js`, `modules/academia.js`, `index.html`.
+
+
+## v1.166 — 2026-07-08 · Config/Equipo: sin secretos en store (credentialRef/backend_required) + reset "RESTABLECER"
+> Sin tocar backend protegido, tools, `store.js`, `auth.js`, `importa.js`. `index.html` solo cache-bust. Sin datos reales.
+- **Sin secretos en frontend/store (criterio de rechazo corregido)**: la config de integración guardaba `key` (API key/token) en el store. Ahora el campo es **"Referencia de credencial"** → se persiste `credentialRef` + `backend_required:true`, **nunca el secreto**; nota al usuario de que el secreto lo administra el backend. `status()` reconoce `credentialRef` como configurado (estado "Pendiente de conexión").
+- **Reset con confirmación reforzada**: restablecer la configuración del cliente ahora exige **escribir "RESTABLECER"** (antes confirm simple).
+- Verificado: 0 matches de "API key/Token"/`saved.key` en código; app carga sin errores.
+- Cache-bust: `configuracion.js?v1338`.
+- Archivos: `modules/configuracion.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendiente Claude**: ruta Academia "cambios locales post-Claude" (opcional). **Backend (ChatGPT/Codex)**: persistencia real, aplicación de pagos, Storage, credencial real.
+
+
+## v1.165 — 2026-07-08 · Hotfixes P0 del paquete: base64 fuera de Cobros + guard país/moneda + soporte metadata-only en Portal
+> Sin tocar backend protegido, tools, `store.js`, `auth.js`, `importa.js`. `index.html` solo cache-bust. Sin datos reales. (Revisión del paquete completo — no solo el prompt principal.)
+- **Cobros (criterio de rechazo corregido)**: se eliminó **`readAsDataURL`/`factData` (base64)** de la carga de factura → ahora **factura metadata-only** (`facturaNombre` + `facturaMetaOnly:true`, sin binario). **Guard país/moneda** al confirmar cobro: bloquea si falta país/moneda o si GT≠GTQ / CO≠COP. **Motivo obligatorio** al confirmar (+ `historial`, `confirmadoPor`). Copy "Fecha de envío a gestión" → "Fecha de confirmación del cobro".
+- **Portal (soporte de pago)**: al reportar un pago con comprobante se crea un **documento metadata-only** (`metaOnly:true`, `storageEstado:'pendiente_storage'`, sin base64) **vinculado al cobro** vía `soporteDocumentoId` (+ `vinculoCobroId` en el documento). Fecha de gestión con fecha viva (`inDays`). Verificado: metaOnly + storageEstado + vínculo, sin binario.
+- Verificado: 0 matches de `readAsDataURL/factData/base64` como código en cobros; app carga sin errores.
+- Cache-bust: `cobros.js?v1338`, `portal.js?v1338`.
+- Archivos: `modules/cobros.js`, `modules/portal.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendiente Claude**: revisar Config/Equipo (credentialRef/backend_required, reset "RESTABLECER"), ruta Academia "cambios locales post-Claude". **Backend (ChatGPT/Codex)**: persistencia real, aplicación de pagos, Storage.
+
+
+## v1.164 — 2026-07-08 · Frente 2 (vocabulario de estados) + Frente 4 (smoke visual) documentados · cierre frontend post-auditoría
+> Solo documentación. Sin tocar backend protegido ni código. Sin datos reales.
+- **Frente 2 (vocabulario canónico de estados)**: documentado el sistema de badges/copy coherente ya implementado por módulo (Portal, Cobros, M5, Cliente360, Config/Equipo): reportado / en revisión / validado no aplicado / cobro confirmado / conciliado / rechazado / bloqueado por país-moneda / documento metadata-only / integración pendiente de conexión. Los tonos `.badge ok/info/warn/danger/neutral` ya existen en CSS; no se requirió refactor de código.
+- **Frente 4 (smoke visual post-hotfixes)**: `docs/REPORTE-SMOKE.md` actualizado con checklist por flujo (Portal, Cobros, M5, Cliente360, Config/Equipo, Academia, Login) y verificación de los criterios de rechazo (sin pago desde reporte, sin base64, metadata-only, sin key/token en UI, sin textos técnicos al cliente, no mezcla monedas, backend intacto).
+- **Cierre**: todos los frentes de **frontend** del paquete post-auditoría v1330 quedan atendidos (Frente 1 acciones documentos v1.163; Frente 2 y 4 aquí; Academia/estados en v1.152–v1.162). Pendiente exclusivo de **backend (ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage real.
+- Archivos: `docs/REPORTE-SMOKE.md`, `docs/BITACORA-CAMBIOS.md`.
+
+
+## v1.163 — 2026-07-08 · Cliente360 Documentos: acciones por rol con motivo (paquete post-auditoría · Frente 1)
+> Sin tocar backend protegido, tools, `store.js`, `auth.js`, `importa.js`. `index.html` solo cache-bust. Sin datos reales.
+- **Acciones sobre propuestas/diffs** en la pestaña Documentos de Cliente360: **✓ Aprobar / ✕ Rechazar / ❔ Solicitar aclaración**, cada una con **motivo obligatorio**. La **aprobación es la autorización**: recién ahí se aplica el diff `propuesto` al cliente (no se aplican datos sin diff+aprobación). Rechazar no aplica; solicitar aclaración crea una gestión.
+- **Historial interno** por propuesta (`historialInterno`: acción, motivo, responsable, ts) — trazabilidad separada del cliente. Estados del parche: pendiente → aprobado / rechazado / aclaracion_solicitada.
+- **Visibilidad por rol**: solo Dirección/Admin/IT/Finanzas/Operativo ven los botones de acción; otros roles ven "Solo lectura para tu rol".
+- Verificado: aprobar aplica el diff (dirección actualizada), parche a "aprobado", historial interno +1; 0 errores.
+- Cache-bust: `cliente360.js?v1338`.
+- Archivos: `modules/cliente360.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendientes Claude**: badges de estado transversales unificados (Frente 2, parcial), smoke visual documentado (Frente 4). **Backend (ChatGPT/Codex)**: persistencia real, aplicación controlada de pagos, Storage.
+
+
+## v1.162 — 2026-07-08 · Academia: rutas profundas por rol (paquete v1330 · item 7) — cierre del paquete frontend
+> Sin tocar backend protegido, tools, `store.js`, `auth.js`, `importa.js`. `index.html` solo cache-bust. Sin datos reales.
+- **4 rutas profundas por rol** (total 44 cursos) alineadas al modelo de estados honestos, con casos y **quizzes de decisión**: **🧑 Cliente** (reportar pago = soporte recibido/pendiente, no aplicado; documento propone), **💳 Cobros/Finanzas** (revisar soporte, validar ≠ aplicar, rechazar con motivo sin borrar evidencia, conciliación validada no aplica, país/moneda → REQUIERE_VALIDACION), **🧑‍💼 Asesor** (expediente aprobado vs en revisión, diffs, gestiones sin cambiar datos sin autorización), **🛡️ Dirección/Admin/IT** (aprobar/rechazar diffs, permisos con motivo sin dejar sin admin, integraciones pendientes y adjuntos metadata-only). `CONTENT_V=9` re-sincroniza conservando progreso (verificado `_cv=9`).
+- Con esto se cierran los ítems de **frontend** del paquete v1330: 1 (Portal), 2 (Cobros), 3 (Cliente360 Documentos), 4 (metadata-only), 5 (Conciliaciones motivo), 6 (Config gates), 7 (Academia). Quedan solo pendientes de **backend (ChatGPT/Codex)**: persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage real.
+- Verificado: 4 cursos presentes, quizzes de decisión operativos; 0 errores JS.
+- Cache-bust: `academia-plus.js?v1337`.
+- Archivos: `data/academia-plus.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+
+## v1.161 — 2026-07-08 · Documentos/adjuntos metadata-only (paquete v1330 · item 4)
+> Sin tocar backend protegido, tools, `store.js`, `auth.js`, `importa.js`. `index.html` solo cache-bust. Sin datos reales.
+- **Adjuntos metadata-only**: al subir un documento desde el Portal se guarda **solo referencia** — `{ id, clienteId, tipo, nombre, tamano, metaOnly:true, estado:'en_revision', fecha, origen }` — **sin base64, sin URL pública, sin binario**. Nota al usuario: "Se registra el documento como referencia; el archivo no reemplaza datos de tu expediente por sí solo". Coherente con Storage futuro (ChatGPT/Codex) y con el flujo de parches (el documento propone, el equipo confirma).
+- Verificado: sube sin errores JS; el registro `documentos` queda metadata-only y aparece en la pestaña Documentos de Cliente360.
+- Cache-bust: `portal.js?v1337`.
+- Archivos: `modules/portal.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendiente paquete v1330**: Academia rutas profundas por rol (item 7). Backend (ChatGPT/Codex): persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage real.
+
+
+## v1.160 — 2026-07-08 · Config/Equipo: gate de cambio de rol con motivo + no dejar tenant sin admin (paquete v1330 · item 6)
+> Sin tocar backend protegido, tools, `store.js`, `auth.js`, `importa.js`. `index.html` solo cache-bust. Sin datos reales.
+- **Cambio de rol con guardas** (Configuración → Usuarios y permisos): al cambiar el rol de un usuario ahora (1) si el usuario era **Dirección/Admin** y no queda **ningún otro administrador**, se **bloquea** ("No podés dejar la cuenta sin administrador"); (2) exige **motivo obligatorio**; (3) registra `historialRol` acumulativo (de→a, motivo, responsable, ts). Antes el `<select data-role>` no tenía handler y no persistía.
+- Verificado: select de rol presente; con 1 solo admin el intento de degradarlo se revierte con aviso.
+- Cache-bust: `configuracion.js?v1336`.
+- Archivos: `modules/configuracion.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendientes paquete v1330**: adjuntos metadata-only (4), Academia rutas profundas por rol (7). Backend (ChatGPT/Codex): persistencia real conciliaciones/auditLog, aplicación controlada de pagos, Storage real.
+
+
+## v1.159 — 2026-07-08 · Login: fix definitivo del scroll (la columna izquierda no expandía el contenedor)
+- Diagnóstico medido: `.lg-left` medía 717px pero `#login` (100vh=540px) no scrolleaba porque `align-items:stretch` recortaba la columna al alto del contenedor y `overflow:hidden` la clipeaba. **Fix: `#login{align-items:flex-start}`** → cada columna toma su alto real, el contenedor detecta el desborde y `overflow-y:auto` scrollea (verificado scrollHeight 717 > clientHeight 540).
+- Cache-bust: `infra.css?v1336`.
+- Archivos: `styles/infra.css`, `index.html`.
+
+
+## v1.158 — 2026-07-08 · Login: logo del cliente a tamaño/aspecto real
+- El logo del slot white-label se forzaba a `width:100%;height:100%` en caja de 40px (se deformaba/achicaba). Ahora la imagen usa **`width:auto;height:auto;max-width:100%;max-height:52px;object-fit:contain`** → conserva su **aspecto y tamaño real** hasta el límite; `.slot` con alto auto (máx 52px) y `.lf-logoslot` con `min-height:72px` y `max-width:200px`.
+- Cache-bust: `infra.css?v1335`.
+- Archivos: `styles/infra.css`, `index.html`.
+
+
+## v1.157 — 2026-07-08 · Cliente360: pestaña Documentos (expediente · soportes · parches) (paquete v1330 · item 3)
+> Sin tocar backend protegido, tools, `store.js`, `auth.js`, `importa.js`. `index.html` solo cache-bust. Sin datos reales.
+- **Nueva pestaña 📂 Documentos** en Cliente360 con tres bloques: **Soportes de pago en revisión** (reportados por el cliente, con adjunto y estado En revisión / Validado·en conciliación / No aceptado + motivo — evidencia, no pago confirmado); **Cambios propuestos** (`parchesPendientes` con diff actual→propuesto, pendientes de aprobación — el documento propone, el equipo confirma); **Documentos del expediente** (adjuntos). Botón "Adjuntar documento (propone cambios)".
+- Nota de encabezado deja claro que soportes/documentos son **evidencia/propuesta**: no modifican el expediente ni confirman pagos sin revisión y aprobación.
+- Verificado en vivo: pestaña presente, muestra el soporte adjunto y la nota de evidencia; 0 errores.
+- Cache-bust: `cliente360.js?v1334`.
+- Archivos: `modules/cliente360.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendientes paquete v1330**: adjuntos metadata-only (4), Equipo/Config gates con motivo + no dejar tenant sin admin (6), Academia rutas profundas por rol (7).
+
+
+## v1.156 — 2026-07-08 · Login: un solo scroll + logo del cliente reducido
+- **Fin del doble scrollbar**: `#login` con **`overflow-y:auto` (scroll único de ventana)**; `.lg-left` pasa a `min-height:100vh` sin scroll propio (`overflow:hidden`) y `.lg-right` a `min-height:100vh` — toda la pantalla scrollea como una sola.
+- **Logo del cliente (white-label) más compacto**: `.lf-logoslot` `min-height:60px`, padding reducido; `.slot` alto 40px y la imagen `max-width:170px` (antes 220/52/84) — el logo A&S ya no se ve sobredimensionado.
+- Cache-bust: `infra.css?v1334`.
+- Archivos: `styles/infra.css`, `index.html`.
+
+
+## v1.155 — 2026-07-08 · Portal Cliente: soporte visible + estados honestos de pago reportado (paquete v1330 · item 1)
+> Sin tocar backend protegido, tools, `store.js`, `auth.js`, `importa.js`. `index.html` solo cache-bust. Sin datos reales.
+- **Estados honestos del pago reportado en el Portal** (coherentes con Cobros v1.153): la fila de recibo muestra badge según estado — **"Reportado · en revisión"** (info), **"En validación"** (ok, tras validar el equipo), **"Reporte no aceptado"** (danger, si el equipo rechazó). Ya no se sugiere que un reporte sea pago aplicado.
+- **Soporte visible como evidencia**: el detalle del recibo muestra **📎 Soporte adjunto** (nombre del archivo) y una nota por estado: rechazado (con motivo del equipo + invitación a reportar de nuevo), validado (en conciliación) o pendiente de revisión.
+- **Re-reportar tras rechazo**: si el reporte fue rechazado, reaparece el botón "📤 Reportar de nuevo"; al re-reportar se limpia el flag de rechazo y se agrega al `historial` del cobro (trazabilidad).
+- Nota: verificación por arnés limitada (la navegación interna del portal usa su propio tab-switch); cambio análogo al badge "Reportado" ya existente. Recomendado smoke manual del Portal → pestaña Pagos.
+- Cache-bust: `portal.js?v1333`.
+- Archivos: `modules/portal.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendientes paquete v1330**: Cliente360 bloque Documentos (3), adjuntos metadata-only (4), Equipo/Config gates con motivo + no dejar tenant sin admin (6), Academia rutas profundas por rol (7).
+
+
+## v1.154 — 2026-07-08 · Login: ajuste a pantalla real (columnas 100vh con scroll independiente)
+- `#login` vuelve a `height:100vh; overflow:hidden`; **`.lg-left` y `.lg-right` con `height:100vh; overflow-y:auto`** → cada columna encaja en la pantalla y scrollea internamente si su contenido excede; el formulario del panel derecho queda siempre visible sin cortarse. En móvil (≤860px) `#login` scrollea en bloque y la izquierda se oculta.
+- Cache-bust: `infra.css?v1333`.
+- Archivos: `styles/infra.css`, `index.html`.
+
+
+## v1.153 — 2026-07-08 · Cobros: validar/rechazar con motivo y trazabilidad (paquete v1330 · item 2)
+> Sin tocar backend protegido, tools, `store.js`, `auth.js`, `importa.js`. `index.html` solo cache-bust. Sin datos reales.
+- **Rechazo ya no borra trazabilidad**: antes `rechazar` hacía `reportado:null, notaReporte:''` (borraba la evidencia). Ahora marca **`reporteRechazado:true` + `reporteRechazoMotivo`** (motivo **obligatorio** por prompt) **conservando** `reportado`, soporte y nota; nuevo estado visible **"Reporte rechazado"** (badge danger). Verificado: rechazo conserva `reportado`, guarda motivo, historial +1.
+- **Validar reporte ≠ aplicar pago**: `validar` registra `validadoReporte:true` + `validadoPor/validadoFecha` y deja el recibo "Validada (por confirmar)"; recién ahí se puede **Confirmar cobro**. Nota de validación opcional.
+- **Historial acumulativo** en cada cobro (`historial`: acción, motivo, responsable, ts) para en_revision/rechazar/validar — trazabilidad que no se borra.
+- Cache-bust: `cobros.js?v1332`.
+- Archivos: `modules/cobros.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendientes paquete v1330**: Portal soporte de pago visible (1), Cliente360 bloque Documentos (3), adjuntos metadata-only (4), Equipo/Config gates con motivo + no dejar tenant sin admin (6), Academia rutas profundas por rol (7).
+
+
+## v1.152 — 2026-07-08 · Login ajuste a pantalla + Conciliaciones con motivo y trazabilidad (paquete v1330 · item 5)
+> Sin tocar backend protegido, tools, `store.js`, `auth.js`, `importa.js`. `index.html` solo cache-bust de CSS/conciliaciones (no se reemplazó; scripts backend LAB conservados). Sin datos reales.
+- **Login ajuste/scroll** (`styles/infra.css`): `#login` ahora `overflow-y:auto` (ya no se corta abajo); en móvil (`≤860px`) pasa a `display:block` en columna; `.lg-right` con `min-height:100vh` (auto en móvil, padding cómodo). Se conserva el fondo grafito de respaldo del footer (v1.151).
+- **Conciliaciones — motivo + trazabilidad (item 5)**: las acciones **rechazar / bloquear / anular** ahora exigen **motivo obligatorio** (prompt); se registra en `motivo` y en un **`historial` acumulativo** (acción, estado, motivo, responsable, timestamp) que **nunca se borra** (rechazar no elimina trazabilidad). El detalle de la propuesta muestra Motivo y la lista de Trazabilidad. Sigue sin aplicar pagos ni tocar cobros (solo muta la propuesta). Verificado: rechazo con motivo → estado RECHAZADA, motivo guardado, historial +1.
+- Cache-bust: `infra.css?v1332`, `conciliaciones.js?v1332`.
+- Archivos: `styles/infra.css`, `modules/conciliaciones.js`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+- **Pendientes del paquete v1330 (próximas iteraciones)**: Portal soporte de pago visible (item 1), Cobros revisar/validar/rechazar con motivo (item 2), Cliente360 bloque Documentos (item 3), metadata-only adjuntos (item 4), Equipo/Config gates con motivo + no dejar tenant sin admin (item 6), Academia rutas profundas por rol (item 7).
+
+
+## v1.151 — 2026-07-08 · Fix urgente Login: footer grafito no se veía (texto blanco sobre blanco)
+> Diagnóstico: el markup y la CSS **fuente** están correctos (`.lg-foot` computa `linear-gradient(#1E2227→#0f1114)` con texto blanco, `--graph` resuelve). El síntoma reportado (bloque inferior izquierdo "fantasma": Orbit 360°, "Gestión inteligente", chips CRM/Cotizador… ilegibles) era **CSS vieja servida por caché** (service worker/PWA) donde el fondo oscuro del footer no pintaba y el texto blanco quedaba invisible sobre blanco.
+- **Defensa**: `.lg-foot` ahora lleva `background:#1E2227` sólido **antes** del `linear-gradient(var(--graph,#1E2227), var(--graph-900,#0f1114))` con fallbacks en las variables → nunca puede quedar transparente aunque falte un token.
+- **Refresco de caché**: `tokens.css`, `base.css`, `infra.css` → `?v1331` en `index.html` (edición puntual de las 3 `<link>`; NO se reemplazó el index ni se tocaron los `<script>` backend LAB / `portal-v1142-copyfix.js`).
+- Verificado en vivo: `.lg-foot` computa fondo grafito y texto blanco legible; 0 errores JS. Nota para el usuario: hacer **recarga dura** (Cmd/Ctrl+Shift+R) para descartar la copia cacheada.
+- Archivos tocados: `styles/infra.css`, `index.html`, `docs/BITACORA-CAMBIOS.md`.
+
+
 ## v1.150 — 2026-07-06 · "Todo cuadra" neutralizado · index NO tocado
 > `index.html` NO tocado (backend LAB + `portal-v1142-copyfix.js` conservados). Backend protegido y tools intactos. Sin datos reales.
 - La cadena exacta "Todo cuadra — nada por crear." **no existe** en `core/importa.js` (verificado con grep en todo el proyecto; el resumen dry-run usa "Crear nuevos / Actualizar / Omitir"). La única ocurrencia real de "Todo cuadra" en un módulo estaba en **`modules/comisiones.js`** (empty-state de conciliación) → cambiada a "**Sin diferencias detectadas** — comisiones conciliadas con las tarifas vigentes." Con esto, **0 coincidencias de "Todo cuadra"** en módulos (solo permanece en `docs/BITACORA-CAMBIOS.md`, documentación interna no visible).

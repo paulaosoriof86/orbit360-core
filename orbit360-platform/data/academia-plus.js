@@ -20,6 +20,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_p_clientes', titulo: 'Dominar Orbit Clientes (Expediente 360)', cat: 'Producto', emoji: '🧑‍💼', color: C.azul,
       desc: 'Autocapacitación a fondo del CRM: expediente, calidad de datos, importación y gestiones.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque el expediente 360 es la fuente única de verdad del cliente: todo lo demás (cobros, pólizas, comisiones) se construye sobre él.', problemaResuelve: 'Datos de contacto incompletos que impiden cobrar y renovar a tiempo.', sinEsto: 'Cadencias de cobro/renovación no llegan, y el equipo pierde tiempo buscando datos dispersos en WhatsApp/correo.', objetivo: 'Mantener el expediente 360 completo y de calidad; usar el importador sin ensuciar datos.', rol: 'Equipo (CRM)', modulo: 'Cliente360, Calidad de datos, Importar', datosLee: 'Expediente, cobertura de datos por cliente', datosEscribe: 'Datos de contacto, notas, solicitudes de completar dato', accionesPermitidas: 'Editar campos inline, notificar al cliente para completar dato, importar con dry-run', erroresEvitar: 'Forzar país/moneda al importar; inventar datos de contacto', casoPractico: 'Cliente con póliza vigente sin WhatsApp: se prioriza en Calidad y se solicita el dato, no se inventa.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Checklist de expediente completo.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Anatomía del expediente 360', 12, [
@@ -53,6 +54,16 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_p_polcob', titulo: 'Pólizas, Cobros y Cartera a fondo', cat: 'Producto', emoji: '📑', color: C.red,
       desc: 'Autocapacitación: ciclo de la póliza, recibos por forma de pago, aplicación de pagos y aging.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque cobrar a tiempo es tan importante como vender: sin cartera sana no hay comisión ni flujo de caja.', problemaResuelve: 'Confusión entre "reportado" y "pagado", y cartera vencida sin seguimiento.', sinEsto: 'Se aplican pagos sin validar, se pierde el aging y la cartera crece sin control.',
+        objetivo: 'Revisar soporte, validar sin aplicar, rechazar con motivo, solicitar aclaración, aplicar pago autorizado, conectar con M5, manejar país/moneda.',
+        rol: 'Cobros / Finanzas', modulo: 'Cobros, Conciliaciones (M5), Cliente360',
+        datosLee: 'Recibo, soporte adjunto (metadata), estado de cuenta banco, moneda/país de la póliza',
+        datosEscribe: 'Estado del cobro (validado/rechazado/aplicado), motivo, historial',
+        accionesPermitidas: 'Validar reporte, Rechazar con motivo, Solicitar aclaración, Aplicar pago (solo si país/moneda confiables)',
+        erroresEvitar: 'Aplicar un pago sin validar; aplicar sin país/moneda; rechazar sin motivo; confundir "validado" con "aplicado"',
+        casoPractico: 'Reporte con soporte no coincide con el banco: se marca "En revisión" o se rechaza con motivo — nunca se aplica a ciegas.',
+        evidencia: 'Quiz + caso práctico', estado: 'progreso/certificado', actualizado: '2026-07-09'
+      },
       recursos: [{ nombre: 'Guía de estados de póliza y cartera.pdf', tipo: 'pdf' }],
       lecciones: [
         L('El ciclo de vida de una póliza', 12, [
@@ -91,16 +102,22 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_p_renov', titulo: 'Renovaciones, Cancelaciones y Retención', cat: 'Comercial', emoji: '🔄', color: C.verde,
       desc: 'Autocapacitación: pipeline por vencer, comparativo multi-aseguradora y recuperación de cartera.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque retener cuesta 5-7 veces menos que captar un cliente nuevo.', problemaResuelve: 'Renovaciones trabajadas tarde (el día del vencimiento) y cancelaciones por falta de seguimiento.', sinEsto: 'La cartera se fuga silenciosamente mes a mes sin que nadie note el patrón.', objetivo: 'Trabajar el pipeline de renovación con anticipación y comparar multi-aseguradora.', rol: 'Asesor / Equipo', modulo: 'Renovaciones, Cancelaciones', datosLee: 'Pólizas por vencer, historial de siniestros', datosEscribe: 'Solicitud de propuesta, motivo de cancelación', accionesPermitidas: 'Solicitar propuestas a una o varias aseguradoras, registrar motivo de cancelación', erroresEvitar: 'Esperar al día del vencimiento; cancelar sin registrar motivo', casoPractico: 'A 60 días del vencimiento se solicita comparativo a 3 aseguradoras antes de llamar al cliente.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Playbook de retención.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Renovar es vender de nuevo (más barato)', 11, [
           S('🔄', 'El pipeline por vencer', C.verde, 'Renovaciones muestra las pólizas que vencen en los próximos 90 días, ordenadas por urgencia. Retener cuesta 5-7 veces menos que captar: trabaja la renovación **60 días antes**, no el día del vencimiento.'),
-          S('📋', 'Solicitar propuestas', C.azul, 'Puedes pedir renovación a la **misma** aseguradora, a **otras**, o a una selección. Orbit arma un **comparativo multi-aseguradora** (no solo replica la prima actual): así llegas al cliente con opciones, no con un simple aviso de cobro.'),
+          S('📋', 'Solicitar propuestas', C.azul, 'Podés pedir renovación a la **misma** aseguradora, a **otras**, o a una selección. Orbit arma un **comparativo multi-aseguradora** (no solo replica la prima actual): así llegás al cliente con opciones, no con un simple aviso de cobro.'),
           S('💡', 'Argumento de renovación', C.ocre, 'No renueves por inercia. Recuerda coberturas usadas, siniestros bien atendidos y cambios de necesidad (auto nuevo, familia, negocio). El valor que diste durante el año es tu mejor argumento.')
         ]),
         L('Cancelaciones: entender la fuga', 10, [
           S('✕', 'Motivos y valor perdido', C.red, 'Cada cancelación registra motivo (precio, servicio, siniestro mal atendido, venta de bien) y el **valor de prima perdido**. La tasa de fuga es un KPI de salud: si sube, hay un problema de servicio o de precio que atacar.'),
           S('♻', 'Recuperación', C.verde, 'Una cancelación no siempre es definitiva. Marca intentos de recuperación y resultado. A veces basta una llamada a tiempo con una alternativa más económica para salvar la cuenta.')
+        ]),
+        L('Paso a paso: trabajar el pipeline de renovación', 11, [
+          S('📋', 'Ver pólizas a 90 días', '#1F8A5B', 'Módulo **Renovaciones** → el pipeline muestra pólizas por vencer ordenadas por urgencia (≤15/30/60/90 días). Empieza siempre por el tramo más urgente.'),
+          S('📩', 'Solicitar propuestas', '#2A6FDB', 'Abre la póliza → **"Solicitar propuestas"** → elige misma aseguradora, otras, o selección múltiple. Orbit arma el comparativo antes de que llames al cliente.'),
+          S('📞', 'Argumentar y cerrar', '#C9821B', 'Presenta el comparativo con el argumento de servicio (siniestros atendidos, coberturas usadas). Si el cliente cancela, registra el motivo en Cancelaciones — no lo dejes sin trazabilidad.')
         ]),
         Q('Evaluación · Renovaciones', [
           { p: '¿Con cuánta anticipación conviene trabajar una renovación?', ops: ['El día del vencimiento', '~60 días antes', 'Después de que venza'], ok: 1 },
@@ -111,6 +128,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_p_opsleads', titulo: 'Ops + Leads: el ciclo comercial en Orbit', cat: 'Comercial', emoji: '🎯', color: C.azul,
       desc: 'Autocapacitación del equipo: cómo fluye un negocio de cotización a emisión y cómo se sincronizan Ops y Leads.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque un negocio debe fluir sin fricción de la cotización a la emisión, con el equipo interno y el asesor viendo lo que les corresponde.', problemaResuelve: 'Doble digitación y falta de visibilidad entre el equipo comercial y el operativo.', sinEsto: 'Negocios se pierden en la transición cotización→emisión y nadie sabe en qué etapa está cada uno.', objetivo: 'Entender el ciclo comercial único proyectado a Ops y Leads, y su sincronía en vivo.', rol: 'Asesor / Equipo interno', modulo: 'Ops, Leads', datosLee: 'Negocio (etapa, probabilidad)', datosEscribe: 'Etapa, cadencia, cierre/emisión', accionesPermitidas: 'Mover etapa, cerrar y emitir (crea cliente)', erroresEvitar: 'El asesor operando en Ops (no le corresponde); emitir sin cierre confirmado', casoPractico: 'Al emitir, Orbit crea el cliente y arranca la cadencia de satisfacción automáticamente.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Mapa Ops↔Leads.png', tipo: 'img' }],
       lecciones: [
         L('Ops y Leads: dos vistas, un mismo negocio', 12, [
@@ -136,6 +154,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_p_finanzas2', titulo: 'Finanzas, Comisiones y Conciliación (operativo)', cat: 'Finanzas', emoji: '💰', color: C.ocre,
       desc: 'Autocapacitación: movimientos por país, catálogo editable, cierres por periodo, comisiones y liquidación.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque sin cierre mensual con respaldo no hay estados financieros confiables ni comisiones bien liquidadas.', problemaResuelve: 'Movimientos mal clasificados y monedas mezcladas entre países.', sinEsto: 'Los reportes financieros quedan inflados o incompletos, y las comisiones se liquidan mal.', objetivo: 'Registrar movimientos por país/moneda y cerrar el mes con respaldo.', rol: 'Finanzas', modulo: 'Finanzas, Comisiones', datosLee: 'Movimientos, catálogo financiero, planillas de comisión', datosEscribe: 'Movimiento clasificado, estado de cierre del mes', accionesPermitidas: 'Registrar movimiento, editar catálogo, cerrar mes con respaldo', erroresEvitar: 'Mezclar monedas de distintos países en un total; cerrar sin planillas/estados de cuenta', casoPractico: 'Un mes no se marca "Cerrado" hasta tener planilla de comisión y estado de cuenta conciliados.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Guía de cierre mensual.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Movimientos, país y moneda', 12, [
@@ -163,6 +182,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_p_import', titulo: 'Importador inteligente y migración de datos', cat: 'Técnico', emoji: '⬇', color: C.teal,
       desc: 'Autocapacitación: fuentes separadas, trazabilidad, país/moneda, estados de validación y reglas de migración.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque migrar datos de Excel/sistemas viejos sin reglas destruye la calidad de la base para siempre.', problemaResuelve: 'Cargas masivas que mezclan países, monedas o inventan clientes desde archivos financieros.', sinEsto: 'La base queda contaminada con datos incorrectos difíciles de limpiar después.', objetivo: 'Migrar datos por fuente separada, con trazabilidad y sin asumir país/moneda.', rol: 'Equipo / IT', modulo: 'Importar', datosLee: 'Archivo de origen (Excel/CSV)', datosEscribe: 'Registros con estado LISTO/REQUIERE_VALIDACION/BLOQUEADO/OMITIDO', accionesPermitidas: 'Elegir fuente, revisar dry-run, confirmar mapeo, descargar reporte', erroresEvitar: 'Mezclar fuentes; asumir GT/GTQ sin evidencia; crear cartera desde histórico financiero', casoPractico: 'Fila sin país/moneda queda en REQUIERE_VALIDACION — se corrige el archivo, no se fuerza.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Contrato de fuentes de migración.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Una fuente, un propósito', 12, [
@@ -200,6 +220,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_p_insights', titulo: 'Insights, Reportes e IA para decidir', cat: 'Técnico', emoji: '📊', color: C.violeta,
       desc: 'Autocapacitación: leer la analítica del CRM, metas, aging y análisis con IA.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque decisiones de negocio sin datos son apuestas, no estrategia.', problemaResuelve: 'Medir producción sobre lo cerrado en vez de lo realmente cobrado.', sinEsto: 'Se celebran ventas que nunca se cobran y las metas quedan infladas.', objetivo: 'Leer KPIs de producción/cartera con criterio y usar IA para decidir.', rol: 'Dirección / Equipo', modulo: 'Insights, Reportes, IA', datosLee: 'Producción, cartera, pipeline', datosEscribe: 'N/A (lectura + exportación)', accionesPermitidas: 'Filtrar por país, exportar, pedir análisis de IA', erroresEvitar: 'Medir metas sobre prima total en vez de neta recaudada', casoPractico: 'Pipeline estancado en "Propuesta enviada" → el problema es seguimiento, no precio.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Diccionario de KPIs.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Leer Insights sin ahogarte en números', 12, [
@@ -226,6 +247,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_t_avanzado', titulo: 'Técnico de Seguros Avanzado: suscripción, tarificación y reaseguro', cat: 'Técnico', emoji: '📐', color: C.graf,
       desc: 'Cómo la aseguradora evalúa el riesgo, arma la prima y se protege — para argumentar con criterio técnico.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque asesorar sin criterio técnico lleva a vender coberturas mal ajustadas al riesgo real.', problemaResuelve: 'Infraseguro y promesas de cobertura que la aseguradora no aceptaría.', sinEsto: 'El cliente cobra menos en el siniestro por regla proporcional, o la póliza se rechaza en suscripción.', objetivo: 'Argumentar con criterio técnico: suscripción, tarificación y reaseguro.', rol: 'Asesor', modulo: 'Pólizas, Cotizador', datosLee: 'Condiciones de póliza, suma asegurada', datosEscribe: 'N/A (formación)', accionesPermitidas: 'Explicar coberturas/exclusiones con criterio técnico', erroresEvitar: 'Prometer coberturas que la aseguradora no aceptaría; infraasegurar', casoPractico: 'Suma asegurada menor al valor real → regla proporcional, el cliente cobra menos en el siniestro.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Fundamentos actuariales.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Suscripción: aceptar, modificar o rechazar el riesgo', 13, [
@@ -257,6 +279,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_t_siniestros', titulo: 'Gestión Profesional de Siniestros', cat: 'Servicio', emoji: '🚨', color: C.red,
       desc: 'El momento de la verdad: acompañar el reclamo de principio a fin y proteger la relación.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque el siniestro es el momento donde se gana o pierde la relación con el cliente para siempre.', problemaResuelve: 'Avisos tardíos y expedientes incompletos que retrasan el pago.', sinEsto: 'El cliente cancela y habla mal del servicio por años; la indemnización puede perderse por plazo vencido.', objetivo: 'Acompañar el siniestro de principio a fin sin perder al cliente.', rol: 'Asesor / Servicio', modulo: 'Siniestros, Cliente360', datosLee: 'Reclamo, documentación', datosEscribe: 'Estado del reclamo, bitácora', accionesPermitidas: 'Reportar, dar seguimiento, escalar objeciones', erroresEvitar: 'Reportar tarde; expediente incompleto', casoPractico: 'Aviso tardío puede costar la indemnización — reportar dentro del plazo siempre.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Checklist de siniestro por ramo.pdf', tipo: 'pdf' }],
       lecciones: [
         L('El siniestro es tu mejor (o peor) marketing', 12, [
@@ -283,6 +306,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_c_avanzado', titulo: 'Venta Consultiva Avanzada y Manejo de Objeciones', cat: 'Comercial', emoji: '🧠', color: C.verde,
       desc: 'Más allá de lo básico: diagnóstico profundo, propuesta de valor, cierre y multiventa.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque vender sin diagnóstico produce cotizaciones que no cierran y clientes mal asesorados.', problemaResuelve: 'Competir solo por precio y no dar seguimiento a las objeciones.', sinEsto: 'Se pierde la venta ante cualquier competidor más barato y no hay multiventa.', objetivo: 'Vender consultivamente: diagnóstico, valor, objeciones y cierre.', rol: 'Asesor', modulo: 'Leads', datosLee: 'Necesidad del cliente', datosEscribe: 'Notas de diagnóstico, próximo paso', accionesPermitidas: 'Diagnosticar, presentar opciones, cerrar con próximo paso agendado', erroresEvitar: 'Competir solo por precio; no agendar próximo paso', casoPractico: 'Ante "lo voy a pensar", se pregunta qué falta para decidir y se agenda fecha concreta.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Biblioteca de objeciones y respuestas.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Diagnóstico antes que producto', 12, [
@@ -310,6 +334,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_lid_equipos', titulo: 'Liderazgo de Equipos Comerciales', cat: 'Liderazgo', emoji: '🧭', color: C.graf,
       desc: 'Dirigir con datos y con personas: metas, coaching, cadencia de gestión y cultura.', destinatarios: 'Dirección',
+      metaLeccion: { porQueExiste: 'Porque un equipo sin cadencia de gestión no mejora, solo reacciona.', problemaResuelve: 'Falta de ritmo en el seguimiento de metas y coaching disperso.', sinEsto: 'Los asesores no reciben feedback a tiempo y las metas se descubren incumplidas al cierre de mes.', objetivo: 'Dirigir con datos y coaching, metas sobre prima neta recaudada.', rol: 'Dirección', modulo: 'Insights, Equipo', datosLee: 'KPIs por asesor', datosEscribe: 'Metas, notas de coaching', accionesPermitidas: 'Definir metas, dar seguimiento semanal/mensual, reconocer/corregir', erroresEvitar: 'Medir solo con instinto; corregir en público', casoPractico: 'Cadencia semanal de pipeline + 1:1 quincenal por asesor sostiene el ritmo del equipo.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Tablero de gestión semanal.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Dirigir con datos, liderar con personas', 13, [
@@ -337,6 +362,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_cum_pldp', titulo: 'Cumplimiento, PLD/LAFT y Protección de Datos', cat: 'Cumplimiento', emoji: '⚖️', color: C.violeta,
       desc: 'Obligaciones del intermediario: prevención de lavado, conozca a su cliente y tratamiento de datos.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque el intermediario es sujeto obligado en PLD/LAFT y en protección de datos personales.', problemaResuelve: 'Señales de alerta ignoradas y datos sensibles mal resguardados.', sinEsto: 'Riesgo de sanción legal y pérdida de confianza del cliente por una filtración.', objetivo: 'Cumplir PLD/LAFT, KYC y protección de datos personales.', rol: 'Equipo', modulo: 'Cliente360, Documentos', datosLee: 'Identidad del cliente, beneficiario final', datosEscribe: 'Alertas escaladas, soporte de debida diligencia', accionesPermitidas: 'Identificar cliente, escalar alertas, resguardar datos', erroresEvitar: 'Ignorar una señal de alerta; compartir datos fuera de la plataforma', casoPractico: 'Pago en efectivo desproporcionado de un tercero → se documenta y escala, no se resuelve solo.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Guía KYC y señales de alerta.pdf', tipo: 'pdf' }],
       lecciones: [
         L('PLD/LAFT y Conozca a su Cliente (KYC)', 12, [
@@ -363,6 +389,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_cx', titulo: 'Servicio y Experiencia del Cliente (CX)', cat: 'Servicio', emoji: '❤️', color: C.terra,
       desc: 'Convertir la póliza en relación: momentos clave, comunicación y recuperación de clientes molestos.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque los momentos de la verdad (siniestro, primer cobro) definen si el cliente se queda o se va.', problemaResuelve: 'Comunicación reactiva en vez de proactiva.', sinEsto: 'Detractores no atendidos cancelan y advierten a otros clientes potenciales.', objetivo: 'Cuidar los momentos de la verdad y recuperar clientes molestos.', rol: 'Equipo / Servicio', modulo: 'Portal, Cliente360', datosLee: 'Encuestas de satisfacción, historial de contacto', datosEscribe: 'Seguimiento post-venta', accionesPermitidas: 'Confirmar pagos, avisar antes del vencimiento, responder detractores', erroresEvitar: 'Ignorar a un detractor; usar jerga técnica', casoPractico: 'Un reclamo bien resuelto genera más lealtad que si nunca hubiera ocurrido.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Mapa de momentos del cliente.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Los momentos que deciden la relación', 12, [
@@ -389,6 +416,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_dig_ia', titulo: 'Habilidades Digitales e IA para Intermediarios', cat: 'Técnico', emoji: '🤖', color: C.azul,
       desc: 'Usar bien la tecnología: automatización, integraciones, IA responsable y productividad.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque la tecnología debe liberar tiempo del asesor para lo humano, no reemplazar su criterio.', problemaResuelve: 'Integraciones mostradas como activas sin estarlo, y contenido de IA enviado sin revisar.', sinEsto: 'Se pierde la confianza del cliente al descubrir que "algo estaba conectado" y no lo estaba.', objetivo: 'Usar automatización e IA de forma responsable, sin simular conexiones reales.', rol: 'Equipo', modulo: 'Automatizaciones, Integraciones, IA', datosLee: 'Eventos operativos', datosEscribe: 'Configuración de automatización', accionesPermitidas: 'Configurar automatizaciones, usar IA con revisión', erroresEvitar: 'Mostrar integración como activa sin estarlo; enviar sin revisar lo generado por IA', casoPractico: 'Una integración no conectada se muestra "pendiente de conexión", nunca como activa.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Guía de integraciones.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Automatización e integraciones', 12, [
@@ -416,6 +444,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_r_vida', titulo: 'Producto: Vida e Invalidez', cat: 'Producto', emoji: '❤️', color: '#C5162E',
       desc: 'Coberturas de vida, cálculo de suma asegurada y argumentos de venta con sensibilidad.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque una familia sin respaldo de Vida queda desprotegida financieramente ante la pérdida de su sostén.', problemaResuelve: 'Sumas aseguradas al azar, sin relación con la necesidad real.', sinEsto: 'La familia recibe un capital insuficiente para sostenerse el tiempo necesario.', objetivo: 'Calcular suma asegurada por necesidad real y asesorar con sensibilidad.', rol: 'Asesor', modulo: 'Cotizador, Pólizas', datosLee: 'Deudas, dependientes, ingreso del cliente', datosEscribe: 'Suma asegurada propuesta', accionesPermitidas: 'Calcular necesidad, explicar vida temporal vs entera', erroresEvitar: 'Vender una cifra al azar; omitir la declaración de salud', casoPractico: 'Padre joven con crédito hipotecario: suma = deuda + años de ingreso familiar.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Calculadora de necesidad de vida.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Qué cubre Vida y para quién', 12, [
@@ -427,6 +456,11 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🗣', 'Hablar de lo difícil', '#C9821B', 'Nadie quiere pensar en su muerte, por eso muchos no se aseguran. Enmarca la conversación en **amor y responsabilidad**: "¿quién sostiene a tu familia si tú faltas?". No es vender miedo; es ofrecer tranquilidad.'),
           S('📄', 'Declaración de salud', '#7A5BD9', 'Vida y GM exigen declaración honesta de salud: ocultar condiciones puede anular el pago del siniestro. Acompaña al cliente a declarar bien; una póliza que no paga es peor que ninguna.')
         ]),
+        L('Paso a paso: cotizar y vender Vida en Orbit', 12, [
+          S('🧮', 'Calcular la suma asegurada', '#C5162E', 'En el **Cotizador**, tipo "Vida" → ingresa deudas del cliente + años de ingreso familiar necesario + metas (educación de los hijos). Orbit sugiere la suma; ajústala con criterio, no reduzcas solo por bajar la prima.'),
+          S('📝', 'Cotizar y comparar', '#2A6FDB', 'Cotiza con 2-3 aseguradoras desde el mismo wizard. Compara vida temporal vs entera en el **Comparativo** y arma tu recomendación con el cliente presente, no después.'),
+          S('✅', 'Cerrar y emitir', '#1F8A5B', 'Al emitir desde Leads/Ops, adjunta la declaración de salud completa en Documentos del cliente. Una declaración incompleta pone en riesgo el pago futuro del siniestro.')
+        ]),
         Q('Evaluación · Vida', [
           { p: 'La suma asegurada de Vida se calcula sobre…', ops: ['La edad del cliente', 'Deudas + años de ingreso + metas familiares', 'El logo de la aseguradora'], ok: 1 },
           { p: 'Ocultar una condición de salud en la declaración…', ops: ['No afecta', 'Puede anular el pago del siniestro', 'Baja la prima legalmente'], ok: 1 }
@@ -436,6 +470,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_r_gm', titulo: 'Producto: Gastos Médicos y Salud', cat: 'Producto', emoji: '🏥', color: '#0E7C86',
       desc: 'Cobertura de salud, deducible y coaseguro, red y argumentos frente al sistema público.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque una hospitalización sin seguro puede costar años de ahorro.', problemaResuelve: 'Vender por precio con tope o red insuficiente.', sinEsto: 'El cliente enfrenta un evento médico caro sin cobertura suficiente.', objetivo: 'Explicar deducible, coaseguro, red y tope para elegir el plan correcto.', rol: 'Asesor', modulo: 'Cotizador, Pólizas', datosLee: 'Plan de salud, condiciones previas', datosEscribe: 'Plan recomendado', accionesPermitidas: 'Comparar planes, explicar preexistencias/carencias', erroresEvitar: 'Vender por precio con tope insuficiente', casoPractico: 'Cirugía cara puede superar una suma baja: el tope importa tanto como el precio.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Comparativo de planes GM.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Cómo funciona un plan de salud', 12, [
@@ -447,6 +482,11 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('⏱', 'Preexistencias y carencias', '#7A5BD9', 'Las condiciones previas suelen tener periodo de carencia o exclusión temporal. Declara con honestidad y explica los tiempos: sorprender al cliente en el siniestro destruye la relación.'),
           S('🛡️', 'Complemento, no lujo', '#1F8A5B', 'Frente al sistema público, GM es acceso rápido y elección de médico en el peor momento. Enmárcalo como protección del patrimonio: una hospitalización sin seguro puede costar años de ahorro.')
         ]),
+        L('Paso a paso: cotizar Gastos Médicos con criterio', 11, [
+          S('🏥', 'Comparar planes', '#0E7C86', 'En el **Comparativo**, revisa deducible, coaseguro, red de hospitales y tope por evento de cada opción — no solo el precio mensual. Explica el balance precio/bolsillo al cliente.'),
+          S('📋', 'Declarar salud sin atajos', '#7A5BD9', 'Registra preexistencias en la solicitud; el sistema las marca con su periodo de carencia. Ocultar una condición pone en riesgo el pago del siniestro.'),
+          S('🔁', 'Revisar en cada renovación', '#1F8A5B', 'Revisa si el plan sigue ajustado a la edad/familia del cliente en cada renovación — la necesidad de salud cambia con el tiempo.')
+        ]),
         Q('Evaluación · GM', [
           { p: 'Un deducible más alto normalmente…', ops: ['Sube la prima', 'Baja la prima pero aumenta el gasto de bolsillo', 'No cambia nada'], ok: 1 },
           { p: 'Atender dentro de la red…', ops: ['Cuesta más', 'Cuesta menos al asegurado', 'No está permitido'], ok: 1 }
@@ -456,12 +496,17 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_r_hogar', titulo: 'Producto: Hogar y Patrimonio', cat: 'Producto', emoji: '🏠', color: '#1F8A5B',
       desc: 'Cobertura de vivienda y contenidos, valor de reposición y venta cruzada con Auto/Vida.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque el patrimonio del cliente (su casa) suele ser su activo más grande.', problemaResuelve: 'Asegurar a valor depreciado sin avisar al cliente.', sinEsto: 'El cliente paga la diferencia de bolsillo tras un siniestro grande.', objetivo: 'Asegurar a valor de reposición y detectar oportunidades de multiventa.', rol: 'Asesor', modulo: 'Cotizador, Pólizas', datosLee: 'Valor del inmueble/contenidos', datosEscribe: 'Suma asegurada, pólizas cruzadas sugeridas', accionesPermitidas: 'Actualizar valor cada renovación, ofrecer Auto/Vida', erroresEvitar: 'Asegurar a valor real (depreciado) sin avisar', casoPractico: 'Cliente con Hogar+Auto+Vida casi no se va: revisa oportunidades en cada renovación.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Inventario de contenidos.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Qué protege Hogar', 11, [
           S('🏠', 'Estructura y contenidos', '#1F8A5B', 'Cubre el inmueble (incendio, daños por agua, fenómenos naturales) y los contenidos (muebles, electrónicos). Añade responsabilidad civil familiar y asistencias (plomero, cerrajero, electricista). Es de las coberturas de mejor relación valor/precio y baja siniestralidad.'),
           S('📐', 'Valor de reposición vs real', '#2A6FDB', 'Reposición: repara/repone a nuevo. Valor real: descuenta depreciación. Asegura a valor de reposición para que el cliente no pague la diferencia tras el siniestro. Revisa el valor cada renovación: la construcción sube.'),
           S('🔗', 'La puerta a la multiventa', '#C9821B', 'Hogar es excelente para venta cruzada: quien asegura su casa suele tener auto y familia que proteger. Un cliente con Auto+Hogar+Vida casi no se va: sube retención y valor de la cuenta.')
+        ]),
+        L('Paso a paso: asegurar Hogar y detectar multiventa', 10, [
+          S('🏠', 'Cotizar a valor de reposición', '#1F8A5B', 'En el Cotizador, ingresa el valor de reposición (no el valor de mercado depreciado) de estructura y contenidos. Actualízalo en cada renovación: la construcción sube de precio con el tiempo.'),
+          S('🔗', 'Detectar multiventa', '#C9821B', 'Al cotizar Hogar, revisa en Cliente360 si el cliente ya tiene Auto o Vida — y viceversa. Un cliente con las tres pólizas casi no se va.')
         ]),
         Q('Evaluación · Hogar', [
           { p: 'Asegurar a valor de reposición significa…', ops: ['Descontar depreciación', 'Reponer/reparar a nuevo', 'Pagar menos siempre'], ok: 1 }
@@ -471,12 +516,17 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_r_fianzas', titulo: 'Producto: Fianzas y Cumplimiento', cat: 'Producto', emoji: '📜', color: '#7A5BD9',
       desc: 'Un ramo distinto: garantía a un tercero, tipos de fianza y análisis de afianzamiento.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque muchos contratos (estatales y privados) exigen fianza para participar.', problemaResuelve: 'Expedientes de afianzamiento incompletos que retrasan la emisión.', sinEsto: 'El cliente pierde la licitación o el contrato por no tener la fianza a tiempo.', objetivo: 'Entender las 3 partes de la fianza y preparar el expediente de afianzamiento.', rol: 'Asesor', modulo: 'Cotizador, Aseguradoras', datosLee: 'Capacidad técnica/financiera del fiado', datosEscribe: 'Expediente de afianzamiento', accionesPermitidas: 'Explicar tipo de fianza, preparar contragarantías', erroresEvitar: 'Confundir fianza con seguro (no hay recuperación en seguro)', casoPractico: 'La afianzadora paga al beneficiario y luego cobra al fiado — no es indemnización sin retorno.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Tipos de fianza y requisitos.pdf', tipo: 'pdf' }],
       lecciones: [
         L('La fianza no es un seguro cualquiera', 12, [
           S('📜', 'Tres partes, no dos', '#7A5BD9', 'En la fianza intervienen fiado (quien debe cumplir), beneficiario (a quien se garantiza) y afianzadora. Garantiza el **cumplimiento de una obligación**: si el fiado falla, la afianzadora paga al beneficiario y **le cobra al fiado** (hay recuperación). No es indemnización sin retorno como en seguros.'),
           S('🏗', 'Tipos frecuentes', '#2A6FDB', 'Seriedad de oferta, cumplimiento de contrato, buen manejo de anticipo, estabilidad de obra, calidad del servicio (contratación estatal y privada). Cada una respalda una etapa del contrato del cliente.'),
           S('🔎', 'Análisis de afianzamiento', '#C9821B', 'La afianzadora estudia capacidad técnica, financiera y experiencia del fiado antes de emitir. Tu rol es preparar el expediente y explicar por qué piden contragarantías: es gestión de riesgo, no desconfianza.')
+        ]),
+        L('Paso a paso: armar un expediente de afianzamiento', 10, [
+          S('📋', 'Identificar el tipo de fianza', '#7A5BD9', 'Pregunta al cliente qué exige el contrato (seriedad de oferta, cumplimiento, anticipo, estabilidad de obra) y cotiza ese tipo específico — no una fianza genérica.'),
+          S('📁', 'Preparar el expediente', '#2A6FDB', 'Reúne estados financieros, experiencia del fiado y contragarantías en Documentos del cliente. Un expediente completo agiliza la emisión y evita retrasos que pueden costarle el contrato.')
         ]),
         Q('Evaluación · Fianzas', [
           { p: 'A diferencia de un seguro, en la fianza…', ops: ['No hay beneficiario', 'La afianzadora recupera del fiado lo que paga', 'No se analiza al cliente'], ok: 1 }
@@ -486,12 +536,17 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_r_rc', titulo: 'Producto: Responsabilidad Civil', cat: 'Producto', emoji: '⚖️', color: '#1E2227',
       desc: 'Proteger el patrimonio frente a daños a terceros: RC general, profesional y D&O.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque cualquier negocio puede enfrentar un juicio por daño a terceros.', problemaResuelve: 'Negocios y profesionales sin cobertura de RC/D&O.', sinEsto: 'Un solo juicio puede consumir el patrimonio personal o empresarial del cliente.', objetivo: 'Identificar cuándo un cliente necesita RC general, profesional o D&O.', rol: 'Asesor', modulo: 'Cotizador', datosLee: 'Actividad del cliente/empresa', datosEscribe: 'Recomendación de cobertura RC', accionesPermitidas: 'Detectar exposición a terceros, cotizar RC', erroresEvitar: 'Ignorar RC en negocios con atención al público', casoPractico: 'Un profesional independiente necesita RC Profesional por errores en su ejercicio.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Escenarios de RC por actividad.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Cuando el daño es a otro', 12, [
           S('⚖️', 'Qué cubre RC', '#1E2227', 'Responde por daños a terceros (personas o bienes) que el asegurado cause: lesiones a un cliente en el local, daño profesional, error de un directivo. Cubre indemnización y **defensa legal**. Un solo juicio puede costar más que años de prima.'),
           S('🩺', 'RC profesional y D&O', '#2A6FDB', 'RC Profesional protege a médicos, arquitectos, abogados por errores en su ejercicio. D&O protege a directores y administradores por decisiones de gestión. Son coberturas de alto valor para empresas y profesionales — mercado con poca competencia y buena comisión.'),
           S('🏭', 'A quién le urge', '#C9821B', 'Cualquier negocio que reciba público, preste servicios profesionales o tenga directivos. El patrimonio personal y empresarial está expuesto; RC lo blinda. Es asesoría de alto impacto que pocos ofrecen bien.')
+        ]),
+        L('Paso a paso: detectar y cotizar RC', 10, [
+          S('🔎', 'Detectar la exposición', '#1E2227', 'Identifica si el cliente atiende público, presta servicios profesionales o tiene directivos — cualquiera de esas condiciones justifica ofrecer RC.'),
+          S('📝', 'Cotizar RC general, profesional o D&O', '#2A6FDB', 'Cotiza el tipo correcto según la exposición detectada; explica que cubre también la defensa legal, no solo la indemnización.')
         ]),
         Q('Evaluación · RC', [
           { p: 'La cobertura de RC responde por…', ops: ['Daños al propio asegurado', 'Daños a terceros que el asegurado cause', 'Solo robo'], ok: 1 }
@@ -501,12 +556,17 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_r_transporte', titulo: 'Producto: Transporte y Carga', cat: 'Producto', emoji: '🚚', color: '#C9821B',
       desc: 'Mercancías en tránsito, modalidades y coordinación con el ramo de comercio exterior.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque la mercancía en tránsito está expuesta a pérdida sin que el cliente lo note hasta que ocurre.', problemaResuelve: 'Seguro de carga desalineado con el Incoterm pactado.', sinEsto: 'El cliente asume pérdidas de mercancía que debieron estar cubiertas.', objetivo: 'Elegir entre póliza por viaje o flotante según frecuencia de envíos.', rol: 'Asesor', modulo: 'Cotizador', datosLee: 'Frecuencia de embarques, Incoterm pactado', datosEscribe: 'Modalidad de póliza recomendada', accionesPermitidas: 'Coordinar seguro según Incoterm', erroresEvitar: 'No alinear el seguro con el Incoterm pactado', casoPractico: 'Importador frecuente: conviene póliza flotante/anual en vez de una por cada envío.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Incoterms y seguro de carga.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Asegurar mercancía en movimiento', 12, [
           S('🚚', 'Qué cubre', '#C9821B', 'Protege las mercancías durante su transporte (terrestre, marítimo, aéreo) contra pérdida o daño: accidente, robo, mojadura, manipulación. Puede ser por **viaje** (un envío) o **póliza flotante/anual** (todos los envíos del año), ideal para importadores/exportadores frecuentes.'),
           S('🌎', 'Comercio exterior', '#2A6FDB', 'Los Incoterms definen quién asegura y hasta dónde. Un cliente que importa o exporta necesita que la responsabilidad y el seguro coincidan con el término pactado. Coordinar esto bien te vuelve indispensable para su operación.'),
           S('📦', 'Suma y valor', '#1F8A5B', 'Se asegura sobre el valor de la factura (a veces + flete + un margen). Documentar bien el embarque agiliza el reclamo si algo se pierde en el camino.')
+        ]),
+        L('Paso a paso: coordinar el seguro de carga', 10, [
+          S('🌎', 'Confirmar el Incoterm', '#2A6FDB', 'Pregunta al cliente qué Incoterm pactó en su contrato de compra/venta — define quién debe asegurar la mercancía y hasta qué punto del trayecto.'),
+          S('🚚', 'Elegir viaje vs flotante', '#C9821B', 'Si el cliente importa/exporta con frecuencia, cotiza póliza flotante/anual; si es un envío puntual, cotiza por viaje. Documenta bien el embarque para agilizar cualquier reclamo.')
         ]),
         Q('Evaluación · Transporte', [
           { p: 'Una póliza flotante/anual conviene a…', ops: ['Quien hace un solo envío', 'Importadores/exportadores con envíos frecuentes', 'Nadie'], ok: 1 }
@@ -517,8 +577,13 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_meta_academia', titulo: 'Cómo crear y editar cursos en la Academia', cat: 'Inducción', emoji: '🛠️', color: '#2A6FDB',
       desc: 'Guía para administradores: crear, regenerar con IA, complementar, eliminar y cargar desde documentos.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque una Academia que no se actualiza deja de ser útil en semanas.', problemaResuelve: 'Cursos desactualizados que enseñan procesos que ya cambiaron.', sinEsto: 'El equipo se forma con información obsoleta y repite errores ya corregidos en el sistema.', objetivo: 'Crear, editar, regenerar con IA y cargar cursos desde documentos.', rol: 'Administrador de Academia', modulo: 'Academia', datosLee: 'Documento/recurso fuente', datosEscribe: 'Curso, lección, quiz', accionesPermitidas: 'Crear/editar/eliminar lección, generar con IA, cargar desde documento', erroresEvitar: 'Publicar sin revisar lo generado por IA', casoPractico: 'Subir un PDF de manual y generar la lección + quiz a partir de él, revisando antes de publicar.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Guía del editor de Academia.pdf', tipo: 'pdf' }],
       lecciones: [
+        L('Paso a paso: crear un curso desde un documento', 9, [
+          S('📎', 'Sube tu documento', '#2A6FDB', 'Botón **"✨ Crear con IA"** → adjunta el PDF/manual base → la IA propone título, lecciones y quiz a partir de él.'),
+          S('✏️', 'Revisa y publica', '#1F8A5B', 'Edita el contenido generado antes de publicar; asigna destinatarios (rol) para que aparezca en la Ruta por rol correspondiente.')
+        ]),
         L('Todo curso es editable', 11, [
           S('🛠️', 'Crear y estructurar', '#2A6FDB', 'Usa **+ Curso** para crear uno nuevo (título, categoría, emoji, color, destinatarios por rol). Agrega **lecciones** de 4 tipos: 🎬 video (YouTube/Vimeo/HeyGen embed), 📖 lectura (por secciones o texto), ✏️ quiz (preguntas con respuesta correcta) y 📎 recurso (PDF/imagen/Drive embebido). Reordénalas arrastrando.'),
           S('✨', 'Regenerar con IA', '#7A5BD9', 'En cada lección de lectura o quiz, **✨/🧠** genera o mejora el contenido con IA: redacta la lección, expande un borrador o crea preguntas. Puedes **replantear** todas las preguntas o solo complementar. La IA propone; tú editas y apruebas antes de guardar.'),
@@ -539,6 +604,15 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_ind_asesor', titulo: '🚀 Inducción del Asesor Nuevo — ruta completa', cat: 'Inducción', emoji: '🚀', color: '#C5162E',
       desc: 'Ruta guiada para un asesor que ingresa: la empresa, lo comercial y el dominio de la plataforma, en orden.', destinatarios: 'Asesor',
+      metaLeccion: { porQueExiste: 'Porque un asesor sin ruta clara tarda meses en ser productivo por prueba y error.', problemaResuelve: 'Onboarding disperso sin orden ni plazos.', sinEsto: 'El asesor nuevo tarda más en cerrar su primera venta y puede desmotivarse.',
+        objetivo: 'Revisar ficha 360, ver documentos por cliente/póliza, distinguir expediente aprobado vs revisión, revisar parches/diffs, crear gestiones sin cambiar datos sin autorización.',
+        rol: 'Asesor', modulo: 'Cliente360, Leads, Gestiones',
+        datosLee: 'Expediente del cliente, pólizas, documentos/diffs propuestos', datosEscribe: 'Gestiones, solicitudes de aclaración',
+        accionesPermitidas: 'Ver documentos, solicitar gestión, marcar seguimiento; NO aprobar/rechazar diffs (eso es Dirección/Admin)',
+        erroresEvitar: 'Asumir que un documento cargado ya actualizó el dato; cambiar datos sin autorización',
+        casoPractico: 'Documento de identidad propone cambio de dirección: el asesor lo ve como "pendiente de revisión", no lo aplica.',
+        evidencia: 'Quiz + caso práctico', estado: 'progreso/certificado', actualizado: '2026-07-09'
+      },
       recursos: [{ nombre: 'Plan de mis primeros 30 días.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Bienvenida y tu ruta de aprendizaje', 10, [
@@ -556,6 +630,11 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🔁', 'Del cierre a la relación', '#1F8A5B', 'Al emitir, Orbit crea el cliente y arranca la cadencia de satisfacción. Tu cartera es tu patrimonio: cuídala con servicio y multiventa (Auto → Vida → Hogar → GM). Un cliente con varias pólizas casi no se va.'),
           S('✅', 'Antes de cerrar tu inducción', '#C9821B', 'Completa: Fundamentos de Seguros, un producto por ramo, Ops+Leads, Orbit Clientes, Pólizas y Cobros, Renovaciones, y Cumplimiento. Cuando termines la ruta, tendrás tu certificado y estarás listo para vender con método.')
         ]),
+        L('Paso a paso: tus primeras semanas', 9, [
+          S('📅', 'Semana 1', '#C5162E', 'Completa Fundamentos de Seguros + revisa Ops/Leads. Acompaña a un asesor senior en 2-3 llamadas.'),
+          S('🎯', 'Semana 2-3', '#2A6FDB', 'Toma un curso de producto por ramo + Orbit Clientes/Pólizas. Empieza a prospectar con supervisión.'),
+          S('✅', 'Semana 4', '#1F8A5B', 'Cierra tu primera venta solo, con Renovaciones y Cumplimiento ya completados.')
+        ]),
         Q('Evaluación · Inducción del asesor', [
           { p: 'El diferencial de la correduría frente al precio es…', ops: ['El logo', 'El servicio y acompañamiento', 'Vender más barato'], ok: 1 },
           { p: 'Como asesor, tu trabajo diario lo ves en…', ops: ['Orbit Ops', 'Orbit Leads', 'Finanzas'], ok: 1 },
@@ -566,6 +645,15 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_ind_admin', titulo: '🗂️ Inducción Administrativa y Operativa — ruta completa', cat: 'Inducción', emoji: '🗂️', color: '#0E7C86',
       desc: 'Ruta guiada para personal administrativo/operativo: cómo funciona cada módulo, qué hacer y cómo ayuda.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque el personal operativo sostiene la calidad de datos y cobros de toda la correduría.', problemaResuelve: 'Falta de criterio sobre qué hacer en cada módulo.', sinEsto: 'Datos sucios y cartera desatendida por no saber priorizar el trabajo diario.',
+        objetivo: 'Recibir solicitudes del portal, vincular documentos, pedir información faltante, escalar bloqueos, mantener trazabilidad.',
+        rol: 'Operativo / Gestiones', modulo: 'Gestiones, Cliente360, Documentos',
+        datosLee: 'Solicitudes del portal, documentos adjuntos, estado de gestiones', datosEscribe: 'Gestión (estado, nota, escalado)',
+        accionesPermitidas: 'Vincular documento a gestión, pedir info faltante, escalar a Dirección si hay bloqueo',
+        erroresEvitar: 'Cerrar una gestión sin trazabilidad; no escalar un bloqueo que no puede resolver',
+        casoPractico: 'Cliente solicita cambio de beneficiario sin documento de respaldo: se pide la información faltante antes de avanzar.',
+        evidencia: 'Quiz + caso práctico', estado: 'progreso/certificado', actualizado: '2026-07-09'
+      },
       recursos: [{ nombre: 'Manual operativo por módulo.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Bienvenida y tu ruta operativa', 10, [
@@ -583,6 +671,11 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🌟', 'Los valores agregados', '#7A5BD9', 'Plantillas de WhatsApp/correo, recordatorios automáticos, portal del cliente, reportes con IA, academia. Conócelos: cada uno te ahorra tiempo y mejora el servicio. La tecnología hace lo repetitivo para que tú resuelvas lo humano.'),
           S('✅', 'Cierra tu inducción', '#1F8A5B', 'Completa los cursos de la ruta por módulos y el de Cumplimiento. Al terminar tendrás el mapa completo de la plataforma y tu certificado de inducción operativa.')
         ]),
+        L('Paso a paso: tu rutina diaria', 9, [
+          S('🩺', '1. Calidad de datos', '#C5162E', 'Empieza el día completando expedientes con póliza vigente sin teléfono/correo.'),
+          S('💳', '2. Cobros', '#C9821B', 'Revisa el aging y valida los pagos reportados por cliente antes de confirmarlos.'),
+          S('🗂', '3. Gestiones', '#0E7C86', 'Atiende las solicitudes creadas desde el portal, vinculando documentos cuando corresponda.')
+        ]),
         Q('Evaluación · Inducción operativa', [
           { p: '¿Por dónde conviene empezar el día operativo?', ops: ['Por Finanzas', 'Por Calidad de datos (expedientes incompletos)', 'Por Marketing'], ok: 1 },
           { p: 'El estado de cuenta bancario importado…', ops: ['Crea cobros y finmovs al instante', 'Va a una bandeja de conciliación pendiente de validar', 'Modifica clientes'], ok: 1 },
@@ -593,18 +686,31 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_ind_cliente', titulo: '🎉 Bienvenido a tu Portal — guía y seguros básicos', cat: 'Producto', emoji: '🎉', color: '#1F8A5B',
       desc: 'Ruta de bienvenida para el cliente nuevo: cómo usar el portal y conceptos básicos de seguros por ramo.', destinatarios: 'clientes',
+      metaLeccion: { porQueExiste: 'Porque un cliente que entiende su portal y su seguro reclama menos y confía más.', problemaResuelve: 'Clientes que no saben cómo reportar un pago o un siniestro.', sinEsto: 'El cliente llama por cosas que podría resolver solo, y siente que no tiene control.',
+        objetivo: 'Reportar pago, adjuntar soporte, entender estados de pago, subir documentos, entender revisión/aplicación, leer notificaciones.',
+        rol: 'Cliente', modulo: 'Portal del Cliente',
+        datosLee: 'Pólizas, recibos, estado de cada pago', datosEscribe: 'Reporte de pago + soporte (metadata), solicitudes de gestión',
+        accionesPermitidas: 'Reportar pago con soporte, ver estado, solicitar gestión, leer notificaciones',
+        erroresEvitar: 'Creer que "reportar" = "pago aplicado"; no adjuntar soporte',
+        casoPractico: 'Cliente sube comprobante y ve "Soporte recibido. Pendiente de validación por el equipo." — no se marca como pagado.',
+        evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09'
+      },
       recursos: [{ nombre: 'Guía rápida de tu portal.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Bienvenido: para qué es tu portal', 8, [
           S('🎉', 'Gracias por confiar en nosotros', '#1F8A5B', 'Te damos la bienvenida. Somos tu correduría: no solo te vendimos un seguro, te acompañamos durante toda su vigencia. Este portal es tu ventana para ver tus pólizas, pagar, reportar y aprender, cuando quieras y desde donde estés.'),
           S('🧭', 'Tu recorrido en 4 pasos', '#2A6FDB', '**1)** Revisa tus **Pólizas** (coberturas, prima, vigencia). **2)** Consulta **Pagos** y reporta un pago con su comprobante. **3)** Reporta y sigue un **Siniestro**. **4)** Solicita gestiones a tu asesor y aprende con esta sección. Todo en minutos, sin llamadas.'),
-          S('📲', 'Siempre a la mano', '#C9821B', 'Puedes instalar el portal como app en tu teléfono. Recibirás avisos de vencimientos y confirmaciones de pago. Ante cualquier duda, el botón de asistente te ayuda o te conecta con tu asesor.')
+          S('📲', 'Siempre a la mano', '#C9821B', 'Podés instalar el portal como app en tu teléfono. Recibirás avisos de vencimientos y confirmaciones de pago. Ante cualquier duda, el botón de asistente te ayuda o te conecta con tu asesor.')
         ]),
         L('Conceptos de seguros que te conviene saber', 12, [
           S('🛡️', 'Prima, cobertura y deducible', '#1E2227', '**Prima**: lo que pagas por tu seguro. **Cobertura**: lo que te protege (está en la carátula de tu póliza). **Deducible**: la parte que asumes en un siniestro antes de que entre el seguro. Conocer estos tres te evita sorpresas.'),
           S('🚗', 'Auto', '#C5162E', 'La cobertura amplia protege tu vehículo (choque, robo, incendio) y a terceros; la de responsabilidad civil cubre solo el daño a otros. Ante un choque: ponte a salvo, toma fotos, no admitas culpa y reporta el siniestro por el portal o a tu asesor.'),
           S('❤️', 'Vida y Gastos Médicos', '#7A5BD9', 'Vida deja un respaldo económico a tu familia si tú faltas. Gastos Médicos cubre hospitalización, cirugías y consultas según tu plan (ojo al deducible y la red de hospitales). Declara siempre tu salud con honestidad: es lo que garantiza que te paguen.'),
           S('🏠', 'Hogar y otros', '#1F8A5B', 'Hogar protege tu vivienda y lo que hay dentro (incendio, daños por agua, robo) y suma asistencias (plomero, cerrajero). Si tienes negocio, pregunta por Responsabilidad Civil. Tu asesor te ayuda a tener la protección correcta para tu momento de vida.')
+        ]),
+        L('Paso a paso: tu primera visita al portal', 8, [
+          S('🔑', 'Ingresa y revisa tus pólizas', '#1F8A5B', 'Inicia sesión con el acceso que te compartió tu asesor. Revisa tus pólizas activas: coberturas, prima y vigencia.'),
+          S('💳', 'Reporta un pago si ya pagaste', '#2A6FDB', 'Ve a Pagos → adjunta tu comprobante. Verás "pendiente de revisión/conciliación" — el equipo lo valida.')
         ]),
         Q('Evaluación · Bienvenida', [
           { p: 'El deducible es…', ops: ['Lo que paga la aseguradora siempre', 'La parte que asumes antes de que entre el seguro', 'Un descuento'], ok: 1 },
@@ -617,6 +723,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_p_aseg_cotiz', titulo: 'Aseguradoras, Cotizador y Comparativo', cat: 'Producto', emoji: '🏢', color: '#2A6FDB',
       desc: 'Autocapacitación: directorio de aseguradoras, cotización multicompañía y comparativo consultivo.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque cotizar con una sola aseguradora deja al cliente sin opciones y a la correduría sin resguardo si sube el precio.', problemaResuelve: 'Recomendar solo por precio sin comparar coberturas reales.', sinEsto: 'El cliente elige mal o se va con el competidor que sí comparó.', objetivo: 'Mantener el directorio de aseguradoras y cotizar multicompañía con criterio.', rol: 'Asesor / Equipo', modulo: 'Aseguradoras, Cotizador, Comparativo', datosLee: 'Ficha de aseguradora, comisiones por ramo', datosEscribe: 'Cotización, comparativo, recomendación', accionesPermitidas: 'Cotizar 2-3 aseguradoras, recomendar con argumento', erroresEvitar: 'Recomendar solo la más barata sin comparar coberturas', casoPractico: 'El comparativo analiza coberturas y sugiere una recomendación, no solo ordena precios.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Ficha de aseguradora y accesos.pdf', tipo: 'pdf' }],
       lecciones: [
         L('El directorio de aseguradoras', 11, [
@@ -628,6 +735,11 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('📋', 'Comparativo consultivo, no tabla', '#7A5BD9', 'El comparativo no solo alinea precios: extrae coberturas y genera una **recomendación** con análisis crítico. La opción más barata rara vez es la mejor: compara deducibles, sumas, exclusiones y red. Tu valor es traducir la tabla en una decisión.'),
           S('🎯', 'Presentar la propuesta', '#C5162E', 'No entregues tres cotizaciones y te calles. Recomienda una con argumentos (cobertura/precio/servicio) y explica por qué. El cliente contrató un asesor, no un buscador de precios.')
         ]),
+        L('Paso a paso: cotizar multicompañía', 11, [
+          S('🏢', 'Actualizar la ficha de aseguradora', '#2A6FDB', 'Módulo **Aseguradoras** → mantén al día contactos, ramos y comisiones por ramo. Un dato desactualizado retrasa toda cotización futura.'),
+          S('🧮', 'Cotizar con el wizard', '#C9821B', 'Cotizador → Tipo → Cliente → Cotizaciones: consulta 2-3 aseguradoras a la vez. Imprime por aseguradora y pasa al Comparativo.'),
+          S('📋', 'Recomendar, no solo entregar', '#C5162E', 'En el Comparativo, elige una opción y explica por qué (cobertura/precio/servicio) antes de enviarla al cliente.')
+        ]),
         Q('Evaluación · Aseguradoras y cotización', [
           { p: 'Lo ideal al cotizar es…', ops: ['Una sola opción', 'Comparar 2-3 aseguradoras y recomendar con criterio', 'Siempre la más barata'], ok: 1 },
           { p: 'El comparativo consultivo…', ops: ['Solo ordena precios', 'Analiza coberturas y sugiere una recomendación', 'No sirve'], ok: 1 }
@@ -637,16 +749,22 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_p_comunicacion', titulo: 'Comunicación con el Cliente: Correo, WhatsApp y Plantillas', cat: 'Servicio', emoji: '✉️', color: '#0E7C86',
       desc: 'Autocapacitación: bandeja de correo, mensajería, plantillas y notificaciones del portal.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque la comunicación oportuna evita llamadas de reclamo y sostiene la confianza.', problemaResuelve: 'Mensajes fríos sin contexto y canales mal elegidos.', sinEsto: 'El cliente se entera tarde de vencimientos y siente que nadie lo acompaña.', objetivo: 'Usar correo/WhatsApp/plantillas de forma honesta y efectiva.', rol: 'Equipo', modulo: 'Correo, Portal, Automatizaciones', datosLee: 'Plantillas, estado de integración', datosEscribe: 'Mensaje enviado, notificación', accionesPermitidas: 'Redactar con plantilla, notificar por portal', erroresEvitar: 'Mostrar integración como conectada sin estarlo', casoPractico: 'Correo sin conectar se muestra "pendiente de conexión", nunca simulado como activo.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Biblioteca de plantillas.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Los canales dentro de Orbit', 11, [
           S('✉️', 'Correo vinculado al expediente', '#0E7C86', 'La bandeja permite redactar y vincular cada correo a un cliente/póliza/cobro/gestión: queda en el expediente. Al conectar Outlook/Gmail se sincroniza tu cuenta real; mientras no, el sistema es honesto y no simula una conexión activa.'),
           S('💬', 'WhatsApp y plantillas', '#1F8A5B', 'Las plantillas de WhatsApp/correo (propuestas, primas pendientes, actualización de datos, bienvenida) estandarizan el mensaje y ahorran tiempo. Personaliza el nombre y el dato clave: una plantilla fría no cierra, una plantilla con contexto sí.'),
-          S('🔔', 'Notificaciones al portal', '#2A6FDB', 'Puedes enviar avisos al portal del cliente (uno o todos). Úsalo para vencimientos, novedades y confirmaciones. Comunicación proactiva = menos llamadas de reclamo y más confianza.')
+          S('🔔', 'Notificaciones al portal', '#2A6FDB', 'Podés enviar avisos al portal del cliente (uno o todos). Usalo para vencimientos, novedades y confirmaciones. Comunicación proactiva = menos llamadas de reclamo y más confianza.')
         ]),
         L('Escribir para que respondan', 9, [
           S('🎯', 'Claro, corto, con acción', '#C9821B', 'Un buen mensaje tiene un solo objetivo y una acción clara (paga aquí, confirma, agenda). Evita jerga técnica y párrafos largos. Si el cliente tiene que pensar qué hacer, no hace nada.'),
           S('⏱', 'Momento y canal', '#7A5BD9', 'WhatsApp para lo urgente y cercano; correo para lo formal y con adjuntos. Recordatorios de cobro **antes** del vencimiento, no después. El canal y el momento correctos multiplican la respuesta.')
+        ]),
+        L('Paso a paso: comunicarte desde Orbit', 10, [
+          S('✉️', 'Redactar y vincular', '#0E7C86', 'Bandeja de Correo → redacta y vincula el mensaje a cliente/póliza/cobro/gestión; queda en el expediente. Conecta tu cuenta real en Configuración cuando la tengas lista.'),
+          S('💬', 'Usar plantillas', '#1F8A5B', 'Elige la plantilla de WhatsApp/correo (propuesta, cobro pendiente, bienvenida) y personaliza nombre + dato clave antes de enviar.'),
+          S('🔔', 'Notificar por el portal', '#2A6FDB', 'Para avisos masivos (vencimientos, novedades), usa las notificaciones del portal en vez de escribir uno por uno.')
         ]),
         Q('Evaluación · Comunicación', [
           { p: 'Una integración de correo no conectada…', ops: ['Se muestra como activa', 'Se muestra como pendiente de conexión (honesto)', 'Da error al cliente'], ok: 1 },
@@ -657,6 +775,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_soft_prod', titulo: 'Productividad, Agenda y Gestión del Tiempo', cat: 'Liderazgo', emoji: '⏳', color: '#C9821B',
       desc: 'Habilidad blanda + módulo Cronograma: priorizar, planificar el día y no perder seguimientos.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque el tiempo del asesor es limitado y debe priorizarse por impacto en cartera.', problemaResuelve: 'Trabajar lo urgente-ruidoso antes que lo importante (cobros vencidos, renovaciones).', sinEsto: 'Se pierde plata en riesgo mientras se atienden tareas de bajo impacto.', objetivo: 'Priorizar el día por impacto usando el Cronograma.', rol: 'Equipo', modulo: 'Cronograma, Inicio', datosLee: 'Tareas, vencimientos, alertas', datosEscribe: 'Bloques de trabajo priorizados', accionesPermitidas: 'Priorizar cobros vencidos/renovaciones antes que lo administrativo', erroresEvitar: 'Trabajar lo urgente-ruidoso antes que lo importante', casoPractico: 'Cobros vencidos y renovaciones a 60 días van antes que tareas administrativas.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Plantilla de bloque semanal.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Dueño de tu tiempo, dueño de tus resultados', 12, [
@@ -668,6 +787,10 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('📌', 'El sistema recuerda por ti', '#2A6FDB', 'Las cadencias, alertas de vencimiento y el módulo Calidad evitan que algo se caiga. Confía en el sistema, pero revísalo a diario: una alerta ignorada es una venta o un cobro que se pierde.'),
           S('🧘', 'Sostenible, no heroico', '#7A5BD9', 'La productividad real es constancia, no maratones. Un ritmo diario ordenado supera al esfuerzo intermitente. Protege tu energía para los momentos que importan: cerrar y acompañar siniestros.')
         ]),
+        L('Paso a paso: organizar tu día con el Cronograma', 9, [
+          S('🗓', 'Revisar el Cronograma cada mañana', '#C9821B', 'Módulo **Cronograma/Inicio** → revisa vencimientos de cobro, renovaciones a 60 días y gestiones abiertas antes de empezar cualquier otra tarea.'),
+          S('📊', 'Priorizar por impacto', '#C5162E', 'Ordena tu día: 1) cobros vencidos y renovaciones próximas, 2) prospectos calientes, 3) administrativo. Lo importante primero, lo ruidoso después.')
+        ]),
         Q('Evaluación · Productividad', [
           { p: '¿Qué priorizas primero en el día?', ops: ['Lo administrativo', 'Cobros vencidos y renovaciones próximas (plata en riesgo)', 'Redes sociales'], ok: 1 },
           { p: 'La productividad real se basa en…', ops: ['Maratones intermitentes', 'Constancia y foco diario', 'Trabajar más horas'], ok: 1 }
@@ -677,6 +800,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_soft_negociacion', titulo: 'Negociación Efectiva para Intermediarios', cat: 'Comercial', emoji: '🤝', color: '#1F8A5B',
       desc: 'Habilidad blanda: preparar, crear valor, manejar precio y cerrar acuerdos que duran.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque ceder precio sin criterio erosiona el margen y enseña al cliente a pedir siempre más.', problemaResuelve: 'Negociar sin preparación ni contrapartida.', sinEsto: 'Se regala margen en cada renovación y se normaliza el descuento como expectativa.', objetivo: 'Negociar creando valor, no solo cediendo precio.', rol: 'Asesor', modulo: 'Leads', datosLee: 'Necesidad y alternativas del cliente', datosEscribe: 'Acuerdo cerrado', accionesPermitidas: 'Preparar antes de negociar, pedir algo a cambio si cede precio', erroresEvitar: 'Ceder precio gratis sin pedir nada a cambio', casoPractico: 'Si cede precio, pide pago anual o referidos a cambio — nunca gratis.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Guía de preparación de negociación.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Negociar es crear valor, no repartir', 12, [
@@ -688,6 +812,10 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🤝', 'Acuerdos sostenibles', '#7A5BD9', 'Un cierre a presión que el cliente lamenta se cancela en la primera renovación. Busca acuerdos que ambos quieran mantener: eso es lo que construye cartera estable y referidos, no la venta forzada de una vez.'),
           S('🔁', 'La relación es la meta', '#C5162E', 'Cada negociación es un ladrillo de la relación de largo plazo. Gana el acuerdo sin perder al cliente: la próxima venta, la renovación y el referido dependen de cómo se sintió en esta.')
         ]),
+        L('Paso a paso: preparar una negociación', 9, [
+          S('🎯', 'Antes de hablar', '#1F8A5B', 'Define tu margen real, qué necesita el cliente y qué puedes ofrecer sin costo (formas de pago, acompañamiento) antes de sentarte a negociar.'),
+          S('💬', 'Durante la conversación', '#2A6FDB', 'Si cedes en precio, pide algo a cambio (pago anual, referidos, más pólizas) en la misma conversación — nunca lo cedas gratis.')
+        ]),
         Q('Evaluación · Negociación', [
           { p: 'La negociación se gana principalmente…', ops: ['Improvisando', 'Con preparación previa', 'Bajando el precio'], ok: 1 },
           { p: 'Si concedes en precio, lo correcto es…', ops: ['Cederlo gratis', 'Pedir algo a cambio (más pólizas, referidos, pago anual)', 'Cancelar la venta'], ok: 1 }
@@ -698,6 +826,7 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_ind_marketing', titulo: '📣 Inducción del Rol Marketing — ruta completa', cat: 'Inducción', emoji: '📣', color: '#7A5BD9',
       desc: 'Ruta guiada para el rol Marketing: la empresa, el calendario de contenidos, integraciones y medición.', destinatarios: 'Marketing',
+      metaLeccion: { porQueExiste: 'Porque marketing en seguros se justifica con negocio (leads), no con vanidad (likes).', problemaResuelve: 'Campañas sin traspaso a Comercial y sin medición de leads generados.', sinEsto: 'Se invierte presupuesto en contenido que no genera ni un solo cliente nuevo.', objetivo: 'Generar leads medibles con integraciones honestas y datos con consentimiento.', rol: 'Marketing', modulo: 'Marketing, Integraciones', datosLee: 'Calendario de contenidos, métricas', datosEscribe: 'Contenido, leads generados', accionesPermitidas: 'Planificar calendario, medir leads por contenido, traspasar lead al asesor', erroresEvitar: 'Medir éxito en likes en vez de leads; usar datos sin consentimiento', casoPractico: 'Un lead generado se traspasa al asesor y entra a Leads con seguimiento — no se queda en Marketing.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09' },
       recursos: [{ nombre: 'Plan de contenidos trimestral.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Bienvenida y tu ruta de Marketing', 10, [
@@ -714,6 +843,10 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🛡️', 'Datos con consentimiento', '#C9821B', 'Las campañas usan datos personales: respeta finalidad y consentimiento (Habeas Data / protección de datos). No exportes carteras a herramientas no autorizadas. Una campaña que incumple datos es una multa y una crisis de confianza.'),
           S('🤝', 'Marketing + Comercial', '#2A6FDB', 'Un lead generado debe llegar al asesor correcto y entrar a Leads con seguimiento. Marketing enciende el interés; Comercial cierra. Coordinen el traspaso: un lead sin seguimiento es dinero de campaña tirado.')
         ]),
+        L('Paso a paso: arma tu primer calendario', 9, [
+          S('📅', 'Planifica el mes', '#7A5BD9', 'Módulo Marketing → crea contenidos con canal, tipo y enfoque para el mes. Segmenta por producto y momento (captación vs renovación).'),
+          S('📈', 'Mide y ajusta', '#1F8A5B', 'Revisa leads generados por contenido cada semana; repite lo que funciona, descarta lo que solo entretiene.')
+        ]),
         Q('Evaluación · Inducción Marketing', [
           { p: 'El éxito de Marketing en una correduría se mide sobre todo en…', ops: ['Likes', 'Leads generados y retención', 'Cantidad de posts'], ok: 1 },
           { p: 'Una integración de marketing no conectada…', ops: ['Se muestra como activa', 'Se muestra como pendiente de conexión', 'Publica igual'], ok: 1 },
@@ -725,6 +858,15 @@ Orbit.ACADEMIA_PLUS = (function () {
     {
       id: 'cur_ind_it', titulo: '⚙️ Inducción IT / Superadmin — configurar la plataforma', cat: 'Inducción', emoji: '⚙️', color: '#1E2227',
       desc: 'Ruta guiada para IT/Superadmin: puesta en marcha, configuración, usuarios, datos, integraciones y addons.', destinatarios: 'Dirección',
+      metaLeccion: { porQueExiste: 'Porque una plataforma mal configurada desde el día uno genera retrabajo constante.', problemaResuelve: 'Configuración fuera de orden (usuarios antes que catálogos, etc.).', sinEsto: 'Se hardcodean soluciones temporales que luego cuestan más deshacer.',
+        objetivo: 'Aprobar/rechazar diffs, auditar documentos y pagos, controlar permisos, cambiar configuración con motivo, revisar riesgos financieros y documentales; tenant isolation, Storage futuro, credenciales seguras, integraciones pendientes, auditoría de acceso.',
+        rol: 'Dirección / Admin / IT-Seguridad', modulo: 'Configuración, Equipo, Cliente360→Documentos, Conciliaciones',
+        datosLee: 'Diffs pendientes, permisos por usuario, estado de integraciones, bitácora de cambios', datosEscribe: 'Aprobación/rechazo con motivo, cambios de rol/config con motivo',
+        accionesPermitidas: 'Aprobar/rechazar diff con motivo, cambiar plan/módulos/integraciones con motivo, auditar accesos',
+        erroresEvitar: 'Dejar el tenant sin admin; cambiar configuración sin motivo; mostrar integración como activa sin conexión real; exponer credenciales',
+        casoPractico: 'Diff sensible (dato fiscal) requiere aprobación explícita de Dirección con motivo registrado antes de aplicarse.',
+        evidencia: 'Quiz + caso práctico', estado: 'progreso/certificado', actualizado: '2026-07-09'
+      },
       recursos: [{ nombre: 'Checklist de puesta en marcha del tenant.pdf', tipo: 'pdf' }],
       lecciones: [
         L('Bienvenida y ruta de administración', 10, [
@@ -751,6 +893,11 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🎓', 'Crear cursos y rutas', '#2A6FDB', 'En Academia creas cursos (video/lectura/quiz/recurso), los generas o complementas con **IA**, cargas contenido **desde documentos**, y los asignas a un rol para que aparezcan en la **Ruta por rol** con certificado. Arma la inducción de cada rol nuevo con esta herramienta.'),
           S('🔁', 'Mantener la plataforma viva', '#1E2227', 'Revisa trimestralmente: catálogos, aseguradoras, plantillas, cursos, roles e integraciones. Documenta los cambios. Una plataforma bien mantenida se adapta al negocio sin depender de código: ese es el valor de que todo sea configurable.')
         ]),
+        L('Paso a paso: puesta en marcha del tenant', 9, [
+          S('🎨', '1. Configuración', '#1E2227', 'Marca, países/monedas, planes y módulos activos primero — todo lo demás depende de esto.'),
+          S('👥', '2. Usuarios', '#2A6FDB', 'Crea usuarios con su rol correcto; verifica que el asesor no vea Ops.'),
+          S('🔌', '3. Integraciones y Academia', '#C9821B', 'Conecta solo lo que el cliente usará; deja el resto como "pendiente de conexión". Crea las rutas de inducción por rol.')
+        ]),
         Q('Evaluación · Inducción IT/Superadmin', [
           { p: 'El orden correcto de puesta en marcha empieza por…', ops: ['Automatizaciones', 'Configuración (marca, países, planes)', 'Crear cursos'], ok: 1 },
           { p: 'Una integración/addon no conectado se muestra como…', ops: ['Activa', 'Pendiente de conexión (honesto)', 'Error al usuario'], ok: 1 },
@@ -758,11 +905,144 @@ Orbit.ACADEMIA_PLUS = (function () {
           { p: 'La personalización del cliente se hace…', ops: ['Tocando código', 'Por configuración (marca, países, roles, integraciones)', 'No se puede'], ok: 1 }
         ])
       ]
+    },
+    /* ============ ITEM 7 · RUTAS PROFUNDAS POR ROL (estados honestos) ============ */
+    {
+      id: 'cur_rp_cliente', titulo: '🧑 Ruta Cliente: pagos y documentos en tu Portal', cat: 'Inducción', emoji: '🧑', color: '#2A6FDB',
+      desc: 'Reportar pago, adjuntar soporte, entender estados y subir documentos — con caso práctico.', destinatarios: 'clientes',
+      metaLeccion: { porQueExiste: 'Porque el cliente debe saber exactamente qué significa cada estado de su pago.', problemaResuelve: 'Clientes que creen que reportar un pago es lo mismo que tenerlo aplicado.', sinEsto: 'Reclamos y desconfianza cuando el pago "reportado" no se refleja de inmediato.', objetivo: 'Reportar pago, adjuntar soporte, entender estados y subir documentos.', rol: 'Cliente', modulo: 'Portal del Cliente', datosLee: 'Pólizas, recibos', datosEscribe: 'Reporte de pago + soporte (metadata)', accionesPermitidas: 'Reportar pago, adjuntar soporte, leer estado', erroresEvitar: 'Creer que reportar = pagado', casoPractico: 'Sube comprobante y ve "Soporte recibido. Pendiente de validación por el equipo."', evidencia: 'Quiz + caso práctico', estado: 'progreso/certificado', actualizado: '2026-07-09' },
+      recursos: [{ nombre: 'Guía del Portal Cliente.pdf', tipo: 'pdf' }],
+      lecciones: [
+        L('Reportar un pago (no es pago aplicado)', 11, [
+          S('📤', 'Reportar ≠ pagado', '#2A6FDB', 'Cuando reportás un pago desde 💳 Pagos, adjuntás tu comprobante como **soporte/evidencia**. El recibo NO queda pagado automáticamente: verás **"Soporte recibido · pendiente de validación por el equipo"**. El equipo revisa y concilia antes de confirmar.'),
+          S('📎', 'Adjuntar soporte', '#0E7C86', 'Subí tu comprobante (transferencia, boleta). Se registra como referencia; el archivo es evidencia para la revisión, no reemplaza el estado del recibo.'),
+          S('🔔', 'Leer los estados y avisos', '#C9821B', '**Reportado · en revisión** = lo estamos validando. **En validación** = validado, en conciliación. **Reporte no aceptado** = con motivo; podés reportar de nuevo. **Cobro confirmado/conciliado** = listo. Las notificaciones te avisan cada cambio.')
+        ]),
+        L('Subir documentos a tu expediente', 8, [
+          S('📁', 'Documento = referencia', '#7A5BD9', 'Al subir DPI/RTU/póliza se registra como **referencia** (nombre, tipo, fecha). Puede **proponer** una actualización de tus datos, pero el equipo la revisa antes de aplicarla. Nunca cambia tu expediente por sí solo.')
+        ]),
+        Q('Evaluación · Cliente', [
+          { p: 'Al reportar un pago con comprobante, ¿qué ves?', ops: ['Pago aplicado', 'Soporte recibido · pendiente de validación', 'Recibo eliminado'], ok: 1 },
+          { p: 'Un documento que subís al portal…', ops: ['Actualiza tus datos automáticamente', 'Propone un cambio que el equipo revisa', 'No sirve'], ok: 1 }
+        ])
+      ]
+    },
+    {
+      id: 'cur_rp_cobros', titulo: '💳 Ruta Cobros/Finanzas: validar sin aplicar', cat: 'Finanzas', emoji: '💳', color: '#C9821B',
+      desc: 'Revisar soporte, validar sin aplicar, rechazar con motivo, conciliar y manejar país/moneda.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque Cobros es el punto donde el dinero reportado se convierte en dinero confirmado.', problemaResuelve: 'Aplicar pagos sin validar contra el soporte o el banco.', sinEsto: 'Cartera y recaudo desalineados con la realidad, difícil de auditar después.', objetivo: 'Validar sin aplicar, rechazar con motivo, conciliar respetando país/moneda.', rol: 'Cobros / Finanzas', modulo: 'Cobros, Conciliaciones', datosLee: 'Soporte, banco, recibo', datosEscribe: 'Estado validado/rechazado, motivo', accionesPermitidas: 'Validar, rechazar con motivo, aplicar solo si país/moneda confiables', erroresEvitar: 'Aplicar sin validar; aplicar sin moneda confiable', casoPractico: 'Soporte no coincide con banco → en revisión o rechazo con motivo.', evidencia: 'Quiz + caso práctico', estado: 'progreso/certificado', actualizado: '2026-07-09' },
+      recursos: [{ nombre: 'Protocolo de validación de cobros.pdf', tipo: 'pdf' }],
+      lecciones: [
+        L('Del reporte a la confirmación', 12, [
+          S('🔎', 'Revisar el soporte', '#C9821B', 'En Cobros, un pago reportado llega como **"Reportado por cliente"** con su soporte. Revisás la evidencia contra el estado de cuenta del banco. Nunca confirmás solo por el reporte.'),
+          S('✅', 'Validar ≠ aplicar', '#1F8A5B', '**Validar el reporte** lo marca como legítimo (queda "Validada · por confirmar") pero **no aplica el pago**. Recién **Confirmar cobro** lo asienta y baja la cartera. Son dos pasos distintos, ambos con trazabilidad.'),
+          S('✕', 'Rechazar con motivo', '#C5162E', 'Si el soporte no coincide con el banco, **marcás en revisión** o **rechazás con motivo obligatorio**. El rechazo **no borra** la evidencia: queda "Reporte no aceptado" con el motivo y el cliente puede reportar de nuevo.'),
+          S('🌎', 'País y moneda', '#2A6FDB', 'GT=GTQ, CO=COP. No se suman monedas en crudo. Si falta país/moneda confiable en una conciliación, queda **REQUIERE_VALIDACION** y no se aplica.')
+        ]),
+        L('Conciliación (M5): propuesta, no aplicación', 10, [
+          S('🔗', 'Validada no es aplicada', '#7A5BD9', 'La bandeja de conciliaciones **propone** cruces con score (MATCH_EXACTO / PROBABLE / REQUIERE_VALIDACION / BLOQUEADO). **Validar una propuesta NO aplica el pago** ni modifica cobros/cartera/producción/comisiones. La aplicación real es una fase posterior autorizada.')
+        ]),
+        Q('Evaluación · Cobros/Finanzas', [
+          { p: '¿Validar un reporte aplica el pago?', ops: ['Sí, de inmediato', 'No — validar y confirmar son pasos distintos', 'Solo si es GTQ'], ok: 1 },
+          { p: 'El soporte no coincide con el banco. ¿Qué hacés?', ops: ['Aplico igual', 'Marco en revisión o rechazo con motivo', 'Borro el recibo'], ok: 1 },
+          { p: 'Una conciliación validada…', ops: ['Aplica el pago sola', 'Es propuesta; no aplica ni toca cobros', 'Crea finmovs'], ok: 1 },
+          { p: 'Falta la moneda en una fila…', ops: ['Se asume GTQ', 'Queda REQUIERE_VALIDACION', 'Se descarta'], ok: 1 }
+        ])
+      ]
+    },
+    {
+      id: 'cur_rp_asesor', titulo: '🧑‍💼 Ruta Asesor: expediente y documentos que proponen', cat: 'Producto', emoji: '🧑‍💼', color: '#1F8A5B',
+      desc: 'Revisar la ficha 360, distinguir aprobado vs en revisión, revisar diffs y crear gestiones sin cambiar datos sin autorización.', destinatarios: 'Asesor',
+      metaLeccion: { porQueExiste: 'Porque el asesor es quien más contacto tiene con los documentos del cliente.', problemaResuelve: 'Actualizar datos del cliente sin pasar por el diff/aprobación.', sinEsto: 'Datos incorrectos entran al sistema sin trazabilidad de quién los cambió ni por qué.', objetivo: 'Distinguir expediente aprobado vs en revisión y no cambiar datos sin autorización.', rol: 'Asesor', modulo: 'Cliente360, Documentos', datosLee: 'Expediente, diffs propuestos', datosEscribe: 'Gestión (sin tocar datos protegidos)', accionesPermitidas: 'Ver documentos/diffs, crear gestión', erroresEvitar: 'Asumir que un documento ya actualizó el dato', casoPractico: 'Documento de identidad propone cambio; no se aplica sin diff aprobado.', evidencia: 'Quiz + caso práctico', estado: 'progreso/certificado', actualizado: '2026-07-09' },
+      recursos: [{ nombre: 'Guía del expediente documental.pdf', tipo: 'pdf' }],
+      lecciones: [
+        L('El expediente documental', 11, [
+          S('📂', 'Aprobado vs en revisión', '#1F8A5B', 'En Cliente360 → **Documentos** ves: soportes de pago en revisión, documentos del expediente y **cambios propuestos (diffs)** pendientes de aprobación. Distinguí lo confirmado de lo que aún está en revisión.'),
+          S('📝', 'El documento propone, no impone', '#7A5BD9', 'Un documento de identidad puede **proponer** un cambio (dirección, fecha) mostrando el diff **actual → propuesto**. No se actualiza el cliente sin ese diff revisable y su confirmación.'),
+          S('🗂', 'Gestiones sin cambiar datos', '#C9821B', 'Podés crear una gestión (endoso, actualización) sin modificar el expediente directamente: la solicitud queda en Ops con trazabilidad; el cambio se aplica tras autorización.'),
+          S('🏢', 'Encontrar el contacto correcto', '#0E7C86', 'Antes de escribirle a una aseguradora, revisa su ficha en **Orbit Aseguradoras** (curso dedicado más abajo): ahí está el contacto del área correcta (emisiones, endosos, siniestros) y el estado real de acceso a su plataforma.')
+        ]),
+        Q('Evaluación · Asesor', [
+          { p: 'Un documento de identidad propone un cambio…', ops: ['Se aplica automáticamente', 'Se muestra como diff y requiere confirmación', 'Se ignora'], ok: 1 },
+          { p: 'Para actualizar datos sensibles del cliente…', ops: ['Los cambio directo', 'Creo gestión / diff con autorización', 'No se puede nunca'], ok: 1 }
+        ])
+      ]
+    },
+    {
+      id: 'cur_aseguradoras', titulo: '🏢 Orbit Aseguradoras: directorio, accesos y conocimiento', cat: 'Producto', emoji: '🏢', color: '#0E7C86',
+      desc: 'Directorio operativo por país, ficha por pestañas, accesos sin contraseñas, y por qué las tarifas son una sección secundaria.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque Aseguradoras es la base operativa para cotizar, emitir, cobrar comisiones y resolver contactos de siniestro.', problemaResuelve: 'Buscar el contacto/portal correcto a mano cada vez, o exponer contraseñas reales.', sinEsto: 'Perdés tiempo, arriesgás credenciales y confundís documento leído con tarifa habilitada.', objetivo: 'Buscar la aseguradora correcta, usar sus accesos de forma segura y entender que leer un documento no habilita nada solo.', rol: 'Equipo', modulo: 'Aseguradoras', datosLee: 'Directorio, contactos, plataformas, productos', datosEscribe: 'Ficha (según permisos), gestiones', accionesPermitidas: 'Buscar, filtrar, abrir ficha, contactar, abrir plataforma/Drive', erroresEvitar: 'Guardar o pedir contraseñas reales; asumir que un documento habilita una tarifa', casoPractico: 'Se importa una planilla de comisiones; las tarifas quedan "Requiere validación" hasta habilitarse.', evidencia: 'Quiz + caso práctico', estado: 'progreso/certificado', actualizado: '2026-07-10' },
+      recursos: [{ nombre: 'Guía de Aseguradoras (pendiente de adjuntar)', tipo: 'pendiente' }],
+      lecciones: [
+        L('Paso a paso: usar el directorio', 11, [
+          S('🔎', 'Buscar y filtrar', '#0E7C86', 'Módulo **Aseguradoras** → busca por nombre, NIT, contacto o ramo; filtra por país (GT/CO), ramo y estado (activas/inactivas). Cada tarjeta muestra contacto principal, estado de acceso y de documentación de un vistazo.'),
+          S('📋', 'Abrir la ficha por pestañas', '#2A6FDB', 'La ficha se organiza en **Resumen · Contactos · Plataformas · Bancos y pagos · Productos · Documentos · Tarifas y conocimiento · Actividad**. Lo operativo (contactos, accesos, productos) va primero; lo técnico (tarifas) queda al final, como sección secundaria.'),
+          S('🔐', 'Accesos sin contraseñas', '#C5162E', 'La pestaña Plataformas nunca guarda contraseñas reales. Cada portal muestra un estado honesto: Pendiente de conexión segura, Acceso disponible, Requiere actualización o Sin acceso registrado. La conexión real llegará por una bóveda segura, no por un campo de texto.'),
+          S('🧮', 'Tarifas y conocimiento no se auto-habilitan', '#7A5BD9', 'Importar un documento tarifario deja el conocimiento en "Propuesta lista para revisar" o "Requiere validación" — nunca habilita un producto en Cotizador/Comparativo automáticamente. Habilitar es una acción explícita y auditable, separada de leer. La <b>planilla de comisiones</b> es otra fuente distinta: liquida comisiones, no habilita tarifas.')
+        ]),
+        Q('Evaluación · Aseguradoras (directorio)', [
+          { p: 'Un portal sin conexión configurada debe mostrar…', ops: ['La contraseña guardada', 'Pendiente de conexión segura', 'Acceso disponible'], ok: 1 },
+          { p: 'Un documento tarifario recién importado…', ops: ['Habilita el producto en Cotizador automáticamente', 'Queda pendiente de validación y requiere habilitación explícita separada', 'Actualiza cartera directamente'], ok: 1 },
+          { p: 'La planilla de comisiones y el conocimiento tarifario del Cotizador son…', ops: ['La misma fuente', 'Fuentes distintas: una liquida comisiones, la otra habilita cotizar', 'Da igual cuál se use'], ok: 1 },
+          { p: 'La pestaña "Tarifas y conocimiento" en la ficha es…', ops: ['La portada principal del módulo', 'Una sección secundaria administrativa', 'Solo visible en Cotizador'], ok: 1 }
+        ])
+      ]
+    },
+    {
+      id: 'cur_rp_direccion', titulo: '🛡️ Ruta Dirección/Admin/IT: aprobar, auditar y configurar', cat: 'Liderazgo', emoji: '🛡️', color: '#1E2227',
+      desc: 'Aprobar/rechazar diffs, auditar pagos y documentos, permisos con motivo, y principios de seguridad/tenant.', destinatarios: 'Dirección',
+      metaLeccion: { porQueExiste: 'Porque Dirección es la última línea de control sobre datos sensibles y configuración del tenant.', problemaResuelve: 'Aprobaciones sin motivo y cambios de configuración sin registro.', sinEsto: 'No hay forma de auditar quién autorizó qué cambio ni por qué.', objetivo: 'Aprobar/rechazar diffs con motivo, auditar y configurar con trazabilidad.', rol: 'Dirección / Admin / IT', modulo: 'Configuración, Equipo, Documentos', datosLee: 'Diffs, bitácora, permisos', datosEscribe: 'Aprobación/rechazo con motivo, config con motivo', accionesPermitidas: 'Aprobar/rechazar diff, cambiar permisos/config con motivo', erroresEvitar: 'Aprobar sin revisar; dejar tenant sin admin', casoPractico: 'Diff sensible (dato fiscal) requiere aprobación explícita con motivo registrado.', evidencia: 'Quiz + caso práctico', estado: 'progreso/certificado', actualizado: '2026-07-09' },
+      recursos: [{ nombre: 'Manual de administración y seguridad.pdf', tipo: 'pdf' }],
+      lecciones: [
+        L('Aprobar, auditar y controlar', 12, [
+          S('✅', 'Aprobar/rechazar diffs', '#1F8A5B', 'Ante un cambio propuesto sensible (identidad, beneficiario), revisás el diff y **aprobás o rechazás con criterio**; queda auditado. Nada crítico se aplica sin tu autorización.'),
+          S('🔑', 'Permisos con motivo', '#C9821B', 'Cambiar un rol exige **motivo** y queda en trazabilidad; el sistema **no te deja sin administrador**. Las acciones administrativas sensibles piden confirmación reforzada.'),
+          S('🌎', 'Producción y moneda', '#2A6FDB', 'Producción/metas/comisiones se leen sobre **prima neta recaudada**. Moneda por país, sin sumar en crudo. Un negocio cerrado que no se cobra no cuenta hasta recaudarse.'),
+          S('🏢', 'Aseguradoras: conocimiento vs habilitación', '#0E7C86', 'Ver el curso **Orbit Aseguradoras**: importar una tarifa nunca la habilita sola en Cotizador/Comparativo — Dirección/IT es quien confirma esa habilitación explícita.')
+        ]),
+        L('Seguridad, tenant e integraciones', 10, [
+          S('🏢', 'Aislamiento por tenant', '#7A5BD9', 'Cada cliente es un tenant aislado; nada se hardcodea. La personalización (marca, países, roles, catálogos) es por configuración.'),
+          S('🔌', 'Integraciones y Storage honestos', '#0E7C86', 'Una integración no conectada se muestra **pendiente de conexión** — nunca como real. Los adjuntos son **metadata-only** (sin binario/URL) hasta que Storage esté disponible. Credenciales con scopes mínimos, nunca expuestas en el front.')
+        ]),
+        Q('Evaluación · Dirección/Admin/IT', [
+          { p: 'Ante un diff sensible de identidad, Dirección…', ops: ['Lo aplica sin ver', 'Lo aprueba/rechaza con criterio y queda auditado', 'Lo borra'], ok: 1 },
+          { p: 'Cambiar un rol…', ops: ['No requiere nada', 'Exige motivo y no puede dejar sin admin', 'Lo hace el asesor'], ok: 1 },
+          { p: 'Una integración sin conectar se muestra…', ops: ['Como conexión real', 'Pendiente de conexión', 'Oculta'], ok: 1 }
+        ])
+      ]
+    },
+    /* ============ QUIZ TRANSVERSAL: PREGUNTAS DE DECISIÓN + CERTIFICADOS ============ */
+    {
+      id: 'cur_quiz_decision', titulo: '🧠 Evaluación de decisión: pagos, documentos y datos', cat: 'Cumplimiento', emoji: '🧠', color: '#7A5BD9',
+      desc: 'Ocho preguntas de decisión que todo rol debe responder bien antes de operar con pagos, documentos o conciliaciones.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque entender los límites entre reportar/validar/conciliar/aplicar evita errores costosos y de cumplimiento.', problemaResuelve: 'Confusión operativa entre roles sobre quién puede hacer qué.', sinEsto: 'Se aplican pagos sin validar o se exponen datos sensibles sin control.',
+        objetivo: 'Confirmar que cada rol entiende los límites entre reportar, validar, conciliar y aplicar.',
+        rol: 'Todos', modulo: 'Portal, Cobros, Conciliaciones, Cliente360, Configuración',
+        datosLee: 'N/A (evaluación)', datosEscribe: 'Resultado del quiz',
+        accionesPermitidas: 'Responder evaluación', erroresEvitar: 'Adivinar sin haber revisado los cursos previos',
+        casoPractico: 'Ver preguntas de la evaluación.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-09'
+      },
+      recursos: [{ nombre: 'Certificados disponibles.pdf', tipo: 'pdf' }],
+      lecciones: [
+        L('Certificados de Orbit 360', 6, [
+          S('🏅', 'Certificados por especialidad', '#7A5BD9', 'Al completar las rutas correspondientes, quedan disponibles: **Portal Cliente: pagos y documentos** · **Cobros y conciliación segura** · **Cliente360 y expediente documental** · **Administración Orbit por tenant** · **Seguridad documental e integraciones**. Cada certificado se emite desde el curso raíz de esa ruta.')
+        ]),
+        Q('Evaluación de decisión (8 preguntas)', [
+          { p: '¿Qué estado debe ver un cliente al reportar un pago?', ops: ['Pagado', 'Pendiente de revisión/conciliación', 'Cobro aplicado'], ok: 1 },
+          { p: '¿Puede una conciliación VALIDADA aplicar el pago por sí sola?', ops: ['Sí, automáticamente', 'No, requiere un paso posterior autorizado', 'Solo si es fin de mes'], ok: 1 },
+          { p: '¿Qué ocurre si falta la moneda en una fila importada?', ops: ['Se asume la del país', 'Queda en REQUIERE_VALIDACION', 'Se descarta sin aviso'], ok: 1 },
+          { p: '¿Puede un documento actualizar al cliente automáticamente?', ops: ['Sí, siempre', 'No, propone un diff para aprobación', 'Solo si el asesor lo sube'], ok: 1 },
+          { p: '¿Qué acciones requieren motivo obligatorio?', ops: ['Ninguna', 'Rechazar, bloquear, anular, cambiar rol/config', 'Solo iniciar sesión'], ok: 1 },
+          { p: '¿Qué texto NO debe usarse si el Storage no está conectado?', ops: ['"Pendiente de configuración"', 'Simular que el archivo ya se guardó de forma segura', 'Mostrar metadata del archivo'], ok: 1 },
+          { p: '¿Qué hace Cobros si el soporte no coincide con el banco?', ops: ['Aplica el pago igual', 'Marca en revisión o rechaza con motivo', 'Ignora el soporte'], ok: 1 },
+          { p: '¿Qué debe hacer Dirección ante un diff sensible (dato fiscal)?', ops: ['Aprobarlo sin revisar', 'Revisar y aprobar/rechazar con motivo', 'Delegarlo sin trazabilidad'], ok: 1 }
+        ])
+      ]
     }
   ];
 
   // Versión de contenido: súbela cuando cambies texto/lecciones para que se re-sincronice.
-  var CONTENT_V = 8;
+  var CONTENT_V = 23;
   function apply() {
     try {
       if (!window.Orbit || !Orbit.store || !Orbit.store.all) return false;
