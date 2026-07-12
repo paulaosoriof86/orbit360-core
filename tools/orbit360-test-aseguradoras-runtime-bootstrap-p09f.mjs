@@ -6,6 +6,7 @@ function assert(condition, message) { if (!condition) throw new Error(message); 
 const scripts = [];
 const events = [];
 const Orbit = {
+  quoteContracts: {},
   store: {
     __firestoreLabExplicit: true,
     _labStatus: () => ({ snapshotAttached: true, snapshotAttachedCount: 10 })
@@ -49,6 +50,9 @@ const document = {
       const src = pathOnly(script.src);
       const row = globalByPath[src];
       if (row) Orbit[row[0]] = row[1];
+      if (src === 'core/quote-comparison-p06-runtime-adapter-v1208.js') {
+        Orbit.quoteContracts.__p06RuntimeAdapterV1208 = { loaded: true };
+      }
       if (src === 'modules/aseguradoras-knowledge-p09.js') {
         Orbit.services = Orbit.services || {};
         Orbit.services.aseguradorasKnowledgeP09 = {};
@@ -84,7 +88,8 @@ const api = Orbit.aseguradorasRuntimeBootstrapP09f;
 assert(api, 'bootstrap debe registrarse');
 const result = await api.start();
 assert(result.status === 'ready', `bootstrap LAB debe quedar ready: ${JSON.stringify(result.errors)}`);
-assert(result.requiredScripts.length === 29, 'debe declarar observador, broker, formulario y contratos previos');
+assert(result.requiredScripts.length === 30, 'debe declarar adapter P06, observador, broker, formulario y contratos previos');
+assert(result.loaded.includes('core/quote-comparison-p06-runtime-adapter-v1208.js'), 'debe cargar adapter P06 para Cotizador');
 assert(result.loaded.includes('core/aseguradoras-batch-history-p09h.js'), 'debe cargar historial P09h');
 assert(result.loaded.includes('core/aseguradoras-batch-admin-actions-p09i.js'), 'debe cargar acciones P09i');
 assert(result.loaded.includes('core/aseguradoras-source-reference-broker-p09j.js'), 'debe cargar broker P09j');
@@ -92,7 +97,8 @@ assert(result.loaded.includes('modules/aseguradoras-batch-admin-form-p09j.js'), 
 assert(result.loaded.includes('core/aseguradoras-runtime-observer-p09n.js'), 'debe cargar observador P09n al final');
 assert(result.bridge && result.bridge.code === 'BACKEND_REQUIRED', 'provider ausente debe permanecer honesto');
 const preflight = api.preflight();
-assert(preflight.ok && preflight.batchRuntimeReady && preflight.batchHistoryReady, 'preflight debe incluir lote e historial');
+assert(preflight.ok && preflight.quoteP06AdapterReady, 'preflight debe confirmar adapter P06');
+assert(preflight.batchRuntimeReady && preflight.batchHistoryReady, 'preflight debe incluir lote e historial');
 assert(preflight.batchAdminActionsReady && preflight.sourceReferenceBrokerReady && preflight.batchAdminFormReady, 'preflight debe incluir P09i/P09j');
 assert(preflight.runtimeObserverReady === true, 'preflight debe confirmar observador P09n');
 assert(preflight.sourceReferenceBackendReady === false, 'backend de referencias pendiente no debe mostrarse listo');
