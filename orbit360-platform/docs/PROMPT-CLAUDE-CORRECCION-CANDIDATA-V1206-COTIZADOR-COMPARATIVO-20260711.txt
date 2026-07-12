@@ -1,0 +1,243 @@
+ORBIT 360 A&S — CORRECCIÓN ACUMULADA v1.206
+COTIZADOR / COMPARATIVO / IMPRESIÓN / REPLANTEAR / PLANTILLAS
+
+Trabaja sobre tu ÚLTIMA candidata visual incremental. No vuelvas a v1.187, v1.197 ni a una base anterior. Antes de modificar, lee completos:
+
+1. PAQUETE-CLAUDE-RECONCILIADO-CODIGO-REAL-V1205-20260711.md
+2. AUDITORIA-CANDIDATA-CLAUDE-V1187-20260711-214858-COTIZADOR-COMPARATIVO.md
+3. AUDITORIA-VISUAL-REAPERTURA-ASEGURADORAS-COTIZADOR-COMPARATIVO-V1203-20260711.md
+4. AUDITORIA-OPERATIVA-COTIZADOR-COMPARATIVO-V1203-20260711.md
+5. AUDITORIA-FORENSE-PROFUNDA-COTIZADOR-COMPARATIVO-V110-CONTRATO-AYS-20260709.md
+6. MATRIZ-EMPALME-COTIZADOR-COMPARATIVO-ORBIT-V110-20260710.md
+7. comparativo_final_v110.html
+8. contratos y bridges físicos v1.198–v1.203 incluidos como referencia de solo lectura.
+
+OBJETIVO ÚNICO
+
+Entregar una sola candidata grande, incremental y auditable que conserve todos tus avances visuales válidos, pero cierre Cotizador y Comparativo con la profundidad visual y funcional del index v110, sin reemplazar ni simular los contratos reales del backend.
+
+REGLAS NO NEGOCIABLES
+
+- No modificar ni entregar sustitutos de data/store.js, data/store-firestore-lab.local.js, core/auth.js, core/importa.js, core/backend-lab-*, firestore.rules ni herramientas backend protegidas.
+- No usar localStorage operativo ni Firebase/Firestore directo desde módulos.
+- No copiar la arquitectura monolítica del index v110. Reutiliza su experiencia visual, sus flujos, impresión, replanteamiento y plantillas dentro de la arquitectura modular Orbit.
+- No inventar tarifas, aseguradoras, credenciales, datos reales ni confirmaciones de envío.
+- No reintroducir TASAS_DEF como oferta real.
+- No usar Orbit._cots como mecanismo primario. Diseña compatible con cotizaciones persistidas, IDs y quoteTransfers.
+- No hardcodear IVA 12%. País, moneda e impuestos vienen de configuración. GT y CO se mantienen separados.
+- No mostrar copy técnico en UI cliente.
+- No marcar enviado al abrir WhatsApp/correo; usar preparado hasta confirmación/callback.
+- No crear póliza, recibos ni cartera al aceptar una propuesta. Crear representación de Solicitud de emisión en Ops.
+
+COTIZADOR PROFUNDO
+
+Reconstruye el Cotizador como flujo guiado:
+
+1. Cliente/prospecto, asesor, país y moneda.
+2. Producto/ramo y datos conocidos del riesgo.
+3. Aseguradoras elegibles.
+4. Productos, planes, fuentes y vigencias disponibles.
+5. Datos faltantes específicos.
+6. Generar o registrar cotizaciones.
+7. Revisar, seleccionar y enviar a Comparativo.
+
+Precarga todo dato disponible desde Cliente360, Renovaciones o contexto de navegación. No obligues a volver a digitar.
+
+Cada propuesta debe mostrar:
+
+- logo y aseguradora;
+- producto/plan;
+- estado de fuente/validación;
+- prima neta;
+- gastos de emisión;
+- gastos financieros;
+- impuestos;
+- prima total;
+- pagos y frecuencia;
+- coberturas y límites;
+- deducibles;
+- condiciones, exclusiones y restricciones;
+- vigencia;
+- fuente, versión y referencia;
+- acciones revisar, editar, excluir, duplicar, imprimir y comparar.
+
+Sin fuente tarifaria compatible, vigente y validada:
+
+- no calcular automáticamente;
+- mostrar “Cotización automática pendiente de configuración”;
+- permitir “Registrar cotización recibida”.
+
+IMPRESIÓN/PDF DEL COTIZADOR
+
+La impresión actual básica queda rechazada. Debe recuperar la experiencia v110 y alinearse con Aseguradoras.
+
+Debe incluir:
+
+- portada corporativa;
+- marca Orbit 360 y slot white-label;
+- logo del tenant y logo de la aseguradora;
+- encabezado/hero por aseguradora;
+- cliente, asesor, país, moneda y riesgo;
+- producto y plan;
+- selección de planes/cotizaciones por aseguradora;
+- forma/frecuencia de pago seleccionada;
+- prima desglosada;
+- coberturas, deducibles, condiciones, exclusiones y vigencia;
+- pie legal/configurable;
+- tipografías Manrope y Source Sans 3;
+- paginación cuidada;
+- impresión A4 profesional;
+- vista previa antes de imprimir/guardar PDF.
+
+No basta con una tabla de montos. Debe ser una cotización presentable al cliente y diferenciada por aseguradora.
+
+COMPARATIVO PROFUNDO
+
+Debe aceptar:
+
+A. propuestas persistidas provenientes del Cotizador;
+B. cotizaciones recibidas en PDF/imagen/Excel/correo/WhatsApp mediante registro documental.
+
+La pantalla debe conservar la estructura visual esencial de v110:
+
+- tarjetas de resumen rápido;
+- mejor opción claramente identificada;
+- bloque oscuro de cliente/riesgo;
+- tabla comparativa profunda por secciones;
+- logos de aseguradoras;
+- prima total destacada;
+- coberturas, límites, deducibles, exclusiones, condiciones, pagos y vigencias;
+- diferencias y ventajas/desventajas;
+- recomendación consultiva explicable;
+- acciones de replanteamiento, impresión, comunicación y aceptación.
+
+IMPRESIÓN/PDF DEL COMPARATIVO
+
+La pantalla y el PDF deben compartir la misma estructura y jerarquía visual del index v110. No crear una versión de impresión simplificada distinta.
+
+Conservar:
+
+- tarjetas resumen;
+- bloque de datos del cliente/riesgo;
+- tabla completa;
+- secciones visuales;
+- logos;
+- fila de prima total;
+- recomendación;
+- encabezado y pie;
+- A4 controlado y saltos de página;
+- responsive de pantalla sin perder fidelidad de PDF.
+
+REPLANTEAR
+
+No reducirlo a tres botones. Implementar modal o panel completo con:
+
+- costo-beneficio/equilibrio;
+- precio;
+- cobertura;
+- deducible;
+- responsabilidad civil;
+- criterio adicional configurable;
+- selección manual de aseguradora con justificación;
+- restablecer recomendación automática.
+
+Al cambiar criterio, recalcula puntuación, ventajas/desventajas y explicación. No inventar datos que no estén en las cotizaciones.
+
+REGISTRAR COTIZACIÓN RECIBIDA
+
+Conservar ese nombre. No volver a “Propuesta manual”.
+
+Flujo:
+
+1. aseguradora del directorio;
+2. producto/plan;
+3. documento o referencia;
+4. propuesta de extracción/mapeo;
+5. diff y corrección humana;
+6. versión, fecha y vigencia;
+7. prima neta, gastos, impuestos y total;
+8. pagos/frecuencia;
+9. coberturas, deducibles, condiciones y exclusiones;
+10. cuadre;
+11. motivo y confirmación;
+12. guardar borrador o validada.
+
+Usar estado canónico requiere_validacion hasta completar fuente y revisión. No inferir prima neta con total/1.12. Si falta país/moneda/impuesto, mostrar Requiere validación.
+
+PLANTILLAS WHATSAPP Y CORREO
+
+Recuperar el patrón v110 y adaptarlo a configuración tenant.
+
+Debe existir:
+
+- biblioteca de plantillas;
+- selección por país/producto/canal;
+- editor autorizado;
+- variables seguras;
+- vista previa;
+- usar en WhatsApp;
+- usar en correo;
+- estado preparado;
+- confirmación real antes de enviado.
+
+Plantillas mínimas:
+
+- cotización individual;
+- comparativo de vehículos;
+- comparativo de gastos médicos;
+- propuesta recomendada;
+- seguimiento;
+- información faltante;
+- aceptación y próximos pasos.
+
+PROPUESTA ACEPTADA
+
+La acción solo aparece si hay propuesta seleccionada y validada. Autocompletar desde cotizacionId/comparativoId:
+
+cliente, asesor, aseguradora, ramo, producto, plan, país, moneda, prima neta, gastos, impuestos, total, pagos, fuente, versión, documento, fechas, riesgo, IDs y póliza origen si es renovación.
+
+El usuario solo confirma aceptación, evidencia, fecha faltante y excepción justificada. Resultado visible: Solicitud de emisión creada en Ops/Emisiones.
+
+ACADEMIA
+
+Actualizar en la misma entrega las rutas Dirección, Operativo y Asesor sobre:
+
+- fuentes y bloqueo sin tarifa;
+- cotización recibida;
+- prima separada;
+- lectura y replanteamiento del comparativo;
+- comunicación preparada vs enviada;
+- aceptación y solicitud de emisión;
+- permisos y errores a evitar.
+
+VALIDACIÓN OBLIGATORIA
+
+Antes de entregar:
+
+- node --check de todo JS;
+- 0 errores de consola;
+- validar 1440, 1024 y 390 px;
+- probar impresión/PDF Cotizador por aseguradora;
+- probar impresión/PDF Comparativo y comparar visualmente con v110;
+- probar todos los criterios de Replantear;
+- probar plantillas y vista previa WA/correo;
+- comprobar que no aparece IVA hardcodeado;
+- comprobar que no hay Orbit._cots como flujo primario;
+- comprobar que no se modificaron archivos protegidos;
+- grep de copy técnico visible = 0;
+- documentar Academia, CHANGELOG, bitácora, pendientes y evidencia.
+
+ENTREGA
+
+Entrega una sola candidata acumulada, no parches separados. Incluye:
+
+1. inventario de archivos modificados;
+2. comparación contra tu base visual anterior;
+3. comparación funcional contra v110;
+4. lista de contratos/hooks respetados;
+5. evidencia de impresión y responsive;
+6. pruebas ejecutadas;
+7. pendientes reales separados por Carril A/B/C;
+8. declaración explícita de archivos protegidos no modificados.
+
+No declares los módulos cerrados si la impresión/PDF, Replantear o plantillas siguen simplificados.
