@@ -1,0 +1,75 @@
+name: Orbit 360 Cotizador Comparativo v1215 Smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/quote-comparison-contracts-v1203.js'
+      - 'orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js'
+      - 'orbit360-platform/modules/cotizador-v1203-source-gate.js'
+      - 'orbit360-platform/modules/comparativo-v1203-operational-bridge.js'
+      - 'orbit360-platform/modules/renewals-v1200-operational-bridge.js'
+      - 'orbit360-platform/modules/ops-workflows-v1201-bridge.js'
+      - 'tools/orbit360-validar-cierre-cotizador-comparativo-v1215.mjs'
+      - '.github/workflows/orbit360-cotizador-comparativo-v1215-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/quote-comparison-contracts-v1203.js'
+      - 'orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js'
+      - 'orbit360-platform/modules/cotizador-v1203-source-gate.js'
+      - 'orbit360-platform/modules/comparativo-v1203-operational-bridge.js'
+      - 'orbit360-platform/modules/renewals-v1200-operational-bridge.js'
+      - 'orbit360-platform/modules/ops-workflows-v1201-bridge.js'
+      - 'tools/orbit360-validar-cierre-cotizador-comparativo-v1215.mjs'
+      - '.github/workflows/orbit360-cotizador-comparativo-v1215-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contract-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate v1.215 contract and protected files
+        run: node tools/orbit360-validar-cierre-cotizador-comparativo-v1215.mjs orbit360-platform
+
+      - name: Validate protected backend contract
+        run: node tools/orbit360-validar-backend-lab-contrato.mjs
+
+      - name: Guard no direct client storage in operational flow
+        run: |
+          if grep -RniE '\b(localStorage|sessionStorage)\b' \
+            orbit360-platform/core/quote-comparison-contracts-v1203.js \
+            orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js \
+            orbit360-platform/modules/cotizador-v1203-source-gate.js \
+            orbit360-platform/modules/comparativo-v1203-operational-bridge.js; then
+            echo 'Direct browser storage detected in operational quote flow'
+            exit 1
+          fi
+
+      - name: Guard internal estimate non-eligibility
+        run: |
+          grep -q "estadoValidacion = 'revisada_interna'" orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js
+          grep -q 'estimacion_interna_no_elegible' orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js
+          grep -q 'comparativo_contiene_estimaciones_internas' orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js
+          grep -q 'elegibleEmision: false' orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js
+
+      - name: Guard real premium breakdown
+        run: |
+          grep -q 'const EPS = 0.51' orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js
+          grep -q 'desglose_prima_no_cuadra' orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js
+          if grep -nE 'total[[:space:]]*-[[:space:]]*(neta|primaNeta)[[:space:]]*-[[:space:]]*(iva|impuestos)' orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js; then
+            echo 'Tautological premium breakdown detected'
+            exit 1
+          fi
