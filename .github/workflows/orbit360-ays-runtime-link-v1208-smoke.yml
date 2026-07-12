@@ -14,6 +14,19 @@ on:
       - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
       - 'tools/orbit360-test-tenant-binding-plan-p10c.mjs'
       - '.github/workflows/orbit360-ays-runtime-link-v1208-smoke.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js'
+      - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
+      - 'orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js'
+      - 'orbit360-platform/tools/orbit360-test-ays-runtime-link-v1208.mjs'
+      - 'orbit360-platform/tools/orbit360-test-quote-p06-runtime-adapter-v1208.mjs'
+      - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
+      - 'tools/orbit360-test-tenant-binding-plan-p10c.mjs'
+      - '.github/workflows/orbit360-ays-runtime-link-v1208-smoke.yml'
   workflow_dispatch:
 
 permissions:
