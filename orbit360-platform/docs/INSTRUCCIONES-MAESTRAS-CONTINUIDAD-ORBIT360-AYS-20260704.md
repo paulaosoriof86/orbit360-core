@@ -1,9 +1,10 @@
 # Instrucciones maestras de continuidad — Orbit 360 A&S
 
-Fecha: 2026-07-04
-Proyecto: Migración A&S — Orbit 360
-Repo: `paulaosoriof86/orbit360-core`
-Rama backend activa: `ays/backend-tenant-lab-v99-20260703`
+Fecha: 2026-07-04  
+Actualización metodológica: 2026-07-12  
+Proyecto: Migración A&S — Orbit 360  
+Repo: `paulaosoriof86/orbit360-core`  
+Rama backend activa: `ays/backend-tenant-lab-v99-20260703`  
 PR vigente: #5, draft, sin merge y sin deploy.
 
 ## Propósito
@@ -16,6 +17,7 @@ Antes de auditar, empalmar, modificar backend, generar prompts o trabajar sobre 
 
 - este archivo;
 - `docs/RAMA-ACTIVA-OBLIGATORIA-AYS-BACKEND.md`;
+- `docs/METODOLOGIA-CANONICA-PAQUETES-CLAUDE-AUDITORIA-RETROALIMENTACION-20260712.md`;
 - `CHANGELOG.md`;
 - `README.md`;
 - `docs/BITACORA-CAMBIOS.md`;
@@ -85,6 +87,9 @@ Trabajar por bloques grandes, útiles y documentados. Reducir al mínimo lo manu
 - Hardcodear A&S o datos reales.
 - Mezclar financiero histórico con cobros/recaudos.
 - Crear clientes/pólizas desde documentos o bancos sin confirmación.
+- Creer una afirmación de Claude sin comprobar archivo, función, comportamiento y prueba.
+- Generar paquetes acumulados cuando no existe un P0 real.
+- Volver a pedir trabajo que ya está implementado y verificado.
 
 ## Regla para cada nuevo candidato Claude
 
@@ -92,18 +97,44 @@ Cuando Paula entregue un nuevo ZIP/prototipo:
 
 1. No empalmar de inmediato.
 2. Auditar como mini-release.
-3. Inventariar archivos.
-4. Revisar `index`, `core`, `modules`, `data` y `docs`.
-5. Validar JS.
-6. Revisar rutas del menú contra módulos.
-7. Buscar accesos directos a almacenamiento operativo.
-8. Buscar textos técnicos visibles.
-9. Buscar fechas fijas y defaults peligrosos.
-10. Revisar importador, país/moneda, pólizas/cartera, primas, cobros, planillas, documentos, PWA y documentación.
-11. Comparar contra pendientes previos.
-12. Documentar resueltos, pendientes, regresiones y nuevos hallazgos.
-13. Pasar por pipeline: preflight, plan, preview, diff, revisión manual.
-14. Empalmar solo si es aditivo y no pisa backend protegido.
+3. Identificar ZIP, SHA256, versión e inventario.
+4. Comparar primero el delta físico contra la candidata inmediatamente anterior.
+5. Revisar `index`, `core`, `modules`, `data`, `styles` y `docs`.
+6. Validar JS.
+7. Comprobar cada afirmación de Claude mediante archivo + función + comportamiento + prueba + resultado.
+8. Revisar rutas del menú contra módulos.
+9. Buscar accesos directos a almacenamiento operativo.
+10. Buscar textos técnicos visibles y verificar la segmentación por rol.
+11. Buscar fechas fijas, impuestos y defaults peligrosos.
+12. Revisar importador, país/moneda, pólizas/cartera, primas, cobros, planillas, documentos, PWA y documentación.
+13. Comparar contra pendientes previos y cambios locales reutilizables.
+14. Clasificar: implementado/verificado, parcial, pendiente, regresión, no demostrado, fuera de alcance Claude o superado/no repetir.
+15. Separar carriles A/B/C y ownership antes de generar instrucciones.
+16. Clasificar severidad P0/P1/P2 según la metodología canónica.
+17. Documentar resueltos, pendientes, regresiones y nuevos hallazgos.
+18. Pasar por pipeline: preflight, plan, preview, diff y revisión manual.
+19. Empalmar solo si es aditivo y no pisa backend protegido.
+20. Aplicar el gate de paquete:
+
+```txt
+P0 real presente
+→ un único paquete pequeño exclusivo para Claude
+→ no empalme completo
+→ continuar B/C en paralelo cuando sea seguro.
+
+P0 = 0
+→ no generar paquete
+→ documentar P1/P2
+→ empalmar selectivamente
+→ actualizar baseline
+→ continuar operación A&S.
+```
+
+Los detalles, formato de paquete, validación de afirmaciones y reglas contra falsos positivos están en:
+
+```txt
+docs/METODOLOGIA-CANONICA-PAQUETES-CLAUDE-AUDITORIA-RETROALIMENTACION-20260712.md
+```
 
 ## Documentación obligatoria
 
@@ -120,7 +151,7 @@ Toda mejora, corrección, bug, hallazgo, cambio o pendiente debe documentarse co
 - estado;
 - si aplica al prototipo base.
 
-Toda mejora hecha directamente por ChatGPT/Codex que aplique al prototipo debe documentarse también para Claude.
+Toda mejora hecha directamente por ChatGPT/Codex que aplique al prototipo debe documentarse también para Claude, indicando si es reusable, específica A&S, backend protegido o ya presente en la candidata.
 
 ## Lógicas comerciales obligatorias
 
@@ -161,8 +192,8 @@ Cada fuente debe tener contrato real, preview, validación, dry-run y trazabilid
 
 El PR #5 contiene backend LAB protegido, pipeline de empalme seguro, auditorías Claude, protección de artefactos locales, plan parser por fuentes separadas, validador de manifests, normalizador país/moneda y nota para Claude con avances backend.
 
-Claude recibió paquete ampliado `PAQUETE_CLAUDE_ORBIT360_AYS_AUDITORIA_AMPLIADA_20260704.zip` y debe corregir P0/P1 antes de un nuevo empalme.
+La candidata y el paquete Claude vigentes deben tomarse siempre de la auditoría más reciente; las referencias históricas de paquetes anteriores no constituyen baseline operativo.
 
 ## Regla final
 
-Antes de actuar, leer. Antes de empalmar, auditar. Antes de afirmar, verificar. Antes de cambiar backend, confirmar rama. Antes de tocar datos, validar fuente. Antes de entregar a Claude, documentar. Antes de cerrar, dejar trazabilidad.
+Antes de actuar, leer. Antes de empalmar, auditar. Antes de afirmar, verificar. Antes de cambiar backend, confirmar rama. Antes de tocar datos, validar fuente. Antes de entregar a Claude, documentar. Antes de crear paquete, comprobar P0. Antes de cerrar, dejar trazabilidad y continuar el carril operativo.
