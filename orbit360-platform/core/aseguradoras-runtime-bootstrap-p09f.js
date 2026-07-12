@@ -1,6 +1,6 @@
 /* ============================================================
    Orbit 360 · P0.9f/P0.9g/P0.9h/P0.9i/P0.9j/P0.9n · Bootstrap seguro
-   Fecha: 2026-07-10
+   Fecha: 2026-07-12
 
    Carga contratos aditivos solo en Firestore LAB para A&S. No modifica
    backend protegido, no registra secretos y no habilita módulos.
@@ -9,7 +9,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p09n-v1';
+  var VERSION = 'p09n-v1208';
   var REQUIRED = [
     { src: 'core/document-source-contract-p04.js', global: 'documentSourceContractP04' },
     { src: 'core/cotizacion-esquema-aseguradora-p0.js', global: 'cotizacionEsquemaAseguradoraP0' },
@@ -17,6 +17,7 @@
     { src: 'core/excel-rule-proposal-adapter-p06b.js', global: 'excelRuleProposalAdapterP06b' },
     { src: 'core/pdf-quote-adapter-p07.js', global: 'pdfQuoteAdapterP07' },
     { src: 'core/tariff-quote-reconciliation-p06c.js', global: 'tariffQuoteReconciliationP06c' },
+    { src: 'core/quote-comparison-p06-runtime-adapter-v1208.js', dataOnly: true },
     { src: 'core/knowledge-binding-gate-p08.js', global: 'knowledgeBindingGateP08' },
     { src: 'core/knowledge-binding-policy-p08.js', global: 'knowledgeBindingPolicyP08', optionalGlobal: true },
     { src: 'core/tenant-insurer-config-p10.js', global: 'tenantInsurerConfigP10' },
@@ -124,6 +125,7 @@
     if (!s || s.__firestoreLabExplicit !== true) errors.push('EXPLICIT_LAB_STORE_REQUIRED');
     if (!b.securityGuard || b.securityGuard.installed !== true) errors.push('BACKEND_SECURITY_GUARD_REQUIRED');
     if (!labStatus.snapshotAttached) errors.push('BASE_SNAPSHOTS_REQUIRED');
+    if (!Orbit.quoteContracts || !Orbit.quoteContracts.__p06RuntimeAdapterV1208) errors.push('P06_QUOTE_ADAPTER_REQUIRED');
     var brokerStatus = Orbit.aseguradorasSourceReferenceBrokerP09j && typeof Orbit.aseguradorasSourceReferenceBrokerP09j.status === 'function'
       ? Orbit.aseguradorasSourceReferenceBrokerP09j.status() : {};
     return {
@@ -131,6 +133,7 @@
       storeReady: !!(s && s.__firestoreLabExplicit),
       securityGuardReady: !!(b.securityGuard && b.securityGuard.installed),
       baseSnapshotsReady: labStatus.snapshotAttached === true,
+      quoteP06AdapterReady: !!(Orbit.quoteContracts && Orbit.quoteContracts.__p06RuntimeAdapterV1208),
       knowledgeSnapshotsReady: !!(Orbit.aseguradorasLabCollectionsP09e && Orbit.aseguradorasLabCollectionsP09e.status().installed),
       batchRuntimeReady: !!Orbit.aseguradorasBatchOrchestratorP09g,
       batchHistoryReady: !!(Orbit.aseguradorasBatchHistoryP09h && Orbit.aseguradorasBatchHistoryP09h.status().installed),
