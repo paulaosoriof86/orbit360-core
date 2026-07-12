@@ -8,9 +8,11 @@ on:
       - 'orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js'
       - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
       - 'orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js'
+      - 'orbit360-platform/core/aseguradoras-binding-enablement-lab-v1208.js'
       - 'orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js'
       - 'orbit360-platform/tools/orbit360-test-ays-runtime-link-v1208.mjs'
       - 'orbit360-platform/tools/orbit360-test-quote-p06-runtime-adapter-v1208.mjs'
+      - 'orbit360-platform/tools/orbit360-test-binding-enablement-lab-v1208.mjs'
       - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
       - 'tools/orbit360-test-tenant-binding-plan-p10c.mjs'
       - '.github/workflows/orbit360-ays-runtime-link-v1208-smoke.yml'
@@ -21,9 +23,11 @@ on:
       - 'orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js'
       - 'orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js'
       - 'orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js'
+      - 'orbit360-platform/core/aseguradoras-binding-enablement-lab-v1208.js'
       - 'orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js'
       - 'orbit360-platform/tools/orbit360-test-ays-runtime-link-v1208.mjs'
       - 'orbit360-platform/tools/orbit360-test-quote-p06-runtime-adapter-v1208.mjs'
+      - 'orbit360-platform/tools/orbit360-test-binding-enablement-lab-v1208.mjs'
       - 'tools/orbit360-test-aseguradoras-runtime-bootstrap-p09f.mjs'
       - 'tools/orbit360-test-tenant-binding-plan-p10c.mjs'
       - '.github/workflows/orbit360-ays-runtime-link-v1208-smoke.yml'
@@ -50,6 +54,7 @@ jobs:
           node --check orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js
           node --check orbit360-platform/core/aseguradoras-runtime-bootstrap-p09f.js
           node --check orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js
+          node --check orbit360-platform/core/aseguradoras-binding-enablement-lab-v1208.js
           node --check orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js
 
       - name: Runtime tenant boundary
@@ -60,6 +65,9 @@ jobs:
 
       - name: P06 quote runtime adapter
         run: node orbit360-platform/tools/orbit360-test-quote-p06-runtime-adapter-v1208.mjs
+
+      - name: Second gate controlled writer
+        run: node orbit360-platform/tools/orbit360-test-binding-enablement-lab-v1208.mjs
 
       - name: AseGuate binding plan
         run: node tools/orbit360-test-tenant-binding-plan-p10c.mjs
