@@ -17,7 +17,10 @@ assert(bridge.includes("ctx.mode !== 'firestore-lab'"), 'runtime debe exigir fir
 assert(bridge.includes("ctx.tenantId !== 'alianzas-soluciones'"), 'runtime debe exigir tenant A&S');
 assert(bridge.includes('core/backend-lab-security-guard.js'), 'debe cargar guard antes del bootstrap');
 assert(bridge.includes('core/aseguradoras-runtime-bootstrap-p09f.js'), 'debe cargar bootstrap P09');
+assert(bridge.includes('core/aseguradoras-binding-enablement-lab-v1208.js'), 'debe cargar escritor controlado del segundo gate');
 assert(bridge.indexOf('core/backend-lab-security-guard.js') < bridge.indexOf('core/aseguradoras-runtime-bootstrap-p09f.js'), 'guard debe preceder bootstrap');
+assert(bridge.indexOf('core/aseguradoras-runtime-bootstrap-p09f.js') < bridge.indexOf('core/aseguradoras-binding-enablement-lab-v1208.js'), 'writer debe cargar después del bootstrap y sus contratos');
+assert(bridge.includes('enablementWriterReady'), 'evento debe informar disponibilidad del writer sin afirmar habilitación');
 assert(bridge.includes('enablesCotizador: false'), 'enlace no puede habilitar Cotizador');
 assert(bridge.includes('enablesComparativo: false'), 'enlace no puede habilitar Comparativo');
 assert(!bridge.includes('TASAS_DEF'), 'enlace no puede introducir tasas genéricas');
@@ -31,6 +34,7 @@ const modulePos = index.indexOf('modules/aseguradoras.js');
 const bridgePos = index.indexOf('modules/aseguradoras-v1202-resources-bridge.js');
 assert(modulePos >= 0 && bridgePos > modulePos, 'bridge debe cargar después del módulo Aseguradoras');
 assert(!index.includes('core/aseguradoras-runtime-bootstrap-p09f.js'), 'runtime A&S no debe contaminar el index general');
+assert(!index.includes('core/aseguradoras-binding-enablement-lab-v1208.js'), 'writer A&S no debe contaminar el index general');
 
 // Ejecución mínima en un tenant ajeno: no debe insertar scripts.
 let appended = 0;
@@ -78,6 +82,6 @@ context.window.Orbit = context.Orbit;
 vm.createContext(context);
 vm.runInContext(bridge, context, { filename: bridgePath });
 await new Promise(resolve => setTimeout(resolve, 0));
-assert(appended === 0, 'tenant ajeno no debe cargar runtime A&S');
+assert(appended === 0, 'tenant ajeno no debe cargar runtime ni writer A&S');
 
 console.log('OK orbit360-test-ays-runtime-link-v1208');
