@@ -1,136 +1,154 @@
-ORBIT 360 A&S — CORRECCIÓN ACUMULADA v1.206
+ORBIT 360 — CORRECCIÓN ACUMULADA v1.206
 COTIZADOR / COMPARATIVO / IMPRESIÓN / REPLANTEAR / PLANTILLAS
 
-Trabaja sobre tu ÚLTIMA candidata visual incremental. No vuelvas a v1.187, v1.197 ni a una base anterior. Antes de modificar, lee completos:
+Trabaja sobre tu ÚLTIMA candidata visual incremental. No vuelvas a v1.187, v1.197 ni a una base anterior.
+
+ANTES DE MODIFICAR, LEE:
 
 1. PAQUETE-CLAUDE-RECONCILIADO-CODIGO-REAL-V1205-20260711.md
 2. AUDITORIA-CANDIDATA-CLAUDE-V1187-20260711-214858-COTIZADOR-COMPARATIVO.md
 3. AUDITORIA-VISUAL-REAPERTURA-ASEGURADORAS-COTIZADOR-COMPARATIVO-V1203-20260711.md
 4. AUDITORIA-OPERATIVA-COTIZADOR-COMPARATIVO-V1203-20260711.md
-5. AUDITORIA-FORENSE-PROFUNDA-COTIZADOR-COMPARATIVO-V110-CONTRATO-AYS-20260709.md
-6. MATRIZ-EMPALME-COTIZADOR-COMPARATIVO-ORBIT-V110-20260710.md
-7. comparativo_final_v110.html
-8. contratos y bridges físicos v1.198–v1.203 incluidos como referencia de solo lectura.
+5. FRONTERA-COTIZADOR-COMPARATIVO-PROTOTIPO-VS-TENANT-AYS-20260711.md
+6. comparativo_final_v110.html, únicamente como referencia funcional/visual y de patrones reutilizables.
+7. contratos y bridges físicos v1.198–v1.203 como referencia de solo lectura.
 
-OBJETIVO ÚNICO
+CORRECCIÓN DE ALCANCE
 
-Entregar una sola candidata grande, incremental y auditable que conserve todos tus avances visuales válidos, pero cierre Cotizador y Comparativo con la profundidad visual y funcional del index v110, sin reemplazar ni simular los contratos reales del backend.
+No debes reconstruir dentro del prototipo general el cotizador exacto de Alianzas y Soluciones.
+
+La separación obligatoria es:
+
+Orbit 360 prototipo comercializable
+→ UX reusable, contratos, configuración genérica y datos ficticios.
+
+Tenant A&S operativo
+→ tasas, reglas, links, formatos, entrenamiento y aseguradoras exactas de A&S.
+
+OBJETIVO ÚNICO DE ESTA CANDIDATA
+
+Entregar una sola candidata grande, incremental y auditable que:
+
+1. conserve tus avances visuales válidos;
+2. deje el Cotizador genérico funcional, estable, configurable y presentable;
+3. eleve el Comparativo con la experiencia profunda reusable del index v110;
+4. no copie ni hardcodee tasas, reglas, links, entrenamiento ni datos exclusivos de A&S;
+5. mantenga compatibilidad con los contratos reales incluidos como referencia.
 
 REGLAS NO NEGOCIABLES
 
 - No modificar ni entregar sustitutos de data/store.js, data/store-firestore-lab.local.js, core/auth.js, core/importa.js, core/backend-lab-*, firestore.rules ni herramientas backend protegidas.
 - No usar localStorage operativo ni Firebase/Firestore directo desde módulos.
-- No copiar la arquitectura monolítica del index v110. Reutiliza su experiencia visual, sus flujos, impresión, replanteamiento y plantillas dentro de la arquitectura modular Orbit.
-- No inventar tarifas, aseguradoras, credenciales, datos reales ni confirmaciones de envío.
-- No reintroducir TASAS_DEF como oferta real.
-- No usar Orbit._cots como mecanismo primario. Diseña compatible con cotizaciones persistidas, IDs y quoteTransfers.
-- No hardcodear IVA 12%. País, moneda e impuestos vienen de configuración. GT y CO se mantienen separados.
+- No copiar la arquitectura monolítica del index v110.
+- No copiar tasas, reglas, links, credenciales, aseguradoras reales ni entrenamiento A&S.
+- No presentar tasas genéricas como ofertas reales.
+- No usar Orbit._cots como mecanismo primario; diseñar compatible con cotizaciones persistidas, IDs y quoteTransfers.
+- País, moneda e impuestos vienen de configuración; no hardcodear IVA 12%.
 - No mostrar copy técnico en UI cliente.
 - No marcar enviado al abrir WhatsApp/correo; usar preparado hasta confirmación/callback.
-- No crear póliza, recibos ni cartera al aceptar una propuesta. Crear representación de Solicitud de emisión en Ops.
+- No crear póliza, recibos ni cartera al aceptar una propuesta; solo representar Solicitud de emisión en Ops.
 
-COTIZADOR PROFUNDO
+COTIZADOR GENÉRICO REUSABLE
 
-Reconstruye el Cotizador como flujo guiado:
+El Cotizador del prototipo puede ser más sencillo que el cotizador A&S exacto, siempre que funcione bien.
 
-1. Cliente/prospecto, asesor, país y moneda.
-2. Producto/ramo y datos conocidos del riesgo.
-3. Aseguradoras elegibles.
-4. Productos, planes, fuentes y vigencias disponibles.
-5. Datos faltantes específicos.
-6. Generar o registrar cotizaciones.
-7. Revisar, seleccionar y enviar a Comparativo.
+Debe incluir:
 
-Precarga todo dato disponible desde Cliente360, Renovaciones o contexto de navegación. No obligues a volver a digitar.
+1. cliente/prospecto, asesor, país y moneda;
+2. ramo/producto y datos del riesgo;
+3. aseguradoras y planes ficticios/configurables;
+4. fuentes tarifarias configurables por tenant;
+5. datos faltantes específicos;
+6. generar o registrar cotizaciones;
+7. revisar, seleccionar y enviar a Comparativo;
+8. historial y trazabilidad por contratos/IDs;
+9. estado honesto cuando no exista fuente válida.
 
-Cada propuesta debe mostrar:
+Cada propuesta genérica debe poder mostrar:
 
-- logo y aseguradora;
+- logo/aseguradora ficticia o configurable;
 - producto/plan;
 - estado de fuente/validación;
 - prima neta;
-- gastos de emisión;
-- gastos financieros;
+- gastos;
 - impuestos;
 - prima total;
-- pagos y frecuencia;
-- coberturas y límites;
+- pagos;
+- coberturas;
 - deducibles;
-- condiciones, exclusiones y restricciones;
+- condiciones;
 - vigencia;
-- fuente, versión y referencia;
-- acciones revisar, editar, excluir, duplicar, imprimir y comparar.
+- acciones revisar, editar, excluir, imprimir y comparar.
 
-Sin fuente tarifaria compatible, vigente y validada:
+Sin fuente válida:
 
 - no calcular automáticamente;
 - mostrar “Cotización automática pendiente de configuración”;
 - permitir “Registrar cotización recibida”.
 
-IMPRESIÓN/PDF DEL COTIZADOR
+IMPRESIÓN DEL COTIZADOR DEL PROTOTIPO
 
-La impresión actual básica queda rechazada. Debe recuperar la experiencia v110 y alinearse con Aseguradoras.
+No debe copiar el formato exacto ni los datos propios de A&S.
 
-Debe incluir:
+Debe ser una plantilla genérica presentable con:
 
-- portada corporativa;
-- marca Orbit 360 y slot white-label;
-- logo del tenant y logo de la aseguradora;
-- encabezado/hero por aseguradora;
-- cliente, asesor, país, moneda y riesgo;
-- producto y plan;
-- selección de planes/cotizaciones por aseguradora;
-- forma/frecuencia de pago seleccionada;
+- marca Orbit 360;
+- slot white-label del tenant;
+- slot de logo de aseguradora;
+- cliente, país, moneda y riesgo;
+- producto/plan;
 - prima desglosada;
-- coberturas, deducibles, condiciones, exclusiones y vigencia;
-- pie legal/configurable;
-- tipografías Manrope y Source Sans 3;
-- paginación cuidada;
-- impresión A4 profesional;
-- vista previa antes de imprimir/guardar PDF.
+- forma de pago;
+- coberturas, deducibles y condiciones disponibles;
+- pie legal configurable;
+- impresión A4 limpia;
+- vista previa;
+- hooks para que cada tenant pueda usar formatos propios.
 
-No basta con una tabla de montos. Debe ser una cotización presentable al cliente y diferenciada por aseguradora.
+No es requisito que Claude replique los formatos específicos por aseguradora entrenados para A&S.
 
-COMPARATIVO PROFUNDO
+COMPARATIVO PROFUNDO REUSABLE
+
+Esta experiencia sí debe conservar lo mejor de v110 porque es generalizable.
 
 Debe aceptar:
 
 A. propuestas persistidas provenientes del Cotizador;
 B. cotizaciones recibidas en PDF/imagen/Excel/correo/WhatsApp mediante registro documental.
 
-La pantalla debe conservar la estructura visual esencial de v110:
+Debe incluir:
 
 - tarjetas de resumen rápido;
-- mejor opción claramente identificada;
-- bloque oscuro de cliente/riesgo;
+- mejor opción identificada;
+- bloque cliente/riesgo;
 - tabla comparativa profunda por secciones;
 - logos de aseguradoras;
-- prima total destacada;
+- prima neta, gastos, impuestos y total;
 - coberturas, límites, deducibles, exclusiones, condiciones, pagos y vigencias;
-- diferencias y ventajas/desventajas;
+- diferencias, ventajas y desventajas;
 - recomendación consultiva explicable;
-- acciones de replanteamiento, impresión, comunicación y aceptación.
+- acciones Replantear, imprimir, comunicar y aceptar;
+- historial y trazabilidad.
 
 IMPRESIÓN/PDF DEL COMPARATIVO
 
-La pantalla y el PDF deben compartir la misma estructura y jerarquía visual del index v110. No crear una versión de impresión simplificada distinta.
-
-Conservar:
+La pantalla y el PDF deben compartir la misma estructura y jerarquía visual reusable del index v110:
 
 - tarjetas resumen;
-- bloque de datos del cliente/riesgo;
+- bloque cliente/riesgo;
 - tabla completa;
 - secciones visuales;
 - logos;
 - fila de prima total;
 - recomendación;
-- encabezado y pie;
-- A4 controlado y saltos de página;
-- responsive de pantalla sin perder fidelidad de PDF.
+- encabezado y pie configurables;
+- A4 controlado y saltos de página.
+
+No copiar textos, datos, tasas ni reglas exclusivas de A&S.
 
 REPLANTEAR
 
-No reducirlo a tres botones. Implementar modal o panel completo con:
+Debe ser reusable y permitir:
 
 - costo-beneficio/equilibrio;
 - precio;
@@ -138,16 +156,16 @@ No reducirlo a tres botones. Implementar modal o panel completo con:
 - deducible;
 - responsabilidad civil;
 - criterio adicional configurable;
-- selección manual de aseguradora con justificación;
+- selección manual con justificación;
 - restablecer recomendación automática.
 
-Al cambiar criterio, recalcula puntuación, ventajas/desventajas y explicación. No inventar datos que no estén en las cotizaciones.
+Al cambiar criterio, recalcula puntuación, ventajas/desventajas y explicación con los datos disponibles. No inventar información.
 
 REGISTRAR COTIZACIÓN RECIBIDA
 
 Conservar ese nombre. No volver a “Propuesta manual”.
 
-Flujo:
+Flujo reusable:
 
 1. aseguradora del directorio;
 2. producto/plan;
@@ -156,21 +174,21 @@ Flujo:
 5. diff y corrección humana;
 6. versión, fecha y vigencia;
 7. prima neta, gastos, impuestos y total;
-8. pagos/frecuencia;
+8. pagos;
 9. coberturas, deducibles, condiciones y exclusiones;
 10. cuadre;
 11. motivo y confirmación;
 12. guardar borrador o validada.
 
-Usar estado canónico requiere_validacion hasta completar fuente y revisión. No inferir prima neta con total/1.12. Si falta país/moneda/impuesto, mostrar Requiere validación.
+Usar requiere_validacion hasta completar fuente y revisión. Si falta país/moneda/impuesto, mostrar Requiere validación.
 
 PLANTILLAS WHATSAPP Y CORREO
 
-Recuperar el patrón v110 y adaptarlo a configuración tenant.
+Implementar el patrón reusable, no el contenido comercial exacto de A&S.
 
 Debe existir:
 
-- biblioteca de plantillas;
+- biblioteca genérica;
 - selección por país/producto/canal;
 - editor autorizado;
 - variables seguras;
@@ -180,11 +198,11 @@ Debe existir:
 - estado preparado;
 - confirmación real antes de enviado.
 
-Plantillas mínimas:
+Ejemplos genéricos:
 
 - cotización individual;
 - comparativo de vehículos;
-- comparativo de gastos médicos;
+- comparativo de salud;
 - propuesta recomendada;
 - seguimiento;
 - información faltante;
@@ -192,52 +210,69 @@ Plantillas mínimas:
 
 PROPUESTA ACEPTADA
 
-La acción solo aparece si hay propuesta seleccionada y validada. Autocompletar desde cotizacionId/comparativoId:
-
-cliente, asesor, aseguradora, ramo, producto, plan, país, moneda, prima neta, gastos, impuestos, total, pagos, fuente, versión, documento, fechas, riesgo, IDs y póliza origen si es renovación.
-
-El usuario solo confirma aceptación, evidencia, fecha faltante y excepción justificada. Resultado visible: Solicitud de emisión creada en Ops/Emisiones.
+La acción solo aparece con propuesta seleccionada y validada. Autocompletar desde cotizacionId/comparativoId y representar Solicitud de emisión en Ops.
 
 ACADEMIA
 
-Actualizar en la misma entrega las rutas Dirección, Operativo y Asesor sobre:
+Actualizar Academia general por rol sobre:
 
-- fuentes y bloqueo sin tarifa;
+- configuración de fuentes;
+- bloqueo sin tarifa válida;
 - cotización recibida;
 - prima separada;
-- lectura y replanteamiento del comparativo;
+- lectura y replanteamiento del Comparativo;
 - comunicación preparada vs enviada;
 - aceptación y solicitud de emisión;
 - permisos y errores a evitar.
 
-VALIDACIÓN OBLIGATORIA
+No incluir tasas, links, reglas ni entrenamiento específico de A&S en la Academia general.
+
+FUERA DEL ALCANCE DE CLAUDE
+
+La implementación exacta de A&S queda para ChatGPT/Codex y el tenant `alianzas-soluciones`:
+
+- tasas seguras y validadas;
+- reglas reales por aseguradora/producto/plan;
+- links y recursos seguros;
+- cotizadores específicos de compañías;
+- conocimiento extraído de los cotizadores aportados;
+- formatos A&S por aseguradora;
+- plantillas comerciales A&S;
+- lógica exacta GT/CO;
+- pruebas sanitizadas A&S;
+- configuración/backend/importadores/dry-run.
+
+VALIDACIÓN DE LA CANDIDATA CLAUDE
 
 Antes de entregar:
 
 - node --check de todo JS;
 - 0 errores de consola;
 - validar 1440, 1024 y 390 px;
-- probar impresión/PDF Cotizador por aseguradora;
-- probar impresión/PDF Comparativo y comparar visualmente con v110;
+- probar Cotizador genérico e impresión configurable;
+- probar Comparativo en pantalla y PDF contra el patrón reusable v110;
 - probar todos los criterios de Replantear;
-- probar plantillas y vista previa WA/correo;
+- probar plantillas genéricas y vista previa;
+- comprobar que no hay datos ni reglas A&S hardcodeados;
 - comprobar que no aparece IVA hardcodeado;
-- comprobar que no hay Orbit._cots como flujo primario;
 - comprobar que no se modificaron archivos protegidos;
 - grep de copy técnico visible = 0;
-- documentar Academia, CHANGELOG, bitácora, pendientes y evidencia.
+- documentar Academia, CHANGELOG, bitácora y pendientes.
 
 ENTREGA
 
-Entrega una sola candidata acumulada, no parches separados. Incluye:
+Entrega una sola candidata acumulada e incluye:
 
 1. inventario de archivos modificados;
 2. comparación contra tu base visual anterior;
-3. comparación funcional contra v110;
-4. lista de contratos/hooks respetados;
-5. evidencia de impresión y responsive;
-6. pruebas ejecutadas;
-7. pendientes reales separados por Carril A/B/C;
-8. declaración explícita de archivos protegidos no modificados.
+3. lista de patrones v110 reutilizados;
+4. lista explícita de elementos A&S no incorporados por ser tenant-specific;
+5. contratos/hooks respetados;
+6. evidencia de impresión y responsive;
+7. pruebas ejecutadas;
+8. pendientes separados por Carril A/B/C;
+9. declaración de archivos protegidos no modificados.
 
-No declares los módulos cerrados si la impresión/PDF, Replantear o plantillas siguen simplificados.
+No declares implementado el Cotizador A&S exacto. Declara únicamente:
+
+“Cotizador genérico reusable preparado para configuración por tenant y Comparativo profundo reusable compatible con el contrato operativo.”
