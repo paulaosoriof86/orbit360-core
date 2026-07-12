@@ -4,6 +4,7 @@
    - hints sanitizados de usuarios;
    - cuentas por accountRef con revelado/copia temporal;
    - origen, calidad y relación con Cotizador.
+   - carga aditiva del runtime documental solo para LAB A&S.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
@@ -20,11 +21,69 @@ Orbit.modules = Orbit.modules || {};
   function insurer() { const id = query().get('ficha'); return id ? S().get('aseguradoras', id) : null; }
   function canSensitive() { return !!(mod.__v1197Bridge.canSensitive && mod.__v1197Bridge.canSensitive()); }
   function state() { return mod.__v1197Bridge.state || {}; }
+  function runtimeContext() {
+    let params;
+    try { params = new URLSearchParams(window.location.search || ''); } catch (e) { params = new URLSearchParams(''); }
+    const backend = window.OrbitBackend || window.ORBIT_BACKEND || {};
+    return {
+      mode: String(params.get('orbitBackend') || backend.mode || '').trim(),
+      tenantId: String(params.get('tenant') || backend.tenantId || backend.tenant || '').trim()
+    };
+  }
+  function scriptPresent(path) {
+    return Array.from(document.querySelectorAll('script[src]')).some(script => String(script.getAttribute('src') || '').split('?')[0].replace(/^\.\//, '') === path);
+  }
+  function loadScriptOnce(path, ready) {
+    if (ready()) return Promise.resolve({ path, status: 'ready' });
+    if (scriptPresent(path)) {
+      return new Promise((resolve, reject) => {
+        const started = Date.now();
+        (function wait() {
+          if (ready()) return resolve({ path, status: 'existing_ready' });
+          if (Date.now() - started > 8000) return reject(new Error('RUNTIME_SCRIPT_TIMEOUT:' + path));
+          setTimeout(wait, 80);
+        })();
+      });
+    }
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = path + '?v=20260712';
+      script.async = false;
+      script.dataset.orbitAysRuntime = 'v1208';
+      script.onload = () => ready() ? resolve({ path, status: 'loaded' }) : reject(new Error('RUNTIME_GLOBAL_MISSING:' + path));
+      script.onerror = () => reject(new Error('RUNTIME_SCRIPT_LOAD_FAILED:' + path));
+      (document.head || document.documentElement).appendChild(script);
+    });
+  }
+  function loadAysRuntime() {
+    const ctx = runtimeContext();
+    if (ctx.mode !== 'firestore-lab' || ctx.tenantId !== 'alianzas-soluciones') return Promise.resolve({ status: 'not_applicable' });
+    if (window.__orbitAysKnowledgeRuntimePromise) return window.__orbitAysKnowledgeRuntimePromise;
+    window.__orbitAysKnowledgeRuntimePromise = loadScriptOnce('core/backend-lab-security-guard.js', () => !!(window.OrbitBackend && window.OrbitBackend.securityGuard))
+      .then(() => loadScriptOnce('core/aseguradoras-runtime-bootstrap-p09f.js', () => !!Orbit.aseguradorasRuntimeBootstrapP09f))
+      .then(() => Orbit.aseguradorasRuntimeBootstrapP09f.start())
+      .then(status => {
+        window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-runtime-linked', { detail: { tenantId: ctx.tenantId, mode: ctx.mode, status: status && status.status || 'loaded', enablesCotizador: false, enablesComparativo: false } }));
+        return status;
+      })
+      .catch(error => {
+        window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-runtime-error', { detail: { tenantId: ctx.tenantId, mode: ctx.mode, error: String(error && error.message || error), enablesCotizador: false, enablesComparativo: false } }));
+        return { status: 'load_failed', errors: [String(error && error.message || error)] };
+      });
+    return window.__orbitAysKnowledgeRuntimePromise;
+  }
   function statusBadge(status) {
     const s = status || {};
     const tone = s.status === 'disponible' ? 'ok' : s.status === 'no_disponible' ? 'danger' : 'warn';
     const text = s.status === 'disponible' ? 'Disponible' : (s.message || (s.status === 'sin_referencia' ? 'Sin referencia' : 'Pendiente de conexión segura'));
     return `<span class="badge ${tone}">${esc(text)}</span>`;
+  }
+  function sensitiveStatusLabel(status) {
+    const value = String(status || '').toLowerCase();
+    if (!value || value === 'sin_sensibles') return 'Sin recursos sensibles registrados';
+    if (value === 'requiere_validacion') return 'Requiere validación';
+    if (value === 'pendiente_conexion' || value === 'backend_required') return 'Conexión segura pendiente';
+    return 'Estado protegido';
   }
   function qualityBanner(a) {
     const src = a.fuenteDirectorio || {};
@@ -32,7 +91,7 @@ Orbit.modules = Orbit.modules || {};
     const sensitive = a.sensitiveImportStatus || {};
     const readiness = (a.ramos || []).some(r => a.ramosHabilitados && a.ramosHabilitados[r] && a.ramosHabilitados[r].cotizador === true);
     const status = a.requiereValidacion || alerts.length ? 'Requiere validación' : (a.ultimaRevision ? 'Revisada' : 'Pendiente de revisión');
-    return `<section class="card pad" data-dir-quality style="margin-bottom:12px;border-left:3px solid ${a.requiereValidacion ? 'var(--danger)' : 'var(--warn)'}"><div class="asg197-section-head"><div><small>Calidad y origen del directorio</small><h3>${esc(status)}</h3></div><span class="badge ${a.requiereValidacion ? 'danger' : 'warn'}">${alerts.length} alerta(s)</span></div><div class="asg197-info-grid"><div><small>Fuente</small><b>${esc(src.archivo || a.fuente || 'Carga manual')}</b></div><div><small>Hoja</small><b>${esc(src.hoja || '—')}</b></div><div><small>País / moneda</small><b>${esc(a.pais || '—')} · ${esc(a.monedaBase || (a.pais === 'CO' ? 'COP' : 'GTQ'))}</b></div><div><small>Contactos</small><b>${(a.contactos || []).length}</b></div><div><small>Plataformas</small><b>${(a.portales || []).length}</b></div><div><small>Bancos/pagos</small><b>${(a.cuentas || []).length}</b></div><div><small>Recursos sensibles</small><b>${(+sensitive.credentialsDetected || 0) + (+sensitive.accountsDetected || 0)} · ${esc(sensitive.status || 'sin_sensibles')}</b></div><div><small>Cotizador</small><b>${readiness ? 'Algún producto habilitado' : 'No habilitada por directorio'}</b></div></div>${alerts.length ? `<div class="cfg-note" style="margin-top:10px">Pendientes: ${alerts.map(esc).join(' · ')}</div>` : ''}<p class="muted" style="font-size:12px;margin:10px 0 0">Importar contactos o accesos no habilita tarifas. Cotizador y Comparativo continúan en default-deny hasta validar producto, país, moneda, plan y fuente.</p></section>`;
+    return `<section class="card pad" data-dir-quality style="margin-bottom:12px;border-left:3px solid ${a.requiereValidacion ? 'var(--danger)' : 'var(--warn)'}"><div class="asg197-section-head"><div><small>Calidad y origen del directorio</small><h3>${esc(status)}</h3></div><span class="badge ${a.requiereValidacion ? 'danger' : 'warn'}">${alerts.length} alerta(s)</span></div><div class="asg197-info-grid"><div><small>Fuente</small><b>${esc(src.archivo || a.fuente || 'Carga manual')}</b></div><div><small>Hoja</small><b>${esc(src.hoja || '—')}</b></div><div><small>País / moneda</small><b>${esc(a.pais || '—')} · ${esc(a.monedaBase || (a.pais === 'CO' ? 'COP' : 'GTQ'))}</b></div><div><small>Contactos</small><b>${(a.contactos || []).length}</b></div><div><small>Plataformas</small><b>${(a.portales || []).length}</b></div><div><small>Bancos/pagos</small><b>${(a.cuentas || []).length}</b></div><div><small>Recursos sensibles</small><b>${(+sensitive.credentialsDetected || 0) + (+sensitive.accountsDetected || 0)} · ${esc(sensitiveStatusLabel(sensitive.status))}</b></div><div><small>Cotizador</small><b>${readiness ? 'Algún producto habilitado' : 'Pendiente de configuración validada'}</b></div></div>${alerts.length ? `<div class="cfg-note" style="margin-top:10px">Pendientes: ${alerts.map(esc).join(' · ')}</div>` : ''}<p class="muted" style="font-size:12px;margin:10px 0 0">Importar contactos o accesos no habilita tarifas. Cotizador y Comparativo permanecen pendientes hasta validar producto, país, moneda, plan y fuente.</p></section>`;
   }
   function accountHtml(a) {
     const authorized = canSensitive();
@@ -112,11 +171,12 @@ Orbit.modules = Orbit.modules || {};
     host.__resourcesObserverV1202 = observer;
   }
 
+  loadAysRuntime();
   const originalRender = mod.render.bind(mod);
   mod.render = function (host) {
     const out = originalRender(host);
     setTimeout(() => { enhance(host); observe(host); }, 10);
     return out;
   };
-  mod.__resourcesV1202 = { originalRender };
+  mod.__resourcesV1202 = { originalRender, loadAysRuntime };
 })();
