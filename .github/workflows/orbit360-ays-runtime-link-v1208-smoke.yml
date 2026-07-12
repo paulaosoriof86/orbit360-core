@@ -1,0 +1,38 @@
+name: Orbit 360 A&S runtime link v1.208 smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-binding-plan-p10c.js'
+      - 'orbit360-platform/tools/orbit360-test-ays-runtime-link-v1208.mjs'
+      - 'tools/orbit360-test-tenant-binding-plan-p10c.mjs'
+      - '.github/workflows/orbit360-ays-runtime-link-v1208-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax bridge
+        run: node --check orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js
+
+      - name: Runtime tenant boundary
+        run: node orbit360-platform/tools/orbit360-test-ays-runtime-link-v1208.mjs
+
+      - name: AseGuate binding plan
+        run: node tools/orbit360-test-tenant-binding-plan-p10c.mjs
