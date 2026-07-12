@@ -62,8 +62,9 @@ Orbit.modules = Orbit.modules || {};
     window.__orbitAysKnowledgeRuntimePromise = loadScriptOnce('core/backend-lab-security-guard.js', () => !!(window.OrbitBackend && window.OrbitBackend.securityGuard))
       .then(() => loadScriptOnce('core/aseguradoras-runtime-bootstrap-p09f.js', () => !!Orbit.aseguradorasRuntimeBootstrapP09f))
       .then(() => Orbit.aseguradorasRuntimeBootstrapP09f.start())
+      .then(status => loadScriptOnce('core/aseguradoras-binding-enablement-lab-v1208.js', () => !!Orbit.aseguradorasBindingEnablementLabV1208).then(() => status))
       .then(status => {
-        window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-runtime-linked', { detail: { tenantId: ctx.tenantId, mode: ctx.mode, status: status && status.status || 'loaded', enablesCotizador: false, enablesComparativo: false } }));
+        window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-runtime-linked', { detail: { tenantId: ctx.tenantId, mode: ctx.mode, status: status && status.status || 'loaded', enablementWriterReady: !!Orbit.aseguradorasBindingEnablementLabV1208, enablesCotizador: false, enablesComparativo: false } }));
         return status;
       })
       .catch(error => {
