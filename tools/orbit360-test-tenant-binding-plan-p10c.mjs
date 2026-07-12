@@ -21,12 +21,16 @@ vm.runInContext(fs.readFileSync('orbit360-platform/core/tenant-binding-plan-p10c
 const api=Orbit.tenantBindingPlanP10c;
 const plan=api.getPlan('alianzas-soluciones','ays_aseguate_vehiculos_binding_v1');
 assert(plan&&plan.variants.length===2,'debe registrar auto y microbus');
+assert(plan.tariffDocumentId==='ays_aseguate_tarifario_2026_v1','tarifario debe usar el id canonico del lote');
+assert(plan.variants.find(v=>v.id==='ays_aseguate_auto_v1').presentationDocumentId==='ays_aseguate_cotizacion_auto_ejemplo_v1','auto debe usar id canonico del lote');
+assert(plan.variants.find(v=>v.id==='ays_aseguate_microbus_v1').presentationDocumentId==='ays_aseguate_cotizacion_microbus_ejemplo_v1','microbus debe usar id canonico del lote');
+assert(plan.variants.every(v=>Object.values(v.targets).every(flag=>flag===false)),'ninguna variante puede habilitar módulos antes del segundo gate');
 const dimsAuto={pais:'GT',moneda:'GTQ',ramo:'Vehículos',producto:'Seguro de vehículo',tipoVehiculo:'Automóvil'};
-const dimsMicro={pais:'GT',moneda:'GTQ',ramo:'Vehículos',producto:'Seguro de vehículo',tipoVehiculo:'Microbús'};
+const dimsMicro={pais:'GT',moneda:'GTQ',ramo:'Vehículos',producto:'Seguro de vehículo',tipoVehiculo:'Microbús hasta 9 pasajeros'};
 const result=api.build({tenantId:'alianzas-soluciones',planId:plan.id,directory:[],rules:[{id:'r-auto',dimensiones:dimsAuto},{id:'r-micro',dimensiones:dimsMicro}],profiles:[{id:'p-auto',dimensiones:dimsAuto},{id:'p-micro',dimensiones:dimsMicro}],validationCases:[{id:'s-auto',dimensiones:dimsAuto},{id:'s-micro',dimensiones:dimsMicro}]});
 assert(result.ok&&result.variants.every(v=>v.status==='ready_for_second_gate'),'ambas variantes deben quedar listas solo para segundo gate');
 assert(result.bindings.every(b=>b.enabled===false&&b.enabledComparativo===false),'bindings deben quedar deshabilitados');
 const incomplete=api.build({tenantId:'alianzas-soluciones',planId:plan.id,rules:[{id:'r-auto',dimensiones:dimsAuto}],profiles:[{id:'p-auto',dimensiones:dimsAuto},{id:'p-micro',dimensiones:dimsMicro}],validationCases:[{id:'s-auto',dimensiones:dimsAuto},{id:'s-micro',dimensiones:dimsMicro}]});
 assert(!incomplete.ok&&incomplete.variants.find(v=>v.id.includes('microbus')).blockers.includes('RULE_REQUIRED'),'microbus sin regla debe bloquearse');
-assert(incomplete.bindings.find(b=>norm(b.dimensiones.tipoVehiculo)==='microbus').status==='presentation_only','microbus no debe heredar regla de automóvil');
+assert(incomplete.bindings.find(b=>norm(b.dimensiones.tipoVehiculo)==='microbus_hasta_9_pasajeros').status==='presentation_only','microbus no debe heredar regla de automóvil');
 console.log('OK orbit360-test-tenant-binding-plan-p10c');
