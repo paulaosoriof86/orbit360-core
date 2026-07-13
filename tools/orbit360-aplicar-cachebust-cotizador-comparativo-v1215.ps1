@@ -20,53 +20,21 @@ if ($LASTEXITCODE -ne 0 -or $branch -ne $requiredBranch) {
 }
 
 $replacements = @(
-  @{
-    Before = 'core/quote-comparison-contracts-v1203-refinements.js?v=20260711'
-    After  = 'core/quote-comparison-contracts-v1203-refinements.js?v=20260712-v1215'
-  },
-  @{
-    Before = 'modules/calidad.js?v1360'
-    After  = 'modules/calidad.js?v=20260712-op1'
-  }
+  @{ Before = 'core/quote-comparison-contracts-v1203-refinements.js?v=20260711'; After = 'core/quote-comparison-contracts-v1203-refinements.js?v=20260712-v1215' },
+  @{ Before = 'modules/calidad.js?v1360'; After = 'modules/calidad.js?v=20260712-op1' }
 )
 
 $insertions = @(
-  @{
-    Anchor = '<link rel="stylesheet" href="styles/v1197-empalme.css?v=20260711">'
-    Value  = '<link rel="stylesheet" href="styles/crm-op1-v1216.css?v=20260712-op1">'
-  },
-  @{
-    Anchor = '<link rel="stylesheet" href="styles/v1197-empalme.css?v=20260711">'
-    Value  = '<link rel="stylesheet" href="styles/aseguradoras-op2-v1217.css?v=20260713-op2">'
-  },
-  @{
-    Anchor = '<script src="core/access-scope.js?v=20260711"></script>'
-    Value  = '<script src="core/crm-op1-role-visibility.js?v=20260712-op1"></script>'
-  },
-  @{
-    Anchor = '<script src="core/access-scope.js?v=20260711"></script>'
-    Value  = '<script src="core/aseguradoras-op2-role-visibility.js?v=20260713-op2"></script>'
-  },
-  @{
-    Anchor = '<script src="core/insurer-directory-import-v1202-security.js?v=20260711"></script>'
-    Value  = '<script src="core/aseguradoras-op2-source-guard.js?v=20260713-op2"></script>'
-  },
-  @{
-    Anchor = '<script src="data/academia-v1203-cotizador-comparativo.js?v=20260711"></script>'
-    Value  = '<script src="data/academia-v1216-crm-portal-poliza.js?v=20260712-op1"></script>'
-  },
-  @{
-    Anchor = '<script src="data/academia-v1202-directorios-aseguradoras.js?v=20260711"></script>'
-    Value  = '<script src="data/academia-v1217-aseguradoras-op2.js?v=20260713-op2"></script>'
-  },
-  @{
-    Anchor = '<script src="modules/portal-v1198-scope-viewer-bridge.js?v=20260711"></script>'
-    Value  = '<script src="modules/crm-op1-closure-bridge.js?v=20260712-op1"></script>'
-  },
-  @{
-    Anchor = '<script src="modules/aseguradoras-v1202-resources-bridge.js?v=20260711"></script>'
-    Value  = '<script src="modules/aseguradoras-op2-closure-bridge.js?v=20260713-op2"></script>'
-  }
+  @{ Anchor = '<link rel="stylesheet" href="styles/v1197-empalme.css?v=20260711">'; Value = '<link rel="stylesheet" href="styles/crm-op1-v1216.css?v=20260712-op1">' },
+  @{ Anchor = '<link rel="stylesheet" href="styles/v1197-empalme.css?v=20260711">'; Value = '<link rel="stylesheet" href="styles/aseguradoras-op2-v1217.css?v=20260713-op2">' },
+  @{ Anchor = '<script src="core/access-scope.js?v=20260711"></script>'; Value = '<script src="core/crm-op1-role-visibility.js?v=20260712-op1"></script>' },
+  @{ Anchor = '<script src="core/access-scope.js?v=20260711"></script>'; Value = '<script src="core/aseguradoras-op2-role-visibility.js?v=20260713-op2"></script>' },
+  @{ Anchor = '<script src="core/insurer-directory-import-v1202-security.js?v=20260711"></script>'; Value = '<script src="core/aseguradoras-op2-source-guard.js?v=20260713-op2"></script>' },
+  @{ Anchor = '<script src="data/academia-v1203-cotizador-comparativo.js?v=20260711"></script>'; Value = '<script src="data/academia-v1216-crm-portal-poliza.js?v=20260712-op1"></script>' },
+  @{ Anchor = '<script src="data/academia-v1202-directorios-aseguradoras.js?v=20260711"></script>'; Value = '<script src="data/academia-v1217-aseguradoras-op2.js?v=20260713-op2"></script>' },
+  @{ Anchor = '<script src="modules/portal-v1198-scope-viewer-bridge.js?v=20260711"></script>'; Value = '<script src="modules/crm-op1-closure-bridge.js?v=20260712-op1"></script>' },
+  @{ Anchor = '<script src="modules/aseguradoras-v1202-resources-bridge.js?v=20260711"></script>'; Value = '<script src="modules/aseguradoras-op2-closure-bridge.js?v=20260713-op2"></script>' },
+  @{ Anchor = '<script src="modules/aseguradoras-v1202-resources-bridge.js?v=20260711"></script>'; Value = '<script src="modules/aseguradoras-op2-permission-guard.js?v=20260713-op2"></script>' }
 )
 
 $text = [System.IO.File]::ReadAllText($index, [System.Text.UTF8Encoding]::new($false))
