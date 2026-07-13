@@ -29,23 +29,27 @@ CRM OP-1:
   evidencia: 10/10 escenarios aprobados
   no repetir salvo regresión nueva o cambio de alcance
 
-Aseguradoras OP-2:
+Aseguradoras OP-2 v1.220:
   cierre funcional implementado
   evidencia reutilizable: 12/15 escenarios aprobados
   pendiente real: 3 vistas de Plataformas
   no repetir los 12 escenarios aprobados
-  cuarentena previa al parser: v1.219 implementada
+  cuarentena antes del parser
+  revisión sin captura
+  actualización solo con identidad canónica exacta
+  actualizaciones probables bloqueadas
+  mensajes operativos sin códigos internos
 
 Siguiente acción inmediata:
-  estabilizar CI del HEAD vigente
+  estabilizar CI agrupado del HEAD vigente
   ejecutar un único gate focalizado de Plataformas
   combinar 12 + 3 para cerrar Aseguradoras 15/15
 
 Siguiente acción operativa Carril C:
   dry-run separado Directorio Guatemala
   dry-run separado Directorio Colombia
-  resolver alias/entidades aliadas/filas bloqueadas
-  no aplicar recursos sensibles sin proveedor seguro
+  resolver identidad, entidades aliadas y filas bloqueadas
+  no aplicar recursos protegidos sin proveedor seguro
 
 Siguiente módulo del plan:
   Cotizador + Comparativo configurable
@@ -58,12 +62,8 @@ Orbit 360 no se considera terminado por acumular arquitectura o documentación. 
 Orden de cierre vigente:
 
 ```txt
-1. CRM completo: Clientes 360, Pólizas, Vehículos, Recibos, Cobros,
-   Cartera, Comisiones, Portal, Calidad y scopes por asesor.
-   Estado: OP-1 cerrado; Pólizas reales siguen como fuente separada pendiente.
-2. Aseguradoras operativas: contactos, plataformas, cuentas, productos,
-   documentos, configuración y relación con Cotizador/Comparativo.
-   Estado: 12/15 visual; pendiente únicamente Plataformas y luego dry-runs GT/CO.
+1. CRM completo — cerrado; Pólizas reales siguen como fuente separada pendiente.
+2. Aseguradoras operativas — 12/15 visual; pendiente Plataformas y dry-runs GT/CO.
 3. Cotizador + Comparativo configurable a partir de comparativo_final_v110.html.
 4. Ops + Leads y sus cadencias/gestiones.
 5. Finanzas, conciliaciones, comisiones, CxC/CxP y movimientos históricos.
@@ -78,7 +78,7 @@ Cada grupo se cierra con datos A&S sanitizados, reglas de negocio, permisos, tes
 
 ```txt
 ChatGPT/Codex:
-  audita, modifica, empalma, documenta, valida estáticamente y prepara el gate
+  audita, modifica, empalma, documenta, valida y prepara el gate
 
 Paula:
   ejecuta un único gate local final solo cuando Chrome/Windows o fuentes locales
@@ -94,25 +94,20 @@ No corresponde pedir a Paula:
 - editar archivos, rutas o comandos internos;
 - diagnosticar fallos del pipeline.
 
-Los reanudadores deben basarse en evidencia estructurada (`results.jsonl` + capturas), no en frases, tildes, orden de archivos o codificación de reportes.
+Los reanudadores usan evidencia estructurada (`results.jsonl` + capturas), no frases, tildes, orden de archivos o codificación de reportes.
 
-## Arquitectura
+## Arquitectura y capa de datos
 
 ```txt
 orbit360-platform/
 ├── index.html
 ├── styles/
 ├── data/
-│   ├── store.js
-│   ├── store-firestore-lab.local.js
-│   └── seed.js
 ├── core/
 ├── modules/
 ├── docs/
 └── tools/
 ```
-
-### Capa de datos única
 
 Los módulos usan exclusivamente `Orbit.store`:
 
@@ -120,7 +115,7 @@ Los módulos usan exclusivamente `Orbit.store`:
 all/get/where/find/insert/update/remove/on/_emit/pref/setPref/init/reseed/raw
 ```
 
-No se permite almacenamiento operativo directo en módulos. El adaptador LAB/real conserva la firma, el tenant y los eventos.
+No se permite almacenamiento operativo directo en módulos. El adaptador LAB/real conserva firma, tenant y eventos.
 
 ### Carriles permanentes
 
@@ -136,18 +131,27 @@ Ningún bloque debe avanzar solo en documentación: debe dejar código, prueba, 
 
 - Prototipo comercial: datos ficticios.
 - Tenant A&S/LAB: datos reales solo por importación/control local, sin hardcodearlos ni subir payload al repositorio.
-- Nuevos registros creados desde la plataforma deben tomar país, moneda, impuestos, catálogos, permisos y defaults desde la configuración del tenant.
-- GT usa GTQ; CO usa COP. Si falta país/moneda, el registro queda `REQUIERE_VALIDACION`.
+- Nuevos registros toman país, moneda, impuestos, catálogos, permisos y defaults desde la configuración del tenant.
+- GT usa GTQ; CO usa COP. Si falta país/moneda, queda `REQUIERE_VALIDACION`.
 - Cobros/recaudos no son `finmovs`.
 - Producción, metas y comisiones usan prima neta recaudada.
 
-### Cuarentena previa de fuentes
+### Importadores seguros
 
-Los libros multihoja se filtran antes del parser y antes de construir operaciones. Índices, diagnósticos, directorios internos y hojas con señales técnicas se excluyen con motivo y conteos agregados, sin mostrar ni persistir el contenido excluido.
+Los libros multihoja se filtran antes del parser. Índices, diagnósticos, directorios internos y hojas con señales técnicas se excluyen con motivo y conteos, sin mostrar ni persistir su contenido.
 
-## Recursos seguros
+```txt
+Revisión preliminar:
+  sin captura de recursos protegidos
 
-El frontend utiliza referencias y proveedores seguros, pero la visibilidad responde a la necesidad operativa:
+Importación preparada:
+  captura protegida solo sobre hojas permitidas
+
+Actualización:
+  identidad canónica exacta o revisión humana
+```
+
+## Recursos operativos
 
 ```txt
 Cuentas bancarias de Aseguradoras:
@@ -157,7 +161,7 @@ Usuarios/contraseñas de portales:
   Dirección/Admin/Operativo o permiso extra explícito
 ```
 
-La migración de valores legacy es no destructiva: se conserva el valor operativo hasta copiarlo, verificarlo y auditar su retiro.
+La migración legacy es no destructiva: se conserva el valor operativo hasta copiarlo, verificarlo y auditar su retiro.
 
 ## Documentación actual
 
@@ -168,12 +172,9 @@ docs/PLAN-VIVO-AVANCE-BACKEND-AYS-20260704.md
 docs/PROTOCOLO-ANTI-DESVIACION-PLAN-OPERATIVO-DATOS-REALES-AYS-20260709.md
 docs/PATRON-CLAUDE-ASEGURADORAS-OP2-V1217-20260713.md
 docs/PATRON-CLAUDE-CUARENTENA-HOJAS-IMPORTADORES-V1219-20260713.md
-docs/CORRECCION-OPERATIVIDAD-CUENTAS-CREDENCIALES-ASEGURADORAS-V1218-20260713.md
+docs/PREFLIGHT-SANITIZADO-DIRECTORIOS-GT-CO-V1219-20260713.md
 docs/HALLAZGO-VISUAL-PLATAFORMAS-ASEGURADORAS-12-DE-15-20260713.md
-docs/AUDITORIA-SANITIZADA-DIRECTORIOS-ASEGURADORAS-GT-CO-OP2-20260713.md
-docs/AUDITORIA-SANITIZADA-CUARENTENA-HOJAS-DIRECTORIOS-OP2-20260713.md
-docs/REPORTE-CIERRE-FUNCIONAL-CRM-OP1-PENDIENTE-GATE-VISUAL-20260712.md
 docs/MATRIZ-FUENTES-REALES-RECIBIDAS-FALTANTES-AYS-20260709.md
 ```
 
-Los documentos históricos anteriores siguen como evidencia, pero no prevalecen sobre estos controles vivos.
+Los documentos históricos siguen como evidencia, pero no prevalecen sobre estos controles vivos.
