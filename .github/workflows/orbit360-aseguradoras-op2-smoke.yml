@@ -141,7 +141,7 @@ jobs:
             exit 1
           fi
 
-      - name: Guard visual matrix and common runner
+      - name: Guard visual matrix and zero manual runner
         run: |
           grep -q 'dir-plataformas-desktop' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           grep -q 'op-plataformas-tablet' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
@@ -149,4 +149,9 @@ jobs:
           grep -q 'accountFull' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           grep -q 'credentialRevealed' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           grep -q 'orbit360-validar-politica-recursos-aseguradoras-v1218.mjs' tools/orbit360-run-operacion-op1-op2-visual.ps1
-          grep -Fq -- '--port 5000' tools/orbit360-run-operacion-op1-op2-visual.ps1
+          grep -q 'Resolve-VisualPort 5000' tools/orbit360-run-operacion-op1-op2-visual.ps1
+          grep -q 'no process is stopped' tools/orbit360-run-operacion-op1-op2-visual.ps1
+          if grep -q 'Stop-Process' tools/orbit360-run-operacion-op1-op2-visual.ps1; then
+            echo 'Runner must preserve other local applications.'
+            exit 1
+          fi
