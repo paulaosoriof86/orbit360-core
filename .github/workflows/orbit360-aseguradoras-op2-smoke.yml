@@ -50,6 +50,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 jobs:
   aseguradoras-static-smoke:
@@ -135,3 +136,23 @@ jobs:
             echo 'Los runners no deben cerrar otras aplicaciones.'
             exit 1
           fi
+
+      - name: Publish verified success status
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -f state=success \
+            -f context='orbit360/aseguradoras-op2-v1220' \
+            -f description='Contratos OP2 v1.220 aprobados'
+
+      - name: Publish verified failure status
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -f state=failure \
+            -f context='orbit360/aseguradoras-op2-v1220' \
+            -f description='Revisar contrato OP2 fallido'
