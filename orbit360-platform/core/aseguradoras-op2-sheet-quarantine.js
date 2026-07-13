@@ -71,7 +71,7 @@ window.Orbit = window.Orbit || {};
     });
     return { filtered, excluded };
   }
-  function augment(result, excluded) {
+  function augment(result, excluded, captureSecure) {
     if (!result) return result;
     result.excluded = [].concat(result.excluded || [], excluded || []);
     const counts = {};
@@ -81,7 +81,9 @@ window.Orbit = window.Orbit || {};
         excludedSheets:(excluded || []).length,
         byReason:counts,
         rawValuesExposed:false,
-        secureCaptureAttempted:false
+        excludedSheetValuesCaptured:false,
+        reviewCaptureSecure:captureSecure === true,
+        scope:'excluded_sheets'
       };
       if ((excluded || []).some(item => item.reason === 'hoja_tecnica_sensible')) {
         result.report.securityWarnings = Array.from(new Set([].concat(result.report.securityWarnings || [], 'archivo_contiene_hojas_tecnicas_excluidas')));
@@ -118,13 +120,16 @@ window.Orbit = window.Orbit || {};
 
   const originalParseMatrices = D.parseMatrices.bind(D);
   function parseMatricesWithQuarantine(matrices, options) {
+    const opts = Object.assign({}, options || {});
     const q = quarantineMatrices(matrices);
-    return augment(originalParseMatrices(q.filtered, options), q.excluded);
+    return augment(originalParseMatrices(q.filtered, opts), q.excluded, opts.captureSecure === true);
   }
   D.parseMatrices = parseMatricesWithQuarantine;
 
   const originalParseFile = D.parseFile.bind(D);
   D.parseFile = async function (file, options) {
+    const opts = Object.assign({}, options || {});
+    const captureSecure = opts.captureSecure !== false;
     await loadSheetJs();
     const buffer = await file.arrayBuffer();
     const sourceHash = await sha256(buffer);
@@ -133,10 +138,10 @@ window.Orbit = window.Orbit || {};
     (workbook.SheetNames || []).forEach(name => {
       matrices[name] = XLSX.utils.sheet_to_json(workbook.Sheets[name], { header:1, blankrows:false, defval:'' });
     });
-    return parseMatricesWithQuarantine(matrices, Object.assign({}, options || {}, {
+    return parseMatricesWithQuarantine(matrices, Object.assign(opts, {
       fileName:file.name,
       sourceHash,
-      captureSecure:true
+      captureSecure
     }));
   };
 
