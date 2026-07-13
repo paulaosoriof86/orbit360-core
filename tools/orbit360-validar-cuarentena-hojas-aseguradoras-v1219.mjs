@@ -35,15 +35,7 @@ async function main() {
     },
     async parseFile() { throw new Error('original_parse_file_should_not_run'); }
   };
-  const fakeXlsx = {
-    read() { return { SheetNames:['Aseguradora Ficticia','Hoja Técnica Renombrada'], Sheets:{ 'Aseguradora Ficticia':{}, 'Hoja Técnica Renombrada':{} } }; },
-    utils:{
-      sheet_to_json(sheet) {
-        return sheet === fakeXlsx.__operational ? [] : [];
-      }
-    },
-    __operational:null
-  };
+
   const operationalRows = [
     ['ASEGURADORA FICTICIA'],
     ['NOMBRE','CARGO','EMAIL'],
@@ -58,9 +50,19 @@ async function main() {
     ['Project ID','proyecto-ficticio'],
     ['SYNTHETIC_PRIVATE_MARKER','no-exportar']
   ];
-  const workbook = { SheetNames:['Aseguradora Ficticia','Hoja Técnica Renombrada'], Sheets:{ operational:{}, technical:{} } };
-  fakeXlsx.read = () => workbook;
-  fakeXlsx.utils.sheet_to_json = sheet => sheet === workbook.Sheets.operational ? operationalRows : technicalRows;
+  const operationalSheet = {};
+  const technicalSheet = {};
+  const workbook = {
+    SheetNames:['Aseguradora Ficticia','Hoja Técnica Renombrada'],
+    Sheets:{
+      'Aseguradora Ficticia':operationalSheet,
+      'Hoja Técnica Renombrada':technicalSheet
+    }
+  };
+  const fakeXlsx = {
+    read:() => workbook,
+    utils:{ sheet_to_json:sheet => sheet === operationalSheet ? operationalRows : technicalRows }
+  };
 
   const sandbox = {
     window:{ Orbit:{ insurerDirectoryImport:fakeImporter }, XLSX:fakeXlsx, crypto:null },
@@ -104,6 +106,8 @@ async function main() {
     const review = await sandbox.Orbit.insurerDirectoryImport.parseFile(fakeFile, { country:'GT', captureSecure:false });
     check('REVIEW_CAPTURE_FALSE', lastOptions && lastOptions.captureSecure === false, 'La revisión de alias mantiene captureSecure=false hasta el parser base');
     check('REVIEW_SUMMARY_FALSE', review.report && review.report.quarantineSummary && review.report.quarantineSummary.reviewCaptureSecure === false, 'El reporte confirma revisión sin captura');
+    check('REVIEW_FILTERED_FILE', review.candidates.length === 1 && review.candidates[0].sourceSheet === 'Aseguradora Ficticia' && review.excluded.some(x => x.sheet === 'Hoja Técnica Renombrada'), 'La revisión del archivo conserva solo la hoja operativa');
+    check('REVIEW_NO_PRIVATE_MARKER', !JSON.stringify(review).includes('SYNTHETIC_PRIVATE_MARKER'), 'La revisión del archivo no filtra contenido excluido');
 
     await sandbox.Orbit.insurerDirectoryImport.parseFile(fakeFile, { country:'GT' });
     check('IMPORT_CAPTURE_DEFAULT_TRUE', lastOptions && lastOptions.captureSecure === true, 'La importación normal conserva captura protegida por defecto');
