@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const cp = require('child_process');
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 
 const root = path.resolve(process.argv[2] || path.join(process.cwd(), 'orbit360-platform'));
 const pass = [], fail = [], warn = [];
@@ -81,7 +81,7 @@ check('RESPONSIVE_PANEL', all(responsive, ['#crm-op1-client-panel', '@media (max
 Object.values(files).filter(exists).filter(file => /\.(?:js|mjs)$/.test(file)).forEach(file => {
   const src = read(file);
   check('NO_DIRECT_STORAGE_' + file.replace(/\W+/g,'_'), !/\b(?:localStorage|sessionStorage)\b/.test(src), 'Sin almacenamiento operativo directo', file);
-  const run = cp.spawnSync(process.execPath, ['--check', p(file)], { encoding:'utf8' });
+  const run = spawnSync(process.execPath, ['--check', p(file)], { encoding:'utf8' });
   check('SYNTAX_' + file.replace(/\W+/g,'_'), run.status === 0, run.status === 0 ? 'Sintaxis válida' : String(run.stderr || run.stdout).trim(), file);
 });
 
