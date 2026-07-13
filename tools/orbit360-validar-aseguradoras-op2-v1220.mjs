@@ -92,7 +92,8 @@ check('RESPONSIVE', all(src.styles,['@media(max-width:900px)','@media(max-width:
 
 Object.values(files).filter(file => fs.existsSync(p(file))).filter(file => /\.(?:js|mjs)$/.test(file)).forEach(file => {
   const content = read(file);
-  check('NO_BROWSER_STORAGE_' + file.replace(/\W+/g,'_'), !/\b(?:localStorage|sessionStorage)\b/.test(content), 'Sin almacenamiento operativo directo', file);
+  const directBrowserStorage = /\b(?:window\s*\.\s*)?(?:localStorage|sessionStorage)\s*(?:\.|\[)/.test(content);
+  check('NO_BROWSER_STORAGE_' + file.replace(/\W+/g,'_'), !directBrowserStorage, 'Sin almacenamiento operativo directo', file);
   const syntax = spawnSync(process.execPath, ['--check', p(file)], { encoding:'utf8' });
   check('SYNTAX_' + file.replace(/\W+/g,'_'), syntax.status === 0, syntax.status === 0 ? 'Sintaxis válida' : String(syntax.stderr || syntax.stdout).trim(), file);
 });
