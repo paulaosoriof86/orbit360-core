@@ -6,6 +6,7 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - 'orbit360-platform/core/access-scope.js'
+      - 'orbit360-platform/core/crm-op1-role-visibility.js'
       - 'orbit360-platform/core/document-viewer.js'
       - 'orbit360-platform/modules/crm-v1198-operational-bridge.js'
       - 'orbit360-platform/modules/calidad.js'
@@ -16,6 +17,8 @@ on:
       - 'orbit360-platform/data/academia-v1216-crm-portal-poliza.js'
       - 'orbit360-platform/styles/crm-op1-v1216.css'
       - 'tools/orbit360-validar-crm-op1.mjs'
+      - 'tools/orbit360-smoke-visual-crm-op1.mjs'
+      - 'tools/orbit360-run-crm-op1-visual.ps1'
       - 'tools/orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1'
       - '.github/workflows/orbit360-crm-op1-smoke.yml'
   pull_request:
@@ -23,6 +26,7 @@ on:
       - main
     paths:
       - 'orbit360-platform/core/access-scope.js'
+      - 'orbit360-platform/core/crm-op1-role-visibility.js'
       - 'orbit360-platform/core/document-viewer.js'
       - 'orbit360-platform/modules/crm-v1198-operational-bridge.js'
       - 'orbit360-platform/modules/calidad.js'
@@ -33,6 +37,8 @@ on:
       - 'orbit360-platform/data/academia-v1216-crm-portal-poliza.js'
       - 'orbit360-platform/styles/crm-op1-v1216.css'
       - 'tools/orbit360-validar-crm-op1.mjs'
+      - 'tools/orbit360-smoke-visual-crm-op1.mjs'
+      - 'tools/orbit360-run-crm-op1-visual.ps1'
       - 'tools/orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1'
       - '.github/workflows/orbit360-crm-op1-smoke.yml'
 
@@ -51,11 +57,22 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Check smoke syntax
+        run: |
+          node --check tools/orbit360-smoke-visual-crm-op1.mjs
+          node --check tools/orbit360-validar-crm-op1.mjs
+
       - name: Validate CRM OP-1
         run: node tools/orbit360-validar-crm-op1.mjs orbit360-platform
 
       - name: Validate protected backend contract
         run: node tools/orbit360-validar-backend-lab-contrato.mjs
+
+      - name: Guard advisor Quality visibility
+        run: |
+          grep -Fq "ensure('Asesor', ['calidad'])" orbit360-platform/core/crm-op1-role-visibility.js
+          grep -Fq 'dataScopeUnchanged: true' orbit360-platform/core/crm-op1-role-visibility.js
+          grep -Fq 'criticalPermissionsUnchanged: true' orbit360-platform/core/crm-op1-role-visibility.js
 
       - name: Guard Calidad before Policy import
         run: |
@@ -85,6 +102,13 @@ jobs:
           grep -q "cur_crm_portal_pol_ase_v1216" orbit360-platform/data/academia-v1216-crm-portal-poliza.js
           grep -q "@media (max-width: 900px)" orbit360-platform/styles/crm-op1-v1216.css
           grep -q "@media (max-width: 520px)" orbit360-platform/styles/crm-op1-v1216.css
+
+      - name: Guard visual matrix
+        run: |
+          grep -q "dir-clientes-desktop" tools/orbit360-smoke-visual-crm-op1.mjs
+          grep -q "op-cliente-tablet" tools/orbit360-smoke-visual-crm-op1.mjs
+          grep -q "ase-cliente-mobile" tools/orbit360-smoke-visual-crm-op1.mjs
+          grep -q "--port 5000" tools/orbit360-run-crm-op1-visual.ps1
 
       - name: Guard honest communication
         run: |
