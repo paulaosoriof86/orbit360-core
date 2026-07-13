@@ -39,6 +39,10 @@ $insertions = @(
     Value  = '<link rel="stylesheet" href="styles/crm-op1-v1216.css?v=20260712-op1">'
   },
   @{
+    Anchor = '<script src="core/access-scope.js?v=20260711"></script>'
+    Value  = '<script src="core/crm-op1-role-visibility.js?v=20260712-op1"></script>'
+  },
+  @{
     Anchor = '<script src="data/academia-v1203-cotizador-comparativo.js?v=20260711"></script>'
     Value  = '<script src="data/academia-v1216-crm-portal-poliza.js?v=20260712-op1"></script>'
   },
@@ -107,5 +111,5 @@ foreach ($item in $insertions) {
 }
 
 Write-Host ('Backup: ' + $backupDir)
-Write-Host 'OK: contrato v1.215, Calidad, cierre CRM, responsive y Academia integrados.'
+Write-Host 'OK: contrato v1.215, Calidad, rol Asesor, cierre CRM, responsive y Academia integrados.'
 Write-Host 'No commit. No push. No deploy.'
