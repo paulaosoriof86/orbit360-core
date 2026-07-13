@@ -46,12 +46,13 @@ if (!browser) {
 
 const validators = [
   runNode('Backend protegido','tools/orbit360-validar-backend-lab-contrato.mjs'),
-  runNode('Aseguradoras OP-2','tools/orbit360-validar-aseguradoras-op2.mjs',[app])
+  runNode('Aseguradoras OP-2 v1.218','tools/orbit360-validar-aseguradoras-op2.mjs',[app])
 ];
 add('============================================================');
-add('ORBIT 360 - VALIDACION VISUAL ASEGURADORAS OP-2');
+add('ORBIT 360 - VALIDACION VISUAL ASEGURADORAS OP-2 V1.218');
 add(`Fecha: ${new Date().toISOString()}`); add(`Repo: ${repo}`); add(`Browser: ${browser}`);
 add(`URL: http://127.0.0.1:${port}`);
+add('Regla: cuentas para todos los usuarios del directorio; credenciales solo Dirección/Admin/Operativo.');
 add('Modo demo y datos ficticios; sin deploy, producción, secretos ni fuentes reales.');
 add('============================================================');
 for (const v of validators) { add(`\n== ${v.name} ==`); add(v.ok ? 'OK' : 'FALLÓ'); if (v.output) add(v.output); }
@@ -69,6 +70,8 @@ const scenarios = [
   { id:'dir-tarifas-desktop', role:'Dirección', view:'tarifas', width:1366, height:900 },
   { id:'op-directorio-tablet', role:'Operativo', view:'directory', width:768, height:950 },
   { id:'op-resumen-tablet', role:'Operativo', view:'resumen', width:768, height:950 },
+  { id:'op-plataformas-tablet', role:'Operativo', view:'plataformas', width:768, height:950 },
+  { id:'op-bancos-tablet', role:'Operativo', view:'bancos', width:768, height:950 },
   { id:'ase-directorio-mobile', role:'Asesor', view:'directory', width:390, height:844 },
   { id:'ase-resumen-mobile', role:'Asesor', view:'resumen', width:390, height:844 },
   { id:'ase-plataformas-mobile', role:'Asesor', view:'plataformas', width:390, height:844 },
@@ -99,24 +102,49 @@ function harnessHtml(url) {
       const roleSel=d.getElementById('rol-sel');let roleAvailable=false;
       if(roleSel){const opt=Array.from(roleSel.options).find(o=>o.value===ROLE||o.textContent.trim()===ROLE);if(opt){roleAvailable=true;roleSel.value=opt.value;roleSel.dispatchEvent(new Event('change',{bubbles:true}));}}
       await sleep(700);
-      const store=w.Orbit&&w.Orbit.store, insurers=store?store.all('aseguradoras')||[]:[];
-      const insurer=insurers.find(x=>x&&x.id)||null;
+      const store=w.Orbit&&w.Orbit.store, secure=w.Orbit&&w.Orbit.secureResources;
+      if(secure&&secure.registerFieldProvider)secure.registerFieldProvider({status:()=>({status:'disponible',available:true,revealAvailable:true,copyAvailable:true,requiresReauth:false}),reveal:async()=>({ok:true,value:'000123456789',expiresInMs:60000}),copy:async()=>({ok:true})});
+      if(secure&&secure.registerCredentialProvider)secure.registerCredentialProvider({status:()=>({status:'disponible',available:true,revealAvailable:true,copyAvailable:true,requiresReauth:true}),reveal:async()=>({ok:true,username:'operacion.demo',password:'ClaveDemoSegura!',value:'ClaveDemoSegura!',expiresInMs:15000}),copy:async()=>({ok:true})});
+      let synthetic=store&&store.get('aseguradoras','asg_smoke_op2_v1218');
+      if(store&&!synthetic){store.insert('aseguradoras',{id:'asg_smoke_op2_v1218',nombre:'Aseguradora Ficticia OP2',pais:'GT',monedaBase:'GTQ',vinculada:true,contactos:[{nombre:'Contacto Ficticio',area:'Operaciones',email:'contacto@example.invalid',principal:true}],portales:[{id:'portal_smoke',nombre:'Portal Ficticio',tipo:'Operaciones',url:'https://example.invalid',credentialRef:'cred_smoke_op2',usuarioHint:'op***@demo.invalid',estadoAcceso:'Acceso disponible'}],cuentas:[{id:'account_smoke',banco:'Banco Ficticio',tipo:'Monetaria',moneda:'GTQ',titular:'Aseguradora Ficticia',accountRef:'account_smoke_op2',numeroHint:'•••• 6789',uso:'Pago de primas',estado:'Disponible'}],ramos:['Autos'],docs:[],actividad:[],ultimaRevision:'2026-07-13'});}
+      synthetic=store&&store.get('aseguradoras','asg_smoke_op2_v1218');
+      const insurers=store?store.all('aseguradoras')||[]:[];
+      const insurer=synthetic||insurers.find(x=>x&&x.id)||null;
       w.location.hash=VIEW==='directory'?'#/aseguradoras':(insurer?'#/aseguradoras?ficha='+encodeURIComponent(insurer.id):'#/aseguradoras');
       await sleep(1500);
       if(VIEW!=='directory'&&VIEW!=='resumen'){
-        const tab=d.querySelector('[data-tab="'+VIEW+'"]');if(tab){tab.click();await sleep(900);}
+        const tab=d.querySelector('[data-tab="'+VIEW+'"]');if(tab){tab.click();await sleep(1200);}
+      }
+      if(VIEW==='plataformas'&&ROLE!=='Asesor'){
+        const reveal=d.querySelector('[data-op2-view-credential]');if(reveal){reveal.click();await sleep(500);}
       }
       const host=d.getElementById('host'), text=(host&&host.innerText||'').trim();
       const directory=!!d.querySelector('.asg197-grid'), page=!!d.querySelector('.asg197-ficha'), body=!!d.querySelector('.asg197-tab-body');
       const quick=!!d.querySelector('[data-asg-op2-summary]');
       const editVisible=!!d.querySelector('[data-edit-asg],[data-op2-directory-actions]');
-      const sensitiveActions=Array.from(d.querySelectorAll('button')).some(b=>/Copiar cuenta|Ver temporalmente|Copiar usuario/.test(b.innerText||'')&&!b.disabled);
+      const bankRows=d.querySelectorAll('[data-op2-bank]').length;
+      const accountText=(d.querySelector('[data-op2-account-value]')||{}).textContent||'';
+      const accountFull=accountText.trim()==='000123456789';
+      const accountCopy=!!d.querySelector('[data-op2-copy-account]:not([disabled])');
+      const credentialButtons=!!d.querySelector('[data-op2-view-credential],[data-op2-copy-password],[data-op2-copy-user]');
+      const usernameText=(d.querySelector('[data-op2-username]')||{}).textContent||'';
+      const passwordText=(d.querySelector('[data-op2-password]')||{}).textContent||'';
+      const credentialRevealed=usernameText.trim()==='operacion.demo'&&passwordText.trim()==='ClaveDemoSegura!';
+      const credentialRestricted=/Credenciales disponibles para Dirección, Administración y Operativo/.test(text);
       const technical=/backend_required|accountRef|credentialRef|Orbit\.store|Firebase|Firestore|localStorage|sessionStorage|Storage pendiente/i.test(d.body.innerText||'');
       const overflow=d.documentElement.scrollWidth>w.innerWidth+3;
       let required=VIEW==='directory'?directory:(page&&body);
       if(VIEW==='resumen')required=required&&quick;
-      const roleRules=ROLE==='Asesor'?!editVisible&&!sensitiveActions:true;
-      const result={scenario:SCENARIO,roleRequested:ROLE,roleAvailable,view,route:w.location.hash,insurers:insurers.length,directory,page,body,quick,editVisible,sensitiveActions,technicalCopyVisible:technical,documentOverflow:overflow,textLength:text.length,errors,ok:roleAvailable&&insurers.length>0&&required&&roleRules&&!technical&&!overflow&&errors.length===0,at:new Date().toISOString()};
+      let roleRules=true;
+      if(ROLE==='Asesor'){
+        roleRules=!editVisible;
+        if(VIEW==='plataformas')roleRules=roleRules&&!credentialButtons&&credentialRestricted&&!/operacion\.demo|ClaveDemoSegura/.test(text);
+        if(VIEW==='bancos')roleRules=roleRules&&bankRows>0&&accountFull&&accountCopy;
+      }else{
+        if(VIEW==='plataformas')roleRules=credentialButtons&&credentialRevealed;
+        if(VIEW==='bancos')roleRules=bankRows>0&&accountFull&&accountCopy;
+      }
+      const result={scenario:SCENARIO,roleRequested:ROLE,roleAvailable,view,route:w.location.hash,insurers:insurers.length,directory,page,body,quick,editVisible,bankRows,accountFull,accountCopy,credentialButtons,credentialRevealed,credentialRestricted,technicalCopyVisible:technical,documentOverflow:overflow,textLength:text.length,errors,ok:roleAvailable&&insurer&&required&&roleRules&&!technical&&!overflow&&errors.length===0,at:new Date().toISOString()};
       await post(result);
     }catch(e){await post({scenario:SCENARIO,roleRequested:ROLE,view:VIEW,errors:errors.concat([{type:'harness',message:String(e&&e.message||e)}]),ok:false,at:new Date().toISOString()});}
   });
@@ -140,8 +168,8 @@ add(`\nServidor visual listo en http://127.0.0.1:${port}`);
 async function runScenario(s){
   const screenshot=path.join(outDir,`${s.id}.png`),profile=path.join(outDir,`profile-${s.id}`);fs.mkdirSync(profile,{recursive:true});
   const url=`http://127.0.0.1:${port}/__op2_harness.html?scenario=${encodeURIComponent(s.id)}&role=${encodeURIComponent(s.role)}&view=${encodeURIComponent(s.view)}`;
-  const args=['--headless=new','--disable-gpu','--hide-scrollbars','--no-first-run','--no-default-browser-check','--disable-background-networking','--disable-component-update','--disable-sync','--metrics-recording-only',`--user-data-dir=${profile}`,`--window-size=${s.width},${s.height}`,'--virtual-time-budget=14000',`--screenshot=${screenshot}`,url];
-  return new Promise(resolve=>{const child=spawn(browser,args,{stdio:['ignore','pipe','pipe']});let stdout='',stderr='';child.stdout.on('data',d=>stdout+=d);child.stderr.on('data',d=>stderr+=d);const timer=setTimeout(()=>{try{child.kill('SIGKILL');}catch(e){}},30000);child.on('close',code=>{clearTimeout(timer);resolve({...s,code,screenshot,stdout:stdout.trim(),stderr:stderr.trim()});});});
+  const args=['--headless=new','--disable-gpu','--hide-scrollbars','--no-first-run','--no-default-browser-check','--disable-background-networking','--disable-component-update','--disable-sync','--metrics-recording-only',`--user-data-dir=${profile}`,`--window-size=${s.width},${s.height}`,'--virtual-time-budget=16000',`--screenshot=${screenshot}`,url];
+  return new Promise(resolve=>{const child=spawn(browser,args,{stdio:['ignore','pipe','pipe']});let stdout='',stderr='';child.stdout.on('data',d=>stdout+=d);child.stderr.on('data',d=>stderr+=d);const timer=setTimeout(()=>{try{child.kill('SIGKILL');}catch(e){}},32000);child.on('close',code=>{clearTimeout(timer);resolve({...s,code,screenshot,stdout:stdout.trim(),stderr:stderr.trim()});});});
 }
 const launches=[];
 for(const s of scenarios){add(`Ejecutando ${s.id} · ${s.role} · ${s.width}x${s.height}`);launches.push(await runScenario(s));await new Promise(r=>setTimeout(r,250));}
