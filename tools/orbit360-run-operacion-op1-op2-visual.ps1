@@ -6,159 +6,231 @@ $ErrorActionPreference = 'Stop'
 $ExpectedBranch = 'ays/backend-tenant-lab-v99-20260703'
 $Reports = Join-Path $Repo '_orbit360_reports'
 $Stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
-$MasterReport = Join-Path $Reports "RUN-OPERACION-OP1-OP2-$Stamp.txt"
+$MasterReport = Join-Path $Reports "RUN-OP1-OP2-$Stamp.txt"
+$App = Join-Path $Repo 'orbit360-platform'
 
-function Add-Report([string]$Text = '') { Add-Content -Path $MasterReport -Value $Text -Encoding UTF8 }
-function Run-Step([string]$Name, [scriptblock]$Block) {
-  Add-Report ''; Add-Report "== $Name =="
-  try { & $Block; Add-Report "OK: $Name"; return $true }
-  catch { Add-Report ("ERROR: {0}" -f $_.Exception.Message); return $false }
+try {
+  [Console]::InputEncoding = New-Object System.Text.UTF8Encoding($false)
+  [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
+  $OutputEncoding = [Console]::OutputEncoding
+  chcp 65001 | Out-Null
+} catch {}
+
+function Add-Report([string]$Text = '') {
+  Add-Content -Path $MasterReport -Value $Text -Encoding UTF8
 }
+
+function Run-Step([string]$Name, [scriptblock]$Block) {
+  Add-Report ''
+  Add-Report "== $Name =="
+  try {
+    & $Block
+    Add-Report "OK: $Name"
+    return $true
+  }
+  catch {
+    Add-Report ("ERROR: {0}" -f $_.Exception.Message)
+    return $false
+  }
+}
+
+function Quote-NativeArg([string]$Value) {
+  if ($Value -notmatch '[\s"]') { return $Value }
+  return '"' + $Value.Replace('"', '\"') + '"'
+}
+
+function Invoke-CapturedNative(
+  [string]$FilePath,
+  [string[]]$Arguments,
+  [string]$FailureMessage
+) {
+  $Token = [guid]::NewGuid().ToString('N')
+  $Stdout = Join-Path $Reports ("native-$Token.out.txt")
+  $Stderr = Join-Path $Reports ("native-$Token.err.txt")
+  $ArgumentText = (($Arguments | ForEach-Object { Quote-NativeArg ([string]$_) }) -join ' ')
+
+  try {
+    $Process = Start-Process -FilePath $FilePath `
+      -ArgumentList $ArgumentText `
+      -WorkingDirectory $Repo `
+      -NoNewWindow `
+      -Wait `
+      -PassThru `
+      -RedirectStandardOutput $Stdout `
+      -RedirectStandardError $Stderr
+
+    if (Test-Path $Stdout) {
+      $Text = Get-Content $Stdout -Raw -Encoding UTF8
+      if ($Text) { Add-Report $Text.TrimEnd() }
+    }
+    if (Test-Path $Stderr) {
+      $Text = Get-Content $Stderr -Raw -Encoding UTF8
+      if ($Text) { Add-Report $Text.TrimEnd() }
+    }
+
+    if ($Process.ExitCode -ne 0) {
+      throw "$FailureMessage Exit code: $($Process.ExitCode)."
+    }
+    return $Process.ExitCode
+  }
+  finally {
+    Remove-Item $Stdout,$Stderr -Force -ErrorAction SilentlyContinue
+  }
+}
+
 function Clear-OrbitPort5000 {
-  $listeners = @()
-  try { $listeners = @(Get-NetTCPConnection -LocalPort 5000 -State Listen -ErrorAction SilentlyContinue) } catch {}
-  if (-not $listeners.Count) { return }
-  $ownerPids = @($listeners | Select-Object -ExpandProperty OwningProcess -Unique)
-  foreach ($pidValue in $ownerPids) {
-    $proc = $null
-    try { $proc = Get-CimInstance Win32_Process -Filter "ProcessId = $pidValue" -ErrorAction Stop } catch {}
-    $cmd = if ($proc) { [string]$proc.CommandLine } else { '' }
-    $name = if ($proc) { [string]$proc.Name } else { "PID $pidValue" }
-    $identity = "$name $cmd"
-    Add-Report "Puerto 5000 ocupado por $name · PID $pidValue"
-    Add-Report "Comando detectado: $cmd"
-    if ($identity -match '(?i)(orbit360|firebase\s+(serve|emulators)|http-server|serve\s+.*orbit360-platform|smoke-visual-(crm-op1|aseguradoras-op2))') {
-      Stop-Process -Id $pidValue -Force -ErrorAction Stop
-      Add-Report "Servidor local Orbit conocido detenido de forma controlada: PID $pidValue"
-    } else {
-      throw "El puerto 5000 pertenece a otra aplicación. No se cerró: $name (PID $pidValue)."
+  $Listeners = @()
+  try { $Listeners = @(Get-NetTCPConnection -LocalPort 5000 -State Listen -ErrorAction SilentlyContinue) } catch {}
+  if (-not $Listeners.Count) { return }
+
+  $OwnerPids = @($Listeners | Select-Object -ExpandProperty OwningProcess -Unique)
+  foreach ($PidValue in $OwnerPids) {
+    $Proc = $null
+    try { $Proc = Get-CimInstance Win32_Process -Filter "ProcessId = $PidValue" -ErrorAction Stop } catch {}
+    $Command = if ($Proc) { [string]$Proc.CommandLine } else { '' }
+    $Name = if ($Proc) { [string]$Proc.Name } else { "PID $PidValue" }
+    $Identity = "$Name $Command"
+    Add-Report "Port 5000 owner: $Name | PID $PidValue"
+    Add-Report "Command: $Command"
+
+    if ($Identity -match '(?i)(orbit360|firebase\s+(serve|emulators)|http-server|serve\s+.*orbit360-platform|smoke-visual-(crm-op1|aseguradoras-op2))') {
+      Stop-Process -Id $PidValue -Force -ErrorAction Stop
+      Add-Report "Known Orbit local server stopped: PID $PidValue"
+    }
+    else {
+      throw "Port 5000 belongs to another application. It was not stopped: $Name (PID $PidValue)."
     }
   }
   Start-Sleep -Milliseconds 700
 }
-function Run-NodeValidator([string]$RelativePath, [string[]]$Arguments = @()) {
-  $File = Join-Path $Repo $RelativePath
-  if (-not (Test-Path $File)) { throw "Falta: $File" }
-  & node $File @Arguments 2>&1 | ForEach-Object { Add-Report $_ }
-  if ($LASTEXITCODE -ne 0) { throw "Falló: $RelativePath" }
-}
 
 New-Item -ItemType Directory -Force -Path $Reports | Out-Null
 Set-Content -Path $MasterReport -Value '============================================================' -Encoding UTF8
-Add-Report 'ORBIT 360 - RUN COMUN OPERACION CRM OP-1 + ASEGURADORAS OP-2 V1.218'
-Add-Report ("Fecha local: {0}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
+Add-Report 'ORBIT 360 - COMMON RUN CRM OP1 + INSURERS OP2 V1.218'
+Add-Report ("Local time: {0}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
 Add-Report ("Repo: {0}" -f $Repo)
-Add-Report ("Rama obligatoria: {0}" -f $ExpectedBranch)
-Add-Report 'URL de validación: http://localhost:5000'
-Add-Report 'Cuentas: todos los usuarios del directorio. Credenciales: Dirección/Admin/Operativo.'
-Add-Report 'Modo: demo/ficticio. Sin deploy, producción, main, secretos, datos reales, commit o push automáticos.'
+Add-Report ("Required branch: {0}" -f $ExpectedBranch)
+Add-Report 'Visual URL: http://localhost:5000'
+Add-Report 'Accounts: all directory viewers. Credentials: Direction/Admin/Operations.'
+Add-Report 'Demo/fictitious mode. No deploy, production, main, secrets, real data, commit or push.'
 Add-Report '============================================================'
 
-$AllOk = $true
-$App = Join-Path $Repo 'orbit360-platform'
-
-$AllOk = (Run-Step '1. Verificar repositorio y rama obligatoria' {
-  if (-not (Test-Path $Repo)) { throw "No existe el repositorio: $Repo" }
+$AllOk = Run-Step '1. Verify repository and branch' {
+  if (-not (Test-Path (Join-Path $Repo '.git'))) { throw "Git repository not found: $Repo" }
   Set-Location $Repo
-  $Branch = (& git branch --show-current).Trim()
-  Add-Report "Rama actual: $Branch"
-  if ($Branch -ne $ExpectedBranch) { throw "Rama incorrecta. Requerida: $ExpectedBranch" }
-  $Status = git status --short
-  if ($Status) {
-    Add-Report 'Cambios locales detectados; no se descartan ni sobrescriben:'
-    $Status | ForEach-Object { Add-Report $_ }
+  $Branch = (& git branch --show-current 2>$null).Trim()
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to read current branch.' }
+  Add-Report "Current branch: $Branch"
+  if ($Branch -ne $ExpectedBranch) { throw "Wrong branch. Required: $ExpectedBranch" }
+
+  $Status = @(& git status --short 2>$null)
+  if ($Status.Count) {
+    Add-Report 'Local untracked/modified paths detected and preserved:'
+    $Status | ForEach-Object { Add-Report ([string]$_) }
   }
-}) -and $AllOk
-
-$AllOk = (Run-Step '2. Sincronizar mediante fast-forward seguro' {
-  Set-Location $Repo
-  & git fetch origin $ExpectedBranch 2>&1 | ForEach-Object { Add-Report $_ }
-  if ($LASTEXITCODE -ne 0) { throw 'Falló git fetch.' }
-  & git pull --ff-only origin $ExpectedBranch 2>&1 | ForEach-Object { Add-Report $_ }
-  if ($LASTEXITCODE -ne 0) { throw 'Git bloqueó el fast-forward. No se forzó ni descartó nada.' }
-  Add-Report ("HEAD sincronizado: {0}" -f ((& git rev-parse HEAD).Trim()))
-}) -and $AllOk
-
-$AllOk = (Run-Step '3. Integrar CRM OP-1 y Aseguradoras OP-2 v1.218 con backup' {
-  $Script = Join-Path $Repo 'tools\orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1'
-  if (-not (Test-Path $Script)) { throw "Falta: $Script" }
-  & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo 2>&1 | ForEach-Object { Add-Report $_ }
-  if ($LASTEXITCODE -ne 0) { throw 'Falló la integración segura del index.' }
-}) -and $AllOk
-
-$AllOk = (Run-Step '4. Validar backend protegido' {
-  Run-NodeValidator 'tools\orbit360-validar-backend-lab-contrato.mjs'
-}) -and $AllOk
-
-$AllOk = (Run-Step '5. Validar CRM OP-1' {
-  Run-NodeValidator 'tools\orbit360-validar-crm-op1.mjs' @($App)
-}) -and $AllOk
-
-$AllOk = (Run-Step '6. Validar Cotizador y Comparativo empalmados' {
-  Run-NodeValidator 'tools\orbit360-validar-cierre-cotizador-comparativo-v1215.mjs' @($App)
-}) -and $AllOk
-
-$AllOk = (Run-Step '7. Validar Aseguradoras OP-2 general' {
-  Run-NodeValidator 'tools\orbit360-validar-aseguradoras-op2.mjs' @($App)
-}) -and $AllOk
-
-$AllOk = (Run-Step '8. Validar política de cuentas y credenciales v1.218' {
-  Run-NodeValidator 'tools\orbit360-validar-politica-recursos-aseguradoras-v1218.mjs' @($App)
-}) -and $AllOk
-
-if ($AllOk) {
-  $AllOk = (Run-Step '9. Preparar localhost:5000 de forma segura' { Clear-OrbitPort5000 }) -and $AllOk
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step '10. Ejecutar matriz visual CRM OP-1' {
+  $AllOk = Run-Step '2. Safe fast-forward sync' {
+    $HeadBefore = (& git rev-parse HEAD 2>$null).Trim()
+    Invoke-CapturedNative 'git' @('-C',$Repo,'fetch','--quiet','origin',$ExpectedBranch) 'git fetch failed.' | Out-Null
+    Invoke-CapturedNative 'git' @('-C',$Repo,'pull','--ff-only','--quiet','origin',$ExpectedBranch) 'Safe fast-forward was blocked. Nothing was forced.' | Out-Null
+    $HeadAfter = (& git rev-parse HEAD 2>$null).Trim()
+    Add-Report "HEAD before: $HeadBefore"
+    Add-Report "HEAD after:  $HeadAfter"
+
+    if ($HeadAfter -ne $HeadBefore -and $env:ORBIT_OP12_REEXEC -ne '1') {
+      Add-Report 'Runner updated during sync. Relaunching the updated file once.'
+      $env:ORBIT_OP12_REEXEC = '1'
+      try {
+        Invoke-CapturedNative 'powershell' @('-NoProfile','-ExecutionPolicy','Bypass','-File',$PSCommandPath,'-Repo',$Repo) 'Updated runner failed.' | Out-Null
+      }
+      finally {
+        Remove-Item Env:ORBIT_OP12_REEXEC -ErrorAction SilentlyContinue
+      }
+      Add-Report 'Updated runner completed. This bootstrap instance will stop now.'
+      try {
+        Get-Content $MasterReport -Raw -Encoding UTF8 | Set-Clipboard
+        notepad $MasterReport
+      } catch {}
+      exit 0
+    }
+  }
+}
+
+if ($AllOk) {
+  $AllOk = Run-Step '3. Integrate CRM OP1 and Insurers OP2 with backup' {
+    $Script = Join-Path $Repo 'tools\orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1'
+    if (-not (Test-Path $Script)) { throw "Integration script missing: $Script" }
+    Invoke-CapturedNative 'powershell' @('-NoProfile','-ExecutionPolicy','Bypass','-File',$Script,'-Repo',$Repo) 'Safe index integration failed.' | Out-Null
+  }
+}
+
+if ($AllOk) {
+  $AllOk = Run-Step '4. Validate account and credential policy' {
+    $Validator = Join-Path $Repo 'tools\orbit360-validar-politica-recursos-aseguradoras-v1218.mjs'
+    if (-not (Test-Path $Validator)) { throw "Policy validator missing: $Validator" }
+    Invoke-CapturedNative 'node' @($Validator,$App) 'Account/credential policy validation failed.' | Out-Null
+  }
+}
+
+if ($AllOk) {
+  $AllOk = Run-Step '5. Prepare localhost port 5000' { Clear-OrbitPort5000 }
+}
+
+if ($AllOk) {
+  $AllOk = Run-Step '6. Run CRM OP1 visual matrix' {
     $Smoke = Join-Path $Repo 'tools\orbit360-smoke-visual-crm-op1.mjs'
-    & node $Smoke --repo $Repo --app $App --port 5000 2>&1 | ForEach-Object { Add-Report $_ }
-    if ($LASTEXITCODE -ne 0) { throw 'CRM OP-1 quedó bloqueado en uno o más escenarios.' }
-  }) -and $AllOk
+    if (-not (Test-Path $Smoke)) { throw "CRM smoke missing: $Smoke" }
+    Invoke-CapturedNative 'node' @($Smoke,'--repo',$Repo,'--app',$App,'--port','5000') 'CRM OP1 visual matrix failed.' | Out-Null
+  }
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step '11. Liberar nuevamente localhost:5000' { Clear-OrbitPort5000 }) -and $AllOk
+  $AllOk = Run-Step '7. Release localhost port 5000' { Clear-OrbitPort5000 }
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step '12. Ejecutar matriz visual Aseguradoras OP-2 v1.218' {
+  $AllOk = Run-Step '8. Run Insurers OP2 visual matrix' {
     $Smoke = Join-Path $Repo 'tools\orbit360-smoke-visual-aseguradoras-op2.mjs'
-    & node $Smoke --repo $Repo --app $App --port 5000 2>&1 | ForEach-Object { Add-Report $_ }
-    if ($LASTEXITCODE -ne 0) { throw 'Aseguradoras OP-2 quedó bloqueado en uno o más escenarios.' }
-  }) -and $AllOk
+    if (-not (Test-Path $Smoke)) { throw "Insurers smoke missing: $Smoke" }
+    Invoke-CapturedNative 'node' @($Smoke,'--repo',$Repo,'--app',$App,'--port','5000') 'Insurers OP2 visual matrix failed.' | Out-Null
+  }
 }
 
-Run-Step '13. Estado Git y evidencias' {
+Run-Step '9. Final Git state and evidence paths' {
   Set-Location $Repo
-  Add-Report ("Rama final: {0}" -f ((& git branch --show-current).Trim()))
-  Add-Report ("HEAD final: {0}" -f ((& git rev-parse HEAD).Trim()))
-  $Status = git status --short
-  if ($Status) {
-    Add-Report 'Cambios locales posteriores esperados por integración/reportes:'
-    $Status | ForEach-Object { Add-Report $_ }
-  } else { Add-Report 'Sin cambios locales.' }
-  Add-Report 'Carpetas de capturas más recientes:'
+  Add-Report ("Final branch: {0}" -f ((& git branch --show-current 2>$null).Trim()))
+  Add-Report ("Final HEAD: {0}" -f ((& git rev-parse HEAD 2>$null).Trim()))
+  $Status = @(& git status --short 2>$null)
+  if ($Status.Count) {
+    Add-Report 'Preserved local paths and expected index/report changes:'
+    $Status | ForEach-Object { Add-Report ([string]$_) }
+  }
+  else { Add-Report 'No local changes.' }
+  Add-Report 'Latest visual evidence folders:'
   Get-ChildItem $Reports -Directory -Filter 'VISUAL-*' -ErrorAction SilentlyContinue |
-    Sort-Object LastWriteTime -Descending | Select-Object -First 4 |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -First 4 |
     ForEach-Object { Add-Report $_.FullName }
 } | Out-Null
 
 Add-Report ''
 if ($AllOk) {
-  Add-Report 'RESULTADO OPERACION OP1+OP2: VALIDACION AUTOMATICA APROBADA'
-  Add-Report 'Pendiente final: revisión humana de las capturas antes de declarar ambos módulos cerrados.'
-  Add-Report 'Los dry-runs reales GT/CO no se ejecutan en este bloque.'
-} else {
-  Add-Report 'RESULTADO OPERACION OP1+OP2: BLOQUEADO_O_CON_ERRORES'
-  Add-Report 'No avanzar a datos reales ni al siguiente módulo hasta corregir P0/P1 del reporte.'
+  Add-Report 'RESULT OP1+OP2: AUTOMATIC VALIDATION PASSED'
+  Add-Report 'Remaining gate: human review of screenshots before closing both modules.'
+  Add-Report 'Real GT/CO dry-runs were not executed.'
 }
-Add-Report 'Restricciones respetadas: no deploy, producción, merge, main, secretos, datos reales, commit ni push automático.'
-Add-Report ("Reporte maestro: {0}" -f $MasterReport)
+else {
+  Add-Report 'RESULT OP1+OP2: BLOCKED'
+  Add-Report 'Execution stopped at the first failing critical step. Later steps were not run.'
+}
+Add-Report 'No deploy, production, merge, main, secrets, real data, automatic commit or push.'
+Add-Report ("Master report: {0}" -f $MasterReport)
 
 try {
   Get-Content $MasterReport -Raw -Encoding UTF8 | Set-Clipboard
   notepad $MasterReport
 } catch {}
+
 if (-not $AllOk) { exit 1 }
