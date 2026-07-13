@@ -3,15 +3,14 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
+import { appendProtectedChecks } from './orbit360-protected-baseline.mjs';
 
 const root = path.resolve(process.argv[2] || path.join(process.cwd(), 'orbit360-platform'));
 const pass = [], fail = [], warn = [];
 const p = file => path.join(root, file);
 const exists = file => fs.existsSync(p(file));
 const read = file => exists(file) ? fs.readFileSync(p(file), 'utf8') : '';
-const hash = file => crypto.createHash('sha256').update(fs.readFileSync(p(file))).digest('hex');
 const all = (src, patterns) => patterns.every(x => typeof x === 'string' ? src.includes(x) : x.test(src));
 function check(id, ok, message, file='') { (ok ? pass : fail).push({ id, message, file }); }
 function warning(id, ok, message, file='') { if (!ok) warn.push({ id, message, file }); }
@@ -65,7 +64,7 @@ check('IMPORT_CONFIRMATION', all(importer, ["CONFIRM_PHRASE = 'CONFIRMO DIRECTOR
 check('IMPORT_SOURCE_SEPARATION', all(importer, ['sourceType: SOURCE_TYPE', "collection: 'aseguradoras'", 'No crea clientes']), 'Fuente separada limitada a Aseguradoras', files.importer);
 check('BACKEND_WRITE_GUARD', all(importerSecurity, ['backendWriteAllowed', 'Conexión segura requerida para aplicar', 'backend_operativo_requerido_para_aplicar_datos_reales']), 'Aplicación real bloqueada sin conexión segura', files.importerSecurity);
 
-check('ALIAS_CANONICAL', all(sourceGuard, ['function canonical', 'version', 'copia', 'function distance', 'distance(x, y) <= 1']), 'Alias/versiones y diferencia de una letra detectables', files.sourceGuard);
+check('ALIAS_CANONICAL', all(sourceGuard, ['function canonical', /v\(\?:ersion\)\?/, 'copia', 'function distance', 'distance(x, y) <= 1']), 'Alias/versiones y diferencia de una letra detectables', files.sourceGuard);
 check('ALIAS_BLOCK_WITHIN', all(sourceGuard, ['duplicado_probable_dentro_del_archivo', 'requiereValidacion = true', "validationStatus = 'requiere_validacion'"]), 'Duplicados probables internos quedan bloqueados', files.sourceGuard);
 check('ALIAS_BLOCK_EXISTING', all(sourceGuard, ['duplicado_probable_con_directorio', "op.action !== 'insert'", 'existingId']), 'Duplicados probables contra directorio quedan bloqueados', files.sourceGuard);
 check('ALIAS_NO_AUTO_MERGE', !/S\(\)\.(?:update|insert|remove)\('aseguradoras'/.test(sourceGuard), 'Guard no fusiona ni escribe automáticamente', files.sourceGuard);
@@ -109,14 +108,7 @@ Object.values(files).filter(exists).filter(file => /\.(?:js|mjs)$/.test(file)).f
   check('SYNTAX_' + file.replace(/\W+/g,'_'), result.status === 0, result.status === 0 ? 'Sintaxis válida' : String(result.stderr || result.stdout).trim(), file);
 });
 
-const protectedExpected = {
-  'data/store.js':'1ec42cf35458c607333a494c4fd7fa74e04101869185423d8cd71ae8098fd838',
-  'core/auth.js':'756b7ec6ad4788b3d77fe09b5ac7f706c9deb62cd44459bd06a2ac5284c5d230',
-  'core/importa.js':'fbdc378d709aeb6816418d8c4d5dd0627675d6919caed887f45494fbf319e0df'
-};
-Object.entries(protectedExpected).forEach(([file, expected]) =>
-  check('PROTECTED_' + file.replace(/\W+/g,'_'), exists(file) && hash(file) === expected, 'Archivo protegido byte-identical', file)
-);
+appendProtectedChecks(pass, fail, root);
 
 const index = read('index.html');
 warning('INDEX_VISIBILITY', index.includes('core/aseguradoras-op2-role-visibility.js?v=20260713-op2'), 'Integrar visibilidad OP-2 mediante pipeline seguro', 'index.html');
