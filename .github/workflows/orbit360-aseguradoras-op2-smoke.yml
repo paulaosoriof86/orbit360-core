@@ -5,24 +5,17 @@ on:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - 'orbit360-platform/core/aseguradoras-op2-role-visibility.js'
-      - 'orbit360-platform/core/aseguradoras-op2-operational-access-policy.js'
-      - 'orbit360-platform/core/aseguradoras-op2-secure-provider-policy-guard.js'
-      - 'orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js'
-      - 'orbit360-platform/core/aseguradoras-op2-source-guard.js'
-      - 'orbit360-platform/core/aseguradoras-op2-import-ui-guard.js'
-      - 'orbit360-platform/core/insurer-directory-import-v1202.js'
-      - 'orbit360-platform/core/insurer-directory-import-v1202-security.js'
-      - 'orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js'
-      - 'orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js'
-      - 'orbit360-platform/modules/aseguradoras-op2-closure-bridge.js'
-      - 'orbit360-platform/modules/aseguradoras-op2-permission-guard.js'
-      - 'orbit360-platform/modules/aseguradoras-op2-operational-resources.js'
+      - 'orbit360-platform/core/aseguradoras-op2-*.js'
+      - 'orbit360-platform/core/insurer-directory-import-v1202*.js'
+      - 'orbit360-platform/modules/aseguradoras*.js'
       - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
       - 'orbit360-platform/styles/aseguradoras-op2-v1217.css'
       - 'tools/orbit360-validar-aseguradoras-op2-v1220.mjs'
+      - 'tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs'
       - 'tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs'
       - 'tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs'
+      - 'tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs'
+      - 'tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs'
       - 'tools/orbit360-smoke-visual-aseguradoras-op2.mjs'
       - 'tools/orbit360-smoke-op2-plataformas-focused-v1218.mjs'
       - 'tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs'
@@ -35,24 +28,17 @@ on:
     branches:
       - main
     paths:
-      - 'orbit360-platform/core/aseguradoras-op2-role-visibility.js'
-      - 'orbit360-platform/core/aseguradoras-op2-operational-access-policy.js'
-      - 'orbit360-platform/core/aseguradoras-op2-secure-provider-policy-guard.js'
-      - 'orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js'
-      - 'orbit360-platform/core/aseguradoras-op2-source-guard.js'
-      - 'orbit360-platform/core/aseguradoras-op2-import-ui-guard.js'
-      - 'orbit360-platform/core/insurer-directory-import-v1202.js'
-      - 'orbit360-platform/core/insurer-directory-import-v1202-security.js'
-      - 'orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js'
-      - 'orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js'
-      - 'orbit360-platform/modules/aseguradoras-op2-closure-bridge.js'
-      - 'orbit360-platform/modules/aseguradoras-op2-permission-guard.js'
-      - 'orbit360-platform/modules/aseguradoras-op2-operational-resources.js'
+      - 'orbit360-platform/core/aseguradoras-op2-*.js'
+      - 'orbit360-platform/core/insurer-directory-import-v1202*.js'
+      - 'orbit360-platform/modules/aseguradoras*.js'
       - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
       - 'orbit360-platform/styles/aseguradoras-op2-v1217.css'
       - 'tools/orbit360-validar-aseguradoras-op2-v1220.mjs'
+      - 'tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs'
       - 'tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs'
       - 'tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs'
+      - 'tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs'
+      - 'tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs'
       - 'tools/orbit360-smoke-visual-aseguradoras-op2.mjs'
       - 'tools/orbit360-smoke-op2-plataformas-focused-v1218.mjs'
       - 'tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs'
@@ -77,35 +63,56 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Check JavaScript syntax
+      - name: Check validator syntax
         run: |
           node --check tools/orbit360-validar-aseguradoras-op2-v1220.mjs
+          node --check tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs
           node --check tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs
           node --check tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs
-          node --check tools/orbit360-smoke-visual-aseguradoras-op2.mjs
+          node --check tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs
+          node --check tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs
           node --check tools/orbit360-smoke-op2-plataformas-focused-v1218.mjs
           node --check tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs
           node --check tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs
-          node --check orbit360-platform/core/aseguradoras-op2-role-visibility.js
-          node --check orbit360-platform/core/aseguradoras-op2-operational-access-policy.js
-          node --check orbit360-platform/core/aseguradoras-op2-secure-provider-policy-guard.js
-          node --check orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js
-          node --check orbit360-platform/core/aseguradoras-op2-source-guard.js
-          node --check orbit360-platform/core/aseguradoras-op2-import-ui-guard.js
-          node --check orbit360-platform/core/insurer-directory-import-v1202-security.js
-          node --check orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          node --check orbit360-platform/modules/aseguradoras-op2-permission-guard.js
-          node --check orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-          node --check orbit360-platform/data/academia-v1217-aseguradoras-op2.js
 
-      - name: Validate Aseguradoras OP-2 v1.220
-        run: node tools/orbit360-validar-aseguradoras-op2-v1220.mjs orbit360-platform
+      - name: Contract group - access and roles
+        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group access
+
+      - name: Contract group - importer and source separation
+        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group import
+
+      - name: Contract group - operational copy and write gate
+        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group copy
+
+      - name: Contract group - sheet quarantine
+        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group quarantine
+
+      - name: Contract group - identity and duplicate control
+        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group alias
+
+      - name: Contract group - directory UX and resources
+        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group ux
+
+      - name: Contract group - migration and permissions
+        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group migration
+
+      - name: Contract group - Academy and responsive
+        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group academy
+
+      - name: Contract group - syntax storage and protected baseline
+        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group technical
 
       - name: Validate resource access policy v1.220
         run: node tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs orbit360-platform
 
       - name: Validate workbook sheet quarantine v1.219
         run: node tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs .
+
+      - name: Validate identity versions and probable updates v1.220
+        run: node tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs .
+
+      - name: Validate operational importer copy v1.220
+        run: node tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs .
 
       - name: Validate focused platform harness
         run: node tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs .
@@ -116,84 +123,15 @@ jobs:
       - name: Validate protected backend
         run: node tools/orbit360-validar-backend-lab-contrato.mjs
 
-      - name: Guard role policy
-        run: |
-          grep -Fq "ensure('Operativo', ['aseguradoras'])" orbit360-platform/core/aseguradoras-op2-role-visibility.js
-          grep -Fq "ensure('Asesor', ['aseguradoras'])" orbit360-platform/core/aseguradoras-op2-role-visibility.js
-          grep -q "accessClass:'operational_all_viewers'" orbit360-platform/core/aseguradoras-op2-operational-access-policy.js
-          grep -q "accessClass:'administrative_operational'" orbit360-platform/core/aseguradoras-op2-operational-access-policy.js
-          grep -Fq "'Dirección','SuperAdmin','AdminTenant','Admin','Operativo'" orbit360-platform/core/aseguradoras-op2-operational-access-policy.js
-
-      - name: Guard direct provider calls
-        run: |
-          grep -q 'R.revealField = function' orbit360-platform/core/aseguradoras-op2-secure-provider-policy-guard.js
-          grep -q 'R.copyField = function' orbit360-platform/core/aseguradoras-op2-secure-provider-policy-guard.js
-          grep -q 'R.revealCredential = function' orbit360-platform/core/aseguradoras-op2-secure-provider-policy-guard.js
-          grep -q 'R.copyCredential = function' orbit360-platform/core/aseguradoras-op2-secure-provider-policy-guard.js
-          grep -q 'denegado_politica_op2' orbit360-platform/core/aseguradoras-op2-secure-provider-policy-guard.js
-
-      - name: Guard sheet quarantine before sensitive capture
-        run: |
-          grep -q 'quarantineMatrices(matrices)' orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js
-          grep -q 'hoja_tecnica_sensible' orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js
-          grep -q 'hoja_personal_interno' orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js
-          grep -q 'rawValuesExposed:false' orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js
-          grep -q 'excludedSheetValuesCaptured:false' orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js
-          grep -q 'const captureSecure = opts.captureSecure !== false' orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js
-          grep -q 'REVIEW_CAPTURE_FALSE' tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs
-          grep -q 'sheet-quarantine.js?v=20260713-op2-v1219' tools/orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1
-
-      - name: Guard bank visibility for all directory viewers
-        run: |
-          grep -q 'las cuentas bancarias están disponibles para todos' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-          grep -q 'data-op2-account-value' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-          grep -q 'R.revealField' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-          grep -q 'R.copyField' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-          grep -q 'P.canCopyBankAccounts()' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-
-      - name: Guard portal credentials for admin operational
-        run: |
-          grep -q 'Credenciales disponibles para Dirección, Administración y Operativo' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-          grep -q 'P.canViewCredentials()' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-          grep -q 'Ver usuario y contraseña' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-          grep -q 'Copiar contraseña' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-          grep -q 'R.revealCredential' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
-
-      - name: Guard non destructive migration
-        run: |
-          grep -q 'function flagLegacySensitive' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          grep -q 'pendiente_migracion_segura_no_destructiva' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          grep -q 'rawPersisted:true' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          grep -q 'migrationPerformed:false' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          grep -q 'destructive:false' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          if grep -q "audit('migrar_recursos_sensibles_legacy'" orbit360-platform/modules/aseguradoras-op2-closure-bridge.js; then
-            echo 'Destructive legacy migration marker detected'
-            exit 1
-          fi
-
-      - name: Guard Academy update without duplicate courses
-        run: |
-          grep -q 'Cuentas bancarias operativas' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
-          grep -q 'Usuarios y contraseñas por rol' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
-          grep -q 'Migración sin pérdida' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
-          grep -q 'Cuarentena de hojas' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
-          grep -q 'Identidad exacta antes de actualizar' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
-          grep -q 'Mensajes operativos' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
-          grep -q 'next._cv = 1220' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
-          if grep -q "Orbit.store.insert('cursos'" orbit360-platform/data/academia-v1217-aseguradoras-op2.js; then
-            echo 'Duplicate course insertion detected'
-            exit 1
-          fi
-
-      - name: Guard visual matrix and zero manual runner
+      - name: Guard zero manual visual runner
         run: |
           grep -q 'dir-plataformas-desktop' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           grep -q 'op-plataformas-tablet' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           grep -q 'ase-plataformas-mobile' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           grep -q 'results.jsonl' tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
-          grep -q '12 reused + 3 focused = 15/15' tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
+          grep -q '12 reutilizados + 3 focalizados = 15/15' tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
           grep -q 'Resolve-Port' tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
           if grep -q 'Stop-Process' tools/orbit360-run-operacion-op1-op2-visual.ps1 tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1; then
-            echo 'Runners must preserve other local applications.'
+            echo 'Los runners no deben cerrar otras aplicaciones.'
             exit 1
           fi
