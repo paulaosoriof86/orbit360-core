@@ -6,7 +6,10 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { appendProtectedChecks } from './orbit360-protected-baseline.mjs';
 
-const root = path.resolve(process.argv[2] || path.join(process.cwd(), 'orbit360-platform'));
+const args = process.argv.slice(2);
+const verbose = args.includes('--verbose');
+const rootArg = args.find(x => x !== '--verbose');
+const root = path.resolve(rootArg || path.join(process.cwd(), 'orbit360-platform'));
 const pass = [], fail = [], warn = [];
 const files = {
   access:'core/access-scope.js',
@@ -107,7 +110,9 @@ const result = {
   validator:'orbit360-validar-aseguradoras-op2-v1220',
   generatedAt:new Date().toISOString(), root,
   summary:{ pass:pass.length, fail:fail.length, warn:warn.length },
-  pass, fail, warn
+  fail,
+  warn
 };
+if (verbose) result.pass = pass;
 console.log(JSON.stringify(result, null, 2));
 process.exit(fail.length ? 1 : 0);
