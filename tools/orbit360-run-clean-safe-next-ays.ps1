@@ -52,6 +52,7 @@ $Stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $Report = Join-Path $SourceReports "RUN-LIMPIO-ASEGURADORAS-OP2-$Stamp.txt"
 $TempRoot = Join-Path $env:TEMP "orbit360-ays-safe-$Stamp"
 $TempRepo = Join-Path $TempRoot 'orbit360-core'
+$TempNodeModules = ''
 $script:RunnerExit = 999
 $script:FinalResult = 'BLOCKED'
 
@@ -231,8 +232,25 @@ catch {
 finally {
   Add ''
   Add '== LIMPIEZA DEL ESPACIO TEMPORAL =='
+  if ($TempNodeModules -and (Test-Path $TempNodeModules)) {
+    try {
+      & cmd.exe /d /c rmdir $TempNodeModules 2>$null
+      if ($LASTEXITCODE -ne 0 -or (Test-Path $TempNodeModules)) {
+        throw 'No se pudo desmontar la union temporal de dependencias.'
+      }
+      Add 'dependency_junction_removed=YES'
+    } catch {
+      Add ("dependency_junction_removed=NO | path={0}" -f $TempNodeModules)
+    }
+  } else {
+    Add 'dependency_junction_removed=NOT_REQUIRED'
+  }
+
   if (Test-Path $TempRoot) {
     try {
+      if ($TempNodeModules -and (Test-Path $TempNodeModules)) {
+        throw 'La union de dependencias sigue presente; el espacio temporal se conserva por seguridad.'
+      }
       Remove-Item $TempRoot -Recurse -Force -ErrorAction Stop
       Add 'temporary_workspace_removed=YES'
     } catch {
