@@ -147,10 +147,11 @@ function Invoke-Native([string]$Exe, [string[]]$Arguments, [string]$FailureMessa
 
 New-Item -ItemType Directory -Force -Path $Reports | Out-Null
 Set-Content -Path $Master -Value '============================================================' -Encoding UTF8
-Add 'ORBIT 360 - CIERRE FOCALIZADO CRM OP1 + ASEGURADORAS OP2 V1.218'
+Add 'ORBIT 360 - CIERRE FOCALIZADO CRM OP1 + ASEGURADORAS OP2 V1.219'
 Add ("Local time: {0}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
 Add 'Evidence reuse is based on results.jsonl + PNG files, not report wording, accents or encoding.'
 Add 'Reuses CRM 10/10 and OP2 12/15. Runs only 3 pending platform scenarios.'
+Add 'Validates sheet quarantine before the visual gate.'
 Add 'No deploy, production, merge, main, real data, commit or push.'
 Add '============================================================'
 
@@ -166,9 +167,10 @@ $Ok = Step '1. Verify branch and reusable JSONL evidence' {
 }
 
 if ($Ok) {
-  $Ok = Step '2. Validate focused harness and evidence parser contracts' {
+  $Ok = Step '2. Validate focused harness, evidence parser and sheet quarantine' {
     Invoke-Native 'node' @((Join-Path $Repo 'tools\orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs'),$Repo) 'Focused harness validator failed.'
     Invoke-Native 'node' @((Join-Path $Repo 'tools\orbit360-validar-resume-evidence-op1-op2-v1218.mjs'),$Repo) 'Evidence parser validator failed.'
+    Invoke-Native 'node' @((Join-Path $Repo 'tools\orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs'),$Repo) 'Sheet quarantine validator failed.'
   }
 }
 
