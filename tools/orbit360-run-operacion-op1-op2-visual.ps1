@@ -45,11 +45,12 @@ function Run-NodeValidator([string]$RelativePath, [string[]]$Arguments = @()) {
 
 New-Item -ItemType Directory -Force -Path $Reports | Out-Null
 Set-Content -Path $MasterReport -Value '============================================================' -Encoding UTF8
-Add-Report 'ORBIT 360 - RUN COMUN OPERACION CRM OP-1 + ASEGURADORAS OP-2'
+Add-Report 'ORBIT 360 - RUN COMUN OPERACION CRM OP-1 + ASEGURADORAS OP-2 V1.218'
 Add-Report ("Fecha local: {0}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
 Add-Report ("Repo: {0}" -f $Repo)
 Add-Report ("Rama obligatoria: {0}" -f $ExpectedBranch)
 Add-Report 'URL de validación: http://localhost:5000'
+Add-Report 'Cuentas: todos los usuarios del directorio. Credenciales: Dirección/Admin/Operativo.'
 Add-Report 'Modo: demo/ficticio. Sin deploy, producción, main, secretos, datos reales, commit o push automáticos.'
 Add-Report '============================================================'
 
@@ -78,7 +79,7 @@ $AllOk = (Run-Step '2. Sincronizar mediante fast-forward seguro' {
   Add-Report ("HEAD sincronizado: {0}" -f ((& git rev-parse HEAD).Trim()))
 }) -and $AllOk
 
-$AllOk = (Run-Step '3. Integrar CRM OP-1 y Aseguradoras OP-2 con backup' {
+$AllOk = (Run-Step '3. Integrar CRM OP-1 y Aseguradoras OP-2 v1.218 con backup' {
   $Script = Join-Path $Repo 'tools\orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1'
   if (-not (Test-Path $Script)) { throw "Falta: $Script" }
   & powershell -NoProfile -ExecutionPolicy Bypass -File $Script -Repo $Repo 2>&1 | ForEach-Object { Add-Report $_ }
@@ -97,16 +98,20 @@ $AllOk = (Run-Step '6. Validar Cotizador y Comparativo empalmados' {
   Run-NodeValidator 'tools\orbit360-validar-cierre-cotizador-comparativo-v1215.mjs' @($App)
 }) -and $AllOk
 
-$AllOk = (Run-Step '7. Validar Aseguradoras OP-2' {
+$AllOk = (Run-Step '7. Validar Aseguradoras OP-2 general' {
   Run-NodeValidator 'tools\orbit360-validar-aseguradoras-op2.mjs' @($App)
 }) -and $AllOk
 
+$AllOk = (Run-Step '8. Validar política de cuentas y credenciales v1.218' {
+  Run-NodeValidator 'tools\orbit360-validar-politica-recursos-aseguradoras-v1218.mjs' @($App)
+}) -and $AllOk
+
 if ($AllOk) {
-  $AllOk = (Run-Step '8. Preparar localhost:5000 de forma segura' { Clear-OrbitPort5000 }) -and $AllOk
+  $AllOk = (Run-Step '9. Preparar localhost:5000 de forma segura' { Clear-OrbitPort5000 }) -and $AllOk
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step '9. Ejecutar matriz visual CRM OP-1' {
+  $AllOk = (Run-Step '10. Ejecutar matriz visual CRM OP-1' {
     $Smoke = Join-Path $Repo 'tools\orbit360-smoke-visual-crm-op1.mjs'
     & node $Smoke --repo $Repo --app $App --port 5000 2>&1 | ForEach-Object { Add-Report $_ }
     if ($LASTEXITCODE -ne 0) { throw 'CRM OP-1 quedó bloqueado en uno o más escenarios.' }
@@ -114,18 +119,18 @@ if ($AllOk) {
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step '10. Liberar nuevamente localhost:5000' { Clear-OrbitPort5000 }) -and $AllOk
+  $AllOk = (Run-Step '11. Liberar nuevamente localhost:5000' { Clear-OrbitPort5000 }) -and $AllOk
 }
 
 if ($AllOk) {
-  $AllOk = (Run-Step '11. Ejecutar matriz visual Aseguradoras OP-2' {
+  $AllOk = (Run-Step '12. Ejecutar matriz visual Aseguradoras OP-2 v1.218' {
     $Smoke = Join-Path $Repo 'tools\orbit360-smoke-visual-aseguradoras-op2.mjs'
     & node $Smoke --repo $Repo --app $App --port 5000 2>&1 | ForEach-Object { Add-Report $_ }
     if ($LASTEXITCODE -ne 0) { throw 'Aseguradoras OP-2 quedó bloqueado en uno o más escenarios.' }
   }) -and $AllOk
 }
 
-Run-Step '12. Estado Git y evidencias' {
+Run-Step '13. Estado Git y evidencias' {
   Set-Location $Repo
   Add-Report ("Rama final: {0}" -f ((& git branch --show-current).Trim()))
   Add-Report ("HEAD final: {0}" -f ((& git rev-parse HEAD).Trim()))
