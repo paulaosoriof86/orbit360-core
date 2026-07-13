@@ -3,8 +3,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
+import { appendProtectedChecks } from './orbit360-protected-baseline.mjs';
 
 const root = path.resolve(process.argv[2] || path.join(process.cwd(), 'orbit360-platform'));
 const pass = [], fail = [], warn = [];
@@ -12,7 +12,6 @@ const pass = [], fail = [], warn = [];
 function p(file) { return path.join(root, file); }
 function exists(file) { return fs.existsSync(p(file)); }
 function read(file) { return exists(file) ? fs.readFileSync(p(file), 'utf8') : ''; }
-function hash(file) { return crypto.createHash('sha256').update(fs.readFileSync(p(file))).digest('hex'); }
 function check(id, ok, message, file) { (ok ? pass : fail).push({ id, message, file: file || '' }); }
 function warning(id, ok, message, file) { if (!ok) warn.push({ id, message, file: file || '' }); }
 function all(src, patterns) { return patterns.every(x => typeof x === 'string' ? src.includes(x) : x.test(src)); }
@@ -75,7 +74,6 @@ check('POLICY_ACTION_GATES', all(closure, ["can('polizas','edit')", 'Los cambios
 check('ACADEMY_ROLES', all(academy, ['Dirección', 'Operativo', 'Asesor', 'cur_crm_portal_pol_dir_v1216', 'cur_crm_portal_pol_op_v1216', 'cur_crm_portal_pol_ase_v1216']), 'Academia profunda por rol', files.academy);
 check('ACADEMY_TOPICS', all(academy, ['Calidad antes de Pólizas', 'Invitación preparada', 'Acceso confirmado', 'Visor documental común', 'Ficha de Póliza']), 'Academia cubre los nuevos flujos', files.academy);
 check('ACADEMY_IDEMPOTENT', all(academy, ['_cv:1216', 'progreso:prev.progreso', 'certificado:!!prev.certificado']), 'Academia conserva progreso y certificados', files.academy);
-
 check('RESPONSIVE_PANEL', all(responsive, ['#crm-op1-client-panel', '@media (max-width: 900px)', '@media (max-width: 520px)']), 'Responsive tablet/móvil del cierre CRM', files.responsive);
 
 Object.values(files).filter(exists).filter(file => /\.(?:js|mjs)$/.test(file)).forEach(file => {
@@ -85,14 +83,7 @@ Object.values(files).filter(exists).filter(file => /\.(?:js|mjs)$/.test(file)).f
   check('SYNTAX_' + file.replace(/\W+/g,'_'), run.status === 0, run.status === 0 ? 'Sintaxis válida' : String(run.stderr || run.stdout).trim(), file);
 });
 
-const protectedExpected = {
-  'data/store.js': '1ec42cf35458c607333a494c4fd7fa74e04101869185423d8cd71ae8098fd838',
-  'core/auth.js': '756b7ec6ad4788b3d77fe09b5ac7f706c9deb62cd44459bd06a2ac5284c5d230',
-  'core/importa.js': 'fbdc378d709aeb6816418d8c4d5dd0627675d6919caed887f45494fbf319e0df'
-};
-Object.entries(protectedExpected).forEach(([file,expected]) =>
-  check('PROTECTED_' + file.replace(/\W+/g,'_'), exists(file) && hash(file) === expected, 'Archivo protegido byte-identical', file)
-);
+appendProtectedChecks(pass, fail, root);
 
 const index = read('index.html');
 warning('CACHE_QUALITY', /modules\/calidad\.js\?v=(?:20260712-op1|op1)/.test(index), 'Aplicar cache-bust seguro de Calidad antes del smoke visual', 'index.html');
