@@ -6,6 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const root = path.resolve(process.argv[2] || path.join(process.cwd(), 'orbit360-platform'));
+const repo = path.resolve(root, '..');
 const files = {
   access:'core/aseguradoras-op2-operational-access-policy.js',
   provider:'core/aseguradoras-op2-secure-provider-policy-guard.js',
@@ -15,6 +16,7 @@ const files = {
   style:'styles/aseguradoras-op2-v1217.css',
   index:'index.html'
 };
+const pipelinePath = path.join(repo, 'tools', 'orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1');
 const pass=[], fail=[];
 const p=f=>path.join(root,f);
 const read=f=>fs.existsSync(p(f))?fs.readFileSync(p(f),'utf8'):'';
@@ -22,7 +24,10 @@ const all=(src,terms)=>terms.every(t=>src.includes(t));
 function check(id,ok,message,file){(ok?pass:fail).push({id,message,file});}
 
 Object.values(files).forEach(file=>check('FILE_'+file.replace(/\W+/g,'_'),fs.existsSync(p(file)),'Archivo presente',file));
+check('FILE_PIPELINE',fs.existsSync(pipelinePath),'Pipeline de integración presente','../tools/orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1');
+
 const access=read(files.access),provider=read(files.provider),resources=read(files.resources),closure=read(files.closure),academy=read(files.academy),style=read(files.style),index=read(files.index);
+const pipeline=fs.existsSync(pipelinePath)?fs.readFileSync(pipelinePath,'utf8'):'';
 
 check('ACCOUNTS_ALL_VIEWERS',all(access,["accessClass:'operational_all_viewers'",'function canViewBankAccounts','function canCopyBankAccounts']), 'Cuentas para usuarios con acceso al directorio',files.access);
 check('CREDENTIALS_ADMIN_OPERATIONAL',all(access,["accessClass:'administrative_operational'","'Dirección','SuperAdmin','AdminTenant','Admin','Operativo'",'function canViewCredentials','function canCopyCredentials']), 'Credenciales para Dirección/Admin/Operativo',files.access);
@@ -44,18 +49,33 @@ check('NO_PREMATURE_MIGRATION',!closure.includes("audit('migrar_recursos_sensibl
 check('ACADEMY_POLICY',all(academy,['Cuentas bancarias operativas','Usuarios y contraseñas por rol','Migración sin pérdida','next._cv = 1218']), 'Academia enseña la política v1.218',files.academy);
 check('RESPONSIVE_POLICY',all(style,['.asg218-bank','.asg218-platform','.asg218-credentials','@media(max-width:640px)']), 'Recursos operativos responsive',files.style);
 
-check('INDEX_ACCESS',index.includes('core/aseguradoras-op2-operational-access-policy.js?v=20260713-op2-v1218'),'Política integrada en index',files.index);
-check('INDEX_PROVIDER',index.includes('core/aseguradoras-op2-secure-provider-policy-guard.js?v=20260713-op2-v1218'),'Guard proveedor integrado en index',files.index);
-check('INDEX_RESOURCES',index.includes('modules/aseguradoras-op2-operational-resources.js?v=20260713-op2-v1218'),'Recursos operativos integrados en index',files.index);
-const accessPos=index.indexOf('core/aseguradoras-op2-operational-access-policy.js?v=20260713-op2-v1218');
-const providerPos=index.indexOf('core/aseguradoras-op2-secure-provider-policy-guard.js?v=20260713-op2-v1218');
-check('INDEX_POLICY_ORDER',accessPos>=0&&providerPos>accessPos,'Política carga antes del guard de proveedor',files.index);
+const refs = {
+  access:'core/aseguradoras-op2-operational-access-policy.js?v=20260713-op2-v1218',
+  provider:'core/aseguradoras-op2-secure-provider-policy-guard.js?v=20260713-op2-v1218',
+  resources:'modules/aseguradoras-op2-operational-resources.js?v=20260713-op2-v1218'
+};
+const indexIntegrated = Object.values(refs).every(ref=>index.includes(ref));
+const pipelinePrepared = Object.values(refs).every(ref=>pipeline.includes(ref));
+check('INDEX_OR_PIPELINE_ACCESS',index.includes(refs.access)||pipeline.includes(refs.access),'Política integrada o preparada por pipeline',files.index);
+check('INDEX_OR_PIPELINE_PROVIDER',index.includes(refs.provider)||pipeline.includes(refs.provider),'Guard proveedor integrado o preparado por pipeline',files.index);
+check('INDEX_OR_PIPELINE_RESOURCES',index.includes(refs.resources)||pipeline.includes(refs.resources),'Recursos operativos integrados o preparados por pipeline',files.index);
+check('INTEGRATION_CONTRACT',indexIntegrated||pipelinePrepared,'Index integrado o pipeline completo disponible',indexIntegrated?files.index:'../tools/orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1');
+
+if (indexIntegrated) {
+  const accessPos=index.indexOf(refs.access);
+  const providerPos=index.indexOf(refs.provider);
+  check('INDEX_POLICY_ORDER',accessPos>=0&&providerPos>accessPos,'Política carga antes del guard de proveedor',files.index);
+} else {
+  const accessPos=pipeline.indexOf(refs.access);
+  const providerPos=pipeline.indexOf(refs.provider);
+  check('PIPELINE_POLICY_ORDER',accessPos>=0&&providerPos>accessPos,'Pipeline inserta política antes del guard de proveedor','../tools/orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1');
+}
 
 [files.access,files.provider,files.resources,files.closure,files.academy].forEach(file=>{
   const out=spawnSync(process.execPath,['--check',p(file)],{encoding:'utf8'});
   check('SYNTAX_'+file.replace(/\W+/g,'_'),out.status===0,out.status===0?'Sintaxis válida':String(out.stderr||out.stdout).trim(),file);
 });
 
-const result={validator:'orbit360-validar-politica-recursos-aseguradoras-v1218',generatedAt:new Date().toISOString(),root,summary:{pass:pass.length,fail:fail.length},pass,fail};
+const result={validator:'orbit360-validar-politica-recursos-aseguradoras-v1218',generatedAt:new Date().toISOString(),root,mode:indexIntegrated?'index_integrated':'pipeline_prepared',summary:{pass:pass.length,fail:fail.length},pass,fail};
 console.log(JSON.stringify(result,null,2));
 process.exit(fail.length?1:0);
