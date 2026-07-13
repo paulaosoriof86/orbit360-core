@@ -30,16 +30,17 @@ function Clear-OrbitPort5000 {
   } catch {}
   if (-not $listeners.Count) { return }
 
-  foreach ($listener in $listeners) {
-    $pidValue = [int]$listener.OwningProcess
+  $ownerPids = @($listeners | Select-Object -ExpandProperty OwningProcess -Unique)
+  foreach ($pidValue in $ownerPids) {
     $proc = $null
     try { $proc = Get-CimInstance Win32_Process -Filter "ProcessId = $pidValue" -ErrorAction Stop } catch {}
     $cmd = if ($proc) { [string]$proc.CommandLine } else { '' }
     $name = if ($proc) { [string]$proc.Name } else { "PID $pidValue" }
+    $identity = "$name $cmd"
     Add-Report "Puerto 5000 ocupado por $name · PID $pidValue"
     Add-Report "Comando detectado: $cmd"
 
-    if ($cmd -match '(?i)(orbit360|firebase\s+(serve|emulators)|http-server|serve\s+.*orbit360-platform|smoke-visual-crm-op1)') {
+    if ($identity -match '(?i)(orbit360|firebase\s+(serve|emulators)|http-server|serve\s+.*orbit360-platform|smoke-visual-crm-op1)') {
       Stop-Process -Id $pidValue -Force -ErrorAction Stop
       Add-Report "Servidor local conocido detenido de forma controlada: PID $pidValue"
     } else {
