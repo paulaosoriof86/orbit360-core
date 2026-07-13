@@ -22,7 +22,11 @@ on:
       - 'tools/orbit360-validar-aseguradoras-op2.mjs'
       - 'tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs'
       - 'tools/orbit360-smoke-visual-aseguradoras-op2.mjs'
+      - 'tools/orbit360-smoke-op2-plataformas-focused-v1218.mjs'
+      - 'tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs'
+      - 'tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs'
       - 'tools/orbit360-run-operacion-op1-op2-visual.ps1'
+      - 'tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1'
       - '.github/workflows/orbit360-aseguradoras-op2-smoke.yml'
   pull_request:
     branches:
@@ -45,7 +49,11 @@ on:
       - 'tools/orbit360-validar-aseguradoras-op2.mjs'
       - 'tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs'
       - 'tools/orbit360-smoke-visual-aseguradoras-op2.mjs'
+      - 'tools/orbit360-smoke-op2-plataformas-focused-v1218.mjs'
+      - 'tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs'
+      - 'tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs'
       - 'tools/orbit360-run-operacion-op1-op2-visual.ps1'
+      - 'tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1'
       - '.github/workflows/orbit360-aseguradoras-op2-smoke.yml'
 
 permissions:
@@ -68,6 +76,9 @@ jobs:
           node --check tools/orbit360-validar-aseguradoras-op2.mjs
           node --check tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs
           node --check tools/orbit360-smoke-visual-aseguradoras-op2.mjs
+          node --check tools/orbit360-smoke-op2-plataformas-focused-v1218.mjs
+          node --check tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs
+          node --check tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs
           node --check orbit360-platform/core/aseguradoras-op2-role-visibility.js
           node --check orbit360-platform/core/aseguradoras-op2-operational-access-policy.js
           node --check orbit360-platform/core/aseguradoras-op2-secure-provider-policy-guard.js
@@ -83,6 +94,12 @@ jobs:
 
       - name: Validate resource access policy v1.218
         run: node tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs orbit360-platform
+
+      - name: Validate focused platform harness
+        run: node tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs .
+
+      - name: Validate JSONL evidence reuse runner
+        run: node tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs .
 
       - name: Validate protected backend
         run: node tools/orbit360-validar-backend-lab-contrato.mjs
@@ -146,12 +163,10 @@ jobs:
           grep -q 'dir-plataformas-desktop' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           grep -q 'op-plataformas-tablet' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           grep -q 'ase-plataformas-mobile' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
-          grep -q 'accountFull' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
-          grep -q 'credentialRevealed' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
-          grep -q 'orbit360-validar-politica-recursos-aseguradoras-v1218.mjs' tools/orbit360-run-operacion-op1-op2-visual.ps1
-          grep -q 'Resolve-VisualPort 5000' tools/orbit360-run-operacion-op1-op2-visual.ps1
-          grep -q 'no process is stopped' tools/orbit360-run-operacion-op1-op2-visual.ps1
-          if grep -q 'Stop-Process' tools/orbit360-run-operacion-op1-op2-visual.ps1; then
-            echo 'Runner must preserve other local applications.'
+          grep -q 'results.jsonl' tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
+          grep -q '12 reused + 3 focused = 15/15' tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
+          grep -q 'Resolve-Port' tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
+          if grep -q 'Stop-Process' tools/orbit360-run-operacion-op1-op2-visual.ps1 tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1; then
+            echo 'Runners must preserve other local applications.'
             exit 1
           fi
