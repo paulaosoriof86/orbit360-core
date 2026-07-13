@@ -8,7 +8,7 @@ PR: #5 draft/open, sin merge ni deploy
 
 ## 1. Propósito
 
-Mantener una vista única del avance operativo, los tres carriles, los pendientes reales y el siguiente bloque. Este documento reemplaza las prioridades históricas ya superadas, pero no elimina sus auditorías ni bitácoras.
+Mantener una vista única del avance operativo, los tres carriles y el siguiente bloque. Este documento prevalece sobre prioridades históricas ya superadas, sin borrar sus auditorías ni bitácoras.
 
 ## 2. Restricciones permanentes
 
@@ -17,7 +17,7 @@ Producción: no autorizada
 Deploy: no autorizado
 Merge/main: no autorizados
 Datos reales hardcodeados: prohibidos
-Secretos en repositorio, UI o reportes: prohibidos
+Valores protegidos en repositorio, UI o reportes: prohibidos
 Backend protegido: no sobrescribir
 Metodología: 0% manual salvo gate local final indispensable
 ```
@@ -47,15 +47,15 @@ Regla: no repetir salvo regresión nueva o cambio de alcance
 
 Incluye Clientes 360, Calidad, Portal, ficha de póliza, scopes y visibilidad por rol dentro del alcance validado.
 
-Pendiente de datos separado:
+Pendiente de fuente separada:
 
 ```txt
-Fuente Pólizas
+Pólizas
 ```
 
 No se deben inferir pólizas desde clientes, movimientos financieros, bancos o cobros.
 
-### OP-2 — Aseguradoras
+### OP-2 — Aseguradoras v1.220
 
 ```txt
 Estado funcional: IMPLEMENTADO
@@ -72,16 +72,20 @@ Avances acumulados:
 
 - directorio y ficha-página operativa;
 - contactos, plataformas, bancos, documentos, productos y trazabilidad;
-- cuentas completas visibles/copiables para usuarios autorizados del módulo;
-- usuarios y contraseñas visibles/copiables para Dirección/Admin/Operativo o permiso extra;
-- Asesor sin acceso a credenciales de portal;
+- cuentas completas visibles y copiables para usuarios autorizados del módulo;
+- accesos de plataformas visibles y copiables para Dirección/Admin/Operativo o permiso extra;
+- Asesor sin acceso a credenciales de plataforma;
 - migración legacy no destructiva;
 - permisos en funciones y proveedor, no solo en botones;
-- alias/versiones/duplicados probables bloqueados para revisión;
+- hojas técnicas, internas y de apoyo en cuarentena antes del parser;
+- revisión preliminar sin captura de recursos protegidos;
+- versiones, errores de una letra y duplicados probables bloqueados;
+- actualización sin revisión únicamente para identidad canónica exacta;
+- actualización probable bloqueada con confirmación humana;
 - entidades aliadas separadas de aseguradoras directas;
+- mensajes operativos sin códigos internos ni copy técnico;
 - directorio importado no habilita tarifas;
-- responsive y Academia por rol;
-- cuarentena previa de hojas técnicas, internas y de apoyo.
+- responsive y Academia por rol v1.220.
 
 Gate final preparado:
 
@@ -89,7 +93,17 @@ Gate final preparado:
 tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
 ```
 
-Solo puede solicitarse a Paula cuando las validaciones estáticas/CI estén estabilizadas. Debe ejecutar únicamente las tres Plataformas pendientes, reutilizar CRM 10/10 y OP-2 12/15, elegir puerto solo y no cerrar otras aplicaciones.
+El gate:
+
+1. sincroniza la rama obligatoria por avance rápido;
+2. aplica integración local idempotente con backup;
+3. ejecuta contratos v1.220 y backend protegido;
+4. reutiliza CRM 10/10 y OP-2 12/15 mediante JSONL + capturas;
+5. selecciona un puerto libre;
+6. ejecuta únicamente las tres vistas de Plataformas;
+7. combina el resultado para cerrar 15/15.
+
+No debe solicitarse a Paula hasta que el circuito estático esté estabilizado.
 
 ## 4. Carriles permanentes
 
@@ -98,61 +112,73 @@ Solo puede solicitarse a Paula cuando las validaciones estáticas/CI estén esta
 Estado:
 
 - patrones CRM documentados para Claude;
-- patrones Aseguradoras documentados para Claude;
-- patrón reusable de cuarentena de hojas documentado;
-- responsive y estados honestos implementados;
-- Academia Aseguradoras actualizada a v1.219 sin duplicar cursos;
+- patrón Aseguradoras documentado;
+- patrón reusable de cuarentena documentado;
+- identidad exacta y bloqueo de actualización probable traducidos a Academia;
+- mensajes operativos y anti-copy técnico incluidos;
+- Academia Aseguradoras v1.220 actualiza los mismos cursos;
 - progreso y certificados preservados.
 
 Pendiente:
 
-- incorporar los patrones en la siguiente candidata comercializable de Claude;
-- no trasladar datos A&S, secretos, bindings LAB ni rutas privadas;
+- trasladar estos patrones a la siguiente candidata comercializable de Claude;
+- no trasladar datos A&S, valores protegidos, bindings LAB ni rutas privadas;
 - después de los dry-runs, agregar casos prácticos sanitizados de revisión de fuentes.
 
 ### Carril B — backend, seguridad y Orbit.store
 
 Estado:
 
-- `Orbit.store`, Auth, Firestore LAB y reglas protegidos;
-- política de cuentas y credenciales aplicada también a llamadas directas del proveedor;
+- `Orbit.store`, Auth, Firestore LAB y reglas permanecen protegidos;
+- política de cuentas y accesos aplicada a UI y llamadas directas del proveedor;
 - migración de recursos en orden copiar → verificar → retirar;
-- cuarentena de hojas ocurre antes del parser, captura protegida y operaciones;
-- evidencia de reanudación usa JSONL + capturas, no frases ni tildes;
-- integración de `index.html` se realiza con backup, verificación y rollback;
-- workflow actualizado a Node 24 y nuevos gates estáticos.
+- cuarentena antes del parser, captura y operaciones;
+- revisión de alias mantiene `captureSecure=false`;
+- importación preparada conserva captura protegida por defecto;
+- coincidencia probable nunca se aplica como actualización silenciosa;
+- copy visible y errores internos se sanitizan;
+- evidencia reutilizable usa JSONL + capturas;
+- integración de `index.html` tiene backup, verificación y rollback;
+- validador canónico v1.220 con salida compacta;
+- CI dividido por contratos para diagnóstico exacto.
 
 Pendiente:
 
 - obtener ejecución CI verde observable para el HEAD vigente;
 - ejecutar una sola vez el gate focalizado local de Plataformas;
-- conectar proveedor seguro real antes de aplicar recursos sensibles de directorios.
+- conectar proveedor seguro real antes de aplicar recursos protegidos de directorios.
 
 ### Carril C — fuentes reales y migración operativa
 
-Inventario sanitizado recibido:
+Preflight sanitizado recibido:
 
 ```txt
 Directorio Guatemala:
   18 hojas totales
   14 candidatas operativas
   4 hojas excluidas
+  cobertura alta de contactos, plataformas y pagos
 
 Directorio Colombia:
   17 hojas totales
   16 candidatas operativas
   1 hoja excluida
+  2 parejas probables por nombre
+  1 candidata de red/aliado
+  cobertura de pagos incompleta
 ```
 
-No se escribieron datos ni se trasladaron valores sensibles al repositorio.
+No se escribieron datos ni se trasladaron valores de las fuentes al repositorio.
+
+Una fuente contiene hojas ajenas al directorio que requieren revisión de seguridad separada. Esas hojas permanecen excluidas; ningún valor debe entrar al dry-run ni a la documentación. La revisión de vigencia o rotación corresponde a un carril de seguridad separado, no al importador de Aseguradoras.
 
 Secuencia obligatoria:
 
 1. cerrar las tres vistas de Plataformas;
 2. ejecutar dry-run Guatemala sin escritura;
-3. resolver alias, entidades aliadas y filas bloqueadas;
+3. resolver identidad, aliados y filas bloqueadas;
 4. ejecutar dry-run Colombia sin escritura;
-5. resolver alias, entidades aliadas y filas bloqueadas;
+5. resolver las dos parejas probables y la entidad aliada;
 6. aplicar únicamente filas confirmadas y recursos mediante proveedor seguro;
 7. solicitar/procesar la fuente separada Pólizas.
 
@@ -176,29 +202,44 @@ No avanzar a Finanzas ni otro módulo para sustituir el cierre pendiente de Aseg
 ### Intermedio A — Evidencia estructurada
 
 ```txt
-Motivo: los reportes de texto generaron falsos negativos por codificación.
-Solución: reutilizar results.jsonl + capturas + IDs exactos.
+Problema: falsos negativos por texto, tildes o codificación.
+Solución: results.jsonl + capturas + IDs exactos + booleano ok.
 Estado: implementado.
 ```
 
-### Intermedio B — Cuarentena previa de hojas
+### Intermedio B — Cuarentena previa
 
 ```txt
-Motivo: excluir por nombre no protege frente a hojas técnicas renombradas.
-Riesgo: mezclar fuentes o crear operaciones inválidas.
+Problema: excluir solo por nombre no protege frente a hojas renombradas.
 Solución: nombre + señales de contenido antes del parser.
-Estado: implementado y con validador ficticio.
+Estado: implementado y probado con datos ficticios.
 ```
 
-### Intermedio C — Integración local del index
+### Intermedio C — Actualización exacta
 
 ```txt
-Motivo: preservar codificación, backend protegido y rollback.
-Solución: pipeline idempotente con backup y verificación de orden.
-Estado: implementado.
+Problema: una coincidencia por inclusión podía proponerse como actualización.
+Solución: identidad canónica exacta o bloqueo para revisión humana.
+Estado: implementado y probado.
 ```
 
-Estos intermedios apoyan el plan; no lo reemplazan ni abren módulos nuevos.
+### Intermedio D — Mensajes operativos
+
+```txt
+Problema: códigos internos o copy técnico podían aparecer temporalmente.
+Solución: mapa de errores, sanitización de texto y observación de cambios tardíos.
+Estado: implementado y probado.
+```
+
+### Intermedio E — CI por contratos
+
+```txt
+Problema: los logs extensos ocultaban el control fallido.
+Solución: validador compacto y grupos access/import/copy/quarantine/alias/ux/migration/academy/technical.
+Estado: implementado; ejecución verde pendiente.
+```
+
+Estos intermedios apoyan el plan; no abren módulos nuevos ni cambian el orden operativo.
 
 ## 7. Metodología 0% manual
 
@@ -210,18 +251,19 @@ ChatGPT/Codex:
 - documenta;
 - ejecuta validaciones accesibles;
 - revisa CI;
+- corrige fallos instrumentales;
 - prepara un único gate local final.
 
 Paula:
 
-- ejecuta una sola acción local cuando Chrome/Windows o la fuente local sean indispensables;
+- ejecuta una sola acción local cuando Chrome/Windows o una fuente local sean indispensables;
 - revisa visualmente el resultado final.
 
 No corresponde pedir a Paula:
 
 - elegir puertos;
 - cerrar aplicaciones;
-- localizar reportes o carpetas;
+- localizar reportes;
 - editar archivos o comandos;
 - diagnosticar el pipeline;
 - repetir escenarios aprobados.
@@ -235,15 +277,18 @@ docs/PATRON-CLAUDE-CUARENTENA-HOJAS-IMPORTADORES-V1219-20260713.md
 docs/PATRON-REUTILIZABLE-CLAUDE-DESGLOSE-COTIZACION-ESTIMACION-INTERNA-20260712.md
 ```
 
-Reglas a conservar en prototipo comercializable:
+Reglas que debe conservar el prototipo comercializable:
 
 - SaaS multi-tenant, sin fork A&S;
-- todos los módulos usan `Orbit.store`;
+- módulos solo mediante `Orbit.store`;
 - estados honestos y no técnicos;
 - importadores por fuentes separadas;
+- cuarentena y revisión antes del parser operativo;
+- revisión preliminar sin captura;
 - dry-run antes de escritura;
-- cuarentena antes del parser;
-- cuentas y credenciales con visibilidad operativa diferente;
+- identidad canónica exacta antes de actualizar;
+- duplicados probables sin fusión automática;
+- cuentas y accesos con visibilidad operativa diferente;
 - migración no destructiva;
 - tarifas default-deny;
 - Academia actualizada por rol.
@@ -258,18 +303,22 @@ Cobros/recaudos ≠ finmovs
 Estado bancario no aplica cobros directamente
 Directorio recibido ≠ tarifa habilitada
 Duplicado probable ≠ fusión automática
+Actualización probable ≠ actualización validada
 Entidad aliada ≠ aseguradora directa
 Producción/metas/comisiones → prima neta recaudada
 ```
 
-## 10. Documentación creada/actualizada en el bloque v1.219
+## 10. Archivos centrales del bloque v1.220
 
 ```txt
-docs/AUDITORIA-SANITIZADA-CUARENTENA-HOJAS-DIRECTORIOS-OP2-20260713.md
-docs/PATRON-CLAUDE-CUARENTENA-HOJAS-IMPORTADORES-V1219-20260713.md
-data/academia-v1217-aseguradoras-op2.js
 core/aseguradoras-op2-sheet-quarantine.js
-tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs
+core/aseguradoras-op2-source-guard.js
+core/insurer-directory-import-v1202-security.js
+data/academia-v1217-aseguradoras-op2.js
+tools/orbit360-validar-aseguradoras-op2-v1220.mjs
+tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs
+tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs
+tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs
 tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
 .github/workflows/orbit360-aseguradoras-op2-smoke.yml
 ```
@@ -277,12 +326,13 @@ tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
 ## 11. Próximo bloque recomendado
 
 ```txt
-1. Diagnosticar y corregir cualquier fallo CI del HEAD actual.
-2. No pedir ejecución local hasta tener el circuito estático estabilizado.
-3. Ejecutar una sola vez el gate focalizado de las tres Plataformas.
-4. Cerrar Aseguradoras 15/15.
-5. Ejecutar dry-run Guatemala y después Colombia, separados y sin escritura.
-6. Continuar Cotizador + Comparativo.
+1. Observar CI agrupado del HEAD actual.
+2. Corregir solo el contrato que falle.
+3. No pedir ejecución local hasta CI verde.
+4. Ejecutar una sola vez el gate de tres Plataformas.
+5. Cerrar Aseguradoras 15/15.
+6. Dry-run Guatemala y después Colombia, separados y sin escritura.
+7. Continuar Cotizador + Comparativo.
 ```
 
 ## 12. Formato obligatorio de cierre de bloque
