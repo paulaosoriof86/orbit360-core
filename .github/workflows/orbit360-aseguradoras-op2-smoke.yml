@@ -7,6 +7,7 @@ on:
     paths:
       - 'orbit360-platform/core/aseguradoras-op2-role-visibility.js'
       - 'orbit360-platform/core/aseguradoras-op2-source-guard.js'
+      - 'orbit360-platform/core/aseguradoras-op2-import-ui-guard.js'
       - 'orbit360-platform/core/insurer-directory-import-v1202.js'
       - 'orbit360-platform/core/insurer-directory-import-v1202-security.js'
       - 'orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js'
@@ -25,6 +26,7 @@ on:
     paths:
       - 'orbit360-platform/core/aseguradoras-op2-role-visibility.js'
       - 'orbit360-platform/core/aseguradoras-op2-source-guard.js'
+      - 'orbit360-platform/core/aseguradoras-op2-import-ui-guard.js'
       - 'orbit360-platform/core/insurer-directory-import-v1202.js'
       - 'orbit360-platform/core/insurer-directory-import-v1202-security.js'
       - 'orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js'
@@ -59,6 +61,7 @@ jobs:
           node --check tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           node --check orbit360-platform/core/aseguradoras-op2-role-visibility.js
           node --check orbit360-platform/core/aseguradoras-op2-source-guard.js
+          node --check orbit360-platform/core/aseguradoras-op2-import-ui-guard.js
           node --check orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
           node --check orbit360-platform/modules/aseguradoras-op2-permission-guard.js
           node --check orbit360-platform/data/academia-v1217-aseguradoras-op2.js
@@ -88,6 +91,9 @@ jobs:
           grep -q 'duplicado_probable_dentro_del_archivo' orbit360-platform/core/aseguradoras-op2-source-guard.js
           grep -q 'duplicado_probable_con_directorio' orbit360-platform/core/aseguradoras-op2-source-guard.js
           grep -q 'distance(x, y) <= 1' orbit360-platform/core/aseguradoras-op2-source-guard.js
+          grep -Fq 'D.parseFile(file, { country, captureSecure:false })' orbit360-platform/core/aseguradoras-op2-import-ui-guard.js
+          grep -q "op2AliasState = 'blocked'" orbit360-platform/core/aseguradoras-op2-import-ui-guard.js
+          grep -q 'La aplicación queda bloqueada para evitar duplicados' orbit360-platform/core/aseguradoras-op2-import-ui-guard.js
 
       - name: Guard sensitive resources
         run: |
