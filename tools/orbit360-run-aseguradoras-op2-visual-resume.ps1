@@ -9,6 +9,7 @@ $App = Join-Path $Repo 'orbit360-platform'
 $Stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $MasterReport = Join-Path $Reports "RESUME-ASEGURADORAS-OP2-$Stamp.txt"
 $script:VisualPort = 0
+$script:ApprovedCrmReport = $null
 
 try {
   [Console]::InputEncoding = New-Object System.Text.UTF8Encoding($false)
@@ -60,6 +61,96 @@ function Invoke-CapturedNative(
   }
 }
 
+function Read-ReportText([string]$Path) {
+  $Bytes = [System.IO.File]::ReadAllBytes($Path)
+  try {
+    $Utf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
+    return $Utf8Strict.GetString($Bytes)
+  }
+  catch {
+    return [System.Text.Encoding]::Default.GetString($Bytes)
+  }
+}
+
+function Normalize-ReportText([string]$Text) {
+  if ($null -eq $Text) { return '' }
+  $FormD = $Text.Normalize([System.Text.NormalizationForm]::FormD)
+  $Builder = New-Object System.Text.StringBuilder
+  foreach ($Char in $FormD.ToCharArray()) {
+    $Category = [System.Globalization.CharUnicodeInfo]::GetUnicodeCategory($Char)
+    if ($Category -ne [System.Globalization.UnicodeCategory]::NonSpacingMark) {
+      [void]$Builder.Append($Char)
+    }
+  }
+  return $Builder.ToString().Normalize([System.Text.NormalizationForm]::FormC).ToUpperInvariant()
+}
+
+function Test-CrmReportApproval([System.IO.FileInfo]$Report) {
+  $ExpectedScenarios = @(
+    'dir-clientes-desktop',
+    'dir-cliente-desktop',
+    'dir-calidad-desktop',
+    'dir-poliza-desktop',
+    'op-cliente-tablet',
+    'op-calidad-tablet',
+    'ase-cliente-mobile',
+    'ase-calidad-mobile',
+    'ase-poliza-mobile',
+    'dir-portal-mobile'
+  )
+
+  $Raw = Read-ReportText $Report.FullName
+  $Normalized = Normalize-ReportText $Raw
+  $Missing = @()
+  foreach ($Scenario in $ExpectedScenarios) {
+    $Pattern = '(?m)^OK\s+' + [regex]::Escape($Scenario.ToUpperInvariant()) + '\s+'
+    if ($Normalized -notmatch $Pattern) { $Missing += $Scenario }
+  }
+
+  $HasTenOfTen = $Normalized -match '10/10\s+ESCENARIOS\s+APROBADOS'
+  $HasApprovedResult = $Normalized -match 'RESULTADO\s+CRM\s+OP-1:' -and $Normalized -match 'APROBADA'
+  $HasScenarioFailure = $Normalized -match '(?m)^FALL(?:O|Ó)\s+(DIR|OP|ASE)-'
+
+  $EvidenceDir = Join-Path $Reports $Report.BaseName
+  $MissingScreenshots = @()
+  foreach ($Scenario in $ExpectedScenarios) {
+    $Shot = Join-Path $EvidenceDir ($Scenario + '.png')
+    if (-not (Test-Path $Shot)) { $MissingScreenshots += $Scenario }
+  }
+
+  $Approved = $HasTenOfTen -and $HasApprovedResult -and -not $HasScenarioFailure -and $Missing.Count -eq 0 -and $MissingScreenshots.Count -eq 0
+  return [pscustomobject]@{
+    Approved = $Approved
+    Report = $Report.FullName
+    EvidenceDir = $EvidenceDir
+    MissingScenarios = $Missing
+    MissingScreenshots = $MissingScreenshots
+    HasTenOfTen = $HasTenOfTen
+    HasApprovedResult = $HasApprovedResult
+    HasScenarioFailure = $HasScenarioFailure
+  }
+}
+
+function Find-ApprovedCrmEvidence {
+  $Candidates = @(Get-ChildItem $Reports -File -Filter 'VISUAL-CRM-OP1-*.txt' -ErrorAction SilentlyContinue |
+    Sort-Object LastWriteTime -Descending)
+  if (-not $Candidates.Count) { throw 'No previous CRM visual report was found. The common runner is required.' }
+
+  $Evaluated = @()
+  foreach ($Candidate in $Candidates) {
+    $Check = Test-CrmReportApproval $Candidate
+    $Evaluated += $Check
+    if ($Check.Approved) { return $Check }
+  }
+
+  Add-Report 'CRM reports evaluated automatically:'
+  foreach ($Check in $Evaluated) {
+    Add-Report ("- {0} | 10/10={1} | approvedResult={2} | missingScenarios={3} | missingScreenshots={4} | scenarioFailure={5}" -f `
+      $Check.Report, $Check.HasTenOfTen, $Check.HasApprovedResult, $Check.MissingScenarios.Count, $Check.MissingScreenshots.Count, $Check.HasScenarioFailure)
+  }
+  throw 'No approved CRM 10/10 evidence set was found. CRM was not rerun.'
+}
+
 function Test-LocalPortAvailable([int]$Port) {
   $Listener = $null
   try {
@@ -97,7 +188,8 @@ Set-Content -Path $MasterReport -Value '========================================
 Add-Report 'ORBIT 360 - RESUME ONLY INSURERS OP2 VISUAL GATE V1.218'
 Add-Report ("Local time: {0}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
 Add-Report ("Repo: {0}" -f $Repo)
-Add-Report 'CRM OP1 is reused only if its previous 10/10 report is present and approved.'
+Add-Report 'CRM OP1 is reused from verified 10/10 report + 10 screenshots; CRM is not rerun.'
+Add-Report 'Report matching is encoding-tolerant and does not depend on accents or only the latest file.'
 Add-Report 'No deploy, production, merge, main, real data, commit or push.'
 Add-Report '============================================================'
 
@@ -107,16 +199,10 @@ $AllOk = Run-Step '1. Verify repository, branch and prior CRM approval' {
   $Branch = (& git branch --show-current 2>$null).Trim()
   if ($Branch -ne $ExpectedBranch) { throw "Wrong branch: $Branch" }
 
-  $CrmReport = Get-ChildItem $Reports -File -Filter 'VISUAL-CRM-OP1-*.txt' -ErrorAction SilentlyContinue |
-    Sort-Object LastWriteTime -Descending |
-    Select-Object -First 1
-  if (-not $CrmReport) { throw 'No previous CRM visual report was found. The common runner is required.' }
-  $CrmText = Get-Content $CrmReport.FullName -Raw -Encoding UTF8
-  if ($CrmText -notmatch 'Resumen:\s*10/10 escenarios aprobados' -or
-      $CrmText -notmatch 'RESULTADO CRM OP-1:\s*VALIDACIÓN VISUAL AUTOMÁTICA APROBADA') {
-    throw "The latest CRM report is not approved: $($CrmReport.FullName)"
-  }
-  Add-Report "CRM reused without rerun: $($CrmReport.FullName)"
+  $script:ApprovedCrmReport = Find-ApprovedCrmEvidence
+  Add-Report "CRM reused without rerun: $($script:ApprovedCrmReport.Report)"
+  Add-Report "CRM screenshot evidence: $($script:ApprovedCrmReport.EvidenceDir)"
+  Add-Report 'CRM evidence verified: 10/10 scenario IDs, approved result, no scenario failures and 10 screenshots.'
 }
 
 if ($AllOk) {
@@ -156,6 +242,7 @@ if ($AllOk) {
 
 Run-Step '7. Final evidence paths' {
   Add-Report ("Final HEAD: {0}" -f ((& git rev-parse HEAD 2>$null).Trim()))
+  if ($script:ApprovedCrmReport) { Add-Report "Reused CRM evidence: $($script:ApprovedCrmReport.Report)" }
   Add-Report 'Latest Insurers evidence:'
   Get-ChildItem $Reports -Directory -Filter 'VISUAL-ASEGURADORAS-OP2-*' -ErrorAction SilentlyContinue |
     Sort-Object LastWriteTime -Descending |
@@ -166,7 +253,7 @@ Run-Step '7. Final evidence paths' {
 Add-Report ''
 if ($AllOk) {
   Add-Report 'RESULT OP2 RESUME: AUTOMATIC VISUAL VALIDATION PASSED'
-  Add-Report 'CRM OP1 was not rerun; its previous 10/10 evidence was reused.'
+  Add-Report 'CRM OP1 was not rerun; its verified 10/10 evidence and screenshots were reused.'
   Add-Report 'Real GT/CO dry-runs were not executed.'
 }
 else {
