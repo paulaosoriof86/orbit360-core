@@ -92,6 +92,7 @@ jobs:
           node --check orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js
           node --check orbit360-platform/core/aseguradoras-op2-source-guard.js
           node --check orbit360-platform/core/aseguradoras-op2-import-ui-guard.js
+          node --check orbit360-platform/core/insurer-directory-import-v1202-security.js
           node --check orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
           node --check orbit360-platform/modules/aseguradoras-op2-permission-guard.js
           node --check orbit360-platform/modules/aseguradoras-op2-operational-resources.js
@@ -100,7 +101,7 @@ jobs:
       - name: Validate Aseguradoras OP-2
         run: node tools/orbit360-validar-aseguradoras-op2.mjs orbit360-platform
 
-      - name: Validate resource access policy v1.219
+      - name: Validate resource access policy v1.220
         run: node tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs orbit360-platform
 
       - name: Validate workbook sheet quarantine v1.219
@@ -176,7 +177,9 @@ jobs:
           grep -q 'Usuarios y contraseñas por rol' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
           grep -q 'Migración sin pérdida' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
           grep -q 'Cuarentena de hojas' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
-          grep -q 'next._cv = 1219' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
+          grep -q 'Identidad exacta antes de actualizar' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
+          grep -q 'Mensajes operativos' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
+          grep -q 'next._cv = 1220' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
           if grep -q "Orbit.store.insert('cursos'" orbit360-platform/data/academia-v1217-aseguradoras-op2.js; then
             echo 'Duplicate course insertion detected'
             exit 1
