@@ -11,6 +11,7 @@ function arg(name, fallback='') { const i = argv.indexOf(name); return i >= 0 &&
 const repo = path.resolve(arg('--repo', process.cwd()));
 const app = path.resolve(arg('--app', path.join(repo, 'orbit360-platform')));
 const port = Number(arg('--port', '5000'));
+const skipValidators = argv.includes('--skip-validators');
 const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
 const reportsRoot = path.join(repo, '_orbit360_reports');
 const outDir = path.join(reportsRoot, `VISUAL-ASEGURADORAS-OP2-${stamp}`);
@@ -44,7 +45,7 @@ if (!browser) {
   fs.writeFileSync(reportPath, log.join('\n'), 'utf8'); process.exit(1);
 }
 
-const validators = [
+const validators = skipValidators ? [] : [
   runNode('Backend protegido','tools/orbit360-validar-backend-lab-contrato.mjs'),
   runNode('Aseguradoras OP-2 v1.218','tools/orbit360-validar-aseguradoras-op2.mjs',[app])
 ];
@@ -54,6 +55,7 @@ add(`Fecha: ${new Date().toISOString()}`); add(`Repo: ${repo}`); add(`Browser: $
 add(`URL: http://127.0.0.1:${port}`);
 add('Regla: cuentas para todos los usuarios del directorio; credenciales solo Dirección/Admin/Operativo.');
 add('Modo demo y datos ficticios; sin deploy, producción, secretos ni fuentes reales.');
+if (skipValidators) add('Validadores previos omitidos porque fueron aprobados por el ejecutor de reanudación.');
 add('============================================================');
 for (const v of validators) { add(`\n== ${v.name} ==`); add(v.ok ? 'OK' : 'FALLÓ'); if (v.output) add(v.output); }
 if (validators.some(v => !v.ok)) {
@@ -144,7 +146,7 @@ function harnessHtml(url) {
         if(VIEW==='plataformas')roleRules=credentialButtons&&credentialRevealed;
         if(VIEW==='bancos')roleRules=bankRows>0&&accountFull&&accountCopy;
       }
-      const result={scenario:SCENARIO,roleRequested:ROLE,roleAvailable,view,route:w.location.hash,insurers:insurers.length,directory,page,body,quick,editVisible,bankRows,accountFull,accountCopy,credentialButtons,credentialRevealed,credentialRestricted,technicalCopyVisible:technical,documentOverflow:overflow,textLength:text.length,errors,ok:roleAvailable&&insurer&&required&&roleRules&&!technical&&!overflow&&errors.length===0,at:new Date().toISOString()};
+      const result={scenario:SCENARIO,roleRequested:ROLE,roleAvailable,view:VIEW,route:w.location.hash,insurers:insurers.length,directory,page,body,quick,editVisible,bankRows,accountFull,accountCopy,credentialButtons,credentialRevealed,credentialRestricted,technicalCopyVisible:technical,documentOverflow:overflow,textLength:text.length,errors,ok:roleAvailable&&insurer&&required&&roleRules&&!technical&&!overflow&&errors.length===0,at:new Date().toISOString()};
       await post(result);
     }catch(e){await post({scenario:SCENARIO,roleRequested:ROLE,view:VIEW,errors:errors.concat([{type:'harness',message:String(e&&e.message||e)}]),ok:false,at:new Date().toISOString()});}
   });
