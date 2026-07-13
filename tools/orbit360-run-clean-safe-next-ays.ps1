@@ -100,27 +100,41 @@ function Invoke-CapturedNative(
   }
 }
 
+function Copy-EvidenceDirectorySafe([string]$SourceDirectory, [string]$DestinationRoot) {
+  if (-not (Test-Path $SourceDirectory)) { return }
+  $Target = Join-Path $DestinationRoot (Split-Path $SourceDirectory -Leaf)
+  New-Item -ItemType Directory -Force -Path $Target | Out-Null
+
+  $ResultFile = Join-Path $SourceDirectory 'results.jsonl'
+  if (Test-Path $ResultFile) {
+    Copy-Item $ResultFile (Join-Path $Target 'results.jsonl') -Force
+  }
+
+  Get-ChildItem $SourceDirectory -File -Filter '*.png' -ErrorAction SilentlyContinue |
+    ForEach-Object { Copy-Item $_.FullName (Join-Path $Target $_.Name) -Force }
+
+  Get-ChildItem $SourceDirectory -File -Filter '*.txt' -ErrorAction SilentlyContinue |
+    ForEach-Object { Copy-Item $_.FullName (Join-Path $Target $_.Name) -Force }
+}
+
 function Copy-EvidenceFolders([string]$Source, [string]$Destination) {
   New-Item -ItemType Directory -Force -Path $Destination | Out-Null
   $Patterns = @('VISUAL-CRM-OP1-*','VISUAL-ASEGURADORAS-OP2-*')
   foreach ($Pattern in $Patterns) {
     Get-ChildItem $Source -Directory -Filter $Pattern -ErrorAction SilentlyContinue |
-      ForEach-Object {
-        $Target = Join-Path $Destination $_.Name
-        Copy-Item $_.FullName $Target -Recurse -Force
-      }
+      ForEach-Object { Copy-EvidenceDirectorySafe $_.FullName $Destination }
   }
 }
 
 function Copy-NewReportsBack([string]$Source, [string]$Destination) {
   if (-not (Test-Path $Source)) { return }
   New-Item -ItemType Directory -Force -Path $Destination | Out-Null
-  Get-ChildItem $Source -Force -ErrorAction SilentlyContinue |
-    ForEach-Object {
-      $Target = Join-Path $Destination $_.Name
-      if ($_.PSIsContainer) { Copy-Item $_.FullName $Target -Recurse -Force }
-      else { Copy-Item $_.FullName $Target -Force }
-    }
+
+  Get-ChildItem $Source -File -ErrorAction SilentlyContinue |
+    ForEach-Object { Copy-Item $_.FullName (Join-Path $Destination $_.Name) -Force }
+
+  Get-ChildItem $Source -Directory -Filter 'VISUAL-*' -ErrorAction SilentlyContinue |
+    ForEach-Object { Copy-EvidenceDirectorySafe $_.FullName $Destination }
 }
 
 Set-Content -Path $Report -Value '============================================================' -Encoding UTF8
@@ -128,6 +142,7 @@ Add 'ORBIT 360 - EJECUCION AISLADA Y SEGURA DEL SIGUIENTE GATE A&S'
 Add ("Fecha local: {0}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
 Add ("Repo preservado: {0}" -f $Repo)
 Add 'Objetivo: cerrar solo las 3 vistas pendientes de Plataformas en Aseguradoras.'
+Add 'Copia selectiva: solo JSONL, capturas y reportes; nunca perfiles ni caches del navegador.'
 Add 'No pull ni switch en el repo preservado. No reset. No clean. No deploy. No datos reales.'
 Add '============================================================'
 
@@ -189,6 +204,7 @@ try {
   $Op2Copied = @(Get-ChildItem $TempReports -Directory -Filter 'VISUAL-ASEGURADORAS-OP2-*' -ErrorAction SilentlyContinue).Count
   Add ("crm_evidence_folders_copied={0}" -f $CrmCopied)
   Add ("aseguradoras_evidence_folders_copied={0}" -f $Op2Copied)
+  Add 'browser_profile_directories_copied=0'
   if ($CrmCopied -lt 1 -or $Op2Copied -lt 1) {
     throw 'No se encontro la evidencia previa necesaria para ejecutar solo el delta.'
   }
