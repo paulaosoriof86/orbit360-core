@@ -11,7 +11,12 @@ on:
       - 'orbit360-platform/modules/calidad.js'
       - 'orbit360-platform/modules/portal-v1198-scope-viewer-bridge.js'
       - 'orbit360-platform/modules/cliente360.js'
+      - 'orbit360-platform/modules/polizas.js'
+      - 'orbit360-platform/modules/crm-op1-closure-bridge.js'
+      - 'orbit360-platform/data/academia-v1216-crm-portal-poliza.js'
+      - 'orbit360-platform/styles/crm-op1-v1216.css'
       - 'tools/orbit360-validar-crm-op1.mjs'
+      - 'tools/orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1'
       - '.github/workflows/orbit360-crm-op1-smoke.yml'
   pull_request:
     branches:
@@ -23,7 +28,12 @@ on:
       - 'orbit360-platform/modules/calidad.js'
       - 'orbit360-platform/modules/portal-v1198-scope-viewer-bridge.js'
       - 'orbit360-platform/modules/cliente360.js'
+      - 'orbit360-platform/modules/polizas.js'
+      - 'orbit360-platform/modules/crm-op1-closure-bridge.js'
+      - 'orbit360-platform/data/academia-v1216-crm-portal-poliza.js'
+      - 'orbit360-platform/styles/crm-op1-v1216.css'
       - 'tools/orbit360-validar-crm-op1.mjs'
+      - 'tools/orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1'
       - '.github/workflows/orbit360-crm-op1-smoke.yml'
 
 permissions:
@@ -53,10 +63,36 @@ jobs:
           grep -q 'Pendiente de pólizas / sin vigente' orbit360-platform/modules/calidad.js
           grep -q 'Todos los asesores' orbit360-platform/modules/calidad.js
 
+      - name: Guard Portal access states
+        run: |
+          grep -q "invitacion_preparada" orbit360-platform/modules/crm-op1-closure-bridge.js
+          grep -q "activo_confirmado" orbit360-platform/modules/crm-op1-closure-bridge.js
+          grep -q "ACCESO CONFIRMADO" orbit360-platform/modules/crm-op1-closure-bridge.js
+          grep -q "entregaConfirmada:false" orbit360-platform/modules/crm-op1-closure-bridge.js
+          grep -q "secretoExpuesto:false" orbit360-platform/modules/crm-op1-closure-bridge.js
+
+      - name: Guard Policy page and viewer
+        run: |
+          grep -q "function policyPage" orbit360-platform/modules/crm-op1-closure-bridge.js
+          grep -q "#/polizas?p=" orbit360-platform/modules/crm-op1-closure-bridge.js
+          grep -q "Orbit.documentViewer.open" orbit360-platform/modules/crm-op1-closure-bridge.js
+          grep -q "Crear gestión operativa" orbit360-platform/modules/crm-op1-closure-bridge.js
+
+      - name: Guard Academy and responsive
+        run: |
+          grep -q "cur_crm_portal_pol_dir_v1216" orbit360-platform/data/academia-v1216-crm-portal-poliza.js
+          grep -q "cur_crm_portal_pol_op_v1216" orbit360-platform/data/academia-v1216-crm-portal-poliza.js
+          grep -q "cur_crm_portal_pol_ase_v1216" orbit360-platform/data/academia-v1216-crm-portal-poliza.js
+          grep -q "@media (max-width: 900px)" orbit360-platform/styles/crm-op1-v1216.css
+          grep -q "@media (max-width: 520px)" orbit360-platform/styles/crm-op1-v1216.css
+
       - name: Guard honest communication
         run: |
           grep -q 'No se ha confirmado ningún envío' orbit360-platform/modules/calidad.js
-          if grep -nE 'campaña.*enviada|recordatorios enviados' orbit360-platform/modules/calidad.js; then
-            echo 'False sent state detected in Calidad'
+          grep -q 'Invitación preparada. La entrega y activación siguen pendientes de confirmación.' orbit360-platform/modules/crm-op1-closure-bridge.js
+          if grep -RniE 'campaña.*enviada|recordatorios enviados|credenciales enviadas|contraseña generada|token visible' \
+            orbit360-platform/modules/calidad.js \
+            orbit360-platform/modules/crm-op1-closure-bridge.js; then
+            echo 'False sent state or exposed credential detected'
             exit 1
           fi
