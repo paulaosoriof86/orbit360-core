@@ -64,7 +64,7 @@ window.Orbit = window.Orbit || {};
     const replacement = button.cloneNode(true);
     replacement.disabled = true;
     replacement.classList.remove('primary'); replacement.classList.add('ghost');
-    replacement.textContent = 'Conexión segura requerida para confirmar';
+    replacement.textContent = 'Conexión segura requerida para aplicar';
     replacement.title = 'Puedes revisar el resultado. La confirmación se habilita cuando la conexión segura esté disponible.';
     replacement.onclick = explain;
     button.replaceWith(replacement);
