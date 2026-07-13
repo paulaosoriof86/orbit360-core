@@ -13,6 +13,7 @@ CRM OP-1:
 
 Aseguradoras OP-2:
   cierre funcional implementado
+  CI estático v1.220: VERDE
   evidencia visual reutilizable · 12/15
   pendiente visual · 3 vistas de Plataformas
 ```
@@ -21,7 +22,7 @@ Aseguradoras OP-2:
 
 ### Identidad antes de actualizar
 
-El importador base podía proponer una actualización por coincidencia parcial. El guard ahora diferencia:
+El importador diferencia:
 
 ```txt
 identidad canónica exacta:
@@ -44,7 +45,7 @@ Casos cubiertos:
 
 ### Mensajes operativos
 
-La UI ya no debe mostrar códigos internos o copy técnico durante el importador.
+La UI no muestra códigos internos ni copy técnico durante el importador.
 
 Se incorporó:
 
@@ -71,9 +72,43 @@ Importación preparada:
   solo sobre hojas permitidas
 ```
 
-## 3. CI observable
+## 3. CI verificable
 
-En la ejecución del commit `b025cc9` aprobaron:
+La ejecución previa de `b025cc9` aprobó todos los contratos funcionales y falló únicamente por una comparación textual del reanudador.
+
+La corrección `6ad2bb8` reemplazó esa comparación por controles estructurales:
+
+- funciones;
+- IDs exactos de escenarios;
+- booleanos JSONL;
+- presencia de capturas;
+- smoke focalizado;
+- ausencia del smoke completo;
+- sincronización `ff-only`;
+- validadores v1.220;
+- ausencia de commit, push o deploy.
+
+Para eliminar la dependencia de correos, el workflow publica un estado verificable sobre el commit.
+
+Commit verificado:
+
+```txt
+52dbe7a1f92423eb0bca67b92dfe689f94c9532a
+```
+
+Contexto:
+
+```txt
+orbit360/aseguradoras-op2-v1220
+```
+
+Resultado:
+
+```txt
+success
+```
+
+Contratos aprobados:
 
 ```txt
 sintaxis de validadores
@@ -91,56 +126,12 @@ prueba de cuarentena
 prueba de versiones y actualizaciones probables
 prueba de copy operativo
 harness focalizado de Plataformas
+reanudador JSONL
+backend protegido
+gate 0% manual
 ```
 
-El único fallo restante fue:
-
-```txt
-Validate JSONL evidence reuse runner
-```
-
-Causa raíz:
-
-- el verificador histórico dependía de frases en inglés;
-- el runner v1.220 utiliza texto operativo en español;
-- la evidencia y el comportamiento eran correctos, pero la comparación textual fallaba.
-
-Corrección:
-
-```txt
-commit: 6ad2bb852ea3a309fdad4084b7bed255145c6bed
-```
-
-El verificador ahora usa:
-
-- funciones;
-- IDs exactos de escenarios;
-- booleanos JSONL;
-- presencia de capturas;
-- smoke focalizado;
-- ausencia del smoke completo;
-- sincronización `ff-only`;
-- validadores v1.220;
-- ausencia de commit, push o deploy.
-
-Estado honesto:
-
-```txt
-Última ejecución totalmente observada:
-  todos los contratos funcionales aprobados
-  un fallo instrumental identificado
-
-Fallo instrumental:
-  corregido
-
-Ejecución posterior:
-  pendiente de observación
-
-CI verde:
-  no declarado todavía
-```
-
-## 4. Gate local final
+## 4. Gate local final habilitado
 
 Archivo:
 
@@ -158,9 +149,7 @@ El gate final:
 6. ejecuta únicamente tres Plataformas;
 7. combina el cierre 15/15.
 
-No cierra otras aplicaciones y no repite escenarios aprobados.
-
-No debe solicitarse a Paula hasta confirmar CI verde.
+No cierra otras aplicaciones, no repite escenarios aprobados y no hace deploy, commit ni push.
 
 ## 5. Carriles
 
@@ -175,8 +164,8 @@ No debe solicitarse a Paula hasta confirmar CI verde.
 
 - Backend protegido intacto.
 - Cuarentena, copy, identidad y migración validados.
-- CI dividido por contratos.
-- Gate local automatizado.
+- CI dividido por contratos y confirmado verde.
+- Gate local automatizado y habilitado.
 
 ### Carril C
 
@@ -189,11 +178,10 @@ No debe solicitarse a Paula hasta confirmar CI verde.
 ## 6. Pendientes reales
 
 ```txt
-1. Observar la ejecución posterior a 6ad2bb8.
-2. Si es verde, ejecutar una sola vez las tres Plataformas.
-3. Cerrar Aseguradoras 15/15.
-4. Dry-run Guatemala sin escritura.
-5. Resolver bloqueos.
-6. Dry-run Colombia sin escritura.
-7. Continuar Cotizador + Comparativo.
+1. Ejecutar una sola vez las tres Plataformas.
+2. Cerrar Aseguradoras 15/15.
+3. Dry-run Guatemala sin escritura.
+4. Resolver bloqueos.
+5. Dry-run Colombia sin escritura.
+6. Continuar Cotizador + Comparativo.
 ```
