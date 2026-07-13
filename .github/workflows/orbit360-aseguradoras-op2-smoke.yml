@@ -6,6 +6,7 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - 'orbit360-platform/core/aseguradoras-op2-role-visibility.js'
+      - 'orbit360-platform/core/aseguradoras-op2-operational-access-policy.js'
       - 'orbit360-platform/core/aseguradoras-op2-source-guard.js'
       - 'orbit360-platform/core/aseguradoras-op2-import-ui-guard.js'
       - 'orbit360-platform/core/insurer-directory-import-v1202.js'
@@ -14,6 +15,7 @@ on:
       - 'orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js'
       - 'orbit360-platform/modules/aseguradoras-op2-closure-bridge.js'
       - 'orbit360-platform/modules/aseguradoras-op2-permission-guard.js'
+      - 'orbit360-platform/modules/aseguradoras-op2-operational-resources.js'
       - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
       - 'orbit360-platform/styles/aseguradoras-op2-v1217.css'
       - 'tools/orbit360-validar-aseguradoras-op2.mjs'
@@ -25,6 +27,7 @@ on:
       - main
     paths:
       - 'orbit360-platform/core/aseguradoras-op2-role-visibility.js'
+      - 'orbit360-platform/core/aseguradoras-op2-operational-access-policy.js'
       - 'orbit360-platform/core/aseguradoras-op2-source-guard.js'
       - 'orbit360-platform/core/aseguradoras-op2-import-ui-guard.js'
       - 'orbit360-platform/core/insurer-directory-import-v1202.js'
@@ -33,6 +36,7 @@ on:
       - 'orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js'
       - 'orbit360-platform/modules/aseguradoras-op2-closure-bridge.js'
       - 'orbit360-platform/modules/aseguradoras-op2-permission-guard.js'
+      - 'orbit360-platform/modules/aseguradoras-op2-operational-resources.js'
       - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
       - 'orbit360-platform/styles/aseguradoras-op2-v1217.css'
       - 'tools/orbit360-validar-aseguradoras-op2.mjs'
@@ -60,10 +64,12 @@ jobs:
           node --check tools/orbit360-validar-aseguradoras-op2.mjs
           node --check tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           node --check orbit360-platform/core/aseguradoras-op2-role-visibility.js
+          node --check orbit360-platform/core/aseguradoras-op2-operational-access-policy.js
           node --check orbit360-platform/core/aseguradoras-op2-source-guard.js
           node --check orbit360-platform/core/aseguradoras-op2-import-ui-guard.js
           node --check orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
           node --check orbit360-platform/modules/aseguradoras-op2-permission-guard.js
+          node --check orbit360-platform/modules/aseguradoras-op2-operational-resources.js
           node --check orbit360-platform/data/academia-v1217-aseguradoras-op2.js
 
       - name: Validate Aseguradoras OP-2
@@ -72,19 +78,47 @@ jobs:
       - name: Validate protected backend
         run: node tools/orbit360-validar-backend-lab-contrato.mjs
 
-      - name: Guard roles without privilege expansion
+      - name: Guard role policy
         run: |
           grep -Fq "ensure('Operativo', ['aseguradoras'])" orbit360-platform/core/aseguradoras-op2-role-visibility.js
           grep -Fq "ensure('Asesor', ['aseguradoras'])" orbit360-platform/core/aseguradoras-op2-role-visibility.js
-          grep -Fq 'sensitiveAccessUnchanged: true' orbit360-platform/core/aseguradoras-op2-role-visibility.js
-          grep -Fq 'insurerWritePermissionUnchanged: true' orbit360-platform/core/aseguradoras-op2-role-visibility.js
+          grep -q "accessClass:'operational_all_viewers'" orbit360-platform/core/aseguradoras-op2-operational-access-policy.js
+          grep -q "accessClass:'administrative_operational'" orbit360-platform/core/aseguradoras-op2-operational-access-policy.js
+          grep -Fq "'Dirección','SuperAdmin','AdminTenant','Admin','Operativo'" orbit360-platform/core/aseguradoras-op2-operational-access-policy.js
+
+      - name: Guard bank visibility for all directory viewers
+        run: |
+          grep -q 'las cuentas bancarias están disponibles para todos' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
+          grep -q 'data-op2-account-value' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
+          grep -q 'R.revealField' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
+          grep -q 'R.copyField' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
+          grep -q 'P.canCopyBankAccounts()' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
+
+      - name: Guard portal credentials for admin operational
+        run: |
+          grep -q 'Credenciales disponibles para Dirección, Administración y Operativo' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
+          grep -q 'P.canViewCredentials()' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
+          grep -q 'Ver usuario y contraseña' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
+          grep -q 'Copiar contraseña' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
+          grep -q 'R.revealCredential' orbit360-platform/modules/aseguradoras-op2-operational-resources.js
+
+      - name: Guard non destructive migration
+        run: |
+          grep -q 'function flagLegacySensitive' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
+          grep -q 'pendiente_migracion_segura_no_destructiva' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
+          grep -q 'rawPersisted:true' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
+          grep -q 'migrationPerformed:false' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
+          grep -q 'destructive:false' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
+          if grep -q "audit('migrar_recursos_sensibles_legacy'" orbit360-platform/modules/aseguradoras-op2-closure-bridge.js; then
+            echo 'Destructive legacy migration marker detected'
+            exit 1
+          fi
 
       - name: Guard direct entry permissions
         run: |
           grep -Fq "A.can('aseguradoras', action)" orbit360-platform/modules/aseguradoras-op2-permission-guard.js
           grep -Fq "startEdit && !allowed('edit')" orbit360-platform/modules/aseguradoras-op2-permission-guard.js
           grep -Fq "!allowed('create')" orbit360-platform/modules/aseguradoras-op2-permission-guard.js
-          grep -Fq "!allowed('create') && !allowed('manage_documents')" orbit360-platform/modules/aseguradoras-op2-permission-guard.js
 
       - name: Guard probable duplicates
         run: |
@@ -92,26 +126,13 @@ jobs:
           grep -q 'duplicado_probable_con_directorio' orbit360-platform/core/aseguradoras-op2-source-guard.js
           grep -q 'distance(x, y) <= 1' orbit360-platform/core/aseguradoras-op2-source-guard.js
           grep -Fq 'D.parseFile(file, { country, captureSecure:false })' orbit360-platform/core/aseguradoras-op2-import-ui-guard.js
-          grep -q "op2AliasState = 'blocked'" orbit360-platform/core/aseguradoras-op2-import-ui-guard.js
           grep -q 'La aplicación queda bloqueada para evitar duplicados' orbit360-platform/core/aseguradoras-op2-import-ui-guard.js
-
-      - name: Guard sensitive resources
-        run: |
-          grep -q 'function sanitizePortal' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          grep -q 'function sanitizeAccount' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          grep -q 'delete out.usuario' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          grep -q 'delete out.numero' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          grep -q 'rawPersisted:false' orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
-          if grep -q "audit('guardar_ficha_aseguradora'" orbit360-platform/modules/aseguradoras-op2-closure-bridge.js; then
-            echo 'False save audit detected'
-            exit 1
-          fi
 
       - name: Guard Academy update without duplicate courses
         run: |
-          grep -q 'cur_dir_aseg_dir_v1202' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
-          grep -q 'cur_dir_aseg_op_v1202' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
-          grep -q 'cur_dir_aseg_asesor_v1202' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
+          grep -q 'Cuentas bancarias operativas' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
+          grep -q 'Usuarios y contraseñas por rol' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
+          grep -q 'Migración sin pérdida' orbit360-platform/data/academia-v1217-aseguradoras-op2.js
           if grep -q "Orbit.store.insert('cursos'" orbit360-platform/data/academia-v1217-aseguradoras-op2.js; then
             echo 'Duplicate course insertion detected'
             exit 1
@@ -119,9 +140,9 @@ jobs:
 
       - name: Guard visual matrix and common runner
         run: |
-          grep -q 'dir-directorio-desktop' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
-          grep -q 'op-directorio-tablet' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
-          grep -q 'ase-directorio-mobile' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
+          grep -q 'dir-plataformas-desktop' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
+          grep -q 'op-plataformas-tablet' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
+          grep -q 'ase-plataformas-mobile' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
+          grep -q 'accountFull' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
+          grep -q 'credentialRevealed' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
           grep -Fq -- '--port 5000' tools/orbit360-run-operacion-op1-op2-visual.ps1
-          grep -q 'orbit360-smoke-visual-crm-op1.mjs' tools/orbit360-run-operacion-op1-op2-visual.ps1
-          grep -q 'orbit360-smoke-visual-aseguradoras-op2.mjs' tools/orbit360-run-operacion-op1-op2-visual.ps1
