@@ -1,200 +1,291 @@
 # Plan vivo de avance backend — Orbit 360 A&S
 
-Fecha de creación: 2026-07-04  
-Última actualización: 2026-07-05  
+Última actualización: 2026-07-13  
 Proyecto: Orbit 360 A&S  
+Repositorio: `paulaosoriof86/orbit360-core`  
 Rama: `ays/backend-tenant-lab-v99-20260703`  
-PR: #5 draft, sin merge y sin deploy.
+PR: #5 draft/open, sin merge ni deploy
 
 ## 1. Propósito
 
-Mantener una vista rápida de avance, pendientes y bloques intermedios agregados durante la continuidad backend.
+Mantener una vista única del avance operativo, los tres carriles, los pendientes reales y el siguiente bloque. Este documento reemplaza las prioridades históricas ya superadas, pero no elimina sus auditorías ni bitácoras.
+
+## 2. Restricciones permanentes
+
+```txt
+Producción: no autorizada
+Deploy: no autorizado
+Merge/main: no autorizados
+Datos reales hardcodeados: prohibidos
+Secretos en repositorio, UI o reportes: prohibidos
+Backend protegido: no sobrescribir
+Metodología: 0% manual salvo gate local final indispensable
+```
+
+Archivos protegidos principales:
+
+```txt
+data/store.js
+data/store-firestore-lab.local.js
+core/backend-lab-*
+core/auth.js
+core/importa.js
+firestore.rules
+tools/orbit360-* backend/protegidos
+```
 
-Este documento no reemplaza contratos ni auditorías. Sirve como tablero de avance.
+## 3. Estado modular vigente
 
-## 2. Estado general
+### OP-1 — CRM
+
+```txt
+Estado funcional: CERRADO
+Estado visual: CERRADO · 10/10
+Evidencia: results.jsonl + 10 capturas
+Regla: no repetir salvo regresión nueva o cambio de alcance
+```
 
-- Producción: no autorizada.
-- Deploy: no autorizado.
-- Merge a main: no autorizado.
-- Datos reales en código: no autorizados.
-- Backend protegido: intacto.
-- Candidata frontend activa aceptada para empalme: `Prototype Development Request - 2026-07-05T062855.313.zip`.
-- Empalme frontend aplicado en GitHub: `Conciliaciones` + `index.html` híbrido LAB.
+Incluye Clientes 360, Calidad, Portal, ficha de póliza, scopes y visibilidad por rol dentro del alcance validado.
 
-## 3. Bloques avanzados
+Pendiente de datos separado:
 
-| Bloque | Estado | Resultado |
-|---|---|---|
-| Fuentes separadas / migración | Avanzado técnico | Contratos y validadores de fuentes separadas; banco, planillas y cobros realizados proponen a `conciliaciones`. |
-| Academia profunda | Avanzado documental | Addendum de Academia, rutas por rol, impacto en manuales/evaluaciones. No desplaza backend crítico. |
-| Portal pago reportado / adjuntos | Avanzado documental + diagnóstico | Contratos de conciliación, documentos, gestiones y plan de auditoría. |
-| Ops ruteo de gestiones | Avanzado documental + diagnóstico | Se definieron listas y ruteo de gestiones. |
-| Cliente360 pagos pendientes | Avanzado documental | Pago reportado debe verse como pendiente de aprobación/conciliación. |
-| Portal acceso / PWA / invitaciones | Avanzado documental | Definido acceso por web, URL directa, PWA, invitación y activación. |
-| Calidad de datos | Avanzado documental | Solicitudes individuales/masivas de datos faltantes con mensaje amable y trazabilidad. |
-| Notificaciones unificadas | Avanzado documental | Contrato evento → audiencia → canal → estado → trazabilidad. |
-| Auth / roles / tenant / portalUsuarios | Avanzado documental + auditoría | Pendiente llevar demo a backend real. |
-| Guard de autorización / auditoría de acceso | Avanzado documental | Guard por ruta/acción/relación y auditoría de eventos críticos. |
-| Canales/correo por usuario autorizado | Avanzado documental | Correo por usuario interno autorizado, no por tenant/rol. |
-| Conciliaciones frontend 062855 | Empalmado en GitHub | `modules/conciliaciones.js` agregado e `index.html` híbrido preservando LAB. |
-| Smoke estático empalme Conciliaciones | Tooling agregado | Validador estático para confirmar index híbrido, carga única del módulo, roles y acciones seguras. |
-| Perfilador de columnas por fuente | Tooling agregado | Manifest validado produce perfil de columnas y readiness para dryRunReport. |
-| Constructor dryRunReport sin filas | Tooling agregado | Construye sobre seguro de dryRunReport desde manifest + perfil. |
-| Adaptador candidatos metadata-only | Tooling agregado | Combina dryRun envelope con candidatos estructurados y readiness para validador/score/propuestas. |
-| Orquestador pipeline metadata-only | Tooling agregado | Encadena perfil, dryRun envelope, candidatos metadata-only y validación final dryRun. |
-| Orquestador score/propuestas plan-only | Tooling agregado | Encadena pipeline metadata-only, score gate, generación de propuestas `conciliaciones` y plan de persistencia sin writes. |
-| Readiness plan de persistencia LAB | Tooling agregado | Valida que el plan de persistencia sea tenant-safe, sin payload real, sin banderas de escritura/aplicación y listo solo para revisión LAB. |
-| Runner validaciones locales Conciliaciones | Tooling agregado | Agrupa smoke estático, test orquestador, test readiness, sintaxis y hash de archivos protegidos en un reporte único local. |
-| Guía runner local y criterios de bloqueo | Documentado + wrapper PS | Agrega comando PowerShell, revisión de reportes, criterios de avance/bloqueo y resumen copiable al portapapeles. |
-| Checklist smoke visual Conciliaciones | Documentado + helper PS | Agrega checklist por rol, estado vacío, acciones seguras, trazabilidad y plantilla de reporte visual. |
-| Modelo clientes + asesor + portal + calidad | Contrato + tooling agregado | Define colecciones, campos, reglas de fuente, portal cliente, relación asesor y validador plan-only. |
-| Modelo pólizas + recibos + cartera | Contrato + tooling agregado | Define estados, prima separada, cartera pendiente año actual, reglas de país/moneda y validador plan-only. |
-| Modelo cobros + pagos reportados + conciliación | Contrato + tooling agregado | Define cobros separados de finmovs, pagos reportados pendientes, conciliación, producción sobre prima neta recaudada y validador plan-only. |
-| Seguimiento de bloques | Agregado intermedio | Este plan vivo se mantiene actualizado después de cada bloque largo. |
+```txt
+Fuente Pólizas
+```
 
-## 4. Bloques pendientes principales
+No se deben inferir pólizas desde clientes, movimientos financieros, bancos o cobros.
+
+### OP-2 — Aseguradoras
 
-| Prioridad | Bloque | Estado esperado |
-|---|---|---|
-| P0 | Ejecutar runner local + smoke visual/operativo Conciliaciones | Pendiente en entorno local/navegador. |
-| P0 | Adapter Firestore LAB real para `conciliaciones/auditLog` | Pendiente de ejecución local/entorno LAB y autorización. |
-| P0 | Ejecutar tests sintéticos modelo clientes | Pendiente de ejecución local. |
-| P0 | Ejecutar tests sintéticos modelo pólizas/recibos/cartera | Pendiente de ejecución local. |
-| P0 | Ejecutar tests sintéticos modelo cobros/pagos/conciliación | Pendiente de ejecución local. |
-| P0 | Contrato/modelo `documentos` + Storage futuro | Pendiente. |
-| P0 | Smokes de roles: cliente/asesor/cobros/admin | Pendiente. |
-| P1 | Validación local del orquestador score/propuestas plan-only | Pendiente de ejecución local; agrupada en runner. |
-| P1 | Validación local de readiness plan persistencia LAB | Pendiente de ejecución local; agrupada en runner. |
-| P1 | Manuales y Academia actualizados por cambio | Pendiente para Claude/prototipo. |
+```txt
+Estado funcional: IMPLEMENTADO
+Estado visual reutilizable: 12/15
+Pendiente visual real: 3 vistas de Plataformas
+Escenarios pendientes:
+  Dirección desktop
+  Operativo tablet
+  Asesor móvil
+Regla: no repetir los 12 aprobados
+```
+
+Avances acumulados:
+
+- directorio y ficha-página operativa;
+- contactos, plataformas, bancos, documentos, productos y trazabilidad;
+- cuentas completas visibles/copiables para usuarios autorizados del módulo;
+- usuarios y contraseñas visibles/copiables para Dirección/Admin/Operativo o permiso extra;
+- Asesor sin acceso a credenciales de portal;
+- migración legacy no destructiva;
+- permisos en funciones y proveedor, no solo en botones;
+- alias/versiones/duplicados probables bloqueados para revisión;
+- entidades aliadas separadas de aseguradoras directas;
+- directorio importado no habilita tarifas;
+- responsive y Academia por rol;
+- cuarentena previa de hojas técnicas, internas y de apoyo.
+
+Gate final preparado:
 
-## 5. Intermedios agregados
+```txt
+tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
+```
+
+Solo puede solicitarse a Paula cuando las validaciones estáticas/CI estén estabilizadas. Debe ejecutar únicamente las tres Plataformas pendientes, reutilizar CRM 10/10 y OP-2 12/15, elegir puerto solo y no cerrar otras aplicaciones.
+
+## 4. Carriles permanentes
 
-### Intermedio 1 — Seguimiento de bloques
+### Carril A — prototipo, UX y Academia
+
+Estado:
+
+- patrones CRM documentados para Claude;
+- patrones Aseguradoras documentados para Claude;
+- patrón reusable de cuarentena de hojas documentado;
+- responsive y estados honestos implementados;
+- Academia Aseguradoras actualizada a v1.219 sin duplicar cursos;
+- progreso y certificados preservados.
 
-Motivo: Paula pidió visualizar avance y pendientes después de cada bloque.
+Pendiente:
 
-Estado: agregado mediante este documento y addendum maestro.
+- incorporar los patrones en la siguiente candidata comercializable de Claude;
+- no trasladar datos A&S, secretos, bindings LAB ni rutas privadas;
+- después de los dry-runs, agregar casos prácticos sanitizados de revisión de fuentes.
 
-### Intermedio 2 — Correo por usuario autorizado
+### Carril B — backend, seguridad y Orbit.store
 
-Motivo: Paula aclaró que el correo no es por tenant ni rol.
+Estado:
 
-Estado: documentado en contratos y matriz de canales por usuario.
+- `Orbit.store`, Auth, Firestore LAB y reglas protegidos;
+- política de cuentas y credenciales aplicada también a llamadas directas del proveedor;
+- migración de recursos en orden copiar → verificar → retirar;
+- cuarentena de hojas ocurre antes del parser, captura protegida y operaciones;
+- evidencia de reanudación usa JSONL + capturas, no frases ni tildes;
+- integración de `index.html` se realiza con backup, verificación y rollback;
+- workflow actualizado a Node 24 y nuevos gates estáticos.
 
-### Intermedio 3 — Cliente sin opción de correo
+Pendiente:
 
-Motivo: aclaración de producto para Portal Cliente.
+- obtener ejecución CI verde observable para el HEAD vigente;
+- ejecutar una sola vez el gate focalizado local de Plataformas;
+- conectar proveedor seguro real antes de aplicar recursos sensibles de directorios.
 
-Estado: documentado. Debe mantenerse en frontend, backend y manuales.
+### Carril C — fuentes reales y migración operativa
 
-### Intermedio 4 — Smoke estático post-empalme Conciliaciones
+Inventario sanitizado recibido:
 
-Motivo: validar el empalme sin esperar navegador local.
+```txt
+Directorio Guatemala:
+  18 hojas totales
+  14 candidatas operativas
+  4 hojas excluidas
 
-Relación con plan principal: puente entre empalme frontend y smoke visual/backend real.
+Directorio Colombia:
+  17 hojas totales
+  16 candidatas operativas
+  1 hoja excluida
+```
 
-Estado: tooling agregado.
-
-### Intermedio 5 — Perfilador de columnas por fuente
-
-Motivo: el manifest validado no era suficiente para generar `dryRunReport`; faltaba verificar campos obligatorios, aliases y columnas no mapeadas por fuente.
-
-Relación con plan principal: puente entre manifest por fuentes separadas y constructor de `dryRunReport`.
-
-Estado: tooling agregado.
-
-### Intermedio 6 — Constructor de dryRunReport sin filas
-
-Motivo: después del perfilador, faltaba un sobre seguro de dryRunReport para conectar manifest + perfil.
-
-Relación con plan principal: puente entre perfilador y adaptador de candidatos metadata-only compatible con el validador dryRunReport.
-
-Estado: tooling agregado.
-
-### Intermedio 7 — Adaptador de candidatos metadata-only
-
-Motivo: el sobre dryRunReport necesitaba candidatos estructurados antes de entrar a validación/score/propuestas.
-
-Relación con plan principal: puente entre constructor dryRunReport y orquestador metadata-only.
-
-Estado: tooling agregado.
-
-### Intermedio 8 — Orquestador de pipeline metadata-only
-
-Motivo: faltaba ejecutar el tramo metadata-only completo en orden y con reporte único.
-
-Relación con plan principal: puente entre validación metadata-only y score/propuestas plan-only.
-
-Estado: tooling agregado.
-
-### Intermedio 9 — Orquestador score/propuestas plan-only
-
-Motivo: después del pipeline metadata-only faltaba encadenar score gate, propuestas y plan de persistencia en un solo reporte.
-
-Relación con plan principal: puente entre dryRun validado y futura persistencia LAB aprobada.
-
-Estado: tooling agregado; pendiente ejecución local.
-
-### Intermedio 10 — Readiness plan de persistencia LAB
-
-Motivo: antes de cualquier adapter LAB real faltaba validar que el plan de persistencia no contenga payload, filas reales, secretos, banderas de writes ni estados aplicados.
-
-Relación con plan principal: puente entre orquestador score/propuestas plan-only y adapter Firestore LAB futuro.
-
-Estado: tooling agregado; pendiente ejecución local.
-
-### Intermedio 11 — Runner agrupado de validaciones locales Conciliaciones
-
-Motivo: reducir pasos manuales y evitar ejecutar validadores sueltos sin reporte único antes de adapter LAB.
-
-Relación con plan principal: puente entre tooling sintético/estático y smoke visual/operativo local.
-
-Estado: tooling agregado; pendiente ejecución local.
-
-### Intermedio 12 — Guía runner local y criterios de bloqueo
-
-Motivo: faltaba una instrucción corta y operativa para ejecutar, revisar reportes y decidir si se bloquea o se pasa a smoke visual.
-
-Relación con plan principal: puente entre runner local y smoke visual/operativo.
-
-Estado: documentación y wrapper PowerShell agregados; pendiente ejecución local.
-
-### Intermedio 13 — Checklist smoke visual/operativo Conciliaciones
-
-Motivo: faltaba una lista de aceptación visual por rol, copy, estado vacío, acciones seguras y trazabilidad antes de adapter LAB.
-
-Relación con plan principal: puente entre ejecución local del runner y revisión técnica posterior a smoke visual.
-
-Estado: documentación y helper PowerShell agregados; pendiente ejecución local/visual.
-
-### Intermedio 14 — Validador modelo clientes plan-only
-
-Motivo: antes de pólizas/cobros faltaba fijar contrato de clientes, relación asesor, portal y calidad de datos con validación sintética.
-
-Relación con plan principal: base para contratos posteriores de pólizas, cobros, portal y roles.
-
-Estado: contrato y tooling agregados; pendiente ejecución local.
-
-### Intermedio 15 — Validador modelo pólizas/recibos/cartera plan-only
-
-Motivo: antes de cobros y conciliación faltaba fijar contrato de pólizas, recibos, cartera, estados y primas separadas.
-
-Relación con plan principal: base para contrato posterior de cobros, pagos reportados y conciliación.
-
-Estado: contrato y tooling agregados; pendiente ejecución local.
-
-### Intermedio 16 — Validador modelo cobros/pagos/conciliación plan-only
-
-Motivo: faltaba fijar el contrato que separa cobros reales, pagos reportados, conciliaciones, cartera, producción y finanzas.
-
-Relación con plan principal: base para contrato posterior de documentos/adjuntos y para futuro adapter de cobros aprobado.
-
-Estado: contrato y tooling agregados; pendiente ejecución local.
-
-## 6. Formato obligatorio de cierre de cada bloque
-
-Cada respuesta de continuidad debe cerrar con:
+No se escribieron datos ni se trasladaron valores sensibles al repositorio.
+
+Secuencia obligatoria:
+
+1. cerrar las tres vistas de Plataformas;
+2. ejecutar dry-run Guatemala sin escritura;
+3. resolver alias, entidades aliadas y filas bloqueadas;
+4. ejecutar dry-run Colombia sin escritura;
+5. resolver alias, entidades aliadas y filas bloqueadas;
+6. aplicar únicamente filas confirmadas y recursos mediante proveedor seguro;
+7. solicitar/procesar la fuente separada Pólizas.
+
+## 5. Orden del plan operativo
+
+```txt
+1. CRM — cerrado
+2. Aseguradoras — pendiente gate focalizado + dry-runs GT/CO
+3. Cotizador + Comparativo configurable
+4. Ops + Leads
+5. Finanzas, conciliaciones, comisiones, CxC/CxP
+6. Marketing
+7. Siniestros, renovaciones, cancelaciones, automatizaciones e integraciones
+8. Academia backend profunda transversal
+```
+
+No avanzar a Finanzas ni otro módulo para sustituir el cierre pendiente de Aseguradoras.
+
+## 6. Intermedios agregados vigentes
+
+### Intermedio A — Evidencia estructurada
+
+```txt
+Motivo: los reportes de texto generaron falsos negativos por codificación.
+Solución: reutilizar results.jsonl + capturas + IDs exactos.
+Estado: implementado.
+```
+
+### Intermedio B — Cuarentena previa de hojas
+
+```txt
+Motivo: excluir por nombre no protege frente a hojas técnicas renombradas.
+Riesgo: mezclar fuentes o crear operaciones inválidas.
+Solución: nombre + señales de contenido antes del parser.
+Estado: implementado y con validador ficticio.
+```
+
+### Intermedio C — Integración local del index
+
+```txt
+Motivo: preservar codificación, backend protegido y rollback.
+Solución: pipeline idempotente con backup y verificación de orden.
+Estado: implementado.
+```
+
+Estos intermedios apoyan el plan; no lo reemplazan ni abren módulos nuevos.
+
+## 7. Metodología 0% manual
+
+ChatGPT/Codex:
+
+- audita;
+- modifica;
+- empalma;
+- documenta;
+- ejecuta validaciones accesibles;
+- revisa CI;
+- prepara un único gate local final.
+
+Paula:
+
+- ejecuta una sola acción local cuando Chrome/Windows o la fuente local sean indispensables;
+- revisa visualmente el resultado final.
+
+No corresponde pedir a Paula:
+
+- elegir puertos;
+- cerrar aplicaciones;
+- localizar reportes o carpetas;
+- editar archivos o comandos;
+- diagnosticar el pipeline;
+- repetir escenarios aprobados.
+
+## 8. Documentación reusable para Claude
+
+```txt
+docs/PATRON-CLAUDE-CRM-CALIDAD-PORTAL-POLIZA-V1216-20260712.md
+docs/PATRON-CLAUDE-ASEGURADORAS-OP2-V1217-20260713.md
+docs/PATRON-CLAUDE-CUARENTENA-HOJAS-IMPORTADORES-V1219-20260713.md
+docs/PATRON-REUTILIZABLE-CLAUDE-DESGLOSE-COTIZACION-ESTIMACION-INTERNA-20260712.md
+```
+
+Reglas a conservar en prototipo comercializable:
+
+- SaaS multi-tenant, sin fork A&S;
+- todos los módulos usan `Orbit.store`;
+- estados honestos y no técnicos;
+- importadores por fuentes separadas;
+- dry-run antes de escritura;
+- cuarentena antes del parser;
+- cuentas y credenciales con visibilidad operativa diferente;
+- migración no destructiva;
+- tarifas default-deny;
+- Academia actualizada por rol.
+
+## 9. Reglas de negocio vigentes
+
+```txt
+GT → GTQ
+CO → COP
+Falta país/moneda → REQUIERE_VALIDACION
+Cobros/recaudos ≠ finmovs
+Estado bancario no aplica cobros directamente
+Directorio recibido ≠ tarifa habilitada
+Duplicado probable ≠ fusión automática
+Entidad aliada ≠ aseguradora directa
+Producción/metas/comisiones → prima neta recaudada
+```
+
+## 10. Documentación creada/actualizada en el bloque v1.219
+
+```txt
+docs/AUDITORIA-SANITIZADA-CUARENTENA-HOJAS-DIRECTORIOS-OP2-20260713.md
+docs/PATRON-CLAUDE-CUARENTENA-HOJAS-IMPORTADORES-V1219-20260713.md
+data/academia-v1217-aseguradoras-op2.js
+core/aseguradoras-op2-sheet-quarantine.js
+tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs
+tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
+.github/workflows/orbit360-aseguradoras-op2-smoke.yml
+```
+
+## 11. Próximo bloque recomendado
+
+```txt
+1. Diagnosticar y corregir cualquier fallo CI del HEAD actual.
+2. No pedir ejecución local hasta tener el circuito estático estabilizado.
+3. Ejecutar una sola vez el gate focalizado de las tres Plataformas.
+4. Cerrar Aseguradoras 15/15.
+5. Ejecutar dry-run Guatemala y después Colombia, separados y sin escritura.
+6. Continuar Cotizador + Comparativo.
+```
+
+## 12. Formato obligatorio de cierre de bloque
 
 ```txt
 Avance del bloque
@@ -210,30 +301,3 @@ Avance del bloque
 - Próximo bloque recomendado:
 - Estado PR/rama:
 ```
-
-Regla fija solicitada por Paula: siempre indicar qué se adelantó, si se agregó un intermedio del plan de trabajo y qué sigue en el plan.
-
-## 7. Próximo bloque recomendado
-
-Continuar con:
-
-```txt
-Preparar contrato/modelo backend de documentos + Storage futuro + adjuntos.
-```
-
-Condición: no avanzar a adapter Firestore LAB real hasta que el runner local y el smoke visual de Conciliaciones estén ejecutados/revisados.
-
-El nuevo bloque de documentos debe mantener:
-
-- tenant isolation;
-- documentos soporte solo proponen datos;
-- relación documento-gestión-pago reportado-conciliación;
-- adjunto visible para operativo/cobros cuando corresponda;
-- no crear clientes/pólizas/cobros sin confirmación y diff;
-- trazabilidad fuente/archivo/hoja/fila/bloque/período;
-- preparación para Storage futuro sin subir archivos reales;
-- impacto en Academia/manuales.
-
-## 8. Estado
-
-Plan vivo actualizado después del empalme, smoke estático de Conciliaciones, perfilador de columnas, constructor de dryRunReport, adaptador de candidatos metadata-only, orquestador metadata-only, orquestador score/propuestas plan-only, readiness plan de persistencia LAB, runner agrupado de validaciones locales, guía/wrapper de ejecución local, checklist/helper de smoke visual, contrato/modelo clientes, contrato/modelo pólizas/recibos/cartera y contrato/modelo cobros/pagos/conciliación. No avanzar a datos reales, aplicación controlada, Firestore writes ni deploy sin smoke local y autorización.
