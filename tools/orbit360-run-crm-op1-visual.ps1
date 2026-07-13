@@ -23,6 +23,31 @@ function Run-Step([string]$Name, [scriptblock]$Block) {
     return $false
   }
 }
+function Clear-OrbitPort5000 {
+  $listeners = @()
+  try {
+    $listeners = @(Get-NetTCPConnection -LocalPort 5000 -State Listen -ErrorAction SilentlyContinue)
+  } catch {}
+  if (-not $listeners.Count) { return }
+
+  foreach ($listener in $listeners) {
+    $pidValue = [int]$listener.OwningProcess
+    $proc = $null
+    try { $proc = Get-CimInstance Win32_Process -Filter "ProcessId = $pidValue" -ErrorAction Stop } catch {}
+    $cmd = if ($proc) { [string]$proc.CommandLine } else { '' }
+    $name = if ($proc) { [string]$proc.Name } else { "PID $pidValue" }
+    Add-Report "Puerto 5000 ocupado por $name · PID $pidValue"
+    Add-Report "Comando detectado: $cmd"
+
+    if ($cmd -match '(?i)(orbit360|firebase\s+(serve|emulators)|http-server|serve\s+.*orbit360-platform|smoke-visual-crm-op1)') {
+      Stop-Process -Id $pidValue -Force -ErrorAction Stop
+      Add-Report "Servidor local conocido detenido de forma controlada: PID $pidValue"
+    } else {
+      throw "El puerto 5000 pertenece a otra aplicación. No se cerró automáticamente: $name (PID $pidValue)."
+    }
+  }
+  Start-Sleep -Milliseconds 700
+}
 
 New-Item -ItemType Directory -Force -Path $Reports | Out-Null
 Set-Content -Path $MasterReport -Value '============================================================' -Encoding UTF8
@@ -86,7 +111,13 @@ $AllOk = (Run-Step '6. Validar Cotizador y Comparativo empalmados' {
 }) -and $AllOk
 
 if ($AllOk) {
-  $AllOk = (Run-Step '7. Ejecutar smoke visual automático CRM en localhost:5000' {
+  $AllOk = (Run-Step '7. Preparar localhost:5000 de forma segura' {
+    Clear-OrbitPort5000
+  }) -and $AllOk
+}
+
+if ($AllOk) {
+  $AllOk = (Run-Step '8. Ejecutar smoke visual automático CRM en localhost:5000' {
     $Smoke = Join-Path $Repo 'tools\orbit360-smoke-visual-crm-op1.mjs'
     if (-not (Test-Path $Smoke)) { throw "Falta: $Smoke" }
     & node $Smoke --repo $Repo --app (Join-Path $Repo 'orbit360-platform') --port 5000 2>&1 | ForEach-Object { Add-Report $_ }
@@ -94,7 +125,7 @@ if ($AllOk) {
   }) -and $AllOk
 }
 
-Run-Step '8. Estado Git posterior' {
+Run-Step '9. Estado Git posterior' {
   Set-Location $Repo
   Add-Report ("Rama final: {0}" -f ((& git branch --show-current).Trim()))
   Add-Report ("HEAD final: {0}" -f ((& git rev-parse HEAD).Trim()))
