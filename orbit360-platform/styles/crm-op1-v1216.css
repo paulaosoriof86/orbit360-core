@@ -1,0 +1,25 @@
+/* Orbit 360 · CRM OP-1 v1.216 · responsive aditivo */
+#crm-op1-client-panel {
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
+}
+#crm-op1-client-panel > *,
+#host .page > div[style*="grid-template-columns:minmax(0,1.2fr)"] > * {
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  #crm-op1-client-panel,
+  #host .page > div[style*="grid-template-columns:minmax(0,1.2fr)"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+@media (max-width: 520px) {
+  #crm-op1-client-panel {
+    padding: 12px !important;
+  }
+  #crm-op1-client-panel .asg197-detail-row {
+    align-items: flex-start;
+  }
+  #host .page > div[style*="grid-template-columns:minmax(0,1.2fr)"] .tbl {
+    min-width: 520px;
+  }
+}
