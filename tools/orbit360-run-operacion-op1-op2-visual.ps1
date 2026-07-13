@@ -8,6 +8,7 @@ $Reports = Join-Path $Repo '_orbit360_reports'
 $Stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $MasterReport = Join-Path $Reports "RUN-OP1-OP2-$Stamp.txt"
 $App = Join-Path $Repo 'orbit360-platform'
+$script:VisualPort = 0
 
 try {
   [Console]::InputEncoding = New-Object System.Text.UTF8Encoding($false)
@@ -78,30 +79,59 @@ function Invoke-CapturedNative(
   }
 }
 
-function Clear-OrbitPort5000 {
-  $Listeners = @()
-  try { $Listeners = @(Get-NetTCPConnection -LocalPort 5000 -State Listen -ErrorAction SilentlyContinue) } catch {}
-  if (-not $Listeners.Count) { return }
-
-  $OwnerPids = @($Listeners | Select-Object -ExpandProperty OwningProcess -Unique)
-  foreach ($PidValue in $OwnerPids) {
-    $Proc = $null
-    try { $Proc = Get-CimInstance Win32_Process -Filter "ProcessId = $PidValue" -ErrorAction Stop } catch {}
-    $Command = if ($Proc) { [string]$Proc.CommandLine } else { '' }
-    $Name = if ($Proc) { [string]$Proc.Name } else { "PID $PidValue" }
-    $Identity = "$Name $Command"
-    Add-Report "Port 5000 owner: $Name | PID $PidValue"
-    Add-Report "Command: $Command"
-
-    if ($Identity -match '(?i)(orbit360|firebase\s+(serve|emulators)|http-server|serve\s+.*orbit360-platform|smoke-visual-(crm-op1|aseguradoras-op2))') {
-      Stop-Process -Id $PidValue -Force -ErrorAction Stop
-      Add-Report "Known Orbit local server stopped: PID $PidValue"
-    }
-    else {
-      throw "Port 5000 belongs to another application. It was not stopped: $Name (PID $PidValue)."
+function Test-LocalPortAvailable([int]$Port) {
+  $Listener = $null
+  try {
+    $Listener = New-Object System.Net.Sockets.TcpListener([System.Net.IPAddress]::Loopback, $Port)
+    $Listener.Start()
+    return $true
+  }
+  catch {
+    return $false
+  }
+  finally {
+    if ($Listener) {
+      try { $Listener.Stop() } catch {}
     }
   }
-  Start-Sleep -Milliseconds 700
+}
+
+function Describe-PortOwner([int]$Port) {
+  $Listeners = @()
+  try {
+    $Listeners = @(Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
+  } catch {}
+
+  if (-not $Listeners.Count) {
+    return "Port $Port is occupied; owner details are unavailable."
+  }
+
+  $Parts = @()
+  foreach ($Listener in $Listeners) {
+    $PidValue = $Listener.OwningProcess
+    $Proc = $null
+    try { $Proc = Get-CimInstance Win32_Process -Filter "ProcessId = $PidValue" -ErrorAction Stop } catch {}
+    $Name = if ($Proc) { [string]$Proc.Name } else { "PID $PidValue" }
+    $Command = if ($Proc) { [string]$Proc.CommandLine } else { '' }
+    $Parts += "$Name | PID $PidValue | $Command"
+  }
+  return "Port $Port preserved for another application: " + ($Parts -join ' || ')
+}
+
+function Resolve-VisualPort([int]$PreferredPort = 5000) {
+  for ($Port = $PreferredPort; $Port -le ($PreferredPort + 40); $Port++) {
+    if (Test-LocalPortAvailable $Port) {
+      if ($Port -eq $PreferredPort) {
+        Add-Report "Preferred visual port is free: $Port"
+      }
+      else {
+        Add-Report "Automatic fallback selected: $Port"
+      }
+      return $Port
+    }
+    Add-Report (Describe-PortOwner $Port)
+  }
+  throw "No free loopback port was found between $PreferredPort and $($PreferredPort + 40)."
 }
 
 New-Item -ItemType Directory -Force -Path $Reports | Out-Null
@@ -110,9 +140,10 @@ Add-Report 'ORBIT 360 - COMMON RUN CRM OP1 + INSURERS OP2 V1.218'
 Add-Report ("Local time: {0}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
 Add-Report ("Repo: {0}" -f $Repo)
 Add-Report ("Required branch: {0}" -f $ExpectedBranch)
-Add-Report 'Visual URL: http://localhost:5000'
+Add-Report 'Visual URL: automatic loopback port (5000 preferred; safe fallback enabled)'
 Add-Report 'Accounts: all directory viewers. Credentials: Direction/Admin/Operations.'
 Add-Report 'Demo/fictitious mode. No deploy, production, main, secrets, real data, commit or push.'
+Add-Report 'Other local applications and their ports are preserved; no process is stopped.'
 Add-Report '============================================================'
 
 $AllOk = Run-Step '1. Verify repository and branch' {
@@ -148,11 +179,7 @@ if ($AllOk) {
       finally {
         Remove-Item Env:ORBIT_OP12_REEXEC -ErrorAction SilentlyContinue
       }
-      Add-Report 'Updated runner completed. This bootstrap instance will stop now.'
-      try {
-        Get-Content $MasterReport -Raw -Encoding UTF8 | Set-Clipboard
-        notepad $MasterReport
-      } catch {}
+      Add-Report 'Updated runner completed. Bootstrap instance stopped without duplicating the visual run.'
       exit 0
     }
   }
@@ -175,26 +202,32 @@ if ($AllOk) {
 }
 
 if ($AllOk) {
-  $AllOk = Run-Step '5. Prepare localhost port 5000' { Clear-OrbitPort5000 }
+  $AllOk = Run-Step '5. Select an available visual port automatically' {
+    $script:VisualPort = Resolve-VisualPort 5000
+    Add-Report "Selected visual URL: http://127.0.0.1:$script:VisualPort"
+  }
 }
 
 if ($AllOk) {
   $AllOk = Run-Step '6. Run CRM OP1 visual matrix' {
     $Smoke = Join-Path $Repo 'tools\orbit360-smoke-visual-crm-op1.mjs'
     if (-not (Test-Path $Smoke)) { throw "CRM smoke missing: $Smoke" }
-    Invoke-CapturedNative 'node' @($Smoke,'--repo',$Repo,'--app',$App,'--port','5000') 'CRM OP1 visual matrix failed.' | Out-Null
+    Invoke-CapturedNative 'node' @($Smoke,'--repo',$Repo,'--app',$App,'--port',[string]$script:VisualPort) 'CRM OP1 visual matrix failed.' | Out-Null
   }
 }
 
 if ($AllOk) {
-  $AllOk = Run-Step '7. Release localhost port 5000' { Clear-OrbitPort5000 }
+  $AllOk = Run-Step '7. Confirm or reselect visual port for Insurers' {
+    $script:VisualPort = Resolve-VisualPort $script:VisualPort
+    Add-Report "Insurers visual URL: http://127.0.0.1:$script:VisualPort"
+  }
 }
 
 if ($AllOk) {
   $AllOk = Run-Step '8. Run Insurers OP2 visual matrix' {
     $Smoke = Join-Path $Repo 'tools\orbit360-smoke-visual-aseguradoras-op2.mjs'
     if (-not (Test-Path $Smoke)) { throw "Insurers smoke missing: $Smoke" }
-    Invoke-CapturedNative 'node' @($Smoke,'--repo',$Repo,'--app',$App,'--port','5000') 'Insurers OP2 visual matrix failed.' | Out-Null
+    Invoke-CapturedNative 'node' @($Smoke,'--repo',$Repo,'--app',$App,'--port',[string]$script:VisualPort) 'Insurers OP2 visual matrix failed.' | Out-Null
   }
 }
 
@@ -202,6 +235,7 @@ Run-Step '9. Final Git state and evidence paths' {
   Set-Location $Repo
   Add-Report ("Final branch: {0}" -f ((& git branch --show-current 2>$null).Trim()))
   Add-Report ("Final HEAD: {0}" -f ((& git rev-parse HEAD 2>$null).Trim()))
+  if ($script:VisualPort) { Add-Report "Last selected visual port: $script:VisualPort" }
   $Status = @(& git status --short 2>$null)
   if ($Status.Count) {
     Add-Report 'Preserved local paths and expected index/report changes:'
