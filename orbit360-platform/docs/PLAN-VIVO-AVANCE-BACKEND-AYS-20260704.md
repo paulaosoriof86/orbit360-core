@@ -45,8 +45,6 @@ Evidencia: results.jsonl + 10 capturas
 Regla: no repetir salvo regresión nueva o cambio de alcance
 ```
 
-Incluye Clientes 360, Calidad, Portal, ficha de póliza, scopes y visibilidad por rol dentro del alcance validado.
-
 Pendiente de fuente separada:
 
 ```txt
@@ -59,35 +57,43 @@ No se deben inferir pólizas desde clientes, movimientos financieros, bancos o c
 
 ```txt
 Estado funcional: IMPLEMENTADO
+CI estático: VERDE
+Contexto verificado: orbit360/aseguradoras-op2-v1220
+Commit verificado: 52dbe7a1f92423eb0bca67b92dfe689f94c9532a
 Estado visual reutilizable: 12/15
 Pendiente visual real: 3 vistas de Plataformas
-Escenarios pendientes:
-  Dirección desktop
-  Operativo tablet
-  Asesor móvil
-Regla: no repetir los 12 aprobados
 ```
+
+Escenarios pendientes:
+
+```txt
+Dirección desktop
+Operativo tablet
+Asesor móvil
+```
+
+Regla: no repetir CRM 10/10 ni los otros 12 escenarios de Aseguradoras.
 
 Avances acumulados:
 
 - directorio y ficha-página operativa;
 - contactos, plataformas, bancos, documentos, productos y trazabilidad;
-- cuentas completas visibles y copiables para usuarios autorizados del módulo;
-- accesos de plataformas visibles y copiables para Dirección/Admin/Operativo o permiso extra;
-- Asesor sin acceso a credenciales de plataforma;
+- cuentas completas visibles y copiables para usuarios autorizados;
+- accesos de plataformas para Dirección/Admin/Operativo o permiso extra;
+- Asesor sin credenciales de plataforma;
 - migración legacy no destructiva;
-- permisos en funciones y proveedor, no solo en botones;
-- hojas técnicas, internas y de apoyo en cuarentena antes del parser;
-- revisión preliminar sin captura de recursos protegidos;
+- permisos en UI, funciones y proveedor;
+- cuarentena antes del parser;
+- revisión preliminar sin captura;
 - versiones, errores de una letra y duplicados probables bloqueados;
-- actualización sin revisión únicamente para identidad canónica exacta;
+- actualización sin revisión solo con identidad canónica exacta;
 - actualización probable bloqueada con confirmación humana;
-- entidades aliadas separadas de aseguradoras directas;
-- mensajes operativos sin códigos internos ni copy técnico;
+- entidad aliada separada de aseguradora directa;
+- mensajes operativos sin códigos internos;
 - directorio importado no habilita tarifas;
 - responsive y Academia por rol v1.220.
 
-Gate final preparado:
+## 4. Gate final habilitado
 
 ```txt
 tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
@@ -95,17 +101,24 @@ tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
 
 El gate:
 
-1. sincroniza la rama obligatoria por avance rápido;
+1. verifica y sincroniza la rama por avance rápido;
 2. aplica integración local idempotente con backup;
 3. ejecuta contratos v1.220 y backend protegido;
 4. reutiliza CRM 10/10 y OP-2 12/15 mediante JSONL + capturas;
-5. selecciona un puerto libre;
-6. ejecuta únicamente las tres vistas de Plataformas;
-7. combina el resultado para cerrar 15/15.
+5. elige un puerto libre;
+6. ejecuta únicamente las tres vistas pendientes;
+7. combina el resultado para cerrar Aseguradoras 15/15;
+8. no hace deploy, commit, push ni cierre de otras aplicaciones.
 
-No debe solicitarse a Paula hasta que el circuito estático esté estabilizado.
+Estado:
 
-## 4. Carriles permanentes
+```txt
+CI requerido antes del gate: APROBADO
+Gate local: HABILITADO
+Ejecución local: PENDIENTE
+```
+
+## 5. Carriles permanentes
 
 ### Carril A — prototipo, UX y Academia
 
@@ -114,79 +127,90 @@ Estado:
 - patrones CRM documentados para Claude;
 - patrón Aseguradoras documentado;
 - patrón reusable de cuarentena documentado;
-- identidad exacta y bloqueo de actualización probable traducidos a Academia;
+- patrón v1.220 de importadores seguros consolidado;
+- identidad exacta y bloqueo de actualización probable en Academia;
 - mensajes operativos y anti-copy técnico incluidos;
-- Academia Aseguradoras v1.220 actualiza los mismos cursos;
+- Academia Aseguradoras actualiza los mismos cursos;
 - progreso y certificados preservados.
+
+Documentos principales:
+
+```txt
+docs/PATRON-CLAUDE-CRM-CALIDAD-PORTAL-POLIZA-V1216-20260712.md
+docs/PATRON-CLAUDE-ASEGURADORAS-OP2-V1217-20260713.md
+docs/PATRON-CLAUDE-CUARENTENA-HOJAS-IMPORTADORES-V1219-20260713.md
+docs/PATRON-CLAUDE-IMPORTADORES-CUARENTENA-IDENTIDAD-COPY-V1220-20260713.md
+docs/PATRON-REUTILIZABLE-CLAUDE-DESGLOSE-COTIZACION-ESTIMACION-INTERNA-20260712.md
+```
 
 Pendiente:
 
 - trasladar estos patrones a la siguiente candidata comercializable de Claude;
 - no trasladar datos A&S, valores protegidos, bindings LAB ni rutas privadas;
-- después de los dry-runs, agregar casos prácticos sanitizados de revisión de fuentes.
+- agregar casos prácticos sanitizados después de los dry-runs.
 
 ### Carril B — backend, seguridad y Orbit.store
 
 Estado:
 
-- `Orbit.store`, Auth, Firestore LAB y reglas permanecen protegidos;
-- política de cuentas y accesos aplicada a UI y llamadas directas del proveedor;
-- migración de recursos en orden copiar → verificar → retirar;
+- `Orbit.store`, Auth, Firestore LAB y reglas protegidos;
+- política de cuentas y accesos aplicada a UI y proveedor;
+- migración en orden copiar → verificar → retirar;
 - cuarentena antes del parser, captura y operaciones;
-- revisión de alias mantiene `captureSecure=false`;
-- importación preparada conserva captura protegida por defecto;
-- coincidencia probable nunca se aplica como actualización silenciosa;
-- copy visible y errores internos se sanitizan;
-- evidencia reutilizable usa JSONL + capturas;
-- integración de `index.html` tiene backup, verificación y rollback;
-- validador canónico v1.220 con salida compacta;
-- CI dividido por contratos para diagnóstico exacto.
+- revisión de alias con `captureSecure=false`;
+- importación preparada con captura protegida por defecto;
+- coincidencia probable nunca actualiza silenciosamente;
+- copy visible y errores internos sanitizados;
+- evidencia reutilizable mediante JSONL + capturas;
+- integración de `index.html` con backup y rollback;
+- validador canónico v1.220;
+- CI dividido por contratos;
+- estado de commit publicado y confirmado `success`.
 
 Pendiente:
 
-- obtener ejecución CI verde observable para el HEAD vigente;
-- ejecutar una sola vez el gate focalizado local de Plataformas;
-- conectar proveedor seguro real antes de aplicar recursos protegidos de directorios.
+- ejecutar el gate visual focalizado una sola vez;
+- conectar proveedor seguro real antes de aplicar recursos protegidos.
 
 ### Carril C — fuentes reales y migración operativa
 
-Preflight sanitizado recibido:
+Preflight sanitizado:
 
 ```txt
-Directorio Guatemala:
+Guatemala:
   18 hojas totales
   14 candidatas operativas
   4 hojas excluidas
   cobertura alta de contactos, plataformas y pagos
 
-Directorio Colombia:
+Colombia:
   17 hojas totales
   16 candidatas operativas
   1 hoja excluida
-  2 parejas probables por nombre
+  2 parejas probables
   1 candidata de red/aliado
   cobertura de pagos incompleta
 ```
 
 No se escribieron datos ni se trasladaron valores de las fuentes al repositorio.
 
-Una fuente contiene hojas ajenas al directorio que requieren revisión de seguridad separada. Esas hojas permanecen excluidas; ningún valor debe entrar al dry-run ni a la documentación. La revisión de vigencia o rotación corresponde a un carril de seguridad separado, no al importador de Aseguradoras.
+Una fuente contiene hojas ajenas al directorio que requieren revisión de seguridad separada. Permanecen excluidas y ningún valor entra al dry-run o documentación.
 
 Secuencia obligatoria:
 
 1. cerrar las tres vistas de Plataformas;
-2. ejecutar dry-run Guatemala sin escritura;
+2. dry-run Guatemala sin escritura;
 3. resolver identidad, aliados y filas bloqueadas;
-4. ejecutar dry-run Colombia sin escritura;
+4. dry-run Colombia sin escritura;
 5. resolver las dos parejas probables y la entidad aliada;
-6. aplicar únicamente filas confirmadas y recursos mediante proveedor seguro;
+6. aplicar solo filas confirmadas mediante proveedor seguro;
 7. solicitar/procesar la fuente separada Pólizas.
 
-## 5. Orden del plan operativo
+## 6. Orden del plan operativo
 
 ```txt
 1. CRM — cerrado
-2. Aseguradoras — pendiente gate focalizado + dry-runs GT/CO
+2. Aseguradoras — gate focalizado habilitado; dry-runs GT/CO después
 3. Cotizador + Comparativo configurable
 4. Ops + Leads
 5. Finanzas, conciliaciones, comisiones, CxC/CxP
@@ -197,51 +221,28 @@ Secuencia obligatoria:
 
 No avanzar a Finanzas ni otro módulo para sustituir el cierre pendiente de Aseguradoras.
 
-## 6. Intermedios agregados vigentes
-
-### Intermedio A — Evidencia estructurada
+## 7. Intermedios vigentes
 
 ```txt
-Problema: falsos negativos por texto, tildes o codificación.
-Solución: results.jsonl + capturas + IDs exactos + booleano ok.
-Estado: implementado.
-```
+Evidencia estructurada:
+  results.jsonl + capturas + IDs exactos + booleano ok
 
-### Intermedio B — Cuarentena previa
+Cuarentena previa:
+  nombre + señales de contenido antes del parser
 
-```txt
-Problema: excluir solo por nombre no protege frente a hojas renombradas.
-Solución: nombre + señales de contenido antes del parser.
-Estado: implementado y probado con datos ficticios.
-```
+Actualización exacta:
+  identidad canónica exacta o bloqueo humano
 
-### Intermedio C — Actualización exacta
+Mensajes operativos:
+  mapa de errores y sanitización de cambios tardíos
 
-```txt
-Problema: una coincidencia por inclusión podía proponerse como actualización.
-Solución: identidad canónica exacta o bloqueo para revisión humana.
-Estado: implementado y probado.
-```
-
-### Intermedio D — Mensajes operativos
-
-```txt
-Problema: códigos internos o copy técnico podían aparecer temporalmente.
-Solución: mapa de errores, sanitización de texto y observación de cambios tardíos.
-Estado: implementado y probado.
-```
-
-### Intermedio E — CI por contratos
-
-```txt
-Problema: los logs extensos ocultaban el control fallido.
-Solución: validador compacto y grupos access/import/copy/quarantine/alias/ux/migration/academy/technical.
-Estado: implementado; ejecución verde pendiente.
+CI verificable:
+  grupos por contrato + estado del commit
 ```
 
 Estos intermedios apoyan el plan; no abren módulos nuevos ni cambian el orden operativo.
 
-## 7. Metodología 0% manual
+## 8. Metodología 0% manual
 
 ChatGPT/Codex:
 
@@ -249,14 +250,15 @@ ChatGPT/Codex:
 - modifica;
 - empalma;
 - documenta;
-- ejecuta validaciones accesibles;
+- valida;
 - revisa CI;
-- corrige fallos instrumentales;
+- corrige fallos;
 - prepara un único gate local final.
 
 Paula:
 
 - ejecuta una sola acción local cuando Chrome/Windows o una fuente local sean indispensables;
+- comparte el reporte generado;
 - revisa visualmente el resultado final.
 
 No corresponde pedir a Paula:
@@ -267,31 +269,6 @@ No corresponde pedir a Paula:
 - editar archivos o comandos;
 - diagnosticar el pipeline;
 - repetir escenarios aprobados.
-
-## 8. Documentación reusable para Claude
-
-```txt
-docs/PATRON-CLAUDE-CRM-CALIDAD-PORTAL-POLIZA-V1216-20260712.md
-docs/PATRON-CLAUDE-ASEGURADORAS-OP2-V1217-20260713.md
-docs/PATRON-CLAUDE-CUARENTENA-HOJAS-IMPORTADORES-V1219-20260713.md
-docs/PATRON-REUTILIZABLE-CLAUDE-DESGLOSE-COTIZACION-ESTIMACION-INTERNA-20260712.md
-```
-
-Reglas que debe conservar el prototipo comercializable:
-
-- SaaS multi-tenant, sin fork A&S;
-- módulos solo mediante `Orbit.store`;
-- estados honestos y no técnicos;
-- importadores por fuentes separadas;
-- cuarentena y revisión antes del parser operativo;
-- revisión preliminar sin captura;
-- dry-run antes de escritura;
-- identidad canónica exacta antes de actualizar;
-- duplicados probables sin fusión automática;
-- cuentas y accesos con visibilidad operativa diferente;
-- migración no destructiva;
-- tarifas default-deny;
-- Academia actualizada por rol.
 
 ## 9. Reglas de negocio vigentes
 
@@ -308,7 +285,7 @@ Entidad aliada ≠ aseguradora directa
 Producción/metas/comisiones → prima neta recaudada
 ```
 
-## 10. Archivos centrales del bloque v1.220
+## 10. Archivos centrales v1.220
 
 ```txt
 core/aseguradoras-op2-sheet-quarantine.js
@@ -319,23 +296,24 @@ tools/orbit360-validar-aseguradoras-op2-v1220.mjs
 tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs
 tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs
 tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs
+tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs
 tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
 .github/workflows/orbit360-aseguradoras-op2-smoke.yml
 ```
 
-## 11. Próximo bloque recomendado
+## 11. Próximo bloque
 
 ```txt
-1. Observar CI agrupado del HEAD actual.
-2. Corregir solo el contrato que falle.
-3. No pedir ejecución local hasta CI verde.
-4. Ejecutar una sola vez el gate de tres Plataformas.
-5. Cerrar Aseguradoras 15/15.
-6. Dry-run Guatemala y después Colombia, separados y sin escritura.
+1. Ejecutar una sola vez el gate focalizado de tres Plataformas.
+2. Auditar el reporte y las tres capturas.
+3. Cerrar Aseguradoras 15/15 si aprueba.
+4. Ejecutar dry-run Guatemala sin escritura.
+5. Resolver bloqueos.
+6. Ejecutar dry-run Colombia sin escritura.
 7. Continuar Cotizador + Comparativo.
 ```
 
-## 12. Formato obligatorio de cierre de bloque
+## 12. Formato obligatorio de cierre
 
 ```txt
 Avance del bloque
