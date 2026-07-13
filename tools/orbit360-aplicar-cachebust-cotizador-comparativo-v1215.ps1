@@ -24,12 +24,18 @@ $replacements = @(
   @{ Before = 'core/quote-comparison-contracts-v1203-refinements.js?v=20260711'; After = 'core/quote-comparison-contracts-v1203-refinements.js?v=20260712-v1215' },
   @{ Before = 'modules/calidad.js?v1360'; After = 'modules/calidad.js?v=20260712-op1' }
 )
+$optionalReplacements = @(
+  @{ Before = 'styles/aseguradoras-op2-v1217.css?v=20260713-op2'; After = 'styles/aseguradoras-op2-v1217.css?v=20260713-op2-v1218' },
+  @{ Before = 'data/academia-v1217-aseguradoras-op2.js?v=20260713-op2'; After = 'data/academia-v1217-aseguradoras-op2.js?v=20260713-op2-v1218' },
+  @{ Before = 'modules/aseguradoras-op2-closure-bridge.js?v=20260713-op2'; After = 'modules/aseguradoras-op2-closure-bridge.js?v=20260713-op2-v1218' }
+)
 
 $insertions = @(
   @{ Anchor = '<link rel="stylesheet" href="styles/v1197-empalme.css?v=20260711">'; Value = '<link rel="stylesheet" href="styles/crm-op1-v1216.css?v=20260712-op1">' },
   @{ Anchor = '<link rel="stylesheet" href="styles/v1197-empalme.css?v=20260711">'; Value = '<link rel="stylesheet" href="styles/aseguradoras-op2-v1217.css?v=20260713-op2-v1218">' },
 
   # Mismo ancla: el último valor de esta subsecuencia queda más cerca del ancla.
+  @{ Anchor = '<script src="core/access-scope.js?v=20260711"></script>'; Value = '<script src="core/aseguradoras-op2-secure-provider-policy-guard.js?v=20260713-op2-v1218"></script>' },
   @{ Anchor = '<script src="core/access-scope.js?v=20260711"></script>'; Value = '<script src="core/aseguradoras-op2-operational-access-policy.js?v=20260713-op2-v1218"></script>' },
   @{ Anchor = '<script src="core/access-scope.js?v=20260711"></script>'; Value = '<script src="core/aseguradoras-op2-role-visibility.js?v=20260713-op2"></script>' },
   @{ Anchor = '<script src="core/access-scope.js?v=20260711"></script>'; Value = '<script src="core/crm-op1-role-visibility.js?v=20260712-op1"></script>' },
@@ -56,6 +62,13 @@ foreach ($item in $replacements) {
   if ($oldCount -ne 1) { throw "Precondición bloqueada para '$($item.Before)': se esperaba 1 referencia y se encontraron $oldCount." }
   $needsChange = $true
 }
+foreach ($item in $optionalReplacements) {
+  $oldCount = ([regex]::Matches($text, [regex]::Escape($item.Before))).Count
+  $newCount = ([regex]::Matches($text, [regex]::Escape($item.After))).Count
+  if ($oldCount -gt 1 -or $newCount -gt 1) { throw "Referencia OP-2 duplicada para '$($item.Before)' / '$($item.After)'." }
+  if ($oldCount -eq 1 -and $newCount -eq 1) { throw "Conviven referencias vieja y nueva: '$($item.Before)' / '$($item.After)'." }
+  if ($oldCount -eq 1) { $needsChange = $true }
+}
 foreach ($item in $insertions) {
   $valueCount = ([regex]::Matches($text, [regex]::Escape($item.Value))).Count
   if ($valueCount -eq 1) { continue }
@@ -76,6 +89,9 @@ Copy-Item $index (Join-Path $backupDir 'index.html') -Force
 
 $updated = $text
 foreach ($item in $replacements) { $updated = $updated.Replace($item.Before, $item.After) }
+foreach ($item in $optionalReplacements) {
+  if ($updated.Contains($item.Before) -and -not $updated.Contains($item.After)) { $updated = $updated.Replace($item.Before, $item.After) }
+}
 foreach ($item in $insertions) {
   if (-not $updated.Contains($item.Value)) { $updated = $updated.Replace($item.Anchor, $item.Anchor + $item.Value) }
 }
@@ -88,6 +104,12 @@ foreach ($item in $replacements) {
     throw "Falló la verificación de '$($item.After)'; index.html fue restaurado."
   }
 }
+foreach ($item in $optionalReplacements) {
+  if (([regex]::Matches($verify, [regex]::Escape($item.After))).Count -ne 1 -or $verify.Contains($item.Before)) {
+    Copy-Item (Join-Path $backupDir 'index.html') $index -Force
+    throw "Falló el upgrade OP-2 de '$($item.Before)'; index.html fue restaurado."
+  }
+}
 foreach ($item in $insertions) {
   if (([regex]::Matches($verify, [regex]::Escape($item.Value))).Count -ne 1) {
     Copy-Item (Join-Path $backupDir 'index.html') $index -Force
@@ -97,12 +119,18 @@ foreach ($item in $insertions) {
 
 $sourcePos = $verify.IndexOf('core/aseguradoras-op2-source-guard.js?v=20260713-op2')
 $uiPos = $verify.IndexOf('core/aseguradoras-op2-import-ui-guard.js?v=20260713-op2')
+$accessPos = $verify.IndexOf('core/aseguradoras-op2-operational-access-policy.js?v=20260713-op2-v1218')
+$providerGuardPos = $verify.IndexOf('core/aseguradoras-op2-secure-provider-policy-guard.js?v=20260713-op2-v1218')
 $closurePos = $verify.IndexOf('modules/aseguradoras-op2-closure-bridge.js?v=20260713-op2-v1218')
 $permissionPos = $verify.IndexOf('modules/aseguradoras-op2-permission-guard.js?v=20260713-op2')
 $operationalPos = $verify.IndexOf('modules/aseguradoras-op2-operational-resources.js?v=20260713-op2-v1218')
 if ($sourcePos -lt 0 -or $uiPos -lt 0 -or $sourcePos -gt $uiPos) {
   Copy-Item (Join-Path $backupDir 'index.html') $index -Force
   throw 'Orden inválido: source-guard debe cargar antes de import-ui-guard. Index restaurado.'
+}
+if ($accessPos -lt 0 -or $providerGuardPos -lt 0 -or $accessPos -gt $providerGuardPos) {
+  Copy-Item (Join-Path $backupDir 'index.html') $index -Force
+  throw 'Orden inválido: operational-access-policy debe cargar antes de secure-provider-policy-guard. Index restaurado.'
 }
 if ($closurePos -lt 0 -or $permissionPos -lt 0 -or $operationalPos -lt 0 -or -not ($closurePos -lt $permissionPos -and $permissionPos -lt $operationalPos)) {
   Copy-Item (Join-Path $backupDir 'index.html') $index -Force
