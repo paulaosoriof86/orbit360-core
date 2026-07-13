@@ -12,7 +12,7 @@ function Count-Exact([string]$Text, [string]$Value) {
 }
 
 Write-Host '============================================================'
-Write-Host 'ORBIT 360 - SAFE INTEGRATION CRM OP1 + INSURERS OP2 V1.218'
+Write-Host 'ORBIT 360 - SAFE INTEGRATION CRM OP1 + INSURERS OP2 V1.219'
 Write-Host ('Local time: ' + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
 Write-Host ('Required branch: ' + $RequiredBranch)
 Write-Host 'No deploy | No merge | No main | No real data'
@@ -72,6 +72,7 @@ $Groups = @(
   @{
     Anchor = '<script src="core/insurer-directory-import-v1202-security.js?v=20260711"></script>'
     Values = @(
+      '<script src="core/aseguradoras-op2-sheet-quarantine.js?v=20260713-op2-v1219"></script>',
       '<script src="core/aseguradoras-op2-source-guard.js?v=20260713-op2"></script>',
       '<script src="core/aseguradoras-op2-import-ui-guard.js?v=20260713-op2"></script>'
     )
@@ -146,7 +147,7 @@ if ($Updated -eq $Original) {
   exit 0
 }
 
-$BackupDir = Join-Path $Repo ('_backups\integration-op1-op2-v1218-' + (Get-Date -Format 'yyyyMMdd_HHmmss'))
+$BackupDir = Join-Path $Repo ('_backups\integration-op1-op2-v1219-' + (Get-Date -Format 'yyyyMMdd_HHmmss'))
 New-Item -ItemType Directory -Path $BackupDir -Force | Out-Null
 Copy-Item $IndexPath (Join-Path $BackupDir 'index.html') -Force
 
@@ -171,6 +172,7 @@ try {
     }
   }
 
+  $QuarantinePos = $Verify.IndexOf('core/aseguradoras-op2-sheet-quarantine.js?v=20260713-op2-v1219')
   $SourcePos = $Verify.IndexOf('core/aseguradoras-op2-source-guard.js?v=20260713-op2')
   $UiPos = $Verify.IndexOf('core/aseguradoras-op2-import-ui-guard.js?v=20260713-op2')
   $AccessPos = $Verify.IndexOf('core/aseguradoras-op2-operational-access-policy.js?v=20260713-op2-v1218')
@@ -179,8 +181,8 @@ try {
   $PermissionPos = $Verify.IndexOf('modules/aseguradoras-op2-permission-guard.js?v=20260713-op2')
   $OperationalPos = $Verify.IndexOf('modules/aseguradoras-op2-operational-resources.js?v=20260713-op2-v1218')
 
-  if (-not ($SourcePos -ge 0 -and $UiPos -gt $SourcePos)) {
-    throw 'Invalid order: source guard must load before import UI guard.'
+  if (-not ($QuarantinePos -ge 0 -and $SourcePos -gt $QuarantinePos -and $UiPos -gt $SourcePos)) {
+    throw 'Invalid order: sheet quarantine -> source guard -> import UI guard.'
   }
   if (-not ($AccessPos -ge 0 -and $ProviderPos -gt $AccessPos)) {
     throw 'Invalid order: access policy must load before provider policy guard.'
@@ -195,5 +197,5 @@ catch {
 }
 
 Write-Host ('Backup: ' + $BackupDir)
-Write-Host 'OK: CRM OP1 and Insurers OP2 v1.218 integrated exactly once.'
+Write-Host 'OK: CRM OP1 and Insurers OP2 v1.219 integrated exactly once.'
 Write-Host 'No commit. No push. No deploy.'
