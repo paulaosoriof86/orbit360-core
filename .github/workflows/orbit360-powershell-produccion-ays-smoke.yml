@@ -1,0 +1,83 @@
+name: Orbit360 PowerShell produccion A&S smoke
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - tools/orbit360-diagnosticar-prerequisitos-produccion-ays.ps1
+      - tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
+      - .github/workflows/orbit360-powershell-produccion-ays-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  powershell-parse-and-guard:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse PowerShell scripts
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $files = @(
+            'tools/orbit360-diagnosticar-prerequisitos-produccion-ays.ps1',
+            'tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1'
+          )
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $file),
+              [ref]$tokens,
+              [ref]$errors
+            )
+            if ($errors.Count -gt 0) {
+              $errors | ForEach-Object { Write-Error "$file :: $($_.Message) :: $($_.Extent.Text)" }
+              throw "PowerShell parse failed: $file"
+            }
+            Write-Host "[OK] parse $file"
+          }
+
+      - name: Guard previous incident patterns
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $diag = Get-Content 'tools/orbit360-diagnosticar-prerequisitos-produccion-ays.ps1' -Raw
+          $gate = Get-Content 'tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1' -Raw
+          $all = $diag + "`n" + $gate
+
+          $required = @(
+            'Start-Process',
+            'RedirectStandardOutput',
+            'RedirectStandardError',
+            'Set-Clipboard',
+            'projects:list',
+            'Find-OrbitRepo'
+          )
+          foreach ($pattern in $required) {
+            if ($all -notmatch [regex]::Escape($pattern)) { throw "Missing required safety pattern: $pattern" }
+            Write-Host "[OK] required $pattern"
+          }
+
+          $forbidden = @(
+            'git reset',
+            'git clean',
+            'git checkout --',
+            'firebase deploy',
+            'firestore:delete',
+            'auth:import',
+            '2>&1 | ForEach-Object'
+          )
+          foreach ($pattern in $forbidden) {
+            if ($all -match [regex]::Escape($pattern)) { throw "Forbidden pattern found: $pattern" }
+            Write-Host "[OK] absent $pattern"
+          }
+
+          if ($diag -notmatch "exit 0") { throw 'Diagnostic must finish without a red failure state.' }
+          if ($diag -notmatch 'No deploy\. No writes\. No imports') { throw 'Diagnostic read-only banner is missing.' }
+          if ($gate -notmatch 'first real failure') { throw 'Focused gate must document fail-fast behavior.' }
+          Write-Host '[OK] safety contract complete'
