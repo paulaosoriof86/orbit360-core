@@ -29,6 +29,7 @@ $insertions = @(
   @{ Anchor = '<link rel="stylesheet" href="styles/v1197-empalme.css?v=20260711">'; Value = '<link rel="stylesheet" href="styles/aseguradoras-op2-v1217.css?v=20260713-op2">' },
   @{ Anchor = '<script src="core/access-scope.js?v=20260711"></script>'; Value = '<script src="core/crm-op1-role-visibility.js?v=20260712-op1"></script>' },
   @{ Anchor = '<script src="core/access-scope.js?v=20260711"></script>'; Value = '<script src="core/aseguradoras-op2-role-visibility.js?v=20260713-op2"></script>' },
+  @{ Anchor = '<script src="core/insurer-directory-import-v1202-security.js?v=20260711"></script>'; Value = '<script src="core/aseguradoras-op2-import-ui-guard.js?v=20260713-op2"></script>' },
   @{ Anchor = '<script src="core/insurer-directory-import-v1202-security.js?v=20260711"></script>'; Value = '<script src="core/aseguradoras-op2-source-guard.js?v=20260713-op2"></script>' },
   @{ Anchor = '<script src="data/academia-v1203-cotizador-comparativo.js?v=20260711"></script>'; Value = '<script src="data/academia-v1216-crm-portal-poliza.js?v=20260712-op1"></script>' },
   @{ Anchor = '<script src="data/academia-v1202-directorios-aseguradoras.js?v=20260711"></script>'; Value = '<script src="data/academia-v1217-aseguradoras-op2.js?v=20260713-op2"></script>' },
@@ -83,6 +84,13 @@ foreach ($item in $insertions) {
     Copy-Item (Join-Path $backupDir 'index.html') $index -Force
     throw "Falló la inserción de '$($item.Value)'; index.html fue restaurado."
   }
+}
+
+$sourcePos = $verify.IndexOf('core/aseguradoras-op2-source-guard.js?v=20260713-op2')
+$uiPos = $verify.IndexOf('core/aseguradoras-op2-import-ui-guard.js?v=20260713-op2')
+if ($sourcePos -lt 0 -or $uiPos -lt 0 -or $sourcePos -gt $uiPos) {
+  Copy-Item (Join-Path $backupDir 'index.html') $index -Force
+  throw 'Orden inválido: el guard de fuente debe cargar antes del guard visual. Index restaurado.'
 }
 
 Write-Host ('Backup: ' + $backupDir)
