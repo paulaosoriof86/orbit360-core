@@ -55,6 +55,24 @@ aplicar datos
 
 El patrón no escribe en almacenamiento y no fusiona entidades.
 
+### Revisión y aplicación son fases distintas
+
+```txt
+Revisión preliminar:
+  captureSecure = false
+  detecta hojas, alias, versiones y duplicados
+  no crea sesión de cuentas o accesos
+  no aplica operaciones
+
+Importación preparada:
+  captureSecure = true por defecto
+  solo sobre hojas permitidas
+  separa valores protegidos antes de Orbit.store
+  continúa bloqueada hasta validación y confirmación
+```
+
+La UI no debe ejecutar dos lecturas que capturen dos veces los mismos recursos. La revisión adicional siempre debe mantener explícitamente `captureSecure=false` hasta el parser base.
+
 ## Reglas multi-tenant
 
 - Configurable por tipo de fuente.
@@ -62,6 +80,7 @@ El patrón no escribe en almacenamiento y no fusiona entidades.
 - Combinar detección por nombre y señales de contenido.
 - Una hoja operativa con campos de acceso no debe confundirse con una hoja técnica.
 - Ante duda, excluir y solicitar revisión; nunca aplicar automáticamente.
+- No mostrar términos técnicos, secretos ni contenido excluido en la UI.
 
 ## Academia
 
@@ -71,7 +90,8 @@ Actualizar la ruta del importador para enseñar:
 2. diferencia entre hoja operativa y hoja técnica;
 3. qué información aparece en el dry-run;
 4. por qué la exclusión ocurre antes del parser;
-5. cómo corregir la fuente y repetir el dry-run.
+5. diferencia entre revisión sin captura e importación preparada;
+6. cómo corregir la fuente y repetir el dry-run.
 
 ## Pruebas mínimas
 
@@ -81,6 +101,9 @@ Actualizar la ruta del importador para enseñar:
 4. Hoja operativa con contactos y plataforma preservada.
 5. Resultado sin valores de la hoja excluida.
 6. Parser base recibe únicamente hojas permitidas.
+7. Revisión preliminar llega al parser con `captureSecure=false`.
+8. Importación normal conserva `captureSecure=true` por defecto.
+9. El archivo revisado conserva solo candidatas permitidas.
 
 ## Impacto Claude / prototipo reutilizable
 
@@ -89,5 +112,6 @@ Patrón reusable detectado: Sí
 Debe compartirse con Claude: Sí
 Módulos: Importadores, Aseguradoras, Configuración, Academia
 Texto UI: operativo, sin términos de infraestructura
-Riesgo si se ignora: mezclar fuentes y presentar operaciones inválidas
+Academia impactada: Sí, lección y evaluación aplicada
+Riesgo si se ignora: mezclar fuentes, capturar recursos durante una revisión o presentar operaciones inválidas
 ```
