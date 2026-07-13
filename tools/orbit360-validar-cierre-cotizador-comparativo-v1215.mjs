@@ -3,8 +3,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
+import { appendProtectedChecks } from './orbit360-protected-baseline.mjs';
 
 const root = path.resolve(process.argv[2] || path.join(process.cwd(), 'orbit360-platform'));
 const failures = [];
@@ -14,7 +14,6 @@ const passes = [];
 function rel(p) { return path.join(root, p); }
 function exists(p) { return fs.existsSync(rel(p)); }
 function read(p) { return exists(p) ? fs.readFileSync(rel(p), 'utf8') : ''; }
-function sha256(p) { return crypto.createHash('sha256').update(fs.readFileSync(rel(p))).digest('hex'); }
 function check(id, condition, message, file) {
   (condition ? passes : failures).push({ id, message, file: file || '' });
 }
@@ -66,14 +65,7 @@ selected.forEach(file => {
   check('NO_DIRECT_STORAGE_' + file.replace(/\W+/g, '_'), !/\b(?:localStorage|sessionStorage)\b/.test(src), 'Sin almacenamiento operativo directo', file);
 });
 
-const protectedExpected = {
-  'data/store.js': '1ec42cf35458c607333a494c4fd7fa74e04101869185423d8cd71ae8098fd838',
-  'core/auth.js': '756b7ec6ad4788b3d77fe09b5ac7f706c9deb62cd44459bd06a2ac5284c5d230',
-  'core/importa.js': 'fbdc378d709aeb6816418d8c4d5dd0627675d6919caed887f45494fbf319e0df'
-};
-Object.entries(protectedExpected).forEach(([file, expected]) => {
-  check('PROTECTED_' + file.replace(/\W+/g, '_'), exists(file) && sha256(file) === expected, 'Archivo protegido byte-identical', file);
-});
+appendProtectedChecks(passes, failures, root);
 
 selected.filter(file => /\.(?:js|mjs)$/.test(file)).forEach(file => {
   const run = spawnSync(process.execPath, ['--check', rel(file)], { encoding: 'utf8' });
