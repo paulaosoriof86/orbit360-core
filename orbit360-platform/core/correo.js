@@ -36,10 +36,10 @@ Orbit.correo = (function () {
       remitenteNombre: 'Equipo Orbit', direccion: 'saliente',
       fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), hora: new Date().toTimeString().slice(0, 5),
       leido: true, destacado: false, cuerpo: cuerpo || '', clienteId: clienteId || '',
-      adjuntos: adjuntos || [], vinculo: vinculo || null, carpeta: 'enviados'
+      adjuntos: adjuntos || [], vinculo: vinculo || null, carpeta: 'preparados'
     };
     S().insert('correos', c);
-    if (clienteId) S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: '', tipo: 'sistema', icon: '✉', fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), titulo: 'Correo enviado: ' + c.asunto, detalle: 'Para ' + c.para });
+    if (clienteId) S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: '', tipo: 'sistema', icon: '✉', fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), titulo: 'Correo preparado: ' + c.asunto, detalle: 'Para ' + c.para + ' · pendiente de confirmación de entrega' });
     return c;
   }
 

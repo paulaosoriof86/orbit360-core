@@ -155,11 +155,15 @@ Orbit.ia = (function () {
     const t = txt.replace(/\s+/g, ' ');
     const sumaM = t.match(/suma\s*asegurada\s*\(?Q?\)?\s*([\d.,]+)/i);
     const suma = sumaM ? +sumaM[1].replace(/,(?=\d{3}\b)/g, '').replace(/[^\d.]/g, '') : 0;
-    // catálogo de aseguradoras conocidas (store + listado GT/CO frecuente)
+    // Directorio real del tenant (+ alias configurables por aseguradora) — nunca un catálogo nominal fijo de marcas reales.
     let cat = [];
-    try { cat = Orbit.store.all('aseguradoras').map(a => a.nombre).filter(Boolean); } catch (e) {}
-    const extra = ['La Ceiba', 'Seguros Universales', 'Aseguradora Guatemalteca', 'El Roble', 'Seguros G&T', 'G&T', 'Mapfre', 'Aseguradora Rural', 'Assa', 'Seguros Continental', 'BAC Seguros', 'Sura', 'Bolívar', 'Mundial', 'Equidad', 'Previsora', 'Solidaria', 'Aseguradora General', 'Seguros Privanza', 'Pan-American', 'MetLife'];
-    extra.forEach(n => { if (!cat.some(c => c.toLowerCase() === n.toLowerCase())) cat.push(n); });
+    try {
+      cat = Orbit.store.all('aseguradoras').reduce((acc, a) => {
+        if (a.nombre) acc.push(a.nombre);
+        (a.aliases || []).forEach(al => { if (al) acc.push(al); });
+        return acc;
+      }, []);
+    } catch (e) {}
     const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const props = []; const seen = {};
     // localizar cada monto seguido de "Prima anual/anual/total"
@@ -168,14 +172,20 @@ Orbit.ia = (function () {
     while ((m = re.exec(t)) !== null) {
       const total = +m[1].replace(/,(?=\d{3}\b)/g, '').replace(/[^\d.]/g, '') || 0;
       if (total < 500) continue;
-      // ventana de 90 chars antes del monto → buscar aseguradora del catálogo
+      // ventana de 90 chars antes del monto → buscar aseguradora del directorio configurado
       const ventana = t.slice(Math.max(0, m.index - 90), m.index);
       const vn = norm(ventana);
       let nombre = null;
       cat.forEach(c => { if (vn.indexOf(norm(c)) >= 0) { if (!nombre || c.length > nombre.length) nombre = c; } });
-      if (!nombre) { const cap = ventana.match(/([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ&.\- ]{3,30})\s*$/); nombre = cap ? cap[1].trim().replace(/\s+/g, ' ') : 'Aseguradora'; }
+      let requiere_validacion = false;
+      if (!nombre) {
+        // no coincide con el directorio configurado — no se inventa la aseguradora, se marca para validación humana
+        const cap = ventana.match(/([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ&.\- ]{3,30})\s*$/);
+        nombre = cap ? cap[1].trim().replace(/\s+/g, ' ') : 'Aseguradora sin identificar';
+        requiere_validacion = true;
+      }
       const key = norm(nombre); if (seen[key]) continue; seen[key] = 1;
-      props.push({ nombre, neta: Math.round(total / 1.12), iva: Math.round(total - total / 1.12), total: Math.round(total), sumaAsegurada: suma, deducible: '', cob: {} });
+      props.push({ nombre, neta: Math.round(total / 1.12), iva: Math.round(total - total / 1.12), total: Math.round(total), sumaAsegurada: suma, deducible: '', cob: {}, requiere_validacion });
     }
     return props;
   }

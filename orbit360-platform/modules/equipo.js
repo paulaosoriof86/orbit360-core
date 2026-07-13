@@ -134,7 +134,7 @@ Orbit.modules.equipo = (function () {
     const team = S().all('asesores').filter(a => /Asesor|Direcc/.test(a.rol));
     const totN = team.reduce((s, a) => s + metaDe(a.id, mesMeta).nueva, 0);
     const totR = team.reduce((s, a) => s + metaDe(a.id, mesMeta).renovada, 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas por asesor, <b>mes</b> y <b>tipo</b> (nueva vs renovada), sobre prima neta. Es la <b>fuente única</b> que leen Insights y Finanzas.</div>
+    return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas por asesor, <b>mes</b> y <b>tipo</b> (nueva vs renovada), sobre prima neta.</div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
       <select id="meta-mes" class="o-sel">${MESES.map((m, i) => `<option value="${i}" ${i === mesMeta ? 'selected' : ''}>${m} 2026</option>`).join('')}</select>
       <span class="muted" style="font-size:12.5px">Meta total del mes: <b style="color:var(--ok)">${U.moneyShort(totN, Orbit.q.monedaPais())}</b> nuevas · <b style="color:var(--info)">${U.moneyShort(totR, Orbit.q.monedaPais())}</b> renovadas</span>
@@ -176,6 +176,11 @@ Orbit.modules.equipo = (function () {
           <div class="ce-l" style="margin-bottom:6px">Roles del usuario <span class="muted">(puede tener varios; el primero es el principal)</span></div>
           <div style="display:flex;flex-wrap:wrap;gap:8px">${roles.map(r => `<label class="chiprole"><input type="checkbox" class="eu-role" value="${r}" ${rolesSel.indexOf(r) >= 0 ? 'checked' : ''}> ${r}</label>`).join('')}</div>
         </div>
+        <label class="ce-l">Alcance de cartera que ve este usuario<select id="eu-scope" class="o-sel">
+          <option value="propia" ${(a.dataScope || 'propia') === 'propia' ? 'selected' : ''}>Solo su propia cartera</option>
+          <option value="equipo" ${a.dataScope === 'equipo' ? 'selected' : ''}>Su equipo (si tiene reportes directos)</option>
+          <option value="todo" ${a.dataScope === 'todo' ? 'selected' : ''}>Toda la cartera (Dirección/Admin)</option>
+        </select><div class="muted" style="font-size:11.5px;margin-top:4px">Declara qué cartera debería ver este usuario. La aplicación aún corre en modo de un solo inicio de sesión de demostración (con selector de rol arriba) — aplicar este alcance a un login real por usuario queda para cuando haya autenticación individual.</div></label>
         <details>
           <summary style="cursor:pointer;font-weight:700;font-size:13px;font-family:var(--f-display)">⚙ Módulos visibles para este usuario <span class="muted" style="font-weight:400">(opcional — por defecto los del rol)</span></summary>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px 12px;margin-top:10px">${TODOS_MOD.map(m => `<label class="ce-l ck" style="font-size:12.5px"><input type="checkbox" class="eu-mod" value="${m}" ${modActual ? (modActual.indexOf(m) >= 0 ? 'checked' : '') : 'checked'}> ${U.esc((modLabel[m] || m))}</label>`).join('')}</div>
@@ -190,7 +195,7 @@ Orbit.modules.equipo = (function () {
           </div>
           <div class="muted" style="font-size:11.5px;margin-top:6px">Estas casillas anulan puntualmente lo que el rol define, sin cambiarle el rol al usuario. La restricción siempre gana sobre el extra.</div>
         </details>
-        <div class="cfg-note">🔐 Al guardar un usuario nuevo, se le envían sus <b>credenciales de acceso</b> al correo y WhatsApp indicados. El correo configurado acá será su usuario de ingreso y el que se asocia a su bandeja.</div>
+        <div class="cfg-note">🔐 Al guardar un usuario nuevo, se prepara la <b>invitación de acceso</b> al correo y WhatsApp indicados, pendiente de confirmación de entrega. El correo configurado acá será su usuario de ingreso y el que se asocia a su bandeja.</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
         <button class="btn ghost" id="eu-cancel">Cancelar</button><button class="btn primary" id="eu-ok">Guardar</button></div>
@@ -207,9 +212,9 @@ Orbit.modules.equipo = (function () {
       const modOverride = (modsChecked.length && modsChecked.length < TODOS_MOD.length) ? modsChecked : null;
       const permisosExtra = $('#eu-perm-asg-extra').checked ? ['aseguradoras_editar'] : [];
       const restricciones = $('#eu-perm-asg-restr').checked ? ['aseguradoras_editar'] : [];
-      const data = { nombre: $('#eu-nombre').value || 'Usuario', rol: rolesFinal[0], roles: rolesFinal, telefono: $('#eu-tel').value, email: $('#eu-email').value, color: $('#eu-color').value, metaPrima: +$('#eu-meta').value || 0, metaRecaudo: +$('#eu-rec').value || 0, inactivo: $('#eu-inact').checked, modulosOverride: modOverride, permisosExtra, restricciones };
+      const data = { nombre: $('#eu-nombre').value || 'Usuario', rol: rolesFinal[0], roles: rolesFinal, dataScope: $('#eu-scope').value, telefono: $('#eu-tel').value, email: $('#eu-email').value, color: $('#eu-color').value, metaPrima: +$('#eu-meta').value || 0, metaRecaudo: +$('#eu-rec').value || 0, inactivo: $('#eu-inact').checked, modulosOverride: modOverride, permisosExtra, restricciones };
       if (id) S().update('asesores', id, data);
-      else { data.id = 'ase' + Date.now().toString().slice(-5); data.iniciales = data.nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; S().insert('asesores', data); const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Usuario creado · credenciales enviadas a ' + (data.email || 'su correo'); document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+      else { data.id = 'ase' + Date.now().toString().slice(-5); data.iniciales = data.nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; S().insert('asesores', data); const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Usuario creado · invitación preparada, pendiente de confirmación (' + (data.email || 'su correo') + ')'; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
       close(); render(document.getElementById('host') || document.getElementById('mod-host'));
     });
   }

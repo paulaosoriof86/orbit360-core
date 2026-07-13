@@ -11,25 +11,45 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.cotizador = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store, q = Orbit.q;
   let host;
-  const TASAS_DEF = { auto: [{ hasta: 50000, tasa: 3.1, min: 2500 }, { hasta: 150000, tasa: 3.0, min: 2600 }, { hasta: 300000, tasa: 2.7, min: 2600 }, { hasta: 600000, tasa: 2.5, min: 2600 }, { hasta: 1e12, tasa: 2.3, min: 2600 }] };
-  const RECARGO_FRACC = { 1: 0, 2: 6.5, 4: 9.5, 6: 10.5, 12: 13.5 };
+  /* P0-RATE: sin reglas comerciales globales. Recargo por fraccionamiento, recargo por
+     antigüedad y gastos de emisión SOLO se aplican si la aseguradora los tiene
+     configurados explícitamente en a.cotTasas (recargoFraccPct{fracc:pct}, recargoAntiguedadPct{anioLimite,pct}, gastosEmisionPct).
+     Si faltan, el componente correspondiente es 0 — nunca un porcentaje genérico para todos los tenants/aseguradoras. */
+  function recargoFraccDe(cfg, fracc) { const t = cfg && cfg.recargoFraccPct; return (t && t[fracc] != null) ? +t[fracc] : 0; }
+  function recargoAntiguedadDe(cfg, anio) { const r = cfg && cfg.recargoAntiguedad; return (r && r.anioLimite && anio < r.anioLimite) ? (+r.pct || 0) / 100 : 0; }
+  function gastosEmisionDe(cfg, pais) { const g = cfg && cfg.gastosEmisionPct; return (g && g[pais] != null) ? +g[pais] : 0; }
   let st = { pais: 'GT', ramo: 'Auto', valor: 120000, anio: 2022, fracc: 12, cliente: '', clienteId: '', asesorId: '', marca: '', linea: '', modelo: '', filas: [] };
-  // Catálogo marca → líneas (genérico, editable por cliente en migración)
-  const VEH = {
+  let wizStep = 1; // 1=datos del riesgo · 2=aseguradoras · 3=resultados
+  // Catálogo marca → líneas, DIFERENCIADO POR PAÍS (el parque vehicular difiere entre GT/CA y CO)
+  const VEH_GT = {
     'Toyota': ['Corolla', 'Hilux', 'RAV4', 'Yaris', 'Land Cruiser', 'Prado', 'Fortuner'],
     'Hyundai': ['Tucson', 'Accent', 'Elantra', 'Santa Fe', 'Creta', 'i10'],
     'Kia': ['Sportage', 'Rio', 'Picanto', 'Sorento', 'Seltos'],
     'Nissan': ['Sentra', 'Frontier', 'Versa', 'Kicks', 'X-Trail'],
     'Mazda': ['Mazda 3', 'CX-5', 'CX-30', 'Mazda 2', 'BT-50'],
-    'Chevrolet': ['Spark', 'Onix', 'Tracker', 'Captiva', 'D-Max'],
-    'Mitsubishi': ['L200', 'Montero', 'Outlander', 'ASX'],
+    'Chevrolet': ['Spark', 'Onix', 'Tracker', 'Captiva', 'D-Max', 'Colorado'],
+    'Mitsubishi': ['L200', 'Montero', 'Outlander', 'ASX', 'Mirage'],
     'Honda': ['Civic', 'CR-V', 'HR-V', 'Fit'],
     'Volkswagen': ['Jetta', 'Tiguan', 'Gol', 'Amarok', 'T-Cross'],
     'Ford': ['Ranger', 'Escape', 'Explorer', 'F-150'],
     'Suzuki': ['Swift', 'Vitara', 'Jimny', 'Baleno'],
     'Otra': ['—']
   };
-  // Catálogo línea → modelos/versiones (3er nivel). Genérico + versiones específicas; editable por cliente en migración.
+  const VEH_CO = {
+    'Renault': ['Sandero', 'Duster', 'Logan', 'Stepway', 'Kwid', 'Koleos'],
+    'Chevrolet': ['Spark GT', 'Onix', 'Tracker', 'Captiva', 'Sail', 'Groove'],
+    'Mazda': ['Mazda 2', 'Mazda 3', 'CX-30', 'CX-5', 'BT-50'],
+    'Kia': ['Picanto', 'Rio', 'Sportage', 'Soluto', 'Seltos'],
+    'Nissan': ['Versa', 'March', 'Kicks', 'Frontier', 'X-Trail'],
+    'Toyota': ['Corolla', 'Hilux', 'Fortuner', 'RAV4', 'Yaris', 'Prado'],
+    'Volkswagen': ['Gol', 'Polo', 'T-Cross', 'Virtus', 'Amarok'],
+    'Hyundai': ['Grand i10', 'Accent', 'Tucson', 'Creta', 'Santa Fe'],
+    'Ford': ['Fiesta', 'EcoSport', 'Ranger', 'Explorer'],
+    'Suzuki': ['Swift', 'Vitara', 'S-Presso', 'Ertiga'],
+    'Otra': ['—']
+  };
+  function vehDe(pais) { return pais === 'CO' ? VEH_CO : VEH_GT; }
+  // Catálogo línea → modelos/versiones (3er nivel). Específico por línea + fallback genérico.
   const TRIMS_DEF = ['Estándar', 'Full Extra', 'Sport', 'Limited', 'XL / XLS', '4x4', 'Híbrido'];
   const VEH_MODELOS = {
     'Toyota|Corolla': ['XLI', 'GLI', 'SE-G', 'Cross', 'Hybrid'],
@@ -47,7 +67,20 @@ Orbit.modules.cotizador = (function () {
     'Chevrolet|D-Max': ['LS', 'LT', 'High Country 4x4'],
     'Honda|CR-V': ['LX', 'EX', 'Touring'],
     'Volkswagen|Amarok': ['Trendline', 'Comfortline', 'Highline 4x4'],
-    'Ford|Ranger': ['XL', 'XLS', 'XLT', 'Limited 4x4']
+    'Ford|Ranger': ['XL', 'XLS', 'XLT', 'Limited 4x4'],
+    // Colombia
+    'Renault|Sandero': ['Life', 'Zen', 'Intens'],
+    'Renault|Duster': ['Zen', 'Intens', 'Iconic 4x4'],
+    'Renault|Logan': ['Life', 'Zen', 'Intens'],
+    'Chevrolet|Spark GT': ['LS', 'LT', 'Activ'],
+    'Chevrolet|Tracker': ['LS', 'LT', 'Premier'],
+    'Mazda|Mazda 3': ['Touring', 'Grand Touring', 'Signature'],
+    'Kia|Soluto': ['LX', 'EX'],
+    'Nissan|Versa': ['Sense', 'Advance', 'Exclusive'],
+    'Volkswagen|Virtus': ['Trendline', 'Comfortline', 'Highline'],
+    'Hyundai|Grand i10': ['Sedán', 'Hatchback'],
+    'Ford|EcoSport': ['S', 'SE', 'Titanium'],
+    'Suzuki|Ertiga': ['GL', 'GLX']
   };
   const modelosDe = (marca, linea) => VEH_MODELOS[marca + '|' + linea] || (linea && linea !== '—' ? TRIMS_DEF : []);
   let tabCot = 'cotizar';
@@ -57,8 +90,8 @@ Orbit.modules.cotizador = (function () {
 
   function camposPorRamo(ramo) {
     if (ramo === 'Auto') {
-      const marcas = Object.keys(VEH);
-      const lineas = VEH[st.marca] || [];
+      const marcas = Object.keys(vehDe(st.pais));
+      const lineas = vehDe(st.pais)[st.marca] || [];
       const modelos = modelosDe(st.marca, st.linea);
       const subramo = st.pais === 'CO'
         ? ['Todo riesgo', 'RC / SOAT+', 'Pérdidas totales', 'Pérdidas parciales', 'Por kilómetros', 'Pesado']
@@ -117,7 +150,15 @@ Orbit.modules.cotizador = (function () {
       + log.map(l => '<tr><td class="mono" style="font-size:11.5px">' + (l.fecha||'—') + '</td><td>' + U.esc(l.cliente||'—') + '</td><td><span class="badge info" style="font-size:10px">' + U.esc(l.ramo||'—') + '</span></td><td>' + U.esc(l.pais||'—') + '</td><td>' + (l.aseg||0) + '</td><td><span class="badge ' + (l.estado==='Emitida'?'ok':'warn') + '" style="font-size:10px">' + U.esc(l.estado||'Guardada') + '</span></td><td><button class="btn ghost sm" data-chl="' + U.esc(l.id) + '">Cargar →</button></td></tr>'
       ).join('') + '</tbody></table></div>';
   }
-  function cargarHistorial(id) { const log = getCotLog(); const e = log.find(x => x.id === id); if (e && e.state) { Object.assign(st, e.state); tabCot = 'cotizar'; render(host); } }
+  function cargarHistorial(id) { const log = getCotLog(); const e = log.find(x => x.id === id); if (e && e.state) { Object.assign(st, e.state); tabCot = 'cotizar'; wizStep = 1; render(host); } }
+  function wizNav(labelsDone) {
+    const steps = [{ n: 1, t: '📋 Datos del riesgo' }, { n: 2, t: '🏢 Aseguradoras' }, { n: 3, t: '🧾 Resultados' }];
+    return '<div class="cz-wiz-nav" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">' + steps.map(s => {
+      const active = s.n === wizStep, done = s.n < wizStep || (s.n === 3 && labelsDone);
+      const clickable = s.n <= wizStep || done;
+      return `<div class="cz-wiz-pill${active ? ' active' : ''}${done && !active ? ' done' : ''}" style="flex:1;min-width:120px;text-align:center;padding:9px 10px;border-radius:10px;font-size:12.5px;font-weight:700;border:1.5px solid ${active ? 'var(--red)' : done ? 'var(--ok)' : 'var(--line)'};background:${active ? 'var(--red)' : 'transparent'};color:${active ? '#fff' : done ? 'var(--ok)' : 'var(--ink-3)'};${clickable ? 'cursor:pointer' : 'cursor:default;opacity:.6'}" ${clickable ? `data-wgo="${s.n}"` : ''}>${done && !active ? '✓ ' : s.n + '. '}${s.t}</div>`;
+    }).join('') + '</div>';
+  }
 
   function asegElegibles() {
     const ramo = st.ramo;
@@ -131,7 +172,6 @@ Orbit.modules.cotizador = (function () {
     });
   }
   function ivaPais(p) { return (Orbit.primas && Orbit.primas.cfgPais) ? Orbit.primas.cfgPais(p).iva : (p === 'CO' ? 19 : 12); }
-  function cotsGuardadas() { return Orbit._cots = Orbit._cots || []; }
   /* ---- DTO canónico CotizacionNormalizada: usado por Cotizador (origen=cotizador) y Comparativo (origen=pdf/manual) ---- */
   Orbit.dto = Orbit.dto || {};
   Orbit.dto.cotizacionNormalizada = function (f) {
@@ -141,19 +181,27 @@ Orbit.modules.cotizador = (function () {
       pais: f.pais || 'GT', cur: f.cur || (f.pais === 'CO' ? 'COP' : 'GTQ'),
       ramo: f.ramo || '', neta: f.neta || 0, iva: f.iva || 0, total: f.total || (f.neta || 0) + (f.iva || 0),
       fracc: f.fracc || 1, sumaAsegurada: f.sumaAsegurada || 0, deducible: f.deducible || '', exclusiones: f.exclusiones || '',
-      aseguradoraId: f.aseguradoraId || '', clienteId: f.clienteId || '', cliente: f.cliente || '', asesorId: f.asesorId || ''
+      aseguradoraId: f.aseguradoraId || '', clienteId: f.clienteId || '', cliente: f.cliente || '', asesorId: f.asesorId || '',
+      /* P0-DTO: fuente/versionado + trazabilidad + estado comercial, mínimos exigidos por el contrato canónico */
+      fuenteDocumentoId: f.fuenteDocumentoId || '', versionFuente: f.versionFuente || '', vigenciaFuente: f.vigenciaFuente || '',
+      confirmacionHumana: !!f.confirmacionHumana, estadoComercial: f.estadoComercial || 'borrador',
+      trazabilidad: f.trazabilidad || { actor: (Orbit.auth && Orbit.auth.user && Orbit.auth.user().nombre) || '', fecha: (Orbit.ui.today ? Orbit.ui.today() : ''), origen: f.origen || 'cotizador' },
+      estadoValidacion: f.estadoValidacion || 'requiere_revision'
     };
   };
 
   function render(h) {
     host = h;
     const asg = asegElegibles();
+    st.filas = st.filas.filter(f => asg.some(a => a.id === f.id));
     if (!st.filas.length) st.filas = asg.slice(0, 3).map(a => ({ id: a.id, modo: 'tasas', prima: 0, sel: true, res: null }));
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '🧮', title: 'Cotizador', sub: 'Cotiza con tus aseguradoras y arma el comparativo', features: [] })}
       <div class="cfg-note" style="margin-bottom:14px">🔗 Consume solo aseguradoras cuyo ramo está <b>habilitado para Cotizador</b> en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/aseguradoras'">Aseguradoras</a> (pestaña Productos/Tarifas). Si desactivás un ramo ahí, deja de aparecer aquí. Envía la cotización al <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/comparativo'">Comparativo</a> para cerrar con el cliente.</div>
-      <div class="tabs" style="max-width:380px;margin-bottom:16px"><div class="tab ${tabCot==='cotizar'?'active ':''}tab" data-czt="cotizar">🧮 Cotizador</div><div class="tab ${tabCot==='historial'?'active ':''}tab" data-czt="historial">📋 Historial</div></div>${tabCot === 'historial' ? vCotHistorial() : ''}<div class="cz-grid" style="${tabCot==='historial'?'display:none':''}">
-        <div class="card pad">
+      <div class="tabs" style="max-width:380px;margin-bottom:16px"><div class="tab ${tabCot==='cotizar'?'active ':''}tab" data-czt="cotizar">🧮 Cotizador</div><div class="tab ${tabCot==='historial'?'active ':''}tab" data-czt="historial">📋 Historial</div></div>${tabCot === 'historial' ? vCotHistorial() : ''}
+      <div style="${tabCot==='historial'?'display:none':''}">
+      ${wizNav()}
+      <div class="card pad" style="${wizStep===1?'':'display:none'}">
           <div class="asg-sec-t">📋 1 · Datos del riesgo</div>
           <div class="cgrid">
             <label class="ce-l">🌎 País<select id="cz-pais" class="o-sel"><option ${st.pais === 'GT' ? 'selected' : ''}>GT</option><option ${st.pais === 'CO' ? 'selected' : ''}>CO</option></select></label>
@@ -161,25 +209,37 @@ Orbit.modules.cotizador = (function () {
             <label class="ce-l">💰 Valor asegurado<input id="cz-valor" class="o-sel" type="number" value="${st.valor}"></label>
             ${camposPorRamo(st.ramo)}
             <label class="ce-l">💳 Pagos<select id="cz-fracc" class="o-sel">${[1, 2, 4, 6, 12].map(f => `<option value="${f}" ${f === st.fracc ? 'selected' : ''}>${f === 1 ? 'Contado' : f + ' pagos'}</option>`).join('')}</select></label>
+            ${st.ramo !== 'Gastos Médicos' ? `<label class="ce-l">📉 Deducible (opcional)<input id="cz-ded-gen" class="o-sel" value="${U.esc(st.deducible || '')}" placeholder="Ej. 1% · Q1,000"></label>` : ''}
             <label class="ce-l">🧑 Cliente<select id="cz-cliid" class="o-sel"><option value="">— Prospecto nuevo —</option>${S().all('clientes').map(c => `<option value="${c.id}" ${c.id === st.clienteId ? 'selected' : ''}>${U.esc(c.nombre)}</option>`).join('')}</select></label>
             <label class="ce-l" id="cz-clinom-wrap" style="${st.clienteId ? 'display:none' : ''}">✍️ Nombre del prospecto<input id="cz-cliente" class="o-sel" value="${U.esc(st.cliente)}" placeholder="Nombre del prospecto"></label>
             <label class="ce-l">🧑‍💼 Asesor<select id="cz-ase" class="o-sel"><option value="">— Asignar —</option>${S().all('asesores').filter(a => !a.inactivo).map(a => `<option value="${a.id}" ${a.id === st.asesorId ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select></label>
           </div>
-          <div class="asg-sec-t" style="margin-top:16px">🏢 2 · Aseguradoras</div>
+          <button class="btn primary" id="cz-next1" style="margin-top:16px;width:100%">Siguiente: elegir aseguradoras →</button>
+      </div>
+      <div class="card pad" style="${wizStep===2?'':'display:none'}">
+          <div class="asg-sec-t">🏢 2 · Aseguradoras</div>
           <div class="muted" style="font-size:11.5px;margin-bottom:9px">Modo <b>📊 tasas</b> calcula con tu tabla; <b>✍️ manual</b> ingresas la prima recibida. Marca ✅ las que quieras llevar al comparativo.</div>
+          ${asg.length ? '' : `<div class="cfg-note" style="margin-bottom:9px">⚠ Cotización automática pendiente de configuración: ninguna aseguradora de <b>${st.pais}</b> tiene el ramo <b>${st.ramo}</b> habilitado para Cotizador. Habilitálo en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/aseguradoras'">Aseguradoras</a> → pestaña Productos/Tarifas, o cargá una cotización recibida desde el Comparativo.</div>`}
           <div id="cz-asgs"></div>
-          <button class="btn ghost sm" id="cz-add" style="margin-top:9px">➕ Aseguradora</button>
-          <button class="btn primary" id="cz-gen" style="margin-top:14px;width:100%">⚡ Cotizar</button>
-        </div>
+          <button class="btn ghost sm" id="cz-add" style="margin-top:9px" ${asg.length ? '' : 'disabled'}>➕ Aseguradora</button>
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <button class="btn ghost" id="cz-back2" style="flex:1">← Atrás</button>
+            <button class="btn primary" id="cz-gen" style="flex:2" ${st.filas.length && asg.length ? '' : 'disabled'}>⚡ Cotizar</button>
+          </div>
+      </div>
+      <div style="${wizStep===3?'':'display:none'}">
+        <button class="btn ghost sm" id="cz-back3" style="margin-bottom:12px">← Editar datos / aseguradoras</button>
         <div class="card pad" id="cz-out"><div class="muted" style="text-align:center;padding:40px 0">🧮 Las cotizaciones aparecerán aquí.</div></div>
+      </div>
       </div>
     </div>`;
     bind(); paintAsgs();
+    if (wizStep === 3 && st.filas.some(f => f.res)) pintarResultados();
   }
   function bind() {
-    const set = (id, k, num) => { const el = host.querySelector(id); if (el) el.addEventListener('change', () => { st[k] = num ? +el.value : el.value; if (k === 'pais') { st.filas = []; render(host); } else if (k === 'ramo') { render(host); } }); };
+    const set = (id, k, num) => { const el = host.querySelector(id); if (el) el.addEventListener('change', () => { st[k] = num ? +el.value : el.value; if (k === 'pais' || k === 'ramo') { st.filas = []; if (k === 'pais') { st.marca = ''; st.linea = ''; st.modelo = ''; st.marcaCustom = false; } render(host); } }); };
     set('#cz-pais', 'pais'); set('#cz-ramo', 'ramo'); set('#cz-valor', 'valor', true); set('#cz-anio', 'anio', true); set('#cz-fracc', 'fracc', true); set('#cz-cliente', 'cliente');
-    set('#cz-sub', 'sub'); set('#cz-ase', 'asesorId');
+    set('#cz-sub', 'sub'); set('#cz-ase', 'asesorId'); set('#cz-ded-gen', 'deducible');
     // Gastos Médicos: cambiar tipo re-renderiza (familiar→integrantes, colectivo→empleados)
     const gmt = host.querySelector('#cz-gm-tipo'); if (gmt) gmt.addEventListener('change', () => { st.gmTipo = gmt.value; render(host); });
     const gmn = host.querySelector('#cz-gm-n'); if (gmn) gmn.addEventListener('change', () => { st.gmIntegrantes = Math.max(2, +gmn.value || 2); render(host); });
@@ -194,10 +254,14 @@ Orbit.modules.cotizador = (function () {
     const mdt = host.querySelector('#cz-modelo-t'); if (mdt) mdt.addEventListener('input', () => { st.modelo = mdt.value; });
     // cliente existente → oculta nombre manual y precarga
     const cli = host.querySelector('#cz-cliid'); if (cli) cli.addEventListener('change', () => { st.clienteId = cli.value; const c = cli.value ? S().get('clientes', cli.value) : null; if (c) { st.cliente = c.nombre; if (c.asesorId) st.asesorId = c.asesorId; if (c.pais) st.pais = c.pais; } render(host); });
-    host.querySelectorAll('[data-czt]').forEach(b => b.addEventListener('click', () => { tabCot = b.dataset.czt; render(host); }));
+    host.querySelectorAll('[data-czt]').forEach(b => b.addEventListener('click', () => { tabCot = b.dataset.czt; wizStep = 1; render(host); }));
     host.querySelectorAll('[data-chl]').forEach(b => b.addEventListener('click', () => cargarHistorial(b.dataset.chl)));
+    host.querySelectorAll('[data-wgo]').forEach(b => b.addEventListener('click', () => { const n = +b.dataset.wgo; if (n <= wizStep) { wizStep = n; render(host); } }));
+    const next1 = host.querySelector('#cz-next1'); if (next1) next1.addEventListener('click', () => { wizStep = 2; render(host); });
+    const back2 = host.querySelector('#cz-back2'); if (back2) back2.addEventListener('click', () => { wizStep = 1; render(host); });
+    const back3 = host.querySelector('#cz-back3'); if (back3) back3.addEventListener('click', () => { wizStep = 2; render(host); });
     host.querySelector('#cz-add').addEventListener('click', () => { const a = asegElegibles().find(x => !st.filas.some(f => f.id === x.id)); if (a) { st.filas.push({ id: a.id, modo: 'tasas', prima: 0, sel: true }); paintAsgs(); } else { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = 'Ya agregaste todas las aseguradoras de ' + st.pais; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); } });
-    host.querySelector('#cz-gen').addEventListener('click', cotizar);
+    host.querySelector('#cz-gen').addEventListener('click', () => { wizStep = 3; render(host); cotizar(); });
   }
   function paintAsgs() {
     const asg = asegElegibles();
@@ -215,31 +279,52 @@ Orbit.modules.cotizador = (function () {
     });
     host.querySelectorAll('[data-adel]').forEach(b => b.addEventListener('click', () => { st.filas.splice(+b.dataset.adel, 1); paintAsgs(); }));
   }
+  /* Sin tasa configurada y validada para la aseguradora, el cálculo automático queda bloqueado — nunca se usa una tarifa genérica. */
+  function tieneTasaValidada(asgId) {
+    const a = S().get('aseguradoras', asgId);
+    const cfg = tarifaDe(a, st.ramo);
+    /* P0-AUTO-GATE: exige tramos + metadata completa (fuenteDocumentoId, version, vigencia) + validaci\u00f3n humana */
+    return !!(a && cfg && cfg.auto && cfg.auto.length && cfg.fuenteDocumentoId && cfg.version && cfg.vigencia && a.cotTasasValidadas && a.cotTasasValidadas[st.ramo]);
+  }
+  /* Tarifas ahora son POR RAMO: a.cotTasas[ramo] = { auto, recargoFraccPct, recargoAntiguedad, gastosEmisionPct, fuenteDocumentoId, version, vigencia }; a.cotTasasValidadas[ramo] = bool. Se editan en Aseguradoras › pestaña Tarifas y conocimiento. */
+  function tarifaDe(a, ramo) { return (a && a.cotTasas && a.cotTasas[ramo]) || null; }
   function calcTasas(asgId) {
     const a = S().get('aseguradoras', asgId);
-    const tabla = (a && a.cotTasas && a.cotTasas.auto) ? a.cotTasas.auto : TASAS_DEF.auto;
+    const cfg = tarifaDe(a, st.ramo);
+    if (!a || !cfg || !cfg.auto || !cfg.auto.length || !(a.cotTasasValidadas && a.cotTasasValidadas[st.ramo])) return null;
+    const tabla = cfg.auto;
     const rango = tabla.find(r => st.valor <= r.hasta) || tabla[tabla.length - 1];
     let neta = Math.max(rango.min, st.valor * rango.tasa / 100);
-    if (st.ramo === 'Auto' && st.anio < 2015) neta *= 1.08;
-    const recargo = (RECARGO_FRACC[st.fracc] || 0) / 100 * neta;
-    const gastosEm = st.pais === 'GT' ? neta * 0.05 : 0;
+    if (st.ramo === 'Auto') neta *= (1 + recargoAntiguedadDe(cfg, st.anio));
+    const recargo = recargoFraccDe(cfg, st.fracc) / 100 * neta;
+    const gastosEm = neta * (gastosEmisionDe(cfg, st.pais) / 100);
     const base = neta + recargo + gastosEm, iva = base * ivaPais(st.pais) / 100;
-    return { neta, recargo, gastosEm, iva, total: base + iva, tasaPct: rango.tasa };
+    return { neta, recargo, gastosEm, iva, total: base + iva, tasaPct: rango.tasa, fuenteDocumentoId: (cfg.fuenteDocumentoId || ''), versionFuente: (cfg.version || ''), vigenciaFuente: (cfg.vigencia || '') };
   }
   function cotizar() {
-    const cur = st.pais === 'CO' ? 'COP' : 'GTQ';
     st.filas.forEach(row => {
       const a = S().get('aseguradoras', row.id);
-      row.res = row.modo === 'manual'
-        ? (() => { const neta = +row.prima || 0, iva = neta * ivaPais(st.pais) / 100; return { neta, recargo: 0, gastosEm: 0, iva, total: neta + iva, tasaPct: null }; })()
-        : calcTasas(row.id);
+      if (row.modo === 'manual') {
+        const neta = +row.prima || 0, iva = neta * ivaPais(st.pais) / 100;
+        row.res = { neta, recargo: 0, gastosEm: 0, iva, total: neta + iva, tasaPct: null };
+      } else {
+        row.res = calcTasas(row.id);
+        if (!row.res) row.bloqueada = true;
+      }
       row.nombre = a ? a.nombre : ''; row.color = a ? a.color : '#999';
     });
+    pintarResultados();
+  }
+  function pintarResultados() {
+    const cur = st.pais === 'CO' ? 'COP' : 'GTQ';
     const con = st.filas.filter(f => f.res);
-    host.querySelector('#cz-out').innerHTML = `
+    const bloqueadas = st.filas.filter(f => f.bloqueada);
+    const outEl = host.querySelector('#cz-out'); if (!outEl) return;
+    outEl.innerHTML = `
+      ${bloqueadas.length ? `<div class="cfg-note" style="margin-bottom:12px">⚠ Tarifa pendiente de validación: ${bloqueadas.map(f => U.esc((S().get('aseguradoras', f.id) || {}).nombre || '')).join(', ')} no tiene tabla de tasas validada para Cotizador — configúrala en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/aseguradoras'">Aseguradoras</a> o usa modo ✍️ Manual con la prima que te den.</div>` : ''}
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <b style="font-family:var(--f-display);font-size:16px">🧾 Cotizaciones · ${st.ramo}</b>
-        <button class="btn primary sm" id="cz-comp">📋 Generar comparativo →</button>
+        ${con.length ? '<button class="btn primary sm" id="cz-comp">📋 Generar comparativo →</button>' : ''}
       </div>
       <div class="cz-cards">${con.map((f, i) => `
         <div class="cz-card">
@@ -253,13 +338,22 @@ Orbit.modules.cotizador = (function () {
             <tr><td>IVA (${ivaPais(st.pais)}%)</td><td class="num">${U.money(f.res.iva, cur)}</td></tr>
           </table>
           <button class="btn ghost sm" style="margin-top:9px;width:100%" data-cprint="${i}">🖨 Imprimir cotización</button>
-          <button class="btn ghost sm" style="margin-top:6px;width:100%" data-csend="${i}">📲 Enviar al cliente</button>
+          <button class="btn ghost sm" style="margin-top:6px;width:100%" data-csend="${i}">📲 Preparar comunicación al cliente (WhatsApp/Correo)</button>
         </div>`).join('')}</div>
       <div class="cfg-note" style="margin-top:13px">📊 Cálculo con rangos por valor, prima mínima, recargo por fraccionamiento, gastos e IVA por país. Las <b>tasas son configurables por aseguradora</b> — ajusta a las tuyas.</div>`;
     host.querySelectorAll('[data-csel]').forEach(c => c.addEventListener('change', e => con[+c.dataset.csel].sel = e.target.checked));
     host.querySelectorAll('[data-cprint]').forEach(b => b.addEventListener('click', () => imprimirCot(con[+b.dataset.cprint], cur)));
     host.querySelectorAll('[data-csend]').forEach(b => b.addEventListener('click', () => enviarCot(con[+b.dataset.csend], cur)));
-    host.querySelector('#cz-comp').addEventListener('click', () => { Orbit._cots = con.filter(f => f.sel).map(f => Orbit.dto.cotizacionNormalizada({ origen: 'cotizador', nombre: f.nombre, color: f.color, total: f.res.total, neta: f.res.neta, iva: f.res.iva, cur, pais: st.pais, ramo: st.ramo, aseguradoraId: f.id, clienteId: st.clienteId, cliente: st.cliente, fracc: st.fracc, sumaAsegurada: st.suma || st.valor || st.dsuma || st.hval || 0, deducible: st.gmDed || '', asesorId: st.asesorId })); location.hash = '#/comparativo'; });
+    const compBtn = host.querySelector('#cz-comp'); if (compBtn) compBtn.addEventListener('click', () => {
+      const dtos = con.filter(f => f.sel).map(f => Orbit.dto.cotizacionNormalizada({ origen: 'cotizador', nombre: f.nombre, color: f.color, total: f.res.total, neta: f.res.neta, iva: f.res.iva, cur, pais: st.pais, ramo: st.ramo, aseguradoraId: f.id, clienteId: st.clienteId, cliente: st.cliente, fracc: st.fracc, sumaAsegurada: st.suma || st.valor || st.dsuma || st.hval || 0, deducible: st.gmDed || st.deducible || '', asesorId: st.asesorId,
+        fuenteDocumentoId: f.res.fuenteDocumentoId || '', versionFuente: f.res.versionFuente || '', vigenciaFuente: f.res.vigenciaFuente || '',
+        confirmacionHumana: f.modo === 'manual', estadoComercial: 'preparada' }));
+      /* P0-FORCED-VALID: automático solo válida si superó el gate de tasas (tieneTasaValidada); manual nace requiere_revision */
+      dtos.forEach(d => { d.estadoValidacion = (d.origen === 'cotizador' && tieneTasaValidada(d.aseguradoraId)) ? 'validada' : 'requiere_revision'; d.id = 'cot' + Date.now() + Math.floor(Math.random() * 999); S().insert('cotizaciones', d); });
+      /* P0-HANDOFF: transferencia persistida por IDs vía Orbit.store, nunca sessionStorage/localStorage */
+      S().insert('quoteTransfers', { id: 'qt' + Date.now(), cotizacionIds: dtos.map(d => d.id), clienteId: st.clienteId, cliente: st.cliente, pais: st.pais, cur, ramo: st.ramo, fecha: (Orbit.ui.today ? Orbit.ui.today() : ''), estado: 'pendiente' });
+      location.hash = '#/comparativo';
+    });
   }
   function imprimirCot(f, cur) {
     const w = window.open('', '_blank'); if (!w) return;
@@ -278,7 +372,7 @@ Orbit.modules.cotizador = (function () {
     if (!cid) { Orbit.ui.toast('Selecciona un cliente para enviar la cotización.'); return; }
     const msg = 'Hola, te comparto la cotización de ' + st.ramo + ' con ' + f.nombre + ':\n\n' +
       '• Prima total: ' + U.money(f.res.total, cur) + '\n• Prima neta: ' + U.money(f.res.neta, cur) + '\n\nQuedo atento para avanzar con la emisión cuando gustes.';
-    Orbit.notify.pedir(cid, { tipo: 'Cotización enviada', icon: '🧮', asunto: 'Cotización de ' + st.ramo + ' · ' + f.nombre, mensaje: msg, adjunto: 'Cotizacion-' + f.nombre + '.pdf' });
+    Orbit.notify.pedir(cid, { tipo: 'Cotización preparada', icon: '🧮', asunto: 'Cotización de ' + st.ramo + ' · ' + f.nombre, mensaje: msg, adjunto: 'Cotizacion-' + f.nombre + '.pdf' });
   }
   return { render };
 })();

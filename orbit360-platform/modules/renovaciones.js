@@ -99,13 +99,13 @@ Orbit.modules.renovaciones = (function () {
     }
     back.innerHTML = `<div class="card" style="width:min(620px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
       <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">📤 Campaña de renovación</b><button class="imp-x" id="rl-x">✕</button></div>
-      <div class="cfg-note" style="margin:14px 16px 0">Selecciona las pólizas a notificar. Se envía <b>WhatsApp + correo</b> con propuesta de renovación generada por IA y queda en el <b>historial de cada cliente</b>.</div>
+      <div class="cfg-note" style="margin:14px 16px 0">Selecciona las pólizas a notificar. Se prepara <b>WhatsApp + correo</b> con propuesta de renovación generada por IA (pendiente de confirmación de entrega) y queda en el <b>historial de cada cliente</b>.</div>
       <div style="padding:10px 16px 0;display:flex;gap:8px;flex-wrap:wrap">
         <select id="rl-fase" class="o-sel" style="width:auto"><option value="">Todos los asesores</option>${S().all('asesores').map(a => `<option value="${a.id}">${U.esc(a.nombre)}</option>`).join('')}</select>
         <select id="rl-framo" class="o-sel" style="width:auto"><option value="">Todos los ramos</option>${[...new Set(base.map(p => p.ramo))].map(r => `<option>${U.esc(r)}</option>`).join('')}</select>
       </div>
       <div id="rl-body" style="padding:12px 16px;overflow:auto;flex:1;display:grid;gap:7px"></div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><span class="muted" id="rl-n"></span><div style="display:flex;gap:8px"><button class="btn ghost" id="rl-cancel">Cancelar</button><button class="btn primary" id="rl-ok">📲 Enviar campaña</button></div></div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><span class="muted" id="rl-n"></span><div style="display:flex;gap:8px"><button class="btn ghost" id="rl-cancel">Cancelar</button><button class="btn primary" id="rl-ok">📲 Preparar campaña</button></div></div>
     </div>`;
     document.body.appendChild(back);
     const close = () => back.remove();
@@ -119,11 +119,11 @@ Orbit.modules.renovaciones = (function () {
       sel.forEach(p => {
         const cli = S().get('clientes', p.clienteId);
         const msg = Orbit.ia ? Orbit.ia.redactar('renovacion', { nombre: cli ? cli.nombre.split(' ')[0] : '', poliza: p.numero, ramo: p.ramo, vence: U.fmtDate(p.vigenciaFin) }) : 'Renovación próxima';
-        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: p.clienteId, asesorId: p.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Campaña de renovación enviada', detalle: 'WhatsApp + correo · ' + p.numero });
+        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: p.clienteId, asesorId: p.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Campaña de renovación preparada · pendiente de confirmación', detalle: 'WhatsApp + correo · ' + p.numero });
         if (Orbit.correo && cli) Orbit.correo.enviar({ para: cli.email || '', asunto: 'Renovación de tu póliza ' + p.numero, cuerpo: msg, clienteId: p.clienteId, vinculo: { tipo: 'poliza', id: p.id, label: p.numero } });
       });
       close();
-      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + sel.length + ' propuestas de renovación enviadas'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + sel.length + ' propuestas de renovación preparadas'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
     });
     paint();
   }
@@ -221,8 +221,8 @@ Orbit.modules.renovaciones = (function () {
       const rows = filas();
       const cuerpo = 'Comparativo de renovación · ' + p.numero + ' (' + p.ramo + '):\n\n' + rows.map(r => '• ' + (r.a.nombre || '') + ': ' + M(r.prima) + (r.actual ? ' (aseguradora actual)' : '') + (r.dPct ? ' · ' + (r.dPct > 0 ? '+' : '') + r.dPct + '% vs actual' : '')).join('\n') + '\n\nQuedamos atentos para asesorarte en la mejor opción.';
       if (Orbit.correo && cli.id) Orbit.correo.enviar({ para: cli.email || '', asunto: 'Comparativo de renovación · ' + p.numero, cuerpo, clienteId: cli.id, vinculo: { tipo: 'poliza', id: p.id, label: p.numero } });
-      S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: cli.id, asesorId: p.asesorId, tipo: 'sistema', icon: '📧', fecha: Orbit.ui.today(), titulo: 'Comparativo de renovación enviado', detalle: rows.length + ' aseguradoras · ' + p.numero });
-      Orbit.ui.toast('✓ Comparativo enviado al cliente');
+      S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: cli.id, asesorId: p.asesorId, tipo: 'sistema', icon: '📧', fecha: Orbit.ui.today(), titulo: 'Comparativo de renovación preparado', detalle: rows.length + ' aseguradoras · ' + p.numero });
+      Orbit.ui.toast('✓ Comparativo preparado para el cliente');
       close();
     });
     // registrar propuesta elegida → gestión de renovación en Ops + actividad

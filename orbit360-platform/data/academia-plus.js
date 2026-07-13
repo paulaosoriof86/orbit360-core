@@ -740,9 +740,20 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🧮', 'Cotizar con el wizard', '#C9821B', 'Cotizador → Tipo → Cliente → Cotizaciones: consulta 2-3 aseguradoras a la vez. Imprime por aseguradora y pasa al Comparativo.'),
           S('📋', 'Recomendar, no solo entregar', '#C5162E', 'En el Comparativo, elige una opción y explica por qué (cobertura/precio/servicio) antes de enviarla al cliente.')
         ]),
+        L('Registrar la decisión del cliente', 9, [
+          S('✓', 'Registrar opción aceptada', '#1F8A5B', 'En el Comparativo, con al menos una propuesta cargada, aparece **"✓ Registrar opción aceptada"**. Elegís cuál propuesta ganó y el cliente, confirmás que el cliente aceptó, y Orbit crea una **Solicitud de emisión en Orbit Ops** con toda la info de la propuesta (aseguradora, plan, prima desglosada, pagos, deducible).'),
+          S('🚫', 'Esto no emite la póliza', '#C5162E', 'Aceptar la opción NO crea una póliza ni recibos. La póliza nace únicamente cuando la aseguradora entrega número de póliza y documento reales — eso pasa en el flujo de emisión de Ops, no aquí. Registrar la aceptación solo deja la solicitud lista para que el equipo la tramite.')
+        ]),
+        L('Cargar propuestas y comunicar sin inventar datos', 10, [
+          S('⬆', 'PDF y manual conviven', '#2A6FDB', 'Podés cargar propuestas por PDF/imagen (extracción asistida) y también escribirlas a mano cuando llegan por correo o llamada — todas se suman a la misma tabla del comparativo, cada una con su fuente y estado de validación visibles.'),
+          S('🔎', 'Nada se compara sin validar', '#C9821B', 'Una propuesta recién cargada por PDF o manual queda en estado "Requiere revisión": no entra al ranking, a la impresión ni a la aceptación hasta que alguien confirme los datos extraídos o corregidos (con motivo, quién y cuándo).'),
+          S('💬', 'Preparada, no Enviada', '#1F8A5B', 'Al comunicar por WhatsApp o correo, Orbit arma el mensaje ("preparado") pero nunca marca "enviado" solo por abrir el canal — eso lo confirma la persona cuando de verdad lo envía.')
+        ]),
         Q('Evaluación · Aseguradoras y cotización', [
           { p: 'Lo ideal al cotizar es…', ops: ['Una sola opción', 'Comparar 2-3 aseguradoras y recomendar con criterio', 'Siempre la más barata'], ok: 1 },
-          { p: 'El comparativo consultivo…', ops: ['Solo ordena precios', 'Analiza coberturas y sugiere una recomendación', 'No sirve'], ok: 1 }
+          { p: 'El comparativo consultivo…', ops: ['Solo ordena precios', 'Analiza coberturas y sugiere una recomendación', 'No sirve'], ok: 1 },
+          { p: 'Al "Registrar opción aceptada" en Comparativo…', ops: ['Se crea la póliza automáticamente', 'Se crea una Solicitud de emisión en Ops; la póliza nace después con datos reales', 'No pasa nada, es solo un aviso'], ok: 1 },
+          { p: 'Una propuesta cargada por PDF que aún no se valida…', ops: ['Entra igual al ranking y se puede aceptar', 'Queda marcada "Requiere revisión" y no entra al ranking/impresión/aceptación hasta validarse', 'Se borra automáticamente'], ok: 1 }
         ])
       ]
     },
@@ -978,13 +989,14 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🔎', 'Buscar y filtrar', '#0E7C86', 'Módulo **Aseguradoras** → busca por nombre, NIT, contacto o ramo; filtra por país (GT/CO), ramo y estado (activas/inactivas). Cada tarjeta muestra contacto principal, estado de acceso y de documentación de un vistazo.'),
           S('📋', 'Abrir la ficha por pestañas', '#2A6FDB', 'La ficha se organiza en **Resumen · Contactos · Plataformas · Bancos y pagos · Productos · Documentos · Tarifas y conocimiento · Actividad**. Lo operativo (contactos, accesos, productos) va primero; lo técnico (tarifas) queda al final, como sección secundaria.'),
           S('🔐', 'Accesos sin contraseñas', '#C5162E', 'La pestaña Plataformas nunca guarda contraseñas reales. Cada portal muestra un estado honesto: Pendiente de conexión segura, Acceso disponible, Requiere actualización o Sin acceso registrado. La conexión real llegará por una bóveda segura, no por un campo de texto.'),
-          S('🧮', 'Tarifas y conocimiento no se auto-habilitan', '#7A5BD9', 'Importar un documento tarifario deja el conocimiento en "Propuesta lista para revisar" o "Requiere validación" — nunca habilita un producto en Cotizador/Comparativo automáticamente. Habilitar es una acción explícita y auditable, separada de leer. La <b>planilla de comisiones</b> es otra fuente distinta: liquida comisiones, no habilita tarifas.')
+          S('🧮', 'Tarifas y conocimiento no se auto-habilitan', '#7A5BD9', 'Importar un documento tarifario deja el conocimiento en "Propuesta lista para revisar" o "Requiere validación" — nunca habilita un producto en Cotizador/Comparativo automáticamente. Para <b>validar</b> una tabla de tasas ahora se exige: documento fuente + versión + vigencia completos, tramos con tasas positivas y mínimos no negativos en orden ascendente, y confirmación de quien valida — todo queda auditado (antes/después, actor, motivo). Habilitar es una acción explícita y auditable, separada de leer. La <b>planilla de comisiones</b> es otra fuente distinta: liquida comisiones, no habilita tarifas.')
         ]),
         Q('Evaluación · Aseguradoras (directorio)', [
           { p: 'Un portal sin conexión configurada debe mostrar…', ops: ['La contraseña guardada', 'Pendiente de conexión segura', 'Acceso disponible'], ok: 1 },
           { p: 'Un documento tarifario recién importado…', ops: ['Habilita el producto en Cotizador automáticamente', 'Queda pendiente de validación y requiere habilitación explícita separada', 'Actualiza cartera directamente'], ok: 1 },
           { p: 'La planilla de comisiones y el conocimiento tarifario del Cotizador son…', ops: ['La misma fuente', 'Fuentes distintas: una liquida comisiones, la otra habilita cotizar', 'Da igual cuál se use'], ok: 1 },
-          { p: 'La pestaña "Tarifas y conocimiento" en la ficha es…', ops: ['La portada principal del módulo', 'Una sección secundaria administrativa', 'Solo visible en Cotizador'], ok: 1 }
+          { p: 'La pestaña "Tarifas y conocimiento" en la ficha es…', ops: ['La portada principal del módulo', 'Una sección secundaria administrativa', 'Solo visible en Cotizador'], ok: 1 },
+          { p: 'Para validar una tabla de tasas y habilitar el cálculo automático hace falta…', ops: ['Solo marcar la casilla de validado', 'Documento fuente + versión + vigencia + tramos válidos, con motivo y confirmación', 'Nada, se habilita al guardar cualquier tramo'], ok: 1 }
         ])
       ]
     },
@@ -1042,7 +1054,7 @@ Orbit.ACADEMIA_PLUS = (function () {
   ];
 
   // Versión de contenido: súbela cuando cambies texto/lecciones para que se re-sincronice.
-  var CONTENT_V = 23;
+  var CONTENT_V = 24;
   function apply() {
     try {
       if (!window.Orbit || !Orbit.store || !Orbit.store.all) return false;

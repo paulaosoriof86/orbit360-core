@@ -857,7 +857,7 @@ Orbit.SEED = (function () {
 
   // orden de actividades por fecha desc se hace en el módulo
   return {
-    __v: 64,
+    __v: 66,
     meta: { now: iso(NOW), empresa: 'Demo Corredores', moneda_base: 'GTQ' },
     asesores, aseguradoras, clientes, polizas, cobros, comisiones, actividades, cancelaciones, vehiculos, negocios, gestiones, novedades, finmovs, acreedores, presupuesto, correos, contenidos, reclamos, cursos, notifs
   };

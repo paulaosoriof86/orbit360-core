@@ -59,10 +59,10 @@ Cada ítem del sidebar lleva su badge real:
 | **BETA** | En estabilización |
 | **PRÓX.** | En roadmap (pantalla con alcance documentado) |
 
-Hoy: **Orbit Inicio** e **Cliente 360** (con Pólizas, Cobros, Renovaciones, Cancelaciones, Comisiones, Historial) están construidos. El resto muestra su alcance objetivo y se construye según el orden de `ORBIT360-BUILD.md`.
+La plataforma cubre hoy el ciclo completo: Cliente 360, Pólizas, Cobros, Renovaciones, Cancelaciones, Comisiones, Historial, Ops/Leads, Cotizador + Comparativo (con tarifas por aseguradora validables y trazables), Aseguradoras (directorio + tarifas + documentos), Correo, Automatizaciones/Integraciones, Orbit IA, Configuración (marca, usuarios, países, integraciones, con secciones técnicas segmentadas por rol), Academia, Marketing, Reportes/Insights, Finanzas, Calidad e Importador. Ver `docs/PLAN-INFRAESTRUCTURA.md` para el detalle de rondas de auditoría y pendientes P1 documentados (no bloqueantes).
 
-## Orden de construcción
-Ver `../orbit360/ORBIT360-BUILD.md` §4. Vamos en: **Paso 1 (Shell + datos + tokens)** ✅ y **CRM Cliente 360** ✅.
+## Versión
+Ver `docs/MANIFIESTO-ENTREGA-v1215.md` para el detalle exacto de la candidata vigente y `CHANGELOG.md` para el historial por versión.
 
 ## Documentación por módulo
 `docs/` — un archivo por módulo conforme se construye. Ver `docs/cliente360.md`.

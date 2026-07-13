@@ -3,10 +3,11 @@
    Directorio GT/CO buscable y filtrable; ficha por pestañas con
    DRAFT real: editar → revisar → motivo → Guardar/Cancelar (cancelar
    nunca escribe al store). Rol activo vía Orbit.session.rol().
-   Motor de fuentes/conocimiento (_fuentes) con dimensiones extendidas
-   y capacidades por fuente (tarifas/reglas/presentación/comparativo/
-   condiciones/casos de prueba). Gate Cotizador/Comparativo default-
-   deny: un ramo solo se ofrece si fue HABILITADO explícitamente.
+   Catálogo de documentos y conocimiento por aseguradora (_fuentes)
+   con dimensiones extendidas y capacidades por documento (tarifas/
+   reglas/presentación/comparativo/condiciones/casos de prueba). Gate
+   Cotizador/Comparativo default-deny: un ramo solo se ofrece si fue
+   HABILITADO explícitamente.
    Seguridad: nunca contraseñas reales — credentialRef:'backend_required'
    + estado honesto. Logo nunca se persiste como Data URL nueva.
    Borrado: normal = desactivar con motivo; borrado físico solo si
@@ -50,7 +51,7 @@ Orbit.modules.aseguradoras = (function () {
   }
   /* auditoría EXTERNA (sobrevive aunque se borre la entidad) */
   function auditExterna(entrada) {
-    try { S().insert('auditoriaAseguradoras', Object.assign({ id: 'audasg' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), fecha: new Date().toISOString(), responsable: actorNombre() + ' · ' + activeRole() }, entrada)); } catch (e) {}
+    try { S().insert('auditoriaAsegExterna', Object.assign({ id: 'audasg' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), fecha: new Date().toISOString(), responsable: actorNombre() + ' · ' + activeRole() }, entrada)); } catch (e) {}
   }
 
   /* ===================== MOTOR DE FUENTES/CONOCIMIENTO (Tarifas) ===================== */
@@ -138,7 +139,7 @@ Orbit.modules.aseguradoras = (function () {
     const puedeEditar = canEdit();
 
     host.innerHTML = `<div class="page">
-      ${K.banner({ icon: '🏢', title: 'Orbit Aseguradoras', sub: 'Directorio operativo: contactos, accesos, cuentas, productos y documentos', features: [], actions: `${puedeEditar ? `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button>` : ''}${puedeEditar ? '<button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>' : ''}` })}
+      ${K.banner({ icon: '🏢', title: 'Orbit Aseguradoras', sub: 'Directorio de aseguradoras vinculadas', features: [], actions: `${puedeEditar ? `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button>` : ''}${puedeEditar ? '<button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>' : ''}` })}
       ${K.kpis([
         { label: 'Activas', val: vinc.length, color: 'var(--ok)', foot: 'de ' + base.length + ' en directorio', footTone: 'up', onclick: "Orbit.modules.aseguradoras.kpi('activas')" },
         { label: 'Con contacto principal', val: conContactoPpal.length, color: 'var(--red)', foot: 'marcado como principal', onclick: "Orbit.modules.aseguradoras.kpi('contacto')" },
@@ -146,8 +147,7 @@ Orbit.modules.aseguradoras = (function () {
         { label: 'Con documentación', val: conDocs.length, color: 'var(--ink-3)', foot: 'con documentos cargados', onclick: "Orbit.modules.aseguradoras.kpi('docs')" },
         { label: 'Requieren actualización', val: pendActualizar.length, color: 'var(--warn)', foot: 'revisar acceso', footTone: pendActualizar.length ? 'down' : undefined, onclick: "Orbit.modules.aseguradoras.kpi('pend')" }
       ])}
-      <div class="cfg-note" style="margin-bottom:12px">${puedeEditar ? 'Activa o desactiva cada aseguradora según tus <b>vinculaciones</b> vigentes (las desactivadas no aparecen al cotizar ni al emitir). <b>Importar</b> agrega o actualiza el directorio.' : `Vista de solo lectura para tu rol (<b>${U.esc(activeRole())}</b>) — la edición y la importación las hace Dirección/Admin.`} Quién puede ver este módulo se define en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/equipo'">Equipo y permisos</a>.</div>
-      <div class="cfg-note" style="margin-bottom:14px">🔗 Este directorio alimenta al <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/cotizador'">Cotizador</a> (solo cotiza los ramos que actives por aseguradora) y al <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/comparativo'">Comparativo</a> (compara esas cotizaciones o propuestas en PDF).</div>
+      ${!puedeEditar ? `<div class="cfg-note" style="margin-bottom:14px">Vista de solo lectura para tu rol (<b>${U.esc(activeRole())}</b>).</div>` : ''}
       <div class="card pad" style="margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <input id="asg-q" class="o-sel" style="flex:1.5;min-width:200px" placeholder="🔎 Buscar por nombre, NIT, contacto o ramo…" value="${U.esc(q)}">
         <select id="asg-fpais" class="o-sel" style="width:120px"><option value="TODOS" ${fPais === 'TODOS' ? 'selected' : ''}>Todo país</option><option value="GT" ${fPais === 'GT' ? 'selected' : ''}>GT</option><option value="CO" ${fPais === 'CO' ? 'selected' : ''}>CO</option></select>
@@ -255,48 +255,43 @@ Orbit.modules.aseguradoras = (function () {
     fichaState[id] = { tab: (fichaState[id] || {}).tab || 'resumen', editing: wantEdit, draft: wantEdit ? cloneEnt(a) : null };
     const st = fichaState[id];
     const data = st.editing ? st.draft : a;
-    let back = document.getElementById('asg-ficha'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'asg-ficha'; back.className = 'drawer-back open'; back.dataset.id = id;
-    back.style.display = 'grid'; back.style.placeItems = 'center';
-    back.innerHTML = `<div class="card" style="width:min(920px,96vw);max-height:92vh;overflow:hidden;padding:0;display:flex;flex-direction:column">
-      <div style="padding:20px 24px;background:linear-gradient(120deg,${a.color},#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-        <div style="display:flex;gap:13px;align-items:center">
-          <span class="asg-logo">${a.logo ? `<img src="${a.logo}">` : '<span>🏢<br><small>logo</small></span>'}</span>
-          <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Aseguradora · ${a.pais}</div>
-            <div style="font-family:var(--f-display);font-weight:800;font-size:20px;color:#fff">${U.esc(a.nombre)}</div>
-            <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'}${st.editing ? ' · <b>Editando</b>' : ''}</div></div>
+    host.innerHTML = `<div class="page" id="asg-ficha" data-id="${id}">
+      <div class="crumb" style="margin-bottom:14px"><a style="cursor:pointer;color:var(--red)" onclick="location.hash='#/aseguradoras'">‹ Aseguradoras</a> / ${U.esc(a.nombre)}</div>
+      <div class="card" style="overflow:hidden;padding:0;display:flex;flex-direction:column">
+        <div style="padding:20px 24px;background:linear-gradient(120deg,${a.color},#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;gap:13px;align-items:center">
+            <span class="asg-logo">${a.logo ? `<img src="${a.logo}">` : '<span>🏢<br><small>logo</small></span>'}</span>
+            <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Aseguradora · ${a.pais}</div>
+              <div style="font-family:var(--f-display);font-weight:800;font-size:20px;color:#fff">${U.esc(a.nombre)}</div>
+              <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'}${st.editing ? ' · <b>Editando</b>' : ''}</div></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${canEdit() ? (st.editing ? '' : `<button class="btn ghost sm" id="af-editar" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff">✏ Editar</button>`) : '<span class="badge neutral" style="background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)">Solo lectura</span>'}
+          </div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          ${canEdit() ? (st.editing ? '' : `<button class="btn ghost sm" id="af-editar" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff">✏ Editar</button>`) : '<span class="badge neutral" style="background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)">Solo lectura</span>'}
-          <button class="imp-x" id="af-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
+        <div class="asg-tabbar" role="tablist">${TABS.map(([k, l]) => `<button class="asg-tab ${k === st.tab ? 'active' : ''}" role="tab" aria-selected="${k === st.tab}" data-tab="${k}">${l}</button>`).join('')}</div>
+        <div id="af-body" role="tabpanel" style="padding:18px 22px">${tabBody(data, st.tab, st.editing)}</div>
+        <div style="padding:12px 22px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
+          ${st.editing
+            ? `<div style="display:flex;gap:8px"><button class="btn primary" id="af-guardar">💾 Guardar cambios</button><button class="btn ghost" id="af-cancelar">✕ Cancelar</button></div>`
+            : (canEdit() ? '<button class="btn ghost" id="af-del" style="color:var(--danger)">🗑 Borrar / desactivar</button>' : '<span></span>')}
+          <button class="btn ghost" onclick="location.hash='#/aseguradoras'">‹ Volver al directorio</button>
         </div>
-      </div>
-      <div class="asg-tabbar" role="tablist">${TABS.map(([k, l]) => `<button class="asg-tab ${k === st.tab ? 'active' : ''}" role="tab" aria-selected="${k === st.tab}" data-tab="${k}">${l}</button>`).join('')}</div>
-      <div id="af-body" role="tabpanel" style="padding:18px 22px;overflow:auto;flex:1">${tabBody(data, st.tab, st.editing)}</div>
-      <div style="padding:12px 22px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
-        ${st.editing
-          ? `<div style="display:flex;gap:8px"><button class="btn primary" id="af-guardar">💾 Guardar cambios</button><button class="btn ghost" id="af-cancelar">✕ Cancelar</button></div>`
-          : (canEdit() ? '<button class="btn ghost" id="af-del" style="color:var(--danger)">🗑 Borrar / desactivar</button>' : '<span></span>')}
-        <button class="btn ghost" data-close>Cerrar</button>
       </div>
     </div>`;
-    document.body.appendChild(back);
+    const back = document.getElementById('asg-ficha');
     Orbit.vault.wire(back);
     back.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
     if (back.querySelector('#af-editar')) back.querySelector('#af-editar').addEventListener('click', () => ficha(id, true));
     if (back.querySelector('#af-guardar')) back.querySelector('#af-guardar').addEventListener('click', () => guardarDraft(id, back));
     if (back.querySelector('#af-cancelar')) back.querySelector('#af-cancelar').addEventListener('click', () => { fichaState[id].editing = false; fichaState[id].draft = null; ficha(id); });
-    const cerrarFicha = () => { if (st.editing) { fichaState[id].editing = false; fichaState[id].draft = null; } back.remove(); history.replaceState(null, '', '#/aseguradoras'); if (Orbit.route) { const p = Object.assign({}, Orbit.route.params); delete p.ficha; Orbit.route.params = p; } };
-    back.querySelector('#af-x').addEventListener('click', cerrarFicha);
-    back.querySelector('[data-close]').addEventListener('click', cerrarFicha);
-    back.addEventListener('click', e => { if (e.target === back) cerrarFicha(); });
     if (back.querySelector('#af-del')) back.querySelector('#af-del').addEventListener('click', () => borrarOdesactivar(id, back));
     wireBody(back, data, st.tab);
   }
 
   /* ---- diff simple (top-level) para trazabilidad antes/después ---- */
   function diffResumen(before, after) {
-    const claves = ['nombre', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada'];
+    const claves = ['nombre', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada', 'cotTasas', 'cotTasasValidadas'];
     const cambios = [];
     claves.forEach(k => { const b = JSON.stringify(before[k]), a2 = JSON.stringify(after[k]); if (b !== a2) cambios.push(k); });
     return cambios;
@@ -312,8 +307,22 @@ Orbit.modules.aseguradoras = (function () {
     const patch = Object.assign({}, st.draft, { actividad: log(before, { cambio: 'Actualización de ficha (' + cambios.join(', ') + ')', motivo, camposCambiados: cambios }) });
     delete patch.id;
     up(id, patch);
+    /* P0-RATE-AUDIT: registro estructurado y externo de cada cambio de tarifas/validación (sobrevive a la ficha) */
+    if (cambios.indexOf('cotTasas') >= 0 || cambios.indexOf('cotTasasValidadas') >= 0) tarifaValidacionAudit(id, before, st.draft, motivo);
     st.editing = false; st.draft = null;
     ficha(id); reload();
+  }
+  /* Auditoría externa de cambios en tarifas/validación tarifaria — nombre estable: tarifaValidacionAudit */
+  function tarifaValidacionAudit(id, before, after, motivo) {
+    const ramos = Array.from(new Set(Object.keys(after.cotTasas || {}).concat(Object.keys(before.cotTasas || {})).concat(Object.keys(after.cotTasasValidadas || {})).concat(Object.keys(before.cotTasasValidadas || {}))));
+    ramos.forEach(ramo => {
+      const antesVal = !!(before.cotTasasValidadas && before.cotTasasValidadas[ramo]);
+      const despuesVal = !!(after.cotTasasValidadas && after.cotTasasValidadas[ramo]);
+      const antesCfg = (before.cotTasas && before.cotTasas[ramo]) || null;
+      const despuesCfg = (after.cotTasas && after.cotTasas[ramo]) || null;
+      if (JSON.stringify(antesCfg) === JSON.stringify(despuesCfg) && antesVal === despuesVal) return;
+      auditExterna({ cambio: (despuesVal && !antesVal) ? 'Tarifa activada (validada) para ' + ramo : (!despuesVal && antesVal) ? 'Tarifa desactivada (invalidada) para ' + ramo : 'Tabla de tasas modificada para ' + ramo, aseguradoraId: id, ramo, motivo, antes: { tramos: antesCfg, validada: antesVal }, despues: { tramos: despuesCfg, validada: despuesVal } });
+    });
   }
 
   /* ---- borrado seguro: normal = SOLO desactivar; borrado físico exige cero vínculos + auditoría externa previa ---- */
@@ -536,15 +545,57 @@ Orbit.modules.aseguradoras = (function () {
   function tabTarifas(a, editing) {
     const resumen = resumenFuentes(a);
     const grupos = resumenGrupos(a);
+    const ramos = a.ramos || [];
+    const id = a.id;
+    tarifaRamoSel[id] = tarifaRamoSel[id] || ramos[0] || '';
+    const ramoSel = tarifaRamoSel[id];
     return `<div class="asg-sec">
       <div class="asg-sec-t">🧮 Tarifas y conocimiento — sección administrativa avanzada</div>
-      <div class="cfg-note" style="margin-bottom:9px">Motor de fuentes: cada documento se normaliza por país/moneda/ramo/producto (+segmento/plan/tipo de riesgo cuando aplica) y expone capacidades (sirve para tarifas, reglas, presentación, comparativo, condiciones, casos de prueba). <b>Procesar un documento nunca habilita automáticamente</b> Cotizador/Comparativo.</div>
+      <div class="cfg-note" style="margin-bottom:9px">Cada documento se organiza por país/moneda/ramo/producto (+segmento/plan/tipo de riesgo cuando aplica) y define qué puede hacerse con él (tarifas, reglas, presentación, comparativo, condiciones, casos de prueba). <b>Procesar un documento nunca habilita automáticamente</b> Cotizador/Comparativo.</div>
       <div class="asg-tarifas-est">${Object.keys(resumen).filter(k => resumen[k] > 0).map(k => `<span class="badge ${k.indexOf('incompleto') >= 0 ? 'danger' : k.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10.5px">${k} (${resumen[k]})</span>`).join('') || '<span class="muted" style="font-size:12px">Sin fuentes cargadas todavía.</span>'}</div>
       <div style="margin-top:12px;display:grid;gap:8px">
         ${grupos.map(g => `<div class="asg-row" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><span style="flex:1;font-size:12px">${U.esc(g.label)}</span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}" style="font-size:10px">${g.estado}</span><span class="muted" style="font-size:11px">${g.docs.length} doc(s)</span></div>`).join('') || ''}
       </div>
       ${editing ? '<button class="btn ghost sm" id="af-imp-doc2" style="margin-top:12px">✨ Importar documento tarifario</button>' : ''}
+      ${ramos.length ? tablaTasasRamo(a, ramoSel, editing) : '<div class="cfg-note" style="margin-top:12px">Agregá al menos un ramo en la pestaña Productos y planes para configurar su tabla de tasas automáticas.</div>'}
     </div>`;
+  }
+  /* ---- Tabla de tasas automáticas del Cotizador, POR RAMO — sin esto, calcTasas() del Cotizador siempre queda bloqueado (nunca se usa un valor genérico) ---- */
+  const tarifaRamoSel = {};
+  /* valida tramos antes de habilitar el cálculo automático */
+  function tramosValidos(tramos) {
+    if (!tramos || !tramos.length) return false;
+    const tasaPositiva = tramos.every(r => r.tasa > 0);
+    const minimoNoNegativo = tramos.every(r => r.min >= 0);
+    const rangoEnOrden = tramos.every((r, i) => i === 0 || r.hasta > tramos[i - 1].hasta);
+    return tasaPositiva && minimoNoNegativo && rangoEnOrden;
+  }
+  function tablaTasasRamo(a, ramo, editing) {
+    const cfg = (a.cotTasas && a.cotTasas[ramo]) || {};
+    const tramos = cfg.auto || [];
+    const validada = !!(a.cotTasasValidadas && a.cotTasasValidadas[ramo]);
+    const puedeValidar = tramos.length > 0 && !!cfg.fuenteDocumentoId && !!cfg.version && !!cfg.vigencia && tramosValidos(tramos);
+    return `<div class="asg-sec-t" style="margin-top:16px">📊 Tabla de tasas automáticas · Cotizador</div>
+      <div class="cfg-note" style="margin-bottom:9px">Sin esta tabla <b>validada</b>, el Cotizador nunca calcula automático para esta aseguradora/ramo — el asesor solo puede usar modo ✍️ Manual con la prima que le den. Cada ramo tiene su propia tabla.</div>
+      <label class="ce-l" style="max-width:260px">Ramo a configurar<select id="tf-ramo" class="o-sel" ${editing ? '' : 'disabled'}>${(a.ramos || []).map(r => `<option ${r === ramo ? 'selected' : ''}>${U.esc(r)}</option>`).join('')}</select></label>
+      <div style="overflow-x:auto;margin-top:8px"><table class="tbl" id="tf-tabla"><thead><tr><th>Hasta (valor asegurado)</th><th>Tasa %</th><th>Prima mínima</th><th></th></tr></thead><tbody>
+        ${tramos.map((r, i) => `<tr data-tftr="${i}"><td><input class="o-sel" type="number" data-tf-hasta value="${r.hasta || 0}" ${editing ? '' : 'disabled'}></td><td><input class="o-sel" type="number" step="0.01" data-tf-tasa value="${r.tasa || 0}" ${editing ? '' : 'disabled'}></td><td><input class="o-sel" type="number" data-tf-min value="${r.min || 0}" ${editing ? '' : 'disabled'}></td><td>${editing ? `<button class="asg-del" data-tf-del="${i}">✕</button>` : ''}</td></tr>`).join('') || `<tr><td colspan="4" class="muted" style="text-align:center;padding:10px">Sin tramos — ${editing ? 'agregá el primero' : 'sin configurar'}</td></tr>`}
+      </tbody></table></div>
+      ${editing ? '<button class="btn ghost sm" id="tf-add" style="margin-top:8px">➕ Tramo</button>' : ''}
+      <div class="cgrid" style="margin-top:14px">
+        <label class="ce-l">Recargo fraccionamiento — 2 pagos %<input class="o-sel" type="number" step="0.1" id="tf-rf2" value="${(cfg.recargoFraccPct && cfg.recargoFraccPct[2]) || 0}" ${editing ? '' : 'disabled'}></label>
+        <label class="ce-l">4 pagos %<input class="o-sel" type="number" step="0.1" id="tf-rf4" value="${(cfg.recargoFraccPct && cfg.recargoFraccPct[4]) || 0}" ${editing ? '' : 'disabled'}></label>
+        <label class="ce-l">6 pagos %<input class="o-sel" type="number" step="0.1" id="tf-rf6" value="${(cfg.recargoFraccPct && cfg.recargoFraccPct[6]) || 0}" ${editing ? '' : 'disabled'}></label>
+        <label class="ce-l">12 pagos %<input class="o-sel" type="number" step="0.1" id="tf-rf12" value="${(cfg.recargoFraccPct && cfg.recargoFraccPct[12]) || 0}" ${editing ? '' : 'disabled'}></label>
+        ${ramo === 'Auto' ? `<label class="ce-l">Recargo por antigüedad — año límite<input class="o-sel" type="number" id="tf-ra-anio" value="${(cfg.recargoAntiguedad && cfg.recargoAntiguedad.anioLimite) || ''}" placeholder="Ej. 2015" ${editing ? '' : 'disabled'}></label><label class="ce-l">% recargo si es anterior<input class="o-sel" type="number" step="0.1" id="tf-ra-pct" value="${(cfg.recargoAntiguedad && cfg.recargoAntiguedad.pct) || ''}" ${editing ? '' : 'disabled'}></label>` : ''}
+        <label class="ce-l">Gastos de emisión GT %<input class="o-sel" type="number" step="0.1" id="tf-ge-gt" value="${(cfg.gastosEmisionPct && cfg.gastosEmisionPct.GT) || 0}" ${editing ? '' : 'disabled'}></label>
+        <label class="ce-l">Gastos de emisión CO %<input class="o-sel" type="number" step="0.1" id="tf-ge-co" value="${(cfg.gastosEmisionPct && cfg.gastosEmisionPct.CO) || 0}" ${editing ? '' : 'disabled'}></label>
+        <label class="ce-l">Documento fuente (referencia)<input class="o-sel" id="tf-fuente" value="${U.esc(cfg.fuenteDocumentoId || '')}" placeholder="Ej. Tarifario Auto 2026" ${editing ? '' : 'disabled'}></label>
+        <label class="ce-l">Versión<input class="o-sel" id="tf-version" value="${U.esc(cfg.version || '')}" placeholder="v2026-1" ${editing ? '' : 'disabled'}></label>
+        <label class="ce-l">Vigencia<input class="o-sel" id="tf-vigencia" value="${U.esc(cfg.vigencia || '')}" placeholder="2026-01 a 2026-12" ${editing ? '' : 'disabled'}></label>
+      </div>
+      <label class="ce-l ck" style="margin-top:10px"><input type="checkbox" id="tf-validada" ${validada ? 'checked' : ''} ${editing && puedeValidar ? '' : 'disabled'}> Tabla validada y habilitada para cálculo automático de ${U.esc(ramo)}</label>
+      ${!puedeValidar && editing ? '<div class="cfg-note" style="margin-top:6px">Agregá al menos un tramo con tasas y mínimos válidos, en orden ascendente, y completá documento fuente + versión + vigencia antes de poder validar.</div>' : ''}`;
   }
 
   /* ---- Actividad ---- */
@@ -552,7 +603,7 @@ Orbit.modules.aseguradoras = (function () {
     const hist = a.actividad || [];
     return `<div class="asg-sec">
       <div class="asg-sec-t">🕒 Actividad</div>
-      <div class="cfg-note" style="margin-bottom:9px">Cambios visibles de esta ficha, con actor real y motivo. Los registros internos de soporte no se muestran separada (\`auditoriaAseguradoras\`) que sobrevive aunque la aseguradora se elimine.</div>
+      <div class="cfg-note" style="margin-bottom:9px">Cambios visibles de esta ficha, con actor real y motivo. Existe además un registro de auditoría interno que se conserva aunque la aseguradora se elimine.</div>
       ${hist.length ? hist.map(h => `<div style="font-size:12px;padding:7px 0;border-bottom:1px dashed var(--line-2)"><b>${U.esc(h.cambio || 'Actualización')}</b> · ${U.esc(h.responsable || 'equipo')} · <span class="muted">${h.fecha ? new Date(h.fecha).toLocaleString() : ''}</span>${h.motivo ? '<div class="muted">Motivo: ' + U.esc(h.motivo) + '</div>' : ''}${h.camposCambiados ? '<div class="muted">Campos: ' + h.camposCambiados.join(', ') + '</div>' : ''}</div>`).join('') : '<div class="muted" style="font-size:12px">Sin actividad registrada.</div>'}
     </div>`;
   }
@@ -610,6 +661,25 @@ Orbit.modules.aseguradoras = (function () {
         const prevDocs = draft.docs || [];
         draft.docs = [...body.querySelectorAll('[data-doc]')].map((r, idx) => Object.assign({}, prevDocs[idx] || {}, { nombre: r.querySelector('[data-dn]').value, cat: r.querySelector('[data-dc]').value, ramo: r.querySelector('[data-dr]').value, pais: r.querySelector('[data-dpais]').value, moneda: r.querySelector('[data-dmon]').value, segmento: r.querySelector('[data-dseg]').value }));
       }
+      if (t === 'tarifas') {
+        const ramo = tarifaRamoSel[draft.id] || (draft.ramos || [])[0];
+        if (ramo) {
+          const tramos = [...body.querySelectorAll('[data-tftr]')].map(r => ({ hasta: +r.querySelector('[data-tf-hasta]').value || 0, tasa: +r.querySelector('[data-tf-tasa]').value || 0, min: +r.querySelector('[data-tf-min]').value || 0 }));
+          const g = s => { const el = body.querySelector(s); return el ? el.value : ''; };
+          draft.cotTasas = draft.cotTasas || {};
+          draft.cotTasas[ramo] = {
+            auto: tramos,
+            recargoFraccPct: { 1: 0, 2: +g('#tf-rf2') || 0, 4: +g('#tf-rf4') || 0, 6: +g('#tf-rf6') || 0, 12: +g('#tf-rf12') || 0 },
+            recargoAntiguedad: { anioLimite: +g('#tf-ra-anio') || 0, pct: +g('#tf-ra-pct') || 0 },
+            gastosEmisionPct: { GT: +g('#tf-ge-gt') || 0, CO: +g('#tf-ge-co') || 0 },
+            fuenteDocumentoId: g('#tf-fuente'), version: g('#tf-version'), vigencia: g('#tf-vigencia')
+          };
+          const chk = body.querySelector('#tf-validada');
+          draft.cotTasasValidadas = draft.cotTasasValidadas || {};
+          const puedeValidarAhora = tramosValidos(tramos) && !!draft.cotTasas[ramo].fuenteDocumentoId && !!draft.cotTasas[ramo].version && !!draft.cotTasas[ramo].vigencia;
+          if (chk) draft.cotTasasValidadas[ramo] = chk.checked && puedeValidarAhora;
+        }
+      }
     }
 
     // cualquier cambio de input snapshotea la pestaña actual al draft (sin escribir al store)
@@ -627,7 +697,12 @@ Orbit.modules.aseguradoras = (function () {
       const add = body.querySelector('#af-add-doc'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.docs = (draft.docs || []).concat([{ id: 'doc' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), nombre: 'Documento.pdf', cat: 'Formulario', estado: 'Documento recibido', pais: draft.pais, moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', ramo: '' }]); selectTab('documentos'); });
       const imp = body.querySelector('#af-imp-doc'); if (imp) imp.addEventListener('click', () => { if (!canEdit()) return; document.getElementById('asg-ficha').remove(); Orbit.importa.open('docs-aseguradora', { onDone: reload }); });
     }
-    if (t === 'tarifas') { const imp = body.querySelector('#af-imp-doc2'); if (imp) imp.addEventListener('click', () => { if (!canEdit()) return; document.getElementById('asg-ficha').remove(); Orbit.importa.open('docs-aseguradora', { onDone: reload }); }); }
+    if (t === 'tarifas') {
+      const imp = body.querySelector('#af-imp-doc2'); if (imp) imp.addEventListener('click', () => { if (!canEdit()) return; document.getElementById('asg-ficha').remove(); Orbit.importa.open('docs-aseguradora', { onDone: reload }); });
+      const sel = body.querySelector('#tf-ramo'); if (sel) sel.addEventListener('change', () => { snapshotTab(); tarifaRamoSel[id] = sel.value; selectTab('tarifas'); });
+      const add = body.querySelector('#tf-add'); if (add) add.addEventListener('click', () => { snapshotTab(); const ramo = tarifaRamoSel[id] || (draft.ramos || [])[0]; draft.cotTasas = draft.cotTasas || {}; draft.cotTasas[ramo] = draft.cotTasas[ramo] || { auto: [] }; draft.cotTasas[ramo].auto = (draft.cotTasas[ramo].auto || []).concat([{ hasta: 0, tasa: 0, min: 0 }]); selectTab('tarifas'); });
+      body.querySelectorAll('[data-tf-del]').forEach(b => b.addEventListener('click', () => { snapshotTab(); const ramo = tarifaRamoSel[id] || (draft.ramos || [])[0]; if (draft.cotTasas && draft.cotTasas[ramo]) draft.cotTasas[ramo].auto.splice(+b.dataset.tfDel, 1); selectTab('tarifas'); }));
+    }
   }
 
   /* ===================== KPI CON DETALLE ===================== */

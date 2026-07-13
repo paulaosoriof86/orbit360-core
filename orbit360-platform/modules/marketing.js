@@ -27,7 +27,7 @@ Orbit.modules.marketing = (function () {
   function integrationMsg(row, fallback) {
     if (!row) return fallback || 'Evento registrado localmente.';
     if (row.estado === 'pendiente_configuracion') return '⚠ Evento registrado: falta configurar ' + (row.proveedor || 'integración') + '.';
-    if (row.estado === 'pendiente_backend') return '⚠ Configuración pendiente de conexión.';
+    if (row.estado === 'pendiente_backend') return '⚠ Falta conexión segura para completar el envío.';
     return fallback || '✓ Evento de integración registrado.';
   }
 

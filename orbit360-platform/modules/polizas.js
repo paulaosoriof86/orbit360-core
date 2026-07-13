@@ -36,6 +36,7 @@ Orbit.modules.polizas = (function () {
     const primaVig = vig.reduce((s, p) => s + q.norm(p.prima, p.moneda), 0);
     const r = rows();
     st.__count = r.length + ' de ' + all.length;
+    const pid = (Orbit.route && Orbit.route.params && Orbit.route.params.p) || null;
 
     host.innerHTML = `<div class="page">
       ${K.bannerFor('polizas', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevaPoliza()">+ Nueva póliza</button>`)}
@@ -66,6 +67,7 @@ Orbit.modules.polizas = (function () {
       if (live) { const a = document.activeElement, v = a.value; render(host); const i = document.getElementById('fq'); if (i) { i.focus(); i.value = v; i.setSelectionRange(v.length, v.length); } }
       else render(host);
     });
+    if (pid && S().get('polizas', pid)) Orbit.modules.cliente360.verPoliza(pid);
   }
   function emptyRow(n) { return `<tr><td colspan="${n}" class="muted" style="text-align:center;padding:30px">Sin resultados.</td></tr>`; }
   function filtrarEstado(e) { st.fest = st.fest === e ? '' : e; const host = document.getElementById('host'); if (host) render(host); }

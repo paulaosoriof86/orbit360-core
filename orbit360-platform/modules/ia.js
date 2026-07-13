@@ -9,6 +9,13 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.ia = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   let host, hist = [], contexto = 'equipo';
+  /* P0-TECH-ROLE: proveedor/modelo de IA es configuración técnica — solo visible al rol activo autorizado */
+  function activeRole() {
+    try { if (Orbit.session && Orbit.session.rol) return Orbit.session.rol(); } catch (e) {}
+    try { if (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) return Orbit.auth.user().rol || 'Asesor'; } catch (e) {}
+    return 'Asesor';
+  }
+  function canViewTechnical() { return ['Dirección', 'Admin'].indexOf(activeRole()) >= 0; }
 
   const CTX = {
     equipo:  { icon: '🧑‍💼', label: 'Equipo interno', desc: 'Análisis operativo, redacción, resúmenes' },
@@ -54,8 +61,10 @@ Orbit.modules.ia = (function () {
       +     '<div class="ia-side-t" style="margin-top:16px">Estado del motor</div>'
       +     '<div class="ia-engine ' + (iaCfg.activo ? 'on' : '') + '">'
       +       (iaCfg.activo
-              ? '🟢 <b>' + U.esc(iaCfg.proveedor) + '</b><br><small>' + U.esc(iaCfg.modelo) + '</small>'
-              : '🟡 <b>Modo heurístico</b><br><small>Conecta una API key en Automatizaciones para respuestas completas con IA real</small>')
+              ? (canViewTechnical()
+                ? '🟢 <b>' + U.esc(iaCfg.proveedor) + '</b><br><small>' + U.esc(iaCfg.modelo) + '</small>'
+                : '🟢 <b>IA activa</b><br><small>Motor configurado por el equipo técnico</small>')
+              : '🟡 <b>Modo heurístico</b><br><small>' + (canViewTechnical() ? 'Conecta una API key en Automatizaciones para respuestas completas con IA real' : 'El equipo técnico puede activar un motor de IA completo') + '</small>')
       +     '</div>'
       +   '</div>'
       +   '<div class="ia-chat">'

@@ -266,11 +266,14 @@ Estado: ✅ hecho · 🟡 parcial · ⏳ pendiente · 🧩 placeholder honesto e
 - 🧩 **Reportes** (exportables, filtros, programados por correo) — placeholder
 - 🧩 **Portal del Cliente** (sus pólizas/recibos/documentos/contacto + **solicitar gestiones que entran a Ops y notifican** — hoy simulado con el botón 🙋 en la ficha) — placeholder
 - 🧩 **Notificaciones WhatsApp** (centro de mensajería WA web + API, plantillas, encuestas) — base hecha (notify), falta centro dedicado
-- ⏳ **Integraciones** (Config): **Outlook prioritario**, Gmail, Green API, Sheets, Canva, Gamma, NotebookLM, HeyGen, redes, Metricool, Mailchimp
-- ⏳ **Localización por país** (glosario de términos configurable por tenant)
-- ⏳ **Equipo y permisos** + **Configuración** self-service (catálogos, metas, branding, módulos activos)
-- ⏳ **Renovaciones multi-aseguradora** (hoy comparativo simula misma aseguradora)
-- ⏳ **Responsive global** (revisar todos los módulos)
+- ✅ **Integraciones** (Config): Outlook prioritario con permisos granulares + resto del catálogo (Gmail, WhatsApp, Sheets, Zapier, n8n, Slack, Teams, etc.)
+- ✅ **Localización por país** (glosario editable por país en Configuración, `configuracion.js`)
+- ✅ **Equipo y permisos** + **Configuración** self-service (`equipo.js`, roles, restricciones/permisosExtra por asesor)
+- ✅ **Renovaciones multi-aseguradora** (comparativo real con selección de aseguradoras, `renovaciones.js`)
+- ✅ **Responsive global** (breakpoints en `base.css`/`infra.css` cubriendo shell, ficha, config, kanban, ia, finanzas, marketing, etc.)
+- ✅ **Aseguradoras**: ficha editable completa por pestañas (contactos, plataformas, bancos, productos, documentos/Drive, tarifas, actividad) con draft real y permisos
+
+> **Auditoría 2026-07-12 (v1.213)**: se verificó código contra este checklist — TODO lo marcado 🧩/⏳ arriba (Finanzas, Aseguradoras, Cotizador, Orbit IA, Academia, Marketing, Reportes, Portal, Notificaciones WA) existe como módulo real, no placeholder. Este documento no se había actualizado en varias rondas (R7–R10); las líneas 🧩/⏳ previas a esta nota reflejan un estado histórico, no el actual. Ver CHANGELOG.md para el detalle versión por versión real.
 
 ### Sobre la "Solicitud del cliente" (cómo opera hoy vs 1.0)
 - **Hoy**: botón 🙋 en la ficha del cliente que crea la gestión en Ops con origen "Solicitud del cliente" y dispara notificación al asesor (WA/correo). Es el **proxy** mientras no exista el Portal.

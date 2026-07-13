@@ -363,12 +363,12 @@ Orbit.modules.cobros = (function () {
       sel.forEach(c => {
         const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
         const msg = Orbit.ia ? Orbit.ia.redactar('cobro', { nombre: cli ? cli.nombre.split(' ')[0] : '', poliza: p ? p.numero : '', monto: U.money(c.monto, c.moneda), vence: U.fmtDate(c.vence) }) : 'Recordatorio de cobro';
-        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Recordatorio de cobro enviado', detalle: 'WhatsApp + correo · ' + (p ? p.numero : '') + ' · ' + U.money(c.monto, c.moneda) });
+        S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Recordatorio de cobro preparado', detalle: 'WhatsApp + correo · ' + (p ? p.numero : '') + ' · ' + U.money(c.monto, c.moneda) });
         S().update('cobros', c.id, { notificado: Orbit.ui.today() });
         if (Orbit.correo && cli) Orbit.correo.enviar({ para: cli.email || '', asunto: 'Recordatorio de pago · ' + (p ? p.numero : ''), cuerpo: msg, clienteId: c.clienteId, vinculo: { tipo: 'cobro', id: c.id, label: 'Recibo ' + c.cuota } });
       });
       close();
-      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + sel.length + ' recordatorios enviados (WhatsApp + correo)'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ ' + sel.length + ' recordatorios preparados (WhatsApp + correo) · pendientes de confirmación de entrega'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
       render(document.getElementById('host'));
     });
     paint();

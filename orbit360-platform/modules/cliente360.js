@@ -620,7 +620,50 @@ Orbit.modules.cliente360 = (function () {
       ${card('💳 Soportes de pago en revisión', 'Reportados por el cliente — evidencia, no pago confirmado', sopHtml)}
       ${card('📝 Cambios propuestos (documentos)', 'Diffs pendientes de aprobación — el documento propone, el equipo confirma', parchHtml)}
       ${card('📎 Documentos del expediente', 'Soportes adjuntos', docsHtml)}
-      <button class="btn ghost sm" onclick="Orbit.importa.open('documentos',{scope:{cid:'${cid}',nombre:'${U.esc(cli.nombre)}'},onDone:()=>Orbit.modules.cliente360.reabrir('${cid}','documentos')})">📎 Adjuntar documento (propone cambios)</button>`;
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn ghost sm" onclick="Orbit.modules.cliente360.subirDocumento('${cid}')">⬆ Agregar documento al expediente</button>
+        <button class="btn ghost sm" onclick="Orbit.importa.open('documentos',{scope:{cid:'${cid}',nombre:'${U.esc(cli.nombre)}'},onDone:()=>Orbit.modules.cliente360.reabrir('${cid}','documentos')})">📎 Adjuntar documento (propone cambios)</button>
+      </div>`;
+  }
+
+  /* ---- Agregar documento manual al expediente (equipo interno) ----
+     Registro como referencia (nombre, tipo, fecha) — mismo patrón honesto
+     que el portal del cliente: sin almacenar el binario (metaOnly). */
+  function subirDocumento(cid, polizaId) {
+    const cli = Orbit.store.get('clientes', cid); if (!cli) return;
+    const tipos = ['DPI / Cédula', 'RTU / RUT', 'Póliza', 'Endoso', 'Comprobante de domicilio', 'Otro'];
+    let back = document.getElementById('c360-doc'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'c360-doc'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
+    back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+        <b style="font-family:var(--f-display);font-size:16px">⬆ Agregar documento · ${U.esc(cli.nombre)}${polizaId ? ' · esta póliza' : ''}</b>
+        <button class="btn ghost sm" id="sd2-x">✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:11px">
+        <label class="ce-l">Tipo de documento<select id="sd2-tipo" class="o-sel" style="width:100%">${tipos.map(t => `<option ${polizaId && t === 'Póliza' ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+        <label class="ce-l">Archivo<input id="sd2-file" type="file" class="o-sel" style="width:100%"></label>
+        <label class="ce-l">Referencia (si no adjuntás archivo)<input id="sd2-ref" class="o-sel" style="width:100%" placeholder="Ej. carpeta Drive del cliente, folio físico…"></label>
+        <div class="cfg-note" style="font-size:11.5px">📎 Orbit registra el documento como <b>referencia</b> (nombre/folio, tipo, fecha) en el expediente — no almacena el binario. Necesitás adjuntar un archivo o escribir una referencia para poder agregarlo; para el archivo real usá el link de Drive del expediente.</div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn ghost" id="sd2-cancel">Cancelar</button><button class="btn primary" id="sd2-ok">Agregar</button></div>
+    </div>`;
+    document.body.appendChild(back);
+    const close2 = () => back.remove();
+    back.querySelector('#sd2-x').addEventListener('click', close2);
+    back.querySelector('#sd2-cancel').addEventListener('click', close2);
+    back.querySelector('#sd2-ok').addEventListener('click', () => {
+      const f = back.querySelector('#sd2-file').files[0];
+      const referencia = (back.querySelector('#sd2-ref').value || '').trim();
+      if (!f && !referencia) { c360toast('⚠ Adjuntá un archivo o escribí una referencia para poder agregar el documento.'); return; }
+      const tipo = back.querySelector('#sd2-tipo').value;
+      const did = 'doc' + Date.now();
+      const documentRef = f ? f.name : referencia;
+      Orbit.store.insert('documentos', { id: did, clienteId: cid, polizaId: polizaId || null, tipo, nombre: f ? f.name : (referencia || tipo), documentRef, referencia, tamano: f ? f.size : 0, metaOnly: true, estado: 'en_revision', fecha: Orbit.ui.today(), origen: 'Equipo interno' });
+      Orbit.store.insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: cli.asesorId, tipo: 'sistema', icon: '📁', fecha: Orbit.ui.today(), titulo: 'Referencia de documento registrada', detalle: tipo + ' · ' + documentRef + ' · archivo pendiente de resguardo' });
+      close2(); c360toast('✓ Referencia registrada · archivo pendiente de resguardo');
+      if (polizaId) verPoliza(polizaId); else reabrir(cid, 'documentos');
+    });
   }
 
   function tabHistorial(cid, r) {
@@ -929,6 +972,8 @@ Orbit.modules.cliente360 = (function () {
     let back = document.getElementById('c360-edit'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center';
+    const __prevHash = location.hash;
+    if (!/[?&]p=/.test(__prevHash)) { const sep = __prevHash.indexOf('?') >= 0 ? '&' : '?'; history.replaceState(null, '', __prevHash + sep + 'p=' + polId); }
     const estBadge = U.estadoBadge(p.estado);
     const renBadge = p.renovable ? '<span class="badge ok">Renovable</span>' : '<span class="badge neutral">No renovable</span>';
     back.innerHTML = `<div class="card" style="width:min(960px,96vw);max-height:92vh;overflow:auto;padding:0">
@@ -1000,6 +1045,19 @@ Orbit.modules.cliente360 = (function () {
           </div>
           <div class="muted" style="font-size:11.5px;margin-top:7px">Comisión aseguradora ${p.comAseguradoraPct}% · comisión vendedor ${p.comVendedorPct}% (sobre prima neta). Recibos generados según la forma de pago; el recargo financiero solo aplica en pago fraccionado.</div>
         </div>
+
+        <div>
+          <div class="vp-sec-t" style="display:flex;justify-content:space-between;align-items:center">📎 Documentos de esta póliza <button class="btn ghost sm" onclick="Orbit.modules.cliente360.subirDocumento('${cid}','${polId}')">⬆ Agregar</button></div>
+          ${(() => {
+            const pdocs = S().all('documentos').filter(d => d.polizaId === polId);
+            if (!pdocs.length) return '<div class="muted" style="font-size:12.5px;padding:8px 0">Sin documentos vinculados a esta póliza todavía.</div>';
+            return `<div style="display:grid;gap:1px">${pdocs.map(d => `<div class="pt-det" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)">
+              <div><b style="font-size:12.5px">${U.esc(d.nombre)}</b><div class="muted" style="font-size:11px">${d.tipo} · ${U.fmtDate(d.fecha)}</div></div>
+              <span class="badge ${d.estado === 'en_revision' ? 'warn' : 'ok'}">${d.estado === 'en_revision' ? 'En revisión' : d.estado}</span>
+            </div>`).join('')}</div>`;
+          })()}
+          <div class="muted" style="font-size:11px;margin-top:6px">Ver expediente completo del cliente en <a style="color:var(--red);cursor:pointer" onclick="document.getElementById('c360-edit') && document.getElementById('c360-edit').remove(); Orbit.modules.cliente360.reabrir('${cid}','documentos')">Documentos</a>.</div>
+        </div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card)">
         <button class="btn ghost" onclick="Orbit.modules.cliente360.editarPoliza('${polId}')">✏ Editar</button>
@@ -1010,7 +1068,7 @@ Orbit.modules.cliente360 = (function () {
       </div>
     </div>`;
     document.body.appendChild(back);
-    const close = () => back.remove();
+    const close = () => { back.remove(); if (location.hash.indexOf('p=' + polId) >= 0) history.replaceState(null, '', __prevHash.split(/[?&]p=/)[0] || __prevHash); };
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#vp-x').addEventListener('click', close);
   }
@@ -1113,7 +1171,7 @@ Orbit.modules.cliente360 = (function () {
         <label class="ce-l">Tipo de endoso<select id="en-tipo" class="o-sel">${tipos.map(t => `<option>${t}</option>`).join('')}</select></label>
         <label class="ce-l">Fecha<input id="en-fecha" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
         <label class="ce-l">Detalle<textarea id="en-det" class="o-sel" style="min-height:56px;resize:vertical;padding:9px 11px" placeholder="Descripción del cambio que aplica a la póliza…"></textarea></label>
-        <div class="cfg-note">Queda registrado en el <b>historial de la póliza</b> y del cliente.</div>
+        <div class="cfg-note">Se registra como <b>gestión pendiente de revisión en Orbit Ops</b> — el endoso no modifica la póliza hasta que el equipo lo confirme con el documento de la aseguradora.</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
         <button class="btn ghost" id="en-cancel">Cancelar</button><button class="btn primary" id="en-ok">Registrar endoso</button></div>
@@ -1126,10 +1184,13 @@ Orbit.modules.cliente360 = (function () {
     back.querySelectorAll('.seg-b').forEach(b => b.addEventListener('click', () => { back.querySelectorAll('.seg-b').forEach(x => x.classList.remove('active')); b.classList.add('active'); back.querySelector('#en-import').style.display = b.dataset.mode === 'import' ? '' : 'none'; }));
     back.querySelector('#en-ok').addEventListener('click', () => {
       const tipo = back.querySelector('#en-tipo').value, fecha = back.querySelector('#en-fecha').value, det = back.querySelector('#en-det').value.trim();
-      const hist = (p.historial || []).concat([{ icon: '📜', fecha, t: tipo, d: det || '—' }]);
-      S().update('polizas', polId, { historial: hist });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: p.clienteId, asesorId: p.asesorId, tipo: 'sistema', icon: '📜', fecha, titulo: 'Endoso: ' + tipo + ' · ' + p.numero, detalle: det || '' });
-      close(); verPoliza(polId);
+      Orbit.ciclo.crearGestion({
+        lista: 'Renovaciones / Modif.', tipo, titulo: tipo + ' · ' + p.numero,
+        clienteId: p.clienteId, polizaId: polId, asesorId: p.asesorId, aseguradoraId: p.aseguradoraId, ramo: p.ramo, prioridad: 'Media',
+        nota: (det || 'Sin detalle adicional') + '\nFecha solicitada: ' + fecha + '\nEstado: pendiente de confirmar con documento de la aseguradora — no modifica la póliza todavía.'
+      });
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: p.clienteId, asesorId: p.asesorId, tipo: 'sistema', icon: '📜', fecha, titulo: 'Endoso solicitado: ' + tipo + ' · ' + p.numero, detalle: det || '' });
+      close(); U.toast('✓ Endoso registrado como gestión pendiente en Ops.'); verPoliza(polId);
     });
   }
 
@@ -1563,5 +1624,5 @@ Orbit.modules.cliente360 = (function () {
   }
   function reabrir(cid, t) { tab = t || 'resumen'; detalle(cid); }
 
-  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir, nuevoCliente, nuevoReclamo, addBitacora, aprobarPropuesta, rechazarPropuesta, aclararPropuesta };
+  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir, nuevoCliente, nuevoReclamo, addBitacora, subirDocumento, aprobarPropuesta, rechazarPropuesta, aclararPropuesta };
 })();

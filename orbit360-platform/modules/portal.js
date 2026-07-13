@@ -157,7 +157,7 @@ Orbit.modules.portal = (function () {
       const dest = back.querySelector('#an-dest').value, tit = back.querySelector('#an-tit').value || 'Aviso', msg = back.querySelector('#an-msg').value;
       const dests = dest === '__all' ? clientes() : [S().get('clientes', dest)];
       dests.forEach(c => { if (!c) return; S().insert('notifs', { id: 'ntf' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.id, titulo: tit, cuerpo: msg, tipo: 'admin', fecha: Orbit.ui.today(), leida: false }); });
-      back.remove(); toast('✓ Notificación enviada a ' + (dest === '__all' ? 'todos' : '1 cliente')); render(host);
+      back.remove(); toast('✓ Notificación preparada para ' + (dest === '__all' ? 'todos' : '1 cliente')); render(host);
     }, 'Enviar');
   }
 

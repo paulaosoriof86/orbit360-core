@@ -12,6 +12,13 @@ Orbit.modules.configuracion = (function () {
   const U = Orbit.ui, K = Orbit.kit, T = () => Orbit.tenant;
   let tab = 'marca';
   let glosPais = null;
+  /* P0-TECH-ROLE: superficie técnica (Interno/Orbit, APIs) solo visible para rol activo autorizado */
+  function activeRole() {
+    try { if (Orbit.session && Orbit.session.rol) return Orbit.session.rol(); } catch (e) {}
+    try { if (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) return Orbit.auth.user().rol || 'Asesor'; } catch (e) {}
+    return 'Asesor';
+  }
+  function canViewTechnical() { return ['Dirección', 'Admin'].indexOf(activeRole()) >= 0; }
 
   const TABS = [
     ['marca', '🎨 Marca', 'cli'],
@@ -24,11 +31,13 @@ Orbit.modules.configuracion = (function () {
   ];
 
   function render(host) {
+    if ((tab === 'interna' || tab === 'apis') && !canViewTechnical()) tab = 'marca';
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '⚙', title: 'Configuración', sub: 'Personalización sin código', features: ['White-label', 'Roles y permisos', 'Módulos por cliente'], actions: '' })}
+      ${!canViewTechnical() ? '<div class="cfg-note" style="margin-bottom:12px">🔒 Las secciones técnicas (APIs, Interno/Orbit) están disponibles solo para roles Dirección/Admin. Tu rol activo es <b>' + U.esc(activeRole()) + '</b>.</div>' : ''}
       <div class="cfg-wrap">
         <div class="cfg-side">
-          ${TABS.map(t => `<button class="cfg-navi ${tab === t[0] ? 'on' : ''} ${t[2]}" data-t="${t[0]}">${t[1]}${t[2] === 'int' ? '<span class="cfg-int">Orbit</span>' : ''}</button>`).join('')}
+          ${TABS.filter(t => (t[0] !== 'interna' && t[0] !== 'apis') || canViewTechnical()).map(t => `<button class="cfg-navi ${tab === t[0] ? 'on' : ''} ${t[2]}" data-t="${t[0]}">${t[1]}${t[2] === 'int' ? '<span class="cfg-int">Orbit</span>' : ''}</button>`).join('')}
         </div>
         <div class="cfg-body" id="cfg-body"></div>
       </div>
@@ -38,6 +47,7 @@ Orbit.modules.configuracion = (function () {
   }
 
   function paint(host) {
+    if ((tab === 'interna' || tab === 'apis') && !canViewTechnical()) tab = 'marca';
     const body = document.getElementById('cfg-body');
     const fns = { marca, usuarios, paises, addons, apis, planes, interna };
     body.innerHTML = (fns[tab] || marca)();
@@ -247,7 +257,7 @@ Orbit.modules.configuracion = (function () {
           </ul>
         </div>`).join('')}
       </div>
-      <div class="cfg-note" style="margin-top:14px">El plan se asigna desde la <b>configuración interna</b> (Orbit). El cliente ve aquí lo que su plan habilita.</div>`;
+      <div class="cfg-note" style="margin-top:14px">Cada plan habilita un conjunto de funcionalidades para el cliente.</div>`;
   }
 
   /* ---------- INTERNA (Orbit) ---------- */
@@ -271,7 +281,7 @@ Orbit.modules.configuracion = (function () {
           <td>${p.addons ? '✓' : '—'}</td>
           <td>${p.apis ? '✓' : '—'}</td>
           <td class="muted" style="font-size:12.5px">${U.esc(p.desc)}</td>
-          <td style="text-align:right"><button class="btn ghost sm" onclick="Orbit.modules.configuracion.editarPlan('${p.id}')">Editar</button></td>itar</button></td>
+          <td style="text-align:right"><button class="btn ghost sm" onclick="Orbit.modules.configuracion.editarPlan('${p.id}')">Editar</button></td>
         </tr>`).join('')}</tbody>
       </table></div>
       <div class="cfg-note" style="margin-bottom:18px">💡 Al asignar un plan al cliente se configuran de una vez sus funcionalidades; podés <b>modificar más o menos según acuerdos o promociones</b> sin cambiar el catálogo base.</div>
@@ -445,7 +455,7 @@ Orbit.modules.configuracion = (function () {
         <div class="cgrid"><label class="ce-l">Nombre del país<input id="cp-nombre" class="o-sel" placeholder="México"></label><label class="ce-l">Código (2 letras)<input id="cp-code" class="o-sel" maxlength="2" placeholder="MX" style="text-transform:uppercase"></label></div>
         <div class="cgrid"><label class="ce-l">IVA / impuesto seguros (%)<input id="cp-iva" class="o-sel" type="number" value="12"></label><label class="ce-l">Moneda<input id="cp-moneda" class="o-sel" placeholder="MXN" value="USD"></label></div>
         <label class="ce-l">Gastos de emisión por defecto (% sobre prima neta)<input id="cp-gem" class="o-sel" type="number" value="0"></label>
-        <div class="cfg-note">Tasas e impuestos configurables por país. Al crear se registran en el motor de primas (Orbit.primas) y quedan disponibles para pólizas y cotizaciones.</div>
+        <div class="cfg-note">Tasas e impuestos configurables por país. Quedan disponibles para pólizas y cotizaciones.</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="cp-cancel">Cancelar</button><button class="btn primary" id="cp-ok">Agregar país</button></div>
     </div>`;
@@ -510,8 +520,8 @@ Orbit.modules.configuracion = (function () {
       + '<div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🔌 Conectar ' + U.esc(label) + '</b><button class="imp-x" id="ci-x">✕</button></div>'
       + '<div style="padding:18px 20px;display:grid;gap:11px">'
       + body
-      + '<label class="ce-l ck"><input type="checkbox" id="ci-on" ' + (saved.activa ? 'checked' : '') + '> Habilitar para el tenant</label>'
-      + '<div id="ci-status" class="cfg-note">La conexión se define a nivel <b>tenant</b> (no por navegador). En este entorno el estado queda <b>Pendiente de conexión</b> hasta activarlo; no se realizazan conexiones reales.</div>'
+      + '<label class="ce-l ck"><input type="checkbox" id="ci-on" ' + (saved.activa ? 'checked' : '') + '> Habilitar para la empresa</label>'
+      + '<div id="ci-status" class="cfg-note">La conexión se define para toda la empresa (no por navegador). El estado queda <b>Pendiente de conexión</b> hasta activarlo; no se realizazan conexiones reales.</div>'
       + '</div>'
       + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="ci-test">🔌 Validar parámetros</button><div style="display:flex;gap:8px"><button class="btn ghost" id="ci-cancel">Cancelar</button><button class="btn primary" id="ci-ok">Guardar</button></div></div></div>';
     document.body.appendChild(back);

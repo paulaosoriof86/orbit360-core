@@ -2,6 +2,22 @@
 
 > Registro cronológico de cambios del **prototipo** (Claude). El backend LAB (ChatGPT/Codex) mantiene su propia bitácora. Formato: versión · fecha · qué cambió · archivos.
 
+## v1.213 — 2026-07-12 · Corrección real post-auditoría v1.212 (no solo Academia)
+
+Respuesta a la auditoría que rechazó v1.212 por solo tocar CHANGELOG/seed/index.html. Esta vez, cambios de comportamiento verificados en vivo (eval_js):
+
+- **Curso duplicado eliminado**: `cur10` (`data/seed.js`) borrado por completo; su contenido único (Preparada vs Enviada, mezcla PDF+manual, aceptación→Ops) se fusionó dentro de `cur_p_aseg_cotiz` (`data/academia-plus.js`) como nueva lección + pregunta de quiz.
+- **`TASAS_DEF` eliminado de `modules/cotizador.js`**: ya no hay tarifa genérica de respaldo. `calcTasas()` devuelve `null` si la aseguradora no tiene `cotTasas.auto` **y** `cotTasasValidadas===true`; la fila queda "bloqueada" con nota honesta "Tarifa pendiente de validación" en vez de calcular con una tasa inventada. Verificado en vivo: con el seed actual (sin tarifas configuradas), el Cotizador automático bloquea las 3 aseguradoras y sugiere modo Manual — captura confirmada, 0 errores de consola.
+- **`Orbit._cots` eliminado como variable global transitoria**: el Cotizador ahora persiste cada `CotizacionNormalizada` en `Orbit.store` (colección `cotizaciones`) y pasa solo los **IDs** al Comparativo vía `sessionStorage` (handoff efímero, no arquitectura final pero ya no vive en memoria suelta ni se confunde con entidad de negocio). El DTO lleva `estadoValidacion` (`validada` para origen `cotizador` con tarifa validada; `requiere_revision` por defecto para PDF/manual).
+- **Gate de estado en Comparativo** (`modules/comparativo.js`): `ranking()`, la tabla comparativa, `imprimir()`, `enviarCliente()` y "Registrar opción aceptada" ahora operan **solo** sobre propuestas con `estadoValidacion==='validada'`. Una propuesta cargada por PDF o escrita a mano nace en `requiere_revision`, se ve con badge de advertencia, y no aparece en ranking/impresión/comunicación/aceptación hasta validarse.
+- **Pipeline de validación implementado**: nuevo botón "✓ Validar datos" por propuesta abre un diálogo que registra actor (`Orbit.auth.user().nombre`) + fecha + motivo opcional, y recién ahí pasa a `validada`. Editar una propuesta de origen `pdf`/`cotizacion_recibida` la regresa a `requiere_revision` y exige un motivo de corrección — no se puede "arreglar en silencio" una propuesta ya validada.
+- **"Enviado" ya no se declara por abrir el canal**: `core/notify.js` cambia el toast y la traza de actividad de "Notificado al cliente por X" a "Mensaje preparado y abierto por X — confirma con el cliente cuando lo reciba"; los botones pasan de "Enviar al cliente" a "Preparar envío al cliente" en Cotizador y Comparativo.
+- **Aceptación ya creaba solicitud de Ops, no póliza** (confirmado, sin cambios de fondo — ya cumplía el requisito): ahora además solo permite elegir entre propuestas validadas.
+- **Copy técnico**: revisado `configuracion.js`, `automatizaciones.js`, `aseguradoras.js`, `core/ia.js` — las menciones a "backend"/"Firebase"/`localStorage` encontradas son comentarios de código o claves internas (`credentialRef:'backend_required'`), nunca texto renderizado al usuario. No se encontró copy técnico visible sin corregir.
+- **Pendiente honesto que sigue abierto**: no existe todavía un editor de UI para cargar una tabla de tasas numérica real por aseguradora (`cotTasas.auto` + marcarla `cotTasasValidadas`) — hoy solo se puede cotizar en modo Manual mientras no se construya ese editor. Se deja documentado, no se inventó una UI a medias para cerrarlo en falso.
+- Cache-busting: `data/seed.js`, `data/academia-plus.js`, `core/notify.js`, `modules/cotizador.js`, `modules/comparativo.js` → `?v1400`.
+- 0 errores de consola verificados en vivo: Cotizador (bloqueo de tarifa), Comparativo (carga manual → badge "Requiere revisión" → Validar → badge "Validada" → aparecen Aceptar/Imprimir/Enviar).
+
 ## v1.177 — 2026-07-10 · Academia: referencia cruzada al curso de Aseguradoras
 
 - Ruta Asesor y Ruta Dirección/Admin/IT ahora referencian explícitamente el curso "Orbit Aseguradoras" (contacto correcto por área; conocimiento tarifario no se autohabilita).
@@ -15,6 +31,114 @@
 - Responsive móvil (≤640px): ficha a pantalla completa, filas/tabs apilan a 100%, tabs más compactos.
 - `core/importa.js` es protegido — no se tocó; el dry-run de `directorio-aseguradoras` sigue siendo el existente (pendiente si se requiere rediseño, corresponde a Carril B).
 - Archivos: `modules/aseguradoras.js`, `modules/cotizador.js`, `modules/comparativo.js`, `styles/infra.css`, `index.html`.
+
+## v1.211 — 2026-07-11 · Comparativo: acceso a "Cargar PDF" junto al de "escribir a mano"
+
+Feedback real: el botón "⬆ Cargar propuestas (PDF)" vivía solo en el banner superior, lejos de la guía de pasos — no quedaba claro cómo avanzar de paso 1 a "reunir propuestas". Ahora ambas acciones para sumar una propuesta (⬆ Cargar PDF / ✍ Escribir a mano) están juntas, en la misma barra de la guía de pasos. Se quitó el botón duplicado del banner.
+
+Archivo: `modules/comparativo.js`, `index.html` (cache-bust).
+
+## v1.210 — 2026-07-11 · Comparativo: quita botón duplicado, clarifica flujo y envío WA
+
+Feedback real del usuario tras v1.209: (1) botón "Registrar cotización recibida" aparecía DOS veces (en la guía de pasos Y en el encabezado, ambos llamaban a la misma función manual) — confuso, parecía que uno pedía datos manuales sin relación al PDF. (2) No se veía la opción de enviar por WhatsApp — sí existía (`Orbit.notify.pedir` abre selector WA/Correo) pero el botón decía solo "Enviar al cliente", sin mencionar el canal. (3) No estaba claro cómo continuar de "reunir propuestas" a comparar.
+
+Corregido:
+- Eliminado el botón duplicado del encabezado. La guía de 3 pasos ahora es la ÚNICA fuente de la acción "escribir cotización a mano" (renombrada así, para diferenciarla del botón superior "⬆ Cargar propuestas (PDF)" que hace extracción automática de PDF).
+- Paso 3 agrega botón "⬇ Ir al comparativo" (scroll) junto al de seguir agregando cotizaciones — ya no se queda sin acción visible.
+- Botones de envío renombrados a "📲 Enviar al cliente (WhatsApp/Correo)" en Comparativo y Cotizador, dejando explícito que WA sí está disponible (abre selector de canal con vista previa del mensaje).
+
+Archivos: `modules/comparativo.js`, `modules/cotizador.js`, `index.html` (cache-bust).
+
+## v1.209 — 2026-07-11 · Comparativo: CTA de siguiente paso + catálogos vehículo por país (GT/CO) en Cotizador y Comparativo
+
+Tres correcciones puntuales:
+1. **Comparativo — "no se ve cómo seguir"**: la guía de 3 pasos era solo informativa. Ahora cada paso muestra un **CTA accionable** debajo ("➕ Registrar cotización recibida" en pasos 1-2, "⬇ Ir al comparativo" en paso 3 que hace scroll a la tabla).
+2. **Catálogos marca/línea por país**: antes Cotizador y Comparativo usaban UN solo catálogo de marcas/líneas para todos los países (mercado genérico centroamericano) aunque el subramo ya distinguía GT/CO. Ahora hay `VEH_GT` y `VEH_CO` separados (Colombia: Renault, Chevrolet Spark GT/Tracker, Mazda, Kia Soluto, etc. — marcas/modelos reales de ese mercado) con sus propios catálogos de versiones/trims. Cambiar país limpia marca/línea/modelo para evitar combinaciones inválidas.
+3. **Formato de impresión (cotización y comparativo)**: confirmado que YA estaba implementado en ambos módulos desde antes (`imprimirCot` en Cotizador, `imprimir` en Comparativo) — ambos generan PDF vía ventana de impresión con logo/marca white-label del tenant, colores del cliente, tabla de coberturas y nota legal. No requería trabajo adicional.
+
+Archivos: `modules/cotizador.js`, `modules/comparativo.js`, `index.html` (cache-bust).
+
+Evalué aplicar el mismo wizard de navegación estricta de Cotizador a Comparativo, pero es la decisión de diseño incorrecta para este módulo: a diferencia de Cotizador (una sola sesión, datos→cotizar→resultado), en Comparativo las propuestas de las aseguradoras **llegan en momentos distintos a lo largo de días** (PDF de una aseguradora hoy, otra mañana) — un wizard que bloquee "volver a agregar" rompería ese flujo real de trabajo. En su lugar, agregué una **guía visual de 3 pasos** (Datos del riesgo → Reunir propuestas → Comparar y cerrar) que refleja el progreso automáticamente según cuántas propuestas hay, sin bloquear ninguna acción — más wayfinding, cero fricción. Se explica el porqué directamente en el mensaje bajo la guía.
+
+Archivos: `modules/comparativo.js`, `index.html` (cache-bust).
+
+## v1.207 — 2026-07-11 · Cotizador: reconstruido como wizard guiado de 3 pasos
+
+Atendiendo el pendiente de mayor alcance del paquete: Cotizador dejó de ser un formulario de una sola pantalla y ahora es un **wizard de 3 pasos** con navegación por pills (1. Datos del riesgo → 2. Aseguradoras → 3. Resultados). Los pasos completados se marcan con ✓ y son clicables para regresar; no se puede saltar hacia adelante sin completar el paso actual. Toda la lógica existente (cálculo por tasas/manual, gate default-deny de aseguradoras habilitadas, DTO hacia Comparativo, deducible genérico, historial) se conservó sin cambios — solo se reestructuró la presentación en pasos. Verificado en vivo: recorrido completo 1→2→3→2→1 sin errores de consola.
+
+Archivos: `modules/cotizador.js`, `index.html` (cache-bust).
+
+## v1.206 — 2026-07-11 · Fix copy residual: "agrégalas manual" en la nota de bienvenida de Comparativo
+
+Encontré (motivado por tu comentario de que se sentía igual) un residuo real: cuando reemplacé el modal "Propuesta manual" por "Registrar cotización recibida" en v1.198, la nota de bienvenida de Comparativo (visible antes de cargar cualquier propuesta) seguía diciendo *"➕ agrégalas manual"*. Corregido a *"➕ registrá una cotización recibida"*, coherente con el nuevo flujo.
+
+Confirmado con captura en vivo: el campo Deducible de v1.205 sí carga correctamente en Cotizador (estaba visible, solo más abajo del scroll inicial — no era un bug, era percepción de "se ve igual" por ser un cambio de formulario, no de layout).
+
+Archivos: `modules/comparativo.js`, `index.html` (cache-bust).
+
+## v1.205 — 2026-07-11 · Cotizador: deducible genérico para todos los ramos (no solo Gastos Médicos)
+
+El DTO `cotizacionNormalizada` tiene campo `deducible`, pero en Cotizador solo se capturaba para Gastos Médicos (`gmDed`) — Auto/Vida/Hogar/Daños siempre llegaban al Comparativo con deducible vacío. Agregado campo "📉 Deducible (opcional)" genérico visible para todos los ramos salvo Gastos Médicos (que ya tiene el suyo específico), y se transfiere al Comparativo junto con el resto de la cotización.
+
+Archivos: `modules/cotizador.js`, `index.html` (cache-bust).
+
+## v1.204b — 2026-07-11 · Fix verificador: filas obsoletas del Cotizador tras cambiar ramo
+
+El verificador encontró que cambiar de **ramo** (no país) dejaba filas de aseguradoras ya no elegibles en pantalla, renderizando un `<select>` vacío (roto visualmente) y dejando "⚡ Cotizar" habilitado contra IDs inválidos. Corregido: cambiar ramo ahora también resetea `st.filas`; además, en cada render se reconcilian las filas contra `asegElegibles()` actual (se descartan las que ya no califican) en vez de dejarlas renderizar vacías. "⚡ Cotizar" ahora depende de `asegElegibles().length` además de `st.filas.length`. Verificado en vivo simulando 0 aseguradoras elegibles: 0 selects vacíos, ambos botones deshabilitados correctamente.
+
+Archivos: `modules/cotizador.js`, `index.html` (cache-bust).
+
+## v1.204 — 2026-07-11 · Cotizador: estado vacío honesto cuando no hay aseguradoras elegibles
+
+Encontré un vacío real en el gate default-deny (`asegElegibles()`, ya implementado en sesiones previas): si ninguna aseguradora del país/ramo elegido tiene el ramo habilitado para Cotizador, la sección de aseguradoras quedaba **vacía sin explicación** — el botón "➕ Aseguradora" no hacía nada visible y "⚡ Cotizar" no tenía nada que calcular. Corregido: ahora muestra *"⚠ Cotización automática pendiente de configuración"* con el país/ramo exactos y un link directo a habilitarlo en Aseguradoras, y deshabilita ambos botones hasta que haya al menos una aseguradora elegible (o hasta cargar una cotización recibida desde Comparativo).
+
+Archivos: `modules/cotizador.js`, `index.html` (cache-bust).
+
+## v1.203 — 2026-07-11 · Endosos: dejan de escribir directo a la póliza, pasan por Ops
+
+Encontré una violación real del contrato de referencia (`endorsement-workflow-v1201`: *"Los endosos viven primero en Ops/gestiones"* y *"No modificar una póliza validada hasta confirmación/documento"*): el modal de endoso en Cliente 360 escribía directo al `historial` de la póliza al confirmar, sin pasar por revisión. Corregido: ahora "Registrar endoso" crea una **gestión pendiente en Ops** (lista "Renovaciones / Modif.", con tipo/detalle/fecha solicitada) y dice explícitamente que no modifica la póliza hasta que el equipo lo confirme con el documento de la aseguradora. Ya no toca `polizas` directamente.
+
+Archivos: `modules/cliente360.js`, `index.html` (cache-bust).
+
+## v1.202 — 2026-07-11 · Ficha de Póliza: deep-link por URL
+
+Extendí el patrón de deep-link (ya usado en Aseguradoras y Cliente 360) a la ficha de Póliza: abrirla desde el listado de Pólizas agrega `?p=<id>` al hash, y cargar/compartir esa URL reabre la ficha automáticamente. Cambio acotado y seguro — no convertí el drawer en una página de layout propio (sigue siendo el mismo panel rico compartido `c360-edit` que usan otras vistas de Cliente 360), solo se hizo direccionable por URL para no arriesgar una regresión en un archivo grande con muchos usos compartidos del mismo drawer.
+
+Archivos: `modules/cliente360.js`, `modules/polizas.js`, `index.html` (cache-bust).
+
+## v1.201 — 2026-07-11 · Academia: lección de "Registrar opción aceptada" (CONTENT_V=24)
+
+Agregada lección al curso "Aseguradoras, Cotizador y Comparativo": explica el nuevo botón "✓ Registrar opción aceptada" de v1.200 — qué hace (crea Solicitud de emisión en Ops con los datos de la propuesta) y qué NO hace (no crea póliza ni recibos; la póliza nace después con número/documento reales de la aseguradora). Agregada pregunta de evaluación correspondiente.
+
+Archivos: `data/academia-plus.js` (CONTENT_V 23→24), `index.html` (cache-bust).
+
+## v1.200 — 2026-07-11 · Comparativo: "Registrar opción aceptada" crea Solicitud de emisión en Ops (P0.4)
+
+Confirmé por lectura de código que buena parte del contrato `quote-comparison-contracts-v1203` **ya estaba implementada de sesiones previas**: `Orbit.dto.cotizacionNormalizada` (DTO canónico) y el gate default-deny en `cotizador.js` (`asegElegibles()` exige `ramosHabilitados[ramo].cotizador === true` explícito — sin eso, no hay cálculo automático). Corregí mi afirmación de la entrega anterior: no era código nuevo por escribir, era código que ya existía y no había verificado a fondo.
+
+Lo que sí faltaba y sí implementé ahora: el cierre de Comparativo terminaba solo en "Enviar al cliente" (mensaje de WhatsApp) — no había forma de registrar la decisión del cliente como una gestión operativa. Agregado botón **"✓ Registrar opción aceptada"** (visible solo con ≥1 propuesta): elige la propuesta aceptada (preseleccionada la mejor por ranking), selecciona cliente, exige confirmar que "el cliente aceptó esta opción", y al confirmar usa `Orbit.ciclo.crearGestion()` para crear una gestión tipo **"Solicitud de emisión"** en Orbit Ops (lista "Gestiones Admin", prioridad Alta) con toda la info de la propuesta en la nota (aseguradora, plan, prima neta/IVA/total, pagos, suma asegurada, deducible, fuente, referencia). **No crea póliza ni recibos** — la nota deja explícito que la póliza nace cuando la aseguradora entregue número y documento reales, tal como exige el contrato de referencia.
+
+Archivos: `modules/comparativo.js`, `index.html` (cache-bust).
+
+## v1.199 — 2026-07-11 · Cierre #66/#67 + evaluación honesta del paquete v1.204B
+
+**#66 (copy técnico transversal):** barrido de `renovaciones.js`, `ops.js`, `leads.js`, `siniestros.js`, `marketing.js`, `equipo.js`, `calidad.js`, `importar.js`. Único hallazgo real: `marketing.js` mostraba *"Configuración pendiente de conexión"* al fallar un evento de integración por backend no conectado — reescrito a *"Falta conexión segura para completar el envío"* (evita insinuar que "configuración" es lo único pendiente cuando en realidad es la conexión). El resto de módulos ya estaba limpio.
+
+**#67 (ficha como página navegable):** verificado que **Cliente 360 ya cumple esto** — su ficha se abre por `?c=<id>` (no modal), con pestañas y estado propios, igual que Aseguradoras. Pólizas **no** lo cumple: hoy el detalle de una póliza (`Orbit.modules.cliente360.verPoliza(id)`) sigue siendo un modal/drawer, no una página con URL propia. Convertirlo es un cambio de arquitectura más grande (el editor de póliza vive dentro de `cliente360.js`, no en `polizas.js`) — queda documentado como pendiente real, no cerrado.
+
+**Sobre el paquete v1.204B recibido (Aseguradoras/Cotizador/Comparativo full rebuild + Academia):** confirmé que mi `aseguradoras.js` YA cumple estructuralmente buena parte de "P0.1" de ese paquete — ficha rica con hero degradado, logo, 8 tabs (Resumen/Contactos/Plataformas/Bancos/Productos/Documentos/Tarifas/Actividad), draft real de edición, deep-link por URL, KPI con detalle. Lo que NO se abordó en esta sesión por alcance/capacidad: reconstrucción de **Cotizador** como wizard con gate de elegibilidad por fuente validada, DTO con IDs persistentes y transferencia estructurada a Comparativo; flujo de **"Propuesta aceptada" → Solicitud de emisión en Ops** (hoy Comparativo cierra con "Enviar al cliente" por WhatsApp, no crea gestión en Ops); y la profundización de Academia para estos flujos. Estos siguen siendo trabajo real pendiente, no simulado ni declarado como cerrado.
+
+Archivos: `modules/marketing.js`, `index.html` (cache-bust).
+
+## v1.198 — 2026-07-11 · P0.3 Comparativo: reemplazo de "Propuesta manual"
+
+**Contexto importante:** se recibió un paquete extenso (v1.204) que asume una base con parches locales `v1.198–v1.203` (contratos como `core/quote-comparison-contracts-v1203.js`, `modules/cotizador-v1203-source-gate.js`, ficha de Aseguradora ya reconstruida como página con hero/logo, flujo "Registrar opción aceptada" en Comparativo, etc.). **Verificado por grep: ninguno de esos archivos existe en este proyecto.** Esta candidata sigue su propia numeración y su propio `aseguradoras.js`/`cotizador.js`/`comparativo.js`, más simples que los descritos en ese paquete. No se puede "traducir visualmente" contratos que no están integrados aquí — se documenta el desajuste en vez de simularlos.
+
+Dentro de lo real y verificable en este código, se cerró el ítem más concreto y de mayor impacto de esa spec (rechazo automático explícito en su sección 19): el modal ambiguo **"Propuesta manual"** (pedía solo nombre + prima total) fue reemplazado por **"Registrar cotización recibida"**: selector de aseguradora del directorio (o "Otra"), producto/plan, fuente de la oferta, desglose completo (prima neta / gastos de emisión / IVA / prima total con auto-cálculo), pagos, suma asegurada, deducible y referencia. Queda etiquetada `origen:'cotizacion_recibida'` y `estadoValidacion:'requiere_revision'` en vez de `'manual'` genérico.
+
+**No se abordaron en esta pasada** (por alcance/capacidad, y porque dependen de contratos que no existen en este proyecto): reconstrucción profunda del Cotizador con stepper/fuentes tipo v110, flujo "Registrar opción aceptada → Solicitud de emisión en Ops" en Comparativo (hoy el cierre es "Enviar al cliente" por WhatsApp, no crea gestión en Ops), Academia para estos flujos nuevos. Quedan como pendientes reales, no como cerrados.
+
+Archivos: `modules/comparativo.js`, `index.html` (cache-bust).
 
 ## v1.197 — 2026-07-11 · Verificación en vivo de Academia + metaLeccion en los 10 cursos base
 

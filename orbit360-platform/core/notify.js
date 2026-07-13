@@ -44,10 +44,10 @@ Orbit.notify = (function () {
       tipo: canal === 'whatsapp' ? 'whatsapp' : 'correo',
       icon: opts.icon || (canal === 'whatsapp' ? '💬' : '✉'),
       fecha: (Orbit.ui && Orbit.ui.today) ? Orbit.ui.today() : new Date().toISOString().slice(0, 10),
-      titulo: opts.tipo || 'Notificación al cliente',
-      detalle: (opts.asunto ? opts.asunto + ' · ' : '') + (opts.mensaje || '').slice(0, 120)
+      titulo: opts.tipo || 'Comunicación preparada',
+      detalle: '(preparado, no confirmado) ' + (opts.asunto ? opts.asunto + ' · ' : '') + (opts.mensaje || '').slice(0, 120)
     });
-    if (!opts.silent && Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('✓ Notificado al cliente por ' + usado);
+    if (!opts.silent && Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('✓ Mensaje preparado y abierto por ' + usado + ' — confirma con el cliente cuando lo reciba.');
     return { canal: usado };
   }
 

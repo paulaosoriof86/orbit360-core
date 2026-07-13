@@ -13,6 +13,13 @@ Orbit.modules.automatizaciones = (function () {
   let cfg = {};
   cfg = Orbit.store.pref('aut_cfg', {}) || {};
   function saveCfg() { Orbit.store.setPref('aut_cfg', cfg); }
+  /* P0-TECH-ROLE: webhook/credenciales/proveedor de IA son configuración técnica — solo rol activo autorizado */
+  function activeRole() {
+    try { if (Orbit.session && Orbit.session.rol) return Orbit.session.rol(); } catch (e) {}
+    try { if (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) return Orbit.auth.user().rol || 'Asesor'; } catch (e) {}
+    return 'Asesor';
+  }
+  function canManageTechnical() { return ['Dirección', 'Admin'].indexOf(activeRole()) >= 0; }
   const LOG = Orbit.store.pref('aut_log', []) || [];
   function addLog(ev, canal, msg) { LOG.unshift({ ts: new Date().toISOString().slice(0,16).replace('T',' '), ev, canal, msg }); if (LOG.length > 50) LOG.pop(); Orbit.store.setPref('aut_log', LOG); }
 
@@ -50,8 +57,10 @@ Orbit.modules.automatizaciones = (function () {
   function render(h) {
     const alertas = alertasPendientes();
     const logRows = LOG.slice(0, 12);
+    const tecnico = canManageTechnical();
     h.innerHTML = `<div class="page">
       ${K.banner({ icon: '⚡', title: 'Automatizaciones & Integraciones', sub: 'Conecta eventos de la operación con Make, WhatsApp, correo/Outlook y más · IA opcional', features: [], actions: '<button class="btn ghost" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)" onclick="Orbit.integraciones&&Orbit.integraciones.openPanel&&Orbit.integraciones.openPanel()">🔌 Eventos de integración</button>' })}
+      ${!tecnico ? '<div class="cfg-note" style="margin-bottom:14px">🔒 El webhook, las credenciales y el proveedor de IA son configuración técnica — visibles en modo lectura para tu rol activo (<b>' + U.esc(activeRole()) + '</b>). Solo Dirección/Admin pueden modificarlos.</div>' : ''}
 
       <div class="aut-grid">
         <div class="aut-col-main">
@@ -60,9 +69,9 @@ Orbit.modules.automatizaciones = (function () {
             <b style="font-family:var(--f-display);font-size:15px">🔗 Webhook de Make (escenario)</b>
             <div class="muted" style="font-size:12.5px;margin-top:4px;margin-bottom:12px">Pega aquí la URL del escenario ya creado en Make. Cada automatización activa enviará su payload (evento, datos, plantilla) a ese escenario; desde Make ramifica a WhatsApp, correo, Sheets, CRM, etc.</div>
             <div style="display:flex;gap:8px">
-              <input id="aut-wh" class="o-sel" style="flex:1" placeholder="https://hook.eu2.make.com/xxxxx" value="${U.esc(getWH())}">
-              <button class="btn primary" id="aut-wh-save">Guardar webhook</button>
-              <button class="btn ghost" id="aut-wh-test">Probar disparo</button>
+              <input id="aut-wh" class="o-sel" style="flex:1" placeholder="https://hook.eu2.make.com/xxxxx" value="${U.esc(getWH())}" ${tecnico ? '' : 'disabled'}>
+              <button class="btn primary" id="aut-wh-save" ${tecnico ? '' : 'disabled'}>Guardar webhook</button>
+              <button class="btn ghost" id="aut-wh-test" ${tecnico ? '' : 'disabled'}>Probar disparo</button>
             </div>
           </div>
 
@@ -93,7 +102,7 @@ Orbit.modules.automatizaciones = (function () {
           <div class="card" style="overflow:hidden">
             <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
               <b style="font-family:var(--f-display);font-size:15px">📋 Registro de disparos</b>
-              <span class="muted" style="font-size:12px">últimos eventos enviados</span>
+              <span class="muted" style="font-size:12px">últimos eventos registrados</span>
             </div>
             <div style="overflow-x:auto"><table class="tbl">
               <thead><tr><th>Fecha</th><th>Canal</th><th>Evento</th><th>Mensaje (preview)</th></tr></thead>
@@ -135,11 +144,11 @@ Orbit.modules.automatizaciones = (function () {
                 <b>${p.nombre}</b>
                 <small>${p.ideal}</small>
               </button>`).join('')}</div>
-            <label class="ce-l" style="margin-top:12px">Modelo<select id="ia-mod" class="o-sel"></select></label>
+            <label class="ce-l" style="margin-top:12px">Modelo<select id="ia-mod" class="o-sel" ${tecnico ? '' : 'disabled'}></select></label>
             <label class="ce-l" style="margin-top:8px"><span id="ia-keylbl">Credencial</span><div class="badge ${Orbit.ia && Orbit.ia.estado && Orbit.ia.estado()==='configurado_pendiente_boveda' ? "warn" : "neutral"}" style="display:inline-block">${Orbit.ia && Orbit.ia.estado ? ({sin_configurar:'Sin configurar', configurado_pendiente_boveda:'Referencia guardada', conectado_verificado:'Conectado y verificado'}[Orbit.ia.estado()]||'Sin configurar') : 'Sin configurar'}</div><input id="ia-key" class="o-sel" type="hidden" value="backend_required"></label>
-            <label class="ce-l ck" style="margin-top:10px"><input type="checkbox" id="ia-act" ${getIA().activo ? 'checked' : ''}> Activar IA como asistente (heurística sin credencial)</label>
-            <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="ia-save" style="flex:1">💾 Guardar</button><button class="btn ghost" id="ia-test">🔌 Probar</button></div>
-            <div class="cfg-note" style="margin-top:10px">La elección se guarda por cliente (tenant). La IA es opcional: sin ella, todo funciona con heurística (sin costo).</div>
+            <label class="ce-l ck" style="margin-top:10px"><input type="checkbox" id="ia-act" ${getIA().activo ? 'checked' : ''} ${tecnico ? '' : 'disabled'}> Activar IA como asistente (heurística sin credencial)</label>
+            <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="ia-save" style="flex:1" ${tecnico ? '' : 'disabled'}>💾 Guardar</button><button class="btn ghost" id="ia-test" ${tecnico ? '' : 'disabled'}>🔌 Probar</button></div>
+            <div class="cfg-note" style="margin-top:10px">La elección se guarda para tu empresa. La IA es opcional: sin ella, todo funciona con heurística (sin costo).</div>
             <details style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
               <summary style="cursor:pointer;font-weight:700;font-size:13px">🧩 IA por módulo (opcional)</summary>
               <div class="muted" style="font-size:12px;margin:6px 0 10px">Por defecto todos los módulos usan el motor de arriba. Aquí puedes asignar un motor distinto a un módulo según el comparativo (ej. extracción con uno económico, redacción con otro). Vacío = usa el global.</div>
@@ -172,13 +181,15 @@ Orbit.modules.automatizaciones = (function () {
   }
 
   function wire(h) {
+    const tecnico = canManageTechnical();
     // Webhook
-    h.querySelector('#aut-wh-save').addEventListener('click', () => { cfg.webhook = h.querySelector('#aut-wh').value.trim(); saveCfg(); toast('✓ Webhook guardado'); });
+    h.querySelector('#aut-wh-save').addEventListener('click', () => { if (!tecnico) { toast('Solo Dirección/Admin puede modificar el webhook.'); return; } cfg.webhook = h.querySelector('#aut-wh').value.trim(); saveCfg(); toast('✓ Webhook guardado'); });
     h.querySelector('#aut-wh-test').addEventListener('click', () => {
+      if (!tecnico) { toast('Solo Dirección/Admin puede probar el webhook.'); return; }
       const wh = getWH();
       if (!wh) { Orbit.ui.toast('Pega primero la URL del webhook de Make.'); return; }
       addLog('prueba_disparo', 'Make', 'Test de conexión desde Orbit 360');
-      toast('🔄 Disparo de prueba enviado a Make. Verifica en tu escenario.');
+      toast('🔄 Disparo de prueba registrado hacia Make. Verifica en tu escenario.');
       render(h);
     });
     // Tabla
@@ -198,6 +209,7 @@ Orbit.modules.automatizaciones = (function () {
     }
     refreshModelos();
     h.querySelectorAll('.ia-card').forEach(c => c.addEventListener('click', () => {
+      if (!tecnico) { toast('Solo Dirección/Admin puede cambiar el proveedor de IA.'); return; }
       const id = c.dataset.iap; const p = IA_PROVS.find(x => x.id === id);
       cfg.ia = Object.assign({}, getIA(), { proveedor: id, modelo: (p && p.modelos[0]) || '' });
       saveCfg();
@@ -205,6 +217,7 @@ Orbit.modules.automatizaciones = (function () {
       refreshModelos();
     }));
     h.querySelector('#ia-save').addEventListener('click', () => {
+      if (!tecnico) { toast('Solo Dirección/Admin puede guardar el motor de IA.'); return; }
       const cur = getIA();
       if (!cur.proveedor) { toast('Elige primero un proveedor de IA'); return; }
       cfg.ia = { proveedor: cur.proveedor, credentialRef: 'backend_required', modelo: h.querySelector('#ia-mod').value, activo: h.querySelector('#ia-act').checked };
@@ -231,8 +244,8 @@ Orbit.modules.automatizaciones = (function () {
     h.querySelector('#aut-scan').addEventListener('click', () => {
       const a = alertasPendientes();
       const msgs = [];
-      if (a.cobrosVenc) msgs.push('⚠️ ' + a.cobrosVenc + ' cobros vencidos — campaña de cobro enviada');
-      if (a.renovProx) msgs.push('🔄 ' + a.renovProx + ' renovaciones próximas — campaña enviada');
+      if (a.cobrosVenc) msgs.push('⚠️ ' + a.cobrosVenc + ' cobros vencidos — campaña de cobro preparada');
+      if (a.renovProx) msgs.push('🔄 ' + a.renovProx + ' renovaciones próximas — campaña preparada');
       if (a.gestAbiertas) msgs.push('🗂 ' + a.gestAbiertas + ' gestiones abiertas — notificado al equipo');
       if (a.leadsAtr) msgs.push('🎯 ' + a.leadsAtr + ' leads atrasados — recordatorio al asesor');
       msgs.forEach(m => addLog('escaneo_manual', getEvCfg('cobro_vence').canal || 'WhatsApp (Make)', m));

@@ -131,7 +131,7 @@ Orbit.modules.notificaciones = (function () {
     if (!cli) { Orbit.ui.toast('Selecciona un cliente destinatario.'); return; }
     addLog({ fecha: new Date().toISOString().slice(0, 10), cliente: cli.nombre, tpl: tplId || 'libre', msg, canal });
     // registrar en historial del cliente
-    S().insert('actividades', { id: 'act' + Date.now(), clienteId: cli.id, asesorId: cli.asesorId, tipo: 'whatsapp', icon: '💬', fecha: new Date().toISOString().slice(0, 10), titulo: 'Mensaje de WhatsApp enviado', detalle: msg.slice(0, 80) });
+    S().insert('actividades', { id: 'act' + Date.now(), clienteId: cli.id, asesorId: cli.asesorId, tipo: 'whatsapp', icon: '💬', fecha: new Date().toISOString().slice(0, 10), titulo: 'Mensaje de WhatsApp preparado', detalle: msg.slice(0, 80) });
     if (canal === 'wa.me') {
       const tel = (cli.telefono || '').replace(/\D/g, '');
       window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(msg), '_blank');
