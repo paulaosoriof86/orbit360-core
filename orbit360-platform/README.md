@@ -2,17 +2,17 @@
 
 Sistema 360 para intermediarios de seguros, comercializable, white-label y multi-tenant. A&S es el primer tenant y se configura mediante `Orbit.tenant`; no existe un fork de código para Alianzas.
 
-## Estado vivo — 2026-07-11
+## Estado vivo — 2026-07-13
 
 ```txt
 Repositorio: paulaosoriof86/orbit360-core
 Rama activa: ays/backend-tenant-lab-v99-20260703
 PR: #5 draft/open
 Merge/deploy/main/producción: no autorizados
-Baseline: rama viva protegida + empalme selectivo candidata Claude v1.188–v1.197
+Baseline: rama viva protegida + empalmes selectivos auditados + documentación vigente
 ```
 
-La última candidata auditada es:
+La última candidata auditada sigue siendo:
 
 ```txt
 Prototype Development Request - 2026-07-11T093254.494.zip
@@ -20,6 +20,34 @@ SHA256: 8ea0fd79eb80bf8b9da2601e17f4922292087e297773bebfe9530e4745aab1a0
 ```
 
 La candidata no reemplaza la rama: aporta UX, responsive, Academia y patrones visuales; el backend, `Orbit.store`, Auth, importadores, seguridad y contratos vivos se preservan mediante empalme aditivo.
+
+## Estado de cierre operativo
+
+```txt
+CRM OP-1:
+  funcional y visualmente cerrado
+  evidencia: 10/10 escenarios aprobados
+  no repetir salvo regresión nueva o cambio de alcance
+
+Aseguradoras OP-2:
+  cierre funcional implementado
+  evidencia reutilizable: 12/15 escenarios aprobados
+  pendiente real: 3 vistas de Plataformas
+  no repetir los 12 escenarios aprobados
+
+Siguiente acción inmediata:
+  ejecutar un único gate focalizado de Plataformas
+  combinar 12 + 3 para cerrar Aseguradoras 15/15
+
+Siguiente acción operativa Carril C:
+  dry-run separado Directorio Guatemala
+  dry-run separado Directorio Colombia
+  resolver alias/entidades aliadas/filas bloqueadas
+  no aplicar recursos sensibles sin proveedor seguro
+
+Siguiente módulo del plan:
+  Cotizador + Comparativo configurable
+```
 
 ## Objetivo operativo
 
@@ -30,8 +58,10 @@ Orden de cierre vigente:
 ```txt
 1. CRM completo: Clientes 360, Pólizas, Vehículos, Recibos, Cobros,
    Cartera, Comisiones, Portal, Calidad y scopes por asesor.
+   Estado: OP-1 cerrado; Pólizas reales siguen como fuente separada pendiente.
 2. Aseguradoras operativas: contactos, plataformas, cuentas, productos,
    documentos, configuración y relación con Cotizador/Comparativo.
+   Estado: 12/15 visual; pendiente únicamente Plataformas.
 3. Cotizador + Comparativo configurable a partir de comparativo_final_v110.html.
 4. Ops + Leads y sus cadencias/gestiones.
 5. Finanzas, conciliaciones, comisiones, CxC/CxP y movimientos históricos.
@@ -41,6 +71,28 @@ Orden de cierre vigente:
 ```
 
 Cada grupo se cierra con datos A&S sanitizados, reglas de negocio, permisos, tests/smoke y una validación visual única cuando el bloque esté listo.
+
+## Metodología 0% manual
+
+```txt
+ChatGPT/Codex:
+  audita, modifica, empalma, documenta, valida estáticamente y prepara el gate
+
+Paula:
+  ejecuta un único gate local final solo cuando Chrome/Windows o fuentes locales
+  sean indispensables, y revisa visualmente el resultado
+```
+
+No corresponde pedir a Paula:
+
+- escoger puertos;
+- cerrar otras aplicaciones;
+- seleccionar manualmente reportes o carpetas;
+- repetir módulos o escenarios ya aprobados;
+- editar archivos, rutas o comandos internos;
+- diagnosticar fallos del pipeline.
+
+Los reanudadores deben basarse en evidencia estructurada (`results.jsonl` + capturas), no en frases, tildes, orden de archivos o codificación de reportes.
 
 ## Arquitectura
 
@@ -89,14 +141,17 @@ Ningún bloque debe avanzar solo en documentación: debe dejar código, prueba, 
 
 ## Recursos seguros
 
-El frontend utiliza referencias, no secretos:
+El frontend utiliza referencias y proveedores seguros, pero la visibilidad responde a la necesidad operativa:
 
 ```txt
-documentRef
-credentialRef
+Cuentas bancarias de Aseguradoras:
+  visibles y copiables para usuarios autorizados del directorio
+
+Usuarios/contraseñas de portales:
+  Dirección/Admin/Operativo o permiso extra explícito
 ```
 
-El visor y la bóveda visual ya tienen contrato. OAuth Drive, Shared Drives, bóveda real, reautenticación, TTL y auditoría durable pertenecen al backend Carril B y deben conectarse sin exponer secretos en frontend, store, seed o logs.
+La migración de valores legacy es no destructiva: se conserva el valor operativo hasta copiarlo, verificarlo y auditar su retiro.
 
 ## Documentación actual
 
@@ -104,9 +159,11 @@ Leer primero:
 
 ```txt
 docs/PROTOCOLO-ANTI-DESVIACION-PLAN-OPERATIVO-DATOS-REALES-AYS-20260709.md
-docs/AUDITORIA-FORENSE-Y-EMPALME-CANDIDATA-V1197-20260711.md
-docs/DELTA-CANDIDATA-V1197-VS-RAMA-VIVA-20260711.md
-docs/PLAN-RETOMA-BACKEND-POST-EMPALME-V1197-20260711.md
+docs/PATRON-CLAUDE-ASEGURADORAS-OP2-V1217-20260713.md
+docs/CORRECCION-OPERATIVIDAD-CUENTAS-CREDENCIALES-ASEGURADORAS-V1218-20260713.md
+docs/HALLAZGO-VISUAL-PLATAFORMAS-ASEGURADORAS-12-DE-15-20260713.md
+docs/AUDITORIA-SANITIZADA-DIRECTORIOS-ASEGURADORAS-GT-CO-OP2-20260713.md
+docs/REPORTE-CIERRE-FUNCIONAL-CRM-OP1-PENDIENTE-GATE-VISUAL-20260712.md
 docs/MATRIZ-FUENTES-REALES-RECIBIDAS-FALTANTES-AYS-20260709.md
 ```
 
