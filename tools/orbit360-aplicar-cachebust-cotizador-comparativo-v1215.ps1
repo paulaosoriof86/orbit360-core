@@ -11,11 +11,6 @@ function Count-Exact([string]$Text, [string]$Value) {
   return ([regex]::Matches($Text, [regex]::Escape($Value))).Count
 }
 
-function Remove-ExactLine([string]$Text, [string]$Value) {
-  $Escaped = [regex]::Escape($Value)
-  return [regex]::Replace($Text, "(?m)^\s*$Escaped\s*\r?\n?", '')
-}
-
 Write-Host '============================================================'
 Write-Host 'ORBIT 360 - SAFE INTEGRATION CRM OP1 + INSURERS OP2 V1.218'
 Write-Host ('Local time: ' + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
@@ -140,9 +135,9 @@ foreach ($Group in $Groups) {
     if ((Count-Exact $Updated $Value) -gt 1) {
       throw "Duplicate integration reference: '$Value'."
     }
-    $Updated = Remove-ExactLine $Updated $Value
+    $Updated = $Updated.Replace($Value, '')
   }
-  $Block = $Group.Anchor + [Environment]::NewLine + (($Group.Values -join [Environment]::NewLine))
+  $Block = $Group.Anchor + ($Group.Values -join '')
   $Updated = $Updated.Replace($Group.Anchor, $Block)
 }
 
