@@ -46,7 +46,7 @@ check('PASSWORD_TEMPORARY',all(resources,['const transient = new Map()','15000',
 
 check('NON_DESTRUCTIVE_MIGRATION',all(closure,['function flagLegacySensitive','pendiente_migracion_segura_no_destructiva','rawPersisted:true','migrationPerformed:false','destructive:false']), 'Migración legacy no destructiva',files.closure);
 check('NO_PREMATURE_MIGRATION',!closure.includes("audit('migrar_recursos_sensibles_legacy'")&&!closure.includes('rawPersisted:false'),'No se declara migración antes de verificar',files.closure);
-check('ACADEMY_POLICY',all(academy,['Cuentas bancarias operativas','Usuarios y contraseñas por rol','Migración sin pérdida','next._cv = 1218']), 'Academia enseña la política v1.218',files.academy);
+check('ACADEMY_POLICY',all(academy,['Cuentas bancarias operativas','Usuarios y contraseñas por rol','Migración sin pérdida','Cuarentena de hojas','next._cv = 1219']), 'Academia enseña recursos y cuarentena v1.219',files.academy);
 check('RESPONSIVE_POLICY',all(style,['.asg218-bank','.asg218-platform','.asg218-credentials','@media(max-width:640px)']), 'Recursos operativos responsive',files.style);
 
 const refs = {
@@ -76,6 +76,6 @@ if (indexIntegrated) {
   check('SYNTAX_'+file.replace(/\W+/g,'_'),out.status===0,out.status===0?'Sintaxis válida':String(out.stderr||out.stdout).trim(),file);
 });
 
-const result={validator:'orbit360-validar-politica-recursos-aseguradoras-v1218',generatedAt:new Date().toISOString(),root,mode:indexIntegrated?'index_integrated':'pipeline_prepared',summary:{pass:pass.length,fail:fail.length},pass,fail};
+const result={validator:'orbit360-validar-politica-recursos-aseguradoras-v1219',generatedAt:new Date().toISOString(),root,mode:indexIntegrated?'index_integrated':'pipeline_prepared',summary:{pass:pass.length,fail:fail.length},pass,fail};
 console.log(JSON.stringify(result,null,2));
 process.exit(fail.length?1:0);
