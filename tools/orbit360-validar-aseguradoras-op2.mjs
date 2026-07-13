@@ -22,6 +22,7 @@ const files = {
   importer:'core/insurer-directory-import-v1202.js',
   importerSecurity:'core/insurer-directory-import-v1202-security.js',
   sourceGuard:'core/aseguradoras-op2-source-guard.js',
+  importUiGuard:'core/aseguradoras-op2-import-ui-guard.js',
   resources:'modules/aseguradoras-v1202-resources-bridge.js',
   ux:'modules/aseguradoras-v1197-ux-bridge.js',
   closure:'modules/aseguradoras-op2-closure-bridge.js',
@@ -36,6 +37,7 @@ const visibility = read(files.visibility);
 const importer = read(files.importer);
 const importerSecurity = read(files.importerSecurity);
 const sourceGuard = read(files.sourceGuard);
+const importUiGuard = read(files.importUiGuard);
 const resources = read(files.resources);
 const ux = read(files.ux);
 const closure = read(files.closure);
@@ -57,6 +59,9 @@ check('ALIAS_CANONICAL', all(sourceGuard, ['function canonical', 'version', 'cop
 check('ALIAS_BLOCK_WITHIN', all(sourceGuard, ['duplicado_probable_dentro_del_archivo', 'requiereValidacion = true', "validationStatus = 'requiere_validacion'"]), 'Duplicados probables internos quedan bloqueados', files.sourceGuard);
 check('ALIAS_BLOCK_EXISTING', all(sourceGuard, ['duplicado_probable_con_directorio', "op.action !== 'insert'", 'existingId']), 'Duplicados probables contra directorio quedan bloqueados', files.sourceGuard);
 check('ALIAS_NO_AUTO_MERGE', !/S\(\)\.(?:update|insert|remove)\('aseguradoras'/.test(sourceGuard), 'Guard no fusiona ni escribe automáticamente', files.sourceGuard);
+check('UI_ALIAS_REAL_FLOW', all(importUiGuard, ['const previousOpen = D.open.bind(D)', 'D.parseFile(file, { country, captureSecure:false })', 'duplicateReview', "root.dataset.op2AliasState = 'blocked'", 'button.disabled = true']), 'Flujo visual real analiza y bloquea alias probables', files.importUiGuard);
+check('UI_ALIAS_NO_SENSITIVE_CAPTURE', all(importUiGuard, ['captureSecure:false', 'No captura recursos sensibles']), 'Revisión paralela no captura sensibles', files.importUiGuard);
+check('UI_ALIAS_FAIL_CLOSED', all(importUiGuard, ["root.dataset.op2AliasState = 'error'", 'La aplicación queda bloqueada para evitar duplicados']), 'Error de revisión bloquea aplicación', files.importUiGuard);
 
 check('UX_DIRECTORY', all(ux, ['kpiData', 'kpiDetail', 'renderDirectory', 'renderFicha', 'Volver al directorio']), 'Directorio, KPI y ficha-página disponibles', files.ux);
 check('UX_TABS', all(ux, ["['resumen','Resumen']", "['contactos','Contactos']", "['plataformas','Plataformas']", "['bancos','Bancos y pagos']", "['documentos','Documentos y Drive']", "['tarifas','Tarifas y conocimiento']"]), 'Ficha reúne recursos operativos', files.ux);
@@ -101,6 +106,7 @@ Object.entries(protectedExpected).forEach(([file, expected]) =>
 const index = read('index.html');
 warning('INDEX_VISIBILITY', index.includes('core/aseguradoras-op2-role-visibility.js?v=20260713-op2'), 'Integrar visibilidad OP-2 mediante pipeline seguro', 'index.html');
 warning('INDEX_SOURCE_GUARD', index.includes('core/aseguradoras-op2-source-guard.js?v=20260713-op2'), 'Integrar guard de alias/duplicados mediante pipeline seguro', 'index.html');
+warning('INDEX_IMPORT_UI', index.includes('core/aseguradoras-op2-import-ui-guard.js?v=20260713-op2'), 'Integrar guard visual del importador mediante pipeline seguro', 'index.html');
 warning('INDEX_CLOSURE', index.includes('modules/aseguradoras-op2-closure-bridge.js?v=20260713-op2'), 'Integrar cierre Aseguradoras OP-2 mediante pipeline seguro', 'index.html');
 warning('INDEX_PERMISSION', index.includes('modules/aseguradoras-op2-permission-guard.js?v=20260713-op2'), 'Integrar guard de entradas OP-2 mediante pipeline seguro', 'index.html');
 warning('INDEX_ACADEMY', index.includes('data/academia-v1217-aseguradoras-op2.js?v=20260713-op2'), 'Integrar Academia OP-2 mediante pipeline seguro', 'index.html');
