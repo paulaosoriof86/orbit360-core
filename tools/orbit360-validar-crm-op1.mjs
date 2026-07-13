@@ -19,6 +19,7 @@ function all(src, patterns) { return patterns.every(x => typeof x === 'string' ?
 
 const files = {
   access: 'core/access-scope.js',
+  roleVisibility: 'core/crm-op1-role-visibility.js',
   crm: 'modules/crm-v1198-operational-bridge.js',
   quality: 'modules/calidad.js',
   portal: 'modules/portal-v1198-scope-viewer-bridge.js',
@@ -32,6 +33,7 @@ const files = {
 Object.entries(files).forEach(([key,file]) => check('FILE_' + key.toUpperCase(), exists(file), 'Archivo requerido presente', file));
 
 const access = read(files.access);
+const roleVisibility = read(files.roleVisibility);
 const crm = read(files.crm);
 const quality = read(files.quality);
 const portal = read(files.portal);
@@ -41,6 +43,7 @@ const responsive = read(files.responsive);
 
 check('SCOPES', all(access, ["return 'all'", "return 'team'", "return 'own'", "return 'none'"]), 'Scopes all/team/own/none implementados', files.access);
 check('SCOPED_STORE', all(access, ['function scopedStore', 'function withScope', "new Set(['clientes','polizas'", 'canView(collection, rec, moduleKey)']), 'Store filtrado por alcance', files.access);
+check('ADVISOR_QUALITY_VISIBLE', all(roleVisibility, ["ensure('Asesor', ['calidad'])", 'dataScopeUnchanged: true', 'criticalPermissionsUnchanged: true']), 'Calidad visible para Asesor sin ampliar scope ni permisos críticos', files.roleVisibility);
 check('CLIENT_INITIAL_STATE', all(crm, ["row.estadoOperativo = 'pendiente_polizas'", "row.estado = 'pendiente_polizas'"]), 'Alta de cliente inicia pendiente de Pólizas', files.crm);
 check('CLIENT_DEDUP', all(crm, ['A.duplicateCandidates(raw)', 'duplicado_probable', 'existe un cliente con identificación o correo coincidente']), 'Deduplicación exacta y probable', files.crm);
 check('CLIENT_GEO', all(crm, ['Orbit.GEO', 'fillCities', 'fillDeps']), 'Geografía mediante catálogos', files.crm);
@@ -93,11 +96,12 @@ Object.entries(protectedExpected).forEach(([file,expected]) =>
 
 const index = read('index.html');
 warning('CACHE_QUALITY', /modules\/calidad\.js\?v=(?:20260712-op1|op1)/.test(index), 'Aplicar cache-bust seguro de Calidad antes del smoke visual', 'index.html');
+warning('INDEX_ROLE_VISIBILITY', index.includes('core/crm-op1-role-visibility.js?v=20260712-op1'), 'Integrar visibilidad de Calidad para Asesor mediante pipeline seguro', 'index.html');
 warning('INDEX_CLOSURE', index.includes('modules/crm-op1-closure-bridge.js?v=20260712-op1'), 'Integrar puente CRM OP-1 en index mediante pipeline seguro', 'index.html');
 warning('INDEX_ACADEMY', index.includes('data/academia-v1216-crm-portal-poliza.js?v=20260712-op1'), 'Integrar Academia CRM OP-1 en index mediante pipeline seguro', 'index.html');
 warning('INDEX_RESPONSIVE', index.includes('styles/crm-op1-v1216.css?v=20260712-op1'), 'Integrar estilos responsive CRM OP-1 en index mediante pipeline seguro', 'index.html');
 warning('POLICY_SOURCE', false, 'La fuente separada de Pólizas sigue pendiente después del cierre visual CRM', 'fuentes');
-warning('VISUAL_GATE', false, 'Pendiente validación visual CRM en 1366/768/390 y perfiles Admin/Operativo/Asesor', 'docs');
+warning('VISUAL_GATE', false, 'Pendiente ejecutar smoke visual CRM en 1366/768/390 y perfiles Dirección/Operativo/Asesor', 'tools/orbit360-smoke-visual-crm-op1.mjs');
 
 const result = {
   validator: 'orbit360-validar-crm-op1-v1216',
