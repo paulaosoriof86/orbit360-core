@@ -1,0 +1,47 @@
+name: Orbit 360 Aseguradoras OP2 Copy v1220
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/insurer-directory-import-v1202-security.js'
+      - 'tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs'
+      - '.github/workflows/orbit360-aseguradoras-op2-copy-v1220.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/insurer-directory-import-v1202-security.js'
+      - 'tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs'
+      - '.github/workflows/orbit360-aseguradoras-op2-copy-v1220.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  copy-static-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/insurer-directory-import-v1202-security.js
+          node --check tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs
+
+      - name: Validate operational copy
+        run: node tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs .
+
+      - name: Guard visible copy
+        run: |
+          grep -q 'FRIENDLY_ERROR_MAP' tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs
+          grep -q 'VISIBLE_TECH_REMOVED' tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs
+          grep -q 'RAW_CODE_REMOVED' tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs
+          grep -q 'NO_INNER_HTML_REWRITE' tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs
