@@ -5,11 +5,11 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 export const PROTECTED_BASELINE_COMMIT = '051fa9b38b82887b73966be90bcc9e4973b568f6';
-export const PROTECTED_FILES = [
-  'orbit360-platform/data/store.js',
-  'orbit360-platform/core/auth.js',
-  'orbit360-platform/core/importa.js'
-];
+export const PROTECTED_BLOBS = {
+  'orbit360-platform/data/store.js': 'cec636757725dea975a63b4aa98fb859baba7316',
+  'orbit360-platform/core/auth.js': '965d033d8cc5955724609b64ad8219b80ea26b3b',
+  'orbit360-platform/core/importa.js': '6624112ec85e2d89d26456a98478dcc8b9725f18'
+};
 
 function runGit(repoRoot, args) {
   return spawnSync('git', ['-C', repoRoot, ...args], {
@@ -20,34 +20,25 @@ function runGit(repoRoot, args) {
 
 export function verifyProtectedBaseline(appRoot, options = {}) {
   const repoRoot = path.resolve(options.repoRoot || path.join(appRoot, '..'));
-  const baseline = options.baseline || PROTECTED_BASELINE_COMMIT;
-  const files = options.files || PROTECTED_FILES;
+  const expected = options.expected || PROTECTED_BLOBS;
   const checks = [];
 
-  const baselineCheck = runGit(repoRoot, ['cat-file', '-e', `${baseline}^{commit}`]);
-  if (baselineCheck.status !== 0) {
-    return {
-      ok: false,
-      baseline,
-      repoRoot,
-      checks: [],
-      error: `El commit baseline protegido ${baseline} no está disponible en el checkout. Se requiere historial completo (fetch-depth: 0).`
-    };
-  }
-
-  for (const file of files) {
-    const diff = runGit(repoRoot, ['diff', '--quiet', baseline, '--', file]);
+  for (const [file, expectedBlob] of Object.entries(expected)) {
+    const hashed = runGit(repoRoot, ['hash-object', `--path=${file}`, file]);
+    const actualBlob = String(hashed.stdout || '').trim();
     checks.push({
       file,
-      ok: diff.status === 0,
-      status: diff.status,
-      error: diff.status > 1 ? String(diff.stderr || diff.stdout || '').trim() : ''
+      expectedBlob,
+      actualBlob,
+      ok: hashed.status === 0 && actualBlob === expectedBlob,
+      status: hashed.status,
+      error: hashed.status !== 0 ? String(hashed.stderr || hashed.stdout || '').trim() : ''
     });
   }
 
   return {
     ok: checks.every(item => item.ok),
-    baseline,
+    baseline: PROTECTED_BASELINE_COMMIT,
     repoRoot,
     checks,
     error: ''
@@ -56,22 +47,14 @@ export function verifyProtectedBaseline(appRoot, options = {}) {
 
 export function appendProtectedChecks(targetPass, targetFail, appRoot, options = {}) {
   const result = verifyProtectedBaseline(appRoot, options);
-  if (result.error) {
-    targetFail.push({
-      id: 'PROTECTED_BASELINE_AVAILABLE',
-      message: result.error,
-      file: 'git-history'
-    });
-    return result;
-  }
 
   for (const item of result.checks) {
     const target = item.ok ? targetPass : targetFail;
     target.push({
       id: 'PROTECTED_' + item.file.replace(/^orbit360-platform\//, '').replace(/\W+/g, '_'),
       message: item.ok
-        ? `Archivo protegido sin cambios desde baseline ${result.baseline.slice(0, 12)}`
-        : `Archivo protegido difiere del baseline ${result.baseline.slice(0, 12)}${item.error ? ': ' + item.error : ''}`,
+        ? `Archivo protegido coincide con Git blob ${item.expectedBlob.slice(0, 12)}`
+        : `Archivo protegido difiere del blob esperado ${item.expectedBlob.slice(0, 12)}; actual ${item.actualBlob || 'no disponible'}${item.error ? ': ' + item.error : ''}`,
       file: item.file.replace(/^orbit360-platform\//, '')
     });
   }
