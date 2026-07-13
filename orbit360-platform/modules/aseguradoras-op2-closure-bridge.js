@@ -1,10 +1,10 @@
 /* ============================================================
-   Orbit 360 · Aseguradoras OP-2 cierre operativo v1.217
+   Orbit 360 · Aseguradoras OP-2 cierre operativo v1.218
    - directorio operativo para Dirección/Operativo/Asesor;
    - edición según Orbit.access;
-   - cuentas, usuarios y credenciales nunca se guardan en claro;
-   - atención rápida, calidad, correcciones y copy no técnico;
-   - conserva módulo base, importador, visor y recursos protegidos.
+   - nuevas cuentas/credenciales usan referencias seguras;
+   - valores legacy se conservan hasta migración segura verificada;
+   - atención rápida, calidad, correcciones y copy no técnico.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
@@ -12,8 +12,8 @@ Orbit.modules = Orbit.modules || {};
   const mod = Orbit.modules.aseguradoras;
   const A = Orbit.access || {};
   const U = Orbit.ui || {};
-  if (!mod || !Orbit.store || Orbit.__aseguradorasOp2ClosureV1217) return;
-  Orbit.__aseguradorasOp2ClosureV1217 = true;
+  if (!mod || !Orbit.store || Orbit.__aseguradorasOp2ClosureV1218) return;
+  Orbit.__aseguradorasOp2ClosureV1218 = true;
 
   const S = () => Orbit.store;
   const clean = v => String(v == null ? '' : v).replace(/\u00a0/g, ' ').trim();
@@ -67,20 +67,39 @@ Orbit.modules = Orbit.modules || {};
       });
     } catch (e) {}
   }
+  function legacyPortal(row) {
+    return !!clean(row && (row.usuario || row.user || row.password || row.pass || row.contrasena));
+  }
+  function legacyAccount(row) {
+    return !!clean(row && (row.numero || row.accountNumber));
+  }
 
   function sanitizePortal(raw, previous) {
-    const p = Object.assign({}, previous || {}, raw || {});
-    const rawUser = clean(p.usuario || p.user || '');
-    const rawSecret = clean(p.password || p.pass || p.contrasena || '');
-    const credentialRef = clean(
-      p.credentialRef || p.secureAccessRef ||
-      (previous && (previous.credentialRef || previous.secureAccessRef)) ||
-      ((rawUser || rawSecret) ? 'backend_required' : '')
-    );
-    const out = Object.assign({}, p, {
-      usuarioHint: clean(p.usuarioHint || (previous && previous.usuarioHint) || maskUser(rawUser)),
+    const incoming = raw || {}, prev = previous || {};
+    const merged = Object.assign({}, prev, incoming);
+    const incomingUser = clean(incoming.usuario || incoming.user || '');
+    const incomingSecret = clean(incoming.password || incoming.pass || incoming.contrasena || '');
+    const previousRef = clean(prev.credentialRef || prev.secureAccessRef || '');
+    const incomingRef = clean(incoming.credentialRef || incoming.secureAccessRef || '');
+    const previousLegacy = legacyPortal(prev);
+
+    if (previousLegacy && !previousRef && !incomingRef && !incomingUser && !incomingSecret) {
+      return Object.assign({}, merged, {
+        usuarioHint:clean(merged.usuarioHint || maskUser(prev.usuario || prev.user || '')),
+        legacyPlaintextPendingMigration:true,
+        estadoAcceso:clean(merged.estadoAcceso || 'Disponible · pendiente migración segura'),
+        secretoExpuesto:false
+      });
+    }
+
+    const rawUser = clean(merged.usuario || merged.user || '');
+    const rawSecret = clean(merged.password || merged.pass || merged.contrasena || '');
+    const credentialRef = clean(incomingRef || previousRef || ((rawUser || rawSecret) ? 'backend_required' : ''));
+    const out = Object.assign({}, merged, {
+      usuarioHint:clean(merged.usuarioHint || maskUser(rawUser)),
       credentialRef,
-      estadoAcceso: clean(p.estadoAcceso || (credentialRef ? 'Pendiente conexión segura' : 'Sin verificar')),
+      estadoAcceso:clean(merged.estadoAcceso || (credentialRef ? 'Pendiente conexión segura' : 'Sin verificar')),
+      legacyPlaintextPendingMigration:false,
       secretoExpuesto:false
     });
     delete out.usuario; delete out.user; delete out.password; delete out.pass;
@@ -88,17 +107,29 @@ Orbit.modules = Orbit.modules || {};
     return out;
   }
   function sanitizeAccount(raw, previous) {
-    const c = Object.assign({}, previous || {}, raw || {});
-    const rawNumber = clean(c.numero || c.accountNumber || '');
-    const accountRef = clean(
-      c.accountRef || c.secureAccountRef ||
-      (previous && (previous.accountRef || previous.secureAccountRef)) ||
-      (rawNumber ? 'backend_required' : '')
-    );
-    const out = Object.assign({}, c, {
-      numeroHint: clean(c.numeroHint || (previous && previous.numeroHint) || maskRight(rawNumber, 4)),
+    const incoming = raw || {}, prev = previous || {};
+    const merged = Object.assign({}, prev, incoming);
+    const incomingNumber = clean(incoming.numero || incoming.accountNumber || '');
+    const previousRef = clean(prev.accountRef || prev.secureAccountRef || '');
+    const incomingRef = clean(incoming.accountRef || incoming.secureAccountRef || '');
+    const previousLegacy = legacyAccount(prev);
+
+    if (previousLegacy && !previousRef && !incomingRef && !incomingNumber) {
+      return Object.assign({}, merged, {
+        numeroHint:clean(merged.numeroHint || maskRight(prev.numero || prev.accountNumber || '', 4)),
+        legacyPlaintextPendingMigration:true,
+        estado:clean(merged.estado || 'Disponible · pendiente migración segura'),
+        secretoExpuesto:false
+      });
+    }
+
+    const rawNumber = clean(merged.numero || merged.accountNumber || '');
+    const accountRef = clean(incomingRef || previousRef || (rawNumber ? 'backend_required' : ''));
+    const out = Object.assign({}, merged, {
+      numeroHint:clean(merged.numeroHint || maskRight(rawNumber, 4)),
       accountRef,
-      estado: clean(c.estado || (accountRef ? 'Pendiente conexión segura' : 'Sin verificar')),
+      estado:clean(merged.estado || (accountRef ? 'Pendiente conexión segura' : 'Sin verificar')),
+      legacyPlaintextPendingMigration:false,
       secretoExpuesto:false
     });
     delete out.numero; delete out.accountNumber; delete out.secureAccountRef;
@@ -113,7 +144,7 @@ Orbit.modules = Orbit.modules || {};
   }
   function installStoreGuard() {
     const store = S();
-    if (!store || store.__aseguradorasOp2SensitiveGuardV1217) return;
+    if (!store || store.__aseguradorasOp2SensitiveGuardV1218) return;
     const originalUpdate = store.update.bind(store);
     const originalInsert = store.insert.bind(store);
     store.update = function (collection, id, patch) {
@@ -126,30 +157,30 @@ Orbit.modules = Orbit.modules || {};
       if (Array.isArray(safe.cuentas)) safe.cuentas = safe.cuentas.map(c => sanitizeAccount(c, null));
       return originalInsert(collection, safe);
     };
-    store.__aseguradorasOp2SensitiveGuardV1217 = { originalUpdate, originalInsert };
+    store.__aseguradorasOp2SensitiveGuardV1218 = { originalUpdate, originalInsert };
   }
   installStoreGuard();
 
-  function migrateLegacySensitive(id) {
+  function flagLegacySensitive(id) {
     const row = S().get('aseguradoras', id);
     if (!row) return false;
-    const legacyPortals = (row.portales || []).some(p => clean(p.usuario || p.user || p.password || p.pass || p.contrasena));
-    const legacyAccounts = (row.cuentas || []).some(c => clean(c.numero || c.accountNumber));
+    const legacyPortals = (row.portales || []).some(legacyPortal);
+    const legacyAccounts = (row.cuentas || []).some(legacyAccount);
     if (!legacyPortals && !legacyAccounts) return false;
+    const code = 'recursos_legacy_pendientes_migracion_segura';
+    if ((row.validacionAlertas || []).includes(code)) return true;
     const before = clone(row);
-    const alerts = Array.from(new Set([].concat(row.validacionAlertas || [], 'recursos_sensibles_legacy_requieren_conexion_segura')));
+    const alerts = Array.from(new Set([].concat(row.validacionAlertas || [], code)));
     S().update('aseguradoras', id, {
-      portales:(row.portales || []).map(p => sanitizePortal(p, p)),
-      cuentas:(row.cuentas || []).map(c => sanitizeAccount(c, c)),
       requiereValidacion:true,
       validacionAlertas:alerts,
-      sensitiveResourceStatus:'requiere_conexion_segura',
-      actividad:appendActivity(row, 'Recursos sensibles migrados a referencias protegidas')
+      sensitiveResourceStatus:'pendiente_migracion_segura_no_destructiva',
+      actividad:appendActivity(row, 'Recursos operativos pendientes de migración segura')
     });
     const after = S().get('aseguradoras', id);
-    audit('migrar_recursos_sensibles_legacy', id, before, after,
-      'Protección automática al abrir el editor',
-      { legacyPortals, legacyAccounts, rawPersisted:false });
+    audit('marcar_recursos_legacy_pendientes_migracion', id, before, after,
+      'Conservar operación hasta migración segura verificada',
+      { legacyPortals, legacyAccounts, rawPersisted:true, migrationPerformed:false, destructive:false });
     return true;
   }
 
@@ -158,14 +189,14 @@ Orbit.modules = Orbit.modules || {};
     const wrap = document.createElement('span');
     wrap.dataset.op2SecureHint = '1';
     wrap.className = 'asg217-secure-hint';
-    wrap.innerHTML = `<span class="badge neutral">${esc(text)}</span><button type="button" class="btn ghost sm" data-op2-secure-action="${kind}:${index}">Gestionar de forma segura</button>`;
+    wrap.innerHTML = `<span class="badge neutral">${esc(text)}</span><button type="button" class="btn ghost sm" data-op2-secure-action="${kind}:${index}">Gestionar migración segura</button>`;
     row.appendChild(wrap);
   }
   function hardenEditor(id) {
     const back = document.getElementById('asg-ficha');
     const row = S().get('aseguradoras', id);
     if (!back || !row) return;
-    migrateLegacySensitive(id);
+    flagLegacySensitive(id);
     const current = S().get('aseguradoras', id) || row;
 
     back.querySelectorAll('[data-portal]').forEach((portalRow, i) => {
@@ -175,25 +206,26 @@ Orbit.modules = Orbit.modules || {};
       const pass = portalRow.querySelector('[data-pp]');
       if (user) {
         user.value = ''; user.disabled = true;
-        user.placeholder = p.usuarioHint ? 'Usuario protegido · ' + p.usuarioHint : 'Usuario protegido';
+        user.placeholder = p.usuarioHint ? 'Usuario disponible en pestaña Plataformas · ' + p.usuarioHint : 'Usuario protegido';
       }
       if (pass) {
         pass.value = ''; pass.disabled = true;
-        pass.placeholder = p.credentialRef ? 'Referencia segura registrada' : 'Conexión segura requerida';
+        pass.placeholder = p.credentialRef || legacyPortal(p) ? 'Contraseña disponible según rol en Plataformas' : 'Conexión segura requerida';
       }
-      secureHint(portalRow, 'portal', i, p.credentialRef ? 'Acceso protegido' : 'Acceso pendiente');
+      secureHint(portalRow, 'portal', i, p.credentialRef ? 'Acceso protegido' : (legacyPortal(p) ? 'Acceso operativo · migración pendiente' : 'Acceso pendiente'));
     });
     back.querySelectorAll('[data-cta]').forEach((accountRow, i) => {
       const c = (current.cuentas || [])[i] || {};
       const number = accountRow.querySelector('[data-ccn]');
       if (number) {
-        number.value = ''; number.disabled = true;
-        number.placeholder = c.numeroHint ? 'Cuenta protegida · ' + c.numeroHint : 'Registrar mediante conexión segura';
+        number.value = clean(c.numero || c.accountNumber || '');
+        number.disabled = true;
+        number.placeholder = c.numeroHint ? 'Cuenta disponible en Bancos y pagos · ' + c.numeroHint : 'Registrar mediante conexión segura';
       }
-      secureHint(accountRow, 'account', i, c.accountRef ? 'Cuenta protegida' : 'Cuenta pendiente');
+      secureHint(accountRow, 'account', i, c.accountRef ? 'Cuenta protegida' : (legacyAccount(c) ? 'Cuenta operativa · migración pendiente' : 'Cuenta pendiente'));
     });
     back.querySelectorAll('[data-op2-secure-action]').forEach(button => {
-      button.onclick = () => toast('La referencia se registra mediante la conexión segura autorizada. No se guardan usuarios, contraseñas ni cuentas completas en la ficha.');
+      button.onclick = () => toast('Los valores existentes continúan operativos. La migración debe copiar, verificar y solo después retirar el valor anterior.');
     });
     const edit = back.querySelector('#af-editar');
     if (edit && !edit.dataset.op2Guard) {
@@ -339,8 +371,8 @@ Orbit.modules = Orbit.modules || {};
     observer.observe(document.documentElement, { childList:true, subtree:true });
   }
 
-  mod.__op2ClosureV1217 = {
+  mod.__op2ClosureV1218 = {
     originalFicha, originalRender, sanitizePortal, sanitizeAccount,
-    sanitizePatch, migrateLegacySensitive, enhance
+    sanitizePatch, flagLegacySensitive, enhance
   };
 })();
