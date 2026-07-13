@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const cp = require('child_process');
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 
 const root = path.resolve(process.argv[2] || path.join(process.cwd(), 'orbit360-platform'));
 const failures = [];
@@ -76,7 +76,7 @@ Object.entries(protectedExpected).forEach(([file, expected]) => {
 });
 
 selected.filter(file => /\.(?:js|mjs)$/.test(file)).forEach(file => {
-  const run = cp.spawnSync(process.execPath, ['--check', rel(file)], { encoding: 'utf8' });
+  const run = spawnSync(process.execPath, ['--check', rel(file)], { encoding: 'utf8' });
   check('SYNTAX_' + file.replace(/\W+/g, '_'), run.status === 0, run.status === 0 ? 'Sintaxis válida' : String(run.stderr || run.stdout).trim(), file);
 });
 
