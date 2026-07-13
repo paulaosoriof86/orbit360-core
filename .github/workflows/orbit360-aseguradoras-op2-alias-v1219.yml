@@ -1,0 +1,47 @@
+name: Orbit 360 Aseguradoras OP2 Alias v1219
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/core/aseguradoras-op2-source-guard.js'
+      - 'tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs'
+      - '.github/workflows/orbit360-aseguradoras-op2-alias-v1219.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'orbit360-platform/core/aseguradoras-op2-source-guard.js'
+      - 'tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs'
+      - '.github/workflows/orbit360-aseguradoras-op2-alias-v1219.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  alias-static-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Check syntax
+        run: |
+          node --check orbit360-platform/core/aseguradoras-op2-source-guard.js
+          node --check tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs
+
+      - name: Validate versions and probable aliases
+        run: node tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs .
+
+      - name: Guard no automatic merge
+        run: |
+          grep -q 'VERSION_CANONICAL' tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs
+          grep -q 'ONE_LETTER_NEAR' tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs
+          grep -q 'CROSS_COUNTRY_NOT_MERGED' tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs
+          grep -q 'NO_AUTO_WRITE' tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs
