@@ -108,7 +108,7 @@ jobs:
           grep -q "dir-clientes-desktop" tools/orbit360-smoke-visual-crm-op1.mjs
           grep -q "op-cliente-tablet" tools/orbit360-smoke-visual-crm-op1.mjs
           grep -q "ase-cliente-mobile" tools/orbit360-smoke-visual-crm-op1.mjs
-          grep -q "--port 5000" tools/orbit360-run-crm-op1-visual.ps1
+          grep -Fq -- "--port 5000" tools/orbit360-run-crm-op1-visual.ps1
 
       - name: Guard honest communication
         run: |
