@@ -1,13 +1,14 @@
 /* ============================================================
-   Orbit 360 · Aseguradoras OP-2 · guard de alias y duplicados v1.217
+   Orbit 360 · Aseguradoras OP-2 · guard de alias y duplicados v1.220
    Marca variantes probables dentro del archivo o contra el directorio
-   existente. Nunca fusiona automáticamente ni toca recursos sensibles.
+   existente. Solo identidad canónica exacta puede actualizar sin revisión.
+   Nunca fusiona automáticamente ni toca recursos sensibles.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 (function () {
   const D = Orbit.insurerDirectoryImport;
-  if (!D || Orbit.__aseguradorasOp2SourceGuardV1217) return;
-  Orbit.__aseguradorasOp2SourceGuardV1217 = true;
+  if (!D || Orbit.__aseguradorasOp2SourceGuardV1220) return;
+  Orbit.__aseguradorasOp2SourceGuardV1220 = true;
 
   function clean(v) { return String(v == null ? '' : v).replace(/\u00a0/g, ' ').trim(); }
   function fold(v) {
@@ -41,6 +42,10 @@ window.Orbit = window.Orbit || {};
     if (x.includes(y) || y.includes(x)) return Math.abs(x.length - y.length) <= 3;
     return distance(x, y) <= 1;
   }
+  function exactCanonical(a, b) {
+    const x = canonical(a), y = canonical(b);
+    return !!x && !!y && x === y;
+  }
   function addAlert(target, code) {
     if (!target) return;
     target.validacionAlertas = Array.from(new Set([].concat(target.validacionAlertas || [], code)));
@@ -49,6 +54,13 @@ window.Orbit = window.Orbit || {};
   }
   function operationFor(result, sheet) {
     return result && result.report && (result.report._operations || []).find(op => op.sourceSheet === sheet);
+  }
+  function existingRows() {
+    try { return Orbit.store && Orbit.store.all ? (Orbit.store.all('aseguradoras') || []) : []; }
+    catch (e) { return []; }
+  }
+  function existingById(rows, id) {
+    return (rows || []).find(row => row && String(row.id || '') === String(id || '')) || null;
   }
   function markResult(result) {
     if (!result || !Array.isArray(result.candidates) || !result.report) return result;
@@ -66,12 +78,23 @@ window.Orbit = window.Orbit || {};
       }
     }
 
-    let existing = [];
-    try { existing = Orbit.store && Orbit.store.all ? (Orbit.store.all('aseguradoras') || []) : []; } catch (e) {}
+    const existing = existingRows();
     candidates.forEach(candidate => {
       const op = operationFor(result, candidate.sourceSheet);
-      if (!op || op.action !== 'insert' || !op.data) return;
-      const found = existing.find(row => (!row.pais || row.pais === candidate.country) && near(row.nombre, candidate.identityName || candidate.sourceSheet));
+      if (!op || !op.data) return;
+      const sourceName = candidate.identityName || candidate.sourceSheet;
+
+      if (op.action === 'update' && op.id) {
+        const found = existingById(existing, op.id);
+        if (found && !exactCanonical(found.nombre, sourceName)) {
+          addAlert(op.data, 'actualizacion_probable_requiere_confirmacion');
+          reviews.push({ type:'probable_update', country:candidate.country, sheet:candidate.sourceSheet, existingId:found.id || '' });
+        }
+        return;
+      }
+
+      if (op.action !== 'insert') return;
+      const found = existing.find(row => (!row.pais || row.pais === candidate.country) && near(row.nombre, sourceName));
       if (!found) return;
       addAlert(op.data, 'duplicado_probable_con_directorio');
       reviews.push({ type:'existing_directory', country:candidate.country, sheet:candidate.sourceSheet, existingId:found.id || '' });
@@ -99,5 +122,6 @@ window.Orbit = window.Orbit || {};
   D.parseFile = async function () { return markResult(await originalParseFile.apply(D, arguments)); };
   D.op2CanonicalName = canonical;
   D.op2NamesNear = near;
-  D.__op2SourceGuardV1217 = { originalParseMatrices, originalParseFile, markResult };
+  D.op2NamesExactCanonical = exactCanonical;
+  D.__op2SourceGuardV1220 = { originalParseMatrices, originalParseFile, markResult, exactCanonical };
 })();
