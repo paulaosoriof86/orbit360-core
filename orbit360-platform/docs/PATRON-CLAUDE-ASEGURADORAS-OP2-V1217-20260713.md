@@ -1,4 +1,4 @@
-# Patrón reusable para Claude — Aseguradoras OP-2 v1.217
+# Patrón reusable para Claude — Aseguradoras OP-2 v1.218
 
 Fecha: 2026-07-13  
 Proyecto: Orbit 360  
@@ -30,36 +30,61 @@ Debe existir directorio, KPI con detalle, ficha-página con regreso y pestañas 
 
 ```txt
 Dirección/Admin: consulta y administración según matriz
-Operativo: consulta y edición operativa según permiso central
-Asesor: consulta del directorio y creación de gestiones de corrección
+Operativo: consulta, cuentas, accesos y edición operativa según permiso central
+Asesor: consulta del directorio, cuentas bancarias y gestiones de corrección
 ```
 
 Mostrar el módulo no amplía automáticamente:
 
 - scope de clientes;
-- acceso a secretos;
 - permisos de importación;
 - edición administrativa;
 - habilitación de tarifas.
 
 La visibilidad final sigue siendo módulos base + extras - restricciones.
 
-## 3. Una sola seguridad para importar y editar
+## 3. Cuentas bancarias y credenciales no tienen la misma visibilidad
 
-Importación y edición manual deben usar la misma política.
+### Cuentas bancarias
 
-Nunca guardar en `Orbit.store`:
+Todo usuario que pueda consultar Aseguradoras debe poder:
+
+- ver el número completo;
+- copiarlo;
+- identificar banco, tipo, moneda, titular y uso;
+- abrir el medio de pago cuando exista.
+
+La cuenta puede residir en un proveedor seguro y resolverse por referencia, pero la UI no debe ocultarla al equipo operativo autorizado.
 
 ```txt
-password
-pass
-contrasena
-usuario completo sensible
-numero de cuenta completo
-accountNumber
+accessClass = operational_all_viewers
+requiredPermission = aseguradoras:view
 ```
 
-Persistir únicamente:
+### Usuarios y contraseñas de portales
+
+Solo pueden verlos o copiarlos:
+
+```txt
+Dirección
+SuperAdmin
+AdminTenant
+Admin
+Operativo
+permiso extra explícito
+```
+
+Asesor puede consultar la plataforma y su estado, pero no ve usuario ni contraseña salvo permiso extra.
+
+```txt
+accessClass = administrative_operational
+```
+
+Las restricciones explícitas siempre prevalecen.
+
+## 4. Seguridad y migración sin pérdida
+
+Para nuevas cargas o nuevas capturas, los valores completos deben ir a un proveedor seguro. `Orbit.store` conserva metadatos, indicios y referencias.
 
 ```txt
 usuarioHint
@@ -71,11 +96,25 @@ fuenteTraza
 secretoExpuesto = false
 ```
 
-Si el prototipo contiene valores legacy en claro, debe migrarlos a referencias protegidas, marcar `requiereValidacion` y auditar la migración real.
+Si existen valores legacy en claro:
 
-El editor manual debe bloquear campos de usuario, contraseña y cuenta completa; debe ofrecer “Gestionar de forma segura”.
+1. deben seguir disponibles según la política de rol;
+2. se marcan como pendientes de migración;
+3. se copian al proveedor seguro;
+4. se verifica lectura y copia desde el proveedor;
+5. solo entonces se retira el valor anterior;
+6. se audita antes/después y resultado.
 
-## 4. Estados honestos
+Nunca borrar primero para conectar después.
+
+El editor puede bloquear la modificación directa del valor sensible, pero debe dirigir a las pestañas operativas:
+
+```txt
+Bancos y pagos
+Plataformas
+```
+
+## 5. Estados honestos
 
 Usar lenguaje operativo:
 
@@ -90,12 +129,13 @@ Validado y habilitado
 Reemplazado por versión
 Bloqueado
 Conexión segura pendiente
+Disponible · pendiente migración segura
 Referencia protegida
 ```
 
-No mostrar `backend_required`, `accountRef`, `credentialRef`, `Orbit.store`, Firebase, Firestore o nombres de almacenamiento en UI cliente.
+No mostrar `backend_required`, `accountRef`, `credentialRef`, `Orbit.store`, Firebase o Firestore en UI cliente.
 
-## 5. Importador de directorios
+## 6. Importador de directorios
 
 Requisitos:
 
@@ -108,7 +148,7 @@ Requisitos:
 - dry-run crear/actualizar/bloquear/requiere validación;
 - motivo y frase reforzada;
 - aplicación únicamente de filas validadas;
-- sensibles en memoria temporal y proveedor seguro;
+- recursos sensibles en memoria temporal y proveedor seguro;
 - sin backend seguro: análisis disponible, aplicación bloqueada.
 
 La frase de confirmación es:
@@ -117,7 +157,7 @@ La frase de confirmación es:
 CONFIRMO DIRECTORIO
 ```
 
-## 6. Alias y duplicados probables
+## 7. Alias y duplicados probables
 
 Además de duplicados exactos, detectar:
 
@@ -136,7 +176,7 @@ validationStatus = requiere_validacion
 
 Nunca fusionar automáticamente.
 
-## 7. Entidades aliadas
+## 8. Entidades aliadas
 
 Una red, aliado, agencia o intermediario no debe convertirse automáticamente en aseguradora directa.
 
@@ -147,7 +187,7 @@ requiereValidacion = true
 
 Su clasificación y uso deben confirmarse antes de habilitar productos o tarifas.
 
-## 8. Relación con Cotizador y Comparativo
+## 9. Relación con Cotizador y Comparativo
 
 ```txt
 contactos importados != tarifa validada
@@ -170,7 +210,7 @@ La habilitación debe ser default-deny y exigir combinación completa:
 - casos de prueba;
 - validación explícita.
 
-## 9. Gestión de correcciones
+## 10. Gestión de correcciones
 
 Asesor y otros roles sin edición deben poder crear una gestión con:
 
@@ -181,9 +221,9 @@ Asesor y otros roles sin edición deben poder crear una gestión con:
 - rol activo;
 - fecha y prioridad.
 
-No deben editar directamente recursos protegidos.
+No deben editar directamente credenciales ni habilitaciones.
 
-## 10. Academia
+## 11. Academia
 
 Actualizar los cursos existentes:
 
@@ -198,36 +238,41 @@ No crear cursos duplicados. Conservar progreso y certificados.
 Enseñar:
 
 - directorio operativo;
-- roles y permisos;
-- seguridad uniforme;
+- cuentas para usuarios autorizados del directorio;
+- credenciales para Dirección/Admin/Operativo;
+- migración no destructiva;
+- roles, extras y restricciones;
 - alias/duplicados;
 - entidades aliadas;
 - estados honestos;
 - correcciones;
 - relación con Cotizador/Comparativo.
 
-## 11. Pruebas obligatorias
+## 12. Pruebas obligatorias
 
 1. Dirección abre directorio, KPI y ficha completa.
-2. Operativo ve el módulo y acciones permitidas por `Orbit.access`.
-3. Asesor ve el módulo, no ve edición ni revelado/copia de sensibles.
-4. Editor manual no persiste usuario, contraseña ni cuenta completa.
-5. Importador no persiste sensibles.
-6. Alias con diferencia de una letra queda bloqueado.
-7. Nombre con versión queda bloqueado o asociado para revisión.
-8. Red/aliado queda como `partner_network` y requiere validación.
-9. Importar contactos no habilita Cotizador.
-10. Documentos usan visor común.
-11. Copy técnico no aparece.
-12. Desktop 1366, tablet 768 y móvil 390 sin overflow global ni errores.
+2. Dirección ve y copia cuenta, usuario y contraseña.
+3. Operativo ve y copia cuenta, usuario y contraseña.
+4. Asesor ve y copia la cuenta bancaria completa.
+5. Asesor no ve usuario ni contraseña del portal.
+6. Una restricción explícita bloquea la acción correspondiente.
+7. Los valores legacy no desaparecen antes de una migración verificada.
+8. Un recurso por referencia recibe contexto de tenant, entidad, rol y clase de acceso.
+9. Alias con diferencia de una letra queda bloqueado.
+10. Nombre con versión queda bloqueado o asociado para revisión.
+11. Red/aliado queda como `partner_network` y requiere validación.
+12. Importar contactos no habilita Cotizador.
+13. Documentos usan visor común.
+14. Copy técnico no aparece.
+15. Desktop 1366, tablet 768 y móvil 390 sin overflow global ni errores.
 
 ## Aplicación local y estado Claude
 
 ```txt
 Carril A: UX, copy, responsive, Academia
-Carril B: permisos, sanitización, referencias seguras, auditoría
+Carril B: política de acceso, proveedor seguro, permisos y auditoría
 Carril C: directorios GT/CO separados y dry-run
-Estado local: cierre funcional implementado; pendiente gate visual y dry-run real
+Estado local: cierre funcional v1.218 implementado; pendiente gate visual y dry-run real
 Estado Claude: obligatorio al modificar estos módulos
 ```
 
