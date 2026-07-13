@@ -12,6 +12,7 @@ on:
       - 'orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js'
       - 'orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js'
       - 'orbit360-platform/modules/aseguradoras-op2-closure-bridge.js'
+      - 'orbit360-platform/modules/aseguradoras-op2-permission-guard.js'
       - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
       - 'orbit360-platform/styles/aseguradoras-op2-v1217.css'
       - 'tools/orbit360-validar-aseguradoras-op2.mjs'
@@ -29,6 +30,7 @@ on:
       - 'orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js'
       - 'orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js'
       - 'orbit360-platform/modules/aseguradoras-op2-closure-bridge.js'
+      - 'orbit360-platform/modules/aseguradoras-op2-permission-guard.js'
       - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
       - 'orbit360-platform/styles/aseguradoras-op2-v1217.css'
       - 'tools/orbit360-validar-aseguradoras-op2.mjs'
@@ -58,6 +60,7 @@ jobs:
           node --check orbit360-platform/core/aseguradoras-op2-role-visibility.js
           node --check orbit360-platform/core/aseguradoras-op2-source-guard.js
           node --check orbit360-platform/modules/aseguradoras-op2-closure-bridge.js
+          node --check orbit360-platform/modules/aseguradoras-op2-permission-guard.js
           node --check orbit360-platform/data/academia-v1217-aseguradoras-op2.js
 
       - name: Validate Aseguradoras OP-2
@@ -72,6 +75,13 @@ jobs:
           grep -Fq "ensure('Asesor', ['aseguradoras'])" orbit360-platform/core/aseguradoras-op2-role-visibility.js
           grep -Fq 'sensitiveAccessUnchanged: true' orbit360-platform/core/aseguradoras-op2-role-visibility.js
           grep -Fq 'insurerWritePermissionUnchanged: true' orbit360-platform/core/aseguradoras-op2-role-visibility.js
+
+      - name: Guard direct entry permissions
+        run: |
+          grep -Fq "A.can('aseguradoras', action)" orbit360-platform/modules/aseguradoras-op2-permission-guard.js
+          grep -Fq "startEdit && !allowed('edit')" orbit360-platform/modules/aseguradoras-op2-permission-guard.js
+          grep -Fq "!allowed('create')" orbit360-platform/modules/aseguradoras-op2-permission-guard.js
+          grep -Fq "!allowed('create') && !allowed('manage_documents')" orbit360-platform/modules/aseguradoras-op2-permission-guard.js
 
       - name: Guard probable duplicates
         run: |
