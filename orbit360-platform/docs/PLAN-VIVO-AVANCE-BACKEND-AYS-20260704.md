@@ -6,20 +6,25 @@ Repositorio: `paulaosoriof86/orbit360-core`
 Rama: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open, sin merge ni deploy
 
+Documento complementario canónico:
+
+```txt
+orbit360-platform/docs/ESTADO-REAL-RUTA-PRODUCCION-AYS-20260713.md
+```
+
 ## 1. Propósito
 
-Mantener una vista única del avance operativo, los tres carriles y el siguiente bloque. Este documento prevalece sobre prioridades históricas ya superadas, sin borrar sus auditorías ni bitácoras.
+Mantener una única vista del avance operativo, los tres carriles y la ruta mínima a una versión A&S utilizable. Este plan prevalece sobre prioridades históricas ya superadas y sobre cualquier instrucción anterior que vuelva a pedir fuentes ya recibidas.
 
 ## 2. Restricciones permanentes
 
 ```txt
-Producción: no autorizada
-Deploy: no autorizado
-Merge/main: no autorizados
 Datos reales hardcodeados: prohibidos
 Valores protegidos en repositorio, UI o reportes: prohibidos
-Backend protegido: no sobrescribir
-Metodología: 0% manual salvo gate local final indispensable
+Backend protegido: no sobrescribir mediante ZIP/prototipo
+Metodología: 0% manual salvo un gate local final indispensable
+A&S: tenant configurable, no fork
+Deploy productivo: requiere gates, acceso Firebase y autorización explícita final
 ```
 
 Archivos protegidos principales:
@@ -45,13 +50,17 @@ Evidencia: results.jsonl + 10 capturas
 Regla: no repetir salvo regresión nueva o cambio de alcance
 ```
 
-Pendiente de fuente separada:
+Baseline real ya procesado:
 
 ```txt
-Pólizas
+Clientes Siga CRM: 440 filas
+Crear: 414
+Requiere validación: 26
+Pólizas/Vehículos/Recibos/Cobros/Cartera: procesados, perfilados o modelados
+Comisiones/Facturas/Banco: modelados por fuente separada
 ```
 
-No se deben inferir pólizas desde clientes, movimientos financieros, bancos o cobros.
+No volver a pedir Clientes, Pólizas, Vehículos, Recibos, Cobros, Cartera o Comisiones como si no existieran. Solo se solicita un delta concreto cuando exista una ausencia exacta demostrada por archivo, periodo, país, aseguradora o dominio.
 
 ### OP-2 — Aseguradoras v1.220
 
@@ -93,7 +102,25 @@ Avances acumulados:
 - directorio importado no habilita tarifas;
 - responsive y Academia por rol v1.220.
 
-## 4. Gate final habilitado
+### OP-3 — Cotizador + Comparativo
+
+```txt
+Baseline frontend acumulado: v1.215
+Fuente avanzada recibida: comparativo_final_v110.html
+Estado: siguiente módulo después de cerrar Aseguradoras
+```
+
+No volver a solicitar el HTML v110. Debe usarse como referencia funcional aislada para rescatar capacidades generalizables sin copiar Firebase, Auth, credenciales, almacenamiento o hardcode A&S.
+
+### OP-4 — Ops + Leads
+
+```txt
+Estado: posterior a Cotizador/Comparativo
+Contrato existente: aceptación validada → issuance_request → Ops
+No crear póliza ni cartera antes de emisión real confirmada
+```
+
+## 4. Gate final de Aseguradoras
 
 ```txt
 tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
@@ -118,63 +145,77 @@ Gate local: HABILITADO
 Ejecución local: PENDIENTE
 ```
 
-## 5. Carriles permanentes
+## 5. Diagnóstico de producción
+
+La razón por la que todavía se ve demo y no operación A&S es concreta:
+
+```txt
+store predeterminado = localStorage + seed ficticio
+Firestore = solo modo firestore-lab por query string
+Auth/rules = usuario LAB de demostración
+firebase.json = sin Hosting
+.firebaserc = inexistente en el repositorio
+carga real A&S = no ejecutada
+```
+
+Publicar el HTML actual no resuelve el problema: desplegaría una demo.
+
+## 6. Carriles permanentes
 
 ### Carril A — prototipo, UX y Academia
 
 Estado:
 
-- patrones CRM documentados para Claude;
-- patrón Aseguradoras documentado;
-- patrón reusable de cuarentena documentado;
-- patrón v1.220 de importadores seguros consolidado;
-- identidad exacta y bloqueo de actualización probable en Academia;
-- mensajes operativos y anti-copy técnico incluidos;
-- Academia Aseguradoras actualiza los mismos cursos;
-- progreso y certificados preservados.
-
-Documentos principales:
-
-```txt
-docs/PATRON-CLAUDE-CRM-CALIDAD-PORTAL-POLIZA-V1216-20260712.md
-docs/PATRON-CLAUDE-ASEGURADORAS-OP2-V1217-20260713.md
-docs/PATRON-CLAUDE-CUARENTENA-HOJAS-IMPORTADORES-V1219-20260713.md
-docs/PATRON-CLAUDE-IMPORTADORES-CUARENTENA-IDENTIDAD-COPY-V1220-20260713.md
-docs/PATRON-REUTILIZABLE-CLAUDE-DESGLOSE-COTIZACION-ESTIMACION-INTERNA-20260712.md
-```
+- CRM cerrado 10/10;
+- Aseguradoras 12/15 con tres vistas focalizadas pendientes;
+- Cotizador/Comparativo v1.215 acumulado;
+- comparativo v110 recibido;
+- patrones CRM, Aseguradoras, importadores, cotizaciones y Academia documentados;
+- no trasladar datos A&S, valores protegidos, bindings LAB ni rutas privadas a Claude.
 
 Pendiente:
 
-- trasladar estos patrones a la siguiente candidata comercializable de Claude;
-- no trasladar datos A&S, valores protegidos, bindings LAB ni rutas privadas;
-- agregar casos prácticos sanitizados después de los dry-runs.
+- cerrar las tres vistas;
+- aplicar patrones a la siguiente candidata comercializable solo cuando aporte un delta real;
+- no abrir otra auditoría general sin ZIP/commit/fallo nuevo.
 
 ### Carril B — backend, seguridad y Orbit.store
 
 Estado:
 
 - `Orbit.store`, Auth, Firestore LAB y reglas protegidos;
-- política de cuentas y accesos aplicada a UI y proveedor;
-- migración en orden copiar → verificar → retirar;
-- cuarentena antes del parser, captura y operaciones;
-- revisión de alias con `captureSecure=false`;
-- importación preparada con captura protegida por defecto;
-- coincidencia probable nunca actualiza silenciosamente;
-- copy visible y errores internos sanitizados;
-- evidencia reutilizable mediante JSONL + capturas;
-- integración de `index.html` con backup y rollback;
-- validador canónico v1.220;
+- política de cuentas y accesos aplicada;
+- cuarentena y default-deny implementados;
 - CI dividido por contratos;
-- estado de commit publicado y confirmado `success`.
+- backend LAB compatible existente.
 
-Pendiente:
+Pendiente productivo real:
 
-- ejecutar el gate visual focalizado una sola vez;
-- conectar proveedor seguro real antes de aplicar recursos protegidos.
+```txt
+modo Firestore productivo sin fallback demo
+Auth multiusuario basado en membresías tenant
+multirol, rol activo y scopes desde backend
+rules productivas
+configuración Firebase por entorno/secrets
+Firebase Hosting y rollback
+smoke productivo
+```
 
 ### Carril C — fuentes reales y migración operativa
 
-Preflight sanitizado:
+Estado recibido/procesado:
+
+```txt
+Clientes: dry-run sanitizado cerrado
+Pólizas/Vehículos/Recibos/Cobros/Cartera: procesados/modelados
+Comisiones/Facturas/Banco: modelados
+Aseguradoras GT/CO: preflight sanitizado y fuentes activas
+Cotizador/Comparativo v110: recibido
+Finanzas GT/CO: fuente recibida separada
+Marketing: calendario, manual y logo recibidos
+```
+
+Preflight Aseguradoras:
 
 ```txt
 Guatemala:
@@ -192,83 +233,58 @@ Colombia:
   cobertura de pagos incompleta
 ```
 
-No se escribieron datos ni se trasladaron valores de las fuentes al repositorio.
+No se han escrito datos reales en el backend productivo. Dry-run/modelado/documentación no equivalen a carga real.
 
-Una fuente contiene hojas ajenas al directorio que requieren revisión de seguridad separada. Permanecen excluidas y ningún valor entra al dry-run o documentación.
-
-Secuencia obligatoria:
+Secuencia:
 
 1. cerrar las tres vistas de Plataformas;
 2. dry-run Guatemala sin escritura;
 3. resolver identidad, aliados y filas bloqueadas;
 4. dry-run Colombia sin escritura;
-5. resolver las dos parejas probables y la entidad aliada;
-6. aplicar solo filas confirmadas mediante proveedor seguro;
-7. solicitar/procesar la fuente separada Pólizas.
+5. resolver parejas probables y entidad aliada;
+6. habilitar backend productivo seguro;
+7. aplicar filas confirmadas con auditLog y rollback;
+8. ejecutar smoke real con datos A&S;
+9. continuar Cotizador/Comparativo v110.
 
-## 6. Orden del plan operativo
+## 7. Orden del plan operativo
 
 ```txt
 1. CRM — cerrado
-2. Aseguradoras — gate focalizado habilitado; dry-runs GT/CO después
-3. Cotizador + Comparativo configurable
-4. Ops + Leads
-5. Finanzas, conciliaciones, comisiones, CxC/CxP
-6. Marketing
-7. Siniestros, renovaciones, cancelaciones, automatizaciones e integraciones
-8. Academia backend profunda transversal
+2. Aseguradoras — tres vistas + dry-runs GT/CO
+3. Backend productivo/Auth/Hosting + primera carga A&S
+4. Cotizador + Comparativo configurable
+5. Ops + Leads
+6. Finanzas, conciliaciones, comisiones, CxC/CxP
+7. Marketing
+8. Siniestros, renovaciones, cancelaciones, automatizaciones e integraciones
+9. Academia backend profunda transversal
 ```
 
-No avanzar a Finanzas ni otro módulo para sustituir el cierre pendiente de Aseguradoras.
+El paso 3 es obligatorio para que los cierres funcionales se traduzcan en una plataforma realmente utilizable. No seguir cerrando módulos únicamente sobre seed demo mientras la operación A&S no tenga persistencia real visible.
 
-## 7. Intermedios vigentes
-
-```txt
-Evidencia estructurada:
-  results.jsonl + capturas + IDs exactos + booleano ok
-
-Cuarentena previa:
-  nombre + señales de contenido antes del parser
-
-Actualización exacta:
-  identidad canónica exacta o bloqueo humano
-
-Mensajes operativos:
-  mapa de errores y sanitización de cambios tardíos
-
-CI verificable:
-  grupos por contrato + estado del commit
-```
-
-Estos intermedios apoyan el plan; no abren módulos nuevos ni cambian el orden operativo.
-
-## 8. Metodología 0% manual
+## 8. Metodología corregida
 
 ChatGPT/Codex:
 
-- audita;
-- modifica;
-- empalma;
-- documenta;
-- valida;
-- revisa CI;
-- corrige fallos;
-- prepara un único gate local final.
+- trabaja por delta;
+- no relee cientos de documentos en cada iteración;
+- audita solo insumos nuevos;
+- modifica, empalma, valida y documenta lo estrictamente necesario;
+- reutiliza evidencia aprobada;
+- mantiene A/B/C;
+- convierte auditoría en acción;
+- prepara un único gate local final cuando sea indispensable.
 
 Paula:
 
-- ejecuta una sola acción local cuando Chrome/Windows o una fuente local sean indispensables;
-- comparte el reporte generado;
-- revisa visualmente el resultado final.
-
-No corresponde pedir a Paula:
-
-- elegir puertos;
-- cerrar aplicaciones;
-- localizar reportes;
-- editar archivos o comandos;
-- diagnosticar el pipeline;
-- repetir escenarios aprobados.
+- no elige puertos;
+- no localiza reportes;
+- no edita archivos o comandos;
+- no diagnostica pipelines;
+- no repite escenarios aprobados;
+- ejecuta una sola acción local cuando navegador, Windows o credenciales locales sean indispensables;
+- revisa la URL y el checklist visual final.
 
 ## 9. Reglas de negocio vigentes
 
@@ -285,47 +301,31 @@ Entidad aliada ≠ aseguradora directa
 Producción/metas/comisiones → prima neta recaudada
 ```
 
-## 10. Archivos centrales v1.220
+## 10. Próximo bloque
 
 ```txt
-core/aseguradoras-op2-sheet-quarantine.js
-core/aseguradoras-op2-source-guard.js
-core/insurer-directory-import-v1202-security.js
-data/academia-v1217-aseguradoras-op2.js
-tools/orbit360-validar-aseguradoras-op2-v1220.mjs
-tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs
-tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs
-tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs
-tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs
-tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
-.github/workflows/orbit360-aseguradoras-op2-smoke.yml
+1. Ejecutar una sola vez el gate de 3 vistas de Aseguradoras.
+2. Auditar las 3 capturas y cerrar 15/15.
+3. Ejecutar dry-runs GT/CO y resolver solo bloqueos concretos.
+4. Implementar modo backend productivo + Auth/membresías + rules + Hosting.
+5. Ejecutar carga controlada inicial A&S.
+6. Smoke productivo y deploy autorizado.
+7. Continuar Cotizador/Comparativo v110 y luego Ops/Leads.
 ```
 
-## 11. Próximo bloque
-
-```txt
-1. Ejecutar una sola vez el gate focalizado de tres Plataformas.
-2. Auditar el reporte y las tres capturas.
-3. Cerrar Aseguradoras 15/15 si aprueba.
-4. Ejecutar dry-run Guatemala sin escritura.
-5. Resolver bloqueos.
-6. Ejecutar dry-run Colombia sin escritura.
-7. Continuar Cotizador + Comparativo.
-```
-
-## 12. Formato obligatorio de cierre
+## 11. Formato obligatorio de cierre
 
 ```txt
 Avance del bloque
 - Qué adelanté:
 - Bloque trabajado:
-- Plan/área impactada:
-- Documentos creados/actualizados:
-- Decisiones agregadas:
-- ¿Se agregó algo intermedio al plan?:
-- Intermedios agregados:
-- Pendientes que siguen:
-- Qué sigue en el plan:
-- Próximo bloque recomendado:
+- Carril A:
+- Carril B:
+- Carril C:
+- Evidencia reutilizada:
+- Datos realmente escritos: Sí/No
+- Validación visual: estado
+- Pendientes exactos:
+- Próxima acción:
 - Estado PR/rama:
 ```
