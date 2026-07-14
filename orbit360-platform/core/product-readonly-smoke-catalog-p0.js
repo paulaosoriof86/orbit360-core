@@ -1,43 +1,43 @@
 /* ============================================================
-   Orbit 360 · Catálogo P0 de colecciones e índices para smoke read-only
-   Fecha: 2026-07-13
+   Orbit 360 · Catálogo P0 corregido de smoke productivo read-only
+   Fecha: 2026-07-14
 
    Define el primer smoke A&S para Dirección, Operativo y Asesor.
-   Capa pura: no consulta Firestore, no crea índices y no escribe.
+   Las cuentas bancarias son información operativa para todo usuario
+   con acceso al módulo Aseguradoras. No crea índices ni escribe.
    ============================================================ */
 (function () {
   'use strict';
 
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p0-20260713';
+  var VERSION = 'p0-corrected-20260714';
   var PHYSICAL_COLLECTION_GROUP = 'items';
   var SUPPORTED_ROLES = Object.freeze(['Dirección', 'Operativo', 'Asesor']);
-  var SCOPE_FIELDS = Object.freeze({ own: 'advisorId', team: 'teamId' });
 
   var FIRST_SMOKE_PROFILE = Object.freeze({
     'Dirección': Object.freeze({
       required: Object.freeze([
         'clientes', 'polizas', 'gestiones', 'aseguradoras',
         'contactosAseguradora', 'plataformasAseguradora',
-        'calidadDatos', 'financiero_historico'
+        'cuentasBancariasAseguradora', 'calidadDatos', 'financiero_historico'
       ]),
       optional: Object.freeze([
-        'cobros', 'carteraPrimas', 'vehiculos', 'solicitudesPortal',
-        'cuentasBancariasAseguradora'
+        'cobros', 'carteraPrimas', 'vehiculos', 'solicitudesPortal'
       ]),
       denied: Object.freeze([])
     }),
     'Operativo': Object.freeze({
       required: Object.freeze([
         'clientes', 'polizas', 'gestiones', 'aseguradoras',
-        'contactosAseguradora', 'plataformasAseguradora', 'calidadDatos'
+        'contactosAseguradora', 'plataformasAseguradora',
+        'cuentasBancariasAseguradora', 'calidadDatos'
       ]),
       optional: Object.freeze([
         'cobros', 'carteraPrimas', 'vehiculos', 'solicitudesPortal'
       ]),
       denied: Object.freeze([
-        'cuentasBancariasAseguradora', 'credentialRefs', 'auditEvents', 'auditoriaImportaciones',
+        'credentialRefs', 'auditEvents', 'auditoriaImportaciones',
         'financiero_historico', 'finmovs', 'movimientosBanco',
         'conciliacionBancaria', 'configuracionTenant'
       ])
@@ -46,14 +46,14 @@
       required: Object.freeze([
         'clientes', 'polizas', 'cobros', 'gestiones',
         'solicitudesPortal', 'aseguradoras', 'contactosAseguradora',
-        'calidadDatos'
+        'cuentasBancariasAseguradora', 'calidadDatos'
       ]),
       optional: Object.freeze(['vehiculos', 'recibosEsperados', 'documentos']),
       denied: Object.freeze([
-        'plataformasAseguradora', 'cuentasBancariasAseguradora',
-        'credentialRefs', 'members', 'auditEvents', 'auditoriaImportaciones',
-        'importBatches', 'financiero_historico', 'finmovs',
-        'movimientosBanco', 'conciliacionBancaria', 'configuracionTenant'
+        'plataformasAseguradora', 'credentialRefs', 'members',
+        'auditEvents', 'auditoriaImportaciones', 'importBatches',
+        'financiero_historico', 'finmovs', 'movimientosBanco',
+        'conciliacionBancaria', 'configuracionTenant'
       ])
     })
   });
@@ -99,8 +99,34 @@
     };
   }
 
-  function collectionPolicy(access, collection) {
-    return clone(access && access.COLLECTION_POLICY && access.COLLECTION_POLICY[collection] || {});
+  function resolveAccess(options) {
+    return options && options.accessPolicy ||
+      window.Orbit.tenantAccessPolicyEffectiveP0 ||
+      window.Orbit.tenantAccessPolicyP0;
+  }
+
+  function bankOverrides() {
+    var bank = window.Orbit.aseguradorasBankAccountVisibilityPolicyP0;
+    return clone(bank && bank.COLLECTION_POLICY_OVERRIDE || {
+      cuentasBancariasAseguradora: {
+        module: 'aseguradoras', scoped: false, advisorRead: true,
+        advisorWrite: false, operationalReadForModuleUsers: true,
+        fullAccountNumberVisible: true, copyAllowed: true,
+        editPermissionSeparate: true
+      }
+    });
+  }
+
+  function mergedContext(options) {
+    var source = options && options.context && typeof options.context === 'object' ? options.context : {};
+    return Object.assign({}, source, {
+      collectionPolicy: Object.assign({}, bankOverrides(), source.collectionPolicy || {})
+    });
+  }
+
+  function collectionPolicy(access, collection, context) {
+    var overrides = context && context.collectionPolicy || {};
+    return clone(overrides[collection] || access && access.COLLECTION_POLICY && access.COLLECTION_POLICY[collection] || {});
   }
 
   function hardDeniedForRole(role, policy) {
@@ -113,10 +139,11 @@
 
   function compileCollection(collection, membership, options) {
     options = options || {};
-    var access = options.accessPolicy || window.Orbit.tenantAccessPolicyP0;
+    var access = resolveAccess(options);
     var planner = options.queryPlanner || window.Orbit.productQueryPlannerP0;
+    var context = mergedContext(options);
     var role = activeRole(membership);
-    var policy = collectionPolicy(access, collection);
+    var policy = collectionPolicy(access, collection, context);
     var errors = [];
     var denial = hardDeniedForRole(role, policy);
     if (denial) errors.push(denial);
@@ -126,7 +153,7 @@
 
     var plan = null;
     if (!errors.length) {
-      plan = planner.compile(collection, membership, { accessPolicy: access, context: options.context || {} });
+      plan = planner.compile(collection, membership, { accessPolicy: access, context: context });
       if (!plan.ok) errors.push.apply(errors, plan.errors || ['plan_invalido']);
       if (plan.denied) errors.push('scope_none');
     }
@@ -140,6 +167,7 @@
       scope: plan ? plan.scope : '',
       constraints: plan ? clone(plan.constraints) : [],
       indexSignature: plan ? indexSignature(plan.constraints) : '',
+      operationalBankRead: collection === 'cuentasBancariasAseguradora',
       errors: unique(errors)
     };
   }
@@ -173,18 +201,14 @@
 
   function buildCatalog(membership, options) {
     options = options || {};
+    var access = resolveAccess(options);
+    var context = mergedContext(options);
     var profileCheck = profileFor(membership);
     if (!profileCheck.ok) {
       return {
-        ok: false,
-        writeAuthorized: false,
-        deployAuthorized: false,
-        version: VERSION,
-        errors: profileCheck.errors,
-        requiredCollections: [],
-        optionalCollections: [],
-        deniedCollections: [],
-        indexCandidates: []
+        ok: false, writeAuthorized: false, deployAuthorized: false,
+        version: VERSION, errors: profileCheck.errors,
+        requiredCollections: [], optionalCollections: [], deniedCollections: [], indexCandidates: []
       };
     }
 
@@ -195,7 +219,10 @@
       return compileCollection(collection, membership, options);
     });
     var denied = profileCheck.profile.denied.map(function (collection) {
-      return { collection: collection, reason: hardDeniedForRole(profileCheck.role, collectionPolicy(options.accessPolicy || window.Orbit.tenantAccessPolicyP0, collection)) || 'perfil_smoke_denegado' };
+      return {
+        collection: collection,
+        reason: hardDeniedForRole(profileCheck.role, collectionPolicy(access, collection, context)) || 'perfil_smoke_denegado'
+      };
     });
 
     var errors = [];
@@ -237,8 +264,9 @@
       ],
       hardGuards: {
         noSystemDocumentsThroughDataStore: true,
-        noCollectionWithoutPolicy: true,
-        noAdvisorPlatformOrBankReads: true,
+        advisorPlatformCredentialsRestricted: true,
+        bankAccountsOperationalForModuleUsers: true,
+        bankEditingPermissionSeparate: true,
         noCrossTenantQuery: true,
         noIndexDeployWithoutConfirmation: true,
         noWrites: true
@@ -259,7 +287,7 @@
       indexes: indexes,
       fieldOverrides: [],
       deployAuthorized: false,
-      source: 'orbit360.product-readonly-smoke-catalog-p0'
+      source: 'orbit360.product-readonly-smoke-catalog-p0-corrected'
     };
   }
 
