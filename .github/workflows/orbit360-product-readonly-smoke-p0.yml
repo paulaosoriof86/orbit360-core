@@ -5,6 +5,7 @@ on:
     paths:
       - 'orbit360-platform/core/product-readonly-smoke-contract-p0.js'
       - 'orbit360-platform/tools/orbit360-validar-product-readonly-smoke-contract-p0.mjs'
+      - 'orbit360-platform/tools/orbit360-generar-product-readonly-smoke-manifest-p0.mjs'
       - '.github/workflows/orbit360-product-readonly-smoke-p0.yml'
   workflow_dispatch:
 
@@ -27,6 +28,10 @@ jobs:
         run: |
           node --check orbit360-platform/core/product-readonly-smoke-contract-p0.js
           node --check orbit360-platform/tools/orbit360-validar-product-readonly-smoke-contract-p0.mjs
+          node --check orbit360-platform/tools/orbit360-generar-product-readonly-smoke-manifest-p0.mjs
 
       - name: Contract tests
         run: node orbit360-platform/tools/orbit360-validar-product-readonly-smoke-contract-p0.mjs
+
+      - name: Generator self-test
+        run: node orbit360-platform/tools/orbit360-generar-product-readonly-smoke-manifest-p0.mjs --self-test
