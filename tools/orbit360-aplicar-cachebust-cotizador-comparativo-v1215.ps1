@@ -12,7 +12,7 @@ function Count-Exact([string]$Text, [string]$Value) {
 }
 
 Write-Host '============================================================'
-Write-Host 'ORBIT 360 - SAFE INTEGRATION CRM OP1 + INSURERS OP2 V1.219'
+Write-Host 'ORBIT 360 - SAFE INTEGRATION CRM OP1 + INSURERS OP2 V1.223'
 Write-Host ('Local time: ' + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
 Write-Host ('Required branch: ' + $RequiredBranch)
 Write-Host 'No deploy | No merge | No main | No real data'
@@ -48,6 +48,11 @@ $ExactReplacements = @(
   @{
     Old = '<script src="modules/aseguradoras-op2-closure-bridge.js?v=20260713-op2"></script>'
     New = '<script src="modules/aseguradoras-op2-closure-bridge.js?v=20260713-op2-v1218"></script>'
+    Required = $false
+  },
+  @{
+    Old = '<script src="modules/aseguradoras-op2-operational-resources.js?v=20260713-op2-v1218"></script>'
+    New = '<script src="modules/aseguradoras-op2-operational-resources.js?v=20260713-op2-v1223"></script>'
     Required = $false
   }
 )
@@ -100,7 +105,7 @@ $Groups = @(
     Values = @(
       '<script src="modules/aseguradoras-op2-closure-bridge.js?v=20260713-op2-v1218"></script>',
       '<script src="modules/aseguradoras-op2-permission-guard.js?v=20260713-op2"></script>',
-      '<script src="modules/aseguradoras-op2-operational-resources.js?v=20260713-op2-v1218"></script>'
+      '<script src="modules/aseguradoras-op2-operational-resources.js?v=20260713-op2-v1223"></script>'
     )
   }
 )
@@ -147,7 +152,7 @@ if ($Updated -eq $Original) {
   exit 0
 }
 
-$BackupDir = Join-Path $Repo ('_backups\integration-op1-op2-v1219-' + (Get-Date -Format 'yyyyMMdd_HHmmss'))
+$BackupDir = Join-Path $Repo ('_backups\integration-op1-op2-v1223-' + (Get-Date -Format 'yyyyMMdd_HHmmss'))
 New-Item -ItemType Directory -Path $BackupDir -Force | Out-Null
 Copy-Item $IndexPath (Join-Path $BackupDir 'index.html') -Force
 
@@ -179,7 +184,7 @@ try {
   $ProviderPos = $Verify.IndexOf('core/aseguradoras-op2-secure-provider-policy-guard.js?v=20260713-op2-v1218')
   $ClosurePos = $Verify.IndexOf('modules/aseguradoras-op2-closure-bridge.js?v=20260713-op2-v1218')
   $PermissionPos = $Verify.IndexOf('modules/aseguradoras-op2-permission-guard.js?v=20260713-op2')
-  $OperationalPos = $Verify.IndexOf('modules/aseguradoras-op2-operational-resources.js?v=20260713-op2-v1218')
+  $OperationalPos = $Verify.IndexOf('modules/aseguradoras-op2-operational-resources.js?v=20260713-op2-v1223')
 
   if (-not ($QuarantinePos -ge 0 -and $SourcePos -gt $QuarantinePos -and $UiPos -gt $SourcePos)) {
     throw 'Invalid order: sheet quarantine -> source guard -> import UI guard.'
@@ -197,5 +202,5 @@ catch {
 }
 
 Write-Host ('Backup: ' + $BackupDir)
-Write-Host 'OK: CRM OP1 and Insurers OP2 v1.219 integrated exactly once.'
+Write-Host 'OK: CRM OP1 and Insurers OP2 v1.223 integrated exactly once.'
 Write-Host 'No commit. No push. No deploy.'
