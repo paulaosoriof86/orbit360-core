@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "orbit360.product-readonly-smoke-catalog.v1",
+  "generatedDate": "2026-07-13",
+  "tenantId": "<runtime>",
+  "smokePhase": "first_read_only",
+  "writeAuthorized": false,
+  "deployAuthorized": false,
+  "physicalCollectionGroup": "items",
+  "systemReadsOutsideDataStore": [
+    "tenants/{tenantId}/system/config",
+    "tenants/{tenantId}/members/{uid}"
+  ],
+  "roles": {
+    "Dirección": {
+      "requiredCollections": [
+        "clientes",
+        "polizas",
+        "gestiones",
+        "aseguradoras",
+        "contactosAseguradora",
+        "plataformasAseguradora",
+        "calidadDatos",
+        "financiero_historico"
+      ],
+      "optionalCollections": [
+        "cobros",
+        "carteraPrimas",
+        "vehiculos",
+        "solicitudesPortal",
+        "cuentasBancariasAseguradora"
+      ],
+      "deniedCollections": [],
+      "indexSignatures": [
+        "tenantId:ASCENDING|country:ASCENDING"
+      ]
+    },
+    "Operativo": {
+      "requiredCollections": [
+        "clientes",
+        "polizas",
+        "gestiones",
+        "aseguradoras",
+        "contactosAseguradora",
+        "plataformasAseguradora",
+        "calidadDatos"
+      ],
+      "optionalCollections": [
+        "cobros",
+        "carteraPrimas",
+        "vehiculos",
+        "solicitudesPortal"
+      ],
+      "deniedCollections": [
+        "cuentasBancariasAseguradora",
+        "credentialRefs",
+        "auditEvents",
+        "auditoriaImportaciones",
+        "financiero_historico",
+        "finmovs",
+        "movimientosBanco",
+        "conciliacionBancaria",
+        "configuracionTenant"
+      ],
+      "indexSignatures": [
+        "tenantId:ASCENDING|country:ASCENDING",
+        "tenantId:ASCENDING|country:ASCENDING|teamId:ASCENDING"
+      ]
+    },
+    "Asesor": {
+      "requiredCollections": [
+        "clientes",
+        "polizas",
+        "cobros",
+        "gestiones",
+        "solicitudesPortal",
+        "aseguradoras",
+        "contactosAseguradora",
+        "calidadDatos"
+      ],
+      "optionalCollections": [
+        "vehiculos",
+        "recibosEsperados",
+        "documentos"
+      ],
+      "deniedCollections": [
+        "plataformasAseguradora",
+        "cuentasBancariasAseguradora",
+        "credentialRefs",
+        "members",
+        "auditEvents",
+        "auditoriaImportaciones",
+        "importBatches",
+        "financiero_historico",
+        "finmovs",
+        "movimientosBanco",
+        "conciliacionBancaria",
+        "configuracionTenant"
+      ],
+      "indexSignatures": [
+        "tenantId:ASCENDING|country:ASCENDING",
+        "tenantId:ASCENDING|country:ASCENDING|advisorId:ASCENDING"
+      ]
+    }
+  },
+  "indexCandidates": [
+    {
+      "collectionGroup": "items",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "tenantId", "order": "ASCENDING" },
+        { "fieldPath": "country", "order": "ASCENDING" }
+      ],
+      "deployAuthorized": false,
+      "status": "candidate_requires_emulator_or_firestore_confirmation"
+    },
+    {
+      "collectionGroup": "items",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "tenantId", "order": "ASCENDING" },
+        { "fieldPath": "country", "order": "ASCENDING" },
+        { "fieldPath": "advisorId", "order": "ASCENDING" }
+      ],
+      "deployAuthorized": false,
+      "status": "candidate_requires_emulator_or_firestore_confirmation"
+    },
+    {
+      "collectionGroup": "items",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "tenantId", "order": "ASCENDING" },
+        { "fieldPath": "country", "order": "ASCENDING" },
+        { "fieldPath": "teamId", "order": "ASCENDING" }
+      ],
+      "deployAuthorized": false,
+      "status": "candidate_requires_emulator_or_firestore_confirmation"
+    }
+  ],
+  "hardGuards": {
+    "noSystemDocumentsThroughDataStore": true,
+    "noAdvisorPlatformOrBankReads": true,
+    "operativoBankReadRequiresExplicitGrant": true,
+    "noCrossTenantQuery": true,
+    "noWrites": true,
+    "noIndexDeployWithoutEmulatorOrFirestoreConfirmation": true
+  }
+}
