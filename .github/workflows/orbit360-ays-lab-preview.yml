@@ -1,0 +1,109 @@
+name: Orbit 360 A&S LAB Preview
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - "orbit360-platform/**"
+      - "firebase.json"
+      - ".github/workflows/orbit360-ays-lab-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-ays-lab-preview
+  cancel-in-progress: true
+
+jobs:
+  deploy_preview:
+    name: Deploy preview only
+    runs-on: ubuntu-latest
+    env:
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      PROJECT_ID_FALLBACK: ${{ vars.FIREBASE_PROJECT_ID_ORBIT360_LAB }}
+
+    steps:
+      - name: Checkout authorized branch
+        uses: actions/checkout@v4
+
+      - name: Enforce preview-only branch and content
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
+          test -f firebase.json
+          test -f orbit360-platform/ays-lab-preview.html
+          test -f orbit360-platform/modules/importar-initial-tenant-lab.js
+          if git ls-files | grep -E 'auth-firebase\.config\.local\.js|CARGA-INICIAL-AYS-.*\.json|clientes\.json|aseguradoras\.json'; then
+            echo "Bloqueo: se detectó configuración local o datos reales versionados."
+            exit 1
+          fi
+
+      - name: Resolve Firebase service account without exposing it
+        id: firebase_auth
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT=""
+          if [ -n "${SA_ORBIT360_LAB:-}" ]; then SERVICE_ACCOUNT="$SA_ORBIT360_LAB"; fi
+          if [ -z "$SERVICE_ACCOUNT" ] && [ -n "${SA_ORBIT_360_LAB:-}" ]; then SERVICE_ACCOUNT="$SA_ORBIT_360_LAB"; fi
+          if [ -z "$SERVICE_ACCOUNT" ] && [ -n "${SA_DEFAULT:-}" ]; then SERVICE_ACCOUNT="$SA_DEFAULT"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then
+            echo "BLOQUEO_SECRET: falta un secreto de service account para Firebase LAB."
+            echo "Nombres aceptados: FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB, FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB o FIREBASE_SERVICE_ACCOUNT."
+            exit 42
+          fi
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
+          if [ -z "$PROJECT_ID" ]; then PROJECT_ID="${PROJECT_ID_FALLBACK:-}"; fi
+          if [ -z "$PROJECT_ID" ]; then
+            echo "BLOQUEO_PROJECT_ID: el service account no incluye project_id y no existe variable de respaldo."
+            exit 43
+          fi
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "FIREBASE_PROJECT_ID=$PROJECT_ID" >> "$GITHUB_ENV"
+          echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/backend-lab-loader.js
+          node --check orbit360-platform/core/importa-write-p0.js
+          node --check orbit360-platform/core/pwa.js
+          node --check orbit360-platform/data/import-initial-profiles.js
+          node --check orbit360-platform/modules/importar-initial-tenant-lab.js
+
+      - name: Deploy fixed preview channel
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab \
+            --project "$FIREBASE_PROJECT_ID" \
+            --expires 30d \
+            --non-interactive \
+            --json | tee "${RUNNER_TEMP}/firebase-preview.json"
+          URL="$(jq -r '.. | strings | select(test("^https://.*\\.(web\\.app|firebaseapp\\.com)$"))' "${RUNNER_TEMP}/firebase-preview.json" | head -n 1)"
+          if [ -z "$URL" ]; then
+            echo "No se pudo resolver la URL del preview."
+            cat "${RUNNER_TEMP}/firebase-preview.json"
+            exit 44
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Orbit 360 A&S LAB Preview"
+            echo ""
+            echo "Preview base: $URL"
+            echo ""
+            echo "Acceso directo: ${URL}/ays-lab-preview.html"
+            echo ""
+            echo "Canal: orbit360-ays-lab · expiración renovable 30 días · no live."
+          } >> "$GITHUB_STEP_SUMMARY"
