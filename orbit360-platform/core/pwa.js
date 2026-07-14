@@ -10,7 +10,6 @@
   function clientName() { try { var t = Orbit.tenant && Orbit.tenant.get(); return (t && t.empresa) || 'Orbit 360'; } catch (e) { return 'Orbit 360'; } }
   function themeColor() { try { return getComputedStyle(document.documentElement).getPropertyValue('--red').trim() || '#C5162E'; } catch (e) { return '#C5162E'; } }
 
-  // SVG fallback icon (data URL) si el cliente no cargó logo
   function fallbackIcon() {
     var c = themeColor();
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="34" fill="#1E2227"/><circle cx="96" cy="96" r="42" fill="' + c + '"/><circle cx="96" cy="96" r="18" fill="#1E2227"/></svg>';
@@ -29,14 +28,8 @@
   function buildManifest() {
     var icon = clientLogo() || fallbackIcon();
     var manifest = {
-      name: clientName() + ' · Orbit 360',
-      short_name: clientName().slice(0, 18),
-      start_url: '.',
-      scope: '.',
-      display: 'standalone',
-      orientation: 'any',
-      background_color: '#1E2227',
-      theme_color: themeColor(),
+      name: clientName() + ' · Orbit 360', short_name: clientName().slice(0, 18), start_url: '.', scope: '.',
+      display: 'standalone', orientation: 'any', background_color: '#1E2227', theme_color: themeColor(),
       description: 'Sistema 360 para intermediarios de seguros.',
       icons: [
         { src: icon, sizes: '192x192', type: icon.indexOf('svg') >= 0 ? 'image/svg+xml' : 'image/png', purpose: 'any maskable' },
@@ -53,9 +46,7 @@
   var deferredPrompt = null;
   function showInstall(estado) {
     var prev = document.getElementById('pwa-install'); if (prev) prev.remove();
-    var btn = document.createElement('button');
-    btn.id = 'pwa-install';
-    // 3 estados (P2-01): instalada / iOS (guía) / otros navegadores (instalar)
+    var btn = document.createElement('button'); btn.id = 'pwa-install';
     if (estado === 'instalada') { btn.textContent = '✓ App instalada'; btn.setAttribute('data-state', 'instalada'); }
     else if (estado === 'ios') { btn.textContent = '📲 Instalar en iPhone/iPad'; btn.setAttribute('data-state', 'ios'); }
     else { btn.textContent = '⬇ Instalar como app'; btn.setAttribute('data-state', 'instalar'); }
@@ -79,19 +70,29 @@
 
   function init() {
     try { setFavicons(); buildManifest(); } catch (e) {}
-    // re-aplicar marca cuando cambie el logo
     var _ab = Orbit.applyBrand;
     if (_ab) Orbit.applyBrand = function () { try { _ab.apply(this, arguments); } catch (e) {} try { setFavicons(); buildManifest(); } catch (e) {} };
     window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)) showInstall('instalar'); });
     window.addEventListener('appinstalled', function () { deferredPrompt = null; showInstall('instalada'); });
-    // 3 estados tras login: instalada / iOS guía / otros navegadores
     var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     if (standalone) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('instalada'); }, 2500); }
     else if (isIOS) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('ios'); }, 4000); }
-    // service worker (no-op si el origen no lo permite, ej. sandbox)
     if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {} }
     Orbit.pwa = { refresh: function () { try { setFavicons(); buildManifest(); } catch (e) {} }, install: showInstall };
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+
+/* Empalme aditivo v1.251: se carga después de los módulos para endurecer sesión,
+   scopes, acciones directas y bancos ficticios sin reemplazar backend protegido. */
+(function () {
+  function load() {
+    if (document.querySelector('script[data-orbit-empalme-v1251]')) return;
+    var s = document.createElement('script');
+    s.src = 'core/empalme-v1251-runtime.js?v=20260714-1251';
+    s.async = false; s.setAttribute('data-orbit-empalme-v1251', '1');
+    document.head.appendChild(s);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load); else load();
 })();
