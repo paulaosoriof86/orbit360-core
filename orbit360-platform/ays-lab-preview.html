@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="orbit-preview-version" content="20260714-1">
+  <meta name="orbit-preview-version" content="20260714-3">
   <title>Orbit 360 · A&S</title>
   <style>
     body{font-family:Manrope,Arial,sans-serif;background:#1E2227;color:#fff;display:grid;place-items:center;min-height:100vh;margin:0}
@@ -15,7 +15,19 @@
 <body>
 <div><span></span><p>Abriendo Orbit 360…</p></div>
 <script>
-  location.replace('index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones#/importar');
+  (async function(){
+    try {
+      if ('serviceWorker' in navigator) {
+        var regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(function(r){ return r.unregister(); }));
+      }
+      if (window.caches && caches.keys) {
+        var keys = await caches.keys();
+        await Promise.all(keys.map(function(k){ return caches.delete(k); }));
+      }
+    } catch (e) {}
+    location.replace('index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260714-3#/importar');
+  })();
 </script>
 </body>
 </html>
