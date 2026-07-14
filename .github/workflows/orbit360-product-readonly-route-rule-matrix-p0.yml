@@ -1,0 +1,38 @@
+name: Orbit360 Product Readonly Route Rule Matrix P0
+
+on:
+  pull_request:
+    paths:
+      - 'orbit360-platform/core/tenant-canonical-paths-contract-p0.js'
+      - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
+      - 'orbit360-platform/core/aseguradoras-bank-account-visibility-policy-p0.js'
+      - 'orbit360-platform/core/tenant-access-policy-effective-p0.js'
+      - 'orbit360-platform/core/product-query-planner-contract-p0.js'
+      - 'orbit360-platform/core/product-readonly-smoke-catalog-p0.js'
+      - 'orbit360-platform/core/product-readonly-route-rule-matrix-p0.js'
+      - 'orbit360-platform/tools/orbit360-validar-product-readonly-route-rule-matrix-p0.mjs'
+      - 'orbit360-platform/tools/orbit360-generar-product-readonly-route-rule-matrix-p0.mjs'
+      - '.github/workflows/orbit360-product-readonly-route-rule-matrix-p0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-route-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax
+        run: |
+          node --check orbit360-platform/core/tenant-access-policy-effective-p0.js
+          node --check orbit360-platform/core/product-readonly-route-rule-matrix-p0.js
+          node --check orbit360-platform/tools/orbit360-validar-product-readonly-route-rule-matrix-p0.mjs
+          node --check orbit360-platform/tools/orbit360-generar-product-readonly-route-rule-matrix-p0.mjs
+      - name: Route matrix tests
+        run: node orbit360-platform/tools/orbit360-validar-product-readonly-route-rule-matrix-p0.mjs
+      - name: Manifest self-test
+        run: node orbit360-platform/tools/orbit360-generar-product-readonly-route-rule-matrix-p0.mjs --self-test > /tmp/orbit360-route-matrix.json
