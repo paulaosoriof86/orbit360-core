@@ -112,6 +112,14 @@ Corrección obligatoria:
 - aceptar revelado visual solo si coinciden ambos valores, la llamada directa fue autorizada y la política del rol permite credenciales;
 - no modificar la aplicación para satisfacer un selector defectuoso.
 
+### 17. `detached HEAD` incompatible con integradores que validan rama
+
+- El runner aislado cambió a `git checkout --detach origin/<rama>`.
+- El integrador seguro ejecuta `git branch --show-current` y exige la rama `ays/backend-tenant-lab-v99-20260703`.
+- En modo detached, el comando devolvió vacío y PowerShell intentó aplicar `.Trim()` sobre un valor nulo.
+- No falló la integración, la aplicación ni la rama original; falló la preparación del clon temporal.
+- Corrección obligatoria: cuando un script hijo valida la rama activa, el clon aislado debe usar `git checkout -B <rama> origin/<rama>` y confirmar tanto el HEAD como `branch --show-current` antes de invocarlo.
+
 ## Reglas nuevas obligatorias
 
 1. Antes de dar PowerShell, revisar esta auditoría y las bitácoras anteriores.
@@ -124,11 +132,13 @@ Corrección obligatoria:
 8. El worktree con cambios locales no se toca; el delta se ejecuta en aislamiento.
 9. Ningún runner puede hacer deploy, importación, reglas, commit, push, merge o escrituras reales.
 10. Cuando Hosting productivo quede configurado, los despliegues se harán por canal automatizado; PowerShell dejará de ser flujo normal.
+11. Antes de lanzar un script hijo, el runner debe verificar sus precondiciones reales: rama activa, HEAD, archivos requeridos y entorno esperado.
 
 ## Estado después de esta auditoría
 
 - CRM OP1: cerrado 10/10; no repetir.
-- Aseguradoras OP2: 13/15 técnicamente demostrados por el último smoke: Asesor aprobado y Dirección/Operativo con acceso correcto pero falso negativo de selector.
-- Aplicación/backend: sin cambio requerido por este hallazgo.
-- Única corrección pendiente: harness focalizado de Plataformas.
-- Próxima ejecución permitida: solo las vistas Dirección desktop y Operativo tablet, después de validar estáticamente el nuevo harness.
+- Aseguradoras OP2: 13/15 técnicamente demostrados; Asesor aprobado y Dirección/Operativo con acceso correcto pero falso negativo del harness anterior.
+- Aplicación/backend: sin cambio requerido por estos hallazgos.
+- Smoke v1.222: limitado a Dirección desktop y Operativo tablet, con selectores por tarjeta.
+- Runner v1.222: corregido para mantener activa la rama obligatoria en el clon aislado antes del integrador.
+- Próxima ejecución permitida: solo Dirección desktop y Operativo tablet; después combinar evidencia 15/15.
