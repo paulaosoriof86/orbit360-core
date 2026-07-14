@@ -28,7 +28,7 @@
   });
   var SENSITIVE_KEYS = Object.freeze([
     'password', 'pass', 'pwd', 'contrasena', 'clave', 'secret', 'token',
-    'apiKey', 'accessToken', 'refreshToken', 'credentialValue'
+    'apikey', 'accesstoken', 'refreshtoken', 'credentialvalue'
   ]);
   var STRONG_CONFIRMATION_PHRASE = 'CONFIRMO AMPLIAR ACCESO';
 
@@ -76,7 +76,7 @@
     };
   }
 
-  function normalize(input, policy) {
+  function normalize(input) {
     input = input || {};
     var roles = unique(input.roles || (input.role || input.rol ? [input.role || input.rol] : []));
     var defaultRole = text(input.defaultRole || input.rolDefault || input.roleDefault || roles[0]);
@@ -98,7 +98,7 @@
       countries: unique(input.countries || input.paises),
       advisorId: text(input.advisorId || input.asesorId),
       teamId: text(input.teamId || input.equipoId),
-      status: VALID_STATUSES.indexOf(status) >= 0 ? status : status,
+      status: status,
       invitedAt: text(input.invitedAt || input.fechaInvitacion),
       activatedAt: text(input.activatedAt || input.fechaActivacion),
       updatedAt: text(input.updatedAt || input.fechaActualizacion),
@@ -113,7 +113,8 @@
       if (!value || typeof value !== 'object') return;
       Object.keys(value).forEach(function (key) {
         var current = path ? path + '.' + key : key;
-        if (SENSITIVE_KEYS.indexOf(key) >= 0) found.push(current);
+        var normalizedKey = String(key).toLowerCase().replace(/[_-]/g, '');
+        if (SENSITIVE_KEYS.indexOf(normalizedKey) >= 0) found.push(current);
         if (value[key] && typeof value[key] === 'object') walk(value[key], current);
       });
     }
@@ -122,7 +123,7 @@
   }
 
   function validate(membership, policy) {
-    var m = normalize(membership, policy);
+    var m = normalize(membership);
     var defs = roleDefinitions(policy);
     var errors = [];
     var warnings = [];
@@ -142,8 +143,8 @@
     if (!m.countries.length) errors.push('paises_faltantes');
     if (m.roles.some(function (role) { return /Asesor/i.test(role); }) && !m.advisorId) errors.push('asesorId_requerido');
     if (sensitive.length) errors.push('campos_sensibles_no_permitidos:' + sensitive.join(','));
-
     if (VALID_SCOPES.indexOf(m.dataScopes.default) < 0) errors.push('scope_default_invalido');
+
     Object.keys(m.dataScopes.modules).forEach(function (moduleKey) {
       if (!moduleKey) errors.push('scope_modulo_sin_clave');
       if (VALID_SCOPES.indexOf(m.dataScopes.modules[moduleKey]) < 0) errors.push('scope_modulo_invalido:' + moduleKey);
@@ -165,14 +166,14 @@
   }
 
   function effectiveModules(membership, policy, moduleCatalog) {
-    var m = normalize(membership, policy);
+    var m = normalize(membership);
     var base = baseModulesForRole(m.activeRole, policy || {}, moduleCatalog);
     var result = unique(base.concat(m.modulesExtra));
     return result.filter(function (moduleKey) { return m.modulesRestricted.indexOf(moduleKey) < 0; });
   }
 
   function effectiveScope(membership, moduleKey, policy) {
-    var m = normalize(membership, policy);
+    var m = normalize(membership);
     var explicit = m.dataScopes.modules[text(moduleKey)] || m.dataScopes.default;
     if (VALID_SCOPES.indexOf(explicit) >= 0) return explicit;
     var defs = roleDefinitions(policy);
@@ -212,25 +213,34 @@
     return after.filter(function (value) { return before.indexOf(value) < 0; });
   }
 
-  function accessExpansion(beforeInput, afterInput, policy) {
-    var before = normalize(beforeInput, policy);
-    var after = normalize(afterInput, policy);
+  function effectiveStoredScope(membership, moduleKey) {
+    return membership.dataScopes.modules[moduleKey] || membership.dataScopes.default;
+  }
+
+  function accessExpansion(beforeInput, afterInput) {
+    var before = normalize(beforeInput);
+    var after = normalize(afterInput);
     var reasons = [];
     var addedRoles = addedValues(before.roles, after.roles);
     var addedModules = addedValues(before.modulesExtra, after.modulesExtra);
-    var removedRestrictions = before.modulesRestricted.filter(function (m) { return after.modulesRestricted.indexOf(m) < 0; });
+    var removedRestrictions = before.modulesRestricted.filter(function (moduleKey) {
+      return after.modulesRestricted.indexOf(moduleKey) < 0;
+    });
+    var scopedModules = unique(Object.keys(before.dataScopes.modules).concat(Object.keys(after.dataScopes.modules)));
 
     if (addedRoles.some(function (role) { return PRIVILEGED_ROLES.indexOf(role) >= 0; })) reasons.push('rol_privilegiado_agregado');
     if (scopeRank(after.dataScopes.default) > scopeRank(before.dataScopes.default)) reasons.push('scope_default_ampliado');
-    Object.keys(after.dataScopes.modules).forEach(function (moduleKey) {
-      if (scopeRank(after.dataScopes.modules[moduleKey]) > scopeRank(before.dataScopes.modules[moduleKey])) reasons.push('scope_modulo_ampliado:' + moduleKey);
+    scopedModules.forEach(function (moduleKey) {
+      var previous = effectiveStoredScope(before, moduleKey);
+      var next = effectiveStoredScope(after, moduleKey);
+      if (scopeRank(next) > scopeRank(previous)) reasons.push('scope_modulo_ampliado:' + moduleKey);
     });
     if (addedModules.length) reasons.push('modulos_extra_agregados');
     if (removedRestrictions.length) reasons.push('restricciones_removidas');
     if (before.status !== 'active' && after.status === 'active') reasons.push('membresia_activada');
     if (after.countries.length > before.countries.length) reasons.push('paises_agregados');
 
-    return { expanded: reasons.length > 0, reasons: reasons };
+    return { expanded: reasons.length > 0, reasons: unique(reasons) };
   }
 
   function validateActor(actor, before, after, expansion, policy) {
@@ -259,7 +269,7 @@
     var afterCheck = validate(afterInput, policy);
     var before = beforeCheck.membership;
     var after = afterCheck.membership;
-    var expansion = accessExpansion(before, after, policy);
+    var expansion = accessExpansion(before, after);
     var errors = [];
 
     if (!beforeCheck.ok) errors.push.apply(errors, beforeCheck.errors.map(function (e) { return 'before:' + e; }));
