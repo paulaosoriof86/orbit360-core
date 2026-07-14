@@ -33,10 +33,10 @@ jobs:
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
+      EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      PROJECT_ID_FALLBACK: ${{ vars.FIREBASE_PROJECT_ID_ORBIT360_LAB }}
 
     steps:
       - name: Checkout authorized branch
@@ -56,7 +56,7 @@ jobs:
             exit 1
           fi
 
-      - name: Resolve Firebase service account without exposing it
+      - name: Resolve and validate Firebase LAB service account
         id: firebase_auth
         shell: bash
         run: |
@@ -74,10 +74,13 @@ jobs:
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
-          if [ -z "$PROJECT_ID" ]; then PROJECT_ID="${PROJECT_ID_FALLBACK:-}"; fi
           if [ -z "$PROJECT_ID" ]; then
-            echo "BLOQUEO_PROJECT_ID: el service account no incluye project_id y no existe variable de respaldo."
+            echo "BLOQUEO_PROJECT_ID: el service account no incluye project_id."
             exit 43
+          fi
+          if [ "$PROJECT_ID" != "$EXPECTED_FIREBASE_PROJECT_ID" ]; then
+            echo "BLOQUEO_PROYECTO_INCORRECTO: la credencial no corresponde al proyecto LAB autorizado."
+            exit 45
           fi
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
           echo "FIREBASE_PROJECT_ID=$PROJECT_ID" >> "$GITHUB_ENV"
@@ -116,6 +119,8 @@ jobs:
             echo "Preview base: $URL"
             echo ""
             echo "Acceso directo: ${URL}/ays-lab-preview.html"
+            echo ""
+            echo "Proyecto: $FIREBASE_PROJECT_ID"
             echo ""
             echo "Canal: orbit360-ays-lab · expiración renovable 30 días · no live."
           } >> "$GITHUB_STEP_SUMMARY"
