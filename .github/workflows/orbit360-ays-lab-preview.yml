@@ -55,6 +55,7 @@ jobs:
           test "$AUTHORIZED_BRANCH" = "ays/backend-tenant-lab-v99-20260703"
           test -f firebase.json
           test -f orbit360-platform/ays-lab-preview.html
+          test -f orbit360-platform/core/backend-lab-auth-guard.js
           test -f orbit360-platform/modules/importar-initial-tenant-lab.js
           test -f tools/orbit360-ensure-lab-user.mjs
           test -f tools/orbit360-test-import-initial-pending-insurers.mjs
@@ -102,6 +103,7 @@ jobs:
           set -euo pipefail
           node --check orbit360-platform/core/backend-lab-loader.js
           node --check orbit360-platform/core/backend-lab-init.js
+          node --check orbit360-platform/core/backend-lab-auth-guard.js
           node --check orbit360-platform/core/importa-write-p0.js
           node --check orbit360-platform/core/pwa.js
           node --check orbit360-platform/core/auth.js
