@@ -96,3 +96,23 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load); else load();
 })();
+
+/* Carga inicial configurable por tenant. El repositorio no contiene los datos:
+   el usuario selecciona el lote local desde Importar. */
+(function () {
+  function add(src, marker, done) {
+    if (document.querySelector('script[' + marker + ']')) { if (done) done(); return; }
+    var s = document.createElement('script');
+    s.src = src;
+    s.async = false;
+    s.setAttribute(marker, '1');
+    if (done) s.onload = done;
+    document.head.appendChild(s);
+  }
+  function load() {
+    add('data/import-initial-profiles.js?v=20260714', 'data-orbit-import-initial-profiles', function () {
+      add('modules/importar-initial-tenant-lab.js?v=20260714', 'data-orbit-import-initial-tenant-lab');
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load); else load();
+})();
