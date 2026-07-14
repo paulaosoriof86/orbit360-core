@@ -1,8 +1,10 @@
 /* ============================================================
-   Orbit 360 · Aseguradoras OP-2 · recursos operativos v1.218
+   Orbit 360 · Aseguradoras OP-2 · recursos operativos v1.223
    Cuentas bancarias visibles/copiables para todo usuario con acceso al
    módulo. Usuarios y contraseñas solo Dirección/Admin/Operativo o extra.
    Los valores por referencia se resuelven desde proveedor seguro.
+   v1.223: revelado resistente a re-render por auditoría y estado temporal
+   aislado por aseguradora + índice de plataforma.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
@@ -45,6 +47,14 @@ Orbit.modules = Orbit.modules || {};
   }
   function credentialContext(a, p, index) {
     return P.credentialContext({ insurerId:a.id, platformIndex:index, platform:p.nombre || '', country:a.pais });
+  }
+  function credentialTransientKey(a, index) {
+    return clean(a && a.id) + '|' + String(index);
+  }
+  function livePlatformRow(index, fallback) {
+    const host = document.getElementById('host');
+    const body = host && host.querySelector('.asg197-tab-body');
+    return body && body.querySelector(`[data-op2-platform="${index}"]`) || fallback || null;
   }
 
   function bankHtml(a) {
@@ -95,13 +105,16 @@ Orbit.modules = Orbit.modules || {};
     const rows = (a.portales || []).map((p, index) => {
       const legacyUser = clean(p.usuario || p.user || '');
       const legacyPass = clean(p.password || p.pass || p.contrasena || '');
+      const active = transient.get(credentialTransientKey(a, index)) || {};
+      const visibleUser = clean(active.username || legacyUser || p.usuarioHint || 'Pendiente');
+      const visiblePass = active.password ? clean(active.password) : (legacyPass ? '••••••••' : 'Pendiente');
       const context = credentialContext(a, p, index);
       const status = p.credentialRef && R && R.credentialStatus ? R.credentialStatus(p.credentialRef, context) : null;
       const available = !!(legacyUser || legacyPass || (status && status.status === 'disponible'));
       const url = safeUrl(p.url || '');
       return `<article class="card pad asg218-platform" data-op2-platform="${index}">
         <div class="asg218-resource-head"><span><b>${esc(p.nombre || 'Plataforma')}</b><small>${esc(p.tipo || '')} · ${esc(p.estadoAcceso || 'Sin verificar')}</small></span><span class="badge ${statusTone(available ? 'disponible' : status && status.status)}">${esc(available ? 'Acceso disponible' : (status && status.message || 'Acceso pendiente'))}</span></div>
-        ${allowed ? `<div class="asg218-credentials"><div><small>Usuario</small><strong class="mono" data-op2-username>${esc(legacyUser || p.usuarioHint || 'Pendiente')}</strong></div><div><small>Contraseña</small><strong class="mono" data-op2-password>${legacyPass ? '••••••••' : 'Pendiente'}</strong></div></div><div class="asg218-resource-actions"><button class="btn ghost sm" data-op2-view-credential="${index}" ${available ? '' : 'disabled'}>Ver usuario y contraseña</button><button class="btn ghost sm" data-op2-copy-user="${index}" ${legacyUser ? '' : 'disabled'}>Copiar usuario</button><button class="btn ghost sm" data-op2-copy-password="${index}" ${legacyPass || (status && status.status === 'disponible') ? '' : 'disabled'}>Copiar contraseña</button>${url ? `<button class="btn ghost sm" data-op2-open-platform="${index}">Abrir plataforma</button>` : ''}</div>` : `<div class="asg218-restricted"><span class="badge neutral">Credenciales disponibles para Dirección, Administración y Operativo</span>${url ? `<button class="btn ghost sm" data-op2-open-platform="${index}">Abrir plataforma</button>` : ''}</div>`}
+        ${allowed ? `<div class="asg218-credentials"><div><small>Usuario</small><strong class="mono" data-op2-username>${esc(visibleUser)}</strong></div><div><small>Contraseña</small><strong class="mono" data-op2-password>${esc(visiblePass)}</strong></div></div><div class="asg218-resource-actions"><button class="btn ghost sm" data-op2-view-credential="${index}" ${available ? '' : 'disabled'}>Ver usuario y contraseña</button><button class="btn ghost sm" data-op2-copy-user="${index}" ${active.username || legacyUser ? '' : 'disabled'}>Copiar usuario</button><button class="btn ghost sm" data-op2-copy-password="${index}" ${active.password || legacyPass || (status && status.status === 'disponible') ? '' : 'disabled'}>Copiar contraseña</button>${url ? `<button class="btn ghost sm" data-op2-open-platform="${index}">Abrir plataforma</button>` : ''}</div>` : `<div class="asg218-restricted"><span class="badge neutral">Credenciales disponibles para Dirección, Administración y Operativo</span>${url ? `<button class="btn ghost sm" data-op2-open-platform="${index}">Abrir plataforma</button>` : ''}</div>`}
       </article>`;
     }).join('');
     return `<div class="asg218-policy-note"><b>Accesos de portal:</b> usuarios y contraseñas se muestran únicamente a Dirección, Administración y Operativo, o a un permiso extra explícito.</div>${rows || '<div class="empty">Sin plataformas registradas.</div>'}`;
@@ -113,7 +126,7 @@ Orbit.modules = Orbit.modules || {};
       password:clean(out && (out.password || out.value || out.secret) || p.password || p.pass || p.contrasena || '')
     };
   }
-  function paintCredential(row, values, index) {
+  function paintCredential(row, values, key, index) {
     if (!row) return;
     const user = row.querySelector('[data-op2-username]');
     const pass = row.querySelector('[data-op2-password]');
@@ -123,11 +136,13 @@ Orbit.modules = Orbit.modules || {};
     if (pass) pass.textContent = values.password || 'Pendiente';
     if (copyUser) copyUser.disabled = !values.username;
     if (copyPass) copyPass.disabled = !values.password;
-    transient.set(index, values);
+    transient.set(key, values);
     clearTimeout(row.__op2HideCredentials);
     row.__op2HideCredentials = setTimeout(() => {
-      if (pass) pass.textContent = values.password ? '••••••••' : 'Pendiente';
-      transient.delete(index);
+      transient.delete(key);
+      const liveRow = livePlatformRow(index, row);
+      const livePass = liveRow && liveRow.querySelector('[data-op2-password]');
+      if (livePass) livePass.textContent = values.password ? '••••••••' : 'Pendiente';
     }, 15000);
   }
 
@@ -159,24 +174,33 @@ Orbit.modules = Orbit.modules || {};
     body.querySelectorAll('[data-op2-view-credential]').forEach(button => button.onclick = async () => {
       const index = +button.dataset.op2ViewCredential, p = (a.portales || [])[index];
       if (!p || !P.canViewCredentials()) return;
+      const fallbackRow = button.closest('[data-op2-platform]');
+      const key = credentialTransientKey(a, index);
       button.disabled = true;
       let out = null;
       if (p.credentialRef && R && R.revealCredential) out = await R.revealCredential(p.credentialRef, credentialContext(a, p, index));
       const values = credentialValues(p, out);
-      paintCredential(button.closest('[data-op2-platform]'), values, index);
+      if (values.username || values.password) transient.set(key, values);
+      enhance(document.getElementById('host'));
+      const row = livePlatformRow(index, fallbackRow);
+      paintCredential(row, values, key, index);
       if (!values.username && !values.password) toast((out && out.message) || 'Acceso no disponible');
-      setTimeout(() => { button.disabled = false; }, 500);
+      setTimeout(() => {
+        const liveRow = livePlatformRow(index, row);
+        const liveButton = liveRow && liveRow.querySelector(`[data-op2-view-credential="${index}"]`);
+        if (liveButton) liveButton.disabled = false;
+      }, 500);
     });
     body.querySelectorAll('[data-op2-copy-user]').forEach(button => button.onclick = async () => {
       const index = +button.dataset.op2CopyUser, p = (a.portales || [])[index];
-      const values = transient.get(index) || credentialValues(p || {}, null);
+      const values = transient.get(credentialTransientKey(a, index)) || credentialValues(p || {}, null);
       const ok = values.username && Orbit.vault && Orbit.vault.copyText ? await Orbit.vault.copyText(values.username) : false;
       toast(ok ? 'Usuario copiado' : 'Primero muestra el acceso para recuperar el usuario completo');
     });
     body.querySelectorAll('[data-op2-copy-password]').forEach(button => button.onclick = async () => {
       const index = +button.dataset.op2CopyPassword, p = (a.portales || [])[index];
       if (!p || !P.canCopyCredentials()) return;
-      const values = transient.get(index) || credentialValues(p, null);
+      const values = transient.get(credentialTransientKey(a, index)) || credentialValues(p, null);
       if (values.password) {
         const ok = Orbit.vault && Orbit.vault.copyText ? await Orbit.vault.copyText(values.password) : false;
         toast(ok ? 'Contraseña copiada' : 'No se pudo copiar');
