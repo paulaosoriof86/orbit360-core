@@ -6,6 +6,7 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - "orbit360-platform/**"
+      - "tools/orbit360-ensure-lab-user.mjs"
       - "firebase.json"
       - ".github/workflows/orbit360-ays-lab-preview.yml"
   pull_request:
@@ -13,6 +14,7 @@ on:
       - main
     paths:
       - "orbit360-platform/**"
+      - "tools/orbit360-ensure-lab-user.mjs"
       - "firebase.json"
       - ".github/workflows/orbit360-ays-lab-preview.yml"
   workflow_dispatch:
@@ -37,6 +39,7 @@ jobs:
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
 
     steps:
       - name: Checkout authorized branch
@@ -51,6 +54,7 @@ jobs:
           test -f firebase.json
           test -f orbit360-platform/ays-lab-preview.html
           test -f orbit360-platform/modules/importar-initial-tenant-lab.js
+          test -f tools/orbit360-ensure-lab-user.mjs
           if git ls-files | grep -E 'auth-firebase\.config\.local\.js|CARGA-INICIAL-AYS-.*\.json|clientes\.json|aseguradoras\.json'; then
             echo "Bloqueo: se detectó configuración local o datos reales versionados."
             exit 1
@@ -67,8 +71,11 @@ jobs:
           if [ -z "$SERVICE_ACCOUNT" ] && [ -n "${SA_DEFAULT:-}" ]; then SERVICE_ACCOUNT="$SA_DEFAULT"; fi
           if [ -z "$SERVICE_ACCOUNT" ]; then
             echo "BLOQUEO_SECRET: falta un secreto de service account para Firebase LAB."
-            echo "Nombres aceptados: FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB, FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB o FIREBASE_SERVICE_ACCOUNT."
             exit 42
+          fi
+          if [ ${#ORBIT360_LAB_LOGIN_PASSWORD} -lt 12 ]; then
+            echo "BLOQUEO_PASSWORD: falta ORBIT360_LAB_LOGIN_PASSWORD o tiene menos de 12 caracteres."
+            exit 46
           fi
           KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
@@ -93,8 +100,17 @@ jobs:
           node --check orbit360-platform/core/backend-lab-loader.js
           node --check orbit360-platform/core/importa-write-p0.js
           node --check orbit360-platform/core/pwa.js
+          node --check orbit360-platform/core/auth.js
           node --check orbit360-platform/data/import-initial-profiles.js
           node --check orbit360-platform/modules/importar-initial-tenant-lab.js
+          node --check tools/orbit360-ensure-lab-user.mjs
+
+      - name: Ensure canonical LAB user and tenant membership
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save firebase-admin@13
+          node tools/orbit360-ensure-lab-user.mjs
 
       - name: Deploy fixed preview channel
         id: deploy
@@ -121,6 +137,8 @@ jobs:
             echo "Acceso directo: ${URL}/ays-lab-preview.html"
             echo ""
             echo "Proyecto: $FIREBASE_PROJECT_ID"
+            echo ""
+            echo "Usuario LAB sincronizado: orbit.lab@demo.com"
             echo ""
             echo "Canal: orbit360-ays-lab · expiración renovable 30 días · no live."
           } >> "$GITHUB_STEP_SUMMARY"
