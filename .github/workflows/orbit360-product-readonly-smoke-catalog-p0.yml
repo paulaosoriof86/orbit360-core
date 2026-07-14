@@ -3,6 +3,10 @@ name: Orbit360 Product Readonly Smoke Catalog P0
 on:
   pull_request:
     paths:
+      - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
+      - 'orbit360-platform/core/aseguradoras-bank-account-visibility-policy-p0.js'
+      - 'orbit360-platform/core/tenant-access-policy-effective-p0.js'
+      - 'orbit360-platform/core/product-query-planner-contract-p0.js'
       - 'orbit360-platform/core/product-readonly-smoke-catalog-p0.js'
       - 'orbit360-platform/tools/orbit360-validar-product-readonly-smoke-catalog-p0.mjs'
       - 'orbit360-platform/tools/orbit360-generar-product-readonly-smoke-catalog-p0.mjs'
@@ -22,6 +26,7 @@ jobs:
           node-version: '22'
       - name: Syntax
         run: |
+          node --check orbit360-platform/core/tenant-access-policy-effective-p0.js
           node --check orbit360-platform/core/product-readonly-smoke-catalog-p0.js
           node --check orbit360-platform/tools/orbit360-validar-product-readonly-smoke-catalog-p0.mjs
           node --check orbit360-platform/tools/orbit360-generar-product-readonly-smoke-catalog-p0.mjs
