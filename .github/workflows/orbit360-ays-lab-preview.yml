@@ -7,6 +7,7 @@ on:
     paths:
       - "orbit360-platform/**"
       - "tools/orbit360-ensure-lab-user.mjs"
+      - "tools/orbit360-test-import-initial-pending-insurers.mjs"
       - "firebase.json"
       - ".github/workflows/orbit360-ays-lab-preview.yml"
   pull_request:
@@ -15,6 +16,7 @@ on:
     paths:
       - "orbit360-platform/**"
       - "tools/orbit360-ensure-lab-user.mjs"
+      - "tools/orbit360-test-import-initial-pending-insurers.mjs"
       - "firebase.json"
       - ".github/workflows/orbit360-ays-lab-preview.yml"
   workflow_dispatch:
@@ -55,6 +57,7 @@ jobs:
           test -f orbit360-platform/ays-lab-preview.html
           test -f orbit360-platform/modules/importar-initial-tenant-lab.js
           test -f tools/orbit360-ensure-lab-user.mjs
+          test -f tools/orbit360-test-import-initial-pending-insurers.mjs
           if git ls-files | grep -E 'auth-firebase\.config\.local\.js|CARGA-INICIAL-AYS-.*\.json|clientes\.json|aseguradoras\.json'; then
             echo "Bloqueo: se detectó configuración local o datos reales versionados."
             exit 1
@@ -93,17 +96,20 @@ jobs:
           echo "FIREBASE_PROJECT_ID=$PROJECT_ID" >> "$GITHUB_ENV"
           echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
 
-      - name: Validate JavaScript syntax
+      - name: Validate JavaScript syntax and import contract
         shell: bash
         run: |
           set -euo pipefail
           node --check orbit360-platform/core/backend-lab-loader.js
+          node --check orbit360-platform/core/backend-lab-init.js
           node --check orbit360-platform/core/importa-write-p0.js
           node --check orbit360-platform/core/pwa.js
           node --check orbit360-platform/core/auth.js
           node --check orbit360-platform/data/import-initial-profiles.js
           node --check orbit360-platform/modules/importar-initial-tenant-lab.js
           node --check tools/orbit360-ensure-lab-user.mjs
+          node --check tools/orbit360-test-import-initial-pending-insurers.mjs
+          node tools/orbit360-test-import-initial-pending-insurers.mjs
 
       - name: Ensure canonical LAB user and tenant membership
         shell: bash
