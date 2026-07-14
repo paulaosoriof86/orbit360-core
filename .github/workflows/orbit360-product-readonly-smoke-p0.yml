@@ -1,0 +1,32 @@
+name: Orbit360 Product Readonly Smoke P0
+
+on:
+  pull_request:
+    paths:
+      - 'orbit360-platform/core/product-readonly-smoke-contract-p0.js'
+      - 'orbit360-platform/tools/orbit360-validar-product-readonly-smoke-contract-p0.mjs'
+      - '.github/workflows/orbit360-product-readonly-smoke-p0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-product-readonly-smoke-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check
+        run: |
+          node --check orbit360-platform/core/product-readonly-smoke-contract-p0.js
+          node --check orbit360-platform/tools/orbit360-validar-product-readonly-smoke-contract-p0.mjs
+
+      - name: Contract tests
+        run: node orbit360-platform/tools/orbit360-validar-product-readonly-smoke-contract-p0.mjs
