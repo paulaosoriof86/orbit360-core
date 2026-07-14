@@ -18,6 +18,8 @@ if (!tenantId) {
 const repoRoot = process.cwd().endsWith('orbit360-platform') ? process.cwd() : path.join(process.cwd(), 'orbit360-platform');
 const files = [
   'core/tenant-access-policy-contract-p0.js',
+  'core/aseguradoras-bank-account-visibility-policy-p0.js',
+  'core/tenant-access-policy-effective-p0.js',
   'core/product-query-planner-contract-p0.js',
   'core/product-readonly-smoke-catalog-p0.js'
 ];
@@ -29,6 +31,7 @@ for (const file of files) {
 }
 
 const api = sandbox.window.Orbit.productReadOnlySmokeCatalogP0;
+const accessPolicy = sandbox.window.Orbit.tenantAccessPolicyEffectiveP0;
 const roleMemberships = {
   'Dirección': {
     tenantId, roles:['Dirección','Asesor'], activeRole:'Dirección', status:'active', countries:['GT','CO'],
@@ -50,7 +53,7 @@ const roles = {};
 const indexMap = new Map();
 for (const [role, membership] of Object.entries(roleMemberships)) {
   const catalog = api.buildCatalog(membership, {
-    accessPolicy: sandbox.window.Orbit.tenantAccessPolicyP0,
+    accessPolicy,
     queryPlanner: sandbox.window.Orbit.productQueryPlannerP0
   });
   if (!catalog.ok) {
@@ -70,7 +73,7 @@ for (const [role, membership] of Object.entries(roleMemberships)) {
 
 const indexCandidates = [...indexMap.values()].sort((a,b)=>a.signature.localeCompare(b.signature));
 const manifest = {
-  schemaVersion:'orbit360.product-readonly-smoke-catalog.v1',
+  schemaVersion:'orbit360.product-readonly-smoke-catalog.v2',
   generatedAt:new Date().toISOString(),
   tenantId,
   smokePhase:'first_read_only',
@@ -90,8 +93,9 @@ const manifest = {
   },
   hardGuards:{
     noSystemDocumentsThroughDataStore:true,
-    noAdvisorPlatformOrBankReads:true,
-    operativoBankReadRequiresExplicitGrant:true,
+    advisorPlatformCredentialsRestricted:true,
+    bankAccountsOperationalForModuleUsers:true,
+    bankEditingPermissionSeparate:true,
     noCrossTenantQuery:true,
     noWrites:true,
     noIndexDeployWithoutEmulatorOrFirestoreConfirmation:true
@@ -113,5 +117,7 @@ if (selfTest) {
   if (indexCandidates.length !== 3) process.exit(4);
   if (manifest.writeAuthorized !== false || manifest.deployAuthorized !== false) process.exit(5);
   if (!roles.Asesor.deniedCollections.some(x=>x.collection==='plataformasAseguradora')) process.exit(6);
-  if (!roles.Operativo.deniedCollections.some(x=>x.collection==='cuentasBancariasAseguradora')) process.exit(7);
+  for (const role of ['Dirección','Operativo','Asesor']) {
+    if (!roles[role].requiredCollections.some(x=>x.collection==='cuentasBancariasAseguradora')) process.exit(7);
+  }
 }
