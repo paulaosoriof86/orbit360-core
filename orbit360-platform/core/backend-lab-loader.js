@@ -1,10 +1,11 @@
 /* ============================================================
-   Orbit 360 - Backend LAB loader v1.104
-   Loads Firebase SDK + local ignored config only for:
+   Orbit 360 - Backend LAB loader v1.105
+   Loads Firebase SDK only for:
    ?orbitBackend=firestore-lab&tenant=alianzas-soluciones
 
-   No secrets in repository. Local config remains ignored by Git.
-   This file is frontend LAB plumbing, not production credential storage.
+   Local: uses ignored core/auth-firebase.config.local.js.
+   Firebase Hosting preview: uses reserved /__/firebase/init.js.
+   No secrets are versioned.
    ============================================================ */
 (function(){
   'use strict';
@@ -13,6 +14,8 @@
   var requestedMode = params.get('orbitBackend') || '';
   var requestedTenant = params.get('tenant') || 'alianzas-soluciones';
   var allowedTenants = ['alianzas-soluciones'];
+  var isFirebaseHosting = /\.(web\.app|firebaseapp\.com)$/i.test(window.location.hostname || '');
+  var configSource = isFirebaseHosting ? '/__/firebase/init.js' : 'core/auth-firebase.config.local.js';
 
   if (requestedMode !== 'firestore-lab') return;
 
@@ -35,9 +38,10 @@
     tenantId: requestedTenant,
     tenant: requestedTenant,
     loader: 'core/backend-lab-loader.js',
-    loaderVersion: 'v1.104',
+    loaderVersion: 'v1.105',
     firebaseLoader: 'pending',
-    configLocal: 'core/auth-firebase.config.local.js',
+    configSource: isFirebaseHosting ? 'firebase-hosting-reserved-init' : 'local-ignored-config',
+    configLocal: isFirebaseHosting ? null : 'core/auth-firebase.config.local.js',
     noFallback: true,
     restrictions: {
       noProduction: true,
@@ -55,7 +59,7 @@
     write('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
     write('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js');
     write('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js');
-    write('core/auth-firebase.config.local.js');
+    write(configSource);
     window.OrbitBackend.firebaseLoader = 'requested';
   } catch(e) {
     window.OrbitBackend.firebaseLoader = 'error';
