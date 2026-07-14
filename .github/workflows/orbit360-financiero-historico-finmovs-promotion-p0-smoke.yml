@@ -1,0 +1,41 @@
+name: Orbit 360 · Promoción financiero histórico a finmovs P0
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - orbit360-platform/core/financiero-historico-finmovs-promotion-contract-p0.js
+      - orbit360-platform/tools/orbit360-validar-financiero-historico-finmovs-promotion-p0.mjs
+      - .github/workflows/orbit360-financiero-historico-finmovs-promotion-p0-smoke.yml
+  pull_request:
+    paths:
+      - orbit360-platform/core/financiero-historico-finmovs-promotion-contract-p0.js
+      - orbit360-platform/tools/orbit360-validar-financiero-historico-finmovs-promotion-p0.mjs
+      - .github/workflows/orbit360-financiero-historico-finmovs-promotion-p0-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  promotion-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check contract syntax
+        run: node --check orbit360-platform/core/financiero-historico-finmovs-promotion-contract-p0.js
+
+      - name: Check validator syntax
+        run: node --check orbit360-platform/tools/orbit360-validar-financiero-historico-finmovs-promotion-p0.mjs
+
+      - name: Run promotion smoke
+        run: node orbit360-platform/tools/orbit360-validar-financiero-historico-finmovs-promotion-p0.mjs
