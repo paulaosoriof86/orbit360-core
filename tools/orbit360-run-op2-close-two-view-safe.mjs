@@ -163,8 +163,10 @@ try {
   exec('git.exe', ['clone','--shared','--no-checkout',repo,tempRepo], repo, 'clon aislado');
   git(tempRepo, ['remote','set-url','origin',origin], 'restaurar origin', false);
   git(tempRepo, ['fetch','--quiet','origin',BRANCH], 'fetch aislado', false);
-  git(tempRepo, ['checkout','--detach',`origin/${BRANCH}`], 'checkout aislado', false);
+  git(tempRepo, ['checkout','-B',BRANCH,`origin/${BRANCH}`], 'checkout aislado', false);
   if (git(tempRepo, ['rev-parse','HEAD']) !== remote) throw new Error('HEAD aislado incorrecto.');
+  if (git(tempRepo, ['branch','--show-current']) !== BRANCH) throw new Error('El clon aislado no quedo sobre la rama obligatoria.');
+  add(`isolated_branch=${BRANCH}`);
   add(`isolated_head=${remote}`);
 
   add(''); add('== INTEGRACION IDEMPOTENTE EN CLON ==');
