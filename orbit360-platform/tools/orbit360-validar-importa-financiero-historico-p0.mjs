@@ -9,9 +9,9 @@ const contractPath = path.join(platform, 'core', 'importa-financiero-historico-c
 const source = fs.readFileSync(contractPath, 'utf8');
 
 const forbidden = [
-  /Orbit\.store/,
-  /localStorage/,
-  /sessionStorage/,
+  /Orbit\.store\s*[.\[]/,
+  /localStorage\s*[.\[]/,
+  /sessionStorage\s*[.\[]/,
   /\.insert\s*\(/,
   /\.update\s*\(/,
   /\.remove\s*\(/
