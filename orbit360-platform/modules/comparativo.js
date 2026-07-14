@@ -15,6 +15,7 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.comparativo = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
+  function actorNombre() { const u = (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) || {}; return u.nombre || 'Usuario'; }
   let host, props = [];
   /* Rol ACTIVO (no el rol base) para el gate de validación de propuestas */
   function activeRole() {
@@ -28,6 +29,7 @@ Orbit.modules.comparativo = (function () {
   function persistirCotizacion(p, archivo) {
     p.id = p.id || ('cot' + Date.now() + Math.floor(Math.random() * 999));
     p.documentRef = archivo || p.documentRef || p.referencia || '';
+    p.fechaCarga = p.fechaCarga || (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10));
     S().insert('cotizaciones', p);
     return p;
   }
@@ -223,7 +225,9 @@ Orbit.modules.comparativo = (function () {
       const boolCob = crits.filter(c => c.tipo === 'bool').reduce((s, c) => s + (p.cob && p.cob[c.k] ? 1 : 0), 0);
       const boolMax = Math.max(1, crits.filter(c => c.tipo === 'bool').length);
       const cobScore = ((+p.sumaAsegurada || 0) / maxS) * 0.6 + (boolCob / boolMax) * 0.4;
-      let score = meta.criterio === 'precio' ? precioScore : meta.criterio === 'cobertura' ? cobScore : (precioScore * 0.5 + cobScore * 0.5);
+      const pond = (Orbit.tenant && Orbit.tenant.get) ? (Orbit.tenant.get().comparativoPonderacion || { precio: 50, cobertura: 50 }) : { precio: 50, cobertura: 50 };
+      const wPrecio = Math.max(0, Math.min(100, pond.precio != null ? pond.precio : 50)) / 100;
+      let score = meta.criterio === 'precio' ? precioScore : meta.criterio === 'cobertura' ? cobScore : (precioScore * wPrecio + cobScore * (1 - wPrecio));
       if (!Number.isFinite(score)) score = 0;
       return { i, p, precioScore, cobScore, score };
     }).sort((a, b) => b.score - a.score);
@@ -260,7 +264,7 @@ Orbit.modules.comparativo = (function () {
     const rk = ranking();
     const winI = rk.length ? rk[0].i : -1;
     host.innerHTML = `<div class="page">
-      ${K.banner({ icon: '📋', title: 'Comparativo', sub: 'Compara aseguradoras a fondo (del cotizador o por PDF) y cierra con la mejor', features: [], actions: `<button class="btn ghost" id="cp-hist-b" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">🕘 Historial</button>` })}
+      ${K.banner({ icon: '📋', title: 'Comparativo', sub: 'Compara aseguradoras a fondo (del cotizador o por PDF) y cierra con la mejor', features: [], actions: `<button class="btn ghost" id="cp-tpl">⚙ Plantilla de impresión</button><button class="btn ghost" id="cp-hist-b" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">🕘 Historial</button>` })}
       ${props.length ? '' : '<div class="cfg-note" style="margin-bottom:14px">📋 El comparativo funciona <b>solo</b>: llena los <b>datos del riesgo</b> abajo, luego <b>⬆ carga PDFs</b> de propuestas (extracción inteligente) o <b>➕ registrá una cotización recibida</b>. También puedes traerlas desde el <a style="color:var(--red);cursor:pointer" onclick="location.hash=\'#/cotizador\'">🧮 Cotizador</a>.</div>'}
       ${guiaPasos()}
       ${datosIniciales()}
@@ -271,8 +275,10 @@ Orbit.modules.comparativo = (function () {
       <div id="cp-out" class="cz-cards">${props.map((p, i) => card(p, i === winI, i, cur)).join('') || '<div class="muted" style="padding:30px 0;text-align:center;grid-column:1/-1">Sin propuestas todavía.</div>'}</div>
       ${propsValidadas().length > 1 ? tabla(cur, rk) : ''}
       ${propsValidadas().length > 1 ? recomendacion(rk, cur) : ''}
+      ${lineaTiempo()}
     </div>`;
     host.querySelector('#cp-hist-b').addEventListener('click', verHist);
+    const tplBtn = host.querySelector('#cp-tpl'); if (tplBtn) tplBtn.addEventListener('click', () => editarPlantilla(host));
     bindMeta();
     const ctaScroll = host.querySelector('#cp-cta-scroll'); if (ctaScroll) ctaScroll.addEventListener('click', () => { const t = host.querySelector('#cp-out'); if (t) t.scrollIntoView({ block: 'start' }); });
     const ctaPdf = host.querySelector('#cp-cta-pdf'); if (ctaPdf) ctaPdf.addEventListener('click', cargarPDF);
@@ -284,7 +290,23 @@ Orbit.modules.comparativo = (function () {
     host.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { props.splice(+b.dataset.del, 1); render(host); }));
     host.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editarProp(+b.dataset.edit)));
     host.querySelectorAll('[data-validar]').forEach(b => b.addEventListener('click', () => validarProp(+b.dataset.validar)));
-    host.querySelectorAll('[data-crit]').forEach(b => b.addEventListener('click', () => { meta.criterio = b.dataset.crit; render(host); }));
+    host.querySelectorAll('[data-imp-una]').forEach(b => b.addEventListener('click', () => imprimirUna(+b.dataset.impUna)));
+    host.querySelectorAll('[data-crit]').forEach(b => b.addEventListener('click', async () => {
+      const nuevo = b.dataset.crit;
+      if (nuevo === meta.criterio) return;
+      const rkAntes = ranking();
+      const recAntes = rkAntes.length ? rkAntes[0].p.nombre : null;
+      const motivo = (await U.prompt('Cambiando criterio de "' + meta.criterio + '" a "' + nuevo + '". Motivo del replanteamiento (obligatorio):', { title: '🔁 Replantear recomendación' }) || '').trim();
+      if (!motivo) { U.toast('El motivo del replanteamiento es obligatorio.'); return; }
+      const antes = meta.criterio;
+      meta.criterio = nuevo;
+      const rkDespues = ranking();
+      const recDespues = rkDespues.length ? rkDespues[0].p.nombre : null;
+      meta.replanteos = meta.replanteos || [];
+      meta.replanteos.push({ fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), actor: actorNombre(), antes, despues: nuevo, motivo: motivo || '(sin motivo declarado)', recomendacionAntes: recAntes, recomendacionDespues: recDespues });
+      if (props.length) guardarHist({ silencioso: true });
+      render(host);
+    }));
   }
   function validarProp(i) {
     const p = props[i]; if (!p) return;
@@ -354,8 +376,40 @@ Orbit.modules.comparativo = (function () {
       <div class="cz-total">${U.money(p.total || 0, cur)}</div>
       <div class="muted" style="font-size:11.5px">💵 prima total${p.fracc > 1 ? ' · ' + U.money((p.total || 0) / p.fracc, cur) + '/pago' : ''}</div>
       ${p.sumaAsegurada ? `<div class="muted" style="font-size:11.5px;margin-top:3px">💰 suma ${U.money(p.sumaAsegurada, cur)}</div>` : ''}
-      ${estado !== 'validada' ? `<div style="font-size:11px;color:var(--warn);margin-top:4px">⚠ No entra al ranking, impresión ni comunicación hasta validar</div><button class="btn primary sm" style="margin-top:9px;width:100%" data-validar="${i}">✓ Validar datos</button>` : ''}
+      ${estado !== 'validada' ? `<div style="font-size:11px;color:var(--warn);margin-top:4px">⚠ No entra al ranking, impresión ni comunicación hasta validar</div><button class="btn primary sm" style="margin-top:9px;width:100%" data-validar="${i}">✓ Validar datos</button>` : `<button class="btn ghost sm" style="margin-top:9px;width:100%" data-imp-una="${i}">🖨 Imprimir esta propuesta</button>`}
     </div>`;
+  }
+  function imprimirUna(i) {
+    const p = props[i]; if (!p || (p.estadoValidacion || 'requiere_revision') !== 'validada') { U.toast('Solo se puede imprimir una propuesta validada.'); return; }
+    const tpl = plantillaCfg();
+    const cur = p.cur || 'GTQ', crits = criteriosDe();
+    const cs = getComputedStyle(document.documentElement);
+    const brand = (cs.getPropertyValue('--red') || '#C5162E').trim() || '#C5162E';
+    const ink = (cs.getPropertyValue('--ink') || '#1E2227').trim() || '#1E2227';
+    const tenant = (Orbit.tenant && Orbit.tenant.nombre) || 'Orbit 360';
+    const tlogo = (Orbit.tenant && Orbit.tenant.logo) || '';
+    const cobRows = crits.filter(c => c.k !== 'sumaAsegurada' && c.k !== 'deducible').map(c => { const v = p.cob && p.cob[c.k]; const txt = c.tipo === 'bool' ? (v ? 'Sí' : 'No') : c.tipo === 'money' ? (v ? U.money(v, cur) : '—') : (v || '—'); return `<tr><td>${c.t.replace(/^[^ ]+ /, '')}</td><td class="n">${txt}</td></tr>`; }).join('');
+    const w = window.open('', '_blank'); if (!w) return;
+    w.document.write(`<html><head><title>Propuesta · ${U.esc(p.nombre)} · ${tenant}</title><style>@page{size:A4 portrait;margin:11mm}body{font-family:system-ui,sans-serif;color:${ink}}
+      .hd{display:flex;align-items:center;gap:12px;border-bottom:3px solid ${brand};padding-bottom:10px;margin-bottom:10px}
+      .hd .lg{height:38px;object-fit:contain} .hd h1{color:${brand};font-size:19px;margin:0;flex:1} .hd .tn{font-weight:800;font-size:14px}
+      .sub{color:#666;font-size:12px;margin:4px 0 14px}
+      table{width:100%;border-collapse:collapse;margin-top:4px;font-size:12px}th,td{border:1px solid #e2e2e2;padding:7px 9px;text-align:left}
+      th{background:${ink};color:#fff} td.n,th.n{text-align:right} .sec td{background:#f3f3f3;font-weight:700}
+      .ft{margin-top:16px;color:#999;font-size:10px}</style></head><body>
+      <div class="hd">${tlogo ? `<img class="lg" src="${tlogo}">` : ''}<h1>${U.esc(p.nombre)} · ${meta.ramo}</h1><span class="tn">${tenant}</span></div>
+      <div class="sub">Propuesta para ${U.esc(meta.cliente || 'Prospecto')}${meta.marca ? ' · ' + meta.marca + ' ' + meta.linea + (meta.modelo ? ' ' + meta.modelo : '') + ' ' + meta.anio : ''} · Validada ${p.validacion ? 'el ' + U.esc(p.validacion.fecha) + ' por ' + U.esc(p.validacion.actor) : ''}</div>
+      <table><tbody>
+        ${tpl.secciones.primaNeta !== false ? `<tr><td><b>${U.esc(tpl.etiquetas.primaNeta || 'Prima neta')}</b></td><td class="n">${U.money(p.neta || 0, cur)}</td></tr>` : ''}
+        ${tpl.secciones.ivaRecargos !== false ? `<tr><td>${U.esc(tpl.etiquetas.ivaRecargos || 'IVA / recargos')}</td><td class="n">${U.money(p.iva || 0, cur)}</td></tr>` : ''}
+        ${tpl.secciones.primaTotal !== false ? `<tr class="sec"><td colspan="2"><b>${U.esc(tpl.etiquetas.primaTotal || 'Prima total')}</b></td></tr>
+        <tr><td>Total${p.fracc > 1 ? ' (' + p.fracc + ' cuotas)' : ' (contado)'}</td><td class="n"><b>${U.money(p.total || 0, cur)}</b>${p.fracc > 1 ? ' · ' + U.money((p.total || 0) / p.fracc, cur) + '/pago' : ''}</td></tr>` : ''}
+        ${p.sumaAsegurada ? `<tr><td>Suma asegurada</td><td class="n">${U.money(p.sumaAsegurada, cur)}</td></tr>` : ''}
+        ${p.deducible ? `<tr><td>Deducible</td><td class="n">${U.esc(p.deducible)}</td></tr>` : ''}
+        ${tpl.secciones.coberturas !== false ? `<tr class="sec"><td colspan="2">🛡️ ${U.esc(tpl.etiquetas.coberturas || 'Coberturas')}</td></tr>${cobRows}` : ''}
+      </tbody></table>
+      <p class="ft">Documento informativo emitido por ${tenant}. Coberturas sujetas a condiciones de póliza vigentes.</p></body></html>`);
+    w.document.close(); setTimeout(() => w.print(), 350);
   }
   function editarProp(i) {
     const p = props[i]; if (!p) return;
@@ -436,11 +490,31 @@ Orbit.modules.comparativo = (function () {
       <tbody>${filaPrima}${filaPago}${filaNeta}${filaIva}<tr><td colspan="${ordered.length + 1}" style="background:var(--surface);font-weight:700;font-size:12px">🛡️ Coberturas</td></tr>${filasCob}</tbody>
     </table></div></div>`;
   }
+  function lineaTiempo() {
+    const eventos = [];
+    props.forEach((p, i) => {
+      eventos.push({ fecha: p.fechaCarga || '', ic: '📄', t: 'Propuesta cargada: ' + (p.nombre || '') + (p.origen ? ' (' + p.origen + ')' : '') });
+      if (p.correccion) eventos.push({ fecha: p.correccion.fecha, ic: '✏️', t: 'Corrección en ' + (p.nombre || '') + ' — ' + (p.correccion.motivo || 'sin motivo') + ' · ' + p.correccion.actor });
+      if (p.validacion) eventos.push({ fecha: p.validacion.fecha, ic: '✓', t: 'Validada: ' + (p.nombre || '') + ' — ' + (p.validacion.motivo || '') + ' · ' + p.validacion.actor });
+    });
+    (meta.replanteos || []).forEach(r => eventos.push({ fecha: r.fecha, ic: '🔁', t: 'Replanteo: ' + r.antes + ' → ' + r.despues + (r.recomendacionAntes !== r.recomendacionDespues ? (' · recomendación cambió de ' + (r.recomendacionAntes || '—') + ' a ' + (r.recomendacionDespues || '—')) : ' · recomendación no cambió') + ' — ' + r.motivo + ' · ' + r.actor }));
+    if (meta.envioPreparado) eventos.push({ fecha: meta.envioPreparado.fecha, ic: '📤', t: 'Comunicación preparada (' + meta.envioPreparado.canal + ') — pendiente de confirmación' });
+    if (meta.decisionCliente) eventos.push({ fecha: meta.decisionCliente.fecha, ic: '🤝', t: 'Decisión del cliente: ' + meta.decisionCliente.texto });
+    if (!eventos.length) return '';
+    eventos.sort((a, b) => String(a.fecha || '').localeCompare(String(b.fecha || '')));
+    return `<div class="card pad" style="margin-top:14px">
+      <b style="font-family:var(--f-display);font-size:14px">🕘 Línea de tiempo de este comparativo</b>
+      <div style="margin-top:10px;display:grid;gap:8px">${eventos.map(e => `<div style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px"><span>${e.ic}</span><div><b style="font-size:11px;color:var(--ink-3)">${U.esc(e.fecha || '—')}</b><div>${U.esc(e.t)}</div></div></div>`).join('')}</div>
+    </div>`;
+  }
   function recomendacion(rk, cur) {
     const top = rk[0], second = rk[1];
     const p = top.p, minT = Math.min(...propsValidadas().map(x => x.total || 1e15));
     const esMasBarata = p.total === minT;
-    const critLabel = { precio: '💵 mejor precio', cobertura: '🛡️ mejor cobertura', equilibrio: '⚖️ mejor equilibrio precio/cobertura' }[meta.criterio];
+    const critsCfg = (Orbit.tenant && Orbit.tenant.get) ? (Orbit.tenant.get().comparativoCriterios || {}) : {};
+    const critLbl = (k, def) => (critsCfg[k] && critsCfg[k].label) || def;
+    const critIco = (k, def) => (critsCfg[k] && critsCfg[k].icon) || def;
+    const critLabel = { precio: critIco('precio', '💵') + ' mejor ' + critLbl('precio', 'precio').toLowerCase(), cobertura: critIco('cobertura', '🛡️') + ' mejor ' + critLbl('cobertura', 'cobertura').toLowerCase(), equilibrio: critIco('equilibrio', '⚖️') + ' mejor equilibrio ' + critLbl('precio', 'precio').toLowerCase() + '/' + critLbl('cobertura', 'cobertura').toLowerCase() }[meta.criterio];
     let texto;
     if (meta.criterio === 'precio') texto = `Por <b>precio</b>, <b>${U.esc(p.nombre)}</b> es la más económica (${U.money(p.total, cur)})${second ? `, ${Math.round((1 - top.p.total / second.p.total) * 100)}% bajo la siguiente` : ''}. Verificá que las coberturas cubran las necesidades del cliente antes de cerrar.`;
     else if (meta.criterio === 'cobertura') texto = `Por <b>cobertura</b>, <b>${U.esc(p.nombre)}</b> ofrece la protección más amplia${p.sumaAsegurada ? ` (suma ${U.money(p.sumaAsegurada, cur)})` : ''}. ${esMasBarata ? 'Y además es la más económica — opción clara.' : 'Tiene una prima mayor, justificable por el alcance.'}`;
@@ -449,7 +523,7 @@ Orbit.modules.comparativo = (function () {
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
         <b style="font-family:var(--f-display);font-size:14px">🧠 Recomendación consultiva</b>
         <div class="seg" style="display:inline-flex;gap:4px">
-          ${[['precio', '💵 Precio'], ['cobertura', '🛡️ Cobertura'], ['equilibrio', '⚖️ Equilibrio']].map(([k, t]) => `<button class="btn ${meta.criterio === k ? 'primary' : 'ghost'} sm" data-crit="${k}">${t}</button>`).join('')}
+          ${(function () { const t = (Orbit.tenant && Orbit.tenant.get) ? (Orbit.tenant.get().comparativoCriterios || {}) : {}; return [['precio', (t.precio && t.precio.icon) || '💵', (t.precio && t.precio.label) || 'Precio'], ['cobertura', (t.cobertura && t.cobertura.icon) || '🛡️', (t.cobertura && t.cobertura.label) || 'Cobertura'], ['equilibrio', (t.equilibrio && t.equilibrio.icon) || '⚖️', (t.equilibrio && t.equilibrio.label) || 'Equilibrio']].map(([k, ic, lb]) => `<button class="btn ${meta.criterio === k ? 'primary' : 'ghost'} sm" data-crit="${k}">${ic} ${U.esc(lb)}</button>`).join(''); })()}
         </div>
       </div>
       <div class="muted" style="font-size:11.5px;margin-bottom:6px">Criterio actual: <b>${critLabel}</b> · cambia el criterio para replantear la recomendación.</div>
@@ -491,6 +565,7 @@ Orbit.modules.comparativo = (function () {
         clienteId: cid, ramo: meta.ramo, prioridad: 'Alta', workflowType: 'issuance_request', quoteId: quoteId, comparisonId: comparisonId,
         nota: 'Aseguradora: ' + p.nombre + (p.plan ? ' · Plan: ' + p.plan : '') + '\nPrima neta: ' + U.money(p.neta || 0, cur) + ' · IVA: ' + U.money(p.iva || 0, cur) + ' · Prima total: ' + U.money(p.total || 0, cur) + ' · Pagos: ' + (p.fracc || 1) + '\nSuma asegurada: ' + U.money(p.sumaAsegurada || 0, cur) + (p.deducible ? ' · Deducible: ' + p.deducible : '') + '\nFuente: ' + (p.fuenteOferta || p.origen || 'cotizador') + (p.referencia ? ' · Ref: ' + p.referencia : '') + '\nEstado: pendiente de número y documento de la aseguradora para emitir la póliza.'
       });
+      meta.decisionCliente = { fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), texto: 'Aceptó ' + p.nombre + (p.plan ? ' (' + p.plan + ')' : '') };
       close(); U.toast('✓ Solicitud de emisión creada en Orbit Ops.'); render(host);
     };
   }
@@ -609,8 +684,50 @@ Orbit.modules.comparativo = (function () {
     back.querySelector('#ch-x').addEventListener('click', close);
     back.querySelectorAll('[data-load]').forEach(b => b.addEventListener('click', () => { const c = S().all('comparativos').find(x => x.id === b.dataset.load); if (c) { props = JSON.parse(JSON.stringify(c.props)); if (c.meta) meta = JSON.parse(JSON.stringify(c.meta)); close(); render(host); } }));
   }
+  function plantillaCfg() {
+    const t = (Orbit.tenant && Orbit.tenant.get) ? Orbit.tenant.get() : {};
+    return t.comparativoPlantilla || { secciones: { primaTotal: true, formaPago: true, primaNeta: true, ivaRecargos: true, coberturas: true }, etiquetas: { primaTotal: 'Prima total', formaPago: 'Forma de pago', primaNeta: 'Prima neta', ivaRecargos: 'IVA / recargos', coberturas: 'Coberturas' } };
+  }
+  function editarPlantilla(host) {
+    const cfg = plantillaCfg();
+    const pond = (Orbit.tenant && Orbit.tenant.get) ? (Orbit.tenant.get().comparativoPonderacion || { precio: 50, cobertura: 50 }) : { precio: 50, cobertura: 50 };
+    const critCfg = (Orbit.tenant && Orbit.tenant.get) ? (Orbit.tenant.get().comparativoCriterios || {}) : {};
+    const campos = [['primaTotal', 'Prima total'], ['formaPago', 'Forma de pago'], ['primaNeta', 'Prima neta'], ['ivaRecargos', 'IVA / recargos'], ['coberturas', 'Coberturas']];
+    let back = document.getElementById('cp-tpl-m'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'cp-tpl-m'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 98;
+    back.innerHTML = '<div class="card" style="width:min(480px,94vw);max-height:88vh;overflow:auto;padding:0">'
+      + '<div style="padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display)">⚙ Plantilla de impresión (tenant)</b><button class="imp-x" id="tpl-x" style="color:var(--ink);border-color:var(--line)">✕</button></div>'
+      + '<div style="padding:16px 18px;display:grid;gap:9px">'
+      + '<div class="cfg-note">Controla qué secciones aparecen y con qué etiqueta (arriba abajo = orden de impresión), tanto en el comparativo genérico como en la impresión individual por aseguradora. No incluye datos ni formatos reales de A&S.</div>'
+      + campos.map(([k, def], i) => `<div class="cgrid" style="grid-template-columns:auto auto 1fr;align-items:center;gap:8px"><span class="muted" style="font-size:11px">#${i + 1}</span><label class="ce-l ck" style="margin:0"><input type="checkbox" data-tpl-on="${k}" ${cfg.secciones[k] !== false ? 'checked' : ''}></label><input class="o-sel" data-tpl-lbl="${k}" value="${U.esc((cfg.etiquetas && cfg.etiquetas[k]) || def)}"></div>`).join('')
+      + '<hr style="border:none;border-top:1px solid var(--line);margin:4px 0">'
+      + '<div class="cfg-note" style="margin:0">Etiquetas de los 3 criterios de recomendación (el cálculo sigue siendo precio/cobertura/equilibrio; acá solo personalizás cómo se llaman):</div>'
+      + ['precio', 'cobertura', 'equilibrio'].map(k => `<label class="ce-l">Criterio "${k}"<input class="o-sel" data-crit-lbl="${k}" value="${U.esc((critCfg[k] && critCfg[k].label) || (k[0].toUpperCase() + k.slice(1)))}"></label>`).join('')
+      + '<label class="ce-l">Ponderación del criterio "Equilibrio": ' + (pond.precio != null ? pond.precio : 50) + '% precio / ' + (100 - (pond.precio != null ? pond.precio : 50)) + '% cobertura<input type="range" id="tpl-pond" min="0" max="100" step="5" value="' + (pond.precio != null ? pond.precio : 50) + '"></label>'
+      + '</div>'
+      + '<div style="padding:13px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="tpl-cancel">Cancelar</button><button class="btn primary" id="tpl-ok">Guardar</button></div></div>';
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.querySelector('#tpl-x').onclick = close; back.querySelector('#tpl-cancel').onclick = close;
+    const pondInp = back.querySelector('#tpl-pond'), pondLbl = back.querySelector('#tpl-pond').closest('label');
+    pondInp.addEventListener('input', () => { const v = +pondInp.value; pondLbl.firstChild.textContent = 'Ponderación del criterio "Equilibrio": ' + v + '% precio / ' + (100 - v) + '% cobertura'; });
+    back.querySelector('#tpl-ok').onclick = () => {
+      const secciones = {}, etiquetas = {};
+      campos.forEach(([k]) => { secciones[k] = back.querySelector(`[data-tpl-on="${k}"]`).checked; etiquetas[k] = back.querySelector(`[data-tpl-lbl="${k}"]`).value || k; });
+      Orbit.tenant.setDeep('comparativoPlantilla', { secciones, etiquetas });
+      const vPrecio = +pondInp.value;
+      Orbit.tenant.setDeep('comparativoPonderacion', { precio: vPrecio, cobertura: 100 - vPrecio });
+      const critNuevo = {};
+      ['precio', 'cobertura', 'equilibrio'].forEach(k => { const el = back.querySelector(`[data-crit-lbl="${k}"]`); const prev = (critCfg[k] && critCfg[k].icon) || ''; critNuevo[k] = { label: (el && el.value) || k, icon: prev }; });
+      Orbit.tenant.setDeep('comparativoCriterios', critNuevo);
+      close(); U.toast('✓ Plantilla de impresión actualizada'); render(host);
+    };
+  }
   function imprimir() {
     const validas = propsValidadas(); if (!validas.length) { Orbit.ui.toast('Necesitás al menos una propuesta validada para imprimir.'); return; }
+    const tpl = plantillaCfg();
     const cur = (validas[0] || {}).cur || 'GTQ', rk = ranking(), minT = Math.min(...validas.map(p => p.total || 1e15));
     const ordered = rk.map(r => r.p);
     const crits = criteriosDe();
@@ -638,12 +755,11 @@ Orbit.modules.comparativo = (function () {
       <div class="sub">${U.esc(meta.cliente || 'Prospecto')}${meta.marca ? ' · ' + meta.marca + ' ' + meta.linea + (meta.modelo ? ' ' + meta.modelo : '') + ' ' + meta.anio : ''}</div>
       <table><thead><tr><th>Concepto</th>${ordered.map(p => `<th class="n">${logoImg(p)}<br>${U.esc(p.nombre)}</th>`).join('')}</tr></thead>
       <tbody>
-        <tr class="win"><td><b>Prima total</b></td>${ordered.map(p => `<td class="n"><b>${U.money(p.total || 0, cur)}</b>${p.total === minT ? ' 🏆' : ''}</td>`).join('')}</tr>
-        <tr><td>Forma de pago</td>${ordered.map(p => `<td class="n">${p.fracc > 1 ? p.fracc + ' cuotas · ' + U.money((p.total || 0) / p.fracc, cur) : 'Contado'}</td>`).join('')}</tr>
-        <tr><td>Prima neta</td>${ordered.map(p => `<td class="n">${U.money(p.neta || 0, cur)}</td>`).join('')}</tr>
-        <tr><td>IVA / recargos</td>${ordered.map(p => `<td class="n">${U.money(p.iva || 0, cur)}</td>`).join('')}</tr>
-        <tr class="sec"><td colspan="${ordered.length + 1}">🛡️ Coberturas</td></tr>
-        ${cobRows}
+        ${tpl.secciones.primaTotal !== false ? `<tr class="win"><td><b>${U.esc(tpl.etiquetas.primaTotal || 'Prima total')}</b></td>${ordered.map(p => `<td class="n"><b>${U.money(p.total || 0, cur)}</b>${p.total === minT ? ' 🏆' : ''}</td>`).join('')}</tr>` : ''}
+        ${tpl.secciones.formaPago !== false ? `<tr><td>${U.esc(tpl.etiquetas.formaPago || 'Forma de pago')}</td>${ordered.map(p => `<td class="n">${p.fracc > 1 ? p.fracc + ' cuotas · ' + U.money((p.total || 0) / p.fracc, cur) : 'Contado'}</td>`).join('')}</tr>` : ''}
+        ${tpl.secciones.primaNeta !== false ? `<tr><td>${U.esc(tpl.etiquetas.primaNeta || 'Prima neta')}</td>${ordered.map(p => `<td class="n">${U.money(p.neta || 0, cur)}</td>`).join('')}</tr>` : ''}
+        ${tpl.secciones.ivaRecargos !== false ? `<tr><td>${U.esc(tpl.etiquetas.ivaRecargos || 'IVA / recargos')}</td>${ordered.map(p => `<td class="n">${U.money(p.iva || 0, cur)}</td>`).join('')}</tr>` : ''}
+        ${tpl.secciones.coberturas !== false ? `<tr class="sec"><td colspan="${ordered.length + 1}">🛡️ ${U.esc(tpl.etiquetas.coberturas || 'Coberturas')}</td></tr>${cobRows}` : ''}
       </tbody></table>
       ${top ? `<div class="rec"><b>🧠 Recomendación (${meta.criterio}):</b> ${U.esc(top.nombre)} — opción sugerida según el criterio de ${meta.criterio === 'precio' ? 'mejor precio' : meta.criterio === 'cobertura' ? 'mejor cobertura' : 'equilibrio precio/cobertura'}.</div>` : ''}
       <p class="ft">Documento informativo emitido por ${tenant}. Coberturas sujetas a condiciones de póliza vigentes. Las propuestas pueden variar según suscripción de la aseguradora.</p></body></html>`);
@@ -660,6 +776,7 @@ Orbit.modules.comparativo = (function () {
     const msg = 'Hola, te comparto el comparativo de ' + (meta.ramo || 'seguros') + ' con ' + validas.length + ' opciones:\n\n' + resumen + '\n\nNuestra recomendación: ' + (ganador.nombre || 'la mejor relación valor/precio') + '. Quedo atento para avanzar con la que prefieras.';
     if (!cid) { Orbit.ui.toast('No hay cliente para asociar. Crea o selecciona uno.'); return; }
     Orbit.notify.pedir(cid, { tipo: 'Comparativo preparado', icon: '⚖️', asunto: 'Comparativo de ' + (meta.ramo || 'seguros') + ' · ' + validas.length + ' opciones', mensaje: msg, adjunto: 'Comparativo-' + (meta.ramo || 'seguros') + '.pdf' });
+    meta.envioPreparado = { fecha: (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), canal: 'WhatsApp/correo' };
   }
   function rgbaHex(hex, a) { let h = hex.replace('#', ''); if (h.length === 3) h = h.split('').map(x => x + x).join(''); const n = parseInt(h, 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
   return { render, enviarCliente };

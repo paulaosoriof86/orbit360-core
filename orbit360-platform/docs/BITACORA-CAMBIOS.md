@@ -2,6 +2,31 @@
 
 > Registro cronológico de cambios del **prototipo** (Claude). El backend LAB (ChatGPT/Codex) mantiene su propia bitácora. Formato: versión · fecha · qué cambió · archivos.
 
+## v1.243 — v1.244 — 2026-07-13 · Cierre P0 residual (fail-closed real de sesión/scope, credenciales)
+
+- `rolesAsignados()` fail-closed real (sin roles/rol válido → deniega, no hereda rol activo).
+- `filtrarPorAsesor()`: registros sin asesor asignado ya no se muestran en scope propia/equipo.
+- `puedeVerModulo()` nuevo (base rol + extras − restringidos); router lo usa en sidebar y guard de ruta.
+- Aseguradoras: Finanzas removido de credenciales de plataformas; bancos sin restricción (regla de negocio).
+- Vault: proveedor por defecto ya no revela `credentialRef` como secreto.
+- Academia: lección de solo-lectura sin nombres técnicos literales.
+- Manifiesto `docs/MANIFIESTO-ENTREGA-v1244.md` creado; README/PENDIENTES apuntan a él.
+- Detalle completo y pruebas en vivo: `CHANGELOG.md` v1.240–v1.244.
+
+## v1.224 — v1.242 — 2026-07-13 · Paquete residual multirol/Aseguradoras/Comparativo (resumen — detalle completo en CHANGELOG.md)
+
+Este bloque resume la serie completa; cada versión individual (con archivos tocados, pruebas en vivo y pendientes) está documentada línea por línea en `CHANGELOG.md`, que es la fuente de verdad más granular a partir de aquí.
+
+- **v1.224** — source-lock: instrucciones legacy "post v1.97" movidas a `docs/legacy/`.
+- **v1.225** — `core/access-scope.js` nuevo; bóveda de credenciales con clave estable y 15s.
+- **v1.226–v1.231** — Academia (lecciones de bóveda/dataScope), scope `propia` real en Cliente360/Pólizas/Cobros/Renovaciones/Siniestros/Comisiones (regresión encontrada y corregida), Asesor+Comparativo habilitado.
+- **v1.232–v1.233** — endoso con diff antes/después, ficha-página de Póliza (antes solo modal), impresión individual de propuesta validada.
+- **v1.234–v1.236** — `roles[]`/`rolDefault` reales con guard de ruta por hash, Aseguradoras habilitada para Operativo/Asesor, permisos de credenciales separados plataformas/bancos, auditLog real del vault.
+- **v1.237–v1.239** — scope `equipo` (por `teamId`) en Ops/Leads, replanteamiento trazable + línea de tiempo + plantilla de impresión configurable en Comparativo.
+- **v1.240–v1.242** — corrección de 4 fallas reproducidas por auditoría externa (bypass de rol cruzado, fallback legacy inseguro, rol persistido inválido, dataScope declarativo) + 1 regresión propia detectada antes de publicar (roles legacy tipo "Asesor Sr." no canonicalizaban) + política de bancos corregida (visible por defecto, no restringida por rol) + motivo de replanteamiento obligatorio + ponderación de Comparativo configurable por tenant + `Orbit.credentials.resolve()` con llamador real y auditoría de contexto completa.
+
+**Pendiente honesto al cierre de esta serie:** evidencia responsive reproducible en los 15 escenarios exactos de Aseguradoras (Dirección desktop / Operativo tablet / Asesor móvil) — requiere capturas del verificador visual, no cambios de código.
+
 ## v1.213 — 2026-07-12 · Corrección real post-auditoría v1.212 (no solo Academia)
 
 Respuesta a la auditoría que rechazó v1.212 por solo tocar CHANGELOG/seed/index.html. Esta vez, cambios de comportamiento verificados en vivo (eval_js):

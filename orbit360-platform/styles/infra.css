@@ -798,6 +798,8 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 .ct-card{margin-bottom:14px}
 .ct-tabs-h{font-size:11.5px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:9px}
 .ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.ct-cell-ramo{flex-direction:column;align-items:stretch !important;justify-content:flex-start !important;gap:6px !important}
+.ct-cell-ramo label b{white-space:nowrap}
 .ct-cell{display:flex;align-items:center;justify-content:space-between;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 11px}
 .ct-cell>span{font-size:12.5px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ct-cell-prod{border-left:3px solid var(--info)}

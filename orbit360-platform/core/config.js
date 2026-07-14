@@ -87,9 +87,11 @@ Orbit.ROLES = {
   'Marketing':   { nivel: 2, desc: 'Marketing, Academia, Reportes, CRM básico.', color: '#6b4ea0',
     modulos: ['inicio','cronograma','marketing','academia','cliente360','correo','reportes'] },
   'Operativo':   { nivel: 2, desc: 'Ops + CRM operativo. Sin Finanzas ni Config.', color: '#0f766e',
-    modulos: ['inicio','cronograma','ops','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo'] },
+    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo'],
+    scopes: { negocios: 'equipo' } },
   'Asesor':      { nivel: 2, desc: 'Su cartera; ve solo su comisión. Sin Ops ni Config.', color: '#2563a8',
-    modulos: ['inicio','cronograma','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','cotizador','correo'] },
+    modulos: ['inicio','cronograma','leads','aseguradoras','cliente360','polizas','cobros','renovaciones','siniestros','historial','cotizador','comparativo','correo'],
+    scopes: { cliente360: 'propia', polizas: 'propia', cobros: 'propia', renovaciones: 'propia', siniestros: 'propia', comisiones: 'propia', negocios: 'propia' } },
   'Asistente':   { nivel: 1, desc: 'Captura y gestión básica. Sin comisiones ni finanzas.', color: '#7a818e',
     modulos: ['inicio','cronograma','cliente360','polizas','cobros','renovaciones','historial','importar','correo'] }
 };
@@ -200,13 +202,73 @@ Orbit.session = (function () {
   if (!d) d = JSON.parse(JSON.stringify(def));
   function save() { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
   function esAsesor() { return d.rol === 'Asesor'; }
+  /* Normaliza etiquetas libres del seed ("Asesor Sr.", "Asesora Jr.", etc.) al rol
+     CANÓNICO de Orbit.ROLES por coincidencia de substring — evita que el fail-closed
+     de rolesAsignados() rechace usuarios legacy cuyo campo `rol` es solo una etiqueta. */
+  function rolCanonico(rolLibre) {
+    if (!rolLibre) return null;
+    if (Orbit.ROLES && Orbit.ROLES[rolLibre]) return rolLibre;
+    const claves = Orbit.ROLES ? Object.keys(Orbit.ROLES) : [];
+    const norm = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const rl = norm(rolLibre);
+    const found = claves.find(k => rl.indexOf(norm(k)) >= 0 || norm(k).indexOf(rl) >= 0);
+    return found || null;
+  }
+  /* Roles asignables del usuario ficticio actual: si el asesor vinculado declara roles[],
+     solo esos son seleccionables. Sin roles[] declarado, FAIL-CLOSED: solo su rol único (a.rol),
+     nunca todo el catálogo. */
+  function rolesAsignados() {
+    if (!(window.Orbit && Orbit.store)) return null; // store aún no cargó (bootstrap pendiente) — YA NO asume [d.rol]
+    try {
+      const a = d.asesorId ? Orbit.store.get('asesores', d.asesorId) : null;
+      if (!a || a.inactivo || a.status === 'blocked' || a.status === 'suspended') return []; // usuario inexistente/inactivo/suspendido: FAIL-CLOSED
+      if (a.roles && a.roles.length) return a.roles;
+      if (a.rol) { const c = rolCanonico(a.rol); if (c) return [c]; }
+      // Registro existe pero sin roles[]/rolDefault/rol válido: FAIL-CLOSED.
+      return [];
+    } catch (e) { return []; }
+  }
+  /* Si el rol activo persistido ya no está entre los asignados del asesor vinculado
+     (p.ej. se le quitó ese rol en Equipo), vuelve a rolDefault o al primero asignado
+     en vez de quedarse en un rol inválido. */
+  function normalizarRolActivo() {
+    try {
+      const asignados = rolesAsignados();
+      if (asignados === null || !asignados.length) return; // bootstrap pendiente o sin roles resolubles: nada a qué normalizar aún
+      if (asignados.indexOf(d.rol) < 0) {
+        const a = (Orbit.store && d.asesorId) ? Orbit.store.get('asesores', d.asesorId) : null;
+        d.rol = (a && a.rolDefault && asignados.indexOf(a.rolDefault) >= 0) ? a.rolDefault : asignados[0];
+        save();
+      }
+    } catch (e) {}
+  }
+  try { normalizarRolActivo(); } catch (e) {}
   return {
-    rol: () => d.rol,
+    rol: () => {
+      try { normalizarRolActivo(); } catch (e) {}
+      try {
+        const asignados = rolesAsignados();
+        if (asignados === null) return d.rol; // bootstrap pendiente: la app aún no puede consultar datos reales
+        if (!asignados.length) return ''; // identidad inválida/inactiva/sin rol resoluble: FAIL-CLOSED real
+      } catch (e) { return ''; }
+      return d.rol;
+    },
     asesorId: () => d.asesorId,
     esAsesor,
+    rolesAsignados,
     verEmpresa: () => ['Dirección', 'Admin', 'Finanzas'].includes(d.rol),
-    canSee: (route) => { const a = (d.asesorId && Orbit.store) ? Orbit.store.get('asesores', d.asesorId) : null; if (a && a.modulosOverride && a.modulosOverride.length) return a.modulosOverride.includes(route); const r = Orbit.ROLES[d.rol]; if (!r) return true; return !r.modulos || r.modulos.includes(route); },
-    set: (rol, asesorId) => { d.rol = rol; if (asesorId) d.asesorId = asesorId; save(); document.dispatchEvent(new CustomEvent('orbit:session')); }
+    canSee: (route) => { try { normalizarRolActivo(); } catch (e) {} const a = (d.asesorId && Orbit.store) ? Orbit.store.get('asesores', d.asesorId) : null; if (!a || a.inactivo || a.status === 'blocked' || a.status === 'suspended') return false; if (a.modulosOverride && a.modulosOverride.length) return a.modulosOverride.includes(route); const r = Orbit.ROLES[d.rol]; if (!r) return false; return !r.modulos || r.modulos.includes(route); },
+    /* set(rol, asesorId): SIEMPRE valida contra los roles asignados del asesor DESTINO
+       (el que quedará activo tras el cambio) — incluso cuando se cambia de asesor
+       explícitamente. Antes, cambiar de asesor evadía la validación de rol. */
+    set: (rol, asesorId) => {
+      const asesorDestino = asesorId || d.asesorId;
+      const a = (Orbit.store && asesorDestino) ? Orbit.store.get('asesores', asesorDestino) : null;
+      if (!a || a.inactivo || a.status === 'blocked' || a.status === 'suspended') { try { Orbit.ui && Orbit.ui.toast && Orbit.ui.toast('Usuario inexistente, inactivo o suspendido.'); } catch (e) {} return false; }
+      const permitidos = (a.roles && a.roles.length) ? a.roles : (a.rol && rolCanonico(a.rol) ? [rolCanonico(a.rol)] : []);
+      if (permitidos.indexOf(rol) < 0) { try { Orbit.ui && Orbit.ui.toast && Orbit.ui.toast('Ese rol no está asignado a ese usuario.'); } catch (e) {} return false; }
+      d.rol = rol; if (asesorId) d.asesorId = asesorId; save(); document.dispatchEvent(new CustomEvent('orbit:session')); return true;
+    }
   };
 })();
 
@@ -240,6 +302,21 @@ Orbit.tenant = (function () {
       ingresos: ['Comisiones aseguradora', 'Incentivos', 'Honorarios', 'Reintegros', 'Aportes', 'Otros'],
       egresos: ['Comisiones asesores', 'Gastos fijos', 'Marketing', 'Operación', 'Tecnología', 'Administración', 'Impuestos', 'Bancos', 'Devolución de préstamo', 'Otros'],
       especiales: ['Saldo inicial', 'Transferencia interna', 'Ajuste', 'Sin clasificar']
+    },
+    // Plantilla de impresión del Comparativo, configurable por tenant (secciones visibles + etiquetas).
+    // No copia formato/datos reales de A&S — son defaults genéricos editables.
+    comparativoPlantilla: {
+      secciones: { primaTotal: true, formaPago: true, primaNeta: true, ivaRecargos: true, coberturas: true },
+      etiquetas: { primaTotal: 'Prima total', formaPago: 'Forma de pago', primaNeta: 'Prima neta', ivaRecargos: 'IVA / recargos', coberturas: 'Coberturas' }
+    },
+    // Ponderación del criterio "Equilibrio" del Comparativo, configurable por tenant (% precio vs % cobertura, suman 100).
+    comparativoPonderacion: { precio: 50, cobertura: 50 },
+    // Etiquetas/iconos de los 3 criterios de recomendación, configurables por tenant (el cálculo
+    // sigue siendo precio/cobertura/equilibrio — se personaliza cómo se llaman y su ícono).
+    comparativoCriterios: {
+      precio: { label: 'Precio', icon: '💵' },
+      cobertura: { label: 'Cobertura', icon: '🛡️' },
+      equilibrio: { label: 'Equilibrio', icon: '⚖️' }
     },
     // Cierre financiero por tenant (P5): último periodo consolidado. Vacío = se calcula
     // relativo a la fecha viva (2 meses atrás). Configurable por país en Configuración.

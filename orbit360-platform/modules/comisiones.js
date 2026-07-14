@@ -12,6 +12,7 @@ Orbit.modules.comisiones = (function () {
   function render(host) {
     if (vista === 'conciliacion') return renderConciliacion(host);
     let all = S().all('comisiones');
+    if (window.Orbit && Orbit.accessScope) all = Orbit.accessScope.filtrarPorAsesor(all, c => c.asesorId, 'comisiones');
     if (fAnio) all = all.filter(c => (c.periodo || '').startsWith(fAnio));
     if (fEstado) all = all.filter(c => fEstado === 'Liquidada' ? c.estado === 'Liquidada' : c.estado !== 'Liquidada');
     const tot = all.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);

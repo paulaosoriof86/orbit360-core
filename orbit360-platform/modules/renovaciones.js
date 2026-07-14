@@ -15,8 +15,9 @@ Orbit.modules.renovaciones = (function () {
       { key: 'd90', label: 'En el horizonte (46–90 d)', tone: 'info', test: d => d > 45 && d <= 90 }
     ];
     const pols = S().where('polizas', p => p.estado !== 'Cancelada');
+    const polsScope = (window.Orbit && Orbit.accessScope) ? Orbit.accessScope.filtrarPorAsesor(pols, p => p.asesorId, 'renovaciones') : pols;
     cols.forEach(c => c.items = []);
-    pols.forEach(p => {
+    polsScope.forEach(p => {
       const d = U.daysFromNow(p.vigenciaFin);
       if (d == null || d > 90) return;
       const col = cols.find(c => c.test(d)); if (col) col.items.push({ p, d });
@@ -73,7 +74,8 @@ Orbit.modules.renovaciones = (function () {
   }
   /* ---- Campaña de renovación por LOTE ---- */
   function campana() {
-    const base = q.renovacionesProximas(60).filter(p => { const c = S().get('clientes', p.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }).sort((a, b) => (a.vigenciaFin || '').localeCompare(b.vigenciaFin || ''));
+    let base = q.renovacionesProximas(60).filter(p => { const c = S().get('clientes', p.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }).sort((a, b) => (a.vigenciaFin || '').localeCompare(b.vigenciaFin || ''));
+    if (window.Orbit && Orbit.accessScope) base = Orbit.accessScope.filtrarPorAsesor(base, p => p.asesorId, 'polizas');
     let fAse = '', fRamo = '';
     let arr = base.slice();
     const incl = new Set(arr.map(p => p.id));
@@ -140,6 +142,7 @@ Orbit.modules.renovaciones = (function () {
   /* ---- Solicitar propuestas de renovación con comparativo MULTI-ASEGURADORA ---- */
   function solicitarPropuestas(polizaId) {
     const p = S().get('polizas', polizaId); if (!p) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(p.asesorId, 'polizas')) { U.toast('Esta póliza está fuera de tu alcance.'); return; }
     const cli = S().get('clientes', p.clienteId) || {};
     const primaBase = +(p.primaNeta != null ? p.primaNeta : p.prima) || 0;
     const cur = p.moneda || (cli.pais === 'CO' ? 'COP' : 'GTQ');

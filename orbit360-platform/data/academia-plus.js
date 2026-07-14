@@ -210,10 +210,17 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🏦', 'Banco y estado de cuenta NO son cobro', '#C5162E', '**Banco no crea cobro confirmado.** El **estado de cuenta del cliente no marca pago realizado** — solo propone conciliación. La **planilla de comisión no crea cartera ni cobro**. El **financiero histórico no crea cartera, cobros ni producción**: es referencia. Los **documentos soporte solo proponen** datos (diferencia revisable + confirmación).'),
           S('🌎', 'País/moneda y caso jun/jul 2026', '#C9821B', 'Si falta **país o moneda**, la fila queda **REQUIERE_VALIDACION** (no se asume). **GT=GTQ, CO=COP**, no se suman en crudo. **Caso especial junio/julio 2026**: es data de migración/transición — se trata como referencia a conciliar, no como lógica productiva fija; requiere validación antes de contar en cartera o producción.')
         ]),
+        L('Financiero histórico → movimiento operativo (delta)', 11, [
+          S('📜', 'El histórico no crea nada operativo', '#C5162E', 'Un archivo de financiero histórico **nunca** crea clientes, pólizas, cartera ni cobros por sí solo. Un **saldo de apertura no es un ingreso**. Un **financiamiento no es ingreso operativo** (es una fuente de fondos, no producción). Todo eso queda clasificado como histórico/referencia hasta que alguien lo promueva explícitamente.'),
+          S('➡️', 'Promover a movimiento real exige 7 requisitos', '#7A5BD9', 'Para que un registro histórico pase a `finmovs` (movimiento financiero real) se necesita: **1)** que sea realizado (no proyectado), **2)** fecha exacta, **3)** país, **4)** moneda, **5)** verificación de que no es duplicado, **6)** un diff visible de qué cambia, y **7)** aprobación de un usuario autorizado con motivo. Sin los 7, se queda como histórico.'),
+          S('🧭', 'Tres estados honestos en pantalla', '#1F8A5B', 'La UI siempre distingue tres estados: **"reconciliado"** (ya cruzado y consistente), **"propuesto para registrar"** (candidato a promoción, pendiente de aprobación) y **"registrado"** (ya es un movimiento real). Nunca se muestra un histórico como si ya fuera un movimiento confirmado.')
+        ]),
         Q('Evaluación · Importador', [
           { p: 'Si una fuente no trae país ni moneda confiables…', ops: ['Se asume Guatemala/GTQ', 'Queda en REQUIERE_VALIDACIÓN', 'Se descarta en silencio'], ok: 1 },
           { p: 'Los documentos importados…', ops: ['Crean clientes directos', 'Proponen cambios pendientes de aprobación', 'Escriben cartera'], ok: 1 },
-          { p: '¿Qué se conserva por cada fila?', ops: ['Solo el monto', 'Hoja, fila, bloque, país, moneda y periodo', 'Nada'], ok: 1 }
+          { p: '¿Qué se conserva por cada fila?', ops: ['Solo el monto', 'Hoja, fila, bloque, país, moneda y periodo', 'Nada'], ok: 1 },
+          { p: 'Un saldo de apertura en el histórico financiero es…', ops: ['Un ingreso operativo', 'Referencia — no cuenta como ingreso', 'Comisión recibida'], ok: 1 },
+          { p: 'Para promover un registro histórico a finmovs hace falta…', ops: ['Solo un clic de aprobación', 'Realizado + fecha + país/moneda + no duplicado + diff + aprobación con motivo', 'Nada, se promueve automático a fin de mes'], ok: 1 }
         ])
       ]
     },
@@ -892,6 +899,8 @@ Orbit.ACADEMIA_PLUS = (function () {
         ]),
         L('Usuarios, roles y carga de datos', 12, [
           S('👥', 'Usuarios y permisos', '#2A6FDB', 'En Equipo creas usuarios con nombre, correo, teléfono/WhatsApp y **rol** (Dirección, Admin, Comercial, Marketing, Operativo, Asesor, Asistente). Un usuario puede tener varios roles (ver como). Puedes restringir módulos por usuario más allá del rol. El asesor no ve Ops; ve su trabajo por Leads.'),
+          S('🎭', 'Rol activo y alcance de datos (dataScope)', '#C5162E', '`core/access-scope.js` centraliza dos cosas distintas: **visibilidad de módulo** (qué ve en el menú, según su rol) y **alcance de datos** (`propia` / `equipo` / `todo` / `ninguno` — cuánto de lo que ve realmente puede consultar). Cada usuario declara **roles[] + rolDefault**: el selector de rol del topbar solo ofrece los roles asignados a ese usuario, no todo el catálogo — pedir un rol no asignado se rechaza. Un Asesor con módulo Cliente360 visible solo ve *sus* clientes (`dataScope==\'propia\'`); Dirección/Admin ven todo; `\'ninguno\'` bloquea la consulta por completo (ej. Asesor y Ops). Si el Asesor detecta un cliente mal asignado, no lo cambia — crea una **gestión de corrección** desde la ficha bloqueada y el equipo la resuelve. Navegar directo por URL a un módulo sin permiso ya no lo abre: el router muestra "No tienes acceso con el rol activo".'),
+          S('⚠️', 'Ampliar acceso exige confirmación reforzada', '#7A5BD9', 'Cuando en Equipo se sube el alcance de un usuario a "todo", o se le agrega un permiso extra, el sistema pide escribir literalmente **CONFIRMO AMPLIAR ACCESO** antes de guardar — no basta un clic. El cambio queda además en el historial de actividad del usuario con el antes/después (rol y scope previos vs. nuevos). Esto evita que un privilegio amplio se otorgue por error.'),
           S('🗄', 'Base de datos inicial', '#1F8A5B', 'Arranca con la carga inicial (clientes, pólizas, cobros, comisiones) o por fuentes separadas. Cada fuente declara su alcance (qué crea y qué NO). Revisa el **dry-run** antes de escribir; lo que quede en *requiere_validación* se corrige en la fuente, no se fuerza.'),
           S('⬇', 'Importador inteligente', '#C5162E', 'Fuentes separadas, trazabilidad por hoja/fila/país/moneda/periodo, exclusión de hojas soporte y estados honestos (LISTO / REQUIERE_VALIDACIÓN / BLOQUEADO / OMITIDO). No se mezclan países/monedas ni se infieren clientes desde finanzas. Cada importación deja reporte descargable.')
         ]),
@@ -904,6 +913,11 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🎓', 'Crear cursos y rutas', '#2A6FDB', 'En Academia creas cursos (video/lectura/quiz/recurso), los generas o complementas con **IA**, cargas contenido **desde documentos**, y los asignas a un rol para que aparezcan en la **Ruta por rol** con certificado. Arma la inducción de cada rol nuevo con esta herramienta.'),
           S('🔁', 'Mantener la plataforma viva', '#1E2227', 'Revisa trimestralmente: catálogos, aseguradoras, plantillas, cursos, roles e integraciones. Documenta los cambios. Una plataforma bien mantenida se adapta al negocio sin depender de código: ese es el valor de que todo sea configurable.')
         ]),
+        L('Verificación productiva en solo lectura', 10, [
+          S('🔍', 'Antes de dar por conectado algo, verificalo en solo lectura', '#0E7C86', 'Cuando IT conecta una integración o fuente real (correo, banco, Drive), el primer estado nunca es "activo": es **Pendiente de conexión** → **Verificación en solo lectura** (se puede leer/probar pero no escribir todavía) → **Escritura bloqueada hasta completar validación** → recién ahí, activo. Nunca saltar directo a "conectado" sin pasar por la verificación.'),
+          S('🚫', 'Nunca mostrar términos técnicos internos al cliente', '#C5162E', 'La UI del cliente final o de un rol comercial/operativo nunca debe nombrar la tecnología interna que hay detrás de una integración o fuente de datos — eso vive solo en documentación técnica interna, no en pantalla. Si necesitás explicar el estado a un usuario, usá siempre lenguaje honesto y operativo: "pendiente de conexión segura", "en verificación", "escritura bloqueada hasta validar" — nunca el nombre del proveedor o la tecnología.'),
+          S('🔒', 'Acceso fail-closed: sin configuración válida, no hay acceso', '#1E2227', 'Si falta configuración, identidad o tenant válido, el sistema **nunca** cae a modo demo mostrando datos ficticios como si fueran reales, ni concede acceso por defecto. Un módulo o ruta sin permiso se deniega de entrada — no se “filtra después” en el navegador. Esto es lo mismo que ya viste en el guard de rutas: pedir un módulo no autorizado por hash muestra "No tienes acceso", nunca el contenido.')
+        ]),
         L('Paso a paso: puesta en marcha del tenant', 9, [
           S('🎨', '1. Configuración', '#1E2227', 'Marca, países/monedas, planes y módulos activos primero — todo lo demás depende de esto.'),
           S('👥', '2. Usuarios', '#2A6FDB', 'Crea usuarios con su rol correcto; verifica que el asesor no vea Ops.'),
@@ -913,6 +927,9 @@ Orbit.ACADEMIA_PLUS = (function () {
           { p: 'El orden correcto de puesta en marcha empieza por…', ops: ['Automatizaciones', 'Configuración (marca, países, planes)', 'Crear cursos'], ok: 1 },
           { p: 'Una integración/addon no conectado se muestra como…', ops: ['Activa', 'Pendiente de conexión (honesto)', 'Error al usuario'], ok: 1 },
           { p: 'Al cargar la base inicial, si una fila queda en requiere_validación…', ops: ['Se fuerza a GTQ', 'Se corrige en la fuente antes de escribir', 'Se ignora'], ok: 1 },
+          { p: 'Antes de dar una integración/fuente por "conectada", el estado correcto de paso intermedio es…', ops: ['Activa directamente', 'Verificación en solo lectura', 'Ninguno, se activa sola'], ok: 1 },
+          { p: 'Un Asesor con dataScope "propia" en Cliente360 y Pólizas…', ops: ['Ve la cartera completa como Dirección', 'Solo ve sus propios clientes/pólizas asignados', 'No ve ningún cliente'], ok: 1 },
+          { p: 'Si un Asesor detecta que un cliente está mal asignado a otro asesor…', ops: ['Lo reasigna él mismo desde la ficha', 'Crea una gestión de corrección para que el equipo lo revise', 'No puede hacer nada'], ok: 1 },
           { p: 'La personalización del cliente se hace…', ops: ['Tocando código', 'Por configuración (marca, países, roles, integraciones)', 'No se puede'], ok: 1 }
         ])
       ]
@@ -989,6 +1006,7 @@ Orbit.ACADEMIA_PLUS = (function () {
           S('🔎', 'Buscar y filtrar', '#0E7C86', 'Módulo **Aseguradoras** → busca por nombre, NIT, contacto o ramo; filtra por país (GT/CO), ramo y estado (activas/inactivas). Cada tarjeta muestra contacto principal, estado de acceso y de documentación de un vistazo.'),
           S('📋', 'Abrir la ficha por pestañas', '#2A6FDB', 'La ficha se organiza en **Resumen · Contactos · Plataformas · Bancos y pagos · Productos · Documentos · Tarifas y conocimiento · Actividad**. Lo operativo (contactos, accesos, productos) va primero; lo técnico (tarifas) queda al final, como sección secundaria.'),
           S('🔐', 'Accesos sin contraseñas', '#C5162E', 'La pestaña Plataformas nunca guarda contraseñas reales. Cada portal muestra un estado honesto: Pendiente de conexión segura, Acceso disponible, Requiere actualización o Sin acceso registrado. La conexión real llegará por una bóveda segura, no por un campo de texto.'),
+          S('🔒', 'Revelación temporal de la bóveda (15s) — solo plataformas', '#7A5BD9', 'La restricción por rol aplica ÚNICAMENTE a credenciales de **plataformas** (usuario/credencial de un portal): usuario y referencia se muestran enmascarados, y con rol autorizado (Dirección/Admin/Operativo/Finanzas o permiso extra explícito) aparecen los botones Ver 15s y Copiar — al revelar, el dato vuelve a ocultarse solo a los 15 segundos. El rol Asesor no ve esos botones para plataformas — en su lugar aparece "Acceso restringido". Las **cuentas bancarias** (pestaña Bancos y pagos) son distintas: cualquier usuario con acceso al módulo Aseguradoras las ve y copia completas por defecto — solo una restricción explícita por usuario las oculta. Cada "Ver"/"Copiar" además queda auditado (actor, rol, aseguradora, plataforma, fecha).'),
           S('🧮', 'Tarifas y conocimiento no se auto-habilitan', '#7A5BD9', 'Importar un documento tarifario deja el conocimiento en "Propuesta lista para revisar" o "Requiere validación" — nunca habilita un producto en Cotizador/Comparativo automáticamente. Para <b>validar</b> una tabla de tasas ahora se exige: documento fuente + versión + vigencia completos, tramos con tasas positivas y mínimos no negativos en orden ascendente, y confirmación de quien valida — todo queda auditado (antes/después, actor, motivo). Habilitar es una acción explícita y auditable, separada de leer. La <b>planilla de comisiones</b> es otra fuente distinta: liquida comisiones, no habilita tarifas.')
         ]),
         Q('Evaluación · Aseguradoras (directorio)', [
@@ -996,7 +1014,10 @@ Orbit.ACADEMIA_PLUS = (function () {
           { p: 'Un documento tarifario recién importado…', ops: ['Habilita el producto en Cotizador automáticamente', 'Queda pendiente de validación y requiere habilitación explícita separada', 'Actualiza cartera directamente'], ok: 1 },
           { p: 'La planilla de comisiones y el conocimiento tarifario del Cotizador son…', ops: ['La misma fuente', 'Fuentes distintas: una liquida comisiones, la otra habilita cotizar', 'Da igual cuál se use'], ok: 1 },
           { p: 'La pestaña "Tarifas y conocimiento" en la ficha es…', ops: ['La portada principal del módulo', 'Una sección secundaria administrativa', 'Solo visible en Cotizador'], ok: 1 },
-          { p: 'Para validar una tabla de tasas y habilitar el cálculo automático hace falta…', ops: ['Solo marcar la casilla de validado', 'Documento fuente + versión + vigencia + tramos válidos, con motivo y confirmación', 'Nada, se habilita al guardar cualquier tramo'], ok: 1 }
+          { p: 'Para validar una tabla de tasas y habilitar el cálculo automático hace falta…', ops: ['Solo marcar la casilla de validado', 'Documento fuente + versión + vigencia + tramos válidos, con motivo y confirmación', 'Nada, se habilita al guardar cualquier tramo'], ok: 1 },
+          { p: 'Un Asesor que abre la pestaña Plataformas ve el usuario/credencial de una aseguradora…', ops: ['Igual que Dirección, con botón Copiar', 'Con badge "Acceso restringido", sin poder revelar ni copiar', 'No ve la pestaña en absoluto'], ok: 1 },
+          { p: 'Un Asesor que abre la pestaña Bancos y pagos de una aseguradora…', ops: ['Ve las cuentas restringidas igual que las credenciales de plataformas', 'Ve las cuentas completas por defecto (solo una restricción explícita lo bloquea)', 'No puede abrir esa pestaña'], ok: 1 },
+          { p: 'Al presionar "Ver 15s" sobre una credencial, el dato…', ops: ['Queda visible para siempre', 'Se oculta automáticamente pasados 15 segundos', 'Se borra del sistema'], ok: 1 }
         ])
       ]
     },
@@ -1054,7 +1075,7 @@ Orbit.ACADEMIA_PLUS = (function () {
   ];
 
   // Versión de contenido: súbela cuando cambies texto/lecciones para que se re-sincronice.
-  var CONTENT_V = 24;
+  var CONTENT_V = 29;
   function apply() {
     try {
       if (!window.Orbit || !Orbit.store || !Orbit.store.all) return false;

@@ -1,4 +1,14 @@
-# Reporte de smoke · Orbit 360 · candidata post-hotfixes v1.163 (frontend v1330 cerrado)
+# Reporte de smoke · Orbit 360
+
+> **Nota de vigencia (2026-07-14, v1.250):** entradas verificadas EN VIVO esta sesión con `eval_js_user_view` (no solo inferidas del código), sobre la candidata v1.250:
+> - Gate central en mutación directa: `Orbit.session.set('Asesor','ase001')` + `dataScope:'ninguno'` + navegar `#/cliente360?c=<id>` por URL directa → bloqueado con toast, NO renderiza la ficha (antes solo protegía listas).
+> - `countries[]`: asesor con `countries:['GT']` + `Orbit.pais='CO'` → `dataScope()` devuelve `'ninguno'` en todos los módulos; con `Orbit.pais='TODOS'` vuelve a `'todo'`. Verificado con y sin recarga dura (cache-bust confirmado en `document.scripts`).
+> - App carga sin errores de consola tras cada tanda de cambios (`ready_for_verification` limpio en cada entrega v1.245–v1.250).
+> **Limitación reconocida:** no se generaron capturas en los 3 viewports exactos (1366×768 desktop / 768×1024 tablet / 390×844 móvil) pedidos por el paquete maestro — este entorno no expone control de tamaño de viewport real al agente; requiere DevTools del navegador del lado del usuario.
+
+> **Nota de vigencia (2026-07-13, v1.240):** este documento arrancó en v1.163 y quedó desactualizado como snapshot único. La evidencia de smoke MÁS RECIENTE y verificada en vivo (no solo inferida del código) vive distribuida en `CHANGELOG.md`, entrada por entrada — cada entrada v1.224+ documenta qué se probó con `eval_js_user_view` y el resultado exacto (ej. v1.240: bypass de rol, fallback legacy, normalización de rol persistido, dataScope de Equipo, política de bancos — los 4 reproducidos por auditoría externa, todos confirmados corregidos en vivo). Tratar el bloque original de abajo (v1.163) como histórico, no como estado actual de la plataforma.
+
+# Reporte de smoke · Orbit 360 · candidata post-hotfixes v1.163 (frontend v1330 cerrado) [HISTÓRICO]
 
 **Fecha:** 2026-07-08 · datos ficticios del seed. Smoke visual/prototipo local (no backend/Firestore/LAB/datos reales).
 

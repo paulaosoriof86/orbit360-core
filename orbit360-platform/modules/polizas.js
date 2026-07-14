@@ -17,7 +17,7 @@ Orbit.modules.polizas = (function () {
   ];
 
   function rows() {
-    return S().all('polizas').filter(p => {
+    return (window.Orbit && Orbit.accessScope ? Orbit.accessScope.filtrarPorAsesor(S().all('polizas'), p => p.asesorId, 'polizas') : S().all('polizas')).filter(p => {
       const cli = S().get('clientes', p.clienteId);
       const veh = S().all('vehiculos').find(v => v.polizaId === p.id);
       const placa = (veh && veh.placa) || p.placa || '';
@@ -31,12 +31,13 @@ Orbit.modules.polizas = (function () {
   }
 
   function render(host) {
+    const pid = (Orbit.route && Orbit.route.params && Orbit.route.params.p) || null;
+    if (pid && S().get('polizas', pid)) { Orbit.modules.cliente360.renderPolizaPagina(host, pid); return; }
     const all = S().all('polizas');
     const vig = all.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
     const primaVig = vig.reduce((s, p) => s + q.norm(p.prima, p.moneda), 0);
     const r = rows();
     st.__count = r.length + ' de ' + all.length;
-    const pid = (Orbit.route && Orbit.route.params && Orbit.route.params.p) || null;
 
     host.innerHTML = `<div class="page">
       ${K.bannerFor('polizas', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevaPoliza()">+ Nueva póliza</button>`)}
@@ -50,7 +51,7 @@ Orbit.modules.polizas = (function () {
         ${K.filterBar(FDEFS(), st)}
         <div style="overflow-x:auto"><table class="tbl">
           <thead><tr><th>Póliza</th><th>Cliente</th><th>Ramo / Producto</th><th>Aseguradora</th><th>Asesor</th><th class="num">Prima</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
-          <tbody>${r.map(p => `<tr class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')">
+          <tbody>${r.map(p => `<tr class="clickable" onclick="location.hash='#/polizas?p=${p.id}'">
             <td><span class="mono" style="font-size:12.5px;font-weight:600">${p.numero}</span><div class="muted" style="font-size:11px">${p.forma}</div></td>
             <td>${K.clienteCell(p.clienteId)}</td>
             <td><b>${p.ramo}</b><div class="muted" style="font-size:12px">${p.producto}</div></td>
@@ -62,12 +63,10 @@ Orbit.modules.polizas = (function () {
             <td style="text-align:right;color:var(--ink-3)"><button class="btn ghost sm" onclick="event.stopPropagation();Orbit.modules.polizas.verDesglose('${p.id}')" title="Desglose de prima y recibos">Desglose</button> ›</td></tr>`).join('') || emptyRow(9)}</tbody>
         </table></div>
       </div></div>`;
-
     K.wireFilters(FDEFS(), st, (id, live) => {
       if (live) { const a = document.activeElement, v = a.value; render(host); const i = document.getElementById('fq'); if (i) { i.focus(); i.value = v; i.setSelectionRange(v.length, v.length); } }
       else render(host);
     });
-    if (pid && S().get('polizas', pid)) Orbit.modules.cliente360.verPoliza(pid);
   }
   function emptyRow(n) { return `<tr><td colspan="${n}" class="muted" style="text-align:center;padding:30px">Sin resultados.</td></tr>`; }
   function filtrarEstado(e) { st.fest = st.fest === e ? '' : e; const host = document.getElementById('host'); if (host) render(host); }
@@ -116,7 +115,7 @@ Orbit.modules.polizas = (function () {
       </div>
       <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
         <button class="btn ghost" id="pd-close">Cerrar</button>
-        <button class="btn primary" onclick="document.getElementById('pol-desg').remove();Orbit.modules.cliente360.verPoliza('${p.id}')">Abrir en Cliente 360</button></div></div>`;
+        <button class="btn primary" onclick="document.getElementById('pol-desg').remove();location.hash='#/polizas?p=${p.id}'">Abrir ficha completa</button></div></div>`;
     document.body.appendChild(back);
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });

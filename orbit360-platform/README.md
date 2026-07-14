@@ -62,7 +62,7 @@ Cada ítem del sidebar lleva su badge real:
 La plataforma cubre hoy el ciclo completo: Cliente 360, Pólizas, Cobros, Renovaciones, Cancelaciones, Comisiones, Historial, Ops/Leads, Cotizador + Comparativo (con tarifas por aseguradora validables y trazables), Aseguradoras (directorio + tarifas + documentos), Correo, Automatizaciones/Integraciones, Orbit IA, Configuración (marca, usuarios, países, integraciones, con secciones técnicas segmentadas por rol), Academia, Marketing, Reportes/Insights, Finanzas, Calidad e Importador. Ver `docs/PLAN-INFRAESTRUCTURA.md` para el detalle de rondas de auditoría y pendientes P1 documentados (no bloqueantes).
 
 ## Versión
-Ver `docs/MANIFIESTO-ENTREGA-v1215.md` para el detalle exacto de la candidata vigente y `CHANGELOG.md` para el historial por versión.
+Base vigente: **v1.251** — ver `CHANGELOG.md` (entrada más reciente arriba) para el historial completo; `docs/MANIFIESTO-ENTREGA-v1251.md` resume esta ronda de correcciones P0 críticas.
 
 ## Documentación por módulo
 `docs/` — un archivo por módulo conforme se construye. Ver `docs/cliente360.md`.

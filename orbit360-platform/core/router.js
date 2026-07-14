@@ -24,7 +24,7 @@ Orbit.router = (function () {
   // ---- sidebar ----
   function buildSidebar() {
     let h = '';
-    const active = (r) => (!(Orbit.tenant && Orbit.tenant.isActive) || Orbit.tenant.isActive(r)) && (!(Orbit.session && Orbit.session.canSee) || Orbit.session.canSee(r));
+    const active = (r) => (window.Orbit && Orbit.accessScope && Orbit.accessScope.puedeVerModulo) ? Orbit.accessScope.puedeVerModulo(r) : ((!(Orbit.tenant && Orbit.tenant.isActive) || Orbit.tenant.isActive(r)) && (!(Orbit.session && Orbit.session.canSee) || Orbit.session.canSee(r)));
     Orbit.NAV.forEach(blk => {
       if (blk.type === 'home') {
         if (!active(blk.route)) return;
@@ -110,8 +110,17 @@ Orbit.router = (function () {
     Orbit.route = { key: route, params: parseQuery(qs) };
     current = route;
     setActive(route);
-    const mod = Orbit.modules[route];
+    const active = (r) => (window.Orbit && Orbit.accessScope && Orbit.accessScope.puedeVerModulo) ? Orbit.accessScope.puedeVerModulo(r) : ((!(Orbit.tenant && Orbit.tenant.isActive) || Orbit.tenant.isActive(r)) && (!(Orbit.session && Orbit.session.canSee) || Orbit.session.canSee(r)));
     host.scrollTop = 0;
+    if (route !== 'inicio' && !active(route)) {
+      host.innerHTML = `<div class="page"><div class="modstate"><div class="ms-ico">🔒</div>
+        <h2>No tienes acceso con el rol activo</h2>
+        <p>Tu rol activo no incluye este módulo. Si crees que deberías tenerlo, pedile a Dirección/Admin que lo habilite desde Configuración → Usuarios y permisos.</p>
+        <button class="btn primary" style="margin-top:14px" onclick="location.hash='#/inicio'">‹ Volver a Inicio</button>
+      </div></div>`;
+      return;
+    }
+    const mod = Orbit.modules[route];
     if (mod && typeof mod.render === 'function') {
       host.innerHTML = '';
       mod.render(host);

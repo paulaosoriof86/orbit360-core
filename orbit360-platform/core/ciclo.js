@@ -45,7 +45,23 @@ Orbit.ciclo = (function () {
   /* ===================== datos / filtros ===================== */
   function etapaInfo(id) { return E[id] || E.nuevo; }
   function paisOK(pais) { return !Orbit.pais || Orbit.pais === 'TODOS' || pais === Orbit.pais; }
-  function rolFiltro(asesorId) {
+  /* Clave de módulo canónica: un negocio vive en Leads siempre y en Ops solo cuando su
+     etapa tiene columna operativa (cotizando/inspeccion/emision) — el scope efectivo debe
+     leer la superficie que realmente lo gobierna, nunca la clave genérica 'negocios' (que no
+     existe en dataScopes.modules y por eso caía siempre al default, evadiendo un ops:'none'
+     explícito). Las gestiones son siempre superficie Ops. */
+  function moduloDeNegocio(n) { return (n && E[n.etapa] && E[n.etapa].ops) ? 'ops' : 'leads'; }
+  function rolFiltro(asesorId, modulo) {
+    const scope = (window.Orbit && Orbit.accessScope) ? Orbit.accessScope.dataScope(modulo || 'leads') : 'todo';
+    if (scope === 'ninguno') return false;
+    if (scope === 'propia') return asesorId === (Orbit.session ? Orbit.session.asesorId() : null);
+    if (scope === 'equipo') {
+      const misAsesorId = Orbit.session ? Orbit.session.asesorId() : null;
+      const mi = misAsesorId ? S().get('asesores', misAsesorId) : null;
+      const su = asesorId ? S().get('asesores', asesorId) : null;
+      if (!mi || !mi.teamId) return asesorId === misAsesorId;
+      return su && su.teamId === mi.teamId;
+    }
     if (Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor()) return asesorId === Orbit.session.asesorId();
     return true;
   }
@@ -54,12 +70,12 @@ Orbit.ciclo = (function () {
     return S().all('negocios').filter(n =>
       (opts.incArchivado ? true : !n.archivado) &&
       paisOK(n.pais) &&
-      (opts.ignoreRol ? true : rolFiltro(n.asesorId)));
+      (opts.ignoreRol ? true : rolFiltro(n.asesorId, moduloDeNegocio(n))));
   }
   function gestiones() {
     return S().all('gestiones').filter(g => !g.archivado &&
       (() => { const c = S().get('clientes', g.clienteId); return !c || paisOK(c.pais); })() &&
-      rolFiltro(g.asesorId));
+      rolFiltro(g.asesorId, 'ops'));
   }
   function primaShort(n) { return U.moneyShort(n.primaEst, n.moneda); }
   function flag(pais) { return pais === 'GT' ? '🇬🇹' : pais === 'CO' ? '🇨🇴' : '🌎'; }
@@ -74,6 +90,7 @@ Orbit.ciclo = (function () {
   /** Mueve un negocio a otra etapa, ejecutando automatizaciones. */
   function setEtapa(id, etapaId) {
     const n = S().get('negocios', id); if (!n || n.etapa === etapaId) return n;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(n.asesorId, moduloDeNegocio(n), { pais: n.pais })) { U.toast('Este negocio está fuera de tu alcance.'); return n; }
     const de = n.etapa;
     const patch = { etapa: etapaId, prob: PROB[etapaId], actualizado: today() };
     // automatización: cadencia de seguimiento al entrar a Propuesta
@@ -96,11 +113,13 @@ Orbit.ciclo = (function () {
 
   function perder(id, motivo) {
     const n = S().get('negocios', id); if (!n) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(n.asesorId, moduloDeNegocio(n), { pais: n.pais })) { U.toast('Este negocio está fuera de tu alcance.'); return; }
     log(n, 'Resultado', n.etapa, 'Perdido' + (motivo ? ' · ' + motivo : ''), 'manual');
     S().update('negocios', id, { etapa: 'perdido', prob: 0, motivoPerdido: motivo || '', actualizado: today() });
   }
   function archivar(id) {
     const n = S().get('negocios', id); if (!n) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(n.asesorId, moduloDeNegocio(n), { pais: n.pais })) { U.toast('Este negocio está fuera de tu alcance.'); return; }
     log(n, 'Archivo', '', 'Archivado', 'manual');
     S().update('negocios', id, { archivado: true });
   }
@@ -108,6 +127,7 @@ Orbit.ciclo = (function () {
   /** Emitir: crea el cliente heredando datos + activa cadencia de encuestas. */
   function emitir(id) {
     const n = S().get('negocios', id); if (!n) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(n.asesorId, moduloDeNegocio(n), { pais: n.pais })) { U.toast('Este negocio está fuera de tu alcance.'); return; }
     if (n.clienteIdCreado) return; // ya creado
     const nuevoId = 'cli' + Date.now().toString().slice(-7);
     const cli = {
@@ -127,9 +147,15 @@ Orbit.ciclo = (function () {
 
   /* ===================== gestiones (Ops admin/renov) ===================== */
   function crearGestion(g) {
+    g = g || {};
+    const misAsesorId = (window.Orbit && Orbit.session && Orbit.session.asesorId) ? Orbit.session.asesorId() : null;
+    const scope = (window.Orbit && Orbit.accessScope) ? Orbit.accessScope.dataScope('ops') : 'todo';
+    if (scope === 'ninguno') { U.toast('No tienes alcance para crear gestiones.'); return null; }
+    // Usuario restringido a 'propia'/'equipo': no puede asignar la gestión a otro asesor fuera de su alcance.
+    if ((scope === 'propia' || scope === 'equipo') && g.asesorId && !Orbit.accessScope.puedeAccederRegistro(g.asesorId, 'ops')) { U.toast('No puedes asignar la gestión a ese asesor.'); return null; }
     const base = {
       id: 'ges' + Date.now().toString().slice(-7), lista: 'Gestiones Admin', tipo: '', titulo: '',
-      clienteId: '', polizaId: '', asesorId: 'ase001', aseguradoraId: '', ramo: '',
+      clienteId: '', polizaId: '', asesorId: g.asesorId || misAsesorId || 'ase001', aseguradoraId: '', ramo: '',
       estado: 'Pendiente', prioridad: 'Media', vence: '', proximaAccion: 'Pendiente de definir',
       checklist: [], nota: '', notas: '', origen: 'manual',
       bitacora: [{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Gestión creada', origen: 'manual' }],
@@ -202,7 +228,7 @@ Orbit.ciclo = (function () {
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[g.prioridad] || 'neutral';
     const est = { 'Pendiente': 'warn', 'En proceso': 'info', 'Resuelta': 'ok' }[g.estado] || 'neutral';
     return `<div class="kcard" data-ges="${g.id}">
-      <div class="kcard-top"><span class="badge ${pr}">${g.prioridad}</span><span class="badge ${est}">${g.estado}</span></div>
+      <div class="kcard-top"><span class="badge ${pr}">${g.prioridad}</span><span class="badge ${est}">${g.estado}</span>${g.diff ? '<span class="badge info" title="Tiene cambios antes/después propuestos">🔀 diff</span>' : ''}</div>
       <div class="kcard-t">${U.esc(g.titulo || g.tipo)}</div>
       <div class="kcard-cli">${cli ? U.esc(cli.nombre) : '<span class="muted">Sin cliente</span>'}</div>
       <div class="kcard-meta"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${asg ? U.esc(asg.nombre) : '—'}</div>
@@ -235,6 +261,7 @@ Orbit.ciclo = (function () {
   /* ===================== ficha de NEGOCIO (rediseñada) ===================== */
   function openNegocio(id) {
     const n = S().get('negocios', id); if (!n) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(n.asesorId, moduloDeNegocio(n), { pais: n.pais })) { U.toast('Este negocio está fuera de tu alcance.'); return; }
     const ase = q.asesor(n.asesorId), asg = q.aseguradora(n.aseguradoraId), ei = etapaInfo(n.etapa);
     const asesores = S().all('asesores'), asgs = S().all('aseguradoras');
     const enOps = !!ei.ops;
@@ -390,6 +417,7 @@ Orbit.ciclo = (function () {
   /* ===================== ficha de GESTIÓN (Ops) ===================== */
   function openGestion(id) {
     const g = S().get('gestiones', id); if (!g) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(g.asesorId, 'ops')) { U.toast('Esta gestión está fuera de tu alcance.'); return; }
     const cli = S().get('clientes', g.clienteId), ase = q.asesor(g.asesorId), asg = q.aseguradora(g.aseguradoraId);
     const asesores = S().all('asesores'), asgs = S().all('aseguradoras');
     const Lcol = (opsListas().find(l => l.nombre === g.lista) || opsListas()[0]);
@@ -486,6 +514,7 @@ Orbit.ciclo = (function () {
   /* desdeCliente=true → la solicita el propio cliente (Portal); notifica al equipo y al asesor. */
   function solicitarGestion(clienteId, polizaId, desdeCliente) {
     const cli = S().get('clientes', clienteId); if (!cli) return;
+    if (!desdeCliente && window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(cli.asesorId, 'ops', { pais: cli.pais })) { U.toast('Este cliente está fuera de tu alcance.'); return; }
     const pols = S().where('polizas', p => p.clienteId === clienteId);
     let tipos = tiposGestion().slice();
     let adjuntos = [];
@@ -545,7 +574,12 @@ Orbit.ciclo = (function () {
 
   /* ===================== nuevo negocio / nueva gestión ===================== */
   function nuevoNegocio() {
-    const asesores = S().all('asesores');
+    const misAsesorId = (window.Orbit && Orbit.session && Orbit.session.asesorId) ? Orbit.session.asesorId() : null;
+    const scope = (window.Orbit && Orbit.accessScope) ? Orbit.accessScope.dataScope('leads') : 'todo';
+    if (scope === 'ninguno') { U.toast('No tienes alcance para crear negocios.'); return; }
+    const restringido = (scope === 'propia');
+    let asesores = S().all('asesores');
+    if (restringido && misAsesorId) asesores = asesores.filter(a => a.id === misAsesorId);
     const html = `
       <div class="ciclo-h" style="background:linear-gradient(120deg,#C5162E,#8f1020)">
         <div><div class="ciclo-eyebrow">Nuevo ingreso · ciclo comercial</div><h2>🌱 Nuevo prospecto</h2>
@@ -563,7 +597,7 @@ Orbit.ciclo = (function () {
           ${fInput('Producto', 'nn-prod', '')}
           ${fInput('Ramo', 'nn-ramo', 'Auto')}
           ${fInput('Prima estimada', 'nn-prima', 0, 'number')}
-          ${fSelectOpt('Asesor', 'nn-ase', asesores.map(a => [a.id, a.nombre]), Orbit.session ? Orbit.session.asesorId() : 'ase001')}
+          ${fSelectOpt('Asesor', 'nn-ase', asesores.map(a => [a.id, a.nombre]), misAsesorId || (Orbit.session ? Orbit.session.asesorId() : 'ase001'))}
         </div>
         ${fSelect('Punto de ingreso', 'nn-ingreso', ['Leads (interés, sin cotizar)', 'Ops (pide cotización)'], 'Ops (pide cotización)')}
         <label class="ce-l">Descripción / detalle del riesgo<textarea id="nn-desc" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px"></textarea></label>
@@ -574,10 +608,11 @@ Orbit.ciclo = (function () {
       const v = sid => (back.querySelector('#' + sid) || {}).value;
       const ingresoOps = v('nn-ingreso').indexOf('Ops') === 0;
       const pais = v('nn-pais');
+      const asesorElegido = restringido ? (misAsesorId || v('nn-ase')) : v('nn-ase');
       const n = {
         id: 'neg' + Date.now().toString().slice(-7), nombre: v('nn-nombre') || 'Prospecto', tipo: v('nn-tipo'),
         etapa: ingresoOps ? 'cotizando' : 'nuevo', prob: ingresoOps ? 45 : 10,
-        asesorId: v('nn-ase'), canal: v('nn-canal'), pais, moneda: pais === 'CO' ? 'COP' : 'GTQ',
+        asesorId: asesorElegido, canal: v('nn-canal'), pais, moneda: pais === 'CO' ? 'COP' : 'GTQ',
         producto: v('nn-prod') || 'Por definir', ramo: v('nn-ramo') || 'Auto', aseguradoraId: '',
         telefono: v('nn-tel'), email: v('nn-email'), primaEst: +v('nn-prima') || 0,
         descripcion: v('nn-desc'), notas: '', cadencia: '', cadenciaActiva: false,
@@ -592,7 +627,9 @@ Orbit.ciclo = (function () {
     });
   }
   function nuevaGestion() {
-    const g = crearGestion({ titulo: 'Nueva gestión', tipo: 'Actualizar datos de cliente', vence: inDays(7) });
+    const misAsesorId = (window.Orbit && Orbit.session && Orbit.session.asesorId) ? Orbit.session.asesorId() : null;
+    const g = crearGestion({ titulo: 'Nueva gestión', tipo: 'Actualizar datos de cliente', vence: inDays(7), asesorId: misAsesorId });
+    if (!g) return;
     refresh(); openGestion(g.id);
   }
 

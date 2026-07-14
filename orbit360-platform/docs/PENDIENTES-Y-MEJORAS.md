@@ -1,3 +1,21 @@
+## PENDIENTES vigentes post-v1.244
+
+Ver `docs/MANIFIESTO-ENTREGA-v1244.md` para el detalle completo de lo cerrado y lo pendiente honesto de esta serie (v1.224–v1.244). Resumen de lo abierto: gates de scope en mutaciones directas (no solo listas/detalle), Comparativo (criterios por tenant, orden de secciones, override por aseguradora), evidencia responsive 15 escenarios.
+
+---
+
+## PENDIENTES vigentes post-v1.224 (paquete exclusivo Claude 2026-07-13, base v1.215)
+
+Solo se resolvió P0-CL-01 en esta pasada (source-lock: legacy "post v1.97" movido a `docs/legacy/`). Queda por hacer, en este orden:
+
+- **P0-CL-02**: helper reutilizable `core/access-scope.js` (rolActivo/dataScope propia-equipo-todo-ninguno centralizado; hoy vive disperso módulo por módulo).
+- **P0-CL-03**: pasar CRM/Cliente360/Póliza/Portal por ese scope centralizado sin regresión.
+- **P0-CL-04**: Aseguradoras OP2 — bóveda de credenciales con revelación temporal (máx. 15s), resistente a re-render, identificada por `aseguradoraId|platformIndex`; hoy solo existe el estado honesto `credentialRef:'backend_required'`, sin componente de revelación.
+- **P0-CL-05**: Academia — sumar las 7 lecciones nuevas del paquete (multirol/scopes, CRM/Portal/Póliza, Aseguradoras/credenciales, importación dry-run, Cotizador/Comparativo, estados honestos) a cursos existentes, sin duplicar.
+- **P1-CL-06/07/08**: Replantear profundo de Cotizador/Comparativo, Ops/Leads (`issuance_request` + endosos con diff), evidencia responsive 1366/768/390 reproducible.
+
+---
+
 # PENDIENTES Y MEJORAS — Orbit 360 (candidata activa 2026-07-04T211525.464)
 
 > Versión unificada: candidata activa **2026-07-04T211525.464** (base comparada `205210.456`) · Academia **CONTENT_V=5**.

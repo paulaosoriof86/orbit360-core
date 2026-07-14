@@ -15,7 +15,8 @@ Orbit.modules.cobros = (function () {
   ];
 
   function rows() {
-    return S().all('cobros').filter(c => {
+    const scoped = (window.Orbit && Orbit.accessScope) ? Orbit.accessScope.filtrarPorAsesor(S().all('cobros'), c => { const p = S().get('polizas', c.polizaId); return p ? p.asesorId : null; }, 'cobros') : S().all('cobros');
+    return scoped.filter(c => {
       if (c.estado === 'Anulado' && st.fest !== 'Anulado') return false;
       // Estados de validación derivados (P0-05): reportado por cliente / conciliado / requiere validación
       const estV = estadoValidacion(c);
@@ -116,6 +117,7 @@ Orbit.modules.cobros = (function () {
   /* ---- Detalle del recibo (drawer) — abre el detalle del cobro, no la póliza ---- */
   function detalle(cobroId) {
     const c = S().get('cobros', cobroId); if (!c) return;
+    if (window.Orbit && Orbit.accessScope) { const p0 = S().get('polizas', c.polizaId); if (!Orbit.accessScope.puedeAccederRegistro((p0 || {}).asesorId || c.asesorId, 'cobros')) { U.toast('Este cobro está fuera de tu alcance.'); return; } }
     const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId), asg = p ? q.aseguradora(p.aseguradoraId) : null, ase = q.asesor(c.asesorId);
     const cur = c.moneda; const m2 = n => U.money(n, cur);
     const TT = k => (Orbit.termino ? Orbit.termino(k, cli && cli.pais) : k);
@@ -174,6 +176,7 @@ Orbit.modules.cobros = (function () {
   /* ---- Cargar factura y conciliar un recibo ya pagado (post-pago) ---- */
   function conciliarFactura(cobroId) {
     const c = S().get('cobros', cobroId); if (!c) return;
+    if (window.Orbit && Orbit.accessScope) { const cli = S().get('clientes', c.clienteId); if (!Orbit.accessScope.puedeAccederRegistro(c.asesorId || (cli && cli.asesorId), 'cobros', { pais: cli && cli.pais })) { U.toast('Este cobro está fuera de tu alcance.'); return; } }
     let pm = document.getElementById('cob-conc'); if (pm) pm.remove();
     pm = document.createElement('div'); pm.id = 'cob-conc'; pm.className = 'drawer-back open';
     pm.style.cssText = 'display:grid;place-items:center;z-index:210';
@@ -218,6 +221,7 @@ Orbit.modules.cobros = (function () {
   /* ---- Validar un pago REPORTADO por el cliente (paso previo a aplicar) ---- */
   function validarReporte(cobroId) {
     const c = S().get('cobros', cobroId); if (!c) return;
+    if (window.Orbit && Orbit.accessScope) { const p0 = S().get('polizas', c.polizaId); if (!Orbit.accessScope.puedeAccederRegistro((p0 || {}).asesorId || c.asesorId, 'cobros')) { U.toast('Este cobro está fuera de tu alcance.'); return; } }
     const cli = S().get('clientes', c.clienteId) || {};
     let pm = document.getElementById('cob-val'); if (pm) pm.remove();
     pm = document.createElement('div'); pm.id = 'cob-val'; pm.className = 'drawer-back open';
@@ -259,6 +263,7 @@ Orbit.modules.cobros = (function () {
   /* ---- Confirmar cobro (modal reutilizable: desde la ficha del recibo y desde la tabla) ---- */
   function aplicarPago(cobroId) {
       const c = S().get('cobros', cobroId); if (!c) return;
+      if (window.Orbit && Orbit.accessScope) { const p0 = S().get('polizas', c.polizaId); if (!Orbit.accessScope.puedeAccederRegistro((p0 || {}).asesorId || c.asesorId, 'cobros')) { U.toast('Este cobro está fuera de tu alcance.'); return; } }
       const cur = c.moneda;
       let pm = document.getElementById('cob-pay'); if (pm) pm.remove();
       pm = document.createElement('div'); pm.id = 'cob-pay'; pm.className = 'drawer-back open';
@@ -326,7 +331,8 @@ Orbit.modules.cobros = (function () {
 
   /* ---- Notificación de cobro por LOTE (selecciona recibos pendientes/vencidos) ---- */
   function lote() {
-    const arr = S().all('cobros').filter(c => { if (c.estado !== 'Pendiente' && c.estado !== 'Vencido') return false; const cli = S().get('clientes', c.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (cli && cli.pais === Orbit.pais); }).sort((a, b) => (a.vence || '').localeCompare(b.vence || ''));
+    let arr = S().all('cobros').filter(c => { if (c.estado !== 'Pendiente' && c.estado !== 'Vencido') return false; const cli = S().get('clientes', c.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (cli && cli.pais === Orbit.pais); }).sort((a, b) => (a.vence || '').localeCompare(b.vence || ''));
+    if (window.Orbit && Orbit.accessScope) arr = Orbit.accessScope.filtrarPorAsesor(arr, c => c.asesorId || (S().get('clientes', c.clienteId) || {}).asesorId, 'cobros');
     const incl = new Set(arr.map(c => c.id));
     let back = document.getElementById('cob-lote'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'cob-lote'; back.className = 'drawer-back open';

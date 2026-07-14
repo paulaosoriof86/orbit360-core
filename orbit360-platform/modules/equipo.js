@@ -173,14 +173,22 @@ Orbit.modules.equipo = (function () {
           <label class="ce-l">Meta recaudo<input id="eu-rec" class="o-sel" type="number" value="${a.metaRecaudo || 0}"></label>
         </div>
         <div>
-          <div class="ce-l" style="margin-bottom:6px">Roles del usuario <span class="muted">(puede tener varios; el primero es el principal)</span></div>
+          <div class="ce-l" style="margin-bottom:6px">Roles del usuario <span class="muted">(puede tener varios)</span></div>
           <div style="display:flex;flex-wrap:wrap;gap:8px">${roles.map(r => `<label class="chiprole"><input type="checkbox" class="eu-role" value="${r}" ${rolesSel.indexOf(r) >= 0 ? 'checked' : ''}> ${r}</label>`).join('')}</div>
+          <label class="ce-l" style="margin-top:8px">Rol por defecto al iniciar sesión<select id="eu-roldef" class="o-sel">${rolesSel.map(r => `<option ${r === (a.rolDefault || rolesSel[0]) ? 'selected' : ''}>${r}</option>`).join('')}</select></label>
+          <div class="muted" style="font-size:11px;margin-top:3px">Solo puede elegir entre los roles marcados arriba. El selector de rol del topbar solo ofrecerá estos roles.</div>
         </div>
         <label class="ce-l">Alcance de cartera que ve este usuario<select id="eu-scope" class="o-sel">
-          <option value="propia" ${(a.dataScope || 'propia') === 'propia' ? 'selected' : ''}>Solo su propia cartera</option>
+          <option value="propia" ${(a.dataScope || (rolesSel.some(r => Orbit.ROLES[r] && Orbit.ROLES[r].nivel >= 4) ? 'todo' : 'propia')) === 'propia' ? 'selected' : ''}>Solo su propia cartera</option>
           <option value="equipo" ${a.dataScope === 'equipo' ? 'selected' : ''}>Su equipo (si tiene reportes directos)</option>
-          <option value="todo" ${a.dataScope === 'todo' ? 'selected' : ''}>Toda la cartera (Dirección/Admin)</option>
-        </select><div class="muted" style="font-size:11.5px;margin-top:4px">Declara qué cartera debería ver este usuario. La aplicación aún corre en modo de un solo inicio de sesión de demostración (con selector de rol arriba) — aplicar este alcance a un login real por usuario queda para cuando haya autenticación individual.</div></label>
+          <option value="todo" ${(a.dataScope || (rolesSel.some(r => Orbit.ROLES[r] && Orbit.ROLES[r].nivel >= 4) ? 'todo' : 'propia')) === 'todo' ? 'selected' : ''}>Toda la cartera (Dirección/Admin)</option>
+          <option value="ninguno" ${a.dataScope === 'ninguno' ? 'selected' : ''}>Ninguna (acceso bloqueado a datos de cartera)</option>
+        </select><div class="muted" style="font-size:11.5px;margin-top:4px">Este alcance ahora SÍ se aplica en vivo (Cliente360, Pólizas, Cobros, Renovaciones, Siniestros, Comisiones, Ops, Leads) — cambiarlo afecta inmediatamente lo que ese usuario puede consultar.</div></label>
+        <label class="ce-l">Equipo <span class="muted">(para alcance "su equipo")</span><input id="eu-team" class="o-sel" value="${U.esc(a.teamId || '')}" placeholder="ej. equipo-norte"></label>
+        <div>
+          <div class="ce-l" style="margin-bottom:6px">Países habilitados para este usuario</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">${Orbit.PAISES.filter(p => p.id !== 'TODOS').map(p => `<label class="chiprole"><input type="checkbox" class="eu-pais" value="${p.id}" ${(a.countries && a.countries.length ? a.countries.indexOf(p.id) >= 0 : true) ? 'checked' : ''}> ${p.label}</label>`).join('')}</div>
+        </div>
         <details>
           <summary style="cursor:pointer;font-weight:700;font-size:13px;font-family:var(--f-display)">⚙ Módulos visibles para este usuario <span class="muted" style="font-weight:400">(opcional — por defecto los del rol)</span></summary>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px 12px;margin-top:10px">${TODOS_MOD.map(m => `<label class="ce-l ck" style="font-size:12.5px"><input type="checkbox" class="eu-mod" value="${m}" ${modActual ? (modActual.indexOf(m) >= 0 ? 'checked' : '') : 'checked'}> ${U.esc((modLabel[m] || m))}</label>`).join('')}</div>
@@ -192,8 +200,11 @@ Orbit.modules.equipo = (function () {
           <div style="display:grid;gap:6px;margin-top:10px;font-size:12.5px">
             <label class="ce-l ck"><input type="checkbox" id="eu-perm-asg-extra" ${(a.permisosExtra || []).indexOf('aseguradoras_editar') >= 0 ? 'checked' : ''}> Extra: puede <b>editar Aseguradoras</b> aunque su rol no lo permita</label>
             <label class="ce-l ck"><input type="checkbox" id="eu-perm-asg-restr" ${(a.restricciones || []).indexOf('aseguradoras_editar') >= 0 ? 'checked' : ''}> Restricción: <b>no puede editar Aseguradoras</b> aunque su rol sí lo permita</label>
+            <hr style="border:none;border-top:1px solid var(--line);margin:2px 0">
+            <label class="ce-l ck"><input type="checkbox" id="eu-perm-plat-extra" ${(a.permisosExtra || []).indexOf('aseguradoras_plataformas_credenciales') >= 0 ? 'checked' : ''}> Extra: puede <b>ver/copiar credenciales de plataformas</b> de aseguradoras</label>
+            <label class="ce-l ck"><input type="checkbox" id="eu-perm-plat-restr" ${(a.restricciones || []).indexOf('aseguradoras_plataformas_credenciales') >= 0 ? 'checked' : ''}> Restricción: <b>no puede ver/copiar credenciales de plataformas</b></label>
           </div>
-          <div class="muted" style="font-size:11.5px;margin-top:6px">Estas casillas anulan puntualmente lo que el rol define, sin cambiarle el rol al usuario. La restricción siempre gana sobre el extra.</div>
+          <div class="muted" style="font-size:11.5px;margin-top:6px">Las cuentas bancarias operativas son visibles/copiables para cualquiera con acceso a Aseguradoras — no tienen restricción por usuario. Solo las credenciales de plataformas requieren permiso explícito (Dirección/Admin/Operativo, o extra). La restricción siempre gana sobre el extra.</div>
         </details>
         <div class="cfg-note">🔐 Al guardar un usuario nuevo, se prepara la <b>invitación de acceso</b> al correo y WhatsApp indicados, pendiente de confirmación de entrega. El correo configurado acá será su usuario de ingreso y el que se asocia a su bandeja.</div>
       </div>
@@ -205,15 +216,75 @@ Orbit.modules.equipo = (function () {
     const $ = s => back.querySelector(s);
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#eu-x').addEventListener('click', close); $('#eu-cancel').addEventListener('click', close);
-    $('#eu-ok').addEventListener('click', () => {
+    $('#eu-ok').addEventListener('click', async () => {
       const rolesChecked = [...back.querySelectorAll('.eu-role:checked')].map(c => c.value);
       const rolesFinal = rolesChecked.length ? rolesChecked : ['Asesor'];
+      const roldefSel = $('#eu-roldef') ? $('#eu-roldef').value : rolesFinal[0];
+      const rolDefault = rolesFinal.indexOf(roldefSel) >= 0 ? roldefSel : rolesFinal[0];
       const modsChecked = [...back.querySelectorAll('.eu-mod:checked')].map(c => c.value);
       const modOverride = (modsChecked.length && modsChecked.length < TODOS_MOD.length) ? modsChecked : null;
-      const permisosExtra = $('#eu-perm-asg-extra').checked ? ['aseguradoras_editar'] : [];
-      const restricciones = $('#eu-perm-asg-restr').checked ? ['aseguradoras_editar'] : [];
-      const data = { nombre: $('#eu-nombre').value || 'Usuario', rol: rolesFinal[0], roles: rolesFinal, dataScope: $('#eu-scope').value, telefono: $('#eu-tel').value, email: $('#eu-email').value, color: $('#eu-color').value, metaPrima: +$('#eu-meta').value || 0, metaRecaudo: +$('#eu-rec').value || 0, inactivo: $('#eu-inact').checked, modulosOverride: modOverride, permisosExtra, restricciones };
-      if (id) S().update('asesores', id, data);
+      const permisosExtra = ['aseguradoras_editar', 'aseguradoras_plataformas_credenciales'].filter(k => {
+        const map = { aseguradoras_editar: '#eu-perm-asg-extra', aseguradoras_plataformas_credenciales: '#eu-perm-plat-extra' };
+        const el = $(map[k]); return el && el.checked;
+      });
+      const restricciones = ['aseguradoras_editar', 'aseguradoras_plataformas_credenciales'].filter(k => {
+        const map = { aseguradoras_editar: '#eu-perm-asg-restr', aseguradoras_plataformas_credenciales: '#eu-perm-plat-restr' };
+        const el = $(map[k]); return el && el.checked;
+      });
+      const scopeNuevo = $('#eu-scope').value;
+      const teamId = $('#eu-team').value.trim();
+      const countries = [...back.querySelectorAll('.eu-pais:checked')].map(c => c.value);
+      const scopeAntes = a.dataScope || 'propia';
+      const inactAntes = !!a.inactivo, inactDespues = $('#eu-inact').checked;
+      const rolesAntes = a.roles || (a.rol ? [a.rol] : []);
+      const PRIVILEGIADOS = ['Dirección', 'Admin'];
+      const agregaRolPrivilegiado = rolesFinal.some(r => PRIVILEGIADOS.indexOf(r) >= 0 && rolesAntes.indexOf(r) < 0);
+      const ampliaScope = (scopeAntes === 'ninguno' && scopeNuevo !== 'ninguno') || (scopeAntes === 'propia' && (scopeNuevo === 'equipo' || scopeNuevo === 'todo')) || (scopeAntes === 'equipo' && scopeNuevo === 'todo');
+      const retiraRestriccion = (a.restricciones || []).some(r => restricciones.indexOf(r) < 0);
+      const reactivaMembresia = inactAntes && !inactDespues;
+      const agregaModulo = modOverride && (!a.modulosOverride || modOverride.some(m => a.modulosOverride.indexOf(m) < 0));
+      const paisesAntes = a.countries || [];
+      const agregaPais = paisesAntes.length && countries.some(p => paisesAntes.indexOf(p) < 0);
+      const ampliaAcceso = ampliaScope || permisosExtra.some(p => (a.permisosExtra || []).indexOf(p) < 0) || agregaRolPrivilegiado || retiraRestriccion || reactivaMembresia || agregaModulo || agregaPais;
+      let motivoExacto = '';
+      if (ampliaAcceso) {
+        const motivos = [];
+        if (ampliaScope) motivos.push('alcance ' + scopeAntes + '→' + scopeNuevo);
+        if (agregaRolPrivilegiado) motivos.push('rol privilegiado agregado');
+        if (retiraRestriccion) motivos.push('restricción retirada');
+        if (reactivaMembresia) motivos.push('membresía reactivada');
+        if (agregaModulo) motivos.push('módulo agregado');
+        if (agregaPais) motivos.push('país agregado');
+        if (permisosExtra.some(p => (a.permisosExtra || []).indexOf(p) < 0)) motivos.push('permiso extra agregado');
+        const conf = (await U.prompt('Estás ampliando el acceso de este usuario (' + motivos.join(', ') + '). Escribí exactamente CONFIRMO AMPLIAR ACCESO y el motivo:', { title: '⚠ Confirmación reforzada' }) || '').trim();
+        if (conf.indexOf('CONFIRMO AMPLIAR ACCESO') !== 0) { U.toast('Cambio cancelado — no se amplió el acceso.'); return; }
+        motivoExacto = conf;
+      }
+      const modulesExtra = modOverride ? modOverride.filter(m => TODOS_MOD.indexOf(m) >= 0 && (Orbit.ROLES[rolDefault] && (Orbit.ROLES[rolDefault].modulos || []).indexOf(m) < 0)) : [];
+      const modulesRestricted = modOverride ? TODOS_MOD.filter(m => (Orbit.ROLES[rolDefault] && (Orbit.ROLES[rolDefault].modulos || []).indexOf(m) >= 0) && modOverride.indexOf(m) < 0) : [];
+      const data = { nombre: $('#eu-nombre').value || 'Usuario', rol: rolDefault, roles: rolesFinal, rolDefault, dataScope: scopeNuevo, teamId: teamId || null, countries, telefono: $('#eu-tel').value, email: $('#eu-email').value, color: $('#eu-color').value, metaPrima: +$('#eu-meta').value || 0, metaRecaudo: +$('#eu-rec').value || 0, inactivo: inactDespues, modulosOverride: modOverride, modulesExtra, modulesRestricted, dataScopes: { default: scopeNuevo, modules: (a.dataScopes && a.dataScopes.modules) || {} }, permisosExtra, restricciones };
+      if (id) {
+        const before = { rol: a.rol, roles: a.roles, dataScope: a.dataScope, dataScopes: a.dataScopes, permisosExtra: a.permisosExtra, restricciones: a.restricciones, inactivo: a.inactivo, modulosOverride: a.modulosOverride, modulesExtra: a.modulesExtra, modulesRestricted: a.modulesRestricted, countries: a.countries };
+        S().update('asesores', id, data);
+        const diffIntegral = {
+          roles: { antes: before.roles || [], despues: rolesFinal },
+          rolDefault: { antes: before.rol || '', despues: rolDefault },
+          scopeDefault: { antes: (before.dataScopes && before.dataScopes.default) || before.dataScope || 'propia', despues: scopeNuevo },
+          scopePorModulo: { antes: (before.dataScopes && before.dataScopes.modules) || {}, despues: data.dataScopes.modules },
+          modulesExtra: { antes: before.modulesExtra || [], despues: modulesExtra },
+          modulesRestricted: { antes: before.modulesRestricted || [], despues: modulesRestricted },
+          paises: { antes: before.countries || [], despues: countries },
+          permisosExtra: { antes: before.permisosExtra || [], despues: permisosExtra },
+          restricciones: { antes: before.restricciones || [], despues: restricciones },
+          estado: { antes: before.inactivo ? 'inactivo' : 'activo', despues: inactDespues ? 'inactivo' : 'activo' }
+        };
+        S().insert('actividades', {
+          id: 'act' + Date.now(), clienteId: '', asesorId: id, tipo: 'sistema', icon: '🔐', fecha: Orbit.ui.today(),
+          titulo: 'Permisos actualizados: ' + U.esc(data.nombre),
+          detalle: 'Actor: ' + (Orbit.session ? Orbit.session.rol() : '—') + ' · Antes: rol ' + (before.rol || '—') + ', scope ' + (diffIntegral.scopeDefault.antes) + ', países ' + (paisesAntes.join(',') || 'todos') + ', activo ' + !before.inactivo + ' → Ahora: rol ' + rolDefault + ', scope ' + scopeNuevo + ', países ' + (countries.join(',') || 'todos') + ', activo ' + !inactDespues + (ampliaAcceso ? ' [AMPLIACIÓN CONFIRMADA — motivo exacto: "' + motivoExacto + '"]' : ''),
+          motivoExacto: motivoExacto || null, diffIntegral, ampliacionConfirmada: !!ampliaAcceso, timestamp: Date.now(), rolActor: (Orbit.session ? Orbit.session.rol() : '—')
+        });
+      }
       else { data.id = 'ase' + Date.now().toString().slice(-5); data.iniciales = data.nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; S().insert('asesores', data); const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Usuario creado · invitación preparada, pendiente de confirmación (' + (data.email || 'su correo') + ')'; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
       close(); render(document.getElementById('host') || document.getElementById('mod-host'));
     });

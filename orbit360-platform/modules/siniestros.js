@@ -13,7 +13,9 @@ Orbit.modules.siniestros = (function () {
   const TONE = { 'Reportado': 'warn', 'En análisis': 'info', 'Documentación': 'info', 'Aprobado': 'ok', 'Pagado': 'ok', 'Rechazado': 'danger' };
 
   function paisOK(cid) { const c = S().get('clientes', cid); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }
-  function todos() { return S().all('reclamos').filter(r => paisOK(r.clienteId)); }
+  function todos() {
+    return (window.Orbit && Orbit.accessScope ? Orbit.accessScope.filtrarPorAsesor(S().all('reclamos'), r => r.asesorId, 'siniestros') : S().all('reclamos')).filter(r => paisOK(r.clienteId));
+  }
 
   function render(h) {
     host = h;
@@ -65,6 +67,7 @@ Orbit.modules.siniestros = (function () {
 
   function ficha(id) {
     const r = S().get('reclamos', id); if (!r) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(r.asesorId, 'siniestros')) { U.toast('Este siniestro está fuera de tu alcance.'); return; }
     const cli = S().get('clientes', r.clienteId), p = S().get('polizas', r.polizaId), asg = q.aseguradora(r.aseguradoraId), ase = q.asesor(r.asesorId);
     const cur = (cli && cli.moneda) || 'GTQ';
     const correos = (Orbit.correo ? Orbit.correo.deEntidad('reclamo', id, r.clienteId) : []);
@@ -132,7 +135,9 @@ Orbit.modules.siniestros = (function () {
   }
 
   function nuevo() {
-    const clientes = S().all('clientes');
+    let clientes = S().all('clientes');
+    if (window.Orbit && Orbit.accessScope) clientes = Orbit.accessScope.filtrarPorAsesor(clientes, c => c.asesorId, 'siniestros');
+    if (!clientes.length) { U.toast('No tienes clientes en tu alcance para registrar un reclamo.'); return; }
     const cid0 = clientes[0] && clientes[0].id;
     let back = document.getElementById('si-new-dr'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'si-new-dr'; back.className = 'drawer-back open';

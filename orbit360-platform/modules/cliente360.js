@@ -52,7 +52,8 @@ Orbit.modules.cliente360 = (function () {
      LISTA (cartera de clientes)
      ========================================================= */
   function lista() {
-    const clientes = S().all('clientes');
+    const clientesBase = (window.Orbit && Orbit.accessScope) ? Orbit.accessScope.filtrarPorAsesor(S().all('clientes'), c => c.asesorId, 'cliente360') : S().all('clientes');
+    const clientes = clientesBase;
     const asesores = S().all('asesores');
     const f = filtros;
     const rows = clientes.filter(c =>
@@ -142,7 +143,20 @@ Orbit.modules.cliente360 = (function () {
      ========================================================= */
   function detalle(cid) {
     const r = q.clienteResumen(cid);
+    if (window.Orbit && Orbit.accessScope && r && r.cli && !Orbit.accessScope.puedeAccederRegistro(r.cli.asesorId, 'clientes')) { U.toast('Este cliente está fuera de tu alcance.'); location.hash = '#/cliente360'; return; }
     const c = r.cli, ase = q.asesor(c.asesorId);
+    const scope = (window.Orbit && Orbit.accessScope) ? Orbit.accessScope.dataScope('cliente360') : 'todo';
+    const misAsesorId = (window.Orbit && Orbit.session && Orbit.session.asesorId) ? Orbit.session.asesorId() : null;
+    const fueraDeAlcance = (window.Orbit && Orbit.accessScope) ? (Orbit.accessScope.filtrarPorAsesor([c], x => x.asesorId, 'cliente360').length === 0) : false;
+    if (fueraDeAlcance) {
+      host.innerHTML = `<div class="page"><div class="card" style="padding:24px;text-align:center">
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px">🔒 Cliente fuera de tu alcance</div>
+        <div class="muted" style="margin-bottom:14px">Este cliente está asignado a otro asesor. Si crees que la asignación es incorrecta, generá una gestión de corrección.</div>
+        <button class="btn ghost sm" onclick="location.hash='#/cliente360'">‹ Volver a Clientes 360</button>
+        <button class="btn primary sm" onclick="Orbit.modules.cliente360.solicitarCorreccionAsignacion('${cid}')">Crear gestión de corrección</button>
+      </div></div>`;
+      return;
+    }
     const tabs = [
       ['resumen', 'Resumen', '📊'], ['polizas', 'Pólizas', '📑'], ['vehiculos', 'Vehículos', '🚗'], ['cobros', 'Cobros', '💳'],
       ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['documentos', 'Documentos', '📂'], ['historial', 'Historial', '📝']
@@ -631,6 +645,7 @@ Orbit.modules.cliente360 = (function () {
      que el portal del cliente: sin almacenar el binario (metaOnly). */
   function subirDocumento(cid, polizaId) {
     const cli = Orbit.store.get('clientes', cid); if (!cli) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(cli.asesorId, 'clientes')) { U.toast('Este cliente está fuera de tu alcance.'); return; }
     const tipos = ['DPI / Cédula', 'RTU / RUT', 'Póliza', 'Endoso', 'Comprobante de domicilio', 'Otro'];
     let back = document.getElementById('c360-doc'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'c360-doc'; back.className = 'drawer-back open';
@@ -715,6 +730,7 @@ Orbit.modules.cliente360 = (function () {
   /* ---- Editar ficha (modal) ---- */
   function edit(cid) {
     const c = S().get('clientes', cid); if (!c) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(c.asesorId, 'clientes')) { U.toast('Este cliente está fuera de tu alcance.'); return; }
     const asesores = S().all('asesores');
     let back = document.getElementById('c360-edit');
     if (back) back.remove();
@@ -804,6 +820,7 @@ Orbit.modules.cliente360 = (function () {
   /* ---- Renovar: modificar No. póliza, aseguradora, prima ---- */
   function renovar(polId) {
     const p = S().get('polizas', polId); if (!p) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(p.asesorId, 'polizas')) { U.toast('Esta póliza está fuera de tu alcance.'); return; }
     const asgs = S().all('aseguradoras');
     let back = document.getElementById('c360-edit'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
@@ -875,6 +892,7 @@ Orbit.modules.cliente360 = (function () {
   /* ---- Comparativo inteligente: renovación vs actual ---- */
   function comparativo(polId) {
     const p = S().get('polizas', polId); if (!p) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(p.asesorId, 'polizas')) { U.toast('Esta póliza está fuera de tu alcance.'); return; }
     const asg = q.aseguradora(p.aseguradoraId);
     p.propuestasRenov = p.propuestasRenov || [];
     let back = document.getElementById('c360-edit'); if (back) back.remove();
@@ -958,30 +976,25 @@ Orbit.modules.cliente360 = (function () {
     paint();
   }
 
-  /* ---- Detalle de póliza (drawer) ---- */
-  function verPoliza(polId) {
-    const p = Orbit.store.get('polizas', polId); if (!p) return;
+  /* ---- Contenido de la ficha de póliza (compartido entre modal rápido y página completa) ---- */
+  function fichaPolizaHtml(polId, opts) {
+    opts = opts || {};
+    const p = Orbit.store.get('polizas', polId); if (!p) return '';
     const cid = p.clienteId, asg = q.aseguradora(p.aseguradoraId), ase = q.asesor(p.asesorId);
     const veh = q.vehiculoDePoliza(polId);
     const cob = Orbit.store.where('cobros', c => c.polizaId === polId).sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
     const d = U.daysFromNow(p.vigenciaFin);
     const cur = p.moneda;
     const m2 = (n) => U.money(n, cur);
-    // totales del cuadro de recibos
     const sum = (k) => cob.reduce((s, c) => s + (+c[k] || 0), 0);
-    let back = document.getElementById('c360-edit'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center';
-    const __prevHash = location.hash;
-    if (!/[?&]p=/.test(__prevHash)) { const sep = __prevHash.indexOf('?') >= 0 ? '&' : '?'; history.replaceState(null, '', __prevHash + sep + 'p=' + polId); }
     const estBadge = U.estadoBadge(p.estado);
     const renBadge = p.renovable ? '<span class="badge ok">Renovable</span>' : '<span class="badge neutral">No renovable</span>';
-    back.innerHTML = `<div class="card" style="width:min(960px,96vw);max-height:92vh;overflow:auto;padding:0">
-      <div class="vp-head">
-        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Póliza · ${p.tipoPoliza || 'Individual'}</div>
+    return `
+      <div class="vp-head" style="${opts.pagina ? 'border-radius:14px' : ''}">
+        <div>${opts.pagina ? '<div class="crumb" style="margin-bottom:6px"><a style="color:rgba(255,255,255,.85);cursor:pointer" onclick="location.hash=\'#/polizas\'">‹ Volver a Pólizas</a></div>' : `<div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Póliza · ${p.tipoPoliza || 'Individual'}</div>`}
           <b style="font-family:var(--f-display);font-size:19px;color:#fff">${p.ramo} · ${U.esc(p.producto)}</b>
           <div class="mono" style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${p.numero} · ${asg ? U.esc(asg.nombre) : '—'}</div></div>
-        <button class="imp-x" id="vp-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
+        ${opts.pagina ? '' : '<button class="imp-x" id="vp-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>'}
       </div>
       <div style="padding:18px 20px;display:grid;gap:16px">
         <div class="vp-tags">${estBadge}${renBadge}${p.multianual ? '<span class="badge info">Multianual</span>' : ''}<span class="badge neutral">${p.contadorRenovaciones || 0} renovaciones</span></div>
@@ -1065,12 +1078,28 @@ Orbit.modules.cliente360 = (function () {
         <button class="btn ghost" onclick="Orbit.ciclo.solicitarGestion('${cid}','${polId}')">🗂 Solicitar gestión</button>
         <button class="btn ghost" onclick="Orbit.modules.cliente360.comparativo('${polId}')">⚖ Comparar renovación</button>
         ${p.renovable ? `<button class="btn primary" onclick="Orbit.modules.cliente360.renovar('${polId}')">🔄 Renovar</button>` : ''}
-      </div>
-    </div>`;
+      </div>`;
+  }
+  /* ---- Detalle de póliza (modal rápido, usado desde Cliente360/tablas) ---- */
+  function verPoliza(polId) {
+    const p = Orbit.store.get('polizas', polId); if (!p) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(p.asesorId, 'polizas')) { U.toast('Esta póliza está fuera de tu alcance.'); return; }
+    let back = document.getElementById('c360-edit'); if (back) back.remove();
+    back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
+    back.style.display = 'grid'; back.style.placeItems = 'center';
+    const __prevHash = location.hash;
+    if (!/[?&]p=/.test(__prevHash)) { const sep = __prevHash.indexOf('?') >= 0 ? '&' : '?'; history.replaceState(null, '', __prevHash + sep + 'p=' + polId); }
+    back.innerHTML = `<div class="card" style="width:min(960px,96vw);max-height:92vh;overflow:auto;padding:0">${fichaPolizaHtml(polId, { pagina: false })}</div>`;
     document.body.appendChild(back);
     const close = () => { back.remove(); if (location.hash.indexOf('p=' + polId) >= 0) history.replaceState(null, '', __prevHash.split(/[?&]p=/)[0] || __prevHash); };
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#vp-x').addEventListener('click', close);
+  }
+  /* ---- Ficha-página completa de Póliza (ruta navegable #/polizas?p=id) ---- */
+  function renderPolizaPagina(host, polId) {
+    const p = Orbit.store.get('polizas', polId);
+    if (!p) { host.innerHTML = '<div class="page"><div class="modstate"><div class="ms-ico">🔎</div><h2>Póliza no encontrada</h2><button class="btn primary" onclick="location.hash=\'#/polizas\'">‹ Volver a Pólizas</button></div></div>'; return; }
+    host.innerHTML = `<div class="page"><div class="card" style="padding:0;overflow:hidden">${fichaPolizaHtml(polId, { pagina: true })}</div></div>`;
   }
 
   /* ---- Siniestros / Reclamos del cliente ---- */
@@ -1157,6 +1186,7 @@ Orbit.modules.cliente360 = (function () {
   /* ---- Endoso / gestión que modifica la póliza (manual · importar · inteligente) ---- */
   function endoso(polId) {
     const p = S().get('polizas', polId); if (!p) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(p.asesorId, 'polizas')) { U.toast('Esta póliza está fuera de tu alcance.'); return; }
     const tipos = ['Endoso de aumento de suma', 'Endoso de reducción', 'Sustitución de vehículo', 'Cambio de propietario', 'Inclusión de beneficiario', 'Modificación de cobertura', 'Endoso de cancelación parcial'];
     let back = document.getElementById('c360-endoso'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'c360-endoso'; back.className = 'drawer-back open';
@@ -1170,7 +1200,14 @@ Orbit.modules.cliente360 = (function () {
         <div id="en-import" style="display:none"><div class="cfg-note">Cargá el documento del endoso (PDF/imagen). El extractor leerá tipo, fecha y montos, y <b>señalará lo que no pueda leer</b>. Quedará en el Drive del cliente.</div><input type="file" id="en-file" class="o-sel" style="margin-top:9px"></div>
         <label class="ce-l">Tipo de endoso<select id="en-tipo" class="o-sel">${tipos.map(t => `<option>${t}</option>`).join('')}</select></label>
         <label class="ce-l">Fecha<input id="en-fecha" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
-        <label class="ce-l">Detalle<textarea id="en-det" class="o-sel" style="min-height:56px;resize:vertical;padding:9px 11px" placeholder="Descripción del cambio que aplica a la póliza…"></textarea></label>
+        <div class="cfg-note" style="margin:0">Diferencia propuesta (antes → después) — se guarda como comparación explícita, no solo texto libre.</div>
+        <div class="cgrid" style="grid-template-columns:1fr 1fr">
+          <label class="ce-l">Prima neta actual<input id="en-neta-antes" class="o-sel" type="number" value="${p.primaNeta || ''}" disabled></label>
+          <label class="ce-l">Prima neta propuesta<input id="en-neta-despues" class="o-sel" type="number" placeholder="dejar igual si no cambia"></label>
+          <label class="ce-l">Suma asegurada actual<input id="en-suma-antes" class="o-sel" type="number" value="${p.sumaAsegurada || ''}" disabled></label>
+          <label class="ce-l">Suma asegurada propuesta<input id="en-suma-despues" class="o-sel" type="number" placeholder="dejar igual si no cambia"></label>
+        </div>
+        <label class="ce-l">Detalle adicional<textarea id="en-det" class="o-sel" style="min-height:56px;resize:vertical;padding:9px 11px" placeholder="Descripción del cambio que aplica a la póliza…"></textarea></label>
         <div class="cfg-note">Se registra como <b>gestión pendiente de revisión en Orbit Ops</b> — el endoso no modifica la póliza hasta que el equipo lo confirme con el documento de la aseguradora.</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
@@ -1184,19 +1221,27 @@ Orbit.modules.cliente360 = (function () {
     back.querySelectorAll('.seg-b').forEach(b => b.addEventListener('click', () => { back.querySelectorAll('.seg-b').forEach(x => x.classList.remove('active')); b.classList.add('active'); back.querySelector('#en-import').style.display = b.dataset.mode === 'import' ? '' : 'none'; }));
     back.querySelector('#en-ok').addEventListener('click', () => {
       const tipo = back.querySelector('#en-tipo').value, fecha = back.querySelector('#en-fecha').value, det = back.querySelector('#en-det').value.trim();
+      const netaAntes = p.primaNeta || 0, netaDespues = back.querySelector('#en-neta-despues').value ? +back.querySelector('#en-neta-despues').value : netaAntes;
+      const sumaAntes = p.sumaAsegurada || 0, sumaDespues = back.querySelector('#en-suma-despues').value ? +back.querySelector('#en-suma-despues').value : sumaAntes;
+      const diff = { primaNeta: { antes: netaAntes, despues: netaDespues }, sumaAsegurada: { antes: sumaAntes, despues: sumaDespues } };
+      const cambios = [];
+      if (netaDespues !== netaAntes) cambios.push('Prima neta: ' + U.money(netaAntes, p.moneda) + ' → ' + U.money(netaDespues, p.moneda));
+      if (sumaDespues !== sumaAntes) cambios.push('Suma asegurada: ' + U.money(sumaAntes, p.moneda) + ' → ' + U.money(sumaDespues, p.moneda));
       Orbit.ciclo.crearGestion({
         lista: 'Renovaciones / Modif.', tipo, titulo: tipo + ' · ' + p.numero,
         clienteId: p.clienteId, polizaId: polId, asesorId: p.asesorId, aseguradoraId: p.aseguradoraId, ramo: p.ramo, prioridad: 'Media',
-        nota: (det || 'Sin detalle adicional') + '\nFecha solicitada: ' + fecha + '\nEstado: pendiente de confirmar con documento de la aseguradora — no modifica la póliza todavía.'
+        diff: diff,
+        nota: (cambios.length ? cambios.join(' · ') + '\n' : '') + (det || 'Sin detalle adicional') + '\nFecha solicitada: ' + fecha + '\nEstado: pendiente de confirmar con documento de la aseguradora — no modifica la póliza todavía.'
       });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: p.clienteId, asesorId: p.asesorId, tipo: 'sistema', icon: '📜', fecha, titulo: 'Endoso solicitado: ' + tipo + ' · ' + p.numero, detalle: det || '' });
-      close(); U.toast('✓ Endoso registrado como gestión pendiente en Ops.'); verPoliza(polId);
+      S().insert('actividades', { id: 'act' + Date.now(), clienteId: p.clienteId, asesorId: p.asesorId, tipo: 'sistema', icon: '📜', fecha, titulo: 'Endoso solicitado: ' + tipo + ' · ' + p.numero, detalle: cambios.join(' · ') || (det || '') });
+      close(); U.toast('✓ Endoso registrado como gestión pendiente en Ops (con diff antes/después).'); verPoliza(polId);
     });
   }
 
   /* ---- Editar póliza (administrable) con auto-cálculo de prima ---- */
   function editarPoliza(polId) {
     const p = S().get('polizas', polId); if (!p) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(p.asesorId, 'polizas')) { U.toast('Esta póliza está fuera de tu alcance.'); return; }
     const cli = S().get('clientes', p.clienteId), pais = cli ? cli.pais : 'GT';
     const asgs = S().all('aseguradoras');
     const ramos = Orbit.cat.ramosDe(pais);
@@ -1342,6 +1387,7 @@ Orbit.modules.cliente360 = (function () {
   /* ---- Ver detalle de vehículo (desde la póliza) ---- */
   function verVehiculo(vehId) {
     const v = S().get('vehiculos', vehId); if (!v) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(v.asesorId, 'polizas')) { U.toast('Este vehículo está fuera de tu alcance.'); return; }
     const cur = (S().get('clientes', v.clienteId) || {}).moneda || 'GTQ';
     let back = document.getElementById('c360-veh'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'c360-veh'; back.className = 'drawer-back open';
@@ -1470,6 +1516,7 @@ Orbit.modules.cliente360 = (function () {
 
   function correoPoliza(polId) {
     const p = S().get('polizas', polId); if (!p) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(p.asesorId, 'polizas')) { U.toast('Esta póliza está fuera de tu alcance.'); return; }
     const cli = S().get('clientes', p.clienteId) || {};
     window.__orbitCompose = {
       para: '', asunto: 'Gestión póliza ' + p.numero + ' · ' + (cli.nombre || ''),
@@ -1583,6 +1630,8 @@ Orbit.modules.cliente360 = (function () {
     };
   }
   async function addBitacora(reclamoId, cid) {
+    const rcl = S().get('reclamos', reclamoId);
+    if (window.Orbit && Orbit.accessScope && rcl && !Orbit.accessScope.puedeAccederRegistro(rcl.asesorId, 'siniestros')) { U.toast('Este siniestro está fuera de tu alcance.'); return; }
     const txt = await Orbit.ui.prompt('Anotar movimiento en la bitácora del reclamo:', { title: 'Bitácora del reclamo' });
     if (!txt) return;
     const rec = Orbit.store.get('reclamos', reclamoId); if (!rec) return;
@@ -1623,6 +1672,19 @@ Orbit.modules.cliente360 = (function () {
     reabrir(cid, 'documentos');
   }
   function reabrir(cid, t) { tab = t || 'resumen'; detalle(cid); }
+  function solicitarCorreccionAsignacion(cid) {
+    const c = S().get('clientes', cid); if (!c) return;
+    const misAsesorId = (window.Orbit && Orbit.session && Orbit.session.asesorId) ? Orbit.session.asesorId() : '';
+    if (Orbit.ciclo && Orbit.ciclo.crearGestion) {
+      Orbit.ciclo.crearGestion({
+        lista: 'Gestiones Admin', tipo: 'Corrección de asignación', titulo: 'Revisar asignación · ' + c.nombre,
+        clienteId: cid, asesorId: misAsesorId, prioridad: 'Media',
+        nota: 'El asesor activo no ve este cliente como propio y solicita revisar la asignación. No se cambió el dato — requiere confirmación del equipo.'
+      });
+    }
+    U.toast('✓ Gestión de corrección creada · el equipo revisará la asignación');
+    location.hash = '#/cliente360';
+  }
 
-  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir, nuevoCliente, nuevoReclamo, addBitacora, subirDocumento, aprobarPropuesta, rechazarPropuesta, aclararPropuesta };
+  return { render, edit, renovar, comparativo, verPoliza, renderPolizaPagina, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir, nuevoCliente, nuevoReclamo, addBitacora, subirDocumento, aprobarPropuesta, rechazarPropuesta, aclararPropuesta, solicitarCorreccionAsignacion };
 })();

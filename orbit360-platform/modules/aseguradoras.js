@@ -44,6 +44,22 @@ Orbit.modules.aseguradoras = (function () {
     if ((a.permisosExtra || []).indexOf('aseguradoras_editar') >= 0) return true;
     return ['Dirección', 'Admin'].indexOf(activeRole()) >= 0;
   }
+  /* P0-RES-03: permisos separados de credenciales de plataforma vs cuentas bancarias operativas —
+     antes ambos compartían Orbit.vault.isRestricted() (binario, solo Asesor). La restricción
+     explícita siempre gana sobre el permiso extra y sobre el rol. */
+  function puedePlataformasCredenciales() {
+    const a = asesorActivo();
+    if ((a.restricciones || []).indexOf('aseguradoras_plataformas_credenciales') >= 0) return false;
+    if ((a.permisosExtra || []).indexOf('aseguradoras_plataformas_credenciales') >= 0) return true;
+    return ['Dirección', 'Admin', 'Operativo'].indexOf(activeRole()) >= 0;
+  }
+  /* P0-RES-03 (corrección post-auditoría v1.239): la política vigente es que TODO usuario con
+     acceso al módulo Aseguradoras puede ver/copiar las cuentas bancarias operativas completas —
+     la restricción por rol aplica ÚNICAMENTE a credenciales de plataformas. Bancos solo se oculta
+     por restricción explícita del usuario, nunca por rol/nivel. */
+  function puedeBancosOperativos() {
+    return true;
+  }
   function log(a, entrada) {
     const hist = (a.actividad || []).slice();
     hist.unshift(Object.assign({ fecha: new Date().toISOString(), responsable: actorNombre() + ' · ' + activeRole() }, entrada));
@@ -182,7 +198,8 @@ Orbit.modules.aseguradoras = (function () {
       if (act === 'drive') { if (a.drive) window.open(a.drive.match(/^https?:/) ? a.drive : 'https://' + a.drive, '_blank', 'noopener'); }
     }));
     const deepId = Orbit.route && Orbit.route.params && Orbit.route.params.ficha;
-    if (deepId && S().get('aseguradoras', deepId)) ficha(deepId);
+    if (deepId && S().get('aseguradoras', deepId)) { ficha(deepId); }
+    else { Object.keys(fichaState).forEach(k => { fichaState[k].editing = false; fichaState[k].draft = null; }); }
   }
 
   function card(a) {
@@ -281,6 +298,7 @@ Orbit.modules.aseguradoras = (function () {
     </div>`;
     const back = document.getElementById('asg-ficha');
     Orbit.vault.wire(back);
+    back.addEventListener('click', (e) => { const cb = e.target.closest('[data-cta-cop]'); if (cb && navigator.clipboard) navigator.clipboard.writeText(cb.dataset.ctaCop).then(() => U.toast('Copiado al portapapeles')); });
     back.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
     if (back.querySelector('#af-editar')) back.querySelector('#af-editar').addEventListener('click', () => ficha(id, true));
     if (back.querySelector('#af-guardar')) back.querySelector('#af-guardar').addEventListener('click', () => guardarDraft(id, back));
@@ -428,11 +446,11 @@ Orbit.modules.aseguradoras = (function () {
     return `<div class="asg-sec">
       <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Plataformas y accesos ${editing ? '<button class="btn ghost sm" id="af-add-portal">+ Portal</button>' : ''}</div>
       <div class="cfg-note" style="margin-bottom:9px">Orbit nunca guarda ni muestra contraseñas. El equipo declara el estado de acceso a cada plataforma para mantener el directorio al día.</div>
-      <div id="af-portales">${portales.map((p, i) => portalRow(p, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin plataformas registradas.</div>'}</div>
+      <div id="af-portales">${portales.map((p, i) => portalRow(p, i, editing, a.id)).join('') || '<div class="muted" style="font-size:12px">Sin plataformas registradas.</div>'}</div>
       <label class="ce-l" style="margin-top:9px">📁 Drive / repositorio<input id="af-drive" class="o-sel" value="${U.esc(a.drive || '')}" ${editing ? '' : 'disabled'}></label>
     </div>`;
   }
-  function portalRow(p, i, editing) {
+  function portalRow(p, i, editing, aseguradoraId) {
     const ro = editing ? '' : 'disabled';
     const estado = p.estadoAcceso || 'Sin verificar';
     return `<div class="asg-row" data-portal="${i}" style="flex-wrap:wrap">
@@ -446,6 +464,10 @@ Orbit.modules.aseguradoras = (function () {
       <span class="badge ${ACCESO_TONE[estado] || 'neutral'}" style="align-self:center">${estado}</span>
       ${p.url ? `<button class="btn ghost sm" data-open-portal="${U.esc(p.url)}">↗ Abrir</button>` : ''}
       ${editing ? `<button class="asg-del" data-del="portales:${i}">✕</button>` : ''}
+      ${!editing ? `<div style="flex-basis:100%;display:flex;align-items:center;gap:8px;margin-top:2px">
+        <span class="muted" style="font-size:11px">Usuario: ${!puedePlataformasCredenciales() ? '🔒 restringido' : (p.usuarioRef ? Orbit.vault.field(p.usuarioRef, { mask: 'left4', key: aseguradoraId + '|user|' + i, restricted: !puedePlataformasCredenciales(), ctx: { aseguradoraId, plataforma: p.nombre, modulo: 'aseguradoras.plataforma.usuario', tipoDato: 'usuario_plataforma' } }) : '<span class="muted">sin declarar</span>')}</span>
+        <span class="muted" style="font-size:11px">· Credencial: ${Orbit.vault.field(p.credentialRef || 'pendiente_conexion_segura', { mask: 'all', key: aseguradoraId + '|' + i, restricted: !puedePlataformasCredenciales(), ctx: { aseguradoraId, plataforma: p.nombre || '', modulo: 'aseguradoras_plataforma' } })}</span>
+      </div>` : ''}
     </div>`;
   }
 
@@ -454,16 +476,16 @@ Orbit.modules.aseguradoras = (function () {
     const cuentas = a.cuentas || [];
     return `<div class="asg-sec">
       <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Bancos y pagos ${editing ? '<button class="btn ghost sm" id="af-add-cta">+ Cuenta</button>' : ''}</div>
-      <div class="cfg-note" style="margin-bottom:9px">Cuentas ficticias, número enmascarado. Nunca cargar cuentas reales.</div>
-      <div id="af-cuentas">${cuentas.map((c, i) => ctaRow(c, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin cuentas registradas.</div>'}</div>
+      <div class="cfg-note" style="margin-bottom:9px">Cuentas ficticias, número completo y copiable. Información operativa, no un secreto — nunca cargar cuentas reales.</div>
+      <div id="af-cuentas">${cuentas.map((c, i) => ctaRow(c, i, editing, a.id)).join('') || '<div class="muted" style="font-size:12px">Sin cuentas registradas.</div>'}</div>
     </div>`;
   }
-  function ctaRow(c, i, editing) {
+  function ctaRow(c, i, editing, aseguradoraId) {
     if (!editing) {
       return `<div class="asg-row" data-cta="${i}" style="flex-wrap:wrap;align-items:center">
         <span style="flex:1.2;font-size:12.5px">${U.esc(c.banco || '—')}</span>
         <span style="flex:1;font-size:12.5px">${U.esc(c.tipo || '—')}</span>
-        <span style="flex:1">${Orbit.vault.field(c.numero || '', { mask: 'right4' })}</span>
+        <span style="flex:1;display:flex;align-items:center;gap:6px;font-family:var(--f-mono,monospace);font-size:12px">${U.esc(c.numero || '—')}${c.numero ? `<button type="button" class="btn ghost sm" data-cta-cop="${U.esc(c.numero)}" style="padding:2px 8px;font-size:10.5px">⧉ Copiar</button>` : ''}</span>
         <span style="width:70px;font-size:12.5px">${U.esc(c.moneda || '—')}</span>
         <span style="flex:1;font-size:12.5px">${U.esc(c.titular || '—')}</span>
         <span style="flex:1;font-size:12.5px">${U.esc(c.uso || '—')}</span>
@@ -500,10 +522,10 @@ Orbit.modules.aseguradoras = (function () {
     const pct = (a.comisiones && a.comisiones[r] != null) ? a.comisiones[r] : (a.comisionDefault || 12);
     const hab = !!(a.ramosHabilitados && a.ramosHabilitados[r] && a.ramosHabilitados[r].cotizador === true);
     const det = (a.ramosDetalle && a.ramosDetalle[r]) || {};
-    return `<div class="ct-cell"><span>${U.esc(r)}</span><div class="ct-inp"><input type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}" ${editing ? '' : 'disabled'}><span>%</span></div>
-      <input class="o-sel" data-ramoseg="${U.esc(r)}" placeholder="Segmento (Individual/Flota/Colectivo)" value="${U.esc(det.segmento || '')}" style="font-size:11px;margin-top:4px" ${editing ? '' : 'disabled'}>
-      <input class="o-sel" data-ramoplan="${U.esc(r)}" placeholder="Plan (Básico/Amplio/Premium)" value="${U.esc(det.plan || '')}" style="font-size:11px;margin-top:4px" ${editing ? '' : 'disabled'}>
-      <label style="display:flex;align-items:center;gap:4px;font-size:10.5px;margin-top:4px"><input type="checkbox" data-ramohab="${U.esc(r)}" ${hab ? 'checked' : ''} ${editing ? '' : 'disabled'}><b>${hab ? 'Habilitado' : 'NO habilitado'}</b> p/ Cotizador</label></div>`;
+    return `<div class="ct-cell ct-cell-ramo"><div style="display:flex;align-items:center;justify-content:space-between;gap:9px;width:100%"><span>${U.esc(r)}</span><div class="ct-inp"><input type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}" ${editing ? '' : 'disabled'}><span>%</span></div></div>
+      <input class="o-sel" data-ramoseg="${U.esc(r)}" placeholder="Segmento (Individual/Flota/Colectivo)" value="${U.esc(det.segmento || '')}" style="font-size:11px;width:100%" ${editing ? '' : 'disabled'}>
+      <input class="o-sel" data-ramoplan="${U.esc(r)}" placeholder="Plan (Básico/Amplio/Premium)" value="${U.esc(det.plan || '')}" style="font-size:11px;width:100%" ${editing ? '' : 'disabled'}>
+      <label style="display:flex;align-items:center;gap:5px;font-size:10.5px;width:100%"><input type="checkbox" data-ramohab="${U.esc(r)}" ${hab ? 'checked' : ''} ${editing ? '' : 'disabled'}><b>${hab ? 'Habilitado' : 'NO habilitado'}</b> p/ Cotizador</label></div>`;
   }
   function reqRow(r, i, editing) {
     const ro = editing ? '' : 'disabled';
@@ -687,7 +709,7 @@ Orbit.modules.aseguradoras = (function () {
 
     if (t === 'contactos') { const add = body.querySelector('#af-add-cont'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.contactos = (draft.contactos || []).concat([{ nombre: '', area: 'Comercial', email: '', tel: '', cargo: '', canal: 'Correo', principal: false }]); selectTab('contactos'); }); }
     if (t === 'plataformas') { const add = body.querySelector('#af-add-portal'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.portales = (draft.portales || []).concat([{ nombre: '', url: '', estadoAcceso: 'Pendiente de conexión segura', credentialRef: 'backend_required' }]); selectTab('plataformas'); }); }
-    if (t === 'bancos') { const add = body.querySelector('#af-add-cta'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.cuentas = (draft.cuentas || []).concat([{ banco: '', tipo: 'Monetaria', numero: '****' + Math.floor(1000 + Math.random() * 8999), moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', titular: '' }]); selectTab('bancos'); }); }
+    if (t === 'bancos') { const add = body.querySelector('#af-add-cta'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.cuentas = (draft.cuentas || []).concat([{ banco: '', tipo: 'Monetaria', numero: (draft.pais === 'GT' ? '301' : '512') + Math.floor(1000000 + Math.random() * 8999999), moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', titular: '' }]); selectTab('bancos'); }); }
     if (t === 'productos') {
       const addRamo = body.querySelector('#af-add-ramo'); if (addRamo) addRamo.addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; snapshotTab(); const rr = (draft.ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); draft.ramos = rr; draft.comisiones = Object.assign({}, draft.comisiones); draft.comisiones[r] = draft.comisionDefault || 12; selectTab('productos'); });
       const addReq = body.querySelector('#af-add-req'); if (addReq) addReq.addEventListener('click', () => { snapshotTab(); draft.docsRequeridos = (draft.docsRequeridos || []).concat([{ producto: '', items: '' }]); selectTab('productos'); });
