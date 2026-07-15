@@ -1,3 +1,4 @@
 Orbit 360 A&S LAB dispatcher verification.
 Authorized one-time technical trigger.
+Execution attempt: direct dispatcher.
 No application code, data, secrets, merge, or production.
