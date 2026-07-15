@@ -1,8 +1,7 @@
 /* ============================================================
    Orbit 360 · Catálogo canónico de asesores para carga inicial LAB
    - Solo tenant alianzas-soluciones y adapter Firestore LAB explícito.
-   - El dry-run usa configuración canónica en memoria, sin depender del
-     orden de snapshots.
+   - El dry-run usa configuración canónica en memoria y no escribe.
    - Antes de confirmar la carga verifica que los 7 asesores existan
      realmente en Firestore; si faltan, los sincroniza vía Orbit.store.
    - Los errores reales de escritura siguen siendo bloqueantes.
@@ -16,22 +15,13 @@
   var CONFIG_URL = 'data/tenant-config/alianzas-soluciones.asesores.json?v=20260715-6';
   var ready = false;
   var installing = false;
+  var dryRunPhase = false;
   var bypassDry = false;
   var bypassWrite = false;
   var catalog = [];
   var byId = {};
 
   if (mode !== 'firestore-lab' || tenant !== 'alianzas-soluciones') return;
-
-  function norm(value) {
-    return String(value == null ? '' : value)
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
 
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -101,7 +91,6 @@
     catalog = config.advisors.map(function (row) { return normalizedRow(row, config); });
     byId = {};
     catalog.forEach(function (row) { byId[row.id] = row; });
-    return config;
   }
 
   function mergeRows(rows) {
@@ -155,13 +144,13 @@
     return ids;
   }
 
-  async function persistAndVerify(store) {
+  async function persistAndVerify(store, writeReal) {
     var ids = catalog.map(function (row) { return row.id; });
     var persisted = await readPersistedIds();
     var missing = ids.filter(function (id) { return !persisted[id]; });
     if (missing.length) {
       catalog.forEach(function (row) {
-        if (!persisted[row.id]) store.update('asesores', row.id, clone(row));
+        if (!persisted[row.id]) writeReal('asesores', row.id, clone(row));
       });
       await waitWrites(store, missing);
     }
@@ -174,7 +163,7 @@
   async function install() {
     if (ready || installing) return;
     var store = window.Orbit && Orbit.store;
-    if (!store || store.__firestoreLabExplicit !== true || typeof store.all !== 'function' || typeof store.get !== 'function') {
+    if (!store || store.__firestoreLabExplicit !== true || typeof store.all !== 'function' || typeof store.get !== 'function' || typeof store.update !== 'function') {
       setTimeout(install, 100);
       return;
     }
@@ -183,6 +172,7 @@
       await loadConfig();
       var originalAll = store.all.bind(store);
       var originalGet = store.get.bind(store);
+      var originalUpdate = store.update.bind(store);
 
       store.all = function (collection) {
         var rows = originalAll(collection);
@@ -195,14 +185,27 @@
         return row;
       };
 
+      store.update = function (collection, id, patch) {
+        if (dryRunPhase && (collection === 'asesores' || collection === 'configuracion_catalogo')) {
+          if (collection === 'asesores' && byId[id]) return Object.assign({}, byId[id], patch || {});
+          return Object.assign({ id: id, tenantId: tenant }, patch || {});
+        }
+        return originalUpdate(collection, id, patch);
+      };
+
       store.__advisorWriteBridgeInstalled = true;
       window.OrbitLabAdvisorWriteBridge = {
         ready: true,
         storeSource: 'firestore-lab-explicit',
         advisorCount: catalog.length,
-        persistAndVerify: function () { return persistAndVerify(store); },
+        persistAndVerify: function () { return persistAndVerify(store, originalUpdate); },
         status: function () {
-          return { ready: ready, advisorCount: catalog.length, installedOnFirestoreLab: store.__firestoreLabExplicit === true };
+          return {
+            ready: ready,
+            advisorCount: catalog.length,
+            dryRunReadOnly: dryRunPhase,
+            installedOnFirestoreLab: store.__firestoreLabExplicit === true
+          };
         }
       };
       ready = true;
@@ -215,11 +218,11 @@
 
   document.addEventListener('click', function (event) {
     var dryButton = event.target && event.target.closest && event.target.closest('[data-ays-initial-modal] [data-dry]');
-    if (dryButton && !bypassDry && !ready) {
+    if (dryButton && !bypassDry) {
       event.preventDefault();
       event.stopImmediatePropagation();
       dryButton.disabled = true;
-      setStatus(dryButton, 'Preparando catálogo canónico de asesores…', false);
+      setStatus(dryButton, 'Preparando dry-run de solo lectura…', false);
       (async function () {
         var started = Date.now();
         while (!ready && Date.now() - started < 15000) {
@@ -227,9 +230,17 @@
         }
         if (!ready) throw new Error('No fue posible preparar el catálogo de asesores.');
         bypassDry = true;
+        dryRunPhase = true;
         dryButton.disabled = false;
-        try { dryButton.onclick(); } finally { bypassDry = false; }
+        try {
+          await Promise.resolve(dryButton.onclick());
+        } finally {
+          dryRunPhase = false;
+          bypassDry = false;
+        }
       })().catch(function (error) {
+        dryRunPhase = false;
+        bypassDry = false;
         setStatus(dryButton, 'Dry-run no disponible: ' + error.message, true);
         dryButton.disabled = false;
       });
@@ -246,8 +257,13 @@
       if (!ready || !window.OrbitLabAdvisorWriteBridge) throw new Error('Catálogo de asesores no disponible.');
       await window.OrbitLabAdvisorWriteBridge.persistAndVerify();
       bypassWrite = true;
-      try { writeButton.onclick(); } finally { bypassWrite = false; }
+      try {
+        await Promise.resolve(writeButton.onclick());
+      } finally {
+        bypassWrite = false;
+      }
     })().catch(function (error) {
+      bypassWrite = false;
       setStatus(writeButton, 'Carga bloqueada: ' + String(error && error.message || error), true);
       writeButton.disabled = false;
     });
