@@ -1,0 +1,19 @@
+name: Orbit 360 LAB Temporary Dispatcher
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/orbit360-lab-temporary-dispatcher.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy_lab_preview:
+    uses: paulaosoriof86/orbit360-core/.github/workflows/orbit360-ays-lab-preview.yml@ays/backend-tenant-lab-v99-20260703
+    with:
+      source_ref: ays/backend-tenant-lab-v99-20260703
+    secrets: inherit
