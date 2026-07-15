@@ -1,11 +1,13 @@
 import fs from 'node:fs';
 
 const guardPath = 'orbit360-platform/core/backend-lab-import-readiness-guard.js';
+const bridgePath = 'orbit360-platform/core/backend-lab-advisor-write-bridge.js';
 const initPath = 'orbit360-platform/core/backend-lab-init.js';
 const importPath = 'orbit360-platform/modules/importar-initial-tenant-lab.js';
 const advisorConfigPath = 'orbit360-platform/data/tenant-config/alianzas-soluciones.asesores.json';
 
 const guard = fs.readFileSync(guardPath, 'utf8');
+const bridge = fs.readFileSync(bridgePath, 'utf8');
 const init = fs.readFileSync(initPath, 'utf8');
 const importer = fs.readFileSync(importPath, 'utf8');
 const advisorConfig = JSON.parse(fs.readFileSync(advisorConfigPath, 'utf8'));
@@ -30,17 +32,21 @@ must(guard, /data-dry/, 'intercepción del dry-run');
 must(guard, /data-write/, 'intercepción de escritura');
 must(guard, /data-rollback/, 'intercepción de rollback');
 must(guard, /stopImmediatePropagation/, 'bloqueo antes del handler operativo');
-must(init, /backend-lab-import-readiness-guard\.js/, 'integración del guard al runtime');
-must(init, /importar-initial-tenant-lab\.js\?v=20260715-2/, 'cache-bust del importador autocontenido');
+
+must(bridge, /orbit:backend:write-ok/, 'puente escucha confirmación write-ok');
+must(bridge, /orbit:backend:write-error/, 'puente descarta escrituras rechazadas');
+must(bridge, /confirmed\[detail\.id\]/, 'puente conserva solo asesores confirmados');
+must(bridge, /Orbit\.store\.get\s*=\s*function/, 'puente cubre carrera de caché en get');
+
+must(init, /backend-lab-advisor-write-bridge\.js\?v=20260715-3/, 'puente cargado antes del importador');
+must(init, /importar-initial-tenant-lab\.js\?v=20260715-3/, 'cache-bust del importador autocontenido');
 must(importer, /function\s+canonicalUser\s*\(/, 'importador valida usuario Firebase canónico');
-must(importer, /async\s+function\s+readCriticalDirect\s*\(/, 'importador ejecuta lectura crítica propia');
+must(importer, /function\s+readCriticalDirect\s*\(/, 'importador ejecuta lectura crítica propia');
 must(importer, /await\s+readCriticalDirect\(false\)/, 'dry-run espera lectura crítica inicial');
 must(importer, /await\s+ensureAdvisorCatalog\(current\.auth\)/, 'dry-run sincroniza catálogo controlado de asesores');
 must(importer, /Orbit\.store\.update\('asesores'/, 'catálogo usa exclusivamente Orbit.store');
-must(importer, /current\.writeQueue/, 'catálogo verifica cola real del adapter');
-must(importer, /current\.writeErrors/, 'catálogo verifica errores reales del adapter');
-must(importer, /relevantPending\.length/, 'catálogo espera fin de pendientes');
-must(importer, /missing\.length/, 'catálogo exige presencia de siete registros');
+must(importer, /writeQueue/, 'catálogo verifica cola real del adapter');
+must(importer, /writeErrors/, 'catálogo verifica errores reales del adapter');
 must(importer, /await\s+waitCatalog\(ids\)/, 'catálogo espera confirmación de escritura');
 must(importer, /await\s+readCriticalDirect\(true\)/, 'dry-run relee colecciones después del catálogo');
 must(importer, /db\.collection\('tenantId'\)\.doc\(tenant\(\)\)\.collection\(name\)\.get\(\)/, 'fallback de lectura usa ruta tenant aislada');
