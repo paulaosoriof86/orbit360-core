@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="orbit-preview-version" content="20260715-2">
+  <meta name="orbit-preview-version" content="20260715-3">
   <title>Orbit 360 · A&S</title>
   <style>
     body{font-family:Manrope,Arial,sans-serif;background:#1E2227;color:#fff;display:grid;place-items:center;min-height:100vh;margin:0}
@@ -26,20 +26,22 @@
         await Promise.all(keys.map(function(k){ return caches.delete(k); }));
       }
       var assets = [
-        'core/backend-lab-loader.js?v=lab-20260703',
-        'core/backend-lab-init.js?v=lab-20260703',
-        'data/store-firestore-lab.local.js?v=lab-store-20260703',
-        'core/auth.js?v1295-labfix-20260703',
-        'core/backend-lab-auth-guard.js?v=20260715-2',
+        'core/backend-lab-loader.js?v=20260715-3',
+        'core/backend-lab-init.js?v=20260715-3',
+        'data/store-firestore-lab.local.js?v=20260715-3',
+        'core/auth.js?v=20260715-3',
+        'core/backend-lab-auth-guard.js?v=20260715-3',
         'core/backend-lab-import-readiness-guard.js?v=20260715-3',
-        'data/tenant-config/alianzas-soluciones.asesores.json?v=20260715-1',
-        'modules/importar-initial-tenant-lab.js?v=20260715-2'
+        'core/backend-lab-advisor-write-bridge.js?v=20260715-3',
+        'data/import-initial-profiles.js?v=20260715-3',
+        'data/tenant-config/alianzas-soluciones.asesores.json?v=20260715-3',
+        'modules/importar-initial-tenant-lab.js?v=20260715-3'
       ];
       await Promise.all(assets.map(function(src){
         return fetch(src, { cache: 'reload', credentials: 'same-origin' }).catch(function(){ return null; });
       }));
     } catch (e) {}
-    location.replace('index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260715-2#/importar');
+    location.replace('index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260715-3#/importar');
   })();
 </script>
 </body>
