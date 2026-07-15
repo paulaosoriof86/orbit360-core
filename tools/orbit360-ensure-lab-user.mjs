@@ -129,6 +129,8 @@ await memberRef.set({
   updatedBy: 'github-actions-lab-bootstrap'
 }, { merge: true });
 
+await import('./orbit360-ensure-lab-advisors.mjs');
+
 console.log('Membresía LAB activa y verificada para alianzas-soluciones.');
 console.log(JSON.stringify({
   ok: true,
@@ -137,5 +139,6 @@ console.log(JSON.stringify({
   tenantId: TENANT_ID,
   uid: EXPECTED_UID,
   email: EXPECTED_EMAIL,
+  advisorCatalogSynchronized: true,
   passwordExposed: false
 }));
