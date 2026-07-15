@@ -3,10 +3,12 @@ import fs from 'node:fs';
 const guardPath = 'orbit360-platform/core/backend-lab-import-readiness-guard.js';
 const initPath = 'orbit360-platform/core/backend-lab-init.js';
 const importPath = 'orbit360-platform/modules/importar-initial-tenant-lab.js';
+const advisorConfigPath = 'orbit360-platform/data/tenant-config/alianzas-soluciones.asesores.json';
 
 const guard = fs.readFileSync(guardPath, 'utf8');
 const init = fs.readFileSync(initPath, 'utf8');
 const importer = fs.readFileSync(importPath, 'utf8');
+const advisorConfig = JSON.parse(fs.readFileSync(advisorConfigPath, 'utf8'));
 
 function must(text, pattern, label) {
   if (!pattern.test(text)) throw new Error(`READINESS_CONTRACT_FAIL: ${label}`);
@@ -32,8 +34,19 @@ must(init, /backend-lab-import-readiness-guard\.js/, 'integración del guard al 
 must(init, /importar-initial-tenant-lab\.js\?v=20260715-2/, 'cache-bust del importador autocontenido');
 must(importer, /function\s+canonicalUser\s*\(/, 'importador valida usuario Firebase canónico');
 must(importer, /function\s+readCriticalDirect\s*\(/, 'importador ejecuta lectura crítica propia');
-must(importer, /await\s+readCriticalDirect\(\)/, 'dry-run espera la lectura crítica');
+must(importer, /await\s+readCriticalDirect\(false\)/, 'dry-run espera lectura crítica inicial');
+must(importer, /await\s+ensureAdvisorCatalog\(z\.auth\)/, 'dry-run sincroniza catálogo controlado de asesores');
+must(importer, /Orbit\.store\.update\('asesores'/, 'catálogo usa exclusivamente Orbit.store');
+must(importer, /await\s+waitCatalog\(ids\)/, 'catálogo espera confirmación de escritura');
+must(importer, /await\s+readCriticalDirect\(true\)/, 'dry-run relee colecciones después del catálogo');
 must(importer, /db\.collection\('tenantId'\)\.doc\(tenant\(\)\)\.collection\(name\)\.get\(\)/, 'fallback de lectura usa ruta tenant aislada');
 must(importer, /if\(!z\.auth\|\|!z\.auth\.uid\)/, 'importador conserva gate de sesión real');
+
+if (advisorConfig.schemaVersion !== 'orbit360.tenant-advisors.v1') throw new Error('READINESS_CONTRACT_FAIL: schema de asesores');
+if (advisorConfig.tenantId !== 'alianzas-soluciones') throw new Error('READINESS_CONTRACT_FAIL: tenant de asesores');
+if (!Array.isArray(advisorConfig.advisors) || advisorConfig.advisors.length !== 7) throw new Error('READINESS_CONTRACT_FAIL: conteo de asesores');
+const expectedNames = ['Paula Osorio','Fernando Arias','Carlos Castro','Johanna Salgado','Braulio Hernández','Nicole Castro','Samuel Daza'];
+const actualNames = new Set(advisorConfig.advisors.map(row => row.nombre));
+expectedNames.forEach(name => { if (!actualNames.has(name)) throw new Error(`READINESS_CONTRACT_FAIL: falta asesor ${name}`); });
 
 console.log('LAB_IMPORT_READINESS_CONTRACT_OK');
