@@ -45,8 +45,8 @@ must(bridge, /\[data-ays-initial-modal\] \[data-write\]/, 'captura controlada de
 must(bridge, /await Promise\.resolve\(dryButton\.onclick\(\)\)/, 'dry-run original se ejecuta dentro de fase solo lectura');
 must(bridge, /await window\.OrbitLabAdvisorWriteBridge\.persistAndVerify\(\)/, 'carga principal espera verificación del catálogo');
 
-must(init, /backend-lab-advisor-write-bridge\.js\?v=20260715-5/, 'guard cargado antes del importador');
-must(init, /importar-initial-tenant-lab\.js\?v=20260715-5/, 'cache-bust del importador autocontenido');
+must(init, /backend-lab-advisor-write-bridge\.js\?v=20260715-6/, 'guard v6 cargado antes del importador');
+must(init, /importar-initial-tenant-lab\.js\?v=20260715-6/, 'cache-bust v6 del importador autocontenido');
 must(importer, /function\s+canonicalUser\s*\(/, 'importador valida usuario Firebase canónico');
 must(importer, /function\s+readCriticalDirect\s*\(/, 'importador ejecuta lectura crítica propia');
 must(importer, /await\s+readCriticalDirect\(false\)/, 'dry-run espera lectura crítica inicial');
