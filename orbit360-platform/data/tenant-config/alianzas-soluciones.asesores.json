@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "orbit360.tenant-advisors.v1",
+  "tenantId": "alianzas-soluciones",
+  "source": "configuracion_catalogo",
+  "effectiveDate": "2026-07-15",
+  "advisors": [
+    {
+      "id": "ase-paula-osorio",
+      "nombre": "Paula Osorio",
+      "aliases": ["Paula", "C.O", "Alianzas y Soluciones Corredores de Seguros"],
+      "roles": ["Dirección", "SuperAdmin", "AdminTenant", "Asesor", "Operativo"],
+      "rolDefault": "Dirección",
+      "scopeDatos": "todos",
+      "estado": "activo"
+    },
+    {
+      "id": "ase-carlos-castro",
+      "nombre": "Carlos Castro",
+      "aliases": ["Carlos"],
+      "roles": ["Operativo", "Asesor"],
+      "rolDefault": "Operativo",
+      "scopeDatos": "propios",
+      "estado": "activo"
+    },
+    {
+      "id": "ase-samuel-daza",
+      "nombre": "Samuel Daza",
+      "aliases": ["Samuel"],
+      "roles": ["Asesor", "Operativo"],
+      "rolDefault": "Asesor",
+      "scopeDatos": "propios",
+      "estado": "activo"
+    },
+    {
+      "id": "ase-fernando-arias",
+      "nombre": "Fernando Arias",
+      "aliases": ["Fernando"],
+      "roles": ["Asesor"],
+      "rolDefault": "Asesor",
+      "scopeDatos": "propios",
+      "estado": "activo"
+    },
+    {
+      "id": "ase-johanna-salgado",
+      "nombre": "Johanna Salgado",
+      "aliases": ["Johanna"],
+      "roles": ["Asesor"],
+      "rolDefault": "Asesor",
+      "scopeDatos": "propios",
+      "estado": "activo"
+    },
+    {
+      "id": "ase-braulio-hernandez",
+      "nombre": "Braulio Hernández",
+      "aliases": ["Braulio", "Braulio Hernandez"],
+      "roles": ["Asesor"],
+      "rolDefault": "Asesor",
+      "scopeDatos": "propios",
+      "estado": "activo"
+    },
+    {
+      "id": "ase-nicole-castro",
+      "nombre": "Nicole Castro",
+      "aliases": ["Nicole"],
+      "roles": ["Asesor"],
+      "rolDefault": "Asesor",
+      "scopeDatos": "propios",
+      "estado": "activo"
+    }
+  ]
+}
