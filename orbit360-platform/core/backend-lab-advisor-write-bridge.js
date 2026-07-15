@@ -1,9 +1,9 @@
 /* ============================================================
    Orbit 360 · Puente de confirmación del catálogo de asesores LAB
    Se instala únicamente sobre el adapter Firestore LAB explícito.
-   Conserva temporalmente filas ya confirmadas por write-ok cuando
-   un snapshot vacío reemplaza el caché antes de la relectura directa.
-   No escribe datos por sí mismo y no contiene credenciales.
+   Mantiene visible la fila solicitada mientras la cola real termina
+   y el snapshot Firestore converge. Los errores reales siguen siendo
+   bloqueantes mediante writeErrors. No contiene credenciales.
    ============================================================ */
 (function () {
   'use strict';
@@ -41,8 +41,9 @@
 
     store.get = function (collection, id) {
       var row = originalGet(collection, id);
-      if (collection === 'asesores' && id && confirmed[id]) {
-        return Object.assign({}, row || {}, confirmed[id]);
+      if (collection === 'asesores' && id) {
+        var overlay = confirmed[id] || desired[id];
+        if (overlay) return Object.assign({}, row || {}, overlay);
       }
       return row;
     };
@@ -57,6 +58,7 @@
       var detail = event && event.detail || {};
       if (detail.collection !== 'asesores' || !detail.id) return;
       delete confirmed[detail.id];
+      delete desired[detail.id];
     });
 
     store.__advisorWriteBridgeInstalled = true;
