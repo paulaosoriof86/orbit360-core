@@ -131,14 +131,53 @@ jobs:
           node tools/orbit360-ensure-lab-user.mjs
 
       - name: Deploy Firestore rules to authorized LAB project
+        id: rules_deploy
         shell: bash
         run: |
-          set -euo pipefail
+          set +e
           test "$FIREBASE_PROJECT_ID" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          LOG_FILE="${RUNNER_TEMP}/firestore-rules-deploy.log"
           npx --yes firebase-tools@latest deploy \
             --only firestore:rules \
             --project "$FIREBASE_PROJECT_ID" \
-            --non-interactive
+            --non-interactive > "$LOG_FILE" 2>&1
+          CODE=$?
+          CATEGORY="ok"
+          if [ "$CODE" -ne 0 ]; then
+            if grep -Eqi 'permission|forbidden|not authorized|403|iam' "$LOG_FILE"; then
+              CATEGORY="permission_denied"
+            elif grep -Eqi 'syntax|parse|compile|invalid rules' "$LOG_FILE"; then
+              CATEGORY="rules_invalid"
+            elif grep -Eqi 'project|not found|does not exist' "$LOG_FILE"; then
+              CATEGORY="project_mismatch"
+            else
+              CATEGORY="deploy_failed"
+            fi
+          fi
+          if [ "$CODE" -eq 0 ]; then OK="true"; else OK="false"; fi
+          echo "ok=$OK" >> "$GITHUB_OUTPUT"
+          echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "Rules deploy result: $CATEGORY"
+          exit 0
+
+      - name: Publish sanitized LAB runtime status
+        shell: bash
+        run: |
+          set -euo pipefail
+          RULES_OK='${{ steps.rules_deploy.outputs.ok }}'
+          RULES_CATEGORY='${{ steps.rules_deploy.outputs.category }}'
+          RULES_EXIT='${{ steps.rules_deploy.outputs.exit_code }}'
+          jq -n \
+            --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg commit "$GITHUB_SHA" \
+            --arg branch "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" \
+            --arg projectId "$FIREBASE_PROJECT_ID" \
+            --arg rulesCategory "$RULES_CATEGORY" \
+            --arg rulesExit "$RULES_EXIT" \
+            --argjson rulesOk "$RULES_OK" \
+            '{schemaVersion:"orbit360-lab-runtime-status-v1",generatedAt:$generatedAt,commit:$commit,branch:$branch,projectId:$projectId,membershipBootstrap:true,rulesDeploy:{ok:$rulesOk,category:$rulesCategory,exitCode:$rulesExit},containsSecrets:false}' \
+            > orbit360-platform/lab-runtime-status.json
 
       - name: Deploy fixed preview channel
         id: deploy
@@ -164,11 +203,19 @@ jobs:
             echo ""
             echo "Acceso directo: ${URL}/ays-lab-preview.html"
             echo ""
+            echo "Diagnóstico sanitizado: ${URL}/lab-runtime-status.json"
+            echo ""
             echo "Proyecto: $FIREBASE_PROJECT_ID"
             echo ""
             echo "Usuario LAB sincronizado: orbit.lab@demo.com"
             echo ""
-            echo "Reglas Firestore LAB: desplegadas antes del preview"
+            echo "Reglas Firestore LAB: ${{ steps.rules_deploy.outputs.category }}"
             echo ""
             echo "Canal: orbit360-ays-lab · expiración renovable 30 días · no live."
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enforce successful Firestore rules deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test '${{ steps.rules_deploy.outputs.ok }}' = 'true'
