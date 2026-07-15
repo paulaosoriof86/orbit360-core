@@ -36,13 +36,15 @@ must(guard, /stopImmediatePropagation/, 'bloqueo antes del handler operativo');
 must(bridge, /store\.__firestoreLabExplicit\s*!==\s*true/, 'puente espera el adapter Firestore LAB explícito');
 must(bridge, /orbit:backend:write-ok/, 'puente escucha confirmación write-ok');
 must(bridge, /orbit:backend:write-error/, 'puente descarta escrituras rechazadas');
-must(bridge, /confirmed\[detail\.id\]/, 'puente conserva solo asesores confirmados');
+must(bridge, /confirmed\[detail\.id\]/, 'puente conserva confirmaciones Firestore');
+must(bridge, /confirmed\[id\]\s*\|\|\s*desired\[id\]/, 'puente mantiene visible la fila solicitada durante convergencia');
+must(bridge, /delete desired\[detail\.id\]/, 'puente elimina overlay cuando la escritura falla');
 must(bridge, /store\.update\s*=\s*function/, 'puente intercepta escrituras del adapter real');
 must(bridge, /store\.get\s*=\s*function/, 'puente cubre carrera de caché en get');
 must(bridge, /installedOnFirestoreLab/, 'puente expone instalación sobre Firestore LAB');
 
-must(init, /backend-lab-advisor-write-bridge\.js\?v=20260715-5/, 'puente con cache-bust vigente');
-must(init, /importar-initial-tenant-lab\.js\?v=20260715-5/, 'cache-bust del importador autocontenido');
+must(init, /backend-lab-advisor-write-bridge\.js\?v=20260715-6/, 'puente con cache-bust vigente');
+must(init, /importar-initial-tenant-lab\.js\?v=20260715-6/, 'cache-bust del importador autocontenido');
 must(importer, /function\s+canonicalUser\s*\(/, 'importador valida usuario Firebase canónico');
 must(importer, /function\s+readCriticalDirect\s*\(/, 'importador ejecuta lectura crítica propia');
 must(importer, /await\s+readCriticalDirect\(false\)/, 'dry-run espera lectura crítica inicial');
