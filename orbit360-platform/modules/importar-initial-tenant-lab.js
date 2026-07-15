@@ -11,7 +11,18 @@ function u(a){return Array.from(new Set((a||[]).filter(Boolean)));}
 function tenant(){try{var t=Orbit.tenant&&Orbit.tenant.get?Orbit.tenant.get():null;if(t&&t.id)return t.id;}catch(x){}return window.OrbitBackend&&(OrbitBackend.tenantId||OrbitBackend.tenant)||'';}
 function profile(){return (Orbit.importInitialProfiles||{})[tenant()]||null;}
 function mode(){return window.OrbitBackend&&OrbitBackend.mode||'';}
-function status(){try{return Orbit.store&&Orbit.store._labStatus?Orbit.store._labStatus():OrbitBackend&&OrbitBackend.status?OrbitBackend.status():{};}catch(x){return{};}}
+function rawStatus(){try{return Orbit.store&&Orbit.store._labStatus?Orbit.store._labStatus():OrbitBackend&&OrbitBackend.status?OrbitBackend.status():{};}catch(x){return{};}}
+function firebaseUser(){try{return window.firebase&&typeof window.firebase.auth==='function'?window.firebase.auth().currentUser:null;}catch(x){return null;}}
+function canonicalUser(){
+  var user=firebaseUser();
+  if(!user)return null;
+  var expectedEmail=String(window.OrbitBackend&&OrbitBackend.expectedEmail||'orbit.lab@demo.com').toLowerCase();
+  var expectedUid=String(window.OrbitBackend&&OrbitBackend.expectedUid||'');
+  if(String(user.email||'').toLowerCase()!==expectedEmail)return null;
+  if(expectedUid&&String(user.uid||'')!==expectedUid)return null;
+  return user;
+}
+function status(){var z=rawStatus()||{},user=canonicalUser();if(user)z.auth={uid:user.uid||'',email:user.email||''};return z;}
 function arrays(p){return{clientes:p&&p.collections&&Array.isArray(p.collections.clientes)?p.collections.clientes:[],aseguradoras:p&&p.collections&&Array.isArray(p.collections.aseguradoras)?p.collections.aseguradoras:[],retenidos:p&&p.retained&&Array.isArray(p.retained.clientes)?p.retained.clientes:[]};}
 function download(name,obj){var b=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}),url=URL.createObjectURL(b),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);}
 async function hash(file){if(!crypto||!crypto.subtle)return'';var d=await crypto.subtle.digest('SHA-256',await file.arrayBuffer());return Array.from(new Uint8Array(d)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');}
@@ -45,6 +56,41 @@ return{batch:{batchId:id,tenantId:pr.tenantId,sourceType:p.sourceType||pr.id,sou
 }
 function wait(batch){var ids=(batch.operations||[]).map(function(o){return{c:o.collection,id:o.id||o.data&&o.data.id};});return new Promise(function(ok,bad){var start=Date.now();(function tick(){var pending=0,failed=0;ids.forEach(function(x){var r=Orbit.store.get(x.c,x.id);if(r&&r._syncStatus==='failed')failed++;else if(!r||r._syncStatus!=='synced')pending++;});if(failed)return bad(new Error('Falló la escritura de '+failed+' registros.'));if(!pending)return ok();if(Date.now()-start>120000)return bad(new Error('Tiempo de verificación agotado. Pendientes: '+pending));setTimeout(tick,500);})();});}
 
+function replaceStoreCollection(name,rows){
+  if(!Orbit.store||typeof Orbit.store.raw!=='function')throw new Error('El almacenamiento LAB no está disponible.');
+  var raw=Orbit.store.raw()||{},target=raw[name];
+  if(!Array.isArray(target))throw new Error('Colección LAB no disponible: '+name+'.');
+  target.splice(0,target.length);
+  rows.forEach(function(row){target.push(row);});
+  if(typeof Orbit.store._emit==='function')Orbit.store._emit(name);
+}
+async function readCriticalDirect(){
+  var user=canonicalUser();
+  if(!user)throw new Error('Inicia sesión.');
+  if(window.OrbitLabImportReadiness&&typeof OrbitLabImportReadiness.readiness==='function'){
+    await OrbitLabImportReadiness.readiness();
+    return status();
+  }
+  var db=null;
+  try{db=window.firebase&&typeof window.firebase.firestore==='function'?window.firebase.firestore():null;}catch(x){}
+  if(!db||typeof db.collection!=='function')throw new Error('El servicio de datos LAB no está disponible.');
+  var names=['clientes','aseguradoras','asesores'];
+  await Promise.all(names.map(function(name){
+    return db.collection('tenantId').doc(tenant()).collection(name).get().then(function(snap){
+      var rows=[];
+      snap.forEach(function(docSnap){var data=docSnap.data()||{};rows.push(Object.assign({},data,{id:data.id||docSnap.id,tenantId:data.tenantId||tenant()}));});
+      replaceStoreCollection(name,rows);
+    });
+  }));
+  var z=status();z.snapshotAttached=true;z.snapshotMode='critical-one-shot-inline';return z;
+}
+function describeError(error){
+  var code=String(error&&error.code||'').replace(/^firestore\//,'');
+  if(code==='permission-denied')return 'Permiso denegado para leer el entorno de validación.';
+  if(code==='unauthenticated')return 'La sesión LAB perdió autenticación.';
+  return String(error&&error.message||error||'No fue posible preparar el dry-run.');
+}
+
 function modal(pr){
 var old=document.querySelector('[data-ays-initial-modal]');if(old)old.remove();
 var d=document.createElement('div');d.dataset.aysInitialModal='1';d.style.cssText='position:fixed;inset:0;z-index:1200;background:rgba(15,18,22,.72);display:grid;place-items:center;padding:18px';
@@ -54,10 +100,25 @@ var q=function(s){return d.querySelector(s);},st=q('[data-status]'),file=q('[dat
 function set(t,bad){st.textContent=t;st.style.borderColor=bad?'var(--danger,#C5162E)':'var(--line,#ddd)';}
 q('[data-x]').onclick=function(){d.remove();};
 file.onchange=async function(){S.file=file.files&&file.files[0];S.payload=null;dry.disabled=write.disabled=report.disabled=rb.disabled=true;confirm.disabled=true;confirm.checked=false;if(!S.file)return;try{var p=JSON.parse(await S.file.text()),v=validate(p,pr);if(!v.ok)throw new Error(v.errors.slice(0,12).join(' | '));S.payload=p;S.hash=await hash(S.file);set('Archivo validado. '+v.warnings.length+' aseguradoras conservarán estado pendiente de validación y uso restringido. Prepara el dry-run.');dry.disabled=false;}catch(x){set('Archivo bloqueado: '+x.message,true);}};
-dry.onclick=function(){try{if(mode()!==pr.requiredBackendMode)throw new Error('Abre el canal de validación de A&S.');if(tenant()!==pr.tenantId)throw new Error('Tenant incorrecto.');var z=status();if(!z.auth||!z.auth.uid)throw new Error('Inicia sesión.');if(!z.snapshotAttached)throw new Error('Los datos aún están cargando.');if(!allow(pr))throw new Error('Contrato de escritura no disponible.');var b=build(S.payload,pr,S.file,S.hash);S.batch=b.batch;S.diff=b.diff;var x=b.diff.counts;q('[data-summary]').innerHTML='<div class="card pad" style="margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px"><div>Clientes crear<br><b>'+x.clientesCrear+'</b></div><div>Clientes actualizar<br><b>'+x.clientesActualizar+'</b></div><div>Retenidos<br><b>'+x.clientesRetenidos+'</b></div><div>Aseguradoras crear<br><b>'+x.aseguradorasCrear+'</b></div><div>Aseguradoras actualizar<br><b>'+x.aseguradorasActualizar+'</b></div><div>Aseguradoras pendientes<br><b>'+x.aseguradorasPendientesValidacion+'</b></div><div>Bloqueos<br><b>'+x.bloqueos+'</b></div></div>';report.disabled=false;confirm.disabled=b.batch.hasBlockingErrors;write.disabled=true;set(b.batch.hasBlockingErrors?'Dry-run bloqueado. No se escribió nada.':'Dry-run aprobado. Las aseguradoras pendientes quedarán restringidas hasta completar su validación.',b.batch.hasBlockingErrors);}catch(x){set('Dry-run no disponible: '+x.message,true);}};
+dry.onclick=async function(){
+  dry.disabled=true;
+  try{
+    if(mode()!==pr.requiredBackendMode)throw new Error('Abre el canal de validación de A&S.');
+    if(tenant()!==pr.tenantId)throw new Error('Tenant incorrecto.');
+    set('Validando sesión y leyendo Clientes, Aseguradoras y Asesores…');
+    var z=await readCriticalDirect();
+    if(!z.auth||!z.auth.uid)throw new Error('Inicia sesión.');
+    if(!allow(pr))throw new Error('Contrato de escritura no disponible.');
+    var b=build(S.payload,pr,S.file,S.hash);S.batch=b.batch;S.diff=b.diff;var x=b.diff.counts;
+    q('[data-summary]').innerHTML='<div class="card pad" style="margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px"><div>Clientes crear<br><b>'+x.clientesCrear+'</b></div><div>Clientes actualizar<br><b>'+x.clientesActualizar+'</b></div><div>Retenidos<br><b>'+x.clientesRetenidos+'</b></div><div>Aseguradoras crear<br><b>'+x.aseguradorasCrear+'</b></div><div>Aseguradoras actualizar<br><b>'+x.aseguradorasActualizar+'</b></div><div>Aseguradoras pendientes<br><b>'+x.aseguradorasPendientesValidacion+'</b></div><div>Bloqueos<br><b>'+x.bloqueos+'</b></div></div>';
+    report.disabled=false;confirm.disabled=b.batch.hasBlockingErrors;write.disabled=true;
+    set(b.batch.hasBlockingErrors?'Dry-run bloqueado. No se escribió nada.':'Dry-run aprobado. Las aseguradoras pendientes quedarán restringidas hasta completar su validación.',b.batch.hasBlockingErrors);
+  }catch(x){set('Dry-run no disponible: '+describeError(x),true);}
+  finally{dry.disabled=!S.payload;}
+};
 confirm.onchange=function(){write.disabled=!(confirm.checked&&S.batch&&!S.batch.hasBlockingErrors);};
 report.onclick=function(){if(S.diff)download('DRY-RUN-'+S.diff.batchId+'.json',S.diff);};
-write.onclick=async function(){write.disabled=true;confirm.disabled=true;try{var z=status(),res=Orbit.importaWriteP0.writeBatch(S.batch,{approved:true,phrase:'CONFIRMO ESCRITURA CONTROLADA',userId:z.auth.uid,reason:pr.confirmationReason});S.rollback=res.rollback||[];if(!res.ok)throw new Error((res.errors||[]).join(' | '));set('Escritura iniciada. Verificando…');await wait(S.batch);download('RESULTADO-'+S.batch.batchId+'.json',{status:'WRITE_LAB_OK',completedAt:new Date().toISOString(),diff:S.diff,written:res.written,auditIds:res.auditIds||[],rollbackAvailable:!!S.rollback.length});rb.disabled=!S.rollback.length;set('Carga verificada. Ya puedes revisar Clientes y Aseguradoras.');setTimeout(function(){location.hash='#/cliente360';},800);}catch(x){rb.disabled=!S.rollback||!S.rollback.length;set('No se pudo verificar la carga: '+x.message,true);}};
+write.onclick=async function(){write.disabled=true;confirm.disabled=true;try{var z=status();if(!z.auth||!z.auth.uid)throw new Error('La sesión LAB no está activa.');var res=Orbit.importaWriteP0.writeBatch(S.batch,{approved:true,phrase:'CONFIRMO ESCRITURA CONTROLADA',userId:z.auth.uid,reason:pr.confirmationReason});S.rollback=res.rollback||[];if(!res.ok)throw new Error((res.errors||[]).join(' | '));set('Escritura iniciada. Verificando…');await wait(S.batch);download('RESULTADO-'+S.batch.batchId+'.json',{status:'WRITE_LAB_OK',completedAt:new Date().toISOString(),diff:S.diff,written:res.written,auditIds:res.auditIds||[],rollbackAvailable:!!S.rollback.length});rb.disabled=!S.rollback.length;set('Carga verificada. Ya puedes revisar Clientes y Aseguradoras.');setTimeout(function(){location.hash='#/cliente360';},800);}catch(x){rb.disabled=!S.rollback||!S.rollback.length;set('No se pudo verificar la carga: '+x.message,true);}};
 rb.onclick=function(){var z=status();if(!z.auth||!S.rollback)return;var r=Orbit.importaWriteP0.rollback(S.rollback,{approved:true,phrase:'CONFIRMO ROLLBACK',userId:z.auth.uid,reason:'Reversión de carga inicial A&S.'});download('ROLLBACK-'+(S.batch&&S.batch.batchId||'sin-lote')+'.json',{result:r,plan:S.rollback});set(r.ok?'Rollback solicitado.':'Rollback con errores.',!r.ok);};
 }
 
