@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 window.Orbit=window.Orbit||{};
-var S={p:null,file:null,payload:null,hash:'',batch:null,diff:null,rollback:null};
+var S={p:null,file:null,payload:null,hash:'',batch:null,diff:null,rollback:null,advisorsReady:false};
 
 function e(v){return Orbit.ui&&Orbit.ui.esc?Orbit.ui.esc(v):String(v==null?'':v).replace(/[&<>"']/g,function(m){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];});}
 function n(v){return String(v==null?'':v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();}
@@ -43,7 +43,7 @@ var seenAseg={};A.aseguradoras.forEach(function(r,i){if(!r||!r.id)x.push('asegur
 return{ok:!x.length,errors:x,warnings:w,arrays:A};
 }
 function allow(pr){if(!Orbit.importaWriteP0||!Array.isArray(Orbit.importaWriteP0.ALLOWED_COLLECTIONS))return false;(pr.allowedCollections||[]).forEach(function(k){if(!Orbit.importaWriteP0.ALLOWED_COLLECTIONS.includes(k))Orbit.importaWriteP0.ALLOWED_COLLECTIONS.push(k);});return true;}
-function advisors(){var m={};(Orbit.store.all('asesores')||[]).forEach(function(r){u([r.nombre,r.name,r.displayName,r.email]).forEach(function(k){if(n(k))m[n(k)]=r;});});return m;}
+function advisors(){var m={};(Orbit.store.all('asesores')||[]).forEach(function(r){u([r.nombre,r.name,r.displayName,r.email].concat(r.aliases||[])).forEach(function(k){if(n(k))m[n(k)]=r;});});return m;}
 function cm(r,rows){var d=n(r.documento||r.numeroDocumento),mail=n(r.email||r.correo),name=n(r.nombre||r.nombreCompleto),m={};(rows||[]).forEach(function(x){if(String(x.id)===String(r.id)||(d&&n(x.documento||x.numeroDocumento)===d)||(mail&&n(x.email||x.correo)===mail)||(name&&n(x.nombre||x.nombreCompleto)===name&&n(x.pais)===n(r.pais)))m[x.id]=x;});return Object.keys(m).map(function(k){return m[k];});}
 function im(r,rows){var names=u([r.nombre,r.canonicalName].concat(r.aliases||[])).map(n);return(rows||[]).filter(function(x){if(String(x.id)===String(r.id))return true;if(n(x.pais)!==n(r.pais))return false;return u([x.nombre,x.canonicalName].concat(x.aliases||[])).map(n).some(function(z){return names.includes(z);});});}
 function build(p,pr,file,sourceHash){
@@ -55,41 +55,13 @@ var diff={batchId:id,tenantId:pr.tenantId,generatedAt:new Date().toISOString(),s
 return{batch:{batchId:id,tenantId:pr.tenantId,sourceType:p.sourceType||pr.id,sourceFileName:file.name,sourceHash:diff.sourceHash,status:blocks.length?'dry_run_bloqueado':'dry_run_aprobado',hasBlockingErrors:!!blocks.length,operations:ops},diff:diff};
 }
 function wait(batch){var ids=(batch.operations||[]).map(function(o){return{c:o.collection,id:o.id||o.data&&o.data.id};});return new Promise(function(ok,bad){var start=Date.now();(function tick(){var pending=0,failed=0;ids.forEach(function(x){var r=Orbit.store.get(x.c,x.id);if(r&&r._syncStatus==='failed')failed++;else if(!r||r._syncStatus!=='synced')pending++;});if(failed)return bad(new Error('Falló la escritura de '+failed+' registros.'));if(!pending)return ok();if(Date.now()-start>120000)return bad(new Error('Tiempo de verificación agotado. Pendientes: '+pending));setTimeout(tick,500);})();});}
+function waitCatalog(ids){return new Promise(function(ok,bad){var start=Date.now();(function tick(){var pending=0,failed=0;ids.forEach(function(id){var r=Orbit.store.get('asesores',id);if(r&&r._syncStatus==='failed')failed++;else if(!r||r._syncStatus!=='synced')pending++;});if(failed)return bad(new Error('No fue posible sincronizar el catálogo de asesores.'));if(!pending)return ok();if(Date.now()-start>30000)return bad(new Error('La sincronización del catálogo de asesores no terminó.'));setTimeout(tick,300);})();});}
+function validateAdvisorConfig(config){if(!config||config.schemaVersion!=='orbit360.tenant-advisors.v1')throw new Error('Configuración de asesores inválida.');if(config.tenantId!==tenant())throw new Error('Tenant incorrecto en configuración de asesores.');if(!Array.isArray(config.advisors)||config.advisors.length!==7)throw new Error('El catálogo debe contener siete asesores.');var ids={},names={};config.advisors.forEach(function(row){var id=String(row&&row.id||'').trim(),name=String(row&&row.nombre||'').trim();if(!id||!name||row.estado!=='activo')throw new Error('Registro de asesor inválido.');if(ids[id]||names[n(name)])throw new Error('Asesor duplicado en configuración.');ids[id]=1;names[n(name)]=1;});return config;}
+async function ensureAdvisorCatalog(auth){if(S.advisorsReady)return;var response=await fetch('data/tenant-config/alianzas-soluciones.asesores.json?v=20260715-1',{cache:'no-store',credentials:'same-origin'});if(!response.ok)throw new Error('No fue posible leer la configuración de asesores.');var config=validateAdvisorConfig(await response.json()),ids=[];config.advisors.forEach(function(row){Orbit.store.update('asesores',row.id,{id:row.id,tenantId:tenant(),nombre:row.nombre,name:row.nombre,displayName:row.nombre,aliases:Array.isArray(row.aliases)?row.aliases:[],estado:'activo',activo:true,configSource:'configuracion_catalogo',configSchemaVersion:config.schemaVersion,configEffectiveDate:config.effectiveDate,accessProvisioned:false,labOnly:true,updatedBy:auth&&auth.uid||'orbit-lab-user'});ids.push(row.id);});Orbit.store.update('configuracion_catalogo','asesores-activos',{id:'asesores-activos',tenantId:tenant(),schemaVersion:config.schemaVersion,source:config.source,effectiveDate:config.effectiveDate,advisorIds:ids.slice(),advisorCount:ids.length,status:'active',labOnly:true,updatedBy:auth&&auth.uid||'orbit-lab-user'});await waitCatalog(ids);S.advisorsReady=true;}
 
-function replaceStoreCollection(name,rows){
-  if(!Orbit.store||typeof Orbit.store.raw!=='function')throw new Error('El almacenamiento LAB no está disponible.');
-  var raw=Orbit.store.raw()||{},target=raw[name];
-  if(!Array.isArray(target))throw new Error('Colección LAB no disponible: '+name+'.');
-  target.splice(0,target.length);
-  rows.forEach(function(row){target.push(row);});
-  if(typeof Orbit.store._emit==='function')Orbit.store._emit(name);
-}
-async function readCriticalDirect(){
-  var user=canonicalUser();
-  if(!user)throw new Error('Inicia sesión.');
-  if(window.OrbitLabImportReadiness&&typeof OrbitLabImportReadiness.readiness==='function'){
-    await OrbitLabImportReadiness.readiness();
-    return status();
-  }
-  var db=null;
-  try{db=window.firebase&&typeof window.firebase.firestore==='function'?window.firebase.firestore():null;}catch(x){}
-  if(!db||typeof db.collection!=='function')throw new Error('El servicio de datos LAB no está disponible.');
-  var names=['clientes','aseguradoras','asesores'];
-  await Promise.all(names.map(function(name){
-    return db.collection('tenantId').doc(tenant()).collection(name).get().then(function(snap){
-      var rows=[];
-      snap.forEach(function(docSnap){var data=docSnap.data()||{};rows.push(Object.assign({},data,{id:data.id||docSnap.id,tenantId:data.tenantId||tenant()}));});
-      replaceStoreCollection(name,rows);
-    });
-  }));
-  var z=status();z.snapshotAttached=true;z.snapshotMode='critical-one-shot-inline';return z;
-}
-function describeError(error){
-  var code=String(error&&error.code||'').replace(/^firestore\//,'');
-  if(code==='permission-denied')return 'Permiso denegado para leer el entorno de validación.';
-  if(code==='unauthenticated')return 'La sesión LAB perdió autenticación.';
-  return String(error&&error.message||error||'No fue posible preparar el dry-run.');
-}
+function replaceStoreCollection(name,rows){if(!Orbit.store||typeof Orbit.store.raw!=='function')throw new Error('El almacenamiento LAB no está disponible.');var raw=Orbit.store.raw()||{},target=raw[name];if(!Array.isArray(target))throw new Error('Colección LAB no disponible: '+name+'.');target.splice(0,target.length);rows.forEach(function(row){target.push(row);});if(typeof Orbit.store._emit==='function')Orbit.store._emit(name);}
+async function readCriticalDirect(force){var user=canonicalUser();if(!user)throw new Error('Inicia sesión.');if(window.OrbitLabImportReadiness){if(force&&typeof OrbitLabImportReadiness.loadCriticalCollections==='function')await OrbitLabImportReadiness.loadCriticalCollections(true);else if(typeof OrbitLabImportReadiness.readiness==='function')await OrbitLabImportReadiness.readiness();return status();}var db=null;try{db=window.firebase&&typeof window.firebase.firestore==='function'?window.firebase.firestore():null;}catch(x){}if(!db||typeof db.collection!=='function')throw new Error('El servicio de datos LAB no está disponible.');var names=['clientes','aseguradoras','asesores'];await Promise.all(names.map(function(name){return db.collection('tenantId').doc(tenant()).collection(name).get().then(function(snap){var rows=[];snap.forEach(function(docSnap){var data=docSnap.data()||{};rows.push(Object.assign({},data,{id:data.id||docSnap.id,tenantId:data.tenantId||tenant()}));});replaceStoreCollection(name,rows);});}));var z=status();z.snapshotAttached=true;z.snapshotMode='critical-one-shot-inline';return z;}
+function describeError(error){var code=String(error&&error.code||'').replace(/^firestore\//,'');if(code==='permission-denied')return 'Permiso denegado para leer o configurar el entorno de validación.';if(code==='unauthenticated')return 'La sesión LAB perdió autenticación.';return String(error&&error.message||error||'No fue posible preparar el dry-run.');}
 
 function modal(pr){
 var old=document.querySelector('[data-ays-initial-modal]');if(old)old.remove();
@@ -100,31 +72,15 @@ var q=function(s){return d.querySelector(s);},st=q('[data-status]'),file=q('[dat
 function set(t,bad){st.textContent=t;st.style.borderColor=bad?'var(--danger,#C5162E)':'var(--line,#ddd)';}
 q('[data-x]').onclick=function(){d.remove();};
 file.onchange=async function(){S.file=file.files&&file.files[0];S.payload=null;dry.disabled=write.disabled=report.disabled=rb.disabled=true;confirm.disabled=true;confirm.checked=false;if(!S.file)return;try{var p=JSON.parse(await S.file.text()),v=validate(p,pr);if(!v.ok)throw new Error(v.errors.slice(0,12).join(' | '));S.payload=p;S.hash=await hash(S.file);set('Archivo validado. '+v.warnings.length+' aseguradoras conservarán estado pendiente de validación y uso restringido. Prepara el dry-run.');dry.disabled=false;}catch(x){set('Archivo bloqueado: '+x.message,true);}};
-dry.onclick=async function(){
-  dry.disabled=true;
-  try{
-    if(mode()!==pr.requiredBackendMode)throw new Error('Abre el canal de validación de A&S.');
-    if(tenant()!==pr.tenantId)throw new Error('Tenant incorrecto.');
-    set('Validando sesión y leyendo Clientes, Aseguradoras y Asesores…');
-    var z=await readCriticalDirect();
-    if(!z.auth||!z.auth.uid)throw new Error('Inicia sesión.');
-    if(!allow(pr))throw new Error('Contrato de escritura no disponible.');
-    var b=build(S.payload,pr,S.file,S.hash);S.batch=b.batch;S.diff=b.diff;var x=b.diff.counts;
-    q('[data-summary]').innerHTML='<div class="card pad" style="margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px"><div>Clientes crear<br><b>'+x.clientesCrear+'</b></div><div>Clientes actualizar<br><b>'+x.clientesActualizar+'</b></div><div>Retenidos<br><b>'+x.clientesRetenidos+'</b></div><div>Aseguradoras crear<br><b>'+x.aseguradorasCrear+'</b></div><div>Aseguradoras actualizar<br><b>'+x.aseguradorasActualizar+'</b></div><div>Aseguradoras pendientes<br><b>'+x.aseguradorasPendientesValidacion+'</b></div><div>Bloqueos<br><b>'+x.bloqueos+'</b></div></div>';
-    report.disabled=false;confirm.disabled=b.batch.hasBlockingErrors;write.disabled=true;
-    set(b.batch.hasBlockingErrors?'Dry-run bloqueado. No se escribió nada.':'Dry-run aprobado. Las aseguradoras pendientes quedarán restringidas hasta completar su validación.',b.batch.hasBlockingErrors);
-  }catch(x){set('Dry-run no disponible: '+describeError(x),true);}
-  finally{dry.disabled=!S.payload;}
-};
+dry.onclick=async function(){dry.disabled=true;try{if(mode()!==pr.requiredBackendMode)throw new Error('Abre el canal de validación de A&S.');if(tenant()!==pr.tenantId)throw new Error('Tenant incorrecto.');set('Validando sesión y leyendo Clientes, Aseguradoras y Asesores…');var z=await readCriticalDirect(false);if(!z.auth||!z.auth.uid)throw new Error('Inicia sesión.');set('Sincronizando catálogo controlado de asesores…');await ensureAdvisorCatalog(z.auth);z=await readCriticalDirect(true);if(!allow(pr))throw new Error('Contrato de escritura no disponible.');var b=build(S.payload,pr,S.file,S.hash);S.batch=b.batch;S.diff=b.diff;var x=b.diff.counts;q('[data-summary]').innerHTML='<div class="card pad" style="margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px"><div>Clientes crear<br><b>'+x.clientesCrear+'</b></div><div>Clientes actualizar<br><b>'+x.clientesActualizar+'</b></div><div>Retenidos<br><b>'+x.clientesRetenidos+'</b></div><div>Aseguradoras crear<br><b>'+x.aseguradorasCrear+'</b></div><div>Aseguradoras actualizar<br><b>'+x.aseguradorasActualizar+'</b></div><div>Aseguradoras pendientes<br><b>'+x.aseguradorasPendientesValidacion+'</b></div><div>Bloqueos<br><b>'+x.bloqueos+'</b></div></div>';report.disabled=false;confirm.disabled=b.batch.hasBlockingErrors;write.disabled=true;set(b.batch.hasBlockingErrors?'Dry-run bloqueado. No se escribió nada.':'Dry-run aprobado. Catálogo de asesores verificado; las aseguradoras pendientes quedarán restringidas.',b.batch.hasBlockingErrors);}catch(x){set('Dry-run no disponible: '+describeError(x),true);}finally{dry.disabled=!S.payload;}};
 confirm.onchange=function(){write.disabled=!(confirm.checked&&S.batch&&!S.batch.hasBlockingErrors);};
 report.onclick=function(){if(S.diff)download('DRY-RUN-'+S.diff.batchId+'.json',S.diff);};
 write.onclick=async function(){write.disabled=true;confirm.disabled=true;try{var z=status();if(!z.auth||!z.auth.uid)throw new Error('La sesión LAB no está activa.');var res=Orbit.importaWriteP0.writeBatch(S.batch,{approved:true,phrase:'CONFIRMO ESCRITURA CONTROLADA',userId:z.auth.uid,reason:pr.confirmationReason});S.rollback=res.rollback||[];if(!res.ok)throw new Error((res.errors||[]).join(' | '));set('Escritura iniciada. Verificando…');await wait(S.batch);download('RESULTADO-'+S.batch.batchId+'.json',{status:'WRITE_LAB_OK',completedAt:new Date().toISOString(),diff:S.diff,written:res.written,auditIds:res.auditIds||[],rollbackAvailable:!!S.rollback.length});rb.disabled=!S.rollback.length;set('Carga verificada. Ya puedes revisar Clientes y Aseguradoras.');setTimeout(function(){location.hash='#/cliente360';},800);}catch(x){rb.disabled=!S.rollback||!S.rollback.length;set('No se pudo verificar la carga: '+x.message,true);}};
 rb.onclick=function(){var z=status();if(!z.auth||!S.rollback)return;var r=Orbit.importaWriteP0.rollback(S.rollback,{approved:true,phrase:'CONFIRMO ROLLBACK',userId:z.auth.uid,reason:'Reversión de carga inicial A&S.'});download('ROLLBACK-'+(S.batch&&S.batch.batchId||'sin-lote')+'.json',{result:r,plan:S.rollback});set(r.ok?'Rollback solicitado.':'Rollback con errores.',!r.ok);};
 }
-
 function mount(host){var pr=profile();if(!pr||mode()!==pr.requiredBackendMode||!host||host.querySelector('[data-ays-initial-card]'))return;var page=host.querySelector('.page')||host,card=document.createElement('div');card.dataset.aysInitialCard='1';card.className='card pad';card.style.cssText='margin:0 0 18px;border:1px solid var(--red,#C5162E);display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap';card.innerHTML='<div><b style="font-size:16px">'+e(pr.title)+'</b><p class="muted" style="margin:5px 0">'+e(pr.description)+'</p><small class="muted">Dry-run, confirmación y rollback.</small></div><button class="btn primary">Abrir carga inicial</button>';card.querySelector('button').onclick=function(){modal(pr);};var h=page.querySelector('.page-head');if(h&&h.nextSibling)page.insertBefore(card,h.nextSibling);else page.insertBefore(card,page.firstChild);}
 function patch(){var m=Orbit.modules&&Orbit.modules.importar;if(!m||typeof m.render!=='function')return false;if(m.__aysInitialPatched)return true;var r=m.render;m.render=function(host){r(host);mount(host);};m.__aysInitialPatched=true;if(location.hash==='#/importar')setTimeout(function(){mount(document.getElementById('host'));},0);return true;}
 function init(){S.p=profile();if(!S.p)return;if(patch())return;var i=0,t=setInterval(function(){if(patch()||++i>40)clearInterval(t);},250);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-Orbit.initialTenantImport={validatePayload:validate,buildDryRun:build,currentProfile:profile};
+Orbit.initialTenantImport={validatePayload:validate,buildDryRun:build,currentProfile:profile,ensureAdvisorCatalog:ensureAdvisorCatalog};
 })();
