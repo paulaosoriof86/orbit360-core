@@ -1,5 +1,4 @@
 name: Orbit 360 LAB Temporary Dispatcher
-# Authorized one-time trigger for Firebase LAB only.
 
 on:
   push:
@@ -17,9 +16,162 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: orbit360-ays-lab-temporary-dispatcher
+  cancel-in-progress: true
+
 jobs:
   deploy_lab_preview:
-    uses: paulaosoriof86/orbit360-core/.github/workflows/orbit360-ays-lab-preview.yml@ays/backend-tenant-lab-v99-20260703
-    with:
-      source_ref: ays/backend-tenant-lab-v99-20260703
-    secrets: inherit
+    name: Deploy authorized LAB preview
+    runs-on: ubuntu-latest
+    env:
+      EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      AUTHORIZED_BRANCH: ays/backend-tenant-lab-v99-20260703
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+
+    steps:
+      - name: Checkout authorized backend branch
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+
+      - name: Enforce LAB-only scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$AUTHORIZED_BRANCH" = "ays/backend-tenant-lab-v99-20260703"
+          test -f firebase.json
+          test -f firestore.rules
+          test -f orbit360-platform/ays-lab-preview.html
+          test -f orbit360-platform/core/backend-lab-auth-guard.js
+          test -f orbit360-platform/core/backend-lab-import-readiness-guard.js
+          test -f orbit360-platform/modules/importar-initial-tenant-lab.js
+          test -f tools/orbit360-ensure-lab-user.mjs
+          test -f tools/orbit360-test-import-initial-pending-insurers.mjs
+          test -f tools/orbit360-test-lab-import-readiness.mjs
+          if git ls-files | grep -E 'auth-firebase\.config\.local\.js|CARGA-INICIAL-AYS-.*\.json|clientes\.json|aseguradoras\.json'; then
+            echo "BLOQUEO: archivo local o datos operativos versionados."
+            exit 1
+          fi
+
+      - name: Resolve authorized Firebase LAB credentials
+        id: firebase_auth
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT=""
+          if [ -n "${SA_ORBIT360_LAB:-}" ]; then SERVICE_ACCOUNT="$SA_ORBIT360_LAB"; fi
+          if [ -z "$SERVICE_ACCOUNT" ] && [ -n "${SA_ORBIT_360_LAB:-}" ]; then SERVICE_ACCOUNT="$SA_ORBIT_360_LAB"; fi
+          if [ -z "$SERVICE_ACCOUNT" ] && [ -n "${SA_DEFAULT:-}" ]; then SERVICE_ACCOUNT="$SA_DEFAULT"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then
+            echo "BLOQUEO_SECRET"
+            exit 42
+          fi
+          if [ ${#ORBIT360_LAB_LOGIN_PASSWORD} -lt 12 ]; then
+            echo "BLOQUEO_PASSWORD"
+            exit 46
+          fi
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
+          test -n "$PROJECT_ID"
+          test "$PROJECT_ID" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "FIREBASE_PROJECT_ID=$PROJECT_ID" >> "$GITHUB_ENV"
+
+      - name: Validate runtime contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/backend-lab-loader.js
+          node --check orbit360-platform/core/backend-lab-init.js
+          node --check orbit360-platform/core/backend-lab-auth-guard.js
+          node --check orbit360-platform/core/backend-lab-import-readiness-guard.js
+          node --check orbit360-platform/data/import-initial-profiles.js
+          node --check orbit360-platform/modules/importar-initial-tenant-lab.js
+          node --check tools/orbit360-ensure-lab-user.mjs
+          node --check tools/orbit360-test-import-initial-pending-insurers.mjs
+          node --check tools/orbit360-test-lab-import-readiness.mjs
+          node tools/orbit360-test-import-initial-pending-insurers.mjs
+          node tools/orbit360-test-lab-import-readiness.mjs
+
+      - name: Ensure canonical LAB user and membership
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save firebase-admin@13
+          node tools/orbit360-ensure-lab-user.mjs
+
+      - name: Deploy Firestore rules to LAB only
+        id: rules_deploy
+        shell: bash
+        run: |
+          set +e
+          LOG_FILE="${RUNNER_TEMP}/firestore-rules-deploy.log"
+          npx --yes firebase-tools@latest deploy \
+            --only firestore:rules \
+            --project "$FIREBASE_PROJECT_ID" \
+            --non-interactive > "$LOG_FILE" 2>&1
+          CODE=$?
+          CATEGORY="ok"
+          if [ "$CODE" -ne 0 ]; then
+            if grep -Eqi 'permission|forbidden|not authorized|403|iam' "$LOG_FILE"; then
+              CATEGORY="permission_denied"
+            elif grep -Eqi 'syntax|parse|compile|invalid rules' "$LOG_FILE"; then
+              CATEGORY="rules_invalid"
+            elif grep -Eqi 'project|not found|does not exist' "$LOG_FILE"; then
+              CATEGORY="project_mismatch"
+            else
+              CATEGORY="deploy_failed"
+            fi
+          fi
+          if [ "$CODE" -eq 0 ]; then OK="true"; else OK="false"; fi
+          echo "ok=$OK" >> "$GITHUB_OUTPUT"
+          echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "Rules deploy result: $CATEGORY"
+          exit 0
+
+      - name: Publish sanitized runtime status
+        shell: bash
+        run: |
+          set -euo pipefail
+          RULES_OK='${{ steps.rules_deploy.outputs.ok }}'
+          RULES_CATEGORY='${{ steps.rules_deploy.outputs.category }}'
+          RULES_EXIT='${{ steps.rules_deploy.outputs.exit_code }}'
+          jq -n \
+            --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg commit "$(git rev-parse HEAD)" \
+            --arg branch "$AUTHORIZED_BRANCH" \
+            --arg projectId "$FIREBASE_PROJECT_ID" \
+            --arg rulesCategory "$RULES_CATEGORY" \
+            --arg rulesExit "$RULES_EXIT" \
+            --argjson rulesOk "$RULES_OK" \
+            '{schemaVersion:"orbit360-lab-runtime-status-v1",generatedAt:$generatedAt,commit:$commit,branch:$branch,projectId:$projectId,membershipBootstrap:true,rulesDeploy:{ok:$rulesOk,category:$rulesCategory,exitCode:$rulesExit},containsSecrets:false}' \
+            > orbit360-platform/lab-runtime-status.json
+
+      - name: Deploy fixed LAB preview channel
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab \
+            --project "$FIREBASE_PROJECT_ID" \
+            --expires 30d \
+            --non-interactive \
+            --json | tee "${RUNNER_TEMP}/firebase-preview.json"
+          URL="$(jq -r '.. | strings | select(test("^https://.*\\.(web\\.app|firebaseapp\\.com)$"))' "${RUNNER_TEMP}/firebase-preview.json" | head -n 1)"
+          test -n "$URL"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Preview: $URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "Rules: ${{ steps.rules_deploy.outputs.category }}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enforce successful Firestore rules deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test '${{ steps.rules_deploy.outputs.ok }}' = 'true'
