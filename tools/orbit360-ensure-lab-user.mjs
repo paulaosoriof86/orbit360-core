@@ -1,8 +1,10 @@
+import { readFileSync } from 'node:fs';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
 const EXPECTED_PROJECT_ID = 'ays-orbit-360-lab';
+const EXPECTED_SERVICE_ACCOUNT_EMAIL = 'firebase-adminsdk-fbsvc@ays-orbit-360-lab.iam.gserviceaccount.com';
 const EXPECTED_UID = 'woJlxR1iFEeiQZvTscPj4qQ5Qc73';
 const EXPECTED_EMAIL = 'orbit.lab@demo.com';
 const TENANT_ID = 'alianzas-soluciones';
@@ -12,10 +14,18 @@ function fail(message, code = 1) {
   process.exit(code);
 }
 
+function sanitizeApiMessage(value) {
+  return String(value || '')
+    .replace(/Bearer\s+[A-Za-z0-9._-]+/gi, 'Bearer [REDACTED]')
+    .replace(/"private_key"\s*:\s*"[^"]+"/gi, '"private_key":"[REDACTED]"')
+    .slice(0, 800);
+}
+
 const password = process.env.ORBIT360_LAB_LOGIN_PASSWORD || '';
 const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || '';
+const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || '';
 
-if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+if (!credentialsPath) {
   fail('BLOQUEO_CREDENCIAL: GOOGLE_APPLICATION_CREDENTIALS no está definido.', 41);
 }
 if (projectId !== EXPECTED_PROJECT_ID) {
@@ -25,12 +35,46 @@ if (password.length < 12) {
   fail('BLOQUEO_PASSWORD: ORBIT360_LAB_LOGIN_PASSWORD debe tener al menos 12 caracteres.', 43);
 }
 
+let credentialJson;
+try {
+  credentialJson = JSON.parse(readFileSync(credentialsPath, 'utf8'));
+} catch {
+  fail('BLOQUEO_CREDENCIAL: no fue posible leer la credencial LAB.', 46);
+}
+
+const serviceAccountEmail = String(credentialJson?.client_email || '').trim().toLowerCase();
+if (serviceAccountEmail !== EXPECTED_SERVICE_ACCOUNT_EMAIL) {
+  console.error('SERVICE_ACCOUNT_MATCH:false');
+  fail('BLOQUEO_CUENTA_SERVICIO: el secreto de GitHub no corresponde a la cuenta autorizada para reglas LAB.', 47);
+}
+console.log('SERVICE_ACCOUNT_MATCH:true');
+console.log(`SERVICE_ACCOUNT_EMAIL:${serviceAccountEmail}`);
+
+const credential = applicationDefault();
 const app = getApps()[0] || initializeApp({
-  credential: applicationDefault(),
+  credential,
   projectId: EXPECTED_PROJECT_ID
 });
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+try {
+  const tokenResult = await credential.getAccessToken();
+  const response = await fetch(`https://firebaserules.googleapis.com/v1/projects/${EXPECTED_PROJECT_ID}/rulesets?pageSize=1`, {
+    headers: { Authorization: `Bearer ${tokenResult.access_token}` }
+  });
+  const payload = await response.json().catch(() => ({}));
+  const status = payload?.error?.status || (response.ok ? 'OK' : 'UNKNOWN');
+  const message = payload?.error?.message || '';
+  console.log(`FIREBASE_RULES_API_STATUS:${response.status}`);
+  console.log(`FIREBASE_RULES_API_RESULT:${status}`);
+  if (!response.ok) {
+    console.log(`FIREBASE_RULES_API_MESSAGE:${sanitizeApiMessage(message)}`);
+  }
+} catch (error) {
+  console.log('FIREBASE_RULES_API_STATUS:ERROR');
+  console.log(`FIREBASE_RULES_API_MESSAGE:${sanitizeApiMessage(error?.message)}`);
+}
 
 let byUid = null;
 let byEmail = null;
@@ -89,6 +133,7 @@ console.log('Membresía LAB activa y verificada para alianzas-soluciones.');
 console.log(JSON.stringify({
   ok: true,
   projectId: EXPECTED_PROJECT_ID,
+  serviceAccountMatch: true,
   tenantId: TENANT_ID,
   uid: EXPECTED_UID,
   email: EXPECTED_EMAIL,
