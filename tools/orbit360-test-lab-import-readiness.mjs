@@ -29,7 +29,11 @@ must(guard, /data-write/, 'intercepción de escritura');
 must(guard, /data-rollback/, 'intercepción de rollback');
 must(guard, /stopImmediatePropagation/, 'bloqueo antes del handler operativo');
 must(init, /backend-lab-import-readiness-guard\.js/, 'integración del guard al runtime');
-must(importer, /if\(!z\.auth\|\|!z\.auth\.uid\)/, 'importador conserva gate de sesión');
-must(importer, /if\(!z\.snapshotAttached\)/, 'importador conserva gate de readiness');
+must(init, /importar-initial-tenant-lab\.js\?v=20260715-2/, 'cache-bust del importador autocontenido');
+must(importer, /function\s+canonicalUser\s*\(/, 'importador valida usuario Firebase canónico');
+must(importer, /function\s+readCriticalDirect\s*\(/, 'importador ejecuta lectura crítica propia');
+must(importer, /await\s+readCriticalDirect\(\)/, 'dry-run espera la lectura crítica');
+must(importer, /db\.collection\('tenantId'\)\.doc\(tenant\(\)\)\.collection\(name\)\.get\(\)/, 'fallback de lectura usa ruta tenant aislada');
+must(importer, /if\(!z\.auth\|\|!z\.auth\.uid\)/, 'importador conserva gate de sesión real');
 
 console.log('LAB_IMPORT_READINESS_CONTRACT_OK');
