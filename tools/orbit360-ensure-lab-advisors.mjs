@@ -82,4 +82,29 @@ batch.set(tenantRoot.collection('configuracion_catalogo').doc('asesores-activos'
 }, { merge: true });
 
 await batch.commit();
-console.log(JSON.stringify({ ok: true, projectId: PROJECT_ID, tenantId: TENANT_ID, advisorCount: config.advisors.length, source: config.source }));
+
+const advisorSnapshots = await Promise.all(
+  config.advisors.map(row => tenantRoot.collection('asesores').doc(row.id).get())
+);
+const verifiedAdvisors = advisorSnapshots.filter(snapshot => {
+  if (!snapshot.exists) return false;
+  const data = snapshot.data() || {};
+  return data.tenantId === TENANT_ID && data.configSource === 'configuracion_catalogo' && data.estado === 'activo';
+});
+const catalogSnapshot = await tenantRoot.collection('configuracion_catalogo').doc('asesores-activos').get();
+const catalogData = catalogSnapshot.exists ? catalogSnapshot.data() || {} : {};
+
+if (verifiedAdvisors.length !== config.advisors.length) stop('BLOQUEO_VERIFICACION_ASESORES');
+if (catalogData.advisorCount !== config.advisors.length || catalogData.status !== 'active') {
+  stop('BLOQUEO_VERIFICACION_CATALOGO_ASESORES');
+}
+
+console.log(JSON.stringify({
+  ok: true,
+  projectId: PROJECT_ID,
+  tenantId: TENANT_ID,
+  advisorCount: config.advisors.length,
+  verifiedAdvisorCount: verifiedAdvisors.length,
+  catalogVerified: true,
+  source: config.source
+}));
