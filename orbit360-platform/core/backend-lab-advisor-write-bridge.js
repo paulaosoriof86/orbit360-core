@@ -1,5 +1,6 @@
 /* ============================================================
    Orbit 360 · Puente de confirmación del catálogo de asesores LAB
+   Se instala únicamente sobre el adapter Firestore LAB explícito.
    Conserva temporalmente filas ya confirmadas por write-ok cuando
    un snapshot vacío reemplaza el caché antes de la relectura directa.
    No escribe datos por sí mismo y no contiene credenciales.
@@ -14,25 +15,31 @@
   if (mode !== 'firestore-lab' || tenant !== 'alianzas-soluciones') return;
 
   function install() {
-    if (!window.Orbit || !Orbit.store || typeof Orbit.store.update !== 'function' || typeof Orbit.store.get !== 'function') {
+    var store = window.Orbit && Orbit.store;
+    if (
+      !store ||
+      store.__firestoreLabExplicit !== true ||
+      typeof store.update !== 'function' ||
+      typeof store.get !== 'function'
+    ) {
       setTimeout(install, 100);
       return;
     }
-    if (Orbit.store.__advisorWriteBridgeInstalled) return;
+    if (store.__advisorWriteBridgeInstalled) return;
 
-    var originalUpdate = Orbit.store.update.bind(Orbit.store);
-    var originalGet = Orbit.store.get.bind(Orbit.store);
+    var originalUpdate = store.update.bind(store);
+    var originalGet = store.get.bind(store);
     var desired = {};
     var confirmed = {};
 
-    Orbit.store.update = function (collection, id, patch) {
+    store.update = function (collection, id, patch) {
       if (collection === 'asesores' && id) {
         desired[id] = Object.assign({}, patch || {}, { id: id, tenantId: tenant });
       }
       return originalUpdate(collection, id, patch);
     };
 
-    Orbit.store.get = function (collection, id) {
+    store.get = function (collection, id) {
       var row = originalGet(collection, id);
       if (collection === 'asesores' && id && confirmed[id]) {
         return Object.assign({}, row || {}, confirmed[id]);
@@ -52,12 +59,14 @@
       delete confirmed[detail.id];
     });
 
-    Orbit.store.__advisorWriteBridgeInstalled = true;
+    store.__advisorWriteBridgeInstalled = true;
     window.OrbitLabAdvisorWriteBridge = {
+      storeSource: 'firestore-lab-explicit',
       status: function () {
         return {
           desired: Object.keys(desired).length,
-          confirmed: Object.keys(confirmed).length
+          confirmed: Object.keys(confirmed).length,
+          installedOnFirestoreLab: store.__firestoreLabExplicit === true
         };
       }
     };
