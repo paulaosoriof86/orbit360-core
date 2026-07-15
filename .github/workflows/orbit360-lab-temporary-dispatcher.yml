@@ -78,10 +78,57 @@ jobs:
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
+          SERVICE_ACCOUNT_EMAIL="$(jq -r '.client_email // empty' "$KEY_FILE")"
           test -n "$PROJECT_ID"
+          test -n "$SERVICE_ACCOUNT_EMAIL"
           test "$PROJECT_ID" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          echo "::add-mask::$SERVICE_ACCOUNT_EMAIL"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
           echo "FIREBASE_PROJECT_ID=$PROJECT_ID" >> "$GITHUB_ENV"
+          echo "FIREBASE_SERVICE_ACCOUNT_EMAIL=$SERVICE_ACCOUNT_EMAIL" >> "$GITHUB_ENV"
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Attempt minimal Firebase Rules Admin IAM grant
+        id: iam_grant
+        shell: bash
+        run: |
+          set +e
+          test "$FIREBASE_PROJECT_ID" = "$EXPECTED_FIREBASE_PROJECT_ID" || exit 45
+          gcloud auth activate-service-account "$FIREBASE_SERVICE_ACCOUNT_EMAIL" \
+            --key-file "$GOOGLE_APPLICATION_CREDENTIALS" \
+            --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1
+          AUTH_CODE=$?
+          LOG_FILE="${RUNNER_TEMP}/orbit360-iam-grant.log"
+          if [ "$AUTH_CODE" -eq 0 ]; then
+            gcloud projects add-iam-policy-binding "$FIREBASE_PROJECT_ID" \
+              --member="serviceAccount:${FIREBASE_SERVICE_ACCOUNT_EMAIL}" \
+              --role="roles/firebaserules.admin" \
+              --condition=None \
+              --quiet > "$LOG_FILE" 2>&1
+            CODE=$?
+          else
+            CODE=$AUTH_CODE
+            echo "gcloud authentication failed" > "$LOG_FILE"
+          fi
+          CATEGORY="granted"
+          if [ "$CODE" -ne 0 ]; then
+            if grep -Eqi 'permission|forbidden|not authorized|403|setIamPolicy' "$LOG_FILE"; then
+              CATEGORY="permission_denied"
+            elif grep -Eqi 'project|not found|does not exist' "$LOG_FILE"; then
+              CATEGORY="project_mismatch"
+            else
+              CATEGORY="grant_failed"
+            fi
+          fi
+          if [ "$CODE" -eq 0 ]; then OK="true"; else OK="false"; fi
+          echo "ok=$OK" >> "$GITHUB_OUTPUT"
+          echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "IAM grant result: $CATEGORY"
+          if [ "$CODE" -eq 0 ]; then sleep 15; fi
+          exit 0
 
       - name: Validate runtime contracts
         shell: bash
@@ -140,6 +187,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          IAM_OK='${{ steps.iam_grant.outputs.ok }}'
+          IAM_CATEGORY='${{ steps.iam_grant.outputs.category }}'
+          IAM_EXIT='${{ steps.iam_grant.outputs.exit_code }}'
           RULES_OK='${{ steps.rules_deploy.outputs.ok }}'
           RULES_CATEGORY='${{ steps.rules_deploy.outputs.category }}'
           RULES_EXIT='${{ steps.rules_deploy.outputs.exit_code }}'
@@ -148,10 +198,13 @@ jobs:
             --arg commit "$(git rev-parse HEAD)" \
             --arg branch "$AUTHORIZED_BRANCH" \
             --arg projectId "$FIREBASE_PROJECT_ID" \
+            --arg iamCategory "$IAM_CATEGORY" \
+            --arg iamExit "$IAM_EXIT" \
             --arg rulesCategory "$RULES_CATEGORY" \
             --arg rulesExit "$RULES_EXIT" \
+            --argjson iamOk "$IAM_OK" \
             --argjson rulesOk "$RULES_OK" \
-            '{schemaVersion:"orbit360-lab-runtime-status-v1",generatedAt:$generatedAt,commit:$commit,branch:$branch,projectId:$projectId,membershipBootstrap:true,rulesDeploy:{ok:$rulesOk,category:$rulesCategory,exitCode:$rulesExit},containsSecrets:false}' \
+            '{schemaVersion:"orbit360-lab-runtime-status-v2",generatedAt:$generatedAt,commit:$commit,branch:$branch,projectId:$projectId,membershipBootstrap:true,iamGrant:{ok:$iamOk,category:$iamCategory,exitCode:$iamExit,role:"roles/firebaserules.admin"},rulesDeploy:{ok:$rulesOk,category:$rulesCategory,exitCode:$rulesExit},containsSecrets:false}' \
             > orbit360-platform/lab-runtime-status.json
 
       - name: Deploy fixed LAB preview channel
@@ -168,6 +221,7 @@ jobs:
           test -n "$URL"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Preview: $URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "IAM grant: ${{ steps.iam_grant.outputs.category }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Rules: ${{ steps.rules_deploy.outputs.category }}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Enforce successful Firestore rules deployment
