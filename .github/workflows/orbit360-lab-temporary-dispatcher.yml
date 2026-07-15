@@ -130,6 +130,22 @@ jobs:
           if [ "$CODE" -eq 0 ]; then sleep 15; fi
           exit 0
 
+      - name: IAM_GRANTED
+        if: steps.iam_grant.outputs.category == 'granted'
+        run: echo "Minimal IAM role granted."
+
+      - name: IAM_PERMISSION_DENIED
+        if: steps.iam_grant.outputs.category == 'permission_denied'
+        run: echo "IAM policy update denied."
+
+      - name: IAM_PROJECT_MISMATCH
+        if: steps.iam_grant.outputs.category == 'project_mismatch'
+        run: echo "IAM project mismatch."
+
+      - name: IAM_GRANT_FAILED
+        if: steps.iam_grant.outputs.category == 'grant_failed'
+        run: echo "IAM grant failed for another reason."
+
       - name: Validate runtime contracts
         shell: bash
         run: |
@@ -182,6 +198,26 @@ jobs:
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
           echo "Rules deploy result: $CATEGORY"
           exit 0
+
+      - name: RULES_OK
+        if: steps.rules_deploy.outputs.category == 'ok'
+        run: echo "Firestore rules deployed."
+
+      - name: RULES_PERMISSION_DENIED
+        if: steps.rules_deploy.outputs.category == 'permission_denied'
+        run: echo "Firestore rules deployment denied."
+
+      - name: RULES_INVALID
+        if: steps.rules_deploy.outputs.category == 'rules_invalid'
+        run: echo "Firestore rules invalid."
+
+      - name: RULES_PROJECT_MISMATCH
+        if: steps.rules_deploy.outputs.category == 'project_mismatch'
+        run: echo "Firestore rules project mismatch."
+
+      - name: RULES_DEPLOY_FAILED
+        if: steps.rules_deploy.outputs.category == 'deploy_failed'
+        run: echo "Firestore rules deployment failed."
 
       - name: Publish sanitized runtime status
         shell: bash
