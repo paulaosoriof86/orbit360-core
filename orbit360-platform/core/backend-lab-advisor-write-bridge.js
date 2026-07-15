@@ -1,10 +1,11 @@
 /* ============================================================
-   Orbit 360 · Catálogo canónico de asesores para carga inicial LAB
+   Orbit 360 · Resolución de asesores para carga inicial LAB
    - Solo tenant alianzas-soluciones y adapter Firestore LAB explícito.
    - El dry-run usa configuración canónica en memoria y no escribe.
-   - Antes de confirmar la carga verifica que los 7 asesores existan
-     realmente en Firestore; si faltan, los sincroniza vía Orbit.store.
-   - Los errores reales de escritura siguen siendo bloqueantes.
+   - Reconcilia el catálogo con usuarios creados desde Equipo por
+     nombre, correo, alias o canonicalAdvisorKey; conserva su ID real.
+   - Antes de confirmar verifica los asesores en Firestore y crea solo
+     los realmente faltantes, sin duplicar usuarios self-service.
    ============================================================ */
 (function () {
   'use strict';
@@ -12,12 +13,13 @@
   var params = new URLSearchParams(window.location.search || '');
   var mode = params.get('orbitBackend') || (window.OrbitBackend && window.OrbitBackend.mode) || '';
   var tenant = params.get('tenant') || (window.OrbitBackend && (window.OrbitBackend.tenantId || window.OrbitBackend.tenant)) || '';
-  var CONFIG_URL = 'data/tenant-config/alianzas-soluciones.asesores.json?v=20260715-6';
+  var CONFIG_URL = 'data/tenant-config/alianzas-soluciones.asesores.json?v=20260715-7';
   var ready = false;
   var installing = false;
   var dryRunPhase = false;
   var bypassDry = false;
   var bypassWrite = false;
+  var canonicalCatalog = [];
   var catalog = [];
   var byId = {};
 
@@ -25,6 +27,39 @@
 
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
+  }
+
+  function norm(value) {
+    return String(value || '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/[^a-z0-9@._+-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function unique(values) {
+    var seen = {};
+    return (values || []).filter(function (value) {
+      var key = norm(value);
+      if (!key || seen[key]) return false;
+      seen[key] = true;
+      return true;
+    });
+  }
+
+  function identityValues(row) {
+    return unique([
+      row && row.nombre,
+      row && row.name,
+      row && row.displayName,
+      row && row.email,
+      row && row.correo,
+      row && row.canonicalAdvisorKey
+    ].concat((row && row.aliases) || []));
+  }
+
+  function identitiesIntersect(left, right) {
+    var index = {};
+    identityValues(left).forEach(function (value) { index[norm(value)] = true; });
+    return identityValues(right).some(function (value) { return !!index[norm(value)]; });
   }
 
   function currentUserId() {
@@ -64,6 +99,7 @@
   function normalizedRow(row, config) {
     return {
       id: row.id,
+      canonicalAdvisorKey: row.id,
       tenantId: tenant,
       nombre: row.nombre,
       name: row.nombre,
@@ -84,13 +120,57 @@
     };
   }
 
-  async function loadConfig() {
+  function findExisting(canonical, rows) {
+    var exact = (rows || []).find(function (row) {
+      return row && (row.id === canonical.id || row.canonicalAdvisorKey === canonical.id);
+    });
+    if (exact) return exact;
+    return (rows || []).find(function (row) { return row && identitiesIntersect(canonical, row); }) || null;
+  }
+
+  function effectiveRow(canonical, existing) {
+    if (!existing) return clone(canonical);
+    var aliases = unique((canonical.aliases || []).concat(existing.aliases || [], [canonical.nombre]));
+    var roles = Array.isArray(existing.roles) && existing.roles.length
+      ? existing.roles.slice()
+      : (canonical.roles || []).slice();
+    return Object.assign({}, canonical, existing, {
+      id: existing.id,
+      canonicalAdvisorKey: canonical.id,
+      tenantId: tenant,
+      nombre: existing.nombre || existing.name || canonical.nombre,
+      name: existing.nombre || existing.name || canonical.nombre,
+      displayName: existing.displayName || existing.nombre || existing.name || canonical.nombre,
+      aliases: aliases,
+      roles: roles,
+      rol: existing.rol || existing.rolDefault || canonical.rol,
+      rolDefault: existing.rolDefault || existing.rol || canonical.rolDefault,
+      scopeDatos: existing.scopeDatos || canonical.scopeDatos,
+      configSource: 'configuracion_catalogo_reconciliado',
+      configSchemaVersion: canonical.configSchemaVersion,
+      configEffectiveDate: canonical.configEffectiveDate
+    });
+  }
+
+  function reconcile(rows) {
+    var sourceRows = Array.isArray(rows) ? rows : [];
+    catalog = canonicalCatalog.map(function (canonical) {
+      return effectiveRow(canonical, findExisting(canonical, sourceRows));
+    });
+    byId = {};
+    catalog.forEach(function (row) {
+      byId[row.id] = row;
+      if (row.canonicalAdvisorKey) byId[row.canonicalAdvisorKey] = row;
+    });
+    return catalog;
+  }
+
+  async function loadConfig(store) {
     var response = await fetch(CONFIG_URL, { cache: 'no-store', credentials: 'same-origin' });
     if (!response.ok) throw new Error('No fue posible leer la configuración de asesores.');
     var config = validateConfig(await response.json());
-    catalog = config.advisors.map(function (row) { return normalizedRow(row, config); });
-    byId = {};
-    catalog.forEach(function (row) { byId[row.id] = row; });
+    canonicalCatalog = config.advisors.map(function (row) { return normalizedRow(row, config); });
+    reconcile(store.all('asesores') || []);
   }
 
   function mergeRows(rows) {
@@ -132,31 +212,34 @@
     });
   }
 
-  async function readPersistedIds() {
+  async function readPersistedRows() {
     var db = window.firebase && typeof firebase.firestore === 'function' ? firebase.firestore() : null;
     if (!db) throw new Error('Firestore LAB no está disponible.');
     var snapshot = await db.collection('tenantId').doc(tenant).collection('asesores').get();
-    var ids = {};
+    var rows = [];
     snapshot.forEach(function (doc) {
-      var data = doc.data() || {};
-      ids[data.id || doc.id] = true;
+      rows.push(Object.assign({ id: doc.id }, doc.data() || {}));
     });
-    return ids;
+    return rows;
+  }
+
+  function missingCanonicals(rows) {
+    return canonicalCatalog.filter(function (canonical) { return !findExisting(canonical, rows); });
   }
 
   async function persistAndVerify(store, writeReal) {
-    var ids = catalog.map(function (row) { return row.id; });
-    var persisted = await readPersistedIds();
-    var missing = ids.filter(function (id) { return !persisted[id]; });
+    var persistedRows = await readPersistedRows();
+    var missing = missingCanonicals(persistedRows);
     if (missing.length) {
-      catalog.forEach(function (row) {
-        if (!persisted[row.id]) writeReal('asesores', row.id, clone(row));
+      missing.forEach(function (canonical) {
+        writeReal('asesores', canonical.id, clone(canonical));
       });
-      await waitWrites(store, missing);
+      await waitWrites(store, missing.map(function (row) { return row.id; }));
     }
-    var verified = await readPersistedIds();
-    var stillMissing = ids.filter(function (id) { return !verified[id]; });
+    var verifiedRows = await readPersistedRows();
+    var stillMissing = missingCanonicals(verifiedRows);
     if (stillMissing.length) throw new Error('Firestore no confirmó ' + stillMissing.length + ' asesores del catálogo.');
+    reconcile(verifiedRows);
     return true;
   }
 
@@ -169,7 +252,7 @@
     }
     installing = true;
     try {
-      await loadConfig();
+      await loadConfig(store);
       var originalAll = store.all.bind(store);
       var originalGet = store.get.bind(store);
       var originalUpdate = store.update.bind(store);
@@ -203,6 +286,7 @@
           return {
             ready: ready,
             advisorCount: catalog.length,
+            reconciledExisting: catalog.filter(function (row) { return row.id !== row.canonicalAdvisorKey; }).length,
             dryRunReadOnly: dryRunPhase,
             installedOnFirestoreLab: store.__firestoreLabExplicit === true
           };
