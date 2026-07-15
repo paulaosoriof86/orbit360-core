@@ -24,6 +24,12 @@ on:
       - "firebase.json"
       - ".github/workflows/orbit360-ays-lab-preview.yml"
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      source_ref:
+        description: Rama exacta autorizada para checkout y despliegue LAB.
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -36,12 +42,14 @@ jobs:
   deploy_preview:
     name: Deploy preview only
     if: >-
+      github.event_name == 'workflow_call' ||
       (github.event_name == 'push' && github.ref_name == 'ays/backend-tenant-lab-v99-20260703') ||
       (github.event_name == 'pull_request' && github.head_ref == 'ays/backend-tenant-lab-v99-20260703') ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
       EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      SOURCE_REF: ${{ inputs.source_ref || github.head_ref || github.ref_name }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -50,13 +58,14 @@ jobs:
     steps:
       - name: Checkout authorized branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref || github.event.pull_request.head.sha || github.sha }}
 
       - name: Enforce preview-only branch and content
         shell: bash
         run: |
           set -euo pipefail
-          AUTHORIZED_BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-          test "$AUTHORIZED_BRANCH" = "ays/backend-tenant-lab-v99-20260703"
+          test "$SOURCE_REF" = "ays/backend-tenant-lab-v99-20260703"
           test -f firebase.json
           test -f firestore.rules
           test -f orbit360-platform/ays-lab-preview.html
@@ -171,7 +180,7 @@ jobs:
           jq -n \
             --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --arg commit "$GITHUB_SHA" \
-            --arg branch "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" \
+            --arg branch "$SOURCE_REF" \
             --arg projectId "$FIREBASE_PROJECT_ID" \
             --arg rulesCategory "$RULES_CATEGORY" \
             --arg rulesExit "$RULES_EXIT" \
