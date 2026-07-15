@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - ".github/workflows/orbit360-lab-temporary-dispatcher.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/orbit360-lab-dispatch-trigger.txt"
   workflow_dispatch:
 
 permissions:
