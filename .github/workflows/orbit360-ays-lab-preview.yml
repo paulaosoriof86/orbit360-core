@@ -8,6 +8,8 @@ on:
       - "orbit360-platform/**"
       - "tools/orbit360-ensure-lab-user.mjs"
       - "tools/orbit360-test-import-initial-pending-insurers.mjs"
+      - "tools/orbit360-test-lab-import-readiness.mjs"
+      - "firestore.rules"
       - "firebase.json"
       - ".github/workflows/orbit360-ays-lab-preview.yml"
   pull_request:
@@ -17,6 +19,8 @@ on:
       - "orbit360-platform/**"
       - "tools/orbit360-ensure-lab-user.mjs"
       - "tools/orbit360-test-import-initial-pending-insurers.mjs"
+      - "tools/orbit360-test-lab-import-readiness.mjs"
+      - "firestore.rules"
       - "firebase.json"
       - ".github/workflows/orbit360-ays-lab-preview.yml"
   workflow_dispatch:
@@ -54,11 +58,14 @@ jobs:
           AUTHORIZED_BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
           test "$AUTHORIZED_BRANCH" = "ays/backend-tenant-lab-v99-20260703"
           test -f firebase.json
+          test -f firestore.rules
           test -f orbit360-platform/ays-lab-preview.html
           test -f orbit360-platform/core/backend-lab-auth-guard.js
+          test -f orbit360-platform/core/backend-lab-import-readiness-guard.js
           test -f orbit360-platform/modules/importar-initial-tenant-lab.js
           test -f tools/orbit360-ensure-lab-user.mjs
           test -f tools/orbit360-test-import-initial-pending-insurers.mjs
+          test -f tools/orbit360-test-lab-import-readiness.mjs
           if git ls-files | grep -E 'auth-firebase\.config\.local\.js|CARGA-INICIAL-AYS-.*\.json|clientes\.json|aseguradoras\.json'; then
             echo "Bloqueo: se detectó configuración local o datos reales versionados."
             exit 1
@@ -104,6 +111,7 @@ jobs:
           node --check orbit360-platform/core/backend-lab-loader.js
           node --check orbit360-platform/core/backend-lab-init.js
           node --check orbit360-platform/core/backend-lab-auth-guard.js
+          node --check orbit360-platform/core/backend-lab-import-readiness-guard.js
           node --check orbit360-platform/core/importa-write-p0.js
           node --check orbit360-platform/core/pwa.js
           node --check orbit360-platform/core/auth.js
@@ -111,7 +119,9 @@ jobs:
           node --check orbit360-platform/modules/importar-initial-tenant-lab.js
           node --check tools/orbit360-ensure-lab-user.mjs
           node --check tools/orbit360-test-import-initial-pending-insurers.mjs
+          node --check tools/orbit360-test-lab-import-readiness.mjs
           node tools/orbit360-test-import-initial-pending-insurers.mjs
+          node tools/orbit360-test-lab-import-readiness.mjs
 
       - name: Ensure canonical LAB user and tenant membership
         shell: bash
@@ -119,6 +129,16 @@ jobs:
           set -euo pipefail
           npm install --no-save firebase-admin@13
           node tools/orbit360-ensure-lab-user.mjs
+
+      - name: Deploy Firestore rules to authorized LAB project
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$FIREBASE_PROJECT_ID" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          npx --yes firebase-tools@latest deploy \
+            --only firestore:rules \
+            --project "$FIREBASE_PROJECT_ID" \
+            --non-interactive
 
       - name: Deploy fixed preview channel
         id: deploy
@@ -147,6 +167,8 @@ jobs:
             echo "Proyecto: $FIREBASE_PROJECT_ID"
             echo ""
             echo "Usuario LAB sincronizado: orbit.lab@demo.com"
+            echo ""
+            echo "Reglas Firestore LAB: desplegadas antes del preview"
             echo ""
             echo "Canal: orbit360-ays-lab · expiración renovable 30 días · no live."
           } >> "$GITHUB_STEP_SUMMARY"
