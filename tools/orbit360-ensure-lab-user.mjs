@@ -140,3 +140,6 @@ console.log(JSON.stringify({
   advisorCatalogSynchronized: diagnostic.advisors.ok,
   passwordExposed: false
 }));
+
+if (!diagnostic.membership.ok) fail('BLOQUEO_MEMBRESIA_LAB_NO_VERIFICADA', 48);
+if (!diagnostic.advisors.ok) fail('BLOQUEO_CATALOGO_ASESORES_NO_VERIFICADO', 49);
