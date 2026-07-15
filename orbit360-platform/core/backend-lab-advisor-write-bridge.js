@@ -4,6 +4,7 @@
    - El dry-run usa configuración canónica en memoria y no escribe.
    - Reconcilia el catálogo con usuarios creados desde Equipo por
      nombre, correo, alias o canonicalAdvisorKey; conserva su ID real.
+   - Recalcula la reconciliación cuando llega cada snapshot Firestore.
    - Antes de confirmar verifica los asesores en Firestore y crea solo
      los realmente faltantes, sin duplicar usuarios self-service.
    ============================================================ */
@@ -259,7 +260,9 @@
 
       store.all = function (collection) {
         var rows = originalAll(collection);
-        return collection === 'asesores' ? mergeRows(rows) : rows;
+        if (collection !== 'asesores') return rows;
+        reconcile(rows);
+        return mergeRows(rows);
       };
 
       store.get = function (collection, id) {
