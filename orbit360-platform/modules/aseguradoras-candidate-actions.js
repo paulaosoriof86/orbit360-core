@@ -33,6 +33,21 @@
   }
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
+  function rolesOf(row) {
+    return Array.from(new Set([].concat(row && (row.roles || row.rolesAsignados || row.rolesDisponibles) || [row && (row.rolDefault || row.rol)]).map(clean).filter(Boolean)));
+  }
+  function alignSessionToCatalog() {
+    try {
+      if (!window.Orbit || !Orbit.session || !Orbit.store || !Orbit.store.all || !Orbit.store.get) return false;
+      const currentId = clean(Orbit.session.asesorId && Orbit.session.asesorId());
+      if (currentId && Orbit.store.get('asesores', currentId)) return true;
+      const role = clean(Orbit.session.rol && Orbit.session.rol());
+      const candidates = (Orbit.store.all('asesores') || []).filter(row => row && row.activo !== false && row.estado !== 'inactivo' && rolesOf(row).includes(role));
+      if (candidates.length !== 1 || !candidates[0].id) return false;
+      Orbit.session.set(role, clean(candidates[0].id));
+      return true;
+    } catch (error) { return false; }
+  }
   function canManage() {
     try { return ['Dirección', 'Admin'].includes(clean(Orbit.session && Orbit.session.rol && Orbit.session.rol())); }
     catch (e) { return false; }
@@ -84,6 +99,8 @@
   }
   function schedule() {
     loadRuntimeContracts();
+    alignSessionToCatalog();
+    setTimeout(alignSessionToCatalog, 150);
     setTimeout(enhance, 0);
     setTimeout(enhance, 180);
   }
@@ -94,6 +111,7 @@
   window.addEventListener('orbit:store:emit', schedule);
   loadRuntimeContracts();
   (function wait() {
+    alignSessionToCatalog();
     if (window.Orbit && Orbit.modules && Orbit.modules.aseguradoras && Orbit.aseguradorasKnowledgeCatalog) { schedule(); return; }
     attempts += 1;
     if (attempts < 100) setTimeout(wait, 100);
