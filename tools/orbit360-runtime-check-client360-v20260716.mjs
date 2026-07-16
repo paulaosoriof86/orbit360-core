@@ -32,18 +32,46 @@ export async function waitForRealTenantData(page, expectedInsurers = 26) {
   return counts;
 }
 
+async function readScopeState(page) {
+  return page.evaluate(() => {
+    const all = Orbit.store.all('clientes') || [];
+    const access = Orbit.access;
+    const scope = access && access.dataScope ? access.dataScope('cliente360') : 'all';
+    const actorAdvisorId = access && access.actorAdvisorId ? String(access.actorAdvisorId() || '') : '';
+    const scoped = access && access.filter ? access.filter('clientes', all, 'cliente360') : all;
+    const ownConsistent = scope !== 'own' || scoped.every(row => String(row.asesorId || '') === actorAdvisorId);
+    return {
+      role: Orbit.session && Orbit.session.rol ? String(Orbit.session.rol() || '') : '',
+      scope,
+      actorAdvisorIdPresent: !!actorAdvisorId,
+      totalClients: all.length,
+      scopedClients: scoped.length,
+      ownConsistent
+    };
+  });
+}
+
 export async function validateClient360(page, report, label) {
   await page.evaluate(() => { location.hash = '#/cliente360'; });
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(800);
+
+  const scopeState = await readScopeState(page);
+  report[`${label}ClientScope`] = scopeState;
+  assert(scopeState.totalClients === EXPECTED_CLIENTS, 'CLIENT_TOTAL_NOT_414', `${label}:${scopeState.totalClients}`);
+  assert(['all','team','own'].includes(scopeState.scope), 'CLIENT_SCOPE_INVALID', `${label}:${scopeState.scope}`);
+  assert(scopeState.scopedClients > 0, 'CLIENT_SCOPE_EMPTY', `${label}:${scopeState.scope}`);
+  assert(scopeState.ownConsistent, 'CLIENT_OWN_SCOPE_LEAK', label);
+  if (scopeState.scope === 'own') assert(scopeState.actorAdvisorIdPresent, 'CLIENT_OWN_SCOPE_WITHOUT_ADVISOR', label);
 
   const rows = page.locator('table.tbl tbody tr.clickable');
   await rows.first().waitFor({ state: 'visible', timeout: 20000 });
   report[`${label}VisibleClientRows`] = await rows.count();
-  assert(report[`${label}VisibleClientRows`] > 0, 'CLIENT_LIST_EMPTY', label);
+  assert(report[`${label}VisibleClientRows`] === scopeState.scopedClients, 'CLIENT_LIST_SCOPE_COUNT_MISMATCH', `${label}:${report[`${label}VisibleClientRows`]}/${scopeState.scopedClients}`);
 
   const kpiText = clean(await page.locator('.kpi-row .kpi').first().innerText());
-  report[`${label}ClientKpiHasExpectedCount`] = new RegExp(`\\b${EXPECTED_CLIENTS}\\b`).test(kpiText);
-  assert(report[`${label}ClientKpiHasExpectedCount`], 'CLIENT_KPI_NOT_414', label);
+  report[`${label}ClientKpiExpectedCount`] = scopeState.scopedClients;
+  report[`${label}ClientKpiMatchesScope`] = new RegExp(`\\b${scopeState.scopedClients}\\b`).test(kpiText);
+  assert(report[`${label}ClientKpiMatchesScope`], 'CLIENT_KPI_SCOPE_MISMATCH', `${label}:${scopeState.scopedClients}`);
 
   await rows.first().click();
   await page.locator('.fichahdr').waitFor({ state: 'visible', timeout: 15000 });
