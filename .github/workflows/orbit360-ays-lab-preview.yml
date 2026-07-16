@@ -148,6 +148,14 @@ jobs:
           npm install --no-save firebase-admin@13
           node tools/orbit360-ensure-lab-user.mjs
 
+      - name: Upload sanitized tenant counts
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-lab-data-counts
+          path: orbit360-platform/lab-data-counts.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Deploy Firestore rules to authorized LAB project
         id: rules_deploy
         shell: bash
@@ -207,7 +215,7 @@ jobs:
             --expires 30d \
             --non-interactive \
             --json | tee "${RUNNER_TEMP}/firebase-preview.json"
-          URL="$(jq -r '.. | strings | select(test("^https://.*\\.(web\\.app|firebaseapp\\.com)$"))' "${RUNNER_TEMP}/firebase-preview.json" | head -n 1)"
+          URL="$(jq -r '.. | strings | select(test("^https://.*\\.(web\\.app|firebaseapp\.com)$"))' "${RUNNER_TEMP}/firebase-preview.json" | head -n 1)"
           if [ -z "$URL" ]; then
             echo "No se pudo resolver la URL del preview."
             cat "${RUNNER_TEMP}/firebase-preview.json"
