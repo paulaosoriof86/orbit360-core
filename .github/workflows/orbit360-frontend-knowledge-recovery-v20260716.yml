@@ -1,0 +1,40 @@
+name: Orbit 360 frontend knowledge recovery v20260716
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/modules/aseguradoras-frontend-projection-v20260716.js'
+      - 'orbit360-platform/styles/aseguradoras-frontend-projection-v20260716.css'
+      - 'orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20260716.js'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js'
+      - 'orbit360-platform/core/pwa.js'
+      - 'orbit360-platform/modules/aseguradoras.js'
+      - 'orbit360-platform/tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs'
+      - '.github/workflows/orbit360-frontend-knowledge-recovery-v20260716.yml'
+  pull_request:
+    paths:
+      - 'orbit360-platform/modules/aseguradoras-frontend-projection-v20260716.js'
+      - 'orbit360-platform/styles/aseguradoras-frontend-projection-v20260716.css'
+      - 'orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20260716.js'
+      - 'orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js'
+      - 'orbit360-platform/core/pwa.js'
+      - 'orbit360-platform/modules/aseguradoras.js'
+      - 'orbit360-platform/tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs'
+      - '.github/workflows/orbit360-frontend-knowledge-recovery-v20260716.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate frontend recovery and mapped knowledge projection
+        run: node orbit360-platform/tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs
