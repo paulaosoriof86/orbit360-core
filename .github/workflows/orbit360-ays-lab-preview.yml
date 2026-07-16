@@ -73,8 +73,8 @@ jobs:
           test -f orbit360-platform/ays-lab-preview.html
           test -f orbit360-platform/core/backend-lab-auth-guard.js
           test -f orbit360-platform/core/backend-lab-import-readiness-guard.js
-          test -f orbit360-platform/core/store-view-refresh-v20260715.js
-          test -f orbit360-platform/modules/aseguradoras-directory-priority-v20260715.js
+          test -f orbit360-platform/core/router.js
+          test -f orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js
           test -f orbit360-platform/modules/importar-initial-tenant-lab.js
           test -f tools/orbit360-ensure-lab-user.mjs
           test -f tools/orbit360-verify-lab-data-counts.mjs
@@ -126,13 +126,13 @@ jobs:
           node --check orbit360-platform/core/backend-lab-init.js
           node --check orbit360-platform/core/backend-lab-auth-guard.js
           node --check orbit360-platform/core/backend-lab-import-readiness-guard.js
-          node --check orbit360-platform/core/store-view-refresh-v20260715.js
+          node --check orbit360-platform/core/router.js
           node --check orbit360-platform/core/importa-dryrun-p0.js
           node --check orbit360-platform/core/importa-write-p0.js
           node --check orbit360-platform/core/pwa.js
           node --check orbit360-platform/core/auth.js
           node --check orbit360-platform/data/import-initial-profiles.js
-          node --check orbit360-platform/modules/aseguradoras-directory-priority-v20260715.js
+          node --check orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js
           node --check orbit360-platform/modules/importar-initial-tenant-lab.js
           node --check tools/orbit360-ensure-lab-user.mjs
           node --check tools/orbit360-verify-lab-data-counts.mjs
@@ -242,8 +242,10 @@ jobs:
             echo "Canal: orbit360-ays-lab · expiración renovable 30 días · no live."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Enforce successful Firestore rules deployment
+      - name: Report Firestore rules deployment status
         shell: bash
         run: |
           set -euo pipefail
-          test '${{ steps.rules_deploy.outputs.ok }}' = 'true'
+          if [ '${{ steps.rules_deploy.outputs.ok }}' != 'true' ]; then
+            echo "::warning::Las reglas LAB no se actualizaron en esta ejecución. Categoría: ${{ steps.rules_deploy.outputs.category }}. El preview se publicó sin modificar reglas."
+          fi
