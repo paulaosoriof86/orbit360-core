@@ -77,7 +77,7 @@ const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 try {
   await page.goto(`${baseUrl}/ays-lab-preview.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  await page.waitForURL(/index\.html/, { timeout: 30000 });
+  await page.waitForURL(/index\.html/, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.locator('#login-form').waitFor({ state: 'visible', timeout: 30000 });
   await page.locator('#lg-user').fill(email);
   await page.locator('#lg-pass').fill(accessKey);
