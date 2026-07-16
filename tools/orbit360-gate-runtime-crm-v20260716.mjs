@@ -4,12 +4,12 @@ import { waitForRealTenantData, validateClient360 } from './orbit360-runtime-che
 
 const baseUrl = String(process.env.ORBIT360_PREVIEW_URL || '').replace(/\/$/, '');
 const email = String(process.env.ORBIT360_LAB_LOGIN_EMAIL || 'orbit.lab@demo.com');
-const accessKey = String(process.env.ORBIT360_LAB_LOGIN_PASSWORD || '');
+const accessKey = String(process.env.ORBIT360_LAB_LOGIN_PASSWORD || '').replace(/[\r\n]+$/g, '');
 const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v4',
+  schemaVersion: 'orbit360-runtime-gate-joint-v5',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
@@ -23,6 +23,10 @@ mkdirSync(insurerOutDir, { recursive: true });
 
 function assert(condition, code, detail = '') {
   if (!condition) throw new Error(`${code}${detail ? `:${detail}` : ''}`);
+}
+
+function isInformationalLoginText(value) {
+  return /Inicia sesi[oó]n|sesi[oó]n no corresponde|usuario LAB autorizado|carga inicial|ejecutar el dry-run/i.test(String(value || ''));
 }
 
 async function waitForCanonicalRuntime(page) {
@@ -94,11 +98,13 @@ async function authState(page) {
 async function ensureAuthenticated(page) {
   const deadline = Date.now() + 60000;
   let submitted = false;
+  let submittedAt = 0;
   let lastState = null;
 
   while (Date.now() < deadline) {
     let state = await authState(page);
     lastState = state;
+
     if (state.inside || state.currentUser) {
       if (!state.inside) {
         await page.evaluate(() => { try { if (Orbit.auth && Orbit.auth.showApp) Orbit.auth.showApp(); } catch (error) {} });
@@ -117,19 +123,39 @@ async function ensureAuthenticated(page) {
     }
 
     if (state.providerReady && state.formVisible && !submitted) {
-      submitted = true;
       try {
         await page.locator('#lg-user').waitFor({ state: 'visible', timeout: 8000 });
         await page.locator('#lg-pass').waitFor({ state: 'visible', timeout: 8000 });
+        await page.evaluate(() => {
+          const el = document.getElementById('login-error');
+          if (el) el.textContent = '';
+        });
         await page.locator('#lg-user').fill(email);
         await page.locator('#lg-pass').fill(accessKey);
+        submitted = true;
+        submittedAt = Date.now();
         await page.locator('#login-form').evaluate(form => form.requestSubmit());
+        await page.waitForTimeout(700);
+        state = await authState(page);
+        lastState = state;
       } catch (error) {
         submitted = false;
+        submittedAt = 0;
       }
     }
 
-    if (state.errorText) throw new Error('LOGIN_REJECTED_BY_PROVIDER');
+    if (submitted && Date.now() - submittedAt > 1200 && state.errorText && !isInformationalLoginText(state.errorText)) {
+      report.authDiagnostic = {
+        providerReady: !!state.providerReady,
+        currentUser: !!state.currentUser,
+        formVisible: !!state.formVisible,
+        firebaseInit: String(state.firebaseInit || ''),
+        firebaseLoader: String(state.firebaseLoader || ''),
+        errorCategory: 'provider_or_form_rejection'
+      };
+      throw new Error('LOGIN_REJECTED_BY_PROVIDER');
+    }
+
     await page.waitForTimeout(500);
   }
 
@@ -138,7 +164,8 @@ async function ensureAuthenticated(page) {
     currentUser: !!(lastState && lastState.currentUser),
     formVisible: !!(lastState && lastState.formVisible),
     firebaseInit: String(lastState && lastState.firebaseInit || ''),
-    firebaseLoader: String(lastState && lastState.firebaseLoader || '')
+    firebaseLoader: String(lastState && lastState.firebaseLoader || ''),
+    submitted
   };
   throw new Error(`LOGIN_UI_STATE_UNSTABLE:${report.authDiagnostic.firebaseInit || 'sin_init'}:${report.authDiagnostic.firebaseLoader || 'sin_loader'}`);
 }
