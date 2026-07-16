@@ -1,0 +1,15 @@
+/* ============================================================
+   Orbit 360 · Aseguradoras · estilos canónicos de la candidata
+   Complementa infraestructura compartida sin sustituir render ni DOM.
+   ============================================================ */
+.asg-tabbar{display:flex;gap:2px;overflow-x:auto;padding:0 18px;border-bottom:1px solid var(--line);flex-shrink:0;background:var(--card);scrollbar-width:thin}
+.asg-tab{flex:0 0 auto;padding:11px 13px;font-family:var(--f-display);font-weight:700;font-size:12.5px;color:var(--ink-3);background:none;border:0;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.asg-tab:hover{color:var(--ink-2)}
+.asg-tab.active{color:var(--red);border-bottom-color:var(--red)}
+.asg-row .o-sel:disabled,.asg-row select:disabled,.asg-sec input:disabled,.asg-sec select:disabled,.asg-sec textarea:disabled{border-color:transparent!important;background:transparent!important;padding-left:0!important;color:var(--ink)!important;opacity:1!important;-webkit-text-fill-color:var(--ink)!important;cursor:default!important;box-shadow:none!important}
+.asg-sec input[type="checkbox"]:disabled{opacity:.75!important}
+.asg-tarifas-est{display:flex;gap:6px;flex-wrap:wrap}
+#asg-ficha>.card>div:first-child{background:linear-gradient(120deg,var(--red),#10141a)}
+#asg-ficha .asg-logo{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25)}
+#asg-ficha .asg-tabbar+div{background:var(--card)}
+@media(max-width:760px){.asg-tabbar{padding:0 10px}.asg-tab{padding:10px 9px;font-size:11.5px}}
