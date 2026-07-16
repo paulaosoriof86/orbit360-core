@@ -128,29 +128,79 @@
     var legal = window.Orbit && Orbit.legal;
     if (!legal || !legal.gate || legal.__idempotentGateV20260716) return;
     var original = legal.gate.bind(legal);
-    var doneScopes = {};
+    var doneScopes = Object.create(null);
+    var pendingScopes = Object.create(null);
+    var callbacks = Object.create(null);
+
+    function legalModalNodes() {
+      return Array.prototype.filter.call(document.querySelectorAll('.drawer-back.open'), function (node) {
+        return !!node.querySelector('#lg-chk,#conf-chk,#lg-ok,#conf-ok');
+      });
+    }
+
+    function removeScopeModals(scope) {
+      legalModalNodes().forEach(function (node) {
+        var tagged = node.getAttribute('data-orbit-legal-scope');
+        if (!tagged || tagged === scope) {
+          if (node.parentNode) node.parentNode.removeChild(node);
+        }
+      });
+    }
+
+    function queueCallback(scope, fn) {
+      if (typeof fn !== 'function') return;
+      callbacks[scope] = callbacks[scope] || [];
+      callbacks[scope].push(fn);
+    }
+
+    function finish(scope) {
+      pendingScopes[scope] = false;
+      doneScopes[scope] = true;
+      removeScopeModals(scope);
+      var list = callbacks[scope] || [];
+      callbacks[scope] = [];
+      list.forEach(function (fn) { try { fn(); } catch (e) {} });
+    }
+
     legal.gate = function (tipo, scopeId, opts) {
       opts = opts || {};
       var scope = String(scopeId || 'anonymous');
-      if (legal.yaAcepto && legal.yaAcepto(scope)) {
-        if (!doneScopes[scope] && opts.onDone) { doneScopes[scope] = true; opts.onDone(); }
+      queueCallback(scope, opts.onDone);
+
+      if ((legal.yaAcepto && legal.yaAcepto(scope)) || doneScopes[scope]) {
+        finish(scope);
         return;
       }
-      var existing = Array.prototype.find.call(document.querySelectorAll('[data-orbit-legal-scope]'), function (node) {
-        return node.getAttribute('data-orbit-legal-scope') === scope;
-      });
-      if (existing) return;
+
+      if (pendingScopes[scope]) return;
+      pendingScopes[scope] = true;
+
       var before = Array.prototype.slice.call(document.querySelectorAll('.drawer-back.open'));
-      original(tipo, scope, {
-        onDone: function () {
-          Array.prototype.slice.call(document.querySelectorAll('[data-orbit-legal-scope]')).forEach(function (node) { if (node.getAttribute('data-orbit-legal-scope') === scope && node.parentNode) node.parentNode.removeChild(node); });
-          if (!doneScopes[scope] && opts.onDone) { doneScopes[scope] = true; opts.onDone(); }
-        }
+      try {
+        original(tipo, scope, { onDone: function () { finish(scope); } });
+      } catch (error) {
+        pendingScopes[scope] = false;
+        throw error;
+      }
+
+      var created = Array.prototype.slice.call(document.querySelectorAll('.drawer-back.open')).find(function (node) {
+        return before.indexOf(node) < 0 && !!node.querySelector('#lg-chk,#conf-chk,#lg-ok,#conf-ok');
       });
-      var created = Array.prototype.slice.call(document.querySelectorAll('.drawer-back.open')).find(function (node) { return before.indexOf(node) < 0; });
-      if (created) created.setAttribute('data-orbit-legal-scope', scope);
+
+      if (created) {
+        created.setAttribute('data-orbit-legal-scope', scope);
+      } else if (legal.yaAcepto && legal.yaAcepto(scope)) {
+        finish(scope);
+      } else {
+        pendingScopes[scope] = false;
+      }
     };
+
     legal.__idempotentGateV20260716 = true;
+    legal.__legalGateStateV20260716 = {
+      pendingScopes: pendingScopes,
+      doneScopes: doneScopes
+    };
   }
 
   function installMobileNavigation() {
