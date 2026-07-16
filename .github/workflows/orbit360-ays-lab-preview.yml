@@ -215,7 +215,7 @@ jobs:
             --expires 30d \
             --non-interactive \
             --json | tee "${RUNNER_TEMP}/firebase-preview.json"
-          URL="$(jq -r '.. | strings | select(test("^https://.*\\.(web\\.app|firebaseapp\.com)$"))' "${RUNNER_TEMP}/firebase-preview.json" | head -n 1)"
+          URL="$(jq -r '.. | strings | select(test("^https://.*\\.(web\\.app|firebaseapp\\.com)$"))' "${RUNNER_TEMP}/firebase-preview.json" | head -n 1)"
           if [ -z "$URL" ]; then
             echo "No se pudo resolver la URL del preview."
             cat "${RUNNER_TEMP}/firebase-preview.json"
