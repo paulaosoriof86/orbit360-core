@@ -121,6 +121,7 @@ jobs:
           node --check orbit360-platform/core/backend-lab-init.js
           node --check orbit360-platform/core/backend-lab-auth-guard.js
           node --check orbit360-platform/core/backend-lab-import-readiness-guard.js
+          node --check orbit360-platform/core/importa-dryrun-p0.js
           node --check orbit360-platform/core/importa-write-p0.js
           node --check orbit360-platform/core/pwa.js
           node --check orbit360-platform/core/auth.js
@@ -129,8 +130,8 @@ jobs:
           node --check tools/orbit360-ensure-lab-user.mjs
           node --check tools/orbit360-test-import-initial-pending-insurers.mjs
           node --check tools/orbit360-test-lab-import-readiness.mjs
-          node tools/orbit360-test-import-initial-pending-insurers.mjs
-          node tools/orbit360-test-lab-import-readiness.mjs
+          timeout 30s node tools/orbit360-test-import-initial-pending-insurers.mjs
+          timeout 30s node tools/orbit360-test-lab-import-readiness.mjs
 
       - name: Ensure canonical LAB user and tenant membership
         shell: bash
