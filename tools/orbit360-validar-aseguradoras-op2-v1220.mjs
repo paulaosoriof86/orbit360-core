@@ -20,7 +20,7 @@ const files = {
   quarantine:'core/aseguradoras-op2-sheet-quarantine.js',
   sourceGuard:'core/aseguradoras-op2-source-guard.js',
   importUi:'core/aseguradoras-op2-import-ui-guard.js',
-  ux:'modules/aseguradoras-v1197-ux-bridge.js',
+  ux:'modules/aseguradoras.js',
   resources:'modules/aseguradoras-v1202-resources-bridge.js',
   operationalResources:'modules/aseguradoras-op2-operational-resources.js',
   closure:'modules/aseguradoras-op2-closure-bridge.js',
@@ -28,6 +28,8 @@ const files = {
   academy:'data/academia-v1217-aseguradoras-op2.js',
   styles:'styles/aseguradoras-op2-v1217.css'
 };
+const adapterFile = 'modules/aseguradoras-v1197-ux-bridge.js';
+const projectionFile = 'modules/aseguradoras-frontend-projection-v20260716.js';
 const p = file => path.join(root, file);
 const read = file => fs.existsSync(p(file)) ? fs.readFileSync(p(file), 'utf8') : '';
 const all = (src, terms) => terms.every(term => typeof term === 'string' ? src.includes(term) : term.test(src));
@@ -35,7 +37,11 @@ function check(id, ok, message, file='') { (ok ? pass : fail).push({ id, message
 function warning(id, ok, message, file='') { if (!ok) warn.push({ id, message, file }); }
 
 Object.entries(files).forEach(([key,file]) => check('FILE_' + key.toUpperCase(), fs.existsSync(p(file)), 'Archivo requerido presente', file));
+check('UX_ADAPTER_FILE', fs.existsSync(p(adapterFile)), 'Adaptador aditivo presente', adapterFile);
+check('UX_PROJECTION_FILE', fs.existsSync(p(projectionFile)), 'Proyección de conocimiento presente', projectionFile);
 const src = Object.fromEntries(Object.entries(files).map(([key,file]) => [key, read(file)]));
+src.adapter = read(adapterFile);
+src.projection = read(projectionFile);
 
 check('ACCESS_CENTRAL', all(src.access,['function can','function audit','function correction']), 'Acceso, auditoría y correcciones centralizados', files.access);
 check('ROLE_VISIBILITY', all(src.visibility,["ensure('Operativo', ['aseguradoras'])","ensure('Asesor', ['aseguradoras'])",'sensitiveAccessUnchanged: true','insurerWritePermissionUnchanged: true']), 'Operativo y Asesor ven el módulo sin ampliar escritura', files.visibility);
@@ -68,9 +74,11 @@ check('ALIAS_NO_WRITES', !/Orbit\.store\.(?:insert|update|remove)/.test(src.sour
 check('UI_REVIEW_NO_CAPTURE', all(src.importUi,['D.parseFile(file, { country, captureSecure:false })','duplicateReview',"root.dataset.op2AliasState = 'blocked'",'button.disabled = true']), 'Revisión visual bloquea sin capturar recursos', files.importUi);
 check('UI_FAIL_CLOSED', all(src.importUi,["root.dataset.op2AliasState = 'error'",'La aplicación queda bloqueada para evitar duplicados']), 'Error de revisión bloquea aplicación', files.importUi);
 
-check('UX_DIRECTORY', all(src.ux,['kpiData','kpiDetail','renderDirectory','renderFicha','Volver al directorio']), 'Directorio, KPI y ficha-página presentes', files.ux);
-check('UX_TABS', all(src.ux,["['resumen','Resumen']","['contactos','Contactos']","['plataformas','Plataformas']","['bancos','Bancos y pagos']","['documentos','Documentos y Drive']","['tarifas','Tarifas y conocimiento']"]), 'Ficha reúne recursos operativos', files.ux);
-check('DOCUMENT_VIEWER', all(src.ux,['Orbit.documentViewer.open',"module:'aseguradoras'",'Ver documento']), 'Documentos usan visor común', files.ux);
+check('UX_DIRECTORY', all(src.ux,['function render(','K.kpis([','function card(','function ficha(','id="asg-ficha"','data-asg=']), 'Renderer canónico contiene directorio, KPI, tarjetas y ficha', files.ux);
+check('UX_TABS', all(src.ux,[/['"]resumen['"]/,/['"]contactos['"]/,/['"]plataformas['"]/,/['"]bancos['"]/,/['"]documentos['"]/,/['"]tarifas['"]/]), 'Ficha canónica reúne recursos operativos', files.ux);
+check('UX_CANONICAL_PRESERVED', all(src.adapter,['visualOverride: false',"canonicalRenderer: 'modules/aseguradoras.js'",'__candidateContractAdapter = true']), 'Adaptador conserva el renderer canónico', adapterFile);
+check('UX_KNOWLEDGE_PROJECTION', all(src.projection,['canonicalRendererPreserved: true','writesKnowledge: false','Mapeado · pendiente de sincronización','Tarifas, reglas y formatos vinculados']), 'Proyección aditiva muestra conocimiento sin escribir ni habilitar', projectionFile);
+check('DOCUMENT_VIEWER', all(src.ux,['Orbit.documentViewer.open',"module:'aseguradoras'",'Ver documento']) || all(src.adapter,['openKnowledge','Fuentes mapeadas']), 'Documentos/conocimiento usan visor o catálogo controlado', files.ux);
 check('RATE_HONESTY', all(src.resources,['Importar contactos o accesos no habilita tarifas','Pendiente de configuración validada']), 'Directorio no habilita tarifas', files.resources);
 
 check('BANK_OPERATIONAL', all(src.operationalResources,['data-op2-account-value','data-op2-copy-account','P.canCopyBankAccounts()','R.revealField','R.copyField']), 'Cuenta visible y copiable según política', files.operationalResources);
@@ -90,7 +98,7 @@ check('ACADEMY_PROGRESS', all(src.academy,['next.progreso = previous.progreso','
 check('ACADEMY_NO_DUPLICATE', !/Orbit\.store\.insert\('cursos'/.test(src.academy), 'Academia no duplica cursos', files.academy);
 check('RESPONSIVE', all(src.styles,['@media(max-width:900px)','@media(max-width:640px)','.asg218-bank','.asg218-platform','.asg218-credentials']), 'Responsive de recursos operativos', files.styles);
 
-Object.values(files).filter(file => fs.existsSync(p(file))).filter(file => /\.(?:js|mjs)$/.test(file)).forEach(file => {
+Object.values(files).concat([adapterFile, projectionFile]).filter((file, index, arr) => arr.indexOf(file) === index).filter(file => fs.existsSync(p(file))).filter(file => /\.(?:js|mjs)$/.test(file)).forEach(file => {
   const content = read(file);
   const directBrowserStorage = /\b(?:window\s*\.\s*)?(?:localStorage|sessionStorage)\s*(?:\.|\[)/.test(content);
   check('NO_BROWSER_STORAGE_' + file.replace(/\W+/g,'_'), !directBrowserStorage, 'Sin almacenamiento operativo directo', file);
@@ -99,7 +107,6 @@ Object.values(files).filter(file => fs.existsSync(p(file))).filter(file => /\.(?
 });
 
 appendProtectedChecks(pass, fail, root);
-
 const index = read('index.html');
 warning('INDEX_QUARANTINE', index.includes('core/aseguradoras-op2-sheet-quarantine.js?v=20260713-op2-v1219'), 'Integrar cuarentena mediante pipeline seguro', 'index.html');
 warning('INDEX_SOURCE_GUARD', index.includes('core/aseguradoras-op2-source-guard.js?v=20260713-op2'), 'Integrar guard de identidad mediante pipeline seguro', 'index.html');
@@ -107,13 +114,7 @@ warning('INDEX_ACADEMY', index.includes('data/academia-v1217-aseguradoras-op2.js
 warning('VISUAL_GATE', false, 'Pendiente gate focalizado de tres vistas Plataformas', 'tools');
 warning('REAL_DRY_RUN', false, 'Pendiente dry-run separado Guatemala y Colombia', 'fuentes');
 
-const result = {
-  validator:'orbit360-validar-aseguradoras-op2-v1220',
-  generatedAt:new Date().toISOString(), root,
-  summary:{ pass:pass.length, fail:fail.length, warn:warn.length },
-  fail,
-  warn
-};
+const result = { validator:'orbit360-validar-aseguradoras-op2-v1220', generatedAt:new Date().toISOString(), root, summary:{ pass:pass.length, fail:fail.length, warn:warn.length }, fail, warn };
 if (verbose) result.pass = pass;
 console.log(JSON.stringify(result, null, 2));
 process.exit(fail.length ? 1 : 0);
