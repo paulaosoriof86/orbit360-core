@@ -10,6 +10,7 @@ on:
       - "tools/orbit360-verify-lab-data-counts.mjs"
       - "tools/orbit360-test-import-initial-pending-insurers.mjs"
       - "tools/orbit360-test-lab-import-readiness.mjs"
+      - "tools/orbit360-test-lab-canonical-view-sync.mjs"
       - "firestore.rules"
       - "firebase.json"
       - ".github/workflows/orbit360-ays-lab-preview.yml"
@@ -22,6 +23,7 @@ on:
       - "tools/orbit360-verify-lab-data-counts.mjs"
       - "tools/orbit360-test-import-initial-pending-insurers.mjs"
       - "tools/orbit360-test-lab-import-readiness.mjs"
+      - "tools/orbit360-test-lab-canonical-view-sync.mjs"
       - "firestore.rules"
       - "firebase.json"
       - ".github/workflows/orbit360-ays-lab-preview.yml"
@@ -73,6 +75,7 @@ jobs:
           test -f orbit360-platform/ays-lab-preview.html
           test -f orbit360-platform/core/backend-lab-auth-guard.js
           test -f orbit360-platform/core/backend-lab-import-readiness-guard.js
+          test -f orbit360-platform/core/backend-lab-canonical-view-sync.js
           test -f orbit360-platform/core/router.js
           test -f orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js
           test -f orbit360-platform/modules/importar-initial-tenant-lab.js
@@ -80,6 +83,7 @@ jobs:
           test -f tools/orbit360-verify-lab-data-counts.mjs
           test -f tools/orbit360-test-import-initial-pending-insurers.mjs
           test -f tools/orbit360-test-lab-import-readiness.mjs
+          test -f tools/orbit360-test-lab-canonical-view-sync.mjs
           if git ls-files | grep -E 'auth-firebase\.config\.local\.js|CARGA-INICIAL-AYS-.*\.json|clientes\.json|aseguradoras\.json'; then
             echo "Bloqueo: se detectó configuración local o datos reales versionados."
             exit 1
@@ -126,6 +130,7 @@ jobs:
           node --check orbit360-platform/core/backend-lab-init.js
           node --check orbit360-platform/core/backend-lab-auth-guard.js
           node --check orbit360-platform/core/backend-lab-import-readiness-guard.js
+          node --check orbit360-platform/core/backend-lab-canonical-view-sync.js
           node --check orbit360-platform/core/router.js
           node --check orbit360-platform/core/importa-dryrun-p0.js
           node --check orbit360-platform/core/importa-write-p0.js
@@ -138,8 +143,10 @@ jobs:
           node --check tools/orbit360-verify-lab-data-counts.mjs
           node --check tools/orbit360-test-import-initial-pending-insurers.mjs
           node --check tools/orbit360-test-lab-import-readiness.mjs
+          node --check tools/orbit360-test-lab-canonical-view-sync.mjs
           timeout 30s node tools/orbit360-test-import-initial-pending-insurers.mjs
           timeout 30s node tools/orbit360-test-lab-import-readiness.mjs
+          timeout 30s node tools/orbit360-test-lab-canonical-view-sync.mjs
 
       - name: Ensure canonical LAB user and tenant membership
         shell: bash
