@@ -37,7 +37,7 @@ const summarySource = read(PATHS.summary);
 
 check(/Orbit\.modules\.aseguradoras\s*=/.test(moduleSource), 'CANONICAL_MODULE_MISSING');
 check(/function\s+ficha\s*\(/.test(moduleSource), 'CANONICAL_FICHA_MISSING');
-check(/data-mode/.test(projectionSource), 'FICHA_MODE_PROJECTION_MISSING');
+check(/dataset\.mode|data-mode/.test(projectionSource), 'FICHA_MODE_PROJECTION_MISSING');
 check(/canonicalRendererPreserved\s*:\s*true/.test(projectionSource), 'CANONICAL_RENDERER_NOT_PRESERVED');
 check(/writesKnowledge\s*:\s*false/.test(projectionSource), 'PROJECTION_WRITE_GUARD_MISSING');
 check(/enablesCotizador\s*:\s*false/.test(projectionSource), 'COTIZADOR_ENABLE_GUARD_MISSING');
