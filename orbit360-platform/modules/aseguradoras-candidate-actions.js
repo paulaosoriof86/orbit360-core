@@ -4,14 +4,32 @@
   'use strict';
   let attempts = 0;
 
-  function loadMultirolContract() {
-    if (window.Orbit && Orbit.session && Orbit.session.__multirolVisibilityV20260716) return;
-    if (document.querySelector('script[data-orbit-multirol-v20260716]')) return;
+  function loadScript(src, marker, ready) {
+    if (ready && ready()) return;
+    if (document.querySelector('script[' + marker + ']')) return;
     const script = document.createElement('script');
-    script.src = 'core/session-multirol-visibility-v20260716.js?v=20260716-1';
+    script.src = src;
     script.async = false;
-    script.dataset.orbitMultirolV20260716 = '1';
+    script.setAttribute(marker, '1');
     document.head.appendChild(script);
+  }
+
+  function loadRuntimeContracts() {
+    loadScript(
+      'core/session-multirol-visibility-v20260716.js?v=20260716-1',
+      'data-orbit-multirol-v20260716',
+      function () { return window.Orbit && Orbit.session && Orbit.session.__multirolVisibilityV20260716; }
+    );
+    loadScript(
+      'core/client-canonical-view-projection-v20260716.js?v=20260716-1',
+      'data-orbit-client-projection-v20260716',
+      function () { return window.Orbit && Orbit.clientCanonicalViewProjectionV20260716; }
+    );
+    loadScript(
+      'modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-2',
+      'data-orbit-insurer-projection-v20260716',
+      function () { return window.Orbit && Orbit.aseguradorasFrontendProjectionV20260716; }
+    );
   }
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
@@ -64,13 +82,17 @@
     }
     return true;
   }
-  function schedule() { setTimeout(enhance, 0); setTimeout(enhance, 180); }
+  function schedule() {
+    loadRuntimeContracts();
+    setTimeout(enhance, 0);
+    setTimeout(enhance, 180);
+  }
   document.addEventListener('click', function (event) {
     if (event.target && event.target.closest && event.target.closest('[data-asg],[data-act],[data-tab]')) schedule();
   }, true);
   window.addEventListener('hashchange', schedule);
   window.addEventListener('orbit:store:emit', schedule);
-  loadMultirolContract();
+  loadRuntimeContracts();
   (function wait() {
     if (window.Orbit && Orbit.modules && Orbit.modules.aseguradoras && Orbit.aseguradorasKnowledgeCatalog) { schedule(); return; }
     attempts += 1;
