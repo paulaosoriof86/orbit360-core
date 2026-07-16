@@ -159,6 +159,10 @@ jobs:
             echo ""
             echo "Proyecto: ays-orbit-360-lab"
             echo ""
+            echo "Commit: ${GITHUB_SHA}"
+            echo ""
+            echo "Run: ${GITHUB_RUN_ID}"
+            echo ""
             echo "Canal temporal: ${ORBIT360_PREVIEW_URL:-no disponible}"
             echo ""
             echo "Gate conjunto: ${{ steps.joint_gate.outcome }}"
@@ -183,27 +187,21 @@ jobs:
           if [ -f "$REPORT" ]; then
             OK="$(jq -r '.ok // false' "$REPORT")"
             ERROR_CODE="$(jq -r '(.error // "") | split(":")[0] | gsub("[\\r\\n]"; " ")' "$REPORT")"
+            FAILED_CHECKS="$(jq -r '[.checks // {} | to_entries[] | select(.value != true) | .key] | join(",")' "$REPORT")"
           else
             OK="false"
             ERROR_CODE="RESULTADO_NO_GENERADO"
+            FAILED_CHECKS="resultado"
           fi
+          if [ "$OK" != "true" ] && [ -z "$ERROR_CODE" ]; then ERROR_CODE="GATE_FALSE_SIN_ERROR"; fi
+          if [ -z "$FAILED_CHECKS" ]; then FAILED_CHECKS="ninguno"; fi
           CLIENTS="$(test -f "$COUNTS" && jq -r '.counts.clientes // 0' "$COUNTS" || echo 0)"
           INSURERS="$(test -f "$COUNTS" && jq -r '.counts.aseguradoras // 0' "$COUNTS" || echo 0)"
           ADVISORS="$(test -f "$COUNTS" && jq -r '.counts.asesores // 0' "$COUNTS" || echo 0)"
           SYNC="$(test -f "$INVENTORY" && jq -r '.gates.operationalSyncComplete // false' "$INVENTORY" || echo false)"
-          BODY=$(cat <<EOF
-          ## Resultado automático sanitizado · Cliente 360 + Aseguradoras
-
-          - Commit: `${GITHUB_SHA}`
-          - Run: `${GITHUB_RUN_ID}`
-          - Gate conjunto: **${OK}**
-          - Conteos LAB: clientes **${CLIENTS}**, aseguradoras **${INSURERS}**, asesores **${ADVISORS}**
-          - Conocimiento Aseguradoras persistido operativamente: **${SYNC}**
-          - Código de bloqueo: `${ERROR_CODE:-NINGUNO}`
-          - Evidencia: artefacto sanitizado del run, sin PII, secretos ni documentos fuente.
-          - Alcance: LAB únicamente; sin producción, merge ni main.
-          EOF
-          )
+          printf -v BODY '%s\n\n- Commit: %s\n- Run: %s\n- Gate conjunto: **%s**\n- Conteos LAB: clientes **%s**, aseguradoras **%s**, asesores **%s**\n- Conocimiento Aseguradoras persistido operativamente: **%s**\n- Código de bloqueo: %s\n- Checks no aprobados: %s\n- Evidencia: artefacto sanitizado del run, sin PII, secretos ni documentos fuente.\n- Alcance: LAB únicamente; sin producción, merge ni main.' \
+            '## Resultado automático sanitizado · Cliente 360 + Aseguradoras' \
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" "$OK" "$CLIENTS" "$INSURERS" "$ADVISORS" "$SYNC" "$ERROR_CODE" "$FAILED_CHECKS"
           gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
 
       - name: Cerrar resultado conjunto
