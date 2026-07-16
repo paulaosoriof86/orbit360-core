@@ -112,7 +112,7 @@ jobs:
           node tools/orbit360-verify-lab-data-counts.mjs
           node tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs
 
-      - name: Sellar commit exacto del runtime temporal
+      - name: Sellar commit exacto del runtime LAB
         shell: bash
         run: |
           set -euo pipefail
@@ -120,27 +120,27 @@ jobs:
             "$GITHUB_SHA" "$GITHUB_RUN_ID" "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" \
             > orbit360-platform/runtime-build.json
 
-      - name: Publicar y verificar canal temporal privado
+      - name: Publicar y verificar canal LAB canónico
         id: deploy
         shell: bash
         run: |
           set -euo pipefail
-          DEPLOY_JSON="${RUNNER_TEMP}/firebase-gate-preview.json"
-          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-gate \
+          DEPLOY_JSON="${RUNNER_TEMP}/firebase-lab-preview.json"
+          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab \
             --project "$FIREBASE_PROJECT_ID" \
-            --expires 7d \
+            --expires 30d \
             --non-interactive \
             --json | tee "$DEPLOY_JSON"
 
-          URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-gate[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$DEPLOY_JSON" | head -n 1)"
+          URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$DEPLOY_JSON" | head -n 1)"
           if [ -z "$URL" ]; then
-            echo "BLOQUEO_URL_CANAL_GATE_NO_ENCONTRADA"
+            echo "BLOQUEO_URL_CANAL_LAB_NO_ENCONTRADA"
             jq -r '.. | strings | select(test("^https://"))' "$DEPLOY_JSON" || true
             exit 47
           fi
           case "$URL" in
-            *--orbit360-ays-gate*) ;;
-            *) echo "BLOQUEO_URL_NO_CORRESPONDE_AL_CANAL_GATE"; exit 48 ;;
+            *--orbit360-ays-lab*) ;;
+            *) echo "BLOQUEO_URL_NO_CORRESPONDE_AL_CANAL_LAB"; exit 48 ;;
           esac
 
           BUILD_JSON="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/runtime-build.json")"
@@ -192,7 +192,7 @@ jobs:
             echo ""
             echo "Run: ${GITHUB_RUN_ID}"
             echo ""
-            echo "Canal temporal verificado: ${ORBIT360_PREVIEW_URL:-no disponible}"
+            echo "Canal LAB verificado: ${ORBIT360_PREVIEW_URL:-no disponible}"
             echo ""
             echo "Gate conjunto: ${{ steps.joint_gate.outcome }}"
             echo ""
@@ -228,9 +228,9 @@ jobs:
           INSURERS="$(test -f "$COUNTS" && jq -r '.counts.aseguradoras // 0' "$COUNTS" || echo 0)"
           ADVISORS="$(test -f "$COUNTS" && jq -r '.counts.asesores // 0' "$COUNTS" || echo 0)"
           SYNC="$(test -f "$INVENTORY" && jq -r '.gates.operationalSyncComplete // false' "$INVENTORY" || echo false)"
-          printf -v BODY '%s\n\n- Commit: %s\n- Run: %s\n- Gate conjunto: **%s**\n- Conteos LAB: clientes **%s**, aseguradoras **%s**, asesores **%s**\n- Conocimiento Aseguradoras persistido operativamente: **%s**\n- Código de bloqueo: %s\n- Checks no aprobados: %s\n- Evidencia: artefacto sanitizado del run, sin PII, secretos ni documentos fuente.\n- Alcance: LAB únicamente; sin producción, merge ni main.' \
+          printf -v BODY '%s\n\n- Commit: %s\n- Run: %s\n- Canal LAB: %s\n- Gate conjunto: **%s**\n- Conteos LAB: clientes **%s**, aseguradoras **%s**, asesores **%s**\n- Conocimiento Aseguradoras persistido operativamente: **%s**\n- Código de bloqueo: %s\n- Checks no aprobados: %s\n- Evidencia: artefacto sanitizado del run, sin PII, secretos ni documentos fuente.\n- Alcance: LAB únicamente; sin producción, merge ni main.' \
             '## Resultado automático sanitizado · Cliente 360 + Aseguradoras' \
-            "$GITHUB_SHA" "$GITHUB_RUN_ID" "$OK" "$CLIENTS" "$INSURERS" "$ADVISORS" "$SYNC" "$ERROR_CODE" "$FAILED_CHECKS"
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" "${ORBIT360_PREVIEW_URL:-no disponible}" "$OK" "$CLIENTS" "$INSURERS" "$ADVISORS" "$SYNC" "$ERROR_CODE" "$FAILED_CHECKS"
           gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
 
       - name: Cerrar resultado conjunto
