@@ -128,12 +128,16 @@ jobs:
           echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
 
       - name: Gate Cliente 360 · Dirección, Operativo y Asesor
+        id: crm_gate
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-gate-runtime-crm-v20260716.mjs
 
       - name: Gate Aseguradoras · Dirección, Operativo y Asesor
+        id: insurer_gate
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -165,9 +169,21 @@ jobs:
             echo ""
             echo "Canal temporal: ${ORBIT360_PREVIEW_URL:-no disponible}"
             echo ""
+            echo "Cliente 360: ${{ steps.crm_gate.outcome }}"
+            echo ""
+            echo "Aseguradoras: ${{ steps.insurer_gate.outcome }}"
+            echo ""
             echo "Clientes esperados: 414 · Aseguradoras esperadas: 26"
             echo ""
             echo "Pólizas, vehículos y cobros se reportan como conteos; no se infieren ni se escriben desde la fuente Clientes."
             echo ""
             echo "Sin producción, sin main, sin merge y sin capturas de datos personales."
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Cerrar resultado conjunto
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test '${{ steps.crm_gate.outcome }}' = 'success'
+          test '${{ steps.insurer_gate.outcome }}' = 'success'
