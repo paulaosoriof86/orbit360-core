@@ -1,6 +1,6 @@
 /* ============================================================
    Orbit 360 · P0 contrato de escritura controlada
-   Fecha: 2026-07-09
+   Fecha: 2026-07-15
 
    Capa pura/aditiva para escribir importaciones solo despues de:
    - dry-run aprobado;
@@ -28,6 +28,9 @@
     'finmovs', 'cobros', 'cxc', 'cxp', 'usuarios', 'roles', 'permisos', 'secrets', 'credenciales'
   ];
 
+  const ACTIVE_WRITES = Object.create(null);
+  let storeGetBridgeInstalled = false;
+
   function nowIso() {
     return new Date().toISOString();
   }
@@ -51,20 +54,100 @@
     return ALLOWED_COLLECTIONS.includes(coll) && !HARD_BLOCKED_COLLECTIONS.includes(coll);
   }
 
+  function targetKey(collection, id) {
+    return String(collection || '') + '::' + String(id || '');
+  }
+
+  function isRestrictedPendingInsurer(op) {
+    const data = op && (op.data || op.record || {});
+    return !!(
+      op &&
+      op.collection === 'aseguradoras' &&
+      data &&
+      data.requiereValidacion === true &&
+      data.validationStatus === 'requiere_validacion' &&
+      data.estadoOperativo === 'pendiente_validacion' &&
+      data.vinculada === false &&
+      data.cotizadorHabilitado === false &&
+      data.comparativoHabilitado === false &&
+      data.tarifasHabilitadas === false
+    );
+  }
+
+  function labStatus() {
+    try {
+      return Orbit.store && typeof Orbit.store._labStatus === 'function'
+        ? Orbit.store._labStatus() || {}
+        : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function ensureStoreGetBridge() {
+    if (storeGetBridgeInstalled || !Orbit.store || typeof Orbit.store.get !== 'function') return;
+    const originalGet = Orbit.store.get.bind(Orbit.store);
+
+    Orbit.store.get = function (collection, id) {
+      const row = originalGet(collection, id);
+      const target = ACTIVE_WRITES[targetKey(collection, id)];
+      if (!target || !row) return row;
+
+      const state = labStatus();
+      const queue = Array.isArray(state.writeQueue) ? state.writeQueue : [];
+      const errors = Array.isArray(state.writeErrors) ? state.writeErrors : [];
+      const startedAt = Date.parse(target.startedAt || '') || 0;
+      const relevantError = errors.find(function (item) {
+        const itemAt = Date.parse(item && item.at || '') || 0;
+        return item && item.collection === collection && String(item.id) === String(id) && itemAt >= startedAt;
+      });
+      if (relevantError) {
+        return Object.assign({}, row, {
+          _syncStatus: 'failed',
+          _syncOp: target.action,
+          _syncError: String(relevantError.error || 'error_escritura'),
+          _syncAt: relevantError.at || nowIso()
+        });
+      }
+
+      const pending = queue.some(function (item) {
+        return item && item.collection === collection && String(item.id) === String(id) && item.status === 'pending';
+      });
+      if (pending) {
+        return Object.assign({}, row, {
+          _syncStatus: 'pending',
+          _syncOp: target.action,
+          _syncAt: target.startedAt
+        });
+      }
+
+      return Object.assign({}, row, {
+        _syncStatus: 'synced',
+        _syncOp: target.action,
+        _syncError: undefined,
+        _syncAt: state.lastWriteOkAt || nowIso()
+      });
+    };
+
+    Orbit.store.__importWriteStatusBridgeInstalled = true;
+    storeGetBridgeInstalled = true;
+  }
+
   function validateRecord(op) {
     const errors = [];
     if (!op || typeof op !== 'object') errors.push('operacion_invalida');
     const coll = op && op.collection;
     const action = op && (op.action || 'insert');
     const data = op && (op.data || op.record || {});
+    const restrictedPendingInsurer = isRestrictedPendingInsurer(op);
     if (!coll) errors.push('collection_faltante');
     if (coll && !isAllowedCollection(coll)) errors.push('collection_no_permitida:' + coll);
     if (!['insert', 'update'].includes(action)) errors.push('accion_no_permitida:' + action);
     if (action === 'update' && !op.id) errors.push('id_requerido_update');
     if (!data || typeof data !== 'object') errors.push('data_invalida');
-    if (data && data.requiereValidacion) errors.push('registro_requiere_validacion');
-    if (data && data.validationStatus && data.validationStatus !== 'validado') errors.push('validationStatus_no_validado');
-    if (data && data.estado === 'requiere_validacion') errors.push('estado_requiere_validacion');
+    if (data && data.requiereValidacion && !restrictedPendingInsurer) errors.push('registro_requiere_validacion');
+    if (data && data.validationStatus && data.validationStatus !== 'validado' && !restrictedPendingInsurer) errors.push('validationStatus_no_validado');
+    if (data && data.estado === 'requiere_validacion' && !restrictedPendingInsurer) errors.push('estado_requiere_validacion');
     if (data && data.moneda === 'REQUIERE_VALIDACION') errors.push('moneda_requiere_validacion');
     if (data && data.pais === 'REQUIERE_VALIDACION') errors.push('pais_requiere_validacion');
     return errors;
@@ -95,6 +178,7 @@
   }
 
   function auditSeed(batch, op, before, after, confirmation) {
+    const restrictedPendingInsurer = isRestrictedPendingInsurer({ collection: op.collection, data: after || op.data || op.record || {} });
     return {
       id: 'aud_imp_' + batch.batchId + '_' + Math.random().toString(36).slice(2, 10),
       tenantId: tenantId() || batch.tenantId || '',
@@ -110,7 +194,7 @@
       reason: confirmation.reason,
       confirmedBy: confirmation.userId,
       confirmedAt: nowIso(),
-      status: 'written_controlled',
+      status: restrictedPendingInsurer ? 'written_controlled_restricted' : 'written_controlled',
       rollbackAvailable: true
     };
   }
@@ -133,28 +217,58 @@
       return { ok: false, written: 0, errors: ['Orbit.store_no_disponible'], rollback: [] };
     }
 
+    ensureStoreGetBridge();
     const result = { ok: true, written: 0, errors: [], rollback: [], auditIds: [] };
 
     batch.operations.forEach(function (op, index) {
       try {
         const action = op.action || 'insert';
-        const data = Object.assign({}, op.data || op.record || {}, {
+        const restrictedPendingInsurer = isRestrictedPendingInsurer(op);
+        const baseData = Object.assign({}, op.data || op.record || {}, {
           tenantId: (op.data && op.data.tenantId) || tenantId() || batch.tenantId || '',
           importBatchId: batch.batchId,
           sourceType: batch.sourceType,
           sourceFileName: batch.sourceFileName || '',
           sourceHash: batch.sourceHash || '',
-          createdByImport: true,
-          validationStatus: 'validado'
+          createdByImport: true
         });
+        const data = restrictedPendingInsurer
+          ? Object.assign(baseData, {
+              requiereValidacion: true,
+              validationStatus: 'requiere_validacion',
+              vinculada: false,
+              cotizadorHabilitado: false,
+              comparativoHabilitado: false,
+              tarifasHabilitadas: false,
+              estadoOperativo: 'pendiente_validacion'
+            })
+          : Object.assign(baseData, {
+              requiereValidacion: false,
+              validationStatus: 'validado'
+            });
+
         let before = null;
         let after = null;
+        const startedAt = nowIso();
         if (action === 'insert') {
           after = Orbit.store.insert(op.collection, data);
         } else {
           before = Orbit.store.get ? Orbit.store.get(op.collection, op.id) : null;
           after = Orbit.store.update(op.collection, op.id, data);
         }
+
+        const targetId = (after && after.id) || op.id || data.id || '';
+        if (targetId) {
+          ACTIVE_WRITES[targetKey(op.collection, targetId)] = {
+            batchId: batch.batchId,
+            action: action,
+            startedAt: startedAt
+          };
+          setTimeout(function () {
+            delete ACTIVE_WRITES[targetKey(op.collection, targetId)];
+          }, 10 * 60 * 1000);
+        }
+
         const audit = auditSeed(batch, op, before, after || data, confirmation);
         if (isAllowedCollection('auditoriaImportaciones')) {
           const aud = Orbit.store.insert('auditoriaImportaciones', audit);
@@ -209,6 +323,7 @@
     ALLOWED_COLLECTIONS,
     HARD_BLOCKED_COLLECTIONS,
     isAllowedCollection,
+    isRestrictedPendingInsurer,
     validateRecord,
     validateBatch,
     validateConfirmation,
