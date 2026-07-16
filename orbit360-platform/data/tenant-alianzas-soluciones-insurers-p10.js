@@ -6,8 +6,10 @@
   window.OrbitTenantInsurerConfigsP10 = window.OrbitTenantInsurerConfigsP10 || [];
   var config = {
     tenantId: 'alianzas-soluciones',
-    version: '2026-07-10',
-    updatedAt: '2026-07-10',
+    version: '2026-07-16',
+    updatedAt: '2026-07-16',
+    preferredInsurerCountryOrder: ['GT', 'CO'],
+    knowledgeSummarySrc: 'data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20260716.js',
     insurers: [
       {
         canonicalKey: 'gt_seguros_bam', internalId: 'ins_gt_seguros_bam',
