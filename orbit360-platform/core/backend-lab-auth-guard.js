@@ -79,9 +79,7 @@
       if (!window.Orbit || !Orbit.session || typeof Orbit.session.set !== 'function') return false;
       var currentRole = typeof Orbit.session.rol === 'function' ? String(Orbit.session.rol() || '') : '';
       var currentAdvisor = typeof Orbit.session.asesorId === 'function' ? String(Orbit.session.asesorId() || '') : '';
-      if (currentRole !== canonicalRole || currentAdvisor !== canonicalAdvisorId) {
-        Orbit.session.set(canonicalRole, canonicalAdvisorId);
-      }
+      if (currentRole !== canonicalRole || currentAdvisor !== canonicalAdvisorId) Orbit.session.set(canonicalRole, canonicalAdvisorId);
       return true;
     } catch (e) {
       return false;
@@ -100,6 +98,14 @@
         if (typeof Orbit.store._attachSnapshots === 'function') Orbit.store._attachSnapshots();
       } catch (e) {}
     }, 180);
+  }
+
+  function loadCandidateActions() {
+    if (document.querySelector('script[data-orbit-lab-addon="aseguradoras-candidate-actions"]')) return;
+    var script = document.createElement('script');
+    script.src = 'modules/aseguradoras-candidate-actions.js?v=20260715-11';
+    script.dataset.orbitLabAddon = 'aseguradoras-candidate-actions';
+    document.head.appendChild(script);
   }
 
   function rerenderCurrentRoute() {
@@ -126,6 +132,7 @@
     syncLabSession();
     paintIdentity(user);
     reattachStore(user);
+    loadCandidateActions();
     try {
       if (window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function') Orbit.auth.showApp();
     } catch (e) {}
@@ -164,6 +171,7 @@
     currentUser: currentUser,
     forceRealLogin: forceRealLogin,
     reattachStore: reattachStore,
-    syncLabSession: syncLabSession
+    syncLabSession: syncLabSession,
+    loadCandidateActions: loadCandidateActions
   };
 })();
