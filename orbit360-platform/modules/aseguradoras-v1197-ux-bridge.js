@@ -14,8 +14,10 @@ Orbit.modules = Orbit.modules || {};
 
   const S = () => Orbit.store;
   const U = Orbit.ui;
-  const KNOWLEDGE_SRC = 'data/tenant-alianzas-soluciones-source-batch-p09g.js?v=20260715-11';
+  const KNOWLEDGE_SRC = 'data/tenant-alianzas-soluciones-source-batch-p09g.js?v=20260716-2';
+  const TENANT_CONFIG_SRC = 'data/tenant-alianzas-soluciones-insurers-p10.js?v=20260716-2';
   let catalogPromise = null;
+  let tenantConfigPromise = null;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function norm(value) {
@@ -29,7 +31,7 @@ Orbit.modules = Orbit.modules || {};
     if (document.querySelector('link[data-asg-candidate-style]')) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'styles/aseguradoras-candidate.css?v=20260715-11';
+    link.href = 'styles/aseguradoras-candidate.css?v=20260716-2';
     link.dataset.asgCandidateStyle = '1';
     document.head.appendChild(link);
   }
@@ -68,6 +70,37 @@ Orbit.modules = Orbit.modules || {};
   }
   function normalizeAll() {
     try { (S().all('aseguradoras') || []).forEach(normalizeRow); } catch (e) {}
+  }
+
+  function loadScriptOnce(src, marker, ready) {
+    if (ready()) return Promise.resolve();
+    const existing = document.querySelector('script[' + marker + ']');
+    if (existing) {
+      return new Promise(resolve => {
+        if (ready()) return resolve();
+        existing.addEventListener('load', resolve, { once: true });
+        setTimeout(resolve, 2500);
+      });
+    }
+    return new Promise(resolve => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = false;
+      script.setAttribute(marker, '1');
+      script.onload = resolve;
+      script.onerror = resolve;
+      document.head.appendChild(script);
+    });
+  }
+
+  function loadTenantConfig() {
+    if (tenantConfigPromise) return tenantConfigPromise;
+    tenantConfigPromise = loadScriptOnce(
+      TENANT_CONFIG_SRC,
+      'data-asg-tenant-config',
+      () => Array.isArray(window.OrbitTenantInsurerConfigsP10) && window.OrbitTenantInsurerConfigsP10.some(item => item && item.tenantId === 'alianzas-soluciones')
+    ).then(() => window.OrbitTenantInsurerConfigsP10 || []);
+    return tenantConfigPromise;
   }
 
   function loadCatalog() {
@@ -122,8 +155,8 @@ Orbit.modules = Orbit.modules || {};
         <div><small style="color:rgba(255,255,255,.7)">Tarifas y conocimiento · catálogo mapeado</small><b style="display:block;color:#fff;font-size:18px;margin-top:3px">${esc(row.nombre)}</b></div><button class="imp-x" data-close style="color:#fff">✕</button>
       </div>
       <div style="padding:18px 20px">
-        <div class="cfg-note" style="margin-bottom:12px"><b>Estado honesto:</b> estas fuentes fueron inventariadas y relacionadas, pero continúan en lectura pendiente. No contienen tasas persistidas y no habilitan Cotizador ni Comparativo hasta extracción, diff, validación humana y segundo gate.</div>
-        <div style="display:grid;gap:8px">${sources.length ? sources.map(item => { const s = item.source || {}; return `<div class="asg-sec"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><b>${esc(s.nombre)}</b><div class="muted" style="font-size:12px;margin-top:3px">${esc(s.pais)} · ${esc(s.moneda)} · ${esc(s.ramo)} · ${esc(s.producto)} · ${esc(s.version)}</div></div><span class="badge warn">Lectura pendiente</span></div></div>`; }).join('') : '<div class="empty">Esta aseguradora no tiene fuentes en el lote documental inicial.</div>'}</div>
+        <div class="cfg-note" style="margin-bottom:12px"><b>Estado honesto:</b> estas fuentes fueron inventariadas y relacionadas. El resumen de mapeo y las colecciones operativas se muestran por separado; no habilitan Cotizador ni Comparativo sin validación humana y segundo gate.</div>
+        <div style="display:grid;gap:8px">${sources.length ? sources.map(item => { const s = item.source || {}; return `<div class="asg-sec"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><b>${esc(s.nombre)}</b><div class="muted" style="font-size:12px;margin-top:3px">${esc(s.pais)} · ${esc(s.moneda)} · ${esc(s.ramo)} · ${esc(s.producto)} · ${esc(s.version)}</div></div><span class="badge warn">Mapeo relacionado</span></div></div>`; }).join('') : '<div class="empty">Esta aseguradora no tiene fuentes en el lote documental inicial.</div>'}</div>
         ${bindings.length ? `<div class="asg-sec-t" style="margin-top:16px">Conjuntos de vinculación definidos</div><div style="display:grid;gap:8px">${bindings.map(item => `<div class="asg-sec"><b>${esc(item.variant && [item.variant.ramo,item.variant.producto,item.variant.tipoVehiculo,item.variant.plan].filter(Boolean).join(' · '))}</b><div class="muted" style="font-size:12px;margin-top:4px">Requiere validación humana y segundo gate. Cotizador/Comparativo: no habilitados.</div></div>`).join('')}</div>` : ''}
       </div>
       <div style="padding:12px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn ghost" data-close>Cerrar</button></div>
@@ -173,18 +206,39 @@ Orbit.modules = Orbit.modules || {};
     }
   }
 
+  function wireProjectionRefresh(host) {
+    if (!host) return;
+    host.querySelectorAll('[data-asg]').forEach(card => {
+      if (card.dataset.knowledgeProjectionRefresh) return;
+      card.dataset.knowledgeProjectionRefresh = '1';
+      card.addEventListener('click', event => {
+        if (event.target.closest('.asg-switch') || event.target.closest('[data-act]')) return;
+        setTimeout(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:knowledge-ready')), 0);
+      });
+    });
+  }
+
   loadStyle();
+  loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));
   loadCatalog();
   normalizeAll();
 
   const originalRender = mod.render.bind(mod);
   const originalFicha = mod.ficha.bind(mod);
   const originalKpi = mod.kpi.bind(mod);
-  mod.render = function (host) { normalizeAll(); return originalRender(host); };
+  mod.render = function (host) {
+    normalizeAll();
+    const out = originalRender(host);
+    setTimeout(() => wireProjectionRefresh(host), 0);
+    return out;
+  };
   mod.ficha = function (id, startEdit) {
     normalizeAll();
     const out = originalFicha(id, startEdit);
-    setTimeout(() => enhanceFicha(id, originalFicha), 0);
+    setTimeout(() => {
+      enhanceFicha(id, originalFicha);
+      window.dispatchEvent(new CustomEvent('orbit:aseguradoras:knowledge-ready'));
+    }, 0);
     return out;
   };
   mod.kpi = function (type) { normalizeAll(); return originalKpi(type); };
@@ -197,8 +251,8 @@ Orbit.modules = Orbit.modules || {};
     sourceBlob: '93f194aae36dfa3ccd4f154f94d216c12350f9cf',
     visualOverride: false,
     canonicalRenderer: 'modules/aseguradoras.js',
-    adapter: 'directory-contract-and-knowledge-catalog-v1'
+    adapter: 'directory-contract-and-knowledge-catalog-v2'
   };
   mod.__candidateContractAdapter = true;
-  Orbit.aseguradorasKnowledgeCatalog = { load: loadCatalog, sourcesFor: sourcesFor, bindingSetsFor: bindingSetsFor, open: openKnowledge };
+  Orbit.aseguradorasKnowledgeCatalog = { load: loadCatalog, loadTenantConfig, sourcesFor, bindingSetsFor, open: openKnowledge };
 })();
