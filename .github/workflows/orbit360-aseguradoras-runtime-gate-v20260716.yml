@@ -70,6 +70,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check orbit360-platform/core/pwa.js
+          node --check orbit360-platform/core/backend-lab-init.js
           node --check orbit360-platform/core/client-canonical-view-projection-v20260716.js
           node --check orbit360-platform/core/session-multirol-visibility-v20260716.js
           node --check orbit360-platform/modules/cliente360.js
@@ -97,12 +98,11 @@ jobs:
           test "$PROJECT_ID" = "$EXPECTED_FIREBASE_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
 
-      - name: Instalar dependencias de gate
+      - name: Instalar dependencia backend LAB
         shell: bash
         run: |
           set -euo pipefail
-          npm install --no-save firebase-admin@13 playwright@1.52.0
-          npx playwright install --with-deps chromium
+          npm install --no-save firebase-admin@13
 
       - name: Sincronizar usuario LAB, asesores y conteos
         shell: bash
@@ -154,6 +154,13 @@ jobs:
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
           echo "ORBIT360_EXPECTED_COMMIT=$GITHUB_SHA" >> "$GITHUB_ENV"
+
+      - name: Instalar navegador del gate visual
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.52.0
+          npx playwright install --with-deps chromium
 
       - name: Gate conjunto · Cliente 360 y Aseguradoras · tres vistas
         id: joint_gate
