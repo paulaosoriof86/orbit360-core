@@ -3,13 +3,24 @@
    - Construye el sidebar desde Orbit.NAV
    - Navegación por hash (#/route)
    - Despacha a Orbit.modules[route].render(host) o a un placeholder
+   - Refresca una sola vez la ruta activa cuando cambia su fuente de datos
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 
 Orbit.router = (function () {
   const U = Orbit.ui;
-  let host, sidebar, current = null;
+  let host, sidebar, current = null, storeRefreshTimer = null, storeRefreshUnsub = null;
+  const REACTIVE_COLLECTIONS = {
+    cliente360: ['clientes', 'asesores', 'polizas', 'cobros', 'vehiculos'],
+    aseguradoras: ['aseguradoras', 'asesores'],
+    polizas: ['polizas', 'clientes', 'aseguradoras', 'vehiculos'],
+    cobros: ['cobros', 'clientes', 'polizas'],
+    conciliaciones: ['cobros', 'polizas', 'clientes', 'finmovs'],
+    renovaciones: ['polizas', 'clientes', 'gestiones'],
+    comisiones: ['comisiones', 'polizas', 'clientes'],
+    calidad: ['clientes', 'polizas', 'asesores']
+  };
 
   // ---- estado de badges ----
   function badgeHtml(estado) {
@@ -105,12 +116,14 @@ Orbit.router = (function () {
     (qs || '').split('&').forEach(kv => { if (!kv) return; const [k, v] = kv.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v || ''); });
     return out;
   }
-  function render(raw) {
+  function render(raw, options) {
     const [route, qs] = String(raw).split('?');
     Orbit.route = { key: route, params: parseQuery(qs) };
     current = route;
     setActive(route);
     const mod = Orbit.modules[route];
+    const preserveScroll = options && options.preserveScroll;
+    const previousScroll = preserveScroll ? window.scrollY : 0;
     host.scrollTop = 0;
     if (mod && typeof mod.render === 'function') {
       host.innerHTML = '';
@@ -118,11 +131,30 @@ Orbit.router = (function () {
     } else {
       host.innerHTML = placeholder(route);
     }
-    window.scrollTo(0, 0);
+    if (preserveScroll) window.scrollTo(0, previousScroll);
+    else window.scrollTo(0, 0);
+  }
+  function rawRouteFromHash() {
+    return (location.hash || '').replace(/^#\/?/, '') || 'inicio';
   }
   function onHash() {
-    const r = (location.hash || '').replace(/^#\/?/, '') || 'inicio';
-    render(r);
+    render(rawRouteFromHash());
+  }
+
+  function wireStoreRefresh() {
+    if (storeRefreshUnsub || !Orbit.store || typeof Orbit.store.on !== 'function') return;
+    storeRefreshUnsub = Orbit.store.on('*', function (collection) {
+      const routeAtEvent = current;
+      const deps = REACTIVE_COLLECTIONS[routeAtEvent];
+      if (!deps) return;
+      if (collection && collection !== '*' && deps.indexOf(collection) < 0) return;
+      if (storeRefreshTimer) clearTimeout(storeRefreshTimer);
+      storeRefreshTimer = setTimeout(function () {
+        storeRefreshTimer = null;
+        if (routeAtEvent !== current) return;
+        render(rawRouteFromHash(), { preserveScroll: true });
+      }, 140);
+    });
   }
 
   // ---- mobile ----
@@ -138,6 +170,7 @@ Orbit.router = (function () {
     document.querySelector('.sb-overlay').addEventListener('click', closeMobile);
     document.querySelectorAll('[data-home]').forEach(el => el.addEventListener('click', () => go('inicio')));
     wireGlobalSearch();
+    wireStoreRefresh();
     window.addEventListener('hashchange', onHash);
     onHash();
   }
