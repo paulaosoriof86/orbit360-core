@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Backend LAB loader v1.108
+   Orbit 360 - Backend LAB loader v1.109
    Loads Firebase SDK only for:
    ?orbitBackend=firestore-lab&tenant=alianzas-soluciones
 
@@ -12,7 +12,7 @@
 (function(){
   'use strict';
 
-  var LAB_RUNTIME = '20260715-6';
+  var LAB_RUNTIME = '20260715-8';
   var hostname = String(window.location.hostname || '').toLowerCase();
   var isAuthorizedLabHost = /^ays-orbit-360-lab--orbit360-ays-lab-[a-z0-9-]+\.web\.app$/i.test(hostname);
   var initialParams = new URLSearchParams(window.location.search || '');
@@ -62,7 +62,7 @@
     tenantId: requestedTenant,
     tenant: requestedTenant,
     loader: 'core/backend-lab-loader.js',
-    loaderVersion: 'v1.108',
+    loaderVersion: 'v1.109',
     runtimeVersion: LAB_RUNTIME,
     firebaseLoader: 'pending',
     configSource: isFirebaseHosting ? 'firebase-hosting-reserved-init' : 'local-ignored-config',
