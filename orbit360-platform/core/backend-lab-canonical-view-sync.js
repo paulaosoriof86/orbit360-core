@@ -2,7 +2,7 @@
    Orbit 360 · Sincronización de vistas canónicas en Firestore LAB
    - No crea un renderer alterno ni reemplaza HTML del prototipo.
    - Reutiliza Orbit.modules.aseguradoras y Orbit.modules.cliente360.
-   - Re-renderiza una sola vez cuando los snapshots reales hidratan
+   - Re-renderiza cuando los snapshots reales hidratan o actualizan
      Clientes o Aseguradoras después del login/carga controlada.
    ============================================================ */
 (function () {
@@ -12,7 +12,7 @@
   var mode = params.get('orbitBackend') || (window.OrbitBackend && window.OrbitBackend.mode) || '';
   var tenant = params.get('tenant') || (window.OrbitBackend && (window.OrbitBackend.tenantId || window.OrbitBackend.tenant)) || '';
   var timer = null;
-  var lastSignature = '';
+  var pendingCollection = '';
 
   if (mode !== 'firestore-lab' || tenant !== 'alianzas-soluciones') return;
 
@@ -33,15 +33,6 @@
     }
   }
 
-  function signature(route) {
-    return [
-      route,
-      collectionCount('clientes'),
-      collectionCount('aseguradoras'),
-      collectionCount('asesores')
-    ].join(':');
-  }
-
   function canonicalModule(route) {
     try {
       return window.Orbit && Orbit.modules && Orbit.modules[route];
@@ -52,6 +43,8 @@
 
   function renderCanonical() {
     timer = null;
+    var triggerCollection = pendingCollection || '*';
+    pendingCollection = '';
     var route = routeKey();
     if (!route) return;
 
@@ -59,13 +52,9 @@
     var mod = canonicalModule(route);
     if (!host || !mod || typeof mod.render !== 'function') return;
 
-    var nextSignature = signature(route);
-    if (nextSignature === lastSignature) return;
-
     if (route === 'cliente360' && collectionCount('clientes') === 0) return;
     if (route === 'aseguradoras' && collectionCount('aseguradoras') === 0) return;
 
-    lastSignature = nextSignature;
     mod.render(host);
 
     try {
@@ -73,6 +62,7 @@
         detail: {
           tenantId: tenant,
           route: route,
+          triggerCollection: triggerCollection,
           clientes: collectionCount('clientes'),
           aseguradoras: collectionCount('aseguradoras'),
           renderer: 'prototype-canonical'
@@ -85,6 +75,7 @@
     var route = routeKey();
     if (!route) return;
     if (collection && ['clientes', 'aseguradoras', 'asesores', '*'].indexOf(collection) < 0) return;
+    pendingCollection = collection || pendingCollection || '*';
     if (timer) clearTimeout(timer);
     timer = setTimeout(renderCanonical, 120);
   }
@@ -96,7 +87,6 @@
     schedule(event && event.detail && event.detail.collection || '');
   });
   window.addEventListener('hashchange', function () {
-    lastSignature = '';
     schedule('*');
   });
 
