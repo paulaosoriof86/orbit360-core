@@ -96,6 +96,7 @@ const diagnostic = {
   serviceAccountMatch: true,
   membership: { ok: false, category: 'not_run' },
   advisors: { ok: false, category: 'not_run' },
+  dataCounts: { ok: false, category: 'not_run' },
   containsSecrets: false
 };
 
@@ -126,9 +127,17 @@ try {
   diagnostic.advisors = { ok: false, category: classify(error), code: String(error?.code || '').slice(0, 80), message: sanitizeApiMessage(error?.message) };
 }
 
+try {
+  await import('./orbit360-verify-lab-data-counts.mjs');
+  diagnostic.dataCounts = { ok: true, category: 'published' };
+} catch (error) {
+  diagnostic.dataCounts = { ok: false, category: classify(error), code: String(error?.code || '').slice(0, 80), message: sanitizeApiMessage(error?.message) };
+}
+
 writeFileSync(STATUS_PATH, JSON.stringify(diagnostic, null, 2));
 console.log(`MEMBERSHIP_RESULT:${diagnostic.membership.category}`);
 console.log(`ADVISOR_CATALOG_RESULT:${diagnostic.advisors.category}`);
+console.log(`DATA_COUNTS_RESULT:${diagnostic.dataCounts.category}`);
 console.log(JSON.stringify({
   ok: diagnostic.membership.ok && diagnostic.advisors.ok,
   projectId: EXPECTED_PROJECT_ID,
@@ -138,6 +147,7 @@ console.log(JSON.stringify({
   email: EXPECTED_EMAIL,
   membershipSynchronized: diagnostic.membership.ok,
   advisorCatalogSynchronized: diagnostic.advisors.ok,
+  dataCountsPublished: diagnostic.dataCounts.ok,
   passwordExposed: false
 }));
 
