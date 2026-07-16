@@ -41,19 +41,38 @@ async function go(page, hash) {
 
 async function acceptLegalOnce(page, report) {
   await page.waitForTimeout(700);
-  const checkbox = page.locator('#lg-chk').first();
-  const shown = await checkbox.isVisible().catch(() => false);
-  report.legalGateDetected = shown;
-  if (shown) {
-    await checkbox.check();
-    const accept = page.locator('#lg-ok').first();
-    await accept.waitFor({ state: 'visible', timeout: 10000 });
-    await accept.click();
-    await checkbox.waitFor({ state: 'detached', timeout: 10000 }).catch(async () => {
-      if (await checkbox.isVisible().catch(() => false)) throw new Error('LEGAL_GATE_DID_NOT_CLOSE');
-    });
-  }
-  await page.waitForTimeout(1000);
+  const state = await page.evaluate(() => {
+    const visible = node => {
+      if (!node) return false;
+      const style = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const boxes = Array.from(document.querySelectorAll('#lg-chk')).filter(visible);
+    if (!boxes.length) return { detected: false, accepted: false, count: 0 };
+    const checkbox = boxes[0];
+    const root = checkbox.closest('[data-orbit-legal-scope]') || checkbox.closest('.drawer-back') || document;
+    const accept = root.querySelector('#lg-ok');
+    if (!accept) return { detected: true, accepted: false, count: boxes.length, error: 'LEGAL_ACCEPT_BUTTON_MISSING' };
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+    accept.click();
+    return { detected: true, accepted: true, count: boxes.length };
+  });
+  report.legalGateDetected = state.detected;
+  if (state.error) throw new Error(state.error);
+  if (state.detected && !state.accepted) throw new Error('LEGAL_GATE_NOT_ACCEPTED');
+
+  await page.waitForFunction(() => {
+    const visible = node => {
+      if (!node) return false;
+      const style = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    return !Array.from(document.querySelectorAll('#lg-chk,[data-orbit-legal-scope]')).some(visible);
+  }, null, { timeout: 10000 });
+  await page.waitForTimeout(900);
   const openScopes = await visibleCount(page.locator('[data-orbit-legal-scope]'));
   const visibleCheckboxes = await visibleCount(page.locator('#lg-chk'));
   assert(openScopes === 0 && visibleCheckboxes === 0, 'LEGAL_MODAL_REAPPEARED', `${openScopes}:${visibleCheckboxes}`);
