@@ -48,6 +48,13 @@ async function ensureAuthenticated(page) {
     return;
   }
 
+  await page.waitForTimeout(1200);
+  const restoredWhileWaiting = await page.evaluate(() => !document.body.classList.contains('pre-auth'));
+  if (restoredWhileWaiting) {
+    report.checks.sessionRestoredDuringLogin = true;
+    return;
+  }
+
   try {
     await page.locator('#lg-user').fill(email, { timeout: 10000 });
     await page.locator('#lg-pass').fill(accessKey, { timeout: 10000 });
@@ -56,6 +63,7 @@ async function ensureAuthenticated(page) {
     const becameInside = await page.evaluate(() => !document.body.classList.contains('pre-auth'));
     if (!becameInside) throw error;
     report.checks.sessionRestoredDuringLogin = true;
+    return;
   }
   await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 45000 });
   report.checks.login = true;
