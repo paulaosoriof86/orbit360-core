@@ -1,8 +1,10 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const modulePath = 'orbit360-platform/modules/importar-initial-tenant-lab.js';
-const source = fs.readFileSync(modulePath, 'utf8');
+const importerPath = 'orbit360-platform/modules/importar-initial-tenant-lab.js';
+const writerPath = 'orbit360-platform/core/importa-write-p0.js';
+const importerSource = fs.readFileSync(importerPath, 'utf8');
+const writerSource = fs.readFileSync(writerPath, 'utf8');
 
 const listeners = new Map();
 const documentMock = {
@@ -15,6 +17,27 @@ const documentMock = {
 };
 
 const advisor = { id: 'ase-paula', nombre: 'Paula Osorio' };
+const rows = { asesores: [advisor], clientes: [], aseguradoras: [], auditoriaImportaciones: [] };
+const store = {
+  all(collection) { return rows[collection] || []; },
+  get(collection, id) { return (rows[collection] || []).find(row => row.id === id) || null; },
+  insert(collection, data) {
+    rows[collection] = rows[collection] || [];
+    const row = { ...data, id: data.id || `${collection}-${rows[collection].length + 1}`, _syncStatus: 'pending' };
+    rows[collection].push(row);
+    return row;
+  },
+  update(collection, id, patch) {
+    rows[collection] = rows[collection] || [];
+    const index = rows[collection].findIndex(row => row.id === id);
+    const row = { ...(index >= 0 ? rows[collection][index] : { id }), ...patch, id, _syncStatus: 'pending' };
+    if (index >= 0) rows[collection][index] = row;
+    else rows[collection].push(row);
+    return row;
+  },
+  _labStatus() { return { writeQueue: [], writeErrors: [], lastWriteOkAt: new Date().toISOString() }; }
+};
+
 const context = {
   console,
   URL,
@@ -32,33 +55,32 @@ const context = {
     tenant: { get: () => ({ id: 'alianzas-soluciones' }) },
     importInitialProfiles: {
       'alianzas-soluciones': {
+        id: 'ays-initial-lab-v1',
         tenantId: 'alianzas-soluciones',
         sourceSchemaVersion: 'orbit360.initial-tenant-batch.v1',
         expectedCounts: { clientes: 1, clientesRetenidos: 0, aseguradoras: 1 },
         allowedCollections: ['clientes', 'aseguradoras']
       }
     },
-    store: {
-      all(collection) {
-        if (collection === 'asesores') return [advisor];
-        return [];
-      }
-    },
+    store,
     modules: {}
   }
 };
 context.window = context;
 vm.createContext(context);
-vm.runInContext(source, context, { filename: modulePath });
+vm.runInContext(importerSource, context, { filename: importerPath });
+vm.runInContext(writerSource, context, { filename: writerPath });
 
 const api = context.Orbit.initialTenantImport;
+const writer = context.Orbit.importaWriteP0;
 if (!api) throw new Error('No se exportó Orbit.initialTenantImport.');
+if (!writer) throw new Error('No se exportó Orbit.importaWriteP0.');
 
 function payload(action = 'CREAR_CON_VALIDACION') {
   return {
     schemaVersion: 'orbit360.initial-tenant-batch.v1',
     tenantId: 'alianzas-soluciones',
-    sourceType: 'test',
+    sourceType: 'ays-initial-lab-v1',
     security: {
       secretValuesIncluded: false,
       credentialsAsReferencesOnly: true,
@@ -96,8 +118,39 @@ if (insurerOp.data.vinculada !== false || insurerOp.data.cotizadorHabilitado !==
   throw new Error('La aseguradora pendiente no quedó restringida.');
 }
 
+writer.ALLOWED_COLLECTIONS.push('clientes', 'aseguradoras');
+const batchErrors = writer.validateBatch(dry.batch);
+if (batchErrors.length) throw new Error(`La escritura controlada bloqueó una aseguradora restringida válida: ${batchErrors.join(', ')}`);
+
+const write = writer.writeBatch(dry.batch, {
+  approved: true,
+  phrase: 'CONFIRMO ESCRITURA CONTROLADA',
+  userId: 'orbit-lab-user',
+  reason: 'Prueba contrato pendiente restringido.'
+});
+if (!write.ok || write.written !== 2) throw new Error(`La escritura controlada falló: ${(write.errors || []).join(', ')}`);
+const writtenInsurer = store.get('aseguradoras', 'aseg-1');
+if (!writtenInsurer) throw new Error('No se escribió la aseguradora pendiente.');
+if (writtenInsurer.validationStatus !== 'requiere_validacion' || writtenInsurer.requiereValidacion !== true) {
+  throw new Error('La escritura convirtió indebidamente la aseguradora pendiente en validada.');
+}
+if (writtenInsurer.vinculada !== false || writtenInsurer.cotizadorHabilitado !== false || writtenInsurer.comparativoHabilitado !== false || writtenInsurer.tarifasHabilitadas !== false || writtenInsurer.estadoOperativo !== 'pendiente_validacion') {
+  throw new Error('La escritura no preservó todas las restricciones operativas.');
+}
+
+const invalidPending = {
+  collection: 'aseguradoras', action: 'insert', data: {
+    id: 'aseg-mal', pais: 'GT', moneda: 'GTQ', requiereValidacion: true,
+    validationStatus: 'requiere_validacion', estadoOperativo: 'pendiente_validacion',
+    vinculada: false, cotizadorHabilitado: true, comparativoHabilitado: false, tarifasHabilitadas: false
+  }
+};
+if (!writer.validateRecord(invalidPending).includes('registro_requiere_validacion')) {
+  throw new Error('Una aseguradora pendiente sin restricción completa debe seguir bloqueada.');
+}
+
 const quarantine = api.buildDryRun(payload('CUARENTENA_NO_ESCRIBIR'), profile, { name: 'test.json' }, 'hash-test');
 if (!quarantine.batch.hasBlockingErrors) throw new Error('Una cuarentena explícita debe bloquear el dry-run.');
 if (!quarantine.diff.blockers.some(x => x.reason === 'cuarentena_fuente')) throw new Error('Falta bloqueo cuarentena_fuente.');
 
-console.log('PASS: contrato de aseguradoras pendientes/cuarentena en carga inicial A&S.');
+console.log('PASS: dry-run y escritura preservan aseguradoras pendientes restringidas; cuarentena sigue bloqueada.');
