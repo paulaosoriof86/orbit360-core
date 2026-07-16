@@ -121,7 +121,7 @@
    Estabilización transversal 2026-07-16
    - aceptación legal idempotente aunque Auth notifique varias veces;
    - menú móvil con un solo comportamiento aunque exista listener heredado;
-   - carga aditiva de la proyección frontend de Aseguradoras.
+   - carga aditiva de contratos multirol, Cliente 360 y Aseguradoras.
    ============================================================ */
 (function () {
   function installLegalGate() {
@@ -180,16 +180,30 @@
     window.addEventListener('resize', function () { if (!mobile()) paint(false); });
   }
 
-  function loadInsurerProjection() {
-    if (document.querySelector('script[data-asg-front-projection-v20260716]')) return;
+  function loadScript(src, marker, ready) {
+    if (ready && ready()) return;
+    if (document.querySelector('script[' + marker + ']')) return;
     var script = document.createElement('script');
-    script.src = 'modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-1';
+    script.src = src;
     script.async = false;
-    script.setAttribute('data-asg-front-projection-v20260716', '1');
+    script.setAttribute(marker, '1');
     document.head.appendChild(script);
   }
 
+  function loadRuntimeContracts() {
+    loadScript('core/session-multirol-visibility-v20260716.js?v=20260716-2', 'data-orbit-multirol-runtime-v20260716', function () {
+      return window.Orbit && Orbit.session && Orbit.session.__multirolVisibilityV20260716;
+    });
+    loadScript('core/client-canonical-view-projection-v20260716.js?v=20260716-1', 'data-orbit-client-projection-runtime-v20260716', function () {
+      return window.Orbit && Orbit.clientCanonicalViewProjectionV20260716;
+    });
+    loadScript('modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-2', 'data-orbit-insurer-projection-runtime-v20260716', function () {
+      return window.Orbit && Orbit.aseguradorasFrontendProjectionV20260716;
+    });
+    loadScript('modules/aseguradoras-candidate-actions.js?v=20260716-2', 'data-orbit-candidate-actions-runtime-v20260716');
+  }
+
   installLegalGate();
-  function ready() { installLegalGate(); installMobileNavigation(); loadInsurerProjection(); }
+  function ready() { installLegalGate(); installMobileNavigation(); loadRuntimeContracts(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
 })();
