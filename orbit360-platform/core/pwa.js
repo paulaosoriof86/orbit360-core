@@ -116,3 +116,80 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load); else load();
 })();
+
+/* ============================================================
+   Estabilización transversal 2026-07-16
+   - aceptación legal idempotente aunque Auth notifique varias veces;
+   - menú móvil con un solo comportamiento aunque exista listener heredado;
+   - carga aditiva de la proyección frontend de Aseguradoras.
+   ============================================================ */
+(function () {
+  function installLegalGate() {
+    var legal = window.Orbit && Orbit.legal;
+    if (!legal || !legal.gate || legal.__idempotentGateV20260716) return;
+    var original = legal.gate.bind(legal);
+    var doneScopes = {};
+    legal.gate = function (tipo, scopeId, opts) {
+      opts = opts || {};
+      var scope = String(scopeId || 'anonymous');
+      if (legal.yaAcepto && legal.yaAcepto(scope)) {
+        if (!doneScopes[scope] && opts.onDone) { doneScopes[scope] = true; opts.onDone(); }
+        return;
+      }
+      var existing = Array.prototype.find.call(document.querySelectorAll('[data-orbit-legal-scope]'), function (node) {
+        return node.getAttribute('data-orbit-legal-scope') === scope;
+      });
+      if (existing) return;
+      var before = Array.prototype.slice.call(document.querySelectorAll('.drawer-back.open'));
+      original(tipo, scope, {
+        onDone: function () {
+          Array.prototype.slice.call(document.querySelectorAll('[data-orbit-legal-scope]')).forEach(function (node) { if (node.getAttribute('data-orbit-legal-scope') === scope && node.parentNode) node.parentNode.removeChild(node); });
+          if (!doneScopes[scope] && opts.onDone) { doneScopes[scope] = true; opts.onDone(); }
+        }
+      });
+      var created = Array.prototype.slice.call(document.querySelectorAll('.drawer-back.open')).find(function (node) { return before.indexOf(node) < 0; });
+      if (created) created.setAttribute('data-orbit-legal-scope', scope);
+    };
+    legal.__idempotentGateV20260716 = true;
+  }
+
+  function installMobileNavigation() {
+    if (document.documentElement.dataset.orbitMobileNavV20260716) return;
+    document.documentElement.dataset.orbitMobileNavV20260716 = '1';
+    var burger = document.getElementById('burger');
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.querySelector('.sb-overlay');
+    if (!burger || !sidebar || !overlay) return;
+    function mobile() { return window.matchMedia && window.matchMedia('(max-width:980px)').matches; }
+    function paint(open) {
+      sidebar.classList.toggle('open', open);
+      overlay.classList.toggle('show', open);
+      document.body.classList.toggle('sb-open', open);
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    burger.addEventListener('click', function (event) {
+      if (!mobile()) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      paint(!sidebar.classList.contains('open'));
+    }, true);
+    overlay.addEventListener('click', function () { if (mobile()) paint(false); }, true);
+    document.addEventListener('click', function (event) {
+      if (mobile() && event.target && event.target.closest && event.target.closest('#sidebar .nav-link')) paint(false);
+    }, true);
+    window.addEventListener('resize', function () { if (!mobile()) paint(false); });
+  }
+
+  function loadInsurerProjection() {
+    if (document.querySelector('script[data-asg-front-projection-v20260716]')) return;
+    var script = document.createElement('script');
+    script.src = 'modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-1';
+    script.async = false;
+    script.setAttribute('data-asg-front-projection-v20260716', '1');
+    document.head.appendChild(script);
+  }
+
+  installLegalGate();
+  function ready() { installLegalGate(); installMobileNavigation(); loadInsurerProjection(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
+})();
