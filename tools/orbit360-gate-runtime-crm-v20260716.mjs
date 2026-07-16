@@ -30,6 +30,37 @@ async function visibleCount(locator) {
   }).length);
 }
 
+async function ensureAuthenticated(page) {
+  await page.waitForFunction(() => {
+    const form = document.getElementById('login-form');
+    const visible = node => {
+      if (!node) return false;
+      const style = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    return !document.body.classList.contains('pre-auth') || visible(form);
+  }, null, { timeout: 30000 });
+
+  const alreadyInside = await page.evaluate(() => !document.body.classList.contains('pre-auth'));
+  if (alreadyInside) {
+    report.checks.sessionRestored = true;
+    return;
+  }
+
+  try {
+    await page.locator('#lg-user').fill(email, { timeout: 10000 });
+    await page.locator('#lg-pass').fill(accessKey, { timeout: 10000 });
+    await page.locator('#login-form').evaluate(form => form.requestSubmit());
+  } catch (error) {
+    const becameInside = await page.evaluate(() => !document.body.classList.contains('pre-auth'));
+    if (!becameInside) throw error;
+    report.checks.sessionRestoredDuringLogin = true;
+  }
+  await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 45000 });
+  report.checks.login = true;
+}
+
 async function acceptLegalGate(page) {
   await page.waitForTimeout(700);
   const state = await page.evaluate(() => {
@@ -78,11 +109,7 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 try {
   await page.goto(`${baseUrl}/ays-lab-preview.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForURL(/index\.html/, { waitUntil: 'domcontentloaded', timeout: 30000 });
-  await page.locator('#login-form').waitFor({ state: 'visible', timeout: 30000 });
-  await page.locator('#lg-user').fill(email);
-  await page.locator('#lg-pass').fill(accessKey);
-  await page.locator('#login-form').evaluate(form => form.requestSubmit());
-  await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 45000 });
+  await ensureAuthenticated(page);
   await acceptLegalGate(page);
 
   report.storeCounts = await waitForRealTenantData(page, 26);
