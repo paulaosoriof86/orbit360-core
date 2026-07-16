@@ -22,6 +22,37 @@ async function selectRole(page, role) {
   await page.waitForTimeout(600);
 }
 
+async function visibleCount(locator) {
+  return locator.evaluateAll(nodes => nodes.filter(node => {
+    const style = getComputedStyle(node);
+    const rect = node.getBoundingClientRect();
+    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+  }).length);
+}
+
+async function acceptLegalGate(page) {
+  await page.waitForTimeout(700);
+  const checkbox = page.locator('#lg-chk').first();
+  const shown = await checkbox.isVisible().catch(() => false);
+  report.checks.legalGateDetected = shown;
+
+  if (shown) {
+    await checkbox.check();
+    const accept = page.locator('#lg-ok').first();
+    await accept.waitFor({ state: 'visible', timeout: 10000 });
+    await accept.click();
+    await checkbox.waitFor({ state: 'detached', timeout: 10000 }).catch(async () => {
+      if (await checkbox.isVisible().catch(() => false)) throw new Error('LEGAL_GATE_DID_NOT_CLOSE');
+    });
+  }
+
+  await page.waitForTimeout(1000);
+  const openLegalScopes = await visibleCount(page.locator('[data-orbit-legal-scope]'));
+  const visibleCheckboxes = await visibleCount(page.locator('#lg-chk'));
+  if (openLegalScopes || visibleCheckboxes) throw new Error(`LEGAL_MODAL_REAPPEARED:${openLegalScopes}:${visibleCheckboxes}`);
+  report.checks.legalOneClick = true;
+}
+
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 try {
@@ -32,16 +63,7 @@ try {
   await page.locator('#lg-pass').fill(accessKey);
   await page.locator('#login-form').evaluate(form => form.requestSubmit());
   await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 45000 });
-
-  const legal = page.locator('.conf-modal');
-  await page.waitForTimeout(700);
-  if (await legal.count()) {
-    await page.locator('.conf-modal #lg-chk').check();
-    await page.locator('.conf-modal #lg-ok').click();
-    await legal.waitFor({ state: 'detached', timeout: 10000 });
-  }
-  await page.waitForTimeout(1000);
-  if (await legal.count()) throw new Error('LEGAL_MODAL_REAPPEARED');
+  await acceptLegalGate(page);
 
   report.storeCounts = await waitForRealTenantData(page, 26);
 
