@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.116
+   Orbit 360 - Backend LAB Firebase init v1.117
    Initializes Firebase only in ?orbitBackend=firestore-lab.
    Reads config from local ignored file variables. No secrets here.
    ============================================================ */
@@ -17,7 +17,7 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.116',
+    firebaseInitVersion: 'v1.117',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
       aseguradorasKnowledgeAutoMount: false
     })
@@ -44,23 +44,23 @@
   }
 
   if (tenant === 'alianzas-soluciones') {
-    /* La operación documental permanece disponible como contrato backend,
-       pero no se auto-monta sobre el directorio operativo. Su futura UI
-       debe vivir en un workspace administrativo explícito. */
+    /* El catálogo documental puede consultarse desde la ficha aprobada, pero
+       el runtime de extracción/persistencia continúa fuera del render principal
+       y no habilita Cotizador ni Comparativo automáticamente. */
     window.__orbitAysKnowledgeRuntimePromise = Promise.resolve({
-      status: 'deferred_to_admin_workspace',
+      status: 'catalog_visible_runtime_controlled',
       autoMount: false,
       enablesCotizador: false,
       enablesComparativo: false
     });
 
-    loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260715-7', 'advisor-write-bridge', function(){
-      loadScriptOnce('data/import-initial-profiles.js?v=20260715-7', 'initial-profile', function(){
-        loadScriptOnce('modules/importar-initial-tenant-lab.js?v=20260715-7', 'initial-import');
+    loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260715-11', 'advisor-write-bridge', function(){
+      loadScriptOnce('data/import-initial-profiles.js?v=20260715-11', 'initial-profile', function(){
+        loadScriptOnce('modules/importar-initial-tenant-lab.js?v=20260715-11', 'initial-import');
       });
     });
-    loadScriptOnce('core/backend-lab-auth-guard.js?v=20260715-7', 'auth-guard', function(){
-      loadScriptOnce('core/backend-lab-import-readiness-guard.js?v=20260715-7', 'import-readiness');
+    loadScriptOnce('core/backend-lab-auth-guard.js?v=20260715-11', 'auth-guard', function(){
+      loadScriptOnce('core/backend-lab-import-readiness-guard.js?v=20260715-11', 'import-readiness');
     });
   }
 
