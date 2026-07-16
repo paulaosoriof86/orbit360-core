@@ -9,7 +9,7 @@ const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v3',
+  schemaVersion: 'orbit360-runtime-gate-joint-v4',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
@@ -73,66 +73,78 @@ async function authState(page) {
       return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
     };
     let providerReady = false;
+    let currentUser = false;
     try {
-      providerReady = !!(window.firebase && firebase.auth && typeof firebase.auth().signInWithEmailAndPassword === 'function');
+      const auth = window.firebase && firebase.auth ? firebase.auth() : null;
+      providerReady = !!(auth && typeof auth.signInWithEmailAndPassword === 'function');
+      currentUser = !!(auth && auth.currentUser);
     } catch (error) {}
     return {
       inside: !document.body.classList.contains('pre-auth'),
       formVisible: visible(document.getElementById('login-form')),
       providerReady,
+      currentUser,
+      firebaseInit: String((window.OrbitBackend || {}).firebaseInit || ''),
+      firebaseLoader: String((window.OrbitBackend || {}).firebaseLoader || ''),
       errorText: String((document.getElementById('login-error') || {}).textContent || '').trim()
     };
   });
 }
 
 async function ensureAuthenticated(page) {
-  for (let attempt = 0; attempt < 14; attempt += 1) {
+  const deadline = Date.now() + 60000;
+  let submitted = false;
+  let lastState = null;
+
+  while (Date.now() < deadline) {
     let state = await authState(page);
-    if (state.inside) {
+    lastState = state;
+    if (state.inside || state.currentUser) {
+      if (!state.inside) {
+        await page.evaluate(() => { try { if (Orbit.auth && Orbit.auth.showApp) Orbit.auth.showApp(); } catch (error) {} });
+      }
+      await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 10000 });
+      report.authMode = submitted ? 'ui_form' : 'session_restored';
       report.checks.authenticated = true;
       return;
-    }
-    if (!state.providerReady) {
-      await page.waitForTimeout(500);
-      continue;
-    }
-    if (!state.formVisible) {
-      await page.evaluate(() => {
-        try {
-          if (window.Orbit && Orbit.auth && typeof Orbit.auth.showLogin === 'function') Orbit.auth.showLogin();
-        } catch (error) {}
-      });
-      await page.waitForTimeout(400);
-      state = await authState(page);
-      if (state.inside) {
-        report.checks.authenticated = true;
-        return;
-      }
-      if (!state.formVisible) continue;
     }
 
-    try {
-      await page.locator('#lg-user').fill(email, { timeout: 5000 });
-      await page.locator('#lg-pass').fill(accessKey, { timeout: 5000 });
-      await page.locator('#login-form').evaluate(form => form.requestSubmit());
-      await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 15000 });
-      report.checks.authenticated = true;
-      return;
-    } catch (error) {
+    if (state.providerReady && !state.formVisible) {
+      await page.evaluate(() => { try { if (Orbit.auth && Orbit.auth.showLogin) Orbit.auth.showLogin(); } catch (error) {} });
+      await page.waitForTimeout(350);
       state = await authState(page);
-      if (state.inside) {
-        report.checks.authenticated = true;
-        return;
-      }
-      if (state.errorText) throw new Error('LOGIN_REJECTED_BY_PROVIDER');
-      await page.waitForTimeout(600);
+      lastState = state;
     }
+
+    if (state.providerReady && state.formVisible && !submitted) {
+      submitted = true;
+      try {
+        await page.locator('#lg-user').waitFor({ state: 'visible', timeout: 8000 });
+        await page.locator('#lg-pass').waitFor({ state: 'visible', timeout: 8000 });
+        await page.locator('#lg-user').fill(email);
+        await page.locator('#lg-pass').fill(accessKey);
+        await page.locator('#login-form').evaluate(form => form.requestSubmit());
+      } catch (error) {
+        submitted = false;
+      }
+    }
+
+    if (state.errorText) throw new Error('LOGIN_REJECTED_BY_PROVIDER');
+    await page.waitForTimeout(500);
   }
-  throw new Error('LOGIN_UI_STATE_UNSTABLE');
+
+  report.authDiagnostic = {
+    providerReady: !!(lastState && lastState.providerReady),
+    currentUser: !!(lastState && lastState.currentUser),
+    formVisible: !!(lastState && lastState.formVisible),
+    firebaseInit: String(lastState && lastState.firebaseInit || ''),
+    firebaseLoader: String(lastState && lastState.firebaseLoader || '')
+  };
+  throw new Error(`LOGIN_UI_STATE_UNSTABLE:${report.authDiagnostic.firebaseInit || 'sin_init'}:${report.authDiagnostic.firebaseLoader || 'sin_loader'}`);
 }
 
 async function acceptLegalGate(page) {
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(900);
   const state = await page.evaluate(() => {
     const visible = node => {
       if (!node) return false;
@@ -140,11 +152,11 @@ async function acceptLegalGate(page) {
       const rect = node.getBoundingClientRect();
       return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
     };
-    const boxes = Array.from(document.querySelectorAll('#lg-chk')).filter(visible);
+    const boxes = Array.from(document.querySelectorAll('#lg-chk,#conf-chk')).filter(visible);
     if (boxes.length !== 1) return { count: boxes.length, error: boxes.length ? 'LEGAL_DUPLICATE_VISIBLE' : 'LEGAL_GATE_NOT_VISIBLE' };
     const checkbox = boxes[0];
     const root = checkbox.closest('.drawer-back') || document;
-    const accept = root.querySelector('#lg-ok');
+    const accept = root.querySelector('#lg-ok,#conf-ok');
     if (!accept) return { count: 1, error: 'LEGAL_ACCEPT_BUTTON_MISSING' };
     checkbox.checked = true;
     checkbox.dispatchEvent(new Event('change', { bubbles: true }));
@@ -162,10 +174,10 @@ async function acceptLegalGate(page) {
       const rect = node.getBoundingClientRect();
       return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
     };
-    return !Array.from(document.querySelectorAll('#lg-chk')).some(visible);
+    return !Array.from(document.querySelectorAll('#lg-chk,#conf-chk')).some(visible);
   }, null, { timeout: 10000 });
   await page.waitForTimeout(1000);
-  const remaining = await visibleCount(page.locator('#lg-chk'));
+  const remaining = await visibleCount(page.locator('#lg-chk,#conf-chk'));
   assert(remaining === 0, 'LEGAL_MODAL_REAPPEARED', String(remaining));
   report.legalVisibleAfter = remaining;
   report.checks.legalOneClick = true;
