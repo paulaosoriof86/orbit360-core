@@ -27,6 +27,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 concurrency:
   group: orbit360-clientes-aseguradoras-runtime-gate-v20260716
@@ -167,6 +169,42 @@ jobs:
             echo ""
             echo "Sin producción, sin main, sin merge y sin capturas de datos personales."
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publicar resultado sanitizado en PR 5
+        if: always() && github.event_name == 'push'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          REPORT="orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json"
+          INVENTORY="orbit360-platform/lab-aseguradoras-knowledge-inventory.json"
+          COUNTS="orbit360-platform/lab-data-counts.json"
+          if [ -f "$REPORT" ]; then
+            OK="$(jq -r '.ok // false' "$REPORT")"
+            ERROR_CODE="$(jq -r '(.error // "") | split(":")[0] | gsub("[\\r\\n]"; " ")' "$REPORT")"
+          else
+            OK="false"
+            ERROR_CODE="RESULTADO_NO_GENERADO"
+          fi
+          CLIENTS="$(test -f "$COUNTS" && jq -r '.counts.clientes // 0' "$COUNTS" || echo 0)"
+          INSURERS="$(test -f "$COUNTS" && jq -r '.counts.aseguradoras // 0' "$COUNTS" || echo 0)"
+          ADVISORS="$(test -f "$COUNTS" && jq -r '.counts.asesores // 0' "$COUNTS" || echo 0)"
+          SYNC="$(test -f "$INVENTORY" && jq -r '.gates.operationalSyncComplete // false' "$INVENTORY" || echo false)"
+          BODY=$(cat <<EOF
+          ## Resultado automático sanitizado · Cliente 360 + Aseguradoras
+
+          - Commit: `${GITHUB_SHA}`
+          - Run: `${GITHUB_RUN_ID}`
+          - Gate conjunto: **${OK}**
+          - Conteos LAB: clientes **${CLIENTS}**, aseguradoras **${INSURERS}**, asesores **${ADVISORS}**
+          - Conocimiento Aseguradoras persistido operativamente: **${SYNC}**
+          - Código de bloqueo: `${ERROR_CODE:-NINGUNO}`
+          - Evidencia: artefacto sanitizado del run, sin PII, secretos ni documentos fuente.
+          - Alcance: LAB únicamente; sin producción, merge ni main.
+          EOF
+          )
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
 
       - name: Cerrar resultado conjunto
         if: always()
