@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.115
+   Orbit 360 - Backend LAB Firebase init v1.116
    Initializes Firebase only in ?orbitBackend=firestore-lab.
    Reads config from local ignored file variables. No secrets here.
    ============================================================ */
@@ -17,7 +17,10 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.115'
+    firebaseInitVersion: 'v1.116',
+    featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
+      aseguradorasKnowledgeAutoMount: false
+    })
   });
 
   function loadScriptOnce(src, key, done) {
@@ -41,8 +44,16 @@
   }
 
   if (tenant === 'alianzas-soluciones') {
-    loadScriptOnce('core/store-view-refresh-v20260715.js?v=20260715-1', 'store-view-refresh');
-    loadScriptOnce('modules/aseguradoras-directory-priority-v20260715.js?v=20260715-1', 'aseguradoras-directory-priority');
+    /* La operación documental permanece disponible como contrato backend,
+       pero no se auto-monta sobre el directorio operativo. Su futura UI
+       debe vivir en un workspace administrativo explícito. */
+    window.__orbitAysKnowledgeRuntimePromise = Promise.resolve({
+      status: 'deferred_to_admin_workspace',
+      autoMount: false,
+      enablesCotizador: false,
+      enablesComparativo: false
+    });
+
     loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260715-7', 'advisor-write-bridge', function(){
       loadScriptOnce('data/import-initial-profiles.js?v=20260715-7', 'initial-profile', function(){
         loadScriptOnce('modules/importar-initial-tenant-lab.js?v=20260715-7', 'initial-import');
