@@ -1,7 +1,9 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.118
+   Orbit 360 - Backend LAB Firebase init v1.119
    Initializes Firebase only in ?orbitBackend=firestore-lab.
-   Reads config from local ignored file variables. No secrets here.
+   Accepts Firebase Hosting reserved init when the default app
+   is already initialized; local mode still reads ignored config.
+   No secrets are versioned or exposed.
    ============================================================ */
 (function(){
   'use strict';
@@ -17,7 +19,7 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.118',
+    firebaseInitVersion: 'v1.119',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
       aseguradorasKnowledgeAutoMount: false
     })
@@ -107,6 +109,17 @@
       return;
     }
 
+    /* Firebase Hosting /__/firebase/init.js initializes the default app
+       directly and does not need to expose a second global config object. */
+    if (window.firebase.apps && window.firebase.apps.length > 0) {
+      var existingApp = typeof window.firebase.app === 'function' ? window.firebase.app() : window.firebase.apps[0];
+      var existingConfig = existingApp && existingApp.options ? existingApp.options : {};
+      window.OrbitBackend.firebaseInit = 'already-initialized';
+      window.OrbitBackend.firebaseConfigInfo = publicConfigInfo(existingConfig);
+      window.OrbitBackend.firebaseProjectId = existingConfig.projectId || '';
+      return;
+    }
+
     var config = findConfig();
     if (!config) {
       window.OrbitBackend.firebaseInit = 'config-not-found';
@@ -117,12 +130,6 @@
     if (!config.projectId || !config.authDomain) {
       window.OrbitBackend.firebaseInit = 'config-incomplete';
       window.OrbitBackend.firebaseInitError = 'Firebase LAB config requires projectId and authDomain';
-      window.OrbitBackend.firebaseConfigInfo = publicConfigInfo(config);
-      return;
-    }
-
-    if (window.firebase.apps && window.firebase.apps.length > 0) {
-      window.OrbitBackend.firebaseInit = 'already-initialized';
       window.OrbitBackend.firebaseConfigInfo = publicConfigInfo(config);
       return;
     }
