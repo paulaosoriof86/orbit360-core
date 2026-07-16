@@ -1,6 +1,6 @@
 /* ============================================================
    Orbit 360 · P0 dry-run sanitizado por fuente separada
-   Fecha: 2026-07-09
+   Fecha: 2026-07-15
 
    Construye reportes de dry-run sin escribir datos reales.
    La salida puede alimentar la UI de confirmacion reforzada solo
@@ -136,6 +136,22 @@
     return found;
   }
 
+  function isRestrictedPendingInsurer(op) {
+    const data = op && (op.data || op.record || {});
+    return !!(
+      op &&
+      op.collection === 'aseguradoras' &&
+      data &&
+      data.requiereValidacion === true &&
+      data.validationStatus === 'requiere_validacion' &&
+      data.estadoOperativo === 'pendiente_validacion' &&
+      data.vinculada === false &&
+      data.cotizadorHabilitado === false &&
+      data.comparativoHabilitado === false &&
+      data.tarifasHabilitadas === false
+    );
+  }
+
   function validateOperation(sourceType, op) {
     const c = SOURCE_CONTRACTS[sourceType];
     const errors = [];
@@ -144,6 +160,7 @@
     if (!op || typeof op !== 'object') errors.push('operacion_invalida');
     const coll = op && op.collection;
     const data = op && (op.data || op.record || {});
+    const restrictedPendingInsurer = isRestrictedPendingInsurer(op);
     if (c && coll && !c.allowed.includes(coll)) errors.push('collection_no_permitida_para_fuente:' + coll);
     if (c && coll && c.forbidden.includes(coll)) errors.push('collection_prohibida_para_fuente:' + coll);
     if (op && !['insert', 'update', undefined, null].includes(op.action)) errors.push('accion_no_permitida:' + op.action);
@@ -151,9 +168,10 @@
     (c ? c.required : []).forEach(function (k) { if (isBlank(data[k])) warnings.push('campo_recomendado_faltante:' + k); });
     (c ? c.blocking : []).forEach(function (k) { if (isBlank(data[k])) errors.push('campo_bloqueante_faltante:' + k); });
     if (hasRawCredential(data)) errors.push('credencial_no_importable_usar_credentialRef_backend_required');
-    if (data.requiereValidacion) errors.push('registro_requiere_validacion');
-    if (data.validationStatus && data.validationStatus !== 'validado') errors.push('validationStatus_no_validado');
-    if (data.estado === 'requiere_validacion') errors.push('estado_requiere_validacion');
+    if (data.requiereValidacion && !restrictedPendingInsurer) errors.push('registro_requiere_validacion');
+    if (data.validationStatus && data.validationStatus !== 'validado' && !restrictedPendingInsurer) errors.push('validationStatus_no_validado');
+    if (data.estado === 'requiere_validacion' && !restrictedPendingInsurer) errors.push('estado_requiere_validacion');
+    if (restrictedPendingInsurer) warnings.push('directorio_aseguradora_pendiente_restringido');
     return { errors, warnings };
   }
 
@@ -222,6 +240,7 @@
   window.Orbit.importaDryRunP0 = {
     SOURCE_CONTRACTS,
     sanitizeRecord,
+    isRestrictedPendingInsurer,
     validateOperation,
     buildDryRun,
     approveDryRun
