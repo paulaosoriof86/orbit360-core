@@ -4,6 +4,16 @@
   'use strict';
   let attempts = 0;
 
+  function loadMultirolContract() {
+    if (window.Orbit && Orbit.session && Orbit.session.__multirolVisibilityV20260716) return;
+    if (document.querySelector('script[data-orbit-multirol-v20260716]')) return;
+    const script = document.createElement('script');
+    script.src = 'core/session-multirol-visibility-v20260716.js?v=20260716-1';
+    script.async = false;
+    script.dataset.orbitMultirolV20260716 = '1';
+    document.head.appendChild(script);
+  }
+
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function canManage() {
     try { return ['Dirección', 'Admin'].includes(clean(Orbit.session && Orbit.session.rol && Orbit.session.rol())); }
@@ -60,6 +70,7 @@
   }, true);
   window.addEventListener('hashchange', schedule);
   window.addEventListener('orbit:store:emit', schedule);
+  loadMultirolContract();
   (function wait() {
     if (window.Orbit && Orbit.modules && Orbit.modules.aseguradoras && Orbit.aseguradorasKnowledgeCatalog) { schedule(); return; }
     attempts += 1;
