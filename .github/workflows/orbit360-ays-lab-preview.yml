@@ -7,6 +7,7 @@ on:
     paths:
       - "orbit360-platform/**"
       - "tools/orbit360-ensure-lab-user.mjs"
+      - "tools/orbit360-verify-lab-data-counts.mjs"
       - "tools/orbit360-test-import-initial-pending-insurers.mjs"
       - "tools/orbit360-test-lab-import-readiness.mjs"
       - "firestore.rules"
@@ -18,6 +19,7 @@ on:
     paths:
       - "orbit360-platform/**"
       - "tools/orbit360-ensure-lab-user.mjs"
+      - "tools/orbit360-verify-lab-data-counts.mjs"
       - "tools/orbit360-test-import-initial-pending-insurers.mjs"
       - "tools/orbit360-test-lab-import-readiness.mjs"
       - "firestore.rules"
@@ -71,8 +73,11 @@ jobs:
           test -f orbit360-platform/ays-lab-preview.html
           test -f orbit360-platform/core/backend-lab-auth-guard.js
           test -f orbit360-platform/core/backend-lab-import-readiness-guard.js
+          test -f orbit360-platform/core/store-view-refresh-v20260715.js
+          test -f orbit360-platform/modules/aseguradoras-directory-priority-v20260715.js
           test -f orbit360-platform/modules/importar-initial-tenant-lab.js
           test -f tools/orbit360-ensure-lab-user.mjs
+          test -f tools/orbit360-verify-lab-data-counts.mjs
           test -f tools/orbit360-test-import-initial-pending-insurers.mjs
           test -f tools/orbit360-test-lab-import-readiness.mjs
           if git ls-files | grep -E 'auth-firebase\.config\.local\.js|CARGA-INICIAL-AYS-.*\.json|clientes\.json|aseguradoras\.json'; then
@@ -121,13 +126,16 @@ jobs:
           node --check orbit360-platform/core/backend-lab-init.js
           node --check orbit360-platform/core/backend-lab-auth-guard.js
           node --check orbit360-platform/core/backend-lab-import-readiness-guard.js
+          node --check orbit360-platform/core/store-view-refresh-v20260715.js
           node --check orbit360-platform/core/importa-dryrun-p0.js
           node --check orbit360-platform/core/importa-write-p0.js
           node --check orbit360-platform/core/pwa.js
           node --check orbit360-platform/core/auth.js
           node --check orbit360-platform/data/import-initial-profiles.js
+          node --check orbit360-platform/modules/aseguradoras-directory-priority-v20260715.js
           node --check orbit360-platform/modules/importar-initial-tenant-lab.js
           node --check tools/orbit360-ensure-lab-user.mjs
+          node --check tools/orbit360-verify-lab-data-counts.mjs
           node --check tools/orbit360-test-import-initial-pending-insurers.mjs
           node --check tools/orbit360-test-lab-import-readiness.mjs
           timeout 30s node tools/orbit360-test-import-initial-pending-insurers.mjs
@@ -214,6 +222,8 @@ jobs:
             echo "Acceso directo: ${URL}/ays-lab-preview.html"
             echo ""
             echo "Diagnóstico sanitizado: ${URL}/lab-runtime-status.json"
+            echo ""
+            echo "Conteos del tenant: ${URL}/lab-data-counts.json"
             echo ""
             echo "Proyecto: $FIREBASE_PROJECT_ID"
             echo ""
