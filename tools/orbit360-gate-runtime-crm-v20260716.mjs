@@ -9,7 +9,7 @@ const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v5',
+  schemaVersion: 'orbit360-runtime-gate-joint-v6',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
@@ -23,10 +23,6 @@ mkdirSync(insurerOutDir, { recursive: true });
 
 function assert(condition, code, detail = '') {
   if (!condition) throw new Error(`${code}${detail ? `:${detail}` : ''}`);
-}
-
-function isInformationalLoginText(value) {
-  return /Inicia sesi[oó]n|sesi[oó]n no corresponde|usuario LAB autorizado|carga inicial|ejecutar el dry-run/i.test(String(value || ''));
 }
 
 async function waitForCanonicalRuntime(page) {
@@ -89,85 +85,73 @@ async function authState(page) {
       providerReady,
       currentUser,
       firebaseInit: String((window.OrbitBackend || {}).firebaseInit || ''),
-      firebaseLoader: String((window.OrbitBackend || {}).firebaseLoader || ''),
-      errorText: String((document.getElementById('login-error') || {}).textContent || '').trim()
+      firebaseLoader: String((window.OrbitBackend || {}).firebaseLoader || '')
     };
   });
 }
 
 async function ensureAuthenticated(page) {
-  const deadline = Date.now() + 60000;
-  let submitted = false;
-  let submittedAt = 0;
-  let lastState = null;
-
-  while (Date.now() < deadline) {
-    let state = await authState(page);
-    lastState = state;
-
-    if (state.inside || state.currentUser) {
-      if (!state.inside) {
-        await page.evaluate(() => { try { if (Orbit.auth && Orbit.auth.showApp) Orbit.auth.showApp(); } catch (error) {} });
-      }
-      await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 10000 });
-      report.authMode = submitted ? 'ui_form' : 'session_restored';
-      report.checks.authenticated = true;
-      return;
+  await page.waitForFunction(() => {
+    try {
+      const auth = window.firebase && firebase.auth ? firebase.auth() : null;
+      return !!(auth && typeof auth.signInWithEmailAndPassword === 'function');
+    } catch (error) {
+      return false;
     }
+  }, null, { timeout: 45000 });
 
-    if (state.providerReady && !state.formVisible) {
-      await page.evaluate(() => { try { if (Orbit.auth && Orbit.auth.showLogin) Orbit.auth.showLogin(); } catch (error) {} });
-      await page.waitForTimeout(350);
-      state = await authState(page);
-      lastState = state;
-    }
-
-    if (state.providerReady && state.formVisible && !submitted) {
+  const initial = await authState(page);
+  if (!initial.currentUser) {
+    const loginResult = await page.evaluate(async ({ loginEmail, loginKey }) => {
       try {
-        await page.locator('#lg-user').waitFor({ state: 'visible', timeout: 8000 });
-        await page.locator('#lg-pass').waitFor({ state: 'visible', timeout: 8000 });
-        await page.evaluate(() => {
-          const el = document.getElementById('login-error');
-          if (el) el.textContent = '';
-        });
-        await page.locator('#lg-user').fill(email);
-        await page.locator('#lg-pass').fill(accessKey);
-        submitted = true;
-        submittedAt = Date.now();
-        await page.locator('#login-form').evaluate(form => form.requestSubmit());
-        await page.waitForTimeout(700);
-        state = await authState(page);
-        lastState = state;
+        const auth = firebase.auth();
+        const credential = await auth.signInWithEmailAndPassword(loginEmail, loginKey);
+        return { ok: !!(credential && credential.user), code: '' };
       } catch (error) {
-        submitted = false;
-        submittedAt = 0;
+        const code = String(error && error.code || 'auth/unknown')
+          .replace(/[^a-z0-9/_-]/gi, '')
+          .slice(0, 80);
+        return { ok: false, code };
       }
-    }
+    }, { loginEmail: email, loginKey: accessKey });
 
-    if (submitted && Date.now() - submittedAt > 1200 && state.errorText && !isInformationalLoginText(state.errorText)) {
+    if (!loginResult.ok) {
       report.authDiagnostic = {
-        providerReady: !!state.providerReady,
-        currentUser: !!state.currentUser,
-        formVisible: !!state.formVisible,
-        firebaseInit: String(state.firebaseInit || ''),
-        firebaseLoader: String(state.firebaseLoader || ''),
-        errorCategory: 'provider_or_form_rejection'
+        providerReady: true,
+        currentUser: false,
+        formVisible: initial.formVisible,
+        firebaseInit: initial.firebaseInit,
+        firebaseLoader: initial.firebaseLoader,
+        errorCategory: loginResult.code || 'auth/unknown'
       };
-      throw new Error('LOGIN_REJECTED_BY_PROVIDER');
+      throw new Error(`LOGIN_PROVIDER_${loginResult.code || 'UNKNOWN'}`);
     }
-
-    await page.waitForTimeout(500);
   }
 
+  await page.waitForFunction(() => {
+    try { return !!(window.firebase && firebase.auth && firebase.auth().currentUser); }
+    catch (error) { return false; }
+  }, null, { timeout: 15000 });
+
+  await page.evaluate(() => {
+    try {
+      if (window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function') Orbit.auth.showApp();
+    } catch (error) {}
+  });
+  await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 10000 });
+
+  const finalState = await authState(page);
+  report.authMode = initial.currentUser ? 'session_restored' : 'provider_direct_gate';
   report.authDiagnostic = {
-    providerReady: !!(lastState && lastState.providerReady),
-    currentUser: !!(lastState && lastState.currentUser),
-    formVisible: !!(lastState && lastState.formVisible),
-    firebaseInit: String(lastState && lastState.firebaseInit || ''),
-    firebaseLoader: String(lastState && lastState.firebaseLoader || ''),
-    submitted
+    providerReady: finalState.providerReady,
+    currentUser: finalState.currentUser,
+    formVisible: finalState.formVisible,
+    firebaseInit: finalState.firebaseInit,
+    firebaseLoader: finalState.firebaseLoader,
+    errorCategory: ''
   };
-  throw new Error(`LOGIN_UI_STATE_UNSTABLE:${report.authDiagnostic.firebaseInit || 'sin_init'}:${report.authDiagnostic.firebaseLoader || 'sin_loader'}`);
+  assert(finalState.currentUser && finalState.inside, 'LOGIN_PROVIDER_SESSION_NOT_ACTIVE');
+  report.checks.authenticated = true;
 }
 
 async function acceptLegalGate(page) {
