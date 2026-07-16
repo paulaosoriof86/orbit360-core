@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.114
+   Orbit 360 - Backend LAB Firebase init v1.115
    Initializes Firebase only in ?orbitBackend=firestore-lab.
    Reads config from local ignored file variables. No secrets here.
    ============================================================ */
@@ -17,12 +17,9 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.114'
+    firebaseInitVersion: 'v1.115'
   });
 
-  /* Carga complementos de importación solo en el tenant LAB autorizado.
-     Los archivos contienen configuración y lógica, nunca datos reales ni
-     secretos; el lote JSON permanece seleccionado en el navegador. */
   function loadScriptOnce(src, key, done) {
     var attr = 'data-orbit-lab-addon';
     var existing = document.querySelector('script[' + attr + '="' + key + '"]');
@@ -44,6 +41,8 @@
   }
 
   if (tenant === 'alianzas-soluciones') {
+    loadScriptOnce('core/store-view-refresh-v20260715.js?v=20260715-1', 'store-view-refresh');
+    loadScriptOnce('modules/aseguradoras-directory-priority-v20260715.js?v=20260715-1', 'aseguradoras-directory-priority');
     loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260715-7', 'advisor-write-bridge', function(){
       loadScriptOnce('data/import-initial-profiles.js?v=20260715-7', 'initial-profile', function(){
         loadScriptOnce('modules/importar-initial-tenant-lab.js?v=20260715-7', 'initial-import');
