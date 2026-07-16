@@ -30,43 +30,77 @@ async function visibleCount(locator) {
   }).length);
 }
 
-async function ensureAuthenticated(page) {
-  await page.waitForFunction(() => {
-    const form = document.getElementById('login-form');
+async function authState(page) {
+  return page.evaluate(() => {
     const visible = node => {
       if (!node) return false;
       const style = getComputedStyle(node);
       const rect = node.getBoundingClientRect();
       return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
     };
-    return !document.body.classList.contains('pre-auth') || visible(form);
-  }, null, { timeout: 30000 });
+    let providerReady = false;
+    try { providerReady = !!(window.firebase && firebase.auth && typeof firebase.auth().signInWithEmailAndPassword === 'function'); } catch (error) {}
+    return {
+      inside: !document.body.classList.contains('pre-auth'),
+      formVisible: visible(document.getElementById('login-form')),
+      providerReady,
+      hasError: !!String((document.getElementById('login-error') || {}).textContent || '').trim()
+    };
+  });
+}
 
-  const alreadyInside = await page.evaluate(() => !document.body.classList.contains('pre-auth'));
-  if (alreadyInside) {
-    report.checks.sessionRestored = true;
-    return;
-  }
+async function ensureAuthenticated(page) {
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    let state = await authState(page);
+    if (state.inside) {
+      report.checks.sessionRestored = true;
+      return;
+    }
+    if (!state.providerReady) {
+      await page.waitForTimeout(500);
+      continue;
+    }
+    if (!state.formVisible) {
+      await page.evaluate(() => {
+        try { if (window.Orbit && Orbit.auth && typeof Orbit.auth.showLogin === 'function') Orbit.auth.showLogin(); } catch (error) {}
+      });
+      await page.waitForTimeout(500);
+      state = await authState(page);
+      if (state.inside) {
+        report.checks.sessionRestoredDuringLogin = true;
+        return;
+      }
+      if (!state.formVisible) continue;
+    }
 
-  await page.waitForTimeout(1200);
-  const restoredWhileWaiting = await page.evaluate(() => !document.body.classList.contains('pre-auth'));
-  if (restoredWhileWaiting) {
-    report.checks.sessionRestoredDuringLogin = true;
-    return;
-  }
+    try {
+      await page.locator('#lg-user').fill(email, { timeout: 4000 });
+      await page.locator('#lg-pass').fill(accessKey, { timeout: 4000 });
+      await page.locator('#login-form').evaluate(form => form.requestSubmit());
+    } catch (error) {
+      state = await authState(page);
+      if (state.inside) {
+        report.checks.sessionRestoredDuringLogin = true;
+        return;
+      }
+      await page.waitForTimeout(500);
+      continue;
+    }
 
-  try {
-    await page.locator('#lg-user').fill(email, { timeout: 10000 });
-    await page.locator('#lg-pass').fill(accessKey, { timeout: 10000 });
-    await page.locator('#login-form').evaluate(form => form.requestSubmit());
-  } catch (error) {
-    const becameInside = await page.evaluate(() => !document.body.classList.contains('pre-auth'));
-    if (!becameInside) throw error;
-    report.checks.sessionRestoredDuringLogin = true;
-    return;
+    try {
+      await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 12000 });
+      report.checks.login = true;
+      return;
+    } catch (error) {
+      state = await authState(page);
+      if (state.inside) {
+        report.checks.login = true;
+        return;
+      }
+      if (state.hasError) throw new Error('LOGIN_REJECTED_BY_PROVIDER');
+    }
   }
-  await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 45000 });
-  report.checks.login = true;
+  throw new Error('LOGIN_UI_STATE_UNSTABLE');
 }
 
 async function acceptLegalGate(page) {
