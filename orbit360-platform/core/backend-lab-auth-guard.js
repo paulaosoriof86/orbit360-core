@@ -2,6 +2,8 @@
    Orbit 360 · Guard de autenticación para preview Firestore LAB
    Evita que una sesión demo aparente acceso LAB y rearma los
    snapshots únicamente después de autenticar al usuario canónico.
+   Sincroniza además la vista activa del usuario LAB con Dirección
+   y el asesor canónico de Paula para no dejar scopes vacíos.
    ============================================================ */
 (function () {
   'use strict';
@@ -10,6 +12,9 @@
   var mode = params.get('orbitBackend') || (window.OrbitBackend && window.OrbitBackend.mode) || '';
   var tenant = params.get('tenant') || (window.OrbitBackend && (window.OrbitBackend.tenantId || window.OrbitBackend.tenant)) || '';
   var expectedEmail = (window.OrbitBackend && window.OrbitBackend.expectedEmail) || 'orbit.lab@demo.com';
+  var expectedUid = (window.OrbitBackend && window.OrbitBackend.expectedUid) || 'woJlxR1iFEeiQZvTscPj4qQ5Qc73';
+  var canonicalRole = 'Dirección';
+  var canonicalAdvisorId = 'ase-paula-osorio';
   var bound = false;
   var lastUid = '';
   var attempts = 0;
@@ -44,7 +49,7 @@
   function paintIdentity(user) {
     var top = document.querySelector('.tb-user .who');
     var avatar = document.querySelector('.tb-user .av');
-    if (top) top.innerHTML = '<b>Usuario LAB</b><br><span id="tb-rol-lbl">Dirección · salir</span>';
+    if (top) top.innerHTML = '<b>Usuario entorno de validación</b><br><span id="tb-rol-lbl">Dirección · salir</span>';
     if (avatar) avatar.textContent = 'OL';
     try {
       document.body.dataset.authBackend = user ? 'firestore-lab' : 'none';
@@ -69,6 +74,20 @@
     paintLoginError(message || 'Inicia sesión con el usuario LAB autorizado para continuar.');
   }
 
+  function syncLabSession() {
+    try {
+      if (!window.Orbit || !Orbit.session || typeof Orbit.session.set !== 'function') return false;
+      var currentRole = typeof Orbit.session.rol === 'function' ? String(Orbit.session.rol() || '') : '';
+      var currentAdvisor = typeof Orbit.session.asesorId === 'function' ? String(Orbit.session.asesorId() || '') : '';
+      if (currentRole !== canonicalRole || currentAdvisor !== canonicalAdvisorId) {
+        Orbit.session.set(canonicalRole, canonicalAdvisorId);
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function reattachStore(user) {
     if (!user || !window.Orbit || !Orbit.store) return;
     if (lastUid === user.uid) return;
@@ -83,9 +102,19 @@
     }, 180);
   }
 
+  function rerenderCurrentRoute() {
+    setTimeout(function () {
+      try {
+        if (window.Orbit && Orbit.router && typeof Orbit.router.rebuildSidebar === 'function') Orbit.router.rebuildSidebar();
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
+      } catch (e) {}
+    }, 260);
+  }
+
   function acceptUser(user) {
     var email = String(user && user.email || '').toLowerCase();
-    if (!user || email !== expectedEmail.toLowerCase()) {
+    var uid = String(user && user.uid || '');
+    if (!user || email !== expectedEmail.toLowerCase() || (expectedUid && uid !== expectedUid)) {
       var a = auth();
       if (user && a && typeof a.signOut === 'function') {
         try { a.signOut(); } catch (e) {}
@@ -94,11 +123,13 @@
       return;
     }
     paintLoginError('');
+    syncLabSession();
     paintIdentity(user);
     reattachStore(user);
     try {
       if (window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function') Orbit.auth.showApp();
     } catch (e) {}
+    rerenderCurrentRoute();
   }
 
   function bind() {
@@ -132,6 +163,7 @@
   window.OrbitLabAuthGuard = {
     currentUser: currentUser,
     forceRealLogin: forceRealLogin,
-    reattachStore: reattachStore
+    reattachStore: reattachStore,
+    syncLabSession: syncLabSession
   };
 })();
