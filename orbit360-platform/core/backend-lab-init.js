@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.117
+   Orbit 360 - Backend LAB Firebase init v1.118
    Initializes Firebase only in ?orbitBackend=firestore-lab.
    Reads config from local ignored file variables. No secrets here.
    ============================================================ */
@@ -17,7 +17,7 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.117',
+    firebaseInitVersion: 'v1.118',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
       aseguradorasKnowledgeAutoMount: false
     })
@@ -54,9 +54,11 @@
       enablesComparativo: false
     });
 
-    loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260715-11', 'advisor-write-bridge', function(){
-      loadScriptOnce('data/import-initial-profiles.js?v=20260715-11', 'initial-profile', function(){
-        loadScriptOnce('modules/importar-initial-tenant-lab.js?v=20260715-11', 'initial-import');
+    loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260716-1', 'advisor-write-bridge', function(){
+      loadScriptOnce('core/backend-lab-advisor-catalog-gate-fix.js?v=20260716-1', 'advisor-catalog-gate-fix', function(){
+        loadScriptOnce('data/import-initial-profiles.js?v=20260716-1', 'initial-profile', function(){
+          loadScriptOnce('modules/importar-initial-tenant-lab.js?v=20260716-1', 'initial-import');
+        });
       });
     });
     loadScriptOnce('core/backend-lab-auth-guard.js?v=20260715-11', 'auth-guard', function(){
