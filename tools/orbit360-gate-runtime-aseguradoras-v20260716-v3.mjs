@@ -25,6 +25,41 @@ async function selectRole(page, role) {
   await select.selectOption(match.value);
   await page.waitForTimeout(600);
 }
+async function ensureAuthenticated(page) {
+  await page.waitForFunction(() => {
+    const form = document.getElementById('login-form');
+    const visible = node => {
+      if (!node) return false;
+      const style = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    return !document.body.classList.contains('pre-auth') || visible(form);
+  }, null, { timeout: 30000 });
+
+  if (await page.evaluate(() => !document.body.classList.contains('pre-auth'))) {
+    report.checks.sessionRestored = true;
+    return;
+  }
+
+  await page.waitForTimeout(1200);
+  if (await page.evaluate(() => !document.body.classList.contains('pre-auth'))) {
+    report.checks.sessionRestoredDuringLogin = true;
+    return;
+  }
+
+  try {
+    await page.locator('#lg-user').fill(email, { timeout: 10000 });
+    await page.locator('#lg-pass').fill(accessKey, { timeout: 10000 });
+    await page.locator('#login-form').evaluate(form => form.requestSubmit());
+  } catch (error) {
+    if (!await page.evaluate(() => !document.body.classList.contains('pre-auth'))) throw error;
+    report.checks.sessionRestoredDuringLogin = true;
+    return;
+  }
+  await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 45000 });
+  report.checks.login = true;
+}
 async function validateInsurers(page, label) {
   await page.evaluate(() => { location.hash = '#/aseguradoras'; });
   await page.waitForTimeout(700);
@@ -62,11 +97,7 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 try {
   await page.goto(`${baseUrl}/ays-lab-preview.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForURL(/index\.html/, { timeout: 30000 });
-  await page.locator('#login-form').waitFor({ state: 'visible', timeout: 30000 });
-  await page.locator('#lg-user').fill(email);
-  await page.locator('#lg-pass').fill(accessKey);
-  await page.locator('#login-form').evaluate(form => form.requestSubmit());
-  await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 45000 });
+  await ensureAuthenticated(page);
 
   const legal = page.locator('.conf-modal');
   await page.waitForTimeout(700);
