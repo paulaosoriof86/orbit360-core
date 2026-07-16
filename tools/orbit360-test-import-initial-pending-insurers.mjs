@@ -154,3 +154,4 @@ if (!quarantine.batch.hasBlockingErrors) throw new Error('Una cuarentena explíc
 if (!quarantine.diff.blockers.some(x => x.reason === 'cuarentena_fuente')) throw new Error('Falta bloqueo cuarentena_fuente.');
 
 console.log('PASS: dry-run y escritura preservan aseguradoras pendientes restringidas; cuarentena sigue bloqueada.');
+process.exit(0);
