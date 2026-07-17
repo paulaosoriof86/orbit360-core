@@ -5,13 +5,15 @@ import { waitForRealTenantData, validateClient360 } from './orbit360-runtime-che
 const baseUrl = String(process.env.ORBIT360_PREVIEW_URL || '').replace(/\/$/, '');
 const email = String(process.env.ORBIT360_LAB_LOGIN_EMAIL || 'orbit.lab@demo.com');
 const accessKey = String(process.env.ORBIT360_LAB_LOGIN_PASSWORD || '').replace(/[\r\n]+$/g, '');
+const expectedRuntime = String(process.env.ORBIT360_EXPECTED_RUNTIME || '20260717-2');
 const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v13-detached-auth-controller',
+  schemaVersion: 'orbit360-runtime-gate-joint-v14-canonical-runtime-stability',
   gateId: 'block1-client360-insurers-lab-v20260717',
-  contractVersion: '1.0.1',
+  contractVersion: '1.0.6',
+  runtimeVersion: expectedRuntime,
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
@@ -21,6 +23,7 @@ const report = {
 
 if (!/^https:\/\//.test(baseUrl)) throw new Error('BLOQUEO_PREVIEW_URL');
 if (accessKey.length < 12) throw new Error('BLOQUEO_ACCESO_LAB');
+if (!/^\d{8}-\d+$/.test(expectedRuntime)) throw new Error('BLOQUEO_RUNTIME_VERSION');
 mkdirSync(outDir, { recursive: true });
 mkdirSync(insurerOutDir, { recursive: true });
 
@@ -66,21 +69,91 @@ const watchdog = setTimeout(() => {
 }, 300000);
 
 async function waitForCanonicalRuntime(page) {
-  const deadline = Date.now() + 45000;
+  const deadline = Date.now() + 60000;
+  let stableSince = 0;
+  let lastState = null;
+
   while (Date.now() < deadline) {
-    const current = new URL(page.url());
-    const canonical = /\/index\.html$/.test(current.pathname) &&
+    let current;
+    try { current = new URL(page.url()); }
+    catch (error) { current = null; }
+
+    const canonicalUrl = Boolean(current &&
+      /\/index\.html$/.test(current.pathname) &&
       current.searchParams.get('orbitBackend') === 'firestore-lab' &&
-      current.searchParams.get('tenant') === 'alianzas-soluciones';
-    if (canonical) break;
-    await page.waitForTimeout(250);
+      current.searchParams.get('tenant') === 'alianzas-soluciones' &&
+      current.searchParams.get('runtime') === expectedRuntime);
+
+    let runtimeState = null;
+    if (canonicalUrl) {
+      runtimeState = await page.evaluate(runtime => {
+        const backend = window.OrbitBackend || {};
+        const firebaseReady = backend.firebaseInit === 'initialized' || backend.firebaseInit === 'already-initialized';
+        return {
+          readyState: document.readyState,
+          runtimeVersion: String(backend.runtimeVersion || ''),
+          firebaseLoader: String(backend.firebaseLoader || ''),
+          firebaseInit: String(backend.firebaseInit || ''),
+          ownersReady: Boolean(window.Orbit && Orbit.store && Orbit.auth && Orbit.router),
+          stable: document.readyState !== 'loading' &&
+            String(backend.runtimeVersion || '') === runtime &&
+            String(backend.firebaseLoader || '') === 'requested' &&
+            firebaseReady &&
+            Boolean(window.Orbit && Orbit.store && Orbit.auth && Orbit.router)
+        };
+      }, expectedRuntime).catch(() => null);
+    }
+
+    lastState = {
+      url: current ? `${current.pathname}${current.search}` : '',
+      canonicalUrl,
+      runtimeState
+    };
+
+    if (canonicalUrl && runtimeState && runtimeState.stable) {
+      if (!stableSince) stableSince = Date.now();
+      if (Date.now() - stableSince >= 1200) break;
+    } else {
+      stableSince = 0;
+    }
+    await page.waitForTimeout(200);
   }
+
   const current = new URL(page.url());
   assert(/\/index\.html$/.test(current.pathname), 'CANONICAL_INDEX_NOT_REACHED');
   assert(current.searchParams.get('orbitBackend') === 'firestore-lab', 'CANONICAL_BACKEND_MISSING');
   assert(current.searchParams.get('tenant') === 'alianzas-soluciones', 'CANONICAL_TENANT_MISSING');
-  await page.waitForFunction(() => window.Orbit && Orbit.store && Orbit.auth && Orbit.router, null, { timeout: 45000 });
+  assert(current.searchParams.get('runtime') === expectedRuntime, 'CANONICAL_RUNTIME_MISMATCH', current.searchParams.get('runtime') || 'missing');
+  assert(stableSince > 0 && Date.now() - stableSince >= 1200, 'CANONICAL_RUNTIME_NOT_STABLE');
+
+  const finalState = await page.evaluate(runtime => {
+    const backend = window.OrbitBackend || {};
+    return {
+      runtimeVersion: String(backend.runtimeVersion || ''),
+      firebaseLoader: String(backend.firebaseLoader || ''),
+      firebaseInit: String(backend.firebaseInit || ''),
+      ownersReady: Boolean(window.Orbit && Orbit.store && Orbit.auth && Orbit.router),
+      runtimeMatches: String(backend.runtimeVersion || '') === runtime
+    };
+  }, expectedRuntime);
+
+  assert(finalState.runtimeMatches, 'RUNTIME_OWNER_VERSION_MISMATCH', finalState.runtimeVersion || 'missing');
+  assert(finalState.firebaseLoader === 'requested', 'FIREBASE_LOADER_NOT_REQUESTED', finalState.firebaseLoader || 'missing');
+  assert(['initialized', 'already-initialized'].includes(finalState.firebaseInit), 'FIREBASE_INIT_NOT_READY', finalState.firebaseInit || 'missing');
+  assert(finalState.ownersReady, 'CANONICAL_OWNERS_NOT_READY');
+
+  report.runtimeDiagnostic = {
+    expectedRuntime,
+    finalUrlRuntime: current.searchParams.get('runtime') || '',
+    ownerRuntime: finalState.runtimeVersion,
+    firebaseLoader: finalState.firebaseLoader,
+    firebaseInit: finalState.firebaseInit,
+    stableMilliseconds: Date.now() - stableSince,
+    lastObservedUrl: lastState && lastState.url || ''
+  };
   report.checks.canonicalRuntime = true;
+  report.checks.canonicalRuntimeVersion = true;
+  report.checks.canonicalRuntimeStable = true;
 }
 
 async function selectRole(page, role) {
@@ -124,7 +197,8 @@ async function authState(page) {
       gateCode: String(gateStatus.code || ''),
       authStage: String((document.body.dataset || {}).authStage || ''),
       firebaseInit: String((window.OrbitBackend || {}).firebaseInit || ''),
-      firebaseLoader: String((window.OrbitBackend || {}).firebaseLoader || '')
+      firebaseLoader: String((window.OrbitBackend || {}).firebaseLoader || ''),
+      runtimeVersion: String((window.OrbitBackend || {}).runtimeVersion || '')
     };
   });
 }
@@ -137,19 +211,23 @@ async function ensureAuthenticated(page) {
   }, null, { timeout: 45000 }), 50000);
 
   const initial = await boundedStep('authentication_initial_state', () => authState(page), 10000);
+  assert(initial.runtimeVersion === expectedRuntime, 'AUTH_RUNTIME_CHANGED_BEFORE_SIGNIN', initial.runtimeVersion || 'missing');
   if (!initial.currentUser) {
-    const dispatch = await boundedStep('authentication_schedule_signin', () => page.evaluate(({ loginEmail, loginKey }) => {
+    const dispatch = await boundedStep('authentication_schedule_signin', () => page.evaluate(({ loginEmail, loginKey, runtime }) => {
+      const backend = window.OrbitBackend || {};
+      if (String(backend.runtimeVersion || '') !== runtime) return { ok: false, code: 'AUTH_RUNTIME_MISMATCH' };
       if (!(window.Orbit && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function')) {
         return { ok: false, code: 'AUTH_OWNER_NOT_READY' };
       }
-      window.__orbitGateAuthStatus = { state: 'pending', code: '' };
+      window.__orbitGateAuthStatus = { state: 'pending', code: '', runtime: runtime };
       setTimeout(() => {
         Promise.resolve()
           .then(() => Orbit.auth.loginFirebase(loginEmail, loginKey))
           .then(user => {
             window.__orbitGateAuthStatus = {
               state: user ? 'resolved' : 'failed',
-              code: user ? '' : 'AUTH_USER_NOT_AVAILABLE'
+              code: user ? '' : 'AUTH_USER_NOT_AVAILABLE',
+              runtime: runtime
             };
           })
           .catch(error => {
@@ -157,26 +235,29 @@ async function ensureAuthenticated(page) {
               state: 'failed',
               code: String(error && (error.code || error.message) || 'auth/unknown')
                 .replace(/[^a-z0-9/_-]/gi, '')
-                .slice(0, 80)
+                .slice(0, 80),
+              runtime: runtime
             };
           });
       }, 0);
       return { ok: true, code: '' };
-    }, { loginEmail: email, loginKey: accessKey }), 10000);
+    }, { loginEmail: email, loginKey: accessKey, runtime: expectedRuntime }), 10000);
     assert(dispatch && dispatch.ok, (dispatch && dispatch.code) || 'AUTH_DISPATCH_FAILED');
 
-    await boundedStep('authentication_observe_signin', () => page.waitForFunction(() => {
+    await boundedStep('authentication_observe_signin', () => page.waitForFunction(runtime => {
       try {
+        const backend = window.OrbitBackend || {};
+        if (String(backend.runtimeVersion || '') !== runtime) return false;
         const auth = window.firebase && firebase.auth ? firebase.auth() : null;
         const status = window.__orbitGateAuthStatus || {};
         return !!(auth && auth.currentUser) || status.state === 'resolved' || status.state === 'failed';
       } catch (error) { return false; }
-    }, null, { timeout: 40000 }), 45000);
+    }, expectedRuntime, { timeout: 40000 }), 45000);
 
     const outcome = await boundedStep('authentication_read_signin', () => authState(page), 10000);
     if (!outcome.currentUser) {
       report.authDiagnostic = {
-        strategy: 'detached_owner_login_controller',
+        strategy: 'stable_runtime_owner_login_controller',
         providerReady: outcome.providerReady,
         ownerReady: outcome.ownerReady,
         currentUser: false,
@@ -184,6 +265,7 @@ async function ensureAuthenticated(page) {
         authStage: outcome.authStage,
         firebaseInit: outcome.firebaseInit,
         firebaseLoader: outcome.firebaseLoader,
+        runtimeVersion: outcome.runtimeVersion,
         gateState: outcome.gateState,
         errorCategory: outcome.gateCode || 'auth/unknown'
       };
@@ -191,10 +273,12 @@ async function ensureAuthenticated(page) {
     }
   }
 
-  await boundedStep('authentication_session', () => page.waitForFunction(() => {
-    try { return !!(window.firebase && firebase.auth && firebase.auth().currentUser); }
-    catch (error) { return false; }
-  }, null, { timeout: 15000 }), 20000);
+  await boundedStep('authentication_session', () => page.waitForFunction(runtime => {
+    try {
+      return String((window.OrbitBackend || {}).runtimeVersion || '') === runtime &&
+        !!(window.firebase && firebase.auth && firebase.auth().currentUser);
+    } catch (error) { return false; }
+  }, expectedRuntime, { timeout: 15000 }), 20000);
 
   await boundedStep('authentication_show_app', () => page.evaluate(() => {
     if (window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function') {
@@ -211,10 +295,11 @@ async function ensureAuthenticated(page) {
   ), 15000);
 
   const finalState = await boundedStep('authentication_final_state', () => authState(page), 10000);
+  assert(finalState.runtimeVersion === expectedRuntime, 'AUTH_RUNTIME_CHANGED_AFTER_SIGNIN', finalState.runtimeVersion || 'missing');
   assert(finalState.currentUser && finalState.inside, 'LOGIN_OWNER_SESSION_NOT_ACTIVE');
-  report.authMode = initial.currentUser ? 'session_restored' : 'detached_owner_contract_gate';
+  report.authMode = initial.currentUser ? 'session_restored' : 'stable_runtime_owner_contract_gate';
   report.authDiagnostic = {
-    strategy: 'detached_owner_login_controller',
+    strategy: 'stable_runtime_owner_login_controller',
     providerReady: finalState.providerReady,
     ownerReady: finalState.ownerReady,
     currentUser: finalState.currentUser,
@@ -222,6 +307,7 @@ async function ensureAuthenticated(page) {
     authStage: finalState.authStage,
     firebaseInit: finalState.firebaseInit,
     firebaseLoader: finalState.firebaseLoader,
+    runtimeVersion: finalState.runtimeVersion,
     gateState: finalState.gateState,
     errorCategory: finalState.gateCode || ''
   };
@@ -442,6 +528,7 @@ try {
 console.log(`ORBIT360_RUNTIME_GATE_JOINT:${JSON.stringify({
   ok: report.ok,
   stage: report.stage,
+  runtimeVersion: report.runtimeVersion,
   counts: report.storeCounts || {},
   checks: report.checks,
   error: report.error || ''
