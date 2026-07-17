@@ -7,7 +7,7 @@ const email = String(process.env.ORBIT360_LAB_LOGIN_EMAIL || 'orbit.lab@demo.com
 const password = String(process.env.ORBIT360_LAB_LOGIN_PASSWORD || '').replace(/[\r\n]+$/g, '');
 const crmDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
-const report = { schemaVersion: 'orbit360-visual-joint-gate-v2', generatedAt: new Date().toISOString(), containsPII: false, containsSecrets: false, stage: 'bootstrap', checks: {} };
+const report = { schemaVersion: 'orbit360-visual-joint-gate-v3', generatedAt: new Date().toISOString(), containsPII: false, containsSecrets: false, stage: 'bootstrap', checks: {} };
 
 if (!/^https:\/\//.test(baseUrl)) throw new Error('BLOQUEO_PREVIEW_URL');
 if (password.length < 12) throw new Error('BLOQUEO_ACCESO_LAB');
@@ -32,7 +32,7 @@ async function isInside(page) {
 
 async function login(page) {
   await page.waitForFunction(() => window.Orbit && Orbit.auth && Orbit.store && window.firebase && firebase.auth, null, { timeout: 45000 });
-  const accepted = await page.waitForFunction(() => {
+  await page.waitForFunction(() => {
     try {
       const inside = !!(firebase.auth().currentUser && !document.body.classList.contains('pre-auth'));
       const form = document.getElementById('login-form');
@@ -40,7 +40,6 @@ async function login(page) {
       return inside || visible;
     } catch (error) { return false; }
   }, null, { timeout: 30000 });
-  void accepted;
 
   if (!(await isInside(page))) {
     const submitted = await page.evaluate(({ loginEmail, loginPassword }) => {
@@ -52,7 +51,9 @@ async function login(page) {
       const form = document.getElementById('login-form');
       const user = document.getElementById('lg-user');
       const pass = document.getElementById('lg-pass');
+      const errorEl = document.getElementById('login-error');
       if (!form || !user || !pass) return inside() ? 'session_accepted' : 'form_missing';
+      if (errorEl) errorEl.textContent = '';
       user.value = loginEmail;
       pass.value = loginPassword;
       user.dispatchEvent(new Event('input', { bubbles: true }));
@@ -68,12 +69,13 @@ async function login(page) {
     try { currentUser = !!(firebase.auth().currentUser); } catch (error) {}
     const inside = !document.body.classList.contains('pre-auth');
     const error = String((document.getElementById('login-error') || {}).textContent || '').trim();
+    const guidance = /inicia sesi[oó]n|usuario lab autorizado|ejecutar el dry-run|antes de abrir la carga inicial/i;
     if (currentUser && inside) return { ok: true, backend: String(document.body.dataset.authBackend || '') };
-    if (error) return { ok: false, backend: '', error: error.slice(0, 120) };
+    if (error && !guidance.test(error)) return { ok: false, backend: '', error: error.slice(0, 120) };
     return false;
   }, null, { timeout: 45000 });
   const state = await handle.jsonValue();
-  assert(state && state.ok, 'LOGIN_ATOMIC_FAILED', state && state.error ? 'visible_error' : 'unknown');
+  assert(state && state.ok, 'LOGIN_ATOMIC_FAILED', state && state.error ? 'firebase_error' : 'unknown');
   assert(state.backend === 'firestore-lab', 'LOGIN_GUARD_NOT_ACCEPTED', state.backend || 'none');
   report.authMode = 'visible_form_atomic_or_restored';
   report.checks.authenticated = true;
