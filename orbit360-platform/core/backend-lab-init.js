@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.119
+   Orbit 360 - Backend LAB Firebase init v1.120
    Initializes Firebase only in ?orbitBackend=firestore-lab.
    Accepts Firebase Hosting reserved init when the default app
    is already initialized; local mode still reads ignored config.
@@ -19,7 +19,7 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.119',
+    firebaseInitVersion: 'v1.120',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
       aseguradorasKnowledgeAutoMount: false
     })
@@ -56,14 +56,16 @@
       enablesComparativo: false
     });
 
-    loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260715-11', 'advisor-write-bridge', function(){
-      loadScriptOnce('data/import-initial-profiles.js?v=20260715-11', 'initial-profile', function(){
-        loadScriptOnce('modules/importar-initial-tenant-lab.js?v=20260715-11', 'initial-import');
-      });
-    });
-    loadScriptOnce('core/backend-lab-auth-guard.js?v=20260716-2', 'auth-guard', function(){
-      loadScriptOnce('core/backend-lab-import-readiness-guard.js?v=20260716-2', 'import-readiness', function(){
-        loadScriptOnce('core/backend-lab-canonical-view-sync.js?v=20260716-2', 'canonical-view-sync');
+    /*
+     * Bootstrap canónico del LAB.
+     * Los perfiles iniciales y el importador inicial fueron artefactos temporales
+     * de carga y no deben reactivarse en cada sesión del tenant. Los datos ya
+     * persistidos se consumen por Orbit.store y por las capas canónicas vigentes.
+     */
+    loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260717-1', 'advisor-write-bridge');
+    loadScriptOnce('core/backend-lab-auth-guard.js?v=20260717-1', 'auth-guard', function(){
+      loadScriptOnce('core/backend-lab-import-readiness-guard.js?v=20260717-1', 'import-readiness', function(){
+        loadScriptOnce('core/backend-lab-canonical-view-sync.js?v=20260717-1', 'canonical-view-sync');
       });
     });
   }
