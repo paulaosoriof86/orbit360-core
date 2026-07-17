@@ -19,6 +19,7 @@ const pwa = read('core/pwa.js');
 const router = read('core/router.js');
 const legal = read('core/legal.js');
 const access = read('core/access-scope.js');
+const insurers = read('modules/aseguradoras.js');
 const index = read('index.html');
 
 const pwaForbidden = [
@@ -47,6 +48,7 @@ check('ROUTER_MOBILE_OWNER', contains(router, 'toggleMobile') && contains(router
 check('ROUTER_ROUTE_GATE', contains(router, "Orbit.access.can(route, 'view')") && contains(router, 'No tienes acceso con el rol activo'), 'route gate');
 check('ROUTER_SINGLE_BOOTSTRAP', contains(router, 'RUNTIME_CONTRACTS') && contains(router, 'loadRuntimeContracts') && contains(router, 'tenant-runtime-config-index.js'), 'slice runtime sequence');
 check('ROUTER_PROJECTED_SEARCH', contains(router, 'Orbit.clientProjection.project') && contains(router, 'Orbit.clientProjection.get'), 'global search projection');
+check('INSURER_PROJECTION_BRIDGE_RETIRED', !contains(router, 'aseguradoras-frontend-projection-v20260716.js'), 'projection must be integrated in modules/aseguradoras.js');
 
 const accessFunctions = [
   'activeRole', 'actorAdvisorId', 'actorUser', 'assignedRoles', 'canView', 'filter',
@@ -55,7 +57,22 @@ const accessFunctions = [
 ];
 const missingAccess = accessFunctions.filter(name => !new RegExp('\\b' + name + '\\b').test(access));
 check('ACCESS_OWNER_SURFACE', missingAccess.length === 0, missingAccess.join(', '));
-check('ACCESS_SCOPE_COUNTRY_FAIL_CLOSED', contains(access, 'countryAllowed') && contains(access, "return false"), 'country/scope gates');
+check('ACCESS_SCOPE_COUNTRY_FAIL_CLOSED', contains(access, 'countryAllowed') && contains(access, 'return false'), 'country/scope gates');
+
+const statesRequired = [
+  'Documento recibido', 'Mapeado', 'Persistido', 'Requiere validación', 'Validado',
+  'Habilitado para Cotizador', 'Habilitado para Comparativo'
+];
+const missingStates = statesRequired.filter(value => !contains(insurers, value));
+check('INSURER_OWNER_STATES', missingStates.length === 0, missingStates.join(', '));
+check('INSURER_CONSUMER_GATES_SEPARATE',
+  contains(insurers, "estado === 'Habilitado para Cotizador'") &&
+  contains(insurers, "estado === 'Habilitado para Comparativo'") &&
+  !contains(insurers, "estado === 'Habilitado para Comparativo' || estado === 'Habilitado para Cotizador'"),
+  'Cotizador and Comparativo require explicit independent enablement');
+check('INSURER_VALIDATED_NOT_ENABLED',
+  !/sirveParaTarifas[^\n]*Validado/.test(insurers) && !/sirveParaReglas[^\n]*estado\s*!==\s*['"]Requiere validación/.test(insurers),
+  'Mapped/Persisted/Validated cannot enable operational consumption');
 
 check('TENANT_CONFIG_INDEX_EXISTS', exists('data/tenant-runtime-config-index.js'), 'declarative tenant index');
 if (exists('data/tenant-runtime-config-index.js')) {
