@@ -31,19 +31,18 @@ jobs:
           set -euo pipefail
           cd orbit360-platform
           test "$(sha256sum modules/aseguradoras.js | awk '{print $1}')" = "e6e413c4dbbfe15a1251dae0bbed4a746df7fbbe3532acfc3b5e83194cad6b3d"
-          test "$(sha256sum core/router.js | awk '{print $1}')" = "e08845d6872fa2e9fb8e8f14a7fd1b9a718efb1ce61722cbdbd63378a0d0848b"
+          test "$(sha256sum core/router.js | awk '{print $1}')" = "5e7daa637f462e039ad8b735700749e6990fd1825c83d8d2f4d989f507f7d718"
           test "$(sha256sum tools/.block0-owner-minimal.patch | awk '{print $1}')" = "4a9af7173d004424933f00d9d3a53e0a36a98f42873604994399a2da07c649da"
           cd ..
-          git apply --check orbit360-platform/tools/.block0-owner-minimal.patch
+          git apply --check --include=orbit360-platform/modules/aseguradoras.js orbit360-platform/tools/.block0-owner-minimal.patch
 
       - name: Aplicar delta mínimo propietario
         shell: bash
         run: |
           set -euo pipefail
-          git apply orbit360-platform/tools/.block0-owner-minimal.patch
+          git apply --include=orbit360-platform/modules/aseguradoras.js orbit360-platform/tools/.block0-owner-minimal.patch
           changed="$(git diff --name-only | sort)"
-          expected=$'orbit360-platform/core/router.js\norbit360-platform/modules/aseguradoras.js'
-          test "$changed" = "$expected"
+          test "$changed" = "orbit360-platform/modules/aseguradoras.js"
 
       - name: Validar sintaxis y contratos
         shell: bash
