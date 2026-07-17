@@ -18,8 +18,8 @@ El formulario de acceso LAB quedaba esperando y el recorrido visual no avanzaba 
 - Caché del navegador versionada y estrategia de red primero.
 - Entrada LAB con limpieza controlada y carga explícita del recurso vigente.
 - Validación administrativa estrictamente read-only durante el gate visual.
-- Reconciliación de asesores por ID, llave canónica, nombre, correo o alias, conservando el ID real creado desde Equipo.
-- Reporte sanitizado previo al despliegue, sin datos personales ni operaciones de escritura.
+- El gate previo verifica existencia de usuario, membresía activa y al menos siete asesores en el tenant; la reconciliación fina continúa en el bridge operativo.
+- Cuando una comprobación previa falla, el motivo sanitizado queda en una ruta incluida en el artefacto del workflow.
 
 ## Carriles
 
@@ -40,6 +40,7 @@ No se reimportaron ni modificaron clientes o aseguradoras. Conteos confirmados a
 - Un gate visual debe verificar, no repetir preparación administrativa.
 - Separar preparación, reparación y validación read-only.
 - Conservar IDs reales y reconciliar identidades mediante llaves canónicas y aliases.
+- No bloquear un despliegue visual por exigir duplicación exacta de un catálogo cuando existe un bridge canónico de identidad.
 - Versionar recursos críticos y service workers.
 - Usar red primero para recursos sensibles al runtime y caché solo como respaldo.
 - Mostrar un límite de espera y un mensaje útil; nunca dejar una acción indefinidamente pendiente.
@@ -47,4 +48,4 @@ No se reimportaron ni modificaron clientes o aseguradoras. Conteos confirmados a
 
 ## Estado
 
-`IMPLEMENTADO_PENDIENTE_GATE_RUNTIME_FINAL_RECONCILIADO`.
+`IMPLEMENTADO_GATE_FINAL_ACTIVADO_CON_DIAGNOSTICO_RECUPERABLE`.
