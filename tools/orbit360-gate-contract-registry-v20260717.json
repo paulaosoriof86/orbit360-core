@@ -54,9 +54,10 @@
   "gates": [
     {
       "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.3",
+      "contractVersion": "1.0.4",
       "block": 1,
-      "status": "ACTIVE_PENDING_PREFLIGHT",
+      "status": "ACTIVE_DIAGNOSTIC_PREFLIGHT",
+      "diagnosticRule": "Preflight failure evidence must be persisted and published before any runtime correction.",
       "reconciliation": {
         "date": "2026-07-17",
         "classification": "FUNCTIONAL_DEFECT",
@@ -82,6 +83,7 @@
       },
       "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
       "validators": [
         "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs",
         "tools/orbit360-runtime-check-client360-v20260716.mjs",
