@@ -9,7 +9,7 @@ const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v11-bounded-legal-contract',
+  schemaVersion: 'orbit360-runtime-gate-joint-v12-detached-legal-dispatch',
   gateId: 'block1-client360-insurers-lab-v20260717',
   contractVersion: '1.0.1',
   generatedAt: new Date().toISOString(),
@@ -214,7 +214,7 @@ async function acceptLegalGate(page) {
 
   report.legalVisibleBefore = initial.count;
   report.legalDiagnostic = {
-    strategy: 'atomic_dom_contract',
+    strategy: 'detached_ui_dispatch',
     ownerReady: initial.ownerReady,
     ownerPending: initial.ownerPending,
     visibleGates: initial.count,
@@ -224,7 +224,7 @@ async function acceptLegalGate(page) {
   assert(initial.ownerReady, 'LEGAL_OWNER_NOT_READY');
   assert(initial.count === 1, initial.count ? 'LEGAL_DUPLICATE_VISIBLE' : 'LEGAL_GATE_NOT_VISIBLE', String(initial.count));
 
-  const accepted = await boundedStep('legal_gate_accept', () => page.evaluate(() => {
+  const scheduled = await boundedStep('legal_gate_schedule_accept', () => page.evaluate(() => {
     const visible = node => {
       if (!node) return false;
       const style = getComputedStyle(node);
@@ -240,13 +240,16 @@ async function acceptLegalGate(page) {
     checkbox.checked = true;
     checkbox.dispatchEvent(new Event('change', { bubbles: true }));
     if (button.disabled) return { ok: false, code: 'LEGAL_ACCEPT_BUTTON_STILL_DISABLED' };
-    button.click();
-    return { ok: true, code: '', control: checkbox.id, button: button.id };
+    const result = { ok: true, code: '', control: checkbox.id, button: button.id };
+    setTimeout(() => {
+      try { button.click(); }
+      catch (error) { document.body.dataset.legalGateDispatchError = 'click_error'; }
+    }, 0);
+    return result;
   }), 10000);
-  assert(accepted && accepted.ok, (accepted && accepted.code) || 'LEGAL_ACCEPT_FAILED');
+  assert(scheduled && scheduled.ok, (scheduled && scheduled.code) || 'LEGAL_ACCEPT_SCHEDULE_FAILED');
 
-  await page.waitForTimeout(350);
-  const settled = await boundedStep('legal_gate_verify', () => page.evaluate(() => {
+  await boundedStep('legal_gate_verify', () => page.waitForFunction(() => {
     const visible = node => {
       if (!node) return false;
       const style = getComputedStyle(node);
@@ -255,13 +258,27 @@ async function acceptLegalGate(page) {
     };
     const remaining = Array.from(document.querySelectorAll('#lg-chk,#conf-chk')).filter(visible).length;
     const pending = Boolean(window.Orbit && Orbit.legal && Orbit.legal.__gateState && Object.values(Orbit.legal.__gateState.pendingScopes || {}).some(Boolean));
-    return { remaining, pending };
+    return remaining === 0 && !pending;
+  }, null, { timeout: 12000 }), 15000);
+
+  const settled = await boundedStep('legal_gate_read_result', () => page.evaluate(() => {
+    const visible = node => {
+      if (!node) return false;
+      const style = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const remaining = Array.from(document.querySelectorAll('#lg-chk,#conf-chk')).filter(visible).length;
+    const pending = Boolean(window.Orbit && Orbit.legal && Orbit.legal.__gateState && Object.values(Orbit.legal.__gateState.pendingScopes || {}).some(Boolean));
+    const dispatchError = String((document.body.dataset || {}).legalGateDispatchError || '');
+    return { remaining, pending, dispatchError };
   }), 10000);
+  assert(!settled.dispatchError, 'LEGAL_DISPATCH_ERROR', settled.dispatchError);
   assert(settled.remaining === 0, 'LEGAL_MODAL_REAPPEARED', String(settled.remaining));
   assert(!settled.pending, 'LEGAL_OWNER_SCOPE_STILL_PENDING');
   report.legalVisibleAfter = settled.remaining;
-  report.legalDiagnostic.acceptedControl = accepted.control || report.legalDiagnostic.acceptedControl;
-  report.legalDiagnostic.acceptButton = accepted.button || '';
+  report.legalDiagnostic.acceptedControl = scheduled.control || report.legalDiagnostic.acceptedControl;
+  report.legalDiagnostic.acceptButton = scheduled.button || '';
   report.legalDiagnostic.ownerPendingAfter = settled.pending;
   report.checks.legalOneClick = true;
 }
