@@ -6,6 +6,7 @@
    - Registra service worker (no-op si el origen no lo permite)
    ============================================================ */
 (function () {
+  var RUNTIME_BUILD = '20260717-2';
   function clientLogo() { try { var t = Orbit.tenant && Orbit.tenant.get(); return (t && t.branding && t.branding.logo) || localStorage.getItem('orbit360_logo') || ''; } catch (e) { return ''; } }
   function clientName() { try { var t = Orbit.tenant && Orbit.tenant.get(); return (t && t.empresa) || 'Orbit 360'; } catch (e) { return 'Orbit 360'; } }
   function themeColor() { try { return getComputedStyle(document.documentElement).getPropertyValue('--red').trim() || '#C5162E'; } catch (e) { return '#C5162E'; } }
@@ -86,7 +87,7 @@
     var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     if (standalone) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('instalada'); }, 2500); }
     else if (isIOS) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('ios'); }, 4000); }
-    if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {} }
+    if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js?v=' + RUNTIME_BUILD).catch(function () {}); } catch (e) {} }
     Orbit.pwa = { refresh: function () { try { setFavicons(); buildManifest(); } catch (e) {} }, install: showInstall };
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
