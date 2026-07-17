@@ -45,6 +45,55 @@ Orbit.auth = (function () {
     };
   }
 
+  function withTimeout(promise, milliseconds, code) {
+    let timer;
+    const timeout = new Promise((resolve, reject) => {
+      timer = setTimeout(() => {
+        const error = new Error(code || 'AUTH_TIMEOUT');
+        error.code = code || 'AUTH_TIMEOUT';
+        reject(error);
+      }, milliseconds);
+    });
+    return Promise.race([Promise.resolve(promise), timeout]).finally(() => clearTimeout(timer));
+  }
+
+  function friendlyAuthError(error) {
+    const code = String(error && (error.code || error.message) || '');
+    if (/AUTH_PERSISTENCE_TIMEOUT/.test(code)) return 'El navegador no permitió preparar la sesión. Cierra esta ventana privada y vuelve a abrir el enlace LAB.';
+    if (/AUTH_SIGNIN_TIMEOUT/.test(code)) return 'El servicio de acceso no respondió. Vuelve a intentarlo en unos segundos.';
+    if (/auth\/(invalid-credential|wrong-password|user-not-found)/i.test(code)) return 'El usuario o la contraseña asignados no son válidos.';
+    if (/auth\/network-request-failed/i.test(code)) return 'No fue posible conectar con el servicio de acceso. Revisa la conexión y vuelve a intentarlo.';
+    if (/auth\/too-many-requests/i.test(code)) return 'El acceso está temporalmente limitado por varios intentos. Espera unos minutos y vuelve a intentarlo.';
+    if (/auth\/unauthorized-domain/i.test(code)) return 'Este canal de validación todavía no está autorizado para iniciar sesión.';
+    if (/auth\/operation-not-allowed/i.test(code)) return 'El acceso con usuario y contraseña no está habilitado en este entorno.';
+    return 'No fue posible iniciar sesión. Intenta nuevamente.';
+  }
+
+  function setAuthStage(value) {
+    try { document.body.dataset.authStage = value || ''; } catch (e) {}
+  }
+
+  async function configureLabPersistence(auth) {
+    if (!auth || typeof auth.setPersistence !== 'function') return;
+    let persistence = null;
+    try {
+      persistence = window.firebase && firebase.auth && firebase.auth.Auth && firebase.auth.Auth.Persistence
+        ? firebase.auth.Auth.Persistence
+        : null;
+    } catch (e) { persistence = null; }
+    if (!persistence) return;
+
+    try {
+      await withTimeout(auth.setPersistence(persistence.SESSION), 8000, 'AUTH_PERSISTENCE_TIMEOUT');
+    } catch (sessionError) {
+      try {
+        await withTimeout(auth.setPersistence(persistence.NONE), 8000, 'AUTH_PERSISTENCE_TIMEOUT');
+      } catch (memoryError) {
+        throw sessionError;
+      }
+    }
+  }
+
   function aceptoConf() { try { return !!localStorage.getItem(CKEY); } catch (e) { return false; } }
   function gateConfidencialidad() {
     if (aceptoConf()) return;
@@ -86,9 +135,15 @@ Orbit.auth = (function () {
 
   async function loginFirebase(email, pass) {
     const auth = fbAuth();
-    if (!auth || typeof auth.signInWithEmailAndPassword !== 'function') throw new Error('Firebase Auth LAB no disponible. Verifica core/auth-firebase.config.local.js.');
-    const cred = await auth.signInWithEmailAndPassword(email, pass);
-    return mapFbUser(cred && cred.user ? cred.user : fbUser());
+    if (!auth || typeof auth.signInWithEmailAndPassword !== 'function') throw new Error('AUTH_NOT_AVAILABLE');
+    setAuthStage('preparing-session');
+    await configureLabPersistence(auth);
+    setAuthStage('signing-in');
+    const cred = await withTimeout(auth.signInWithEmailAndPassword(email, pass), 25000, 'AUTH_SIGNIN_TIMEOUT');
+    const current = cred && cred.user ? cred.user : fbUser();
+    if (!current) throw new Error('AUTH_USER_NOT_AVAILABLE');
+    setAuthStage('authenticated');
+    return mapFbUser(current);
   }
 
   function logout() {
@@ -108,6 +163,7 @@ Orbit.auth = (function () {
     const lg = document.getElementById('login');
     if (lg) { lg.classList.add('hidden'); setTimeout(() => lg.style.display = 'none', 480); }
     document.body.classList.remove('pre-auth');
+    setAuthStage('inside');
     setTimeout(function () {
       const u = user() || {};
       const tipo = u.tipo === 'socio' ? 'socio' : 'interno';
@@ -121,6 +177,7 @@ Orbit.auth = (function () {
     const lg = document.getElementById('login');
     if (lg) { lg.style.display = ''; lg.classList.remove('hidden'); }
     document.body.classList.add('pre-auth');
+    if (!document.body.dataset.authStage || document.body.dataset.authStage === 'inside') setAuthStage('login-ready');
     try { if (Orbit.applyBrand) Orbit.applyBrand(); } catch (e) {}
     setTimeout(paintLoginDefaults, 0);
   }
@@ -169,12 +226,23 @@ Orbit.auth = (function () {
     el.textContent = message || '';
   }
 
+  function setSubmitting(form, active) {
+    if (!form) return;
+    const button = form.querySelector('button[type="submit"]');
+    form.dataset.submitting = active ? '1' : '0';
+    if (!button) return;
+    if (!button.dataset.label) button.dataset.label = button.textContent || 'Ingresar al Orbit 360';
+    button.disabled = !!active;
+    button.textContent = active ? 'Validando acceso…' : button.dataset.label;
+  }
+
   function init() {
     paintLoginDefaults();
 
     const form = document.getElementById('login-form');
     if (form) form.addEventListener('submit', async e => {
       e.preventDefault();
+      if (form.dataset.submitting === '1') return;
       const labMode = isLab();
       const emailEl = document.getElementById('lg-user');
       const passEl = document.getElementById('lg-pass');
@@ -186,9 +254,14 @@ Orbit.auth = (function () {
         if (emailEl) emailEl.value = email;
       }
 
+      paintError('');
+      setSubmitting(form, true);
+      setAuthStage('submitting');
+
       try {
         if (labMode) {
-          if (pass === DEMO_PASS) throw new Error('Modo Firestore LAB activo: usa la contraseña LAB guardada, no la contraseña demo.');
+          if (!pass) throw new Error('AUTH_PASSWORD_REQUIRED');
+          if (pass === DEMO_PASS) throw new Error('AUTH_DEMO_PASSWORD_BLOCKED');
           await loginFirebase(email, pass);
         } else {
           login({ nombre: 'Andrea Beltrán', rol: 'Dirección', email });
@@ -196,8 +269,14 @@ Orbit.auth = (function () {
         paintError('');
         showApp();
       } catch (err) {
-        paintError(err && err.message ? err.message : 'No se pudo iniciar sesión.');
+        setAuthStage('error');
+        const code = String(err && (err.code || err.message) || '');
+        if (code === 'AUTH_PASSWORD_REQUIRED') paintError('Ingresa la contraseña asignada para continuar.');
+        else if (code === 'AUTH_DEMO_PASSWORD_BLOCKED') paintError('Usa la contraseña asignada para este entorno, no la contraseña de demostración.');
+        else paintError(friendlyAuthError(err));
         showLogin();
+      } finally {
+        setSubmitting(form, false);
       }
     });
 
