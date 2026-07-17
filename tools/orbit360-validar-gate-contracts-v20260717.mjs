@@ -17,15 +17,21 @@ function executableText(text, rel) {
   if (/\.(?:js|mjs|cjs)$/i.test(rel)) {
     out = out.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
   }
+  if (/\.html?$/i.test(rel)) {
+    out = out.replace(/<!--[\s\S]*?-->/g, '');
+  }
   if (/\.ya?ml$/i.test(rel)) {
     out = out.replace(/^\s*#.*$/gm, '');
   }
   return out;
 }
+function unique(values) {
+  return [...new Set((values || []).filter(Boolean))];
+}
 function resultAndExit(status, checks, exitCode) {
   const failed = checks.filter(item => !item.ok);
   const payload = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v1',
+    schemaVersion: 'orbit360-gate-contract-preflight-v2-runtime-graph',
     gateId: requestedGateId,
     status,
     classification: status === 'GO_GATE_CONTRACT' ? null : 'VALIDATOR_STALE',
@@ -78,8 +84,8 @@ for (const owner of registry.canonicalOwners || []) {
   }
 }
 
-const retiredFiles = (gate.forbiddenRuntimeReferences || []).filter(token => /\.js$/i.test(token) || /^install/.test(token));
-const retiredSelectors = (gate.forbiddenRuntimeReferences || []).filter(token => !retiredFiles.includes(token));
+const forbiddenTokens = unique(gate.forbiddenRuntimeReferences || []);
+const retiredFiles = forbiddenTokens.filter(token => /\.js$/i.test(token) || /^install/.test(token));
 
 if (exists(gate.workflow)) {
   const workflow = executableText(read(gate.workflow), gate.workflow);
@@ -92,11 +98,33 @@ if (exists(gate.workflow)) {
   check('WORKFLOW_CHANNEL_LOCK', workflow.includes(gate.environment.hostingChannel), gate.environment.hostingChannel);
 }
 
-const runtimeValidator = (gate.validators || []).find(rel => /orbit360-gate-runtime-crm-v20260716\.mjs$/.test(rel));
-if (runtimeValidator && exists(runtimeValidator)) {
-  const source = executableText(read(runtimeValidator), runtimeValidator);
-  for (const token of retiredSelectors) {
-    check(`RUNTIME_VALIDATOR_NO_RETIRED_SELECTOR:${token}`, !source.includes(token), `${runtimeValidator} → ${token}`);
+/*
+ * Fail-closed runtime graph validation.
+ * A retired bridge can be reintroduced transitively by a loader even when the
+ * workflow and the final runtime validator no longer mention it. The registry
+ * therefore declares every active bootstrap/owner file that can participate in
+ * the slice, and this preflight scans executable content before secrets,
+ * Firebase, Hosting or Playwright are used.
+ */
+const fallbackRuntimeGraph = [
+  ...(gate.requiredFiles || []),
+  'orbit360-platform/index.html',
+  'orbit360-platform/core/backend-lab-loader.js',
+  'orbit360-platform/core/backend-lab-init.js',
+  'orbit360-platform/core/backend-lab-auth-guard.js'
+];
+const runtimeGraphFiles = unique((gate.runtimeGraphFiles && gate.runtimeGraphFiles.length)
+  ? gate.runtimeGraphFiles
+  : fallbackRuntimeGraph);
+
+check('RUNTIME_GRAPH_DECLARED', runtimeGraphFiles.length > 0, `files=${runtimeGraphFiles.length}`);
+for (const rel of runtimeGraphFiles) {
+  const present = exists(rel);
+  check(`RUNTIME_GRAPH_FILE_EXISTS:${rel}`, present, rel);
+  if (!present) continue;
+  const source = executableText(read(rel), rel);
+  for (const token of forbiddenTokens) {
+    check(`RUNTIME_GRAPH_NO_RETIRED_REF:${rel}:${token}`, !source.includes(token), `${rel} → ${token}`);
   }
 }
 
