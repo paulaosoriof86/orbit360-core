@@ -9,7 +9,7 @@ const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v9-owner-aware',
+  schemaVersion: 'orbit360-runtime-gate-joint-v10-owner-auth-contract',
   gateId: 'block1-client360-insurers-lab-v20260717',
   contractVersion: '1.0.1',
   generatedAt: new Date().toISOString(),
@@ -94,16 +94,20 @@ async function authState(page) {
     };
     let providerReady = false;
     let currentUser = false;
+    let ownerReady = false;
     try {
       const auth = window.firebase && firebase.auth ? firebase.auth() : null;
       providerReady = !!(auth && typeof auth.signInWithEmailAndPassword === 'function');
       currentUser = !!(auth && auth.currentUser);
+      ownerReady = !!(window.Orbit && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function');
     } catch (error) {}
     return {
       inside: !document.body.classList.contains('pre-auth'),
       formVisible: visible(document.getElementById('login-form')),
       providerReady,
+      ownerReady,
       currentUser,
+      authStage: String((document.body.dataset || {}).authStage || ''),
       firebaseInit: String((window.OrbitBackend || {}).firebaseInit || ''),
       firebaseLoader: String((window.OrbitBackend || {}).firebaseLoader || '')
     };
@@ -111,39 +115,46 @@ async function authState(page) {
 }
 
 async function ensureAuthenticated(page) {
+  stage('authentication_owner_ready');
   await page.waitForFunction(() => {
     try {
-      const auth = window.firebase && firebase.auth ? firebase.auth() : null;
-      return !!(auth && typeof auth.signInWithEmailAndPassword === 'function');
+      return !!(window.Orbit && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function');
     } catch (error) { return false; }
   }, null, { timeout: 45000 });
 
   const initial = await authState(page);
   if (!initial.currentUser) {
+    stage('authentication_signin');
     const loginResult = await page.evaluate(async ({ loginEmail, loginKey }) => {
       try {
-        const credential = await firebase.auth().signInWithEmailAndPassword(loginEmail, loginKey);
-        return { ok: !!(credential && credential.user), code: '' };
+        const user = await Orbit.auth.loginFirebase(loginEmail, loginKey);
+        return { ok: !!user, code: '' };
       } catch (error) {
         return {
           ok: false,
-          code: String(error && error.code || 'auth/unknown').replace(/[^a-z0-9/_-]/gi, '').slice(0, 80)
+          code: String(error && (error.code || error.message) || 'auth/unknown')
+            .replace(/[^a-z0-9/_-]/gi, '')
+            .slice(0, 80)
         };
       }
     }, { loginEmail: email, loginKey: accessKey });
     if (!loginResult.ok) {
       report.authDiagnostic = {
-        providerReady: true,
+        strategy: 'owner_login_contract',
+        providerReady: initial.providerReady,
+        ownerReady: initial.ownerReady,
         currentUser: false,
         formVisible: initial.formVisible,
+        authStage: initial.authStage,
         firebaseInit: initial.firebaseInit,
         firebaseLoader: initial.firebaseLoader,
         errorCategory: loginResult.code || 'auth/unknown'
       };
-      throw new Error(`LOGIN_PROVIDER_${loginResult.code || 'UNKNOWN'}`);
+      throw new Error(`LOGIN_OWNER_${loginResult.code || 'UNKNOWN'}`);
     }
   }
 
+  stage('authentication_session');
   await page.waitForFunction(() => {
     try { return !!(window.firebase && firebase.auth && firebase.auth().currentUser); }
     catch (error) { return false; }
@@ -154,12 +165,15 @@ async function ensureAuthenticated(page) {
   });
   await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 10000 });
   const finalState = await authState(page);
-  assert(finalState.currentUser && finalState.inside, 'LOGIN_PROVIDER_SESSION_NOT_ACTIVE');
-  report.authMode = initial.currentUser ? 'session_restored' : 'provider_direct_gate';
+  assert(finalState.currentUser && finalState.inside, 'LOGIN_OWNER_SESSION_NOT_ACTIVE');
+  report.authMode = initial.currentUser ? 'session_restored' : 'owner_contract_gate';
   report.authDiagnostic = {
+    strategy: 'owner_login_contract',
     providerReady: finalState.providerReady,
+    ownerReady: finalState.ownerReady,
     currentUser: finalState.currentUser,
     formVisible: finalState.formVisible,
+    authStage: finalState.authStage,
     firebaseInit: finalState.firebaseInit,
     firebaseLoader: finalState.firebaseLoader,
     errorCategory: ''
