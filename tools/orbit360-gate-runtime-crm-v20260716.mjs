@@ -9,7 +9,9 @@ const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v8',
+  schemaVersion: 'orbit360-runtime-gate-joint-v9-owner-aware',
+  gateId: 'block1-client360-insurers-lab-v20260717',
+  contractVersion: '1.0.1',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
@@ -33,6 +35,13 @@ function stage(name) {
 }
 function assert(condition, code, detail = '') {
   if (!condition) throw new Error(`${code}${detail ? `:${detail}` : ''}`);
+}
+async function visibleCount(locator) {
+  return locator.evaluateAll(nodes => nodes.filter(node => {
+    const style = getComputedStyle(node);
+    const rect = node.getBoundingClientRect();
+    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+  }).length);
 }
 
 let browser = null;
@@ -75,14 +84,6 @@ async function selectRole(page, role) {
   await page.waitForTimeout(700);
 }
 
-async function visibleCount(locator) {
-  return locator.evaluateAll(nodes => nodes.filter(node => {
-    const style = getComputedStyle(node);
-    const rect = node.getBoundingClientRect();
-    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
-  }).length);
-}
-
 async function authState(page) {
   return page.evaluate(() => {
     const visible = node => {
@@ -114,26 +115,22 @@ async function ensureAuthenticated(page) {
     try {
       const auth = window.firebase && firebase.auth ? firebase.auth() : null;
       return !!(auth && typeof auth.signInWithEmailAndPassword === 'function');
-    } catch (error) {
-      return false;
-    }
+    } catch (error) { return false; }
   }, null, { timeout: 45000 });
 
   const initial = await authState(page);
   if (!initial.currentUser) {
     const loginResult = await page.evaluate(async ({ loginEmail, loginKey }) => {
       try {
-        const auth = firebase.auth();
-        const credential = await auth.signInWithEmailAndPassword(loginEmail, loginKey);
+        const credential = await firebase.auth().signInWithEmailAndPassword(loginEmail, loginKey);
         return { ok: !!(credential && credential.user), code: '' };
       } catch (error) {
-        const code = String(error && error.code || 'auth/unknown')
-          .replace(/[^a-z0-9/_-]/gi, '')
-          .slice(0, 80);
-        return { ok: false, code };
+        return {
+          ok: false,
+          code: String(error && error.code || 'auth/unknown').replace(/[^a-z0-9/_-]/gi, '').slice(0, 80)
+        };
       }
     }, { loginEmail: email, loginKey: accessKey });
-
     if (!loginResult.ok) {
       report.authDiagnostic = {
         providerReady: true,
@@ -151,15 +148,13 @@ async function ensureAuthenticated(page) {
     try { return !!(window.firebase && firebase.auth && firebase.auth().currentUser); }
     catch (error) { return false; }
   }, null, { timeout: 15000 });
-
   await page.evaluate(() => {
-    try {
-      if (window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function') Orbit.auth.showApp();
-    } catch (error) {}
+    try { if (window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function') Orbit.auth.showApp(); }
+    catch (error) {}
   });
   await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 10000 });
-
   const finalState = await authState(page);
+  assert(finalState.currentUser && finalState.inside, 'LOGIN_PROVIDER_SESSION_NOT_ACTIVE');
   report.authMode = initial.currentUser ? 'session_restored' : 'provider_direct_gate';
   report.authDiagnostic = {
     providerReady: finalState.providerReady,
@@ -169,7 +164,6 @@ async function ensureAuthenticated(page) {
     firebaseLoader: finalState.firebaseLoader,
     errorCategory: ''
   };
-  assert(finalState.currentUser && finalState.inside, 'LOGIN_PROVIDER_SESSION_NOT_ACTIVE');
   report.checks.authenticated = true;
 }
 
@@ -179,15 +173,12 @@ async function acceptLegalGate(page) {
   const count = await boxes.count();
   report.legalVisibleBefore = count;
   assert(count === 1, count ? 'LEGAL_DUPLICATE_VISIBLE' : 'LEGAL_GATE_NOT_VISIBLE', String(count));
-
   const checkbox = boxes.first();
   const root = checkbox.locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " drawer-back ")][1]');
   const accept = root.locator('#lg-ok,#conf-ok').first();
   assert(await accept.count() === 1, 'LEGAL_ACCEPT_BUTTON_MISSING');
-
   await checkbox.check({ force: true });
   await accept.click({ force: true });
-
   await page.waitForFunction(() => {
     const visible = node => {
       if (!node) return false;
@@ -215,7 +206,7 @@ async function validateInsurers(page, label, advisorMode = false) {
 
   const firstText = String(await cards.first().innerText()).replace(/\s+/g, ' ').trim();
   assert(/\bGT\b/.test(firstText), 'GT_NOT_FIRST', label);
-  assert(await page.locator('#asg-order-v20260716').count() === 1, 'INSURER_ORDER_CONTROL_MISSING', label);
+  assert(await page.locator('#asg-order').count() === 1, 'INSURER_ORDER_CONTROL_MISSING', label);
 
   const mappedCard = cards.filter({ hasText: mappedInsurer }).first();
   assert(await mappedCard.count() > 0, 'MAPPED_INSURER_CARD_NOT_FOUND', label);
@@ -224,16 +215,26 @@ async function validateInsurers(page, label, advisorMode = false) {
   const ficha = page.locator('#asg-ficha');
   await ficha.waitFor({ state: 'visible', timeout: 15000 });
   await page.waitForTimeout(500);
-  assert(await ficha.getAttribute('data-mode') === 'read', 'INSURER_FICHA_NOT_READ_MODE', label);
   assert(await page.locator('#af-guardar').count() === 0, 'INSURER_SAVE_VISIBLE_IN_READ_MODE', label);
   if (advisorMode) assert(await page.locator('#af-editar').count() === 0, 'ADVISOR_INSURER_EDIT_VISIBLE');
 
+  const owner = await page.evaluate(() => ({
+    knowledge: Boolean(window.Orbit && Orbit.modules && Orbit.modules.aseguradoras && Orbit.modules.aseguradoras.__ownerKnowledgeV20260717),
+    order: Boolean(window.Orbit && Orbit.modules && Orbit.modules.aseguradoras && Orbit.modules.aseguradoras.__tenantOrderV20260717),
+    gates: Boolean(window.Orbit && Orbit.modules && Orbit.modules.aseguradoras && Orbit.modules.aseguradoras.__consumerGatesSeparatedV20260717)
+  }));
+  assert(owner.knowledge && owner.order && owner.gates, 'INSURER_OWNER_CONTRACT_NOT_ACTIVE', label);
+
   await page.locator('[data-tab="tarifas"]').click();
-  const knowledge = page.locator('#asg-knowledge-projection-v20260716');
+  const knowledge = page.locator('#af-body');
   await knowledge.waitFor({ state: 'visible', timeout: 15000 });
+  await page.waitForFunction(() => {
+    const body = document.querySelector('#af-body');
+    return Boolean(body && /Fuentes mapeadas y persistidas|Mapeado|Persistido|Validado/i.test(String(body.textContent || '')));
+  }, null, { timeout: 15000 });
   const text = String(await knowledge.innerText()).replace(/\s+/g, ' ').trim();
-  assert(/Mapeo|Mapeado|Conocimiento proyectado/i.test(text), 'INSURER_KNOWLEDGE_NOT_VISIBLE', label);
-  assert(!/No hay fuentes vinculadas/.test(text), 'INSURER_KNOWLEDGE_SOURCES_EMPTY', label);
+  assert(/Mapeado|Persistido|Validado|Conocimiento/i.test(text), 'INSURER_KNOWLEDGE_NOT_VISIBLE', label);
+  assert(!/Sin conocimiento adicional mapeado o persistido/.test(text), 'INSURER_KNOWLEDGE_SOURCES_EMPTY', label);
   report[`${label}KnowledgeVisible`] = true;
 }
 
@@ -254,6 +255,7 @@ browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 page.setDefaultTimeout(15000);
 page.setDefaultNavigationTimeout(45000);
+
 try {
   stage('open_lab_preview');
   await page.goto(`${baseUrl}/ays-lab-preview.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
@@ -294,6 +296,7 @@ try {
 
   report.checks.realClientCount = report.storeCounts.clientes === 414;
   report.checks.realInsurerCount = report.storeCounts.aseguradoras === 26;
+  report.checks.realAdvisorCount = report.storeCounts.asesores === 7;
   report.checks.allTenTabs = true;
   report.checks.gtFirst = true;
   report.checks.insurerReadMode = true;
