@@ -54,19 +54,26 @@
   "gates": [
     {
       "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.4",
+      "contractVersion": "1.0.5",
       "block": 1,
-      "status": "ACTIVE_DIAGNOSTIC_PREFLIGHT",
+      "status": "ACTIVE_PENDING_PREFLIGHT",
       "diagnosticRule": "Preflight failure evidence must be persisted and published before any runtime correction.",
       "reconciliation": {
         "date": "2026-07-17",
-        "classification": "FUNCTIONAL_DEFECT",
-        "scope": "LAB bootstrap owner separation",
+        "classifications": [
+          "FUNCTIONAL_DEFECT",
+          "VALIDATOR_STALE"
+        ],
+        "scope": "LAB preview bootstrap and precise forbidden-token contract",
         "removedRuntimeReferences": [
           "data/import-initial-profiles.js",
           "modules/importar-initial-tenant-lab.js",
           "modules/aseguradoras-candidate-actions.js"
         ],
+        "retiredOverbroadTokens": [
+          "data-mode"
+        ],
+        "retiredTokenReason": "data-mode is a legitimate semantic attribute used by the canonical Cliente 360 segmented control for Manual, Importar and Inteligente modes; it is not evidence of a retired bridge.",
         "preserved": [
           "Orbit.store",
           "core/auth.js",
@@ -74,7 +81,7 @@
           "backend-lab-advisor-write-bridge.js",
           "backend-lab-import-readiness-guard.js",
           "backend-lab-canonical-view-sync.js",
-          "Cliente 360 renderer",
+          "Cliente 360 renderer and segmented control",
           "Aseguradoras renderer",
           "414 clientes",
           "26 aseguradoras",
@@ -124,8 +131,7 @@
         "installLegalGate",
         "installMobileNavigation",
         "asg-order-v20260716",
-        "asg-knowledge-projection-v20260716",
-        "data-mode"
+        "asg-knowledge-projection-v20260716"
       ],
       "environment": {
         "branch": "ays/backend-tenant-lab-v99-20260703",
