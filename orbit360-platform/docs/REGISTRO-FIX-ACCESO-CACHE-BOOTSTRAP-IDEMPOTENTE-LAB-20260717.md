@@ -17,8 +17,9 @@ El formulario de acceso LAB quedaba esperando y el recorrido visual no avanzaba 
 - Manejo de sesión con límite de espera y mensajes visibles.
 - Caché del navegador versionada y estrategia de red primero.
 - Entrada LAB con limpieza controlada y carga explícita del recurso vigente.
-- Preparación administrativa idempotente: verifica recursos existentes sin volver a modificarlos.
-- Verificador read-only sanitizado disponible para evolución del pipeline.
+- Validación administrativa estrictamente read-only durante el gate visual.
+- Reconciliación de asesores por ID, llave canónica, nombre, correo o alias, conservando el ID real creado desde Equipo.
+- Reporte sanitizado previo al despliegue, sin datos personales ni operaciones de escritura.
 
 ## Carriles
 
@@ -28,7 +29,7 @@ No se reemplazó el prototipo ni los renderers de Cliente 360 o Aseguradoras. El
 
 ### B — Backend y seguridad
 
-No se modificaron `Orbit.store`, el adaptador de datos, reglas ni importadores. Se redujeron operaciones administrativas repetidas durante validaciones visuales.
+No se modificaron `Orbit.store`, el adaptador de datos, reglas ni importadores. Se eliminaron operaciones administrativas repetidas durante validaciones visuales.
 
 ### C — Datos reales
 
@@ -38,6 +39,7 @@ No se reimportaron ni modificaron clientes o aseguradoras. Conteos confirmados a
 
 - Un gate visual debe verificar, no repetir preparación administrativa.
 - Separar preparación, reparación y validación read-only.
+- Conservar IDs reales y reconciliar identidades mediante llaves canónicas y aliases.
 - Versionar recursos críticos y service workers.
 - Usar red primero para recursos sensibles al runtime y caché solo como respaldo.
 - Mostrar un límite de espera y un mensaje útil; nunca dejar una acción indefinidamente pendiente.
@@ -45,4 +47,4 @@ No se reimportaron ni modificaron clientes o aseguradoras. Conteos confirmados a
 
 ## Estado
 
-`IMPLEMENTADO_PENDIENTE_GATE_RUNTIME_FINAL`.
+`IMPLEMENTADO_PENDIENTE_GATE_RUNTIME_FINAL_RECONCILIADO`.
