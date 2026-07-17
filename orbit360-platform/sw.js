@@ -1,15 +1,56 @@
-/* Orbit 360 · Service Worker — cache mínimo para instalabilidad/offline.
-   En el dominio real cachea el shell; en sandbox simplemente no registra. */
-var CACHE = 'orbit360-v1';
-self.addEventListener('install', function (e) { self.skipWaiting(); });
-self.addEventListener('activate', function (e) { e.waitUntil(self.clients.claim()); });
-self.addEventListener('fetch', function (e) {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
+/* Orbit 360 · Service Worker — red primero con fallback offline.
+   Evita que una versión antigua de Auth o del shell bloquee el canal LAB. */
+var CACHE = 'orbit360-v20260717-1';
+var BUILD = '20260717-1';
+
+self.addEventListener('install', function () {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', function (event) {
+  event.waitUntil(
+    caches.keys().then(function (keys) {
+      return Promise.all(keys.map(function (key) {
+        if (key.indexOf('orbit360-') === 0 && key !== CACHE) return caches.delete(key);
+        return Promise.resolve(false);
+      }));
+    }).then(function () {
+      return self.clients.claim();
+    })
+  );
+});
+
+self.addEventListener('fetch', function (event) {
+  if (event.request.method !== 'GET') return;
+
+  var originalUrl = new URL(event.request.url);
+  if (originalUrl.origin !== self.location.origin) return;
+
+  event.respondWith(
     caches.open(CACHE).then(function (cache) {
-      return cache.match(e.request).then(function (hit) {
-        var net = fetch(e.request).then(function (res) { try { cache.put(e.request, res.clone()); } catch (x) {} return res; }).catch(function () { return hit; });
-        return hit || net;
+      var request = event.request;
+
+      if (/\/core\/auth\.js$/i.test(originalUrl.pathname)) {
+        var freshAuthUrl = new URL(originalUrl.href);
+        freshAuthUrl.searchParams.set('orbitBuild', BUILD);
+        request = new Request(freshAuthUrl.href, {
+          method: 'GET',
+          headers: event.request.headers,
+          credentials: event.request.credentials,
+          redirect: event.request.redirect
+        });
+      }
+
+      return fetch(request, { cache: 'no-store' }).then(function (response) {
+        if (response && response.ok) {
+          try { cache.put(event.request, response.clone()); } catch (ignore) {}
+        }
+        return response;
+      }).catch(function (error) {
+        return cache.match(event.request).then(function (hit) {
+          if (hit) return hit;
+          throw error;
+        });
       });
     })
   );
