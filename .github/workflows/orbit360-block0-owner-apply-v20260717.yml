@@ -44,7 +44,7 @@ jobs:
           changed="$(git diff --name-only | sort)"
           test "$changed" = "orbit360-platform/modules/aseguradoras.js"
 
-      - name: Validar sintaxis y contratos
+      - name: Sintaxis de propietarios
         shell: bash
         run: |
           set -euo pipefail
@@ -54,8 +54,20 @@ jobs:
           node --check core/pwa.js
           node --check core/legal.js
           node --check core/access-scope.js
-          node tools/orbit360-aseguradoras-owner-contract-v20260717.js | tee /tmp/owner-contract.json
-          node tools/orbit360-block0-architecture-gate-v20260717.js | tee /tmp/architecture-gate.json
+
+      - name: Contrato conductual Aseguradoras
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd orbit360-platform
+          node tools/orbit360-aseguradoras-owner-contract-v20260717.js
+
+      - name: Gate estático arquitectura Bloque 0
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd orbit360-platform
+          node tools/orbit360-block0-architecture-gate-v20260717.js
 
       - name: Verificar hashes finales y protegidos
         shell: bash
