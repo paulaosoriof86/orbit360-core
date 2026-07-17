@@ -6,6 +6,7 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.polizas = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
+  const PC = id => (window.Orbit && Orbit.clientProjection && Orbit.clientProjection.get(id)) || S().get('clientes', id);
   let st = { fq: '', framo: '', fasg: '', fase: '', fest: '', sort: 'vence' };
 
   const FDEFS = () => [
@@ -18,10 +19,11 @@ Orbit.modules.polizas = (function () {
 
   function rows() {
     return S().all('polizas').filter(p => {
-      const cli = S().get('clientes', p.clienteId);
+      const cli = PC(p.clienteId);
       const veh = S().all('vehiculos').find(v => v.polizaId === p.id);
       const placa = (veh && veh.placa) || p.placa || '';
-      const txt = (p.numero + ' ' + p.producto + ' ' + (cli ? cli.nombre : '') + ' ' + placa + ' ' + (veh ? (veh.marca + ' ' + veh.linea) : '')).toLowerCase();
+      const clienteTxt = cli ? [cli.nombre, cli.identificacion, cli.email, cli.telefono].filter(Boolean).join(' ') : '';
+      const txt = (p.numero + ' ' + p.producto + ' ' + clienteTxt + ' ' + placa + ' ' + (veh ? (veh.marca + ' ' + veh.linea) : '')).toLowerCase();
       return (!st.fq || txt.includes(st.fq.toLowerCase())) &&
         (!st.framo || p.ramo === st.framo) &&
         (!st.fasg || p.aseguradoraId === st.fasg) &&
@@ -74,7 +76,7 @@ Orbit.modules.polizas = (function () {
      recibos generados, fuente de importación y estado de validación. */
   function verDesglose(id) {
     const p = S().get('polizas', id); if (!p) return;
-    const cli = S().get('clientes', p.clienteId) || {};
+    const cli = PC(p.clienteId) || {};
     const asg = q.aseguradora(p.aseguradoraId) || {};
     const cur = p.moneda || cli.moneda || Orbit.q.monedaPais();
     const M = (n) => (n == null || n === '') ? '—' : U.money(n, cur);
