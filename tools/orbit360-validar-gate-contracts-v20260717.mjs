@@ -37,7 +37,7 @@ function writeEvidence(payload) {
 function resultAndExit(status, checks, exitCode) {
   const failed = checks.filter(item => !item.ok);
   const payload = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v3-sanitized-evidence',
+    schemaVersion: 'orbit360-gate-contract-preflight-v4-runtime-version-parity',
     gateId: requestedGateId,
     generatedAt: new Date().toISOString(),
     containsPII: false,
@@ -80,6 +80,7 @@ check('ACTIVE_BLOCK', Number(gate.block) === Number(registry.plan && registry.pl
 check('WORKFLOW_EXISTS', exists(gate.workflow), gate.workflow);
 check('PREFLIGHT_MATCH', gate.preflight === 'tools/orbit360-validar-gate-contracts-v20260717.mjs', gate.preflight || 'missing');
 check('PREFLIGHT_EVIDENCE_MATCH', gate.preflightEvidence === EVIDENCE_REL, gate.preflightEvidence || 'missing');
+check('RUNTIME_VERSION_FORMAT', /^\d{8}-\d+$/.test(String(gate.runtimeVersion || '')), gate.runtimeVersion || 'missing');
 
 for (const rel of gate.requiredFiles || []) {
   check(`REQUIRED_FILE:${rel}`, exists(rel), rel);
@@ -139,6 +140,26 @@ for (const rel of runtimeGraphFiles) {
   const source = executableText(read(rel), rel);
   for (const token of forbiddenTokens) {
     check(`RUNTIME_GRAPH_NO_RETIRED_REF:${rel}:${token}`, !source.includes(token), `${rel} → ${token}`);
+  }
+}
+
+/*
+ * Runtime version parity is a binding navigation contract. Preview, loader,
+ * Service Worker, PWA, runtime gate and workflow must point to the same value;
+ * otherwise a transient page can be accepted and destroyed during Auth.
+ */
+const runtimeVersionContracts = Array.isArray(gate.runtimeVersionContracts) ? gate.runtimeVersionContracts : [];
+check('RUNTIME_VERSION_CONTRACTS_DECLARED', runtimeVersionContracts.length >= 5, `contracts=${runtimeVersionContracts.length}`);
+for (const contract of runtimeVersionContracts) {
+  const rel = String(contract && contract.path || '');
+  const tokens = unique(contract && contract.requiredTokens || []);
+  const present = Boolean(rel && exists(rel));
+  check(`RUNTIME_VERSION_FILE_EXISTS:${rel || 'missing'}`, present, rel || 'missing');
+  check(`RUNTIME_VERSION_TOKENS_DECLARED:${rel || 'missing'}`, tokens.length > 0, `tokens=${tokens.length}`);
+  if (!present) continue;
+  const source = executableText(read(rel), rel);
+  for (const token of tokens) {
+    check(`RUNTIME_VERSION_TOKEN:${rel}:${token}`, source.includes(token), `${rel} → ${token}`);
   }
 }
 
