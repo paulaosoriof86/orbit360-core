@@ -1,0 +1,122 @@
+name: Orbit 360 · Aplicar owner Aseguradoras Bloque 0
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-block0-owner-apply-v20260717.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-block0-owner-apply-v20260717
+  cancel-in-progress: false
+
+jobs:
+  apply-owner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout rama exacta
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ays/backend-tenant-lab-v99-20260703
+
+      - name: Verificar baseline y parche
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd orbit360-platform
+          test "$(sha256sum modules/aseguradoras.js | awk '{print $1}')" = "e6e413c4dbbfe15a1251dae0bbed4a746df7fbbe3532acfc3b5e83194cad6b3d"
+          test "$(sha256sum core/router.js | awk '{print $1}')" = "e08845d6872fa2e9fb8e8f14a7fd1b9a718efb1ce61722cbdbd63378a0d0848b"
+          test "$(sha256sum tools/.block0-owner-minimal.patch | awk '{print $1}')" = "4a9af7173d004424933f00d9d3a53e0a36a98f42873604994399a2da07c649da"
+          cd ..
+          git apply --check orbit360-platform/tools/.block0-owner-minimal.patch
+
+      - name: Aplicar delta mínimo propietario
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply orbit360-platform/tools/.block0-owner-minimal.patch
+          changed="$(git diff --name-only | sort)"
+          expected=$'orbit360-platform/core/router.js\norbit360-platform/modules/aseguradoras.js'
+          test "$changed" = "$expected"
+
+      - name: Validar sintaxis y contratos
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd orbit360-platform
+          node --check modules/aseguradoras.js
+          node --check core/router.js
+          node --check core/pwa.js
+          node --check core/legal.js
+          node --check core/access-scope.js
+          node tools/orbit360-aseguradoras-owner-contract-v20260717.js | tee /tmp/owner-contract.json
+          node tools/orbit360-block0-architecture-gate-v20260717.js | tee /tmp/architecture-gate.json
+
+      - name: Verificar hashes finales y protegidos
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd orbit360-platform
+          test "$(sha256sum modules/aseguradoras.js | awk '{print $1}')" = "0b8cae27265792ae9089cdd253bd83143d395396ae102548a5826d34e07cbdd9"
+          test "$(sha256sum core/router.js | awk '{print $1}')" = "5e7daa637f462e039ad8b735700749e6990fd1825c83d8d2f4d989f507f7d718"
+          git diff --exit-code -- data/store.js data/store-firestore-lab.local.js core/auth.js core/importa.js firestore.rules
+
+      - name: Documentar evidencia
+        shell: bash
+        run: |
+          set -euo pipefail
+          module_hash="$(sha256sum orbit360-platform/modules/aseguradoras.js | awk '{print $1}')"
+          router_hash="$(sha256sum orbit360-platform/core/router.js | awk '{print $1}')"
+          cat > orbit360-platform/docs/RESULTADO-GATE-ARQUITECTURA-BLOQUE0-20260717.md <<EOF
+          # Resultado gate arquitectura Bloque 0 — 2026-07-17
+
+          ## Resultado
+
+          \`GO_STATIC_ARCHITECTURE\`
+
+          ## Owner Aseguradoras
+
+          - Orden configurable por tenant integrado en \`modules/aseguradoras.js\`.
+          - Conocimiento mapeado, persistido y de ficha leído sin escritura.
+          - \`Mapeado\`, \`Persistido\` y \`Validado\` no habilitan consumo.
+          - Cotizador y Comparativo requieren habilitación independiente.
+          - Proyección temporal retirada del bootstrap de Router.
+
+          ## Evidencia
+
+          - SHA-256 owner: \`$module_hash\`
+          - SHA-256 Router: \`$router_hash\`
+          - \`node --check\`: PASS.
+          - Contrato conductual Aseguradoras: PASS.
+          - Gate arquitectura Bloque 0: PASS.
+          - Archivos protegidos: sin cambios.
+
+          ## Alcance
+
+          Este cierre es estático y contractual. El gate LAB de Cliente 360 + Aseguradoras continúa como Bloque 1 y debe producir evidencia runtime sanitizada antes de revisión visual.
+          EOF
+
+      - name: Retirar staging temporal y workflow de un solo uso
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f orbit360-platform/tools/.block0-owner-minimal.patch
+          rm -rf orbit360-platform/tools/.block0-owner-patch
+          rm -rf orbit360-platform/tools/.block0-owner-patch-b64
+          rm -f .github/workflows/orbit360-block0-owner-apply-v20260717.yml
+
+      - name: Commit y push del cierre arquitectónico
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "orbit360-automation"
+          git config user.email "orbit360-automation@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(block0): consolidate insurer owner and close architecture gate"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
