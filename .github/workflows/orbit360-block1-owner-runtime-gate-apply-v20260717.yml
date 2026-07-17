@@ -1,0 +1,66 @@
+name: Orbit 360 · Alinear gate LAB con owners Bloque 1
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-block1-owner-runtime-gate-apply-v20260717.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-block1-owner-runtime-gate-apply-v20260717
+  cancel-in-progress: false
+
+jobs:
+  apply-runtime-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout rama exacta
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ays/backend-tenant-lab-v99-20260703
+
+      - name: Aplicar parche owner-aware
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f tools/.block1-owner-runtime-gate.patch
+          git apply --check tools/.block1-owner-runtime-gate.patch
+          git apply tools/.block1-owner-runtime-gate.patch
+          changed="$(git diff --name-only | sort)"
+          expected=$'.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml\ntools/orbit360-gate-runtime-crm-v20260716.mjs'
+          test "$changed" = "$expected"
+
+      - name: Validar sintaxis y contratos estáticos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+          node --check tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs
+          node --check orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
+          node --check orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js
+          node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
+          node orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js
+          node tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs
+
+      - name: Retirar staging de un solo uso
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f tools/.block1-owner-runtime-gate.patch
+          rm -f .github/workflows/orbit360-block1-owner-runtime-gate-apply-v20260717.yml
+
+      - name: Commit y activar gate LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "orbit360-automation"
+          git config user.email "orbit360-automation@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(block1): align LAB runtime gate with canonical owners"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
