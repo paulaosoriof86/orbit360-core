@@ -182,6 +182,7 @@ jobs:
         with:
           name: orbit360-clientes-aseguradoras-runtime-gate-v20260717-${{ github.run_id }}
           path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/lab-data-counts.json
             orbit360-platform/lab-aseguradoras-knowledge-inventory.json
             orbit360-platform/runtime-build.json
@@ -194,6 +195,8 @@ jobs:
         if: always()
         shell: bash
         run: |
+          PREFLIGHT="orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json"
+          PREFLIGHT_STATUS="$(test -f "$PREFLIGHT" && jq -r '.status // "no disponible"' "$PREFLIGHT" || echo 'no disponible')"
           {
             echo "## Orbit 360 · Gate conjunto Cliente 360 + Aseguradoras"
             echo ""
@@ -206,6 +209,8 @@ jobs:
             echo "Commit: ${GITHUB_SHA}"
             echo ""
             echo "Run: ${GITHUB_RUN_ID}"
+            echo ""
+            echo "Preflight: ${PREFLIGHT_STATUS}"
             echo ""
             echo "Canal LAB verificado: ${ORBIT360_PREVIEW_URL:-no disponible}"
             echo ""
@@ -225,13 +230,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          PREFLIGHT="orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json"
           REPORT="orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json"
           INVENTORY="orbit360-platform/lab-aseguradoras-knowledge-inventory.json"
           COUNTS="orbit360-platform/lab-data-counts.json"
+          PREFLIGHT_STATUS="$(test -f "$PREFLIGHT" && jq -r '.status // "no disponible"' "$PREFLIGHT" || echo 'no disponible')"
           if [ -f "$REPORT" ]; then
             OK="$(jq -r '.ok // false' "$REPORT")"
             ERROR_CODE="$(jq -r '(.error // "") | split(":")[0] | gsub("[\\r\\n]"; " ")' "$REPORT")"
             FAILED_CHECKS="$(jq -r '[.checks // {} | to_entries[] | select(.value != true) | .key] | join(",")' "$REPORT")"
+          elif [ -f "$PREFLIGHT" ]; then
+            OK="false"
+            ERROR_CODE="$(jq -r '.status // "VALIDATOR_STALE"' "$PREFLIGHT")"
+            FAILED_CHECKS="$(jq -r '[.failedCheckIds // [] | .[]] | join(",")' "$PREFLIGHT")"
           else
             OK="false"
             ERROR_CODE="RESULTADO_NO_GENERADO"
@@ -243,9 +254,9 @@ jobs:
           INSURERS="$(test -f "$COUNTS" && jq -r '.counts.aseguradoras // 0' "$COUNTS" || echo 0)"
           ADVISORS="$(test -f "$COUNTS" && jq -r '.counts.asesores // 0' "$COUNTS" || echo 0)"
           SYNC="$(test -f "$INVENTORY" && jq -r '.gates.operationalSyncComplete // false' "$INVENTORY" || echo false)"
-          printf -v BODY '%s\n\n- Gate: %s\n- Commit: %s\n- Run: %s\n- Canal LAB: %s\n- Gate conjunto: **%s**\n- Conteos LAB: clientes **%s**, aseguradoras **%s**, asesores **%s**\n- Conocimiento Aseguradoras persistido operativamente: **%s**\n- Código de bloqueo: %s\n- Checks no aprobados: %s\n- Evidencia: artefacto sanitizado del run, sin PII, secretos ni documentos fuente.\n- Alcance: LAB únicamente; sin producción, merge ni main.' \
+          printf -v BODY '%s\n\n- Gate: %s\n- Commit: %s\n- Run: %s\n- Preflight: **%s**\n- Canal LAB: %s\n- Gate conjunto: **%s**\n- Conteos LAB: clientes **%s**, aseguradoras **%s**, asesores **%s**\n- Conocimiento Aseguradoras persistido operativamente: **%s**\n- Código de bloqueo: %s\n- Checks no aprobados: %s\n- Evidencia: artefacto sanitizado del run, sin PII, secretos ni documentos fuente.\n- Alcance: LAB únicamente; sin producción, merge ni main.' \
             '## Resultado automático sanitizado · Cliente 360 + Aseguradoras' \
-            "$ORBIT360_GATE_ID" "$GITHUB_SHA" "$GITHUB_RUN_ID" "${ORBIT360_PREVIEW_URL:-no disponible}" "$OK" "$CLIENTS" "$INSURERS" "$ADVISORS" "$SYNC" "$ERROR_CODE" "$FAILED_CHECKS"
+            "$ORBIT360_GATE_ID" "$GITHUB_SHA" "$GITHUB_RUN_ID" "$PREFLIGHT_STATUS" "${ORBIT360_PREVIEW_URL:-no disponible}" "$OK" "$CLIENTS" "$INSURERS" "$ADVISORS" "$SYNC" "$ERROR_CODE" "$FAILED_CHECKS"
           gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
 
       - name: Fallar si el gate conjunto no fue aprobado
