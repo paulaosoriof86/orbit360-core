@@ -1,0 +1,74 @@
+name: Orbit 360 Visual Only Gate 20260716
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-visual-only-gate-v20260716.yml"
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-visual-only-gate-v20260716
+  cancel-in-progress: true
+
+jobs:
+  visual_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ORBIT360_PREVIEW_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
+      ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
+      ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+
+    steps:
+      - name: Publicar inicio
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          printf -v BODY '## Gate visual aislado iniciado\n\n- Commit: %s\n- Run: %s\n- Canal LAB ya publicado; sin nueva carga ni deploy.' "$GITHUB_SHA" "$GITHUB_RUN_ID"
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
+
+      - uses: actions/checkout@v4
+
+      - name: Validar verificador
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-gate-visual-clientes-aseguradoras-v20260716-v2.mjs
+
+      - name: Ejecutar recorrido visual
+        id: gate
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.52.0
+          npx playwright install --with-deps chromium
+          node tools/orbit360-gate-visual-clientes-aseguradoras-v20260716-v2.mjs
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-visual-only-gate-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json
+            orbit360-platform/runtime-gate-aseguradoras-v20260716/resultado-sanitizado.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Publicar resultado
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          R="orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json"
+          OK="$(test -f "$R" && jq -r '.ok // false' "$R" || echo false)"
+          STAGE="$(test -f "$R" && jq -r '.stage // "sin_etapa"' "$R" || echo resultado_no_generado)"
+          CODE="$(test -f "$R" && jq -r '(.error // "") | split(":")[0]' "$R" || echo RESULTADO_NO_GENERADO)"
+          printf -v BODY '## Resultado gate visual aislado\n\n- Commit: %s\n- Run: %s\n- Gate: **%s**\n- Etapa: %s\n- Código: %s\n- Canal: %s\n- Sin carga, deploy, merge ni producción.' "$GITHUB_SHA" "$GITHUB_RUN_ID" "$OK" "$STAGE" "$CODE" "$ORBIT360_PREVIEW_URL"
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
+          test "$OK" = true
