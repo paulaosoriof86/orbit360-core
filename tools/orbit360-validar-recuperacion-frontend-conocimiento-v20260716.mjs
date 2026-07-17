@@ -4,8 +4,11 @@ import vm from 'node:vm';
 const ROOT = 'orbit360-platform';
 const PATHS = {
   module: `${ROOT}/modules/aseguradoras.js`,
-  projection: `${ROOT}/modules/aseguradoras-frontend-projection-v20260716.js`,
+  router: `${ROOT}/core/router.js`,
+  legal: `${ROOT}/core/legal.js`,
   pwa: `${ROOT}/core/pwa.js`,
+  access: `${ROOT}/core/access-scope.js`,
+  tenantIndex: `${ROOT}/data/tenant-runtime-config-index.js`,
   config: `${ROOT}/data/tenant-alianzas-soluciones-insurers-p10.js`,
   summary: `${ROOT}/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20260716.js`
 };
@@ -13,44 +16,77 @@ const PATHS = {
 function fail(code, detail = '') {
   throw new Error(`${code}${detail ? `:${detail}` : ''}`);
 }
-
 function check(condition, code, detail = '') {
   if (!condition) fail(code, detail);
 }
-
 function read(path) {
   check(existsSync(path), 'FILE_NOT_FOUND', path);
   return readFileSync(path, 'utf8');
 }
-
 function runBrowserData(source, filename) {
   const sandbox = { window: {} };
   vm.runInNewContext(source, sandbox, { filename });
   return sandbox.window;
 }
+function executableText(text) {
+  return String(text || '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
 
 const moduleSource = read(PATHS.module);
-const projectionSource = read(PATHS.projection);
+const routerSource = read(PATHS.router);
+const legalSource = read(PATHS.legal);
 const pwaSource = read(PATHS.pwa);
+const accessSource = read(PATHS.access);
+const tenantIndexSource = read(PATHS.tenantIndex);
 const configSource = read(PATHS.config);
 const summarySource = read(PATHS.summary);
 
 check(/Orbit\.modules\.aseguradoras\s*=/.test(moduleSource), 'CANONICAL_MODULE_MISSING');
 check(/function\s+ficha\s*\(/.test(moduleSource), 'CANONICAL_FICHA_MISSING');
-check(/dataset\.mode|data-mode/.test(projectionSource), 'FICHA_MODE_PROJECTION_MISSING');
-check(/canonicalRendererPreserved\s*:\s*true/.test(projectionSource), 'CANONICAL_RENDERER_NOT_PRESERVED');
-check(/writesKnowledge\s*:\s*false/.test(projectionSource), 'PROJECTION_WRITE_GUARD_MISSING');
-check(/enablesCotizador\s*:\s*false/.test(projectionSource), 'COTIZADOR_ENABLE_GUARD_MISSING');
-check(/enablesComparativo\s*:\s*false/.test(projectionSource), 'COMPARATIVO_ENABLE_GUARD_MISSING');
-check(/loadMappedSummary/.test(projectionSource), 'MAPPED_SUMMARY_LOADER_MISSING');
-check(/mappedSummaryRows/.test(projectionSource), 'MAPPED_SUMMARY_MERGE_MISSING');
-check(/Mapeado[^\n]*pendiente de sincronización/.test(projectionSource), 'MAPPED_SYNC_STATUS_MISSING');
+check(/__ownerKnowledgeV20260717\s*:\s*true/.test(moduleSource), 'INSURER_OWNER_KNOWLEDGE_MISSING');
+check(/__tenantOrderV20260717\s*:\s*true/.test(moduleSource), 'INSURER_TENANT_ORDER_MISSING');
+check(/__consumerGatesSeparatedV20260717\s*:\s*true/.test(moduleSource), 'INSURER_CONSUMER_GATES_MISSING');
+check(/function\s+knowledgeSources\s*\(/.test(moduleSource), 'INSURER_KNOWLEDGE_MERGE_MISSING');
+check(/function\s+ensureKnowledgeSummaryLoaded\s*\(/.test(moduleSource), 'INSURER_SUMMARY_LOADER_MISSING');
+check(/id="asg-order"/.test(moduleSource), 'INSURER_ORDER_CONTROL_MISSING');
+check(/estado === 'Habilitado para Cotizador'/.test(moduleSource), 'COTIZADOR_EXPLICIT_GATE_MISSING');
+check(/estado === 'Habilitado para Comparativo'/.test(moduleSource), 'COMPARATIVO_EXPLICIT_GATE_MISSING');
+check(!/estado === 'Habilitado para Comparativo' \|\| estado === 'Habilitado para Cotizador'/.test(moduleSource), 'CONSUMER_GATES_NOT_SEPARATED');
 
-check(/function\s+installLegalGate\s*\(/.test(pwaSource), 'LEGAL_IDEMPOTENCY_GUARD_MISSING');
-check(/data-orbit-legal-scope/.test(pwaSource), 'LEGAL_SCOPE_MARKER_MISSING');
-check(/function\s+installMobileNavigation\s*\(/.test(pwaSource), 'MOBILE_NAV_GUARD_MISSING');
-check(/stopImmediatePropagation/.test(pwaSource), 'MOBILE_DUPLICATE_HANDLER_GUARD_MISSING');
-check(/classList\.toggle\('sb-open'/.test(pwaSource), 'MOBILE_BODY_STATE_MISSING');
+check(/function\s+toggleMobile\s*\(/.test(routerSource), 'MOBILE_ROUTER_OWNER_MISSING');
+check(/stopImmediatePropagation/.test(routerSource), 'MOBILE_DUPLICATE_HANDLER_GUARD_MISSING');
+check(/classList\.toggle\('sb-open'/.test(routerSource), 'MOBILE_BODY_STATE_MISSING');
+check(/Orbit\.access\.can\(r, 'view'\)|Orbit\.access\.can\(route, 'view'\)/.test(routerSource), 'ROUTER_ACCESS_GATE_MISSING');
+check(!/aseguradoras-frontend-projection-v20260716\.js/.test(routerSource), 'INSURER_PROJECTION_BRIDGE_STILL_LOADED');
+check(!/aseguradoras-candidate-actions\.js/.test(routerSource), 'INSURER_CANDIDATE_ACTIONS_STILL_LOADED');
+
+check(/__ownerIdempotent\s*:\s*true/.test(legalSource), 'LEGAL_OWNER_IDEMPOTENCY_MISSING');
+check(/data-legal-gate/.test(legalSource), 'LEGAL_SCOPE_MARKER_MISSING');
+check(/queueCallback/.test(legalSource) && /finish\(scope\)/.test(legalSource), 'LEGAL_CALLBACK_QUEUE_MISSING');
+
+const pwaForbidden = [
+  'installLegalGate', 'installMobileNavigation', 'loadRuntimeContracts',
+  'session-multirol-visibility', 'client-canonical-view-projection',
+  'aseguradoras-frontend-projection', 'aseguradoras-candidate-actions'
+];
+const pwaLeaks = pwaForbidden.filter(token => pwaSource.includes(token));
+check(pwaLeaks.length === 0, 'PWA_OPERATIONAL_BOOTSTRAP_FORBIDDEN', pwaLeaks.join(','));
+check(/buildManifest/.test(pwaSource) && /serviceWorker\.register/.test(pwaSource), 'PWA_OWNER_FUNCTIONS_MISSING');
+
+const accessFunctions = [
+  'activeRole', 'actorAdvisorId', 'actorUser', 'assignedRoles', 'canView', 'filter',
+  'canAccessRecord', 'can', 'deriveClientState', 'duplicateCandidates', 'prepareManual',
+  'audit', 'correction', 'scopedStore', 'withScope'
+];
+const missingAccess = accessFunctions.filter(name => !new RegExp(`\\b${name}\\b`).test(accessSource));
+check(missingAccess.length === 0, 'ACCESS_OWNER_SURFACE_INCOMPLETE', missingAccess.join(','));
+check(/countryAllowed/.test(accessSource), 'ACCESS_COUNTRY_GATE_MISSING');
+
+const tenantExecutable = executableText(tenantIndexSource);
+check(!/password|secret|token|credential|numeroCuenta|cuentaBancaria/i.test(tenantExecutable), 'TENANT_INDEX_SENSITIVE_PAYLOAD');
+check(/alianzas-soluciones/.test(tenantIndexSource) && /insurerConfigSrc/.test(tenantIndexSource), 'TENANT_RUNTIME_INDEX_MISSING');
 
 const configWindow = runBrowserData(configSource, PATHS.config);
 const configs = configWindow.OrbitTenantInsurerConfigsP10 || [];
@@ -94,8 +130,12 @@ for (const pattern of forbidden) {
 const result = {
   ok: true,
   canonicalRendererPreserved: true,
-  legalIdempotencyGuard: true,
-  mobileNavigationGuard: true,
+  insurerKnowledgeOwner: true,
+  tenantOrderOwner: true,
+  consumerGatesSeparated: true,
+  legalIdempotencyOwner: true,
+  mobileNavigationOwner: true,
+  pwaOwnerOnly: true,
   preferredCountryOrder: config.preferredInsurerCountryOrder,
   mappedInsurers: insurers.length,
   mappedSources: sources.length,
