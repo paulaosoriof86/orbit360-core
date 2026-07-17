@@ -13,36 +13,12 @@
     "tenant": "alianzas-soluciones"
   },
   "canonicalOwners": [
-    {
-      "id": "pwa",
-      "path": "orbit360-platform/core/pwa.js",
-      "requiredTokens": ["buildManifest", "serviceWorker.register"]
-    },
-    {
-      "id": "router",
-      "path": "orbit360-platform/core/router.js",
-      "requiredTokens": ["RUNTIME_CONTRACTS", "loadRuntimeContracts", "toggleMobile", "Orbit.access.can"]
-    },
-    {
-      "id": "legal",
-      "path": "orbit360-platform/core/legal.js",
-      "requiredTokens": ["__ownerIdempotent", "pendingScopes", "doneScopes", "data-legal-gate"]
-    },
-    {
-      "id": "access",
-      "path": "orbit360-platform/core/access-scope.js",
-      "requiredTokens": ["deriveClientState", "duplicateCandidates", "prepareManual", "scopedStore", "withScope"]
-    },
-    {
-      "id": "clientProjection",
-      "path": "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
-      "requiredTokens": ["Orbit.clientProjection", "project", "get"]
-    },
-    {
-      "id": "insurers",
-      "path": "orbit360-platform/modules/aseguradoras.js",
-      "requiredTokens": ["__ownerKnowledgeV20260717", "__tenantOrderV20260717", "__consumerGatesSeparatedV20260717", "knowledgeSources"]
-    }
+    {"id":"pwa","path":"orbit360-platform/core/pwa.js","requiredTokens":["buildManifest","serviceWorker.register"]},
+    {"id":"router","path":"orbit360-platform/core/router.js","requiredTokens":["RUNTIME_CONTRACTS","loadRuntimeContracts","toggleMobile","Orbit.access.can"]},
+    {"id":"legal","path":"orbit360-platform/core/legal.js","requiredTokens":["__ownerIdempotent","pendingScopes","doneScopes","data-legal-gate"]},
+    {"id":"access","path":"orbit360-platform/core/access-scope.js","requiredTokens":["deriveClientState","duplicateCandidates","prepareManual","scopedStore","withScope"]},
+    {"id":"clientProjection","path":"orbit360-platform/core/client-canonical-view-projection-v20260716.js","requiredTokens":["Orbit.clientProjection","project","get"]},
+    {"id":"insurers","path":"orbit360-platform/modules/aseguradoras.js","requiredTokens":["__ownerKnowledgeV20260717","__tenantOrderV20260717","__consumerGatesSeparatedV20260717","knowledgeSources"]}
   ],
   "retiredRuntimeArtifacts": [
     "orbit360-platform/core/empalme-v1251-runtime.js",
@@ -51,130 +27,86 @@
     "orbit360-platform/data/import-initial-profiles.js",
     "orbit360-platform/modules/importar-initial-tenant-lab.js"
   ],
-  "gates": [
-    {
-      "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.6",
-      "runtimeVersion": "20260717-2",
-      "block": 1,
-      "status": "ACTIVE_PENDING_RUNTIME_GATE",
-      "diagnosticRule": "The gate may authenticate only after URL, loader, Firebase and owner runtime remain canonical and stable.",
-      "reconciliation": {
-        "date": "2026-07-17",
-        "classifications": [
-          "PIPELINE_MECHANISM_FAILURE",
-          "FUNCTIONAL_DEFECT",
-          "VALIDATOR_STALE"
-        ],
-        "scope": "LAB canonical runtime navigation and version parity",
-        "rootCause": "The preview requested runtime 20260717-2 while the loader required 20260716-2. The gate ignored the runtime query parameter and could dispatch Auth in a transient document that was then replaced, losing the pending login state.",
-        "corrections": [
-          "Unify preview, loader, Service Worker, PWA, workflow and gate on runtime 20260717-2",
-          "Require a stable canonical document before Auth",
-          "Validate runtime version parity in the preflight before secrets, Firebase, Hosting or Playwright"
-        ],
-        "preserved": [
-          "Orbit.store",
-          "core/auth.js",
-          "core/legal.js",
-          "Firebase credentials and configuration",
-          "Cliente 360 renderer",
-          "Aseguradoras renderer",
-          "414 clientes",
-          "26 aseguradoras",
-          "7 asesores"
-        ]
-      },
-      "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
-      "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-      "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
-      "validators": [
-        "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs",
-        "tools/orbit360-runtime-check-client360-v20260716.mjs",
-        "tools/orbit360-gate-runtime-crm-v20260716.mjs",
-        "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
-        "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js"
+  "gates": [{
+    "gateId": "block1-client360-insurers-lab-v20260717",
+    "contractVersion": "1.0.7",
+    "runtimeVersion": "20260717-2",
+    "block": 1,
+    "status": "ACTIVE_PENDING_RUNTIME_GATE",
+    "diagnosticRule": "Reuse the canonical owner snapshot already approved before Auth; do not repeat the same owner wait.",
+    "reconciliation": {
+      "date": "2026-07-17",
+      "classifications": ["PIPELINE_MECHANISM_FAILURE"],
+      "scope": "canonical owner handoff",
+      "rootCause": "The canonical runtime step had already approved Store, Auth and Router. A redundant animation-frame wait repeated the Auth-owner condition and expired during bootstrap thread saturation.",
+      "corrections": [
+        "Return the approved owner/session snapshot from canonical runtime",
+        "Reuse that snapshot as the Auth initial state",
+        "Remove the redundant owner-ready wait",
+        "Use bounded polling only for state changes after dispatch"
       ],
-      "requiredFiles": [
-        "orbit360-platform/ays-lab-preview.html",
-        "orbit360-platform/modules/cliente360.js",
-        "orbit360-platform/modules/aseguradoras.js",
-        "orbit360-platform/core/router.js",
-        "orbit360-platform/core/legal.js",
-        "orbit360-platform/core/access-scope.js",
-        "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
-        "orbit360-platform/data/tenant-runtime-config-index.js"
-      ],
-      "runtimeGraphFiles": [
-        "orbit360-platform/ays-lab-preview.html",
-        "orbit360-platform/index.html",
-        "orbit360-platform/sw.js",
-        "orbit360-platform/core/pwa.js",
-        "orbit360-platform/core/backend-lab-loader.js",
-        "orbit360-platform/core/backend-lab-init.js",
-        "orbit360-platform/core/backend-lab-auth-guard.js",
-        "orbit360-platform/core/router.js",
-        "orbit360-platform/core/legal.js",
-        "orbit360-platform/core/access-scope.js",
-        "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
-        "orbit360-platform/modules/cliente360.js",
-        "orbit360-platform/modules/aseguradoras.js",
-        "orbit360-platform/data/tenant-runtime-config-index.js"
-      ],
-      "runtimeVersionContracts": [
-        {
-          "path": "orbit360-platform/ays-lab-preview.html",
-          "requiredTokens": ["content=\"20260717-2\"", "sw.js?v=20260717-2", "runtime=20260717-2"]
-        },
-        {
-          "path": "orbit360-platform/core/backend-lab-loader.js",
-          "requiredTokens": ["var LAB_RUNTIME = '20260717-2'", "runtimeVersion: LAB_RUNTIME"]
-        },
-        {
-          "path": "orbit360-platform/sw.js",
-          "requiredTokens": ["var CACHE = 'orbit360-v20260717-2'", "var BUILD = '20260717-2'"]
-        },
-        {
-          "path": "orbit360-platform/core/pwa.js",
-          "requiredTokens": ["var RUNTIME_BUILD = '20260717-2'", "serviceWorker.register('sw.js?v=' + RUNTIME_BUILD)"]
-        },
-        {
-          "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
-          "requiredTokens": ["ORBIT360_EXPECTED_RUNTIME || '20260717-2'", "contractVersion: '1.0.6'", "canonicalRuntimeStable"]
-        },
-        {
-          "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
-          "requiredTokens": ["ORBIT360_EXPECTED_RUNTIME: 20260717-2", "CANONICAL_RUNTIME_VERSION"]
-        }
-      ],
-      "forbiddenRuntimeReferences": [
-        "aseguradoras-candidate-actions.js",
-        "aseguradoras-frontend-projection-v20260716.js",
-        "empalme-v1251-runtime.js",
-        "import-initial-profiles.js",
-        "importar-initial-tenant-lab.js",
-        "installLegalGate",
-        "installMobileNavigation",
-        "asg-order-v20260716",
-        "asg-knowledge-projection-v20260716"
-      ],
-      "environment": {
-        "branch": "ays/backend-tenant-lab-v99-20260703",
-        "firebaseProjectId": "ays-orbit-360-lab",
-        "hostingChannel": "orbit360-ays-lab"
-      },
-      "expectedAggregates": {
-        "clientes": 414,
-        "aseguradoras": 26,
-        "asesores": 7
-      },
-      "runtimeViews": [
-        "direccion_desktop",
-        "operativo_tablet",
-        "asesor_mobile"
-      ],
-      "successEvidence": "orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json",
-      "successPredicate": "ok === true"
-    }
-  ]
+      "preserved": ["Orbit.store","core/auth.js","core/legal.js","Cliente 360 renderer","Aseguradoras renderer","414 clientes","26 aseguradoras","7 asesores"]
+    },
+    "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+    "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
+    "validators": [
+      "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs",
+      "tools/orbit360-runtime-check-client360-v20260716.mjs",
+      "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+      "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+      "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js"
+    ],
+    "requiredFiles": [
+      "orbit360-platform/ays-lab-preview.html",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/core/legal.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
+      "orbit360-platform/data/tenant-runtime-config-index.js"
+    ],
+    "runtimeGraphFiles": [
+      "orbit360-platform/ays-lab-preview.html",
+      "orbit360-platform/index.html",
+      "orbit360-platform/sw.js",
+      "orbit360-platform/core/pwa.js",
+      "orbit360-platform/core/backend-lab-loader.js",
+      "orbit360-platform/core/backend-lab-init.js",
+      "orbit360-platform/core/backend-lab-auth-guard.js",
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/core/legal.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/data/tenant-runtime-config-index.js"
+    ],
+    "runtimeVersionContracts": [
+      {"path":"orbit360-platform/ays-lab-preview.html","requiredTokens":["content=\"20260717-2\"","sw.js?v=20260717-2","runtime=20260717-2"]},
+      {"path":"orbit360-platform/core/backend-lab-loader.js","requiredTokens":["var LAB_RUNTIME = '20260717-2'","runtimeVersion: LAB_RUNTIME"]},
+      {"path":"orbit360-platform/sw.js","requiredTokens":["var CACHE = 'orbit360-v20260717-2'","var BUILD = '20260717-2'"]},
+      {"path":"orbit360-platform/core/pwa.js","requiredTokens":["var RUNTIME_BUILD = '20260717-2'","serviceWorker.register('sw.js?v=' + RUNTIME_BUILD)"]},
+      {"path":"tools/orbit360-gate-runtime-crm-v20260716.mjs","requiredTokens":["ORBIT360_EXPECTED_RUNTIME || '20260717-2'","contractVersion: '1.0.7'","canonicalAuthOwnerHandoff","authentication_owner_contract_reuse"]},
+      {"path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml","requiredTokens":["ORBIT360_EXPECTED_RUNTIME: 20260717-2","CANONICAL_RUNTIME_VERSION"]}
+    ],
+    "forbiddenRuntimeReferences": [
+      "aseguradoras-candidate-actions.js",
+      "aseguradoras-frontend-projection-v20260716.js",
+      "empalme-v1251-runtime.js",
+      "import-initial-profiles.js",
+      "importar-initial-tenant-lab.js",
+      "installLegalGate",
+      "installMobileNavigation",
+      "asg-order-v20260716",
+      "asg-knowledge-projection-v20260716",
+      "authentication_owner_ready"
+    ],
+    "environment": {"branch":"ays/backend-tenant-lab-v99-20260703","firebaseProjectId":"ays-orbit-360-lab","hostingChannel":"orbit360-ays-lab"},
+    "expectedAggregates": {"clientes":414,"aseguradoras":26,"asesores":7},
+    "runtimeViews": ["direccion_desktop","operativo_tablet","asesor_mobile"],
+    "successEvidence": "orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json",
+    "successPredicate": "ok === true"
+  }]
 }
