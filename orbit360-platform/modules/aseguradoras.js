@@ -17,7 +17,37 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.aseguradoras = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
-  let host, q = '', fPais = 'TODOS', fRamo = '', fEstado = 'TODAS';
+  const ORDER_KEY = 'orbit360_aseguradoras_order';
+  let host, q = '', fPais = 'TODOS', fRamo = '', fEstado = 'TODAS', orderMode = readOrder(), knowledgeSummaryLoading = false;
+  function clean(value) { return String(value == null ? '' : value).trim(); }
+  function norm(value) { return clean(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); }
+  function tenantId() {
+    try {
+      const backend = window.OrbitBackend || window.ORBIT_BACKEND || {};
+      const tenant = Orbit.tenant && Orbit.tenant.get ? (Orbit.tenant.get() || {}) : {};
+      return clean(backend.tenantId || backend.tenant || tenant.tenantId || tenant.id || tenant.slug);
+    } catch (e) { return ''; }
+  }
+  function tenantInsurerConfig() {
+    const id = tenantId();
+    return [].concat(window.OrbitTenantInsurerConfigsP10 || []).find(item => clean(item && item.tenantId) === id) || {};
+  }
+  function preferredCountries() {
+    const configured = [].concat(tenantInsurerConfig().preferredInsurerCountryOrder || []).map(item => clean(item).toUpperCase()).filter(Boolean);
+    if (configured.length) return configured;
+    return [].concat(Orbit.PAISES || []).map(item => clean(item && item.id).toUpperCase()).filter(id => id && id !== 'TODOS');
+  }
+  function orderStorageKey() { return ORDER_KEY + ':' + (tenantId() || 'default'); }
+  function readOrder() { try { return localStorage.getItem(orderStorageKey()) || 'country'; } catch (e) { return 'country'; } }
+  function saveOrder(value) { orderMode = value || 'country'; try { localStorage.setItem(orderStorageKey(), orderMode); } catch (e) {} }
+  function countryRank(country) { const idx = preferredCountries().indexOf(clean(country).toUpperCase()); return idx >= 0 ? idx : 999; }
+  function recentValue(row) { const value = row && (row.updatedAt || row.conocimientoActualizadoAt || row.ultimaRevision || row.fuenteFecha || row.createdAt); const time = value ? Date.parse(value) : 0; return Number.isFinite(time) ? time : 0; }
+  function compareInsurers(a, b) {
+    if (orderMode === 'name') return clean(a.nombre).localeCompare(clean(b.nombre), 'es');
+    if (orderMode === 'active') return Number(b.vinculada !== false) - Number(a.vinculada !== false) || countryRank(a.pais) - countryRank(b.pais) || clean(a.nombre).localeCompare(clean(b.nombre), 'es');
+    if (orderMode === 'recent') return recentValue(b) - recentValue(a) || clean(a.nombre).localeCompare(clean(b.nombre), 'es');
+    return countryRank(a.pais) - countryRank(b.pais) || clean(a.nombre).localeCompare(clean(b.nombre), 'es');
+  }
   function paisOK(p) { return !Orbit.pais || Orbit.pais === 'TODOS' || p === Orbit.pais; }
   function up(id, patch) { S().update('aseguradoras', id, patch); }
   function reload() { if (host) render(host); }
@@ -39,6 +69,7 @@ Orbit.modules.aseguradoras = (function () {
     try { const asesorId = Orbit.session && Orbit.session.asesorId && Orbit.session.asesorId(); return asesorId ? (S().get('asesores', asesorId) || {}) : {}; } catch (e) { return {}; }
   }
   function canEdit() {
+    try { if (Orbit.access && Orbit.access.can) return Orbit.access.can('aseguradoras', 'edit') === true; } catch (e) {}
     const a = asesorActivo();
     if ((a.restricciones || []).indexOf('aseguradoras_editar') >= 0) return false;
     if ((a.permisosExtra || []).indexOf('aseguradoras_editar') >= 0) return true;
@@ -56,7 +87,7 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ===================== MOTOR DE FUENTES/CONOCIMIENTO (Tarifas) ===================== */
   const SOURCE_TYPES = ['tarifario', 'cotizacion_ejemplo', 'poliza_ejemplo', 'formulario', 'manual', 'circular'];
-  const SOURCE_STATES = ['Documento recibido', 'Lectura preparada', 'Propuesta lista para revisar', 'Requiere validación', 'Conocimiento incompleto', 'Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'];
+  const SOURCE_STATES = ['Documento recibido', 'Mapeado', 'Persistido', 'Requiere validación', 'Validado', 'Conocimiento incompleto', 'Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'];
   // dimensiones extendidas — no todas se capturan en la UI de docs aún (país/moneda/ramo sí);
   // el resto queda disponible en el contrato para consumidores/importadores futuros.
   const DIMENSION_KEYS = ['pais', 'moneda', 'ramo', 'producto', 'familiaProducto', 'subtipoProducto', 'segmento', 'tipoRiesgo', 'tipoVehiculo', 'usoVehiculo', 'plan'];
@@ -75,6 +106,85 @@ Orbit.modules.aseguradoras = (function () {
   function sourceDimensions(d) { const o = {}; DIMENSION_KEYS.forEach(k => { if (d[k]) o[k] = d[k]; }); return o; }
   function sourceCombinationKey(d) { return DIMENSION_KEYS.map(k => d[k] || '—').join(' · '); }
   function groupLabel(key) { return key; }
+  function sourceIdentity(item) { return clean(item && (item.documentId || item.sourceDocumentId || item.id || item.nombre || item.fileName || item.archivo)).toLowerCase(); }
+  function visibleState(value) {
+    const key = norm(value).replace(/ /g, '_');
+    if (/habilitado.*cotizador/.test(key)) return 'Habilitado para Cotizador';
+    if (/habilitado.*comparativo/.test(key)) return 'Habilitado para Comparativo';
+    if (/requiere.*valid|requires.*valid/.test(key)) return 'Requiere validación';
+    if (/validado|validated/.test(key)) return 'Validado';
+    if (/persist|metadata_persisted/.test(key)) return 'Persistido';
+    if (/mapeado|mapped|lectura_preparada|propuesta_lista/.test(key)) return 'Mapeado';
+    if (/incomplet|conflict|error/.test(key)) return 'Conocimiento incompleto';
+    return clean(value) || 'Documento recibido';
+  }
+  function tenantKnowledgeSummary() {
+    const id = tenantId();
+    return [].concat(window.OrbitTenantInsurerKnowledgeSummaries || []).find(item => clean(item && item.tenantId) === id) || null;
+  }
+  function insurerNames(row) { return [row && row.nombre, row && row.canonicalName, row && row.displayName].concat(row && row.aliases || []).map(norm).filter(Boolean); }
+  function mappedSummaryFor(row) {
+    const registry = tenantKnowledgeSummary();
+    if (!registry) return null;
+    const names = insurerNames(row);
+    return [].concat(registry.insurers || []).find(item => [item && item.insurerName].concat(item && item.aliases || []).map(norm).filter(Boolean).some(name => names.indexOf(name) >= 0)) || null;
+  }
+  function mappedSummaryRows(row) {
+    const summary = mappedSummaryFor(row);
+    return [].concat(summary && summary.sources || []).map(item => Object.assign({}, item, {
+      id: clean(item.id || item.documentId || item.sourceDocumentId),
+      nombre: clean(item.nombre || item.fileName || item.archivo || item.documentId) || 'Fuente mapeada',
+      estado: visibleState(item.estado || item.status || 'Mapeado'),
+      sourceOrigin: 'Mapeado'
+    }));
+  }
+  function persistedKnowledgeRows(row) {
+    try {
+      const service = Orbit.services && Orbit.services.aseguradorasKnowledgeP09;
+      const result = service && typeof service.read === 'function' ? service.read({ tenantId: tenantId(), aseguradoraId: row.id }) : null;
+      if (!result || result.ok === false) return [];
+      return [].concat(result.sources || []).map(item => Object.assign({}, item, { estado: visibleState(item.estado || item.status || 'Persistido'), sourceOrigin: 'Persistido' }));
+    } catch (e) { return []; }
+  }
+  function knowledgeSources(row) {
+    const map = Object.create(null), order = [];
+    [mappedSummaryRows(row), persistedKnowledgeRows(row), [].concat(row.docs || []).map(item => Object.assign({}, item, { sourceOrigin: 'Ficha' }))].forEach(group => {
+      group.forEach(item => {
+        const key = sourceIdentity(item) || ('source_' + order.length);
+        if (!map[key]) { map[key] = {}; order.push(key); }
+        map[key] = Object.assign({}, map[key], item, { estado: visibleState(item.estado || item.status) });
+      });
+    });
+    return order.map(key => map[key]);
+  }
+  function configuredKnowledgeSummarySrc() { return clean(tenantInsurerConfig().knowledgeSummarySrc); }
+  function refreshOwnerView() {
+    const open = document.getElementById('asg-ficha');
+    if (open && open.dataset.id && S().get('aseguradoras', open.dataset.id)) ficha(open.dataset.id);
+    else reload();
+  }
+  function ensureKnowledgeSummaryLoaded() {
+    if (tenantKnowledgeSummary() || knowledgeSummaryLoading) return;
+    const src = configuredKnowledgeSummarySrc();
+    if (!src || document.querySelector('script[data-orbit-insurer-summary-owner]')) return;
+    knowledgeSummaryLoading = true;
+    const script = document.createElement('script');
+    script.src = src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260717-owner';
+    script.async = false;
+    script.setAttribute('data-orbit-insurer-summary-owner', tenantId() || 'tenant');
+    script.onload = function () { knowledgeSummaryLoading = false; refreshOwnerView(); };
+    script.onerror = function () { knowledgeSummaryLoading = false; };
+    document.head.appendChild(script);
+  }
+  function extraKnowledgeHtml(row) {
+    const rows = knowledgeSources(row).filter(item => item.sourceOrigin !== 'Ficha');
+    if (!rows.length) return '<div class="cfg-note" style="margin-top:10px">Sin conocimiento adicional mapeado o persistido para esta aseguradora.</div>';
+    return '<div class="asg-sec-t" style="margin-top:14px">🧠 Fuentes mapeadas y persistidas</div><div style="display:grid;gap:7px">' + rows.map(item => {
+      const nd = normalizarFuente(item, row), ev = evaluarFuente(nd);
+      const dims = [nd.pais, nd.moneda, nd.ramo, nd.producto].filter(Boolean).join(' · ') || 'Dimensiones pendientes';
+      return '<div class="asg-row" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><span style="flex:1"><b>' + U.esc(nd.nombre || 'Fuente') + '</b><small class="muted" style="display:block">' + U.esc(item.sourceOrigin || 'Conocimiento') + ' · ' + U.esc(dims) + '</small></span><span class="badge ' + (ev.estado.indexOf('Habilitado') === 0 ? 'ok' : ev.estado === 'Conocimiento incompleto' ? 'danger' : 'neutral') + '">' + U.esc(ev.estado) + '</span></div>';
+    }).join('') + '</div>';
+  }
   /* Evalúa una fuente y devuelve estado + capacidades de consumo (no solo texto).
      Suficiencia mínima: país + moneda + ramo. Sin eso, "Conocimiento incompleto"
      sin importar el estado que el usuario haya declarado — y NINGUNA capacidad. */
@@ -82,11 +192,11 @@ Orbit.modules.aseguradoras = (function () {
     const completa = !!(d.pais && d.moneda && d.ramo);
     const estado = completa ? (d.estado || 'Documento recibido') : 'Conocimiento incompleto';
     const habCot = completa && estado === 'Habilitado para Cotizador';
-    const habComp = completa && (estado === 'Habilitado para Comparativo' || estado === 'Habilitado para Cotizador');
+    const habComp = completa && estado === 'Habilitado para Comparativo';
     return {
       estado,
-      sirveParaTarifas: completa && ['Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'].indexOf(estado) >= 0,
-      sirveParaReglas: completa && d.tipo === 'tarifario' && estado !== 'Requiere validación',
+      sirveParaTarifas: habCot || habComp,
+      sirveParaReglas: completa && d.tipo === 'tarifario' && (habCot || habComp),
       sirveParaPresentacion: completa && (d.tipo === 'cotizacion_ejemplo' || d.tipo === 'poliza_ejemplo'),
       sirveParaComparativo: habComp,
       sirveParaCondiciones: completa && ['formulario', 'manual', 'circular'].indexOf(d.tipo) >= 0,
@@ -96,20 +206,20 @@ Orbit.modules.aseguradoras = (function () {
     };
   }
   function resumenFuentes(a) {
-    const docs = (a.docs || []).map(d => normalizarFuente(d, a));
+    const docs = knowledgeSources(a).map(d => normalizarFuente(d, a));
     const out = {}; SOURCE_STATES.concat(['Conocimiento incompleto']).forEach(s => out[s] = 0);
     docs.forEach(d => { const e = evaluarFuente(d).estado; out[e] = (out[e] || 0) + 1; });
     return out;
   }
   function resumenGrupos(a) {
-    const docs = (a.docs || []).map(d => normalizarFuente(d, a));
+    const docs = knowledgeSources(a).map(d => normalizarFuente(d, a));
     const g = {};
     docs.forEach(d => { const k = sourceCombinationKey(d); (g[k] = g[k] || []).push(d); });
     return Object.keys(g).map(k => {
       const evs = g[k].map(evaluarFuente);
       const incompleto = evs.some(e => e.estado === 'Conocimiento incompleto');
       // habilitado de grupo exige CONJUNTO suficiente: al menos una fuente con tarifas/reglas Y ninguna incompleta
-      const habilitado = !incompleto && evs.some(e => e.sirveParaTarifas) && evs.some(e => e.sirveParaReglas || e.sirveParaPresentacion);
+      const habilitado = !incompleto && evs.some(e => e.habilitadoCotizador || e.sirveParaComparativo);
       return { key: k, label: groupLabel(k), docs: g[k], estado: incompleto ? 'Conocimiento incompleto' : (habilitado ? 'Habilitado' : 'Pendiente') };
     });
   }
@@ -117,6 +227,7 @@ Orbit.modules.aseguradoras = (function () {
   /* ===================== DIRECTORIO ===================== */
   function render(h) {
     host = h;
+    ensureKnowledgeSummaryLoaded();
     const todas = S().all('aseguradoras');
     let all = todas.filter(a => paisOK(a.pais));
     if (fPais !== 'TODOS') all = all.filter(a => a.pais === fPais);
@@ -129,6 +240,7 @@ Orbit.modules.aseguradoras = (function () {
         || (a.contactos || []).some(c => (c.nombre || '').toLowerCase().includes(t))
         || (a.ramos || []).some(r => r.toLowerCase().includes(t)));
     }
+    all = all.slice().sort(compareInsurers);
     const ramosAll = Array.from(new Set(todas.reduce((acc, a) => acc.concat(a.ramos || []), []))).sort();
     const base = todas.filter(a => paisOK(a.pais));
     const vinc = base.filter(a => a.vinculada !== false);
@@ -153,6 +265,7 @@ Orbit.modules.aseguradoras = (function () {
         <select id="asg-fpais" class="o-sel" style="width:120px"><option value="TODOS" ${fPais === 'TODOS' ? 'selected' : ''}>Todo país</option><option value="GT" ${fPais === 'GT' ? 'selected' : ''}>GT</option><option value="CO" ${fPais === 'CO' ? 'selected' : ''}>CO</option></select>
         <select id="asg-fram" class="o-sel" style="width:160px"><option value="">Todo ramo</option>${ramosAll.map(r => `<option ${r === fRamo ? 'selected' : ''}>${r}</option>`).join('')}</select>
         <select id="asg-fest" class="o-sel" style="width:140px"><option value="TODAS" ${fEstado === 'TODAS' ? 'selected' : ''}>Todas</option><option value="ACTIVAS" ${fEstado === 'ACTIVAS' ? 'selected' : ''}>Activas</option><option value="INACTIVAS" ${fEstado === 'INACTIVAS' ? 'selected' : ''}>Inactivas</option></select>
+        <select id="asg-order" class="o-sel" style="width:190px"><option value="country" ${orderMode === 'country' ? 'selected' : ''}>País preferido primero</option><option value="name" ${orderMode === 'name' ? 'selected' : ''}>Nombre A–Z</option><option value="active" ${orderMode === 'active' ? 'selected' : ''}>Activas primero</option><option value="recent" ${orderMode === 'recent' ? 'selected' : ''}>Actualización reciente</option></select>
       </div>
       <div class="asg-grid">${all.map(a => card(a)).join('') || '<div class="muted" style="padding:16px">Sin resultados para este filtro.</div>'}</div>
     </div>`;
@@ -162,6 +275,7 @@ Orbit.modules.aseguradoras = (function () {
     host.querySelector('#asg-fpais').addEventListener('change', e => { fPais = e.target.value; render(host); });
     host.querySelector('#asg-fram').addEventListener('change', e => { fRamo = e.target.value; render(host); });
     host.querySelector('#asg-fest').addEventListener('change', e => { fEstado = e.target.value; render(host); });
+    host.querySelector('#asg-order').addEventListener('change', e => { saveOrder(e.target.value); render(host); });
     host.querySelectorAll('[data-asg]').forEach(el => el.addEventListener('click', e => { if (e.target.closest('.asg-switch') || e.target.closest('[data-act]')) return; ficha(el.dataset.asg); }));
     host.querySelectorAll('[data-toggle]').forEach(t => t.addEventListener('change', async e => {
       e.stopPropagation();
@@ -249,6 +363,7 @@ Orbit.modules.aseguradoras = (function () {
   }
 
   function ficha(id, startEdit) {
+    ensureKnowledgeSummaryLoaded();
     const a = S().get('aseguradoras', id); if (!a) return;
     const wantEdit = !!startEdit && canEdit();
     if ((Orbit.route && Orbit.route.params && Orbit.route.params.ficha) !== id) { history.replaceState(null, '', '#/aseguradoras?ficha=' + id); if (Orbit.route) Orbit.route.params = Object.assign({}, Orbit.route.params, { ficha: id }); }
@@ -556,6 +671,7 @@ Orbit.modules.aseguradoras = (function () {
       <div style="margin-top:12px;display:grid;gap:8px">
         ${grupos.map(g => `<div class="asg-row" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><span style="flex:1;font-size:12px">${U.esc(g.label)}</span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}" style="font-size:10px">${g.estado}</span><span class="muted" style="font-size:11px">${g.docs.length} doc(s)</span></div>`).join('') || ''}
       </div>
+      ${extraKnowledgeHtml(a)}
       ${editing ? '<button class="btn ghost sm" id="af-imp-doc2" style="margin-top:12px">✨ Importar documento tarifario</button>' : ''}
       ${ramos.length ? tablaTasasRamo(a, ramoSel, editing) : '<div class="cfg-note" style="margin-top:12px">Agregá al menos un ramo en la pestaña Productos y planes para configurar su tabla de tasas automáticas.</div>'}
     </div>`;
@@ -741,6 +857,9 @@ Orbit.modules.aseguradoras = (function () {
 
   return {
     render, ficha, kpi,
-    _fuentes: { SOURCE_TYPES, SOURCE_STATES, DIMENSION_KEYS, normalizarFuente, evaluarFuente, resumenFuentes, resumenGrupos, sourceDimensions, sourceCombinationKey, groupLabel, legacyType }
+    __ownerKnowledgeV20260717: true,
+    __tenantOrderV20260717: true,
+    __consumerGatesSeparatedV20260717: true,
+    _fuentes: { SOURCE_TYPES, SOURCE_STATES, DIMENSION_KEYS, normalizarFuente, evaluarFuente, resumenFuentes, resumenGrupos, knowledgeSources, sourceDimensions, sourceCombinationKey, groupLabel, legacyType }
   };
 })();
