@@ -61,6 +61,7 @@ jobs:
           test -f orbit360-platform/modules/cliente360.js
           test -f orbit360-platform/core/client-canonical-view-projection-v20260716.js
           test -f orbit360-platform/modules/aseguradoras.js
+          test -f orbit360-platform/modules/aseguradoras-candidate-actions.js
           test -f orbit360-platform/modules/aseguradoras-frontend-projection-v20260716.js
           test -f tools/orbit360-runtime-check-client360-v20260716.mjs
           test -f tools/orbit360-gate-runtime-crm-v20260716.mjs
@@ -75,6 +76,7 @@ jobs:
           node --check orbit360-platform/core/session-multirol-visibility-v20260716.js
           node --check orbit360-platform/modules/cliente360.js
           node --check orbit360-platform/modules/aseguradoras.js
+          node --check orbit360-platform/modules/aseguradoras-candidate-actions.js
           node --check orbit360-platform/modules/aseguradoras-frontend-projection-v20260716.js
           node --check tools/orbit360-runtime-check-client360-v20260716.mjs
           node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
