@@ -4,14 +4,46 @@
   'use strict';
   let attempts = 0;
 
-  function loadScript(src, marker, ready) {
-    if (ready && ready()) return;
-    if (document.querySelector('script[' + marker + ']')) return;
+  function loadScript(src, marker, ready, done) {
+    if (ready && ready()) { if (done) done(); return; }
+    const existing = document.querySelector('script[' + marker + ']');
+    if (existing) {
+      if (!done) return;
+      const started = Date.now();
+      (function waitExisting() {
+        if (!ready || ready()) { done(); return; }
+        if (Date.now() - started < 8000) setTimeout(waitExisting, 80);
+      })();
+      return;
+    }
     const script = document.createElement('script');
     script.src = src;
     script.async = false;
     script.setAttribute(marker, '1');
+    if (done) script.onload = done;
     document.head.appendChild(script);
+  }
+
+  function tenantKnowledgeConfigReady() {
+    return [].concat(window.OrbitTenantInsurerConfigsP10 || []).some(function (item) {
+      return item && item.tenantId === 'alianzas-soluciones' && item.knowledgeSummarySrc;
+    });
+  }
+
+  function loadTenantKnowledgeConfig(done) {
+    loadScript(
+      'core/tenant-insurer-config-p10.js?v=20260716-3',
+      'data-orbit-tenant-insurer-config-core-v20260716',
+      function () { return window.Orbit && Orbit.tenantInsurerConfigP10; },
+      function () {
+        loadScript(
+          'data/tenant-alianzas-soluciones-insurers-p10.js?v=20260716-3',
+          'data-orbit-tenant-insurer-config-ays-v20260716',
+          tenantKnowledgeConfigReady,
+          done
+        );
+      }
+    );
   }
 
   function loadRuntimeContracts() {
@@ -25,11 +57,13 @@
       'data-orbit-client-projection-v20260716',
       function () { return window.Orbit && Orbit.clientCanonicalViewProjectionV20260716; }
     );
-    loadScript(
-      'modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-2',
-      'data-orbit-insurer-projection-v20260716',
-      function () { return window.Orbit && Orbit.aseguradorasFrontendProjectionV20260716; }
-    );
+    loadTenantKnowledgeConfig(function () {
+      loadScript(
+        'modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-3',
+        'data-orbit-insurer-projection-v20260716',
+        function () { return window.Orbit && Orbit.aseguradorasFrontendProjectionV20260716; }
+      );
+    });
   }
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
