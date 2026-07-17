@@ -18,6 +18,9 @@ window.Orbit = window.Orbit || {};
 Orbit.legal = (function () {
   const AKEY = 'orbit360_legal_aceptaciones';
   const VERSION = '2.0';
+  const pendingScopes = Object.create(null);
+  const doneScopes = Object.create(null);
+  const callbacks = Object.create(null);
 
   function pais() { try { return (Orbit.tenant && Orbit.tenant.get && Orbit.tenant.get().paisDefault) || Orbit.pais || 'GT'; } catch (e) { return 'GT'; } }
   function empresa() { try { return (Orbit.tenant && Orbit.tenant.get && Orbit.tenant.get().nombre) || 'el Intermediario'; } catch (e) { return 'el Intermediario'; } }
@@ -39,12 +42,9 @@ Orbit.legal = (function () {
     return 'la autoridad de protección de datos competente';
   }
 
-  /* catálogo de cláusulas — texto legal estructurado por país.
-     Cada cláusula: { ic, titulo, intro, bloques:[{h, p?, items?}], meta:{...} } */
   function catalogo() {
     const p = pais(), norma = normaDatos(p), L = leyPais(p), emp = empresa();
     return {
-      /* ---------------- 1. CONFIDENCIALIDAD (interno) ---------------- */
       confidencialidad: {
         ic: '🔒', titulo: 'Acuerdo de confidencialidad y manejo de información',
         intro: 'Este acuerdo regula el acceso del colaborador a la información confidencial contenida y gestionada en la plataforma Orbit 360 en el marco de su relación con ' + emp + '.',
@@ -62,7 +62,6 @@ Orbit.legal = (function () {
         meta: { ley: L.ley, foro: L.foro }
       },
 
-      /* ---------------- 2. TRATAMIENTO DE DATOS ---------------- */
       tratamiento_datos: {
         ic: '🛡️', titulo: 'Autorización para el tratamiento de datos personales',
         intro: 'En cumplimiento de ' + norma + ', se informa la política de tratamiento de los datos personales gestionados en la plataforma.',
@@ -81,7 +80,6 @@ Orbit.legal = (function () {
         meta: { norma: norma, autoridad: autoridad(p) }
       },
 
-      /* ---------------- 3. SOCIOS / ALIADOS (NDA reforzado) ---------------- */
       socios: {
         ic: '🤝', titulo: 'Acuerdo de confidencialidad, no reproducción y no competencia (socios / aliados)',
         intro: 'Como socio, aliado, inversionista o tercero con acceso privilegiado a la plataforma Orbit 360, acepto obligaciones reforzadas de confidencialidad y de no competencia tecnológica, dado el carácter estratégico y propietario del software.',
@@ -99,7 +97,6 @@ Orbit.legal = (function () {
         meta: { vigencia: 'Indefinida (confidencialidad) · 2 años post-terminación (no competencia)', ley: L.ley, foro: L.foro }
       },
 
-      /* ---------------- 4. LICENCIA AL CLIENTE QUE CONTRATA ---------------- */
       licencia_cliente: {
         ic: '📄', titulo: 'Contrato de licencia de uso de la plataforma',
         intro: 'Este contrato regula la licencia de uso de Orbit 360 otorgada al cliente (intermediario de seguros) que contrata la plataforma.',
@@ -117,7 +114,6 @@ Orbit.legal = (function () {
         meta: { vigencia: 'Plazo contratado (renovable)', ley: L.ley, foro: L.foro }
       },
 
-      /* ---------------- 5. PORTAL DEL CLIENTE (mutua) ---------------- */
       cliente_portal: {
         ic: '🔐', titulo: 'Confidencialidad mutua y autorización de datos — Portal del Cliente',
         intro: 'Acuerdo recíproco entre ' + emp + ' y el asegurado para el resguardo de la información del portal, conforme a ' + norma + '.',
@@ -137,7 +133,6 @@ Orbit.legal = (function () {
         meta: { norma: norma }
       },
 
-      /* ---------------- 6. DESCARGO IA ---------------- */
       descargo_ia: {
         ic: '🤖', titulo: 'Descargo sobre resultados de inteligencia artificial',
         intro: 'La plataforma incluye funciones asistidas por IA (extracción de documentos, análisis, recomendaciones, generación de contenido y mensajes).',
@@ -154,27 +149,21 @@ Orbit.legal = (function () {
     };
   }
 
-  // qué cláusulas aplican a cada tipo de usuario
   function clausulasPara(tipo) {
     if (tipo === 'cliente') return ['cliente_portal', 'descargo_ia'];
     if (tipo === 'socio') return ['socios', 'confidencialidad', 'tratamiento_datos', 'descargo_ia'];
     if (tipo === 'licenciatario') return ['licencia_cliente', 'socios', 'tratamiento_datos', 'descargo_ia'];
-    return ['confidencialidad', 'tratamiento_datos', 'descargo_ia']; // usuario interno
+    return ['confidencialidad', 'tratamiento_datos', 'descargo_ia'];
   }
 
   function aceptaciones() { try { return JSON.parse(localStorage.getItem(AKEY) || '{}'); } catch (e) { return {}; } }
   function yaAcepto(scopeId) { const a = aceptaciones(); return !!(a[scopeId] && a[scopeId].version === VERSION); }
-  function fakeIP() { // IP simulada y estable por scope (demo — en backend se captura la real)
-    return '186.' + (Math.floor(Math.random() * 255)) + '.' + (Math.floor(Math.random() * 255)) + '.' + (Math.floor(Math.random() * 255));
-  }
+  function fakeIP() { return '186.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255); }
   function registrar(scopeId, meta) {
     const a = aceptaciones();
     let usuario = '';
     try { usuario = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && (Orbit.auth.user().nombre || Orbit.auth.user().email)) || ''; } catch (e) {}
-    a[scopeId] = Object.assign({
-      aceptado: true, version: VERSION, fecha: new Date().toISOString(),
-      pais: pais(), usuario: usuario, ip: fakeIP()
-    }, meta || {});
+    a[scopeId] = Object.assign({ aceptado: true, version: VERSION, fecha: new Date().toISOString(), pais: pais(), usuario: usuario, ip: fakeIP() }, meta || {});
     try { localStorage.setItem(AKEY, JSON.stringify(a)); } catch (e) {}
   }
 
@@ -195,38 +184,52 @@ Orbit.legal = (function () {
     return rows.length ? '<div class="lg-meta">' + rows.join(' · ') + '</div>' : '';
   }
   function clausulaHTML(c) {
-    return '<div class="lg-clausula"><div class="lg-cl-t">' + c.ic + ' ' + c.titulo + '</div>'
-      + (c.intro ? '<p class="lg-intro">' + c.intro + '</p>' : '')
-      + (c.bloques ? c.bloques.map(bloqueHTML).join('') : '')
-      + metaHTML(c.meta) + '</div>';
+    return '<div class="lg-clausula"><div class="lg-cl-t">' + c.ic + ' ' + c.titulo + '</div>' + (c.intro ? '<p class="lg-intro">' + c.intro + '</p>' : '') + (c.bloques ? c.bloques.map(bloqueHTML).join('') : '') + metaHTML(c.meta) + '</div>';
   }
 
-  /* Muestra el gate de cláusulas para un tipo de usuario; persiste; permite imprimir.
-     scopeId identifica a quién (ej. 'user:admin@demo.com' o 'cliente:cli001'). */
+  function queueCallback(scope, fn) {
+    if (typeof fn !== 'function') return;
+    callbacks[scope] = callbacks[scope] || [];
+    callbacks[scope].push(fn);
+  }
+  function removeScopeModal(scope) {
+    const safe = String(scope || '').replace(/"/g, '');
+    document.querySelectorAll('[data-legal-gate]').forEach(node => {
+      if (node.getAttribute('data-legal-gate') === safe && node.parentNode) node.parentNode.removeChild(node);
+    });
+  }
+  function finish(scope) {
+    pendingScopes[scope] = false;
+    doneScopes[scope] = true;
+    removeScopeModal(scope);
+    const list = callbacks[scope] || [];
+    callbacks[scope] = [];
+    list.forEach(fn => { try { fn(); } catch (e) {} });
+  }
+
   function gate(tipo, scopeId, opts) {
     opts = opts || {};
-    if (yaAcepto(scopeId)) { if (opts.onDone) opts.onDone(); return; }
+    const scope = String(scopeId || 'anonymous');
+    queueCallback(scope, opts.onDone);
+    if (yaAcepto(scope) || doneScopes[scope]) { finish(scope); return; }
+    if (pendingScopes[scope]) return;
+    pendingScopes[scope] = true;
+
     const cat = catalogo(); const claves = clausulasPara(tipo);
     const cuerpo = claves.map(k => clausulaHTML(cat[k])).join('');
-    const titulo = tipo === 'cliente' ? 'Bienvenido/a — antes de continuar'
-      : (tipo === 'socio' ? 'Acuerdo de socio / aliado'
-      : (tipo === 'licenciatario' ? 'Contrato de licencia — antes de comenzar' : 'Antes de continuar'));
+    const titulo = tipo === 'cliente' ? 'Bienvenido/a — antes de continuar' : (tipo === 'socio' ? 'Acuerdo de socio / aliado' : (tipo === 'licenciatario' ? 'Contrato de licencia — antes de comenzar' : 'Antes de continuar'));
     const back = document.createElement('div');
-    back.className = 'drawer-back open'; back.style.cssText = 'display:grid;place-items:center;z-index:262';
-    back.innerHTML = '<div class="conf-modal" style="max-width:660px">'
-      + '<div class="conf-h"><span class="conf-ic">📜</span><div><div class="nov-eyebrow">' + titulo + '</div><h2>Acuerdos legales</h2></div></div>'
-      + '<div class="conf-body" style="max-height:56vh;overflow:auto">' + cuerpo + '</div>'
-      + '<label class="conf-chk"><input type="checkbox" id="lg-chk"> He leído y <b>acepto</b> íntegramente los acuerdos anteriores.</label>'
-      + '<div class="conf-f" style="display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="lg-print">🖨️ Imprimir / PDF</button><button class="btn primary" id="lg-ok" disabled>Aceptar y continuar</button></div>'
-      + '</div>';
+    back.setAttribute('data-legal-gate', scope.replace(/"/g, ''));
+    back.className = 'drawer-back open';
+    back.style.cssText = 'display:grid;place-items:center;z-index:262';
+    back.innerHTML = '<div class="conf-modal" style="max-width:660px"><div class="conf-h"><span class="conf-ic">📜</span><div><div class="nov-eyebrow">' + titulo + '</div><h2>Acuerdos legales</h2></div></div><div class="conf-body" style="max-height:56vh;overflow:auto">' + cuerpo + '</div><label class="conf-chk"><input type="checkbox" id="lg-chk"> He leído y <b>acepto</b> íntegramente los acuerdos anteriores.</label><div class="conf-f" style="display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="lg-print">🖨️ Imprimir / PDF</button><button class="btn primary" id="lg-ok" disabled>Aceptar y continuar</button></div></div>';
     document.body.appendChild(back);
     const chk = back.querySelector('#lg-chk'), ok = back.querySelector('#lg-ok');
     chk.addEventListener('change', () => { ok.disabled = !chk.checked; });
     back.querySelector('#lg-print').addEventListener('click', () => imprimir(tipo));
-    ok.addEventListener('click', () => { registrar(scopeId, { tipo: tipo, clausulas: claves }); back.remove(); if (opts.onDone) opts.onDone(); });
+    ok.addEventListener('click', () => { registrar(scope, { tipo: tipo, clausulas: claves }); finish(scope); });
   }
 
-  // versión imprimible (ventana nueva) con bloque de firmas de ambas partes
   function imprimir(tipo) {
     const cat = catalogo(); const claves = clausulasPara(tipo); const emp = empresa();
     const w = window.open('', '_blank'); if (!w) return;
@@ -242,15 +245,9 @@ Orbit.legal = (function () {
       if (mm.length) s += '<p class="mt"><small>' + mm.join(' · ') + '</small></p>';
       return s;
     }).join('<hr>');
-    w.document.write('<html><head><title>Acuerdos legales · Orbit 360</title><style>body{font-family:Georgia,serif;max-width:740px;margin:40px auto;padding:0 28px;line-height:1.6;color:#1E2227}h1{font-family:sans-serif}h3{margin-top:26px;color:#C5162E}h4{margin:14px 0 4px;font-size:14px}ul{margin:6px 0}hr{border:0;border-top:1px solid #e0e0e0;margin:24px 0}.mt small{color:#666}.firmas{margin-top:48px;display:flex;gap:48px}.firma{flex:1;border-top:1px solid #333;padding-top:8px;font-size:13px}</style></head><body>'
-      + '<h1>Acuerdos legales · Orbit 360</h1>'
-      + '<p><b>Parte:</b> ' + emp + ' · <b>País:</b> ' + pais() + ' · <b>Versión:</b> ' + VERSION + ' · <b>Fecha:</b> ' + new Date().toLocaleDateString() + '</p>'
-      + body
-      + '<div class="firmas"><div class="firma">Nombre y firma · Aceptante<br><br>Documento: ____________</div><div class="firma">Por ' + emp + '<br><br>Representante legal</div></div>'
-      + '<p class="mt"><small>Documento generado por Orbit 360. Debe ser revisado y adaptado por asesoría legal antes de su uso definitivo.</small></p>'
-      + '</body></html>');
+    w.document.write('<html><head><title>Acuerdos legales · Orbit 360</title><style>body{font-family:Georgia,serif;max-width:740px;margin:40px auto;padding:0 28px;line-height:1.6;color:#1E2227}h1{font-family:sans-serif}h3{margin-top:26px;color:#C5162E}h4{margin:14px 0 4px;font-size:14px}ul{margin:6px 0}hr{border:0;border-top:1px solid #e0e0e0;margin:24px 0}.mt small{color:#666}.firmas{margin-top:48px;display:flex;gap:48px}.firma{flex:1;border-top:1px solid #333;padding-top:8px;font-size:13px}</style></head><body><h1>Acuerdos legales · Orbit 360</h1><p><b>Parte:</b> ' + emp + ' · <b>País:</b> ' + pais() + ' · <b>Versión:</b> ' + VERSION + ' · <b>Fecha:</b> ' + new Date().toLocaleDateString() + '</p>' + body + '<div class="firmas"><div class="firma">Nombre y firma · Aceptante<br><br>Documento: ____________</div><div class="firma">Por ' + emp + '<br><br>Representante legal</div></div><p class="mt"><small>Documento generado por Orbit 360. Debe ser revisado y adaptado por asesoría legal antes de su uso definitivo.</small></p></body></html>');
     w.document.close(); setTimeout(() => w.print(), 300);
   }
 
-  return { gate, yaAcepto, registrar, aceptaciones, clausulasPara, catalogo, imprimir, pais };
+  return { gate, yaAcepto, registrar, aceptaciones, clausulasPara, catalogo, imprimir, pais, __ownerIdempotent: true, __gateState: { pendingScopes, doneScopes } };
 })();
