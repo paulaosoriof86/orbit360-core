@@ -100,14 +100,6 @@
     }, 180);
   }
 
-  function loadCandidateActions() {
-    if (document.querySelector('script[data-orbit-lab-addon="aseguradoras-candidate-actions"]')) return;
-    var script = document.createElement('script');
-    script.src = 'modules/aseguradoras-candidate-actions.js?v=20260715-11';
-    script.dataset.orbitLabAddon = 'aseguradoras-candidate-actions';
-    document.head.appendChild(script);
-  }
-
   function rerenderCurrentRoute() {
     setTimeout(function () {
       try {
@@ -132,7 +124,6 @@
     syncLabSession();
     paintIdentity(user);
     reattachStore(user);
-    loadCandidateActions();
     try {
       if (window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function') Orbit.auth.showApp();
     } catch (e) {}
@@ -171,7 +162,6 @@
     currentUser: currentUser,
     forceRealLogin: forceRealLogin,
     reattachStore: reattachStore,
-    syncLabSession: syncLabSession,
-    loadCandidateActions: loadCandidateActions
+    syncLabSession: syncLabSession
   };
 })();
