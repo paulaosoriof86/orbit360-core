@@ -31,7 +31,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: orbit360-clientes-aseguradoras-runtime-gate-v20260716
+  group: orbit360-clientes-aseguradoras-runtime-gate-v20260716-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
