@@ -32,18 +32,25 @@
 
   function loadTenantKnowledgeConfig(done) {
     loadScript(
-      'core/tenant-insurer-config-p10.js?v=20260716-3',
+      'core/tenant-insurer-config-p10.js?v=20260716-4',
       'data-orbit-tenant-insurer-config-core-v20260716',
       function () { return window.Orbit && Orbit.tenantInsurerConfigP10; },
       function () {
         loadScript(
-          'data/tenant-alianzas-soluciones-insurers-p10.js?v=20260716-3',
+          'data/tenant-alianzas-soluciones-insurers-p10.js?v=20260716-4',
           'data-orbit-tenant-insurer-config-ays-v20260716',
           tenantKnowledgeConfigReady,
           done
         );
       }
     );
+  }
+
+  function refreshKnowledgeProjection() {
+    try {
+      const api = window.Orbit && Orbit.aseguradorasFrontendProjectionV20260716;
+      if (api && typeof api.loadMappedSummary === 'function') api.loadMappedSummary();
+    } catch (error) {}
   }
 
   function loadRuntimeContracts() {
@@ -59,9 +66,10 @@
     );
     loadTenantKnowledgeConfig(function () {
       loadScript(
-        'modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-3',
+        'modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-4',
         'data-orbit-insurer-projection-v20260716',
-        function () { return window.Orbit && Orbit.aseguradorasFrontendProjectionV20260716; }
+        function () { return window.Orbit && Orbit.aseguradorasFrontendProjectionV20260716; },
+        refreshKnowledgeProjection
       );
     });
   }
