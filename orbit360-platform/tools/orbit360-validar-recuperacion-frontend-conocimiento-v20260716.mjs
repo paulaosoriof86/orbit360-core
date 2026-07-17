@@ -5,8 +5,10 @@ import vm from 'node:vm';
 const root = path.resolve(process.cwd(), 'orbit360-platform');
 const files = {
   projection: path.join(root, 'modules/aseguradoras-frontend-projection-v20260716.js'),
+  candidateActions: path.join(root, 'modules/aseguradoras-candidate-actions.js'),
   projectionCss: path.join(root, 'styles/aseguradoras-frontend-projection-v20260716.css'),
   summary: path.join(root, 'data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20260716.js'),
+  configCore: path.join(root, 'core/tenant-insurer-config-p10.js'),
   config: path.join(root, 'data/tenant-alianzas-soluciones-insurers-p10.js'),
   pwa: path.join(root, 'core/pwa.js'),
   canonical: path.join(root, 'modules/aseguradoras.js'),
@@ -20,7 +22,9 @@ function parseJs(source, name) { try { new vm.Script(source, { filename: name })
 
 const source = Object.fromEntries(Object.entries(files).map(([key, file]) => [key, read(file)]));
 parseJs(source.projection, 'aseguradoras-frontend-projection-v20260716.js');
+parseJs(source.candidateActions, 'aseguradoras-candidate-actions.js');
 parseJs(source.summary, 'alianzas-soluciones.aseguradoras-knowledge-summary-v20260716.js');
+parseJs(source.configCore, 'tenant-insurer-config-p10.js');
 parseJs(source.config, 'tenant-alianzas-soluciones-insurers-p10.js');
 parseJs(source.pwa, 'pwa.js');
 parseJs(source.canonical, 'aseguradoras.js');
@@ -35,6 +39,15 @@ assert(source.pwa.includes('stopImmediatePropagation'), 'MOBILE_BURGER_SINGLE_HA
 assert(source.pwa.includes('__idempotentGateV20260716'), 'LEGAL_IDEMPOTENCY_GUARD_MISSING');
 assert(source.canonical.includes("['tarifas', '🧮 Tarifas y conocimiento']"), 'CANONICAL_TARIFF_TAB_MISSING');
 assert(source.recoveryDoc.includes('Mapear, persistir y visualizar son etapas distintas'), 'METHODOLOGY_DOCUMENTATION_MISSING');
+
+const configCoreIndex = source.candidateActions.indexOf('core/tenant-insurer-config-p10.js');
+const tenantConfigIndex = source.candidateActions.indexOf('data/tenant-alianzas-soluciones-insurers-p10.js');
+const projectionIndex = source.candidateActions.indexOf('modules/aseguradoras-frontend-projection-v20260716.js');
+assert(configCoreIndex >= 0, 'TENANT_INSURER_CONFIG_CORE_LOADER_MISSING');
+assert(tenantConfigIndex > configCoreIndex, 'TENANT_INSURER_CONFIG_DATA_ORDER_INVALID');
+assert(projectionIndex > tenantConfigIndex, 'KNOWLEDGE_PROJECTION_LOADED_BEFORE_TENANT_CONFIG');
+assert(source.candidateActions.includes('tenantKnowledgeConfigReady'), 'TENANT_KNOWLEDGE_READINESS_GUARD_MISSING');
+assert(source.config.includes('knowledgeSummarySrc'), 'TENANT_KNOWLEDGE_SUMMARY_POINTER_MISSING');
 
 const sandbox = {
   window: {},
@@ -65,6 +78,7 @@ sandbox.Orbit = {
 
 vm.createContext(sandbox);
 vm.runInContext(source.summary, sandbox, { filename: 'summary.js' });
+vm.runInContext(source.configCore, sandbox, { filename: 'config-core.js' });
 vm.runInContext(source.config, sandbox, { filename: 'config.js' });
 vm.runInContext(source.projection, sandbox, { filename: 'projection.js' });
 
@@ -88,6 +102,9 @@ assert(sources.every((item) => item.pais === 'GT' && item.moneda === 'GTQ'), 'SU
 assert(!source.summary.match(/(?:password|passwd|api[_-]?key|access[_-]?token|private[_-]?key)\s*[:=]/i), 'SUMMARY_SECRET_PATTERN_FOUND');
 assert(!source.summary.match(/[A-Z]:\\|\/Users\/|\/home\//), 'SUMMARY_LOCAL_PATH_FOUND');
 
+const tenantConfig = sandbox.Orbit.tenantInsurerConfigP10.getTenantConfig('alianzas-soluciones');
+assert(tenantConfig && tenantConfig.insurers.length === 6, 'TENANT_CONFIG_NOT_REGISTERED');
+
 const api = sandbox.Orbit.aseguradorasFrontendProjectionV20260716;
 assert(api && api.status().summaryLoaded === true, 'PROJECTION_API_OR_SUMMARY_NOT_READY');
 assert(api.compareRows({ pais: 'GT', nombre: 'Z' }, { pais: 'CO', nombre: 'A' }) < 0, 'PREFERRED_COUNTRY_ORDER_INVALID');
@@ -101,6 +118,7 @@ console.log(JSON.stringify({
   status: 'PASS',
   block: 'FRONTEND_KNOWLEDGE_RECOVERY_20260716',
   canonicalRendererPreserved: true,
+  tenantConfigLoadedBeforeProjection: true,
   preferredCountryOrder: ['GT', 'CO'],
   insurersSummarized: summary.insurers.length,
   sourcesSummarized: sources.length,
