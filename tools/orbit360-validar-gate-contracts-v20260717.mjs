@@ -4,6 +4,8 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const REGISTRY_PATH = path.join(ROOT, 'tools/orbit360-gate-contract-registry-v20260717.json');
+const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
+const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const requestedGateId = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
 
 function read(rel) {
@@ -28,18 +30,28 @@ function executableText(text, rel) {
 function unique(values) {
   return [...new Set((values || []).filter(Boolean))];
 }
+function writeEvidence(payload) {
+  fs.mkdirSync(path.dirname(EVIDENCE_PATH), { recursive: true });
+  fs.writeFileSync(EVIDENCE_PATH, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+}
 function resultAndExit(status, checks, exitCode) {
   const failed = checks.filter(item => !item.ok);
   const payload = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v2-runtime-graph',
+    schemaVersion: 'orbit360-gate-contract-preflight-v3-sanitized-evidence',
     gateId: requestedGateId,
+    generatedAt: new Date().toISOString(),
+    containsPII: false,
+    containsSecrets: false,
     status,
     classification: status === 'GO_GATE_CONTRACT' ? null : 'VALIDATOR_STALE',
+    evidencePath: EVIDENCE_REL,
     total: checks.length,
     passed: checks.length - failed.length,
     failed: failed.length,
+    failedCheckIds: failed.map(item => item.id),
     checks
   };
+  writeEvidence(payload);
   console.log(JSON.stringify(payload, null, 2));
   process.exit(exitCode);
 }
@@ -67,6 +79,7 @@ check('SCHEMA_VERSION', registry.schemaVersion === 'orbit360-gate-contract-regis
 check('ACTIVE_BLOCK', Number(gate.block) === Number(registry.plan && registry.plan.activeBlock), `gate=${gate.block}; plan=${registry.plan && registry.plan.activeBlock}`);
 check('WORKFLOW_EXISTS', exists(gate.workflow), gate.workflow);
 check('PREFLIGHT_MATCH', gate.preflight === 'tools/orbit360-validar-gate-contracts-v20260717.mjs', gate.preflight || 'missing');
+check('PREFLIGHT_EVIDENCE_MATCH', gate.preflightEvidence === EVIDENCE_REL, gate.preflightEvidence || 'missing');
 
 for (const rel of gate.requiredFiles || []) {
   check(`REQUIRED_FILE:${rel}`, exists(rel), rel);
@@ -93,6 +106,7 @@ if (exists(gate.workflow)) {
     check(`WORKFLOW_NO_RETIRED_REF:${token}`, !workflow.includes(token), `${gate.workflow} → ${token}`);
   }
   check('WORKFLOW_CALLS_PREFLIGHT', workflow.includes('orbit360-validar-gate-contracts-v20260717.mjs') && workflow.includes(requestedGateId), gate.workflow);
+  check('WORKFLOW_PUBLISHES_PREFLIGHT_EVIDENCE', workflow.includes(EVIDENCE_REL), `${gate.workflow} → ${EVIDENCE_REL}`);
   check('WORKFLOW_BRANCH_LOCK', workflow.includes(gate.environment.branch), gate.environment.branch);
   check('WORKFLOW_PROJECT_LOCK', workflow.includes(gate.environment.firebaseProjectId), gate.environment.firebaseProjectId);
   check('WORKFLOW_CHANNEL_LOCK', workflow.includes(gate.environment.hostingChannel), gate.environment.hostingChannel);
