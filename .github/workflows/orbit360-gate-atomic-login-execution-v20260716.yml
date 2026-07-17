@@ -1,0 +1,93 @@
+name: Orbit 360 Atomic Login Joint Gate 20260716
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: [".github/workflows/orbit360-gate-atomic-login-execution-v20260716.yml"]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-atomic-login-joint-gate-v20260716
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
+      ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+      SA1: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA2: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA3: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Publicar inicio
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          printf -v BODY '## Gate atómico iniciado\n\n- Commit: %s\n- Run: %s\n- Alcance: LAB; sin producción, merge ni main.' "$GITHUB_SHA" "$GITHUB_RUN_ID"
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
+      - uses: actions/checkout@v4
+      - name: Validar sintaxis
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "ays/backend-tenant-lab-v99-20260703"
+          node --check tools/orbit360-gate-visual-clientes-aseguradoras-v20260716-v2.mjs
+          node tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs
+      - name: Preparar LAB
+        run: |
+          set -euo pipefail
+          SA="${SA1:-}"; if [ -z "$SA" ]; then SA="${SA2:-}"; fi; if [ -z "$SA" ]; then SA="${SA3:-}"; fi
+          test -n "$SA"; test ${#ORBIT360_LAB_LOGIN_PASSWORD} -ge 12
+          KEY="${RUNNER_TEMP}/lab.json"; printf '%s' "$SA" > "$KEY"; chmod 600 "$KEY"
+          test "$(jq -r '.project_id // empty' "$KEY")" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY" >> "$GITHUB_ENV"
+          npm install --no-save firebase-admin@13
+          node tools/orbit360-ensure-lab-user.mjs
+          node tools/orbit360-verify-lab-data-counts.mjs
+          node tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs
+      - name: Publicar canal exacto
+        run: |
+          set -euo pipefail
+          printf '{"commit":"%s","run":"%s"}\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > orbit360-platform/runtime-build.json
+          OUT="${RUNNER_TEMP}/deploy.json"
+          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab --project "$FIREBASE_PROJECT_ID" --expires 30d --non-interactive --json | tee "$OUT"
+          URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$OUT" | head -n1)"
+          test -n "$URL"
+          BUILD="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/runtime-build.json")"
+          test "$(printf '%s' "$BUILD" | jq -r '.commit')" = "$GITHUB_SHA"
+          echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
+      - name: Ejecutar gate
+        id: visual
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.52.0
+          npx playwright install --with-deps chromium
+          node tools/orbit360-gate-visual-clientes-aseguradoras-v20260716-v2.mjs
+      - name: Subir evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-atomic-login-gate-${{ github.run_id }}
+          path: |
+            orbit360-platform/lab-data-counts.json
+            orbit360-platform/lab-aseguradoras-knowledge-inventory.json
+            orbit360-platform/runtime-build.json
+            orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json
+          retention-days: 7
+      - name: Publicar cierre
+        if: always()
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          R="orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json"
+          OK="$(test -f "$R" && jq -r '.ok // false' "$R" || echo false)"
+          STAGE="$(test -f "$R" && jq -r '.stage // "sin_etapa"' "$R" || echo resultado_no_generado)"
+          CODE="$(test -f "$R" && jq -r '(.error // "") | split(":")[0]' "$R" || echo RESULTADO_NO_GENERADO)"
+          printf -v BODY '## Resultado gate atómico\n\n- Commit: %s\n- Run: %s\n- Gate: **%s**\n- Etapa: %s\n- Código: %s\n- Canal: %s\n- Evidencia sanitizada; LAB sin producción, merge ni main.' "$GITHUB_SHA" "$GITHUB_RUN_ID" "$OK" "$STAGE" "$CODE" "${ORBIT360_PREVIEW_URL:-no disponible}"
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
+          test "$OK" = true
