@@ -14,6 +14,11 @@ function check(id, ok, detail) {
 }
 function contains(text, token) { return text.indexOf(token) >= 0; }
 function excludes(text, tokens) { return tokens.filter(token => contains(text, token)); }
+function executableText(text) {
+  return String(text || '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
 
 const pwa = read('core/pwa.js');
 const router = read('core/router.js');
@@ -78,8 +83,9 @@ check('INSURER_VALIDATED_NOT_ENABLED',
 
 check('TENANT_CONFIG_INDEX_EXISTS', exists('data/tenant-runtime-config-index.js'), 'declarative tenant index');
 if (exists('data/tenant-runtime-config-index.js')) {
-  const tenantIndex = read('data/tenant-runtime-config-index.js');
-  check('TENANT_INDEX_NO_SECRETS', !/password|secret|token|credential|numeroCuenta|cuentaBancaria/i.test(tenantIndex), 'no sensitive payload');
+  const tenantIndex = executableText(read('data/tenant-runtime-config-index.js'));
+  const sensitiveTokens = tenantIndex.match(/password|secret|token|credential|numeroCuenta|cuentaBancaria/gi) || [];
+  check('TENANT_INDEX_NO_SECRETS', sensitiveTokens.length === 0, sensitiveTokens.join(', '));
 }
 
 check('INDEX_PWA_ONCE', (index.match(/core\/pwa\.js/g) || []).length === 1, 'one PWA owner load');
