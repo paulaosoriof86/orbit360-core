@@ -9,7 +9,7 @@ const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v6',
+  schemaVersion: 'orbit360-runtime-gate-joint-v7',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
@@ -156,28 +156,19 @@ async function ensureAuthenticated(page) {
 
 async function acceptLegalGate(page) {
   await page.waitForTimeout(900);
-  const state = await page.evaluate(() => {
-    const visible = node => {
-      if (!node) return false;
-      const style = getComputedStyle(node);
-      const rect = node.getBoundingClientRect();
-      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
-    };
-    const boxes = Array.from(document.querySelectorAll('#lg-chk,#conf-chk')).filter(visible);
-    if (boxes.length !== 1) return { count: boxes.length, error: boxes.length ? 'LEGAL_DUPLICATE_VISIBLE' : 'LEGAL_GATE_NOT_VISIBLE' };
-    const checkbox = boxes[0];
-    const root = checkbox.closest('.drawer-back') || document;
-    const accept = root.querySelector('#lg-ok,#conf-ok');
-    if (!accept) return { count: 1, error: 'LEGAL_ACCEPT_BUTTON_MISSING' };
-    checkbox.checked = true;
-    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-    accept.disabled = false;
-    accept.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
-    return { count: 1, accepted: true };
-  });
-  report.legalVisibleBefore = state.count;
-  if (state.error) throw new Error(`${state.error}:${state.count}`);
-  assert(state.accepted, 'LEGAL_GATE_NOT_ACCEPTED');
+  const boxes = page.locator('#lg-chk:visible,#conf-chk:visible');
+  const count = await boxes.count();
+  report.legalVisibleBefore = count;
+  assert(count === 1, count ? 'LEGAL_DUPLICATE_VISIBLE' : 'LEGAL_GATE_NOT_VISIBLE', String(count));
+
+  const checkbox = boxes.first();
+  const root = checkbox.locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " drawer-back ")][1]');
+  const accept = root.locator('#lg-ok,#conf-ok').first();
+  assert(await accept.count() === 1, 'LEGAL_ACCEPT_BUTTON_MISSING');
+
+  await checkbox.check({ force: true });
+  await accept.click({ force: true });
+
   await page.waitForFunction(() => {
     const visible = node => {
       if (!node) return false;
