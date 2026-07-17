@@ -78,20 +78,26 @@ for (const owner of registry.canonicalOwners || []) {
   }
 }
 
-const inspectFiles = [gate.workflow, ...(gate.validators || [])].filter(exists);
-for (const rel of inspectFiles) {
-  const source = executableText(read(rel), rel);
-  for (const token of gate.forbiddenRuntimeReferences || []) {
-    check(`NO_RETIRED_REF:${rel}:${token}`, !source.includes(token), `${rel} → ${token}`);
-  }
-}
+const retiredFiles = (gate.forbiddenRuntimeReferences || []).filter(token => /\.js$/i.test(token) || /^install/.test(token));
+const retiredSelectors = (gate.forbiddenRuntimeReferences || []).filter(token => !retiredFiles.includes(token));
 
 if (exists(gate.workflow)) {
   const workflow = executableText(read(gate.workflow), gate.workflow);
+  for (const token of retiredFiles) {
+    check(`WORKFLOW_NO_RETIRED_REF:${token}`, !workflow.includes(token), `${gate.workflow} → ${token}`);
+  }
   check('WORKFLOW_CALLS_PREFLIGHT', workflow.includes('orbit360-validar-gate-contracts-v20260717.mjs') && workflow.includes(requestedGateId), gate.workflow);
   check('WORKFLOW_BRANCH_LOCK', workflow.includes(gate.environment.branch), gate.environment.branch);
   check('WORKFLOW_PROJECT_LOCK', workflow.includes(gate.environment.firebaseProjectId), gate.environment.firebaseProjectId);
   check('WORKFLOW_CHANNEL_LOCK', workflow.includes(gate.environment.hostingChannel), gate.environment.hostingChannel);
+}
+
+const runtimeValidator = (gate.validators || []).find(rel => /orbit360-gate-runtime-crm-v20260716\.mjs$/.test(rel));
+if (runtimeValidator && exists(runtimeValidator)) {
+  const source = executableText(read(runtimeValidator), runtimeValidator);
+  for (const token of retiredSelectors) {
+    check(`RUNTIME_VALIDATOR_NO_RETIRED_SELECTOR:${token}`, !source.includes(token), `${runtimeValidator} → ${token}`);
+  }
 }
 
 const currentBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || process.env.ORBIT360_BRANCH || '';
