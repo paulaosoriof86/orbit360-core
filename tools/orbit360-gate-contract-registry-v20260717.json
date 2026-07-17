@@ -54,7 +54,7 @@
   "gates": [
     {
       "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.0",
+      "contractVersion": "1.0.1",
       "block": 1,
       "status": "ACTIVE_PENDING_RUNTIME_PASS",
       "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
@@ -83,7 +83,10 @@
         "import-initial-profiles.js",
         "importar-initial-tenant-lab.js",
         "installLegalGate",
-        "installMobileNavigation"
+        "installMobileNavigation",
+        "asg-order-v20260716",
+        "asg-knowledge-projection-v20260716",
+        "data-mode"
       ],
       "environment": {
         "branch": "ays/backend-tenant-lab-v99-20260703",
