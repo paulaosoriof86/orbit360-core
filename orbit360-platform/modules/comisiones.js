@@ -121,8 +121,9 @@ Orbit.modules.comisiones = (function () {
 
   /* ---- Detalle de comisiones de un grupo (asesor/aseguradora/periodo) ---- */
   function detalle(campo, key) {
-    const regs = S().all('comisiones').filter(c => (campo === 'asesorId' ? c.asesorId : campo === 'aseguradoraId' ? c.aseguradoraId : c.periodo) === key)
+    let regs = S().all('comisiones').filter(c => (campo === 'asesorId' ? c.asesorId : campo === 'aseguradoraId' ? c.aseguradoraId : c.periodo) === key)
       .sort((a, b) => (b.periodo || '').localeCompare(a.periodo || ''));
+    if (window.Orbit && Orbit.accessScope) regs = Orbit.accessScope.filtrarPorAsesor(regs, r => r.asesorId, 'comisiones');
     let titulo = key;
     if (campo === 'asesorId') { const a = q.asesor(key); titulo = a ? a.nombre : key; }
     else if (campo === 'aseguradoraId') { const a = q.aseguradora(key); titulo = a ? a.nombre : key; }
@@ -174,6 +175,7 @@ Orbit.modules.comisiones = (function () {
 
   function toggleEstado(id, campo, key) {
     const c = S().get('comisiones', id); if (!c) return;
+    if (window.Orbit && Orbit.accessScope && !Orbit.accessScope.puedeAccederRegistro(c.asesorId, 'comisiones')) { U.toast('Esta comisión está fuera de tu alcance.'); return; }
     S().update('comisiones', id, { estado: c.estado === 'Liquidada' ? 'Devengada' : 'Liquidada' });
     detalle(campo, key); // reabrir con datos frescos
     const h = document.getElementById('host'); if (h) render(h);

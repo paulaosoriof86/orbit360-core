@@ -206,12 +206,16 @@ Orbit.legal = (function () {
   function gate(tipo, scopeId, opts) {
     opts = opts || {};
     if (yaAcepto(scopeId)) { if (opts.onDone) opts.onDone(); return; }
+    // Evita apilar modales duplicados: si esta misma cláusula ya está abierta en pantalla
+    // (p.ej. gate() invocado más de una vez antes del primer clic), no crea una copia nueva.
+    if (document.querySelector('[data-legal-gate="' + scopeId.replace(/"/g, '') + '"]')) return;
     const cat = catalogo(); const claves = clausulasPara(tipo);
     const cuerpo = claves.map(k => clausulaHTML(cat[k])).join('');
     const titulo = tipo === 'cliente' ? 'Bienvenido/a — antes de continuar'
       : (tipo === 'socio' ? 'Acuerdo de socio / aliado'
       : (tipo === 'licenciatario' ? 'Contrato de licencia — antes de comenzar' : 'Antes de continuar'));
     const back = document.createElement('div');
+    back.setAttribute('data-legal-gate', scopeId);
     back.className = 'drawer-back open'; back.style.cssText = 'display:grid;place-items:center;z-index:262';
     back.innerHTML = '<div class="conf-modal" style="max-width:660px">'
       + '<div class="conf-h"><span class="conf-ic">📜</span><div><div class="nov-eyebrow">' + titulo + '</div><h2>Acuerdos legales</h2></div></div>'

@@ -381,7 +381,7 @@ Orbit.modules.comparativo = (function () {
   }
   function imprimirUna(i) {
     const p = props[i]; if (!p || (p.estadoValidacion || 'requiere_revision') !== 'validada') { U.toast('Solo se puede imprimir una propuesta validada.'); return; }
-    const tpl = plantillaCfg();
+    const tpl = plantillaCfg(p.aseguradoraId);
     const cur = p.cur || 'GTQ', crits = criteriosDe();
     const cs = getComputedStyle(document.documentElement);
     const brand = (cs.getPropertyValue('--red') || '#C5162E').trim() || '#C5162E';
@@ -684,12 +684,17 @@ Orbit.modules.comparativo = (function () {
     back.querySelector('#ch-x').addEventListener('click', close);
     back.querySelectorAll('[data-load]').forEach(b => b.addEventListener('click', () => { const c = S().all('comparativos').find(x => x.id === b.dataset.load); if (c) { props = JSON.parse(JSON.stringify(c.props)); if (c.meta) meta = JSON.parse(JSON.stringify(c.meta)); close(); render(host); } }));
   }
-  function plantillaCfg() {
+  function plantillaCfg(aseguradoraId) {
     const t = (Orbit.tenant && Orbit.tenant.get) ? Orbit.tenant.get() : {};
-    return t.comparativoPlantilla || { secciones: { primaTotal: true, formaPago: true, primaNeta: true, ivaRecargos: true, coberturas: true }, etiquetas: { primaTotal: 'Prima total', formaPago: 'Forma de pago', primaNeta: 'Prima neta', ivaRecargos: 'IVA / recargos', coberturas: 'Coberturas' } };
+    const base = t.comparativoPlantilla || { secciones: { primaTotal: true, formaPago: true, primaNeta: true, ivaRecargos: true, coberturas: true }, etiquetas: { primaTotal: 'Prima total', formaPago: 'Forma de pago', primaNeta: 'Prima neta', ivaRecargos: 'IVA / recargos', coberturas: 'Coberturas' } };
+    if (!aseguradoraId) return base;
+    const ov = (t.comparativoPlantillaPorAseguradora || {})[aseguradoraId];
+    if (!ov) return base;
+    return { secciones: Object.assign({}, base.secciones, ov.secciones || {}), etiquetas: Object.assign({}, base.etiquetas, ov.etiquetas || {}) };
   }
-  function editarPlantilla(host) {
-    const cfg = plantillaCfg();
+  function editarPlantilla(host, aseguradoraId) {
+    const cfg = plantillaCfg(aseguradoraId);
+    const asgs = S().all('aseguradoras').sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
     const pond = (Orbit.tenant && Orbit.tenant.get) ? (Orbit.tenant.get().comparativoPonderacion || { precio: 50, cobertura: 50 }) : { precio: 50, cobertura: 50 };
     const critCfg = (Orbit.tenant && Orbit.tenant.get) ? (Orbit.tenant.get().comparativoCriterios || {}) : {};
     const campos = [['primaTotal', 'Prima total'], ['formaPago', 'Forma de pago'], ['primaNeta', 'Prima neta'], ['ivaRecargos', 'IVA / recargos'], ['coberturas', 'Coberturas']];
@@ -697,7 +702,11 @@ Orbit.modules.comparativo = (function () {
     back = document.createElement('div'); back.id = 'cp-tpl-m'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 98;
     back.innerHTML = '<div class="card" style="width:min(480px,94vw);max-height:88vh;overflow:auto;padding:0">'
-      + '<div style="padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display)">⚙ Plantilla de impresión (tenant)</b><button class="imp-x" id="tpl-x" style="color:var(--ink);border-color:var(--line)">✕</button></div>'
+      + '<div style="padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display)">⚙ Plantilla de impresión</b><button class="imp-x" id="tpl-x" style="color:var(--ink);border-color:var(--line)">✕</button></div>'
+      + '<div style="padding:16px 18px 0;display:grid;gap:9px">'
+      + '<label class="ce-l">Aplicar a<select class="o-sel" id="tpl-asg"><option value="">Tenant (base para todas)</option>' + asgs.map(a => `<option value="${a.id}" ${aseguradoraId === a.id ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('') + '</select></label>'
+      + (aseguradoraId ? '<div class="cfg-note" style="margin:0">Este ajuste sobreescribe la plantilla del tenant solo para esta aseguradora. Dejalo igual a la base para heredar sin cambios.</div>' : '')
+      + '</div>'
       + '<div style="padding:16px 18px;display:grid;gap:9px">'
       + '<div class="cfg-note">Controla qué secciones aparecen y con qué etiqueta (arriba abajo = orden de impresión), tanto en el comparativo genérico como en la impresión individual por aseguradora. No incluye datos ni formatos reales de A&S.</div>'
       + campos.map(([k, def], i) => `<div class="cgrid" style="grid-template-columns:auto auto 1fr;align-items:center;gap:8px"><span class="muted" style="font-size:11px">#${i + 1}</span><label class="ce-l ck" style="margin:0"><input type="checkbox" data-tpl-on="${k}" ${cfg.secciones[k] !== false ? 'checked' : ''}></label><input class="o-sel" data-tpl-lbl="${k}" value="${U.esc((cfg.etiquetas && cfg.etiquetas[k]) || def)}"></div>`).join('')
@@ -716,6 +725,12 @@ Orbit.modules.comparativo = (function () {
     back.querySelector('#tpl-ok').onclick = () => {
       const secciones = {}, etiquetas = {};
       campos.forEach(([k]) => { secciones[k] = back.querySelector(`[data-tpl-on="${k}"]`).checked; etiquetas[k] = back.querySelector(`[data-tpl-lbl="${k}"]`).value || k; });
+      if (aseguradoraId) {
+        const overrides = ((Orbit.tenant.get() || {}).comparativoPlantillaPorAseguradora) || {};
+        overrides[aseguradoraId] = { secciones, etiquetas };
+        Orbit.tenant.setDeep('comparativoPlantillaPorAseguradora', overrides);
+        close(); U.toast('✓ Plantilla de esta aseguradora actualizada'); render(host); return;
+      }
       Orbit.tenant.setDeep('comparativoPlantilla', { secciones, etiquetas });
       const vPrecio = +pondInp.value;
       Orbit.tenant.setDeep('comparativoPonderacion', { precio: vPrecio, cobertura: 100 - vPrecio });

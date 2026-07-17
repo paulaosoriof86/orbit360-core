@@ -1168,7 +1168,7 @@ Orbit.modules.finanzas = (function () {
     back.innerHTML = `<div class="card" style="width:min(560px,95vw);max-height:90vh;overflow:auto;padding:0">
       <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">⚙ Categorías financieras</b><button class="imp-x" id="cat-x">✕</button></div>
       <div style="padding:18px 20px">
-        <div class="cfg-note" style="margin-bottom:14px">Configurables por cliente. Aplican a los movimientos de ingresos, egresos y casos especiales — sin hardcode.</div>
+        <div class="cfg-note" style="margin-bottom:14px">Configurables por cliente. Aplican a los movimientos de ingresos, egresos y casos especiales.</div>
         ${bloque('💰 Ingresos', 'ingresos', cat.ingresos)}
         ${bloque('💸 Egresos', 'egresos', cat.egresos)}
         ${bloque('🔖 Especiales', 'especiales', cat.especiales)}

@@ -98,7 +98,6 @@ Orbit.router = (function () {
     if (!route) route = 'inicio';
     if (location.hash !== '#/' + route) { location.hash = '#/' + route; return; }
     render(route);
-    closeMobile();
   }
   function parseQuery(qs) {
     const out = {};
@@ -110,6 +109,7 @@ Orbit.router = (function () {
     Orbit.route = { key: route, params: parseQuery(qs) };
     current = route;
     setActive(route);
+    closeMobile(); // toda navegación real (tap de un item del menú en móvil) debe cerrar el overlay
     const active = (r) => (window.Orbit && Orbit.accessScope && Orbit.accessScope.puedeVerModulo) ? Orbit.accessScope.puedeVerModulo(r) : ((!(Orbit.tenant && Orbit.tenant.isActive) || Orbit.tenant.isActive(r)) && (!(Orbit.session && Orbit.session.canSee) || Orbit.session.canSee(r)));
     host.scrollTop = 0;
     if (route !== 'inicio' && !active(route)) {
