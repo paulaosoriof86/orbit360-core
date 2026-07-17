@@ -29,21 +29,22 @@
   ],
   "gates": [{
     "gateId": "block1-client360-insurers-lab-v20260717",
-    "contractVersion": "1.0.7",
+    "contractVersion": "1.0.8",
     "runtimeVersion": "20260717-2",
     "block": 1,
     "status": "ACTIVE_PENDING_RUNTIME_GATE",
-    "diagnosticRule": "Reuse the canonical owner snapshot already approved before Auth; do not repeat the same owner wait.",
+    "diagnosticRule": "Every Playwright operation in canonical runtime must have its own bounded timeout before the global watchdog.",
     "reconciliation": {
       "date": "2026-07-17",
       "classifications": ["PIPELINE_MECHANISM_FAILURE"],
-      "scope": "canonical owner handoff",
-      "rootCause": "The canonical runtime step had already approved Store, Auth and Router. A redundant animation-frame wait repeated the Auth-owner condition and expired during bootstrap thread saturation.",
+      "scope": "bounded canonical runtime controller",
+      "rootCause": "The custom canonical-runtime loop contained page.evaluate without an operation timeout. When the document thread stayed occupied, the controller could not recover until the five-minute global watchdog.",
       "corrections": [
-        "Return the approved owner/session snapshot from canonical runtime",
-        "Reuse that snapshot as the Auth initial state",
-        "Remove the redundant owner-ready wait",
-        "Use bounded polling only for state changes after dispatch"
+        "Replace the custom evaluate loop with Playwright-managed waitForFunction",
+        "Require 1200 ms of continuous canonical stability",
+        "Bound canonical runtime wait to 95 seconds",
+        "Bound the final runtime snapshot to 12 seconds",
+        "Preserve the owner snapshot for authentication handoff"
       ],
       "preserved": ["Orbit.store","core/auth.js","core/legal.js","Cliente 360 renderer","Aseguradoras renderer","414 clientes","26 aseguradoras","7 asesores"]
     },
@@ -88,7 +89,7 @@
       {"path":"orbit360-platform/core/backend-lab-loader.js","requiredTokens":["var LAB_RUNTIME = '20260717-2'","runtimeVersion: LAB_RUNTIME"]},
       {"path":"orbit360-platform/sw.js","requiredTokens":["var CACHE = 'orbit360-v20260717-2'","var BUILD = '20260717-2'"]},
       {"path":"orbit360-platform/core/pwa.js","requiredTokens":["var RUNTIME_BUILD = '20260717-2'","serviceWorker.register('sw.js?v=' + RUNTIME_BUILD)"]},
-      {"path":"tools/orbit360-gate-runtime-crm-v20260716.mjs","requiredTokens":["ORBIT360_EXPECTED_RUNTIME || '20260717-2'","contractVersion: '1.0.7'","canonicalAuthOwnerHandoff","authentication_owner_contract_reuse"]},
+      {"path":"tools/orbit360-gate-runtime-crm-v20260716.mjs","requiredTokens":["ORBIT360_EXPECTED_RUNTIME || '20260717-2'","contractVersion: '1.0.8'","canonical_runtime_wait","canonical_runtime_snapshot","canonicalAuthOwnerHandoff","PIPELINE_STEP_TIMEOUT"]},
       {"path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml","requiredTokens":["ORBIT360_EXPECTED_RUNTIME: 20260717-2","CANONICAL_RUNTIME_VERSION"]}
     ],
     "forbiddenRuntimeReferences": [
@@ -101,7 +102,8 @@
       "installMobileNavigation",
       "asg-order-v20260716",
       "asg-knowledge-projection-v20260716",
-      "authentication_owner_ready"
+      "authentication_owner_ready",
+      "const deadline = Date.now() + 60000"
     ],
     "environment": {"branch":"ays/backend-tenant-lab-v99-20260703","firebaseProjectId":"ays-orbit-360-lab","hostingChannel":"orbit360-ays-lab"},
     "expectedAggregates": {"clientes":414,"aseguradoras":26,"asesores":7},
