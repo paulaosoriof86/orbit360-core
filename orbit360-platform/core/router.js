@@ -141,8 +141,29 @@ Orbit.router = (function () {
   const RUNTIME_CONTRACTS = [
     { src: 'core/session-multirol-visibility-v20260716.js?v=20260716-2', marker: 'data-orbit-multirol-runtime-v20260716', ready: () => Orbit.session && Orbit.session.__multirolVisibilityV20260716 },
     { src: 'core/client-canonical-view-projection-v20260716.js?v=20260717-2', marker: 'data-orbit-client-projection-runtime-v20260716', ready: () => Orbit.clientProjection && Orbit.clientProjection.get },
-    { src: 'modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-2', marker: 'data-orbit-insurer-projection-runtime-v20260716', ready: () => Orbit.aseguradorasFrontendProjectionV20260716 },
-    { src: 'modules/aseguradoras-candidate-actions.js?v=20260716-2', marker: 'data-orbit-candidate-actions-runtime-v20260716', ready: () => false }
+    { src: 'core/tenant-insurer-config-p10.js?v=20260717-1', marker: 'data-orbit-tenant-insurer-config-core-v20260717', ready: () => Orbit.tenantInsurerConfigP10 },
+    { src: 'data/tenant-runtime-config-index.js?v=20260717-1', marker: 'data-orbit-tenant-runtime-index-v20260717', ready: () => window.OrbitTenantRuntimeConfigIndex },
+    {
+      src: () => {
+        let tenantId = '';
+        try {
+          const cfg = Orbit.tenant && Orbit.tenant.get ? (Orbit.tenant.get() || {}) : {};
+          tenantId = String((window.OrbitBackend && (OrbitBackend.tenantId || OrbitBackend.tenant)) || cfg.tenantId || cfg.id || '').trim();
+        } catch (e) {}
+        const index = window.OrbitTenantRuntimeConfigIndex || {};
+        return index[tenantId] && index[tenantId].insurerConfigSrc || '';
+      },
+      marker: 'data-orbit-tenant-insurer-config-active-v20260717',
+      ready: () => {
+        let tenantId = '';
+        try {
+          const cfg = Orbit.tenant && Orbit.tenant.get ? (Orbit.tenant.get() || {}) : {};
+          tenantId = String((window.OrbitBackend && (OrbitBackend.tenantId || OrbitBackend.tenant)) || cfg.tenantId || cfg.id || '').trim();
+        } catch (e) {}
+        return [].concat(window.OrbitTenantInsurerConfigsP10 || []).some(item => item && item.tenantId === tenantId);
+      }
+    },
+    { src: 'modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-2', marker: 'data-orbit-insurer-projection-runtime-v20260716', ready: () => Orbit.aseguradorasFrontendProjectionV20260716 }
   ];
 
   function loadRuntimeContracts(done) {
@@ -152,8 +173,10 @@ Orbit.router = (function () {
       const item = RUNTIME_CONTRACTS[pos++];
       try { if (item.ready && item.ready()) { next(); return; } } catch (e) {}
       if (document.querySelector('script[' + item.marker + ']')) { next(); return; }
+      const src = typeof item.src === 'function' ? item.src() : item.src;
+      if (!src) { next(); return; }
       const script = document.createElement('script');
-      script.src = item.src;
+      script.src = src;
       script.async = false;
       script.setAttribute(item.marker, '1');
       script.onload = next;
