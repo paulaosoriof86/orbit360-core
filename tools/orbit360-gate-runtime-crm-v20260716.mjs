@@ -9,7 +9,7 @@ const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v10-owner-auth-contract',
+  schemaVersion: 'orbit360-runtime-gate-joint-v11-bounded-legal-contract',
   gateId: 'block1-client360-insurers-lab-v20260717',
   contractVersion: '1.0.1',
   generatedAt: new Date().toISOString(),
@@ -42,6 +42,18 @@ async function visibleCount(locator) {
     const rect = node.getBoundingClientRect();
     return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
   }).length);
+}
+async function boundedStep(name, task, timeoutMs = 15000) {
+  stage(name);
+  let timer = null;
+  const timeout = new Promise((resolve, reject) => {
+    timer = setTimeout(() => reject(new Error(`PIPELINE_STEP_TIMEOUT:${name}`)), timeoutMs);
+  });
+  try {
+    return await Promise.race([Promise.resolve().then(task), timeout]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 let browser = null;
@@ -183,29 +195,74 @@ async function ensureAuthenticated(page) {
 
 async function acceptLegalGate(page) {
   await page.waitForTimeout(900);
-  const boxes = page.locator('#lg-chk:visible,#conf-chk:visible');
-  const count = await boxes.count();
-  report.legalVisibleBefore = count;
-  assert(count === 1, count ? 'LEGAL_DUPLICATE_VISIBLE' : 'LEGAL_GATE_NOT_VISIBLE', String(count));
-  const checkbox = boxes.first();
-  const root = checkbox.locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " drawer-back ")][1]');
-  const accept = root.locator('#lg-ok,#conf-ok').first();
-  assert(await accept.count() === 1, 'LEGAL_ACCEPT_BUTTON_MISSING');
-  await checkbox.check({ force: true });
-  await accept.click({ force: true });
-  await page.waitForFunction(() => {
+  const initial = await boundedStep('legal_gate_inspect', () => page.evaluate(() => {
     const visible = node => {
       if (!node) return false;
       const style = getComputedStyle(node);
       const rect = node.getBoundingClientRect();
       return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
     };
-    return !Array.from(document.querySelectorAll('#lg-chk,#conf-chk')).some(visible);
-  }, null, { timeout: 10000 });
-  await page.waitForTimeout(1000);
-  const remaining = await visibleCount(page.locator('#lg-chk,#conf-chk'));
-  assert(remaining === 0, 'LEGAL_MODAL_REAPPEARED', String(remaining));
-  report.legalVisibleAfter = remaining;
+    const boxes = Array.from(document.querySelectorAll('#lg-chk,#conf-chk')).filter(visible);
+    return {
+      count: boxes.length,
+      ids: boxes.map(node => node.id),
+      ownerReady: Boolean(window.Orbit && Orbit.legal && Orbit.legal.__ownerIdempotent),
+      ownerPending: Boolean(window.Orbit && Orbit.legal && Orbit.legal.__gateState && Object.values(Orbit.legal.__gateState.pendingScopes || {}).some(Boolean)),
+      scopes: Array.from(document.querySelectorAll('[data-legal-gate]')).map(node => String(node.getAttribute('data-legal-gate') || '')).filter(Boolean).length
+    };
+  }), 10000);
+
+  report.legalVisibleBefore = initial.count;
+  report.legalDiagnostic = {
+    strategy: 'atomic_dom_contract',
+    ownerReady: initial.ownerReady,
+    ownerPending: initial.ownerPending,
+    visibleGates: initial.count,
+    scopedGates: initial.scopes,
+    acceptedControl: initial.ids[0] || ''
+  };
+  assert(initial.ownerReady, 'LEGAL_OWNER_NOT_READY');
+  assert(initial.count === 1, initial.count ? 'LEGAL_DUPLICATE_VISIBLE' : 'LEGAL_GATE_NOT_VISIBLE', String(initial.count));
+
+  const accepted = await boundedStep('legal_gate_accept', () => page.evaluate(() => {
+    const visible = node => {
+      if (!node) return false;
+      const style = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const boxes = Array.from(document.querySelectorAll('#lg-chk,#conf-chk')).filter(visible);
+    if (boxes.length !== 1) return { ok: false, code: boxes.length ? 'LEGAL_DUPLICATE_VISIBLE' : 'LEGAL_GATE_NOT_VISIBLE' };
+    const checkbox = boxes[0];
+    const root = checkbox.closest('.drawer-back');
+    const button = root && root.querySelector('#lg-ok,#conf-ok');
+    if (!button) return { ok: false, code: 'LEGAL_ACCEPT_BUTTON_MISSING' };
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+    if (button.disabled) return { ok: false, code: 'LEGAL_ACCEPT_BUTTON_STILL_DISABLED' };
+    button.click();
+    return { ok: true, code: '', control: checkbox.id, button: button.id };
+  }), 10000);
+  assert(accepted && accepted.ok, (accepted && accepted.code) || 'LEGAL_ACCEPT_FAILED');
+
+  await page.waitForTimeout(350);
+  const settled = await boundedStep('legal_gate_verify', () => page.evaluate(() => {
+    const visible = node => {
+      if (!node) return false;
+      const style = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const remaining = Array.from(document.querySelectorAll('#lg-chk,#conf-chk')).filter(visible).length;
+    const pending = Boolean(window.Orbit && Orbit.legal && Orbit.legal.__gateState && Object.values(Orbit.legal.__gateState.pendingScopes || {}).some(Boolean));
+    return { remaining, pending };
+  }), 10000);
+  assert(settled.remaining === 0, 'LEGAL_MODAL_REAPPEARED', String(settled.remaining));
+  assert(!settled.pending, 'LEGAL_OWNER_SCOPE_STILL_PENDING');
+  report.legalVisibleAfter = settled.remaining;
+  report.legalDiagnostic.acceptedControl = accepted.control || report.legalDiagnostic.acceptedControl;
+  report.legalDiagnostic.acceptButton = accepted.button || '';
+  report.legalDiagnostic.ownerPendingAfter = settled.pending;
   report.checks.legalOneClick = true;
 }
 
