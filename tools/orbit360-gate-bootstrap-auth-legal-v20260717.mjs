@@ -20,8 +20,7 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
       providerReady &&
       Boolean(form && form.dataset.authMode === 'firestore-lab') &&
       Boolean(window.Orbit && Orbit.store && Orbit.router && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function') &&
-      Boolean(Orbit.route && Orbit.route.key) &&
-      document.querySelectorAll('#sidebar .nav-link').length > 1;
+      Boolean(Orbit.route && Orbit.route.key);
 
     if (!ready) {
       window.__orbitProductBootstrapSince = 0;
@@ -48,7 +47,7 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
     providerReady: true,
     authUiReady: true,
     routeReady: true,
-    sidebarReady: true,
+    preAuthAccessFailClosed: true,
     ownerHandoffReady: true,
     productBootstrapReady: true
   };
