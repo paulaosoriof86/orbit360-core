@@ -11,18 +11,17 @@ const STATUS_PATH = 'orbit360-platform/lab-advisor-status.json';
 const FALLBACK_ARTIFACT_PATH = 'orbit360-platform/lab-data-counts.json';
 
 const report = {
-  schemaVersion: 'orbit360-lab-readiness-v4',
+  schemaVersion: 'orbit360-lab-readiness-v5',
   generatedAt: new Date().toISOString(),
   projectId: PROJECT_ID,
   tenantId: TENANT_ID,
   mode: 'read_only',
   checks: {
     user: false,
-    membership: false,
-    advisors: false
+    membership: false
   },
-  counts: {
-    advisorsExisting: 0
+  delegatedChecks: {
+    dataCounts: 'orbit360-verify-lab-data-counts.mjs'
   },
   writePerformed: false,
   containsPII: false,
@@ -41,7 +40,7 @@ function persistDiagnostic() {
 
   if (!report.ok) {
     writeFileSync(FALLBACK_ARTIFACT_PATH, `${JSON.stringify({
-      schemaVersion: 'orbit360-lab-readiness-diagnostic-v1',
+      schemaVersion: 'orbit360-lab-readiness-diagnostic-v2',
       generatedAt: report.generatedAt,
       projectId: PROJECT_ID,
       tenantId: TENANT_ID,
@@ -49,13 +48,14 @@ function persistDiagnostic() {
       counts: {
         clientes: 0,
         aseguradoras: 0,
-        asesores: report.counts.advisorsExisting
+        asesores: 0
       },
       readiness: {
         checks: report.checks,
+        delegatedChecks: report.delegatedChecks,
         userErrorCategory: report.userErrorCategory || '',
         membershipErrorCategory: report.membershipErrorCategory || '',
-        advisorErrorCategory: report.advisorErrorCategory || '',
+        bootstrapErrorCategory: report.bootstrapErrorCategory || '',
         writePerformed: false
       },
       containsPII: false,
@@ -93,26 +93,17 @@ try {
   } catch (error) {
     report.membershipErrorCategory = category(error, 'membership_read_failed');
   }
-
-  try {
-    const snapshot = await db.collection('tenantId').doc(TENANT_ID).collection('asesores').get();
-    report.counts.advisorsExisting = snapshot.size;
-    report.checks.advisors = snapshot.size >= 7;
-  } catch (error) {
-    report.advisorErrorCategory = category(error, 'advisor_read_failed');
-  }
 } catch (error) {
   report.bootstrapErrorCategory = category(error, 'readiness_bootstrap_failed');
 }
 
 persistDiagnostic();
-console.log(`LAB_READINESS:${JSON.stringify({
+console.log(`LAB_ACCESS_READINESS:${JSON.stringify({
   ok: report.ok,
   checks: report.checks,
-  counts: report.counts,
+  delegatedChecks: report.delegatedChecks,
   userErrorCategory: report.userErrorCategory || '',
   membershipErrorCategory: report.membershipErrorCategory || '',
-  advisorErrorCategory: report.advisorErrorCategory || '',
   bootstrapErrorCategory: report.bootstrapErrorCategory || '',
   writePerformed: false
 })}`);
