@@ -44,6 +44,7 @@ jobs:
       EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
+      ORBIT360_EXPECTED_RUNTIME: 20260717-2
       ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
       ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -67,7 +68,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          node --check orbit360-platform/sw.js
           node --check orbit360-platform/core/pwa.js
+          node --check orbit360-platform/core/backend-lab-loader.js
           node --check orbit360-platform/core/router.js
           node --check orbit360-platform/core/legal.js
           node --check orbit360-platform/core/access-scope.js
@@ -120,8 +123,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          printf '{"schemaVersion":"orbit360-runtime-build-v1","commit":"%s","run":"%s","branch":"%s","gateId":"%s"}\n' \
-            "$GITHUB_SHA" "$GITHUB_RUN_ID" "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" "$ORBIT360_GATE_ID" \
+          printf '{"schemaVersion":"orbit360-runtime-build-v2","commit":"%s","run":"%s","branch":"%s","gateId":"%s","runtimeVersion":"%s"}\n' \
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" "$ORBIT360_GATE_ID" "$ORBIT360_EXPECTED_RUNTIME" \
             > orbit360-platform/runtime-build.json
 
       - name: Publicar y verificar canal LAB canónico
@@ -129,6 +132,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          CANONICAL_RUNTIME_VERSION="$ORBIT360_EXPECTED_RUNTIME"
           DEPLOY_JSON="${RUNNER_TEMP}/firebase-lab-preview.json"
           npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab \
             --project "$FIREBASE_PROJECT_ID" \
@@ -151,11 +155,20 @@ jobs:
           DEPLOYED_SHA="$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty')"
           DEPLOYED_RUN="$(printf '%s' "$BUILD_JSON" | jq -r '.run // empty')"
           DEPLOYED_GATE="$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty')"
+          DEPLOYED_RUNTIME="$(printf '%s' "$BUILD_JSON" | jq -r '.runtimeVersion // empty')"
           test "$DEPLOYED_SHA" = "$GITHUB_SHA"
           test "$DEPLOYED_RUN" = "$GITHUB_RUN_ID"
           test "$DEPLOYED_GATE" = "$ORBIT360_GATE_ID"
-          curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/core/backend-lab-loader.js" | grep -q 'Backend LAB loader'
-          curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/ays-lab-preview.html" | grep -q 'orbit-preview-version'
+          test "$DEPLOYED_RUNTIME" = "$CANONICAL_RUNTIME_VERSION"
+
+          LOADER_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/core/backend-lab-loader.js")"
+          PREVIEW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/ays-lab-preview.html")"
+          SW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/sw.js")"
+          PWA_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/core/pwa.js")"
+          printf '%s' "$LOADER_SOURCE" | grep -Fq "var LAB_RUNTIME = '$CANONICAL_RUNTIME_VERSION'"
+          printf '%s' "$PREVIEW_SOURCE" | grep -Fq "runtime=$CANONICAL_RUNTIME_VERSION"
+          printf '%s' "$SW_SOURCE" | grep -Fq "var BUILD = '$CANONICAL_RUNTIME_VERSION'"
+          printf '%s' "$PWA_SOURCE" | grep -Fq "var RUNTIME_BUILD = '$CANONICAL_RUNTIME_VERSION'"
 
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
@@ -201,6 +214,8 @@ jobs:
             echo "## Orbit 360 · Gate conjunto Cliente 360 + Aseguradoras"
             echo ""
             echo "Gate: ${ORBIT360_GATE_ID}"
+            echo ""
+            echo "Runtime: ${ORBIT360_EXPECTED_RUNTIME}"
             echo ""
             echo "Rama: ays/backend-tenant-lab-v99-20260703"
             echo ""
@@ -254,9 +269,9 @@ jobs:
           INSURERS="$(test -f "$COUNTS" && jq -r '.counts.aseguradoras // 0' "$COUNTS" || echo 0)"
           ADVISORS="$(test -f "$COUNTS" && jq -r '.counts.asesores // 0' "$COUNTS" || echo 0)"
           SYNC="$(test -f "$INVENTORY" && jq -r '.gates.operationalSyncComplete // false' "$INVENTORY" || echo false)"
-          printf -v BODY '%s\n\n- Gate: %s\n- Commit: %s\n- Run: %s\n- Preflight: **%s**\n- Canal LAB: %s\n- Gate conjunto: **%s**\n- Conteos LAB: clientes **%s**, aseguradoras **%s**, asesores **%s**\n- Conocimiento Aseguradoras persistido operativamente: **%s**\n- Código de bloqueo: %s\n- Checks no aprobados: %s\n- Evidencia: artefacto sanitizado del run, sin PII, secretos ni documentos fuente.\n- Alcance: LAB únicamente; sin producción, merge ni main.' \
+          printf -v BODY '%s\n\n- Gate: %s\n- Runtime: %s\n- Commit: %s\n- Run: %s\n- Preflight: **%s**\n- Canal LAB: %s\n- Gate conjunto: **%s**\n- Conteos LAB: clientes **%s**, aseguradoras **%s**, asesores **%s**\n- Conocimiento Aseguradoras persistido operativamente: **%s**\n- Código de bloqueo: %s\n- Checks no aprobados: %s\n- Evidencia: artefacto sanitizado del run, sin PII, secretos ni documentos fuente.\n- Alcance: LAB únicamente; sin producción, merge ni main.' \
             '## Resultado automático sanitizado · Cliente 360 + Aseguradoras' \
-            "$ORBIT360_GATE_ID" "$GITHUB_SHA" "$GITHUB_RUN_ID" "$PREFLIGHT_STATUS" "${ORBIT360_PREVIEW_URL:-no disponible}" "$OK" "$CLIENTS" "$INSURERS" "$ADVISORS" "$SYNC" "$ERROR_CODE" "$FAILED_CHECKS"
+            "$ORBIT360_GATE_ID" "$ORBIT360_EXPECTED_RUNTIME" "$GITHUB_SHA" "$GITHUB_RUN_ID" "$PREFLIGHT_STATUS" "${ORBIT360_PREVIEW_URL:-no disponible}" "$OK" "$CLIENTS" "$INSURERS" "$ADVISORS" "$SYNC" "$ERROR_CODE" "$FAILED_CHECKS"
           gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
 
       - name: Fallar si el gate conjunto no fue aprobado
