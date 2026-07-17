@@ -54,9 +54,10 @@
   "gates": [
     {
       "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.1",
+      "contractVersion": "1.0.2",
       "block": 1,
-      "status": "ACTIVE_PENDING_RUNTIME_PASS",
+      "status": "ACTIVE_FROZEN_VALIDATOR_STALE",
+      "freezeReason": "Active LAB bootstrap graph still references retired runtime artifacts; runtime execution is blocked until the graph is reconciled.",
       "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
       "validators": [
@@ -74,6 +75,20 @@
         "orbit360-platform/core/legal.js",
         "orbit360-platform/core/access-scope.js",
         "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
+        "orbit360-platform/data/tenant-runtime-config-index.js"
+      ],
+      "runtimeGraphFiles": [
+        "orbit360-platform/ays-lab-preview.html",
+        "orbit360-platform/index.html",
+        "orbit360-platform/core/backend-lab-loader.js",
+        "orbit360-platform/core/backend-lab-init.js",
+        "orbit360-platform/core/backend-lab-auth-guard.js",
+        "orbit360-platform/core/router.js",
+        "orbit360-platform/core/legal.js",
+        "orbit360-platform/core/access-scope.js",
+        "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/modules/aseguradoras.js",
         "orbit360-platform/data/tenant-runtime-config-index.js"
       ],
       "forbiddenRuntimeReferences": [
