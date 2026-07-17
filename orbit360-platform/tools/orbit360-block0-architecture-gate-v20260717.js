@@ -45,7 +45,9 @@ const routerForbidden = ['empalme-v1251-runtime', 'aseguradoras-candidate-action
 const routerLeaks = excludes(router, routerForbidden);
 check('ROUTER_NO_RETIRED_LOADERS', routerLeaks.length === 0, routerLeaks.join(', '));
 check('ROUTER_MOBILE_OWNER', contains(router, 'toggleMobile') && contains(router, 'aria-expanded') && contains(router, 'stopImmediatePropagation'), 'mobile owner');
-check('ROUTER_ROUTE_GATE', contains(router, "Orbit.access.can(route, 'view')") && contains(router, 'No tienes acceso con el rol activo'), 'route gate');
+const routerUsesAccessGate = contains(router, "Orbit.access.can(route, 'view')") || contains(router, "Orbit.access.can(r, 'view')");
+const routerAppliesGateToRoute = contains(router, '!active(route)') || contains(router, "Orbit.access.can(route, 'view')");
+check('ROUTER_ROUTE_GATE', routerUsesAccessGate && routerAppliesGateToRoute && contains(router, 'No tienes acceso con el rol activo'), 'route gate through active(route)');
 check('ROUTER_SINGLE_BOOTSTRAP', contains(router, 'RUNTIME_CONTRACTS') && contains(router, 'loadRuntimeContracts') && contains(router, 'tenant-runtime-config-index.js'), 'slice runtime sequence');
 check('ROUTER_PROJECTED_SEARCH', contains(router, 'Orbit.clientProjection.project') && contains(router, 'Orbit.clientProjection.get'), 'global search projection');
 check('INSURER_PROJECTION_BRIDGE_RETIRED', !contains(router, 'aseguradoras-frontend-projection-v20260716.js'), 'projection must be integrated in modules/aseguradoras.js');
