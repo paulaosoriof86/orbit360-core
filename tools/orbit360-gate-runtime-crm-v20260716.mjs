@@ -9,7 +9,7 @@ const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v12-detached-legal-dispatch',
+  schemaVersion: 'orbit360-runtime-gate-joint-v13-detached-auth-controller',
   gateId: 'block1-client360-insurers-lab-v20260717',
   contractVersion: '1.0.1',
   generatedAt: new Date().toISOString(),
@@ -113,12 +113,15 @@ async function authState(page) {
       currentUser = !!(auth && auth.currentUser);
       ownerReady = !!(window.Orbit && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function');
     } catch (error) {}
+    const gateStatus = window.__orbitGateAuthStatus || {};
     return {
       inside: !document.body.classList.contains('pre-auth'),
       formVisible: visible(document.getElementById('login-form')),
       providerReady,
       ownerReady,
       currentUser,
+      gateState: String(gateStatus.state || ''),
+      gateCode: String(gateStatus.code || ''),
       authStage: String((document.body.dataset || {}).authStage || ''),
       firebaseInit: String((window.OrbitBackend || {}).firebaseInit || ''),
       firebaseLoader: String((window.OrbitBackend || {}).firebaseLoader || '')
@@ -127,60 +130,91 @@ async function authState(page) {
 }
 
 async function ensureAuthenticated(page) {
-  stage('authentication_owner_ready');
-  await page.waitForFunction(() => {
+  await boundedStep('authentication_owner_ready', () => page.waitForFunction(() => {
     try {
       return !!(window.Orbit && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function');
     } catch (error) { return false; }
-  }, null, { timeout: 45000 });
+  }, null, { timeout: 45000 }), 50000);
 
-  const initial = await authState(page);
+  const initial = await boundedStep('authentication_initial_state', () => authState(page), 10000);
   if (!initial.currentUser) {
-    stage('authentication_signin');
-    const loginResult = await page.evaluate(async ({ loginEmail, loginKey }) => {
-      try {
-        const user = await Orbit.auth.loginFirebase(loginEmail, loginKey);
-        return { ok: !!user, code: '' };
-      } catch (error) {
-        return {
-          ok: false,
-          code: String(error && (error.code || error.message) || 'auth/unknown')
-            .replace(/[^a-z0-9/_-]/gi, '')
-            .slice(0, 80)
-        };
+    const dispatch = await boundedStep('authentication_schedule_signin', () => page.evaluate(({ loginEmail, loginKey }) => {
+      if (!(window.Orbit && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function')) {
+        return { ok: false, code: 'AUTH_OWNER_NOT_READY' };
       }
-    }, { loginEmail: email, loginKey: accessKey });
-    if (!loginResult.ok) {
+      window.__orbitGateAuthStatus = { state: 'pending', code: '' };
+      setTimeout(() => {
+        Promise.resolve()
+          .then(() => Orbit.auth.loginFirebase(loginEmail, loginKey))
+          .then(user => {
+            window.__orbitGateAuthStatus = {
+              state: user ? 'resolved' : 'failed',
+              code: user ? '' : 'AUTH_USER_NOT_AVAILABLE'
+            };
+          })
+          .catch(error => {
+            window.__orbitGateAuthStatus = {
+              state: 'failed',
+              code: String(error && (error.code || error.message) || 'auth/unknown')
+                .replace(/[^a-z0-9/_-]/gi, '')
+                .slice(0, 80)
+            };
+          });
+      }, 0);
+      return { ok: true, code: '' };
+    }, { loginEmail: email, loginKey: accessKey }), 10000);
+    assert(dispatch && dispatch.ok, (dispatch && dispatch.code) || 'AUTH_DISPATCH_FAILED');
+
+    await boundedStep('authentication_observe_signin', () => page.waitForFunction(() => {
+      try {
+        const auth = window.firebase && firebase.auth ? firebase.auth() : null;
+        const status = window.__orbitGateAuthStatus || {};
+        return !!(auth && auth.currentUser) || status.state === 'resolved' || status.state === 'failed';
+      } catch (error) { return false; }
+    }, null, { timeout: 40000 }), 45000);
+
+    const outcome = await boundedStep('authentication_read_signin', () => authState(page), 10000);
+    if (!outcome.currentUser) {
       report.authDiagnostic = {
-        strategy: 'owner_login_contract',
-        providerReady: initial.providerReady,
-        ownerReady: initial.ownerReady,
+        strategy: 'detached_owner_login_controller',
+        providerReady: outcome.providerReady,
+        ownerReady: outcome.ownerReady,
         currentUser: false,
-        formVisible: initial.formVisible,
-        authStage: initial.authStage,
-        firebaseInit: initial.firebaseInit,
-        firebaseLoader: initial.firebaseLoader,
-        errorCategory: loginResult.code || 'auth/unknown'
+        formVisible: outcome.formVisible,
+        authStage: outcome.authStage,
+        firebaseInit: outcome.firebaseInit,
+        firebaseLoader: outcome.firebaseLoader,
+        gateState: outcome.gateState,
+        errorCategory: outcome.gateCode || 'auth/unknown'
       };
-      throw new Error(`LOGIN_OWNER_${loginResult.code || 'UNKNOWN'}`);
+      throw new Error(`LOGIN_OWNER_${outcome.gateCode || 'UNKNOWN'}`);
     }
   }
 
-  stage('authentication_session');
-  await page.waitForFunction(() => {
+  await boundedStep('authentication_session', () => page.waitForFunction(() => {
     try { return !!(window.firebase && firebase.auth && firebase.auth().currentUser); }
     catch (error) { return false; }
-  }, null, { timeout: 15000 });
-  await page.evaluate(() => {
-    try { if (window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function') Orbit.auth.showApp(); }
-    catch (error) {}
-  });
-  await page.waitForFunction(() => !document.body.classList.contains('pre-auth'), null, { timeout: 10000 });
-  const finalState = await authState(page);
+  }, null, { timeout: 15000 }), 20000);
+
+  await boundedStep('authentication_show_app', () => page.evaluate(() => {
+    if (window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function') {
+      Orbit.auth.showApp();
+      return true;
+    }
+    return false;
+  }), 10000);
+
+  await boundedStep('authentication_inside', () => page.waitForFunction(
+    () => !document.body.classList.contains('pre-auth'),
+    null,
+    { timeout: 10000 }
+  ), 15000);
+
+  const finalState = await boundedStep('authentication_final_state', () => authState(page), 10000);
   assert(finalState.currentUser && finalState.inside, 'LOGIN_OWNER_SESSION_NOT_ACTIVE');
-  report.authMode = initial.currentUser ? 'session_restored' : 'owner_contract_gate';
+  report.authMode = initial.currentUser ? 'session_restored' : 'detached_owner_contract_gate';
   report.authDiagnostic = {
-    strategy: 'owner_login_contract',
+    strategy: 'detached_owner_login_controller',
     providerReady: finalState.providerReady,
     ownerReady: finalState.ownerReady,
     currentUser: finalState.currentUser,
@@ -188,7 +222,8 @@ async function ensureAuthenticated(page) {
     authStage: finalState.authStage,
     firebaseInit: finalState.firebaseInit,
     firebaseLoader: finalState.firebaseLoader,
-    errorCategory: ''
+    gateState: finalState.gateState,
+    errorCategory: finalState.gateCode || ''
   };
   report.checks.authenticated = true;
 }
