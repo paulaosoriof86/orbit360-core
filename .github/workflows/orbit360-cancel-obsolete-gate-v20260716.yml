@@ -1,0 +1,22 @@
+name: Orbit 360 Cancel Obsolete Joint Gate 20260716
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-clientes-aseguradoras-runtime-gate-v20260716
+  cancel-in-progress: true
+
+jobs:
+  release_runner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Liberar ejecución obsoleta
+        run: echo "Obsolete unbounded gate cancelled; bounded gate remains authoritative."
