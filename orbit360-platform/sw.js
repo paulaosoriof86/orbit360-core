@@ -1,7 +1,7 @@
 /* Orbit 360 · Service Worker — red primero con fallback offline.
    Evita que una versión antigua de Auth o del shell bloquee el canal LAB. */
-var CACHE = 'orbit360-v20260717-1';
-var BUILD = '20260717-1';
+var CACHE = 'orbit360-v20260717-2';
+var BUILD = '20260717-2';
 
 self.addEventListener('install', function () {
   self.skipWaiting();
