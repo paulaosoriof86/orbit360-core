@@ -29,22 +29,22 @@
   ],
   "gates": [{
     "gateId": "block1-client360-insurers-lab-v20260717",
-    "contractVersion": "1.0.8",
+    "contractVersion": "1.0.9",
     "runtimeVersion": "20260717-2",
     "block": 1,
     "status": "ACTIVE_PENDING_RUNTIME_GATE",
-    "diagnosticRule": "Every Playwright operation in canonical runtime must have its own bounded timeout before the global watchdog.",
+    "diagnosticRule": "Canonical readiness is one atomic browser condition; the gate must not reconstruct it with a second evaluate call.",
     "reconciliation": {
       "date": "2026-07-17",
       "classifications": ["PIPELINE_MECHANISM_FAILURE"],
-      "scope": "bounded canonical runtime controller",
-      "rootCause": "The custom canonical-runtime loop contained page.evaluate without an operation timeout. When the document thread stayed occupied, the controller could not recover until the five-minute global watchdog.",
+      "scope": "atomic canonical readiness before authentication",
+      "rootCause": "The bounded canonical wait succeeded, but a second page.evaluate attempted to rebuild the same evidence while bootstrap work could resume, causing canonical_runtime_snapshot to time out.",
       "corrections": [
-        "Replace the custom evaluate loop with Playwright-managed waitForFunction",
-        "Require 1200 ms of continuous canonical stability",
-        "Bound canonical runtime wait to 95 seconds",
-        "Bound the final runtime snapshot to 12 seconds",
-        "Preserve the owner snapshot for authentication handoff"
+        "Require document.readyState complete",
+        "Require runtime, Firebase, provider and canonical owners in one condition",
+        "Require two seconds of continuous atomic readiness",
+        "Remove the post-readiness page.evaluate snapshot",
+        "Start Auth directly from the approved atomic condition"
       ],
       "preserved": ["Orbit.store","core/auth.js","core/legal.js","Cliente 360 renderer","Aseguradoras renderer","414 clientes","26 aseguradoras","7 asesores"]
     },
@@ -89,7 +89,7 @@
       {"path":"orbit360-platform/core/backend-lab-loader.js","requiredTokens":["var LAB_RUNTIME = '20260717-2'","runtimeVersion: LAB_RUNTIME"]},
       {"path":"orbit360-platform/sw.js","requiredTokens":["var CACHE = 'orbit360-v20260717-2'","var BUILD = '20260717-2'"]},
       {"path":"orbit360-platform/core/pwa.js","requiredTokens":["var RUNTIME_BUILD = '20260717-2'","serviceWorker.register('sw.js?v=' + RUNTIME_BUILD)"]},
-      {"path":"tools/orbit360-gate-runtime-crm-v20260716.mjs","requiredTokens":["ORBIT360_EXPECTED_RUNTIME || '20260717-2'","contractVersion: '1.0.8'","canonical_runtime_wait","canonical_runtime_snapshot","canonicalAuthOwnerHandoff","PIPELINE_STEP_TIMEOUT"]},
+      {"path":"tools/orbit360-gate-runtime-crm-v20260716.mjs","requiredTokens":["ORBIT360_EXPECTED_RUNTIME || '20260717-2'","contractVersion: '1.0.9'","canonical_runtime_atomic_ready","document.readyState === 'complete'","providerReady","atomicReadiness","PIPELINE_STEP_TIMEOUT"]},
       {"path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml","requiredTokens":["ORBIT360_EXPECTED_RUNTIME: 20260717-2","CANONICAL_RUNTIME_VERSION"]}
     ],
     "forbiddenRuntimeReferences": [
@@ -103,6 +103,7 @@
       "asg-order-v20260716",
       "asg-knowledge-projection-v20260716",
       "authentication_owner_ready",
+      "canonical_runtime_snapshot",
       "const deadline = Date.now() + 60000"
     ],
     "environment": {"branch":"ays/backend-tenant-lab-v99-20260703","firebaseProjectId":"ays-orbit-360-lab","hostingChannel":"orbit360-ays-lab"},
