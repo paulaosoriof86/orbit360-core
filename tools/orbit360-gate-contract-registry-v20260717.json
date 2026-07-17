@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-v1",
+  "issuedAt": "2026-07-17",
+  "plan": {
+    "name": "PLAN-MAESTRO-EJECUCION-PRODUCTIVA-ANTI-DESVIACION-SINCRONIZACION-CLAUDE-ORBIT360-AYS-20260716",
+    "activeBlock": 1,
+    "previousBlockStatus": "GO_STATIC_ARCHITECTURE"
+  },
+  "repository": {
+    "fullName": "paulaosoriof86/orbit360-core",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pr": 5,
+    "tenant": "alianzas-soluciones"
+  },
+  "canonicalOwners": [
+    {
+      "id": "pwa",
+      "path": "orbit360-platform/core/pwa.js",
+      "requiredTokens": ["buildManifest", "serviceWorker.register"]
+    },
+    {
+      "id": "router",
+      "path": "orbit360-platform/core/router.js",
+      "requiredTokens": ["RUNTIME_CONTRACTS", "loadRuntimeContracts", "toggleMobile", "Orbit.access.can"]
+    },
+    {
+      "id": "legal",
+      "path": "orbit360-platform/core/legal.js",
+      "requiredTokens": ["__ownerIdempotent", "pendingScopes", "doneScopes", "data-legal-gate"]
+    },
+    {
+      "id": "access",
+      "path": "orbit360-platform/core/access-scope.js",
+      "requiredTokens": ["deriveClientState", "duplicateCandidates", "prepareManual", "scopedStore", "withScope"]
+    },
+    {
+      "id": "clientProjection",
+      "path": "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
+      "requiredTokens": ["Orbit.clientProjection", "project", "get"]
+    },
+    {
+      "id": "insurers",
+      "path": "orbit360-platform/modules/aseguradoras.js",
+      "requiredTokens": ["__ownerKnowledgeV20260717", "__tenantOrderV20260717", "__consumerGatesSeparatedV20260717", "knowledgeSources"]
+    }
+  ],
+  "retiredRuntimeArtifacts": [
+    "orbit360-platform/core/empalme-v1251-runtime.js",
+    "orbit360-platform/modules/aseguradoras-candidate-actions.js",
+    "orbit360-platform/modules/aseguradoras-frontend-projection-v20260716.js",
+    "orbit360-platform/data/import-initial-profiles.js",
+    "orbit360-platform/modules/importar-initial-tenant-lab.js"
+  ],
+  "gates": [
+    {
+      "gateId": "block1-client360-insurers-lab-v20260717",
+      "contractVersion": "1.0.0",
+      "block": 1,
+      "status": "ACTIVE_PENDING_RUNTIME_PASS",
+      "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+      "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "validators": [
+        "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs",
+        "tools/orbit360-runtime-check-client360-v20260716.mjs",
+        "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+        "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+        "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js"
+      ],
+      "requiredFiles": [
+        "orbit360-platform/ays-lab-preview.html",
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/core/router.js",
+        "orbit360-platform/core/legal.js",
+        "orbit360-platform/core/access-scope.js",
+        "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
+        "orbit360-platform/data/tenant-runtime-config-index.js"
+      ],
+      "forbiddenRuntimeReferences": [
+        "aseguradoras-candidate-actions.js",
+        "aseguradoras-frontend-projection-v20260716.js",
+        "empalme-v1251-runtime.js",
+        "import-initial-profiles.js",
+        "importar-initial-tenant-lab.js",
+        "installLegalGate",
+        "installMobileNavigation"
+      ],
+      "environment": {
+        "branch": "ays/backend-tenant-lab-v99-20260703",
+        "firebaseProjectId": "ays-orbit-360-lab",
+        "hostingChannel": "orbit360-ays-lab"
+      },
+      "expectedAggregates": {
+        "clientes": 414,
+        "aseguradoras": 26,
+        "asesores": 7
+      },
+      "runtimeViews": [
+        "direccion_desktop",
+        "operativo_tablet",
+        "asesor_mobile"
+      ],
+      "successEvidence": "orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json",
+      "successPredicate": "ok === true"
+    }
+  ]
+}
