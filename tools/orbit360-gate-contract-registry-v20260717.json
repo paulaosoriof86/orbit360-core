@@ -54,34 +54,31 @@
   "gates": [
     {
       "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.5",
+      "contractVersion": "1.0.6",
+      "runtimeVersion": "20260717-2",
       "block": 1,
-      "status": "ACTIVE_PENDING_PREFLIGHT",
-      "diagnosticRule": "Preflight failure evidence must be persisted and published before any runtime correction.",
+      "status": "ACTIVE_PENDING_RUNTIME_GATE",
+      "diagnosticRule": "The gate may authenticate only after URL, loader, Firebase and owner runtime remain canonical and stable.",
       "reconciliation": {
         "date": "2026-07-17",
         "classifications": [
+          "PIPELINE_MECHANISM_FAILURE",
           "FUNCTIONAL_DEFECT",
           "VALIDATOR_STALE"
         ],
-        "scope": "LAB preview bootstrap and precise forbidden-token contract",
-        "removedRuntimeReferences": [
-          "data/import-initial-profiles.js",
-          "modules/importar-initial-tenant-lab.js",
-          "modules/aseguradoras-candidate-actions.js"
+        "scope": "LAB canonical runtime navigation and version parity",
+        "rootCause": "The preview requested runtime 20260717-2 while the loader required 20260716-2. The gate ignored the runtime query parameter and could dispatch Auth in a transient document that was then replaced, losing the pending login state.",
+        "corrections": [
+          "Unify preview, loader, Service Worker, PWA, workflow and gate on runtime 20260717-2",
+          "Require a stable canonical document before Auth",
+          "Validate runtime version parity in the preflight before secrets, Firebase, Hosting or Playwright"
         ],
-        "retiredOverbroadTokens": [
-          "data-mode"
-        ],
-        "retiredTokenReason": "data-mode is a legitimate semantic attribute used by the canonical Cliente 360 segmented control for Manual, Importar and Inteligente modes; it is not evidence of a retired bridge.",
         "preserved": [
           "Orbit.store",
           "core/auth.js",
           "core/legal.js",
-          "backend-lab-advisor-write-bridge.js",
-          "backend-lab-import-readiness-guard.js",
-          "backend-lab-canonical-view-sync.js",
-          "Cliente 360 renderer and segmented control",
+          "Firebase credentials and configuration",
+          "Cliente 360 renderer",
           "Aseguradoras renderer",
           "414 clientes",
           "26 aseguradoras",
@@ -111,6 +108,8 @@
       "runtimeGraphFiles": [
         "orbit360-platform/ays-lab-preview.html",
         "orbit360-platform/index.html",
+        "orbit360-platform/sw.js",
+        "orbit360-platform/core/pwa.js",
         "orbit360-platform/core/backend-lab-loader.js",
         "orbit360-platform/core/backend-lab-init.js",
         "orbit360-platform/core/backend-lab-auth-guard.js",
@@ -121,6 +120,32 @@
         "orbit360-platform/modules/cliente360.js",
         "orbit360-platform/modules/aseguradoras.js",
         "orbit360-platform/data/tenant-runtime-config-index.js"
+      ],
+      "runtimeVersionContracts": [
+        {
+          "path": "orbit360-platform/ays-lab-preview.html",
+          "requiredTokens": ["content=\"20260717-2\"", "sw.js?v=20260717-2", "runtime=20260717-2"]
+        },
+        {
+          "path": "orbit360-platform/core/backend-lab-loader.js",
+          "requiredTokens": ["var LAB_RUNTIME = '20260717-2'", "runtimeVersion: LAB_RUNTIME"]
+        },
+        {
+          "path": "orbit360-platform/sw.js",
+          "requiredTokens": ["var CACHE = 'orbit360-v20260717-2'", "var BUILD = '20260717-2'"]
+        },
+        {
+          "path": "orbit360-platform/core/pwa.js",
+          "requiredTokens": ["var RUNTIME_BUILD = '20260717-2'", "serviceWorker.register('sw.js?v=' + RUNTIME_BUILD)"]
+        },
+        {
+          "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+          "requiredTokens": ["ORBIT360_EXPECTED_RUNTIME || '20260717-2'", "contractVersion: '1.0.6'", "canonicalRuntimeStable"]
+        },
+        {
+          "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+          "requiredTokens": ["ORBIT360_EXPECTED_RUNTIME: 20260717-2", "CANONICAL_RUNTIME_VERSION"]
+        }
       ],
       "forbiddenRuntimeReferences": [
         "aseguradoras-candidate-actions.js",
