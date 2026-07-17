@@ -1,17 +1,20 @@
 /* ============================================================
-   Orbit 360 · proyección canónica de clientes importados · 2026-07-16
-   Contrato reusable y aditivo:
-   - adapta en memoria campos normalizados del importador al contrato
-     visual del CRM aprobado;
-   - no escribe, no reimporta y no sustituye Orbit.store;
-   - preserva trazabilidad, calidad y campos de origen;
-   - permite que Cliente 360, Pólizas, Cobros y búsqueda reutilicen
-     el mismo cliente mientras se completa la migración por fuentes.
+   Orbit 360 · proyección canónica de clientes importados · 2026-07-17
+
+   Propietario reusable:
+   - Orbit.clientProjection.project(row) devuelve COPIA canónica;
+   - Orbit.clientProjection.get(id) lee Orbit.store y devuelve COPIA;
+   - no reimporta, no crea relaciones y no llama insert/update/remove.
+
+   Compatibilidad temporal:
+   - applyAll() conserva la proyección in-place necesaria para renderers
+     antiguos de Cliente 360 mientras se trasladan al helper propietario;
+   - debe retirarse cuando Cliente 360/Calidad/Pólizas/Cobros consuman
+     Orbit.clientProjection directamente.
    ============================================================ */
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
-  if (Orbit.clientCanonicalViewProjectionV20260716) return;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function isLegal(value) {
@@ -21,44 +24,107 @@
   function unique(values) {
     return Array.from(new Set([].concat(values || []).map(clean).filter(Boolean)));
   }
-  function project(row) {
-    if (!row || typeof row !== 'object') return row;
 
-    row.nombre = clean(row.nombre || row.nombreCompleto || row.razonSocial);
-    row.tipo = clean(row.tipo) || (isLegal(row.tipoPersona) || clean(row.razonSocial) ? 'Empresa' : 'Persona');
-    row.identificacion = clean(row.identificacion || row.numeroDocumento || row.documento || row.nit);
-    row.email = clean(row.email || row.correo || row.contactoPrincipalCorreo);
-    row.telefono = clean(row.telefono || row.whatsapp || row.telefonoAlterno || row.contactoPrincipalTelefono);
-    row.whatsapp = clean(row.whatsapp || row.telefono || row.contactoPrincipalTelefono);
-    row.ciudad = clean(row.ciudad || row.ciudadMunicipio || row.canton);
-    row.departamento = clean(row.departamento || row.departamentoProvincia || row.provincia);
-    row.direccion = clean(row.direccion);
-    row.fechaAlta = clean(row.fechaAlta || row.fechaAltaOrigen);
-    row.fechaNac = clean(row.fechaNac || row.fechaNacimiento);
-    row.segmento = clean(row.segmento || 'Nuevo');
-    row.canal = clean(row.canal || row.canalOrigen || 'Migración');
-    row.estado = clean(row.estado || row.estadoOperativo || 'pendiente_polizas');
-    row.estadoOperativo = clean(row.estadoOperativo || row.estado || 'pendiente_polizas');
-    row.moneda = clean(row.moneda || (row.pais === 'CO' ? 'COP' : row.pais === 'GT' ? 'GTQ' : ''));
-    row.etiquetas = unique(row.etiquetas || []);
-    row.contactoAlt = clean(row.contactoAlt || row.contactoPrincipalNombre);
-    row.driveLink = clean(row.driveLink || row.drive || row.expedienteUrl);
+  var ALIAS = {
+    nombre: ['nombre', 'nombreCompleto', 'razonSocial'],
+    identificacion: ['identificacion', 'numeroDocumento', 'documento', 'nit'],
+    email: ['email', 'correo', 'contactoPrincipalCorreo'],
+    telefono: ['telefono', 'whatsapp', 'telefonoAlterno', 'contactoPrincipalTelefono'],
+    ciudad: ['ciudad', 'ciudadMunicipio', 'canton'],
+    departamento: ['departamento', 'departamentoProvincia', 'provincia'],
+    fechaAlta: ['fechaAlta', 'fechaAltaOrigen'],
+    fechaNac: ['fechaNac', 'fechaNacimiento'],
+    driveLink: ['driveLink', 'drive', 'expedienteUrl'],
+    estado: ['estado', 'estadoOperativo']
+  };
 
-    var alerts = unique(row.alertasCalidad || (row.calidad && row.calidad.alertas) || []);
-    row.alertasCalidad = alerts;
-    row.calidad = Object.assign({}, row.calidad || {}, {
-      alertas: alerts,
-      estado: clean((row.calidad && row.calidad.estado) || (row.requiereValidacion ? 'REQUIERE_VALIDACION' : 'PENDIENTE_POLIZAS'))
+  function pick(src, keys) {
+    for (var i = 0; i < keys.length; i++) {
+      var value = src ? src[keys[i]] : undefined;
+      if (value !== undefined && value !== null && String(value).trim() !== '') return value;
+    }
+    return '';
+  }
+  function hasPolicies(client) {
+    if (!client) return false;
+    if (typeof client.numPolizas === 'number') return client.numPolizas > 0;
+    try {
+      return !!(Orbit.store && Orbit.store.where && Orbit.store.where('polizas', function (p) {
+        return p.clienteId === client.id;
+      }).length);
+    } catch (error) { return false; }
+  }
+  function qualityAlerts(client) {
+    if (!client) return [];
+    if (Array.isArray(client.alertasCalidad)) return unique(client.alertasCalidad);
+    if (client.calidad && Array.isArray(client.calidad.alertas)) return unique(client.calidad.alertas);
+    if (Array.isArray(client.alertas)) return unique(client.alertas);
+    return [];
+  }
+  function operationalState(client) {
+    var state = pick(client, ALIAS.estado);
+    if (state) return state;
+    return hasPolicies(client) ? clean(client && client.estado) : 'pendiente_polizas';
+  }
+  function project(client) {
+    if (!client || typeof client !== 'object') return client;
+    var out = Object.assign({}, client);
+    Object.keys(ALIAS).forEach(function (canon) {
+      var value = pick(client, ALIAS[canon]);
+      if (value !== '' || out[canon] === undefined) out[canon] = value || out[canon] || '';
     });
-
-    row.__canonicalViewProjection = '20260716.1';
-    return row;
+    out.tipo = clean(out.tipo) || (isLegal(out.tipoPersona) || clean(out.razonSocial) ? 'Empresa' : 'Persona');
+    out.whatsapp = clean(out.whatsapp || out.telefono || out.contactoPrincipalTelefono);
+    out.segmento = clean(out.segmento || 'Nuevo');
+    out.canal = clean(out.canal || out.canalOrigen || 'Migración');
+    out.estado = operationalState(client);
+    out.estadoOperativo = clean(out.estadoOperativo || out.estado || 'pendiente_polizas');
+    out.moneda = clean(out.moneda || '');
+    out.etiquetas = unique(out.etiquetas || []);
+    out.contactoAlt = clean(out.contactoAlt || out.contactoPrincipalNombre);
+    out.alertasCalidad = qualityAlerts(client);
+    out.calidad = Object.assign({}, out.calidad || {}, {
+      alertas: out.alertasCalidad,
+      estado: clean((out.calidad && out.calidad.estado) || (out.requiereValidacion ? 'REQUIERE_VALIDACION' : 'PENDIENTE_POLIZAS'))
+    });
+    out._proyeccionCanonica = true;
+    return out;
+  }
+  function field(client, canon) {
+    if (!ALIAS[canon]) return client ? client[canon] : '';
+    return pick(client, ALIAS[canon]);
+  }
+  function get(clientId) {
+    if (!clientId) return null;
+    try {
+      var client = Orbit.store && Orbit.store.get ? Orbit.store.get('clientes', clientId) : null;
+      return client ? project(client) : null;
+    } catch (error) { return null; }
   }
 
+  Orbit.clientProjection = {
+    version: '20260717.1',
+    project: project,
+    get: get,
+    field: field,
+    estadoOperativo: operationalState,
+    alertasCalidad: qualityAlerts,
+    ALIAS: ALIAS,
+    writesStore: false,
+    reimportsData: false,
+    createsRelations: false
+  };
+
+  function projectInPlace(row) {
+    if (!row || typeof row !== 'object') return row;
+    Object.assign(row, project(row));
+    row.__canonicalViewProjection = '20260717.1-temporal';
+    return row;
+  }
   function applyAll() {
     var rows = [];
     try { rows = Orbit.store && Orbit.store.all ? (Orbit.store.all('clientes') || []) : []; } catch (error) {}
-    rows.forEach(project);
+    rows.forEach(projectInPlace);
     try {
       if (window.OrbitLabCanonicalViewSync && typeof OrbitLabCanonicalViewSync.schedule === 'function') {
         OrbitLabCanonicalViewSync.schedule('clientes');
@@ -74,9 +140,11 @@
   document.addEventListener('orbit:session', function () { setTimeout(applyAll, 0); });
 
   Orbit.clientCanonicalViewProjectionV20260716 = {
-    version: '20260716.1',
-    project: project,
+    version: '20260717.1',
+    project: projectInPlace,
+    projectCopy: project,
     applyAll: applyAll,
+    temporaryInPlaceBridge: true,
     writesStore: false,
     reimportsData: false,
     replacesRenderer: false
