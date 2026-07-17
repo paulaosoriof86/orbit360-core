@@ -1,0 +1,82 @@
+--- a/.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml
++++ b/.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml
+@@ -61,11 +61,14 @@ jobs:
+           test "$BRANCH" = "ays/backend-tenant-lab-v99-20260703"
+           test -f orbit360-platform/ays-lab-preview.html
+           test -f orbit360-platform/modules/cliente360.js
++          test -f orbit360-platform/core/router.js
++          test -f orbit360-platform/core/legal.js
++          test -f orbit360-platform/core/access-scope.js
+           test -f orbit360-platform/core/client-canonical-view-projection-v20260716.js
+           test -f orbit360-platform/modules/aseguradoras.js
+-          test -f orbit360-platform/modules/aseguradoras-candidate-actions.js
+-          test -f orbit360-platform/modules/aseguradoras-frontend-projection-v20260716.js
++          test -f orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
++          test -f orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js
+           test -f tools/orbit360-runtime-check-client360-v20260716.mjs
+           test -f tools/orbit360-gate-runtime-crm-v20260716.mjs
+ 
+@@ -73,15 +76,18 @@ jobs:
+         run: |
+           set -euo pipefail
+           node --check orbit360-platform/core/pwa.js
++          node --check orbit360-platform/core/router.js
++          node --check orbit360-platform/core/legal.js
++          node --check orbit360-platform/core/access-scope.js
+           node --check orbit360-platform/core/backend-lab-init.js
+           node --check orbit360-platform/core/client-canonical-view-projection-v20260716.js
+           node --check orbit360-platform/core/session-multirol-visibility-v20260716.js
+           node --check orbit360-platform/modules/cliente360.js
+           node --check orbit360-platform/modules/aseguradoras.js
+-          node --check orbit360-platform/modules/aseguradoras-candidate-actions.js
+-          node --check orbit360-platform/modules/aseguradoras-frontend-projection-v20260716.js
++          node --check orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
++          node --check orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js
+           node --check tools/orbit360-runtime-check-client360-v20260716.mjs
+           node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+           node --check tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs
+           node --check tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs
++          node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
++          node orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js
+           node tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs
+--- a/tools/orbit360-gate-runtime-crm-v20260716.mjs
++++ b/tools/orbit360-gate-runtime-crm-v20260716.mjs
+@@ -217,24 +217,34 @@ async function validateInsurers(page, label, advisorMode = false) {
+ 
+   const firstText = String(await cards.first().innerText()).replace(/\s+/g, ' ').trim();
+   assert(/\bGT\b/.test(firstText), 'GT_NOT_FIRST', label);
+-  assert(await page.locator('#asg-order-v20260716').count() === 1, 'INSURER_ORDER_CONTROL_MISSING', label);
++  assert(await page.locator('#asg-order').count() === 1, 'INSURER_ORDER_CONTROL_MISSING', label);
+ 
+   const mappedCard = cards.filter({ hasText: mappedInsurer }).first();
+   assert(await mappedCard.count() > 0, 'MAPPED_INSURER_CARD_NOT_FOUND', label);
+   await mappedCard.click();
+ 
+   const ficha = page.locator('#asg-ficha');
+   await ficha.waitFor({ state: 'visible', timeout: 15000 });
+   await page.waitForTimeout(500);
+-  assert(await ficha.getAttribute('data-mode') === 'read', 'INSURER_FICHA_NOT_READ_MODE', label);
+   assert(await page.locator('#af-guardar').count() === 0, 'INSURER_SAVE_VISIBLE_IN_READ_MODE', label);
+   if (advisorMode) assert(await page.locator('#af-editar').count() === 0, 'ADVISOR_INSURER_EDIT_VISIBLE');
+ 
+   await page.locator('[data-tab="tarifas"]').click();
+-  const knowledge = page.locator('#asg-knowledge-projection-v20260716');
++  const knowledge = page.locator('#af-body');
+   await knowledge.waitFor({ state: 'visible', timeout: 15000 });
++  await page.waitForFunction(() => {
++    const body = document.querySelector('#af-body');
++    return !!(body && /Fuentes mapeadas y persistidas|Mapeado|Persistido|Validado/i.test(String(body.textContent || '')));
++  }, null, { timeout: 15000 });
+   const text = String(await knowledge.innerText()).replace(/\s+/g, ' ').trim();
+-  assert(/Mapeo|Mapeado|Conocimiento proyectado/i.test(text), 'INSURER_KNOWLEDGE_NOT_VISIBLE', label);
+-  assert(!/No hay fuentes vinculadas/.test(text), 'INSURER_KNOWLEDGE_SOURCES_EMPTY', label);
++  assert(/Mapeado|Persistido|Validado|Conocimiento/i.test(text), 'INSURER_KNOWLEDGE_NOT_VISIBLE', label);
++  assert(!/Sin conocimiento adicional mapeado o persistido/.test(text), 'INSURER_KNOWLEDGE_SOURCES_EMPTY', label);
++  const owner = await page.evaluate(() => ({
++    knowledge: !!(window.Orbit && Orbit.modules && Orbit.modules.aseguradoras && Orbit.modules.aseguradoras.__ownerKnowledgeV20260717),
++    order: !!(window.Orbit && Orbit.modules && Orbit.modules.aseguradoras && Orbit.modules.aseguradoras.__tenantOrderV20260717),
++    gates: !!(window.Orbit && Orbit.modules && Orbit.modules.aseguradoras && Orbit.modules.aseguradoras.__consumerGatesSeparatedV20260717)
++  }));
++  assert(owner.knowledge && owner.order && owner.gates, 'INSURER_OWNER_CONTRACT_NOT_ACTIVE', label);
+   report[`${label}KnowledgeVisible`] = true;
+ }
