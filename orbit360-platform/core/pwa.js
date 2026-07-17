@@ -28,8 +28,14 @@
   function buildManifest() {
     var icon = clientLogo() || fallbackIcon();
     var manifest = {
-      name: clientName() + ' · Orbit 360', short_name: clientName().slice(0, 18), start_url: '.', scope: '.',
-      display: 'standalone', orientation: 'any', background_color: '#1E2227', theme_color: themeColor(),
+      name: clientName() + ' · Orbit 360',
+      short_name: clientName().slice(0, 18),
+      start_url: '.',
+      scope: '.',
+      display: 'standalone',
+      orientation: 'any',
+      background_color: '#1E2227',
+      theme_color: themeColor(),
       description: 'Sistema 360 para intermediarios de seguros.',
       icons: [
         { src: icon, sizes: '192x192', type: icon.indexOf('svg') >= 0 ? 'image/svg+xml' : 'image/png', purpose: 'any maskable' },
@@ -46,7 +52,8 @@
   var deferredPrompt = null;
   function showInstall(estado) {
     var prev = document.getElementById('pwa-install'); if (prev) prev.remove();
-    var btn = document.createElement('button'); btn.id = 'pwa-install';
+    var btn = document.createElement('button');
+    btn.id = 'pwa-install';
     if (estado === 'instalada') { btn.textContent = '✓ App instalada'; btn.setAttribute('data-state', 'instalada'); }
     else if (estado === 'ios') { btn.textContent = '📲 Instalar en iPhone/iPad'; btn.setAttribute('data-state', 'ios'); }
     else { btn.textContent = '⬇ Instalar como app'; btn.setAttribute('data-state', 'instalar'); }
@@ -61,6 +68,7 @@
     if (estado === 'instalada') setTimeout(function () { if (btn.parentNode) { btn.style.opacity = '0'; setTimeout(function () { btn.remove(); }, 300); } }, 4000);
     else setTimeout(function () { if (document.getElementById('pwa-install')) btn.style.opacity = '0.85'; }, 8000);
   }
+
   function iosHint() {
     var d = document.createElement('div');
     d.style.cssText = 'position:fixed;left:50%;bottom:74px;transform:translateX(-50%);z-index:301;background:#1E2227;color:#fff;padding:12px 16px;border-radius:12px;font-size:13px;max-width:300px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)';
@@ -82,178 +90,4 @@
     Orbit.pwa = { refresh: function () { try { setFavicons(); buildManifest(); } catch (e) {} }, install: showInstall };
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-})();
-
-/* Empalme aditivo v1.251: se carga después de los módulos para endurecer sesión,
-   scopes, acciones directas y bancos ficticios sin reemplazar backend protegido. */
-(function () {
-  function load() {
-    if (document.querySelector('script[data-orbit-empalme-v1251]')) return;
-    var s = document.createElement('script');
-    s.src = 'core/empalme-v1251-runtime.js?v=20260714-1251';
-    s.async = false; s.setAttribute('data-orbit-empalme-v1251', '1');
-    document.head.appendChild(s);
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load); else load();
-})();
-
-/* Carga inicial configurable por tenant. El repositorio no contiene los datos:
-   el usuario selecciona el lote local desde Importar. */
-(function () {
-  function add(src, marker, done) {
-    if (document.querySelector('script[' + marker + ']')) { if (done) done(); return; }
-    var s = document.createElement('script');
-    s.src = src;
-    s.async = false;
-    s.setAttribute(marker, '1');
-    if (done) s.onload = done;
-    document.head.appendChild(s);
-  }
-  function load() {
-    add('data/import-initial-profiles.js?v=20260714', 'data-orbit-import-initial-profiles', function () {
-      add('modules/importar-initial-tenant-lab.js?v=20260714', 'data-orbit-import-initial-tenant-lab');
-    });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load); else load();
-})();
-
-/* ============================================================
-   Estabilización transversal 2026-07-16
-   - aceptación legal idempotente aunque Auth notifique varias veces;
-   - menú móvil con un solo comportamiento aunque exista listener heredado;
-   - carga aditiva de contratos multirol, Cliente 360 y Aseguradoras.
-   ============================================================ */
-(function () {
-  function installLegalGate() {
-    var legal = window.Orbit && Orbit.legal;
-    if (!legal || !legal.gate || legal.__idempotentGateV20260716) return;
-    var original = legal.gate.bind(legal);
-    var doneScopes = Object.create(null);
-    var pendingScopes = Object.create(null);
-    var callbacks = Object.create(null);
-
-    function legalModalNodes() {
-      return Array.prototype.filter.call(document.querySelectorAll('.drawer-back.open'), function (node) {
-        return !!node.querySelector('#lg-chk,#conf-chk,#lg-ok,#conf-ok');
-      });
-    }
-
-    function removeScopeModals(scope) {
-      legalModalNodes().forEach(function (node) {
-        var tagged = node.getAttribute('data-orbit-legal-scope');
-        if (!tagged || tagged === scope) {
-          if (node.parentNode) node.parentNode.removeChild(node);
-        }
-      });
-    }
-
-    function queueCallback(scope, fn) {
-      if (typeof fn !== 'function') return;
-      callbacks[scope] = callbacks[scope] || [];
-      callbacks[scope].push(fn);
-    }
-
-    function finish(scope) {
-      pendingScopes[scope] = false;
-      doneScopes[scope] = true;
-      removeScopeModals(scope);
-      var list = callbacks[scope] || [];
-      callbacks[scope] = [];
-      list.forEach(function (fn) { try { fn(); } catch (e) {} });
-    }
-
-    legal.gate = function (tipo, scopeId, opts) {
-      opts = opts || {};
-      var scope = String(scopeId || 'anonymous');
-      queueCallback(scope, opts.onDone);
-
-      if ((legal.yaAcepto && legal.yaAcepto(scope)) || doneScopes[scope]) {
-        finish(scope);
-        return;
-      }
-
-      if (pendingScopes[scope]) return;
-      pendingScopes[scope] = true;
-
-      var before = Array.prototype.slice.call(document.querySelectorAll('.drawer-back.open'));
-      try {
-        original(tipo, scope, { onDone: function () { finish(scope); } });
-      } catch (error) {
-        pendingScopes[scope] = false;
-        throw error;
-      }
-
-      var created = Array.prototype.slice.call(document.querySelectorAll('.drawer-back.open')).find(function (node) {
-        return before.indexOf(node) < 0 && !!node.querySelector('#lg-chk,#conf-chk,#lg-ok,#conf-ok');
-      });
-
-      if (created) {
-        created.setAttribute('data-orbit-legal-scope', scope);
-      } else if (legal.yaAcepto && legal.yaAcepto(scope)) {
-        finish(scope);
-      } else {
-        pendingScopes[scope] = false;
-      }
-    };
-
-    legal.__idempotentGateV20260716 = true;
-    legal.__legalGateStateV20260716 = {
-      pendingScopes: pendingScopes,
-      doneScopes: doneScopes
-    };
-  }
-
-  function installMobileNavigation() {
-    if (document.documentElement.dataset.orbitMobileNavV20260716) return;
-    document.documentElement.dataset.orbitMobileNavV20260716 = '1';
-    var burger = document.getElementById('burger');
-    var sidebar = document.getElementById('sidebar');
-    var overlay = document.querySelector('.sb-overlay');
-    if (!burger || !sidebar || !overlay) return;
-    function mobile() { return window.matchMedia && window.matchMedia('(max-width:980px)').matches; }
-    function paint(open) {
-      sidebar.classList.toggle('open', open);
-      overlay.classList.toggle('show', open);
-      document.body.classList.toggle('sb-open', open);
-      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-    burger.addEventListener('click', function (event) {
-      if (!mobile()) return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      paint(!sidebar.classList.contains('open'));
-    }, true);
-    overlay.addEventListener('click', function () { if (mobile()) paint(false); }, true);
-    document.addEventListener('click', function (event) {
-      if (mobile() && event.target && event.target.closest && event.target.closest('#sidebar .nav-link')) paint(false);
-    }, true);
-    window.addEventListener('resize', function () { if (!mobile()) paint(false); });
-  }
-
-  function loadScript(src, marker, ready) {
-    if (ready && ready()) return;
-    if (document.querySelector('script[' + marker + ']')) return;
-    var script = document.createElement('script');
-    script.src = src;
-    script.async = false;
-    script.setAttribute(marker, '1');
-    document.head.appendChild(script);
-  }
-
-  function loadRuntimeContracts() {
-    loadScript('core/session-multirol-visibility-v20260716.js?v=20260716-2', 'data-orbit-multirol-runtime-v20260716', function () {
-      return window.Orbit && Orbit.session && Orbit.session.__multirolVisibilityV20260716;
-    });
-    loadScript('core/client-canonical-view-projection-v20260716.js?v=20260716-1', 'data-orbit-client-projection-runtime-v20260716', function () {
-      return window.Orbit && Orbit.clientCanonicalViewProjectionV20260716;
-    });
-    loadScript('modules/aseguradoras-frontend-projection-v20260716.js?v=20260716-2', 'data-orbit-insurer-projection-runtime-v20260716', function () {
-      return window.Orbit && Orbit.aseguradorasFrontendProjectionV20260716;
-    });
-    loadScript('modules/aseguradoras-candidate-actions.js?v=20260716-2', 'data-orbit-candidate-actions-runtime-v20260716');
-  }
-
-  installLegalGate();
-  function ready() { installLegalGate(); installMobileNavigation(); loadRuntimeContracts(); }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
 })();
