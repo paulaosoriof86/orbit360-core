@@ -16,6 +16,47 @@ Orbit.ACADEMIA_PLUS = (function () {
   function S(icon, t, color, d) { return { icon: icon, t: t, color: color, d: d }; }
 
   var cursos = [
+    /* ============ DELTA: ACCESO, MULTIROL, SCOPE Y SEGURIDAD ============ */
+    {
+      id: 'cur_p_acceso_multirol', titulo: 'Acceso, multirol, alcance y seguridad de datos', cat: 'Producto', emoji: '🔐', color: C.graf,
+      desc: 'Cómo Orbit decide qué ve y qué puede hacer cada persona: roles, alcance de datos, países, permisos y estados honestos de conexión.', destinatarios: 'equipo',
+      metaLeccion: { porQueExiste: 'Porque un intermediario maneja datos sensibles de terceros: quién ve y quién cambia cada registro es una decisión de negocio, no un detalle técnico.', problemaResuelve: 'Accesos “todo o nada”, personas viendo cartera ajena y cambios sin rastro.', sinEsto: 'Fugas de información, reasignaciones indebidas y auditorías imposibles.', objetivo: 'Entender el contrato de acceso (rol activo, alcance, país), operar dentro del propio alcance y pedir corrección cuando algo no me pertenece.', rol: 'Equipo (todos)', modulo: 'Equipo, Configuración, Cliente360, Aseguradoras, Integraciones', datosLee: 'Rol activo, roles asignados, alcance por módulo, países autorizados', datosEscribe: 'Solo dentro del propio alcance; ampliaciones exigen motivo y confirmación', accionesPermitidas: 'Cambiar de rol asignado, consultar en alcance, completar dato faltante, crear gestión de corrección', erroresEvitar: 'Suponer que cambiar de rol cambia de persona; suponer que ver un módulo es ver todos sus datos; forzar un acceso por deep-link', casoPractico: 'Un asesor abre por link una póliza de otro asesor: el sistema la bloquea aunque el filtro global esté en “Todos”.', evidencia: 'Quiz', estado: 'progreso/certificado', actualizado: '2026-07-17' },
+      recursos: [{ nombre: 'Mapa de roles, alcance y países.pdf', tipo: 'pdf' }],
+      lecciones: [
+        L('Multirol: una persona, varios sombreros', 11, [
+          S('🎭', 'Rol activo vs. identidad', C.graf, 'Podés tener varios **roles asignados** (p. ej. Operativo y Asesor). El **rol activo** es el que usás ahora; el selector solo muestra los roles que te asignaron. Cambiar de rol **no cambia tu identidad**: seguís siendo la misma persona (tu `asesorId` no se altera), solo cambia qué podés ver y hacer.'),
+          S('🧩', 'Rol por defecto', C.azul, 'Cada usuario tiene un rol **por defecto** con el que arranca la sesión. Si el rol activo deja de estar permitido, el sistema cae al default válido — nunca a un rol privilegiado “por si acaso”.'),
+          S('🙅', 'Lo que un rol NO hace', C.red, 'Que veas el **módulo** no significa que veas **todos sus datos**: visibilidad de módulo y alcance de datos son cosas distintas (siguiente lección). Un rol no asignado no aparece ni puede activarse.')
+        ]),
+        L('Alcance de datos y país', 12, [
+          S('🎯', 'Propios / equipo / todos / ninguno', C.verde, 'Tu **alcance** por módulo define qué registros ves: solo los **propios**, los de tu **equipo**, **todos**, o **ninguno**. Un módulo visible con alcance “ninguno” no muestra registros — y eso es correcto, no un error.'),
+          S('🌎', 'Acceso por país', C.teal, 'Si tenés países autorizados, un registro de otro país queda **fuera de tu alcance aunque el filtro global esté en “Todos”**. El país del registro manda, no el selector de pantalla.'),
+          S('🚧', 'Registros sin dueño', C.ocre, 'Un registro sin asesor asignado **no** cae automáticamente en “propios/equipo”: queda para el alcance “todos” (bandeja de dirección/calidad). Así nadie hereda cartera por accidente.')
+        ]),
+        L('Fail-closed: deep-links y mutaciones', 10, [
+          S('🔒', 'Puertas que fallan cerradas', C.red, 'Ante duda o error de resolución, Orbit **niega** (fail-closed): nunca abre de más. Ocultar una tarjeta no basta — la acción directa por ID (abrir ficha, aplicar cobro, endosar, renovar) también valida el registro puntual.'),
+          S('🔗', 'Deep-link ajeno', C.graf, 'Pegar el link de un registro fuera de tu alcance no lo abre: se bloquea con aviso. La lista filtrada y la mutación protegida usan el **mismo motor** de acceso.'),
+          S('✋', 'Límites del Asesor', C.azul, 'Un Asesor consulta su alcance y completa datos faltantes permitidos, pero **no reasigna, no elimina, no fusiona, no cambia estado operativo** ni toca pólizas/cobros/conciliaciones validadas. Cuando no puede cambiar algo, **crea una gestión de corrección**.')
+        ]),
+        L('Equipo y ampliación de permisos', 10, [
+          S('🧮', 'Base + extras − restringidos', C.violeta, 'La visibilidad final de módulos = módulos **base del rol** + **extras** asignados − **restringidos**. La restricción siempre gana. El alcance de datos se configura aparte, por módulo.'),
+          S('🛡', 'Ampliar acceso deja rastro', C.red, 'Subir a “todos”, agregar un rol privilegiado, agregar un país o retirar una restricción exige **confirmación reforzada + motivo**, y guarda **antes/después + actor + fecha**. Ampliar acceso nunca es silencioso.'),
+          S('⛔', 'Suspender y revocar', C.graf, 'Un usuario inactivo o suspendido no ve nada (fail-closed). Revocar es inmediato y auditable.')
+        ]),
+        L('Estados honestos de conexión e integraciones', 9, [
+          S('🔌', 'Configurado ≠ conectado', C.teal, 'Guardar parámetros de una integración la deja **Pendiente de conexión**, no “conectada”. Validar parámetros comprueba que estén completos; **no** establece una conexión real ni afirma que exista.'),
+          S('🗣', 'Lenguaje claro', C.azul, 'Orbit habla en estados de negocio: *No configurado, Pendiente de conexión segura, Parámetros preparados, Conexión en validación, Conectado, Error de conexión*. Nunca muestra jerga interna al usuario.'),
+          S('🔐', 'Credenciales por referencia', C.graf, 'Orbit **nunca** guarda ni muestra el secreto real: registra una **referencia**; la revelación es temporal y auditada. Una cuenta bancaria operativa **no** es una credencial: se ve completa y se copia, pero no es un secreto.')
+        ]),
+        Q('Evaluación · Acceso y seguridad', [
+          { p: 'Cambiar tu rol activo de Dirección a Asesor…', ops: ['Cambia tu identidad/asesorId', 'Mantiene tu identidad; solo cambia lo que ves y podés hacer', 'Borra tus permisos'], ok: 1 },
+          { p: 'Un módulo visible con alcance “ninguno”…', ops: ['Muestra todos los registros', 'No muestra registros, y eso es correcto', 'Es un error a reportar'], ok: 1 },
+          { p: 'Abrir por link un registro de otro país no autorizado…', ops: ['Se permite si el filtro global está en “Todos”', 'Se bloquea: el país del registro manda', 'Depende del navegador'], ok: 1 },
+          { p: 'Guardar los parámetros de una integración significa que…', ops: ['Ya está conectada', 'Queda Pendiente de conexión hasta activarla y validarla', 'Se conecta sola en 24h'], ok: 1 },
+          { p: 'Cuando un Asesor no puede cambiar un dato crítico…', ops: ['Lo cambia igual', 'Crea una gestión de corrección', 'Elimina el registro'], ok: 1 }
+        ])
+      ]
+    },
     /* ============ AUTOCAPACITACIÓN POR MÓDULO ============ */
     {
       id: 'cur_p_clientes', titulo: 'Dominar Orbit Clientes (Expediente 360)', cat: 'Producto', emoji: '🧑‍💼', color: C.azul,
@@ -1075,7 +1116,7 @@ Orbit.ACADEMIA_PLUS = (function () {
   ];
 
   // Versión de contenido: súbela cuando cambies texto/lecciones para que se re-sincronice.
-  var CONTENT_V = 29;
+  var CONTENT_V = 30;
   function apply() {
     try {
       if (!window.Orbit || !Orbit.store || !Orbit.store.all) return false;

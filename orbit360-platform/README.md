@@ -62,7 +62,7 @@ Cada ítem del sidebar lleva su badge real:
 La plataforma cubre hoy el ciclo completo: Cliente 360, Pólizas, Cobros, Renovaciones, Cancelaciones, Comisiones, Historial, Ops/Leads, Cotizador + Comparativo (con tarifas por aseguradora validables y trazables), Aseguradoras (directorio + tarifas + documentos), Correo, Automatizaciones/Integraciones, Orbit IA, Configuración (marca, usuarios, países, integraciones, con secciones técnicas segmentadas por rol), Academia, Marketing, Reportes/Insights, Finanzas, Calidad e Importador. Ver `docs/PLAN-INFRAESTRUCTURA.md` para el detalle de rondas de auditoría y pendientes P1 documentados (no bloqueantes).
 
 ## Versión
-Base vigente: **v1.251** — ver `CHANGELOG.md` (entrada más reciente arriba) para el historial completo; `docs/MANIFIESTO-ENTREGA-v1251.md` resume esta ronda de correcciones P0 críticas.
+Base vigente: **v1.258** — ver `CHANGELOG.md` (entrada más reciente arriba); `docs/MANIFIESTO-ENTREGA-v1258.md` resume la corrección **semántica** P0-S1/P0-S2/P0-S3 (contrato de acceso conductual completo, proyección canónica en búsquedas/detalles/lotes/mensajes/automatizaciones de Pólizas y Cobros, gate separado Cotizador≠Comparativo). Batería conductual (53 aserciones) en `tools/orbit360-p0-tests.html`.
 
 ## Documentación por módulo
 `docs/` — un archivo por módulo conforme se construye. Ver `docs/cliente360.md`.

@@ -24,7 +24,8 @@ Orbit.modules.calidad = (function () {
   function tieneVigente(cid) { return q.polizasDe(cid).some(p => p.estado === 'Vigente' || p.estado === 'Por renovar'); }
 
   function render(host) {
-    const all = S().all('clientes').map(c => ({ c, f: faltantes(c), vig: tieneVigente(c.id) }))
+    const P = c => (window.Orbit && Orbit.clientProjection) ? Orbit.clientProjection.project(c) : c;
+    const all = S().all('clientes').map(c => { const pc = P(c); return { c: pc, f: faltantes(pc), vig: tieneVigente(pc.id) }; })
       .filter(x => x.f.length > 0);
     const conVig = all.filter(x => x.vig);
     const rows = all.filter(x => (!st.soloVig || x.vig) && (!st.ffalta || x.f.some(f => f.k === st.ffalta)))
@@ -110,7 +111,7 @@ Orbit.modules.calidad = (function () {
   }
 
   function campana() {
-    const all = S().all('clientes').map(c => ({ c, f: faltantes(c) })).filter(x => x.f.length && tieneVigente(x.c.id));
+    const all = S().all('clientes').map(c => { const pc = (window.Orbit && Orbit.clientProjection) ? Orbit.clientProjection.project(c) : c; return { c: pc, f: faltantes(pc) }; }).filter(x => x.f.length && tieneVigente(x.c.id));
     const wa = all.filter(x => x.c.telefono).length, mail = all.filter(x => !x.c.telefono && x.c.email).length;
     Orbit.ui.toast('Campaña de actualización:\n\n• ' + wa + ' por WhatsApp (tienen teléfono)\n• ' + mail + ' por correo (sin WhatsApp, con email)\n• ' + (all.length - wa - mail) + ' sin canal — requieren gestión manual.\n\nUsa la plantilla "Actualización de datos" con los campos pendientes de cada cliente.');
   }

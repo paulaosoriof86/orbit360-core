@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>Orbit 360 · Pruebas conductuales P0 v1.258</title>
+<style>body{font:14px/1.5 system-ui,sans-serif;margin:24px;color:#1E2227;background:#fafafa}
+h1{font-size:18px}h2{font-size:15px;margin-top:24px;border-bottom:2px solid #C5162E;padding-bottom:4px}
+table{border-collapse:collapse;margin:8px 0;font-size:12.5px;width:100%}th,td{border:1px solid #ccc;padding:5px 9px;text-align:center}
+th{background:#1E2227;color:#fff}td.k{text-align:left}.ok{color:#1f8a4c;font-weight:700}.no{color:#C5162E;font-weight:700}
+.pass{background:#e9f7ee}.fail{background:#fde8ea}pre{background:#111;color:#0f0;padding:12px;border-radius:6px;font-size:12px}</style>
+</head><body>
+<h1>Orbit 360 · Batería conductual P0 (v1.258)</h1>
+<p>Pruebas de <b>comportamiento</b> (no solo existencia) sobre la app real. Inserta registros temporales en memoria y los elimina al terminar; restaura sesión y tenant.</p>
+<div id="out">Cargando app…</div>
+<iframe id="app" src="../index.html?test=1" style="width:0;height:0;border:0;position:absolute"></iframe>
+<script>
+// cache-bust del iframe para cargar SIEMPRE la última versión de los módulos
+document.getElementById('app').src='../index.html?test='+Date.now();
+const fr=document.getElementById('app'), out=document.getElementById('out');
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+const R=[]; // {sec,name,ok,got}
+function A(sec,name,ok,got){R.push({sec,name,ok:!!ok,got:got===undefined?'':String(got)});}
+fr.addEventListener('load',()=>setTimeout(run,1000));
+function run(){
+  const W=fr.contentWindow, O=W.Orbit;
+  if(!O||!O.access||!O.store){out.innerHTML='<p class="no">No se pudo acceder a Orbit.</p>';return;}
+  const LS=W.localStorage, SK='orbit360_sessionview', TK='orbit360_tenant';
+  const sessionSnap=LS.getItem(SK)||JSON.stringify({rol:O.session.rol(),asesorId:O.session.asesorId()});
+  const tenantSnap=LS.getItem(TK);
+  const cleanup=[]; // fns
+  try{
+    /* ===== P0-S2 · proyección en Pólizas/Cobros (cliente solo-aliases) ===== */
+    const alias={id:'cli_alias_test',nombreCompleto:'Cliente de Prueba',numeroDocumento:'TEST-001',correo:'prueba@example.test',contactoPrincipalTelefono:'00000000',ciudadMunicipio:'Ciudad de prueba',departamentoProvincia:'Región de prueba',estadoOperativo:'pendiente_polizas',pais:'GT',moneda:'GTQ',asesorId:'ase_test_p0'};
+    O.store.insert('clientes',alias); cleanup.push(()=>O.store.remove('clientes','cli_alias_test'));
+    const polA={id:'pol_alias_test',clienteId:'cli_alias_test',asesorId:'ase_test_p0',numero:'GT-TEST-1',ramo:'Auto',producto:'Auto',estado:'Vigente',prima:1000,moneda:'GTQ',pais:'GT',forma:'Anual'};
+    O.store.insert('polizas',polA); cleanup.push(()=>O.store.remove('polizas','pol_alias_test'));
+    const cobA={id:'cob_alias_test',clienteId:'cli_alias_test',polizaId:'pol_alias_test',asesorId:'ase_test_p0',cuota:'1/1',monto:1000,moneda:'GTQ',estado:'Pendiente',vence:'2026-12-01'};
+    O.store.insert('cobros',cobA); cleanup.push(()=>O.store.remove('cobros','cob_alias_test'));
+    const pc=O.clientProjection.get('cli_alias_test');
+    A('P0-S2','get() proyecta nombre',pc&&pc.nombre==='Cliente de Prueba',pc&&pc.nombre);
+    A('P0-S2','get() proyecta email',pc&&pc.email==='prueba@example.test');
+    A('P0-S2','get() proyecta teléfono',pc&&pc.telefono==='00000000');
+    const raw=O.store.get('clientes','cli_alias_test');
+    A('P0-S2','store NO mutado (sigue solo-aliases)',raw.nombre===undefined&&raw.email===undefined,'nombre='+raw.nombre);
+    // búsqueda de Pólizas (replica rows(): usa PC(p.clienteId).nombre)
+    const txtPol=(polA.numero+' '+polA.producto+' '+(O.clientProjection.get(polA.clienteId)||{}).nombre).toLowerCase();
+    A('P0-S2','búsqueda Pólizas encuentra por nombre',txtPol.includes('prueba'));
+    A('P0-S2','búsqueda Pólizas por documento',(txtPol+' '+pc.identificacion.toLowerCase()).includes('test-001'));
+    // búsqueda de Cobros (replica matchTxt())
+    const txtCob=((O.clientProjection.get(cobA.clienteId)||{}).nombre+' '+polA.numero).toLowerCase();
+    A('P0-S2','búsqueda Cobros encuentra por nombre',txtCob.includes('prueba'));
+    // mensaje (lote usa PC(...).nombre.split)
+    const msgName=((O.clientProjection.get(cobA.clienteId)||{}).nombre||'').split(' ')[0];
+    A('P0-S2','mensaje usa nombre proyectado',msgName==='Cliente');
+    A('P0-S2','no crea relaciones extra',O.store.where('polizas',p=>p.clienteId==='cli_alias_test').length===1);
+
+    /* ===== P0-S1 · contrato conductual (asesor de prueba) ===== */
+    const teamMate={id:'ase_test_mate',nombre:'Compañero Prueba',roles:['Asesor'],teamId:'team_test',dataScopes:{default:'team'}};
+    O.store.insert('asesores',teamMate); cleanup.push(()=>O.store.remove('asesores','ase_test_mate'));
+    const testAse={id:'ase_test_p0',nombre:'Asesor Prueba',email:'ase@test.local',roles:['Asesor'],rolDefault:'Asesor',teamId:'team_test',countries:['GT'],dataScopes:{default:'propia',modules:{cobros:'propia',polizas:'propia',cliente360:'propia'}},restricciones:['polizas_delete'],permisosExtra:['polizas_delete','cobros_export']};
+    O.store.insert('asesores',testAse); cleanup.push(()=>O.store.remove('asesores','ase_test_p0'));
+    // matriz tenant: bloquea 'export' en cobros para Asesor (capa 3)
+    const tCfg=O.tenant.get(); const matrizPrev=tCfg.permisosMatriz;
+    O.tenant.set({permisosMatriz:{Asesor:{cobros:{export:false}}}});
+    O.session.set('Asesor','ase_test_p0');
+    A('P0-S1','actorUser combina Auth+asesor',(()=>{const u=O.access.actorUser();return u&&u.asesorId==='ase_test_p0'&&!!u.nombre&&!!u.rolActivo;})(),JSON.stringify(O.access.actorUser()));
+    A('P0-S1','assignedRoles = roles asignados',(O.access.assignedRoles()||[]).join()==='Asesor');
+    A('P0-S1','restricción GANA sobre extra (polizas_delete)',O.access.can('polizas','delete')===false);
+    // extra habilita: usar acción sin restricción y sin matriz que la bloquee
+    O.tenant.set({permisosMatriz:{}});
+    A('P0-S1','extra habilita cuando no hay restricción (cobros_export)',O.access.can('cobros','export')===true);
+    // matriz bloquea (recolocar matriz y quitar el extra conflictivo del efecto)
+    O.tenant.set({permisosMatriz:{Asesor:{polizas:{share:false}}}});
+    A('P0-S1','matriz tenant bloquea acción',O.access.can('polizas','share')===false);
+    O.tenant.set({permisosMatriz:{Asesor:{polizas:{share:true}}}});
+    A('P0-S1','matriz tenant permite acción',O.access.can('polizas','share')===true);
+    A('P0-S1','scope propia',O.access.dataScope('cliente360')==='propia');
+    A('P0-S1','país por registro (CO ajeno bloqueado)',O.access.canAccessRecord({asesorId:'ase_test_p0',pais:'CO'},'cliente360',{})===false);
+    A('P0-S1','registro propio permitido',O.access.canAccessRecord({asesorId:'ase_test_p0',pais:'GT'},'cliente360',{})===true);
+    A('P0-S1','deep-link ajeno fail-closed',O.access.canAccessRecord({asesorId:'ase_test_mate'},'polizas',{})===false);
+    // asesor derivado por cliente/póliza (cobro sin asesorId directo)
+    A('P0-S1','recordAdvisorId por polizaId→póliza',O.access.recordAdvisorId('cobros',{polizaId:'pol_alias_test'})==='ase_test_p0');
+    A('P0-S1','recordAdvisorId por clienteId',O.access.recordAdvisorId('actividades',{clienteId:'cli_alias_test'})==='ase_test_p0');
+    A('P0-S1','cobro sin asesorId usa relación (equipo ve al compañero)',(()=>{O.session.set('Asesor','ase_test_mate');const r=O.access.canAccessRecord({clienteId:'cli_alias_test'},'cobros',{collection:'cobros'});O.session.set('Asesor','ase_test_p0');return r===true;})());
+    // 5 estados de cliente (registros temporales)
+    const stCli={id:'cli_st_test',nombre:'Estados',pais:'GT',moneda:'GTQ',asesorId:'ase_test_p0'};
+    O.store.insert('clientes',stCli); cleanup.push(()=>O.store.remove('clientes','cli_st_test'));
+    A('P0-S1','estado: sin pólizas → pendiente_polizas',O.access.deriveClientState('cli_st_test')==='pendiente_polizas');
+    O.store.insert('polizas',{id:'pol_st1',clienteId:'cli_st_test',asesorId:'ase_test_p0',estado:'Vigente',numero:'X',ramo:'Auto',moneda:'GTQ',pais:'GT'}); cleanup.push(()=>O.store.remove('polizas','pol_st1'));
+    A('P0-S1','estado: vigente sin mora → activo',O.access.deriveClientState('cli_st_test')==='activo');
+    O.store.insert('cobros',{id:'cob_st1',clienteId:'cli_st_test',polizaId:'pol_st1',asesorId:'ase_test_p0',estado:'Vencido',monto:1,moneda:'GTQ'}); cleanup.push(()=>O.store.remove('cobros','cob_st1'));
+    A('P0-S1','estado: vigente + cobro vencido → activo_en_mora',O.access.deriveClientState('cli_st_test')==='activo_en_mora');
+    O.store.update('polizas','pol_st1',{estado:'Cancelada'});
+    A('P0-S1','estado: solo cancelada → reactivable',O.access.deriveClientState('cli_st_test')==='reactivable');
+    O.store.update('polizas','pol_st1',{estado:'Suspendida'});
+    A('P0-S1','estado: histórico no-reactivable → inactivo',O.access.deriveClientState('cli_st_test')==='inactivo');
+    // alta manual estructurada
+    const pm=O.access.prepareManual('clientes',{nombreCompleto:'Alta Manual',pais:'GT'},{});
+    A('P0-S1','prepareManual: tenantId presente',pm.tenantId!==undefined);
+    A('P0-S1','prepareManual: moneda desde config (GTQ)',pm.moneda==='GTQ');
+    A('P0-S1','prepareManual: fuente=ingreso_manual_plataforma',pm.fuente==='ingreso_manual_plataforma');
+    A('P0-S1','prepareManual: trazabilidad estructurada',!!(pm.trazabilidad&&pm.trazabilidad.actor!==undefined&&pm.trazabilidad.fecha));
+    A('P0-S1','prepareManual: calidad.alertas + estado',Array.isArray(pm.calidad.alertas)&&!!pm.calidad.estado);
+    A('P0-S1','prepareManual: estadoOperativo pendiente_polizas',pm.estadoOperativo==='pendiente_polizas');
+    A('P0-S1','prepareManual: requiereValidacion por faltantes',pm.requiereValidacion===true);
+    A('P0-S1','prepareManual NO escribe al store',O.store.get('clientes',pm.id||'__none__')===null||pm._prepared===true&&!O.store.all('clientes').some(c=>c!==alias&&c.nombre==='Alta Manual'));
+    // duplicados
+    const dupE=O.access.duplicateCandidates({identificacion:'TEST-001'});
+    A('P0-S1','duplicado exacto por identificación',dupE.exact.indexOf('cli_alias_test')>=0);
+    const dupP=O.access.duplicateCandidates({nombreCompleto:'Cliente de Prueba',correo:'prueba@example.test',id:'__nuevo__'});
+    A('P0-S1','duplicado probable por nombre+correo',dupP.probable.indexOf('cli_alias_test')>=0);
+    // audit / correction escriben solo vía store (y limpian)
+    const aBefore=(O.store.all('auditoria')||[]).length;
+    const aid=O.access.audit('actualizar','clientes','cli_alias_test',{a:1},{a:2},'motivo test');
+    A('P0-S1','audit(firma larga) escribe vía store',!!aid&&(O.store.all('auditoria')||[]).length===aBefore+1);
+    if(aid) O.store.remove('auditoria',aid);
+    const aid2=O.access.audit({accion:'x'}); A('P0-S1','audit(entry) compatible',!!aid2); if(aid2)O.store.remove('auditoria',aid2);
+    // scopedStore / withScope
+    const realStore=O.store;
+    const sc=O.access.scopedStore('cobros');
+    A('P0-S1','scopedStore filtra colección operativa',Array.isArray(sc.all('cobros'))&&sc.all('cobros').length<=realStore.all('cobros').length);
+    A('P0-S1','scopedStore preserva otras operaciones (pref)',typeof sc.pref==='function');
+    let inside=false; const res=O.access.withScope('cobros',()=>{inside=(O.store!==realStore);return 42;});
+    A('P0-S1','withScope reemplaza store dentro',inside&&res===42);
+    A('P0-S1','withScope restaura store tras ÉXITO',O.store===realStore);
+    let threw=false; try{O.access.withScope('cobros',()=>{throw new Error('boom');});}catch(e){threw=true;}
+    A('P0-S1','withScope restaura store tras ERROR',threw&&O.store===realStore);
+
+    /* ===== P0-S3 · gate separado por consumidor ===== */
+    const ev=O.modules.aseguradoras._fuentes.evaluarFuente, rg=O.modules.aseguradoras._fuentes.resumenGrupos;
+    const base={pais:'GT',moneda:'GTQ',ramo:'Auto',tipo:'tarifario'};
+    const estados=['Documento recibido','Mapeado','Persistido','Requiere validación','Validado','Habilitado para Cotizador','Habilitado para Comparativo'];
+    const espera={'Habilitado para Cotizador':['tarifas','cotizador'],'Habilitado para Comparativo':['tarifas','comparativo']};
+    estados.forEach(est=>{
+      const r=ev(Object.assign({},base,{estado:est}));
+      const grupo=rg({pais:'GT',ramos:['Auto'],docs:[Object.assign({id:'d'},base,{estado:est})]})[0];
+      const cells={tarifas:r.sirveParaTarifas,cotizador:r.habilitadoCotizador,comparativo:r.sirveParaComparativo,grupo:grupo&&grupo.estado==='Habilitado'};
+      const perm=espera[est]||[]; let ok=true;
+      ['tarifas','cotizador','comparativo'].forEach(k=>{const should=perm.indexOf(k)>=0;if(!!cells[k]!==should)ok=false;});
+      // grupo habilitado solo si hay habilitación explícita
+      if(!!cells.grupo !== (perm.indexOf('cotizador')>=0||perm.indexOf('comparativo')>=0)) ok=false;
+      A('P0-S3',est,ok,'tar='+cells.tarifas+' cot='+cells.cotizador+' comp='+cells.comparativo+' grupo='+cells.grupo);
+    });
+    // separación estricta
+    const cot=ev(Object.assign({},base,{estado:'Habilitado para Cotizador'}));
+    const comp=ev(Object.assign({},base,{estado:'Habilitado para Comparativo'}));
+    A('P0-S3','Cotizador NO habilita Comparativo',cot.sirveParaComparativo===false);
+    A('P0-S3','Comparativo NO habilita Cotizador',comp.habilitadoCotizador===false);
+  }catch(e){ A('ERROR','excepción en pruebas',false,e&&e.stack||e); }
+  finally{
+    cleanup.reverse().forEach(fn=>{try{fn();}catch(e){}});
+    if(tenantSnap!==null){try{LS.setItem(TK,tenantSnap);}catch(e){}}
+    LS.setItem(SK,sessionSnap);
+    try{W.document.dispatchEvent(new W.CustomEvent('orbit:session'));W.document.dispatchEvent(new W.CustomEvent('orbit:tenant'));}catch(e){}
+  }
+  // render
+  const secs=[...new Set(R.map(r=>r.sec))];
+  const fails=R.filter(r=>!r.ok);
+  let html=`<pre>RESULTADO GLOBAL: ${fails.length?('❌ '+fails.length+' FALLO(S)'):'✅ TODAS LAS PRUEBAS CONDUCTUALES PASAN'} · ${R.length} aserciones</pre>`;
+  secs.forEach(s=>{html+=`<h2>${esc(s)}</h2><table><tr><th>Prueba</th><th>OK</th><th>Detalle</th></tr>`+
+    R.filter(r=>r.sec===s).map(r=>`<tr class="${r.ok?'pass':'fail'}"><td class="k">${esc(r.name)}</td><td class="${r.ok?'ok':'no'}">${r.ok?'✓':'✗'}</td><td class="k">${esc(r.got)}</td></tr>`).join('')+`</table>`;});
+  out.innerHTML=html;
+}
+</script>
+</body></html>

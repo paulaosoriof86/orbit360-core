@@ -483,9 +483,9 @@ Orbit.modules.configuracion = (function () {
       const host = document.getElementById('host'); if (host) render(host);
     });
   }
-  /* Estado claro por integración (tenant-wide). En demo/LAB NUNCA se presenta como
-     conexión real: si hay parámetros queda "Pendiente de backend". El sistema de
-     integraciones del lane backend (Orbit.integraciones) es la fuente de verdad cuando existe. */
+  /* Estado claro por integración (tenant-wide). Nunca se presenta como conexión real:
+     con parámetros capturados queda "Pendiente de conexión" hasta la activación y
+     validación segura. Orbit.integraciones es la fuente de verdad cuando existe. */
   function integEstado(id) {
     const cfg = Orbit.store.pref('integ_' + id, {}) || {};
     const tn = T().get();
@@ -521,7 +521,7 @@ Orbit.modules.configuracion = (function () {
       + '<div style="padding:18px 20px;display:grid;gap:11px">'
       + body
       + '<label class="ce-l ck"><input type="checkbox" id="ci-on" ' + (saved.activa ? 'checked' : '') + '> Habilitar para la empresa</label>'
-      + '<div id="ci-status" class="cfg-note">La conexión se define para toda la empresa (no por navegador). El estado queda <b>Pendiente de conexión</b> hasta activarlo; no se realizazan conexiones reales.</div>'
+      + '<div id="ci-status" class="cfg-note">La conexión se define para toda la empresa (no por navegador). El estado queda <b>Pendiente de conexión</b> hasta activarlo; validar parámetros no establece una conexión real.</div>'
       + '</div>'
       + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="ci-test">🔌 Validar parámetros</button><div style="display:flex;gap:8px"><button class="btn ghost" id="ci-cancel">Cancelar</button><button class="btn primary" id="ci-ok">Guardar</button></div></div></div>';
     document.body.appendChild(back);
@@ -534,7 +534,7 @@ Orbit.modules.configuracion = (function () {
       const url = (back.querySelector('#ci-url') || {}).value || '';
       const st = back.querySelector('#ci-status');
       if (!u && !k && !url) { st.innerHTML = '⚠️ Ingresa al menos la cuenta o credenciales para validar los parámetros.'; st.style.color = 'var(--warn)'; return; }
-      st.innerHTML = '✅ Parámetros completos. La conexión se activa a nivel del tenant (queda <b>Pendiente de conexión</b>).'; st.style.color = 'var(--ok)';
+      st.innerHTML = '✅ Parámetros preparados. La conexión queda pendiente de activación y validación segura.'; st.style.color = 'var(--ok)';
     };
     back.querySelector('#ci-ok').onclick = () => {
       const data = esOutlook

@@ -46,7 +46,8 @@ Orbit.kit = (function () {
     }).join('') + '</div>';
   }
   function clienteCell(cliId) {
-    const c = S().get('clientes', cliId); if (!c) return '—';
+    let c = S().get('clientes', cliId); if (!c) return '—';
+    if (window.Orbit && Orbit.clientProjection) c = Orbit.clientProjection.project(c);
     return `<a style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="event.stopPropagation();location.hash='#/cliente360?c=${c.id}'">
       ${U.avatar(c.nombre, c.tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'sm')}
       <span style="min-width:0"><span style="font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${U.esc(c.nombre)}</span>

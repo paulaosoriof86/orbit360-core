@@ -210,7 +210,7 @@ Orbit.integraciones = (function () {
     const s = document.createElement('script');
     s.src = 'core/integraciones-lab-mock.js?v1296';
     s.onload = function () { labMockLoading = false; if (cb) cb(Orbit.integracionesLabMock); };
-    s.onerror = function () { labMockLoading = false; try { Orbit.ui.toast('No se pudo cargar la simulación LAB.'); } catch (e) {} };
+    s.onerror = function () { labMockLoading = false; try { Orbit.ui.toast('No se pudo completar la prueba de conexión.'); } catch (e) {} };
     document.head.appendChild(s);
   }
   function labMock(action, idEvento, opts) { ensureLabMock(function (mock) { if (!mock) return; const fn = mock[action || 'ciclo']; if (typeof fn === 'function') fn(idEvento, opts || {}); }); }

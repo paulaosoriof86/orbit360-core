@@ -72,7 +72,7 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ===================== MOTOR DE FUENTES/CONOCIMIENTO (Tarifas) ===================== */
   const SOURCE_TYPES = ['tarifario', 'cotizacion_ejemplo', 'poliza_ejemplo', 'formulario', 'manual', 'circular'];
-  const SOURCE_STATES = ['Documento recibido', 'Lectura preparada', 'Propuesta lista para revisar', 'Requiere validación', 'Conocimiento incompleto', 'Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'];
+  const SOURCE_STATES = ['Documento recibido', 'Mapeado', 'Persistido', 'Requiere validación', 'Validado', 'Conocimiento incompleto', 'Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'];
   // dimensiones extendidas — no todas se capturan en la UI de docs aún (país/moneda/ramo sí);
   // el resto queda disponible en el contrato para consumidores/importadores futuros.
   const DIMENSION_KEYS = ['pais', 'moneda', 'ramo', 'producto', 'familiaProducto', 'subtipoProducto', 'segmento', 'tipoRiesgo', 'tipoVehiculo', 'usoVehiculo', 'plan'];
@@ -97,12 +97,13 @@ Orbit.modules.aseguradoras = (function () {
   function evaluarFuente(d) {
     const completa = !!(d.pais && d.moneda && d.ramo);
     const estado = completa ? (d.estado || 'Documento recibido') : 'Conocimiento incompleto';
+    // Habilitación SEPARADA por consumidor: Cotizador y Comparativo no se infieren uno del otro.
     const habCot = completa && estado === 'Habilitado para Cotizador';
-    const habComp = completa && (estado === 'Habilitado para Comparativo' || estado === 'Habilitado para Cotizador');
+    const habComp = completa && estado === 'Habilitado para Comparativo';
     return {
       estado,
-      sirveParaTarifas: completa && ['Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'].indexOf(estado) >= 0,
-      sirveParaReglas: completa && d.tipo === 'tarifario' && estado !== 'Requiere validación',
+      sirveParaTarifas: habCot || habComp,
+      sirveParaReglas: completa && d.tipo === 'tarifario' && (habCot || habComp),
       sirveParaPresentacion: completa && (d.tipo === 'cotizacion_ejemplo' || d.tipo === 'poliza_ejemplo'),
       sirveParaComparativo: habComp,
       sirveParaCondiciones: completa && ['formulario', 'manual', 'circular'].indexOf(d.tipo) >= 0,
@@ -124,8 +125,9 @@ Orbit.modules.aseguradoras = (function () {
     return Object.keys(g).map(k => {
       const evs = g[k].map(evaluarFuente);
       const incompleto = evs.some(e => e.estado === 'Conocimiento incompleto');
-      // habilitado de grupo exige CONJUNTO suficiente: al menos una fuente con tarifas/reglas Y ninguna incompleta
-      const habilitado = !incompleto && evs.some(e => e.sirveParaTarifas) && evs.some(e => e.sirveParaReglas || e.sirveParaPresentacion);
+      // Grupo 'Habilitado' SOLO por habilitación explícita (Cotizador/Comparativo).
+      // 'Mapeado'/'Persistido'/'Validado' y capacidades auxiliares (presentación) NO habilitan.
+      const habilitado = !incompleto && evs.some(e => e.habilitadoCotizador || e.sirveParaComparativo);
       return { key: k, label: groupLabel(k), docs: g[k], estado: incompleto ? 'Conocimiento incompleto' : (habilitado ? 'Habilitado' : 'Pendiente') };
     });
   }
@@ -574,6 +576,7 @@ Orbit.modules.aseguradoras = (function () {
     return `<div class="asg-sec">
       <div class="asg-sec-t">🧮 Tarifas y conocimiento — sección administrativa avanzada</div>
       <div class="cfg-note" style="margin-bottom:9px">Cada documento se organiza por país/moneda/ramo/producto (+segmento/plan/tipo de riesgo cuando aplica) y define qué puede hacerse con él (tarifas, reglas, presentación, comparativo, condiciones, casos de prueba). <b>Procesar un documento nunca habilita automáticamente</b> Cotizador/Comparativo.</div>
+      <div class="cfg-note" style="margin-bottom:9px">Estados de conocimiento, en orden y <b>no equivalentes</b>: <b>Documento recibido → Mapeado → Persistido → Requiere validación → Validado → Habilitado para Cotizador / Comparativo</b>. Mapeado ≠ Validado ≠ Habilitado: un documento validado es correcto pero <b>todavía no</b> ofrece tarifa hasta habilitarlo explícitamente.</div>
       <div class="asg-tarifas-est">${Object.keys(resumen).filter(k => resumen[k] > 0).map(k => `<span class="badge ${k.indexOf('incompleto') >= 0 ? 'danger' : k.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10.5px">${k} (${resumen[k]})</span>`).join('') || '<span class="muted" style="font-size:12px">Sin fuentes cargadas todavía.</span>'}</div>
       <div style="margin-top:12px;display:grid;gap:8px">
         ${grupos.map(g => `<div class="asg-row" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><span style="flex:1;font-size:12px">${U.esc(g.label)}</span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}" style="font-size:10px">${g.estado}</span><span class="muted" style="font-size:11px">${g.docs.length} doc(s)</span></div>`).join('') || ''}

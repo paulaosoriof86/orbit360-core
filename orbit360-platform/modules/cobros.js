@@ -6,6 +6,8 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.cobros = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
+  /* P0-S2 · proyección canónica del cliente para lecturas visuales (nunca muta el store) */
+  const PC = id => (window.Orbit && Orbit.clientProjection && Orbit.clientProjection.get(id)) || PC(id);
   let st = { fq: '', fest: '', fase: '', sort: 'vence' };
 
   const FDEFS = () => [
@@ -24,7 +26,7 @@ Orbit.modules.cobros = (function () {
       if (st.fest === 'Conciliado') return c.conciliado && matchTxt(c);
       if (st.fest === 'Requiere validación') return (c.requiereValidacion || estV === 'Requiere validación') && matchTxt(c);
       if (st.fest === 'Bloqueado') return c.estado === 'Bloqueado' && matchTxt(c);
-      const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
+      const cli = PC(c.clienteId), p = S().get('polizas', c.polizaId);
       let placa = '';
       if (p) { const veh = S().all('vehiculos').find(v => v.polizaId === p.id) || (p.vehiculoId ? S().get('vehiculos', p.vehiculoId) : null); if (veh) placa = veh.placa || ''; }
       const txt = ((cli ? cli.nombre : '') + ' ' + (p ? p.numero : '') + ' ' + placa).toLowerCase();
@@ -35,7 +37,7 @@ Orbit.modules.cobros = (function () {
   }
 
   function matchTxt(c) {
-    const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
+    const cli = PC(c.clienteId), p = S().get('polizas', c.polizaId);
     let placa = ''; try { const v = S().all('vehiculos').find(x => x.polizaId === (p && p.id)); placa = v ? v.placa : ''; } catch (e) {}
     const txt = ((cli ? cli.nombre : '') + ' ' + (p ? p.numero : '') + ' ' + placa).toLowerCase();
     return (!st.fq || txt.includes(st.fq.toLowerCase())) && (!st.fase || c.asesorId === st.fase);
@@ -118,7 +120,7 @@ Orbit.modules.cobros = (function () {
   function detalle(cobroId) {
     const c = S().get('cobros', cobroId); if (!c) return;
     if (window.Orbit && Orbit.accessScope) { const p0 = S().get('polizas', c.polizaId); if (!Orbit.accessScope.puedeAccederRegistro((p0 || {}).asesorId || c.asesorId, 'cobros')) { U.toast('Este cobro está fuera de tu alcance.'); return; } }
-    const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId), asg = p ? q.aseguradora(p.aseguradoraId) : null, ase = q.asesor(c.asesorId);
+    const cli = PC(c.clienteId), p = S().get('polizas', c.polizaId), asg = p ? q.aseguradora(p.aseguradoraId) : null, ase = q.asesor(c.asesorId);
     const cur = c.moneda; const m2 = n => U.money(n, cur);
     const TT = k => (Orbit.termino ? Orbit.termino(k, cli && cli.pais) : k);
     const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
@@ -176,7 +178,7 @@ Orbit.modules.cobros = (function () {
   /* ---- Cargar factura y conciliar un recibo ya pagado (post-pago) ---- */
   function conciliarFactura(cobroId) {
     const c = S().get('cobros', cobroId); if (!c) return;
-    if (window.Orbit && Orbit.accessScope) { const cli = S().get('clientes', c.clienteId); if (!Orbit.accessScope.puedeAccederRegistro(c.asesorId || (cli && cli.asesorId), 'cobros', { pais: cli && cli.pais })) { U.toast('Este cobro está fuera de tu alcance.'); return; } }
+    if (window.Orbit && Orbit.accessScope) { const cli = PC(c.clienteId); if (!Orbit.accessScope.puedeAccederRegistro(c.asesorId || (cli && cli.asesorId), 'cobros', { pais: cli && cli.pais })) { U.toast('Este cobro está fuera de tu alcance.'); return; } }
     let pm = document.getElementById('cob-conc'); if (pm) pm.remove();
     pm = document.createElement('div'); pm.id = 'cob-conc'; pm.className = 'drawer-back open';
     pm.style.cssText = 'display:grid;place-items:center;z-index:210';
@@ -222,7 +224,7 @@ Orbit.modules.cobros = (function () {
   function validarReporte(cobroId) {
     const c = S().get('cobros', cobroId); if (!c) return;
     if (window.Orbit && Orbit.accessScope) { const p0 = S().get('polizas', c.polizaId); if (!Orbit.accessScope.puedeAccederRegistro((p0 || {}).asesorId || c.asesorId, 'cobros')) { U.toast('Este cobro está fuera de tu alcance.'); return; } }
-    const cli = S().get('clientes', c.clienteId) || {};
+    const cli = PC(c.clienteId) || {};
     let pm = document.getElementById('cob-val'); if (pm) pm.remove();
     pm = document.createElement('div'); pm.id = 'cob-val'; pm.className = 'drawer-back open';
     pm.style.cssText = 'display:grid;place-items:center;z-index:210';
@@ -305,7 +307,7 @@ Orbit.modules.cobros = (function () {
       });
       pm.querySelector('#pm-ok').addEventListener('click', () => {
         // Guard país/moneda (P0): no se confirma sin país+moneda coherentes (GT=GTQ, CO=COP).
-        const cli0 = S().get('clientes', c.clienteId) || {};
+        const cli0 = PC(c.clienteId) || {};
         const pais = c.pais || cli0.pais || '';
         const okMoneda = (pais === 'GT' && cur === 'GTQ') || (pais === 'CO' && cur === 'COP') || (!!pais && !!cur && pais !== 'GT' && pais !== 'CO');
         if (!pais || !cur || !okMoneda) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '⛔ No se puede confirmar: país/moneda faltante o incoherente (GT=GTQ, CO=COP)'; document.body.appendChild(t); setTimeout(() => t.remove(), 3200); return; }
@@ -321,7 +323,7 @@ Orbit.modules.cobros = (function () {
         if (Orbit.q && Orbit.q.postRecaudo) Orbit.q.postRecaudo(Object.assign({}, c, patch), fecha, metodo);
         S().insert('actividades', { id: 'act'+Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'cobro', icon: '💳', fecha, titulo: 'Pago confirmado', detalle: U.money(c.monto, cur) + ' · ' + metodo + (conciliado ? ' · Conciliado' : '') });
         // Fire automations
-        const cliObj = S().get('clientes', c.clienteId);
+        const cliObj = PC(c.clienteId);
         if (Orbit.modules.automatizaciones && cliObj) Orbit.modules.automatizaciones.disparar('pago_aplicado', { nombre: (cliObj.nombre||'').split(' ')[0], monto: U.money(c.monto, cur) });
         pmClose();
         const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✅ Pago confirmado' + (conciliado ? ' y conciliado' : ' — pendiente conciliación'); document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
@@ -331,8 +333,8 @@ Orbit.modules.cobros = (function () {
 
   /* ---- Notificación de cobro por LOTE (selecciona recibos pendientes/vencidos) ---- */
   function lote() {
-    let arr = S().all('cobros').filter(c => { if (c.estado !== 'Pendiente' && c.estado !== 'Vencido') return false; const cli = S().get('clientes', c.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (cli && cli.pais === Orbit.pais); }).sort((a, b) => (a.vence || '').localeCompare(b.vence || ''));
-    if (window.Orbit && Orbit.accessScope) arr = Orbit.accessScope.filtrarPorAsesor(arr, c => c.asesorId || (S().get('clientes', c.clienteId) || {}).asesorId, 'cobros');
+    let arr = S().all('cobros').filter(c => { if (c.estado !== 'Pendiente' && c.estado !== 'Vencido') return false; const cli = PC(c.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (cli && cli.pais === Orbit.pais); }).sort((a, b) => (a.vence || '').localeCompare(b.vence || ''));
+    if (window.Orbit && Orbit.accessScope) arr = Orbit.accessScope.filtrarPorAsesor(arr, c => c.asesorId || (PC(c.clienteId) || {}).asesorId, 'cobros');
     const incl = new Set(arr.map(c => c.id));
     let back = document.getElementById('cob-lote'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'cob-lote'; back.className = 'drawer-back open';
@@ -341,7 +343,7 @@ Orbit.modules.cobros = (function () {
       const sel = arr.filter(c => incl.has(c.id));
       const tot = sel.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
       back.querySelector('#lo-body').innerHTML = arr.map(c => {
-        const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId), d = U.daysFromNow(c.vence);
+        const cli = PC(c.clienteId), p = S().get('polizas', c.polizaId), d = U.daysFromNow(c.vence);
         return `<label class="lote-row ${incl.has(c.id) ? '' : 'off'}">
           <input type="checkbox" data-lo="${c.id}" ${incl.has(c.id) ? 'checked' : ''}>
           <span style="flex:1;min-width:0"><b>${cli ? U.esc(cli.nombre) : '—'}</b> <span class="muted" style="font-size:11.5px">· ${p ? p.numero : ''} · ${c.cuota}</span><br><span class="muted" style="font-size:11px">${d < 0 ? 'venció hace ' + (-d) + 'd' : 'vence en ' + d + 'd'}</span></span>
@@ -367,7 +369,7 @@ Orbit.modules.cobros = (function () {
     back.querySelector('#lo-ok').addEventListener('click', () => {
       const sel = arr.filter(c => incl.has(c.id));
       sel.forEach(c => {
-        const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
+        const cli = PC(c.clienteId), p = S().get('polizas', c.polizaId);
         const msg = Orbit.ia ? Orbit.ia.redactar('cobro', { nombre: cli ? cli.nombre.split(' ')[0] : '', poliza: p ? p.numero : '', monto: U.money(c.monto, c.moneda), vence: U.fmtDate(c.vence) }) : 'Recordatorio de cobro';
         S().insert('actividades', { id: 'act' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Recordatorio de cobro preparado', detalle: 'WhatsApp + correo · ' + (p ? p.numero : '') + ' · ' + U.money(c.monto, c.moneda) });
         S().update('cobros', c.id, { notificado: Orbit.ui.today() });

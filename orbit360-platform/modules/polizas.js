@@ -6,6 +6,8 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.polizas = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
+  /* P0-S2 · proyección canónica del cliente para lecturas visuales (nunca muta el store) */
+  const PC = id => (window.Orbit && Orbit.clientProjection && Orbit.clientProjection.get(id)) || PC(id);
   let st = { fq: '', framo: '', fasg: '', fase: '', fest: '', sort: 'vence' };
 
   const FDEFS = () => [
@@ -18,7 +20,7 @@ Orbit.modules.polizas = (function () {
 
   function rows() {
     return (window.Orbit && Orbit.accessScope ? Orbit.accessScope.filtrarPorAsesor(S().all('polizas'), p => p.asesorId, 'polizas') : S().all('polizas')).filter(p => {
-      const cli = S().get('clientes', p.clienteId);
+      const cli = PC(p.clienteId);
       const veh = S().all('vehiculos').find(v => v.polizaId === p.id);
       const placa = (veh && veh.placa) || p.placa || '';
       const txt = (p.numero + ' ' + p.producto + ' ' + (cli ? cli.nombre : '') + ' ' + placa + ' ' + (veh ? (veh.marca + ' ' + veh.linea) : '')).toLowerCase();
@@ -75,7 +77,7 @@ Orbit.modules.polizas = (function () {
      recibos generados, fuente de importación y estado de validación. */
   function verDesglose(id) {
     const p = S().get('polizas', id); if (!p) return;
-    const cli = S().get('clientes', p.clienteId) || {};
+    const cli = PC(p.clienteId) || {};
     const asg = q.aseguradora(p.aseguradoraId) || {};
     const cur = p.moneda || cli.moneda || Orbit.q.monedaPais();
     const M = (n) => (n == null || n === '') ? '—' : U.money(n, cur);

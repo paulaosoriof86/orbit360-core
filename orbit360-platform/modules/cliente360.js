@@ -53,7 +53,9 @@ Orbit.modules.cliente360 = (function () {
      ========================================================= */
   function lista() {
     const clientesBase = (window.Orbit && Orbit.accessScope) ? Orbit.accessScope.filtrarPorAsesor(S().all('clientes'), c => c.asesorId, 'cliente360') : S().all('clientes');
-    const clientes = clientesBase;
+    // P0-02: proyección canónica ANTES de filtros/búsqueda/render — un cliente importado con
+    // aliases (nombreCompleto/correo/numeroDocumento/ciudadMunicipio) aparece y se busca bien.
+    const clientes = (window.Orbit && Orbit.clientProjection) ? clientesBase.map(c => Orbit.clientProjection.project(c)) : clientesBase;
     const asesores = S().all('asesores');
     const f = filtros;
     const rows = clientes.filter(c =>
@@ -144,7 +146,7 @@ Orbit.modules.cliente360 = (function () {
   function detalle(cid) {
     const r = q.clienteResumen(cid);
     if (window.Orbit && Orbit.accessScope && r && r.cli && !Orbit.accessScope.puedeAccederRegistro(r.cli.asesorId, 'clientes')) { U.toast('Este cliente está fuera de tu alcance.'); location.hash = '#/cliente360'; return; }
-    const c = r.cli, ase = q.asesor(c.asesorId);
+    const c = (window.Orbit && Orbit.clientProjection) ? Orbit.clientProjection.project(r.cli) : r.cli, ase = q.asesor(r.cli.asesorId);
     const scope = (window.Orbit && Orbit.accessScope) ? Orbit.accessScope.dataScope('cliente360') : 'todo';
     const misAsesorId = (window.Orbit && Orbit.session && Orbit.session.asesorId) ? Orbit.session.asesorId() : null;
     const fueraDeAlcance = (window.Orbit && Orbit.accessScope) ? (Orbit.accessScope.filtrarPorAsesor([c], x => x.asesorId, 'cliente360').length === 0) : false;
