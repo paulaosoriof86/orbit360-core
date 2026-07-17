@@ -9,10 +9,11 @@ const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v7',
+  schemaVersion: 'orbit360-runtime-gate-joint-v8',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
+  stage: 'bootstrap',
   checks: {}
 };
 
@@ -21,9 +22,27 @@ if (accessKey.length < 12) throw new Error('BLOQUEO_ACCESO_LAB');
 mkdirSync(outDir, { recursive: true });
 mkdirSync(insurerOutDir, { recursive: true });
 
+function writeReport() {
+  const payload = `${JSON.stringify(report, null, 2)}\n`;
+  writeFileSync(`${outDir}/resultado-sanitizado.json`, payload);
+  writeFileSync(`${insurerOutDir}/resultado-sanitizado.json`, payload);
+}
+function stage(name) {
+  report.stage = name;
+  console.log(`ORBIT360_GATE_STAGE:${name}`);
+}
 function assert(condition, code, detail = '') {
   if (!condition) throw new Error(`${code}${detail ? `:${detail}` : ''}`);
 }
+
+let browser = null;
+const watchdog = setTimeout(() => {
+  report.ok = false;
+  report.error = `GATE_TIMEOUT:${report.stage}`;
+  writeReport();
+  console.error(`ORBIT360_RUNTIME_GATE_TIMEOUT:${report.stage}`);
+  process.exit(124);
+}, 300000);
 
 async function waitForCanonicalRuntime(page) {
   const deadline = Date.now() + 45000;
@@ -231,31 +250,45 @@ async function validateMobileMenu(page) {
   report.checks.mobileMenuComplete = true;
 }
 
-const browser = await chromium.launch({ headless: true });
+browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+page.setDefaultTimeout(15000);
+page.setDefaultNavigationTimeout(45000);
 try {
+  stage('open_lab_preview');
   await page.goto(`${baseUrl}/ays-lab-preview.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  stage('canonical_runtime');
   await waitForCanonicalRuntime(page);
+  stage('authentication');
   await ensureAuthenticated(page);
+  stage('legal_gate');
   await acceptLegalGate(page);
 
+  stage('real_tenant_data');
   report.storeCounts = await waitForRealTenantData(page, 26);
 
+  stage('desktop_direction_client360');
   await selectRole(page, 'Dirección');
   await validateClient360(page, report, 'desktopDirection');
+  stage('desktop_direction_aseguradoras');
   await validateInsurers(page, 'desktopDirection');
   report.checks.desktopDirection = true;
 
+  stage('tablet_operativo_client360');
   await page.setViewportSize({ width: 820, height: 1180 });
   await selectRole(page, 'Operativo');
   await validateClient360(page, report, 'tabletOperativo');
+  stage('tablet_operativo_aseguradoras');
   await validateInsurers(page, 'tabletOperativo');
   report.checks.tabletOperativo = true;
 
+  stage('mobile_asesor_menu');
   await page.setViewportSize({ width: 390, height: 844 });
   await selectRole(page, 'Asesor');
   await validateMobileMenu(page);
+  stage('mobile_asesor_client360');
   await validateClient360(page, report, 'mobileAsesor');
+  stage('mobile_asesor_aseguradoras');
   await validateInsurers(page, 'mobileAsesor', true);
   report.checks.mobileAsesor = true;
 
@@ -266,20 +299,25 @@ try {
   report.checks.insurerReadMode = true;
   report.checks.insurerKnowledgeVisible = true;
   report.ok = Object.values(report.checks).every(Boolean);
+  stage('completed');
 } catch (error) {
   report.ok = false;
   report.error = String(error && (error.stack || error.message || error)).replace(/\s+/g, ' ').trim();
 } finally {
-  const payload = `${JSON.stringify(report, null, 2)}\n`;
-  writeFileSync(`${outDir}/resultado-sanitizado.json`, payload);
-  writeFileSync(`${insurerOutDir}/resultado-sanitizado.json`, payload);
-  await browser.close();
+  writeReport();
+  stage('closing_browser');
+  await Promise.race([
+    browser.close(),
+    new Promise(resolve => setTimeout(resolve, 10000))
+  ]);
+  clearTimeout(watchdog);
 }
 
 console.log(`ORBIT360_RUNTIME_GATE_JOINT:${JSON.stringify({
   ok: report.ok,
+  stage: report.stage,
   counts: report.storeCounts || {},
   checks: report.checks,
   error: report.error || ''
 })}`);
-if (!report.ok) process.exit(1);
+process.exit(report.ok ? 0 : 1);
