@@ -10,9 +10,9 @@ const outDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 const insurerOutDir = 'orbit360-platform/runtime-gate-aseguradoras-v20260716';
 const mappedInsurer = /Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
 const report = {
-  schemaVersion: 'orbit360-runtime-gate-joint-v14-canonical-runtime-stability',
+  schemaVersion: 'orbit360-runtime-gate-joint-v15-canonical-owner-handoff',
   gateId: 'block1-client360-insurers-lab-v20260717',
-  contractVersion: '1.0.6',
+  contractVersion: '1.0.7',
   runtimeVersion: expectedRuntime,
   generatedAt: new Date().toISOString(),
   containsPII: false,
@@ -128,7 +128,23 @@ async function waitForCanonicalRuntime(page) {
 
   const finalState = await page.evaluate(runtime => {
     const backend = window.OrbitBackend || {};
+    let providerReady = false;
+    let currentUser = false;
+    try {
+      const auth = window.firebase && firebase.auth ? firebase.auth() : null;
+      providerReady = !!(auth && typeof auth.signInWithEmailAndPassword === 'function');
+      currentUser = !!(auth && auth.currentUser);
+    } catch (error) {}
+    const gateStatus = window.__orbitGateAuthStatus || {};
     return {
+      inside: !document.body.classList.contains('pre-auth'),
+      formVisible: Boolean(document.getElementById('login-form')),
+      providerReady,
+      ownerReady: Boolean(window.Orbit && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function'),
+      currentUser,
+      gateState: String(gateStatus.state || ''),
+      gateCode: String(gateStatus.code || ''),
+      authStage: String((document.body.dataset || {}).authStage || ''),
       runtimeVersion: String(backend.runtimeVersion || ''),
       firebaseLoader: String(backend.firebaseLoader || ''),
       firebaseInit: String(backend.firebaseInit || ''),
@@ -141,6 +157,7 @@ async function waitForCanonicalRuntime(page) {
   assert(finalState.firebaseLoader === 'requested', 'FIREBASE_LOADER_NOT_REQUESTED', finalState.firebaseLoader || 'missing');
   assert(['initialized', 'already-initialized'].includes(finalState.firebaseInit), 'FIREBASE_INIT_NOT_READY', finalState.firebaseInit || 'missing');
   assert(finalState.ownersReady, 'CANONICAL_OWNERS_NOT_READY');
+  assert(finalState.ownerReady, 'CANONICAL_AUTH_OWNER_NOT_READY');
 
   report.runtimeDiagnostic = {
     expectedRuntime,
@@ -149,11 +166,14 @@ async function waitForCanonicalRuntime(page) {
     firebaseLoader: finalState.firebaseLoader,
     firebaseInit: finalState.firebaseInit,
     stableMilliseconds: Date.now() - stableSince,
-    lastObservedUrl: lastState && lastState.url || ''
+    lastObservedUrl: lastState && lastState.url || '',
+    ownerHandoffReady: finalState.ownerReady
   };
   report.checks.canonicalRuntime = true;
   report.checks.canonicalRuntimeVersion = true;
   report.checks.canonicalRuntimeStable = true;
+  report.checks.canonicalAuthOwnerHandoff = true;
+  return finalState;
 }
 
 async function selectRole(page, role) {
@@ -203,14 +223,9 @@ async function authState(page) {
   });
 }
 
-async function ensureAuthenticated(page) {
-  await boundedStep('authentication_owner_ready', () => page.waitForFunction(() => {
-    try {
-      return !!(window.Orbit && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function');
-    } catch (error) { return false; }
-  }, null, { timeout: 45000 }), 50000);
-
-  const initial = await boundedStep('authentication_initial_state', () => authState(page), 10000);
+async function ensureAuthenticated(page, canonicalState) {
+  const initial = await boundedStep('authentication_owner_contract_reuse', async () => canonicalState, 3000);
+  assert(initial && initial.ownerReady, 'AUTH_OWNER_HANDOFF_MISSING');
   assert(initial.runtimeVersion === expectedRuntime, 'AUTH_RUNTIME_CHANGED_BEFORE_SIGNIN', initial.runtimeVersion || 'missing');
   if (!initial.currentUser) {
     const dispatch = await boundedStep('authentication_schedule_signin', () => page.evaluate(({ loginEmail, loginKey, runtime }) => {
@@ -241,7 +256,7 @@ async function ensureAuthenticated(page) {
           });
       }, 0);
       return { ok: true, code: '' };
-    }, { loginEmail: email, loginKey: accessKey, runtime: expectedRuntime }), 10000);
+    }, { loginEmail: email, loginKey: accessKey, runtime: expectedRuntime }), 20000);
     assert(dispatch && dispatch.ok, (dispatch && dispatch.code) || 'AUTH_DISPATCH_FAILED');
 
     await boundedStep('authentication_observe_signin', () => page.waitForFunction(runtime => {
@@ -252,12 +267,12 @@ async function ensureAuthenticated(page) {
         const status = window.__orbitGateAuthStatus || {};
         return !!(auth && auth.currentUser) || status.state === 'resolved' || status.state === 'failed';
       } catch (error) { return false; }
-    }, expectedRuntime, { timeout: 40000 }), 45000);
+    }, expectedRuntime, { timeout: 40000, polling: 250 }), 45000);
 
-    const outcome = await boundedStep('authentication_read_signin', () => authState(page), 10000);
+    const outcome = await boundedStep('authentication_read_signin', () => authState(page), 15000);
     if (!outcome.currentUser) {
       report.authDiagnostic = {
-        strategy: 'stable_runtime_owner_login_controller',
+        strategy: 'canonical_owner_handoff_login_controller',
         providerReady: outcome.providerReady,
         ownerReady: outcome.ownerReady,
         currentUser: false,
@@ -278,7 +293,7 @@ async function ensureAuthenticated(page) {
       return String((window.OrbitBackend || {}).runtimeVersion || '') === runtime &&
         !!(window.firebase && firebase.auth && firebase.auth().currentUser);
     } catch (error) { return false; }
-  }, expectedRuntime, { timeout: 15000 }), 20000);
+  }, expectedRuntime, { timeout: 15000, polling: 250 }), 20000);
 
   await boundedStep('authentication_show_app', () => page.evaluate(() => {
     if (window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function') {
@@ -291,15 +306,15 @@ async function ensureAuthenticated(page) {
   await boundedStep('authentication_inside', () => page.waitForFunction(
     () => !document.body.classList.contains('pre-auth'),
     null,
-    { timeout: 10000 }
+    { timeout: 10000, polling: 250 }
   ), 15000);
 
-  const finalState = await boundedStep('authentication_final_state', () => authState(page), 10000);
+  const finalState = await boundedStep('authentication_final_state', () => authState(page), 15000);
   assert(finalState.runtimeVersion === expectedRuntime, 'AUTH_RUNTIME_CHANGED_AFTER_SIGNIN', finalState.runtimeVersion || 'missing');
   assert(finalState.currentUser && finalState.inside, 'LOGIN_OWNER_SESSION_NOT_ACTIVE');
-  report.authMode = initial.currentUser ? 'session_restored' : 'stable_runtime_owner_contract_gate';
+  report.authMode = initial.currentUser ? 'session_restored' : 'canonical_owner_handoff_contract_gate';
   report.authDiagnostic = {
-    strategy: 'stable_runtime_owner_login_controller',
+    strategy: 'canonical_owner_handoff_login_controller',
     providerReady: finalState.providerReady,
     ownerReady: finalState.ownerReady,
     currentUser: finalState.currentUser,
@@ -469,9 +484,9 @@ try {
   stage('open_lab_preview');
   await page.goto(`${baseUrl}/ays-lab-preview.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
   stage('canonical_runtime');
-  await waitForCanonicalRuntime(page);
+  const canonicalAuthState = await waitForCanonicalRuntime(page);
   stage('authentication');
-  await ensureAuthenticated(page);
+  await ensureAuthenticated(page, canonicalAuthState);
   stage('legal_gate');
   await acceptLegalGate(page);
 
