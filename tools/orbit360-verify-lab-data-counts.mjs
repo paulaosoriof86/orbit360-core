@@ -17,15 +17,18 @@ function errorCategory(error) {
     .slice(0, 80);
 }
 
-async function withRetry(label, operation, maxAttempts = 5) {
+async function countCollection(collectionRef, label) {
   let lastError = null;
-  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
     try {
-      return await operation();
+      const snapshot = await collectionRef.count().get();
+      return Number(snapshot.data().count || 0);
     } catch (error) {
       lastError = error;
-      console.warn(`LAB_COUNT_RETRY:${label}:${attempt}:${errorCategory(error)}`);
-      if (attempt < maxAttempts) await wait(1500 * attempt);
+      const category = errorCategory(error);
+      console.warn(`LAB_AGGREGATE_COUNT_RETRY:${label}:${attempt}:${category}`);
+      if (category === '8' || attempt === 2) break;
+      await wait(2000);
     }
   }
   throw lastError || new Error(`count_failed_${label}`);
@@ -39,7 +42,7 @@ const db = getFirestore(app);
 const root = db.collection('tenantId').doc(TENANT_ID);
 
 const result = {
-  schemaVersion: 'orbit360-lab-data-counts-v2',
+  schemaVersion: 'orbit360-lab-data-counts-v3',
   generatedAt: new Date().toISOString(),
   projectId: PROJECT_ID,
   tenantId: TENANT_ID,
@@ -47,29 +50,30 @@ const result = {
   counts: { clientes: 0, aseguradoras: 0, asesores: 0 },
   expected: EXPECTED,
   readyForVisualValidation: false,
+  verificationMethod: 'firestore_count_aggregation',
   readAttemptsBounded: true,
   containsPII: false,
   containsSecrets: false
 };
 
 try {
-  for (const name of Object.keys(result.counts)) {
-    result.counts[name] = await withRetry(name, async () => {
-      const snapshot = await root.collection(name).get();
-      return snapshot.size;
-    });
-  }
+  const names = Object.keys(result.counts);
+  const values = await Promise.all(names.map(name => countCollection(root.collection(name), name)));
+  names.forEach((name, index) => { result.counts[name] = values[index]; });
+
   result.readyForVisualValidation =
     result.counts.clientes === EXPECTED.clientes &&
     result.counts.aseguradoras === EXPECTED.aseguradoras &&
     result.counts.asesores >= EXPECTED.asesores;
 } catch (error) {
   result.errorCategory = errorCategory(error);
+  result.resourceExhausted = result.errorCategory === '8';
 }
 
 writeFileSync(OUTPUT, `${JSON.stringify(result, null, 2)}\n`);
 console.log(`LAB_DATA_COUNTS:${JSON.stringify(result.counts)}`);
 console.log(`LAB_DATA_VISIBLE_READY:${result.readyForVisualValidation}`);
+console.log(`LAB_DATA_COUNT_METHOD:${result.verificationMethod}`);
 if (result.errorCategory) console.error(`LAB_DATA_COUNT_ERROR:${result.errorCategory}`);
 
 if (!result.readyForVisualValidation) process.exit(52);
