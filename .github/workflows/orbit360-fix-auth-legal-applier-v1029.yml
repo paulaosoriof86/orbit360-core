@@ -1,0 +1,94 @@
+name: Orbit 360 Fix Auth Legal Applier
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: [".github/workflows/orbit360-fix-auth-legal-applier-v1029.yml"]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Ejecutar parche literal auditado
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          workflow = Path('.github/workflows/orbit360-external-auth-legal-gate-v1029.yml')
+          lines = workflow.read_text().splitlines()
+          starts = [i for i, line in enumerate(lines) if line.strip() == "python3 <<'PY'"]
+          assert len(starts) >= 2, 'EMBEDDED_PATCHES_NOT_FOUND'
+
+          def extract(index):
+              start = starts[index] + 1
+              end = next(i for i in range(start, len(lines)) if lines[i].strip() == 'PY')
+              return textwrap.dedent('\n'.join(lines[start:end]))
+
+          patch = extract(0)
+          patch = patch.replace('\n    auth,\n', '\n    lambda _match: auth,\n')
+          patch = patch.replace('\n    legal.rstrip(),\n', '\n    lambda _match: legal.rstrip(),\n')
+          assert 'lambda _match: auth' in patch
+          assert 'lambda _match: legal.rstrip()' in patch
+          exec(compile(patch, 'auth-legal-literal-patch.py', 'exec'), {})
+
+          overlay = extract(1)
+          exec(compile(overlay, 'auth-legal-overlay.py', 'exec'), {})
+          PY
+
+          cat > orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-GATE-AUTH-LEGAL-EXTERNO-20260718.md <<'DOC'
+          # Bloque 1 · Gate externo de autenticación y legal
+
+          Fecha: 2026-07-18
+
+          Clasificación: `PIPELINE_MECHANISM_FAILURE`.
+
+          El bootstrap completo, la configuración activa del tenant y `router-ready` quedaron aprobados. El primer fallo posterior ocurrió cuando el validador intentó iniciar sesión mediante `page.evaluate`, aunque la plataforma ya dispone de un formulario canónico que es el propietario real del flujo Firebase.
+
+          La corrección no modifica Auth, usuarios ni datos. El gate completa `#lg-user` y `#lg-pass`, envía `#login-form` y observa externamente que el cuerpo abandona `pre-auth`, que el login se oculta y que el shell aparece.
+
+          La aceptación legal también usa controles visibles: un único modal `data-legal-gate`, checkbox `#lg-chk` y botón `#lg-ok`. Se elimina la inspección y programación mediante evaluaciones internas.
+
+          Carril A: UI canónica utilizada sin cambios. Carril B: solo validator/gate y contrato; Auth, Store, reglas y backend protegidos intactos. Carril C: 414 clientes, 26 aseguradoras y 7 asesores sin reimportación.
+
+          Claude: `BACKEND_PROTEGIDO_NO_CLAUDE`. Academia: distinguir prueba del flujo real por UI frente a invocar funciones internas desde el validador.
+          DOC
+
+          cat > orbit360-platform/docs/ACADEMIA-BLOQUE1-GATE-UI-EXTERNO-20260718.md <<'DOC'
+          # Academia Orbit 360 · Gate por interfaz externa
+
+          Un gate funcional debe probar el mismo camino que usa una persona: completar el formulario, enviarlo y observar el cambio visible de estado. Invocar funciones internas con `page.evaluate` puede bloquear el hilo que se intenta validar y no representa la experiencia real.
+
+          Para acuerdos legales, la evidencia correcta es la existencia de un único modal, el cambio del checkbox, la habilitación del botón y la desaparición del modal tras aceptar.
+
+          Este patrón se clasifica como `PIPELINE_MECHANISM_FAILURE`: el producto puede estar correcto mientras el mecanismo de prueba impide o sustituye el flujo real.
+          DOC
+
+          node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
+          git rm .github/workflows/orbit360-external-auth-legal-gate-v1029.yml
+          git rm .github/workflows/orbit360-fix-auth-legal-applier-v1029.yml
+      - name: Preflight vinculante
+        shell: bash
+        env:
+          ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = GO_GATE_CONTRACT
+          test "$(jq -r '.failed' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 0
+      - name: Publicar corte externo
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs tools/orbit360-gate-contract-overlay-v20260718.json orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-GATE-AUTH-LEGAL-EXTERNO-20260718.md orbit360-platform/docs/ACADEMIA-BLOQUE1-GATE-UI-EXTERNO-20260718.md
+          git commit -m "fix(block1): validate auth and legal through canonical UI"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
