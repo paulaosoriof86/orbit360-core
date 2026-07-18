@@ -2,9 +2,66 @@
    Evita que una versión antigua de Auth o del shell bloquee el canal LAB. */
 var CACHE = 'orbit360-v20260717-2';
 var BUILD = '20260717-2';
+var RUNTIME_CONTRACT_TIMEOUT_MS = 8000;
+var RUNTIME_CONTRACT_PATHS = [
+  '/core/session-multirol-visibility-v20260716.js',
+  '/core/client-canonical-view-projection-v20260716.js',
+  '/core/tenant-insurer-config-p10.js',
+  '/data/tenant-runtime-config-index.js'
+];
 
-self.addEventListener('install', function () {
-  self.skipWaiting();
+function canonicalRequest(pathname) {
+  return new Request(new URL(pathname, self.location.origin).href, {
+    method: 'GET',
+    credentials: 'same-origin',
+    redirect: 'follow'
+  });
+}
+
+function isRuntimeContract(pathname) {
+  return RUNTIME_CONTRACT_PATHS.indexOf(pathname) >= 0;
+}
+
+function fetchWithTimeout(request, timeoutMs) {
+  if (typeof AbortController !== 'function') {
+    return Promise.race([
+      fetch(request, { cache: 'no-store' }),
+      new Promise(function (_, reject) {
+        setTimeout(function () { reject(new Error('NETWORK_TIMEOUT')); }, timeoutMs);
+      })
+    ]);
+  }
+  var controller = new AbortController();
+  var timer = setTimeout(function () { controller.abort(); }, timeoutMs);
+  return fetch(request, { cache: 'no-store', signal: controller.signal }).then(function (response) {
+    clearTimeout(timer);
+    return response;
+  }, function (error) {
+    clearTimeout(timer);
+    throw error;
+  });
+}
+
+function cacheResponse(cache, key, response) {
+  if (!response || !response.ok) return Promise.resolve(response);
+  return cache.put(key, response.clone()).catch(function () { return false; }).then(function () {
+    return response;
+  });
+}
+
+self.addEventListener('install', function (event) {
+  event.waitUntil(
+    caches.open(CACHE).then(function (cache) {
+      return Promise.all(RUNTIME_CONTRACT_PATHS.map(function (pathname) {
+        var key = canonicalRequest(pathname);
+        return fetchWithTimeout(key, 15000).then(function (response) {
+          return cacheResponse(cache, key, response);
+        }).catch(function () { return null; });
+      }));
+    }).then(function () {
+      return self.skipWaiting();
+    })
+  );
 });
 
 self.addEventListener('activate', function (event) {
@@ -25,6 +82,30 @@ self.addEventListener('fetch', function (event) {
 
   var originalUrl = new URL(event.request.url);
   if (originalUrl.origin !== self.location.origin) return;
+
+  if (isRuntimeContract(originalUrl.pathname)) {
+    event.respondWith(
+      caches.open(CACHE).then(function (cache) {
+        var key = canonicalRequest(originalUrl.pathname);
+        return cache.match(key).then(function (hit) {
+          var refresh = fetchWithTimeout(event.request, RUNTIME_CONTRACT_TIMEOUT_MS).then(function (response) {
+            return cacheResponse(cache, key, response);
+          });
+          if (hit) {
+            event.waitUntil(refresh.catch(function () { return null; }));
+            return hit;
+          }
+          return refresh.catch(function (error) {
+            return cache.match(event.request, { ignoreSearch: true }).then(function (fallback) {
+              if (fallback) return fallback;
+              throw error;
+            });
+          });
+        });
+      })
+    );
+    return;
+  }
 
   event.respondWith(
     caches.open(CACHE).then(function (cache) {
