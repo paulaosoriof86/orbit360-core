@@ -75,12 +75,13 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
   if (!report.bootstrapTransportDiagnostic) installBootstrapDiagnostics(page, report);
   report.bootstrapTransportDiagnostic.currentUrl = page.url();
 
-  await approveStage(report, bounded, 'canonical_url_ready', () => page.waitForURL(url => {
-    return /\/index\.html$/.test(url.pathname) &&
-      url.searchParams.get('orbitBackend') === 'firestore-lab' &&
-      url.searchParams.get('tenant') === 'alianzas-soluciones' &&
-      url.searchParams.get('runtime') === runtime;
-  }, { waitUntil: 'domcontentloaded', timeout: 15000 }), 18000);
+  await approveStage(report, bounded, 'canonical_url_ready', async () => {
+    const url = new URL(page.url());
+    requireState(/\/index\.html$/.test(url.pathname), 'CANONICAL_INDEX_NOT_REACHED', url.pathname);
+    requireState(url.searchParams.get('orbitBackend') === 'firestore-lab', 'CANONICAL_BACKEND_MISSING');
+    requireState(url.searchParams.get('tenant') === 'alianzas-soluciones', 'CANONICAL_TENANT_MISSING');
+    requireState(url.searchParams.get('runtime') === runtime, 'CANONICAL_RUNTIME_MISMATCH', url.searchParams.get('runtime') || 'missing');
+  }, 5000);
 
   report.bootstrapTransportDiagnostic.currentUrl = page.url();
   report.checks.canonicalDocumentParsed = true;
