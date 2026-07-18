@@ -16,6 +16,8 @@ const save=()=>{const p=JSON.stringify(report,null,2)+'\n';dirs.forEach(d=>write
 const stage=s=>{report.stage=s;console.log(`ORBIT360_GATE_STAGE:${s}`);};
 const requireState=(v,c,d='')=>{if(!v)throw new Error(c+(d?`:${d}`:''));};
 async function bounded(name,fn,ms=15000){stage(name);let t;try{return await Promise.race([Promise.resolve().then(fn),new Promise((_,r)=>{t=setTimeout(()=>r(new Error(`PIPELINE_STEP_TIMEOUT:${name}`)),ms);})]);}finally{clearTimeout(t);}}
+function diagnosticText(value){return String(value||'').replace(/https?:\/\/[^/\s]+/g,'').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').replace(/[A-Za-z0-9_-]{48,}/g,'[redacted]').replace(/\s+/g,' ').trim().slice(0,320);}
+function diagnosticPath(value){try{return new URL(String(value||'')).pathname.slice(0,180);}catch(error){return '';}}
 let browser;
 const watchdog=setTimeout(()=>{report.ok=false;report.error=`GATE_TIMEOUT:${report.stage}`;save();process.exit(124);},300000);
 
@@ -65,6 +67,31 @@ async function validateMobileMenu(page){
 
 browser=await chromium.launch({headless:true});
 const page=await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(45000);
+const cdp=await page.context().newCDPSession(page);
+report.browserParseDiagnostics={failedScripts:[],exceptions:[]};
+await cdp.send('Runtime.enable');
+await cdp.send('Debugger.enable');
+cdp.on('Debugger.scriptFailedToParse',event=>{
+  if(report.browserParseDiagnostics.failedScripts.length>=12)return;
+  report.browserParseDiagnostics.failedScripts.push({
+    path:diagnosticPath(event&&event.url),
+    line:Number(event&&event.startLine||0)+1,
+    column:Number(event&&event.startColumn||0)+1,
+    error:diagnosticText(event&&event.errorMessage),
+    length:Number(event&&event.length||0)
+  });
+});
+cdp.on('Runtime.exceptionThrown',event=>{
+  if(report.browserParseDiagnostics.exceptions.length>=12)return;
+  const details=event&&event.exceptionDetails||{};
+  const frame=details.stackTrace&&details.stackTrace.callFrames&&details.stackTrace.callFrames[0]||{};
+  report.browserParseDiagnostics.exceptions.push({
+    path:diagnosticPath(details.url||frame.url),
+    line:Number(details.lineNumber??frame.lineNumber??0)+1,
+    column:Number(details.columnNumber??frame.columnNumber??0)+1,
+    error:diagnosticText(details.exception&&details.exception.description||details.text)
+  });
+});
 try{
   stage('open_lab_preview');await page.goto(`${baseUrl}/ays-lab-preview.html`,{waitUntil:'domcontentloaded',timeout:60000});
   await awaitPreviewRedirect(page);
