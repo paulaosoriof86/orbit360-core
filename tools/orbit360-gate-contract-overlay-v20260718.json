@@ -3,11 +3,11 @@
   "issuedAt": "2026-07-18",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": "PIPELINE_MECHANISM_FAILURE",
-  "diagnosticRevision": "browser-load-lifecycle-before-auth-v1",
-  "contractRevision": "1.0.25-lifecycle-v1",
-  "sourceRunId": 29660698549,
-  "sourceHead": "5b442f3124769e51a326c5de33940702991c9c59",
-  "firstFailedStage": "authentication_form_ready",
+  "diagnosticRevision": "post-router-runtime-terminal-before-auth-v1",
+  "contractRevision": "1.0.25-post-router-terminal-v1",
+  "sourceRunId": 29661458840,
+  "sourceHead": "36b22b176756ee7adcd4d88132e22eb43bc68dfd",
+  "firstFailedStage": "canonical_document_load_complete",
   "canonicalOwners": [
     {
       "id": "routerTenantBootstrap",
@@ -39,14 +39,16 @@
       ]
     },
     {
-      "id": "gateDocumentLifecycle",
+      "id": "gatePostRouterRuntime",
       "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
       "requiredTokens": [
-        "canonical_document_load_complete",
-        "page.waitForLoadState('load'",
-        "browser-lifecycle-event",
+        "canonical_post_router_runtime_terminal",
+        "page.exposeBinding('__orbitGatePostRouterRuntime'",
+        "orbit:aseguradoras:tenant-runtime-linked",
+        "orbit:aseguradoras:tenant-runtime-error",
+        "external-custom-event-binding",
         "beforeAuth:true",
-        "report.checks.canonical_document_load_complete=true"
+        "report.checks.canonical_post_router_runtime_terminal=true"
       ]
     }
   ],
@@ -97,11 +99,13 @@
     {
       "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
       "requiredTokens": [
-        "canonical_document_load_complete",
-        "page.waitForLoadState('load'",
-        "browser-lifecycle-event",
+        "canonical_post_router_runtime_terminal",
+        "page.exposeBinding('__orbitGatePostRouterRuntime'",
+        "orbit:aseguradoras:tenant-runtime-linked",
+        "orbit:aseguradoras:tenant-runtime-error",
+        "external-custom-event-binding",
         "beforeAuth:true",
-        "report.checks.canonical_document_load_complete=true"
+        "report.checks.canonical_post_router_runtime_terminal=true"
       ]
     }
   ],
