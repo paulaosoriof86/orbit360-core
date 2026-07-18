@@ -7,6 +7,29 @@
    ============================================================ */
 (function () {
   var RUNTIME_BUILD = '20260717-2';
+  var workerState = window.OrbitPwaWorkerState = {
+    runtimeBuild: RUNTIME_BUILD,
+    status: 'registering',
+    controlled: false,
+    scriptPath: ''
+  };
+
+  function workerPath(worker) {
+    try { return worker && worker.scriptURL ? new URL(worker.scriptURL).pathname + new URL(worker.scriptURL).search : ''; } catch (e) { return ''; }
+  }
+
+  function controllerMatches(registration) {
+    var controller = navigator.serviceWorker && navigator.serviceWorker.controller;
+    var active = registration && registration.active;
+    if (!controller || !active) return false;
+    return workerPath(controller) === workerPath(active) && workerPath(controller).indexOf('v=' + RUNTIME_BUILD) >= 0;
+  }
+
+  function signalWorker(status) {
+    workerState.status = status;
+    workerState.controlled = status === 'controlled';
+    try { console.log('ORBIT360_RUNTIME_SIGNAL:pwa-controller:' + status); } catch (e) {}
+  }
 
   function waitForWorkerActivation(registration) {
     var worker = registration && (registration.installing || registration.waiting);
@@ -26,16 +49,47 @@
     });
   }
 
+  function waitForWorkerControl(registration) {
+    if (controllerMatches(registration)) return Promise.resolve(registration);
+    return new Promise(function (resolve) {
+      var settled = false;
+      var timer = setTimeout(finish, 10000);
+      function finish() {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        navigator.serviceWorker.removeEventListener('controllerchange', check);
+        resolve(registration);
+      }
+      function check() { if (controllerMatches(registration)) finish(); }
+      navigator.serviceWorker.addEventListener('controllerchange', check);
+      check();
+    });
+  }
+
   function registerServiceWorker() {
-    if (!('serviceWorker' in navigator)) return Promise.resolve(null);
+    if (!('serviceWorker' in navigator)) {
+      signalWorker('unsupported');
+      return Promise.resolve(workerState);
+    }
     try {
       return navigator.serviceWorker.register('sw.js?v=' + RUNTIME_BUILD).then(function (registration) {
         return registration.update().catch(function () { return registration; }).then(function () {
           return waitForWorkerActivation(registration);
+        }).then(function () {
+          return waitForWorkerControl(registration);
+        }).then(function () {
+          workerState.scriptPath = workerPath(navigator.serviceWorker.controller || registration.active);
+          signalWorker(controllerMatches(registration) ? 'controlled' : 'uncontrolled');
+          return workerState;
         });
-      }).catch(function () { return null; });
+      }).catch(function () {
+        signalWorker('error');
+        return workerState;
+      });
     } catch (error) {
-      return Promise.resolve(null);
+      signalWorker('error');
+      return Promise.resolve(workerState);
     }
   }
 

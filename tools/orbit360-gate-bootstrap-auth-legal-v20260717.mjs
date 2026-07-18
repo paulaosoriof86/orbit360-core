@@ -19,6 +19,10 @@ function safePath(rawUrl) {
   }
 }
 
+function isRuntimeContractPath(path) {
+  return /client-canonical-view-projection|tenant-insurer-config|tenant-runtime-config-index|session-multirol-visibility|tenant-[^/]+-insurers-p10/.test(String(path || ''));
+}
+
 export function installBootstrapDiagnostics(page, report) {
   const diagnostic = report.bootstrapTransportDiagnostic = {
     currentUrl: page.url(),
@@ -27,23 +31,34 @@ export function installBootstrapDiagnostics(page, report) {
     lastFailedRequest: null,
     lastBadResponse: null,
     pageErrors: [],
+    contractRequests: [],
+    contractFinished: [],
     contractResponses: [],
+    runtimeSignals: [],
     consoleMessages: []
   };
 
   page.on('request', request => {
     diagnostic.currentUrl = page.url();
+    const path = safePath(request.url());
     diagnostic.lastRequestStarted = {
-      path: safePath(request.url()),
+      path,
       resourceType: request.resourceType()
     };
+    if (isRuntimeContractPath(path) && diagnostic.contractRequests.length < 32) {
+      diagnostic.contractRequests.push({ path, resourceType: request.resourceType() });
+    }
   });
   page.on('requestfinished', request => {
     diagnostic.currentUrl = page.url();
+    const path = safePath(request.url());
     diagnostic.lastRequestFinished = {
-      path: safePath(request.url()),
+      path,
       resourceType: request.resourceType()
     };
+    if (isRuntimeContractPath(path) && diagnostic.contractFinished.length < 32) {
+      diagnostic.contractFinished.push({ path, resourceType: request.resourceType() });
+    }
   });
   page.on('requestfailed', request => {
     diagnostic.currentUrl = page.url();
@@ -55,7 +70,7 @@ export function installBootstrapDiagnostics(page, report) {
   });
   page.on('response', response => {
     const path = safePath(response.url());
-    if (/client-canonical-view-projection|tenant-insurer-config|tenant-runtime-config-index|session-multirol-visibility/.test(path) && diagnostic.contractResponses.length < 16) {
+    if (isRuntimeContractPath(path) && diagnostic.contractResponses.length < 32) {
       diagnostic.contractResponses.push({
         path,
         status: response.status(),
@@ -67,10 +82,15 @@ export function installBootstrapDiagnostics(page, report) {
     diagnostic.lastBadResponse = { path, status: response.status() };
   });
   page.on('console', message => {
+    const text = sanitizeDiagnostic(message.text());
+    if (text.indexOf('ORBIT360_RUNTIME_SIGNAL:') === 0) {
+      if (diagnostic.runtimeSignals.length < 64) diagnostic.runtimeSignals.push(text);
+      return;
+    }
     if (!['error', 'warning'].includes(message.type()) || diagnostic.consoleMessages.length >= 12) return;
     diagnostic.consoleMessages.push({
       type: message.type(),
-      text: sanitizeDiagnostic(message.text())
+      text
     });
   });
   page.on('pageerror', error => {
@@ -119,40 +139,94 @@ async function validateServedRuntimeScripts(page, { report, bounded, requireStat
   }, 70000);
 }
 
-async function waitForRuntimeContractOwner(page, { marker, owner, code, requireState, report }) {
+async function waitForRuntimeContractOwner(page, { marker, owner, code, nextPathPattern, nextSignal, requireState, report }) {
   const terminal = ['error', 'timeout', 'no-source'];
   const deadline = Date.now() + 20000;
   let last = null;
   while (Date.now() < deadline) {
-    last = await page.evaluate(({ marker, owner }) => {
-      const router = window.Orbit && Orbit.router;
-      const contract = router && router.runtimeContractState ? router.runtimeContractState[marker] || null : null;
-      let ready = false;
-      if (owner === 'tenant-core') {
-        ready = Boolean(window.Orbit && Orbit.tenantInsurerConfigP10 && typeof Orbit.tenantInsurerConfigP10.registerTenantConfig === 'function');
-      } else if (owner === 'tenant-index') {
-        ready = Boolean(window.OrbitTenantRuntimeConfigIndex && window.OrbitTenantRuntimeConfigIndex['alianzas-soluciones']);
-      } else if (owner === 'tenant-active') {
-        ready = [].concat(window.OrbitTenantInsurerConfigsP10 || []).some(item => item && item.tenantId === 'alianzas-soluciones');
-      }
-      return {
-        ready,
-        status: String(contract && contract.status || ''),
-        contractReady: Boolean(contract && contract.ready),
-        srcPresent: Boolean(contract && contract.src),
-        loadEvent: Boolean(contract && contract.loadEvent),
-        errorEvent: Boolean(contract && contract.errorEvent)
-      };
-    }, { marker, owner });
-    if (last.ready) return;
-    if (terminal.includes(last.status)) {
+    const diagnostic = report.bootstrapTransportDiagnostic || {};
+    const signals = [].concat(diagnostic.runtimeSignals || []);
+    const readySignal = 'ORBIT360_RUNTIME_SIGNAL:contract-ready:' + marker;
+    const terminalPrefix = 'ORBIT360_RUNTIME_SIGNAL:contract-terminal:' + marker + ':';
+    const transitionBySignal = signals.includes(readySignal) || (nextSignal && signals.includes('ORBIT360_RUNTIME_SIGNAL:' + nextSignal));
+    const transitionByRequest = nextPathPattern && [].concat(diagnostic.contractRequests || []).some(item => new RegExp(nextPathPattern).test(String(item && item.path || '')));
+    if (transitionBySignal || transitionByRequest) {
+      report.runtimeOwnerDiagnostics = Object.assign({}, report.runtimeOwnerDiagnostics || {}, {
+        [code]: { ready: true, evidence: transitionBySignal ? 'runtime-signal' : 'next-contract-request' }
+      });
+      return;
+    }
+    const terminalSignal = signals.find(item => item.indexOf(terminalPrefix) === 0);
+    if (terminalSignal) {
+      const status = terminalSignal.slice(terminalPrefix.length) || 'error';
+      requireState(false, code + '_' + status.toUpperCase(), terminalSignal);
+    }
+
+    last = await Promise.race([
+      page.evaluate(({ marker, owner }) => {
+        const router = window.Orbit && Orbit.router;
+        const contract = router && router.runtimeContractState ? router.runtimeContractState[marker] || null : null;
+        let ready = false;
+        if (owner === 'tenant-core') {
+          ready = Boolean(window.Orbit && Orbit.tenantInsurerConfigP10 && typeof Orbit.tenantInsurerConfigP10.registerTenantConfig === 'function');
+        } else if (owner === 'tenant-index') {
+          ready = Boolean(window.OrbitTenantRuntimeConfigIndex && window.OrbitTenantRuntimeConfigIndex['alianzas-soluciones']);
+        } else if (owner === 'tenant-active') {
+          ready = [].concat(window.OrbitTenantInsurerConfigsP10 || []).some(item => item && item.tenantId === 'alianzas-soluciones');
+        }
+        return {
+          ready,
+          status: String(contract && contract.status || ''),
+          contractReady: Boolean(contract && contract.ready),
+          srcPresent: Boolean(contract && contract.src),
+          loadEvent: Boolean(contract && contract.loadEvent),
+          errorEvent: Boolean(contract && contract.errorEvent)
+        };
+      }, { marker, owner }),
+      new Promise(resolve => setTimeout(() => resolve({ evaluationTimeout: true }), 1000))
+    ]);
+    if (last && last.ready) return;
+    if (last && terminal.includes(last.status)) {
       report.runtimeOwnerDiagnostics = Object.assign({}, report.runtimeOwnerDiagnostics || {}, { [code]: last });
       requireState(false, code + '_' + last.status.toUpperCase(), JSON.stringify(last));
     }
-    await page.waitForTimeout(250);
+    await new Promise(resolve => setTimeout(resolve, 250));
   }
   report.runtimeOwnerDiagnostics = Object.assign({}, report.runtimeOwnerDiagnostics || {}, { [code]: last });
   requireState(false, code + '_NOT_READY', JSON.stringify(last || {}));
+}
+
+async function waitForPwaController(page, report, requireState) {
+  const deadline = Date.now() + 22000;
+  let last = null;
+  while (Date.now() < deadline) {
+    const signals = [].concat(report.bootstrapTransportDiagnostic && report.bootstrapTransportDiagnostic.runtimeSignals || []);
+    if (signals.includes('ORBIT360_RUNTIME_SIGNAL:pwa-controller:controlled') || signals.includes('ORBIT360_RUNTIME_SIGNAL:pwa-ready:controlled')) return;
+    const terminal = signals.find(item => /ORBIT360_RUNTIME_SIGNAL:pwa-(?:controller|ready):(unsupported|uncontrolled|timeout|error)/.test(item));
+    if (terminal) requireState(false, 'PWA_CONTROLLER_' + terminal.split(':').pop().toUpperCase(), terminal);
+    last = await Promise.race([
+      page.evaluate(() => window.OrbitPwaWorkerState || null),
+      new Promise(resolve => setTimeout(() => resolve({ evaluationTimeout: true }), 1000))
+    ]);
+    if (last && last.controlled === true) return;
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
+  requireState(false, 'PWA_CONTROLLER_NOT_READY', JSON.stringify(last || {}));
+}
+
+async function waitForRouterSignal(page, report, requireState) {
+  const deadline = Date.now() + 24000;
+  while (Date.now() < deadline) {
+    const signals = [].concat(report.bootstrapTransportDiagnostic && report.bootstrapTransportDiagnostic.runtimeSignals || []);
+    if (signals.includes('ORBIT360_RUNTIME_SIGNAL:router-ready:1')) return;
+    const state = await Promise.race([
+      page.evaluate(() => Boolean(window.Orbit && Orbit.route && Orbit.route.key)),
+      new Promise(resolve => setTimeout(() => resolve(false), 1000))
+    ]);
+    if (state) return;
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
+  requireState(false, 'ROUTER_READY_SIGNAL_MISSING');
 }
 
 export async function waitForProductBootstrap(page, { runtime, bounded, requireState, report }) {
@@ -195,6 +269,8 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
     return Boolean(window.Orbit && Orbit.store && Orbit.router && Orbit.auth &&
       typeof Orbit.auth.loginFirebase === 'function');
   }, null, { timeout: 20000, polling: 250 }), 24000);
+
+  await approveStage(report, bounded, 'canonical_pwa_controller_ready', () => waitForPwaController(page, report, requireState), 26000);
 
   await validateServedRuntimeScripts(page, { report, bounded, requireState });
 
@@ -331,6 +407,7 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
     marker: 'data-orbit-tenant-insurer-config-core-v20260717',
     owner: 'tenant-core',
     code: 'TENANT_INSURER_CORE',
+    nextPathPattern: '^/data/tenant-runtime-config-index\\.js$',
     requireState,
     report
   }), 24000);
@@ -339,6 +416,7 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
     marker: 'data-orbit-tenant-runtime-index-v20260717',
     owner: 'tenant-index',
     code: 'TENANT_RUNTIME_INDEX',
+    nextPathPattern: '^/data/tenant-[^/]+-insurers-p10\\.js$',
     requireState,
     report
   }), 24000);
@@ -347,13 +425,12 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
     marker: 'data-orbit-tenant-insurer-config-active-v20260717',
     owner: 'tenant-active',
     code: 'TENANT_INSURER_ACTIVE',
+    nextSignal: 'router-ready:1',
     requireState,
     report
   }), 24000);
 
-  await approveStage(report, bounded, 'canonical_router_start_ready', () => page.waitForFunction(() => {
-    return Boolean(window.Orbit && Orbit.route && Orbit.route.key);
-  }, null, { timeout: 20000, polling: 250 }), 24000);
+  await approveStage(report, bounded, 'canonical_router_start_ready', () => waitForRouterSignal(page, report, requireState), 28000);
 
   await approveStage(report, bounded, 'canonical_bootstrap_stable', async () => {
     await page.waitForTimeout(2000);

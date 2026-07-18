@@ -182,7 +182,7 @@ Orbit.router = (function () {
   const RUNTIME_CONTRACTS = [
     { src: 'core/session-multirol-visibility-v20260716.js?v=20260716-2', marker: 'data-orbit-multirol-runtime-v20260716', ready: () => Orbit.session && Orbit.session.__multirolVisibilityV20260716 },
     { src: 'core/client-canonical-view-projection-v20260716.js?v=20260717-2', marker: 'data-orbit-client-projection-runtime-v20260716', ready: () => Orbit.clientProjection && Orbit.clientProjection.get },
-    { src: 'core/tenant-insurer-config-p10.js?v=20260717-1', marker: 'data-orbit-tenant-insurer-config-core-v20260717', ready: () => Orbit.tenantInsurerConfigP10 },
+    { src: 'core/tenant-insurer-config-p10.js?v=20260717-1', marker: 'data-orbit-tenant-insurer-config-core-v20260717', ready: () => Orbit.tenantInsurerConfigP10 && typeof Orbit.tenantInsurerConfigP10.registerTenantConfig === 'function' },
     { src: 'data/tenant-runtime-config-index.js?v=20260717-1', marker: 'data-orbit-tenant-runtime-index-v20260717', ready: () => window.OrbitTenantRuntimeConfigIndex },
     {
       src: () => {
@@ -210,6 +210,10 @@ Orbit.router = (function () {
     try { return !item.ready || !!item.ready(); } catch (e) { return false; }
   }
 
+  function runtimeSignal(code, detail) {
+    try { console.log('ORBIT360_RUNTIME_SIGNAL:' + code + (detail ? ':' + detail : '')); } catch (e) {}
+  }
+
   function loadRuntimeContracts(done) {
     let pos = 0;
     function next() {
@@ -222,8 +226,16 @@ Orbit.router = (function () {
         ready: contractReady(item),
         startedAt: Date.now()
       };
-      if (state.ready) { state.status = 'ready'; state.finishedAt = Date.now(); next(); return; }
-      if (!src) { state.status = 'no-source'; state.finishedAt = Date.now(); next(); return; }
+      if (state.ready) {
+        state.status = 'ready'; state.finishedAt = Date.now();
+        runtimeSignal('contract-ready', item.marker);
+        next(); return;
+      }
+      if (!src) {
+        state.status = 'no-source'; state.finishedAt = Date.now();
+        runtimeSignal('contract-terminal', item.marker + ':no-source');
+        next(); return;
+      }
 
       let script = document.querySelector('script[' + item.marker + ']');
       let settled = false;
@@ -237,6 +249,7 @@ Orbit.router = (function () {
         state.status = status;
         state.ready = contractReady(item);
         state.finishedAt = Date.now();
+        runtimeSignal(state.ready ? 'contract-ready' : 'contract-terminal', item.marker + (state.ready ? '' : ':' + status));
         next();
       }
       function checkReady() {
@@ -292,12 +305,38 @@ Orbit.router = (function () {
     window.addEventListener('resize', function () { if (!isMobile()) closeMobile(); });
     window.addEventListener('hashchange', onHash);
     onHash();
+    runtimeSignal('router-ready', '1');
   }
 
   function init() {
     host = document.getElementById('host');
     sidebar = document.getElementById('sidebar');
-    loadRuntimeContracts(start);
+    let started = false;
+    function begin() {
+      if (started) return;
+      started = true;
+      loadRuntimeContracts(start);
+    }
+    const pwaReady = window.OrbitPwaWorkerReady;
+    if (!pwaReady || typeof pwaReady.then !== 'function') {
+      runtimeContractState.__pwa = { status: 'unavailable', controlled: false };
+      runtimeSignal('pwa-ready', 'unavailable');
+      begin();
+      return;
+    }
+    Promise.race([
+      pwaReady,
+      new Promise(resolve => setTimeout(() => resolve({ status: 'timeout', controlled: false }), 20000))
+    ]).then(function (state) {
+      const status = state && state.controlled ? 'controlled' : String(state && state.status || 'uncontrolled');
+      runtimeContractState.__pwa = { status: status, controlled: status === 'controlled' };
+      runtimeSignal('pwa-ready', status);
+      begin();
+    }).catch(function () {
+      runtimeContractState.__pwa = { status: 'error', controlled: false };
+      runtimeSignal('pwa-ready', 'error');
+      begin();
+    });
   }
 
   function wireGlobalSearch() {

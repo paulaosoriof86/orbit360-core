@@ -20,7 +20,7 @@ function canonicalRequest(pathname) {
 }
 
 function isRuntimeContract(pathname) {
-  return RUNTIME_CONTRACT_PATHS.indexOf(pathname) >= 0;
+  return RUNTIME_CONTRACT_PATHS.indexOf(pathname) >= 0 || /^\/data\/tenant-[^/]+-insurers-p10\.js$/i.test(pathname);
 }
 
 function fetchWithTimeout(request, timeoutMs) {
