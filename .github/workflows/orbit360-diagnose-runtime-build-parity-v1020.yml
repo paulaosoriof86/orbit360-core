@@ -1,0 +1,51 @@
+name: Orbit 360 Diagnose Runtime Build Parity 1.0.20
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-diagnose-runtime-build-parity-v1020.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Comparar runtime-build publicado con y sin cache-buster
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_URL="https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app/runtime-build.json"
+          EXPECTED_COMMIT="11478e9b75ec68a3705ccdf2713cd8cc14312759"
+          EXPECTED_RUN="29652470409"
+          EXPECTED_GATE="block1-client360-insurers-lab-v20260717"
+          EXPECTED_RUNTIME="20260717-2"
+          PLAIN_STATUS="$(curl -sS -o /tmp/plain.json -w '%{http_code}' -H 'Cache-Control: no-cache' "$BASE_URL")"
+          BUST_STATUS="$(curl -sS -o /tmp/bust.json -w '%{http_code}' -H 'Cache-Control: no-cache' "${BASE_URL}?orbitRun=${EXPECTED_RUN}")"
+          PLAIN_COMMIT="$(jq -r '.commit // empty' /tmp/plain.json 2>/dev/null || true)"
+          PLAIN_RUN="$(jq -r '.run // empty' /tmp/plain.json 2>/dev/null || true)"
+          PLAIN_GATE="$(jq -r '.gateId // empty' /tmp/plain.json 2>/dev/null || true)"
+          PLAIN_RUNTIME="$(jq -r '.runtimeVersion // empty' /tmp/plain.json 2>/dev/null || true)"
+          BUST_COMMIT="$(jq -r '.commit // empty' /tmp/bust.json 2>/dev/null || true)"
+          BUST_RUN="$(jq -r '.run // empty' /tmp/bust.json 2>/dev/null || true)"
+          BUST_GATE="$(jq -r '.gateId // empty' /tmp/bust.json 2>/dev/null || true)"
+          BUST_RUNTIME="$(jq -r '.runtimeVersion // empty' /tmp/bust.json 2>/dev/null || true)"
+          jq -n \
+            --arg schemaVersion "orbit360-runtime-build-parity-v1" \
+            --arg expectedCommit "$EXPECTED_COMMIT" --arg expectedRun "$EXPECTED_RUN" --arg expectedGate "$EXPECTED_GATE" --arg expectedRuntime "$EXPECTED_RUNTIME" \
+            --arg plainStatus "$PLAIN_STATUS" --arg plainCommit "$PLAIN_COMMIT" --arg plainRun "$PLAIN_RUN" --arg plainGate "$PLAIN_GATE" --arg plainRuntime "$PLAIN_RUNTIME" \
+            --arg bustStatus "$BUST_STATUS" --arg bustCommit "$BUST_COMMIT" --arg bustRun "$BUST_RUN" --arg bustGate "$BUST_GATE" --arg bustRuntime "$BUST_RUNTIME" \
+            '{schemaVersion:$schemaVersion,containsPII:false,containsSecrets:false,expected:{commit:$expectedCommit,run:$expectedRun,gateId:$expectedGate,runtimeVersion:$expectedRuntime},plain:{httpStatus:$plainStatus,commit:$plainCommit,run:$plainRun,gateId:$plainGate,runtimeVersion:$plainRuntime},cacheBusted:{httpStatus:$bustStatus,commit:$bustCommit,run:$bustRun,gateId:$bustGate,runtimeVersion:$bustRuntime},matches:{plainCommit:($plainCommit==$expectedCommit),plainRun:($plainRun==$expectedRun),plainGate:($plainGate==$expectedGate),plainRuntime:($plainRuntime==$expectedRuntime),cacheBustedCommit:($bustCommit==$expectedCommit),cacheBustedRun:($bustRun==$expectedRun),cacheBustedGate:($bustGate==$expectedGate),cacheBustedRuntime:($bustRuntime==$expectedRuntime),plainEqualsCacheBusted:($plainCommit==$bustCommit and $plainRun==$bustRun and $plainGate==$bustGate and $plainRuntime==$bustRuntime)}}' \
+            > .github/orbit360-runtime-build-parity-v1020.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/orbit360-runtime-build-parity-v1020.json
+          git commit -m "chore(block1): record runtime build parity diagnostic [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
