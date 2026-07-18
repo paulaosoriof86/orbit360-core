@@ -2,12 +2,12 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-18",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "VALIDATOR_STALE",
-  "diagnosticRevision": "controlled-runtime-promise-or-terminal-event-v1",
-  "contractRevision": "1.0.25-controlled-runtime-v1",
-  "sourceRunId": 29661945043,
-  "sourceHead": "c9f978319b049e85aa51c290645eb03a201ca009",
-  "firstFailedStage": "canonical_post_router_runtime_terminal",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "diagnosticRevision": "canonical-target-domcontentloaded-before-auth-v1",
+  "contractRevision": "1.0.25-canonical-domcontentloaded-v1",
+  "sourceRunId": 29662251706,
+  "sourceHead": "90a9b15dbb481e33198cfc7cd5d45489e98a21cf",
+  "firstFailedStage": "authentication_form_ready",
   "canonicalOwners": [
     {
       "id": "routerTenantBootstrap",
@@ -39,7 +39,7 @@
       ]
     },
     {
-      "id": "gateControlledRuntime",
+      "id": "gateControlledRuntimeAndCanonicalDom",
       "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
       "requiredTokens": [
         "canonical_post_router_runtime_terminal",
@@ -49,8 +49,13 @@
         "orbit:aseguradoras:tenant-runtime-linked",
         "orbit:aseguradoras:tenant-runtime-error",
         "external-custom-event-binding",
-        "beforeAuth:true",
-        "report.checks.canonical_post_router_runtime_terminal=true"
+        "canonical_domcontentloaded_ready",
+        "report.documentLifecycleSignals=[]",
+        "page.on('domcontentloaded'",
+        "item.path==='/index.html'",
+        "method:'playwright-page-event'",
+        "report.checks.canonical_domcontentloaded_ready=true",
+        "beforeAuth:true"
       ]
     }
   ],
@@ -108,8 +113,13 @@
         "orbit:aseguradoras:tenant-runtime-linked",
         "orbit:aseguradoras:tenant-runtime-error",
         "external-custom-event-binding",
-        "beforeAuth:true",
-        "report.checks.canonical_post_router_runtime_terminal=true"
+        "canonical_domcontentloaded_ready",
+        "report.documentLifecycleSignals=[]",
+        "page.on('domcontentloaded'",
+        "item.path==='/index.html'",
+        "method:'playwright-page-event'",
+        "report.checks.canonical_domcontentloaded_ready=true",
+        "beforeAuth:true"
       ]
     }
   ],
