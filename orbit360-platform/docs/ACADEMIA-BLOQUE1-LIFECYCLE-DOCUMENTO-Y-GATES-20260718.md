@@ -1,22 +1,25 @@
-# Academia · Lifecycle del documento y gates
+# Academia · Owners dinámicos y gates funcionales
 
 Fecha: 2026-07-18
 
-Un gate debe distinguir tres estados:
+Un gate debe distinguir cuatro estados:
 
 1. Bootstrap y Router listos.
-2. Documento completamente cargado.
-3. Interfaz lista para interacción funcional.
+2. Loader post-Router iniciado.
+3. Loader post-Router terminado mediante su señal propia.
+4. Interfaz lista para interacción funcional.
 
-`router-ready` no equivale por sí solo a una interfaz interactuable. Antes de probar acceso, legal, roles o módulos, el gate debe confirmar el lifecycle `load` del navegador.
+`router-ready` no significa que todos los loaders dinámicos hayan terminado. Tampoco debe usarse `window.load` como sustituto, porque recursos adicionales pueden mantener abierto el lifecycle global sin impedir que el shell cumpla su contrato.
 
-Cuando el producto y los datos están correctos pero la prueba interactúa demasiado pronto, la clasificación es `PIPELINE_MECHANISM_FAILURE`. Se corrige el gate, no Auth, Store, Router, módulos ni datos.
+Cada loader debe publicar un evento terminal de éxito o error. El gate observa ese evento desde fuera y después prueba el flujo visible real.
+
+Cuando producto y datos están correctos, pero la prueba usa una condición de espera que no pertenece al owner, la clasificación es `PIPELINE_MECHANISM_FAILURE`. Se corrige el gate, no Auth, Store, Router, módulos ni datos.
 
 Evidencia esperada:
 
 ```txt
-canonical_document_load_complete: true
-method: browser-lifecycle-event
+canonical_post_router_runtime_terminal: true
+method: external-custom-event-binding
 beforeAuth: true
 ```
 
