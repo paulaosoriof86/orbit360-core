@@ -1,5 +1,5 @@
-# content-publish-trigger: 2026-07-18T16:32Z
-name: Orbit 360 Publish Validated Runtime Closure 20260718
+# ledger-finalization-trigger: 2026-07-18T16:42Z
+name: Orbit 360 Finalize Temporary Pipeline Ledger 20260718
 
 on:
   push:
@@ -13,12 +13,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: orbit360-publish-validated-runtime-closure-v20260718
+  group: orbit360-finalize-temporary-pipeline-ledger-v20260718
   cancel-in-progress: false
 
 jobs:
-  publish:
-    name: Publicar contenido validado 1.0.19
+  finalize:
+    name: Finalizar ledger temporal 1.0.19
     runs-on: ubuntu-latest
     steps:
       - name: Checkout rama autorizada
@@ -27,71 +27,48 @@ jobs:
           ref: ays/backend-tenant-lab-v99-20260703
           fetch-depth: 2
 
-      - name: Transformar y corregir mecanismo temporal
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git branch --show-current)" = "ays/backend-tenant-lab-v99-20260703"
-          node - <<'NODE'
-          const fs = require('fs');
-          const path = 'tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs';
-          let source = fs.readFileSync(path, 'utf8');
-          const from = "files[fileKey] = files[fileKey].replace(from, to);";
-          const to = "files[fileKey] = files[fileKey].replace(from, () => to);";
-          const count = source.split(from).length - 1;
-          if (count !== 1) throw new Error('PATCH_REPLACER_MATCH_COUNT:' + count);
-          fs.writeFileSync(path, source.replace(from, to), 'utf8');
-          NODE
-          node --check tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs
-          node --check tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
-          node tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
-
-      - name: Mantener workflow temporal fuera de retirados hasta cierre atómico final
+      - name: Actualizar registro y documentación del retiro
         shell: bash
         run: |
           set -euo pipefail
           node - <<'NODE'
           const fs = require('fs');
           const registryPath = 'tools/orbit360-gate-contract-registry-v20260717.json';
+          const docPath = 'orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718.md';
           const workflowPath = '.github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718.yml';
           const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
-          registry.retiredRuntimeArtifacts = registry.retiredRuntimeArtifacts.filter(path => path !== workflowPath);
-          registry.temporaryPipelineArtifacts = [{
-            path: workflowPath,
-            classification: 'TEMPORAL_RETIRO',
-            purpose: 'Publish validated 1.0.19 content without workflow-scope mutation.',
-            retirementGate: 'block1-client360-insurers-lab-v20260717',
-            retirementAction: 'Delete atomically with concurrency alignment before the unique runtime gate execution.'
-          }];
+          registry.temporaryPipelineArtifacts = [];
+          registry.retiredRuntimeArtifacts = [...new Set([].concat(registry.retiredRuntimeArtifacts || [], workflowPath))];
+          const gate = registry.gates.find(item => item.gateId === 'block1-client360-insurers-lab-v20260717');
+          if (!gate || gate.contractVersion !== '1.0.19') throw new Error('GATE_CONTRACT_NOT_1019');
+          gate.executionDispatch = {
+            mode: 'workflow_dispatch',
+            uniqueExecution: true,
+            dispatchAfterRetirement: true,
+            purpose: 'Execute the same gate once against the clean HEAD after all temporary pipeline artifacts are removed.'
+          };
+          gate.reconciliation.corrections = [...new Set(gate.reconciliation.corrections.concat([
+            'publish validated content without workflow-scope mutation',
+            'retire temporary pipeline workflow before the unique gate dispatch',
+            'dispatch the existing gate exactly once against the clean branch HEAD'
+          ]))];
           fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2) + '\n', 'utf8');
+
+          let doc = fs.readFileSync(docPath, 'utf8');
+          if (!doc.includes('## Publicación y retiro del mecanismo temporal')) {
+            doc += '\n## Publicación y retiro del mecanismo temporal\n\nEl contenido 1.0.19 fue validado y publicado sin mutar workflows mediante GITHUB_TOKEN. El workflow temporal se registra como retirado y debe eliminarse antes de ejecutar el gate. La ejecución final se solicita una sola vez mediante workflow_dispatch sobre el HEAD limpio.\n';
+          }
+          fs.writeFileSync(docPath, doc, 'utf8');
           NODE
-          rm -f tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs
-          rm -f tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
-
-      - name: Validar sintaxis, alcance y preflight vinculante
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check orbit360-platform/sw.js
-          node --check orbit360-platform/core/pwa.js
-          node --check orbit360-platform/core/router.js
-          node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
-          rm -rf orbit360-platform/runtime-gate-crm-v20260716
 
-          allowed='^(orbit360-platform/core/pwa\.js|orbit360-platform/core/router\.js|orbit360-platform/sw\.js|tools/orbit360-gate-bootstrap-auth-legal-v20260717\.mjs|tools/orbit360-gate-runtime-crm-v20260716\.mjs|tools/orbit360-gate-contract-registry-v20260717\.json|orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718\.md|tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718\.mjs|tools/orbit360-close-controlled-pwa-runtime-signals-v20260718\.mjs)$'
-          unexpected="$(git status --short | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
-          test -z "$unexpected" || { echo "UNEXPECTED_FILES"; echo "$unexpected"; exit 1; }
-
-      - name: Commit y push del contenido validado
+      - name: Commit y push del ledger final
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add tools/orbit360-gate-contract-registry-v20260717.json orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718.md
           test -n "$(git status --short)"
-          git commit -m "fix(block1): control PWA and externalize runtime signals 1.0.19"
+          git commit -m "docs(block1): finalize 1.0.19 pipeline retirement ledger [skip ci]"
           git push origin HEAD:ays/backend-tenant-lab-v99-20260703
