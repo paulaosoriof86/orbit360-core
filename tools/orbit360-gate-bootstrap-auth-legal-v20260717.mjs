@@ -1,34 +1,118 @@
-export async function waitForProductBootstrap(page, { runtime, bounded, requireState, report }) {
-  await bounded('canonical_product_bootstrap_ready', () => page.waitForFunction(expected => {
-    const url = new URL(location.href);
-    const backend = window.OrbitBackend || {};
-    const form = document.getElementById('login-form');
-    let providerReady = false;
-    try {
-      const auth = window.firebase && firebase.auth ? firebase.auth() : null;
-      providerReady = Boolean(auth && typeof auth.signInWithEmailAndPassword === 'function');
-    } catch (error) {}
+function sanitizeDiagnostic(value) {
+  return String(value || '')
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email]')
+    .replace(/[A-Za-z0-9_-]{48,}/g, '[redacted]')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 180);
+}
 
-    const ready = /\/index\.html$/.test(url.pathname) &&
+function safePath(rawUrl) {
+  try {
+    const parsed = new URL(rawUrl);
+    return parsed.pathname.slice(0, 180);
+  } catch (error) {
+    return '';
+  }
+}
+
+export function installBootstrapDiagnostics(page, report) {
+  const diagnostic = report.bootstrapTransportDiagnostic = {
+    lastRequestStarted: null,
+    lastRequestFinished: null,
+    lastFailedRequest: null,
+    lastBadResponse: null,
+    pageErrors: []
+  };
+
+  page.on('request', request => {
+    diagnostic.lastRequestStarted = {
+      path: safePath(request.url()),
+      resourceType: request.resourceType()
+    };
+  });
+  page.on('requestfinished', request => {
+    diagnostic.lastRequestFinished = {
+      path: safePath(request.url()),
+      resourceType: request.resourceType()
+    };
+  });
+  page.on('requestfailed', request => {
+    diagnostic.lastFailedRequest = {
+      path: safePath(request.url()),
+      resourceType: request.resourceType(),
+      error: sanitizeDiagnostic(request.failure() && request.failure().errorText)
+    };
+  });
+  page.on('response', response => {
+    if (response.status() < 400) return;
+    diagnostic.lastBadResponse = {
+      path: safePath(response.url()),
+      status: response.status()
+    };
+  });
+  page.on('pageerror', error => {
+    if (diagnostic.pageErrors.length >= 8) return;
+    diagnostic.pageErrors.push({
+      name: sanitizeDiagnostic(error && error.name),
+      message: sanitizeDiagnostic(error && error.message)
+    });
+  });
+}
+
+async function approveStage(report, bounded, name, task, timeoutMs) {
+  await bounded(name, task, timeoutMs);
+  report.checks[name] = true;
+}
+
+export async function waitForProductBootstrap(page, { runtime, bounded, requireState, report }) {
+  await approveStage(report, bounded, 'canonical_url_ready', () => page.waitForURL(url => {
+    return /\/index\.html$/.test(url.pathname) &&
       url.searchParams.get('orbitBackend') === 'firestore-lab' &&
       url.searchParams.get('tenant') === 'alianzas-soluciones' &&
-      url.searchParams.get('runtime') === expected &&
-      document.readyState !== 'loading' &&
-      String(backend.runtimeVersion || '') === expected &&
-      String(backend.firebaseLoader || '') === 'requested' &&
-      ['initialized', 'already-initialized'].includes(String(backend.firebaseInit || '')) &&
-      providerReady &&
-      Boolean(form && form.dataset.authMode === 'firestore-lab') &&
-      Boolean(window.Orbit && Orbit.store && Orbit.router && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function') &&
-      Boolean(Orbit.route && Orbit.route.key);
+      url.searchParams.get('runtime') === runtime;
+  }, { timeout: 15000 }), 18000);
 
-    if (!ready) {
-      window.__orbitProductBootstrapSince = 0;
+  report.checks.canonicalDocumentParsed = true;
+
+  await approveStage(report, bounded, 'canonical_backend_runtime_ready', () => page.waitForFunction(expected => {
+    const backend = window.OrbitBackend || {};
+    return String(backend.runtimeVersion || '') === expected &&
+      String(backend.firebaseLoader || '') === 'requested' &&
+      ['initialized', 'already-initialized'].includes(String(backend.firebaseInit || ''));
+  }, runtime, { timeout: 30000, polling: 250 }), 34000);
+
+  await approveStage(report, bounded, 'canonical_auth_provider_ready', () => page.waitForFunction(() => {
+    try {
+      const auth = window.firebase && firebase.auth ? firebase.auth() : null;
+      return Boolean(auth && typeof auth.signInWithEmailAndPassword === 'function');
+    } catch (error) {
       return false;
     }
-    if (!window.__orbitProductBootstrapSince) window.__orbitProductBootstrapSince = Date.now();
-    return Date.now() - window.__orbitProductBootstrapSince >= 2000;
-  }, runtime, { timeout: 105000, polling: 250 }), 110000);
+  }, null, { timeout: 20000, polling: 250 }), 24000);
+
+  await approveStage(report, bounded, 'canonical_auth_ui_ready', () => page.waitForFunction(() => {
+    const form = document.getElementById('login-form');
+    return Boolean(form && form.dataset.authMode === 'firestore-lab');
+  }, null, { timeout: 20000, polling: 250 }), 24000);
+
+  await approveStage(report, bounded, 'canonical_owner_handoff_ready', () => page.waitForFunction(() => {
+    return Boolean(window.Orbit && Orbit.store && Orbit.router && Orbit.auth &&
+      typeof Orbit.auth.loginFirebase === 'function');
+  }, null, { timeout: 20000, polling: 250 }), 24000);
+
+  await approveStage(report, bounded, 'canonical_router_start_ready', () => page.waitForFunction(() => {
+    return Boolean(window.Orbit && Orbit.route && Orbit.route.key);
+  }, null, { timeout: 35000, polling: 250 }), 39000);
+
+  await approveStage(report, bounded, 'canonical_bootstrap_stable', async () => {
+    await page.waitForTimeout(2000);
+    await page.waitForFunction(expected => {
+      const backend = window.OrbitBackend || {};
+      return String(backend.runtimeVersion || '') === expected &&
+        Boolean(window.Orbit && Orbit.store && Orbit.router && Orbit.auth && Orbit.route && Orbit.route.key);
+    }, runtime, { timeout: 8000, polling: 250 });
+  }, 12000);
 
   const current = new URL(page.url());
   requireState(/\/index\.html$/.test(current.pathname), 'CANONICAL_INDEX_NOT_REACHED');
