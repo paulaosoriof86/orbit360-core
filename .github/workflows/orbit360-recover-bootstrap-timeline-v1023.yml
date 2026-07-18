@@ -1,0 +1,37 @@
+name: Orbit 360 Recover Bootstrap Timeline 1.0.23
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-recover-bootstrap-timeline-v1023.yml"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Recuperar JSON medido sin repetir navegador
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run view 29655191682 --repo "$GITHUB_REPOSITORY" --log > /tmp/measurement.log
+          line="$(grep -F 'ORBIT360_BOOTSTRAP_TIMELINE_JSON=' /tmp/measurement.log | tail -n 1)"
+          test -n "$line"
+          json="${line#*ORBIT360_BOOTSTRAP_TIMELINE_JSON=}"
+          printf '%s\n' "$json" | jq -e '.schemaVersion == "orbit360-bootstrap-timeline-v4" and .containsPII == false and .containsSecrets == false' > .github/orbit360-bootstrap-timeline-v1023.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/orbit360-bootstrap-timeline-v1023.json
+          git commit -m "chore(block1): recover measured bootstrap timeline [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
