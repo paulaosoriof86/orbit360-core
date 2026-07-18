@@ -25,12 +25,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh run list --repo "$GITHUB_REPOSITORY" --workflow orbit360-measure-bootstrap-timeline-v1023.yml --branch ays/backend-tenant-lab-v99-20260703 --limit 5 --json databaseId,status,conclusion,headSha,createdAt,event,workflowName \
-            --jq '[.[] | select(.headSha == "1cd85ecd065f00142cb0cd2d337e35c60136c138")][0] | {runId:.databaseId,status,conclusion,headSha,createdAt,event,workflowName}' \
+          gh run list --repo "$GITHUB_REPOSITORY" --workflow orbit360-measure-bootstrap-timeline-v1023.yml --branch ays/backend-tenant-lab-v99-20260703 --limit 10 --json databaseId,status,conclusion,headSha,createdAt,event,workflowName \
+            --jq '[.[] | select(.headSha == "f8188ab9321f80fd40a2e4be0649d48cd64d1456")][0] | {runId:.databaseId,status,conclusion,headSha,createdAt,event,workflowName}' \
             > .github/orbit360-bootstrap-timeline-v1023-status.json
           test "$(jq -r '.runId // empty' .github/orbit360-bootstrap-timeline-v1023-status.json)" != ""
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .github/orbit360-bootstrap-timeline-v1023-status.json
-          git commit -m "chore(block1): record bootstrap timeline status [skip ci]"
+          git commit -m "chore(block1): record valid bootstrap timeline status [skip ci]"
           git push origin HEAD:ays/backend-tenant-lab-v99-20260703
