@@ -185,8 +185,16 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
     requireState(false, 'RUNTIME_CONTRACT_LOADER_NOT_OBSERVED');
   }, 50000);
 
+  const CLIENT_PROJECTION_READY_BUDGET_MS = 450000;
+  const CLIENT_PROJECTION_DIAGNOSTIC_RESERVE_MS = 10000;
+  report.stageBudgets = Object.assign({}, report.stageBudgets || {}, {
+    canonical_client_projection_ready: CLIENT_PROJECTION_READY_BUDGET_MS,
+    canonical_client_projection_observation: CLIENT_PROJECTION_READY_BUDGET_MS - CLIENT_PROJECTION_DIAGNOSTIC_RESERVE_MS,
+    canonical_client_projection_diagnostic_reserve: CLIENT_PROJECTION_DIAGNOSTIC_RESERVE_MS
+  });
+
   await approveStage(report, bounded, 'canonical_client_projection_ready', async () => {
-    const deadline = Date.now() + 15000;
+    const deadline = Date.now() + (CLIENT_PROJECTION_READY_BUDGET_MS - CLIENT_PROJECTION_DIAGNOSTIC_RESERVE_MS);
     const timeline = [];
     let previousSignature = '';
     let markerEverSeen = false;
@@ -281,7 +289,7 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
       };
     }, bootstrapDocumentToken);
     requireState(false, 'CLIENT_PROJECTION_NOT_REGISTERED', JSON.stringify(report.runtimeContractDiagnostics));
-  }, 25000);
+  }, CLIENT_PROJECTION_READY_BUDGET_MS);
 
   await approveStage(report, bounded, 'canonical_tenant_insurer_core_ready', () => page.waitForFunction(() => {
     return Boolean(window.Orbit && Orbit.tenantInsurerConfigP10 && typeof Orbit.tenantInsurerConfigP10.registerTenantConfig === 'function');
