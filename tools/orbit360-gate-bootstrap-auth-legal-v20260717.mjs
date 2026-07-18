@@ -77,6 +77,7 @@ async function validateServedRuntimeScripts(page, { report, bounded, requireStat
   const paths = [
     '/core/session-multirol-visibility-v20260716.js',
     '/core/client-canonical-view-projection-v20260716.js',
+    '/modules/aseguradoras-v1197-ux-bridge.js',
     '/core/tenant-insurer-config-p10.js',
     '/data/tenant-runtime-config-index.js',
     '/data/tenant-alianzas-soluciones-insurers-p10.js'
@@ -145,6 +146,11 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
   }, null, { timeout: 20000, polling: 250 }), 24000);
 
   await validateServedRuntimeScripts(page, { report, bounded, requireState });
+
+  await approveStage(report, bounded, 'canonical_runtime_contract_loader_started', () => page.waitForFunction(() => {
+    if (window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function') return true;
+    return Boolean(document.querySelector('script[data-orbit-client-projection-runtime-v20260716]'));
+  }, null, { timeout: 45000, polling: 250 }), 50000);
 
   await approveStage(report, bounded, 'canonical_client_projection_ready', () => page.waitForFunction(() => {
     return Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function');
