@@ -1,5 +1,5 @@
-# validation-diagnostic-trigger: 2026-07-18T16:08Z
-name: Orbit 360 Diagnose Runtime Closure Validation 20260718
+# final-apply-trigger: 2026-07-18T16:14Z
+name: Orbit 360 Apply Controlled PWA Runtime Signals 20260718
 
 on:
   push:
@@ -10,15 +10,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: orbit360-diagnose-runtime-closure-validation-v20260718
+  group: orbit360-apply-controlled-pwa-runtime-signals-v20260718
   cancel-in-progress: false
 
 jobs:
-  diagnose:
-    name: Diagnosticar validación del cierre 1.0.19
+  apply:
+    name: Aplicar cierre atómico validado PWA + señales runtime 1.0.19
     runs-on: ubuntu-latest
     steps:
       - name: Checkout rama autorizada
@@ -27,82 +27,97 @@ jobs:
           ref: ays/backend-tenant-lab-v99-20260703
           fetch-depth: 2
 
-      - name: Transformar y capturar cada validación
-        id: diagnostic
+      - name: Corregir mecanismo temporal y ejecutar transformación
         shell: bash
         run: |
-          set +e
-          mkdir -p orbit360-validation-diagnostic/logs
-          node tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs > orbit360-validation-diagnostic/logs/00-transform.log 2>&1
-          TRANSFORM=$?
-          if [ "$TRANSFORM" -eq 0 ]; then
-            rm -f tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs
-            rm -f tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
-            rm -f .github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718.yml
-          fi
-
-          run_check() {
-            local key="$1"
-            shift
-            "$@" > "orbit360-validation-diagnostic/logs/${key}.log" 2>&1
-            echo $? > "orbit360-validation-diagnostic/logs/${key}.exit"
-          }
-
-          if [ "$TRANSFORM" -eq 0 ]; then
-            run_check 01-sw node --check orbit360-platform/sw.js
-            run_check 02-pwa node --check orbit360-platform/core/pwa.js
-            run_check 03-router node --check orbit360-platform/core/router.js
-            run_check 04-helper node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-            run_check 05-executor node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
-            run_check 06-preflight-syntax node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-            run_check 07-preflight node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
-          fi
-
-          git status --short > orbit360-validation-diagnostic/status.txt
-          allowed='^(orbit360-platform/core/pwa\.js|orbit360-platform/core/router\.js|orbit360-platform/sw\.js|tools/orbit360-gate-bootstrap-auth-legal-v20260717\.mjs|tools/orbit360-gate-runtime-crm-v20260716\.mjs|tools/orbit360-gate-contract-registry-v20260717\.json|orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718\.md|tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718\.mjs|tools/orbit360-close-controlled-pwa-runtime-signals-v20260718\.mjs|\.github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718\.yml)$'
-          sed -E 's/^.. //' orbit360-validation-diagnostic/status.txt | grep -Ev "$allowed" > orbit360-validation-diagnostic/unexpected.txt || true
-          if [ -s orbit360-validation-diagnostic/unexpected.txt ]; then SCOPE=1; else SCOPE=0; fi
-
-          TRANSFORM="$TRANSFORM" SCOPE="$SCOPE" node - <<'NODE'
+          set -euo pipefail
+          test "$(git branch --show-current)" = "ays/backend-tenant-lab-v99-20260703"
+          node --check tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs
+          node --check tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
+          node - <<'NODE'
           const fs = require('fs');
-          const dir = 'orbit360-validation-diagnostic';
-          const clean = value => String(value || '')
-            .replace(/\/home\/runner\/work\/[^\s]+/g, '[workspace]')
-            .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email]')
-            .slice(-12000);
-          const read = path => fs.existsSync(path) ? fs.readFileSync(path, 'utf8') : '';
-          const checks = {};
-          for (const file of fs.readdirSync(dir + '/logs')) {
-            if (!file.endsWith('.exit')) continue;
-            const key = file.replace(/\.exit$/, '');
-            checks[key] = {
-              exit: Number(read(dir + '/logs/' + file).trim()),
-              log: clean(read(dir + '/logs/' + key + '.log'))
-            };
-          }
-          const result = {
-            ok: false,
-            classification: 'PIPELINE_MECHANISM_FAILURE',
-            transformExit: Number(process.env.TRANSFORM || 0),
-            scopeExit: Number(process.env.SCOPE || 0),
-            transformLog: clean(read(dir + '/logs/00-transform.log')),
-            checks,
-            status: clean(read(dir + '/status.txt')),
-            unexpected: clean(read(dir + '/unexpected.txt'))
-          };
-          fs.writeFileSync(dir + '/diagnostic.json', JSON.stringify(result, null, 2));
+          const path = 'tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs';
+          let source = fs.readFileSync(path, 'utf8');
+          const from = "files[fileKey] = files[fileKey].replace(from, to);";
+          const to = "files[fileKey] = files[fileKey].replace(from, () => to);";
+          const count = source.split(from).length - 1;
+          if (count !== 1) throw new Error('PATCH_REPLACER_MATCH_COUNT:' + count);
+          source = source.replace(from, to);
+          fs.writeFileSync(path, source, 'utf8');
           NODE
-          echo "diagnostic_ready=1" >> "$GITHUB_OUTPUT"
-          exit 0
+          node --check tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs
+          node tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
 
-      - name: Publicar diagnóstico sanitizado
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-diagnostic-runtime-closure-validation-v20260718
-          path: orbit360-validation-diagnostic/diagnostic.json
-          if-no-files-found: error
-          retention-days: 3
-
-      - name: Marcar corrida diagnóstica
+      - name: Alinear ejecución única del gate y contrato
         shell: bash
-        run: exit 1
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const workflowPath = '.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml';
+          const registryPath = 'tools/orbit360-gate-contract-registry-v20260717.json';
+          const docPath = 'orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718.md';
+          let workflow = fs.readFileSync(workflowPath, 'utf8');
+          const oldGroup = 'group: orbit360-clientes-aseguradoras-runtime-gate-v20260717-' + '$' + '{{ github.event_name }}';
+          const newGroup = 'group: orbit360-clientes-aseguradoras-runtime-gate-v20260717';
+          const count = workflow.split(oldGroup).length - 1;
+          if (count !== 1) throw new Error('GATE_CONCURRENCY_MATCH_COUNT:' + count);
+          workflow = workflow.replace(oldGroup, newGroup);
+          fs.writeFileSync(workflowPath, workflow, 'utf8');
+
+          const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+          const gate = registry.gates.find(item => item.gateId === 'block1-client360-insurers-lab-v20260717');
+          if (!gate || gate.contractVersion !== '1.0.19') throw new Error('GATE_CONTRACT_NOT_1019');
+          gate.executionConcurrency = {
+            group: 'orbit360-clientes-aseguradoras-runtime-gate-v20260717',
+            cancelInProgress: true,
+            purpose: 'Collapse push and pull_request triggers into one active gate execution.'
+          };
+          const wfContract = gate.runtimeVersionContracts.find(item => item.path === workflowPath);
+          if (!wfContract) throw new Error('WORKFLOW_CONTRACT_MISSING');
+          wfContract.requiredTokens = [...new Set(wfContract.requiredTokens.concat([
+            newGroup,
+            'cancel-in-progress: true'
+          ]))];
+          fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2) + '\n', 'utf8');
+
+          let doc = fs.readFileSync(docPath, 'utf8');
+          doc += '\n## Ejecución única del gate\n\nLos disparos push y pull_request comparten un solo grupo de concurrencia con cancelación del intento anterior. Esto evita dos ejecuciones paralelas del mismo cierre y conserva la regla de un único gate activo.\n';
+          fs.writeFileSync(docPath, doc, 'utf8');
+          NODE
+
+      - name: Retirar staging temporal en el mismo cierre
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs
+          rm -f tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
+          rm -f .github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718.yml
+
+      - name: Validar sintaxis, alcance y contrato vinculante
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/sw.js
+          node --check orbit360-platform/core/pwa.js
+          node --check orbit360-platform/core/router.js
+          node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
+          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          rm -rf orbit360-platform/runtime-gate-crm-v20260716
+
+          allowed='^(orbit360-platform/core/pwa\.js|orbit360-platform/core/router\.js|orbit360-platform/sw\.js|tools/orbit360-gate-bootstrap-auth-legal-v20260717\.mjs|tools/orbit360-gate-runtime-crm-v20260716\.mjs|tools/orbit360-gate-contract-registry-v20260717\.json|orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718\.md|tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718\.mjs|tools/orbit360-close-controlled-pwa-runtime-signals-v20260718\.mjs|\.github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718\.yml|\.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716\.yml)$'
+          unexpected="$(git status --short | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+          test -z "$unexpected" || { echo "UNEXPECTED_FILES"; echo "$unexpected"; exit 1; }
+
+      - name: Commit y push del cierre 1.0.19
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          test -n "$(git status --short)"
+          git commit -m "fix(block1): control PWA and externalize runtime signals 1.0.19"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
