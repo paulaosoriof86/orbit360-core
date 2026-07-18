@@ -1,0 +1,84 @@
+name: Orbit 360 Measure Bootstrap Timeline 1.0.23
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-measure-bootstrap-timeline-v1023.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Instalar navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.52.0
+          npx playwright install --with-deps chromium
+      - name: Medir bootstrap solo con eventos externos
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/measure-bootstrap.mjs <<'NODE'
+          import { chromium } from 'playwright';
+          import { writeFileSync } from 'node:fs';
+          const url='https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2#/aseguradoras';
+          const report={schemaVersion:'orbit360-bootstrap-timeline-v1',containsPII:false,containsSecrets:false,startedAt:new Date().toISOString(),milestones:{},runtimeSignals:[],pageErrors:[],badResponses:[],lastRequestFinished:null,result:null};
+          const started=Date.now();
+          const ms=()=>Date.now()-started;
+          const pathOf=value=>{try{return new URL(value).pathname}catch{return ''}};
+          const browser=await chromium.launch({headless:true});
+          const page=await browser.newPage({viewport:{width:1440,height:1000}});
+          const cdp=await page.context().newCDPSession(page);
+          await cdp.send('Debugger.enable');
+          await cdp.send('DOM.enable');
+          cdp.on('Debugger.scriptParsed',event=>{
+            const path=pathOf(event.url);
+            const key=path==='/data/store.js'?'storeParsedMs':path==='/core/auth.js'?'authParsedMs':path==='/core/router.js'?'routerParsedMs':path==='/core/pwa.js'?'pwaParsedMs':'';
+            if(key&&report.milestones[key]==null)report.milestones[key]=ms();
+          });
+          cdp.on('Debugger.scriptFailedToParse',event=>{
+            const path=pathOf(event.url);
+            if(/\/data\/store\.js$|\/core\/(?:auth|router|pwa)\.js$/.test(path))report.badResponses.push({type:'scriptFailedToParse',path,ms:ms()});
+          });
+          page.on('requestfinished',request=>{report.lastRequestFinished={path:pathOf(request.url()),type:request.resourceType(),ms:ms()};if(report.lastRequestFinished.path==='/core/novedades.js'&&report.milestones.novedadesFinishedMs==null)report.milestones.novedadesFinishedMs=ms();});
+          page.on('response',response=>{if(response.status()>=400&&report.badResponses.length<20)report.badResponses.push({type:'http',path:pathOf(response.url()),status:response.status(),ms:ms()});});
+          page.on('pageerror',error=>{if(report.pageErrors.length<12)report.pageErrors.push({name:String(error&&error.name||''),message:String(error&&error.message||'').slice(0,300),ms:ms()});});
+          page.on('console',message=>{const text=String(message.text()||'');if(!text.startsWith('ORBIT360_RUNTIME_SIGNAL:'))return;if(report.runtimeSignals.length<80)report.runtimeSignals.push({text,ms:ms()});if(text==='ORBIT360_RUNTIME_SIGNAL:router-ready:1'&&report.milestones.routerReadySignalMs==null)report.milestones.routerReadySignalMs=ms();if(/ORBIT360_RUNTIME_SIGNAL:contract-requested:/.test(text)&&report.milestones.firstContractRequestedMs==null)report.milestones.firstContractRequestedMs=ms();});
+          try{await page.goto(url,{waitUntil:'commit',timeout:30000});report.milestones.navigationCommittedMs=ms();}catch(error){report.navigationError=String(error&&error.message||error).slice(0,300);}
+          const deadline=Date.now()+240000;
+          while(Date.now()<deadline){
+            try{
+              const doc=await cdp.send('DOM.getDocument',{depth:1,pierce:true});
+              const form=await cdp.send('DOM.querySelector',{nodeId:doc.root.nodeId,selector:'#login-form'});
+              if(form.nodeId){
+                const attrs=await cdp.send('DOM.getAttributes',{nodeId:form.nodeId});
+                for(let i=0;i<attrs.attributes.length;i+=2){
+                  if(attrs.attributes[i]==='data-auth-mode'&&attrs.attributes[i+1]==='firestore-lab'&&report.milestones.authModeReadyMs==null)report.milestones.authModeReadyMs=ms();
+                }
+              }
+            }catch(error){if(!report.domError)report.domError=String(error&&error.message||error).slice(0,300);}
+            if(report.milestones.authModeReadyMs!=null&&report.milestones.routerParsedMs!=null&&report.milestones.firstContractRequestedMs!=null)break;
+            await new Promise(resolve=>setTimeout(resolve,250));
+          }
+          report.result={complete:Boolean(report.milestones.authModeReadyMs!=null&&report.milestones.routerParsedMs!=null&&report.milestones.firstContractRequestedMs!=null),elapsedMs:ms(),pageErrorCount:report.pageErrors.length,badResponseCount:report.badResponses.length};
+          report.finishedAt=new Date().toISOString();
+          writeFileSync('/tmp/orbit360-bootstrap-timeline-v1023.json',JSON.stringify(report,null,2)+'\n');
+          await Promise.race([browser.close(),new Promise(resolve=>setTimeout(resolve,5000))]);
+          NODE
+          node /tmp/measure-bootstrap.mjs
+          cp /tmp/orbit360-bootstrap-timeline-v1023.json .github/orbit360-bootstrap-timeline-v1023.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/orbit360-bootstrap-timeline-v1023.json
+          git commit -m "chore(block1): record external bootstrap timeline 1.0.23 [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
