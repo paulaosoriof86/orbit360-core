@@ -3,7 +3,11 @@
   "issuedAt": "2026-07-18",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": "PIPELINE_MECHANISM_FAILURE",
-  "diagnosticRevision": "external-ui-auth-legal-gate-v1",
+  "diagnosticRevision": "browser-load-lifecycle-before-auth-v1",
+  "contractRevision": "1.0.25-lifecycle-v1",
+  "sourceRunId": 29660698549,
+  "sourceHead": "5b442f3124769e51a326c5de33940702991c9c59",
+  "firstFailedStage": "authentication_form_ready",
   "canonicalOwners": [
     {
       "id": "routerTenantBootstrap",
@@ -33,15 +37,28 @@
         "legal_gate_verify_external",
         "canonical_visible_controls_external_gate"
       ]
+    },
+    {
+      "id": "gateDocumentLifecycle",
+      "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+      "requiredTokens": [
+        "canonical_document_load_complete",
+        "page.waitForLoadState('load'",
+        "browser-lifecycle-event",
+        "beforeAuth:true",
+        "report.checks.canonical_document_load_complete=true"
+      ]
     }
   ],
   "requiredFiles": [
     "orbit360-platform/core/router-tenant-config-bootstrap.js",
-    "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs"
+    "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
+    "tools/orbit360-gate-runtime-crm-v20260716.mjs"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/core/router-tenant-config-bootstrap.js",
-    "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs"
+    "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
+    "tools/orbit360-gate-runtime-crm-v20260716.mjs"
   ],
   "runtimeVersionContracts": [
     {
@@ -75,6 +92,16 @@
         "checkbox.check()",
         "legal_gate_verify_external",
         "canonical_visible_controls_external_gate"
+      ]
+    },
+    {
+      "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+      "requiredTokens": [
+        "canonical_document_load_complete",
+        "page.waitForLoadState('load'",
+        "browser-lifecycle-event",
+        "beforeAuth:true",
+        "report.checks.canonical_document_load_complete=true"
       ]
     }
   ],
