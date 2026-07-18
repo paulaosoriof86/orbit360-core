@@ -4,6 +4,8 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const REGISTRY_PATH = path.join(ROOT, 'tools/orbit360-gate-contract-registry-v20260717.json');
+const OVERLAY_REL = 'tools/orbit360-gate-contract-overlay-v20260718.json';
+const OVERLAY_PATH = path.join(ROOT, OVERLAY_REL);
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const requestedGateId = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
@@ -37,7 +39,7 @@ function writeEvidence(payload) {
 function resultAndExit(status, checks, exitCode) {
   const failed = checks.filter(item => !item.ok);
   const payload = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v4-runtime-version-parity',
+    schemaVersion: 'orbit360-gate-contract-preflight-v5-overlay-parity',
     gateId: requestedGateId,
     generatedAt: new Date().toISOString(),
     containsPII: false,
@@ -67,15 +69,62 @@ try {
   resultAndExit('VALIDATOR_STALE', [{ id: 'REGISTRY_VALID_JSON', ok: false, detail: error.message }], 41);
 }
 
-const gate = (registry.gates || []).find(item => item.gateId === requestedGateId);
+let overlay = null;
+if (fs.existsSync(OVERLAY_PATH)) {
+  try {
+    overlay = JSON.parse(fs.readFileSync(OVERLAY_PATH, 'utf8'));
+  } catch (error) {
+    resultAndExit('VALIDATOR_STALE', [{ id: 'OVERLAY_VALID_JSON', ok: false, detail: error.message }], 41);
+  }
+  if (overlay.schemaVersion !== 'orbit360-gate-contract-overlay-v1') {
+    resultAndExit('VALIDATOR_STALE', [{ id: 'OVERLAY_SCHEMA_VERSION', ok: false, detail: overlay.schemaVersion || 'missing' }], 41);
+  }
+  if (overlay.gateId !== requestedGateId) {
+    resultAndExit('VALIDATOR_STALE', [{ id: 'OVERLAY_GATE_MATCH', ok: false, detail: `${overlay.gateId || 'missing'} != ${requestedGateId}` }], 41);
+  }
+}
+
+let gate = (registry.gates || []).find(item => item.gateId === requestedGateId);
 if (!gate) {
   resultAndExit('VALIDATOR_STALE', [{ id: 'GATE_REGISTERED', ok: false, detail: requestedGateId }], 41);
+}
+
+if (overlay) {
+  const owners = new Map((registry.canonicalOwners || []).map(item => [item.id, item]));
+  for (const owner of overlay.canonicalOwners || []) owners.set(owner.id, owner);
+  registry.canonicalOwners = [...owners.values()];
+
+  gate.requiredFiles = unique([...(gate.requiredFiles || []), ...(overlay.requiredFiles || [])]);
+  gate.runtimeGraphFiles = unique([...(gate.runtimeGraphFiles || []), ...(overlay.runtimeGraphFiles || [])]);
+
+  const contracts = new Map((gate.runtimeVersionContracts || []).map(item => [item.path, {
+    ...item,
+    requiredTokens: unique(item.requiredTokens || [])
+  }]));
+  for (const contract of overlay.runtimeVersionContracts || []) {
+    const current = contracts.get(contract.path);
+    if (current) {
+      current.requiredTokens = unique([...(current.requiredTokens || []), ...(contract.requiredTokens || [])]);
+      contracts.set(contract.path, current);
+    } else {
+      contracts.set(contract.path, {
+        ...contract,
+        requiredTokens: unique(contract.requiredTokens || [])
+      });
+    }
+  }
+  gate.runtimeVersionContracts = [...contracts.values()];
 }
 
 const checks = [];
 const check = (id, ok, detail = '') => checks.push({ id, ok: Boolean(ok), detail });
 
 check('SCHEMA_VERSION', registry.schemaVersion === 'orbit360-gate-contract-registry-v1', registry.schemaVersion || 'missing');
+check('OVERLAY_PRESENT', Boolean(overlay), overlay ? OVERLAY_REL : 'missing');
+if (overlay) {
+  check('OVERLAY_SCHEMA_VERSION', overlay.schemaVersion === 'orbit360-gate-contract-overlay-v1', overlay.schemaVersion || 'missing');
+  check('OVERLAY_GATE_MATCH', overlay.gateId === requestedGateId, overlay.gateId || 'missing');
+}
 check('ACTIVE_BLOCK', Number(gate.block) === Number(registry.plan && registry.plan.activeBlock), `gate=${gate.block}; plan=${registry.plan && registry.plan.activeBlock}`);
 check('WORKFLOW_EXISTS', exists(gate.workflow), gate.workflow);
 check('PREFLIGHT_MATCH', gate.preflight === 'tools/orbit360-validar-gate-contracts-v20260717.mjs', gate.preflight || 'missing');
