@@ -178,6 +178,7 @@ Orbit.router = (function () {
   function closeMobile() { paintMobile(false); }
   function toggleMobile() { if (isMobile()) paintMobile(!sidebar.classList.contains('open')); }
 
+  const runtimeContractState = {};
   const RUNTIME_CONTRACTS = [
     { src: 'core/session-multirol-visibility-v20260716.js?v=20260716-2', marker: 'data-orbit-multirol-runtime-v20260716', ready: () => Orbit.session && Orbit.session.__multirolVisibilityV20260716 },
     { src: 'core/client-canonical-view-projection-v20260716.js?v=20260717-2', marker: 'data-orbit-client-projection-runtime-v20260716', ready: () => Orbit.clientProjection && Orbit.clientProjection.get },
@@ -205,22 +206,65 @@ Orbit.router = (function () {
     }
   ];
 
+  function contractReady(item) {
+    try { return !item.ready || !!item.ready(); } catch (e) { return false; }
+  }
+
   function loadRuntimeContracts(done) {
     let pos = 0;
     function next() {
       if (pos >= RUNTIME_CONTRACTS.length) { done(); return; }
       const item = RUNTIME_CONTRACTS[pos++];
-      try { if (item.ready && item.ready()) { next(); return; } } catch (e) {}
-      if (document.querySelector('script[' + item.marker + ']')) { next(); return; }
       const src = typeof item.src === 'function' ? item.src() : item.src;
-      if (!src) { next(); return; }
-      const script = document.createElement('script');
-      script.src = src;
-      script.async = false;
-      script.setAttribute(item.marker, '1');
-      script.onload = next;
-      script.onerror = next;
-      document.head.appendChild(script);
+      const state = runtimeContractState[item.marker] = {
+        src: src || '',
+        status: 'pending',
+        ready: contractReady(item),
+        startedAt: Date.now()
+      };
+      if (state.ready) { state.status = 'ready'; state.finishedAt = Date.now(); next(); return; }
+      if (!src) { state.status = 'no-source'; state.finishedAt = Date.now(); next(); return; }
+
+      let script = document.querySelector('script[' + item.marker + ']');
+      let settled = false;
+      let poll = null;
+      let cutoff = null;
+      function finish(status) {
+        if (settled) return;
+        settled = true;
+        if (poll) clearInterval(poll);
+        if (cutoff) clearTimeout(cutoff);
+        state.status = status;
+        state.ready = contractReady(item);
+        state.finishedAt = Date.now();
+        next();
+      }
+      function checkReady() {
+        if (contractReady(item)) finish('ready');
+      }
+      function attach(node) {
+        node.addEventListener('load', function () { state.loadEvent = true; checkReady(); }, { once: true });
+        node.addEventListener('error', function () { state.errorEvent = true; finish('error'); }, { once: true });
+      }
+
+      if (!script) {
+        script = document.createElement('script');
+        script.src = src;
+        script.async = false;
+        script.setAttribute(item.marker, '1');
+        state.status = 'loading';
+        attach(script);
+        document.head.appendChild(script);
+      } else {
+        state.status = 'existing-marker';
+        attach(script);
+      }
+
+      poll = setInterval(checkReady, 100);
+      cutoff = setTimeout(function () {
+        finish(contractReady(item) ? 'ready' : 'timeout');
+      }, 15000);
+      checkReady();
     }
     next();
   }
@@ -280,5 +324,5 @@ Orbit.router = (function () {
     inp.addEventListener('focus', () => { if (inp.value.trim().length >= 2) buscar(inp.value); });
     inp.addEventListener('blur', () => setTimeout(() => dd.classList.remove('open'), 180));
   }
-  return { init, go, loadRuntimeContracts, rebuildSidebar: () => { try { buildSidebar(); setActive((Orbit.route && Orbit.route.key) || 'inicio'); } catch (e) {} } };
+  return { init, go, loadRuntimeContracts, runtimeContractState, rebuildSidebar: () => { try { buildSidebar(); setActive((Orbit.route && Orbit.route.key) || 'inicio'); } catch (e) {} } };
 })();
