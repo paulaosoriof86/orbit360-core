@@ -256,16 +256,17 @@ Orbit.router = (function () {
         if (contractReady(item)) finish('ready');
       }
       function attach(node) {
-        node.addEventListener('load', function () { state.loadEvent = true; checkReady(); }, { once: true });
-        node.addEventListener('error', function () { state.errorEvent = true; finish('error'); }, { once: true });
+        node.addEventListener('load', function () { state.loadEvent = true; runtimeSignal('contract-loaded', item.marker); checkReady(); }, { once: true });
+        node.addEventListener('error', function () { state.errorEvent = true; runtimeSignal('contract-load-error', item.marker); finish('error'); }, { once: true });
       }
 
       if (!script) {
         script = document.createElement('script');
         script.src = src;
-        script.async = false;
+        script.async = true;
         script.setAttribute(item.marker, '1');
         state.status = 'loading';
+        runtimeSignal('contract-requested', item.marker);
         attach(script);
         document.head.appendChild(script);
       } else {

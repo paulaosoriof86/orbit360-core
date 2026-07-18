@@ -17,9 +17,10 @@
   if (mode !== 'firestore-lab' || tenant !== 'alianzas-soluciones') return;
 
   function routeKey() {
-    var hash = String(window.location.hash || '');
-    if (hash.indexOf('#/cliente360') === 0) return 'cliente360';
-    if (hash.indexOf('#/aseguradoras') === 0) return 'aseguradoras';
+    try {
+      var key = window.Orbit && Orbit.route && Orbit.route.key ? String(Orbit.route.key) : '';
+      if (key === 'cliente360' || key === 'aseguradoras') return key;
+    } catch (error) {}
     return '';
   }
 

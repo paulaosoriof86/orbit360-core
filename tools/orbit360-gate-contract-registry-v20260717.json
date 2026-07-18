@@ -43,7 +43,11 @@
         "runtimeSignal",
         "OrbitPwaWorkerReady",
         "runtimeSignal('router-ready', '1')",
-        "runtimeSignal('pwa-ready', status)"
+        "runtimeSignal('pwa-ready', status)",
+        "script.async = true",
+        "runtimeSignal('contract-requested', item.marker)",
+        "runtimeSignal('contract-loaded', item.marker)",
+        "runtimeSignal('contract-load-error', item.marker)"
       ]
     },
     {
@@ -118,12 +122,12 @@
   "gates": [
     {
       "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.21",
-      "diagnosticRevision": "auth-ui-external-evidence-v1",
+      "contractVersion": "1.0.22",
+      "diagnosticRevision": "router-owned-contract-queue-v1",
       "runtimeVersion": "20260717-2",
       "block": 1,
-      "status": "ACTIVE_VALIDATOR_RECONCILIATION",
-      "diagnosticRule": "Accept canonical_auth_ui_ready from parsed Store/Router/Auth owners, approved Firebase Auth provider, Router contract progression and zero page errors; do not duplicate the ordered bootstrap proof through a page evaluator that can be starved.",
+      "status": "ACTIVE_ROOT_CAUSE_FIX",
+      "diagnosticRule": "Only Router may begin canonical route rendering. Router-owned runtime contracts use explicit next() sequencing with async scripts and must not join the global ordered queue created by unrelated module loaders.",
       "executionBudget": {
         "type": "derived_operational_critical_path_with_stage_ceiling",
         "baseCriticalPathMs": 750000,
@@ -141,23 +145,27 @@
           "canonical_client_projection_diagnostic_reserve": 10000
         },
         "evidence": {
-          "sourceContractVersion": "1.0.20",
-          "preflightPassed": true,
-          "labCountsPassed": true,
-          "labDeployPassed": true,
-          "browserGateStarted": true,
-          "storeScriptParsed": true,
-          "routerScriptParsed": true,
-          "authScriptParsed": true,
-          "authProviderReady": true,
+          "sourceContractVersion": "1.0.21",
+          "passedStages": [
+            "canonical_auth_ui_ready",
+            "canonical_owner_handoff_ready",
+            "canonical_pwa_controller_ready",
+            "canonical_runtime_scripts_syntax_ready",
+            "canonical_runtime_contract_loader_started",
+            "canonical_client_projection_ready"
+          ],
+          "failedStage": "canonical_tenant_insurer_core_ready",
+          "tenantCoreHttpStatus": 200,
+          "tenantCoreRequestFinished": true,
+          "tenantCoreStaticSyntax": true,
+          "tenantCoreBrowserParsed": false,
+          "tenantCoreLoadSignal": false,
+          "nextContractRequested": false,
           "pageErrors": 0,
-          "routerContractProgressObserved": true,
-          "failedStage": "canonical_auth_ui_ready",
-          "firstError": "PIPELINE_STEP_TIMEOUT:canonical_auth_ui_ready",
-          "rootInference": "Router contract requests and runtime signals prove Orbit.router.init executed. In the canonical inline bootstrap Orbit.auth.init follows immediately, with no page errors. The duplicate page.waitForFunction timed out while contract loading continued."
+          "rootInference": "The contract downloaded successfully but never entered scriptParsed or load. backend-lab-canonical-view-sync may render from location.hash before Router ownership and Aseguradoras loaders insert unrelated async=false scripts. Router also marked its explicitly sequenced contracts async=false, placing them in that shared ordered queue."
         },
-        "interpretation": "Product remains frozen. Version 1.0.21 changes only canonical_auth_ui_ready validation evidence; watchdog and all accepted budgets remain unchanged.",
-        "exhaustionPolicy": "Run once after GO_GATE_CONTRACT. If canonical_auth_ui_ready fails again, stop all retries and inspect only authUiDiagnostic, browserParseDiagnostics and bootstrapTransportDiagnostic. Do not touch product, Auth, Router, Store, rules or data.",
+        "interpretation": "This is a product bootstrap defect, not a validator timeout. Version 1.0.22 gates early canonical rendering on Orbit.route and isolates Router-owned contracts from unrelated ordered dynamic scripts. Existing watchdog and stage budgets remain unchanged.",
+        "exhaustionPolicy": "Run once after GO_GATE_CONTRACT. If tenant core again returns 200 without scriptParsed or contract-loaded, stop retries and inspect only contract-requested/loaded signals, browserParseDiagnostics and the list of earlier dynamic scripts. Do not alter data, Auth, Store, Firestore rules or renderers.",
         "acceptancePolicy": "Only sanitized ok:true closes the gate.",
         "workerControlTimeoutMs": 10000,
         "pwaControllerGateMs": 22000,
@@ -168,25 +176,24 @@
       "reconciliation": {
         "date": "2026-07-18",
         "classifications": [
-          "VALIDATOR_STALE"
+          "FUNCTIONAL_DEFECT"
         ],
-        "scope": "canonical_auth_ui_ready validator only",
-        "rootCause": "The gate re-evaluated the login form inside the page after external evidence already proved owner parsing, Auth provider readiness and Router bootstrap progression. Runtime.evaluate was starved during contract loading and produced a false timeout.",
+        "scope": "Router bootstrap ownership and dynamic runtime contract scheduling",
+        "rootCause": "The LAB canonical view synchronizer could render Aseguradoras directly from the URL hash before Router completed its runtime contracts. That render can start independent async=false loaders. Router contracts were also async=false despite having their own explicit sequential next() controller, so they shared the global ordered dynamic-script queue. The tenant core downloaded but remained unexecuted behind that queue.",
         "corrections": [
-          "freeze Cliente 360, Aseguradoras, Orbit.store, Auth, Router, Firestore rules and tenant data",
-          "derive Auth UI readiness from external owner parse evidence, approved Auth provider, Router progress and zero page errors",
-          "record authUiDiagnostic with each evidence component",
-          "fail closed on parse failure, page error or missing Router progress",
-          "retain owner handoff reconciliation 1.0.20",
-          "run preflight first and the same gate once"
+          "make backend-lab-canonical-view-sync recognize only Orbit.route owned by the started Router, never raw location.hash",
+          "keep early snapshot hydration from rendering Cliente 360 or Aseguradoras before Router start",
+          "set Router-owned dynamic contract scripts async=true because next() already enforces canonical dependency order",
+          "emit contract-requested, contract-loaded and contract-load-error signals",
+          "retain all 1.0.19-1.0.21 PWA and external-evidence protections",
+          "run binding preflight first and the same gate once"
         ],
         "openEvidence": [
-          "1.0.21 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
+          "1.0.22 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
         ],
         "preserved": [
           "Orbit.store API",
           "core/auth.js",
-          "core/router.js",
           "Firestore rules",
           "Cliente 360 renderer",
           "Aseguradoras renderer",
@@ -224,7 +231,8 @@
         "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
         "tools/orbit360-gate-environment-v20260717.mjs",
         "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-SERVICE-WORKER-WAITUNTIL-20260718.md",
-        "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718.md"
+        "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718.md",
+        "orbit360-platform/core/backend-lab-canonical-view-sync.js"
       ],
       "runtimeGraphFiles": [
         "orbit360-platform/ays-lab-preview.html",
@@ -242,7 +250,8 @@
         "orbit360-platform/modules/cliente360.js",
         "orbit360-platform/modules/aseguradoras.js",
         "orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js",
-        "orbit360-platform/data/tenant-runtime-config-index.js"
+        "orbit360-platform/data/tenant-runtime-config-index.js",
+        "orbit360-platform/core/backend-lab-canonical-view-sync.js"
       ],
       "runtimeVersionContracts": [
         {
@@ -300,7 +309,11 @@
             "runtimeSignal",
             "runtimeSignal('router-ready', '1')",
             "runtimeSignal('pwa-ready', status)",
-            "window.OrbitPwaWorkerReady"
+            "window.OrbitPwaWorkerReady",
+            "script.async = true",
+            "runtimeSignal('contract-requested', item.marker)",
+            "runtimeSignal('contract-loaded', item.marker)",
+            "runtimeSignal('contract-load-error', item.marker)"
           ]
         },
         {
@@ -317,7 +330,7 @@
         {
           "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
           "requiredTokens": [
-            "contractVersion:'1.0.21'",
+            "contractVersion:'1.0.22'",
             "WATCHDOG_BUDGET_MS=900000",
             "OBSERVER_CAPTURE_TIMEOUT_MS=5000",
             "report.failureStage=report.stage",
@@ -390,6 +403,14 @@
             "CANONICAL_RUNTIME_VERSION",
             "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
             "tools/orbit360-gate-environment-v20260717.mjs"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/backend-lab-canonical-view-sync.js",
+          "requiredTokens": [
+            "var key = window.Orbit && Orbit.route && Orbit.route.key",
+            "if (key === 'cliente360' || key === 'aseguradoras') return key",
+            "return ''"
           ]
         }
       ],

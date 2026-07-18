@@ -71,3 +71,29 @@ La versión 1.0.21 mantiene congelados producto, Auth, Router, Store, reglas y d
 Carriles: A sin cambios en Cliente 360/Aseguradoras; B solo gate, registro y evidencia; C conserva 414 clientes, 26 aseguradoras y 7 asesores sin reimportación. Claude: BACKEND_PROTEGIDO_NO_CLAUDE. Academia: documentar que un hito UI puede probarse por orden canónico y señales externas cuando Runtime.evaluate queda congestionado.
 
 Salida: preflight vinculante primero; mismo gate una sola vez; cierre exclusivamente con evidencia sanitizada ok:true.
+
+## Corrección 1.0.22 · propiedad Router y cola de contratos
+
+Clasificación: FUNCTIONAL_DEFECT.
+
+La evidencia 1.0.21 aprobó Auth UI, handoff, PWA, sintaxis, loader y proyección canónica de 414 clientes. El contrato core de aseguradoras respondió HTTP 200, terminó su descarga y pasó validación sintáctica independiente, pero no produjo Debugger.scriptParsed, load, señal de runtime ni solicitud del contrato siguiente.
+
+Causa raíz: backend-lab-canonical-view-sync podía renderizar Cliente 360 o Aseguradoras leyendo location.hash antes de que el Router terminara su bootstrap. El render de Aseguradoras activa cargadores auxiliares dinámicos. Esos cargadores y los contratos del Router usaban async=false, por lo que compartían una cola global ordenada. Aunque el Router ya posee una secuencia explícita mediante next(), su contrato tenant-insurer-config-p10.js quedó descargado pero retenido sin ejecución.
+
+Corrección:
+- backend-lab-canonical-view-sync solo reconoce Orbit.route, establecido por el Router propietario;
+- no hay render canónico temprano desde el hash;
+- los contratos del Router usan async=true y conservan su orden por next();
+- se agregan señales contract-requested, contract-loaded y contract-load-error;
+- no cambian Store, Auth, datos, reglas, Cliente 360 ni Aseguradoras.
+
+Carriles:
+- A: renderers preservados; se corrige únicamente cuándo pueden comenzar a renderizar.
+- B: Router y sincronizador LAB alineados con propiedad canónica; backend protegido documentado.
+- C: 414 clientes, 26 aseguradoras y 7 asesores sin reimportación ni escritura nueva.
+
+Claude: BACKEND_PROTEGIDO_NO_CLAUDE. Patrón reusable acumulado: no mezclar scripts runtime propietarios con colas globales async=false; el propietario debe controlar explícitamente orden y habilitación de render.
+
+Academia: documentar propiedad de bootstrap, diferencia entre descarga y ejecución de scripts, y cómo distinguir FUNCTIONAL_DEFECT de VALIDATOR_STALE.
+
+Salida: preflight vinculante primero; después el mismo gate una sola vez; cierre únicamente con evidencia sanitizada ok:true.
