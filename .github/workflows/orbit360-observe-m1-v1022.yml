@@ -1,0 +1,36 @@
+name: Orbit 360 Observe M1 1.0.22
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-observe-m1-v1022.yml"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Registrar la única corrida 1.0.22 sin despachar otra
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run list --repo "$GITHUB_REPOSITORY" --workflow orbit360-aseguradoras-runtime-gate-v20260716.yml --event workflow_dispatch --branch ays/backend-tenant-lab-v99-20260703 --limit 10 --json databaseId,status,conclusion,headSha,createdAt,event,workflowName \
+            --jq '[.[] | select(.createdAt >= "2026-07-18T17:28:00Z")][0] | {runId:.databaseId,status,conclusion,headSha,createdAt,event,workflowName,contractVersion:"1.0.22"}' \
+            > .github/orbit360-m1-gate-v1022-status.json
+          test "$(jq -r '.runId // empty' .github/orbit360-m1-gate-v1022-status.json)" != ""
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/orbit360-m1-gate-v1022-status.json
+          git commit -m "chore(block1): record M1 gate 1.0.22 status [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
