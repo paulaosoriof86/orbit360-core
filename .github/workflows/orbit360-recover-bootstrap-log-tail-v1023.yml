@@ -1,0 +1,39 @@
+name: Orbit 360 Recover Bootstrap Log Tail 1.0.23
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-recover-bootstrap-log-tail-v1023.yml"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Recuperar cola sanitizada del log
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run view 29655191682 --repo "$GITHUB_REPOSITORY" --log > /tmp/measurement.log
+          tail -n 80 /tmp/measurement.log \
+            | sed -E 's#/home/runner/work/[^ ]+#[workspace]#g' \
+            | sed -E 's/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/[email]/g' \
+            | sed -E 's/[A-Za-z0-9_-]{48,}/[redacted]/g' \
+            > .github/orbit360-bootstrap-log-tail-v1023.txt
+          test -s .github/orbit360-bootstrap-log-tail-v1023.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/orbit360-bootstrap-log-tail-v1023.txt
+          git commit -m "chore(block1): record bootstrap measurement log tail [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
