@@ -119,7 +119,8 @@
     "tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs",
     ".github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718.yml",
     "tools/orbit360-patch-external-contract-observer-v1023.mjs",
-    "tools/orbit360-patch-gate-registry-v1023.mjs"
+    "tools/orbit360-patch-gate-registry-v1023.mjs",
+    ".github/workflows/orbit360-apply-external-contract-observer-v1023.yml"
   ],
   "gates": [
     {
@@ -471,17 +472,9 @@
         "mode": "workflow_dispatch",
         "uniqueExecution": true,
         "dispatchAfterRetirement": true,
-        "purpose": "Execute the same gate once against the clean HEAD after all temporary pipeline artifacts are removed."
+        "purpose": "Execute 1.0.23 once after the temporary apply workflow is removed."
       }
     }
   ],
-  "temporaryPipelineArtifacts": [
-    {
-      "path": ".github/workflows/orbit360-apply-external-contract-observer-v1023.yml",
-      "classification": "TEMPORAL_RETIRO",
-      "purpose": "Publish validated external-only gate observer 1.0.23.",
-      "retirementGate": "block1-client360-insurers-lab-v20260717",
-      "retirementAction": "Delete before the unique workflow_dispatch execution and then seal the retirement ledger."
-    }
-  ]
+  "temporaryPipelineArtifacts": []
 }
