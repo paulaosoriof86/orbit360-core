@@ -26,7 +26,9 @@ export function installBootstrapDiagnostics(page, report) {
     lastRequestFinished: null,
     lastFailedRequest: null,
     lastBadResponse: null,
-    pageErrors: []
+    pageErrors: [],
+    contractResponses: [],
+    consoleMessages: []
   };
 
   page.on('request', request => {
@@ -52,11 +54,24 @@ export function installBootstrapDiagnostics(page, report) {
     };
   });
   page.on('response', response => {
+    const path = safePath(response.url());
+    if (/client-canonical-view-projection|tenant-insurer-config|tenant-runtime-config-index|session-multirol-visibility/.test(path) && diagnostic.contractResponses.length < 16) {
+      diagnostic.contractResponses.push({
+        path,
+        status: response.status(),
+        contentType: String(response.headers()['content-type'] || '').slice(0, 100),
+        fromServiceWorker: Boolean(response.fromServiceWorker && response.fromServiceWorker())
+      });
+    }
     if (response.status() < 400) return;
-    diagnostic.lastBadResponse = {
-      path: safePath(response.url()),
-      status: response.status()
-    };
+    diagnostic.lastBadResponse = { path, status: response.status() };
+  });
+  page.on('console', message => {
+    if (!['error', 'warning'].includes(message.type()) || diagnostic.consoleMessages.length >= 12) return;
+    diagnostic.consoleMessages.push({
+      type: message.type(),
+      text: sanitizeDiagnostic(message.text())
+    });
   });
   page.on('pageerror', error => {
     if (diagnostic.pageErrors.length >= 8) return;
@@ -160,7 +175,7 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
       await page.waitForTimeout(250);
     }
 
-    report.runtimeContractDiagnostics = await page.evaluate(async () => {
+    report.runtimeContractDiagnostics = await page.evaluate(() => {
       const markerName = 'data-orbit-client-projection-runtime-v20260716';
       const marker = document.querySelector('script[' + markerName + ']');
       const pathOf = value => {
@@ -182,37 +197,20 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
         'data-orbit-tenant-runtime-index-v20260717',
         'data-orbit-tenant-insurer-config-active-v20260717'
       ].reduce((out, name) => { out[name] = Boolean(document.querySelector('script[' + name + ']')); return out; }, {});
-      let fetched = { attempted: false, status: 0, bytes: 0, containsOwnerToken: false, contentType: '' };
-      if (marker && marker.src) {
-        fetched.attempted = true;
-        try {
-          const response = await fetch(marker.src, { cache: 'no-store', credentials: 'same-origin' });
-          const body = await response.text();
-          fetched = {
-            attempted: true,
-            status: response.status,
-            bytes: body.length,
-            containsOwnerToken: body.includes('Orbit.clientProjection'),
-            contentType: String(response.headers.get('content-type') || '').slice(0, 80)
-          };
-        } catch (error) {
-          fetched.error = String(error && error.name || 'fetch_failed').slice(0, 80);
-        }
-      }
       return {
         marker: marker ? {
           present: true,
           path: pathOf(marker.src),
           async: Boolean(marker.async),
           defer: Boolean(marker.defer),
-          connected: Boolean(marker.isConnected)
+          connected: Boolean(marker.isConnected),
+          type: String(marker.type || '')
         } : { present: false },
         ownerPresent: Boolean(window.Orbit && Orbit.clientProjection),
         ownerGetPresent: Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function'),
         routerRoutePresent: Boolean(window.Orbit && Orbit.route && Orbit.route.key),
         laterMarkers,
-        resources,
-        fetched
+        resources
       };
     });
     requireState(false, 'CLIENT_PROJECTION_NOT_REGISTERED', JSON.stringify(report.runtimeContractDiagnostics));
