@@ -7,7 +7,7 @@ import { readGateEnvironment } from './orbit360-gate-environment-v20260717.mjs';
 const { baseUrl, email, accessValue:key, runtime }=readGateEnvironment();
 const dirs=['orbit360-platform/runtime-gate-crm-v20260716','orbit360-platform/runtime-gate-aseguradoras-v20260716'];
 const mapped=/Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
-const report={schemaVersion:'orbit360-runtime-gate-joint-v19-preauth-fail-closed',gateId:'block1-client360-insurers-lab-v20260717',contractVersion:'1.0.12',runtimeVersion:runtime,generatedAt:new Date().toISOString(),containsPII:false,containsSecrets:false,stage:'bootstrap',checks:{}};
+const report={schemaVersion:'orbit360-runtime-gate-joint-v19-preauth-fail-closed',gateId:'block1-client360-insurers-lab-v20260717',contractVersion:'1.0.13',runtimeVersion:runtime,generatedAt:new Date().toISOString(),containsPII:false,containsSecrets:false,stage:'bootstrap',checks:{}};
 if(!/^https:\/\//.test(baseUrl))throw new Error('BLOQUEO_PREVIEW_URL');
 if(key.length<12)throw new Error('BLOQUEO_ACCESO_LAB');
 if(!/^\d{8}-\d+$/.test(runtime))throw new Error('BLOQUEO_RUNTIME_VERSION');
@@ -19,7 +19,9 @@ async function bounded(name,fn,ms=15000){stage(name);let t;try{return await Prom
 function diagnosticText(value){return String(value||'').replace(/https?:\/\/[^/\s]+/g,'').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').replace(/[A-Za-z0-9_-]{48,}/g,'[redacted]').replace(/\s+/g,' ').trim().slice(0,320);}
 function diagnosticPath(value){try{return new URL(String(value||'')).pathname.slice(0,180);}catch(error){return '';}}
 let browser;
-const watchdog=setTimeout(()=>{report.ok=false;report.error=`GATE_TIMEOUT:${report.stage}`;save();process.exit(124);},300000);
+const WATCHDOG_BUDGET_MS=900000;
+report.watchdogBudgetMs=WATCHDOG_BUDGET_MS;
+const watchdog=setTimeout(()=>{report.ok=false;report.error=`GATE_TIMEOUT:${report.stage}`;save();process.exit(124);},WATCHDOG_BUDGET_MS);
 
 async function awaitPreviewRedirect(page){
   await bounded('preview_redirect_ready',async()=>{
