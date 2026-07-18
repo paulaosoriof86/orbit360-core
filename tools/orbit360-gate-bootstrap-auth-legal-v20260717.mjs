@@ -66,6 +66,8 @@ async function approveStage(report, bounded, name, task, timeoutMs) {
 }
 
 export async function waitForProductBootstrap(page, { runtime, bounded, requireState, report }) {
+  if (!report.bootstrapTransportDiagnostic) installBootstrapDiagnostics(page, report);
+
   await approveStage(report, bounded, 'canonical_url_ready', () => page.waitForURL(url => {
     return /\/index\.html$/.test(url.pathname) &&
       url.searchParams.get('orbitBackend') === 'firestore-lab' &&
