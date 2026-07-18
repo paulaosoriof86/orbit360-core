@@ -19,6 +19,19 @@ async function bounded(name,fn,ms=15000){stage(name);let t;try{return await Prom
 let browser;
 const watchdog=setTimeout(()=>{report.ok=false;report.error=`GATE_TIMEOUT:${report.stage}`;save();process.exit(124);},300000);
 
+async function awaitPreviewRedirect(page){
+  await bounded('preview_redirect_ready',async()=>{
+    const redirectCutoff=Date.now()+15000;
+    let current=new URL(page.url());
+    while(Date.now()<redirectCutoff){
+      current=new URL(page.url());
+      if(/\/index\.html$/.test(current.pathname)&&current.searchParams.get('orbitBackend')==='firestore-lab'&&current.searchParams.get('tenant')==='alianzas-soluciones'&&current.searchParams.get('runtime')===runtime)return;
+      await page.waitForTimeout(100);
+    }
+    requireState(false,'CANONICAL_INDEX_NOT_REACHED',current.pathname);
+  },18000);
+  report.checks.previewRedirectReady=true;
+}
 async function selectRole(page,label){
   const select=page.locator('#rol-sel');await select.waitFor({state:'attached',timeout:15000});
   const options=await select.locator('option').evaluateAll(nodes=>nodes.map(node=>({value:node.value,text:String(node.textContent||'').trim()})));
@@ -54,6 +67,7 @@ browser=await chromium.launch({headless:true});
 const page=await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(45000);
 try{
   stage('open_lab_preview');await page.goto(`${baseUrl}/ays-lab-preview.html`,{waitUntil:'domcontentloaded',timeout:60000});
+  await awaitPreviewRedirect(page);
   await waitForProductBootstrap(page,{runtime,bounded,requireState,report});
   await authenticateWithOwner(page,{email,key,runtime,bounded,requireState,report});
   await acceptLegalOnce(page,{bounded,requireState,report});
