@@ -1,4 +1,4 @@
-# package-trigger: 2026-07-18T16:20Z
+# package-trigger: 2026-07-18T16:24Z
 name: Orbit 360 Package Validated Runtime Closure 20260718
 
 on:
@@ -120,3 +120,7 @@ jobs:
           path: orbit360-validated-closure/
           if-no-files-found: error
           retention-days: 3
+
+      - name: Marcar corrida de transporte del artefacto
+        shell: bash
+        run: exit 1
