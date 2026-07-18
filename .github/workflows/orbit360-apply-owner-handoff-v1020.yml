@@ -1,0 +1,71 @@
+name: Orbit 360 Apply Owner Handoff Validator 1.0.20
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: [".github/workflows/orbit360-apply-owner-handoff-v1020.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-apply-owner-handoff-v1020
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+
+      - name: Aplicar reconciliación del validador
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "ays/backend-tenant-lab-v99-20260703"
+          node --check tools/orbit360-patch-owner-handoff-v1020.mjs
+          node --check tools/orbit360-patch-gate-registry-v1020.mjs
+          node tools/orbit360-patch-owner-handoff-v1020.mjs
+          node tools/orbit360-patch-gate-registry-v1020.mjs
+          cat >> orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718.md <<'DOC'
+
+## Reconciliación 1.0.20
+
+Clasificación: VALIDATOR_STALE.
+
+La corrida 1.0.19 aprobó preflight, owners estáticos, credenciales LAB, conteos, publicación del canal, PWA controlada, proveedor Auth e interfaz Auth. El fallo ocurrió en un evaluador que volvió a comprobar Store, Router y Auth después de que canonical_auth_ui_ready ya había probado la secuencia canónica Orbit.store.init → Orbit.router.init → Orbit.auth.init.
+
+El producto queda congelado. La versión 1.0.20 modifica únicamente el gate: amplía el observador CDP instalado antes de la navegación para registrar por separado data/store.js, core/router.js y core/auth.js; combina esa evidencia con canonical_auth_ui_ready; y elimina el evaluador duplicado. Cualquier fallo de parseo o ausencia de evidencia permanece fail-closed.
+
+Carriles: Cliente 360 y Aseguradoras sin cambios; backend protegido preservado; 414 clientes, 26 aseguradoras y 7 asesores sin reimportación. Claude: BACKEND_PROTEGIDO_NO_CLAUDE. Academia: distinguir VALIDATOR_STALE de FUNCTIONAL_DEFECT y congelar producto cuando la evidencia previa ya demuestra el contrato funcional.
+
+Salida: preflight vinculante primero; después el mismo gate una sola vez; cierre únicamente con resultado sanitizado ok:true.
+DOC
+          rm -f tools/orbit360-patch-owner-handoff-v1020.mjs tools/orbit360-patch-gate-registry-v1020.mjs
+
+      - name: Validar sintaxis y preflight vinculante
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
+          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          rm -rf orbit360-platform/runtime-gate-crm-v20260716
+          allowed='^(tools/orbit360-gate-bootstrap-auth-legal-v20260717\.mjs|tools/orbit360-gate-runtime-crm-v20260716\.mjs|tools/orbit360-gate-contract-registry-v20260717\.json|orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718\.md|tools/orbit360-patch-owner-handoff-v1020\.mjs|tools/orbit360-patch-gate-registry-v1020\.mjs)$'
+          unexpected="$(git status --short | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+          test -z "$unexpected" || { echo "$unexpected"; exit 1; }
+
+      - name: Publicar cierre 1.0.20 sin disparar el gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(block1): reconcile stale owner handoff validator 1.0.20 [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
