@@ -1,4 +1,4 @@
-name: Orbit 360 Apply External Contract Observer 1.0.23
+name: Orbit 360 Diagnose External Contract Observer 1.0.23 B
 
 on:
   push:
@@ -6,29 +6,23 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - ".github/workflows/orbit360-apply-external-contract-observer-v1023.yml"
-  workflow_dispatch:
 
 permissions:
   contents: write
 
-concurrency:
-  group: orbit360-apply-external-contract-observer-v1023
-  cancel-in-progress: false
-
 jobs:
-  apply:
+  diagnose:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
           fetch-depth: 2
-
-      - name: Corregir serialización y aplicar observador externo 1.0.23
+      - name: Ejecutar transformación corregida y aislar cada control
         shell: bash
         run: |
-          set -euo pipefail
-          test "$(git branch --show-current)" = "ays/backend-tenant-lab-v99-20260703"
+          set +e
+          mkdir -p /tmp/orbit360-v1023b
           python - <<'PY'
           from pathlib import Path
           path = Path('tools/orbit360-patch-external-contract-observer-v1023.mjs')
@@ -40,59 +34,53 @@ jobs:
               raise SystemExit(f'PATCH_REGEX_SERIALIZATION_MATCH_COUNT:{count}')
           path.write_text(source.replace(old, new), encoding='utf-8')
           PY
-          node --check tools/orbit360-patch-external-contract-observer-v1023.mjs
-          node --check tools/orbit360-patch-gate-registry-v1023.mjs
-          node tools/orbit360-patch-external-contract-observer-v1023.mjs
-          node tools/orbit360-patch-gate-registry-v1023.mjs
-          node - <<'NODE'
+          SERIALIZE=$?
+          node --check tools/orbit360-patch-external-contract-observer-v1023.mjs > /tmp/orbit360-v1023b/00-patch-syntax.log 2>&1
+          PATCH_SYNTAX=$?
+          TRANSFORM=99
+          if [ "$SERIALIZE" -eq 0 ] && [ "$PATCH_SYNTAX" -eq 0 ]; then
+            node tools/orbit360-patch-external-contract-observer-v1023.mjs > /tmp/orbit360-v1023b/01-transform-helper.log 2>&1
+            A=$?
+            node tools/orbit360-patch-gate-registry-v1023.mjs > /tmp/orbit360-v1023b/02-transform-registry.log 2>&1
+            B=$?
+            if [ "$A" -eq 0 ] && [ "$B" -eq 0 ]; then TRANSFORM=0; else TRANSFORM=1; fi
+          fi
+          if [ "$TRANSFORM" -eq 0 ]; then
+            node - <<'NODE'
           const fs = require('fs');
           const path = 'tools/orbit360-gate-contract-registry-v20260717.json';
           const workflow = '.github/workflows/orbit360-apply-external-contract-observer-v1023.yml';
           const registry = JSON.parse(fs.readFileSync(path, 'utf8'));
           registry.retiredRuntimeArtifacts = [].concat(registry.retiredRuntimeArtifacts || []).filter(item => item !== workflow);
-          registry.temporaryPipelineArtifacts = [{
-            path: workflow,
-            classification: 'TEMPORAL_RETIRO',
-            purpose: 'Publish validated external-only gate observer 1.0.23.',
-            retirementGate: 'block1-client360-insurers-lab-v20260717',
-            retirementAction: 'Delete before the unique workflow_dispatch execution and then seal the retirement ledger.'
-          }];
-          fs.writeFileSync(path, JSON.stringify(registry, null, 2) + '\n', 'utf8');
+          registry.temporaryPipelineArtifacts = [{path:workflow,classification:'TEMPORAL_RETIRO',purpose:'diagnostic'}];
+          fs.writeFileSync(path, JSON.stringify(registry, null, 2) + '\n');
           NODE
-          rm -f tools/orbit360-patch-external-contract-observer-v1023.mjs
-          rm -f tools/orbit360-patch-gate-registry-v1023.mjs
-
-      - name: Validar sintaxis, ausencia de backlog y preflight
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          ! grep -Fq "resolve({ evaluationTimeout: true })" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          ! grep -Fq "setTimeout(() => resolve(false), 1000)" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          grep -Fq "RUNTIME_CONTRACT_LOADER_EXTERNAL_EVIDENCE_MISSING" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          grep -Fq "CLIENT_PROJECTION_EXTERNAL_EVIDENCE_MISSING" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          grep -Fq "code + '_EXTERNAL_EVIDENCE_MISSING'" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
-          rm -rf orbit360-platform/runtime-gate-crm-v20260716
-          allowed='^(tools/orbit360-gate-bootstrap-auth-legal-v20260717\.mjs|tools/orbit360-gate-runtime-crm-v20260716\.mjs|tools/orbit360-gate-contract-registry-v20260717\.json|orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718\.md|tools/orbit360-patch-external-contract-observer-v1023\.mjs|tools/orbit360-patch-gate-registry-v1023\.mjs)$'
-          unexpected="$(git status --short | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
-          test -z "$unexpected" || { echo "$unexpected"; exit 1; }
-
-      - name: Publicar cierre validado 1.0.23
-        shell: bash
-        run: |
-          set -euo pipefail
+          fi
+          run_check(){ local key="$1"; shift; "$@" > "/tmp/orbit360-v1023b/${key}.log" 2>&1; echo $? > "/tmp/orbit360-v1023b/${key}.exit"; }
+          if [ "$TRANSFORM" -eq 0 ]; then
+            run_check 10-helper-syntax node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
+            run_check 11-runtime-syntax node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+            run_check 12-preflight-syntax node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+            run_check 13-no-evaluation-timeout bash -c '! grep -Fq "resolve({ evaluationTimeout: true })" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs'
+            run_check 14-no-false-timeout bash -c '! grep -Fq "setTimeout(() => resolve(false), 1000)" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs'
+            run_check 15-loader-token grep -Fq RUNTIME_CONTRACT_LOADER_EXTERNAL_EVIDENCE_MISSING tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
+            run_check 16-projection-token grep -Fq CLIENT_PROJECTION_EXTERNAL_EVIDENCE_MISSING tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
+            run_check 17-owner-token grep -Fq "code + '_EXTERNAL_EVIDENCE_MISSING'" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
+            run_check 18-preflight node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+            rm -rf orbit360-platform/runtime-gate-crm-v20260716
+            allowed='^(tools/orbit360-gate-bootstrap-auth-legal-v20260717\.mjs|tools/orbit360-gate-runtime-crm-v20260716\.mjs|tools/orbit360-gate-contract-registry-v20260717\.json|orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718\.md|tools/orbit360-patch-external-contract-observer-v1023\.mjs|tools/orbit360-patch-gate-registry-v1023\.mjs)$'
+            unexpected="$(git status --short | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+            printf '%s' "$unexpected" > /tmp/orbit360-v1023b/unexpected.txt
+            if [ -z "$unexpected" ]; then echo 0 > /tmp/orbit360-v1023b/19-scope.exit; else echo 1 > /tmp/orbit360-v1023b/19-scope.exit; fi
+          fi
+          SERIALIZE="$SERIALIZE" PATCH_SYNTAX="$PATCH_SYNTAX" TRANSFORM="$TRANSFORM" node - <<'NODE'
+          const fs=require('fs');const d='/tmp/orbit360-v1023b';const read=p=>fs.existsSync(p)?fs.readFileSync(p,'utf8'):'';const clean=s=>String(s||'').replace(/\/home\/runner\/work\/[^\s]+/g,'[workspace]').slice(-10000);const checks={};for(const f of fs.readdirSync(d)){if(!f.endsWith('.exit'))continue;const k=f.slice(0,-5);checks[k]={exit:Number(read(d+'/'+f).trim()),log:clean(read(d+'/'+k+'.log'))};}const out={schemaVersion:'orbit360-v1023-validation-diagnostic-v2',containsPII:false,containsSecrets:false,classification:'PIPELINE_MECHANISM_FAILURE',serializeExit:Number(process.env.SERIALIZE),patchSyntaxExit:Number(process.env.PATCH_SYNTAX),transformExit:Number(process.env.TRANSFORM),checks,transformHelperLog:clean(read(d+'/01-transform-helper.log')),transformRegistryLog:clean(read(d+'/02-transform-registry.log')),unexpected:clean(read(d+'/unexpected.txt'))};fs.writeFileSync('/tmp/v1023b.json',JSON.stringify(out,null,2)+'\n');
+          NODE
+          git reset --hard HEAD
+          cp /tmp/v1023b.json .github/orbit360-v1023-validation-diagnostic-b.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs \
-            tools/orbit360-gate-runtime-crm-v20260716.mjs \
-            tools/orbit360-gate-contract-registry-v20260717.json \
-            orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718.md \
-            tools/orbit360-patch-external-contract-observer-v1023.mjs \
-            tools/orbit360-patch-gate-registry-v1023.mjs
-          test -n "$(git status --short)"
-          git commit -m "fix(block1): replace polling backlog with external observer 1.0.23 [skip ci]"
+          git add .github/orbit360-v1023-validation-diagnostic-b.json
+          git commit -m "chore(block1): record second 1.0.23 validation diagnostic [skip ci]"
           git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          exit 1
