@@ -1,0 +1,43 @@
+name: Orbit 360 Apply Gate Version 1.0.18
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - "tools/orbit360-patch-gate-version-v1018-20260718.mjs"
+      - ".github/workflows/orbit360-apply-gate-version-v1018-20260718.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+      - name: Aplicar versión exacta
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-patch-gate-version-v1018-20260718.mjs
+          node tools/orbit360-patch-gate-version-v1018-20260718.mjs
+          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+          grep -Fq "contractVersion:'1.0.18'" tools/orbit360-gate-runtime-crm-v20260716.mjs
+          ! grep -Fq "contractVersion:'1.0.17'" tools/orbit360-gate-runtime-crm-v20260716.mjs
+      - name: Commit limpio y retirar mecanismo temporal
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm tools/orbit360-patch-gate-version-v1018-20260718.mjs
+          rm .github/workflows/orbit360-apply-gate-version-v1018-20260718.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/orbit360-gate-runtime-crm-v20260716.mjs tools/orbit360-patch-gate-version-v1018-20260718.mjs .github/workflows/orbit360-apply-gate-version-v1018-20260718.yml
+          git diff --cached --check
+          git commit -m "chore(block1): bump gate executor to 1.0.18 [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
