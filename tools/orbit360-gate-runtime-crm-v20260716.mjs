@@ -7,7 +7,7 @@ import { readGateEnvironment } from './orbit360-gate-environment-v20260717.mjs';
 const { baseUrl, email, accessValue:key, runtime }=readGateEnvironment();
 const dirs=['orbit360-platform/runtime-gate-crm-v20260716','orbit360-platform/runtime-gate-aseguradoras-v20260716'];
 const mapped=/Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
-const report={schemaVersion:'orbit360-runtime-gate-joint-v23-external-contract-observer',gateId:'block1-client360-insurers-lab-v20260717',contractVersion:'1.0.23',runtimeVersion:runtime,generatedAt:new Date().toISOString(),containsPII:false,containsSecrets:false,stage:'bootstrap',checks:{}};
+const report={schemaVersion:'orbit360-runtime-gate-joint-v24-router-sequential',gateId:'block1-client360-insurers-lab-v20260717',contractVersion:'1.0.24',runtimeVersion:runtime,generatedAt:new Date().toISOString(),containsPII:false,containsSecrets:false,stage:'bootstrap',checks:{}};
 if(!/^https:\/\//.test(baseUrl))throw new Error('BLOQUEO_PREVIEW_URL');
 if(key.length<12)throw new Error('BLOQUEO_ACCESO_LAB');
 if(!/^\d{8}-\d+$/.test(runtime))throw new Error('BLOQUEO_RUNTIME_VERSION');

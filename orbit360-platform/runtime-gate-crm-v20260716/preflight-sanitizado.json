@@ -1,19 +1,16 @@
 {
   "schemaVersion": "orbit360-gate-contract-preflight-v4-runtime-version-parity",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "generatedAt": "2026-07-18T19:29:33.787Z",
+  "generatedAt": "2026-07-18T19:30:43.237Z",
   "containsPII": false,
   "containsSecrets": false,
-  "status": "VALIDATOR_STALE",
-  "classification": "VALIDATOR_STALE",
+  "status": "GO_GATE_CONTRACT",
+  "classification": null,
   "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
   "total": 612,
-  "passed": 610,
-  "failed": 2,
-  "failedCheckIds": [
-    "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router.js:script.async = true",
-    "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:contractVersion:'1.0.23'"
-  ],
+  "passed": 612,
+  "failed": 0,
+  "failedCheckIds": [],
   "checks": [
     {
       "id": "SCHEMA_VERSION",
@@ -2596,11 +2593,6 @@
       "detail": "orbit360-platform/core/router.js → window.OrbitPwaWorkerReady"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router.js:script.async = true",
-      "ok": false,
-      "detail": "orbit360-platform/core/router.js → script.async = true"
-    },
-    {
       "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router.js:runtimeSignal('contract-requested', item.marker)",
       "ok": true,
       "detail": "orbit360-platform/core/router.js → runtimeSignal('contract-requested', item.marker)"
@@ -2614,6 +2606,11 @@
       "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router.js:runtimeSignal('contract-load-error', item.marker)",
       "ok": true,
       "detail": "orbit360-platform/core/router.js → runtimeSignal('contract-load-error', item.marker)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router.js:script.async = false",
+      "ok": true,
+      "detail": "orbit360-platform/core/router.js → script.async = false"
     },
     {
       "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/data/store-firestore-lab.local.js",
@@ -2666,9 +2663,9 @@
       "detail": "tokens=13"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:contractVersion:'1.0.23'",
-      "ok": false,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → contractVersion:'1.0.23'"
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:contractVersion:'1.0.24'",
+      "ok": true,
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → contractVersion:'1.0.24'"
     },
     {
       "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:WATCHDOG_BUDGET_MS=900000",

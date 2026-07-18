@@ -263,7 +263,7 @@ Orbit.router = (function () {
       if (!script) {
         script = document.createElement('script');
         script.src = src;
-        script.async = true;
+        script.async = false;
         script.setAttribute(item.marker, '1');
         state.status = 'loading';
         runtimeSignal('contract-requested', item.marker);

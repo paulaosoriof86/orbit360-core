@@ -44,10 +44,10 @@
         "OrbitPwaWorkerReady",
         "runtimeSignal('router-ready', '1')",
         "runtimeSignal('pwa-ready', status)",
-        "script.async = true",
         "runtimeSignal('contract-requested', item.marker)",
         "runtimeSignal('contract-loaded', item.marker)",
-        "runtimeSignal('contract-load-error', item.marker)"
+        "runtimeSignal('contract-load-error', item.marker)",
+        "script.async = false"
       ]
     },
     {
@@ -125,12 +125,12 @@
   "gates": [
     {
       "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.23",
-      "diagnosticRevision": "external-only-contract-observer-v1",
+      "contractVersion": "1.0.24",
+      "diagnosticRevision": "router-owned-sequential-contract-queue-v1",
       "runtimeVersion": "20260717-2",
       "block": 1,
-      "status": "ACTIVE_PIPELINE_MECHANISM_FIX",
-      "diagnosticRule": "Observe PWA, Router and runtime contracts only through browser-external requests, responses, requestfinished events, console runtime signals and Debugger parse events. Never accumulate uncancelled Runtime.evaluate calls while waiting for the same page thread to execute a contract.",
+      "status": "ACTIVE_FUNCTIONAL_FIX",
+      "diagnosticRule": "Router remains the sole runtime-contract owner. With early rendering blocked until Orbit.route exists, its dynamically inserted contracts use async=false so browser execution order is deterministic and matches the explicit next() queue.",
       "executionBudget": {
         "type": "derived_operational_critical_path_with_stage_ceiling",
         "baseCriticalPathMs": 750000,
@@ -148,7 +148,7 @@
           "canonical_client_projection_diagnostic_reserve": 10000
         },
         "evidence": {
-          "sourceContractVersion": "1.0.22",
+          "sourceContractVersion": "1.0.23",
           "passedStages": [
             "canonical_auth_ui_ready",
             "canonical_owner_handoff_ready",
@@ -165,12 +165,11 @@
           "tenantCoreBrowserParsed": false,
           "tenantCoreLoadedSignal": false,
           "nextContractRequested": false,
-          "runtimeOwnerDiagnostic": "evaluationTimeout:true",
           "pageErrors": 0,
-          "mechanismFinding": "waitForRuntimeContractOwner launched a new page.evaluate every 250 ms after Promise.race returned its one-second timeout. The timed-out evaluations were not cancelled. The client projection, PWA, Router and loader observers used the same pattern, allowing a backlog of Runtime.evaluate commands to compete with the page thread that needed to execute the downloaded contract."
+          "mechanismFinding": "The external async contract completed transport but remained unparsed and unexecuted inside the owner deadline. The early-render guard from 1.0.22 remains active, so no module auxiliary loader can enter the Router queue before bootstrap completes."
         },
-        "interpretation": "Product code remains frozen at the architecturally valid 1.0.22 Router ownership fix. Version 1.0.23 changes only the gate observer and preserves the 900000 ms watchdog, the 450000 ms client projection budget and every existing fail-closed condition.",
-        "exhaustionPolicy": "Execute 1.0.23 once after GO_GATE_CONTRACT. If canonical_tenant_insurer_core_ready fails again, stop all retries and inspect only browser-external requests, responses, requestfinished events, runtime signals and Debugger parse evidence. Do not add page evaluators or modify product, Store, Auth, Router, data, rules or renderers.",
+        "interpretation": "Version 1.0.24 keeps the 1.0.22 ownership guard and the 1.0.23 external observer, but restores deterministic async=false execution exclusively inside the Router-owned next() queue.",
+        "exhaustionPolicy": "Execute 1.0.24 once after GO_GATE_CONTRACT. If canonical_tenant_insurer_core_ready fails again, stop retries and inspect only Router queue state and external parse/load signals.",
         "acceptancePolicy": "Only a sanitized result with ok:true closes M1.",
         "workerControlTimeoutMs": 10000,
         "pwaControllerGateMs": 22000,
@@ -183,27 +182,26 @@
       "reconciliation": {
         "date": "2026-07-18",
         "classifications": [
-          "PIPELINE_MECHANISM_FAILURE"
+          "FUNCTIONAL_DEFECT",
+          "VALIDATOR_STALE"
         ],
-        "scope": "Bootstrap observer and runtime-contract readiness mechanism only",
-        "rootCause": "Promise.race bounded the caller but did not cancel page.evaluate. Repeated polling accumulated unresolved Runtime.evaluate commands on the same browser thread that had to execute the runtime contracts. The validator could therefore create or amplify the starvation it reported.",
+        "scope": "Router runtime-contract scheduling plus duplicated version-token registry checks",
+        "rootCause": "After early rendering was already blocked, script.async=true unnecessarily delegated contract execution timing to the browser. The first 1.0.24 preflight then exposed two stale duplicated registry tokens that still required async=true and contract 1.0.23.",
         "corrections": [
-          "freeze product at the accepted 1.0.22 Router ownership and async contract queue correction",
-          "remove repeated page.evaluate fallbacks from PWA, Router, loader-start, client-projection and runtime-owner observers",
-          "use only browser-external requests, responses, requestfinished, runtime signals and Debugger parse evidence for bootstrap contracts",
-          "retain fail-closed behavior for terminal signals, script parse failures, runtime exceptions and page errors",
-          "derive bootstrap stability from previously approved milestones plus router-ready signal",
-          "preserve watchdog and all stage budgets without extension",
-          "run the binding preflight first and the same gate once"
+          "preserve Orbit.route ownership guard",
+          "use async=false only for the Router sequential contract queue",
+          "update canonical owner tokens and runtimeVersionContracts together",
+          "retain explicit next() ordering and runtime signals",
+          "preserve Store, Auth, rules, data and renderers",
+          "run the binding preflight first and the official gate once"
         ],
         "openEvidence": [
-          "1.0.23 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
+          "1.0.24 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
         ],
         "preserved": [
           "Orbit.store API",
           "core/auth.js",
-          "core/router.js 1.0.22 ownership fix",
-          "backend-lab-canonical-view-sync 1.0.22 ownership fix",
+          "backend-lab-canonical-view-sync ownership guard",
           "Firestore rules",
           "Cliente 360 renderer",
           "Aseguradoras renderer",
@@ -320,10 +318,10 @@
             "runtimeSignal('router-ready', '1')",
             "runtimeSignal('pwa-ready', status)",
             "window.OrbitPwaWorkerReady",
-            "script.async = true",
             "runtimeSignal('contract-requested', item.marker)",
             "runtimeSignal('contract-loaded', item.marker)",
-            "runtimeSignal('contract-load-error', item.marker)"
+            "runtimeSignal('contract-load-error', item.marker)",
+            "script.async = false"
           ]
         },
         {
@@ -340,7 +338,7 @@
         {
           "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
           "requiredTokens": [
-            "contractVersion:'1.0.23'",
+            "contractVersion:'1.0.24'",
             "WATCHDOG_BUDGET_MS=900000",
             "OBSERVER_CAPTURE_TIMEOUT_MS=5000",
             "report.failureStage=report.stage",
