@@ -11,6 +11,8 @@ on:
       - "tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs"
       - "tools/orbit360-runtime-check-client360-v20260716.mjs"
       - "tools/orbit360-gate-runtime-crm-v20260716.mjs"
+      - "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs"
+      - "tools/orbit360-gate-environment-v20260717.mjs"
       - "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs"
       - ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml"
   pull_request:
@@ -23,6 +25,8 @@ on:
       - "tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs"
       - "tools/orbit360-runtime-check-client360-v20260716.mjs"
       - "tools/orbit360-gate-runtime-crm-v20260716.mjs"
+      - "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs"
+      - "tools/orbit360-gate-environment-v20260717.mjs"
       - "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs"
       - ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml"
   workflow_dispatch:
@@ -83,6 +87,8 @@ jobs:
           node --check orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js
           node --check tools/orbit360-runtime-check-client360-v20260716.mjs
           node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+          node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
+          node --check tools/orbit360-gate-environment-v20260717.mjs
           node --check tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs
           node --check tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs
           node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
