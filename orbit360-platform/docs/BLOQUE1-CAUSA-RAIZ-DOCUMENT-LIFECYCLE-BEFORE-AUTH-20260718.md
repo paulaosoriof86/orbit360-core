@@ -1,49 +1,60 @@
-# Bloque 1 · Causa raíz: lifecycle del documento antes de autenticación
+# Bloque 1 · Causa raíz: runtime post-Router antes de autenticación
 
 Fecha: 2026-07-18  
 Gate: `block1-client360-insurers-lab-v20260717`  
-Evidencia fuente: run `29660698549`, HEAD `5b442f3124769e51a326c5de33940702991c9c59`  
 Clasificación: `PIPELINE_MECHANISM_FAILURE`
 
-## Primer fallo real
+## Evidencia inicial
 
-El gate aprobó bootstrap, backend LAB, proveedor de autenticación, owners, PWA, contratos runtime, proyección de clientes, configuración de aseguradoras, tenant activo y señal `router-ready`.
+El run `29660698549`, HEAD `5b442f3124769e51a326c5de33940702991c9c59`, aprobó backend LAB, proveedor de autenticación, owners, PWA, contratos runtime, proyección de clientes, configuración tenant y `router-ready`, pero el gate intentó usar la interfaz mientras continuaba la carga post-Router.
 
-Después falló en `authentication_form_ready` porque Playwright no pudo resolver ni siquiera `locator('body')` dentro de 12 segundos.
+## Intento diagnóstico descartado
 
-La evidencia simultánea mostró que el documento seguía solicitando y procesando scripts después de `router-ready`. Por tanto, `canonical_bootstrap_stable` demostraba estabilidad de contratos y Router, pero no que el navegador hubiera completado el evento `load` ni que la UI estuviera lista para interacción.
+El run `29661458840`, HEAD `36b22b176756ee7adcd4d88132e22eb43bc68dfd`, añadió `canonical_document_load_complete`. La etapa agotó 120.000 ms aunque todos los contratos canónicos y Router estaban aprobados.
 
-## Corrección de causa raíz
+El evento global `window.load` no es el owner correcto: al renderizar Aseguradoras se inicia una cola documental post-Router de scripts dinámicos. Esa cola puede mantener abierto el lifecycle global aunque el shell ya haya alcanzado su bootstrap funcional.
 
-El runner incorpora una etapa vinculante anterior a autenticación:
+`lastRequestStarted` tampoco identifica una solicitud pendiente; por ello no se atribuye el bloqueo a un archivo individual ni al Service Worker sin evidencia correlacionada.
+
+## Corrección vigente
+
+El gate observa desde antes de navegar los eventos terminales publicados por el owner real de la cola:
 
 ```txt
-canonical_document_load_complete
+orbit:aseguradoras:tenant-runtime-linked
+orbit:aseguradoras:tenant-runtime-error
 ```
 
-Esta etapa espera el lifecycle nativo del navegador mediante `page.waitForLoadState('load')`, conserva el watchdog global de 900.000 ms y registra evidencia sanitizada:
+La etapa vinculante es:
 
 ```txt
-state: load
-method: browser-lifecycle-event
+canonical_post_router_runtime_terminal
+```
+
+La evidencia se transfiere a Node mediante un binding externo. El gate continúa solo cuando el owner termina y el estado no es `load_failed`, `error` o `blocked_context`.
+
+Evidencia esperada:
+
+```txt
+method: external-custom-event-binding
 beforeAuth: true
 ```
 
-Solo después se permite observar sesión restaurada o completar el formulario canónico.
+Después se permite observar sesión restaurada o usar el formulario canónico.
 
 ## Alcance preservado
 
-- Carril A: no cambia Cliente 360, Aseguradoras, Auth ni Legal.
-- Carril B: cambia únicamente el mecanismo del gate y su contrato overlay.
-- Carril C: no reimporta ni modifica los 414 clientes, 26 aseguradoras o 7 asesores.
-- Sin cambios en `Orbit.store`, Firestore rules, credenciales, `main`, merge o producción.
+- Carril A: Cliente 360, Aseguradoras, Auth y Legal sin cambios.
+- Carril B: únicamente runner del gate y contrato overlay.
+- Carril C: 414 clientes, 26 aseguradoras y 7 asesores sin reimportación ni escritura.
+- `Orbit.store`, reglas Firestore, credenciales, `main`, merge y producción permanecen intactos.
 
-## Clasificación para Claude y Academia
+## Claude y Academia
 
-- Claude: `BACKEND_PROTEGIDO_NO_CLAUDE` para el código del gate.
-- Patrón reusable: el frontend no debe considerar `router-ready` equivalente a documento interactuable; las pruebas deben respetar el lifecycle real del navegador.
-- Academia: diferenciar contrato de bootstrap, carga completa e interacción funcional.
+- Código: `BACKEND_PROTEGIDO_NO_CLAUDE`.
+- Patrón reusable: cada loader dinámico debe exponer una señal terminal propia; una prueba no debe sustituirla por `window.load`.
+- Academia: diferenciar Router listo, runtime post-Router terminado e interfaz funcional.
 
 ## Criterio de cierre
 
-El mismo gate se ejecuta una sola vez después del preflight vinculante. Solo evidencia sanitizada `ok:true` permite cerrar M1 y pasar a la revisión visual única.
+El workflow ejecuta primero el preflight vinculante. Solo evidencia sanitizada `ok:true` permite cerrar M1 y pasar a la revisión visual única.
