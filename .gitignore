@@ -25,3 +25,5 @@ _orbit360_private_overlays/
 *.payload.json
 *.manifest.local.json
 *.manifest.private.json
+
+node_modules/
