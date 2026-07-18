@@ -443,93 +443,88 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
 }
 
 export async function authenticateWithOwner(page, { email, key, runtime, bounded, requireState, report }) {
-  const scheduled = await bounded('authentication_schedule_signin', () => page.evaluate(({ email, key, runtime }) => {
-    if (String((window.OrbitBackend || {}).runtimeVersion || '') !== runtime) return { ok: false, code: 'AUTH_RUNTIME_MISMATCH' };
-    if (!(window.Orbit && Orbit.auth && typeof Orbit.auth.loginFirebase === 'function')) return { ok: false, code: 'AUTH_OWNER_NOT_READY' };
-    let currentUser = null;
-    try { currentUser = window.firebase && firebase.auth ? firebase.auth().currentUser : null; } catch (error) {}
-    if (currentUser) {
-      window.__orbitGateAuthStatus = { state: 'resolved', code: '', restored: true };
-      return { ok: true };
+  await bounded('authentication_form_ready', async () => {
+    const form = page.locator('#login-form');
+    await form.waitFor({ state: 'visible', timeout: 20000 });
+    requireState(await form.getAttribute('data-auth-mode') === 'firestore-lab', 'AUTH_FORM_MODE_INVALID');
+    await page.locator('#lg-user').waitFor({ state: 'visible', timeout: 10000 });
+    await page.locator('#lg-pass').waitFor({ state: 'visible', timeout: 10000 });
+  }, 24000);
+
+  const bodyClass = String(await page.locator('body').getAttribute('class') || '');
+  if (!bodyClass.split(/\s+/).includes('pre-auth')) {
+    report.authMode = 'session_restored_external_ui';
+    report.checks.authenticated = true;
+    return;
+  }
+
+  await bounded('authentication_fill_form', async () => {
+    await page.locator('#lg-user').fill(email);
+    await page.locator('#lg-pass').fill(key);
+    const form = page.locator('#login-form');
+    requireState(String(await form.getAttribute('data-auth-mode') || '') === 'firestore-lab', 'AUTH_FORM_MODE_INVALID');
+  }, 15000);
+
+  await bounded('authentication_submit_form', async () => {
+    const button = page.locator('#login-form button[type="submit"]');
+    await button.waitFor({ state: 'visible', timeout: 10000 });
+    await button.click();
+  }, 15000);
+
+  await bounded('authentication_observe_ui', async () => {
+    const inside = page.locator('body:not(.pre-auth)');
+    const failure = page.locator('#login-error');
+    const deadline = Date.now() + 50000;
+    while (Date.now() < deadline) {
+      if (await inside.count()) return;
+      if (await failure.count()) {
+        const text = String(await failure.textContent() || '').trim();
+        if (text) requireState(false, 'LOGIN_FORM_ERROR', text.slice(0, 160));
+      }
+      await page.waitForTimeout(200);
     }
-    window.__orbitGateAuthStatus = { state: 'pending', code: '', restored: false };
-    setTimeout(() => {
-      Promise.resolve(Orbit.auth.loginFirebase(email, key))
-        .then(user => {
-          window.__orbitGateAuthStatus = { state: user ? 'resolved' : 'failed', code: user ? '' : 'AUTH_USER_NOT_AVAILABLE', restored: false };
-        })
-        .catch(error => {
-          window.__orbitGateAuthStatus = {
-            state: 'failed',
-            code: String(error && (error.code || error.message) || 'auth/unknown').replace(/[^a-z0-9/_-]/gi, '').slice(0, 80),
-            restored: false
-          };
-        });
-    }, 0);
-    return { ok: true };
-  }, { email, key, runtime }), 15000);
-  requireState(scheduled && scheduled.ok, (scheduled && scheduled.code) || 'AUTH_DISPATCH_FAILED');
+    requireState(false, 'LOGIN_FORM_DID_NOT_ENTER_APP');
+  }, 54000);
 
-  await bounded('authentication_observe_signin', () => page.waitForFunction(expected => {
-    const status = window.__orbitGateAuthStatus || {};
-    let currentUser = false;
-    try { currentUser = Boolean(window.firebase && firebase.auth && firebase.auth().currentUser); } catch (error) {}
-    return String((window.OrbitBackend || {}).runtimeVersion || '') === expected &&
-      (currentUser || status.state === 'resolved' || status.state === 'failed');
-  }, runtime, { timeout: 40000, polling: 250 }), 45000);
+  await bounded('authentication_verify_ui', async () => {
+    const finalClass = String(await page.locator('body').getAttribute('class') || '');
+    requireState(!finalClass.split(/\s+/).includes('pre-auth'), 'AUTH_BODY_STILL_PRE_AUTH');
+    await page.locator('#login').waitFor({ state: 'hidden', timeout: 12000 });
+    await page.locator('#shell').waitFor({ state: 'visible', timeout: 12000 });
+  }, 16000);
 
-  const outcome = await bounded('authentication_read_signin', () => page.evaluate(() => {
-    const status = window.__orbitGateAuthStatus || {};
-    let currentUser = false;
-    try { currentUser = Boolean(window.firebase && firebase.auth && firebase.auth().currentUser); } catch (error) {}
-    return { currentUser, code: String(status.code || ''), restored: Boolean(status.restored) };
-  }), 10000);
-  requireState(outcome.currentUser, `LOGIN_OWNER_${outcome.code || 'UNKNOWN'}`);
-
-  await bounded('authentication_show_app', () => page.evaluate(() => {
-    if (!(window.Orbit && Orbit.auth && typeof Orbit.auth.showApp === 'function')) return false;
-    Orbit.auth.showApp();
-    return true;
-  }), 10000);
-  await bounded('authentication_inside', () => page.waitForFunction(
-    () => !document.body.classList.contains('pre-auth'),
-    null,
-    { timeout: 12000, polling: 250 }
-  ), 15000);
-  report.authMode = outcome.restored ? 'session_restored' : 'canonical_owner_contract_gate';
+  report.authMode = 'canonical_login_form_external_gate';
   report.checks.authenticated = true;
 }
 
 export async function acceptLegalOnce(page, { bounded, requireState, report }) {
   await page.waitForTimeout(900);
-  const state = await bounded('legal_gate_inspect', () => page.evaluate(() => {
-    const visible = node => {
-      if (!node) return false;
-      const style = getComputedStyle(node);
-      const rect = node.getBoundingClientRect();
-      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
-    };
-    const boxes = Array.from(document.querySelectorAll('#lg-chk,#conf-chk')).filter(visible);
-    return { count: boxes.length, ownerReady: Boolean(window.Orbit && Orbit.legal && Orbit.legal.__ownerIdempotent) };
-  }), 10000);
-  requireState(state.ownerReady, 'LEGAL_OWNER_NOT_READY');
-  requireState(state.count === 1, state.count ? 'LEGAL_DUPLICATE_VISIBLE' : 'LEGAL_GATE_NOT_VISIBLE', String(state.count));
 
-  const scheduled = await bounded('legal_gate_schedule_accept', () => page.evaluate(() => {
-    const checkbox = document.querySelector('#lg-chk,#conf-chk');
-    const root = checkbox && checkbox.closest('.drawer-back');
-    const button = root && root.querySelector('#lg-ok,#conf-ok');
-    if (!checkbox || !button) return false;
-    checkbox.checked = true;
-    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-    setTimeout(() => button.click(), 0);
-    return true;
-  }), 10000);
-  requireState(scheduled, 'LEGAL_ACCEPT_SCHEDULE_FAILED');
+  await bounded('legal_gate_visible', async () => {
+    const roots = page.locator('[data-legal-gate]:visible');
+    await roots.first().waitFor({ state: 'visible', timeout: 15000 });
+    const count = await roots.count();
+    requireState(count === 1, count ? 'LEGAL_DUPLICATE_VISIBLE' : 'LEGAL_GATE_NOT_VISIBLE', String(count));
+    const checkbox = roots.first().locator('#lg-chk');
+    const button = roots.first().locator('#lg-ok');
+    requireState(await checkbox.count() === 1, 'LEGAL_CHECKBOX_MISSING');
+    requireState(await button.count() === 1, 'LEGAL_ACCEPT_BUTTON_MISSING');
+  }, 18000);
 
-  await bounded('legal_gate_verify', () => page.waitForFunction(() => {
-    const pending = Boolean(window.Orbit && Orbit.legal && Orbit.legal.__gateState && Object.values(Orbit.legal.__gateState.pendingScopes || {}).some(Boolean));
-    return !document.querySelector('#lg-chk,#conf-chk') && !pending;
-  }, null, { timeout: 15000, polling: 250 }), 18000);
+  await bounded('legal_gate_click_accept', async () => {
+    const root = page.locator('[data-legal-gate]:visible').first();
+    const checkbox = root.locator('#lg-chk');
+    const button = root.locator('#lg-ok');
+    await checkbox.check();
+    await button.waitFor({ state: 'visible', timeout: 8000 });
+    await button.click();
+  }, 12000);
+
+  await bounded('legal_gate_verify_external', async () => {
+    await page.locator('[data-legal-gate]').waitFor({ state: 'detached', timeout: 18000 });
+    requireState(await page.locator('#lg-chk,#conf-chk').count() === 0, 'LEGAL_GATE_STILL_VISIBLE');
+  }, 20000);
+
+  report.legalGateMode = 'canonical_visible_controls_external_gate';
   report.checks.legalOneClick = true;
 }

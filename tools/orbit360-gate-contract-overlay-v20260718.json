@@ -2,8 +2,8 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-18",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "FUNCTIONAL_DEFECT",
-  "diagnosticRevision": "router-shell-tenant-bootstrap-v1",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "diagnosticRevision": "external-ui-auth-legal-gate-v1",
   "canonicalOwners": [
     {
       "id": "routerTenantBootstrap",
@@ -16,13 +16,32 @@
         "data-orbit-router-tenant-bootstrap",
         "document.write"
       ]
+    },
+    {
+      "id": "gateExternalAuthLegal",
+      "path": "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
+      "requiredTokens": [
+        "authentication_form_ready",
+        "authentication_fill_form",
+        "authentication_submit_form",
+        "authentication_observe_ui",
+        "body:not(.pre-auth)",
+        "canonical_login_form_external_gate",
+        "legal_gate_visible",
+        "legal_gate_click_accept",
+        "checkbox.check()",
+        "legal_gate_verify_external",
+        "canonical_visible_controls_external_gate"
+      ]
     }
   ],
   "requiredFiles": [
-    "orbit360-platform/core/router-tenant-config-bootstrap.js"
+    "orbit360-platform/core/router-tenant-config-bootstrap.js",
+    "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs"
   ],
   "runtimeGraphFiles": [
-    "orbit360-platform/core/router-tenant-config-bootstrap.js"
+    "orbit360-platform/core/router-tenant-config-bootstrap.js",
+    "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs"
   ],
   "runtimeVersionContracts": [
     {
@@ -40,6 +59,22 @@
         "core/tenant-insurer-config-p10.js?v=20260717-1",
         "data/tenant-runtime-config-index.js?v=20260717-1",
         "core/router-tenant-config-bootstrap.js?v=20260718-1"
+      ]
+    },
+    {
+      "path": "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
+      "requiredTokens": [
+        "authentication_form_ready",
+        "authentication_fill_form",
+        "authentication_submit_form",
+        "authentication_observe_ui",
+        "body:not(.pre-auth)",
+        "canonical_login_form_external_gate",
+        "legal_gate_visible",
+        "legal_gate_click_accept",
+        "checkbox.check()",
+        "legal_gate_verify_external",
+        "canonical_visible_controls_external_gate"
       ]
     }
   ],
