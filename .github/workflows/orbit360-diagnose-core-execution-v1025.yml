@@ -1,0 +1,175 @@
+name: Orbit 360 Diagnose Core Execution 1.0.25
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: [".github/workflows/orbit360-diagnose-core-execution-v1025.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 1
+
+      - name: Instalar navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.52.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+
+      - name: Medir entrega y ejecución sin evaluar el hilo bloqueado
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const { chromium } = require('playwright');
+          const origin = 'https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app';
+          const corePath = '/core/tenant-insurer-config-p10.js';
+          const canonical = origin + '/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2#/aseguradoras';
+          const sha = value => crypto.createHash('sha256').update(value).digest('hex');
+          const report = {
+            schemaVersion: 'orbit360-core-execution-diagnostic-v1',
+            contractVersion: '1.0.25',
+            containsPII: false,
+            containsSecrets: false,
+            platform: { requested:false, response:false, finished:false, parsed:false, loadedSignal:false, readySignal:false, body:null },
+            repository: {},
+            direct: {},
+            cacheStorage: { available:false, caches:[], entry:null, error:'' },
+            isolatedNoServiceWorker: {},
+            isolatedControlled: {},
+            conclusion: ''
+          };
+          const repoBody = fs.readFileSync('orbit360-platform/core/tenant-insurer-config-p10.js');
+          report.repository = { bytes: repoBody.length, sha256: sha(repoBody) };
+          const browser = await chromium.launch({ headless:true });
+          try {
+            const context = await browser.newContext();
+            const directResponse = await context.request.get(origin + corePath, { timeout:15000 });
+            const directBody = Buffer.from(await directResponse.body());
+            report.direct = { status:directResponse.status(), bytes:directBody.length, sha256:sha(directBody), matchesRepository:sha(directBody)===report.repository.sha256 };
+
+            const page = await context.newPage();
+            const cdp = await context.newCDPSession(page);
+            await cdp.send('Network.enable');
+            await cdp.send('Debugger.enable');
+            let coreRequestId = '';
+            cdp.on('Network.requestWillBeSent', event => {
+              try { if (new URL(event.request.url).pathname === corePath) { coreRequestId=event.requestId; report.platform.requested=true; } } catch {}
+            });
+            cdp.on('Network.responseReceived', event => {
+              try {
+                if (new URL(event.response.url).pathname !== corePath) return;
+                coreRequestId=event.requestId;
+                report.platform.response=true;
+                report.platform.status=event.response.status;
+                report.platform.fromServiceWorker=Boolean(event.response.fromServiceWorker);
+                report.platform.mimeType=String(event.response.mimeType||'');
+              } catch {}
+            });
+            cdp.on('Network.loadingFinished', async event => {
+              if (!coreRequestId || event.requestId !== coreRequestId) return;
+              report.platform.finished=true;
+              report.platform.encodedDataLength=event.encodedDataLength;
+              try {
+                const body = await cdp.send('Network.getResponseBody',{requestId:event.requestId});
+                const bytes = Buffer.from(body.body || '', body.base64Encoded ? 'base64' : 'utf8');
+                report.platform.body={bytes:bytes.length,sha256:sha(bytes),matchesRepository:sha(bytes)===report.repository.sha256,matchesDirect:sha(bytes)===report.direct.sha256};
+              } catch(error) { report.platform.body={error:String(error&&error.message||error).slice(0,180)}; }
+            });
+            cdp.on('Debugger.scriptParsed', event => {
+              try { if (new URL(event.url).pathname === corePath) report.platform.parsed=true; } catch {}
+            });
+            page.on('console', message => {
+              const text=String(message.text()||'');
+              if(text==='ORBIT360_RUNTIME_SIGNAL:contract-loaded:data-orbit-tenant-insurer-config-core-v20260717')report.platform.loadedSignal=true;
+              if(text==='ORBIT360_RUNTIME_SIGNAL:contract-ready:data-orbit-tenant-insurer-config-core-v20260717')report.platform.readySignal=true;
+            });
+            await page.goto(canonical,{waitUntil:'commit',timeout:30000}).catch(()=>{});
+            await new Promise(resolve=>setTimeout(resolve,30000));
+
+            try {
+              const names = await cdp.send('CacheStorage.requestCacheNames',{securityOrigin:origin});
+              report.cacheStorage.available=true;
+              report.cacheStorage.caches=(names.caches||[]).map(item=>({cacheName:item.cacheName,cacheId:item.cacheId}));
+              for(const cache of names.caches||[]){
+                const entries=await cdp.send('CacheStorage.requestEntries',{cacheId:cache.cacheId,skipCount:0,pageSize:200});
+                const hit=(entries.cacheDataEntries||[]).find(item=>{try{return new URL(item.requestURL).pathname===corePath}catch{return false}});
+                if(!hit)continue;
+                const cached=await cdp.send('CacheStorage.requestCachedResponse',{cacheId:cache.cacheId,requestURL:hit.requestURL,requestHeaders:[]});
+                const body=Buffer.from(cached.response&&cached.response.body||'','base64');
+                report.cacheStorage.entry={cacheName:cache.cacheName,requestPath:corePath,bytes:body.length,sha256:sha(body),matchesRepository:sha(body)===report.repository.sha256};
+                break;
+              }
+            } catch(error) { report.cacheStorage.error=String(error&&error.message||error).slice(0,240); }
+
+            const noSwContext = await browser.newContext({ serviceWorkers:'block' });
+            const noSwPage = await noSwContext.newPage();
+            await noSwPage.setContent('<!doctype html><html><head></head><body></body></html>');
+            report.isolatedNoServiceWorker = await noSwPage.evaluate(async url => {
+              window.Orbit={};
+              return await Promise.race([
+                new Promise(resolve=>{
+                  const s=document.createElement('script');
+                  s.src=url;
+                  s.onload=()=>resolve({loaded:true,owner:Boolean(window.Orbit&&Orbit.tenantInsurerConfigP10)});
+                  s.onerror=()=>resolve({loaded:false,owner:false,error:'script-error'});
+                  document.head.appendChild(s);
+                }),
+                new Promise(resolve=>setTimeout(()=>resolve({loaded:false,owner:false,error:'timeout'}),12000))
+              ]);
+            }, origin+corePath);
+            await noSwContext.close();
+
+            const isolatedPage = await context.newPage();
+            await isolatedPage.goto(origin + '/__orbit_core_diag__.html',{waitUntil:'domcontentloaded',timeout:15000}).catch(()=>{});
+            await isolatedPage.reload({waitUntil:'domcontentloaded',timeout:15000}).catch(()=>{});
+            report.isolatedControlled.controller = await isolatedPage.evaluate(()=>Boolean(navigator.serviceWorker&&navigator.serviceWorker.controller)).catch(()=>false);
+            report.isolatedControlled.execution = await isolatedPage.evaluate(async url => {
+              window.Orbit={};
+              return await Promise.race([
+                new Promise(resolve=>{
+                  const s=document.createElement('script');
+                  s.src=url;
+                  s.onload=()=>resolve({loaded:true,owner:Boolean(window.Orbit&&Orbit.tenantInsurerConfigP10)});
+                  s.onerror=()=>resolve({loaded:false,owner:false,error:'script-error'});
+                  document.head.appendChild(s);
+                }),
+                new Promise(resolve=>setTimeout(()=>resolve({loaded:false,owner:false,error:'timeout'}),12000))
+              ]);
+            }, origin+corePath).catch(error=>({loaded:false,owner:false,error:String(error&&error.message||error).slice(0,180)}));
+            await isolatedPage.close();
+            await context.close();
+          } finally { await browser.close().catch(()=>{}); }
+
+          const platformBodyMatches=report.platform.body&&report.platform.body.matchesRepository===true;
+          const noSwOk=report.isolatedNoServiceWorker.loaded&&report.isolatedNoServiceWorker.owner;
+          const controlledOk=report.isolatedControlled.execution&&report.isolatedControlled.execution.loaded&&report.isolatedControlled.execution.owner;
+          if(report.platform.body&&report.platform.body.matchesRepository===false) report.conclusion='SERVICE_WORKER_BODY_MISMATCH';
+          else if(platformBodyMatches&&noSwOk&&controlledOk&&!report.platform.parsed) report.conclusion='ROUTER_ORDERED_QUEUE_EXECUTION_STALL';
+          else if(noSwOk&&!controlledOk) report.conclusion='SERVICE_WORKER_EXECUTION_FAILURE';
+          else if(!noSwOk) report.conclusion='CORE_SCRIPT_ISOLATED_EXECUTION_FAILURE';
+          else report.conclusion='INSUFFICIENT_DIAGNOSTIC_EVIDENCE';
+          fs.writeFileSync('.github/orbit360-v1025-core-execution-diagnostic.json',JSON.stringify(report,null,2)+'\n','utf8');
+          NODE
+
+          rm -f .github/workflows/orbit360-diagnose-core-execution-v1025.yml
+
+      - name: Persistir diagnóstico sanitizado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "diag(block1): persist core execution evidence 1.0.25 [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
