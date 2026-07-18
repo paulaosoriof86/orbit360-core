@@ -53,3 +53,7 @@ El gate dependía de evaluaciones dentro de una página cuyo bootstrap podía es
 ## Regla de salida
 
 Ejecutar el mismo gate una sola vez después de GO_GATE_CONTRACT. Aceptar exclusivamente evidencia sanitizada con ok:true. Si falla 1.0.19, detener reintentos y diagnosticar únicamente la primera etapa real con la evidencia de esa corrida.
+
+## Publicación y retiro del mecanismo temporal
+
+El contenido 1.0.19 fue validado y publicado sin mutar workflows mediante GITHUB_TOKEN. El workflow temporal se registra como retirado y debe eliminarse antes de ejecutar el gate. La ejecución final se solicita una sola vez mediante workflow_dispatch sobre el HEAD limpio.

@@ -112,7 +112,8 @@
     ".github/workflows/orbit360-apply-runtime-owner-waits-v20260718.yml",
     ".github/workflows/orbit360-apply-gate-version-v1018-20260718.yml",
     "tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs",
-    "tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs"
+    "tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs",
+    ".github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718.yml"
   ],
   "gates": [
     {
@@ -182,7 +183,10 @@
           "allow canonical progression evidence from the next contract request or explicit Router signal",
           "retain functional owner checks and fail on terminal error, timeout or no-source states",
           "remove temporary patch and workflow in the same closure commit",
-          "execute the same gate once after GO_GATE_CONTRACT"
+          "execute the same gate once after GO_GATE_CONTRACT",
+          "publish validated content without workflow-scope mutation",
+          "retire temporary pipeline workflow before the unique gate dispatch",
+          "dispatch the existing gate exactly once against the clean branch HEAD"
         ],
         "openEvidence": [
           "contract 1.0.19 must produce sanitized ok:true and complete Dirección desktop, Operativo tablet and Asesor móvil in one execution"
@@ -421,16 +425,14 @@
         "asesor_mobile"
       ],
       "successEvidence": "orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json",
-      "successPredicate": "ok === true"
+      "successPredicate": "ok === true",
+      "executionDispatch": {
+        "mode": "workflow_dispatch",
+        "uniqueExecution": true,
+        "dispatchAfterRetirement": true,
+        "purpose": "Execute the same gate once against the clean HEAD after all temporary pipeline artifacts are removed."
+      }
     }
   ],
-  "temporaryPipelineArtifacts": [
-    {
-      "path": ".github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718.yml",
-      "classification": "TEMPORAL_RETIRO",
-      "purpose": "Publish validated 1.0.19 content without workflow-scope mutation.",
-      "retirementGate": "block1-client360-insurers-lab-v20260717",
-      "retirementAction": "Delete atomically with concurrency alignment before the unique runtime gate execution."
-    }
-  ]
+  "temporaryPipelineArtifacts": []
 }
