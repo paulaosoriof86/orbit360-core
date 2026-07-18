@@ -1,0 +1,57 @@
+name: Orbit 360 Persist 1.0.24 Preflight
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: [".github/workflows/orbit360-persist-v1024-preflight.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 1
+
+      - name: Simular corte y ejecutar preflight
+        shell: bash
+        env:
+          ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const rp='orbit360-platform/core/router.js';
+          fs.writeFileSync(rp,fs.readFileSync(rp,'utf8').replace('script.async = true;','script.async = false;'),'utf8');
+          const gp='tools/orbit360-gate-runtime-crm-v20260716.mjs';
+          fs.writeFileSync(gp,fs.readFileSync(gp,'utf8').replace("schemaVersion:'orbit360-runtime-gate-joint-v23-external-contract-observer'","schemaVersion:'orbit360-runtime-gate-joint-v24-router-sequential'").replace("contractVersion:'1.0.23'","contractVersion:'1.0.24'"),'utf8');
+          const jp='tools/orbit360-gate-contract-registry-v20260717.json';
+          const j=JSON.parse(fs.readFileSync(jp,'utf8'));
+          const o=j.canonicalOwners.find(x=>x.id==='router');
+          o.requiredTokens=o.requiredTokens.filter(x=>x!=='script.async = true');
+          if(!o.requiredTokens.includes('script.async = false'))o.requiredTokens.push('script.async = false');
+          j.gates.find(x=>x.gateId==='block1-client360-insurers-lab-v20260717').contractVersion='1.0.24';
+          fs.writeFileSync(jp,JSON.stringify(j,null,2)+'\n','utf8');
+          NODE
+          set +e
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          code=$?
+          set -e
+          cp orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json .github/orbit360-v1024-preflight-sanitized.json
+          printf '{"exitCode":%s}\n' "$code" > .github/orbit360-v1024-preflight-exit.json
+          git checkout -- orbit360-platform/core/router.js tools/orbit360-gate-runtime-crm-v20260716.mjs tools/orbit360-gate-contract-registry-v20260717.json
+          rm -f .github/workflows/orbit360-persist-v1024-preflight.yml
+
+      - name: Persistir evidencia sin disparar CI
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "diag(block1): persist 1.0.24 preflight evidence [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
