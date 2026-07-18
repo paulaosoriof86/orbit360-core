@@ -7,7 +7,7 @@ import { readGateEnvironment } from './orbit360-gate-environment-v20260717.mjs';
 const { baseUrl, email, accessValue:key, runtime }=readGateEnvironment();
 const dirs=['orbit360-platform/runtime-gate-crm-v20260716','orbit360-platform/runtime-gate-aseguradoras-v20260716'];
 const mapped=/Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
-const report={schemaVersion:'orbit360-runtime-gate-joint-v19-preauth-fail-closed',gateId:'block1-client360-insurers-lab-v20260717',contractVersion:'1.0.14',runtimeVersion:runtime,generatedAt:new Date().toISOString(),containsPII:false,containsSecrets:false,stage:'bootstrap',checks:{}};
+const report={schemaVersion:'orbit360-runtime-gate-joint-v19-preauth-fail-closed',gateId:'block1-client360-insurers-lab-v20260717',contractVersion:'1.0.15',runtimeVersion:runtime,generatedAt:new Date().toISOString(),containsPII:false,containsSecrets:false,stage:'bootstrap',checks:{}};
 if(!/^https:\/\//.test(baseUrl))throw new Error('BLOQUEO_PREVIEW_URL');
 if(key.length<12)throw new Error('BLOQUEO_ACCESO_LAB');
 if(!/^\d{8}-\d+$/.test(runtime))throw new Error('BLOQUEO_RUNTIME_VERSION');
@@ -20,8 +20,17 @@ function diagnosticText(value){return String(value||'').replace(/https?:\/\/[^/\
 function diagnosticPath(value){try{return new URL(String(value||'')).pathname.slice(0,180);}catch(error){return '';}}
 let browser;
 const WATCHDOG_BUDGET_MS=900000;
+const OBSERVER_CAPTURE_TIMEOUT_MS=5000;
 report.watchdogBudgetMs=WATCHDOG_BUDGET_MS;
-const watchdog=setTimeout(()=>{report.ok=false;report.error=`GATE_TIMEOUT:${report.stage}`;save();process.exit(124);},WATCHDOG_BUDGET_MS);
+report.observerCaptureTimeoutMs=OBSERVER_CAPTURE_TIMEOUT_MS;
+const watchdog=setTimeout(()=>{
+  report.ok=false;
+  report.watchdogExceeded=true;
+  report.watchdogStage=report.stage;
+  if(!report.error)report.error=`GATE_TIMEOUT:${report.stage}`;
+  save();
+  process.exit(124);
+},WATCHDOG_BUDGET_MS);
 
 async function awaitPreviewRedirect(page){
   await bounded('preview_redirect_ready',async()=>{
@@ -152,10 +161,30 @@ try{
   await page.setViewportSize({width:390,height:844});await selectRole(page,'Asesor');stage('mobile_asesor_menu');await validateMobileMenu(page);stage('mobile_asesor_client360');await validateClient360(page,report,'mobileAsesor');stage('mobile_asesor_aseguradoras');await validateInsurers(page,'mobileAsesor',true);report.checks.mobileAsesor=true;
   Object.assign(report.checks,{realClientCount:report.storeCounts.clientes===414,realInsurerCount:report.storeCounts.aseguradoras===26,realAdvisorCount:report.storeCounts.asesores===7,allTenTabs:true,gtFirst:true,insurerReadMode:true,insurerKnowledgeVisible:true});
   report.ok=Object.values(report.checks).every(Boolean);stage('completed');
-}catch(error){report.ok=false;report.error=String(error&&(error.stack||error.message||error)).replace(/\s+/g,' ').trim();}
-finally{
-  try{report.runtimeContractObserver=await page.evaluate(()=>window.__orbitGateContractObserver||null);}catch(error){report.runtimeContractObserver={unavailable:true};}
-  save();stage('closing_browser');await Promise.race([browser.close(),new Promise(resolve=>setTimeout(resolve,10000))]);clearTimeout(watchdog);
+}catch(error){
+  report.ok=false;
+  report.failureStage=report.stage;
+  report.error=String(error&&(error.stack||error.message||error)).replace(/\s+/g,' ').trim();
+  save();
+}finally{
+  try{
+    const finalDiagnostic=await Promise.race([
+      page.evaluate(()=>({
+        observer:window.__orbitGateContractObserver||null,
+        routerRuntimeContracts:window.Orbit&&Orbit.router&&Orbit.router.runtimeContractState?Orbit.router.runtimeContractState:{}
+      })),
+      new Promise(resolve=>setTimeout(()=>resolve({observer:{unavailable:true,code:'OBSERVER_CAPTURE_TIMEOUT'},routerRuntimeContracts:{}}),OBSERVER_CAPTURE_TIMEOUT_MS))
+    ]);
+    report.runtimeContractObserver=finalDiagnostic.observer;
+    report.routerRuntimeContracts=finalDiagnostic.routerRuntimeContracts;
+  }catch(error){
+    report.runtimeContractObserver={unavailable:true,code:diagnosticText(error&&error.name||'OBSERVER_CAPTURE_FAILED')};
+    report.routerRuntimeContracts={};
+  }
+  save();
+  stage('closing_browser');
+  await Promise.race([browser.close(),new Promise(resolve=>setTimeout(resolve,10000))]);
+  clearTimeout(watchdog);
 }
-console.log(`ORBIT360_RUNTIME_GATE_JOINT:${JSON.stringify({ok:report.ok,stage:report.stage,runtimeVersion:report.runtimeVersion,counts:report.storeCounts||{},checks:report.checks,error:report.error||''})}`);
+console.log(`ORBIT360_RUNTIME_GATE_JOINT:${JSON.stringify({ok:report.ok,stage:report.stage,failureStage:report.failureStage||'',runtimeVersion:report.runtimeVersion,counts:report.storeCounts||{},checks:report.checks,error:report.error||''})}`);
 process.exit(report.ok?0:1);
