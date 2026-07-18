@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "orbit360-runtime-build-parity-v1",
+  "containsPII": false,
+  "containsSecrets": false,
+  "expected": {
+    "commit": "11478e9b75ec68a3705ccdf2713cd8cc14312759",
+    "run": "29652470409",
+    "gateId": "block1-client360-insurers-lab-v20260717",
+    "runtimeVersion": "20260717-2"
+  },
+  "plain": {
+    "httpStatus": "200",
+    "commit": "11478e9b75ec68a3705ccdf2713cd8cc14312759",
+    "run": "29652470409",
+    "gateId": "block1-client360-insurers-lab-v20260717",
+    "runtimeVersion": "20260717-2"
+  },
+  "cacheBusted": {
+    "httpStatus": "200",
+    "commit": "11478e9b75ec68a3705ccdf2713cd8cc14312759",
+    "run": "29652470409",
+    "gateId": "block1-client360-insurers-lab-v20260717",
+    "runtimeVersion": "20260717-2"
+  },
+  "matches": {
+    "plainCommit": true,
+    "plainRun": true,
+    "plainGate": true,
+    "plainRuntime": true,
+    "cacheBustedCommit": true,
+    "cacheBustedRun": true,
+    "cacheBustedGate": true,
+    "cacheBustedRuntime": true,
+    "plainEqualsCacheBusted": true
+  }
+}
