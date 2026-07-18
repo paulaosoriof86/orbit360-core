@@ -108,6 +108,28 @@ async function approveStage(report, bounded, name, task, timeoutMs) {
   report.checks[name] = true;
 }
 
+async function waitForAuthUiEvidence(report, requireState) {
+  const required=['/data/store.js','/core/router.js','/core/auth.js'];
+  const deadline=Date.now()+20000;
+  let evidence=null;
+  while(Date.now()<deadline){
+    const parsed=new Set([].concat(report.browserParseDiagnostics&&report.browserParseDiagnostics.parsedScripts||[]).map(x=>String(x&&x.path||'')));
+    const failed=new Set([].concat(report.browserParseDiagnostics&&report.browserParseDiagnostics.failedScripts||[]).map(x=>String(x&&x.path||'')));
+    const transport=report.bootstrapTransportDiagnostic||{};
+    const signals=[].concat(transport.runtimeSignals||[]);
+    const requests=[].concat(transport.contractRequests||[]);
+    const pageErrors=[].concat(transport.pageErrors||[]);
+    const routerProgressObserved=signals.some(x=>/ORBIT360_RUNTIME_SIGNAL:(pwa-ready|contract-ready):/.test(String(x||'')))||requests.some(x=>/session-multirol-visibility|client-canonical-view-projection|tenant-insurer-config/.test(String(x&&x.path||'')));
+    evidence={storeOwnerScriptParsed:parsed.has(required[0]),routerOwnerScriptParsed:parsed.has(required[1]),authOwnerScriptParsed:parsed.has(required[2]),ownerScriptParseFailures:required.filter(p=>failed.has(p)),authProviderReady:report.checks.canonical_auth_provider_ready===true,routerContractProgressObserved:routerProgressObserved,pageErrorCount:pageErrors.length,canonicalInitOrderEstablished:routerProgressObserved&&pageErrors.length===0};
+    report.authUiDiagnostic=evidence;
+    if(evidence.ownerScriptParseFailures.length)requireState(false,'AUTH_UI_OWNER_SCRIPT_PARSE_FAILED',JSON.stringify(evidence.ownerScriptParseFailures));
+    if(evidence.pageErrorCount)requireState(false,'AUTH_UI_PAGE_ERROR',JSON.stringify(pageErrors.slice(0,3)));
+    if(evidence.storeOwnerScriptParsed&&evidence.routerOwnerScriptParsed&&evidence.authOwnerScriptParsed&&evidence.authProviderReady&&evidence.routerContractProgressObserved)return;
+    await new Promise(r=>setTimeout(r,100));
+  }
+  requireState(false,'AUTH_UI_EXTERNAL_EVIDENCE_MISSING',JSON.stringify(evidence||{}));
+}
+
 async function waitForOwnerHandoffEvidence(report, requireState) {
   const required=['/data/store.js','/core/router.js','/core/auth.js'];
   const deadline=Date.now()+20000;
@@ -276,10 +298,7 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
     }
   }, null, { timeout: 20000, polling: 250 }), 24000);
 
-  await approveStage(report, bounded, 'canonical_auth_ui_ready', () => page.waitForFunction(() => {
-    const form = document.getElementById('login-form');
-    return Boolean(form && form.dataset.authMode === 'firestore-lab');
-  }, null, { timeout: 20000, polling: 250 }), 24000);
+  await approveStage(report, bounded, 'canonical_auth_ui_ready', () => waitForAuthUiEvidence(report, requireState), 24000);
 
   await approveStage(report, bounded, 'canonical_owner_handoff_ready', () => waitForOwnerHandoffEvidence(report, requireState), 24000);
 

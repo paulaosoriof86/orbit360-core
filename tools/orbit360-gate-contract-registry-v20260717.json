@@ -118,12 +118,12 @@
   "gates": [
     {
       "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.20",
-      "diagnosticRevision": "external-owner-handoff-evidence-v1",
+      "contractVersion": "1.0.21",
+      "diagnosticRevision": "auth-ui-external-evidence-v1",
       "runtimeVersion": "20260717-2",
       "block": 1,
       "status": "ACTIVE_VALIDATOR_RECONCILIATION",
-      "diagnosticRule": "Accept Store, Router and Auth handoff from pre-navigation CDP parse evidence plus the approved Auth UI milestone; do not duplicate the same proof through a page evaluator that can be starved by later runtime contracts.",
+      "diagnosticRule": "Accept canonical_auth_ui_ready from parsed Store/Router/Auth owners, approved Firebase Auth provider, Router contract progression and zero page errors; do not duplicate the ordered bootstrap proof through a page evaluator that can be starved.",
       "executionBudget": {
         "type": "derived_operational_critical_path_with_stage_ceiling",
         "baseCriticalPathMs": 750000,
@@ -141,42 +141,47 @@
           "canonical_client_projection_diagnostic_reserve": 10000
         },
         "evidence": {
-          "sourceContractVersion": "1.0.19",
+          "sourceContractVersion": "1.0.20",
           "preflightPassed": true,
           "labCountsPassed": true,
           "labDeployPassed": true,
-          "pwaControllerControlled": true,
+          "browserGateStarted": true,
+          "storeScriptParsed": true,
+          "routerScriptParsed": true,
+          "authScriptParsed": true,
           "authProviderReady": true,
-          "authUiReady": true,
-          "failedStage": "canonical_owner_handoff_ready",
-          "firstError": "PIPELINE_STEP_TIMEOUT:canonical_owner_handoff_ready",
-          "rootInference": "canonical_auth_ui_ready proves the canonical inline order reached Orbit.auth.init after Orbit.store.init and Orbit.router.init; the duplicate page evaluator timed out while contracts continued loading."
+          "pageErrors": 0,
+          "routerContractProgressObserved": true,
+          "failedStage": "canonical_auth_ui_ready",
+          "firstError": "PIPELINE_STEP_TIMEOUT:canonical_auth_ui_ready",
+          "rootInference": "Router contract requests and runtime signals prove Orbit.router.init executed. In the canonical inline bootstrap Orbit.auth.init follows immediately, with no page errors. The duplicate page.waitForFunction timed out while contract loading continued."
         },
-        "interpretation": "Product frozen. Version 1.0.20 changes only validator evidence; watchdog and accepted budgets remain unchanged.",
-        "exhaustionPolicy": "Run once after GO_GATE_CONTRACT. If the same stage fails, inspect only ownerHandoffDiagnostic and browserParseDiagnostics; do not touch product owners, data or another module.",
+        "interpretation": "Product remains frozen. Version 1.0.21 changes only canonical_auth_ui_ready validation evidence; watchdog and all accepted budgets remain unchanged.",
+        "exhaustionPolicy": "Run once after GO_GATE_CONTRACT. If canonical_auth_ui_ready fails again, stop all retries and inspect only authUiDiagnostic, browserParseDiagnostics and bootstrapTransportDiagnostic. Do not touch product, Auth, Router, Store, rules or data.",
         "acceptancePolicy": "Only sanitized ok:true closes the gate.",
         "workerControlTimeoutMs": 10000,
         "pwaControllerGateMs": 22000,
         "routerSignalWaitMs": 24000,
-        "ownerHandoffExternalEvidenceMs": 24000
+        "ownerHandoffExternalEvidenceMs": 24000,
+        "authUiExternalEvidenceMs": 24000
       },
       "reconciliation": {
         "date": "2026-07-18",
         "classifications": [
           "VALIDATOR_STALE"
         ],
-        "scope": "canonical_owner_handoff_ready validator only",
-        "rootCause": "The gate re-evaluated Store, Router and Auth after canonical_auth_ui_ready had already proven the ordered initialization path. The duplicate evaluator was starved and produced a false timeout.",
+        "scope": "canonical_auth_ui_ready validator only",
+        "rootCause": "The gate re-evaluated the login form inside the page after external evidence already proved owner parsing, Auth provider readiness and Router bootstrap progression. Runtime.evaluate was starved during contract loading and produced a false timeout.",
         "corrections": [
           "freeze Cliente 360, Aseguradoras, Orbit.store, Auth, Router, Firestore rules and tenant data",
-          "extend pre-navigation CDP parse evidence to data/store.js, core/router.js and core/auth.js",
-          "record each owner separately in ownerHandoffDiagnostic",
-          "use canonical_auth_ui_ready as ordered bootstrap proof",
-          "fail closed on owner parse failure or missing evidence",
+          "derive Auth UI readiness from external owner parse evidence, approved Auth provider, Router progress and zero page errors",
+          "record authUiDiagnostic with each evidence component",
+          "fail closed on parse failure, page error or missing Router progress",
+          "retain owner handoff reconciliation 1.0.20",
           "run preflight first and the same gate once"
         ],
         "openEvidence": [
-          "1.0.20 sanitized ok:true across three views"
+          "1.0.21 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
         ],
         "preserved": [
           "Orbit.store API",
@@ -312,7 +317,7 @@
         {
           "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
           "requiredTokens": [
-            "contractVersion:'1.0.20'",
+            "contractVersion:'1.0.21'",
             "WATCHDOG_BUDGET_MS=900000",
             "OBSERVER_CAPTURE_TIMEOUT_MS=5000",
             "report.failureStage=report.stage",
@@ -368,7 +373,14 @@
             "routerOwnerScriptParsed",
             "authOwnerScriptParsed",
             "inlineInitOrderEstablished",
-            "OWNER_HANDOFF_EXTERNAL_EVIDENCE_MISSING"
+            "OWNER_HANDOFF_EXTERNAL_EVIDENCE_MISSING",
+            "waitForAuthUiEvidence",
+            "authUiDiagnostic",
+            "routerContractProgressObserved",
+            "canonicalInitOrderEstablished",
+            "AUTH_UI_EXTERNAL_EVIDENCE_MISSING",
+            "AUTH_UI_OWNER_SCRIPT_PARSE_FAILED",
+            "AUTH_UI_PAGE_ERROR"
           ]
         },
         {

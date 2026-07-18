@@ -59,3 +59,15 @@ El producto quedó congelado. La versión 1.0.20 modifica únicamente el gate: a
 ## Solicitud única de salida
 
 Ejecutar mediante workflow_dispatch exactamente una vez el workflow existente Orbit 360 Clientes y Aseguradoras Runtime Gate 20260717 sobre la rama autorizada. El preflight contractual debe correr primero. Aceptar exclusivamente evidencia sanitizada con ok:true; si falla la misma etapa, detener reintentos y diagnosticar solo ownerHandoffDiagnostic y browserParseDiagnostics.
+
+## Reconciliación 1.0.21
+
+Clasificación: VALIDATOR_STALE.
+
+La corrida 1.0.20 superó preflight, arquitectura, datos, publicación LAB y ejecución del navegador. La primera etapa fallida fue canonical_auth_ui_ready. La evidencia sanitizada registró data/store.js, core/router.js y core/auth.js parseados sin errores; el proveedor Auth disponible; cero pageErrors; y progreso real de Router mediante solicitudes y señales de contratos. En el bootstrap canónico, Orbit.auth.init se invoca inmediatamente después de Orbit.router.init. El page.waitForFunction duplicó esa evidencia y quedó sin respuesta mientras la carga de contratos continuaba.
+
+La versión 1.0.21 mantiene congelados producto, Auth, Router, Store, reglas y datos. Solo reemplaza el evaluador de canonical_auth_ui_ready por evidencia externa correlacionada: scripts owner parseados, proveedor Auth aprobado, progreso de Router y ausencia de errores de página. La comprobación permanece fail-closed ante cualquier parse failure, pageError o falta de progreso.
+
+Carriles: A sin cambios en Cliente 360/Aseguradoras; B solo gate, registro y evidencia; C conserva 414 clientes, 26 aseguradoras y 7 asesores sin reimportación. Claude: BACKEND_PROTEGIDO_NO_CLAUDE. Academia: documentar que un hito UI puede probarse por orden canónico y señales externas cuando Runtime.evaluate queda congestionado.
+
+Salida: preflight vinculante primero; mismo gate una sola vez; cierre exclusivamente con evidencia sanitizada ok:true.
