@@ -1,0 +1,87 @@
+name: Orbit 360 Diagnose Auth UI DOM 1.0.20
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-diagnose-auth-ui-dom-v1020.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+      - name: Instalar navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.52.0
+          npx playwright install --with-deps chromium
+      - name: Observar Auth UI fuera del evaluador de página
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p orbit360-auth-ui-diagnostic
+          cat > /tmp/diagnose-auth-ui.mjs <<'NODE'
+          import { chromium } from 'playwright';
+          import { writeFileSync } from 'node:fs';
+          const url='https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2#/aseguradoras';
+          const report={schemaVersion:'orbit360-auth-ui-dom-diagnostic-v1',containsPII:false,containsSecrets:false,urlPath:'/index.html',startedAt:new Date().toISOString(),events:[],requests:[],responses:[],pageErrors:[],result:null};
+          const browser=await chromium.launch({headless:true});
+          const page=await browser.newPage({viewport:{width:1440,height:1000}});
+          const started=Date.now();
+          const pathOf=v=>{try{return new URL(v).pathname}catch{return ''}};
+          page.on('request',r=>{if(report.requests.length<80)report.requests.push({ms:Date.now()-started,path:pathOf(r.url()),type:r.resourceType()})});
+          page.on('response',r=>{const p=pathOf(r.url());if(report.responses.length<80&&(/auth|router|store|tenant|client-canonical|session-multirol/.test(p)))report.responses.push({ms:Date.now()-started,path:p,status:r.status(),fromServiceWorker:Boolean(r.fromServiceWorker&&r.fromServiceWorker())})});
+          page.on('pageerror',e=>{if(report.pageErrors.length<12)report.pageErrors.push({ms:Date.now()-started,name:String(e&&e.name||''),message:String(e&&e.message||'').slice(0,280)})});
+          const cdp=await page.context().newCDPSession(page);
+          await cdp.send('DOM.enable');
+          await cdp.send('Runtime.enable');
+          await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});
+          let found=null;
+          for(let i=0;i<240;i++){
+            const ms=Date.now()-started;
+            let snapshot={ms,formPresent:false,authMode:'',bodyAuthStage:'',bodyClass:'',runtimeEval:null};
+            try{
+              const doc=await cdp.send('DOM.getDocument',{depth:1,pierce:true});
+              const form=await cdp.send('DOM.querySelector',{nodeId:doc.root.nodeId,selector:'#login-form'});
+              if(form.nodeId){
+                snapshot.formPresent=true;
+                const attrs=await cdp.send('DOM.getAttributes',{nodeId:form.nodeId});
+                for(let j=0;j<attrs.attributes.length;j+=2)if(attrs.attributes[j]==='data-auth-mode')snapshot.authMode=attrs.attributes[j+1]||'';
+              }
+              const body=await cdp.send('DOM.querySelector',{nodeId:doc.root.nodeId,selector:'body'});
+              if(body.nodeId){
+                const attrs=await cdp.send('DOM.getAttributes',{nodeId:body.nodeId});
+                for(let j=0;j<attrs.attributes.length;j+=2){if(attrs.attributes[j]==='data-auth-stage')snapshot.bodyAuthStage=attrs.attributes[j+1]||'';if(attrs.attributes[j]==='class')snapshot.bodyClass=attrs.attributes[j+1]||'';}
+              }
+            }catch(error){snapshot.domError=String(error&&error.message||error).slice(0,240)}
+            try{
+              snapshot.runtimeEval=await Promise.race([page.evaluate(()=>({formMode:(document.getElementById('login-form')||{}).dataset?.authMode||'',orbitAuth:Boolean(window.Orbit&&Orbit.auth),orbitRouter:Boolean(window.Orbit&&Orbit.router),orbitStore:Boolean(window.Orbit&&Orbit.store)})),new Promise(resolve=>setTimeout(()=>resolve({timeout:true}),600))]);
+            }catch(error){snapshot.runtimeEval={error:String(error&&error.name||'evaluation-error')}}
+            if(i===0||i%4===0||snapshot.authMode||snapshot.runtimeEval?.formMode)report.events.push(snapshot);
+            if(snapshot.authMode==='firestore-lab'){found=snapshot;break;}
+            await new Promise(resolve=>setTimeout(resolve,250));
+          }
+          report.result={authUiReady:Boolean(found),evidence:found||report.events.at(-1)||null,elapsedMs:Date.now()-started};
+          report.finishedAt=new Date().toISOString();
+          writeFileSync('orbit360-auth-ui-diagnostic/diagnostic.json',JSON.stringify(report,null,2)+'\n');
+          await Promise.race([browser.close(),new Promise(resolve=>setTimeout(resolve,5000))]);
+          NODE
+          node /tmp/diagnose-auth-ui.mjs
+      - name: Publicar diagnóstico sanitizado
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-auth-ui-dom-diagnostic-v1020
+          path: orbit360-auth-ui-diagnostic/diagnostic.json
+          retention-days: 3
+          if-no-files-found: error
+      - name: Marcar corrida diagnóstica
+        shell: bash
+        run: exit 1
