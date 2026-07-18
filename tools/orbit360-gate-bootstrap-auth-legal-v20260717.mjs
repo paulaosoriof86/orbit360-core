@@ -152,9 +152,71 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
     return Boolean(document.querySelector('script[data-orbit-client-projection-runtime-v20260716]'));
   }, null, { timeout: 45000, polling: 250 }), 50000);
 
-  await approveStage(report, bounded, 'canonical_client_projection_ready', () => page.waitForFunction(() => {
-    return Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function');
-  }, null, { timeout: 12000, polling: 250 }), 15000);
+  await approveStage(report, bounded, 'canonical_client_projection_ready', async () => {
+    const deadline = Date.now() + 15000;
+    while (Date.now() < deadline) {
+      const ready = await page.evaluate(() => Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function'));
+      if (ready) return;
+      await page.waitForTimeout(250);
+    }
+
+    report.runtimeContractDiagnostics = await page.evaluate(async () => {
+      const markerName = 'data-orbit-client-projection-runtime-v20260716';
+      const marker = document.querySelector('script[' + markerName + ']');
+      const pathOf = value => {
+        try { return new URL(String(value || ''), location.href).pathname; } catch (error) { return ''; }
+      };
+      const resources = performance.getEntriesByType('resource')
+        .filter(entry => /client-canonical-view-projection-v20260716\.js/.test(String(entry.name || '')))
+        .slice(-4)
+        .map(entry => ({
+          path: pathOf(entry.name),
+          duration: Math.round(Number(entry.duration || 0)),
+          transferSize: Number(entry.transferSize || 0),
+          encodedBodySize: Number(entry.encodedBodySize || 0),
+          decodedBodySize: Number(entry.decodedBodySize || 0),
+          responseStatus: Number(entry.responseStatus || 0)
+        }));
+      const laterMarkers = [
+        'data-orbit-tenant-insurer-config-core-v20260717',
+        'data-orbit-tenant-runtime-index-v20260717',
+        'data-orbit-tenant-insurer-config-active-v20260717'
+      ].reduce((out, name) => { out[name] = Boolean(document.querySelector('script[' + name + ']')); return out; }, {});
+      let fetched = { attempted: false, status: 0, bytes: 0, containsOwnerToken: false, contentType: '' };
+      if (marker && marker.src) {
+        fetched.attempted = true;
+        try {
+          const response = await fetch(marker.src, { cache: 'no-store', credentials: 'same-origin' });
+          const body = await response.text();
+          fetched = {
+            attempted: true,
+            status: response.status,
+            bytes: body.length,
+            containsOwnerToken: body.includes('Orbit.clientProjection'),
+            contentType: String(response.headers.get('content-type') || '').slice(0, 80)
+          };
+        } catch (error) {
+          fetched.error = String(error && error.name || 'fetch_failed').slice(0, 80);
+        }
+      }
+      return {
+        marker: marker ? {
+          present: true,
+          path: pathOf(marker.src),
+          async: Boolean(marker.async),
+          defer: Boolean(marker.defer),
+          connected: Boolean(marker.isConnected)
+        } : { present: false },
+        ownerPresent: Boolean(window.Orbit && Orbit.clientProjection),
+        ownerGetPresent: Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function'),
+        routerRoutePresent: Boolean(window.Orbit && Orbit.route && Orbit.route.key),
+        laterMarkers,
+        resources,
+        fetched
+      };
+    });
+    requireState(false, 'CLIENT_PROJECTION_NOT_REGISTERED', JSON.stringify(report.runtimeContractDiagnostics));
+  }, 25000);
 
   await approveStage(report, bounded, 'canonical_tenant_insurer_core_ready', () => page.waitForFunction(() => {
     return Boolean(window.Orbit && Orbit.tenantInsurerConfigP10 && typeof Orbit.tenantInsurerConfigP10.registerTenantConfig === 'function');
