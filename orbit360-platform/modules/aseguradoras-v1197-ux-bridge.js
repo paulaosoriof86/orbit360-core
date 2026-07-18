@@ -57,7 +57,7 @@ Orbit.modules = Orbit.modules || {};
       tel: clean(contact.tel || contact.telefono),
       ext: clean(contact.ext || contact.extension),
       pais: clean(contact.pais || row.pais),
-      canal: clean(contact.canal || (contact.email ? 'Correo' : (contact.tel || contact.telefono ? 'Teléfono' : 'Correo')),
+      canal: clean(contact.canal || (contact.email ? 'Correo' : (contact.tel || contact.telefono ? 'Teléfono' : 'Correo'))),
       vigencia: clean(contact.vigencia || 'Por confirmar'),
       area: clean(contact.area || (contact.cargo ? 'Comercial' : ''))
     }));
