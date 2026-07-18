@@ -108,6 +108,22 @@ async function approveStage(report, bounded, name, task, timeoutMs) {
   report.checks[name] = true;
 }
 
+async function waitForOwnerHandoffEvidence(report, requireState) {
+  const required=['/data/store.js','/core/router.js','/core/auth.js'];
+  const deadline=Date.now()+20000;
+  let evidence=null;
+  while(Date.now()<deadline){
+    const parsed=new Set([].concat(report.browserParseDiagnostics&&report.browserParseDiagnostics.parsedScripts||[]).map(x=>String(x&&x.path||'')));
+    const failed=new Set([].concat(report.browserParseDiagnostics&&report.browserParseDiagnostics.failedScripts||[]).map(x=>String(x&&x.path||'')));
+    evidence={storeOwnerScriptParsed:parsed.has(required[0]),routerOwnerScriptParsed:parsed.has(required[1]),authOwnerScriptParsed:parsed.has(required[2]),ownerScriptParseFailures:required.filter(p=>failed.has(p)),authUiInitialized:report.checks.canonical_auth_ui_ready===true,inlineInitOrderEstablished:report.checks.canonical_auth_ui_ready===true};
+    report.ownerHandoffDiagnostic=evidence;
+    if(evidence.ownerScriptParseFailures.length)requireState(false,'OWNER_SCRIPT_PARSE_FAILED',JSON.stringify(evidence.ownerScriptParseFailures));
+    if(evidence.storeOwnerScriptParsed&&evidence.routerOwnerScriptParsed&&evidence.authOwnerScriptParsed&&evidence.authUiInitialized)return;
+    await new Promise(r=>setTimeout(r,100));
+  }
+  requireState(false,'OWNER_HANDOFF_EXTERNAL_EVIDENCE_MISSING',JSON.stringify(evidence||{}));
+}
+
 async function validateServedRuntimeScripts(page, { report, bounded, requireState }) {
   const paths = [
     '/core/session-multirol-visibility-v20260716.js',
@@ -265,10 +281,7 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
     return Boolean(form && form.dataset.authMode === 'firestore-lab');
   }, null, { timeout: 20000, polling: 250 }), 24000);
 
-  await approveStage(report, bounded, 'canonical_owner_handoff_ready', () => page.waitForFunction(() => {
-    return Boolean(window.Orbit && Orbit.store && Orbit.router && Orbit.auth &&
-      typeof Orbit.auth.loginFirebase === 'function');
-  }, null, { timeout: 20000, polling: 250 }), 24000);
+  await approveStage(report, bounded, 'canonical_owner_handoff_ready', () => waitForOwnerHandoffEvidence(report, requireState), 24000);
 
   await approveStage(report, bounded, 'canonical_pwa_controller_ready', () => waitForPwaController(page, report, requireState), 26000);
 

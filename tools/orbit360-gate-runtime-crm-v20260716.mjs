@@ -7,7 +7,7 @@ import { readGateEnvironment } from './orbit360-gate-environment-v20260717.mjs';
 const { baseUrl, email, accessValue:key, runtime }=readGateEnvironment();
 const dirs=['orbit360-platform/runtime-gate-crm-v20260716','orbit360-platform/runtime-gate-aseguradoras-v20260716'];
 const mapped=/Aseguradora Guatemalteca|AseGuate|Seguros BAM|Aseguradora Rural|Banrural|Bantrab|Seguros Columna|Seguros Universales/i;
-const report={schemaVersion:'orbit360-runtime-gate-joint-v19-preauth-fail-closed',gateId:'block1-client360-insurers-lab-v20260717',contractVersion:'1.0.19',runtimeVersion:runtime,generatedAt:new Date().toISOString(),containsPII:false,containsSecrets:false,stage:'bootstrap',checks:{}};
+const report={schemaVersion:'orbit360-runtime-gate-joint-v20-owner-handoff-external-evidence',gateId:'block1-client360-insurers-lab-v20260717',contractVersion:'1.0.20',runtimeVersion:runtime,generatedAt:new Date().toISOString(),containsPII:false,containsSecrets:false,stage:'bootstrap',checks:{}};
 if(!/^https:\/\//.test(baseUrl))throw new Error('BLOQUEO_PREVIEW_URL');
 if(key.length<12)throw new Error('BLOQUEO_ACCESO_LAB');
 if(!/^\d{8}-\d+$/.test(runtime))throw new Error('BLOQUEO_RUNTIME_VERSION');
@@ -124,7 +124,7 @@ await cdp.send('Runtime.enable');
 await cdp.send('Debugger.enable');
 cdp.on('Debugger.scriptParsed',event=>{
   const path=diagnosticPath(event&&event.url);
-  if(!/client-canonical-view-projection|tenant-insurer-config|tenant-runtime-config-index|session-multirol-visibility/.test(path))return;
+  if(!/data\/store\.js|core\/router\.js|core\/auth\.js|client-canonical-view-projection|tenant-insurer-config|tenant-runtime-config-index|session-multirol-visibility/.test(path))return;
   if(report.browserParseDiagnostics.parsedScripts.length>=16)return;
   report.browserParseDiagnostics.parsedScripts.push({path,line:Number(event&&event.startLine||0)+1,length:Number(event&&event.length||0)});
 });

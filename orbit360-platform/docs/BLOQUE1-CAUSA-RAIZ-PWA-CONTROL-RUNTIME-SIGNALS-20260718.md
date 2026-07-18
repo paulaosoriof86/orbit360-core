@@ -63,3 +63,15 @@ El contenido 1.0.19 fue validado y publicado sin mutar workflows mediante GITHUB
 HEAD limpio previo: 6ee7f69f4740ca73d37422f521e842c1c420c23d.
 
 Esta actualización documental solicita una única ejecución del workflow existente Orbit 360 Clientes y Aseguradoras Runtime Gate 20260717. El preflight contractual debe ejecutarse primero y solo una evidencia sanitizada con ok:true permite cerrar M1 y pasar a la revisión visual.
+
+## Reconciliación 1.0.20
+
+Clasificación: VALIDATOR_STALE.
+
+La corrida 1.0.19 aprobó preflight, owners estáticos, credenciales LAB, conteos, publicación del canal, PWA controlada, proveedor Auth e interfaz Auth. El fallo ocurrió en un evaluador que volvió a comprobar Store, Router y Auth después de que canonical_auth_ui_ready ya había probado la secuencia canónica Orbit.store.init → Orbit.router.init → Orbit.auth.init.
+
+El producto queda congelado. La versión 1.0.20 modifica únicamente el gate: amplía el observador CDP instalado antes de la navegación para registrar por separado data/store.js, core/router.js y core/auth.js; combina esa evidencia con canonical_auth_ui_ready; y elimina el evaluador duplicado. Cualquier fallo de parseo o ausencia de evidencia permanece fail-closed.
+
+Carriles: Cliente 360 y Aseguradoras sin cambios; backend protegido preservado; 414 clientes, 26 aseguradoras y 7 asesores sin reimportación. Claude: BACKEND_PROTEGIDO_NO_CLAUDE. Academia: distinguir VALIDATOR_STALE de FUNCTIONAL_DEFECT y congelar producto cuando la evidencia previa ya demuestra el contrato funcional.
+
+Salida: preflight vinculante primero; después el mismo gate una sola vez; cierre únicamente con resultado sanitizado ok:true.
