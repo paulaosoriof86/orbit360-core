@@ -1,10 +1,11 @@
 function sanitizeDiagnostic(value) {
   return String(value || '')
+    .replace(/https?:\/\/[^/\s]+/g, '')
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email]')
     .replace(/[A-Za-z0-9_-]{48,}/g, '[redacted]')
     .replace(/\s+/g, ' ')
     .trim()
-    .slice(0, 180);
+    .slice(0, 420);
 }
 
 function safePath(rawUrl) {
@@ -18,6 +19,7 @@ function safePath(rawUrl) {
 
 export function installBootstrapDiagnostics(page, report) {
   const diagnostic = report.bootstrapTransportDiagnostic = {
+    currentUrl: page.url(),
     lastRequestStarted: null,
     lastRequestFinished: null,
     lastFailedRequest: null,
@@ -26,18 +28,21 @@ export function installBootstrapDiagnostics(page, report) {
   };
 
   page.on('request', request => {
+    diagnostic.currentUrl = page.url();
     diagnostic.lastRequestStarted = {
       path: safePath(request.url()),
       resourceType: request.resourceType()
     };
   });
   page.on('requestfinished', request => {
+    diagnostic.currentUrl = page.url();
     diagnostic.lastRequestFinished = {
       path: safePath(request.url()),
       resourceType: request.resourceType()
     };
   });
   page.on('requestfailed', request => {
+    diagnostic.currentUrl = page.url();
     diagnostic.lastFailedRequest = {
       path: safePath(request.url()),
       resourceType: request.resourceType(),
@@ -55,7 +60,8 @@ export function installBootstrapDiagnostics(page, report) {
     if (diagnostic.pageErrors.length >= 8) return;
     diagnostic.pageErrors.push({
       name: sanitizeDiagnostic(error && error.name),
-      message: sanitizeDiagnostic(error && error.message)
+      message: sanitizeDiagnostic(error && error.message),
+      stack: sanitizeDiagnostic(error && error.stack)
     });
   });
 }
@@ -67,13 +73,15 @@ async function approveStage(report, bounded, name, task, timeoutMs) {
 
 export async function waitForProductBootstrap(page, { runtime, bounded, requireState, report }) {
   if (!report.bootstrapTransportDiagnostic) installBootstrapDiagnostics(page, report);
+  report.bootstrapTransportDiagnostic.currentUrl = page.url();
 
-  await approveStage(report, bounded, 'canonical_url_ready', () => page.waitForURL(url => {
-    return /\/index\.html$/.test(url.pathname) &&
-      url.searchParams.get('orbitBackend') === 'firestore-lab' &&
-      url.searchParams.get('tenant') === 'alianzas-soluciones' &&
-      url.searchParams.get('runtime') === runtime;
-  }, { timeout: 15000 }), 18000);
+  await approveStage(report, bounded, 'canonical_url_ready', async () => {
+    const url = new URL(page.url());
+    requireState(/\/index\.html$/.test(url.pathname), 'CANONICAL_INDEX_NOT_REACHED', url.pathname);
+    requireState(url.searchParams.get('orbitBackend') === 'firestore-lab', 'CANONICAL_BACKEND_MISSING');
+    requireState(url.searchParams.get('tenant') === 'alianzas-soluciones', 'CANONICAL_TENANT_MISSING');
+    requireState(url.searchParams.get('runtime') === runtime, 'CANONICAL_RUNTIME_MISMATCH', url.searchParams.get('runtime') || 'missing');
+  }, 5000);
 
   report.checks.canonicalDocumentParsed = true;
 
