@@ -8,7 +8,9 @@ on:
       - ".github/workflows/orbit360-diagnose-auth-ui-dom-v1020.yml"
 
 permissions:
-  contents: write
+  contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   diagnose:
@@ -32,7 +34,7 @@ jobs:
           import { chromium } from 'playwright';
           import { writeFileSync } from 'node:fs';
           const url='https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2#/aseguradoras';
-          const report={schemaVersion:'orbit360-auth-ui-dom-diagnostic-v3',containsPII:false,containsSecrets:false,urlPath:'/index.html',startedAt:new Date().toISOString(),events:[],requests:[],responses:[],pageErrors:[],result:null,diagnosticError:null};
+          const report={schemaVersion:'orbit360-auth-ui-dom-diagnostic-v4',containsPII:false,containsSecrets:false,urlPath:'/index.html',startedAt:new Date().toISOString(),events:[],requests:[],responses:[],pageErrors:[],result:null,diagnosticError:null};
           const started=Date.now();
           const pathOf=v=>{try{return new URL(v).pathname}catch{return ''}};
           let browser=null;
@@ -81,13 +83,20 @@ jobs:
           }
           NODE
           node /tmp/diagnose-auth-ui.mjs || true
-      - name: Persistir diagnóstico sanitizado
+      - name: Publicar resumen sanitizado en PR 5
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          cp orbit360-auth-ui-diagnostic/diagnostic.json .github/orbit360-auth-ui-dom-diagnostic-v1020.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/orbit360-auth-ui-dom-diagnostic-v1020.json
-          git commit -m "chore(block1): record Auth UI DOM diagnostic [skip ci]"
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          compact="$(jq -c '{schemaVersion,containsPII,containsSecrets,diagnosticError,result,pageErrorCount:(.pageErrors|length),requestCount:(.requests|length),responseCount:(.responses|length),firstReadyEvent:([.events[]|select(.authMode=="firestore-lab")][0]//null),lastEvent:(.events[-1]//null)}' orbit360-auth-ui-diagnostic/diagnostic.json)"
+          body="## Diagnóstico sanitizado · Auth UI DOM · 1.0.20
+
+Clasificación en evaluación: VALIDATOR_STALE vs FUNCTIONAL_DEFECT.
+
+\`\`\`json
+${compact}
+\`\`\`
+
+Sin PII, secretos ni capturas. No modifica producto, datos, Auth, Router, Store ni reglas."
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$body"
