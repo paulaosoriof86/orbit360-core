@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-18",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "classification": "FUNCTIONAL_DEFECT",
+  "diagnosticRevision": "router-shell-tenant-bootstrap-v1",
+  "canonicalOwners": [
+    {
+      "id": "routerTenantBootstrap",
+      "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "requiredTokens": [
+        "owner: 'core/router.js'",
+        "phase: 'shell-parse'",
+        "sourceResolved: Boolean(source)",
+        "target.origin !== window.location.origin",
+        "data-orbit-router-tenant-bootstrap",
+        "document.write"
+      ]
+    }
+  ],
+  "requiredFiles": [
+    "orbit360-platform/core/router-tenant-config-bootstrap.js"
+  ],
+  "runtimeGraphFiles": [
+    "orbit360-platform/core/router-tenant-config-bootstrap.js"
+  ],
+  "runtimeVersionContracts": [
+    {
+      "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "requiredTokens": [
+        "owner: 'core/router.js'",
+        "phase: 'shell-parse'",
+        "target.origin !== window.location.origin",
+        "data-orbit-router-tenant-bootstrap"
+      ]
+    },
+    {
+      "path": "orbit360-platform/index.html",
+      "requiredTokens": [
+        "core/tenant-insurer-config-p10.js?v=20260717-1",
+        "data/tenant-runtime-config-index.js?v=20260717-1",
+        "core/router-tenant-config-bootstrap.js?v=20260718-1"
+      ]
+    }
+  ],
+  "preserved": [
+    "Orbit.store API",
+    "core/auth.js",
+    "Firestore rules",
+    "Cliente 360 renderer",
+    "Aseguradoras renderer",
+    "414 clientes",
+    "26 aseguradoras",
+    "7 asesores"
+  ]
+}
