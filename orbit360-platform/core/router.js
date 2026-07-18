@@ -237,10 +237,10 @@ Orbit.router = (function () {
         next(); return;
       }
 
-      let script = document.querySelector('script[' + item.marker + ']');
       let settled = false;
       let poll = null;
       let cutoff = null;
+      let markerNode = document.querySelector('script[' + item.marker + ']');
       function finish(status) {
         if (settled) return;
         settled = true;
@@ -255,29 +255,47 @@ Orbit.router = (function () {
       function checkReady() {
         if (contractReady(item)) finish('ready');
       }
-      function attach(node) {
-        node.addEventListener('load', function () { state.loadEvent = true; runtimeSignal('contract-loaded', item.marker); checkReady(); }, { once: true });
-        node.addEventListener('error', function () { state.errorEvent = true; runtimeSignal('contract-load-error', item.marker); finish('error'); }, { once: true });
+      function ensureMarker() {
+        if (markerNode) return markerNode;
+        markerNode = document.createElement('script');
+        markerNode.type = 'application/json';
+        markerNode.setAttribute(item.marker, '1');
+        markerNode.setAttribute('data-orbit-runtime-owner', 'router');
+        markerNode.textContent = '{}';
+        document.head.appendChild(markerNode);
+        return markerNode;
       }
-
-      if (!script) {
-        script = document.createElement('script');
-        script.src = src;
-        script.async = false;
-        script.setAttribute(item.marker, '1');
-        state.status = 'loading';
+      function loadDeterministically() {
+        const target = new URL(src, window.location.href);
+        if (target.origin !== window.location.origin) {
+          state.errorCode = 'cross-origin';
+          runtimeSignal('contract-load-error', item.marker);
+          finish('cross-origin');
+          return;
+        }
+        ensureMarker();
+        state.status = 'importing';
+        state.executionMode = 'dynamic-import';
         runtimeSignal('contract-requested', item.marker);
-        attach(script);
-        document.head.appendChild(script);
-      } else {
-        state.status = 'existing-marker';
-        attach(script);
+        import(target.href).then(function () {
+          if (settled) return;
+          state.loadEvent = true;
+          runtimeSignal('contract-loaded', item.marker);
+          checkReady();
+        }).catch(function (error) {
+          if (settled) return;
+          state.errorEvent = true;
+          state.errorCode = String(error && (error.name || error.message) || 'load-error').replace(/[^a-z0-9_-]/gi, '').slice(0, 80);
+          runtimeSignal('contract-load-error', item.marker);
+          finish('error');
+        });
       }
 
       poll = setInterval(checkReady, 100);
       cutoff = setTimeout(function () {
         finish(contractReady(item) ? 'ready' : 'timeout');
       }, 15000);
+      loadDeterministically();
       checkReady();
     }
     next();
