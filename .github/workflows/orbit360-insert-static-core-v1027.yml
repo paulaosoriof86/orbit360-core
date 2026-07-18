@@ -1,0 +1,32 @@
+name: Orbit 360 Insert Static Generic Core
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: [".github/workflows/orbit360-insert-static-core-v1027.yml"]
+permissions:
+  contents: write
+jobs:
+  insert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Insertar dependencias estables
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -c 'from pathlib import Path; p=Path("orbit360-platform/index.html"); s=p.read_text(); a="<script src=\"core/router.js?v1291\"></script><script src=\"core/pwa.js?v1304\"></script>"; b="<script src=\"core/tenant-insurer-config-p10.js?v=20260717-1\"></script><script src=\"data/tenant-runtime-config-index.js?v=20260717-1\"></script>"+a; assert a in s; p.write_text(s if "core/tenant-insurer-config-p10.js?v=20260717-1" in s else s.replace(a,b,1))'
+          test "$(grep -o 'core/tenant-insurer-config-p10.js?v=20260717-1' orbit360-platform/index.html | wc -l)" -eq 1
+          test "$(grep -o 'data/tenant-runtime-config-index.js?v=20260717-1' orbit360-platform/index.html | wc -l)" -eq 1
+          git rm .github/workflows/orbit360-insert-static-core-v1027.yml
+      - name: Publicar
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add orbit360-platform/index.html
+          git commit -m "fix(block1): preload stable generic runtime core"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
