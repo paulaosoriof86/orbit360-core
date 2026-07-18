@@ -240,7 +240,8 @@ Orbit.router = (function () {
       let settled = false;
       let poll = null;
       let cutoff = null;
-      let markerNode = document.querySelector('script[' + item.marker + ']');
+      let script = document.querySelector('script[' + item.marker + ']');
+      if (script) state.status = 'existing-marker';
       function finish(status) {
         if (settled) return;
         settled = true;
@@ -256,14 +257,15 @@ Orbit.router = (function () {
         if (contractReady(item)) finish('ready');
       }
       function ensureMarker() {
-        if (markerNode) return markerNode;
-        markerNode = document.createElement('script');
-        markerNode.type = 'application/json';
-        markerNode.setAttribute(item.marker, '1');
-        markerNode.setAttribute('data-orbit-runtime-owner', 'router');
-        markerNode.textContent = '{}';
-        document.head.appendChild(markerNode);
-        return markerNode;
+        if (script) return script;
+        script = document.createElement('script');
+        script.type = 'application/json';
+        script.async = false;
+        script.setAttribute(item.marker, '1');
+        script.setAttribute('data-orbit-runtime-owner', 'router');
+        script.textContent = '{}';
+        document.head.appendChild(script);
+        return script;
       }
       function loadDeterministically() {
         const target = new URL(src, window.location.href);
