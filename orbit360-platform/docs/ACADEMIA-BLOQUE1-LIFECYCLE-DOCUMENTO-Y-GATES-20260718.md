@@ -1,23 +1,32 @@
-# Academia · Estados terminales de un runtime
+# Academia · Redirecciones y documento canónico en gates
 
 Fecha: 2026-07-18
 
-Un runtime puede terminar de tres formas válidas o bloqueantes:
+Una validación puede navegar primero a una página de entrada y después ser redirigida al documento real de la aplicación. Estos estados no deben confundirse:
 
-1. **Cargado:** el loader ejecuta sus recursos y publica una señal de éxito.
-2. **Controlado:** la configuración desactiva intencionalmente el montaje automático y devuelve una promesa resuelta con estado honesto.
-3. **Error:** el loader publica fallo, contexto bloqueado o recurso no disponible.
+1. `DOMContentLoaded` de la página de entrada.
+2. Cambio de URL hacia el destino.
+3. `DOMContentLoaded` del documento canónico.
+4. Runtime controlado o cargado.
+5. Interfaz lista para el flujo funcional.
 
-Un gate debe reconocer los dos primeros caminos cuando el contrato del owner los permite. Exigir únicamente el evento de carga convierte el validador en obsoleto cuando el runtime está controlado por configuración.
+Comprobar únicamente la URL no garantiza que el segundo documento haya terminado de construirse. Un gate debe registrar el lifecycle antes de navegar y exigir el evento del destino canónico antes de usar selectores o completar formularios.
 
-La clasificación correcta es `VALIDATOR_STALE`: se actualiza el gate y se mantiene congelado el producto.
+Cuando las señales externas funcionan, pero Playwright todavía no puede consultar `body`, el problema puede ser el orden entre documentos y no Auth, credenciales o datos.
+
+Clasificación:
+
+```txt
+PIPELINE_MECHANISM_FAILURE
+```
 
 Evidencia esperada:
 
 ```txt
-canonical_post_router_runtime_terminal: true
-method: external-custom-event-binding
+canonical_domcontentloaded_ready: true
+path: /index.html
+method: playwright-page-event
 beforeAuth: true
 ```
 
-Estados `load_failed`, `error` o `blocked_context` permanecen bloqueantes. La evidencia no incluye datos personales ni credenciales.
+La corrección se limita al gate. Cliente 360, Aseguradoras, Auth, Legal, Store, reglas y datos permanecen intactos.
