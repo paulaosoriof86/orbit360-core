@@ -101,6 +101,29 @@
         "__consumerGatesSeparatedV20260717",
         "knowledgeSources"
       ]
+    },
+    {
+      "id": "insurersAdapterRuntime",
+      "path": "orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js",
+      "requiredTokens": [
+        "function tenantConfigReady()",
+        "waitForRouterOwnedTenantConfig",
+        "tenantConfigOwner: 'core/router.js'",
+        "phase: 'post-router-render'",
+        "autoloadsBeforeRouter: false",
+        "loadTenantConfig();",
+        "loadCatalog();"
+      ]
+    },
+    {
+      "id": "insurersResourcesRuntime",
+      "path": "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js",
+      "requiredTokens": [
+        "loadAysRuntime();",
+        "phase: 'post-router-render'",
+        "autoloadsBeforeRouter: false",
+        "mod.__resourcesRuntimeOwnershipV20260718"
+      ]
     }
   ],
   "retiredRuntimeArtifacts": [
@@ -125,12 +148,12 @@
   "gates": [
     {
       "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.24",
-      "diagnosticRevision": "router-owned-sequential-contract-queue-v1",
+      "contractVersion": "1.0.25",
+      "diagnosticRevision": "single-router-bootstrap-post-render-module-loaders-v1",
       "runtimeVersion": "20260717-2",
       "block": 1,
       "status": "ACTIVE_FUNCTIONAL_FIX",
-      "diagnosticRule": "Router remains the sole runtime-contract owner. With early rendering blocked until Orbit.route exists, its dynamically inserted contracts use async=false so browser execution order is deterministic and matches the explicit next() queue.",
+      "diagnosticRule": "Router is the only owner allowed to load tenant insurer bootstrap contracts. Aseguradoras adapters may observe tenant readiness and may load module-local knowledge resources only from mod.render, after Router contracts have completed.",
       "executionBudget": {
         "type": "derived_operational_critical_path_with_stage_ceiling",
         "baseCriticalPathMs": 750000,
@@ -148,7 +171,7 @@
           "canonical_client_projection_diagnostic_reserve": 10000
         },
         "evidence": {
-          "sourceContractVersion": "1.0.23",
+          "sourceContractVersion": "1.0.24",
           "passedStages": [
             "canonical_auth_ui_ready",
             "canonical_owner_handoff_ready",
@@ -158,18 +181,19 @@
             "canonical_client_projection_ready"
           ],
           "failedStage": "canonical_tenant_insurer_core_ready",
+          "tenantActiveConfigRequestedBeforeRouterContracts": true,
           "tenantCoreRequestedSignal": true,
           "tenantCoreHttpStatus": 200,
           "tenantCoreRequestFinished": true,
           "tenantCoreStaticSyntax": true,
           "tenantCoreBrowserParsed": false,
           "tenantCoreLoadedSignal": false,
-          "nextContractRequested": false,
           "pageErrors": 0,
-          "mechanismFinding": "The external async contract completed transport but remained unparsed and unexecuted inside the owner deadline. The early-render guard from 1.0.22 remains active, so no module auxiliary loader can enter the Router queue before bootstrap completes."
+          "runtimeExceptions": 0,
+          "mechanismFinding": "Two Aseguradoras bridges executed module-local loaders at file evaluation time. The active tenant config and protected knowledge runtime entered the browser ordered script queue before the Router-owned core contract, creating competing bootstrap ownership."
         },
-        "interpretation": "Version 1.0.24 keeps the 1.0.22 ownership guard and the 1.0.23 external observer, but restores deterministic async=false execution exclusively inside the Router-owned next() queue.",
-        "exhaustionPolicy": "Execute 1.0.24 once after GO_GATE_CONTRACT. If canonical_tenant_insurer_core_ready fails again, stop retries and inspect only Router queue state and external parse/load signals.",
+        "interpretation": "Version 1.0.25 preserves Router 1.0.24 and removes only pre-Router autoloads from Aseguradoras bridges. Tenant config is observed, never injected by the adapter. Knowledge and secure-resource runtimes start lazily from mod.render.",
+        "exhaustionPolicy": "Execute 1.0.25 once after GO_GATE_CONTRACT. If canonical_tenant_insurer_core_ready fails again, stop retries and inspect all dynamic script requests that occur before Router start; do not extend budgets or touch Store, Auth, rules, data or renderers.",
         "acceptancePolicy": "Only a sanitized result with ok:true closes M1.",
         "workerControlTimeoutMs": 10000,
         "pwaControllerGateMs": 22000,
@@ -182,26 +206,26 @@
       "reconciliation": {
         "date": "2026-07-18",
         "classifications": [
-          "FUNCTIONAL_DEFECT",
-          "VALIDATOR_STALE"
+          "FUNCTIONAL_DEFECT"
         ],
-        "scope": "Router runtime-contract scheduling plus duplicated version-token registry checks",
-        "rootCause": "After early rendering was already blocked, script.async=true unnecessarily delegated contract execution timing to the browser. The first 1.0.24 preflight then exposed two stale duplicated registry tokens that still required async=true and contract 1.0.23.",
+        "scope": "Aseguradoras bridge bootstrap ownership only",
+        "rootCause": "The Router was declared canonical owner, but aseguradoras-v1197-ux-bridge and aseguradoras-v1202-resources-bridge still loaded tenant/runtime scripts at module evaluation time. Those auxiliary async=false scripts entered the same ordered queue before Router bootstrap completed.",
         "corrections": [
-          "preserve Orbit.route ownership guard",
-          "use async=false only for the Router sequential contract queue",
-          "update canonical owner tokens and runtimeVersionContracts together",
-          "retain explicit next() ordering and runtime signals",
-          "preserve Store, Auth, rules, data and renderers",
-          "run the binding preflight first and the official gate once"
+          "remove tenant config script injection from the v1197 adapter",
+          "make v1197 observe Router-owned tenant config",
+          "move knowledge catalog loading to Aseguradoras render",
+          "move protected resources runtime loading to Aseguradoras render",
+          "register both bridges in gate contracts",
+          "preserve Router, Store, Auth, rules, data and canonical renderers",
+          "run binding preflight first and the official gate once"
         ],
         "openEvidence": [
-          "1.0.24 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
+          "1.0.25 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
         ],
         "preserved": [
           "Orbit.store API",
           "core/auth.js",
-          "backend-lab-canonical-view-sync ownership guard",
+          "core/router.js 1.0.24",
           "Firestore rules",
           "Cliente 360 renderer",
           "Aseguradoras renderer",
@@ -240,7 +264,8 @@
         "tools/orbit360-gate-environment-v20260717.mjs",
         "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-SERVICE-WORKER-WAITUNTIL-20260718.md",
         "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718.md",
-        "orbit360-platform/core/backend-lab-canonical-view-sync.js"
+        "orbit360-platform/core/backend-lab-canonical-view-sync.js",
+        "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js"
       ],
       "runtimeGraphFiles": [
         "orbit360-platform/ays-lab-preview.html",
@@ -259,7 +284,8 @@
         "orbit360-platform/modules/aseguradoras.js",
         "orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js",
         "orbit360-platform/data/tenant-runtime-config-index.js",
-        "orbit360-platform/core/backend-lab-canonical-view-sync.js"
+        "orbit360-platform/core/backend-lab-canonical-view-sync.js",
+        "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js"
       ],
       "runtimeVersionContracts": [
         {
@@ -338,7 +364,7 @@
         {
           "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
           "requiredTokens": [
-            "contractVersion:'1.0.24'",
+            "contractVersion:'1.0.25'",
             "WATCHDOG_BUDGET_MS=900000",
             "OBSERVER_CAPTURE_TIMEOUT_MS=5000",
             "report.failureStage=report.stage",
@@ -424,6 +450,25 @@
             "if (key === 'cliente360' || key === 'aseguradoras') return key",
             "return ''"
           ]
+        },
+        {
+          "path": "orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js",
+          "requiredTokens": [
+            "function tenantConfigReady()",
+            "waitForRouterOwnedTenantConfig",
+            "tenantConfigOwner: 'core/router.js'",
+            "phase: 'post-router-render'",
+            "autoloadsBeforeRouter: false"
+          ]
+        },
+        {
+          "path": "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js",
+          "requiredTokens": [
+            "loadAysRuntime();",
+            "phase: 'post-router-render'",
+            "autoloadsBeforeRouter: false",
+            "mod.__resourcesRuntimeOwnershipV20260718"
+          ]
         }
       ],
       "forbiddenRuntimeReferences": [
@@ -447,7 +492,11 @@
         "setTimeout(attachSnapshots, 1200)",
         "setTimeout(attachSnapshots, 3500)",
         "canonical_tenant_insurer_core_ready', () => page.waitForFunction",
-        "event.waitUntil(refresh.catch"
+        "event.waitUntil(refresh.catch",
+        "TENANT_CONFIG_SRC",
+        "data-asg-tenant-config",
+        "loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+        "loadAysRuntime();\n  const originalRender"
       ],
       "environment": {
         "branch": "ays/backend-tenant-lab-v99-20260703",

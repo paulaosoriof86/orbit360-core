@@ -15,7 +15,6 @@ Orbit.modules = Orbit.modules || {};
   const S = () => Orbit.store;
   const U = Orbit.ui;
   const KNOWLEDGE_SRC = 'data/tenant-alianzas-soluciones-source-batch-p09g.js?v=20260716-2';
-  const TENANT_CONFIG_SRC = 'data/tenant-alianzas-soluciones-insurers-p10.js?v=20260716-2';
   let catalogPromise = null;
   let tenantConfigPromise = null;
 
@@ -72,38 +71,27 @@ Orbit.modules = Orbit.modules || {};
     try { (S().all('aseguradoras') || []).forEach(normalizeRow); } catch (e) {}
   }
 
-  function loadScriptOnce(src, marker, ready) {
-    if (ready()) return Promise.resolve();
-    const existing = document.querySelector('script[' + marker + ']');
-    if (existing) {
-      return new Promise(resolve => {
-        if (ready()) return resolve();
-        existing.addEventListener('load', resolve, { once: true });
-        setTimeout(resolve, 2500);
-      });
-    }
-    return new Promise(resolve => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.async = false;
-      script.setAttribute(marker, '1');
-      script.onload = resolve;
-      script.onerror = resolve;
-      document.head.appendChild(script);
-    });
-  }
+  function tenantConfigReady() {
+  return Array.isArray(window.OrbitTenantInsurerConfigsP10) && window.OrbitTenantInsurerConfigsP10.some(item => item && item.tenantId === 'alianzas-soluciones');
+}
+function loadTenantConfig() {
+  if (tenantConfigReady()) return Promise.resolve(window.OrbitTenantInsurerConfigsP10 || []);
+  if (tenantConfigPromise) return tenantConfigPromise;
+  tenantConfigPromise = new Promise(resolve => {
+    const started = Date.now();
+    (function waitForRouterOwnedTenantConfig() {
+      if (tenantConfigReady()) {
+        window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready'));
+        return resolve(window.OrbitTenantInsurerConfigsP10 || []);
+      }
+      if (Date.now() - started >= 8000) return resolve([]);
+      setTimeout(waitForRouterOwnedTenantConfig, 80);
+    })();
+  });
+  return tenantConfigPromise;
+}
 
-  function loadTenantConfig() {
-    if (tenantConfigPromise) return tenantConfigPromise;
-    tenantConfigPromise = loadScriptOnce(
-      TENANT_CONFIG_SRC,
-      'data-asg-tenant-config',
-      () => Array.isArray(window.OrbitTenantInsurerConfigsP10) && window.OrbitTenantInsurerConfigsP10.some(item => item && item.tenantId === 'alianzas-soluciones')
-    ).then(() => window.OrbitTenantInsurerConfigsP10 || []);
-    return tenantConfigPromise;
-  }
-
-  function loadCatalog() {
+function loadCatalog() {
     if (window.OrbitSourceBatchesP09g) return Promise.resolve(window.OrbitSourceBatchesP09g);
     if (catalogPromise) return catalogPromise;
     catalogPromise = new Promise(resolve => {
@@ -219,14 +207,14 @@ Orbit.modules = Orbit.modules || {};
   }
 
   loadStyle();
-  loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));
-  loadCatalog();
   normalizeAll();
 
   const originalRender = mod.render.bind(mod);
   const originalFicha = mod.ficha.bind(mod);
   const originalKpi = mod.kpi.bind(mod);
   mod.render = function (host) {
+    loadTenantConfig();
+    loadCatalog();
     normalizeAll();
     const out = originalRender(host);
     setTimeout(() => wireProjectionRefresh(host), 0);
@@ -253,6 +241,7 @@ Orbit.modules = Orbit.modules || {};
     canonicalRenderer: 'modules/aseguradoras.js',
     adapter: 'directory-contract-and-knowledge-catalog-v2'
   };
+  mod.__runtimeOwnershipV20260718 = { tenantConfigOwner: 'core/router.js', phase: 'post-router-render', autoloadsBeforeRouter: false };
   mod.__candidateContractAdapter = true;
   Orbit.aseguradorasKnowledgeCatalog = { load: loadCatalog, loadTenantConfig, sourcesFor, bindingSetsFor, open: openKnowledge };
 })();

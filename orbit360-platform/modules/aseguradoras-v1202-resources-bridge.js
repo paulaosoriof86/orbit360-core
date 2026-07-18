@@ -172,12 +172,13 @@ Orbit.modules = Orbit.modules || {};
     host.__resourcesObserverV1202 = observer;
   }
 
-  loadAysRuntime();
   const originalRender = mod.render.bind(mod);
   mod.render = function (host) {
+    loadAysRuntime();
     const out = originalRender(host);
     setTimeout(() => { enhance(host); observe(host); }, 10);
     return out;
   };
+  mod.__resourcesRuntimeOwnershipV20260718 = { phase: 'post-router-render', autoloadsBeforeRouter: false };
   mod.__resourcesV1202 = { originalRender, loadAysRuntime };
 })();
