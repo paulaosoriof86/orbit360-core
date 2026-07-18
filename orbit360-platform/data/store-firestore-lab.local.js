@@ -60,6 +60,7 @@
     snapshotAttachedCount: 0,
     snapshotErrors: {},
     auth: null,
+    authGatedSnapshots: true,
     noFallback: true,
     cache: cache
   };
@@ -474,7 +475,8 @@
   }
 
   function init(){
-    state.status = state.snapshotAttached ? 'ready' : 'waiting-firestore';
+    var user = canonicalAuthUser();
+    state.status = state.snapshotAttached ? 'ready' : (user ? 'waiting-firestore' : 'waiting-auth');
     return api;
   }
 
@@ -558,7 +560,22 @@
     }
   }
 
+  function canonicalAuthUser(){
+    var user = updateAuthState();
+    var email = String(user && user.email || '').toLowerCase();
+    var uid = String(user && user.uid || '');
+    if (!user || email !== EXPECTED_EMAIL.toLowerCase() || (EXPECTED_UID && uid !== EXPECTED_UID)) return null;
+    return user;
+  }
+
   function attachSnapshots(){
+    var user = canonicalAuthUser();
+    if (!user) {
+      state.status = 'waiting-auth';
+      state.snapshotAttached = false;
+      state.snapshotAttachedCount = 0;
+      return false;
+    }
     if (attachStarted) return state.snapshotAttached;
     attachStarted = true;
 
@@ -617,7 +634,8 @@
     _labStatus: function(){ updateAuthState(); return Object.assign({}, state, { cache: undefined }); },
     _attachSnapshots: attachSnapshots,
     _detachSnapshots: detachSnapshots,
-    __firestoreLabExplicit: true
+    __firestoreLabExplicit: true,
+    __authGatedSnapshots: true
   };
 
   w.Orbit.store = api;
@@ -636,6 +654,7 @@
     expectedEmail: EXPECTED_EMAIL,
     attachLabSnapshots: attachSnapshots,
     detachLabSnapshots: detachSnapshots,
+    authGatedSnapshots: true,
     status: function(){ updateAuthState(); return Object.assign({}, state, { cache: undefined }); }
   });
 
@@ -643,12 +662,7 @@
   w.ORBIT_LAB_COLLECTIONS = COLLECTIONS.slice();
   w.Orbit.__labStore = state;
 
-  state.status = 'installed';
-  updateAuthState();
-
-  setTimeout(attachSnapshots, 0);
-  setTimeout(attachSnapshots, 1200);
-  setTimeout(attachSnapshots, 3500);
+  state.status = canonicalAuthUser() ? 'waiting-firestore' : 'waiting-auth';
 
   log('Store Firestore LAB v1.74 instalado. Tenant:', tenantId);
 })();
