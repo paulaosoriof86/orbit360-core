@@ -1,4 +1,4 @@
-name: Orbit 360 Apply Controlled PWA Runtime Signals 20260718
+name: Orbit 360 Diagnose Controlled PWA Runtime Signals 20260718
 
 on:
   push:
@@ -9,15 +9,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: orbit360-apply-controlled-pwa-runtime-signals-v20260718
+  group: orbit360-diagnose-controlled-pwa-runtime-signals-v20260718
   cancel-in-progress: false
 
 jobs:
-  apply:
-    name: Aplicar cierre atómico PWA + señales runtime 1.0.19
+  diagnose:
+    name: Diagnosticar mecanismo de transformación 1.0.19
     runs-on: ubuntu-latest
     steps:
       - name: Checkout rama autorizada
@@ -26,48 +26,35 @@ jobs:
           ref: ays/backend-tenant-lab-v99-20260703
           fetch-depth: 2
 
-      - name: Verificar base y ejecutar transformación controlada
+      - name: Ejecutar diagnóstico sin escritura persistente
+        id: diagnostic
         shell: bash
         run: |
-          set -euo pipefail
-          test "$(git branch --show-current)" = "ays/backend-tenant-lab-v99-20260703"
-          test -f tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs
-          test -f tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
-          node --check tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs
-          node --check tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
-          node tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
+          set +e
+          mkdir -p orbit360-diagnostic
+          node --check tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs > orbit360-diagnostic/check-patch.log 2>&1
+          CHECK_PATCH=$?
+          node --check tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs > orbit360-diagnostic/check-close.log 2>&1
+          CHECK_CLOSE=$?
+          PATCH_EXIT=99
+          if [ "$CHECK_PATCH" -eq 0 ] && [ "$CHECK_CLOSE" -eq 0 ]; then
+            node tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs > orbit360-diagnostic/patch.log 2>&1
+            PATCH_EXIT=$?
+          fi
+          git status --short > orbit360-diagnostic/status.txt
+          node -e "const fs=require('fs'); const read=p=>fs.existsSync(p)?fs.readFileSync(p,'utf8'):''; const clean=s=>String(s).replace(/\/home\/runner\/work\/[^\s]+/g,'[workspace]').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').slice(-12000); fs.writeFileSync('orbit360-diagnostic/diagnostic.json',JSON.stringify({ok:false,classification:'PIPELINE_MECHANISM_FAILURE',checkPatch:Number(process.argv[1]),checkClose:Number(process.argv[2]),patchExit:Number(process.argv[3]),patchLog:clean(read('orbit360-diagnostic/patch.log')),checkPatchLog:clean(read('orbit360-diagnostic/check-patch.log')),checkCloseLog:clean(read('orbit360-diagnostic/check-close.log')),changedFiles:read('orbit360-diagnostic/status.txt').trim().split(/\r?\n/).filter(Boolean)},null,2));" "$CHECK_PATCH" "$CHECK_CLOSE" "$PATCH_EXIT"
+          echo "patch_exit=$PATCH_EXIT" >> "$GITHUB_OUTPUT"
+          exit 0
 
-      - name: Retirar staging temporal en el mismo cierre
+      - name: Publicar diagnóstico sanitizado
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-diagnostic-controlled-pwa-runtime-signals-v20260718
+          path: orbit360-diagnostic/diagnostic.json
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Marcar diagnóstico si el mecanismo falló
+        if: steps.diagnostic.outputs.patch_exit != '0'
         shell: bash
-        run: |
-          set -euo pipefail
-          rm -f tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs
-          rm -f tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs
-          rm -f .github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718.yml
-
-      - name: Validar sintaxis, alcance y contrato vinculante
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check orbit360-platform/sw.js
-          node --check orbit360-platform/core/pwa.js
-          node --check orbit360-platform/core/router.js
-          node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
-
-          allowed='^(orbit360-platform/core/pwa\.js|orbit360-platform/core/router\.js|orbit360-platform/sw\.js|tools/orbit360-gate-bootstrap-auth-legal-v20260717\.mjs|tools/orbit360-gate-runtime-crm-v20260716\.mjs|tools/orbit360-gate-contract-registry-v20260717\.json|orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718\.md|tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718\.mjs|tools/orbit360-close-controlled-pwa-runtime-signals-v20260718\.mjs|\.github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718\.yml)$'
-          unexpected="$(git status --short | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
-          test -z "$unexpected" || { echo "UNEXPECTED_FILES"; echo "$unexpected"; exit 1; }
-
-      - name: Commit y push del cierre 1.0.19
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          test -n "$(git status --short)"
-          git commit -m "fix(block1): control PWA and externalize runtime signals 1.0.19"
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+        run: exit 1
