@@ -117,17 +117,19 @@
     ".github/workflows/orbit360-apply-gate-version-v1018-20260718.yml",
     "tools/orbit360-patch-controlled-pwa-runtime-signals-v20260718.mjs",
     "tools/orbit360-close-controlled-pwa-runtime-signals-v20260718.mjs",
-    ".github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718.yml"
+    ".github/workflows/orbit360-apply-controlled-pwa-runtime-signals-v20260718.yml",
+    "tools/orbit360-patch-external-contract-observer-v1023.mjs",
+    "tools/orbit360-patch-gate-registry-v1023.mjs"
   ],
   "gates": [
     {
       "gateId": "block1-client360-insurers-lab-v20260717",
-      "contractVersion": "1.0.22",
-      "diagnosticRevision": "router-owned-contract-queue-v1",
+      "contractVersion": "1.0.23",
+      "diagnosticRevision": "external-only-contract-observer-v1",
       "runtimeVersion": "20260717-2",
       "block": 1,
-      "status": "ACTIVE_ROOT_CAUSE_FIX",
-      "diagnosticRule": "Only Router may begin canonical route rendering. Router-owned runtime contracts use explicit next() sequencing with async scripts and must not join the global ordered queue created by unrelated module loaders.",
+      "status": "ACTIVE_PIPELINE_MECHANISM_FIX",
+      "diagnosticRule": "Observe PWA, Router and runtime contracts only through browser-external requests, responses, requestfinished events, console runtime signals and Debugger parse events. Never accumulate uncancelled Runtime.evaluate calls while waiting for the same page thread to execute a contract.",
       "executionBudget": {
         "type": "derived_operational_critical_path_with_stage_ceiling",
         "baseCriticalPathMs": 750000,
@@ -145,7 +147,7 @@
           "canonical_client_projection_diagnostic_reserve": 10000
         },
         "evidence": {
-          "sourceContractVersion": "1.0.21",
+          "sourceContractVersion": "1.0.22",
           "passedStages": [
             "canonical_auth_ui_ready",
             "canonical_owner_handoff_ready",
@@ -155,45 +157,52 @@
             "canonical_client_projection_ready"
           ],
           "failedStage": "canonical_tenant_insurer_core_ready",
+          "tenantCoreRequestedSignal": true,
           "tenantCoreHttpStatus": 200,
           "tenantCoreRequestFinished": true,
           "tenantCoreStaticSyntax": true,
           "tenantCoreBrowserParsed": false,
-          "tenantCoreLoadSignal": false,
+          "tenantCoreLoadedSignal": false,
           "nextContractRequested": false,
+          "runtimeOwnerDiagnostic": "evaluationTimeout:true",
           "pageErrors": 0,
-          "rootInference": "The contract downloaded successfully but never entered scriptParsed or load. backend-lab-canonical-view-sync may render from location.hash before Router ownership and Aseguradoras loaders insert unrelated async=false scripts. Router also marked its explicitly sequenced contracts async=false, placing them in that shared ordered queue."
+          "mechanismFinding": "waitForRuntimeContractOwner launched a new page.evaluate every 250 ms after Promise.race returned its one-second timeout. The timed-out evaluations were not cancelled. The client projection, PWA, Router and loader observers used the same pattern, allowing a backlog of Runtime.evaluate commands to compete with the page thread that needed to execute the downloaded contract."
         },
-        "interpretation": "This is a product bootstrap defect, not a validator timeout. Version 1.0.22 gates early canonical rendering on Orbit.route and isolates Router-owned contracts from unrelated ordered dynamic scripts. Existing watchdog and stage budgets remain unchanged.",
-        "exhaustionPolicy": "Run once after GO_GATE_CONTRACT. If tenant core again returns 200 without scriptParsed or contract-loaded, stop retries and inspect only contract-requested/loaded signals, browserParseDiagnostics and the list of earlier dynamic scripts. Do not alter data, Auth, Store, Firestore rules or renderers.",
-        "acceptancePolicy": "Only sanitized ok:true closes the gate.",
+        "interpretation": "Product code remains frozen at the architecturally valid 1.0.22 Router ownership fix. Version 1.0.23 changes only the gate observer and preserves the 900000 ms watchdog, the 450000 ms client projection budget and every existing fail-closed condition.",
+        "exhaustionPolicy": "Execute 1.0.23 once after GO_GATE_CONTRACT. If canonical_tenant_insurer_core_ready fails again, stop all retries and inspect only browser-external requests, responses, requestfinished events, runtime signals and Debugger parse evidence. Do not add page evaluators or modify product, Store, Auth, Router, data, rules or renderers.",
+        "acceptancePolicy": "Only a sanitized result with ok:true closes M1.",
         "workerControlTimeoutMs": 10000,
         "pwaControllerGateMs": 22000,
         "routerSignalWaitMs": 24000,
         "ownerHandoffExternalEvidenceMs": 24000,
-        "authUiExternalEvidenceMs": 24000
+        "authUiExternalEvidenceMs": 24000,
+        "externalObserverPollingMs": 100,
+        "runtimeEvaluateBacklogAllowed": 0
       },
       "reconciliation": {
         "date": "2026-07-18",
         "classifications": [
-          "FUNCTIONAL_DEFECT"
+          "PIPELINE_MECHANISM_FAILURE"
         ],
-        "scope": "Router bootstrap ownership and dynamic runtime contract scheduling",
-        "rootCause": "The LAB canonical view synchronizer could render Aseguradoras directly from the URL hash before Router completed its runtime contracts. That render can start independent async=false loaders. Router contracts were also async=false despite having their own explicit sequential next() controller, so they shared the global ordered dynamic-script queue. The tenant core downloaded but remained unexecuted behind that queue.",
+        "scope": "Bootstrap observer and runtime-contract readiness mechanism only",
+        "rootCause": "Promise.race bounded the caller but did not cancel page.evaluate. Repeated polling accumulated unresolved Runtime.evaluate commands on the same browser thread that had to execute the runtime contracts. The validator could therefore create or amplify the starvation it reported.",
         "corrections": [
-          "make backend-lab-canonical-view-sync recognize only Orbit.route owned by the started Router, never raw location.hash",
-          "keep early snapshot hydration from rendering Cliente 360 or Aseguradoras before Router start",
-          "set Router-owned dynamic contract scripts async=true because next() already enforces canonical dependency order",
-          "emit contract-requested, contract-loaded and contract-load-error signals",
-          "retain all 1.0.19-1.0.21 PWA and external-evidence protections",
-          "run binding preflight first and the same gate once"
+          "freeze product at the accepted 1.0.22 Router ownership and async contract queue correction",
+          "remove repeated page.evaluate fallbacks from PWA, Router, loader-start, client-projection and runtime-owner observers",
+          "use only browser-external requests, responses, requestfinished, runtime signals and Debugger parse evidence for bootstrap contracts",
+          "retain fail-closed behavior for terminal signals, script parse failures, runtime exceptions and page errors",
+          "derive bootstrap stability from previously approved milestones plus router-ready signal",
+          "preserve watchdog and all stage budgets without extension",
+          "run the binding preflight first and the same gate once"
         ],
         "openEvidence": [
-          "1.0.22 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
+          "1.0.23 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
         ],
         "preserved": [
           "Orbit.store API",
           "core/auth.js",
+          "core/router.js 1.0.22 ownership fix",
+          "backend-lab-canonical-view-sync 1.0.22 ownership fix",
           "Firestore rules",
           "Cliente 360 renderer",
           "Aseguradoras renderer",
@@ -330,7 +339,7 @@
         {
           "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
           "requiredTokens": [
-            "contractVersion:'1.0.22'",
+            "contractVersion:'1.0.23'",
             "WATCHDOG_BUDGET_MS=900000",
             "OBSERVER_CAPTURE_TIMEOUT_MS=5000",
             "report.failureStage=report.stage",
@@ -350,8 +359,7 @@
           "requiredTokens": [
             "installBootstrapDiagnostics",
             "waitForRuntimeContractOwner",
-            "terminal = ['error', 'timeout', 'no-source']",
-            "code + '_NOT_READY'",
+            "code + '_EXTERNAL_EVIDENCE_MISSING'",
             "canonical_url_ready",
             "CANONICAL_INDEX_NOT_REACHED",
             "canonical_backend_runtime_ready",
@@ -359,26 +367,30 @@
             "canonical_auth_ui_ready",
             "canonical_owner_handoff_ready",
             "canonical_runtime_contract_loader_started",
-            "if (responseSeen) return;",
-            "setTimeout(() => resolve(false), 1000)",
+            "RUNTIME_CONTRACT_LOADER_EXTERNAL_EVIDENCE_MISSING",
             "CLIENT_PROJECTION_READY_BUDGET_MS = 450000",
             "CLIENT_PROJECTION_DIAGNOSTIC_RESERVE_MS = 10000",
             "canonical_client_projection_ready: CLIENT_PROJECTION_READY_BUDGET_MS",
+            "waitForClientProjectionEvidence",
+            "CLIENT_PROJECTION_EXTERNAL_EVIDENCE_MISSING",
             "marker: 'data-orbit-tenant-insurer-config-core-v20260717'",
             "marker: 'data-orbit-tenant-runtime-index-v20260717'",
             "marker: 'data-orbit-tenant-insurer-config-active-v20260717'",
             "canonical_router_start_ready",
             "canonical_bootstrap_stable",
+            "BOOTSTRAP_ROUTER_SIGNAL_MISSING",
             "bootstrapTransportDiagnostic",
             "stack: sanitizeDiagnostic",
             "preAuthAccessFailClosed",
             "contractRequests",
             "contractFinished",
+            "contractResponses",
             "runtimeSignals",
             "waitForPwaController",
+            "PWA_CONTROLLER_EXTERNAL_EVIDENCE_MISSING",
             "waitForRouterSignal",
+            "ROUTER_READY_EXTERNAL_EVIDENCE_MISSING",
             "nextPathPattern",
-            "evaluationTimeout",
             "canonical_pwa_controller_ready",
             "waitForOwnerHandoffEvidence",
             "ownerHandoffDiagnostic",
@@ -393,7 +405,8 @@
             "canonicalInitOrderEstablished",
             "AUTH_UI_EXTERNAL_EVIDENCE_MISSING",
             "AUTH_UI_OWNER_SCRIPT_PARSE_FAILED",
-            "AUTH_UI_PAGE_ERROR"
+            "AUTH_UI_PAGE_ERROR",
+            "const bootstrapDocumentToken = 'browser-external-evidence-v1'"
           ]
         },
         {
@@ -462,5 +475,13 @@
       }
     }
   ],
-  "temporaryPipelineArtifacts": []
+  "temporaryPipelineArtifacts": [
+    {
+      "path": ".github/workflows/orbit360-apply-external-contract-observer-v1023.yml",
+      "classification": "TEMPORAL_RETIRO",
+      "purpose": "Publish validated external-only gate observer 1.0.23.",
+      "retirementGate": "block1-client360-insurers-lab-v20260717",
+      "retirementAction": "Delete before the unique workflow_dispatch execution and then seal the retirement ledger."
+    }
+  ]
 }

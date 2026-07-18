@@ -97,3 +97,23 @@ Claude: BACKEND_PROTEGIDO_NO_CLAUDE. Patrón reusable acumulado: no mezclar scri
 Academia: documentar propiedad de bootstrap, diferencia entre descarga y ejecución de scripts, y cómo distinguir FUNCTIONAL_DEFECT de VALIDATOR_STALE.
 
 Salida: preflight vinculante primero; después el mismo gate una sola vez; cierre únicamente con evidencia sanitizada ok:true.
+
+
+## Reconciliación 1.0.23 · observador externo sin backlog
+
+Clasificación: PIPELINE_MECHANISM_FAILURE.
+
+La versión 1.0.22 conservó el avance de PWA, Auth UI, handoff, sintaxis, loader y proyección de 414 clientes. El contrato core de aseguradoras volvió a responder HTTP 200 y a finalizar su descarga, pero el diagnóstico del owner terminó como evaluationTimeout. La revisión del gate encontró que cada timeout de Promise.race liberaba al bucle sin cancelar el page.evaluate subyacente; el bucle lanzaba otra evaluación cada 250 ms. La cola acumulada competía con el mismo hilo de navegador que debía ejecutar el contrato.
+
+La 1.0.23 congela producto y reemplaza únicamente observadores del gate. PWA, inicio del loader, proyección, owners runtime, Router y estabilidad del bootstrap se prueban mediante eventos externos: request, response, requestfinished, señales ORBIT360_RUNTIME_SIGNAL y Debugger.scriptParsed/scriptFailedToParse. No se acumulan evaluaciones dentro de la página. Se mantiene fail-closed ante señales terminales, errores de parseo, excepciones o pageErrors.
+
+Carriles:
+- A: Cliente 360 y Aseguradoras preservados; no cambian renderers ni UX.
+- B: solo helper del gate, ejecutor, registro y evidencia; Store, Auth, Router 1.0.22 y reglas preservados.
+- C: 414 clientes, 26 aseguradoras y 7 asesores sin reimportación ni escritura.
+
+Claude: BACKEND_PROTEGIDO_NO_CLAUDE. Patrón reusable acumulado: un timeout de Promise.race no cancela Runtime.evaluate; los observadores de bootstrap deben usar señales externas o cancelar explícitamente su trabajo.
+
+Academia: documentar la diferencia entre limitar la espera del caller y cancelar la operación subyacente, y cómo un validador puede causar la inanición que intenta medir.
+
+Salida: preflight vinculante primero; mismo gate una sola vez; cierre exclusivamente con evidencia sanitizada ok:true.
