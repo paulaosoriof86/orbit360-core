@@ -51,6 +51,7 @@ async function waitForPostRouterRuntime(){
     while(Date.now()<deadline){
       const signals=[].concat(report.postRouterRuntimeSignals||[]);
       const terminal=signals.find(item=>item&&(
+        item.name==='orbit:aseguradoras:runtime-controlled'||
         item.name==='orbit:aseguradoras:tenant-runtime-linked'||
         item.name==='orbit:aseguradoras:tenant-runtime-error'
       ));
@@ -142,6 +143,30 @@ await page.addInitScript(() => {
     'orbit:aseguradoras:tenant-runtime-linked',
     'orbit:aseguradoras:tenant-runtime-error'
   ].forEach(name=>window.addEventListener(name,forwardRuntimeEvent));
+  let controlledObserved=false;
+  const observeControlledRuntime=()=>{
+    if(controlledObserved)return;
+    const pending=window.__orbitAysKnowledgeRuntimePromise;
+    if(!pending)return;
+    controlledObserved=true;
+    Promise.resolve(pending).then(value=>{
+      try{
+        window.__orbitGatePostRouterRuntime({
+          name:'orbit:aseguradoras:runtime-controlled',
+          status:String(value&&value.status||'controlled')
+        });
+      }catch(error){}
+    },error=>{
+      try{
+        window.__orbitGatePostRouterRuntime({
+          name:'orbit:aseguradoras:tenant-runtime-error',
+          status:String(error&&error.message||error||'error')
+        });
+      }catch(ignore){}
+    });
+  };
+  observeControlledRuntime();
+  const controlledTimer=setInterval(observeControlledRuntime,50);
   let previous='';
   const sample=()=>{
     const marker=document.querySelector('script[data-orbit-client-projection-runtime-v20260716]');
@@ -165,7 +190,7 @@ await page.addInitScript(() => {
   };
   sample();
   const timer=setInterval(sample,50);
-  window.addEventListener('beforeunload',()=>{sample();clearInterval(timer);},{once:true});
+  window.addEventListener('beforeunload',()=>{sample();clearInterval(timer);clearInterval(controlledTimer);},{once:true});
 });
 const cdp=await page.context().newCDPSession(page);
 report.browserParseDiagnostics={failedScripts:[],exceptions:[],parsedScripts:[]};
