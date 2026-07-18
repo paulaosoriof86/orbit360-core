@@ -1,0 +1,40 @@
+name: Orbit 360 Observe M1 Gate 1.0.20
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-observe-m1-gate-v1020.yml"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Registrar corrida workflow_dispatch sin volver a despachar
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml/runs?event=workflow_dispatch&branch=ays%2Fbackend-tenant-lab-v99-20260703&per_page=10" \
+            > /tmp/runs.json
+          jq '[.workflow_runs[] | select(.created_at >= "2026-07-18T16:40:00Z")][0] | {runId:.id,status,conclusion,headSha:.head_sha,createdAt:.created_at,event,workflowName:.name}' /tmp/runs.json > .github/orbit360-m1-gate-v1020-status.json
+          test "$(jq -r '.runId // empty' .github/orbit360-m1-gate-v1020-status.json)" != ""
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/orbit360-m1-gate-v1020-status.json
+          git commit -m "chore(block1): record unique M1 gate run [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
