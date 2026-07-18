@@ -1,0 +1,80 @@
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7392391Z ^[[36;1m  });^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7393250Z ^[[36;1m  page.on('requestfinished',request=>{^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7395072Z ^[[36;1m    report.lastRequestFinished={path:pathOf(request.url()),type:request.resourceType(),ms:ms()};^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7397998Z ^[[36;1m    if(report.lastRequestFinished.path==='/core/novedades.js'&&report.milestones.novedadesFinishedMs==null)report.milestones.novedadesFinishedMs=ms();^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7400254Z ^[[36;1m  });^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7402560Z ^[[36;1m  page.on('response',response=>{if(response.status()>=400&&report.badResponses.length<20)report.badResponses.push({type:'http',path:pathOf(response.url()),status:response.status(),ms:ms()});});^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7406728Z ^[[36;1m  page.on('pageerror',error=>{if(report.pageErrors.length<12)report.pageErrors.push({name:String(error&&error.name||''),message:String(error&&error.message||'').slice(0,240),ms:ms()});});^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7409224Z ^[[36;1m  page.on('console',message=>{^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7410254Z ^[[36;1m    const text=String(message.text()||'');^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7411433Z ^[[36;1m    if(!text.startsWith('ORBIT360_RUNTIME_SIGNAL:'))return;^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7413252Z ^[[36;1m    if(report.runtimeSignals.length<40)report.runtimeSignals.push({text,ms:ms()});^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7415961Z ^[[36;1m    if(text==='ORBIT360_RUNTIME_SIGNAL:router-ready:1'&&report.milestones.routerReadySignalMs==null)report.milestones.routerReadySignalMs=ms();^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7419702Z ^[[36;1m    if(text.includes('ORBIT360_RUNTIME_SIGNAL:contract-requested:')&&report.milestones.firstContractRequestedMs==null)report.milestones.firstContractRequestedMs=ms();^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7422098Z ^[[36;1m  });^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7423594Z ^[[36;1m  try { await page.goto(url,{waitUntil:'commit',timeout:30000}); report.milestones.navigationCommittedMs=ms(); }^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7425987Z ^[[36;1m  catch(error) { report.navigationError=String(error&&error.message||error).slice(0,240); }^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7427596Z ^[[36;1m  const deadline=Date.now()+180000;^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7428587Z ^[[36;1m  while(Date.now()<deadline){^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7429484Z ^[[36;1m    try {^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7430538Z ^[[36;1m      const doc=await cdp.send('DOM.getDocument',{depth:1,pierce:true});^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7432439Z ^[[36;1m      const form=await cdp.send('DOM.querySelector',{nodeId:doc.root.nodeId,selector:'#login-form'});^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7434046Z ^[[36;1m      if(form.nodeId){^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7435324Z ^[[36;1m        const attrs=await cdp.send('DOM.getAttributes',{nodeId:form.nodeId});^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7436792Z ^[[36;1m        for(let i=0;i<attrs.attributes.length;i+=2){^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7439161Z ^[[36;1m          if(attrs.attributes[i]==='data-auth-mode'&&attrs.attributes[i+1]==='firestore-lab'&&report.milestones.authModeReadyMs==null)report.milestones.authModeReadyMs=ms();^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7441397Z ^[[36;1m        }^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7442128Z ^[[36;1m      }^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7442836Z ^[[36;1m    } catch(error) {^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7444208Z ^[[36;1m      if(!report.domError)report.domError=String(error&&error.message||error).slice(0,240);^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7445818Z ^[[36;1m    }^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7447718Z ^[[36;1m    if(report.milestones.authModeReadyMs!=null&&report.milestones.routerParsedMs!=null&&report.milestones.firstContractRequestedMs!=null)break;^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7450089Z ^[[36;1m    await new Promise(resolve=>setTimeout(resolve,250));^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7451173Z ^[[36;1m  }^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7454437Z ^[[36;1m  report.result={complete:Boolean(report.milestones.authModeReadyMs!=null&&report.milestones.routerParsedMs!=null&&report.milestones.firstContractRequestedMs!=null),elapsedMs:ms(),pageErrorCount:report.pageErrors.length,badResponseCount:report.badResponses.length};^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7457975Z ^[[36;1m} catch(error) {^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7459575Z ^[[36;1m  report.diagnosticError={name:String(error&&error.name||''),message:String(error&&error.message||error).slice(0,400)};^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7461440Z ^[[36;1m} finally {^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7463111Z ^[[36;1m  if(browser)await Promise.race([browser.close().catch(()=>{}),new Promise(resolve=>setTimeout(resolve,3000))]);^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7464879Z ^[[36;1m}^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7465952Z ^[[36;1mconsole.log('ORBIT360_BOOTSTRAP_TIMELINE_JSON='+JSON.stringify(report));^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7467231Z ^[[36;1mNODE^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7468003Z ^[[36;1mnode /tmp/measure-bootstrap.mjs^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7468896Z ^[[36;1mexit 1^[[0m
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7516395Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:05:49.7517574Z ##[endgroup]
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6728793Z node:internal/modules/package_json_reader:314
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6729509Z   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6730049Z         ^
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6730273Z 
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6730607Z Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'playwright' imported from /tmp/measure-bootstrap.mjs
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6731271Z     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6732277Z     at packageResolve (node:internal/modules/esm/resolve:768:81)
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6732751Z     at moduleResolve (node:internal/modules/esm/resolve:855:18)
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6733328Z     at defaultResolve (node:internal/modules/esm/resolve:985:11)
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6733957Z     at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6734663Z     at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6735230Z     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6735748Z     at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6736129Z   code: 'ERR_MODULE_NOT_FOUND'
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6736843Z }
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6737061Z 
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6737223Z Node.js v22.23.1
+measure	Medir y publicar resultado compacto en log	2026-07-18T18:06:13.6763771Z ##[error]Process completed with exit code 1.
+measure	Post Run actions/checkout@v4	﻿2026-07-18T18:06:13.6879830Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/[redacted]/
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.6881150Z Post job cleanup.
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7476700Z [command]/usr/bin/git version
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7501616Z git version 2.54.0
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7525551Z Temporarily overriding HOME='[workspace] before making global git config changes
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7527174Z Adding repository directory to the temporary git global config as a safe directory
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7529928Z [command]/usr/bin/git config --global --add safe.directory [workspace]
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7555519Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7579388Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7728950Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7741748Z http.https://github.com/.extraheader
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7748214Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7769511Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7919880Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+measure	Post Run actions/checkout@v4	2026-07-18T18:06:13.7937581Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+measure	Complete job	﻿2026-07-18T18:06:13.8207973Z Cleaning up orphan processes
+measure	Complete job	2026-07-18T18:06:13.8411389Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/[redacted]/
