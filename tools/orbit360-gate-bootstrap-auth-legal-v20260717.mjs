@@ -172,10 +172,14 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
   await approveStage(report, bounded, 'canonical_runtime_contract_loader_started', async () => {
     const deadline = Date.now() + 45000;
     while (Date.now() < deadline) {
-      const ownerReady = await page.evaluate(() => Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function'));
       const responseSeen = [].concat(report.bootstrapTransportDiagnostic && report.bootstrapTransportDiagnostic.contractResponses || [])
         .some(item => /client-canonical-view-projection-v20260716\.js$/.test(String(item && item.path || '')) && Number(item.status || 0) < 400);
-      if (ownerReady || responseSeen) return;
+      if (responseSeen) return;
+      const ownerReady = await Promise.race([
+        page.evaluate(() => Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function')),
+        new Promise(resolve => setTimeout(() => resolve(false), 1000))
+      ]);
+      if (ownerReady) return;
       await page.waitForTimeout(100);
     }
     requireState(false, 'RUNTIME_CONTRACT_LOADER_NOT_OBSERVED');
