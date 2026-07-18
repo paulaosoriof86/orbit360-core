@@ -1,19 +1,16 @@
-# Academia · Owners dinámicos y gates funcionales
+# Academia · Estados terminales de un runtime
 
 Fecha: 2026-07-18
 
-Un gate debe distinguir cuatro estados:
+Un runtime puede terminar de tres formas válidas o bloqueantes:
 
-1. Bootstrap y Router listos.
-2. Loader post-Router iniciado.
-3. Loader post-Router terminado mediante su señal propia.
-4. Interfaz lista para interacción funcional.
+1. **Cargado:** el loader ejecuta sus recursos y publica una señal de éxito.
+2. **Controlado:** la configuración desactiva intencionalmente el montaje automático y devuelve una promesa resuelta con estado honesto.
+3. **Error:** el loader publica fallo, contexto bloqueado o recurso no disponible.
 
-`router-ready` no significa que todos los loaders dinámicos hayan terminado. Tampoco debe usarse `window.load` como sustituto, porque recursos adicionales pueden mantener abierto el lifecycle global sin impedir que el shell cumpla su contrato.
+Un gate debe reconocer los dos primeros caminos cuando el contrato del owner los permite. Exigir únicamente el evento de carga convierte el validador en obsoleto cuando el runtime está controlado por configuración.
 
-Cada loader debe publicar un evento terminal de éxito o error. El gate observa ese evento desde fuera y después prueba el flujo visible real.
-
-Cuando producto y datos están correctos, pero la prueba usa una condición de espera que no pertenece al owner, la clasificación es `PIPELINE_MECHANISM_FAILURE`. Se corrige el gate, no Auth, Store, Router, módulos ni datos.
+La clasificación correcta es `VALIDATOR_STALE`: se actualiza el gate y se mantiene congelado el producto.
 
 Evidencia esperada:
 
@@ -23,4 +20,4 @@ method: external-custom-event-binding
 beforeAuth: true
 ```
 
-La evidencia permanece sanitizada y no incluye datos personales ni credenciales.
+Estados `load_failed`, `error` o `blocked_context` permanecen bloqueantes. La evidencia no incluye datos personales ni credenciales.
