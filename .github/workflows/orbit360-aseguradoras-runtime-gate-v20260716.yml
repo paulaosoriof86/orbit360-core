@@ -140,12 +140,44 @@ jobs:
           set -euo pipefail
           CANONICAL_RUNTIME_VERSION="$ORBIT360_EXPECTED_RUNTIME"
           DEPLOY_JSON="${RUNNER_TEMP}/firebase-lab-preview.json"
+          DIAG_DIR="orbit360-platform/runtime-gate-crm-v20260716"
+          DIAG_FILE="$DIAG_DIR/deploy-diagnostic-sanitized.json"
+          mkdir -p "$DIAG_DIR"
+          PHASE="initializing"
+          URL=""
+          write_diag() {
+            local ok="$1"
+            local exit_code="$2"
+            local firebase_code=""
+            if [ -f "$DEPLOY_JSON" ]; then
+              firebase_code="$(jq -r '.error.code // .status // empty' "$DEPLOY_JSON" 2>/dev/null | head -n 1 | tr -cd 'A-Za-z0-9_.:-' | cut -c1-80 || true)"
+            fi
+            jq -n \
+              --arg phase "$PHASE" \
+              --arg firebaseCode "$firebase_code" \
+              --argjson ok "$ok" \
+              --argjson exitCode "$exit_code" \
+              --argjson urlFound "$(test -n "$URL" && echo true || echo false)" \
+              '{schemaVersion:"orbit360-deploy-diagnostic-v1",containsPII:false,containsSecrets:false,ok:$ok,phase:$phase,exitCode:$exitCode,firebaseCode:$firebaseCode,urlFound:$urlFound}' \
+              > "$DIAG_FILE"
+          }
+          on_error() {
+            local code=$?
+            trap - ERR
+            write_diag false "$code"
+            echo "ORBIT360_DEPLOY_PHASE_FAILED:${PHASE}:exit=${code}"
+            exit "$code"
+          }
+          trap on_error ERR
+
+          PHASE="firebase_channel_deploy"
           npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab \
             --project "$FIREBASE_PROJECT_ID" \
             --expires 30d \
             --non-interactive \
             --json | tee "$DEPLOY_JSON"
 
+          PHASE="channel_url_discovery"
           URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$DEPLOY_JSON" | head -n 1)"
           if [ -z "$URL" ]; then
             echo "BLOQUEO_URL_CANAL_LAB_NO_ENCONTRADA"
@@ -157,7 +189,9 @@ jobs:
             *) echo "BLOQUEO_URL_NO_CORRESPONDE_AL_CANAL_LAB"; exit 48 ;;
           esac
 
+          PHASE="runtime_build_fetch"
           BUILD_JSON="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/runtime-build.json")"
+          PHASE="runtime_build_assert"
           DEPLOYED_SHA="$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty')"
           DEPLOYED_RUN="$(printf '%s' "$BUILD_JSON" | jq -r '.run // empty')"
           DEPLOYED_GATE="$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty')"
@@ -167,15 +201,20 @@ jobs:
           test "$DEPLOYED_GATE" = "$ORBIT360_GATE_ID"
           test "$DEPLOYED_RUNTIME" = "$CANONICAL_RUNTIME_VERSION"
 
+          PHASE="runtime_sources_fetch"
           LOADER_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/core/backend-lab-loader.js")"
           PREVIEW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/ays-lab-preview.html")"
           SW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/sw.js")"
           PWA_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/core/pwa.js")"
+          PHASE="runtime_sources_assert"
           printf '%s' "$LOADER_SOURCE" | grep -Fq "var LAB_RUNTIME = '$CANONICAL_RUNTIME_VERSION'"
           printf '%s' "$PREVIEW_SOURCE" | grep -Fq "runtime=$CANONICAL_RUNTIME_VERSION"
           printf '%s' "$SW_SOURCE" | grep -Fq "var BUILD = '$CANONICAL_RUNTIME_VERSION'"
           printf '%s' "$PWA_SOURCE" | grep -Fq "var RUNTIME_BUILD = '$CANONICAL_RUNTIME_VERSION'"
 
+          PHASE="completed"
+          write_diag true 0
+          trap - ERR
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
           echo "ORBIT360_EXPECTED_COMMIT=$GITHUB_SHA" >> "$GITHUB_ENV"
@@ -205,6 +244,7 @@ jobs:
             orbit360-platform/lab-data-counts.json
             orbit360-platform/lab-aseguradoras-knowledge-inventory.json
             orbit360-platform/runtime-build.json
+            orbit360-platform/runtime-gate-crm-v20260716/deploy-diagnostic-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json
             orbit360-platform/runtime-gate-aseguradoras-v20260716/resultado-sanitizado.json
           if-no-files-found: warn
