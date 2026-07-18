@@ -1,4 +1,4 @@
-name: Orbit 360 Apply External Contract Observer 1.0.23
+name: Orbit 360 Finalize External Observer Ledger 1.0.23
 
 on:
   push:
@@ -6,106 +6,41 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - ".github/workflows/orbit360-apply-external-contract-observer-v1023.yml"
-  workflow_dispatch:
 
 permissions:
   contents: write
 
-concurrency:
-  group: orbit360-apply-external-contract-observer-v1023
-  cancel-in-progress: false
-
 jobs:
-  apply:
+  finalize:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
           fetch-depth: 2
-
-      - name: Corregir serialización exacta y aplicar 1.0.23
+      - name: Sellar retiro del pipeline temporal
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git branch --show-current)" = "ays/backend-tenant-lab-v99-20260703"
-          python - <<'PY'
-          from pathlib import Path
-          path = Path('tools/orbit360-patch-external-contract-observer-v1023.mjs')
-          source = path.read_text(encoding='utf-8')
-          replacements = [
-              (
-                  r"const nextRequest = requests.some(item => /^\/core\/tenant-insurer-config-p10\.js$/.test(String(item && item.path || '')));",
-                  r"const nextRequest = requests.some(item => /^\\/core\\/tenant-insurer-config-p10\\.js$/.test(String(item && item.path || '')));"
-              ),
-              (
-                  "externalFunctions + 'export async function waitForProductBootstrap(',",
-                  "externalFunctions,"
-              )
-          ]
-          for old, new in replacements:
-              count = source.count(old)
-              if count != 1:
-                  raise SystemExit(f'PATCH_SERIALIZATION_MATCH_COUNT:{count}:{old[:40]}')
-              source = source.replace(old, new)
-          path.write_text(source, encoding='utf-8')
-          PY
-          node --check tools/orbit360-patch-external-contract-observer-v1023.mjs
-          node --check tools/orbit360-patch-gate-registry-v1023.mjs
-          node tools/orbit360-patch-external-contract-observer-v1023.mjs
-          node tools/orbit360-patch-gate-registry-v1023.mjs
           node - <<'NODE'
           const fs = require('fs');
           const path = 'tools/orbit360-gate-contract-registry-v20260717.json';
           const workflow = '.github/workflows/orbit360-apply-external-contract-observer-v1023.yml';
           const registry = JSON.parse(fs.readFileSync(path, 'utf8'));
-          registry.retiredRuntimeArtifacts = [].concat(registry.retiredRuntimeArtifacts || []).filter(item => item !== workflow);
-          registry.temporaryPipelineArtifacts = [{
-            path: workflow,
-            classification: 'TEMPORAL_RETIRO',
-            purpose: 'Publish validated external-only gate observer 1.0.23.',
-            retirementGate: 'block1-client360-insurers-lab-v20260717',
-            retirementAction: 'Delete before the unique workflow_dispatch execution and then seal the retirement ledger.'
-          }];
+          const gate = [].concat(registry.gates || []).find(item => item.gateId === 'block1-client360-insurers-lab-v20260717');
+          if (!gate || gate.contractVersion !== '1.0.23') throw new Error('GATE_1023_NOT_ACTIVE');
+          registry.temporaryPipelineArtifacts = [].concat(registry.temporaryPipelineArtifacts || []).filter(item => item && item.path !== workflow);
+          registry.retiredRuntimeArtifacts = [...new Set([].concat(registry.retiredRuntimeArtifacts || [], workflow))];
+          gate.executionDispatch = {
+            mode: 'workflow_dispatch',
+            uniqueExecution: true,
+            dispatchAfterRetirement: true,
+            purpose: 'Execute 1.0.23 once after the temporary apply workflow is removed.'
+          };
           fs.writeFileSync(path, JSON.stringify(registry, null, 2) + '\n', 'utf8');
           NODE
-          rm -f tools/orbit360-patch-external-contract-observer-v1023.mjs
-          rm -f tools/orbit360-patch-gate-registry-v1023.mjs
-          rm -f .github/orbit360-v1023-validation-diagnostic-b.json
-
-      - name: Validar sintaxis, ausencia de backlog y preflight
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          ! grep -Fq "resolve({ evaluationTimeout: true })" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          ! grep -Fq "setTimeout(() => resolve(false), 1000)" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          ! grep -Fq "waitForProductBootstrap(export async function" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          grep -Fq "RUNTIME_CONTRACT_LOADER_EXTERNAL_EVIDENCE_MISSING" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          grep -Fq "CLIENT_PROJECTION_EXTERNAL_EVIDENCE_MISSING" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          grep -Fq "code + '_EXTERNAL_EVIDENCE_MISSING'" tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
-          rm -rf orbit360-platform/runtime-gate-crm-v20260716
-          allowed='^(tools/orbit360-gate-bootstrap-auth-legal-v20260717\.mjs|tools/orbit360-gate-runtime-crm-v20260716\.mjs|tools/orbit360-gate-contract-registry-v20260717\.json|orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718\.md|tools/orbit360-patch-external-contract-observer-v1023\.mjs|tools/orbit360-patch-gate-registry-v1023\.mjs|\.github/orbit360-v1023-validation-diagnostic-b\.json)$'
-          unexpected="$(git status --short | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
-          test -z "$unexpected" || { echo "$unexpected"; exit 1; }
-
-      - name: Publicar cierre validado 1.0.23
-        shell: bash
-        run: |
-          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs \
-            tools/orbit360-gate-runtime-crm-v20260716.mjs \
-            tools/orbit360-gate-contract-registry-v20260717.json \
-            orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PWA-CONTROL-RUNTIME-SIGNALS-20260718.md \
-            tools/orbit360-patch-external-contract-observer-v1023.mjs \
-            tools/orbit360-patch-gate-registry-v1023.mjs \
-            .github/orbit360-v1023-validation-diagnostic-b.json
-          test -n "$(git status --short)"
-          git commit -m "fix(block1): replace polling backlog with external observer 1.0.23 [skip ci]"
+          git add tools/orbit360-gate-contract-registry-v20260717.json
+          git commit -m "docs(block1): seal 1.0.23 observer retirement ledger [skip ci]"
           git push origin HEAD:ays/backend-tenant-lab-v99-20260703
