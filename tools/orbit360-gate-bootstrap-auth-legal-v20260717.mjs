@@ -162,20 +162,81 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
 
   await validateServedRuntimeScripts(page, { report, bounded, requireState });
 
-  await approveStage(report, bounded, 'canonical_runtime_contract_loader_started', () => page.waitForFunction(() => {
-    if (window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function') return true;
-    return Boolean(document.querySelector('script[data-orbit-client-projection-runtime-v20260716]'));
-  }, null, { timeout: 45000, polling: 250 }), 50000);
+  const bootstrapDocumentToken = await page.evaluate(() => {
+    if (!window.__orbitGateDocumentToken) {
+      window.__orbitGateDocumentToken = 'doc-' + String(Math.round(performance.timeOrigin || Date.now()));
+    }
+    return window.__orbitGateDocumentToken;
+  });
+
+  await approveStage(report, bounded, 'canonical_runtime_contract_loader_started', async () => {
+    const deadline = Date.now() + 45000;
+    while (Date.now() < deadline) {
+      const ownerReady = await page.evaluate(() => Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function'));
+      const responseSeen = [].concat(report.bootstrapTransportDiagnostic && report.bootstrapTransportDiagnostic.contractResponses || [])
+        .some(item => /client-canonical-view-projection-v20260716\.js$/.test(String(item && item.path || '')) && Number(item.status || 0) < 400);
+      if (ownerReady || responseSeen) return;
+      await page.waitForTimeout(100);
+    }
+    requireState(false, 'RUNTIME_CONTRACT_LOADER_NOT_OBSERVED');
+  }, 50000);
 
   await approveStage(report, bounded, 'canonical_client_projection_ready', async () => {
     const deadline = Date.now() + 15000;
+    const timeline = [];
+    let previousSignature = '';
+    let markerEverSeen = false;
+    let ownerEverSeen = false;
+    let ownerGetEverSeen = false;
+    let documentChanged = false;
+
     while (Date.now() < deadline) {
-      const ready = await page.evaluate(() => Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function'));
-      if (ready) return;
-      await page.waitForTimeout(250);
+      const snapshot = await page.evaluate(expectedDocumentToken => {
+        const marker = document.querySelector('script[data-orbit-client-projection-runtime-v20260716]');
+        const ownerPresent = Boolean(window.Orbit && Orbit.clientProjection);
+        const ownerGetPresent = Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function');
+        return {
+          elapsedMs: Math.round(performance.now()),
+          readyState: document.readyState,
+          documentTokenMatches: window.__orbitGateDocumentToken === expectedDocumentToken,
+          markerPresent: Boolean(marker),
+          markerConnected: Boolean(marker && marker.isConnected),
+          ownerPresent,
+          ownerGetPresent,
+          temporaryOwnerPresent: Boolean(window.Orbit && Orbit.clientCanonicalViewProjectionV20260716),
+          routePresent: Boolean(window.Orbit && Orbit.route && Orbit.route.key),
+          orbitKeyCount: window.Orbit ? Object.keys(Orbit).length : 0
+        };
+      }, bootstrapDocumentToken);
+
+      markerEverSeen = markerEverSeen || snapshot.markerPresent;
+      ownerEverSeen = ownerEverSeen || snapshot.ownerPresent;
+      ownerGetEverSeen = ownerGetEverSeen || snapshot.ownerGetPresent;
+      documentChanged = documentChanged || !snapshot.documentTokenMatches;
+      const signature = JSON.stringify([
+        snapshot.documentTokenMatches,
+        snapshot.markerPresent,
+        snapshot.markerConnected,
+        snapshot.ownerPresent,
+        snapshot.ownerGetPresent,
+        snapshot.temporaryOwnerPresent,
+        snapshot.routePresent,
+        snapshot.readyState,
+        snapshot.orbitKeyCount
+      ]);
+      if (signature !== previousSignature && timeline.length < 24) {
+        timeline.push(snapshot);
+        previousSignature = signature;
+      }
+      if (snapshot.ownerGetPresent) {
+        report.runtimeContractTimeline = { markerEverSeen, ownerEverSeen, ownerGetEverSeen, documentChanged, events: timeline };
+        return;
+      }
+      await page.waitForTimeout(100);
     }
 
-    report.runtimeContractDiagnostics = await page.evaluate(() => {
+    report.runtimeContractTimeline = { markerEverSeen, ownerEverSeen, ownerGetEverSeen, documentChanged, events: timeline };
+    report.runtimeContractDiagnostics = await page.evaluate(expectedDocumentToken => {
       const markerName = 'data-orbit-client-projection-runtime-v20260716';
       const marker = document.querySelector('script[' + markerName + ']');
       const pathOf = value => {
@@ -198,6 +259,7 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
         'data-orbit-tenant-insurer-config-active-v20260717'
       ].reduce((out, name) => { out[name] = Boolean(document.querySelector('script[' + name + ']')); return out; }, {});
       return {
+        documentTokenMatches: window.__orbitGateDocumentToken === expectedDocumentToken,
         marker: marker ? {
           present: true,
           path: pathOf(marker.src),
@@ -208,11 +270,12 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
         } : { present: false },
         ownerPresent: Boolean(window.Orbit && Orbit.clientProjection),
         ownerGetPresent: Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function'),
+        temporaryOwnerPresent: Boolean(window.Orbit && Orbit.clientCanonicalViewProjectionV20260716),
         routerRoutePresent: Boolean(window.Orbit && Orbit.route && Orbit.route.key),
         laterMarkers,
         resources
       };
-    });
+    }, bootstrapDocumentToken);
     requireState(false, 'CLIENT_PROJECTION_NOT_REGISTERED', JSON.stringify(report.runtimeContractDiagnostics));
   }, 25000);
 
