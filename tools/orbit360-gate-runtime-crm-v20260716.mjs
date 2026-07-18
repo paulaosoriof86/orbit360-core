@@ -72,6 +72,27 @@ async function waitForPostRouterRuntime(){
   },185000);
   report.checks.canonical_post_router_runtime_terminal=true;
 }
+async function waitForCanonicalDomContentLoaded(){
+  await bounded('canonical_domcontentloaded_ready',async()=>{
+    const deadline=Date.now()+60000;
+    while(Date.now()<deadline){
+      const signals=[].concat(report.documentLifecycleSignals||[]);
+      const hit=signals.find(item=>item&&item.path==='/index.html'&&item.runtime===runtime);
+      if(hit){
+        report.documentLifecycleDiagnostic={
+          state:'domcontentloaded',
+          method:'playwright-page-event',
+          path:hit.path,
+          beforeAuth:true
+        };
+        return;
+      }
+      await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    requireState(false,'CANONICAL_DOMCONTENTLOADED_MISSING');
+  },65000);
+  report.checks.canonical_domcontentloaded_ready=true;
+}
 async function selectRole(page,label){
   const select=page.locator('#rol-sel');await select.waitFor({state:'attached',timeout:15000});
   const options=await select.locator('option').evaluateAll(nodes=>nodes.map(node=>({value:node.value,text:String(node.textContent||'').trim()})));
@@ -107,6 +128,18 @@ browser=await chromium.launch({headless:true});
 const page=await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(45000);
 report.navigationTimeline=[];
 report.postRouterRuntimeSignals=[];
+report.documentLifecycleSignals=[];
+page.on('domcontentloaded',()=>{
+  try{
+    const current=new URL(page.url());
+    if(report.documentLifecycleSignals.length<8){
+      report.documentLifecycleSignals.push({
+        path:current.pathname,
+        runtime:current.searchParams.get('runtime')||''
+      });
+    }
+  }catch(error){}
+});
 page.on('framenavigated',frame=>{
   if(frame!==page.mainFrame()||report.navigationTimeline.length>=12)return;
   report.navigationTimeline.push({path:diagnosticPath(frame.url()),atMs:Date.now()});
@@ -228,6 +261,7 @@ try{
   await awaitPreviewRedirect(page);
   await waitForProductBootstrap(page,{runtime,bounded,requireState,report});
   await waitForPostRouterRuntime();
+  await waitForCanonicalDomContentLoaded();
   await authenticateWithOwner(page,{email,key,runtime,bounded,requireState,report});
   await acceptLegalOnce(page,{bounded,requireState,report});
   stage('real_tenant_data');report.storeCounts=await waitForRealTenantData(page,26);
