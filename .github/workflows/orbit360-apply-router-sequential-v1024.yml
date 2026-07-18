@@ -1,0 +1,109 @@
+name: Orbit 360 Apply Router Sequential 1.0.24
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: [".github/workflows/orbit360-apply-router-sequential-v1024.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 1
+
+      - name: Aplicar contrato 1.0.24
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+
+          const routerPath = 'orbit360-platform/core/router.js';
+          let router = fs.readFileSync(routerPath, 'utf8');
+          if (!router.includes('script.async = true;')) throw new Error('ROUTER_ASYNC_TRUE_NOT_FOUND');
+          router = router.replace('script.async = true;', 'script.async = false;');
+          fs.writeFileSync(routerPath, router, 'utf8');
+
+          const runnerPath = 'tools/orbit360-gate-runtime-crm-v20260716.mjs';
+          let runner = fs.readFileSync(runnerPath, 'utf8');
+          runner = runner.replace("schemaVersion:'orbit360-runtime-gate-joint-v23-external-contract-observer'", "schemaVersion:'orbit360-runtime-gate-joint-v24-router-sequential'");
+          runner = runner.replace("contractVersion:'1.0.23'", "contractVersion:'1.0.24'");
+          if (!runner.includes("contractVersion:'1.0.24'")) throw new Error('RUNNER_VERSION_NOT_UPDATED');
+          fs.writeFileSync(runnerPath, runner, 'utf8');
+
+          const registryPath = 'tools/orbit360-gate-contract-registry-v20260717.json';
+          const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+          const owner = registry.canonicalOwners.find(x => x.id === 'router');
+          owner.requiredTokens = owner.requiredTokens.filter(x => x !== 'script.async = true');
+          if (!owner.requiredTokens.includes('script.async = false')) owner.requiredTokens.push('script.async = false');
+          const gate = registry.gates.find(x => x.gateId === 'block1-client360-insurers-lab-v20260717');
+          gate.contractVersion = '1.0.24';
+          gate.diagnosticRevision = 'router-owned-sequential-contract-queue-v1';
+          gate.status = 'ACTIVE_FUNCTIONAL_FIX';
+          gate.diagnosticRule = 'Router remains the sole runtime-contract owner. With early rendering blocked until Orbit.route exists, its dynamically inserted contracts must use async=false so browser execution order is deterministic and matches the explicit next() queue.';
+          gate.executionBudget.evidence = {
+            sourceContractVersion: '1.0.23',
+            passedStages: ['canonical_auth_ui_ready','canonical_owner_handoff_ready','canonical_pwa_controller_ready','canonical_runtime_scripts_syntax_ready','canonical_runtime_contract_loader_started','canonical_client_projection_ready'],
+            failedStage: 'canonical_tenant_insurer_core_ready',
+            tenantCoreRequestedSignal: true,
+            tenantCoreHttpStatus: 200,
+            tenantCoreRequestFinished: true,
+            tenantCoreStaticSyntax: true,
+            tenantCoreBrowserParsed: false,
+            tenantCoreLoadedSignal: false,
+            nextContractRequested: false,
+            pageErrors: 0,
+            mechanismFinding: 'The external async script completed transport but remained unparsed and unexecuted inside the owner deadline. The early-render guard from 1.0.22 remains active, so no module auxiliary loader can enter the Router queue before bootstrap completes.'
+          };
+          gate.executionBudget.interpretation = 'Version 1.0.24 keeps the 1.0.22 owner guard and external 1.0.23 observer, but restores deterministic async=false execution exclusively inside the Router-owned next() queue.';
+          gate.executionBudget.exhaustionPolicy = 'Execute 1.0.24 once after GO_GATE_CONTRACT. If canonical_tenant_insurer_core_ready fails again, stop retries and inspect only Router queue state and external parse/load signals.';
+          gate.reconciliation = {
+            date: '2026-07-18',
+            classifications: ['FUNCTIONAL_DEFECT'],
+            scope: 'Router runtime-contract scheduling only',
+            rootCause: 'After early rendering was already blocked, script.async=true unnecessarily delegated contract execution timing to the browser. HTTP 200 and requestfinished therefore did not guarantee timely parse or owner readiness.',
+            corrections: ['preserve Orbit.route ownership guard','use async=false only for the Router sequential contract queue','retain explicit next() ordering and runtime signals','preserve Store, Auth, rules, data and renderers','run preflight first and the official gate once'],
+            openEvidence: ['1.0.24 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil'],
+            preserved: ['Orbit.store API','core/auth.js','backend-lab-canonical-view-sync ownership guard','Firestore rules','Cliente 360 renderer','Aseguradoras renderer','414 clientes','26 aseguradoras','7 asesores']
+          };
+          fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2) + '\n', 'utf8');
+
+          fs.writeFileSync('orbit360-platform/docs/BLOQUE1-CORTE-ROUTER-SECUENCIAL-1.0.24-20260718.md', [
+            '# Bloque 1 · Corte Router secuencial 1.0.24','',
+            'Clasificación: `FUNCTIONAL_DEFECT` limitado al scheduling del Router.','',
+            'La evidencia 1.0.23 aprobó Auth, handoff, PWA, sintaxis, loader y proyección de Cliente 360. El contrato core de Aseguradoras respondió HTTP 200 y terminó su descarga, pero no fue parseado ni ejecutado dentro del límite.','',
+            'Se conserva el guard que impide render temprano antes de `Orbit.route`. Por ello, la cola del Router vuelve a `async=false`: un solo owner, una sola secuencia `next()`, sin cargadores auxiliares compitiendo antes del bootstrap.','',
+            'Carril A: sin cambios en Cliente 360, Aseguradoras o UX.','Carril B: Router, registro, gate y documentación. Store, Auth y reglas intactos.','Carril C: 414 clientes, 26 aseguradoras y 7 asesores sin reimportación.','',
+            'Claude: `BACKEND_PROTEGIDO_NO_CLAUDE`. Academia: una descarga HTTP 200 no equivale a ejecución; distinguir transporte, parseo, owner y readiness.','',
+            'Salida: preflight vinculante y una sola ejecución; cierre únicamente con `ok:true`.',''
+          ].join('\n'), 'utf8');
+          NODE
+
+          rm -f .github/workflows/orbit360-apply-deterministic-runtime-loader-v1024.yml
+          rm -f .github/workflows/orbit360-apply-router-sequential-v1024.yml
+
+      - name: Preflight vinculante
+        shell: bash
+        env:
+          ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/router.js
+          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+
+      - name: Publicar corte y activar gate oficial
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(block1): router sequential runtime contracts 1.0.24"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
