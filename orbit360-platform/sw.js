@@ -1,8 +1,9 @@
 /* Orbit 360 · Service Worker — red primero con fallback offline.
    Evita que una versión antigua de Auth o del shell bloquee el canal LAB. */
-var CACHE = 'orbit360-v20260717-2';
+var CACHE = 'orbit360-v20260717-2-pwa2';
 var BUILD = '20260717-2';
 var RUNTIME_CONTRACT_TIMEOUT_MS = 8000;
+var RUNTIME_CONTRACT_CACHE_STRATEGY = 'cache-first-bounded-revalidate';
 var RUNTIME_CONTRACT_PATHS = [
   '/core/session-multirol-visibility-v20260716.js',
   '/core/client-canonical-view-projection-v20260716.js',
@@ -84,22 +85,26 @@ self.addEventListener('fetch', function (event) {
   if (originalUrl.origin !== self.location.origin) return;
 
   if (isRuntimeContract(originalUrl.pathname)) {
+    var key = canonicalRequest(originalUrl.pathname);
+    var cachePromise = caches.open(CACHE);
+    var refreshPromise = cachePromise.then(function (cache) {
+      return fetchWithTimeout(event.request, RUNTIME_CONTRACT_TIMEOUT_MS).then(function (response) {
+        return cacheResponse(cache, key, response);
+      });
+    });
+
+    event.waitUntil(refreshPromise.catch(function () { return null; }));
     event.respondWith(
-      caches.open(CACHE).then(function (cache) {
-        var key = canonicalRequest(originalUrl.pathname);
-        return cache.match(key).then(function (hit) {
-          var refresh = fetchWithTimeout(event.request, RUNTIME_CONTRACT_TIMEOUT_MS).then(function (response) {
-            return cacheResponse(cache, key, response);
-          });
-          if (hit) {
-            event.waitUntil(refresh.catch(function () { return null; }));
-            return hit;
-          }
-          return refresh.catch(function (error) {
-            return cache.match(event.request, { ignoreSearch: true }).then(function (fallback) {
-              if (fallback) return fallback;
-              throw error;
-            });
+      cachePromise.then(function (cache) {
+        return cache.match(key);
+      }).then(function (hit) {
+        if (hit) return hit;
+        return refreshPromise.catch(function (error) {
+          return cachePromise.then(function (cache) {
+            return cache.match(event.request, { ignoreSearch: true });
+          }).then(function (fallback) {
+            if (fallback) return fallback;
+            throw error;
           });
         });
       })
