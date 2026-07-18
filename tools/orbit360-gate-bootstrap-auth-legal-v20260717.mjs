@@ -443,16 +443,25 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
 }
 
 export async function authenticateWithOwner(page, { email, key, runtime, bounded, requireState, report }) {
-  await bounded('authentication_form_ready', async () => {
+  const entryState = await bounded('authentication_form_ready', async () => {
+    const body = page.locator('body');
+    const login = page.locator('#login');
+    await body.waitFor({ state: 'attached', timeout: 12000 });
+    await login.waitFor({ state: 'attached', timeout: 12000 });
+    const bodyClass = String(await body.getAttribute('class') || '');
+    const loginClass = String(await login.getAttribute('class') || '');
+    const restored = !bodyClass.split(/\s+/).includes('pre-auth') || loginClass.split(/\s+/).includes('hidden');
+    if (restored) return { restored: true };
+
     const form = page.locator('#login-form');
     await form.waitFor({ state: 'visible', timeout: 20000 });
     requireState(await form.getAttribute('data-auth-mode') === 'firestore-lab', 'AUTH_FORM_MODE_INVALID');
     await page.locator('#lg-user').waitFor({ state: 'visible', timeout: 10000 });
     await page.locator('#lg-pass').waitFor({ state: 'visible', timeout: 10000 });
-  }, 24000);
+    return { restored: false };
+  }, 26000);
 
-  const bodyClass = String(await page.locator('body').getAttribute('class') || '');
-  if (!bodyClass.split(/\s+/).includes('pre-auth')) {
+  if (entryState && entryState.restored) {
     report.authMode = 'session_restored_external_ui';
     report.checks.authenticated = true;
     return;

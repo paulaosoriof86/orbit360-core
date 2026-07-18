@@ -13,3 +13,7 @@ La aceptación legal también usa controles visibles: un único modal `data-lega
 Carril A: UI canónica utilizada sin cambios. Carril B: solo validator/gate y contrato; Auth, Store, reglas y backend protegidos intactos. Carril C: 414 clientes, 26 aseguradoras y 7 asesores sin reimportación.
 
 Claude: `BACKEND_PROTEGIDO_NO_CLAUDE`. Academia: distinguir prueba del flujo real por UI frente a invocar funciones internas desde el validador.
+
+## Refinamiento de sesión restaurada
+
+La corrida externa confirmó que Firebase puede restaurar la sesión y ocultar el acceso antes de que el gate busque el formulario. El gate observa primero `body.pre-auth` y `#login.hidden`; solo exige campos visibles cuando la página continúa realmente en estado de acceso.
