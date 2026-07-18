@@ -145,6 +145,8 @@ jobs:
           mkdir -p "$DIAG_DIR"
           PHASE="initializing"
           URL=""
+          PROPAGATION_ATTEMPTS=0
+          BUILD_EXACT=false
           write_diag() {
             local ok="$1"
             local exit_code="$2"
@@ -158,7 +160,9 @@ jobs:
               --argjson ok "$ok" \
               --argjson exitCode "$exit_code" \
               --argjson urlFound "$(test -n "$URL" && echo true || echo false)" \
-              '{schemaVersion:"orbit360-deploy-diagnostic-v1",containsPII:false,containsSecrets:false,ok:$ok,phase:$phase,exitCode:$exitCode,firebaseCode:$firebaseCode,urlFound:$urlFound}' \
+              --argjson propagationAttempts "$PROPAGATION_ATTEMPTS" \
+              --argjson buildExact "$BUILD_EXACT" \
+              '{schemaVersion:"orbit360-deploy-diagnostic-v2",containsPII:false,containsSecrets:false,ok:$ok,phase:$phase,exitCode:$exitCode,firebaseCode:$firebaseCode,urlFound:$urlFound,propagationAttempts:$propagationAttempts,buildExact:$buildExact}' \
               > "$DIAG_FILE"
           }
           on_error() {
@@ -189,23 +193,39 @@ jobs:
             *) echo "BLOQUEO_URL_NO_CORRESPONDE_AL_CANAL_LAB"; exit 48 ;;
           esac
 
-          PHASE="runtime_build_fetch"
-          BUILD_JSON="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/runtime-build.json")"
+          PHASE="runtime_build_propagation_ready"
+          BUILD_JSON=""
+          DEPLOYED_SHA=""
+          DEPLOYED_RUN=""
+          DEPLOYED_GATE=""
+          DEPLOYED_RUNTIME=""
+          for attempt in $(seq 1 20); do
+            PROPAGATION_ATTEMPTS="$attempt"
+            BUILD_URL="${URL}/runtime-build.json?orbitRun=${GITHUB_RUN_ID}&attempt=${attempt}"
+            if BUILD_JSON="$(curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BUILD_URL" 2>/dev/null)"; then
+              DEPLOYED_SHA="$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty' 2>/dev/null || true)"
+              DEPLOYED_RUN="$(printf '%s' "$BUILD_JSON" | jq -r '.run // empty' 2>/dev/null || true)"
+              DEPLOYED_GATE="$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty' 2>/dev/null || true)"
+              DEPLOYED_RUNTIME="$(printf '%s' "$BUILD_JSON" | jq -r '.runtimeVersion // empty' 2>/dev/null || true)"
+              if [ "$DEPLOYED_SHA" = "$GITHUB_SHA" ] && \
+                 [ "$DEPLOYED_RUN" = "$GITHUB_RUN_ID" ] && \
+                 [ "$DEPLOYED_GATE" = "$ORBIT360_GATE_ID" ] && \
+                 [ "$DEPLOYED_RUNTIME" = "$CANONICAL_RUNTIME_VERSION" ]; then
+                BUILD_EXACT=true
+                break
+              fi
+            fi
+            sleep 2
+          done
           PHASE="runtime_build_assert"
-          DEPLOYED_SHA="$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty')"
-          DEPLOYED_RUN="$(printf '%s' "$BUILD_JSON" | jq -r '.run // empty')"
-          DEPLOYED_GATE="$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty')"
-          DEPLOYED_RUNTIME="$(printf '%s' "$BUILD_JSON" | jq -r '.runtimeVersion // empty')"
-          test "$DEPLOYED_SHA" = "$GITHUB_SHA"
-          test "$DEPLOYED_RUN" = "$GITHUB_RUN_ID"
-          test "$DEPLOYED_GATE" = "$ORBIT360_GATE_ID"
-          test "$DEPLOYED_RUNTIME" = "$CANONICAL_RUNTIME_VERSION"
+          test "$BUILD_EXACT" = true
 
           PHASE="runtime_sources_fetch"
-          LOADER_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/core/backend-lab-loader.js")"
-          PREVIEW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/ays-lab-preview.html")"
-          SW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/sw.js")"
-          PWA_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors "$URL/core/pwa.js")"
+          CACHE_BUSTER="orbitRun=${GITHUB_RUN_ID}"
+          LOADER_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/core/backend-lab-loader.js?$CACHE_BUSTER")"
+          PREVIEW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/ays-lab-preview.html?$CACHE_BUSTER")"
+          SW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/sw.js?$CACHE_BUSTER")"
+          PWA_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/core/pwa.js?$CACHE_BUSTER")"
           PHASE="runtime_sources_assert"
           printf '%s' "$LOADER_SOURCE" | grep -Fq "var LAB_RUNTIME = '$CANONICAL_RUNTIME_VERSION'"
           printf '%s' "$PREVIEW_SOURCE" | grep -Fq "runtime=$CANONICAL_RUNTIME_VERSION"
