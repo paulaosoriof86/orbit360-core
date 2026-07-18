@@ -14,18 +14,18 @@
   "retiredRuntimeArtifacts": ["orbit360-platform/core/empalme-v1251-runtime.js","orbit360-platform/modules/aseguradoras-candidate-actions.js","orbit360-platform/modules/aseguradoras-frontend-projection-v20260716.js","orbit360-platform/data/import-initial-profiles.js","orbit360-platform/modules/importar-initial-tenant-lab.js"],
   "gates": [{
     "gateId":"block1-client360-insurers-lab-v20260717",
-    "contractVersion":"1.0.10",
+    "contractVersion":"1.0.11",
     "runtimeVersion":"20260717-2",
     "block":1,
     "status":"ACTIVE_PENDING_RUNTIME_GATE",
-    "diagnosticRule":"Readiness must use product bootstrap postconditions, not the browser complete transport state.",
+    "diagnosticRule":"Pre-auth readiness must preserve fail-closed access; full module visibility is validated only after authenticated role selection.",
     "reconciliation": {
       "date":"2026-07-17",
-      "classifications":["VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],
-      "scope":"product bootstrap readiness before authentication",
-      "rootCause":"The gate required document.readyState complete, which waits for secondary resources although Router and Auth had already completed their public initialization contracts.",
-      "corrections":["Use document parsed rather than document complete","Require login form auth mode firestore-lab","Require Orbit.route.key after router start","Require more than one sidebar route after sidebar build","Preserve Firebase provider and canonical owner checks","Extract bootstrap Auth and Legal stages into reusable gate helper"],
-      "preserved":["Orbit.store","core/auth.js","core/legal.js","Cliente 360 renderer","Aseguradoras renderer","414 clientes","26 aseguradoras","7 asesores"]
+      "classifications":["VALIDATOR_STALE"],
+      "scope":"pre-auth product bootstrap versus post-auth role visibility",
+      "rootCause":"The gate required more than one sidebar route before authentication, while Orbit.access intentionally resolves an empty role to scope none and Router therefore exposes only the fail-closed pre-auth navigation.",
+      "corrections":["Remove the pre-auth multi-route requirement","Keep runtime, Firebase, provider, Auth UI and Router route readiness","Record preAuthAccessFailClosed as an approved diagnostic","Validate the complete menu only after selecting the authenticated Asesor role","Track both helper files in workflow paths and syntax checks"],
+      "preserved":["Orbit.store","core/auth.js","core/legal.js","core/access-scope.js","core/router.js","Cliente 360 renderer","Aseguradoras renderer","414 clientes","26 aseguradoras","7 asesores"]
     },
     "workflow":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
     "preflight":"tools/orbit360-validar-gate-contracts-v20260717.mjs",
@@ -38,11 +38,11 @@
       {"path":"orbit360-platform/core/backend-lab-loader.js","requiredTokens":["var LAB_RUNTIME = '20260717-2'","runtimeVersion: LAB_RUNTIME"]},
       {"path":"orbit360-platform/sw.js","requiredTokens":["var CACHE = 'orbit360-v20260717-2'","var BUILD = '20260717-2'"]},
       {"path":"orbit360-platform/core/pwa.js","requiredTokens":["var RUNTIME_BUILD = '20260717-2'","serviceWorker.register('sw.js?v=' + RUNTIME_BUILD)"]},
-      {"path":"tools/orbit360-gate-runtime-crm-v20260716.mjs","requiredTokens":["contractVersion:'1.0.10'","waitForProductBootstrap","authenticateWithOwner","acceptLegalOnce","PIPELINE_STEP_TIMEOUT"]},
-      {"path":"tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs","requiredTokens":["canonical_product_bootstrap_ready","document.readyState !== 'loading'","form.dataset.authMode === 'firestore-lab'","Orbit.route && Orbit.route.key","#sidebar .nav-link","providerReady"]},
-      {"path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml","requiredTokens":["ORBIT360_EXPECTED_RUNTIME: 20260717-2","CANONICAL_RUNTIME_VERSION"]}
+      {"path":"tools/orbit360-gate-runtime-crm-v20260716.mjs","requiredTokens":["contractVersion:'1.0.11'","waitForProductBootstrap","authenticateWithOwner","acceptLegalOnce","PIPELINE_STEP_TIMEOUT"]},
+      {"path":"tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs","requiredTokens":["canonical_product_bootstrap_ready","document.readyState !== 'loading'","form.dataset.authMode === 'firestore-lab'","Orbit.route && Orbit.route.key","providerReady","preAuthAccessFailClosed"]},
+      {"path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml","requiredTokens":["ORBIT360_EXPECTED_RUNTIME: 20260717-2","CANONICAL_RUNTIME_VERSION","tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs","tools/orbit360-gate-environment-v20260717.mjs","node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs","node --check tools/orbit360-gate-environment-v20260717.mjs"]}
     ],
-    "forbiddenRuntimeReferences":["aseguradoras-candidate-actions.js","aseguradoras-frontend-projection-v20260716.js","empalme-v1251-runtime.js","import-initial-profiles.js","importar-initial-tenant-lab.js","installLegalGate","installMobileNavigation","asg-order-v20260716","asg-knowledge-projection-v20260716","authentication_owner_ready","canonical_runtime_snapshot","document.readyState === 'complete'","const deadline = Date.now() + 60000"],
+    "forbiddenRuntimeReferences":["aseguradoras-candidate-actions.js","aseguradoras-frontend-projection-v20260716.js","empalme-v1251-runtime.js","import-initial-profiles.js","importar-initial-tenant-lab.js","installLegalGate","installMobileNavigation","asg-order-v20260716","asg-knowledge-projection-v20260716","authentication_owner_ready","canonical_runtime_snapshot","document.readyState === 'complete'","document.querySelectorAll('#sidebar .nav-link').length > 1","const deadline = Date.now() + 60000"],
     "environment":{"branch":"ays/backend-tenant-lab-v99-20260703","firebaseProjectId":"ays-orbit-360-lab","hostingChannel":"orbit360-ays-lab"},
     "expectedAggregates":{"clientes":414,"aseguradoras":26,"asesores":7},
     "runtimeViews":["direccion_desktop","operativo_tablet","asesor_mobile"],
