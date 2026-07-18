@@ -1,0 +1,47 @@
+name: Orbit 360 Clean Diagnostic Dependencies 1.0.25
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: [".github/workflows/orbit360-clean-diagnostic-dependencies-v1025.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+
+      - name: Retirar dependencias diagnósticas versionadas
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "ays/backend-tenant-lab-v99-20260703"
+          test -f .github/orbit360-v1025-core-execution-diagnostic-v3.json
+          git rm -r --ignore-unmatch node_modules
+          if ! grep -Fxq 'node_modules/' .gitignore; then printf '\nnode_modules/\n' >> .gitignore; fi
+          git rm .github/workflows/orbit360-clean-diagnostic-dependencies-v1025.yml
+          git add .gitignore
+
+      - name: Verificar alcance limpio
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -d node_modules
+          git diff --cached --name-only > /tmp/changed.txt
+          test "$(grep -Ev '^(node_modules/|\.gitignore$|\.github/workflows/orbit360-clean-diagnostic-dependencies-v1025\.yml$)' /tmp/changed.txt | wc -l)" -eq 0
+          test -f .github/orbit360-v1025-core-execution-diagnostic-v3.json
+
+      - name: Publicar limpieza
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(block1): remove diagnostic dependencies from branch"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
