@@ -153,6 +153,12 @@ try{
   stage('open_lab_preview');await page.goto(`${baseUrl}/ays-lab-preview.html`,{waitUntil:'domcontentloaded',timeout:60000});
   await awaitPreviewRedirect(page);
   await waitForProductBootstrap(page,{runtime,bounded,requireState,report});
+  await bounded('canonical_document_load_complete',async()=>{
+    await page.waitForLoadState('load',{timeout:120000});
+    await page.waitForTimeout(500);
+    report.documentLifecycleDiagnostic={state:'load',method:'browser-lifecycle-event',beforeAuth:true};
+  },125000);
+  report.checks.canonical_document_load_complete=true;
   await authenticateWithOwner(page,{email,key,runtime,bounded,requireState,report});
   await acceptLegalOnce(page,{bounded,requireState,report});
   stage('real_tenant_data');report.storeCounts=await waitForRealTenantData(page,26);
