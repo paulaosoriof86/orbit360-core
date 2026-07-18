@@ -7,6 +7,40 @@
    ============================================================ */
 (function () {
   var RUNTIME_BUILD = '20260717-2';
+
+  function waitForWorkerActivation(registration) {
+    var worker = registration && (registration.installing || registration.waiting);
+    if (!worker || worker.state === 'activated') return Promise.resolve(registration);
+    return new Promise(function (resolve) {
+      var settled = false;
+      var timer = setTimeout(finish, 15000);
+      function finish() {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(registration);
+      }
+      worker.addEventListener('statechange', function () {
+        if (worker.state === 'activated' || worker.state === 'redundant') finish();
+      });
+    });
+  }
+
+  function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return Promise.resolve(null);
+    try {
+      return navigator.serviceWorker.register('sw.js?v=' + RUNTIME_BUILD).then(function (registration) {
+        return registration.update().catch(function () { return registration; }).then(function () {
+          return waitForWorkerActivation(registration);
+        });
+      }).catch(function () { return null; });
+    } catch (error) {
+      return Promise.resolve(null);
+    }
+  }
+
+  window.OrbitPwaWorkerReady = registerServiceWorker();
+
   function clientLogo() { try { var t = Orbit.tenant && Orbit.tenant.get(); return (t && t.branding && t.branding.logo) || localStorage.getItem('orbit360_logo') || ''; } catch (e) { return ''; } }
   function clientName() { try { var t = Orbit.tenant && Orbit.tenant.get(); return (t && t.empresa) || 'Orbit 360'; } catch (e) { return 'Orbit 360'; } }
   function themeColor() { try { return getComputedStyle(document.documentElement).getPropertyValue('--red').trim() || '#C5162E'; } catch (e) { return '#C5162E'; } }
@@ -87,8 +121,7 @@
     var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     if (standalone) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('instalada'); }, 2500); }
     else if (isIOS) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('ios'); }, 4000); }
-    if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js?v=' + RUNTIME_BUILD).catch(function () {}); } catch (e) {} }
-    Orbit.pwa = { refresh: function () { try { setFavicons(); buildManifest(); } catch (e) {} }, install: showInstall };
+    Orbit.pwa = { refresh: function () { try { setFavicons(); buildManifest(); } catch (e) {} }, install: showInstall, workerReady: window.OrbitPwaWorkerReady };
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
