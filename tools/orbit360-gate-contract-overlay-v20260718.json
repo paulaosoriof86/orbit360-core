@@ -2,12 +2,12 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-18",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "PIPELINE_MECHANISM_FAILURE",
-  "diagnosticRevision": "canonical-target-domcontentloaded-before-auth-v1",
-  "contractRevision": "1.0.25-canonical-domcontentloaded-v1",
-  "sourceRunId": 29662251706,
-  "sourceHead": "90a9b15dbb481e33198cfc7cd5d45489e98a21cf",
-  "firstFailedStage": "authentication_form_ready",
+  "classification": "ENVIRONMENT_FAILURE",
+  "diagnosticRevision": "lab-channel-exact-build-propagation-v1",
+  "contractRevision": "1.0.25-lab-build-propagation-v1",
+  "sourceRunId": 29662512024,
+  "sourceHead": "53a4f37c39729f4f1cac45ed1fb71362b27b9807",
+  "firstFailedStage": "runtime_build_assert",
   "canonicalOwners": [
     {
       "id": "routerTenantBootstrap",
@@ -57,17 +57,33 @@
         "report.checks.canonical_domcontentloaded_ready=true",
         "beforeAuth:true"
       ]
+    },
+    {
+      "id": "gateLabDeployPropagation",
+      "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+      "requiredTokens": [
+        "runtime_build_propagation_ready",
+        "PROPAGATION_ATTEMPTS=0",
+        "BUILD_EXACT=false",
+        "for attempt in $(seq 1 20)",
+        "orbitRun=${GITHUB_RUN_ID}",
+        "Cache-Control: no-cache",
+        "test \"$BUILD_EXACT\" = true",
+        "orbit360-deploy-diagnostic-v2"
+      ]
     }
   ],
   "requiredFiles": [
     "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
-    "tools/orbit360-gate-runtime-crm-v20260716.mjs"
+    "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+    ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
-    "tools/orbit360-gate-runtime-crm-v20260716.mjs"
+    "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+    ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml"
   ],
   "runtimeVersionContracts": [
     {
@@ -120,6 +136,19 @@
         "method:'playwright-page-event'",
         "report.checks.canonical_domcontentloaded_ready=true",
         "beforeAuth:true"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+      "requiredTokens": [
+        "runtime_build_propagation_ready",
+        "PROPAGATION_ATTEMPTS=0",
+        "BUILD_EXACT=false",
+        "for attempt in $(seq 1 20)",
+        "orbitRun=${GITHUB_RUN_ID}",
+        "Cache-Control: no-cache",
+        "test \"$BUILD_EXACT\" = true",
+        "orbit360-deploy-diagnostic-v2"
       ]
     }
   ],
