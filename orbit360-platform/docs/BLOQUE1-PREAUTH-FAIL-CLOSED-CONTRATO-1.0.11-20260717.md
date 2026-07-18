@@ -4,39 +4,47 @@ Fecha: 2026-07-17
 
 Gate: `block1-client360-insurers-lab-v20260717`
 
-## Hallazgo
+## Evidencia acumulada
 
-El run `29615254551` confirmó preflight, canal LAB y conteos 414/26/7. El validador se detenía antes del acceso porque exigía más de una ruta visible sin identidad ni rol activo.
+El run `29615254551` confirmó preflight, canal LAB y conteos 414/26/7. El requisito de menú múltiple antes del acceso fue retirado porque Access funciona correctamente en modo fail-closed.
 
-El owner Access opera correctamente en modo fail-closed antes del login. La visibilidad completa corresponde al estado autenticado con rol y scope resueltos.
+El run `29625166230` volvió a detenerse en una condición compuesta de bootstrap. Esa evidencia no permite atribuir el fallo a producto, Auth, Router o transporte.
 
-## Clasificación
+## Clasificación vigente
 
-`VALIDATOR_STALE`.
+`PIPELINE_MECHANISM_FAILURE`.
 
-## Corrección
+No se modifica ningún owner de producto hasta aislar una sola precondición.
 
-- retirar solo el requisito de menú múltiple pre-auth;
-- conservar runtime, Firebase, proveedor Auth, formulario LAB y ruta inicial;
-- registrar `preAuthAccessFailClosed`;
-- validar menú completo después del login en Asesor móvil;
-- incluir los helpers del gate en `paths` y `node --check` del workflow.
+## Diagnóstico aplicado
+
+La espera compuesta se divide en etapas acotadas:
+
+1. URL canónica;
+2. runtime backend y Firebase;
+3. proveedor Auth;
+4. UI Auth inicializada;
+5. handoff de owners;
+6. inicio del Router;
+7. estabilidad final.
+
+El artefacto sanitizado registra además el último recurso iniciado, terminado, fallido o con error HTTP y los errores de página sin datos sensibles.
 
 ## Carriles
 
 - A: frontend y módulos preservados.
-- B: validador y cobertura CI corregidos.
+- B: observabilidad del validador corregida; producto congelado.
 - C: datos 414/26/7 preservados; sin reimportación.
 
 ## Claude y Academia
 
-- `REPLICABLE_CLAUDE_INMEDIATO`: separar seguridad pre-auth de visibilidad post-auth.
-- `REPLICABLE_CLAUDE_ACUMULADO`: readiness → identidad → rol → visibilidad.
-- `BACKEND_PROTEGIDO_NO_CLAUDE`: automatización LAB.
-- `ACADEMIA_ACTUALIZAR`: enseñar fail-closed y scopes por rol.
+- `REPLICABLE_CLAUDE_INMEDIATO`: una espera compuesta debe producir etapas observables.
+- `REPLICABLE_CLAUDE_ACUMULADO`: URL → runtime → proveedor → Auth UI → owners → Router → estabilidad.
+- `BACKEND_PROTEGIDO_NO_CLAUDE`: canal, acceso y diagnóstico CI.
+- `ACADEMIA_ACTUALIZAR`: distinguir defecto funcional de validador sin observabilidad.
 
 ## Estado
 
-`ACTIVE_PENDING_RUNTIME_GATE`.
+`ACTIVE_ROOT_CAUSE_DIAGNOSTIC`.
 
-Solo evidencia `ok:true` habilita revisión visual. Bloque 2 y producción permanecen bloqueados.
+La siguiente ejecución solo identifica la primera etapa y el recurso responsables. No habilita revisión visual salvo evidencia final `ok:true`. Bloque 2 y producción permanecen bloqueados.
