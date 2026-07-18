@@ -1,50 +1,42 @@
-# Bloque 1 · Causa raíz: runtime controlado antes de autenticación
+# Bloque 1 · Causa raíz: documento canónico antes de autenticación
 
 Fecha: 2026-07-18  
 Gate: `block1-client360-insurers-lab-v20260717`  
-Clasificación vigente: `VALIDATOR_STALE`
+Clasificación vigente: `PIPELINE_MECHANISM_FAILURE`
 
 ## Secuencia de evidencia
 
-1. Run `29660698549`: bootstrap aprobado; interacción UI demasiado temprana.
-2. Run `29661458840`: `window.load` no ocurrió dentro de 120.000 ms; ese lifecycle global fue descartado como condición del gate.
-3. Run `29661945043`: el listener del evento terminal no recibió señales, aunque los contratos, Router y scripts observados terminaron sin errores de página.
+1. Run `29660698549`: bootstrap aprobado; la interacción UI comenzó demasiado pronto.
+2. Run `29661458840`: esperar `window.load` fue descartado porque los loaders post-Router pueden mantener abierto el lifecycle global.
+3. Run `29661945043`: el gate exigía solo eventos del bridge, aunque el baseline usa un runtime controlado.
+4. Run `29662251706`: el camino controlado quedó aprobado mediante `orbit:aseguradoras:runtime-controlled`, pero `authentication_form_ready` volvió a fallar al intentar consultar `body`.
 
-## Causa raíz definitiva
+## Causa raíz vigente
 
-`backend-lab-init.js` asigna anticipadamente:
+La primera navegación del gate abre `ays-lab-preview.html` y espera su `DOMContentLoaded`. Ese documento redirige mediante `location.replace` a la página canónica `index.html`.
 
-```txt
-window.__orbitAysKnowledgeRuntimePromise
-status: catalog_visible_runtime_controlled
-autoMount: false
-```
+El gate verificaba después únicamente que la URL hubiera cambiado. No esperaba el `DOMContentLoaded` del segundo documento. Las señales externas de Router y runtime podían llegar durante el parseo, antes de que Playwright dispusiera de un documento canónico estable para selectores.
 
-El bridge de recursos de Aseguradoras devuelve inmediatamente esa promesa cuando ya existe. Por ese retorno temprano no ejecuta el bloque que publica:
+Por eso el binding externo funcionó, mientras `locator('body')` no pudo resolverse.
 
-```txt
-orbit:aseguradoras:tenant-runtime-linked
-orbit:aseguradoras:tenant-runtime-error
-```
+## Corrección vigente
 
-El producto cumple su modo controlado. El validador era obsoleto porque exigía exclusivamente eventos pertenecientes al camino de carga completa.
-
-## Corrección vigente del gate
-
-El gate observa desde antes de navegar dos caminos válidos:
-
-1. Resolución de la promesa controlada preexistente.
-2. Evento terminal del bridge cuando el runtime sí se carga.
-
-La evidencia se transfiere externamente a Node mediante binding y se registra como:
+El runner registra el evento `page.on('domcontentloaded')` antes de iniciar la navegación y conserva evidencia de cada documento. Después de bootstrap y runtime controlado exige:
 
 ```txt
-canonical_post_router_runtime_terminal: true
-method: external-custom-event-binding
+canonical_domcontentloaded_ready
+path: /index.html
+runtime: 20260717-2
+method: playwright-page-event
 beforeAuth: true
 ```
 
-Estados de error, `load_failed` o `blocked_context` siguen siendo bloqueantes.
+Solo entonces permite observar sesión restaurada o completar el formulario canónico.
+
+Se preservan los dos caminos terminales del runtime de Aseguradoras:
+
+1. Promesa controlada preexistente.
+2. Evento terminal del bridge cuando corresponde cargarlo.
 
 ## Alcance preservado
 
@@ -56,8 +48,8 @@ Estados de error, `load_failed` o `blocked_context` siguen siendo bloqueantes.
 ## Claude y Academia
 
 - Código: `BACKEND_PROTEGIDO_NO_CLAUDE`.
-- Patrón reusable: un validador debe reconocer todos los estados terminales declarados por el owner, incluido un modo controlado o desactivado intencionalmente.
-- Academia: diferenciar runtime cargado, runtime controlado y error de runtime.
+- Patrón reusable: cuando existe una redirección entre documentos, el gate debe esperar el lifecycle del destino canónico, no solo el de la página inicial ni el cambio de URL.
+- Academia: diferenciar preview cargado, destino canónico cargado, runtime terminado e interfaz funcional.
 
 ## Criterio de cierre
 
