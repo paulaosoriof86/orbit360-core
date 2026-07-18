@@ -1,0 +1,59 @@
+name: Orbit 360 Capture 1.0.24 Preflight
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: [".github/workflows/orbit360-capture-v1024-preflight.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 1
+
+      - name: Simular corte mínimo
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const rp='orbit360-platform/core/router.js';
+          let r=fs.readFileSync(rp,'utf8').replace('script.async = true;','script.async = false;');
+          fs.writeFileSync(rp,r,'utf8');
+          const gp='tools/orbit360-gate-runtime-crm-v20260716.mjs';
+          let g=fs.readFileSync(gp,'utf8').replace("schemaVersion:'orbit360-runtime-gate-joint-v23-external-contract-observer'","schemaVersion:'orbit360-runtime-gate-joint-v24-router-sequential'").replace("contractVersion:'1.0.23'","contractVersion:'1.0.24'");
+          fs.writeFileSync(gp,g,'utf8');
+          const jp='tools/orbit360-gate-contract-registry-v20260717.json';
+          const j=JSON.parse(fs.readFileSync(jp,'utf8'));
+          const o=j.canonicalOwners.find(x=>x.id==='router');
+          o.requiredTokens=o.requiredTokens.filter(x=>x!=='script.async = true');
+          if(!o.requiredTokens.includes('script.async = false'))o.requiredTokens.push('script.async = false');
+          const gate=j.gates.find(x=>x.gateId==='block1-client360-insurers-lab-v20260717');
+          gate.contractVersion='1.0.24';
+          fs.writeFileSync(jp,JSON.stringify(j,null,2)+'\n','utf8');
+          NODE
+
+      - name: Ejecutar preflight sin ocultar evidencia
+        shell: bash
+        env:
+          ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: |
+          set +e
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          echo "exitCode=$?" > orbit360-platform/runtime-gate-crm-v20260716/preflight-exit.txt
+          exit 0
+
+      - name: Publicar evidencia sanitizada
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-v1024-preflight-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-exit.txt
+          retention-days: 3
