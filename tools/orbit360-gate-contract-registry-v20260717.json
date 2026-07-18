@@ -14,32 +14,34 @@
   "retiredRuntimeArtifacts":["orbit360-platform/core/empalme-v1251-runtime.js","orbit360-platform/modules/aseguradoras-candidate-actions.js","orbit360-platform/modules/aseguradoras-frontend-projection-v20260716.js","orbit360-platform/data/import-initial-profiles.js","orbit360-platform/modules/importar-initial-tenant-lab.js"],
   "gates":[{
     "gateId":"block1-client360-insurers-lab-v20260717",
-    "contractVersion":"1.0.13",
-    "diagnosticRevision":"observed-response-derived-budget-v1",
+    "contractVersion":"1.0.14",
+    "diagnosticRevision":"client-projection-derived-stage-budget-v1",
     "runtimeVersion":"20260717-2",
     "block":1,
     "status":"ACTIVE_BUDGETED_EXECUTION",
-    "diagnosticRule":"Validate every served bridge; recognize the runtime contract loader from an observed successful script response or owner readiness; then require each projected owner within its own bounded stage.",
+    "diagnosticRule":"Validate every served bridge; recognize the runtime contract loader from an observed successful script response or owner readiness; then require each projected owner within its evidence-derived bounded stage.",
     "executionBudget":{
-      "type":"derived_operational_critical_path",
+      "type":"derived_operational_critical_path_with_stage_ceiling",
       "baseCriticalPathMs":750000,
-      "reserveMs":150000,
-      "reserveRatio":0.2,
+      "globalReserveMs":150000,
+      "globalReserveRatio":0.2,
       "watchdogBudgetMs":900000,
-      "allocationMs":{
-        "navigationAndCanonicalRedirect":78000,
-        "bootstrapAndRuntimeContracts":337000,
-        "authenticationAndLegal":85000,
-        "tenantHydration":45000,
-        "threeRoleViews":195000,
-        "browserClose":10000
+      "derivedStageBudgetsMs":{
+        "canonical_client_projection_ready":450000,
+        "canonical_client_projection_observation":440000,
+        "canonical_client_projection_diagnostic_reserve":10000
       },
-      "derivation":"750000 ms operational critical path plus 150000 ms reserve equals a 900000 ms global watchdog.",
-      "interpretation":"This is an anti-false-timeout ceiling, not a performance target and not a relaxation of any functional, security, role, count or UI assertion.",
-      "exhaustionPolicy":"If the same gate reaches GATE_TIMEOUT at 900000 ms, stop retries and classify the exact active stage as PIPELINE_MECHANISM_FAILURE before any further change.",
+      "evidence":{
+        "sourceContractVersion":"1.0.13",
+        "observedOwnerSignalMs":370675,
+        "stageReserveAboveObservedMs":79325,
+        "derivation":"370675 ms observed owner signal rounded to a 450000 ms stage ceiling; 440000 ms are reserved for observation and 10000 ms for sanitized diagnostics."
+      },
+      "interpretation":"The 450000 ms stage ceiling is contained within the unchanged 900000 ms global watchdog. It is an anti-false-timeout ceiling, not a performance target and not a relaxation of functional, security, role, count or UI assertions.",
+      "exhaustionPolicy":"If canonical_client_projection_ready fails again under 450000 ms, stop retries and diagnose the exact owner lifecycle or page execution mechanism. If the gate reaches the 900000 ms watchdog, classify the exact active stage as PIPELINE_MECHANISM_FAILURE before any further change.",
       "acceptancePolicy":"Only a sanitized result with ok:true closes the gate."
     },
-    "reconciliation":{"date":"2026-07-18","classifications":["ENVIRONMENT_FAILURE","FUNCTIONAL_DEFECT","VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],"scope":"LAB publication, insurer UX bridge syntax, static script graph, runtime contract observation and global execution budget","rootCause":"A transient Hosting publication failure was cleared by one bounded retry. The browser diagnostic then identified and removed a missing parenthesis in aseguradoras-v1197-ux-bridge.js. Later runs proved that the canonical client projection was served with HTTP 200, valid JavaScript MIME, valid syntax and successful browser parsing. The remaining false negative came from the gate probing page state before prioritizing the already observed response, while the global 300000 ms watchdog was shorter than the derived operational critical path for bootstrap, authentication, legal, hydration and three role views.","corrections":["retain one bounded retry only for a confirmed transient Hosting failure","repair the single missing parenthesis in aseguradoras-v1197-ux-bridge.js","include the served insurer bridge in runtime syntax validation","recognize loader start from the observed successful client projection response before probing page state","bound the fallback page probe to 1000 ms","set and report WATCHDOG_BUDGET_MS=900000","preserve every stage-level timeout and every success assertion"],"openEvidence":["contract 1.0.13 must produce sanitized ok:true and complete all three role views in one execution"],"preserved":["Orbit.store","core/auth.js","core/legal.js","core/access-scope.js","core/router.js","Cliente 360 renderer","Aseguradoras renderer","414 clientes","26 aseguradoras","7 asesores"]},
+    "reconciliation":{"date":"2026-07-18","classifications":["ENVIRONMENT_FAILURE","FUNCTIONAL_DEFECT","VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],"scope":"LAB publication, insurer UX bridge syntax, runtime contract observation and evidence-derived local/global execution budgets","rootCause":"The 1.0.13 evidence proved that the canonical client projection was served with HTTP 200, valid JavaScript MIME, valid syntax, successful browser parsing and an available owner/get API at approximately 370675 ms. The global watchdog had already been corrected to 900000 ms, but canonical_client_projection_ready still retained a 25000 ms outer bound and a 15000 ms observation deadline. The failure was therefore a stale local validator budget, not a product, data, Router, Auth or store defect.","corrections":["retain WATCHDOG_BUDGET_MS=900000","derive canonical_client_projection_ready as a 450000 ms stage ceiling from the observed 370675 ms signal","allocate 440000 ms to owner observation and 10000 ms to sanitized diagnostics","report the stage budgets in resultado-sanitizado.json","preserve all subsequent owner, Auth, Legal, data, role, UI and count assertions","execute the same gate once after GO_GATE_CONTRACT"],"openEvidence":["contract 1.0.14 must produce sanitized ok:true and complete all three role views in one execution"],"preserved":["Orbit.store","core/auth.js","core/legal.js","core/access-scope.js","core/router.js","Cliente 360 renderer","Aseguradoras renderer","414 clientes","26 aseguradoras","7 asesores"]},
     "workflow":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
     "preflight":"tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "preflightEvidence":"orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
@@ -51,8 +53,8 @@
       {"path":"orbit360-platform/core/backend-lab-loader.js","requiredTokens":["var LAB_RUNTIME = '20260717-2'","runtimeVersion: LAB_RUNTIME"]},
       {"path":"orbit360-platform/sw.js","requiredTokens":["var CACHE = 'orbit360-v20260717-2'","var BUILD = '20260717-2'"]},
       {"path":"orbit360-platform/core/pwa.js","requiredTokens":["var RUNTIME_BUILD = '20260717-2'","serviceWorker.register('sw.js?v=' + RUNTIME_BUILD)"]},
-      {"path":"tools/orbit360-gate-runtime-crm-v20260716.mjs","requiredTokens":["contractVersion:'1.0.13'","WATCHDOG_BUDGET_MS=900000","report.watchdogBudgetMs=WATCHDOG_BUDGET_MS","awaitPreviewRedirect","preview_redirect_ready","redirectCutoff=Date.now()+15000","waitForProductBootstrap","PIPELINE_STEP_TIMEOUT"]},
-      {"path":"tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs","requiredTokens":["installBootstrapDiagnostics","canonical_url_ready","CANONICAL_INDEX_NOT_REACHED","canonical_backend_runtime_ready","canonical_auth_provider_ready","canonical_auth_ui_ready","canonical_owner_handoff_ready","canonical_runtime_contract_loader_started","if (responseSeen) return;","setTimeout(() => resolve(false), 1000)","aseguradoras-v1197-ux-bridge.js","canonical_router_start_ready","canonical_bootstrap_stable","bootstrapTransportDiagnostic","stack: sanitizeDiagnostic","preAuthAccessFailClosed"]},
+      {"path":"tools/orbit360-gate-runtime-crm-v20260716.mjs","requiredTokens":["contractVersion:'1.0.14'","WATCHDOG_BUDGET_MS=900000","report.watchdogBudgetMs=WATCHDOG_BUDGET_MS","awaitPreviewRedirect","preview_redirect_ready","redirectCutoff=Date.now()+15000","waitForProductBootstrap","PIPELINE_STEP_TIMEOUT"]},
+      {"path":"tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs","requiredTokens":["installBootstrapDiagnostics","canonical_url_ready","CANONICAL_INDEX_NOT_REACHED","canonical_backend_runtime_ready","canonical_auth_provider_ready","canonical_auth_ui_ready","canonical_owner_handoff_ready","canonical_runtime_contract_loader_started","if (responseSeen) return;","setTimeout(() => resolve(false), 1000)","CLIENT_PROJECTION_READY_BUDGET_MS = 450000","CLIENT_PROJECTION_DIAGNOSTIC_RESERVE_MS = 10000","canonical_client_projection_ready: CLIENT_PROJECTION_READY_BUDGET_MS","aseguradoras-v1197-ux-bridge.js","canonical_router_start_ready","canonical_bootstrap_stable","bootstrapTransportDiagnostic","stack: sanitizeDiagnostic","preAuthAccessFailClosed"]},
       {"path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml","requiredTokens":["ORBIT360_EXPECTED_RUNTIME: 20260717-2","CANONICAL_RUNTIME_VERSION","tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs","tools/orbit360-gate-environment-v20260717.mjs"]}
     ],
     "forbiddenRuntimeReferences":["aseguradoras-candidate-actions.js","aseguradoras-frontend-projection-v20260716.js","empalme-v1251-runtime.js","import-initial-profiles.js","importar-initial-tenant-lab.js","installLegalGate","installMobileNavigation","asg-order-v20260716","asg-knowledge-projection-v20260716","authentication_owner_ready","canonical_runtime_snapshot","document.readyState === 'complete'","document.querySelectorAll('#sidebar .nav-link').length > 1","canonical_product_bootstrap_ready","page.waitForURL","const deadline = Date.now() + 60000"],
