@@ -8,7 +8,7 @@ on:
       - ".github/workflows/orbit360-measure-bootstrap-timeline-v1023.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   measure:
@@ -17,6 +17,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
       - name: Instalar navegador
         shell: bash
         run: |
@@ -32,7 +33,7 @@ jobs:
           import { chromium } from 'playwright';
           import { writeFileSync } from 'node:fs';
           const url='https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2#/aseguradoras';
-          const report={schemaVersion:'orbit360-bootstrap-timeline-v2',containsPII:false,containsSecrets:false,startedAt:new Date().toISOString(),milestones:{},runtimeSignals:[],pageErrors:[],badResponses:[],lastRequestFinished:null,result:null,diagnosticError:null};
+          const report={schemaVersion:'orbit360-bootstrap-timeline-v3',containsPII:false,containsSecrets:false,startedAt:new Date().toISOString(),milestones:{},runtimeSignals:[],pageErrors:[],badResponses:[],lastRequestFinished:null,result:null,diagnosticError:null};
           const started=Date.now();
           const ms=()=>Date.now()-started;
           const pathOf=value=>{try{return new URL(value).pathname}catch{return ''}};
@@ -94,15 +95,13 @@ jobs:
           }
           NODE
           node /tmp/measure-bootstrap.mjs || true
-      - name: Publicar medición sanitizada
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-bootstrap-timeline-v1023
-          path: orbit360-bootstrap-timeline/timeline.json
-          retention-days: 3
-          if-no-files-found: error
-      - name: Marcar corrida diagnóstica
-        if: always()
+      - name: Persistir medición sanitizada
         shell: bash
-        run: exit 1
+        run: |
+          set -euo pipefail
+          cp orbit360-bootstrap-timeline/timeline.json .github/orbit360-bootstrap-timeline-v1023.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/orbit360-bootstrap-timeline-v1023.json
+          git commit -m "chore(block1): record external bootstrap timeline 1.0.23 [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
