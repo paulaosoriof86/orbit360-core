@@ -1,3 +1,5 @@
+import { Script } from 'node:vm';
+
 function sanitizeDiagnostic(value) {
   return String(value || '')
     .replace(/https?:\/\/[^/\s]+/g, '')
@@ -71,6 +73,36 @@ async function approveStage(report, bounded, name, task, timeoutMs) {
   report.checks[name] = true;
 }
 
+async function validateServedRuntimeScripts(page, { report, bounded, requireState }) {
+  const paths = [
+    '/core/session-multirol-visibility-v20260716.js',
+    '/core/client-canonical-view-projection-v20260716.js',
+    '/core/tenant-insurer-config-p10.js',
+    '/data/tenant-runtime-config-index.js',
+    '/data/tenant-alianzas-soluciones-insurers-p10.js'
+  ];
+
+  await approveStage(report, bounded, 'canonical_runtime_scripts_syntax_ready', async () => {
+    const origin = new URL(page.url()).origin;
+    const diagnostics = [];
+    for (const path of paths) {
+      const response = await page.context().request.get(new URL(path, origin).href, { timeout: 12000 });
+      const status = response.status();
+      requireState(response.ok(), 'RUNTIME_SCRIPT_HTTP', `${path}:${status}`);
+      const body = await response.text();
+      try {
+        new Script(body, { filename: path });
+        diagnostics.push({ path, status, bytes: Buffer.byteLength(body), syntax: true });
+      } catch (error) {
+        diagnostics.push({ path, status, bytes: Buffer.byteLength(body), syntax: false, error: sanitizeDiagnostic(error && error.message) });
+        report.runtimeScriptDiagnostics = diagnostics;
+        throw new Error(`RUNTIME_SCRIPT_SYNTAX:${path}:${sanitizeDiagnostic(error && error.message)}`);
+      }
+    }
+    report.runtimeScriptDiagnostics = diagnostics;
+  }, 70000);
+}
+
 export async function waitForProductBootstrap(page, { runtime, bounded, requireState, report }) {
   if (!report.bootstrapTransportDiagnostic) installBootstrapDiagnostics(page, report);
   report.bootstrapTransportDiagnostic.currentUrl = page.url();
@@ -112,9 +144,27 @@ export async function waitForProductBootstrap(page, { runtime, bounded, requireS
       typeof Orbit.auth.loginFirebase === 'function');
   }, null, { timeout: 20000, polling: 250 }), 24000);
 
+  await validateServedRuntimeScripts(page, { report, bounded, requireState });
+
+  await approveStage(report, bounded, 'canonical_client_projection_ready', () => page.waitForFunction(() => {
+    return Boolean(window.Orbit && Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function');
+  }, null, { timeout: 12000, polling: 250 }), 15000);
+
+  await approveStage(report, bounded, 'canonical_tenant_insurer_core_ready', () => page.waitForFunction(() => {
+    return Boolean(window.Orbit && Orbit.tenantInsurerConfigP10 && typeof Orbit.tenantInsurerConfigP10.registerTenantConfig === 'function');
+  }, null, { timeout: 12000, polling: 250 }), 15000);
+
+  await approveStage(report, bounded, 'canonical_tenant_runtime_index_ready', () => page.waitForFunction(() => {
+    return Boolean(window.OrbitTenantRuntimeConfigIndex && window.OrbitTenantRuntimeConfigIndex['alianzas-soluciones']);
+  }, null, { timeout: 12000, polling: 250 }), 15000);
+
+  await approveStage(report, bounded, 'canonical_tenant_insurer_active_ready', () => page.waitForFunction(() => {
+    return [].concat(window.OrbitTenantInsurerConfigsP10 || []).some(item => item && item.tenantId === 'alianzas-soluciones');
+  }, null, { timeout: 12000, polling: 250 }), 15000);
+
   await approveStage(report, bounded, 'canonical_router_start_ready', () => page.waitForFunction(() => {
     return Boolean(window.Orbit && Orbit.route && Orbit.route.key);
-  }, null, { timeout: 35000, polling: 250 }), 39000);
+  }, null, { timeout: 20000, polling: 250 }), 24000);
 
   await approveStage(report, bounded, 'canonical_bootstrap_stable', async () => {
     await page.waitForTimeout(2000);
