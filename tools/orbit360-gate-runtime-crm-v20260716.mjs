@@ -45,6 +45,32 @@ async function awaitPreviewRedirect(page){
   },18000);
   report.checks.previewRedirectReady=true;
 }
+async function waitForPostRouterRuntime(){
+  await bounded('canonical_post_router_runtime_terminal',async()=>{
+    const deadline=Date.now()+180000;
+    while(Date.now()<deadline){
+      const signals=[].concat(report.postRouterRuntimeSignals||[]);
+      const terminal=signals.find(item=>item&&(
+        item.name==='orbit:aseguradoras:tenant-runtime-linked'||
+        item.name==='orbit:aseguradoras:tenant-runtime-error'
+      ));
+      if(terminal){
+        requireState(terminal.name!=='orbit:aseguradoras:tenant-runtime-error','POST_ROUTER_RUNTIME_ERROR',terminal.status||'error');
+        requireState(!/load_failed|error|blocked_context/i.test(String(terminal.status||'')),'POST_ROUTER_RUNTIME_NOT_READY',terminal.status||'unknown');
+        report.postRouterRuntimeDiagnostic={
+          event:terminal.name,
+          status:terminal.status||'loaded',
+          method:'external-custom-event-binding',
+          beforeAuth:true
+        };
+        return;
+      }
+      await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    requireState(false,'POST_ROUTER_RUNTIME_TERMINAL_MISSING');
+  },185000);
+  report.checks.canonical_post_router_runtime_terminal=true;
+}
 async function selectRole(page,label){
   const select=page.locator('#rol-sel');await select.waitFor({state:'attached',timeout:15000});
   const options=await select.locator('option').evaluateAll(nodes=>nodes.map(node=>({value:node.value,text:String(node.textContent||'').trim()})));
@@ -79,9 +105,17 @@ async function validateMobileMenu(page){
 browser=await chromium.launch({headless:true});
 const page=await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(45000);
 report.navigationTimeline=[];
+report.postRouterRuntimeSignals=[];
 page.on('framenavigated',frame=>{
   if(frame!==page.mainFrame()||report.navigationTimeline.length>=12)return;
   report.navigationTimeline.push({path:diagnosticPath(frame.url()),atMs:Date.now()});
+});
+await page.exposeBinding('__orbitGatePostRouterRuntime',(_source,payload)=>{
+  if(report.postRouterRuntimeSignals.length>=16)return;
+  report.postRouterRuntimeSignals.push({
+    name:diagnosticText(payload&&payload.name),
+    status:diagnosticText(payload&&payload.status)
+  });
 });
 await page.addInitScript(() => {
   const startedAt = Date.now();
@@ -93,6 +127,21 @@ await page.addInitScript(() => {
     temporaryOwnerEverSeen:false,
     events:[]
   };
+  const forwardRuntimeEvent=event=>{
+    try{
+      const detail=event&&event.detail||{};
+      window.__orbitGatePostRouterRuntime({
+        name:String(event&&event.type||''),
+        status:String(detail.status||detail.error||'')
+      });
+    }catch(error){}
+  };
+  [
+    'orbit:aseguradoras:knowledge-ready',
+    'orbit:aseguradoras:knowledge-error',
+    'orbit:aseguradoras:tenant-runtime-linked',
+    'orbit:aseguradoras:tenant-runtime-error'
+  ].forEach(name=>window.addEventListener(name,forwardRuntimeEvent));
   let previous='';
   const sample=()=>{
     const marker=document.querySelector('script[data-orbit-client-projection-runtime-v20260716]');
@@ -153,12 +202,7 @@ try{
   stage('open_lab_preview');await page.goto(`${baseUrl}/ays-lab-preview.html`,{waitUntil:'domcontentloaded',timeout:60000});
   await awaitPreviewRedirect(page);
   await waitForProductBootstrap(page,{runtime,bounded,requireState,report});
-  await bounded('canonical_document_load_complete',async()=>{
-    await page.waitForLoadState('load',{timeout:120000});
-    await page.waitForTimeout(500);
-    report.documentLifecycleDiagnostic={state:'load',method:'browser-lifecycle-event',beforeAuth:true};
-  },125000);
-  report.checks.canonical_document_load_complete=true;
+  await waitForPostRouterRuntime();
   await authenticateWithOwner(page,{email,key,runtime,bounded,requireState,report});
   await acceptLegalOnce(page,{bounded,requireState,report});
   stage('real_tenant_data');report.storeCounts=await waitForRealTenantData(page,26);
