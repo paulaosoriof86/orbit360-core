@@ -56,4 +56,10 @@ Ejecutar el mismo gate una sola vez después de GO_GATE_CONTRACT. Aceptar exclus
 
 ## Publicación y retiro del mecanismo temporal
 
-El contenido 1.0.19 fue validado y publicado sin mutar workflows mediante GITHUB_TOKEN. El workflow temporal se registra como retirado y debe eliminarse antes de ejecutar el gate. La ejecución final se solicita una sola vez mediante workflow_dispatch sobre el HEAD limpio.
+El contenido 1.0.19 fue validado y publicado sin mutar workflows mediante GITHUB_TOKEN. El workflow temporal y los scripts de transformación quedaron retirados antes de ejecutar el gate. No quedan staging, parches ni ejecutores de un solo uso activos en la rama.
+
+## Solicitud única de ejecución
+
+HEAD limpio previo: 6ee7f69f4740ca73d37422f521e842c1c420c23d.
+
+Esta actualización documental solicita una única ejecución del workflow existente Orbit 360 Clientes y Aseguradoras Runtime Gate 20260717. El preflight contractual debe ejecutarse primero y solo una evidencia sanitizada con ok:true permite cerrar M1 y pasar a la revisión visual.
