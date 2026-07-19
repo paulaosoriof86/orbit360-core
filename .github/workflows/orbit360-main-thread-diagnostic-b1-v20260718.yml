@@ -8,6 +8,11 @@ on:
       - ".github/workflows/orbit360-main-thread-diagnostic-b1-v20260718.yml"
       - "tools/orbit360-diagnosticar-hilo-principal-b1-v20260718.mjs"
       - "orbit360-platform/modules/portal-v1142-copyfix.js"
+  pull_request:
+    branches:
+      - main
+    types:
+      - ready_for_review
   workflow_dispatch:
 
 permissions:
@@ -21,6 +26,7 @@ concurrency:
 
 jobs:
   diagnose:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.ref == 'ays/backend-tenant-lab-v99-20260703'
     name: Diagnóstico aislado del hilo principal · sin gate ni deploy
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -28,10 +34,14 @@ jobs:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
       ORBIT360_EXPECTED_RUNTIME: 20260717-2
       ORBIT360_PREVIEW_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
+      ORBIT360_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+      ORBIT360_TARGET_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
     steps:
       - name: Checkout rama autorizada
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Preflight vinculante antes del navegador
         shell: bash
@@ -98,15 +108,16 @@ jobs:
 
           const orderedNames = ['bare', 'cdp-debugger', 'gate-observer'];
           const summary = {
-            schemaVersion: 'orbit360-main-thread-classification-v2-durable-result',
+            schemaVersion: 'orbit360-main-thread-classification-v3-explicit-trigger',
             generatedAt: new Date().toISOString(),
             containsPII: false,
             containsSecrets: false,
             gateId: 'block1-client360-insurers-lab-v20260717',
             contractVersion: '1.0.25',
-            sourceCommit: process.env.GITHUB_SHA || '',
+            sourceCommit: process.env.ORBIT360_SOURCE_COMMIT || process.env.GITHUB_SHA || '',
             runId: process.env.GITHUB_RUN_ID || '',
             runAttempt: process.env.GITHUB_RUN_ATTEMPT || '',
+            trigger: process.env.GITHUB_EVENT_NAME || '',
             evidenceProduced,
             classification,
             finding,
@@ -167,7 +178,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Persistir resultado durable y comentar PR 5
-        if: always() && github.event_name == 'push'
+        if: always()
         continue-on-error: true
         uses: actions/github-script@v7
         env:
@@ -178,20 +189,23 @@ jobs:
             const fs = require('fs');
             const resultPath = process.env.RESULT_PATH;
             const durablePath = process.env.DURABLE_PATH;
+            const targetBranch = process.env.ORBIT360_TARGET_BRANCH || context.ref.replace('refs/heads/', '');
+            const sourceCommit = process.env.ORBIT360_SOURCE_COMMIT || context.sha;
             let result;
             try {
               result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
             } catch (error) {
               result = {
-                schemaVersion: 'orbit360-main-thread-classification-v2-durable-result',
+                schemaVersion: 'orbit360-main-thread-classification-v3-explicit-trigger',
                 generatedAt: new Date().toISOString(),
                 containsPII: false,
                 containsSecrets: false,
                 gateId: 'block1-client360-insurers-lab-v20260717',
                 contractVersion: '1.0.25',
-                sourceCommit: context.sha,
+                sourceCommit,
                 runId: String(context.runId),
                 runAttempt: String(process.env.GITHUB_RUN_ATTEMPT || ''),
+                trigger: context.eventName,
                 evidenceProduced: false,
                 classification: 'PIPELINE_MECHANISM_FAILURE',
                 finding: 'DIAGNOSTIC_CLASSIFICATION_NOT_PRODUCED',
@@ -201,9 +215,10 @@ jobs:
                 nextAction: 'Stop. Correct only the diagnostic execution/observability mechanism; do not rerun the official gate.'
               };
             }
-            result.sourceCommit = context.sha;
+            result.sourceCommit = sourceCommit;
             result.runId = String(context.runId);
             result.runAttempt = String(process.env.GITHUB_RUN_ATTEMPT || '');
+            result.trigger = context.eventName;
             const serialized = JSON.stringify(result, null, 2) + '\n';
 
             try {
@@ -213,7 +228,7 @@ jobs:
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   path: durablePath,
-                  ref: context.ref.replace('refs/heads/', '')
+                  ref: targetBranch
                 });
                 currentSha = current.data.sha;
               } catch (error) {
@@ -225,7 +240,7 @@ jobs:
                 path: durablePath,
                 message: `chore(block1): publicar resultado diagnóstico ${context.runId} [skip ci]`,
                 content: Buffer.from(serialized).toString('base64'),
-                branch: context.ref.replace('refs/heads/', ''),
+                branch: targetBranch,
                 sha: currentSha
               });
             } catch (error) {
@@ -237,7 +252,8 @@ jobs:
               '## Diagnóstico aislado B1 · resultado post-fix',
               '',
               `- Run: \`${context.runId}\``,
-              `- Commit: \`${context.sha}\``,
+              `- Commit probado: \`${sourceCommit}\``,
+              `- Disparador: \`${context.eventName}\``,
               '- Gate oficial ejecutado: **no**',
               '- Deploy o sincronización: **no**',
               `- Evidencia producida: **${result.evidenceProduced === true}**`,
