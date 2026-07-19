@@ -1,0 +1,141 @@
+name: Orbit 360 Dispatch Official M1 Once 20260719
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-dispatch-official-m1-once-v20260719.yml"
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-dispatch-official-m1-once-v20260719
+  cancel-in-progress: false
+
+jobs:
+  dispatch_once:
+    name: Despachar gate oficial M1 exactamente una vez
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validar rama y despachar workflow oficial
+        uses: actions/github-script@v7
+        env:
+          TARGET_WORKFLOW: orbit360-aseguradoras-runtime-gate-v20260716.yml
+          TARGET_REF: ays/backend-tenant-lab-v99-20260703
+          RESULT_PATH: .github/diagnostic-results/orbit360-m1-official-dispatch-latest.json
+        with:
+          script: |
+            const targetWorkflow = process.env.TARGET_WORKFLOW;
+            const targetRef = process.env.TARGET_REF;
+            const resultPath = process.env.RESULT_PATH;
+            if (context.ref !== `refs/heads/${targetRef}`) {
+              core.setFailed(`UNAUTHORIZED_BRANCH:${context.ref}`);
+              return;
+            }
+
+            const result = {
+              schemaVersion: 'orbit360-m1-official-dispatch-v1',
+              generatedAt: new Date().toISOString(),
+              containsPII: false,
+              containsSecrets: false,
+              gateId: 'block1-client360-insurers-lab-v20260717',
+              targetWorkflow,
+              targetRef,
+              dispatcherCommit: context.sha,
+              dispatched: false,
+              runId: '',
+              status: 'PENDING',
+              error: ''
+            };
+
+            try {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: targetWorkflow,
+                ref: targetRef
+              });
+              result.dispatched = true;
+              result.status = 'DISPATCH_ACCEPTED';
+
+              for (let attempt = 0; attempt < 20; attempt += 1) {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                const runs = await github.rest.actions.listWorkflowRuns({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  workflow_id: targetWorkflow,
+                  branch: targetRef,
+                  event: 'workflow_dispatch',
+                  per_page: 10
+                });
+                const match = (runs.data.workflow_runs || []).find(run => run.head_branch === targetRef);
+                if (match) {
+                  result.runId = String(match.id);
+                  result.status = String(match.status || 'queued').toUpperCase();
+                  result.runUrl = String(match.html_url || '');
+                  result.headSha = String(match.head_sha || '');
+                  break;
+                }
+              }
+            } catch (error) {
+              result.status = 'DISPATCH_FAILED';
+              result.error = String(error.message || error).slice(0, 300);
+            }
+
+            const serialized = JSON.stringify(result, null, 2) + '\n';
+            try {
+              let currentSha;
+              try {
+                const current = await github.rest.repos.getContent({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: resultPath,
+                  ref: targetRef
+                });
+                currentSha = current.data.sha;
+              } catch (error) {
+                if (error.status !== 404) throw error;
+              }
+              await github.rest.repos.createOrUpdateFileContents({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                path: resultPath,
+                message: `chore(block1): registrar dispatch oficial M1 ${result.runId || 'fallido'} [skip ci]`,
+                content: Buffer.from(serialized).toString('base64'),
+                branch: targetRef,
+                sha: currentSha
+              });
+            } catch (error) {
+              core.warning(`No se pudo persistir dispatch: ${error.message}`);
+            }
+
+            const lines = [
+              '## M1 · despacho explícito del gate oficial',
+              '',
+              `- Workflow: \`${targetWorkflow}\``,
+              `- Rama: \`${targetRef}\``,
+              `- Commit despachador: \`${context.sha}\``,
+              `- Dispatch aceptado: **${result.dispatched}**`,
+              `- Estado: **${result.status}**`,
+              `- Run: \`${result.runId || 'no asignado'}\``,
+              `- HEAD probado: \`${result.headSha || 'pendiente'}\``,
+              '- Número de despachos solicitados: **1**',
+              '- Producción o merge: **no**'
+            ];
+            if (result.error) lines.push(`- Error sanitizado: \`${result.error}\``);
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 5,
+              body: lines.join('\n')
+            });
+
+            if (!result.dispatched || !result.runId) {
+              core.setFailed(result.error || 'OFFICIAL_M1_RUN_NOT_OBSERVED');
+            }
