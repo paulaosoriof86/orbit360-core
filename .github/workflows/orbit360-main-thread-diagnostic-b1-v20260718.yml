@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   issues: write
   pull-requests: write
 
@@ -57,44 +57,60 @@ jobs:
           set -euo pipefail
           node tools/orbit360-diagnosticar-hilo-principal-b1-v20260718.mjs
 
-      - name: Clasificar capa causal sin modificar producto
+      - name: Clasificar capa causal con fallback obligatorio
         if: always()
         shell: bash
         run: |
           set -euo pipefail
-          REPORT="orbit360-platform/runtime-gate-crm-v20260716/main-thread-diagnostic-sanitized.json"
-          test -f "$REPORT"
           node --input-type=module <<'NODE'
-          import { readFileSync, writeFileSync } from 'node:fs';
+          import { existsSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+          import { dirname } from 'node:path';
+
           const reportPath = 'orbit360-platform/runtime-gate-crm-v20260716/main-thread-diagnostic-sanitized.json';
           const outputPath = 'orbit360-platform/runtime-gate-crm-v20260716/main-thread-classification-sanitized.json';
-          const report = JSON.parse(readFileSync(reportPath, 'utf8'));
+          let report = { variants: [] };
+          let evidenceProduced = false;
+          if (existsSync(reportPath)) {
+            try {
+              report = JSON.parse(readFileSync(reportPath, 'utf8'));
+              evidenceProduced = true;
+            } catch {
+              evidenceProduced = false;
+            }
+          }
+
           const variants = Object.fromEntries((report.variants || []).map(item => [item.name, item]));
           const bare = variants.bare;
           const cdp = variants['cdp-debugger'];
           const observer = variants['gate-observer'];
           let classification = 'PIPELINE_MECHANISM_FAILURE';
-          let finding = 'EXTERNAL_DIAGNOSTIC_DID_NOT_REPRODUCE_GATE_AUTH_LOCATOR_FAILURE';
-          if (!bare || !cdp || !observer) {
-            classification = 'PIPELINE_MECHANISM_FAILURE';
+          let finding = 'DIAGNOSTIC_EVIDENCE_NOT_PRODUCED';
+          if (evidenceProduced && (!bare || !cdp || !observer)) {
             finding = 'DIAGNOSTIC_VARIANT_MISSING';
-          } else if (bare.responseReady !== true) {
+          } else if (evidenceProduced && bare.responseReady !== true) {
             classification = 'FUNCTIONAL_DEFECT';
             finding = 'BARE_BROWSER_MAIN_THREAD_NOT_RESPONSIVE';
-          } else if (cdp.responseReady !== true || observer.responseReady !== true) {
-            classification = 'PIPELINE_MECHANISM_FAILURE';
+          } else if (evidenceProduced && (cdp.responseReady !== true || observer.responseReady !== true)) {
             finding = 'INSTRUMENTATION_CAUSES_OR_EXPOSES_BROWSER_CONTROL_BLOCK';
+          } else if (evidenceProduced) {
+            finding = 'MAIN_THREAD_RESPONSIVE_AFTER_PORTAL_IDEMPOTENCE_FIX';
           }
+
+          const orderedNames = ['bare', 'cdp-debugger', 'gate-observer'];
           const summary = {
-            schemaVersion: 'orbit360-main-thread-classification-v1',
+            schemaVersion: 'orbit360-main-thread-classification-v2-durable-result',
             generatedAt: new Date().toISOString(),
             containsPII: false,
             containsSecrets: false,
             gateId: 'block1-client360-insurers-lab-v20260717',
             contractVersion: '1.0.25',
+            sourceCommit: process.env.GITHUB_SHA || '',
+            runId: process.env.GITHUB_RUN_ID || '',
+            runAttempt: process.env.GITHUB_RUN_ATTEMPT || '',
+            evidenceProduced,
             classification,
             finding,
-            variants: ['bare', 'cdp-debugger', 'gate-observer'].map(name => ({
+            variants: orderedNames.map(name => ({
               name,
               responseReady: variants[name]?.responseReady === true,
               probeError: String(variants[name]?.probeError || '').slice(0, 180),
@@ -103,16 +119,22 @@ jobs:
               pausedFunction: String(variants[name]?.pausedFrames?.[0]?.functionName || '').slice(0, 120),
               pausedPath: String(variants[name]?.pausedFrames?.[0]?.path || '').slice(0, 160)
             })),
-            nextAction: classification === 'FUNCTIONAL_DEFECT'
-              ? 'Inspect the top product frame from the bare variant; do not change the gate or budgets.'
-              : 'Freeze product and isolate the Playwright/authentication helper mechanism before one official gate rerun.'
+            officialGateExecuted: false,
+            deployOrSyncExecuted: false,
+            nextAction: finding === 'MAIN_THREAD_RESPONSIVE_AFTER_PORTAL_IDEMPOTENCE_FIX'
+              ? 'Run the binding preflight and the official M1 gate exactly once.'
+              : classification === 'FUNCTIONAL_DEFECT'
+                ? 'Stop. Inspect only the first bare-browser product frame; do not change gate or budgets.'
+                : 'Stop. Correct only the diagnostic execution/observability mechanism; do not rerun the official gate.'
           };
+          mkdirSync(dirname(outputPath), { recursive: true });
           writeFileSync(outputPath, JSON.stringify(summary, null, 2) + '\n');
           console.log(`ORBIT360_MAIN_THREAD_CLASSIFICATION:${JSON.stringify(summary)}`);
           NODE
 
-      - name: Publicar evidencia sanitizada
+      - name: Publicar evidencia sanitizada como artefacto
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: orbit360-b1-main-thread-diagnostic-${{ github.run_id }}
@@ -120,7 +142,7 @@ jobs:
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/main-thread-diagnostic-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/main-thread-classification-sanitized.json
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 7
 
       - name: Resumen del corte causal
@@ -140,41 +162,100 @@ jobs:
               echo ""
               jq -r '.variants[] | "- \(.name): responseReady=\(.responseReady), probeError=\(.probeError)"' "$REPORT"
             else
-              echo "Bloqueo: no se produjo evidencia diagnóstica."
+              echo "Bloqueo: no se produjo clasificación de cierre."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Publicar clasificación sanitizada en PR 5
+      - name: Persistir resultado durable y comentar PR 5
         if: always() && github.event_name == 'push'
-        shell: bash
+        continue-on-error: true
+        uses: actions/github-script@v7
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          REPORT="orbit360-platform/runtime-gate-crm-v20260716/main-thread-classification-sanitized.json"
-          BODY="${RUNNER_TEMP}/orbit360-main-thread-comment.md"
-          {
-            echo "## Diagnóstico aislado B1 · hilo principal"
-            echo ""
-            echo "- Run: \`${GITHUB_RUN_ID}\`"
-            echo "- Commit: \`${GITHUB_SHA}\`"
-            echo "- Gate oficial ejecutado: **no**"
-            echo "- Deploy o sincronización: **no**"
-            echo "- Producto modificado: **no**"
-            echo ""
-            if [ -f "$REPORT" ]; then
-              echo "- Clasificación: **$(jq -r '.classification' "$REPORT")**"
-              echo "- Hallazgo: \`$(jq -r '.finding' "$REPORT")\`"
-              echo ""
-              echo "### Variantes"
-              jq -r '.variants[] | "- `\(.name)`: responseReady=`\(.responseReady)`; probeError=`\(.probeError)`; top=`\(.topFunction)` `\(.topPath)`; paused=`\(.pausedFunction)` `\(.pausedPath)`"' "$REPORT"
-              echo ""
-              echo "Siguiente acción vinculante: $(jq -r '.nextAction' "$REPORT")"
-            else
-              echo "- Clasificación: **PIPELINE_MECHANISM_FAILURE**"
-              echo "- Hallazgo: \`DIAGNOSTIC_EVIDENCE_NOT_PRODUCED\`"
-              echo ""
-              echo "La ejecución se cierra aquí; no se reintenta el gate ni se modifica producto."
-            fi
-          } > "$BODY"
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file "$BODY"
+          RESULT_PATH: orbit360-platform/runtime-gate-crm-v20260716/main-thread-classification-sanitized.json
+          DURABLE_PATH: .github/diagnostic-results/orbit360-b1-main-thread-latest.json
+        with:
+          script: |
+            const fs = require('fs');
+            const resultPath = process.env.RESULT_PATH;
+            const durablePath = process.env.DURABLE_PATH;
+            let result;
+            try {
+              result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+            } catch (error) {
+              result = {
+                schemaVersion: 'orbit360-main-thread-classification-v2-durable-result',
+                generatedAt: new Date().toISOString(),
+                containsPII: false,
+                containsSecrets: false,
+                gateId: 'block1-client360-insurers-lab-v20260717',
+                contractVersion: '1.0.25',
+                sourceCommit: context.sha,
+                runId: String(context.runId),
+                runAttempt: String(process.env.GITHUB_RUN_ATTEMPT || ''),
+                evidenceProduced: false,
+                classification: 'PIPELINE_MECHANISM_FAILURE',
+                finding: 'DIAGNOSTIC_CLASSIFICATION_NOT_PRODUCED',
+                variants: [],
+                officialGateExecuted: false,
+                deployOrSyncExecuted: false,
+                nextAction: 'Stop. Correct only the diagnostic execution/observability mechanism; do not rerun the official gate.'
+              };
+            }
+            result.sourceCommit = context.sha;
+            result.runId = String(context.runId);
+            result.runAttempt = String(process.env.GITHUB_RUN_ATTEMPT || '');
+            const serialized = JSON.stringify(result, null, 2) + '\n';
+
+            try {
+              let currentSha;
+              try {
+                const current = await github.rest.repos.getContent({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: durablePath,
+                  ref: context.ref.replace('refs/heads/', '')
+                });
+                currentSha = current.data.sha;
+              } catch (error) {
+                if (error.status !== 404) throw error;
+              }
+              await github.rest.repos.createOrUpdateFileContents({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                path: durablePath,
+                message: `chore(block1): publicar resultado diagnóstico ${context.runId} [skip ci]`,
+                content: Buffer.from(serialized).toString('base64'),
+                branch: context.ref.replace('refs/heads/', ''),
+                sha: currentSha
+              });
+            } catch (error) {
+              core.warning(`No se pudo persistir el resultado durable: ${error.message}`);
+            }
+
+            const variants = Array.isArray(result.variants) ? result.variants : [];
+            const lines = [
+              '## Diagnóstico aislado B1 · resultado post-fix',
+              '',
+              `- Run: \`${context.runId}\``,
+              `- Commit: \`${context.sha}\``,
+              '- Gate oficial ejecutado: **no**',
+              '- Deploy o sincronización: **no**',
+              `- Evidencia producida: **${result.evidenceProduced === true}**`,
+              `- Clasificación: **${result.classification}**`,
+              `- Hallazgo: \`${result.finding}\``,
+              '',
+              '### Variantes',
+              ...variants.map(item => `- \`${item.name}\`: responseReady=\`${item.responseReady === true}\`; probeError=\`${item.probeError || ''}\`; top=\`${item.topFunction || ''}\` \`${item.topPath || ''}\``),
+              '',
+              `Siguiente acción vinculante: ${result.nextAction}`
+            ];
+            try {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 5,
+                body: lines.join('\n')
+              });
+            } catch (error) {
+              core.warning(`No se pudo publicar el comentario: ${error.message}`);
+            }
