@@ -33,7 +33,7 @@ jobs:
     env:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
       ORBIT360_EXPECTED_RUNTIME: 20260717-2
-      ORBIT360_PREVIEW_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
+      ORBIT360_PREVIEW_URL: http://127.0.0.1:4173
       ORBIT360_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
       ORBIT360_TARGET_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
@@ -59,6 +59,23 @@ jobs:
           npm install --no-save playwright@1.52.0
           npx playwright install --with-deps chromium
 
+      - name: Levantar runtime exacto del checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory orbit360-platform > "${RUNNER_TEMP}/orbit360-http.log" 2>&1 &
+          echo $! > "${RUNNER_TEMP}/orbit360-http.pid"
+          for attempt in $(seq 1 30); do
+            if curl -fsS "${ORBIT360_PREVIEW_URL}/ays-lab-preview.html" > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS "${ORBIT360_PREVIEW_URL}/ays-lab-preview.html" > /dev/null
+          curl -fsS "${ORBIT360_PREVIEW_URL}/modules/portal-v1142-copyfix.js" | grep -F "academiaStoreEnsured" > /dev/null
+          curl -fsS "${ORBIT360_PREVIEW_URL}/modules/portal-v1142-copyfix.js" | grep -F "courseNeedsUpdate" > /dev/null
+          echo "ORBIT360_CHECKOUT_RUNTIME_READY:${ORBIT360_SOURCE_COMMIT}"
+
       - name: Ejecutar diagnóstico externo en tres variantes
         id: diagnostic
         continue-on-error: true
@@ -67,7 +84,7 @@ jobs:
           set -euo pipefail
           node tools/orbit360-diagnosticar-hilo-principal-b1-v20260718.mjs
 
-      - name: Clasificar capa causal con fallback obligatorio
+      - name: Clasificar capa causal con procedencia obligatoria
         if: always()
         shell: bash
         run: |
@@ -93,9 +110,15 @@ jobs:
           const bare = variants.bare;
           const cdp = variants['cdp-debugger'];
           const observer = variants['gate-observer'];
+          const runtimeTarget = String(report.runtimeTarget || '');
+          const reportSourceCommit = String(report.sourceCommit || '');
+          const expectedSourceCommit = String(process.env.ORBIT360_SOURCE_COMMIT || process.env.GITHUB_SHA || '');
           let classification = 'PIPELINE_MECHANISM_FAILURE';
           let finding = 'DIAGNOSTIC_EVIDENCE_NOT_PRODUCED';
-          if (evidenceProduced && (!bare || !cdp || !observer)) {
+          if (evidenceProduced && (runtimeTarget !== 'CHECKOUT_LOCAL' || reportSourceCommit !== expectedSourceCommit)) {
+            classification = 'ENVIRONMENT_FAILURE';
+            finding = 'DIAGNOSTIC_RUNTIME_PROVENANCE_MISMATCH';
+          } else if (evidenceProduced && (!bare || !cdp || !observer)) {
             finding = 'DIAGNOSTIC_VARIANT_MISSING';
           } else if (evidenceProduced && bare.responseReady !== true) {
             classification = 'FUNCTIONAL_DEFECT';
@@ -103,18 +126,20 @@ jobs:
           } else if (evidenceProduced && (cdp.responseReady !== true || observer.responseReady !== true)) {
             finding = 'INSTRUMENTATION_CAUSES_OR_EXPOSES_BROWSER_CONTROL_BLOCK';
           } else if (evidenceProduced) {
-            finding = 'MAIN_THREAD_RESPONSIVE_AFTER_PORTAL_IDEMPOTENCE_FIX';
+            finding = 'MAIN_THREAD_RESPONSIVE_ON_CURRENT_CHECKOUT';
           }
 
           const orderedNames = ['bare', 'cdp-debugger', 'gate-observer'];
           const summary = {
-            schemaVersion: 'orbit360-main-thread-classification-v3-explicit-trigger',
+            schemaVersion: 'orbit360-main-thread-classification-v4-checkout-provenance',
             generatedAt: new Date().toISOString(),
             containsPII: false,
             containsSecrets: false,
             gateId: 'block1-client360-insurers-lab-v20260717',
             contractVersion: '1.0.25',
-            sourceCommit: process.env.ORBIT360_SOURCE_COMMIT || process.env.GITHUB_SHA || '',
+            sourceCommit: expectedSourceCommit,
+            reportSourceCommit,
+            runtimeTarget,
             runId: process.env.GITHUB_RUN_ID || '',
             runAttempt: process.env.GITHUB_RUN_ATTEMPT || '',
             trigger: process.env.GITHUB_EVENT_NAME || '',
@@ -132,11 +157,11 @@ jobs:
             })),
             officialGateExecuted: false,
             deployOrSyncExecuted: false,
-            nextAction: finding === 'MAIN_THREAD_RESPONSIVE_AFTER_PORTAL_IDEMPOTENCE_FIX'
+            nextAction: finding === 'MAIN_THREAD_RESPONSIVE_ON_CURRENT_CHECKOUT'
               ? 'Run the binding preflight and the official M1 gate exactly once.'
               : classification === 'FUNCTIONAL_DEFECT'
                 ? 'Stop. Inspect only the first bare-browser product frame; do not change gate or budgets.'
-                : 'Stop. Correct only the diagnostic execution/observability mechanism; do not rerun the official gate.'
+                : 'Stop. Correct only the diagnostic execution/runtime provenance mechanism; do not rerun the official gate.'
           };
           mkdirSync(dirname(outputPath), { recursive: true });
           writeFileSync(outputPath, JSON.stringify(summary, null, 2) + '\n');
@@ -167,6 +192,10 @@ jobs:
             echo "Gate no ejecutado. Sin deploy, sin sincronización y sin cambios de producto."
             echo ""
             if [ -f "$REPORT" ]; then
+              echo "Runtime probado: $(jq -r '.runtimeTarget' "$REPORT")"
+              echo ""
+              echo "Commit probado: $(jq -r '.sourceCommit' "$REPORT")"
+              echo ""
               echo "Clasificación: $(jq -r '.classification' "$REPORT")"
               echo ""
               echo "Hallazgo: $(jq -r '.finding' "$REPORT")"
@@ -196,13 +225,15 @@ jobs:
               result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
             } catch (error) {
               result = {
-                schemaVersion: 'orbit360-main-thread-classification-v3-explicit-trigger',
+                schemaVersion: 'orbit360-main-thread-classification-v4-checkout-provenance',
                 generatedAt: new Date().toISOString(),
                 containsPII: false,
                 containsSecrets: false,
                 gateId: 'block1-client360-insurers-lab-v20260717',
                 contractVersion: '1.0.25',
                 sourceCommit,
+                reportSourceCommit: '',
+                runtimeTarget: '',
                 runId: String(context.runId),
                 runAttempt: String(process.env.GITHUB_RUN_ATTEMPT || ''),
                 trigger: context.eventName,
@@ -212,7 +243,7 @@ jobs:
                 variants: [],
                 officialGateExecuted: false,
                 deployOrSyncExecuted: false,
-                nextAction: 'Stop. Correct only the diagnostic execution/observability mechanism; do not rerun the official gate.'
+                nextAction: 'Stop. Correct only the diagnostic execution/runtime provenance mechanism; do not rerun the official gate.'
               };
             }
             result.sourceCommit = sourceCommit;
@@ -249,10 +280,11 @@ jobs:
 
             const variants = Array.isArray(result.variants) ? result.variants : [];
             const lines = [
-              '## Diagnóstico aislado B1 · resultado post-fix',
+              '## Diagnóstico aislado B1 · resultado checkout vigente',
               '',
               `- Run: \`${context.runId}\``,
               `- Commit probado: \`${sourceCommit}\``,
+              `- Runtime: \`${result.runtimeTarget || ''}\``,
               `- Disparador: \`${context.eventName}\``,
               '- Gate oficial ejecutado: **no**',
               '- Deploy o sincronización: **no**',
