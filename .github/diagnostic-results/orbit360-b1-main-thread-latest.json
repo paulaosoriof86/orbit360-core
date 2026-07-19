@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "orbit360-main-thread-classification-v2-durable-result",
+  "generatedAt": "2026-07-19T00:49:58.904Z",
+  "containsPII": false,
+  "containsSecrets": false,
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.25",
+  "sourceCommit": "d9378b765ad6a226059ae82b34ac94402b4f6954",
+  "runId": "29667420502",
+  "runAttempt": "1",
+  "evidenceProduced": true,
+  "classification": "FUNCTIONAL_DEFECT",
+  "finding": "BARE_BROWSER_MAIN_THREAD_NOT_RESPONSIVE",
+  "variants": [
+    {
+      "name": "bare",
+      "responseReady": false,
+      "probeError": "LOCATOR_PROBE_TIMEOUT",
+      "topFunction": "(anonymous)",
+      "topPath": "/modules/portal-v1142-copyfix.js",
+      "pausedFunction": "",
+      "pausedPath": ""
+    },
+    {
+      "name": "cdp-debugger",
+      "responseReady": false,
+      "probeError": "LOCATOR_PROBE_TIMEOUT",
+      "topFunction": "(anonymous)",
+      "topPath": "/modules/portal-v1142-copyfix.js",
+      "pausedFunction": "markPending",
+      "pausedPath": ""
+    },
+    {
+      "name": "gate-observer",
+      "responseReady": false,
+      "probeError": "LOCATOR_PROBE_TIMEOUT",
+      "topFunction": "(anonymous)",
+      "topPath": "/modules/portal-v1142-copyfix.js",
+      "pausedFunction": "paintRoleSelector",
+      "pausedPath": ""
+    }
+  ],
+  "officialGateExecuted": false,
+  "deployOrSyncExecuted": false,
+  "nextAction": "Stop. Inspect only the first bare-browser product frame; do not change gate or budgets."
+}
