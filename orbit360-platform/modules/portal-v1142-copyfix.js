@@ -9,6 +9,9 @@ window.Orbit = window.Orbit || {};
   var A = 'aplicado';
   var AP = 'aplicar';
   var TODO = 'Todo cuadra ' + '— nada por crear';
+  var academiaStoreEnsured = false;
+  var academiaStoreEnsuring = false;
+  var applyTimer = 0;
   var phrasePairs = [
     ['✓ Pago reportado · el equipo lo validará', '✓ Recibimos tu reporte · pendiente de revisión/conciliación'],
     ['El equipo lo valida y te confirma.', 'Queda pendiente de revisión/conciliación y te confirmaremos cuando quede conciliado.'],
@@ -134,17 +137,34 @@ window.Orbit = window.Orbit || {};
     if (i >= 0) list[i] = Object.assign({}, list[i], course, { progreso: list[i].progreso || 0, certificado: !!list[i].certificado });
     else list.push(Object.assign({}, course));
   }
+  function courseNeedsUpdate(prev, next) {
+    if (!prev) return true;
+    var scalarKeys = ['titulo', 'cat', 'emoji', 'color', 'destinatarios', 'desc'];
+    if (scalarKeys.some(function (key) { return prev[key] !== next[key]; })) return true;
+    try { return JSON.stringify(prev.lecciones || []) !== JSON.stringify(next.lecciones || []); }
+    catch (e) { return true; }
+  }
   function ensureAcademia() {
+    if (academiaStoreEnsured || academiaStoreEnsuring) return;
     try {
       var c = academyCourse();
       if (Orbit.SEED && Array.isArray(Orbit.SEED.cursos)) upsertCourse(Orbit.SEED.cursos, c);
-      if (Orbit.store && Orbit.store.all && Orbit.store.insert) {
-        var rows = Orbit.store.all('cursos') || [];
-        var prev = rows.find(function (r) { return r && r.id === c.id; });
-        if (!prev) Orbit.store.insert('cursos', Object.assign({}, c));
-        else if (Orbit.store.update) Orbit.store.update('cursos', c.id, Object.assign({}, c, { progreso: prev.progreso || 0, certificado: !!prev.certificado }));
-      }
-    } catch (e) {}
+      if (!(Orbit.store && Orbit.store.all && Orbit.store.insert)) return;
+      academiaStoreEnsuring = true;
+      academiaStoreEnsured = true;
+      var rows = Orbit.store.all('cursos') || [];
+      var prev = rows.find(function (r) { return r && r.id === c.id; });
+      var next = Object.assign({}, c, {
+        progreso: prev && prev.progreso || 0,
+        certificado: !!(prev && prev.certificado)
+      });
+      if (!prev) Orbit.store.insert('cursos', next);
+      else if (Orbit.store.update && courseNeedsUpdate(prev, next)) Orbit.store.update('cursos', c.id, next);
+    } catch (e) {
+      academiaStoreEnsured = false;
+    } finally {
+      academiaStoreEnsuring = false;
+    }
   }
   function patchSeedCopy() {
     try {
@@ -167,16 +187,26 @@ window.Orbit = window.Orbit || {};
     patchAttrs(root || document);
     addReportedNote(root || document);
   }
+  function scheduleApply(root, delay) {
+    try { clearTimeout(applyTimer); } catch (e) {}
+    applyTimer = setTimeout(function () { apply(root || document.body); }, Number(delay || 60));
+  }
   patchConfigObjects();
   patchSeedCopy();
   ensureAcademia();
   document.addEventListener('DOMContentLoaded', function () { apply(document.body); });
-  document.addEventListener('click', function () { setTimeout(function () { apply(document.body); }, 60); }, true);
-  document.addEventListener('orbit:store', function () { setTimeout(function () { apply(document.body); }, 80); });
-  document.addEventListener('orbit:reseeded', function () { setTimeout(function () { apply(document.body); }, 80); });
+  document.addEventListener('click', function () { scheduleApply(document.body, 60); }, true);
+  document.addEventListener('orbit:store', function () { scheduleApply(document.body, 80); });
+  document.addEventListener('orbit:reseeded', function () {
+    academiaStoreEnsured = false;
+    scheduleApply(document.body, 80);
+  });
   try {
     var mo = new MutationObserver(function (muts) {
-      muts.forEach(function (m) { if (m.addedNodes) m.addedNodes.forEach(function (n) { if (n.nodeType === 1) apply(n); }); });
+      var hasAddedElements = muts.some(function (m) {
+        return m.addedNodes && Array.prototype.some.call(m.addedNodes, function (n) { return n.nodeType === 1; });
+      });
+      if (hasAddedElements) scheduleApply(document.body, 60);
     });
     mo.observe(document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
