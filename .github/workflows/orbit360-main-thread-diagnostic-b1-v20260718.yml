@@ -11,10 +11,12 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 concurrency:
   group: orbit360-b1-main-thread-diagnostic-v20260718
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   diagnose:
@@ -60,7 +62,6 @@ jobs:
         run: |
           set -euo pipefail
           REPORT="orbit360-platform/runtime-gate-crm-v20260716/main-thread-diagnostic-sanitized.json"
-          CLASSIFICATION="orbit360-platform/runtime-gate-crm-v20260716/main-thread-classification-sanitized.json"
           test -f "$REPORT"
           node --input-type=module <<'NODE'
           import { readFileSync, writeFileSync } from 'node:fs';
@@ -141,3 +142,38 @@ jobs:
               echo "Bloqueo: no se produjo evidencia diagnóstica."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publicar clasificación sanitizada en PR 5
+        if: always() && github.event_name == 'push'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          REPORT="orbit360-platform/runtime-gate-crm-v20260716/main-thread-classification-sanitized.json"
+          BODY="${RUNNER_TEMP}/orbit360-main-thread-comment.md"
+          {
+            echo "## Diagnóstico aislado B1 · hilo principal"
+            echo ""
+            echo "- Run: \`${GITHUB_RUN_ID}\`"
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Gate oficial ejecutado: **no**"
+            echo "- Deploy o sincronización: **no**"
+            echo "- Producto modificado: **no**"
+            echo ""
+            if [ -f "$REPORT" ]; then
+              echo "- Clasificación: **$(jq -r '.classification' "$REPORT")**"
+              echo "- Hallazgo: \`$(jq -r '.finding' "$REPORT")\`"
+              echo ""
+              echo "### Variantes"
+              jq -r '.variants[] | "- `\(.name)`: responseReady=`\(.responseReady)`; probeError=`\(.probeError)`; top=`\(.topFunction)` `\(.topPath)`; paused=`\(.pausedFunction)` `\(.pausedPath)`"' "$REPORT"
+              echo ""
+              echo "Siguiente acción vinculante: $(jq -r '.nextAction' "$REPORT")"
+            else
+              echo "- Clasificación: **PIPELINE_MECHANISM_FAILURE**"
+              echo "- Hallazgo: \`DIAGNOSTIC_EVIDENCE_NOT_PRODUCED\`"
+              echo ""
+              echo "La ejecución se cierra aquí; no se reintenta el gate ni se modifica producto."
+            fi
+          } > "$BODY"
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file "$BODY"
