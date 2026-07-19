@@ -32,15 +32,27 @@ function executableText(text, rel) {
 function unique(values) {
   return [...new Set((values || []).filter(Boolean))];
 }
+function mergeObjects(base, patch) {
+  if (!patch || typeof patch !== 'object' || Array.isArray(patch)) return base;
+  const out = { ...(base || {}) };
+  for (const [key, value] of Object.entries(patch)) {
+    if (value && typeof value === 'object' && !Array.isArray(value)) out[key] = mergeObjects(out[key], value);
+    else out[key] = value;
+  }
+  return out;
+}
 function writeEvidence(payload) {
   fs.mkdirSync(path.dirname(EVIDENCE_PATH), { recursive: true });
   fs.writeFileSync(EVIDENCE_PATH, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 }
-function resultAndExit(status, checks, exitCode) {
+function resultAndExit(status, checks, exitCode, gate = null, overlay = null) {
   const failed = checks.filter(item => !item.ok);
   const payload = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v5-overlay-parity',
+    schemaVersion: 'orbit360-gate-contract-preflight-v6-effective-overlay',
     gateId: requestedGateId,
+    contractVersion: gate && gate.contractVersion || '',
+    diagnosticRevision: gate && gate.diagnosticRevision || '',
+    overlayRevision: overlay && overlay.contractRevision || '',
     generatedAt: new Date().toISOString(),
     containsPII: false,
     containsSecrets: false,
@@ -90,6 +102,8 @@ if (!gate) {
 }
 
 if (overlay) {
+  if (overlay.gatePatch) gate = mergeObjects(gate, overlay.gatePatch);
+
   const owners = new Map((registry.canonicalOwners || []).map(item => [item.id, item]));
   for (const owner of overlay.canonicalOwners || []) owners.set(owner.id, owner);
   registry.canonicalOwners = [...owners.values()];
@@ -104,8 +118,10 @@ if (overlay) {
   for (const contract of overlay.runtimeVersionContracts || []) {
     const current = contracts.get(contract.path);
     if (current) {
-      current.requiredTokens = unique([...(current.requiredTokens || []), ...(contract.requiredTokens || [])]);
-      contracts.set(contract.path, current);
+      current.requiredTokens = contract.replaceRequiredTokens === true
+        ? unique(contract.requiredTokens || [])
+        : unique([...(current.requiredTokens || []), ...(contract.requiredTokens || [])]);
+      contracts.set(contract.path, { ...current, ...contract, requiredTokens: current.requiredTokens });
     } else {
       contracts.set(contract.path, {
         ...contract,
@@ -124,6 +140,7 @@ check('OVERLAY_PRESENT', Boolean(overlay), overlay ? OVERLAY_REL : 'missing');
 if (overlay) {
   check('OVERLAY_SCHEMA_VERSION', overlay.schemaVersion === 'orbit360-gate-contract-overlay-v1', overlay.schemaVersion || 'missing');
   check('OVERLAY_GATE_MATCH', overlay.gateId === requestedGateId, overlay.gateId || 'missing');
+  check('OVERLAY_CONTRACT_MATCH', overlay.contractRevision && String(overlay.contractRevision).startsWith(String(gate.contractVersion)), `${overlay.contractRevision || 'missing'} vs ${gate.contractVersion || 'missing'}`);
 }
 check('ACTIVE_BLOCK', Number(gate.block) === Number(registry.plan && registry.plan.activeBlock), `gate=${gate.block}; plan=${registry.plan && registry.plan.activeBlock}`);
 check('WORKFLOW_EXISTS', exists(gate.workflow), gate.workflow);
@@ -162,14 +179,6 @@ if (exists(gate.workflow)) {
   check('WORKFLOW_CHANNEL_LOCK', workflow.includes(gate.environment.hostingChannel), gate.environment.hostingChannel);
 }
 
-/*
- * Fail-closed runtime graph validation.
- * A retired bridge can be reintroduced transitively by a loader even when the
- * workflow and the final runtime validator no longer mention it. The registry
- * therefore declares every active bootstrap/owner file that can participate in
- * the slice, and this preflight scans executable content before secrets,
- * Firebase, Hosting or Playwright are used.
- */
 const fallbackRuntimeGraph = [
   ...(gate.requiredFiles || []),
   'orbit360-platform/index.html',
@@ -192,11 +201,6 @@ for (const rel of runtimeGraphFiles) {
   }
 }
 
-/*
- * Runtime version parity is a binding navigation contract. Preview, loader,
- * Service Worker, PWA, runtime gate and workflow must point to the same value;
- * otherwise a transient page can be accepted and destroyed during Auth.
- */
 const runtimeVersionContracts = Array.isArray(gate.runtimeVersionContracts) ? gate.runtimeVersionContracts : [];
 check('RUNTIME_VERSION_CONTRACTS_DECLARED', runtimeVersionContracts.length >= 5, `contracts=${runtimeVersionContracts.length}`);
 for (const contract of runtimeVersionContracts) {
@@ -229,5 +233,5 @@ for (const rel of protectedPaths) {
 }
 
 const failed = checks.filter(item => !item.ok);
-if (failed.length) resultAndExit('VALIDATOR_STALE', checks, 41);
-resultAndExit('GO_GATE_CONTRACT', checks, 0);
+if (failed.length) resultAndExit('VALIDATOR_STALE', checks, 41, gate, overlay);
+resultAndExit('GO_GATE_CONTRACT', checks, 0, gate, overlay);
