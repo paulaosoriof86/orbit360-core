@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   correct:
-    name: M1 · corregir país por trazabilidad exacta
+    name: M1 · corregir país desde código regional fuente
     runs-on: ubuntu-latest
     env:
       EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
@@ -60,7 +60,7 @@ jobs:
         shell: bash
         run: npm install --no-save firebase-admin@13
 
-      - name: Corregir 16 clientes con auditoría y rollback
+      - name: Normalizar país y moneda con trazabilidad exacta
         shell: bash
         run: |
           set -euo pipefail
@@ -73,31 +73,36 @@ jobs:
           const PROJECT_ID = 'ays-orbit-360-lab';
           const TENANT_ID = 'alianzas-soluciones';
           const OUTPUT = 'orbit360-platform/runtime-gate-crm-v20260716/client-country-correction-sanitized.json';
+          const TOTAL = 414;
           const CO_ROWS = new Set([153,154,155,156,157,158,159,160,166,180,194,195,202,412,433,438]);
-          const EXPECTED_TOTAL = 414;
-          const EXPECTED_GT = 398;
-          const EXPECTED_CO = 16;
+          const PENDING_ROWS = new Set([53,109,147,167,243,249,251,258,259,262,263,264,265,273,274,297,299,300,302,306,308,312,313,314,315,316,319,320,323,324,325,326,327,328,329,330,333,336,337,341,342,343,345,354,357,360,363,366,367,369,371,391,402,404,405,413,417,419,422,423,424,427,431,432]);
 
           function clean(value) { return String(value == null ? '' : value).trim(); }
-          function country(value) {
+          function normalizeCountry(value) {
             const text = clean(value).toUpperCase();
             if (text === 'GT' || text === 'GUATEMALA') return 'GT';
             if (text === 'CO' || text === 'COLOMBIA') return 'CO';
+            if (/REQUIERE|VALIDACION|PENDIENTE|SIN_DATO/.test(text.replace(/\s+/g,'_'))) return 'REQUIERE_VALIDACION';
             return text ? 'OTHER' : 'BLANK';
           }
-          function rowOf(data) {
+          function sourceRow(data) {
             const a = Number(data?.trazabilidad?.fila);
             const b = Number(data?._migration?.sourceRow);
             return Number.isInteger(a) && Number.isInteger(b) && a === b ? a : null;
           }
-          function counts(docs) {
-            const out = { GT: 0, CO: 0, OTHER: 0, BLANK: 0 };
-            docs.forEach(doc => { out[country(doc.data()?.pais)] += 1; });
+          function desired(row) {
+            if (CO_ROWS.has(row)) return { pais: 'CO', moneda: 'COP', fuente: 'cod_region_57' };
+            if (PENDING_ROWS.has(row)) return { pais: 'REQUIERE_VALIDACION', moneda: '', fuente: 'cod_region_ausente_o_no_confiable' };
+            return { pais: 'GT', moneda: 'GTQ', fuente: 'cod_region_502' };
+          }
+          function aggregate(items, selector) {
+            const out = { GT: 0, CO: 0, REQUIERE_VALIDACION: 0, OTHER: 0, BLANK: 0 };
+            items.forEach(item => { const key = selector(item); out[key] = (out[key] || 0) + 1; });
             return out;
           }
           function write(result) {
             writeFileSync(OUTPUT, `${JSON.stringify(result, null, 2)}\n`);
-            console.log(`CLIENT_COUNTRY_CORRECTION:${JSON.stringify({ ok: result.ok, status: result.status, targets: result.targetCount, before: result.beforeCountry, after: result.afterCountry })}`);
+            console.log(`CLIENT_COUNTRY_CORRECTION:${JSON.stringify({ok:result.ok,status:result.status,plan:result.planCountry,before:result.beforeCountry,after:result.afterCountry,changed:result.changed})}`);
           }
 
           const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || '';
@@ -108,107 +113,82 @@ jobs:
           const collection = root.collection('clientes');
           const snapshot = await collection.get();
           const docs = snapshot.docs;
-          const targets = docs.filter(doc => CO_ROWS.has(rowOf(doc.data() || {})));
+          const rows = new Set();
+          const plan = [];
           const result = {
-            schemaVersion: 'orbit360-client-country-correction-v1',
-            generatedAt: new Date().toISOString(),
-            projectId: PROJECT_ID,
-            tenantId: TENANT_ID,
-            totalClients: docs.length,
-            expectedTargets: EXPECTED_CO,
-            targetCount: targets.length,
-            beforeCountry: counts(docs),
-            traceContract: 'trazabilidad.fila === _migration.sourceRow',
-            sourceRule: 'Cod. Región 57 → CO/COP',
-            auditAndRollback: true,
-            containsPII: false,
-            containsSecrets: false,
-            ok: false,
-            status: 'initializing'
+            schemaVersion: 'orbit360-client-country-correction-v2-source-region',
+            generatedAt: new Date().toISOString(), projectId: PROJECT_ID, tenantId: TENANT_ID,
+            totalClients: docs.length, sourceRule: 'Cod. Región 502→GT/GTQ; 57→CO/COP; faltante/no confiable→REQUIERE_VALIDACION',
+            readOnlyPreflight: true, auditAndRollback: true, containsPII: false, containsSecrets: false,
+            ok: false, status: 'initializing'
           };
 
           try {
-            if (docs.length !== EXPECTED_TOTAL) throw new Error(`UNEXPECTED_CLIENT_TOTAL:${docs.length}`);
-            if (targets.length !== EXPECTED_CO) throw new Error(`UNEXPECTED_TARGET_COUNT:${targets.length}`);
-            const targetCountries = targets.reduce((acc, doc) => {
-              const key = country(doc.data()?.pais);
-              acc[key] = (acc[key] || 0) + 1;
-              return acc;
-            }, {});
-            result.targetCountryBefore = targetCountries;
+            if (docs.length !== TOTAL) throw new Error(`UNEXPECTED_CLIENT_TOTAL:${docs.length}`);
+            for (const doc of docs) {
+              const data = doc.data() || {};
+              const row = sourceRow(data);
+              if (row === null || row < 2 || row > 441) throw new Error('TRACE_ROW_INVALID');
+              if (rows.has(row)) throw new Error(`TRACE_ROW_DUPLICATE:${row}`);
+              rows.add(row);
+              plan.push({ doc, data, row, after: desired(row) });
+            }
+            result.beforeCountry = aggregate(plan, item => normalizeCountry(item.data.pais));
+            result.planCountry = aggregate(plan, item => item.after.pais);
+            if (result.planCountry.CO !== 16) throw new Error(`SOURCE_PLAN_CO_MISMATCH:${result.planCountry.CO}`);
+            if (Object.values(result.planCountry).reduce((a,b) => a+b,0) !== TOTAL) throw new Error('SOURCE_PLAN_TOTAL_MISMATCH');
+            const allowed = plan.every(item => ['GT','CO','REQUIERE_VALIDACION'].includes(normalizeCountry(item.data.pais)));
+            if (!allowed) throw new Error(`CURRENT_COUNTRY_VALUE_UNEXPECTED:${JSON.stringify(result.beforeCountry)}`);
 
-            if (targetCountries.CO === EXPECTED_CO && targetCountries.GT === undefined) {
-              result.status = 'already_correct';
-            } else {
-              if (targetCountries.GT !== EXPECTED_CO || Object.keys(targetCountries).length !== 1) {
-                throw new Error(`MIXED_TARGET_STATE:${JSON.stringify(targetCountries)}`);
+            const changes = plan.filter(item =>
+              normalizeCountry(item.data.pais) !== item.after.pais || clean(item.data.moneda) !== item.after.moneda
+            );
+            result.changed = changes.length;
+            if (changes.length) {
+              const batch = db.batch();
+              const auditRef = root.collection('auditLog').doc('m1_client_country_source_region_20260719_v2');
+              batch.set(auditRef, {
+                schemaVersion: 'orbit360-client-country-correction-audit-v2', tenantId: TENANT_ID,
+                action: 'normalize_country_from_source_region_code', classification: 'DATA_CONTRACT_FAILURE',
+                sourceRule: result.sourceRule, createdAt: FieldValue.serverTimestamp(), beforeCounts: result.beforeCountry,
+                plannedCounts: result.planCountry, rollbackAvailable: true,
+                rollback: changes.map(item => ({ id: item.doc.id, fila: item.row, pais: clean(item.data.pais), moneda: clean(item.data.moneda) })),
+                containsPII: false, containsSecrets: false
+              }, { merge: false });
+              for (const item of changes) {
+                const pending = item.after.pais === 'REQUIERE_VALIDACION';
+                batch.update(item.doc.ref, {
+                  pais: item.after.pais, moneda: item.after.moneda,
+                  paisRequiereValidacion: pending, monedaRequiereValidacion: pending,
+                  paisFuente: item.after.fuente,
+                  'trazabilidad.pais': item.after.pais,
+                  'trazabilidad.moneda': item.after.moneda,
+                  'trazabilidad.paisFuente': item.after.fuente,
+                  'trazabilidad.paisCorregidoEn': FieldValue.serverTimestamp(),
+                  '_migration.country': item.after.pais,
+                  '_migration.currency': item.after.moneda,
+                  '_migration.countrySource': item.after.fuente
+                }, { lastUpdateTime: item.doc.updateTime });
               }
-
-              const auditRef = root.collection('auditoriaClientesExterna').doc('country_fix_region57_20260719');
-              await db.runTransaction(async transaction => {
-                const fresh = [];
-                for (const target of targets) fresh.push(await transaction.get(target.ref));
-                for (const doc of fresh) {
-                  if (!doc.exists) throw new Error('TARGET_DISAPPEARED');
-                  const data = doc.data() || {};
-                  const row = rowOf(data);
-                  if (!CO_ROWS.has(row)) throw new Error('TRACE_CONTRACT_CHANGED');
-                  if (country(data.pais) !== 'GT') throw new Error('COUNTRY_CHANGED_BEFORE_WRITE');
-                }
-
-                transaction.set(auditRef, {
-                  schemaVersion: 'orbit360-client-country-correction-audit-v1',
-                  tenantId: TENANT_ID,
-                  action: 'normalize_country_from_source_region_code',
-                  sourceRule: 'Cod. Región 57 → CO/COP',
-                  sourceRows: [...CO_ROWS].sort((a,b) => a-b),
-                  before: fresh.map(doc => ({ id: doc.id, pais: doc.data()?.pais || '', moneda: doc.data()?.moneda || '', fila: rowOf(doc.data() || {}) })),
-                  after: { pais: 'CO', moneda: 'COP' },
-                  createdAt: FieldValue.serverTimestamp(),
-                  rollbackAvailable: true,
-                  sourceRuns: [29708226504, 29708505326],
-                  containsSecrets: false
-                }, { merge: false });
-
-                for (const doc of fresh) {
-                  transaction.update(doc.ref, {
-                    pais: 'CO',
-                    moneda: 'COP',
-                    'trazabilidad.pais': 'CO',
-                    'trazabilidad.moneda': 'COP',
-                    'trazabilidad.paisFuente': 'Cod. Región 57',
-                    'trazabilidad.paisCorregidoEn': FieldValue.serverTimestamp(),
-                    '_migration.country': 'CO',
-                    '_migration.currency': 'COP',
-                    '_migration.countrySource': 'cod_region_57'
-                  });
-                }
-              });
-              result.status = 'corrected_with_audit';
+              await batch.commit();
+              result.status = 'corrected_with_audit_and_rollback';
+            } else {
+              result.status = 'already_correct';
             }
 
             const afterSnapshot = await collection.get();
-            result.afterCountry = counts(afterSnapshot.docs);
-            const afterTargets = afterSnapshot.docs.filter(doc => CO_ROWS.has(rowOf(doc.data() || {})));
-            result.targetCountryAfter = afterTargets.reduce((acc, doc) => {
-              const key = country(doc.data()?.pais);
-              acc[key] = (acc[key] || 0) + 1;
-              return acc;
-            }, {});
-            if (result.afterCountry.GT !== EXPECTED_GT || result.afterCountry.CO !== EXPECTED_CO) {
-              throw new Error(`UNEXPECTED_FINAL_COUNTRY_COUNTS:${JSON.stringify(result.afterCountry)}`);
-            }
-            if (result.targetCountryAfter.CO !== EXPECTED_CO || Object.keys(result.targetCountryAfter).length !== 1) {
-              throw new Error(`UNEXPECTED_FINAL_TARGET_STATE:${JSON.stringify(result.targetCountryAfter)}`);
+            result.afterCountry = aggregate(afterSnapshot.docs, doc => normalizeCountry(doc.data()?.pais));
+            if (JSON.stringify(result.afterCountry) !== JSON.stringify(result.planCountry)) {
+              throw new Error(`POSTCONDITION_MISMATCH:${JSON.stringify(result.afterCountry)}`);
             }
             result.ok = true;
             write(result);
           } catch (error) {
             result.status = 'blocked';
-            result.errorCode = String(error?.message || error).replace(/[^A-Za-z0-9:{}_,./-]/g, '').slice(0, 220);
+            result.errorCode = String(error?.message || error).replace(/[^A-Za-z0-9:{}_,./-]/g,'').slice(0,240);
             try {
               const afterSnapshot = await collection.get();
-              result.afterCountry = counts(afterSnapshot.docs);
+              result.afterCountry = aggregate(afterSnapshot.docs, doc => normalizeCountry(doc.data()?.pais));
             } catch {}
             write(result);
             process.exit(54);
@@ -233,21 +213,20 @@ jobs:
           set -euo pipefail
           FILE="orbit360-platform/runtime-gate-crm-v20260716/client-country-correction-sanitized.json"
           if [ -f "$FILE" ]; then
-            OK="$(jq -r '.ok // false' "$FILE")"
-            STATUS="$(jq -r '.status // "sin_resultado"' "$FILE")"
-            TARGETS="$(jq -r '.targetCount // 0' "$FILE")"
-            BEFORE="$(jq -c '.beforeCountry // {}' "$FILE")"
-            AFTER="$(jq -c '.afterCountry // {}' "$FILE")"
+            OK="$(jq -r '.ok // false' "$FILE")"; STATUS="$(jq -r '.status // "sin_resultado"' "$FILE")"
+            CHANGED="$(jq -r '.changed // 0' "$FILE")"; BEFORE="$(jq -c '.beforeCountry // {}' "$FILE")"
+            PLAN="$(jq -c '.planCountry // {}' "$FILE")"; AFTER="$(jq -c '.afterCountry // {}' "$FILE")"
             CODE="$(jq -r '.errorCode // "ninguno"' "$FILE")"
           else
-            OK=false; STATUS=sin_resultado; TARGETS=0; BEFORE='{}'; AFTER='{}'; CODE=evidencia_no_generada
+            OK=false; STATUS=sin_resultado; CHANGED=0; BEFORE='{}'; PLAN='{}'; AFTER='{}'; CODE=evidencia_no_generada
           fi
-          printf -v BODY '%s\n\n%s\n%s\n%s\n%s\n%s\n%s\n%s' \
-            '## Resultado sanitizado · corrección país Cliente 360' \
+          printf -v BODY '%s\n\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s' \
+            '## Resultado sanitizado · país Cliente 360 desde código regional' \
             "- Commit: ${GITHUB_SHA:0:7} · Run: ${GITHUB_RUN_ID}" \
             "- Estado: ${STATUS} · Aprobado: ${OK}" \
-            "- Registros objetivo: ${TARGETS}" \
+            "- Registros modificados: ${CHANGED}" \
             "- Antes: ${BEFORE}" \
+            "- Plan fuente: ${PLAN}" \
             "- Después: ${AFTER}" \
             "- Código: ${CODE}" \
             '- LAB con auditoría y rollback; sin PII, producción, merge ni main.'
