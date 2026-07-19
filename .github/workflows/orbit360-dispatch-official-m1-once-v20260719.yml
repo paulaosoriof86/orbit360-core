@@ -1,4 +1,4 @@
-name: Orbit 360 Dispatch Official M1 Once 20260719
+name: Orbit 360 Apply Validator Stale 1.0.26
 
 on:
   push:
@@ -14,128 +14,101 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: orbit360-dispatch-official-m1-once-v20260719
-  cancel-in-progress: false
+  group: orbit360-validator-stale-v1026-single-flight
+  cancel-in-progress: true
 
 jobs:
-  dispatch_once:
-    name: Despachar gate oficial M1 exactamente una vez
+  apply_preflight_dispatch:
+    name: Aplicar control 1.0.26 · preflight · gate único
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    env:
+      BRANCH: ays/backend-tenant-lab-v99-20260703
+      GATE_ID: block1-client360-insurers-lab-v20260717
+      OFFICIAL_WORKFLOW: orbit360-aseguradoras-runtime-gate-v20260716.yml
+      SOURCE_WORKFLOW: .github/workflows/orbit360-apply-validator-stale-client-projection-v1026.yml
     steps:
-      - name: Validar rama y despachar workflow oficial
+      - name: Checkout rama obligatoria
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+
+      - name: Ejecutar parche auditado
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "$BRANCH"
+          test -f "$SOURCE_WORKFLOW"
+          python3 - <<'PY'
+          from pathlib import Path
+          source = Path('.github/workflows/orbit360-apply-validator-stale-client-projection-v1026.yml').read_text(encoding='utf-8')
+          marker = "          node --input-type=module <<'NODE'\n"
+          start = source.index(marker) + len(marker)
+          end = source.index("\n          NODE", start)
+          block = source[start:end]
+          lines = [line[10:] if line.startswith('          ') else line for line in block.splitlines()]
+          Path('/tmp/orbit360-validator-stale-v1026.mjs').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          PY
+          node --check /tmp/orbit360-validator-stale-v1026.mjs
+          node /tmp/orbit360-validator-stale-v1026.mjs
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const path='tools/orbit360-gate-contract-registry-v20260717.json';
+          const registry=JSON.parse(fs.readFileSync(path,'utf8'));
+          registry.retiredRuntimeArtifacts=[...new Set([...(registry.retiredRuntimeArtifacts||[]),'.github/workflows/orbit360-launch-validator-stale-client-projection-v1026.yml'])];
+          fs.writeFileSync(path,JSON.stringify(registry,null,2)+'\n');
+          NODE
+          git rm -f .github/workflows/orbit360-dispatch-official-m1-once-v20260719.yml
+          git rm -f .github/workflows/orbit360-apply-validator-stale-client-projection-v1026.yml
+          git rm -f .github/workflows/orbit360-launch-validator-stale-client-projection-v1026.yml
+
+      - name: Preflight vinculante y control de alcance
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! git status --short | grep -E 'orbit360-platform/(data/store\.js|data/store-firestore-lab\.local\.js|core/auth\.js|core/router\.js|modules/cliente360\.js|modules/aseguradoras\.js)|firestore\.rules'
+          node --check tools/orbit360-runtime-check-client360-v20260716.mjs
+          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = "GO_GATE_CONTRACT"
+
+      - name: Commit único de control
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "orbit360-gate-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add .
+          git commit -m "fix(block1): alinear validador de proyección 1.0.26 [skip ci]"
+          git push origin "HEAD:${BRANCH}"
+          echo "PATCH_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Despachar gate oficial exactamente una vez
         uses: actions/github-script@v7
-        env:
-          TARGET_WORKFLOW: orbit360-aseguradoras-runtime-gate-v20260716.yml
-          TARGET_REF: ays/backend-tenant-lab-v99-20260703
-          RESULT_PATH: .github/diagnostic-results/orbit360-m1-official-dispatch-latest.json
         with:
           script: |
-            const targetWorkflow = process.env.TARGET_WORKFLOW;
-            const targetRef = process.env.TARGET_REF;
-            const resultPath = process.env.RESULT_PATH;
-            if (context.ref !== `refs/heads/${targetRef}`) {
-              core.setFailed(`UNAUTHORIZED_BRANCH:${context.ref}`);
-              return;
+            const workflow=process.env.OFFICIAL_WORKFLOW;
+            const branch=process.env.BRANCH;
+            const patchSha=process.env.PATCH_SHA;
+            const startedAt=Date.now();
+            await github.rest.actions.createWorkflowDispatch({owner:context.repo.owner,repo:context.repo.repo,workflow_id:workflow,ref:branch});
+            let run=null;
+            for(let attempt=0;attempt<30;attempt+=1){
+              await new Promise(resolve=>setTimeout(resolve,1500));
+              const response=await github.rest.actions.listWorkflowRuns({owner:context.repo.owner,repo:context.repo.repo,workflow_id:workflow,branch,event:'workflow_dispatch',per_page:20});
+              run=(response.data.workflow_runs||[]).find(item=>item.head_sha===patchSha&&new Date(item.created_at).getTime()>=startedAt-5000);
+              if(run)break;
             }
-
-            const result = {
-              schemaVersion: 'orbit360-m1-official-dispatch-v1',
-              generatedAt: new Date().toISOString(),
-              containsPII: false,
-              containsSecrets: false,
-              gateId: 'block1-client360-insurers-lab-v20260717',
-              targetWorkflow,
-              targetRef,
-              dispatcherCommit: context.sha,
-              dispatched: false,
-              runId: '',
-              status: 'PENDING',
-              error: ''
-            };
-
-            try {
-              await github.rest.actions.createWorkflowDispatch({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                workflow_id: targetWorkflow,
-                ref: targetRef
-              });
-              result.dispatched = true;
-              result.status = 'DISPATCH_ACCEPTED';
-
-              for (let attempt = 0; attempt < 20; attempt += 1) {
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                const runs = await github.rest.actions.listWorkflowRuns({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  workflow_id: targetWorkflow,
-                  branch: targetRef,
-                  event: 'workflow_dispatch',
-                  per_page: 10
-                });
-                const match = (runs.data.workflow_runs || []).find(run => run.head_branch === targetRef);
-                if (match) {
-                  result.runId = String(match.id);
-                  result.status = String(match.status || 'queued').toUpperCase();
-                  result.runUrl = String(match.html_url || '');
-                  result.headSha = String(match.head_sha || '');
-                  break;
-                }
-              }
-            } catch (error) {
-              result.status = 'DISPATCH_FAILED';
-              result.error = String(error.message || error).slice(0, 300);
-            }
-
-            const serialized = JSON.stringify(result, null, 2) + '\n';
-            try {
-              let currentSha;
-              try {
-                const current = await github.rest.repos.getContent({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  path: resultPath,
-                  ref: targetRef
-                });
-                currentSha = current.data.sha;
-              } catch (error) {
-                if (error.status !== 404) throw error;
-              }
-              await github.rest.repos.createOrUpdateFileContents({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                path: resultPath,
-                message: `chore(block1): registrar dispatch oficial M1 ${result.runId || 'fallido'} [skip ci]`,
-                content: Buffer.from(serialized).toString('base64'),
-                branch: targetRef,
-                sha: currentSha
-              });
-            } catch (error) {
-              core.warning(`No se pudo persistir dispatch: ${error.message}`);
-            }
-
-            const lines = [
-              '## M1 · despacho explícito del gate oficial',
-              '',
-              `- Workflow: \`${targetWorkflow}\``,
-              `- Rama: \`${targetRef}\``,
-              `- Commit despachador: \`${context.sha}\``,
-              `- Dispatch aceptado: **${result.dispatched}**`,
-              `- Estado: **${result.status}**`,
-              `- Run: \`${result.runId || 'no asignado'}\``,
-              `- HEAD probado: \`${result.headSha || 'pendiente'}\``,
-              '- Número de despachos solicitados: **1**',
-              '- Producción o merge: **no**'
-            ];
-            if (result.error) lines.push(`- Error sanitizado: \`${result.error}\``);
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: 5,
-              body: lines.join('\n')
-            });
-
-            if (!result.dispatched || !result.runId) {
-              core.setFailed(result.error || 'OFFICIAL_M1_RUN_NOT_OBSERVED');
-            }
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:5,body:[
+              '## M1 · contrato 1.0.26 despachado','',
+              '- Clasificación corregida: **VALIDATOR_STALE**',
+              `- Commit de control: \`${patchSha||'no disponible'}\``,
+              `- Run oficial: \`${run?run.id:'no observado'}\``,
+              '- Despachos solicitados: **1**',
+              '- Producto, datos y backend protegido modificados: **no**',
+              '- Producción, main o merge: **no**'
+            ].join('\n')});
+            if(!run)core.setFailed('OFFICIAL_M1_1026_RUN_NOT_OBSERVED');
+            else core.notice(`OFFICIAL_M1_1026_RUN_ID:${run.id}`);
