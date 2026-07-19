@@ -7,7 +7,7 @@
    - no reimporta, no crea relaciones y no llama insert/update/remove.
 
    Reparación visual M1:
-   - normaliza tipo Persona/Empresa, país GT/CO y fechas;
+   - normaliza tipo Persona/Empresa, país GT/CO/REQUIERE_VALIDACION y fechas;
    - evita aplicar la misma proyección repetidamente;
    - conserva estado pendiente_polizas cuando aún no existen relaciones.
    ============================================================ */
@@ -33,12 +33,13 @@
   }
   function normalizeCountry(value, source) {
     var text = normalized(value);
+    if (/requiere validacion|por validar|sin dato|pendiente/.test(text)) return 'REQUIERE_VALIDACION';
     if (/^co$|^col$|colombia|colombiano|colombiana/.test(text)) return 'CO';
     if (/^gt$|^gtm$|guatemala|guatemalteco|guatemalteca/.test(text)) return 'GT';
     var currency = normalized(source && source.moneda);
     if (currency === 'cop' || /peso colombiano/.test(currency)) return 'CO';
     if (currency === 'gtq' || /quetzal/.test(currency)) return 'GT';
-    return '';
+    return source && (source.paisRequiereValidacion || source.monedaRequiereValidacion) ? 'REQUIERE_VALIDACION' : '';
   }
   function normalizeDate(value) {
     if (value == null || value === '') return '';
@@ -53,7 +54,7 @@
         var isoDate = new Date(Date.UTC(+iso[1], +iso[2] - 1, +iso[3]));
         return Number.isNaN(isoDate.getTime()) ? '' : isoDate.toISOString().slice(0, 10);
       }
-      var latam = raw.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/);
+      var latam = raw.match(/^(\d{1,2})[-\/.](\d{1,2})[-\.](\d{4})/);
       if (latam) {
         var latamDate = new Date(Date.UTC(+latam[3], +latam[2] - 1, +latam[1]));
         return Number.isNaN(latamDate.getTime()) ? '' : latamDate.toISOString().slice(0, 10);
@@ -127,7 +128,7 @@
     out.alertasCalidad = qualityAlerts(client);
     out.calidad = Object.assign({}, out.calidad || {}, {
       alertas: out.alertasCalidad,
-      estado: clean((out.calidad && out.calidad.estado) || (out.requiereValidacion ? 'REQUIERE_VALIDACION' : 'PENDIENTE_POLIZAS'))
+      estado: clean((out.calidad && out.calidad.estado) || ((out.requiereValidacion || out.paisRequiereValidacion || out.pais === 'REQUIERE_VALIDACION') ? 'REQUIERE_VALIDACION' : 'PENDIENTE_POLIZAS'))
     });
     out._proyeccionCanonica = true;
     return out;
