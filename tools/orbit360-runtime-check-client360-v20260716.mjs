@@ -4,6 +4,8 @@ const EXPECTED_TABS = ['resumen','polizas','vehiculos','cobros','recibos','renov
 const EXPECTED_CLIENT_PROJECTION_VERSION = '20260719.2';
 const EXPECTED_CLIENT_PROJECTION_BRIDGE = '20260719.2-temporal';
 const VISUAL_REPAIR_REVISION = 'visual-human-repair-v2';
+const COUNTRY_DATA_CONTRACT_REVISION = 'country-data-contract-v1';
+const EXPECTED_COUNTRY_COUNTS = { GT: 234, CO: 15, REQUIERE_VALIDACION: 165 };
 
 function assert(condition, code, detail = '') {
   if (!condition) throw new Error(`${code}${detail ? `:${detail}` : ''}`);
@@ -61,7 +63,7 @@ async function readCanonicalDataset(page) {
     const rows = (Orbit.store.all('clientes') || []).map(row => helper.project ? helper.project(row) : row);
     const invalidDates = rows.filter(row => /InvalidDate/i.test(String(row.fechaAlta || '')) || /InvalidDate/i.test(String(row.fechaNac || ''))).length;
     const invalidTypes = rows.filter(row => !['Persona','Empresa'].includes(String(row.tipo || ''))).length;
-    const invalidCountries = rows.filter(row => !['GT','CO'].includes(String(row.pais || ''))).length;
+    const invalidCountries = rows.filter(row => !['GT','CO','REQUIERE_VALIDACION'].includes(String(row.pais || ''))).length;
     return {
       helperVersion: helper.version || '',
       total: rows.length,
@@ -69,6 +71,7 @@ async function readCanonicalDataset(page) {
       empresas: rows.filter(row => row.tipo === 'Empresa').length,
       gt: rows.filter(row => row.pais === 'GT').length,
       co: rows.filter(row => row.pais === 'CO').length,
+      requiereValidacion: rows.filter(row => row.pais === 'REQUIERE_VALIDACION').length,
       invalidDates,
       invalidTypes,
       invalidCountries
@@ -147,6 +150,7 @@ export async function validateClient360(page, report, label) {
   if (report.error == null) report.error = '';
   report.schemaVersion = 'orbit360-runtime-gate-joint-v27-role-selection-parity';
   report.visualRepairRevision = VISUAL_REPAIR_REVISION;
+  report.countryDataContractRevision = COUNTRY_DATA_CONTRACT_REVISION;
   await page.evaluate(() => { location.hash = '#/cliente360'; });
   await page.waitForTimeout(800);
 
@@ -166,7 +170,13 @@ export async function validateClient360(page, report, label) {
   assert(dataset.invalidCountries === 0, 'CLIENT_CANONICAL_COUNTRY_INVALID', `${label}:${dataset.invalidCountries}`);
   assert(dataset.invalidDates === 0, 'CLIENT_CANONICAL_DATE_INVALID', `${label}:${dataset.invalidDates}`);
   assert(dataset.personas > 0 && dataset.empresas > 0, 'CLIENT_CANONICAL_TYPE_BUCKET_EMPTY', `${label}:${dataset.personas}/${dataset.empresas}`);
-  assert(dataset.gt > 0 && dataset.co > 0, 'CLIENT_CANONICAL_COUNTRY_BUCKET_EMPTY', `${label}:${dataset.gt}/${dataset.co}`);
+  assert(
+    dataset.gt === EXPECTED_COUNTRY_COUNTS.GT &&
+    dataset.co === EXPECTED_COUNTRY_COUNTS.CO &&
+    dataset.requiereValidacion === EXPECTED_COUNTRY_COUNTS.REQUIERE_VALIDACION,
+    'CLIENT_CANONICAL_COUNTRY_COUNTS_INVALID',
+    `${label}:${dataset.gt}/${dataset.co}/${dataset.requiereValidacion}`
+  );
 
   const rows = page.locator('table.tbl tbody tr.clickable');
   await rows.first().waitFor({ state: 'visible', timeout: 20000 });
@@ -195,7 +205,7 @@ export async function validateClient360(page, report, label) {
       temporaryBridge: bridge.temporaryInPlaceBridge === true,
       hasName: !!row.nombre,
       hasType: ['Persona','Empresa'].includes(row.tipo),
-      hasCountry: ['GT','CO'].includes(row.pais),
+      hasCountry: ['GT','CO','REQUIERE_VALIDACION'].includes(row.pais),
       hasState: !!row.estadoOperativo,
       hasLabelsArray: Array.isArray(row.etiquetas),
       state: row.estadoOperativo || row.estado || '',
