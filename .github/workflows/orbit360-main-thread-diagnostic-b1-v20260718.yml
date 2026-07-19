@@ -1,0 +1,143 @@
+name: Orbit 360 B1 Main Thread Diagnostic 20260718
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-main-thread-diagnostic-b1-v20260718.yml"
+      - "tools/orbit360-diagnosticar-hilo-principal-b1-v20260718.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-b1-main-thread-diagnostic-v20260718
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    name: Diagnóstico aislado del hilo principal · sin gate ni deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
+      ORBIT360_EXPECTED_RUNTIME: 20260717-2
+      ORBIT360_PREVIEW_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
+
+    steps:
+      - name: Checkout rama autorizada
+        uses: actions/checkout@v4
+
+      - name: Preflight vinculante antes del navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          test "$BRANCH" = "ays/backend-tenant-lab-v99-20260703"
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+
+      - name: Instalar navegador diagnóstico
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Ejecutar diagnóstico externo en tres variantes
+        id: diagnostic
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-diagnosticar-hilo-principal-b1-v20260718.mjs
+
+      - name: Clasificar capa causal sin modificar producto
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPORT="orbit360-platform/runtime-gate-crm-v20260716/main-thread-diagnostic-sanitized.json"
+          CLASSIFICATION="orbit360-platform/runtime-gate-crm-v20260716/main-thread-classification-sanitized.json"
+          test -f "$REPORT"
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const reportPath = 'orbit360-platform/runtime-gate-crm-v20260716/main-thread-diagnostic-sanitized.json';
+          const outputPath = 'orbit360-platform/runtime-gate-crm-v20260716/main-thread-classification-sanitized.json';
+          const report = JSON.parse(readFileSync(reportPath, 'utf8'));
+          const variants = Object.fromEntries((report.variants || []).map(item => [item.name, item]));
+          const bare = variants.bare;
+          const cdp = variants['cdp-debugger'];
+          const observer = variants['gate-observer'];
+          let classification = 'PIPELINE_MECHANISM_FAILURE';
+          let finding = 'EXTERNAL_DIAGNOSTIC_DID_NOT_REPRODUCE_GATE_AUTH_LOCATOR_FAILURE';
+          if (!bare || !cdp || !observer) {
+            classification = 'PIPELINE_MECHANISM_FAILURE';
+            finding = 'DIAGNOSTIC_VARIANT_MISSING';
+          } else if (bare.responseReady !== true) {
+            classification = 'FUNCTIONAL_DEFECT';
+            finding = 'BARE_BROWSER_MAIN_THREAD_NOT_RESPONSIVE';
+          } else if (cdp.responseReady !== true || observer.responseReady !== true) {
+            classification = 'PIPELINE_MECHANISM_FAILURE';
+            finding = 'INSTRUMENTATION_CAUSES_OR_EXPOSES_BROWSER_CONTROL_BLOCK';
+          }
+          const summary = {
+            schemaVersion: 'orbit360-main-thread-classification-v1',
+            generatedAt: new Date().toISOString(),
+            containsPII: false,
+            containsSecrets: false,
+            gateId: 'block1-client360-insurers-lab-v20260717',
+            contractVersion: '1.0.25',
+            classification,
+            finding,
+            variants: ['bare', 'cdp-debugger', 'gate-observer'].map(name => ({
+              name,
+              responseReady: variants[name]?.responseReady === true,
+              probeError: String(variants[name]?.probeError || '').slice(0, 180),
+              topFunction: String(variants[name]?.profileTop?.[0]?.functionName || '').slice(0, 120),
+              topPath: String(variants[name]?.profileTop?.[0]?.path || '').slice(0, 160),
+              pausedFunction: String(variants[name]?.pausedFrames?.[0]?.functionName || '').slice(0, 120),
+              pausedPath: String(variants[name]?.pausedFrames?.[0]?.path || '').slice(0, 160)
+            })),
+            nextAction: classification === 'FUNCTIONAL_DEFECT'
+              ? 'Inspect the top product frame from the bare variant; do not change the gate or budgets.'
+              : 'Freeze product and isolate the Playwright/authentication helper mechanism before one official gate rerun.'
+          };
+          writeFileSync(outputPath, JSON.stringify(summary, null, 2) + '\n');
+          console.log(`ORBIT360_MAIN_THREAD_CLASSIFICATION:${JSON.stringify(summary)}`);
+          NODE
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-b1-main-thread-diagnostic-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/main-thread-diagnostic-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/main-thread-classification-sanitized.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Resumen del corte causal
+        if: always()
+        shell: bash
+        run: |
+          REPORT="orbit360-platform/runtime-gate-crm-v20260716/main-thread-classification-sanitized.json"
+          {
+            echo "## Orbit 360 · Diagnóstico aislado del hilo principal"
+            echo ""
+            echo "Gate no ejecutado. Sin deploy, sin sincronización y sin cambios de producto."
+            echo ""
+            if [ -f "$REPORT" ]; then
+              echo "Clasificación: $(jq -r '.classification' "$REPORT")"
+              echo ""
+              echo "Hallazgo: $(jq -r '.finding' "$REPORT")"
+              echo ""
+              jq -r '.variants[] | "- \(.name): responseReady=\(.responseReady), probeError=\(.probeError)"' "$REPORT"
+            else
+              echo "Bloqueo: no se produjo evidencia diagnóstica."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
