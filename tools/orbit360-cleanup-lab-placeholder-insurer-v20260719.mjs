@@ -25,13 +25,25 @@ function normalize(value) {
     .trim();
 }
 
+const GT_GEO = new Set([
+  'alta verapaz','baja verapaz','chimaltenango','chiquimula','el progreso','escuintla','guatemala',
+  'huehuetenango','izabal','jalapa','jutiapa','peten','quetzaltenango','quiche','retalhuleu',
+  'sacatepequez','san marcos','santa rosa','solola','suchitepequez','totonicapan','zacapa'
+]);
+const CO_GEO = new Set([
+  'amazonas','antioquia','arauca','atlantico','bogota','bogota dc','bolivar','boyaca','caldas','caqueta',
+  'casanare','cauca','cesar','choco','cordoba','cundinamarca','guainia','guaviare','huila','la guajira',
+  'magdalena','meta','narino','norte de santander','putumayo','quindio','risaralda',
+  'san andres y providencia','santander','sucre','tolima','valle del cauca','vaupes','vichada'
+]);
+
 function fingerprint(value) {
   return createHash('sha256').update(`${TENANT_ID}|${clean(value)}`).digest('hex').slice(0, 16);
 }
 
 function resultBase() {
   return {
-    schemaVersion: 'orbit360-lab-placeholder-cleanup-v2-country-diagnostic',
+    schemaVersion: 'orbit360-lab-placeholder-cleanup-v3-country-geo-diagnostic',
     generatedAt: new Date().toISOString(),
     projectId: PROJECT_ID,
     tenantId: TENANT_ID,
@@ -83,36 +95,78 @@ function phoneCountry(value) {
   return 'OTHER';
 }
 
+function geographyCountry(data) {
+  const values = [
+    data.departamentoProvincia, data.provincia, data.departamento,
+    data.ciudadMunicipio, data.ciudad, data.canton
+  ].map(normalize).filter(Boolean);
+  let gt = false;
+  let co = false;
+  for (const value of values) {
+    if (GT_GEO.has(value)) gt = true;
+    if (CO_GEO.has(value) || value.startsWith('bogota ')) co = true;
+  }
+  if (gt && !co) return 'GT';
+  if (co && !gt) return 'CO';
+  if (gt && co) return 'AMBIGUOUS';
+  return values.length ? 'UNKNOWN' : 'BLANK';
+}
+
+function sourceRowOf(data) {
+  const candidate = data.sourceRow ?? data._migration?.row ?? data.filaOrigen ?? data.source?.row;
+  const number = Number(candidate);
+  return Number.isFinite(number) && number > 0 ? number : null;
+}
+
 async function clientCountryProfile(root) {
   const snapshot = await root.collection('clientes').get();
+  const sourceRows = new Set();
+  let duplicateSourceRows = 0;
   const profile = {
     total: snapshot.size,
     rawCountry: { GT: 0, CO: 0, REQUIERE_VALIDACION: 0, BLANK: 0, OTHER: 0 },
     phoneCountry: { '502': 0, '57': 0, BLANK: 0, OTHER: 0 },
+    geographyEvidence: { GT: 0, CO: 0, AMBIGUOUS: 0, UNKNOWN: 0, BLANK: 0 },
     mismatches: {
       rawGtPhone57: 0,
       rawCoPhone502: 0,
+      rawGtGeoCo: 0,
+      rawCoGeoGt: 0,
       rawUnknownPhone502: 0,
       rawUnknownPhone57: 0
     },
     migrationTracePresent: 0,
-    sourceCountryFieldPresent: 0
+    sourceCountryFieldPresent: 0,
+    sourceRowPresent: 0,
+    uniqueSourceRows: 0,
+    duplicateSourceRows: 0
   };
 
   for (const doc of snapshot.docs) {
     const data = doc.data() || {};
     const country = rawCountry(data.pais ?? data.paisCodigo ?? data.codigoPais ?? data.country);
     const phone = phoneCountry(data.codigoPaisTelefono ?? data.codRegion ?? data.codigoRegion ?? data.regionCode);
+    const geography = geographyCountry(data);
+    const sourceRow = sourceRowOf(data);
     profile.rawCountry[country] += 1;
     profile.phoneCountry[phone] += 1;
+    profile.geographyEvidence[geography] += 1;
     if (country === 'GT' && phone === '57') profile.mismatches.rawGtPhone57 += 1;
     if (country === 'CO' && phone === '502') profile.mismatches.rawCoPhone502 += 1;
+    if (country === 'GT' && geography === 'CO') profile.mismatches.rawGtGeoCo += 1;
+    if (country === 'CO' && geography === 'GT') profile.mismatches.rawCoGeoGt += 1;
     if ((country === 'BLANK' || country === 'REQUIERE_VALIDACION' || country === 'OTHER') && phone === '502') profile.mismatches.rawUnknownPhone502 += 1;
     if ((country === 'BLANK' || country === 'REQUIERE_VALIDACION' || country === 'OTHER') && phone === '57') profile.mismatches.rawUnknownPhone57 += 1;
     if (data._migration || data.sourceFile || data.sourceRow || data.origen) profile.migrationTracePresent += 1;
     if (data.pais !== undefined || data.paisCodigo !== undefined || data.codigoPais !== undefined || data.country !== undefined) profile.sourceCountryFieldPresent += 1;
+    if (sourceRow != null) {
+      profile.sourceRowPresent += 1;
+      if (sourceRows.has(sourceRow)) duplicateSourceRows += 1;
+      sourceRows.add(sourceRow);
+    }
   }
-
+  profile.uniqueSourceRows = sourceRows.size;
+  profile.duplicateSourceRows = duplicateSourceRows;
   return profile;
 }
 
