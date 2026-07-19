@@ -1,5 +1,8 @@
+export const CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.26';
 const EXPECTED_CLIENTS = 414;
 const EXPECTED_TABS = ['resumen','polizas','vehiculos','cobros','recibos','renovaciones','siniestros','comisiones','correos','historial'];
+const EXPECTED_CLIENT_PROJECTION_VERSION = '20260717.1';
+const EXPECTED_CLIENT_PROJECTION_BRIDGE = '20260717.1-temporal';
 
 function assert(condition, code, detail = '') {
   if (!condition) throw new Error(`${code}${detail ? `:${detail}` : ''}`);
@@ -52,6 +55,8 @@ async function readScopeState(page) {
 }
 
 export async function validateClient360(page, report, label) {
+  report.contractVersion = CLIENT360_VALIDATOR_CONTRACT_VERSION;
+  report.schemaVersion = 'orbit360-runtime-gate-joint-v26-validator-parity';
   await page.evaluate(() => { location.hash = '#/cliente360'; });
   await page.waitForTimeout(800);
 
@@ -79,8 +84,12 @@ export async function validateClient360(page, report, label) {
   const projection = await page.evaluate(() => {
     const id = Orbit.route && Orbit.route.params && Orbit.route.params.c;
     const row = id && Orbit.store.get('clientes', id);
+    const helper = Orbit.clientProjection || {};
+    const bridge = Orbit.clientCanonicalViewProjectionV20260716 || {};
     return row ? {
       canonical: row.__canonicalViewProjection || '',
+      helperVersion: helper.version || '',
+      temporaryBridge: bridge.temporaryInPlaceBridge === true,
       hasName: !!row.nombre,
       hasType: !!row.tipo,
       hasState: !!row.estadoOperativo,
@@ -89,7 +98,9 @@ export async function validateClient360(page, report, label) {
     } : null;
   });
   report[`${label}ClientProjection`] = projection;
-  assert(projection && projection.canonical === '20260716.1', 'CLIENT_CANONICAL_PROJECTION_MISSING', label);
+  assert(projection && projection.helperVersion === EXPECTED_CLIENT_PROJECTION_VERSION, 'CLIENT_CANONICAL_HELPER_VERSION_MISMATCH', `${label}:${projection && projection.helperVersion || 'missing'}`);
+  assert(projection.canonical === EXPECTED_CLIENT_PROJECTION_BRIDGE, 'CLIENT_CANONICAL_PROJECTION_MISSING', `${label}:${projection.canonical || 'missing'}`);
+  assert(projection.temporaryBridge, 'CLIENT_CANONICAL_TEMPORARY_BRIDGE_NOT_DECLARED', label);
   assert(projection.hasName && projection.hasType && projection.hasState && projection.hasLabelsArray, 'CLIENT_CANONICAL_FIELDS_INCOMPLETE', label);
   assert(/pendiente_polizas/i.test(projection.state), 'CLIENT_STATE_NOT_PENDING_POLICIES', projection.state);
 
