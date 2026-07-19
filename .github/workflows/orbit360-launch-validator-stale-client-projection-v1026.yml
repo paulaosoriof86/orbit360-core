@@ -1,0 +1,134 @@
+name: Orbit 360 Launch Validator Stale Client Projection 1.0.26
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-launch-validator-stale-client-projection-v1026.yml"
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-validator-stale-v1026-single-flight
+  cancel-in-progress: true
+
+jobs:
+  apply_and_dispatch:
+    name: Ejecutar parche auditado · preflight · dispatch único
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BRANCH: ays/backend-tenant-lab-v99-20260703
+      GATE_ID: block1-client360-insurers-lab-v20260717
+      OFFICIAL_WORKFLOW: orbit360-aseguradoras-runtime-gate-v20260716.yml
+      SOURCE_WORKFLOW: .github/workflows/orbit360-apply-validator-stale-client-projection-v1026.yml
+    steps:
+      - name: Checkout rama obligatoria
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+
+      - name: Extraer y ejecutar el parche documentado
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "$BRANCH"
+          test -f "$SOURCE_WORKFLOW"
+          python3 - <<'PY'
+          from pathlib import Path
+          source = Path('.github/workflows/orbit360-apply-validator-stale-client-projection-v1026.yml').read_text(encoding='utf-8')
+          marker = "          node --input-type=module <<'NODE'\n"
+          start = source.index(marker) + len(marker)
+          end = source.index("\n          NODE", start)
+          block = source[start:end]
+          lines = []
+          for line in block.splitlines():
+              lines.append(line[10:] if line.startswith('          ') else line)
+          Path('/tmp/orbit360-validator-stale-v1026.mjs').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          PY
+          node --check /tmp/orbit360-validator-stale-v1026.mjs
+          node /tmp/orbit360-validator-stale-v1026.mjs
+          git rm -f .github/workflows/orbit360-dispatch-official-m1-once-v20260719.yml
+          git rm -f .github/workflows/orbit360-apply-validator-stale-client-projection-v1026.yml
+          git rm -f .github/workflows/orbit360-launch-validator-stale-client-projection-v1026.yml
+
+      - name: Validar alcance y ejecutar preflight vinculante
+        shell: bash
+        run: |
+          set -euo pipefail
+          ALLOWED='^(.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml|.github/workflows/orbit360-dispatch-official-m1-once-v20260719.yml|.github/workflows/orbit360-apply-validator-stale-client-projection-v1026.yml|.github/workflows/orbit360-launch-validator-stale-client-projection-v1026.yml|tools/orbit360-runtime-check-client360-v20260716.mjs|tools/orbit360-gate-runtime-crm-v20260716.mjs|tools/orbit360-gate-contract-registry-v20260717.json|tools/orbit360-gate-contract-overlay-v20260718.json|orbit360-platform/CHANGELOG.md|orbit360-platform/docs/BLOQUE1-VALIDATOR-STALE-PROYECCION-CLIENTE360-20260719.md)$'
+          CHANGED="$(git status --short | sed -E 's/^.. //')"
+          test -n "$CHANGED"
+          while IFS= read -r file; do
+            test -z "$file" || echo "$file" | grep -Eq "$ALLOWED"
+          done <<< "$CHANGED"
+          ! git status --short | grep -E 'orbit360-platform/(data/store\.js|data/store-firestore-lab\.local\.js|core/auth\.js|core/router\.js|modules/cliente360\.js|modules/aseguradoras\.js)|firestore\.rules'
+          node --check tools/orbit360-runtime-check-client360-v20260716.mjs
+          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = "GO_GATE_CONTRACT"
+
+      - name: Publicar commit único 1.0.26
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "orbit360-gate-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add .
+          git commit -m "fix(block1): alinear validador de proyección 1.0.26 [skip ci]"
+          git push origin "HEAD:${BRANCH}"
+          echo "PATCH_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Despachar gate oficial exactamente una vez
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflow = process.env.OFFICIAL_WORKFLOW;
+            const branch = process.env.BRANCH;
+            const patchSha = process.env.PATCH_SHA;
+            const startedAt = Date.now();
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: workflow,
+              ref: branch
+            });
+            let run = null;
+            for (let attempt = 0; attempt < 30; attempt += 1) {
+              await new Promise(resolve => setTimeout(resolve, 1500));
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: workflow,
+                branch,
+                event: 'workflow_dispatch',
+                per_page: 20
+              });
+              run = (runs.data.workflow_runs || []).find(item => item.head_sha === patchSha && new Date(item.created_at).getTime() >= startedAt - 5000);
+              if (run) break;
+            }
+            const lines = [
+              '## M1 · contrato 1.0.26 despachado',
+              '',
+              '- Clasificación corregida: **VALIDATOR_STALE**',
+              `- Commit de control: \`${patchSha || 'no disponible'}\``,
+              `- Run oficial: \`${run ? run.id : 'no observado'}\``,
+              '- Despachos solicitados: **1**',
+              '- Producto, datos y backend protegido modificados: **no**',
+              '- Producción, main o merge: **no**'
+            ];
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 5,
+              body: lines.join('\n')
+            });
+            if (!run) core.setFailed('OFFICIAL_M1_1026_RUN_NOT_OBSERVED');
+            else core.notice(`OFFICIAL_M1_1026_RUN_ID:${run.id}`);
