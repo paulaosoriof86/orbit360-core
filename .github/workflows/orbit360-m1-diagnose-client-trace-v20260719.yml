@@ -1,0 +1,210 @@
+name: Orbit 360 M1 Diagnose Client Country Trace 20260719
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-m1-diagnose-client-trace-v20260719.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-m1-diagnose-client-trace-v20260719
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    name: M1 · perfilar trazabilidad país clientes sin PII
+    runs-on: ubuntu-latest
+    env:
+      EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - name: Checkout rama autorizada
+        uses: actions/checkout@v4
+
+      - name: Preflight vinculante
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          test "$BRANCH" = "ays/backend-tenant-lab-v99-20260703"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+
+      - name: Resolver cuenta de servicio LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then echo "BLOQUEO_SECRET_LAB"; exit 42; fi
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
+          test "$PROJECT_ID" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar dependencia backend LAB
+        shell: bash
+        run: npm install --no-save firebase-admin@13
+
+      - name: Diagnóstico read-only de trazabilidad
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          node --input-type=module <<'NODE'
+          import { writeFileSync } from 'node:fs';
+          import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
+          import { getFirestore } from 'firebase-admin/firestore';
+
+          const PROJECT_ID = 'ays-orbit-360-lab';
+          const TENANT_ID = 'alianzas-soluciones';
+          const OUTPUT = 'orbit360-platform/runtime-gate-crm-v20260716/client-country-trace-diagnostic-sanitized.json';
+          const CO_EXCEL_ROWS = new Set([153,154,155,156,157,158,159,160,166,180,194,195,202,412,433,438]);
+          const TRACE_KEY = /(row|fila|line|trace|traz|source|origen)/i;
+          const TOP_KEYS = ['_migration','sourceFile','sourceRow','origen','trazabilidad','fuente','fuenteFila','numeroFila','_numeroFila'];
+
+          function clean(value) { return String(value == null ? '' : value).trim(); }
+          function canonicalCountry(value) {
+            const text = clean(value).toLowerCase();
+            if (/^(co|col|colombia)$/.test(text)) return 'CO';
+            if (/^(gt|gtm|guatemala)$/.test(text)) return 'GT';
+            return text ? 'OTHER' : 'BLANK';
+          }
+          function integer(value) {
+            if (typeof value === 'number' && Number.isInteger(value)) return value;
+            const text = clean(value);
+            return /^\d{1,6}$/.test(text) ? Number(text) : null;
+          }
+          function collect(value, path, depth, out) {
+            if (depth > 3 || value == null) return;
+            if (Array.isArray(value)) return;
+            if (typeof value === 'object') {
+              for (const [key, child] of Object.entries(value)) {
+                const next = path ? `${path}.${key}` : key;
+                if (TRACE_KEY.test(next) || depth === 0) collect(child, next, depth + 1, out);
+              }
+              return;
+            }
+            if (TRACE_KEY.test(path)) out.push({ path, value });
+          }
+
+          const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || '';
+          if (projectId !== PROJECT_ID) throw new Error('BLOQUEO_PROYECTO_LAB');
+          const app = getApps()[0] || initializeApp({ credential: applicationDefault(), projectId: PROJECT_ID });
+          const db = getFirestore(app);
+          const snapshot = await db.collection('tenantId').doc(TENANT_ID).collection('clientes').get();
+          const topPresence = Object.fromEntries(TOP_KEYS.map(key => [key, 0]));
+          const currentCountry = { GT: 0, CO: 0, OTHER: 0, BLANK: 0 };
+          const fields = new Map();
+
+          for (const doc of snapshot.docs) {
+            const data = doc.data() || {};
+            const country = canonicalCountry(data.pais ?? data.paisCodigo ?? data.codigoPais ?? data.country);
+            currentCountry[country] += 1;
+            for (const key of TOP_KEYS) if (data[key] !== undefined && data[key] !== null) topPresence[key] += 1;
+            const trace = [];
+            collect(data, '', 0, trace);
+            for (const item of trace) {
+              const state = fields.get(item.path) || {
+                path: item.path,
+                presence: 0,
+                numeric: 0,
+                min: null,
+                max: null,
+                exactCoRows: 0,
+                minusOneCoRows: 0,
+                plusOneCoRows: 0,
+                exactMatchedValues: []
+              };
+              state.presence += 1;
+              const n = integer(item.value);
+              if (n !== null) {
+                state.numeric += 1;
+                state.min = state.min === null ? n : Math.min(state.min, n);
+                state.max = state.max === null ? n : Math.max(state.max, n);
+                if (CO_EXCEL_ROWS.has(n)) {
+                  state.exactCoRows += 1;
+                  if (!state.exactMatchedValues.includes(n)) state.exactMatchedValues.push(n);
+                }
+                if (CO_EXCEL_ROWS.has(n + 1)) state.minusOneCoRows += 1;
+                if (CO_EXCEL_ROWS.has(n - 1)) state.plusOneCoRows += 1;
+              }
+              fields.set(item.path, state);
+            }
+          }
+
+          const traceCandidates = [...fields.values()]
+            .filter(item => item.numeric > 0)
+            .sort((a, b) =>
+              (b.exactCoRows - a.exactCoRows) ||
+              (b.minusOneCoRows - a.minusOneCoRows) ||
+              (b.plusOneCoRows - a.plusOneCoRows) ||
+              (b.presence - a.presence)
+            )
+            .slice(0, 30)
+            .map(item => ({ ...item, exactMatchedValues: item.exactMatchedValues.sort((a,b) => a-b) }));
+
+          const result = {
+            schemaVersion: 'orbit360-client-country-trace-diagnostic-v1',
+            generatedAt: new Date().toISOString(),
+            projectId: PROJECT_ID,
+            tenantId: TENANT_ID,
+            totalClients: snapshot.size,
+            expectedColombiaSourceRows: CO_EXCEL_ROWS.size,
+            currentCountry,
+            topPresence,
+            traceCandidates,
+            readOnly: true,
+            containsPII: false,
+            containsSecrets: false
+          };
+          writeFileSync(OUTPUT, `${JSON.stringify(result, null, 2)}\n`);
+          const best = traceCandidates[0] || null;
+          console.log(`CLIENT_COUNTRY_TRACE:${JSON.stringify({ total: result.totalClients, currentCountry, best })}`);
+          NODE
+
+      - name: Publicar evidencia sanitizada
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-client-country-trace-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/client-country-trace-diagnostic-sanitized.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publicar resumen en PR 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/client-country-trace-diagnostic-sanitized.json"
+          TOTAL="$(jq -r '.totalClients' "$FILE")"
+          CO="$(jq -r '.currentCountry.CO' "$FILE")"
+          GT="$(jq -r '.currentCountry.GT' "$FILE")"
+          FIELD="$(jq -r '.traceCandidates[0].path // "sin_candidato"' "$FILE")"
+          EXACT="$(jq -r '.traceCandidates[0].exactCoRows // 0' "$FILE")"
+          MINUS="$(jq -r '.traceCandidates[0].minusOneCoRows // 0' "$FILE")"
+          PLUS="$(jq -r '.traceCandidates[0].plusOneCoRows // 0' "$FILE")"
+          printf -v BODY '%s\n\n%s\n%s\n%s\n%s\n%s\n%s' \
+            '## Diagnóstico sanitizado · trazabilidad país Cliente 360' \
+            "- Commit: ${GITHUB_SHA:0:7} · Run: ${GITHUB_RUN_ID}" \
+            "- Clientes: ${TOTAL} · país actual GT ${GT} / CO ${CO}" \
+            "- Mejor campo de traza: ${FIELD}" \
+            "- Coincidencias filas CO exactas: ${EXACT}" \
+            "- Coincidencias con offset -1/+1: ${MINUS}/${PLUS}" \
+            '- Solo lectura; sin PII, secretos, escrituras, producción, merge ni main.'
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY"
