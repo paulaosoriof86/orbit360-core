@@ -15,26 +15,56 @@
 <body>
 <div><span></span><p>Preparando Orbit 360…</p></div>
 <script>
-  (async function(){
-    try {
+  (function(){
+    var PREVIEW_BOOTSTRAP_BUDGET_MS = 12000;
+    var PREVIEW_OPERATION_TIMEOUT_MS = 3000;
+    var PREVIEW_WORKER_READY_TIMEOUT_MS = 7000;
+    var target = 'index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2#/aseguradoras';
+    var state = window.__ORBIT_PREVIEW_BOOTSTRAP__ = {
+      version: '20260719.1-bounded',
+      budgetMs: PREVIEW_BOOTSTRAP_BUDGET_MS,
+      status: 'preparing'
+    };
+
+    function timeout(ms, value) {
+      return new Promise(function(resolve){ setTimeout(function(){ resolve(value); }, ms); });
+    }
+    function bounded(promise, ms, fallback) {
+      return Promise.race([
+        Promise.resolve(promise).catch(function(){ return fallback; }),
+        timeout(ms, fallback)
+      ]);
+    }
+
+    async function prepareBestEffort() {
       if ('serviceWorker' in navigator) {
-        var regs = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(regs.map(function(r){ return r.unregister(); }));
+        var regs = await bounded(navigator.serviceWorker.getRegistrations(), PREVIEW_OPERATION_TIMEOUT_MS, []);
+        await bounded(Promise.all((regs || []).map(function(r){
+          return Promise.resolve(r.unregister()).catch(function(){ return false; });
+        })), PREVIEW_OPERATION_TIMEOUT_MS, []);
       }
+
       if (window.caches && caches.keys) {
-        var keys = await caches.keys();
-        await Promise.all(keys.map(function(k){ return caches.delete(k); }));
+        var keys = await bounded(caches.keys(), PREVIEW_OPERATION_TIMEOUT_MS, []);
+        await bounded(Promise.all((keys || []).map(function(k){
+          return Promise.resolve(caches.delete(k)).catch(function(){ return false; });
+        })), PREVIEW_OPERATION_TIMEOUT_MS, []);
       }
+
       if ('serviceWorker' in navigator) {
-        var registration = await navigator.serviceWorker.register('sw.js?v=20260717-2', { scope: './' });
-        await navigator.serviceWorker.ready;
+        await bounded(
+          navigator.serviceWorker.register('sw.js?v=20260717-2', { scope: './' }),
+          PREVIEW_OPERATION_TIMEOUT_MS,
+          null
+        );
+        await bounded(navigator.serviceWorker.ready, PREVIEW_WORKER_READY_TIMEOUT_MS, null);
         if (!navigator.serviceWorker.controller) {
-          await Promise.race([
-            new Promise(function(resolve){ navigator.serviceWorker.addEventListener('controllerchange', resolve, { once:true }); }),
-            new Promise(function(resolve){ setTimeout(resolve, 5000); })
-          ]);
+          await bounded(new Promise(function(resolve){
+            navigator.serviceWorker.addEventListener('controllerchange', resolve, { once:true });
+          }), 2000, null);
         }
       }
+
       var assets = [
         'core/backend-lab-loader.js?v=20260716-2',
         'core/backend-lab-init.js?v=20260717-1',
@@ -57,11 +87,22 @@
         'core/backend-lab-advisor-write-bridge.js?v=20260716-2',
         'data/tenant-config/alianzas-soluciones.asesores.json?v=20260715-7'
       ];
-      for (var i = 0; i < assets.length; i += 1) {
-        try { await fetch(assets[i], { cache: 'reload', credentials: 'same-origin' }); } catch (ignore) {}
-      }
-    } catch (e) {}
-    location.replace('index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2#/aseguradoras');
+      await bounded(Promise.all(assets.map(function(asset){
+        return fetch(asset, { cache: 'reload', credentials: 'same-origin' }).catch(function(){ return null; });
+      })), PREVIEW_OPERATION_TIMEOUT_MS, []);
+    }
+
+    Promise.race([
+      prepareBestEffort().then(function(){ state.status = 'prepared'; }),
+      timeout(PREVIEW_BOOTSTRAP_BUDGET_MS, 'budget_exhausted').then(function(result){
+        if (result === 'budget_exhausted') state.status = result;
+      })
+    ]).catch(function(){
+      state.status = 'degraded';
+    }).finally(function(){
+      state.redirectScheduled = true;
+      location.replace(target);
+    });
   })();
 </script>
 </body>
