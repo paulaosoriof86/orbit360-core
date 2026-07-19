@@ -1,8 +1,8 @@
-/* Orbit 360 · Academia · integridad visual M1 v1.222 */
+/* Orbit 360 · Academia · API 1.221 · contenido M1 1.222 */
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  if(Orbit.ACADEMIA_V1221_M1_VISUAL&&Orbit.ACADEMIA_V1221_M1_VISUAL.version==='1.222')return;
+  if(Orbit.ACADEMIA_V1221_M1_VISUAL&&Orbit.ACADEMIA_V1221_M1_VISUAL.version==='1.221'&&Orbit.ACADEMIA_V1221_M1_VISUAL.contentVersion==='1.222')return;
   function sec(icon,title,detail){return{icon:icon,t:title,color:'#C5162E',d:detail};}
   function lesson(){return{t:'Estados honestos y revisión visual',min:20,tipo:'lectura',_m1visualv:1222,secciones:[
     sec('🧭','Ausencia de información no significa estado favorable','Sin pólizas, cartera o cobros migrados, Orbit muestra pendiente, sin datos o aún no disponible; nunca Al día por ausencia de fuente.'),
@@ -25,5 +25,5 @@
   function apply(){return['cur_p_clientes','cur_dir_aseg_dir_v1202','cur_dir_aseg_op_v1202','cur_dir_aseg_asesor_v1202'].map(update).some(Boolean);}
   var tries=0;(function wait(){if(apply()||tries++>60)return;setTimeout(wait,150);})();
   document.addEventListener('orbit:reseeded',apply);
-  Orbit.ACADEMIA_V1221_M1_VISUAL={version:'1.222',apply:apply};
+  Orbit.ACADEMIA_V1221_M1_VISUAL={version:'1.221',contentVersion:'1.222',apply:apply};
 })();
