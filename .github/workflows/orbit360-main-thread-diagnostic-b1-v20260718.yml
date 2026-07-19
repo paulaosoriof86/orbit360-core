@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/orbit360-main-thread-diagnostic-b1-v20260718.yml"
       - "tools/orbit360-diagnosticar-hilo-principal-b1-v20260718.mjs"
+      - "orbit360-platform/modules/portal-v1142-copyfix.js"
   workflow_dispatch:
 
 permissions:
