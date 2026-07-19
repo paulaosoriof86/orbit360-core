@@ -1,0 +1,254 @@
+name: Orbit 360 M1 Correct Client Country 20260719
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-m1-correct-client-country-v20260719.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-m1-correct-client-country-v20260719
+  cancel-in-progress: true
+
+jobs:
+  correct:
+    name: M1 · corregir país por trazabilidad exacta
+    runs-on: ubuntu-latest
+    env:
+      EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - name: Checkout rama autorizada
+        uses: actions/checkout@v4
+
+      - name: Preflight vinculante
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          test "$BRANCH" = "ays/backend-tenant-lab-v99-20260703"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+
+      - name: Resolver cuenta de servicio LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then echo "BLOQUEO_SECRET_LAB"; exit 42; fi
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
+          test "$PROJECT_ID" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar dependencia backend LAB
+        shell: bash
+        run: npm install --no-save firebase-admin@13
+
+      - name: Corregir 16 clientes con auditoría y rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          node --input-type=module <<'NODE'
+          import { writeFileSync } from 'node:fs';
+          import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
+          import { FieldValue, getFirestore } from 'firebase-admin/firestore';
+
+          const PROJECT_ID = 'ays-orbit-360-lab';
+          const TENANT_ID = 'alianzas-soluciones';
+          const OUTPUT = 'orbit360-platform/runtime-gate-crm-v20260716/client-country-correction-sanitized.json';
+          const CO_ROWS = new Set([153,154,155,156,157,158,159,160,166,180,194,195,202,412,433,438]);
+          const EXPECTED_TOTAL = 414;
+          const EXPECTED_GT = 398;
+          const EXPECTED_CO = 16;
+
+          function clean(value) { return String(value == null ? '' : value).trim(); }
+          function country(value) {
+            const text = clean(value).toUpperCase();
+            if (text === 'GT' || text === 'GUATEMALA') return 'GT';
+            if (text === 'CO' || text === 'COLOMBIA') return 'CO';
+            return text ? 'OTHER' : 'BLANK';
+          }
+          function rowOf(data) {
+            const a = Number(data?.trazabilidad?.fila);
+            const b = Number(data?._migration?.sourceRow);
+            return Number.isInteger(a) && Number.isInteger(b) && a === b ? a : null;
+          }
+          function counts(docs) {
+            const out = { GT: 0, CO: 0, OTHER: 0, BLANK: 0 };
+            docs.forEach(doc => { out[country(doc.data()?.pais)] += 1; });
+            return out;
+          }
+          function write(result) {
+            writeFileSync(OUTPUT, `${JSON.stringify(result, null, 2)}\n`);
+            console.log(`CLIENT_COUNTRY_CORRECTION:${JSON.stringify({ ok: result.ok, status: result.status, targets: result.targetCount, before: result.beforeCountry, after: result.afterCountry })}`);
+          }
+
+          const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || '';
+          if (projectId !== PROJECT_ID) throw new Error('BLOQUEO_PROYECTO_LAB');
+          const app = getApps()[0] || initializeApp({ credential: applicationDefault(), projectId: PROJECT_ID });
+          const db = getFirestore(app);
+          const root = db.collection('tenantId').doc(TENANT_ID);
+          const collection = root.collection('clientes');
+          const snapshot = await collection.get();
+          const docs = snapshot.docs;
+          const targets = docs.filter(doc => CO_ROWS.has(rowOf(doc.data() || {})));
+          const result = {
+            schemaVersion: 'orbit360-client-country-correction-v1',
+            generatedAt: new Date().toISOString(),
+            projectId: PROJECT_ID,
+            tenantId: TENANT_ID,
+            totalClients: docs.length,
+            expectedTargets: EXPECTED_CO,
+            targetCount: targets.length,
+            beforeCountry: counts(docs),
+            traceContract: 'trazabilidad.fila === _migration.sourceRow',
+            sourceRule: 'Cod. Región 57 → CO/COP',
+            auditAndRollback: true,
+            containsPII: false,
+            containsSecrets: false,
+            ok: false,
+            status: 'initializing'
+          };
+
+          try {
+            if (docs.length !== EXPECTED_TOTAL) throw new Error(`UNEXPECTED_CLIENT_TOTAL:${docs.length}`);
+            if (targets.length !== EXPECTED_CO) throw new Error(`UNEXPECTED_TARGET_COUNT:${targets.length}`);
+            const targetCountries = targets.reduce((acc, doc) => {
+              const key = country(doc.data()?.pais);
+              acc[key] = (acc[key] || 0) + 1;
+              return acc;
+            }, {});
+            result.targetCountryBefore = targetCountries;
+
+            if (targetCountries.CO === EXPECTED_CO && targetCountries.GT === undefined) {
+              result.status = 'already_correct';
+            } else {
+              if (targetCountries.GT !== EXPECTED_CO || Object.keys(targetCountries).length !== 1) {
+                throw new Error(`MIXED_TARGET_STATE:${JSON.stringify(targetCountries)}`);
+              }
+
+              const auditRef = root.collection('auditoriaClientesExterna').doc('country_fix_region57_20260719');
+              await db.runTransaction(async transaction => {
+                const fresh = [];
+                for (const target of targets) fresh.push(await transaction.get(target.ref));
+                for (const doc of fresh) {
+                  if (!doc.exists) throw new Error('TARGET_DISAPPEARED');
+                  const data = doc.data() || {};
+                  const row = rowOf(data);
+                  if (!CO_ROWS.has(row)) throw new Error('TRACE_CONTRACT_CHANGED');
+                  if (country(data.pais) !== 'GT') throw new Error('COUNTRY_CHANGED_BEFORE_WRITE');
+                }
+
+                transaction.set(auditRef, {
+                  schemaVersion: 'orbit360-client-country-correction-audit-v1',
+                  tenantId: TENANT_ID,
+                  action: 'normalize_country_from_source_region_code',
+                  sourceRule: 'Cod. Región 57 → CO/COP',
+                  sourceRows: [...CO_ROWS].sort((a,b) => a-b),
+                  before: fresh.map(doc => ({ id: doc.id, pais: doc.data()?.pais || '', moneda: doc.data()?.moneda || '', fila: rowOf(doc.data() || {}) })),
+                  after: { pais: 'CO', moneda: 'COP' },
+                  createdAt: FieldValue.serverTimestamp(),
+                  rollbackAvailable: true,
+                  sourceRuns: [29708226504, 29708505326],
+                  containsSecrets: false
+                }, { merge: false });
+
+                for (const doc of fresh) {
+                  transaction.update(doc.ref, {
+                    pais: 'CO',
+                    moneda: 'COP',
+                    'trazabilidad.pais': 'CO',
+                    'trazabilidad.moneda': 'COP',
+                    'trazabilidad.paisFuente': 'Cod. Región 57',
+                    'trazabilidad.paisCorregidoEn': FieldValue.serverTimestamp(),
+                    '_migration.country': 'CO',
+                    '_migration.currency': 'COP',
+                    '_migration.countrySource': 'cod_region_57'
+                  });
+                }
+              });
+              result.status = 'corrected_with_audit';
+            }
+
+            const afterSnapshot = await collection.get();
+            result.afterCountry = counts(afterSnapshot.docs);
+            const afterTargets = afterSnapshot.docs.filter(doc => CO_ROWS.has(rowOf(doc.data() || {})));
+            result.targetCountryAfter = afterTargets.reduce((acc, doc) => {
+              const key = country(doc.data()?.pais);
+              acc[key] = (acc[key] || 0) + 1;
+              return acc;
+            }, {});
+            if (result.afterCountry.GT !== EXPECTED_GT || result.afterCountry.CO !== EXPECTED_CO) {
+              throw new Error(`UNEXPECTED_FINAL_COUNTRY_COUNTS:${JSON.stringify(result.afterCountry)}`);
+            }
+            if (result.targetCountryAfter.CO !== EXPECTED_CO || Object.keys(result.targetCountryAfter).length !== 1) {
+              throw new Error(`UNEXPECTED_FINAL_TARGET_STATE:${JSON.stringify(result.targetCountryAfter)}`);
+            }
+            result.ok = true;
+            write(result);
+          } catch (error) {
+            result.status = 'blocked';
+            result.errorCode = String(error?.message || error).replace(/[^A-Za-z0-9:{}_,./-]/g, '').slice(0, 220);
+            try {
+              const afterSnapshot = await collection.get();
+              result.afterCountry = counts(afterSnapshot.docs);
+            } catch {}
+            write(result);
+            process.exit(54);
+          }
+          NODE
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-client-country-correction-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/client-country-correction-sanitized.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Publicar resumen en PR 5
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/client-country-correction-sanitized.json"
+          if [ -f "$FILE" ]; then
+            OK="$(jq -r '.ok // false' "$FILE")"
+            STATUS="$(jq -r '.status // "sin_resultado"' "$FILE")"
+            TARGETS="$(jq -r '.targetCount // 0' "$FILE")"
+            BEFORE="$(jq -c '.beforeCountry // {}' "$FILE")"
+            AFTER="$(jq -c '.afterCountry // {}' "$FILE")"
+            CODE="$(jq -r '.errorCode // "ninguno"' "$FILE")"
+          else
+            OK=false; STATUS=sin_resultado; TARGETS=0; BEFORE='{}'; AFTER='{}'; CODE=evidencia_no_generada
+          fi
+          printf -v BODY '%s\n\n%s\n%s\n%s\n%s\n%s\n%s\n%s' \
+            '## Resultado sanitizado · corrección país Cliente 360' \
+            "- Commit: ${GITHUB_SHA:0:7} · Run: ${GITHUB_RUN_ID}" \
+            "- Estado: ${STATUS} · Aprobado: ${OK}" \
+            "- Registros objetivo: ${TARGETS}" \
+            "- Antes: ${BEFORE}" \
+            "- Después: ${AFTER}" \
+            "- Código: ${CODE}" \
+            '- LAB con auditoría y rollback; sin PII, producción, merge ni main.'
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY"
