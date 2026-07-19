@@ -46,7 +46,7 @@ Orbit.modules = Orbit.modules || {};
   function openNewInsurer() {
     if (!canCreate()) return toast('Tu rol activo no puede crear aseguradoras.');
     const current = Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : '';
-    const body = `<div class="cfg-note" style="margin-bottom:13px">El país es obligatorio porque define moneda, impuestos, catálogos y alcance. La ficha se crea sin contraseñas ni cuentas completas; esos recursos usan referencias seguras.</div><div class="cgrid">
+    const body = `<div class="cfg-note" style="margin-bottom:13px">El país es obligatorio porque define moneda, impuestos, catálogos y alcance. La ficha solo se crea al confirmar nombre, país y motivo; cancelar no escribe ningún borrador.</div><div class="cgrid">
       <label class="ce-l">Nombre comercial *<input id="asg1202-name" class="o-sel"></label>
       <label class="ce-l">País *<select id="asg1202-country" class="o-sel"><option value="">— Seleccionar —</option>${countryOptions(current)}</select></label>
       <label class="ce-l">NIT / identificación fiscal<input id="asg1202-nit" class="o-sel"></label>
@@ -98,17 +98,32 @@ Orbit.modules = Orbit.modules || {};
     const out = originalRender(host);
     setTimeout(() => {
       if (!host) return;
-      const add = host.querySelector('[data-new-asg]');
+      const add = host.querySelector('#asg-new, [data-new-asg]');
       if (add && !add.dataset.v1202) {
-        const replacement = add.cloneNode(true); replacement.dataset.v1202 = '1'; replacement.onclick = openNewInsurer; add.replaceWith(replacement);
+        const replacement = add.cloneNode(true);
+        replacement.dataset.v1202 = '1';
+        replacement.dataset.newAsg = 'safe-confirm-before-insert';
+        replacement.addEventListener('click', openNewInsurer);
+        add.replaceWith(replacement);
       }
-      const imp = host.querySelector('[data-import-asg]');
+      const imp = host.querySelector('#asg-imp, [data-import-asg]');
       if (imp && !imp.dataset.v1202) {
-        const replacement = imp.cloneNode(true); replacement.dataset.v1202 = '1'; replacement.onclick = () => mod.importarDirectorio(); imp.replaceWith(replacement);
+        const replacement = imp.cloneNode(true);
+        replacement.dataset.v1202 = '1';
+        replacement.dataset.importAsg = 'specialized-directory-import';
+        replacement.addEventListener('click', () => mod.importarDirectorio());
+        imp.replaceWith(replacement);
       }
     }, 0);
     return out;
   };
 
-  mod.__directoryImportV1202 = { originalNew, originalImportOpen, originalRender };
+  mod.__directoryImportV1202 = {
+    originalNew,
+    originalImportOpen,
+    originalRender,
+    safeCreateBeforeInsert: true,
+    cancelWritesStore: false,
+    selectors: ['#asg-new', '#asg-imp']
+  };
 })();

@@ -62,6 +62,8 @@ context.window.OrbitTenantInsurerKnowledgeSummaries = [{
 
 vm.createContext(context);
 const ownerPath = path.resolve(__dirname, '..', 'modules', 'aseguradoras.js');
+const bridgePath = path.resolve(__dirname, '..', 'modules', 'aseguradoras-v1202-import-bridge.js');
+const bridgeSource = fs.readFileSync(bridgePath, 'utf8');
 vm.runInContext(fs.readFileSync(ownerPath, 'utf8'), context);
 
 const moduleApi = context.Orbit.modules.aseguradoras;
@@ -89,9 +91,22 @@ assert(rows.some(item => item.estado === 'Persistido'), 'Falta estado Persistido
 assert(writes.length === 0, 'La proyección de conocimiento no puede escribir');
 assert(sources.resumenGrupos(insurer).every(group => group.estado !== 'Habilitado'), 'Sin habilitación explícita el grupo debe quedar pendiente');
 
+assert(bridgeSource.includes("host.querySelector('#asg-new, [data-new-asg]')"), 'El bridge debe capturar el botón real #asg-new');
+assert(bridgeSource.includes("host.querySelector('#asg-imp, [data-import-asg]')"), 'El bridge debe capturar el botón real #asg-imp');
+assert(bridgeSource.includes("replacement.dataset.newAsg = 'safe-confirm-before-insert'"), 'Falta marcador de alta segura');
+assert(bridgeSource.includes('safeCreateBeforeInsert: true'), 'Falta contrato create-before-insert');
+assert(bridgeSource.includes('cancelWritesStore: false'), 'Cancelar no puede escribir al store');
+const nameGuard = bridgeSource.indexOf("if (!name) return toast('Ingresa el nombre comercial.')");
+const countryGuard = bridgeSource.indexOf("if (!country) return toast('Selecciona el país.')");
+const reasonGuard = bridgeSource.indexOf("if (!reason) return toast('Registra el motivo del alta.')");
+const insertPoint = bridgeSource.indexOf("S().insert('aseguradoras', row)");
+assert(nameGuard >= 0 && countryGuard > nameGuard && reasonGuard > countryGuard && insertPoint > reasonGuard, 'La inserción debe ocurrir solo después de nombre, país y motivo');
+
 console.log(JSON.stringify({
   test: 'orbit360-aseguradoras-owner-contract-v20260717',
   status: 'PASS',
   writes: writes.length,
-  states: rows.map(item => item.estado)
+  states: rows.map(item => item.estado),
+  safeCreateBeforeInsert: true,
+  realButtonSelectorsCovered: true
 }, null, 2));
