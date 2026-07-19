@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "orbit360-m1-official-dispatch-v1",
+  "generatedAt": "2026-07-19T01:18:12.415Z",
+  "containsPII": false,
+  "containsSecrets": false,
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "targetWorkflow": "orbit360-aseguradoras-runtime-gate-v20260716.yml",
+  "targetRef": "ays/backend-tenant-lab-v99-20260703",
+  "dispatcherCommit": "615d2263e88c1f6f72a7165c1a56634e66f142a7",
+  "dispatched": true,
+  "runId": "29668369152",
+  "status": "QUEUED",
+  "error": "",
+  "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/29668369152",
+  "headSha": "615d2263e88c1f6f72a7165c1a56634e66f142a7"
+}
