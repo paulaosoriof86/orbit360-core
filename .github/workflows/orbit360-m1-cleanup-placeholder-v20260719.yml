@@ -11,6 +11,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 concurrency:
   group: orbit360-m1-cleanup-placeholder-v20260719
@@ -78,3 +80,41 @@ jobs:
             orbit360-platform/lab-data-counts.json
           if-no-files-found: warn
           retention-days: 7
+
+      - name: Publicar resultado sanitizado en PR 5
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/placeholder-cleanup-sanitized.json"
+          if [ -f "$FILE" ]; then
+            STATUS="$(jq -r '.status // "sin_resultado"' "$FILE")"
+            OK="$(jq -r '.ok // false' "$FILE")"
+            BEFORE="$(jq -r '.beforeCount // "—"' "$FILE")"
+            AFTER="$(jq -r '.afterCount // "—"' "$FILE")"
+            RELATIONS="$(jq -r '.relationCount // "—"' "$FILE")"
+            ERROR_CODE="$(jq -r '.errorCode // "ninguno"' "$FILE")"
+          else
+            STATUS="sin_resultado"
+            OK="false"
+            BEFORE="—"
+            AFTER="—"
+            RELATIONS="—"
+            ERROR_CODE="evidencia_no_generada"
+          fi
+          BODY=$(cat <<EOF
+          ## Resultado sanitizado · limpieza M1
+
+          - Commit: `${GITHUB_SHA:0:7}`
+          - Run: `${GITHUB_RUN_ID}`
+          - Estado: `${STATUS}`
+          - Aprobado: `${OK}`
+          - Conteo antes/después: `${BEFORE}` → `${AFTER}`
+          - Relaciones encontradas: `${RELATIONS}`
+          - Código: `${ERROR_CODE}`
+          - Alcance: LAB; con auditoría y rollback; sin producción, merge ni main.
+          EOF
+          )
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY"
