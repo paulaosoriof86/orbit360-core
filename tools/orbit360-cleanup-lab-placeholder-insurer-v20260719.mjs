@@ -31,7 +31,7 @@ function fingerprint(value) {
 
 function resultBase() {
   return {
-    schemaVersion: 'orbit360-lab-placeholder-cleanup-v1',
+    schemaVersion: 'orbit360-lab-placeholder-cleanup-v2-country-diagnostic',
     generatedAt: new Date().toISOString(),
     projectId: PROJECT_ID,
     tenantId: TENANT_ID,
@@ -40,6 +40,7 @@ function resultBase() {
     candidateRecordHash: RECORD_HASH,
     candidateIdentityHash: IDENTITY_HASH,
     readOnlyPreflight: true,
+    clientCountryProfileReadOnly: true,
     auditAndRollbackRequired: true,
     containsPII: false,
     containsSecrets: false,
@@ -51,12 +52,68 @@ function resultBase() {
 function writeResult(result) {
   mkdirSync(OUTPUT_DIR, { recursive: true });
   writeFileSync(OUTPUT, `${JSON.stringify(result, null, 2)}\n`);
-  console.log(`M1_PLACEHOLDER_CLEANUP:${JSON.stringify({ ok: result.ok, status: result.status, before: result.beforeCount, after: result.afterCount, relationCount: result.relationCount })}`);
+  console.log(`M1_PLACEHOLDER_CLEANUP:${JSON.stringify({
+    ok: result.ok,
+    status: result.status,
+    before: result.beforeCount,
+    after: result.afterCount,
+    relationCount: result.relationCount,
+    clientCountryProfile: result.clientCountryProfile || null
+  })}`);
 }
 
 async function count(ref) {
   const snapshot = await ref.count().get();
   return Number(snapshot.data().count || 0);
+}
+
+function rawCountry(value) {
+  const normalized = normalize(value);
+  if (/^(gt|gtm|guatemala)$/.test(normalized)) return 'GT';
+  if (/^(co|col|colombia)$/.test(normalized)) return 'CO';
+  if (/requiere validacion|por validar|sin dato|pendiente/.test(normalized)) return 'REQUIERE_VALIDACION';
+  return normalized ? 'OTHER' : 'BLANK';
+}
+
+function phoneCountry(value) {
+  const digits = clean(value).replace(/\D/g, '');
+  if (!digits) return 'BLANK';
+  if (digits === '502' || digits.startsWith('502')) return '502';
+  if (digits === '57' || digits.startsWith('57')) return '57';
+  return 'OTHER';
+}
+
+async function clientCountryProfile(root) {
+  const snapshot = await root.collection('clientes').get();
+  const profile = {
+    total: snapshot.size,
+    rawCountry: { GT: 0, CO: 0, REQUIERE_VALIDACION: 0, BLANK: 0, OTHER: 0 },
+    phoneCountry: { '502': 0, '57': 0, BLANK: 0, OTHER: 0 },
+    mismatches: {
+      rawGtPhone57: 0,
+      rawCoPhone502: 0,
+      rawUnknownPhone502: 0,
+      rawUnknownPhone57: 0
+    },
+    migrationTracePresent: 0,
+    sourceCountryFieldPresent: 0
+  };
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data() || {};
+    const country = rawCountry(data.pais ?? data.paisCodigo ?? data.codigoPais ?? data.country);
+    const phone = phoneCountry(data.codigoPaisTelefono ?? data.codRegion ?? data.codigoRegion ?? data.regionCode);
+    profile.rawCountry[country] += 1;
+    profile.phoneCountry[phone] += 1;
+    if (country === 'GT' && phone === '57') profile.mismatches.rawGtPhone57 += 1;
+    if (country === 'CO' && phone === '502') profile.mismatches.rawCoPhone502 += 1;
+    if ((country === 'BLANK' || country === 'REQUIERE_VALIDACION' || country === 'OTHER') && phone === '502') profile.mismatches.rawUnknownPhone502 += 1;
+    if ((country === 'BLANK' || country === 'REQUIERE_VALIDACION' || country === 'OTHER') && phone === '57') profile.mismatches.rawUnknownPhone57 += 1;
+    if (data._migration || data.sourceFile || data.sourceRow || data.origen) profile.migrationTracePresent += 1;
+    if (data.pais !== undefined || data.paisCodigo !== undefined || data.codigoPais !== undefined || data.country !== undefined) profile.sourceCountryFieldPresent += 1;
+  }
+
+  return profile;
 }
 
 async function relationEvidence(root, candidateId) {
@@ -108,6 +165,7 @@ const result = resultBase();
 
 try {
   result.beforeCount = await count(insurers);
+  result.clientCountryProfile = await clientCountryProfile(root);
   const snapshot = await insurers.get();
   const candidates = snapshot.docs.filter(doc => fingerprint(doc.id) === RECORD_HASH);
 
@@ -165,6 +223,7 @@ try {
   result.status = 'blocked';
   result.errorCode = String(error?.message || error).replace(/[^A-Za-z0-9:_/-]/g, '').slice(0, 160);
   try { result.afterCount = await count(insurers); } catch {}
+  try { if (!result.clientCountryProfile) result.clientCountryProfile = await clientCountryProfile(root); } catch {}
   writeResult(result);
   process.exit(53);
 }
