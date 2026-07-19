@@ -104,17 +104,15 @@ jobs:
             RELATIONS="—"
             ERROR_CODE="evidencia_no_generada"
           fi
-          BODY=$(cat <<EOF
-          ## Resultado sanitizado · limpieza M1
-
-          - Commit: `${GITHUB_SHA:0:7}`
-          - Run: `${GITHUB_RUN_ID}`
-          - Estado: `${STATUS}`
-          - Aprobado: `${OK}`
-          - Conteo antes/después: `${BEFORE}` → `${AFTER}`
-          - Relaciones encontradas: `${RELATIONS}`
-          - Código: `${ERROR_CODE}`
-          - Alcance: LAB; con auditoría y rollback; sin producción, merge ni main.
-          EOF
-          )
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          printf -v BODY '%s\n\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s' \
+            '## Resultado sanitizado · limpieza M1' \
+            "- Commit: ${SHORT_SHA}" \
+            "- Run: ${GITHUB_RUN_ID}" \
+            "- Estado: ${STATUS}" \
+            "- Aprobado: ${OK}" \
+            "- Conteo antes/después: ${BEFORE} → ${AFTER}" \
+            "- Relaciones encontradas: ${RELATIONS}" \
+            "- Código: ${ERROR_CODE}" \
+            '- Alcance: LAB; con auditoría y rollback; sin producción, merge ni main.'
           gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY"
