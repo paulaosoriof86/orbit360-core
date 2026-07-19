@@ -3,17 +3,23 @@ import { chromium } from 'playwright';
 
 const baseUrl = String(process.env.ORBIT360_PREVIEW_URL || '').replace(/\/$/, '');
 const runtime = String(process.env.ORBIT360_EXPECTED_RUNTIME || '20260717-2');
-if (!/^https:\/\//.test(baseUrl)) throw new Error('DIAGNOSTIC_PREVIEW_URL_MISSING');
+let parsedBase;
+try { parsedBase = new URL(baseUrl); } catch { throw new Error('DIAGNOSTIC_PREVIEW_URL_MISSING'); }
+const isHttps = parsedBase.protocol === 'https:';
+const isLocalHttp = parsedBase.protocol === 'http:' && ['127.0.0.1', 'localhost', '::1'].includes(parsedBase.hostname);
+if (!isHttps && !isLocalHttp) throw new Error('DIAGNOSTIC_PREVIEW_URL_UNSAFE');
 
 const outputDir = 'orbit360-platform/runtime-gate-crm-v20260716';
 mkdirSync(outputDir, { recursive: true });
 const outputFile = `${outputDir}/main-thread-diagnostic-sanitized.json`;
 const report = {
-  schemaVersion: 'orbit360-main-thread-diagnostic-v1',
+  schemaVersion: 'orbit360-main-thread-diagnostic-v2-runtime-provenance',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
   runtimeVersion: runtime,
+  runtimeTarget: isLocalHttp ? 'CHECKOUT_LOCAL' : 'REMOTE_CHANNEL',
+  sourceCommit: String(process.env.ORBIT360_SOURCE_COMMIT || process.env.GITHUB_SHA || ''),
   variants: []
 };
 
@@ -209,5 +215,5 @@ try {
   if (browser) await browser.close().catch(() => {});
 }
 
-console.log(`ORBIT360_MAIN_THREAD_DIAGNOSTIC:${JSON.stringify({ok:report.ok,variants:report.variants.map(item=>({name:item.name,responseReady:item.responseReady,probeError:item.probeError,top:item.profileTop[0]||null,paused:item.pausedFrames[0]||null}))})}`);
+console.log(`ORBIT360_MAIN_THREAD_DIAGNOSTIC:${JSON.stringify({ok:report.ok,runtimeTarget:report.runtimeTarget,sourceCommit:report.sourceCommit,variants:report.variants.map(item=>({name:item.name,responseReady:item.responseReady,probeError:item.probeError,top:item.profileTop[0]||null,paused:item.pausedFrames[0]||null}))})}`);
 process.exit(report.ok ? 0 : 1);
