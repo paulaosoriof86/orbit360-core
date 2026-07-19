@@ -1,41 +1,43 @@
 {
-  "schemaVersion": "orbit360-main-thread-classification-v3-explicit-trigger",
-  "generatedAt": "2026-07-19T01:14:57.183Z",
+  "schemaVersion": "orbit360-main-thread-classification-v4-checkout-provenance",
+  "generatedAt": "2026-07-19T01:15:43.341Z",
   "containsPII": false,
   "containsSecrets": false,
   "gateId": "block1-client360-insurers-lab-v20260717",
   "contractVersion": "1.0.25",
-  "sourceCommit": "beef88f2971bcb7927b30132b050e244110d17b0",
-  "runId": "29668247927",
+  "sourceCommit": "11695bae995e20c8f68db13b9e54db88263d6292",
+  "reportSourceCommit": "11695bae995e20c8f68db13b9e54db88263d6292",
+  "runtimeTarget": "CHECKOUT_LOCAL",
+  "runId": "29668276251",
   "runAttempt": "1",
   "trigger": "push",
-  "evidenceProduced": false,
+  "evidenceProduced": true,
   "classification": "PIPELINE_MECHANISM_FAILURE",
-  "finding": "DIAGNOSTIC_EVIDENCE_NOT_PRODUCED",
+  "finding": "MAIN_THREAD_RESPONSIVE_ON_CURRENT_CHECKOUT",
   "variants": [
     {
       "name": "bare",
-      "responseReady": false,
+      "responseReady": true,
       "probeError": "",
-      "topFunction": "",
+      "topFunction": "(idle)",
       "topPath": "",
       "pausedFunction": "",
       "pausedPath": ""
     },
     {
       "name": "cdp-debugger",
-      "responseReady": false,
+      "responseReady": true,
       "probeError": "",
-      "topFunction": "",
+      "topFunction": "(idle)",
       "topPath": "",
       "pausedFunction": "",
       "pausedPath": ""
     },
     {
       "name": "gate-observer",
-      "responseReady": false,
+      "responseReady": true,
       "probeError": "",
-      "topFunction": "",
+      "topFunction": "(idle)",
       "topPath": "",
       "pausedFunction": "",
       "pausedPath": ""
@@ -43,5 +45,5 @@
   ],
   "officialGateExecuted": false,
   "deployOrSyncExecuted": false,
-  "nextAction": "Stop. Correct only the diagnostic execution/observability mechanism; do not rerun the official gate."
+  "nextAction": "Run the binding preflight and the official M1 gate exactly once."
 }
