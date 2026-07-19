@@ -3,32 +3,35 @@
   "issuedAt": "2026-07-19",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": "VALIDATOR_STALE",
-  "diagnosticRevision": "client-projection-validator-parity-v1",
-  "contractRevision": "1.0.26-client-projection-validator-parity-v1",
-  "sourceRunId": 29668369152,
-  "sourceHead": "615d2263e88c1f6f72a7165c1a56634e66f142a7",
-  "firstFailedStage": "desktop_direction_client360",
+  "diagnosticRevision": "responsive-role-selection-parity-v1",
+  "contractRevision": "1.0.27-responsive-role-selection-parity-v1",
+  "sourceRunId": 29669017875,
+  "sourceHead": "22e51537b6bd75044c930bc5b251d1649148b1e3",
+  "firstFailedStage": "desktop_direction_aseguradoras",
   "gatePatch": {
-    "contractVersion": "1.0.26",
-    "diagnosticRevision": "client-projection-validator-parity-v1",
+    "contractVersion": "1.0.27",
+    "diagnosticRevision": "responsive-role-selection-parity-v1",
     "status": "ACTIVE_VALIDATOR_STALE_FIX",
-    "diagnosticRule": "Validate the declared Client 360 owner version and the explicitly temporary bridge marker separately. A current temporary bridge is not missing canonical projection.",
+    "diagnosticRule": "A responsive role test must prepare the active role semantically through the DOM change event and must not require the topbar role selector to be visibly actionable.",
     "executionBudget": {
-      "interpretation": "Version 1.0.26 changes validator parity only. Cliente 360, Aseguradoras, Store, Auth, Router, rules and data remain frozen.",
-      "exhaustionPolicy": "Execute 1.0.26 once after GO_GATE_CONTRACT. If another stage fails, stop and classify that first failure before any additional change.",
+      "interpretation": "Version 1.0.27 changes validator role preparation only. Cliente 360, Aseguradoras, Store, Auth, Router, rules, responsive CSS and tenant data remain frozen.",
+      "exhaustionPolicy": "Execute 1.0.27 once after GO_GATE_CONTRACT. If another stage fails, stop and classify that first failure before any additional change.",
       "evidence": {
-        "sourceContractVersion": "1.0.25",
-        "sourceRunId": 29668369152,
-        "failedStage": "desktop_direction_client360",
-        "errorCode": "CLIENT_CANONICAL_PROJECTION_MISSING",
-        "validatorExpectedProjection": "20260716.1",
-        "runtimeHelperVersion": "20260717.1",
-        "runtimeTemporaryBridge": "20260717.1-temporal",
+        "sourceContractVersion": "1.0.26",
+        "sourceRunId": 29669017875,
+        "failedStage": "desktop_direction_aseguradoras",
+        "actualFailurePoint": "role_transition_to_operativo_after_tablet_viewport",
+        "errorCode": "ROLE_SELECTOR_NOT_VISIBLE_FOR_SELECT_OPTION",
+        "desktopDirectionPassed": true,
         "clientCount": 414,
-        "visibleRows": 414,
-        "kpiMatched": true,
-        "fieldsComplete": true,
-        "mechanismFinding": "The product exposed the correct current helper, temporary marker, fields, state and row count; only the obsolete literal in the validator failed."
+        "insurerCount": 26,
+        "advisorCount": 7,
+        "clientProjectionPassed": true,
+        "insurerDirectoryPassed": true,
+        "insurerKnowledgeVisible": true,
+        "pageErrors": 0,
+        "scriptParseFailures": 0,
+        "mechanismFinding": "The role selector remained attached but was not visible after the viewport changed to tablet. Playwright selectOption requires a visible actionable element, although role preparation is not itself the responsive behavior under test."
       }
     },
     "reconciliation": {
@@ -36,23 +39,25 @@
       "classifications": [
         "VALIDATOR_STALE"
       ],
-      "scope": "Cliente 360 validator and effective gate contract only",
-      "rootCause": "The canonical helper evolved to 20260717.1 and the compatibility bridge to 20260717.1-temporal, while the validator still required 20260716.1.",
+      "scope": "Joint gate role preparation only",
+      "rootCause": "The gate used a visible-control Playwright action as an internal setup mechanism after entering a responsive viewport where the control can be legitimately hidden or clipped.",
       "corrections": [
-        "freeze product and protected backend",
-        "validate owner version and temporary bridge independently",
-        "preserve field, state, tab, scope and count assertions",
-        "update effective registry overlay, preflight, validator, CHANGELOG, Claude and Academia together",
+        "freeze product, protected backend, responsive CSS and tenant data",
+        "resolve the requested role option from the attached DOM select",
+        "assign the option value and dispatch a bubbling change event",
+        "verify the active value independently of visual visibility",
+        "preserve all three viewport validations and all functional assertions",
         "run the official gate exactly once"
       ],
       "openEvidence": [
-        "1.0.26 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
+        "1.0.27 sanitized ok:true across Dirección desktop, Operativo tablet and Asesor móvil"
       ],
       "preserved": [
         "Orbit.store API",
         "core/auth.js",
         "core/router.js",
         "Firestore rules",
+        "responsive CSS",
         "Cliente 360 renderer",
         "Aseguradoras renderer",
         "414 clientes",
@@ -63,8 +68,7 @@
     "executionDispatch": {
       "mode": "recognized-push-workflow",
       "uniqueExecution": true,
-      "dispatchAfterRetirement": true,
-      "purpose": "Run contract 1.0.26 once from the final validator commit after all control files and temporary workflows are retired."
+      "purpose": "Run contract 1.0.27 once from the final joint gate validator commit."
     }
   },
   "canonicalOwners": [
@@ -84,9 +88,10 @@
       "id": "clientProjectionValidator",
       "path": "tools/orbit360-runtime-check-client360-v20260716.mjs",
       "requiredTokens": [
-        "CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.26'",
+        "CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.27'",
         "EXPECTED_CLIENT_PROJECTION_VERSION = '20260717.1'",
         "EXPECTED_CLIENT_PROJECTION_BRIDGE = '20260717.1-temporal'",
+        "orbit360-runtime-gate-joint-v27-role-selection-parity",
         "CLIENT_CANONICAL_HELPER_VERSION_MISMATCH",
         "CLIENT_CANONICAL_TEMPORARY_BRIDGE_NOT_DECLARED"
       ]
@@ -124,6 +129,8 @@
       "id": "gateControlledRuntimeAndCanonicalDom",
       "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
       "requiredTokens": [
+        "contractVersion: '1.0.27'",
+        "orbit360-runtime-gate-joint-v27-role-selection-parity",
         "canonical_post_router_runtime_terminal",
         "page.exposeBinding('__orbitGatePostRouterRuntime'",
         "window.__orbitAysKnowledgeRuntimePromise",
@@ -132,12 +139,14 @@
         "orbit:aseguradoras:tenant-runtime-error",
         "external-custom-event-binding",
         "canonical_domcontentloaded_ready",
-        "report.documentLifecycleSignals=[]",
+        "report.documentLifecycleSignals = []",
         "page.on('domcontentloaded'",
-        "item.path==='/index.html'",
-        "method:'playwright-page-event'",
-        "report.checks.canonical_domcontentloaded_ready=true",
-        "beforeAuth:true"
+        "item.path === '/index.html'",
+        "method: 'playwright-page-event'",
+        "report.checks.canonical_domcontentloaded_ready = true",
+        "beforeAuth: true",
+        "select.dispatchEvent(new Event('change', { bubbles: true }))",
+        "responsiveVisibilityIndependent: true"
       ]
     },
     {
@@ -161,7 +170,8 @@
     "tools/orbit360-gate-runtime-crm-v20260716.mjs",
     "tools/orbit360-runtime-check-client360-v20260716.mjs",
     ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
-    "orbit360-platform/docs/BLOQUE1-VALIDATOR-STALE-PROYECCION-CLIENTE360-20260719.md"
+    "orbit360-platform/docs/BLOQUE1-VALIDATOR-STALE-PROYECCION-CLIENTE360-20260719.md",
+    "orbit360-platform/docs/BLOQUE1-VALIDATOR-STALE-SELECCION-ROL-RESPONSIVE-20260719.md"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/core/router-tenant-config-bootstrap.js",
@@ -175,10 +185,11 @@
       "path": "tools/orbit360-runtime-check-client360-v20260716.mjs",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.26'",
+        "CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.27'",
         "EXPECTED_CLIENT_PROJECTION_VERSION = '20260717.1'",
         "EXPECTED_CLIENT_PROJECTION_BRIDGE = '20260717.1-temporal'",
         "report.contractVersion = CLIENT360_VALIDATOR_CONTRACT_VERSION",
+        "orbit360-runtime-gate-joint-v27-role-selection-parity",
         "CLIENT_CANONICAL_HELPER_VERSION_MISMATCH",
         "CLIENT_CANONICAL_TEMPORARY_BRIDGE_NOT_DECLARED"
       ]
@@ -218,8 +229,10 @@
     },
     {
       "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+      "replaceRequiredTokens": true,
       "requiredTokens": [
-        "contractVersion:'1.0.25'",
+        "contractVersion: '1.0.27'",
+        "orbit360-runtime-gate-joint-v27-role-selection-parity",
         "canonical_post_router_runtime_terminal",
         "page.exposeBinding('__orbitGatePostRouterRuntime'",
         "window.__orbitAysKnowledgeRuntimePromise",
@@ -228,12 +241,14 @@
         "orbit:aseguradoras:tenant-runtime-error",
         "external-custom-event-binding",
         "canonical_domcontentloaded_ready",
-        "report.documentLifecycleSignals=[]",
+        "report.documentLifecycleSignals = []",
         "page.on('domcontentloaded'",
-        "item.path==='/index.html'",
-        "method:'playwright-page-event'",
-        "report.checks.canonical_domcontentloaded_ready=true",
-        "beforeAuth:true"
+        "item.path === '/index.html'",
+        "method: 'playwright-page-event'",
+        "report.checks.canonical_domcontentloaded_ready = true",
+        "beforeAuth: true",
+        "select.dispatchEvent(new Event('change', { bubbles: true }))",
+        "responsiveVisibilityIndependent: true"
       ]
     },
     {
@@ -255,6 +270,7 @@
     "core/auth.js",
     "core/router.js",
     "Firestore rules",
+    "responsive CSS",
     "Cliente 360 renderer",
     "Aseguradoras renderer",
     "414 clientes",
