@@ -4,6 +4,7 @@
    - conserva el asesor/identidad al cambiar rol activo;
    - muestra únicamente roles asignados al usuario activo;
    - visibilidad = módulos base + extras - restringidos;
+   - permite consulta de Aseguradoras para roles Asesor sin abrir escrituras;
    - no reemplaza Auth, Orbit.store ni scopes de datos.
    ============================================================ */
 (function () {
@@ -23,9 +24,14 @@
     row = row || advisor() || {};
     return uniq(row.roles || row.rolesAsignados || row.rolesDisponibles || [row.rolDefault || row.rol]);
   }
+  function consultativeModules(role) {
+    var route = 'aseguradoras';
+    if ((/Asesor/i.test(role) || role === 'Comercial') && route === 'aseguradoras') return [route];
+    return [];
+  }
   function baseModules(role) {
     var def = Orbit.ROLES && Orbit.ROLES[role];
-    return uniq(def && def.modulos || []);
+    return uniq([].concat(def && def.modulos || [], consultativeModules(role)));
   }
   function extras(row, role) {
     row = row || {};
@@ -108,8 +114,10 @@
   Orbit.session.effectiveModules = function () { return effectiveModules(clean(Orbit.session.rol && Orbit.session.rol()), advisor()); };
   Orbit.session.assignedRoles = function () { return assignedRoles(advisor()); };
   Orbit.session.__multirolVisibilityV20260716 = {
-    version: '20260716.1',
+    version: '20260719.1',
     additiveVisibility: true,
+    consultativeReadOnly: true,
+    advisorInsurerReadOnly: true,
     preservesAdvisorIdentity: true,
     replacesAuth: false,
     replacesDataScope: false
