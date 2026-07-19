@@ -1,4 +1,4 @@
-export const CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.26';
+export const CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.27';
 const EXPECTED_CLIENTS = 414;
 const EXPECTED_TABS = ['resumen','polizas','vehiculos','cobros','recibos','renovaciones','siniestros','comisiones','correos','historial'];
 const EXPECTED_CLIENT_PROJECTION_VERSION = '20260717.1';
@@ -56,7 +56,7 @@ async function readScopeState(page) {
 
 export async function validateClient360(page, report, label) {
   report.contractVersion = CLIENT360_VALIDATOR_CONTRACT_VERSION;
-  report.schemaVersion = 'orbit360-runtime-gate-joint-v26-validator-parity';
+  report.schemaVersion = 'orbit360-runtime-gate-joint-v27-role-selection-parity';
   await page.evaluate(() => { location.hash = '#/cliente360'; });
   await page.waitForTimeout(800);
 
