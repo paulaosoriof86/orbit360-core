@@ -1,4 +1,4 @@
-name: Orbit 360 Secure Access Hosting LAB 20260720
+name: Orbit 360 Ephemeral Handoff Cleanup LAB 20260720
 
 on:
   push:
@@ -11,15 +11,11 @@ permissions:
   contents: read
   pull-requests: write
 
-concurrency:
-  group: orbit360-secure-access-hosting-lab-v20260720
-  cancel-in-progress: false
-
 jobs:
-  deploy_hosting:
-    name: Aseguradoras · publicar flujo seguro en LAB
+  cleanup:
+    name: Seguridad · retirar llaves efímeras de handoff
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     env:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
@@ -37,12 +33,6 @@ jobs:
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          node --check orbit360-platform/core/insurer-directory-import-v1202.js
-          grep -Fq 'data-secure-only' orbit360-platform/core/insurer-directory-import-v1202.js
-          grep -Fq 'Guardar únicamente accesos seguros' orbit360-platform/core/insurer-directory-import-v1202.js
-          grep -Fq 'No se modificó el directorio' orbit360-platform/core/insurer-directory-import-v1202.js
-          grep -Fq 'appliesOpaqueRefsAfterRemoteConfirmation: true' orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
-          grep -Fq 'noSecretPersistence: true' orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
 
       - name: Resolver principal LAB
         shell: bash
@@ -54,40 +44,33 @@ jobs:
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "DEPLOYER_EMAIL=$(jq -r '.client_email // empty' "$KEY_FILE")" >> "$GITHUB_ENV"
 
-      - name: Publicar canal LAB
+      - name: Instalar Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ays-orbit-360-lab
+
+      - name: Eliminar exclusivamente llaves efímeras
         shell: bash
         run: |
           set -euo pipefail
-          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab \
-            --project "$FIREBASE_PROJECT_ID" \
-            --expires 30d \
-            --non-interactive \
-            --json > "${RUNNER_TEMP}/hosting.json"
-          PREVIEW_URL="$(jq -r '.. | strings | select(startswith("https://"))' "${RUNNER_TEMP}/hosting.json" | grep -E '\.(web\.app|firebaseapp\.com)' | head -n 1)"
-          test -n "$PREVIEW_URL"
-          echo "PREVIEW_URL=$PREVIEW_URL" >> "$GITHUB_ENV"
-
-      - name: Verificar fuente realmente publicada
-        shell: bash
-        run: |
-          set -euo pipefail
-          importer="$(curl -fsSL --retry 8 --retry-delay 3 --retry-all-errors -H 'Cache-Control: no-cache' "${PREVIEW_URL}/core/insurer-directory-import-v1202.js?run=${GITHUB_RUN_ID}")"
-          provider="$(curl -fsSL --retry 8 --retry-delay 3 --retry-all-errors -H 'Cache-Control: no-cache' "${PREVIEW_URL}/core/aseguradoras-credentials-provider-lab-v20260720.js?run=${GITHUB_RUN_ID}")"
-          printf '%s' "$importer" | grep -Fq 'data-secure-only'
-          printf '%s' "$importer" | grep -Fq 'Guardar únicamente accesos seguros'
-          printf '%s' "$importer" | grep -Fq 'applySecureOnly.__secureOnlyV20260720 = true'
-          printf '%s' "$importer" | grep -Fq 'No se modificó el directorio'
-          printf '%s' "$provider" | grep -Fq 'appliesOpaqueRefsAfterRemoteConfirmation: true'
-          printf '%s' "$provider" | grep -Fq 'noSecretPersistence: true'
+          gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project "$FIREBASE_PROJECT_ID" >/dev/null
+          REMOVED=0
+          for item in orbit360-credential-handoff-key-20260720 orbit360-credential-handoff-key-20260720-v2; do
+            if gcloud secrets describe "$item" --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1; then
+              gcloud secrets delete "$item" --project "$FIREBASE_PROJECT_ID" --quiet >/dev/null
+              REMOVED=$((REMOVED + 1))
+            fi
+          done
           mkdir -p orbit360-platform/runtime-gate-crm-v20260716
-          jq -n --arg run "$GITHUB_RUN_ID" --arg commit "$GITHUB_SHA" --arg previewUrl "$PREVIEW_URL" '{schemaVersion:"orbit360-secure-access-hosting-v1",containsSecrets:false,containsPII:false,ok:true,phase:"completed",run:$run,commit:$commit,previewUrl:$previewUrl,secureOnlyButton:true,directoryWrites:false,remoteConfirmationRequired:true,opaqueRefsAfterConfirmation:true}' > orbit360-platform/runtime-gate-crm-v20260716/secure-access-hosting-sanitized.json
+          jq -n --arg run "$GITHUB_RUN_ID" --arg commit "$GITHUB_SHA" --argjson removed "$REMOVED" '{schemaVersion:"orbit360-ephemeral-handoff-cleanup-v1",containsSecrets:false,containsPII:false,ok:true,phase:"completed",run:$run,commit:$commit,ephemeralKeysRemoved:$removed,permanentVaultTouched:false}' > orbit360-platform/runtime-gate-crm-v20260716/ephemeral-handoff-cleanup-sanitized.json
 
       - name: Publicar evidencia sanitizada
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-secure-access-hosting-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/secure-access-hosting-sanitized.json
+          name: orbit360-ephemeral-handoff-cleanup-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/ephemeral-handoff-cleanup-sanitized.json
           if-no-files-found: error
           retention-days: 7
 
@@ -96,4 +79,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "Hosting LAB seguro publicado y verificado. Botón exclusivo activo; no reimporta aseguradoras. URL: ${PREVIEW_URL}. Run: ${GITHUB_RUN_ID}. Commit: ${GITHUB_SHA}."
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "Limpieza de handoff efímero completada. La bóveda permanente no fue modificada. Run: ${GITHUB_RUN_ID}. Commit: ${GITHUB_SHA}."
