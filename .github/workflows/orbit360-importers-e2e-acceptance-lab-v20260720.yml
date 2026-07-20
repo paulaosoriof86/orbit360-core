@@ -107,7 +107,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm install --no-save firebase-admin@13 playwright@1.52.0
+          npm install --no-save firebase-admin@13 playwright@1.52.0 xlsx@0.18.5
+          node -e "require('firebase-admin'); require('xlsx'); console.log('DEPENDENCIAS_GATE_OK')"
           npx playwright install --with-deps chromium
 
       - name: Ejecutar gate integral una sola vez
