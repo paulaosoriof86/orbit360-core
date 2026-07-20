@@ -558,7 +558,7 @@ Orbit.insurerDirectoryImport = (function () {
     const result = uiState.result;
     back.innerHTML = `<div class="card" style="width:min(980px,97vw);max-height:94vh;display:flex;flex-direction:column;padding:0"><div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;gap:12px"><div><small style="color:rgba(255,255,255,.65)">Importación inteligente · fuente separada</small><b style="display:block;color:#fff;font-family:var(--f-display);font-size:18px">Directorio de aseguradoras</b></div><button class="imp-x" data-close style="color:#fff">✕</button></div><div style="padding:18px 20px;overflow:auto;flex:1">
       ${!result ? `<div class="cfg-note" style="margin-bottom:13px">Selecciona el país que corresponde al archivo. No se infiere silenciosamente porque GT y CO tienen monedas, catálogos y estructuras distintas.</div><div class="cgrid"><label class="ce-l">País del directorio *<select id="idir-country" class="o-sel"><option value="">— Seleccionar —</option><option value="GT">Guatemala · GTQ</option><option value="CO">Colombia · COP</option></select></label><label class="ce-l">Archivo Excel *<input id="idir-file" type="file" accept=".xlsx,.xls" class="o-sel"></label></div><div id="idir-status" class="muted" style="margin-top:13px">El archivo se procesa en el navegador. No se sube al repositorio.</div>` : reportHtml(result)}
-      </div><div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">${result ? '<button class="btn ghost" data-reset>Elegir otro archivo</button>' : ''}${result && (result.report.totals.operations - result.report.totals.blocked) > 0 ? `<button class="btn primary" data-approve>Importar ${result.report.totals.operations - result.report.totals.blocked} registro(s) validados</button>` : ''}<button class="btn ghost" data-close>Cerrar</button></div></div>`;
+      </div><div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">${result ? '<button class="btn ghost" data-reset>Elegir otro archivo</button>' : ''}${result && (result.report.totals.operations - result.report.totals.blocked) > 0 ? `<button class="btn primary" data-approve>Importar ${result.report.totals.operations - result.report.totals.blocked} registro(s) validados</button>` : ''}${result && result.securePayloadCount > 0 ? '<button class="btn primary" data-secure-only>Guardar únicamente accesos seguros</button>' : ''}<button class="btn ghost" data-close>Cerrar</button></div></div>`;
     back.querySelectorAll('[data-close]').forEach(x => x.onclick = close);
     const reset = back.querySelector('[data-reset]'); if (reset) reset.onclick = () => { if (uiState.result && uiState.result.report) secureSession.delete(uiState.result.report.reportId); uiState.result = null; paint(); };
     const file = back.querySelector('#idir-file');
@@ -570,6 +570,25 @@ Orbit.insurerDirectoryImport = (function () {
       status.textContent = 'Leyendo y clasificando hojas…';
       try { uiState.result = await parseFile(file.files[0], { country }); paint(); }
       catch (e) { status.textContent = 'No se pudo procesar el Excel: ' + clean(e && e.message || e); }
+    };
+    const secureOnly = back.querySelector('[data-secure-only]');
+    if (secureOnly) secureOnly.onclick = async () => {
+      const reason = clean(await U().prompt('Motivo de la carga segura de accesos:', { title: 'Confirmar accesos seguros' }));
+      if (!reason) return;
+      const phrase = clean(await U().prompt('Escribe exactamente: ' + CONFIRM_PHRASE, { title: 'Confirmación reforzada' }));
+      secureOnly.disabled = true;
+      secureOnly.textContent = 'Guardando accesos de forma segura…';
+      const applied = await applySecureOnly(result, { approved: true, phrase, reason });
+      if (!applied.ok) {
+        secureOnly.disabled = false;
+        secureOnly.textContent = 'Guardar únicamente accesos seguros';
+        return toast('No se aplicó: ' + (applied.errors || []).join(', '));
+      }
+      const done = uiState && uiState.options && uiState.options.onDone;
+      close();
+      toast(applied.imported + ' acceso(s) guardados de forma segura. No se modificó el directorio.');
+      if (done) done(applied);
+      else if (Orbit.modules && Orbit.modules.aseguradoras && Orbit.modules.aseguradoras.render) Orbit.modules.aseguradoras.render(document.getElementById('host'));
     };
     const approve = back.querySelector('[data-approve]');
     if (approve) approve.onclick = async () => {
