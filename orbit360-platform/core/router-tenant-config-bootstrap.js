@@ -1,7 +1,7 @@
 /* Orbit 360 · Bootstrap genérico de configuración tenant para el Router.
    Lee el índice ya cargado y solicita únicamente la configuración activa.
-   Carga contrato visual y proveedor seguro antes de router.js para evitar
-   proyecciones tardías, estados falsos de credenciales y doble render.
+   Carga el contrato visual/operativo Cliente 360 + Aseguradoras antes de
+   router.js para evitar proyecciones tardías y doble render.
    No contiene datos de tenants, secretos ni credenciales. */
 (function () {
   'use strict';
@@ -13,7 +13,6 @@
   var source = String(entry && entry.insurerConfigSrc || '').trim();
   var visualScriptSrc = 'core/client-insurer-visual-contract-v20260720.js?v=20260720-2';
   var visualStyleSrc = 'styles/client-insurer-visual-contract-v20260720.css?v=20260720-2';
-  var credentialProviderSrc = 'core/aseguradoras-credentials-provider-lab-v20260720.js?v=20260720-1';
 
   window.OrbitTenantBootstrapState = {
     owner: 'core/router.js',
@@ -22,8 +21,6 @@
     sourceResolved: Boolean(source),
     visualContractRequested: true,
     visualContractVersion: '20260720.2',
-    credentialProviderRequested: true,
-    credentialProviderVersion: '20260720.1',
     status: source ? 'requested' : 'visual-only'
   };
 
@@ -37,9 +34,8 @@
 
   var visualScript = safeSameOrigin(visualScriptSrc, '/core/client-insurer-visual-contract-v20260720.js');
   var visualStyle = safeSameOrigin(visualStyleSrc, '/styles/client-insurer-visual-contract-v20260720.css');
-  var credentialProvider = safeSameOrigin(credentialProviderSrc, '/core/aseguradoras-credentials-provider-lab-v20260720.js');
-  if (!visualScript || !visualStyle || !credentialProvider) {
-    window.OrbitTenantBootstrapState.status = 'runtime-source-blocked';
+  if (!visualScript || !visualStyle) {
+    window.OrbitTenantBootstrapState.status = 'visual-source-blocked';
     return;
   }
 
@@ -60,9 +56,7 @@
   if (document.readyState === 'loading') {
     var styleHref = visualStyle.pathname + visualStyle.search;
     var scriptHref = visualScript.pathname + visualScript.search;
-    var providerHref = credentialProvider.pathname + credentialProvider.search;
     document.write('<link rel="stylesheet" href="' + styleHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-m1-visual-style="1">');
-    document.write('<script src="' + providerHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-insurer-credential-provider="1"><\/script>');
     document.write('<script src="' + scriptHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-m1-visual-contract="1"><\/script>');
     if (target) {
       var escaped = (target.pathname + target.search).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
@@ -96,30 +90,17 @@
     document.head.appendChild(tenantScript);
   }
 
-  function loadVisualContract() {
-    if (window.Orbit && window.Orbit.clientInsurerVisualContractV20260720 && window.Orbit.clientInsurerVisualContractV20260720.version === '20260720.2') {
-      loadTenantConfig();
-      return;
-    }
-    var script = document.createElement('script');
-    script.src = visualScript.pathname + visualScript.search;
-    script.async = false;
-    script.setAttribute('data-orbit-m1-visual-contract', '1');
-    script.addEventListener('load', loadTenantConfig, { once: true });
-    script.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'visual-error'; }, { once: true });
-    document.head.appendChild(script);
-  }
-
-  if (window.Orbit && window.Orbit.__insurerCredentialProviderLabV20260720) {
-    loadVisualContract();
+  if (window.Orbit && window.Orbit.clientInsurerVisualContractV20260720 && window.Orbit.clientInsurerVisualContractV20260720.version === '20260720.2') {
+    loadTenantConfig();
     return;
   }
 
-  var providerScript = document.createElement('script');
-  providerScript.src = credentialProvider.pathname + credentialProvider.search;
-  providerScript.async = false;
-  providerScript.setAttribute('data-orbit-insurer-credential-provider', '1');
-  providerScript.addEventListener('load', loadVisualContract, { once: true });
-  providerScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'credential-provider-error'; }, { once: true });
-  document.head.appendChild(providerScript);
+  var script = document.createElement('script');
+  script.src = visualScript.pathname + visualScript.search;
+  script.async = false;
+  script.setAttribute('data-orbit-m1-visual-contract', '1');
+  script.addEventListener('load', loadTenantConfig, { once: true });
+  script.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'visual-error'; }, { once: true });
+  document.head.appendChild(script);
 })();
+/* Preflight v5 reconciliado: sin cambios de producto. */
