@@ -15,8 +15,8 @@
   var visualStyleSrc = 'styles/client-insurer-visual-contract-v20260720.css?v=20260720-2';
   var credentialProviderSrc = 'core/aseguradoras-credentials-provider-lab-v20260720.js?v=20260720-1';
   var secureTargetBridgeSrc = 'core/insurer-secure-target-bridge-v20260720.js?v=20260720-1';
-  var importerContractSrc = 'core/importer-execution-contract-v20260720.js?v=20260720-1';
-  var importerAcademySrc = 'data/academia-v1225-importadores-e2e.js?v=20260720-1';
+  var importerContractSrc = 'core/importer-execution-contract-v20260720.js?v=20260720-2';
+  var importerAcademySrc = 'data/academia-v1225-importadores-e2e.js?v=20260720-2';
 
   window.OrbitTenantBootstrapState = {
     owner: 'core/router.js',
@@ -30,9 +30,9 @@
     secureTargetBridgeRequested: true,
     secureTargetBridgeVersion: '20260720.1',
     importerContractRequested: true,
-    importerContractVersion: '20260720.1',
+    importerContractVersion: '20260720.2',
     importerAcademyRequested: true,
-    importerAcademyVersion: '1.225',
+    importerAcademyVersion: '1.226',
     status: source ? 'requested' : 'visual-only'
   };
 
@@ -157,7 +157,7 @@
   }
 
   function loadImporterAcademy() {
-    if (window.Orbit && window.Orbit.ACADEMIA_V1225_IMPORTERS_E2E) {
+    if (window.Orbit && window.Orbit.ACADEMIA_V1225_IMPORTERS_E2E && window.Orbit.ACADEMIA_V1225_IMPORTERS_E2E.version === '1.226') {
       loadCredentialProvider();
       return;
     }
@@ -170,7 +170,7 @@
     document.head.appendChild(academyScript);
   }
 
-  if (window.Orbit && window.Orbit.importerExecutionContractV20260720) {
+  if (window.Orbit && window.Orbit.importerExecutionContractV20260720 && window.Orbit.importerExecutionContractV20260720.version === '20260720.2') {
     loadImporterAcademy();
     return;
   }
@@ -183,4 +183,4 @@
   importerScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'importer-contract-error'; }, { once: true });
   document.head.appendChild(importerScript);
 })();
-/* Preflight v7: contrato E2E y Academia cargados antes del Router. */
+/* Preflight v7: contrato E2E legal y Academia cargados antes del Router. */
