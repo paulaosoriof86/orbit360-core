@@ -1,8 +1,8 @@
 # Incidente importador — aseguradoras pendientes de validación
 
-Fecha: 2026-07-14
-Proyecto: Orbit 360 A&S
-Rama: `ays/backend-tenant-lab-v99-20260703`
+Fecha: 2026-07-14  
+Proyecto: Orbit 360 A&S  
+Rama: `ays/backend-tenant-lab-v99-20260703`  
 Carril: C con guardas B
 
 ## Evidencia
@@ -52,3 +52,7 @@ Revertir estos commits en orden inverso únicamente ante una regresión demostra
 ## Aplicación a Claude y Academia
 
 Patrón reusable: separar `bloqueo que impide escritura` de `registro cargable con calidad pendiente y capacidades restringidas`. Academia debe explicar que una entidad pendiente puede entrar al directorio sin habilitar funciones operativas sensibles.
+
+## Reapertura acotada — 2026-07-20
+
+La aceptación técnica sintética no sustituye la aceptación de datos reales. Antes del Bloque 2 se debe probar desde la plataforma la carga directa de los directorios GT y CO, con diff por aseguradora, escritura controlada, lectura posterior, confirmación de accesos protegidos, auditoría, rollback y matriz final de completitud.
