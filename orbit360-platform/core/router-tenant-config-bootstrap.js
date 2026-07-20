@@ -1,7 +1,7 @@
 /* Orbit 360 · Bootstrap genérico de configuración tenant para el Router.
    Lee el índice ya cargado y solicita únicamente la configuración activa.
-   Carga también el contrato visual reusable Cliente 360 + Aseguradoras
-   antes de router.js para evitar proyecciones tardías y doble render.
+   Carga el contrato visual/operativo Cliente 360 + Aseguradoras antes de
+   router.js para evitar proyecciones tardías y doble render.
    No contiene datos de tenants, secretos ni credenciales. */
 (function () {
   'use strict';
@@ -11,8 +11,8 @@
   var index = window.OrbitTenantRuntimeConfigIndex || {};
   var entry = tenantId && index[tenantId] ? index[tenantId] : null;
   var source = String(entry && entry.insurerConfigSrc || '').trim();
-  var visualScriptSrc = 'core/client-insurer-visual-contract-v20260720.js?v=20260720-1';
-  var visualStyleSrc = 'styles/client-insurer-visual-contract-v20260720.css?v=20260720-1';
+  var visualScriptSrc = 'core/client-insurer-visual-contract-v20260720.js?v=20260720-2';
+  var visualStyleSrc = 'styles/client-insurer-visual-contract-v20260720.css?v=20260720-2';
 
   window.OrbitTenantBootstrapState = {
     owner: 'core/router.js',
@@ -20,7 +20,7 @@
     tenantResolved: Boolean(tenantId),
     sourceResolved: Boolean(source),
     visualContractRequested: true,
-    visualContractVersion: '20260720.1',
+    visualContractVersion: '20260720.2',
     status: source ? 'requested' : 'visual-only'
   };
 
@@ -90,7 +90,7 @@
     document.head.appendChild(tenantScript);
   }
 
-  if (window.Orbit && window.Orbit.clientInsurerVisualContractV20260720) {
+  if (window.Orbit && window.Orbit.clientInsurerVisualContractV20260720 && window.Orbit.clientInsurerVisualContractV20260720.version === '20260720.2') {
     loadTenantConfig();
     return;
   }
