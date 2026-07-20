@@ -6,7 +6,7 @@ import { spawnSync } from 'node:child_process';
 const PROJECT_ID = 'ays-orbit-360-lab';
 const CHANNEL = 'orbit360-ays-lab';
 const GATE_ID = 'importers-e2e-acceptance-lab-v20260720';
-const RUNTIME = '20260720-3';
+const RUNTIME = '20260720-4';
 const RUN_ID = String(process.env.GITHUB_RUN_ID || Date.now());
 const checkedOutHead = String(spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout || '').trim();
 const SHA = checkedOutHead || String(process.env.GITHUB_SHA || 'local');
@@ -16,6 +16,7 @@ const STATE = process.env.ORBIT360_IMPORTERS_E2E_STATE || `${EVIDENCE_DIR}/impor
 const EVIDENCE = process.env.ORBIT360_IMPORTERS_E2E_EVIDENCE || `${EVIDENCE_DIR}/importers-e2e-acceptance-sanitized.json`;
 const CLEANUP = process.env.ORBIT360_IMPORTERS_E2E_CLEANUP || `${EVIDENCE_DIR}/importers-e2e-cleanup-sanitized.json`;
 const VAULT = process.env.ORBIT360_IMPORTERS_E2E_VAULT_ROLLBACK || `${EVIDENCE_DIR}/importers-e2e-vault-rollback-sanitized.json`;
+const MEMBERSHIP = process.env.ORBIT360_MEMBERSHIP_EVIDENCE || `${EVIDENCE_DIR}/membership-contract-sanitized.json`;
 
 if (BRANCH && BRANCH !== 'ays/backend-tenant-lab-v99-20260703') throw new Error('BLOQUEO_RAMA_LAB');
 if (String(process.env.FIREBASE_PROJECT_ID || '') !== PROJECT_ID) throw new Error('BLOQUEO_PROYECTO_LAB');
@@ -25,13 +26,12 @@ if (!process.env.ORBIT360_LAB_LOGIN_PASSWORD || process.env.ORBIT360_LAB_LOGIN_P
 fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
 
 function run(command, args, options = {}) {
-  const result = spawnSync(command, args, {
+  return spawnSync(command, args, {
     cwd: process.cwd(),
     env: Object.assign({}, process.env, options.env || {}),
     encoding: 'utf8',
     stdio: options.capture ? ['ignore', 'pipe', 'pipe'] : 'inherit'
   });
-  return result;
 }
 function runNode(file, args = []) {
   return run(process.execPath, [file, ...args]);
@@ -70,6 +70,7 @@ async function fetchText(url) {
 }
 
 let fixturePrepared = false;
+let membershipCode = 1;
 let browserCode = 1;
 let rollbackCode = 1;
 let cleanupCode = 1;
@@ -107,10 +108,22 @@ try {
   const bootstrapSource = await fetchText(`${previewUrl}/core/router-tenant-config-bootstrap.js?run=${RUN_ID}`);
   if (!readinessSource.includes("var VERSION = '20260720.1'") || !readinessSource.includes('neverMutatesLegalAcceptance: true')) throw new Error('SESSION_READINESS_NOT_SERVED');
   if (!contractSource.includes("var VERSION = '20260720.2'") || !contractSource.includes('forbidsSuccessWithZero: true')) throw new Error('CONTRACT_NOT_SERVED');
-  if (!academySource.includes("version: '1.226'")) throw new Error('ACADEMY_NOT_SERVED');
+  if (!academySource.includes("version: '1.227'") || !academySource.includes('membershipRequired: true')) throw new Error('ACADEMY_NOT_SERVED');
   if (!bootstrapSource.includes("sessionReadinessVersion: '20260720.1'") ||
       !bootstrapSource.includes("importerContractVersion: '20260720.2'") ||
-      !bootstrapSource.includes("importerAcademyVersion: '1.226'")) throw new Error('BOOTSTRAP_NOT_SERVED');
+      !bootstrapSource.includes("importerAcademyVersion: '1.227'")) throw new Error('BOOTSTRAP_NOT_SERVED');
+
+  const membership = runNode('tools/orbit360-ensure-lab-secure-membership-v20260720.mjs');
+  membershipCode = Number(membership.status ?? 1);
+  if (membershipCode !== 0) throw new Error(`MEMBERSHIP_CONTRACT_FAILED_${membershipCode}`);
+  const membershipEvidence = JSON.parse(fs.readFileSync(MEMBERSHIP, 'utf8'));
+  if (membershipEvidence.ok !== true ||
+      membershipEvidence.checks?.activeRoleAssigned !== true ||
+      membershipEvidence.checks?.rolesAssigned !== true ||
+      membershipEvidence.checks?.scopeAll !== true ||
+      membershipEvidence.checks?.noSensitiveFields !== true) {
+    throw new Error('MEMBERSHIP_CONTRACT_NOT_CANONICAL');
+  }
 
   const fixture = runNode('tools/orbit360-importers-e2e-fixture-v20260720.mjs', ['prepare']);
   if (fixture.status !== 0) throw new Error(`FIXTURE_PREPARE_FAILED_${fixture.status}`);
@@ -160,10 +173,11 @@ const final = runNode('tools/orbit360-importers-e2e-finalize-v20260720.mjs');
 const finalCode = Number(final.status ?? 1);
 
 const summary = {
-  schemaVersion: 'orbit360-importers-e2e-coordinator-v2',
+  schemaVersion: 'orbit360-importers-e2e-coordinator-v3',
   runtimeVersion: RUNTIME,
   runId: RUN_ID,
   commit: SHA,
+  membershipCode,
   browserCode,
   rollbackCode,
   cleanupCode,
