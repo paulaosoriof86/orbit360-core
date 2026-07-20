@@ -60,6 +60,31 @@
         "Aplicación confirmada",
         "Defecto funcional o validador obsoleto"
       ]
+    },
+    {
+      "id": "realInsurerDirectoryExecution",
+      "path": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js",
+      "requiredTokens": [
+        "owner visual canónico v1.221",
+        "singleFileRead: true",
+        "controlledWrite: true",
+        "Orbit.importaWriteP0.writeBatch",
+        "async function waitWritten",
+        "applySecureOnly(result",
+        "Orbit.importaWriteP0.rollback",
+        "accountProviderPending: true"
+      ]
+    },
+    {
+      "id": "realInsurerDirectoryAcademy",
+      "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "requiredTokens": [
+        "Academia profunda Aseguradoras OP-2 v1.221",
+        "Carga directa desde Orbit",
+        "Escritura controlada y lectura posterior",
+        "Defecto funcional o validador obsoleto",
+        "version:'1.221'"
+      ]
     }
   ],
   "gates": [
@@ -69,138 +94,167 @@
       "diagnosticRevision": "canonical-browser-backend-store-rollback-v1",
       "runtimeVersion": "20260720-1",
       "block": 1,
-      "status": "ACTIVE_ROOT_CAUSE_GATE",
-      "diagnosticRule": "An importer is accepted only when one synthetic source traverses the real browser UI, canonical Auth and active role, target resolution, protected backend, opaque operational reference, read-after-write, success and rejection audit, and full rollback in a single sanitized execution.",
+      "status": "HISTORICAL_CLOSED_BY_OVERLAY",
+      "diagnosticRule": "The synthetic importer gate remains historical and must not be reexecuted without regression evidence.",
       "executionBudget": {
-        "type": "bounded_e2e_with_mandatory_rollback",
-        "watchdogBudgetMs": 900000,
-        "browserBootstrapMs": 120000,
-        "providerInvocationMs": 65000,
-        "storeObservationMs": 45000,
-        "rollbackMs": 120000,
-        "exhaustionPolicy": "Execute once after GO_GATE_CONTRACT. If the same stage fails twice, stop retries and classify the root cause before any product patch.",
-        "acceptancePolicy": "Only sanitized evidence with ok:true and rollbackOk:true unfreezes real importer testing."
+        "type": "historical_closed",
+        "watchdogBudgetMs": 0,
+        "exhaustionPolicy": "Do not rerun without regression evidence.",
+        "acceptancePolicy": "Closure is preserved by the historical artifact and documentation."
       },
       "workflow": ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
       "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
       "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
       "validators": [
-        "tools/orbit360-importers-e2e-fixture-v20260720.mjs",
         "tools/orbit360-importers-e2e-browser-v20260720.mjs",
-        "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
-        "tools/orbit360-importers-e2e-finalize-v20260720.mjs",
-        "tools/orbit360-gate-environment-v20260717.mjs"
+        "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs"
       ],
       "requiredFiles": [
         "orbit360-platform/core/importer-execution-contract-v20260720.js",
         "orbit360-platform/core/insurer-directory-import-v1202.js",
         "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
         "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
-        "orbit360-platform/core/router-tenant-config-bootstrap.js",
-        "orbit360-platform/core/backend-lab-init.js",
-        "orbit360-platform/core/auth.js",
-        "orbit360-platform/core/access-scope.js",
-        "orbit360-platform/data/store-firestore-lab.local.js",
-        "orbit360-platform/data/academia-v1225-importadores-e2e.js",
-        "functions/index.js",
-        "tools/orbit360-importers-e2e-fixture-v20260720.mjs",
-        "tools/orbit360-importers-e2e-browser-v20260720.mjs",
-        "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
-        "tools/orbit360-importers-e2e-finalize-v20260720.mjs",
-        "orbit360-platform/docs/INCIDENTE-SISTEMICO-IMPORTADORES-E2E-20260720.md",
-        "orbit360-platform/docs/BLOQUE-IMPORTADORES-E2E-CONTRATO-GATE-20260720.md"
+        "functions/index.js"
+      ],
+      "runtimeGraphFiles": [
+        "orbit360-platform/core/importer-execution-contract-v20260720.js",
+        "orbit360-platform/core/insurer-directory-import-v1202.js",
+        "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+        "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+        "functions/index.js"
+      ],
+      "runtimeVersionContracts": [
+        { "path": "orbit360-platform/core/importer-execution-contract-v20260720.js", "requiredTokens": ["singleTargetOwner: true"] },
+        { "path": "orbit360-platform/core/insurer-directory-import-v1202.js", "requiredTokens": ["applySecureOnly.__secureOnlyV20260720 = true"] },
+        { "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js", "requiredTokens": ["noProtectedValueAccess: true"] },
+        { "path": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js", "requiredTokens": ["remoteConfirmationRequired: true"] },
+        { "path": "functions/index.js", "requiredTokens": ["exports.orbit360ImportInsurerCredentials"] }
+      ],
+      "forbiddenRuntimeReferences": [],
+      "environment": {
+        "branch": "ays/backend-tenant-lab-v99-20260703",
+        "firebaseProjectId": "ays-orbit-360-lab",
+        "hostingChannel": "orbit360-ays-lab",
+        "tenantId": "alianzas-soluciones",
+        "productionAllowed": false
+      }
+    },
+    {
+      "gateId": "block1-real-insurer-directories-lab-v20260720",
+      "contractVersion": "1.0.0",
+      "diagnosticRevision": "direct-gt-co-platform-import-v1",
+      "runtimeVersion": "20260720-1",
+      "block": 1,
+      "status": "ACTIVE_DATA_CONTRACT_FIX",
+      "diagnosticRule": "Real insurer data is accepted only when the GT and CO workbooks are uploaded from Orbit as separate sources, produce per-sheet dry-run and diff, write only exact validated identities through the canonical writer, confirm read-after-write, move eligible portal access values to the protected provider, preserve opaque references, publish sanitized completeness by insurer and keep rollback available.",
+      "executionBudget": {
+        "type": "two_source_real_data_acceptance_with_human_file_selection",
+        "watchdogBudgetMs": 900000,
+        "sourceParseMs": 120000,
+        "directoryWriteAndReadbackMs": 180000,
+        "protectedConfirmationMs": 180000,
+        "inventoryAndEvidenceMs": 120000,
+        "rollbackMs": 180000,
+        "exhaustionPolicy": "Run static preflight first. Upload Guatemala once, verify it, then upload Colombia once. If the same stage fails twice, stop and classify root cause before any further patch or retry.",
+        "acceptancePolicy": "Only sanitized evidence may close the gate: both sources processed separately; 26 canonical insurers preserved; no blind merge of allies, duplicates or contaminated sheets; protected values absent from operational storage; per-insurer completeness matrix produced; portal access confirmations reconciled; bank-account protected-provider gaps reported honestly; rollback available."
+      },
+      "workflow": ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
+      "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
+      "validators": [
+        "tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs",
+        "tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs",
+        "tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs",
+        "tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs",
+        "tools/orbit360-validar-backend-lab-contrato.mjs"
+      ],
+      "requiredFiles": [
+        "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js",
+        "orbit360-platform/core/insurer-directory-import-v1202.js",
+        "orbit360-platform/core/insurer-directory-import-v1202-security.js",
+        "orbit360-platform/core/aseguradoras-op2-sheet-quarantine.js",
+        "orbit360-platform/core/aseguradoras-op2-source-guard.js",
+        "orbit360-platform/core/importa-write-p0.js",
+        "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+        "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+        "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+        ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
+        "orbit360-platform/docs/INCIDENTE-IMPORTADOR-ASEGURADORAS-PENDIENTES-20260714.md"
       ],
       "runtimeGraphFiles": [
         "orbit360-platform/index.html",
         "orbit360-platform/core/backend-lab-loader.js",
         "orbit360-platform/core/backend-lab-init.js",
-        "orbit360-platform/core/auth.js",
-        "orbit360-platform/core/access-scope.js",
-        "orbit360-platform/data/store-firestore-lab.local.js",
-        "orbit360-platform/core/importer-execution-contract-v20260720.js",
+        "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js",
         "orbit360-platform/core/insurer-directory-import-v1202.js",
+        "orbit360-platform/core/importa-write-p0.js",
         "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
         "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
-        "orbit360-platform/core/router-tenant-config-bootstrap.js",
-        "orbit360-platform/data/academia-v1225-importadores-e2e.js",
-        "functions/index.js"
+        "orbit360-platform/data/academia-v1217-aseguradoras-op2.js"
       ],
       "runtimeVersionContracts": [
         {
-          "path": "orbit360-platform/core/importer-execution-contract-v20260720.js",
+          "path": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js",
           "requiredTokens": [
             "var VERSION = '20260720.1'",
-            "singleTargetOwner: true",
-            "requiresRollbackForSynthetic: true",
-            "forbidsSuccessWithZero: true",
-            "sanitizeEvidence"
+            "singleFileRead: true",
+            "Orbit.importaWriteP0.writeBatch",
+            "async function waitWritten",
+            "applySecureOnly(result",
+            "Orbit.importaWriteP0.rollback",
+            "accountProviderPending: true"
           ]
         },
         {
           "path": "orbit360-platform/core/insurer-directory-import-v1202.js",
           "requiredTokens": [
-            "applySecureOnly.__secureOnlyV20260720 = true",
-            "confirmacion_remota_incompleta",
-            "remote.ok !== true",
-            "imported <= 0"
+            "const secureSession = new Map()",
+            "persistedInStore: false",
+            "applySecureOnly.__secureOnlyV20260720 = true"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/insurer-directory-import-v1202-security.js",
+          "requiredTokens": [
+            "function backendWriteAllowed",
+            "backend_operativo_requerido_para_aplicar_datos_reales"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/importa-write-p0.js",
+          "requiredTokens": [
+            "function writeBatch(batch, confirm)",
+            "function rollback(plan, confirm)",
+            "importBatchId",
+            "sourceHash"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+          "requiredTokens": [
+            "noProtectedValueAccess: true",
+            "Orbit.secureImport.importInsurerDirectory = wrapped"
           ]
         },
         {
           "path": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
           "requiredTokens": [
             "remoteConfirmationRequired: true",
-            "appliesOpaqueRefsAfterRemoteConfirmation: true",
-            "orbit360ImportInsurerCredentials",
-            "applyMappings(result)"
+            "appliesOpaqueRefsAfterRemoteConfirmation: true"
           ]
         },
         {
-          "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+          "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
           "requiredTokens": [
-            "version: '20260720.1'",
-            "function enrich(payload)",
-            "noProtectedValueAccess: true"
-          ]
-        },
-        {
-          "path": "functions/index.js",
-          "requiredTokens": [
-            "exports.orbit360ImportInsurerCredentials",
-            "sanitizeImportItems",
-            "await writeVault(vault)",
-            "credential.import"
-          ]
-        },
-        {
-          "path": "tools/orbit360-importers-e2e-browser-v20260720.mjs",
-          "requiredTokens": [
-            "providerRequestObserved",
-            "targetIdsResolved",
-            "readAfterWriteOk",
-            "auditFailureObserved",
-            "ORBIT360_IMPORTERS_E2E_BROWSER_READY_FOR_ROLLBACK"
-          ]
-        },
-        {
-          "path": "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
-          "requiredTokens": [
-            "vaultRecordDeleted",
-            "transientVersionDestroyed",
-            "otherRecordsPreserved",
-            "ORBIT360_IMPORTERS_E2E_VAULT_ROLLBACK_OK"
-          ]
-        },
-        {
-          "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
-          "requiredTokens": [
-            "importerContractVersion: '20260720.1'",
-            "importerAcademyVersion: '1.225'",
-            "data-orbit-importer-execution-contract",
-            "data-orbit-importers-e2e-academy"
+            "version:'1.221'",
+            "Carga directa desde Orbit",
+            "Escritura controlada y lectura posterior"
           ]
         }
       ],
-      "forbiddenRuntimeReferences": [],
+      "forbiddenRuntimeReferences": [
+        "modules/importar-initial-tenant-lab.js"
+      ],
       "environment": {
         "branch": "ays/backend-tenant-lab-v99-20260703",
         "firebaseProjectId": "ays-orbit-360-lab",
