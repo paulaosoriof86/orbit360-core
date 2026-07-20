@@ -2,27 +2,27 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-20",
   "gateId": "importers-e2e-acceptance-lab-v20260720",
-  "classification": "PIPELINE_MECHANISM_FAILURE_CORRECTED_READY_FOR_SINGLE_EXECUTION",
-  "diagnosticRevision": "canonical-session-legal-membership-provider-function-dependencies-v5",
-  "contractRevision": "1.0.4-canonical-session-legal-membership-provider-function-dependencies-v5",
+  "classification": "PIPELINE_MECHANISM_FAILURE_OBSERVABILITY_DIAGNOSIS_PENDING",
+  "diagnosticRevision": "provider-revisions-readonly-v3",
+  "contractRevision": "1.0.5-provider-revisions-readonly-v3",
   "gatePatch": {
-    "contractVersion": "1.0.4",
-    "diagnosticRevision": "canonical-session-legal-membership-provider-function-dependencies-v5",
+    "contractVersion": "1.0.5",
+    "diagnosticRevision": "provider-revisions-readonly-v3",
     "runtimeVersion": "20260720-4",
-    "status": "ACTIVE_SINGLE_EXECUTION_PENDING",
+    "status": "READ_ONLY_DEPLOYMENT_DIAGNOSTIC_PENDING",
     "workflow": ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
-    "staticValidationStatus": "PREFLIGHT_REQUIRED_BEFORE_EXECUTION",
+    "staticValidationStatus": "PREFLIGHT_REQUIRED_BEFORE_DIAGNOSTIC",
     "executionBudget": {
-      "type": "bounded_e2e_single_execution_v5",
+      "type": "read_only_provider_revision_diagnostic",
       "watchdogBudgetMs": 900000,
       "membershipContractMs": 60000,
-      "providerDeployMs": 300000,
-      "browserBootstrapMs": 120000,
-      "providerInvocationMs": 65000,
-      "storeObservationMs": 45000,
-      "rollbackMs": 120000,
-      "exhaustionPolicy": "Execute revision v5 exactly once after GO_GATE_CONTRACT, provider role-normalization PASS, FUNCTION_DEPENDENCIES_OK and FIREBASE_TOOLS_PINNED. If provider deploy fails again, stop all reruns and classify the sanitized deploy category without modifying product modules or data.",
-      "acceptancePolicy": "Accept only sanitized evidence with canonical membership, provider deployment and authorization ready, browserAuthReady, activeRoleResolved, legalGateSatisfied, provider confirmation, read-after-write, success and rejection audit, rollbackOk and ok:true."
+      "providerDeployMs": 0,
+      "browserBootstrapMs": 0,
+      "providerInvocationMs": 0,
+      "storeObservationMs": 0,
+      "rollbackMs": 0,
+      "exhaustionPolicy": "Run one read-only revision diagnostic after GO_GATE_CONTRACT. Do not deploy, invoke the provider, open a browser or write operational data. Do not rerun the M1 gate until the four Functions are classified as current, partial, not applied or inconsistent.",
+      "acceptancePolicy": "Accept only sanitized read-only evidence for all four Functions, Cloud Run revisions, traffic, runtime service accounts and IAM. The next action must be derived from deploymentClassification."
     }
   },
   "canonicalOwners": [
@@ -77,9 +77,14 @@
       "id": "providerAuthorizationDiagnostic",
       "path": "tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
       "requiredTokens": [
-        "diagnosticRevision: 'membership-sources-and-iam-get-v2'",
-        ".map((value) => clean(value))",
+        "diagnosticRevision: 'provider-revisions-readonly-v3'",
+        "const FUNCTION_IDS = [",
         "membershipAuthorizationWouldPass",
+        "DEPLOYMENT_CONFIRMED_CURRENT",
+        "DEPLOYMENT_PARTIAL",
+        "DEPLOYMENT_NOT_APPLIED",
+        "DEPLOYMENT_REVISION_INCONSISTENT",
+        "latestReadyRevisionHash",
         "PROVIDER_AUTHORIZATION_LAYER_READY",
         "providerAuthorizationReady"
       ]
@@ -137,15 +142,18 @@
     "orbit360-platform/core/legal.js",
     "orbit360-platform/data/academia-v1225-importadores-e2e.js",
     ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
+    ".github/workflows/orbit360-deploy-secure-provider-role-fix-lab-v20260720.yml",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-LEGAL-GATE-20260720.md",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-MEMBERSHIP-403-20260720.md",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-CALLBACK-ARITY-ROLE-NORMALIZATION-20260720.md",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-VALIDADOR-AUTORREFERENCIAL-WORKFLOW-M1-20260720.md",
-    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-DEPLOY-FUNCTIONS-DEPENDENCIES-M1-20260720.md"
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-DEPLOY-FUNCTIONS-DEPENDENCIES-M1-20260720.md",
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-OBSERVABILIDAD-DEPLOY-FUNCTIONS-M1-20260720.md"
   ],
   "runtimeGraphFiles": [
     "functions/package.json",
     "functions/index.js",
+    "tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
     "orbit360-platform/core/legal.js",
     "orbit360-platform/core/auth.js",
     "orbit360-platform/core/session-readiness-contract-v20260720.js",
@@ -195,11 +203,20 @@
       "path": "tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "diagnosticRevision: 'membership-sources-and-iam-get-v2'",
-        ".map((value) => clean(value))",
-        "membershipAuthorizationWouldPass",
+        "diagnosticRevision: 'provider-revisions-readonly-v3'",
+        "const FUNCTION_IDS = [",
+        "REFERENCE_RUN_ID",
+        "updatedDuringReferenceRun",
+        "latestReadyRevisionHash",
+        "latestCreatedRevisionHash",
+        "allLatestRevisionsReady",
+        "DEPLOYMENT_CONFIRMED_CURRENT",
+        "DEPLOYMENT_PARTIAL",
+        "DEPLOYMENT_NOT_APPLIED",
+        "DEPLOYMENT_REVISION_INCONSISTENT",
         "PROVIDER_AUTHORIZATION_LAYER_READY",
         "providerAuthorizationReady",
+        "mode: 'read_only'",
         "iamReadMethod: 'GET'"
       ]
     },
@@ -368,6 +385,22 @@
         "membership-contract-sanitized.json",
         "orbit360-run-importers-e2e-gate-v20260720.mjs",
         "No production, main or merge"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-deploy-secure-provider-role-fix-lab-v20260720.yml",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "Orbit 360 Provider Revision Diagnostic Read Only LAB 20260720",
+        "mode: read_only",
+        "ORBIT360_REFERENCE_DEPLOY_RUN_ID: \"29781660851\"",
+        "node tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
+        "deploymentClassification",
+        "DEPLOYMENT_CONFIRMED_CURRENT",
+        "DEPLOYMENT_PARTIAL",
+        "DEPLOYMENT_NOT_APPLIED",
+        "DEPLOYMENT_REVISION_INCONSISTENT",
+        "No deploy. No provider invocation. No operational writes."
       ]
     }
   ]
