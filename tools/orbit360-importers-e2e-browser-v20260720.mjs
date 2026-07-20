@@ -166,11 +166,24 @@ async function run() {
     const parsed = await page.evaluate(() => {
       const modal = document.getElementById('ins-dir-import-v1202');
       const text = modal?.textContent || '';
-      return Boolean(modal?.querySelector('[data-secure-only]')) &&
-        /Operaciones\s*1\b/.test(text) &&
-        /Credenciales detectadas\s*1\b/.test(text);
+      const operations = Number((text.match(/Operaciones\s*(\d+)/i) || [])[1] || 0);
+      const references = Number((text.match(/(?:referencias de conexión detectadas|Credenciales detectadas)\s*(\d+)/i) || [])[1] || 0);
+      return {
+        ready: Boolean(modal?.querySelector('[data-secure-only]')),
+        operations,
+        references
+      };
     });
-    if (!parsed) throw Object.assign(new Error('PARSE'), { gateCode: 'SOURCE_PARSE_FAILED' });
+    diagnostic.parser = {
+      ready: parsed.ready === true,
+      operations: Number(parsed.operations || 0),
+      references: Number(parsed.references || 0),
+      observerVersion: '20260720.2'
+    };
+    write();
+    if (!parsed.ready || parsed.operations !== 1 || parsed.references !== 1) {
+      throw Object.assign(new Error('PARSE'), { gateCode: 'SOURCE_PARSE_FAILED' });
+    }
     move('source_parsed', 1);
     mark('sourceParsed');
 
