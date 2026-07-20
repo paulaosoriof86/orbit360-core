@@ -2,23 +2,38 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-20",
   "gateId": "importers-e2e-acceptance-lab-v20260720",
-  "classification": "PIPELINE_MECHANISM_FAILURE_ROOT_CAUSE_CONFIRMED",
-  "diagnosticRevision": "canonical-browser-backend-store-rollback-legal-gate-freeze-v1",
-  "contractRevision": "1.0.0-canonical-browser-backend-store-rollback-legal-gate-freeze-v1",
+  "classification": "PIPELINE_MECHANISM_FAILURE_ROOT_CAUSE_FIXED_STATICALLY",
+  "diagnosticRevision": "canonical-session-readiness-legal-gate-freeze-v2",
+  "contractRevision": "1.0.0-canonical-session-readiness-legal-gate-freeze-v2",
   "gatePatch": {
     "contractVersion": "1.0.0",
-    "diagnosticRevision": "canonical-browser-backend-store-rollback-legal-gate-freeze-v1",
+    "diagnosticRevision": "canonical-session-readiness-legal-gate-freeze-v2",
     "runtimeVersion": "20260720-2",
-    "status": "FROZEN_AFTER_TWO_CONFIRMATION_STAGE_FAILURES",
+    "status": "FROZEN_PENDING_NEW_UI_LEGAL_ACCEPTANCE_GATE_REVISION",
     "workflow": ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml",
+    "staticValidationStatus": "LOCAL_DETERMINISTIC_PASS_NOT_REPO_PREFLIGHT",
     "executionBudget": {
-      "type": "frozen_pending_browser_session_lifecycle_contract",
+      "type": "frozen_pending_new_registered_gate_revision",
       "watchdogBudgetMs": 900000,
-      "exhaustionPolicy": "Do not rerun. The confirmation stage failed twice before provider invocation. Reconcile legal-gate session readiness in the canonical browser lifecycle contract first.",
-      "acceptancePolicy": "A future revision must prove legalGateSatisfied:true before any actionable importer click and must use a new registered diagnostic revision."
+      "exhaustionPolicy": "Do not rerun the current revision. The repeated confirmation-stage failure is closed by the canonical session-readiness contract. Build and register a new revision that completes the real legal UI before any importer click.",
+      "acceptancePolicy": "The future revision must prove browserAuthReady, activeRoleResolved, tenantResolved and legalGateSatisfied before the first actionable click, then execute exactly once."
     }
   },
   "canonicalOwners": [
+    {
+      "id": "sessionReadinessContract",
+      "path": "orbit360-platform/core/session-readiness-contract-v20260720.js",
+      "requiredTokens": [
+        "var VERSION = '20260720.1'",
+        "requiresAuthBeforeActionableClick: true",
+        "requiresActiveRoleBeforeActionableClick: true",
+        "requiresTenantBeforeActionableClick: true",
+        "requiresLegalGateBeforeActionableClick: true",
+        "neverMutatesLegalAcceptance: true",
+        "neverClicksOperationalUi: true",
+        "writesStore: false"
+      ]
+    },
     {
       "id": "importerExecutionContract",
       "path": "orbit360-platform/core/importer-execution-contract-v20260720.js",
@@ -56,6 +71,8 @@
   ],
   "requiredFiles": [
     "tools/orbit360-run-importers-e2e-gate-v20260720.mjs",
+    "tools/orbit360-validate-session-readiness-contract-v20260720.mjs",
+    "orbit360-platform/core/session-readiness-contract-v20260720.js",
     "orbit360-platform/core/auth.js",
     "orbit360-platform/core/legal.js",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-LEGAL-GATE-20260720.md"
@@ -63,11 +80,34 @@
   "runtimeGraphFiles": [
     "orbit360-platform/core/legal.js",
     "orbit360-platform/core/auth.js",
+    "orbit360-platform/core/session-readiness-contract-v20260720.js",
     "orbit360-platform/core/importer-execution-contract-v20260720.js",
     "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "orbit360-platform/data/academia-v1225-importadores-e2e.js"
   ],
   "runtimeVersionContracts": [
+    {
+      "path": "orbit360-platform/core/session-readiness-contract-v20260720.js",
+      "requiredTokens": [
+        "var VERSION = '20260720.1'",
+        "blockingCode = 'LEGAL_GATE_PENDING'",
+        "legalGateSatisfied: legalSatisfied",
+        "waitForReady: waitForReady",
+        "neverMutatesLegalAcceptance: true",
+        "neverClicksOperationalUi: true",
+        "writesStore: false"
+      ]
+    },
+    {
+      "path": "tools/orbit360-validate-session-readiness-contract-v20260720.mjs",
+      "requiredTokens": [
+        "SCENARIO_UNAUTHENTICATED_BLOCKED",
+        "SCENARIO_LEGAL_PENDING_BLOCKED",
+        "SCENARIO_ACCEPTED_OVERLAY_OPEN_BLOCKED",
+        "SCENARIO_READY",
+        "NO_STORAGE_WRITES_DURING_SCENARIOS"
+      ]
+    },
     {
       "path": "orbit360-platform/core/importer-execution-contract-v20260720.js",
       "replaceRequiredTokens": true,
@@ -84,10 +124,11 @@
       "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
       "replaceRequiredTokens": true,
       "requiredTokens": [
+        "sessionReadinessVersion: '20260720.1'",
+        "data-orbit-session-readiness-contract",
         "importerContractVersion: '20260720.2'",
         "importerAcademyVersion: '1.226'",
-        "importer-execution-contract-v20260720.js?v=20260720-2",
-        "academia-v1225-importadores-e2e.js?v=20260720-2"
+        "session-readiness-contract-v20260720.js?v=20260720-1"
       ]
     },
     {
@@ -114,16 +155,6 @@
         "fixturePrepared",
         "vault-rollback-v20260720.mjs",
         "finalize-v20260720.mjs"
-      ]
-    },
-    {
-      "path": "tools/orbit360-importers-e2e-browser-v20260720.mjs",
-      "requiredTokens": [
-        "observerVersion: '20260720.2'",
-        "diagnostic.parser",
-        "driverVersion: '20260720.2'",
-        "reasonPromptCompleted",
-        "phrasePromptCompleted"
       ]
     },
     {
