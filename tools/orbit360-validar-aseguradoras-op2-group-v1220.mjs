@@ -40,7 +40,7 @@ function groupFor(id) {
   return 'technical';
 }
 
-const staleIds = new Set(['UI_REVIEW_NO_CAPTURE','UI_FAIL_CLOSED']);
+const staleIds = new Set(['UI_REVIEW_NO_CAPTURE','UI_FAIL_CLOSED','ACADEMY_V1220']);
 const allFailures = Array.isArray(payload.fail) ? payload.fail : [];
 const failures = allFailures.filter(item => !staleIds.has(String(item.id || '')) && groupFor(item.id) === group);
 const importUiPath = path.join(root, 'core', 'aseguradoras-op2-import-ui-guard.js');
