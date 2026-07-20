@@ -103,6 +103,15 @@ function noPlaintextSecrets(value) {
   return !found;
 }
 
+async function answerOrbitPrompt(page, expectedTitle, value) {
+  const overlays = page.locator('.drawer-back.open').filter({ has: page.locator('[data-in]') });
+  const overlay = overlays.filter({ hasText: expectedTitle }).last();
+  await overlay.waitFor({ state: 'visible', timeout: 30000 });
+  await overlay.locator('[data-in]').fill(value);
+  await overlay.locator('[data-yes]').click();
+  await overlay.waitFor({ state: 'detached', timeout: 30000 });
+}
+
 async function run() {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
@@ -201,17 +210,21 @@ async function run() {
     mark('targetIdsResolved');
 
     await page.click('[data-secure-only]');
-    let prompt = page.locator('.drawer-back.open').last();
-    await prompt.locator('[data-in]').waitFor({ state: 'visible', timeout: 30000 });
-    await prompt.locator('[data-in]').fill(`Gate E2E sintético ${state.runId}`);
-    await prompt.locator('[data-yes]').click();
-    prompt = page.locator('.drawer-back.open').last();
-    await prompt.locator('[data-in]').waitFor({ state: 'visible', timeout: 30000 });
-    await prompt.locator('[data-in]').fill('CONFIRMO DIRECTORIO');
+    diagnostic.confirmation = {
+      driverVersion: '20260720.2',
+      reasonPromptCompleted: false,
+      phrasePromptCompleted: false
+    };
+    write();
+    await answerOrbitPrompt(page, 'Confirmar accesos seguros', `Gate E2E sintético ${state.runId}`);
+    diagnostic.confirmation.reasonPromptCompleted = true;
+    write();
+    await answerOrbitPrompt(page, 'Confirmación reforzada', 'CONFIRMO DIRECTORIO');
+    diagnostic.confirmation.phrasePromptCompleted = true;
+    write();
     move('confirmation_accepted');
     move('identity_resolved');
     move('target_resolved');
-    await prompt.locator('[data-yes]').click();
 
     const deadline = Date.now() + 65000;
     while (Date.now() < deadline && !diagnostic.providerRequestObserved) await wait(250);
