@@ -2,12 +2,12 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-20",
   "gateId": "importers-e2e-acceptance-lab-v20260720",
-  "classification": "VALIDATOR_STALE",
-  "diagnosticRevision": "canonical-browser-backend-store-rollback-v1",
-  "contractRevision": "1.0.0-canonical-browser-backend-store-rollback-v1",
+  "classification": "VALIDATOR_STALE_RESOLVED",
+  "diagnosticRevision": "canonical-browser-backend-store-rollback-observer-v2",
+  "contractRevision": "1.0.0-canonical-browser-backend-store-rollback-observer-v2",
   "gatePatch": {
     "contractVersion": "1.0.0",
-    "diagnosticRevision": "canonical-browser-backend-store-rollback-v1",
+    "diagnosticRevision": "canonical-browser-backend-store-rollback-observer-v2",
     "status": "ACTIVE_ROOT_CAUSE_GATE",
     "workflow": ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
   },
@@ -31,6 +31,15 @@
         "fixturePrepared",
         "vault-rollback-v20260720.mjs",
         "finalize-v20260720.mjs"
+      ]
+    },
+    {
+      "path": "tools/orbit360-importers-e2e-browser-v20260720.mjs",
+      "requiredTokens": [
+        "observerVersion: '20260720.2'",
+        "referencias de conexión detectadas|Credenciales detectadas",
+        "diagnostic.parser",
+        "parsed.references !== 1"
       ]
     }
   ]
