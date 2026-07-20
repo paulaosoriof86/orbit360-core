@@ -55,7 +55,8 @@ let execution = contract.create({
   }]
 });
 const diagnostic = {
-  schemaVersion: 'orbit360-importers-e2e-browser-diagnostic-v1',
+  schemaVersion: 'orbit360-importers-e2e-browser-diagnostic-v2',
+  driverVersion: '20260720.3',
   runId: String(process.env.GITHUB_RUN_ID || ''),
   commit: String(process.env.GITHUB_SHA || ''),
   providerRequestObserved: false,
@@ -112,6 +113,60 @@ async function answerOrbitPrompt(page, expectedTitle, value) {
   await overlay.waitFor({ state: 'detached', timeout: 30000 });
 }
 
+async function completeLegalUiGate(page) {
+  await page.waitForFunction(() => Boolean(
+    window.Orbit &&
+    Orbit.legal &&
+    typeof Orbit.legal.gate === 'function' &&
+    Orbit.sessionReadinessContractV20260720 &&
+    typeof Orbit.sessionReadinessContractV20260720.snapshot === 'function' &&
+    typeof Orbit.sessionReadinessContractV20260720.waitForReady === 'function'
+  ), null, { timeout: 90000 });
+
+  const initial = await page.evaluate(() => {
+    const api = Orbit.sessionReadinessContractV20260720;
+    return api.sanitized(api.snapshot());
+  });
+  diagnostic.sessionReadinessInitial = initial;
+  write();
+
+  if (!initial.ready) {
+    if (initial.blockingCode !== 'LEGAL_GATE_PENDING') {
+      throw Object.assign(new Error('SESSION'), { gateCode: initial.blockingCode || 'PIPELINE_MECHANISM_FAILURE' });
+    }
+    const legalOverlay = page.locator('[data-legal-gate].drawer-back.open').last();
+    await legalOverlay.waitFor({ state: 'visible', timeout: 30000 });
+    await legalOverlay.locator('#lg-chk').check();
+    await legalOverlay.locator('#lg-ok').click();
+    await legalOverlay.waitFor({ state: 'detached', timeout: 30000 });
+    diagnostic.legalUiAcceptanceCompleted = true;
+    write();
+  }
+
+  const final = await page.evaluate(async () => {
+    const api = Orbit.sessionReadinessContractV20260720;
+    try {
+      const ready = await api.waitForReady({ timeoutMs: 30000, pollMs: 100 });
+      return api.sanitized(ready);
+    } catch (error) {
+      const safe = api.sanitized(error && error.evidence ? error.evidence : api.snapshot());
+      safe.waitErrorCode = String(error && error.code || '').replace(/[^A-Za-z0-9_.-]+/g, '_').slice(0, 100);
+      return safe;
+    }
+  });
+  diagnostic.sessionReadinessFinal = final;
+  write();
+
+  if (!final.ready ||
+      final.predicates?.browserAuthReady !== true ||
+      final.predicates?.activeRoleResolved !== true ||
+      final.predicates?.tenantResolved !== true ||
+      final.predicates?.legalGateSatisfied !== true) {
+    throw Object.assign(new Error('SESSION'), { gateCode: final.blockingCode || 'LEGAL_GATE_PENDING' });
+  }
+  mark('legalGateSatisfied');
+}
+
 async function run() {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
@@ -158,6 +213,8 @@ async function run() {
     execution.actor.activeRole = auth.role;
     mark('browserAuthReady');
     mark('activeRoleResolved');
+
+    await completeLegalUiGate(page);
 
     await page.waitForFunction(id => Boolean(Orbit.store?.get && Orbit.store.get('aseguradoras', id)), state.fixtureId, { timeout: 90000 });
     await page.waitForFunction(() => Boolean(
@@ -211,7 +268,7 @@ async function run() {
 
     await page.click('[data-secure-only]');
     diagnostic.confirmation = {
-      driverVersion: '20260720.2',
+      driverVersion: '20260720.3',
       reasonPromptCompleted: false,
       phrasePromptCompleted: false
     };
