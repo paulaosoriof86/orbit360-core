@@ -2,27 +2,38 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-20",
   "gateId": "importers-e2e-acceptance-lab-v20260720",
-  "classification": "ROLLBACK_RUNTIME_DEPENDENCY_CORRECTED_READY_FOR_SINGLE_EXECUTION",
-  "diagnosticRevision": "provider-current-orphan-rollback-precheck-v7",
-  "contractRevision": "1.0.7-provider-current-orphan-rollback-precheck-v7",
+  "classification": "CLOSED_GO_IMPORTERS_E2E",
+  "diagnosticRevision": "m1-closed-ok-true-v8",
+  "contractRevision": "1.0.8-m1-closed-ok-true-v8",
   "gatePatch": {
-    "contractVersion": "1.0.7",
-    "diagnosticRevision": "provider-current-orphan-rollback-precheck-v7",
+    "contractVersion": "1.0.8",
+    "diagnosticRevision": "m1-closed-ok-true-v8",
     "runtimeVersion": "20260720-4",
-    "status": "ACTIVE_SINGLE_EXECUTION_PENDING",
+    "status": "CLOSED_OK_TRUE",
     "workflow": ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
-    "staticValidationStatus": "PREFLIGHT_REQUIRED_BEFORE_EXECUTION",
+    "staticValidationStatus": "GO_GATE_CONTRACT",
+    "closureEvidence": {
+      "runId": "29783567910",
+      "commit": "f79bcc1ddeb53dbde784c7165132ae7e33d743ae",
+      "artifactId": "8477581608",
+      "artifactDigest": "sha256:f2ac23413eee5af6adaf756869847c72af32df672065e885b6d58a7c246344d1",
+      "stage": "completed",
+      "ok": true,
+      "rollbackOk": true,
+      "containsPII": false,
+      "containsSecrets": false
+    },
     "executionBudget": {
-      "type": "bounded_e2e_current_provider_rollback_precheck_single_execution_v7",
-      "watchdogBudgetMs": 900000,
-      "membershipContractMs": 60000,
+      "type": "closed_no_reexecution_without_regression",
+      "watchdogBudgetMs": 0,
+      "membershipContractMs": 0,
       "providerDeployMs": 0,
-      "browserBootstrapMs": 120000,
-      "providerInvocationMs": 65000,
-      "storeObservationMs": 45000,
-      "rollbackMs": 120000,
-      "exhaustionPolicy": "Execute revision v7 exactly once after GO_GATE_CONTRACT, DEPLOYMENT_CONFIRMED_CURRENT, PROVIDER_AUTHORIZATION_LAYER_READY, SECRET_MANAGER_ROLLBACK_DEPENDENCY_OK and orphan rollback verification for run 29782834288. Do not redeploy Functions. If rollback fails again, stop all reruns and classify only the sanitized rollback evidence.",
-      "acceptancePolicy": "Accept only sanitized evidence with same immutable HEAD, current provider revision, orphan residue removed before fixture creation, canonical membership, browserAuthReady, activeRoleResolved, tenantResolved, legalGateSatisfied, provider confirmation, opaque reference, read-after-write, success and rejection audit, current rollbackOk and ok:true."
+      "browserBootstrapMs": 0,
+      "providerInvocationMs": 0,
+      "storeObservationMs": 0,
+      "rollbackMs": 0,
+      "exhaustionPolicy": "M1 is closed. Do not rerun this gate, redeploy the provider or recreate synthetic fixtures unless new evidence proves a regression against the accepted commit and artifact.",
+      "acceptancePolicy": "Accepted by sanitized evidence from run 29783567910 with immutable HEAD, current provider revision, prior residue removed, canonical membership, browserAuthReady, activeRoleResolved, tenantResolved, legalGateSatisfied, provider confirmation, opaque reference, read-after-write, success and rejection audit, rollbackOk and ok:true."
     }
   },
   "canonicalOwners": [
@@ -175,7 +186,9 @@
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-DEPLOY-FUNCTIONS-DEPENDENCIES-M1-20260720.md",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-OBSERVABILIDAD-DEPLOY-FUNCTIONS-M1-20260720.md",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-DEPLOY-EXIT-FALSE-NEGATIVE-M1-20260720.md",
-    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-ROLLBACK-SECRET-MANAGER-DEPENDENCY-M1-20260720.md"
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-ROLLBACK-SECRET-MANAGER-DEPENDENCY-M1-20260720.md",
+    "orbit360-platform/docs/CIERRE-M1-CLIENTE360-ASEGURADORAS-IMPORTADORES-E2E-20260720.md",
+    "orbit360-platform/docs/BITACORA-CAMBIOS-AYS-BACKEND-20260720-CIERRE-M1.md"
   ],
   "runtimeGraphFiles": [
     "functions/package.json",
