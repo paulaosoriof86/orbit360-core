@@ -1,4 +1,4 @@
-name: Orbit 360 Secure Credential Handoff Key V2 20260720
+name: Orbit 360 Secure Access Browser Flow LAB 20260720
 
 on:
   push:
@@ -8,28 +8,29 @@ on:
       - ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 concurrency:
-  group: orbit360-secure-credential-handoff-key-v2-20260720
+  group: orbit360-secure-access-browser-flow-lab-v20260720
   cancel-in-progress: false
 
 jobs:
-  prepare_key:
-    name: Aseguradoras · segunda llave efímera para handoff cifrado
+  publish_secure_browser_flow:
+    name: Aseguradoras · habilitar carga exclusiva de accesos seguros
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
-      HANDOFF_SECRET_ID: orbit360-credential-handoff-key-20260720-v2
+      TARGET: orbit360-platform/core/insurer-directory-import-v1202.js
       SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     steps:
       - name: Checkout rama autorizada
         uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
 
       - name: Preflight vinculante
         shell: bash
@@ -37,7 +38,91 @@ jobs:
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          grep -Fq "createRequire(new URL('../functions/package.json', import.meta.url))" tools/orbit360-apply-secure-credentials-handoff-v20260720.mjs
+          node --check "$TARGET"
+          grep -Fq 'applySecureOnly.__secureOnlyV20260720 = true' "$TARGET"
+          grep -Fq 'appliesOpaqueRefsAfterRemoteConfirmation: true' orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
+          grep -Fq 'noSecretPersistence: true' orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
+
+      - name: Conectar botón de carga exclusivamente segura
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const path = process.env.TARGET;
+          let source = readFileSync(path, 'utf8');
+          const buttonMarker = 'data-secure-only';
+          const handlerMarker = "const secureOnly = back.querySelector('[data-secure-only]');";
+
+          if (!source.includes(buttonMarker)) {
+            const closeButton = '<button class="btn ghost" data-close>Cerrar</button></div></div>`;';
+            const secureButton = '${result && result.securePayloadCount > 0 ? \'<button class="btn primary" data-secure-only>Guardar únicamente accesos seguros</button>\' : \'\'}<button class="btn ghost" data-close>Cerrar</button></div></div>`;';
+            if (!source.includes(closeButton)) throw new Error('SECURE_ONLY_BUTTON_ANCHOR_NOT_FOUND');
+            source = source.replace(closeButton, secureButton);
+          }
+
+          if (!source.includes(handlerMarker)) {
+            const anchor = "    const approve = back.querySelector('[data-approve]');";
+            const handler = `    const secureOnly = back.querySelector('[data-secure-only]');
+              if (secureOnly) secureOnly.onclick = async () => {
+                const reason = clean(await U().prompt('Motivo de la carga segura de accesos:', { title: 'Confirmar accesos seguros' }));
+                if (!reason) return;
+                const phrase = clean(await U().prompt('Escribe exactamente: ' + CONFIRM_PHRASE, { title: 'Confirmación reforzada' }));
+                secureOnly.disabled = true;
+                secureOnly.textContent = 'Guardando accesos de forma segura…';
+                const applied = await applySecureOnly(result, { approved: true, phrase, reason });
+                if (!applied.ok) {
+                  secureOnly.disabled = false;
+                  secureOnly.textContent = 'Guardar únicamente accesos seguros';
+                  return toast('No se aplicó: ' + (applied.errors || []).join(', '));
+                }
+                const done = uiState && uiState.options && uiState.options.onDone;
+                close();
+                toast(applied.imported + ' acceso(s) guardados de forma segura. No se modificó el directorio.');
+                if (done) done(applied);
+                else if (Orbit.modules && Orbit.modules.aseguradoras && Orbit.modules.aseguradoras.render) Orbit.modules.aseguradoras.render(document.getElementById('host'));
+              };
+          `;
+            if (!source.includes(anchor)) throw new Error('SECURE_ONLY_HANDLER_ANCHOR_NOT_FOUND');
+            source = source.replace(anchor, handler + anchor);
+          }
+
+          writeFileSync(path, source);
+          NODE
+
+      - name: Validar UX y contrato seguro
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check "$TARGET"
+          grep -Fq 'data-secure-only' "$TARGET"
+          grep -Fq "const secureOnly = back.querySelector('[data-secure-only]');" "$TARGET"
+          grep -Fq 'Guardar únicamente accesos seguros' "$TARGET"
+          grep -Fq 'No se modificó el directorio' "$TARGET"
+          grep -Fq 'applySecureOnly(result' "$TARGET"
+          if grep -Eq 'S\(\)\.(insert|update)\(.aseguradoras.' <(sed -n '/async function applySecureOnly/,/applySecureOnly.__secureOnlyV20260720/p' "$TARGET"); then
+            echo 'SECURE_ONLY_WRITES_DIRECTORY'; exit 41
+          fi
+
+      - name: Retirar mecanismos temporales de handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm -f --ignore-unmatch .github/secure-handoff/orbit360-credentials-envelope-20260720.json
+          git rm -f --ignore-unmatch tools/orbit360-apply-secure-credentials-handoff-v20260720.mjs
+          rmdir .github/secure-handoff 2>/dev/null || true
+
+      - name: Persistir cambio validado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "orbit360-gate-bot"
+          git config user.email "orbit360-gate-bot@users.noreply.github.com"
+          git add "$TARGET"
+          if git diff --cached --quiet; then echo 'Sin cambios pendientes'; else
+            git commit -m "feat(aseguradoras): habilitar carga exclusiva de accesos seguros [skip ci]"
+            git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          fi
 
       - name: Resolver principal LAB
         shell: bash
@@ -56,51 +141,71 @@ jobs:
         with:
           project_id: ays-orbit-360-lab
 
-      - name: Crear segunda llave efímera
+      - name: Limpiar llaves efímeras abandonadas
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project "$FIREBASE_PROJECT_ID" >/dev/null
+          for secret in orbit360-credential-handoff-key-20260720 orbit360-credential-handoff-key-20260720-v2; do
+            if gcloud secrets describe "$secret" --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1; then
+              gcloud secrets delete "$secret" --project "$FIREBASE_PROJECT_ID" --quiet >/dev/null
+            fi
+          done
+
+      - name: Publicar Hosting LAB
         shell: bash
         run: |
           set -euo pipefail
           OUT_DIR="orbit360-platform/runtime-gate-crm-v20260716"
           mkdir -p "$OUT_DIR"
-          PRIVATE_KEY="${RUNNER_TEMP}/handoff-private-v2.pem"
-          PUBLIC_KEY="$OUT_DIR/handoff-public-v2.pem"
-          DIAG="$OUT_DIR/handoff-key-v2-sanitized.json"
+          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab \
+            --project "$FIREBASE_PROJECT_ID" --expires 30d --non-interactive --json > "${RUNNER_TEMP}/hosting.json"
+          PREVIEW_URL="$(jq -r '.. | strings | select(test("^https://[^/]+\\.(web\\.app|firebaseapp\\.com)$"))' "${RUNNER_TEMP}/hosting.json" | head -n 1)"
+          test -n "$PREVIEW_URL"
+          echo "PREVIEW_URL=$PREVIEW_URL" >> "$GITHUB_ENV"
 
-          gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project="$FIREBASE_PROJECT_ID" >/dev/null
-          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out "$PRIVATE_KEY" >/dev/null 2>&1
-          openssl pkey -in "$PRIVATE_KEY" -pubout -out "$PUBLIC_KEY" >/dev/null 2>&1
-          chmod 600 "$PRIVATE_KEY"
+      - name: Verificar fuente publicada
+        shell: bash
+        run: |
+          set -euo pipefail
+          importer="$(curl -fsSL --retry 8 --retry-delay 3 --retry-all-errors -H 'Cache-Control: no-cache' "${PREVIEW_URL}/core/insurer-directory-import-v1202.js?run=${GITHUB_RUN_ID}")"
+          provider="$(curl -fsSL --retry 8 --retry-delay 3 --retry-all-errors -H 'Cache-Control: no-cache' "${PREVIEW_URL}/core/aseguradoras-credentials-provider-lab-v20260720.js?run=${GITHUB_RUN_ID}")"
+          printf '%s' "$importer" | grep -Fq 'data-secure-only'
+          printf '%s' "$importer" | grep -Fq 'Guardar únicamente accesos seguros'
+          printf '%s' "$importer" | grep -Fq 'applySecureOnly.__secureOnlyV20260720 = true'
+          printf '%s' "$importer" | grep -Fq 'No se modificó el directorio'
+          printf '%s' "$provider" | grep -Fq 'appliesOpaqueRefsAfterRemoteConfirmation: true'
+          printf '%s' "$provider" | grep -Fq 'noSecretPersistence: true'
 
-          if gcloud secrets describe "$HANDOFF_SECRET_ID" --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1; then
-            gcloud secrets versions add "$HANDOFF_SECRET_ID" --data-file="$PRIVATE_KEY" --project "$FIREBASE_PROJECT_ID" >/dev/null
-          else
-            gcloud secrets create "$HANDOFF_SECRET_ID" --replication-policy=automatic --data-file="$PRIVATE_KEY" --project "$FIREBASE_PROJECT_ID" >/dev/null
-          fi
-
-          FINGERPRINT="$(openssl pkey -pubin -in "$PUBLIC_KEY" -outform DER 2>/dev/null | sha256sum | awk '{print $1}')"
           jq -n \
-            --arg run "$GITHUB_RUN_ID" \
-            --arg commit "$GITHUB_SHA" \
-            --arg fingerprint "$FINGERPRINT" \
-            '{schemaVersion:"orbit360-secure-handoff-key-v2",containsSecrets:false,containsPII:false,ok:true,keyReady:true,algorithm:"RSA-OAEP-4096+AES-256-GCM",run:$run,commit:$commit,publicKeyFingerprint:$fingerprint}' > "$DIAG"
-          shred -u "$PRIVATE_KEY" || rm -f "$PRIVATE_KEY"
+            --arg run "$GITHUB_RUN_ID" --arg commit "$GITHUB_SHA" --arg previewUrl "$PREVIEW_URL" \
+            '{schemaVersion:"orbit360-secure-access-browser-flow-v1",containsSecrets:false,containsPII:false,ok:true,phase:"completed",run:$run,commit:$commit,previewUrl:$previewUrl,secureOnlyButton:true,directoryWrites:false,remoteConfirmationRequired:true,opaqueRefsAfterConfirmation:true,temporaryKeysDeleted:true}' \
+            > orbit360-platform/runtime-gate-crm-v20260716/secure-access-browser-flow-sanitized.json
 
-      - name: Publicar solo llave pública y evidencia sanitizada
+      - name: Publicar evidencia sanitizada
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-secure-handoff-public-key-v2-${{ github.run_id }}
-          path: |
-            orbit360-platform/runtime-gate-crm-v20260716/handoff-public-v2.pem
-            orbit360-platform/runtime-gate-crm-v20260716/handoff-key-v2-sanitized.json
+          name: orbit360-secure-access-browser-flow-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/secure-access-browser-flow-sanitized.json
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 7
 
-      - name: Comentar resultado sanitizado en PR 5
+      - name: Comentar cierre en PR 5
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          FILE="orbit360-platform/runtime-gate-crm-v20260716/handoff-key-v2-sanitized.json"
-          FINGERPRINT="$(jq -r '.publicKeyFingerprint' "$FILE")"
-          printf -v BODY '### Segundo handoff cifrado · llave regenerada\n\n- Resultado: **OK**\n- Algoritmo: `RSA-OAEP-4096 + AES-256-GCM`\n- Huella pública: `%s`\n- Run: `%s`\n- Commit: `%s`\n\nLa primera llave fue destruida. Esta nueva llave privada permanece exclusivamente en Secret Manager y se eliminará al concluir el intento corregido.' "$FINGERPRINT" "$GITHUB_RUN_ID" "$GITHUB_SHA"
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "$BODY"
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "### Flujo seguro desde navegador · Aseguradoras LAB
+
+- Resultado: **OK**
+- Botón exclusivo: \`Guardar únicamente accesos seguros\`
+- Reimporta aseguradoras: \`false\`
+- Modifica contactos/cuentas/directorio: \`false\`
+- Confirmación remota obligatoria: \`true\`
+- Referencias opacas después de bóveda: \`true\`
+- Llaves efímeras temporales: \`eliminadas\`
+- LAB: ${PREVIEW_URL}
+- Run: \`${GITHUB_RUN_ID}\`
+- Commit evaluado: \`${GITHUB_SHA}\`
+
+Los Excel se procesan en el navegador y no se suben al repositorio."
