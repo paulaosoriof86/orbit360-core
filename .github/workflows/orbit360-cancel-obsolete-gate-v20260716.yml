@@ -1,4 +1,4 @@
-name: Orbit 360 Cancel Obsolete Joint Gate 20260716
+name: Orbit 360 Secure Binding Inventory Read Only 20260720
 
 on:
   push:
@@ -9,14 +9,168 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
-  group: orbit360-clientes-aseguradoras-runtime-gate-v20260716
-  cancel-in-progress: true
+  group: orbit360-secure-binding-inventory-readonly-v20260720
+  cancel-in-progress: false
 
 jobs:
-  release_runner:
+  inventory:
+    name: Recursos protegidos existentes · solo lectura
     runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
     steps:
-      - name: Liberar ejecución obsoleta
-        run: echo "Obsolete unbounded gate cancelled; bounded gate remains authoritative."
+      - name: Checkout rama autorizada
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+
+      - name: Preflight vinculante
+        env:
+          ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+
+      - name: Resolver cuenta de servicio LAB
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then echo "BLOQUEO_SECRET_LAB"; exit 42; fi
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_SA_EMAIL=$(jq -r '.client_email // empty' "$KEY_FILE")" >> "$GITHUB_ENV"
+
+      - name: Autenticar gcloud sin modificar infraestructura
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.SA_ORBIT360_LAB || env.SA_ORBIT_360_LAB || env.SA_DEFAULT }}
+          project_id: ays-orbit-360-lab
+          create_credentials_file: true
+          export_environment_variables: true
+
+      - name: Inventariar recursos existentes sin leer valores
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          OUT="orbit360-platform/runtime-gate-crm-v20260716/secure-binding-inventory-sanitized.json"
+          TMP="${RUNNER_TEMP}/orbit360-secure-binding"
+          mkdir -p "$TMP"
+
+          secretListOk=false
+          functionsListOk=false
+          runListOk=false
+          secretCount=0
+          candidateSecretCount=0
+          functionsCount=0
+          candidateFunctionCount=0
+          readyFunctionCount=0
+          runServiceCount=0
+          candidateRunServiceCount=0
+          candidateHttpsEndpointCount=0
+
+          if gcloud secrets list --project "$FIREBASE_PROJECT_ID" --format=json > "$TMP/secrets.json" 2> "$TMP/secrets.err"; then
+            secretListOk=true
+            secretCount=$(jq 'length' "$TMP/secrets.json")
+            candidateSecretCount=$(jq '[.[] | (.name // "") | ascii_downcase | select(test("orbit|asegur|credential|access|portal|vault|secret"))] | length' "$TMP/secrets.json")
+          fi
+
+          if gcloud functions list --project "$FIREBASE_PROJECT_ID" --v2 --format=json > "$TMP/functions.json" 2> "$TMP/functions.err"; then
+            functionsListOk=true
+            functionsCount=$(jq 'length' "$TMP/functions.json")
+            candidateFunctionCount=$(jq '[.[] | ((.name // "") + " " + (.buildConfig.entryPoint // "")) | ascii_downcase | select(test("orbit|asegur|credential|access|portal|vault|secret"))] | length' "$TMP/functions.json")
+            readyFunctionCount=$(jq '[.[] | select((.state // "") == "ACTIVE")] | length' "$TMP/functions.json")
+            candidateHttpsEndpointCount=$(jq '[.[] | select((((.name // "") + " " + (.buildConfig.entryPoint // "")) | ascii_downcase | test("orbit|asegur|credential|access|portal|vault|secret"))) | select((.serviceConfig.uri // "") != "")] | length' "$TMP/functions.json")
+          fi
+
+          if gcloud run services list --project "$FIREBASE_PROJECT_ID" --platform managed --format=json > "$TMP/run.json" 2> "$TMP/run.err"; then
+            runListOk=true
+            runServiceCount=$(jq 'length' "$TMP/run.json")
+            candidateRunServiceCount=$(jq '[.[] | (.metadata.name // "") | ascii_downcase | select(test("orbit|asegur|credential|access|portal|vault|secret"))] | length' "$TMP/run.json")
+          fi
+
+          classification="NO_VISIBLE_SECURE_BINDING"
+          if [ "$candidateHttpsEndpointCount" -gt 0 ]; then
+            classification="SECURE_BINDING_ENDPOINT_CANDIDATE_EXISTS"
+          elif [ "$candidateFunctionCount" -gt 0 ] || [ "$candidateRunServiceCount" -gt 0 ]; then
+            classification="SECURE_BACKEND_CANDIDATE_EXISTS_WITHOUT_CONFIRMED_ENDPOINT"
+          elif [ "$candidateSecretCount" -gt 0 ]; then
+            classification="SECURE_STORAGE_CANDIDATE_EXISTS_PROVIDER_NOT_VISIBLE"
+          elif [ "$secretListOk" != true ] || [ "$functionsListOk" != true ] || [ "$runListOk" != true ]; then
+            classification="INVENTORY_PARTIAL_PERMISSION_LIMIT"
+          fi
+
+          jq -n \
+            --arg schemaVersion "orbit360-secure-binding-inventory-v1" \
+            --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg projectId "$FIREBASE_PROJECT_ID" \
+            --arg classification "$classification" \
+            --argjson secretListOk "$secretListOk" \
+            --argjson functionsListOk "$functionsListOk" \
+            --argjson runListOk "$runListOk" \
+            --argjson secretCount "$secretCount" \
+            --argjson candidateSecretCount "$candidateSecretCount" \
+            --argjson functionsCount "$functionsCount" \
+            --argjson candidateFunctionCount "$candidateFunctionCount" \
+            --argjson readyFunctionCount "$readyFunctionCount" \
+            --argjson runServiceCount "$runServiceCount" \
+            --argjson candidateRunServiceCount "$candidateRunServiceCount" \
+            --argjson candidateHttpsEndpointCount "$candidateHttpsEndpointCount" \
+            '{schemaVersion:$schemaVersion,generatedAt:$generatedAt,projectId:$projectId,readOnly:true,containsSecrets:false,containsResourceNames:false,containsUrls:false,secretManager:{listOk:$secretListOk,total:$secretCount,candidates:$candidateSecretCount},functions:{listOk:$functionsListOk,total:$functionsCount,candidates:$candidateFunctionCount,active:$readyFunctionCount,candidateHttpsEndpoints:$candidateHttpsEndpointCount},cloudRun:{listOk:$runListOk,total:$runServiceCount,candidates:$candidateRunServiceCount},classification:$classification}' > "$OUT"
+
+          cat "$OUT"
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-secure-binding-inventory-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/secure-binding-inventory-sanitized.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Comentar resultado sanitizado en PR 5
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/secure-binding-inventory-sanitized.json"
+          test -f "$FILE"
+          node <<'NODE' > /tmp/secure-binding-comment.md
+          const fs = require('fs');
+          const d = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/secure-binding-inventory-sanitized.json','utf8'));
+          process.stdout.write([
+            '### Inventario sanitizado · binding seguro existente',
+            '',
+            '- Solo lectura: `' + d.readOnly + '`',
+            '- Secret Manager consultable: `' + d.secretManager.listOk + '`',
+            '- Recursos Secret Manager: `' + d.secretManager.total + '` · candidatos: `' + d.secretManager.candidates + '`',
+            '- Functions consultables: `' + d.functions.listOk + '`',
+            '- Functions: `' + d.functions.total + '` · candidatos: `' + d.functions.candidates + '` · activos: `' + d.functions.active + '`',
+            '- Endpoints candidatos: `' + d.functions.candidateHttpsEndpoints + '`',
+            '- Cloud Run consultable: `' + d.cloudRun.listOk + '`',
+            '- Servicios Cloud Run: `' + d.cloudRun.total + '` · candidatos: `' + d.cloudRun.candidates + '`',
+            '- Clasificación: **' + d.classification + '**',
+            '- Run: `' + process.env.GITHUB_RUN_ID + '`',
+            '',
+            'No se leyeron valores ni se publicaron nombres, URLs, identificadores o configuraciones.'
+          ].join('\n'));
+          NODE
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/secure-binding-comment.md
+
+      - name: Alto controlado para evidencia observable
+        if: always()
+        run: exit 1
