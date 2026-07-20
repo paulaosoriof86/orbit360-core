@@ -1,5 +1,5 @@
 name: Orbit 360 Importers E2E Acceptance LAB 20260720 V4
-run-name: M1 importadores v4 inmutable · ${{ github.sha }}
+run-name: M1 importadores v4 proveedor inmutable · ${{ github.sha }}
 
 on:
   push:
@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: orbit360-importers-e2e-v4-single-execution
@@ -70,20 +71,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          node --check functions/index.js
           node --check orbit360-platform/core/session-readiness-contract-v20260720.js
           node --check orbit360-platform/core/membership-multirol-contract-p0.js
           node --check orbit360-platform/core/importer-execution-contract-v20260720.js
           node --check tools/orbit360-ensure-lab-secure-membership-v20260720.mjs
+          node --check tools/orbit360-validate-provider-role-normalization-v20260720.mjs
+          node --check tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs
           node --check tools/orbit360-importers-e2e-browser-v20260720.mjs
           node --check tools/orbit360-run-importers-e2e-gate-v20260720.mjs
           node --check tools/orbit360-importers-e2e-finalize-v20260720.mjs
+          node tools/orbit360-validate-provider-role-normalization-v20260720.mjs
           node tools/orbit360-validate-session-readiness-contract-v20260720.mjs
 
   e2e:
-    name: Importadores · membresía, UI legal, proveedor, store, auditoría y rollback
+    name: Importadores · proveedor, membresía, UI legal, store, auditoría y rollback
     needs: preflight
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     env:
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
       ORBIT360_GATE_ID: importers-e2e-acceptance-lab-v20260720
@@ -97,6 +102,8 @@ jobs:
       ORBIT360_IMPORTERS_E2E_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
       ORBIT360_PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
       ORBIT360_MEMBERSHIP_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/membership-contract-sanitized.json
+      ORBIT360_PROVIDER_AUTH_DIAGNOSTIC: orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
+      ORBIT360_PROVIDER_DEPLOY_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/provider-deploy-sanitized.json
       ORBIT360_VALIDATED_SHA: ${{ needs.preflight.outputs.validated_sha }}
     steps:
       - name: Checkout SHA inmutable
@@ -139,11 +146,100 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm install --no-save firebase-admin@13 playwright@1.52.0 xlsx@0.18.5
-          node -e "require('firebase-admin'); require('xlsx'); console.log('DEPENDENCIAS_GATE_OK')"
+          npm install --no-save firebase-admin@13 google-auth-library@9 playwright@1.52.0 xlsx@0.18.5
+          node -e "require('firebase-admin'); require('google-auth-library'); require('xlsx'); console.log('DEPENDENCIAS_GATE_OK')"
           npx playwright install --with-deps chromium
 
+      - name: Desplegar proveedor seguro LAB y preservar error sanitizado
+        id: deploy_provider
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          npx firebase-tools deploy \
+            --only functions:orbit360ImportInsurerCredentials,functions:orbit360CredentialStatus,functions:orbit360RevealInsurerCredential,functions:orbit360CopyInsurerCredential \
+            --project "$FIREBASE_PROJECT_ID" \
+            --non-interactive \
+            --json > "${RUNNER_TEMP}/provider-deploy.stdout" 2> "${RUNNER_TEMP}/provider-deploy.stderr"
+          DEPLOY_CODE=$?
+          set -e
+          export DEPLOY_CODE
+          node <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const read = path => fs.existsSync(path) ? fs.readFileSync(path, 'utf8') : '';
+          const stdout = read(`${process.env.RUNNER_TEMP}/provider-deploy.stdout`);
+          const stderr = read(`${process.env.RUNNER_TEMP}/provider-deploy.stderr`);
+          const combined = `${stdout}\n${stderr}`;
+          const lower = combined.toLowerCase();
+          const hash = value => crypto.createHash('sha256').update(value).digest('hex');
+          let category = Number(process.env.DEPLOY_CODE) === 0 ? 'DEPLOY_OK' : 'DEPLOY_FAILED_UNCLASSIFIED';
+          if (/iam\.serviceaccounts\.actas|act as service account/.test(lower)) category = 'SECURITY_FAILURE_SERVICE_ACCOUNT_ACT_AS';
+          else if (/permission[_ -]?denied|missing required permission|not authorized/.test(lower)) category = 'SECURITY_FAILURE_DEPLOY_PERMISSION';
+          else if (/no function matches|does not match any functions/.test(lower)) category = 'PIPELINE_MECHANISM_FAILURE_FUNCTION_SELECTOR';
+          else if (/quota|resource exhausted/.test(lower)) category = 'ENVIRONMENT_FAILURE_QUOTA';
+          else if (/api.*not enabled|serviceusage/.test(lower)) category = 'ENVIRONMENT_FAILURE_API_DISABLED';
+          else if (/build failed|failed to build|container healthcheck/.test(lower)) category = 'FUNCTIONAL_DEFECT_FUNCTION_BUILD';
+          else if (/precondition|operation.*in progress/.test(lower)) category = 'ENVIRONMENT_FAILURE_DEPLOY_PRECONDITION';
+          const evidence = {
+            schemaVersion: 'orbit360-provider-deploy-sanitized-v1',
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            environment: 'LAB',
+            commit: process.env.GITHUB_SHA,
+            runId: process.env.GITHUB_RUN_ID,
+            deployedFunctions: [
+              'orbit360ImportInsurerCredentials',
+              'orbit360CredentialStatus',
+              'orbit360RevealInsurerCredential',
+              'orbit360CopyInsurerCredential'
+            ],
+            exitCode: Number(process.env.DEPLOY_CODE),
+            category,
+            stdoutHash: hash(stdout),
+            stderrHash: hash(stderr),
+            outputBytes: Buffer.byteLength(combined),
+            containsRawOutput: false,
+            containsPII: false,
+            containsSecrets: false,
+            hostingTouched: false,
+            firestoreRulesTouched: false,
+            productionTouched: false,
+            ok: Number(process.env.DEPLOY_CODE) === 0
+          };
+          fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716', { recursive: true });
+          fs.writeFileSync(process.env.ORBIT360_PROVIDER_DEPLOY_EVIDENCE, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8');
+          console.log(`ORBIT360_PROVIDER_DEPLOY:${category}:exit=${evidence.exitCode}`);
+          NODE
+          exit "$DEPLOY_CODE"
+
+      - name: Diagnosticar autorización del proveedor desplegado
+        id: provider_diagnostic
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: node tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs
+
+      - name: Validar proveedor antes del importador
+        shell: bash
+        env:
+          DEPLOY_OUTCOME: ${{ steps.deploy_provider.outcome }}
+          DIAGNOSTIC_OUTCOME: ${{ steps.provider_diagnostic.outcome }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const deploy = JSON.parse(fs.readFileSync(process.env.ORBIT360_PROVIDER_DEPLOY_EVIDENCE, 'utf8'));
+          const diagnostic = JSON.parse(fs.readFileSync(process.env.ORBIT360_PROVIDER_AUTH_DIAGNOSTIC, 'utf8'));
+          if (process.env.DEPLOY_OUTCOME !== 'success' || deploy.ok !== true) {
+            throw new Error(`PROVIDER_DEPLOY_NOT_READY:${deploy.category || 'UNKNOWN'}`);
+          }
+          if (process.env.DIAGNOSTIC_OUTCOME !== 'success' || diagnostic.providerAuthorizationReady !== true) {
+            throw new Error(`PROVIDER_AUTHORIZATION_NOT_READY:${diagnostic.classification || 'UNKNOWN'}`);
+          }
+          console.log('ORBIT360_PROVIDER_AUTHORIZATION_READY');
+          NODE
+
       - name: Ejecutar gate integral una sola vez
+        id: integrated_gate
         shell: bash
         run: |
           set -euo pipefail
@@ -156,6 +252,8 @@ jobs:
           name: orbit360-importers-e2e-v4-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/provider-deploy-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/membership-contract-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-cleanup-sanitized.json
@@ -165,25 +263,84 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+      - name: Actualizar estado observable en PR 5
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          TARGET_PR: "5"
+          DEPLOY_PATH: orbit360-platform/runtime-gate-crm-v20260716/provider-deploy-sanitized.json
+          DIAGNOSTIC_PATH: orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
+          E2E_PATH: orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+          GATE_OUTCOME: ${{ steps.integrated_gate.outcome }}
+        with:
+          script: |
+            const fs = require('fs');
+            const read = (path, fallback) => fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, 'utf8')) : fallback;
+            const deploy = read(process.env.DEPLOY_PATH, { category: 'EVIDENCE_MISSING', ok: false });
+            const diagnostic = read(process.env.DIAGNOSTIC_PATH, { classification: 'EVIDENCE_MISSING', providerAuthorizationReady: false });
+            const e2e = read(process.env.E2E_PATH, { stage: 'not_executed', predicates: {}, ok: false });
+            const predicates = e2e.predicates || {};
+            const start = '<!-- ORBIT360_M1_V4_FINAL_START -->';
+            const end = '<!-- ORBIT360_M1_V4_FINAL_END -->';
+            const block = `${start}
+            ## Gate integral M1 v4 · evidencia sanitizada
+
+            \`\`\`txt
+            run: ${process.env.RUN_ID}
+            HEAD evaluado: ${process.env.HEAD_SHA}
+            deploy proveedor: ${deploy.category || 'UNKNOWN'}
+            autorización proveedor: ${diagnostic.classification || 'UNKNOWN'}
+            gate outcome: ${process.env.GATE_OUTCOME || 'not_executed'}
+            etapa E2E: ${e2e.stage || 'missing'}
+            ok: ${e2e.ok === true}
+            \`\`\`
+
+            - Deploy LAB del proveedor aprobado: **${deploy.ok === true}**
+            - Autorización del proveedor lista: **${diagnostic.providerAuthorizationReady === true}**
+            - Autenticación navegador: **${predicates.browserAuthReady === true}**
+            - Rol activo resuelto: **${predicates.activeRoleResolved === true}**
+            - Tenant resuelto: **${predicates.tenantResolved === true}**
+            - Gate legal satisfecho: **${predicates.legalGateSatisfied === true}**
+            - Proveedor invocado: **${predicates.providerInvoked === true}**
+            - Confirmación remota: **${predicates.remoteConfirmationObserved === true}**
+            - Read-after-write: **${predicates.readAfterWriteObserved === true || predicates.readAfterWriteOk === true}**
+            - Auditoría de éxito: **${predicates.auditSuccessObserved === true}**
+            - Auditoría de rechazo: **${predicates.auditFailureObserved === true}**
+            - Secretos en store operativo: **${predicates.plaintextSecretsInOperationalStore === true}**
+            - Rollback: **${predicates.rollbackOk === true}**
+            - Hosting productivo, main o merge: **false**
+            ${end}`;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = Number(process.env.TARGET_PR);
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+            const current = pr.body || '';
+            const pattern = new RegExp(`${start}[\\s\\S]*?${end}`, 'm');
+            const body = pattern.test(current) ? current.replace(pattern, block) : `${current.trim()}\n\n${block}\n`;
+            await github.rest.pulls.update({ owner, repo, pull_number, body });
+
       - name: Limpiar cuenta temporal
         if: always()
         shell: bash
         run: |
-          set -euo pipefail
-          rm -f "${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          rm -f "${RUNNER_TEMP}/orbit360-firebase-lab.json" \
+                "${RUNNER_TEMP}/provider-deploy.stdout" \
+                "${RUNNER_TEMP}/provider-deploy.stderr"
 
       - name: Resumen de alcance
         if: always()
         shell: bash
         run: |
           {
-            echo "## Importadores E2E · revisión v4 inmutable"
+            echo "## Importadores E2E · revisión v4 proveedor inmutable"
             echo ""
             echo "Gate: importers-e2e-acceptance-lab-v20260720"
             echo ""
             echo "Commit validado: ${ORBIT360_VALIDATED_SHA}"
             echo ""
-            echo "La membresía canónica y la UI legal real deben quedar listas antes del primer clic del importador."
+            echo "La normalización de roles, membresía canónica y UI legal deben quedar listas antes del primer clic del importador."
             echo ""
-            echo "No real source reloads. No production, main or merge."
+            echo "No production, main or merge."
           } >> "$GITHUB_STEP_SUMMARY"
