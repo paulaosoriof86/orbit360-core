@@ -520,27 +520,55 @@ Orbit.insurerDirectoryImport = (function () {
     if (A().audit) A().audit('aplicar_directorio_aseguradoras', 'aseguradoras', result.report.reportId, null, { inserted, updated, blocked: blocked.length, secureStatus }, confirmation.reason, { sourceHash: result.report.sourceHash, sourceFileName: result.report.sourceFileName, confirmationPhrase: CONFIRM_PHRASE });
     return { ok: true, inserted, updated, blocked: blocked.length, secureStatus };
   }
-  async function applySecureOnly(result, confirmation) {
-    if (!canManage()) return { ok: false, errors: ['permiso_importacion_denegado'] };
-    if (!result || !result.report) return { ok: false, errors: ['dry_run_requerido'] };
-    if (!confirmation || confirmation.approved !== true || confirmation.phrase !== CONFIRM_PHRASE || !clean(confirmation.reason)) return { ok: false, errors: ['confirmacion_reforzada_requerida'] };
-    const operations = result.report._operations || [];
-    const validSheets = new Set(operations.filter(op => !(op.data && (op.data.requiereValidacion || op.data.validationStatus !== 'validado'))).map(op => op.sourceSheet));
-    const secureItems = (secureSession.get(result.report.reportId) || []).filter(item => item && item.type === 'credential' && validSheets.has(item.insurerSheet));
-    const secureProvider = Orbit.secureImport && Orbit.secureImport.importInsurerDirectory;
-    if (!secureItems.length) { secureSession.delete(result.report.reportId); return { ok: true, imported: 0, secureStatus: 'sin_sensibles', validSheets: validSheets.size }; }
-    if (typeof secureProvider !== 'function') return { ok: false, errors: ['backend_operativo_requerido_para_aplicar_datos_reales'] };
-    try {
-      const remote = await secureProvider({ tenantId: tenantId(), sourceFileName: result.report.sourceFileName, sourceHash: result.report.sourceHash, items: secureItems });
-      if (!remote || remote.ok !== true) throw new Error('confirmacion_remota_incompleta');
-      secureSession.delete(result.report.reportId);
-      if (A().audit) A().audit('aplicar_accesos_aseguradoras_secure_only', 'aseguradoras', result.report.reportId, null, { imported: Number(remote.imported || 0), validSheets: validSheets.size, blockedSheets: Math.max(0, operations.length - validSheets.size), containsSecrets: false }, confirmation.reason, { sourceHash: result.report.sourceHash, sourceFileName: result.report.sourceFileName, confirmationPhrase: CONFIRM_PHRASE });
-      return { ok: true, imported: Number(remote.imported || 0), mappings: [].concat(remote.mappings || []), secureStatus: 'confirmado_backend_seguro', validSheets: validSheets.size, blockedSheets: Math.max(0, operations.length - validSheets.size), containsSecrets: false };
-    } catch (error) {
-      return { ok: false, errors: ['confirmacion_remota_incompleta'], errorCode: clean(error && (error.code || error.message), 120) };
-    }
+  function secureOnlyEligibleItems(sourceItems, operations) {
+  const blockedSheets = new Set([].concat(operations || []).filter(op => {
+    const alerts = [].concat(op && op.data && op.data.validacionAlertas || []);
+    return alerts.some(alert => /entidad_no_es_aseguradora_directa|duplicado_dentro_del_archivo/.test(clean(alert)));
+  }).map(op => op && op.sourceSheet).filter(Boolean));
+  return [].concat(sourceItems || []).filter(item => item && item.type === 'credential' && !blockedSheets.has(item.insurerSheet));
+}
+function secureProviderReady() {
+  return !!(Orbit.secureImport && typeof Orbit.secureImport.importInsurerDirectory === 'function');
+}
+async function waitForSecureProvider(timeoutMs) {
+  if (secureProviderReady()) return Orbit.secureImport.importInsurerDirectory;
+  return new Promise(resolve => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      try { window.removeEventListener('orbit:insurer-credential-provider-ready', onReady); } catch (e) {}
+      resolve(secureProviderReady() ? Orbit.secureImport.importInsurerDirectory : null);
+    };
+    const onReady = () => finish();
+    try { window.addEventListener('orbit:insurer-credential-provider-ready', onReady, { once: true }); } catch (e) {}
+    setTimeout(finish, Math.max(1000, Number(timeoutMs) || 8000));
+  });
+}
+async function applySecureOnly(result, confirmation) {
+  if (!canManage()) return { ok: false, errors: ['permiso_importacion_denegado'] };
+  if (!result || !result.report) return { ok: false, errors: ['dry_run_requerido'] };
+  if (!confirmation || confirmation.approved !== true || confirmation.phrase !== CONFIRM_PHRASE || !clean(confirmation.reason)) return { ok: false, errors: ['confirmacion_reforzada_requerida'] };
+  const operations = result.report._operations || [];
+  const sourceItems = secureSession.get(result.report.reportId) || [];
+  const secureItems = secureOnlyEligibleItems(sourceItems, operations);
+  if (!secureItems.length) return { ok: false, errors: ['sin_accesos_elegibles_para_guardar'] };
+  const secureProvider = await waitForSecureProvider(8000);
+  if (typeof secureProvider !== 'function') return { ok: false, errors: ['proveedor_seguro_no_disponible'] };
+  try {
+    const remote = await secureProvider({ tenantId: tenantId(), sourceFileName: result.report.sourceFileName, sourceHash: result.report.sourceHash, items: secureItems });
+    const imported = Number(remote && remote.imported || 0);
+    const mappings = [].concat(remote && remote.mappings || []);
+    if (!remote || remote.ok !== true || imported <= 0 || !mappings.length) throw new Error('confirmacion_remota_sin_accesos');
+    secureSession.delete(result.report.reportId);
+    if (A().audit) A().audit('aplicar_accesos_aseguradoras_secure_only', 'aseguradoras', result.report.reportId, null, { imported, requested: secureItems.length, skipped: Math.max(0, secureItems.length - imported), containsSecrets: false }, confirmation.reason, { sourceHash: result.report.sourceHash, sourceFileName: result.report.sourceFileName, confirmationPhrase: CONFIRM_PHRASE });
+    return { ok: true, imported, requested: secureItems.length, skipped: Math.max(0, secureItems.length - imported), mappings, secureStatus: 'confirmado_backend_seguro', containsSecrets: false };
+  } catch (error) {
+    return { ok: false, errors: ['confirmacion_remota_incompleta'], errorCode: clean(error && (error.code || error.message), 120) };
   }
-  applySecureOnly.__secureOnlyV20260720 = true;
+}
+applySecureOnly.__secureOnlyV20260720 = true;
+applySecureOnly.__secureOnlyProviderGateV20260720 = true;
   function esc(v) { return U().esc ? U().esc(String(v == null ? '' : v)) : clean(v); }
   function toast(v) { try { U().toast(v); } catch (e) {} }
   function close() { const b = document.getElementById('ins-dir-import-v1202'); if (b) b.remove(); if (uiState && uiState.result && uiState.result.report) secureSession.delete(uiState.result.report.reportId); uiState = null; }
@@ -586,7 +614,7 @@ Orbit.insurerDirectoryImport = (function () {
       }
       const done = uiState && uiState.options && uiState.options.onDone;
       close();
-      toast(applied.imported + ' acceso(s) guardados de forma segura. No se modificó el directorio.');
+      toast(applied.imported + ' acceso(s) guardados de forma segura' + (applied.skipped ? ' · ' + applied.skipped + ' pendiente(s) de validación' : '') + '. No se modificó el directorio.');
       if (done) done(applied);
       else if (Orbit.modules && Orbit.modules.aseguradoras && Orbit.modules.aseguradoras.render) Orbit.modules.aseguradoras.render(document.getElementById('host'));
     };
@@ -613,6 +641,6 @@ Orbit.insurerDirectoryImport = (function () {
 
   return {
     SOURCE_TYPE, CONFIRM_PHRASE, canManage, normalizeName, namesCompatible, safeUrl,
-    parseMatrices, parseFile, buildOperations, buildDryRun, applyApproved, applySecureOnly, open, close
+    parseMatrices, parseFile, buildOperations, buildDryRun, applyApproved, secureOnlyEligibleItems, secureProviderReady, applySecureOnly, open, close
   };
 })();
