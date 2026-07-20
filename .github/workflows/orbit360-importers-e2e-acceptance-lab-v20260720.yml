@@ -49,22 +49,77 @@ jobs:
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
 
-      - name: Validar mecanismo de SHA único
+      - name: Validar estructura efectiva de ejecución inmutable
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
           const path = '.github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml';
-          const source = fs.readFileSync(path, 'utf8');
-          const immutableRef = 'ref: ' + '$' + '{{ github.sha }}';
-          const count = source.split(immutableRef).length - 1;
-          if (count !== 2) throw new Error(`IMMUTABLE_SHA_CHECKOUT_COUNT_${count}`);
-          if (source.includes('pull_request:')) throw new Error('DUPLICATE_PULL_REQUEST_TRIGGER');
-          if (source.includes('workflow_dispatch:')) throw new Error('UNAVAILABLE_WORKFLOW_DISPATCH_TRIGGER');
-          if (source.includes('ref: ays/backend-tenant-lab-v99-20260703')) throw new Error('MUTABLE_BRANCH_CHECKOUT_BLOCKED');
-          if (!source.includes('cancel-in-progress: true')) throw new Error('STALE_RUN_CANCELLATION_REQUIRED');
-          console.log('ORBIT360_IMMUTABLE_SHA_WORKFLOW_OK');
+          const lines = fs.readFileSync(path, 'utf8').replace(/\r\n/g, '\n').split('\n');
+
+          function topLevelBlock(name) {
+            const start = lines.findIndex((line) => line === `${name}:`);
+            if (start < 0) throw new Error(`TOP_LEVEL_BLOCK_MISSING_${name.toUpperCase()}`);
+            const block = [];
+            for (let index = start + 1; index < lines.length; index += 1) {
+              const line = lines[index];
+              if (/^[A-Za-z0-9_-]+:\s*$/.test(line)) break;
+              block.push(line);
+            }
+            return block;
+          }
+
+          const onBlock = topLevelBlock('on');
+          const triggerKeys = onBlock
+            .map((line) => line.match(/^  ([A-Za-z0-9_-]+):\s*$/))
+            .filter(Boolean)
+            .map((match) => match[1]);
+          if (triggerKeys.length !== 1 || triggerKeys[0] !== 'push') {
+            throw new Error(`TRIGGER_SET_NOT_SINGLE_PUSH_${triggerKeys.join('_') || 'EMPTY'}`);
+          }
+          if (!onBlock.some((line) => /^    branches:\s*$/.test(line))) {
+            throw new Error('PUSH_BRANCHES_BLOCK_MISSING');
+          }
+          if (!onBlock.some((line) => /^      - ays\/backend-tenant-lab-v99-20260703\s*$/.test(line))) {
+            throw new Error('AUTHORIZED_BRANCH_MISSING');
+          }
+          if (!onBlock.some((line) => /^    paths:\s*$/.test(line))) {
+            throw new Error('PUSH_PATHS_BLOCK_MISSING');
+          }
+          if (!onBlock.some((line) => /^      - ["']?\.github\/workflows\/orbit360-importers-e2e-acceptance-lab-v20260720\.yml["']?\s*$/.test(line))) {
+            throw new Error('WORKFLOW_SELF_PATH_FILTER_MISSING');
+          }
+
+          const checkoutCount = lines.filter((line) => /^\s+uses:\s+actions\/checkout@v4\s*$/.test(line)).length;
+          const checkoutRefs = lines
+            .map((line) => line.match(/^\s+ref:\s*(.+?)\s*$/))
+            .filter(Boolean)
+            .map((match) => match[1]);
+          const immutableRef = '$' + '{{ github.sha }}';
+          if (checkoutCount !== 2) throw new Error(`CHECKOUT_ACTION_COUNT_${checkoutCount}`);
+          if (checkoutRefs.length !== checkoutCount) throw new Error(`CHECKOUT_REF_COUNT_${checkoutRefs.length}`);
+          if (!checkoutRefs.every((value) => value === immutableRef)) {
+            throw new Error(`NON_IMMUTABLE_CHECKOUT_REF_${checkoutRefs.join('_')}`);
+          }
+
+          const concurrencyBlock = topLevelBlock('concurrency');
+          const group = concurrencyBlock
+            .map((line) => line.match(/^  group:\s*(.+?)\s*$/))
+            .filter(Boolean)
+            .map((match) => match[1]);
+          const cancel = concurrencyBlock
+            .map((line) => line.match(/^  cancel-in-progress:\s*(.+?)\s*$/))
+            .filter(Boolean)
+            .map((match) => match[1]);
+          if (group.length !== 1 || group[0] !== 'orbit360-importers-e2e-v4-single-execution') {
+            throw new Error(`CONCURRENCY_GROUP_INVALID_${group.join('_') || 'EMPTY'}`);
+          }
+          if (cancel.length !== 1 || cancel[0] !== 'true') {
+            throw new Error(`CANCEL_IN_PROGRESS_INVALID_${cancel.join('_') || 'EMPTY'}`);
+          }
+
+          console.log('ORBIT360_IMMUTABLE_WORKFLOW_STRUCTURE_OK');
           NODE
 
       - name: Validar owners y mecanismo de la revisión v4
