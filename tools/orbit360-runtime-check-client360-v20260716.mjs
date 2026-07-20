@@ -4,8 +4,8 @@ const EXPECTED_TABS = ['resumen','polizas','vehiculos','cobros','recibos','renov
 const EXPECTED_CLIENT_PROJECTION_VERSION = '20260719.2';
 const EXPECTED_CLIENT_PROJECTION_BRIDGE = '20260719.2-temporal';
 const VISUAL_REPAIR_REVISION = 'visual-human-repair-v2';
-const COUNTRY_DATA_CONTRACT_REVISION = 'country-data-contract-v1';
-const EXPECTED_COUNTRY_COUNTS = { GT: 234, CO: 15, REQUIERE_VALIDACION: 165 };
+const COUNTRY_DATA_CONTRACT_REVISION = 'country-data-contract-v2-source-region';
+const EXPECTED_COUNTRY_COUNTS = { GT: 337, CO: 16, REQUIERE_VALIDACION: 61 };
 
 function assert(condition, code, detail = '') {
   if (!condition) throw new Error(`${code}${detail ? `:${detail}` : ''}`);
@@ -142,6 +142,7 @@ async function validateCountryAndTypeFilters(page, report, label, scopeState) {
   });
   report[`${label}CanonicalFilters`] = result;
   assert(result.colombia != null && result.colombia > 0, 'CLIENT_FILTER_CO_EMPTY', label);
+  assert(result.colombia === EXPECTED_COUNTRY_COUNTS.CO, 'CLIENT_FILTER_CO_COUNT_INVALID', `${label}:${result.colombia}`);
   assert(result.companies != null && result.companies > 0, 'CLIENT_FILTER_COMPANY_EMPTY', label);
 }
 
