@@ -17,7 +17,7 @@
   var credentialProviderSrc = 'core/aseguradoras-credentials-provider-lab-v20260720.js?v=20260720-1';
   var secureTargetBridgeSrc = 'core/insurer-secure-target-bridge-v20260720.js?v=20260720-1';
   var importerContractSrc = 'core/importer-execution-contract-v20260720.js?v=20260720-2';
-  var importerAcademySrc = 'data/academia-v1225-importadores-e2e.js?v=20260720-2';
+  var importerAcademySrc = 'data/academia-v1225-importadores-e2e.js?v=20260720-3';
 
   window.OrbitTenantBootstrapState = {
     owner: 'core/router.js',
@@ -35,7 +35,7 @@
     importerContractRequested: true,
     importerContractVersion: '20260720.2',
     importerAcademyRequested: true,
-    importerAcademyVersion: '1.226',
+    importerAcademyVersion: '1.227',
     status: source ? 'requested' : 'visual-only'
   };
 
@@ -163,7 +163,7 @@
   }
 
   function loadImporterAcademy() {
-    if (window.Orbit && window.Orbit.ACADEMIA_V1225_IMPORTERS_E2E && window.Orbit.ACADEMIA_V1225_IMPORTERS_E2E.version === '1.226') {
+    if (window.Orbit && window.Orbit.ACADEMIA_V1225_IMPORTERS_E2E && window.Orbit.ACADEMIA_V1225_IMPORTERS_E2E.version === '1.227') {
       loadCredentialProvider();
       return;
     }
@@ -203,4 +203,4 @@
   sessionScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'session-readiness-error'; }, { once: true });
   document.head.appendChild(sessionScript);
 })();
-/* Preflight v8: sesión legal, contrato E2E y Academia cargados antes del Router. */
+/* Preflight v9: sesión legal, membresía, contrato E2E y Academia cargados antes del Router. */
