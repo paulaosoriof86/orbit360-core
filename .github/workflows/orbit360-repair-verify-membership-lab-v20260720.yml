@@ -1,0 +1,228 @@
+name: Orbit 360 Repair and Verify Membership LAB 20260720
+run-name: M1 membresía canónica · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-repair-verify-membership-lab-v20260720.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: orbit360-repair-verify-membership-lab-v20260720
+  cancel-in-progress: true
+
+jobs:
+  repair_verify:
+    name: Membresía LAB · reparar, releer y diagnosticar
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      ORBIT360_MEMBERSHIP_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/membership-contract-sanitized.json
+      ORBIT360_PROVIDER_AUTH_DIAGNOSTIC: orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
+    steps:
+      - name: Checkout SHA inmutable
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Preflight vinculante antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = "push"
+          test "$GITHUB_REF_NAME" = "ays/backend-tenant-lab-v99-20260703"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
+          node --check tools/orbit360-ensure-lab-secure-membership-v20260720.mjs
+          node --check tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs
+          echo "ORBIT360_MEMBERSHIP_REPAIR_PREFLIGHT_OK"
+
+      - name: Resolver cuenta LAB después del preflight
+        shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then echo "BLOQUEO_SECRET_LAB"; exit 42; fi
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
+          test "$PROJECT_ID" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar dependencias verificadas
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save firebase-admin@13 google-auth-library@9
+
+      - name: Reparar membresía canónica LAB con auditoría
+        id: repair
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-ensure-lab-secure-membership-v20260720.mjs
+
+      - name: Diagnosticar autorización después de la reparación
+        id: diagnostic
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs
+
+      - name: Publicar evidencias sanitizadas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-membership-repair-verify-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/membership-contract-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Actualizar evidencia observable en PR 5
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          TARGET_PR: "5"
+          MEMBERSHIP_PATH: orbit360-platform/runtime-gate-crm-v20260716/membership-contract-sanitized.json
+          DIAGNOSTIC_PATH: orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
+          REPAIR_OUTCOME: ${{ steps.repair.outcome }}
+          DIAGNOSTIC_OUTCOME: ${{ steps.diagnostic.outcome }}
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+        with:
+          script: |
+            const fs = require('fs');
+            const read = (path, fallback) => fs.existsSync(path)
+              ? JSON.parse(fs.readFileSync(path, 'utf8'))
+              : fallback;
+            const membership = read(process.env.MEMBERSHIP_PATH, {
+              classification: 'MEMBERSHIP_EVIDENCE_MISSING', checks: {}, ok: false
+            });
+            const diagnostic = read(process.env.DIAGNOSTIC_PATH, {
+              classification: 'DIAGNOSTIC_EVIDENCE_MISSING', checks: {}, cloudRunIam: {}, errors: {}, ok: false
+            });
+            const m = membership.checks || {};
+            const d = diagnostic.checks || {};
+            const errors = diagnostic.errors || {};
+            const errorLines = Object.keys(errors).length
+              ? Object.entries(errors).map(([key, value]) => `- ${key}: \`${String(value).slice(0, 120)}\``).join('\n')
+              : '- ninguno';
+            const membershipStart = '<!-- ORBIT360_MEMBERSHIP_REPAIR_START -->';
+            const membershipEnd = '<!-- ORBIT360_MEMBERSHIP_REPAIR_END -->';
+            const providerStart = '<!-- ORBIT360_PROVIDER_DIAGNOSTIC_START -->';
+            const providerEnd = '<!-- ORBIT360_PROVIDER_DIAGNOSTIC_END -->';
+            const membershipBlock = `${membershipStart}
+            ## Reparación sanitizada de membresía LAB
+
+            \`\`\`txt
+            run: ${process.env.RUN_ID}
+            HEAD evaluado: ${process.env.HEAD_SHA}
+            resultado técnico: ${process.env.REPAIR_OUTCOME}
+            clasificación: ${membership.classification || 'UNCLASSIFIED'}
+            cambio aplicado: ${membership.changed === true}
+            campos modificados: ${Number(membership.changedFieldCount || 0)}
+            ok: ${membership.ok === true}
+            \`\`\`
+
+            - Roles canónicos asignados: **${m.rolesAssigned === true}**
+            - Rol activo asignado: **${m.activeRoleAssigned === true}**
+            - Rol predeterminado asignado: **${m.defaultRoleAssigned === true}**
+            - Países asignados: **${m.countriesAssigned === true}**
+            - Scope general válido: **${m.scopeAll === true}**
+            - Asesor enlazado: **${m.advisorLinked === true}**
+            - Sin campos sensibles: **${m.noSensitiveFields === true}**
+            - Relectura canónica: **${m.canonicalReadback === true}**
+            - Auditoría registrada: **${membership.auditRecorded === true || membership.changed !== true}**
+            - Rollback documentado: **${membership.rollbackDocumented === true || membership.changed !== true}**
+
+            La reparación se limitó a la membresía LAB; no tocó clientes, aseguradoras ni credenciales.
+            ${membershipEnd}`;
+            const providerBlock = `${providerStart}
+            ## Diagnóstico sanitizado del proveedor seguro
+
+            \`\`\`txt
+            run: ${process.env.RUN_ID}
+            HEAD evaluado: ${process.env.HEAD_SHA}
+            modo: read_only posterior a reparación
+            resultado técnico: ${process.env.DIAGNOSTIC_OUTCOME}
+            revisión: ${diagnostic.diagnosticRevision || 'missing'}
+            método IAM: ${diagnostic.iamReadMethod || 'missing'}
+            clasificación: ${diagnostic.classification || 'UNCLASSIFIED'}
+            \`\`\`
+
+            - Membresía autorizaría la operación: **${d.membershipAuthorizationWouldPass === true}**
+            - Función activa: **${d.functionActive === true}**
+            - Cuenta ejecutora coincide: **${d.runtimeServiceAccountMatches === true}**
+            - Política Cloud Run legible: **${diagnostic.cloudRunIam?.readable === true}**
+            - Ingreso callable invocable: **${d.publicCallableIngress === true}**
+
+            Causa candidata: ${String(diagnostic.rootCauseCandidate || 'No determinada.').slice(0, 500)}
+
+            Errores sanitizados:
+            ${errorLines}
+
+            El diagnóstico no abrió el importador, no invocó el proveedor y no escribió datos operativos.
+            ${providerEnd}`;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = Number(process.env.TARGET_PR);
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+            let body = pr.body || '';
+            const replace = (text, start, end, block) => {
+              const pattern = new RegExp(`${start}[\\s\\S]*?${end}`, 'm');
+              return pattern.test(text) ? text.replace(pattern, block) : `${text.trim()}\n\n${block}\n`;
+            };
+            body = replace(body, membershipStart, membershipEnd, membershipBlock);
+            body = replace(body, providerStart, providerEnd, providerBlock);
+            await github.rest.pulls.update({ owner, repo, pull_number, body });
+
+      - name: Limpiar cuenta temporal
+        if: always()
+        shell: bash
+        run: rm -f "${RUNNER_TEMP}/orbit360-firebase-lab.json"
+
+      - name: Sellar resultado del bloque
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const membershipPath = process.env.ORBIT360_MEMBERSHIP_EVIDENCE;
+          const diagnosticPath = process.env.ORBIT360_PROVIDER_AUTH_DIAGNOSTIC;
+          if (!fs.existsSync(membershipPath)) throw new Error('MEMBERSHIP_EVIDENCE_MISSING');
+          if (!fs.existsSync(diagnosticPath)) throw new Error('DIAGNOSTIC_EVIDENCE_MISSING');
+          const membership = JSON.parse(fs.readFileSync(membershipPath, 'utf8'));
+          const diagnostic = JSON.parse(fs.readFileSync(diagnosticPath, 'utf8'));
+          if (membership.ok !== true) throw new Error('MEMBERSHIP_REPAIR_NOT_CANONICAL');
+          if (diagnostic.diagnosticComplete !== true) throw new Error('PROVIDER_DIAGNOSTIC_INCOMPLETE');
+          if (diagnostic.checks?.membershipAuthorizationWouldPass !== true) {
+            throw new Error('MEMBERSHIP_AUTHORIZATION_STILL_BLOCKED');
+          }
+          console.log(`ORBIT360_MEMBERSHIP_REPAIR_VERIFY_OK:${diagnostic.classification}`);
+          NODE
