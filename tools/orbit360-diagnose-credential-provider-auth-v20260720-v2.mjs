@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import { GoogleAuth } from 'google-auth-library';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
@@ -9,11 +10,21 @@ const REGION = 'us-central1';
 const TENANT_ID = 'alianzas-soluciones';
 const EXPECTED_UID = 'woJlxR1iFEeiQZvTscPj4qQ5Qc73';
 const EXPECTED_EMAIL = 'orbit.lab@demo.com';
-const FUNCTION_ID = 'orbit360ImportInsurerCredentials';
 const EXPECTED_RUNTIME_SA = 'orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com';
+const FUNCTION_IDS = [
+  'orbit360ImportInsurerCredentials',
+  'orbit360CredentialStatus',
+  'orbit360RevealInsurerCredential',
+  'orbit360CopyInsurerCredential'
+];
+const PRIMARY_FUNCTION_ID = FUNCTION_IDS[0];
 const OUTPUT = process.env.ORBIT360_PROVIDER_AUTH_DIAGNOSTIC ||
   'orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json';
 const IMPORT_ROLES = new Set(['direccion', 'superadmin', 'super_admin', 'admin', 'admintenant', 'admin_tenant']);
+const REFERENCE_RUN_ID = String(process.env.ORBIT360_REFERENCE_DEPLOY_RUN_ID || '29781660851');
+const REFERENCE_START = String(process.env.ORBIT360_REFERENCE_DEPLOY_START || '2026-07-20T21:49:46Z');
+const REFERENCE_END = String(process.env.ORBIT360_REFERENCE_DEPLOY_END || '2026-07-20T21:53:15Z');
+const WINDOW_PAD_MS = 5 * 60 * 1000;
 
 const runtimeProject = String(process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || '');
 if (runtimeProject !== PROJECT_ID) throw new Error('BLOQUEO_PROYECTO_LAB_PROVIDER_DIAGNOSTIC');
@@ -55,6 +66,25 @@ function category(error, fallback) {
     .replace(/[^A-Za-z0-9_.:/-]+/g, '_');
 }
 
+function hashValue(value) {
+  const text = clean(value, 2000);
+  return text ? crypto.createHash('sha256').update(text).digest('hex') : '';
+}
+
+function safeTimestamp(value) {
+  const text = clean(value, 80);
+  const time = Date.parse(text);
+  return Number.isFinite(time) ? new Date(time).toISOString() : '';
+}
+
+function withinReferenceWindow(value) {
+  const time = Date.parse(String(value || ''));
+  const start = Date.parse(REFERENCE_START);
+  const end = Date.parse(REFERENCE_END);
+  if (![time, start, end].every(Number.isFinite)) return false;
+  return time >= start - WINDOW_PAD_MS && time <= end + WINDOW_PAD_MS;
+}
+
 function summarizePolicy(policy) {
   const bindings = Array.isArray(policy?.bindings) ? policy.bindings : [];
   const invoker = bindings.filter(binding => clean(binding?.role, 160) === 'roles/run.invoker');
@@ -69,6 +99,23 @@ function summarizePolicy(policy) {
     userInvokerCount: members.filter(value => /^user:/i.test(value)).length,
     groupInvokerCount: members.filter(value => /^group:/i.test(value)).length
   };
+}
+
+function summarizeStateMessages(messages) {
+  return (Array.isArray(messages) ? messages : []).slice(0, 12).map((item) => ({
+    severity: clean(item?.severity, 40),
+    type: clean(item?.type, 100),
+    messageHash: hashValue(item?.message || '')
+  }));
+}
+
+function summarizeTraffic(statuses) {
+  return (Array.isArray(statuses) ? statuses : []).slice(0, 12).map((item) => ({
+    type: clean(item?.type, 40),
+    percent: Number.isFinite(Number(item?.percent)) ? Number(item.percent) : 0,
+    revisionHash: hashValue(item?.revision || ''),
+    tagPresent: Boolean(item?.tag)
+  }));
 }
 
 async function accessToken() {
@@ -107,17 +154,25 @@ function write(report) {
 }
 
 const report = {
-  schemaVersion: 'orbit360-provider-authorization-diagnostic-v2',
-  diagnosticRevision: 'membership-sources-and-iam-get-v2',
+  schemaVersion: 'orbit360-provider-authorization-diagnostic-v3-four-functions-readonly',
+  diagnosticRevision: 'provider-revisions-readonly-v3',
   projectId: PROJECT_ID,
   region: REGION,
   tenantId: TENANT_ID,
-  functionId: FUNCTION_ID,
+  functionId: PRIMARY_FUNCTION_ID,
+  functionIds: FUNCTION_IDS,
   mode: 'read_only',
   iamReadMethod: 'GET',
+  referenceDeployRun: {
+    runId: REFERENCE_RUN_ID,
+    startAt: safeTimestamp(REFERENCE_START),
+    endAt: safeTimestamp(REFERENCE_END),
+    comparisonPaddingMs: WINDOW_PAD_MS
+  },
   checks: {},
   membership: {},
   deployment: {},
+  functions: [],
   cloudRunIam: {},
   functionIam: {},
   errors: {}
@@ -167,77 +222,170 @@ try {
 
 try {
   const token = await accessToken();
-  const functionName = `projects/${PROJECT_ID}/locations/${REGION}/functions/${FUNCTION_ID}`;
-  const functionData = await apiGet(token, `https://cloudfunctions.googleapis.com/v2/${functionName}`);
-  const serviceResource = clean(functionData?.serviceConfig?.service, 360);
-  report.deployment = {
-    state: clean(functionData?.state, 80),
-    environment: clean(functionData?.environment, 80),
-    updateTimePresent: Boolean(functionData?.updateTime),
-    serviceResourcePresent: Boolean(serviceResource),
-    uriPresent: Boolean(functionData?.serviceConfig?.uri),
-    runtimeServiceAccountMatches: clean(functionData?.serviceConfig?.serviceAccountEmail, 240) === EXPECTED_RUNTIME_SA,
-    ingressSettings: clean(functionData?.serviceConfig?.ingressSettings, 100),
-    allTrafficOnLatestRevision: functionData?.serviceConfig?.allTrafficOnLatestRevision === true
-  };
-  report.checks.functionActive = report.deployment.state === 'ACTIVE';
-  report.checks.runtimeServiceAccountMatches = report.deployment.runtimeServiceAccountMatches;
-
-  try {
-    const functionPolicy = await apiGet(token, `https://cloudfunctions.googleapis.com/v2/${functionName}:getIamPolicy`);
-    report.functionIam = summarizePolicy(functionPolicy);
-  } catch (error) {
-    report.functionIam = { readable: false };
-    report.errors.functionIam = category(error, 'FUNCTION_IAM_UNREADABLE');
-  }
-
-  if (serviceResource) {
+  for (const functionId of FUNCTION_IDS) {
+    const functionName = `projects/${PROJECT_ID}/locations/${REGION}/functions/${functionId}`;
+    const row = {
+      functionId,
+      exists: false,
+      state: '',
+      environment: '',
+      createTime: '',
+      updateTime: '',
+      updatedDuringReferenceRun: false,
+      runtime: '',
+      entryPointMatches: false,
+      serviceResourcePresent: false,
+      uriPresent: false,
+      runtimeServiceAccountMatches: false,
+      ingressSettings: '',
+      allTrafficOnLatestRevision: false,
+      stateMessages: [],
+      cloudRun: {},
+      functionIam: {},
+      cloudRunIam: {},
+      errors: {}
+    };
     try {
-      const runService = await apiGet(token, `https://run.googleapis.com/v2/${serviceResource}`);
-      report.deployment.cloudRunIngress = clean(runService?.ingress, 100);
-      report.deployment.cloudRunUriPresent = Boolean(runService?.uri);
-    } catch (error) {
-      report.errors.cloudRunService = category(error, 'CLOUD_RUN_SERVICE_UNREADABLE');
-    }
+      const functionData = await apiGet(token, `https://cloudfunctions.googleapis.com/v2/${functionName}`);
+      const serviceResource = clean(functionData?.serviceConfig?.service, 500);
+      row.exists = true;
+      row.state = clean(functionData?.state, 80);
+      row.environment = clean(functionData?.environment, 80);
+      row.createTime = safeTimestamp(functionData?.createTime);
+      row.updateTime = safeTimestamp(functionData?.updateTime);
+      row.updatedDuringReferenceRun = withinReferenceWindow(functionData?.updateTime);
+      row.runtime = clean(functionData?.buildConfig?.runtime, 80);
+      row.entryPointMatches = clean(functionData?.buildConfig?.entryPoint, 160) === functionId;
+      row.serviceResourcePresent = Boolean(serviceResource);
+      row.uriPresent = Boolean(functionData?.serviceConfig?.uri);
+      row.runtimeServiceAccountMatches = clean(functionData?.serviceConfig?.serviceAccountEmail, 240) === EXPECTED_RUNTIME_SA;
+      row.ingressSettings = clean(functionData?.serviceConfig?.ingressSettings, 100);
+      row.allTrafficOnLatestRevision = functionData?.serviceConfig?.allTrafficOnLatestRevision === true;
+      row.stateMessages = summarizeStateMessages(functionData?.stateMessages);
 
-    try {
-      const runPolicy = await apiGet(token, `https://run.googleapis.com/v2/${serviceResource}:getIamPolicy`);
-      report.cloudRunIam = summarizePolicy(runPolicy);
-      report.checks.publicCallableIngress = report.cloudRunIam.publicInvoker === true;
+      try {
+        const functionPolicy = await apiGet(token, `https://cloudfunctions.googleapis.com/v2/${functionName}:getIamPolicy`);
+        row.functionIam = summarizePolicy(functionPolicy);
+      } catch (error) {
+        row.functionIam = { readable: false };
+        row.errors.functionIam = category(error, 'FUNCTION_IAM_UNREADABLE');
+      }
+
+      if (serviceResource) {
+        try {
+          const runService = await apiGet(token, `https://run.googleapis.com/v2/${serviceResource}`);
+          row.cloudRun = {
+            readable: true,
+            createTime: safeTimestamp(runService?.createTime),
+            updateTime: safeTimestamp(runService?.updateTime),
+            latestReadyRevisionHash: hashValue(runService?.latestReadyRevision || ''),
+            latestCreatedRevisionHash: hashValue(runService?.latestCreatedRevision || ''),
+            latestReadyMatchesCreated: Boolean(
+              runService?.latestReadyRevision &&
+              runService?.latestCreatedRevision &&
+              runService.latestReadyRevision === runService.latestCreatedRevision
+            ),
+            observedGeneration: clean(runService?.observedGeneration, 80),
+            generation: clean(runService?.generation, 80),
+            ingress: clean(runService?.ingress, 100),
+            uriPresent: Boolean(runService?.uri),
+            trafficStatuses: summarizeTraffic(runService?.trafficStatuses),
+            terminalConditionState: clean(runService?.terminalCondition?.state, 40),
+            terminalConditionType: clean(runService?.terminalCondition?.type, 80),
+            terminalConditionReason: clean(runService?.terminalCondition?.reason, 100),
+            terminalConditionMessageHash: hashValue(runService?.terminalCondition?.message || '')
+          };
+        } catch (error) {
+          row.cloudRun = { readable: false };
+          row.errors.cloudRunService = category(error, 'CLOUD_RUN_SERVICE_UNREADABLE');
+        }
+
+        try {
+          const runPolicy = await apiGet(token, `https://run.googleapis.com/v2/${serviceResource}:getIamPolicy`);
+          row.cloudRunIam = summarizePolicy(runPolicy);
+        } catch (error) {
+          row.cloudRunIam = { readable: false };
+          row.errors.cloudRunIam = category(error, 'CLOUD_RUN_IAM_UNREADABLE');
+        }
+      }
     } catch (error) {
-      report.cloudRunIam = { readable: false };
-      report.errors.cloudRunIam = category(error, 'CLOUD_RUN_IAM_UNREADABLE');
-      report.checks.publicCallableIngress = false;
+      row.errors.functionDescribe = category(error, 'FUNCTION_DESCRIBE_FAILED');
     }
-  } else {
-    report.checks.publicCallableIngress = false;
+    report.functions.push(row);
   }
 } catch (error) {
-  report.errors.deployment = category(error, 'FUNCTION_DESCRIBE_FAILED');
-  report.checks.functionActive = false;
-  report.checks.runtimeServiceAccountMatches = false;
-  report.checks.publicCallableIngress = false;
+  report.errors.accessToken = category(error, 'GOOGLE_ACCESS_TOKEN_UNAVAILABLE');
+}
+
+const primary = report.functions.find((item) => item.functionId === PRIMARY_FUNCTION_ID) || {};
+report.deployment = {
+  state: clean(primary.state, 80),
+  environment: clean(primary.environment, 80),
+  createTime: clean(primary.createTime, 80),
+  updateTime: clean(primary.updateTime, 80),
+  updateTimePresent: Boolean(primary.updateTime),
+  updatedDuringReferenceRun: primary.updatedDuringReferenceRun === true,
+  serviceResourcePresent: primary.serviceResourcePresent === true,
+  uriPresent: primary.uriPresent === true,
+  runtimeServiceAccountMatches: primary.runtimeServiceAccountMatches === true,
+  ingressSettings: clean(primary.ingressSettings, 100),
+  allTrafficOnLatestRevision: primary.allTrafficOnLatestRevision === true,
+  cloudRunIngress: clean(primary.cloudRun?.ingress, 100),
+  cloudRunUriPresent: primary.cloudRun?.uriPresent === true,
+  latestReadyMatchesCreated: primary.cloudRun?.latestReadyMatchesCreated === true
+};
+report.functionIam = primary.functionIam || {};
+report.cloudRunIam = primary.cloudRunIam || {};
+
+report.checks.functionCountExpected = report.functions.length === FUNCTION_IDS.length;
+report.checks.allFunctionsDescribed = report.functions.every((item) => item.exists === true);
+report.checks.allFunctionsActive = report.functions.every((item) => item.state === 'ACTIVE');
+report.checks.functionActive = primary.state === 'ACTIVE';
+report.checks.allEntryPointsMatch = report.functions.every((item) => item.entryPointMatches === true);
+report.checks.allRuntimeServiceAccountsMatch = report.functions.every((item) => item.runtimeServiceAccountMatches === true);
+report.checks.runtimeServiceAccountMatches = primary.runtimeServiceAccountMatches === true;
+report.checks.allCloudRunServicesReadable = report.functions.every((item) => item.cloudRun?.readable === true);
+report.checks.allLatestRevisionsReady = report.functions.every((item) => item.cloudRun?.latestReadyMatchesCreated === true);
+report.checks.allCloudRunIamReadable = report.functions.every((item) => item.cloudRunIam?.readable === true);
+report.checks.allCallableIngress = report.functions.every((item) => item.cloudRunIam?.publicInvoker === true);
+report.checks.publicCallableIngress = primary.cloudRunIam?.publicInvoker === true;
+report.checks.functionsUpdatedDuringReferenceRun = report.functions.filter((item) => item.updatedDuringReferenceRun === true).length;
+report.checks.noStateMessages = report.functions.every((item) => item.stateMessages.length === 0);
+
+const updatedCount = report.checks.functionsUpdatedDuringReferenceRun;
+if (report.checks.allFunctionsDescribed !== true || report.checks.allFunctionsActive !== true) {
+  report.deploymentClassification = 'DEPLOYMENT_REVISION_INCONSISTENT';
+} else if (updatedCount === FUNCTION_IDS.length) {
+  report.deploymentClassification = 'DEPLOYMENT_CONFIRMED_CURRENT';
+} else if (updatedCount > 0) {
+  report.deploymentClassification = 'DEPLOYMENT_PARTIAL';
+} else {
+  report.deploymentClassification = 'DEPLOYMENT_NOT_APPLIED';
 }
 
 if (report.checks.membershipAuthorizationWouldPass === false) {
   report.classification = 'DATA_CONTRACT_FAILURE_MEMBERSHIP';
   report.rootCauseCandidate = 'La membresía efectiva aún no contiene el rol activo dentro de roles canónicos asignados.';
-} else if (report.checks.functionActive !== true || report.checks.runtimeServiceAccountMatches !== true) {
+} else if (
+  report.checks.allFunctionsActive !== true ||
+  report.checks.allRuntimeServiceAccountsMatch !== true ||
+  report.checks.allEntryPointsMatch !== true
+) {
   report.classification = 'ENVIRONMENT_FAILURE_PROVIDER_DEPLOYMENT';
-  report.rootCauseCandidate = 'La función desplegada o su cuenta ejecutora no coinciden con el contrato vigente.';
-} else if (report.cloudRunIam.readable !== true) {
+  report.rootCauseCandidate = 'Una o más Functions no están activas o no coinciden con el contrato de runtime vigente.';
+} else if (report.checks.allCloudRunIamReadable !== true) {
   report.classification = 'ENVIRONMENT_FAILURE_IAM_POLICY_UNREADABLE';
-  report.rootCauseCandidate = 'La política IAM del servicio no pudo leerse con el método GET correcto.';
-} else if (report.checks.publicCallableIngress !== true) {
+  report.rootCauseCandidate = 'La política IAM de uno o más servicios no pudo leerse con el método GET correcto.';
+} else if (report.checks.allCallableIngress !== true) {
   report.classification = 'ENVIRONMENT_FAILURE_CALLABLE_INVOKER';
-  report.rootCauseCandidate = 'El servicio Cloud Run no tiene un invocador público compatible con el protocolo callable de Firebase.';
+  report.rootCauseCandidate = 'Uno o más servicios Cloud Run no tienen un invocador público compatible con el protocolo callable de Firebase.';
 } else {
   report.classification = 'PROVIDER_AUTHORIZATION_LAYER_READY';
-  report.rootCauseCandidate = 'Membresía, despliegue e ingreso callable cumplen el contrato previo a una invocación controlada.';
+  report.rootCauseCandidate = 'Membresía, Functions, cuentas ejecutoras e ingreso callable cumplen el contrato previo a una invocación controlada.';
 }
 
 report.diagnosticComplete = true;
 report.providerAuthorizationReady = report.classification === 'PROVIDER_AUTHORIZATION_LAYER_READY';
 report.ok = true;
 write(report);
-console.log(`ORBIT360_PROVIDER_AUTH_DIAGNOSTIC_V2:${report.classification}`);
+console.log(`ORBIT360_PROVIDER_AUTH_DIAGNOSTIC_V3:${report.deploymentClassification}:${report.classification}`);
