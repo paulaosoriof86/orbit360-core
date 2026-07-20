@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   preflight:
@@ -25,9 +26,16 @@ jobs:
           ref: ays/backend-tenant-lab-v99-20260703
 
       - name: Validar contrato del gate M1
+        id: contract
+        continue-on-error: true
         env:
           ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-        run: node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+        run: |
+          set +e
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Publicar evidencia sanitizada
         if: always()
@@ -38,4 +46,42 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-# Disparo aislado posterior al alta del workflow; no ejecuta deploy ni navegador.
+      - name: Publicar estado sanitizado en PR 5
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXIT_CODE: ${{ steps.contract.outputs.exit_code }}
+        run: |
+          node - <<'NODE' > /tmp/preflight-comment.md
+          const fs = require('fs');
+          const file = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
+          let data = {};
+          try { data = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (_) {}
+          const lines = [
+            '### Preflight aislado M1',
+            '',
+            '- Estado: `' + (data.status || 'SIN_EVIDENCIA') + '`',
+            '- Clasificación: `' + (data.classification || 'NINGUNA') + '`',
+            '- Contrato: `' + (data.contractVersion || '') + '`',
+            '- Diagnóstico: `' + (data.diagnosticRevision || '') + '`',
+            '- Checks: `' + (data.passed || 0) + '/' + (data.total || 0) + '`',
+            '- Fallos: `' + (data.failed || 0) + '`',
+            '- Run: `' + process.env.GITHUB_RUN_ID + '`',
+            '- Commit: `' + process.env.GITHUB_SHA + '`',
+            '',
+            'No ejecutó deploy, navegador, Firebase ni escritura de datos.'
+          ];
+          if (Array.isArray(data.failedCheckIds) && data.failedCheckIds.length) {
+            lines.push('', 'Primeros checks fallidos:', '', ...data.failedCheckIds.slice(0, 10).map(x => '- `' + x + '`'));
+          }
+          process.stdout.write(lines.join('\n'));
+          NODE
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/preflight-comment.md
+
+      - name: Fallar si no hubo GO_GATE_CONTRACT
+        if: always()
+        env:
+          EXIT_CODE: ${{ steps.contract.outputs.exit_code }}
+        run: test "${EXIT_CODE:-41}" = "0"
+
+# Control aislado: no ejecuta deploy, navegador ni acceso a secretos.
