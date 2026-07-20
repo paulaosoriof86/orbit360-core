@@ -1,4 +1,4 @@
-name: Orbit 360 Secure Handoff Module Resolution Fix 20260720
+name: Orbit 360 Secure Credential Handoff Key V2 20260720
 
 on:
   push:
@@ -8,21 +8,23 @@ on:
       - ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
 concurrency:
-  group: orbit360-secure-handoff-module-resolution-fix-v20260720
+  group: orbit360-secure-credential-handoff-key-v2-20260720
   cancel-in-progress: false
 
 jobs:
-  fix_module_resolution:
-    name: Aseguradoras · corregir mecanismo de carga Firebase
+  prepare_key:
+    name: Aseguradoras · segunda llave efímera para handoff cifrado
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     env:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
-      TARGET: tools/orbit360-apply-secure-credentials-handoff-v20260720.mjs
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      HANDOFF_SECRET_ID: orbit360-credential-handoff-key-20260720-v2
+      SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     steps:
       - name: Checkout rama autorizada
         uses: actions/checkout@v4
@@ -35,72 +37,70 @@ jobs:
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          grep -Fq "createRequire(new URL('../functions/package.json', import.meta.url))" tools/orbit360-apply-secure-credentials-handoff-v20260720.mjs
 
-      - name: Instalar dependencias declaradas
+      - name: Resolver principal LAB
         shell: bash
         run: |
           set -euo pipefail
-          npm install --prefix functions --ignore-scripts --no-audit --no-fund
-          npm --prefix functions run check
+          test -n "${SA_PRIMARY:-}"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SA_PRIMARY" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "DEPLOYER_EMAIL=$(jq -r '.client_email // empty' "$KEY_FILE")" >> "$GITHUB_ENV"
 
-      - name: Corregir exclusivamente resolución de módulos
+      - name: Instalar Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ays-orbit-360-lab
+
+      - name: Crear segunda llave efímera
         shell: bash
         run: |
           set -euo pipefail
-          node --input-type=module <<'NODE'
-          import { readFileSync, writeFileSync } from 'node:fs';
-          const path = process.env.TARGET;
-          let source = readFileSync(path, 'utf8');
-          const before = `const require = createRequire(import.meta.url);
-          const { initializeApp, cert, getApps } = require('../functions/node_modules/firebase-admin/app');
-          const { getAuth } = require('../functions/node_modules/firebase-admin/auth');
-          const { getFirestore } = require('../functions/node_modules/firebase-admin/firestore');`;
-          const after = `const require = createRequire(new URL('../functions/package.json', import.meta.url));
-          const { initializeApp, cert, getApps } = require('firebase-admin/app');
-          const { getAuth } = require('firebase-admin/auth');
-          const { getFirestore } = require('firebase-admin/firestore');`;
-          if (source.includes(after)) {
-            console.log('Resolución ya corregida');
-          } else {
-            if (!source.includes(before)) throw new Error('MODULE_RESOLUTION_SIGNATURE_NOT_FOUND');
-            source = source.replace(before, after);
-            writeFileSync(path, source);
-          }
-          NODE
+          OUT_DIR="orbit360-platform/runtime-gate-crm-v20260716"
+          mkdir -p "$OUT_DIR"
+          PRIVATE_KEY="${RUNNER_TEMP}/handoff-private-v2.pem"
+          PUBLIC_KEY="$OUT_DIR/handoff-public-v2.pem"
+          DIAG="$OUT_DIR/handoff-key-v2-sanitized.json"
 
-      - name: Validar mecanismo corregido
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check "$TARGET"
-          node - <<'NODE'
-          const { createRequire } = require('node:module');
-          const { pathToFileURL } = require('node:url');
-          const { resolve } = require('node:path');
-          const req = createRequire(pathToFileURL(resolve('functions/package.json')));
-          const app = req('firebase-admin/app');
-          const auth = req('firebase-admin/auth');
-          const firestore = req('firebase-admin/firestore');
-          if (!app.initializeApp || !auth.getAuth || !firestore.getFirestore) process.exit(41);
-          console.log('GO_FIREBASE_ADMIN_MODULE_RESOLUTION');
-          NODE
-          grep -Fq "createRequire(new URL('../functions/package.json', import.meta.url))" "$TARGET"
-          grep -Fq "require('firebase-admin/app')" "$TARGET"
+          gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project="$FIREBASE_PROJECT_ID" >/dev/null
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out "$PRIVATE_KEY" >/dev/null 2>&1
+          openssl pkey -in "$PRIVATE_KEY" -pubout -out "$PUBLIC_KEY" >/dev/null 2>&1
+          chmod 600 "$PRIVATE_KEY"
 
-      - name: Persistir corrección validada
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "orbit360-gate-bot"
-          git config user.email "orbit360-gate-bot@users.noreply.github.com"
-          git add "$TARGET"
-          if git diff --cached --quiet; then echo 'Sin cambios'; exit 0; fi
-          git commit -m "fix(security): resolver firebase-admin desde package contract [skip ci]"
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          if gcloud secrets describe "$HANDOFF_SECRET_ID" --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1; then
+            gcloud secrets versions add "$HANDOFF_SECRET_ID" --data-file="$PRIVATE_KEY" --project "$FIREBASE_PROJECT_ID" >/dev/null
+          else
+            gcloud secrets create "$HANDOFF_SECRET_ID" --replication-policy=automatic --data-file="$PRIVATE_KEY" --project "$FIREBASE_PROJECT_ID" >/dev/null
+          fi
 
-      - name: Comentar diagnóstico sanitizado en PR 5
+          FINGERPRINT="$(openssl pkey -pubin -in "$PUBLIC_KEY" -outform DER 2>/dev/null | sha256sum | awk '{print $1}')"
+          jq -n \
+            --arg run "$GITHUB_RUN_ID" \
+            --arg commit "$GITHUB_SHA" \
+            --arg fingerprint "$FINGERPRINT" \
+            '{schemaVersion:"orbit360-secure-handoff-key-v2",containsSecrets:false,containsPII:false,ok:true,keyReady:true,algorithm:"RSA-OAEP-4096+AES-256-GCM",run:$run,commit:$commit,publicKeyFingerprint:$fingerprint}' > "$DIAG"
+          shred -u "$PRIVATE_KEY" || rm -f "$PRIVATE_KEY"
+
+      - name: Publicar solo llave pública y evidencia sanitizada
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-secure-handoff-public-key-v2-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/handoff-public-v2.pem
+            orbit360-platform/runtime-gate-crm-v20260716/handoff-key-v2-sanitized.json
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Comentar resultado sanitizado en PR 5
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body '### Causa raíz del primer intento de handoff\n\n- Clasificación: **PIPELINE_MECHANISM_FAILURE**\n- Capa corregida: resolución local de `firebase-admin` en el ejecutor efímero.\n- Validación: `GO_FIREBASE_ADMIN_MODULE_RESOLUTION`\n- Datos modificados: **ninguno**\n- Secretos expuestos: **ninguno**\n- Run: `'$GITHUB_RUN_ID'`\n- Commit evaluado: `'$GITHUB_SHA'`\n\nNo se reintentó la importación durante este diagnóstico.'
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/handoff-key-v2-sanitized.json"
+          FINGERPRINT="$(jq -r '.publicKeyFingerprint' "$FILE")"
+          printf -v BODY '### Segundo handoff cifrado · llave regenerada\n\n- Resultado: **OK**\n- Algoritmo: `RSA-OAEP-4096 + AES-256-GCM`\n- Huella pública: `%s`\n- Run: `%s`\n- Commit: `%s`\n\nLa primera llave fue destruida. Esta nueva llave privada permanece exclusivamente en Secret Manager y se eliminará al concluir el intento corregido.' "$FINGERPRINT" "$GITHUB_RUN_ID" "$GITHUB_SHA"
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "$BODY"
