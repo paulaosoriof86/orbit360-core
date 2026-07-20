@@ -469,7 +469,7 @@ Orbit.insurerDirectoryImport = (function () {
     (out.cuentas || []).forEach(c => { delete c.numero; delete c.accountNumber; });
     return out;
   }
-  function applyApproved(result, confirmation) {
+  async function applyApproved(result, confirmation) {
     if (!canManage()) return { ok: false, errors: ['permiso_importacion_denegado'] };
     if (!result || !result.report) return { ok: false, errors: ['dry_run_requerido'] };
     if (!confirmation || confirmation.approved !== true || confirmation.phrase !== CONFIRM_PHRASE || !clean(confirmation.reason)) return { ok: false, errors: ['confirmacion_reforzada_requerida'] };
@@ -507,7 +507,11 @@ Orbit.insurerDirectoryImport = (function () {
     const secureItems = (secureSession.get(result.report.reportId) || []).filter(x => appliedSheets.has(x.insurerSheet));
     let secureStatus = 'backend_required';
     if (typeof secureProvider === 'function' && secureItems.length) {
-      try { secureProvider({ tenantId: tenantId(), sourceFileName: result.report.sourceFileName, sourceHash: result.report.sourceHash, items: secureItems }); secureStatus = 'enviado_backend_seguro'; } catch (e) { secureStatus = 'backend_error'; }
+      try {
+        const remote = await secureProvider({ tenantId: tenantId(), sourceFileName: result.report.sourceFileName, sourceHash: result.report.sourceHash, items: secureItems });
+        if (!remote || remote.ok !== true) throw new Error('confirmacion_remota_incompleta');
+        secureStatus = 'confirmado_backend_seguro';
+      } catch (e) { secureStatus = 'backend_error'; }
     } else if (!secureItems.length) secureStatus = 'sin_sensibles';
     try {
       S().insert('actividades', { id: 'act_' + Date.now().toString(36), tenantId: tenantId(), tipo: 'importacion', icon: '🏢', fecha: today(), titulo: 'Directorio de aseguradoras importado', detalle: inserted + ' creadas · ' + updated + ' actualizadas · ' + blocked.length + ' pendientes · sensibles: ' + secureStatus, fuente: SOURCE_TYPE });
@@ -516,6 +520,27 @@ Orbit.insurerDirectoryImport = (function () {
     if (A().audit) A().audit('aplicar_directorio_aseguradoras', 'aseguradoras', result.report.reportId, null, { inserted, updated, blocked: blocked.length, secureStatus }, confirmation.reason, { sourceHash: result.report.sourceHash, sourceFileName: result.report.sourceFileName, confirmationPhrase: CONFIRM_PHRASE });
     return { ok: true, inserted, updated, blocked: blocked.length, secureStatus };
   }
+  async function applySecureOnly(result, confirmation) {
+    if (!canManage()) return { ok: false, errors: ['permiso_importacion_denegado'] };
+    if (!result || !result.report) return { ok: false, errors: ['dry_run_requerido'] };
+    if (!confirmation || confirmation.approved !== true || confirmation.phrase !== CONFIRM_PHRASE || !clean(confirmation.reason)) return { ok: false, errors: ['confirmacion_reforzada_requerida'] };
+    const operations = result.report._operations || [];
+    const validSheets = new Set(operations.filter(op => !(op.data && (op.data.requiereValidacion || op.data.validationStatus !== 'validado'))).map(op => op.sourceSheet));
+    const secureItems = (secureSession.get(result.report.reportId) || []).filter(item => item && item.type === 'credential' && validSheets.has(item.insurerSheet));
+    const secureProvider = Orbit.secureImport && Orbit.secureImport.importInsurerDirectory;
+    if (!secureItems.length) { secureSession.delete(result.report.reportId); return { ok: true, imported: 0, secureStatus: 'sin_sensibles', validSheets: validSheets.size }; }
+    if (typeof secureProvider !== 'function') return { ok: false, errors: ['backend_operativo_requerido_para_aplicar_datos_reales'] };
+    try {
+      const remote = await secureProvider({ tenantId: tenantId(), sourceFileName: result.report.sourceFileName, sourceHash: result.report.sourceHash, items: secureItems });
+      if (!remote || remote.ok !== true) throw new Error('confirmacion_remota_incompleta');
+      secureSession.delete(result.report.reportId);
+      if (A().audit) A().audit('aplicar_accesos_aseguradoras_secure_only', 'aseguradoras', result.report.reportId, null, { imported: Number(remote.imported || 0), validSheets: validSheets.size, blockedSheets: Math.max(0, operations.length - validSheets.size), containsSecrets: false }, confirmation.reason, { sourceHash: result.report.sourceHash, sourceFileName: result.report.sourceFileName, confirmationPhrase: CONFIRM_PHRASE });
+      return { ok: true, imported: Number(remote.imported || 0), mappings: [].concat(remote.mappings || []), secureStatus: 'confirmado_backend_seguro', validSheets: validSheets.size, blockedSheets: Math.max(0, operations.length - validSheets.size), containsSecrets: false };
+    } catch (error) {
+      return { ok: false, errors: ['confirmacion_remota_incompleta'], errorCode: clean(error && (error.code || error.message), 120) };
+    }
+  }
+  applySecureOnly.__secureOnlyV20260720 = true;
   function esc(v) { return U().esc ? U().esc(String(v == null ? '' : v)) : clean(v); }
   function toast(v) { try { U().toast(v); } catch (e) {} }
   function close() { const b = document.getElementById('ins-dir-import-v1202'); if (b) b.remove(); if (uiState && uiState.result && uiState.result.report) secureSession.delete(uiState.result.report.reportId); uiState = null; }
@@ -551,7 +576,7 @@ Orbit.insurerDirectoryImport = (function () {
       const reason = clean(await U().prompt('Motivo de la importación:', { title: 'Confirmar directorio' }));
       if (!reason) return;
       const phrase = clean(await U().prompt('Escribe exactamente: ' + CONFIRM_PHRASE, { title: 'Confirmación reforzada' }));
-      const applied = applyApproved(result, { approved: true, phrase, reason, applyValidOnly: true });
+      const applied = await applyApproved(result, { approved: true, phrase, reason, applyValidOnly: true });
       if (!applied.ok) return toast('No se aplicó: ' + (applied.errors || []).join(', '));
       const done = uiState && uiState.options && uiState.options.onDone;
       close(); toast(applied.inserted + ' aseguradora(s) creada(s) · ' + applied.updated + ' actualizada(s) · ' + applied.blocked + ' pendiente(s). Recursos sensibles: ' + applied.secureStatus);
@@ -569,6 +594,6 @@ Orbit.insurerDirectoryImport = (function () {
 
   return {
     SOURCE_TYPE, CONFIRM_PHRASE, canManage, normalizeName, namesCompatible, safeUrl,
-    parseMatrices, parseFile, buildOperations, buildDryRun, applyApproved, open, close
+    parseMatrices, parseFile, buildOperations, buildDryRun, applyApproved, applySecureOnly, open, close
   };
 })();
