@@ -1,4 +1,4 @@
-name: Orbit 360 Functions Deploy Readonly Diagnosis 20260720
+name: Orbit 360 Functions State Readonly 20260720
 
 on:
   push:
@@ -11,19 +11,16 @@ permissions:
   contents: read
   pull-requests: write
 
-concurrency:
-  group: orbit360-functions-deploy-readonly-diagnosis-v20260720
-  cancel-in-progress: false
-
 jobs:
   diagnose:
-    name: Credenciales Aseguradoras · diagnóstico Functions solo lectura
+    name: Credenciales Aseguradoras · estado Functions
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 10
     env:
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
       REGION: us-central1
+      EXPECTED_RUNTIME_SA: orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com
       SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     steps:
       - name: Checkout rama autorizada
@@ -32,168 +29,67 @@ jobs:
           ref: ays/backend-tenant-lab-v99-20260703
 
       - name: Preflight vinculante
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+        run: node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
 
       - name: Resolver principal existente
         shell: bash
         run: |
           set -euo pipefail
-          test -n "${SA_PRIMARY:-}"
           KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
           printf '%s' "$SA_PRIMARY" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
-          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
-          DEPLOYER_EMAIL="$(jq -r '.client_email // empty' "$KEY_FILE")"
-          test -n "$DEPLOYER_EMAIL"
+          test "$(jq -r '.project_id' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          echo "DEPLOYER_EMAIL=$DEPLOYER_EMAIL" >> "$GITHUB_ENV"
+          echo "DEPLOYER_EMAIL=$(jq -r '.client_email' "$KEY_FILE")" >> "$GITHUB_ENV"
 
       - name: Instalar Google Cloud CLI
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ays-orbit-360-lab
 
-      - name: Diagnosticar permisos y recursos sin modificar infraestructura
+      - name: Consultar estado sin modificar recursos
         shell: bash
         run: |
           set -euo pipefail
           OUT_DIR="orbit360-platform/runtime-gate-crm-v20260716"
-          OUT="$OUT_DIR/functions-deploy-readonly-diagnostic.json"
+          OUT="$OUT_DIR/functions-state-readonly.json"
           mkdir -p "$OUT_DIR"
-
           gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project="$FIREBASE_PROJECT_ID" >/dev/null
-          gcloud config set project "$FIREBASE_PROJECT_ID" >/dev/null
-
-          PERMISSIONS=(
-            serviceusage.services.use
-            cloudfunctions.functions.create
-            cloudfunctions.functions.update
-            cloudfunctions.functions.get
-            cloudbuild.builds.create
-            artifactregistry.repositories.get
-            artifactregistry.repositories.list
-            artifactregistry.repositories.create
-            artifactregistry.repositories.uploadArtifacts
-            run.services.create
-            run.services.update
-            run.services.get
-            run.services.setIamPolicy
-            eventarc.triggers.create
-            eventarc.triggers.get
-            iam.serviceAccounts.actAs
-            storage.buckets.get
-            storage.buckets.create
-          )
-
-          printf '%s\n' "${PERMISSIONS[@]}" | jq -R . | jq -s '{permissions:.}' > "${RUNNER_TEMP}/permissions-request.json"
-          TOKEN="$(gcloud auth print-access-token)"
-          curl -fsS \
-            -X POST \
-            -H "Authorization: Bearer ${TOKEN}" \
-            -H 'Content-Type: application/json' \
-            --data-binary @"${RUNNER_TEMP}/permissions-request.json" \
-            "https://cloudresourcemanager.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}:testIamPermissions" \
-            > "${RUNNER_TEMP}/permissions-response.json"
-          unset TOKEN
-
-          GRANTED_FILE="${RUNNER_TEMP}/granted.txt"
-          jq -r '.permissions[]?' "${RUNNER_TEMP}/permissions-response.json" | sort -u > "$GRANTED_FILE"
-          MISSING_FILE="${RUNNER_TEMP}/missing.txt"
-          : > "$MISSING_FILE"
-          for permission in "${PERMISSIONS[@]}"; do
-            if ! grep -Fxq "$permission" "$GRANTED_FILE"; then printf '%s\n' "$permission" >> "$MISSING_FILE"; fi
-          done
-
-          FUNCTION_NAMES=(orbit360ImportInsurerCredentials orbit360CredentialStatus orbit360RevealInsurerCredential orbit360CopyInsurerCredential)
-          EXISTING=0
-          for function_name in "${FUNCTION_NAMES[@]}"; do
-            if gcloud functions describe "$function_name" --gen2 --region "$REGION" --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1; then
-              EXISTING=$((EXISTING + 1))
+          ITEMS='[]'
+          ACTIVE=0
+          MATCH=0
+          for name in orbit360ImportInsurerCredentials orbit360CredentialStatus orbit360RevealInsurerCredential orbit360CopyInsurerCredential; do
+            FILE="${RUNNER_TEMP}/${name}.json"
+            if gcloud functions describe "$name" --gen2 --region "$REGION" --project "$FIREBASE_PROJECT_ID" --format=json > "$FILE" 2>/dev/null; then
+              state="$(jq -r '.state // "UNKNOWN"' "$FILE")"
+              runtime="$(jq -r '.serviceConfig.serviceAccountEmail // ""' "$FILE")"
+              codes="$(jq -c '[.stateMessages[]?.code // empty]' "$FILE")"
+              [ "$state" = "ACTIVE" ] && ACTIVE=$((ACTIVE + 1))
+              runtime_ok=false; [ "$runtime" = "$EXPECTED_RUNTIME_SA" ] && runtime_ok=true && MATCH=$((MATCH + 1))
+              item="$(jq -n --arg name "$name" --arg state "$state" --argjson runtimeOk "$runtime_ok" --argjson codes "$codes" '{name:$name,state:$state,runtimeOk:$runtimeOk,codes:$codes}')"
+            else
+              item="$(jq -n --arg name "$name" '{name:$name,state:"NOT_FOUND",runtimeOk:false,codes:[]}')"
             fi
+            ITEMS="$(jq -c --argjson item "$item" '. + [$item]' <<< "$ITEMS")"
           done
-
-          PROJECT_NUMBER="$(gcloud projects describe "$FIREBASE_PROJECT_ID" --format='value(projectNumber)')"
-          POLICY="${RUNNER_TEMP}/project-policy.json"
-          gcloud projects get-iam-policy "$FIREBASE_PROJECT_ID" --format=json > "$POLICY"
-
-          has_binding() {
-            local role="$1"
-            local member="$2"
-            jq -e --arg role "$role" --arg member "$member" '.bindings[]? | select(.role==$role) | .members[]? | select(.==$member)' "$POLICY" >/dev/null
-          }
-
-          GCF_AGENT="serviceAccount:service-${PROJECT_NUMBER}@gcf-admin-robot.iam.gserviceaccount.com"
-          RUN_AGENT="serviceAccount:service-${PROJECT_NUMBER}@serverless-robot-prod.iam.gserviceaccount.com"
-          EVENTARC_AGENT="serviceAccount:service-${PROJECT_NUMBER}@gcp-sa-eventarc.iam.gserviceaccount.com"
-          CLOUDBUILD_AGENT="serviceAccount:service-${PROJECT_NUMBER}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
-          ARTIFACT_AGENT="serviceAccount:service-${PROJECT_NUMBER}@gcp-sa-artifactregistry.iam.gserviceaccount.com"
-
-          GCF_OK=false; has_binding roles/cloudfunctions.serviceAgent "$GCF_AGENT" && GCF_OK=true
-          RUN_OK=false; has_binding roles/run.serviceAgent "$RUN_AGENT" && RUN_OK=true
-          EVENTARC_OK=false; has_binding roles/eventarc.serviceAgent "$EVENTARC_AGENT" && EVENTARC_OK=true
-          CLOUDBUILD_OK=false; has_binding roles/cloudbuild.serviceAgent "$CLOUDBUILD_AGENT" && CLOUDBUILD_OK=true
-          ARTIFACT_OK=false; has_binding roles/artifactregistry.serviceAgent "$ARTIFACT_AGENT" && ARTIFACT_OK=true
-
-          SECRET_READY=false
-          gcloud secrets describe orbit360-insurer-credentials-alianzas-soluciones --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1 && SECRET_READY=true
-          RUNTIME_READY=false
-          gcloud iam service-accounts describe orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1 && RUNTIME_READY=true
-
-          jq -n \
-            --arg run "$GITHUB_RUN_ID" \
-            --arg commit "$GITHUB_SHA" \
-            --argjson requestedPermissions "$(printf '%s\n' "${PERMISSIONS[@]}" | jq -R . | jq -s .)" \
-            --argjson grantedPermissions "$(jq -R . "$GRANTED_FILE" | jq -s .)" \
-            --argjson missingPermissions "$(jq -R . "$MISSING_FILE" | jq -s 'map(select(length>0))')" \
-            --argjson existingFunctions "$EXISTING" \
-            --argjson secretReady "$SECRET_READY" \
-            --argjson runtimeServiceAccountReady "$RUNTIME_READY" \
-            --argjson cloudFunctionsServiceAgentReady "$GCF_OK" \
-            --argjson cloudRunServiceAgentReady "$RUN_OK" \
-            --argjson eventarcServiceAgentReady "$EVENTARC_OK" \
-            --argjson cloudBuildServiceAgentReady "$CLOUDBUILD_OK" \
-            --argjson artifactRegistryServiceAgentReady "$ARTIFACT_OK" \
-            '{schemaVersion:"orbit360-functions-deploy-readonly-diagnostic-v1",containsSecrets:false,containsPII:false,ok:true,run:$run,commit:$commit,requestedPermissions:$requestedPermissions,grantedPermissions:$grantedPermissions,missingPermissions:$missingPermissions,existingFunctions:$existingFunctions,secretReady:$secretReady,runtimeServiceAccountReady:$runtimeServiceAccountReady,serviceAgents:{cloudFunctions:$cloudFunctionsServiceAgentReady,cloudRun:$cloudRunServiceAgentReady,eventarc:$eventarcServiceAgentReady,cloudBuild:$cloudBuildServiceAgentReady,artifactRegistry:$artifactRegistryServiceAgentReady}}' \
-            > "$OUT"
+          jq -n --arg run "$GITHUB_RUN_ID" --arg commit "$GITHUB_SHA" --argjson functions "$ITEMS" --argjson active "$ACTIVE" --argjson runtimeMatch "$MATCH" '{schemaVersion:"orbit360-functions-state-readonly-v1",containsSecrets:false,containsPII:false,ok:true,run:$run,commit:$commit,functions:$functions,activeFunctions:$active,runtimeMatchFunctions:$runtimeMatch}' > "$OUT"
 
       - name: Publicar evidencia sanitizada
-        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-functions-deploy-readonly-diagnostic-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/functions-deploy-readonly-diagnostic.json
+          name: orbit360-functions-state-readonly-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/functions-state-readonly.json
           if-no-files-found: error
           retention-days: 3
 
-      - name: Comentar diagnóstico sanitizado en PR 5
-        if: always()
+      - name: Comentar estado sanitizado en PR 5
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: bash
         run: |
-          FILE="orbit360-platform/runtime-gate-crm-v20260716/functions-deploy-readonly-diagnostic.json"
-          if [ ! -f "$FILE" ]; then exit 0; fi
-          node - <<'NODE' > /tmp/functions-readonly-comment.md
-          const fs = require('fs');
-          const d = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/functions-deploy-readonly-diagnostic.json','utf8'));
-          process.stdout.write([
-            '### Diagnóstico solo lectura · despliegue Functions',
-            '',
-            '- Resultado diagnóstico: **' + (d.ok ? 'OK' : 'NO_GO') + '**',
-            '- Permisos faltantes: `' + d.missingPermissions.length + '`',
-            '- Detalle: `' + (d.missingPermissions.join(', ') || 'ninguno') + '`',
-            '- Functions existentes: `' + d.existingFunctions + ' de 4`',
-            '- Bóveda existente: `' + d.secretReady + '`',
-            '- Cuenta runtime existente: `' + d.runtimeServiceAccountReady + '`',
-            '- Agentes de servicio: `' + JSON.stringify(d.serviceAgents) + '`',
-            '- Run: `' + d.run + '`',
-            '- Commit: `' + d.commit + '`',
-            '',
-            'La comprobación fue de solo lectura y no contiene secretos ni valores operativos.'
-          ].join('\n'));
+          node - <<'NODE' > /tmp/functions-state.md
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/functions-state-readonly.json','utf8'));
+          const states=d.functions.map(x=>x.name+':'+x.state+(x.codes.length?'['+x.codes.join(',')+']':'')).join(' · ');
+          process.stdout.write('### Estado real · Functions del proveedor seguro\n\n- Activas: `'+d.activeFunctions+' de 4`\n- Cuenta runtime correcta: `'+d.runtimeMatchFunctions+' de 4`\n- Estados: `'+states+'`\n- Run: `'+d.run+'`\n- Commit: `'+d.commit+'`\n\nComprobación de solo lectura; no contiene credenciales.');
           NODE
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/functions-readonly-comment.md
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/functions-state.md
