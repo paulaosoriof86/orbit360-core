@@ -43,6 +43,7 @@ const p = evidence.predicates;
 const functionalOk =
   p.browserAuthReady === true &&
   p.activeRoleResolved === true &&
+  p.legalGateSatisfied === true &&
   p.sourceParsed === true &&
   p.dryRunProduced === true &&
   p.targetIdsResolved === true &&
