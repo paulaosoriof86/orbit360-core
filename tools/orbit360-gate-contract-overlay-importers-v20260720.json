@@ -1,1 +1,36 @@
-{"schemaVersion":"orbit360-gate-contract-overlay-v1","issuedAt":"2026-07-20","gateId":"importers-e2e-acceptance-lab-v20260720","classification":"VALIDATOR_STALE","diagnosticRevision":"canonical-browser-backend-store-rollback-v1","contractRevision":"1.0.0-canonical-browser-backend-store-rollback-v1","gatePatch":{"contractVersion":"1.0.0","diagnosticRevision":"canonical-browser-backend-store-rollback-v1","status":"ACTIVE_ROOT_CAUSE_GATE"}}
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-20",
+  "gateId": "importers-e2e-acceptance-lab-v20260720",
+  "classification": "VALIDATOR_STALE",
+  "diagnosticRevision": "canonical-browser-backend-store-rollback-v1",
+  "contractRevision": "1.0.0-canonical-browser-backend-store-rollback-v1",
+  "gatePatch": {
+    "contractVersion": "1.0.0",
+    "diagnosticRevision": "canonical-browser-backend-store-rollback-v1",
+    "status": "ACTIVE_ROOT_CAUSE_GATE"
+  },
+  "requiredFiles": [
+    "tools/orbit360-run-importers-e2e-gate-v20260720.mjs"
+  ],
+  "runtimeVersionContracts": [
+    {
+      "path": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "requiredTokens": [
+        "orbit360-gate-contract-preflight-v7-multi-gate-extension",
+        "REGISTRY_EXTENSION_RELS",
+        "OVERLAY_RELS",
+        "OVERLAY_FOR_GATE_PRESENT"
+      ]
+    },
+    {
+      "path": "tools/orbit360-run-importers-e2e-gate-v20260720.mjs",
+      "requiredTokens": [
+        "ORBIT360_IMPORTERS_E2E_GATE_OK",
+        "fixturePrepared",
+        "vault-rollback-v20260720.mjs",
+        "finalize-v20260720.mjs"
+      ]
+    }
+  ]
+}
