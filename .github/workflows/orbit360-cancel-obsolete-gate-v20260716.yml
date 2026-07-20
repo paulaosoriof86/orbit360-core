@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: orbit360-insurer-portal-mapping-sanitized-v20260720
@@ -96,3 +97,13 @@ jobs:
           path: orbit360-platform/runtime-gate-crm-v20260716/insurer-portal-mapping-sanitized.json
           if-no-files-found: error
           retention-days: 3
+
+      - name: Publicar referencia sanitizada en PR 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          COUNT="$(jq -r '.insurerCount' orbit360-platform/runtime-gate-crm-v20260716/insurer-portal-mapping-sanitized.json)"
+          PORTALS="$(jq -r '.portalCount' orbit360-platform/runtime-gate-crm-v20260716/insurer-portal-mapping-sanitized.json)"
+          printf -v BODY '### Inventario sanitizado de portales\n\n- Aseguradoras: `%s`\n- Portales: `%s`\n- Run: `%s`\n- Commit: `%s`\n\nNo contiene enlaces, usuarios, contraseñas, cuentas, contactos ni datos personales.' "$COUNT" "$PORTALS" "$GITHUB_RUN_ID" "$GITHUB_SHA"
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "$BODY"
