@@ -50,6 +50,16 @@
         "orbit360ImportInsurerCredentials",
         "applyMappings(result)"
       ]
+    },
+    {
+      "id": "importersAcademyE2E",
+      "path": "orbit360-platform/data/academia-v1225-importadores-e2e.js",
+      "requiredTokens": [
+        "version: '1.225'",
+        "Archivo leído",
+        "Aplicación confirmada",
+        "Defecto funcional o validador obsoleto"
+      ]
     }
   ],
   "gates": [
@@ -77,6 +87,7 @@
       "validators": [
         "tools/orbit360-importers-e2e-fixture-v20260720.mjs",
         "tools/orbit360-importers-e2e-browser-v20260720.mjs",
+        "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
         "tools/orbit360-importers-e2e-finalize-v20260720.mjs",
         "tools/orbit360-gate-environment-v20260717.mjs"
       ],
@@ -85,15 +96,19 @@
         "orbit360-platform/core/insurer-directory-import-v1202.js",
         "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
         "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+        "orbit360-platform/core/router-tenant-config-bootstrap.js",
         "orbit360-platform/core/backend-lab-init.js",
         "orbit360-platform/core/auth.js",
         "orbit360-platform/core/access-scope.js",
         "orbit360-platform/data/store-firestore-lab.local.js",
+        "orbit360-platform/data/academia-v1225-importadores-e2e.js",
         "functions/index.js",
         "tools/orbit360-importers-e2e-fixture-v20260720.mjs",
         "tools/orbit360-importers-e2e-browser-v20260720.mjs",
+        "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
         "tools/orbit360-importers-e2e-finalize-v20260720.mjs",
-        "orbit360-platform/docs/INCIDENTE-SISTEMICO-IMPORTADORES-E2E-20260720.md"
+        "orbit360-platform/docs/INCIDENTE-SISTEMICO-IMPORTADORES-E2E-20260720.md",
+        "orbit360-platform/docs/BLOQUE-IMPORTADORES-E2E-CONTRATO-GATE-20260720.md"
       ],
       "runtimeGraphFiles": [
         "orbit360-platform/index.html",
@@ -106,6 +121,8 @@
         "orbit360-platform/core/insurer-directory-import-v1202.js",
         "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
         "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+        "orbit360-platform/core/router-tenant-config-bootstrap.js",
+        "orbit360-platform/data/academia-v1225-importadores-e2e.js",
         "functions/index.js"
       ],
       "runtimeVersionContracts": [
@@ -162,6 +179,24 @@
             "readAfterWriteOk",
             "auditFailureObserved",
             "ORBIT360_IMPORTERS_E2E_BROWSER_READY_FOR_ROLLBACK"
+          ]
+        },
+        {
+          "path": "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
+          "requiredTokens": [
+            "vaultRecordDeleted",
+            "transientVersionDestroyed",
+            "otherRecordsPreserved",
+            "ORBIT360_IMPORTERS_E2E_VAULT_ROLLBACK_OK"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
+          "requiredTokens": [
+            "importerContractVersion: '20260720.1'",
+            "importerAcademyVersion: '1.225'",
+            "data-orbit-importer-execution-contract",
+            "data-orbit-importers-e2e-academy"
           ]
         }
       ],
