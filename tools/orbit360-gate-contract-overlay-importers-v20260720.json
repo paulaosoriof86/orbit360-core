@@ -2,12 +2,12 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-20",
   "gateId": "importers-e2e-acceptance-lab-v20260720",
-  "classification": "DATA_CONTRACT_FAILURE_CORRECTED_READY_FOR_SINGLE_EXECUTION",
-  "diagnosticRevision": "canonical-session-legal-membership-driver-v4",
-  "contractRevision": "1.0.2-canonical-session-legal-membership-driver-v4",
+  "classification": "FUNCTIONAL_DEFECT_CORRECTED_READY_FOR_SINGLE_EXECUTION",
+  "diagnosticRevision": "canonical-session-legal-membership-provider-role-normalization-v4",
+  "contractRevision": "1.0.3-canonical-session-legal-membership-provider-role-normalization-v4",
   "gatePatch": {
-    "contractVersion": "1.0.2",
-    "diagnosticRevision": "canonical-session-legal-membership-driver-v4",
+    "contractVersion": "1.0.3",
+    "diagnosticRevision": "canonical-session-legal-membership-provider-role-normalization-v4",
     "runtimeVersion": "20260720-4",
     "status": "ACTIVE_SINGLE_EXECUTION_PENDING",
     "workflow": ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
@@ -16,12 +16,13 @@
       "type": "bounded_e2e_single_execution_v4",
       "watchdogBudgetMs": 900000,
       "membershipContractMs": 60000,
+      "providerDeployMs": 300000,
       "browserBootstrapMs": 120000,
       "providerInvocationMs": 65000,
       "storeObservationMs": 45000,
       "rollbackMs": 120000,
-      "exhaustionPolicy": "Execute revision v4 exactly once after GO_GATE_CONTRACT. If provider_invoked fails again, stop all reruns and reopen the provider authorization root cause.",
-      "acceptancePolicy": "Accept only sanitized evidence with canonical membership, browserAuthReady, activeRoleResolved, legalGateSatisfied, provider confirmation, read-after-write, success and rejection audit, rollbackOk and ok:true."
+      "exhaustionPolicy": "Execute revision v4 exactly once after GO_GATE_CONTRACT and provider role-normalization PASS. If provider_invoked fails again, stop all reruns and classify the first real provider check.",
+      "acceptancePolicy": "Accept only sanitized evidence with canonical membership, provider authorization ready, browserAuthReady, activeRoleResolved, legalGateSatisfied, provider confirmation, read-after-write, success and rejection audit, rollbackOk and ok:true."
     }
   },
   "canonicalOwners": [
@@ -49,6 +50,29 @@
         "paises_faltantes",
         "asesorId_requerido",
         "CONFIRMO AMPLIAR ACCESO"
+      ]
+    },
+    {
+      "id": "secureProviderAuthorization",
+      "path": "functions/index.js",
+      "requiredTokens": [
+        "function unique(values)",
+        ".map((value) => clean(value))",
+        "const assignedRoles = unique(rolesFrom(member).concat(rolesFrom(advisor)))",
+        "assignedRoles.includes(activeRole)",
+        "IMPORT_ROLES.has(activeRole)",
+        "exports.orbit360ImportInsurerCredentials"
+      ]
+    },
+    {
+      "id": "providerAuthorizationDiagnostic",
+      "path": "tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
+      "requiredTokens": [
+        "diagnosticRevision: 'membership-sources-and-iam-get-v2'",
+        ".map((value) => clean(value))",
+        "membershipAuthorizationWouldPass",
+        "PROVIDER_AUTHORIZATION_LAYER_READY",
+        "providerAuthorizationReady"
       ]
     },
     {
@@ -88,11 +112,14 @@
     }
   ],
   "requiredFiles": [
+    "functions/index.js",
     "tools/orbit360-run-importers-e2e-gate-v20260720.mjs",
     "tools/orbit360-importers-e2e-browser-v20260720.mjs",
     "tools/orbit360-importers-e2e-finalize-v20260720.mjs",
     "tools/orbit360-ensure-lab-secure-membership-v20260720.mjs",
     "tools/orbit360-validate-session-readiness-contract-v20260720.mjs",
+    "tools/orbit360-validate-provider-role-normalization-v20260720.mjs",
+    "tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
     "orbit360-platform/core/session-readiness-contract-v20260720.js",
     "orbit360-platform/core/membership-multirol-contract-p0.js",
     "orbit360-platform/core/importer-execution-contract-v20260720.js",
@@ -101,9 +128,11 @@
     "orbit360-platform/data/academia-v1225-importadores-e2e.js",
     ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-LEGAL-GATE-20260720.md",
-    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-MEMBERSHIP-403-20260720.md"
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-MEMBERSHIP-403-20260720.md",
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-CALLBACK-ARITY-ROLE-NORMALIZATION-20260720.md"
   ],
   "runtimeGraphFiles": [
+    "functions/index.js",
     "orbit360-platform/core/legal.js",
     "orbit360-platform/core/auth.js",
     "orbit360-platform/core/session-readiness-contract-v20260720.js",
@@ -113,6 +142,45 @@
     "orbit360-platform/data/academia-v1225-importadores-e2e.js"
   ],
   "runtimeVersionContracts": [
+    {
+      "path": "functions/index.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "function unique(values)",
+        ".map((value) => clean(value))",
+        "const assignedRoles = unique(rolesFrom(member).concat(rolesFrom(advisor)))",
+        "assignedRoles.includes(activeRole)",
+        "IMPORT_ROLES.has(activeRole)",
+        "exports.orbit360ImportInsurerCredentials",
+        "exports.orbit360CredentialStatus",
+        "exports.orbit360RevealInsurerCredential",
+        "exports.orbit360CopyInsurerCredential"
+      ]
+    },
+    {
+      "path": "tools/orbit360-validate-provider-role-normalization-v20260720.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "UNSAFE_MAP_CALLBACK",
+        "SAFE_MAP_CALLBACK_MISSING",
+        "ROLE_TRUNCATED",
+        "PREFIX_ROLE_PRESENT",
+        "OWNER_DIAGNOSTIC_ROLE_NORMALIZATION_DRIFT",
+        "unsafeMapCallbackPresent: false"
+      ]
+    },
+    {
+      "path": "tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "diagnosticRevision: 'membership-sources-and-iam-get-v2'",
+        ".map((value) => clean(value))",
+        "membershipAuthorizationWouldPass",
+        "PROVIDER_AUTHORIZATION_LAYER_READY",
+        "providerAuthorizationReady",
+        "iamReadMethod: 'GET'"
+      ]
+    },
     {
       "path": "orbit360-platform/core/session-readiness-contract-v20260720.js",
       "requiredTokens": [
@@ -266,6 +334,10 @@
       "requiredTokens": [
         "IMPORTERS_E2E_V4_SINGLE_EXECUTION",
         "orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720",
+        "orbit360-validate-provider-role-normalization-v20260720.mjs",
+        "functions:orbit360ImportInsurerCredentials",
+        "tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
+        "providerAuthorizationReady",
         "orbit360-ensure-lab-secure-membership-v20260720.mjs",
         "membership-contract-sanitized.json",
         "orbit360-run-importers-e2e-gate-v20260720.mjs",
