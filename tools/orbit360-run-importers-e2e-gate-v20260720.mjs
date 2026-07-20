@@ -8,7 +8,8 @@ const CHANNEL = 'orbit360-ays-lab';
 const GATE_ID = 'importers-e2e-acceptance-lab-v20260720';
 const RUNTIME = '20260720-3';
 const RUN_ID = String(process.env.GITHUB_RUN_ID || Date.now());
-const SHA = String(process.env.GITHUB_SHA || 'local');
+const checkedOutHead = String(spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout || '').trim();
+const SHA = checkedOutHead || String(process.env.GITHUB_SHA || 'local');
 const BRANCH = String(process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || process.env.ORBIT360_BRANCH || '');
 const EVIDENCE_DIR = 'orbit360-platform/runtime-gate-crm-v20260716';
 const STATE = process.env.ORBIT360_IMPORTERS_E2E_STATE || `${EVIDENCE_DIR}/importers-e2e-state.json`;
@@ -162,6 +163,7 @@ const summary = {
   schemaVersion: 'orbit360-importers-e2e-coordinator-v2',
   runtimeVersion: RUNTIME,
   runId: RUN_ID,
+  commit: SHA,
   browserCode,
   rollbackCode,
   cleanupCode,
