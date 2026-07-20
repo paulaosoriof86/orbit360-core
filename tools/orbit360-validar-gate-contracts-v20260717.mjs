@@ -4,8 +4,13 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const REGISTRY_PATH = path.join(ROOT, 'tools/orbit360-gate-contract-registry-v20260717.json');
-const OVERLAY_REL = 'tools/orbit360-gate-contract-overlay-v20260718.json';
-const OVERLAY_PATH = path.join(ROOT, OVERLAY_REL);
+const REGISTRY_EXTENSION_RELS = [
+  'tools/orbit360-gate-contract-registry-extension-v20260720.json'
+];
+const OVERLAY_RELS = [
+  'tools/orbit360-gate-contract-overlay-v20260718.json',
+  'tools/orbit360-gate-contract-overlay-importers-v20260720.json'
+];
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const requestedGateId = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
@@ -21,12 +26,8 @@ function executableText(text, rel) {
   if (/\.(?:js|mjs|cjs)$/i.test(rel)) {
     out = out.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
   }
-  if (/\.html?$/i.test(rel)) {
-    out = out.replace(/<!--[\s\S]*?-->/g, '');
-  }
-  if (/\.ya?ml$/i.test(rel)) {
-    out = out.replace(/^\s*#.*$/gm, '');
-  }
+  if (/\.html?$/i.test(rel)) out = out.replace(/<!--[\s\S]*?-->/g, '');
+  if (/\.ya?ml$/i.test(rel)) out = out.replace(/^\s*#.*$/gm, '');
   return out;
 }
 function unique(values) {
@@ -41,18 +42,30 @@ function mergeObjects(base, patch) {
   }
   return out;
 }
+function mergeRegistryExtension(registry, extension) {
+  const owners = new Map((registry.canonicalOwners || []).map(item => [item.id, item]));
+  for (const owner of extension.canonicalOwners || []) owners.set(owner.id, owner);
+  registry.canonicalOwners = [...owners.values()];
+
+  const gates = new Map((registry.gates || []).map(item => [item.gateId, item]));
+  for (const gate of extension.gates || []) gates.set(gate.gateId, gate);
+  registry.gates = [...gates.values()];
+  return registry;
+}
 function writeEvidence(payload) {
   fs.mkdirSync(path.dirname(EVIDENCE_PATH), { recursive: true });
   fs.writeFileSync(EVIDENCE_PATH, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 }
-function resultAndExit(status, checks, exitCode, gate = null, overlay = null) {
+function resultAndExit(status, checks, exitCode, gate = null, overlay = null, metadata = {}) {
   const failed = checks.filter(item => !item.ok);
   const payload = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v6-effective-overlay',
+    schemaVersion: 'orbit360-gate-contract-preflight-v7-multi-gate-extension',
     gateId: requestedGateId,
     contractVersion: gate && gate.contractVersion || '',
     diagnosticRevision: gate && gate.diagnosticRevision || '',
     overlayRevision: overlay && overlay.contractRevision || '',
+    overlayPath: metadata.overlayPath || '',
+    registryExtensions: metadata.registryExtensions || [],
     generatedAt: new Date().toISOString(),
     containsPII: false,
     containsSecrets: false,
@@ -70,6 +83,9 @@ function resultAndExit(status, checks, exitCode, gate = null, overlay = null) {
   process.exit(exitCode);
 }
 
+const bootstrapChecks = [];
+const bootstrapCheck = (id, ok, detail = '') => bootstrapChecks.push({ id, ok: Boolean(ok), detail });
+
 if (!fs.existsSync(REGISTRY_PATH)) {
   resultAndExit('VALIDATOR_STALE', [{ id: 'REGISTRY_EXISTS', ok: false, detail: REGISTRY_PATH }], 41);
 }
@@ -81,79 +97,105 @@ try {
   resultAndExit('VALIDATOR_STALE', [{ id: 'REGISTRY_VALID_JSON', ok: false, detail: error.message }], 41);
 }
 
-let overlay = null;
-if (fs.existsSync(OVERLAY_PATH)) {
+const loadedExtensions = [];
+for (const rel of REGISTRY_EXTENSION_RELS) {
+  if (!exists(rel)) continue;
+  let extension;
   try {
-    overlay = JSON.parse(fs.readFileSync(OVERLAY_PATH, 'utf8'));
+    extension = JSON.parse(read(rel));
   } catch (error) {
-    resultAndExit('VALIDATOR_STALE', [{ id: 'OVERLAY_VALID_JSON', ok: false, detail: error.message }], 41);
+    resultAndExit('VALIDATOR_STALE', [{ id: `REGISTRY_EXTENSION_VALID_JSON:${rel}`, ok: false, detail: error.message }], 41);
   }
-  if (overlay.schemaVersion !== 'orbit360-gate-contract-overlay-v1') {
-    resultAndExit('VALIDATOR_STALE', [{ id: 'OVERLAY_SCHEMA_VERSION', ok: false, detail: overlay.schemaVersion || 'missing' }], 41);
-  }
-  if (overlay.gateId !== requestedGateId) {
-    resultAndExit('VALIDATOR_STALE', [{ id: 'OVERLAY_GATE_MATCH', ok: false, detail: `${overlay.gateId || 'missing'} != ${requestedGateId}` }], 41);
-  }
+  bootstrapCheck(`REGISTRY_EXTENSION_SCHEMA:${rel}`, extension.schemaVersion === 'orbit360-gate-contract-registry-extension-v1', extension.schemaVersion || 'missing');
+  registry = mergeRegistryExtension(registry, extension);
+  loadedExtensions.push(rel);
 }
+
+const overlays = [];
+for (const rel of OVERLAY_RELS) {
+  if (!exists(rel)) continue;
+  let overlay;
+  try {
+    overlay = JSON.parse(read(rel));
+  } catch (error) {
+    resultAndExit('VALIDATOR_STALE', [{ id: `OVERLAY_VALID_JSON:${rel}`, ok: false, detail: error.message }], 41);
+  }
+  bootstrapCheck(`OVERLAY_SCHEMA_VERSION:${rel}`, overlay.schemaVersion === 'orbit360-gate-contract-overlay-v1', overlay.schemaVersion || 'missing');
+  overlays.push({ rel, overlay });
+}
+
+const selected = overlays.find(item => item.overlay && item.overlay.gateId === requestedGateId) || null;
+if (!selected) {
+  resultAndExit(
+    'VALIDATOR_STALE',
+    bootstrapChecks.concat([{ id: 'OVERLAY_FOR_GATE_PRESENT', ok: false, detail: `${requestedGateId} in ${OVERLAY_RELS.join(', ')}` }]),
+    41,
+    null,
+    null,
+    { registryExtensions: loadedExtensions }
+  );
+}
+const overlay = selected.overlay;
 
 let gate = (registry.gates || []).find(item => item.gateId === requestedGateId);
 if (!gate) {
-  resultAndExit('VALIDATOR_STALE', [{ id: 'GATE_REGISTERED', ok: false, detail: requestedGateId }], 41);
+  resultAndExit(
+    'VALIDATOR_STALE',
+    bootstrapChecks.concat([{ id: 'GATE_REGISTERED', ok: false, detail: requestedGateId }]),
+    41,
+    null,
+    overlay,
+    { overlayPath: selected.rel, registryExtensions: loadedExtensions }
+  );
 }
 
-if (overlay) {
-  if (overlay.gatePatch) gate = mergeObjects(gate, overlay.gatePatch);
+if (overlay.gatePatch) gate = mergeObjects(gate, overlay.gatePatch);
 
-  const owners = new Map((registry.canonicalOwners || []).map(item => [item.id, item]));
-  for (const owner of overlay.canonicalOwners || []) owners.set(owner.id, owner);
-  registry.canonicalOwners = [...owners.values()];
+const owners = new Map((registry.canonicalOwners || []).map(item => [item.id, item]));
+for (const owner of overlay.canonicalOwners || []) owners.set(owner.id, owner);
+registry.canonicalOwners = [...owners.values()];
 
-  gate.requiredFiles = unique([...(gate.requiredFiles || []), ...(overlay.requiredFiles || [])]);
-  gate.runtimeGraphFiles = unique([...(gate.runtimeGraphFiles || []), ...(overlay.runtimeGraphFiles || [])]);
+gate.requiredFiles = unique([...(gate.requiredFiles || []), ...(overlay.requiredFiles || [])]);
+gate.runtimeGraphFiles = unique([...(gate.runtimeGraphFiles || []), ...(overlay.runtimeGraphFiles || [])]);
 
-  const contracts = new Map((gate.runtimeVersionContracts || []).map(item => [item.path, {
-    ...item,
-    requiredTokens: unique(item.requiredTokens || [])
-  }]));
-  for (const contract of overlay.runtimeVersionContracts || []) {
-    const current = contracts.get(contract.path);
-    if (current) {
-      current.requiredTokens = contract.replaceRequiredTokens === true
-        ? unique(contract.requiredTokens || [])
-        : unique([...(current.requiredTokens || []), ...(contract.requiredTokens || [])]);
-      contracts.set(contract.path, { ...current, ...contract, requiredTokens: current.requiredTokens });
-    } else {
-      contracts.set(contract.path, {
-        ...contract,
-        requiredTokens: unique(contract.requiredTokens || [])
-      });
-    }
+const contracts = new Map((gate.runtimeVersionContracts || []).map(item => [item.path, {
+  ...item,
+  requiredTokens: unique(item.requiredTokens || [])
+}]));
+for (const contract of overlay.runtimeVersionContracts || []) {
+  const current = contracts.get(contract.path);
+  if (current) {
+    current.requiredTokens = contract.replaceRequiredTokens === true
+      ? unique(contract.requiredTokens || [])
+      : unique([...(current.requiredTokens || []), ...(contract.requiredTokens || [])]);
+    contracts.set(contract.path, { ...current, ...contract, requiredTokens: current.requiredTokens });
+  } else {
+    contracts.set(contract.path, { ...contract, requiredTokens: unique(contract.requiredTokens || []) });
   }
-  gate.runtimeVersionContracts = [...contracts.values()];
 }
+gate.runtimeVersionContracts = [...contracts.values()];
 
-const checks = [];
+const checks = [...bootstrapChecks];
 const check = (id, ok, detail = '') => checks.push({ id, ok: Boolean(ok), detail });
 
 check('SCHEMA_VERSION', registry.schemaVersion === 'orbit360-gate-contract-registry-v1', registry.schemaVersion || 'missing');
-check('OVERLAY_PRESENT', Boolean(overlay), overlay ? OVERLAY_REL : 'missing');
-if (overlay) {
-  check('OVERLAY_SCHEMA_VERSION', overlay.schemaVersion === 'orbit360-gate-contract-overlay-v1', overlay.schemaVersion || 'missing');
-  check('OVERLAY_GATE_MATCH', overlay.gateId === requestedGateId, overlay.gateId || 'missing');
-  check('OVERLAY_CONTRACT_MATCH', overlay.contractRevision && String(overlay.contractRevision).startsWith(String(gate.contractVersion)), `${overlay.contractRevision || 'missing'} vs ${gate.contractVersion || 'missing'}`);
-}
+check('OVERLAY_PRESENT', Boolean(overlay), selected.rel);
+check('OVERLAY_SCHEMA_VERSION', overlay.schemaVersion === 'orbit360-gate-contract-overlay-v1', overlay.schemaVersion || 'missing');
+check('OVERLAY_GATE_MATCH', overlay.gateId === requestedGateId, overlay.gateId || 'missing');
+check(
+  'OVERLAY_CONTRACT_MATCH',
+  overlay.contractRevision && String(overlay.contractRevision).startsWith(String(gate.contractVersion)),
+  `${overlay.contractRevision || 'missing'} vs ${gate.contractVersion || 'missing'}`
+);
 check('ACTIVE_BLOCK', Number(gate.block) === Number(registry.plan && registry.plan.activeBlock), `gate=${gate.block}; plan=${registry.plan && registry.plan.activeBlock}`);
 check('WORKFLOW_EXISTS', exists(gate.workflow), gate.workflow);
 check('PREFLIGHT_MATCH', gate.preflight === 'tools/orbit360-validar-gate-contracts-v20260717.mjs', gate.preflight || 'missing');
 check('PREFLIGHT_EVIDENCE_MATCH', gate.preflightEvidence === EVIDENCE_REL, gate.preflightEvidence || 'missing');
 check('RUNTIME_VERSION_FORMAT', /^\d{8}-\d+$/.test(String(gate.runtimeVersion || '')), gate.runtimeVersion || 'missing');
 
-for (const rel of gate.requiredFiles || []) {
-  check(`REQUIRED_FILE:${rel}`, exists(rel), rel);
-}
-for (const rel of gate.validators || []) {
-  check(`VALIDATOR_EXISTS:${rel}`, exists(rel), rel);
-}
+for (const rel of gate.requiredFiles || []) check(`REQUIRED_FILE:${rel}`, exists(rel), rel);
+for (const rel of gate.validators || []) check(`VALIDATOR_EXISTS:${rel}`, exists(rel), rel);
+
 for (const owner of registry.canonicalOwners || []) {
   const ownerExists = exists(owner.path);
   check(`OWNER_EXISTS:${owner.id}`, ownerExists, owner.path);
@@ -186,9 +228,7 @@ const fallbackRuntimeGraph = [
   'orbit360-platform/core/backend-lab-init.js',
   'orbit360-platform/core/backend-lab-auth-guard.js'
 ];
-const runtimeGraphFiles = unique((gate.runtimeGraphFiles && gate.runtimeGraphFiles.length)
-  ? gate.runtimeGraphFiles
-  : fallbackRuntimeGraph);
+const runtimeGraphFiles = unique((gate.runtimeGraphFiles && gate.runtimeGraphFiles.length) ? gate.runtimeGraphFiles : fallbackRuntimeGraph);
 
 check('RUNTIME_GRAPH_DECLARED', runtimeGraphFiles.length > 0, `files=${runtimeGraphFiles.length}`);
 for (const rel of runtimeGraphFiles) {
@@ -217,9 +257,7 @@ for (const contract of runtimeVersionContracts) {
 }
 
 const currentBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || process.env.ORBIT360_BRANCH || '';
-if (currentBranch) {
-  check('RUNTIME_BRANCH', currentBranch === gate.environment.branch, `actual=${currentBranch}; expected=${gate.environment.branch}`);
-}
+if (currentBranch) check('RUNTIME_BRANCH', currentBranch === gate.environment.branch, `actual=${currentBranch}; expected=${gate.environment.branch}`);
 
 const protectedPaths = [
   'orbit360-platform/data/store.js',
@@ -228,10 +266,9 @@ const protectedPaths = [
   'orbit360-platform/core/importa.js',
   'firestore.rules'
 ];
-for (const rel of protectedPaths) {
-  check(`PROTECTED_PATH_PRESENT:${rel}`, exists(rel), rel);
-}
+for (const rel of protectedPaths) check(`PROTECTED_PATH_PRESENT:${rel}`, exists(rel), rel);
 
 const failed = checks.filter(item => !item.ok);
-if (failed.length) resultAndExit('VALIDATOR_STALE', checks, 41, gate, overlay);
-resultAndExit('GO_GATE_CONTRACT', checks, 0, gate, overlay);
+const metadata = { overlayPath: selected.rel, registryExtensions: loadedExtensions };
+if (failed.length) resultAndExit('VALIDATOR_STALE', checks, 41, gate, overlay, metadata);
+resultAndExit('GO_GATE_CONTRACT', checks, 0, gate, overlay, metadata);
