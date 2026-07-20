@@ -103,3 +103,4 @@
   script.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'visual-error'; }, { once: true });
   document.head.appendChild(script);
 })();
+/* Preflight v5 reconciliado: sin cambios de producto. */
