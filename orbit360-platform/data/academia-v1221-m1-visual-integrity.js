@@ -1,32 +1,35 @@
-/* Orbit 360 · Academia · API 1.221 · contenido M1 1.223 */
+/* Orbit 360 · Academia · API 1.221 · contenido M1 1.224 */
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  if(Orbit.ACADEMIA_V1221_M1_VISUAL&&Orbit.ACADEMIA_V1221_M1_VISUAL.version==='1.221'&&Orbit.ACADEMIA_V1221_M1_VISUAL.contentVersion==='1.223')return;
+  if(Orbit.ACADEMIA_V1221_M1_VISUAL&&Orbit.ACADEMIA_V1221_M1_VISUAL.version==='1.221'&&Orbit.ACADEMIA_V1221_M1_VISUAL.contentVersion==='1.224')return;
   function sec(icon,title,detail){return{icon:icon,t:title,color:'#C5162E',d:detail};}
-  function lesson(){return{t:'Estados honestos y revisión visual',min:22,tipo:'lectura',_m1visualv:1223,secciones:[
+  function lesson(){return{t:'Estados honestos y operación segura',min:25,tipo:'lectura',_m1visualv:1224,secciones:[
     sec('🧭','Ausencia de información no significa estado favorable','Sin pólizas, cartera o cobros migrados, Orbit muestra pendiente, sin datos o aún no disponible; nunca Al día por ausencia de fuente.'),
-    sec('🌎','País y tipo usan valores canónicos','Los filtros trabajan con GT, CO, REQUIERE_VALIDACION y Persona/Empresa. País por validar identifica los expedientes que aún necesitan confirmación; no se les asigna Guatemala por defecto.'),
+    sec('🌎','País por validar y evidencia posterior','País y moneda se corrigen en Calidad con motivo y auditoría. Pólizas o cobros vinculados pueden sugerir GT o CO, pero una moneda aislada nunca cambia el país silenciosamente. Un conflicto siempre requiere revisión humana.'),
+    sec('🧩','Segmentación antes y después de Pólizas','Sin pólizas validadas el segmento es Pendiente de clasificar. Nuevo, Recurrente, Estándar, Premium e Histórico solo se calculan con reglas visibles; Premium exige umbral configurado sobre prima neta recaudada.'),
     sec('📅','Fechas inválidas','Una fecha no interpretable se presenta como Sin fecha registrada o Fecha no disponible, nunca InvalidDate.'),
-    sec('👥','Rol activo visible','Escritorio, tableta y móvil deben permitir identificar y cambiar los roles realmente asignados.'),
-    sec('🔎','Búsqueda móvil','Cliente 360 permite buscar por nombre, identificación, teléfono o correo también en móvil.'),
-    sec('🔗','Datos accionables y jerarquía','En Aseguradoras, correo, teléfono, WhatsApp y portal deben tener etiqueta, jerarquía y acción directa. Los datos bancarios conservan revelado y copia seguros; nunca se exponen por un atajo visual.'),
-    sec('✨','Estabilidad del primer render','El módulo debe abrir con la proyección canónica desde el primer contenido visible. Un segundo repintado que corrige tipo, fecha o país es un defecto funcional, aunque el resultado final parezca correcto.'),
-    sec('📥','Importación honesta','Cerrar sin archivo vuelve a la vista anterior. Solo existe éxito cuando hay propuesta, diferencia o registro trazable.'),
-    sec('🏢','Alta sin borrador fantasma','Abrir Nueva aseguradora no crea ningún registro. Solo se escribe después de confirmar nombre, país y motivo. Cancelar o cerrar conserva exactamente el mismo conteo.'),
-    sec('🧪','Defecto y validador','FUNCTIONAL_DEFECT describe una falla del producto; VALIDATOR_STALE describe una prueba que no cubre la experiencia real. Validar un objeto interno no sustituye comprobar el DOM que ve la persona usuaria.')
+    sec('👥','Rol activo y alcance','Escritorio, tableta y móvil deben permitir identificar el rol activo. Calidad y Cliente 360 respetan propios, equipo o todos.'),
+    sec('🔗','Directorio operativo y accesos protegidos','Correo, teléfono, WhatsApp y portal tienen acción directa. Los accesos se recuperan temporalmente desde un proveedor seguro según permisos y quedan auditados; no se persisten contraseñas como texto visible.'),
+    sec('🏦','Copia bancaria completa y segura','Banco, tipo, cuenta, moneda, titular y uso pueden copiarse como bloque operativo. Ver y Copiar respetan el control seguro y no convierten el dato en texto permanente.'),
+    sec('📥','Archivo seleccionado no significa almacenado','Seleccionar un archivo solo prepara la propuesta. El éxito exige persistencia comprobada. Sin referencia HTTPS o almacenamiento seguro, Orbit debe decir Propuesta registrada, archivo pendiente de almacenamiento; nunca Archivo cargado.'),
+    sec('🧠','Tarifas y conocimiento','Cada fuente se revisa por país, moneda, ramo y producto. Registrar un documento no habilita automáticamente Cotizador ni Comparativo.'),
+    sec('🏢','Aseguradoras inactivas','Una aseguradora inactiva conserva histórico y debe mostrar el motivo de desactivación. No se reactiva automáticamente por tener contactos, documentos o pólizas.'),
+    sec('✨','Estabilidad y responsive','El primer contenido visible ya debe usar la proyección canónica. Títulos, acciones y tabs deben caber y ser legibles en escritorio, tableta y móvil.'),
+    sec('🧪','Defecto y validador','FUNCTIONAL_DEFECT describe una falla del producto; VALIDATOR_STALE describe una prueba que no cubre la experiencia real. Un check verde no reemplaza la conducta visible y verificable.')
   ]};}
-  function quiz(){return{t:'Evaluación · integridad visual M1',min:14,tipo:'quiz',_m1visualv:1223,preguntas:[
-    {p:'Un cliente sin cartera cargada debe aparecer…',ops:['Al día','Pendiente o sin información','Con salud 100'],ok:1},
-    {p:'Valores canónicos de tipo:',ops:['natural/jurídica','Persona/Empresa','nuevo/antiguo'],ok:1},
-    {p:'Un expediente sin país confiable debe…',ops:['Asignarse a GT','Mostrarse como País por validar','Ocultarse'],ok:1},
-    {p:'Un selector correcto en datos internos pero vacío en pantalla corresponde a…',ops:['VALIDATOR_STALE y defecto funcional visible','Éxito funcional','Dato completo'],ok:0},
-    {p:'Los datos bancarios deben…',ops:['Mostrarse siempre completos','Usar revelado y copia seguros','Ocultarse sin posibilidad de gestión'],ok:1},
-    {p:'¿Cuándo se crea una aseguradora nueva?',ops:['Al abrir el formulario','Después de confirmar nombre, país y motivo','Al cerrar el formulario'],ok:1}
+  function quiz(){return{t:'Evaluación · honestidad operativa M1',min:16,tipo:'quiz',_m1visualv:1224,preguntas:[
+    {p:'Un cliente sin pólizas validadas debe tener segmento…',ops:['Nuevo','Pendiente de clasificar','Premium'],ok:1},
+    {p:'La moneda COP de un cobro vinculado permite…',ops:['Cambiar el país automáticamente','Sugerir Colombia para revisión','Ocultar el cliente'],ok:1},
+    {p:'Seleccionar un PDF en el navegador significa…',ops:['Archivo almacenado','Propuesta preparada; falta comprobar persistencia','Tarifa habilitada'],ok:1},
+    {p:'Una contraseña operativa debe…',ops:['Guardarse en la ficha','Recuperarse temporalmente desde conexión segura y auditarse','Compartirse en observaciones'],ok:1},
+    {p:'Copiar datos bancarios completos debe incluir…',ops:['Solo los últimos cuatro dígitos','Banco, tipo, cuenta, moneda, titular y uso según permisos','La contraseña del portal'],ok:1},
+    {p:'Registrar un tarifario habilita Cotizador…',ops:['Siempre','Nunca de forma automática; requiere validación','Solo por el nombre del archivo'],ok:1},
+    {p:'Una aseguradora inactiva debe…',ops:['Desaparecer','Mostrar motivo y conservar histórico','Reactivarse al abrirla'],ok:1}
   ]};}
-  function update(id){try{var current=Orbit.store&&Orbit.store.get?Orbit.store.get('cursos',id):null;if(!current)return false;var next=JSON.parse(JSON.stringify(current));next.lecciones=(next.lecciones||[]).filter(function(x){return x&&x._m1visualv!==1221&&x._m1visualv!==1222&&x._m1visualv!==1223;});next.lecciones.push(lesson(),quiz());next._cv=Math.max(+next._cv||0,1223);next.progreso=current.progreso||0;next.certificado=!!current.certificado;Orbit.store.update('cursos',id,next);return true;}catch(e){return false;}}
+  function update(id){try{var current=Orbit.store&&Orbit.store.get?Orbit.store.get('cursos',id):null;if(!current)return false;var next=JSON.parse(JSON.stringify(current));next.lecciones=(next.lecciones||[]).filter(function(x){return x&&x._m1visualv!==1221&&x._m1visualv!==1222&&x._m1visualv!==1223&&x._m1visualv!==1224;});next.lecciones.push(lesson(),quiz());next._cv=Math.max(+next._cv||0,1224);next.progreso=current.progreso||0;next.certificado=!!current.certificado;Orbit.store.update('cursos',id,next);return true;}catch(e){return false;}}
   function apply(){return['cur_p_clientes','cur_dir_aseg_dir_v1202','cur_dir_aseg_op_v1202','cur_dir_aseg_asesor_v1202'].map(update).some(Boolean);}
   var tries=0;(function wait(){if(apply()||tries++>60)return;setTimeout(wait,150);})();
   document.addEventListener('orbit:reseeded',apply);
-  Orbit.ACADEMIA_V1221_M1_VISUAL={version:'1.221',contentVersion:'1.223',apply:apply};
+  Orbit.ACADEMIA_V1221_M1_VISUAL={version:'1.221',contentVersion:'1.224',apply:apply};
 })();
