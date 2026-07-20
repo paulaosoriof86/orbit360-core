@@ -1,4 +1,4 @@
-name: Orbit 360 Secure Import Confirmation Fix 20260720
+name: Orbit 360 Secure Credentials Apply LAB 20260720
 
 on:
   push:
@@ -8,94 +8,170 @@ on:
       - ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
 concurrency:
-  group: orbit360-secure-import-confirmation-fix-v20260720
+  group: orbit360-secure-credentials-apply-lab-v20260720
   cancel-in-progress: false
 
 jobs:
-  patch:
-    name: Aseguradoras · confirmación remota y ruta secure-only
+  apply_secure_credentials:
+    name: Aseguradoras · aplicar accesos cifrados y referencias opacas
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     env:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
-      TARGET: orbit360-platform/core/insurer-directory-import-v1202.js
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      TENANT_ID: alianzas-soluciones
+      EXPECTED_UID: woJlxR1iFEeiQZvTscPj4qQ5Qc73
+      EXPECTED_EMAIL: orbit.lab@demo.com
+      REGION: us-central1
+      HANDOFF_SECRET_ID: orbit360-credential-handoff-key-20260720
+      ENVELOPE_FILE: .github/secure-handoff/orbit360-credentials-envelope-20260720.json
+      EXPECTED_FINGERPRINT: 04ffa2de35646eef0c33bc539fe52766e30fdb449353705253710fb878f66130
+      EXPECTED_ITEM_COUNT: "37"
+      SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     steps:
       - name: Checkout rama autorizada
         uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
 
-      - name: Preflight vinculante
+      - name: Preflight vinculante antes de secretos
         shell: bash
         run: |
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          node --check tools/orbit360-apply-secure-credentials-handoff-v20260720.mjs
+          test -f "$ENVELOPE_FILE"
+          jq -e \
+            --arg tenant "$TENANT_ID" \
+            --arg fp "$EXPECTED_FINGERPRINT" \
+            --argjson count "$EXPECTED_ITEM_COUNT" \
+            '.schemaVersion == "orbit360-secure-handoff-envelope-v1" and
+             .containsPlaintextSecrets == false and
+             .algorithm == "RSA-OAEP-SHA256+AES-256-GCM" and
+             .tenantId == $tenant and
+             .publicKeyFingerprint == $fp and
+             .itemCount == $count and
+             (.sourceHash | test("^[a-f0-9]{64}$"))' "$ENVELOPE_FILE" >/dev/null
 
-      - name: Aplicar fix acotado
+      - name: Resolver principal LAB
         shell: bash
         run: |
           set -euo pipefail
-          node --input-type=module - <<'NODE'
-          import { readFileSync, writeFileSync } from 'node:fs';
-          const path = process.env.TARGET;
-          let source = readFileSync(path, 'utf8');
-          if (source.includes('__secureOnlyV20260720')) {
-            console.log('Fix ya aplicado');
-            process.exit(0);
-          }
-          const applySignature = '  function applyApproved(result, confirmation) {';
-          if (!source.includes(applySignature)) throw new Error('APPLY_SIGNATURE_NOT_FOUND');
-          source = source.replace(applySignature, '  async function applyApproved(result, confirmation) {');
+          test -n "${SA_PRIMARY:-}"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SA_PRIMARY" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
+          test "$(jq -r '.client_email // empty' "$KEY_FILE")" != ""
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "DEPLOYER_EMAIL=$(jq -r '.client_email // empty' "$KEY_FILE")" >> "$GITHUB_ENV"
 
-          const beforeProvider = `    let secureStatus = 'backend_required';\n    if (typeof secureProvider === 'function' && secureItems.length) {\n      try { secureProvider({ tenantId: tenantId(), sourceFileName: result.report.sourceFileName, sourceHash: result.report.sourceHash, items: secureItems }); secureStatus = 'enviado_backend_seguro'; } catch (e) { secureStatus = 'backend_error'; }\n    } else if (!secureItems.length) secureStatus = 'sin_sensibles';`;
-          const afterProvider = `    let secureStatus = 'backend_required';\n    if (typeof secureProvider === 'function' && secureItems.length) {\n      try {\n        const remote = await secureProvider({ tenantId: tenantId(), sourceFileName: result.report.sourceFileName, sourceHash: result.report.sourceHash, items: secureItems });\n        if (!remote || remote.ok !== true) throw new Error('confirmacion_remota_incompleta');\n        secureStatus = 'confirmado_backend_seguro';\n      } catch (e) { secureStatus = 'backend_error'; }\n    } else if (!secureItems.length) secureStatus = 'sin_sensibles';`;
-          if (!source.includes(beforeProvider)) throw new Error('PROVIDER_BLOCK_NOT_FOUND');
-          source = source.replace(beforeProvider, afterProvider);
+      - name: Instalar Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ays-orbit-360-lab
 
-          const uiCall = '      const applied = applyApproved(result, { approved: true, phrase, reason, applyValidOnly: true });';
-          if (!source.includes(uiCall)) throw new Error('UI_CALL_NOT_FOUND');
-          source = source.replace(uiCall, '      const applied = await applyApproved(result, { approved: true, phrase, reason, applyValidOnly: true });');
-
-          const insertAt = '  function esc(v) {';
-          if (!source.includes(insertAt)) throw new Error('INSERT_POINT_NOT_FOUND');
-          const secureOnly = `  async function applySecureOnly(result, confirmation) {\n    if (!canManage()) return { ok: false, errors: ['permiso_importacion_denegado'] };\n    if (!result || !result.report) return { ok: false, errors: ['dry_run_requerido'] };\n    if (!confirmation || confirmation.approved !== true || confirmation.phrase !== CONFIRM_PHRASE || !clean(confirmation.reason)) return { ok: false, errors: ['confirmacion_reforzada_requerida'] };\n    const operations = result.report._operations || [];\n    const validSheets = new Set(operations.filter(op => !(op.data && (op.data.requiereValidacion || op.data.validationStatus !== 'validado'))).map(op => op.sourceSheet));\n    const secureItems = (secureSession.get(result.report.reportId) || []).filter(item => item && item.type === 'credential' && validSheets.has(item.insurerSheet));\n    const secureProvider = Orbit.secureImport && Orbit.secureImport.importInsurerDirectory;\n    if (!secureItems.length) { secureSession.delete(result.report.reportId); return { ok: true, imported: 0, secureStatus: 'sin_sensibles', validSheets: validSheets.size }; }\n    if (typeof secureProvider !== 'function') return { ok: false, errors: ['backend_operativo_requerido_para_aplicar_datos_reales'] };\n    try {\n      const remote = await secureProvider({ tenantId: tenantId(), sourceFileName: result.report.sourceFileName, sourceHash: result.report.sourceHash, items: secureItems });\n      if (!remote || remote.ok !== true) throw new Error('confirmacion_remota_incompleta');\n      secureSession.delete(result.report.reportId);\n      if (A().audit) A().audit('aplicar_accesos_aseguradoras_secure_only', 'aseguradoras', result.report.reportId, null, { imported: Number(remote.imported || 0), validSheets: validSheets.size, blockedSheets: Math.max(0, operations.length - validSheets.size), containsSecrets: false }, confirmation.reason, { sourceHash: result.report.sourceHash, sourceFileName: result.report.sourceFileName, confirmationPhrase: CONFIRM_PHRASE });\n      return { ok: true, imported: Number(remote.imported || 0), mappings: [].concat(remote.mappings || []), secureStatus: 'confirmado_backend_seguro', validSheets: validSheets.size, blockedSheets: Math.max(0, operations.length - validSheets.size), containsSecrets: false };\n    } catch (error) {\n      return { ok: false, errors: ['confirmacion_remota_incompleta'], errorCode: clean(error && (error.code || error.message), 120) };\n    }\n  }\n  applySecureOnly.__secureOnlyV20260720 = true;\n`;
-          source = source.replace(insertAt, secureOnly + insertAt);
-
-          const exportLine = '    parseMatrices, parseFile, buildOperations, buildDryRun, applyApproved, open, close';
-          if (!source.includes(exportLine)) throw new Error('EXPORT_LINE_NOT_FOUND');
-          source = source.replace(exportLine, '    parseMatrices, parseFile, buildOperations, buildDryRun, applyApproved, applySecureOnly, open, close');
-          writeFileSync(path, source);
-          NODE
-
-      - name: Validar fix y contratos
+      - name: Instalar dependencias verificadas
         shell: bash
         run: |
           set -euo pipefail
-          node --check "$TARGET"
-          grep -Fq 'async function applyApproved' "$TARGET"
-          grep -Fq 'await secureProvider' "$TARGET"
-          grep -Fq 'async function applySecureOnly' "$TARGET"
-          grep -Fq 'applySecureOnly.__secureOnlyV20260720 = true' "$TARGET"
-          grep -Fq 'applyApproved, applySecureOnly, open, close' "$TARGET"
+          npm install --prefix functions --ignore-scripts --no-audit --no-fund
+          npm --prefix functions run check
 
-      - name: Persistir fix validado
+      - name: Recuperar llave efímera
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name "orbit360-gate-bot"
-          git config user.email "orbit360-gate-bot@users.noreply.github.com"
-          git add "$TARGET"
-          if git diff --cached --quiet; then echo 'Sin cambios'; exit 0; fi
-          git commit -m "fix(import): esperar confirmación remota y habilitar secure-only [skip ci]"
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project "$FIREBASE_PROJECT_ID" >/dev/null
+          PRIVATE_KEY="${RUNNER_TEMP}/handoff-private.pem"
+          gcloud secrets versions access latest --secret "$HANDOFF_SECRET_ID" --project "$FIREBASE_PROJECT_ID" > "$PRIVATE_KEY"
+          chmod 600 "$PRIVATE_KEY"
+          PUBLIC_FP="$(openssl pkey -in "$PRIVATE_KEY" -pubout -outform DER 2>/dev/null | sha256sum | awk '{print $1}')"
+          test "$PUBLIC_FP" = "$EXPECTED_FINGERPRINT"
+          echo "HANDOFF_PRIVATE_KEY=$PRIVATE_KEY" >> "$GITHUB_ENV"
+
+      - name: Descifrar, invocar proveedor y aplicar referencias opacas
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT_DIR="orbit360-platform/runtime-gate-crm-v20260716"
+          mkdir -p "$OUT_DIR"
+          export ORBIT360_SECURE_APPLY_DIAG="$OUT_DIR/secure-credentials-apply-sanitized.json"
+          node tools/orbit360-apply-secure-credentials-handoff-v20260720.mjs
+
+      - name: Destruir llave efímera y limpiar archivos temporales
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          DIAG="orbit360-platform/runtime-gate-crm-v20260716/secure-credentials-apply-sanitized.json"
+          DESTROYED=1
+          if [ -n "${DEPLOYER_EMAIL:-}" ] && [ -f "${GOOGLE_APPLICATION_CREDENTIALS:-/nonexistent}" ]; then
+            gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project="$FIREBASE_PROJECT_ID" >/dev/null 2>&1
+            gcloud secrets delete "$HANDOFF_SECRET_ID" --project "$FIREBASE_PROJECT_ID" --quiet >/dev/null 2>&1
+            DESTROYED=$?
+          fi
+          if [ -f "${HANDOFF_PRIVATE_KEY:-/nonexistent}" ]; then shred -u "$HANDOFF_PRIVATE_KEY" 2>/dev/null || rm -f "$HANDOFF_PRIVATE_KEY"; fi
+          if [ -f "${GOOGLE_APPLICATION_CREDENTIALS:-/nonexistent}" ]; then shred -u "$GOOGLE_APPLICATION_CREDENTIALS" 2>/dev/null || rm -f "$GOOGLE_APPLICATION_CREDENTIALS"; fi
+          if [ -f "$DIAG" ] && [ "$DESTROYED" -eq 0 ]; then
+            jq '.keyDestroyed = true' "$DIAG" > "$DIAG.tmp" && mv "$DIAG.tmp" "$DIAG"
+          fi
+          exit 0
+
+      - name: Validar predicado final de importación segura
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/secure-credentials-apply-sanitized.json"
+          jq -e \
+            --argjson expected "$EXPECTED_ITEM_COUNT" \
+            '.ok == true and .phase == "completed" and
+             .imported == $expected and .opaqueRefsVerified == $expected and
+             .directionRevealVerified == true and .advisorDenied == true and
+             .plaintextSecretsInStore == false and .keyDestroyed == true' "$FILE" >/dev/null
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-secure-credentials-apply-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/secure-credentials-apply-sanitized.json
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Comentar resultado sanitizado en PR 5
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body '### Importador Aseguradoras · confirmación remota corregida\n\n- Resultado: **OK**\n- El flujo ya espera la respuesta del proveedor antes de mostrar éxito.\n- Se agregó una ruta `secure-only` que no reimporta Aseguradoras, contactos, bancos ni configuración.\n- Run: `'$GITHUB_RUN_ID'`\n- Commit evaluado: `'$GITHUB_SHA'`\n\nNo se usaron datos reales ni secretos en esta corrección.'
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/secure-credentials-apply-sanitized.json"
+          if [ ! -f "$FILE" ]; then exit 0; fi
+          node <<'NODE' > /tmp/orbit360-secure-apply.md
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/secure-credentials-apply-sanitized.json','utf8'));
+          process.stdout.write([
+            '### Aplicación segura de accesos · Aseguradoras LAB',
+            '',
+            '- Resultado: **'+(d.ok?'OK':'NO_GO')+'**',
+            '- Fase: `'+d.phase+'`',
+            '- Registros cifrados aplicados: `'+d.imported+'`',
+            '- Aseguradoras actualizadas: `'+d.insurerDocumentsUpdated+'`',
+            '- Referencias opacas verificadas: `'+d.opaqueRefsVerified+'`',
+            '- Dirección: `'+d.directionRevealVerified+'`',
+            '- Operativo: `'+d.operativeCopyVerified+'`'+(d.operativeReason?' (`'+d.operativeReason+'`)':''),
+            '- Asesor denegado: `'+d.advisorDenied+'`',
+            '- Secretos en store: `'+d.plaintextSecretsInStore+'`',
+            '- Llave efímera destruida: `'+d.keyDestroyed+'`',
+            '- Run: `'+d.run+'`',
+            '- Commit: `'+d.commit+'`',
+            '',
+            'La evidencia no contiene usuarios, contraseñas, datos personales ni valores protegidos.'
+          ].join('\n'));
+          NODE
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/orbit360-secure-apply.md
