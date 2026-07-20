@@ -127,3 +127,4 @@ html.orbit-m1-stable-ui #host{min-height:calc(100vh - var(--topbar-h));contain:l
   .m1-contact-actions{grid-template-columns:1fr}
   .m1-knowledge-summary{grid-template-columns:1fr}
 }
+/* Gate M1 operativo v5: trigger único después de contrato sincronizado. */
