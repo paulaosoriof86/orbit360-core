@@ -1,8 +1,8 @@
 # Estado vigente M1 — 2026-07-20
 
-Repositorio: `paulaosoriof86/orbit360-core`
-Rama: `ays/backend-tenant-lab-v99-20260703`
-PR: #5 draft/open
+Repositorio: `paulaosoriof86/orbit360-core`  
+Rama: `ays/backend-tenant-lab-v99-20260703`  
+PR: #5 draft/open  
 Producción: no autorizada
 
 ## Estado confirmado
@@ -10,69 +10,99 @@ Producción: no autorizada
 - Bloque 0 cerrado con `GO_STATIC_ARCHITECTURE`.
 - Gate funcional Cliente 360 + Aseguradoras aprobado previamente.
 - Revisión visual realizada.
-- 414 clientes, 26 aseguradoras y 77 portales preservados.
+- 414 clientes, 26 aseguradoras, 77 portales y 7 asesores preservados.
 - IAM resuelto.
 - Cuatro Functions del proveedor seguro activas.
 - Acceso anónimo bloqueado.
 - Hosting LAB disponible.
+- Falso éxito con cero corregido.
+- Target aseguradora–portal incorporado sin leer valores protegidos.
 
-## Intentos de carga desde navegador
+## Gate integral de importadores
 
-### Primer intento
+Gate: `importers-e2e-acceptance-lab-v20260720`.
 
-Clasificación: `DATA_CONTRACT_FAILURE / PROVIDER_NOT_INVOKED`.
+Contrato vigente: `20260720.2`.
 
-El flujo descartaba todos los accesos por alertas generales del directorio y permitía mostrar éxito con cero. No hubo escritura en bóveda ni referencias opacas.
+Estado: `FROZEN_AFTER_TWO_CONFIRMATION_STAGE_FAILURES`.
 
-### Segundo intento
+El workflow quedó congelado y no se dispara por commits. No ejecuta secretos, navegador, deploy, fixture ni escrituras de datos.
 
-La interfaz bloqueó honestamente el falso éxito y mostró `confirmacion_remota_incompleta`.
+## Evidencia de las ejecuciones
 
-Auditoría posterior:
+### Run 29770504103
 
-- eventos remotos: 0;
-- ítems almacenados: 0;
-- referencias opacas: 0;
-- datos expuestos: 0.
+- Preflight: aprobado.
+- Autenticación y rol: aprobados.
+- Fuente sintética: leída.
+- Operaciones: 1.
+- Referencias detectadas: 1.
+- Target interno: resuelto.
+- Etapa final: `dry_run_produced`.
+- Proveedor invocado: no.
+- Rollback: completo.
+- Conteos restaurados: 414 clientes, 26 aseguradoras y 7 asesores.
 
-Clasificación: `DATA_CONTRACT_FAILURE / TARGET_MAPPING_EMPTY_BEFORE_PROVIDER`.
+### Run 29771152601
 
-Causa raíz: el dry-run conocía la aseguradora existente, pero esa relación no llegaba al lote sensible. El proveedor filtraba los registros sin `insurerId` y `portalId` antes de invocar la Function.
+- Preflight: 227/227 aprobado.
+- Autenticación y rol: aprobados.
+- Fuente sintética: leída.
+- Operaciones: 1.
+- Referencias detectadas: 1.
+- Target interno: resuelto.
+- Etapa final: `dry_run_produced`.
+- Proveedor invocado: no.
+- Rollback de fixture y bóveda: completo.
+- Otros registros preservados: sí.
+- Conteos restaurados: 414 clientes, 26 aseguradoras y 7 asesores.
 
-## Corrección vigente
+## Causa raíz confirmada
 
-Se añadió el puente separado:
+Clasificación: `PIPELINE_MECHANISM_FAILURE`.
 
-`core/insurer-secure-target-bridge-v20260720.js`
+Código conceptual: `SYNTHETIC_BROWSER_LEGAL_GATE_NOT_SATISFIED`.
 
-Propiedades:
+La sesión sintética se autenticó correctamente, pero inició con almacenamiento vacío. El owner legal presenta el acuerdo una sola vez por usuario y versión mediante un overlay. El ejecutor no modelaba esa condición de sesión; por eso pudo leer el archivo y construir el dry-run, pero el primer clic operativo quedó bloqueado antes de abrir la confirmación del importador.
 
-- añade únicamente IDs internos de aseguradora y portal;
-- no lee, registra ni persiste valores protegidos;
-- vincula por nombre normalizado, host público único o trazabilidad/posición existente;
-- no crea aseguradoras ni portales;
-- no fuerza coincidencias ambiguas;
-- se carga después del proveedor seguro y antes del Router.
+No es un defecto del Excel, parser, IAM, proveedor, target ni backend. Es una omisión del contrato del navegador de prueba.
 
-Publicación confirmada:
+## Cambios aplicados
 
-- run: `29766099957`;
-- resultado: `success`;
-- preflight: aprobado;
-- sintaxis y marcadores: aprobados;
-- Hosting LAB: publicado;
-- puente y bootstrap: recuperados y verificados desde el canal.
+- Workflow E2E congelado después de dos fallos en la misma etapa.
+- Contrato canónico actualizado a `20260720.2`.
+- Predicado obligatorio: `legalGateSatisfied`.
+- Código de etapa: `LEGAL_GATE_PENDING`.
+- Regla: ningún clic operativo antes de resolver identidad, rol, tenant y gate legal.
+- Bootstrap sincronizado con contrato `20260720.2`.
+- Academia actualizada a `1.226`.
+- Cierre documentado en `CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-LEGAL-GATE-20260720.md`.
+
+## Carriles
+
+- A · Frontend, UX y Academia: estados honestos; sesión legal enseñada por rol.
+- B · Backend y seguridad: proveedor, IAM, auditoría y rollback preservados; no fueron la causa.
+- C · Datos reales: sin nuevas cargas; conteos y bóveda restaurados.
+
+## Restricciones vigentes
+
+- No repetir las cargas reales de Guatemala o Colombia.
+- No ejecutar nuevamente el gate con la revisión actual.
+- No modificar el importador para adaptarlo al test.
+- No desactivar ni saltar el acuerdo legal.
+- No reimportar las 26 aseguradoras.
+- No avanzar a Pólizas o Cobros.
+- No merge, `main`, producción, DNS ni deploy productivo.
 
 ## Siguiente acción exacta
 
-1. Recargar el canal LAB con `Ctrl + Shift + R`.
-2. Repetir una sola vez la carga exclusiva de accesos de Guatemala.
-3. Repetir una sola vez la carga exclusiva de accesos de Colombia.
-4. Aceptar solo resultados con cantidad positiva.
-5. Ejecutar verificación read-only de conteos, referencias, bóveda, ausencia de secretos y roles.
-6. Ejecutar una sola vez el gate final M1.
-7. Cerrar M1 e iniciar Bloque 2: bootstrap productivo read-only.
+Diseñar y auditar un contrato canónico de preparación de sesión que pruebe, antes del primer clic:
 
-## Restricciones
+```txt
+browserAuthReady:true
+activeRoleResolved:true
+tenantResolved:true
+legalGateSatisfied:true
+```
 
-No reimportar el directorio general. No avanzar a Pólizas, Cobros, merge, `main`, producción o DNS antes del cierre final de M1.
+La aceptación debe completarse por la UI legal real o por un fixture equivalente validado por el owner legal. Solo después se registra una nueva revisión del gate y se ejecuta una vez. M1 sigue abierto hasta obtener evidencia integral sanitizada `ok:true`.
