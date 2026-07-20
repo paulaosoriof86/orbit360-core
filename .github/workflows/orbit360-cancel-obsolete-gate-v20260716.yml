@@ -51,7 +51,7 @@ jobs:
       - name: Diagnóstico estático por fase
         shell: bash
         run: |
-          set -u
+          set -uo pipefail
           DIAG="orbit360-platform/runtime-gate-crm-v20260716/credential-provider-static-diagnostic.json"
           PHASE="initializing"
           write_diag() {
@@ -65,39 +65,28 @@ jobs:
               --argjson exitCode "$code" \
               '{schemaVersion:"orbit360-secure-provider-static-diagnostic-v1",containsSecrets:false,containsPII:false,ok:$ok,phase:$phase,exitCode:$exitCode,commit:$commit,run:$run}' > "$DIAG"
           }
-          check() {
+          run_phase() {
             PHASE="$1"
             shift
             echo "ORBIT360_STATIC_PHASE:${PHASE}"
-            "$@"
-            local code=$?
-            if [ "$code" -ne 0 ]; then
+            if "$@"; then
+              return 0
+            else
+              local code=$?
               write_diag false "$code"
               exit "$code"
             fi
           }
           write_diag false 0
-          check node_functions node --check functions/index.js
-          check node_provider node --check orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
-          check node_bootstrap node --check orbit360-platform/core/router-tenant-config-bootstrap.js
-          PHASE="firebase_functions_contract"
-          node -e "const f=require('./firebase.json'); if(!f.functions||f.functions.source!=='functions'||f.functions.runtime!=='nodejs22') process.exit(41)"
-          code=$?; if [ "$code" -ne 0 ]; then write_diag false "$code"; exit "$code"; fi
-          PHASE="bootstrap_provider_marker"
-          grep -Fq 'data-orbit-insurer-credential-provider' orbit360-platform/core/router-tenant-config-bootstrap.js
-          code=$?; if [ "$code" -ne 0 ]; then write_diag false "$code"; exit "$code"; fi
-          PHASE="provider_remote_confirmation_marker"
-          grep -Fq 'appliesOpaqueRefsAfterRemoteConfirmation: true' orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
-          code=$?; if [ "$code" -ne 0 ]; then write_diag false "$code"; exit "$code"; fi
-          PHASE="provider_no_persistence_marker"
-          grep -Fq 'noSecretPersistence: true' orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
-          code=$?; if [ "$code" -ne 0 ]; then write_diag false "$code"; exit "$code"; fi
-          PHASE="npm_install"
-          npm install --prefix functions --ignore-scripts --no-audit --no-fund
-          code=$?; if [ "$code" -ne 0 ]; then write_diag false "$code"; exit "$code"; fi
-          PHASE="npm_check"
-          npm --prefix functions run check
-          code=$?; if [ "$code" -ne 0 ]; then write_diag false "$code"; exit "$code"; fi
+          run_phase node_functions node --check functions/index.js
+          run_phase node_provider node --check orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
+          run_phase node_bootstrap node --check orbit360-platform/core/router-tenant-config-bootstrap.js
+          run_phase firebase_functions_contract node -e "const f=require('./firebase.json'); if(!f.functions||f.functions.source!=='functions'||f.functions.runtime!=='nodejs22') process.exit(41)"
+          run_phase bootstrap_provider_marker grep -Fq 'data-orbit-insurer-credential-provider' orbit360-platform/core/router-tenant-config-bootstrap.js
+          run_phase provider_remote_confirmation_marker grep -Fq 'appliesOpaqueRefsAfterRemoteConfirmation: true' orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
+          run_phase provider_no_persistence_marker grep -Fq 'noSecretPersistence: true' orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
+          run_phase npm_install npm install --prefix functions --ignore-scripts --no-audit --no-fund
+          run_phase npm_check npm --prefix functions run check
           PHASE="completed"
           write_diag true 0
 
