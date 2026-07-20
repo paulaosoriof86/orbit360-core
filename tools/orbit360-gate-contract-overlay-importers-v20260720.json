@@ -2,18 +2,18 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-20",
   "gateId": "importers-e2e-acceptance-lab-v20260720",
-  "classification": "DEPLOYMENT_CONFIRMED_CURRENT_READY_FOR_E2E",
-  "diagnosticRevision": "provider-current-no-redeploy-v6",
-  "contractRevision": "1.0.6-provider-current-no-redeploy-v6",
+  "classification": "ROLLBACK_RUNTIME_DEPENDENCY_CORRECTED_READY_FOR_SINGLE_EXECUTION",
+  "diagnosticRevision": "provider-current-orphan-rollback-precheck-v7",
+  "contractRevision": "1.0.7-provider-current-orphan-rollback-precheck-v7",
   "gatePatch": {
-    "contractVersion": "1.0.6",
-    "diagnosticRevision": "provider-current-no-redeploy-v6",
+    "contractVersion": "1.0.7",
+    "diagnosticRevision": "provider-current-orphan-rollback-precheck-v7",
     "runtimeVersion": "20260720-4",
     "status": "ACTIVE_SINGLE_EXECUTION_PENDING",
     "workflow": ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
     "staticValidationStatus": "PREFLIGHT_REQUIRED_BEFORE_EXECUTION",
     "executionBudget": {
-      "type": "bounded_e2e_current_provider_single_execution_v6",
+      "type": "bounded_e2e_current_provider_rollback_precheck_single_execution_v7",
       "watchdogBudgetMs": 900000,
       "membershipContractMs": 60000,
       "providerDeployMs": 0,
@@ -21,8 +21,8 @@
       "providerInvocationMs": 65000,
       "storeObservationMs": 45000,
       "rollbackMs": 120000,
-      "exhaustionPolicy": "Execute revision v6 exactly once after GO_GATE_CONTRACT, DEPLOYMENT_CONFIRMED_CURRENT and PROVIDER_AUTHORIZATION_LAYER_READY. Do not redeploy Functions. If a later stage fails, stop all reruns and classify only the first real browser, legal, invocation, store, audit or rollback check.",
-      "acceptancePolicy": "Accept only sanitized evidence with same immutable HEAD, current provider revision, canonical membership, browserAuthReady, activeRoleResolved, tenantResolved, legalGateSatisfied, provider confirmation, opaque reference, read-after-write, success and rejection audit, rollbackOk and ok:true."
+      "exhaustionPolicy": "Execute revision v7 exactly once after GO_GATE_CONTRACT, DEPLOYMENT_CONFIRMED_CURRENT, PROVIDER_AUTHORIZATION_LAYER_READY, SECRET_MANAGER_ROLLBACK_DEPENDENCY_OK and orphan rollback verification for run 29782834288. Do not redeploy Functions. If rollback fails again, stop all reruns and classify only the sanitized rollback evidence.",
+      "acceptancePolicy": "Accept only sanitized evidence with same immutable HEAD, current provider revision, orphan residue removed before fixture creation, canonical membership, browserAuthReady, activeRoleResolved, tenantResolved, legalGateSatisfied, provider confirmation, opaque reference, read-after-write, success and rejection audit, current rollbackOk and ok:true."
     }
   },
   "canonicalOwners": [
@@ -81,12 +81,35 @@
         "const FUNCTION_IDS = [",
         "membershipAuthorizationWouldPass",
         "DEPLOYMENT_CONFIRMED_CURRENT",
-        "DEPLOYMENT_PARTIAL",
-        "DEPLOYMENT_NOT_APPLIED",
-        "DEPLOYMENT_REVISION_INCONSISTENT",
         "latestReadyRevisionHash",
         "PROVIDER_AUTHORIZATION_LAYER_READY",
         "providerAuthorizationReady"
+      ]
+    },
+    {
+      "id": "orphanRollbackStateOwner",
+      "path": "tools/orbit360-prepare-orphan-vault-rollback-state-v20260720.mjs",
+      "requiredTokens": [
+        "ORBIT360_ROLLBACK_TARGET_RUN_ID",
+        "ORBIT360_ORPHAN_STATE_PATH",
+        "importers_e2e_${RUN_ID}",
+        "credentialRef",
+        "containsSecrets: false",
+        "ORBIT360_ORPHAN_VAULT_ROLLBACK_STATE_READY"
+      ]
+    },
+    {
+      "id": "vaultRollbackOwner",
+      "path": "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
+      "requiredTokens": [
+        "@google-cloud/secret-manager",
+        "addSecretVersion",
+        "destroySecretVersion",
+        "vaultRecordDeleted",
+        "transientVersionDestroyed",
+        "otherRecordsPreserved",
+        "containsSecrets: false",
+        "ORBIT360_IMPORTERS_E2E_VAULT_ROLLBACK_OK"
       ]
     },
     {
@@ -131,6 +154,8 @@
     "tools/orbit360-run-importers-e2e-gate-v20260720.mjs",
     "tools/orbit360-importers-e2e-browser-v20260720.mjs",
     "tools/orbit360-importers-e2e-finalize-v20260720.mjs",
+    "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
+    "tools/orbit360-prepare-orphan-vault-rollback-state-v20260720.mjs",
     "tools/orbit360-ensure-lab-secure-membership-v20260720.mjs",
     "tools/orbit360-validate-session-readiness-contract-v20260720.mjs",
     "tools/orbit360-validate-provider-role-normalization-v20260720.mjs",
@@ -149,12 +174,15 @@
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-VALIDADOR-AUTORREFERENCIAL-WORKFLOW-M1-20260720.md",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-DEPLOY-FUNCTIONS-DEPENDENCIES-M1-20260720.md",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-OBSERVABILIDAD-DEPLOY-FUNCTIONS-M1-20260720.md",
-    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-DEPLOY-EXIT-FALSE-NEGATIVE-M1-20260720.md"
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-DEPLOY-EXIT-FALSE-NEGATIVE-M1-20260720.md",
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-ROLLBACK-SECRET-MANAGER-DEPENDENCY-M1-20260720.md"
   ],
   "runtimeGraphFiles": [
     "functions/package.json",
     "functions/index.js",
     "tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
+    "tools/orbit360-prepare-orphan-vault-rollback-state-v20260720.mjs",
+    "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
     "orbit360-platform/core/legal.js",
     "orbit360-platform/core/auth.js",
     "orbit360-platform/core/session-readiness-contract-v20260720.js",
@@ -212,13 +240,36 @@
         "latestCreatedRevisionHash",
         "allLatestRevisionsReady",
         "DEPLOYMENT_CONFIRMED_CURRENT",
-        "DEPLOYMENT_PARTIAL",
-        "DEPLOYMENT_NOT_APPLIED",
-        "DEPLOYMENT_REVISION_INCONSISTENT",
         "PROVIDER_AUTHORIZATION_LAYER_READY",
         "providerAuthorizationReady",
         "mode: 'read_only'",
         "iamReadMethod: 'GET'"
+      ]
+    },
+    {
+      "path": "tools/orbit360-prepare-orphan-vault-rollback-state-v20260720.mjs",
+      "requiredTokens": [
+        "ORBIT360_ROLLBACK_TARGET_RUN_ID",
+        "ORBIT360_ORPHAN_STATE_PATH",
+        "const executionId = `importers_e2e_${RUN_ID}`",
+        "const credentialRef = `cred_${crypto.createHash",
+        "containsPII: false",
+        "containsSecrets: false",
+        "ORBIT360_ORPHAN_VAULT_ROLLBACK_STATE_READY"
+      ]
+    },
+    {
+      "path": "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
+      "requiredTokens": [
+        "@google-cloud/secret-manager",
+        "addSecretVersion",
+        "destroySecretVersion",
+        "vaultRecordDeleted",
+        "transientVersionDestroyed",
+        "otherRecordsPreserved",
+        "containsPII: false",
+        "containsSecrets: false",
+        "ORBIT360_IMPORTERS_E2E_VAULT_ROLLBACK_OK"
       ]
     },
     {
@@ -322,6 +373,7 @@
       "requiredTokens": [
         "const RUNTIME = '20260720-4'",
         "tools/orbit360-ensure-lab-secure-membership-v20260720.mjs",
+        "tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs",
         "MEMBERSHIP_CONTRACT_NOT_CANONICAL",
         "version: '1.227'",
         "importerAcademyVersion: '1.227'",
@@ -338,6 +390,8 @@
         "p.legalGateSatisfied === true",
         "p.providerInvoked === true",
         "p.auditFailureObserved === true",
+        "vault.vaultRecordDeleted === true",
+        "vault.transientVersionDestroyed === true",
         "ORBIT360_IMPORTERS_E2E_OK"
       ]
     },
@@ -374,17 +428,21 @@
       "requiredTokens": [
         "IMPORTERS_E2E_V4_SINGLE_EXECUTION",
         "orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720",
-        "orbit360-validate-provider-role-normalization-v20260720.mjs",
         "ORBIT360_REFERENCE_DEPLOY_RUN_ID: \"29781660851\"",
-        "firebase-tools@15.24.0",
-        "FIREBASE_TOOLS_PINNED_15.24.0",
+        "@google-cloud/secret-manager@6.2.0",
+        "SECRET_MANAGER_ROLLBACK_DEPENDENCY_OK",
+        "ORBIT360_ROLLBACK_TARGET_RUN_ID: \"29782834288\"",
+        "ORBIT360_ORPHAN_STATE_PATH",
+        "ORBIT360_ORPHAN_ROLLBACK_EVIDENCE",
+        "orbit360-prepare-orphan-vault-rollback-state-v20260720.mjs",
+        "ORBIT360_ORPHAN_VAULT_ROLLBACK_STATE_READY",
+        "ORBIT360_IMPORTERS_E2E_VAULT_ROLLBACK_OK",
         "DEPLOYMENT_CONFIRMED_CURRENT",
         "providerAuthorizationReady",
         "No provider redeploy",
-        "tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
-        "orbit360-ensure-lab-secure-membership-v20260720.mjs",
-        "membership-contract-sanitized.json",
         "orbit360-run-importers-e2e-gate-v20260720.mjs",
+        "importers-e2e-vault-rollback-sanitized.json",
+        "importers-e2e-orphan-vault-rollback-sanitized.json",
         "No production, main or merge"
       ]
     },
@@ -398,9 +456,6 @@
         "node tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
         "deploymentClassification",
         "DEPLOYMENT_CONFIRMED_CURRENT",
-        "DEPLOYMENT_PARTIAL",
-        "DEPLOYMENT_NOT_APPLIED",
-        "DEPLOYMENT_REVISION_INCONSISTENT",
         "No deploy. No provider invocation. No operational writes."
       ]
     }
