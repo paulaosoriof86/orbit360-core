@@ -1,7 +1,7 @@
 /* Orbit 360 · Bootstrap genérico de configuración tenant para el Router.
    Lee el índice ya cargado y solicita únicamente la configuración activa.
-   Carga contrato visual y proveedor seguro antes de router.js para evitar
-   proyecciones tardías, estados falsos de credenciales y doble render.
+   Carga contrato visual, proveedor seguro y puente de vínculo antes de router.js
+   para evitar proyecciones tardías, estados falsos y doble render.
    No contiene datos de tenants, secretos ni credenciales. */
 (function () {
   'use strict';
@@ -14,6 +14,7 @@
   var visualScriptSrc = 'core/client-insurer-visual-contract-v20260720.js?v=20260720-2';
   var visualStyleSrc = 'styles/client-insurer-visual-contract-v20260720.css?v=20260720-2';
   var credentialProviderSrc = 'core/aseguradoras-credentials-provider-lab-v20260720.js?v=20260720-1';
+  var secureTargetBridgeSrc = 'core/insurer-secure-target-bridge-v20260720.js?v=20260720-1';
 
   window.OrbitTenantBootstrapState = {
     owner: 'core/router.js',
@@ -24,6 +25,8 @@
     visualContractVersion: '20260720.2',
     credentialProviderRequested: true,
     credentialProviderVersion: '20260720.1',
+    secureTargetBridgeRequested: true,
+    secureTargetBridgeVersion: '20260720.1',
     status: source ? 'requested' : 'visual-only'
   };
 
@@ -38,7 +41,8 @@
   var visualScript = safeSameOrigin(visualScriptSrc, '/core/client-insurer-visual-contract-v20260720.js');
   var visualStyle = safeSameOrigin(visualStyleSrc, '/styles/client-insurer-visual-contract-v20260720.css');
   var credentialProvider = safeSameOrigin(credentialProviderSrc, '/core/aseguradoras-credentials-provider-lab-v20260720.js');
-  if (!visualScript || !visualStyle || !credentialProvider) {
+  var secureTargetBridge = safeSameOrigin(secureTargetBridgeSrc, '/core/insurer-secure-target-bridge-v20260720.js');
+  if (!visualScript || !visualStyle || !credentialProvider || !secureTargetBridge) {
     window.OrbitTenantBootstrapState.status = 'runtime-source-blocked';
     return;
   }
@@ -61,8 +65,10 @@
     var styleHref = visualStyle.pathname + visualStyle.search;
     var scriptHref = visualScript.pathname + visualScript.search;
     var providerHref = credentialProvider.pathname + credentialProvider.search;
+    var bridgeHref = secureTargetBridge.pathname + secureTargetBridge.search;
     document.write('<link rel="stylesheet" href="' + styleHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-m1-visual-style="1">');
     document.write('<script src="' + providerHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-insurer-credential-provider="1"><\/script>');
+    document.write('<script src="' + bridgeHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-insurer-secure-target-bridge="1"><\/script>');
     document.write('<script src="' + scriptHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-m1-visual-contract="1"><\/script>');
     if (target) {
       var escaped = (target.pathname + target.search).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
@@ -110,8 +116,22 @@
     document.head.appendChild(script);
   }
 
+  function loadSecureTargetBridge() {
+    if (window.Orbit && window.Orbit.__insurerSecureTargetBridgeV20260720) {
+      loadVisualContract();
+      return;
+    }
+    var bridgeScript = document.createElement('script');
+    bridgeScript.src = secureTargetBridge.pathname + secureTargetBridge.search;
+    bridgeScript.async = false;
+    bridgeScript.setAttribute('data-orbit-insurer-secure-target-bridge', '1');
+    bridgeScript.addEventListener('load', loadVisualContract, { once: true });
+    bridgeScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'secure-target-bridge-error'; }, { once: true });
+    document.head.appendChild(bridgeScript);
+  }
+
   if (window.Orbit && window.Orbit.__insurerCredentialProviderLabV20260720) {
-    loadVisualContract();
+    loadSecureTargetBridge();
     return;
   }
 
@@ -119,8 +139,8 @@
   providerScript.src = credentialProvider.pathname + credentialProvider.search;
   providerScript.async = false;
   providerScript.setAttribute('data-orbit-insurer-credential-provider', '1');
-  providerScript.addEventListener('load', loadVisualContract, { once: true });
+  providerScript.addEventListener('load', loadSecureTargetBridge, { once: true });
   providerScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'credential-provider-error'; }, { once: true });
   document.head.appendChild(providerScript);
 })();
-/* Preflight v5 reconciliado: proveedor seguro restaurado sin cambios de datos. */
+/* Preflight v6 reconciliado: proveedor y puente seguro cargados antes del Router. */
