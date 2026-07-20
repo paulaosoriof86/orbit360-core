@@ -1,6 +1,11 @@
 name: Orbit 360 Importers E2E Acceptance LAB 20260720 V3
 
 on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml"
   pull_request:
     branches:
       - main
@@ -19,7 +24,7 @@ concurrency:
 jobs:
   preflight:
     name: Importadores · preflight vinculante sin secretos
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.ref == 'ays/backend-tenant-lab-v99-20260703'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.pull_request.head.ref == 'ays/backend-tenant-lab-v99-20260703'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
