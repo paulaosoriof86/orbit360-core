@@ -1,4 +1,4 @@
-name: Orbit 360 Importer End-to-End Diagnosis LAB 20260720
+name: Orbit 360 Importers E2E Acceptance LAB 20260720
 
 on:
   push:
@@ -11,155 +11,95 @@ permissions:
   contents: read
   pull-requests: write
 
+concurrency:
+  group: orbit360-importers-e2e-acceptance-lab-v20260720
+  cancel-in-progress: false
+
 jobs:
-  diagnose_importer:
-    name: Aseguradoras · diagnóstico integral de importación segura
+  importers_e2e:
+    name: Importadores · navegador, store, auditoría y rollback
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
-      ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
+      ORBIT360_GATE_ID: importers-e2e-acceptance-lab-v20260720
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
-      TENANT_ID: alianzas-soluciones
+      ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
+      ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
+      ORBIT360_EXPECTED_UID: woJlxR1iFEeiQZvTscPj4qQ5Qc73
+      ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
       SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      ORBIT360_IMPORTERS_E2E_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
+      ORBIT360_PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+
     steps:
       - name: Checkout rama autorizada
         uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
 
-      - name: Preflight vinculante
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Preflight vinculante antes de secretos
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
+
+      - name: Validar sintaxis del gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/importer-execution-contract-v20260720.js
+          node --check orbit360-platform/core/router-tenant-config-bootstrap.js
+          node --check tools/orbit360-importers-e2e-fixture-v20260720.mjs
+          node --check tools/orbit360-importers-e2e-browser-v20260720.mjs
+          node --check tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs
+          node --check tools/orbit360-importers-e2e-finalize-v20260720.mjs
+          node --check tools/orbit360-run-importers-e2e-gate-v20260720.mjs
 
       - name: Resolver cuenta LAB
         shell: bash
         run: |
           set -euo pipefail
-          FILE="${RUNNER_TEMP}/lab.json"
+          test -n "${SA_PRIMARY:-}"
+          FILE="${RUNNER_TEMP}/orbit360-lab.json"
           printf '%s' "$SA_PRIMARY" > "$FILE"
           chmod 600 "$FILE"
-          test "$(jq -r '.project_id // empty' "$FILE")" = "$FIREBASE_PROJECT_ID"
+          test "$(jq -r '.project_id // empty' "$FILE")" = "ays-orbit-360-lab"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$FILE" >> "$GITHUB_ENV"
-          echo "DEPLOYER_EMAIL=$(jq -r '.client_email // empty' "$FILE")" >> "$GITHUB_ENV"
 
-      - name: Instalar herramientas de diagnóstico
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ays-orbit-360-lab
-
-      - name: Instalar dependencia Firestore
-        shell: bash
-        run: npm install --prefix functions --ignore-scripts --no-audit --no-fund
-
-      - name: Auditar Firestore sin modificar datos
+      - name: Instalar dependencias verificadas
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
-          export OUT_FILE=orbit360-platform/runtime-gate-crm-v20260716/importer-e2e-diagnosis-sanitized.json
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          import {createRequire} from 'node:module';
-          const require=createRequire(new URL('./functions/package.json',import.meta.url));
-          const {initializeApp,cert}=require('firebase-admin/app');
-          const {getFirestore}=require('firebase-admin/firestore');
-          const account=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS,'utf8'));
-          const app=initializeApp({credential:cert(account),projectId:process.env.FIREBASE_PROJECT_ID});
-          const db=getFirestore(app);
-          const audit=await db.collection('tenants').doc(process.env.TENANT_ID).collection('auditEvents').get();
-          let importEvents=0, importedItems=0, deniedEvents=0, lastImportAt='';
-          for(const doc of audit.docs){
-            const row=doc.data()||{};
-            const action=String(row.action||'');
-            if(action==='credential.import'){
-              importEvents+=1;
-              importedItems+=Number(row.count||0);
-              const stamp=row.createdAt&&typeof row.createdAt.toDate==='function'?row.createdAt.toDate().toISOString():'';
-              if(stamp>lastImportAt)lastImportAt=stamp;
-            }
-            if(String(row.outcome||'').includes('denied'))deniedEvents+=1;
-          }
-          const insurers=await db.collection('tenantId').doc(process.env.TENANT_ID).collection('aseguradoras').get();
-          let portals=0,refs=0,plaintextFields=0;
-          const sensitive=/^(username|usuario|password|contrasena|contraseña|secret|token|apiKey)$/i;
-          for(const doc of insurers.docs){
-            for(const portal of (doc.data()?.portales||[])){
-              portals+=1;
-              if(/^cred_[a-f0-9]{32}$/.test(String(portal?.credentialRef||'').trim()))refs+=1;
-              for(const [key,value] of Object.entries(portal||{}))if(sensitive.test(key)&&String(value||'').trim())plaintextFields+=1;
-            }
-          }
-          const classification=importEvents===0&&refs===0?'REQUEST_DID_NOT_REACH_PROVIDER':importEvents>0&&refs===0?'PROVIDER_STORED_BUT_REFS_NOT_APPLIED':refs>0?'REMOTE_WRITE_PRESENT':'INDETERMINATE';
-          fs.writeFileSync(process.env.OUT_FILE,JSON.stringify({schemaVersion:'orbit360-importer-e2e-diagnosis-v1',containsSecrets:false,containsPII:false,ok:true,classification,importEvents,importedItems,deniedEvents,lastImportAt,insurers:insurers.size,portals,opaqueRefs:refs,plaintextFields},null,2));
-          console.log('DIAG_'+classification);
-          NODE
+          npm install --no-save --ignore-scripts --no-audit --no-fund firebase-tools firebase-admin@13 playwright@1.55.0 xlsx@0.18.5 @google-cloud/secret-manager@6
+          npx playwright install --with-deps chromium
 
-      - name: Auditar invocaciones recientes de la Function
-        shell: bash
-        run: |
-          set +e
-          gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project="$FIREBASE_PROJECT_ID" >/dev/null 2>&1
-          RAW="${RUNNER_TEMP}/function-logs.json"
-          gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="orbit360importinsurercredentials" AND timestamp>="2026-07-20T17:30:00Z"' --project "$FIREBASE_PROJECT_ID" --limit 100 --order desc --format=json > "$RAW" 2>/dev/null
-          STATUS=$?
-          OUT=orbit360-platform/runtime-gate-crm-v20260716/importer-e2e-diagnosis-sanitized.json
-          if [ "$STATUS" -eq 0 ] && jq -e 'type=="array"' "$RAW" >/dev/null 2>&1; then
-            TOTAL=$(jq 'length' "$RAW")
-            S2=$(jq '[.[]|select((.httpRequest.status//0)>=200 and (.httpRequest.status//0)<300)]|length' "$RAW")
-            S4=$(jq '[.[]|select((.httpRequest.status//0)>=400 and (.httpRequest.status//0)<500)]|length' "$RAW")
-            S5=$(jq '[.[]|select((.httpRequest.status//0)>=500)]|length' "$RAW")
-            jq --argjson total "$TOTAL" --argjson s2 "$S2" --argjson s4 "$S4" --argjson s5 "$S5" '.functionLogReadable=true|.functionRequests=$total|.function2xx=$s2|.function4xx=$s4|.function5xx=$s5' "$OUT" > "$OUT.tmp" && mv "$OUT.tmp" "$OUT"
-          else
-            jq '.functionLogReadable=false|.functionRequests=null|.function2xx=null|.function4xx=null|.function5xx=null' "$OUT" > "$OUT.tmp" && mv "$OUT.tmp" "$OUT"
-          fi
-          rm -f "$RAW"
-          exit 0
-
-      - name: Clasificar causa raíz
+      - name: Ejecutar gate integral una sola vez
         shell: bash
         run: |
           set -euo pipefail
-          OUT=orbit360-platform/runtime-gate-crm-v20260716/importer-e2e-diagnosis-sanitized.json
-          node <<'NODE'
-          const fs=require('fs');
-          const p='orbit360-platform/runtime-gate-crm-v20260716/importer-e2e-diagnosis-sanitized.json';
-          const d=JSON.parse(fs.readFileSync(p,'utf8'));
-          if(d.classification==='REQUEST_DID_NOT_REACH_PROVIDER'){
-            d.rootCauseClass='DATA_CONTRACT_FAILURE';
-            d.rootCause='FRONTEND_TARGET_CONTRACT_NOT_E2E_VALIDATED';
-          }else if(d.classification==='PROVIDER_STORED_BUT_REFS_NOT_APPLIED'){
-            d.rootCauseClass='DATA_CONTRACT_FAILURE';
-            d.rootCause='REMOTE_CONFIRMATION_NOT_APPLIED_TO_STORE';
-          }else if((d.function4xx||0)>0&&d.importEvents===0){
-            d.rootCauseClass='SECURITY_FAILURE';
-            d.rootCause='PROVIDER_AUTHORIZATION_REJECTED';
-          }else{
-            d.rootCauseClass='PIPELINE_MECHANISM_FAILURE';
-            d.rootCause='RUNTIME_RESULT_NOT_OBSERVABLE';
-          }
-          d.importerSystemFinding='NO_MANDATORY_BROWSER_TO_BACKEND_TO_STORE_ACCEPTANCE_GATE';
-          fs.writeFileSync(p,JSON.stringify(d,null,2));
-          NODE
-          jq -e '.containsSecrets==false and .containsPII==false and .insurers==26 and .portals==77 and .plaintextFields==0' "$OUT" >/dev/null
+          node tools/orbit360-run-importers-e2e-gate-v20260720.mjs
 
       - name: Publicar evidencia sanitizada
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-importer-e2e-diagnosis-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/importer-e2e-diagnosis-sanitized.json
-          if-no-files-found: error
+          name: orbit360-importers-e2e-acceptance-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-cleanup-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-vault-rollback-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-coordinator-sanitized.json
+          if-no-files-found: warn
           retention-days: 7
 
-      - name: Comentar diagnóstico en PR 5
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          F=orbit360-platform/runtime-gate-crm-v20260716/importer-e2e-diagnosis-sanitized.json
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "### Diagnóstico integral de importadores · sin reintento\n\n- Clasificación runtime: \`$(jq -r .classification $F)\`\n- Clase raíz: \`$(jq -r .rootCauseClass $F)\`\n- Causa raíz: \`$(jq -r .rootCause $F)\`\n- Hallazgo sistémico: \`$(jq -r .importerSystemFinding $F)\`\n- Eventos remotos: \`$(jq -r .importEvents $F)\`\n- Ítems remotos: \`$(jq -r .importedItems $F)\`\n- Referencias opacas: \`$(jq -r .opaqueRefs $F)\`\n- Secretos en Firestore: \`$(jq -r .plaintextFields $F)\`\n- Logs Function legibles: \`$(jq -r .functionLogReadable $F)\`\n- Run: \`$GITHUB_RUN_ID\`\n\nNo se modificaron datos, bóveda ni producto durante este diagnóstico."
-
-      - name: Limpiar credencial temporal
+      - name: Limpiar cuenta temporal
         if: always()
+        shell: bash
         run: rm -f "${GOOGLE_APPLICATION_CREDENTIALS:-/nonexistent}"
