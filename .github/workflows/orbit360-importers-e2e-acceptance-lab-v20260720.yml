@@ -201,7 +201,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm install --no-save firebase-admin@13 google-auth-library@9 playwright@1.52.0 xlsx@0.18.5
+          npm install --no-save firebase-admin@13 google-auth-library@9 playwright@1.52.0 xlsx@0.18.5 firebase-tools@15.24.0
+          npm install --prefix functions --omit=dev --no-audit --no-fund
+          (
+            cd functions
+            node -e "require('firebase-functions/v2/https'); require('firebase-admin/app'); require('@google-cloud/secret-manager'); console.log('FUNCTION_DEPENDENCIES_OK')"
+          )
+          node <<'NODE'
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('node_modules/firebase-tools/package.json', 'utf8'));
+          if (pkg.version !== '15.24.0') throw new Error(`FIREBASE_TOOLS_VERSION_${pkg.version}`);
+          console.log('FIREBASE_TOOLS_PINNED_15.24.0');
+          NODE
           node -e "require('firebase-admin'); require('google-auth-library'); require('xlsx'); console.log('DEPENDENCIAS_GATE_OK')"
           npx playwright install --with-deps chromium
 
@@ -211,7 +222,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          npx firebase-tools deploy \
+          ./node_modules/.bin/firebase deploy \
             --only functions:orbit360ImportInsurerCredentials,functions:orbit360CredentialStatus,functions:orbit360RevealInsurerCredential,functions:orbit360CopyInsurerCredential \
             --project "$FIREBASE_PROJECT_ID" \
             --non-interactive \
@@ -229,7 +240,9 @@ jobs:
           const lower = combined.toLowerCase();
           const hash = value => crypto.createHash('sha256').update(value).digest('hex');
           let category = Number(process.env.DEPLOY_CODE) === 0 ? 'DEPLOY_OK' : 'DEPLOY_FAILED_UNCLASSIFIED';
-          if (/iam\.serviceaccounts\.actas|act as service account/.test(lower)) category = 'SECURITY_FAILURE_SERVICE_ACCOUNT_ACT_AS';
+          if (/cannot find module|failed to load function definition|functions codebase could not be analyzed|error parsing triggers/.test(lower)) category = 'PIPELINE_MECHANISM_FAILURE_FUNCTION_DEPENDENCIES';
+          else if (/npm (err|error)|eresolve|enoent/.test(lower)) category = 'PIPELINE_MECHANISM_FAILURE_NPM_INSTALL';
+          else if (/iam\.serviceaccounts\.actas|act as service account/.test(lower)) category = 'SECURITY_FAILURE_SERVICE_ACCOUNT_ACT_AS';
           else if (/permission[_ -]?denied|missing required permission|not authorized/.test(lower)) category = 'SECURITY_FAILURE_DEPLOY_PERMISSION';
           else if (/no function matches|does not match any functions/.test(lower)) category = 'PIPELINE_MECHANISM_FAILURE_FUNCTION_SELECTOR';
           else if (/quota|resource exhausted/.test(lower)) category = 'ENVIRONMENT_FAILURE_QUOTA';
@@ -237,11 +250,13 @@ jobs:
           else if (/build failed|failed to build|container healthcheck/.test(lower)) category = 'FUNCTIONAL_DEFECT_FUNCTION_BUILD';
           else if (/precondition|operation.*in progress/.test(lower)) category = 'ENVIRONMENT_FAILURE_DEPLOY_PRECONDITION';
           const evidence = {
-            schemaVersion: 'orbit360-provider-deploy-sanitized-v1',
+            schemaVersion: 'orbit360-provider-deploy-sanitized-v2',
             projectId: process.env.FIREBASE_PROJECT_ID,
             environment: 'LAB',
             commit: process.env.GITHUB_SHA,
             runId: process.env.GITHUB_RUN_ID,
+            firebaseToolsVersion: '15.24.0',
+            functionsDependenciesReady: true,
             deployedFunctions: [
               'orbit360ImportInsurerCredentials',
               'orbit360CredentialStatus',
@@ -352,6 +367,8 @@ jobs:
             ok: ${e2e.ok === true}
             \`\`\`
 
+            - Firebase CLI fijado: **${deploy.firebaseToolsVersion === '15.24.0'}**
+            - Dependencias Functions verificadas: **${deploy.functionsDependenciesReady === true}**
             - Deploy LAB del proveedor aprobado: **${deploy.ok === true}**
             - Autorización del proveedor lista: **${diagnostic.providerAuthorizationReady === true}**
             - Autenticación navegador: **${predicates.browserAuthReady === true}**
@@ -395,7 +412,7 @@ jobs:
             echo ""
             echo "Commit validado: ${ORBIT360_VALIDATED_SHA}"
             echo ""
-            echo "La normalización de roles, membresía canónica y UI legal deben quedar listas antes del primer clic del importador."
+            echo "La normalización de roles, membresía canónica, dependencias Functions y UI legal deben quedar listas antes del primer clic del importador."
             echo ""
             echo "No production, main or merge."
           } >> "$GITHUB_STEP_SUMMARY"
