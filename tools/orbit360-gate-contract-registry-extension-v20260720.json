@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v1",
+  "issuedAt": "2026-07-20",
+  "repository": {
+    "fullName": "paulaosoriof86/orbit360-core",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pr": 5,
+    "tenant": "alianzas-soluciones"
+  },
+  "canonicalOwners": [
+    {
+      "id": "importerExecutionContract",
+      "path": "orbit360-platform/core/importer-execution-contract-v20260720.js",
+      "requiredTokens": [
+        "singleTargetOwner: true",
+        "requiresReadAfterWrite: true",
+        "requiresAuditSuccessAndFailure: true",
+        "requiresRollbackForSynthetic: true",
+        "forbidsSuccessWithZero: true",
+        "writesStore: false"
+      ]
+    },
+    {
+      "id": "insurerDirectoryImporterE2E",
+      "path": "orbit360-platform/core/insurer-directory-import-v1202.js",
+      "requiredTokens": [
+        "applySecureOnly.__secureOnlyV20260720 = true",
+        "confirmacion_remota_incompleta",
+        "remote.ok !== true",
+        "imported <= 0",
+        "secureProviderReady"
+      ]
+    },
+    {
+      "id": "insurerSecureTargetBridge",
+      "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+      "requiredTokens": [
+        "version: '20260720.1'",
+        "function enrich(payload)",
+        "noProtectedValueAccess: true",
+        "Orbit.secureImport.importInsurerDirectory = wrapped"
+      ]
+    },
+    {
+      "id": "insurerCredentialProviderE2E",
+      "path": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+      "requiredTokens": [
+        "remoteConfirmationRequired: true",
+        "appliesOpaqueRefsAfterRemoteConfirmation: true",
+        "orbit360ImportInsurerCredentials",
+        "applyMappings(result)"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "gateId": "importers-e2e-acceptance-lab-v20260720",
+      "contractVersion": "1.0.0",
+      "diagnosticRevision": "canonical-browser-backend-store-rollback-v1",
+      "runtimeVersion": "20260720-1",
+      "block": 1,
+      "status": "ACTIVE_ROOT_CAUSE_GATE",
+      "diagnosticRule": "An importer is accepted only when one synthetic source traverses the real browser UI, canonical Auth and active role, target resolution, protected backend, opaque operational reference, read-after-write, success and rejection audit, and full rollback in a single sanitized execution.",
+      "executionBudget": {
+        "type": "bounded_e2e_with_mandatory_rollback",
+        "watchdogBudgetMs": 900000,
+        "browserBootstrapMs": 120000,
+        "providerInvocationMs": 65000,
+        "storeObservationMs": 45000,
+        "rollbackMs": 120000,
+        "exhaustionPolicy": "Execute once after GO_GATE_CONTRACT. If the same stage fails twice, stop retries and classify the root cause before any product patch.",
+        "acceptancePolicy": "Only sanitized evidence with ok:true and rollbackOk:true unfreezes real importer testing."
+      },
+      "workflow": ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
+      "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
+      "validators": [
+        "tools/orbit360-importers-e2e-fixture-v20260720.mjs",
+        "tools/orbit360-importers-e2e-browser-v20260720.mjs",
+        "tools/orbit360-importers-e2e-finalize-v20260720.mjs",
+        "tools/orbit360-gate-environment-v20260717.mjs"
+      ],
+      "requiredFiles": [
+        "orbit360-platform/core/importer-execution-contract-v20260720.js",
+        "orbit360-platform/core/insurer-directory-import-v1202.js",
+        "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+        "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+        "orbit360-platform/core/backend-lab-init.js",
+        "orbit360-platform/core/auth.js",
+        "orbit360-platform/core/access-scope.js",
+        "orbit360-platform/data/store-firestore-lab.local.js",
+        "functions/index.js",
+        "tools/orbit360-importers-e2e-fixture-v20260720.mjs",
+        "tools/orbit360-importers-e2e-browser-v20260720.mjs",
+        "tools/orbit360-importers-e2e-finalize-v20260720.mjs",
+        "orbit360-platform/docs/INCIDENTE-SISTEMICO-IMPORTADORES-E2E-20260720.md"
+      ],
+      "runtimeGraphFiles": [
+        "orbit360-platform/index.html",
+        "orbit360-platform/core/backend-lab-loader.js",
+        "orbit360-platform/core/backend-lab-init.js",
+        "orbit360-platform/core/auth.js",
+        "orbit360-platform/core/access-scope.js",
+        "orbit360-platform/data/store-firestore-lab.local.js",
+        "orbit360-platform/core/importer-execution-contract-v20260720.js",
+        "orbit360-platform/core/insurer-directory-import-v1202.js",
+        "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+        "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+        "functions/index.js"
+      ],
+      "runtimeVersionContracts": [
+        {
+          "path": "orbit360-platform/core/importer-execution-contract-v20260720.js",
+          "requiredTokens": [
+            "var VERSION = '20260720.1'",
+            "singleTargetOwner: true",
+            "requiresRollbackForSynthetic: true",
+            "forbidsSuccessWithZero: true",
+            "sanitizeEvidence"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/insurer-directory-import-v1202.js",
+          "requiredTokens": [
+            "applySecureOnly.__secureOnlyV20260720 = true",
+            "confirmacion_remota_incompleta",
+            "remote.ok !== true",
+            "imported <= 0"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+          "requiredTokens": [
+            "remoteConfirmationRequired: true",
+            "appliesOpaqueRefsAfterRemoteConfirmation: true",
+            "orbit360ImportInsurerCredentials",
+            "applyMappings(result)"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+          "requiredTokens": [
+            "version: '20260720.1'",
+            "function enrich(payload)",
+            "noProtectedValueAccess: true"
+          ]
+        },
+        {
+          "path": "functions/index.js",
+          "requiredTokens": [
+            "exports.orbit360ImportInsurerCredentials",
+            "sanitizeImportItems",
+            "await writeVault(vault)",
+            "credential.import"
+          ]
+        },
+        {
+          "path": "tools/orbit360-importers-e2e-browser-v20260720.mjs",
+          "requiredTokens": [
+            "providerRequestObserved",
+            "targetIdsResolved",
+            "readAfterWriteOk",
+            "auditFailureObserved",
+            "ORBIT360_IMPORTERS_E2E_BROWSER_READY_FOR_ROLLBACK"
+          ]
+        }
+      ],
+      "forbiddenRuntimeReferences": [],
+      "environment": {
+        "branch": "ays/backend-tenant-lab-v99-20260703",
+        "firebaseProjectId": "ays-orbit-360-lab",
+        "hostingChannel": "orbit360-ays-lab",
+        "tenantId": "alianzas-soluciones",
+        "productionAllowed": false
+      }
+    }
+  ]
+}
