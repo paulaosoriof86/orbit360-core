@@ -1,30 +1,24 @@
-name: Orbit 360 Secure Portal Mapping Fix LAB 20260720
+name: Orbit 360 Secure Target Bridge Deploy LAB 20260720
 
 on:
   push:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
+      - .github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
-concurrency:
-  group: orbit360-secure-portal-mapping-fix-v20260720
-  cancel-in-progress: false
-
 jobs:
-  fix_mapping:
-    name: Aseguradoras · vincular accesos con portales existentes
+  deploy_bridge:
+    name: Aseguradoras · validar y publicar puente seguro
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
     env:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
-      IMPORTER: orbit360-platform/core/insurer-directory-import-v1202.js
-      INDEX_FILE: orbit360-platform/index.html
       SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     steps:
       - name: Checkout rama autorizada
@@ -36,140 +30,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
 
-      - name: Aplicar corrección acotada al contrato de vínculo
+      - name: Validar archivos del puente
         shell: bash
         run: |
           set -euo pipefail
-          node --input-type=module <<'NODE'
-          import {readFileSync,writeFileSync} from 'node:fs';
-          const importer=process.env.IMPORTER;
-          let source=readFileSync(importer,'utf8');
-          if(!source.includes('__securePortalMappingV20260720')){
-            const capture="if ((user || password) && secure) secure.push({ type: 'credential', insurerSheet: source.sheetName, platformIndex: out.length - 1, username: user, password, url: link });";
-            const enhanced=`if ((user || password) && secure) {
-              const portal = out[out.length - 1];
-              secure.push({
-                type: 'credential', insurerSheet: source.sheetName, platformIndex: out.length - 1,
-                portalKey: fold([portal.nombre, portal.urlHint, portal.tipo].join('|')),
-                portalName: portal.nombre, portalUrlHint: portal.urlHint, portalType: portal.tipo,
-                username: user, password, url: link
-              });
-            }`;
-            const count=source.split(capture).length-1;
-            if(count!==2) throw new Error('CAPTURE_SIGNATURE_COUNT_'+count);
-            source=source.split(capture).join(enhanced);
+          node --check orbit360-platform/core/insurer-secure-target-bridge-v20260720.js
+          node --check orbit360-platform/core/router-tenant-config-bootstrap.js
+          grep -Fq '__insurerSecureTargetBridgeV20260720' orbit360-platform/core/insurer-secure-target-bridge-v20260720.js
+          grep -Fq 'insurer-secure-target-bridge-v20260720.js?v=20260720-1' orbit360-platform/core/router-tenant-config-bootstrap.js
 
-            const start=source.indexOf('function secureOnlyEligibleItems(sourceItems, operations) {');
-            const end=source.indexOf('function secureProviderReady()',start);
-            if(start<0||end<0) throw new Error('ELIGIBILITY_BLOCK_NOT_FOUND');
-            const block=`function secureOnlyEligibleItems(sourceItems, operations) {
-              const blockedSheets = new Set([].concat(operations || []).filter(op => {
-                const alerts = [].concat(op && op.data && op.data.validacionAlertas || []);
-                return alerts.some(alert => /entidad_no_es_aseguradora_directa|duplicado_dentro_del_archivo/.test(clean(alert)));
-              }).map(op => op && op.sourceSheet).filter(Boolean));
-              return [].concat(sourceItems || []).filter(item => item && item.type === 'credential' && !blockedSheets.has(item.insurerSheet));
-            }
-            function securePortalKey(portal) {
-              portal = portal || {};
-              return fold([portal.nombre || portal.portalName, portal.urlHint || portal.portalUrlHint, portal.tipo || portal.portalType].join('|'));
-            }
-            function secureOnlyTargetedItems(sourceItems, operations) {
-              const eligible = secureOnlyEligibleItems(sourceItems, operations);
-              const ops = [].concat(operations || []);
-              return eligible.map(item => {
-                const op = ops.find(row => clean(row && row.sourceSheet) === clean(item.insurerSheet));
-                if (!op || op.action !== 'update' || !clean(op.id)) return null;
-                let insurer = null;
-                try {
-                  insurer = S().get ? S().get('aseguradoras', op.id) : (S().all('aseguradoras') || []).find(row => clean(row && row.id) === clean(op.id));
-                } catch (error) {}
-                if (!insurer) return null;
-                const portals = [].concat(insurer.portales || []).map((portal, index) => ({ portal, index }));
-                const key = clean(item.portalKey);
-                let match = key ? portals.find(row => securePortalKey(row.portal) === key) : null;
-                if (!match) {
-                  const name = fold(item.portalName);
-                  const byName = name ? portals.filter(row => fold(row.portal && row.portal.nombre) === name) : [];
-                  if (byName.length === 1) match = byName[0];
-                }
-                if (!match) {
-                  const hint = fold(item.portalUrlHint);
-                  const byHint = hint ? portals.filter(row => fold(row.portal && row.portal.urlHint) === hint) : [];
-                  if (byHint.length === 1) match = byHint[0];
-                }
-                if (!match) return null;
-                return Object.assign({}, item, {
-                  insurerId: clean(op.id, 160),
-                  portalId: clean(match.portal && (match.portal.id || String(match.index)), 160)
-                });
-              }).filter(Boolean);
-            }
-            secureOnlyTargetedItems.__securePortalMappingV20260720 = true;
-            `;
-            source=source.slice(0,start)+block+source.slice(end);
-
-            const useBefore='const secureItems = secureOnlyEligibleItems(sourceItems, operations);\n  if (!secureItems.length) return { ok: false, errors: [\'sin_accesos_elegibles_para_guardar\'] };';
-            const useAfter=`const eligibleItems = secureOnlyEligibleItems(sourceItems, operations);
-  const secureItems = secureOnlyTargetedItems(sourceItems, operations);
-  if (!secureItems.length) return { ok: false, errors: ['sin_accesos_vinculables_a_portales_existentes'], requested: eligibleItems.length };`;
-            if(!source.includes(useBefore)) throw new Error('SECURE_ITEMS_SIGNATURE_NOT_FOUND');
-            source=source.replace(useBefore,useAfter);
-            source=source.replaceAll('requested: secureItems.length, skipped: Math.max(0, secureItems.length - imported)','requested: eligibleItems.length, skipped: Math.max(0, eligibleItems.length - imported)');
-            source=source.replace('secureOnlyEligibleItems, secureProviderReady, applySecureOnly','secureOnlyEligibleItems, securePortalKey, secureOnlyTargetedItems, secureProviderReady, applySecureOnly');
-            writeFileSync(importer,source);
-          }
-
-          const index=process.env.INDEX_FILE;
-          let html=readFileSync(index,'utf8');
-          const old='core/insurer-directory-import-v1202.js?v=20260711';
-          const fresh='core/insurer-directory-import-v1202.js?v=20260720-3';
-          if(html.includes(old)) html=html.replace(old,fresh);
-          else if(!html.includes(fresh)) throw new Error('INDEX_CACHE_SIGNATURE_NOT_FOUND');
-          writeFileSync(index,html);
-          NODE
-
-      - name: Validar sintaxis y contrato puro
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check "$IMPORTER"
-          grep -Fq '__securePortalMappingV20260720' "$IMPORTER"
-          grep -Fq 'sin_accesos_vinculables_a_portales_existentes' "$IMPORTER"
-          grep -Fq 'insurer-directory-import-v1202.js?v=20260720-3' "$INDEX_FILE"
-          node <<'NODE'
-          const fs=require('fs'),vm=require('vm');
-          const code=fs.readFileSync(process.env.IMPORTER,'utf8');
-          const live={id:'asg_general',portales:[{id:'portal_live',nombre:'Emisión',urlHint:'portal.example.com',tipo:'Plataforma'}]};
-          const Orbit={store:{get:(c,id)=>c==='aseguradoras'&&id==='asg_general'?live:null,all:()=>[live]},ui:{},access:{},secureImport:{importInsurerDirectory:async()=>({ok:true,imported:1,mappings:[{}]})}};
-          const window={Orbit,addEventListener:()=>{},removeEventListener:()=>{}};
-          const context={window,Orbit,console,setTimeout,clearTimeout,URL,Map,Set,Promise};
-          vm.createContext(context);vm.runInContext(code,context);
-          const api=context.Orbit.insurerDirectoryImport;
-          const item={type:'credential',insurerSheet:'GENERAL',portalKey:'emision portal example com plataforma',portalName:'Emisión',portalUrlHint:'portal.example.com',portalType:'Plataforma'};
-          const update=[{sourceSheet:'GENERAL',action:'update',id:'asg_general',data:{validacionAlertas:['nombre_hoja_no_coincide_identidad']}}];
-          const target=api.secureOnlyTargetedItems([item],update);
-          if(target.length!==1||target[0].insurerId!=='asg_general'||target[0].portalId!=='portal_live') throw new Error('TARGET_MAPPING_FAILED');
-          const insert=[{sourceSheet:'GENERAL',action:'insert',id:'',data:{validacionAlertas:[]}}];
-          if(api.secureOnlyTargetedItems([item],insert).length!==0) throw new Error('INSERT_MUST_NOT_RECEIVE_ACCESS');
-          const blocked=[{sourceSheet:'GENERAL',action:'update',id:'asg_general',data:{validacionAlertas:['entidad_no_es_aseguradora_directa']}}];
-          if(api.secureOnlyTargetedItems([item],blocked).length!==0) throw new Error('PARTNER_MUST_REMAIN_BLOCKED');
-          console.log('GO_SECURE_PORTAL_MAPPING_PURE_SMOKE');
-          NODE
-
-      - name: Persistir fix validado
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "orbit360-gate-bot"
-          git config user.email "orbit360-gate-bot@users.noreply.github.com"
-          git add "$IMPORTER" "$INDEX_FILE"
-          git commit -m "fix(import): vincular accesos con portal existente [skip ci]"
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
-
-      - name: Resolver cuenta de servicio LAB
+      - name: Resolver cuenta LAB
         shell: bash
         run: |
           set -euo pipefail
@@ -183,23 +55,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          DEPLOY_JSON="${RUNNER_TEMP}/deploy.json"
-          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab --project "$FIREBASE_PROJECT_ID" --expires 30d --non-interactive --json | tee "$DEPLOY_JSON"
-          URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$DEPLOY_JSON" | head -n 1)"
+          OUT="${RUNNER_TEMP}/deploy.json"
+          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab --project "$FIREBASE_PROJECT_ID" --expires 30d --non-interactive --json | tee "$OUT"
+          URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$OUT" | head -n 1)"
           test -n "$URL"
-          SRC="$(curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/core/insurer-directory-import-v1202.js?run=$GITHUB_RUN_ID")"
-          HTML="$(curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/index.html?run=$GITHUB_RUN_ID")"
-          printf '%s' "$SRC" | grep -Fq '__securePortalMappingV20260720'
-          printf '%s' "$SRC" | grep -Fq 'sin_accesos_vinculables_a_portales_existentes'
-          printf '%s' "$HTML" | grep -Fq 'insurer-directory-import-v1202.js?v=20260720-3'
+          BRIDGE="$(curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/core/insurer-secure-target-bridge-v20260720.js?run=$GITHUB_RUN_ID")"
+          BOOT="$(curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/core/router-tenant-config-bootstrap.js?run=$GITHUB_RUN_ID")"
+          printf '%s' "$BRIDGE" | grep -Fq '__insurerSecureTargetBridgeV20260720'
+          printf '%s' "$BOOT" | grep -Fq 'insurer-secure-target-bridge-v20260720.js?v=20260720-1'
           echo "LAB_URL=$URL" >> "$GITHUB_ENV"
 
       - name: Limpiar archivo temporal
         if: always()
         run: rm -f "${GOOGLE_APPLICATION_CREDENTIALS:-/nonexistent}"
 
-      - name: Comentar cierre técnico
+      - name: Comentar cierre
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "### Fix de vínculo aseguradora–portal\n\n- Resultado: **OK**\n- Clasificación: \`DATA_CONTRACT_FAILURE / TARGET_MAPPING_EMPTY_BEFORE_PROVIDER\`\n- Smoke: \`GO_SECURE_PORTAL_MAPPING_PURE_SMOKE\`\n- Solo se vinculan portales de aseguradoras existentes.\n- Inserciones, socios/redes y ambigüedades permanecen bloqueados.\n- Versión de importador: \`20260720-3\`\n- LAB: \`$LAB_URL\`\n- Run: \`$GITHUB_RUN_ID\`\n- Commit evaluado: \`$GITHUB_SHA\`\n\nNo se modificaron la bóveda ni los datos durante el fix."
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "Puente seguro aseguradora–portal publicado y verificado. Run: $GITHUB_RUN_ID. LAB: $LAB_URL."
