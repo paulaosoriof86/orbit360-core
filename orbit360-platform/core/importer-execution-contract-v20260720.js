@@ -1,5 +1,5 @@
 /* Orbit 360 · contrato canónico de ejecución de importadores · 2026-07-20
-   Une parser, dry-run, identidad, target, backend, store, auditoría y rollback.
+   Une parser, dry-run, identidad, gate legal, target, backend, store, auditoría y rollback.
    No transporta ni persiste valores protegidos; solo define el contrato y evidencia sanitizada. */
 (function (root, factory) {
   'use strict';
@@ -10,7 +10,7 @@
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   'use strict';
 
-  var VERSION = '20260720.1';
+  var VERSION = '20260720.2';
   var SCHEMA = 'orbit360-importer-execution-contract-v1';
   var STAGES = Object.freeze([
     'created',
@@ -53,6 +53,7 @@
     'CONFIRMATION_REJECTED',
     'AUTH_NOT_READY',
     'ACTIVE_ROLE_UNRESOLVED',
+    'LEGAL_GATE_PENDING',
     'TENANT_MISMATCH',
     'TARGET_ID_UNRESOLVED',
     'PROVIDER_NOT_REGISTERED',
@@ -120,6 +121,7 @@
       predicates: {
         browserAuthReady: false,
         activeRoleResolved: false,
+        legalGateSatisfied: false,
         sourceParsed: false,
         dryRunProduced: false,
         targetIdsResolved: false,
@@ -190,6 +192,7 @@
     return validate(execution).ok &&
       bool(p.browserAuthReady) &&
       bool(p.activeRoleResolved) &&
+      bool(p.legalGateSatisfied) &&
       bool(p.sourceParsed) &&
       bool(p.dryRunProduced) &&
       bool(p.targetIdsResolved) &&
@@ -212,6 +215,7 @@
       execution.stage === 'completed' &&
       bool(p.browserAuthReady) &&
       bool(p.activeRoleResolved) &&
+      bool(p.legalGateSatisfied) &&
       bool(p.sourceParsed) &&
       bool(p.dryRunProduced) &&
       bool(p.targetIdsResolved) &&
@@ -239,6 +243,7 @@
       predicates: {
         browserAuthReady: bool(p.browserAuthReady),
         activeRoleResolved: bool(p.activeRoleResolved),
+        legalGateSatisfied: bool(p.legalGateSatisfied),
         sourceParsed: bool(p.sourceParsed),
         dryRunProduced: bool(p.dryRunProduced),
         targetIdsResolved: bool(p.targetIdsResolved),
@@ -274,6 +279,7 @@
     requiresReadAfterWrite: true,
     requiresAuditSuccessAndFailure: true,
     requiresRollbackForSynthetic: true,
+    requiresLegalGateBeforeActionableClick: true,
     forbidsSuccessWithZero: true,
     writesStore: false,
     create: create,
