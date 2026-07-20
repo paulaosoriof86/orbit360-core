@@ -2,10 +2,10 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 
-const require = createRequire(import.meta.url);
-const { initializeApp, cert, getApps } = require('../functions/node_modules/firebase-admin/app');
-const { getAuth } = require('../functions/node_modules/firebase-admin/auth');
-const { getFirestore } = require('../functions/node_modules/firebase-admin/firestore');
+const require = createRequire(new URL('../functions/package.json', import.meta.url));
+const { initializeApp, cert, getApps } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
+const { getFirestore } = require('firebase-admin/firestore');
 
 const env = process.env;
 const diagPath = env.ORBIT360_SECURE_APPLY_DIAG;
