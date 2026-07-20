@@ -203,3 +203,5 @@ jobs:
       - name: Alto controlado para obtener evidencia observable
         if: always()
         run: exit 1
+
+# Segundo disparo controlado: mismo diagnóstico, cero escrituras.
