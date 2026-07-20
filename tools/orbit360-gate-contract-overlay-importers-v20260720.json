@@ -2,25 +2,26 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-20",
   "gateId": "importers-e2e-acceptance-lab-v20260720",
-  "classification": "PIPELINE_MECHANISM_FAILURE_ROOT_CAUSE_FIXED_READY_FOR_SINGLE_EXECUTION",
-  "diagnosticRevision": "canonical-session-readiness-legal-ui-driver-v3",
-  "contractRevision": "1.0.1-canonical-session-readiness-legal-ui-driver-v3",
+  "classification": "DATA_CONTRACT_FAILURE_CORRECTED_READY_FOR_SINGLE_EXECUTION",
+  "diagnosticRevision": "canonical-session-legal-membership-driver-v4",
+  "contractRevision": "1.0.2-canonical-session-legal-membership-driver-v4",
   "gatePatch": {
-    "contractVersion": "1.0.1",
-    "diagnosticRevision": "canonical-session-readiness-legal-ui-driver-v3",
-    "runtimeVersion": "20260720-3",
+    "contractVersion": "1.0.2",
+    "diagnosticRevision": "canonical-session-legal-membership-driver-v4",
+    "runtimeVersion": "20260720-4",
     "status": "ACTIVE_SINGLE_EXECUTION_PENDING",
     "workflow": ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
     "staticValidationStatus": "PREFLIGHT_REQUIRED_BEFORE_EXECUTION",
     "executionBudget": {
-      "type": "bounded_e2e_single_execution_v3",
+      "type": "bounded_e2e_single_execution_v4",
       "watchdogBudgetMs": 900000,
+      "membershipContractMs": 60000,
       "browserBootstrapMs": 120000,
       "providerInvocationMs": 65000,
       "storeObservationMs": 45000,
       "rollbackMs": 120000,
-      "exhaustionPolicy": "Execute revision v3 exactly once after GO_GATE_CONTRACT. If it fails, do not rerun before classifying the first real failed check.",
-      "acceptancePolicy": "Accept only sanitized evidence with browserAuthReady, activeRoleResolved, legalGateSatisfied, provider confirmation, read-after-write, success and rejection audit, rollbackOk and ok:true."
+      "exhaustionPolicy": "Execute revision v4 exactly once after GO_GATE_CONTRACT. If provider_invoked fails again, stop all reruns and reopen the provider authorization root cause.",
+      "acceptancePolicy": "Accept only sanitized evidence with canonical membership, browserAuthReady, activeRoleResolved, legalGateSatisfied, provider confirmation, read-after-write, success and rejection audit, rollbackOk and ok:true."
     }
   },
   "canonicalOwners": [
@@ -36,6 +37,18 @@
         "neverMutatesLegalAcceptance: true",
         "neverClicksOperationalUi: true",
         "writesStore: false"
+      ]
+    },
+    {
+      "id": "membershipContract",
+      "path": "orbit360-platform/core/membership-multirol-contract-p0.js",
+      "requiredTokens": [
+        "var VERSION = 'p0-20260713'",
+        "roles_faltantes",
+        "rol_activo_no_asignado",
+        "paises_faltantes",
+        "asesorId_requerido",
+        "CONFIRMO AMPLIAR ACCESO"
       ]
     },
     {
@@ -66,9 +79,10 @@
       "id": "importersAcademyE2E",
       "path": "orbit360-platform/data/academia-v1225-importadores-e2e.js",
       "requiredTokens": [
-        "version: '1.226'",
-        "Aceptación legal vigente",
-        "Overlay pendiente",
+        "version: '1.227'",
+        "Membresía canónica",
+        "Fallo de contrato de datos",
+        "membershipRequired: true",
         "Dos fallos iguales"
       ]
     }
@@ -77,19 +91,23 @@
     "tools/orbit360-run-importers-e2e-gate-v20260720.mjs",
     "tools/orbit360-importers-e2e-browser-v20260720.mjs",
     "tools/orbit360-importers-e2e-finalize-v20260720.mjs",
+    "tools/orbit360-ensure-lab-secure-membership-v20260720.mjs",
     "tools/orbit360-validate-session-readiness-contract-v20260720.mjs",
     "orbit360-platform/core/session-readiness-contract-v20260720.js",
+    "orbit360-platform/core/membership-multirol-contract-p0.js",
     "orbit360-platform/core/importer-execution-contract-v20260720.js",
     "orbit360-platform/core/auth.js",
     "orbit360-platform/core/legal.js",
     "orbit360-platform/data/academia-v1225-importadores-e2e.js",
     ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
-    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-LEGAL-GATE-20260720.md"
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-LEGAL-GATE-20260720.md",
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-MEMBERSHIP-403-20260720.md"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/core/legal.js",
     "orbit360-platform/core/auth.js",
     "orbit360-platform/core/session-readiness-contract-v20260720.js",
+    "orbit360-platform/core/membership-multirol-contract-p0.js",
     "orbit360-platform/core/importer-execution-contract-v20260720.js",
     "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "orbit360-platform/data/academia-v1225-importadores-e2e.js"
@@ -118,6 +136,32 @@
       ]
     },
     {
+      "path": "orbit360-platform/core/membership-multirol-contract-p0.js",
+      "requiredTokens": [
+        "var VERSION = 'p0-20260713'",
+        "roles_faltantes",
+        "rol_activo_no_asignado",
+        "paises_faltantes",
+        "asesorId_requerido",
+        "CONFIRMO AMPLIAR ACCESO"
+      ]
+    },
+    {
+      "path": "tools/orbit360-ensure-lab-secure-membership-v20260720.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "const PROJECT_ID = 'ays-orbit-360-lab'",
+        "const TENANT_ID = 'alianzas-soluciones'",
+        "const CONFIRMATION = 'CONFIRMO AMPLIAR ACCESO'",
+        "DATA_CONTRACT_FAILURE_CORRECTED",
+        "membership_contract_repaired",
+        "strongConfirmationVerified: true",
+        "rollbackDocumented",
+        "noSensitiveFields",
+        "ORBIT360_LAB_MEMBERSHIP_REPAIRED"
+      ]
+    },
+    {
       "path": "orbit360-platform/core/importer-execution-contract-v20260720.js",
       "replaceRequiredTokens": true,
       "requiredTokens": [
@@ -136,16 +180,19 @@
         "sessionReadinessVersion: '20260720.1'",
         "data-orbit-session-readiness-contract",
         "importerContractVersion: '20260720.2'",
-        "importerAcademyVersion: '1.226'",
-        "session-readiness-contract-v20260720.js?v=20260720-1"
+        "importerAcademyVersion: '1.227'",
+        "academia-v1225-importadores-e2e.js?v=20260720-3",
+        "Preflight v9"
       ]
     },
     {
       "path": "orbit360-platform/data/academia-v1225-importadores-e2e.js",
       "requiredTokens": [
-        "version: '1.226'",
+        "version: '1.227'",
         "legalGateRequired: true",
-        "Aceptación legal vigente"
+        "membershipRequired: true",
+        "Membresía canónica",
+        "Fallo de contrato de datos"
       ]
     },
     {
@@ -166,11 +213,12 @@
       "path": "tools/orbit360-run-importers-e2e-gate-v20260720.mjs",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "const RUNTIME = '20260720-3'",
-        "SESSION_READINESS_NOT_SERVED",
-        "var VERSION = '20260720.2'",
-        "version: '1.226'",
-        "importerAcademyVersion: '1.226'",
+        "const RUNTIME = '20260720-4'",
+        "tools/orbit360-ensure-lab-secure-membership-v20260720.mjs",
+        "MEMBERSHIP_CONTRACT_NOT_CANONICAL",
+        "version: '1.227'",
+        "importerAcademyVersion: '1.227'",
+        "schemaVersion: 'orbit360-importers-e2e-coordinator-v3'",
         "ORBIT360_IMPORTERS_E2E_GATE_OK"
       ]
     },
@@ -217,9 +265,10 @@
     {
       "path": ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
       "requiredTokens": [
-        "IMPORTERS_E2E_V3_SINGLE_EXECUTION",
+        "IMPORTERS_E2E_V4_SINGLE_EXECUTION",
         "orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720",
-        "orbit360-validate-session-readiness-contract-v20260720.mjs",
+        "orbit360-ensure-lab-secure-membership-v20260720.mjs",
+        "membership-contract-sanitized.json",
         "orbit360-run-importers-e2e-gate-v20260720.mjs",
         "No production, main or merge"
       ]
