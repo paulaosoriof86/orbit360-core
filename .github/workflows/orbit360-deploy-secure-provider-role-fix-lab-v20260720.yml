@@ -1,5 +1,5 @@
-name: Orbit 360 Deploy Secure Provider Role Fix LAB 20260720
-run-name: M1 deploy proveedor roles · ${{ github.sha }}
+name: Orbit 360 Provider Revision Diagnostic Read Only LAB 20260720
+run-name: M1 diagnóstico read-only proveedor · ${{ github.sha }}
 
 on:
   push:
@@ -13,19 +13,21 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: orbit360-deploy-secure-provider-role-fix-lab-v20260720
+  group: orbit360-provider-revision-diagnostic-readonly-v20260720
   cancel-in-progress: true
 
 env:
   FIREBASE_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_PROVIDER_AUTH_DIAGNOSTIC: orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
-  ORBIT360_DEPLOY_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/provider-role-fix-deploy-sanitized.json
+  ORBIT360_REFERENCE_DEPLOY_RUN_ID: "29781660851"
+  ORBIT360_REFERENCE_DEPLOY_START: "2026-07-20T21:49:46Z"
+  ORBIT360_REFERENCE_DEPLOY_END: "2026-07-20T21:53:15Z"
 
 jobs:
-  deploy_verify:
-    name: Proveedor seguro LAB · preflight, deploy y diagnóstico
+  diagnose_readonly:
+    name: Proveedor seguro LAB · revisiones e IAM en modo lectura
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 12
     steps:
       - name: Checkout SHA inmutable
         uses: actions/checkout@v4
@@ -38,7 +40,7 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Preflight contractual antes de secretos
+      - name: Preflight contractual y prohibición de despliegue
         shell: bash
         run: |
           set -euo pipefail
@@ -47,10 +49,22 @@ jobs:
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test "$FIREBASE_PROJECT_ID" = "ays-orbit-360-lab"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
-          node --check functions/index.js
           node --check tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs
-          node tools/orbit360-test-role-normalization-callback-arity-v20260720.mjs
-          echo "ORBIT360_PROVIDER_ROLE_FIX_PREFLIGHT_OK"
+          node <<'NODE'
+          const fs = require('fs');
+          const path = '.github/workflows/orbit360-deploy-secure-provider-role-fix-lab-v20260720.yml';
+          const source = fs.readFileSync(path, 'utf8');
+          const forbiddenCommands = [
+            ['firebase', 'deploy'].join(' '),
+            ['gcloud', 'functions', 'deploy'].join(' '),
+            ['gcloud', 'run', 'deploy'].join(' ')
+          ];
+          for (const command of forbiddenCommands) {
+            if (source.includes(command)) throw new Error(`READ_ONLY_WORKFLOW_CONTAINS_FORBIDDEN_COMMAND_${command.replace(/\s+/g, '_')}`);
+          }
+          if (!source.includes("mode: read_only")) throw new Error('READ_ONLY_EVIDENCE_TOKEN_MISSING');
+          console.log('ORBIT360_PROVIDER_REVISION_READONLY_PREFLIGHT_OK');
+          NODE
 
       - name: Resolver cuenta LAB después del preflight
         shell: bash
@@ -73,124 +87,91 @@ jobs:
 
       - name: Instalar dependencias de diagnóstico
         shell: bash
-        run: npm install --no-save firebase-admin@13 google-auth-library@9
-
-      - name: Desplegar solo cuatro Functions del proveedor LAB
-        id: deploy
-        continue-on-error: true
-        shell: bash
         run: |
-          set -o pipefail
-          npx firebase-tools deploy \
-            --only functions:orbit360ImportInsurerCredentials,functions:orbit360CredentialStatus,functions:orbit360RevealInsurerCredential,functions:orbit360CopyInsurerCredential \
-            --project "$FIREBASE_PROJECT_ID" \
-            --non-interactive \
-            --json > "${RUNNER_TEMP}/provider-deploy.json"
+          set -euo pipefail
+          npm install --no-save firebase-admin@13 google-auth-library@9
+          node -e "require('firebase-admin'); require('google-auth-library'); console.log('READ_ONLY_DIAGNOSTIC_DEPENDENCIES_OK')"
 
-      - name: Diagnosticar autorización y revisión desplegada
+      - name: Leer cuatro Functions, revisiones, tráfico e IAM
         id: diagnostic
-        if: always()
-        continue-on-error: true
         shell: bash
         run: node tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs
 
-      - name: Construir evidencia sanitizada
-        if: always()
+      - name: Validar evidencia sanitizada read-only
         shell: bash
-        env:
-          DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
-          DIAGNOSTIC_OUTCOME: ${{ steps.diagnostic.outcome }}
-          RUN_ID: ${{ github.run_id }}
-          HEAD_SHA: ${{ github.sha }}
         run: |
           node <<'NODE'
           const fs = require('fs');
-          const diagnosticPath = process.env.ORBIT360_PROVIDER_AUTH_DIAGNOSTIC;
-          const diagnostic = fs.existsSync(diagnosticPath)
-            ? JSON.parse(fs.readFileSync(diagnosticPath, 'utf8'))
-            : { classification: 'DIAGNOSTIC_EVIDENCE_MISSING', checks: {}, errors: {} };
-          const evidence = {
-            schemaVersion: 'orbit360-provider-role-fix-deploy-evidence-v1',
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            environment: 'LAB',
-            runId: process.env.RUN_ID,
-            commit: process.env.HEAD_SHA,
-            deployedFunctions: [
-              'orbit360ImportInsurerCredentials',
-              'orbit360CredentialStatus',
-              'orbit360RevealInsurerCredential',
-              'orbit360CopyInsurerCredential'
-            ],
-            deployOutcome: process.env.DEPLOY_OUTCOME,
-            diagnosticOutcome: process.env.DIAGNOSTIC_OUTCOME,
-            diagnosticClassification: diagnostic.classification || 'UNCLASSIFIED',
-            checks: diagnostic.checks || {},
-            cloudRunIamReadable: diagnostic.cloudRunIam?.readable === true,
-            containsPII: false,
-            containsSecrets: false,
-            productionTouched: false,
-            hostingTouched: false,
-            firestoreRulesTouched: false,
-            ok: process.env.DEPLOY_OUTCOME === 'success' &&
-              process.env.DIAGNOSTIC_OUTCOME === 'success' &&
-              diagnostic.classification === 'PROVIDER_AUTHORIZATION_LAYER_READY'
-          };
-          fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716', { recursive: true });
-          fs.writeFileSync(process.env.ORBIT360_DEPLOY_EVIDENCE, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8');
+          const path = process.env.ORBIT360_PROVIDER_AUTH_DIAGNOSTIC;
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const accepted = new Set([
+            'DEPLOYMENT_CONFIRMED_CURRENT',
+            'DEPLOYMENT_PARTIAL',
+            'DEPLOYMENT_NOT_APPLIED',
+            'DEPLOYMENT_REVISION_INCONSISTENT'
+          ]);
+          if (report.mode !== 'read_only') throw new Error('DIAGNOSTIC_MODE_NOT_READ_ONLY');
+          if (report.functionIds?.length !== 4 || report.functions?.length !== 4) throw new Error('FOUR_FUNCTIONS_EVIDENCE_REQUIRED');
+          if (!accepted.has(report.deploymentClassification)) throw new Error(`DEPLOYMENT_CLASSIFICATION_INVALID_${report.deploymentClassification || 'EMPTY'}`);
+          if (report.containsPII !== false || report.containsSecrets !== false) throw new Error('SANITIZATION_CONTRACT_FAILED');
+          if (report.diagnosticComplete !== true || report.ok !== true) throw new Error('READ_ONLY_DIAGNOSTIC_INCOMPLETE');
+          console.log(`ORBIT360_PROVIDER_REVISION_DIAGNOSTIC_OK:${report.deploymentClassification}`);
           NODE
 
-      - name: Publicar evidencias sanitizadas
-        if: always()
+      - name: Publicar evidencia sanitizada
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-provider-role-fix-deploy-${{ github.run_id }}
+          name: orbit360-provider-revision-readonly-${{ github.run_id }}
           path: |
-            orbit360-platform/runtime-gate-crm-v20260716/provider-role-fix-deploy-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
           if-no-files-found: error
           retention-days: 7
 
-      - name: Actualizar estado observable en PR 5
-        if: always()
+      - name: Actualizar diagnóstico observable en PR 5
         uses: actions/github-script@v7
         env:
           TARGET_PR: "5"
-          EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/provider-role-fix-deploy-sanitized.json
+          EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
           RUN_ID: ${{ github.run_id }}
           HEAD_SHA: ${{ github.sha }}
         with:
           script: |
             const fs = require('fs');
-            const start = '<!-- ORBIT360_PROVIDER_ROLE_FIX_DEPLOY_START -->';
-            const end = '<!-- ORBIT360_PROVIDER_ROLE_FIX_DEPLOY_END -->';
-            const evidence = fs.existsSync(process.env.EVIDENCE_PATH)
-              ? JSON.parse(fs.readFileSync(process.env.EVIDENCE_PATH, 'utf8'))
-              : { deployOutcome: 'missing', diagnosticOutcome: 'missing', diagnosticClassification: 'EVIDENCE_MISSING', checks: {}, ok: false };
-            const checks = evidence.checks || {};
+            const report = JSON.parse(fs.readFileSync(process.env.EVIDENCE_PATH, 'utf8'));
+            const checks = report.checks || {};
+            const functions = Array.isArray(report.functions) ? report.functions : [];
+            const start = '<!-- ORBIT360_PROVIDER_REVISION_READONLY_START -->';
+            const end = '<!-- ORBIT360_PROVIDER_REVISION_READONLY_END -->';
+            const rows = functions.map((item) =>
+              `- ${item.functionId}: estado **${item.state || 'desconocido'}**, actualizada en ventana **${item.updatedDuringReferenceRun === true}**, revisión lista **${item.cloudRun?.latestReadyMatchesCreated === true}**, IAM callable **${item.cloudRunIam?.publicInvoker === true}**`
+            ).join('\n');
             const block = `${start}
-            ## Deploy LAB del fix de normalización de roles
+            ## Diagnóstico read-only de revisiones del proveedor seguro
 
             \`\`\`txt
             run: ${process.env.RUN_ID}
-            HEAD desplegado: ${process.env.HEAD_SHA}
-            ambiente: LAB
-            Functions: 4
-            deploy: ${evidence.deployOutcome}
-            diagnóstico: ${evidence.diagnosticOutcome}
-            clasificación: ${evidence.diagnosticClassification}
-            ok: ${evidence.ok === true}
+            HEAD evaluado: ${process.env.HEAD_SHA}
+            modo: read_only
+            deploy de referencia: ${report.referenceDeployRun?.runId || '—'}
+            clasificación despliegue: ${report.deploymentClassification || 'UNCLASSIFIED'}
+            clasificación autorización: ${report.classification || 'UNCLASSIFIED'}
+            ok diagnóstico: ${report.ok === true}
             \`\`\`
 
-            - Membresía autorizaría la operación: **${checks.membershipAuthorizationWouldPass === true}**
-            - Function activa: **${checks.functionActive === true}**
-            - Cuenta ejecutora coincide: **${checks.runtimeServiceAccountMatches === true}**
-            - Ingreso callable invocable: **${checks.publicCallableIngress === true}**
-            - Política IAM legible: **${evidence.cloudRunIamReadable === true}**
-            - Hosting desplegado: **false**
-            - Reglas Firestore desplegadas: **false**
-            - Producción tocada: **false**
-            - Secretos publicados: **false**
+            - Functions descritas: **${checks.allFunctionsDescribed === true}**
+            - Functions activas: **${checks.allFunctionsActive === true}**
+            - Entry points correctos: **${checks.allEntryPointsMatch === true}**
+            - Cuentas ejecutoras correctas: **${checks.allRuntimeServiceAccountsMatch === true}**
+            - Revisiones listas: **${checks.allLatestRevisionsReady === true}**
+            - IAM legible: **${checks.allCloudRunIamReadable === true}**
+            - Ingreso callable: **${checks.allCallableIngress === true}**
+            - Functions actualizadas durante el run de referencia: **${Number(checks.functionsUpdatedDuringReferenceRun || 0)}/4**
+            - Membresía autoriza: **${checks.membershipAuthorizationWouldPass === true}**
+
+            ${rows}
+
+            No deploy. No provider invocation. No operational writes.
             ${end}`;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
@@ -204,10 +185,16 @@ jobs:
       - name: Limpiar cuenta temporal
         if: always()
         shell: bash
-        run: rm -f "${RUNNER_TEMP}/orbit360-firebase-lab.json" "${RUNNER_TEMP}/provider-deploy.json"
+        run: rm -f "${RUNNER_TEMP}/orbit360-firebase-lab.json"
 
-      - name: Sellar resultado
+      - name: Resumen de alcance
         if: always()
         shell: bash
         run: |
-          node -e "const e=require('./orbit360-platform/runtime-gate-crm-v20260716/provider-role-fix-deploy-sanitized.json'); if(e.ok!==true) process.exit(70); console.log('ORBIT360_PROVIDER_ROLE_FIX_DEPLOY_OK')"
+          {
+            echo "## Provider revision diagnostic"
+            echo ""
+            echo "mode: read_only"
+            echo ""
+            echo "No deploy. No provider invocation. No operational writes."
+          } >> "$GITHUB_STEP_SUMMARY"
