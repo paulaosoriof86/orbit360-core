@@ -1,4 +1,5 @@
 name: Orbit 360 Provider Authorization Diagnostic LAB 20260720
+run-name: M1 proveedor read-only · ${{ github.sha }}
 
 on:
   push:
@@ -6,37 +7,29 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - ".github/workflows/orbit360-provider-authorization-diagnostic-lab-v20260720.yml"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/orbit360-provider-authorization-diagnostic-lab-v20260720.yml"
-  workflow_dispatch:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: orbit360-provider-authorization-diagnostic-lab
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   diagnose:
     name: Proveedor seguro · diagnóstico read-only
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.ref == 'ays/backend-tenant-lab-v99-20260703'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
-      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       ORBIT360_PROVIDER_AUTH_DIAGNOSTIC: orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
     steps:
-      - name: Checkout rama autorizada
+      - name: Checkout SHA inmutable
         uses: actions/checkout@v4
         with:
-          ref: ays/backend-tenant-lab-v99-20260703
+          ref: ${{ github.sha }}
+          fetch-depth: 1
 
       - name: Preparar Node 22
         uses: actions/setup-node@v4
@@ -47,13 +40,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-          test "$BRANCH" = "ays/backend-tenant-lab-v99-20260703"
+          test "$GITHUB_EVENT_NAME" = "push"
+          test "$GITHUB_REF_NAME" = "ays/backend-tenant-lab-v99-20260703"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
           node --check tools/orbit360-diagnose-credential-provider-auth-v20260720.mjs
+          echo "ORBIT360_PROVIDER_DIAGNOSTIC_PREFLIGHT_OK"
 
       - name: Resolver cuenta LAB después del preflight
         shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
           set -euo pipefail
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
@@ -74,12 +73,14 @@ jobs:
           npm install --no-save firebase-admin@13 google-auth-library@9
 
       - name: Diagnosticar membresía, despliegue e IAM sin invocar el proveedor
+        id: diagnostic
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-diagnose-credential-provider-auth-v20260720.mjs
 
-      - name: Publicar diagnóstico sanitizado
+      - name: Publicar diagnóstico sanitizado como artefacto
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -88,17 +89,79 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+      - name: Actualizar estado observable en PR 5
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          TARGET_PR: "5"
+          REPORT_PATH: orbit360-platform/runtime-gate-crm-v20260716/provider-authorization-diagnostic-sanitized.json
+          DIAGNOSTIC_OUTCOME: ${{ steps.diagnostic.outcome }}
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+        with:
+          script: |
+            const fs = require('fs');
+            const markerStart = '<!-- ORBIT360_PROVIDER_DIAGNOSTIC_START -->';
+            const markerEnd = '<!-- ORBIT360_PROVIDER_DIAGNOSTIC_END -->';
+            let report = {
+              classification: 'DIAGNOSTIC_EVIDENCE_MISSING',
+              rootCauseCandidate: 'El diagnóstico no produjo evidencia sanitizada.',
+              checks: {},
+              errors: { evidence: 'missing' }
+            };
+            if (fs.existsSync(process.env.REPORT_PATH)) {
+              report = JSON.parse(fs.readFileSync(process.env.REPORT_PATH, 'utf8'));
+            }
+            const checks = report.checks || {};
+            const errors = report.errors || {};
+            const errorLines = Object.keys(errors).length
+              ? Object.entries(errors).map(([key, value]) => `- ${key}: \`${String(value).slice(0, 120)}\``).join('\n')
+              : '- ninguno';
+            const block = `${markerStart}
+            ## Diagnóstico sanitizado del proveedor seguro
+
+            \`\`\`txt
+            run: ${process.env.RUN_ID}
+            HEAD evaluado: ${process.env.HEAD_SHA}
+            modo: read_only
+            resultado técnico: ${process.env.DIAGNOSTIC_OUTCOME}
+            clasificación: ${report.classification || 'UNCLASSIFIED'}
+            \`\`\`
+
+            - Membresía autorizaría la operación: **${checks.membershipAuthorizationWouldPass === true}**
+            - Función activa: **${checks.functionActive === true}**
+            - Cuenta ejecutora coincide: **${checks.runtimeServiceAccountMatches === true}**
+            - Ingreso callable invocable: **${checks.publicCallableIngress === true}**
+
+            Causa candidata: ${String(report.rootCauseCandidate || 'No determinada.').slice(0, 500)}
+
+            Errores sanitizados:
+            ${errorLines}
+
+            El diagnóstico no abrió el importador, no invocó el proveedor y no escribió datos operativos.
+            ${markerEnd}`;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = Number(process.env.TARGET_PR);
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+            const current = pr.body || '';
+            const pattern = new RegExp(`${markerStart}[\\s\\S]*?${markerEnd}`, 'm');
+            const body = pattern.test(current)
+              ? current.replace(pattern, block)
+              : `${current.trim()}\n\n${block}\n`;
+            await github.rest.pulls.update({ owner, repo, pull_number, body });
+
       - name: Limpiar cuenta temporal
         if: always()
         shell: bash
         run: rm -f "${RUNNER_TEMP}/orbit360-firebase-lab.json"
 
-      - name: Alcance
+      - name: Sellar conclusión del diagnóstico
         if: always()
         shell: bash
         run: |
-          {
-            echo "## Diagnóstico read-only del proveedor seguro"
-            echo ""
-            echo "No abre el importador, no llama al proveedor, no escribe datos, no despliega producción."
-          } >> "$GITHUB_STEP_SUMMARY"
+          set -euo pipefail
+          echo "## Diagnóstico read-only del proveedor seguro" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "No abre el importador, no llama al proveedor, no escribe datos, no despliega producción." >> "$GITHUB_STEP_SUMMARY"
+          test "${{ steps.diagnostic.outcome }}" = "success"
