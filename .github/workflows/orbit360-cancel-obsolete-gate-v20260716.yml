@@ -1,4 +1,4 @@
-name: Orbit 360 Secure Credentials Provider LAB 20260720
+name: Orbit 360 Secure Credentials IAM Diagnostic 20260720
 
 on:
   push:
@@ -12,20 +12,18 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: orbit360-secure-credentials-provider-lab-v20260720
+  group: orbit360-secure-credentials-iam-diagnostic-v20260720
   cancel-in-progress: false
 
 jobs:
-  secure_provider_lab:
-    name: Credenciales Aseguradoras · proveedor seguro LAB
+  iam_diagnostic:
+    name: Credenciales Aseguradoras · diagnóstico IAM de solo lectura
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     env:
       EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
-      RUNTIME_SERVICE_ACCOUNT: orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com
-      SECRET_ID: orbit360-insurer-credentials-alianzas-soluciones
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -36,24 +34,13 @@ jobs:
         with:
           ref: ays/backend-tenant-lab-v99-20260703
 
-      - name: Preflight vinculante antes de secretos y deploy
+      - name: Preflight vinculante antes de credenciales e infraestructura
         shell: bash
         run: |
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-
-      - name: Validación estática del slice seguro
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check functions/index.js
-          node --check orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
-          node --check orbit360-platform/core/router-tenant-config-bootstrap.js
-          node -e "const f=require('./firebase.json'); if(!f.functions||f.functions.source!=='functions'||f.functions.runtime!=='nodejs22') process.exit(41)"
-          npm install --prefix functions --ignore-scripts --no-audit --no-fund
-          npm --prefix functions run check
 
       - name: Resolver cuenta de servicio LAB
         shell: bash
@@ -78,186 +65,120 @@ jobs:
         with:
           project_id: ays-orbit-360-lab
 
-      - name: Crear bóveda, permisos mínimos y publicar proveedor
-        id: deploy
+      - name: Diagnosticar servicios y roles sin escritura
         shell: bash
         run: |
           set -euo pipefail
-          DIAG_DIR="orbit360-platform/runtime-gate-crm-v20260716"
-          DIAG_FILE="$DIAG_DIR/credential-provider-deploy-sanitized.json"
-          mkdir -p "$DIAG_DIR"
-          PHASE="initializing"
-          SECRET_READY=false
-          RUNTIME_SA_READY=false
-          FUNCTIONS_DEPLOYED=false
-          HOSTING_DEPLOYED=false
-          CALLABLE_AUTH_GUARD=false
-          PROVIDER_SOURCE_PRESENT=false
-          PREVIEW_URL=""
-          write_diag() {
-            local ok="$1"
-            local exit_code="$2"
-            jq -n \
-              --arg phase "$PHASE" \
-              --arg commit "$GITHUB_SHA" \
-              --arg run "$GITHUB_RUN_ID" \
-              --argjson ok "$ok" \
-              --argjson exitCode "$exit_code" \
-              --argjson secretReady "$SECRET_READY" \
-              --argjson runtimeServiceAccountReady "$RUNTIME_SA_READY" \
-              --argjson functionsDeployed "$FUNCTIONS_DEPLOYED" \
-              --argjson hostingDeployed "$HOSTING_DEPLOYED" \
-              --argjson callableAuthGuard "$CALLABLE_AUTH_GUARD" \
-              --argjson providerSourcePresent "$PROVIDER_SOURCE_PRESENT" \
-              '{schemaVersion:"orbit360-secure-credential-provider-deploy-v1",containsPII:false,containsSecrets:false,ok:$ok,phase:$phase,exitCode:$exitCode,commit:$commit,run:$run,secretReady:$secretReady,runtimeServiceAccountReady:$runtimeServiceAccountReady,functionsDeployed:$functionsDeployed,hostingDeployed:$hostingDeployed,callableAuthGuard:$callableAuthGuard,providerSourcePresent:$providerSourcePresent}' \
-              > "$DIAG_FILE"
-          }
-          on_error() {
-            local code=$?
-            trap - ERR
-            write_diag false "$code"
-            echo "ORBIT360_SECURE_PROVIDER_PHASE_FAILED:${PHASE}:exit=${code}"
-            exit "$code"
-          }
-          trap on_error ERR
-          write_diag false 0
-
-          PHASE="authenticate_gcloud"
+          OUT="orbit360-platform/runtime-gate-crm-v20260716/credential-provider-iam-diagnostic-sanitized.json"
+          mkdir -p "$(dirname "$OUT")"
           gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project="$FIREBASE_PROJECT_ID" >/dev/null
           gcloud config set project "$FIREBASE_PROJECT_ID" >/dev/null
 
-          PHASE="enable_required_apis"
-          gcloud services enable \
-            cloudfunctions.googleapis.com \
-            run.googleapis.com \
-            cloudbuild.googleapis.com \
-            artifactregistry.googleapis.com \
-            eventarc.googleapis.com \
-            secretmanager.googleapis.com \
-            iam.googleapis.com \
-            --project "$FIREBASE_PROJECT_ID" >/dev/null
+          REQUIRED_SERVICES=(
+            cloudfunctions.googleapis.com
+            run.googleapis.com
+            cloudbuild.googleapis.com
+            artifactregistry.googleapis.com
+            eventarc.googleapis.com
+            secretmanager.googleapis.com
+            iam.googleapis.com
+          )
+          SERVICES_READABLE=false
+          POLICY_READABLE=false
+          ENABLED_FILE="${RUNNER_TEMP}/enabled-services.txt"
+          ROLES_FILE="${RUNNER_TEMP}/deployer-roles.txt"
+          : > "$ENABLED_FILE"
+          : > "$ROLES_FILE"
 
-          PHASE="runtime_service_account"
-          if ! gcloud iam service-accounts describe "$RUNTIME_SERVICE_ACCOUNT" --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1; then
-            gcloud iam service-accounts create orbit360-secrets-lab \
-              --display-name="Orbit 360 secure resources LAB" \
-              --project "$FIREBASE_PROJECT_ID" >/dev/null
+          if gcloud services list --enabled --project "$FIREBASE_PROJECT_ID" --format='value(config.name)' > "$ENABLED_FILE" 2>/dev/null; then
+            SERVICES_READABLE=true
           fi
-          gcloud iam service-accounts add-iam-policy-binding "$RUNTIME_SERVICE_ACCOUNT" \
-            --member="serviceAccount:${DEPLOYER_EMAIL}" \
-            --role="roles/iam.serviceAccountUser" \
-            --project "$FIREBASE_PROJECT_ID" >/dev/null
-          gcloud projects add-iam-policy-binding "$FIREBASE_PROJECT_ID" \
-            --member="serviceAccount:${RUNTIME_SERVICE_ACCOUNT}" \
-            --role="roles/datastore.user" \
-            --condition=None >/dev/null
-          RUNTIME_SA_READY=true
-
-          PHASE="secret_manager_vault"
-          INIT_FILE="${RUNNER_TEMP}/orbit360-empty-credential-vault.json"
-          jq -n --arg tenant "alianzas-soluciones" \
-            '{schemaVersion:"orbit360-insurer-credentials-v1",tenantId:$tenant,updatedAt:"initial",records:{}}' > "$INIT_FILE"
-          if ! gcloud secrets describe "$SECRET_ID" --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1; then
-            gcloud secrets create "$SECRET_ID" \
-              --replication-policy="automatic" \
-              --data-file="$INIT_FILE" \
-              --project "$FIREBASE_PROJECT_ID" >/dev/null
-          elif [ -z "$(gcloud secrets versions list "$SECRET_ID" --project "$FIREBASE_PROJECT_ID" --filter='state=ENABLED' --format='value(name)' | head -n 1)" ]; then
-            gcloud secrets versions add "$SECRET_ID" --data-file="$INIT_FILE" --project "$FIREBASE_PROJECT_ID" >/dev/null
+          if gcloud projects get-iam-policy "$FIREBASE_PROJECT_ID" \
+            --flatten='bindings[].members' \
+            --filter="bindings.members:serviceAccount:${DEPLOYER_EMAIL}" \
+            --format='value(bindings.role)' > "$ROLES_FILE" 2>/dev/null; then
+            POLICY_READABLE=true
           fi
-          gcloud secrets add-iam-policy-binding "$SECRET_ID" \
-            --member="serviceAccount:${RUNTIME_SERVICE_ACCOUNT}" \
-            --role="roles/secretmanager.secretAccessor" \
-            --project "$FIREBASE_PROJECT_ID" >/dev/null
-          gcloud secrets add-iam-policy-binding "$SECRET_ID" \
-            --member="serviceAccount:${RUNTIME_SERVICE_ACCOUNT}" \
-            --role="roles/secretmanager.secretVersionAdder" \
-            --project "$FIREBASE_PROJECT_ID" >/dev/null
-          SECRET_READY=true
-          rm -f "$INIT_FILE"
 
-          PHASE="deploy_functions"
-          npx --yes firebase-tools@latest deploy \
-            --only "functions:orbit360ImportInsurerCredentials,functions:orbit360CredentialStatus,functions:orbit360RevealInsurerCredential,functions:orbit360CopyInsurerCredential" \
-            --project "$FIREBASE_PROJECT_ID" \
-            --non-interactive \
-            --json > "${RUNNER_TEMP}/functions-deploy.json"
-          FUNCTIONS_DEPLOYED=true
+          MISSING_JSON='[]'
+          ENABLED_JSON='[]'
+          for service in "${REQUIRED_SERVICES[@]}"; do
+            if grep -Fxq "$service" "$ENABLED_FILE"; then
+              ENABLED_JSON="$(jq -c --arg v "$service" '. + [$v]' <<< "$ENABLED_JSON")"
+            else
+              MISSING_JSON="$(jq -c --arg v "$service" '. + [$v]' <<< "$MISSING_JSON")"
+            fi
+          done
 
-          PHASE="callable_auth_guard"
-          STATUS_URL="https://us-central1-${FIREBASE_PROJECT_ID}.cloudfunctions.net/orbit360CredentialStatus"
-          HTTP_CODE="$(curl -sS -o "${RUNNER_TEMP}/callable-guard.json" -w '%{http_code}' \
-            -X POST "$STATUS_URL" \
-            -H 'Content-Type: application/json; charset=utf-8' \
-            --data '{"data":{"tenantId":"alianzas-soluciones","activeRole":"Dirección","credentialRef":""}}')"
-          test "$HTTP_CODE" = "401"
-          grep -Eiq 'UNAUTHENTICATED|unauthenticated|authentication' "${RUNNER_TEMP}/callable-guard.json"
-          CALLABLE_AUTH_GUARD=true
+          has_role() { grep -Fxq "$1" "$ROLES_FILE" && echo true || echo false; }
+          OWNER="$(has_role roles/owner)"
+          SERVICE_USAGE_ADMIN="$(has_role roles/serviceusage.serviceUsageAdmin)"
+          SERVICE_USAGE_CONSUMER="$(has_role roles/serviceusage.serviceUsageConsumer)"
+          FIREBASE_ADMIN="$(has_role roles/firebase.admin)"
+          CLOUD_FUNCTIONS_ADMIN="$(has_role roles/cloudfunctions.admin)"
+          IAM_SA_ADMIN="$(has_role roles/iam.serviceAccountAdmin)"
+          SECRET_MANAGER_ADMIN="$(has_role roles/secretmanager.admin)"
+          PROJECT_IAM_ADMIN="$(has_role roles/resourcemanager.projectIamAdmin)"
+          CAN_ENABLE_SERVICES=false
+          if [ "$OWNER" = true ] || [ "$SERVICE_USAGE_ADMIN" = true ]; then CAN_ENABLE_SERVICES=true; fi
 
-          PHASE="deploy_hosting_lab"
-          HOSTING_JSON="${RUNNER_TEMP}/hosting-lab.json"
-          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab \
-            --project "$FIREBASE_PROJECT_ID" \
-            --expires 30d \
-            --non-interactive \
-            --json | tee "$HOSTING_JSON" >/dev/null
-          PREVIEW_URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$HOSTING_JSON" | head -n 1)"
-          test -n "$PREVIEW_URL"
-          HOSTING_DEPLOYED=true
-
-          PHASE="verify_hosting_provider_source"
-          BOOTSTRAP_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "${PREVIEW_URL}/core/router-tenant-config-bootstrap.js?run=${GITHUB_RUN_ID}")"
-          PROVIDER_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "${PREVIEW_URL}/core/aseguradoras-credentials-provider-lab-v20260720.js?run=${GITHUB_RUN_ID}")"
-          printf '%s' "$BOOTSTRAP_SOURCE" | grep -Fq 'data-orbit-insurer-credential-provider'
-          printf '%s' "$PROVIDER_SOURCE" | grep -Fq 'appliesOpaqueRefsAfterRemoteConfirmation: true'
-          printf '%s' "$PROVIDER_SOURCE" | grep -Fq 'noSecretPersistence: true'
-          PROVIDER_SOURCE_PRESENT=true
-
-          PHASE="completed"
-          write_diag true 0
-          trap - ERR
-          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          jq -n \
+            --arg commit "$GITHUB_SHA" \
+            --arg run "$GITHUB_RUN_ID" \
+            --argjson servicesReadable "$SERVICES_READABLE" \
+            --argjson policyReadable "$POLICY_READABLE" \
+            --argjson enabledRequiredServices "$ENABLED_JSON" \
+            --argjson missingRequiredServices "$MISSING_JSON" \
+            --argjson owner "$OWNER" \
+            --argjson serviceUsageAdmin "$SERVICE_USAGE_ADMIN" \
+            --argjson serviceUsageConsumer "$SERVICE_USAGE_CONSUMER" \
+            --argjson firebaseAdmin "$FIREBASE_ADMIN" \
+            --argjson cloudFunctionsAdmin "$CLOUD_FUNCTIONS_ADMIN" \
+            --argjson iamServiceAccountAdmin "$IAM_SA_ADMIN" \
+            --argjson secretManagerAdmin "$SECRET_MANAGER_ADMIN" \
+            --argjson projectIamAdmin "$PROJECT_IAM_ADMIN" \
+            --argjson canEnableServices "$CAN_ENABLE_SERVICES" \
+            '{schemaVersion:"orbit360-secure-credential-provider-iam-diagnostic-v1",containsPII:false,containsSecrets:false,readOnly:true,commit:$commit,run:$run,servicesReadable:$servicesReadable,policyReadable:$policyReadable,enabledRequiredServices:$enabledRequiredServices,missingRequiredServices:$missingRequiredServices,roleCapabilities:{owner:$owner,serviceUsageAdmin:$serviceUsageAdmin,serviceUsageConsumer:$serviceUsageConsumer,firebaseAdmin:$firebaseAdmin,cloudFunctionsAdmin:$cloudFunctionsAdmin,iamServiceAccountAdmin:$iamServiceAccountAdmin,secretManagerAdmin:$secretManagerAdmin,projectIamAdmin:$projectIamAdmin},canEnableServices:$canEnableServices,rootCause:($canEnableServices|if . then "pending_service_inventory" else "missing_serviceusage_services_enable" end)}' \
+            > "$OUT"
 
       - name: Publicar evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-secure-credential-provider-lab-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/credential-provider-deploy-sanitized.json
+          name: orbit360-secure-credential-iam-diagnostic-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/credential-provider-iam-diagnostic-sanitized.json
           if-no-files-found: error
           retention-days: 7
 
-      - name: Comentar resultado sanitizado en PR 5
+      - name: Comentar diagnóstico sanitizado en PR 5
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          FILE="orbit360-platform/runtime-gate-crm-v20260716/credential-provider-deploy-sanitized.json"
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/credential-provider-iam-diagnostic-sanitized.json"
           if [ ! -f "$FILE" ]; then exit 0; fi
-          node - <<'NODE' > /tmp/secure-provider-comment.md
+          node - <<'NODE' > /tmp/iam-diagnostic-comment.md
           const fs = require('fs');
-          const d = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/credential-provider-deploy-sanitized.json','utf8'));
+          const d = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/credential-provider-iam-diagnostic-sanitized.json','utf8'));
           process.stdout.write([
-            '### Proveedor seguro de credenciales · LAB',
+            '### Diagnóstico IAM · proveedor seguro de credenciales',
             '',
-            '- Resultado: **' + (d.ok ? 'OK' : 'NO_GO') + '**',
-            '- Fase: `' + d.phase + '`',
-            '- Bóveda preparada: `' + d.secretReady + '`',
-            '- Cuenta runtime preparada: `' + d.runtimeServiceAccountReady + '`',
-            '- Functions publicadas: `' + d.functionsDeployed + '`',
-            '- Autenticación obligatoria verificada: `' + d.callableAuthGuard + '`',
-            '- Hosting LAB publicado: `' + d.hostingDeployed + '`',
-            '- Fuente del proveedor verificada: `' + d.providerSourcePresent + '`',
+            '- Solo lectura: `' + d.readOnly + '`',
+            '- Servicios consultables: `' + d.servicesReadable + '`',
+            '- Política consultable: `' + d.policyReadable + '`',
+            '- Servicios requeridos ya habilitados: `' + d.enabledRequiredServices.length + '/7`',
+            '- Servicios requeridos faltantes: `' + d.missingRequiredServices.length + '`',
+            '- Puede habilitar servicios: `' + d.canEnableServices + '`',
+            '- Causa raíz: `' + d.rootCause + '`',
             '- Run: `' + d.run + '`',
-            '- Commit: `' + d.commit + '`',
             '',
-            'La evidencia no contiene credenciales, PII ni valores de Secret Manager.'
+            'No creó ni modificó APIs, IAM, Secret Manager, Functions, Firestore o Hosting.'
           ].join('\n'));
           NODE
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/secure-provider-comment.md
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/iam-diagnostic-comment.md
 
       - name: Alto controlado para evidencia observable
         if: always()
         run: |
-          echo "EVIDENCE_READY_EXPECTED_STOP"
+          echo "IAM_DIAGNOSTIC_READY_EXPECTED_STOP"
           exit 78
