@@ -1,0 +1,149 @@
+name: Orbit 360 Importers E2E Acceptance LAB 20260720 V3
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: orbit360-importers-e2e-v3-single-execution
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    name: Importadores · preflight vinculante sin secretos
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[importers-e2e-v3-once]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout rama autorizada
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Preflight vinculante antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
+          echo "IMPORTERS_E2E_V3_SINGLE_EXECUTION"
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
+
+      - name: Validar owners y mecanismo de la revisión v3
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/session-readiness-contract-v20260720.js
+          node --check orbit360-platform/core/importer-execution-contract-v20260720.js
+          node --check tools/orbit360-importers-e2e-browser-v20260720.mjs
+          node --check tools/orbit360-run-importers-e2e-gate-v20260720.mjs
+          node --check tools/orbit360-importers-e2e-finalize-v20260720.mjs
+          node tools/orbit360-validate-session-readiness-contract-v20260720.mjs
+
+  e2e:
+    name: Importadores · UI legal real, proveedor, store, auditoría y rollback
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      ORBIT360_GATE_ID: importers-e2e-acceptance-lab-v20260720
+      ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
+      ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
+      ORBIT360_EXPECTED_UID: woJlxR1iFEeiQZvTscPj4qQ5Qc73
+      ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      ORBIT360_IMPORTERS_E2E_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
+      ORBIT360_PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+    steps:
+      - name: Checkout rama autorizada
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Resolver cuenta LAB después del preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then echo "BLOQUEO_SECRET_LAB"; exit 42; fi
+          if [ ${#ORBIT360_LAB_LOGIN_PASSWORD} -lt 12 ]; then echo "BLOQUEO_LOGIN_LAB"; exit 46; fi
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
+          test "$PROJECT_ID" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar dependencias verificadas
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save firebase-admin@13 playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Ejecutar gate integral una sola vez
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-run-importers-e2e-gate-v20260720.mjs
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-importers-e2e-v3-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-cleanup-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-vault-rollback-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-coordinator-sanitized.json
+            orbit360-platform/runtime-build.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Limpiar cuenta temporal
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "${RUNNER_TEMP}/orbit360-firebase-lab.json"
+
+      - name: Resumen de alcance
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Importadores E2E · revisión v3"
+            echo ""
+            echo "Gate: importers-e2e-acceptance-lab-v20260720"
+            echo ""
+            echo "Commit: ${GITHUB_SHA}"
+            echo ""
+            echo "La UI legal real debe completarse antes del primer clic del importador."
+            echo ""
+            echo "No real source reloads. No production, main or merge."
+          } >> "$GITHUB_STEP_SUMMARY"
