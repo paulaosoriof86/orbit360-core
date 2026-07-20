@@ -6,7 +6,7 @@ import { spawnSync } from 'node:child_process';
 const PROJECT_ID = 'ays-orbit-360-lab';
 const CHANNEL = 'orbit360-ays-lab';
 const GATE_ID = 'importers-e2e-acceptance-lab-v20260720';
-const RUNTIME = '20260720-1';
+const RUNTIME = '20260720-3';
 const RUN_ID = String(process.env.GITHUB_RUN_ID || Date.now());
 const SHA = String(process.env.GITHUB_SHA || 'local');
 const BRANCH = String(process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || process.env.ORBIT360_BRANCH || '');
@@ -100,12 +100,16 @@ try {
 
   const build = JSON.parse(await fetchText(`${previewUrl}/runtime-build.json?run=${RUN_ID}`));
   if (build.commit !== SHA || build.gateId !== GATE_ID || build.runtimeVersion !== RUNTIME) throw new Error('RUNTIME_BUILD_MISMATCH');
+  const readinessSource = await fetchText(`${previewUrl}/core/session-readiness-contract-v20260720.js?run=${RUN_ID}`);
   const contractSource = await fetchText(`${previewUrl}/core/importer-execution-contract-v20260720.js?run=${RUN_ID}`);
   const academySource = await fetchText(`${previewUrl}/data/academia-v1225-importadores-e2e.js?run=${RUN_ID}`);
   const bootstrapSource = await fetchText(`${previewUrl}/core/router-tenant-config-bootstrap.js?run=${RUN_ID}`);
-  if (!contractSource.includes('forbidsSuccessWithZero: true')) throw new Error('CONTRACT_NOT_SERVED');
-  if (!academySource.includes("version: '1.225'")) throw new Error('ACADEMY_NOT_SERVED');
-  if (!bootstrapSource.includes("importerContractVersion: '20260720.1'")) throw new Error('BOOTSTRAP_NOT_SERVED');
+  if (!readinessSource.includes("var VERSION = '20260720.1'") || !readinessSource.includes('neverMutatesLegalAcceptance: true')) throw new Error('SESSION_READINESS_NOT_SERVED');
+  if (!contractSource.includes("var VERSION = '20260720.2'") || !contractSource.includes('forbidsSuccessWithZero: true')) throw new Error('CONTRACT_NOT_SERVED');
+  if (!academySource.includes("version: '1.226'")) throw new Error('ACADEMY_NOT_SERVED');
+  if (!bootstrapSource.includes("sessionReadinessVersion: '20260720.1'") ||
+      !bootstrapSource.includes("importerContractVersion: '20260720.2'") ||
+      !bootstrapSource.includes("importerAcademyVersion: '1.226'")) throw new Error('BOOTSTRAP_NOT_SERVED');
 
   const fixture = runNode('tools/orbit360-importers-e2e-fixture-v20260720.mjs', ['prepare']);
   if (fixture.status !== 0) throw new Error(`FIXTURE_PREPARE_FAILED_${fixture.status}`);
@@ -155,7 +159,8 @@ const final = runNode('tools/orbit360-importers-e2e-finalize-v20260720.mjs');
 const finalCode = Number(final.status ?? 1);
 
 const summary = {
-  schemaVersion: 'orbit360-importers-e2e-coordinator-v1',
+  schemaVersion: 'orbit360-importers-e2e-coordinator-v2',
+  runtimeVersion: RUNTIME,
   runId: RUN_ID,
   browserCode,
   rollbackCode,
