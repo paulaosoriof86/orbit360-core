@@ -1,4 +1,4 @@
-/* Orbit 360 · Academia v1.225 — Importadores completos y evidencia E2E */
+/* Orbit 360 · Academia v1.226 — Importadores completos, sesión legal y evidencia E2E */
 window.Orbit = window.Orbit || {};
 Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
   'use strict';
@@ -11,7 +11,7 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
   }
   function quiz(role) {
     return {
-      t: 'Comprobación aplicada', min: 7, tipo: 'quiz', preguntas: [
+      t: 'Comprobación aplicada', min: 8, tipo: 'quiz', preguntas: [
         {
           p: '¿Qué demuestra que un archivo fue leído correctamente?',
           ops: ['Que la importación ya quedó aplicada', 'Que el sistema pudo interpretar la fuente y producir un resultado preliminar', 'Que todos los datos son válidos'],
@@ -20,6 +20,11 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
         {
           p: '¿Cuándo puede mostrarse una importación como completada?',
           ops: ['Cuando aparece el dry-run', 'Cuando la escritura se confirma y la información puede releerse', 'Cuando el archivo tiene varias hojas'],
+          ok: 1
+        },
+        {
+          p: '¿Qué debe comprobar una sesión nueva antes del primer clic operativo?',
+          ops: ['Solo que exista internet', 'Identidad, rol, tenant y aceptación legal vigente', 'Que el archivo tenga contraseña'],
           ok: 1
         },
         {
@@ -44,7 +49,7 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
       cat: 'Operación',
       emoji: '🧭',
       color: '#1E2227',
-      desc: 'Cómo distinguir lectura, dry-run, aplicación real, auditoría y rollback en cualquier fuente.',
+      desc: 'Cómo distinguir lectura, sesión lista, dry-run, aplicación real, auditoría y rollback en cualquier fuente.',
       destinatarios: role,
       recursos: [],
       metaLeccion: {
@@ -61,8 +66,13 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
           section('✅', 'Aplicación confirmada', 'Solo existe cuando el servicio autorizado confirma la escritura y la plataforma puede releer el resultado.'),
           section('↩️', 'Rollback', 'Las pruebas ficticias deben retirarse por completo y restaurar los conteos anteriores.')
         ]),
-        lesson('Gate integral y estados honestos', [
+        lesson('Sesión lista antes de operar', [
           section('👤', 'Identidad y rol', 'La misma identidad, tenant y rol activo deben conservarse desde la pantalla hasta la operación autorizada.'),
+          section('⚖️', 'Aceptación legal vigente', 'En un navegador nuevo, el acuerdo legal se presenta una sola vez y debe completarse antes del primer clic operativo. Un gate automatizado no puede ignorarlo ni ocultarlo.'),
+          section('🚫', 'Overlay pendiente', 'Si el acuerdo legal sigue abierto, el gate debe detenerse con un código claro. No puede interpretar el bloqueo del clic como fallo del archivo o del backend.'),
+          section('🔐', 'Sesión canónica', 'La preparación de sesión termina únicamente cuando autenticación, rol, tenant y gate legal están resueltos.')
+        ]),
+        lesson('Gate integral y estados honestos', [
           section('🎯', 'Destino único', 'Cada registro debe llegar con un destino interno inequívoco. No se vuelve a deducir en capas diferentes.'),
           section('🧾', 'Auditoría', 'Deben quedar comprobados tanto el resultado aceptado como un rechazo controlado, sin registrar valores protegidos.'),
           section('🛡️', 'Sin secretos en datos operativos', 'Usuarios, contraseñas y números completos permanecen en el servicio seguro; la ficha guarda solo referencias opacas.'),
@@ -98,12 +108,12 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
       courses.forEach(function (courseRow) {
         var previous = byId[courseRow.id];
         if (!previous) {
-          Orbit.store.insert('cursos', Object.assign({ progreso: 0, certificado: false, _cv: 1225 }, courseRow));
-        } else if ((previous._cv || 0) < 1225) {
+          Orbit.store.insert('cursos', Object.assign({ progreso: 0, certificado: false, _cv: 1226 }, courseRow));
+        } else if ((previous._cv || 0) < 1226) {
           Orbit.store.update('cursos', courseRow.id, Object.assign({}, courseRow, {
             progreso: previous.progreso || 0,
             certificado: Boolean(previous.certificado),
-            _cv: 1225
+            _cv: 1226
           }));
         }
       });
@@ -119,5 +129,5 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
     setTimeout(loop, 150);
   })();
   document.addEventListener('orbit:reseeded', apply);
-  return { version: '1.225', contentVersion: '1.225', courses: courses, apply: apply };
+  return { version: '1.226', contentVersion: '1.226', legalGateRequired: true, courses: courses, apply: apply };
 })();
