@@ -33,6 +33,36 @@ Inventario de solo lectura, run `29724137323`:
 
 La evidencia no recuperó ni publicó valores, nombres, enlaces o identificadores.
 
+## Dry-run de la fuente separada
+
+Se procesaron los directorios GT y CO como fuente independiente `accesos_aseguradoras`, sin conservar ni publicar enlaces, usuarios, claves o valores bancarios.
+
+Resultado:
+
+- registros fuente: 77;
+- Guatemala: 40;
+- Colombia: 37;
+- accesos completos: 51;
+- portales con solo enlace: 24;
+- registro parcial: 1;
+- encabezado sin acceso real: 1;
+- ámbito Aseguradora: 72;
+- entidad aliada multicompañía: 2;
+- configuración general del tenant: 3;
+- coincidencias directas: 66;
+- registros bajo alias duplicados: 4;
+- alias que requieren validación: 2.
+
+Decisiones propuestas:
+
+- 41 listos para crear referencia opaca con proveedor confirmado;
+- 4 listos con control explícito de alias;
+- 24 permanecen como portales sin credencial;
+- 7 requieren validación humana;
+- 1 debe omitirse como encabezado.
+
+El total fuente coincide con los 77 portales observados en LAB, pero no significa que deban crearse 77 credenciales. Tres registros son generales del tenant, dos pertenecen a una entidad aliada y uno no es un portal real.
+
 ## Verificación del binding
 
 El runtime conserva los contratos para revelado temporal, copia, rol activo y auditoría. Sin embargo, no existe en el repositorio un adaptador registrado que conecte esos contratos con un proveedor real.
@@ -68,12 +98,13 @@ No se crea otro owner ni otra vista paralela.
 ## Siguiente acción exacta
 
 1. resolver la referencia concreta del proveedor seguro ya creado, sin volver a pedir permisos generales;
-2. tratar el lote como fuente separada `accesos_aseguradoras`, no como reimportación del directorio;
-3. producir dry-run sanitizado por país, aseguradora y portal;
-4. generar referencias opacas solo después de confirmación del proveedor;
-5. actualizar únicamente referencia, estado y trazabilidad;
-6. validar Dirección desktop, Operativo tablet y denegación Asesor móvil;
-7. ejecutar una sola vez el gate M1 únicamente si cambia el runtime evaluado.
+2. aplicar el dry-run sanitizado ya producido;
+3. generar 41 referencias opacas directas y 4 bajo control de alias solo después de confirmación del proveedor;
+4. mantener 24 portales sin credencial;
+5. enviar 7 registros a validación y omitir 1 encabezado;
+6. actualizar únicamente referencia, estado y trazabilidad;
+7. validar Dirección desktop, Operativo tablet y denegación Asesor móvil;
+8. ejecutar una sola vez el gate M1 únicamente si cambia el runtime evaluado.
 
 ## Producción y dominio
 
@@ -94,7 +125,7 @@ La conexión del dominio pertenece a Bloque 6 y requiere autorización explícit
 
 - A: owner visual existente; pendiente validación con referencias reales.
 - B: enlazar el proveedor existente por referencia concreta; no crear infraestructura paralela.
-- C: migración separada desde los directorios GT/CO, con trazabilidad y sin exposición.
+- C: dry-run de la fuente separada cerrado; pendiente aplicación controlada de referencias.
 
 ## Clasificación para continuidad
 
