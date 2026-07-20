@@ -1,4 +1,4 @@
-name: Orbit 360 Ephemeral Handoff Cleanup LAB 20260720
+name: Orbit 360 Secure Access Verification LAB 20260720
 
 on:
   push:
@@ -11,23 +11,31 @@ permissions:
   contents: read
   pull-requests: write
 
+concurrency:
+  group: orbit360-secure-access-verification-lab-v20260720
+  cancel-in-progress: false
+
 jobs:
-  cleanup:
-    name: Seguridad · retirar llaves efímeras de handoff
+  verify_secure_access:
+    name: Aseguradoras · referencias opacas, proveedor y roles
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      TENANT_ID: alianzas-soluciones
+      EXPECTED_UID: woJlxR1iFEeiQZvTscPj4qQ5Qc73
+      EXPECTED_EMAIL: orbit.lab@demo.com
+      REGION: us-central1
+      MIN_EXPECTED_OPAQUE_REFS: "37"
       SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-
     steps:
       - name: Checkout rama autorizada
         uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
 
-      - name: Preflight vinculante
+      - name: Preflight vinculante antes de credenciales
         shell: bash
         run: |
           set -euo pipefail
@@ -44,39 +52,246 @@ jobs:
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          echo "DEPLOYER_EMAIL=$(jq -r '.client_email // empty' "$KEY_FILE")" >> "$GITHUB_ENV"
 
-      - name: Instalar Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ays-orbit-360-lab
-
-      - name: Eliminar exclusivamente llaves efímeras
+      - name: Instalar dependencias declaradas
         shell: bash
         run: |
           set -euo pipefail
-          gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project "$FIREBASE_PROJECT_ID" >/dev/null
-          REMOVED=0
-          for item in orbit360-credential-handoff-key-20260720 orbit360-credential-handoff-key-20260720-v2; do
-            if gcloud secrets describe "$item" --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1; then
-              gcloud secrets delete "$item" --project "$FIREBASE_PROJECT_ID" --quiet >/dev/null
-              REMOVED=$((REMOVED + 1))
-            fi
-          done
-          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
-          jq -n --arg run "$GITHUB_RUN_ID" --arg commit "$GITHUB_SHA" --argjson removed "$REMOVED" '{schemaVersion:"orbit360-ephemeral-handoff-cleanup-v1",containsSecrets:false,containsPII:false,ok:true,phase:"completed",run:$run,commit:$commit,ephemeralKeysRemoved:$removed,permanentVaultTouched:false}' > orbit360-platform/runtime-gate-crm-v20260716/ephemeral-handoff-cleanup-sanitized.json
+          npm install --prefix functions --ignore-scripts --no-audit --no-fund
+          npm --prefix functions run check
+
+      - name: Verificar Firestore, proveedor y permisos
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT_DIR="orbit360-platform/runtime-gate-crm-v20260716"
+          mkdir -p "$OUT_DIR"
+          export OUT_FILE="$OUT_DIR/secure-access-verification-sanitized.json"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import { createRequire } from 'node:module';
+          const require = createRequire(new URL('./functions/package.json', import.meta.url));
+          const { initializeApp, cert, getApps } = require('firebase-admin/app');
+          const { getAuth } = require('firebase-admin/auth');
+          const { getFirestore } = require('firebase-admin/firestore');
+
+          const env = process.env;
+          const result = {
+            schemaVersion: 'orbit360-secure-access-verification-v1',
+            containsSecrets: false,
+            containsPII: false,
+            ok: false,
+            phase: 'initializing',
+            classification: '',
+            run: env.GITHUB_RUN_ID || '',
+            commit: env.GITHUB_SHA || '',
+            clients: 0,
+            insurers: 0,
+            portals: 0,
+            opaqueRefs: 0,
+            uniqueOpaqueRefs: 0,
+            backendRequired: 0,
+            storedAccessAvailable: 0,
+            providerAvailable: 0,
+            plaintextCredentialFields: 0,
+            directionReveal: false,
+            operativeCopy: false,
+            advisorDenied: false,
+            directionAssigned: false,
+            operativeAssigned: false,
+            advisorAssigned: false
+          };
+          const write = () => fs.writeFileSync(env.OUT_FILE, JSON.stringify(result, null, 2));
+          const clean = (v, max=512) => String(v == null ? '' : v).replace(/\u0000/g, '').trim().slice(0,max);
+          const norm = v => clean(v,120).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+          const roleValues = row => Array.from(new Set([].concat(row?.roles||[],row?.rolesAsignados||[],row?.rolesDisponibles||[],row?.assignedRoles||[],row?.role||[],row?.rol||[],row?.rolDefault||[]).map(norm).filter(Boolean)));
+          const sensitiveKey = /^(username|usuario|user|password|contrasena|contraseña|secret|token|apiKey)$/i;
+          const REF_RE = /^cred_[a-f0-9]{32}$/;
+
+          async function publicConfig() {
+            for (const host of [`${env.FIREBASE_PROJECT_ID}.web.app`, `${env.FIREBASE_PROJECT_ID}.firebaseapp.com`]) {
+              try {
+                const response = await fetch(`https://${host}/__/firebase/init.json`, { cache: 'no-store' });
+                if (!response.ok) continue;
+                const config = await response.json();
+                if (config.apiKey && config.projectId === env.FIREBASE_PROJECT_ID) return config;
+              } catch {}
+            }
+            throw Object.assign(new Error('Firebase public config unavailable'), { code: 'ENVIRONMENT_FAILURE' });
+          }
+
+          async function callable(name, token, data) {
+            const response = await fetch(`https://${env.REGION}-${env.FIREBASE_PROJECT_ID}.cloudfunctions.net/${name}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json; charset=utf-8', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ data: { tenantId: env.TENANT_ID, ...data } }),
+              cache: 'no-store'
+            });
+            let body = {};
+            try { body = await response.json(); } catch {}
+            if (!response.ok || body.error) {
+              const error = new Error('Callable rejected');
+              error.code = body?.error?.status || `HTTP_${response.status}`;
+              throw error;
+            }
+            return body.result !== undefined ? body.result : body.data;
+          }
+
+          try {
+            result.phase = 'read_firestore'; write();
+            const serviceAccount = JSON.parse(fs.readFileSync(env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'));
+            const app = getApps()[0] || initializeApp({ credential: cert(serviceAccount), projectId: env.FIREBASE_PROJECT_ID });
+            const db = getFirestore(app);
+            const tenantRoot = db.collection('tenantId').doc(env.TENANT_ID);
+            const [clientsSnap, insurersSnap, memberSnap] = await Promise.all([
+              tenantRoot.collection('clientes').get(),
+              tenantRoot.collection('aseguradoras').get(),
+              db.collection('tenants').doc(env.TENANT_ID).collection('members').doc(env.EXPECTED_UID).get()
+            ]);
+            result.clients = clientsSnap.size;
+            result.insurers = insurersSnap.size;
+            const memberRoles = roleValues(memberSnap.exists ? memberSnap.data() : {});
+            result.directionAssigned = memberRoles.includes('direccion');
+            result.operativeAssigned = memberRoles.includes('operativo');
+            result.advisorAssigned = memberRoles.includes('asesor');
+
+            const mappings = [];
+            for (const doc of insurersSnap.docs) {
+              const row = doc.data() || {};
+              const portals = Array.isArray(row.portales) ? row.portales : [];
+              result.portals += portals.length;
+              for (let index=0; index<portals.length; index+=1) {
+                const portal = portals[index] || {};
+                for (const [key,value] of Object.entries(portal)) {
+                  if (sensitiveKey.test(key) && clean(value)) result.plaintextCredentialFields += 1;
+                }
+                const ref = clean(portal.credentialRef,80);
+                if (ref === 'backend_required') result.backendRequired += 1;
+                if (REF_RE.test(ref)) {
+                  result.opaqueRefs += 1;
+                  if (clean(portal.estadoAcceso) === 'Acceso disponible') result.storedAccessAvailable += 1;
+                  mappings.push({ insurerId: doc.id, portalId: clean(portal.id || String(index),160), credentialRef: ref });
+                }
+              }
+            }
+            result.uniqueOpaqueRefs = new Set(mappings.map(item => item.credentialRef)).size;
+
+            if (result.clients !== 414 || result.insurers !== 26 || result.plaintextCredentialFields !== 0 || result.opaqueRefs < Number(env.MIN_EXPECTED_OPAQUE_REFS)) {
+              throw Object.assign(new Error('Operational data contract mismatch'), { code: 'DATA_CONTRACT_FAILURE' });
+            }
+
+            result.phase = 'authenticate_lab_user'; write();
+            const auth = getAuth(app);
+            const user = await auth.getUser(env.EXPECTED_UID);
+            if (String(user.email || '').toLowerCase() !== String(env.EXPECTED_EMAIL).toLowerCase()) {
+              throw Object.assign(new Error('Unexpected LAB identity'), { code: 'SECURITY_FAILURE' });
+            }
+            const token = await auth.createCustomToken(env.EXPECTED_UID);
+            const config = await publicConfig();
+            const signIn = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${encodeURIComponent(config.apiKey)}`, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, returnSecureToken: true })
+            });
+            const signed = await signIn.json();
+            if (!signIn.ok || !signed.idToken) throw Object.assign(new Error('Token exchange failed'), { code: 'ENVIRONMENT_FAILURE' });
+
+            result.phase = 'verify_provider'; write();
+            let sample = null;
+            let sampleStatus = null;
+            for (const mapping of mappings) {
+              const status = await callable('orbit360CredentialStatus', signed.idToken, { activeRole: 'direccion', ...mapping });
+              if (status?.ok && status.available) {
+                result.providerAvailable += 1;
+                if (!sample) { sample = mapping; sampleStatus = status; }
+              }
+            }
+            if (result.providerAvailable !== result.opaqueRefs || !sample) {
+              throw Object.assign(new Error('Provider availability mismatch'), { code: 'DATA_CONTRACT_FAILURE' });
+            }
+
+            const field = sampleStatus.passwordAvailable ? 'password' : 'username';
+            const revealed = await callable('orbit360RevealInsurerCredential', signed.idToken, { activeRole: 'direccion', ...sample, field });
+            result.directionReveal = Boolean(revealed?.ok && clean(revealed.value));
+            if (revealed && typeof revealed === 'object') delete revealed.value;
+
+            const copied = await callable('orbit360CopyInsurerCredential', signed.idToken, { activeRole: 'operativo', ...sample, field });
+            result.operativeCopy = Boolean(copied?.ok && clean(copied.value));
+            if (copied && typeof copied === 'object') delete copied.value;
+
+            try {
+              await callable('orbit360CredentialStatus', signed.idToken, { activeRole: 'asesor', ...sample });
+            } catch (error) {
+              result.advisorDenied = /PERMISSION_DENIED|permission/i.test(clean(error?.code,120));
+            }
+
+            result.phase = 'completed';
+            result.ok = result.clients === 414 && result.insurers === 26 &&
+              result.opaqueRefs >= Number(env.MIN_EXPECTED_OPAQUE_REFS) &&
+              result.providerAvailable === result.opaqueRefs &&
+              result.plaintextCredentialFields === 0 &&
+              result.directionReveal && result.operativeCopy && result.advisorDenied;
+            if (!result.ok) throw Object.assign(new Error('Closure predicates incomplete'), { code: 'DATA_CONTRACT_FAILURE' });
+            write();
+            console.log(`GO_SECURE_ACCESS_VERIFIED refs=${result.opaqueRefs} available=${result.providerAvailable}`);
+          } catch (error) {
+            result.classification = clean(error?.code || 'PIPELINE_MECHANISM_FAILURE',120).replace(/[^A-Za-z0-9_.-]+/g,'_');
+            write();
+            throw error;
+          }
+          NODE
+
+      - name: Limpiar cuenta temporal del runner
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "${GOOGLE_APPLICATION_CREDENTIALS:-/nonexistent}" ]; then shred -u "$GOOGLE_APPLICATION_CREDENTIALS" 2>/dev/null || rm -f "$GOOGLE_APPLICATION_CREDENTIALS"; fi
+
+      - name: Validar cierre técnico de accesos
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/secure-access-verification-sanitized.json"
+          jq -e '.ok == true and .phase == "completed" and .clients == 414 and .insurers == 26 and .opaqueRefs >= 37 and .providerAvailable == .opaqueRefs and .plaintextCredentialFields == 0 and .directionReveal == true and .operativeCopy == true and .advisorDenied == true' "$FILE" >/dev/null
 
       - name: Publicar evidencia sanitizada
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-ephemeral-handoff-cleanup-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/ephemeral-handoff-cleanup-sanitized.json
+          name: orbit360-secure-access-verification-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/secure-access-verification-sanitized.json
           if-no-files-found: error
           retention-days: 7
 
-      - name: Comentar resultado en PR 5
+      - name: Comentar resultado sanitizado en PR 5
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "Limpieza de handoff efímero completada. La bóveda permanente no fue modificada. Run: ${GITHUB_RUN_ID}. Commit: ${GITHUB_SHA}."
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/secure-access-verification-sanitized.json"
+          test -f "$FILE" || exit 0
+          node <<'NODE' > /tmp/orbit360-secure-verification.md
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/secure-access-verification-sanitized.json','utf8'));
+          process.stdout.write([
+            '### Verificación posterior a carga · Accesos Aseguradoras LAB','',
+            '- Resultado: **'+(d.ok?'OK':'NO_GO')+'**',
+            '- Fase: `'+d.phase+'`',
+            '- Clasificación: `'+(d.classification||'NONE')+'`',
+            '- Clientes: `'+d.clients+'`',
+            '- Aseguradoras: `'+d.insurers+'`',
+            '- Portales: `'+d.portals+'`',
+            '- Referencias opacas: `'+d.opaqueRefs+'`',
+            '- Referencias únicas: `'+d.uniqueOpaqueRefs+'`',
+            '- Disponibles en proveedor: `'+d.providerAvailable+'`',
+            '- Estado disponible persistido: `'+d.storedAccessAvailable+'`',
+            '- Pendientes backend: `'+d.backendRequired+'`',
+            '- Campos sensibles en Firestore: `'+d.plaintextCredentialFields+'`',
+            '- Dirección revela: `'+d.directionReveal+'`',
+            '- Operativo copia: `'+d.operativeCopy+'`',
+            '- Asesor denegado: `'+d.advisorDenied+'`',
+            '- Run: `'+d.run+'`',
+            '- Commit: `'+d.commit+'`','',
+            'La evidencia no contiene nombres, referencias, usuarios, contraseñas ni valores protegidos.'
+          ].join('\n'));
+          NODE
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/orbit360-secure-verification.md
