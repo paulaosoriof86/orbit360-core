@@ -1,0 +1,153 @@
+name: Orbit 360 Diagnose Membership Role Shape LAB 20260720
+run-name: M1 forma de roles read-only · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-diagnose-membership-role-shape-lab-v20260720.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: orbit360-diagnose-membership-role-shape-lab-v20260720
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    name: Membresía LAB · forma y estabilidad read-only
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      ORBIT360_MEMBERSHIP_SHAPE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/membership-role-shape-sanitized.json
+    steps:
+      - name: Checkout SHA inmutable
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Preflight vinculante antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = "push"
+          test "$GITHUB_REF_NAME" = "ays/backend-tenant-lab-v99-20260703"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
+          node --check tools/orbit360-diagnose-membership-role-shape-v20260720.mjs
+          echo "ORBIT360_MEMBERSHIP_ROLE_SHAPE_PREFLIGHT_OK"
+
+      - name: Resolver cuenta LAB después del preflight
+        shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then echo "BLOQUEO_SECRET_LAB"; exit 42; fi
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
+          test "$PROJECT_ID" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar dependencia verificada
+        shell: bash
+        run: npm install --no-save firebase-admin@13
+
+      - name: Leer forma y estabilidad sin escribir
+        id: shape
+        shell: bash
+        run: node tools/orbit360-diagnose-membership-role-shape-v20260720.mjs
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-membership-role-shape-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/membership-role-shape-sanitized.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Actualizar diagnóstico observable en PR 5
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          TARGET_PR: "5"
+          REPORT_PATH: orbit360-platform/runtime-gate-crm-v20260716/membership-role-shape-sanitized.json
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+        with:
+          script: |
+            const fs = require('fs');
+            const start = '<!-- ORBIT360_MEMBERSHIP_SHAPE_START -->';
+            const end = '<!-- ORBIT360_MEMBERSHIP_SHAPE_END -->';
+            let report = { classification: 'EVIDENCE_MISSING', checks: {}, observations: [] };
+            if (fs.existsSync(process.env.REPORT_PATH)) {
+              report = JSON.parse(fs.readFileSync(process.env.REPORT_PATH, 'utf8'));
+            }
+            const checks = report.checks || {};
+            const last = (report.observations || []).slice(-1)[0] || {};
+            const mr = last.memberRoles || {};
+            const ar = last.advisorRoles || {};
+            const fields = mr.fields || {};
+            const fieldLines = ['roles','rolesAsignados','rolesDisponibles','assignedRoles','role','rol','rolDefault','defaultRole','activeRole','rolActivo']
+              .map(key => {
+                const f = fields[key] || {};
+                const values = Array.isArray(f.normalizedValues) ? f.normalizedValues.join(', ') : '';
+                return `- \`${key}\`: tipo **${f.type || 'missing'}**, valores normalizados \`${values || '—'}\``;
+              }).join('\n');
+            const block = `${start}
+            ## Diagnóstico estricto de forma de roles
+
+            \`\`\`txt
+            run: ${process.env.RUN_ID}
+            HEAD evaluado: ${process.env.HEAD_SHA}
+            modo: read_only
+            lecturas: ${Number(report.readCount || 0)}
+            clasificación: ${report.classification || 'UNCLASSIFIED'}
+            \`\`\`
+
+            - Documento miembro estable: **${checks.memberRoleSurfaceStable === true}**
+            - Documento asesor estable: **${checks.advisorRoleSurfaceStable === true}**
+            - Campo \`roles\` es arreglo: **${checks.rolesFieldIsArray === true}**
+            - Campo \`roles\` contiene solo roles canónicos: **${checks.rolesFieldOnlyCanonical === true}**
+            - Rol activo aparece en \`roles\`: **${checks.activeRoleInRolesField === true}**
+            - Rol activo aparece en algún campo: **${checks.activeRoleInAnyRoleField === true}**
+            - Escrituras realizadas: **false**
+
+            Campos del miembro:
+            ${fieldLines}
+
+            Roles del asesor normalizados: \`${Array.isArray(ar.allValues) ? ar.allValues.join(', ') : '—'}\`
+
+            Metadatos sanitizados del miembro: \`updatedBy=${last.memberMetadata?.updatedBy || '—'}; contractSource=${last.memberMetadata?.contractSource || '—'}\`
+            ${end}`;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = Number(process.env.TARGET_PR);
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+            const current = pr.body || '';
+            const pattern = new RegExp(`${start}[\\s\\S]*?${end}`, 'm');
+            const body = pattern.test(current) ? current.replace(pattern, block) : `${current.trim()}\n\n${block}\n`;
+            await github.rest.pulls.update({ owner, repo, pull_number, body });
+
+      - name: Limpiar cuenta temporal
+        if: always()
+        shell: bash
+        run: rm -f "${RUNNER_TEMP}/orbit360-firebase-lab.json"
