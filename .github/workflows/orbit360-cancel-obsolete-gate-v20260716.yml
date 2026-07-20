@@ -1,4 +1,4 @@
-name: Orbit 360 Secure Access UI Integration 20260720
+name: Orbit 360 Secure Access Hosting LAB 20260720
 
 on:
   push:
@@ -8,28 +8,28 @@ on:
       - ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
 concurrency:
-  group: orbit360-secure-access-ui-integration-v20260720
+  group: orbit360-secure-access-hosting-lab-v20260720
   cancel-in-progress: false
 
 jobs:
-  integrate_ui:
-    name: Aseguradoras · integrar carga exclusiva de accesos
+  deploy_hosting:
+    name: Aseguradoras · publicar flujo seguro en LAB
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 25
     env:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
-      TARGET: orbit360-platform/core/insurer-directory-import-v1202.js
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
 
     steps:
       - name: Checkout rama autorizada
         uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
-          fetch-depth: 0
 
       - name: Preflight vinculante
         shell: bash
@@ -37,47 +37,63 @@ jobs:
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          node --check "$TARGET"
-          node --check tools/orbit360-enable-secure-only-browser-flow-v20260720.mjs
-          grep -Fq 'applySecureOnly.__secureOnlyV20260720 = true' "$TARGET"
-
-      - name: Conectar botón exclusivo
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-enable-secure-only-browser-flow-v20260720.mjs "$TARGET"
-          node --check "$TARGET"
-          grep -Fq 'data-secure-only' "$TARGET"
-          grep -Fq 'Guardar únicamente accesos seguros' "$TARGET"
-          grep -Fq 'No se modificó el directorio' "$TARGET"
+          node --check orbit360-platform/core/insurer-directory-import-v1202.js
+          grep -Fq 'data-secure-only' orbit360-platform/core/insurer-directory-import-v1202.js
+          grep -Fq 'Guardar únicamente accesos seguros' orbit360-platform/core/insurer-directory-import-v1202.js
+          grep -Fq 'No se modificó el directorio' orbit360-platform/core/insurer-directory-import-v1202.js
           grep -Fq 'appliesOpaqueRefsAfterRemoteConfirmation: true' orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
           grep -Fq 'noSecretPersistence: true' orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
 
-      - name: Retirar mecanismos temporales abandonados
+      - name: Resolver principal LAB
         shell: bash
         run: |
           set -euo pipefail
-          git rm -f --ignore-unmatch .github/secure-handoff/orbit360-credentials-envelope-20260720.json
-          git rm -f --ignore-unmatch tools/orbit360-apply-secure-credentials-handoff-v20260720.mjs
-          rmdir .github/secure-handoff 2>/dev/null || true
+          test -n "${SA_PRIMARY:-}"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          printf '%s' "$SA_PRIMARY" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
 
-      - name: Persistir integración validada
+      - name: Publicar canal LAB
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name "orbit360-gate-bot"
-          git config user.email "orbit360-gate-bot@users.noreply.github.com"
-          git add "$TARGET"
-          if git diff --cached --quiet; then
-            echo "Sin cambios pendientes"
-          else
-            git commit -m "feat(aseguradoras): habilitar carga exclusiva de accesos seguros [skip ci]"
-            git push origin HEAD:ays/backend-tenant-lab-v99-20260703
-          fi
+          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab \
+            --project "$FIREBASE_PROJECT_ID" \
+            --expires 30d \
+            --non-interactive \
+            --json > "${RUNNER_TEMP}/hosting.json"
+          PREVIEW_URL="$(jq -r '.. | strings | select(startswith("https://"))' "${RUNNER_TEMP}/hosting.json" | grep -E '\.(web\.app|firebaseapp\.com)' | head -n 1)"
+          test -n "$PREVIEW_URL"
+          echo "PREVIEW_URL=$PREVIEW_URL" >> "$GITHUB_ENV"
 
-      - name: Comentar integración en PR 5
+      - name: Verificar fuente realmente publicada
+        shell: bash
+        run: |
+          set -euo pipefail
+          importer="$(curl -fsSL --retry 8 --retry-delay 3 --retry-all-errors -H 'Cache-Control: no-cache' "${PREVIEW_URL}/core/insurer-directory-import-v1202.js?run=${GITHUB_RUN_ID}")"
+          provider="$(curl -fsSL --retry 8 --retry-delay 3 --retry-all-errors -H 'Cache-Control: no-cache' "${PREVIEW_URL}/core/aseguradoras-credentials-provider-lab-v20260720.js?run=${GITHUB_RUN_ID}")"
+          printf '%s' "$importer" | grep -Fq 'data-secure-only'
+          printf '%s' "$importer" | grep -Fq 'Guardar únicamente accesos seguros'
+          printf '%s' "$importer" | grep -Fq 'applySecureOnly.__secureOnlyV20260720 = true'
+          printf '%s' "$importer" | grep -Fq 'No se modificó el directorio'
+          printf '%s' "$provider" | grep -Fq 'appliesOpaqueRefsAfterRemoteConfirmation: true'
+          printf '%s' "$provider" | grep -Fq 'noSecretPersistence: true'
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          jq -n --arg run "$GITHUB_RUN_ID" --arg commit "$GITHUB_SHA" --arg previewUrl "$PREVIEW_URL" '{schemaVersion:"orbit360-secure-access-hosting-v1",containsSecrets:false,containsPII:false,ok:true,phase:"completed",run:$run,commit:$commit,previewUrl:$previewUrl,secureOnlyButton:true,directoryWrites:false,remoteConfirmationRequired:true,opaqueRefsAfterConfirmation:true}' > orbit360-platform/runtime-gate-crm-v20260716/secure-access-hosting-sanitized.json
+
+      - name: Publicar evidencia sanitizada
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-secure-access-hosting-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/secure-access-hosting-sanitized.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Comentar resultado en PR 5
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "Integración UI segura OK. Botón: Guardar únicamente accesos seguros. No reimporta aseguradoras ni modifica contactos, cuentas o directorio. Run: ${GITHUB_RUN_ID}. Commit: ${GITHUB_SHA}."
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "Hosting LAB seguro publicado y verificado. Botón exclusivo activo; no reimporta aseguradoras. URL: ${PREVIEW_URL}. Run: ${GITHUB_RUN_ID}. Commit: ${GITHUB_SHA}."
