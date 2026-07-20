@@ -1,4 +1,4 @@
-name: Orbit 360 Secure Credentials IAM Diagnostic 20260720
+name: Orbit 360 Cancel Obsolete Joint Gate 20260716
 
 on:
   push:
@@ -9,176 +9,14 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 concurrency:
-  group: orbit360-secure-credentials-iam-diagnostic-v20260720
-  cancel-in-progress: false
+  group: orbit360-clientes-aseguradoras-runtime-gate-v20260716
+  cancel-in-progress: true
 
 jobs:
-  iam_diagnostic:
-    name: Credenciales Aseguradoras · diagnóstico IAM de solo lectura
+  release_runner:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
-      FIREBASE_PROJECT_ID: ays-orbit-360-lab
-      ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
-      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
     steps:
-      - name: Checkout rama autorizada
-        uses: actions/checkout@v4
-        with:
-          ref: ays/backend-tenant-lab-v99-20260703
-
-      - name: Preflight vinculante antes de credenciales e infraestructura
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-
-      - name: Resolver cuenta de servicio LAB
-        shell: bash
-        run: |
-          set -euo pipefail
-          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
-          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
-          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
-          if [ -z "$SERVICE_ACCOUNT" ]; then echo "BLOQUEO_SECRET_LAB"; exit 42; fi
-          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
-          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
-          chmod 600 "$KEY_FILE"
-          PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
-          DEPLOYER_EMAIL="$(jq -r '.client_email // empty' "$KEY_FILE")"
-          test "$PROJECT_ID" = "$EXPECTED_FIREBASE_PROJECT_ID"
-          test -n "$DEPLOYER_EMAIL"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          echo "DEPLOYER_EMAIL=$DEPLOYER_EMAIL" >> "$GITHUB_ENV"
-
-      - name: Instalar Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ays-orbit-360-lab
-
-      - name: Diagnosticar servicios y roles sin escritura
-        shell: bash
-        run: |
-          set -euo pipefail
-          OUT="orbit360-platform/runtime-gate-crm-v20260716/credential-provider-iam-diagnostic-sanitized.json"
-          mkdir -p "$(dirname "$OUT")"
-          gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project="$FIREBASE_PROJECT_ID" >/dev/null
-          gcloud config set project "$FIREBASE_PROJECT_ID" >/dev/null
-
-          REQUIRED_SERVICES=(
-            cloudfunctions.googleapis.com
-            run.googleapis.com
-            cloudbuild.googleapis.com
-            artifactregistry.googleapis.com
-            eventarc.googleapis.com
-            secretmanager.googleapis.com
-            iam.googleapis.com
-          )
-          SERVICES_READABLE=false
-          POLICY_READABLE=false
-          ENABLED_FILE="${RUNNER_TEMP}/enabled-services.txt"
-          ROLES_FILE="${RUNNER_TEMP}/deployer-roles.txt"
-          : > "$ENABLED_FILE"
-          : > "$ROLES_FILE"
-
-          if gcloud services list --enabled --project "$FIREBASE_PROJECT_ID" --format='value(config.name)' > "$ENABLED_FILE" 2>/dev/null; then
-            SERVICES_READABLE=true
-          fi
-          if gcloud projects get-iam-policy "$FIREBASE_PROJECT_ID" \
-            --flatten='bindings[].members' \
-            --filter="bindings.members:serviceAccount:${DEPLOYER_EMAIL}" \
-            --format='value(bindings.role)' > "$ROLES_FILE" 2>/dev/null; then
-            POLICY_READABLE=true
-          fi
-
-          MISSING_JSON='[]'
-          ENABLED_JSON='[]'
-          for service in "${REQUIRED_SERVICES[@]}"; do
-            if grep -Fxq "$service" "$ENABLED_FILE"; then
-              ENABLED_JSON="$(jq -c --arg v "$service" '. + [$v]' <<< "$ENABLED_JSON")"
-            else
-              MISSING_JSON="$(jq -c --arg v "$service" '. + [$v]' <<< "$MISSING_JSON")"
-            fi
-          done
-
-          has_role() { grep -Fxq "$1" "$ROLES_FILE" && echo true || echo false; }
-          OWNER="$(has_role roles/owner)"
-          SERVICE_USAGE_ADMIN="$(has_role roles/serviceusage.serviceUsageAdmin)"
-          SERVICE_USAGE_CONSUMER="$(has_role roles/serviceusage.serviceUsageConsumer)"
-          FIREBASE_ADMIN="$(has_role roles/firebase.admin)"
-          CLOUD_FUNCTIONS_ADMIN="$(has_role roles/cloudfunctions.admin)"
-          IAM_SA_ADMIN="$(has_role roles/iam.serviceAccountAdmin)"
-          SECRET_MANAGER_ADMIN="$(has_role roles/secretmanager.admin)"
-          PROJECT_IAM_ADMIN="$(has_role roles/resourcemanager.projectIamAdmin)"
-          CAN_ENABLE_SERVICES=false
-          if [ "$OWNER" = true ] || [ "$SERVICE_USAGE_ADMIN" = true ]; then CAN_ENABLE_SERVICES=true; fi
-
-          jq -n \
-            --arg commit "$GITHUB_SHA" \
-            --arg run "$GITHUB_RUN_ID" \
-            --argjson servicesReadable "$SERVICES_READABLE" \
-            --argjson policyReadable "$POLICY_READABLE" \
-            --argjson enabledRequiredServices "$ENABLED_JSON" \
-            --argjson missingRequiredServices "$MISSING_JSON" \
-            --argjson owner "$OWNER" \
-            --argjson serviceUsageAdmin "$SERVICE_USAGE_ADMIN" \
-            --argjson serviceUsageConsumer "$SERVICE_USAGE_CONSUMER" \
-            --argjson firebaseAdmin "$FIREBASE_ADMIN" \
-            --argjson cloudFunctionsAdmin "$CLOUD_FUNCTIONS_ADMIN" \
-            --argjson iamServiceAccountAdmin "$IAM_SA_ADMIN" \
-            --argjson secretManagerAdmin "$SECRET_MANAGER_ADMIN" \
-            --argjson projectIamAdmin "$PROJECT_IAM_ADMIN" \
-            --argjson canEnableServices "$CAN_ENABLE_SERVICES" \
-            '{schemaVersion:"orbit360-secure-credential-provider-iam-diagnostic-v1",containsPII:false,containsSecrets:false,readOnly:true,commit:$commit,run:$run,servicesReadable:$servicesReadable,policyReadable:$policyReadable,enabledRequiredServices:$enabledRequiredServices,missingRequiredServices:$missingRequiredServices,roleCapabilities:{owner:$owner,serviceUsageAdmin:$serviceUsageAdmin,serviceUsageConsumer:$serviceUsageConsumer,firebaseAdmin:$firebaseAdmin,cloudFunctionsAdmin:$cloudFunctionsAdmin,iamServiceAccountAdmin:$iamServiceAccountAdmin,secretManagerAdmin:$secretManagerAdmin,projectIamAdmin:$projectIamAdmin},canEnableServices:$canEnableServices,rootCause:($canEnableServices|if . then "pending_service_inventory" else "missing_serviceusage_services_enable" end)}' \
-            > "$OUT"
-
-      - name: Publicar evidencia sanitizada
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-secure-credential-iam-diagnostic-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/credential-provider-iam-diagnostic-sanitized.json
-          if-no-files-found: error
-          retention-days: 7
-
-      - name: Comentar diagnóstico sanitizado en PR 5
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          FILE="orbit360-platform/runtime-gate-crm-v20260716/credential-provider-iam-diagnostic-sanitized.json"
-          if [ ! -f "$FILE" ]; then exit 0; fi
-          node - <<'NODE' > /tmp/iam-diagnostic-comment.md
-          const fs = require('fs');
-          const d = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/credential-provider-iam-diagnostic-sanitized.json','utf8'));
-          process.stdout.write([
-            '### Diagnóstico IAM · proveedor seguro de credenciales',
-            '',
-            '- Solo lectura: `' + d.readOnly + '`',
-            '- Servicios consultables: `' + d.servicesReadable + '`',
-            '- Política consultable: `' + d.policyReadable + '`',
-            '- Servicios requeridos ya habilitados: `' + d.enabledRequiredServices.length + '/7`',
-            '- Servicios requeridos faltantes: `' + d.missingRequiredServices.length + '`',
-            '- Puede habilitar servicios: `' + d.canEnableServices + '`',
-            '- Causa raíz: `' + d.rootCause + '`',
-            '- Run: `' + d.run + '`',
-            '',
-            'No creó ni modificó APIs, IAM, Secret Manager, Functions, Firestore o Hosting.'
-          ].join('\n'));
-          NODE
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/iam-diagnostic-comment.md
-
-      - name: Alto controlado para evidencia observable
-        if: always()
-        run: |
-          echo "IAM_DIAGNOSTIC_READY_EXPECTED_STOP"
-          exit 78
+      - name: Liberar ejecución obsoleta
+        run: echo "Obsolete unbounded gate cancelled; bounded gate remains authoritative."
