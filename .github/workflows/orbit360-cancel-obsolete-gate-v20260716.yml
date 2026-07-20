@@ -21,11 +21,22 @@ jobs:
         with:
           ref: ays/backend-tenant-lab-v99-20260703
 
-      - name: Confirmar freeze
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Preflight del contrato congelado
         shell: bash
         run: |
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
+
+      - name: Confirmar freeze
+        shell: bash
+        run: |
+          set -euo pipefail
           echo "FREEZE_IMPORTERS_E2E_CONFIRMATION_STAGE"
           echo "Root cause: synthetic browser session did not satisfy the mandatory legal acceptance gate before the first actionable click."
           echo "No secrets, browser, deploy, fixture or data writes are executed by this frozen workflow."
