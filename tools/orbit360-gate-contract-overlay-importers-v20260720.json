@@ -8,7 +8,7 @@
   "gatePatch": {
     "contractVersion": "1.0.4",
     "diagnosticRevision": "canonical-session-legal-membership-provider-function-dependencies-v5",
-    "runtimeVersion": "20260720-5",
+    "runtimeVersion": "20260720-4",
     "status": "ACTIVE_SINGLE_EXECUTION_PENDING",
     "workflow": ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
     "staticValidationStatus": "PREFLIGHT_REQUIRED_BEFORE_EXECUTION",
