@@ -2,17 +2,25 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-20",
   "gateId": "importers-e2e-acceptance-lab-v20260720",
-  "classification": "PIPELINE_MECHANISM_FAILURE_RESOLVED",
-  "diagnosticRevision": "canonical-browser-backend-store-rollback-observer-v2-confirmation-driver-v2",
-  "contractRevision": "1.0.0-canonical-browser-backend-store-rollback-observer-v2-confirmation-driver-v2",
+  "classification": "PIPELINE_MECHANISM_FAILURE_ROOT_CAUSE_CONFIRMED",
+  "diagnosticRevision": "canonical-browser-backend-store-rollback-legal-gate-freeze-v1",
+  "contractRevision": "1.0.0-canonical-browser-backend-store-rollback-legal-gate-freeze-v1",
   "gatePatch": {
     "contractVersion": "1.0.0",
-    "diagnosticRevision": "canonical-browser-backend-store-rollback-observer-v2-confirmation-driver-v2",
-    "status": "ACTIVE_ROOT_CAUSE_GATE",
-    "workflow": ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
+    "diagnosticRevision": "canonical-browser-backend-store-rollback-legal-gate-freeze-v1",
+    "status": "FROZEN_AFTER_TWO_CONFIRMATION_STAGE_FAILURES",
+    "workflow": ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml",
+    "executionBudget": {
+      "type": "frozen_pending_browser_session_lifecycle_contract",
+      "watchdogBudgetMs": 900000,
+      "exhaustionPolicy": "Do not rerun. The confirmation stage failed twice before provider invocation. Reconcile legal-gate session readiness in the canonical browser lifecycle contract first.",
+      "acceptancePolicy": "A future revision must prove legalGateSatisfied:true before any actionable importer click and must use a new registered diagnostic revision."
+    }
   },
   "requiredFiles": [
-    "tools/orbit360-run-importers-e2e-gate-v20260720.mjs"
+    "tools/orbit360-run-importers-e2e-gate-v20260720.mjs",
+    "orbit360-platform/core/auth.js",
+    "orbit360-platform/core/legal.js"
   ],
   "runtimeVersionContracts": [
     {
@@ -37,14 +45,37 @@
       "path": "tools/orbit360-importers-e2e-browser-v20260720.mjs",
       "requiredTokens": [
         "observerVersion: '20260720.2'",
-        "referencias de conexión detectadas|Credenciales detectadas",
         "diagnostic.parser",
-        "parsed.references !== 1",
         "driverVersion: '20260720.2'",
-        "answerOrbitPrompt(page, 'Confirmar accesos seguros'",
-        "answerOrbitPrompt(page, 'Confirmación reforzada'",
         "reasonPromptCompleted",
         "phrasePromptCompleted"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/auth.js",
+      "requiredTokens": [
+        "Orbit.legal && Orbit.legal.gate",
+        "Orbit.legal.gate(tipo, scopeId)",
+        "setTimeout(function ()"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/legal.js",
+      "requiredTokens": [
+        "const AKEY = 'orbit360_legal_aceptaciones'",
+        "function yaAcepto(scopeId)",
+        "data-legal-gate",
+        "back.className = 'drawer-back open'",
+        "id=\"lg-chk\"",
+        "id=\"lg-ok\""
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml",
+      "requiredTokens": [
+        "FREEZE_IMPORTERS_E2E_CONFIRMATION_STAGE",
+        "workflow_dispatch",
+        "No secrets, browser, deploy, fixture or data writes"
       ]
     }
   ]
