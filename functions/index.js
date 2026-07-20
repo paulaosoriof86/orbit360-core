@@ -47,7 +47,7 @@ function normalize(value) {
 }
 
 function unique(values) {
-  return Array.from(new Set([].concat(values || []).map(clean).filter(Boolean)));
+  return Array.from(new Set([].concat(values || []).map((value) => clean(value)).filter(Boolean)));
 }
 
 function rolesFrom(row) {
