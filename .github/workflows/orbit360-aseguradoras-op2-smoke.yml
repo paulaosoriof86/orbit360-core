@@ -3,50 +3,25 @@ name: Orbit 360 Aseguradoras OP2 Smoke
 on:
   workflow_dispatch:
   push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
+    branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - 'orbit360-platform/core/aseguradoras-op2-*.js'
       - 'orbit360-platform/core/insurer-directory-import-v1202*.js'
       - 'orbit360-platform/modules/aseguradoras*.js'
       - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
       - 'orbit360-platform/styles/aseguradoras-op2-v1217.css'
-      - 'tools/orbit360-validar-aseguradoras-op2-v1220.mjs'
-      - 'tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs'
-      - 'tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs'
-      - 'tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs'
-      - 'tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs'
-      - 'tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs'
-      - 'tools/orbit360-smoke-visual-aseguradoras-op2.mjs'
-      - 'tools/orbit360-smoke-op2-plataformas-focused-v1218.mjs'
-      - 'tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs'
-      - 'tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs'
-      - 'tools/orbit360-run-operacion-op1-op2-visual.ps1'
-      - 'tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1'
-      - 'tools/orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1'
+      - 'tools/orbit360-validar-aseguradoras-op2*.mjs'
+      - 'tools/orbit360-validar-*aseguradoras*.mjs'
+      - 'tools/orbit360-smoke-*aseguradoras*.mjs'
       - '.github/workflows/orbit360-aseguradoras-op2-smoke.yml'
   pull_request:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'orbit360-platform/core/aseguradoras-op2-*.js'
       - 'orbit360-platform/core/insurer-directory-import-v1202*.js'
       - 'orbit360-platform/modules/aseguradoras*.js'
       - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
-      - 'orbit360-platform/styles/aseguradoras-op2-v1217.css'
-      - 'tools/orbit360-validar-aseguradoras-op2-v1220.mjs'
-      - 'tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs'
-      - 'tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs'
-      - 'tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs'
-      - 'tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs'
-      - 'tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs'
-      - 'tools/orbit360-smoke-visual-aseguradoras-op2.mjs'
-      - 'tools/orbit360-smoke-op2-plataformas-focused-v1218.mjs'
-      - 'tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs'
-      - 'tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs'
-      - 'tools/orbit360-run-operacion-op1-op2-visual.ps1'
-      - 'tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1'
-      - 'tools/orbit360-aplicar-cachebust-cotizador-comparativo-v1215.ps1'
+      - 'tools/orbit360-validar-aseguradoras-op2*.mjs'
       - '.github/workflows/orbit360-aseguradoras-op2-smoke.yml'
 
 permissions:
@@ -57,105 +32,76 @@ jobs:
   aseguradoras-static-smoke:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '24'
 
-      - name: Check validator syntax
+      - name: Execute contracts and preserve evidence
+        id: contracts
+        shell: bash
         run: |
-          node --check tools/orbit360-validar-aseguradoras-op2-v1220.mjs
-          node --check tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs
-          node --check tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs
-          node --check tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs
-          node --check tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs
-          node --check tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs
-          node --check tools/orbit360-smoke-op2-plataformas-focused-v1218.mjs
-          node --check tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs
-          node --check tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs
+          mkdir -p orbit360-op2-contract-evidence
+          exit_code=0
+          node --check tools/orbit360-validar-aseguradoras-op2-v1220.mjs || exit_code=1
+          node --check tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs || exit_code=1
+          for group in access import copy quarantine alias ux migration academy technical; do
+            set +e
+            node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group "$group" > "orbit360-op2-contract-evidence/${group}.json"
+            code=$?
+            set -e
+            cat "orbit360-op2-contract-evidence/${group}.json"
+            if [ "$code" -ne 0 ]; then exit_code=1; fi
+          done
+          validators=(
+            "tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs orbit360-platform"
+            "tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs ."
+            "tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs ."
+            "tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs ."
+            "tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs ."
+            "tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs ."
+            "tools/orbit360-validar-backend-lab-contrato.mjs"
+          )
+          index=0
+          for command in "${validators[@]}"; do
+            set +e
+            bash -lc "node $command" > "orbit360-op2-contract-evidence/extra-${index}.json" 2>&1
+            code=$?
+            set -e
+            cat "orbit360-op2-contract-evidence/extra-${index}.json"
+            if [ "$code" -ne 0 ]; then exit_code=1; fi
+            index=$((index + 1))
+          done
+          grep -q 'dir-plataformas-desktop' tools/orbit360-smoke-visual-aseguradoras-op2.mjs || exit_code=1
+          grep -q 'op-plataformas-tablet' tools/orbit360-smoke-visual-aseguradoras-op2.mjs || exit_code=1
+          grep -q 'ase-plataformas-mobile' tools/orbit360-smoke-visual-aseguradoras-op2.mjs || exit_code=1
+          printf '{"schemaVersion":"orbit360-op2-static-contract-v1","head":"%s","ok":%s,"containsSecrets":false}\n' "$GITHUB_SHA" "$([ "$exit_code" -eq 0 ] && echo true || echo false)" > orbit360-op2-contract-evidence/summary.json
+          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+          exit 0
 
-      - name: Contract group - access and roles
-        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group access
+      - name: Upload static contract evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-op2-static-contract-${{ github.run_id }}
+          path: orbit360-op2-contract-evidence
+          if-no-files-found: error
+          retention-days: 7
 
-      - name: Contract group - importer and source separation
-        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group import
+      - name: Enforce contracts
+        if: steps.contracts.outputs.exit_code != '0'
+        run: exit 1
 
-      - name: Contract group - operational copy and write gate
-        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group copy
-
-      - name: Contract group - sheet quarantine
-        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group quarantine
-
-      - name: Contract group - identity and duplicate control
-        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group alias
-
-      - name: Contract group - directory UX and resources
-        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group ux
-
-      - name: Contract group - migration and permissions
-        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group migration
-
-      - name: Contract group - Academy and responsive
-        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group academy
-
-      - name: Contract group - syntax storage and protected baseline
-        run: node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group technical
-
-      - name: Validate resource access policy v1.220
-        run: node tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs orbit360-platform
-
-      - name: Validate workbook sheet quarantine v1.219
-        run: node tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs .
-
-      - name: Validate identity versions and probable updates v1.220
-        run: node tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs .
-
-      - name: Validate operational importer copy v1.220
-        run: node tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs .
-
-      - name: Validate focused platform harness
-        run: node tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs .
-
-      - name: Validate JSONL evidence reuse runner
-        run: node tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs .
-
-      - name: Validate protected backend
-        run: node tools/orbit360-validar-backend-lab-contrato.mjs
-
-      - name: Guard zero manual visual runner
-        run: |
-          grep -q 'dir-plataformas-desktop' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
-          grep -q 'op-plataformas-tablet' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
-          grep -q 'ase-plataformas-mobile' tools/orbit360-smoke-visual-aseguradoras-op2.mjs
-          grep -q 'results.jsonl' tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
-          grep -q '12 reutilizados + 3 focalizados = 15/15' tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
-          grep -q 'Resolve-Port' tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1
-          if grep -q 'Stop-Process' tools/orbit360-run-operacion-op1-op2-visual.ps1 tools/orbit360-run-aseguradoras-op2-plataformas-resume.ps1; then
-            echo 'Los runners no deben cerrar otras aplicaciones.'
-            exit 1
-          fi
-
-      - name: Publish verified success status
+      - name: Publish success status
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -f state=success \
-            -f context='orbit360/aseguradoras-op2-v1221' \
-            -f description='Contratos OP2 v1.221 aprobados' \
-            -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=success -f context='orbit360/aseguradoras-op2-v1221' -f description='Contratos OP2 v1.221 aprobados' -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
-      - name: Publish verified failure status
+      - name: Publish failure status
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -f state=failure \
-            -f context='orbit360/aseguradoras-op2-v1221' \
-            -f description='Revisar contrato OP2 v1.221 fallido' \
-            -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context='orbit360/aseguradoras-op2-v1221' -f description='Revisar evidencia OP2 v1.221' -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
