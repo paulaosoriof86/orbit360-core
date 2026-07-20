@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 · Academia profunda Aseguradoras OP-2 v1.220
+   Orbit 360 · Academia profunda Aseguradoras OP-2 v1.221
    Actualiza los cursos v1.202 existentes; no crea rutas duplicadas.
    Conserva progreso y certificados.
    ============================================================ */
@@ -13,39 +13,41 @@ Orbit.ACADEMIA_V1220_ASEGURADORAS = (function () {
   function section(icon, title, text) { return { icon, t:title, color:'#C5162E', d:text }; }
   function lesson(role) {
     return {
-      t:'Cierre operativo OP-2', min:20, tipo:'lectura', _op2v:1220,
+      t:'Cierre operativo OP-2', min:24, tipo:'lectura', _op2v:1221,
       secciones:[
         section('🏢','Directorio, no pantalla técnica','Aseguradoras reúne contactos, plataformas, códigos, bancos, documentos, productos, condiciones y conocimiento. Cada dato debe apoyar cotización, emisión, cobros, renovaciones o siniestros.'),
-        section('🏦','Cuentas bancarias operativas','Todo usuario autorizado para consultar Aseguradoras puede ver y copiar el número completo de cuenta, banco, moneda, titular y uso. El valor puede resolverse desde un proveedor seguro, pero no debe ocultarse al equipo que necesita operar.'),
-        section('🔐','Usuarios y contraseñas por rol','Dirección, Administración y Operativo pueden ver y copiar usuarios y contraseñas de portales. Asesor puede abrir la plataforma cuando corresponda, pero no ve credenciales salvo permiso extra explícito.'),
-        section('🛡','Migración sin pérdida','Los valores existentes continúan disponibles hasta que la migración segura haya copiado y verificado el recurso. Nunca se elimina primero para conectar después.'),
-        section('🚧','Cuarentena de hojas','Antes del dry-run, Orbit excluye índices, diagnósticos, directorios internos y hojas con señales técnicas o configuraciones ajenas al directorio. La exclusión ocurre antes de leer recursos protegidos o construir operaciones, y el reporte solo muestra hoja, motivo y conteos; nunca los valores detectados.'),
-        section('🧭','Estado honesto','“Fuente recibida”, “requiere validación”, “conexión pendiente”, “disponible” y “habilitada” son estados distintos. Un directorio importado no habilita tarifas.'),
-        section('🔁','Identidad exacta antes de actualizar','Solo una identidad canónica exacta puede proponerse como actualización sin revisión adicional. Versiones de hoja, abreviaturas dudosas, inclusiones parciales o diferencias de una letra quedan bloqueadas para confirmación humana. Nunca se fusionan automáticamente.'),
-        section('💬','Mensajes operativos','La interfaz explica qué falta y cómo continuar con lenguaje de negocio. No muestra códigos internos, nombres de almacenamiento ni detalles de infraestructura.'),
-        section('🗂','Corrección mediante gestión', role === 'Asesor'
-          ? 'Consulta contactos, documentos y cuentas bancarias del directorio; reporta datos incorrectos mediante una gestión. No edites credenciales ni habilites productos.'
+        section('📥','Carga directa desde Orbit','Guatemala y Colombia se importan desde la plataforma como fuentes separadas. El archivo se lee una sola vez, se clasifica por hoja y no se reemplaza por una carga externa que evite probar el flujo real.'),
+        section('🔎','Dry-run y diff antes de confirmar','Orbit muestra por hoja qué aseguradora se actualizará, creará o quedará retenida, junto con conteos de contactos, portales y recursos bancarios. Ningún cambio se aplica antes del motivo y la confirmación reforzada.'),
+        section('🧩','Identidad exacta y cuarentena','Solo una identidad canónica exacta puede proponerse como actualización sin revisión adicional. Versiones, abreviaturas dudosas, diferencias de una letra, aliados y hojas contaminadas quedan retenidos; nunca se fusionan automáticamente.'),
+        section('✍️','Escritura controlada y lectura posterior','Un lote no se declara completo porque el botón terminó. Debe escribir el conteo aprobado, conservar trazabilidad de archivo y hoja, y leer nuevamente los registros confirmados desde la organización.'),
+        section('🔐','Accesos protegidos después del directorio','Los usuarios y contraseñas se envían al servicio protegido únicamente después de resolver la aseguradora y el portal reales. La ficha conserva una referencia; el valor no se guarda junto con el directorio.'),
+        section('🏦','Cuentas bancarias con estado honesto','Los datos operativos no sensibles pueden incorporarse al directorio. Un número bancario completo solo se declara disponible cuando existe y responde su proveedor protegido específico; hasta entonces debe aparecer como pendiente, no como importado.'),
+        section('↩️','Rollback y auditoría','La importación conserva antes/después, actor, motivo, fuente y lote. Si la escritura, la lectura posterior o la confirmación protegida quedan incompletas, el directorio se revierte y no se presenta un cierre positivo.'),
+        section('🧭','Estados distintos','“Fuente recibida”, “dry-run generado”, “requiere validación”, “dato confirmado”, “acceso disponible” y “cuenta protegida pendiente” son estados diferentes. Importar el directorio tampoco habilita tarifas.'),
+        section('🛠','Defecto funcional o validador obsoleto','Si el producto sigue usando un flujo incompleto se corrige el defecto funcional. Si el producto ya cumple el contrato pero una prueba exige el comportamiento retirado, se congela la ejecución y se actualiza el validador antes de volver a probar.'),
+        section('🗂','Acción por rol', role === 'Asesor'
+          ? 'Consulta el directorio y reporta información incorrecta mediante una gestión. No importa archivos, modifica accesos ni habilita productos.'
           : role === 'Operativo'
-            ? 'Mantén el directorio, usa cuentas y accesos para la operación y reporta cualquier recurso desactualizado. Las habilitaciones tarifarias siguen un gate independiente.'
-            : 'Revisa país, identidad, permisos, trazabilidad y motivo antes de confirmar altas, importaciones o cambios de acceso.'),
-        section('📚','Relación con Cotizador y Comparativo','Contactos, cuentas o una cotización de ejemplo no equivalen a una tarifa validada. La habilitación exige producto, país, moneda, plan, versión, vigencia, reglas y casos de prueba suficientes.')
+            ? 'Revisa el diff, mantiene contactos y recursos operativos según permisos y valida que cada acceso muestre un estado real. No habilita tarifas por importar un directorio.'
+            : 'Confirma país, identidad, retenidos, trazabilidad, motivo y resultado de lectura posterior antes de aceptar una carga real.'),
+        section('📚','Relación con Cotizador y Comparativo','Contactos, cuentas o accesos no equivalen a una tarifa validada. La habilitación exige producto, país, moneda, plan, versión, vigencia, reglas y casos de prueba suficientes.')
       ]
     };
   }
   function quiz(role) {
     return {
-      t:'Evaluación OP-2', min:12, tipo:'quiz', _op2v:1220,
+      t:'Evaluación OP-2', min:14, tipo:'quiz', _op2v:1221,
       preguntas:[
-        { p:'¿Quién puede ver las cuentas bancarias del directorio?', ops:['Solo Dirección','Todos los usuarios autorizados para consultar Aseguradoras','Solo Finanzas'], ok:1 },
-        { p:'¿Quién puede ver usuarios y contraseñas de portales?', ops:['Cualquier usuario','Dirección, Administración y Operativo, o un permiso extra explícito','Solo Asesor'], ok:1 },
-        { p:'¿Qué ocurre con un valor antiguo antes de migrarlo?', ops:['Se borra inmediatamente','Se conserva hasta copiarlo y verificar la migración segura','Se publica fuera del tenant'], ok:1 },
-        { p:'¿Qué debe hacer Orbit con una hoja que contiene configuración técnica o un directorio interno?', ops:['Importarla como aseguradora','Excluirla antes del parser y registrar solo el motivo','Mostrar sus valores en el reporte'], ok:1 },
-        { p:'¿Cuándo puede proponerse una actualización sin revisión adicional?', ops:['Cuando los nombres se parecen','Solo cuando la identidad canónica es exacta','Cuando comparten una palabra'], ok:1 },
-        { p:'¿Qué debe ver el usuario cuando una validación falla?', ops:['El código interno','Un mensaje operativo que explique qué falta','El detalle de infraestructura'], ok:1 },
-        { p:'¿Importar contactos habilita el Cotizador?', ops:['Sí, automáticamente','No; requiere fuentes y validación por combinación','Solo para Asesores'], ok:1 },
-        { p:role === 'Asesor' ? '¿Qué puede consultar el Asesor?' : '¿Qué debe acompañar un cambio sensible?', ops:role === 'Asesor'
-          ? ['Cuentas bancarias y recursos no restringidos del directorio','Contraseñas administrativas sin permiso','Auditoría interna completa']
-          : ['Solo el botón Guardar','Motivo, actor, antes/después y validación correspondiente','Una nota sin fecha'], ok:role === 'Asesor' ? 0 : 1 }
+        { p:'¿Cómo deben cargarse los directorios de Guatemala y Colombia?', ops:['Como una sola fuente combinada','Desde Orbit y como fuentes separadas','Mediante una escritura externa sin dry-run'], ok:1 },
+        { p:'¿Cuándo puede declararse completa una importación?', ops:['Cuando termina el parser','Después de escritura, lectura posterior y confirmaciones requeridas','Al seleccionar el archivo'], ok:1 },
+        { p:'¿Qué ocurre con una identidad dudosa o una hoja contaminada?', ops:['Se fusiona por similitud','Se retiene o pone en cuarentena','Se crea una aseguradora adicional'], ok:1 },
+        { p:'¿Dónde se guardan usuarios y contraseñas?', ops:['Junto con contactos','En el servicio protegido y la ficha conserva una referencia','En el archivo de auditoría'], ok:1 },
+        { p:'¿Qué estado corresponde a un número bancario completo sin proveedor protegido?', ops:['Disponible','Pendiente de conexión protegida','Validado automáticamente'], ok:1 },
+        { p:'¿Qué debe suceder si falla la lectura posterior?', ops:['Cerrar con advertencia','Aplicar rollback y no declarar éxito','Continuar con la siguiente fuente'], ok:1 },
+        { p:'¿Importar el directorio habilita el Cotizador?', ops:['Sí','No; es un gate independiente','Solo en Guatemala'], ok:1 },
+        { p:role === 'Asesor' ? '¿Qué debe hacer el Asesor ante un dato incorrecto?' : '¿Qué debe revisar quien confirma el lote?', ops:role === 'Asesor'
+          ? ['Crear una gestión de corrección','Cambiar la contraseña','Fusionar la aseguradora']
+          : ['Solo el nombre del archivo','País, identidad, retenidos, motivo, trazabilidad y verificación','Únicamente el total de hojas'], ok:role === 'Asesor' ? 0 : 1 }
       ]
     };
   }
@@ -54,14 +56,14 @@ Orbit.ACADEMIA_V1220_ASEGURADORAS = (function () {
     const previous = Orbit.store.get('cursos', id);
     if (!previous) return false;
     const next = JSON.parse(JSON.stringify(previous));
-    next.lecciones = (next.lecciones || []).filter(x => x && x._op2v !== 1217 && x._op2v !== 1218 && x._op2v !== 1219 && x._op2v !== 1220);
+    next.lecciones = (next.lecciones || []).filter(x => x && ![1217,1218,1219,1220,1221].includes(x._op2v));
     next.lecciones.push(lesson(role), quiz(role));
-    next.desc = 'Utilizar el directorio operativo con recursos por rol, cuarentena, identidad exacta, mensajes claros y trazabilidad.';
+    next.desc = 'Importar y utilizar el directorio con fuentes separadas, diff, escritura controlada, verificación, recursos protegidos y estados honestos.';
     next.metaLeccion = Object.assign({}, next.metaLeccion || {}, {
       impacto:'Conecta Aseguradoras con Cotizador, Comparativo, Clientes, Pólizas, Cobros, Ops, Siniestros y Academia sin habilitar capacidades no validadas.',
-      seguridad:'Recursos visibles según rol; migración no destructiva; hojas técnicas excluidas antes del parser; actualizaciones probables bloqueadas; códigos internos fuera de la interfaz.'
+      seguridad:'Una lectura por archivo; identidades dudosas retenidas; valores protegidos fuera del directorio; lectura posterior obligatoria; rollback ante cierre incompleto.'
     });
-    next._cv = 1220;
+    next._cv = 1221;
     next.progreso = previous.progreso || 0;
     next.certificado = !!previous.certificado;
     Orbit.store.update('cursos', id, next);
@@ -76,5 +78,6 @@ Orbit.ACADEMIA_V1220_ASEGURADORAS = (function () {
   let tries = 0;
   (function loop(){ if (apply() || tries++ > 60) return; setTimeout(loop,150); })();
   document.addEventListener('orbit:reseeded', apply);
-  return { COURSE_IDS, apply };
+  return { version:'1.221', COURSE_IDS, apply, directPlatformImport:true, readAfterWriteRequired:true, protectedAccountsHonestState:true };
 })();
+Orbit.ACADEMIA_V1221_ASEGURADORAS = Orbit.ACADEMIA_V1220_ASEGURADORAS;
