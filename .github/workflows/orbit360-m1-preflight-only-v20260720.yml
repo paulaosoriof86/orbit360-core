@@ -37,3 +37,5 @@ jobs:
           path: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
           if-no-files-found: error
           retention-days: 7
+
+# Disparo aislado posterior al alta del workflow; no ejecuta deploy ni navegador.
