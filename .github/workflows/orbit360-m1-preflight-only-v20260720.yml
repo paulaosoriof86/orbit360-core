@@ -1,0 +1,39 @@
+name: Orbit 360 M1 Preflight Only 20260720
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m1-preflight-only-v20260720.yml'
+      - 'tools/orbit360-gate-contract-registry-v20260717.json'
+      - 'tools/orbit360-gate-contract-overlay-v20260718.json'
+      - 'tools/orbit360-validar-gate-contracts-v20260717.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    name: M1 · contrato vinculante aislado
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout rama autorizada
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+
+      - name: Validar contrato del gate M1
+        env:
+          ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m1-preflight-only-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          if-no-files-found: error
+          retention-days: 7
