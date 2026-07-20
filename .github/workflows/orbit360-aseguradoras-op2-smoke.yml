@@ -1,6 +1,7 @@
 name: Orbit 360 Aseguradoras OP2 Smoke
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - ays/backend-tenant-lab-v99-20260703
@@ -144,8 +145,9 @@ jobs:
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
             -f state=success \
-            -f context='orbit360/aseguradoras-op2-v1220' \
-            -f description='Contratos OP2 v1.220 aprobados'
+            -f context='orbit360/aseguradoras-op2-v1221' \
+            -f description='Contratos OP2 v1.221 aprobados' \
+            -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
       - name: Publish verified failure status
         if: failure()
@@ -154,5 +156,6 @@ jobs:
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
             -f state=failure \
-            -f context='orbit360/aseguradoras-op2-v1220' \
-            -f description='Revisar contrato OP2 fallido'
+            -f context='orbit360/aseguradoras-op2-v1221' \
+            -f description='Revisar contrato OP2 v1.221 fallido' \
+            -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
