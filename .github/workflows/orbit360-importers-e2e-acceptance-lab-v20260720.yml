@@ -1,4 +1,4 @@
-name: Orbit 360 Importers E2E Acceptance LAB 20260720 V3
+name: Orbit 360 Importers E2E Acceptance LAB 20260720 V4
 
 on:
   push:
@@ -18,7 +18,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: orbit360-importers-e2e-v3-single-execution
+  group: orbit360-importers-e2e-v4-single-execution
   cancel-in-progress: false
 
 jobs:
@@ -44,23 +44,25 @@ jobs:
           set -euo pipefail
           BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
           test "$BRANCH" = "ays/backend-tenant-lab-v99-20260703"
-          echo "IMPORTERS_E2E_V3_SINGLE_EXECUTION"
+          echo "IMPORTERS_E2E_V4_SINGLE_EXECUTION"
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
 
-      - name: Validar owners y mecanismo de la revisión v3
+      - name: Validar owners y mecanismo de la revisión v4
         shell: bash
         run: |
           set -euo pipefail
           node --check orbit360-platform/core/session-readiness-contract-v20260720.js
+          node --check orbit360-platform/core/membership-multirol-contract-p0.js
           node --check orbit360-platform/core/importer-execution-contract-v20260720.js
+          node --check tools/orbit360-ensure-lab-secure-membership-v20260720.mjs
           node --check tools/orbit360-importers-e2e-browser-v20260720.mjs
           node --check tools/orbit360-run-importers-e2e-gate-v20260720.mjs
           node --check tools/orbit360-importers-e2e-finalize-v20260720.mjs
           node tools/orbit360-validate-session-readiness-contract-v20260720.mjs
 
   e2e:
-    name: Importadores · UI legal real, proveedor, store, auditoría y rollback
+    name: Importadores · membresía, UI legal, proveedor, store, auditoría y rollback
     needs: preflight
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -76,6 +78,7 @@ jobs:
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       ORBIT360_IMPORTERS_E2E_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
       ORBIT360_PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+      ORBIT360_MEMBERSHIP_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/membership-contract-sanitized.json
     steps:
       - name: Checkout rama autorizada
         uses: actions/checkout@v4
@@ -121,9 +124,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-importers-e2e-v3-${{ github.run_id }}
+          name: orbit360-importers-e2e-v4-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/membership-contract-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-cleanup-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-vault-rollback-sanitized.json
@@ -144,13 +148,13 @@ jobs:
         shell: bash
         run: |
           {
-            echo "## Importadores E2E · revisión v3"
+            echo "## Importadores E2E · revisión v4"
             echo ""
             echo "Gate: importers-e2e-acceptance-lab-v20260720"
             echo ""
             echo "Commit: ${GITHUB_SHA}"
             echo ""
-            echo "La UI legal real debe completarse antes del primer clic del importador."
+            echo "La membresía canónica y la UI legal real deben quedar listas antes del primer clic del importador."
             echo ""
             echo "No real source reloads. No production, main or merge."
           } >> "$GITHUB_STEP_SUMMARY"
