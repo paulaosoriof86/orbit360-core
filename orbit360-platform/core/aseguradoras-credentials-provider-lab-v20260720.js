@@ -92,8 +92,8 @@
     var body = {};
     try { body = await response.json(); } catch (error) {}
     if (!response.ok || body.error) {
-      var statusCode = body && body.error && body.error.status || ('http_' + response.status);
-      state.lastErrorCode = norm(statusCode) || 'secure_provider_error';
+      var status = body && body.error && body.error.status || ('http_' + response.status);
+      state.lastErrorCode = norm(status) || 'secure_provider_error';
       throw providerError(state.lastErrorCode, body && body.error && body.error.message || 'La operación segura fue rechazada.');
     }
     state.lastCallAt = new Date().toISOString();
@@ -184,22 +184,87 @@
     return copy(input.credentialRef, input);
   }
 
+  function resolveImportTarget(item) {
+    item = item || {};
+    var sheet = clean(item.insurerSheet, 240);
+    var platformIndex = Number(item.platformIndex);
+    var insurers = [];
+    try { insurers = Orbit.store && Orbit.store.all ? (Orbit.store.all('aseguradoras') || []) : []; } catch (error) {}
+    var insurer = insurers.find(function (row) {
+      if (sheet && clean(row && row.fuenteDirectorio && row.fuenteDirectorio.hoja, 240) === sheet) return true;
+      return (row && row.portales || []).some(function (portal) {
+        return sheet && clean(portal && portal.fuenteTraza && portal.fuenteTraza.hoja, 240) === sheet;
+      });
+    });
+    if (!insurer) return { insurerId: '', portalId: '' };
+    var portals = insurer.portales || [];
+    var portal = Number.isInteger(platformIndex) && platformIndex >= 0 ? portals[platformIndex] : null;
+    if (!portal || (sheet && clean(portal.fuenteTraza && portal.fuenteTraza.hoja, 240) !== sheet)) {
+      portal = portals.find(function (row) {
+        return sheet && clean(row && row.fuenteTraza && row.fuenteTraza.hoja, 240) === sheet;
+      }) || null;
+    }
+    return {
+      insurerId: clean(insurer.id, 160),
+      portalId: clean(portal && (portal.id || String(portals.indexOf(portal))), 160)
+    };
+  }
+
+  function applyMappings(result) {
+    var mappings = result && Array.isArray(result.mappings) ? result.mappings : [];
+    var grouped = {};
+    mappings.forEach(function (mapping) {
+      var insurerId = clean(mapping && mapping.insurerId, 160);
+      if (!insurerId) return;
+      (grouped[insurerId] = grouped[insurerId] || []).push(mapping);
+    });
+    Object.keys(grouped).forEach(function (insurerId) {
+      var insurer = Orbit.store && Orbit.store.get ? Orbit.store.get('aseguradoras', insurerId) : null;
+      if (!insurer) return;
+      var portals = (insurer.portales || []).map(function (portal) { return Object.assign({}, portal); });
+      grouped[insurerId].forEach(function (mapping) {
+        var portalId = clean(mapping.portalId, 160);
+        var index = portals.findIndex(function (portal, idx) { return clean(portal.id || String(idx), 160) === portalId; });
+        if (index < 0) return;
+        portals[index].credentialRef = clean(mapping.credentialRef, 80);
+        portals[index].estadoCredencial = mapping.available ? 'registrada' : 'requiere_actualizacion';
+        portals[index].estadoAcceso = mapping.usernameAvailable && mapping.passwordAvailable ? 'Acceso disponible' : 'Requiere actualización';
+        portals[index].credencialActualizadaAt = new Date().toISOString();
+      });
+      var status = Object.assign({}, insurer.sensitiveImportStatus || {}, {
+        status: 'stored_securely',
+        credentialsStored: grouped[insurerId].filter(function (row) { return row.available; }).length,
+        updatedAt: new Date().toISOString()
+      });
+      Orbit.store.update('aseguradoras', insurerId, { portales: portals, sensitiveImportStatus: status });
+    });
+    try { window.dispatchEvent(new CustomEvent('orbit:insurer-credentials-updated', { detail: { count: mappings.length, containsSecrets: false } })); } catch (error) {}
+    return mappings.length;
+  }
+
   async function importInsurerDirectory(payload) {
     payload = payload || {};
     var sourceHash = clean(payload.sourceHash, 80).toLowerCase();
     var sourceItems = Array.isArray(payload.items) ? payload.items : [];
     var items = sourceItems.map(function (item) {
+      var target = resolveImportTarget(item);
       return {
-        insurerId: clean(item && item.insurerId, 160),
-        portalId: clean(item && (item.portalId || item.resourceId), 160),
+        insurerId: clean(item && item.insurerId || target.insurerId, 160),
+        portalId: clean(item && (item.portalId || item.resourceId) || target.portalId, 160),
         credentialRef: REF_RE.test(clean(item && item.credentialRef, 80)) ? clean(item.credentialRef, 80) : '',
         username: clean(item && item.username, 320),
         password: clean(item && item.password, 512)
       };
     }).filter(function (item) { return item.insurerId && item.portalId && (item.username || item.password); });
-    if (!items.length) return { ok: true, status: 'sin_sensibles', imported: 0, mappings: [] };
+    if (!items.length) return { ok: true, status: 'sin_sensibles_mapeados', imported: 0, mappings: [] };
     try {
-      return await callable('orbit360ImportInsurerCredentials', { sourceHash: sourceHash, items: items });
+      var result = await callable('orbit360ImportInsurerCredentials', { sourceHash: sourceHash, items: items });
+      var updated = applyMappings(result);
+      if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast(updated + ' acceso(s) protegidos confirmados y disponibles.');
+      return result;
+    } catch (error) {
+      if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('No fue posible confirmar los accesos protegidos. No se marcaron como disponibles.');
+      throw error;
     } finally {
       items.forEach(function (item) { item.username = ''; item.password = ''; });
       sourceItems.forEach(function (item) {
@@ -227,12 +292,34 @@
   if (!Orbit.secureSecrets) Orbit.secureSecrets = sensitiveProvider;
 
   Orbit.secureImport = Object.assign({}, Orbit.secureImport || {}, {
-    importInsurerDirectory: importInsurerDirectory,
+    importInsurerDirectory: function (payload) {
+      var pending = importInsurerDirectory(payload);
+      Orbit.secureImport.lastImportPromise = pending;
+      return pending;
+    },
     version: '20260720.1',
     remoteConfirmationRequired: true,
-    retainsSecretPayload: false
+    retainsSecretPayload: false,
+    appliesOpaqueRefsAfterRemoteConfirmation: true
   });
   state.importProviderRegistered = true;
+
+  if (window.MutationObserver) {
+    new MutationObserver(function (records) {
+      records.forEach(function (record) {
+        Array.prototype.forEach.call(record.addedNodes || [], function (node) {
+          if (!node || node.nodeType !== 1) return;
+          var candidates = [node].concat(Array.prototype.slice.call(node.querySelectorAll ? node.querySelectorAll('[class*="toast"]') : []));
+          candidates.forEach(function (candidate) {
+            var text = clean(candidate.textContent, 600);
+            if (/Recursos sensibles:\s*enviado_backend_seguro/i.test(text)) {
+              candidate.textContent = text.replace(/Recursos sensibles:\s*enviado_backend_seguro/i, 'Accesos enviados para confirmación segura');
+            }
+          });
+        });
+      });
+    }).observe(document.body, { childList: true, subtree: true });
+  }
 
   Orbit.__insurerCredentialProviderLabV20260720 = state;
   try { window.dispatchEvent(new CustomEvent('orbit:insurer-credential-provider-ready', { detail: { version: state.version, tenantId: TENANT_ID } })); } catch (error) {}
