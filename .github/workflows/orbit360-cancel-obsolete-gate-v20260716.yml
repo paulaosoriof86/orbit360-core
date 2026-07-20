@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: orbit360-secure-credentials-static-diagnosis-v20260720
@@ -108,3 +109,28 @@ jobs:
           path: orbit360-platform/runtime-gate-crm-v20260716/credential-provider-static-diagnostic.json
           if-no-files-found: error
           retention-days: 3
+
+      - name: Publicar resultado sanitizado en PR 5
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/credential-provider-static-diagnostic.json"
+          if [ ! -f "$FILE" ]; then exit 0; fi
+          node - <<'NODE' > /tmp/orbit360-static-diagnostic.md
+          const fs = require('fs');
+          const d = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/credential-provider-static-diagnostic.json','utf8'));
+          process.stdout.write([
+            '### Diagnóstico estático · proveedor seguro LAB',
+            '',
+            '- Resultado: **' + (d.ok ? 'OK' : 'NO_GO') + '**',
+            '- Fase: `' + d.phase + '`',
+            '- Exit code: `' + d.exitCode + '`',
+            '- Run: `' + d.run + '`',
+            '- Commit: `' + d.commit + '`',
+            '',
+            'La evidencia no contiene credenciales, datos personales ni valores protegidos.'
+          ].join('\n'));
+          NODE
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/orbit360-static-diagnostic.md
