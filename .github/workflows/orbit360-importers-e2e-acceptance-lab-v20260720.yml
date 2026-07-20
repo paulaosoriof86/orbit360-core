@@ -6,32 +6,27 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml"
-  workflow_dispatch:
 
 permissions:
   contents: read
-  pull-requests: write
 
 concurrency:
   group: orbit360-importers-e2e-v4-single-execution
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   preflight:
     name: Importadores · preflight vinculante sin secretos
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.pull_request.head.ref == 'ays/backend-tenant-lab-v99-20260703'
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    outputs:
+      validated_sha: ${{ steps.validated-head.outputs.sha }}
     steps:
-      - name: Checkout rama autorizada
+      - name: Checkout SHA inmutable
         uses: actions/checkout@v4
         with:
-          ref: ays/backend-tenant-lab-v99-20260703
+          ref: ${{ github.sha }}
+          fetch-depth: 1
 
       - name: Preparar Node 22
         uses: actions/setup-node@v4
@@ -39,14 +34,36 @@ jobs:
           node-version: "22"
 
       - name: Preflight vinculante antes de secretos
+        id: validated-head
         shell: bash
         run: |
           set -euo pipefail
-          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-          test "$BRANCH" = "ays/backend-tenant-lab-v99-20260703"
+          test "$GITHUB_EVENT_NAME" = "push"
+          test "$GITHUB_REF_NAME" = "ays/backend-tenant-lab-v99-20260703"
+          ACTUAL_SHA="$(git rev-parse HEAD)"
+          test "$ACTUAL_SHA" = "$GITHUB_SHA"
+          echo "sha=$ACTUAL_SHA" >> "$GITHUB_OUTPUT"
           echo "IMPORTERS_E2E_V4_SINGLE_EXECUTION"
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
+
+      - name: Validar mecanismo de SHA único
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const path = '.github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml';
+          const source = fs.readFileSync(path, 'utf8');
+          const immutableRef = 'ref: ' + '$' + '{{ github.sha }}';
+          const count = source.split(immutableRef).length - 1;
+          if (count !== 2) throw new Error(`IMMUTABLE_SHA_CHECKOUT_COUNT_${count}`);
+          if (source.includes('pull_request:')) throw new Error('DUPLICATE_PULL_REQUEST_TRIGGER');
+          if (source.includes('workflow_dispatch:')) throw new Error('UNAVAILABLE_WORKFLOW_DISPATCH_TRIGGER');
+          if (source.includes('ref: ays/backend-tenant-lab-v99-20260703')) throw new Error('MUTABLE_BRANCH_CHECKOUT_BLOCKED');
+          if (!source.includes('cancel-in-progress: true')) throw new Error('STALE_RUN_CANCELLATION_REQUIRED');
+          console.log('ORBIT360_IMMUTABLE_SHA_WORKFLOW_OK');
+          NODE
 
       - name: Validar owners y mecanismo de la revisión v4
         shell: bash
@@ -79,11 +96,22 @@ jobs:
       ORBIT360_IMPORTERS_E2E_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
       ORBIT360_PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
       ORBIT360_MEMBERSHIP_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/membership-contract-sanitized.json
+      ORBIT360_VALIDATED_SHA: ${{ needs.preflight.outputs.validated_sha }}
     steps:
-      - name: Checkout rama autorizada
+      - name: Checkout SHA inmutable
         uses: actions/checkout@v4
         with:
-          ref: ays/backend-tenant-lab-v99-20260703
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Confirmar mismo HEAD del preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          ACTUAL_SHA="$(git rev-parse HEAD)"
+          test "$ACTUAL_SHA" = "$GITHUB_SHA"
+          test "$ACTUAL_SHA" = "$ORBIT360_VALIDATED_SHA"
+          echo "ORBIT360_SAME_HEAD_ACROSS_JOBS_OK"
 
       - name: Preparar Node 22
         uses: actions/setup-node@v4
@@ -148,11 +176,11 @@ jobs:
         shell: bash
         run: |
           {
-            echo "## Importadores E2E · revisión v4"
+            echo "## Importadores E2E · revisión v4 inmutable"
             echo ""
             echo "Gate: importers-e2e-acceptance-lab-v20260720"
             echo ""
-            echo "Commit: ${GITHUB_SHA}"
+            echo "Commit validado: ${ORBIT360_VALIDATED_SHA}"
             echo ""
             echo "La membresía canónica y la UI legal real deben quedar listas antes del primer clic del importador."
             echo ""
