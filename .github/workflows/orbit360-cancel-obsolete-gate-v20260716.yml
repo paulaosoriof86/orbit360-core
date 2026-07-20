@@ -82,8 +82,11 @@ jobs:
           NODE
           gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/preflight-comment.md
 
-      - name: Aceptar únicamente GO_GATE_CONTRACT
+      - name: Alto controlado para obtener ID del run
         if: always()
         env:
           EXIT_CODE: ${{ steps.preflight.outputs.exit_code }}
-        run: test "${EXIT_CODE:-41}" = "0"
+        run: |
+          test "${EXIT_CODE:-41}" = "0"
+          echo "EVIDENCE_READY_EXPECTED_STOP"
+          exit 78
