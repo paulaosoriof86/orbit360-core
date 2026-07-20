@@ -2,12 +2,12 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-20",
   "gateId": "importers-e2e-acceptance-lab-v20260720",
-  "classification": "VALIDATOR_STALE_RESOLVED",
-  "diagnosticRevision": "canonical-browser-backend-store-rollback-observer-v2",
-  "contractRevision": "1.0.0-canonical-browser-backend-store-rollback-observer-v2",
+  "classification": "PIPELINE_MECHANISM_FAILURE_RESOLVED",
+  "diagnosticRevision": "canonical-browser-backend-store-rollback-observer-v2-confirmation-driver-v2",
+  "contractRevision": "1.0.0-canonical-browser-backend-store-rollback-observer-v2-confirmation-driver-v2",
   "gatePatch": {
     "contractVersion": "1.0.0",
-    "diagnosticRevision": "canonical-browser-backend-store-rollback-observer-v2",
+    "diagnosticRevision": "canonical-browser-backend-store-rollback-observer-v2-confirmation-driver-v2",
     "status": "ACTIVE_ROOT_CAUSE_GATE",
     "workflow": ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
   },
@@ -39,7 +39,12 @@
         "observerVersion: '20260720.2'",
         "referencias de conexión detectadas|Credenciales detectadas",
         "diagnostic.parser",
-        "parsed.references !== 1"
+        "parsed.references !== 1",
+        "driverVersion: '20260720.2'",
+        "answerOrbitPrompt(page, 'Confirmar accesos seguros'",
+        "answerOrbitPrompt(page, 'Confirmación reforzada'",
+        "reasonPromptCompleted",
+        "phrasePromptCompleted"
       ]
     }
   ]
