@@ -1,4 +1,4 @@
-name: Orbit 360 Secure Only Provider Gate Fix V2 LAB 20260720
+name: Orbit 360 Secure Mapping Audit LAB 20260720
 
 on:
   push:
@@ -8,189 +8,80 @@ on:
       - ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
-concurrency:
-  group: orbit360-secure-only-provider-gate-fix-v2-20260720
-  cancel-in-progress: false
-
 jobs:
-  fix_and_publish:
-    name: Aseguradoras · fix secure-only + smoke puro + publicación LAB
+  audit_mapping:
+    name: Aseguradoras · auditoría de vínculo remoto
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     env:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
-      TARGET: orbit360-platform/core/insurer-directory-import-v1202.js
+      TENANT_ID: alianzas-soluciones
       SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     steps:
-      - name: Checkout rama autorizada
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
 
       - name: Preflight vinculante
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+        run: node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
 
-      - name: Aplicar fix funcional acotado
+      - name: Resolver cuenta LAB
         shell: bash
         run: |
           set -euo pipefail
+          FILE="${RUNNER_TEMP}/lab.json"
+          printf '%s' "$SA_PRIMARY" > "$FILE"
+          chmod 600 "$FILE"
+          test "$(jq -r '.project_id // empty' "$FILE")" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar dependencia
+        run: npm install --prefix functions --ignore-scripts --no-audit --no-fund
+
+      - name: Contar eventos y referencias
+        shell: bash
+        run: |
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          export OUT_FILE=orbit360-platform/runtime-gate-crm-v20260716/mapping-audit-sanitized.json
           node --input-type=module <<'NODE'
-          import { readFileSync, writeFileSync } from 'node:fs';
-          const path = process.env.TARGET;
-          let source = readFileSync(path, 'utf8');
-          if (source.includes('__secureOnlyProviderGateV20260720')) {
-            console.log('Fix ya aplicado');
-            process.exit(0);
-          }
-          const start = source.indexOf('  async function applySecureOnly(result, confirmation) {');
-          const marker = '  applySecureOnly.__secureOnlyV20260720 = true;';
-          const end = source.indexOf(marker, start);
-          if (start < 0 || end < 0) throw new Error('SECURE_ONLY_FUNCTION_NOT_FOUND');
-          const replacement = `  function secureOnlyEligibleItems(sourceItems, operations) {
-            const blockedSheets = new Set([].concat(operations || []).filter(op => {
-              const alerts = [].concat(op && op.data && op.data.validacionAlertas || []);
-              return alerts.some(alert => /entidad_no_es_aseguradora_directa|duplicado_dentro_del_archivo/.test(clean(alert)));
-            }).map(op => op && op.sourceSheet).filter(Boolean));
-            return [].concat(sourceItems || []).filter(item => item && item.type === 'credential' && !blockedSheets.has(item.insurerSheet));
-          }
-          function secureProviderReady() {
-            return !!(Orbit.secureImport && typeof Orbit.secureImport.importInsurerDirectory === 'function');
-          }
-          async function waitForSecureProvider(timeoutMs) {
-            if (secureProviderReady()) return Orbit.secureImport.importInsurerDirectory;
-            return new Promise(resolve => {
-              let settled = false;
-              const finish = () => {
-                if (settled) return;
-                settled = true;
-                try { window.removeEventListener('orbit:insurer-credential-provider-ready', onReady); } catch (e) {}
-                resolve(secureProviderReady() ? Orbit.secureImport.importInsurerDirectory : null);
-              };
-              const onReady = () => finish();
-              try { window.addEventListener('orbit:insurer-credential-provider-ready', onReady, { once: true }); } catch (e) {}
-              setTimeout(finish, Math.max(1000, Number(timeoutMs) || 8000));
-            });
-          }
-          async function applySecureOnly(result, confirmation) {
-            if (!canManage()) return { ok: false, errors: ['permiso_importacion_denegado'] };
-            if (!result || !result.report) return { ok: false, errors: ['dry_run_requerido'] };
-            if (!confirmation || confirmation.approved !== true || confirmation.phrase !== CONFIRM_PHRASE || !clean(confirmation.reason)) return { ok: false, errors: ['confirmacion_reforzada_requerida'] };
-            const operations = result.report._operations || [];
-            const sourceItems = secureSession.get(result.report.reportId) || [];
-            const secureItems = secureOnlyEligibleItems(sourceItems, operations);
-            if (!secureItems.length) return { ok: false, errors: ['sin_accesos_elegibles_para_guardar'] };
-            const secureProvider = await waitForSecureProvider(8000);
-            if (typeof secureProvider !== 'function') return { ok: false, errors: ['proveedor_seguro_no_disponible'] };
-            try {
-              const remote = await secureProvider({ tenantId: tenantId(), sourceFileName: result.report.sourceFileName, sourceHash: result.report.sourceHash, items: secureItems });
-              const imported = Number(remote && remote.imported || 0);
-              const mappings = [].concat(remote && remote.mappings || []);
-              if (!remote || remote.ok !== true || imported <= 0 || !mappings.length) throw new Error('confirmacion_remota_sin_accesos');
-              secureSession.delete(result.report.reportId);
-              if (A().audit) A().audit('aplicar_accesos_aseguradoras_secure_only', 'aseguradoras', result.report.reportId, null, { imported, requested: secureItems.length, skipped: Math.max(0, secureItems.length - imported), containsSecrets: false }, confirmation.reason, { sourceHash: result.report.sourceHash, sourceFileName: result.report.sourceFileName, confirmationPhrase: CONFIRM_PHRASE });
-              return { ok: true, imported, requested: secureItems.length, skipped: Math.max(0, secureItems.length - imported), mappings, secureStatus: 'confirmado_backend_seguro', containsSecrets: false };
-            } catch (error) {
-              return { ok: false, errors: ['confirmacion_remota_incompleta'], errorCode: clean(error && (error.code || error.message), 120) };
-            }
-          }
-          applySecureOnly.__secureOnlyV20260720 = true;
-          applySecureOnly.__secureOnlyProviderGateV20260720 = true;`;
-          source = source.slice(0, start) + replacement + source.slice(end + marker.length);
-          const exportBefore = '    parseMatrices, parseFile, buildOperations, buildDryRun, applyApproved, applySecureOnly, open, close';
-          const exportAfter = '    parseMatrices, parseFile, buildOperations, buildDryRun, applyApproved, secureOnlyEligibleItems, secureProviderReady, applySecureOnly, open, close';
-          if (!source.includes(exportBefore)) throw new Error('EXPORT_SIGNATURE_NOT_FOUND');
-          source = source.replace(exportBefore, exportAfter);
-          const oldToast = "      toast(applied.imported + ' acceso(s) guardados de forma segura. No se modificó el directorio.');";
-          const newToast = "      toast(applied.imported + ' acceso(s) guardados de forma segura' + (applied.skipped ? ' · ' + applied.skipped + ' pendiente(s) de validación' : '') + '. No se modificó el directorio.');";
-          if (!source.includes(oldToast)) throw new Error('TOAST_SIGNATURE_NOT_FOUND');
-          source = source.replace(oldToast, newToast);
-          writeFileSync(path, source);
+          import fs from 'node:fs';
+          import {createRequire} from 'node:module';
+          const require=createRequire(new URL('./functions/package.json',import.meta.url));
+          const {initializeApp,cert}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const account=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS,'utf8'));
+          const app=initializeApp({credential:cert(account),projectId:process.env.FIREBASE_PROJECT_ID});
+          const db=getFirestore(app);
+          const audit=await db.collection('tenants').doc(process.env.TENANT_ID).collection('auditEvents').get();
+          let events=0,items=0;
+          for(const doc of audit.docs){const row=doc.data()||{};if(String(row.action||'')==='credential.import'){events+=1;items+=Number(row.count||0);}}
+          const insurers=await db.collection('tenantId').doc(process.env.TENANT_ID).collection('aseguradoras').get();
+          let portals=0,refs=0;
+          for(const doc of insurers.docs){for(const portal of (doc.data()?.portales||[])){portals+=1;if(/^cred_[a-f0-9]{32}$/.test(String(portal?.credentialRef||'').trim()))refs+=1;}}
+          const classification=events===0&&refs===0?'TARGET_MAPPING_EMPTY_BEFORE_PROVIDER':events>0&&refs===0?'REMOTE_STORED_REFS_NOT_APPLIED':'PARTIAL_OR_COMPLETE';
+          fs.writeFileSync(process.env.OUT_FILE,JSON.stringify({schemaVersion:'orbit360-mapping-audit-v1',containsSecrets:false,containsPII:false,ok:true,classification,events,items,insurers:insurers.size,portals,refs},null,2));
+          console.log(`DIAG_${classification}`);
           NODE
 
-      - name: Validar sintaxis y contratos
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check "$TARGET"
-          grep -Fq '__secureOnlyProviderGateV20260720' "$TARGET"
-          grep -Fq 'function secureOnlyEligibleItems' "$TARGET"
-          grep -Fq "errors: ['sin_accesos_elegibles_para_guardar']" "$TARGET"
-          grep -Fq "errors: ['proveedor_seguro_no_disponible']" "$TARGET"
-          grep -Fq 'imported <= 0' "$TARGET"
-          grep -Fq 'secureOnlyEligibleItems, secureProviderReady, applySecureOnly' "$TARGET"
-
-      - name: Smoke puro · elegibilidad y disponibilidad del proveedor
-        shell: bash
-        run: |
-          set -euo pipefail
-          node <<'NODE'
-          const fs=require('fs'),vm=require('vm');
-          const code=fs.readFileSync(process.env.TARGET,'utf8');
-          const Orbit={store:{all:()=>[]},ui:{},access:{},secureImport:{importInsurerDirectory:async()=>({ok:true,imported:1,mappings:[{}]})}};
-          const window={Orbit,addEventListener:()=>{},removeEventListener:()=>{}};
-          const context={window,Orbit,console,setTimeout,clearTimeout,URL,Map,Set,Promise};
-          vm.createContext(context); vm.runInContext(code,context);
-          const api=context.Orbit.insurerDirectoryImport;
-          const sourceItems=[{type:'credential',insurerSheet:'GENERAL'},{type:'bank_account',insurerSheet:'GENERAL'}];
-          const onlyNameMismatch=[{sourceSheet:'GENERAL',data:{validacionAlertas:['nombre_hoja_no_coincide_identidad']}}];
-          const partnerBlocked=[{sourceSheet:'GENERAL',data:{validacionAlertas:['entidad_no_es_aseguradora_directa']}}];
-          if(api.secureOnlyEligibleItems(sourceItems,onlyNameMismatch).length!==1) throw new Error('NAME_MISMATCH_SHOULD_REMAIN_ELIGIBLE');
-          if(api.secureOnlyEligibleItems(sourceItems,partnerBlocked).length!==0) throw new Error('PARTNER_SHOULD_BE_BLOCKED');
-          if(api.secureProviderReady()!==true) throw new Error('PROVIDER_READY_NOT_DETECTED');
-          console.log('GO_SECURE_ONLY_PURE_SMOKE');
-          NODE
-
-      - name: Persistir fix validado sin gate final
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "orbit360-gate-bot"
-          git config user.email "orbit360-gate-bot@users.noreply.github.com"
-          git add "$TARGET"
-          if git diff --cached --quiet; then echo 'Sin cambios'; exit 0; fi
-          git commit -m "fix(import): asegurar invocación del proveedor y bloquear cero accesos [skip ci]"
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
-
-      - name: Resolver cuenta de servicio LAB
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "${SA_PRIMARY:-}"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
-          printf '%s' "$SA_PRIMARY" > "$KEY_FILE"
-          chmod 600 "$KEY_FILE"
-          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-
-      - name: Publicar y verificar fix en canal LAB
-        shell: bash
-        run: |
-          set -euo pipefail
-          DEPLOY_JSON="${RUNNER_TEMP}/firebase-secure-only-fix-v2.json"
-          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab --project "$FIREBASE_PROJECT_ID" --expires 30d --non-interactive --json | tee "$DEPLOY_JSON"
-          URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$DEPLOY_JSON" | head -n 1)"
-          test -n "$URL"
-          SOURCE="$(curl -fsSL --retry 8 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/core/insurer-directory-import-v1202.js?run=$GITHUB_RUN_ID")"
-          printf '%s' "$SOURCE" | grep -Fq '__secureOnlyProviderGateV20260720'
-          printf '%s' "$SOURCE" | grep -Fq 'function secureOnlyEligibleItems'
-          printf '%s' "$SOURCE" | grep -Fq 'imported <= 0'
-          echo "LAB_URL=$URL" >> "$GITHUB_ENV"
-
-      - name: Limpiar credencial temporal
+      - name: Limpiar archivo temporal
         if: always()
-        run: |
-          if [ -f "${GOOGLE_APPLICATION_CREDENTIALS:-/nonexistent}" ]; then shred -u "$GOOGLE_APPLICATION_CREDENTIALS" 2>/dev/null || rm -f "$GOOGLE_APPLICATION_CREDENTIALS"; fi
+        run: rm -f "${GOOGLE_APPLICATION_CREDENTIALS:-/nonexistent}"
 
-      - name: Comentar fix validado en PR 5
+      - name: Publicar evidencia
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-mapping-audit-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/mapping-audit-sanitized.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Comentar resultado
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "### Fix causa raíz secure-only v2\n\n- Resultado: **OK**\n- Clasificación cerrada: \`DATA_CONTRACT_FAILURE / PROVIDER_NOT_INVOKED\`\n- Validador corregido: \`VALIDATOR_STALE\` retirado mediante smoke puro.\n- Discrepancias de nombre siguen elegibles cuando el portal ya es vinculable.\n- Socios/redes y duplicados permanecen bloqueados.\n- Cero accesos ya no puede mostrarse como éxito.\n- Proveedor ausente produce error explícito.\n- Smoke: \`GO_SECURE_ONLY_PURE_SMOKE\`\n- LAB: \`$LAB_URL\`\n- Run: \`$GITHUB_RUN_ID\`\n- Commit evaluado: \`$GITHUB_SHA\`\n\nNo se modificaron datos ni la bóveda durante el fix."
+          F=orbit360-platform/runtime-gate-crm-v20260716/mapping-audit-sanitized.json
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "### Auditoría segundo intento\n\n- Clasificación: \`$(jq -r .classification $F)\`\n- Eventos: \`$(jq -r .events $F)\`\n- Ítems: \`$(jq -r .items $F)\`\n- Referencias: \`$(jq -r .refs $F)\`\n- Run: \`$GITHUB_RUN_ID\`"
