@@ -1,4 +1,4 @@
-name: Orbit 360 Secure Provider Hosting Closure 20260720
+name: Orbit 360 Insurer Portal Mapping Sanitized 20260720
 
 on:
   push:
@@ -9,21 +9,19 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 concurrency:
-  group: orbit360-secure-provider-hosting-closure-v20260720
-  cancel-in-progress: false
+  group: orbit360-insurer-portal-mapping-sanitized-v20260720
+  cancel-in-progress: true
 
 jobs:
-  closure:
-    name: Credenciales Aseguradoras · guardia y Hosting LAB
+  mapping:
+    name: Aseguradoras · inventario sanitizado de portales
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     env:
-      FIREBASE_PROJECT_ID: ays-orbit-360-lab
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
-      REGION: us-central1
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
       SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     steps:
       - name: Checkout rama autorizada
@@ -37,104 +35,64 @@ jobs:
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          node --check functions/index.js
-          node --check orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
-          node --check orbit360-platform/core/router-tenant-config-bootstrap.js
 
-      - name: Resolver principal existente
+      - name: Resolver cuenta LAB
         shell: bash
         run: |
           set -euo pipefail
+          test -n "${SA_PRIMARY:-}"
           KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
           printf '%s' "$SA_PRIMARY" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
-          test "$(jq -r '.project_id' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          echo "DEPLOYER_EMAIL=$(jq -r '.client_email' "$KEY_FILE")" >> "$GITHUB_ENV"
 
-      - name: Instalar Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ays-orbit-360-lab
-
-      - name: Verificar guardia y publicar Hosting LAB
+      - name: Generar inventario sin valores protegidos
         shell: bash
         run: |
           set -euo pipefail
-          OUT_DIR="orbit360-platform/runtime-gate-crm-v20260716"
-          OUT="$OUT_DIR/secure-provider-hosting-closure.json"
-          mkdir -p "$OUT_DIR"
-          PHASE="initializing"
-          FUNCTIONS_ACTIVE=false
-          AUTH_GUARD=false
-          HOSTING_DEPLOYED=false
-          PROVIDER_SOURCE=false
-          PREVIEW_URL=""
-          write_diag() {
-            local ok="$1"; local code="$2"
-            jq -n --arg phase "$PHASE" --arg run "$GITHUB_RUN_ID" --arg commit "$GITHUB_SHA" --argjson ok "$ok" --argjson exitCode "$code" --argjson functionsActive "$FUNCTIONS_ACTIVE" --argjson authenticationGuard "$AUTH_GUARD" --argjson hostingDeployed "$HOSTING_DEPLOYED" --argjson providerSource "$PROVIDER_SOURCE" '{schemaVersion:"orbit360-secure-provider-hosting-closure-v1",containsSecrets:false,containsPII:false,ok:$ok,phase:$phase,exitCode:$exitCode,run:$run,commit:$commit,functionsActive:$functionsActive,authenticationGuard:$authenticationGuard,hostingDeployed:$hostingDeployed,providerSource:$providerSource}' > "$OUT"
-          }
-          fail() { local code=$?; trap - ERR; write_diag false "$code"; exit "$code"; }
-          trap fail ERR
-          write_diag false 0
+          npm install --no-save firebase-admin@13
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          node --input-type=module - <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          import { cert, initializeApp } from 'firebase-admin/app';
+          import { getFirestore } from 'firebase-admin/firestore';
+          const key = JSON.parse(readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'));
+          const app = initializeApp({ credential: cert(key), projectId: 'ays-orbit-360-lab' });
+          const db = getFirestore(app);
+          const snapshot = await db.collection('tenantId').doc('alianzas-soluciones').collection('aseguradoras').get();
+          const insurers = snapshot.docs.map(doc => {
+            const row = doc.data() || {};
+            return {
+              id: doc.id,
+              nombre: String(row.nombre || ''),
+              pais: String(row.pais || ''),
+              sourceSheet: String(row.fuenteDirectorio && row.fuenteDirectorio.hoja || ''),
+              portals: [].concat(row.portales || []).map((portal, index) => ({
+                id: String(portal && (portal.id || index)),
+                nombre: String(portal && portal.nombre || ''),
+                sourceSheet: String(portal && portal.fuenteTraza && portal.fuenteTraza.hoja || ''),
+                sourceRow: Number(portal && portal.fuenteTraza && portal.fuenteTraza.fila || 0),
+                credentialState: /^cred_[a-f0-9]{32}$/.test(String(portal && portal.credentialRef || '')) ? 'opaque_ref' : (String(portal && portal.credentialRef || '') ? 'pending_ref' : 'none')
+              }))
+            };
+          }).sort((a,b) => a.pais.localeCompare(b.pais) || a.nombre.localeCompare(b.nombre));
+          const payload = {
+            schemaVersion: 'orbit360-insurer-portal-mapping-sanitized-v1',
+            containsSecrets: false,
+            containsPII: false,
+            tenantId: 'alianzas-soluciones',
+            insurerCount: insurers.length,
+            portalCount: insurers.reduce((sum, item) => sum + item.portals.length, 0),
+            insurers
+          };
+          writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/insurer-portal-mapping-sanitized.json', JSON.stringify(payload, null, 2));
+          NODE
 
-          PHASE="authenticate_gcloud"
-          gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project="$FIREBASE_PROJECT_ID" >/dev/null
-
-          PHASE="verify_functions_active"
-          active=0
-          for name in orbit360ImportInsurerCredentials orbit360CredentialStatus orbit360RevealInsurerCredential orbit360CopyInsurerCredential; do
-            state="$(gcloud functions describe "$name" --gen2 --region "$REGION" --project "$FIREBASE_PROJECT_ID" --format='value(state)')"
-            [ "$state" = "ACTIVE" ]
-            active=$((active + 1))
-          done
-          [ "$active" -eq 4 ]
-          FUNCTIONS_ACTIVE=true
-
-          PHASE="verify_anonymous_guard"
-          STATUS_URL="https://us-central1-${FIREBASE_PROJECT_ID}.cloudfunctions.net/orbit360CredentialStatus"
-          HTTP_CODE="$(curl -sS --retry 6 --retry-delay 3 --retry-all-errors -o "${RUNNER_TEMP}/anonymous.json" -w '%{http_code}' -X POST "$STATUS_URL" -H 'Content-Type: application/json; charset=utf-8' --data '{"data":{"tenantId":"alianzas-soluciones","activeRole":"Dirección","credentialRef":""}}')"
-          [ "$HTTP_CODE" = "401" ]
-          grep -Eiq 'UNAUTHENTICATED|unauthenticated|authentication' "${RUNNER_TEMP}/anonymous.json"
-          AUTH_GUARD=true
-
-          PHASE="deploy_hosting_lab"
-          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab --project "$FIREBASE_PROJECT_ID" --expires 30d --non-interactive --json > "${RUNNER_TEMP}/hosting.json"
-          PREVIEW_URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "${RUNNER_TEMP}/hosting.json" | head -n 1)"
-          [ -n "$PREVIEW_URL" ]
-          HOSTING_DEPLOYED=true
-
-          PHASE="verify_provider_source"
-          bootstrap="$(curl -fsSL --retry 8 --retry-delay 3 --retry-all-errors -H 'Cache-Control: no-cache' "${PREVIEW_URL}/core/router-tenant-config-bootstrap.js?run=${GITHUB_RUN_ID}")"
-          provider="$(curl -fsSL --retry 8 --retry-delay 3 --retry-all-errors -H 'Cache-Control: no-cache' "${PREVIEW_URL}/core/aseguradoras-credentials-provider-lab-v20260720.js?run=${GITHUB_RUN_ID}")"
-          printf '%s' "$bootstrap" | grep -Fq 'data-orbit-insurer-credential-provider'
-          printf '%s' "$provider" | grep -Fq 'appliesOpaqueRefsAfterRemoteConfirmation: true'
-          printf '%s' "$provider" | grep -Fq 'noSecretPersistence: true'
-          PROVIDER_SOURCE=true
-
-          PHASE="completed"
-          write_diag true 0
-          trap - ERR
-
-      - name: Publicar evidencia sanitizada
-        if: always()
+      - name: Publicar inventario sanitizado
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-secure-provider-hosting-closure-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/secure-provider-hosting-closure.json
+          name: orbit360-insurer-portal-mapping-sanitized-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/insurer-portal-mapping-sanitized.json
           if-no-files-found: error
-          retention-days: 7
-
-      - name: Comentar cierre sanitizado en PR 5
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          FILE="orbit360-platform/runtime-gate-crm-v20260716/secure-provider-hosting-closure.json"
-          if [ ! -f "$FILE" ]; then exit 0; fi
-          node - <<'NODE' > /tmp/provider-hosting-closure.md
-          const fs=require('fs');
-          const d=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/secure-provider-hosting-closure.json','utf8'));
-          process.stdout.write('### Cierre proveedor seguro · guardia y Hosting LAB\n\n- Resultado: **'+(d.ok?'OK':'NO_GO')+'**\n- Fase: `'+d.phase+'`\n- Functions activas: `'+d.functionsActive+'`\n- Guardia anónima 401: `'+d.authenticationGuard+'`\n- Hosting LAB: `'+d.hostingDeployed+'`\n- Fuente del proveedor: `'+d.providerSource+'`\n- Run: `'+d.run+'`\n- Commit: `'+d.commit+'`\n\nLa evidencia no contiene credenciales ni valores protegidos.');
-          NODE
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/provider-hosting-closure.md
+          retention-days: 3
