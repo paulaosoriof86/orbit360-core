@@ -47,7 +47,7 @@ Aseguradoras representaba los datos de lectura mediante `input` y `select` desha
 - Tarjetas semánticas para contactos, portales y bancos.
 - Correos, teléfonos y URLs accionables, seleccionables y copiables.
 - Encabezado y ficha de Aseguradoras adaptados a móvil.
-- Academia mantiene la distinción entre defecto funcional y validador obsoleto, estados honestos, valores canónicos y alta segura.
+- Academia actualizada a contenido 1.223: País por validar, enlaces accionables, seguridad bancaria, primer render y diferencia entre defecto funcional y validador obsoleto.
 
 ### Carril B · Backend, seguridad y gates
 
@@ -92,7 +92,7 @@ Aprobaron:
 ## Claude
 
 - `REPLICABLE_CLAUDE_ACUMULADO`: proyección temprana de lectura, contrato visual semántico, filtros canónicos, tarjetas responsive, enlaces accionables y validación del DOM.
-- `ACADEMIA_ACTUALIZAR`: explicar que una prueba del objeto interno no sustituye la revisión del DOM visible; reforzar País por validar y controles accionables.
+- `ACADEMIA_ACTUALIZAR`: completado en contenido 1.223.
 - `TENANT_AYS_ONLY`: conteos 414/26/7 y distribución real.
 - `BACKEND_PROTEGIDO_NO_CLAUDE`: bootstrap LAB, store Firestore, credenciales, reglas, auditoría y canal.
 - `SECRETO_DATO_REAL`: nombres, correos, teléfonos, cuentas y filas específicas no se transfieren.
