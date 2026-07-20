@@ -2,18 +2,18 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-20",
   "gateId": "importers-e2e-acceptance-lab-v20260720",
-  "classification": "FUNCTIONAL_DEFECT_CORRECTED_READY_FOR_SINGLE_EXECUTION",
-  "diagnosticRevision": "canonical-session-legal-membership-provider-role-normalization-v4",
-  "contractRevision": "1.0.3-canonical-session-legal-membership-provider-role-normalization-v4",
+  "classification": "PIPELINE_MECHANISM_FAILURE_CORRECTED_READY_FOR_SINGLE_EXECUTION",
+  "diagnosticRevision": "canonical-session-legal-membership-provider-function-dependencies-v5",
+  "contractRevision": "1.0.4-canonical-session-legal-membership-provider-function-dependencies-v5",
   "gatePatch": {
-    "contractVersion": "1.0.3",
-    "diagnosticRevision": "canonical-session-legal-membership-provider-role-normalization-v4",
-    "runtimeVersion": "20260720-4",
+    "contractVersion": "1.0.4",
+    "diagnosticRevision": "canonical-session-legal-membership-provider-function-dependencies-v5",
+    "runtimeVersion": "20260720-5",
     "status": "ACTIVE_SINGLE_EXECUTION_PENDING",
     "workflow": ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
     "staticValidationStatus": "PREFLIGHT_REQUIRED_BEFORE_EXECUTION",
     "executionBudget": {
-      "type": "bounded_e2e_single_execution_v4",
+      "type": "bounded_e2e_single_execution_v5",
       "watchdogBudgetMs": 900000,
       "membershipContractMs": 60000,
       "providerDeployMs": 300000,
@@ -21,8 +21,8 @@
       "providerInvocationMs": 65000,
       "storeObservationMs": 45000,
       "rollbackMs": 120000,
-      "exhaustionPolicy": "Execute revision v4 exactly once after GO_GATE_CONTRACT and provider role-normalization PASS. If provider_invoked fails again, stop all reruns and classify the first real provider check.",
-      "acceptancePolicy": "Accept only sanitized evidence with canonical membership, provider authorization ready, browserAuthReady, activeRoleResolved, legalGateSatisfied, provider confirmation, read-after-write, success and rejection audit, rollbackOk and ok:true."
+      "exhaustionPolicy": "Execute revision v5 exactly once after GO_GATE_CONTRACT, provider role-normalization PASS, FUNCTION_DEPENDENCIES_OK and FIREBASE_TOOLS_PINNED. If provider deploy fails again, stop all reruns and classify the sanitized deploy category without modifying product modules or data.",
+      "acceptancePolicy": "Accept only sanitized evidence with canonical membership, provider deployment and authorization ready, browserAuthReady, activeRoleResolved, legalGateSatisfied, provider confirmation, read-after-write, success and rejection audit, rollbackOk and ok:true."
     }
   },
   "canonicalOwners": [
@@ -50,6 +50,15 @@
         "paises_faltantes",
         "asesorId_requerido",
         "CONFIRMO AMPLIAR ACCESO"
+      ]
+    },
+    {
+      "id": "secureProviderDependencies",
+      "path": "functions/package.json",
+      "requiredTokens": [
+        "\"@google-cloud/secret-manager\": \"6.2.0\"",
+        "\"firebase-admin\": \"^13.0.0\"",
+        "\"firebase-functions\": \"7.3.0\""
       ]
     },
     {
@@ -112,6 +121,7 @@
     }
   ],
   "requiredFiles": [
+    "functions/package.json",
     "functions/index.js",
     "tools/orbit360-run-importers-e2e-gate-v20260720.mjs",
     "tools/orbit360-importers-e2e-browser-v20260720.mjs",
@@ -129,9 +139,12 @@
     ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-LEGAL-GATE-20260720.md",
     "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-MEMBERSHIP-403-20260720.md",
-    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-CALLBACK-ARITY-ROLE-NORMALIZATION-20260720.md"
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-CALLBACK-ARITY-ROLE-NORMALIZATION-20260720.md",
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-VALIDADOR-AUTORREFERENCIAL-WORKFLOW-M1-20260720.md",
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-DEPLOY-FUNCTIONS-DEPENDENCIES-M1-20260720.md"
   ],
   "runtimeGraphFiles": [
+    "functions/package.json",
     "functions/index.js",
     "orbit360-platform/core/legal.js",
     "orbit360-platform/core/auth.js",
@@ -142,6 +155,15 @@
     "orbit360-platform/data/academia-v1225-importadores-e2e.js"
   ],
   "runtimeVersionContracts": [
+    {
+      "path": "functions/package.json",
+      "requiredTokens": [
+        "\"node\": \"22\"",
+        "\"@google-cloud/secret-manager\": \"6.2.0\"",
+        "\"firebase-admin\": \"^13.0.0\"",
+        "\"firebase-functions\": \"7.3.0\""
+      ]
+    },
     {
       "path": "functions/index.js",
       "replaceRequiredTokens": true,
@@ -335,6 +357,10 @@
         "IMPORTERS_E2E_V4_SINGLE_EXECUTION",
         "orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720",
         "orbit360-validate-provider-role-normalization-v20260720.mjs",
+        "firebase-tools@15.24.0",
+        "npm install --prefix functions --omit=dev --no-audit --no-fund",
+        "FUNCTION_DEPENDENCIES_OK",
+        "FIREBASE_TOOLS_PINNED_15.24.0",
         "functions:orbit360ImportInsurerCredentials",
         "tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs",
         "providerAuthorizationReady",
