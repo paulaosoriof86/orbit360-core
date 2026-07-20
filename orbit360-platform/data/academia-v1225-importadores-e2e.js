@@ -1,4 +1,4 @@
-/* Orbit 360 · Academia v1.226 — Importadores completos, sesión legal y evidencia E2E */
+/* Orbit 360 · Academia v1.227 — Importadores completos, sesión legal, membresía y evidencia E2E */
 window.Orbit = window.Orbit || {};
 Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
   'use strict';
@@ -28,6 +28,11 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
           ok: 1
         },
         {
+          p: '¿Qué significa que el frontend muestre un rol pero el backend lo rechace?',
+          ops: ['Que el archivo está dañado', 'Que la membresía canónica no asigna o no autoriza ese rol y debe corregirse el contrato de acceso', 'Que debe repetirse el gate sin cambios'],
+          ok: 1
+        },
+        {
           p: '¿Qué debe ocurrir con una prueba sintética?',
           ops: ['Debe quedarse como dato de demostración', 'Debe eliminarse mediante rollback y restaurar los conteos', 'Debe mezclarse con datos reales'],
           ok: 1
@@ -49,7 +54,7 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
       cat: 'Operación',
       emoji: '🧭',
       color: '#1E2227',
-      desc: 'Cómo distinguir lectura, sesión lista, dry-run, aplicación real, auditoría y rollback en cualquier fuente.',
+      desc: 'Cómo distinguir lectura, sesión lista, membresía autorizada, dry-run, aplicación real, auditoría y rollback en cualquier fuente.',
       destinatarios: role,
       recursos: [],
       metaLeccion: {
@@ -66,11 +71,12 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
           section('✅', 'Aplicación confirmada', 'Solo existe cuando el servicio autorizado confirma la escritura y la plataforma puede releer el resultado.'),
           section('↩️', 'Rollback', 'Las pruebas ficticias deben retirarse por completo y restaurar los conteos anteriores.')
         ]),
-        lesson('Sesión lista antes de operar', [
+        lesson('Sesión y membresía listas antes de operar', [
           section('👤', 'Identidad y rol', 'La misma identidad, tenant y rol activo deben conservarse desde la pantalla hasta la operación autorizada.'),
+          section('🪪', 'Membresía canónica', 'El rol activo debe estar asignado en la membresía, con países, scopes y vínculo de asesor cuando corresponda. Que la pantalla muestre un rol no basta para autorizar una acción sensible.'),
           section('⚖️', 'Aceptación legal vigente', 'En un navegador nuevo, el acuerdo legal se presenta una sola vez y debe completarse antes del primer clic operativo. Un gate automatizado no puede ignorarlo ni ocultarlo.'),
           section('🚫', 'Overlay pendiente', 'Si el acuerdo legal sigue abierto, el gate debe detenerse con un código claro. No puede interpretar el bloqueo del clic como fallo del archivo o del backend.'),
-          section('🔐', 'Sesión canónica', 'La preparación de sesión termina únicamente cuando autenticación, rol, tenant y gate legal están resueltos.')
+          section('🔐', 'Sesión canónica', 'La preparación de sesión termina únicamente cuando autenticación, rol, tenant, membresía y gate legal están resueltos.')
         ]),
         lesson('Gate integral y estados honestos', [
           section('🎯', 'Destino único', 'Cada registro debe llegar con un destino interno inequívoco. No se vuelve a deducir en capas diferentes.'),
@@ -81,8 +87,9 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
             ? 'Trabaja solo dentro de tu alcance. Cuando falte una relación o pertenezca a otra cartera, crea una gestión de corrección.'
             : 'Revisa origen, diferencias, alcance, responsable, resultado de escritura y evidencia antes de aprobar una migración.')
         ]),
-        lesson('Defecto funcional o validador obsoleto', [
+        lesson('Clasificar antes de corregir', [
           section('🧱', 'Defecto funcional', 'El producto no cumple el contrato: no llega al destino, escribe parcialmente, muestra un éxito falso o no puede releer.'),
+          section('🪪', 'Fallo de contrato de datos', 'La identidad existe, pero su membresía no contiene roles, rol activo, países o scopes coherentes. Se corrige la membresía o el adapter, no el archivo importado.'),
           section('📐', 'Validador obsoleto', 'La regla automatizada ya no representa el contrato vigente. Se congela el producto y se corrigen juntos registro, validador, workflow y documentación.'),
           section('🔁', 'Dos fallos iguales', 'No se repite ni se agrega otro parche. Se detienen los intentos y se diagnostica la causa raíz de la etapa.'),
           section('🧭', 'Una fuente por migración', 'Clientes, pólizas, vehículos, cobros, planillas, bancos, histórico, documentos y configuración conservan contratos separados.')
@@ -108,12 +115,12 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
       courses.forEach(function (courseRow) {
         var previous = byId[courseRow.id];
         if (!previous) {
-          Orbit.store.insert('cursos', Object.assign({ progreso: 0, certificado: false, _cv: 1226 }, courseRow));
-        } else if ((previous._cv || 0) < 1226) {
+          Orbit.store.insert('cursos', Object.assign({ progreso: 0, certificado: false, _cv: 1227 }, courseRow));
+        } else if ((previous._cv || 0) < 1227) {
           Orbit.store.update('cursos', courseRow.id, Object.assign({}, courseRow, {
             progreso: previous.progreso || 0,
             certificado: Boolean(previous.certificado),
-            _cv: 1226
+            _cv: 1227
           }));
         }
       });
@@ -129,5 +136,5 @@ Orbit.ACADEMIA_V1225_IMPORTERS_E2E = (function () {
     setTimeout(loop, 150);
   })();
   document.addEventListener('orbit:reseeded', apply);
-  return { version: '1.226', contentVersion: '1.226', legalGateRequired: true, courses: courses, apply: apply };
+  return { version: '1.227', contentVersion: '1.227', legalGateRequired: true, membershipRequired: true, courses: courses, apply: apply };
 })();
