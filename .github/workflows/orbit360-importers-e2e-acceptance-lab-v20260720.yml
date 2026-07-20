@@ -1,9 +1,9 @@
 name: Orbit 360 Importers E2E Acceptance LAB 20260720 V3
 
 on:
-  push:
+  pull_request:
     branches:
-      - ays/backend-tenant-lab-v99-20260703
+      - main
     paths:
       - ".github/workflows/orbit360-importers-e2e-acceptance-lab-v20260720.yml"
   workflow_dispatch:
@@ -19,7 +19,7 @@ concurrency:
 jobs:
   preflight:
     name: Importadores · preflight vinculante sin secretos
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[importers-e2e-v3-once]')
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.ref == 'ays/backend-tenant-lab-v99-20260703'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -37,7 +37,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          test "$BRANCH" = "ays/backend-tenant-lab-v99-20260703"
           echo "IMPORTERS_E2E_V3_SINGLE_EXECUTION"
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
