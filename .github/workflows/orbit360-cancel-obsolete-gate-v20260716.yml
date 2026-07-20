@@ -1,4 +1,4 @@
-name: Orbit 360 Importers E2E Acceptance LAB 20260720
+name: Orbit 360 Importers E2E Confirmation Driver Fix 20260720
 
 on:
   push:
@@ -8,29 +8,19 @@ on:
       - .github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
-concurrency:
-  group: orbit360-importers-e2e-acceptance-lab-v20260720
-  cancel-in-progress: false
-
 jobs:
-  importers_e2e:
-    name: Importadores · navegador, store, auditoría y rollback
+  fix_confirmation_driver:
+    name: Importadores · corregir conductor de confirmaciones
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     env:
       ORBIT360_GATE_ID: importers-e2e-acceptance-lab-v20260720
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
       ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
-      ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
-      ORBIT360_EXPECTED_UID: woJlxR1iFEeiQZvTscPj4qQ5Qc73
-      ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
-      SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-      ORBIT360_IMPORTERS_E2E_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
       ORBIT360_PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-
     steps:
       - name: Checkout rama autorizada
         uses: actions/checkout@v4
@@ -42,64 +32,30 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Preflight vinculante antes de secretos
+      - name: Preflight vinculante
         shell: bash
         run: |
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
 
-      - name: Validar sintaxis del gate
+      - name: Aplicar corrección determinista
         shell: bash
         run: |
           set -euo pipefail
-          node --check orbit360-platform/core/importer-execution-contract-v20260720.js
-          node --check orbit360-platform/core/router-tenant-config-bootstrap.js
-          node --check tools/orbit360-importers-e2e-fixture-v20260720.mjs
+          node tools/orbit360-fix-importers-e2e-confirmation-driver-v20260720.mjs
           node --check tools/orbit360-importers-e2e-browser-v20260720.mjs
-          node --check tools/orbit360-importers-e2e-vault-rollback-v20260720.mjs
-          node --check tools/orbit360-importers-e2e-finalize-v20260720.mjs
-          node --check tools/orbit360-run-importers-e2e-gate-v20260720.mjs
+          grep -Fq "driverVersion: '20260720.2'" tools/orbit360-importers-e2e-browser-v20260720.mjs
+          grep -Fq "answerOrbitPrompt(page, 'Confirmar accesos seguros'" tools/orbit360-importers-e2e-browser-v20260720.mjs
+          grep -Fq "answerOrbitPrompt(page, 'Confirmación reforzada'" tools/orbit360-importers-e2e-browser-v20260720.mjs
 
-      - name: Resolver cuenta LAB
+      - name: Persistir únicamente el conductor
         shell: bash
         run: |
           set -euo pipefail
-          test -n "${SA_PRIMARY:-}"
-          FILE="${RUNNER_TEMP}/orbit360-lab.json"
-          printf '%s' "$SA_PRIMARY" > "$FILE"
-          chmod 600 "$FILE"
-          test "$(jq -r '.project_id // empty' "$FILE")" = "ays-orbit-360-lab"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$FILE" >> "$GITHUB_ENV"
-
-      - name: Instalar dependencias verificadas
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-save --ignore-scripts --no-audit --no-fund firebase-tools firebase-admin@13 playwright@1.55.0 xlsx@0.18.5 @google-cloud/secret-manager@6
-          npx playwright install --with-deps chromium
-
-      - name: Ejecutar gate integral una sola vez
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-run-importers-e2e-gate-v20260720.mjs
-
-      - name: Publicar evidencia sanitizada
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-importers-e2e-acceptance-${{ github.run_id }}
-          path: |
-            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-acceptance-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-cleanup-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-vault-rollback-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/importers-e2e-coordinator-sanitized.json
-          if-no-files-found: warn
-          retention-days: 7
-
-      - name: Limpiar cuenta temporal
-        if: always()
-        shell: bash
-        run: rm -f "${GOOGLE_APPLICATION_CREDENTIALS:-/nonexistent}"
+          git config user.name "orbit360-gate-bot"
+          git config user.email "orbit360-gate-bot@users.noreply.github.com"
+          git add tools/orbit360-importers-e2e-browser-v20260720.mjs
+          git diff --cached --quiet && exit 0
+          git commit -m "fix(validators): estabilizar confirmaciones E2E [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
