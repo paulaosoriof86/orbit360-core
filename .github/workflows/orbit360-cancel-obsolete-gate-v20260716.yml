@@ -1,4 +1,4 @@
-name: Orbit 360 Secure Credentials Static Diagnosis 20260720
+name: Orbit 360 Secure Credentials Static Restore 20260720
 
 on:
   push:
@@ -8,16 +8,16 @@ on:
       - ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 concurrency:
-  group: orbit360-secure-credentials-static-diagnosis-v20260720
+  group: orbit360-secure-credentials-static-restore-v20260720
   cancel-in-progress: false
 
 jobs:
-  static_diagnosis:
-    name: Credenciales Aseguradoras · diagnóstico estático vinculante
+  static_restore:
+    name: Credenciales Aseguradoras · validar y restaurar slice auditado
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -48,7 +48,7 @@ jobs:
           git show "$RESTORE_COMMIT:functions/package.json" > functions/package.json
           git show "$RESTORE_COMMIT:orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js" > orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
 
-      - name: Diagnóstico estático por fase
+      - name: Validación estática por fase
         shell: bash
         run: |
           set -uo pipefail
@@ -69,13 +69,10 @@ jobs:
             PHASE="$1"
             shift
             echo "ORBIT360_STATIC_PHASE:${PHASE}"
-            if "$@"; then
-              return 0
-            else
-              local code=$?
-              write_diag false "$code"
-              exit "$code"
-            fi
+            if "$@"; then return 0; fi
+            local code=$?
+            write_diag false "$code"
+            exit "$code"
           }
           write_diag false 0
           run_phase node_functions node --check functions/index.js
@@ -90,11 +87,26 @@ jobs:
           PHASE="completed"
           write_diag true 0
 
-      - name: Publicar diagnóstico sanitizado
+      - name: Persistir slice únicamente después de validación OK
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.ok == true and .phase == "completed"' orbit360-platform/runtime-gate-crm-v20260716/credential-provider-static-diagnostic.json >/dev/null
+          git config user.name "orbit360-gate-bot"
+          git config user.email "orbit360-gate-bot@users.noreply.github.com"
+          git add functions/index.js functions/package.json orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js
+          if git diff --cached --quiet; then
+            echo "Slice ya persistido"
+            exit 0
+          fi
+          git commit -m "feat(security): restaurar proveedor seguro LAB [skip ci]"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+
+      - name: Publicar evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-secure-provider-static-diagnostic-${{ github.run_id }}
+          name: orbit360-secure-provider-static-restore-${{ github.run_id }}
           path: orbit360-platform/runtime-gate-crm-v20260716/credential-provider-static-diagnostic.json
           if-no-files-found: error
           retention-days: 3
@@ -107,19 +119,19 @@ jobs:
         run: |
           FILE="orbit360-platform/runtime-gate-crm-v20260716/credential-provider-static-diagnostic.json"
           if [ ! -f "$FILE" ]; then exit 0; fi
-          node - <<'NODE' > /tmp/orbit360-static-diagnostic.md
+          node - <<'NODE' > /tmp/orbit360-static-restore.md
           const fs = require('fs');
           const d = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/credential-provider-static-diagnostic.json','utf8'));
           process.stdout.write([
-            '### Diagnóstico estático · proveedor seguro LAB',
+            '### Restauración estática · proveedor seguro LAB',
             '',
             '- Resultado: **' + (d.ok ? 'OK' : 'NO_GO') + '**',
             '- Fase: `' + d.phase + '`',
             '- Exit code: `' + d.exitCode + '`',
             '- Run: `' + d.run + '`',
-            '- Commit: `' + d.commit + '`',
+            '- Commit evaluado: `' + d.commit + '`',
             '',
             'La evidencia no contiene credenciales, datos personales ni valores protegidos.'
           ].join('\n'));
           NODE
-          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/orbit360-static-diagnostic.md
+          gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/orbit360-static-restore.md
