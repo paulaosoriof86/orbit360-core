@@ -8,7 +8,8 @@
   "gatePatch": {
     "contractVersion": "1.0.0",
     "diagnosticRevision": "canonical-browser-backend-store-rollback-v1",
-    "status": "ACTIVE_ROOT_CAUSE_GATE"
+    "status": "ACTIVE_ROOT_CAUSE_GATE",
+    "workflow": ".github/workflows/orbit360-cancel-obsolete-gate-v20260716.yml"
   },
   "requiredFiles": [
     "tools/orbit360-run-importers-e2e-gate-v20260720.mjs"
