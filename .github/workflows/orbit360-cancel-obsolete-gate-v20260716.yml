@@ -1,4 +1,4 @@
-name: Orbit 360 Insurer Portal Mapping Sanitized 20260720
+name: Orbit 360 Secure Credential Handoff Key 20260720
 
 on:
   push:
@@ -12,17 +12,18 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: orbit360-insurer-portal-mapping-sanitized-v20260720
-  cancel-in-progress: true
+  group: orbit360-secure-credential-handoff-key-v20260720
+  cancel-in-progress: false
 
 jobs:
-  mapping:
-    name: Aseguradoras · inventario sanitizado de portales
+  prepare_key:
+    name: Aseguradoras · llave efímera para handoff cifrado
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
       FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      HANDOFF_SECRET_ID: orbit360-credential-handoff-key-20260720
       SA_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     steps:
       - name: Checkout rama autorizada
@@ -37,7 +38,7 @@ jobs:
           test "${GITHUB_REF_NAME}" = "ays/backend-tenant-lab-v99-20260703"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
 
-      - name: Resolver cuenta LAB
+      - name: Resolver principal LAB
         shell: bash
         run: |
           set -euo pipefail
@@ -47,63 +48,58 @@ jobs:
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "DEPLOYER_EMAIL=$(jq -r '.client_email // empty' "$KEY_FILE")" >> "$GITHUB_ENV"
 
-      - name: Generar inventario sin valores protegidos
+      - name: Instalar Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ays-orbit-360-lab
+
+      - name: Crear llave efímera y guardar solo la privada en Secret Manager
         shell: bash
         run: |
           set -euo pipefail
-          npm install --no-save firebase-admin@13
-          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
-          node --input-type=module - <<'NODE'
-          import { readFileSync, writeFileSync } from 'node:fs';
-          import { cert, initializeApp } from 'firebase-admin/app';
-          import { getFirestore } from 'firebase-admin/firestore';
-          const key = JSON.parse(readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'));
-          const app = initializeApp({ credential: cert(key), projectId: 'ays-orbit-360-lab' });
-          const db = getFirestore(app);
-          const snapshot = await db.collection('tenantId').doc('alianzas-soluciones').collection('aseguradoras').get();
-          const insurers = snapshot.docs.map(doc => {
-            const row = doc.data() || {};
-            return {
-              id: doc.id,
-              nombre: String(row.nombre || ''),
-              pais: String(row.pais || ''),
-              sourceSheet: String(row.fuenteDirectorio && row.fuenteDirectorio.hoja || ''),
-              portals: [].concat(row.portales || []).map((portal, index) => ({
-                id: String(portal && (portal.id || index)),
-                nombre: String(portal && portal.nombre || ''),
-                sourceSheet: String(portal && portal.fuenteTraza && portal.fuenteTraza.hoja || ''),
-                sourceRow: Number(portal && portal.fuenteTraza && portal.fuenteTraza.fila || 0),
-                credentialState: /^cred_[a-f0-9]{32}$/.test(String(portal && portal.credentialRef || '')) ? 'opaque_ref' : (String(portal && portal.credentialRef || '') ? 'pending_ref' : 'none')
-              }))
-            };
-          }).sort((a,b) => a.pais.localeCompare(b.pais) || a.nombre.localeCompare(b.nombre));
-          const payload = {
-            schemaVersion: 'orbit360-insurer-portal-mapping-sanitized-v1',
-            containsSecrets: false,
-            containsPII: false,
-            tenantId: 'alianzas-soluciones',
-            insurerCount: insurers.length,
-            portalCount: insurers.reduce((sum, item) => sum + item.portals.length, 0),
-            insurers
-          };
-          writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/insurer-portal-mapping-sanitized.json', JSON.stringify(payload, null, 2));
-          NODE
+          OUT_DIR="orbit360-platform/runtime-gate-crm-v20260716"
+          mkdir -p "$OUT_DIR"
+          PRIVATE_KEY="${RUNNER_TEMP}/handoff-private.pem"
+          PUBLIC_KEY="$OUT_DIR/handoff-public.pem"
+          DIAG="$OUT_DIR/handoff-key-sanitized.json"
 
-      - name: Publicar inventario sanitizado
+          gcloud auth activate-service-account "$DEPLOYER_EMAIL" --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project="$FIREBASE_PROJECT_ID" >/dev/null
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out "$PRIVATE_KEY" >/dev/null 2>&1
+          openssl pkey -in "$PRIVATE_KEY" -pubout -out "$PUBLIC_KEY" >/dev/null 2>&1
+          chmod 600 "$PRIVATE_KEY"
+
+          if gcloud secrets describe "$HANDOFF_SECRET_ID" --project "$FIREBASE_PROJECT_ID" >/dev/null 2>&1; then
+            gcloud secrets versions add "$HANDOFF_SECRET_ID" --data-file="$PRIVATE_KEY" --project "$FIREBASE_PROJECT_ID" >/dev/null
+          else
+            gcloud secrets create "$HANDOFF_SECRET_ID" --replication-policy=automatic --data-file="$PRIVATE_KEY" --project "$FIREBASE_PROJECT_ID" >/dev/null
+          fi
+
+          FINGERPRINT="$(openssl pkey -pubin -in "$PUBLIC_KEY" -outform DER 2>/dev/null | sha256sum | awk '{print $1}')"
+          jq -n \
+            --arg run "$GITHUB_RUN_ID" \
+            --arg commit "$GITHUB_SHA" \
+            --arg fingerprint "$FINGERPRINT" \
+            '{schemaVersion:"orbit360-secure-handoff-key-v1",containsSecrets:false,containsPII:false,ok:true,keyReady:true,algorithm:"RSA-OAEP-4096+AES-256-GCM",run:$run,commit:$commit,publicKeyFingerprint:$fingerprint}' > "$DIAG"
+          shred -u "$PRIVATE_KEY" || rm -f "$PRIVATE_KEY"
+
+      - name: Publicar llave pública y evidencia sanitizada
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-insurer-portal-mapping-sanitized-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/insurer-portal-mapping-sanitized.json
+          name: orbit360-secure-handoff-public-key-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/handoff-public.pem
+            orbit360-platform/runtime-gate-crm-v20260716/handoff-key-sanitized.json
           if-no-files-found: error
-          retention-days: 3
+          retention-days: 1
 
-      - name: Publicar referencia sanitizada en PR 5
+      - name: Comentar resultado sanitizado en PR 5
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          COUNT="$(jq -r '.insurerCount' orbit360-platform/runtime-gate-crm-v20260716/insurer-portal-mapping-sanitized.json)"
-          PORTALS="$(jq -r '.portalCount' orbit360-platform/runtime-gate-crm-v20260716/insurer-portal-mapping-sanitized.json)"
-          printf -v BODY '### Inventario sanitizado de portales\n\n- Aseguradoras: `%s`\n- Portales: `%s`\n- Run: `%s`\n- Commit: `%s`\n\nNo contiene enlaces, usuarios, contraseñas, cuentas, contactos ni datos personales.' "$COUNT" "$PORTALS" "$GITHUB_RUN_ID" "$GITHUB_SHA"
+          FILE="orbit360-platform/runtime-gate-crm-v20260716/handoff-key-sanitized.json"
+          FINGERPRINT="$(jq -r '.publicKeyFingerprint' "$FILE")"
+          printf -v BODY '### Handoff cifrado efímero · llave preparada\n\n- Resultado: **OK**\n- Algoritmo: `RSA-OAEP-4096 + AES-256-GCM`\n- Huella pública: `%s`\n- Run: `%s`\n- Commit: `%s`\n\nLa llave privada temporal permanece exclusivamente en Secret Manager. El artefacto contiene solo la llave pública y evidencia sanitizada.' "$FINGERPRINT" "$GITHUB_RUN_ID" "$GITHUB_SHA"
           gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body "$BODY"
