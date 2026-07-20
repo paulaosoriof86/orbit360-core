@@ -22,9 +22,9 @@ Producción: no autorizada
 
 Gate: `importers-e2e-acceptance-lab-v20260720`.
 
-Contrato vigente: `20260720.2`.
+Contrato del importador: `20260720.2`.
 
-Estado: `FROZEN_AFTER_TWO_CONFIRMATION_STAGE_FAILURES`.
+Estado: `FROZEN_PENDING_NEW_UI_LEGAL_ACCEPTANCE_GATE_REVISION`.
 
 El workflow quedó congelado y no se dispara por commits. No ejecuta secretos, navegador, deploy, fixture ni escrituras de datos.
 
@@ -65,18 +65,76 @@ Código conceptual: `SYNTHETIC_BROWSER_LEGAL_GATE_NOT_SATISFIED`.
 
 La sesión sintética se autenticó correctamente, pero inició con almacenamiento vacío. El owner legal presenta el acuerdo una sola vez por usuario y versión mediante un overlay. El ejecutor no modelaba esa condición de sesión; por eso pudo leer el archivo y construir el dry-run, pero el primer clic operativo quedó bloqueado antes de abrir la confirmación del importador.
 
-No es un defecto del Excel, parser, IAM, proveedor, target ni backend. Es una omisión del contrato del navegador de prueba.
+No es un defecto del Excel, parser, IAM, proveedor, target ni backend. Es una omisión del ciclo de vida del navegador de prueba.
+
+## Contrato canónico de preparación de sesión
+
+Owner:
+
+`core/session-readiness-contract-v20260720.js`
+
+Versión: `20260720.1`.
+
+Predicados:
+
+```txt
+browserAuthReady
+activeRoleResolved
+tenantResolved
+legalApiReady
+legalAcceptanceRecorded
+legalOverlayOpen
+legalGateSatisfied
+appVisible
+```
+
+Garantías:
+
+- no acepta acuerdos;
+- no hace clics;
+- no escribe almacenamiento;
+- no llama directamente al registrador legal;
+- no usa `Orbit.store`;
+- no expone identidad ni valores protegidos.
+
+Bootstrap: el owner se carga antes del contrato del importador.
+
+## Auditoría determinista
+
+Validador:
+
+`tools/orbit360-validate-session-readiness-contract-v20260720.mjs`
+
+Resultado local aislado:
+
+```txt
+19 PASS
+0 FAIL
+ok:true
+```
+
+Escenarios comprobados:
+
+1. usuario no autenticado → `AUTH_NOT_READY`;
+2. gate legal pendiente → `LEGAL_GATE_PENDING`;
+3. aceptación registrada pero overlay abierto → sigue bloqueado;
+4. sesión completa → `ready:true`;
+5. cero escrituras durante todos los escenarios.
+
+Esta validación no sustituye el preflight de repositorio y no reactiva el gate.
 
 ## Cambios aplicados
 
 - Workflow E2E congelado después de dos fallos en la misma etapa.
-- Contrato canónico actualizado a `20260720.2`.
+- Contrato del importador actualizado a `20260720.2`.
+- Contrato de sesión añadido en `20260720.1`.
 - Predicado obligatorio: `legalGateSatisfied`.
 - Código de etapa: `LEGAL_GATE_PENDING`.
 - Regla: ningún clic operativo antes de resolver identidad, rol, tenant y gate legal.
-- Bootstrap sincronizado con contrato `20260720.2`.
+- Bootstrap sincronizado.
 - Academia actualizada a `1.226`.
 - Cierre documentado en `CIERRE-CAUSA-RAIZ-IMPORTERS-E2E-LEGAL-GATE-20260720.md`.
+- Bloque de readiness documentado en `BLOQUE-SESSION-READINESS-CANONICO-20260720.md`.
 
 ## Carriles
 
@@ -96,13 +154,14 @@ No es un defecto del Excel, parser, IAM, proveedor, target ni backend. Es una om
 
 ## Siguiente acción exacta
 
-Diseñar y auditar un contrato canónico de preparación de sesión que pruebe, antes del primer clic:
+Diseñar una revisión nueva del conductor de navegador que complete la UI legal real una sola vez, espere `ready:true`, produzca evidencia sanitizada y solo entonces permita el primer clic del importador.
 
-```txt
-browserAuthReady:true
-activeRoleResolved:true
-tenantResolved:true
-legalGateSatisfied:true
-```
+Antes de ejecutarla se debe:
 
-La aceptación debe completarse por la UI legal real o por un fixture equivalente validado por el owner legal. Solo después se registra una nueva revisión del gate y se ejecuta una vez. M1 sigue abierto hasta obtener evidencia integral sanitizada `ok:true`.
+1. registrar una nueva revisión del gate;
+2. actualizar owner, preflight, workflow, documentación y Academia juntos;
+3. ejecutar el preflight vinculante;
+4. ejecutar la nueva revisión una sola vez;
+5. aceptar exclusivamente evidencia integral sanitizada `ok:true`.
+
+M1 sigue abierto hasta obtener esa evidencia.
