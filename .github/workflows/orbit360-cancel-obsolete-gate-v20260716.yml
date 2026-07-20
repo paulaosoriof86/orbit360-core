@@ -255,3 +255,9 @@ jobs:
           ].join('\n'));
           NODE
           gh pr comment 5 --repo "$GITHUB_REPOSITORY" --body-file /tmp/secure-provider-comment.md
+
+      - name: Alto controlado para evidencia observable
+        if: always()
+        run: |
+          echo "EVIDENCE_READY_EXPECTED_STOP"
+          exit 78
