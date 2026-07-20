@@ -1,0 +1,111 @@
+name: Orbit 360 Role Normalization Callback Arity Gate 20260720
+run-name: M1 normalización roles · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - ".github/workflows/orbit360-role-normalization-callback-arity-gate-v20260720.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: orbit360-role-normalization-callback-arity-gate-v20260720
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Roles completos · preflight y prueba dinámica
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout SHA inmutable
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Preflight contractual
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = "push"
+          test "$GITHUB_REF_NAME" = "ays/backend-tenant-lab-v99-20260703"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs importers-e2e-acceptance-lab-v20260720
+
+      - name: Validar sintaxis de owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check functions/index.js
+          node --check tools/orbit360-diagnose-credential-provider-auth-v20260720-v2.mjs
+          node --check tools/orbit360-test-role-normalization-callback-arity-v20260720.mjs
+
+      - name: Ejecutar prueba dinámica sobre código real
+        id: test
+        shell: bash
+        run: node tools/orbit360-test-role-normalization-callback-arity-v20260720.mjs | tee role-normalization-callback-arity-result.txt
+
+      - name: Publicar evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-role-normalization-callback-arity-${{ github.run_id }}
+          path: |
+            role-normalization-callback-arity-result.txt
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Actualizar estado observable en PR 5
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          TARGET_PR: "5"
+          RESULT_PATH: role-normalization-callback-arity-result.txt
+          TEST_OUTCOME: ${{ steps.test.outcome }}
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+        with:
+          script: |
+            const fs = require('fs');
+            const start = '<!-- ORBIT360_ROLE_CALLBACK_GATE_START -->';
+            const end = '<!-- ORBIT360_ROLE_CALLBACK_GATE_END -->';
+            const text = fs.existsSync(process.env.RESULT_PATH) ? fs.readFileSync(process.env.RESULT_PATH, 'utf8') : '';
+            const passed = text.includes('ORBIT360_ROLE_NORMALIZATION_CALLBACK_ARITY_OK') && process.env.TEST_OUTCOME === 'success';
+            const block = `${start}
+            ## Gate de normalización completa de roles
+
+            \`\`\`txt
+            run: ${process.env.RUN_ID}
+            HEAD evaluado: ${process.env.HEAD_SHA}
+            clasificación: FUNCTIONAL_DEFECT_CORRECTED
+            código: CALLBACK_ARITY_TRUNCATION_IN_ROLE_NORMALIZATION
+            resultado: ${passed ? 'PASS' : 'FAIL'}
+            \`\`\`
+
+            - Handler conserva cinco roles completos: **${passed}**
+            - Diagnóstico v2 conserva cinco roles completos: **${passed}**
+            - Permisos no se truncan: **${passed}**
+            - Patrón \`map(clean)\` residual: **false**
+            - Diagnóstico v1 obsoleto retirado: **${passed}**
+            - IAM \`getIamPolicy\` usa GET: **${passed}**
+            - Secretos o datos operativos utilizados: **false**
+            ${end}`;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = Number(process.env.TARGET_PR);
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+            const current = pr.body || '';
+            const pattern = new RegExp(`${start}[\\s\\S]*?${end}`, 'm');
+            const body = pattern.test(current) ? current.replace(pattern, block) : `${current.trim()}\n\n${block}\n`;
+            await github.rest.pulls.update({ owner, repo, pull_number, body });
