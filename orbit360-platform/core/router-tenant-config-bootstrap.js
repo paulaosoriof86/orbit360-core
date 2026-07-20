@@ -1,6 +1,6 @@
 /* Orbit 360 · Bootstrap genérico de configuración tenant para el Router.
    Lee el índice ya cargado y solicita únicamente la configuración activa.
-   Carga contratos transversales, proveedor seguro y vínculo antes de router.js
+   Carga contratos transversales, sesión, proveedor seguro y vínculo antes de router.js
    para evitar proyecciones tardías, estados falsos y doble render.
    No contiene datos de tenants, secretos ni credenciales. */
 (function () {
@@ -13,6 +13,7 @@
   var source = String(entry && entry.insurerConfigSrc || '').trim();
   var visualScriptSrc = 'core/client-insurer-visual-contract-v20260720.js?v=20260720-2';
   var visualStyleSrc = 'styles/client-insurer-visual-contract-v20260720.css?v=20260720-2';
+  var sessionReadinessSrc = 'core/session-readiness-contract-v20260720.js?v=20260720-1';
   var credentialProviderSrc = 'core/aseguradoras-credentials-provider-lab-v20260720.js?v=20260720-1';
   var secureTargetBridgeSrc = 'core/insurer-secure-target-bridge-v20260720.js?v=20260720-1';
   var importerContractSrc = 'core/importer-execution-contract-v20260720.js?v=20260720-2';
@@ -25,6 +26,8 @@
     sourceResolved: Boolean(source),
     visualContractRequested: true,
     visualContractVersion: '20260720.2',
+    sessionReadinessRequested: true,
+    sessionReadinessVersion: '20260720.1',
     credentialProviderRequested: true,
     credentialProviderVersion: '20260720.1',
     secureTargetBridgeRequested: true,
@@ -46,11 +49,12 @@
 
   var visualScript = safeSameOrigin(visualScriptSrc, '/core/client-insurer-visual-contract-v20260720.js');
   var visualStyle = safeSameOrigin(visualStyleSrc, '/styles/client-insurer-visual-contract-v20260720.css');
+  var sessionReadiness = safeSameOrigin(sessionReadinessSrc, '/core/session-readiness-contract-v20260720.js');
   var credentialProvider = safeSameOrigin(credentialProviderSrc, '/core/aseguradoras-credentials-provider-lab-v20260720.js');
   var secureTargetBridge = safeSameOrigin(secureTargetBridgeSrc, '/core/insurer-secure-target-bridge-v20260720.js');
   var importerContract = safeSameOrigin(importerContractSrc, '/core/importer-execution-contract-v20260720.js');
   var importerAcademy = safeSameOrigin(importerAcademySrc, '/data/academia-v1225-importadores-e2e.js');
-  if (!visualScript || !visualStyle || !credentialProvider || !secureTargetBridge || !importerContract || !importerAcademy) {
+  if (!visualScript || !visualStyle || !sessionReadiness || !credentialProvider || !secureTargetBridge || !importerContract || !importerAcademy) {
     window.OrbitTenantBootstrapState.status = 'runtime-source-blocked';
     return;
   }
@@ -72,11 +76,13 @@
   if (document.readyState === 'loading') {
     var styleHref = visualStyle.pathname + visualStyle.search;
     var scriptHref = visualScript.pathname + visualScript.search;
+    var sessionHref = sessionReadiness.pathname + sessionReadiness.search;
     var providerHref = credentialProvider.pathname + credentialProvider.search;
     var bridgeHref = secureTargetBridge.pathname + secureTargetBridge.search;
     var importerContractHref = importerContract.pathname + importerContract.search;
     var importerAcademyHref = importerAcademy.pathname + importerAcademy.search;
     document.write('<link rel="stylesheet" href="' + styleHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-m1-visual-style="1">');
+    document.write('<script src="' + sessionHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-session-readiness-contract="1"><\/script>');
     document.write('<script src="' + importerContractHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-importer-execution-contract="1"><\/script>');
     document.write('<script src="' + importerAcademyHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-importers-e2e-academy="1"><\/script>');
     document.write('<script src="' + providerHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-insurer-credential-provider="1"><\/script>');
@@ -170,17 +176,31 @@
     document.head.appendChild(academyScript);
   }
 
-  if (window.Orbit && window.Orbit.importerExecutionContractV20260720 && window.Orbit.importerExecutionContractV20260720.version === '20260720.2') {
-    loadImporterAcademy();
+  function loadImporterContract() {
+    if (window.Orbit && window.Orbit.importerExecutionContractV20260720 && window.Orbit.importerExecutionContractV20260720.version === '20260720.2') {
+      loadImporterAcademy();
+      return;
+    }
+    var importerScript = document.createElement('script');
+    importerScript.src = importerContract.pathname + importerContract.search;
+    importerScript.async = false;
+    importerScript.setAttribute('data-orbit-importer-execution-contract', '1');
+    importerScript.addEventListener('load', loadImporterAcademy, { once: true });
+    importerScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'importer-contract-error'; }, { once: true });
+    document.head.appendChild(importerScript);
+  }
+
+  if (window.Orbit && window.Orbit.sessionReadinessContractV20260720 && window.Orbit.sessionReadinessContractV20260720.version === '20260720.1') {
+    loadImporterContract();
     return;
   }
 
-  var importerScript = document.createElement('script');
-  importerScript.src = importerContract.pathname + importerContract.search;
-  importerScript.async = false;
-  importerScript.setAttribute('data-orbit-importer-execution-contract', '1');
-  importerScript.addEventListener('load', loadImporterAcademy, { once: true });
-  importerScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'importer-contract-error'; }, { once: true });
-  document.head.appendChild(importerScript);
+  var sessionScript = document.createElement('script');
+  sessionScript.src = sessionReadiness.pathname + sessionReadiness.search;
+  sessionScript.async = false;
+  sessionScript.setAttribute('data-orbit-session-readiness-contract', '1');
+  sessionScript.addEventListener('load', loadImporterContract, { once: true });
+  sessionScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'session-readiness-error'; }, { once: true });
+  document.head.appendChild(sessionScript);
 })();
-/* Preflight v7: contrato E2E legal y Academia cargados antes del Router. */
+/* Preflight v8: sesión legal, contrato E2E y Academia cargados antes del Router. */
