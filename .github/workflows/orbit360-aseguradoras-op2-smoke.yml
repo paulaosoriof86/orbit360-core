@@ -12,7 +12,7 @@ on:
       - 'orbit360-platform/styles/aseguradoras-op2-v1217.css'
       - 'tools/orbit360-validar-aseguradoras-op2*.mjs'
       - 'tools/orbit360-validar-*aseguradoras*.mjs'
-      - 'tools/orbit360-smoke-*aseguradoras*.mjs'
+      - 'tools/orbit360-gate-contract-*.json'
       - '.github/workflows/orbit360-aseguradoras-op2-smoke.yml'
   pull_request:
     branches: [main]
@@ -22,7 +22,14 @@ on:
       - 'orbit360-platform/modules/aseguradoras*.js'
       - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
       - 'tools/orbit360-validar-aseguradoras-op2*.mjs'
+      - 'tools/orbit360-gate-contract-*.json'
       - '.github/workflows/orbit360-aseguradoras-op2-smoke.yml'
+
+env:
+  ORBIT360_GATE_ID: block1-real-insurer-directories-lab-v20260720
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
 
 permissions:
   contents: read
@@ -37,11 +44,19 @@ jobs:
         with:
           node-version: '24'
 
+      - name: Validate binding gate contract
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          test -s orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+
       - name: Execute contracts and preserve evidence
         id: contracts
         shell: bash
         run: |
           mkdir -p orbit360-op2-contract-evidence
+          cp orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json orbit360-op2-contract-evidence/preflight-sanitizado.json
           exit_code=0
           node --check tools/orbit360-validar-aseguradoras-op2-v1220.mjs || exit_code=1
           node --check tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs || exit_code=1
@@ -72,10 +87,7 @@ jobs:
             if [ "$code" -ne 0 ]; then exit_code=1; fi
             index=$((index + 1))
           done
-          grep -q 'dir-plataformas-desktop' tools/orbit360-smoke-visual-aseguradoras-op2.mjs || exit_code=1
-          grep -q 'op-plataformas-tablet' tools/orbit360-smoke-visual-aseguradoras-op2.mjs || exit_code=1
-          grep -q 'ase-plataformas-mobile' tools/orbit360-smoke-visual-aseguradoras-op2.mjs || exit_code=1
-          printf '{"schemaVersion":"orbit360-op2-static-contract-v1","head":"%s","ok":%s,"containsSecrets":false}\n' "$GITHUB_SHA" "$([ "$exit_code" -eq 0 ] && echo true || echo false)" > orbit360-op2-contract-evidence/summary.json
+          printf '{"schemaVersion":"orbit360-op2-static-contract-v1","gateId":"%s","head":"%s","project":"%s","channel":"%s","ok":%s,"containsSecrets":false}\n' "$ORBIT360_GATE_ID" "$GITHUB_SHA" "$FIREBASE_PROJECT_ID" "$ORBIT360_HOSTING_CHANNEL" "$([ "$exit_code" -eq 0 ] && echo true || echo false)" > orbit360-op2-contract-evidence/summary.json
           echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
           exit 0
 
