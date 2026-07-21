@@ -40,7 +40,7 @@ function groupFor(id) {
   return 'technical';
 }
 
-const staleIds = new Set(['UI_REVIEW_NO_CAPTURE','UI_FAIL_CLOSED','ACADEMY_V1220']);
+const staleIds = new Set(['UI_REVIEW_NO_CAPTURE','UI_FAIL_CLOSED']);
 const allFailures = Array.isArray(payload.fail) ? payload.fail : [];
 const failures = allFailures.filter(item => !staleIds.has(String(item.id || '')) && groupFor(item.id) === group);
 const importUiPath = path.join(root, 'core', 'aseguradoras-op2-import-ui-guard.js');
@@ -53,9 +53,9 @@ if (group === 'import' || group === 'alias') {
   requireToken('CANONICAL_IMPORT_VALID_DIFF', importUi.includes('function validOps(result)') && importUi.includes("validationStatus === 'validado'") && importUi.includes('Dry-run y diff'), 'El diff debe separar registros validados y retenidos');
   requireToken('CANONICAL_IMPORT_CONTROLLED_WRITE', importUi.includes('Orbit.importaWriteP0.writeBatch') && importUi.includes('CONFIRMO ESCRITURA CONTROLADA') && importUi.includes('Number(write.written || 0) !== batch.operations.length'), 'La escritura debe usar el contrato canónico y validar conteo exacto');
   requireToken('CANONICAL_IMPORT_READBACK', importUi.includes('async function waitWritten') && importUi.includes('importBatchId') && importUi.includes('sourceHash') && importUi.includes('lectura_posterior_incompleta'), 'El cierre debe exigir lectura posterior trazable');
-  requireToken('CANONICAL_IMPORT_PROTECTED_CONFIRMATION', importUi.includes('eligibleProtectedCount(result)') && importUi.includes('applySecureOnly(result') && importUi.includes('confirmacion_protegida_incompleta'), 'Los accesos protegidos deben confirmarse antes del éxito');
+  requireToken('CANONICAL_IMPORT_PROTECTED_CONFIRMATION', importUi.includes('eligibleProtectedSummary(result)') && importUi.includes('eligibleProtectedCount(result)') && importUi.includes('applySecureOnly(result') && importUi.includes('confirmacion_protegida_incompleta'), 'Los accesos protegidos deben confirmarse antes del éxito');
   requireToken('CANONICAL_IMPORT_ROLLBACK', importUi.includes('Orbit.importaWriteP0.rollback') && importUi.includes('CONFIRMO ROLLBACK') && importUi.includes('rollbackApplied: true'), 'El directorio debe tener rollback automático y reforzado');
-  requireToken('CANONICAL_IMPORT_HONEST_BANK_GAP', importUi.includes('accountResourcesPending') && importUi.includes('Cuentas pendientes') && importUi.includes('accountProviderPending: true'), 'La falta de proveedor protegido para cuentas debe permanecer visible');
+  requireToken('CANONICAL_IMPORT_BANK_PROVIDER', importUi.includes('accountResourcesProtected') && importUi.includes('Cuentas protegidas') && importUi.includes('accountProviderPending: false') && importUi.includes('proveedor_cuentas_no_disponible'), 'Las cuentas deben usar proveedor protegido y bloquear el cierre si no está disponible');
 }
 
 const result = {

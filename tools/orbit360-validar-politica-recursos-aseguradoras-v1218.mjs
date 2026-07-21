@@ -46,7 +46,7 @@ check('PASSWORD_TEMPORARY',all(resources,['const transient = new Map()','15000',
 
 check('NON_DESTRUCTIVE_MIGRATION',all(closure,['function flagLegacySensitive','pendiente_migracion_segura_no_destructiva','rawPersisted:true','migrationPerformed:false','destructive:false']), 'Migración legacy no destructiva',files.closure);
 check('NO_PREMATURE_MIGRATION',!closure.includes("audit('migrar_recursos_sensibles_legacy'")&&!closure.includes('rawPersisted:false'),'No se declara migración antes de verificar',files.closure);
-check('ACADEMY_POLICY',all(academy,['Carga directa desde Orbit','Dry-run y diff antes de confirmar','Escritura controlada y lectura posterior','Cuentas bancarias con estado honesto','Defecto funcional o validador obsoleto','next._cv = 1221']), 'Academia enseña recursos, identidad exacta y copy operativo v1.220',files.academy);
+check('ACADEMY_POLICY',all(academy,['Carga directa desde Orbit','Dry-run y diff antes de confirmar','Escritura controlada y lectura posterior','Cuentas bancarias con estado honesto','Defecto funcional o validador obsoleto','next._cv = 1222']), 'Academia enseña recursos, identidad exacta y copy operativo v1.220',files.academy);
 check('RESPONSIVE_POLICY',all(style,['.asg218-bank','.asg218-platform','.asg218-credentials','@media(max-width:640px)']), 'Recursos operativos responsive',files.style);
 
 const refs = {

@@ -268,6 +268,8 @@
       };
       Orbit.secureImport.__bankAccountsWrappedV20260721 = true;
     }
+    Orbit.secureImport.supportsBankAccounts = true;
+    Orbit.secureImport.bankAccountProviderVersion = state.version;
     state.importProviderWrapped = true;
     Orbit.__insurerBankAccountProviderLabV20260721 = state;
     try { window.dispatchEvent(new CustomEvent('orbit:insurer-bank-provider-ready', { detail: { version: state.version, tenantId: TENANT_ID } })); } catch (error) {}

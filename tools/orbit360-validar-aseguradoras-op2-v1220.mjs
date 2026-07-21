@@ -93,7 +93,7 @@ check('NO_PREMATURE_MIGRATION', !src.closure.includes("audit('migrar_recursos_se
 check('DIRECT_ENTRY_GUARD', all(src.permission,["A.can('aseguradoras', action)",'startEdit && !allowed',"!allowed('create')","!allowed('create') && !allowed('manage_documents')"]), 'Entradas directas exigen permiso', files.permission);
 
 check('ACADEMY_SAME_IDS', all(src.academy,['cur_dir_aseg_dir_v1202','cur_dir_aseg_op_v1202','cur_dir_aseg_asesor_v1202','Orbit.store.update']), 'Academia actualiza cursos existentes', files.academy);
-check('ACADEMY_V1220', all(src.academy,['Cuarentena de hojas','Identidad exacta antes de actualizar','Mensajes operativos','next._cv = 1220']), 'Academia enseña contratos v1.220', files.academy);
+check('ACADEMY_V1222', all(src.academy,['Carga directa desde Orbit','Escritura controlada y lectura posterior','Cuentas bancarias con estado honesto','next._cv = 1222']), 'Academia enseña contratos v1.222', files.academy);
 check('ACADEMY_PROGRESS', all(src.academy,['next.progreso = previous.progreso','next.certificado = !!previous.certificado']), 'Progreso y certificado preservados', files.academy);
 check('ACADEMY_NO_DUPLICATE', !/Orbit\.store\.insert\('cursos'/.test(src.academy), 'Academia no duplica cursos', files.academy);
 check('RESPONSIVE', all(src.styles,['@media(max-width:900px)','@media(max-width:640px)','.asg218-bank','.asg218-platform','.asg218-credentials']), 'Responsive de recursos operativos', files.styles);

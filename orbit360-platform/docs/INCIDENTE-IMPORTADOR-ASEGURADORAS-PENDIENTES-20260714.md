@@ -74,3 +74,21 @@ Correcciones:
 5. Registro, overlay, workflow y documentación avanzan juntos a contrato 1.0.1.
 
 No se tocaron Firebase, secretos, datos LAB, reglas, producción ni el gate sintético cerrado.
+
+
+## Causa raíz definitiva · cuentas bancarias protegidas — 2026-07-21
+
+Clasificación: `SECURITY_FAILURE + DATA_CONTRACT_FAILURE + PIPELINE_MECHANISM_FAILURE`.
+
+La carga inicial conservó 91 números bancarios completos en la colección operativa de Aseguradoras. El parser ya los separaba como recursos protegidos, pero el flujo `applySecureOnly` filtraba únicamente credenciales de portales y no existía proveedor bancario conectado. El pipeline autorreparable dependía de un segundo workflow que GitHub no disparaba desde `GITHUB_TOKEN`.
+
+Corrección de raíz:
+
+- un solo gate ejecuta preflight, contratos, proveedor, migración, preview y navegador;
+- el mismo backend seguro admite credenciales y cuentas con referencias distintas;
+- la migración idempotente crea una nueva versión de bóveda, confirma lectura y sustituye texto plano mediante batch atómico;
+- el importador envía `credential` y `bank_account` en la misma confirmación protegida;
+- el owner bloquea el cierre si existen cuentas y el proveedor bancario no está disponible;
+- Academia y validadores distinguen fuente, escritura operativa y recurso protegido confirmado.
+
+No se reimportan aseguradoras para resolver esta falla. No se documentan ni publican valores reales. Clasificación Claude: `BACKEND_PROTEGIDO_NO_CLAUDE`; solo el patrón UX/metodológico se acumula como `REPLICABLE_CLAUDE_ACUMULADO`.

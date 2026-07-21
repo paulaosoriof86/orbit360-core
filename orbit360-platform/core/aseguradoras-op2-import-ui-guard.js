@@ -10,7 +10,7 @@
   if (Orbit.__aseguradorasOp2ImportUiGuardV1221) return;
   Orbit.__aseguradorasOp2ImportUiGuardV1221 = true;
 
-  var VERSION = '20260720.1';
+  var VERSION = '20260721.1';
   var TENANT = 'alianzas-soluciones';
   var PHRASE = 'CONFIRMO DIRECTORIO';
   var state = { result: null, rollback: [], done: null, busy: false };
@@ -45,14 +45,19 @@
     var all = [].concat(result && result.report && result.report._operations || []);
     return Math.max(0, all.length - validOps(result).length);
   }
-  function eligibleProtectedCount(result) {
+  function eligibleProtectedSummary(result) {
     var valid = validOps(result);
-    return [].concat(result && result.candidates || []).reduce(function (sum, candidate) {
+    return [].concat(result && result.candidates || []).reduce(function (summary, candidate) {
       var op = valid.find(function (item) { return clean(item && item.sourceSheet, 240) === clean(candidate && candidate.sourceSheet, 240); });
-      var count = Number(candidate && candidate.record && candidate.record.sensitiveImportStatus && candidate.record.sensitiveImportStatus.credentialsDetected || 0);
-      return sum + (op ? count : 0);
-    }, 0);
+      if (!op) return summary;
+      var sensitive = candidate && candidate.record && candidate.record.sensitiveImportStatus || {};
+      summary.credentials += Number(sensitive.credentialsDetected || 0);
+      summary.accounts += Number(sensitive.accountsDetected || 0);
+      summary.total = summary.credentials + summary.accounts;
+      return summary;
+    }, { credentials: 0, accounts: 0, total: 0 });
   }
+  function eligibleProtectedCount(result) { return eligibleProtectedSummary(result).total; }
   function allowCollection() {
     var W = Orbit.importaWriteP0;
     if (!W || !Array.isArray(W.ALLOWED_COLLECTIONS)) return false;
@@ -99,15 +104,17 @@
     state.busy = true; state.rollback = []; state.done = null;
     try {
       if (!ready() || !authorized() || !allowCollection()) return { ok: false, errors: ['contrato_no_disponible'] };
-      var uid = actorId(), batch = batchOf(result);
+      var uid = actorId(), batch = batchOf(result), eligibleSummary = eligibleProtectedSummary(result);
       if (!uid || !batch.operations.length) return { ok: false, errors: ['sin_operaciones_validadas'] };
+      if (eligibleSummary.accounts > 0 && !(Orbit.secureImport && Orbit.secureImport.supportsBankAccounts === true)) return { ok: false, errors: ['proveedor_cuentas_no_disponible'] };
       var write = Orbit.importaWriteP0.writeBatch(batch, { approved: true, phrase: 'CONFIRMO ESCRITURA CONTROLADA', userId: uid, reason: clean(reason, 500) });
       state.rollback = [].concat(write && write.rollback || []);
       if (!write || write.ok !== true || Number(write.written || 0) !== batch.operations.length || !(await waitWritten(write, batch))) {
         rollback('Reversión automática por escritura o lectura incompleta.');
         return { ok: false, errors: [].concat(write && write.errors || ['lectura_posterior_incompleta']), rollbackApplied: true };
       }
-      var protectedTotal = Number(result && result.report && result.report.sensitiveSummary && result.report.sensitiveSummary.credentials || 0);
+      var protectedSummary = result && result.report && result.report.sensitiveSummary || {};
+      var protectedTotal = Number(protectedSummary.credentials || 0) + Number(protectedSummary.accounts || 0);
       var protectedEligible = eligibleProtectedCount(result);
       var protectedResult = { ok: true, imported: 0, skipped: 0, mappings: [] };
       if (protectedEligible > 0) {
@@ -118,13 +125,17 @@
         }
         await refresh();
       }
+      var protectedMappings = [].concat(protectedResult && protectedResult.mappings || []);
+      var accountResourcesProtected = protectedMappings.filter(function (mapping) { return mapping && clean(mapping.accountRef, 80); }).length;
+      var credentialResourcesProtected = Math.max(0, Number(protectedResult.imported || 0) - accountResourcesProtected);
       state.done = {
         ok: true, batchId: batch.batchId, written: batch.operations.length,
         created: batch.operations.filter(function (op) { return op.action === 'insert'; }).length,
         updated: batch.operations.filter(function (op) { return op.action === 'update'; }).length,
         blocked: blockedCount(result), protectedImported: Number(protectedResult.imported || 0),
+        credentialResourcesProtected: credentialResourcesProtected,
+        accountResourcesProtected: accountResourcesProtected,
         protectedSkipped: Math.max(0, protectedTotal - protectedEligible),
-        accountResourcesPending: Number(result && result.report && result.report.sensitiveSummary && result.report.sensitiveSummary.accounts || 0),
         rollbackAvailable: state.rollback.length > 0, containsProtectedValues: false
       };
       return clone(state.done);
@@ -145,7 +156,7 @@
   function paint() {
     var root = document.getElementById('ins-dir-execution-20260720'); if (!root) return;
     var result = state.result, done = state.done, totals = result && result.report && result.report.totals || {}, protectedSummary = result && result.report && result.report.sensitiveSummary || {};
-    var body = !result ? '<div class="cfg-note">Guatemala y Colombia se cargan como fuentes separadas. Selecciona el país correspondiente al archivo.</div><div class="cgrid" style="margin-top:12px"><label class="ce-l">País *<select id="dir-country-20260720" class="o-sel"><option value="">— Seleccionar —</option><option value="GT">Guatemala · GTQ</option><option value="CO">Colombia · COP</option></select></label><label class="ce-l">Archivo Excel *<input id="dir-file-20260720" type="file" accept=".xlsx,.xls" class="o-sel"></label></div><div id="dir-status-20260720" class="muted" style="margin-top:12px">No se ha aplicado ningún cambio.</div>' : done ? '<div class="cfg-note"><b>Carga verificada.</b> El directorio fue escrito y leído nuevamente; los accesos confirmados quedaron disponibles mediante referencia protegida.</div><div class="asg197-info-grid" style="margin-top:12px"><div><small>Creadas</small><b>' + done.created + '</b></div><div><small>Actualizadas</small><b>' + done.updated + '</b></div><div><small>Retenidas</small><b>' + done.blocked + '</b></div><div><small>Accesos confirmados</small><b>' + done.protectedImported + '</b></div><div><small>Cuentas pendientes</small><b>' + done.accountResourcesPending + '</b></div></div>' : '<div class="cfg-note"><b>Dry-run y diff:</b> revisa qué hojas se actualizarán, crearán o quedarán retenidas. Ningún cambio se aplica hasta confirmar.</div><div class="asg197-info-grid" style="margin-top:12px"><div><small>Operaciones</small><b>' + Number(totals.operations || 0) + '</b></div><div><small>Crear</small><b>' + Number(totals.insert || 0) + '</b></div><div><small>Actualizar</small><b>' + Number(totals.update || 0) + '</b></div><div><small>Retenidas</small><b>' + Number(totals.blocked || 0) + '</b></div><div><small>Accesos detectados</small><b>' + Number(protectedSummary.credentials || 0) + '</b></div><div><small>Cuentas protegidas</small><b>' + Number(protectedSummary.accounts || 0) + '</b></div></div><div style="overflow:auto;margin-top:12px"><table class="tbl"><thead><tr><th>Hoja</th><th>País</th><th>Acción</th><th class="num">Contactos</th><th class="num">Portales</th><th class="num">Bancos</th><th>Estado</th></tr></thead><tbody>' + rowsHtml(result) + '</tbody></table></div>';
+    var body = !result ? '<div class="cfg-note">Guatemala y Colombia se cargan como fuentes separadas. Selecciona el país correspondiente al archivo.</div><div class="cgrid" style="margin-top:12px"><label class="ce-l">País *<select id="dir-country-20260720" class="o-sel"><option value="">— Seleccionar —</option><option value="GT">Guatemala · GTQ</option><option value="CO">Colombia · COP</option></select></label><label class="ce-l">Archivo Excel *<input id="dir-file-20260720" type="file" accept=".xlsx,.xls" class="o-sel"></label></div><div id="dir-status-20260720" class="muted" style="margin-top:12px">No se ha aplicado ningún cambio.</div>' : done ? '<div class="cfg-note"><b>Carga verificada.</b> El directorio fue escrito y leído nuevamente; los accesos confirmados quedaron disponibles mediante referencia protegida.</div><div class="asg197-info-grid" style="margin-top:12px"><div><small>Creadas</small><b>' + done.created + '</b></div><div><small>Actualizadas</small><b>' + done.updated + '</b></div><div><small>Retenidas</small><b>' + done.blocked + '</b></div><div><small>Accesos protegidos</small><b>' + done.credentialResourcesProtected + '</b></div><div><small>Cuentas protegidas</small><b>' + done.accountResourcesProtected + '</b></div></div>' : '<div class="cfg-note"><b>Dry-run y diff:</b> revisa qué hojas se actualizarán, crearán o quedarán retenidas. Ningún cambio se aplica hasta confirmar.</div><div class="asg197-info-grid" style="margin-top:12px"><div><small>Operaciones</small><b>' + Number(totals.operations || 0) + '</b></div><div><small>Crear</small><b>' + Number(totals.insert || 0) + '</b></div><div><small>Actualizar</small><b>' + Number(totals.update || 0) + '</b></div><div><small>Retenidas</small><b>' + Number(totals.blocked || 0) + '</b></div><div><small>Accesos detectados</small><b>' + Number(protectedSummary.credentials || 0) + '</b></div><div><small>Cuentas protegidas</small><b>' + Number(protectedSummary.accounts || 0) + '</b></div></div><div style="overflow:auto;margin-top:12px"><table class="tbl"><thead><tr><th>Hoja</th><th>País</th><th>Acción</th><th class="num">Contactos</th><th class="num">Portales</th><th class="num">Bancos</th><th>Estado</th></tr></thead><tbody>' + rowsHtml(result) + '</tbody></table></div>';
     root.innerHTML = '<div class="card" style="width:min(1080px,97vw);max-height:94vh;display:flex;flex-direction:column;padding:0"><div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between"><div><small style="color:rgba(255,255,255,.65)">Importación directa · fuente separada</small><b style="display:block;color:#fff;font-family:var(--f-display);font-size:18px">Directorio de aseguradoras</b></div><button class="imp-x" data-close>✕</button></div><div style="padding:18px 20px;overflow:auto;flex:1">' + body + '</div><div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">' + (result && !done ? '<button class="btn ghost" data-reset>Elegir otro archivo</button><button class="btn primary" data-apply>Confirmar registros validados</button>' : '') + (done ? '<button class="btn ghost" data-view>Revisar aseguradoras</button><button class="btn secondary" data-rollback>Rollback del directorio</button>' : '') + '<button class="btn ghost" data-close>Cerrar</button></div></div>';
     root.querySelectorAll('[data-close]').forEach(function (button) { button.onclick = close; });
     var file = root.querySelector('#dir-file-20260720');
@@ -172,7 +183,7 @@
       apply.disabled = true; apply.textContent = 'Aplicando y verificando…';
       var out = await execute(state.result, reason);
       if (!out.ok) { apply.disabled = false; apply.textContent = 'Confirmar registros validados'; return toast('La carga no se cerró: ' + [].concat(out.errors || ['revisión requerida']).join(', ')); }
-      paint(); toast(out.written + ' aseguradora(s) confirmadas · ' + out.protectedImported + ' acceso(s) disponibles.');
+      paint(); toast(out.written + ' aseguradora(s) confirmadas · ' + out.protectedImported + ' recurso(s) protegidos disponibles.');
     };
   }
   function open() {
@@ -186,6 +197,6 @@
     if (D.open && D.open.__canonicalDirectoryExecution20260720) return true;
     open.__canonicalDirectoryExecution20260720 = true; D.open = open; D.executeCanonical = execute; D.rollbackCanonicalDirectory = rollback; D.canonicalExecutionVersion = VERSION; D.__op2ImportUiGuardV1217 = { version: VERSION, canonicalOwner: true, singleFileRead: true, controlledWrite: true }; return true;
   }
-  Orbit.__insurerDirectoryExecution20260720 = { version: VERSION, install: install, execute: execute, rollback: rollback, directExcelUpload: true, controlledWrite: true, readAfterWrite: true, protectedConfirmation: true, directoryRollback: true, accountProviderPending: true };
+  Orbit.__insurerDirectoryExecution20260720 = { version: VERSION, install: install, execute: execute, rollback: rollback, directExcelUpload: true, controlledWrite: true, readAfterWrite: true, protectedConfirmation: true, directoryRollback: true, accountProviderPending: false };
   var attempts = 0, timer = setInterval(function () { attempts += 1; if (install() || attempts > 120) clearInterval(timer); }, 250); setTimeout(install, 0);
 })();

@@ -525,7 +525,7 @@ Orbit.insurerDirectoryImport = (function () {
     const alerts = [].concat(op && op.data && op.data.validacionAlertas || []);
     return alerts.some(alert => /entidad_no_es_aseguradora_directa|duplicado_dentro_del_archivo/.test(clean(alert)));
   }).map(op => op && op.sourceSheet).filter(Boolean));
-  return [].concat(sourceItems || []).filter(item => item && item.type === 'credential' && !blockedSheets.has(item.insurerSheet));
+  return [].concat(sourceItems || []).filter(item => item && ['credential','bank_account'].includes(item.type) && !blockedSheets.has(item.insurerSheet));
 }
 function secureProviderReady() {
   return !!(Orbit.secureImport && typeof Orbit.secureImport.importInsurerDirectory === 'function');
@@ -577,7 +577,7 @@ applySecureOnly.__secureOnlyProviderGateV20260720 = true;
     const rows = (r.sheetSummary || []).map(s => `<tr><td>${esc(s.sheet)}</td><td>${esc(s.country)}</td><td>${s.entityType === 'insurer' ? 'Aseguradora' : '<span class="badge warn">Validar entidad</span>'}</td><td class="num">${s.contacts}</td><td class="num">${s.platforms}</td><td class="num">${s.accounts}</td><td>${s.alerts.length ? `<span class="badge ${s.alerts.some(a => /nombre_hoja|entidad_no|duplicado/.test(a)) ? 'danger' : 'warn'}">${s.alerts.length} aviso(s)</span>` : '<span class="badge ok">Lista</span>'}</td></tr>`).join('');
     return `<div class="cfg-note" style="margin-bottom:12px"><b>Fuente separada:</b> Directorio de aseguradoras. Puede crear/actualizar únicamente Aseguradoras y sus recursos operativos. No crea clientes, pólizas, cobros, cartera, finanzas, usuarios ni permisos.</div>
       <div class="asg197-info-grid"><div><small>Operaciones</small><b>${t.operations || 0}</b></div><div><small>Crear</small><b>${t.insert || 0}</b></div><div><small>Actualizar</small><b>${t.update || 0}</b></div><div><small>Bloqueadas</small><b style="color:${t.blocked ? 'var(--danger)' : 'var(--ok)'}">${t.blocked || 0}</b></div><div><small>Credenciales detectadas</small><b>${r.sensitiveSummary.credentials}</b></div><div><small>Cuentas detectadas</small><b>${r.sensitiveSummary.accounts}</b></div></div>
-      <div class="cfg-note" style="margin:12px 0">Usuarios, contraseñas y números completos <b>no se muestran ni se escriben en Orbit.store</b>. Quedan como <code>credentialRef/accountRef = backend_required</code> hasta que el proveedor seguro esté conectado.</div>
+      <div class="cfg-note" style="margin:12px 0">Usuarios, contraseñas y números completos <b>no se muestran ni se escriben en Orbit.store</b>. Se envían al proveedor protegido al confirmar; la ficha conserva únicamente referencias opacas y datos enmascarados.</div>
       <div style="overflow:auto"><table class="tbl"><thead><tr><th>Hoja</th><th>País</th><th>Entidad</th><th class="num">Contactos</th><th class="num">Plataformas</th><th class="num">Bancos/pagos</th><th>Estado</th></tr></thead><tbody>${rows}</tbody></table></div>
       ${(result.excluded || []).length ? `<div class="muted" style="font-size:12px;margin-top:10px">Hojas excluidas: ${result.excluded.map(x => esc(x.sheet)).join(' · ')}</div>` : ''}`;
   }
@@ -586,7 +586,7 @@ applySecureOnly.__secureOnlyProviderGateV20260720 = true;
     const result = uiState.result;
     back.innerHTML = `<div class="card" style="width:min(980px,97vw);max-height:94vh;display:flex;flex-direction:column;padding:0"><div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;gap:12px"><div><small style="color:rgba(255,255,255,.65)">Importación inteligente · fuente separada</small><b style="display:block;color:#fff;font-family:var(--f-display);font-size:18px">Directorio de aseguradoras</b></div><button class="imp-x" data-close style="color:#fff">✕</button></div><div style="padding:18px 20px;overflow:auto;flex:1">
       ${!result ? `<div class="cfg-note" style="margin-bottom:13px">Selecciona el país que corresponde al archivo. No se infiere silenciosamente porque GT y CO tienen monedas, catálogos y estructuras distintas.</div><div class="cgrid"><label class="ce-l">País del directorio *<select id="idir-country" class="o-sel"><option value="">— Seleccionar —</option><option value="GT">Guatemala · GTQ</option><option value="CO">Colombia · COP</option></select></label><label class="ce-l">Archivo Excel *<input id="idir-file" type="file" accept=".xlsx,.xls" class="o-sel"></label></div><div id="idir-status" class="muted" style="margin-top:13px">El archivo se procesa en el navegador. No se sube al repositorio.</div>` : reportHtml(result)}
-      </div><div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">${result ? '<button class="btn ghost" data-reset>Elegir otro archivo</button>' : ''}${result && (result.report.totals.operations - result.report.totals.blocked) > 0 ? `<button class="btn primary" data-approve>Importar ${result.report.totals.operations - result.report.totals.blocked} registro(s) validados</button>` : ''}${result && result.securePayloadCount > 0 ? '<button class="btn primary" data-secure-only>Guardar únicamente accesos seguros</button>' : ''}<button class="btn ghost" data-close>Cerrar</button></div></div>`;
+      </div><div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">${result ? '<button class="btn ghost" data-reset>Elegir otro archivo</button>' : ''}${result && (result.report.totals.operations - result.report.totals.blocked) > 0 ? `<button class="btn primary" data-approve>Importar ${result.report.totals.operations - result.report.totals.blocked} registro(s) validados</button>` : ''}${result && result.securePayloadCount > 0 ? '<button class="btn primary" data-secure-only>Guardar únicamente recursos protegidos</button>' : ''}<button class="btn ghost" data-close>Cerrar</button></div></div>`;
     back.querySelectorAll('[data-close]').forEach(x => x.onclick = close);
     const reset = back.querySelector('[data-reset]'); if (reset) reset.onclick = () => { if (uiState.result && uiState.result.report) secureSession.delete(uiState.result.report.reportId); uiState.result = null; paint(); };
     const file = back.querySelector('#idir-file');
@@ -601,20 +601,20 @@ applySecureOnly.__secureOnlyProviderGateV20260720 = true;
     };
     const secureOnly = back.querySelector('[data-secure-only]');
     if (secureOnly) secureOnly.onclick = async () => {
-      const reason = clean(await U().prompt('Motivo de la carga segura de accesos:', { title: 'Confirmar accesos seguros' }));
+      const reason = clean(await U().prompt('Motivo de la carga segura de recursos:', { title: 'Confirmar accesos seguros' }));
       if (!reason) return;
       const phrase = clean(await U().prompt('Escribe exactamente: ' + CONFIRM_PHRASE, { title: 'Confirmación reforzada' }));
       secureOnly.disabled = true;
-      secureOnly.textContent = 'Guardando accesos de forma segura…';
+      secureOnly.textContent = 'Guardando recursos de forma segura…';
       const applied = await applySecureOnly(result, { approved: true, phrase, reason });
       if (!applied.ok) {
         secureOnly.disabled = false;
-        secureOnly.textContent = 'Guardar únicamente accesos seguros';
+        secureOnly.textContent = 'Guardar únicamente recursos protegidos';
         return toast('No se aplicó: ' + (applied.errors || []).join(', '));
       }
       const done = uiState && uiState.options && uiState.options.onDone;
       close();
-      toast(applied.imported + ' acceso(s) guardados de forma segura' + (applied.skipped ? ' · ' + applied.skipped + ' pendiente(s) de validación' : '') + '. No se modificó el directorio.');
+      toast(applied.imported + ' recurso(s) guardados de forma segura' + (applied.skipped ? ' · ' + applied.skipped + ' pendiente(s) de validación' : '') + '. No se modificó el directorio.');
       if (done) done(applied);
       else if (Orbit.modules && Orbit.modules.aseguradoras && Orbit.modules.aseguradoras.render) Orbit.modules.aseguradoras.render(document.getElementById('host'));
     };
