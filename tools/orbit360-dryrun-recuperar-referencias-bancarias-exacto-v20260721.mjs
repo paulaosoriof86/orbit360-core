@@ -20,13 +20,16 @@ const EXPECTED = Object.freeze({
   clients: 414,
   insurers: 26,
   advisors: 7,
+  bankRows: 93,
   currentValid: 23,
   currentPending: 70,
   vaultRows: 91,
   restore: 68,
-  removeDuplicates: 2,
+  newPending: 2,
+  removeDuplicates: 0,
   affectedGtDocuments: 13,
-  finalValid: 91
+  finalValid: 91,
+  finalPending: 2
 });
 
 const clean = (value, max = 240) => String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
@@ -60,12 +63,23 @@ function readManifest() {
   const full = path.resolve(MANIFEST_REL);
   if (!fs.existsSync(full)) fail('RECOVERY_MANIFEST_REQUIRED', MANIFEST_REL);
   const manifest = JSON.parse(fs.readFileSync(full, 'utf8'));
-  if (manifest.schemaVersion !== 'orbit360-bank-reference-recovery-map-v2-sanitized') fail('RECOVERY_MANIFEST_SCHEMA_MISMATCH');
+  if (manifest.schemaVersion !== 'orbit360-bank-reference-recovery-map-v3-sanitized') fail('RECOVERY_MANIFEST_SCHEMA_MISMATCH');
   if (manifest.mode !== 'STATIC_CONFIRMED_NO_WRITE' || manifest.evidenceClassification !== 'CONFIRMED') fail('RECOVERY_MANIFEST_NOT_CONFIRMED');
   if (!manifest.safety || manifest.safety.containsPII !== false || manifest.safety.containsSecrets !== false || manifest.safety.containsRawBankValues !== false || manifest.safety.colombiaTouched !== false) fail('RECOVERY_MANIFEST_SAFETY_MISMATCH');
+  if (manifest.safety.createsRows !== false || manifest.safety.deletesRows !== false || manifest.safety.reordersRows !== false) fail('RECOVERY_MANIFEST_ROW_MUTATION_MISMATCH');
   if (!Array.isArray(manifest.recoveryMappings) || manifest.recoveryMappings.length !== EXPECTED.restore) fail('RECOVERY_MAPPING_COUNT_MISMATCH');
+  if (!Array.isArray(manifest.newPendingRows) || manifest.newPendingRows.length !== EXPECTED.newPending) fail('RECOVERY_NEW_PENDING_COUNT_MISMATCH');
   if (!Array.isArray(manifest.duplicateIncomingRows) || manifest.duplicateIncomingRows.length !== EXPECTED.removeDuplicates) fail('RECOVERY_DUPLICATE_COUNT_MISMATCH');
   if (Number(manifest.summary && manifest.summary.ambiguousRows) !== 0 || Number(manifest.summary && manifest.summary.unmappedRows) !== 0) fail('RECOVERY_MANIFEST_NOT_EXACT');
+  if (Number(manifest.summary && manifest.summary.expectedFinalBankRows) !== EXPECTED.bankRows ||
+      Number(manifest.summary && manifest.summary.expectedFinalValidReferences) !== EXPECTED.finalValid ||
+      Number(manifest.summary && manifest.summary.expectedFinalPendingRows) !== EXPECTED.finalPending ||
+      Number(manifest.summary && manifest.summary.expectedFinalDuplicateRows) !== 0) fail('RECOVERY_MANIFEST_FINAL_STATE_MISMATCH');
+  const identity = manifest.identityContract || {};
+  if (Number(identity.historicalReferenceRestorations) !== EXPECTED.restore ||
+      Number(identity.newPendingRowsPreserved) !== EXPECTED.newPending ||
+      Number(identity.duplicateRemovals) !== EXPECTED.removeDuplicates ||
+      identity.newPendingRowsMeaning !== 'new_relative_to_healthy_checkpoint_not_historical_duplicates') fail('RECOVERY_IDENTITY_CONTRACT_NOT_CONFIRMED');
   const trace = manifest.traceContract || {};
   const traceValid = trace.classification === 'DATA_CONTRACT_FAILURE' &&
     trace.rootCause === 'xlsx_blankrows_false_converted_physical_rows_to_nonblank_ordinals' &&
@@ -108,6 +122,7 @@ function publicAccount(row) {
 
 async function main() {
   const manifest = readManifest();
+  const manifestIdentityContractValidated = true;
   const manifestTraceContractValidated = true;
   const traceIsAuditMetadata = true;
   const recoveryScopeChangesTraceFields = false;
@@ -122,6 +137,7 @@ async function main() {
 
   const docs = new Map();
   const countryHashesBefore = { GT: [], CO: [], OTHER: [] };
+  let currentBankRows = 0;
   let currentValid = 0;
   let currentPending = 0;
   let rawProtectedValues = 0;
@@ -131,6 +147,7 @@ async function main() {
     const country = clean(data.pais || data.country, 12).toUpperCase() || 'OTHER';
     const accounts = [].concat(data.cuentas || []).map((row, index) => {
       const ref = refOf(row);
+      currentBankRows += 1;
       if (REF_RE.test(ref)) currentValid += 1;
       if (ref === 'backend_required') currentPending += 1;
       if (clean(row && (row.numero || row.accountNumber), 320)) rawProtectedValues += 1;
@@ -151,7 +168,7 @@ async function main() {
 
   const proposalsByInsurer = new Map();
   const restoreProposals = [];
-  const duplicateProposals = [];
+  const newPendingEvidence = [];
   const consumedCurrent = new Set();
   const consumedLegacy = new Set();
 
@@ -173,7 +190,7 @@ async function main() {
     if (consumedCurrent.has(currentKey) || consumedLegacy.has(legacyKey)) fail('RECOVERY_MAPPING_DUPLICATE', hash(currentKey));
     consumedCurrent.add(currentKey);
     consumedLegacy.add(legacyKey);
-    if (!proposalsByInsurer.has(insurerId)) proposalsByInsurer.set(insurerId, { restores: [], duplicates: [] });
+    if (!proposalsByInsurer.has(insurerId)) proposalsByInsurer.set(insurerId, { restores: [] });
     proposalsByInsurer.get(insurerId).restores.push({ accountIndex: account.index, currentAccountId, legacyAccountId, ref: vaultRow.ref });
     restoreProposals.push({
       insurerId,
@@ -191,48 +208,66 @@ async function main() {
     });
   }
 
-  for (const row of manifest.duplicateIncomingRows) {
-    const [insurerId, incomingAccountId, preservedLegacyAccountId, sourceSheet, storedTraceRow, incomingIdHash, legacyIdHash, resolution] = row;
+  const newPendingIds = new Set();
+  const newPendingFingerprints = new Set();
+  for (const row of manifest.newPendingRows) {
+    const [insurerId, currentAccountId, sourceSheet, storedTraceRow, currentIdHash, evidenceStatus, resolution] = row;
     const doc = docs.get(insurerId);
-    if (!doc) fail('DUPLICATE_INSURER_NOT_FOUND', hash(insurerId));
-    if (doc.country !== 'GT') fail('DUPLICATE_OUTSIDE_GT', `${hash(insurerId)}:${doc.country}`);
-    const incomingMatches = doc.accounts.filter((account) => account.id === incomingAccountId);
-    const preservedMatches = doc.accounts.filter((account) => account.id === preservedLegacyAccountId);
-    if (incomingMatches.length !== 1 || preservedMatches.length !== 1) fail('DUPLICATE_PAIR_NOT_UNIQUE', hash(`${insurerId}|${incomingAccountId}`));
-    const incoming = incomingMatches[0];
-    const preserved = preservedMatches[0];
-    if (incoming.ref !== 'backend_required' || !REF_RE.test(preserved.ref)) fail('DUPLICATE_PAIR_STATE_MISMATCH', hash(`${insurerId}|${incomingAccountId}`));
-    if (hash(incomingAccountId) !== incomingIdHash || hash(preservedLegacyAccountId) !== legacyIdHash) fail('DUPLICATE_ID_HASH_MISMATCH', hash(incomingAccountId));
-    if (fingerprint(incoming.original) !== fingerprint(preserved.original)) fail('DUPLICATE_FINGERPRINT_MISMATCH', hash(incomingAccountId));
-    if (resolution !== 'remove_incoming_duplicate_preserve_existing_valid_reference') fail('DUPLICATE_RESOLUTION_MISMATCH');
-    if (!proposalsByInsurer.has(insurerId)) proposalsByInsurer.set(insurerId, { restores: [], duplicates: [] });
-    proposalsByInsurer.get(insurerId).duplicates.push({ incomingIndex: incoming.index, incomingAccountId, preservedLegacyAccountId });
-    duplicateProposals.push({
+    if (!doc) fail('NEW_PENDING_INSURER_NOT_FOUND', hash(insurerId));
+    if (doc.country !== 'GT') fail('NEW_PENDING_OUTSIDE_GT', `${hash(insurerId)}:${doc.country}`);
+    const matches = doc.accounts.filter((account) => account.id === currentAccountId);
+    if (matches.length !== 1) fail('NEW_PENDING_ACCOUNT_ID_NOT_UNIQUE', `${hash(insurerId)}:${hash(currentAccountId)}`);
+    const account = matches[0];
+    if (account.ref !== 'backend_required') fail('NEW_PENDING_ACCOUNT_NOT_PENDING', `${hash(insurerId)}:${hash(currentAccountId)}`);
+    if (hash(currentAccountId) !== currentIdHash) fail('NEW_PENDING_ID_HASH_MISMATCH', hash(currentAccountId));
+    if (evidenceStatus !== 'CONFIRMED_NEW_RELATIVE_TO_HEALTHY_CHECKPOINT' ||
+        resolution !== 'preserve_backend_required_for_separate_secure_onboarding') fail('NEW_PENDING_RESOLUTION_MISMATCH', hash(currentAccountId));
+    const currentKey = `${insurerId}|${currentAccountId}`;
+    if (consumedCurrent.has(currentKey) || newPendingIds.has(currentKey)) fail('NEW_PENDING_OVERLAPS_RECOVERY', hash(currentKey));
+    if (vaultByLegacy.has(currentKey)) fail('NEW_PENDING_DIRECT_VAULT_ID_COLLISION', hash(currentKey));
+    const accountFingerprint = fingerprint(account.original);
+    if (!accountFingerprint || accountFingerprint === '|||') fail('NEW_PENDING_FINGERPRINT_EMPTY', hash(currentAccountId));
+    const otherFingerprints = doc.accounts
+      .filter((candidate) => candidate.id !== currentAccountId)
+      .map((candidate) => fingerprint(candidate.original))
+      .filter((value) => value && value !== '|||');
+    if (otherFingerprints.includes(accountFingerprint)) fail('NEW_PENDING_NOT_DISTINCT', hash(currentAccountId));
+    if (newPendingFingerprints.has(accountFingerprint)) fail('NEW_PENDING_ROWS_DUPLICATE_EACH_OTHER', hash(currentAccountId));
+    newPendingFingerprints.add(accountFingerprint);
+    newPendingIds.add(currentKey);
+    newPendingEvidence.push({
       insurerId,
-      incomingAccountId,
-      preservedLegacyAccountId,
+      currentAccountId,
       sourceSheet,
       storedTraceRow: Number(storedTraceRow),
-      traceIsAuditMetadata: true,
-      incomingIdHash,
-      legacyIdHash,
-      operation: resolution,
+      currentIdHash,
+      evidenceStatus,
+      resolution,
+      beforeState: 'backend_required',
+      afterState: 'backend_required',
+      operation: 'preserve_new_pending_row_unchanged',
+      distinctFingerprintConfirmed: true,
       containsPII: false,
       containsSecrets: false
     });
   }
 
   const affectedDocuments = [];
+  let simulatedBankRows = 0;
   let simulatedValid = 0;
   let simulatedPending = 0;
   let simulatedDuplicates = 0;
+  let creates = 0;
+  let deletes = 0;
+  let reorderChanges = 0;
   let nonReferenceFieldChanges = 0;
   let colombiaDocumentChanges = 0;
   const countryHashesAfter = { GT: [], CO: [], OTHER: [] };
 
   docs.forEach((doc, insurerId) => {
     const beforeAccounts = [].concat(doc.data.cuentas || []).map(clone);
-    let afterAccounts = beforeAccounts.map(clone);
+    const afterAccounts = beforeAccounts.map(clone);
+    const beforeOrder = beforeAccounts.map((account, index) => idOf(account, index));
     const plan = proposalsByInsurer.get(insurerId);
     if (plan) {
       for (const restore of plan.restores) {
@@ -244,13 +279,12 @@ async function main() {
         afterAccounts[restore.accountIndex] = after;
         if (digest(publicAccount(before)) !== digest(publicAccount(after))) nonReferenceFieldChanges += 1;
       }
-      const duplicateIds = new Set(plan.duplicates.map((duplicate) => duplicate.incomingAccountId));
-      afterAccounts = afterAccounts.filter((account, index) => !duplicateIds.has(idOf(account, index)));
       affectedDocuments.push({
         insurerId,
         country: doc.country,
         restores: plan.restores.length,
-        duplicateRemovals: plan.duplicates.length,
+        newPendingRowsPreserved: newPendingEvidence.filter((row) => row.insurerId === insurerId).length,
+        duplicateRemovals: 0,
         accountsBefore: beforeAccounts.length,
         accountsAfter: afterAccounts.length,
         beforeDocumentHash: digest(doc.data),
@@ -263,7 +297,13 @@ async function main() {
       });
     }
 
+    creates += Math.max(0, afterAccounts.length - beforeAccounts.length);
+    deletes += Math.max(0, beforeAccounts.length - afterAccounts.length);
+    const afterOrder = afterAccounts.map((account, index) => idOf(account, index));
+    if (digest(beforeOrder) !== digest(afterOrder)) reorderChanges += 1;
+
     afterAccounts.forEach((account) => {
+      simulatedBankRows += 1;
       const ref = refOf(account);
       if (REF_RE.test(ref)) simulatedValid += 1;
       if (ref === 'backend_required') simulatedPending += 1;
@@ -277,26 +317,41 @@ async function main() {
   });
   Object.values(countryHashesAfter).forEach((rows) => rows.sort((left, right) => left[0].localeCompare(right[0])));
 
+  const newPendingRowsPreserved = newPendingEvidence.every((item) => {
+    const doc = docs.get(item.insurerId);
+    const account = doc && doc.accounts.find((candidate) => candidate.id === item.currentAccountId);
+    return account && account.ref === 'backend_required';
+  });
+
   const checks = {
     clientsPreserved: clientSnapshot.size === EXPECTED.clients,
     insurersPreserved: insurerSnapshot.size === EXPECTED.insurers,
     advisorsPreserved: advisorSnapshot.size === EXPECTED.advisors,
+    bankRowsBeforeExpected: currentBankRows === EXPECTED.bankRows,
     currentStateExpected: currentValid === EXPECTED.currentValid && currentPending === EXPECTED.currentPending,
     vaultRowsPreserved: vault.rows.length === EXPECTED.vaultRows,
     vaultValuesPresent: vault.rows.filter((row) => row.valuePresent).length === EXPECTED.vaultRows,
     rawProtectedValuesAbsent: rawProtectedValues === 0,
+    manifestIdentityContractValidated,
     manifestTraceContractValidated,
     traceIsAuditMetadata,
     recoveryScopeChangesTraceFields: recoveryScopeChangesTraceFields === false,
     restoreProposalsExact: restoreProposals.length === EXPECTED.restore,
-    duplicateRemovalsExact: duplicateProposals.length === EXPECTED.removeDuplicates,
-    allPendingRowsAccounted: consumedCurrent.size + duplicateProposals.length === EXPECTED.currentPending,
+    newPendingRowsExact: newPendingEvidence.length === EXPECTED.newPending,
+    newPendingRowsDistinct: newPendingEvidence.every((row) => row.distinctFingerprintConfirmed === true),
+    newPendingRowsPreserved,
+    duplicateRemovalsZero: EXPECTED.removeDuplicates === 0,
+    allPendingRowsAccounted: consumedCurrent.size + newPendingIds.size === EXPECTED.currentPending,
     affectedGtDocumentsExact: affectedDocuments.length === EXPECTED.affectedGtDocuments && affectedDocuments.every((doc) => doc.country === 'GT'),
+    noCreates: creates === 0,
+    noDeletes: deletes === 0,
+    noReorder: reorderChanges === 0,
     noNonReferenceFieldChanges: nonReferenceFieldChanges === 0,
     traceFieldsUntouched: affectedDocuments.every((doc) => doc.traceFieldsChanged === false),
     colombiaUntouched: colombiaDocumentChanges === 0 && digest(countryHashesBefore.CO) === digest(countryHashesAfter.CO),
+    finalBankRowsExact: simulatedBankRows === EXPECTED.bankRows,
     finalValidReferencesExact: simulatedValid === EXPECTED.finalValid,
-    finalPendingReferencesZero: simulatedPending === 0,
+    finalPendingReferencesExact: simulatedPending === EXPECTED.finalPending,
     finalDuplicateFingerprintsZero: simulatedDuplicates === 0,
     manifestHashCoverageExact: manifest.validation && manifest.validation.hashSetDifference === 0,
     writesExecuted: false,
@@ -306,7 +361,7 @@ async function main() {
 
   const ok = Object.values(checks).every(Boolean);
   const report = {
-    schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v2-trace-audit-only',
+    schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v3-68-restores-2-new-pending',
     generatedAt: new Date().toISOString(),
     projectId: PROJECT,
     tenantId: TENANT,
@@ -322,12 +377,14 @@ async function main() {
       manifestPath: MANIFEST_REL,
       manifestHash: digest(manifest),
       vaultUpdatedAtHash: hash(vault.updatedAt, 16),
+      identityContract: '68_historical_restores_2_new_pending_0_removals',
       traceContract: 'audit_metadata_not_identity_key'
     },
     before: {
       clients: clientSnapshot.size,
       insurers: insurerSnapshot.size,
       advisors: advisorSnapshot.size,
+      bankRows: currentBankRows,
       validReferences: currentValid,
       pendingReferences: currentPending,
       vaultRows: vault.rows.length,
@@ -335,23 +392,28 @@ async function main() {
     },
     proposal: {
       restores: restoreProposals.length,
-      duplicateRemovals: duplicateProposals.length,
+      newPendingRowsPreserved: newPendingEvidence.length,
+      duplicateRemovals: 0,
+      creates,
+      deletes,
+      reorderChanges,
       affectedDocuments: affectedDocuments.length,
       nonReferenceFieldChanges,
       traceFieldChanges: 0,
       colombiaDocumentChanges
     },
     simulatedAfter: {
+      bankRows: simulatedBankRows,
       validReferences: simulatedValid,
       pendingReferences: simulatedPending,
       duplicateFingerprints: simulatedDuplicates
     },
     checks,
     restoreProposals,
-    duplicateProposals,
+    newPendingEvidence,
     affectedDocuments,
     authorizationRequiredForWrite: true,
-    nextAllowedAction: ok ? 'single_atomic_recovery_write_after_separate_preflight' : 'STOP_THE_LINE'
+    nextAllowedAction: ok ? 'single_atomic_68_reference_recovery_after_separate_preflight' : 'STOP_THE_LINE'
   };
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -374,7 +436,7 @@ async function main() {
 main().catch((error) => {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   const payload = {
-    schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v2-trace-audit-only',
+    schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v3-68-restores-2-new-pending',
     generatedAt: new Date().toISOString(),
     projectId: PROJECT,
     tenantId: TENANT,
