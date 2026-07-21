@@ -1,85 +1,45 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v13-final-block1-validator-corrected",
+  "schemaVersion": "orbit360-incident-freeze-v14-final-visual-owner-stop",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "FINAL_BLOCK1_GATE_READONLY_AUTHORIZED",
+  "status": "STOP_THE_LINE_FINAL_VISUAL_OWNER_STABILITY",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "controlIssue": 7,
   "tenantId": "alianzas-soluciones",
   "classification": [
-    "DATA_CONTRACT_FAILURE",
+    "FUNCTIONAL_DEFECT",
     "PIPELINE_MECHANISM_FAILURE",
     "VALIDATOR_STALE"
   ],
-  "healthyCheckpoint": {
-    "commit": "02a5436bc804b3a861f82375b124d05015389b4b",
-    "runId": 29797444980,
-    "clients": 414,
-    "insurers": 26,
-    "advisors": 7,
-    "validProtectedReferences": 91,
-    "rawProtectedValuesInStore": 0
-  },
   "recoveryResult": {
     "status": "COMPLETED_AND_READBACK_CONFIRMED",
     "runId": 29867382206,
-    "head": "59815328dd7551f6ba337ee2ebd2c319dff065f8",
     "artifactId": 8509742588,
     "artifactDigest": "sha256:74498434aaf2c58acbe570c716c08e5d2c76a2b6aee55ab284b13e84ae4c5c64",
-    "recoveryId": "recovery_de2a471f2b90087aad83",
     "transactionCommitted": true,
+    "historicalReferenceRestorations": 68,
     "firestoreDocumentsWritten": 13,
     "secretManagerWritesExecuted": false,
     "deployExecuted": false,
-    "migrationExecuted": false,
-    "rollbackAvailable": true,
     "rollbackExecuted": false,
-    "readAfterWriteConfirmed": true,
-    "containsPII": false,
-    "containsSecrets": false
+    "readAfterWriteConfirmed": true
   },
-  "applied": {
-    "historicalReferenceRestorations": 68,
-    "newPendingRowsPreserved": 2,
-    "duplicateRemovals": 0,
-    "creates": 0,
-    "deletes": 0,
-    "reorders": 0,
-    "affectedGtDocuments": 13,
-    "nonReferenceFieldChanges": 0,
-    "traceFieldChanges": 0,
-    "colombiaDocumentChanges": 0
-  },
-  "after": {
+  "inventoryEvidence": {
+    "status": "COMPLETED_OK_TRUE",
+    "runId": 29868538689,
+    "artifactId": 8510179033,
+    "artifactDigest": "sha256:7297652bfbdc666c17a9eb3ebf332bcaff33108908aa1757d97331db96960e6e",
     "clients": 414,
     "insurers": 26,
     "advisors": 7,
     "totalCuentaResources": 107,
     "protectedBankRows": 93,
     "validReferences": 91,
-    "pendingReferences": 2,
     "uniqueValidReferences": 91,
-    "vaultRows": 91,
-    "rawProtectedValues": 0,
-    "colombia": "INTACT"
-  },
-  "inventoryEvidence": {
-    "ok": true,
-    "runId": 29868538689,
-    "head": "05162a3bab49dfaf1301bed427c18516c672fd41",
-    "artifactId": 8510179033,
-    "artifactDigest": "sha256:7297652bfbdc666c17a9eb3ebf332bcaff33108908aa1757d97331db96960e6e",
-    "mode": "read_only_post_recovery_inventory",
-    "clients": 414,
-    "insurers": 26,
-    "advisors": 7,
-    "protectedBankRows": 93,
-    "validReferences": 91,
     "pendingReferences": 2,
-    "uniqueValidReferences": 91,
     "vaultRows": 91,
     "vaultValues": 91,
     "invalidReferences": 0,
@@ -89,143 +49,126 @@
     "coInsurers": 13,
     "colombiaPendingReferences": 0,
     "writesExecuted": false,
-    "secretManagerWritesExecuted": false,
-    "deployExecuted": false,
-    "containsPII": false,
-    "containsSecrets": false
+    "deployExecuted": false
   },
-  "runtimeAuthorization": {
-    "authorizationId": "exact-bank-reference-recovery-dryrun-68plus2new-v1",
-    "active": false,
-    "consumed": true,
-    "consumedRunId": 29865964420
-  },
-  "preflightAuthorization": {
-    "authorizationId": "data-contract-68plus2new-preflight-only-v1",
-    "active": false,
-    "consumed": true,
-    "consumedRunId": 29865714028
-  },
-  "writeAuthorization": {
-    "authorizationId": "exact-bank-reference-recovery-write-68plus2new-v1",
-    "active": false,
-    "consumed": true,
-    "consumedRunId": 29867382206,
-    "secondExecutionAllowed": false,
-    "writesAllowed": false,
-    "secretManagerWritesAllowed": false,
-    "deployAllowed": false
-  },
-  "inventoryAuthorization": {
-    "authorizationId": "post-recovery-inventory-readonly-v1",
-    "active": false,
-    "consumed": true,
-    "consumedRunId": 29868538689,
-    "secondExecutionAllowed": false,
-    "writesAllowed": false,
-    "secretManagerWritesAllowed": false,
-    "deployAllowed": false
-  },
-  "finalGateAuthorization": {
-    "authorizationId": "final-block1-readonly-gate-v1",
-    "authorizationRevision": 2,
-    "active": true,
-    "consumed": false,
-    "allowedExecutions": 1,
-    "action": "unique_final_block1_gate_readonly",
-    "gateId": "block1-client360-insurers-lab-v20260717",
-    "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
-    "preflightRequired": true,
-    "firestoreReadAllowed": true,
-    "browserAllowed": true,
-    "writesAllowed": false,
-    "secretManagerWritesAllowed": false,
-    "deployAllowed": false,
-    "productionAllowed": false,
-    "runtimeGraphMustMatchExistingChannel": true,
-    "previousAttempt": {
+  "finalGateAttempts": [
+    {
       "runId": 29868945252,
-      "head": "b7f0501fc3d71668c7ad268540d7d6dad6c20223",
-      "artifactId": 8510333722,
-      "artifactDigest": "sha256:66045ccc998fd269c085b3864c77f23ba9365c66921f9449708abbe9167dda36",
-      "status": "FAILURE_BEFORE_LAB",
       "classification": "VALIDATOR_STALE",
       "failedStage": "preflight",
-      "failedChecks": 5,
+      "cause": "stale_global_owner_tokens",
       "secretsRead": false,
       "browserExecuted": false,
-      "firestoreReadExecuted": false,
       "writesExecuted": false,
       "deployExecuted": false
     },
-    "validatorCorrection": {
-      "scope": "gate_overlay_only",
-      "productFrozen": true,
-      "ownersAligned": [
-        "insurerSecureTargetBridge",
-        "realInsurerDirectoryAcademy",
-        "finalReadOnlyWorkflow"
-      ],
-      "frontendChanged": false,
-      "dataChanged": false,
-      "runtimeChanged": false,
-      "workflowBehaviorChanged": false,
-      "overlayRevision": "1.0.27-final-block1-readonly-validator-alignment-v1"
+    {
+      "runId": 29869225178,
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "failedStage": "preview_redirect_ready",
+      "cause": "directory_runtime_build_metadata_used_as_frontend_runtime",
+      "frontendRuntime": "20260717-2",
+      "directoryRuntimeMetadata": "20260721-1",
+      "authenticated": false,
+      "writesExecuted": false,
+      "deployExecuted": false
     },
-    "expectedCounts": {
-      "clients": 414,
-      "insurers": 26,
-      "advisors": 7
+    {
+      "runId": 29869538040,
+      "artifactId": 8510578843,
+      "classification": "FUNCTIONAL_DEFECT",
+      "failedStage": "desktop_direction_client360",
+      "errorCode": "INSURER_SECURE_CREDENTIAL_UI_MISSING",
+      "authenticated": true,
+      "legalAcceptedOnce": true,
+      "countsConfirmed": "414_26_7",
+      "writesExecuted": false,
+      "deployExecuted": false
     },
-    "expectedViews": [
-      "Direccion desktop",
-      "Operativo tablet",
-      "Asesor movil"
-    ],
-    "acceptance": "SANITIZED_OK_TRUE_ONLY"
-  },
-  "blockedGateIds": [],
-  "blockedWorkflows": [
-    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml"
+    {
+      "runId": 29870164119,
+      "artifactId": 8510828362,
+      "artifactDigest": "sha256:08f88f1bc3ef92405c474dc758fd66093bfc3948c046bc0e163d15de10f0fce6",
+      "classification": "FUNCTIONAL_DEFECT",
+      "failedStage": "desktop_direction_client360",
+      "errorCode": "INSURER_SECURE_CREDENTIAL_UI_MISSING",
+      "sameStageFailureCount": 2,
+      "validatorStableWaitApplied": true,
+      "authenticated": true,
+      "legalAcceptedOnce": true,
+      "countsConfirmed": "414_26_7",
+      "writesExecuted": false,
+      "deployExecuted": false
+    }
   ],
+  "rootCause": {
+    "owner": "Aseguradoras ficha render plus client-insurer visual contract",
+    "modulePath": "orbit360-platform/modules/aseguradoras.js",
+    "visualContractPath": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "sequence": [
+      "ficha renders base tab body",
+      "visual contract enhances portal rows and adds protected credential controls",
+      "knowledge summary script finishes loading",
+      "ensureKnowledgeSummaryLoaded onload calls refreshOwnerView",
+      "refreshOwnerView rerenders the complete ficha and removes enhanced controls",
+      "MutationObserver reapplies enhancements on a later animation frame"
+    ],
+    "effect": "intermediate unstable DOM without m1-credential-box",
+    "evidence": "same visual stage failed twice after explicit stable selector wait",
+    "dataCause": false,
+    "recoveryCause": false,
+    "authenticationCause": false,
+    "environmentCause": false
+  },
+  "finalGateAuthorization": {
+    "authorizationId": "final-block1-readonly-gate-v1",
+    "active": false,
+    "consumed": true,
+    "lastRunId": 29870164119,
+    "secondSameStageRetryAllowed": false,
+    "writesAllowed": false,
+    "deployAllowed": false
+  },
   "blockedActions": [
+    "repeat_final_gate",
+    "patch_validator_again",
     "repeat_recovery_write",
     "repeat_recovery_dryrun",
     "repeat_post_recovery_inventory",
-    "remove_gt_new_accounts",
-    "write_secret_manager",
-    "reimport_guatemala_directory",
-    "import_colombia_directory",
     "reimport_clients",
     "reimport_insurers",
+    "remove_gt_new_accounts",
     "advance_policies",
     "advance_collections",
     "advance_block2",
-    "deploy_lab",
     "deploy_production",
     "merge_main",
     "create_parallel_gate",
-    "create_temporary_workflow",
-    "perform_visual_review_before_gate_go"
+    "create_temporary_workflow"
   ],
   "allowedActions": [
-    "execute_same_final_block1_gate_once_after_validator_alignment",
+    "implement_single_owner_visual_stability_fix",
+    "update_module_visual_contract_validator_registry_together",
+    "run_static_preflight_without_secrets",
+    "authorize_one_targeted_lab_deploy_after_static_go",
+    "execute_one_final_gate_and_one_visual_review",
     "synchronize_pr_issue_and_documentation"
   ],
   "stateClarification": {
-    "m1Functional": "PRESERVED",
-    "insurers": "26_OF_26_PRESERVED",
-    "portalCredentials": "26_OF_26_PRESERVED",
+    "m1DataRecovery": "CLOSED",
+    "postRecoveryInventory": "CLOSED_OK_TRUE",
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
     "historicalBankReferences": "91_OF_91_RESTORED_AND_UNIQUE",
     "newGtAccounts": "2_PRESERVED_PENDING_SECURE_ONBOARDING",
+    "portalCredentials": "26_OF_26_PRESERVED",
     "colombia": "INTACT",
     "reimportRequired": false,
-    "recoveryWriteComplete": true,
-    "postRecoveryInventoryComplete": true,
-    "finalGatePending": true,
-    "visualReviewPending": true
+    "finalVisualGate": "BLOCKED_BY_CONFIRMED_OWNER_RERENDER_INSTABILITY",
+    "productionTouched": false
   },
-  "nextAllowedStep": "Execute the same final Block 1 read-only gate once after correcting only the stale overlay tokens. The first attempt did not reach secrets, LAB, browser or runtime. Accept only sanitized ok:true evidence; if the same stage fails again, stop retries and diagnose the preflight registry mechanism.",
+  "nextAllowedStep": "Fix the single visual owner race: the knowledge-summary load must not leave an intermediate ficha without protected controls. Module, visual contract, validator and gate registry must be updated together. Run static preflight first; only after GO may one targeted LAB deploy and one final gate be authorized.",
   "containsPII": false,
   "containsSecrets": false
 }
