@@ -1,31 +1,137 @@
 {
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
-  "issuedAt": "2026-07-20",
+  "issuedAt": "2026-07-21",
   "gateId": "block1-real-insurer-directories-lab-v20260720",
-  "classification": "DATA_CONTRACT_FAILURE",
-  "diagnosticRevision": "direct-gt-co-platform-import-v2-static-root-causes",
-  "contractRevision": "1.0.1-real-directories-v2",
+  "classification": "SECURITY_FAILURE",
+  "diagnosticRevision": "secure-bank-provider-and-legacy-migration-v1",
+  "contractRevision": "1.1.0-secure-bank-provider-v1",
   "gatePatch": {
-    "contractVersion": "1.0.1",
-    "diagnosticRevision": "direct-gt-co-platform-import-v2-static-root-causes",
-    "runtimeVersion": "20260720-1",
-    "status": "ACTIVE_STATIC_ROOT_CAUSE_FIXED",
+    "contractVersion": "1.1.0",
+    "diagnosticRevision": "secure-bank-provider-and-legacy-migration-v1",
+    "runtimeVersion": "20260721-1",
+    "status": "ACTIVE_SECURITY_ROOT_CAUSE_FIX",
     "workflow": ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
-    "staticValidationStatus": "PENDING_GATE_CONTRACT",
+    "staticValidationStatus": "PENDING_SECURITY_ROOT_CAUSE_GATE",
     "executionBudget": {
-      "type": "two_source_real_data_acceptance_with_human_file_selection",
+      "type": "secure_legacy_bank_migration_then_two_source_acceptance",
       "watchdogBudgetMs": 900000,
       "sourceParseMs": 120000,
       "directoryWriteAndReadbackMs": 180000,
       "protectedConfirmationMs": 180000,
       "inventoryAndEvidenceMs": 120000,
       "rollbackMs": 180000,
-      "exhaustionPolicy": "Run preflight first. Process Guatemala once and Colombia once. Stop after two failures in the same stage and diagnose root cause.",
-      "acceptancePolicy": "Close only with sanitized evidence of direct platform upload, separate GT and CO dry-runs, 26 canonical insurers, exact identity control, read-after-write, opaque portal references, completeness matrix and rollback."
+      "exhaustionPolicy": "Run preflight first. Deploy only the LAB bank provider, migrate the 91 legacy accounts once, confirm zero raw values and protected read, then process Guatemala once and Colombia once. Stop after two failures in the same stage.",
+      "acceptancePolicy": "Close only with sanitized evidence of 26 canonical insurers, zero unmasked sensitive values in operational storage, at least 91 opaque bank references, one protected reveal confirmation, direct platform upload, separate GT and CO dry-runs, exact identity control, read-after-write and rollback."
     }
   },
-  "canonicalOwners": [],
-  "requiredFiles": [],
-  "runtimeGraphFiles": [],
-  "runtimeVersionContracts": []
+  "canonicalOwners": [
+    {
+      "id": "realInsurerDirectoryExecution",
+      "path": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js",
+      "requiredTokens": [
+        "open.__canonicalDirectoryExecution20260720 = true",
+        "singleFileRead: true",
+        "controlledWrite: true",
+        "Orbit.importaWriteP0.writeBatch",
+        "async function waitWritten",
+        "eligibleProtectedSummary(result)",
+        "applySecureOnly(result",
+        "Orbit.importaWriteP0.rollback",
+        "accountProviderPending: false"
+      ]
+    },
+    {
+      "id": "realInsurerDirectoryAcademy",
+      "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "requiredTokens": [
+        "Orbit.ACADEMIA_V1222_ASEGURADORAS",
+        "Carga directa desde Orbit",
+        "Escritura controlada y lectura posterior",
+        "Defecto funcional o validador obsoleto",
+        "version:'1.222'",
+        "next._cv = 1222"
+      ]
+    },
+    {
+      "id": "insurerBankAccountProviderE2E",
+      "path": "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
+      "requiredTokens": [
+        "version: '20260721.1'",
+        "registerFieldProvider",
+        "supportsBankAccounts = true",
+        "orbit360ImportInsurerBankAccounts",
+        "applyMappings(result)"
+      ]
+    }
+  ],
+  "requiredFiles": [
+    "functions/bank-accounts.js",
+    "functions/bootstrap.js",
+    "functions/package.json",
+    "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
+    "tools/orbit360-migrar-cuentas-aseguradoras-vault-lab-v20260721-v2.mjs",
+    "tools/orbit360-validar-proveedor-cuentas-aseguradoras-lab-v20260721.mjs",
+    "tools/orbit360-aseguradoras-import-readiness-v20260720.mjs"
+  ],
+  "runtimeGraphFiles": [
+    "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
+    "functions/bank-accounts.js",
+    "functions/bootstrap.js"
+  ],
+  "runtimeVersionContracts": [
+    {
+      "path": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "var VERSION = '20260721.1'",
+        "singleFileRead: true",
+        "Orbit.importaWriteP0.writeBatch",
+        "async function waitWritten",
+        "eligibleProtectedSummary(result)",
+        "applySecureOnly(result",
+        "Orbit.importaWriteP0.rollback",
+        "accountProviderPending: false"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/insurer-directory-import-v1202.js",
+      "requiredTokens": [
+        "['credential','bank_account'].includes(item.type)"
+      ]
+    },
+    {
+      "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "version:'1.222'",
+        "next._cv = 1222",
+        "Carga directa desde Orbit",
+        "Escritura controlada y lectura posterior"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
+      "requiredTokens": [
+        "registerFieldProvider",
+        "supportsBankAccounts = true",
+        "orbit360ImportInsurerBankAccounts"
+      ]
+    },
+    {
+      "path": "functions/bank-accounts.js",
+      "requiredTokens": [
+        "exports.orbit360ImportInsurerBankAccounts",
+        "exports.orbit360BankAccountStatus",
+        "exports.orbit360RevealInsurerBankAccount",
+        "exports.orbit360CopyInsurerBankAccount"
+      ]
+    },
+    {
+      "path": "functions/bootstrap.js",
+      "requiredTokens": [
+        "require('./index')",
+        "require('./bank-accounts')"
+      ]
+    }
+  ]
 }
