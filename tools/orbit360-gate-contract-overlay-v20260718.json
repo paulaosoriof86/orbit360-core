@@ -1,1 +1,194 @@
-{"schemaVersion":"orbit360-gate-contract-overlay-v1","issuedAt":"2026-07-20","gateId":"block1-client360-insurers-lab-v20260717","classification":"VALIDATOR_STALE","diagnosticRevision":"visual-human-repair-v5-operational-honesty","contractRevision":"1.0.27-visual-human-repair-v5-operational-honesty","gatePatch":{"contractVersion":"1.0.27","diagnosticRevision":"visual-human-repair-v5-operational-honesty","status":"VALIDATOR_RECONCILED_NO_RERUN"},"canonicalOwners":[{"id":"clientInsurerVisualContract","path":"orbit360-platform/core/client-insurer-visual-contract-v20260720.js","requiredTokens":["Orbit.clientInsurerVisualContractV20260720","countryEvidenceProposalOnly:true","segmentationReadOnly:true","writesStore:false"]},{"id":"clientDataQuality","path":"orbit360-platform/modules/calidad.js","requiredTokens":["País por validar","clientCountryEvidence","soloCamposPendientes: true","version: '1.217-country-quality'"]},{"id":"insurerDocumentImport","path":"orbit360-platform/modules/aseguradoras-v1202-import-bridge.js","requiredTokens":["Orbit.__insurerDirectoryBridgeV1203","openInsurerDocumentImport","documentaryImportRequiresVerifiedPersistence: true","selectedFileDoesNotEqualStored: true"]}],"requiredFiles":["orbit360-platform/core/client-insurer-visual-contract-v20260720.js","orbit360-platform/styles/client-insurer-visual-contract-v20260720.css","orbit360-platform/modules/calidad.js","orbit360-platform/modules/aseguradoras-v1202-import-bridge.js","orbit360-platform/data/academia-v1221-m1-visual-integrity.js"],"runtimeGraphFiles":["orbit360-platform/core/client-insurer-visual-contract-v20260720.js","orbit360-platform/styles/client-insurer-visual-contract-v20260720.css","orbit360-platform/modules/calidad.js","orbit360-platform/modules/aseguradoras-v1202-import-bridge.js"],"runtimeVersionContracts":[{"path":"tools/orbit360-runtime-check-client360-v20260716.mjs","replaceRequiredTokens":true,"requiredTokens":["EXPECTED_CLIENT_PROJECTION_VERSION = '20260720.2'","EXPECTED_VISUAL_CONTRACT_VERSION = '20260720.2'","VISUAL_REPAIR_REVISION = 'visual-human-repair-v5-operational-honesty'","QUALITY_COUNTRY_FILTER_MISSING","IMPORTER_FALSE_SUCCESS_COPY_VISIBLE","RESPONSIVE_TITLE_OVERFLOW"]},{"path":"tools/orbit360-gate-runtime-crm-v20260716.mjs","replaceRequiredTokens":true,"requiredTokens":["contractVersion: '1.0.27'","orbit360-runtime-gate-joint-v27-role-selection-parity","canonical_post_router_runtime_terminal","page.exposeBinding('__orbitGatePostRouterRuntime'","window.__orbitAysKnowledgeRuntimePromise","orbit:aseguradoras:runtime-controlled","orbit:aseguradoras:tenant-runtime-linked","orbit:aseguradoras:tenant-runtime-error","external-custom-event-binding","canonical_domcontentloaded_ready","report.documentLifecycleSignals = []","page.on('domcontentloaded'","item.path === '/index.html'","method: 'playwright-page-event'","report.checks.canonical_domcontentloaded_ready = true","beforeAuth: true","select.dispatchEvent(new Event('change', { bubbles: true }))","responsiveVisibilityIndependent: true"]},{"path":"orbit360-platform/core/client-insurer-visual-contract-v20260720.js","replaceRequiredTokens":true,"requiredTokens":["version:'20260720.2'","function countryEvidence(clientId)","function segmentFor(row)","m1SegmentCriteria","data-m1-bank-copy-all","m1-knowledge-summary","exposesSecrets:false"]},{"path":"orbit360-platform/styles/client-insurer-visual-contract-v20260720.css","replaceRequiredTokens":true,"requiredTokens":["orbit-m1-stable-ui",".m1-credential-box",".m1-inactive-reason",".m1-knowledge-summary","@media(max-width:760px)"]},{"path":"orbit360-platform/modules/calidad.js","replaceRequiredTokens":true,"requiredTokens":["País por validar","Moneda por validar","clientCountryEvidence","soloCamposPendientes: true","version: '1.217-country-quality'"]},{"path":"orbit360-platform/modules/aseguradoras-v1202-import-bridge.js","replaceRequiredTokens":true,"requiredTokens":["Orbit.__insurerDirectoryBridgeV1203","function openInsurerDocumentImport(options)","No se ha guardado nada","El archivo no fue almacenado","documentaryImportRequiresVerifiedPersistence: true"]},{"path":"orbit360-platform/core/router-tenant-config-bootstrap.js","replaceRequiredTokens":true,"requiredTokens":["visualContractVersion: '20260720.2'","client-insurer-visual-contract-v20260720.js?v=20260720-2","client-insurer-visual-contract-v20260720.css?v=20260720-2"]},{"path":"orbit360-platform/data/academia-v1221-m1-visual-integrity.js","replaceRequiredTokens":true,"requiredTokens":["version:'1.221'","contentVersion:'1.224'","_m1visualv:1224"]}]}
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-21",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "classification": "VALIDATOR_STALE",
+  "diagnosticRevision": "final-block1-readonly-validator-alignment-v1",
+  "contractRevision": "1.0.27-final-block1-readonly-validator-alignment-v1",
+  "gatePatch": {
+    "contractVersion": "1.0.27",
+    "diagnosticRevision": "final-block1-readonly-validator-alignment-v1",
+    "status": "FINAL_READONLY_GATE_VALIDATOR_ALIGNED"
+  },
+  "canonicalOwners": [
+    {
+      "id": "clientInsurerVisualContract",
+      "path": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+      "requiredTokens": [
+        "Orbit.clientInsurerVisualContractV20260720",
+        "countryEvidenceProposalOnly:true",
+        "segmentationReadOnly:true",
+        "writesStore:false"
+      ]
+    },
+    {
+      "id": "clientDataQuality",
+      "path": "orbit360-platform/modules/calidad.js",
+      "requiredTokens": [
+        "País por validar",
+        "clientCountryEvidence",
+        "soloCamposPendientes: true",
+        "version: '1.217-country-quality'"
+      ]
+    },
+    {
+      "id": "insurerDocumentImport",
+      "path": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+      "requiredTokens": [
+        "Orbit.__insurerDirectoryBridgeV1203",
+        "openInsurerDocumentImport",
+        "documentaryImportRequiresVerifiedPersistence: true",
+        "selectedFileDoesNotEqualStored: true"
+      ]
+    },
+    {
+      "id": "insurerSecureTargetBridge",
+      "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+      "requiredTokens": [
+        "version: '20260721.3'",
+        "async function callProviderWithoutOperationalWrites",
+        "providerReturnsMappingsOnly: true",
+        "providerOperationalStoreWritesAllowed: false"
+      ]
+    },
+    {
+      "id": "realInsurerDirectoryAcademy",
+      "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "requiredTokens": [
+        "Orbit.ACADEMIA_V1223_ASEGURADORAS",
+        "version:'1.223'",
+        "Una confirmación, una escritura",
+        "Después de migrar, solo inventariar",
+        "postMigrationReadOnly:true"
+      ]
+    }
+  ],
+  "requiredFiles": [
+    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+    "orbit360-platform/modules/calidad.js",
+    "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+    "orbit360-platform/data/academia-v1221-m1-visual-integrity.js"
+  ],
+  "runtimeGraphFiles": [
+    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+    "orbit360-platform/modules/calidad.js",
+    "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js"
+  ],
+  "runtimeVersionContracts": [
+    {
+      "path": "tools/orbit360-runtime-check-client360-v20260716.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "EXPECTED_CLIENT_PROJECTION_VERSION = '20260720.2'",
+        "EXPECTED_VISUAL_CONTRACT_VERSION = '20260720.2'",
+        "VISUAL_REPAIR_REVISION = 'visual-human-repair-v5-operational-honesty'",
+        "QUALITY_COUNTRY_FILTER_MISSING",
+        "IMPORTER_FALSE_SUCCESS_COPY_VISIBLE",
+        "RESPONSIVE_TITLE_OVERFLOW"
+      ]
+    },
+    {
+      "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "contractVersion: '1.0.27'",
+        "orbit360-runtime-gate-joint-v27-role-selection-parity",
+        "canonical_post_router_runtime_terminal",
+        "page.exposeBinding('__orbitGatePostRouterRuntime'",
+        "window.__orbitAysKnowledgeRuntimePromise",
+        "orbit:aseguradoras:runtime-controlled",
+        "orbit:aseguradoras:tenant-runtime-linked",
+        "orbit:aseguradoras:tenant-runtime-error",
+        "external-custom-event-binding",
+        "canonical_domcontentloaded_ready",
+        "report.documentLifecycleSignals = []",
+        "page.on('domcontentloaded'",
+        "item.path === '/index.html'",
+        "method: 'playwright-page-event'",
+        "report.checks.canonical_domcontentloaded_ready = true",
+        "beforeAuth: true",
+        "select.dispatchEvent(new Event('change', { bubbles: true }))",
+        "responsiveVisibilityIndependent: true"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "version:'20260720.2'",
+        "function countryEvidence(clientId)",
+        "function segmentFor(row)",
+        "m1SegmentCriteria",
+        "data-m1-bank-copy-all",
+        "m1-knowledge-summary",
+        "exposesSecrets:false"
+      ]
+    },
+    {
+      "path": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "orbit-m1-stable-ui",
+        ".m1-credential-box",
+        ".m1-inactive-reason",
+        ".m1-knowledge-summary",
+        "@media(max-width:760px)"
+      ]
+    },
+    {
+      "path": "orbit360-platform/modules/calidad.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "País por validar",
+        "Moneda por validar",
+        "clientCountryEvidence",
+        "soloCamposPendientes: true",
+        "version: '1.217-country-quality'"
+      ]
+    },
+    {
+      "path": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "Orbit.__insurerDirectoryBridgeV1203",
+        "function openInsurerDocumentImport(options)",
+        "No se ha guardado nada",
+        "El archivo no fue almacenado",
+        "documentaryImportRequiresVerifiedPersistence: true"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "visualContractVersion: '20260720.2'",
+        "client-insurer-visual-contract-v20260720.js?v=20260720-2",
+        "client-insurer-visual-contract-v20260720.css?v=20260720-2"
+      ]
+    },
+    {
+      "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "version:'1.221'",
+        "contentVersion:'1.224'",
+        "_m1visualv:1224"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "ORBIT360_FINAL_GATE_AUTHORIZATION_ID: final-block1-readonly-gate-v1",
+        "ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab",
+        "Verificar canal LAB existente sin deploy",
+        "runtimeGraphChanged:false",
+        "deployExecuted:false",
+        "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
+        "tools/orbit360-gate-environment-v20260717.mjs"
+      ]
+    }
+  ]
+}
