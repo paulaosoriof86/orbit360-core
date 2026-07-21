@@ -11,6 +11,7 @@ const db = {
   aseguradoras: [],
   gestiones: [],
   actividades: [],
+  auditoriaImportaciones: [],
   auditLog: []
 };
 
@@ -37,11 +38,16 @@ const store = {
     }
     Object.assign(current, JSON.parse(JSON.stringify(patch || {})));
     return current;
+  },
+  remove(collection, id) {
+    db[collection] = (db[collection] || []).filter((row) => row.id !== id);
+    return true;
   }
 };
 
 const Orbit = {
   store,
+  tenant: { get: () => ({ id: 'tenant-a' }) },
   ui: { today: () => '2026-07-21', toast: () => {} },
   access: {
     activeRole: () => role,
@@ -119,16 +125,121 @@ function load(rel) {
   vm.runInNewContext(read(rel), sandbox, { filename: rel });
 }
 
-// Orden real del runtime: importador especializado, contrato canónico y listener P0.
+// Orden real del runtime canónico: importador base, escritor P0, política formal,
+// contrato de traspaso y listener global.
 load('core/insurer-directory-import-v1202.js');
+load('core/importa-write-p0.js');
+load('core/importa-write-aseguradoras-contract-v20260721.js');
 load('core/importer-controlled-write-contract-v20260721.js');
 load('core/importa-dryrun-p0-wire.js');
 
 assert.ok(Orbit.insurerDirectoryImport, 'Debe existir el owner especializado');
+assert.ok(Orbit.importaWriteP0, 'Debe existir el escritor P0');
+assert.ok(Orbit.importaWriteP0.__aseguradorasWriteContractV20260721, 'Debe existir la política formal de Aseguradoras');
+assert.equal(Orbit.importaWriteP0.__aseguradorasWriteContractV20260721.version, '20260721.1');
+assert.equal(Orbit.importaWriteP0.__aseguradorasWriteContractV20260721.failClosed, true);
+assert.equal(Orbit.importaWriteP0.isAllowedCollection('aseguradoras'), true);
 assert.ok(Orbit.importerControlledWriteContractV20260721, 'Debe existir el contrato canónico');
 assert.ok(Orbit.importaDryRunP0Wire, 'Debe existir el listener P0');
 assert.equal(Orbit.importerControlledWriteContractV20260721.version, '20260721.2');
 assert.equal(Orbit.store.__p0DryRunWireContractVersion, '20260721.2');
+
+const genericConfirmation = {
+  approved: true,
+  phrase: 'CONFIRMO ESCRITURA CONTROLADA',
+  userId: 'u1',
+  reason: 'Prueba del contrato formal de Aseguradoras'
+};
+
+const missingTrace = Orbit.importaWriteP0.writeBatch({
+  batchId: 'batch_missing_trace',
+  sourceType: 'directorio_aseguradoras',
+  sourceFileName: 'sin-traza.xlsx',
+  status: 'dry_run_aprobado',
+  hasBlockingErrors: false,
+  operations: [{
+    action: 'insert',
+    collection: 'aseguradoras',
+    data: {
+      id: 'asg_missing_trace',
+      nombre: 'Sin trazabilidad',
+      pais: 'GT',
+      moneda: 'GTQ',
+      requiereValidacion: false,
+      validationStatus: 'validado'
+    }
+  }]
+}, genericConfirmation);
+assert.equal(missingTrace.ok, false, 'Un lote sin trazabilidad debe bloquearse');
+assert.ok(missingTrace.errors.some((code) => code.includes('trazabilidad_archivo_hoja_faltante')));
+assert.equal(db.aseguradoras.length, 0);
+
+const mixedBatch = Orbit.importaWriteP0.writeBatch({
+  batchId: 'batch_mixed',
+  sourceType: 'directorio_aseguradoras',
+  sourceFileName: 'mixed.xlsx',
+  status: 'dry_run_aprobado',
+  hasBlockingErrors: false,
+  operations: [
+    {
+      action: 'insert',
+      collection: 'aseguradoras',
+      data: {
+        id: 'asg_mixed', nombre: 'Mixta', pais: 'GT', moneda: 'GTQ',
+        requiereValidacion: false, validationStatus: 'validado',
+        fuenteDirectorio: { archivo: 'mixed.xlsx', hoja: 'ASEGURADORA', pais: 'GT', tipo: 'directorio_aseguradoras', importadoAt: '2026-07-21T00:00:00.000Z' }
+      }
+    },
+    {
+      action: 'insert',
+      collection: 'gestiones',
+      data: { id: 'ges_mixed', validationStatus: 'validado' }
+    }
+  ]
+}, genericConfirmation);
+assert.equal(mixedBatch.ok, false, 'No se permiten lotes de colecciones mezcladas');
+assert.ok(mixedBatch.errors.includes('mixed_collection_batch_not_allowed'));
+assert.equal(db.aseguradoras.length, 0);
+
+const formalWrite = Orbit.importaWriteP0.writeBatch({
+  batchId: 'batch_contract_valid',
+  sourceType: 'directorio_aseguradoras',
+  sourceFileName: 'contrato-validado.xlsx',
+  sourceHash: '0123456789abcdef0123456789abcdef',
+  status: 'dry_run_aprobado',
+  hasBlockingErrors: false,
+  operations: [{
+    action: 'insert',
+    collection: 'aseguradoras',
+    data: {
+      id: 'asg_contract_valid',
+      nombre: 'Aseguradora contrato',
+      pais: 'GT',
+      moneda: 'GTQ',
+      requiereValidacion: false,
+      validationStatus: 'validado',
+      contactos: [],
+      portales: [],
+      cuentas: [],
+      fuenteDirectorio: {
+        archivo: 'contrato-validado.xlsx',
+        hoja: 'ASEGURADORA CONTRATO',
+        pais: 'GT',
+        tipo: 'directorio_aseguradoras',
+        importadoAt: '2026-07-21T00:00:00.000Z'
+      }
+    }
+  }]
+}, genericConfirmation);
+
+assert.equal(formalWrite.ok, true, 'El lote formal validado debe escribirse');
+assert.equal(formalWrite.written, 1);
+assert.equal(db.aseguradoras.length, 1);
+assert.equal(db.auditoriaImportaciones.length, 1, 'El escritor formal debe dejar auditoría');
+assert.equal(db.aseguradoras[0].createdByImport, true);
+assert.equal(db.aseguradoras[0].importBatchId, 'batch_contract_valid');
+assert.equal(db.aseguradoras[0].sourceType, 'directorio_aseguradoras');
+assert.equal(Object.keys(Orbit.importaDryRunP0Wire.pending()).length, 0, 'El escritor formal no debe generar un segundo dry-run');
 
 const gt = {
   'ÍNDICE': [['Resumen']],
@@ -174,13 +285,13 @@ assert.equal(applied.ok, true, 'La confirmación válida debe finalizar correcta
 assert.equal(applied.inserted, 1, 'Debe declarar una aseguradora creada');
 assert.equal(applied.updated, 0, 'No debe declarar actualizaciones inexistentes');
 assert.equal(applied.blocked, 1, 'Debe conservar un registro pendiente');
-assert.equal(db.aseguradoras.length, 1, 'Una aseguradora debe quedar realmente insertada');
+assert.equal(db.aseguradoras.length, 2, 'El importador especializado debe insertar una aseguradora adicional');
 assert.equal(db.gestiones.length, 1, 'La hoja retenida debe dejar una gestión trazable');
 assert.equal(db.actividades.length, 1, 'La ejecución debe dejar actividad de auditoría');
 assert.equal(db.auditLog.length, 1, 'La ejecución debe invocar auditoría del owner');
-assert.equal(applied.inserted, db.aseguradoras.length, 'El resultado no puede declarar éxito sin escritura real');
+assert.equal(applied.inserted, db.aseguradoras.filter((row) => row.id !== 'asg_contract_valid').length, 'El resultado no puede declarar éxito sin escritura real');
 
-const persisted = db.aseguradoras[0];
+const persisted = db.aseguradoras.find((row) => row.id !== 'asg_contract_valid');
 assert.equal(persisted.createdByImport, true, 'Debe persistir marcador canónico de importación');
 assert.ok(persisted.importBatchId, 'Debe persistir identificador de lote');
 assert.equal(persisted.sourceType, 'directorio_aseguradoras');
@@ -194,7 +305,8 @@ assert.equal(persisted.fuenteDirectorio.pais, 'GT');
 const serializedStore = JSON.stringify({
   aseguradoras: db.aseguradoras,
   gestiones: db.gestiones,
-  actividades: db.actividades
+  actividades: db.actividades,
+  auditoriaImportaciones: db.auditoriaImportaciones
 });
 assert.ok(!serializedStore.includes('secret-real'), 'La contraseña no debe llegar al store');
 assert.ok(!serializedStore.includes('123456789'), 'El número bancario completo no debe llegar al store');
@@ -221,7 +333,7 @@ const unauthorized = Orbit.store.insert('aseguradoras', {
   }
 });
 assert.equal(unauthorized._p0DryRunCaptured, true, 'La propuesta sin confirmar debe quedar capturada');
-assert.equal(db.aseguradoras.length, 1, 'La propuesta sin confirmar no debe persistirse');
+assert.equal(db.aseguradoras.length, 2, 'La propuesta sin confirmar no debe persistirse');
 assert.equal(Object.keys(Orbit.importaDryRunP0Wire.pending()).length, 1, 'Debe existir un dry-run para la propuesta sin confirmar');
 assert.ok(Orbit.importaDryRunP0Wire.pending().directorio_aseguradoras, 'La captura debe conservar la fuente correcta');
 
@@ -233,7 +345,7 @@ const manual = Orbit.store.insert('aseguradoras', {
   fuente: 'ingreso_manual_plataforma'
 });
 assert.equal(manual.id, 'asg_manual');
-assert.equal(db.aseguradoras.length, 2, 'El alta manual no debe quedar bloqueada por el listener de importaciones');
+assert.equal(db.aseguradoras.length, 3, 'El alta manual no debe quedar bloqueada por el listener de importaciones');
 
 role = 'Asesor';
 const denied = await Orbit.insurerDirectoryImport.applyApproved(parsed, {
@@ -247,7 +359,9 @@ assert.ok(denied.errors.includes('permiso_importacion_denegado'));
 
 console.log('ORBIT360 DIRECTORIOS ASEGURADORAS CONTROLLED WRITE: OK');
 console.log('- orden real de carga reproducido');
-console.log('- una aseguradora realmente insertada');
+console.log('- política formal fail-closed validada');
+console.log('- lote sin trazabilidad y lote mixto bloqueados');
+console.log('- una escritura formal y una especializada realmente insertadas');
 console.log('- cero segundo dry-run y cero falso éxito');
 console.log('- secretos y cuentas completas fuera del store');
 console.log('- auditoría, trazabilidad y gestión retenida presentes');
