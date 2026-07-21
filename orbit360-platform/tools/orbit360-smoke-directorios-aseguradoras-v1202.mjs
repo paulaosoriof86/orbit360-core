@@ -204,17 +204,36 @@ const pendingAfterConfirmed = Orbit.importaDryRunP0Wire.pending();
 assert.equal(Object.keys(pendingAfterConfirmed).length, 0, 'La escritura confirmada no debe generar un segundo dry-run');
 assert.equal(Orbit.importaDryRunP0Wire.lastReport(), null, 'No debe existir reporte P0 secundario');
 
-// Caso negativo: una escritura marcada como importada, pero sin contrato ni trazabilidad,
-// debe continuar interceptada y no llegar al store.
+// Caso negativo realista: propuesta aún en dry-run, con trazabilidad pero sin transición
+// de applyApproved. Debe quedar interceptada y no llegar al store.
 const unauthorized = Orbit.store.insert('aseguradoras', {
-  id: 'asg_no_autorizada',
-  nombre: 'Registro sin contrato',
+  id: 'asg_preconfirm',
+  nombre: 'Propuesta sin confirmar',
   pais: 'GT',
-  importado: true
+  requiereValidacion: false,
+  validationStatus: 'validado',
+  fuenteDirectorio: {
+    archivo: 'preconfirm.xlsx',
+    hoja: 'PROPUESTA',
+    pais: 'GT',
+    tipo: 'directorio_aseguradoras',
+    importadoAt: '2026-07-21T00:00:00.000Z'
+  }
 });
-assert.equal(unauthorized._p0DryRunCaptured, true, 'La escritura no autorizada debe quedar capturada');
-assert.equal(db.aseguradoras.length, 1, 'La escritura no autorizada no debe persistirse');
-assert.equal(Object.keys(Orbit.importaDryRunP0Wire.pending()).length, 1, 'Debe existir un dry-run para la escritura no autorizada');
+assert.equal(unauthorized._p0DryRunCaptured, true, 'La propuesta sin confirmar debe quedar capturada');
+assert.equal(db.aseguradoras.length, 1, 'La propuesta sin confirmar no debe persistirse');
+assert.equal(Object.keys(Orbit.importaDryRunP0Wire.pending()).length, 1, 'Debe existir un dry-run para la propuesta sin confirmar');
+assert.ok(Orbit.importaDryRunP0Wire.pending().directorio_aseguradoras, 'La captura debe conservar la fuente correcta');
+
+// Alta manual: no pertenece a un importador y debe conservar su flujo propio.
+const manual = Orbit.store.insert('aseguradoras', {
+  id: 'asg_manual',
+  nombre: 'Alta manual',
+  pais: 'GT',
+  fuente: 'ingreso_manual_plataforma'
+});
+assert.equal(manual.id, 'asg_manual');
+assert.equal(db.aseguradoras.length, 2, 'El alta manual no debe quedar bloqueada por el listener de importaciones');
 
 role = 'Asesor';
 const denied = await Orbit.insurerDirectoryImport.applyApproved(parsed, {
@@ -232,4 +251,5 @@ console.log('- una aseguradora realmente insertada');
 console.log('- cero segundo dry-run y cero falso éxito');
 console.log('- secretos y cuentas completas fuera del store');
 console.log('- auditoría, trazabilidad y gestión retenida presentes');
-console.log('- escrituras sin contrato continúan interceptadas');
+console.log('- propuesta sin confirmar interceptada');
+console.log('- alta manual preservada');
