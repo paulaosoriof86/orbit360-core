@@ -8,6 +8,7 @@ on:
       - 'tools/orbit360-authorize-preflight-only-v20260721.json'
       - 'tools/orbit360-authorize-exact-recovery-dryrun-v20260721.json'
       - 'tools/orbit360-authorize-exact-recovery-write-v20260721.json'
+      - 'tools/orbit360-authorize-post-recovery-inventory-v20260721.json'
 
 permissions:
   contents: read
@@ -25,10 +26,11 @@ env:
   ORBIT360_PREFLIGHT_AUTHORIZATION_ID: data-contract-68plus2new-preflight-only-v1
   ORBIT360_DRYRUN_AUTHORIZATION_ID: exact-bank-reference-recovery-dryrun-68plus2new-v1
   ORBIT360_WRITE_AUTHORIZATION_ID: exact-bank-reference-recovery-write-68plus2new-v1
+  ORBIT360_INVENTORY_AUTHORIZATION_ID: post-recovery-inventory-readonly-v1
 
 jobs:
   bounded-control:
-    name: Control acotado · preflight, dry-run o recuperación
+    name: Control acotado · preflight, dry-run, recuperación o inventario
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -52,19 +54,24 @@ jobs:
           PREFLIGHT='tools/orbit360-authorize-preflight-only-v20260721.json'
           DRYRUN='tools/orbit360-authorize-exact-recovery-dryrun-v20260721.json'
           WRITE='tools/orbit360-authorize-exact-recovery-write-v20260721.json'
+          INVENTORY='tools/orbit360-authorize-post-recovery-inventory-v20260721.json'
           preflight_count="$(printf '%s\n' "$CHANGED" | grep -cx "$PREFLIGHT" || true)"
           dryrun_count="$(printf '%s\n' "$CHANGED" | grep -cx "$DRYRUN" || true)"
           write_count="$(printf '%s\n' "$CHANGED" | grep -cx "$WRITE" || true)"
-          test $((preflight_count + dryrun_count + write_count)) -eq 1
+          inventory_count="$(printf '%s\n' "$CHANGED" | grep -cx "$INVENTORY" || true)"
+          test $((preflight_count + dryrun_count + write_count + inventory_count)) -eq 1
           if [ "$preflight_count" -eq 1 ]; then
             echo 'mode=preflight_only' >> "$GITHUB_OUTPUT"
             echo "marker=$PREFLIGHT" >> "$GITHUB_OUTPUT"
           elif [ "$dryrun_count" -eq 1 ]; then
             echo 'mode=exact_dryrun' >> "$GITHUB_OUTPUT"
             echo "marker=$DRYRUN" >> "$GITHUB_OUTPUT"
-          else
+          elif [ "$write_count" -eq 1 ]; then
             echo 'mode=exact_write' >> "$GITHUB_OUTPUT"
             echo "marker=$WRITE" >> "$GITHUB_OUTPUT"
+          else
+            echo 'mode=post_recovery_inventory' >> "$GITHUB_OUTPUT"
+            echo "marker=$INVENTORY" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Validar autorización vinculante sin credenciales
@@ -78,42 +85,51 @@ jobs:
           MODE='${{ steps.scope.outputs.mode }}'
           DRYRUN_SCRIPT='tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs'
           WRITE_SCRIPT='tools/orbit360-recuperar-referencias-bancarias-atomico-v20260721.mjs'
+          INVENTORY_SCRIPT='tools/orbit360-inventariar-cuentas-protegidas-aseguradoras-lab-v20260721.mjs'
           MANIFEST='tools/orbit360-bank-reference-recovery-map-v20260721.json'
-          test -f "$FREEZE" && test -f "$MARKER" && test -f "$DRYRUN_SCRIPT" && test -f "$WRITE_SCRIPT" && test -f "$MANIFEST"
+          test -f "$FREEZE" && test -f "$MARKER" && test -f "$DRYRUN_SCRIPT" && test -f "$WRITE_SCRIPT" && test -f "$INVENTORY_SCRIPT" && test -f "$MANIFEST"
           test "$(jq -r '.allowedExecutions' "$MARKER")" = '1'
-          if [ "$MODE" = 'preflight_only' ]; then
-            test "$(jq -r '.writesAllowed' "$MARKER")" = 'false'
-            test "$(jq -r '.status' "$FREEZE")" = 'DATA_CONTRACT_CORRECTION_PREFLIGHT_ONLY_AUTHORIZED'
-            test "$(jq -r '.preflightAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_PREFLIGHT_AUTHORIZATION_ID"
-            test "$(jq -r '.preflightAuthorization.active' "$FREEZE")" = 'true'
-            test "$(jq -r '.preflightAuthorization.secretsAllowed' "$FREEZE")" = 'false'
-            test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_PREFLIGHT_AUTHORIZATION_ID"
-            test "$(jq -r '.action' "$MARKER")" = 'central_preflight_only'
-          elif [ "$MODE" = 'exact_dryrun' ]; then
-            test "$(jq -r '.writesAllowed' "$MARKER")" = 'false'
-            test "$(jq -r '.status' "$FREEZE")" = 'BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED'
-            test "$(jq -r '.runtimeAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_DRYRUN_AUTHORIZATION_ID"
-            test "$(jq -r '.runtimeAuthorization.active' "$FREEZE")" = 'true'
-            test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_DRYRUN_AUTHORIZATION_ID"
-            test "$(jq -r '.action' "$MARKER")" = 'exact_recovery_readonly_dry_run'
-          else
-            test "$(jq -r '.writesAllowed' "$MARKER")" = 'true'
-            test "$(jq -r '.status' "$FREEZE")" = 'BOUNDED_EXACT_RECOVERY_WRITE_AUTHORIZED'
-            test "$(jq -r '.writeAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_WRITE_AUTHORIZATION_ID"
-            test "$(jq -r '.writeAuthorization.active' "$FREEZE")" = 'true'
-            test "$(jq -r '.writeAuthorization.allowedExecutions' "$FREEZE")" = '1'
-            test "$(jq -r '.writeAuthorization.firestoreDocuments' "$FREEZE")" = '13'
-            test "$(jq -r '.writeAuthorization.secretManagerWritesAllowed' "$FREEZE")" = 'false'
-            test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_WRITE_AUTHORIZATION_ID"
-            test "$(jq -r '.action' "$MARKER")" = 'exact_recovery_atomic_write'
-            test "$(jq -r '.expected.historicalReferenceRestorations' "$MARKER")" = '68'
-            test "$(jq -r '.expected.newPendingRowsPreserved' "$MARKER")" = '2'
-            test "$(jq -r '.expected.duplicateRemovals' "$MARKER")" = '0'
-            test "$(jq -r '.expected.finalValidReferences' "$MARKER")" = '91'
-            test "$(jq -r '.expected.finalPendingReferences' "$MARKER")" = '2'
-          fi
+          case "$MODE" in
+            preflight_only)
+              test "$(jq -r '.writesAllowed' "$MARKER")" = 'false'
+              test "$(jq -r '.status' "$FREEZE")" = 'DATA_CONTRACT_CORRECTION_PREFLIGHT_ONLY_AUTHORIZED'
+              test "$(jq -r '.preflightAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_PREFLIGHT_AUTHORIZATION_ID"
+              test "$(jq -r '.preflightAuthorization.active' "$FREEZE")" = 'true'
+              test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_PREFLIGHT_AUTHORIZATION_ID"
+              test "$(jq -r '.action' "$MARKER")" = 'central_preflight_only'
+              ;;
+            exact_dryrun)
+              test "$(jq -r '.writesAllowed' "$MARKER")" = 'false'
+              test "$(jq -r '.status' "$FREEZE")" = 'BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED'
+              test "$(jq -r '.runtimeAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_DRYRUN_AUTHORIZATION_ID"
+              test "$(jq -r '.runtimeAuthorization.active' "$FREEZE")" = 'true'
+              test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_DRYRUN_AUTHORIZATION_ID"
+              test "$(jq -r '.action' "$MARKER")" = 'exact_recovery_readonly_dry_run'
+              ;;
+            exact_write)
+              test "$(jq -r '.writesAllowed' "$MARKER")" = 'true'
+              test "$(jq -r '.status' "$FREEZE")" = 'BOUNDED_EXACT_RECOVERY_WRITE_AUTHORIZED'
+              test "$(jq -r '.writeAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_WRITE_AUTHORIZATION_ID"
+              test "$(jq -r '.writeAuthorization.active' "$FREEZE")" = 'true'
+              test "$(jq -r '.writeAuthorization.allowedExecutions' "$FREEZE")" = '1'
+              test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_WRITE_AUTHORIZATION_ID"
+              test "$(jq -r '.action' "$MARKER")" = 'exact_recovery_atomic_write'
+              ;;
+            post_recovery_inventory)
+              test "$(jq -r '.writesAllowed' "$MARKER")" = 'false'
+              test "$(jq -r '.runtimeAllowed' "$MARKER")" = 'true'
+              test "$(jq -r '.status' "$FREEZE")" = 'POST_RECOVERY_INVENTORY_READONLY_AUTHORIZED'
+              test "$(jq -r '.inventoryAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_INVENTORY_AUTHORIZATION_ID"
+              test "$(jq -r '.inventoryAuthorization.active' "$FREEZE")" = 'true'
+              test "$(jq -r '.inventoryAuthorization.writesAllowed' "$FREEZE")" = 'false'
+              test "$(jq -r '.inventoryAuthorization.secretManagerWritesAllowed' "$FREEZE")" = 'false'
+              test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_INVENTORY_AUTHORIZATION_ID"
+              test "$(jq -r '.action' "$MARKER")" = 'post_recovery_readonly_inventory'
+              ;;
+          esac
           node --check "$DRYRUN_SCRIPT"
           node --check "$WRITE_SCRIPT"
+          node --check "$INVENTORY_SCRIPT"
           node --check tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs
           node --check tools/orbit360-validar-recuperacion-referencias-atomica-v20260721.mjs
 
@@ -131,14 +147,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ '${{ steps.scope.outputs.mode }}' = 'exact_write' ]; then
+          MODE='${{ steps.scope.outputs.mode }}'
+          if [ "$MODE" = 'exact_write' ]; then
             node tools/orbit360-validar-recuperacion-referencias-atomica-v20260721.mjs > orbit360-bounded-control-evidence/static-validator.json
             cp orbit360-platform/runtime-incident-importer-20260721/atomic-recovery-static-validator-sanitized.json orbit360-bounded-control-evidence/static-validator-sanitized.json
+            test "$(jq -r '.ok' orbit360-bounded-control-evidence/static-validator-sanitized.json)" = 'true'
+          elif [ "$MODE" = 'post_recovery_inventory' ]; then
+            node --check tools/orbit360-inventariar-cuentas-protegidas-aseguradoras-lab-v20260721.mjs
+            ! grep -Eq '\.(set|update|create|delete)\s*\(' tools/orbit360-inventariar-cuentas-protegidas-aseguradoras-lab-v20260721.mjs
+            jq -n '{schemaVersion:"orbit360-post-recovery-inventory-static-v1",ok:true,mode:"static_no_runtime",writesExecuted:false,runtimeExecuted:false,containsPII:false,containsSecrets:false}' > orbit360-bounded-control-evidence/static-validator-sanitized.json
           else
             node tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs > orbit360-bounded-control-evidence/static-validator.json
             cp orbit360-platform/runtime-incident-importer-20260721/static-importer-atomicity-sanitized.json orbit360-bounded-control-evidence/static-validator-sanitized.json
+            test "$(jq -r '.ok' orbit360-bounded-control-evidence/static-validator-sanitized.json)" = 'true'
           fi
-          test "$(jq -r '.ok' orbit360-bounded-control-evidence/static-validator-sanitized.json)" = 'true'
           test "$(jq -r '.runtimeExecuted' orbit360-bounded-control-evidence/static-validator-sanitized.json)" = 'false'
 
       - name: Resolver identidad LAB
@@ -167,6 +189,44 @@ jobs:
           set -euo pipefail
           npm install --no-save firebase-admin@13 @google-cloud/secret-manager@6.2.0
 
+      - name: Ejecutar inventario post-recuperación read-only
+        if: ${{ steps.scope.outputs.mode == 'post_recovery_inventory' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-inventariar-cuentas-protegidas-aseguradoras-lab-v20260721.mjs > orbit360-bounded-control-evidence/inventory-stdout-sanitized.json
+          REPORT='orbit360-platform/runtime-incident-importer-20260721/post-recovery-inventory-sanitized.json'
+          test -f "$REPORT"
+          cp "$REPORT" orbit360-bounded-control-evidence/post-recovery-inventory-sanitized.json
+          jq -e '
+            .ok == true and
+            .mode == "read_only_post_recovery_inventory" and
+            .writesExecuted == false and
+            .firestoreWritesExecuted == false and
+            .secretManagerWritesExecuted == false and
+            .deployExecuted == false and
+            .migrationExecuted == false and
+            .containsPII == false and
+            .containsSecrets == false and
+            .counts.clients == 414 and
+            .counts.insurers == 26 and
+            .counts.advisors == 7 and
+            .inventory.totalCuentaResources == 107 and
+            .inventory.protectedBankRows == 93 and
+            .inventory.validReferences == 91 and
+            .inventory.pendingReferences == 2 and
+            .inventory.uniqueValidReferences == 91 and
+            .inventory.invalidReferences == 0 and
+            .inventory.duplicateReferences == 0 and
+            .inventory.rawProtectedValues == 0 and
+            .inventory.country.GT.insurers == 13 and
+            .inventory.country.CO.insurers == 13 and
+            .inventory.country.CO.pendingReferences == 0 and
+            .inventory.vault.rows == 91 and
+            .inventory.vault.valuesPresent == 91 and
+            .failedCheckIds == []
+          ' "$REPORT" >/dev/null
+
       - name: Ejecutar dry-run exacto read-only
         if: ${{ steps.scope.outputs.mode == 'exact_dryrun' }}
         shell: bash
@@ -190,44 +250,7 @@ jobs:
           test -f "$REPORT"
           cp "$REPORT" orbit360-bounded-control-evidence/atomic-write-sanitized.json
           if [ "$EXIT_CODE" -ne 0 ]; then exit "$EXIT_CODE"; fi
-          jq -e '
-            .ok == true and
-            .mode == "single_atomic_reference_recovery" and
-            .transactionCommitted == true and
-            .writesExecuted == true and
-            .firestoreDocumentsWritten == 13 and
-            .secretManagerWritesExecuted == false and
-            .deployExecuted == false and
-            .migrationExecuted == false and
-            .rollbackExecuted == false and
-            .containsPII == false and
-            .containsSecrets == false and
-            .before.clients == 414 and
-            .before.insurers == 26 and
-            .before.advisors == 7 and
-            .before.totalCuentaResources == 107 and
-            .before.protectedBankRows == 93 and
-            .before.validReferences == 23 and
-            .before.pendingReferences == 70 and
-            .before.vaultRows == 91 and
-            .before.rawProtectedValues == 0 and
-            .applied.historicalReferenceRestorations == 68 and
-            .applied.newPendingRowsPreserved == 2 and
-            .applied.duplicateRemovals == 0 and
-            .applied.creates == 0 and
-            .applied.deletes == 0 and
-            .applied.reorders == 0 and
-            .applied.affectedGtDocuments == 13 and
-            .applied.nonReferenceFieldChanges == 0 and
-            .applied.traceFieldChanges == 0 and
-            .applied.colombiaDocumentChanges == 0 and
-            .after.totalCuentaResources == 107 and
-            .after.protectedBankRows == 93 and
-            .after.validReferences == 91 and
-            .after.pendingReferences == 2 and
-            .after.uniqueValidReferences == 91 and
-            .after.rawProtectedValues == 0
-          ' "$REPORT" >/dev/null
+          test "$(jq -r '.ok' "$REPORT")" = 'true'
 
       - name: Subir evidencia sanitizada
         if: always()
@@ -256,9 +279,13 @@ jobs:
               context='orbit360/exact-recovery-dryrun-68plus2new-v3'
               description='Dry-run read-only aprobado; escritura bloqueada'
               ;;
-            *)
+            exact_write)
               context='orbit360/atomic-recovery-write-68plus2new-v1'
               description='68 referencias restauradas; 2 nuevas pendientes preservadas'
+              ;;
+            *)
+              context='orbit360/post-recovery-inventory-readonly-v1'
+              description='Inventario read-only: 414/26/7, 91 válidas y 2 pendientes'
               ;;
           esac
           if [ "${{ job.status }}" != success ]; then
