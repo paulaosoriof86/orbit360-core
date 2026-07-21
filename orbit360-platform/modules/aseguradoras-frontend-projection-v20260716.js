@@ -15,8 +15,7 @@
   Orbit.modules = Orbit.modules || {};
 
   var VERSION = '20260716.2';
-  var ORDER_KEY = 'orbit360_aseguradoras_order';
-  var state = { order: readOrder(), patched: false, summaryLoading: false, summaryRetries: 0 };
+  var state = { order: 'country', patched: false, summaryLoading: false, summaryRetries: 0 };
 
   function loadProjectionStyle() {
     if (document.querySelector('link[data-asg-front-projection-style]')) return;
@@ -53,13 +52,8 @@
     var configured = [].concat(tenantInsurerConfig().preferredInsurerCountryOrder || []);
     return configured.length ? configured.map(function (item) { return clean(item).toUpperCase(); }) : ['GT', 'CO'];
   }
-  function readOrder() {
-    try { return localStorage.getItem(ORDER_KEY) || 'country'; }
-    catch (error) { return 'country'; }
-  }
   function saveOrder(value) {
     state.order = value || 'country';
-    try { localStorage.setItem(ORDER_KEY, state.order); } catch (error) {}
   }
   function countryRank(country) {
     var value = clean(country).toUpperCase();

@@ -3,13 +3,13 @@
   "issuedAt": "2026-07-20",
   "gateId": "block1-real-insurer-directories-lab-v20260720",
   "classification": "DATA_CONTRACT_FAILURE",
-  "diagnosticRevision": "direct-gt-co-platform-import-v1",
-  "contractRevision": "1.0.0-real-directories-v1",
+  "diagnosticRevision": "direct-gt-co-platform-import-v2-static-root-causes",
+  "contractRevision": "1.0.1-real-directories-v2",
   "gatePatch": {
-    "contractVersion": "1.0.0",
-    "diagnosticRevision": "direct-gt-co-platform-import-v1",
+    "contractVersion": "1.0.1",
+    "diagnosticRevision": "direct-gt-co-platform-import-v2-static-root-causes",
     "runtimeVersion": "20260720-1",
-    "status": "ACTIVE_DATA_CONTRACT_FIX",
+    "status": "ACTIVE_STATIC_ROOT_CAUSE_FIXED",
     "workflow": ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
     "staticValidationStatus": "PENDING_GATE_CONTRACT",
     "executionBudget": {

@@ -83,7 +83,7 @@ check('RATE_HONESTY', all(src.resources,['Importar contactos o accesos no habili
 
 check('BANK_OPERATIONAL', all(src.operationalResources,['data-op2-account-value','data-op2-copy-account','P.canCopyBankAccounts()','R.revealField','R.copyField']), 'Cuenta visible y copiable según política', files.operationalResources);
 check('CREDENTIAL_OPERATIONAL', all(src.operationalResources,['Ver usuario y contraseña','Copiar usuario','Copiar contraseña','P.canViewCredentials()','R.revealCredential','R.copyCredential']), 'Accesos visibles y copiables para roles autorizados', files.operationalResources);
-check('CREDENTIAL_TEMPORARY', all(src.operationalResources,['const transient = new Map()','15000','transient.delete(index)']), 'Contraseña temporal en memoria', files.operationalResources);
+check('CREDENTIAL_TEMPORARY', all(src.operationalResources,['const transient = new Map()','15000','transient.delete(key)','credentialTransientKey(a, index)']), 'Contraseña temporal en memoria', files.operationalResources);
 check('PROVIDER_CONTEXT', all(src.operationalResources,['P.bankContext','P.credentialContext','insurerId:a.id','platformIndex:index']), 'Proveedor recibe entidad y contexto de permiso', files.operationalResources);
 
 check('STORE_GUARD', all(src.closure,['function installStoreGuard',"collection === 'aseguradoras' ? sanitizePatch",'__aseguradorasOp2SensitiveGuardV1218']), 'Altas y cambios pasan por guard', files.closure);

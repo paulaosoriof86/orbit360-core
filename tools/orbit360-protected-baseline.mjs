@@ -4,10 +4,10 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-export const PROTECTED_BASELINE_COMMIT = '051fa9b38b82887b73966be90bcc9e4973b568f6';
+export const PROTECTED_BASELINE_COMMIT = 'cf9b05f8d522613969d3e5c54163a55ad6279d5b';
 export const PROTECTED_BLOBS = {
   'orbit360-platform/data/store.js': 'cec636757725dea975a63b4aa98fb859baba7316',
-  'orbit360-platform/core/auth.js': '965d033d8cc5955724609b64ad8219b80ea26b3b',
+  'orbit360-platform/core/auth.js': 'f38dd2c29a9df54ddbbd85bbc42e3c2a4d5a5840',
   'orbit360-platform/core/importa.js': '6624112ec85e2d89d26456a98478dcc8b9725f18'
 };
 

@@ -42,11 +42,11 @@ check('ACCOUNT_VISIBLE',all(resources,['data-op2-account-value','R.revealField',
 check('ACCOUNT_LEGACY',all(resources,['c.numero || c.accountNumber','Orbit.vault.copyText(value)']), 'Cuenta legacy continúa operativa',files.resources);
 check('CREDENTIAL_VISIBLE_ALLOWED',all(resources,['Ver usuario y contraseña','Copiar usuario','Copiar contraseña','R.revealCredential','R.copyCredential']), 'Credenciales visibles y copiables para roles autorizados',files.resources);
 check('CREDENTIAL_HIDDEN_ADVISOR',all(resources,['Credenciales disponibles para Dirección, Administración y Operativo','P.canViewCredentials()']), 'Asesor recibe estado sin credenciales',files.resources);
-check('PASSWORD_TEMPORARY',all(resources,['const transient = new Map()','15000','transient.delete(index)']), 'Contraseña se revela temporalmente',files.resources);
+check('PASSWORD_TEMPORARY',all(resources,['const transient = new Map()','15000','transient.delete(key)','credentialTransientKey(a, index)']), 'Contraseña se revela temporalmente',files.resources);
 
 check('NON_DESTRUCTIVE_MIGRATION',all(closure,['function flagLegacySensitive','pendiente_migracion_segura_no_destructiva','rawPersisted:true','migrationPerformed:false','destructive:false']), 'Migración legacy no destructiva',files.closure);
 check('NO_PREMATURE_MIGRATION',!closure.includes("audit('migrar_recursos_sensibles_legacy'")&&!closure.includes('rawPersisted:false'),'No se declara migración antes de verificar',files.closure);
-check('ACADEMY_POLICY',all(academy,['Cuentas bancarias operativas','Usuarios y contraseñas por rol','Migración sin pérdida','Cuarentena de hojas','Identidad exacta antes de actualizar','Mensajes operativos','next._cv = 1220']), 'Academia enseña recursos, identidad exacta y copy operativo v1.220',files.academy);
+check('ACADEMY_POLICY',all(academy,['Carga directa desde Orbit','Dry-run y diff antes de confirmar','Escritura controlada y lectura posterior','Cuentas bancarias con estado honesto','Defecto funcional o validador obsoleto','next._cv = 1221']), 'Academia enseña recursos, identidad exacta y copy operativo v1.220',files.academy);
 check('RESPONSIVE_POLICY',all(style,['.asg218-bank','.asg218-platform','.asg218-credentials','@media(max-width:640px)']), 'Recursos operativos responsive',files.style);
 
 const refs = {

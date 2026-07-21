@@ -124,11 +124,36 @@
         "functions/index.js"
       ],
       "runtimeVersionContracts": [
-        { "path": "orbit360-platform/core/importer-execution-contract-v20260720.js", "requiredTokens": ["singleTargetOwner: true"] },
-        { "path": "orbit360-platform/core/insurer-directory-import-v1202.js", "requiredTokens": ["applySecureOnly.__secureOnlyV20260720 = true"] },
-        { "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js", "requiredTokens": ["noProtectedValueAccess: true"] },
-        { "path": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js", "requiredTokens": ["remoteConfirmationRequired: true"] },
-        { "path": "functions/index.js", "requiredTokens": ["exports.orbit360ImportInsurerCredentials"] }
+        {
+          "path": "orbit360-platform/core/importer-execution-contract-v20260720.js",
+          "requiredTokens": [
+            "singleTargetOwner: true"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/insurer-directory-import-v1202.js",
+          "requiredTokens": [
+            "applySecureOnly.__secureOnlyV20260720 = true"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+          "requiredTokens": [
+            "noProtectedValueAccess: true"
+          ]
+        },
+        {
+          "path": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+          "requiredTokens": [
+            "remoteConfirmationRequired: true"
+          ]
+        },
+        {
+          "path": "functions/index.js",
+          "requiredTokens": [
+            "exports.orbit360ImportInsurerCredentials"
+          ]
+        }
       ],
       "forbiddenRuntimeReferences": [],
       "environment": {
@@ -141,11 +166,11 @@
     },
     {
       "gateId": "block1-real-insurer-directories-lab-v20260720",
-      "contractVersion": "1.0.0",
-      "diagnosticRevision": "direct-gt-co-platform-import-v1",
+      "contractVersion": "1.0.1",
+      "diagnosticRevision": "direct-gt-co-platform-import-v2-static-root-causes",
       "runtimeVersion": "20260720-1",
       "block": 1,
-      "status": "ACTIVE_DATA_CONTRACT_FIX",
+      "status": "ACTIVE_STATIC_ROOT_CAUSE_FIXED",
       "diagnosticRule": "Real insurer data is accepted only when the GT and CO workbooks are uploaded from Orbit as separate sources, produce per-sheet dry-run and diff, write only exact validated identities through the canonical writer, confirm read-after-write, move eligible portal access values to the protected provider, preserve opaque references, publish sanitized completeness by insurer and keep rollback available.",
       "executionBudget": {
         "type": "two_source_real_data_acceptance_with_human_file_selection",

@@ -17,8 +17,7 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.aseguradoras = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
-  const ORDER_KEY = 'orbit360_aseguradoras_order';
-  let host, q = '', fPais = 'TODOS', fRamo = '', fEstado = 'TODAS', orderMode = readOrder(), knowledgeSummaryLoading = false;
+  let host, q = '', fPais = 'TODOS', fRamo = '', fEstado = 'TODAS', orderMode = 'country', knowledgeSummaryLoading = false;
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function norm(value) { return clean(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); }
   function tenantId() {
@@ -37,9 +36,7 @@ Orbit.modules.aseguradoras = (function () {
     if (configured.length) return configured;
     return [].concat(Orbit.PAISES || []).map(item => clean(item && item.id).toUpperCase()).filter(id => id && id !== 'TODOS');
   }
-  function orderStorageKey() { return ORDER_KEY + ':' + (tenantId() || 'default'); }
-  function readOrder() { try { return localStorage.getItem(orderStorageKey()) || 'country'; } catch (e) { return 'country'; } }
-  function saveOrder(value) { orderMode = value || 'country'; try { localStorage.setItem(orderStorageKey(), orderMode); } catch (e) {} }
+  function saveOrder(value) { orderMode = value || 'country'; }
   function countryRank(country) { const idx = preferredCountries().indexOf(clean(country).toUpperCase()); return idx >= 0 ? idx : 999; }
   function recentValue(row) { const value = row && (row.updatedAt || row.conocimientoActualizadoAt || row.ultimaRevision || row.fuenteFecha || row.createdAt); const time = value ? Date.parse(value) : 0; return Number.isFinite(time) ? time : 0; }
   function compareInsurers(a, b) {

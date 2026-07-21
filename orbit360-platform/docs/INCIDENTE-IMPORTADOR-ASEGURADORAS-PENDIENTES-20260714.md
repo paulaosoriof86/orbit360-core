@@ -56,3 +56,21 @@ Patrón reusable: separar `bloqueo que impide escritura` de `registro cargable c
 ## Reapertura acotada — 2026-07-20
 
 La aceptación técnica sintética no sustituye la aceptación de datos reales. Antes del Bloque 2 se debe probar desde la plataforma la carga directa de los directorios GT y CO, con diff por aseguradora, escritura controlada, lectura posterior, confirmación de accesos protegidos, auditoría, rollback y matriz final de completitud.
+
+
+## Diagnóstico estático de causa raíz — 2026-07-20
+
+Clasificación consolidada:
+
+- `VALIDATOR_STALE`: los validadores exigían una llave temporal antigua, contenidos de Academia v1.220 y el hash de Auth anterior al cierre aceptado de M1.
+- `FUNCTIONAL_DEFECT`: dos módulos persistían una preferencia visual directamente en almacenamiento del navegador. Se reemplazó por estado de sesión; no cambia datos operativos ni configuración del tenant.
+
+Correcciones:
+
+1. La revelación temporal continúa durante 15 segundos y elimina la llave compuesta `aseguradora|portal`.
+2. Academia se valida contra v1.221 y conserva la diferencia entre fuente, dry-run, escritura, lectura posterior y recurso protegido pendiente.
+3. El baseline protegido reconoce el Auth aceptado durante M1; no se modificó `core/auth.js`.
+4. El orden del directorio permanece configurable durante la sesión, sin escritura directa del módulo en almacenamiento del navegador.
+5. Registro, overlay, workflow y documentación avanzan juntos a contrato 1.0.1.
+
+No se tocaron Firebase, secretos, datos LAB, reglas, producción ni el gate sintético cerrado.
