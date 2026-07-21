@@ -60,7 +60,7 @@ function accountKey(insurerId, accountId) {
 }
 
 const report = {
-  schemaVersion: 'orbit360-bank-reference-reconciliation-v1',
+  schemaVersion: 'orbit360-bank-reference-reconciliation-v2',
   generatedAt: new Date().toISOString(),
   projectId: EXPECTED_PROJECT_ID,
   tenantId: TENANT_ID,
@@ -68,13 +68,16 @@ const report = {
   expected: {
     insurers: EXPECTED_INSURERS,
     accounts: EXPECTED_ACCOUNTS,
-    currentValidReferences: EXPECTED_VALID_REFS,
-    repairNeeded: EXPECTED_REPAIR
+    preRepairValidReferences: EXPECTED_VALID_REFS,
+    preRepairCount: EXPECTED_REPAIR,
+    completedValidReferences: EXPECTED_ACCOUNTS
   },
   containsPII: false,
   containsSecrets: false,
   checks: {},
+  state: 'unknown',
   repairReady: false,
+  alreadyRepaired: false,
   ok: false
 };
 
@@ -150,7 +153,8 @@ try {
     vaultInvalid,
     vaultDuplicates
   };
-  report.checks = {
+
+  const commonChecks = {
     insurerCountPreserved: snapshot.size === EXPECTED_INSURERS,
     accountRowsExact: accountRows === EXPECTED_ACCOUNTS,
     vaultRecordsExact: vault.bankAccounts.length === EXPECTED_ACCOUNTS,
@@ -161,21 +165,31 @@ try {
     noVaultOrphans: vaultWithoutCurrent === 0,
     noDuplicateCurrentKeys: currentDuplicateKeys === 0,
     noInvalidVaultRecords: vaultInvalid === 0,
-    noDuplicateVaultRecords: vaultDuplicates === 0,
-    currentValidRefsExpected: currentValidRefs === EXPECTED_VALID_REFS,
-    repairCountExpected: repairNeeded === EXPECTED_REPAIR
+    noDuplicateVaultRecords: vaultDuplicates === 0
   };
-  report.repairReady = Object.values(report.checks).every(Boolean);
-  report.ok = report.repairReady;
+  const commonReady = Object.values(commonChecks).every(Boolean);
+  const repairState = currentValidRefs === EXPECTED_VALID_REFS && repairNeeded === EXPECTED_REPAIR;
+  const completeState = currentValidRefs === EXPECTED_ACCOUNTS && repairNeeded === 0;
+
+  report.checks = Object.assign({}, commonChecks, {
+    preRepairStateExact: repairState,
+    completedStateExact: completeState
+  });
+  report.repairReady = commonReady && repairState;
+  report.alreadyRepaired = commonReady && completeState;
+  report.state = report.repairReady ? 'repair_required' : report.alreadyRepaired ? 'already_repaired' : 'inconsistent';
+  report.ok = report.repairReady || report.alreadyRepaired;
   if (!report.ok) report.errorCode = 'REFERENCE_RECONCILIATION_NOT_READY';
 } catch (error) {
   report.errorCode = sanitizeError(error);
   report.ok = false;
   report.repairReady = false;
+  report.alreadyRepaired = false;
+  report.state = 'error';
 } finally {
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   fs.writeFileSync(OUT_FILE, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 }
 
-console.log(`ORBIT360_BANK_REFERENCE_RECONCILIATION:${JSON.stringify({ ok: report.ok, repairReady: report.repairReady, inventory: report.inventory || {}, checks: report.checks, errorCode: report.errorCode || '', containsSecrets: false })}`);
+console.log(`ORBIT360_BANK_REFERENCE_RECONCILIATION:${JSON.stringify({ ok: report.ok, state: report.state, repairReady: report.repairReady, alreadyRepaired: report.alreadyRepaired, inventory: report.inventory || {}, checks: report.checks, errorCode: report.errorCode || '', containsSecrets: false })}`);
 if (!report.ok) process.exit(1);
