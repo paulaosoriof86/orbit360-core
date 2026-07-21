@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "orbit360-post-recovery-inventory-authorization-v1",
+  "issuedAt": "2026-07-21",
+  "authorizationId": "post-recovery-inventory-readonly-v1",
+  "incidentId": "insurer-directory-protected-reference-regression-v20260721",
+  "action": "post_recovery_readonly_inventory",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "tenantId": "alianzas-soluciones",
+  "allowedExecutions": 1,
+  "runtimeAllowed": true,
+  "firestoreReadAllowed": true,
+  "vaultReadAllowed": true,
+  "writesAllowed": false,
+  "secretManagerWritesAllowed": false,
+  "deployAllowed": false,
+  "browserAllowed": false,
+  "reimportAllowed": false,
+  "colombiaModificationAllowed": false,
+  "sourceRecovery": {
+    "runId": 29867382206,
+    "artifactId": 8509742588,
+    "artifactDigest": "sha256:74498434aaf2c58acbe570c716c08e5d2c76a2b6aee55ab284b13e84ae4c5c64",
+    "transactionCommitted": true,
+    "readAfterWriteConfirmed": true
+  },
+  "expected": {
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "gtInsurers": 13,
+    "coInsurers": 13,
+    "totalCuentaResources": 107,
+    "protectedBankRows": 93,
+    "validReferences": 91,
+    "pendingReferences": 2,
+    "uniqueValidReferences": 91,
+    "vaultRows": 91,
+    "vaultValues": 91,
+    "rawProtectedValues": 0,
+    "invalidReferences": 0,
+    "duplicateReferences": 0,
+    "colombiaPendingReferences": 0,
+    "newPendingKeys": [
+      "gt-gt-seguros|account_gtseguros_01",
+      "gt-gt-seguros|account_gtseguros_02"
+    ]
+  },
+  "sourceBlobs": {
+    "inventory": "847c0d1749e4a0ad25b7de266219775ff7189bee",
+    "workflow": "a7a039adea02d9a15cfd7d34e1291a2017eb22a1",
+    "freeze": "c61ee637bfe621f5b356d2c0d382b23e8ce47394",
+    "overlay": "135a61affb58c59754384df3c7030db9e469bd82"
+  },
+  "acceptance": "SANITIZED_OK_TRUE_ONLY",
+  "containsPII": false,
+  "containsSecrets": false
+}
