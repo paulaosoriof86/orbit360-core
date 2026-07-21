@@ -147,12 +147,19 @@ jobs:
           DIAG_DIR='orbit360-platform/runtime-gate-crm-v20260716'
           mkdir -p "$DIAG_DIR"
           BUILD_JSON="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "${ORBIT360_PREVIEW_URL}/runtime-build.json?finalGate=${GITHUB_RUN_ID}")"
+          PREVIEW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "${ORBIT360_PREVIEW_URL}/ays-lab-preview.html?finalGate=${GITHUB_RUN_ID}")"
           DEPLOYED_SHA="$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty')"
-          DEPLOYED_RUNTIME="$(printf '%s' "$BUILD_JSON" | jq -r '.runtimeVersion // empty')"
+          DEPLOYED_RUNTIME_METADATA="$(printf '%s' "$BUILD_JSON" | jq -r '.runtimeVersion // empty')"
           DEPLOYED_GATE="$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty')"
+          FRONTEND_RUNTIME="$(printf '%s' "$PREVIEW_SOURCE" | sed -n 's/.*name="orbit-preview-version" content="\([^"]*\)".*/\1/p' | head -n 1)"
+          if [ -z "$FRONTEND_RUNTIME" ]; then
+            FRONTEND_RUNTIME="$(printf '%s' "$PREVIEW_SOURCE" | sed -n 's/.*runtime=\([0-9]\{8\}-[0-9][0-9]*\).*/\1/p' | head -n 1)"
+          fi
           test "$DEPLOYED_SHA" != ''
-          test "$DEPLOYED_RUNTIME" != ''
+          test "$DEPLOYED_RUNTIME_METADATA" != ''
           test "$DEPLOYED_GATE" != ''
+          test "$FRONTEND_RUNTIME" != ''
+          printf '%s' "$FRONTEND_RUNTIME" | grep -Eq '^[0-9]{8}-[0-9]+$'
           git cat-file -e "${DEPLOYED_SHA}^{commit}"
           RUNTIME_FILES=(
             orbit360-platform/ays-lab-preview.html
@@ -181,16 +188,20 @@ jobs:
           )
           CHANGED="$(git diff --name-only "$DEPLOYED_SHA" "$GITHUB_SHA" -- "${RUNTIME_FILES[@]}")"
           test -z "$CHANGED"
+          METADATA_ALIGNED=false
+          if [ "$DEPLOYED_RUNTIME_METADATA" = "$FRONTEND_RUNTIME" ]; then METADATA_ALIGNED=true; fi
           jq -n \
             --arg deployedSha "$DEPLOYED_SHA" \
-            --arg deployedRuntime "$DEPLOYED_RUNTIME" \
+            --arg deployedRuntimeMetadata "$DEPLOYED_RUNTIME_METADATA" \
+            --arg frontendRuntime "$FRONTEND_RUNTIME" \
             --arg deployedGate "$DEPLOYED_GATE" \
             --arg url "$ORBIT360_PREVIEW_URL" \
-            '{schemaVersion:"orbit360-existing-lab-runtime-readonly-v1",ok:true,deployedSha:$deployedSha,deployedRuntime:$deployedRuntime,deployedGate:$deployedGate,url:$url,runtimeGraphChanged:false,deployExecuted:false,containsPII:false,containsSecrets:false}' \
+            --argjson metadataAligned "$METADATA_ALIGNED" \
+            '{schemaVersion:"orbit360-existing-lab-runtime-readonly-v2",ok:true,deployedSha:$deployedSha,deployedRuntimeMetadata:$deployedRuntimeMetadata,frontendRuntime:$frontendRuntime,runtimeSource:"ays-lab-preview.html",deployedGate:$deployedGate,url:$url,runtimeGraphChanged:false,runtimeMetadataAligned:$metadataAligned,runtimeBuildMetadataRepresentsDirectoryFlow:true,deployExecuted:false,containsPII:false,containsSecrets:false}' \
             > "$DIAG_DIR/existing-runtime-sanitized.json"
-          echo "runtime=$DEPLOYED_RUNTIME" >> "$GITHUB_OUTPUT"
+          echo "runtime=$FRONTEND_RUNTIME" >> "$GITHUB_OUTPUT"
           echo "sha=$DEPLOYED_SHA" >> "$GITHUB_OUTPUT"
-          echo "ORBIT360_EXPECTED_RUNTIME=$DEPLOYED_RUNTIME" >> "$GITHUB_ENV"
+          echo "ORBIT360_EXPECTED_RUNTIME=$FRONTEND_RUNTIME" >> "$GITHUB_ENV"
           echo "ORBIT360_EXPECTED_COMMIT=$DEPLOYED_SHA" >> "$GITHUB_ENV"
 
       - name: Gate final único · tres vistas
