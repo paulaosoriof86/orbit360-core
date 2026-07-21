@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "orbit360-validator-stale-preflight-authorization-v1",
+  "issuedAt": "2026-07-21",
+  "authorizationId": "validator-stale-preflight-only-v1",
+  "incidentId": "insurer-directory-protected-reference-regression-v20260721",
+  "action": "central_preflight_only",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "tenantId": "alianzas-soluciones",
+  "allowedExecutions": 1,
+  "secretsAllowed": false,
+  "firestoreReadAllowed": false,
+  "vaultReadAllowed": false,
+  "writesAllowed": false,
+  "deployAllowed": false,
+  "browserAllowed": false,
+  "runtimeAllowed": false,
+  "expected": {
+    "preflightStatus": "GO_GATE_CONTRACT",
+    "failedChecks": 0,
+    "containsPII": false,
+    "containsSecrets": false
+  },
+  "sourceBlobs": {
+    "overlay": "202e8e982430c23576ef2844faacaaedccaf83bb",
+    "freeze": "a90c4be05ffcdd3244e8e5789973a070ac2cb00e",
+    "workflow": "6212f80bab95017e4146fcc621c16b1af7df7be3",
+    "academy": "66cbfa565852f29344244fa1e577b22cb880a065"
+  },
+  "acceptance": "GO_GATE_CONTRACT_AND_ZERO_RUNTIME_ONLY",
+  "containsPII": false,
+  "containsSecrets": false
+}
