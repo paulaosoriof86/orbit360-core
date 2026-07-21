@@ -14,7 +14,9 @@ FUNCTIONAL_DEFECT
 
 No corresponde a datos, recuperación, Auth, Firestore, secretos, Hosting, caché ni validador obsoleto.
 
-## Evidencia del run congelado
+## Evidencia congelada
+
+### Primer run dirigido
 
 ```txt
 Run: 29872097446
@@ -25,7 +27,18 @@ Etapa: desktop_direction_client360
 Código: INSURER_SECURE_CREDENTIAL_UI_MISSING
 ```
 
-La publicación Hosting LAB fue correcta y limitada al frontend. El canal sirvió el mismo SHA del run. No se desplegaron Functions ni rules; no hubo escrituras operativas ni producción.
+### Segundo run, después de la barrera event-driven
+
+```txt
+Run: 29872987103
+Artifact: 8511908838
+Digest: sha256:2e960b74656f3b3dde6e31f363b67f741a3156a25398d79576dbe6cdbb7d3b40
+HEAD: a8d435865ad93caa007dc974ec9f96d8a1a58892
+Etapa: desktop_direction_client360
+Código: INSURER_SECURE_CREDENTIAL_UI_MISSING
+```
+
+Ambas publicaciones Hosting LAB fueron correctas y limitadas al frontend. El canal sirvió el mismo SHA de cada run. No se desplegaron Functions ni rules; no hubo escrituras operativas ni producción.
 
 Los conteos permanecieron:
 
@@ -39,37 +52,54 @@ asesores: 7
 
 El validador logró esperar exitosamente una `.m1-credential-box` visible y falló inmediatamente después al contar cero cajas.
 
-Esto prueba que el control protegido sí se construyó, pero fue eliminado por un rerender entre la espera y la lectura. El gate no capturó una ficha inexistente ni un dato ausente: capturó una ventana transitoria de DOM no canónico.
+Esto demuestra que el control protegido sí se construyó, pero fue eliminado por un rerender entre la espera y la lectura. El gate no capturó una ficha inexistente ni un dato ausente: capturó una ventana transitoria de DOM no canónico.
 
-## Causa raíz de la primera barrera
+## Causa raíz por capas
 
-La barrera `20260721.1` observaba únicamente scripts con:
+### Capa 1: barrera no conectada al mecanismo real
+
+La barrera `20260721.1` observaba un owner de script que el runtime real no utilizaba para gobernar sus transiciones. Se corrigió en `20260721.2` para escuchar eventos de conocimiento, cambios de pestaña y mutaciones de la ficha.
+
+### Capa 2: owner canónico diferido
+
+El segundo run confirmó que la barrera no era la fuente de verdad correcta. La causa estructural estaba en el owner visual canónico:
+
+1. `modules/aseguradoras.js` reemplaza sincrónicamente `#af-body` cuando cambia la pestaña o se reconstruye la ficha.
+2. `core/client-insurer-visual-contract-v20260720.js` agregaba los controles protegidos después, mediante un `MutationObserver` que solo programaba `enhance()` para el siguiente `requestAnimationFrame`.
+3. Durante ese intervalo, el DOM base quedaba visible sin `.m1-credential-box` ni las tarjetas bancarias canónicas.
+4. Una barrera secundaria podía reducir la ventana, pero no eliminar la causa mientras el owner canónico siguiera siendo post-render.
+
+Causa raíz definitiva:
 
 ```txt
-data-orbit-insurer-summary-owner
+El owner visual canónico reparaba las mutaciones de la ficha un frame después del rerender propietario, en lugar de hacerlo dentro del mismo ciclo de mutación del DOM.
 ```
 
-El runtime real de conocimiento no utiliza ese owner para gobernar sus transiciones. Se carga mediante el bootstrap P0.9f, scripts `data-orbit-p09f`, eventos `orbit:aseguradoras:knowledge-loading/ready` y mutaciones posteriores de la ficha.
+## Corrección en el propietario canónico
 
-El contrato visual canónico ya tenía un `MutationObserver`, pero su reparación se programaba para el siguiente `requestAnimationFrame`. La ficha permanecía visible durante ese intervalo. Por eso el gate podía observar el DOM base después del rerender y antes de la reaplicación del contrato visual.
+Se corrigió únicamente:
 
-## Corrección en el propietario
+```txt
+orbit360-platform/core/client-insurer-visual-contract-v20260720.js
+```
 
-Se corrigió la misma barrera, sin crear otro renderer ni otro bridge:
+Commit inicial del fix:
 
-- versión `20260721.2`;
-- escucha los eventos reales del runtime de conocimiento;
-- intercepta las transiciones de pestañas antes del rerender;
-- observa reemplazos dentro de `#asg-ficha`;
-- oculta temporalmente la ficha cuando falta el contrato semántico esperado;
-- reaplica el owner canónico en pases acotados;
-- libera la vista solo cuando la pestaña activa tiene sus controles completos;
-- no escribe `Orbit.store`;
-- no reimporta;
-- no lee ni expone secretos;
-- no sustituye `modules/aseguradoras.js`.
+```txt
+e8d5374986ea735da8c2a4584bb66e5affb49110
+```
 
-El Router carga explícitamente la versión `20260721.2` para impedir que el service worker o el navegador reutilicen la barrera anterior.
+Cambio aplicado:
+
+- `MutationObserver` dirigido al owner canónico;
+- detección de reemplazos de `#asg-ficha`, `#af-body` y filas de contactos, portales y bancos;
+- ejecución inmediata de `runEnhance()` en el mismo microtask de la mutación;
+- guardia contra reentrada;
+- `requestAnimationFrame` se conserva solo para eventos externos de sesión, ruta o store;
+- metadatos explícitos `synchronousMutationOwner:true` y `mutationMode:'same-microtask'`;
+- la barrera `20260721.2` permanece como protección secundaria, no como renderer ni fuente de verdad;
+- no se creó otro bridge ni otro renderer;
+- no se modificó el módulo funcional de Aseguradoras.
 
 ## Datos y entornos tocados
 
@@ -79,7 +109,7 @@ Firestore operativo: sin escrituras
 Secret Manager: sin escrituras
 Bóveda: no leída
 Colombia: intacta
-Hosting LAB: el run fallido dejó publicado el SHA 0cdd36b...
+Hosting LAB: conserva el SHA del segundo run fallido hasta nueva autorización
 Producción: no tocada
 Main/merge: no realizados
 ```
@@ -92,26 +122,27 @@ Clasificación:
 REPLICABLE_CLAUDE_ACUMULADO
 ```
 
-Patrón reusable: cuando un módulo base es enriquecido por un contrato visual después de cargas asíncronas, la UI no debe quedar visible durante una ventana intermedia sin controles canónicos. La estabilidad debe gobernarse por eventos reales y estado semántico del DOM, no por la mera existencia o carga de un script.
+Patrón reusable: si un renderer propietario reemplaza una región del DOM y otro owner aporta controles obligatorios de lectura, la transformación canónica no puede diferirse un frame. Debe ejecutarse atómicamente en el mismo ciclo de mutación o integrarse directamente al renderer propietario. Las barreras son protección secundaria, no sustitutos de ownership.
 
 No se comparte backend, credenciales, datos A&S ni detalles de bóveda.
 
 ## Impacto Academia
 
-Debe conservarse el aprendizaje ya incorporado sobre:
+Debe enseñar:
 
 - diferencia entre dato ausente y render transitorio;
-- owner visual canónico;
-- eventos de carga y estados honestos;
-- por qué no se reimportan datos para corregir visualización;
-- por qué un gate puede detectar una ventana inestable aunque el control aparezca durante milisegundos.
+- diferencia entre barrera visual y owner canónico;
+- por qué una corrección post-render puede fallar aunque el control aparezca brevemente;
+- por qué no se reimportan datos para resolver una ventana de DOM;
+- cómo distinguir defecto funcional de fallo de entorno o validador obsoleto.
 
 No cambia el flujo funcional del usuario; cambia la garantía de estabilidad con la que se presenta.
 
 ## Siguiente acción exacta
 
-1. actualizar contrato del gate a `1.0.29` con la barrera event-driven;
-2. ejecutar un único preflight estático sin secretos, navegador, Firestore ni deploy;
-3. aceptar solo `GO_GATE_CONTRACT` y `ok:true`;
-4. únicamente después autorizar una nueva publicación Hosting LAB dirigida y un gate final único;
-5. si vuelve a fallar la misma etapa, congelar sin reintento.
+1. registrar contrato `1.0.30` con el owner visual sincrónico;
+2. congelar los runs `29872097446` y `29872987103` sin reintento;
+3. ejecutar un único preflight estático sin secretos, navegador, Firestore, bóveda ni deploy;
+4. aceptar solo `GO_GATE_CONTRACT` y `ok:true`;
+5. únicamente después autorizar una publicación Hosting LAB dirigida y el mismo gate final único;
+6. si vuelve a fallar la misma etapa, detener completamente la automatización y no crear otro parche.
