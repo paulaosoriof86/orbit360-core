@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "orbit360-local-static-atomicity-mirror-v1",
+  "generatedAt": "2026-07-21",
+  "mode": "offline_no_runtime",
+  "ok": true,
+  "containsPII": false,
+  "containsSecrets": false,
+  "firestoreReadExecuted": false,
+  "firestoreWriteExecuted": false,
+  "vaultReadExecuted": false,
+  "vaultWriteExecuted": false,
+  "runtimeExecuted": false,
+  "checks": {
+    "recovery_68": true,
+    "duplicates_2": true,
+    "pending_70_unique": true,
+    "ambiguous_0": true,
+    "unmapped_0": true,
+    "expected_91": true,
+    "hash_difference_0": true,
+    "coordinator_owner": true,
+    "provider_before_write": true,
+    "fail_closed": true,
+    "durable_wait": true,
+    "read_after_write": true,
+    "rollback_operational_documents": true,
+    "distributed_vault_rollback_claimed": false,
+    "bridge_mappings_only": true,
+    "bridge_blocks_store": true,
+    "bridge_finally_restores_store": true,
+    "coordinator_syntax": true,
+    "bridge_syntax": true
+  },
+  "metrics": {
+    "secureProviderCallIndex": 1241,
+    "firstOperationalWriteIndex": 2215,
+    "secondOperationalWriteIndex": 2278,
+    "recoveryMappings": 68,
+    "duplicatesToRemove": 2,
+    "expectedFinalValidReferences": 91,
+    "expectedPendingReferences": 0,
+    "expectedDuplicateReferences": 0
+  },
+  "scope": {
+    "validationType": "offline_static_source_and_manifest",
+    "production": false,
+    "deploy": false,
+    "dataRecoveryExecuted": false,
+    "browserValidationExecuted": false
+  }
+}
