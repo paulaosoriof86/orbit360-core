@@ -1,15 +1,18 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v1",
+  "schemaVersion": "orbit360-incident-freeze-v2",
   "issuedAt": "2026-07-21",
+  "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "STOP_THE_LINE_READ_ONLY_DIAGNOSIS",
+  "status": "STOP_THE_LINE_METHODOLOGY_REVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
+  "controlIssue": 7,
   "tenantId": "alianzas-soluciones",
   "classification": [
     "DATA_CONTRACT_FAILURE",
-    "PIPELINE_MECHANISM_FAILURE"
+    "PIPELINE_MECHANISM_FAILURE",
+    "METHODOLOGY_ENFORCEMENT_FAILURE"
   ],
   "healthyCheckpoint": {
     "commit": "02a5436bc804b3a861f82375b124d05015389b4b",
@@ -18,19 +21,55 @@
     "clients": 414,
     "advisors": 7,
     "rawProtectedValuesInStore": 0,
-    "validProtectedReferences": 91
+    "validProtectedReferences": 91,
+    "meaning": "M1 y las 26 aseguradoras sí estaban validados en este checkpoint"
   },
-  "failedObservation": {
+  "regressedObservation": {
     "commit": "1284d1ab2bb16bd8eb77e4f39afd83970d68af4b",
     "runId": 29803066010,
     "insurers": 26,
     "rawProtectedValuesInStore": 0,
     "validProtectedReferences": 23,
-    "errorCode": "POST_MIGRATION_STATE_INCOMPLETE"
+    "missingProtectedReferences": 68,
+    "errorCode": "POST_MIGRATION_STATE_INCOMPLETE",
+    "meaning": "La reimportación posterior degradó referencias; no invalida el checkpoint sano previo"
   },
+  "methodologyRecurrence": {
+    "confirmed": true,
+    "firstStage": "readonly_identity_diagnosis",
+    "sameStageFailuresReached": 2,
+    "additionalAttemptsAfterLimit": true,
+    "incorrectAssumption": "34 unresolved rows were assumed recoverable by last4 before runtime evidence",
+    "runtimeEvidence": {
+      "uniqueMetadataFingerprintMatches": 34,
+      "uniqueLast4Matches": 0,
+      "unresolved": 34,
+      "ambiguous": 0,
+      "writesExecuted": 0
+    },
+    "rootCause": "The incident freeze was documentary only; workflows and the central gate preflight did not enforce it, and push path triggers converted each patch into another automatic run"
+  },
+  "blockedGateIds": [
+    "block1-real-insurer-directories-lab-v20260720",
+    "block1-client360-insurers-lab-v20260717"
+  ],
+  "blockedWorkflows": [
+    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
+    ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml"
+  ],
   "blockedActions": [
+    "any_runtime_execution",
     "rerun_gate",
+    "rerun_readonly_diagnosis",
+    "create_or_patch_diagnostic_script",
+    "create_or_patch_recovery_script",
     "create_parallel_gate",
+    "create_temporary_workflow",
+    "automatic_push_trigger",
+    "read_firestore",
+    "read_secret_manager",
+    "write_firestore",
+    "restore_references",
     "reimport_guatemala_directory",
     "import_colombia_directory",
     "reimport_clients",
@@ -38,54 +77,59 @@
     "advance_policies",
     "advance_collections",
     "advance_block2",
+    "deploy_lab",
     "deploy_production",
     "merge_main",
-    "modify_unrelated_modules"
+    "modify_product_or_unrelated_modules",
+    "state_conclusion_without_sanitized_evidence"
   ],
   "allowedActions": [
-    "read_only_inventory",
-    "sanitized_diff",
-    "vault_version_verification",
-    "audit_trace_review",
+    "static_methodology_audit",
+    "compare_commits_without_runtime",
+    "read_repository_documents",
+    "disable_automatic_workflows",
+    "strengthen_freeze_controls",
+    "synchronize_pr_issue_and_documentation",
     "document_root_cause"
   ],
   "repeatRule": {
     "sameErrorOrStageLimit": 2,
-    "onLimit": "STOP_THE_LINE",
+    "onLimit": "STOP_THE_LINE_METHODOLOGY_REVIEW",
     "thirdAttemptAllowed": false,
     "patchAllowed": false,
-    "parallelGateAllowed": false
+    "parallelGateAllowed": false,
+    "runtimeReadOnlyAllowed": false,
+    "automaticWorkflowAllowed": false
   },
-  "singleOwner": "insurer-directory-import-coordinator",
-  "recoveryOrder": [
-    "read_only_inventory",
-    "compare_against_healthy_checkpoint",
-    "identify_affected_records_and_batches",
-    "verify_vault_versions",
-    "selective_reference_recovery",
-    "fix_atomic_import_owner",
-    "single_preflight",
-    "single_gate",
-    "single_visual_review"
-  ],
+  "evidenceVocabulary": {
+    "CONFIRMED": "Supported by a completed sanitized artifact or immutable checkpoint",
+    "HYPOTHESIS": "Plausible but not authorized for decisions or writes",
+    "DISPROVED": "Contradicted by later sanitized runtime evidence",
+    "UNKNOWN": "Not yet demonstrated; must not be converted into a next execution step"
+  },
+  "stateClarification": {
+    "m1Functional": "PRESERVED",
+    "insurersAtHealthyCheckpoint": "VALIDATED_26_OF_26",
+    "portalCredentialsInVault": "CONFIRMED_26_OF_26",
+    "bankAccountsInVault": "CONFIRMED_91_OF_91",
+    "currentOperationalDocumentReferences": "REGRESSED_23_VALID_68_MISSING",
+    "recoveryIdentity": "34_CONFIRMED_34_UNKNOWN",
+    "colombia": "INTACT_AND_BLOCKED",
+    "reimportRequired": false,
+    "recoveryAuthorized": false
+  },
   "resumePredicates": {
-    "clients": 414,
-    "insurers": 26,
-    "advisors": 7,
-    "rawProtectedValuesInStore": 0,
-    "minimumValidProtectedReferences": 91,
-    "invalidReferences": 0,
-    "duplicateReferences": 0,
-    "secondDryRun": 0,
-    "providerConfirmedBeforeWrite": true,
-    "durableWriteConfirmed": true,
-    "readAfterWrite": true,
-    "audit": true,
-    "rollback": true,
-    "unauthorizedRecordsModified": 0,
-    "sanitizedEvidenceOk": true
+    "paulaMethodologyReviewCompleted": true,
+    "singleAuthoritativeStateDocument": true,
+    "automaticWorkflowsDisabled": true,
+    "incidentFreezeEnforcedBeforeAnySecretOrRuntime": true,
+    "noHypothesisPresentedAsConfirmed": true,
+    "singleOwnerNamed": true,
+    "singleNonRuntimeNextStepDefined": true,
+    "runtimeAuthorizationSeparateAndExplicit": true
   },
-  "documentation": "orbit360-platform/docs/CORTE-FORMAL-ANTI-BUCLE-IMPORTADOR-ASEGURADORAS-20260721.md",
+  "nextAllowedStep": "Complete and approve the static methodology audit only; do not diagnose or recover the remaining references yet",
+  "documentation": "orbit360-platform/docs/CORTE-METODOLOGICO-REINCIDENCIA-ANTI-BUCLE-20260721.md",
   "containsPII": false,
   "containsSecrets": false
 }
