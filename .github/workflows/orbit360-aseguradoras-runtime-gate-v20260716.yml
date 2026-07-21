@@ -1,74 +1,92 @@
-name: Orbit 360 Clientes y Aseguradoras Runtime Gate 20260717
+name: Orbit 360 · Gate final read-only Cliente 360 y Aseguradoras
 
 on:
   push:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - "orbit360-platform/**"
-      - "tools/orbit360-gate-contract-registry-v20260717.json"
-      - "tools/orbit360-validar-gate-contracts-v20260717.mjs"
-      - "tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs"
-      - "tools/orbit360-runtime-check-client360-v20260716.mjs"
-      - "tools/orbit360-gate-runtime-crm-v20260716.mjs"
-      - "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs"
-      - "tools/orbit360-gate-environment-v20260717.mjs"
-      - "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs"
-      - ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "orbit360-platform/**"
-      - "tools/orbit360-gate-contract-registry-v20260717.json"
-      - "tools/orbit360-validar-gate-contracts-v20260717.mjs"
-      - "tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs"
-      - "tools/orbit360-runtime-check-client360-v20260716.mjs"
-      - "tools/orbit360-gate-runtime-crm-v20260716.mjs"
-      - "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs"
-      - "tools/orbit360-gate-environment-v20260717.mjs"
-      - "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs"
-      - ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml"
-  workflow_dispatch:
+      - 'tools/orbit360-authorize-final-block1-gate-readonly-v20260721.json'
 
 permissions:
   contents: read
   issues: write
   pull-requests: write
+  statuses: write
 
 concurrency:
-  group: orbit360-clientes-aseguradoras-runtime-gate-v20260717-${{ github.event_name }}
-  cancel-in-progress: true
+  group: orbit360-final-block1-readonly-v1
+  cancel-in-progress: false
+
+env:
+  EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
+  ORBIT360_FINAL_GATE_AUTHORIZATION_ID: final-block1-readonly-gate-v1
+  ORBIT360_PREVIEW_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
+  ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
+  ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+  SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+  SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+  SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
 jobs:
-  runtime_gate:
-    name: Cliente 360 y Aseguradoras · contrato + tres vistas · datos A&S
+  final-readonly-gate:
+    name: Cliente 360 + Aseguradoras · gate final único sin deploy
     runs-on: ubuntu-latest
-    env:
-      EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
-      FIREBASE_PROJECT_ID: ays-orbit-360-lab
-      ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
-      ORBIT360_EXPECTED_RUNTIME: 20260717-2
-      ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
-      ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
-      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
+    timeout-minutes: 20
     steps:
-      - name: Checkout rama autorizada
+      - name: Checkout SHA exacto
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
 
-      - name: Preflight vinculante · contrato del gate y causa raíz
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar autorización final sin credenciales
         shell: bash
         run: |
           set -euo pipefail
-          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-          test "$BRANCH" = "ays/backend-tenant-lab-v99-20260703"
+          test "${GITHUB_REF_NAME}" = "$ORBIT360_BRANCH"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          MARKER='tools/orbit360-authorize-final-block1-gate-readonly-v20260721.json'
+          FREEZE='tools/orbit360-incident-freeze-v20260721.json'
+          INVENTORY_REF='orbit360-platform/docs/evidence/post-recovery-inventory-29868538689-sanitized.json'
+          test -f "$MARKER" && test -f "$FREEZE" && test -f "$INVENTORY_REF"
+          test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_FINAL_GATE_AUTHORIZATION_ID"
+          test "$(jq -r '.action' "$MARKER")" = 'unique_final_block1_gate_readonly'
+          test "$(jq -r '.allowedExecutions' "$MARKER")" = '1'
+          test "$(jq -r '.writesAllowed' "$MARKER")" = 'false'
+          test "$(jq -r '.deployAllowed' "$MARKER")" = 'false'
+          test "$(jq -r '.status' "$FREEZE")" = 'FINAL_BLOCK1_GATE_READONLY_AUTHORIZED'
+          test "$(jq -r '.finalGateAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_FINAL_GATE_AUTHORIZATION_ID"
+          test "$(jq -r '.finalGateAuthorization.active' "$FREEZE")" = 'true'
+          test "$(jq -r '.finalGateAuthorization.deployAllowed' "$FREEZE")" = 'false'
+          test "$(jq -r '.inventoryEvidence.ok' "$FREEZE")" = 'true'
+          test "$(jq -r '.inventoryEvidence.runId' "$FREEZE")" = '29868538689'
+          test "$(jq -r '.ok' "$INVENTORY_REF")" = 'true'
+          test "$(jq -r '.inventory.validReferences' "$INVENTORY_REF")" = '91'
+          test "$(jq -r '.inventory.pendingReferences' "$INVENTORY_REF")" = '2'
+          test "$(jq -r '.inventory.uniqueValidReferences' "$INVENTORY_REF")" = '91'
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
+          node --check tools/orbit360-runtime-check-client360-v20260716.mjs
+          node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
+          node --check tools/orbit360-gate-environment-v20260717.mjs
 
-      - name: Validación estática · owners, contratos y sintaxis
+      - name: Preflight vinculante · contrato final
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'GO_GATE_CONTRACT'
+
+      - name: Validación estática · owners y sintaxis
         shell: bash
         run: |
           set -euo pipefail
@@ -83,170 +101,99 @@ jobs:
           node --check orbit360-platform/core/session-multirol-visibility-v20260716.js
           node --check orbit360-platform/modules/cliente360.js
           node --check orbit360-platform/modules/aseguradoras.js
-          node --check orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
-          node --check orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js
-          node --check tools/orbit360-runtime-check-client360-v20260716.mjs
-          node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
-          node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
-          node --check tools/orbit360-gate-environment-v20260717.mjs
-          node --check tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs
-          node --check tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs
+          node --check orbit360-platform/modules/calidad.js
+          node --check orbit360-platform/modules/aseguradoras-v1202-import-bridge.js
           node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
           node orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js
           node tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs
 
-      - name: Resolver cuenta de servicio LAB
+      - name: Resolver identidad LAB
         shell: bash
         run: |
           set -euo pipefail
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
           if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
           if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
-          if [ -z "$SERVICE_ACCOUNT" ]; then echo "BLOQUEO_SECRET_LAB"; exit 42; fi
-          if [ ${#ORBIT360_LAB_LOGIN_PASSWORD} -lt 12 ]; then echo "BLOQUEO_LOGIN_LAB"; exit 46; fi
-          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab.json"
+          test -n "$SERVICE_ACCOUNT"
+          test ${#ORBIT360_LAB_LOGIN_PASSWORD} -ge 12
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab-final-gate.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
-          PROJECT_ID="$(jq -r '.project_id // empty' "$KEY_FILE")"
-          test "$PROJECT_ID" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
 
-      - name: Instalar dependencia backend LAB
+      - name: Instalar dependencias read-only
         shell: bash
         run: |
           set -euo pipefail
-          npm install --no-save firebase-admin@13
-
-      - name: Sincronizar usuario LAB, asesores y conteos
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-ensure-lab-user.mjs
-          node tools/orbit360-verify-lab-data-counts.mjs
-          node tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs
-
-      - name: Sellar commit exacto del runtime LAB
-        shell: bash
-        run: |
-          set -euo pipefail
-          printf '{"schemaVersion":"orbit360-runtime-build-v2","commit":"%s","run":"%s","branch":"%s","gateId":"%s","runtimeVersion":"%s"}\n' \
-            "$GITHUB_SHA" "$GITHUB_RUN_ID" "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" "$ORBIT360_GATE_ID" "$ORBIT360_EXPECTED_RUNTIME" \
-            > orbit360-platform/runtime-build.json
-
-      - name: Publicar y verificar canal LAB canónico
-        id: deploy
-        shell: bash
-        run: |
-          set -euo pipefail
-          CANONICAL_RUNTIME_VERSION="$ORBIT360_EXPECTED_RUNTIME"
-          DEPLOY_JSON="${RUNNER_TEMP}/firebase-lab-preview.json"
-          DIAG_DIR="orbit360-platform/runtime-gate-crm-v20260716"
-          DIAG_FILE="$DIAG_DIR/deploy-diagnostic-sanitized.json"
-          mkdir -p "$DIAG_DIR"
-          PHASE="initializing"
-          URL=""
-          PROPAGATION_ATTEMPTS=0
-          BUILD_EXACT=false
-          write_diag() {
-            local ok="$1"
-            local exit_code="$2"
-            local firebase_code=""
-            if [ -f "$DEPLOY_JSON" ]; then
-              firebase_code="$(jq -r '.error.code // .status // empty' "$DEPLOY_JSON" 2>/dev/null | head -n 1 | tr -cd 'A-Za-z0-9_.:-' | cut -c1-80 || true)"
-            fi
-            jq -n \
-              --arg phase "$PHASE" \
-              --arg firebaseCode "$firebase_code" \
-              --argjson ok "$ok" \
-              --argjson exitCode "$exit_code" \
-              --argjson urlFound "$(test -n "$URL" && echo true || echo false)" \
-              --argjson propagationAttempts "$PROPAGATION_ATTEMPTS" \
-              --argjson buildExact "$BUILD_EXACT" \
-              '{schemaVersion:"orbit360-deploy-diagnostic-v2",containsPII:false,containsSecrets:false,ok:$ok,phase:$phase,exitCode:$exitCode,firebaseCode:$firebaseCode,urlFound:$urlFound,propagationAttempts:$propagationAttempts,buildExact:$buildExact}' \
-              > "$DIAG_FILE"
-          }
-          on_error() {
-            local code=$?
-            trap - ERR
-            write_diag false "$code"
-            echo "ORBIT360_DEPLOY_PHASE_FAILED:${PHASE}:exit=${code}"
-            exit "$code"
-          }
-          trap on_error ERR
-
-          PHASE="firebase_channel_deploy"
-          npx --yes firebase-tools@latest hosting:channel:deploy orbit360-ays-lab \
-            --project "$FIREBASE_PROJECT_ID" \
-            --expires 30d \
-            --non-interactive \
-            --json | tee "$DEPLOY_JSON"
-
-          PHASE="channel_url_discovery"
-          URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$DEPLOY_JSON" | head -n 1)"
-          if [ -z "$URL" ]; then
-            echo "BLOQUEO_URL_CANAL_LAB_NO_ENCONTRADA"
-            jq -r '.. | strings | select(test("^https://"))' "$DEPLOY_JSON" || true
-            exit 47
-          fi
-          case "$URL" in
-            *--orbit360-ays-lab*) ;;
-            *) echo "BLOQUEO_URL_NO_CORRESPONDE_AL_CANAL_LAB"; exit 48 ;;
-          esac
-
-          PHASE="runtime_build_propagation_ready"
-          BUILD_JSON=""
-          DEPLOYED_SHA=""
-          DEPLOYED_RUN=""
-          DEPLOYED_GATE=""
-          DEPLOYED_RUNTIME=""
-          for attempt in $(seq 1 20); do
-            PROPAGATION_ATTEMPTS="$attempt"
-            BUILD_URL="${URL}/runtime-build.json?orbitRun=${GITHUB_RUN_ID}&attempt=${attempt}"
-            if BUILD_JSON="$(curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BUILD_URL" 2>/dev/null)"; then
-              DEPLOYED_SHA="$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty' 2>/dev/null || true)"
-              DEPLOYED_RUN="$(printf '%s' "$BUILD_JSON" | jq -r '.run // empty' 2>/dev/null || true)"
-              DEPLOYED_GATE="$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty' 2>/dev/null || true)"
-              DEPLOYED_RUNTIME="$(printf '%s' "$BUILD_JSON" | jq -r '.runtimeVersion // empty' 2>/dev/null || true)"
-              if [ "$DEPLOYED_SHA" = "$GITHUB_SHA" ] && \
-                 [ "$DEPLOYED_RUN" = "$GITHUB_RUN_ID" ] && \
-                 [ "$DEPLOYED_GATE" = "$ORBIT360_GATE_ID" ] && \
-                 [ "$DEPLOYED_RUNTIME" = "$CANONICAL_RUNTIME_VERSION" ]; then
-                BUILD_EXACT=true
-                break
-              fi
-            fi
-            sleep 2
-          done
-          PHASE="runtime_build_assert"
-          test "$BUILD_EXACT" = true
-
-          PHASE="runtime_sources_fetch"
-          CACHE_BUSTER="orbitRun=${GITHUB_RUN_ID}"
-          LOADER_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/core/backend-lab-loader.js?$CACHE_BUSTER")"
-          PREVIEW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/ays-lab-preview.html?$CACHE_BUSTER")"
-          SW_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/sw.js?$CACHE_BUSTER")"
-          PWA_SOURCE="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/core/pwa.js?$CACHE_BUSTER")"
-          PHASE="runtime_sources_assert"
-          printf '%s' "$LOADER_SOURCE" | grep -Fq "var LAB_RUNTIME = '$CANONICAL_RUNTIME_VERSION'"
-          printf '%s' "$PREVIEW_SOURCE" | grep -Fq "runtime=$CANONICAL_RUNTIME_VERSION"
-          printf '%s' "$SW_SOURCE" | grep -Fq "var BUILD = '$CANONICAL_RUNTIME_VERSION'"
-          printf '%s' "$PWA_SOURCE" | grep -Fq "var RUNTIME_BUILD = '$CANONICAL_RUNTIME_VERSION'"
-
-          PHASE="completed"
-          write_diag true 0
-          trap - ERR
-          echo "url=$URL" >> "$GITHUB_OUTPUT"
-          echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
-          echo "ORBIT360_EXPECTED_COMMIT=$GITHUB_SHA" >> "$GITHUB_ENV"
-
-      - name: Instalar navegador del gate visual
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-save playwright@1.52.0
+          npm install --no-save firebase-admin@13 playwright@1.52.0
           npx playwright install --with-deps chromium
 
-      - name: Gate conjunto · Cliente 360 y Aseguradoras · tres vistas
+      - name: Verificar conteos y conocimiento LAB sin escribir
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-verify-lab-data-counts.mjs
+          node tools/orbit360-inventariar-aseguradoras-knowledge-lab-v20260716.mjs
+          test "$(jq -r '.counts.clientes' orbit360-platform/lab-data-counts.json)" = '414'
+          test "$(jq -r '.counts.aseguradoras' orbit360-platform/lab-data-counts.json)" = '26'
+          test "$(jq -r '.counts.asesores' orbit360-platform/lab-data-counts.json)" = '7'
+
+      - name: Verificar canal LAB existente sin deploy
+        id: runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIAG_DIR='orbit360-platform/runtime-gate-crm-v20260716'
+          mkdir -p "$DIAG_DIR"
+          BUILD_JSON="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "${ORBIT360_PREVIEW_URL}/runtime-build.json?finalGate=${GITHUB_RUN_ID}")"
+          DEPLOYED_SHA="$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty')"
+          DEPLOYED_RUNTIME="$(printf '%s' "$BUILD_JSON" | jq -r '.runtimeVersion // empty')"
+          DEPLOYED_GATE="$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty')"
+          test "$DEPLOYED_SHA" != ''
+          test "$DEPLOYED_RUNTIME" != ''
+          test "$DEPLOYED_GATE" != ''
+          git cat-file -e "${DEPLOYED_SHA}^{commit}"
+          RUNTIME_FILES=(
+            orbit360-platform/ays-lab-preview.html
+            orbit360-platform/index.html
+            orbit360-platform/sw.js
+            orbit360-platform/core/pwa.js
+            orbit360-platform/core/backend-lab-loader.js
+            orbit360-platform/core/backend-lab-init.js
+            orbit360-platform/core/backend-lab-auth-guard.js
+            orbit360-platform/data/store-firestore-lab.local.js
+            orbit360-platform/core/router.js
+            orbit360-platform/core/legal.js
+            orbit360-platform/core/access-scope.js
+            orbit360-platform/core/client-canonical-view-projection-v20260716.js
+            orbit360-platform/core/router-tenant-config-bootstrap.js
+            orbit360-platform/core/client-insurer-visual-contract-v20260720.js
+            orbit360-platform/styles/client-insurer-visual-contract-v20260720.css
+            orbit360-platform/modules/cliente360.js
+            orbit360-platform/modules/aseguradoras.js
+            orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js
+            orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js
+            orbit360-platform/modules/aseguradoras-v1202-import-bridge.js
+            orbit360-platform/modules/calidad.js
+            orbit360-platform/data/tenant-runtime-config-index.js
+            orbit360-platform/core/backend-lab-canonical-view-sync.js
+          )
+          CHANGED="$(git diff --name-only "$DEPLOYED_SHA" "$GITHUB_SHA" -- "${RUNTIME_FILES[@]}")"
+          test -z "$CHANGED"
+          jq -n \
+            --arg deployedSha "$DEPLOYED_SHA" \
+            --arg deployedRuntime "$DEPLOYED_RUNTIME" \
+            --arg deployedGate "$DEPLOYED_GATE" \
+            --arg url "$ORBIT360_PREVIEW_URL" \
+            '{schemaVersion:"orbit360-existing-lab-runtime-readonly-v1",ok:true,deployedSha:$deployedSha,deployedRuntime:$deployedRuntime,deployedGate:$deployedGate,url:$url,runtimeGraphChanged:false,deployExecuted:false,containsPII:false,containsSecrets:false}' \
+            > "$DIAG_DIR/existing-runtime-sanitized.json"
+          echo "runtime=$DEPLOYED_RUNTIME" >> "$GITHUB_OUTPUT"
+          echo "sha=$DEPLOYED_SHA" >> "$GITHUB_OUTPUT"
+          echo "ORBIT360_EXPECTED_RUNTIME=$DEPLOYED_RUNTIME" >> "$GITHUB_ENV"
+          echo "ORBIT360_EXPECTED_COMMIT=$DEPLOYED_SHA" >> "$GITHUB_ENV"
+
+      - name: Gate final único · tres vistas
         id: joint_gate
         continue-on-error: true
         shell: bash
@@ -254,95 +201,61 @@ jobs:
           set -euo pipefail
           node tools/orbit360-gate-runtime-crm-v20260716.mjs
 
-      - name: Publicar evidencia sanitizada sin capturas ni PII
+      - name: Validar resultado sanitizado
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPORT='orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json'
+          test -f "$REPORT"
+          jq -e '
+            .ok == true and
+            .gateId == "block1-client360-insurers-lab-v20260717" and
+            .contractVersion == "1.0.27" and
+            .containsPII == false and
+            .containsSecrets == false and
+            .checks.desktopDirection == true and
+            .checks.tabletOperativo == true and
+            .checks.mobileAsesor == true and
+            .checks.realClientCount == true and
+            .checks.realInsurerCount == true and
+            .checks.realAdvisorCount == true and
+            .checks.insurerReadMode == true and
+            .checks.insurerKnowledgeVisible == true
+          ' "$REPORT" >/dev/null
+          test '${{ steps.joint_gate.outcome }}' = 'success'
+
+      - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-clientes-aseguradoras-runtime-gate-v20260717-${{ github.run_id }}
+          name: orbit360-final-block1-readonly-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/lab-data-counts.json
             orbit360-platform/lab-aseguradoras-knowledge-inventory.json
-            orbit360-platform/runtime-build.json
-            orbit360-platform/runtime-gate-crm-v20260716/deploy-diagnostic-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/existing-runtime-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json
             orbit360-platform/runtime-gate-aseguradoras-v20260716/resultado-sanitizado.json
-          if-no-files-found: warn
-          retention-days: 7
+            orbit360-platform/docs/evidence/post-recovery-inventory-29868538689-sanitized.json
+          if-no-files-found: error
+          retention-days: 30
 
-      - name: Resumen
+      - name: Publicar estado final
         if: always()
-        shell: bash
-        run: |
-          PREFLIGHT="orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json"
-          PREFLIGHT_STATUS="$(test -f "$PREFLIGHT" && jq -r '.status // "no disponible"' "$PREFLIGHT" || echo 'no disponible')"
-          {
-            echo "## Orbit 360 · Gate conjunto Cliente 360 + Aseguradoras"
-            echo ""
-            echo "Gate: ${ORBIT360_GATE_ID}"
-            echo ""
-            echo "Runtime: ${ORBIT360_EXPECTED_RUNTIME}"
-            echo ""
-            echo "Rama: ays/backend-tenant-lab-v99-20260703"
-            echo ""
-            echo "Proyecto: ays-orbit-360-lab"
-            echo ""
-            echo "Commit: ${GITHUB_SHA}"
-            echo ""
-            echo "Run: ${GITHUB_RUN_ID}"
-            echo ""
-            echo "Preflight: ${PREFLIGHT_STATUS}"
-            echo ""
-            echo "Canal LAB verificado: ${ORBIT360_PREVIEW_URL:-no disponible}"
-            echo ""
-            echo "Gate conjunto: ${{ steps.joint_gate.outcome }}"
-            echo ""
-            echo "Clientes esperados: 414 · Aseguradoras esperadas: 26 · Asesores esperados: 7"
-            echo ""
-            echo "Pólizas, vehículos y cobros no se infieren ni se escriben desde Clientes."
-            echo ""
-            echo "Sin producción, sin main, sin merge y sin capturas de datos personales."
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Publicar resultado sanitizado en PR 5
-        if: always() && github.event_name == 'push'
-        shell: bash
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          PREFLIGHT="orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json"
-          REPORT="orbit360-platform/runtime-gate-crm-v20260716/resultado-sanitizado.json"
-          INVENTORY="orbit360-platform/lab-aseguradoras-knowledge-inventory.json"
-          COUNTS="orbit360-platform/lab-data-counts.json"
-          PREFLIGHT_STATUS="$(test -f "$PREFLIGHT" && jq -r '.status // "no disponible"' "$PREFLIGHT" || echo 'no disponible')"
-          if [ -f "$REPORT" ]; then
-            OK="$(jq -r '.ok // false' "$REPORT")"
-            ERROR_CODE="$(jq -r '(.error // "") | split(":")[0] | gsub("[\\r\\n]"; " ")' "$REPORT")"
-            FAILED_CHECKS="$(jq -r '[.checks // {} | to_entries[] | select(.value != true) | .key] | join(",")' "$REPORT")"
-          elif [ -f "$PREFLIGHT" ]; then
-            OK="false"
-            ERROR_CODE="$(jq -r '.status // "VALIDATOR_STALE"' "$PREFLIGHT")"
-            FAILED_CHECKS="$(jq -r '[.failedCheckIds // [] | .[]] | join(",")' "$PREFLIGHT")"
-          else
-            OK="false"
-            ERROR_CODE="RESULTADO_NO_GENERADO"
-            FAILED_CHECKS="resultado"
-          fi
-          if [ "$OK" != "true" ] && [ -z "$ERROR_CODE" ]; then ERROR_CODE="GATE_FALSE_SIN_ERROR"; fi
-          if [ -z "$FAILED_CHECKS" ]; then FAILED_CHECKS="ninguno"; fi
-          CLIENTS="$(test -f "$COUNTS" && jq -r '.counts.clientes // 0' "$COUNTS" || echo 0)"
-          INSURERS="$(test -f "$COUNTS" && jq -r '.counts.aseguradoras // 0' "$COUNTS" || echo 0)"
-          ADVISORS="$(test -f "$COUNTS" && jq -r '.counts.asesores // 0' "$COUNTS" || echo 0)"
-          SYNC="$(test -f "$INVENTORY" && jq -r '.gates.operationalSyncComplete // false' "$INVENTORY" || echo false)"
-          printf -v BODY '%s\n\n- Gate: %s\n- Runtime: %s\n- Commit: %s\n- Run: %s\n- Preflight: **%s**\n- Canal LAB: %s\n- Gate conjunto: **%s**\n- Conteos LAB: clientes **%s**, aseguradoras **%s**, asesores **%s**\n- Conocimiento Aseguradoras persistido operativamente: **%s**\n- Código de bloqueo: %s\n- Checks no aprobados: %s\n- Evidencia: artefacto sanitizado del run, sin PII, secretos ni documentos fuente.\n- Alcance: LAB únicamente; sin producción, merge ni main.' \
-            '## Resultado automático sanitizado · Cliente 360 + Aseguradoras' \
-            "$ORBIT360_GATE_ID" "$ORBIT360_EXPECTED_RUNTIME" "$GITHUB_SHA" "$GITHUB_RUN_ID" "$PREFLIGHT_STATUS" "${ORBIT360_PREVIEW_URL:-no disponible}" "$OK" "$CLIENTS" "$INSURERS" "$ADVISORS" "$SYNC" "$ERROR_CODE" "$FAILED_CHECKS"
-          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
-
-      - name: Fallar si el gate conjunto no fue aprobado
-        if: always()
         shell: bash
         run: |
-          set -euo pipefail
-          test '${{ steps.joint_gate.outcome }}' = 'success'
+          state=success
+          description='M1 gate final read-only aprobado; revisión visual única habilitada'
+          if [ "${{ job.status }}" != success ]; then
+            state=failure
+            description='M1 gate final falló; evidencia preservada y STOP THE LINE'
+          fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -f state="$state" \
+            -f context='orbit360/final-block1-readonly-v1' \
+            -f description="$description" \
+            -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
