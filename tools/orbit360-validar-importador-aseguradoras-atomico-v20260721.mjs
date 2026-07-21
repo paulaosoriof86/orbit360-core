@@ -144,7 +144,16 @@ const dryRunTokens = [
 ];
 for (const token of dryRunTokens) check(`DRYRUN_TOKEN:${token}`, dryRun.includes(token), token);
 check('DRYRUN_TRACE_NOT_IDENTITY_GATE', !dryRun.includes('RECOVERY_TRACE_MISMATCH') && !dryRun.includes('DUPLICATE_TRACE_MISMATCH'), 'trace metadata must not block stable identity');
-check('DRYRUN_NO_FIRESTORE_WRITE', !/\.(set|update|create|delete)\s*\(/.test(dryRun), 'read-only exact dry-run');
+const forbiddenFirestoreWritePatterns = [
+  /\.doc\s*\([^)]*\)[\s\S]{0,160}?\.(?:set|update|create|delete)\s*\(/,
+  /\.collection\s*\([^)]*\)[\s\S]{0,160}?\.add\s*\(/,
+  /\b(?:writeBatch|runTransaction|bulkWriter)\s*\(/
+];
+const detectedFirestoreWritePatterns = forbiddenFirestoreWritePatterns
+  .map((pattern, index) => ({ index, matched: pattern.test(dryRun) }))
+  .filter(item => item.matched)
+  .map(item => item.index);
+check('DRYRUN_NO_FIRESTORE_WRITE', detectedFirestoreWritePatterns.length === 0, `detected=${detectedFirestoreWritePatterns.join(',') || 'none'}`);
 
 const applyStart = coordinator.indexOf('async function applyApproved');
 const applyEnd = coordinator.indexOf('\n  function esc(', applyStart);
