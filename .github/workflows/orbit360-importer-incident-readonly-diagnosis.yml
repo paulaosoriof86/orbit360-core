@@ -1,20 +1,171 @@
-name: FROZEN · Orbit 360 Incident Importador Aseguradoras
+name: Orbit 360 · Dry-run exacto recuperación bancaria 68+2
 
-# Hard freeze after repeated methodology loop on 2026-07-21.
-# No push/pull_request trigger. No runtime, secrets, Firestore, vault or recovery.
+# Ejecución única vinculada al marcador. Sin workflow_dispatch, sin trigger genérico,
+# sin escritura, migración, navegador o deploy.
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-authorize-exact-recovery-dryrun-v20260721.json'
 
 permissions:
   contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-exact-recovery-dryrun-68plus2-v1
+  cancel-in-progress: false
+
+env:
+  ORBIT360_GATE_ID: block1-real-insurer-directories-lab-v20260720
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
+  ORBIT360_AUTHORIZATION_ID: exact-bank-reference-recovery-dryrun-68plus2-v1
+  ORBIT360_EXPECTED_RESTORES: 68
+  ORBIT360_EXPECTED_DUPLICATE_REMOVALS: 2
+  ORBIT360_EXPECTED_FINAL_REFERENCES: 91
 
 jobs:
-  frozen-methodology-review:
-    if: ${{ false }}
-    name: FROZEN · revisión metodológica requerida
+  exact-readonly-dryrun:
+    name: ÚNICO · dry-run exacto 68 restauraciones + 2 deduplicaciones
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
     steps:
-      - run: |
-          echo "STOP_THE_LINE_METHODOLOGY_REVIEW"
-          echo "See tools/orbit360-incident-freeze-v20260721.json"
-          exit 1
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar autorización vinculante antes de credenciales
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "$ORBIT360_BRANCH"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          FREEZE='tools/orbit360-incident-freeze-v20260721.json'
+          MARKER='tools/orbit360-authorize-exact-recovery-dryrun-v20260721.json'
+          SCRIPT='tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs'
+          MANIFEST='tools/orbit360-bank-reference-recovery-map-v20260721.json'
+          test -f "$FREEZE" && test -f "$MARKER" && test -f "$SCRIPT" && test -f "$MANIFEST"
+          test "$(jq -r '.status' "$FREEZE")" = 'BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED'
+          test "$(jq -r '.runtimeAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_AUTHORIZATION_ID"
+          test "$(jq -r '.runtimeAuthorization.active' "$FREEZE")" = 'true'
+          test "$(jq -r '.runtimeAuthorization.allowedExecutions' "$FREEZE")" = '1'
+          test "$(jq -r '.runtimeAuthorization.writesAllowed' "$FREEZE")" = 'false'
+          test "$(jq -r '.runtimeAuthorization.script' "$FREEZE")" = "$SCRIPT"
+          test "$(jq -r '.runtimeAuthorization.manifest' "$FREEZE")" = "$MANIFEST"
+          test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_AUTHORIZATION_ID"
+          test "$(jq -r '.action' "$MARKER")" = 'exact_recovery_readonly_dry_run'
+          test "$(jq -r '.allowedExecutions' "$MARKER")" = '1'
+          test "$(jq -r '.writesAllowed' "$MARKER")" = 'false'
+          test "$(jq -r '.expected.restores' "$MARKER")" = "$ORBIT360_EXPECTED_RESTORES"
+          test "$(jq -r '.expected.duplicateRemovals' "$MARKER")" = "$ORBIT360_EXPECTED_DUPLICATE_REMOVALS"
+          test "$(jq -r '.expected.finalValidReferences' "$MARKER")" = "$ORBIT360_EXPECTED_FINAL_REFERENCES"
+          node --check "$SCRIPT"
+          node --check tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs
+
+      - name: Preflight central vinculante antes de secrets o runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p orbit360-exact-recovery-evidence
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID" > orbit360-exact-recovery-evidence/preflight.json
+          cp orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json orbit360-exact-recovery-evidence/preflight-sanitizado.json
+          test "$(jq -r '.status' orbit360-exact-recovery-evidence/preflight-sanitizado.json)" = 'GO_GATE_CONTRACT'
+
+      - name: Ejecutar validador estático canónico
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs > orbit360-exact-recovery-evidence/static-validator.json
+          cp orbit360-platform/runtime-incident-importer-20260721/static-importer-atomicity-sanitized.json orbit360-exact-recovery-evidence/static-importer-atomicity-sanitized.json
+          test "$(jq -r '.ok' orbit360-exact-recovery-evidence/static-importer-atomicity-sanitized.json)" = 'true'
+          test "$(jq -r '.runtimeExecuted' orbit360-exact-recovery-evidence/static-importer-atomicity-sanitized.json)" = 'false'
+
+      - name: Resolver identidad LAB de solo lectura
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab-exact-dryrun.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar dependencias mínimas reproducibles
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save firebase-admin@13 @google-cloud/secret-manager@6.2.0
+
+      - name: Ejecutar una sola vez el dry-run exacto
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs
+          REPORT='orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-exact-dry-run-sanitized.json'
+          test -f "$REPORT"
+          cp "$REPORT" orbit360-exact-recovery-evidence/bank-reference-recovery-exact-dry-run-sanitized.json
+          jq -e '
+            .ok == true and
+            .mode == "read_only_exact_manifest_dry_run" and
+            .writesExecuted == false and
+            .deployExecuted == false and
+            .migrationExecuted == false and
+            .containsPII == false and
+            .containsSecrets == false and
+            .before.clients == 414 and
+            .before.insurers == 26 and
+            .before.advisors == 7 and
+            .before.validReferences == 23 and
+            .before.pendingReferences == 70 and
+            .before.vaultRows == 91 and
+            .before.rawProtectedValues == 0 and
+            .proposal.restores == 68 and
+            .proposal.duplicateRemovals == 2 and
+            .proposal.affectedDocuments == 13 and
+            .proposal.nonReferenceFieldChanges == 0 and
+            .proposal.colombiaDocumentChanges == 0 and
+            .simulatedAfter.validReferences == 91 and
+            .simulatedAfter.pendingReferences == 0 and
+            .simulatedAfter.duplicateFingerprints == 0 and
+            .authorizationRequiredForWrite == true
+          ' "$REPORT" >/dev/null
+          jq '{ok,mode,writesExecuted,before,proposal,simulatedAfter,checks,authorizationRequiredForWrite,nextAllowedAction,containsPII,containsSecrets}' "$REPORT"
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-exact-recovery-dryrun-${{ github.run_id }}-${{ github.run_attempt }}
+          path: orbit360-exact-recovery-evidence
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publicar resultado del único dry-run
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          state=success
+          description='Dry-run exacto 68+2 aprobado; escritura aún bloqueada'
+          if [ "${{ job.status }}" != success ]; then state=failure; description='Dry-run exacto falló; STOP THE LINE sin reintento'; fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/exact-recovery-dryrun-68plus2-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
