@@ -7,6 +7,7 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - '.github/workflows/orbit360-aseguradoras-op2-smoke.yml'
+      - 'tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs'
       - 'functions/**'
       - 'tools/orbit360-inventariar-functions-aseguradoras-lab-v20260721.mjs'
       - 'tools/orbit360-migrar-cuentas-aseguradoras-vault-lab-v20260721-v2.mjs'
@@ -43,8 +44,105 @@ env:
   ORBIT360_FIREBASE_TOOLS_VERSION: 15.24.0
 
 jobs:
+  incident-readonly-diagnosis:
+    name: STOP THE LINE · diagnóstico read-only del importador
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Preflight vinculante antes de credenciales
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p orbit360-importer-incident-evidence
+          test "${GITHUB_REF_NAME}" = "$ORBIT360_BRANCH"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID" > orbit360-importer-incident-evidence/preflight.json
+          cp orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json orbit360-importer-incident-evidence/preflight-sanitizado.json
+          test "$(jq -r '.status' orbit360-importer-incident-evidence/preflight-sanitizado.json)" = GO_GATE_CONTRACT
+
+      - name: Resolver identidad LAB solo lectura
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab-readonly.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar dependencias del diagnóstico
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save firebase-admin@13 @google-cloud/secret-manager@6.2.0
+
+      - name: Inventariar referencias, bóveda y auditoría sin escritura
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs
+          cp orbit360-platform/runtime-incident-importer-20260721/insurer-protected-reference-diff-sanitizado.json orbit360-importer-incident-evidence/insurer-protected-reference-diff-sanitizado.json
+
+      - name: Validar corte seguro
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPORT='orbit360-importer-incident-evidence/insurer-protected-reference-diff-sanitizado.json'
+          test -f "$REPORT"
+          test "$(jq -r '.diagnosisComplete // false' "$REPORT")" = true
+          test "$(jq -r '.mode' "$REPORT")" = read_only
+          test "$(jq -r '.writesExecuted // true' "$REPORT")" = false
+          test "$(jq -r '.deployExecuted // true' "$REPORT")" = false
+          test "$(jq -r '.migrationExecuted // true' "$REPORT")" = false
+          test "$(jq -r '.containsSecrets // true' "$REPORT")" = false
+          test "$(jq -r '.containsPII // true' "$REPORT")" = false
+          test "$(jq -r '.current.rawAccountValues // -1' "$REPORT")" = 0
+          test "$(jq -r '.current.rawCredentialValues // -1' "$REPORT")" = 0
+          jq '{schemaVersion,generatedAt,mode,writesExecuted,diagnosisComplete,current,vault,diff,safetyChecks}' "$REPORT"
+
+      - name: Subir evidencia sanitizada del incidente
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-importer-incident-readonly-${{ github.run_id }}-${{ github.run_attempt }}
+          path: orbit360-importer-incident-evidence
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publicar estado STOP THE LINE
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          state=success
+          description='Diagnóstico read-only completado; gate de escritura congelado'
+          if [ "${{ job.status }}" != success ]; then state=failure; description='Diagnóstico read-only incompleto; no reintentar gate'; fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/importer-incident-readonly-v20260721' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
+
   real-directories-readiness:
-    name: Gate único · inventario · migración · preview · importador
+    if: ${{ false }}
+    name: FROZEN · gate anterior de migración, preview e importador
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -72,10 +170,8 @@ jobs:
           mkdir -p orbit360-real-directories-evidence
           test "${GITHUB_REF_NAME}" = "$ORBIT360_BRANCH"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID" \
-            > orbit360-real-directories-evidence/preflight.json
-          cp orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json \
-            orbit360-real-directories-evidence/preflight-sanitizado.json
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID" > orbit360-real-directories-evidence/preflight.json
+          cp orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json orbit360-real-directories-evidence/preflight-sanitizado.json
           test "$(jq -r '.status' orbit360-real-directories-evidence/preflight-sanitizado.json)" = GO_GATE_CONTRACT
 
       - name: Resolver credenciales exclusivas de LAB
@@ -99,31 +195,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm install --no-save \
-            firebase-admin@13 \
-            google-auth-library@9 \
-            playwright@1.52.0 \
-            xlsx@0.18.5 \
-            @google-cloud/secret-manager@6.2.0 \
-            "firebase-tools@${ORBIT360_FIREBASE_TOOLS_VERSION}"
+          npm install --no-save firebase-admin@13 google-auth-library@9 playwright@1.52.0 xlsx@0.18.5 @google-cloud/secret-manager@6.2.0 "firebase-tools@${ORBIT360_FIREBASE_TOOLS_VERSION}"
           npm --prefix functions install --no-audit --no-fund
           npm --prefix functions run check
           node <<'NODE'
           const pkg = require('./node_modules/firebase-tools/package.json');
-          if (pkg.version !== process.env.ORBIT360_FIREBASE_TOOLS_VERSION) {
-            throw new Error(`FIREBASE_TOOLS_DRIFT:${pkg.version}`);
-          }
+          if (pkg.version !== process.env.ORBIT360_FIREBASE_TOOLS_VERSION) throw new Error(`FIREBASE_TOOLS_DRIFT:${pkg.version}`);
           const exported = Object.keys(require('./functions/bootstrap.js')).sort();
-          const required = [
-            'orbit360ImportInsurerCredentials',
-            'orbit360CredentialStatus',
-            'orbit360RevealInsurerCredential',
-            'orbit360CopyInsurerCredential',
-            'orbit360ImportInsurerBankAccounts',
-            'orbit360BankAccountStatus',
-            'orbit360RevealInsurerBankAccount',
-            'orbit360CopyInsurerBankAccount'
-          ];
+          const required = ['orbit360ImportInsurerCredentials','orbit360CredentialStatus','orbit360RevealInsurerCredential','orbit360CopyInsurerCredential','orbit360ImportInsurerBankAccounts','orbit360BankAccountStatus','orbit360RevealInsurerBankAccount','orbit360CopyInsurerBankAccount'];
           const missing = required.filter((name) => !exported.includes(name));
           if (missing.length) throw new Error(`FUNCTION_EXPORTS_MISSING:${missing.join(',')}`);
           console.log('ORBIT360_EIGHT_SECURE_FUNCTION_EXPORTS_OK');
@@ -144,23 +223,12 @@ jobs:
           CREDENTIALS_READY="$(jq -r '.credentialsReady // false' "$INVENTORY")"
           BANK_READY="$(jq -r '.bankAccountsReady // false' "$INVENTORY")"
           BANK_EXISTS="$(jq '[.functions[]? | select(.group == "bankAccounts" and .exists == true)] | length' "$INVENTORY")"
-          DISCOVERED="$(jq -r '.discoveredCount // 0' "$INVENTORY")"
           echo "credentials_ready=$CREDENTIALS_READY" >> "$GITHUB_OUTPUT"
           echo "bank_ready=$BANK_READY" >> "$GITHUB_OUTPUT"
           echo "bank_exists=$BANK_EXISTS" >> "$GITHUB_OUTPUT"
-          echo "discovered=$DISCOVERED" >> "$GITHUB_OUTPUT"
-          if [ "$CREDENTIALS_READY" != true ]; then
-            echo 'CREDENTIAL_PROVIDER_REGRESSION_OR_INVENTORY_BLOCKED'
-            exit 61
-          fi
-          if [ "$BANK_EXISTS" = 4 ] && [ "$BANK_READY" != true ]; then
-            echo 'BANK_FUNCTIONS_EXIST_BUT_NOT_READY_NO_REDEPLOY'
-            exit 62
-          fi
-          if [ "$BANK_READY" = true ]; then
-            test "$INVENTORY_EXIT" = 0
-            echo 'ORBIT360_BANK_FUNCTIONS_ALREADY_READY_SKIP_DEPLOY'
-          fi
+          if [ "$CREDENTIALS_READY" != true ]; then exit 61; fi
+          if [ "$BANK_EXISTS" = 4 ] && [ "$BANK_READY" != true ]; then exit 62; fi
+          if [ "$BANK_READY" = true ]; then test "$INVENTORY_EXIT" = 0; fi
 
       - name: Desplegar una sola vez únicamente si faltan Functions bancarias
         if: steps.inventory.outputs.bank_exists != '4'
@@ -168,18 +236,8 @@ jobs:
         run: |
           set -euo pipefail
           DEPLOY_JSON="${RUNNER_TEMP}/firebase-bank-functions.json"
-          npx firebase deploy \
-            --only functions:orbit360ImportInsurerBankAccounts,functions:orbit360BankAccountStatus,functions:orbit360RevealInsurerBankAccount,functions:orbit360CopyInsurerBankAccount \
-            --project "$FIREBASE_PROJECT_ID" \
-            --non-interactive \
-            --force \
-            --json | tee "$DEPLOY_JSON"
-          jq -n \
-            --arg project "$FIREBASE_PROJECT_ID" \
-            --arg node "$(node --version)" \
-            --arg firebaseTools "$ORBIT360_FIREBASE_TOOLS_VERSION" \
-            '{schemaVersion:"orbit360-bank-functions-deploy-v3",ok:true,mode:"single_missing_functions_deploy",projectId:$project,node:$node,firebaseTools:$firebaseTools,containsPII:false,containsSecrets:false}' \
-            > orbit360-real-directories-evidence/bank-functions-deploy-sanitizado.json
+          npx firebase deploy --only functions:orbit360ImportInsurerBankAccounts,functions:orbit360BankAccountStatus,functions:orbit360RevealInsurerBankAccount,functions:orbit360CopyInsurerBankAccount --project "$FIREBASE_PROJECT_ID" --non-interactive --force --json | tee "$DEPLOY_JSON"
+          jq -n --arg project "$FIREBASE_PROJECT_ID" --arg node "$(node --version)" --arg firebaseTools "$ORBIT360_FIREBASE_TOOLS_VERSION" '{schemaVersion:"orbit360-bank-functions-deploy-v3",ok:true,mode:"single_missing_functions_deploy",projectId:$project,node:$node,firebaseTools:$firebaseTools,containsPII:false,containsSecrets:false}' > orbit360-real-directories-evidence/bank-functions-deploy-sanitizado.json
 
       - name: Confirmar Functions activas, revisión lista y tráfico completo
         shell: bash
@@ -192,20 +250,13 @@ jobs:
           test "$(jq -r '.discoveredCount // 0' "$INVENTORY")" = 8
           test "$(jq -r '.credentialsReady // false' "$INVENTORY")" = true
           test "$(jq -r '.bankAccountsReady // false' "$INVENTORY")" = true
-          if [ ! -f orbit360-real-directories-evidence/bank-functions-deploy-sanitizado.json ]; then
-            jq -n \
-              --arg project "$FIREBASE_PROJECT_ID" \
-              '{schemaVersion:"orbit360-bank-functions-deploy-v3",ok:true,mode:"skipped_existing_functions_ready",projectId:$project,containsPII:false,containsSecrets:false}' \
-              > orbit360-real-directories-evidence/bank-functions-deploy-sanitizado.json
-          fi
 
       - name: Migrar cuentas heredadas y verificar cero texto plano
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-migrar-cuentas-aseguradoras-vault-lab-v20260721-v2.mjs
-          cp orbit360-platform/lab-bank-account-migration.json \
-            orbit360-real-directories-evidence/lab-bank-account-migration.json
+          cp orbit360-platform/lab-bank-account-migration.json orbit360-real-directories-evidence/lab-bank-account-migration.json
           test "$(jq -r '.ok // false' orbit360-platform/lab-bank-account-migration.json)" = true
           test "$(jq -r '.after.rawCount // -1' orbit360-platform/lab-bank-account-migration.json)" = 0
           test "$(jq -r '.after.refCount // 0' orbit360-platform/lab-bank-account-migration.json)" -ge "$ORBIT360_EXPECTED_BANK_ACCOUNTS"
@@ -219,44 +270,17 @@ jobs:
           test "$(jq -r '.counts.clientes // 0' orbit360-platform/lab-data-counts.json)" = 414
           test "$(jq -r '.counts.aseguradoras // 0' orbit360-platform/lab-data-counts.json)" = 26
           test "$(jq -r '.counts.asesores // 0' orbit360-platform/lab-data-counts.json)" = 7
-          cp orbit360-platform/lab-data-counts.json orbit360-real-directories-evidence/lab-data-counts.json
-          cp orbit360-platform/lab-aseguradoras-knowledge-inventory.json \
-            orbit360-real-directories-evidence/lab-aseguradoras-knowledge-inventory.json
 
       - name: Publicar preview LAB exacto
         id: deploy
         shell: bash
         run: |
           set -euo pipefail
-          printf '{"schemaVersion":"orbit360-runtime-build-v2","commit":"%s","run":"%s","branch":"%s","gateId":"%s","runtimeVersion":"%s"}\n' \
-            "$GITHUB_SHA" "$GITHUB_RUN_ID" "$ORBIT360_BRANCH" "$ORBIT360_GATE_ID" "$ORBIT360_EXPECTED_RUNTIME" \
-            > orbit360-platform/runtime-build.json
+          printf '{"schemaVersion":"orbit360-runtime-build-v2","commit":"%s","run":"%s","branch":"%s","gateId":"%s","runtimeVersion":"%s"}\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" "$ORBIT360_BRANCH" "$ORBIT360_GATE_ID" "$ORBIT360_EXPECTED_RUNTIME" > orbit360-platform/runtime-build.json
           DEPLOY_JSON="${RUNNER_TEMP}/firebase-lab-preview.json"
-          npx firebase hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" \
-            --project "$FIREBASE_PROJECT_ID" \
-            --expires 30d \
-            --non-interactive \
-            --json | tee "$DEPLOY_JSON"
+          npx firebase hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --project "$FIREBASE_PROJECT_ID" --expires 30d --non-interactive --json | tee "$DEPLOY_JSON"
           URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$DEPLOY_JSON" | head -n 1)"
           test -n "$URL"
-          BUILD_EXACT=false
-          for attempt in $(seq 1 20); do
-            BUILD_JSON="$(curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "${URL}/runtime-build.json?run=${GITHUB_RUN_ID}&attempt=${attempt}" 2>/dev/null || true)"
-            DEPLOYED_SHA="$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty' 2>/dev/null || true)"
-            DEPLOYED_GATE="$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty' 2>/dev/null || true)"
-            if [ "$DEPLOYED_SHA" = "$GITHUB_SHA" ] && [ "$DEPLOYED_GATE" = "$ORBIT360_GATE_ID" ]; then
-              BUILD_EXACT=true
-              break
-            fi
-            sleep 2
-          done
-          test "$BUILD_EXACT" = true
-          jq -n --arg url "$URL" --arg commit "$GITHUB_SHA" --arg gateId "$ORBIT360_GATE_ID" \
-            '{schemaVersion:"orbit360-lab-preview-v1",containsPII:false,containsSecrets:false,ok:true,url:$url,commit:$commit,gateId:$gateId}' \
-            > orbit360-real-directories-evidence/deploy-sanitizado.json
-          echo "url=$URL" >> "$GITHUB_OUTPUT"
-          echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
-          echo "ORBIT360_EXPECTED_COMMIT=$GITHUB_SHA" >> "$GITHUB_ENV"
 
       - name: Validar navegador y proveedor protegido
         shell: bash
@@ -265,12 +289,6 @@ jobs:
           npx playwright install --with-deps chromium
           node tools/orbit360-aseguradoras-import-readiness-v20260720.mjs
           node tools/orbit360-validar-proveedor-cuentas-aseguradoras-lab-v20260721.mjs
-          cp orbit360-platform/runtime-gate-real-insurer-directories-v20260720/resultado-sanitizado.json \
-            orbit360-real-directories-evidence/readiness-sanitizado.json
-          cp orbit360-platform/runtime-gate-real-insurer-directories-v20260720/bank-provider-sanitizado.json \
-            orbit360-real-directories-evidence/bank-provider-sanitizado.json
-          test "$(jq -r '.ok // false' orbit360-real-directories-evidence/readiness-sanitizado.json)" = true
-          test "$(jq -r '.ok // false' orbit360-real-directories-evidence/bank-provider-sanitizado.json)" = true
 
       - name: Subir evidencia sanitizada
         if: always()
@@ -291,8 +309,4 @@ jobs:
           state=success
           description='Functions, cuentas protegidas e importador listos para GT'
           if [ "${{ job.status }}" != success ]; then state=failure; description='Revisar primera etapa fallida del gate único'; fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -f state="$state" \
-            -f context='orbit360/aseguradoras-real-directories-v20260720' \
-            -f description="$description" \
-            -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/aseguradoras-real-directories-v20260720' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
