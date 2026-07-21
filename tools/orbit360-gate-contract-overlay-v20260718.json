@@ -2,13 +2,13 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-21",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "FUNCTIONAL_DEFECT_SELF_MUTATION_LOOP",
-  "diagnosticRevision": "canonical-owner-idempotent-disconnect-own-writes-v1",
-  "contractRevision": "1.0.32-canonical-owner-idempotent-disconnect-own-writes-v1",
+  "classification": "FUNCTIONAL_DEFECT_CLIENT360_STRUCTURAL_TRIGGER_MISSING",
+  "diagnosticRevision": "canonical-owner-idempotent-client360-triggers-v1",
+  "contractRevision": "1.0.33-canonical-owner-idempotent-client360-triggers-v1",
   "gatePatch": {
-    "contractVersion": "1.0.32",
-    "diagnosticRevision": "canonical-owner-idempotent-disconnect-own-writes-v1",
-    "status": "TARGETED_LAB_DEPLOY_AND_FINAL_GATE_AUTHORIZED"
+    "contractVersion": "1.0.33",
+    "diagnosticRevision": "canonical-owner-idempotent-client360-triggers-v1",
+    "status": "FUNCTIONAL_FIX_PENDING_STATIC_PREFLIGHT"
   },
   "canonicalOwners": [
     {
@@ -31,7 +31,7 @@
       "path": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
       "requiredTokens": [
         "Orbit.clientInsurerVisualContractV20260720",
-        "idempotenceRevision:'20260721.3'",
+        "idempotenceRevision:'20260721.4'",
         "countryEvidenceProposalOnly:true",
         "segmentationReadOnly:true",
         "function setHtmlIfChanged(node,html)",
@@ -39,9 +39,14 @@
         "function pauseCanonicalObserver()",
         "function observeCanonicalOwner()",
         "function nodeNeedsCanonicalEnhancement(node)",
+        "node.id==='f-pais'",
+        "node.id==='f-seg'",
+        "node.matches('#f-pais,#f-seg",
+        "node.querySelector('#f-pais,#f-seg",
         "mutationMode:'same-microtask-disconnect-own-writes'",
         "observerOwnMutations:false",
         "idempotentDomWrites:true",
+        "client360StructuralTrigger:true",
         "writesStore:false"
       ]
     },
@@ -97,6 +102,7 @@
     "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-BARRERA-VISUAL-EVENTOS-DOM-20260721.md",
     "orbit360-platform/docs/BLOQUE1-VALIDATOR-STALE-CONTRATO-PREFLIGHT-DINAMICO-20260721.md",
     "orbit360-platform/docs/BLOQUE1-STOP-LINE-LOOP-MUTATION-OWNER-VISUAL-20260721.md",
+    "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-DISPARADOR-CLIENTE360-EXCLUIDO-20260721.md",
     "orbit360-platform/docs/evidence/owner-visual-idempotence-proof-local-20260721-sanitized.json",
     "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs"
   ],
@@ -170,7 +176,7 @@
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "version:'20260720.2'",
-        "idempotenceRevision:'20260721.3'",
+        "idempotenceRevision:'20260721.4'",
         "function countryEvidence(clientId)",
         "function segmentFor(row)",
         "m1SegmentCriteria",
@@ -184,12 +190,17 @@
         "function runEnhance()",
         "var resumeObserver=pauseCanonicalObserver()",
         "function nodeNeedsCanonicalEnhancement(node)",
+        "node.id==='f-pais'",
+        "node.id==='f-seg'",
+        "node.matches('#f-pais,#f-seg",
+        "node.querySelector('#f-pais,#f-seg",
         "function mutationTouchesCanonicalView(records)",
         "function handleCanonicalMutations(records)",
         "canonicalObserver=new MutationObserver(handleCanonicalMutations)",
         "mutationMode:'same-microtask-disconnect-own-writes'",
         "observerOwnMutations:false",
         "idempotentDomWrites:true",
+        "client360StructuralTrigger:true",
         "enhance:runEnhance",
         "exposesSecrets:false"
       ]
@@ -198,8 +209,11 @@
       "path": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "orbit360-owner-visual-idempotence-proof-v1",
-        "one_base_mutation_one_transform_zero_followup_mutations",
+        "orbit360-owner-visual-idempotence-proof-v2-client360-trigger",
+        "one_base_mutation_one_transform_zero_followup_mutations_with_client360_filters",
+        "client_country_filter_structural_trigger",
+        "client_segment_filter_structural_trigger",
+        "client360_trigger_contract",
         "html_idempotence_second_noop",
         "text_idempotence_second_noop",
         "zero_followup_mutations",
@@ -213,10 +227,11 @@
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "orbit360-probar-owner-visual-idempotente-v20260721.mjs",
-        "proof.totalChecks === 24",
+        "proof.totalChecks === 27",
         "proof.proof.baseMutations === 1",
         "proof.proof.canonicalTransforms === 1",
         "proof.proof.followUpObserverDeliveries === 0",
+        "proof.proof.client360StructuralTriggers",
         "ownerIdempotence"
       ]
     },
