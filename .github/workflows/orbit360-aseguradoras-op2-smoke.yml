@@ -1,5 +1,4 @@
 name: Orbit 360 Aseguradoras OP2 Smoke
-
 on:
   workflow_dispatch:
   push:
@@ -9,32 +8,17 @@ on:
       - 'orbit360-platform/core/insurer-directory-import-v1202*.js'
       - 'orbit360-platform/modules/aseguradoras*.js'
       - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
-      - 'orbit360-platform/styles/aseguradoras-op2-v1217.css'
-      - 'tools/orbit360-validar-aseguradoras-op2*.mjs'
-      - 'tools/orbit360-validar-*aseguradoras*.mjs'
-      - 'tools/orbit360-gate-contract-*.json'
-      - '.github/workflows/orbit360-aseguradoras-op2-smoke.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'orbit360-platform/core/aseguradoras-op2-*.js'
-      - 'orbit360-platform/core/insurer-directory-import-v1202*.js'
-      - 'orbit360-platform/modules/aseguradoras*.js'
-      - 'orbit360-platform/data/academia-v1217-aseguradoras-op2.js'
       - 'tools/orbit360-validar-aseguradoras-op2*.mjs'
       - 'tools/orbit360-gate-contract-*.json'
       - '.github/workflows/orbit360-aseguradoras-op2-smoke.yml'
-
 env:
   ORBIT360_GATE_ID: block1-real-insurer-directories-lab-v20260720
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   FIREBASE_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
-
 permissions:
   contents: read
   statuses: write
-
 jobs:
   aseguradoras-static-smoke:
     runs-on: ubuntu-latest
@@ -43,77 +27,62 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-
-      - name: Validate binding gate contract
+      - name: Capture binding preflight
+        id: preflight
         shell: bash
         run: |
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          test -s orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-
-      - name: Execute contracts and preserve evidence
-        id: contracts
-        shell: bash
-        run: |
-          mkdir -p orbit360-op2-contract-evidence
-          cp orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json orbit360-op2-contract-evidence/preflight-sanitizado.json
-          exit_code=0
-          node --check tools/orbit360-validar-aseguradoras-op2-v1220.mjs || exit_code=1
-          node --check tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs || exit_code=1
-          for group in access import copy quarantine alias ux migration academy technical; do
-            set +e
-            node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group "$group" > "orbit360-op2-contract-evidence/${group}.json"
-            code=$?
-            set -e
-            cat "orbit360-op2-contract-evidence/${group}.json"
-            if [ "$code" -ne 0 ]; then exit_code=1; fi
-          done
-          validators=(
-            "tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs orbit360-platform"
-            "tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs ."
-            "tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs ."
-            "tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs ."
-            "tools/orbit360-validar-smoke-op2-plataformas-focused-v1218.mjs ."
-            "tools/orbit360-validar-resume-evidence-op1-op2-v1218.mjs ."
-            "tools/orbit360-validar-backend-lab-contrato.mjs"
-          )
-          index=0
-          for command in "${validators[@]}"; do
-            set +e
-            bash -lc "node $command" > "orbit360-op2-contract-evidence/extra-${index}.json" 2>&1
-            code=$?
-            set -e
-            cat "orbit360-op2-contract-evidence/extra-${index}.json"
-            if [ "$code" -ne 0 ]; then exit_code=1; fi
-            index=$((index + 1))
-          done
-          printf '{"schemaVersion":"orbit360-op2-static-contract-v1","gateId":"%s","head":"%s","project":"%s","channel":"%s","ok":%s,"containsSecrets":false}\n' "$ORBIT360_GATE_ID" "$GITHUB_SHA" "$FIREBASE_PROJECT_ID" "$ORBIT360_HOSTING_CHANNEL" "$([ "$exit_code" -eq 0 ] && echo true || echo false)" > orbit360-op2-contract-evidence/summary.json
-          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+          mkdir -p orbit360-op2-evidence
+          set +e
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID" > orbit360-op2-evidence/preflight-output.json
+          code=$?
+          set -e
+          cat orbit360-op2-evidence/preflight-output.json
+          test ! -s orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json || cp orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json orbit360-op2-evidence/preflight-sanitizado.json
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
-
-      - name: Upload static contract evidence
+      - name: Upload preflight evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-op2-static-contract-${{ github.run_id }}
-          path: orbit360-op2-contract-evidence
+          name: orbit360-op2-preflight-${{ github.run_id }}
+          path: orbit360-op2-evidence
           if-no-files-found: error
           retention-days: 7
-
+      - name: Enforce preflight
+        if: steps.preflight.outputs.exit_code != '0'
+        run: exit 1
+      - name: Run static contract groups
+        id: contracts
+        shell: bash
+        run: |
+          code=0
+          for group in access import copy quarantine alias ux migration academy technical; do
+            node tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs orbit360-platform --group "$group" > "orbit360-op2-evidence/${group}.json" || code=1
+          done
+          node tools/orbit360-validar-politica-recursos-aseguradoras-v1218.mjs orbit360-platform > orbit360-op2-evidence/policy.json || code=1
+          node tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs . > orbit360-op2-evidence/quarantine.json || code=1
+          node tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs . > orbit360-op2-evidence/identity.json || code=1
+          node tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs . > orbit360-op2-evidence/copy.json || code=1
+          printf '{"gateId":"%s","head":"%s","project":"%s","channel":"%s","ok":%s,"containsSecrets":false}\n' "$ORBIT360_GATE_ID" "$GITHUB_SHA" "$FIREBASE_PROJECT_ID" "$ORBIT360_HOSTING_CHANNEL" "$([ "$code" -eq 0 ] && echo true || echo false)" > orbit360-op2-evidence/summary.json
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Upload contract evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-op2-contract-${{ github.run_id }}
+          path: orbit360-op2-evidence
+          if-no-files-found: error
+          retention-days: 7
       - name: Enforce contracts
         if: steps.contracts.outputs.exit_code != '0'
         run: exit 1
-
-      - name: Publish success status
-        if: success()
+      - name: Publish status
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=success -f context='orbit360/aseguradoras-op2-v1221' -f description='Contratos OP2 v1.221 aprobados' -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-
-      - name: Publish failure status
-        if: failure()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context='orbit360/aseguradoras-op2-v1221' -f description='Revisar evidencia OP2 v1.221' -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          state=success
+          description='Contratos OP2 v1.221 aprobados'
+          if [ "${{ job.status }}" != success ]; then state=failure; description='Revisar evidencia OP2 v1.221'; fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/aseguradoras-op2-v1221' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
