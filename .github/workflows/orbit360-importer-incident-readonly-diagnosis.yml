@@ -1,5 +1,6 @@
 name: Orbit 360 Incident Importador Aseguradoras Read-Only
 
+# incidentRevision: 20260721-2
 on:
   workflow_dispatch:
   push:
