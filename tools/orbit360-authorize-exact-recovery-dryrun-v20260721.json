@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-exact-recovery-dryrun-authorization-v3",
+  "schemaVersion": "orbit360-exact-recovery-dryrun-authorization-v4",
   "issuedAt": "2026-07-21",
   "authorizationId": "exact-bank-reference-recovery-dryrun-68plus2-v1",
-  "authorizationRevision": 3,
+  "authorizationRevision": 4,
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
   "action": "exact_recovery_readonly_dry_run",
   "repository": "paulaosoriof86/orbit360-core",
@@ -23,15 +23,31 @@
     "preflightRuntimeExecuted": false
   },
   "previousAttempt": {
-    "runId": 29849973356,
+    "runId": 29860654183,
     "status": "FAILURE",
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "failureStage": "dry_run_report_not_copied_before_shell_exit",
+    "artifactId": 8507136987,
+    "artifactDigest": "sha256:4251a6275758dc58e1ce46746e2189e34c660c353a0b000c16cb7a4abb63430a",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "errorCode": "RECOVERY_TRACE_MISMATCH",
+    "errorDetailHash": "b08aa9d29e46d7d4",
+    "rootCause": "xlsx_blankrows_false_converted_physical_rows_to_nonblank_ordinals",
     "writesExecuted": false,
     "deployExecuted": false,
     "migrationExecuted": false,
-    "artifactId": 8502922581,
-    "artifactIncompleteForRootCause": true
+    "evidencePreserved": true
+  },
+  "rootCauseCorrection": {
+    "scope": "trace_contract_compatibility_only",
+    "source": "Directorio Aseguradoras Guatemala 2026.xlsx",
+    "method": "exact_physical_to_stored_row_reconciliation",
+    "rowsReconciled": 70,
+    "sourceSheets": 13,
+    "ambiguousRows": 0,
+    "unmappedRows": 0,
+    "identitiesChanged": false,
+    "referenceHashesChanged": false,
+    "operationalDataChanged": false,
+    "futureParserStructuralFixDeferred": true
   },
   "expected": {
     "clients": 414,
@@ -50,7 +66,7 @@
     "finalDuplicateReferences": 0
   },
   "sourceBlobs": {
-    "manifest": "3c0acb969eca682c878648f9af35d1a05d496da3",
+    "manifest": "4f2565f3b7e6821cd4f48b08ab8ead452b96ca54",
     "script": "e329c40deb1155f570804296e001bf3aa340e87d",
     "coordinator": "0c899570c03ea540adc48ed45273c251d2c86afe",
     "targetBridge": "29fc2195b8d76fb6d4babab97ae8b389da6e9669",
