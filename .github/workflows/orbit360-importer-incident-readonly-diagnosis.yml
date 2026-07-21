@@ -150,15 +150,40 @@ jobs:
           set -euo pipefail
           npm install --no-save firebase-admin@13 @google-cloud/secret-manager@6.2.0
 
-      - name: Ejecutar una sola vez el dry-run exacto
+      - name: Ejecutar una sola vez el dry-run exacto y preservar siempre su evidencia
         if: ${{ steps.scope.outputs.mode == 'exact_dryrun' }}
         shell: bash
         run: |
-          set -euo pipefail
-          node tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs
+          set -uo pipefail
           REPORT='orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-exact-dry-run-sanitized.json'
+          STDOUT='orbit360-bounded-control-evidence/dry-run-stdout-sanitized.json'
+          STDERR='orbit360-bounded-control-evidence/dry-run-stderr-sanitized.log'
+          set +e
+          node tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs > "$STDOUT" 2> "$STDERR"
+          DRYRUN_EXIT=$?
+          set -e
           test -f "$REPORT"
           cp "$REPORT" orbit360-bounded-control-evidence/bank-reference-recovery-exact-dry-run-sanitized.json
+          jq '{
+            ok,
+            classification,
+            errorCode,
+            errorDetailHash,
+            mode,
+            writesExecuted,
+            deployExecuted,
+            migrationExecuted,
+            before,
+            proposal,
+            simulatedAfter,
+            failedCheckIds: (.checks // {} | to_entries | map(select(.value != true) | .key)),
+            containsPII,
+            containsSecrets,
+            nextAllowedAction
+          }' "$REPORT" > orbit360-bounded-control-evidence/dry-run-result-summary-sanitized.json
+          if [ "$DRYRUN_EXIT" -ne 0 ]; then
+            exit "$DRYRUN_EXIT"
+          fi
           jq -e '
             .ok == true and
             .mode == "read_only_exact_manifest_dry_run" and
@@ -212,6 +237,6 @@ jobs:
           fi
           if [ "${{ job.status }}" != success ]; then
             state=failure
-            description="$MODE falló; STOP THE LINE sin reintento"
+            description="$MODE falló; evidencia preservada y STOP THE LINE"
           fi
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context="$context" -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
