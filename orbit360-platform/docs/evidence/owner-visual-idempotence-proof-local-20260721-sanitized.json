@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "orbit360-owner-visual-idempotence-proof-local-v1",
+  "generatedAt": "2026-07-21T23:17:35.463Z",
+  "classification": "FUNCTIONAL_DEFECT_SELF_MUTATION_LOOP",
+  "sourcePath": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+  "testPath": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
+  "idempotenceRevision": "20260721.3",
+  "sourceSha256": "b9d6a4398cb7007a2868724db7d0d85a8e155c6bbe152082a43186291545c6f0",
+  "testSha256": "7161ef8954339846df5f0c6ce44413330a1b5acbf7fa1c732a0987957dc2f8fe",
+  "ok": true,
+  "totalChecks": 24,
+  "passedChecks": 24,
+  "failedChecks": 0,
+  "proof": {
+    "baseMutations": 1,
+    "canonicalTransforms": 1,
+    "followUpObserverDeliveries": 0,
+    "expected": "one_base_mutation_one_transform_zero_followup_mutations"
+  },
+  "verifiedBehaviors": [
+    "observer_disconnects_before_canonical_transform",
+    "observer_reconnects_after_canonical_transform",
+    "observer_scope_is_structural",
+    "portal_note_write_is_idempotent",
+    "bank_note_write_is_idempotent",
+    "knowledge_text_write_is_idempotent",
+    "country_quality_write_is_idempotent",
+    "empty_portfolio_write_is_idempotent",
+    "second_identical_html_write_is_noop",
+    "second_identical_text_write_is_noop"
+  ],
+  "writesExecuted": false,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "firestoreRead": false,
+  "vaultRead": false,
+  "deployExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
