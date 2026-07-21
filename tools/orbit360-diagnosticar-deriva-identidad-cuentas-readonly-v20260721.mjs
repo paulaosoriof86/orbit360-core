@@ -140,7 +140,7 @@ async function main() {
     schemaVersion: 'orbit360-bank-account-identity-drift-v2', generatedAt: new Date().toISOString(), projectId: PROJECT, tenantId: TENANT,
     mode: 'read_only_identity_diagnosis', writesExecuted: false, deployExecuted: false, migrationExecuted: false, containsPII: false, containsSecrets: false,
     summary: { insurerCount: snap.size, vaultRows: vault.length, currentValidRefs: validRefs, currentPendingRefs: pendingRefs, missingVaultRows: missing.length, directIdMatches: direct, uniqueFingerprintMatches: full, uniqueLast4Matches: last4Only, idDriftMatches: idDrift, bankLabelDrift: bankDrift, typeLabelDrift: typeDrift, currencyDrift, ambiguous: ambiguous.length, unmatched: unmatched.length, pendingBackendWithoutVault: pendingWithoutVault.length, matchedByCountry: { GT: matches.length } },
-    matches, ambiguous, unmatched, pendingBackendWithoutVault, checks, identityDiagnosisReady: Object.values(checks).every(Boolean)
+    matches, ambiguous, unmatched, pendingBackendWithoutVault: pendingWithoutVault, checks, identityDiagnosisReady: Object.values(checks).every(Boolean)
   };
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
