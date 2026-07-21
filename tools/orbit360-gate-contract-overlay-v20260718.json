@@ -2,15 +2,27 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-21",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "VALIDATOR_STALE",
-  "diagnosticRevision": "final-block1-readonly-validator-alignment-v1",
-  "contractRevision": "1.0.27-final-block1-readonly-validator-alignment-v1",
+  "classification": "FUNCTIONAL_DEFECT",
+  "diagnosticRevision": "single-owner-visual-stability-barrier-v1",
+  "contractRevision": "1.0.28-single-owner-visual-stability-barrier-v1",
   "gatePatch": {
-    "contractVersion": "1.0.27",
-    "diagnosticRevision": "final-block1-readonly-validator-alignment-v1",
-    "status": "FINAL_READONLY_GATE_VALIDATOR_ALIGNED"
+    "contractVersion": "1.0.28",
+    "diagnosticRevision": "single-owner-visual-stability-barrier-v1",
+    "status": "STATIC_FIX_PENDING_PREFLIGHT"
   },
   "canonicalOwners": [
+    {
+      "id": "clientInsurerVisualStabilityBarrier",
+      "path": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
+      "requiredTokens": [
+        "__clientInsurerVisualStabilityBarrierV20260721",
+        "knowledgeSettledBeforeVisible: true",
+        "canonicalVisualOwner: 'core/client-insurer-visual-contract-v20260720.js'",
+        "writesStore: false",
+        "reimportsData: false",
+        "exposesSecrets: false"
+      ]
+    },
     {
       "id": "clientInsurerVisualContract",
       "path": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
@@ -64,6 +76,7 @@
     }
   ],
   "requiredFiles": [
+    "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
     "orbit360-platform/modules/calidad.js",
@@ -71,6 +84,7 @@
     "orbit360-platform/data/academia-v1221-m1-visual-integrity.js"
   ],
   "runtimeGraphFiles": [
+    "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
     "orbit360-platform/modules/calidad.js",
@@ -86,7 +100,9 @@
         "VISUAL_REPAIR_REVISION = 'visual-human-repair-v5-operational-honesty'",
         "QUALITY_COUNTRY_FILTER_MISSING",
         "IMPORTER_FALSE_SUCCESS_COPY_VISIBLE",
-        "RESPONSIVE_TITLE_OVERFLOW"
+        "RESPONSIVE_TITLE_OVERFLOW",
+        "page.locator('.m1-credential-box').first().waitFor",
+        "page.locator('.m1-bank-card [data-vlt-copy]').first().waitFor"
       ]
     },
     {
@@ -111,6 +127,21 @@
         "beforeAuth: true",
         "select.dispatchEvent(new Event('change', { bubbles: true }))",
         "responsiveVisibilityIndependent: true"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "version: '20260721.1'",
+        "orbit-insurer-knowledge-pending",
+        "script[data-orbit-insurer-summary-owner]",
+        "releaseStableView",
+        "canonicalOwnerReapplied: true",
+        "orbit:aseguradoras:visual-stable",
+        "writesStore: false",
+        "reimportsData: false",
+        "exposesSecrets: false"
       ]
     },
     {
@@ -163,6 +194,10 @@
       "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
       "replaceRequiredTokens": true,
       "requiredTokens": [
+        "visualStabilityVersion: '20260721.1'",
+        "client-insurer-visual-stability-barrier-v20260721.js?v=20260721-1",
+        "data-orbit-insurer-visual-stability",
+        "loadVisualStability",
         "visualContractVersion: '20260720.2'",
         "client-insurer-visual-contract-v20260720.js?v=20260720-2",
         "client-insurer-visual-contract-v20260720.css?v=20260720-2"
