@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "orbit360-incident-freeze-v1",
+  "issuedAt": "2026-07-21",
+  "incidentId": "insurer-directory-protected-reference-regression-v20260721",
+  "status": "STOP_THE_LINE_READ_ONLY_DIAGNOSIS",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "tenantId": "alianzas-soluciones",
+  "classification": [
+    "DATA_CONTRACT_FAILURE",
+    "PIPELINE_MECHANISM_FAILURE"
+  ],
+  "healthyCheckpoint": {
+    "commit": "02a5436bc804b3a861f82375b124d05015389b4b",
+    "runId": 29797444980,
+    "insurers": 26,
+    "clients": 414,
+    "advisors": 7,
+    "rawProtectedValuesInStore": 0,
+    "validProtectedReferences": 91
+  },
+  "failedObservation": {
+    "commit": "1284d1ab2bb16bd8eb77e4f39afd83970d68af4b",
+    "runId": 29803066010,
+    "insurers": 26,
+    "rawProtectedValuesInStore": 0,
+    "validProtectedReferences": 23,
+    "errorCode": "POST_MIGRATION_STATE_INCOMPLETE"
+  },
+  "blockedActions": [
+    "rerun_gate",
+    "create_parallel_gate",
+    "reimport_guatemala_directory",
+    "import_colombia_directory",
+    "reimport_clients",
+    "reimport_insurers",
+    "advance_policies",
+    "advance_collections",
+    "advance_block2",
+    "deploy_production",
+    "merge_main",
+    "modify_unrelated_modules"
+  ],
+  "allowedActions": [
+    "read_only_inventory",
+    "sanitized_diff",
+    "vault_version_verification",
+    "audit_trace_review",
+    "document_root_cause"
+  ],
+  "repeatRule": {
+    "sameErrorOrStageLimit": 2,
+    "onLimit": "STOP_THE_LINE",
+    "thirdAttemptAllowed": false,
+    "patchAllowed": false,
+    "parallelGateAllowed": false
+  },
+  "singleOwner": "insurer-directory-import-coordinator",
+  "recoveryOrder": [
+    "read_only_inventory",
+    "compare_against_healthy_checkpoint",
+    "identify_affected_records_and_batches",
+    "verify_vault_versions",
+    "selective_reference_recovery",
+    "fix_atomic_import_owner",
+    "single_preflight",
+    "single_gate",
+    "single_visual_review"
+  ],
+  "resumePredicates": {
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "rawProtectedValuesInStore": 0,
+    "minimumValidProtectedReferences": 91,
+    "invalidReferences": 0,
+    "duplicateReferences": 0,
+    "secondDryRun": 0,
+    "providerConfirmedBeforeWrite": true,
+    "durableWriteConfirmed": true,
+    "readAfterWrite": true,
+    "audit": true,
+    "rollback": true,
+    "unauthorizedRecordsModified": 0,
+    "sanitizedEvidenceOk": true
+  },
+  "documentation": "orbit360-platform/docs/CORTE-FORMAL-ANTI-BUCLE-IMPORTADOR-ASEGURADORAS-20260721.md",
+  "containsPII": false,
+  "containsSecrets": false
+}
