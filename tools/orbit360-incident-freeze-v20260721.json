@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v10-recovery-completed",
+  "schemaVersion": "orbit360-incident-freeze-v11-post-recovery-inventory-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "RECOVERY_COMPLETED_POST_WRITE_READONLY_GATE_PENDING",
+  "status": "POST_RECOVERY_INVENTORY_READONLY_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -117,9 +117,38 @@
     "secretManagerWritesAllowed": false,
     "deployAllowed": false
   },
-  "blockedGateIds": [],
+  "inventoryAuthorization": {
+    "authorizationId": "post-recovery-inventory-readonly-v1",
+    "active": true,
+    "consumed": false,
+    "allowedExecutions": 1,
+    "action": "post_recovery_readonly_inventory",
+    "firestoreReadAllowed": true,
+    "vaultReadAllowed": true,
+    "writesAllowed": false,
+    "secretManagerWritesAllowed": false,
+    "deployAllowed": false,
+    "browserAllowed": false,
+    "expected": {
+      "clients": 414,
+      "insurers": 26,
+      "advisors": 7,
+      "totalCuentaResources": 107,
+      "protectedBankRows": 93,
+      "validReferences": 91,
+      "pendingReferences": 2,
+      "uniqueValidReferences": 91,
+      "vaultRows": 91,
+      "rawProtectedValues": 0,
+      "colombiaPendingReferences": 0
+    }
+  },
+  "blockedGateIds": [
+    "block1-client360-insurers-lab-v20260717"
+  ],
   "blockedWorkflows": [
-    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml"
+    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
+    ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml"
   ],
   "blockedActions": [
     "repeat_recovery_write",
@@ -137,12 +166,12 @@
     "deploy_production",
     "merge_main",
     "create_parallel_gate",
-    "create_temporary_workflow"
+    "create_temporary_workflow",
+    "execute_final_block1_gate_before_inventory_go",
+    "perform_visual_review_before_gate_go"
   ],
   "allowedActions": [
     "execute_single_readonly_post_recovery_inventory",
-    "execute_unique_final_block1_gate_after_inventory_go",
-    "perform_single_visual_review_after_gate_go",
     "synchronize_pr_issue_and_documentation"
   ],
   "stateClarification": {
@@ -154,10 +183,11 @@
     "colombia": "INTACT",
     "reimportRequired": false,
     "recoveryWriteComplete": true,
+    "postRecoveryInventoryPending": true,
     "finalGatePending": true,
     "visualReviewPending": true
   },
-  "nextAllowedStep": "Execute one read-only post-recovery inventory. If it confirms 414 clients, 26 insurers, 7 advisors, 91 unique valid references, two pending new G&T rows, 91 vault rows, zero raw values and Colombia intact, run the single final Block 1 gate and then the single visual review.",
+  "nextAllowedStep": "Execute exactly one post-recovery inventory in read-only mode. It must confirm 414 clients, 26 insurers, 7 advisors, 91 unique valid references, two pending new G&T rows, 91 vault rows, zero raw values and Colombia with zero pending protected rows. The final Block 1 gate remains blocked until sanitized ok:true evidence exists.",
   "containsPII": false,
   "containsSecrets": false
 }
