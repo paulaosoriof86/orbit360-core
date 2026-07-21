@@ -1,0 +1,108 @@
+name: Orbit 360 Incident Importador Aseguradoras Read-Only
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-importer-incident-readonly-diagnosis.yml'
+      - 'tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-importer-incident-readonly-diagnosis
+  cancel-in-progress: true
+
+env:
+  ORBIT360_GATE_ID: block1-real-insurer-directories-lab-v20260720
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_EXPECTED_BANK_ACCOUNTS: 91
+
+jobs:
+  readonly-diagnosis:
+    name: STOP THE LINE · inventario read-only
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Preflight vinculante antes de credenciales
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "$ORBIT360_BRANCH"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID" > /tmp/orbit360-preflight-readonly.json
+          test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = GO_GATE_CONTRACT
+
+      - name: Resolver identidad LAB solo lectura
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab-readonly.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar dependencias del diagnóstico
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save firebase-admin@13 @google-cloud/secret-manager@6.2.0
+
+      - name: Inventariar referencias y bóveda sin escritura
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs
+
+      - name: Validar que el diagnóstico fue seguro
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPORT='orbit360-platform/runtime-incident-importer-20260721/insurer-protected-reference-diff-sanitizado.json'
+          test -f "$REPORT"
+          test "$(jq -r '.diagnosisComplete // false' "$REPORT")" = true
+          test "$(jq -r '.mode' "$REPORT")" = read_only
+          test "$(jq -r '.writesExecuted // true' "$REPORT")" = false
+          test "$(jq -r '.deployExecuted // true' "$REPORT")" = false
+          test "$(jq -r '.migrationExecuted // true' "$REPORT")" = false
+          test "$(jq -r '.containsSecrets // true' "$REPORT")" = false
+          test "$(jq -r '.containsPII // true' "$REPORT")" = false
+          test "$(jq -r '.current.rawAccountValues // -1' "$REPORT")" = 0
+          test "$(jq -r '.current.rawCredentialValues // -1' "$REPORT")" = 0
+          jq '{schemaVersion,generatedAt,mode,writesExecuted,diagnosisComplete,current,vault,diff,safetyChecks}' "$REPORT"
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-importer-incident-readonly-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-incident-importer-20260721/insurer-protected-reference-diff-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          if-no-files-found: error
+          retention-days: 30
