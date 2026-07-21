@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v6-correct-68-plus-2-new",
+  "schemaVersion": "orbit360-incident-freeze-v7-static-68-plus-2-new-preflight",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "STOP_THE_LINE_DATA_CONTRACT_CORRECTION_REQUIRED",
+  "status": "DATA_CONTRACT_CORRECTION_PREFLIGHT_ONLY_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -35,66 +35,6 @@
     "duplicateRowsConfirmed": 0,
     "rawProtectedValuesInStore": 0
   },
-  "gtEvidence": {
-    "insurerId": "gt-gt-seguros",
-    "documentRows": 11,
-    "validReferences": 2,
-    "pendingRows": 9,
-    "vaultRows": 9,
-    "missingHistoricalReferences": 7,
-    "newPendingRows": 2,
-    "newPendingAccountIds": [
-      "account_gtseguros_01",
-      "account_gtseguros_02"
-    ],
-    "duplicateFingerprintConfirmed": false,
-    "lastRuntimeError": "DUPLICATE_FINGERPRINT_MISMATCH"
-  },
-  "closedBlocks": {
-    "methodologyReview": true,
-    "historicalReferenceIdentity": {
-      "status": "CONFIRMED",
-      "restoreMappings": 68,
-      "unmappedHistoricalReferences": 0,
-      "ambiguousHistoricalReferences": 0,
-      "manifest": "tools/orbit360-bank-reference-recovery-map-v20260721.json"
-    },
-    "twoRemainingRowsClassification": {
-      "status": "CONFIRMED_NEW_PENDING_NOT_DUPLICATES",
-      "newPendingRows": 2,
-      "duplicateRows": 0,
-      "evidenceRun": 29863179008,
-      "artifactId": 8508127929,
-      "artifactDigest": "sha256:2d90f74c85e139acddb34fc5d1433d313b8b98fbc425e825bfdd57157866ee10"
-    },
-    "atomicImporterOwner": {
-      "status": "STATIC_OWNER_PRESERVED_CONTRACT_UPDATE_REQUIRED",
-      "owner": "insurer-directory-import-coordinator-v1221",
-      "providerBeforeOperationalWrite": true,
-      "providerMappingsOnly": true,
-      "mergeNonDestructive": true,
-      "durableWriteRequired": true,
-      "readAfterWriteRequired": true,
-      "operationalRollbackRequired": true,
-      "distributedVaultRollbackClaimed": false,
-      "partialApplyAllowed": false
-    }
-  },
-  "runtimeAuthorization": {
-    "authorizationId": "exact-bank-reference-recovery-dryrun-68plus2-v1",
-    "active": false,
-    "consumed": true,
-    "lastRunId": 29863179008,
-    "result": "STOP_THE_LINE_DUPLICATE_FINGERPRINT_MISMATCH",
-    "writesAllowed": false,
-    "firestoreReadAllowed": false,
-    "vaultReadAllowed": false,
-    "browserAllowed": false,
-    "deployAllowed": false,
-    "reimportAllowed": false,
-    "colombiaModificationAllowed": false,
-    "nextRuntimeAuthorizationRequired": true
-  },
   "correctContract": {
     "historicalReferenceRestorations": 68,
     "newPendingRowsPreserved": 2,
@@ -113,13 +53,78 @@
     },
     "newRowsSecureOnboarding": "SEPARATE_LATER_STEP_WITH_PROTECTED_PROVIDER_READBACK_AND_ROLLBACK"
   },
+  "staticAlignment": {
+    "status": "READY_FOR_CENTRAL_PREFLIGHT_ONLY",
+    "map": {
+      "path": "tools/orbit360-bank-reference-recovery-map-v20260721.json",
+      "blob": "c9fd67544cd62b0eb40320520785ec730d81329f",
+      "contract": "68_restores_2_new_pending_0_removals"
+    },
+    "dryRun": {
+      "path": "tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs",
+      "blob": "4fd21ec348f53d89955fdb7a057b214c93be4a76",
+      "writesAllowed": false
+    },
+    "validator": {
+      "path": "tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs",
+      "blob": "b3d4153229efb3d0b1f3311bbfb8195f5ff96353"
+    },
+    "workflow": {
+      "path": ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml",
+      "blob": "b7d0a7c14fe8d36b666c83e89ccdcc49c1b1d7f0",
+      "preflightSecretsAllowed": false,
+      "preflightRuntimeAllowed": false
+    },
+    "overlay": {
+      "path": "tools/orbit360-gate-contract-overlay-importers-v20260720.json",
+      "blob": "135a61affb58c59754384df3c7030db9e469bd82",
+      "contractVersion": "1.1.3"
+    },
+    "academyReview": {
+      "status": "REVIEWED_NO_CHANGE_REQUIRED",
+      "reason": "Academia contains generic role and safety guidance and does not own recovery counts or execution.",
+      "blob": "594750d1bda62077ae88cf24697b739e4eec3939"
+    }
+  },
+  "runtimeAuthorization": {
+    "authorizationId": "exact-bank-reference-recovery-dryrun-68plus2new-v1",
+    "active": false,
+    "consumed": false,
+    "action": "exact_recovery_readonly_dry_run",
+    "allowedExecutions": 0,
+    "writesAllowed": false,
+    "firestoreReadAllowed": false,
+    "vaultReadAllowed": false,
+    "browserAllowed": false,
+    "deployAllowed": false,
+    "reimportAllowed": false,
+    "colombiaModificationAllowed": false,
+    "nextRuntimeAuthorizationRequired": true
+  },
+  "preflightAuthorization": {
+    "authorizationId": "data-contract-68plus2new-preflight-only-v1",
+    "active": true,
+    "action": "central_preflight_only",
+    "allowedExecutions": 1,
+    "secretsAllowed": false,
+    "firestoreReadAllowed": false,
+    "vaultReadAllowed": false,
+    "writesAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "deployAllowed": false,
+    "expected": {
+      "status": "GO_GATE_CONTRACT",
+      "failedChecks": 0,
+      "containsPII": false,
+      "containsSecrets": false
+    }
+  },
   "blockedGateIds": [
-    "block1-client360-insurers-lab-v20260717",
-    "block1-real-insurer-directories-lab-v20260720"
+    "block1-client360-insurers-lab-v20260717"
   ],
   "blockedWorkflows": [
-    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
-    ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml"
+    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml"
   ],
   "blockedActions": [
     "execute_recovery_dryrun",
@@ -145,15 +150,14 @@
     "modify_unrelated_modules"
   ],
   "allowedActions": [
-    "correct_static_68_restore_2_new_pending_contract",
-    "update_manifest_dryrun_workflow_validator_overlay_together",
-    "update_freeze_documentation_ledger_academy_together",
-    "run_central_preflight_without_secrets_or_runtime_after_static_alignment",
+    "execute_central_preflight_once_without_secrets_or_runtime",
+    "upload_sanitized_preflight_evidence",
     "synchronize_pr_issue_and_documentation"
   ],
   "repeatRule": {
     "runtimeDryRunAllowedNow": false,
     "patchAndRetryLoopAllowed": false,
+    "preflightFailureAction": "STOP_AND_CLASSIFY_WITH_PRESERVED_EVIDENCE",
     "nextRuntimeRequiresSeparateAuthorizationAfterStaticPreflightGo": true,
     "runtimeWriteAllowed": false
   },
@@ -167,10 +171,11 @@
     "colombia": "INTACT_AND_BLOCKED",
     "reimportRequired": false,
     "recoveryDryRunAuthorized": false,
-    "recoveryWriteAuthorized": false
+    "recoveryWriteAuthorized": false,
+    "centralPreflightAuthorized": true
   },
   "supersedingDocument": "orbit360-platform/docs/CORTE-FORMAL-68-REFERENCIAS-2-CUENTAS-GT-NUEVAS-20260721.md",
-  "nextAllowedStep": "Correct all static owners to 68 restorations plus two preserved new G&T pending accounts and zero removals, then execute only the central preflight without secrets or runtime. Any runtime requires a separate later authorization.",
+  "nextAllowedStep": "Execute exactly one central preflight without secrets, Firestore, vault or runtime. Accept only GO_GATE_CONTRACT with zero failed checks. Any runtime requires a separate later authorization.",
   "containsPII": false,
   "containsSecrets": false
 }
