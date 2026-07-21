@@ -8,7 +8,7 @@
   "gatePatch": {
     "contractVersion": "1.0.29",
     "diagnosticRevision": "event-driven-dom-visual-stability-barrier-v2",
-    "status": "FUNCTIONAL_FIX_PENDING_STATIC_PREFLIGHT"
+    "status": "TARGETED_LAB_DEPLOY_AND_FINAL_GATE_AUTHORIZED"
   },
   "canonicalOwners": [
     {
@@ -227,6 +227,8 @@
       "requiredTokens": [
         "ORBIT360_TARGETED_DEPLOY_AUTHORIZATION_ID: final-block1-targeted-lab-deploy-gate-v1",
         "targeted_lab_deploy_then_unique_final_block1_gate_readonly",
+        "staticPreflightEvidence.runId",
+        "staticPreflightAuthorization.runId",
         "Publicar frontend corregido en canal LAB",
         "hosting:channel:deploy \"$ORBIT360_HOSTING_CHANNEL\"",
         "targeted_lab_frontend_only",
