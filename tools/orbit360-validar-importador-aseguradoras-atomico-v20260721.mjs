@@ -32,7 +32,7 @@ function writeEvidence(payload) {
 for (const [id, rel] of Object.entries(FILES)) check(`FILE_${id.toUpperCase()}`, exists(rel), rel);
 if (checks.some(item => !item.ok)) {
   const payload = {
-    schemaVersion: 'orbit360-static-importer-atomicity-v1',
+    schemaVersion: 'orbit360-static-importer-atomicity-v2-bounded-runtime',
     generatedAt: new Date().toISOString(),
     mode: 'static_no_runtime',
     ok: false,
@@ -129,7 +129,7 @@ const applyStart = coordinator.indexOf('async function applyApproved');
 const applyEnd = coordinator.indexOf('\n  function esc(', applyStart);
 const applySource = applyStart >= 0 && applyEnd > applyStart ? coordinator.slice(applyStart, applyEnd) : '';
 const secureIndex = applySource.indexOf('await confirmSecureResources');
-const operationalWriteIndexes = [applySource.indexOf("S().update('aseguradoras'"), applySource.indexOf('const plans')), applySource.indexOf("S().insert('aseguradoras'"), applySource.indexOf('const plans'))].filter(index => index >= 0);
+const operationalWriteIndexes = [applySource.indexOf("S().update('aseguradoras'", applySource.indexOf('const plans')), applySource.indexOf("S().insert('aseguradoras'", applySource.indexOf('const plans'))].filter(index => index >= 0);
 check('PROVIDER_BEFORE_OPERATIONAL_WRITE', secureIndex >= 0 && operationalWriteIndexes.length > 0 && operationalWriteIndexes.every(index => secureIndex < index), `secure=${secureIndex}; writes=${operationalWriteIndexes.join(',')}`);
 check('FAILURE_RETURNS_FALSE', /catch\s*\(error\)[\s\S]*?ok:\s*false/.test(applySource), 'applyApproved catch');
 check('NO_PARTIAL_VALID_APPLY', !applySource.includes('applyValidOnly'), 'applyValidOnly absent from canonical coordinator');
@@ -144,14 +144,30 @@ check('COORDINATOR_SYNTAX', coordinatorSyntax.ok, coordinatorSyntax.detail);
 check('BRIDGE_SYNTAX', bridgeSyntax.ok, bridgeSyntax.detail);
 
 if (freeze) {
-  const blockedGateIds = Array.isArray(freeze.blockedGateIds) ? freeze.blockedGateIds : [];
-  check('FREEZE_REMAINS_ACTIVE', String(freeze.status || '').startsWith('STOP_THE_LINE'), freeze.status);
-  check('RUNTIME_GATE_STILL_BLOCKED', blockedGateIds.includes('block1-real-insurer-directories-lab-v20260720'), blockedGateIds.join(','));
+  const status = String(freeze.status || '');
+  const authorization = freeze.runtimeAuthorization || {};
+  const hardFrozen = status.startsWith('STOP_THE_LINE');
+  const bounded = status === 'BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED';
+  check('INCIDENT_CONTROL_ACTIVE', hardFrozen || bounded, status);
+  check(
+    'RUNTIME_SCOPE_BOUND',
+    hardFrozen || (
+      bounded &&
+      authorization.active === true &&
+      authorization.authorizationId === 'exact-bank-reference-recovery-dryrun-68plus2-v1' &&
+      authorization.action === 'exact_recovery_readonly_dry_run' &&
+      authorization.allowedExecutions === 1 &&
+      authorization.writesAllowed === false &&
+      authorization.script === 'tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs' &&
+      authorization.manifest === FILES.manifest
+    ),
+    bounded ? JSON.stringify({ authorizationId: authorization.authorizationId, action: authorization.action, allowedExecutions: authorization.allowedExecutions, writesAllowed: authorization.writesAllowed }) : status
+  );
 }
 
 const failed = checks.filter(item => !item.ok);
 const payload = {
-  schemaVersion: 'orbit360-static-importer-atomicity-v1',
+  schemaVersion: 'orbit360-static-importer-atomicity-v2-bounded-runtime',
   generatedAt: new Date().toISOString(),
   mode: 'static_no_runtime',
   ok: failed.length === 0,
@@ -177,7 +193,8 @@ const payload = {
     readAfterWriteRequired: true,
     rollbackOperationalDocuments: true,
     distributedVaultRollbackClaimed: false,
-    partialApplyAllowed: false
+    partialApplyAllowed: false,
+    boundedRuntimeAuthorization: freeze && freeze.status === 'BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED'
   },
   total: checks.length,
   passed: checks.length - failed.length,
