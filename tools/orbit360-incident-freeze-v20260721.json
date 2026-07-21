@@ -1,17 +1,17 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v4-preflight-only",
+  "schemaVersion": "orbit360-incident-freeze-v5-bounded-dryrun",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "VALIDATOR_STALE_CORRECTION_PREFLIGHT_ONLY_AUTHORIZED",
+  "status": "BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "controlIssue": 7,
   "tenantId": "alianzas-soluciones",
   "classification": [
-    "VALIDATOR_STALE",
-    "METHODOLOGY_ENFORCEMENT_FAILURE"
+    "DATA_CONTRACT_FAILURE",
+    "PIPELINE_MECHANISM_FAILURE"
   ],
   "healthyCheckpoint": {
     "commit": "02a5436bc804b3a861f82375b124d05015389b4b",
@@ -32,7 +32,7 @@
     "duplicateIncomingRows": 2,
     "rawProtectedValuesInStore": 0
   },
-  "closedStaticBlocks": {
+  "closedBlocks": {
     "methodologyReview": true,
     "identityResolution": {
       "status": "CONFIRMED",
@@ -55,57 +55,67 @@
       "distributedVaultRollbackClaimed": false,
       "partialApplyAllowed": false,
       "evidence": "orbit360-platform/runtime-incident-importer-20260721/static-importer-atomicity-offline-sanitized.json"
+    },
+    "validatorStaleCorrection": {
+      "status": "GO_GATE_CONTRACT",
+      "runId": 29849799651,
+      "head": "84e0f838bb2153818196ef91376ea98137c75842",
+      "totalChecks": 295,
+      "passed": 295,
+      "failed": 0,
+      "secretsRead": false,
+      "firestoreRead": false,
+      "vaultRead": false,
+      "writesExecuted": false,
+      "artifactId": 8502848222
     }
-  },
-  "failedBoundedRun": {
-    "runId": 29849319790,
-    "head": "e419da2ca33e325878f81e2ea36e3ba8d70c069e",
-    "classification": "VALIDATOR_STALE",
-    "firstFailedStage": "central_gate_preflight",
-    "secretsRead": false,
-    "firestoreRead": false,
-    "vaultRead": false,
-    "writesExecuted": false,
-    "dryRunExecuted": false,
-    "failedCheckIds": [
-      "OWNER_TOKEN:realInsurerDirectoryAcademy:version:'1.221'",
-      "WORKFLOW_CALLS_PREFLIGHT",
-      "WORKFLOW_PUBLISHES_PREFLIGHT_EVIDENCE",
-      "WORKFLOW_BRANCH_LOCK",
-      "WORKFLOW_PROJECT_LOCK",
-      "WORKFLOW_CHANNEL_LOCK",
-      "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:version:'1.221'"
-    ]
-  },
-  "validatorCorrection": {
-    "overlay": "tools/orbit360-gate-contract-overlay-importers-v20260720.json",
-    "workflow": ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml",
-    "academyOwnerVersion": "1.223",
-    "productChanged": false,
-    "dataChanged": false
-  },
-  "preflightAuthorization": {
-    "authorizationId": "validator-stale-preflight-only-v1",
-    "active": true,
-    "action": "central_preflight_only",
-    "workflow": ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml",
-    "triggerMarker": "tools/orbit360-authorize-preflight-only-v20260721.json",
-    "allowedExecutions": 1,
-    "secretsAllowed": false,
-    "firestoreReadAllowed": false,
-    "vaultReadAllowed": false,
-    "writesAllowed": false,
-    "browserAllowed": false,
-    "deployAllowed": false,
-    "acceptance": "GO_GATE_CONTRACT_AND_ZERO_RUNTIME_ONLY"
   },
   "runtimeAuthorization": {
     "authorizationId": "exact-bank-reference-recovery-dryrun-68plus2-v1",
-    "active": false,
-    "consumedRunId": 29849319790,
-    "dryRunExecuted": false,
+    "authorizationRevision": 2,
+    "reason": "The first marker-bound run stopped at VALIDATOR_STALE before secrets or runtime. Preflight correction then passed 295/295 in a separate zero-runtime run.",
+    "active": true,
+    "action": "exact_recovery_readonly_dry_run",
+    "script": "tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs",
+    "manifest": "tools/orbit360-bank-reference-recovery-map-v20260721.json",
+    "workflow": ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml",
+    "triggerMarker": "tools/orbit360-authorize-exact-recovery-dryrun-v20260721.json",
+    "allowedExecutions": 1,
     "writesAllowed": false,
-    "newAuthorizationRequiredAfterPreflightGo": true
+    "firestoreReadAllowed": true,
+    "vaultReadAllowed": true,
+    "browserAllowed": false,
+    "deployAllowed": false,
+    "reimportAllowed": false,
+    "colombiaModificationAllowed": false,
+    "expectedBefore": {
+      "clients": 414,
+      "insurers": 26,
+      "advisors": 7,
+      "validReferences": 23,
+      "pendingReferences": 70,
+      "vaultRows": 91,
+      "rawProtectedValues": 0
+    },
+    "expectedProposal": {
+      "referenceRestorations": 68,
+      "duplicateRemovals": 2,
+      "affectedGtDocuments": 13,
+      "nonReferenceFieldChanges": 0,
+      "colombiaDocumentChanges": 0
+    },
+    "expectedAfter": {
+      "validReferences": 91,
+      "pendingReferences": 0,
+      "duplicateReferences": 0
+    },
+    "acceptance": "sanitized_report_ok_true_only"
+  },
+  "preflightAuthorization": {
+    "authorizationId": "validator-stale-preflight-only-v1",
+    "active": false,
+    "consumedRunId": 29849799651,
+    "result": "GO_GATE_CONTRACT_295_OF_295"
   },
   "blockedGateIds": [
     "block1-client360-insurers-lab-v20260717"
@@ -114,11 +124,8 @@
     ".github/workflows/orbit360-aseguradoras-op2-smoke.yml"
   ],
   "blockedActions": [
-    "read_firestore",
-    "read_secret_manager",
     "write_firestore",
     "write_secret_manager",
-    "execute_recovery_dryrun",
     "restore_references",
     "remove_duplicates",
     "reimport_guatemala_directory",
@@ -137,17 +144,18 @@
     "modify_product_or_unrelated_modules"
   ],
   "allowedActions": [
-    "read_repository_documents",
-    "execute_central_preflight_once_without_secrets_or_runtime",
-    "upload_sanitized_preflight_evidence",
+    "execute_exact_recovery_readonly_dry_run_once",
+    "read_firestore_only_inside_authorized_script",
+    "read_secret_manager_only_inside_authorized_script",
+    "upload_sanitized_dryrun_evidence",
     "synchronize_pr_issue_and_documentation"
   ],
   "repeatRule": {
-    "onPreflightFailure": "STOP_THE_LINE",
-    "secondPreflightAttemptAllowed": false,
-    "runtimeReadAllowed": false,
+    "onDryRunFailure": "STOP_THE_LINE",
+    "secondDryRunAttemptAllowed": false,
+    "patchAfterDryRunFailureAllowed": false,
     "runtimeWriteAllowed": false,
-    "automaticWorkflowAllowed": "single_preflight_marker_only"
+    "automaticWorkflowAllowed": "single_exact_marker_update_only"
   },
   "stateClarification": {
     "m1Functional": "PRESERVED",
@@ -158,11 +166,10 @@
     "recoveryIdentity": "CONFIRMED_68_RESTORES_2_DUPLICATES_0_UNKNOWN",
     "colombia": "INTACT_AND_BLOCKED",
     "reimportRequired": false,
-    "preflightOnlyAuthorized": true,
-    "recoveryDryRunAuthorized": false,
+    "recoveryDryRunAuthorized": true,
     "recoveryWriteAuthorized": false
   },
-  "nextAllowedStep": "Execute exactly one central preflight without secrets or runtime. Only GO_GATE_CONTRACT may permit a later separate read-only dry-run authorization.",
+  "nextAllowedStep": "Execute exactly one sanitized exact recovery dry-run. Accept only 68 restorations, two duplicate removals, 13 GT documents, Colombia unchanged and simulated final 91 valid, zero pending, zero duplicates.",
   "containsPII": false,
   "containsSecrets": false
 }
