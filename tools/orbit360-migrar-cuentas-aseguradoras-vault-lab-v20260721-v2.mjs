@@ -21,6 +21,7 @@ const REPAIR_SCRIPT = 'tools/orbit360-restaurar-referencias-cuentas-aseguradoras
 const RECON_FILE = path.resolve('orbit360-platform/runtime-gate-real-insurer-directories-v20260720/bank-reference-reconciliation-sanitizado.json');
 const REPAIR_FILE = path.resolve('orbit360-platform/runtime-gate-real-insurer-directories-v20260720/bank-reference-repair-sanitizado.json');
 const OUT_FILE = path.resolve('orbit360-platform/lab-bank-account-migration.json');
+const EVIDENCE_DIR = path.resolve('orbit360-real-directories-evidence');
 const REQUIRED_CONFIRMATION = 'CONFIRM_68_REFERENCE_RESTORE';
 
 function clean(value, max = 180) {
@@ -39,6 +40,17 @@ function run(script, extraEnv = {}) {
     stdio: 'inherit'
   });
   return Number(result.status || 0);
+}
+
+function copyEvidence(file, name) {
+  try {
+    if (!fs.existsSync(file)) return false;
+    fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
+    fs.copyFileSync(file, path.join(EVIDENCE_DIR, name));
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 function failure(code, reconciliation = null, repair = null) {
@@ -78,6 +90,8 @@ try {
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   const reconExit = run(RECON_SCRIPT);
   const reconciliation = readJson(RECON_FILE);
+  copyEvidence(RECON_FILE, 'bank-reference-reconciliation-sanitizado.json');
+
   if (reconExit !== 0 || !reconciliation || reconciliation.ok !== true) {
     finalReport = failure(reconciliation && reconciliation.errorCode || 'REFERENCE_RECONCILIATION_FAILED', reconciliation);
   } else {
@@ -86,6 +100,8 @@ try {
       : {};
     const repairExit = run(REPAIR_SCRIPT, repairEnv);
     const repair = readJson(REPAIR_FILE);
+    copyEvidence(REPAIR_FILE, 'bank-reference-repair-sanitizado.json');
+
     if (repairExit !== 0 || !repair || repair.ok !== true) {
       finalReport = failure(repair && repair.errorCode || 'REFERENCE_REPAIR_FAILED', reconciliation, repair);
     } else {
@@ -127,6 +143,7 @@ try {
 }
 
 fs.writeFileSync(OUT_FILE, `${JSON.stringify(finalReport, null, 2)}\n`, 'utf8');
+copyEvidence(OUT_FILE, 'lab-bank-account-migration.json');
 console.log(`ORBIT360_BANK_REFERENCE_RECOVERY_ORCHESTRATOR:${JSON.stringify({ ok: finalReport.ok, mode: finalReport.mode, reconciliationState: finalReport.reconciliationState, referenceRepairExecuted: finalReport.referenceRepairExecuted, repairCount: finalReport.repairCount || 0, idempotent: finalReport.idempotent, rollbackExecuted: finalReport.rollbackExecuted, before: finalReport.before || {}, after: finalReport.after || {}, errorCode: finalReport.errorCode || '', containsSecrets: false })}`);
 
 // El workflow copia primero esta evidencia y después evalúa .ok.
