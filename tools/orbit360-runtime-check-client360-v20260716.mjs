@@ -275,6 +275,7 @@ async function validateInsurerVisualContract(page, report, label) {
   await page.locator('#asg-ficha.m1-asg-ficha').waitFor({ state: 'visible', timeout: 15000 });
   await page.locator('[data-tab="plataformas"]').click();
   await page.locator('.m1-portal-card').first().waitFor({ state: 'visible', timeout: 10000 });
+  await page.locator('.m1-credential-box').first().waitFor({ state: 'visible', timeout: 10000 });
   const portals = await page.evaluate(() => ({ cards: document.querySelectorAll('.m1-portal-card').length, openLinks: document.querySelectorAll('.m1-portal-card a[target="_blank"]').length, copyButtons: document.querySelectorAll('.m1-portal-card [data-m1-copy]').length, credentialBoxes: document.querySelectorAll('.m1-credential-box').length, passwordInputs: document.querySelectorAll('input[type="password"]').length, technicalPasswordCopy: /Orbit nunca guarda ni muestra contraseñas/i.test(document.body.innerText), labeled: Array.from(document.querySelectorAll('.m1-portal-card')).every(card => /URL|Responsable|Última verificación|Acceso protegido/i.test(card.innerText)) }));
   assert(portals.cards > 0 && portals.labeled, 'INSURER_PORTAL_HIERARCHY_MISSING', label);
   assert(portals.openLinks > 0 && portals.copyButtons > 0, 'INSURER_PORTAL_ACTIONS_MISSING', label);
@@ -284,6 +285,9 @@ async function validateInsurerVisualContract(page, report, label) {
   await page.locator('#asg-ficha.m1-asg-ficha').waitFor({ state: 'visible', timeout: 15000 });
   await page.locator('[data-tab="bancos"]').click();
   await page.locator('.m1-bank-card').first().waitFor({ state: 'visible', timeout: 10000 });
+  await page.locator('.m1-bank-card [data-m1-bank-copy-all]').first().waitFor({ state: 'visible', timeout: 10000 });
+  await page.locator('.m1-bank-card [data-vlt-copy]').first().waitFor({ state: 'visible', timeout: 10000 });
+  await page.locator('.m1-bank-card [data-vlt-view]').first().waitFor({ state: 'visible', timeout: 10000 });
   const banks = await page.evaluate(() => ({ cards: document.querySelectorAll('.m1-bank-card').length, labeled: Array.from(document.querySelectorAll('.m1-bank-card')).every(card => /Banco|Tipo|Cuenta|Moneda|Titular|Uso|Acciones/i.test(card.innerText)), secureCopy: document.querySelectorAll('.m1-bank-card [data-vlt-copy]').length, secureReveal: document.querySelectorAll('.m1-bank-card [data-vlt-view]').length, completeCopy: document.querySelectorAll('.m1-bank-card [data-m1-bank-copy-all]').length, technicalCopy: /Cuentas ficticias|Nunca cargar cuentas reales/i.test(document.body.innerText) }));
   assert(banks.cards > 0 && banks.labeled, 'INSURER_BANK_HIERARCHY_MISSING', label);
   assert(banks.secureCopy > 0 && banks.secureReveal > 0 && banks.completeCopy === banks.cards, 'INSURER_BANK_COMPLETE_COPY_MISSING', label);
