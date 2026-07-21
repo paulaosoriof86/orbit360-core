@@ -6,7 +6,7 @@
 
    Fail-closed:
    - no autoriza por colección solamente;
-   - exige owner, fuente y trazabilidad completas;
+   - exige owner, fuente, transición y trazabilidad completas;
    - no transporta secretos ni valores bancarios completos;
    - cualquier escritura fuera del contrato sigue interceptada.
    ============================================================ */
@@ -77,6 +77,13 @@
     };
   }
 
+  function approvedTransition(data) {
+    if (!data || Object.prototype.hasOwnProperty.call(data, 'validationStatus')) return false;
+    if (!clean(data.id)) return false;
+    if (data.importado === true) return true;
+    return [].concat(data.actividad || []).some((item) => clean(item && item.cambio) === 'Directorio importado/propuesto');
+  }
+
   function authorizedInsurer(data) {
     const trace = insurerTrace(data);
     const alerts = [].concat(data && data.validacionAlertas || []);
@@ -86,6 +93,7 @@
       trace.file &&
       trace.sheet &&
       ['GT', 'CO'].includes(trace.country) &&
+      approvedTransition(data) &&
       data.requiereValidacion !== true &&
       !alerts.some((item) => HARD_BLOCKING_ALERT.test(clean(item))) &&
       !hasSensitivePlaintext(data)
@@ -171,6 +179,7 @@
     classify,
     canonicalize,
     evidence,
-    hasSensitivePlaintext
+    hasSensitivePlaintext,
+    approvedTransition
   });
 })();
