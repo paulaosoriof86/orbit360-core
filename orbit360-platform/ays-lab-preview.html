@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="orbit-preview-version" content="20260717-2">
+  <meta name="orbit-preview-version" content="20260721-1">
   <title>Orbit 360 · A&S</title>
   <style>
     body{font-family:Manrope,Arial,sans-serif;background:#1E2227;color:#fff;display:grid;place-items:center;min-height:100vh;margin:0}
@@ -19,9 +19,9 @@
     var PREVIEW_BOOTSTRAP_BUDGET_MS = 12000;
     var PREVIEW_OPERATION_TIMEOUT_MS = 3000;
     var PREVIEW_WORKER_READY_TIMEOUT_MS = 7000;
-    var target = 'index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2#/aseguradoras';
+    var target = 'index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260721-1#/aseguradoras';
     var state = window.__ORBIT_PREVIEW_BOOTSTRAP__ = {
-      version: '20260719.1-bounded',
+      version: '20260721.1-canonical-importer',
       budgetMs: PREVIEW_BOOTSTRAP_BUDGET_MS,
       status: 'preparing'
     };
@@ -53,7 +53,7 @@
 
       if ('serviceWorker' in navigator) {
         await bounded(
-          navigator.serviceWorker.register('sw.js?v=20260717-2', { scope: './' }),
+          navigator.serviceWorker.register('sw.js?v=20260721-1', { scope: './' }),
           PREVIEW_OPERATION_TIMEOUT_MS,
           null
         );
@@ -67,8 +67,19 @@
 
       var assets = [
         'core/backend-lab-loader.js?v=20260716-2',
-        'core/backend-lab-init.js?v=20260717-1',
+        'core/backend-lab-init.js?v=20260721-1',
         'data/store-firestore-lab.local.js?v=20260716-2',
+        'core/importa-dryrun-p0.js?v=20260716-2',
+        'core/importa-write-p0.js?v=20260721-1',
+        'core/importer-controlled-write-contract-v20260721.js?v=20260721-2',
+        'core/importa-dryrun-p0-wire.js?v=20260721-2',
+        'core/aseguradoras-op2-source-guard.js?v=20260721-1',
+        'core/aseguradoras-op2-fresh-read-guard-v20260721.js?v=20260721-1',
+        'core/backend-lab-aseguradoras-partial-write-v20260721.js?v=20260721-1',
+        'core/aseguradoras-op2-import-ui-guard.js?v=20260721-2',
+        'core/aseguradoras-canonical-runtime-bootstrap-v20260721.js?v=20260721-1',
+        'core/aseguradoras-credentials-provider-lab-v20260720.js?v=20260720-4',
+        'core/aseguradoras-bank-accounts-provider-lab-v20260721.js?v=20260721-1',
         'core/router.js?v1291',
         'core/auth.js?v=20260717-auth-timeout1',
         'modules/cliente360.js?v1360',
@@ -79,8 +90,6 @@
         'styles/aseguradoras-candidate.css?v=20260716-2',
         'data/tenant-alianzas-soluciones-source-batch-p09g.js?v=20260716-2',
         'modules/crm-v1198-operational-bridge.js?v=20260716-2',
-        'core/importa-dryrun-p0.js?v=20260716-2',
-        'core/importa-write-p0.js?v=20260716-2',
         'core/backend-lab-auth-guard.js?v=20260717-1',
         'core/backend-lab-import-readiness-guard.js?v=20260716-2',
         'core/backend-lab-canonical-view-sync.js?v=20260716-2',
