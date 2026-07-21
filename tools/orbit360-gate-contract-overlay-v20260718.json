@@ -3,12 +3,12 @@
   "issuedAt": "2026-07-21",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": "FUNCTIONAL_DEFECT",
-  "diagnosticRevision": "single-owner-visual-stability-barrier-v1",
-  "contractRevision": "1.0.28-single-owner-visual-stability-barrier-v1",
+  "diagnosticRevision": "event-driven-dom-visual-stability-barrier-v2",
+  "contractRevision": "1.0.29-event-driven-dom-visual-stability-barrier-v2",
   "gatePatch": {
-    "contractVersion": "1.0.28",
-    "diagnosticRevision": "single-owner-visual-stability-barrier-v1",
-    "status": "TARGETED_LAB_DEPLOY_AND_FINAL_GATE_AUTHORIZED"
+    "contractVersion": "1.0.29",
+    "diagnosticRevision": "event-driven-dom-visual-stability-barrier-v2",
+    "status": "FUNCTIONAL_FIX_PENDING_STATIC_PREFLIGHT"
   },
   "canonicalOwners": [
     {
@@ -16,7 +16,10 @@
       "path": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
       "requiredTokens": [
         "__clientInsurerVisualStabilityBarrierV20260721",
+        "version: '20260721.2'",
         "knowledgeSettledBeforeVisible: true",
+        "eventDriven: true",
+        "domMutationGuard: true",
         "canonicalVisualOwner: 'core/client-insurer-visual-contract-v20260720.js'",
         "writesStore: false",
         "reimportsData: false",
@@ -81,7 +84,8 @@
     "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
     "orbit360-platform/modules/calidad.js",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
-    "orbit360-platform/data/academia-v1221-m1-visual-integrity.js"
+    "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+    "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-BARRERA-VISUAL-EVENTOS-DOM-20260721.md"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
@@ -133,12 +137,16 @@
       "path": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "version: '20260721.1'",
-        "orbit-insurer-knowledge-pending",
-        "script[data-orbit-insurer-summary-owner]",
-        "releaseStableView",
-        "canonicalOwnerReapplied: true",
-        "orbit:aseguradoras:visual-stable",
+        "version: '20260721.2'",
+        "function expectedReady(view)",
+        "scheduleStablePass",
+        "ficha-dom-replaced",
+        "tab-transition:",
+        "orbit:aseguradoras:knowledge-loading",
+        "orbit:aseguradoras:knowledge-ready",
+        "eventDriven: true",
+        "domMutationGuard: true",
+        "knowledgeSettledBeforeVisible: true",
         "writesStore: false",
         "reimportsData: false",
         "exposesSecrets: false"
@@ -194,8 +202,9 @@
       "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "visualStabilityVersion: '20260721.1'",
-        "client-insurer-visual-stability-barrier-v20260721.js?v=20260721-1",
+        "visualStabilityVersion: '20260721.2'",
+        "client-insurer-visual-stability-barrier-v20260721.js?v=20260721-2",
+        "__clientInsurerVisualStabilityBarrierV20260721.version === '20260721.2'",
         "data-orbit-insurer-visual-stability",
         "loadVisualStability",
         "visualContractVersion: '20260720.2'",
