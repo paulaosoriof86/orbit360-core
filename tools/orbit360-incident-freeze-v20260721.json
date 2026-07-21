@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v2",
+  "schemaVersion": "orbit360-incident-freeze-v3-bounded-readonly",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "STOP_THE_LINE_METHODOLOGY_REVIEW",
+  "status": "BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -30,46 +30,92 @@
     "insurers": 26,
     "rawProtectedValuesInStore": 0,
     "validProtectedReferences": 23,
+    "pendingProtectedReferences": 70,
     "missingProtectedReferences": 68,
     "errorCode": "POST_MIGRATION_STATE_INCOMPLETE",
-    "meaning": "La reimportación posterior degradó referencias; no invalida el checkpoint sano previo"
+    "meaning": "La reimportación posterior degradó referencias y creó dos filas duplicadas; no invalida el checkpoint sano"
   },
-  "methodologyRecurrence": {
-    "confirmed": true,
-    "firstStage": "readonly_identity_diagnosis",
-    "sameStageFailuresReached": 2,
-    "additionalAttemptsAfterLimit": true,
-    "incorrectAssumption": "34 unresolved rows were assumed recoverable by last4 before runtime evidence",
-    "runtimeEvidence": {
-      "uniqueMetadataFingerprintMatches": 34,
-      "uniqueLast4Matches": 0,
-      "unresolved": 34,
-      "ambiguous": 0,
-      "writesExecuted": 0
+  "closedStaticBlocks": {
+    "methodologyReview": true,
+    "identityResolution": {
+      "status": "CONFIRMED",
+      "restoreMappings": 68,
+      "duplicateRows": 2,
+      "unmappedRows": 0,
+      "ambiguousRows": 0,
+      "expectedFinalReferences": 91,
+      "manifest": "tools/orbit360-bank-reference-recovery-map-v20260721.json"
     },
-    "rootCause": "The incident freeze was documentary only; workflows and the central gate preflight did not enforce it, and push path triggers converted each patch into another automatic run"
+    "atomicImporterOwner": {
+      "status": "STATIC_OK",
+      "owner": "insurer-directory-import-coordinator-v1221",
+      "providerBeforeOperationalWrite": true,
+      "providerMappingsOnly": true,
+      "mergeNonDestructive": true,
+      "durableWriteRequired": true,
+      "readAfterWriteRequired": true,
+      "operationalRollbackRequired": true,
+      "distributedVaultRollbackClaimed": false,
+      "partialApplyAllowed": false,
+      "evidence": "orbit360-platform/runtime-incident-importer-20260721/static-importer-atomicity-offline-sanitized.json"
+    }
+  },
+  "runtimeAuthorization": {
+    "authorizationId": "exact-bank-reference-recovery-dryrun-68plus2-v1",
+    "active": true,
+    "action": "exact_recovery_readonly_dry_run",
+    "script": "tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs",
+    "manifest": "tools/orbit360-bank-reference-recovery-map-v20260721.json",
+    "workflow": ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml",
+    "triggerMarker": "tools/orbit360-authorize-exact-recovery-dryrun-v20260721.json",
+    "allowedExecutions": 1,
+    "writesAllowed": false,
+    "firestoreReadAllowed": true,
+    "vaultReadAllowed": true,
+    "browserAllowed": false,
+    "deployAllowed": false,
+    "reimportAllowed": false,
+    "colombiaModificationAllowed": false,
+    "expectedBefore": {
+      "clients": 414,
+      "insurers": 26,
+      "advisors": 7,
+      "validReferences": 23,
+      "pendingReferences": 70,
+      "vaultRows": 91,
+      "rawProtectedValues": 0
+    },
+    "expectedProposal": {
+      "referenceRestorations": 68,
+      "duplicateRemovals": 2,
+      "affectedGtDocuments": 13,
+      "nonReferenceFieldChanges": 0,
+      "colombiaDocumentChanges": 0
+    },
+    "expectedAfter": {
+      "validReferences": 91,
+      "pendingReferences": 0,
+      "duplicateReferences": 0
+    },
+    "acceptance": "sanitized_report_ok_true_only"
   },
   "blockedGateIds": [
-    "block1-real-insurer-directories-lab-v20260720",
     "block1-client360-insurers-lab-v20260717"
   ],
   "blockedWorkflows": [
-    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
-    ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml"
+    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml"
   ],
   "blockedActions": [
-    "any_runtime_execution",
-    "rerun_gate",
-    "rerun_readonly_diagnosis",
-    "create_or_patch_diagnostic_script",
-    "create_or_patch_recovery_script",
+    "rerun_general_diagnosis",
+    "rerun_hierarchical_identity_diagnosis",
+    "run_stale_hierarchical_recovery_script",
     "create_parallel_gate",
     "create_temporary_workflow",
-    "automatic_push_trigger",
-    "read_firestore",
-    "read_secret_manager",
+    "generic_automatic_push_trigger",
     "write_firestore",
+    "write_secret_manager",
     "restore_references",
+    "remove_duplicates",
     "reimport_guatemala_directory",
     "import_colombia_directory",
     "reimport_clients",
@@ -77,58 +123,60 @@
     "advance_policies",
     "advance_collections",
     "advance_block2",
+    "browser_validation",
     "deploy_lab",
     "deploy_production",
     "merge_main",
-    "modify_product_or_unrelated_modules",
+    "modify_unrelated_modules",
     "state_conclusion_without_sanitized_evidence"
   ],
   "allowedActions": [
-    "static_methodology_audit",
-    "compare_commits_without_runtime",
     "read_repository_documents",
-    "disable_automatic_workflows",
-    "strengthen_freeze_controls",
-    "synchronize_pr_issue_and_documentation",
-    "document_root_cause"
+    "run_static_validator_offline",
+    "execute_exact_recovery_readonly_dry_run_once",
+    "read_firestore_only_inside_authorized_script",
+    "read_secret_manager_only_inside_authorized_script",
+    "upload_sanitized_dryrun_evidence",
+    "synchronize_pr_issue_and_documentation"
   ],
   "repeatRule": {
-    "sameErrorOrStageLimit": 2,
-    "onLimit": "STOP_THE_LINE_METHODOLOGY_REVIEW",
-    "thirdAttemptAllowed": false,
-    "patchAllowed": false,
+    "sameErrorOrStageLimit": 1,
+    "onAnyFailure": "STOP_THE_LINE",
+    "secondAttemptAllowed": false,
+    "patchAfterFailureAllowed": false,
     "parallelGateAllowed": false,
-    "runtimeReadOnlyAllowed": false,
-    "automaticWorkflowAllowed": false
+    "runtimeReadOnlyAllowed": true,
+    "runtimeWriteAllowed": false,
+    "automaticWorkflowAllowed": "single_marker_bound_execution_only"
   },
   "evidenceVocabulary": {
     "CONFIRMED": "Supported by a completed sanitized artifact or immutable checkpoint",
     "HYPOTHESIS": "Plausible but not authorized for decisions or writes",
     "DISPROVED": "Contradicted by later sanitized runtime evidence",
-    "UNKNOWN": "Not yet demonstrated; must not be converted into a next execution step"
+    "UNKNOWN": "Not demonstrated and cannot authorize execution"
   },
   "stateClarification": {
     "m1Functional": "PRESERVED",
     "insurersAtHealthyCheckpoint": "VALIDATED_26_OF_26",
     "portalCredentialsInVault": "CONFIRMED_26_OF_26",
     "bankAccountsInVault": "CONFIRMED_91_OF_91",
-    "currentOperationalDocumentReferences": "REGRESSED_23_VALID_68_MISSING",
-    "recoveryIdentity": "34_CONFIRMED_34_UNKNOWN",
+    "currentOperationalDocumentReferences": "REGRESSED_23_VALID_70_PENDING",
+    "recoveryIdentity": "CONFIRMED_68_RESTORES_2_DUPLICATES_0_UNKNOWN",
     "colombia": "INTACT_AND_BLOCKED",
     "reimportRequired": false,
-    "recoveryAuthorized": false
+    "dryRunAuthorized": true,
+    "recoveryWriteAuthorized": false
   },
   "resumePredicates": {
-    "paulaMethodologyReviewCompleted": true,
-    "singleAuthoritativeStateDocument": true,
-    "automaticWorkflowsDisabled": true,
-    "incidentFreezeEnforcedBeforeAnySecretOrRuntime": true,
-    "noHypothesisPresentedAsConfirmed": true,
-    "singleOwnerNamed": true,
-    "singleNonRuntimeNextStepDefined": true,
-    "runtimeAuthorizationSeparateAndExplicit": true
+    "methodologyReviewCompleted": true,
+    "healthyAndRegressedStatesSeparated": true,
+    "identityMapExact": true,
+    "staticAtomicOwnerEvidenceOk": true,
+    "automaticGeneralWorkflowsDisabled": true,
+    "singleBoundedRuntimeActionDefined": true,
+    "writeAuthorizationSeparate": true
   },
-  "nextAllowedStep": "Complete and approve the static methodology audit only; do not diagnose or recover the remaining references yet",
+  "nextAllowedStep": "Execute exactly one sanitized read-only dry-run using the confirmed 68-restoration plus two-deduplication manifest; no write or retry is authorized",
   "documentation": "orbit360-platform/docs/CORTE-METODOLOGICO-REINCIDENCIA-ANTI-BUCLE-20260721.md",
   "containsPII": false,
   "containsSecrets": false
