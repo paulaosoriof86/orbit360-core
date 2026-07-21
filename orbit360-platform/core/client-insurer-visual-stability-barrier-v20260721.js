@@ -1,20 +1,88 @@
 /* Orbit 360 · Barrera de estabilidad visual Cliente/Aseguradoras.
    Owner de carga: core/router-tenant-config-bootstrap.js.
    No renderiza, no escribe store y no sustituye módulos.
-   Mantiene oculta la ficha únicamente mientras se resuelve el resumen de
-   conocimiento que puede provocar un rerender completo; después invoca el
-   contrato visual canónico y libera la vista en el mismo ciclo estable. */
+   Mantiene oculta la ficha durante cualquier transición que pueda reemplazar
+   el DOM canónico y solo la libera cuando el contrato visual ya está completo. */
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
-  if (window.Orbit.__clientInsurerVisualStabilityBarrierV20260721) return;
+  var previous = window.Orbit.__clientInsurerVisualStabilityBarrierV20260721;
+  if (previous && previous.version === '20260721.2') return;
 
   var root = document.documentElement;
   var pendingClass = 'orbit-insurer-knowledge-pending';
-  var style = document.createElement('style');
-  style.setAttribute('data-orbit-insurer-visual-stability-style', '1');
-  style.textContent = 'html.' + pendingClass + ' #asg-ficha{visibility:hidden!important;pointer-events:none!important}';
-  document.head.appendChild(style);
+  var scheduled = false;
+  var settling = false;
+  var passId = 0;
+  var maxPasses = 30;
+  var style = document.querySelector('style[data-orbit-insurer-visual-stability-style]');
+  if (!style) {
+    style = document.createElement('style');
+    style.setAttribute('data-orbit-insurer-visual-stability-style', '1');
+    style.textContent = 'html.' + pendingClass + ' #asg-ficha{visibility:hidden!important;pointer-events:none!important}';
+    document.head.appendChild(style);
+  }
+
+  function routeActive() {
+    return String(window.location && window.location.hash || '').indexOf('#/aseguradoras') === 0;
+  }
+
+  function ficha() {
+    return document.getElementById('asg-ficha');
+  }
+
+  function activeTab(view) {
+    var tab = view && view.querySelector('.asg-tab.on[data-tab],.asg-tab.active[data-tab]');
+    return tab && String(tab.getAttribute('data-tab') || '').trim() || '';
+  }
+
+  function count(view, selector) {
+    return view ? view.querySelectorAll(selector).length : 0;
+  }
+
+  function expectedReady(view) {
+    if (!routeActive()) return true;
+    if (!view || !view.classList.contains('m1-asg-ficha')) return false;
+    var tab = activeTab(view);
+    if (tab === 'contactos') {
+      var contactRows = count(view, '#af-contactos .asg-row[data-cont]');
+      return contactRows === 0 || count(view, '.m1-contact-card') >= contactRows;
+    }
+    if (tab === 'plataformas') {
+      var portalRows = count(view, '#af-portales .asg-row[data-portal]');
+      return portalRows === 0 || (count(view, '.m1-portal-card') >= portalRows && count(view, '.m1-credential-box') >= portalRows);
+    }
+    if (tab === 'bancos') {
+      var bankRows = count(view, '#af-cuentas .asg-row[data-cta]');
+      return bankRows === 0 || count(view, '.m1-bank-card') >= bankRows;
+    }
+    if (tab === 'tarifas') {
+      return Boolean(view.querySelector('#af-body .m1-knowledge-summary'));
+    }
+    return true;
+  }
+
+  function publish(status, reason, ready, passes) {
+    window.Orbit.__clientInsurerVisualStabilityState = {
+      version: '20260721.2',
+      status: status,
+      reason: reason || '',
+      activeTab: activeTab(ficha()),
+      expectedReady: ready === true,
+      passes: passes || 0,
+      knowledgeSettledBeforeVisible: ready === true,
+      canonicalOwnerReapplied: ready === true,
+      eventDriven: true,
+      domMutationGuard: true,
+      writesStore: false
+    };
+  }
+
+  function markPending(reason) {
+    if (!routeActive()) return;
+    root.classList.add(pendingClass);
+    publish('waiting-stable-dom', reason, false, 0);
+  }
 
   function enhanceCanonicalOwner() {
     try {
@@ -23,64 +91,118 @@
     } catch (error) {}
   }
 
-  function releaseStableView(script, status) {
-    if (script) script.dataset.orbitKnowledgeSettled = status || 'settled';
-    requestAnimationFrame(function () {
+  function releaseStableView(reason, passes) {
+    root.classList.remove(pendingClass);
+    publish('stable', reason, true, passes);
+    try {
+      document.dispatchEvent(new CustomEvent('orbit:aseguradoras:visual-stable', {
+        detail: { version: '20260721.2', status: 'stable', reason: reason || '', passes: passes || 0 }
+      }));
+    } catch (error) {}
+  }
+
+  function runStablePass(reason) {
+    var currentPassId = ++passId;
+    var passes = 0;
+    settling = true;
+    markPending(reason);
+
+    function pass() {
+      if (currentPassId !== passId) return;
+      if (!routeActive()) {
+        settling = false;
+        root.classList.remove(pendingClass);
+        publish('inactive-route', reason, true, passes);
+        return;
+      }
+      passes += 1;
       enhanceCanonicalOwner();
       requestAnimationFrame(function () {
+        if (currentPassId !== passId) return;
         enhanceCanonicalOwner();
-        root.classList.remove(pendingClass);
-        window.Orbit.__clientInsurerVisualStabilityState = {
-          version: '20260721.1',
-          status: status || 'settled',
-          knowledgeSettledBeforeVisible: true,
-          canonicalOwnerReapplied: true,
-          writesStore: false
-        };
-        try {
-          document.dispatchEvent(new CustomEvent('orbit:aseguradoras:visual-stable', {
-            detail: { version: '20260721.1', status: status || 'settled' }
-          }));
-        } catch (error) {}
+        requestAnimationFrame(function () {
+          if (currentPassId !== passId) return;
+          var ready = expectedReady(ficha());
+          if (ready) {
+            settling = false;
+            releaseStableView(reason, passes);
+            return;
+          }
+          if (passes >= maxPasses) {
+            settling = false;
+            publish('blocked-incomplete-dom', reason, false, passes);
+            return;
+          }
+          setTimeout(pass, 40);
+        });
+      });
+    }
+    pass();
+  }
+
+  function scheduleStablePass(reason) {
+    if (!routeActive()) {
+      root.classList.remove(pendingClass);
+      return;
+    }
+    markPending(reason);
+    if (scheduled) return;
+    scheduled = true;
+    setTimeout(function () {
+      scheduled = false;
+      runStablePass(reason || 'scheduled');
+    }, 0);
+  }
+
+  function touchesFicha(records) {
+    return Array.prototype.some.call(records || [], function (record) {
+      var target = record.target;
+      if (target && target.nodeType === 1 && (target.id === 'asg-ficha' || target.closest && target.closest('#asg-ficha'))) return true;
+      return Array.prototype.some.call(record.addedNodes || [], function (node) {
+        return node && node.nodeType === 1 && (node.id === 'asg-ficha' || node.querySelector && node.querySelector('#asg-ficha'));
       });
     });
   }
 
-  function bindKnowledgeScript(script) {
-    if (!script || script.dataset.orbitVisualStabilityBound === '1') return;
-    script.dataset.orbitVisualStabilityBound = '1';
-    root.classList.add(pendingClass);
-    window.Orbit.__clientInsurerVisualStabilityState = {
-      version: '20260721.1',
-      status: 'waiting-knowledge',
-      knowledgeSettledBeforeVisible: false,
-      canonicalOwnerReapplied: false,
-      writesStore: false
-    };
-    script.addEventListener('load', function () { releaseStableView(script, 'loaded'); }, { once: true });
-    script.addEventListener('error', function () { releaseStableView(script, 'load-error-honest'); }, { once: true });
+  if (window.MutationObserver) {
+    new MutationObserver(function (records) {
+      if (!routeActive() || settling || !touchesFicha(records)) return;
+      if (!expectedReady(ficha())) scheduleStablePass('ficha-dom-replaced');
+    }).observe(document.documentElement, { childList: true, subtree: true });
   }
 
-  function scan(node) {
-    if (!node || node.nodeType !== 1) return;
-    if (node.matches && node.matches('script[data-orbit-insurer-summary-owner]')) bindKnowledgeScript(node);
-    if (node.querySelectorAll) node.querySelectorAll('script[data-orbit-insurer-summary-owner]').forEach(bindKnowledgeScript);
-  }
+  document.addEventListener('click', function (event) {
+    var tab = event.target && event.target.closest && event.target.closest('#asg-ficha [data-tab]');
+    if (!tab) return;
+    scheduleStablePass('tab-transition:' + String(tab.getAttribute('data-tab') || 'unknown'));
+  }, true);
 
-  document.querySelectorAll('script[data-orbit-insurer-summary-owner]').forEach(bindKnowledgeScript);
-  new MutationObserver(function (records) {
-    records.forEach(function (record) {
-      Array.prototype.forEach.call(record.addedNodes || [], scan);
-    });
-  }).observe(document.head, { childList: true, subtree: true });
+  window.addEventListener('hashchange', function () { scheduleStablePass('hashchange'); });
+  window.addEventListener('orbit:aseguradoras:knowledge-loading', function () { scheduleStablePass('knowledge-loading'); });
+  window.addEventListener('orbit:aseguradoras:knowledge-ready', function () { scheduleStablePass('knowledge-ready'); });
+  window.addEventListener('orbit:aseguradoras:knowledge-error', function () { scheduleStablePass('knowledge-error'); });
+  window.addEventListener('orbit:aseguradoras:tenant-runtime-linked', function () { scheduleStablePass('tenant-runtime-linked'); });
+  window.addEventListener('orbit:aseguradoras:runtime-controlled', function () { scheduleStablePass('runtime-controlled'); });
+  window.addEventListener('orbit:store:emit', function () {
+    if (routeActive() && !expectedReady(ficha())) scheduleStablePass('store-emit');
+  });
+  document.addEventListener('orbit:store', function () {
+    if (routeActive() && !expectedReady(ficha())) scheduleStablePass('store-event');
+  });
 
   window.Orbit.__clientInsurerVisualStabilityBarrierV20260721 = {
-    version: '20260721.1',
+    version: '20260721.2',
     owner: 'core/router-tenant-config-bootstrap.js',
     canonicalVisualOwner: 'core/client-insurer-visual-contract-v20260720.js',
     knowledgeSettledBeforeVisible: true,
+    eventDriven: true,
+    domMutationGuard: true,
+    scheduleStablePass: scheduleStablePass,
+    expectedReady: expectedReady,
     writesStore: false,
     reimportsData: false,
     exposesSecrets: false
   };
+
+  scheduleStablePass('bootstrap');
 })();
