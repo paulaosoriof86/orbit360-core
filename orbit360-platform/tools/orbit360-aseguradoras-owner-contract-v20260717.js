@@ -110,10 +110,11 @@ const proofRun = spawnSync(process.execPath, [idempotenceTestPath, visualOwnerPa
 assert(proofRun.status === 0, 'La prueba determinista de idempotencia falló: ' + String(proofRun.stderr || proofRun.stdout || '').slice(0, 500));
 const proof = JSON.parse(fs.readFileSync(proofPath, 'utf8'));
 assert(proof.ok === true, 'La evidencia de idempotencia debe ser ok:true');
-assert(proof.totalChecks === 24 && proof.failedChecks === 0, 'La prueba de idempotencia debe aprobar 24/24 checks');
+assert(proof.totalChecks === 27 && proof.failedChecks === 0, 'La prueba de idempotencia y disparadores Cliente 360 debe aprobar 27/27 checks');
 assert(proof.proof.baseMutations === 1, 'Debe probar exactamente una mutación base');
 assert(proof.proof.canonicalTransforms === 1, 'Debe probar exactamente una transformación canónica');
 assert(proof.proof.followUpObserverDeliveries === 0, 'Debe probar cero entregas posteriores del observer');
+assert(Array.isArray(proof.proof.client360StructuralTriggers) && proof.proof.client360StructuralTriggers.includes('f-pais') && proof.proof.client360StructuralTriggers.includes('f-seg'), 'Debe probar disparadores estructurales de país y segmento en Cliente 360');
 assert(proof.runtimeExecuted === false && proof.browserExecuted === false && proof.deployExecuted === false, 'La prueba debe ser totalmente estática');
 
 console.log(JSON.stringify({
@@ -128,6 +129,7 @@ console.log(JSON.stringify({
     checks: proof.totalChecks,
     baseMutations: proof.proof.baseMutations,
     canonicalTransforms: proof.proof.canonicalTransforms,
-    followUpObserverDeliveries: proof.proof.followUpObserverDeliveries
+    followUpObserverDeliveries: proof.proof.followUpObserverDeliveries,
+    client360StructuralTriggers: proof.proof.client360StructuralTriggers
   }
 }, null, 2));
