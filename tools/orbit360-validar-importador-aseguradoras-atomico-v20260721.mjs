@@ -33,7 +33,7 @@ function writeEvidence(payload) {
 for (const [id, rel] of Object.entries(FILES)) check(`FILE_${id.toUpperCase()}`, exists(rel), rel);
 if (checks.some(item => !item.ok)) {
   const payload = {
-    schemaVersion: 'orbit360-static-importer-atomicity-v3-trace-audit-owner',
+    schemaVersion: 'orbit360-static-importer-atomicity-v4-68-restores-2-new-pending',
     generatedAt: new Date().toISOString(),
     mode: 'static_no_runtime',
     ok: false,
@@ -58,35 +58,44 @@ catch (error) { check('FREEZE_VALID_JSON', false, error.message); }
 
 if (manifest) {
   const recovery = Array.isArray(manifest.recoveryMappings) ? manifest.recoveryMappings : [];
+  const newPending = Array.isArray(manifest.newPendingRows) ? manifest.newPendingRows : [];
   const duplicates = Array.isArray(manifest.duplicateIncomingRows) ? manifest.duplicateIncomingRows : [];
   const currentIds = recovery.map(row => row[1]);
   const legacyIds = recovery.map(row => row[2]);
-  const incomingDuplicateIds = duplicates.map(row => row[1]);
-  const allPendingIds = currentIds.concat(incomingDuplicateIds);
+  const newPendingIds = newPending.map(row => row[1]);
+  const allPendingIds = currentIds.concat(newPendingIds);
   const legacyHashes = recovery.map(row => row[6]);
   const expectedRefHashes = recovery.map(row => row[7]);
+  const newPendingHashes = newPending.map(row => row[4]);
   const hash12 = value => /^[a-f0-9]{12}$/.test(String(value || ''));
   const trace = manifest.traceContract || {};
+  const identity = manifest.identityContract || {};
 
-  check('MANIFEST_SCHEMA', manifest.schemaVersion === 'orbit360-bank-reference-recovery-map-v2-sanitized', manifest.schemaVersion);
+  check('MANIFEST_SCHEMA', manifest.schemaVersion === 'orbit360-bank-reference-recovery-map-v3-sanitized', manifest.schemaVersion);
   check('MANIFEST_MODE', manifest.mode === 'STATIC_CONFIRMED_NO_WRITE', manifest.mode);
   check('MANIFEST_EVIDENCE_CONFIRMED', manifest.evidenceClassification === 'CONFIRMED', manifest.evidenceClassification);
   check('RECOVERY_COUNT_68', recovery.length === 68, recovery.length);
-  check('DUPLICATE_COUNT_2', duplicates.length === 2, duplicates.length);
+  check('NEW_PENDING_COUNT_2', newPending.length === 2, newPending.length);
+  check('DUPLICATE_COUNT_ZERO', duplicates.length === 0, duplicates.length);
   check('UNMAPPED_ZERO', Number(manifest.summary && manifest.summary.unmappedRows) === 0, manifest.summary && manifest.summary.unmappedRows);
   check('AMBIGUOUS_ZERO', Number(manifest.summary && manifest.summary.ambiguousRows) === 0, manifest.summary && manifest.summary.ambiguousRows);
+  check('FINAL_BANK_ROWS_93', Number(manifest.summary && manifest.summary.expectedFinalBankRows) === 93, manifest.summary && manifest.summary.expectedFinalBankRows);
   check('FINAL_REFERENCES_91', Number(manifest.summary && manifest.summary.expectedFinalValidReferences) === 91, manifest.summary && manifest.summary.expectedFinalValidReferences);
-  check('FINAL_PENDING_ZERO', Number(manifest.summary && manifest.summary.expectedFinalPendingRows) === 0, manifest.summary && manifest.summary.expectedFinalPendingRows);
+  check('FINAL_PENDING_2', Number(manifest.summary && manifest.summary.expectedFinalPendingRows) === 2, manifest.summary && manifest.summary.expectedFinalPendingRows);
   check('FINAL_DUPLICATES_ZERO', Number(manifest.summary && manifest.summary.expectedFinalDuplicateRows) === 0, manifest.summary && manifest.summary.expectedFinalDuplicateRows);
   check('RECOVERY_ROWS_SHAPE', recovery.every(row => Array.isArray(row) && row.length === 8 && Number(row[4]) > 0), `rows=${recovery.length}`);
-  check('DUPLICATE_ROWS_SHAPE', duplicates.every(row => Array.isArray(row) && row.length === 8 && Number(row[4]) > 0), `rows=${duplicates.length}`);
+  check('NEW_PENDING_ROWS_SHAPE', newPending.every(row => Array.isArray(row) && row.length === 7 && Number(row[3]) > 0), `rows=${newPending.length}`);
   check('CURRENT_IDS_UNIQUE', unique(currentIds), `unique=${new Set(currentIds).size}`);
   check('LEGACY_IDS_UNIQUE', unique(legacyIds), `unique=${new Set(legacyIds).size}`);
+  check('NEW_PENDING_IDS_UNIQUE', unique(newPendingIds), `unique=${new Set(newPendingIds).size}`);
   check('ALL_PENDING_IDS_70_UNIQUE', allPendingIds.length === 70 && unique(allPendingIds), `rows=${allPendingIds.length}; unique=${new Set(allPendingIds).size}`);
   check('LEGACY_HASHES_UNIQUE', unique(legacyHashes) && legacyHashes.every(hash12), `unique=${new Set(legacyHashes).size}`);
   check('REFERENCE_HASHES_UNIQUE', unique(expectedRefHashes) && expectedRefHashes.every(hash12), `unique=${new Set(expectedRefHashes).size}`);
+  check('NEW_PENDING_HASHES_UNIQUE', unique(newPendingHashes) && newPendingHashes.every(hash12), `unique=${new Set(newPendingHashes).size}`);
   check('ALL_MISSING_HASHES_COVERED', manifest.validation && manifest.validation.allMissingReferenceHashesCovered === true && Number(manifest.validation.hashSetDifference) === 0, JSON.stringify(manifest.validation || {}));
-  check('ALL_PENDING_ROWS_ACCOUNTED', manifest.validation && manifest.validation.allPendingRowsAccountedFor === true && Number(manifest.validation.pendingRowsAccountedFor) === 70, JSON.stringify(manifest.validation || {}));
+  check('ALL_PENDING_ROWS_ACCOUNTED', manifest.validation && manifest.validation.allPendingRowsAccountedFor === true && Number(manifest.validation.pendingRowsAccountedFor) === 70 && Number(manifest.validation.recoveryRowsAccountedFor) === 68 && Number(manifest.validation.newPendingRowsAccountedFor) === 2 && Number(manifest.validation.duplicateRowsAccountedFor) === 0, JSON.stringify(manifest.validation || {}));
+  check('NEW_PENDING_CONFIRMED_NOT_DUPLICATES', manifest.validation && manifest.validation.newPendingRowsDistinctFromHistoricalReferences === true && manifest.validation.newPendingRowsPreserved === true, JSON.stringify(manifest.validation || {}));
+  check('IDENTITY_CONTRACT_68_PLUS_2_NEW', Number(identity.historicalReferenceRestorations) === 68 && Number(identity.newPendingRowsPreserved) === 2 && Number(identity.duplicateRemovals) === 0, JSON.stringify(identity));
   check('TRACE_ROOT_CAUSE_CLASSIFIED', trace.classification === 'DATA_CONTRACT_FAILURE', trace.classification);
   check('TRACE_ROWS_RECONCILED_70', Number(trace.rowsReconciled) === 70 && Number(manifest.validation && manifest.validation.traceRowsReconciled) === 70, `${trace.rowsReconciled}`);
   check('TRACE_AMBIGUOUS_ZERO', Number(trace.ambiguousRows) === 0 && Number(manifest.validation && manifest.validation.traceAmbiguousRows) === 0, `${trace.ambiguousRows}`);
@@ -96,6 +105,7 @@ if (manifest) {
   check('MANIFEST_NO_SECRETS', manifest.safety && manifest.safety.containsSecrets === false, 'containsSecrets');
   check('MANIFEST_NO_RAW_BANK_VALUES', manifest.safety && manifest.safety.containsRawBankValues === false, 'containsRawBankValues');
   check('MANIFEST_COLOMBIA_UNTOUCHED', manifest.safety && manifest.safety.colombiaTouched === false, 'colombiaTouched');
+  check('MANIFEST_NO_ROW_MUTATION', manifest.safety && manifest.safety.createsRows === false && manifest.safety.deletesRows === false && manifest.safety.reordersRows === false, JSON.stringify(manifest.safety || {}));
 }
 
 const parser = read(FILES.parser);
@@ -134,15 +144,23 @@ const bridgeTokens = [
 for (const token of bridgeTokens) check(`BRIDGE_TOKEN:${token}`, bridge.includes(token), token);
 
 const dryRunTokens = [
+  'manifestIdentityContractValidated = true',
   'manifestTraceContractValidated = true',
   'traceIsAuditMetadata = true',
   'recoveryScopeChangesTraceFields = false',
   "operation: 'restore_accountRef_only'",
+  "operation: 'preserve_new_pending_row_unchanged'",
+  'newPendingRowsPreserved',
+  'duplicateRemovalsZero',
+  'noCreates',
+  'noDeletes',
+  'noReorder',
   'traceFieldsUntouched',
   'authorizationRequiredForWrite: true',
-  "schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v2-trace-audit-only'"
+  "schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v3-68-restores-2-new-pending'"
 ];
 for (const token of dryRunTokens) check(`DRYRUN_TOKEN:${token}`, dryRun.includes(token), token);
+check('DRYRUN_NO_DUPLICATE_REMOVAL_LOGIC', !dryRun.includes('remove_incoming_duplicate_preserve_existing_valid_reference') && !dryRun.includes('DUPLICATE_FINGERPRINT_MISMATCH') && !dryRun.includes('DUPLICATE_PAIR_'), 'two new rows must be preserved');
 check('DRYRUN_TRACE_NOT_IDENTITY_GATE', !dryRun.includes('RECOVERY_TRACE_MISMATCH') && !dryRun.includes('DUPLICATE_TRACE_MISMATCH'), 'trace metadata must not block stable identity');
 const forbiddenFirestoreWritePatterns = [
   /\.doc\s*\([^)]*\)[\s\S]{0,160}?\.(?:set|update|create|delete)\s*\(/,
@@ -178,28 +196,39 @@ check('DRYRUN_SYNTAX', dryRunSyntax.ok, dryRunSyntax.detail);
 if (freeze) {
   const status = String(freeze.status || '');
   const authorization = freeze.runtimeAuthorization || {};
+  const preflightAuthorization = freeze.preflightAuthorization || {};
   const hardFrozen = status.startsWith('STOP_THE_LINE');
+  const preflightOnly = status === 'DATA_CONTRACT_CORRECTION_PREFLIGHT_ONLY_AUTHORIZED';
   const bounded = status === 'BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED';
-  check('INCIDENT_CONTROL_ACTIVE', hardFrozen || bounded, status);
+  check('INCIDENT_CONTROL_ACTIVE', hardFrozen || preflightOnly || bounded, status);
   check(
     'RUNTIME_SCOPE_BOUND',
-    hardFrozen || (
+    hardFrozen ||
+    (
+      preflightOnly &&
+      preflightAuthorization.active === true &&
+      preflightAuthorization.secretsAllowed === false &&
+      preflightAuthorization.firestoreReadAllowed === false &&
+      preflightAuthorization.vaultReadAllowed === false &&
+      authorization.active === false
+    ) ||
+    (
       bounded &&
       authorization.active === true &&
-      authorization.authorizationId === 'exact-bank-reference-recovery-dryrun-68plus2-v1' &&
+      authorization.authorizationId === 'exact-bank-reference-recovery-dryrun-68plus2new-v1' &&
       authorization.action === 'exact_recovery_readonly_dry_run' &&
       authorization.allowedExecutions === 1 &&
       authorization.writesAllowed === false &&
       authorization.script === FILES.dryRun &&
       authorization.manifest === FILES.manifest
     ),
-    bounded ? JSON.stringify({ authorizationId: authorization.authorizationId, action: authorization.action, allowedExecutions: authorization.allowedExecutions, writesAllowed: authorization.writesAllowed }) : status
+    status
   );
 }
 
 const failed = checks.filter(item => !item.ok);
 const payload = {
-  schemaVersion: 'orbit360-static-importer-atomicity-v3-trace-audit-owner',
+  schemaVersion: 'orbit360-static-importer-atomicity-v4-68-restores-2-new-pending',
   generatedAt: new Date().toISOString(),
   mode: 'static_no_runtime',
   ok: failed.length === 0,
@@ -212,11 +241,14 @@ const payload = {
   vaultReadExecuted: false,
   recovery: {
     mappings: manifest && manifest.summary && manifest.summary.recoveryMappings || 0,
+    newPendingRows: manifest && manifest.summary && manifest.summary.newPendingRows || 0,
     duplicates: manifest && manifest.summary && manifest.summary.duplicateIncomingRows || 0,
     ambiguous: manifest && manifest.summary && manifest.summary.ambiguousRows || 0,
     traceRowsReconciled: manifest && manifest.traceContract && manifest.traceContract.rowsReconciled || 0,
     traceIsAuditMetadata: true,
-    expectedFinalReferences: manifest && manifest.summary && manifest.summary.expectedFinalValidReferences || 0
+    expectedFinalBankRows: manifest && manifest.summary && manifest.summary.expectedFinalBankRows || 0,
+    expectedFinalReferences: manifest && manifest.summary && manifest.summary.expectedFinalValidReferences || 0,
+    expectedFinalPending: manifest && manifest.summary && manifest.summary.expectedFinalPendingRows || 0
   },
   contract: {
     owner: 'insurer-directory-import-coordinator-v1221',
@@ -228,6 +260,9 @@ const payload = {
     rollbackOperationalDocuments: true,
     distributedVaultRollbackClaimed: false,
     partialApplyAllowed: false,
+    historicalReferenceRestorations: 68,
+    newPendingRowsPreserved: 2,
+    duplicateRemovals: 0,
     traceIsAuditMetadata: true,
     traceFieldsWrittenByRecovery: false,
     boundedRuntimeAuthorization: freeze && freeze.status === 'BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED'
