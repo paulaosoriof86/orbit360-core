@@ -1,6 +1,6 @@
 name: Orbit 360 Incident Importador Aseguradoras Read-Only
 
-# incidentRevision: 20260721-3
+# incidentRevision: 20260721-4
 on:
   workflow_dispatch:
   push:
@@ -9,12 +9,14 @@ on:
     paths:
       - '.github/workflows/orbit360-importer-incident-readonly-diagnosis.yml'
       - 'tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs'
+      - 'tools/orbit360-dryrun-recuperar-referencias-bancarias-v20260721.mjs'
   pull_request:
     branches:
       - main
     paths:
       - '.github/workflows/orbit360-importer-incident-readonly-diagnosis.yml'
       - 'tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs'
+      - 'tools/orbit360-dryrun-recuperar-referencias-bancarias-v20260721.mjs'
 
 permissions:
   contents: read
@@ -31,7 +33,7 @@ env:
 
 jobs:
   readonly-diagnosis:
-    name: STOP THE LINE · inventario read-only
+    name: STOP THE LINE · diagnóstico y dry-run read-only
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -73,7 +75,7 @@ jobs:
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
 
-      - name: Instalar dependencias del diagnóstico
+      - name: Instalar dependencias read-only
         shell: bash
         run: |
           set -euo pipefail
@@ -85,30 +87,55 @@ jobs:
           set -euo pipefail
           node tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs
 
-      - name: Validar que el diagnóstico fue seguro
+      - name: Ejecutar dry-run de recuperación selectiva
         shell: bash
         run: |
           set -euo pipefail
-          REPORT='orbit360-platform/runtime-incident-importer-20260721/insurer-protected-reference-diff-sanitizado.json'
-          test -f "$REPORT"
-          test "$(jq -r '.diagnosisComplete // false' "$REPORT")" = true
-          test "$(jq -r '.mode' "$REPORT")" = read_only
-          test "$(jq -r '.writesExecuted // true' "$REPORT")" = false
-          test "$(jq -r '.deployExecuted // true' "$REPORT")" = false
-          test "$(jq -r '.migrationExecuted // true' "$REPORT")" = false
-          test "$(jq -r '.containsSecrets // true' "$REPORT")" = false
-          test "$(jq -r '.containsPII // true' "$REPORT")" = false
-          test "$(jq -r '.current.rawAccountValues // -1' "$REPORT")" = 0
-          test "$(jq -r '.current.rawCredentialValues // -1' "$REPORT")" = 0
-          jq '{schemaVersion,generatedAt,mode,writesExecuted,diagnosisComplete,current,vault,diff,safetyChecks}' "$REPORT"
+          node tools/orbit360-dryrun-recuperar-referencias-bancarias-v20260721.mjs
+
+      - name: Validar corte y propuesta exacta
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIAG='orbit360-platform/runtime-incident-importer-20260721/insurer-protected-reference-diff-sanitizado.json'
+          DRY='orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-dry-run-sanitizado.json'
+          BACKUP='orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-backup-manifest-sanitizado.json'
+          test -f "$DIAG"
+          test -f "$DRY"
+          test -f "$BACKUP"
+          test "$(jq -r '.diagnosisComplete' "$DIAG")" = true
+          test "$(jq -r '.writesExecuted' "$DIAG")" = false
+          test "$(jq -r '.recoveryReady' "$DRY")" = true
+          test "$(jq -r '.mode' "$DRY")" = read_only_dry_run
+          test "$(jq -r '.writesExecuted' "$DRY")" = false
+          test "$(jq -r '.deployExecuted' "$DRY")" = false
+          test "$(jq -r '.migrationExecuted' "$DRY")" = false
+          test "$(jq -r '.containsSecrets' "$DRY")" = false
+          test "$(jq -r '.containsPII' "$DRY")" = false
+          test "$(jq -r '.proposal.proposedChanges' "$DRY")" = 68
+          test "$(jq -r '.proposal.affectedGtDocuments' "$DRY")" = 13
+          test "$(jq -r '.proposal.colombiaChanges' "$DRY")" = 0
+          test "$(jq -r '.proposal.creates' "$DRY")" = 0
+          test "$(jq -r '.proposal.deletes' "$DRY")" = 0
+          test "$(jq -r '.proposal.reorderDetected' "$DRY")" = 0
+          test "$(jq -r '.proposal.nonReferenceFieldChanges' "$DRY")" = 0
+          test "$(jq -r '.proposal.duplicateProposalCount' "$DRY")" = 0
+          test "$(jq -r '.proposal.blockers' "$DRY")" = 0
+          test "$(jq -r '.proposal.projectedValidRefs' "$DRY")" = 91
+          test "$(jq -r '.proposal.projectedPendingRefs' "$DRY")" = 2
+          test "$(jq -r '.rollbackExact' "$BACKUP")" = true
+          test "$(jq -r '.writesExecuted' "$BACKUP")" = false
+          jq '{schemaVersion,generatedAt,mode,baseline,proposal,checks,recoveryReady}' "$DRY"
 
       - name: Publicar evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-importer-incident-readonly-${{ github.run_id }}
+          name: orbit360-importer-recovery-dry-run-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-incident-importer-20260721/insurer-protected-reference-diff-sanitizado.json
+            orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-dry-run-sanitizado.json
+            orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-backup-manifest-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
           if-no-files-found: error
           retention-days: 30
