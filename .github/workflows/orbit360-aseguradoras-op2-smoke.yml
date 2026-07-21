@@ -108,15 +108,17 @@ jobs:
           set -euo pipefail
           REPORT='orbit360-importer-incident-evidence/insurer-protected-reference-diff-sanitizado.json'
           test -f "$REPORT"
-          test "$(jq -r '.diagnosisComplete // false' "$REPORT")" = true
-          test "$(jq -r '.mode' "$REPORT")" = read_only
-          test "$(jq -r '.writesExecuted // true' "$REPORT")" = false
-          test "$(jq -r '.deployExecuted // true' "$REPORT")" = false
-          test "$(jq -r '.migrationExecuted // true' "$REPORT")" = false
-          test "$(jq -r '.containsSecrets // true' "$REPORT")" = false
-          test "$(jq -r '.containsPII // true' "$REPORT")" = false
-          test "$(jq -r '.current.rawAccountValues // -1' "$REPORT")" = 0
-          test "$(jq -r '.current.rawCredentialValues // -1' "$REPORT")" = 0
+          jq -e '
+            .diagnosisComplete == true and
+            .mode == "read_only" and
+            .writesExecuted == false and
+            .deployExecuted == false and
+            .migrationExecuted == false and
+            .containsSecrets == false and
+            .containsPII == false and
+            .current.rawAccountValues == 0 and
+            .current.rawCredentialValues == 0
+          ' "$REPORT" >/dev/null
           jq '{schemaVersion,generatedAt,mode,writesExecuted,diagnosisComplete,current,vault,diff,safetyChecks}' "$REPORT"
 
       - name: Subir evidencia sanitizada del incidente
