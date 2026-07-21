@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-exact-recovery-dryrun-authorization-v2",
+  "schemaVersion": "orbit360-exact-recovery-dryrun-authorization-v3",
   "issuedAt": "2026-07-21",
   "authorizationId": "exact-bank-reference-recovery-dryrun-68plus2-v1",
-  "authorizationRevision": 2,
+  "authorizationRevision": 3,
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
   "action": "exact_recovery_readonly_dry_run",
   "repository": "paulaosoriof86/orbit360-core",
@@ -21,6 +21,17 @@
     "centralPreflightFailed": 0,
     "preflightSecretsRead": false,
     "preflightRuntimeExecuted": false
+  },
+  "previousAttempt": {
+    "runId": 29849973356,
+    "status": "FAILURE",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "failureStage": "dry_run_report_not_copied_before_shell_exit",
+    "writesExecuted": false,
+    "deployExecuted": false,
+    "migrationExecuted": false,
+    "artifactId": 8502922581,
+    "artifactIncompleteForRootCause": true
   },
   "expected": {
     "clients": 414,
@@ -46,7 +57,7 @@
     "validator": "65d0ba0b5130a534b511976264751b407d47407a",
     "overlay": "202e8e982430c23576ef2844faacaaedccaf83bb",
     "freeze": "3ea6938c50c876a5e4f45dcceb1aa2a53b29f580",
-    "workflow": "6212f80bab95017e4146fcc621c16b1af7df7be3",
+    "workflow": "04f9c48a58cd8a0af75448b7dd6df147d27ee308",
     "academy": "66cbfa565852f29344244fa1e577b22cb880a065"
   },
   "acceptance": "sanitized_report_ok_true_only",
