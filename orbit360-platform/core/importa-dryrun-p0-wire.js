@@ -89,12 +89,24 @@
     return resolveControlled(collection, data).controlled;
   }
 
+  function specializedInsurerCandidate(coll, data) {
+    if (coll !== 'aseguradoras' || !data) return false;
+    const trace = data.fuenteDirectorio || {};
+    return !!(
+      data.importado === true ||
+      data.sourceType === 'directorio_aseguradoras' ||
+      trace.tipo === 'directorio_aseguradoras' ||
+      (trace.archivo && trace.hoja && trace.pais)
+    );
+  }
+
   function importCandidate(coll, data) {
     if (!data || controlledWrite(coll, data)) return false;
     if (coll === 'auditoriaImportaciones') return false;
     const id = String(data.id || '');
     return !!(
       drawerOpen() ||
+      specializedInsurerCandidate(coll, data) ||
       data.importado === true ||
       data.origen === 'importado' ||
       /_imp_|^act_imp_|^cob_imp_|^pol_imp_|^com_imp_|^fac_imp_|^con_imp_/i.test(id) ||
@@ -104,6 +116,7 @@
 
   function inferSource(coll, data) {
     if (data && data.sourceType) return data.sourceType;
+    if (coll === 'aseguradoras' && data && data.fuenteDirectorio && data.fuenteDirectorio.tipo) return data.fuenteDirectorio.tipo;
     if (data && data.origen === 'estado-cuenta-banco') return 'estado_cuenta_bancario';
     return COLL_TO_SOURCE[coll] || 'fuente_no_clasificada';
   }
