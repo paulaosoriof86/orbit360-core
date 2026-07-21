@@ -4,7 +4,7 @@
    Owner único del grafo runtime para el directorio real:
    1. bloquea el modal anterior;
    2. instala escritura parcial de Aseguradoras;
-   3. carga contratos P0 y listener controlado;
+   3. carga contratos P0, política formal de Aseguradoras y listener;
    4. carga guard de identidad y lectura fresca;
    5. instala la UI canónica de una confirmación/una escritura;
    6. falla cerrado ante cualquier dependencia incompleta.
@@ -18,12 +18,14 @@
   var tenant = params.get('tenant') || (window.OrbitBackend && (OrbitBackend.tenantId || OrbitBackend.tenant)) || '';
   var TENANT_ID = 'alianzas-soluciones';
   var VERSION = '20260721.1';
+  var INSURER_WRITE_CONTRACT_VERSION = '20260721.1';
 
   if (mode !== 'firestore-lab' || tenant !== TENANT_ID) return;
   if (window.OrbitAseguradorasCanonicalRuntimeV20260721) return;
 
   var state = window.OrbitAseguradorasCanonicalRuntimeV20260721 = {
     version: VERSION,
+    insurerWriteContractVersion: INSURER_WRITE_CONTRACT_VERSION,
     owner: 'core/aseguradoras-canonical-runtime-bootstrap-v20260721.js',
     tenantId: TENANT_ID,
     status: 'waiting-base-importer',
@@ -73,7 +75,10 @@
           resolve(true);
           return;
         }
-        existing.addEventListener('load', function () { resolve(true); }, { once: true });
+        existing.addEventListener('load', function () {
+          if (predicate && !predicate()) reject(new Error('RUNTIME_OWNER_NOT_READY:' + key));
+          else resolve(true);
+        }, { once: true });
         existing.addEventListener('error', function () { reject(new Error('RUNTIME_LOAD_FAILED:' + key)); }, { once: true });
         return;
       }
@@ -124,14 +129,18 @@
 
   function verifyFinalGraph() {
     var D = Orbit.insurerDirectoryImport;
+    var W = Orbit.importaWriteP0;
     return !!(
       D &&
       D.open && D.open.__canonicalDirectoryExecution20260720 === true &&
-      D.canonicalExecutionVersion === '20260721.1' &&
+      D.canonicalExecutionVersion === VERSION &&
       D.__op2SourceGuardV1220 &&
       D.__backendWriteGuardV1220 &&
       D.__freshReadGuardV20260721 &&
-      Orbit.importaWriteP0 &&
+      W && typeof W.writeBatch === 'function' &&
+      W.__aseguradorasWriteContractV20260721 &&
+      W.__aseguradorasWriteContractV20260721.version === INSURER_WRITE_CONTRACT_VERSION &&
+      W.__aseguradorasWriteContractV20260721.failClosed === true &&
       Orbit.importerControlledWriteContractV20260721 &&
       Orbit.importerControlledWriteContractV20260721.version === '20260721.2' &&
       Orbit.importaDryRunP0Wire &&
@@ -154,6 +163,9 @@
     await loadScript('core/importa-write-p0.js?v=20260721-1', 'write-p0', function () {
       return Orbit.importaWriteP0 && typeof Orbit.importaWriteP0.writeBatch === 'function';
     });
+    await loadScript('core/importa-write-aseguradoras-contract-v20260721.js?v=20260721-1', 'insurer-write-contract', function () {
+      return Orbit.importaWriteP0 && Orbit.importaWriteP0.__aseguradorasWriteContractV20260721 && Orbit.importaWriteP0.__aseguradorasWriteContractV20260721.version === INSURER_WRITE_CONTRACT_VERSION;
+    });
     await loadScript('core/importer-controlled-write-contract-v20260721.js?v=20260721-2', 'controlled-write-contract', function () {
       return Orbit.importerControlledWriteContractV20260721 && Orbit.importerControlledWriteContractV20260721.version === '20260721.2';
     });
@@ -174,7 +186,11 @@
     state.status = 'ready';
     state.ready = true;
     state.errorCode = '';
-    try { window.dispatchEvent(new CustomEvent('orbit:insurer-directory-canonical-ready', { detail: { version: VERSION, ready: true } })); } catch (error) {}
+    try {
+      window.dispatchEvent(new CustomEvent('orbit:insurer-directory-canonical-ready', {
+        detail: { version: VERSION, insurerWriteContractVersion: INSURER_WRITE_CONTRACT_VERSION, ready: true }
+      }));
+    } catch (error) {}
   }
 
   bootstrap().catch(function (error) {
@@ -182,6 +198,10 @@
     state.ready = false;
     state.errorCode = clean(error && (error.code || error.message) || 'CANONICAL_BOOTSTRAP_FAILED').replace(/[^A-Za-z0-9_.:-]/g, '_');
     blockLegacyOpen();
-    try { window.dispatchEvent(new CustomEvent('orbit:insurer-directory-canonical-blocked', { detail: { version: VERSION, ready: false, errorCode: state.errorCode } })); } catch (eventError) {}
+    try {
+      window.dispatchEvent(new CustomEvent('orbit:insurer-directory-canonical-blocked', {
+        detail: { version: VERSION, insurerWriteContractVersion: INSURER_WRITE_CONTRACT_VERSION, ready: false, errorCode: state.errorCode }
+      }));
+    } catch (eventError) {}
   });
 })();
