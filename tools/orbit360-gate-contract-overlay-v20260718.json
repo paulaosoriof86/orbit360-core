@@ -8,7 +8,7 @@
   "gatePatch": {
     "contractVersion": "1.0.31",
     "diagnosticRevision": "canonical-owner-same-microtask-dynamic-preflight-evidence-v1",
-    "status": "VALIDATOR_FIX_PENDING_STATIC_PREFLIGHT"
+    "status": "TARGETED_LAB_DEPLOY_AND_FINAL_GATE_AUTHORIZED"
   },
   "canonicalOwners": [
     {
