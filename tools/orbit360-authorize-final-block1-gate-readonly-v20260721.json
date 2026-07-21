@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "orbit360-final-block1-readonly-authorization-v1",
+  "issuedAt": "2026-07-21",
+  "authorizationId": "final-block1-readonly-gate-v1",
+  "action": "unique_final_block1_gate_readonly",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "tenantId": "alianzas-soluciones",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "allowedExecutions": 1,
+  "preflightRequired": true,
+  "runtimeAllowed": true,
+  "browserAllowed": true,
+  "firestoreReadAllowed": true,
+  "writesAllowed": false,
+  "secretManagerWritesAllowed": false,
+  "deployAllowed": false,
+  "productionAllowed": false,
+  "reimportAllowed": false,
+  "sourceInventory": {
+    "runId": 29868538689,
+    "artifactId": 8510179033,
+    "artifactDigest": "sha256:7297652bfbdc666c17a9eb3ebf332bcaff33108908aa1757d97331db96960e6e",
+    "ok": true,
+    "validReferences": 91,
+    "pendingReferences": 2,
+    "uniqueValidReferences": 91
+  },
+  "expected": {
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "contractVersion": "1.0.27",
+    "views": [
+      "Direccion desktop",
+      "Operativo tablet",
+      "Asesor movil"
+    ],
+    "runtimeGraphChanged": false,
+    "deployExecuted": false,
+    "writesExecuted": false
+  },
+  "sourceBlobs": {
+    "workflow": "0e2abdd8cf1f25c89052f8cd1d9d85642427758b",
+    "freeze": "d888fc5ef7b05d36b47ae2226f5bb4ef00013abf",
+    "overlay": "4b163ee019f3c08f5a97ff68070fc1be35fbe09c",
+    "runtimeGate": "60ef7bef6056c2d4840522c6dfb212b8da85acf7"
+  },
+  "acceptance": "SANITIZED_OK_TRUE_ONLY",
+  "containsPII": false,
+  "containsSecrets": false
+}
