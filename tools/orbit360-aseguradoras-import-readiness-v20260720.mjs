@@ -1,4 +1,5 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright';
 
 const BASE_URL = String(process.env.ORBIT360_PREVIEW_URL || '').replace(/\/$/, '');
@@ -6,6 +7,8 @@ const EMAIL = String(process.env.ORBIT360_LAB_LOGIN_EMAIL || 'orbit.lab@demo.com
 const PASSWORD = String(process.env.ORBIT360_LAB_LOGIN_PASSWORD || '');
 const EXPECTED_COMMIT = String(process.env.ORBIT360_EXPECTED_COMMIT || '');
 const OUT_DIR = 'orbit360-platform/runtime-gate-real-insurer-directories-v20260720';
+const CONTROLLED_WRITE_SMOKE = 'orbit360-platform/tools/orbit360-smoke-directorios-aseguradoras-v1202.mjs';
+const CONTROLLED_WRITE_CONTRACT_VERSION = '20260721.2';
 
 if (!/^https:\/\//.test(BASE_URL)) throw new Error('PREVIEW_URL_REQUIRED');
 if (PASSWORD.length < 12) throw new Error('LAB_LOGIN_REQUIRED');
@@ -53,15 +56,22 @@ const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
 const page = await context.newPage();
 const report = {
-  schemaVersion: 'orbit360-real-insurer-directory-readiness-v2',
+  schemaVersion: 'orbit360-real-insurer-directory-readiness-v3',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
   expectedCommit: EXPECTED_COMMIT,
+  controlledWriteContractVersion: CONTROLLED_WRITE_CONTRACT_VERSION,
   checks: {}
 };
 
 try {
+  execFileSync(process.execPath, [CONTROLLED_WRITE_SMOKE], {
+    cwd: process.cwd(),
+    stdio: 'inherit',
+    env: process.env
+  });
+
   await page.goto(`${BASE_URL}/ays-lab-preview.html?readiness=${Date.now()}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForURL(/index\.html/, { timeout: 30000 });
   await page.locator('#login-form').waitFor({ state: 'visible', timeout: 30000 });
@@ -140,17 +150,26 @@ try {
         if (String(row && row.accountRef || '').trim()) inventory.referenceCounts.accountRef += 1;
       });
     });
+    const contract = window.Orbit && Orbit.importerControlledWriteContractV20260721;
     return {
       owner: !!(window.Orbit && Orbit.insurerDirectoryImport),
       parseFile: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.parseFile === 'function'),
       applyApproved: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.applyApproved === 'function'),
       applySecureOnly: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.applySecureOnly === 'function'),
       secureProvider: !!(window.Orbit && Orbit.secureImport && typeof Orbit.secureImport.importInsurerDirectory === 'function'),
+      controlledWriteContract: !!contract,
+      controlledWriteContractVersion: String(contract && contract.version || ''),
+      p0WireReady: !!(window.Orbit && Orbit.importaDryRunP0Wire),
+      p0WireContractVersion: String(Orbit.store && Orbit.store.__p0DryRunWireContractVersion || ''),
       sensitiveFieldInventory: inventory
     };
   });
   assert(importerRuntime.owner && importerRuntime.parseFile && importerRuntime.applyApproved && importerRuntime.applySecureOnly, 'IMPORTER_OWNER_NOT_READY');
   assert(importerRuntime.secureProvider, 'SECURE_PROVIDER_NOT_READY');
+  assert(importerRuntime.controlledWriteContract, 'CONTROLLED_WRITE_CONTRACT_NOT_READY');
+  assert(importerRuntime.controlledWriteContractVersion === CONTROLLED_WRITE_CONTRACT_VERSION, 'CONTROLLED_WRITE_CONTRACT_VERSION_INVALID', importerRuntime.controlledWriteContractVersion);
+  assert(importerRuntime.p0WireReady, 'P0_WIRE_NOT_READY');
+  assert(importerRuntime.p0WireContractVersion === CONTROLLED_WRITE_CONTRACT_VERSION, 'P0_WIRE_CONTRACT_VERSION_INVALID', importerRuntime.p0WireContractVersion);
 
   const importButton = page.locator('#asg-imp, [data-import-asg]').first();
   await importButton.waitFor({ state: 'visible', timeout: 15000 });
@@ -176,6 +195,7 @@ try {
 
   const sensitiveInventory = importerRuntime.sensitiveFieldInventory;
   report.checks = {
+    controlledWriteRegression: true,
     login: true,
     legalReady: true,
     directionRole: true,
@@ -185,6 +205,10 @@ try {
     controlledWriterReady: importerRuntime.applyApproved,
     secureOnlyReady: importerRuntime.applySecureOnly,
     secureProviderReady: importerRuntime.secureProvider,
+    controlledWriteContractReady: importerRuntime.controlledWriteContract,
+    controlledWriteContractExact: importerRuntime.controlledWriteContractVersion === CONTROLLED_WRITE_CONTRACT_VERSION,
+    p0WireReady: importerRuntime.p0WireReady,
+    p0WireContractExact: importerRuntime.p0WireContractVersion === CONTROLLED_WRITE_CONTRACT_VERSION,
     noUnmaskedSensitiveValues: sensitiveInventory.suspiciousUnmasked === 0,
     importButtonReady: true,
     countryGTCO: countryValues.includes('GT') && countryValues.includes('CO'),
@@ -193,6 +217,10 @@ try {
   };
   report.insurerCount = insurerCount;
   report.sensitiveFieldInventory = sensitiveInventory;
+  report.importerRuntime = {
+    controlledWriteContractVersion: importerRuntime.controlledWriteContractVersion,
+    p0WireContractVersion: importerRuntime.p0WireContractVersion
+  };
   report.ok = Object.values(report.checks).every(Boolean);
   if (!report.ok && sensitiveInventory.suspiciousUnmasked > 0) {
     report.error = `UNMASKED_SENSITIVE_VALUES_PRESENT:${sensitiveInventory.suspiciousUnmasked}`;
