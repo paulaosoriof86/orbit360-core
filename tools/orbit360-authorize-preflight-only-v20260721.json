@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "orbit360-validator-stale-preflight-authorization-v1",
+  "schemaVersion": "orbit360-data-contract-preflight-authorization-v1",
   "issuedAt": "2026-07-21",
-  "authorizationId": "validator-stale-preflight-only-v1",
+  "authorizationId": "data-contract-68plus2new-preflight-only-v1",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
   "action": "central_preflight_only",
   "repository": "paulaosoriof86/orbit360-core",
@@ -15,6 +15,14 @@
   "deployAllowed": false,
   "browserAllowed": false,
   "runtimeAllowed": false,
+  "contract": {
+    "historicalReferenceRestorations": 68,
+    "newPendingRowsPreserved": 2,
+    "duplicateRemovals": 0,
+    "finalBankRows": 93,
+    "finalValidReferences": 91,
+    "finalPendingReferences": 2
+  },
   "expected": {
     "preflightStatus": "GO_GATE_CONTRACT",
     "failedChecks": 0,
@@ -22,10 +30,13 @@
     "containsSecrets": false
   },
   "sourceBlobs": {
-    "overlay": "202e8e982430c23576ef2844faacaaedccaf83bb",
-    "freeze": "a90c4be05ffcdd3244e8e5789973a070ac2cb00e",
-    "workflow": "6212f80bab95017e4146fcc621c16b1af7df7be3",
-    "academy": "66cbfa565852f29344244fa1e577b22cb880a065"
+    "manifest": "c9fd67544cd62b0eb40320520785ec730d81329f",
+    "dryRun": "4fd21ec348f53d89955fdb7a057b214c93be4a76",
+    "validator": "b3d4153229efb3d0b1f3311bbfb8195f5ff96353",
+    "workflow": "b7d0a7c14fe8d36b666c83e89ccdcc49c1b1d7f0",
+    "overlay": "135a61affb58c59754384df3c7030db9e469bd82",
+    "freeze": "049964ef7eed8f53e1a209cba49b2f259cdee6db",
+    "academy": "594750d1bda62077ae88cf24697b739e4eec3939"
   },
   "acceptance": "GO_GATE_CONTRACT_AND_ZERO_RUNTIME_ONLY",
   "containsPII": false,
