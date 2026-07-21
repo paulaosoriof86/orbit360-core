@@ -1,6 +1,6 @@
 /* Orbit 360 · resolución canónica de destinos protegidos de Aseguradoras.
    Vincula cada recurso sensible con una identidad estable antes de llamar
-   al proveedor. No lee ni persiste valores protegidos fuera de memoria. */
+   al proveedor. El proveedor devuelve mappings; no modifica el directorio. */
 (function () {
   'use strict';
 
@@ -183,26 +183,64 @@
     });
     return Object.assign({}, payload || {}, { items: items });
   }
+  async function callProviderWithoutOperationalWrites(provider, payload) {
+    var store = Orbit.store || {};
+    var originalUpdate = store.update;
+    var originalInsert = store.insert;
+    var originalRemove = store.remove;
+    var blockedMutations = [];
+    function blocked(method, collection, id) {
+      if (collection !== 'aseguradoras') {
+        var original = method === 'update' ? originalUpdate : method === 'insert' ? originalInsert : originalRemove;
+        return typeof original === 'function' ? original.apply(store, Array.prototype.slice.call(arguments, 1)) : null;
+      }
+      blockedMutations.push({ method: method, collection: collection, id: clean(id, 160) });
+      return collection === 'aseguradoras' && id && store.get ? store.get(collection, id) : null;
+    }
+    if (typeof originalUpdate === 'function') store.update = function (collection, id, patch) { return blocked('update', collection, id, patch); };
+    if (typeof originalInsert === 'function') store.insert = function (collection, data) { return blocked('insert', collection, data && data.id, data); };
+    if (typeof originalRemove === 'function') store.remove = function (collection, id) { return blocked('remove', collection, id); };
+    try {
+      var result = await provider(payload);
+      if (result && typeof result === 'object') {
+        result.providerOperationalWritesBlocked = blockedMutations.length;
+        result.providerReturnsMappingsOnly = true;
+      }
+      return result;
+    } finally {
+      if (typeof originalUpdate === 'function') store.update = originalUpdate;
+      if (typeof originalInsert === 'function') store.insert = originalInsert;
+      if (typeof originalRemove === 'function') store.remove = originalRemove;
+    }
+  }
   function attach() {
     if (!Orbit.secureImport || typeof Orbit.secureImport.importInsurerDirectory !== 'function') return false;
     var current = Orbit.secureImport.importInsurerDirectory;
-    if (current.__secureTargetBridgeV20260721) return true;
-    var wrapped = function (payload) { return current(enrich(payload)); };
+    if (current.__secureTargetBridgeV20260721MappingsOnly) return true;
+    var wrapped = function (payload) {
+      return callProviderWithoutOperationalWrites(current, enrich(payload));
+    };
     wrapped.__secureTargetBridgeV20260721 = true;
+    wrapped.__secureTargetBridgeV20260721MappingsOnly = true;
     Orbit.secureImport.importInsurerDirectory = wrapped;
-    Orbit.secureImport.targetBridgeVersion = '20260721.2';
+    Orbit.secureImport.targetBridgeVersion = '20260721.3';
+    Orbit.secureImport.providerReturnsMappingsOnly = true;
+    Orbit.secureImport.providerOperationalStoreWritesAllowed = false;
     return true;
   }
 
   Orbit.__insurerSecureTargetBridgeV20260720 = {
-    version: '20260721.2',
+    version: '20260721.3',
     attach: attach,
     enrich: enrich,
     findInsurer: findInsurer,
     findPortal: findPortal,
     findAccount: findAccount,
+    callProviderWithoutOperationalWrites: callProviderWithoutOperationalWrites,
     noProtectedValuePersistence: true,
-    stableTargetsRequired: true
+    stableTargetsRequired: true,
+    providerReturnsMappingsOnly: true,
+    providerOperationalStoreWritesAllowed: false
   };
   if (!attach()) {
     window.addEventListener('orbit:insurer-credential-provider-ready', attach);
