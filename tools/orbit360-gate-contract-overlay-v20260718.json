@@ -8,7 +8,7 @@
   "gatePatch": {
     "contractVersion": "1.0.32",
     "diagnosticRevision": "canonical-owner-idempotent-disconnect-own-writes-v1",
-    "status": "FUNCTIONAL_FIX_PENDING_STATIC_PREFLIGHT"
+    "status": "TARGETED_LAB_DEPLOY_AND_FINAL_GATE_AUTHORIZED"
   },
   "canonicalOwners": [
     {
