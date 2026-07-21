@@ -2,135 +2,179 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-21",
   "gateId": "block1-real-insurer-directories-lab-v20260720",
-  "classification": "SECURITY_FAILURE",
-  "diagnosticRevision": "secure-bank-provider-and-legacy-migration-v1",
-  "contractRevision": "1.1.0-secure-bank-provider-v1",
+  "classification": "VALIDATOR_STALE + PIPELINE_MECHANISM_FAILURE",
+  "diagnosticRevision": "post-migration-read-only-and-controlled-write-v1",
+  "contractRevision": "1.1.1-post-migration-read-only-v1",
   "gatePatch": {
-    "contractVersion": "1.1.0",
-    "diagnosticRevision": "secure-bank-provider-and-legacy-migration-v1",
-    "runtimeVersion": "20260721-1",
-    "status": "ACTIVE_SECURITY_ROOT_CAUSE_FIX",
+    "contractVersion": "1.1.1",
+    "diagnosticRevision": "post-migration-read-only-and-controlled-write-v1",
+    "runtimeVersion": "20260721-2",
+    "status": "ACTIVE_POST_MIGRATION_READ_ONLY_CONTROLLED_WRITE_FIX",
     "workflow": ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
-    "staticValidationStatus": "PENDING_SECURITY_ROOT_CAUSE_GATE",
+    "staticValidationStatus": "PENDING_POST_MIGRATION_READ_ONLY_GATE",
+    "diagnosticRule": "After the audited migration closure, bank data is verified read-only. A confirmed insurer-directory write must pass once through the specialized contract without a second P0 dry-run; any unconfirmed proposal remains intercepted.",
+    "validators": [
+      "tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs",
+      "tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs",
+      "tools/orbit360-validar-alias-directorios-aseguradoras-v1219.mjs",
+      "tools/orbit360-validar-copy-importador-aseguradoras-v1220.mjs",
+      "tools/orbit360-validar-backend-lab-contrato.mjs",
+      "tools/orbit360-inventariar-cuentas-protegidas-aseguradoras-lab-v20260721.mjs",
+      "tools/orbit360-validar-proveedor-cuentas-aseguradoras-lab-v20260721.mjs",
+      "tools/orbit360-aseguradoras-import-readiness-v20260720.mjs"
+    ],
     "executionBudget": {
-      "type": "secure_legacy_bank_migration_then_two_source_acceptance",
+      "type": "post_migration_read_only_then_single_confirmed_directory_write",
       "watchdogBudgetMs": 900000,
       "sourceParseMs": 120000,
       "directoryWriteAndReadbackMs": 180000,
       "protectedConfirmationMs": 180000,
       "inventoryAndEvidenceMs": 120000,
       "rollbackMs": 180000,
-      "exhaustionPolicy": "Run preflight first. Deploy only the LAB bank provider, migrate the 91 legacy accounts once, confirm zero raw values and protected read, then process Guatemala once and Colombia once. Stop after two failures in the same stage.",
-      "acceptancePolicy": "Close only with sanitized evidence of 26 canonical insurers, zero unmasked sensitive values in operational storage, at least 91 opaque bank references, one protected reveal confirmation, direct platform upload, separate GT and CO dry-runs, exact identity control, read-after-write and rollback."
+      "exhaustionPolicy": "Run preflight first. Verify the eight existing Functions and the closed bank state without mutation. Stop on any raw value, missing reference or duplicate reference. Only after sanitized ok:true deploy the exact preview and validate the controlled-write regression. Do not repeat Guatemala before closure and keep Colombia blocked.",
+      "acceptancePolicy": "Accept only sanitized evidence of 26 insurers, zero raw bank values, at least 91 valid unique references, protected reveal readiness, exact controlled-write contract 20260721.2, one real insert, zero second dry-run, zero false success, trace, audit and interception of an unconfirmed proposal."
     }
   },
   "canonicalOwners": [
     {
-      "id": "realInsurerDirectoryExecution",
-      "path": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js",
+      "id": "postMigrationBankInventory",
+      "path": "tools/orbit360-inventariar-cuentas-protegidas-aseguradoras-lab-v20260721.mjs",
       "requiredTokens": [
-        "open.__canonicalDirectoryExecution20260720 = true",
-        "singleFileRead: true",
-        "controlledWrite: true",
-        "Orbit.importaWriteP0.writeBatch",
-        "async function waitWritten",
-        "eligibleProtectedSummary(result)",
-        "applySecureOnly(result",
-        "Orbit.importaWriteP0.rollback",
-        "accountProviderPending: false"
+        "mode: 'read_only'",
+        "rawValuesAbsent",
+        "protectedReferencesPreserved",
+        "referencesUnique",
+        "migrationExecuted: false"
+      ]
+    },
+    {
+      "id": "insurerDirectoryControlledWriteContract",
+      "path": "orbit360-platform/core/importer-controlled-write-contract-v20260721.js",
+      "requiredTokens": [
+        "const VERSION = '20260721.2'",
+        "const OWNER = 'insurer-directory-import-v1202'",
+        "function approvedTransition",
+        "function hasSensitivePlaintext",
+        "confirmedBeforeWrite: true"
+      ]
+    },
+    {
+      "id": "importP0ControlledWriteListener",
+      "path": "orbit360-platform/core/importa-dryrun-p0-wire.js",
+      "requiredTokens": [
+        "function resolveControlled",
+        "function specializedInsurerCandidate",
+        "specializedInsurerCandidate(coll, data)",
+        "Orbit.store.__p0DryRunWireContractVersion = '20260721.2'"
       ]
     },
     {
       "id": "realInsurerDirectoryAcademy",
       "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
       "requiredTokens": [
-        "Orbit.ACADEMIA_V1222_ASEGURADORAS",
-        "Carga directa desde Orbit",
-        "Escritura controlada y lectura posterior",
-        "Defecto funcional o validador obsoleto",
-        "version:'1.222'",
-        "next._cv = 1222"
-      ]
-    },
-    {
-      "id": "insurerBankAccountProviderE2E",
-      "path": "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
-      "requiredTokens": [
-        "version: '20260721.1'",
-        "registerFieldProvider",
-        "supportsBankAccounts = true",
-        "orbit360ImportInsurerBankAccounts",
-        "applyMappings(result)"
+        "Orbit.ACADEMIA_V1223_ASEGURADORAS",
+        "Una confirmación, una escritura",
+        "Defecto funcional, contrato o validador",
+        "version:'1.223'",
+        "next._cv = 1223"
       ]
     }
   ],
   "requiredFiles": [
-    "functions/bank-accounts.js",
-    "functions/bootstrap.js",
-    "functions/package.json",
-    "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
+    "tools/orbit360-inventariar-cuentas-protegidas-aseguradoras-lab-v20260721.mjs",
     "tools/orbit360-migrar-cuentas-aseguradoras-vault-lab-v20260721-v2.mjs",
     "tools/orbit360-validar-proveedor-cuentas-aseguradoras-lab-v20260721.mjs",
-    "tools/orbit360-aseguradoras-import-readiness-v20260720.mjs"
+    "tools/orbit360-aseguradoras-import-readiness-v20260720.mjs",
+    "orbit360-platform/core/importer-controlled-write-contract-v20260721.js",
+    "orbit360-platform/core/importa-dryrun-p0-wire.js",
+    "orbit360-platform/modules/importar.js",
+    "orbit360-platform/tools/orbit360-smoke-directorios-aseguradoras-v1202.mjs",
+    "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-SEGUNDO-DRYRUN-DIRECTORIO-ASEGURADORAS-20260721.md"
   ],
   "runtimeGraphFiles": [
-    "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
-    "functions/bank-accounts.js",
-    "functions/bootstrap.js"
+    "orbit360-platform/core/importer-controlled-write-contract-v20260721.js",
+    "orbit360-platform/core/importa-dryrun-p0-wire.js",
+    "orbit360-platform/modules/importar.js"
   ],
   "runtimeVersionContracts": [
     {
-      "path": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js",
+      "path": "tools/orbit360-inventariar-cuentas-protegidas-aseguradoras-lab-v20260721.mjs",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "var VERSION = '20260721.1'",
-        "singleFileRead: true",
-        "Orbit.importaWriteP0.writeBatch",
-        "async function waitWritten",
-        "eligibleProtectedSummary(result)",
-        "applySecureOnly(result",
-        "Orbit.importaWriteP0.rollback",
-        "accountProviderPending: false"
+        "mode: 'read_only'",
+        "rawValuesAbsent",
+        "protectedReferencesPreserved",
+        "referencesUnique",
+        "migrationExecuted: false"
       ]
     },
     {
-      "path": "orbit360-platform/core/insurer-directory-import-v1202.js",
+      "path": "tools/orbit360-migrar-cuentas-aseguradoras-vault-lab-v20260721-v2.mjs",
+      "replaceRequiredTokens": true,
       "requiredTokens": [
-        "['credential','bank_account'].includes(item.type)"
+        "ORBIT360_POST_MIGRATION_COMPAT = '1'",
+        "orbit360-inventariar-cuentas-protegidas-aseguradoras-lab-v20260721.mjs"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/importer-controlled-write-contract-v20260721.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "const VERSION = '20260721.2'",
+        "function approvedTransition",
+        "Object.prototype.hasOwnProperty.call(data, 'validationStatus')",
+        "confirmedBeforeWrite: true"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/importa-dryrun-p0-wire.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "function resolveControlled",
+        "function specializedInsurerCandidate",
+        "specializedInsurerCandidate(coll, data)",
+        "Orbit.store.__p0DryRunWireContractVersion = '20260721.2'"
+      ]
+    },
+    {
+      "path": "orbit360-platform/modules/importar.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "core/importer-controlled-write-contract-v20260721.js?v=20260721-2",
+        "orbit:controlled-write-contract-ready",
+        "orbit:p0-dryrun-builder-ready",
+        "core/importa-dryrun-p0-wire.js?v=20260721-2"
+      ]
+    },
+    {
+      "path": "orbit360-platform/tools/orbit360-smoke-directorios-aseguradoras-v1202.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "Orden real del runtime",
+        "La propuesta sin confirmar debe quedar capturada",
+        "El alta manual no debe quedar bloqueada",
+        "cero segundo dry-run"
+      ]
+    },
+    {
+      "path": "tools/orbit360-aseguradoras-import-readiness-v20260720.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "CONTROLLED_WRITE_CONTRACT_VERSION = '20260721.2'",
+        "controlledWriteRegression: true",
+        "CONTROLLED_WRITE_CONTRACT_VERSION_INVALID",
+        "P0_WIRE_CONTRACT_VERSION_INVALID"
       ]
     },
     {
       "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "version:'1.222'",
-        "next._cv = 1222",
-        "Carga directa desde Orbit",
-        "Escritura controlada y lectura posterior"
-      ]
-    },
-    {
-      "path": "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
-      "requiredTokens": [
-        "registerFieldProvider",
-        "supportsBankAccounts = true",
-        "orbit360ImportInsurerBankAccounts"
-      ]
-    },
-    {
-      "path": "functions/bank-accounts.js",
-      "requiredTokens": [
-        "exports.orbit360ImportInsurerBankAccounts",
-        "exports.orbit360BankAccountStatus",
-        "exports.orbit360RevealInsurerBankAccount",
-        "exports.orbit360CopyInsurerBankAccount"
-      ]
-    },
-    {
-      "path": "functions/bootstrap.js",
-      "requiredTokens": [
-        "require('./index')",
-        "require('./bank-accounts')"
+        "version:'1.223'",
+        "next._cv = 1223",
+        "Una confirmación, una escritura",
+        "Defecto funcional, contrato o validador"
       ]
     }
   ]
