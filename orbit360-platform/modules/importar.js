@@ -82,6 +82,19 @@ Orbit.modules.importar = (function () {
     addScript('core/importa-write-p0.js?v=20260709');
   }
 
+  function loadControlledWriteContract(onload) {
+    if (Orbit.importerControlledWriteContractV20260721) { if (onload) onload(); return; }
+    if (Orbit.__importerControlledWriteContractV20260721Loader) {
+      if (onload) document.addEventListener('orbit:controlled-write-contract-ready', onload, { once: true });
+      return;
+    }
+    Orbit.__importerControlledWriteContractV20260721Loader = true;
+    addScript('core/importer-controlled-write-contract-v20260721.js?v=20260721-1', function () {
+      try { document.dispatchEvent(new CustomEvent('orbit:controlled-write-contract-ready')); } catch (e) {}
+      if (onload) onload();
+    });
+  }
+
   function loadP0DryRunBuilder(onload) {
     if (Orbit.importaDryRunP0) { if (onload) onload(); return; }
     if (Orbit.__importaDryRunP0Loader) return;
@@ -92,8 +105,10 @@ Orbit.modules.importar = (function () {
   function loadP0DryRunWire() {
     if (Orbit.importaDryRunP0Wire || Orbit.__importaDryRunP0WireLoader) return;
     Orbit.__importaDryRunP0WireLoader = true;
-    loadP0DryRunBuilder(function () {
-      if (!Orbit.importaDryRunP0Wire) addScript('core/importa-dryrun-p0-wire.js?v=20260709');
+    loadControlledWriteContract(function () {
+      loadP0DryRunBuilder(function () {
+        if (!Orbit.importaDryRunP0Wire) addScript('core/importa-dryrun-p0-wire.js?v=20260721-1');
+      });
     });
   }
 
