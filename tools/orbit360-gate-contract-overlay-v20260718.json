@@ -2,13 +2,13 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-21",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "FUNCTIONAL_DEFECT_CLIENT360_STRUCTURAL_TRIGGER_MISSING",
-  "diagnosticRevision": "canonical-owner-idempotent-client360-triggers-v1",
-  "contractRevision": "1.0.33-canonical-owner-idempotent-client360-triggers-v1",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "diagnosticRevision": "hosting-script-integrity-before-browser-v1",
+  "contractRevision": "1.0.34-hosting-script-integrity-before-browser-v1",
   "gatePatch": {
-    "contractVersion": "1.0.33",
-    "diagnosticRevision": "canonical-owner-idempotent-client360-triggers-v1",
-    "status": "FUNCTIONAL_FIX_PENDING_STATIC_PREFLIGHT"
+    "contractVersion": "1.0.34",
+    "diagnosticRevision": "hosting-script-integrity-before-browser-v1",
+    "status": "PIPELINE_FIX_PENDING_STATIC_PREFLIGHT"
   },
   "canonicalOwners": [
     {
@@ -98,13 +98,16 @@
     "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
     "orbit360-platform/modules/calidad.js",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+    "orbit360-platform/modules/ia.js",
     "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
     "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-BARRERA-VISUAL-EVENTOS-DOM-20260721.md",
     "orbit360-platform/docs/BLOQUE1-VALIDATOR-STALE-CONTRATO-PREFLIGHT-DINAMICO-20260721.md",
     "orbit360-platform/docs/BLOQUE1-STOP-LINE-LOOP-MUTATION-OWNER-VISUAL-20260721.md",
     "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-DISPARADOR-CLIENTE360-EXCLUIDO-20260721.md",
+    "orbit360-platform/docs/BLOQUE1-PIPELINE-INTEGRIDAD-SCRIPT-IA-HOSTING-20260721.md",
     "orbit360-platform/docs/evidence/owner-visual-idempotence-proof-local-20260721-sanitized.json",
-    "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs"
+    "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
+    "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
@@ -236,6 +239,30 @@
       ]
     },
     {
+      "path": "orbit360-platform/modules/ia.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "Orbit.modules.ia = (function ()",
+        "function getIACfg()",
+        "return { render };",
+        "})();"
+      ]
+    },
+    {
+      "path": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "orbit360-hosting-script-integrity-v1",
+        "ORBIT360_INTEGRITY_SCRIPT_PATH",
+        "new vm.Script(source",
+        "endsWithOwnerClosure",
+        "REMOTE_SCRIPT_INTEGRITY_MISMATCH",
+        "exactMatch",
+        "browserExecuted: false",
+        "containsSecrets: false"
+      ]
+    },
+    {
       "path": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
       "replaceRequiredTokens": true,
       "requiredTokens": [
@@ -302,6 +329,12 @@
         "staticPreflightEvidence.contractVersion",
         "staticPreflightAuthorization.contractVersion",
         "finalGateAuthorization.contractVersion",
+        "node --check orbit360-platform/modules/ia.js",
+        "node --check tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+        "node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs --local-only",
+        "Verificar integridad exacta de scripts publicados",
+        "node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+        "script-integrity-sanitized.json",
         "Publicar frontend corregido en canal LAB",
         "hosting:channel:deploy \"$ORBIT360_HOSTING_CHANNEL\"",
         "targeted_lab_frontend_only",
