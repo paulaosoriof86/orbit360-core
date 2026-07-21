@@ -185,7 +185,7 @@
     }
 
     Orbit.store.__p0DryRunWire = true;
-    Orbit.store.__p0DryRunWireContractVersion = '20260721.1';
+    Orbit.store.__p0DryRunWireContractVersion = '20260721.2';
     return true;
   }
 
