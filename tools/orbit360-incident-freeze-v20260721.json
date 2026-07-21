@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v20-canonical-owner-static-preflight",
+  "schemaVersion": "orbit360-incident-freeze-v21-dynamic-contract-static-preflight",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
@@ -10,7 +10,8 @@
   "controlIssue": 7,
   "tenantId": "alianzas-soluciones",
   "classification": [
-    "FUNCTIONAL_DEFECT"
+    "FUNCTIONAL_DEFECT",
+    "VALIDATOR_STALE"
   ],
   "recoveryResult": {
     "status": "COMPLETED_AND_READBACK_CONFIRMED",
@@ -55,8 +56,6 @@
       "artifactDigest": "sha256:809e9f0148593eb24f1aed5340acf00a691d753ffd9548230a8c7dee6829a44a",
       "head": "0cdd36b3136b6fba5ee0f6be6df7b6bc42d90186",
       "deploymentOk": true,
-      "deploymentScope": "targeted_lab_frontend_only",
-      "deployedShaMatches": true,
       "failedStage": "desktop_direction_client360",
       "errorCode": "INSURER_SECURE_CREDENTIAL_UI_MISSING",
       "writesExecuted": false,
@@ -71,8 +70,6 @@
       "artifactDigest": "sha256:2e960b74656f3b3dde6e31f363b67f741a3156a25398d79576dbe6cdbb7d3b40",
       "head": "a8d435865ad93caa007dc974ec9f96d8a1a58892",
       "deploymentOk": true,
-      "deploymentScope": "targeted_lab_frontend_only",
-      "deployedShaMatches": true,
       "failedStage": "desktop_direction_client360",
       "errorCode": "INSURER_SECURE_CREDENTIAL_UI_MISSING",
       "writesExecuted": false,
@@ -99,7 +96,7 @@
     "cacheCause": false
   },
   "implementedFix": {
-    "status": "STATIC_PENDING_PREFLIGHT",
+    "status": "STATIC_PREFLIGHT_1_0_30_PASSED_WORKFLOW_REVALIDATION_PENDING",
     "canonicalVisualOwner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "ownerCommit": "e8d5374986ea735da8c2a4584bb66e5affb49110",
     "ownerBlob": "3057eb3270ad03e33ec193d69865c4d9e21a8d01",
@@ -108,7 +105,6 @@
     "mutationMode": "same-microtask",
     "secondaryBarrier": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
     "secondaryBarrierVersion": "20260721.2",
-    "rootCauseDocument": "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-BARRERA-VISUAL-EVENTOS-DOM-20260721.md",
     "newRendererCreated": false,
     "newBridgeCreated": false,
     "moduleAseguradorasChanged": false,
@@ -120,29 +116,45 @@
     "labDeployed": false,
     "productionTouched": false
   },
-  "previousStaticPreflightEvidence": {
-    "runId": 29872744794,
-    "artifactId": 8511780712,
-    "artifactDigest": "sha256:3818d75fb3e2470269fa4e65be85ac83a6070a4547cb2d1fb694008e7084c8c5",
-    "contractVersion": "1.0.29",
+  "validatorStaleFix": {
+    "classification": "VALIDATOR_STALE",
+    "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+    "workflowCommit": "7e53211e717880d3e665bd5b19b9a95c0ffd6c6f",
+    "workflowBlob": "ae4a733c60f6196064e10019e6d1415d83d0781c",
+    "cause": "targeted_authorization_still_required_literal_contract_1_0_29",
+    "method": "derive_contract_version_from_marker_static_preflight_freeze_and_final_gate_freeze",
+    "productChanged": false,
+    "runtimeExecuted": false,
+    "deployExecuted": false,
+    "document": "orbit360-platform/docs/BLOQUE1-VALIDATOR-STALE-CONTRATO-PREFLIGHT-DINAMICO-20260721.md"
+  },
+  "supersededStaticPreflightEvidence": {
+    "runId": 29874164347,
+    "artifactId": 8512322966,
+    "artifactDigest": "sha256:5fdccc1aa9b33943eb7f88ef909a0050b95fdc1c0a4106f4bdba240d46b2419c",
+    "contractVersion": "1.0.30",
+    "diagnosticRevision": "canonical-visual-owner-same-microtask-v1",
     "status": "GO_GATE_CONTRACT",
+    "totalChecks": 1047,
+    "passedChecks": 1047,
+    "failedChecks": 0,
     "ok": true,
     "runtimeExecuted": false,
     "browserExecuted": false,
     "secretsRead": false,
     "writesExecuted": false,
     "deployExecuted": false,
-    "supersededBy": "1.0.30"
+    "supersededReason": "workflow_authorization_changed_after_preflight"
   },
   "staticPreflightAuthorization": {
     "authorizationId": "final-block1-static-preflight-v1",
-    "authorizationRevision": 3,
+    "authorizationRevision": 4,
     "active": true,
     "consumed": false,
     "allowedExecutions": 1,
     "action": "final_block1_static_preflight_only",
     "gateId": "block1-client360-insurers-lab-v20260717",
-    "contractVersion": "1.0.30",
+    "contractVersion": "1.0.31",
     "secretsAllowed": false,
     "runtimeAllowed": false,
     "browserAllowed": false,
@@ -187,10 +199,10 @@
     "merge_main",
     "create_parallel_gate",
     "create_temporary_workflow",
-    "modify_another_module"
+    "modify_product_module"
   ],
   "allowedActions": [
-    "execute_single_final_block1_static_preflight_for_contract_1_0_30_without_secrets"
+    "execute_single_final_block1_static_preflight_for_contract_1_0_31_without_secrets"
   ],
   "stateClarification": {
     "m1DataRecovery": "CLOSED",
@@ -204,12 +216,13 @@
     "colombia": "INTACT",
     "reimportRequired": false,
     "failedTargetedGates": "BOTH_FROZEN_NO_RETRY",
-    "visualStabilityFix": "CANONICAL_OWNER_ATOMIC_FIX_IMPLEMENTED_STATIC_PENDING_PREFLIGHT",
+    "visualStabilityFix": "CANONICAL_OWNER_ATOMIC_FIX_STATIC_PASSED",
+    "validatorFix": "DYNAMIC_CONTRACT_COMPARISON_PENDING_STATIC_PREFLIGHT",
     "targetedLabDeployAuthorized": false,
     "finalGateAuthorized": false,
     "productionTouched": false
   },
-  "nextAllowedStep": "Execute exactly one final Block 1 static preflight for contract 1.0.30. It must validate the synchronous canonical visual owner, same-microtask mutation handling, reentry guard, secondary barrier, workflow and existing validators without secrets, runtime, browser, Firestore, vault or deploy. Only GO_GATE_CONTRACT plus static ok:true may permit a later targeted LAB deploy and final gate authorization.",
+  "nextAllowedStep": "Execute exactly one final Block 1 static preflight for contract 1.0.31. It must validate the canonical same-microtask owner and the dynamic workflow contract comparison without secrets, runtime, browser, Firestore, vault or deploy. Only GO_GATE_CONTRACT plus static ok:true may permit a later targeted LAB deploy and final gate authorization.",
   "containsPII": false,
   "containsSecrets": false
 }
