@@ -24,14 +24,39 @@ const groups = {
   ]
 };
 
-function runJson(args) {
-  const stdout = execFileSync('gcloud', args, {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-    env: process.env,
-    maxBuffer: 20 * 1024 * 1024
-  });
-  return JSON.parse(stdout || 'null');
+class InventoryCommandError extends Error {
+  constructor(stage, error) {
+    super(stage);
+    this.name = 'InventoryCommandError';
+    this.stage = stage;
+    this.exitStatus = Number.isFinite(Number(error && error.status)) ? Number(error.status) : -1;
+    const stderr = Buffer.isBuffer(error && error.stderr)
+      ? error.stderr.toString('utf8')
+      : String(error && error.stderr || error && error.message || '');
+    this.safeDetail = stderr
+      .replace(/https?:\/\/\S+/gi, '[url]')
+      .replace(/[A-Za-z0-9_\-]{30,}/g, '[redacted]')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .slice(0, 3)
+      .join(' | ')
+      .slice(0, 500);
+  }
+}
+
+function runJson(stage, args) {
+  try {
+    const stdout = execFileSync('gcloud', args, {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: process.env,
+      maxBuffer: 20 * 1024 * 1024
+    });
+    return JSON.parse(stdout || 'null');
+  } catch (error) {
+    throw new InventoryCommandError(stage, error);
+  }
 }
 
 function lastSegment(value) {
@@ -50,19 +75,20 @@ function findFunction(rows, expectedName) {
   }) || null;
 }
 
-function describeRunService(serviceResource) {
+function describeRunService(serviceResource, expectedName) {
   const serviceName = lastSegment(serviceResource);
-  if (!serviceName) return null;
-  try {
-    return runJson([
-      'run', 'services', 'describe', serviceName,
-      '--region', region,
-      '--project', projectId,
-      '--format=json'
-    ]);
-  } catch {
-    return null;
+  if (!serviceName) {
+    throw new InventoryCommandError(`service_resource_missing:${expectedName}`, {
+      status: 64,
+      stderr: 'Cloud Functions v2 no devolvió serviceConfig.service.'
+    });
   }
+  return runJson(`run_service_describe:${expectedName}`, [
+    'run', 'services', 'describe', serviceName,
+    '--region', region,
+    '--project', projectId,
+    '--format=json'
+  ]);
 }
 
 function trafficPercentForLatest(service, latestReadyRevision) {
@@ -98,7 +124,7 @@ function inventoryOne(rows, expectedName, group) {
   const serviceAccount = clean(fn.serviceConfig && fn.serviceConfig.serviceAccountEmail, 240);
   const serviceResource = clean(fn.serviceConfig && fn.serviceConfig.service, 400);
   const serviceName = lastSegment(serviceResource);
-  const service = describeRunService(serviceResource);
+  const service = describeRunService(serviceResource, expectedName);
   const latestCreatedRevision = clean(service && service.status && service.status.latestCreatedRevisionName, 240);
   const latestReadyRevision = clean(service && service.status && service.status.latestReadyRevisionName, 240);
   const latestTrafficPercent = trafficPercentForLatest(service, latestReadyRevision);
@@ -133,9 +159,9 @@ function inventoryOne(rows, expectedName, group) {
 let result;
 let exitCode = 1;
 try {
-  const rows = runJson([
+  const rows = runJson('functions_list_v2', [
     'functions', 'list',
-    '--gen2',
+    '--v2',
     `--regions=${region}`,
     '--project', projectId,
     '--format=json'
@@ -152,13 +178,14 @@ try {
   const ok = credentialsReady && bankAccountsReady && functions.length === 8;
 
   result = {
-    schemaVersion: 'orbit360-insurer-functions-inventory-v1',
+    schemaVersion: 'orbit360-insurer-functions-inventory-v2',
     generatedAt: new Date().toISOString(),
     projectId,
     region,
     containsPII: false,
     containsSecrets: false,
     mode: 'read_only',
+    discoveryApi: 'cloud-functions-v2',
     expectedCount: 8,
     discoveredCount: functions.filter((item) => item.exists).length,
     credentialsReady,
@@ -169,19 +196,23 @@ try {
   exitCode = ok ? 0 : 1;
 } catch (error) {
   result = {
-    schemaVersion: 'orbit360-insurer-functions-inventory-v1',
+    schemaVersion: 'orbit360-insurer-functions-inventory-v2',
     generatedAt: new Date().toISOString(),
     projectId,
     region,
     containsPII: false,
     containsSecrets: false,
     mode: 'read_only',
+    discoveryApi: 'cloud-functions-v2',
     expectedCount: 8,
     discoveredCount: 0,
     credentialsReady: false,
     bankAccountsReady: false,
     ok: false,
-    errorClass: clean(error && error.name || 'INVENTORY_ERROR', 80)
+    errorClass: clean(error && error.name || 'INVENTORY_ERROR', 80),
+    errorStage: clean(error && error.stage || 'unknown', 160),
+    exitStatus: Number.isFinite(Number(error && error.exitStatus)) ? Number(error.exitStatus) : -1,
+    safeDetail: clean(error && error.safeDetail || '', 500)
   };
 }
 
