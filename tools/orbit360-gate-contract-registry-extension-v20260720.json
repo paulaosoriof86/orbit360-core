@@ -55,17 +55,17 @@
       "id": "importersAcademyE2E",
       "path": "orbit360-platform/data/academia-v1225-importadores-e2e.js",
       "requiredTokens": [
-        "version: '1.225'",
+        "version: '1.227'",
         "Archivo leído",
         "Aplicación confirmada",
-        "Defecto funcional o validador obsoleto"
+        "Validador obsoleto"
       ]
     },
     {
       "id": "realInsurerDirectoryExecution",
       "path": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js",
       "requiredTokens": [
-        "owner visual canónico v1.221",
+        "open.__canonicalDirectoryExecution20260720 = true",
         "singleFileRead: true",
         "controlledWrite: true",
         "Orbit.importaWriteP0.writeBatch",
@@ -79,7 +79,7 @@
       "id": "realInsurerDirectoryAcademy",
       "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
       "requiredTokens": [
-        "Academia profunda Aseguradoras OP-2 v1.221",
+        "Orbit.ACADEMIA_V1221_ASEGURADORAS",
         "Carga directa desde Orbit",
         "Escritura controlada y lectura posterior",
         "Defecto funcional o validador obsoleto",
@@ -223,8 +223,8 @@
         {
           "path": "orbit360-platform/core/importa-write-p0.js",
           "requiredTokens": [
-            "function writeBatch(batch, confirm)",
-            "function rollback(plan, confirm)",
+            "function writeBatch(batch, confirmation)",
+            "function rollback(plan, confirmation)",
             "importBatchId",
             "sourceHash"
           ]
