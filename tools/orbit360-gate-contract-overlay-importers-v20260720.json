@@ -2,17 +2,17 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-21",
   "gateId": "block1-real-insurer-directories-lab-v20260720",
-  "classification": "DATA_CONTRACT_FAILURE + PIPELINE_MECHANISM_FAILURE + METHODOLOGY_ENFORCEMENT_FAILURE",
-  "diagnosticRevision": "exact-68-plus-2-recovery-and-single-atomic-owner-v1",
-  "contractRevision": "1.1.2-exact-recovery-atomic-owner-v1",
+  "classification": "VALIDATOR_STALE",
+  "diagnosticRevision": "bounded-exact-recovery-preflight-alignment-v2",
+  "contractRevision": "1.1.2-bounded-exact-recovery-preflight-v2",
   "gatePatch": {
     "contractVersion": "1.1.2",
-    "diagnosticRevision": "exact-68-plus-2-recovery-and-single-atomic-owner-v1",
+    "diagnosticRevision": "bounded-exact-recovery-preflight-alignment-v2",
     "runtimeVersion": "20260721-2",
-    "status": "STATIC_ATOMICITY_COMPLETE_RUNTIME_FROZEN",
-    "workflow": ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
-    "staticValidationStatus": "ATOMIC_OWNER_AND_RECOVERY_MAP_REGISTERED",
-    "diagnosticRule": "The healthy checkpoint remains valid. The later GT regression is repaired only through the exact sanitized 68-reference map plus two duplicate removals. The parser remains dry-run-only; the canonical coordinator owns secure-provider confirmation, non-destructive merge, durable operational write, read-after-write, audit and operational rollback. Runtime remains blocked until a separate bounded authorization.",
+    "status": "BOUNDED_EXACT_RECOVERY_DRYRUN_PREFLIGHT_ALIGNED",
+    "workflow": ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml",
+    "staticValidationStatus": "VALIDATOR_STALE_CORRECTED_RUNTIME_NOT_RETRIED",
+    "diagnosticRule": "The healthy checkpoint remains valid. The later GT regression is repaired only through the exact sanitized 68-reference map plus two duplicate removals. This contract validates the single marker-bound read-only workflow. The parser remains dry-run-only; the canonical coordinator owns secure-provider confirmation, non-destructive merge, durable operational write, read-after-write, audit and operational rollback. No data runtime is authorized by this validator correction.",
     "validators": [
       "tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs",
       "tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs",
@@ -25,14 +25,14 @@
       "tools/orbit360-aseguradoras-import-readiness-v20260720.mjs"
     ],
     "executionBudget": {
-      "type": "static_complete_runtime_requires_separate_bounded_authorization",
+      "type": "validator_stale_correction_before_separate_runtime_authorization",
       "watchdogBudgetMs": 900000,
       "staticValidationMs": 120000,
       "recoveryDryRunMs": 180000,
       "recoveryWriteAndReadbackMs": 240000,
       "finalGateMs": 300000,
-      "exhaustionPolicy": "Do not execute runtime while the incident freeze is active. After static ok:true, authorize exactly one recovery dry-run. Any count other than 68 reference restorations plus two duplicate removals stops the line without another patch or retry.",
-      "acceptancePolicy": "Recovery may close only with 414 clients, 26 insurers, 7 advisors, 91 valid unique bank references, zero pending bank rows, zero duplicate bank rows, zero raw protected values, 26 portal credentials available through protected reveal/copy, Colombia unchanged, provider confirmed before operational write, durable write, read-after-write, audit and operational rollback evidence. Distributed vault rollback is not claimed."
+      "exhaustionPolicy": "Correct registry, owner and workflow references only. Validate the central preflight without secrets or runtime. Do not rerun the failed workflow automatically. Any later read-only dry-run requires a new explicit one-use authorization because run 29849319790 consumed the previous marker at preflight.",
+      "acceptancePolicy": "A future recovery dry-run may close only with 414 clients, 26 insurers, 7 advisors, 91 valid unique bank references, zero pending bank rows, zero duplicate bank rows, zero raw protected values, Colombia unchanged, exactly 68 restorations and two duplicate removals, and sanitized ok:true evidence."
     }
   },
   "canonicalOwners": [
@@ -95,6 +95,18 @@
       ]
     },
     {
+      "id": "realInsurerDirectoryAcademy",
+      "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "requiredTokens": [
+        "Orbit.ACADEMIA_V1223_ASEGURADORAS",
+        "version:'1.223'",
+        "Una confirmación, una escritura",
+        "Después de migrar, solo inventariar",
+        "Defecto funcional, contrato o validador",
+        "postMigrationReadOnly:true"
+      ]
+    },
+    {
       "id": "insurerBankRecoveryMap",
       "path": "tools/orbit360-bank-reference-recovery-map-v20260721.json",
       "requiredTokens": [
@@ -123,6 +135,8 @@
   "requiredFiles": [
     "tools/orbit360-bank-reference-recovery-map-v20260721.json",
     "tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs",
+    "tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs",
+    "tools/orbit360-authorize-exact-recovery-dryrun-v20260721.json",
     "orbit360-platform/core/insurer-directory-import-v1202.js",
     "orbit360-platform/core/insurer-directory-import-v1202-security.js",
     "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
@@ -132,7 +146,7 @@
     "tools/orbit360-validar-proveedor-cuentas-aseguradoras-lab-v20260721.mjs",
     "tools/orbit360-aseguradoras-import-readiness-v20260720.mjs",
     "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
-    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml"
+    ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/index.html",
@@ -140,7 +154,8 @@
     "orbit360-platform/core/insurer-directory-import-v1202-security.js",
     "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
     "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
-    "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js"
+    "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
+    "orbit360-platform/data/academia-v1217-aseguradoras-op2.js"
   ],
   "runtimeVersionContracts": [
     {
@@ -191,6 +206,17 @@
         "supportsBankAccounts = true",
         "orbit360ImportInsurerBankAccounts",
         "remoteConfirmationRequired: true"
+      ]
+    },
+    {
+      "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "Orbit.ACADEMIA_V1223_ASEGURADORAS",
+        "version:'1.223'",
+        "Una confirmación, una escritura",
+        "Después de migrar, solo inventariar",
+        "postMigrationReadOnly:true"
       ]
     },
     {
