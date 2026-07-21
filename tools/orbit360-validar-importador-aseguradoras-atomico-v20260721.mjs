@@ -9,6 +9,7 @@ const FILES = {
   parser: 'orbit360-platform/core/insurer-directory-import-v1202.js',
   coordinator: 'orbit360-platform/core/insurer-directory-import-v1202-security.js',
   targetBridge: 'orbit360-platform/core/insurer-secure-target-bridge-v20260720.js',
+  dryRun: 'tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs',
   index: 'orbit360-platform/index.html',
   freeze: 'tools/orbit360-incident-freeze-v20260721.json'
 };
@@ -32,7 +33,7 @@ function writeEvidence(payload) {
 for (const [id, rel] of Object.entries(FILES)) check(`FILE_${id.toUpperCase()}`, exists(rel), rel);
 if (checks.some(item => !item.ok)) {
   const payload = {
-    schemaVersion: 'orbit360-static-importer-atomicity-v2-bounded-runtime',
+    schemaVersion: 'orbit360-static-importer-atomicity-v3-trace-audit-owner',
     generatedAt: new Date().toISOString(),
     mode: 'static_no_runtime',
     ok: false,
@@ -65,6 +66,7 @@ if (manifest) {
   const legacyHashes = recovery.map(row => row[6]);
   const expectedRefHashes = recovery.map(row => row[7]);
   const hash12 = value => /^[a-f0-9]{12}$/.test(String(value || ''));
+  const trace = manifest.traceContract || {};
 
   check('MANIFEST_SCHEMA', manifest.schemaVersion === 'orbit360-bank-reference-recovery-map-v2-sanitized', manifest.schemaVersion);
   check('MANIFEST_MODE', manifest.mode === 'STATIC_CONFIRMED_NO_WRITE', manifest.mode);
@@ -85,6 +87,11 @@ if (manifest) {
   check('REFERENCE_HASHES_UNIQUE', unique(expectedRefHashes) && expectedRefHashes.every(hash12), `unique=${new Set(expectedRefHashes).size}`);
   check('ALL_MISSING_HASHES_COVERED', manifest.validation && manifest.validation.allMissingReferenceHashesCovered === true && Number(manifest.validation.hashSetDifference) === 0, JSON.stringify(manifest.validation || {}));
   check('ALL_PENDING_ROWS_ACCOUNTED', manifest.validation && manifest.validation.allPendingRowsAccountedFor === true && Number(manifest.validation.pendingRowsAccountedFor) === 70, JSON.stringify(manifest.validation || {}));
+  check('TRACE_ROOT_CAUSE_CLASSIFIED', trace.classification === 'DATA_CONTRACT_FAILURE', trace.classification);
+  check('TRACE_ROWS_RECONCILED_70', Number(trace.rowsReconciled) === 70 && Number(manifest.validation && manifest.validation.traceRowsReconciled) === 70, `${trace.rowsReconciled}`);
+  check('TRACE_AMBIGUOUS_ZERO', Number(trace.ambiguousRows) === 0 && Number(manifest.validation && manifest.validation.traceAmbiguousRows) === 0, `${trace.ambiguousRows}`);
+  check('TRACE_UNMAPPED_ZERO', Number(trace.unmappedRows) === 0 && Number(manifest.validation && manifest.validation.traceUnmappedRows) === 0, `${trace.unmappedRows}`);
+  check('TRACE_IS_AUDIT_NOT_WRITE_SCOPE', trace.recoveryScopeChangesTraceFields === false, `${trace.recoveryScopeChangesTraceFields}`);
   check('MANIFEST_NO_PII', manifest.safety && manifest.safety.containsPII === false, 'containsPII');
   check('MANIFEST_NO_SECRETS', manifest.safety && manifest.safety.containsSecrets === false, 'containsSecrets');
   check('MANIFEST_NO_RAW_BANK_VALUES', manifest.safety && manifest.safety.containsRawBankValues === false, 'containsRawBankValues');
@@ -94,6 +101,7 @@ if (manifest) {
 const parser = read(FILES.parser);
 const coordinator = read(FILES.coordinator);
 const bridge = read(FILES.targetBridge);
+const dryRun = read(FILES.dryRun);
 const index = read(FILES.index);
 
 const coordinatorTokens = [
@@ -125,6 +133,19 @@ const bridgeTokens = [
 ];
 for (const token of bridgeTokens) check(`BRIDGE_TOKEN:${token}`, bridge.includes(token), token);
 
+const dryRunTokens = [
+  'manifestTraceContractValidated = true',
+  'traceIsAuditMetadata = true',
+  'recoveryScopeChangesTraceFields = false',
+  "operation: 'restore_accountRef_only'",
+  'traceFieldsUntouched',
+  'authorizationRequiredForWrite: true',
+  "schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v2-trace-audit-only'"
+];
+for (const token of dryRunTokens) check(`DRYRUN_TOKEN:${token}`, dryRun.includes(token), token);
+check('DRYRUN_TRACE_NOT_IDENTITY_GATE', !dryRun.includes('RECOVERY_TRACE_MISMATCH') && !dryRun.includes('DUPLICATE_TRACE_MISMATCH'), 'trace metadata must not block stable identity');
+check('DRYRUN_NO_FIRESTORE_WRITE', !/\.(set|update|create|delete)\s*\(/.test(dryRun), 'read-only exact dry-run');
+
 const applyStart = coordinator.indexOf('async function applyApproved');
 const applyEnd = coordinator.indexOf('\n  function esc(', applyStart);
 const applySource = applyStart >= 0 && applyEnd > applyStart ? coordinator.slice(applyStart, applyEnd) : '';
@@ -136,12 +157,14 @@ check('NO_PARTIAL_VALID_APPLY', !applySource.includes('applyValidOnly'), 'applyV
 check('OLD_FALSE_SUCCESS_REMOVED_FROM_OWNER', !coordinator.includes("secureStatus = 'backend_error'") && !coordinator.includes('return { ok: true, inserted, updated, blocked: blocked.length, secureStatus }'), 'old false-success pattern absent');
 check('PARSER_REMAINS_DRYRUN_SOURCE', parser.includes('function buildDryRun') && parser.includes('function parseMatrices'), 'parser/dry-run preserved');
 check('CANONICAL_OVERRIDE_LOAD_ORDER', index.indexOf('core/insurer-directory-import-v1202.js') >= 0 && index.indexOf('core/insurer-directory-import-v1202-security.js') > index.indexOf('core/insurer-directory-import-v1202.js'), 'parser before coordinator');
-check('BRIDGE_BLOCKS_PROVIDER_STORE_UPDATE', bridge.includes("store.update = function") && bridge.includes("collection !== 'aseguradoras'") && bridge.includes('finally'), 'provider isolation');
+check('BRIDGE_BLOCKS_PROVIDER_STORE_UPDATE', bridge.includes('store.update = function') && bridge.includes("collection !== 'aseguradoras'") && bridge.includes('finally'), 'provider isolation');
 
 const coordinatorSyntax = syntaxCheck(FILES.coordinator);
 const bridgeSyntax = syntaxCheck(FILES.targetBridge);
+const dryRunSyntax = syntaxCheck(FILES.dryRun);
 check('COORDINATOR_SYNTAX', coordinatorSyntax.ok, coordinatorSyntax.detail);
 check('BRIDGE_SYNTAX', bridgeSyntax.ok, bridgeSyntax.detail);
+check('DRYRUN_SYNTAX', dryRunSyntax.ok, dryRunSyntax.detail);
 
 if (freeze) {
   const status = String(freeze.status || '');
@@ -158,7 +181,7 @@ if (freeze) {
       authorization.action === 'exact_recovery_readonly_dry_run' &&
       authorization.allowedExecutions === 1 &&
       authorization.writesAllowed === false &&
-      authorization.script === 'tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs' &&
+      authorization.script === FILES.dryRun &&
       authorization.manifest === FILES.manifest
     ),
     bounded ? JSON.stringify({ authorizationId: authorization.authorizationId, action: authorization.action, allowedExecutions: authorization.allowedExecutions, writesAllowed: authorization.writesAllowed }) : status
@@ -167,7 +190,7 @@ if (freeze) {
 
 const failed = checks.filter(item => !item.ok);
 const payload = {
-  schemaVersion: 'orbit360-static-importer-atomicity-v2-bounded-runtime',
+  schemaVersion: 'orbit360-static-importer-atomicity-v3-trace-audit-owner',
   generatedAt: new Date().toISOString(),
   mode: 'static_no_runtime',
   ok: failed.length === 0,
@@ -182,6 +205,8 @@ const payload = {
     mappings: manifest && manifest.summary && manifest.summary.recoveryMappings || 0,
     duplicates: manifest && manifest.summary && manifest.summary.duplicateIncomingRows || 0,
     ambiguous: manifest && manifest.summary && manifest.summary.ambiguousRows || 0,
+    traceRowsReconciled: manifest && manifest.traceContract && manifest.traceContract.rowsReconciled || 0,
+    traceIsAuditMetadata: true,
     expectedFinalReferences: manifest && manifest.summary && manifest.summary.expectedFinalValidReferences || 0
   },
   contract: {
@@ -194,6 +219,8 @@ const payload = {
     rollbackOperationalDocuments: true,
     distributedVaultRollbackClaimed: false,
     partialApplyAllowed: false,
+    traceIsAuditMetadata: true,
+    traceFieldsWrittenByRecovery: false,
     boundedRuntimeAuthorization: freeze && freeze.status === 'BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED'
   },
   total: checks.length,
