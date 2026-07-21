@@ -10,6 +10,7 @@ const OUT_DIR = 'orbit360-platform/runtime-gate-real-insurer-directories-v202607
 const CONTROLLED_WRITE_SMOKE = 'orbit360-platform/tools/orbit360-smoke-directorios-aseguradoras-v1202.mjs';
 const PARTIAL_WRITE_SMOKE = 'orbit360-platform/tools/orbit360-smoke-aseguradoras-partial-write-v20260721.mjs';
 const CONTROLLED_WRITE_CONTRACT_VERSION = '20260721.2';
+const INSURER_WRITE_CONTRACT_VERSION = '20260721.1';
 const CANONICAL_RUNTIME_VERSION = '20260721.1';
 
 if (!/^https:\/\//.test(BASE_URL)) throw new Error('PREVIEW_URL_REQUIRED');
@@ -66,12 +67,13 @@ const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
 const page = await context.newPage();
 const report = {
-  schemaVersion: 'orbit360-real-insurer-directory-readiness-v4',
+  schemaVersion: 'orbit360-real-insurer-directory-readiness-v5',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
   expectedCommit: EXPECTED_COMMIT,
   controlledWriteContractVersion: CONTROLLED_WRITE_CONTRACT_VERSION,
+  insurerWriteContractVersion: INSURER_WRITE_CONTRACT_VERSION,
   canonicalRuntimeVersion: CANONICAL_RUNTIME_VERSION,
   checks: {}
 };
@@ -102,10 +104,12 @@ try {
     status: String(window.OrbitAseguradorasCanonicalRuntimeV20260721 && OrbitAseguradorasCanonicalRuntimeV20260721.status || ''),
     ready: window.OrbitAseguradorasCanonicalRuntimeV20260721 && OrbitAseguradorasCanonicalRuntimeV20260721.ready === true,
     version: String(window.OrbitAseguradorasCanonicalRuntimeV20260721 && OrbitAseguradorasCanonicalRuntimeV20260721.version || ''),
+    insurerWriteContractVersion: String(window.OrbitAseguradorasCanonicalRuntimeV20260721 && OrbitAseguradorasCanonicalRuntimeV20260721.insurerWriteContractVersion || ''),
     errorCode: String(window.OrbitAseguradorasCanonicalRuntimeV20260721 && OrbitAseguradorasCanonicalRuntimeV20260721.errorCode || '')
   }));
   assert(canonicalBootstrap.ready, 'CANONICAL_RUNTIME_BLOCKED', canonicalBootstrap.errorCode || canonicalBootstrap.status);
   assert(canonicalBootstrap.version === CANONICAL_RUNTIME_VERSION, 'CANONICAL_RUNTIME_VERSION_INVALID', canonicalBootstrap.version);
+  assert(canonicalBootstrap.insurerWriteContractVersion === INSURER_WRITE_CONTRACT_VERSION, 'CANONICAL_INSURER_WRITE_CONTRACT_VERSION_INVALID', canonicalBootstrap.insurerWriteContractVersion);
 
   report.roleOptions = await selectDirection(page);
   await page.evaluate(() => { location.hash = '#/aseguradoras'; });
@@ -172,7 +176,9 @@ try {
       });
     });
     const D = window.Orbit && Orbit.insurerDirectoryImport;
+    const W = window.Orbit && Orbit.importaWriteP0;
     const contract = window.Orbit && Orbit.importerControlledWriteContractV20260721;
+    const insurerWriteContract = W && W.__aseguradorasWriteContractV20260721;
     const partial = window.Orbit && Orbit.store && Orbit.store.__aseguradorasPartialWriteV20260721;
     const canonicalState = window.OrbitAseguradorasCanonicalRuntimeV20260721 || {};
     return {
@@ -185,7 +191,10 @@ try {
       sourceGuard: !!(D && D.__op2SourceGuardV1220),
       backendWriteGuard: !!(D && D.__backendWriteGuardV1220),
       freshReadGuard: !!(D && D.__freshReadGuardV20260721),
-      writeP0: !!(window.Orbit && Orbit.importaWriteP0 && typeof Orbit.importaWriteP0.writeBatch === 'function'),
+      writeP0: !!(W && typeof W.writeBatch === 'function'),
+      insurerWriteContractReady: !!insurerWriteContract,
+      insurerWriteContractVersion: String(insurerWriteContract && insurerWriteContract.version || ''),
+      insurerWriteContractFailClosed: insurerWriteContract && insurerWriteContract.failClosed === true,
       controlledWriteContract: !!contract,
       controlledWriteContractVersion: String(contract && contract.version || ''),
       p0WireReady: !!(window.Orbit && Orbit.importaDryRunP0Wire),
@@ -206,6 +215,8 @@ try {
   assert(importerRuntime.canonicalExecutionVersion === CANONICAL_RUNTIME_VERSION, 'CANONICAL_EXECUTION_VERSION_INVALID', importerRuntime.canonicalExecutionVersion);
   assert(importerRuntime.sourceGuard && importerRuntime.backendWriteGuard && importerRuntime.freshReadGuard, 'CANONICAL_IMPORTER_GUARDS_INCOMPLETE');
   assert(importerRuntime.writeP0, 'CONTROLLED_WRITE_OWNER_NOT_READY');
+  assert(importerRuntime.insurerWriteContractReady && importerRuntime.insurerWriteContractFailClosed, 'INSURER_WRITE_CONTRACT_NOT_READY');
+  assert(importerRuntime.insurerWriteContractVersion === INSURER_WRITE_CONTRACT_VERSION, 'INSURER_WRITE_CONTRACT_VERSION_INVALID', importerRuntime.insurerWriteContractVersion);
   assert(importerRuntime.controlledWriteContract, 'CONTROLLED_WRITE_CONTRACT_NOT_READY');
   assert(importerRuntime.controlledWriteContractVersion === CONTROLLED_WRITE_CONTRACT_VERSION, 'CONTROLLED_WRITE_CONTRACT_VERSION_INVALID', importerRuntime.controlledWriteContractVersion);
   assert(importerRuntime.p0WireReady, 'P0_WIRE_NOT_READY');
@@ -249,12 +260,16 @@ try {
     insurerCount26: insurerCount === 26,
     canonicalRuntimeReady: canonicalBootstrap.ready,
     canonicalRuntimeExact: canonicalBootstrap.version === CANONICAL_RUNTIME_VERSION,
+    canonicalBootstrapInsurerWriteContractExact: canonicalBootstrap.insurerWriteContractVersion === INSURER_WRITE_CONTRACT_VERSION,
     canonicalImporterOwner: importerRuntime.canonicalOpen,
     canonicalExecutionExact: importerRuntime.canonicalExecutionVersion === CANONICAL_RUNTIME_VERSION,
     sourceGuardReady: importerRuntime.sourceGuard,
     backendWriteGuardReady: importerRuntime.backendWriteGuard,
     freshReadGuardReady: importerRuntime.freshReadGuard,
     controlledWriterReady: importerRuntime.writeP0,
+    insurerWriteContractReady: importerRuntime.insurerWriteContractReady,
+    insurerWriteContractFailClosed: importerRuntime.insurerWriteContractFailClosed,
+    insurerWriteContractExact: importerRuntime.insurerWriteContractVersion === INSURER_WRITE_CONTRACT_VERSION,
     controlledWriteContractReady: importerRuntime.controlledWriteContract,
     controlledWriteContractExact: importerRuntime.controlledWriteContractVersion === CONTROLLED_WRITE_CONTRACT_VERSION,
     p0WireReady: importerRuntime.p0WireReady,
@@ -277,6 +292,7 @@ try {
     canonicalBootstrapStatus: canonicalBootstrap.status,
     canonicalBootstrapVersion: canonicalBootstrap.version,
     canonicalExecutionVersion: importerRuntime.canonicalExecutionVersion,
+    insurerWriteContractVersion: importerRuntime.insurerWriteContractVersion,
     controlledWriteContractVersion: importerRuntime.controlledWriteContractVersion,
     p0WireContractVersion: importerRuntime.p0WireContractVersion,
     partialWriteVersion: importerRuntime.partialWriteVersion
