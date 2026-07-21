@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.120
+   Orbit 360 - Backend LAB Firebase init v1.121
    Initializes Firebase only in ?orbitBackend=firestore-lab.
    Accepts Firebase Hosting reserved init when the default app
    is already initialized; local mode still reads ignored config.
@@ -19,7 +19,7 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.120',
+    firebaseInitVersion: 'v1.121',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
       aseguradorasKnowledgeAutoMount: false
     })
@@ -62,6 +62,7 @@
      * de carga y no deben reactivarse en cada sesión del tenant. Los datos ya
      * persistidos se consumen por Orbit.store y por las capas canónicas vigentes.
      */
+    loadScriptOnce('core/aseguradoras-bank-accounts-provider-lab-v20260721.js?v=20260721-1', 'bank-account-provider');
     loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260717-1', 'advisor-write-bridge');
     loadScriptOnce('core/backend-lab-auth-guard.js?v=20260717-1', 'auth-guard', function(){
       loadScriptOnce('core/backend-lab-import-readiness-guard.js?v=20260717-1', 'import-readiness', function(){
