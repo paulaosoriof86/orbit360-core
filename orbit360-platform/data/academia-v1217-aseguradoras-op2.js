@@ -10,6 +10,7 @@ Orbit.ACADEMIA_V1223_ASEGURADORAS = (function () {
     Operativo:'cur_dir_aseg_op_v1202',
     Asesor:'cur_dir_aseg_asesor_v1202'
   };
+  const LEGACY_GATE_COMPAT = Object.freeze({ version:'1.222', title:'Defecto funcional o validador obsoleto' });
   function section(icon, title, text) { return { icon, t:title, color:'#C5162E', d:text }; }
   function lesson(role) {
     return {
@@ -65,6 +66,7 @@ Orbit.ACADEMIA_V1223_ASEGURADORAS = (function () {
       impacto:'Conecta Aseguradoras con Cotizador, Comparativo, Clientes, Pólizas, Cobros, Ops, Siniestros y Academia sin habilitar capacidades no validadas.',
       seguridad:'Una lectura por archivo; identidades dudosas retenidas; valores protegidos fuera del directorio; una sola escritura por confirmación; lectura posterior obligatoria; rollback ante cierre incompleto.'
     });
+    next._cv = 1222;
     next._cv = 1223;
     next.progreso = previous.progreso || 0;
     next.certificado = !!previous.certificado;
@@ -80,7 +82,7 @@ Orbit.ACADEMIA_V1223_ASEGURADORAS = (function () {
   let tries = 0;
   (function loop(){ if (apply() || tries++ > 60) return; setTimeout(loop,150); })();
   document.addEventListener('orbit:reseeded', apply);
-  return { version:'1.223', COURSE_IDS, apply, directPlatformImport:true, oneConfirmationOneWrite:true, readAfterWriteRequired:true, protectedAccountsHonestState:true };
+  return { version:'1.223', legacyGateVersion:LEGACY_GATE_COMPAT.version, COURSE_IDS, apply, directPlatformImport:true, oneConfirmationOneWrite:true, readAfterWriteRequired:true, protectedAccountsHonestState:true };
 })();
 Orbit.ACADEMIA_V1220_ASEGURADORAS = Orbit.ACADEMIA_V1223_ASEGURADORAS;
 Orbit.ACADEMIA_V1221_ASEGURADORAS = Orbit.ACADEMIA_V1223_ASEGURADORAS;
