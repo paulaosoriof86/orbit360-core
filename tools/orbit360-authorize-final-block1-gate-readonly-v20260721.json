@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-final-block1-readonly-authorization-v2",
+  "schemaVersion": "orbit360-final-block1-readonly-authorization-v3",
   "issuedAt": "2026-07-21",
   "authorizationId": "final-block1-readonly-gate-v1",
-  "authorizationRevision": 2,
+  "authorizationRevision": 3,
   "action": "unique_final_block1_gate_readonly",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -28,30 +28,38 @@
     "uniqueValidReferences": 91
   },
   "previousAttempt": {
-    "runId": 29868945252,
-    "artifactId": 8510333722,
-    "artifactDigest": "sha256:66045ccc998fd269c085b3864c77f23ba9365c66921f9449708abbe9167dda36",
-    "classification": "VALIDATOR_STALE",
-    "failedStage": "preflight",
-    "failedChecks": 5,
-    "secretsRead": false,
-    "browserExecuted": false,
-    "runtimeExecuted": false,
+    "runId": 29869225178,
+    "artifactId": 8510459297,
+    "artifactDigest": "sha256:5aac3d2f48230333908f1f407cf6ba7d4e032d7e32acd590d856edfa29394fbb",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "failedStage": "preview_redirect_ready",
+    "cause": "runtime_build_metadata_from_directory_flow_used_as_frontend_runtime",
+    "deployedRuntimeMetadata": "20260721-1",
+    "frontendRuntime": "20260717-2",
+    "preflightPassed": true,
+    "staticValidationPassed": true,
+    "labCountsPassed": true,
+    "runtimeGraphMatched": true,
+    "authenticationExecuted": false,
+    "roleViewsExecuted": false,
     "writesExecuted": false,
     "deployExecuted": false
   },
-  "validatorCorrection": {
-    "scope": "gate_overlay_only",
-    "overlayRevision": "1.0.27-final-block1-readonly-validator-alignment-v1",
+  "pipelineCorrection": {
+    "scope": "final_gate_runtime_reader_only",
+    "runtimeSource": "deployed_ays_lab_preview_meta",
+    "runtimeBuildMetadataRole": "directory_flow_metadata_only",
     "frontendChanged": false,
     "dataChanged": false,
-    "runtimeChanged": false
+    "deployedChannelChanged": false,
+    "deployExecuted": false
   },
   "expected": {
     "clients": 414,
     "insurers": 26,
     "advisors": 7,
     "contractVersion": "1.0.27",
+    "frontendRuntime": "20260717-2",
     "views": [
       "Direccion desktop",
       "Operativo tablet",
@@ -62,7 +70,7 @@
     "writesExecuted": false
   },
   "sourceBlobs": {
-    "workflow": "0e2abdd8cf1f25c89052f8cd1d9d85642427758b",
+    "workflow": "1e650d2e5a6a8a00110b3126bd75b63c524e4c1f",
     "freeze": "31130b4c53115ae813a06c75ee70a8c032532269",
     "overlay": "0f07472601ec0aa74b0f8450f6a10649fbf5d92e",
     "runtimeGate": "60ef7bef6056c2d4840522c6dfb212b8da85acf7"
