@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v12-final-block1-gate-authorized",
+  "schemaVersion": "orbit360-incident-freeze-v13-final-block1-validator-corrected",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
@@ -128,6 +128,7 @@
   },
   "finalGateAuthorization": {
     "authorizationId": "final-block1-readonly-gate-v1",
+    "authorizationRevision": 2,
     "active": true,
     "consumed": false,
     "allowedExecutions": 1,
@@ -142,6 +143,35 @@
     "deployAllowed": false,
     "productionAllowed": false,
     "runtimeGraphMustMatchExistingChannel": true,
+    "previousAttempt": {
+      "runId": 29868945252,
+      "head": "b7f0501fc3d71668c7ad268540d7d6dad6c20223",
+      "artifactId": 8510333722,
+      "artifactDigest": "sha256:66045ccc998fd269c085b3864c77f23ba9365c66921f9449708abbe9167dda36",
+      "status": "FAILURE_BEFORE_LAB",
+      "classification": "VALIDATOR_STALE",
+      "failedStage": "preflight",
+      "failedChecks": 5,
+      "secretsRead": false,
+      "browserExecuted": false,
+      "firestoreReadExecuted": false,
+      "writesExecuted": false,
+      "deployExecuted": false
+    },
+    "validatorCorrection": {
+      "scope": "gate_overlay_only",
+      "productFrozen": true,
+      "ownersAligned": [
+        "insurerSecureTargetBridge",
+        "realInsurerDirectoryAcademy",
+        "finalReadOnlyWorkflow"
+      ],
+      "frontendChanged": false,
+      "dataChanged": false,
+      "runtimeChanged": false,
+      "workflowBehaviorChanged": false,
+      "overlayRevision": "1.0.27-final-block1-readonly-validator-alignment-v1"
+    },
     "expectedCounts": {
       "clients": 414,
       "insurers": 26,
@@ -179,7 +209,7 @@
     "perform_visual_review_before_gate_go"
   ],
   "allowedActions": [
-    "execute_unique_final_block1_gate_readonly",
+    "execute_same_final_block1_gate_once_after_validator_alignment",
     "synchronize_pr_issue_and_documentation"
   ],
   "stateClarification": {
@@ -195,7 +225,7 @@
     "finalGatePending": true,
     "visualReviewPending": true
   },
-  "nextAllowedStep": "Execute exactly one final Block 1 gate in read-only mode against the existing LAB channel. The workflow must run the binding preflight first, prove the deployed runtime graph matches the current functional files, validate Direccion desktop, Operativo tablet and Asesor movil, and produce sanitized ok:true evidence without deploy or writes.",
+  "nextAllowedStep": "Execute the same final Block 1 read-only gate once after correcting only the stale overlay tokens. The first attempt did not reach secrets, LAB, browser or runtime. Accept only sanitized ok:true evidence; if the same stage fails again, stop retries and diagnose the preflight registry mechanism.",
   "containsPII": false,
   "containsSecrets": false
 }
