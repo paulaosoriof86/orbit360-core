@@ -18,11 +18,14 @@ function extractOneLineFunction(name) {
   return vm.runInNewContext(`(${match[0]})`);
 }
 
-check('owner_revision', source.includes("idempotenceRevision:'20260721.3'"));
+check('owner_revision', source.includes("idempotenceRevision:'20260721.4'"));
 check('observer_declared', source.includes('canonicalObserver=null'));
 check('observer_disconnects', source.includes('canonicalObserver.disconnect()'));
 check('observer_reconnects', source.includes('observeCanonicalOwner()'));
 check('observer_scope_structural', source.includes("record.target.id==='af-body'") && source.includes('nodeNeedsCanonicalEnhancement'));
+check('client_country_filter_structural_trigger', source.includes("node.id==='f-pais'") && source.includes("node.matches('#f-pais,#f-seg"));
+check('client_segment_filter_structural_trigger', source.includes("node.id==='f-seg'") && source.includes("node.querySelector('#f-pais,#f-seg"));
+check('client360_trigger_contract', source.includes('client360StructuralTrigger:true'));
 check('observer_ignores_own_mutations', source.includes("observerOwnMutations:false"));
 check('mutation_mode', source.includes("mutationMode:'same-microtask-disconnect-own-writes'"));
 check('html_helper_used_for_portal_note', source.includes("setHtmlIfChanged(note,'<b>Directorio operativo:"));
@@ -83,11 +86,11 @@ check('observer_restored_after_transform', observerConnected === true);
 
 const failed = checks.filter(item => !item.ok);
 const report = {
-  schemaVersion: 'orbit360-owner-visual-idempotence-proof-v1',
+  schemaVersion: 'orbit360-owner-visual-idempotence-proof-v2-client360-trigger',
   generatedAt: new Date().toISOString(),
   source: path.relative(process.cwd(), sourcePath).replaceAll('\\', '/'),
-  idempotenceRevision: '20260721.3',
-  classification: 'FUNCTIONAL_DEFECT_SELF_MUTATION_LOOP',
+  idempotenceRevision: '20260721.4',
+  classification: 'FUNCTIONAL_DEFECT_CLIENT360_STRUCTURAL_TRIGGER_MISSING',
   ok: failed.length === 0,
   totalChecks: checks.length,
   passedChecks: checks.length - failed.length,
@@ -98,7 +101,8 @@ const report = {
     followUpObserverDeliveries,
     htmlWrites,
     textWrites,
-    expected: 'one_base_mutation_one_transform_zero_followup_mutations'
+    client360StructuralTriggers: ['f-pais', 'f-seg'],
+    expected: 'one_base_mutation_one_transform_zero_followup_mutations_with_client360_filters'
   },
   writesExecuted: false,
   runtimeExecuted: false,
