@@ -1,0 +1,22 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const root=path.resolve(process.cwd(),'orbit360-platform'); const read=rel=>fs.readFileSync(path.join(root,rel),'utf8');
+const db={aseguradoras:[],gestiones:[],auditoriaImportaciones:[]};
+const store={all:c=>(db[c]||[]).slice(),get(c,id){return(db[c]||[]).find(x=>x.id===id)||null;},insert(c,row){db[c]=db[c]||[];const out=JSON.parse(JSON.stringify(row||{}));db[c].push(out);return out;},update(c,id,p){const row=this.get(c,id);if(row)Object.assign(row,JSON.parse(JSON.stringify(p||{})));return row;},remove(c,id){db[c]=(db[c]||[]).filter(x=>x.id!==id);return true;}};
+const Orbit={store,tenant:{get:()=>({id:'tenant-a'})},importaDryRunP0:{buildDryRun(input){return Object.assign({},input,{status:'dry_run_pendiente_revision',hasBlockingErrors:false});}}};
+const document={getElementById:()=>null,addEventListener:()=>{},createElement:()=>({remove(){}}),body:{appendChild(){}}};
+const windowObject={Orbit,addEventListener:()=>{},removeEventListener:()=>{}}; const sandbox={window:windowObject,Orbit,document,console,Date,Math,JSON,Set,Map,Promise,setTimeout,clearTimeout,CustomEvent:class{}}; windowObject.window=windowObject;windowObject.document=document;
+for(const rel of ['core/importa-write-p0.js','core/importa-write-aseguradoras-contract-v20260721.js','core/importer-controlled-write-contract-v20260721.js','core/importa-dryrun-p0-wire.js'])vm.runInNewContext(read(rel),sandbox,{filename:rel});
+const W=Orbit.importaWriteP0; assert.ok(W&&W.__aseguradorasWriteContractV20260721); assert.equal(W.__aseguradorasWriteContractV20260721.version,'20260721.1'); assert.equal(W.isAllowedCollection('aseguradoras'),true);
+const confirmation={approved:true,phrase:'CONFIRMO ESCRITURA CONTROLADA',userId:'u1',reason:'Smoke formal'};
+function batch(data,extra={}){return Object.assign({batchId:'batch_'+Math.random().toString(36).slice(2),sourceType:'directorio_aseguradoras',sourceFileName:'directorio.xlsx',status:'dry_run_aprobado',hasBlockingErrors:false,operations:[{action:'insert',collection:'aseguradoras',data}]},extra);}
+const base={id:'asg_valid',nombre:'Aseguradora válida',pais:'GT',moneda:'GTQ',requiereValidacion:false,validationStatus:'validado',contactos:[],portales:[],cuentas:[],fuenteDirectorio:{archivo:'directorio.xlsx',hoja:'ASEGURADORA',pais:'GT',tipo:'directorio_aseguradoras',importadoAt:'2026-07-21T00:00:00.000Z'}};
+let result=W.writeBatch(batch(Object.assign({},base,{fuenteDirectorio:{}})),confirmation);assert.equal(result.ok,false);assert.ok(result.errors.some(x=>x.includes('trazabilidad_archivo_hoja_faltante')));
+result=W.writeBatch(batch(Object.assign({},base,{id:'asg_secret',portales:[{usuario:'raw-user'}]})),confirmation);assert.equal(result.ok,false);assert.ok(result.errors.some(x=>x.includes('plaintext_sensitive_detected')));
+result=W.writeBatch(Object.assign(batch(base),{operations:[{action:'insert',collection:'aseguradoras',data:base},{action:'insert',collection:'gestiones',data:{id:'g1',validationStatus:'validado'}}]}),confirmation);assert.equal(result.ok,false);assert.ok(result.errors.includes('mixed_collection_batch_not_allowed'));
+result=W.writeBatch(batch(base,{batchId:'batch_valid'}),confirmation);assert.equal(result.ok,true);assert.equal(result.written,1);assert.equal(db.aseguradoras.length,1);assert.equal(db.auditoriaImportaciones.length,1);assert.equal(db.aseguradoras[0].createdByImport,true);assert.equal(db.aseguradoras[0].importBatchId,'batch_valid');
+assert.equal(Object.keys(Orbit.importaDryRunP0Wire.pending()).length,0);assert.equal(Orbit.importaDryRunP0Wire.lastReport(),null);
+console.log('ORBIT360 ASEGURADORAS WRITE POLICY: OK');
+console.log('- lote sin trazabilidad bloqueado');console.log('- texto plano sensible bloqueado');console.log('- lote mixto bloqueado');console.log('- lote válido escrito una sola vez con auditoría');
