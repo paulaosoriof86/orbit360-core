@@ -2,17 +2,17 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-21",
   "gateId": "block1-real-insurer-directories-lab-v20260720",
-  "classification": "VALIDATOR_STALE",
-  "diagnosticRevision": "bounded-exact-recovery-preflight-alignment-v2",
-  "contractRevision": "1.1.2-bounded-exact-recovery-preflight-v2",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "diagnosticRevision": "static-68-restores-2-new-pending-preflight-v3",
+  "contractRevision": "1.1.3-static-68-restores-2-new-pending-preflight-v3",
   "gatePatch": {
-    "contractVersion": "1.1.2",
-    "diagnosticRevision": "bounded-exact-recovery-preflight-alignment-v2",
-    "runtimeVersion": "20260721-2",
-    "status": "BOUNDED_EXACT_RECOVERY_DRYRUN_PREFLIGHT_ALIGNED",
+    "contractVersion": "1.1.3",
+    "diagnosticRevision": "static-68-restores-2-new-pending-preflight-v3",
+    "runtimeVersion": "20260721-3",
+    "status": "STATIC_68_RESTORES_2_NEW_PENDING_PREFLIGHT_ALIGNED",
     "workflow": ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml",
-    "staticValidationStatus": "VALIDATOR_STALE_CORRECTED_RUNTIME_NOT_RETRIED",
-    "diagnosticRule": "The healthy checkpoint remains valid. The later GT regression is repaired only through the exact sanitized 68-reference map plus two duplicate removals. This contract validates the single marker-bound read-only workflow. The parser remains dry-run-only; the canonical coordinator owns secure-provider confirmation, non-destructive merge, durable operational write, read-after-write, audit and operational rollback. No data runtime is authorized by this validator correction.",
+    "staticValidationStatus": "DATA_CONTRACT_CORRECTED_RUNTIME_NOT_AUTHORIZED",
+    "diagnosticRule": "The healthy checkpoint remains valid. The later GT regression contains 68 exact historical reference restorations and two G&T rows confirmed as new relative to the checkpoint. The two new rows remain backend_required and are not removed. This contract validates only the static map, read-only dry-run definition, workflow and owners. The parser remains dry-run-only; the canonical coordinator owns secure-provider confirmation, non-destructive merge, durable operational write, read-after-write, audit and operational rollback. No data runtime is authorized by this contract correction.",
     "validators": [
       "tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs",
       "tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs",
@@ -25,14 +25,14 @@
       "tools/orbit360-aseguradoras-import-readiness-v20260720.mjs"
     ],
     "executionBudget": {
-      "type": "validator_stale_correction_before_separate_runtime_authorization",
+      "type": "data_contract_static_alignment_before_separate_runtime_authorization",
       "watchdogBudgetMs": 900000,
       "staticValidationMs": 120000,
       "recoveryDryRunMs": 180000,
       "recoveryWriteAndReadbackMs": 240000,
       "finalGateMs": 300000,
-      "exhaustionPolicy": "Correct registry, owner and workflow references only. Validate the central preflight without secrets or runtime. Do not rerun the failed workflow automatically. Any later read-only dry-run requires a new explicit one-use authorization because run 29849319790 consumed the previous marker at preflight.",
-      "acceptancePolicy": "A future recovery dry-run may close only with 414 clients, 26 insurers, 7 advisors, 91 valid unique bank references, zero pending bank rows, zero duplicate bank rows, zero raw protected values, Colombia unchanged, exactly 68 restorations and two duplicate removals, and sanitized ok:true evidence."
+      "exhaustionPolicy": "Correct map, dry-run, workflow, validator, overlay, freeze and documentation together. Execute only the central preflight without secrets or runtime. Do not trigger a read-only dry-run automatically. Any later runtime requires a separate explicit one-use authorization.",
+      "acceptancePolicy": "A future recovery dry-run may close only with 414 clients, 26 insurers, 7 advisors, 93 bank rows, 91 valid unique historical references, two preserved new G&T pending rows, zero removals, zero creates, zero deletes, zero reorders, zero raw protected values, Colombia unchanged, exactly 68 restorations, and sanitized ok:true evidence."
     }
   },
   "canonicalOwners": [
@@ -111,12 +111,29 @@
       "path": "tools/orbit360-bank-reference-recovery-map-v20260721.json",
       "requiredTokens": [
         "\"recoveryMappings\": 68",
-        "\"duplicateIncomingRows\": 2",
-        "\"unmappedRows\": 0",
-        "\"ambiguousRows\": 0",
+        "\"newPendingRows\": 2",
+        "\"duplicateIncomingRows\": 0",
+        "\"expectedFinalBankRows\": 93",
         "\"expectedFinalValidReferences\": 91",
+        "\"expectedFinalPendingRows\": 2",
         "\"containsSecrets\": false",
-        "\"colombiaTouched\": false"
+        "\"colombiaTouched\": false",
+        "\"deletesRows\": false"
+      ]
+    },
+    {
+      "id": "insurerBankRecoveryDryRun",
+      "path": "tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs",
+      "requiredTokens": [
+        "manifestIdentityContractValidated = true",
+        "operation: 'restore_accountRef_only'",
+        "operation: 'preserve_new_pending_row_unchanged'",
+        "duplicateRemovalsZero",
+        "noCreates",
+        "noDeletes",
+        "noReorder",
+        "authorizationRequiredForWrite: true",
+        "orbit360-bank-reference-recovery-exact-dry-run-v3-68-restores-2-new-pending"
       ]
     },
     {
@@ -124,7 +141,8 @@
       "path": "tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs",
       "requiredTokens": [
         "RECOVERY_COUNT_68",
-        "DUPLICATE_COUNT_2",
+        "NEW_PENDING_COUNT_2",
+        "DUPLICATE_COUNT_ZERO",
         "PROVIDER_BEFORE_OPERATIONAL_WRITE",
         "BRIDGE_BLOCKS_PROVIDER_STORE_UPDATE",
         "distributedVaultRollbackClaimed: false",
@@ -224,15 +242,34 @@
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "\"recoveryMappings\": 68",
-        "\"duplicateIncomingRows\": 2",
+        "\"newPendingRows\": 2",
+        "\"duplicateIncomingRows\": 0",
+        "\"expectedFinalBankRows\": 93",
         "\"expectedFinalValidReferences\": 91",
+        "\"expectedFinalPendingRows\": 2",
         "\"hashSetDifference\": 0"
+      ]
+    },
+    {
+      "path": "tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "operation: 'restore_accountRef_only'",
+        "operation: 'preserve_new_pending_row_unchanged'",
+        "duplicateRemovalsZero",
+        "noCreates",
+        "noDeletes",
+        "noReorder",
+        "authorizationRequiredForWrite: true"
       ]
     },
     {
       "path": "tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs",
       "replaceRequiredTokens": true,
       "requiredTokens": [
+        "RECOVERY_COUNT_68",
+        "NEW_PENDING_COUNT_2",
+        "DUPLICATE_COUNT_ZERO",
         "PROVIDER_BEFORE_OPERATIONAL_WRITE",
         "BRIDGE_BLOCKS_PROVIDER_STORE_UPDATE",
         "runtimeExecuted: false",
