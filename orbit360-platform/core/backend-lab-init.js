@@ -1,27 +1,21 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.121
+   Orbit 360 - Backend LAB Firebase init v1.122
    Initializes Firebase only in ?orbitBackend=firestore-lab.
-   Accepts Firebase Hosting reserved init when the default app
-   is already initialized; local mode still reads ignored config.
    No secrets are versioned or exposed.
    ============================================================ */
 (function(){
   'use strict';
-
   var params = new URLSearchParams(window.location.search || '');
   var mode = params.get('orbitBackend') || (window.OrbitBackend && window.OrbitBackend.mode) || '';
   var tenant = params.get('tenant') || (window.OrbitBackend && (window.OrbitBackend.tenantId || window.OrbitBackend.tenant)) || 'alianzas-soluciones';
-
   if (mode !== 'firestore-lab') return;
 
   window.OrbitBackend = Object.assign({}, window.OrbitBackend || {}, {
-    mode: 'firestore-lab',
-    tenantId: tenant,
-    tenant: tenant,
-    firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.121',
+    mode: 'firestore-lab', tenantId: tenant, tenant: tenant,
+    firebaseInit: 'pending', firebaseInitVersion: 'v1.122',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
-      aseguradorasKnowledgeAutoMount: false
+      aseguradorasKnowledgeAutoMount: false,
+      insurerDirectoryCanonicalRuntime: true
     })
   });
 
@@ -39,29 +33,20 @@
     script.src = src;
     script.setAttribute(attr, key);
     script.onload = function(){ script.dataset.loaded = '1'; if (done) done(); };
-    script.onerror = function(){
-      try { console.error('[Orbit Backend LAB] No se pudo cargar complemento:', src); } catch(e) {}
-    };
+    script.onerror = function(){ try { console.error('[Orbit Backend LAB] No se pudo cargar complemento:', src); } catch(e) {} };
     document.head.appendChild(script);
   }
 
   if (tenant === 'alianzas-soluciones') {
-    /* El catálogo documental puede consultarse desde la ficha aprobada, pero
-       el runtime de extracción/persistencia continúa fuera del render principal
-       y no habilita Cotizador ni Comparativo automáticamente. */
     window.__orbitAysKnowledgeRuntimePromise = Promise.resolve({
-      status: 'catalog_visible_runtime_controlled',
-      autoMount: false,
-      enablesCotizador: false,
-      enablesComparativo: false
+      status: 'catalog_visible_runtime_controlled', autoMount: false,
+      enablesCotizador: false, enablesComparativo: false
     });
 
-    /*
-     * Bootstrap canónico del LAB.
-     * Los perfiles iniciales y el importador inicial fueron artefactos temporales
-     * de carga y no deben reactivarse en cada sesión del tenant. Los datos ya
-     * persistidos se consumen por Orbit.store y por las capas canónicas vigentes.
-     */
+    /* Owner canónico primero. Bloquea el flujo anterior hasta verificar
+       contratos, lectura fresca, proveedores y escritura parcial. */
+    loadScriptOnce('core/aseguradoras-canonical-runtime-bootstrap-v20260721.js?v=20260721-1', 'insurer-directory-canonical-runtime');
+    loadScriptOnce('data/academia-v1224-aseguradoras-canonical-recovery.js?v=20260721-1', 'academy-canonical-recovery');
     loadScriptOnce('core/aseguradoras-bank-accounts-provider-lab-v20260721.js?v=20260721-1', 'bank-account-provider');
     loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260717-1', 'advisor-write-bridge');
     loadScriptOnce('core/backend-lab-auth-guard.js?v=20260717-1', 'auth-guard', function(){
@@ -73,36 +58,21 @@
 
   function findConfig(){
     var candidates = [
-      window.firebaseConfigLab,
-      window.firebaseConfigLocal,
-      window.firebaseConfigOrbit,
-      window.ORBIT_FIREBASE_LAB_CONFIG,
-      window.ORBIT_FIREBASE_CONFIG,
-      window.OrbitFirebaseLabConfig,
-      window.OrbitFirebaseConfig,
-      window.FIREBASE_CONFIG,
-      window.__firebase_config,
-      window.__FIREBASE_CONFIG__,
-      window.firebaseConfig
+      window.firebaseConfigLab, window.firebaseConfigLocal, window.firebaseConfigOrbit,
+      window.ORBIT_FIREBASE_LAB_CONFIG, window.ORBIT_FIREBASE_CONFIG,
+      window.OrbitFirebaseLabConfig, window.OrbitFirebaseConfig,
+      window.FIREBASE_CONFIG, window.__firebase_config, window.__FIREBASE_CONFIG__, window.firebaseConfig
     ];
-
     for (var i = 0; i < candidates.length; i++) {
       var cfg = candidates[i];
       if (cfg && typeof cfg === 'object' && (cfg.projectId || cfg.authDomain)) return cfg;
     }
-
     if (window.Orbit && window.Orbit.firebaseConfig) return window.Orbit.firebaseConfig;
     if (window.OrbitBackend && window.OrbitBackend.firebaseConfig) return window.OrbitBackend.firebaseConfig;
     return null;
   }
-
   function publicConfigInfo(config){
-    return {
-      projectId: config && config.projectId || '',
-      authDomain: config && config.authDomain || '',
-      hasApiKey: !!(config && config.apiKey),
-      hasAppId: !!(config && config.appId)
-    };
+    return { projectId: config && config.projectId || '', authDomain: config && config.authDomain || '', hasApiKey: !!(config && config.apiKey), hasAppId: !!(config && config.appId) };
   }
 
   try {
@@ -111,9 +81,6 @@
       window.OrbitBackend.firebaseInitError = 'firebase.initializeApp unavailable';
       return;
     }
-
-    /* Firebase Hosting /__/firebase/init.js initializes the default app
-       directly and does not need to expose a second global config object. */
     if (window.firebase.apps && window.firebase.apps.length > 0) {
       var existingApp = typeof window.firebase.app === 'function' ? window.firebase.app() : window.firebase.apps[0];
       var existingConfig = existingApp && existingApp.options ? existingApp.options : {};
@@ -122,21 +89,18 @@
       window.OrbitBackend.firebaseProjectId = existingConfig.projectId || '';
       return;
     }
-
     var config = findConfig();
     if (!config) {
       window.OrbitBackend.firebaseInit = 'config-not-found';
       window.OrbitBackend.firebaseInitError = 'Local config did not expose a recognized Firebase config object';
       return;
     }
-
     if (!config.projectId || !config.authDomain) {
       window.OrbitBackend.firebaseInit = 'config-incomplete';
       window.OrbitBackend.firebaseInitError = 'Firebase LAB config requires projectId and authDomain';
       window.OrbitBackend.firebaseConfigInfo = publicConfigInfo(config);
       return;
     }
-
     window.firebase.initializeApp(config);
     window.OrbitBackend.firebaseInit = 'initialized';
     window.OrbitBackend.firebaseConfigInfo = publicConfigInfo(config);
