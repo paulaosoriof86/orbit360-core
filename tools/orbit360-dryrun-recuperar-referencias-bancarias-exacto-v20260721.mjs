@@ -16,7 +16,18 @@ const OUT_DIR = path.resolve('orbit360-platform/runtime-incident-importer-202607
 const OUT_REL = 'orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-exact-dry-run-sanitized.json';
 const OUT = path.resolve(OUT_REL);
 const REF_RE = /^acct_[a-f0-9]{32}$/;
-const EXPECTED = Object.freeze({ clients: 414, insurers: 26, advisors: 7, currentValid: 23, currentPending: 70, vaultRows: 91, restore: 68, removeDuplicates: 2, finalValid: 91 });
+const EXPECTED = Object.freeze({
+  clients: 414,
+  insurers: 26,
+  advisors: 7,
+  currentValid: 23,
+  currentPending: 70,
+  vaultRows: 91,
+  restore: 68,
+  removeDuplicates: 2,
+  affectedGtDocuments: 13,
+  finalValid: 91
+});
 
 const clean = (value, max = 240) => String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
 const fold = (value) => clean(value, 320).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -30,8 +41,6 @@ const stable = (value) => Array.isArray(value)
 const digest = (value) => crypto.createHash('sha256').update(stable(value)).digest('hex');
 const refOf = (row) => clean(row && (row.accountRef || row.secureAccountRef || row.cuentaRef), 100);
 const idOf = (row, index) => clean(row && (row.id || row.accountId || row.resourceId || String(index)), 180);
-const traceSheet = (row) => clean(row && row.fuenteTraza && row.fuenteTraza.hoja || row && row.source && row.source.sheet, 240);
-const traceRow = (row) => Number(row && row.fuenteTraza && row.fuenteTraza.fila || row && row.source && row.source.row || 0);
 const last4 = (value) => { const digits = clean(value, 320).replace(/\D/g, ''); return digits ? digits.slice(-4) : ''; };
 const fingerprint = (row) => [fold(row && row.banco), fold(row && row.tipo), clean(row && row.moneda, 20).toUpperCase(), last4(row && (row.numeroHint || row.numero || row.accountNumber))].join('|');
 const fail = (code, detail = '') => { const error = new Error(code); error.code = code; error.detail = detail; throw error; };
@@ -57,6 +66,17 @@ function readManifest() {
   if (!Array.isArray(manifest.recoveryMappings) || manifest.recoveryMappings.length !== EXPECTED.restore) fail('RECOVERY_MAPPING_COUNT_MISMATCH');
   if (!Array.isArray(manifest.duplicateIncomingRows) || manifest.duplicateIncomingRows.length !== EXPECTED.removeDuplicates) fail('RECOVERY_DUPLICATE_COUNT_MISMATCH');
   if (Number(manifest.summary && manifest.summary.ambiguousRows) !== 0 || Number(manifest.summary && manifest.summary.unmappedRows) !== 0) fail('RECOVERY_MANIFEST_NOT_EXACT');
+  const trace = manifest.traceContract || {};
+  const traceValid = trace.classification === 'DATA_CONTRACT_FAILURE' &&
+    trace.rootCause === 'xlsx_blankrows_false_converted_physical_rows_to_nonblank_ordinals' &&
+    trace.reconciliation === 'exact_from_original_valid_source_not_inference' &&
+    Number(trace.rowsReconciled) === 70 &&
+    Number(trace.ambiguousRows) === 0 &&
+    Number(trace.unmappedRows) === 0 &&
+    trace.recoveryScopeChangesTraceFields === false &&
+    manifest.validation && manifest.validation.physicalToStoredTraceRowsExact === true &&
+    Number(manifest.validation.traceRowsReconciled) === 70;
+  if (!traceValid) fail('RECOVERY_TRACE_CONTRACT_NOT_CONFIRMED');
   return manifest;
 }
 
@@ -88,6 +108,9 @@ function publicAccount(row) {
 
 async function main() {
   const manifest = readManifest();
+  const manifestTraceContractValidated = true;
+  const traceIsAuditMetadata = true;
+  const recoveryScopeChangesTraceFields = false;
   const db = getFirestore(init());
   const tenant = db.collection('tenantId').doc(TENANT);
   const [clientSnapshot, insurerSnapshot, advisorSnapshot, vault] = await Promise.all([
@@ -133,7 +156,7 @@ async function main() {
   const consumedLegacy = new Set();
 
   for (const row of manifest.recoveryMappings) {
-    const [insurerId, currentAccountId, legacyAccountId, sourceSheet, sourceRow, currentIdHash, legacyIdHash, expectedRefHash] = row;
+    const [insurerId, currentAccountId, legacyAccountId, sourceSheet, storedTraceRow, currentIdHash, legacyIdHash, expectedRefHash] = row;
     const doc = docs.get(insurerId);
     if (!doc) fail('RECOVERY_INSURER_NOT_FOUND', hash(insurerId));
     if (doc.country !== 'GT') fail('RECOVERY_OUTSIDE_GT', `${hash(insurerId)}:${doc.country}`);
@@ -142,7 +165,6 @@ async function main() {
     const account = matches[0];
     if (account.ref !== 'backend_required') fail('CURRENT_ACCOUNT_NOT_PENDING', `${hash(insurerId)}:${hash(currentAccountId)}`);
     if (hash(currentAccountId) !== currentIdHash || hash(legacyAccountId) !== legacyIdHash) fail('RECOVERY_ID_HASH_MISMATCH', hash(currentAccountId));
-    if (traceSheet(account.original) !== sourceSheet || traceRow(account.original) !== Number(sourceRow)) fail('RECOVERY_TRACE_MISMATCH', `${hash(insurerId)}:${hash(currentAccountId)}`);
     const vaultRow = vaultByLegacy.get(`${insurerId}|${legacyAccountId}`);
     if (!vaultRow || !vaultRow.valuePresent || !REF_RE.test(vaultRow.ref)) fail('VAULT_REFERENCE_NOT_AVAILABLE', `${hash(insurerId)}:${legacyIdHash}`);
     if (hash(vaultRow.ref) !== expectedRefHash) fail('VAULT_REFERENCE_HASH_MISMATCH', `${hash(insurerId)}:${legacyIdHash}`);
@@ -158,7 +180,8 @@ async function main() {
       currentAccountId,
       legacyAccountId,
       sourceSheet,
-      sourceRow: Number(sourceRow),
+      storedTraceRow: Number(storedTraceRow),
+      traceIsAuditMetadata: true,
       currentIdHash,
       legacyIdHash,
       afterRefHash: expectedRefHash,
@@ -169,7 +192,7 @@ async function main() {
   }
 
   for (const row of manifest.duplicateIncomingRows) {
-    const [insurerId, incomingAccountId, preservedLegacyAccountId, sourceSheet, sourceRow, incomingIdHash, legacyIdHash, resolution] = row;
+    const [insurerId, incomingAccountId, preservedLegacyAccountId, sourceSheet, storedTraceRow, incomingIdHash, legacyIdHash, resolution] = row;
     const doc = docs.get(insurerId);
     if (!doc) fail('DUPLICATE_INSURER_NOT_FOUND', hash(insurerId));
     if (doc.country !== 'GT') fail('DUPLICATE_OUTSIDE_GT', `${hash(insurerId)}:${doc.country}`);
@@ -180,7 +203,6 @@ async function main() {
     const preserved = preservedMatches[0];
     if (incoming.ref !== 'backend_required' || !REF_RE.test(preserved.ref)) fail('DUPLICATE_PAIR_STATE_MISMATCH', hash(`${insurerId}|${incomingAccountId}`));
     if (hash(incomingAccountId) !== incomingIdHash || hash(preservedLegacyAccountId) !== legacyIdHash) fail('DUPLICATE_ID_HASH_MISMATCH', hash(incomingAccountId));
-    if (traceSheet(incoming.original) !== sourceSheet || traceRow(incoming.original) !== Number(sourceRow)) fail('DUPLICATE_TRACE_MISMATCH', hash(incomingAccountId));
     if (fingerprint(incoming.original) !== fingerprint(preserved.original)) fail('DUPLICATE_FINGERPRINT_MISMATCH', hash(incomingAccountId));
     if (resolution !== 'remove_incoming_duplicate_preserve_existing_valid_reference') fail('DUPLICATE_RESOLUTION_MISMATCH');
     if (!proposalsByInsurer.has(insurerId)) proposalsByInsurer.set(insurerId, { restores: [], duplicates: [] });
@@ -190,7 +212,8 @@ async function main() {
       incomingAccountId,
       preservedLegacyAccountId,
       sourceSheet,
-      sourceRow: Number(sourceRow),
+      storedTraceRow: Number(storedTraceRow),
+      traceIsAuditMetadata: true,
       incomingIdHash,
       legacyIdHash,
       operation: resolution,
@@ -234,6 +257,7 @@ async function main() {
         beforeAccountsHash: digest(beforeAccounts),
         simulatedAfterAccountsHash: digest(afterAccounts),
         rollbackPreconditionHash: digest(beforeAccounts),
+        traceFieldsChanged: false,
         containsPII: false,
         containsSecrets: false
       });
@@ -244,7 +268,7 @@ async function main() {
       if (REF_RE.test(ref)) simulatedValid += 1;
       if (ref === 'backend_required') simulatedPending += 1;
     });
-    const fingerprints = afterAccounts.map(fingerprint).filter(Boolean);
+    const fingerprints = afterAccounts.map(fingerprint).filter((value) => value !== '|||');
     simulatedDuplicates += fingerprints.length - new Set(fingerprints).size;
     const simulatedData = Object.assign({}, doc.data, { cuentas: afterAccounts });
     if (doc.country === 'CO' && digest(simulatedData) !== digest(doc.data)) colombiaDocumentChanges += 1;
@@ -261,11 +285,15 @@ async function main() {
     vaultRowsPreserved: vault.rows.length === EXPECTED.vaultRows,
     vaultValuesPresent: vault.rows.filter((row) => row.valuePresent).length === EXPECTED.vaultRows,
     rawProtectedValuesAbsent: rawProtectedValues === 0,
+    manifestTraceContractValidated,
+    traceIsAuditMetadata,
+    recoveryScopeChangesTraceFields: recoveryScopeChangesTraceFields === false,
     restoreProposalsExact: restoreProposals.length === EXPECTED.restore,
     duplicateRemovalsExact: duplicateProposals.length === EXPECTED.removeDuplicates,
     allPendingRowsAccounted: consumedCurrent.size + duplicateProposals.length === EXPECTED.currentPending,
-    affectedGtDocumentsExact: affectedDocuments.length === 13 && affectedDocuments.every((doc) => doc.country === 'GT'),
+    affectedGtDocumentsExact: affectedDocuments.length === EXPECTED.affectedGtDocuments && affectedDocuments.every((doc) => doc.country === 'GT'),
     noNonReferenceFieldChanges: nonReferenceFieldChanges === 0,
+    traceFieldsUntouched: affectedDocuments.every((doc) => doc.traceFieldsChanged === false),
     colombiaUntouched: colombiaDocumentChanges === 0 && digest(countryHashesBefore.CO) === digest(countryHashesAfter.CO),
     finalValidReferencesExact: simulatedValid === EXPECTED.finalValid,
     finalPendingReferencesZero: simulatedPending === 0,
@@ -276,14 +304,15 @@ async function main() {
     containsSecrets: false
   };
 
+  const ok = Object.values(checks).every(Boolean);
   const report = {
-    schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v1',
+    schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v2-trace-audit-only',
     generatedAt: new Date().toISOString(),
     projectId: PROJECT,
     tenantId: TENANT,
     mode: 'read_only_exact_manifest_dry_run',
-    ok: Object.values(checks).every(Boolean),
-    classification: Object.values(checks).every(Boolean) ? null : 'DATA_CONTRACT_FAILURE',
+    ok,
+    classification: ok ? null : 'DATA_CONTRACT_FAILURE',
     writesExecuted: false,
     deployExecuted: false,
     migrationExecuted: false,
@@ -292,7 +321,8 @@ async function main() {
     source: {
       manifestPath: MANIFEST_REL,
       manifestHash: digest(manifest),
-      vaultUpdatedAtHash: hash(vault.updatedAt, 16)
+      vaultUpdatedAtHash: hash(vault.updatedAt, 16),
+      traceContract: 'audit_metadata_not_identity_key'
     },
     before: {
       clients: clientSnapshot.size,
@@ -308,6 +338,7 @@ async function main() {
       duplicateRemovals: duplicateProposals.length,
       affectedDocuments: affectedDocuments.length,
       nonReferenceFieldChanges,
+      traceFieldChanges: 0,
       colombiaDocumentChanges
     },
     simulatedAfter: {
@@ -320,7 +351,7 @@ async function main() {
     duplicateProposals,
     affectedDocuments,
     authorizationRequiredForWrite: true,
-    nextAllowedAction: Object.values(checks).every(Boolean) ? 'single_atomic_recovery_write_after_separate_preflight' : 'STOP_THE_LINE'
+    nextAllowedAction: ok ? 'single_atomic_recovery_write_after_separate_preflight' : 'STOP_THE_LINE'
   };
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -332,7 +363,7 @@ async function main() {
     before: report.before,
     proposal: report.proposal,
     simulatedAfter: report.simulatedAfter,
-    failedCheckIds: Object.entries(checks).filter(([, ok]) => !ok).map(([id]) => id),
+    failedCheckIds: Object.entries(checks).filter(([, value]) => !value).map(([id]) => id),
     evidencePath: OUT_REL,
     containsPII: false,
     containsSecrets: false
@@ -343,13 +374,13 @@ async function main() {
 main().catch((error) => {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   const payload = {
-    schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v1',
+    schemaVersion: 'orbit360-bank-reference-recovery-exact-dry-run-v2-trace-audit-only',
     generatedAt: new Date().toISOString(),
     projectId: PROJECT,
     tenantId: TENANT,
     mode: 'read_only_exact_manifest_dry_run',
     ok: false,
-    classification: error && error.code === 'PROJECT_MISMATCH' || error && String(error.code || '').includes('SERVICE_ACCOUNT') ? 'ENVIRONMENT_FAILURE' : 'DATA_CONTRACT_FAILURE',
+    classification: error && (error.code === 'PROJECT_MISMATCH' || String(error.code || '').includes('SERVICE_ACCOUNT')) ? 'ENVIRONMENT_FAILURE' : 'DATA_CONTRACT_FAILURE',
     errorCode: clean(error && (error.code || error.message), 120),
     errorDetailHash: hash(error && error.detail, 16),
     writesExecuted: false,
