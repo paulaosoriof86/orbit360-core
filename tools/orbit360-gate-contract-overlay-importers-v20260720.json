@@ -3,16 +3,16 @@
   "issuedAt": "2026-07-21",
   "gateId": "block1-real-insurer-directories-lab-v20260720",
   "classification": "VALIDATOR_STALE + PIPELINE_MECHANISM_FAILURE",
-  "diagnosticRevision": "post-migration-read-only-and-controlled-write-v1",
-  "contractRevision": "1.1.1-post-migration-read-only-v1",
+  "diagnosticRevision": "post-migration-read-only-and-controlled-write-v2",
+  "contractRevision": "1.1.1-post-migration-read-only-v2",
   "gatePatch": {
     "contractVersion": "1.1.1",
-    "diagnosticRevision": "post-migration-read-only-and-controlled-write-v1",
+    "diagnosticRevision": "post-migration-read-only-and-controlled-write-v2",
     "runtimeVersion": "20260721-1",
-    "status": "ACTIVE_POST_MIGRATION_READ_ONLY_CONTROLLED_WRITE_FIX",
+    "status": "ACTIVE_POST_MIGRATION_READ_ONLY_CONTROLLED_WRITE_FIX_V2",
     "workflow": ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
-    "staticValidationStatus": "PENDING_POST_MIGRATION_READ_ONLY_GATE",
-    "diagnosticRule": "After the audited migration closure, bank data is verified read-only. A confirmed insurer-directory write must pass once through the specialized contract without a second P0 dry-run; any unconfirmed proposal remains intercepted.",
+    "staticValidationStatus": "PENDING_POST_MIGRATION_READ_ONLY_GATE_V2",
+    "diagnosticRule": "After the audited migration closure, bank data is verified read-only. A confirmed insurer-directory write must pass once through the specialized contract without a second P0 dry-run; any unconfirmed proposal remains intercepted. Static tokens must be executable text, not comments removed by the preflight sanitizer.",
     "validators": [
       "tools/orbit360-validar-aseguradoras-op2-group-v1220.mjs",
       "tools/orbit360-validar-cuarentena-hojas-aseguradoras-v1219.mjs",
@@ -154,7 +154,7 @@
       "path": "orbit360-platform/tools/orbit360-smoke-directorios-aseguradoras-v1202.mjs",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "Orden real del runtime",
+        "orden real de carga reproducido",
         "La propuesta sin confirmar debe quedar capturada",
         "El alta manual no debe quedar bloqueada",
         "cero segundo dry-run"
