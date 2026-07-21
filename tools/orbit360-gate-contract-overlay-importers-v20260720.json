@@ -8,7 +8,7 @@
   "gatePatch": {
     "contractVersion": "1.1.1",
     "diagnosticRevision": "post-migration-read-only-and-controlled-write-v1",
-    "runtimeVersion": "20260721-2",
+    "runtimeVersion": "20260721-1",
     "status": "ACTIVE_POST_MIGRATION_READ_ONLY_CONTROLLED_WRITE_FIX",
     "workflow": ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
     "staticValidationStatus": "PENDING_POST_MIGRATION_READ_ONLY_GATE",
@@ -74,9 +74,11 @@
       "requiredTokens": [
         "Orbit.ACADEMIA_V1223_ASEGURADORAS",
         "Una confirmación, una escritura",
+        "Después de migrar, solo inventariar",
         "Defecto funcional, contrato o validador",
         "version:'1.223'",
-        "next._cv = 1223"
+        "next._cv = 1223",
+        "postMigrationReadOnly:true"
       ]
     }
   ],
@@ -90,7 +92,8 @@
     "orbit360-platform/modules/importar.js",
     "orbit360-platform/tools/orbit360-smoke-directorios-aseguradoras-v1202.mjs",
     "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
-    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-SEGUNDO-DRYRUN-DIRECTORIO-ASEGURADORAS-20260721.md"
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-SEGUNDO-DRYRUN-DIRECTORIO-ASEGURADORAS-20260721.md",
+    "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-GATE-POST-MIGRACION-READONLY-20260721.md"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/core/importer-controlled-write-contract-v20260721.js",
@@ -174,7 +177,8 @@
         "version:'1.223'",
         "next._cv = 1223",
         "Una confirmación, una escritura",
-        "Defecto funcional, contrato o validador"
+        "Después de migrar, solo inventariar",
+        "postMigrationReadOnly:true"
       ]
     }
   ]
