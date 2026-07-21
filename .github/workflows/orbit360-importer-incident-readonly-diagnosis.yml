@@ -1,6 +1,6 @@
 name: Orbit 360 Incident Importador Aseguradoras Read-Only
 
-# incidentRevision: 20260721-7
+# incidentRevision: 20260721-8
 on:
   workflow_dispatch:
   push:
@@ -10,7 +10,7 @@ on:
       - '.github/workflows/orbit360-importer-incident-readonly-diagnosis.yml'
       - 'tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs'
       - 'tools/orbit360-diagnosticar-deriva-identidad-cuentas-readonly-v20260721.mjs'
-      - 'tools/orbit360-dryrun-recuperar-referencias-bancarias-v20260721.mjs'
+      - 'tools/orbit360-dryrun-recuperar-referencias-bancarias-hierarchical-v20260721.mjs'
   pull_request:
     branches:
       - main
@@ -18,7 +18,7 @@ on:
       - '.github/workflows/orbit360-importer-incident-readonly-diagnosis.yml'
       - 'tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs'
       - 'tools/orbit360-diagnosticar-deriva-identidad-cuentas-readonly-v20260721.mjs'
-      - 'tools/orbit360-dryrun-recuperar-referencias-bancarias-v20260721.mjs'
+      - 'tools/orbit360-dryrun-recuperar-referencias-bancarias-hierarchical-v20260721.mjs'
 
 permissions:
   contents: read
@@ -35,8 +35,8 @@ env:
   ORBIT360_EXPECTED_BANK_ACCOUNTS: 91
 
 jobs:
-  readonly-identity-diagnosis:
-    name: STOP THE LINE · identidad bancaria read-only
+  readonly-recovery-dry-run:
+    name: STOP THE LINE · recuperación bancaria read-only
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -59,8 +59,8 @@ jobs:
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${{ github.event.pull_request.head.sha || github.sha }}" \
             -f state='pending' \
-            -f context='orbit360/importer-identity-drift-v20260721' \
-            -f description='Diagnóstico read-only de identidad bancaria en ejecución' \
+            -f context='orbit360/importer-recovery-dryrun-v20260721' \
+            -f description='Dry-run read-only de 68 referencias en ejecución' \
             -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
 
       - name: Preparar Node 22
@@ -108,43 +108,71 @@ jobs:
           set -euo pipefail
           node tools/orbit360-diagnosticar-deriva-identidad-cuentas-readonly-v20260721.mjs
 
-      - name: Validar causa raíz de identidad
+      - name: Construir backup y dry-run jerárquico sin escritura
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-dryrun-recuperar-referencias-bancarias-hierarchical-v20260721.mjs
+
+      - name: Validar evidencia metodológica completa
         shell: bash
         run: |
           set -euo pipefail
           DIAG='orbit360-platform/runtime-incident-importer-20260721/insurer-protected-reference-diff-sanitizado.json'
           IDENTITY='orbit360-platform/runtime-incident-importer-20260721/bank-account-identity-drift-sanitizado.json'
+          DRYRUN='orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-dry-run-sanitizado.json'
+          BACKUP='orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-backup-manifest-sanitizado.json'
           test -f "$DIAG"
           test -f "$IDENTITY"
+          test -f "$DRYRUN"
+          test -f "$BACKUP"
           test "$(jq -r '.diagnosisComplete' "$DIAG")" = true
           test "$(jq -r '.writesExecuted' "$DIAG")" = false
           test "$(jq -r '.identityDiagnosisReady' "$IDENTITY")" = true
-          test "$(jq -r '.mode' "$IDENTITY")" = read_only_identity_diagnosis
-          test "$(jq -r '.writesExecuted' "$IDENTITY")" = false
-          test "$(jq -r '.deployExecuted' "$IDENTITY")" = false
-          test "$(jq -r '.migrationExecuted' "$IDENTITY")" = false
-          test "$(jq -r '.containsSecrets' "$IDENTITY")" = false
-          test "$(jq -r '.containsPII' "$IDENTITY")" = false
           test "$(jq -r '.summary.missingVaultRows' "$IDENTITY")" = 68
           test "$(jq -r '.summary.directIdMatches' "$IDENTITY")" = 0
           test "$(jq -r '.summary.uniqueFingerprintMatches' "$IDENTITY")" = 34
           test "$(jq -r '.summary.uniqueLast4Matches' "$IDENTITY")" = 34
-          test "$(jq -r '.summary.idDriftMatches' "$IDENTITY")" = 68
           test "$(jq -r '.summary.ambiguous' "$IDENTITY")" = 0
           test "$(jq -r '.summary.unmatched' "$IDENTITY")" = 0
           test "$(jq -r '.summary.pendingBackendWithoutVault' "$IDENTITY")" = 2
-          test "$(jq -r '.summary.matchedByCountry.GT' "$IDENTITY")" = 68
-          test "$(jq -r '.summary.matchedByCountry.CO // 0' "$IDENTITY")" = 0
-          jq '{schemaVersion,generatedAt,mode,summary,checks,identityDiagnosisReady}' "$IDENTITY"
+          test "$(jq -r '.recoveryReady' "$DRYRUN")" = true
+          test "$(jq -r '.mode' "$DRYRUN")" = read_only_hierarchical_recovery_dry_run
+          test "$(jq -r '.proposal.proposedChanges' "$DRYRUN")" = 68
+          test "$(jq -r '.proposal.affectedGtDocuments' "$DRYRUN")" = 13
+          test "$(jq -r '.proposal.projectedValidRefs' "$DRYRUN")" = 91
+          test "$(jq -r '.proposal.projectedPendingRefs' "$DRYRUN")" = 2
+          test "$(jq -r '.proposal.creates' "$DRYRUN")" = 0
+          test "$(jq -r '.proposal.deletes' "$DRYRUN")" = 0
+          test "$(jq -r '.proposal.reorderDetected' "$DRYRUN")" = 0
+          test "$(jq -r '.proposal.nonReferenceFieldChanges' "$DRYRUN")" = 0
+          test "$(jq -r '.proposal.colombiaChanges' "$DRYRUN")" = 0
+          test "$(jq -r '.matching.directIdMatches' "$DRYRUN")" = 0
+          test "$(jq -r '.matching.uniqueFingerprintMatches' "$DRYRUN")" = 34
+          test "$(jq -r '.matching.uniqueLast4Matches' "$DRYRUN")" = 34
+          test "$(jq -r '.matching.ambiguous' "$DRYRUN")" = 0
+          test "$(jq -r '.matching.unmatched' "$DRYRUN")" = 0
+          test "$(jq -r '.writesExecuted' "$DRYRUN")" = false
+          test "$(jq -r '.containsSecrets' "$DRYRUN")" = false
+          test "$(jq -r '.containsPII' "$DRYRUN")" = false
+          test "$(jq -r '.affectedDocuments' "$BACKUP")" = 13
+          test "$(jq -r '.proposedChanges' "$BACKUP")" = 68
+          test "$(jq -r '.rollbackExact' "$BACKUP")" = true
+          test "$(jq -r '.writesExecuted' "$BACKUP")" = false
+          test "$(jq -r '.containsSecrets' "$BACKUP")" = false
+          test "$(jq -r '.containsPII' "$BACKUP")" = false
+          jq '{schemaVersion,generatedAt,mode,baseline,matching,proposal,checks,recoveryReady}' "$DRYRUN"
 
       - name: Publicar evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-importer-identity-drift-${{ github.run_id }}
+          name: orbit360-importer-recovery-dryrun-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-incident-importer-20260721/insurer-protected-reference-diff-sanitizado.json
             orbit360-platform/runtime-incident-importer-20260721/bank-account-identity-drift-sanitizado.json
+            orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-dry-run-sanitizado.json
+            orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-backup-manifest-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
           if-no-files-found: error
           retention-days: 30
@@ -157,13 +185,13 @@ jobs:
         shell: bash
         run: |
           state='success'
-          description='Deriva confirmada: 34 huellas + 34 últimos cuatro, cero ambiguos'
+          description='Dry-run válido: 68 referencias, 13 GT, Colombia intacta, cero escritura'
           if [ "${{ job.status }}" != success ]; then
             state='failure'
-            description='Diagnóstico de identidad requiere revisión'
+            description='Dry-run de recuperación requiere revisión'
           fi
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${{ github.event.pull_request.head.sha || github.sha }}" \
             -f state="$state" \
-            -f context='orbit360/importer-identity-drift-v20260721' \
+            -f context='orbit360/importer-recovery-dryrun-v20260721' \
             -f description="$description" \
             -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
