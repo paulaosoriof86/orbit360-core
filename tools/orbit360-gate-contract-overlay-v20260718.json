@@ -8,7 +8,7 @@
   "gatePatch": {
     "contractVersion": "1.0.28",
     "diagnosticRevision": "single-owner-visual-stability-barrier-v1",
-    "status": "STATIC_FIX_PENDING_PREFLIGHT"
+    "status": "TARGETED_LAB_DEPLOY_AND_FINAL_GATE_AUTHORIZED"
   },
   "canonicalOwners": [
     {
@@ -216,11 +216,15 @@
       "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "ORBIT360_FINAL_GATE_AUTHORIZATION_ID: final-block1-readonly-gate-v1",
-        "ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab",
-        "Verificar canal LAB existente sin deploy",
-        "runtimeGraphChanged:false",
-        "deployExecuted:false",
+        "ORBIT360_TARGETED_DEPLOY_AUTHORIZATION_ID: final-block1-targeted-lab-deploy-gate-v1",
+        "targeted_lab_deploy_then_unique_final_block1_gate_readonly",
+        "Publicar frontend corregido en canal LAB",
+        "hosting:channel:deploy \"$ORBIT360_HOSTING_CHANNEL\"",
+        "targeted_lab_frontend_only",
+        "functionsDeployed:false",
+        "rulesDeployed:false",
+        "productionTouched:false",
+        "Gate final único · tres vistas",
         "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
         "tools/orbit360-gate-environment-v20260717.mjs"
       ]
