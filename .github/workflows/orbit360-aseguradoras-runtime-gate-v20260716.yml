@@ -107,7 +107,9 @@ jobs:
             test "$(jq -r '.deployAllowed' "$MARKER")" = 'true'
             test "$(jq -r '.deploymentScope' "$MARKER")" = 'hosting_channel_only'
             test "$(jq -r '.staticPreflightEvidence.ok' "$MARKER")" = 'true'
-            test "$(jq -r '.staticPreflightEvidence.runId' "$MARKER")" = '29871162305'
+            test "$(jq -r '.staticPreflightEvidence.runId' "$MARKER")" = "$(jq -r '.staticPreflightAuthorization.runId' "$FREEZE")"
+            test "$(jq -r '.staticPreflightEvidence.contractVersion' "$MARKER")" = "$(jq -r '.staticPreflightAuthorization.contractVersion' "$FREEZE")"
+            test "$(jq -r '.staticPreflightEvidence.contractVersion' "$MARKER")" = '1.0.29'
             test "$(jq -r '.status' "$FREEZE")" = 'FINAL_BLOCK1_TARGETED_LAB_DEPLOY_AND_GATE_AUTHORIZED'
             test "$(jq -r '.staticPreflightAuthorization.consumed' "$FREEZE")" = 'true'
             test "$(jq -r '.finalGateAuthorization.active' "$FREEZE")" = 'true'
