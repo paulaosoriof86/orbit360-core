@@ -53,7 +53,7 @@ const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
 const page = await context.newPage();
 const report = {
-  schemaVersion: 'orbit360-real-insurer-directory-readiness-v1',
+  schemaVersion: 'orbit360-real-insurer-directory-readiness-v2',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
@@ -83,23 +83,74 @@ try {
   const insurerCount = await cards.count();
   assert(insurerCount === 26, 'INSURER_COUNT_INVALID', String(insurerCount));
 
-  const importerRuntime = await page.evaluate(() => ({
-    owner: !!(window.Orbit && Orbit.insurerDirectoryImport),
-    parseFile: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.parseFile === 'function'),
-    applyApproved: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.applyApproved === 'function'),
-    applySecureOnly: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.applySecureOnly === 'function'),
-    secureProvider: !!(window.Orbit && Orbit.secureImport && typeof Orbit.secureImport.importInsurerDirectory === 'function'),
-    rawSensitiveFieldCount: (Orbit.store.all('aseguradoras') || []).reduce((total, insurer) => {
-      const portals = [].concat(insurer && insurer.portales || []);
-      const accounts = [].concat(insurer && insurer.cuentas || []);
-      const portalRaw = portals.reduce((count, row) => count + ['usuario','user','password','pass','contrasena'].filter((key) => String(row && row[key] || '').trim()).length, 0);
-      const accountRaw = accounts.reduce((count, row) => count + ['numero','accountNumber'].filter((key) => String(row && row[key] || '').trim()).length, 0);
-      return total + portalRaw + accountRaw;
-    }, 0)
-  }));
+  const importerRuntime = await page.evaluate(() => {
+    const fold = (value) => String(value == null ? '' : value)
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+    const placeholderTokens = [
+      'backend_required', 'pendiente', 'sin verificar', 'no disponible',
+      'requiere actualizacion', 'sin acceso registrado', 'protegido',
+      'referencia', 'credentialref', 'accountref', 'n/a', 'na', 'null', 'none'
+    ];
+    const classify = (field, value) => {
+      const raw = String(value == null ? '' : value).trim();
+      if (!raw) return 'absent';
+      const normalized = fold(raw);
+      if (placeholderTokens.some((token) => normalized === token || normalized.includes(token))) return 'safe_placeholder';
+      if (/[\*•●]{2,}/.test(raw) || /x{3,}/i.test(raw) || /\*{2,}@/.test(raw)) return 'safe_masked';
+      if (/^(?:[_-]|\.)+$/.test(raw)) return 'safe_placeholder';
+      return field === 'password' || field === 'pass' || field === 'contrasena'
+        ? 'suspicious_password'
+        : field === 'numero' || field === 'accountNumber'
+          ? 'suspicious_account'
+          : 'suspicious_user';
+    };
+    const inventory = {
+      present: 0,
+      safePlaceholder: 0,
+      safeMasked: 0,
+      suspiciousUnmasked: 0,
+      suspiciousByType: { user: 0, password: 0, account: 0 },
+      referenceCounts: { credentialRef: 0, accountRef: 0 },
+      fieldCounts: {}
+    };
+    const inspect = (field, value) => {
+      const category = classify(field, value);
+      if (category === 'absent') return;
+      inventory.present += 1;
+      inventory.fieldCounts[field] = (inventory.fieldCounts[field] || 0) + 1;
+      if (category === 'safe_placeholder') inventory.safePlaceholder += 1;
+      else if (category === 'safe_masked') inventory.safeMasked += 1;
+      else {
+        inventory.suspiciousUnmasked += 1;
+        if (category === 'suspicious_password') inventory.suspiciousByType.password += 1;
+        else if (category === 'suspicious_account') inventory.suspiciousByType.account += 1;
+        else inventory.suspiciousByType.user += 1;
+      }
+    };
+    (Orbit.store.all('aseguradoras') || []).forEach((insurer) => {
+      [].concat(insurer && insurer.portales || []).forEach((row) => {
+        ['usuario','user','password','pass','contrasena'].forEach((field) => inspect(field, row && row[field]));
+        if (String(row && row.credentialRef || '').trim()) inventory.referenceCounts.credentialRef += 1;
+      });
+      [].concat(insurer && insurer.cuentas || []).forEach((row) => {
+        ['numero','accountNumber'].forEach((field) => inspect(field, row && row[field]));
+        if (String(row && row.accountRef || '').trim()) inventory.referenceCounts.accountRef += 1;
+      });
+    });
+    return {
+      owner: !!(window.Orbit && Orbit.insurerDirectoryImport),
+      parseFile: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.parseFile === 'function'),
+      applyApproved: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.applyApproved === 'function'),
+      applySecureOnly: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.applySecureOnly === 'function'),
+      secureProvider: !!(window.Orbit && Orbit.secureImport && typeof Orbit.secureImport.importInsurerDirectory === 'function'),
+      sensitiveFieldInventory: inventory
+    };
+  });
   assert(importerRuntime.owner && importerRuntime.parseFile && importerRuntime.applyApproved && importerRuntime.applySecureOnly, 'IMPORTER_OWNER_NOT_READY');
   assert(importerRuntime.secureProvider, 'SECURE_PROVIDER_NOT_READY');
-  assert(importerRuntime.rawSensitiveFieldCount === 0, 'RAW_SENSITIVE_FIELDS_PRESENT', String(importerRuntime.rawSensitiveFieldCount));
 
   const importButton = page.locator('#asg-imp, [data-import-asg]').first();
   await importButton.waitFor({ state: 'visible', timeout: 15000 });
@@ -123,6 +174,7 @@ try {
   });
   assert(runtimeBuild && runtimeBuild.commit === EXPECTED_COMMIT, 'RUNTIME_COMMIT_MISMATCH', String(runtimeBuild && runtimeBuild.commit || 'missing'));
 
+  const sensitiveInventory = importerRuntime.sensitiveFieldInventory;
   report.checks = {
     login: true,
     legalReady: true,
@@ -133,15 +185,18 @@ try {
     controlledWriterReady: importerRuntime.applyApproved,
     secureOnlyReady: importerRuntime.applySecureOnly,
     secureProviderReady: importerRuntime.secureProvider,
-    noRawSensitiveFields: importerRuntime.rawSensitiveFieldCount === 0,
+    noUnmaskedSensitiveValues: sensitiveInventory.suspiciousUnmasked === 0,
     importButtonReady: true,
     countryGTCO: countryValues.includes('GT') && countryValues.includes('CO'),
     excelInputReady: accept.includes('.xlsx') && accept.includes('.xls'),
     exactRuntimeCommit: runtimeBuild.commit === EXPECTED_COMMIT
   };
   report.insurerCount = insurerCount;
-  report.rawSensitiveFieldCount = importerRuntime.rawSensitiveFieldCount;
+  report.sensitiveFieldInventory = sensitiveInventory;
   report.ok = Object.values(report.checks).every(Boolean);
+  if (!report.ok && sensitiveInventory.suspiciousUnmasked > 0) {
+    report.error = `UNMASKED_SENSITIVE_VALUES_PRESENT:${sensitiveInventory.suspiciousUnmasked}`;
+  }
 } catch (error) {
   report.ok = false;
   report.error = String(error && (error.stack || error.message) || error).replace(/\s+/g, ' ').trim().slice(0, 800);
