@@ -1,6 +1,6 @@
 name: Orbit 360 Incident Importador Aseguradoras Read-Only
 
-# incidentRevision: 20260721-6
+# incidentRevision: 20260721-7
 on:
   workflow_dispatch:
   push:
@@ -127,11 +127,12 @@ jobs:
           test "$(jq -r '.containsPII' "$IDENTITY")" = false
           test "$(jq -r '.summary.missingVaultRows' "$IDENTITY")" = 68
           test "$(jq -r '.summary.directIdMatches' "$IDENTITY")" = 0
-          test "$(jq -r '.summary.uniqueFingerprintMatches' "$IDENTITY")" = 68
+          test "$(jq -r '.summary.uniqueFingerprintMatches' "$IDENTITY")" = 34
+          test "$(jq -r '.summary.uniqueLast4Matches' "$IDENTITY")" = 34
           test "$(jq -r '.summary.idDriftMatches' "$IDENTITY")" = 68
           test "$(jq -r '.summary.ambiguous' "$IDENTITY")" = 0
           test "$(jq -r '.summary.unmatched' "$IDENTITY")" = 0
-          test "$(jq -r '.summary.pendingWithoutVault' "$IDENTITY")" = 2
+          test "$(jq -r '.summary.pendingBackendWithoutVault' "$IDENTITY")" = 2
           test "$(jq -r '.summary.matchedByCountry.GT' "$IDENTITY")" = 68
           test "$(jq -r '.summary.matchedByCountry.CO // 0' "$IDENTITY")" = 0
           jq '{schemaVersion,generatedAt,mode,summary,checks,identityDiagnosisReady}' "$IDENTITY"
@@ -156,7 +157,7 @@ jobs:
         shell: bash
         run: |
           state='success'
-          description='Deriva confirmada: 68 matches únicos, cero ambiguos'
+          description='Deriva confirmada: 34 huellas + 34 últimos cuatro, cero ambiguos'
           if [ "${{ job.status }}" != success ]; then
             state='failure'
             description='Diagnóstico de identidad requiere revisión'
