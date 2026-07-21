@@ -1,7 +1,8 @@
 {
-  "schemaVersion": "orbit360-final-block1-readonly-authorization-v1",
+  "schemaVersion": "orbit360-final-block1-readonly-authorization-v2",
   "issuedAt": "2026-07-21",
   "authorizationId": "final-block1-readonly-gate-v1",
+  "authorizationRevision": 2,
   "action": "unique_final_block1_gate_readonly",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -26,6 +27,26 @@
     "pendingReferences": 2,
     "uniqueValidReferences": 91
   },
+  "previousAttempt": {
+    "runId": 29868945252,
+    "artifactId": 8510333722,
+    "artifactDigest": "sha256:66045ccc998fd269c085b3864c77f23ba9365c66921f9449708abbe9167dda36",
+    "classification": "VALIDATOR_STALE",
+    "failedStage": "preflight",
+    "failedChecks": 5,
+    "secretsRead": false,
+    "browserExecuted": false,
+    "runtimeExecuted": false,
+    "writesExecuted": false,
+    "deployExecuted": false
+  },
+  "validatorCorrection": {
+    "scope": "gate_overlay_only",
+    "overlayRevision": "1.0.27-final-block1-readonly-validator-alignment-v1",
+    "frontendChanged": false,
+    "dataChanged": false,
+    "runtimeChanged": false
+  },
   "expected": {
     "clients": 414,
     "insurers": 26,
@@ -42,8 +63,8 @@
   },
   "sourceBlobs": {
     "workflow": "0e2abdd8cf1f25c89052f8cd1d9d85642427758b",
-    "freeze": "d888fc5ef7b05d36b47ae2226f5bb4ef00013abf",
-    "overlay": "4b163ee019f3c08f5a97ff68070fc1be35fbe09c",
+    "freeze": "31130b4c53115ae813a06c75ee70a8c032532269",
+    "overlay": "0f07472601ec0aa74b0f8450f6a10649fbf5d92e",
     "runtimeGate": "60ef7bef6056c2d4840522c6dfb212b8da85acf7"
   },
   "acceptance": "SANITIZED_OK_TRUE_ONLY",
