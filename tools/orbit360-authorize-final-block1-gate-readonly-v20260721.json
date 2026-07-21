@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v3",
+  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v4",
   "issuedAt": "2026-07-21",
   "authorizationId": "final-block1-static-preflight-v1",
-  "authorizationRevision": 3,
+  "authorizationRevision": 4,
   "action": "final_block1_static_preflight_only",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -35,41 +35,35 @@
     "pendingReferences": 2,
     "uniqueValidReferences": 91
   },
-  "failedRuntimeEvidence": [
-    {
-      "runId": 29872097446,
-      "artifactId": 8511575171,
-      "artifactDigest": "sha256:809e9f0148593eb24f1aed5340acf00a691d753ffd9548230a8c7dee6829a44a",
-      "head": "0cdd36b3136b6fba5ee0f6be6df7b6bc42d90186",
-      "failedStage": "desktop_direction_client360",
-      "errorCode": "INSURER_SECURE_CREDENTIAL_UI_MISSING",
-      "frozenNoRetry": true
-    },
-    {
-      "runId": 29872987103,
-      "artifactId": 8511908838,
-      "artifactDigest": "sha256:2e960b74656f3b3dde6e31f363b67f741a3156a25398d79576dbe6cdbb7d3b40",
-      "head": "a8d435865ad93caa007dc974ec9f96d8a1a58892",
-      "failedStage": "desktop_direction_client360",
-      "errorCode": "INSURER_SECURE_CREDENTIAL_UI_MISSING",
-      "frozenNoRetry": true
-    }
-  ],
+  "supersededStaticPreflightEvidence": {
+    "runId": 29874164347,
+    "artifactId": 8512322966,
+    "artifactDigest": "sha256:5fdccc1aa9b33943eb7f88ef909a0050b95fdc1c0a4106f4bdba240d46b2419c",
+    "contractVersion": "1.0.30",
+    "status": "GO_GATE_CONTRACT",
+    "totalChecks": 1047,
+    "passedChecks": 1047,
+    "failedChecks": 0,
+    "ok": true,
+    "supersededReason": "workflow_authorization_changed_after_preflight"
+  },
   "rootCause": {
-    "classification": "FUNCTIONAL_DEFECT",
-    "fact": "credential_box_waitFor_succeeded_then_immediate_count_was_zero",
-    "cause": "canonical_visual_owner_deferred_dom_repair_to_requestAnimationFrame_after_synchronous_af_body_replacement",
-    "validatorCorrect": true,
-    "barrierIsSecondary": true
+    "productClassification": "FUNCTIONAL_DEFECT",
+    "validatorClassification": "VALIDATOR_STALE",
+    "productCause": "canonical_visual_owner_deferred_dom_repair_to_requestAnimationFrame_after_synchronous_af_body_replacement",
+    "validatorCause": "targeted_authorization_required_literal_contract_1_0_29",
+    "validatorCorrectedBeforeRuntime": true
   },
   "implementedFix": {
     "canonicalVisualOwner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "ownerCommit": "e8d5374986ea735da8c2a4584bb66e5affb49110",
     "ownerBlob": "3057eb3270ad03e33ec193d69865c4d9e21a8d01",
-    "method": "synchronous_mutation_observer_owner_same_microtask_with_reentry_guard",
     "synchronousMutationOwner": true,
     "mutationMode": "same-microtask",
-    "secondaryBarrierVersion": "20260721.2",
+    "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+    "workflowCommit": "7e53211e717880d3e665bd5b19b9a95c0ffd6c6f",
+    "workflowBlob": "ae4a733c60f6196064e10019e6d1415d83d0781c",
+    "dynamicContractComparison": true,
     "newRendererCreated": false,
     "newBridgeCreated": false,
     "moduleAseguradorasChanged": false,
@@ -81,17 +75,17 @@
     "canonicalVisualOwner": "3057eb3270ad03e33ec193d69865c4d9e21a8d01",
     "visualStabilityBarrier": "b7b53097fee3d526dd6ceeeaba31aed2b91ca6a5",
     "routerBootstrap": "3f4eeb8d4593809c0d8799a5c54c430afe3b78e6",
-    "workflow": "3872b3a3c3a5732a23f0b25aa09e13b39234a68d",
-    "overlay": "85baccd2513393e94d242aec58b0e018e2ffc071",
-    "freeze": "8ac1dd73310299b611eacd5153f332acc67c87cd",
-    "rootCauseDocument": "5604d12ae490445cd88043baee1defee5a37216e"
+    "workflow": "ae4a733c60f6196064e10019e6d1415d83d0781c",
+    "overlay": "dde0630fe622afcad5970c0683195d55bbd15626",
+    "freeze": "a42352ac5cdc8c0881892c6833983a83ecf28ed7"
   },
   "expected": {
-    "contractVersion": "1.0.30",
-    "diagnosticRevision": "canonical-visual-owner-same-microtask-v1",
+    "contractVersion": "1.0.31",
+    "diagnosticRevision": "canonical-owner-same-microtask-dynamic-preflight-evidence-v1",
     "preflightStatus": "GO_GATE_CONTRACT",
     "synchronousMutationOwner": true,
     "mutationMode": "same-microtask",
+    "dynamicContractComparison": true,
     "writesExecuted": false,
     "runtimeExecuted": false,
     "browserExecuted": false,
