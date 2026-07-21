@@ -126,7 +126,7 @@ jobs:
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'GO_GATE_CONTRACT'
 
-      - name: Validación estática · owners y sintaxis
+      - name: Validación estática · owners, sintaxis e integridad local
         shell: bash
         run: |
           set -euo pipefail
@@ -146,10 +146,13 @@ jobs:
           node --check orbit360-platform/modules/aseguradoras.js
           node --check orbit360-platform/modules/calidad.js
           node --check orbit360-platform/modules/aseguradoras-v1202-import-bridge.js
+          node --check orbit360-platform/modules/ia.js
+          node --check tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs
           node --check tools/orbit360-gate-runtime-crm-v20260716.mjs
           node --check tools/orbit360-runtime-check-client360-v20260716.mjs
           node --check tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs
           node --check tools/orbit360-gate-environment-v20260717.mjs
+          node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs --local-only
           node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
           node orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js
           node tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs
@@ -232,6 +235,15 @@ jobs:
           echo "ORBIT360_EXPECTED_RUNTIME=$FRONTEND_RUNTIME" >> "$GITHUB_ENV"
           echo "ORBIT360_EXPECTED_COMMIT=$DEPLOYED_SHA" >> "$GITHUB_ENV"
 
+      - name: Verificar integridad exacta de scripts publicados
+        if: ${{ steps.scope.outputs.mode == 'targeted_deploy_gate' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs
+          test "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
+          test "$(jq -r '.exactMatch' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
+
       - name: Gate final único · tres vistas
         if: ${{ steps.scope.outputs.mode == 'targeted_deploy_gate' }}
         id: joint_gate
@@ -259,6 +271,7 @@ jobs:
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/final-static-preflight-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/targeted-deploy-sanitized.json
             orbit360-platform/lab-data-counts.json
             orbit360-platform/lab-aseguradoras-knowledge-inventory.json
