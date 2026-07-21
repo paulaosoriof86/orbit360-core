@@ -1,18 +1,20 @@
 {
-  "schemaVersion": "orbit360-final-block1-readonly-authorization-v4",
+  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v1",
   "issuedAt": "2026-07-21",
-  "authorizationId": "final-block1-readonly-gate-v1",
-  "authorizationRevision": 4,
-  "action": "unique_final_block1_gate_readonly",
+  "authorizationId": "final-block1-static-preflight-v1",
+  "authorizationRevision": 1,
+  "action": "final_block1_static_preflight_only",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "tenantId": "alianzas-soluciones",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "allowedExecutions": 1,
   "preflightRequired": true,
-  "runtimeAllowed": true,
-  "browserAllowed": true,
-  "firestoreReadAllowed": true,
+  "runtimeAllowed": false,
+  "browserAllowed": false,
+  "firestoreReadAllowed": false,
+  "vaultReadAllowed": false,
+  "secretsAllowed": false,
   "writesAllowed": false,
   "secretManagerWritesAllowed": false,
   "deployAllowed": false,
@@ -27,64 +29,42 @@
     "pendingReferences": 2,
     "uniqueValidReferences": 91
   },
-  "previousAttempt": {
-    "runId": 29869538040,
-    "artifactId": 8510578843,
-    "artifactDigest": "sha256:c7792ca5bd0eba58e292750aff5f79ccc47e1cf7b15dba4e6c13e213ad5a752d",
-    "classification": "VALIDATOR_STALE",
-    "failedStage": "desktop_direction_client360",
+  "rootCause": {
+    "classification": "FUNCTIONAL_DEFECT",
+    "sameStageFailureCount": 2,
+    "lastRunId": 29870164119,
     "errorCode": "INSURER_SECURE_CREDENTIAL_UI_MISSING",
-    "cause": "validator_measured_nested_protected_controls_during_intermediate_rerender",
-    "preflightPassed": true,
-    "staticValidationPassed": true,
-    "runtimeGraphMatched": true,
-    "authenticated": true,
-    "legalAcceptedOnce": true,
-    "counts": {
-      "clients": 414,
-      "insurers": 26,
-      "advisors": 7
-    },
+    "cause": "knowledge_summary_load_rerenders_full_insurer_ficha_after_visual_enhancement"
+  },
+  "implementedFix": {
+    "owner": "core/router-tenant-config-bootstrap.js",
+    "barrier": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
+    "canonicalVisualOwner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "method": "knowledge_settled_before_ficha_visible",
+    "newRendererCreated": false,
+    "writesStore": false,
+    "reimportsData": false,
+    "exposesSecrets": false
+  },
+  "sourceBlobs": {
+    "visualStabilityBarrier": "9aac3b0e85fbefcaaa60ecef6cf69dd583b59ce1",
+    "routerBootstrap": "47516425d6b46615c396c775f47c6fd38343d933",
+    "clientValidator": "560b280904c0196ff6cc6b2248d25aef50e88c2b",
+    "overlay": "b701f741cd631b687038433bc2a1a72a3b80ba59",
+    "workflow": "97b1d35da14bd480b31e5adbdf7bba4747aa15cf",
+    "freeze": "d029832eb4c8b17524092fe718063e6ee8eb7244"
+  },
+  "expected": {
+    "contractVersion": "1.0.28",
+    "preflightStatus": "GO_GATE_CONTRACT",
+    "staticOk": true,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretsRead": false,
     "writesExecuted": false,
     "deployExecuted": false
   },
-  "validatorCorrection": {
-    "scope": "visual_validator_waits_only",
-    "stableWaitsAdded": [
-      "m1-credential-box",
-      "data-m1-bank-copy-all",
-      "data-vlt-copy",
-      "data-vlt-view"
-    ],
-    "acceptanceRulesChanged": false,
-    "frontendChanged": false,
-    "dataChanged": false,
-    "deployedChannelChanged": false,
-    "deployExecuted": false
-  },
-  "expected": {
-    "clients": 414,
-    "insurers": 26,
-    "advisors": 7,
-    "contractVersion": "1.0.27",
-    "frontendRuntime": "20260717-2",
-    "views": [
-      "Direccion desktop",
-      "Operativo tablet",
-      "Asesor movil"
-    ],
-    "runtimeGraphChanged": false,
-    "deployExecuted": false,
-    "writesExecuted": false
-  },
-  "sourceBlobs": {
-    "workflow": "1e650d2e5a6a8a00110b3126bd75b63c524e4c1f",
-    "freeze": "31130b4c53115ae813a06c75ee70a8c032532269",
-    "overlay": "0f07472601ec0aa74b0f8450f6a10649fbf5d92e",
-    "runtimeGate": "60ef7bef6056c2d4840522c6dfb212b8da85acf7",
-    "clientValidator": "560b280904c0196ff6cc6b2248d25aef50e88c2b"
-  },
-  "acceptance": "SANITIZED_OK_TRUE_ONLY",
+  "acceptance": "GO_GATE_CONTRACT_AND_STATIC_OK_TRUE_ONLY",
   "containsPII": false,
   "containsSecrets": false
 }
