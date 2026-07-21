@@ -11,6 +11,9 @@ const OVERLAY_RELS = [
   'tools/orbit360-gate-contract-overlay-v20260718.json',
   'tools/orbit360-gate-contract-overlay-importers-v20260720.json'
 ];
+const INCIDENT_FREEZE_RELS = [
+  'tools/orbit360-incident-freeze-v20260721.json'
+];
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const requestedGateId = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
@@ -58,19 +61,26 @@ function writeEvidence(payload) {
 }
 function resultAndExit(status, checks, exitCode, gate = null, overlay = null, metadata = {}) {
   const failed = checks.filter(item => !item.ok);
+  const classification = status === 'GO_GATE_CONTRACT'
+    ? null
+    : status === 'INCIDENT_FROZEN'
+      ? 'METHODOLOGY_ENFORCEMENT_FAILURE'
+      : 'VALIDATOR_STALE';
   const payload = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v7-multi-gate-extension',
+    schemaVersion: 'orbit360-gate-contract-preflight-v8-incident-freeze',
     gateId: requestedGateId,
     contractVersion: gate && gate.contractVersion || '',
     diagnosticRevision: gate && gate.diagnosticRevision || '',
     overlayRevision: overlay && overlay.contractRevision || '',
     overlayPath: metadata.overlayPath || '',
+    incidentFreezePath: metadata.incidentFreezePath || '',
+    incidentId: metadata.incidentId || '',
     registryExtensions: metadata.registryExtensions || [],
     generatedAt: new Date().toISOString(),
     containsPII: false,
     containsSecrets: false,
     status,
-    classification: status === 'GO_GATE_CONTRACT' ? null : 'VALIDATOR_STALE',
+    classification,
     evidencePath: EVIDENCE_REL,
     total: checks.length,
     passed: checks.length - failed.length,
@@ -81,6 +91,43 @@ function resultAndExit(status, checks, exitCode, gate = null, overlay = null, me
   writeEvidence(payload);
   console.log(JSON.stringify(payload, null, 2));
   process.exit(exitCode);
+}
+
+for (const rel of INCIDENT_FREEZE_RELS) {
+  if (!exists(rel)) continue;
+  let freeze;
+  try {
+    freeze = JSON.parse(read(rel));
+  } catch (error) {
+    resultAndExit(
+      'INCIDENT_FROZEN',
+      [{ id: `INCIDENT_FREEZE_VALID_JSON:${rel}`, ok: false, detail: error.message }],
+      42,
+      null,
+      null,
+      { incidentFreezePath: rel }
+    );
+  }
+  const status = String(freeze && freeze.status || '');
+  const blockedGateIds = Array.isArray(freeze && freeze.blockedGateIds) ? freeze.blockedGateIds : [];
+  const blocksRequestedGate = status.startsWith('STOP_THE_LINE') && blockedGateIds.includes(requestedGateId);
+  if (blocksRequestedGate) {
+    resultAndExit(
+      'INCIDENT_FROZEN',
+      [{
+        id: 'ACTIVE_INCIDENT_FREEZE',
+        ok: false,
+        detail: `${freeze.incidentId || 'incident'}:${status}:${requestedGateId}`
+      }],
+      42,
+      null,
+      null,
+      {
+        incidentFreezePath: rel,
+        incidentId: freeze.incidentId || ''
+      }
+    );
+  }
 }
 
 const bootstrapChecks = [];
