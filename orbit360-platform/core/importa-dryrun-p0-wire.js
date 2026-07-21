@@ -1,12 +1,15 @@
 /* ============================================================
    Orbit 360 · P0 wire dry-run antes de escritura
-   Fecha: 2026-07-09
+   Fecha inicial: 2026-07-09
+   Contrato controlado: 2026-07-21
 
-   Captura escrituras originadas por el drawer de importacion y las
-   convierte en operaciones de dry-run sanitizado. No escribe hasta que
-   exista dry-run aprobado + confirmacion de escritura controlada.
+   Captura escrituras originadas por importaciones que todavía no
+   tienen dry-run y confirmación. Las escrituras ya aprobadas por un
+   owner especializado deben cumplir el contrato canónico y pasan una
+   sola vez al store, sin generar un segundo dry-run.
    ============================================================ */
 (function () {
+  'use strict';
   window.Orbit = window.Orbit || {};
   if (Orbit.__importaDryRunP0Wired) return;
   Orbit.__importaDryRunP0Wired = true;
@@ -47,12 +50,47 @@
     return !!(d && d.classList && d.classList.contains('open'));
   }
 
-  function controlledWrite(data) {
-    return !!(data && data.createdByImport === true && data.importBatchId && data.validationStatus === 'validado');
+  function genericControlledWrite(data) {
+    return !!(
+      data &&
+      data.createdByImport === true &&
+      data.importBatchId &&
+      data.validationStatus === 'validado'
+    );
+  }
+
+  function specializedContract() {
+    return Orbit.importerControlledWriteContractV20260721 || null;
+  }
+
+  function resolveControlled(collection, data) {
+    if (genericControlledWrite(data)) {
+      return { controlled: true, data, owner: 'importa-write-p0', kind: 'generic_controlled_write' };
+    }
+    const contract = specializedContract();
+    if (!contract || typeof contract.classify !== 'function' || typeof contract.canonicalize !== 'function') {
+      return { controlled: false, data, owner: '', kind: '' };
+    }
+    const classification = contract.classify(collection, data || {});
+    if (!classification || classification.controlled !== true) {
+      return { controlled: false, data, owner: '', kind: '' };
+    }
+    const canonical = contract.canonicalize(collection, data || {});
+    if (!canonical) return { controlled: false, data, owner: '', kind: '' };
+    return {
+      controlled: true,
+      data: canonical,
+      owner: contract.owner || 'specialized_importer',
+      kind: classification.kind || 'specialized_controlled_write'
+    };
+  }
+
+  function controlledWrite(collection, data) {
+    return resolveControlled(collection, data).controlled;
   }
 
   function importCandidate(coll, data) {
-    if (!data || controlledWrite(data)) return false;
+    if (!data || controlledWrite(coll, data)) return false;
     if (coll === 'auditoriaImportaciones') return false;
     const id = String(data.id || '');
     return !!(
@@ -131,23 +169,31 @@
     const originalUpdate = Orbit.store.update ? Orbit.store.update.bind(Orbit.store) : null;
 
     Orbit.store.insert = function (coll, rec) {
+      const controlled = resolveControlled(coll, rec);
+      if (controlled.controlled) return originalInsert(coll, controlled.data);
       if (importCandidate(coll, rec)) return capture('insert', coll, rec, rec && rec.id);
       return originalInsert(coll, rec);
     };
 
     if (originalUpdate) {
       Orbit.store.update = function (coll, id, patch) {
+        const controlled = resolveControlled(coll, patch);
+        if (controlled.controlled) return originalUpdate(coll, id, controlled.data);
         if (importCandidate(coll, patch)) return capture('update', coll, patch, id);
         return originalUpdate(coll, id, patch);
       };
     }
 
     Orbit.store.__p0DryRunWire = true;
+    Orbit.store.__p0DryRunWireContractVersion = '20260721.1';
     return true;
   }
 
   Orbit.importaDryRunP0Wire = {
     inferSource,
+    controlledWrite,
+    resolveControlled,
+    importCandidate,
     batchFor,
     rebuildReport,
     pending: function () { return Orbit.__p0DryRunCaptured || {}; },
