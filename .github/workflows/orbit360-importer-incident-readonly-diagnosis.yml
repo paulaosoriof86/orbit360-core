@@ -1,197 +1,20 @@
-name: Orbit 360 Incident Importador Aseguradoras Read-Only
+name: FROZEN · Orbit 360 Incident Importador Aseguradoras
 
-# incidentRevision: 20260721-8
+# Hard freeze after repeated methodology loop on 2026-07-21.
+# No push/pull_request trigger. No runtime, secrets, Firestore, vault or recovery.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - '.github/workflows/orbit360-importer-incident-readonly-diagnosis.yml'
-      - 'tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs'
-      - 'tools/orbit360-diagnosticar-deriva-identidad-cuentas-readonly-v20260721.mjs'
-      - 'tools/orbit360-dryrun-recuperar-referencias-bancarias-hierarchical-v20260721.mjs'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/orbit360-importer-incident-readonly-diagnosis.yml'
-      - 'tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs'
-      - 'tools/orbit360-diagnosticar-deriva-identidad-cuentas-readonly-v20260721.mjs'
-      - 'tools/orbit360-dryrun-recuperar-referencias-bancarias-hierarchical-v20260721.mjs'
 
 permissions:
   contents: read
-  statuses: write
-
-concurrency:
-  group: orbit360-importer-incident-readonly-diagnosis
-  cancel-in-progress: true
-
-env:
-  ORBIT360_GATE_ID: block1-real-insurer-directories-lab-v20260720
-  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  FIREBASE_PROJECT_ID: ays-orbit-360-lab
-  ORBIT360_EXPECTED_BANK_ACCOUNTS: 91
 
 jobs:
-  readonly-recovery-dry-run:
-    name: STOP THE LINE · recuperación bancaria read-only
+  frozen-methodology-review:
+    if: ${{ false }}
+    name: FROZEN · revisión metodológica requerida
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
     steps:
-      - name: Checkout SHA exacto
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 1
-
-      - name: Publicar estado pending
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${{ github.event.pull_request.head.sha || github.sha }}" \
-            -f state='pending' \
-            -f context='orbit360/importer-recovery-dryrun-v20260721' \
-            -f description='Dry-run read-only de 68 referencias en ejecución' \
-            -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
-
-      - name: Preparar Node 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Preflight vinculante antes de credenciales
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
-          ORBIT360_BRANCH="$ORBIT360_BRANCH" node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID" > /tmp/orbit360-preflight-readonly.json
-          test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = GO_GATE_CONTRACT
-
-      - name: Resolver identidad LAB solo lectura
-        shell: bash
-        run: |
-          set -euo pipefail
-          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
-          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
-          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
-          test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab-readonly.json"
-          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
-          chmod 600 "$KEY_FILE"
-          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$FIREBASE_PROJECT_ID"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-
-      - name: Instalar dependencias read-only
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-save firebase-admin@13 @google-cloud/secret-manager@6.2.0
-
-      - name: Inventariar referencias y bóveda sin escritura
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs
-
-      - name: Diagnosticar deriva de identidad de cuentas
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-diagnosticar-deriva-identidad-cuentas-readonly-v20260721.mjs
-
-      - name: Construir backup y dry-run jerárquico sin escritura
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-dryrun-recuperar-referencias-bancarias-hierarchical-v20260721.mjs
-
-      - name: Validar evidencia metodológica completa
-        shell: bash
-        run: |
-          set -euo pipefail
-          DIAG='orbit360-platform/runtime-incident-importer-20260721/insurer-protected-reference-diff-sanitizado.json'
-          IDENTITY='orbit360-platform/runtime-incident-importer-20260721/bank-account-identity-drift-sanitizado.json'
-          DRYRUN='orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-dry-run-sanitizado.json'
-          BACKUP='orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-backup-manifest-sanitizado.json'
-          test -f "$DIAG"
-          test -f "$IDENTITY"
-          test -f "$DRYRUN"
-          test -f "$BACKUP"
-          test "$(jq -r '.diagnosisComplete' "$DIAG")" = true
-          test "$(jq -r '.writesExecuted' "$DIAG")" = false
-          test "$(jq -r '.identityDiagnosisReady' "$IDENTITY")" = true
-          test "$(jq -r '.summary.missingVaultRows' "$IDENTITY")" = 68
-          test "$(jq -r '.summary.directIdMatches' "$IDENTITY")" = 0
-          test "$(jq -r '.summary.uniqueFingerprintMatches' "$IDENTITY")" = 34
-          test "$(jq -r '.summary.uniqueLast4Matches' "$IDENTITY")" = 34
-          test "$(jq -r '.summary.ambiguous' "$IDENTITY")" = 0
-          test "$(jq -r '.summary.unmatched' "$IDENTITY")" = 0
-          test "$(jq -r '.summary.pendingBackendWithoutVault' "$IDENTITY")" = 2
-          test "$(jq -r '.recoveryReady' "$DRYRUN")" = true
-          test "$(jq -r '.mode' "$DRYRUN")" = read_only_hierarchical_recovery_dry_run
-          test "$(jq -r '.proposal.proposedChanges' "$DRYRUN")" = 68
-          test "$(jq -r '.proposal.affectedGtDocuments' "$DRYRUN")" = 13
-          test "$(jq -r '.proposal.projectedValidRefs' "$DRYRUN")" = 91
-          test "$(jq -r '.proposal.projectedPendingRefs' "$DRYRUN")" = 2
-          test "$(jq -r '.proposal.creates' "$DRYRUN")" = 0
-          test "$(jq -r '.proposal.deletes' "$DRYRUN")" = 0
-          test "$(jq -r '.proposal.reorderDetected' "$DRYRUN")" = 0
-          test "$(jq -r '.proposal.nonReferenceFieldChanges' "$DRYRUN")" = 0
-          test "$(jq -r '.proposal.colombiaChanges' "$DRYRUN")" = 0
-          test "$(jq -r '.matching.directIdMatches' "$DRYRUN")" = 0
-          test "$(jq -r '.matching.uniqueFingerprintMatches' "$DRYRUN")" = 34
-          test "$(jq -r '.matching.uniqueLast4Matches' "$DRYRUN")" = 34
-          test "$(jq -r '.matching.ambiguous' "$DRYRUN")" = 0
-          test "$(jq -r '.matching.unmatched' "$DRYRUN")" = 0
-          test "$(jq -r '.writesExecuted' "$DRYRUN")" = false
-          test "$(jq -r '.containsSecrets' "$DRYRUN")" = false
-          test "$(jq -r '.containsPII' "$DRYRUN")" = false
-          test "$(jq -r '.affectedDocuments' "$BACKUP")" = 13
-          test "$(jq -r '.proposedChanges' "$BACKUP")" = 68
-          test "$(jq -r '.rollbackExact' "$BACKUP")" = true
-          test "$(jq -r '.writesExecuted' "$BACKUP")" = false
-          test "$(jq -r '.containsSecrets' "$BACKUP")" = false
-          test "$(jq -r '.containsPII' "$BACKUP")" = false
-          jq '{schemaVersion,generatedAt,mode,baseline,matching,proposal,checks,recoveryReady}' "$DRYRUN"
-
-      - name: Publicar evidencia sanitizada
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-importer-recovery-dryrun-${{ github.run_id }}
-          path: |
-            orbit360-platform/runtime-incident-importer-20260721/insurer-protected-reference-diff-sanitizado.json
-            orbit360-platform/runtime-incident-importer-20260721/bank-account-identity-drift-sanitizado.json
-            orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-dry-run-sanitizado.json
-            orbit360-platform/runtime-incident-importer-20260721/bank-reference-recovery-backup-manifest-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Publicar estado final
-        if: always()
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          state='success'
-          description='Dry-run válido: 68 referencias, 13 GT, Colombia intacta, cero escritura'
-          if [ "${{ job.status }}" != success ]; then
-            state='failure'
-            description='Dry-run de recuperación requiere revisión'
-          fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${{ github.event.pull_request.head.sha || github.sha }}" \
-            -f state="$state" \
-            -f context='orbit360/importer-recovery-dryrun-v20260721' \
-            -f description="$description" \
-            -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
+      - run: |
+          echo "STOP_THE_LINE_METHODOLOGY_REVIEW"
+          echo "See tools/orbit360-incident-freeze-v20260721.json"
+          exit 1
