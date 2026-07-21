@@ -21,6 +21,7 @@ Orbit.ACADEMIA_V1223_ASEGURADORAS = (function () {
         section('🔎','Dry-run y diff antes de confirmar','Orbit muestra por hoja qué aseguradora se actualizará, creará o quedará retenida, junto con conteos de contactos, portales y recursos bancarios. Ningún cambio se aplica antes del motivo y la confirmación reforzada.'),
         section('✅','Una confirmación, una escritura','Después de confirmar, el lote conserva su identificador, fuente y trazabilidad para que la escritura ocurra una sola vez. La plataforma no debe generar otra revisión previa sobre el mismo registro ni declarar éxito si el conteo escrito no coincide.'),
         section('🧩','Identidad exacta y cuarentena','Solo una identidad canónica exacta puede proponerse como actualización sin revisión adicional. Versiones, abreviaturas dudosas, diferencias de una letra, aliados y hojas contaminadas quedan retenidos; nunca se fusionan automáticamente.'),
+        section('🧾','Trazabilidad auditable, identidad estable','Archivo, hoja y fila explican de dónde vino un dato, pero no sustituyen el identificador estable del recurso. Si un lector omite filas vacías o cambia la numeración visible, la traza se reconcilia con la fuente y se conserva para auditoría; nunca se usa sola para reasignar una cuenta ni se modifica durante una recuperación de referencias.'),
         section('✍️','Escritura controlada y lectura posterior','Un lote no se declara completo porque el botón terminó. Debe escribir el conteo aprobado, conservar trazabilidad de archivo y hoja, y leer nuevamente los registros confirmados desde la organización.'),
         section('🔐','Accesos protegidos después del directorio','Los usuarios y contraseñas se envían al servicio protegido únicamente después de resolver la aseguradora y el portal reales. La ficha conserva una referencia; el valor no se guarda junto con el directorio.'),
         section('🏦','Cuentas bancarias con estado honesto','Los números bancarios completos se envían al proveedor protegido y la ficha conserva únicamente una referencia y una terminación enmascarada. Una cuenta solo se declara disponible después de confirmar escritura y lectura protegida.'),
@@ -46,6 +47,7 @@ Orbit.ACADEMIA_V1223_ASEGURADORAS = (function () {
         { p:'¿Qué hace un gate después de cerrar una migración?', ops:['Vuelve a migrar por seguridad','Inventaría y verifica sin escribir','Corrige automáticamente cualquier diferencia'], ok:1 },
         { p:'¿Cuándo puede declararse completa una importación?', ops:['Cuando termina el parser','Después de escritura, lectura posterior y confirmaciones requeridas','Al seleccionar el archivo'], ok:1 },
         { p:'¿Qué ocurre con una identidad dudosa o una hoja contaminada?', ops:['Se fusiona por similitud','Se retiene o pone en cuarentena','Se crea una aseguradora adicional'], ok:1 },
+        { p:'¿Para qué sirven archivo, hoja y fila?', ops:['Para reemplazar el identificador estable','Para auditar el origen sin reasignar por sí solos el recurso','Para guardar el número bancario'], ok:1 },
         { p:'¿Dónde se guardan usuarios y contraseñas?', ops:['Junto con contactos','En el servicio protegido y la ficha conserva una referencia','En el archivo de auditoría'], ok:1 },
         { p:'¿Cuándo puede declararse disponible un número bancario completo?', ops:['Cuando existe en el Excel','Después de escritura y lectura confirmadas en el proveedor protegido','Al crear la ficha'], ok:1 },
         { p:'¿Qué debe suceder si falla la lectura posterior?', ops:['Cerrar con advertencia','Aplicar rollback y no declarar éxito','Continuar con la siguiente fuente'], ok:1 },
@@ -66,7 +68,7 @@ Orbit.ACADEMIA_V1223_ASEGURADORAS = (function () {
     next.desc = 'Importar y utilizar el directorio con fuentes separadas, una sola escritura confirmada, verificación post-migración read-only, recursos protegidos y estados honestos.';
     next.metaLeccion = Object.assign({}, next.metaLeccion || {}, {
       impacto:'Conecta Aseguradoras con Cotizador, Comparativo, Clientes, Pólizas, Cobros, Ops, Siniestros y Academia sin habilitar capacidades no validadas.',
-      seguridad:'Una lectura por archivo; identidades dudosas retenidas; valores protegidos fuera del directorio; una sola escritura por confirmación; gates post-migración read-only; lectura posterior y rollback obligatorios.'
+      seguridad:'Una lectura por archivo; identidades dudosas retenidas; trazabilidad auditable sin sustituir identidad estable; valores protegidos fuera del directorio; una sola escritura por confirmación; gates post-migración read-only; lectura posterior y rollback obligatorios.'
     });
     next._cv = 1222;
     next._cv = 1223;
