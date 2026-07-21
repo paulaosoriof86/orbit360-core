@@ -8,7 +8,9 @@ const PASSWORD = String(process.env.ORBIT360_LAB_LOGIN_PASSWORD || '');
 const EXPECTED_COMMIT = String(process.env.ORBIT360_EXPECTED_COMMIT || '');
 const OUT_DIR = 'orbit360-platform/runtime-gate-real-insurer-directories-v20260720';
 const CONTROLLED_WRITE_SMOKE = 'orbit360-platform/tools/orbit360-smoke-directorios-aseguradoras-v1202.mjs';
+const PARTIAL_WRITE_SMOKE = 'orbit360-platform/tools/orbit360-smoke-aseguradoras-partial-write-v20260721.mjs';
 const CONTROLLED_WRITE_CONTRACT_VERSION = '20260721.2';
+const CANONICAL_RUNTIME_VERSION = '20260721.1';
 
 if (!/^https:\/\//.test(BASE_URL)) throw new Error('PREVIEW_URL_REQUIRED');
 if (PASSWORD.length < 12) throw new Error('LAB_LOGIN_REQUIRED');
@@ -17,6 +19,14 @@ mkdirSync(OUT_DIR, { recursive: true });
 
 function assert(condition, code, detail = '') {
   if (!condition) throw new Error(`${code}${detail ? `:${detail}` : ''}`);
+}
+
+function runSmoke(script) {
+  execFileSync(process.execPath, [script], {
+    cwd: process.cwd(),
+    stdio: 'inherit',
+    env: process.env
+  });
 }
 
 async function acceptLegal(page) {
@@ -56,21 +66,19 @@ const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
 const page = await context.newPage();
 const report = {
-  schemaVersion: 'orbit360-real-insurer-directory-readiness-v3',
+  schemaVersion: 'orbit360-real-insurer-directory-readiness-v4',
   generatedAt: new Date().toISOString(),
   containsPII: false,
   containsSecrets: false,
   expectedCommit: EXPECTED_COMMIT,
   controlledWriteContractVersion: CONTROLLED_WRITE_CONTRACT_VERSION,
+  canonicalRuntimeVersion: CANONICAL_RUNTIME_VERSION,
   checks: {}
 };
 
 try {
-  execFileSync(process.execPath, [CONTROLLED_WRITE_SMOKE], {
-    cwd: process.cwd(),
-    stdio: 'inherit',
-    env: process.env
-  });
+  runSmoke(CONTROLLED_WRITE_SMOKE);
+  runSmoke(PARTIAL_WRITE_SMOKE);
 
   await page.goto(`${BASE_URL}/ays-lab-preview.html?readiness=${Date.now()}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForURL(/index\.html/, { timeout: 30000 });
@@ -85,8 +93,21 @@ try {
   await page.waitForTimeout(900);
 
   await page.waitForFunction(() => window.Orbit && Orbit.store && Orbit.store.all && Orbit.store.all('aseguradoras').length === 26, null, { timeout: 45000 });
-  report.roleOptions = await selectDirection(page);
+  await page.waitForFunction(() => {
+    const state = window.OrbitAseguradorasCanonicalRuntimeV20260721;
+    return state && (state.ready === true || state.status === 'blocked');
+  }, null, { timeout: 45000 });
 
+  const canonicalBootstrap = await page.evaluate(() => ({
+    status: String(window.OrbitAseguradorasCanonicalRuntimeV20260721 && OrbitAseguradorasCanonicalRuntimeV20260721.status || ''),
+    ready: window.OrbitAseguradorasCanonicalRuntimeV20260721 && OrbitAseguradorasCanonicalRuntimeV20260721.ready === true,
+    version: String(window.OrbitAseguradorasCanonicalRuntimeV20260721 && OrbitAseguradorasCanonicalRuntimeV20260721.version || ''),
+    errorCode: String(window.OrbitAseguradorasCanonicalRuntimeV20260721 && OrbitAseguradorasCanonicalRuntimeV20260721.errorCode || '')
+  }));
+  assert(canonicalBootstrap.ready, 'CANONICAL_RUNTIME_BLOCKED', canonicalBootstrap.errorCode || canonicalBootstrap.status);
+  assert(canonicalBootstrap.version === CANONICAL_RUNTIME_VERSION, 'CANONICAL_RUNTIME_VERSION_INVALID', canonicalBootstrap.version);
+
+  report.roleOptions = await selectDirection(page);
   await page.evaluate(() => { location.hash = '#/aseguradoras'; });
   const cards = page.locator('.asg-grid [data-asg]');
   await cards.first().waitFor({ state: 'visible', timeout: 20000 });
@@ -150,36 +171,61 @@ try {
         if (String(row && row.accountRef || '').trim()) inventory.referenceCounts.accountRef += 1;
       });
     });
+    const D = window.Orbit && Orbit.insurerDirectoryImport;
     const contract = window.Orbit && Orbit.importerControlledWriteContractV20260721;
+    const partial = window.Orbit && Orbit.store && Orbit.store.__aseguradorasPartialWriteV20260721;
+    const canonicalState = window.OrbitAseguradorasCanonicalRuntimeV20260721 || {};
     return {
-      owner: !!(window.Orbit && Orbit.insurerDirectoryImport),
-      parseFile: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.parseFile === 'function'),
-      applyApproved: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.applyApproved === 'function'),
-      applySecureOnly: !!(window.Orbit && Orbit.insurerDirectoryImport && typeof Orbit.insurerDirectoryImport.applySecureOnly === 'function'),
-      secureProvider: !!(window.Orbit && Orbit.secureImport && typeof Orbit.secureImport.importInsurerDirectory === 'function'),
+      baseOwner: !!D,
+      parseFile: !!(D && typeof D.parseFile === 'function'),
+      applyApproved: !!(D && typeof D.applyApproved === 'function'),
+      applySecureOnly: !!(D && typeof D.applySecureOnly === 'function'),
+      canonicalOpen: !!(D && D.open && D.open.__canonicalDirectoryExecution20260720 === true),
+      canonicalExecutionVersion: String(D && D.canonicalExecutionVersion || ''),
+      sourceGuard: !!(D && D.__op2SourceGuardV1220),
+      backendWriteGuard: !!(D && D.__backendWriteGuardV1220),
+      freshReadGuard: !!(D && D.__freshReadGuardV20260721),
+      writeP0: !!(window.Orbit && Orbit.importaWriteP0 && typeof Orbit.importaWriteP0.writeBatch === 'function'),
       controlledWriteContract: !!contract,
       controlledWriteContractVersion: String(contract && contract.version || ''),
       p0WireReady: !!(window.Orbit && Orbit.importaDryRunP0Wire),
       p0WireContractVersion: String(Orbit.store && Orbit.store.__p0DryRunWireContractVersion || ''),
+      partialWriteReady: !!partial,
+      partialWriteVersion: String(partial && partial.version || ''),
+      partialWritePatchOnly: partial && partial.remoteWritesPatchOnly === true,
+      secureProvider: !!(window.Orbit && Orbit.secureImport && typeof Orbit.secureImport.importInsurerDirectory === 'function'),
+      bankProvider: !!(window.Orbit && Orbit.secureImport && Orbit.secureImport.supportsBankAccounts === true),
+      canonicalBootstrapReady: canonicalState.ready === true,
+      canonicalBootstrapVersion: String(canonicalState.version || ''),
       sensitiveFieldInventory: inventory
     };
   });
-  assert(importerRuntime.owner && importerRuntime.parseFile && importerRuntime.applyApproved && importerRuntime.applySecureOnly, 'IMPORTER_OWNER_NOT_READY');
-  assert(importerRuntime.secureProvider, 'SECURE_PROVIDER_NOT_READY');
+
+  assert(importerRuntime.baseOwner && importerRuntime.parseFile && importerRuntime.applyApproved && importerRuntime.applySecureOnly, 'IMPORTER_BASE_NOT_READY');
+  assert(importerRuntime.canonicalOpen, 'CANONICAL_IMPORTER_OWNER_NOT_INSTALLED');
+  assert(importerRuntime.canonicalExecutionVersion === CANONICAL_RUNTIME_VERSION, 'CANONICAL_EXECUTION_VERSION_INVALID', importerRuntime.canonicalExecutionVersion);
+  assert(importerRuntime.sourceGuard && importerRuntime.backendWriteGuard && importerRuntime.freshReadGuard, 'CANONICAL_IMPORTER_GUARDS_INCOMPLETE');
+  assert(importerRuntime.writeP0, 'CONTROLLED_WRITE_OWNER_NOT_READY');
   assert(importerRuntime.controlledWriteContract, 'CONTROLLED_WRITE_CONTRACT_NOT_READY');
   assert(importerRuntime.controlledWriteContractVersion === CONTROLLED_WRITE_CONTRACT_VERSION, 'CONTROLLED_WRITE_CONTRACT_VERSION_INVALID', importerRuntime.controlledWriteContractVersion);
   assert(importerRuntime.p0WireReady, 'P0_WIRE_NOT_READY');
   assert(importerRuntime.p0WireContractVersion === CONTROLLED_WRITE_CONTRACT_VERSION, 'P0_WIRE_CONTRACT_VERSION_INVALID', importerRuntime.p0WireContractVersion);
+  assert(importerRuntime.partialWriteReady && importerRuntime.partialWritePatchOnly, 'PARTIAL_WRITE_CONTRACT_NOT_READY');
+  assert(importerRuntime.secureProvider && importerRuntime.bankProvider, 'SECURE_PROVIDERS_NOT_READY');
 
   const importButton = page.locator('#asg-imp, [data-import-asg]').first();
   await importButton.waitFor({ state: 'visible', timeout: 15000 });
   assert(await importButton.isEnabled(), 'IMPORT_BUTTON_DISABLED');
   await importButton.click();
 
-  const modal = page.locator('#ins-dir-import-v1202');
+  const modal = page.locator('#ins-dir-execution-20260720');
   await modal.waitFor({ state: 'visible', timeout: 15000 });
-  const country = modal.locator('#idir-country');
-  const file = modal.locator('#idir-file');
+  assert(await page.locator('#ins-dir-import-v1202').count() === 0, 'LEGACY_IMPORTER_MODAL_VISIBLE');
+  assert(await modal.locator('[data-secure-only]').count() === 0, 'LEGACY_SECURE_ONLY_ACTION_VISIBLE');
+  assert(await modal.locator('[data-approve]').count() === 0, 'LEGACY_APPROVE_ACTION_VISIBLE');
+
+  const country = modal.locator('#dir-country-20260720');
+  const file = modal.locator('#dir-file-20260720');
   await country.waitFor({ state: 'visible', timeout: 10000 });
   await file.waitFor({ state: 'visible', timeout: 10000 });
   const countryValues = await country.locator('option').evaluateAll((nodes) => nodes.map((node) => node.value).filter(Boolean));
@@ -196,20 +242,30 @@ try {
   const sensitiveInventory = importerRuntime.sensitiveFieldInventory;
   report.checks = {
     controlledWriteRegression: true,
+    partialWriteRegression: true,
     login: true,
     legalReady: true,
     directionRole: true,
     insurerCount26: insurerCount === 26,
-    canonicalImporterOwner: importerRuntime.owner,
-    parserReady: importerRuntime.parseFile,
-    controlledWriterReady: importerRuntime.applyApproved,
-    secureOnlyReady: importerRuntime.applySecureOnly,
-    secureProviderReady: importerRuntime.secureProvider,
+    canonicalRuntimeReady: canonicalBootstrap.ready,
+    canonicalRuntimeExact: canonicalBootstrap.version === CANONICAL_RUNTIME_VERSION,
+    canonicalImporterOwner: importerRuntime.canonicalOpen,
+    canonicalExecutionExact: importerRuntime.canonicalExecutionVersion === CANONICAL_RUNTIME_VERSION,
+    sourceGuardReady: importerRuntime.sourceGuard,
+    backendWriteGuardReady: importerRuntime.backendWriteGuard,
+    freshReadGuardReady: importerRuntime.freshReadGuard,
+    controlledWriterReady: importerRuntime.writeP0,
     controlledWriteContractReady: importerRuntime.controlledWriteContract,
     controlledWriteContractExact: importerRuntime.controlledWriteContractVersion === CONTROLLED_WRITE_CONTRACT_VERSION,
     p0WireReady: importerRuntime.p0WireReady,
     p0WireContractExact: importerRuntime.p0WireContractVersion === CONTROLLED_WRITE_CONTRACT_VERSION,
+    partialWriteReady: importerRuntime.partialWriteReady,
+    partialWritePatchOnly: importerRuntime.partialWritePatchOnly,
+    secureProviderReady: importerRuntime.secureProvider,
+    bankProviderReady: importerRuntime.bankProvider,
     noUnmaskedSensitiveValues: sensitiveInventory.suspiciousUnmasked === 0,
+    legacyModalAbsent: true,
+    singleCanonicalActionFlow: true,
     importButtonReady: true,
     countryGTCO: countryValues.includes('GT') && countryValues.includes('CO'),
     excelInputReady: accept.includes('.xlsx') && accept.includes('.xls'),
@@ -218,8 +274,12 @@ try {
   report.insurerCount = insurerCount;
   report.sensitiveFieldInventory = sensitiveInventory;
   report.importerRuntime = {
+    canonicalBootstrapStatus: canonicalBootstrap.status,
+    canonicalBootstrapVersion: canonicalBootstrap.version,
+    canonicalExecutionVersion: importerRuntime.canonicalExecutionVersion,
     controlledWriteContractVersion: importerRuntime.controlledWriteContractVersion,
-    p0WireContractVersion: importerRuntime.p0WireContractVersion
+    p0WireContractVersion: importerRuntime.p0WireContractVersion,
+    partialWriteVersion: importerRuntime.partialWriteVersion
   };
   report.ok = Object.values(report.checks).every(Boolean);
   if (!report.ok && sensitiveInventory.suspiciousUnmasked > 0) {
@@ -227,7 +287,7 @@ try {
   }
 } catch (error) {
   report.ok = false;
-  report.error = String(error && (error.stack || error.message) || error).replace(/\s+/g, ' ').trim().slice(0, 800);
+  report.error = String(error && (error.stack || error.message) || error).replace(/\s+/g, ' ').trim().slice(0, 1000);
 } finally {
   writeFileSync(`${OUT_DIR}/resultado-sanitizado.json`, `${JSON.stringify(report, null, 2)}\n`);
   await browser.close();
