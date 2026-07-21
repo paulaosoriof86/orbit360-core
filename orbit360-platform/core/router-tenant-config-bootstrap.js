@@ -11,6 +11,7 @@
   var index = window.OrbitTenantRuntimeConfigIndex || {};
   var entry = tenantId && index[tenantId] ? index[tenantId] : null;
   var source = String(entry && entry.insurerConfigSrc || '').trim();
+  var visualStabilitySrc = 'core/client-insurer-visual-stability-barrier-v20260721.js?v=20260721-1';
   var visualScriptSrc = 'core/client-insurer-visual-contract-v20260720.js?v=20260720-2';
   var visualStyleSrc = 'styles/client-insurer-visual-contract-v20260720.css?v=20260720-2';
   var sessionReadinessSrc = 'core/session-readiness-contract-v20260720.js?v=20260720-1';
@@ -24,6 +25,8 @@
     phase: 'shell-parse',
     tenantResolved: Boolean(tenantId),
     sourceResolved: Boolean(source),
+    visualStabilityRequested: true,
+    visualStabilityVersion: '20260721.1',
     visualContractRequested: true,
     visualContractVersion: '20260720.2',
     sessionReadinessRequested: true,
@@ -47,6 +50,7 @@
     return target;
   }
 
+  var visualStability = safeSameOrigin(visualStabilitySrc, '/core/client-insurer-visual-stability-barrier-v20260721.js');
   var visualScript = safeSameOrigin(visualScriptSrc, '/core/client-insurer-visual-contract-v20260720.js');
   var visualStyle = safeSameOrigin(visualStyleSrc, '/styles/client-insurer-visual-contract-v20260720.css');
   var sessionReadiness = safeSameOrigin(sessionReadinessSrc, '/core/session-readiness-contract-v20260720.js');
@@ -54,7 +58,7 @@
   var secureTargetBridge = safeSameOrigin(secureTargetBridgeSrc, '/core/insurer-secure-target-bridge-v20260720.js');
   var importerContract = safeSameOrigin(importerContractSrc, '/core/importer-execution-contract-v20260720.js');
   var importerAcademy = safeSameOrigin(importerAcademySrc, '/data/academia-v1225-importadores-e2e.js');
-  if (!visualScript || !visualStyle || !sessionReadiness || !credentialProvider || !secureTargetBridge || !importerContract || !importerAcademy) {
+  if (!visualStability || !visualScript || !visualStyle || !sessionReadiness || !credentialProvider || !secureTargetBridge || !importerContract || !importerAcademy) {
     window.OrbitTenantBootstrapState.status = 'runtime-source-blocked';
     return;
   }
@@ -75,6 +79,7 @@
 
   if (document.readyState === 'loading') {
     var styleHref = visualStyle.pathname + visualStyle.search;
+    var stabilityHref = visualStability.pathname + visualStability.search;
     var scriptHref = visualScript.pathname + visualScript.search;
     var sessionHref = sessionReadiness.pathname + sessionReadiness.search;
     var providerHref = credentialProvider.pathname + credentialProvider.search;
@@ -87,6 +92,7 @@
     document.write('<script src="' + importerAcademyHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-importers-e2e-academy="1"><\/script>');
     document.write('<script src="' + providerHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-insurer-credential-provider="1"><\/script>');
     document.write('<script src="' + bridgeHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-insurer-secure-target-bridge="1"><\/script>');
+    document.write('<script src="' + stabilityHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-insurer-visual-stability="1"><\/script>');
     document.write('<script src="' + scriptHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-orbit-m1-visual-contract="1"><\/script>');
     if (target) {
       var escaped = (target.pathname + target.search).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
@@ -134,16 +140,30 @@
     document.head.appendChild(script);
   }
 
+  function loadVisualStability() {
+    if (window.Orbit && window.Orbit.__clientInsurerVisualStabilityBarrierV20260721) {
+      loadVisualContract();
+      return;
+    }
+    var stabilityScript = document.createElement('script');
+    stabilityScript.src = visualStability.pathname + visualStability.search;
+    stabilityScript.async = false;
+    stabilityScript.setAttribute('data-orbit-insurer-visual-stability', '1');
+    stabilityScript.addEventListener('load', loadVisualContract, { once: true });
+    stabilityScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'visual-stability-error'; }, { once: true });
+    document.head.appendChild(stabilityScript);
+  }
+
   function loadSecureTargetBridge() {
     if (window.Orbit && window.Orbit.__insurerSecureTargetBridgeV20260720) {
-      loadVisualContract();
+      loadVisualStability();
       return;
     }
     var bridgeScript = document.createElement('script');
     bridgeScript.src = secureTargetBridge.pathname + secureTargetBridge.search;
     bridgeScript.async = false;
     bridgeScript.setAttribute('data-orbit-insurer-secure-target-bridge', '1');
-    bridgeScript.addEventListener('load', loadVisualContract, { once: true });
+    bridgeScript.addEventListener('load', loadVisualStability, { once: true });
     bridgeScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'secure-target-bridge-error'; }, { once: true });
     document.head.appendChild(bridgeScript);
   }
@@ -203,4 +223,4 @@
   sessionScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'session-readiness-error'; }, { once: true });
   document.head.appendChild(sessionScript);
 })();
-/* Preflight v9: sesión legal, membresía, contrato E2E y Academia cargados antes del Router. */
+/* Preflight v10: barrera visual, sesión legal, membresía, contrato E2E y Academia cargados antes del Router. */
