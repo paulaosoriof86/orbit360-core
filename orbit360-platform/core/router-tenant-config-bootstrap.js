@@ -11,7 +11,7 @@
   var index = window.OrbitTenantRuntimeConfigIndex || {};
   var entry = tenantId && index[tenantId] ? index[tenantId] : null;
   var source = String(entry && entry.insurerConfigSrc || '').trim();
-  var visualStabilitySrc = 'core/client-insurer-visual-stability-barrier-v20260721.js?v=20260721-1';
+  var visualStabilitySrc = 'core/client-insurer-visual-stability-barrier-v20260721.js?v=20260721-2';
   var visualScriptSrc = 'core/client-insurer-visual-contract-v20260720.js?v=20260720-2';
   var visualStyleSrc = 'styles/client-insurer-visual-contract-v20260720.css?v=20260720-2';
   var sessionReadinessSrc = 'core/session-readiness-contract-v20260720.js?v=20260720-1';
@@ -26,7 +26,7 @@
     tenantResolved: Boolean(tenantId),
     sourceResolved: Boolean(source),
     visualStabilityRequested: true,
-    visualStabilityVersion: '20260721.1',
+    visualStabilityVersion: '20260721.2',
     visualContractRequested: true,
     visualContractVersion: '20260720.2',
     sessionReadinessRequested: true,
@@ -141,7 +141,7 @@
   }
 
   function loadVisualStability() {
-    if (window.Orbit && window.Orbit.__clientInsurerVisualStabilityBarrierV20260721) {
+    if (window.Orbit && window.Orbit.__clientInsurerVisualStabilityBarrierV20260721 && window.Orbit.__clientInsurerVisualStabilityBarrierV20260721.version === '20260721.2') {
       loadVisualContract();
       return;
     }
@@ -223,4 +223,4 @@
   sessionScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'session-readiness-error'; }, { once: true });
   document.head.appendChild(sessionScript);
 })();
-/* Preflight v10: barrera visual, sesión legal, membresía, contrato E2E y Academia cargados antes del Router. */
+/* Preflight v11: barrera visual event-driven, sesión legal, membresía, contrato E2E y Academia cargados antes del Router. */
