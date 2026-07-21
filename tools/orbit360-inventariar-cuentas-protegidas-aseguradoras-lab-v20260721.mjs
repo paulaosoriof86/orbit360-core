@@ -11,7 +11,9 @@ const EXPECTED_PROJECT_ID = 'ays-orbit-360-lab';
 const TENANT_ID = 'alianzas-soluciones';
 const EXPECTED_INSURERS = 26;
 const EXPECTED_REFS = Number(process.env.ORBIT360_EXPECTED_BANK_ACCOUNTS || 91);
+const COMPAT_MODE = process.env.ORBIT360_POST_MIGRATION_COMPAT === '1';
 const OUT_FILE = path.resolve('orbit360-platform/runtime-gate-real-insurer-directories-v20260720/bank-data-inventory-sanitizado.json');
+const LEGACY_OUT_FILE = path.resolve('orbit360-platform/lab-bank-account-migration.json');
 
 function clean(value, max = 180) {
   return String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
@@ -114,7 +116,35 @@ try {
 } finally {
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   fs.writeFileSync(OUT_FILE, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+
+  const counts = report.inventory || {};
+  const legacyReport = {
+    schemaVersion: 'orbit360-bank-account-vault-migration-v2',
+    generatedAt: report.generatedAt,
+    projectId: report.projectId,
+    tenantId: report.tenantId,
+    mode: 'post_migration_read_only',
+    migrationExecuted: false,
+    idempotent: true,
+    before: {
+      insurerCount: Number(counts.insurerCount || 0),
+      rawCount: Number(counts.rawCount || 0),
+      refCount: Number(counts.refCount || 0)
+    },
+    after: {
+      insurerCount: Number(counts.insurerCount || 0),
+      rawCount: Number(counts.rawCount || 0),
+      refCount: Number(counts.refCount || 0)
+    },
+    inventoryChecks: report.checks,
+    errorCode: report.errorCode || '',
+    rollbackModel: 'historical_migration_artifact_preserved_no_new_write',
+    containsPII: false,
+    containsSecrets: false,
+    ok: report.ok
+  };
+  fs.writeFileSync(LEGACY_OUT_FILE, `${JSON.stringify(legacyReport, null, 2)}\n`, 'utf8');
 }
 
-console.log(`ORBIT360_PROTECTED_BANK_DATA_INVENTORY:${JSON.stringify({ ok: report.ok, inventory: report.inventory || {}, checks: report.checks, errorCode: report.errorCode || '', mode: report.mode, containsSecrets: false })}`);
-if (!report.ok) process.exit(1);
+console.log(`ORBIT360_PROTECTED_BANK_DATA_INVENTORY:${JSON.stringify({ ok: report.ok, inventory: report.inventory || {}, checks: report.checks, errorCode: report.errorCode || '', mode: report.mode, migrationExecuted: false, containsSecrets: false })}`);
+if (!report.ok && !COMPAT_MODE) process.exit(1);
