@@ -2,13 +2,13 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-21",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "FUNCTIONAL_DEFECT",
-  "diagnosticRevision": "canonical-visual-owner-same-microtask-v1",
-  "contractRevision": "1.0.30-canonical-visual-owner-same-microtask-v1",
+  "classification": "VALIDATOR_STALE",
+  "diagnosticRevision": "canonical-owner-same-microtask-dynamic-preflight-evidence-v1",
+  "contractRevision": "1.0.31-canonical-owner-same-microtask-dynamic-preflight-evidence-v1",
   "gatePatch": {
-    "contractVersion": "1.0.30",
-    "diagnosticRevision": "canonical-visual-owner-same-microtask-v1",
-    "status": "FUNCTIONAL_FIX_PENDING_STATIC_PREFLIGHT"
+    "contractVersion": "1.0.31",
+    "diagnosticRevision": "canonical-owner-same-microtask-dynamic-preflight-evidence-v1",
+    "status": "VALIDATOR_FIX_PENDING_STATIC_PREFLIGHT"
   },
   "canonicalOwners": [
     {
@@ -88,7 +88,8 @@
     "orbit360-platform/modules/calidad.js",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
     "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
-    "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-BARRERA-VISUAL-EVENTOS-DOM-20260721.md"
+    "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-BARRERA-VISUAL-EVENTOS-DOM-20260721.md",
+    "orbit360-platform/docs/BLOQUE1-VALIDATOR-STALE-CONTRATO-PREFLIGHT-DINAMICO-20260721.md"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
@@ -240,6 +241,9 @@
         "targeted_lab_deploy_then_unique_final_block1_gate_readonly",
         "staticPreflightEvidence.runId",
         "staticPreflightAuthorization.runId",
+        "staticPreflightEvidence.contractVersion",
+        "staticPreflightAuthorization.contractVersion",
+        "finalGateAuthorization.contractVersion",
         "Publicar frontend corregido en canal LAB",
         "hosting:channel:deploy \"$ORBIT360_HOSTING_CHANNEL\"",
         "targeted_lab_frontend_only",
