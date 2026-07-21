@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-bank-reference-recovery-map-v2-sanitized",
+  "schemaVersion": "orbit360-bank-reference-recovery-map-v3-sanitized",
   "generatedAt": "2026-07-21",
   "tenantId": "alianzas-soluciones",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
@@ -7,13 +7,31 @@
   "evidenceClassification": "CONFIRMED",
   "summary": {
     "recoveryMappings": 68,
-    "duplicateIncomingRows": 2,
+    "newPendingRows": 2,
+    "duplicateIncomingRows": 0,
     "unmappedRows": 0,
     "ambiguousRows": 0,
+    "expectedFinalBankRows": 93,
     "expectedFinalValidReferences": 91,
-    "expectedFinalPendingRows": 0,
+    "expectedFinalPendingRows": 2,
     "expectedFinalDuplicateRows": 0,
     "traceCompatibilityMappings": 70
+  },
+  "identityContract": {
+    "classification": "DATA_CONTRACT_FAILURE",
+    "historicalReferenceRestorations": 68,
+    "newPendingRowsPreserved": 2,
+    "duplicateRemovals": 0,
+    "stableIdentityKeys": [
+      "insurerId",
+      "currentAccountId",
+      "legacyAccountId",
+      "currentIdHash",
+      "legacyIdHash",
+      "expectedAccountRefHash"
+    ],
+    "newPendingRowsMeaning": "new_relative_to_healthy_checkpoint_not_historical_duplicates",
+    "newPendingRowsSecureOnboarding": "separate_later_step_with_protected_provider_readback_and_rollback"
   },
   "traceContract": {
     "classification": "DATA_CONTRACT_FAILURE",
@@ -51,7 +69,10 @@
     "containsRawBankValues": false,
     "containsCredentialValues": false,
     "requiresReimport": false,
-    "colombiaTouched": false
+    "colombiaTouched": false,
+    "createsRows": false,
+    "deletesRows": false,
+    "reordersRows": false
   },
   "columns": [
     "insurerId",
@@ -133,20 +154,21 @@
     ["gt-seguros-universales","account_universales_08","bank_gt-seguros-universales_8","UNIVERSALES",45,"248c02013097","8bb5c4630f09","9bc5334816fa"],
     ["gt-seguros-universales","account_universales_09","bank_gt-seguros-universales_9","UNIVERSALES",46,"84fb35cde181","69e20aa1eb14","f70613dc301c"]
   ],
-  "duplicateColumns": [
+  "newPendingColumns": [
     "insurerId",
-    "incomingAccountId",
-    "preservedLegacyAccountId",
+    "currentAccountId",
     "sourceSheet",
     "storedTraceRow",
-    "incomingIdHash",
-    "legacyIdHash",
+    "currentIdHash",
+    "evidenceStatus",
     "resolution"
   ],
-  "duplicateIncomingRows": [
-    ["gt-gt-seguros","account_gtseguros_01","bank_gt-gt-seguros_1","G&T SEGUROS",31,"6272bc1bfed1","45def55e4767","remove_incoming_duplicate_preserve_existing_valid_reference"],
-    ["gt-gt-seguros","account_gtseguros_02","bank_gt-gt-seguros_2","G&T SEGUROS",32,"335df1dc18cb","9f837ebd1236","remove_incoming_duplicate_preserve_existing_valid_reference"]
+  "newPendingRows": [
+    ["gt-gt-seguros","account_gtseguros_01","G&T SEGUROS",31,"6272bc1bfed1","CONFIRMED_NEW_RELATIVE_TO_HEALTHY_CHECKPOINT","preserve_backend_required_for_separate_secure_onboarding"],
+    ["gt-gt-seguros","account_gtseguros_02","G&T SEGUROS",32,"335df1dc18cb","CONFIRMED_NEW_RELATIVE_TO_HEALTHY_CHECKPOINT","preserve_backend_required_for_separate_secure_onboarding"]
   ],
+  "duplicateColumns": [],
+  "duplicateIncomingRows": [],
   "validation": {
     "allMissingReferenceHashesCovered": true,
     "missingReferenceHashCount": 68,
@@ -154,6 +176,11 @@
     "hashSetDifference": 0,
     "allPendingRowsAccountedFor": true,
     "pendingRowsAccountedFor": 70,
+    "recoveryRowsAccountedFor": 68,
+    "newPendingRowsAccountedFor": 2,
+    "duplicateRowsAccountedFor": 0,
+    "newPendingRowsDistinctFromHistoricalReferences": true,
+    "newPendingRowsPreserved": true,
     "physicalToStoredTraceRowsExact": true,
     "traceRowsReconciled": 70,
     "traceAmbiguousRows": 0,
