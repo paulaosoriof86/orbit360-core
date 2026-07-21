@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v7-static-68-plus-2-new-preflight",
+  "schemaVersion": "orbit360-incident-freeze-v8-bounded-68-plus-2-new-dryrun",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "DATA_CONTRACT_CORRECTION_PREFLIGHT_ONLY_AUTHORIZED",
+  "status": "BOUNDED_EXACT_RECOVERY_DRYRUN_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -53,8 +53,24 @@
     },
     "newRowsSecureOnboarding": "SEPARATE_LATER_STEP_WITH_PROTECTED_PROVIDER_READBACK_AND_ROLLBACK"
   },
+  "staticPreflight": {
+    "status": "GO_GATE_CONTRACT",
+    "runId": 29865714028,
+    "head": "8143726f8da6cb7bf59412162a27ff043bdc6665",
+    "contractVersion": "1.1.3",
+    "diagnosticRevision": "static-68-restores-2-new-pending-preflight-v3",
+    "totalChecks": 323,
+    "passed": 323,
+    "failed": 0,
+    "secretsRead": false,
+    "firestoreRead": false,
+    "vaultRead": false,
+    "runtimeExecuted": false,
+    "writesExecuted": false,
+    "artifactId": 8509089997,
+    "artifactDigest": "sha256:0dede663d2cbb0cf8ae2d6e897220c6a8cc2cab41effc364f2926b49af0f9447"
+  },
   "staticAlignment": {
-    "status": "READY_FOR_CENTRAL_PREFLIGHT_ONLY",
     "map": {
       "path": "tools/orbit360-bank-reference-recovery-map-v20260721.json",
       "blob": "c9fd67544cd62b0eb40320520785ec730d81329f",
@@ -71,9 +87,7 @@
     },
     "workflow": {
       "path": ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml",
-      "blob": "b7d0a7c14fe8d36b666c83e89ccdcc49c1b1d7f0",
-      "preflightSecretsAllowed": false,
-      "preflightRuntimeAllowed": false
+      "blob": "b7d0a7c14fe8d36b666c83e89ccdcc49c1b1d7f0"
     },
     "overlay": {
       "path": "tools/orbit360-gate-contract-overlay-importers-v20260720.json",
@@ -82,43 +96,69 @@
     },
     "academyReview": {
       "status": "REVIEWED_NO_CHANGE_REQUIRED",
-      "reason": "Academia contains generic role and safety guidance and does not own recovery counts or execution.",
+      "reason": "Academia does not own recovery counts, identity mapping or execution.",
       "blob": "594750d1bda62077ae88cf24697b739e4eec3939"
     }
   },
   "runtimeAuthorization": {
     "authorizationId": "exact-bank-reference-recovery-dryrun-68plus2new-v1",
-    "active": false,
+    "authorizationRevision": 1,
+    "active": true,
     "consumed": false,
     "action": "exact_recovery_readonly_dry_run",
-    "allowedExecutions": 0,
+    "script": "tools/orbit360-dryrun-recuperar-referencias-bancarias-exacto-v20260721.mjs",
+    "manifest": "tools/orbit360-bank-reference-recovery-map-v20260721.json",
+    "workflow": ".github/workflows/orbit360-importer-incident-readonly-diagnosis.yml",
+    "triggerMarker": "tools/orbit360-authorize-exact-recovery-dryrun-v20260721.json",
+    "allowedExecutions": 1,
     "writesAllowed": false,
-    "firestoreReadAllowed": false,
-    "vaultReadAllowed": false,
+    "firestoreReadAllowed": true,
+    "vaultReadAllowed": true,
     "browserAllowed": false,
     "deployAllowed": false,
     "reimportAllowed": false,
     "colombiaModificationAllowed": false,
-    "nextRuntimeAuthorizationRequired": true
+    "expectedBefore": {
+      "clients": 414,
+      "insurers": 26,
+      "advisors": 7,
+      "bankRows": 93,
+      "validReferences": 23,
+      "pendingReferences": 70,
+      "vaultRows": 91,
+      "rawProtectedValues": 0
+    },
+    "expectedProposal": {
+      "referenceRestorations": 68,
+      "newPendingRowsPreserved": 2,
+      "duplicateRemovals": 0,
+      "creates": 0,
+      "deletes": 0,
+      "reorders": 0,
+      "affectedGtDocuments": 13,
+      "nonReferenceFieldChanges": 0,
+      "traceFieldChanges": 0,
+      "colombiaDocumentChanges": 0
+    },
+    "expectedAfter": {
+      "bankRows": 93,
+      "validReferences": 91,
+      "pendingReferences": 2,
+      "duplicateReferences": 0
+    },
+    "acceptance": "sanitized_report_ok_true_only"
   },
   "preflightAuthorization": {
     "authorizationId": "data-contract-68plus2new-preflight-only-v1",
-    "active": true,
-    "action": "central_preflight_only",
-    "allowedExecutions": 1,
+    "active": false,
+    "consumed": true,
+    "consumedRunId": 29865714028,
+    "result": "GO_GATE_CONTRACT_323_OF_323",
     "secretsAllowed": false,
     "firestoreReadAllowed": false,
     "vaultReadAllowed": false,
     "writesAllowed": false,
-    "runtimeAllowed": false,
-    "browserAllowed": false,
-    "deployAllowed": false,
-    "expected": {
-      "status": "GO_GATE_CONTRACT",
-      "failedChecks": 0,
-      "containsPII": false,
-      "containsSecrets": false
-    }
+    "runtimeAllowed": false
   },
   "blockedGateIds": [
     "block1-client360-insurers-lab-v20260717"
@@ -127,7 +167,6 @@
     ".github/workflows/orbit360-aseguradoras-op2-smoke.yml"
   ],
   "blockedActions": [
-    "execute_recovery_dryrun",
     "write_firestore",
     "write_secret_manager",
     "restore_references",
@@ -150,16 +189,18 @@
     "modify_unrelated_modules"
   ],
   "allowedActions": [
-    "execute_central_preflight_once_without_secrets_or_runtime",
-    "upload_sanitized_preflight_evidence",
+    "execute_exact_recovery_readonly_dry_run_once",
+    "read_firestore_only_inside_authorized_script",
+    "read_secret_manager_only_inside_authorized_script",
+    "upload_sanitized_dryrun_evidence",
     "synchronize_pr_issue_and_documentation"
   ],
   "repeatRule": {
-    "runtimeDryRunAllowedNow": false,
-    "patchAndRetryLoopAllowed": false,
-    "preflightFailureAction": "STOP_AND_CLASSIFY_WITH_PRESERVED_EVIDENCE",
-    "nextRuntimeRequiresSeparateAuthorizationAfterStaticPreflightGo": true,
-    "runtimeWriteAllowed": false
+    "onDryRunFailure": "STOP_THE_LINE_AND_CLASSIFY_WITH_PRESERVED_EVIDENCE",
+    "secondDryRunAttemptAllowed": false,
+    "patchAfterDryRunFailureAllowed": false,
+    "runtimeWriteAllowed": false,
+    "nextWriteRequiresSeparateAuthorizationAfterDryRunGo": true
   },
   "stateClarification": {
     "m1Functional": "PRESERVED",
@@ -170,12 +211,11 @@
     "recoveryIdentity": "CONFIRMED_68_RESTORES_2_NEW_PENDING_0_DUPLICATES",
     "colombia": "INTACT_AND_BLOCKED",
     "reimportRequired": false,
-    "recoveryDryRunAuthorized": false,
-    "recoveryWriteAuthorized": false,
-    "centralPreflightAuthorized": true
+    "recoveryDryRunAuthorized": true,
+    "recoveryWriteAuthorized": false
   },
   "supersedingDocument": "orbit360-platform/docs/CORTE-FORMAL-68-REFERENCIAS-2-CUENTAS-GT-NUEVAS-20260721.md",
-  "nextAllowedStep": "Execute exactly one central preflight without secrets, Firestore, vault or runtime. Accept only GO_GATE_CONTRACT with zero failed checks. Any runtime requires a separate later authorization.",
+  "nextAllowedStep": "Execute exactly one sanitized read-only dry-run. Accept only 68 restorations, two preserved new G&T pending rows, zero removals, zero creates/deletes/reorders, 13 GT documents, Colombia unchanged and simulated final 93 rows with 91 valid and two pending.",
   "containsPII": false,
   "containsSecrets": false
 }
