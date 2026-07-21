@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { spawnSync } = require('child_process');
 
 const writes = [];
 const data = { aseguradoras: [], asesores: [], polizas: [], cobros: [], comisiones: [], reclamos: [], gestiones: [], negocios: [] };
@@ -102,11 +103,31 @@ const reasonGuard = bridgeSource.indexOf("if (!reason) return toast('Registra el
 const insertPoint = bridgeSource.indexOf("S().insert('aseguradoras', row)");
 assert(nameGuard >= 0 && countryGuard > nameGuard && reasonGuard > countryGuard && insertPoint > reasonGuard, 'La inserción debe ocurrir solo después de nombre, país y motivo');
 
+const idempotenceTestPath = path.resolve(__dirname, '..', '..', 'tools', 'orbit360-probar-owner-visual-idempotente-v20260721.mjs');
+const visualOwnerPath = path.resolve(__dirname, '..', 'core', 'client-insurer-visual-contract-v20260720.js');
+const proofPath = path.resolve(__dirname, '..', 'runtime-gate-crm-v20260716', 'owner-idempotence-proof-sanitized.json');
+const proofRun = spawnSync(process.execPath, [idempotenceTestPath, visualOwnerPath, proofPath], { encoding: 'utf8' });
+assert(proofRun.status === 0, 'La prueba determinista de idempotencia falló: ' + String(proofRun.stderr || proofRun.stdout || '').slice(0, 500));
+const proof = JSON.parse(fs.readFileSync(proofPath, 'utf8'));
+assert(proof.ok === true, 'La evidencia de idempotencia debe ser ok:true');
+assert(proof.totalChecks === 24 && proof.failedChecks === 0, 'La prueba de idempotencia debe aprobar 24/24 checks');
+assert(proof.proof.baseMutations === 1, 'Debe probar exactamente una mutación base');
+assert(proof.proof.canonicalTransforms === 1, 'Debe probar exactamente una transformación canónica');
+assert(proof.proof.followUpObserverDeliveries === 0, 'Debe probar cero entregas posteriores del observer');
+assert(proof.runtimeExecuted === false && proof.browserExecuted === false && proof.deployExecuted === false, 'La prueba debe ser totalmente estática');
+
 console.log(JSON.stringify({
   test: 'orbit360-aseguradoras-owner-contract-v20260717',
   status: 'PASS',
   writes: writes.length,
   states: rows.map(item => item.estado),
   safeCreateBeforeInsert: true,
-  realButtonSelectorsCovered: true
+  realButtonSelectorsCovered: true,
+  ownerIdempotence: {
+    revision: proof.idempotenceRevision,
+    checks: proof.totalChecks,
+    baseMutations: proof.proof.baseMutations,
+    canonicalTransforms: proof.proof.canonicalTransforms,
+    followUpObserverDeliveries: proof.proof.followUpObserverDeliveries
+  }
 }, null, 2));
