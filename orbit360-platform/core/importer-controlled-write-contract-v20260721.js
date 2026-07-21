@@ -15,10 +15,11 @@
   window.Orbit = window.Orbit || {};
   if (Orbit.importerControlledWriteContractV20260721) return;
 
-  const VERSION = '20260721.1';
+  const VERSION = '20260721.2';
   const SOURCE = 'directorio_aseguradoras';
   const OWNER = 'insurer-directory-import-v1202';
   const HARD_BLOCKING_ALERT = /nombre_hoja|entidad_no|duplicado_dentro_del_archivo/i;
+  const SENSITIVE_KEYS = new Set(['password', 'pass', 'contrasena', 'usuario', 'user', 'numero', 'accountNumber']);
 
   function clean(value) {
     return String(value == null ? '' : value).trim();
@@ -34,9 +35,35 @@
     return Math.abs(h >>> 0).toString(36);
   }
 
+  function safeSensitivePlaceholder(value) {
+    const text = clean(value);
+    if (!text) return true;
+    if (text === 'backend_required') return true;
+    if (/^[*•●xX\s-]+$/.test(text)) return true;
+    return false;
+  }
+
   function hasSensitivePlaintext(data) {
-    const text = JSON.stringify(data || {});
-    return /"(?:password|pass|contrasena|usuario|user|numero|accountNumber)"\s*:\s*"(?!\s*(?:|backend_required|\*|•))/i.test(text);
+    let found = false;
+    function walk(value) {
+      if (found || value == null) return;
+      if (Array.isArray(value)) {
+        value.forEach(walk);
+        return;
+      }
+      if (typeof value !== 'object') return;
+      Object.keys(value).forEach((key) => {
+        if (found) return;
+        const child = value[key];
+        if (SENSITIVE_KEYS.has(key) && !safeSensitivePlaceholder(child)) {
+          found = true;
+          return;
+        }
+        walk(child);
+      });
+    }
+    walk(data || {});
+    return found;
   }
 
   function insurerTrace(data) {
@@ -108,7 +135,7 @@
     const result = classify(collection, data);
     if (!result.controlled) return null;
     const identity = sourceIdentity(collection, data);
-    const out = Object.assign({}, data || {}, {
+    return Object.assign({}, data || {}, {
       createdByImport: true,
       importBatchId: clean(data && data.importBatchId) || ('batch_dir_asg_' + hash(identity)),
       sourceType: SOURCE,
@@ -119,7 +146,6 @@
         confirmedBeforeWrite: true
       }
     });
-    return out;
   }
 
   function evidence(collection, data) {
