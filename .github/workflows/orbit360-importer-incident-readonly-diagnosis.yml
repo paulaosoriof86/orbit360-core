@@ -23,11 +23,14 @@ env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   FIREBASE_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
-  ORBIT360_PREFLIGHT_AUTHORIZATION_ID: validator-stale-preflight-only-v1
-  ORBIT360_DRYRUN_AUTHORIZATION_ID: exact-bank-reference-recovery-dryrun-68plus2-v1
+  ORBIT360_PREFLIGHT_AUTHORIZATION_ID: data-contract-68plus2new-preflight-only-v1
+  ORBIT360_DRYRUN_AUTHORIZATION_ID: exact-bank-reference-recovery-dryrun-68plus2new-v1
   ORBIT360_EXPECTED_RESTORES: 68
-  ORBIT360_EXPECTED_DUPLICATE_REMOVALS: 2
+  ORBIT360_EXPECTED_NEW_PENDING: 2
+  ORBIT360_EXPECTED_DUPLICATE_REMOVALS: 0
+  ORBIT360_EXPECTED_FINAL_BANK_ROWS: 93
   ORBIT360_EXPECTED_FINAL_REFERENCES: 91
+  ORBIT360_EXPECTED_FINAL_PENDING: 2
 
 jobs:
   bounded-control:
@@ -80,12 +83,13 @@ jobs:
           test "$(jq -r '.writesAllowed' "$MARKER")" = 'false'
           test "$(jq -r '.allowedExecutions' "$MARKER")" = '1'
           if [ "$MODE" = 'preflight_only' ]; then
-            test "$(jq -r '.status' "$FREEZE")" = 'VALIDATOR_STALE_CORRECTION_PREFLIGHT_ONLY_AUTHORIZED'
+            test "$(jq -r '.status' "$FREEZE")" = 'DATA_CONTRACT_CORRECTION_PREFLIGHT_ONLY_AUTHORIZED'
             test "$(jq -r '.preflightAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_PREFLIGHT_AUTHORIZATION_ID"
             test "$(jq -r '.preflightAuthorization.active' "$FREEZE")" = 'true'
             test "$(jq -r '.preflightAuthorization.secretsAllowed' "$FREEZE")" = 'false'
             test "$(jq -r '.preflightAuthorization.firestoreReadAllowed' "$FREEZE")" = 'false'
             test "$(jq -r '.preflightAuthorization.vaultReadAllowed' "$FREEZE")" = 'false'
+            test "$(jq -r '.runtimeAuthorization.active' "$FREEZE")" = 'false'
             test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_PREFLIGHT_AUTHORIZATION_ID"
             test "$(jq -r '.action' "$MARKER")" = 'central_preflight_only'
           else
@@ -98,8 +102,11 @@ jobs:
             test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_DRYRUN_AUTHORIZATION_ID"
             test "$(jq -r '.action' "$MARKER")" = 'exact_recovery_readonly_dry_run'
             test "$(jq -r '.expected.restores' "$MARKER")" = "$ORBIT360_EXPECTED_RESTORES"
+            test "$(jq -r '.expected.newPendingRowsPreserved' "$MARKER")" = "$ORBIT360_EXPECTED_NEW_PENDING"
             test "$(jq -r '.expected.duplicateRemovals' "$MARKER")" = "$ORBIT360_EXPECTED_DUPLICATE_REMOVALS"
+            test "$(jq -r '.expected.finalBankRows' "$MARKER")" = "$ORBIT360_EXPECTED_FINAL_BANK_ROWS"
             test "$(jq -r '.expected.finalValidReferences' "$MARKER")" = "$ORBIT360_EXPECTED_FINAL_REFERENCES"
+            test "$(jq -r '.expected.finalPendingReferences' "$MARKER")" = "$ORBIT360_EXPECTED_FINAL_PENDING"
           fi
           node --check "$SCRIPT"
           node --check tools/orbit360-validar-importador-aseguradoras-atomico-v20260721.mjs
@@ -195,17 +202,24 @@ jobs:
             .before.clients == 414 and
             .before.insurers == 26 and
             .before.advisors == 7 and
+            .before.bankRows == 93 and
             .before.validReferences == 23 and
             .before.pendingReferences == 70 and
             .before.vaultRows == 91 and
             .before.rawProtectedValues == 0 and
             .proposal.restores == 68 and
-            .proposal.duplicateRemovals == 2 and
+            .proposal.newPendingRowsPreserved == 2 and
+            .proposal.duplicateRemovals == 0 and
+            .proposal.creates == 0 and
+            .proposal.deletes == 0 and
+            .proposal.reorderChanges == 0 and
             .proposal.affectedDocuments == 13 and
             .proposal.nonReferenceFieldChanges == 0 and
+            .proposal.traceFieldChanges == 0 and
             .proposal.colombiaDocumentChanges == 0 and
+            .simulatedAfter.bankRows == 93 and
             .simulatedAfter.validReferences == 91 and
-            .simulatedAfter.pendingReferences == 0 and
+            .simulatedAfter.pendingReferences == 2 and
             .simulatedAfter.duplicateFingerprints == 0 and
             .authorizationRequiredForWrite == true
           ' "$REPORT" >/dev/null
@@ -229,11 +243,11 @@ jobs:
           MODE='${{ steps.scope.outputs.mode }}'
           state=success
           if [ "$MODE" = 'preflight_only' ]; then
-            context='orbit360/validator-stale-preflight-v1'
-            description='Preflight corregido GO; cero secrets y cero runtime'
+            context='orbit360/data-contract-preflight-68plus2new-v1'
+            description='Preflight 68+2 nuevas GO; cero secrets y cero runtime'
           else
-            context='orbit360/exact-recovery-dryrun-68plus2-v2'
-            description='Dry-run exacto 68+2 aprobado; escritura aún bloqueada'
+            context='orbit360/exact-recovery-dryrun-68plus2new-v3'
+            description='Dry-run 68 restores + 2 nuevas aprobado; escritura bloqueada'
           fi
           if [ "${{ job.status }}" != success ]; then
             state=failure
