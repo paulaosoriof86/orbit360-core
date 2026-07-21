@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v11-post-recovery-inventory-authorized",
+  "schemaVersion": "orbit360-incident-freeze-v12-final-block1-gate-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "POST_RECOVERY_INVENTORY_READONLY_AUTHORIZED",
+  "status": "FINAL_BLOCK1_GATE_READONLY_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -41,17 +41,6 @@
     "containsPII": false,
     "containsSecrets": false
   },
-  "before": {
-    "clients": 414,
-    "insurers": 26,
-    "advisors": 7,
-    "totalCuentaResources": 107,
-    "protectedBankRows": 93,
-    "validReferences": 23,
-    "pendingReferences": 70,
-    "vaultRows": 91,
-    "rawProtectedValues": 0
-  },
   "applied": {
     "historicalReferenceRestorations": 68,
     "newPendingRowsPreserved": 2,
@@ -65,35 +54,45 @@
     "colombiaDocumentChanges": 0
   },
   "after": {
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
     "totalCuentaResources": 107,
     "protectedBankRows": 93,
     "validReferences": 91,
     "pendingReferences": 2,
     "uniqueValidReferences": 91,
+    "vaultRows": 91,
     "rawProtectedValues": 0,
     "colombia": "INTACT"
   },
-  "preflightEvidence": {
-    "runId": 29867382206,
-    "contractVersion": "1.1.3",
-    "status": "GO_GATE_CONTRACT",
-    "failed": 0
-  },
-  "staticValidatorEvidence": {
-    "schemaVersion": "orbit360-atomic-recovery-static-validator-v1",
-    "total": 29,
-    "passed": 29,
-    "failed": 0,
-    "runtimeExecuted": false,
-    "writesExecuted": false
-  },
-  "dryRunEvidence": {
-    "sourceRunId": 29865964420,
-    "sourceArtifactId": 8509192602,
-    "sourceArtifactDigest": "sha256:19e63019c299423a29ba0b3fb23ec1c93fd659dacf796b877635fcbc6a1a56e5",
-    "acceptance": "DRYRUN_FUNCTIONALLY_GREEN_FROM_PRESERVED_EVIDENCE",
-    "reclassificationChecks": 34,
-    "reclassificationFailed": 0
+  "inventoryEvidence": {
+    "ok": true,
+    "runId": 29868538689,
+    "head": "05162a3bab49dfaf1301bed427c18516c672fd41",
+    "artifactId": 8510179033,
+    "artifactDigest": "sha256:7297652bfbdc666c17a9eb3ebf332bcaff33108908aa1757d97331db96960e6e",
+    "mode": "read_only_post_recovery_inventory",
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "protectedBankRows": 93,
+    "validReferences": 91,
+    "pendingReferences": 2,
+    "uniqueValidReferences": 91,
+    "vaultRows": 91,
+    "vaultValues": 91,
+    "invalidReferences": 0,
+    "duplicateReferences": 0,
+    "rawProtectedValues": 0,
+    "gtInsurers": 13,
+    "coInsurers": 13,
+    "colombiaPendingReferences": 0,
+    "writesExecuted": false,
+    "secretManagerWritesExecuted": false,
+    "deployExecuted": false,
+    "containsPII": false,
+    "containsSecrets": false
   },
   "runtimeAuthorization": {
     "authorizationId": "exact-bank-reference-recovery-dryrun-68plus2new-v1",
@@ -119,40 +118,50 @@
   },
   "inventoryAuthorization": {
     "authorizationId": "post-recovery-inventory-readonly-v1",
+    "active": false,
+    "consumed": true,
+    "consumedRunId": 29868538689,
+    "secondExecutionAllowed": false,
+    "writesAllowed": false,
+    "secretManagerWritesAllowed": false,
+    "deployAllowed": false
+  },
+  "finalGateAuthorization": {
+    "authorizationId": "final-block1-readonly-gate-v1",
     "active": true,
     "consumed": false,
     "allowedExecutions": 1,
-    "action": "post_recovery_readonly_inventory",
+    "action": "unique_final_block1_gate_readonly",
+    "gateId": "block1-client360-insurers-lab-v20260717",
+    "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+    "preflightRequired": true,
     "firestoreReadAllowed": true,
-    "vaultReadAllowed": true,
+    "browserAllowed": true,
     "writesAllowed": false,
     "secretManagerWritesAllowed": false,
     "deployAllowed": false,
-    "browserAllowed": false,
-    "expected": {
+    "productionAllowed": false,
+    "runtimeGraphMustMatchExistingChannel": true,
+    "expectedCounts": {
       "clients": 414,
       "insurers": 26,
-      "advisors": 7,
-      "totalCuentaResources": 107,
-      "protectedBankRows": 93,
-      "validReferences": 91,
-      "pendingReferences": 2,
-      "uniqueValidReferences": 91,
-      "vaultRows": 91,
-      "rawProtectedValues": 0,
-      "colombiaPendingReferences": 0
-    }
+      "advisors": 7
+    },
+    "expectedViews": [
+      "Direccion desktop",
+      "Operativo tablet",
+      "Asesor movil"
+    ],
+    "acceptance": "SANITIZED_OK_TRUE_ONLY"
   },
-  "blockedGateIds": [
-    "block1-client360-insurers-lab-v20260717"
-  ],
+  "blockedGateIds": [],
   "blockedWorkflows": [
-    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml",
-    ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml"
+    ".github/workflows/orbit360-aseguradoras-op2-smoke.yml"
   ],
   "blockedActions": [
     "repeat_recovery_write",
     "repeat_recovery_dryrun",
+    "repeat_post_recovery_inventory",
     "remove_gt_new_accounts",
     "write_secret_manager",
     "reimport_guatemala_directory",
@@ -167,11 +176,10 @@
     "merge_main",
     "create_parallel_gate",
     "create_temporary_workflow",
-    "execute_final_block1_gate_before_inventory_go",
     "perform_visual_review_before_gate_go"
   ],
   "allowedActions": [
-    "execute_single_readonly_post_recovery_inventory",
+    "execute_unique_final_block1_gate_readonly",
     "synchronize_pr_issue_and_documentation"
   ],
   "stateClarification": {
@@ -183,11 +191,11 @@
     "colombia": "INTACT",
     "reimportRequired": false,
     "recoveryWriteComplete": true,
-    "postRecoveryInventoryPending": true,
+    "postRecoveryInventoryComplete": true,
     "finalGatePending": true,
     "visualReviewPending": true
   },
-  "nextAllowedStep": "Execute exactly one post-recovery inventory in read-only mode. It must confirm 414 clients, 26 insurers, 7 advisors, 91 unique valid references, two pending new G&T rows, 91 vault rows, zero raw values and Colombia with zero pending protected rows. The final Block 1 gate remains blocked until sanitized ok:true evidence exists.",
+  "nextAllowedStep": "Execute exactly one final Block 1 gate in read-only mode against the existing LAB channel. The workflow must run the binding preflight first, prove the deployed runtime graph matches the current functional files, validate Direccion desktop, Operativo tablet and Asesor movil, and produce sanitized ok:true evidence without deploy or writes.",
   "containsPII": false,
   "containsSecrets": false
 }
