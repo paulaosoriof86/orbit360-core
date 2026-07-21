@@ -3,12 +3,12 @@
   "issuedAt": "2026-07-21",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": "FUNCTIONAL_DEFECT",
-  "diagnosticRevision": "event-driven-dom-visual-stability-barrier-v2",
-  "contractRevision": "1.0.29-event-driven-dom-visual-stability-barrier-v2",
+  "diagnosticRevision": "canonical-visual-owner-same-microtask-v1",
+  "contractRevision": "1.0.30-canonical-visual-owner-same-microtask-v1",
   "gatePatch": {
-    "contractVersion": "1.0.29",
-    "diagnosticRevision": "event-driven-dom-visual-stability-barrier-v2",
-    "status": "TARGETED_LAB_DEPLOY_AND_FINAL_GATE_AUTHORIZED"
+    "contractVersion": "1.0.30",
+    "diagnosticRevision": "canonical-visual-owner-same-microtask-v1",
+    "status": "FUNCTIONAL_FIX_PENDING_STATIC_PREFLIGHT"
   },
   "canonicalOwners": [
     {
@@ -33,6 +33,9 @@
         "Orbit.clientInsurerVisualContractV20260720",
         "countryEvidenceProposalOnly:true",
         "segmentationReadOnly:true",
+        "synchronousMutationOwner:true",
+        "mutationMode:'same-microtask'",
+        "new MutationObserver(handleCanonicalMutations)",
         "writesStore:false"
       ]
     },
@@ -162,6 +165,14 @@
         "m1SegmentCriteria",
         "data-m1-bank-copy-all",
         "m1-knowledge-summary",
+        "var scheduled=false,enhancing=false",
+        "function runEnhance()",
+        "function mutationTouchesCanonicalView(records)",
+        "function handleCanonicalMutations(records)",
+        "new MutationObserver(handleCanonicalMutations)",
+        "synchronousMutationOwner:true",
+        "mutationMode:'same-microtask'",
+        "enhance:runEnhance",
         "exposesSecrets:false"
       ]
     },
