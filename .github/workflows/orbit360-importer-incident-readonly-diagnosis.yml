@@ -1,11 +1,17 @@
 name: Orbit 360 Incident Importador Aseguradoras Read-Only
 
-# incidentRevision: 20260721-2
+# incidentRevision: 20260721-3
 on:
   workflow_dispatch:
   push:
     branches:
       - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-importer-incident-readonly-diagnosis.yml'
+      - 'tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs'
+  pull_request:
+    branches:
+      - main
     paths:
       - '.github/workflows/orbit360-importer-incident-readonly-diagnosis.yml'
       - 'tools/orbit360-diagnosticar-referencias-aseguradoras-readonly-v20260721.mjs'
@@ -37,7 +43,7 @@ jobs:
       - name: Checkout SHA exacto
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 1
 
       - name: Preparar Node 22
@@ -49,9 +55,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "${GITHUB_REF_NAME}" = "$ORBIT360_BRANCH"
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID" > /tmp/orbit360-preflight-readonly.json
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
+          ORBIT360_BRANCH="$ORBIT360_BRANCH" node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID" > /tmp/orbit360-preflight-readonly.json
           test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = GO_GATE_CONTRACT
 
       - name: Resolver identidad LAB solo lectura
