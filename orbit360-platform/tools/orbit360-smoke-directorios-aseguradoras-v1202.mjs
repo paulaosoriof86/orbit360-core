@@ -127,7 +127,8 @@ load('core/importa-dryrun-p0-wire.js');
 assert.ok(Orbit.insurerDirectoryImport, 'Debe existir el owner especializado');
 assert.ok(Orbit.importerControlledWriteContractV20260721, 'Debe existir el contrato canónico');
 assert.ok(Orbit.importaDryRunP0Wire, 'Debe existir el listener P0');
-assert.equal(Orbit.store.__p0DryRunWireContractVersion, '20260721.1');
+assert.equal(Orbit.importerControlledWriteContractV20260721.version, '20260721.2');
+assert.equal(Orbit.store.__p0DryRunWireContractVersion, '20260721.2');
 
 const gt = {
   'ÍNDICE': [['Resumen']],
@@ -184,6 +185,7 @@ assert.equal(persisted.createdByImport, true, 'Debe persistir marcador canónico
 assert.ok(persisted.importBatchId, 'Debe persistir identificador de lote');
 assert.equal(persisted.sourceType, 'directorio_aseguradoras');
 assert.equal(persisted.importControl.owner, 'insurer-directory-import-v1202');
+assert.equal(persisted.importControl.contractVersion, '20260721.2');
 assert.equal(persisted.importControl.confirmedBeforeWrite, true);
 assert.equal(persisted.fuenteDirectorio.archivo, 'directorio-gt-prueba.xlsx');
 assert.equal(persisted.fuenteDirectorio.hoja, 'ASEGURADORA UNO');
