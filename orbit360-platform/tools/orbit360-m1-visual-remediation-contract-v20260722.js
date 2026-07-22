@@ -42,7 +42,7 @@ check('CSS_PWA_INSTALL', css.includes('#pwa-install') && css.includes('max-width
 check('ACADEMY_CONTENT_1228', academy.includes("contentVersion:'1.228'") && academy.includes('_m1visualv:1228'), 'academy version');
 check('ACADEMY_USER_PASSWORD_SEPARATION', academy.includes('El usuario del portal permanece visible') && academy.includes('La contraseña usa un espacio separado'), 'academy credentials');
 check('ACADEMY_BANK_EXCLUDES_USE', academy.includes('El campo Uso no se muestra ni se copia') && !academy.includes('titular y uso pueden copiarse'), 'academy bank copy');
-check('ACADEMY_RESPONSIVE', academy.includes('Instalar como app') && academy.includes('títulos, encabezados, pestañas y acciones'), 'academy responsive');
+check('ACADEMY_RESPONSIVE', ['títulos','encabezados','pestañas','acciones','Instalar como app'].every(token=>academy.includes(token)), 'academy responsive semantic tokens');
 
 const blockedActions = Array.isArray(freeze.blockedActions) ? freeze.blockedActions : [];
 const activeStaticAuthorization = authorization.active === true && authorization.consumed === false && authorization.allowedExecutions === 1 && authorization.action === 'final_block1_static_preflight_1_0_37_lifecycle_v2_only' && authorization.expectedContractVersion === '1.0.37';
@@ -62,6 +62,7 @@ const result = {
   schemaVersion: 'orbit360-m1-visual-remediation-contract-v1',
   contractVersion: '1.0.37',
   revision: '20260722.1',
+  validatorSemanticRevision: 'responsive-token-set-v1',
   validatorLifecycleRevision: 'phase-aware-static-authorization-v2',
   classification: 'FUNCTIONAL_DEFECT',
   total: checks.length,
