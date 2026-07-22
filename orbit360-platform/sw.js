@@ -1,7 +1,8 @@
 /* Orbit 360 · Service Worker — red primero con fallback offline.
    Evita que una versión antigua de Auth o del shell bloquee el canal LAB. */
-var CACHE = 'orbit360-v20260717-2-pwa2';
-var BUILD = '20260717-2';
+var CACHE = 'orbit360-v20260721-4-pwa1';
+var BUILD = '20260721-4';
+var CRITICAL_RELEASE = 'block1-critical-runtime-20260721-4';
 var RUNTIME_CONTRACT_TIMEOUT_MS = 8000;
 var RUNTIME_CONTRACT_CACHE_STRATEGY = 'cache-first-bounded-revalidate';
 var RUNTIME_CONTRACT_PATHS = [
