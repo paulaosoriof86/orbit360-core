@@ -10,13 +10,37 @@ const manifestPath = path.join(ROOT, MANIFEST_REL);
 const localOnly = process.argv.includes('--local-only');
 const baseUrl = String(process.env.ORBIT360_PREVIEW_URL || '').replace(/\/$/, '');
 const outPath = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json');
+const OWNER_CLOSURE_POLICY = 'iife_before_trailing_comments';
 
 function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
 }
 
+function withoutTrailingComments(source) {
+  let value = String(source || '').trimEnd();
+  let changed = true;
+  while (changed) {
+    changed = false;
+    if (value.endsWith('*/')) {
+      const start = value.lastIndexOf('/*');
+      if (start >= 0) {
+        value = value.slice(0, start).trimEnd();
+        changed = true;
+        continue;
+      }
+    }
+    const lines = value.split(/\r?\n/);
+    if (lines.length && lines[lines.length - 1].trim().startsWith('//')) {
+      lines.pop();
+      value = lines.join('\n').trimEnd();
+      changed = true;
+    }
+  }
+  return value;
+}
+
 function ownerClosure(source) {
-  return /\}\)\(\);\s*$/.test(source);
+  return /\}\)\(\);$/.test(withoutTrailingComments(source));
 }
 
 function inspectBuffer(buffer, asset) {
@@ -51,6 +75,7 @@ const report = {
   releaseId: '',
   gateId: '',
   contractVersion: '',
+  ownerClosurePolicy: OWNER_CLOSURE_POLICY,
   localOnly,
   assetCount: 0,
   checkedAssets: [],
@@ -139,6 +164,7 @@ try {
     ok: report.ok,
     schemaVersion: report.schemaVersion,
     releaseId: report.releaseId,
+    ownerClosurePolicy: report.ownerClosurePolicy,
     assetCount: report.assetCount,
     localSyntaxOk: report.localSyntaxOk,
     exactMatch: report.exactMatch,
