@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-final-block1-gate-consumed-visual-review-pending-v1",
+  "schemaVersion": "orbit360-final-block1-gate-consumed-visual-remediation-required-v1",
   "issuedAt": "2026-07-22",
   "authorizationId": "final-block1-targeted-lab-deploy-gate-v1",
-  "authorizationRevision": 8,
-  "action": "blocked_gate_consumed_visual_review_pending",
+  "authorizationRevision": 9,
+  "action": "blocked_visual_remediation_required",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "tenantId": "alianzas-soluciones",
@@ -21,7 +21,7 @@
   "rulesDeployAllowed": false,
   "productionAllowed": false,
   "reimportAllowed": false,
-  "finalEvidence": {
+  "historicalFinalEvidence": {
     "ok": true,
     "runId": 29925156385,
     "artifactId": 8531633698,
@@ -30,18 +30,9 @@
     "gateContractVersion": "1.0.36",
     "runtimeContractVersion": "1.0.29",
     "stage": "completed",
-    "desktopDirection": true,
-    "tabletOperativo": true,
-    "mobileAsesor": true,
-    "directionScope": "all",
-    "operativoScope": "team",
-    "advisorScope": "own",
     "clients": 414,
     "insurers": 26,
     "advisors": 7,
-    "allRemoteBytesAndSha256Exact": true,
-    "credentialBoxesVisible": true,
-    "passwordInputsInInsurerView": 0,
     "writesExecuted": false,
     "functionsDeployed": false,
     "rulesDeployed": false,
@@ -49,11 +40,18 @@
   },
   "visualReview": {
     "authorized": true,
-    "singleReviewOnly": true,
-    "hostingUrl": "https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app",
-    "vaultRevealByAuthorizedHumanOnly": true
+    "consumed": true,
+    "approved": false,
+    "result": "FAILED_FUNCTIONAL_DEFECT",
+    "remediationContractVersion": "1.0.37",
+    "remediationRevision": "20260722.1",
+    "findings": [
+      "responsive_mobile",
+      "portal_user_password_semantics",
+      "bank_display_and_copy_semantics"
+    ]
   },
-  "acceptance": "PAULA_VISUAL_APPROVAL_REQUIRED_TO_CLOSE_M1",
+  "acceptance": "STATIC_REMEDIATION_ONLY_NO_RUNTIME_OR_DEPLOY",
   "containsPII": false,
   "containsSecrets": false
 }
