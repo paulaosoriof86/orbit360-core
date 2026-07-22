@@ -1,4 +1,4 @@
-export const CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.28';
+export const CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.29';
 const EXPECTED_CLIENTS = 414;
 const EXPECTED_TABS = ['resumen','polizas','vehiculos','cobros','recibos','renovaciones','siniestros','comisiones','correos','historial'];
 const EXPECTED_CLIENT_PROJECTION_VERSION = '20260720.2';
@@ -6,6 +6,7 @@ const EXPECTED_VISUAL_CONTRACT_VERSION = '20260720.2';
 const VISUAL_REPAIR_REVISION = 'visual-human-repair-v5-operational-honesty';
 const COUNTRY_DATA_CONTRACT_REVISION = 'country-data-contract-v3-quality-proposal';
 const SECURE_CREDENTIAL_VALIDATOR_REVISION = 'insurer-view-password-scope-v1';
+const DOCUMENT_IMPORT_VALIDATOR_REVISION = 'role-permission-aware-v1';
 const EXPECTED_COUNTRY_COUNTS = { GT: 337, CO: 16, REQUIERE_VALIDACION: 61 };
 const EXPECTED_TYPE_COUNTS = { Persona: 391, Empresa: 23 };
 const EXPECTED_SEGMENT_COUNTS = { 'Pendiente de clasificar': 414 };
@@ -212,9 +213,55 @@ async function validateQualityCountryFlow(page, report, label, scopeState) {
   await page.locator('table.tbl tbody tr.clickable').first().waitFor({ state: 'visible', timeout: 15000 });
 }
 
+async function readDocumentImportPermission(page) {
+  return page.evaluate(() => {
+    const access = Orbit.access || {};
+    const role = access.activeRole ? String(access.activeRole() || '') : Orbit.session && Orbit.session.rol ? String(Orbit.session.rol() || '') : '';
+    const canCreate = access.can ? access.can('aseguradoras', 'create') === true : false;
+    const canManageDocuments = access.can ? access.can('aseguradoras', 'manage_documents') === true : false;
+    const effectiveCanManage = ['Dirección','Admin'].includes(role) || canCreate;
+    return { role, canCreate, canManageDocuments, effectiveCanManage };
+  });
+}
+
 async function validateImporterHonesty(page, insurerId, report, label) {
+  const permission = await readDocumentImportPermission(page);
   const before = await page.evaluate(id => { const a = Orbit.store.get('aseguradoras', id); return (a && a.docs || []).length; }, insurerId);
-  await page.evaluate(id => Orbit.modules.aseguradoras.importarDocumentoSeguro({ scope: { insurerId: id, target: 'documentos' } }), insurerId);
+  if (permission.role === 'Dirección') assert(permission.effectiveCanManage, 'DIRECTION_DOCUMENT_IMPORT_PERMISSION_MISSING', label);
+  if (/Asesor/i.test(permission.role)) assert(!permission.effectiveCanManage, 'ADVISOR_DOCUMENT_IMPORT_PERMISSION_LEAK', label);
+
+  await page.evaluate(id => {
+    const stale = document.getElementById('asg-doc-import-v1203');
+    if (stale) stale.remove();
+    Orbit.modules.aseguradoras.importarDocumentoSeguro({ scope: { insurerId: id, target: 'documentos' } });
+  }, insurerId);
+
+  if (!permission.effectiveCanManage) {
+    await page.waitForTimeout(500);
+    const denied = await page.evaluate(id => {
+      const a = Orbit.store.get('aseguradoras', id);
+      return {
+        modalPresent: Boolean(document.getElementById('asg-doc-import-v1203')),
+        after: (a && a.docs || []).length
+      };
+    }, insurerId);
+    assert(!denied.modalPresent, 'RESTRICTED_ROLE_DOCUMENT_IMPORT_MODAL_VISIBLE', label);
+    assert(denied.after === before, 'RESTRICTED_ROLE_DOCUMENT_IMPORT_WROTE_DATA', `${label}:${before}/${denied.after}`);
+    report[`${label}ImporterHonesty`] = {
+      revision: DOCUMENT_IMPORT_VALIDATOR_REVISION,
+      role: permission.role,
+      permissionMode: 'denied-by-active-permission',
+      canCreate: permission.canCreate,
+      canManageDocuments: permission.canManageDocuments,
+      effectiveCanManage: false,
+      before,
+      after: denied.after,
+      modalPresent: false,
+      deniedNoWrite: true
+    };
+    return;
+  }
+
   await page.locator('#asg-doc-import-v1203').waitFor({ state: 'visible', timeout: 10000 });
   await page.locator('#asgdoc-file').setInputFiles({ name: 'validacion-importador.txt', mimeType: 'text/plain', buffer: Buffer.from('validacion de estado honesto Orbit 360') });
   const state = await page.evaluate(() => ({
@@ -230,7 +277,19 @@ async function validateImporterHonesty(page, insurerId, report, label) {
   await page.locator('#asg-doc-import-v1203 [data-close]').first().click();
   const after = await page.evaluate(id => { const a = Orbit.store.get('aseguradoras', id); return (a && a.docs || []).length; }, insurerId);
   assert(after === before, 'IMPORTER_CANCEL_WROTE_DATA', `${label}:${before}/${after}`);
-  report[`${label}ImporterHonesty`] = { before, after, selectedFileDoesNotEqualStored: true, noFalseSuccess: true };
+  report[`${label}ImporterHonesty`] = {
+    revision: DOCUMENT_IMPORT_VALIDATOR_REVISION,
+    role: permission.role,
+    permissionMode: 'authorized-honest-proposal',
+    canCreate: permission.canCreate,
+    canManageDocuments: permission.canManageDocuments,
+    effectiveCanManage: true,
+    before,
+    after,
+    selectedFileDoesNotEqualStored: true,
+    noFalseSuccess: true,
+    cancelNoWrite: true
+  };
 }
 
 async function validateInsurerVisualContract(page, report, label) {
@@ -322,16 +381,18 @@ async function validateInsurerVisualContract(page, report, label) {
   assert(!knowledge.technicalCopy && knowledge.honestActivation, 'INSURER_KNOWLEDGE_COPY_NOT_HONEST', label);
 
   await validateImporterHonesty(page, ids.contact, report, label);
-  report[`${label}InsurerVisualContract`] = { hero, inactiveReason: true, contactCards: contacts.cards, portalCards: portals.cards, credentialBoxes: portals.credentialBoxes, passwordInputsInInsurerView: portals.passwordInputsInInsurerView, hiddenLoginPasswordInputs: portals.hiddenLoginPasswordInputs, bankCards: banks.cards, completeBankCopy: true, knowledgeSummary: true, importerHonest: true };
+  const importer = report[`${label}ImporterHonesty`] || {};
+  report[`${label}InsurerVisualContract`] = { hero, inactiveReason: true, contactCards: contacts.cards, portalCards: portals.cards, credentialBoxes: portals.credentialBoxes, passwordInputsInInsurerView: portals.passwordInputsInInsurerView, hiddenLoginPasswordInputs: portals.hiddenLoginPasswordInputs, bankCards: banks.cards, completeBankCopy: true, knowledgeSummary: true, importerPermissionMode: importer.permissionMode || '', importerHonest: importer.noFalseSuccess === true || importer.deniedNoWrite === true };
 }
 
 export async function validateClient360(page, report, label) {
   report.contractVersion = CLIENT360_VALIDATOR_CONTRACT_VERSION;
   if (report.error == null) report.error = '';
-  report.schemaVersion = 'orbit360-runtime-gate-joint-v28-secure-credential-scope';
+  report.schemaVersion = 'orbit360-runtime-gate-joint-v29-role-aware-document-import';
   report.visualRepairRevision = VISUAL_REPAIR_REVISION;
   report.countryDataContractRevision = COUNTRY_DATA_CONTRACT_REVISION;
   report.secureCredentialValidatorRevision = SECURE_CREDENTIAL_VALIDATOR_REVISION;
+  report.documentImportValidatorRevision = DOCUMENT_IMPORT_VALIDATOR_REVISION;
 
   const bootstrap = await readVisualBootstrap(page);
   report[`${label}VisualBootstrap`] = bootstrap;
