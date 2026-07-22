@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v66-hosting-delivery-authorized",
+  "schemaVersion": "orbit360-incident-freeze-v67-hosting-recovery-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-control-plane-distributed-state-and-phase-drift-v20260722",
-  "status": "STATIC_PREFLIGHT_V2_PASS_HOSTING_DELIVERY_AUTHORIZED",
+  "status": "HOSTING_DELIVERY_V1_PIPELINE_MECHANISM_FAILURE_RETRY_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -12,8 +12,6 @@
     "block1-client360-insurers-lab-v20260717"
   ],
   "classification": [
-    "FUNCTIONAL_DEFECT",
-    "VALIDATOR_STALE",
     "PIPELINE_MECHANISM_FAILURE"
   ],
   "methodologicalDecision": {
@@ -23,6 +21,7 @@
     "visualizationBeforeM2": true,
     "authorizedPhase": "LAB_HOSTING_DELIVERY",
     "allowedExecutions": 1,
+    "recoveryRevision": "inspect-reuse-deploy-resolve-v1",
     "deploymentScope": "hosting_channel_only",
     "firebaseProjectId": "ays-orbit-360-lab",
     "hostingChannel": "orbit360-ays-lab",
@@ -45,7 +44,6 @@
     "artifactDigest": "sha256:582d6523730a859f5197ae13ae9b220c771ef778feb27e65d49dfa280c481f8a",
     "executedHead": "3a334d81393dc2b05fb5e271b8b1108e87f733ad",
     "contractVersion": "1.0.36",
-    "runtimeContractVersion": "1.0.29",
     "ok": true,
     "finalGateRerun": false
   },
@@ -69,6 +67,36 @@
     "rulesDeployed": false,
     "productionTouched": false
   },
+  "hostingDeliveryV1": {
+    "status": "FAILED_PIPELINE_MECHANISM",
+    "runId": 29963097060,
+    "artifactId": 8546764883,
+    "artifactDigest": "sha256:8e64664d442ecaf58159175b3d28b3ce5a7a0af8355f61257ff29ddb002666a9",
+    "executionHead": "6eadc942e92b82440806605be0a7bc31455843ca",
+    "requestId": "m1-targeted-hosting-visualization-v1-20260722",
+    "preflightStatus": "GO_GATE_CONTRACT",
+    "preflightChecks": "1356_OF_1356",
+    "identityStatus": "PASS",
+    "localIntegrityStatus": "PASS",
+    "failedStage": "publish_frontend_and_resolve_url_combined",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "rootCause": "The workflow combined Firebase deployment, URL extraction and build verification in one step and did not persist the Firebase command output, so it could not distinguish an actual deployment failure from a successful deployment followed by URL-resolution failure.",
+    "productRegression": false,
+    "dataChanged": false,
+    "newFunctionalFixRequired": false
+  },
+  "hostingRecovery": {
+    "revision": "inspect-reuse-deploy-resolve-v1",
+    "authorized": true,
+    "allowedExecutions": 1,
+    "inspectExistingChannelFirst": true,
+    "reuseMatchingExistingBuild": true,
+    "deployOnlyIfMissing": true,
+    "persistCommandExitCode": true,
+    "persistSanitizedError": true,
+    "urlResolutionFallback": "hosting_channel_list",
+    "remoteIntegrityRequired": true
+  },
   "inventoryEvidence": {
     "ok": true,
     "runId": 29868538689,
@@ -87,16 +115,10 @@
     "status": "ROOT_CAUSE_CLOSED_STRUCTURALLY",
     "controlPlaneRevision": "phase-capability-immutable-request-v2",
     "staticPhaseVerified": true,
-    "hostingPhaseContractReady": true,
+    "hostingPhasePreflightVerified": true,
+    "hostingPhasePreflightChecks": "1356_OF_1356",
     "independentNonExecutingAudit": {
-      "status": "PASS",
-      "performedAt": "2026-07-22"
-    },
-    "validatorSemanticCorrection": {
-      "status": "VERIFIED_PASS",
-      "validatorSemanticRevision": "responsive-token-set-v1",
-      "staticRunId": 29962814208,
-      "visualChecks": "29_OF_29"
+      "status": "PASS"
     },
     "productOwnerChanged": false,
     "dataChanged": false,
@@ -106,15 +128,16 @@
     "importersChanged": false
   },
   "allowedActions": [
-    "create_one_immutable_lab_hosting_delivery_request_bound_to_current_parent_head",
-    "read_firebase_service_account_for_hosting_auth_only",
-    "deploy_frontend_to_orbit360_ays_lab_hosting_channel",
+    "create_one_immutable_lab_hosting_delivery_recovery_request_v2",
+    "inspect_existing_hosting_channel_read_only",
+    "reuse_existing_matching_preview",
+    "deploy_frontend_only_if_matching_preview_is_absent",
     "verify_remote_critical_asset_integrity",
     "return_preview_url_for_human_visual_review"
   ],
   "blockedActions": [
-    "edit_or_reuse_consumed_static_requests",
-    "rerun_static_preflight_29962814208",
+    "edit_or_reuse_consumed_requests",
+    "rerun_hosting_delivery_v1_run_29963097060",
     "run_second_final_gate",
     "run_runtime_gate",
     "open_browser_automation",
@@ -143,7 +166,8 @@
     "m1StaticPreflightV2": "PASS",
     "m1VisualRemediation": "PASS_29_OF_29",
     "m1Architecture": "GO_STATIC_ARCHITECTURE",
-    "m1HostingDelivery": "AUTHORIZED_ONE_IMMUTABLE_REQUEST",
+    "m1HostingDeliveryV1": "PIPELINE_MECHANISM_FAILURE",
+    "m1HostingRecoveryV2": "AUTHORIZED_ONE_IMMUTABLE_REQUEST",
     "m1HumanVisualReview": "PENDING_PREVIEW_URL",
     "m1Closed": false,
     "gateRerunAuthorized": false,
@@ -155,7 +179,7 @@
     "reimportRequired": false,
     "visualizationBeforeM2": true
   },
-  "nextAllowedStep": "Create exactly one immutable LAB_HOSTING_DELIVERY request bound to the current parent HEAD and to static preflight run 29962814208 / artifact 8546643930. Run the canonical gate-contract preflight first, deploy only Hosting channel orbit360-ays-lab in project ays-orbit-360-lab, prove exact remote critical-asset integrity, and return the sanitized preview URL for Paula's human review before M2.",
+  "nextAllowedStep": "Create exactly one immutable LAB_HOSTING_DELIVERY recovery request v2. Inspect the existing orbit360-ays-lab channel first; reuse it if runtime-build identifies execution head 6eadc942e92b82440806605be0a7bc31455843ca and critical assets match. Otherwise perform one Hosting-only deploy with persisted command diagnostics, resolve the URL through deploy output or channel-list fallback, prove exact remote integrity and return the preview URL for Paula's review before M2.",
   "containsPII": false,
   "containsSecrets": false
 }
