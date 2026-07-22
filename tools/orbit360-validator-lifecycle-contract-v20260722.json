@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v6-visualization-before-m2",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v7-hosting-delivery",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -13,52 +13,47 @@
     "VALIDATOR_STALE",
     "PIPELINE_MECHANISM_FAILURE"
   ],
-  "repeatedFailureEvidence": {
-    "sameStageFailureCount": 2,
-    "runs": [29953485798, 29954997417, 29961263105],
-    "latestFailedCheckIds": ["ACADEMY_RESPONSIVE"],
-    "rootCause": "The original control plane mixed static, runtime and Hosting semantics. After that structural cause was corrected and verified 1366/1366, the last failure was a brittle exact-phrase validator even though Academy contained all required responsive concepts.",
-    "productRegression": false
+  "staticPreflightV2": {
+    "status": "PASS",
+    "runId": 29962814208,
+    "artifactId": 8546643930,
+    "artifactDigest": "sha256:0bf8160846d1f6eef7e9be5f1e54d632cfd6468a98fe3e8f9a7f3493dd83568f",
+    "executionHead": "61c235735ebd5ffd68acfe2e7314e2cad86dd5a7",
+    "gateContractStatus": "GO_GATE_CONTRACT",
+    "visualChecks": "29_OF_29",
+    "visualValidatorRevision": "responsive-token-set-v1",
+    "architectureStatus": "GO_STATIC_ARCHITECTURE",
+    "finalGateRerun": false
   },
   "retiredLifecycleChecks": [
-    "FREEZE_STOP_THE_LINE",
-    "FREEZE_NO_RUNTIME",
-    "AUTHORIZATION_CONSUMED",
     "WORKFLOW_PROJECT_LOCK_FOR_ALL_PHASES",
     "WORKFLOW_CHANNEL_LOCK_FOR_ALL_PHASES",
-    "ACADEMY_RESPONSIVE_EXACT_PHRASE"
+    "ACADEMY_RESPONSIVE_EXACT_PHRASE",
+    "MUTABLE_AUTHORIZATION_TRIGGER"
   ],
   "replacementLifecycleChecks": [
-    "FREEZE_M1_OPEN",
-    "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
-    "AUTHORIZATION_STATIC_LIFECYCLE",
     "EXECUTION_PROFILE_DECLARED",
     "WORKFLOW_PHASE_LOCK",
-    "WORKFLOW_PROJECT_LOCK_NOT_APPLICABLE",
-    "WORKFLOW_CHANNEL_LOCK_NOT_APPLICABLE",
-    "ACADEMY_RESPONSIVE_SEMANTIC_TOKEN_SET"
+    "HOSTING_CAPABILITY:secrets",
+    "HOSTING_CAPABILITY:deploy",
+    "HOSTING_PROJECT_LOCK_ENABLED",
+    "HOSTING_CHANNEL_LOCK_ENABLED",
+    "WORKFLOW_PROJECT_LOCK",
+    "WORKFLOW_CHANNEL_LOCK",
+    "IMMUTABLE_REQUEST_PARENT_HEAD",
+    "STATIC_PREFLIGHT_ARTIFACT_VERIFIED"
   ],
-  "activeLifecycle": {
-    "authorized": {
-      "active": true,
-      "consumed": false,
-      "allowedExecutions": 1
-    },
-    "completed": {
-      "active": false,
-      "consumed": true,
-      "allowedExecutions": 0
-    }
-  },
-  "invariantsForStaticPreflight": {
+  "invariantsForHostingDelivery": {
     "m1Closed": false,
     "finalGateRerunBlocked": true,
-    "secretsAllowed": false,
+    "secretsAllowed": true,
+    "secretPurpose": "firebase_hosting_lab_auth_only",
     "firestoreReadAllowed": false,
     "writesAllowed": false,
     "runtimeAllowed": false,
     "browserAllowed": false,
-    "deployAllowed": false,
+    "deployAllowed": true,
+    "deploymentScope": "hosting_channel_only",
     "functionsDeployAllowed": false,
     "rulesDeployAllowed": false,
     "productionAllowed": false
@@ -67,55 +62,52 @@
     "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "engine": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
     "baseOverlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
-    "parallelWrapperRetired": "tools/orbit360-validar-gate-contracts-composed-v20260722.mjs",
-    "parallelOverlayRetired": "tools/orbit360-gate-contract-overlay-validator-lifecycle-v20260722.json",
     "compositionMechanism": "canonical-entrypoint-temp-mirror-v1",
     "executionRequestModel": "immutable-request-bound-to-parent-head-and-run-attempt-v1",
     "operationalWrites": 0,
     "evidenceWrites": 1,
     "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
-    "engineStdoutParsingRetired": true,
-    "failedRunIds": [29953485798, 29954997417, 29961263105],
-    "rootCause": "distributed_control_plane_then_brittle_exact_phrase_validator",
-    "nextPhaseAfterPass": "LAB_HOSTING_DELIVERY_SEPARATE_REQUEST"
+    "finalTechnicalGateRerun": false,
+    "phase": "LAB_HOSTING_DELIVERY",
+    "nextHumanAction": "VISUAL_REVIEW_BEFORE_M2"
   },
   "canonicalOverlayPatch": {
     "schemaVersion": "orbit360-gate-contract-overlay-v1",
     "issuedAt": "2026-07-22",
     "gateId": "block1-client360-insurers-lab-v20260717",
-    "classification": "VALIDATOR_STALE",
-    "diagnosticRevision": "static-preflight-v2-before-hosting-visualization",
-    "contractRevision": "1.0.37-static-preflight-v2-before-hosting-visualization",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "diagnosticRevision": "targeted-hosting-delivery-before-m2-v1",
+    "contractRevision": "1.0.37-targeted-hosting-delivery-before-m2-v1",
     "gatePatch": {
       "contractVersion": "1.0.37",
-      "diagnosticRevision": "static-preflight-v2-before-hosting-visualization",
-      "status": "CONTROL_PLANE_RECONCILED_STATIC_PREFLIGHT_V2_AUTHORIZED",
+      "diagnosticRevision": "targeted-hosting-delivery-before-m2-v1",
+      "status": "STATIC_PREFLIGHT_V2_PASS_HOSTING_DELIVERY_AUTHORIZED",
       "executionProfile": {
-        "phase": "STATIC_PREFLIGHT",
+        "phase": "LAB_HOSTING_DELIVERY",
         "capabilities": {
-          "secrets": false,
+          "secrets": true,
           "firestoreRead": false,
           "writes": false,
           "runtime": false,
           "browser": false,
-          "deploy": false,
+          "deploy": true,
           "functionsDeploy": false,
           "rulesDeploy": false,
           "production": false
         },
         "workflowLocks": {
           "branch": true,
-          "firebaseProject": false,
-          "hostingChannel": false
+          "firebaseProject": true,
+          "hostingChannel": true
         },
         "requestModel": "immutable-request-bound-to-parent-head-and-run-attempt-v1"
       },
-      "diagnosticRule": "The control plane is structurally reconciled and independently audited. Execute one immutable static preflight v2 to verify the semantic Academy validator, the visual contract and static architecture before a separately authorized Hosting LAB delivery. The final technical gate is not rerun.",
-      "acceptancePolicy": "Accept only GO_GATE_CONTRACT plus visual remediation PASS 29/29 with validatorSemanticRevision responsive-token-set-v1 and GO_STATIC_ARCHITECTURE. Allow no secrets, Firestore, operational writes, runtime, browser, Functions, Rules, production or deploy."
+      "diagnosticRule": "Static preflight v2 passed GO_GATE_CONTRACT, visual 29/29 and GO_STATIC_ARCHITECTURE. Publish only the exact corrected frontend to the named Hosting LAB channel. Read the service-account secret only for Hosting authentication. Do not read Firestore, execute browser automation, deploy Functions or Rules, touch production or rerun the final technical gate.",
+      "acceptancePolicy": "Accept only GO_GATE_CONTRACT in LAB_HOSTING_DELIVERY, verified static artifact, zero functional drift, exact remote critical-asset integrity and a sanitized LAB preview URL."
     },
     "effectiveOwnerReconciliation": {
-      "baselineOverlayContract": "1.0.37-visual-review-semantic-responsive-remediation-v1",
-      "classification": "VALIDATOR_STALE",
+      "baselineOverlayContract": "1.0.37-static-preflight-v2-before-hosting-visualization",
+      "classification": "PIPELINE_MECHANISM_FAILURE",
       "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
       "controlPlaneRevision": "phase-capability-immutable-request-v2",
       "productOwnersChanged": [],
@@ -137,7 +129,6 @@
         "id": "m1VisualIntegrityAcademy",
         "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
         "requiredTokens": [
-          "version:'1.221'",
           "contentVersion:'1.228'",
           "_m1visualv:1228",
           "El usuario del portal permanece visible",
@@ -151,13 +142,8 @@
         "id": "m1VisualRemediationContract",
         "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
         "requiredTokens": [
-          "orbit360-m1-visual-remediation-contract-v1",
           "contractVersion: '1.0.37'",
           "validatorSemanticRevision: 'responsive-token-set-v1'",
-          "validatorLifecycleRevision: 'phase-aware-static-authorization-v2'",
-          "FREEZE_M1_OPEN",
-          "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
-          "AUTHORIZATION_STATIC_LIFECYCLE",
           "BANK_COPY_EXCLUDES_USE",
           "ACADEMY_CONTENT_1228",
           "runtimeExecuted: false",
@@ -169,15 +155,17 @@
     "requiredFiles": [
       "tools/orbit360-validator-lifecycle-contract-v20260722.json",
       "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
+      "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+      "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+      "firebase.json",
       "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTROL-PLANE-GATES-INMUTABLES-ORBIT360-AYS-20260722.md",
-      "orbit360-platform/docs/evidence/m1-canonical-pipeline-reconciliation-20260722-sanitized.json"
+      "orbit360-platform/docs/evidence/post-recovery-inventory-29868538689-sanitized.json"
     ],
     "runtimeVersionContracts": [
       {
         "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
         "replaceRequiredTokens": true,
         "requiredTokens": [
-          "version:'1.221'",
           "contentVersion:'1.228'",
           "_m1visualv:1228",
           "El usuario del portal permanece visible",
@@ -191,13 +179,8 @@
         "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
         "replaceRequiredTokens": true,
         "requiredTokens": [
-          "orbit360-m1-visual-remediation-contract-v1",
           "contractVersion: '1.0.37'",
           "validatorSemanticRevision: 'responsive-token-set-v1'",
-          "validatorLifecycleRevision: 'phase-aware-static-authorization-v2'",
-          "FREEZE_M1_OPEN",
-          "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
-          "AUTHORIZATION_STATIC_LIFECYCLE",
           "BANK_COPY_EXCLUDES_USE",
           "ACADEMY_CONTENT_1228",
           "runtimeExecuted: false",
@@ -214,9 +197,7 @@
           "orbit360-validar-gate-contracts-engine-v20260717.mjs",
           "parallelWrapperRetired: true",
           "parallelOverlayRetired: true",
-          "evidenceWrites: 1",
           "ENGINE_EVIDENCE_USED = 'sync-file-evidence-not-stdout-v1'",
-          "engineEvidencePath",
           "engineStdoutParsed: false"
         ]
       },
@@ -225,12 +206,11 @@
         "replaceRequiredTokens": true,
         "requiredTokens": [
           "ALLOWED_EXECUTION_PHASES",
-          "EXECUTION_PROFILE_DECLARED",
-          "EXECUTION_PHASE_ALLOWED",
-          "WORKFLOW_PHASE_LOCK",
-          "WORKFLOW_PROJECT_LOCK_NOT_APPLICABLE",
-          "WORKFLOW_CHANNEL_LOCK_NOT_APPLICABLE",
-          "STATIC_CAPABILITY_DISABLED",
+          "HOSTING_CAPABILITY",
+          "HOSTING_PROJECT_LOCK_ENABLED",
+          "HOSTING_CHANNEL_LOCK_ENABLED",
+          "WORKFLOW_PROJECT_LOCK",
+          "WORKFLOW_CHANNEL_LOCK",
           "GO_GATE_CONTRACT"
         ]
       },
@@ -238,17 +218,17 @@
         "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
         "replaceRequiredTokens": true,
         "requiredTokens": [
-          "ORBIT360_GATE_PHASE: static_preflight",
-          "ORBIT360_REQUEST_FILE: tools/orbit360-m1-static-preflight-request-v2-20260722.json",
-          "ORBIT360_METHOD_DECISION_ID: paula-20260722-visualization-before-m2",
-          "immutable-request-bound-to-parent-head-and-run-attempt-v1",
+          "ORBIT360_GATE_PHASE: lab_hosting_delivery",
+          "ORBIT360_REQUEST_FILE: tools/orbit360-m1-hosting-delivery-request-v1-20260722.json",
+          "EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab",
+          "ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab",
+          "actions: read",
           "test \"${GITHUB_RUN_ATTEMPT}\" = '1'",
-          "node --check tools/orbit360-validar-gate-contracts-v20260717.mjs",
           "node tools/orbit360-validar-gate-contracts-v20260717.mjs \"$ORBIT360_GATE_ID\"",
-          "validatorSemanticRevision == \"responsive-token-set-v1\"",
-          "node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
-          "node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
-          "nextAuthorizedPhase:\"LAB_HOSTING_DELIVERY_SEPARATE_REQUEST\"",
+          "LAB_HOSTING_DELIVERY",
+          "hosting:channel:deploy",
+          "targeted_lab_frontend_visual_review_only",
+          "node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
           "functionsDeployed:false",
           "rulesDeployed:false",
           "productionTouched:false"
