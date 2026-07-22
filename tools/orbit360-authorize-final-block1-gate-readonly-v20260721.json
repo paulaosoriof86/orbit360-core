@@ -1,14 +1,15 @@
 {
-  "schemaVersion": "orbit360-final-block1-stop-line-owner-registry-v1",
+  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v12-owner-registry-reconciled",
   "issuedAt": "2026-07-21",
-  "authorizationId": "final-block1-stop-line-owner-registry-v1",
-  "authorizationRevision": 1,
-  "action": "blocked_stop_the_line_owner_registry_reconciliation_required",
+  "authorizationId": "final-block1-static-preflight-v1",
+  "authorizationRevision": 12,
+  "action": "final_block1_static_preflight_only",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "tenantId": "alianzas-soluciones",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "allowedExecutions": 0,
+  "allowedExecutions": 1,
+  "preflightRequired": true,
   "runtimeAllowed": false,
   "browserAllowed": false,
   "firestoreReadAllowed": false,
@@ -17,34 +18,56 @@
   "writesAllowed": false,
   "secretManagerWritesAllowed": false,
   "deployAllowed": false,
+  "deploymentScope": "none",
   "functionsDeployAllowed": false,
   "rulesDeployAllowed": false,
   "productionAllowed": false,
   "reimportAllowed": false,
-  "failedStaticPreflights": [
-    {
-      "runId": 29881901498,
-      "artifactId": 8515080227,
-      "artifactDigest": "sha256:2833e2a425269376fd48eb938234b3a0c279f4ea4e943e94351b91c20f30e385",
-      "failedChecks": 6,
-      "classification": "VALIDATOR_STALE"
-    },
-    {
-      "runId": 29882121307,
-      "artifactId": 8515159061,
-      "artifactDigest": "sha256:c6e4c3ce786ed79f482a5a5ea59eb9ce3d5b08f2cfacdcfe0c64f5217ca5e56f",
-      "failedChecks": 3,
-      "classification": "VALIDATOR_STALE"
-    }
-  ],
-  "rootCause": {
-    "classification": "VALIDATOR_STALE",
-    "contributingClassification": "PIPELINE_MECHANISM_FAILURE",
-    "cause": "overlay_1_0_35_dropped_two_effective_owner_overrides_while_simplifying_the_contract",
-    "sameStageFailedTwice": true,
-    "productInvalid": false
+  "sourceInventory": {
+    "runId": 29868538689,
+    "ok": true,
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "validReferences": 91,
+    "pendingReferences": 2,
+    "uniqueValidReferences": 91
   },
-  "nextAllowedStep": "Read-only reconcile base registry, extensions and overlays owner by owner. Do not modify files or execute workflows until a separate atomic correction is authorized.",
+  "ownerRegistryReconciliation": {
+    "ok": true,
+    "overlayCommit": "781ed51b1ef2d70b8b46c46450f947c2f2e67b40",
+    "freezeCommit": "677b18f7f9870da4b33853f85f98336df87dc5d9",
+    "contractVersion": "1.0.35",
+    "preservedOwners": 6,
+    "addedOwners": 1,
+    "droppedOwners": 0,
+    "restoredOwners": [
+      "clientDataQuality",
+      "insurerDocumentImport",
+      "insurerSecureTargetBridge",
+      "realInsurerDirectoryAcademy"
+    ],
+    "productFilesChanged": false,
+    "validatorImplementationChanged": false
+  },
+  "expected": {
+    "contractVersion": "1.0.35",
+    "preflightStatus": "GO_GATE_CONTRACT",
+    "criticalRelease": "block1-critical-runtime-20260721-4",
+    "criticalAssetCount": 9,
+    "ownerIdempotenceChecks": 27,
+    "baseMutations": 1,
+    "canonicalTransforms": 1,
+    "followUpObserverDeliveries": 0,
+    "effectiveOwnersPreserved": true,
+    "droppedOwners": 0,
+    "writesExecuted": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "acceptance": "GO_GATE_CONTRACT_AND_STATIC_OK_TRUE_ONLY",
   "containsPII": false,
   "containsSecrets": false
 }
