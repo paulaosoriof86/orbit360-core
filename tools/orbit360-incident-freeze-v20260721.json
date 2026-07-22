@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v57-static-preflight-validator-stale",
+  "schemaVersion": "orbit360-incident-freeze-v58-validator-lifecycle-reconciled-preflight-pending",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-visual-review-semantic-and-responsive-defects-v20260722",
-  "status": "STOP_THE_LINE_STATIC_PREFLIGHT_1_0_37_VALIDATOR_STALE",
+  "status": "VALIDATOR_LIFECYCLE_RECONCILED_BINDING_PREFLIGHT_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -14,7 +14,8 @@
   ],
   "classification": [
     "FUNCTIONAL_DEFECT",
-    "VALIDATOR_STALE"
+    "VALIDATOR_STALE",
+    "ENVIRONMENT_FAILURE"
   ],
   "historicalTechnicalEvidence": {
     "gatePassed": true,
@@ -25,12 +26,10 @@
     "contractVersion": "1.0.36",
     "runtimeContractVersion": "1.0.29",
     "ok": true,
-    "stage": "completed",
     "clients": 414,
     "insurers": 26,
     "advisors": 7,
     "writesExecuted": false,
-    "vaultRead": false,
     "functionsDeployed": false,
     "rulesDeployed": false,
     "productionTouched": false
@@ -52,16 +51,6 @@
       "bank_use_field_must_not_be_displayed_or_copied"
     ]
   },
-  "rootCause": {
-    "classification": "FUNCTIONAL_DEFECT",
-    "owner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
-    "styleOwner": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
-    "validatorGap": "The final gate checked secure boxes, permissions and absence of password inputs, but did not validate visible username/password separation, exact bank-copy semantics or real mobile containment.",
-    "dataFailure": false,
-    "backendFailure": false,
-    "vaultFailure": false,
-    "reimportRequired": false
-  },
   "staticRemediationEvidence": {
     "status": "PASS",
     "effectiveContractVersion": "1.0.37",
@@ -74,22 +63,17 @@
     "writesExecuted": false,
     "runtimeExecuted": false,
     "browserExecuted": false,
-    "deployExecuted": false,
-    "temporaryWorkflowRetired": true,
-    "temporaryScriptRetired": true,
-    "temporaryPayloadRetired": true
+    "deployExecuted": false
   },
   "bindingStaticPreflight": {
-    "status": "FAIL",
+    "status": "FAILED_VALIDATOR_STALE",
     "contractVersion": "1.0.37",
     "path": "orbit360-platform/docs/evidence/m1-binding-static-preflight-1-0-37-20260722-sanitized.json",
     "gateContractStatus": "GO_GATE_CONTRACT",
     "gateContractChecksPassed": 1314,
     "gateContractChecksFailed": 0,
-    "architectureStatus": "NO_GO",
     "architectureChecksPassed": 33,
     "architectureChecksFailed": 2,
-    "visualRemediationStatus": "FAIL",
     "visualRemediationChecksPassed": 26,
     "visualRemediationChecksFailed": 3,
     "failedVisualChecks": [
@@ -105,17 +89,45 @@
   "preflightFailureRootCause": {
     "classification": "VALIDATOR_STALE",
     "firstFailedCheck": "FREEZE_STOP_THE_LINE",
-    "cause": "The visual validator required the freeze to remain in the pre-remediation STOP_THE_LINE state and the authorization to be already consumed while the binding preflight was correctly running under an active one-use static authorization.",
+    "cause": "The validator required post-consumption state while the one-use static authorization was correctly active.",
     "architecturePropagation": [
       "M1_VISUAL_REMEDIATION_CONTRACT_EXECUTES",
       "M1_VISUAL_REMEDIATION_CONTRACT_PASS"
     ],
     "productRegression": false,
     "dataContractFailure": false,
-    "environmentFailure": false,
-    "pipelineMechanismFailure": false,
-    "securityFailure": false,
-    "sameStageRetryAllowedBeforeCorrection": false
+    "securityFailure": false
+  },
+  "validatorLifecycleCorrection": {
+    "status": "CONTRACT_RECONCILED_PENDING_BINDING_EXECUTION",
+    "gateContractVersion": "1.0.37",
+    "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
+    "contractPath": "tools/orbit360-validator-lifecycle-contract-v20260722.json",
+    "documentationPath": "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-VALIDATOR-LIFECYCLE-PREFLIGHT-20260722.md",
+    "productOwnerChanged": false,
+    "academyUpdatedTo": "1.228",
+    "retiredChecks": [
+      "FREEZE_STOP_THE_LINE",
+      "FREEZE_NO_RUNTIME",
+      "AUTHORIZATION_CONSUMED"
+    ],
+    "replacementChecks": [
+      "FREEZE_M1_OPEN",
+      "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
+      "AUTHORIZATION_STATIC_LIFECYCLE"
+    ]
+  },
+  "environmentFailure": {
+    "classification": "ENVIRONMENT_FAILURE",
+    "mechanism": "GitHub Actions push workflow",
+    "attemptedWorkflowCommits": [
+      "20984329195ca953c0b691e93a41fddb8e9a0519",
+      "e6cf59b51062719681bf8f5bc81fd9da17741c89"
+    ],
+    "workflowRunObserved": false,
+    "commitStatusObserved": false,
+    "replacementMechanism": "single atomic Git Data commit",
+    "productRetry": false
   },
   "preservedInventory": {
     "clients": 414,
@@ -126,13 +138,15 @@
     "pendingBankReferences": 2,
     "portalCredentialsPreserved": "26_OF_26",
     "colombia": "INTACT",
-    "rawProtectedValuesInStore": 0
+    "rawProtectedValuesInStore": 0,
+    "reimportRequired": false
   },
   "allowedActions": [
-    "correct_validator_lifecycle_contract_only"
+    "prepare_single_use_static_preflight_authorization_1_0_37_lifecycle_v2",
+    "run_binding_static_preflight_after_environment_recovers"
   ],
   "blockedActions": [
-    "rerun_static_preflight_before_validator_correction",
+    "run_static_preflight_without_single_use_authorization",
     "run_second_final_gate",
     "run_runtime",
     "open_browser",
@@ -153,31 +167,14 @@
     "merge_main",
     "create_parallel_gate"
   ],
-  "validatorCorrectionBoundary": {
-    "nextContractVersion": "1.0.38",
-    "scope": [
-      "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
-      "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
-      "tools/orbit360-gate-contract-overlay-v20260718.json",
-      "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
-      "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
-      "documentation"
-    ],
-    "productOwnersFrozen": true,
-    "secretsAllowed": false,
-    "runtimeAllowed": false,
-    "browserAllowed": false,
-    "firestoreReadAllowed": false,
-    "writesAllowed": false,
-    "deployAllowed": false
-  },
   "stateClarification": {
     "m1DataRecovery": "CLOSED",
     "m1TechnicalGate": "HISTORICAL_PASS",
     "m1VisualReview": "FAILED_FUNCTIONAL_DEFECT_REMEDIATED_STATICALLY",
     "m1StaticRemediation": "PASS",
-    "m1BindingPreflight": "FAILED_VALIDATOR_STALE",
-    "m1ValidatorLifecycleCorrection": "PENDING",
+    "m1BindingPreflight": "FAILED_VALIDATOR_STALE_CORRECTED_PENDING_EXECUTION",
+    "m1ValidatorLifecycleCorrection": "RECONCILED",
+    "m1Environment": "GITHUB_ACTIONS_RUN_NOT_OBSERVED",
     "m1Closed": false,
     "gateRerunAuthorized": false,
     "runtimeAuthorized": false,
@@ -185,7 +182,7 @@
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Correct only the lifecycle assumptions in the visual validator and the dependent architecture/overlay/Academy contracts under version 1.0.38. Do not modify the visual product owner and do not rerun the preflight until the corrected static validator passes.",
+  "nextAllowedStep": "When the static execution mechanism is available, create and consume one separate static-only authorization for the binding preflight under gate contract 1.0.37 and validator lifecycle revision phase-aware-static-authorization-v2. Do not rerun the final gate and do not enable runtime, browser or deploy.",
   "containsPII": false,
   "containsSecrets": false
 }

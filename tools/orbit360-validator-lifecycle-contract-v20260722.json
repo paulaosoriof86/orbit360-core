@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "issuedAt": "2026-07-22",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "gateContractVersion": "1.0.37",
+  "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
+  "classification": "VALIDATOR_STALE",
+  "firstFailedCheck": "FREEZE_STOP_THE_LINE",
+  "retiredLifecycleChecks": [
+    "FREEZE_STOP_THE_LINE",
+    "FREEZE_NO_RUNTIME",
+    "AUTHORIZATION_CONSUMED"
+  ],
+  "activeLifecycle": {
+    "authorized": {
+      "active": true,
+      "consumed": false,
+      "allowedExecutions": 1
+    },
+    "completed": {
+      "active": false,
+      "consumed": true,
+      "allowedExecutions": 0
+    }
+  },
+  "invariantsForBothPhases": {
+    "m1Closed": false,
+    "finalGateRerunBlocked": true,
+    "secretsAllowed": false,
+    "firestoreReadAllowed": false,
+    "writesAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "deployAllowed": false,
+    "functionsDeployAllowed": false,
+    "rulesDeployAllowed": false,
+    "productionAllowed": false
+  },
+  "productOwnerChanged": false,
+  "dataChanged": false,
+  "storeChanged": false,
+  "authChanged": false,
+  "vaultChanged": false,
+  "importersChanged": false,
+  "containsPII": false,
+  "containsSecrets": false
+}

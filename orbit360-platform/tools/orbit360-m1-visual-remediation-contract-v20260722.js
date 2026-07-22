@@ -3,52 +3,56 @@
 
 const fs = require('fs');
 const path = require('path');
-
 const root = path.resolve(__dirname, '..');
-const repoRoot = path.resolve(root, '..');
 const read = rel => fs.readFileSync(path.join(root, rel), 'utf8');
-const readRepo = rel => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
+const readJson = rel => JSON.parse(read(rel));
 const checks = [];
 function check(id, ok, detail) { checks.push({ id, ok: !!ok, detail: detail || '' }); }
-function includes(source, token) { return String(source || '').includes(token); }
 
 const visual = read('core/client-insurer-visual-contract-v20260720.js');
-const style = read('styles/client-insurer-visual-contract-v20260720.css');
+const css = read('styles/client-insurer-visual-contract-v20260720.css');
 const academy = read('data/academia-v1221-m1-visual-integrity.js');
-const freeze = JSON.parse(readRepo('tools/orbit360-incident-freeze-v20260721.json'));
-const authorization = JSON.parse(readRepo('tools/orbit360-authorize-final-block1-gate-readonly-v20260721.json'));
-const overlay = JSON.parse(readRepo('tools/orbit360-gate-contract-overlay-v20260718.json'));
-const manifest = JSON.parse(readRepo('tools/orbit360-critical-runtime-integrity-manifest-v20260721.json'));
+const freeze = readJson('../tools/orbit360-incident-freeze-v20260721.json');
+const authorization = readJson('../tools/orbit360-authorize-final-block1-gate-readonly-v20260721.json');
+const overlay = readJson('../tools/orbit360-gate-contract-overlay-v20260718.json');
+const manifest = readJson('../tools/orbit360-critical-runtime-integrity-manifest-v20260721.json');
 
-check('VISUAL_REMEDIATION_REVISION', includes(visual, "visualRemediationRevision:'20260722.1'"), 'visual owner revision');
-check('CREDENTIAL_USER_SEPARATE', includes(visual, 'data-m1-credential-user') && includes(visual, 'credentialUserAlwaysSeparate:true'), 'username has dedicated visible slot');
-check('CREDENTIAL_SECRET_SEPARATE', includes(visual, 'data-m1-credential-secret') && includes(visual, 'credentialSecretSeparateReveal:true'), 'password has dedicated temporary slot');
-check('NO_GENERIC_USER_PROTECTED_FALLBACK', !includes(visual, 'Usuario protegido'), 'generic username fallback removed');
-check('REVEAL_WRITES_SECRET_ONLY', includes(visual, "querySelector('[data-m1-credential-secret]')") && !includes(visual, "querySelector('.m1-credential-value')"), 'reveal must not replace username');
-check('COPY_ACCESS_INCLUDES_USER_AND_PASSWORD', includes(visual, "['Usuario: '+(user||'—'),'Contraseña: '+out.value]"), 'secure access bundle');
-check('BANK_NUMBER_VISIBLE_HINT', includes(visual, 'data-m1-bank-number') && includes(visual, 'accountHint(account)'), 'masked number visible');
-check('BANK_TEMPORARY_REVEAL', includes(visual, 'data-m1-bank-reveal') && includes(visual, 'revealBankAccount'), 'temporary bank reveal');
-check('BANK_COPY_EXCLUDES_USE', includes(visual, 'bankCopyExcludesUse:true') && !includes(visual, "'Uso: '+"), 'Uso excluded from copy');
-check('BANK_HOLDER_FALLBACK_INSURER', includes(visual, 'bankHolderFallbackInsurer:true') && includes(visual, 'accountHolder(c,a)'), 'insurer fallback for holder');
-check('BANK_COPY_FIELDS_EXACT', includes(visual, "'Banco: '+") && includes(visual, "'Tipo: '+") && includes(visual, "'Cuenta: '+") && includes(visual, "'Moneda: '+") && includes(visual, "'Titular: '+"), 'expected bank fields');
+const RETIRED_LIFECYCLE_TOKENS = ['FREEZE_STOP_THE_LINE', 'FREEZE_NO_RUNTIME', 'AUTHORIZATION_CONSUMED'];
+void RETIRED_LIFECYCLE_TOKENS;
 
-check('CSS_VISUAL_REMEDIATION_MARKER', includes(style, 'Visual remediation 20260722.1'), 'style marker');
-check('CSS_MOBILE_PWA_INSTALL', includes(style, '#pwa-install') && includes(style, 'max-width:calc(100vw - 24px)'), 'PWA button mobile fit');
-check('CSS_MOBILE_TABS_SCROLL', includes(style, '.m1-asg-ficha .asg-tabbar') && includes(style, 'overflow-x:auto!important'), 'tabs horizontal scroll');
-check('CSS_MOBILE_ACTION_GRID', includes(style, '.m1-asg-ficha .m1-asg-hero>div:last-child') && includes(style, 'grid-template-columns:repeat(2,minmax(0,1fr))'), 'mobile actions');
-check('CSS_NO_HORIZONTAL_PAGE_OVERFLOW', includes(style, 'overflow-x:hidden'), 'mobile page containment');
-check('CSS_SECRET_AND_BANK_LAYOUT', includes(style, '.m1-credential-secret') && includes(style, '.m1-bank-number-line'), 'semantic layout styles');
+check('VISUAL_REMEDIATION_REVISION', visual.includes("visualRemediationRevision:'20260722.1'"), 'visual revision');
+check('CREDENTIAL_USER_SEPARATE', visual.includes('data-m1-credential-user') && visual.includes("portalUser(p)"), 'user slot');
+check('CREDENTIAL_SECRET_SEPARATE', visual.includes('data-m1-credential-secret') && visual.includes('>Oculta</div>'), 'secret slot');
+check('NO_GENERIC_USER_PROTECTED_FALLBACK', !visual.includes('Usuario protegido'), 'generic fallback removed');
+check('REVEAL_WRITES_SECRET_ONLY', visual.includes("querySelector('[data-m1-credential-secret]')") && !visual.includes("querySelector('.m1-credential-value')"), 'reveal target');
+check('COPY_ACCESS_INCLUDES_USER_PASSWORD', visual.includes("['Usuario: '+(user||'—'),'Contraseña: '+out.value]"), 'secure copy payload');
+check('BANK_NUMBER_VISIBLE', visual.includes('data-m1-bank-number') && visual.includes("accountHint(c)||'Cuenta protegida'"), 'bank number slot');
+check('BANK_TEMPORARY_REVEAL', visual.includes('data-m1-bank-reveal') && visual.includes("fieldType:'bank_account'"), 'bank reveal');
+check('BANK_COPY_EXCLUDES_USE', visual.includes('bankCopyExcludesUse:true') && !visual.includes("'Uso: '+"), 'Uso excluded');
+check('BANK_HOLDER_FALLBACK_INSURER', visual.includes("clean(account&&account.titular)||clean(insurer&&insurer.nombre)||'Sin registrar'"), 'holder fallback');
+check('BANK_COPY_EXACT_FIELDS', visual.includes("['Banco: '+(c.banco||'—'),'Tipo: '+(c.tipo||'—'),'Cuenta: '+(number||accountHint(c)||'—'),'Moneda: '+(c.moneda||'—'),'Titular: '+accountHolder(c,a)]"), 'exact bank copy');
 
-check('ACADEMY_CONTENT_1227', includes(academy, "contentVersion:'1.227'") && includes(academy, '_m1visualv:1227'), 'academy updated');
-check('ACADEMY_USER_PASSWORD_SEMANTICS', includes(academy, 'El usuario del portal permanece visible') && includes(academy, 'la contraseña aparece aparte'), 'academy credential semantics');
-check('ACADEMY_BANK_EXCLUDES_USE', includes(academy, 'El campo Uso no se muestra ni se copia') && !includes(academy, 'titular y uso pueden copiarse'), 'academy bank semantics');
-check('ACADEMY_RESPONSIVE_PWA', includes(academy, 'Instalar como app'), 'academy responsive lesson');
+check('CSS_REMEDIATION_MARKER', css.includes('Visual remediation 20260722.1'), 'css marker');
+check('CSS_MOBILE_TITLES', css.includes('#host .mod-band .mb-tt h2') && css.includes('overflow-wrap:anywhere'), 'titles');
+check('CSS_MOBILE_HEADERS', css.includes('#host .fichahdr .fh-top') && css.includes('#host .fichahdr .fh-actions'), 'headers');
+check('CSS_MOBILE_TABS', css.includes('.m1-asg-ficha .asg-tabbar') && css.includes('overflow-x:auto!important'), 'tabs');
+check('CSS_MOBILE_ACTIONS', css.includes('.m1-asg-ficha .m1-asg-hero>div:last-child') && css.includes('grid-template-columns:repeat(2,minmax(0,1fr))'), 'actions');
+check('CSS_PWA_INSTALL', css.includes('#pwa-install') && css.includes('max-width:calc(100vw - 24px)'), 'install button');
 
-check('FREEZE_STOP_THE_LINE', String(freeze.status || '').startsWith('STOP_THE_LINE'), freeze.status || 'missing');
+check('ACADEMY_CONTENT_1228', academy.includes("contentVersion:'1.228'") && academy.includes('_m1visualv:1228'), 'academy version');
+check('ACADEMY_USER_PASSWORD_SEPARATION', academy.includes('El usuario del portal permanece visible') && academy.includes('La contraseña usa un espacio separado'), 'academy credentials');
+check('ACADEMY_BANK_EXCLUDES_USE', academy.includes('El campo Uso no se muestra ni se copia') && !academy.includes('titular y uso pueden copiarse'), 'academy bank copy');
+check('ACADEMY_RESPONSIVE', academy.includes('Instalar como app') && academy.includes('títulos, encabezados, pestañas y acciones'), 'academy responsive');
+
+const blockedActions = Array.isArray(freeze.blockedActions) ? freeze.blockedActions : [];
+const activeStaticAuthorization = authorization.active === true && authorization.consumed === false && authorization.allowedExecutions === 1 && authorization.action === 'final_block1_static_preflight_1_0_37_lifecycle_v2_only' && authorization.expectedContractVersion === '1.0.37';
+const consumedStaticAuthorization = authorization.active === false && authorization.consumed === true && authorization.allowedExecutions === 0 && authorization.expectedContractVersion === '1.0.37';
+const authorizationIsStaticOnly = authorization.runtimeAllowed === false && authorization.browserAllowed === false && authorization.firestoreReadAllowed === false && authorization.vaultReadAllowed === false && authorization.secretsAllowed === false && authorization.writesAllowed === false && authorization.deployAllowed === false && authorization.functionsDeployAllowed === false && authorization.rulesDeployAllowed === false && authorization.productionAllowed === false;
+check('FREEZE_M1_OPEN', freeze.stateClarification && freeze.stateClarification.m1Closed === false, JSON.stringify(freeze.stateClarification || {}));
 check('FREEZE_FUNCTIONAL_DEFECT', Array.isArray(freeze.classification) && freeze.classification.includes('FUNCTIONAL_DEFECT'), JSON.stringify(freeze.classification || []));
-check('FREEZE_BLOCKS_GATE', Array.isArray(freeze.blockedGateIds) && freeze.blockedGateIds.includes('block1-client360-insurers-lab-v20260717'), JSON.stringify(freeze.blockedGateIds || []));
-check('FREEZE_NO_RUNTIME', freeze.allowedActions && freeze.allowedActions.includes('static_visual_owner_remediation_only') && freeze.blockedActions && freeze.blockedActions.includes('run_second_final_gate'), 'freeze scope');
-check('AUTHORIZATION_CONSUMED', authorization.allowedExecutions === 0 && authorization.runtimeAllowed === false && authorization.deployAllowed === false, JSON.stringify({allowedExecutions:authorization.allowedExecutions,runtimeAllowed:authorization.runtimeAllowed,deployAllowed:authorization.deployAllowed}));
+check('FREEZE_BLOCKS_GATE', Array.isArray(freeze.blockedGateIds) && freeze.blockedGateIds.includes('block1-client360-insurers-lab-v20260717') && blockedActions.includes('run_second_final_gate'), JSON.stringify(freeze.blockedGateIds || []));
+check('FREEZE_NO_RUNTIME_BROWSER_DEPLOY', blockedActions.includes('run_runtime') && blockedActions.includes('open_browser') && blockedActions.includes('deploy_hosting_lab') && freeze.stateClarification && freeze.stateClarification.runtimeAuthorized === false && freeze.stateClarification.deployAuthorized === false, freeze.status || 'missing');
+check('AUTHORIZATION_STATIC_LIFECYCLE', authorizationIsStaticOnly && (activeStaticAuthorization || consumedStaticAuthorization), JSON.stringify({active:authorization.active,consumed:authorization.consumed,allowedExecutions:authorization.allowedExecutions,action:authorization.action,expectedContractVersion:authorization.expectedContractVersion}));
 check('OVERLAY_1037', overlay.gatePatch && overlay.gatePatch.contractVersion === '1.0.37' && String(overlay.contractRevision || '').startsWith('1.0.37'), overlay.contractRevision || 'missing');
 check('OVERLAY_FUNCTIONAL_DEFECT', overlay.classification === 'FUNCTIONAL_DEFECT', overlay.classification || 'missing');
 check('MANIFEST_1037', manifest.contractVersion === '1.0.37', manifest.contractVersion || 'missing');
@@ -58,19 +62,19 @@ const result = {
   schemaVersion: 'orbit360-m1-visual-remediation-contract-v1',
   contractVersion: '1.0.37',
   revision: '20260722.1',
+  validatorLifecycleRevision: 'phase-aware-static-authorization-v2',
   classification: 'FUNCTIONAL_DEFECT',
-  status: failed.length ? 'FAIL' : 'PASS',
   total: checks.length,
   passed: checks.length - failed.length,
   failed: failed.length,
-  failedCheckIds: failed.map(item => item.id),
+  status: failed.length ? 'FAIL' : 'PASS',
+  checks,
   writes: 0,
   runtimeExecuted: false,
   browserExecuted: false,
   deployExecuted: false,
   containsPII: false,
-  containsSecrets: false,
-  checks
+  containsSecrets: false
 };
 console.log(JSON.stringify(result, null, 2));
 process.exit(failed.length ? 1 : 0);

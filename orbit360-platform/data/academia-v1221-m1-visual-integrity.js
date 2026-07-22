@@ -1,43 +1,44 @@
-/* Orbit 360 · Academia · API 1.221 · contenido M1 1.227 */
+/* ============================================================
+   Orbit 360 · Academia · Integridad visual M1 por rol
+   Fecha: 2026-07-22 · contenido M1 1.228
+   - Dirección / Operativo / Asesor
+   - contrato visual, accesos seguros, responsive y ciclo de vida
+   ============================================================ */
 (function(){
   'use strict';
-  window.Orbit=window.Orbit||{};
-  if(Orbit.ACADEMIA_V1221_M1_VISUAL&&Orbit.ACADEMIA_V1221_M1_VISUAL.version==='1.221'&&Orbit.ACADEMIA_V1221_M1_VISUAL.contentVersion==='1.227')return;
-  function sec(icon,title,detail){return{icon:icon,t:title,color:'#C5162E',d:detail};}
-  function lesson(){return{t:'Estados honestos y operación segura',min:30,tipo:'lectura',_m1visualv:1227,secciones:[
-    sec('🧭','Ausencia de información no significa estado favorable','Sin pólizas, cartera o cobros migrados, Orbit muestra pendiente, sin datos o aún no disponible; nunca Al día por ausencia de fuente.'),
-    sec('🌎','País por validar y evidencia posterior','País y moneda se corrigen en Calidad con motivo y auditoría. Pólizas o cobros vinculados pueden sugerir GT o CO, pero una moneda aislada nunca cambia el país silenciosamente. Un conflicto siempre requiere revisión humana.'),
-    sec('🧩','Segmentación antes y después de Pólizas','Sin pólizas validadas el segmento es Pendiente de clasificar. Nuevo, Recurrente, Estándar, Premium e Histórico solo se calculan con reglas visibles; Premium exige umbral configurado sobre prima neta recaudada.'),
-    sec('📅','Fechas inválidas','Una fecha no interpretable se presenta como Sin fecha registrada o Fecha no disponible, nunca InvalidDate.'),
-    sec('👥','Rol activo y alcance','Escritorio, tableta y móvil deben permitir identificar el rol activo. Calidad y Cliente 360 respetan propios, equipo o todos.'),
-    sec('🛡️','El rol activo impone el techo','En una cuenta multirol, cambiar a Asesor también cambia el alcance efectivo. Un scope amplio de Dirección nunca se hereda al activar Asesor: Dirección puede llegar a todos, Operativo como máximo al equipo y Asesor únicamente a sus propios clientes. Una restricción más estrecha, como ninguno, siempre prevalece.'),
-    sec('🔗','Usuario visible y contraseña protegida','El usuario del portal permanece visible en su propio campo. Ver temporalmente revela únicamente la contraseña en un espacio separado y por tiempo limitado; nunca reemplaza el usuario ni persiste el secreto en la ficha.'),
-    sec('🏦','Copia bancaria completa y segura','Banco, tipo, cuenta, moneda y titular pueden copiarse como bloque operativo. El titular usa la aseguradora cuando la fuente no trae otro valor. El campo Uso no se muestra ni se copia porque no pertenece al bloque que debe compartir el equipo.'),
-    sec('📥','Archivo seleccionado no significa almacenado','Seleccionar un archivo solo prepara la propuesta. El éxito exige persistencia comprobada. Sin referencia HTTPS o almacenamiento seguro, Orbit debe decir Propuesta registrada, archivo pendiente de almacenamiento; nunca Archivo cargado.'),
-    sec('🧠','Tarifas y conocimiento','Cada fuente se revisa por país, moneda, ramo y producto. Registrar un documento no habilita automáticamente Cotizador ni Comparativo.'),
-    sec('🏢','Aseguradoras inactivas','Una aseguradora inactiva conserva histórico y debe mostrar el motivo de desactivación. No se reactiva automáticamente por tener contactos, documentos o pólizas.'),
-    sec('✨','Estabilidad y responsive','El primer contenido visible ya debe usar la proyección canónica. Títulos, encabezados, tabs, acciones y el botón Instalar como app deben caber, ser legibles y no producir desplazamiento horizontal en escritorio, tableta o móvil.'),
-    sec('🧪','Defecto y validador','FUNCTIONAL_DEFECT describe una falla del producto; VALIDATOR_STALE describe una prueba que no cubre la experiencia real. Un check verde no reemplaza la conducta visible y verificable.'),
-    sec('🔐','Integridad antes del navegador','Un fix local y un preflight verde no demuestran que Hosting esté sirviendo esos mismos archivos. Antes de abrir navegador, index, Router, barrera visual, contrato visual, PWA, Service Worker e IA deben coincidir byte por byte y por SHA-256 con el HEAD autorizado.'),
-    sec('🛑','Cuándo detener reintentos','Si el mismo error se repite después de un fix local, no se crea otro parche. Se congela el gate y se revisa si la entrega, cache, workflow o verificador dejó pasar una versión anterior.')
-  ]};}
-  function quiz(){return{t:'Evaluación · honestidad operativa M1',min:20,tipo:'quiz',_m1visualv:1227,preguntas:[
-    {p:'Un cliente sin pólizas validadas debe tener segmento…',ops:['Nuevo','Pendiente de clasificar','Premium'],ok:1},
-    {p:'La moneda COP de un cobro vinculado permite…',ops:['Cambiar el país automáticamente','Sugerir Colombia para revisión','Ocultar el cliente'],ok:1},
-    {p:'Una cuenta con Dirección y Asesor cambia su rol activo a Asesor. ¿Qué alcance máximo conserva?',ops:['Todos, porque también tiene Dirección','Solo sus clientes propios','Todo el equipo comercial'],ok:1},
-    {p:'Si una configuración explícita dice ninguno y el rol permitiría todos…',ops:['Gana todos','Gana ninguno','Se combinan ambos'],ok:1},
-    {p:'Seleccionar un PDF en el navegador significa…',ops:['Archivo almacenado','Propuesta preparada; falta comprobar persistencia','Tarifa habilitada'],ok:1},
-    {p:'Al pulsar Ver temporalmente en un portal…',ops:['La contraseña reemplaza el usuario','El usuario permanece visible y la contraseña aparece aparte por tiempo limitado','La contraseña se guarda en la ficha'],ok:1},
-    {p:'Copiar datos bancarios completos debe incluir…',ops:['Banco, tipo, cuenta, moneda y titular','Banco, cuenta, uso y contraseña del portal','Solo los últimos cuatro dígitos'],ok:0},
-    {p:'Registrar un tarifario habilita Cotizador…',ops:['Siempre','Nunca de forma automática; requiere validación','Solo por el nombre del archivo'],ok:1},
-    {p:'Una aseguradora inactiva debe…',ops:['Desaparecer','Mostrar motivo y conservar histórico','Reactivarse al abrirla'],ok:1},
-    {p:'En móvil, un encabezado o botón que obliga a desplazarse horizontalmente…',ops:['Es aceptable si funciona en escritorio','Es un defecto responsive que debe corregirse en el owner visual','Se corrige reimportando datos'],ok:1},
-    {p:'Un preflight local verde demuestra que el navegador recibió el fix…',ops:['Sí, siempre','No; los activos críticos desplegados deben coincidir en bytes y SHA-256','Solo si cambió el comentario del archivo'],ok:1},
-    {p:'Si el mismo error reaparece después de un fix local…',ops:['Se agrega otro parche visual','Se detienen reintentos y se revisa pipeline, cache e integridad de entrega','Se reimportan datos'],ok:1}
-  ]};}
-  function update(id){try{var current=Orbit.store&&Orbit.store.get?Orbit.store.get('cursos',id):null;if(!current)return false;var next=JSON.parse(JSON.stringify(current));next.lecciones=(next.lecciones||[]).filter(function(x){return x&&x._m1visualv!==1221&&x._m1visualv!==1222&&x._m1visualv!==1223&&x._m1visualv!==1224&&x._m1visualv!==1225&&x._m1visualv!==1226&&x._m1visualv!==1227;});next.lecciones.push(lesson(),quiz());next._cv=Math.max(+next._cv||0,1227);next.progreso=current.progreso||0;next.certificado=!!current.certificado;Orbit.store.update('cursos',id,next);return true;}catch(e){return false;}}
-  function apply(){return['cur_p_clientes','cur_dir_aseg_dir_v1202','cur_dir_aseg_op_v1202','cur_dir_aseg_asesor_v1202'].map(update).some(Boolean);}
-  var tries=0;(function wait(){if(apply()||tries++>60)return;setTimeout(wait,150);})();
-  document.addEventListener('orbit:reseeded',apply);
-  Orbit.ACADEMIA_V1221_M1_VISUAL={version:'1.221',contentVersion:'1.227',criticalRelease:'block1-critical-runtime-20260721-4',activeRoleScopeCeiling:true,visualSemanticsRemediation:true,apply:apply};
+  window.Orbit=window.Orbit||{}; Orbit.modules=Orbit.modules||{};
+  if(Orbit.academiaM1VisualIntegrity&&Orbit.academiaM1VisualIntegrity.contentVersion==='1.228')return;
+  const sec=(icon,title,body)=>({icon,title,body});
+  const common=[
+    sec('🧭','Un gate técnico no sustituye la revisión visual','El gate confirma contratos, permisos y ausencia de escrituras no autorizadas. La revisión humana confirma que títulos, datos, acciones y estados se entienden y funcionan en el dispositivo real.'),
+    sec('📱','Responsive verificable','En móvil deben caber títulos, encabezados, pestañas, acciones e Instalar como app sin salirse de la pantalla, superponerse ni ocultar controles.'),
+    sec('🔐','Usuario y contraseña cumplen funciones distintas','El usuario del portal permanece visible. La contraseña usa un espacio separado, se revela temporalmente y vuelve a Oculta. Copiar acceso seguro incluye usuario y contraseña solo con permiso.'),
+    sec('🏦','Datos bancarios exactos','La ficha muestra banco, tipo, número enmascarado, moneda y titular. El titular usa el nombre de la aseguradora cuando falta en la cuenta. El campo Uso no se muestra ni se copia.'),
+    sec('🧪','Defecto y validador','FUNCTIONAL_DEFECT describe una falla del producto; VALIDATOR_STALE describe una prueba que no representa el contrato vigente. Un check verde no reemplaza la conducta visible y verificable.'),
+    sec('🔄','Ciclo de vida de una autorización estática','Durante un preflight de un solo uso, la autorización está activa y aún no consumida. Solo al finalizar pasa a consumida. El validador debe aceptar ambas fases sin habilitar secretos, Firestore, escrituras, runtime, navegador ni deploy.')
+  ];
+  const byRole={
+    'Dirección':common.concat([sec('✅','Validación de Dirección','Confirma directorio y ficha, usuario visible, revelado separado de contraseña, copia segura y datos bancarios completos. La revisión no autoriza reimportación ni cambios de credenciales.')]),
+    'Operativo':common.concat([sec('🛠️','Validación de Operativo','Comprueba que la tableta respete scope team, que los accesos autorizados funcionen y que importadores restringidos no abran modal ni escriban.')]),
+    'Asesor':common.concat([sec('💼','Validación de Asesor','Comprueba en móvil scope own, menú y pestañas utilizables, lectura honesta y ausencia de acciones administrativas restringidas.')])
+  };
+  const quiz=[
+    {p:'¿Qué demuestra un gate técnico PASS?',ops:['Que toda la experiencia visual fue aprobada','Que los contratos automatizados evaluados pasaron','Que producción puede desplegarse'],ok:1},
+    {p:'Al revelar una contraseña, el usuario del portal debe…',ops:['Ser reemplazado por la contraseña','Permanecer visible en su espacio','Ocultarse también'],ok:1},
+    {p:'Copiar datos bancarios completos incluye…',ops:['Banco, tipo, cuenta, moneda y titular','Uso interno y observaciones','Contraseña del portal'],ok:0},
+    {p:'Durante un preflight estático autorizado de un solo uso, la autorización debe estar…',ops:['Activa y no consumida hasta finalizar','Consumida antes de iniciar','Con navegador y deploy habilitados'],ok:0},
+    {p:'¿Qué hacer si el validador exige una fase de autorización incorrecta?',ops:['Modificar el producto para satisfacerlo','Clasificar VALIDATOR_STALE y corregir el contrato del validador','Reimportar datos'],ok:1}
+  ];
+  function apply(){
+    const store=Orbit.store;if(!store||!store.all||!store.insert||!store.update)return {ok:false,code:'STORE_REQUIRED'};
+    const lessons=(store.all('lecciones')||[]).filter(x=>x&&x._m1visualv!==1221&&x._m1visualv!==1226&&x._m1visualv!==1227&&x._m1visualv!==1228);
+    Object.keys(byRole).forEach(role=>lessons.push({id:'m1visual_'+role.toLowerCase().replace(/ó/g,'o')+'_1228',titulo:'Integridad visual M1 · '+role,rol:role,secciones:byRole[role],obligatoria:true,_m1visualv:1228}));
+    const current=(store.all('evaluaciones')||[]).filter(x=>x&&x._m1visualv!==1221&&x._m1visualv!==1226&&x._m1visualv!==1227&&x._m1visualv!==1228);
+    current.push({id:'eval_m1_visual_1228',titulo:'Caso aplicado · Integridad visual y ciclo de vida',preguntas:quiz,_m1visualv:1228});
+    const put=(col,rows)=>rows.forEach(row=>{const old=store.get&&store.get(col,row.id);old?store.update(col,row.id,row):store.insert(col,row);});
+    put('lecciones',lessons);put('evaluaciones',current);
+    try{const cfg=(store.get('config','academia')||{});store.update('config','academia',Object.assign({},cfg,{contenidoM1Visual:'1.228',actualizadoAt:new Date().toISOString()}));}catch(e){}
+    return {ok:true,contentVersion:'1.228',roles:Object.keys(byRole),lessons:3,quiz:quiz.length,writesThroughOrbitStoreOnly:true};
+  }
+  Orbit.academiaM1VisualIntegrity={version:'1.221',contentVersion:'1.228',visualSemanticsRemediation:true,validatorLifecyclePhaseAware:true,apply};
 })();
