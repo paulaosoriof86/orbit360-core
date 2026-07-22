@@ -3,12 +3,34 @@
   "issuedAt": "2026-07-21",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": "VALIDATOR_STALE",
-  "diagnosticRevision": "critical-runtime-integrity-manifest-v1",
-  "contractRevision": "1.0.35-critical-runtime-integrity-manifest-v1",
+  "diagnosticRevision": "critical-runtime-integrity-manifest-owner-reconciliation-v2",
+  "contractRevision": "1.0.35-critical-runtime-integrity-manifest-owner-reconciliation-v2",
   "gatePatch": {
     "contractVersion": "1.0.35",
-    "diagnosticRevision": "critical-runtime-integrity-manifest-v1",
-    "status": "PIPELINE_FIX_PENDING_STATIC_PREFLIGHT"
+    "diagnosticRevision": "critical-runtime-integrity-manifest-owner-reconciliation-v2",
+    "status": "OWNER_REGISTRY_RECONCILED_STATIC_PREFLIGHT_PENDING"
+  },
+  "effectiveOwnerReconciliation": {
+    "baselineOverlayRef": "a6b6641cc8d090930c8a7e9cfc6ad90ea239ff80",
+    "preservedOwnerIds": [
+      "clientInsurerVisualStabilityBarrier",
+      "clientInsurerVisualContract",
+      "clientDataQuality",
+      "insurerDocumentImport",
+      "insurerSecureTargetBridge",
+      "realInsurerDirectoryAcademy"
+    ],
+    "addedOwnerIds": [
+      "pwa"
+    ],
+    "droppedOwnerIds": [],
+    "baseExtensionStaleOwnersOverridden": [
+      "insurerSecureTargetBridge",
+      "realInsurerDirectoryAcademy"
+    ],
+    "productFilesChanged": false,
+    "validatorImplementationChanged": false,
+    "writesExecuted": false
   },
   "canonicalOwners": [
     {
@@ -64,6 +86,47 @@
         "client360StructuralTrigger:true",
         "writesStore:false"
       ]
+    },
+    {
+      "id": "clientDataQuality",
+      "path": "orbit360-platform/modules/calidad.js",
+      "requiredTokens": [
+        "País por validar",
+        "clientCountryEvidence",
+        "soloCamposPendientes: true",
+        "version: '1.217-country-quality'"
+      ]
+    },
+    {
+      "id": "insurerDocumentImport",
+      "path": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+      "requiredTokens": [
+        "Orbit.__insurerDirectoryBridgeV1203",
+        "openInsurerDocumentImport",
+        "documentaryImportRequiresVerifiedPersistence: true",
+        "selectedFileDoesNotEqualStored: true"
+      ]
+    },
+    {
+      "id": "insurerSecureTargetBridge",
+      "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+      "requiredTokens": [
+        "version: '20260721.3'",
+        "async function callProviderWithoutOperationalWrites",
+        "providerReturnsMappingsOnly: true",
+        "providerOperationalStoreWritesAllowed: false"
+      ]
+    },
+    {
+      "id": "realInsurerDirectoryAcademy",
+      "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "requiredTokens": [
+        "Orbit.ACADEMIA_V1223_ASEGURADORAS",
+        "version:'1.223'",
+        "Una confirmación, una escritura",
+        "Después de migrar, solo inventariar",
+        "postMigrationReadOnly:true"
+      ]
     }
   ],
   "requiredFiles": [
@@ -78,12 +141,15 @@
     "orbit360-platform/modules/ia.js",
     "orbit360-platform/modules/calidad.js",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+    "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+    "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
     "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
     "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
     "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
     "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
     "orbit360-platform/docs/evidence/owner-visual-idempotence-proof-local-20260721-sanitized.json",
-    "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-MANIFIESTO-INTEGRIDAD-RUNTIME-CRITICO-20260721.md"
+    "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-MANIFIESTO-INTEGRIDAD-RUNTIME-CRITICO-20260721.md",
+    "orbit360-platform/docs/BLOQUE1-STOP-LINE-RECONCILIACION-OWNERS-REGISTRO-20260721.md"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/index.html",
@@ -97,6 +163,8 @@
     "orbit360-platform/modules/cliente360.js",
     "orbit360-platform/modules/aseguradoras.js",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+    "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+    "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
     "orbit360-platform/modules/ia.js",
     "orbit360-platform/modules/calidad.js"
   ],
@@ -259,6 +327,49 @@
         "proof.proof.canonicalTransforms === 1",
         "proof.proof.followUpObserverDeliveries === 0",
         "ownerIdempotence"
+      ]
+    },
+    {
+      "path": "orbit360-platform/modules/calidad.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "País por validar",
+        "Moneda por validar",
+        "clientCountryEvidence",
+        "soloCamposPendientes: true",
+        "version: '1.217-country-quality'"
+      ]
+    },
+    {
+      "path": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "Orbit.__insurerDirectoryBridgeV1203",
+        "function openInsurerDocumentImport(options)",
+        "No se ha guardado nada",
+        "El archivo no fue almacenado",
+        "documentaryImportRequiresVerifiedPersistence: true"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "version: '20260721.3'",
+        "async function callProviderWithoutOperationalWrites",
+        "providerReturnsMappingsOnly: true",
+        "providerOperationalStoreWritesAllowed: false"
+      ]
+    },
+    {
+      "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "Orbit.ACADEMIA_V1223_ASEGURADORAS",
+        "version:'1.223'",
+        "Una confirmación, una escritura",
+        "Después de migrar, solo inventariar",
+        "postMigrationReadOnly:true"
       ]
     },
     {
