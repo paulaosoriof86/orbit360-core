@@ -1,10 +1,11 @@
-export const CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.27';
+export const CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.28';
 const EXPECTED_CLIENTS = 414;
 const EXPECTED_TABS = ['resumen','polizas','vehiculos','cobros','recibos','renovaciones','siniestros','comisiones','correos','historial'];
 const EXPECTED_CLIENT_PROJECTION_VERSION = '20260720.2';
 const EXPECTED_VISUAL_CONTRACT_VERSION = '20260720.2';
 const VISUAL_REPAIR_REVISION = 'visual-human-repair-v5-operational-honesty';
 const COUNTRY_DATA_CONTRACT_REVISION = 'country-data-contract-v3-quality-proposal';
+const SECURE_CREDENTIAL_VALIDATOR_REVISION = 'insurer-view-password-scope-v1';
 const EXPECTED_COUNTRY_COUNTS = { GT: 337, CO: 16, REQUIERE_VALIDACION: 61 };
 const EXPECTED_TYPE_COUNTS = { Persona: 391, Empresa: 23 };
 const EXPECTED_SEGMENT_COUNTS = { 'Pendiente de clasificar': 414 };
@@ -276,10 +277,31 @@ async function validateInsurerVisualContract(page, report, label) {
   await page.locator('[data-tab="plataformas"]').click();
   await page.locator('.m1-portal-card').first().waitFor({ state: 'visible', timeout: 10000 });
   await page.locator('.m1-credential-box').first().waitFor({ state: 'visible', timeout: 10000 });
-  const portals = await page.evaluate(() => ({ cards: document.querySelectorAll('.m1-portal-card').length, openLinks: document.querySelectorAll('.m1-portal-card a[target="_blank"]').length, copyButtons: document.querySelectorAll('.m1-portal-card [data-m1-copy]').length, credentialBoxes: document.querySelectorAll('.m1-credential-box').length, passwordInputs: document.querySelectorAll('input[type="password"]').length, technicalPasswordCopy: /Orbit nunca guarda ni muestra contraseñas/i.test(document.body.innerText), labeled: Array.from(document.querySelectorAll('.m1-portal-card')).every(card => /URL|Responsable|Última verificación|Acceso protegido/i.test(card.innerText)) }));
+  const portals = await page.evaluate(() => {
+    const login = document.getElementById('login');
+    const hiddenLoginPasswordInputs = login && getComputedStyle(login).display === 'none'
+      ? login.querySelectorAll('input[type="password"]').length
+      : 0;
+    return {
+      cards: document.querySelectorAll('.m1-portal-card').length,
+      openLinks: document.querySelectorAll('.m1-portal-card a[target="_blank"]').length,
+      copyButtons: document.querySelectorAll('.m1-portal-card [data-m1-copy]').length,
+      credentialBoxes: document.querySelectorAll('.m1-credential-box').length,
+      passwordInputsInInsurerView: document.querySelectorAll('#asg-ficha input[type="password"], .m1-portal-card input[type="password"]').length,
+      hiddenLoginPasswordInputs,
+      technicalPasswordCopy: /Orbit nunca guarda ni muestra contraseñas/i.test(String((document.querySelector('#asg-ficha') || {}).innerText || '')),
+      labeled: Array.from(document.querySelectorAll('.m1-portal-card')).every(card => /URL|Responsable|Última verificación|Acceso protegido/i.test(card.innerText))
+    };
+  });
+  report[`${label}SecureCredentialScope`] = {
+    revision: SECURE_CREDENTIAL_VALIDATOR_REVISION,
+    passwordInputsInInsurerView: portals.passwordInputsInInsurerView,
+    hiddenLoginPasswordInputs: portals.hiddenLoginPasswordInputs,
+    hiddenLoginExcludedFromInsurerScope: true
+  };
   assert(portals.cards > 0 && portals.labeled, 'INSURER_PORTAL_HIERARCHY_MISSING', label);
   assert(portals.openLinks > 0 && portals.copyButtons > 0, 'INSURER_PORTAL_ACTIONS_MISSING', label);
-  assert(portals.credentialBoxes > 0 && portals.passwordInputs === 0 && !portals.technicalPasswordCopy, 'INSURER_SECURE_CREDENTIAL_UI_MISSING', label);
+  assert(portals.credentialBoxes > 0 && portals.passwordInputsInInsurerView === 0 && !portals.technicalPasswordCopy, 'INSURER_SECURE_CREDENTIAL_UI_MISSING', `${label}:insurerPasswords=${portals.passwordInputsInInsurerView}:hiddenLoginPasswords=${portals.hiddenLoginPasswordInputs}`);
 
   await page.evaluate(id => { location.hash = '#/aseguradoras?ficha=' + encodeURIComponent(id); }, ids.bank);
   await page.locator('#asg-ficha.m1-asg-ficha').waitFor({ state: 'visible', timeout: 15000 });
@@ -300,15 +322,16 @@ async function validateInsurerVisualContract(page, report, label) {
   assert(!knowledge.technicalCopy && knowledge.honestActivation, 'INSURER_KNOWLEDGE_COPY_NOT_HONEST', label);
 
   await validateImporterHonesty(page, ids.contact, report, label);
-  report[`${label}InsurerVisualContract`] = { hero, inactiveReason: true, contactCards: contacts.cards, portalCards: portals.cards, credentialBoxes: portals.credentialBoxes, bankCards: banks.cards, completeBankCopy: true, knowledgeSummary: true, importerHonest: true };
+  report[`${label}InsurerVisualContract`] = { hero, inactiveReason: true, contactCards: contacts.cards, portalCards: portals.cards, credentialBoxes: portals.credentialBoxes, passwordInputsInInsurerView: portals.passwordInputsInInsurerView, hiddenLoginPasswordInputs: portals.hiddenLoginPasswordInputs, bankCards: banks.cards, completeBankCopy: true, knowledgeSummary: true, importerHonest: true };
 }
 
 export async function validateClient360(page, report, label) {
   report.contractVersion = CLIENT360_VALIDATOR_CONTRACT_VERSION;
   if (report.error == null) report.error = '';
-  report.schemaVersion = 'orbit360-runtime-gate-joint-v27-visual-dom-v5';
+  report.schemaVersion = 'orbit360-runtime-gate-joint-v28-secure-credential-scope';
   report.visualRepairRevision = VISUAL_REPAIR_REVISION;
   report.countryDataContractRevision = COUNTRY_DATA_CONTRACT_REVISION;
+  report.secureCredentialValidatorRevision = SECURE_CREDENTIAL_VALIDATOR_REVISION;
 
   const bootstrap = await readVisualBootstrap(page);
   report[`${label}VisualBootstrap`] = bootstrap;
