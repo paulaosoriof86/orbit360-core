@@ -1,18 +1,19 @@
 {
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
-  "issuedAt": "2026-07-21",
+  "issuedAt": "2026-07-22",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "VALIDATOR_STALE",
-  "diagnosticRevision": "critical-runtime-integrity-owner-closure-comment-tolerant-v3",
-  "contractRevision": "1.0.35-critical-runtime-integrity-owner-closure-comment-tolerant-v3",
+  "classification": "SECURITY_FAILURE",
+  "diagnosticRevision": "active-role-scope-ceiling-v1",
+  "contractRevision": "1.0.36-active-role-scope-ceiling-v1",
   "gatePatch": {
-    "contractVersion": "1.0.35",
-    "diagnosticRevision": "critical-runtime-integrity-owner-closure-comment-tolerant-v3",
-    "status": "INTEGRITY_VERIFIER_COMMENT_TOLERANCE_STATIC_PREFLIGHT_PENDING"
+    "contractVersion": "1.0.36",
+    "diagnosticRevision": "active-role-scope-ceiling-v1",
+    "status": "ACTIVE_ROLE_SCOPE_CEILING_STATIC_PREFLIGHT_AUTHORIZED"
   },
   "effectiveOwnerReconciliation": {
-    "baselineOverlayRef": "a6b6641cc8d090930c8a7e9cfc6ad90ea239ff80",
+    "baselineOverlayRef": "b760ec88adcc319ce2fd0c7c1e0ce0410f41c4fa",
     "preservedOwnerIds": [
+      "pwa",
       "clientInsurerVisualStabilityBarrier",
       "clientInsurerVisualContract",
       "clientDataQuality",
@@ -21,18 +22,20 @@
       "realInsurerDirectoryAcademy"
     ],
     "addedOwnerIds": [
-      "pwa"
+      "access"
     ],
     "droppedOwnerIds": [],
     "baseExtensionStaleOwnersOverridden": [
       "insurerSecureTargetBridge",
       "realInsurerDirectoryAcademy"
     ],
-    "productFilesChanged": false,
+    "securityFix": "active-role-scope-ceiling-v1",
+    "productFilesChanged": true,
     "validatorImplementationChanged": false,
     "writesExecuted": false,
-    "integrityVerifierPolicy": "iife_before_trailing_comments",
-    "integrityVerifierCommit": "ec291989630845d401472bcc9249a0f7ce28e866"
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false
   },
   "canonicalOwners": [
     {
@@ -129,6 +132,20 @@
         "Después de migrar, solo inventariar",
         "postMigrationReadOnly:true"
       ]
+    },
+    {
+      "id": "access",
+      "path": "orbit360-platform/core/access-scope.js",
+      "requiredTokens": [
+        "var SCOPE_LEVEL = { none: 0, own: 1, team: 2, all: 3 }",
+        "function roleScopeCeiling(moduleKey)",
+        "function applyRoleScopeCeiling(requestedScope, moduleKey)",
+        "if (ALL_ROLES.indexOf(role) >= 0) return 'all'",
+        "if (TEAM_ROLES.indexOf(role) >= 0) return 'team'",
+        "if (OWN_ROLES.indexOf(role) >= 0 || /Asesor/i.test(role)) return 'own'",
+        "return scopeLevel(requested) <= scopeLevel(ceiling) ? requested : ceiling",
+        "__activeRoleScopeCeilingV20260721: true"
+      ]
     }
   ],
   "requiredFiles": [
@@ -146,6 +163,10 @@
     "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
     "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
     "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+    "orbit360-platform/core/access-scope.js",
+    "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js",
+    "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+    "orbit360-platform/docs/BLOQUE1-SECURITY-FAILURE-TECHO-SCOPE-ROL-ACTIVO-20260721.md",
     "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
     "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
     "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
@@ -162,11 +183,13 @@
     "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
     "orbit360-platform/core/pwa.js",
     "orbit360-platform/sw.js",
+    "orbit360-platform/core/access-scope.js",
     "orbit360-platform/modules/cliente360.js",
     "orbit360-platform/modules/aseguradoras.js",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
     "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
     "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+    "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
     "orbit360-platform/modules/ia.js",
     "orbit360-platform/modules/calidad.js"
   ],
@@ -282,7 +305,7 @@
       "requiredTokens": [
         "orbit360-critical-runtime-integrity-manifest-v1",
         "block1-critical-runtime-20260721-4",
-        "1.0.35",
+        "1.0.36",
         "routerTenantBootstrap",
         "clientInsurerVisualStabilityBarrier",
         "serviceWorker",
@@ -382,24 +405,61 @@
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "version:'1.221'",
-        "contentVersion:'1.225'",
-        "_m1visualv:1225",
-        "Integridad antes del navegador",
+        "contentVersion:'1.226'",
+        "_m1visualv:1226",
+        "El rol activo impone el techo",
+        "activeRoleScopeCeiling:true",
         "block1-critical-runtime-20260721-4"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/access-scope.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "var SCOPE_LEVEL = { none: 0, own: 1, team: 2, all: 3 }",
+        "function roleScopeCeiling(moduleKey)",
+        "function applyRoleScopeCeiling(requestedScope, moduleKey)",
+        "return applyRoleScopeCeiling(ex, moduleKey)",
+        "return scopeLevel(requested) <= scopeLevel(ceiling) ? requested : ceiling",
+        "__activeRoleScopeCeilingV20260721: true"
+      ]
+    },
+    {
+      "path": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "active-role-scope-ceiling-v1",
+        "Dirección debe conservar scope all explícito",
+        "Operativo no puede heredar all",
+        "Asesor no puede heredar all",
+        "none debe prevalecer",
+        "advisorExplicitAll: 'own'",
+        "operativoExplicitAll: 'team'",
+        "writes.length === 0"
+      ]
+    },
+    {
+      "path": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "ACCESS_ACTIVE_ROLE_SCOPE_CEILING",
+        "ACCESS_ROLE_SCOPE_CONTRACT_EXECUTES",
+        "ACCESS_ROLE_SCOPE_CONTRACT_PASS",
+        "ACCESS_ADVISOR_SCOPE_OWN",
+        "ACCESS_OPERATIVO_SCOPE_TEAM",
+        "ACCESS_EXPLICIT_NONE_WINS",
+        "ACCESS_SCOPE_TEST_NO_WRITES"
       ]
     },
     {
       "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "replaceRequiredTokens": true,
       "requiredTokens": [
+        "final_block1_static_preflight_only",
         "targeted_lab_deploy_then_unique_final_block1_gate_readonly",
-        "node --check tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+        "node --check orbit360-platform/core/access-scope.js",
+        "node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
         "node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs --local-only",
-        "Verificar integridad exacta de scripts publicados",
-        "node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
-        "script-integrity-sanitized.json",
-        "Gate final único · tres vistas",
-        "hosting:channel:deploy \"$ORBIT360_HOSTING_CHANNEL\"",
         "functionsDeployed:false",
         "rulesDeployed:false",
         "productionTouched:false"
