@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-final-block1-static-preflight-authorized-v13-canonical-engine-evidence",
+  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v14-consumed-retired",
   "issuedAt": "2026-07-22",
   "authorizationId": "final-block1-static-preflight-1-0-37-v3",
-  "authorizationRevision": 13,
+  "authorizationRevision": 14,
   "action": "final_block1_static_preflight_1_0_37_lifecycle_v2_only",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -11,10 +11,15 @@
   "expectedContractVersion": "1.0.37",
   "visualRemediationRevision": "20260722.1",
   "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
-  "allowedExecutions": 1,
-  "active": true,
-  "consumed": false,
-  "preflightRequired": true,
+  "active": false,
+  "consumed": true,
+  "allowedExecutions": 0,
+  "consumedByRunId": 29954997417,
+  "outcome": "FAILED_VALIDATOR_STALE",
+  "failedCheckIds": [
+    "WORKFLOW_PROJECT_LOCK",
+    "WORKFLOW_CHANNEL_LOCK"
+  ],
   "runtimeAllowed": false,
   "browserAllowed": false,
   "firestoreReadAllowed": false,
@@ -28,40 +33,8 @@
   "productionAllowed": false,
   "reimportAllowed": false,
   "finalGateRerunAllowed": false,
-  "validators": [
-    "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-    "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
-    "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
-    "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js"
-  ],
-  "expected": {
-    "gateContractStatus": "GO_GATE_CONTRACT",
-    "gateContractVersion": "1.0.37",
-    "architectureStatus": "GO_STATIC_ARCHITECTURE",
-    "visualRemediationStatus": "PASS",
-    "visualRemediationChecksPassed": 29,
-    "visualRemediationChecksFailed": 0,
-    "finalGateRerun": false,
-    "writesExecuted": false,
-    "runtimeExecuted": false,
-    "browserExecuted": false,
-    "deployExecuted": false,
-    "containsPII": false,
-    "containsSecrets": false
-  },
-  "acceptance": "GO_GATE_CONTRACT_AND_GO_STATIC_ARCHITECTURE_AND_M1_VISUAL_REMEDIATION_PASS_ONLY",
+  "retiredBy": "immutable-request-bound-to-parent-head-and-run-attempt-v1",
+  "retirementReason": "Mutable authorization state in Git duplicated lifecycle state and remained active after failed runs. Future execution is authorized only by an immutable request bound to the parent HEAD and first GitHub run attempt.",
   "containsPII": false,
-  "containsSecrets": false,
-  "previousAttempt": {
-    "authorizationId": "final-block1-static-preflight-1-0-37-v2",
-    "runId": 29953485798,
-    "status": "FAILED_PIPELINE_MECHANISM",
-    "failedCheckId": "CANONICAL_PREFLIGHT_ENTRYPOINT",
-    "cause": "engine_stdout_truncated_by_process_exit",
-    "productRegression": false,
-    "gateRerun": false,
-    "runtimeExecuted": false,
-    "browserExecuted": false,
-    "deployExecuted": false
-  }
+  "containsSecrets": false
 }
