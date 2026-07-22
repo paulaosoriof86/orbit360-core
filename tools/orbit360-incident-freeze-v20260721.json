@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v36-owner-registry-reconciled-static-preflight-authorized",
+  "schemaVersion": "orbit360-incident-freeze-v37-documentation-presence-corrected-static-preflight-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
@@ -45,7 +45,8 @@
       "head": "009d7c29401af67194e7331f104e6b7942111fce",
       "contractVersion": "1.0.35",
       "status": "VALIDATOR_STALE",
-      "failedChecks": 6
+      "failedChecks": 6,
+      "cause": "stale_base_runtime_gate_token_contract"
     },
     {
       "runId": 29882121307,
@@ -54,7 +55,23 @@
       "head": "9ea4d719fb7986d462aec9bb0c6ced4cb38e29bc",
       "contractVersion": "1.0.35",
       "status": "VALIDATOR_STALE",
-      "failedChecks": 3
+      "failedChecks": 3,
+      "cause": "overlay_omitted_effective_owner_overrides"
+    },
+    {
+      "runId": 29883945919,
+      "artifactId": 8515820110,
+      "artifactDigest": "sha256:4d0d2cb45afc900188d7b9e68e14be0193fc5de9de6b8a4b81af2c99092ec509",
+      "head": "9fc2a3bbd3c1bef74dcad736e2278ac7667868ef",
+      "contractVersion": "1.0.35",
+      "status": "VALIDATOR_STALE",
+      "totalChecks": 1194,
+      "passedChecks": 1193,
+      "failedChecks": 1,
+      "failedCheckIds": [
+        "REQUIRED_FILE:orbit360-platform/docs/BLOQUE1-STOP-LINE-RECONCILIACION-OWNERS-REGISTRO-20260721.md"
+      ],
+      "cause": "required_reconciliation_document_not_committed_before_preflight"
     }
   ],
   "ownerRegistryReconciliation": {
@@ -92,6 +109,16 @@
     "deployExecuted": false,
     "writesExecuted": false
   },
+  "documentationCorrection": {
+    "ok": true,
+    "path": "orbit360-platform/docs/BLOQUE1-STOP-LINE-RECONCILIACION-OWNERS-REGISTRO-20260721.md",
+    "commit": "89338acd222b4d4fe8d3a67b837d75757f780a2d",
+    "productFilesChanged": false,
+    "validatorImplementationChanged": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false
+  },
   "implementedProductState": {
     "contractVersion": "1.0.35",
     "criticalRelease": "block1-critical-runtime-20260721-4",
@@ -111,7 +138,7 @@
   },
   "staticPreflightAuthorization": {
     "authorizationId": "final-block1-static-preflight-v1",
-    "authorizationRevision": 12,
+    "authorizationRevision": 13,
     "active": true,
     "consumed": false,
     "allowedExecutions": 1,
@@ -157,7 +184,7 @@
     "create_parallel_gate"
   ],
   "allowedActions": [
-    "execute_single_final_block1_static_preflight_after_atomic_owner_registry_reconciliation"
+    "execute_single_final_block1_static_preflight_after_documentation_presence_correction"
   ],
   "stateClarification": {
     "m1DataRecovery": "CLOSED",
@@ -171,12 +198,13 @@
     "selfMutationLoop": "RESOLVED",
     "criticalRuntimeIntegrity": "IMPLEMENTED_PENDING_AUTHORIZED_STATIC_PREFLIGHT",
     "ownerRegistryReconciliation": "COMPLETED",
+    "documentationPresence": "CORRECTED",
     "targetedLabDeployAuthorized": false,
     "finalGateAuthorized": false,
     "productionTouched": false,
     "m1Closed": false
   },
-  "nextAllowedStep": "Execute exactly one static preflight for contract 1.0.35 after the atomic owner reconciliation. It must remain without secrets, browser, Firestore, vault or deploy. Only GO_GATE_CONTRACT plus static ok:true may later authorize one targeted LAB deploy and final gate.",
+  "nextAllowedStep": "Execute exactly one static preflight for contract 1.0.35 after creating the only missing required documentation file. It must remain without secrets, browser, Firestore, vault or deploy. Only GO_GATE_CONTRACT plus static ok:true may later authorize one targeted LAB deploy and final gate.",
   "containsPII": false,
   "containsSecrets": false
 }
