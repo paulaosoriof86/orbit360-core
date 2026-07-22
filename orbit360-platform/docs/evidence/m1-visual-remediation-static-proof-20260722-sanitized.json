@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "orbit360-m1-visual-remediation-static-proof-v1",
+  "issuedAt": "2026-07-22",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "classification": "FUNCTIONAL_DEFECT",
+  "effectiveContractVersion": "1.0.37",
+  "visualRemediationRevision": "20260722.1",
+  "appliedCommit": "84c6d4e3e2f60d2273056619bc1ab4f53b6ec9e3",
+  "staticValidation": {
+    "status": "PASS",
+    "dedicatedContract": "orbit360-m1-visual-remediation-contract-v1",
+    "checksPassed": 29,
+    "checksFailed": 0,
+    "architectureStatus": "GO_STATIC_ARCHITECTURE",
+    "nodeSyntaxChecks": "PASS"
+  },
+  "scope": {
+    "productOwnersChanged": [
+      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+      "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css"
+    ],
+    "academyChanged": true,
+    "validatorChanged": true,
+    "contractOverlayChanged": true,
+    "criticalIntegrityManifestChanged": true,
+    "dataChanged": false,
+    "storeChanged": false,
+    "authChanged": false,
+    "vaultChanged": false,
+    "importersChanged": false
+  },
+  "temporaryMechanism": {
+    "workflowRetired": true,
+    "applicationScriptRetired": true,
+    "payloadRetired": true,
+    "permanentOwnerCreated": false
+  },
+  "execution": {
+    "operationalWrites": 0,
+    "firestoreWrites": 0,
+    "vaultRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "hostingDeployExecuted": false,
+    "functionsDeployed": false,
+    "rulesDeployed": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "preservedInventory": {
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "validUniqueBankReferences": 91,
+    "pendingBankReferences": 2,
+    "portalCredentials": "26_OF_26",
+    "colombia": "INTACT",
+    "reimportRequired": false
+  },
+  "nextAction": "Create and consume one separate single-use authorization for the binding static preflight of contract 1.0.37. Do not rerun the final gate and do not enable runtime, browser or deploy in that authorization.",
+  "containsPII": false,
+  "containsSecrets": false
+}
