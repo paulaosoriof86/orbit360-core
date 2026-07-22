@@ -1,16 +1,20 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v50-advisor-active-role-scope-leak",
+  "schemaVersion": "orbit360-incident-freeze-v51-active-role-scope-static-preflight",
   "issuedAt": "2026-07-21",
-  "updatedAt": "2026-07-21",
+  "updatedAt": "2026-07-22",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "STOP_THE_LINE_ADVISOR_ACTIVE_ROLE_SCOPE_LEAK",
+  "status": "FINAL_BLOCK1_STATIC_PREFLIGHT_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "controlIssue": 7,
   "tenantId": "alianzas-soluciones",
-  "blockedGateIds": ["block1-client360-insurers-lab-v20260717"],
-  "classification": ["SECURITY_FAILURE"],
+  "blockedGateIds": [
+    "block1-client360-insurers-lab-v20260717"
+  ],
+  "classification": [
+    "SECURITY_FAILURE"
+  ],
   "inventoryEvidence": {
     "ok": true,
     "runId": 29868538689,
@@ -44,7 +48,6 @@
     "observedDataScope": "all",
     "observedScopedClients": 414,
     "actorAdvisorIdPresent": true,
-    "qualityModuleExpectedForObservedAllScopeButUnavailable": true,
     "writesExecuted": false,
     "functionsDeployed": false,
     "rulesDeployed": false,
@@ -53,18 +56,28 @@
   "confirmedRootCauseDirection": {
     "classification": "SECURITY_FAILURE",
     "code": "ACTIVE_ROLE_SCOPE_CEILING_NOT_ENFORCED",
-    "finding": "Orbit.access.dataScope resolves advisor-record explicit scope before enforcing the ceiling of the active role, allowing a multirol user switched to Asesor to retain an all-scope inherited from another role",
+    "finding": "Orbit.access.dataScope accepted an explicit multirol all scope before enforcing the ceiling of the active Asesor role",
     "advisorMustBeOwn": true,
+    "operativoMustNotExceedTeam": true,
+    "explicitNoneMustAlwaysWin": true,
     "validatorMustNotSkipQualityToHideLeak": true,
     "previousFixesInvalidated": false,
     "deliveryCause": false,
     "cacheCause": false,
     "dataCountCause": false
   },
+  "securityFix": {
+    "contract": "active-role-scope-ceiling-v1",
+    "gateContractVersion": "1.0.36",
+    "owner": "orbit360-platform/core/access-scope.js",
+    "contractTest": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js",
+    "architectureGate": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+    "academyContentVersion": "1.226",
+    "implemented": true,
+    "staticPreflightPending": true,
+    "runtimeValidated": false
+  },
   "allowedActions": [
-    "audit_active_role_scope_resolution_and_multirol_contract",
-    "implement_role_ceiling_in_existing_access_owner_without_hardcoding_tenant",
-    "update_access_contract_academy_and_documentation",
     "run_single_static_preflight_after_security_fix"
   ],
   "blockedActions": [
@@ -82,17 +95,35 @@
     "write_secret_manager",
     "reimport_clients",
     "reimport_insurers",
+    "change_insurer_credentials",
+    "change_insurer_importers",
     "advance_policies",
     "advance_block2",
     "merge_main",
     "create_parallel_gate"
   ],
+  "staticPreflightAuthorization": {
+    "authorizationId": "final-block1-static-preflight-v1",
+    "active": true,
+    "consumed": false,
+    "allowedExecutions": 1,
+    "contractVersion": "1.0.36",
+    "secretsAllowed": false,
+    "firestoreReadAllowed": false,
+    "vaultReadAllowed": false,
+    "writesAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "deployAllowed": false,
+    "productionAllowed": false
+  },
   "finalGateAuthorization": {
     "authorizationId": "final-block1-targeted-lab-deploy-gate-v1",
     "active": false,
     "consumed": true,
     "allowedExecutions": 0,
     "lastRunId": 29887445294,
+    "contractVersion": "1.0.36",
     "writesAllowed": false,
     "deployAllowed": false,
     "productionAllowed": false
@@ -109,13 +140,13 @@
     "desktopDirection": "PASSED_COMPLETE",
     "tabletOperativo": "PASSED_COMPLETE",
     "mobileAsesorMenu": "PASSED",
-    "mobileAsesorScope": "SECURITY_FIX_REQUIRED_OWN_NOT_ALL",
+    "mobileAsesorScope": "FIX_IMPLEMENTED_STATIC_PREFLIGHT_PENDING",
     "targetedLabDeployAuthorized": false,
     "finalGateAuthorized": false,
     "productionTouched": false,
     "m1Closed": false
   },
-  "nextAllowedStep": "Audit the canonical access owner and multirol session contract, then correct only active-role scope resolution so an Asesor role can never exceed own scope even when the same user has another role with all scope. Preserve explicit restrictions and permit narrower scopes. Update access tests, documentation and Academy together, then run one static preflight before any browser or deploy.",
+  "nextAllowedStep": "Run exactly one static preflight for contract 1.0.36. Require GO_GATE_CONTRACT, GO_STATIC_ARCHITECTURE, advisor own, operativo team, explicit none wins and zero writes. Do not read secrets or data, open a browser or deploy.",
   "containsPII": false,
   "containsSecrets": false
 }
