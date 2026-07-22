@@ -6,14 +6,15 @@
 (function () {
   'use strict';
 
+  var CRITICAL_RELEASE = 'block1-critical-runtime-20260721-4';
   var params = new URLSearchParams(window.location.search || '');
   var tenantId = String(params.get('tenant') || '').trim();
   var index = window.OrbitTenantRuntimeConfigIndex || {};
   var entry = tenantId && index[tenantId] ? index[tenantId] : null;
   var source = String(entry && entry.insurerConfigSrc || '').trim();
-  var visualStabilitySrc = 'core/client-insurer-visual-stability-barrier-v20260721.js?v=20260721-2';
-  var visualScriptSrc = 'core/client-insurer-visual-contract-v20260720.js?v=20260720-2';
-  var visualStyleSrc = 'styles/client-insurer-visual-contract-v20260720.css?v=20260720-2';
+  var visualStabilitySrc = 'core/client-insurer-visual-stability-barrier-v20260721.js?v=20260721-4';
+  var visualScriptSrc = 'core/client-insurer-visual-contract-v20260720.js?v=20260721-4';
+  var visualStyleSrc = 'styles/client-insurer-visual-contract-v20260720.css?v=20260721-4';
   var sessionReadinessSrc = 'core/session-readiness-contract-v20260720.js?v=20260720-1';
   var credentialProviderSrc = 'core/aseguradoras-credentials-provider-lab-v20260720.js?v=20260720-1';
   var secureTargetBridgeSrc = 'core/insurer-secure-target-bridge-v20260720.js?v=20260720-1';
@@ -25,10 +26,12 @@
     phase: 'shell-parse',
     tenantResolved: Boolean(tenantId),
     sourceResolved: Boolean(source),
+    criticalRelease: CRITICAL_RELEASE,
     visualStabilityRequested: true,
-    visualStabilityVersion: '20260721.2',
+    visualStabilityVersion: '20260721.4',
     visualContractRequested: true,
     visualContractVersion: '20260720.2',
+    visualContractDeliveryRevision: '20260721.4',
     sessionReadinessRequested: true,
     sessionReadinessVersion: '20260720.1',
     credentialProviderRequested: true,
@@ -141,7 +144,7 @@
   }
 
   function loadVisualStability() {
-    if (window.Orbit && window.Orbit.__clientInsurerVisualStabilityBarrierV20260721 && window.Orbit.__clientInsurerVisualStabilityBarrierV20260721.version === '20260721.2') {
+    if (window.Orbit && window.Orbit.__clientInsurerVisualStabilityBarrierV20260721 && window.Orbit.__clientInsurerVisualStabilityBarrierV20260721.version === '20260721.4') {
       loadVisualContract();
       return;
     }
@@ -223,4 +226,4 @@
   sessionScript.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'session-readiness-error'; }, { once: true });
   document.head.appendChild(sessionScript);
 })();
-/* Preflight v11: barrera visual event-driven, sesión legal, membresía, contrato E2E y Academia cargados antes del Router. */
+/* Preflight v12: release crítico versionado, barrera visual event-driven, sesión legal, membresía, contrato E2E y Academia cargados antes del Router. */
