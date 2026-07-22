@@ -1,17 +1,14 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v41-first-visible-directory-incomplete",
+  "schemaVersion": "orbit360-incident-freeze-v42-first-visible-directory-fix-static-preflight-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "STOP_THE_LINE_FIRST_VISIBLE_DIRECTORY_INCOMPLETE",
+  "status": "FINAL_BLOCK1_STATIC_PREFLIGHT_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "controlIssue": 7,
   "tenantId": "alianzas-soluciones",
-  "blockedGateIds": [
-    "block1-client360-insurers-lab-v20260717"
-  ],
   "classification": [
     "FUNCTIONAL_DEFECT"
   ],
@@ -29,7 +26,7 @@
     "writesExecuted": false,
     "deployExecuted": false
   },
-  "staticPreflightEvidence": {
+  "previousStaticEvidence": {
     "ok": true,
     "runId": 29884864315,
     "artifactId": 8516143596,
@@ -40,11 +37,7 @@
     "preflightChecks": 1197,
     "preflightPassed": 1197,
     "criticalAssetCount": 9,
-    "criticalIntegrityLocalOk": true,
-    "staticValidatorsOk": true,
-    "runtimeExecuted": false,
-    "browserExecuted": false,
-    "deployExecuted": false
+    "staticValidatorsOk": true
   },
   "failedFinalGateEvidence": {
     "runId": 29884976786,
@@ -55,7 +48,6 @@
     "remoteCriticalIntegrityPassed": true,
     "remoteCriticalAssetCount": 9,
     "allRemoteBytesAndSha256Exact": true,
-    "gateExecuted": true,
     "failureStage": "desktop_direction_client360",
     "errorCode": "INSURER_INACTIVE_REASON_MISSING",
     "writesExecuted": false,
@@ -66,25 +58,68 @@
   "confirmedRootCause": {
     "classification": "FUNCTIONAL_DEFECT",
     "code": "FIRST_VISIBLE_DIRECTORY_INCOMPLETE",
-    "cause": "the_visual_stability_barrier_marks_the_route_pending_but_its_css_hides_only_asg_ficha_not_the_asg_grid_while_the_canonical_owner_runs_asynchronously",
+    "cause": "pending_visual_css_hid_only_the_insurer_detail_while_the_directory_grid_became_visible_before_the_canonical_owner_inserted_the_inactive_reason",
     "deliveryCause": false,
     "cacheCause": false,
     "validatorCause": false,
     "dataCause": false,
-    "securityCause": false,
-    "evidence": [
-      "all_nine_remote_assets_exact",
-      "barrier_20260721_4_loaded",
-      "grid_becomes_visible_before_m1_inactive_reason_is_inserted",
-      "barrier_uses_setTimeout_and_two_requestAnimationFrame_cycles",
-      "pending_css_targets_only_asg_ficha"
-    ]
+    "securityCause": false
   },
-  "allowedActions": [
-    "correct_existing_visual_stability_barrier_first_visible_directory_guard",
-    "update_owner_contract_documentation_and_academy_impact",
-    "run_single_static_preflight_after_root_cause_fix"
-  ],
+  "implementedFix": {
+    "ok": true,
+    "barrierPath": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
+    "barrierCommit": "04737846f00780a50d1c9394371a37dbdee6e6dc",
+    "barrierVersion": "20260721.4",
+    "directoryVisibilityRevision": "20260721.4a-first-visible-complete",
+    "criticalRelease": "block1-critical-runtime-20260721-4",
+    "directoryFirstPaintGuard": true,
+    "pendingCssHidesDirectory": true,
+    "pendingCssDisablesDirectoryInteraction": true,
+    "synchronousOwnerBeforeRelease": true,
+    "directoryReadyRequiredBeforeRelease": true,
+    "ownerContractPath": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js",
+    "ownerContractCommit": "8f225f6ccf9ca6b212a7621a09f67afce8745742",
+    "documentationPath": "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-PRIMER-DIRECTORIO-VISIBLE-INCOMPLETO-20260721.md",
+    "documentationCommit": "1cf63378da8ab0758ab3c177b96fe9109e940429",
+    "academyCoverage": "EXISTING_CONTENT_1_225_ALREADY_EXACT",
+    "rendererChanged": false,
+    "storeChanged": false,
+    "backendChanged": false,
+    "dataChanged": false,
+    "writesExecuted": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false
+  },
+  "staticPreflightAuthorization": {
+    "authorizationId": "final-block1-static-preflight-v1",
+    "authorizationRevision": 16,
+    "active": true,
+    "consumed": false,
+    "allowedExecutions": 1,
+    "action": "final_block1_static_preflight_only",
+    "gateId": "block1-client360-insurers-lab-v20260717",
+    "contractVersion": "1.0.35",
+    "secretsAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "firestoreReadAllowed": false,
+    "vaultReadAllowed": false,
+    "writesAllowed": false,
+    "deployAllowed": false,
+    "productionAllowed": false,
+    "acceptance": "GO_GATE_CONTRACT_AND_STATIC_OK_TRUE_ONLY"
+  },
+  "finalGateAuthorization": {
+    "authorizationId": "final-block1-targeted-lab-deploy-gate-v1",
+    "active": false,
+    "consumed": true,
+    "allowedExecutions": 0,
+    "lastRunId": 29884976786,
+    "writesAllowed": false,
+    "deployAllowed": false,
+    "productionAllowed": false
+  },
   "blockedActions": [
     "repeat_run_29884976786",
     "open_browser",
@@ -104,16 +139,9 @@
     "merge_main",
     "create_parallel_gate"
   ],
-  "finalGateAuthorization": {
-    "authorizationId": "final-block1-targeted-lab-deploy-gate-v1",
-    "active": false,
-    "consumed": true,
-    "allowedExecutions": 0,
-    "lastRunId": 29884976786,
-    "writesAllowed": false,
-    "deployAllowed": false,
-    "productionAllowed": false
-  },
+  "allowedActions": [
+    "execute_single_static_preflight_after_first_visible_directory_fix"
+  ],
   "stateClarification": {
     "m1DataRecovery": "CLOSED",
     "clients": 414,
@@ -123,15 +151,15 @@
     "portalCredentials": "26_OF_26_PRESERVED",
     "colombia": "INTACT",
     "reimportRequired": false,
-    "contractPreflight": "GO_1197_OF_1197",
-    "criticalRuntimeIntegrityRemote": "OK_9_OF_9_EXACT",
-    "firstVisibleDirectory": "FUNCTIONAL_FIX_REQUIRED",
+    "contractVersion": "1.0.35",
+    "criticalRelease": "block1-critical-runtime-20260721-4",
+    "directoryVisibilityRevision": "20260721.4a-first-visible-complete",
     "targetedLabDeployAuthorized": false,
     "finalGateAuthorized": false,
     "productionTouched": false,
     "m1Closed": false
   },
-  "nextAllowedStep": "Modify only the existing visual stability barrier so the insurer directory grid remains hidden and non-interactive while pending, then release it only after directoryReady is true and the inactive reason exists. Update the owner contract and documentation together, then run one static preflight before any new deploy or browser.",
+  "nextAllowedStep": "Execute exactly one static preflight for contract 1.0.35 after the first-visible-directory fix. It must validate syntax, 9 critical local assets, architecture, owner contract, directory first-paint guard and idempotence 27/27 without secrets, browser, Firestore, vault or deploy. Only static ok:true may authorize one later targeted LAB deploy and final gate.",
   "containsPII": false,
   "containsSecrets": false
 }
