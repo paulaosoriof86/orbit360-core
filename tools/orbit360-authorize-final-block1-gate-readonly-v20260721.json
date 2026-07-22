@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v14-integrity-verifier-comment-tolerance",
+  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v15-owner-contract-barrier-version",
   "issuedAt": "2026-07-21",
   "authorizationId": "final-block1-static-preflight-v1",
-  "authorizationRevision": 14,
+  "authorizationRevision": 15,
   "action": "final_block1_static_preflight_only",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -33,33 +33,34 @@
     "pendingReferences": 2,
     "uniqueValidReferences": 91
   },
-  "ownerRegistryReconciliation": {
-    "ok": true,
-    "overlayCommit": "781ed51b1ef2d70b8b46c46450f947c2f2e67b40",
-    "contractVersion": "1.0.35",
-    "preservedOwners": 6,
-    "addedOwners": 1,
-    "droppedOwners": 0,
-    "productFilesChanged": false
+  "previousStaticEvidence": {
+    "runId": 29884526054,
+    "artifactId": 8516035806,
+    "artifactDigest": "sha256:5262e8409a099eedcd04bf2e672cc0846f77bd77b6a8639600580a9d59c942f6",
+    "contractStatus": "GO_GATE_CONTRACT",
+    "contractChecks": 1197,
+    "criticalIntegrityOk": true,
+    "criticalAssetCount": 9,
+    "localSyntaxOk": true,
+    "ownerClosuresOk": true,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false
   },
-  "contractPreflightEvidence": {
-    "runId": 29884111586,
-    "artifactId": 8515882763,
-    "artifactDigest": "sha256:e6ccd01a5ee294512162a6fff89075e1f46685158599bafb7e199e4140e2082d",
-    "status": "GO_GATE_CONTRACT",
-    "totalChecks": 1194,
-    "passedChecks": 1194,
-    "failedChecks": 0
-  },
-  "integrityVerifierCorrection": {
+  "staticStageReconciliation": {
     "ok": true,
-    "toolCommit": "ec291989630845d401472bcc9249a0f7ce28e866",
-    "overlayCommit": "72d7a754c20bfbc6d5e2aa6a31cde75b5e27e456",
-    "freezeCommit": "e9930a2d2699cb8b90a57b59e601275a3247d164",
-    "documentationCommit": "e8d7d71fc71de2fead955888e789a32015b45d31",
-    "ownerClosurePolicy": "iife_before_trailing_comments",
-    "syntaxValidationPreserved": true,
-    "remoteByteAndShaValidationPreserved": true,
+    "ownerContractCommit": "a713562cbcece0a640e2c9d64674907b0814fc8d",
+    "freezeCommit": "3acd3310e90bf4b82dba595bd8326de95debe6f2",
+    "documentationCommit": "025062c1cc3ebdf3421c1571421e5203a319b869",
+    "barrierVersion": "20260721.4",
+    "criticalRelease": "block1-critical-runtime-20260721-4",
+    "registryVersion": "20260721.2",
+    "auditedValidators": [
+      "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+      "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js",
+      "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs"
+    ],
+    "remainingStaleVersionContracts": 0,
     "productFilesChanged": false
   },
   "expected": {
@@ -70,10 +71,14 @@
     "localAllPresent": true,
     "localSyntaxOk": true,
     "ownerClosurePolicy": "iife_before_trailing_comments",
+    "architectureStatus": "GO_STATIC_ARCHITECTURE",
+    "ownerContractStatus": "PASS",
+    "barrierVersion": "20260721.4",
     "ownerIdempotenceChecks": 27,
     "baseMutations": 1,
     "canonicalTransforms": 1,
     "followUpObserverDeliveries": 0,
+    "frontendKnowledgeRecoveryOk": true,
     "writesExecuted": false,
     "runtimeExecuted": false,
     "browserExecuted": false,
