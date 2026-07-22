@@ -1,17 +1,14 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v44-secure-credential-validator-global-login-input",
+  "schemaVersion": "orbit360-incident-freeze-v45-secure-credential-validator-scope-static-preflight-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "STOP_THE_LINE_SECURE_CREDENTIAL_VALIDATOR_SCOPE",
+  "status": "FINAL_BLOCK1_STATIC_PREFLIGHT_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "controlIssue": 7,
   "tenantId": "alianzas-soluciones",
-  "blockedGateIds": [
-    "block1-client360-insurers-lab-v20260717"
-  ],
   "classification": [
     "VALIDATOR_STALE"
   ],
@@ -35,7 +32,6 @@
     "artifactDigest": "sha256:26bdf4105f481ad3f5d56edfcf9fed54d8acd145df099c8aa3033f252f7b31c9",
     "head": "2c47c24186a2aed48b7490c34655bbbd438b8221",
     "contractVersion": "1.0.35",
-    "preflightStatus": "GO_GATE_CONTRACT",
     "criticalAssetCount": 9,
     "allRemoteBytesAndSha256Exact": true,
     "inactiveReasonGatePassed": true,
@@ -49,21 +45,66 @@
   "confirmedRootCause": {
     "classification": "VALIDATOR_STALE",
     "code": "GLOBAL_HIDDEN_LOGIN_PASSWORD_INPUT_COUNTED_AS_INSURER_FIELD",
-    "cause": "the_validator_counts_all_input_type_password_elements_in_the_document_while_auth_hides_but_does_not_remove_the_login_form",
+    "cause": "the_validator_counted_all_password_inputs_in_the_document_while_auth_hides_but_does_not_remove_the_login_form",
     "productCredentialUiCreatesPasswordInputs": false,
     "hiddenLoginInputRemainsInDom": true,
     "loginHiddenAfterAuth": true,
     "inactiveDirectoryFixInvalidated": false,
-    "deliveryCause": false,
-    "cacheCause": false,
     "dataCause": false,
     "securityCause": false
   },
-  "allowedActions": [
-    "scope_secure_credential_password_input_validation_to_insurer_view",
-    "update_validator_contract_documentation_and_academy_impact",
-    "run_single_static_preflight_after_validator_scope_fix"
-  ],
+  "implementedFix": {
+    "ok": true,
+    "validatorPath": "tools/orbit360-runtime-check-client360-v20260716.mjs",
+    "validatorCommit": "5b1e086b29a2b1aa0147c0f5ea615d7e417a67aa",
+    "validatorContractVersion": "1.0.28",
+    "validatorRevision": "insurer-view-password-scope-v1",
+    "passwordScope": "#asg-ficha,.m1-portal-card",
+    "passwordInputsInInsurerViewRequired": 0,
+    "hiddenLoginPasswordInputsReportedSeparately": true,
+    "hiddenLoginExcludedFromInsurerScope": true,
+    "globalPasswordCountForbidden": true,
+    "ownerContractCommit": "2d96efa0b67332053ed16ef61bc14d6ab6fcc68d",
+    "documentationCommit": "54571c7cc752ae568ac6840eeeba49f5673c9dcc",
+    "academyCoverage": "EXISTING_CONTENT_1_225_ALREADY_COVERS_SECURE_ACCESS_AND_VALIDATOR_STALE",
+    "productFilesChanged": false,
+    "authChanged": false,
+    "storeChanged": false,
+    "dataChanged": false,
+    "writesExecuted": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false
+  },
+  "staticPreflightAuthorization": {
+    "authorizationId": "final-block1-static-preflight-v1",
+    "authorizationRevision": 17,
+    "active": true,
+    "consumed": false,
+    "allowedExecutions": 1,
+    "action": "final_block1_static_preflight_only",
+    "gateId": "block1-client360-insurers-lab-v20260717",
+    "contractVersion": "1.0.35",
+    "secretsAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "firestoreReadAllowed": false,
+    "vaultReadAllowed": false,
+    "writesAllowed": false,
+    "deployAllowed": false,
+    "productionAllowed": false,
+    "acceptance": "GO_GATE_CONTRACT_AND_STATIC_OK_TRUE_ONLY"
+  },
+  "finalGateAuthorization": {
+    "authorizationId": "final-block1-targeted-lab-deploy-gate-v1",
+    "active": false,
+    "consumed": true,
+    "allowedExecutions": 0,
+    "lastRunId": 29885950401,
+    "writesAllowed": false,
+    "deployAllowed": false,
+    "productionAllowed": false
+  },
   "blockedActions": [
     "repeat_run_29885950401",
     "open_browser",
@@ -83,16 +124,9 @@
     "merge_main",
     "create_parallel_gate"
   ],
-  "finalGateAuthorization": {
-    "authorizationId": "final-block1-targeted-lab-deploy-gate-v1",
-    "active": false,
-    "consumed": true,
-    "allowedExecutions": 0,
-    "lastRunId": 29885950401,
-    "writesAllowed": false,
-    "deployAllowed": false,
-    "productionAllowed": false
-  },
+  "allowedActions": [
+    "execute_single_static_preflight_after_secure_credential_validator_scope_fix"
+  ],
   "stateClarification": {
     "m1DataRecovery": "CLOSED",
     "clients": 414,
@@ -102,16 +136,14 @@
     "portalCredentials": "26_OF_26_PRESERVED",
     "colombia": "INTACT",
     "reimportRequired": false,
-    "contractPreflight": "GO",
-    "criticalRuntimeIntegrityRemote": "OK_9_OF_9_EXACT",
     "inactiveReason": "PASSED",
-    "secureCredentialValidator": "SCOPE_FIX_REQUIRED",
+    "secureCredentialValidatorContract": "1.0.28_PENDING_STATIC_PREFLIGHT",
     "targetedLabDeployAuthorized": false,
     "finalGateAuthorized": false,
     "productionTouched": false,
     "m1Closed": false
   },
-  "nextAllowedStep": "Modify only the runtime validator so password inputs are counted inside the insurer detail or portal cards, not across the hidden login form. Preserve the requirement of zero password fields in the insurer UI. Update documentation and run one static preflight before any deploy or browser.",
+  "nextAllowedStep": "Execute exactly one static preflight. It must validate syntax, contract 1.0.35, validator 1.0.28, insurer-only password scope, separated hidden-login diagnostic, owner contract, critical local assets and idempotence without secrets, browser, Firestore, vault or deploy. Only static ok:true may authorize a later targeted gate.",
   "containsPII": false,
   "containsSecrets": false
 }
