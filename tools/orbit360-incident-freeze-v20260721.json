@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v61-canonical-engine-evidence-authorized",
+  "schemaVersion": "orbit360-incident-freeze-v62-control-plane-reconciled",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
-  "incidentId": "m1-visual-review-semantic-and-responsive-defects-v20260722",
-  "status": "FINAL_BLOCK1_STATIC_PREFLIGHT_AUTHORIZED",
+  "incidentId": "m1-control-plane-distributed-state-and-phase-drift-v20260722",
+  "status": "CONTROL_PLANE_RECONCILED_STATIC_PREFLIGHT_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -62,60 +62,61 @@
     "browserExecuted": false,
     "deployExecuted": false
   },
-  "firstBindingStaticPreflight": {
-    "status": "FAILED_VALIDATOR_STALE",
-    "contractVersion": "1.0.37",
-    "gateContractStatus": "GO_GATE_CONTRACT",
-    "gateContractChecksPassed": 1314,
-    "gateContractChecksFailed": 0,
-    "architectureChecksPassed": 33,
-    "architectureChecksFailed": 2,
-    "visualRemediationChecksPassed": 26,
-    "visualRemediationChecksFailed": 3,
-    "failedVisualChecks": [
-      "FREEZE_STOP_THE_LINE",
-      "FREEZE_NO_RUNTIME",
-      "AUTHORIZATION_CONSUMED"
+  "failedPreflightAttempts": [
+    {
+      "runId": 29953485798,
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "failedCheckIds": ["CANONICAL_PREFLIGHT_ENTRYPOINT"],
+      "cause": "engine_stdout_truncated_by_process_exit",
+      "productRegression": false
+    },
+    {
+      "runId": 29954997417,
+      "classification": "VALIDATOR_STALE",
+      "failedCheckIds": ["WORKFLOW_PROJECT_LOCK", "WORKFLOW_CHANNEL_LOCK"],
+      "cause": "runtime_hosting_environment_locks_enforced_unconditionally_against_static_preflight_workflow",
+      "productRegression": false
+    }
+  ],
+  "controlPlaneReconciliation": {
+    "status": "ROOT_CAUSE_CLOSED_STRUCTURALLY",
+    "sameStageFailures": 2,
+    "readyForImmutableRequest": true,
+    "controlPlaneRevision": "phase-capability-immutable-request-v1",
+    "rootCause": "Gate control was distributed across registry, extension, overlay, lifecycle patch, freeze, mutable authorization, workflow and manually maintained PR text. The registry described runtime/Hosting while the active workflow was static. The engine had unconditional environment checks, so lifecycle token composition could not align semantics.",
+    "corrections": [
+      "declare execution phase and capabilities in the composed canonical gate contract",
+      "make project and Hosting locks conditional on declared workflow capabilities",
+      "require an explicit workflow phase lock",
+      "retire Git-tracked active/consumed authorization as an execution mechanism",
+      "use one immutable execution request bound to the reconciled parent HEAD and GitHub run attempt 1",
+      "keep the final technical gate historical and forbid rerun",
+      "treat GitHub run evidence and PR metadata as live state instead of manually copied HEAD text"
     ],
-    "writesExecuted": false,
-    "runtimeExecuted": false,
-    "browserExecuted": false,
-    "deployExecuted": false
-  },
-  "canonicalPipelineReconciliation": {
-    "status": "AUTHORIZED_AFTER_ENGINE_EVIDENCE_ROOT_CAUSE",
-    "officialEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-    "preservedEngine": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
-    "lifecycleContract": "tools/orbit360-validator-lifecycle-contract-v20260722.json",
-    "parallelWrapperRetired": true,
-    "parallelOverlayRetired": true,
-    "workflowFinalGateRerunRemoved": true,
-    "classificationCorrectedToPipelineMechanismFailure": true,
     "productOwnerChanged": false,
     "dataChanged": false,
-    "engineStdoutParsingRetired": true,
-    "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
-    "failedRunId": 29953485798,
-    "failedCheckId": "CANONICAL_PREFLIGHT_ENTRYPOINT",
-    "rootCause": "preserved_engine_process_exit_truncated_piped_stdout_before_complete_json_flush"
+    "storeChanged": false,
+    "authChanged": false,
+    "vaultChanged": false,
+    "importersChanged": false
   },
   "staticPreflightAuthorization": {
     "authorizationId": "final-block1-static-preflight-1-0-37-v3",
     "action": "final_block1_static_preflight_1_0_37_lifecycle_v2_only",
     "contractVersion": "1.0.37",
     "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
-    "active": true,
-    "consumed": false,
-    "allowedExecutions": 1,
+    "active": false,
+    "consumed": true,
+    "allowedExecutions": 0,
+    "consumedByRunId": 29954997417,
+    "outcome": "FAILED_VALIDATOR_STALE",
     "secretsAllowed": false,
     "firestoreReadAllowed": false,
     "writesAllowed": false,
     "runtimeAllowed": false,
     "browserAllowed": false,
     "deployAllowed": false,
-    "finalGateRerunAllowed": false,
-    "previousFailedRunId": 29953485798,
-    "previousFailedAuthorizationId": "final-block1-static-preflight-1-0-37-v2"
+    "finalGateRerunAllowed": false
   },
   "preservedInventory": {
     "clients": 414,
@@ -130,10 +131,11 @@
     "reimportRequired": false
   },
   "allowedActions": [
-    "run_one_binding_static_preflight_through_canonical_entrypoint"
+    "create_one_immutable_static_preflight_request_bound_to_reconciled_parent_head"
   ],
   "blockedActions": [
-    "run_static_preflight_without_single_use_authorization",
+    "reuse_consumed_git_authorization",
+    "rerun_same_github_run_attempt",
     "run_second_final_gate",
     "run_runtime",
     "open_browser",
@@ -161,9 +163,9 @@
     "m1TechnicalGate": "HISTORICAL_PASS",
     "m1VisualReview": "FAILED_FUNCTIONAL_DEFECT_REMEDIATED_STATICALLY",
     "m1StaticRemediation": "PASS",
-    "m1BindingPreflight": "AUTHORIZED_PENDING_SINGLE_EXECUTION_AFTER_PIPELINE_ROOT_CAUSE",
-    "m1ValidatorLifecycleCorrection": "CANONICALIZED",
-    "m1PipelineMechanismCorrection": "CANONICALIZED",
+    "m1BindingPreflight": "CONTROL_PLANE_RECONCILED_IMMUTABLE_REQUEST_PENDING",
+    "m1ValidatorLifecycleCorrection": "PHASE_CAPABILITY_MODEL",
+    "m1PipelineMechanismCorrection": "IMMUTABLE_REQUEST_BOUND_TO_PARENT_HEAD",
     "m1Closed": false,
     "gateRerunAuthorized": false,
     "runtimeAuthorized": false,
@@ -171,7 +173,7 @@
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Execute exactly one binding static preflight through tools/orbit360-validar-gate-contracts-v20260717.mjs using authorization final-block1-static-preflight-1-0-37-v3. Read the preserved engine result from its synchronous evidence file, not stdout. Accept only GO_GATE_CONTRACT, visual PASS 29/29 and GO_STATIC_ARCHITECTURE. Do not rerun the final gate and do not enable secrets, Firestore, operational writes, runtime, browser or deploy.",
+  "nextAllowedStep": "Create exactly one immutable STATIC_PREFLIGHT request bound to the reconciled parent HEAD. Accept only GO_GATE_CONTRACT with executionPhase STATIC_PREFLIGHT, visual PASS 29/29 and GO_STATIC_ARCHITECTURE. Do not rerun the final gate and do not enable secrets, Firestore, operational writes, runtime, browser or deploy.",
   "containsPII": false,
   "containsSecrets": false
 }
