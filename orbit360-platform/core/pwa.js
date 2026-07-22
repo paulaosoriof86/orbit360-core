@@ -6,9 +6,11 @@
    - Registra service worker (no-op si el origen no lo permite)
    ============================================================ */
 (function () {
-  var RUNTIME_BUILD = '20260717-2';
+  var RUNTIME_BUILD = '20260721-4';
+  var CRITICAL_RELEASE = 'block1-critical-runtime-20260721-4';
   var workerState = window.OrbitPwaWorkerState = {
     runtimeBuild: RUNTIME_BUILD,
+    criticalRelease: CRITICAL_RELEASE,
     status: 'registering',
     controlled: false,
     scriptPath: ''
