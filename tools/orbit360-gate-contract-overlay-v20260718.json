@@ -3,20 +3,44 @@
   "issuedAt": "2026-07-21",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": "PIPELINE_MECHANISM_FAILURE",
-  "diagnosticRevision": "hosting-script-integrity-before-browser-v1",
-  "contractRevision": "1.0.34-hosting-script-integrity-before-browser-v1",
+  "diagnosticRevision": "critical-runtime-integrity-manifest-v1",
+  "contractRevision": "1.0.35-critical-runtime-integrity-manifest-v1",
   "gatePatch": {
-    "contractVersion": "1.0.34",
-    "diagnosticRevision": "hosting-script-integrity-before-browser-v1",
+    "contractVersion": "1.0.35",
+    "diagnosticRevision": "critical-runtime-integrity-manifest-v1",
     "status": "PIPELINE_FIX_PENDING_STATIC_PREFLIGHT"
   },
   "canonicalOwners": [
+    {
+      "id": "pwa",
+      "path": "orbit360-platform/core/pwa.js",
+      "requiredTokens": [
+        "buildManifest",
+        "registerServiceWorker",
+        "waitForWorkerActivation",
+        "OrbitPwaWorkerReady",
+        "serviceWorker.register",
+        "waitForWorkerControl",
+        "OrbitPwaWorkerState",
+        "controllerMatches",
+        "pwa-controller:",
+        "RUNTIME_BUILD = '20260721-4'",
+        "block1-critical-runtime-20260721-4"
+      ]
+    },
     {
       "id": "clientInsurerVisualStabilityBarrier",
       "path": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
       "requiredTokens": [
         "__clientInsurerVisualStabilityBarrierV20260721",
-        "version: '20260721.2'",
+        "registryContract = { version: '20260721.2' }",
+        "previous.version === '20260721.4'",
+        "version: '20260721.4'",
+        "criticalRelease: CRITICAL_RELEASE",
+        "block1-critical-runtime-20260721-4",
+        "function directoryReady(grid)",
+        ".asg-card.off[data-asg]",
+        "directoryStructuralTrigger: true",
         "knowledgeSettledBeforeVisible: true",
         "eventDriven: true",
         "domMutationGuard: true",
@@ -31,6 +55,7 @@
       "path": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
       "requiredTokens": [
         "Orbit.clientInsurerVisualContractV20260720",
+        "version:'20260720.2'",
         "idempotenceRevision:'20260721.4'",
         "countryEvidenceProposalOnly:true",
         "segmentationReadOnly:true",
@@ -39,10 +64,6 @@
         "function pauseCanonicalObserver()",
         "function observeCanonicalOwner()",
         "function nodeNeedsCanonicalEnhancement(node)",
-        "node.id==='f-pais'",
-        "node.id==='f-seg'",
-        "node.matches('#f-pais,#f-seg",
-        "node.querySelector('#f-pais,#f-seg",
         "mutationMode:'same-microtask-disconnect-own-writes'",
         "observerOwnMutations:false",
         "idempotentDomWrites:true",
@@ -93,82 +114,55 @@
     }
   ],
   "requiredFiles": [
+    "orbit360-platform/index.html",
+    "orbit360-platform/ays-lab-preview.html",
+    "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+    "orbit360-platform/core/pwa.js",
+    "orbit360-platform/sw.js",
+    "orbit360-platform/modules/ia.js",
     "orbit360-platform/modules/calidad.js",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
-    "orbit360-platform/modules/ia.js",
     "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+    "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+    "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+    "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
+    "orbit360-platform/docs/evidence/owner-visual-idempotence-proof-local-20260721-sanitized.json",
     "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-BARRERA-VISUAL-EVENTOS-DOM-20260721.md",
     "orbit360-platform/docs/BLOQUE1-VALIDATOR-STALE-CONTRATO-PREFLIGHT-DINAMICO-20260721.md",
     "orbit360-platform/docs/BLOQUE1-STOP-LINE-LOOP-MUTATION-OWNER-VISUAL-20260721.md",
     "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-DISPARADOR-CLIENTE360-EXCLUIDO-20260721.md",
     "orbit360-platform/docs/BLOQUE1-PIPELINE-INTEGRIDAD-SCRIPT-IA-HOSTING-20260721.md",
-    "orbit360-platform/docs/evidence/owner-visual-idempotence-proof-local-20260721-sanitized.json",
-    "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
-    "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs"
+    "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-MANIFIESTO-INTEGRIDAD-RUNTIME-CRITICO-20260721.md"
   ],
   "runtimeGraphFiles": [
+    "orbit360-platform/index.html",
+    "orbit360-platform/ays-lab-preview.html",
+    "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
-    "orbit360-platform/modules/calidad.js",
-    "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js"
+    "orbit360-platform/core/pwa.js",
+    "orbit360-platform/sw.js",
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+    "orbit360-platform/modules/ia.js",
+    "orbit360-platform/modules/calidad.js"
   ],
   "runtimeVersionContracts": [
-    {
-      "path": "tools/orbit360-runtime-check-client360-v20260716.mjs",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "EXPECTED_CLIENT_PROJECTION_VERSION = '20260720.2'",
-        "EXPECTED_VISUAL_CONTRACT_VERSION = '20260720.2'",
-        "VISUAL_REPAIR_REVISION = 'visual-human-repair-v5-operational-honesty'",
-        "QUALITY_COUNTRY_FILTER_MISSING",
-        "IMPORTER_FALSE_SUCCESS_COPY_VISIBLE",
-        "RESPONSIVE_TITLE_OVERFLOW",
-        "page.locator('.m1-credential-box').first().waitFor",
-        "page.locator('.m1-bank-card [data-vlt-copy]').first().waitFor"
-      ]
-    },
-    {
-      "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "contractVersion: '1.0.27'",
-        "orbit360-runtime-gate-joint-v27-role-selection-parity",
-        "canonical_post_router_runtime_terminal",
-        "page.exposeBinding('__orbitGatePostRouterRuntime'",
-        "window.__orbitAysKnowledgeRuntimePromise",
-        "orbit:aseguradoras:runtime-controlled",
-        "orbit:aseguradoras:tenant-runtime-linked",
-        "orbit:aseguradoras:tenant-runtime-error",
-        "external-custom-event-binding",
-        "canonical_domcontentloaded_ready",
-        "report.documentLifecycleSignals = []",
-        "page.on('domcontentloaded'",
-        "item.path === '/index.html'",
-        "method: 'playwright-page-event'",
-        "report.checks.canonical_domcontentloaded_ready = true",
-        "beforeAuth: true",
-        "select.dispatchEvent(new Event('change', { bubbles: true }))",
-        "responsiveVisibilityIndependent: true"
-      ]
-    },
     {
       "path": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "version: '20260721.2'",
-        "function expectedReady(view)",
-        "scheduleStablePass",
-        "ficha-dom-replaced",
-        "tab-transition:",
-        "orbit:aseguradoras:knowledge-loading",
-        "orbit:aseguradoras:knowledge-ready",
-        "eventDriven: true",
-        "domMutationGuard: true",
-        "knowledgeSettledBeforeVisible: true",
+        "registryContract = { version: '20260721.2' }",
+        "previous.version === '20260721.4'",
+        "version: '20260721.4'",
+        "block1-critical-runtime-20260721-4",
+        "function directoryReady(grid)",
+        "directoryStructuralTrigger: true",
         "writesStore: false",
         "reimportsData: false",
         "exposesSecrets: false"
@@ -180,32 +174,101 @@
       "requiredTokens": [
         "version:'20260720.2'",
         "idempotenceRevision:'20260721.4'",
-        "function countryEvidence(clientId)",
-        "function segmentFor(row)",
-        "m1SegmentCriteria",
-        "data-m1-bank-copy-all",
-        "m1-knowledge-summary",
         "function setHtmlIfChanged(node,html)",
         "function setTextIfChanged(node,text)",
-        "var scheduled=false,enhancing=false,canonicalObserver=null",
         "function pauseCanonicalObserver()",
         "function observeCanonicalOwner()",
         "function runEnhance()",
-        "var resumeObserver=pauseCanonicalObserver()",
-        "function nodeNeedsCanonicalEnhancement(node)",
-        "node.id==='f-pais'",
-        "node.id==='f-seg'",
-        "node.matches('#f-pais,#f-seg",
-        "node.querySelector('#f-pais,#f-seg",
         "function mutationTouchesCanonicalView(records)",
         "function handleCanonicalMutations(records)",
-        "canonicalObserver=new MutationObserver(handleCanonicalMutations)",
         "mutationMode:'same-microtask-disconnect-own-writes'",
         "observerOwnMutations:false",
         "idempotentDomWrites:true",
-        "client360StructuralTrigger:true",
         "enhance:runEnhance",
         "exposesSecrets:false"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "block1-critical-runtime-20260721-4",
+        "visualStabilityVersion: '20260721.4'",
+        "client-insurer-visual-stability-barrier-v20260721.js?v=20260721-4",
+        "__clientInsurerVisualStabilityBarrierV20260721.version === '20260721.4'",
+        "visualContractVersion: '20260720.2'",
+        "visualContractDeliveryRevision: '20260721.4'",
+        "client-insurer-visual-contract-v20260720.js?v=20260721-4",
+        "client-insurer-visual-contract-v20260720.css?v=20260721-4",
+        "data-orbit-insurer-visual-stability",
+        "loadVisualStability"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/pwa.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "RUNTIME_BUILD = '20260721-4'",
+        "block1-critical-runtime-20260721-4",
+        "serviceWorker.register('sw.js?v=' + RUNTIME_BUILD)",
+        "controllerMatches",
+        "OrbitPwaWorkerState",
+        "OrbitPwaWorkerReady"
+      ]
+    },
+    {
+      "path": "orbit360-platform/sw.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "orbit360-v20260721-4-pwa2",
+        "BUILD = '20260721-4'",
+        "block1-critical-runtime-20260721-4",
+        "CRITICAL_RUNTIME_PATHS",
+        "isCriticalRuntime",
+        "releaseRequest",
+        "orbitBuild",
+        "criticalRelease"
+      ]
+    },
+    {
+      "path": "orbit360-platform/ays-lab-preview.html",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "orbit-preview-version\" content=\"20260717-2",
+        "orbit-critical-release\" content=\"block1-critical-runtime-20260721-4",
+        "sw.js?v=20260721-4",
+        "router-tenant-config-bootstrap.js?v=20260721-4",
+        "client-insurer-visual-stability-barrier-v20260721.js?v=20260721-4",
+        "criticalRelease="
+      ]
+    },
+    {
+      "path": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "orbit360-critical-runtime-integrity-manifest-v1",
+        "block1-critical-runtime-20260721-4",
+        "1.0.35",
+        "routerTenantBootstrap",
+        "clientInsurerVisualStabilityBarrier",
+        "serviceWorker",
+        "previewBootstrap",
+        "allRemoteBytesAndSha256Exact"
+      ]
+    },
+    {
+      "path": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "orbit360-hosting-critical-integrity-manifest-v2",
+        "ORBIT360_INTEGRITY_MANIFEST_PATH",
+        "checkedAssets",
+        "assetCount",
+        "REMOTE_CRITICAL_ASSET_INTEGRITY_MISMATCH",
+        "remoteAllExact",
+        "exactMatch",
+        "browserExecuted: false",
+        "containsSecrets: false"
       ]
     },
     {
@@ -216,9 +279,6 @@
         "one_base_mutation_one_transform_zero_followup_mutations_with_client360_filters",
         "client_country_filter_structural_trigger",
         "client_segment_filter_structural_trigger",
-        "client360_trigger_contract",
-        "html_idempotence_second_noop",
-        "text_idempotence_second_noop",
         "zero_followup_mutations",
         "runtimeExecuted: false",
         "browserExecuted: false",
@@ -234,79 +294,7 @@
         "proof.proof.baseMutations === 1",
         "proof.proof.canonicalTransforms === 1",
         "proof.proof.followUpObserverDeliveries === 0",
-        "proof.proof.client360StructuralTriggers",
         "ownerIdempotence"
-      ]
-    },
-    {
-      "path": "orbit360-platform/modules/ia.js",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "Orbit.modules.ia = (function ()",
-        "function getIACfg()",
-        "return { render };",
-        "})();"
-      ]
-    },
-    {
-      "path": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "orbit360-hosting-script-integrity-v1",
-        "ORBIT360_INTEGRITY_SCRIPT_PATH",
-        "new vm.Script(source",
-        "endsWithOwnerClosure",
-        "REMOTE_SCRIPT_INTEGRITY_MISMATCH",
-        "exactMatch",
-        "browserExecuted: false",
-        "containsSecrets: false"
-      ]
-    },
-    {
-      "path": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "orbit-m1-stable-ui",
-        ".m1-credential-box",
-        ".m1-inactive-reason",
-        ".m1-knowledge-summary",
-        "@media(max-width:760px)"
-      ]
-    },
-    {
-      "path": "orbit360-platform/modules/calidad.js",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "País por validar",
-        "Moneda por validar",
-        "clientCountryEvidence",
-        "soloCamposPendientes: true",
-        "version: '1.217-country-quality'"
-      ]
-    },
-    {
-      "path": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "Orbit.__insurerDirectoryBridgeV1203",
-        "function openInsurerDocumentImport(options)",
-        "No se ha guardado nada",
-        "El archivo no fue almacenado",
-        "documentaryImportRequiresVerifiedPersistence: true"
-      ]
-    },
-    {
-      "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "visualStabilityVersion: '20260721.2'",
-        "client-insurer-visual-stability-barrier-v20260721.js?v=20260721-2",
-        "__clientInsurerVisualStabilityBarrierV20260721.version === '20260721.2'",
-        "data-orbit-insurer-visual-stability",
-        "loadVisualStability",
-        "visualContractVersion: '20260720.2'",
-        "client-insurer-visual-contract-v20260720.js?v=20260720-2",
-        "client-insurer-visual-contract-v20260720.css?v=20260720-2"
       ]
     },
     {
@@ -314,36 +302,27 @@
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "version:'1.221'",
-        "contentVersion:'1.224'",
-        "_m1visualv:1224"
+        "contentVersion:'1.225'",
+        "_m1visualv:1225",
+        "Integridad antes del navegador",
+        "block1-critical-runtime-20260721-4"
       ]
     },
     {
       "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "ORBIT360_TARGETED_DEPLOY_AUTHORIZATION_ID: final-block1-targeted-lab-deploy-gate-v1",
         "targeted_lab_deploy_then_unique_final_block1_gate_readonly",
-        "staticPreflightEvidence.runId",
-        "staticPreflightAuthorization.runId",
-        "staticPreflightEvidence.contractVersion",
-        "staticPreflightAuthorization.contractVersion",
-        "finalGateAuthorization.contractVersion",
-        "node --check orbit360-platform/modules/ia.js",
         "node --check tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
         "node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs --local-only",
         "Verificar integridad exacta de scripts publicados",
         "node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
         "script-integrity-sanitized.json",
-        "Publicar frontend corregido en canal LAB",
+        "Gate final único · tres vistas",
         "hosting:channel:deploy \"$ORBIT360_HOSTING_CHANNEL\"",
-        "targeted_lab_frontend_only",
         "functionsDeployed:false",
         "rulesDeployed:false",
-        "productionTouched:false",
-        "Gate final único · tres vistas",
-        "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
-        "tools/orbit360-gate-environment-v20260717.mjs"
+        "productionTouched:false"
       ]
     }
   ]
