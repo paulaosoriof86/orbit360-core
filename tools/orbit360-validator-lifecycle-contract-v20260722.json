@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v7-hosting-delivery",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v8-hosting-delivery-recovery",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -10,7 +10,6 @@
   "controlPlaneRevision": "phase-capability-immutable-request-v2",
   "methodologicalDecisionId": "paula-20260722-visualization-before-m2",
   "classification": [
-    "VALIDATOR_STALE",
     "PIPELINE_MECHANISM_FAILURE"
   ],
   "staticPreflightV2": {
@@ -25,24 +24,32 @@
     "architectureStatus": "GO_STATIC_ARCHITECTURE",
     "finalGateRerun": false
   },
-  "retiredLifecycleChecks": [
-    "WORKFLOW_PROJECT_LOCK_FOR_ALL_PHASES",
-    "WORKFLOW_CHANNEL_LOCK_FOR_ALL_PHASES",
-    "ACADEMY_RESPONSIVE_EXACT_PHRASE",
-    "MUTABLE_AUTHORIZATION_TRIGGER"
-  ],
-  "replacementLifecycleChecks": [
-    "EXECUTION_PROFILE_DECLARED",
-    "WORKFLOW_PHASE_LOCK",
-    "HOSTING_CAPABILITY:secrets",
-    "HOSTING_CAPABILITY:deploy",
-    "HOSTING_PROJECT_LOCK_ENABLED",
-    "HOSTING_CHANNEL_LOCK_ENABLED",
-    "WORKFLOW_PROJECT_LOCK",
-    "WORKFLOW_CHANNEL_LOCK",
-    "IMMUTABLE_REQUEST_PARENT_HEAD",
-    "STATIC_PREFLIGHT_ARTIFACT_VERIFIED"
-  ],
+  "hostingDeliveryV1": {
+    "status": "FAILED_PIPELINE_MECHANISM",
+    "runId": 29963097060,
+    "artifactId": 8546764883,
+    "artifactDigest": "sha256:8e64664d442ecaf58159175b3d28b3ce5a7a0af8355f61257ff29ddb002666a9",
+    "executionHead": "6eadc942e92b82440806605be0a7bc31455843ca",
+    "preflightStatus": "GO_GATE_CONTRACT",
+    "preflightChecks": "1356_OF_1356",
+    "identityStatus": "PASS",
+    "localIntegrityStatus": "PASS",
+    "failedStage": "publish_frontend_and_resolve_url_combined",
+    "rootCause": "The workflow combined Firebase deployment, URL extraction and build verification in one opaque step and did not persist the Firebase command output. The failure therefore could not distinguish an actual deploy failure from a successful deploy followed by URL-resolution failure.",
+    "productRegression": false,
+    "dataChanged": false
+  },
+  "replacementMechanism": {
+    "revision": "inspect-reuse-deploy-resolve-v1",
+    "steps": [
+      "inspect existing channel read-only",
+      "reuse an already published matching build",
+      "deploy only when matching build is absent",
+      "persist Firebase command exit code and sanitized stderr",
+      "resolve URL from deploy JSON with channel-list fallback",
+      "verify runtime-build and exact remote critical assets"
+    ]
+  },
   "invariantsForHostingDelivery": {
     "m1Closed": false,
     "finalGateRerunBlocked": true,
@@ -64,11 +71,8 @@
     "baseOverlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
     "compositionMechanism": "canonical-entrypoint-temp-mirror-v1",
     "executionRequestModel": "immutable-request-bound-to-parent-head-and-run-attempt-v1",
-    "operationalWrites": 0,
-    "evidenceWrites": 1,
-    "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
-    "finalTechnicalGateRerun": false,
     "phase": "LAB_HOSTING_DELIVERY",
+    "finalTechnicalGateRerun": false,
     "nextHumanAction": "VISUAL_REVIEW_BEFORE_M2"
   },
   "canonicalOverlayPatch": {
@@ -76,12 +80,12 @@
     "issuedAt": "2026-07-22",
     "gateId": "block1-client360-insurers-lab-v20260717",
     "classification": "PIPELINE_MECHANISM_FAILURE",
-    "diagnosticRevision": "targeted-hosting-delivery-before-m2-v1",
-    "contractRevision": "1.0.37-targeted-hosting-delivery-before-m2-v1",
+    "diagnosticRevision": "hosting-inspect-reuse-deploy-resolve-v1",
+    "contractRevision": "1.0.37-hosting-inspect-reuse-deploy-resolve-v1",
     "gatePatch": {
       "contractVersion": "1.0.37",
-      "diagnosticRevision": "targeted-hosting-delivery-before-m2-v1",
-      "status": "STATIC_PREFLIGHT_V2_PASS_HOSTING_DELIVERY_AUTHORIZED",
+      "diagnosticRevision": "hosting-inspect-reuse-deploy-resolve-v1",
+      "status": "HOSTING_DELIVERY_V1_PIPELINE_MECHANISM_FAILURE_RETRY_AUTHORIZED",
       "executionProfile": {
         "phase": "LAB_HOSTING_DELIVERY",
         "capabilities": {
@@ -102,18 +106,16 @@
         },
         "requestModel": "immutable-request-bound-to-parent-head-and-run-attempt-v1"
       },
-      "diagnosticRule": "Static preflight v2 passed GO_GATE_CONTRACT, visual 29/29 and GO_STATIC_ARCHITECTURE. Publish only the exact corrected frontend to the named Hosting LAB channel. Read the service-account secret only for Hosting authentication. Do not read Firestore, execute browser automation, deploy Functions or Rules, touch production or rerun the final technical gate.",
-      "acceptancePolicy": "Accept only GO_GATE_CONTRACT in LAB_HOSTING_DELIVERY, verified static artifact, zero functional drift, exact remote critical-asset integrity and a sanitized LAB preview URL."
+      "diagnosticRule": "Inspect the Hosting LAB channel before deploying. If the prior attempt already published the exact frontend build, reuse its URL and do not deploy again. Otherwise execute one Hosting-only deploy while preserving command exit code and sanitized diagnostics, then resolve the URL from deploy output or channel-list fallback.",
+      "acceptancePolicy": "Accept only GO_GATE_CONTRACT in LAB_HOSTING_DELIVERY, verified static evidence, zero functional drift, a matching runtime-build, exact remote critical assets and a sanitized preview URL."
     },
     "effectiveOwnerReconciliation": {
-      "baselineOverlayContract": "1.0.37-static-preflight-v2-before-hosting-visualization",
+      "baselineOverlayContract": "1.0.37-targeted-hosting-delivery-before-m2-v1",
       "classification": "PIPELINE_MECHANISM_FAILURE",
-      "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
-      "controlPlaneRevision": "phase-capability-immutable-request-v2",
-      "productOwnersChanged": [],
-      "academyChanged": false,
       "validatorChanged": true,
       "workflowChanged": true,
+      "productOwnersChanged": [],
+      "academyChanged": false,
       "dataChanged": false,
       "storeChanged": false,
       "authChanged": false,
@@ -195,8 +197,6 @@
           "CANONICAL_LIFECYCLE_COMPOSITION = 'phase-aware-static-authorization-v2'",
           "canonicalOverlayPatch",
           "orbit360-validar-gate-contracts-engine-v20260717.mjs",
-          "parallelWrapperRetired: true",
-          "parallelOverlayRetired: true",
           "ENGINE_EVIDENCE_USED = 'sync-file-evidence-not-stdout-v1'",
           "engineStdoutParsed: false"
         ]
@@ -205,7 +205,7 @@
         "path": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
         "replaceRequiredTokens": true,
         "requiredTokens": [
-          "ALLOWED_EXECUTION_PHASES",
+          "LAB_HOSTING_DELIVERY",
           "HOSTING_CAPABILITY",
           "HOSTING_PROJECT_LOCK_ENABLED",
           "HOSTING_CHANNEL_LOCK_ENABLED",
@@ -219,14 +219,17 @@
         "replaceRequiredTokens": true,
         "requiredTokens": [
           "ORBIT360_GATE_PHASE: lab_hosting_delivery",
-          "ORBIT360_REQUEST_FILE: tools/orbit360-m1-hosting-delivery-request-v1-20260722.json",
+          "ORBIT360_REQUEST_FILE: tools/orbit360-m1-hosting-delivery-request-v2-20260722.json",
           "EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab",
           "ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab",
-          "actions: read",
-          "test \"${GITHUB_RUN_ATTEMPT}\" = '1'",
-          "node tools/orbit360-validar-gate-contracts-v20260717.mjs \"$ORBIT360_GATE_ID\"",
-          "LAB_HOSTING_DELIVERY",
+          "previousAttempt.runId",
+          "hosting:channel:list",
+          "hosting-channel-inspection-sanitized.json",
+          "firebase-hosting-command-sanitized.json",
+          "firebase-hosting-error-sanitized.txt",
           "hosting:channel:deploy",
+          "ORBIT360_REUSED_EXISTING",
+          "reusedExistingDeployment",
           "targeted_lab_frontend_visual_review_only",
           "node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
           "functionsDeployed:false",
