@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v62-control-plane-reconciled",
+  "schemaVersion": "orbit360-incident-freeze-v63-immutable-request-consumed-validator-stale-corrected",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-control-plane-distributed-state-and-phase-drift-v20260722",
-  "status": "CONTROL_PLANE_RECONCILED_STATIC_PREFLIGHT_PENDING",
+  "status": "STOP_THE_LINE_AFTER_IMMUTABLE_REQUEST_VISUAL_VALIDATOR_STALE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -66,22 +66,41 @@
     {
       "runId": 29953485798,
       "classification": "PIPELINE_MECHANISM_FAILURE",
-      "failedCheckIds": ["CANONICAL_PREFLIGHT_ENTRYPOINT"],
+      "failedCheckIds": [
+        "CANONICAL_PREFLIGHT_ENTRYPOINT"
+      ],
       "cause": "engine_stdout_truncated_by_process_exit",
       "productRegression": false
     },
     {
       "runId": 29954997417,
       "classification": "VALIDATOR_STALE",
-      "failedCheckIds": ["WORKFLOW_PROJECT_LOCK", "WORKFLOW_CHANNEL_LOCK"],
+      "failedCheckIds": [
+        "WORKFLOW_PROJECT_LOCK",
+        "WORKFLOW_CHANNEL_LOCK"
+      ],
       "cause": "runtime_hosting_environment_locks_enforced_unconditionally_against_static_preflight_workflow",
+      "productRegression": false
+    },
+    {
+      "runId": 29961263105,
+      "classification": "VALIDATOR_STALE",
+      "stage": "visual_remediation_contract",
+      "preflightStatus": "GO_GATE_CONTRACT",
+      "preflightChecks": "1366_OF_1366",
+      "executionPhase": "STATIC_PREFLIGHT",
+      "visualChecks": "28_OF_29",
+      "failedCheckIds": [
+        "ACADEMY_RESPONSIVE"
+      ],
+      "cause": "validator_required_brittle_exact_phrase_with_conjunction_while_academy_contains_all_required_semantic_tokens",
       "productRegression": false
     }
   ],
   "controlPlaneReconciliation": {
     "status": "ROOT_CAUSE_CLOSED_STRUCTURALLY",
     "sameStageFailures": 2,
-    "readyForImmutableRequest": true,
+    "readyForImmutableRequest": false,
     "controlPlaneRevision": "phase-capability-immutable-request-v1",
     "rootCause": "Gate control was distributed across registry, extension, overlay, lifecycle patch, freeze, mutable authorization, workflow and manually maintained PR text. The registry described runtime/Hosting while the active workflow was static. The engine had unconditional environment checks, so lifecycle token composition could not align semantics.",
     "corrections": [
@@ -98,7 +117,33 @@
     "storeChanged": false,
     "authChanged": false,
     "vaultChanged": false,
-    "importersChanged": false
+    "importersChanged": false,
+    "immutableRequestConsumed": {
+      "requestId": "m1-static-preflight-control-plane-reconciled-v1-20260722",
+      "parentHead": "5071c7f63c923106723f2e41fb820c4131f634d6",
+      "executionHead": "7d1f3cbc65cd85a99c6e629aad0a55c1231d0eae",
+      "runId": 29961263105,
+      "runAttempt": 1,
+      "outcome": "PRECHECK_GO_VISUAL_VALIDATOR_STALE"
+    },
+    "structuralVerification": {
+      "gateContractStatus": "GO_GATE_CONTRACT",
+      "checksPassed": 1366,
+      "checksFailed": 0,
+      "executionPhase": "STATIC_PREFLIGHT",
+      "projectAndChannelLocksConditional": true,
+      "controlPlaneRootCauseClosed": true
+    },
+    "validatorSemanticCorrection": {
+      "status": "APPLIED_NO_EXECUTION",
+      "commit": "84c0acbddbc9b5b4f44902f2d2f3c9a418a2d34e",
+      "checkId": "ACADEMY_RESPONSIVE",
+      "oldMechanism": "exact_phrase_match",
+      "newMechanism": "semantic_token_set",
+      "academyChanged": false,
+      "productChanged": false,
+      "newRequestCreated": false
+    }
   },
   "staticPreflightAuthorization": {
     "authorizationId": "final-block1-static-preflight-1-0-37-v3",
@@ -131,9 +176,12 @@
     "reimportRequired": false
   },
   "allowedActions": [
-    "create_one_immutable_static_preflight_request_bound_to_reconciled_parent_head"
+    "independent_nonexecuting_audit_of_control_plane_and_visual_validator_semantics"
   ],
   "blockedActions": [
+    "edit_consumed_immutable_request",
+    "rerun_immutable_request_29961263105",
+    "create_new_static_preflight_request",
     "reuse_consumed_git_authorization",
     "rerun_same_github_run_attempt",
     "run_second_final_gate",
@@ -163,17 +211,18 @@
     "m1TechnicalGate": "HISTORICAL_PASS",
     "m1VisualReview": "FAILED_FUNCTIONAL_DEFECT_REMEDIATED_STATICALLY",
     "m1StaticRemediation": "PASS",
-    "m1BindingPreflight": "CONTROL_PLANE_RECONCILED_IMMUTABLE_REQUEST_PENDING",
-    "m1ValidatorLifecycleCorrection": "PHASE_CAPABILITY_MODEL",
-    "m1PipelineMechanismCorrection": "IMMUTABLE_REQUEST_BOUND_TO_PARENT_HEAD",
+    "m1BindingPreflight": "CONTROL_PLANE_GO_VISUAL_VALIDATOR_STALE_CORRECTED_WITHOUT_RERUN",
+    "m1ValidatorLifecycleCorrection": "PHASE_CAPABILITY_MODEL_VERIFIED_1366_OF_1366",
+    "m1PipelineMechanismCorrection": "IMMUTABLE_REQUEST_CONSUMED_RUN_29961263105",
     "m1Closed": false,
     "gateRerunAuthorized": false,
     "runtimeAuthorized": false,
     "deployAuthorized": false,
     "productionTouched": false,
-    "reimportRequired": false
+    "reimportRequired": false,
+    "m1VisualValidatorCorrection": "ACADEMY_RESPONSIVE_SEMANTIC_TOKEN_SET_APPLIED_NO_EXECUTION"
   },
-  "nextAllowedStep": "Create exactly one immutable STATIC_PREFLIGHT request bound to the reconciled parent HEAD. Accept only GO_GATE_CONTRACT with executionPhase STATIC_PREFLIGHT, visual PASS 29/29 and GO_STATIC_ARCHITECTURE. Do not rerun the final gate and do not enable secrets, Firestore, operational writes, runtime, browser or deploy.",
+  "nextAllowedStep": "Perform an independent non-executing audit of the reconciled control plane and the semantic ACADEMY_RESPONSIVE validator. Do not create or reuse an execution request, do not rerun GitHub Actions, and do not modify product, data, Store, Auth, importers, runtime or Hosting. A future execution may be authorized only after that audit confirms the entire contract matrix before the request exists.",
   "containsPII": false,
   "containsSecrets": false
 }
