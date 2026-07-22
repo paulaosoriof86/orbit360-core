@@ -23,7 +23,13 @@ const allowedFinal = new Set([
   'orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js',
   'orbit360-platform/docs/BLOQUE1-FUNCTIONAL-DEFECT-REVISION-VISUAL-20260722.md'
 ]);
-function run(args, options={}) { return execFileSync(args[0], args.slice(1), { cwd: repo, encoding:'utf8', stdio: options.capture ? 'pipe' : 'inherit' }); }
+function run(args, options={}) {
+  return execFileSync(args[0], args.slice(1), {
+    cwd: repo,
+    encoding: 'utf8',
+    stdio: options.capture ? 'pipe' : 'inherit'
+  });
+}
 function fail(message) { console.error(message); process.exit(1); }
 function sha256(buffer) { return crypto.createHash('sha256').update(buffer).digest('hex'); }
 
@@ -33,22 +39,34 @@ const freeze = JSON.parse(fs.readFileSync(path.join(repo,'tools/orbit360-inciden
 const auth = JSON.parse(fs.readFileSync(path.join(repo,'tools/orbit360-authorize-final-block1-gate-readonly-v20260721.json'),'utf8'));
 if (!String(freeze.status||'').startsWith('STOP_THE_LINE')) fail('FREEZE_NOT_ACTIVE');
 if (!Array.isArray(freeze.classification) || !freeze.classification.includes('FUNCTIONAL_DEFECT')) fail('FREEZE_CLASSIFICATION_MISMATCH');
-if (auth.allowedExecutions !== 0 || auth.runtimeAllowed !== false || auth.deployAllowed !== false) fail('AUTHORIZATION_NOT_CONSUMED');
-
+if (auth.allowedExecutions !== 0 || auth.runtimeAllowed !== false || auth.browserAllowed !== false || auth.deployAllowed !== false) fail('AUTHORIZATION_NOT_CONSUMED');
 for (const [rel, expected] of Object.entries(expectedBaseBlobs)) {
   const actual = run(['git','hash-object',rel],{capture:true}).trim();
   if (actual !== expected) fail(`BASE_BLOB_MISMATCH:${rel}:${actual}:${expected}`);
 }
+
 const manifestPath = path.join(payloadDir,'manifest.json');
 if (!fs.existsSync(manifestPath)) fail('PAYLOAD_MANIFEST_MISSING');
 const payload = JSON.parse(fs.readFileSync(manifestPath,'utf8'));
-if (payload.schemaVersion !== 'orbit360-m1-visual-remediation-payload-v1') fail('PAYLOAD_SCHEMA_MISMATCH');
+if (payload.schemaVersion !== 'orbit360-m1-visual-remediation-archive-payload-v1') fail('PAYLOAD_SCHEMA_MISMATCH');
+if (!payload.archive || payload.archive.file !== 'payload.tar.gz.b64') fail('PAYLOAD_ARCHIVE_CONTRACT_MISMATCH');
+const encoded = fs.readFileSync(path.join(payloadDir,payload.archive.file),'utf8').trim();
+const archive = Buffer.from(encoded,'base64');
+if (archive.length !== payload.archive.bytes) fail(`ARCHIVE_SIZE_MISMATCH:${archive.length}:${payload.archive.bytes}`);
+if (sha256(archive) !== payload.archive.sha256) fail('ARCHIVE_HASH_MISMATCH');
+const archivePath = path.join(payloadDir,'.payload.tar.gz');
+const extractDir = path.join(payloadDir,'.extract');
+fs.writeFileSync(archivePath, archive);
+fs.rmSync(extractDir,{recursive:true,force:true});
+fs.mkdirSync(extractDir,{recursive:true});
+run(['tar','-xzf',archivePath,'-C',extractDir]);
 for (const item of payload.files || []) {
   if (!allowedFinal.has(item.target)) fail(`TARGET_NOT_ALLOWED:${item.target}`);
-  const encoded = item.chunks.map(name => fs.readFileSync(path.join(payloadDir,name),'utf8').trim()).join('');
-  const buffer = Buffer.from(encoded,'base64');
-  if (buffer.length !== item.bytes) fail(`PAYLOAD_SIZE_MISMATCH:${item.target}`);
-  if (sha256(buffer) !== item.sha256) fail(`PAYLOAD_HASH_MISMATCH:${item.target}`);
+  const source = path.join(extractDir,item.target);
+  if (!fs.existsSync(source)) fail(`ARCHIVE_TARGET_MISSING:${item.target}`);
+  const buffer = fs.readFileSync(source);
+  if (buffer.length !== item.bytes) fail(`TARGET_SIZE_MISMATCH:${item.target}`);
+  if (sha256(buffer) !== item.sha256) fail(`TARGET_HASH_MISMATCH:${item.target}`);
   const target = path.join(repo,item.target);
   fs.mkdirSync(path.dirname(target),{recursive:true});
   fs.writeFileSync(target,buffer);
@@ -79,4 +97,15 @@ run(['git','config','user.name','github-actions[bot]']);
 run(['git','config','user.email','41898282+github-actions[bot]@users.noreply.github.com']);
 run(['git','commit','-m','fix(m1): corregir semántica visual y responsive bajo contrato 1.0.37']);
 run(['git','push','origin',`HEAD:${branch}`]);
-console.log(JSON.stringify({status:'PASS',contractVersion:'1.0.37',dedicatedChecks:dedicated.total,architectureChecks:architecture.total,retiredTemporaryArtifacts:true,writesOperational:0,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,commit:run(['git','rev-parse','HEAD'],{capture:true}).trim()},null,2));
+console.log(JSON.stringify({
+  status:'PASS',
+  contractVersion:'1.0.37',
+  dedicatedChecks:dedicated.total,
+  architectureChecks:architecture.total,
+  retiredTemporaryArtifacts:true,
+  writesOperational:0,
+  runtimeExecuted:false,
+  browserExecuted:false,
+  deployExecuted:false,
+  commit:run(['git','rev-parse','HEAD'],{capture:true}).trim()
+},null,2));
