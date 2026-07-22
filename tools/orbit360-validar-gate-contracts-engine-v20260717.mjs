@@ -17,6 +17,7 @@ const INCIDENT_FREEZE_RELS = [
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const requestedGateId = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
+const ALLOWED_EXECUTION_PHASES = new Set(['STATIC_PREFLIGHT', 'LAB_RUNTIME_GATE', 'LAB_HOSTING_DELIVERY']);
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -67,10 +68,11 @@ function resultAndExit(status, checks, exitCode, gate = null, overlay = null, me
       ? 'METHODOLOGY_ENFORCEMENT_FAILURE'
       : 'VALIDATOR_STALE';
   const payload = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v8-incident-freeze',
+    schemaVersion: 'orbit360-gate-contract-preflight-v9-phase-capability-model',
     gateId: requestedGateId,
     contractVersion: gate && gate.contractVersion || '',
     diagnosticRevision: gate && gate.diagnosticRevision || '',
+    executionPhase: metadata.executionPhase || '',
     overlayRevision: overlay && overlay.contractRevision || '',
     overlayPath: metadata.overlayPath || '',
     incidentFreezePath: metadata.incidentFreezePath || '',
@@ -224,6 +226,21 @@ gate.runtimeVersionContracts = [...contracts.values()];
 
 const checks = [...bootstrapChecks];
 const check = (id, ok, detail = '') => checks.push({ id, ok: Boolean(ok), detail });
+const executionProfile = gate.executionProfile && typeof gate.executionProfile === 'object' ? gate.executionProfile : null;
+const executionPhase = String(executionProfile && executionProfile.phase || '');
+const workflowLocks = executionProfile && executionProfile.workflowLocks || {};
+const capabilities = executionProfile && executionProfile.capabilities || {};
+const staticCapabilityKeys = [
+  'secrets',
+  'firestoreRead',
+  'writes',
+  'runtime',
+  'browser',
+  'deploy',
+  'functionsDeploy',
+  'rulesDeploy',
+  'production'
+];
 
 check('SCHEMA_VERSION', registry.schemaVersion === 'orbit360-gate-contract-registry-v1', registry.schemaVersion || 'missing');
 check('OVERLAY_PRESENT', Boolean(overlay), selected.rel);
@@ -239,6 +256,16 @@ check('WORKFLOW_EXISTS', exists(gate.workflow), gate.workflow);
 check('PREFLIGHT_MATCH', gate.preflight === 'tools/orbit360-validar-gate-contracts-v20260717.mjs', gate.preflight || 'missing');
 check('PREFLIGHT_EVIDENCE_MATCH', gate.preflightEvidence === EVIDENCE_REL, gate.preflightEvidence || 'missing');
 check('RUNTIME_VERSION_FORMAT', /^\d{8}-\d+$/.test(String(gate.runtimeVersion || '')), gate.runtimeVersion || 'missing');
+check('EXECUTION_PROFILE_DECLARED', Boolean(executionProfile), executionPhase || 'missing');
+check('EXECUTION_PHASE_ALLOWED', ALLOWED_EXECUTION_PHASES.has(executionPhase), executionPhase || 'missing');
+check('EXECUTION_BRANCH_LOCK_DECLARED', workflowLocks.branch === true, JSON.stringify(workflowLocks));
+if (executionPhase === 'STATIC_PREFLIGHT') {
+  for (const key of staticCapabilityKeys) {
+    check(`STATIC_CAPABILITY_DISABLED:${key}`, capabilities[key] === false, `${key}=${String(capabilities[key])}`);
+  }
+  check('STATIC_PROJECT_LOCK_DISABLED', workflowLocks.firebaseProject === false, JSON.stringify(workflowLocks));
+  check('STATIC_CHANNEL_LOCK_DISABLED', workflowLocks.hostingChannel === false, JSON.stringify(workflowLocks));
+}
 
 for (const rel of gate.requiredFiles || []) check(`REQUIRED_FILE:${rel}`, exists(rel), rel);
 for (const rel of gate.validators || []) check(`VALIDATOR_EXISTS:${rel}`, exists(rel), rel);
@@ -264,8 +291,17 @@ if (exists(gate.workflow)) {
   check('WORKFLOW_CALLS_PREFLIGHT', workflow.includes('orbit360-validar-gate-contracts-v20260717.mjs') && workflow.includes(requestedGateId), gate.workflow);
   check('WORKFLOW_PUBLISHES_PREFLIGHT_EVIDENCE', workflow.includes(EVIDENCE_REL), `${gate.workflow} → ${EVIDENCE_REL}`);
   check('WORKFLOW_BRANCH_LOCK', workflow.includes(gate.environment.branch), gate.environment.branch);
-  check('WORKFLOW_PROJECT_LOCK', workflow.includes(gate.environment.firebaseProjectId), gate.environment.firebaseProjectId);
-  check('WORKFLOW_CHANNEL_LOCK', workflow.includes(gate.environment.hostingChannel), gate.environment.hostingChannel);
+  check('WORKFLOW_PHASE_LOCK', workflow.includes(`ORBIT360_GATE_PHASE: ${String(executionPhase).toLowerCase()}`), executionPhase);
+  if (workflowLocks.firebaseProject === true) {
+    check('WORKFLOW_PROJECT_LOCK', workflow.includes(gate.environment.firebaseProjectId), gate.environment.firebaseProjectId);
+  } else {
+    check('WORKFLOW_PROJECT_LOCK_NOT_APPLICABLE', !workflow.includes(gate.environment.firebaseProjectId), `phase=${executionPhase}`);
+  }
+  if (workflowLocks.hostingChannel === true) {
+    check('WORKFLOW_CHANNEL_LOCK', workflow.includes(gate.environment.hostingChannel), gate.environment.hostingChannel);
+  } else {
+    check('WORKFLOW_CHANNEL_LOCK_NOT_APPLICABLE', !workflow.includes(gate.environment.hostingChannel), `phase=${executionPhase}`);
+  }
 }
 
 const fallbackRuntimeGraph = [
@@ -316,6 +352,6 @@ const protectedPaths = [
 for (const rel of protectedPaths) check(`PROTECTED_PATH_PRESENT:${rel}`, exists(rel), rel);
 
 const failed = checks.filter(item => !item.ok);
-const metadata = { overlayPath: selected.rel, registryExtensions: loadedExtensions };
+const metadata = { overlayPath: selected.rel, registryExtensions: loadedExtensions, executionPhase };
 if (failed.length) resultAndExit('VALIDATOR_STALE', checks, 41, gate, overlay, metadata);
 resultAndExit('GO_GATE_CONTRACT', checks, 0, gate, overlay, metadata);
