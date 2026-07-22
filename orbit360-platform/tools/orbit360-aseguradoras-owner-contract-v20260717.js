@@ -122,6 +122,9 @@ assert(proof.runtimeExecuted === false && proof.browserExecuted === false && pro
 assert(barrierSource.includes("version: '20260721.4'"), 'La barrera debe declarar versión 20260721.4');
 assert(barrierSource.includes("block1-critical-runtime-20260721-4"), 'La barrera debe declarar el release crítico vigente');
 assert(barrierSource.includes("registryContract = { version: '20260721.2' }"), 'La barrera debe conservar la versión pública estable del registro');
+assert(barrierSource.includes("DIRECTORY_VISIBILITY_REVISION = '20260721.4a-first-visible-complete'"), 'Falta revisión de primer directorio visible completo');
+assert(barrierSource.includes("#host .asg-grid{visibility:hidden!important;pointer-events:none!important}"), 'El directorio debe permanecer oculto y no interactivo mientras está pendiente');
+assert(barrierSource.includes('directoryFirstPaintGuard: true'), 'Falta contrato reusable de primer pintado completo');
 assert(barrierSource.includes('function directoryReady(grid)'), 'Falta contrato semántico del directorio');
 assert(barrierSource.includes("node.classList.contains('asg-grid')"), 'Falta disparador estructural .asg-grid');
 assert(barrierSource.includes("node.matches('.asg-card.off[data-asg]')"), 'Falta disparador de tarjeta inactiva');
@@ -129,6 +132,12 @@ assert(barrierSource.includes("node.querySelector('#asg-ficha,.asg-grid,.asg-car
 assert(barrierSource.includes("scheduleStablePass(ficha() ? 'ficha-dom-replaced' : 'directory-dom-replaced')"), 'Falta ruta de estabilización del directorio');
 assert(barrierSource.includes('/Inactiva:/i.test'), 'La estabilidad debe exigir motivo visible de inactividad');
 assert(barrierSource.includes('directoryStructuralTrigger: true'), 'Falta marcador reusable del disparador estructural');
+const scheduleStart = barrierSource.indexOf('function scheduleStablePass(reason)');
+const pendingPoint = barrierSource.indexOf('markPending(reason);', scheduleStart);
+const syncEnhancePoint = barrierSource.indexOf('enhanceCanonicalOwner();', pendingPoint);
+const syncReadyPoint = barrierSource.indexOf('if (expectedReady(ficha()))', syncEnhancePoint);
+const asyncPoint = barrierSource.indexOf('setTimeout(function ()', syncReadyPoint);
+assert(scheduleStart >= 0 && pendingPoint > scheduleStart && syncEnhancePoint > pendingPoint && syncReadyPoint > syncEnhancePoint && asyncPoint > syncReadyPoint, 'El owner debe aplicarse y comprobarse antes de la estabilización asíncrona');
 
 console.log(JSON.stringify({
   test: 'orbit360-aseguradoras-owner-contract-v20260717',
@@ -147,10 +156,13 @@ console.log(JSON.stringify({
   },
   directoryStability: {
     barrierVersion: '20260721.4',
+    directoryVisibilityRevision: '20260721.4a-first-visible-complete',
     criticalRelease: 'block1-critical-runtime-20260721-4',
     registryVersion: '20260721.2',
     structuralTrigger: true,
+    directoryFirstPaintGuard: true,
     inactiveReasonRequired: true,
+    synchronousOwnerBeforeRelease: true,
     writesStore: false
   }
 }, null, 2));
