@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <meta name="orbit-preview-version" content="20260717-2">
+  <meta name="orbit-critical-release" content="block1-critical-runtime-20260721-4">
   <title>Orbit 360 · A&S</title>
   <style>
     body{font-family:Manrope,Arial,sans-serif;background:#1E2227;color:#fff;display:grid;place-items:center;min-height:100vh;margin:0}
@@ -19,9 +20,11 @@
     var PREVIEW_BOOTSTRAP_BUDGET_MS = 12000;
     var PREVIEW_OPERATION_TIMEOUT_MS = 3000;
     var PREVIEW_WORKER_READY_TIMEOUT_MS = 7000;
-    var target = 'index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2#/aseguradoras';
+    var CRITICAL_RELEASE = 'block1-critical-runtime-20260721-4';
+    var target = 'index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2&criticalRelease=' + encodeURIComponent(CRITICAL_RELEASE) + '#/aseguradoras';
     var state = window.__ORBIT_PREVIEW_BOOTSTRAP__ = {
-      version: '20260719.1-bounded',
+      version: '20260721.4-critical-integrity',
+      criticalRelease: CRITICAL_RELEASE,
       budgetMs: PREVIEW_BOOTSTRAP_BUDGET_MS,
       status: 'preparing'
     };
@@ -53,7 +56,7 @@
 
       if ('serviceWorker' in navigator) {
         await bounded(
-          navigator.serviceWorker.register('sw.js?v=20260717-2', { scope: './' }),
+          navigator.serviceWorker.register('sw.js?v=20260721-4', { scope: './' }),
           PREVIEW_OPERATION_TIMEOUT_MS,
           null
         );
@@ -69,6 +72,12 @@
         'core/backend-lab-loader.js?v=20260716-2',
         'core/backend-lab-init.js?v=20260717-1',
         'data/store-firestore-lab.local.js?v=20260716-2',
+        'core/router-tenant-config-bootstrap.js?v=20260721-4',
+        'core/client-insurer-visual-stability-barrier-v20260721.js?v=20260721-4',
+        'core/client-insurer-visual-contract-v20260720.js?v=20260721-4',
+        'styles/client-insurer-visual-contract-v20260720.css?v=20260721-4',
+        'core/pwa.js?v=20260721-4',
+        'sw.js?v=20260721-4',
         'core/router.js?v1291',
         'core/auth.js?v=20260717-auth-timeout1',
         'modules/cliente360.js?v1360',
@@ -88,7 +97,7 @@
         'data/tenant-config/alianzas-soluciones.asesores.json?v=20260715-7'
       ];
       await bounded(Promise.all(assets.map(function(asset){
-        return fetch(asset, { cache: 'reload', credentials: 'same-origin' }).catch(function(){ return null; });
+        return fetch(asset, { cache: 'reload', credentials: 'same-origin', headers: { 'Cache-Control': 'no-cache' } }).catch(function(){ return null; });
       })), PREVIEW_OPERATION_TIMEOUT_MS, []);
     }
 
