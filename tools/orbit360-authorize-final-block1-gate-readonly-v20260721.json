@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-final-block1-static-preflight-authorized-v12-canonical",
+  "schemaVersion": "orbit360-final-block1-static-preflight-authorized-v13-canonical-engine-evidence",
   "issuedAt": "2026-07-22",
-  "authorizationId": "final-block1-static-preflight-1-0-37-v2",
-  "authorizationRevision": 12,
+  "authorizationId": "final-block1-static-preflight-1-0-37-v3",
+  "authorizationRevision": 13,
   "action": "final_block1_static_preflight_1_0_37_lifecycle_v2_only",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -51,5 +51,17 @@
   },
   "acceptance": "GO_GATE_CONTRACT_AND_GO_STATIC_ARCHITECTURE_AND_M1_VISUAL_REMEDIATION_PASS_ONLY",
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "previousAttempt": {
+    "authorizationId": "final-block1-static-preflight-1-0-37-v2",
+    "runId": 29953485798,
+    "status": "FAILED_PIPELINE_MECHANISM",
+    "failedCheckId": "CANONICAL_PREFLIGHT_ENTRYPOINT",
+    "cause": "engine_stdout_truncated_by_process_exit",
+    "productRegression": false,
+    "gateRerun": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false
+  }
 }

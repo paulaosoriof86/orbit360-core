@@ -1,4 +1,4 @@
-name: Orbit 360 · Cierre canónico M1 visual
+name: Orbit 360 · Preflight canónico M1 visual
 
 on:
   push:
@@ -9,28 +9,23 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
   statuses: write
 
 concurrency:
-  group: orbit360-final-block1-canonical-v2
+  group: orbit360-final-block1-static-preflight-v3
   cancel-in-progress: false
 
 env:
-  EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
-  FIREBASE_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
-  ORBIT360_STATIC_PREFLIGHT_AUTHORIZATION_ID: final-block1-static-preflight-1-0-37-v2
-  ORBIT360_TARGETED_VISUAL_AUTHORIZATION_ID: final-block1-targeted-visual-review-lab-v1
+  ORBIT360_STATIC_PREFLIGHT_AUTHORIZATION_ID: final-block1-static-preflight-1-0-37-v3
   ORBIT360_FINAL_GATE_POLICY: no_final_gate_rerun
 
 jobs:
-  canonical-m1-closure:
-    name: Preflight estático o entrega visual LAB sin repetir gate final
+  canonical-static-preflight:
+    name: Preflight estático vinculante · sin secretos, runtime ni deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     steps:
       - name: Checkout SHA exacto
         uses: actions/checkout@v4
@@ -43,26 +38,6 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Resolver modo autorizado
-        id: scope
-        shell: bash
-        run: |
-          set -euo pipefail
-          MARKER='tools/orbit360-authorize-final-block1-gate-readonly-v20260721.json'
-          ACTION="$(jq -r '.action // empty' "$MARKER")"
-          case "$ACTION" in
-            final_block1_static_preflight_1_0_37_lifecycle_v2_only)
-              echo 'mode=static_preflight' >> "$GITHUB_OUTPUT"
-              ;;
-            targeted_lab_deploy_visual_review_only)
-              echo 'mode=targeted_visual_review' >> "$GITHUB_OUTPUT"
-              ;;
-            *)
-              echo "BLOQUEO_ACCION_NO_AUTORIZADA:$ACTION"
-              exit 41
-              ;;
-          esac
-
       - name: Validar autorización e inventario sin credenciales
         shell: bash
         run: |
@@ -72,40 +47,28 @@ jobs:
           MARKER='tools/orbit360-authorize-final-block1-gate-readonly-v20260721.json'
           FREEZE='tools/orbit360-incident-freeze-v20260721.json'
           INVENTORY='orbit360-platform/docs/evidence/post-recovery-inventory-29868538689-sanitized.json'
-          MODE='${{ steps.scope.outputs.mode }}'
           test -f "$MARKER" && test -f "$FREEZE" && test -f "$INVENTORY"
+          test "$(jq -r '.action' "$MARKER")" = 'final_block1_static_preflight_1_0_37_lifecycle_v2_only'
+          test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_STATIC_PREFLIGHT_AUTHORIZATION_ID"
           test "$(jq -r '.active' "$MARKER")" = 'true'
           test "$(jq -r '.consumed' "$MARKER")" = 'false'
           test "$(jq -r '.allowedExecutions' "$MARKER")" = '1'
+          test "$(jq -r '.runtimeAllowed' "$MARKER")" = 'false'
+          test "$(jq -r '.browserAllowed' "$MARKER")" = 'false'
+          test "$(jq -r '.firestoreReadAllowed' "$MARKER")" = 'false'
+          test "$(jq -r '.vaultReadAllowed' "$MARKER")" = 'false'
+          test "$(jq -r '.secretsAllowed' "$MARKER")" = 'false'
           test "$(jq -r '.writesAllowed' "$MARKER")" = 'false'
-          test "$(jq -r '.productionAllowed' "$MARKER")" = 'false'
-          test "$(jq -r '.reimportAllowed' "$MARKER")" = 'false'
+          test "$(jq -r '.deployAllowed' "$MARKER")" = 'false'
+          test "$(jq -r '.finalGateRerunAllowed' "$MARKER")" = 'false'
+          test "$(jq -r '.status' "$FREEZE")" = 'FINAL_BLOCK1_STATIC_PREFLIGHT_AUTHORIZED'
+          test "$(jq -r '.staticPreflightAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_STATIC_PREFLIGHT_AUTHORIZATION_ID"
+          test "$(jq -r '.staticPreflightAuthorization.active' "$FREEZE")" = 'true'
           test "$(jq -r '.inventoryEvidence.ok' "$FREEZE")" = 'true'
           test "$(jq -r '.inventoryEvidence.runId' "$FREEZE")" = '29868538689'
           test "$(jq -r '.ok' "$INVENTORY")" = 'true'
           test "$(jq -r '.inventory.validReferences' "$INVENTORY")" = '91'
           test "$(jq -r '.inventory.pendingReferences' "$INVENTORY")" = '2'
-          if [ "$MODE" = 'static_preflight' ]; then
-            test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_STATIC_PREFLIGHT_AUTHORIZATION_ID"
-            test "$(jq -r '.expectedContractVersion' "$MARKER")" = '1.0.37'
-            test "$(jq -r '.runtimeAllowed' "$MARKER")" = 'false'
-            test "$(jq -r '.browserAllowed' "$MARKER")" = 'false'
-            test "$(jq -r '.firestoreReadAllowed' "$MARKER")" = 'false'
-            test "$(jq -r '.vaultReadAllowed' "$MARKER")" = 'false'
-            test "$(jq -r '.secretsAllowed' "$MARKER")" = 'false'
-            test "$(jq -r '.deployAllowed' "$MARKER")" = 'false'
-            test "$(jq -r '.status' "$FREEZE")" = 'FINAL_BLOCK1_STATIC_PREFLIGHT_AUTHORIZED'
-            test "$(jq -r '.staticPreflightAuthorization.active' "$FREEZE")" = 'true'
-            test "$(jq -r '.staticPreflightAuthorization.allowedExecutions' "$FREEZE")" = '1'
-          else
-            test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_TARGETED_VISUAL_AUTHORIZATION_ID"
-            test "$(jq -r '.deployAllowed' "$MARKER")" = 'true'
-            test "$(jq -r '.deploymentScope' "$MARKER")" = 'hosting_channel_only'
-            test "$(jq -r '.browserAllowed' "$MARKER")" = 'false'
-            test "$(jq -r '.firestoreReadAllowed' "$MARKER")" = 'false'
-            test "$(jq -r '.status' "$FREEZE")" = 'FINAL_BLOCK1_TARGETED_VISUAL_REVIEW_AUTHORIZED'
-            test "$(jq -r '.staticPreflightEvidence.ok' "$MARKER")" = 'true'
-          fi
 
       - name: Preflight canónico vinculante
         shell: bash
@@ -113,16 +76,17 @@ jobs:
           set -euo pipefail
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-v20260717.mjs
-          node --check orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js
-          node --check orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'GO_GATE_CONTRACT'
           test "$(jq -r '.canonicalLifecycleComposition' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'phase-aware-static-authorization-v2'
+          test "$(jq -r '.engineEvidenceSource' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'sync-file-evidence-not-stdout-v1'
+          test "$(jq -r '.engineStdoutParsed' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'false'
 
       - name: Contrato visual 1.0.37
         shell: bash
         run: |
           set -euo pipefail
+          node --check orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js
           node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/m1-visual-remediation-sanitized.json
           jq -e '.status == "PASS" and .contractVersion == "1.0.37" and .total == 29 and .passed == 29 and .failed == 0 and .runtimeExecuted == false and .browserExecuted == false and .deployExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/m1-visual-remediation-sanitized.json >/dev/null
 
@@ -130,74 +94,26 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          node --check orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
           node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js > orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-sanitized.json
           jq -e '.status == "GO_STATIC_ARCHITECTURE" and .failed == 0' orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-sanitized.json >/dev/null
 
       - name: Cerrar evidencia de preflight estático
-        if: ${{ steps.scope.outputs.mode == 'static_preflight' }}
         shell: bash
         run: |
           set -euo pipefail
-          jq -n --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-final-block1-static-preflight-v2-canonical",ok:true,commit:$commit,runId:($run|tonumber),contractVersion:"1.0.37",gateContractStatus:"GO_GATE_CONTRACT",visualRemediationStatus:"PASS",architectureStatus:"GO_STATIC_ARCHITECTURE",finalGateRerun:false,writesExecuted:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/final-static-preflight-sanitized.json
-
-      - name: Resolver identidad LAB para entrega visual
-        if: ${{ steps.scope.outputs.mode == 'targeted_visual_review' }}
-        env:
-          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
-          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
-          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
-          test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab-visual-review.json"
-          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
-          chmod 600 "$KEY_FILE"
-          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-
-      - name: Publicar frontend correctivo en canal LAB
-        if: ${{ steps.scope.outputs.mode == 'targeted_visual_review' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          jq -n --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" --arg gateId "$ORBIT360_GATE_ID" '{schemaVersion:"orbit360-runtime-build-v3-visual-review",commit:$commit,run:$run,gateId:$gateId,deploymentScope:"targeted_lab_frontend_visual_review_only",finalGateRerun:false,deployExecuted:true,writesExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false}' > orbit360-platform/runtime-build.json
-          DEPLOY_JSON="${RUNNER_TEMP}/firebase-lab-preview.json"
-          npx --yes firebase-tools@latest hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --project "$FIREBASE_PROJECT_ID" --expires 30d --non-interactive --json | tee "$DEPLOY_JSON"
-          URL="$(jq -r '.. | strings | select(test("^https://[^/]*--orbit360-ays-lab[^/]*\\.(web\\.app|firebaseapp\\.com)$"))' "$DEPLOY_JSON" | head -n 1)"
-          test -n "$URL"
-          BUILD_JSON="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/runtime-build.json?visualReview=$GITHUB_RUN_ID")"
-          test "$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty')" = "$GITHUB_SHA"
-          test "$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty')" = "$ORBIT360_GATE_ID"
-          test "$(printf '%s' "$BUILD_JSON" | jq -r '.finalGateRerun')" = 'false'
-          echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
-          jq -n --arg url "$URL" --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-targeted-lab-visual-review-v1",ok:true,url:$url,commit:$commit,runId:($run|tonumber),deploymentScope:"targeted_lab_frontend_visual_review_only",finalGateRerun:false,hostingOnly:true,writesExecuted:false,browserExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/targeted-deploy-sanitized.json
-
-      - name: Verificar integridad exacta publicada
-        if: ${{ steps.scope.outputs.mode == 'targeted_visual_review' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs
-          test "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
-          test "$(jq -r '.exactMatch' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
+          jq -n --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-final-block1-static-preflight-v3-canonical",ok:true,commit:$commit,runId:($run|tonumber),contractVersion:"1.0.37",gateContractStatus:"GO_GATE_CONTRACT",visualRemediationStatus:"PASS",visualChecks:"29_OF_29",architectureStatus:"GO_STATIC_ARCHITECTURE",engineEvidenceSource:"sync-file-evidence-not-stdout-v1",finalGateRerun:false,writesExecuted:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/final-static-preflight-sanitized.json
 
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-canonical-${{ steps.scope.outputs.mode }}-${{ github.run_id }}
+          name: orbit360-m1-canonical-static-preflight-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/m1-visual-remediation-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-sanitized.jsom
+            orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/final-static-preflight-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/targeted-deploy-sanitized.jsom
-            orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json
-            orbit360-platform/runtime-build.json
             orbit360-platform/docs/evidence/post-recovery-inventory-29868538689-sanitized.json
           if-no-files-found: warn
           retention-days: 30
@@ -209,18 +125,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          MODE='${{ steps.scope.outputs.mode }}'
           state=success
-          context='orbit360/m1-canonical-static-preflight-v2'
           description='Preflight canónico GO; gate final no repetido'
-          if [ "$MODE" = 'targeted_visual_review' ]; then
-            context='orbit360/m1-targeted-visual-review-lab-v1'
-            description='Frontend LAB correctivo publicado; revisión visual habilitada'
-          fi
-          if [ "${{ job.status }}" != success ]; then state=failure; description="$MODE falló; STOP THE LINE"; fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context="$context" -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
-
-      - name: Limpiar identidad temporal
-        if: always()
-        shell: bash
-        run: rm -f "${RUNNER_TEMP}/orbit360-firebase-lab-visual-review.json"
+          if [ "${{ job.status }}" != success ]; then state=failure; description='Preflight canónico falló; STOP THE LINE'; fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-canonical-static-preflight-v3' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null

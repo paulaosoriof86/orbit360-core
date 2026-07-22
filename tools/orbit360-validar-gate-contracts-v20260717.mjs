@@ -13,9 +13,10 @@ const ENGINE = 'tools/orbit360-validar-gate-contracts-engine-v20260717.mjs';
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-aware-static-authorization-v2';
+const ENGINE_EVIDENCE_USED = 'sync-file-evidence-not-stdout-v1';
 
-function readJson(rel) {
-  return JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
+function readJson(rel, base = ROOT) {
+  return JSON.parse(fs.readFileSync(path.join(base, rel), 'utf8'));
 }
 function unique(values) {
   return [...new Set((values || []).filter(Boolean))];
@@ -73,20 +74,27 @@ function createMirror(tempRoot, composedOverlay) {
   for (const name of fs.readdirSync(ROOT)) {
     const source = path.join(ROOT, name);
     const target = path.join(tempRoot, name);
-    if (name !== 'tools') {
-      link(source, target);
+    if (name === 'tools') {
+      fs.mkdirSync(target, { recursive: true });
+      for (const child of fs.readdirSync(source)) {
+        const childSource = path.join(source, child);
+        const childTarget = path.join(target, child);
+        if (child === path.basename(BASE_OVERLAY)) fs.writeFileSync(childTarget, `${JSON.stringify(composedOverlay, null, 2)}\n`, 'utf8');
+        else link(childSource, childTarget);
+      }
       continue;
     }
-    fs.mkdirSync(target, { recursive: true });
-    for (const child of fs.readdirSync(source)) {
-      const childSource = path.join(source, child);
-      const childTarget = path.join(target, child);
-      if (child === path.basename(BASE_OVERLAY)) {
-        fs.writeFileSync(childTarget, `${JSON.stringify(composedOverlay, null, 2)}\n`, 'utf8');
-      } else {
-        link(childSource, childTarget);
+    if (name === 'orbit360-platform') {
+      fs.mkdirSync(target, { recursive: true });
+      for (const child of fs.readdirSync(source)) {
+        const childSource = path.join(source, child);
+        const childTarget = path.join(target, child);
+        if (child === 'runtime-gate-crm-v20260716') fs.mkdirSync(childTarget, { recursive: true });
+        else link(childSource, childTarget);
       }
+      continue;
     }
+    link(source, target);
   }
 }
 function writeEvidence(payload) {
@@ -111,18 +119,17 @@ try {
   });
   exitCode = Number.isInteger(run.status) ? run.status : 41;
   if (run.error) throw run.error;
-  const stdout = String(run.stdout || '').trim();
-  const parsed = stdout ? JSON.parse(stdout) : {
-    status: 'VALIDATOR_STALE',
-    failed: 1,
-    failedCheckIds: ['CANONICAL_ENGINE_NO_OUTPUT']
-  };
+  const engineEvidencePath = path.join(tempRoot, EVIDENCE_REL);
+  if (!fs.existsSync(engineEvidencePath)) throw new Error('CANONICAL_ENGINE_EVIDENCE_MISSING');
+  const parsed = readJson(EVIDENCE_REL, tempRoot);
   output = {
     ...parsed,
     canonicalEntrypoint: 'tools/orbit360-validar-gate-contracts-v20260717.mjs',
     canonicalEngine: ENGINE,
     canonicalLifecycleContract: LIFECYCLE_CONTRACT,
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
+    engineEvidenceSource: ENGINE_EVIDENCE_USED,
+    engineStdoutParsed: false,
     parallelWrapperRetired: true,
     parallelOverlayRetired: true,
     operationalWrites: 0,
@@ -138,7 +145,7 @@ try {
   if (run.stderr) output.stderrSanitized = String(run.stderr).trim().slice(0, 2000);
 } catch (error) {
   output = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v9-canonical-lifecycle',
+    schemaVersion: 'orbit360-gate-contract-preflight-v10-canonical-engine-evidence',
     gateId: GATE_ID,
     contractVersion: '1.0.37',
     status: 'VALIDATOR_STALE',
@@ -147,6 +154,8 @@ try {
     failedCheckIds: ['CANONICAL_PREFLIGHT_ENTRYPOINT'],
     error: String(error && error.message || error),
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
+    engineEvidenceSource: ENGINE_EVIDENCE_USED,
+    engineStdoutParsed: false,
     operationalWrites: 0,
     evidenceWrites: 1,
     secretsRead: false,

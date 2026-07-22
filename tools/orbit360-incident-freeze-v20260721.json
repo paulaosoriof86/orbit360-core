@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v60-canonical-static-preflight-authorized",
+  "schemaVersion": "orbit360-incident-freeze-v61-canonical-engine-evidence-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-visual-review-semantic-and-responsive-defects-v20260722",
@@ -83,7 +83,7 @@
     "deployExecuted": false
   },
   "canonicalPipelineReconciliation": {
-    "status": "AUTHORIZED_FOR_ONE_BINDING_STATIC_PREFLIGHT",
+    "status": "AUTHORIZED_AFTER_ENGINE_EVIDENCE_ROOT_CAUSE",
     "officialEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "preservedEngine": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
     "lifecycleContract": "tools/orbit360-validator-lifecycle-contract-v20260722.json",
@@ -92,10 +92,15 @@
     "workflowFinalGateRerunRemoved": true,
     "classificationCorrectedToPipelineMechanismFailure": true,
     "productOwnerChanged": false,
-    "dataChanged": false
+    "dataChanged": false,
+    "engineStdoutParsingRetired": true,
+    "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
+    "failedRunId": 29953485798,
+    "failedCheckId": "CANONICAL_PREFLIGHT_ENTRYPOINT",
+    "rootCause": "preserved_engine_process_exit_truncated_piped_stdout_before_complete_json_flush"
   },
   "staticPreflightAuthorization": {
-    "authorizationId": "final-block1-static-preflight-1-0-37-v2",
+    "authorizationId": "final-block1-static-preflight-1-0-37-v3",
     "action": "final_block1_static_preflight_1_0_37_lifecycle_v2_only",
     "contractVersion": "1.0.37",
     "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
@@ -108,7 +113,9 @@
     "runtimeAllowed": false,
     "browserAllowed": false,
     "deployAllowed": false,
-    "finalGateRerunAllowed": false
+    "finalGateRerunAllowed": false,
+    "previousFailedRunId": 29953485798,
+    "previousFailedAuthorizationId": "final-block1-static-preflight-1-0-37-v2"
   },
   "preservedInventory": {
     "clients": 414,
@@ -154,7 +161,7 @@
     "m1TechnicalGate": "HISTORICAL_PASS",
     "m1VisualReview": "FAILED_FUNCTIONAL_DEFECT_REMEDIATED_STATICALLY",
     "m1StaticRemediation": "PASS",
-    "m1BindingPreflight": "AUTHORIZED_PENDING_SINGLE_EXECUTION",
+    "m1BindingPreflight": "AUTHORIZED_PENDING_SINGLE_EXECUTION_AFTER_PIPELINE_ROOT_CAUSE",
     "m1ValidatorLifecycleCorrection": "CANONICALIZED",
     "m1PipelineMechanismCorrection": "CANONICALIZED",
     "m1Closed": false,
@@ -164,7 +171,7 @@
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Execute exactly one binding static preflight through tools/orbit360-validar-gate-contracts-v20260717.mjs. Accept only GO_GATE_CONTRACT, visual PASS 29/29 and GO_STATIC_ARCHITECTURE. Do not rerun the final gate and do not enable secrets, Firestore, operational writes, runtime, browser or deploy.",
+  "nextAllowedStep": "Execute exactly one binding static preflight through tools/orbit360-validar-gate-contracts-v20260717.mjs using authorization final-block1-static-preflight-1-0-37-v3. Read the preserved engine result from its synchronous evidence file, not stdout. Accept only GO_GATE_CONTRACT, visual PASS 29/29 and GO_STATIC_ARCHITECTURE. Do not rerun the final gate and do not enable secrets, Firestore, operational writes, runtime, browser or deploy.",
   "containsPII": false,
   "containsSecrets": false
 }

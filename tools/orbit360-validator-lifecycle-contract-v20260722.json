@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v3-canonical-entrypoint",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v4-canonical-engine-evidence",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -54,15 +54,20 @@
     "parallelOverlayRetired": "tools/orbit360-gate-contract-overlay-validator-lifecycle-v20260722.json",
     "compositionMechanism": "canonical-entrypoint-temp-mirror-v1",
     "operationalWrites": 0,
-    "evidenceWrites": 1
+    "evidenceWrites": 1,
+    "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
+    "engineStdoutParsingRetired": true,
+    "failedRunId": 29953485798,
+    "failedCheckId": "CANONICAL_PREFLIGHT_ENTRYPOINT",
+    "rootCause": "preserved_engine_process_exit_truncated_piped_stdout_before_complete_json_flush"
   },
   "canonicalOverlayPatch": {
     "schemaVersion": "orbit360-gate-contract-overlay-v1",
     "issuedAt": "2026-07-22",
     "gateId": "block1-client360-insurers-lab-v20260717",
     "classification": "VALIDATOR_STALE",
-    "diagnosticRevision": "validator-lifecycle-canonical-entrypoint-v3",
-    "contractRevision": "1.0.37-validator-lifecycle-canonical-entrypoint-v3",
+    "diagnosticRevision": "validator-lifecycle-canonical-engine-evidence-v4",
+    "contractRevision": "1.0.37-validator-lifecycle-canonical-engine-evidence-v4",
     "gatePatch": {
       "contractVersion": "1.0.37",
       "diagnosticRevision": "visual-remediation-validator-lifecycle-canonical-entrypoint-v3",
@@ -168,7 +173,10 @@
           "orbit360-validar-gate-contracts-engine-v20260717.mjs",
           "parallelWrapperRetired: true",
           "parallelOverlayRetired: true",
-          "evidenceWrites: 1"
+          "evidenceWrites: 1",
+          "ENGINE_EVIDENCE_USED = 'sync-file-evidence-not-stdout-v1'",
+          "engineEvidencePath",
+          "engineStdoutParsed: false"
         ]
       },
       {
@@ -187,12 +195,13 @@
         "replaceRequiredTokens": true,
         "requiredTokens": [
           "final_block1_static_preflight_1_0_37_lifecycle_v2_only",
-          "targeted_lab_deploy_visual_review_only",
+          "ORBIT360_STATIC_PREFLIGHT_AUTHORIZATION_ID: final-block1-static-preflight-1-0-37-v3",
           "ORBIT360_FINAL_GATE_POLICY: no_final_gate_rerun",
           "node --check tools/orbit360-validar-gate-contracts-v20260717.mjs",
           "node tools/orbit360-validar-gate-contracts-v20260717.mjs \"$ORBIT360_GATE_ID\"",
           "node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
           "node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+          "engineEvidenceSource:\"sync-file-evidence-not-stdout-v1\"",
           "functionsDeployed:false",
           "rulesDeployed:false",
           "productionTouched:false"

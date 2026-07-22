@@ -34,3 +34,9 @@ Se acepta exclusivamente cuando coinciden:
 ## Estado
 
 Autorizado exactamente un preflight estático vinculante. M1 permanece abierto hasta consumir esa evidencia y completar una entrega correctiva separada en Hosting LAB con revisión visual humana acotada.
+
+## Evidencia de la primera ejecución canónica
+
+La ejecución `29953485798` confirmó que el workflow, la autorización y el inventario eran válidos. El único fallo ocurrió en `CANONICAL_PREFLIGHT_ENTRYPOINT`: el motor preservado escribió correctamente su archivo JSON sincronizado, pero su `process.exit()` interrumpió la salida extensa enviada por `stdout`, que quedó incompleta. Se retiró la interpretación de `stdout`; el entrypoint ahora consume exclusivamente el archivo de evidencia escrito sincrónicamente dentro del mirror temporal.
+
+La autorización `final-block1-static-preflight-1-0-37-v2` se considera consumida por esa ejecución fallida. La revisión `v3` es una autorización nueva, separada y de un solo uso emitida únicamente después de cerrar la causa raíz. No habilita secretos, Firestore, escrituras operativas, runtime, navegador, deploy ni repetición del gate final.

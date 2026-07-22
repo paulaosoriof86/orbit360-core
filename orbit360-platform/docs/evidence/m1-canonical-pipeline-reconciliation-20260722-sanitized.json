@@ -1,12 +1,12 @@
 {
-  "schemaVersion": "orbit360-m1-canonical-pipeline-reconciliation-v1",
+  "schemaVersion": "orbit360-m1-canonical-pipeline-reconciliation-v2-engine-evidence",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "gateId": "block1-client360-insurers-lab-v20260717",
   "contractVersion": "1.0.37",
-  "status": "AUTHORIZED_PENDING_SINGLE_BINDING_STATIC_PREFLIGHT",
+  "status": "AUTHORIZED_PENDING_SINGLE_BINDING_STATIC_PREFLIGHT_AFTER_ROOT_CAUSE",
   "classifications": [
     "FUNCTIONAL_DEFECT",
     "VALIDATOR_STALE",
@@ -25,10 +25,15 @@
     "parallelWrapperRetired": true,
     "parallelOverlayRetired": true,
     "workflowFinalGateRerunRemoved": true,
-    "bankValidatorStaleTokenCorrected": true
+    "bankValidatorStaleTokenCorrected": true,
+    "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
+    "engineStdoutParsingRetired": true,
+    "failedRunId": 29953485798,
+    "failedCheckId": "CANONICAL_PREFLIGHT_ENTRYPOINT",
+    "rootCause": "preserved_engine_process_exit_truncated_piped_stdout_before_complete_json_flush"
   },
   "authorization": {
-    "id": "final-block1-static-preflight-1-0-37-v2",
+    "id": "final-block1-static-preflight-1-0-37-v3",
     "active": true,
     "consumed": false,
     "allowedExecutions": 1,
@@ -38,7 +43,9 @@
     "runtimeAllowed": false,
     "browserAllowed": false,
     "deployAllowed": false,
-    "finalGateRerunAllowed": false
+    "finalGateRerunAllowed": false,
+    "previousFailedAuthorizationId": "final-block1-static-preflight-1-0-37-v2",
+    "previousFailedRunId": 29953485798
   },
   "preservedInventory": {
     "clients": 414,
