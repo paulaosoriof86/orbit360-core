@@ -1,6 +1,6 @@
 /* Orbit 360 · Service Worker — red primero con fallback offline.
    Evita que una versión antigua de Auth o del shell bloquee el canal LAB. */
-var CACHE = 'orbit360-v20260721-4-pwa1';
+var CACHE = 'orbit360-v20260721-4-pwa2';
 var BUILD = '20260721-4';
 var CRITICAL_RELEASE = 'block1-critical-runtime-20260721-4';
 var RUNTIME_CONTRACT_TIMEOUT_MS = 8000;
@@ -10,6 +10,14 @@ var RUNTIME_CONTRACT_PATHS = [
   '/core/client-canonical-view-projection-v20260716.js',
   '/core/tenant-insurer-config-p10.js',
   '/data/tenant-runtime-config-index.js'
+];
+var CRITICAL_RUNTIME_PATHS = [
+  '/core/router-tenant-config-bootstrap.js',
+  '/core/client-insurer-visual-stability-barrier-v20260721.js',
+  '/core/client-insurer-visual-contract-v20260720.js',
+  '/styles/client-insurer-visual-contract-v20260720.css',
+  '/core/pwa.js',
+  '/modules/ia.js'
 ];
 
 function canonicalRequest(pathname) {
@@ -22,6 +30,22 @@ function canonicalRequest(pathname) {
 
 function isRuntimeContract(pathname) {
   return RUNTIME_CONTRACT_PATHS.indexOf(pathname) >= 0 || /^\/data\/tenant-[^/]+-insurers-p10\.js$/i.test(pathname);
+}
+
+function isCriticalRuntime(pathname) {
+  return CRITICAL_RUNTIME_PATHS.indexOf(pathname) >= 0;
+}
+
+function releaseRequest(eventRequest, originalUrl) {
+  var freshUrl = new URL(originalUrl.href);
+  freshUrl.searchParams.set('orbitBuild', BUILD);
+  freshUrl.searchParams.set('criticalRelease', CRITICAL_RELEASE);
+  return new Request(freshUrl.href, {
+    method: 'GET',
+    headers: eventRequest.headers,
+    credentials: eventRequest.credentials,
+    redirect: eventRequest.redirect
+  });
 }
 
 function fetchWithTimeout(request, timeoutMs) {
@@ -117,15 +141,8 @@ self.addEventListener('fetch', function (event) {
     caches.open(CACHE).then(function (cache) {
       var request = event.request;
 
-      if (/\/core\/auth\.js$/i.test(originalUrl.pathname)) {
-        var freshAuthUrl = new URL(originalUrl.href);
-        freshAuthUrl.searchParams.set('orbitBuild', BUILD);
-        request = new Request(freshAuthUrl.href, {
-          method: 'GET',
-          headers: event.request.headers,
-          credentials: event.request.credentials,
-          redirect: event.request.redirect
-        });
+      if (isCriticalRuntime(originalUrl.pathname) || /\/core\/auth\.js$/i.test(originalUrl.pathname)) {
+        request = releaseRequest(event.request, originalUrl);
       }
 
       return fetch(request, { cache: 'no-store' }).then(function (response) {
