@@ -1,9 +1,9 @@
 {
   "schemaVersion": "orbit360-critical-runtime-integrity-manifest-v1",
-  "issuedAt": "2026-07-21",
+  "issuedAt": "2026-07-22",
   "releaseId": "block1-critical-runtime-20260721-4",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "contractVersion": "1.0.35",
+  "contractVersion": "1.0.36",
   "assets": [
     {
       "id": "index",
