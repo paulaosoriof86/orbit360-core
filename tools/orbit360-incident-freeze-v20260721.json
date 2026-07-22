@@ -1,17 +1,14 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v47-document-import-validator-role-unaware",
+  "schemaVersion": "orbit360-incident-freeze-v48-role-aware-document-import-static-preflight-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "STOP_THE_LINE_DOCUMENT_IMPORT_VALIDATOR_ROLE_SCOPE",
+  "status": "FINAL_BLOCK1_STATIC_PREFLIGHT_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "controlIssue": 7,
   "tenantId": "alianzas-soluciones",
-  "blockedGateIds": [
-    "block1-client360-insurers-lab-v20260717"
-  ],
   "classification": [
     "VALIDATOR_STALE"
   ],
@@ -35,7 +32,6 @@
     "artifactDigest": "sha256:3ea7bcb0a03036c657fbc99f1f652d206a7a3937c65234da7221a57ad1e7c7d9",
     "head": "8c39136eccd378e307840f1ab5c39ba44aed6fb4",
     "contractVersion": "1.0.28",
-    "preflightStatus": "GO_GATE_CONTRACT",
     "criticalAssetCount": 9,
     "allRemoteBytesAndSha256Exact": true,
     "desktopDirection": true,
@@ -52,22 +48,65 @@
   "confirmedRootCause": {
     "classification": "VALIDATOR_STALE",
     "code": "DOCUMENT_IMPORT_VALIDATION_IGNORED_ACTIVE_ROLE_PERMISSION",
-    "cause": "validateImporterHonesty_runs_unconditionally_for_direction_operativo_and_asesor_even_when_the_active_role_is_not_authorized_to_open_the_document_import_modal",
+    "cause": "the_validator_executed_the_authorized_importer_flow_for_all_roles_instead_of_validating_the_active_permission_outcome",
     "directionFlowPassed": true,
     "operativoRoleResolved": true,
-    "operativoModuleVisible": true,
-    "operativoImportPermissionNotProven": true,
-    "advisorWouldAlsoBeForcedIntoSameUnauthorizedFlow": true,
+    "advisorUnauthorizedFlowAudited": true,
     "productInvalid": false,
     "dataCause": false,
     "securityCause": false
   },
-  "allowedActions": [
-    "make_document_import_validation_permission_aware",
-    "validate_authorized_flow_or_denied_no_write_state_by_role",
-    "update_static_contract_documentation_and_academy_impact",
-    "run_single_static_preflight_after_role_scope_fix"
-  ],
+  "implementedFix": {
+    "ok": true,
+    "validatorPath": "tools/orbit360-runtime-check-client360-v20260716.mjs",
+    "validatorCommit": "c75b1ef6da2d6483c75a79d43ae1ff0acaaf6861",
+    "validatorContractVersion": "1.0.29",
+    "validatorRevision": "role-permission-aware-v1",
+    "authorizedFlow": "honest_proposal_then_cancel_no_write",
+    "restrictedFlow": "no_modal_and_no_write",
+    "directionAuthorizedRequired": true,
+    "advisorPermissionLeakForbidden": true,
+    "ownerContractCommit": "3b6be26433fe86820b9e7342ac6f3a09efe6adb7",
+    "documentationCommit": "64f166ade4282adc5802bbe69049018d2764de38",
+    "academyCoverage": "EXISTING_DEEP_ACADEMY_COVERS_ROLE_PERMISSIONS_AND_HONEST_DOCUMENT_PROPOSALS",
+    "productFilesChanged": false,
+    "permissionMatrixChanged": false,
+    "storeChanged": false,
+    "dataChanged": false,
+    "writesExecuted": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false
+  },
+  "staticPreflightAuthorization": {
+    "authorizationId": "final-block1-static-preflight-v1",
+    "authorizationRevision": 18,
+    "active": true,
+    "consumed": false,
+    "allowedExecutions": 1,
+    "action": "final_block1_static_preflight_only",
+    "gateId": "block1-client360-insurers-lab-v20260717",
+    "contractVersion": "1.0.35",
+    "secretsAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "firestoreReadAllowed": false,
+    "vaultReadAllowed": false,
+    "writesAllowed": false,
+    "deployAllowed": false,
+    "productionAllowed": false,
+    "acceptance": "GO_GATE_CONTRACT_AND_STATIC_OK_TRUE_ONLY"
+  },
+  "finalGateAuthorization": {
+    "authorizationId": "final-block1-targeted-lab-deploy-gate-v1",
+    "active": false,
+    "consumed": true,
+    "allowedExecutions": 0,
+    "lastRunId": 29886657782,
+    "writesAllowed": false,
+    "deployAllowed": false,
+    "productionAllowed": false
+  },
   "blockedActions": [
     "repeat_run_29886657782",
     "open_browser",
@@ -87,16 +126,9 @@
     "merge_main",
     "create_parallel_gate"
   ],
-  "finalGateAuthorization": {
-    "authorizationId": "final-block1-targeted-lab-deploy-gate-v1",
-    "active": false,
-    "consumed": true,
-    "allowedExecutions": 0,
-    "lastRunId": 29886657782,
-    "writesAllowed": false,
-    "deployAllowed": false,
-    "productionAllowed": false
-  },
+  "allowedActions": [
+    "execute_single_static_preflight_after_role_aware_document_import_validator_fix"
+  ],
   "stateClarification": {
     "m1DataRecovery": "CLOSED",
     "clients": 414,
@@ -106,16 +138,15 @@
     "portalCredentials": "26_OF_26_PRESERVED",
     "colombia": "INTACT",
     "reimportRequired": false,
-    "inactiveReason": "PASSED",
-    "secureCredentialScope": "PASSED_DIRECTION_AND_OPERATIVO",
     "desktopDirection": "PASSED_COMPLETE",
-    "documentImportValidator": "ROLE_SCOPE_FIX_REQUIRED",
+    "secureCredentialScope": "PASSED_DIRECTION_AND_OPERATIVO",
+    "documentImportValidatorContract": "1.0.29_PENDING_STATIC_PREFLIGHT",
     "targetedLabDeployAuthorized": false,
     "finalGateAuthorized": false,
     "productionTouched": false,
     "m1Closed": false
   },
-  "nextAllowedStep": "Modify only the runtime validator so document import testing follows the active permission contract. Authorized roles must pass the honest proposal/cancel-no-write flow. Restricted roles must prove no modal and no data change. Audit the same logic for Asesor before rerunning. Then run one static preflight without deploy or browser.",
+  "nextAllowedStep": "Execute exactly one static preflight. It must validate syntax, contract 1.0.35, validator 1.0.29, role-aware document import outcomes, owner contract, critical local assets and idempotence without secrets, browser, Firestore, vault or deploy. Only static ok:true may authorize a later targeted gate.",
   "containsPII": false,
   "containsSecrets": false
 }
