@@ -25,7 +25,7 @@ Evidencia relevante:
 - run `29953485798`: `PIPELINE_MECHANISM_FAILURE`, check `CANONICAL_PREFLIGHT_ENTRYPOINT`;
 - run `29954997417`: `VALIDATOR_STALE`, checks `WORKFLOW_PROJECT_LOCK` y `WORKFLOW_CHANNEL_LOCK`;
 - gate técnico histórico: PASS, sin reejecución;
-- remediación visual: PASS 29/29;
+- remediación visual: PASS estático previo;
 - producto, datos, Store, Auth, importadores y backend protegido: sin regresión demostrada.
 
 La repetición no fue causada por Clientes, Aseguradoras, credenciales, referencias bancarias ni por la remediación visual.
@@ -166,7 +166,7 @@ Fuentes vivas autorizadas:
 3. artefacto sanitizado del run para checks y predicado de éxito;
 4. freeze versionado para restricciones y causa raíz.
 
-El cuerpo del PR no debe volver a declarar manualmente un HEAD como fuente autoritativa. Puede indicar:
+El cuerpo del PR no debe volver a declarar manualmente un HEAD como fuente autoritativa. Debe indicar:
 
 ```text
 HEAD vivo: consultar metadata del PR
@@ -253,9 +253,55 @@ finalGateRerun=false
 
 Este preflight no ejecuta el gate técnico final, no abre navegador, no despliega Hosting, no lee bóveda y no toca datos.
 
-Solo después de PASS podrá evaluarse una solicitud separada de `LAB_HOSTING_DELIVERY` para publicar el frontend correctivo y realizar una única revisión visual humana acotada.
+## 10. Verificación estructural realizada
 
-## 10. Impacto Claude / prototipo
+La solicitud inmutable `m1-static-preflight-control-plane-reconciled-v1-20260722` se ejecutó una sola vez:
+
+```text
+Run: 29961263105
+Attempt: 1
+Execution phase: STATIC_PREFLIGHT
+Gate contract: GO_GATE_CONTRACT
+Contract checks: 1366/1366
+Runtime/browser/deploy/writes: false
+Final technical gate rerun: false
+```
+
+Este resultado prueba que la causa raíz del control plane distribuido quedó corregida: el preflight estático dejó de exigir proyecto Firebase y canal Hosting.
+
+El run se detuvo después en el contrato visual:
+
+```text
+Visual checks: 28/29
+Failed check: ACADEMY_RESPONSIVE
+Classification: VALIDATOR_STALE
+```
+
+La lección de Academia sí contenía `títulos`, `encabezados`, `pestañas`, `acciones` e `Instalar como app`. El validador exigía una frase literal con una conjunción distinta. No existió defecto de contenido ni regresión del producto.
+
+El check fue corregido sin nueva ejecución para validar el conjunto semántico de conceptos. La solicitud inmutable quedó consumida y no puede reutilizarse.
+
+## 11. Auditoría independiente no ejecutora
+
+Se verificó sin ejecutar GitHub Actions que:
+
+- el motor lee `executionProfile` antes de aplicar locks de entorno;
+- `STATIC_PREFLIGHT` deshabilita capacidades operativas y locks de proyecto/canal;
+- el workflow solo se dispara por la solicitud inmutable;
+- la solicitud se liga a `HEAD^` y bloquea `GITHUB_RUN_ATTEMPT` distinto de 1;
+- la autorización mutable anterior está inactiva, consumida y retirada;
+- `ACADEMY_RESPONSIVE` valida tokens semánticos individuales;
+- Academia contiene todos los conceptos exigidos.
+
+Resultado:
+
+```text
+INDEPENDENT_NON_EXECUTING_AUDIT: PASS
+NEW_EXECUTION_AUTHORIZED: false
+STOP_THE_LINE: vigente
+```
+
+## 12. Impacto Claude / prototipo
 
 **Clasificación:** `REPLICABLE_CLAUDE_ACUMULADO`.
 
@@ -267,16 +313,9 @@ Claude debe conservar:
 - cero cambios de UX para satisfacer un check de infraestructura;
 - retiro de bridges y mecanismos paralelos.
 
-Claude no recibe:
+Claude no recibe workflows internos, autorizaciones, infraestructura Firebase, secretos, datos reales ni implementación protegida del motor.
 
-- workflows internos;
-- autorizaciones;
-- infraestructura Firebase;
-- secretos;
-- datos reales;
-- implementación protegida del motor.
-
-## 11. Impacto Academia
+## 13. Impacto Academia
 
 Academia técnica debe enseñar:
 
@@ -285,19 +324,19 @@ Academia técnica debe enseñar:
 - cómo leer una solicitud inmutable;
 - diferencia entre `VALIDATOR_STALE`, `PIPELINE_MECHANISM_FAILURE` y `FUNCTIONAL_DEFECT`;
 - por qué dos fallos detienen los reintentos;
-- por qué no se corrige el producto para satisfacer una infraestructura desalineada.
+- por qué no se corrige el producto para satisfacer infraestructura desalineada;
+- por qué los validadores deben comprobar semántica o conducta y no redacciones literales frágiles.
 
-## 12. Criterio de cierre de esta causa raíz
+## 14. Estado vinculante posterior
 
-La causa raíz se considera cerrada estructuralmente cuando:
+```text
+CONTROL PLANE ROOT CAUSE: CLOSED STRUCTURALLY
+PREFLIGHT CONTROL CONTRACT: GO 1366/1366
+VISUAL VALIDATOR STALE: CORRECTED WITHOUT RERUN
+INDEPENDENT NON-EXECUTING AUDIT: PASS
+M1: OPEN
+NEW EXECUTION: NOT AUTHORIZED
+RUNTIME / BROWSER / HOSTING / DATA / PRODUCTION: BLOCKED
+```
 
-- el motor valida requisitos según fase y capacidades;
-- el workflow declara la misma fase;
-- la autorización mutable está consumida y retirada;
-- el freeze registra ambos fallos y el control plane reconciliado;
-- la solicitud inmutable está ligada al parent HEAD;
-- una sola ejecución produce evidencia sanitizada;
-- el PR usa metadata viva y no un HEAD copiado manualmente;
-- no se crea gate, workflow ni overlay paralelo.
-
-Este cierre no implica por sí solo que M1 esté cerrado. M1 solo se cierra después del preflight PASS, la entrega Hosting LAB autorizada por separado y la revisión visual humana aprobada.
+M1 no se cierra con este addendum. Una futura ejecución solo podrá abrirse mediante una decisión metodológica separada basada en la auditoría completada; no puede reutilizar la solicitud consumida ni crear otra automáticamente.
