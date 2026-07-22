@@ -2,36 +2,43 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-22",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "SECURITY_FAILURE",
-  "diagnosticRevision": "active-role-scope-ceiling-v1",
-  "contractRevision": "1.0.36-active-role-scope-ceiling-v1",
+  "classification": "FUNCTIONAL_DEFECT",
+  "diagnosticRevision": "visual-review-semantic-responsive-remediation-v1",
+  "contractRevision": "1.0.37-visual-review-semantic-responsive-remediation-v1",
   "gatePatch": {
-    "contractVersion": "1.0.36",
-    "diagnosticRevision": "active-role-scope-ceiling-v1",
-    "status": "ACTIVE_ROLE_SCOPE_CEILING_STATIC_PREFLIGHT_AUTHORIZED"
+    "contractVersion": "1.0.37",
+    "diagnosticRevision": "visual-review-semantic-responsive-remediation-v1",
+    "status": "STOP_LINE_VISUAL_REMEDIATION_STATIC_ONLY",
+    "validators": [
+      "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs",
+      "tools/orbit360-runtime-check-client360-v20260716.mjs",
+      "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+      "tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
+      "tools/orbit360-gate-environment-v20260717.mjs",
+      "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+      "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js",
+      "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js"
+    ],
+    "diagnosticRule": "The technical gate remains historical PASS, but the single human visual review failed on visible semantics and responsive containment. Correct only the canonical visual owner, its style owner, validator and Academy. No data, vault, importer, Auth, Store, Rules, Functions or production changes are allowed.",
+    "acceptancePolicy": "Static remediation may be accepted only when the dedicated contract returns PASS with zero writes, runtime, browser and deploy. A later official preflight and any Hosting LAB deployment require separate one-use authorization; the final gate is not rerun."
   },
   "effectiveOwnerReconciliation": {
-    "baselineOverlayRef": "b760ec88adcc319ce2fd0c7c1e0ce0410f41c4fa",
-    "preservedOwnerIds": [
-      "pwa",
-      "clientInsurerVisualStabilityBarrier",
+    "baselineOverlayContract": "1.0.36-active-role-scope-ceiling-v1",
+    "preservedTechnicalGateEvidence": true,
+    "visualReviewApproved": false,
+    "classification": "FUNCTIONAL_DEFECT",
+    "visualRemediationRevision": "20260722.1",
+    "productOwnersChanged": [
       "clientInsurerVisualContract",
-      "clientDataQuality",
-      "insurerDocumentImport",
-      "insurerSecureTargetBridge",
-      "realInsurerDirectoryAcademy"
+      "clientInsurerVisualStyle"
     ],
-    "addedOwnerIds": [
-      "access"
-    ],
-    "droppedOwnerIds": [],
-    "baseExtensionStaleOwnersOverridden": [
-      "insurerSecureTargetBridge",
-      "realInsurerDirectoryAcademy"
-    ],
-    "securityFix": "active-role-scope-ceiling-v1",
-    "productFilesChanged": true,
-    "validatorImplementationChanged": false,
+    "academyChanged": true,
+    "validatorChanged": true,
+    "dataChanged": false,
+    "storeChanged": false,
+    "authChanged": false,
+    "vaultChanged": false,
+    "importersChanged": false,
     "writesExecuted": false,
     "runtimeExecuted": false,
     "browserExecuted": false,
@@ -81,6 +88,16 @@
         "Orbit.clientInsurerVisualContractV20260720",
         "version:'20260720.2'",
         "idempotenceRevision:'20260721.4'",
+        "visualRemediationRevision:'20260722.1'",
+        "data-m1-credential-user",
+        "data-m1-credential-secret",
+        "function revealBankAccount",
+        "data-m1-bank-number",
+        "data-m1-bank-reveal",
+        "credentialUserAlwaysSeparate:true",
+        "credentialSecretSeparateReveal:true",
+        "bankCopyExcludesUse:true",
+        "bankHolderFallbackInsurer:true",
         "function setHtmlIfChanged(node,html)",
         "function setTextIfChanged(node,text)",
         "function pauseCanonicalObserver()",
@@ -90,6 +107,18 @@
         "idempotentDomWrites:true",
         "client360StructuralTrigger:true",
         "writesStore:false"
+      ]
+    },
+    {
+      "id": "clientInsurerVisualStyle",
+      "path": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+      "requiredTokens": [
+        "Visual remediation 20260722.1",
+        ".m1-credential-secret",
+        ".m1-bank-number-line",
+        "#pwa-install",
+        "overflow-x:auto!important",
+        "overflow-x:hidden"
       ]
     },
     {
@@ -134,6 +163,19 @@
       ]
     },
     {
+      "id": "m1VisualIntegrityAcademy",
+      "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+      "requiredTokens": [
+        "version:'1.221'",
+        "contentVersion:'1.227'",
+        "_m1visualv:1227",
+        "El usuario del portal permanece visible",
+        "El campo Uso no se muestra ni se copia",
+        "Instalar como app",
+        "visualSemanticsRemediation:true"
+      ]
+    },
+    {
       "id": "access",
       "path": "orbit360-platform/core/access-scope.js",
       "requiredTokens": [
@@ -145,6 +187,20 @@
         "if (OWN_ROLES.indexOf(role) >= 0 || /Asesor/i.test(role)) return 'own'",
         "return scopeLevel(requested) <= scopeLevel(ceiling) ? requested : ceiling",
         "__activeRoleScopeCeilingV20260721: true"
+      ]
+    },
+    {
+      "id": "m1VisualRemediationContract",
+      "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "requiredTokens": [
+        "orbit360-m1-visual-remediation-contract-v1",
+        "contractVersion: '1.0.37'",
+        "FREEZE_STOP_THE_LINE",
+        "BANK_COPY_EXCLUDES_USE",
+        "ACADEMY_CONTENT_1227",
+        "runtimeExecuted: false",
+        "browserExecuted: false",
+        "deployExecuted: false"
       ]
     }
   ],
@@ -166,13 +222,14 @@
     "orbit360-platform/core/access-scope.js",
     "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js",
     "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
-    "orbit360-platform/docs/BLOQUE1-SECURITY-FAILURE-TECHO-SCOPE-ROL-ACTIVO-20260721.md",
+    "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
     "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
     "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
     "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
     "orbit360-platform/docs/evidence/owner-visual-idempotence-proof-local-20260721-sanitized.json",
     "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-MANIFIESTO-INTEGRIDAD-RUNTIME-CRITICO-20260721.md",
-    "orbit360-platform/docs/BLOQUE1-STOP-LINE-RECONCILIACION-OWNERS-REGISTRO-20260721.md"
+    "orbit360-platform/docs/BLOQUE1-STOP-LINE-RECONCILIACION-OWNERS-REGISTRO-20260721.md",
+    "orbit360-platform/docs/BLOQUE1-FUNCTIONAL-DEFECT-REVISION-VISUAL-20260722.md"
   ],
   "runtimeGraphFiles": [
     "orbit360-platform/index.html",
@@ -234,6 +291,13 @@
       "requiredTokens": [
         "version:'20260720.2'",
         "idempotenceRevision:'20260721.4'",
+        "visualRemediationRevision:'20260722.1'",
+        "data-m1-credential-user",
+        "data-m1-credential-secret",
+        "data-m1-bank-number",
+        "data-m1-bank-reveal",
+        "bankCopyExcludesUse:true",
+        "bankHolderFallbackInsurer:true",
         "function setHtmlIfChanged(node,html)",
         "function setTextIfChanged(node,text)",
         "function pauseCanonicalObserver()",
@@ -244,6 +308,18 @@
         "mutationMode:'same-microtask-disconnect-own-writes'",
         "observerOwnMutations:false",
         "enhance:runEnhance"
+      ]
+    },
+    {
+      "path": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "Visual remediation 20260722.1",
+        ".m1-credential-secret",
+        ".m1-bank-number-line",
+        "#pwa-install",
+        "overflow-x:auto!important",
+        "overflow-x:hidden"
       ]
     },
     {
@@ -305,7 +381,7 @@
       "requiredTokens": [
         "orbit360-critical-runtime-integrity-manifest-v1",
         "block1-critical-runtime-20260721-4",
-        "1.0.36",
+        "1.0.37",
         "routerTenantBootstrap",
         "clientInsurerVisualStabilityBarrier",
         "serviceWorker",
@@ -405,11 +481,12 @@
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "version:'1.221'",
-        "contentVersion:'1.226'",
-        "_m1visualv:1226",
-        "El rol activo impone el techo",
-        "activeRoleScopeCeiling:true",
-        "block1-critical-runtime-20260721-4"
+        "contentVersion:'1.227'",
+        "_m1visualv:1227",
+        "El usuario del portal permanece visible",
+        "El campo Uso no se muestra ni se copia",
+        "Instalar como app",
+        "visualSemanticsRemediation:true"
       ]
     },
     {
@@ -439,16 +516,28 @@
       ]
     },
     {
+      "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "orbit360-m1-visual-remediation-contract-v1",
+        "contractVersion: '1.0.37'",
+        "FREEZE_STOP_THE_LINE",
+        "BANK_COPY_EXCLUDES_USE",
+        "ACADEMY_CONTENT_1227",
+        "runtimeExecuted: false",
+        "browserExecuted: false",
+        "deployExecuted: false"
+      ]
+    },
+    {
       "path": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "ACCESS_ACTIVE_ROLE_SCOPE_CEILING",
-        "ACCESS_ROLE_SCOPE_CONTRACT_EXECUTES",
-        "ACCESS_ROLE_SCOPE_CONTRACT_PASS",
-        "ACCESS_ADVISOR_SCOPE_OWN",
-        "ACCESS_OPERATIVO_SCOPE_TEAM",
-        "ACCESS_EXPLICIT_NONE_WINS",
-        "ACCESS_SCOPE_TEST_NO_WRITES"
+        "M1_VISUAL_REMEDIATION_CONTRACT_EXISTS",
+        "M1_VISUAL_REMEDIATION_CONTRACT_EXECUTES",
+        "M1_VISUAL_REMEDIATION_CONTRACT_PASS",
+        "M1_VISUAL_REMEDIATION_CONTRACT_1037",
+        "M1_VISUAL_REMEDIATION_NO_WRITES"
       ]
     },
     {

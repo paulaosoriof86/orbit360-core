@@ -93,6 +93,21 @@ if (exists(accessContractRel)) {
   }
 }
 
+const visualRemediationRel = 'tools/orbit360-m1-visual-remediation-contract-v20260722.js';
+check('M1_VISUAL_REMEDIATION_CONTRACT_EXISTS', exists(visualRemediationRel), visualRemediationRel);
+let visualRemediation = null;
+if (exists(visualRemediationRel)) {
+  const run = spawnSync(process.execPath, [path.join(root, visualRemediationRel)], { encoding: 'utf8' });
+  check('M1_VISUAL_REMEDIATION_CONTRACT_EXECUTES', run.status === 0, String(run.stderr || run.stdout || '').slice(0, 900));
+  try { visualRemediation = JSON.parse(String(run.stdout || '').trim()); }
+  catch (error) { check('M1_VISUAL_REMEDIATION_CONTRACT_JSON', false, error.message); }
+  if (visualRemediation) {
+    check('M1_VISUAL_REMEDIATION_CONTRACT_PASS', visualRemediation.status === 'PASS', visualRemediation.status || 'missing');
+    check('M1_VISUAL_REMEDIATION_CONTRACT_1037', visualRemediation.contractVersion === '1.0.37', visualRemediation.contractVersion || 'missing');
+    check('M1_VISUAL_REMEDIATION_NO_WRITES', visualRemediation.writes === 0, String(visualRemediation.writes));
+  }
+}
+
 const statesRequired = [
   'Documento recibido', 'Mapeado', 'Persistido', 'Requiere validación', 'Validado',
   'Habilitado para Cotizador', 'Habilitado para Comparativo'
@@ -129,6 +144,11 @@ const result = {
     advisorExplicitAll: accessContract.cases && accessContract.cases.advisorExplicitAll,
     operativoExplicitAll: accessContract.cases && accessContract.cases.operativoExplicitAll,
     writes: accessContract.writes
+  } : null,
+  visualRemediationContract: visualRemediation ? {
+    contractVersion: visualRemediation.contractVersion,
+    revision: visualRemediation.revision,
+    writes: visualRemediation.writes
   } : null,
   total: checks.length,
   passed: checks.length - failed.length,

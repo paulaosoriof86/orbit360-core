@@ -3,7 +3,7 @@
   "issuedAt": "2026-07-22",
   "releaseId": "block1-critical-runtime-20260721-4",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "contractVersion": "1.0.36",
+  "contractVersion": "1.0.37",
   "assets": [
     {
       "id": "index",
@@ -82,7 +82,8 @@
     "allLocalFilesPresent": true,
     "allRequiredScriptsSyntaxOk": true,
     "allRemoteBytesAndSha256Exact": true,
-    "browserAllowedOnlyAfterExactMatch": true
+    "browserAllowedOnlyAfterExactMatch": true,
+    "visualRemediationStaticContractRequired": true
   },
   "writesExecuted": false,
   "runtimeExecuted": false,
