@@ -119,7 +119,9 @@ assert(proof.proof.followUpObserverDeliveries === 0, 'Debe probar cero entregas 
 assert(Array.isArray(proof.proof.client360StructuralTriggers) && proof.proof.client360StructuralTriggers.includes('f-pais') && proof.proof.client360StructuralTriggers.includes('f-seg'), 'Debe probar disparadores estructurales de país y segmento en Cliente 360');
 assert(proof.runtimeExecuted === false && proof.browserExecuted === false && proof.deployExecuted === false, 'La prueba debe ser totalmente estática');
 
-assert(barrierSource.includes("version: '20260721.3'"), 'La barrera debe declarar versión 20260721.3');
+assert(barrierSource.includes("version: '20260721.4'"), 'La barrera debe declarar versión 20260721.4');
+assert(barrierSource.includes("block1-critical-runtime-20260721-4"), 'La barrera debe declarar el release crítico vigente');
+assert(barrierSource.includes("registryContract = { version: '20260721.2' }"), 'La barrera debe conservar la versión pública estable del registro');
 assert(barrierSource.includes('function directoryReady(grid)'), 'Falta contrato semántico del directorio');
 assert(barrierSource.includes("node.classList.contains('asg-grid')"), 'Falta disparador estructural .asg-grid');
 assert(barrierSource.includes("node.matches('.asg-card.off[data-asg]')"), 'Falta disparador de tarjeta inactiva');
@@ -144,7 +146,9 @@ console.log(JSON.stringify({
     client360StructuralTriggers: proof.proof.client360StructuralTriggers
   },
   directoryStability: {
-    barrierVersion: '20260721.3',
+    barrierVersion: '20260721.4',
+    criticalRelease: 'block1-critical-runtime-20260721-4',
+    registryVersion: '20260721.2',
     structuralTrigger: true,
     inactiveReasonRequired: true,
     writesStore: false
