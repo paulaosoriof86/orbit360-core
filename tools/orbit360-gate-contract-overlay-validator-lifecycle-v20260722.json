@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-22",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "classification": "VALIDATOR_STALE",
+  "diagnosticRevision": "validator-lifecycle-phase-aware-v2",
+  "contractRevision": "1.0.37-validator-lifecycle-phase-aware-v2",
+  "gatePatch": {
+    "contractVersion": "1.0.37",
+    "diagnosticRevision": "visual-remediation-plus-validator-lifecycle-phase-aware-v2",
+    "status": "VALIDATOR_LIFECYCLE_AND_OVERLAY_RECONCILED_BINDING_PREFLIGHT_PENDING",
+    "diagnosticRule": "The visual product remediation remains frozen. The validator must accept either an active single-use static authorization or its consumed state while keeping M1 open, the final gate rerun blocked, and secrets, Firestore, writes, runtime, browser, Functions, Rules, production and deploy disabled.",
+    "acceptancePolicy": "Run only the binding static preflight under a separate one-use static authorization. Accept only GO_GATE_CONTRACT plus the dedicated visual contract PASS and GO_STATIC_ARCHITECTURE. Do not rerun the final gate."
+  },
+  "effectiveOwnerReconciliation": {
+    "baselineOverlayContract": "1.0.37-visual-review-semantic-responsive-remediation-v1",
+    "classification": "VALIDATOR_STALE",
+    "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
+    "productOwnersChanged": [],
+    "academyChanged": true,
+    "validatorChanged": true,
+    "dataChanged": false,
+    "storeChanged": false,
+    "authChanged": false,
+    "vaultChanged": false,
+    "importersChanged": false,
+    "writesExecuted": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false
+  },
+  "canonicalOwners": [
+    {
+      "id": "m1VisualIntegrityAcademy",
+      "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+      "requiredTokens": [
+        "version:'1.221'",
+        "contentVersion:'1.228'",
+        "_m1visualv:1228",
+        "El usuario del portal permanece visible",
+        "El campo Uso no se muestra ni se copia",
+        "Instalar como app",
+        "visualSemanticsRemediation:true",
+        "validatorLifecyclePhaseAware:true"
+      ]
+    },
+    {
+      "id": "m1VisualRemediationContract",
+      "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "requiredTokens": [
+        "orbit360-m1-visual-remediation-contract-v1",
+        "contractVersion: '1.0.37'",
+        "validatorLifecycleRevision: 'phase-aware-static-authorization-v2'",
+        "FREEZE_M1_OPEN",
+        "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
+        "AUTHORIZATION_STATIC_LIFECYCLE",
+        "BANK_COPY_EXCLUDES_USE",
+        "ACADEMY_CONTENT_1228",
+        "runtimeExecuted: false",
+        "browserExecuted: false",
+        "deployExecuted: false"
+      ]
+    }
+  ],
+  "requiredFiles": [
+    "tools/orbit360-validator-lifecycle-contract-v20260722.json",
+    "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-VALIDATOR-LIFECYCLE-PREFLIGHT-20260722.md",
+    "orbit360-platform/docs/evidence/m1-validator-lifecycle-reconciliation-20260722-sanitized.json"
+  ],
+  "runtimeVersionContracts": [
+    {
+      "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "version:'1.221'",
+        "contentVersion:'1.228'",
+        "_m1visualv:1228",
+        "El usuario del portal permanece visible",
+        "El campo Uso no se muestra ni se copia",
+        "Instalar como app",
+        "visualSemanticsRemediation:true",
+        "validatorLifecyclePhaseAware:true"
+      ]
+    },
+    {
+      "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "orbit360-m1-visual-remediation-contract-v1",
+        "contractVersion: '1.0.37'",
+        "validatorLifecycleRevision: 'phase-aware-static-authorization-v2'",
+        "FREEZE_M1_OPEN",
+        "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
+        "AUTHORIZATION_STATIC_LIFECYCLE",
+        "BANK_COPY_EXCLUDES_USE",
+        "ACADEMY_CONTENT_1228",
+        "runtimeExecuted: false",
+        "browserExecuted: false",
+        "deployExecuted: false"
+      ]
+    }
+  ]
+}

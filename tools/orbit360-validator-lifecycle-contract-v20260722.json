@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v2-composed-overlay",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -13,6 +13,11 @@
     "FREEZE_STOP_THE_LINE",
     "FREEZE_NO_RUNTIME",
     "AUTHORIZATION_CONSUMED"
+  ],
+  "replacementLifecycleChecks": [
+    "FREEZE_M1_OPEN",
+    "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
+    "AUTHORIZATION_STATIC_LIFECYCLE"
   ],
   "activeLifecycle": {
     "authorized": {
@@ -38,6 +43,17 @@
     "functionsDeployAllowed": false,
     "rulesDeployAllowed": false,
     "productionAllowed": false
+  },
+  "overlayComposition": {
+    "mechanism": "temp-mirror-no-repo-write-v1",
+    "wrapper": "tools/orbit360-validar-gate-contracts-composed-v20260722.mjs",
+    "officialPreflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "overlayPaths": [
+      "tools/orbit360-gate-contract-overlay-v20260718.json",
+      "tools/orbit360-gate-contract-overlay-validator-lifecycle-v20260722.json"
+    ],
+    "historicalOverlayModified": false,
+    "repositoryWritesDuringPreflight": 0
   },
   "productOwnerChanged": false,
   "dataChanged": false,
