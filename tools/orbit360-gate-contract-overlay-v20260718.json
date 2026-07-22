@@ -3,12 +3,12 @@
   "issuedAt": "2026-07-21",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": "VALIDATOR_STALE",
-  "diagnosticRevision": "critical-runtime-integrity-manifest-owner-reconciliation-v2",
-  "contractRevision": "1.0.35-critical-runtime-integrity-manifest-owner-reconciliation-v2",
+  "diagnosticRevision": "critical-runtime-integrity-owner-closure-comment-tolerant-v3",
+  "contractRevision": "1.0.35-critical-runtime-integrity-owner-closure-comment-tolerant-v3",
   "gatePatch": {
     "contractVersion": "1.0.35",
-    "diagnosticRevision": "critical-runtime-integrity-manifest-owner-reconciliation-v2",
-    "status": "OWNER_REGISTRY_RECONCILED_STATIC_PREFLIGHT_PENDING"
+    "diagnosticRevision": "critical-runtime-integrity-owner-closure-comment-tolerant-v3",
+    "status": "INTEGRITY_VERIFIER_COMMENT_TOLERANCE_STATIC_PREFLIGHT_PENDING"
   },
   "effectiveOwnerReconciliation": {
     "baselineOverlayRef": "a6b6641cc8d090930c8a7e9cfc6ad90ea239ff80",
@@ -30,7 +30,9 @@
     ],
     "productFilesChanged": false,
     "validatorImplementationChanged": false,
-    "writesExecuted": false
+    "writesExecuted": false,
+    "integrityVerifierPolicy": "iife_before_trailing_comments",
+    "integrityVerifierCommit": "ec291989630845d401472bcc9249a0f7ce28e866"
   },
   "canonicalOwners": [
     {
@@ -300,7 +302,10 @@
         "remoteAllExact",
         "exactMatch",
         "browserExecuted: false",
-        "containsSecrets: false"
+        "containsSecrets: false",
+        "OWNER_CLOSURE_POLICY = 'iife_before_trailing_comments'",
+        "function withoutTrailingComments(source)",
+        "ownerClosurePolicy: OWNER_CLOSURE_POLICY"
       ]
     },
     {
