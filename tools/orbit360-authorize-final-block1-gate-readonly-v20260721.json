@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v12-owner-registry-reconciled",
+  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v13-documentation-presence-corrected",
   "issuedAt": "2026-07-21",
   "authorizationId": "final-block1-static-preflight-v1",
-  "authorizationRevision": 12,
+  "authorizationRevision": 13,
   "action": "final_block1_static_preflight_only",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -36,17 +36,20 @@
   "ownerRegistryReconciliation": {
     "ok": true,
     "overlayCommit": "781ed51b1ef2d70b8b46c46450f947c2f2e67b40",
-    "freezeCommit": "677b18f7f9870da4b33853f85f98336df87dc5d9",
     "contractVersion": "1.0.35",
     "preservedOwners": 6,
     "addedOwners": 1,
     "droppedOwners": 0,
-    "restoredOwners": [
-      "clientDataQuality",
-      "insurerDocumentImport",
-      "insurerSecureTargetBridge",
-      "realInsurerDirectoryAcademy"
-    ],
+    "productFilesChanged": false,
+    "validatorImplementationChanged": false
+  },
+  "documentationCorrection": {
+    "ok": true,
+    "path": "orbit360-platform/docs/BLOQUE1-STOP-LINE-RECONCILIACION-OWNERS-REGISTRO-20260721.md",
+    "commit": "89338acd222b4d4fe8d3a67b837d75757f780a2d",
+    "previousRunId": 29883945919,
+    "previousPassedChecks": 1193,
+    "previousFailedChecks": 1,
     "productFilesChanged": false,
     "validatorImplementationChanged": false
   },
@@ -61,6 +64,7 @@
     "followUpObserverDeliveries": 0,
     "effectiveOwnersPreserved": true,
     "droppedOwners": 0,
+    "requiredDocumentationPresent": true,
     "writesExecuted": false,
     "runtimeExecuted": false,
     "browserExecuted": false,
