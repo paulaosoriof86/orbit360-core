@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v55-static-visual-remediation-passed-preflight-pending",
+  "schemaVersion": "orbit360-incident-freeze-v56-binding-preflight-failed-stop-line",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-visual-review-semantic-and-responsive-defects-v20260722",
-  "status": "STATIC_VISUAL_REMEDIATION_PASSED_SINGLE_USE_PREFLIGHT_PENDING",
+  "status": "STOP_THE_LINE_STATIC_PREFLIGHT_1_0_37_FAILED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -89,10 +89,7 @@
     "colombia": "INTACT",
     "rawProtectedValuesInStore": 0
   },
-  "allowedActions": [
-    "prepare_single_use_static_preflight_authorization_1_0_37",
-    "run_single_use_static_preflight_1_0_37_after_authorization"
-  ],
+  "allowedActions": [],
   "blockedActions": [
     "run_second_final_gate",
     "run_runtime",
@@ -129,15 +126,32 @@
     "m1TechnicalGate": "HISTORICAL_PASS",
     "m1VisualReview": "FAILED_FUNCTIONAL_DEFECT_REMEDIATED_STATICALLY",
     "m1StaticRemediation": "PASS",
-    "m1BindingPreflight": "PENDING_SINGLE_USE_AUTHORIZATION",
+    "m1BindingPreflight": "FAIL",
     "m1Closed": false,
     "gateRerunAuthorized": false,
     "runtimeAuthorized": false,
     "deployAuthorized": false,
     "productionTouched": false,
-    "reimportRequired": false
+    "reimportRequired": false,
+    "m1CorrectiveLabDelivery": "PENDING_SEPARATE_SINGLE_USE_AUTHORIZATION"
   },
-  "nextAllowedStep": "Create and consume one separate single-use authorization for the binding static preflight of contract 1.0.37. The authorization must allow no secrets, runtime, browser, Firestore read, writes or deploy. Do not rerun the final gate.",
+  "nextAllowedStep": "Stop retries. Diagnose the first failed static check from the recorded evidence before modifying any other layer.",
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "bindingStaticPreflight": {
+    "status": "FAIL",
+    "contractVersion": "1.0.37",
+    "path": "orbit360-platform/docs/evidence/m1-binding-static-preflight-1-0-37-20260722-sanitized.json",
+    "gateContractStatus": "GO_GATE_CONTRACT",
+    "gateContractChecksPassed": 1314,
+    "gateContractChecksFailed": 0,
+    "architectureStatus": "NO_GO",
+    "visualRemediationStatus": "FAIL",
+    "visualRemediationChecksPassed": 26,
+    "visualRemediationChecksFailed": 3,
+    "writesExecuted": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false
+  }
 }

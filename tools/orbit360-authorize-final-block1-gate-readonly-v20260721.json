@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v10-visual-remediation-1-0-37",
+  "schemaVersion": "orbit360-final-block1-static-preflight-consumed-v11-visual-remediation-1-0-37",
   "issuedAt": "2026-07-22",
   "authorizationId": "final-block1-static-preflight-1-0-37-v1",
-  "authorizationRevision": 10,
-  "action": "final_block1_static_preflight_1_0_37_only",
+  "authorizationRevision": 11,
+  "action": "final_block1_static_preflight_1_0_37_consumed",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "tenantId": "alianzas-soluciones",
@@ -11,9 +11,9 @@
   "expectedContractVersion": "1.0.37",
   "visualRemediationRevision": "20260722.1",
   "sourceRemediationCommit": "84c6d4e3e2f60d2273056619bc1ab4f53b6ec9e3",
-  "allowedExecutions": 1,
-  "active": true,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "active": false,
+  "consumed": true,
   "preflightRequired": true,
   "runtimeAllowed": false,
   "browserAllowed": false,
@@ -48,5 +48,17 @@
   },
   "acceptance": "GO_GATE_CONTRACT_AND_GO_STATIC_ARCHITECTURE_AND_M1_VISUAL_REMEDIATION_PASS_ONLY",
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "preflightEvidence": {
+    "status": "FAIL",
+    "path": "orbit360-platform/docs/evidence/m1-binding-static-preflight-1-0-37-20260722-sanitized.json",
+    "gateContractStatus": "GO_GATE_CONTRACT",
+    "gateContractVersion": "1.0.37",
+    "gateChecksPassed": 1314,
+    "gateChecksFailed": 0,
+    "architectureStatus": "NO_GO",
+    "visualRemediationStatus": "FAIL",
+    "visualRemediationChecksPassed": 26,
+    "visualRemediationChecksFailed": 3
+  }
 }

@@ -1,21 +1,65 @@
 {
-  "schemaVersion": "orbit360-gate-contract-preflight-v4-runtime-version-parity",
+  "schemaVersion": "orbit360-gate-contract-preflight-v8-incident-freeze",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "generatedAt": "2026-07-18T19:41:34.821Z",
+  "contractVersion": "1.0.37",
+  "diagnosticRevision": "visual-review-semantic-responsive-remediation-v1",
+  "overlayRevision": "1.0.37-visual-review-semantic-responsive-remediation-v1",
+  "overlayPath": "tools/orbit360-gate-contract-overlay-v20260718.json",
+  "incidentFreezePath": "",
+  "incidentId": "",
+  "registryExtensions": [
+    "tools/orbit360-gate-contract-registry-extension-v20260720.json"
+  ],
+  "generatedAt": "2026-07-22T18:24:40.143Z",
   "containsPII": false,
   "containsSecrets": false,
   "status": "GO_GATE_CONTRACT",
   "classification": null,
   "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
-  "total": 733,
-  "passed": 733,
+  "total": 1314,
+  "passed": 1314,
   "failed": 0,
   "failedCheckIds": [],
   "checks": [
     {
+      "id": "REGISTRY_EXTENSION_SCHEMA:tools/orbit360-gate-contract-registry-extension-v20260720.json",
+      "ok": true,
+      "detail": "orbit360-gate-contract-registry-extension-v1"
+    },
+    {
+      "id": "OVERLAY_SCHEMA_VERSION:tools/orbit360-gate-contract-overlay-v20260718.json",
+      "ok": true,
+      "detail": "orbit360-gate-contract-overlay-v1"
+    },
+    {
+      "id": "OVERLAY_SCHEMA_VERSION:tools/orbit360-gate-contract-overlay-importers-v20260720.json",
+      "ok": true,
+      "detail": "orbit360-gate-contract-overlay-v1"
+    },
+    {
       "id": "SCHEMA_VERSION",
       "ok": true,
       "detail": "orbit360-gate-contract-registry-v1"
+    },
+    {
+      "id": "OVERLAY_PRESENT",
+      "ok": true,
+      "detail": "tools/orbit360-gate-contract-overlay-v20260718.json"
+    },
+    {
+      "id": "OVERLAY_SCHEMA_VERSION",
+      "ok": true,
+      "detail": "orbit360-gate-contract-overlay-v1"
+    },
+    {
+      "id": "OVERLAY_GATE_MATCH",
+      "ok": true,
+      "detail": "block1-client360-insurers-lab-v20260717"
+    },
+    {
+      "id": "OVERLAY_CONTRACT_MATCH",
+      "ok": true,
+      "detail": "1.0.37-visual-review-semantic-responsive-remediation-v1 vs 1.0.37"
     },
     {
       "id": "ACTIVE_BLOCK",
@@ -138,6 +182,111 @@
       "detail": "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js"
     },
     {
+      "id": "REQUIRED_FILE:orbit360-platform/index.html",
+      "ok": true,
+      "detail": "orbit360-platform/index.html"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/modules/ia.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/modules/calidad.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js"
+    },
+    {
+      "id": "REQUIRED_FILE:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+      "ok": true,
+      "detail": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json"
+    },
+    {
+      "id": "REQUIRED_FILE:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs"
+    },
+    {
+      "id": "REQUIRED_FILE:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
+      "ok": true,
+      "detail": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/docs/evidence/owner-visual-idempotence-proof-local-20260721-sanitized.json",
+      "ok": true,
+      "detail": "orbit360-platform/docs/evidence/owner-visual-idempotence-proof-local-20260721-sanitized.json"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-MANIFIESTO-INTEGRIDAD-RUNTIME-CRITICO-20260721.md",
+      "ok": true,
+      "detail": "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-MANIFIESTO-INTEGRIDAD-RUNTIME-CRITICO-20260721.md"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/docs/BLOQUE1-STOP-LINE-RECONCILIACION-OWNERS-REGISTRO-20260721.md",
+      "ok": true,
+      "detail": "orbit360-platform/docs/BLOQUE1-STOP-LINE-RECONCILIACION-OWNERS-REGISTRO-20260721.md"
+    },
+    {
+      "id": "REQUIRED_FILE:orbit360-platform/docs/BLOQUE1-FUNCTIONAL-DEFECT-REVISION-VISUAL-20260722.md",
+      "ok": true,
+      "detail": "orbit360-platform/docs/BLOQUE1-FUNCTIONAL-DEFECT-REVISION-VISUAL-20260722.md"
+    },
+    {
       "id": "VALIDATOR_EXISTS:tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs",
       "ok": true,
       "detail": "tools/orbit360-validar-recuperacion-frontend-conocimiento-v20260716.mjs"
@@ -171,6 +320,11 @@
       "id": "VALIDATOR_EXISTS:orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js",
       "ok": true,
       "detail": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js"
+    },
+    {
+      "id": "VALIDATOR_EXISTS:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js"
     },
     {
       "id": "OWNER_EXISTS:pwa",
@@ -221,6 +375,16 @@
       "id": "OWNER_TOKEN:pwa:pwa-controller:",
       "ok": true,
       "detail": "orbit360-platform/core/pwa.js → pwa-controller:"
+    },
+    {
+      "id": "OWNER_TOKEN:pwa:RUNTIME_BUILD = '20260721-4'",
+      "ok": true,
+      "detail": "orbit360-platform/core/pwa.js → RUNTIME_BUILD = '20260721-4'"
+    },
+    {
+      "id": "OWNER_TOKEN:pwa:block1-critical-runtime-20260721-4",
+      "ok": true,
+      "detail": "orbit360-platform/core/pwa.js → block1-critical-runtime-20260721-4"
     },
     {
       "id": "OWNER_EXISTS:router",
@@ -373,29 +537,44 @@
       "detail": "orbit360-platform/core/access-scope.js"
     },
     {
-      "id": "OWNER_TOKEN:access:deriveClientState",
+      "id": "OWNER_TOKEN:access:var SCOPE_LEVEL = { none: 0, own: 1, team: 2, all: 3 }",
       "ok": true,
-      "detail": "orbit360-platform/core/access-scope.js → deriveClientState"
+      "detail": "orbit360-platform/core/access-scope.js → var SCOPE_LEVEL = { none: 0, own: 1, team: 2, all: 3 }"
     },
     {
-      "id": "OWNER_TOKEN:access:duplicateCandidates",
+      "id": "OWNER_TOKEN:access:function roleScopeCeiling(moduleKey)",
       "ok": true,
-      "detail": "orbit360-platform/core/access-scope.js → duplicateCandidates"
+      "detail": "orbit360-platform/core/access-scope.js → function roleScopeCeiling(moduleKey)"
     },
     {
-      "id": "OWNER_TOKEN:access:prepareManual",
+      "id": "OWNER_TOKEN:access:function applyRoleScopeCeiling(requestedScope, moduleKey)",
       "ok": true,
-      "detail": "orbit360-platform/core/access-scope.js → prepareManual"
+      "detail": "orbit360-platform/core/access-scope.js → function applyRoleScopeCeiling(requestedScope, moduleKey)"
     },
     {
-      "id": "OWNER_TOKEN:access:scopedStore",
+      "id": "OWNER_TOKEN:access:if (ALL_ROLES.indexOf(role) >= 0) return 'all'",
       "ok": true,
-      "detail": "orbit360-platform/core/access-scope.js → scopedStore"
+      "detail": "orbit360-platform/core/access-scope.js → if (ALL_ROLES.indexOf(role) >= 0) return 'all'"
     },
     {
-      "id": "OWNER_TOKEN:access:withScope",
+      "id": "OWNER_TOKEN:access:if (TEAM_ROLES.indexOf(role) >= 0) return 'team'",
       "ok": true,
-      "detail": "orbit360-platform/core/access-scope.js → withScope"
+      "detail": "orbit360-platform/core/access-scope.js → if (TEAM_ROLES.indexOf(role) >= 0) return 'team'"
+    },
+    {
+      "id": "OWNER_TOKEN:access:if (OWN_ROLES.indexOf(role) >= 0 || /Asesor/i.test(role)) return 'own'",
+      "ok": true,
+      "detail": "orbit360-platform/core/access-scope.js → if (OWN_ROLES.indexOf(role) >= 0 || /Asesor/i.test(role)) return 'own'"
+    },
+    {
+      "id": "OWNER_TOKEN:access:return scopeLevel(requested) <= scopeLevel(ceiling) ? requested : ceiling",
+      "ok": true,
+      "detail": "orbit360-platform/core/access-scope.js → return scopeLevel(requested) <= scopeLevel(ceiling) ? requested : ceiling"
+    },
+    {
+      "id": "OWNER_TOKEN:access:__activeRoleScopeCeilingV20260721: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/access-scope.js → __activeRoleScopeCeilingV20260721: true"
     },
     {
       "id": "OWNER_EXISTS:clientProjection",
@@ -508,6 +687,611 @@
       "detail": "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js → mod.__resourcesRuntimeOwnershipV20260718"
     },
     {
+      "id": "OWNER_EXISTS:importerExecutionContract",
+      "ok": true,
+      "detail": "orbit360-platform/core/importer-execution-contract-v20260720.js"
+    },
+    {
+      "id": "OWNER_TOKEN:importerExecutionContract:singleTargetOwner: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/importer-execution-contract-v20260720.js → singleTargetOwner: true"
+    },
+    {
+      "id": "OWNER_TOKEN:importerExecutionContract:requiresReadAfterWrite: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/importer-execution-contract-v20260720.js → requiresReadAfterWrite: true"
+    },
+    {
+      "id": "OWNER_TOKEN:importerExecutionContract:requiresAuditSuccessAndFailure: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/importer-execution-contract-v20260720.js → requiresAuditSuccessAndFailure: true"
+    },
+    {
+      "id": "OWNER_TOKEN:importerExecutionContract:requiresRollbackForSynthetic: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/importer-execution-contract-v20260720.js → requiresRollbackForSynthetic: true"
+    },
+    {
+      "id": "OWNER_TOKEN:importerExecutionContract:forbidsSuccessWithZero: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/importer-execution-contract-v20260720.js → forbidsSuccessWithZero: true"
+    },
+    {
+      "id": "OWNER_TOKEN:importerExecutionContract:writesStore: false",
+      "ok": true,
+      "detail": "orbit360-platform/core/importer-execution-contract-v20260720.js → writesStore: false"
+    },
+    {
+      "id": "OWNER_EXISTS:insurerDirectoryImporterE2E",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-directory-import-v1202.js"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerDirectoryImporterE2E:applySecureOnly.__secureOnlyV20260720 = true",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-directory-import-v1202.js → applySecureOnly.__secureOnlyV20260720 = true"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerDirectoryImporterE2E:confirmacion_remota_incompleta",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-directory-import-v1202.js → confirmacion_remota_incompleta"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerDirectoryImporterE2E:remote.ok !== true",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-directory-import-v1202.js → remote.ok !== true"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerDirectoryImporterE2E:imported <= 0",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-directory-import-v1202.js → imported <= 0"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerDirectoryImporterE2E:secureProviderReady",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-directory-import-v1202.js → secureProviderReady"
+    },
+    {
+      "id": "OWNER_EXISTS:insurerSecureTargetBridge",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerSecureTargetBridge:version: '20260721.3'",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → version: '20260721.3'"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerSecureTargetBridge:async function callProviderWithoutOperationalWrites",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → async function callProviderWithoutOperationalWrites"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerSecureTargetBridge:providerReturnsMappingsOnly: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → providerReturnsMappingsOnly: true"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerSecureTargetBridge:providerOperationalStoreWritesAllowed: false",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → providerOperationalStoreWritesAllowed: false"
+    },
+    {
+      "id": "OWNER_EXISTS:insurerCredentialProviderE2E",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerCredentialProviderE2E:remoteConfirmationRequired: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js → remoteConfirmationRequired: true"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerCredentialProviderE2E:appliesOpaqueRefsAfterRemoteConfirmation: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js → appliesOpaqueRefsAfterRemoteConfirmation: true"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerCredentialProviderE2E:orbit360ImportInsurerCredentials",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js → orbit360ImportInsurerCredentials"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerCredentialProviderE2E:applyMappings(result)",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js → applyMappings(result)"
+    },
+    {
+      "id": "OWNER_EXISTS:importersAcademyE2E",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1225-importadores-e2e.js"
+    },
+    {
+      "id": "OWNER_TOKEN:importersAcademyE2E:version: '1.227'",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1225-importadores-e2e.js → version: '1.227'"
+    },
+    {
+      "id": "OWNER_TOKEN:importersAcademyE2E:Archivo leído",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1225-importadores-e2e.js → Archivo leído"
+    },
+    {
+      "id": "OWNER_TOKEN:importersAcademyE2E:Aplicación confirmada",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1225-importadores-e2e.js → Aplicación confirmada"
+    },
+    {
+      "id": "OWNER_TOKEN:importersAcademyE2E:Validador obsoleto",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1225-importadores-e2e.js → Validador obsoleto"
+    },
+    {
+      "id": "OWNER_EXISTS:realInsurerDirectoryExecution",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryExecution:open.__canonicalDirectoryExecution20260720 = true",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js → open.__canonicalDirectoryExecution20260720 = true"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryExecution:singleFileRead: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js → singleFileRead: true"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryExecution:controlledWrite: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js → controlledWrite: true"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryExecution:Orbit.importaWriteP0.writeBatch",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js → Orbit.importaWriteP0.writeBatch"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryExecution:async function waitWritten",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js → async function waitWritten"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryExecution:applySecureOnly(result",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js → applySecureOnly(result"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryExecution:Orbit.importaWriteP0.rollback",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js → Orbit.importaWriteP0.rollback"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryExecution:accountProviderPending: false",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js → accountProviderPending: false"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryExecution:eligibleProtectedSummary(result)",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-op2-import-ui-guard.js → eligibleProtectedSummary(result)"
+    },
+    {
+      "id": "OWNER_EXISTS:realInsurerDirectoryAcademy",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryAcademy:Orbit.ACADEMIA_V1223_ASEGURADORAS",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → Orbit.ACADEMIA_V1223_ASEGURADORAS"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryAcademy:version:'1.223'",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → version:'1.223'"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryAcademy:Una confirmación, una escritura",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → Una confirmación, una escritura"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryAcademy:Después de migrar, solo inventariar",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → Después de migrar, solo inventariar"
+    },
+    {
+      "id": "OWNER_TOKEN:realInsurerDirectoryAcademy:postMigrationReadOnly:true",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → postMigrationReadOnly:true"
+    },
+    {
+      "id": "OWNER_EXISTS:insurerBankAccountProviderE2E",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerBankAccountProviderE2E:version: '20260721.1'",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js → version: '20260721.1'"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerBankAccountProviderE2E:registerFieldProvider",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js → registerFieldProvider"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerBankAccountProviderE2E:supportsBankAccounts = true",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js → supportsBankAccounts = true"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerBankAccountProviderE2E:orbit360ImportInsurerBankAccounts",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js → orbit360ImportInsurerBankAccounts"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerBankAccountProviderE2E:applyMappings(result)",
+      "ok": true,
+      "detail": "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js → applyMappings(result)"
+    },
+    {
+      "id": "OWNER_EXISTS:clientInsurerVisualStabilityBarrier",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:__clientInsurerVisualStabilityBarrierV20260721",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → __clientInsurerVisualStabilityBarrierV20260721"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:registryContract = { version: '20260721.2' }",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → registryContract = { version: '20260721.2' }"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:previous.version === '20260721.4'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → previous.version === '20260721.4'"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:version: '20260721.4'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → version: '20260721.4'"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:criticalRelease: CRITICAL_RELEASE",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → criticalRelease: CRITICAL_RELEASE"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:block1-critical-runtime-20260721-4",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → block1-critical-runtime-20260721-4"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:function directoryReady(grid)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → function directoryReady(grid)"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:.asg-card.off[data-asg]",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → .asg-card.off[data-asg]"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:directoryStructuralTrigger: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → directoryStructuralTrigger: true"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:canonicalVisualOwner: 'core/client-insurer-visual-contract-v20260720.js'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → canonicalVisualOwner: 'core/client-insurer-visual-contract-v20260720.js'"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:writesStore: false",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → writesStore: false"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:reimportsData: false",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → reimportsData: false"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStabilityBarrier:exposesSecrets: false",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → exposesSecrets: false"
+    },
+    {
+      "id": "OWNER_EXISTS:clientInsurerVisualContract",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:Orbit.clientInsurerVisualContractV20260720",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → Orbit.clientInsurerVisualContractV20260720"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:version:'20260720.2'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → version:'20260720.2'"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:idempotenceRevision:'20260721.4'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → idempotenceRevision:'20260721.4'"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:visualRemediationRevision:'20260722.1'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → visualRemediationRevision:'20260722.1'"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:data-m1-credential-user",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → data-m1-credential-user"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:data-m1-credential-secret",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → data-m1-credential-secret"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:function revealBankAccount",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function revealBankAccount"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:data-m1-bank-number",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → data-m1-bank-number"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:data-m1-bank-reveal",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → data-m1-bank-reveal"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:credentialUserAlwaysSeparate:true",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → credentialUserAlwaysSeparate:true"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:credentialSecretSeparateReveal:true",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → credentialSecretSeparateReveal:true"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:bankCopyExcludesUse:true",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → bankCopyExcludesUse:true"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:bankHolderFallbackInsurer:true",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → bankHolderFallbackInsurer:true"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:function setHtmlIfChanged(node,html)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function setHtmlIfChanged(node,html)"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:function setTextIfChanged(node,text)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function setTextIfChanged(node,text)"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:function pauseCanonicalObserver()",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function pauseCanonicalObserver()"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:function observeCanonicalOwner()",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function observeCanonicalOwner()"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:mutationMode:'same-microtask-disconnect-own-writes'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → mutationMode:'same-microtask-disconnect-own-writes'"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:observerOwnMutations:false",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → observerOwnMutations:false"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:idempotentDomWrites:true",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → idempotentDomWrites:true"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:client360StructuralTrigger:true",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → client360StructuralTrigger:true"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualContract:writesStore:false",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → writesStore:false"
+    },
+    {
+      "id": "OWNER_EXISTS:clientInsurerVisualStyle",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStyle:Visual remediation 20260722.1",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → Visual remediation 20260722.1"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStyle:.m1-credential-secret",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → .m1-credential-secret"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStyle:.m1-bank-number-line",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → .m1-bank-number-line"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStyle:#pwa-install",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → #pwa-install"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStyle:overflow-x:auto!important",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → overflow-x:auto!important"
+    },
+    {
+      "id": "OWNER_TOKEN:clientInsurerVisualStyle:overflow-x:hidden",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → overflow-x:hidden"
+    },
+    {
+      "id": "OWNER_EXISTS:clientDataQuality",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js"
+    },
+    {
+      "id": "OWNER_TOKEN:clientDataQuality:País por validar",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → País por validar"
+    },
+    {
+      "id": "OWNER_TOKEN:clientDataQuality:clientCountryEvidence",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → clientCountryEvidence"
+    },
+    {
+      "id": "OWNER_TOKEN:clientDataQuality:soloCamposPendientes: true",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → soloCamposPendientes: true"
+    },
+    {
+      "id": "OWNER_TOKEN:clientDataQuality:version: '1.217-country-quality'",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → version: '1.217-country-quality'"
+    },
+    {
+      "id": "OWNER_EXISTS:insurerDocumentImport",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerDocumentImport:Orbit.__insurerDirectoryBridgeV1203",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → Orbit.__insurerDirectoryBridgeV1203"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerDocumentImport:openInsurerDocumentImport",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → openInsurerDocumentImport"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerDocumentImport:documentaryImportRequiresVerifiedPersistence: true",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → documentaryImportRequiresVerifiedPersistence: true"
+    },
+    {
+      "id": "OWNER_TOKEN:insurerDocumentImport:selectedFileDoesNotEqualStored: true",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → selectedFileDoesNotEqualStored: true"
+    },
+    {
+      "id": "OWNER_EXISTS:m1VisualIntegrityAcademy",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualIntegrityAcademy:version:'1.221'",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → version:'1.221'"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualIntegrityAcademy:contentVersion:'1.227'",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → contentVersion:'1.227'"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualIntegrityAcademy:_m1visualv:1227",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → _m1visualv:1227"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualIntegrityAcademy:El usuario del portal permanece visible",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → El usuario del portal permanece visible"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualIntegrityAcademy:El campo Uso no se muestra ni se copia",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → El campo Uso no se muestra ni se copia"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualIntegrityAcademy:Instalar como app",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → Instalar como app"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualIntegrityAcademy:visualSemanticsRemediation:true",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → visualSemanticsRemediation:true"
+    },
+    {
+      "id": "OWNER_EXISTS:m1VisualRemediationContract",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualRemediationContract:orbit360-m1-visual-remediation-contract-v1",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → orbit360-m1-visual-remediation-contract-v1"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualRemediationContract:contractVersion: '1.0.37'",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → contractVersion: '1.0.37'"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualRemediationContract:FREEZE_STOP_THE_LINE",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → FREEZE_STOP_THE_LINE"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualRemediationContract:BANK_COPY_EXCLUDES_USE",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → BANK_COPY_EXCLUDES_USE"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualRemediationContract:ACADEMY_CONTENT_1227",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → ACADEMY_CONTENT_1227"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualRemediationContract:runtimeExecuted: false",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → runtimeExecuted: false"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualRemediationContract:browserExecuted: false",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → browserExecuted: false"
+    },
+    {
+      "id": "OWNER_TOKEN:m1VisualRemediationContract:deployExecuted: false",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → deployExecuted: false"
+    },
+    {
       "id": "WORKFLOW_NO_RETIRED_REF:aseguradoras-candidate-actions.js",
       "ok": true,
       "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → aseguradoras-candidate-actions.js"
@@ -570,7 +1354,7 @@
     {
       "id": "RUNTIME_GRAPH_DECLARED",
       "ok": true,
-      "detail": "files=18"
+      "detail": "files=28"
     },
     {
       "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/ays-lab-preview.html",
@@ -2913,9 +3697,1309 @@
       "detail": "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js → loadAysRuntime();\n  const originalRender"
     },
     {
+      "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:aseguradoras-candidate-actions.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → aseguradoras-candidate-actions.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:aseguradoras-frontend-projection-v20260716.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → aseguradoras-frontend-projection-v20260716.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:empalme-v1251-runtime.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → empalme-v1251-runtime.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:import-initial-profiles.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → import-initial-profiles.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:importar-initial-tenant-lab.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → importar-initial-tenant-lab.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:installLegalGate",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → installLegalGate"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:installMobileNavigation",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → installMobileNavigation"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:asg-order-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → asg-order-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:asg-knowledge-projection-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → asg-knowledge-projection-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:authentication_owner_ready",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → authentication_owner_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:canonical_runtime_snapshot",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → canonical_runtime_snapshot"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:document.readyState === 'complete'",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → document.readyState === 'complete'"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:document.querySelectorAll('#sidebar .nav-link').length > 1",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → document.querySelectorAll('#sidebar .nav-link').length > 1"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:canonical_product_bootstrap_ready",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → canonical_product_bootstrap_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:page.waitForURL",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → page.waitForURL"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:const deadline = Date.now() + 60000",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → const deadline = Date.now() + 60000"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:setTimeout(attachSnapshots, 0)",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → setTimeout(attachSnapshots, 0)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:setTimeout(attachSnapshots, 1200)",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → setTimeout(attachSnapshots, 1200)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:setTimeout(attachSnapshots, 3500)",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → setTimeout(attachSnapshots, 3500)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:canonical_tenant_insurer_core_ready', () => page.waitForFunction",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → canonical_tenant_insurer_core_ready', () => page.waitForFunction"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:event.waitUntil(refresh.catch",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → event.waitUntil(refresh.catch"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:TENANT_CONFIG_SRC",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → TENANT_CONFIG_SRC"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:data-asg-tenant-config",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → data-asg-tenant-config"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/router-tenant-config-bootstrap.js:loadAysRuntime();\n  const originalRender",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → loadAysRuntime();\n  const originalRender"
+    },
+    {
+      "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:aseguradoras-candidate-actions.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → aseguradoras-candidate-actions.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:aseguradoras-frontend-projection-v20260716.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → aseguradoras-frontend-projection-v20260716.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:empalme-v1251-runtime.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → empalme-v1251-runtime.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:import-initial-profiles.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → import-initial-profiles.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:importar-initial-tenant-lab.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → importar-initial-tenant-lab.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:installLegalGate",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → installLegalGate"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:installMobileNavigation",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → installMobileNavigation"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:asg-order-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → asg-order-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:asg-knowledge-projection-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → asg-knowledge-projection-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:authentication_owner_ready",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → authentication_owner_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:canonical_runtime_snapshot",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → canonical_runtime_snapshot"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:document.readyState === 'complete'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → document.readyState === 'complete'"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:document.querySelectorAll('#sidebar .nav-link').length > 1",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → document.querySelectorAll('#sidebar .nav-link').length > 1"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:canonical_product_bootstrap_ready",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → canonical_product_bootstrap_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:page.waitForURL",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → page.waitForURL"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:const deadline = Date.now() + 60000",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → const deadline = Date.now() + 60000"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:setTimeout(attachSnapshots, 0)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → setTimeout(attachSnapshots, 0)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:setTimeout(attachSnapshots, 1200)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → setTimeout(attachSnapshots, 1200)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:setTimeout(attachSnapshots, 3500)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → setTimeout(attachSnapshots, 3500)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:canonical_tenant_insurer_core_ready', () => page.waitForFunction",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → canonical_tenant_insurer_core_ready', () => page.waitForFunction"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:event.waitUntil(refresh.catch",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → event.waitUntil(refresh.catch"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:TENANT_CONFIG_SRC",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → TENANT_CONFIG_SRC"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:data-asg-tenant-config",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → data-asg-tenant-config"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:loadAysRuntime();\n  const originalRender",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → loadAysRuntime();\n  const originalRender"
+    },
+    {
+      "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:aseguradoras-candidate-actions.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → aseguradoras-candidate-actions.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:aseguradoras-frontend-projection-v20260716.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → aseguradoras-frontend-projection-v20260716.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:empalme-v1251-runtime.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → empalme-v1251-runtime.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:import-initial-profiles.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → import-initial-profiles.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:importar-initial-tenant-lab.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → importar-initial-tenant-lab.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:installLegalGate",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → installLegalGate"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:installMobileNavigation",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → installMobileNavigation"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:asg-order-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → asg-order-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:asg-knowledge-projection-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → asg-knowledge-projection-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:authentication_owner_ready",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → authentication_owner_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:canonical_runtime_snapshot",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → canonical_runtime_snapshot"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:document.readyState === 'complete'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → document.readyState === 'complete'"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:document.querySelectorAll('#sidebar .nav-link').length > 1",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → document.querySelectorAll('#sidebar .nav-link').length > 1"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:canonical_product_bootstrap_ready",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → canonical_product_bootstrap_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:page.waitForURL",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → page.waitForURL"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:const deadline = Date.now() + 60000",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → const deadline = Date.now() + 60000"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:setTimeout(attachSnapshots, 0)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → setTimeout(attachSnapshots, 0)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:setTimeout(attachSnapshots, 1200)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → setTimeout(attachSnapshots, 1200)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:setTimeout(attachSnapshots, 3500)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → setTimeout(attachSnapshots, 3500)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:canonical_tenant_insurer_core_ready', () => page.waitForFunction",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → canonical_tenant_insurer_core_ready', () => page.waitForFunction"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:event.waitUntil(refresh.catch",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → event.waitUntil(refresh.catch"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:TENANT_CONFIG_SRC",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → TENANT_CONFIG_SRC"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:data-asg-tenant-config",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → data-asg-tenant-config"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:loadAysRuntime();\n  const originalRender",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → loadAysRuntime();\n  const originalRender"
+    },
+    {
+      "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:aseguradoras-candidate-actions.js",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → aseguradoras-candidate-actions.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:aseguradoras-frontend-projection-v20260716.js",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → aseguradoras-frontend-projection-v20260716.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:empalme-v1251-runtime.js",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → empalme-v1251-runtime.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:import-initial-profiles.js",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → import-initial-profiles.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:importar-initial-tenant-lab.js",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → importar-initial-tenant-lab.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:installLegalGate",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → installLegalGate"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:installMobileNavigation",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → installMobileNavigation"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:asg-order-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → asg-order-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:asg-knowledge-projection-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → asg-knowledge-projection-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:authentication_owner_ready",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → authentication_owner_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:canonical_runtime_snapshot",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → canonical_runtime_snapshot"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:document.readyState === 'complete'",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → document.readyState === 'complete'"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:document.querySelectorAll('#sidebar .nav-link').length > 1",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → document.querySelectorAll('#sidebar .nav-link').length > 1"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:canonical_product_bootstrap_ready",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → canonical_product_bootstrap_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:page.waitForURL",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → page.waitForURL"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:const deadline = Date.now() + 60000",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → const deadline = Date.now() + 60000"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:setTimeout(attachSnapshots, 0)",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → setTimeout(attachSnapshots, 0)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:setTimeout(attachSnapshots, 1200)",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → setTimeout(attachSnapshots, 1200)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:setTimeout(attachSnapshots, 3500)",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → setTimeout(attachSnapshots, 3500)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:canonical_tenant_insurer_core_ready', () => page.waitForFunction",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → canonical_tenant_insurer_core_ready', () => page.waitForFunction"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:event.waitUntil(refresh.catch",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → event.waitUntil(refresh.catch"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:TENANT_CONFIG_SRC",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → TENANT_CONFIG_SRC"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:data-asg-tenant-config",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → data-asg-tenant-config"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:loadAysRuntime();\n  const originalRender",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → loadAysRuntime();\n  const originalRender"
+    },
+    {
+      "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:aseguradoras-candidate-actions.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → aseguradoras-candidate-actions.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:aseguradoras-frontend-projection-v20260716.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → aseguradoras-frontend-projection-v20260716.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:empalme-v1251-runtime.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → empalme-v1251-runtime.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:import-initial-profiles.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → import-initial-profiles.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:importar-initial-tenant-lab.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → importar-initial-tenant-lab.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:installLegalGate",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → installLegalGate"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:installMobileNavigation",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → installMobileNavigation"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:asg-order-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → asg-order-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:asg-knowledge-projection-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → asg-knowledge-projection-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:authentication_owner_ready",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → authentication_owner_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:canonical_runtime_snapshot",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → canonical_runtime_snapshot"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:document.readyState === 'complete'",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → document.readyState === 'complete'"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:document.querySelectorAll('#sidebar .nav-link').length > 1",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → document.querySelectorAll('#sidebar .nav-link').length > 1"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:canonical_product_bootstrap_ready",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → canonical_product_bootstrap_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:page.waitForURL",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → page.waitForURL"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:const deadline = Date.now() + 60000",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → const deadline = Date.now() + 60000"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:setTimeout(attachSnapshots, 0)",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → setTimeout(attachSnapshots, 0)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:setTimeout(attachSnapshots, 1200)",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → setTimeout(attachSnapshots, 1200)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:setTimeout(attachSnapshots, 3500)",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → setTimeout(attachSnapshots, 3500)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:canonical_tenant_insurer_core_ready', () => page.waitForFunction",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → canonical_tenant_insurer_core_ready', () => page.waitForFunction"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:event.waitUntil(refresh.catch",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → event.waitUntil(refresh.catch"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:TENANT_CONFIG_SRC",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → TENANT_CONFIG_SRC"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:data-asg-tenant-config",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → data-asg-tenant-config"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:loadAysRuntime();\n  const originalRender",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → loadAysRuntime();\n  const originalRender"
+    },
+    {
+      "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:aseguradoras-candidate-actions.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → aseguradoras-candidate-actions.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:aseguradoras-frontend-projection-v20260716.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → aseguradoras-frontend-projection-v20260716.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:empalme-v1251-runtime.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → empalme-v1251-runtime.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:import-initial-profiles.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → import-initial-profiles.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:importar-initial-tenant-lab.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → importar-initial-tenant-lab.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:installLegalGate",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → installLegalGate"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:installMobileNavigation",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → installMobileNavigation"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:asg-order-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → asg-order-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:asg-knowledge-projection-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → asg-knowledge-projection-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:authentication_owner_ready",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → authentication_owner_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:canonical_runtime_snapshot",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → canonical_runtime_snapshot"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:document.readyState === 'complete'",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → document.readyState === 'complete'"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:document.querySelectorAll('#sidebar .nav-link').length > 1",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → document.querySelectorAll('#sidebar .nav-link').length > 1"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:canonical_product_bootstrap_ready",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → canonical_product_bootstrap_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:page.waitForURL",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → page.waitForURL"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:const deadline = Date.now() + 60000",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → const deadline = Date.now() + 60000"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:setTimeout(attachSnapshots, 0)",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → setTimeout(attachSnapshots, 0)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:setTimeout(attachSnapshots, 1200)",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → setTimeout(attachSnapshots, 1200)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:setTimeout(attachSnapshots, 3500)",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → setTimeout(attachSnapshots, 3500)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:canonical_tenant_insurer_core_ready', () => page.waitForFunction",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → canonical_tenant_insurer_core_ready', () => page.waitForFunction"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:event.waitUntil(refresh.catch",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → event.waitUntil(refresh.catch"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:TENANT_CONFIG_SRC",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → TENANT_CONFIG_SRC"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:data-asg-tenant-config",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → data-asg-tenant-config"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:loadAysRuntime();\n  const originalRender",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → loadAysRuntime();\n  const originalRender"
+    },
+    {
+      "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:aseguradoras-candidate-actions.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → aseguradoras-candidate-actions.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:aseguradoras-frontend-projection-v20260716.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → aseguradoras-frontend-projection-v20260716.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:empalme-v1251-runtime.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → empalme-v1251-runtime.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:import-initial-profiles.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → import-initial-profiles.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:importar-initial-tenant-lab.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → importar-initial-tenant-lab.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:installLegalGate",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → installLegalGate"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:installMobileNavigation",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → installMobileNavigation"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:asg-order-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → asg-order-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:asg-knowledge-projection-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → asg-knowledge-projection-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:authentication_owner_ready",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → authentication_owner_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:canonical_runtime_snapshot",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → canonical_runtime_snapshot"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:document.readyState === 'complete'",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → document.readyState === 'complete'"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:document.querySelectorAll('#sidebar .nav-link').length > 1",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → document.querySelectorAll('#sidebar .nav-link').length > 1"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:canonical_product_bootstrap_ready",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → canonical_product_bootstrap_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:page.waitForURL",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → page.waitForURL"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:const deadline = Date.now() + 60000",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → const deadline = Date.now() + 60000"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:setTimeout(attachSnapshots, 0)",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → setTimeout(attachSnapshots, 0)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:setTimeout(attachSnapshots, 1200)",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → setTimeout(attachSnapshots, 1200)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:setTimeout(attachSnapshots, 3500)",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → setTimeout(attachSnapshots, 3500)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:canonical_tenant_insurer_core_ready', () => page.waitForFunction",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → canonical_tenant_insurer_core_ready', () => page.waitForFunction"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:event.waitUntil(refresh.catch",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → event.waitUntil(refresh.catch"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:TENANT_CONFIG_SRC",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → TENANT_CONFIG_SRC"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:data-asg-tenant-config",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → data-asg-tenant-config"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:loadAysRuntime();\n  const originalRender",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → loadAysRuntime();\n  const originalRender"
+    },
+    {
+      "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:aseguradoras-candidate-actions.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → aseguradoras-candidate-actions.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:aseguradoras-frontend-projection-v20260716.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → aseguradoras-frontend-projection-v20260716.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:empalme-v1251-runtime.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → empalme-v1251-runtime.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:import-initial-profiles.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → import-initial-profiles.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:importar-initial-tenant-lab.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → importar-initial-tenant-lab.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:installLegalGate",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → installLegalGate"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:installMobileNavigation",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → installMobileNavigation"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:asg-order-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → asg-order-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:asg-knowledge-projection-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → asg-knowledge-projection-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:authentication_owner_ready",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → authentication_owner_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:canonical_runtime_snapshot",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → canonical_runtime_snapshot"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:document.readyState === 'complete'",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → document.readyState === 'complete'"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:document.querySelectorAll('#sidebar .nav-link').length > 1",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → document.querySelectorAll('#sidebar .nav-link').length > 1"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:canonical_product_bootstrap_ready",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → canonical_product_bootstrap_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:page.waitForURL",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → page.waitForURL"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:const deadline = Date.now() + 60000",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → const deadline = Date.now() + 60000"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:setTimeout(attachSnapshots, 0)",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → setTimeout(attachSnapshots, 0)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:setTimeout(attachSnapshots, 1200)",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → setTimeout(attachSnapshots, 1200)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:setTimeout(attachSnapshots, 3500)",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → setTimeout(attachSnapshots, 3500)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:canonical_tenant_insurer_core_ready', () => page.waitForFunction",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → canonical_tenant_insurer_core_ready', () => page.waitForFunction"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:event.waitUntil(refresh.catch",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → event.waitUntil(refresh.catch"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:TENANT_CONFIG_SRC",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → TENANT_CONFIG_SRC"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:data-asg-tenant-config",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → data-asg-tenant-config"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:loadAysRuntime();\n  const originalRender",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → loadAysRuntime();\n  const originalRender"
+    },
+    {
+      "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/modules/ia.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:aseguradoras-candidate-actions.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → aseguradoras-candidate-actions.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:aseguradoras-frontend-projection-v20260716.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → aseguradoras-frontend-projection-v20260716.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:empalme-v1251-runtime.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → empalme-v1251-runtime.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:import-initial-profiles.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → import-initial-profiles.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:importar-initial-tenant-lab.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → importar-initial-tenant-lab.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:installLegalGate",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → installLegalGate"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:installMobileNavigation",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → installMobileNavigation"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:asg-order-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → asg-order-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:asg-knowledge-projection-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → asg-knowledge-projection-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:authentication_owner_ready",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → authentication_owner_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:canonical_runtime_snapshot",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → canonical_runtime_snapshot"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:document.readyState === 'complete'",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → document.readyState === 'complete'"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:document.querySelectorAll('#sidebar .nav-link').length > 1",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → document.querySelectorAll('#sidebar .nav-link').length > 1"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:canonical_product_bootstrap_ready",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → canonical_product_bootstrap_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:page.waitForURL",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → page.waitForURL"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:const deadline = Date.now() + 60000",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → const deadline = Date.now() + 60000"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:setTimeout(attachSnapshots, 0)",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → setTimeout(attachSnapshots, 0)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:setTimeout(attachSnapshots, 1200)",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → setTimeout(attachSnapshots, 1200)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:setTimeout(attachSnapshots, 3500)",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → setTimeout(attachSnapshots, 3500)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:canonical_tenant_insurer_core_ready', () => page.waitForFunction",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → canonical_tenant_insurer_core_ready', () => page.waitForFunction"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:event.waitUntil(refresh.catch",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → event.waitUntil(refresh.catch"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:TENANT_CONFIG_SRC",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → TENANT_CONFIG_SRC"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:data-asg-tenant-config",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → data-asg-tenant-config"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/ia.js:loadAysRuntime();\n  const originalRender",
+      "ok": true,
+      "detail": "orbit360-platform/modules/ia.js → loadAysRuntime();\n  const originalRender"
+    },
+    {
+      "id": "RUNTIME_GRAPH_FILE_EXISTS:orbit360-platform/modules/calidad.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:aseguradoras-candidate-actions.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → aseguradoras-candidate-actions.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:aseguradoras-frontend-projection-v20260716.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → aseguradoras-frontend-projection-v20260716.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:empalme-v1251-runtime.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → empalme-v1251-runtime.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:import-initial-profiles.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → import-initial-profiles.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:importar-initial-tenant-lab.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → importar-initial-tenant-lab.js"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:installLegalGate",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → installLegalGate"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:installMobileNavigation",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → installMobileNavigation"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:asg-order-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → asg-order-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:asg-knowledge-projection-v20260716",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → asg-knowledge-projection-v20260716"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:authentication_owner_ready",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → authentication_owner_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:canonical_runtime_snapshot",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → canonical_runtime_snapshot"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:document.readyState === 'complete'",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → document.readyState === 'complete'"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:document.querySelectorAll('#sidebar .nav-link').length > 1",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → document.querySelectorAll('#sidebar .nav-link').length > 1"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:canonical_product_bootstrap_ready",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → canonical_product_bootstrap_ready"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:page.waitForURL",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → page.waitForURL"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:const deadline = Date.now() + 60000",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → const deadline = Date.now() + 60000"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:setTimeout(attachSnapshots, 0)",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → setTimeout(attachSnapshots, 0)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:setTimeout(attachSnapshots, 1200)",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → setTimeout(attachSnapshots, 1200)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:setTimeout(attachSnapshots, 3500)",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → setTimeout(attachSnapshots, 3500)"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:canonical_tenant_insurer_core_ready', () => page.waitForFunction",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → canonical_tenant_insurer_core_ready', () => page.waitForFunction"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:event.waitUntil(refresh.catch",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → event.waitUntil(refresh.catch"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:TENANT_CONFIG_SRC",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → TENANT_CONFIG_SRC"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:data-asg-tenant-config",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → data-asg-tenant-config"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → loadTenantConfig().then(() => window.dispatchEvent(new CustomEvent('orbit:aseguradoras:tenant-config-ready')));\n  loadCatalog();"
+    },
+    {
+      "id": "RUNTIME_GRAPH_NO_RETIRED_REF:orbit360-platform/modules/calidad.js:loadAysRuntime();\n  const originalRender",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → loadAysRuntime();\n  const originalRender"
+    },
+    {
       "id": "RUNTIME_VERSION_CONTRACTS_DECLARED",
       "ok": true,
-      "detail": "contracts=12"
+      "detail": "contracts=29"
     },
     {
       "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/ays-lab-preview.html",
@@ -2925,22 +5009,37 @@
     {
       "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/ays-lab-preview.html",
       "ok": true,
-      "detail": "tokens=3"
+      "detail": "tokens=6"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/ays-lab-preview.html:content=\"20260717-2\"",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/ays-lab-preview.html:orbit-preview-version\" content=\"20260717-2",
       "ok": true,
-      "detail": "orbit360-platform/ays-lab-preview.html → content=\"20260717-2\""
+      "detail": "orbit360-platform/ays-lab-preview.html → orbit-preview-version\" content=\"20260717-2"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/ays-lab-preview.html:sw.js?v=20260717-2",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/ays-lab-preview.html:orbit-critical-release\" content=\"block1-critical-runtime-20260721-4",
       "ok": true,
-      "detail": "orbit360-platform/ays-lab-preview.html → sw.js?v=20260717-2"
+      "detail": "orbit360-platform/ays-lab-preview.html → orbit-critical-release\" content=\"block1-critical-runtime-20260721-4"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/ays-lab-preview.html:runtime=20260717-2",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/ays-lab-preview.html:sw.js?v=20260721-4",
       "ok": true,
-      "detail": "orbit360-platform/ays-lab-preview.html → runtime=20260717-2"
+      "detail": "orbit360-platform/ays-lab-preview.html → sw.js?v=20260721-4"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/ays-lab-preview.html:router-tenant-config-bootstrap.js?v=20260721-4",
+      "ok": true,
+      "detail": "orbit360-platform/ays-lab-preview.html → router-tenant-config-bootstrap.js?v=20260721-4"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/ays-lab-preview.html:client-insurer-visual-stability-barrier-v20260721.js?v=20260721-4",
+      "ok": true,
+      "detail": "orbit360-platform/ays-lab-preview.html → client-insurer-visual-stability-barrier-v20260721.js?v=20260721-4"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/ays-lab-preview.html:criticalRelease=",
+      "ok": true,
+      "detail": "orbit360-platform/ays-lab-preview.html → criticalRelease="
     },
     {
       "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/core/backend-lab-loader.js",
@@ -2970,52 +5069,47 @@
     {
       "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/sw.js",
       "ok": true,
-      "detail": "tokens=9"
+      "detail": "tokens=8"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:var CACHE = 'orbit360-v20260717-2-pwa2'",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:orbit360-v20260721-4-pwa2",
       "ok": true,
-      "detail": "orbit360-platform/sw.js → var CACHE = 'orbit360-v20260717-2-pwa2'"
+      "detail": "orbit360-platform/sw.js → orbit360-v20260721-4-pwa2"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:var BUILD = '20260717-2'",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:BUILD = '20260721-4'",
       "ok": true,
-      "detail": "orbit360-platform/sw.js → var BUILD = '20260717-2'"
+      "detail": "orbit360-platform/sw.js → BUILD = '20260721-4'"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:RUNTIME_CONTRACT_TIMEOUT_MS = 8000",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:block1-critical-runtime-20260721-4",
       "ok": true,
-      "detail": "orbit360-platform/sw.js → RUNTIME_CONTRACT_TIMEOUT_MS = 8000"
+      "detail": "orbit360-platform/sw.js → block1-critical-runtime-20260721-4"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:RUNTIME_CONTRACT_CACHE_STRATEGY = 'cache-first-bounded-revalidate'",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:CRITICAL_RUNTIME_PATHS",
       "ok": true,
-      "detail": "orbit360-platform/sw.js → RUNTIME_CONTRACT_CACHE_STRATEGY = 'cache-first-bounded-revalidate'"
+      "detail": "orbit360-platform/sw.js → CRITICAL_RUNTIME_PATHS"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:var cachePromise = caches.open(CACHE)",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:isCriticalRuntime",
       "ok": true,
-      "detail": "orbit360-platform/sw.js → var cachePromise = caches.open(CACHE)"
+      "detail": "orbit360-platform/sw.js → isCriticalRuntime"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:var refreshPromise = cachePromise.then",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:releaseRequest",
       "ok": true,
-      "detail": "orbit360-platform/sw.js → var refreshPromise = cachePromise.then"
+      "detail": "orbit360-platform/sw.js → releaseRequest"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:event.waitUntil(refreshPromise.catch",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:orbitBuild",
       "ok": true,
-      "detail": "orbit360-platform/sw.js → event.waitUntil(refreshPromise.catch"
+      "detail": "orbit360-platform/sw.js → orbitBuild"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:event.respondWith(",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:criticalRelease",
       "ok": true,
-      "detail": "orbit360-platform/sw.js → event.respondWith("
-    },
-    {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/sw.js:tenant-[^/]+-insurers-p10",
-      "ok": true,
-      "detail": "orbit360-platform/sw.js → tenant-[^/]+-insurers-p10"
+      "detail": "orbit360-platform/sw.js → criticalRelease"
     },
     {
       "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/core/pwa.js",
@@ -3025,32 +5119,17 @@
     {
       "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/core/pwa.js",
       "ok": true,
-      "detail": "tokens=10"
+      "detail": "tokens=6"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:var RUNTIME_BUILD = '20260717-2'",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:RUNTIME_BUILD = '20260721-4'",
       "ok": true,
-      "detail": "orbit360-platform/core/pwa.js → var RUNTIME_BUILD = '20260717-2'"
+      "detail": "orbit360-platform/core/pwa.js → RUNTIME_BUILD = '20260721-4'"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:registerServiceWorker",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:block1-critical-runtime-20260721-4",
       "ok": true,
-      "detail": "orbit360-platform/core/pwa.js → registerServiceWorker"
-    },
-    {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:waitForWorkerActivation",
-      "ok": true,
-      "detail": "orbit360-platform/core/pwa.js → waitForWorkerActivation"
-    },
-    {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:window.OrbitPwaWorkerReady = registerServiceWorker()",
-      "ok": true,
-      "detail": "orbit360-platform/core/pwa.js → window.OrbitPwaWorkerReady = registerServiceWorker()"
-    },
-    {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:registration.update()",
-      "ok": true,
-      "detail": "orbit360-platform/core/pwa.js → registration.update()"
+      "detail": "orbit360-platform/core/pwa.js → block1-critical-runtime-20260721-4"
     },
     {
       "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:serviceWorker.register('sw.js?v=' + RUNTIME_BUILD)",
@@ -3058,9 +5137,9 @@
       "detail": "orbit360-platform/core/pwa.js → serviceWorker.register('sw.js?v=' + RUNTIME_BUILD)"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:waitForWorkerControl",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:controllerMatches",
       "ok": true,
-      "detail": "orbit360-platform/core/pwa.js → waitForWorkerControl"
+      "detail": "orbit360-platform/core/pwa.js → controllerMatches"
     },
     {
       "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:OrbitPwaWorkerState",
@@ -3068,14 +5147,9 @@
       "detail": "orbit360-platform/core/pwa.js → OrbitPwaWorkerState"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:controllerMatches",
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:OrbitPwaWorkerReady",
       "ok": true,
-      "detail": "orbit360-platform/core/pwa.js → controllerMatches"
-    },
-    {
-      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/pwa.js:pwa-controller:",
-      "ok": true,
-      "detail": "orbit360-platform/core/pwa.js → pwa-controller:"
+      "detail": "orbit360-platform/core/pwa.js → OrbitPwaWorkerReady"
     },
     {
       "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/core/router.js",
@@ -3203,69 +5277,69 @@
       "detail": "tokens=13"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:contractVersion:'1.0.25'",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:schemaVersion: 'orbit360-runtime-gate-joint-v27-role-selection-parity'",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → contractVersion:'1.0.25'"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → schemaVersion: 'orbit360-runtime-gate-joint-v27-role-selection-parity'"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:WATCHDOG_BUDGET_MS=900000",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:contractVersion: '1.0.27'",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → WATCHDOG_BUDGET_MS=900000"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → contractVersion: '1.0.27'"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:OBSERVER_CAPTURE_TIMEOUT_MS=5000",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:const WATCHDOG_BUDGET_MS = 900000",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → OBSERVER_CAPTURE_TIMEOUT_MS=5000"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → const WATCHDOG_BUDGET_MS = 900000"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:report.failureStage=report.stage",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:const OBSERVER_CAPTURE_TIMEOUT_MS = 5000",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → report.failureStage=report.stage"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → const OBSERVER_CAPTURE_TIMEOUT_MS = 5000"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:report.watchdogExceeded=true",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:report.watchdogBudgetMs = WATCHDOG_BUDGET_MS",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → report.watchdogExceeded=true"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → report.watchdogBudgetMs = WATCHDOG_BUDGET_MS"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:if(!report.error)report.error",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:report.observerCaptureTimeoutMs = OBSERVER_CAPTURE_TIMEOUT_MS",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → if(!report.error)report.error"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → report.observerCaptureTimeoutMs = OBSERVER_CAPTURE_TIMEOUT_MS"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:routerRuntimeContracts",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:report.watchdogExceeded = true",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → routerRuntimeContracts"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → report.watchdogExceeded = true"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:awaitPreviewRedirect",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:if (!report.error) report.error",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → awaitPreviewRedirect"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → if (!report.error) report.error"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:waitForProductBootstrap",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:report.failureStage = report.stage",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → waitForProductBootstrap"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → report.failureStage = report.stage"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:PIPELINE_STEP_TIMEOUT",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:page.exposeBinding('__orbitGatePostRouterRuntime'",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → PIPELINE_STEP_TIMEOUT"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → page.exposeBinding('__orbitGatePostRouterRuntime'"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:data\\/store\\.js",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:canonical_post_router_runtime_terminal",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → data\\/store\\.js"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → canonical_post_router_runtime_terminal"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:core\\/router\\.js",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:canonical_domcontentloaded_ready",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → core\\/router\\.js"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → canonical_domcontentloaded_ready"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:core\\/auth\\.js",
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-gate-runtime-crm-v20260716.mjs:select.dispatchEvent(new Event('change', { bubbles: true }))",
       "ok": true,
-      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → core\\/auth\\.js"
+      "detail": "tools/orbit360-gate-runtime-crm-v20260716.mjs → select.dispatchEvent(new Event('change', { bubbles: true }))"
     },
     {
       "id": "RUNTIME_VERSION_FILE_EXISTS:tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
@@ -3535,27 +5609,47 @@
     {
       "id": "RUNTIME_VERSION_TOKENS_DECLARED:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "ok": true,
-      "detail": "tokens=4"
+      "detail": "tokens=8"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:ORBIT360_EXPECTED_RUNTIME: 20260717-2",
+      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:final_block1_static_preflight_only",
       "ok": true,
-      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → ORBIT360_EXPECTED_RUNTIME: 20260717-2"
+      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → final_block1_static_preflight_only"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:CANONICAL_RUNTIME_VERSION",
+      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:targeted_lab_deploy_then_unique_final_block1_gate_readonly",
       "ok": true,
-      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → CANONICAL_RUNTIME_VERSION"
+      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → targeted_lab_deploy_then_unique_final_block1_gate_readonly"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs",
+      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:node --check orbit360-platform/core/access-scope.js",
       "ok": true,
-      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs"
+      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → node --check orbit360-platform/core/access-scope.js"
     },
     {
-      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:tools/orbit360-gate-environment-v20260717.mjs",
+      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
       "ok": true,
-      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → tools/orbit360-gate-environment-v20260717.mjs"
+      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs --local-only",
+      "ok": true,
+      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs --local-only"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:functionsDeployed:false",
+      "ok": true,
+      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → functionsDeployed:false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:rulesDeployed:false",
+      "ok": true,
+      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → rulesDeployed:false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml:productionTouched:false",
+      "ok": true,
+      "detail": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml → productionTouched:false"
     },
     {
       "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/core/backend-lab-canonical-view-sync.js",
@@ -3646,6 +5740,826 @@
       "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js:mod.__resourcesRuntimeOwnershipV20260718",
       "ok": true,
       "detail": "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js → mod.__resourcesRuntimeOwnershipV20260718"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
+      "ok": true,
+      "detail": "tokens=9"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:registryContract = { version: '20260721.2' }",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → registryContract = { version: '20260721.2' }"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:previous.version === '20260721.4'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → previous.version === '20260721.4'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:version: '20260721.4'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → version: '20260721.4'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:block1-critical-runtime-20260721-4",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → block1-critical-runtime-20260721-4"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:function directoryReady(grid)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → function directoryReady(grid)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:directoryStructuralTrigger: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → directoryStructuralTrigger: true"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:writesStore: false",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → writesStore: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:reimportsData: false",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → reimportsData: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js:exposesSecrets: false",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js → exposesSecrets: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+      "ok": true,
+      "detail": "tokens=19"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:version:'20260720.2'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → version:'20260720.2'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:idempotenceRevision:'20260721.4'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → idempotenceRevision:'20260721.4'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:visualRemediationRevision:'20260722.1'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → visualRemediationRevision:'20260722.1'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:data-m1-credential-user",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → data-m1-credential-user"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:data-m1-credential-secret",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → data-m1-credential-secret"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:data-m1-bank-number",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → data-m1-bank-number"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:data-m1-bank-reveal",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → data-m1-bank-reveal"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:bankCopyExcludesUse:true",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → bankCopyExcludesUse:true"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:bankHolderFallbackInsurer:true",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → bankHolderFallbackInsurer:true"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:function setHtmlIfChanged(node,html)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function setHtmlIfChanged(node,html)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:function setTextIfChanged(node,text)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function setTextIfChanged(node,text)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:function pauseCanonicalObserver()",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function pauseCanonicalObserver()"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:function observeCanonicalOwner()",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function observeCanonicalOwner()"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:function runEnhance()",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function runEnhance()"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:function mutationTouchesCanonicalView(records)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function mutationTouchesCanonicalView(records)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:function handleCanonicalMutations(records)",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → function handleCanonicalMutations(records)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:mutationMode:'same-microtask-disconnect-own-writes'",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → mutationMode:'same-microtask-disconnect-own-writes'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:observerOwnMutations:false",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → observerOwnMutations:false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/client-insurer-visual-contract-v20260720.js:enhance:runEnhance",
+      "ok": true,
+      "detail": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js → enhance:runEnhance"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+      "ok": true,
+      "detail": "tokens=6"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:Visual remediation 20260722.1",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → Visual remediation 20260722.1"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:.m1-credential-secret",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → .m1-credential-secret"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:.m1-bank-number-line",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → .m1-bank-number-line"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:#pwa-install",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → #pwa-install"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:overflow-x:auto!important",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → overflow-x:auto!important"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/styles/client-insurer-visual-contract-v20260720.css:overflow-x:hidden",
+      "ok": true,
+      "detail": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css → overflow-x:hidden"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "ok": true,
+      "detail": "tokens=9"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router-tenant-config-bootstrap.js:block1-critical-runtime-20260721-4",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → block1-critical-runtime-20260721-4"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router-tenant-config-bootstrap.js:visualStabilityVersion: '20260721.4'",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → visualStabilityVersion: '20260721.4'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router-tenant-config-bootstrap.js:client-insurer-visual-stability-barrier-v20260721.js?v=20260721-4",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → client-insurer-visual-stability-barrier-v20260721.js?v=20260721-4"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router-tenant-config-bootstrap.js:__clientInsurerVisualStabilityBarrierV20260721.version === '20260721.4'",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → __clientInsurerVisualStabilityBarrierV20260721.version === '20260721.4'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router-tenant-config-bootstrap.js:visualContractVersion: '20260720.2'",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → visualContractVersion: '20260720.2'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router-tenant-config-bootstrap.js:visualContractDeliveryRevision: '20260721.4'",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → visualContractDeliveryRevision: '20260721.4'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router-tenant-config-bootstrap.js:client-insurer-visual-contract-v20260720.js?v=20260721-4",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → client-insurer-visual-contract-v20260720.js?v=20260721-4"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router-tenant-config-bootstrap.js:client-insurer-visual-contract-v20260720.css?v=20260721-4",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → client-insurer-visual-contract-v20260720.css?v=20260721-4"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/router-tenant-config-bootstrap.js:loadVisualStability",
+      "ok": true,
+      "detail": "orbit360-platform/core/router-tenant-config-bootstrap.js → loadVisualStability"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+      "ok": true,
+      "detail": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+      "ok": true,
+      "detail": "tokens=8"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json:orbit360-critical-runtime-integrity-manifest-v1",
+      "ok": true,
+      "detail": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json → orbit360-critical-runtime-integrity-manifest-v1"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json:block1-critical-runtime-20260721-4",
+      "ok": true,
+      "detail": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json → block1-critical-runtime-20260721-4"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json:1.0.37",
+      "ok": true,
+      "detail": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json → 1.0.37"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json:routerTenantBootstrap",
+      "ok": true,
+      "detail": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json → routerTenantBootstrap"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json:clientInsurerVisualStabilityBarrier",
+      "ok": true,
+      "detail": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json → clientInsurerVisualStabilityBarrier"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json:serviceWorker",
+      "ok": true,
+      "detail": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json → serviceWorker"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json:previewBootstrap",
+      "ok": true,
+      "detail": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json → previewBootstrap"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-critical-runtime-integrity-manifest-v20260721.json:allRemoteBytesAndSha256Exact",
+      "ok": true,
+      "detail": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json → allRemoteBytesAndSha256Exact"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+      "ok": true,
+      "detail": "tokens=12"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:orbit360-hosting-critical-integrity-manifest-v2",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → orbit360-hosting-critical-integrity-manifest-v2"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:ORBIT360_INTEGRITY_MANIFEST_PATH",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → ORBIT360_INTEGRITY_MANIFEST_PATH"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:checkedAssets",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → checkedAssets"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:assetCount",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → assetCount"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:REMOTE_CRITICAL_ASSET_INTEGRITY_MISMATCH",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → REMOTE_CRITICAL_ASSET_INTEGRITY_MISMATCH"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:remoteAllExact",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → remoteAllExact"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:exactMatch",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → exactMatch"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:browserExecuted: false",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → browserExecuted: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:containsSecrets: false",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → containsSecrets: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:OWNER_CLOSURE_POLICY = 'iife_before_trailing_comments'",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → OWNER_CLOSURE_POLICY = 'iife_before_trailing_comments'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:function withoutTrailingComments(source)",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → function withoutTrailingComments(source)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs:ownerClosurePolicy: OWNER_CLOSURE_POLICY",
+      "ok": true,
+      "detail": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs → ownerClosurePolicy: OWNER_CLOSURE_POLICY"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
+      "ok": true,
+      "detail": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
+      "ok": true,
+      "detail": "tokens=8"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs:orbit360-owner-visual-idempotence-proof-v2-client360-trigger",
+      "ok": true,
+      "detail": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs → orbit360-owner-visual-idempotence-proof-v2-client360-trigger"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs:one_base_mutation_one_transform_zero_followup_mutations_with_client360_filters",
+      "ok": true,
+      "detail": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs → one_base_mutation_one_transform_zero_followup_mutations_with_client360_filters"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs:client_country_filter_structural_trigger",
+      "ok": true,
+      "detail": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs → client_country_filter_structural_trigger"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs:client_segment_filter_structural_trigger",
+      "ok": true,
+      "detail": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs → client_segment_filter_structural_trigger"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs:zero_followup_mutations",
+      "ok": true,
+      "detail": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs → zero_followup_mutations"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs:runtimeExecuted: false",
+      "ok": true,
+      "detail": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs → runtimeExecuted: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs:browserExecuted: false",
+      "ok": true,
+      "detail": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs → browserExecuted: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs:deployExecuted: false",
+      "ok": true,
+      "detail": "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs → deployExecuted: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js",
+      "ok": true,
+      "detail": "tokens=6"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js:orbit360-probar-owner-visual-idempotente-v20260721.mjs",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js → orbit360-probar-owner-visual-idempotente-v20260721.mjs"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js:proof.totalChecks === 27",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js → proof.totalChecks === 27"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js:proof.proof.baseMutations === 1",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js → proof.proof.baseMutations === 1"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js:proof.proof.canonicalTransforms === 1",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js → proof.proof.canonicalTransforms === 1"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js:proof.proof.followUpObserverDeliveries === 0",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js → proof.proof.followUpObserverDeliveries === 0"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js:ownerIdempotence",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js → ownerIdempotence"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/modules/calidad.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/modules/calidad.js",
+      "ok": true,
+      "detail": "tokens=5"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/calidad.js:País por validar",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → País por validar"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/calidad.js:Moneda por validar",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → Moneda por validar"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/calidad.js:clientCountryEvidence",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → clientCountryEvidence"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/calidad.js:soloCamposPendientes: true",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → soloCamposPendientes: true"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/calidad.js:version: '1.217-country-quality'",
+      "ok": true,
+      "detail": "orbit360-platform/modules/calidad.js → version: '1.217-country-quality'"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+      "ok": true,
+      "detail": "tokens=5"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:Orbit.__insurerDirectoryBridgeV1203",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → Orbit.__insurerDirectoryBridgeV1203"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:function openInsurerDocumentImport(options)",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → function openInsurerDocumentImport(options)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:No se ha guardado nada",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → No se ha guardado nada"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:El archivo no fue almacenado",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → El archivo no fue almacenado"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/modules/aseguradoras-v1202-import-bridge.js:documentaryImportRequiresVerifiedPersistence: true",
+      "ok": true,
+      "detail": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js → documentaryImportRequiresVerifiedPersistence: true"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+      "ok": true,
+      "detail": "tokens=4"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:version: '20260721.3'",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → version: '20260721.3'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:async function callProviderWithoutOperationalWrites",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → async function callProviderWithoutOperationalWrites"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:providerReturnsMappingsOnly: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → providerReturnsMappingsOnly: true"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/insurer-secure-target-bridge-v20260720.js:providerOperationalStoreWritesAllowed: false",
+      "ok": true,
+      "detail": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js → providerOperationalStoreWritesAllowed: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
+      "ok": true,
+      "detail": "tokens=5"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:Orbit.ACADEMIA_V1223_ASEGURADORAS",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → Orbit.ACADEMIA_V1223_ASEGURADORAS"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:version:'1.223'",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → version:'1.223'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:Una confirmación, una escritura",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → Una confirmación, una escritura"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:Después de migrar, solo inventariar",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → Después de migrar, solo inventariar"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1217-aseguradoras-op2.js:postMigrationReadOnly:true",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js → postMigrationReadOnly:true"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+      "ok": true,
+      "detail": "tokens=7"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:version:'1.221'",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → version:'1.221'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:contentVersion:'1.227'",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → contentVersion:'1.227'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:_m1visualv:1227",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → _m1visualv:1227"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:El usuario del portal permanece visible",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → El usuario del portal permanece visible"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:El campo Uso no se muestra ni se copia",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → El campo Uso no se muestra ni se copia"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:Instalar como app",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → Instalar como app"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/data/academia-v1221-m1-visual-integrity.js:visualSemanticsRemediation:true",
+      "ok": true,
+      "detail": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js → visualSemanticsRemediation:true"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/core/access-scope.js",
+      "ok": true,
+      "detail": "orbit360-platform/core/access-scope.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/core/access-scope.js",
+      "ok": true,
+      "detail": "tokens=6"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/access-scope.js:var SCOPE_LEVEL = { none: 0, own: 1, team: 2, all: 3 }",
+      "ok": true,
+      "detail": "orbit360-platform/core/access-scope.js → var SCOPE_LEVEL = { none: 0, own: 1, team: 2, all: 3 }"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/access-scope.js:function roleScopeCeiling(moduleKey)",
+      "ok": true,
+      "detail": "orbit360-platform/core/access-scope.js → function roleScopeCeiling(moduleKey)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/access-scope.js:function applyRoleScopeCeiling(requestedScope, moduleKey)",
+      "ok": true,
+      "detail": "orbit360-platform/core/access-scope.js → function applyRoleScopeCeiling(requestedScope, moduleKey)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/access-scope.js:return applyRoleScopeCeiling(ex, moduleKey)",
+      "ok": true,
+      "detail": "orbit360-platform/core/access-scope.js → return applyRoleScopeCeiling(ex, moduleKey)"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/access-scope.js:return scopeLevel(requested) <= scopeLevel(ceiling) ? requested : ceiling",
+      "ok": true,
+      "detail": "orbit360-platform/core/access-scope.js → return scopeLevel(requested) <= scopeLevel(ceiling) ? requested : ceiling"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/core/access-scope.js:__activeRoleScopeCeilingV20260721: true",
+      "ok": true,
+      "detail": "orbit360-platform/core/access-scope.js → __activeRoleScopeCeilingV20260721: true"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js",
+      "ok": true,
+      "detail": "tokens=8"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js:active-role-scope-ceiling-v1",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js → active-role-scope-ceiling-v1"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js:Dirección debe conservar scope all explícito",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js → Dirección debe conservar scope all explícito"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js:Operativo no puede heredar all",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js → Operativo no puede heredar all"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js:Asesor no puede heredar all",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js → Asesor no puede heredar all"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js:none debe prevalecer",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js → none debe prevalecer"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js:advisorExplicitAll: 'own'",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js → advisorExplicitAll: 'own'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js:operativoExplicitAll: 'team'",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js → operativoExplicitAll: 'team'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js:writes.length === 0",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-access-active-role-scope-contract-v20260721.js → writes.length === 0"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "ok": true,
+      "detail": "tokens=8"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js:orbit360-m1-visual-remediation-contract-v1",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → orbit360-m1-visual-remediation-contract-v1"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js:contractVersion: '1.0.37'",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → contractVersion: '1.0.37'"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js:FREEZE_STOP_THE_LINE",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → FREEZE_STOP_THE_LINE"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js:BANK_COPY_EXCLUDES_USE",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → BANK_COPY_EXCLUDES_USE"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js:ACADEMY_CONTENT_1227",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → ACADEMY_CONTENT_1227"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js:runtimeExecuted: false",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → runtimeExecuted: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js:browserExecuted: false",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → browserExecuted: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js:deployExecuted: false",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js → deployExecuted: false"
+    },
+    {
+      "id": "RUNTIME_VERSION_FILE_EXISTS:orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKENS_DECLARED:orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+      "ok": true,
+      "detail": "tokens=5"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js:M1_VISUAL_REMEDIATION_CONTRACT_EXISTS",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js → M1_VISUAL_REMEDIATION_CONTRACT_EXISTS"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js:M1_VISUAL_REMEDIATION_CONTRACT_EXECUTES",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js → M1_VISUAL_REMEDIATION_CONTRACT_EXECUTES"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js:M1_VISUAL_REMEDIATION_CONTRACT_PASS",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js → M1_VISUAL_REMEDIATION_CONTRACT_PASS"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js:M1_VISUAL_REMEDIATION_CONTRACT_1037",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js → M1_VISUAL_REMEDIATION_CONTRACT_1037"
+    },
+    {
+      "id": "RUNTIME_VERSION_TOKEN:orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js:M1_VISUAL_REMEDIATION_NO_WRITES",
+      "ok": true,
+      "detail": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js → M1_VISUAL_REMEDIATION_NO_WRITES"
     },
     {
       "id": "RUNTIME_BRANCH",
