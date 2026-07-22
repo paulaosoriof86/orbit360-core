@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v5-phase-capability-immutable-request",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v6-visualization-before-m2",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -7,16 +7,17 @@
   "gateId": "block1-client360-insurers-lab-v20260717",
   "gateContractVersion": "1.0.37",
   "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
-  "controlPlaneRevision": "phase-capability-immutable-request-v1",
+  "controlPlaneRevision": "phase-capability-immutable-request-v2",
+  "methodologicalDecisionId": "paula-20260722-visualization-before-m2",
   "classification": [
     "VALIDATOR_STALE",
     "PIPELINE_MECHANISM_FAILURE"
   ],
   "repeatedFailureEvidence": {
     "sameStageFailureCount": 2,
-    "runs": [29953485798, 29954997417],
-    "latestFailedCheckIds": ["WORKFLOW_PROJECT_LOCK", "WORKFLOW_CHANNEL_LOCK"],
-    "rootCause": "The registry described a runtime/Hosting gate while the active workflow was a static preflight. The validation engine enforced project and channel tokens unconditionally, and lifecycle composition could replace token lists but could not change those engine semantics. Runtime state was also duplicated across registry, overlay, lifecycle, freeze, authorization and PR text.",
+    "runs": [29953485798, 29954997417, 29961263105],
+    "latestFailedCheckIds": ["ACADEMY_RESPONSIVE"],
+    "rootCause": "The original control plane mixed static, runtime and Hosting semantics. After that structural cause was corrected and verified 1366/1366, the last failure was a brittle exact-phrase validator even though Academy contained all required responsive concepts.",
     "productRegression": false
   },
   "retiredLifecycleChecks": [
@@ -24,7 +25,8 @@
     "FREEZE_NO_RUNTIME",
     "AUTHORIZATION_CONSUMED",
     "WORKFLOW_PROJECT_LOCK_FOR_ALL_PHASES",
-    "WORKFLOW_CHANNEL_LOCK_FOR_ALL_PHASES"
+    "WORKFLOW_CHANNEL_LOCK_FOR_ALL_PHASES",
+    "ACADEMY_RESPONSIVE_EXACT_PHRASE"
   ],
   "replacementLifecycleChecks": [
     "FREEZE_M1_OPEN",
@@ -33,7 +35,8 @@
     "EXECUTION_PROFILE_DECLARED",
     "WORKFLOW_PHASE_LOCK",
     "WORKFLOW_PROJECT_LOCK_NOT_APPLICABLE",
-    "WORKFLOW_CHANNEL_LOCK_NOT_APPLICABLE"
+    "WORKFLOW_CHANNEL_LOCK_NOT_APPLICABLE",
+    "ACADEMY_RESPONSIVE_SEMANTIC_TOKEN_SET"
   ],
   "activeLifecycle": {
     "authorized": {
@@ -47,7 +50,7 @@
       "allowedExecutions": 0
     }
   },
-  "invariantsForBothPhases": {
+  "invariantsForStaticPreflight": {
     "m1Closed": false,
     "finalGateRerunBlocked": true,
     "secretsAllowed": false,
@@ -72,20 +75,21 @@
     "evidenceWrites": 1,
     "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
     "engineStdoutParsingRetired": true,
-    "failedRunIds": [29953485798, 29954997417],
-    "rootCause": "distributed_control_plane_without_phase_capabilities_and_with_git_tracked_mutable_authorization_state"
+    "failedRunIds": [29953485798, 29954997417, 29961263105],
+    "rootCause": "distributed_control_plane_then_brittle_exact_phrase_validator",
+    "nextPhaseAfterPass": "LAB_HOSTING_DELIVERY_SEPARATE_REQUEST"
   },
   "canonicalOverlayPatch": {
     "schemaVersion": "orbit360-gate-contract-overlay-v1",
     "issuedAt": "2026-07-22",
     "gateId": "block1-client360-insurers-lab-v20260717",
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "diagnosticRevision": "phase-capability-immutable-request-v1",
-    "contractRevision": "1.0.37-phase-capability-immutable-request-v1",
+    "classification": "VALIDATOR_STALE",
+    "diagnosticRevision": "static-preflight-v2-before-hosting-visualization",
+    "contractRevision": "1.0.37-static-preflight-v2-before-hosting-visualization",
     "gatePatch": {
       "contractVersion": "1.0.37",
-      "diagnosticRevision": "phase-capability-immutable-request-v1",
-      "status": "CONTROL_PLANE_RECONCILED_STATIC_PREFLIGHT_REQUEST_PENDING",
+      "diagnosticRevision": "static-preflight-v2-before-hosting-visualization",
+      "status": "CONTROL_PLANE_RECONCILED_STATIC_PREFLIGHT_V2_AUTHORIZED",
       "executionProfile": {
         "phase": "STATIC_PREFLIGHT",
         "capabilities": {
@@ -106,14 +110,14 @@
         },
         "requestModel": "immutable-request-bound-to-parent-head-and-run-attempt-v1"
       },
-      "diagnosticRule": "The visual product remediation remains frozen. The canonical contract now declares the execution phase and capabilities. Static preflight must not require Firebase project or Hosting channel tokens. One immutable request bound to the reconciled parent HEAD may execute once; GitHub reruns are blocked by run attempt.",
-      "acceptancePolicy": "Accept only GO_GATE_CONTRACT plus visual remediation PASS and GO_STATIC_ARCHITECTURE. The final gate is not rerun. No secrets, Firestore, operational writes, runtime, browser, Functions, Rules, production or deploy are allowed."
+      "diagnosticRule": "The control plane is structurally reconciled and independently audited. Execute one immutable static preflight v2 to verify the semantic Academy validator, the visual contract and static architecture before a separately authorized Hosting LAB delivery. The final technical gate is not rerun.",
+      "acceptancePolicy": "Accept only GO_GATE_CONTRACT plus visual remediation PASS 29/29 with validatorSemanticRevision responsive-token-set-v1 and GO_STATIC_ARCHITECTURE. Allow no secrets, Firestore, operational writes, runtime, browser, Functions, Rules, production or deploy."
     },
     "effectiveOwnerReconciliation": {
       "baselineOverlayContract": "1.0.37-visual-review-semantic-responsive-remediation-v1",
-      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "classification": "VALIDATOR_STALE",
       "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
-      "controlPlaneRevision": "phase-capability-immutable-request-v1",
+      "controlPlaneRevision": "phase-capability-immutable-request-v2",
       "productOwnersChanged": [],
       "academyChanged": false,
       "validatorChanged": true,
@@ -149,6 +153,7 @@
         "requiredTokens": [
           "orbit360-m1-visual-remediation-contract-v1",
           "contractVersion: '1.0.37'",
+          "validatorSemanticRevision: 'responsive-token-set-v1'",
           "validatorLifecycleRevision: 'phase-aware-static-authorization-v2'",
           "FREEZE_M1_OPEN",
           "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
@@ -164,7 +169,7 @@
     "requiredFiles": [
       "tools/orbit360-validator-lifecycle-contract-v20260722.json",
       "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
-      "orbit360-platform/docs/BLOQUE1-CIERRE-CANONICO-PIPELINE-M1-20260722.md",
+      "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTROL-PLANE-GATES-INMUTABLES-ORBIT360-AYS-20260722.md",
       "orbit360-platform/docs/evidence/m1-canonical-pipeline-reconciliation-20260722-sanitized.json"
     ],
     "runtimeVersionContracts": [
@@ -188,6 +193,7 @@
         "requiredTokens": [
           "orbit360-m1-visual-remediation-contract-v1",
           "contractVersion: '1.0.37'",
+          "validatorSemanticRevision: 'responsive-token-set-v1'",
           "validatorLifecycleRevision: 'phase-aware-static-authorization-v2'",
           "FREEZE_M1_OPEN",
           "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
@@ -233,14 +239,16 @@
         "replaceRequiredTokens": true,
         "requiredTokens": [
           "ORBIT360_GATE_PHASE: static_preflight",
-          "ORBIT360_REQUEST_FILE: tools/orbit360-m1-static-preflight-request-v20260722.json",
+          "ORBIT360_REQUEST_FILE: tools/orbit360-m1-static-preflight-request-v2-20260722.json",
+          "ORBIT360_METHOD_DECISION_ID: paula-20260722-visualization-before-m2",
           "immutable-request-bound-to-parent-head-and-run-attempt-v1",
           "test \"${GITHUB_RUN_ATTEMPT}\" = '1'",
           "node --check tools/orbit360-validar-gate-contracts-v20260717.mjs",
           "node tools/orbit360-validar-gate-contracts-v20260717.mjs \"$ORBIT360_GATE_ID\"",
+          "validatorSemanticRevision == \"responsive-token-set-v1\"",
           "node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
           "node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
-          "engineEvidenceSource:\"sync-file-evidence-not-stdout-v1\"",
+          "nextAuthorizedPhase:\"LAB_HOSTING_DELIVERY_SEPARATE_REQUEST\"",
           "functionsDeployed:false",
           "rulesDeployed:false",
           "productionTouched:false"
