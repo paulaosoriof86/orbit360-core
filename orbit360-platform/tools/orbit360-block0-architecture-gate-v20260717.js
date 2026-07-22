@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 const root = path.resolve(__dirname, '..');
 const read = rel => fs.readFileSync(path.join(root, rel), 'utf8');
@@ -60,11 +61,37 @@ check('INSURER_PROJECTION_BRIDGE_RETIRED', !contains(router, 'aseguradoras-front
 const accessFunctions = [
   'activeRole', 'actorAdvisorId', 'actorUser', 'assignedRoles', 'canView', 'filter',
   'canAccessRecord', 'can', 'deriveClientState', 'duplicateCandidates', 'prepareManual',
-  'audit', 'correction', 'scopedStore', 'withScope'
+  'audit', 'correction', 'scopedStore', 'withScope', 'roleScopeCeiling',
+  'applyRoleScopeCeiling', 'scopeLevel'
 ];
 const missingAccess = accessFunctions.filter(name => !new RegExp('\\b' + name + '\\b').test(access));
 check('ACCESS_OWNER_SURFACE', missingAccess.length === 0, missingAccess.join(', '));
 check('ACCESS_SCOPE_COUNTRY_FAIL_CLOSED', contains(access, 'countryAllowed') && contains(access, 'return false'), 'country/scope gates');
+check('ACCESS_ACTIVE_ROLE_SCOPE_CEILING',
+  contains(access, '__activeRoleScopeCeilingV20260721') &&
+  contains(access, "if (ALL_ROLES.indexOf(role) >= 0) return 'all'") &&
+  contains(access, "if (TEAM_ROLES.indexOf(role) >= 0) return 'team'") &&
+  contains(access, "if (OWN_ROLES.indexOf(role) >= 0 || /Asesor/i.test(role)) return 'own'") &&
+  contains(access, "return scopeLevel(requested) <= scopeLevel(ceiling) ? requested : ceiling"),
+  'active role caps explicit advisor scope');
+check('ACCESS_UNKNOWN_ROLE_FAILS_CLOSED', contains(access, "return 'none';") && contains(access, 'roleScopeCeiling(moduleKey)'), 'unknown role ceiling none');
+
+const accessContractRel = 'tools/orbit360-access-active-role-scope-contract-v20260721.js';
+check('ACCESS_ROLE_SCOPE_CONTRACT_EXISTS', exists(accessContractRel), accessContractRel);
+let accessContract = null;
+if (exists(accessContractRel)) {
+  const run = spawnSync(process.execPath, [path.join(root, accessContractRel)], { encoding: 'utf8' });
+  check('ACCESS_ROLE_SCOPE_CONTRACT_EXECUTES', run.status === 0, String(run.stderr || run.stdout || '').slice(0, 600));
+  try { accessContract = JSON.parse(String(run.stdout || '').trim()); }
+  catch (error) { check('ACCESS_ROLE_SCOPE_CONTRACT_JSON', false, error.message); }
+  if (accessContract) {
+    check('ACCESS_ROLE_SCOPE_CONTRACT_PASS', accessContract.status === 'PASS', accessContract.status || 'missing');
+    check('ACCESS_ADVISOR_SCOPE_OWN', accessContract.cases && accessContract.cases.advisorExplicitAll === 'own', JSON.stringify(accessContract.cases || {}));
+    check('ACCESS_OPERATIVO_SCOPE_TEAM', accessContract.cases && accessContract.cases.operativoExplicitAll === 'team', JSON.stringify(accessContract.cases || {}));
+    check('ACCESS_EXPLICIT_NONE_WINS', accessContract.cases && accessContract.cases.explicitNoneAlwaysWins === true, JSON.stringify(accessContract.cases || {}));
+    check('ACCESS_SCOPE_TEST_NO_WRITES', accessContract.writes === 0, String(accessContract.writes));
+  }
+}
 
 const statesRequired = [
   'Documento recibido', 'Mapeado', 'Persistido', 'Requiere validación', 'Validado',
@@ -97,6 +124,12 @@ const failed = checks.filter(item => !item.ok);
 const result = {
   gate: 'orbit360-block0-architecture-gate-v20260717',
   root,
+  accessContract: accessContract ? {
+    contract: accessContract.contract,
+    advisorExplicitAll: accessContract.cases && accessContract.cases.advisorExplicitAll,
+    operativoExplicitAll: accessContract.cases && accessContract.cases.operativoExplicitAll,
+    writes: accessContract.writes
+  } : null,
   total: checks.length,
   passed: checks.length - failed.length,
   failed: failed.length,
