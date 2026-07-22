@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v10",
+  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v11",
   "issuedAt": "2026-07-21",
   "authorizationId": "final-block1-static-preflight-v1",
-  "authorizationRevision": 10,
+  "authorizationRevision": 11,
   "action": "final_block1_static_preflight_only",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -33,37 +33,26 @@
     "pendingReferences": 2,
     "uniqueValidReferences": 91
   },
-  "repeatedRuntimeEvidence": {
-    "firstRunId": 29878410649,
-    "latestRunId": 29880654490,
-    "latestArtifactId": 8514643781,
-    "latestArtifactDigest": "sha256:abf9993db867297046559b5396a81f450df388f1e039a175af0dafa862704550",
-    "errorCode": "INSURER_INACTIVE_REASON_MISSING",
-    "sameErrorRepeatedAfterLocalFix": true,
-    "frozenNoRetry": true
+  "failedStaticPreflightEvidence": {
+    "runId": 29881901498,
+    "artifactId": 8515080227,
+    "artifactDigest": "sha256:2833e2a425269376fd48eb938234b3a0c279f4ea4e943e94351b91c20f30e385",
+    "status": "VALIDATOR_STALE",
+    "failedChecks": 6,
+    "productInvalid": false
   },
   "rootCause": {
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "contributingClassification": "VALIDATOR_STALE",
-    "cause": "single_script_integrity_check_did_not_prove_exact_delivery_of_the_critical_runtime_graph_before_browser",
-    "localProductFixInvalidated": false,
-    "runtimeReceivedNewBarrierProven": false
+    "classification": "VALIDATOR_STALE",
+    "cause": "base_runtime_gate_token_contract_was_not_replaced_by_overlay_1_0_35"
   },
   "implementedFix": {
     "contractVersion": "1.0.35",
     "diagnosticRevision": "critical-runtime-integrity-manifest-v1",
     "criticalRelease": "block1-critical-runtime-20260721-4",
+    "runtimeGateContractReplaced": true,
+    "runtimeGateInternalContract": "1.0.27",
     "integrityManifest": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
-    "integrityTool": "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
-    "assetCount": 9,
-    "barrierVersion": "20260721.4",
-    "routerDeliveryRevision": "20260721.4",
-    "pwaBuild": "20260721-4",
-    "serviceWorkerBuild": "20260721-4",
-    "previewCriticalRelease": "block1-critical-runtime-20260721-4",
-    "academyContentVersion": "1.225",
-    "newRendererCreated": false,
-    "newBridgeCreated": false,
+    "criticalAssetCount": 9,
     "writesStore": false,
     "reimportsData": false,
     "exposesSecrets": false
