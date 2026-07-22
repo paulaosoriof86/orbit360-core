@@ -1,47 +1,51 @@
-name: Orbit 360 · Preflight canónico M1 visual
+name: Orbit 360 · Entrega visual M1 Hosting LAB
 
 on:
   push:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - 'tools/orbit360-m1-static-preflight-request-v2-20260722.json'
+      - 'tools/orbit360-m1-hosting-delivery-request-v1-20260722.json'
 
 permissions:
+  actions: read
   contents: read
   statuses: write
 
 concurrency:
-  group: orbit360-final-block1-static-preflight-v5
+  group: orbit360-final-block1-hosting-delivery-v1
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_PHASE: static_preflight
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-static-preflight-request-v2-20260722.json
+  ORBIT360_GATE_PHASE: lab_hosting_delivery
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-hosting-delivery-request-v1-20260722.json
   ORBIT360_REQUEST_MODEL: immutable-request-bound-to-parent-head-and-run-attempt-v1
-  ORBIT360_FINAL_GATE_POLICY: no_final_gate_rerun
   ORBIT360_METHOD_DECISION_ID: paula-20260722-visualization-before-m2
+  EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
+  ORBIT360_FINAL_GATE_POLICY: no_final_gate_rerun
 
 jobs:
-  canonical-static-preflight:
-    name: Preflight estático vinculante v2 · antes de visualización LAB
+  targeted-hosting-delivery:
+    name: Publicar frontend correctivo · Hosting LAB · sin navegador ni datos
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - name: Checkout SHA exacto
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Preparar Node 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Validar decisión, solicitud inmutable e inventario
+      - name: Validar solicitud, freeze y evidencia estática
         shell: bash
         run: |
           set -euo pipefail
@@ -56,30 +60,59 @@ jobs:
           test "$(jq -r '.requestModel' "$REQUEST")" = "$ORBIT360_REQUEST_MODEL"
           test "$(jq -r '.methodologicalDecisionId' "$REQUEST")" = "$ORBIT360_METHOD_DECISION_ID"
           test "$(jq -r '.gateId' "$REQUEST")" = "$ORBIT360_GATE_ID"
-          test "$(jq -r '.phase' "$REQUEST")" = 'STATIC_PREFLIGHT'
-          test "$(jq -r '.allowedExecutions' "$REQUEST")" = '1'
+          test "$(jq -r '.phase' "$REQUEST")" = 'LAB_HOSTING_DELIVERY'
           test "$(jq -r '.parentHead' "$REQUEST")" = "$(git rev-parse HEAD^)"
-          test "$(jq -r '.finalGateRerunAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.allowedExecutions' "$REQUEST")" = '1'
+          test "$(jq -r '.secretsAllowed' "$REQUEST")" = 'true'
+          test "$(jq -r '.deployAllowed' "$REQUEST")" = 'true'
+          test "$(jq -r '.deploymentScope' "$REQUEST")" = 'hosting_channel_only'
+          test "$(jq -r '.firebaseProjectId' "$REQUEST")" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          test "$(jq -r '.hostingChannel' "$REQUEST")" = "$ORBIT360_HOSTING_CHANNEL"
+          test "$(jq -r '.firestoreReadAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.writesAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.runtimeAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.browserAllowed' "$REQUEST")" = 'false'
-          test "$(jq -r '.firestoreReadAllowed' "$REQUEST")" = 'false'
-          test "$(jq -r '.vaultReadAllowed' "$REQUEST")" = 'false'
-          test "$(jq -r '.secretsAllowed' "$REQUEST")" = 'false'
-          test "$(jq -r '.writesAllowed' "$REQUEST")" = 'false'
-          test "$(jq -r '.deployAllowed' "$REQUEST")" = 'false'
-          test "$(jq -r '.status' "$FREEZE")" = 'CONTROL_PLANE_RECONCILED_STATIC_PREFLIGHT_V2_AUTHORIZED'
+          test "$(jq -r '.functionsDeployAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.rulesDeployAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.productionAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.finalGateRerunAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.status' "$FREEZE")" = 'STATIC_PREFLIGHT_V2_PASS_HOSTING_DELIVERY_AUTHORIZED'
           test "$(jq -r '.methodologicalDecision.id' "$FREEZE")" = "$ORBIT360_METHOD_DECISION_ID"
-          test "$(jq -r '.methodologicalDecision.visualizationBeforeM2' "$FREEZE")" = 'true'
-          test "$(jq -r '.controlPlaneReconciliation.readyForImmutableRequest' "$FREEZE")" = 'true'
-          test "$(jq -r '.controlPlaneReconciliation.independentNonExecutingAudit.status' "$FREEZE")" = 'PASS'
-          test "$(jq -r '.controlPlaneReconciliation.validatorSemanticCorrection.status' "$FREEZE")" = 'APPLIED_NO_EXECUTION'
+          test "$(jq -r '.methodologicalDecision.authorizedPhase' "$FREEZE")" = 'LAB_HOSTING_DELIVERY'
+          test "$(jq -r '.staticPreflightV2.status' "$FREEZE")" = 'PASS'
+          test "$(jq -r '.staticPreflightV2.runId' "$FREEZE")" = "$(jq -r '.staticPreflight.runId' "$REQUEST")"
+          test "$(jq -r '.staticPreflightV2.artifactId' "$FREEZE")" = "$(jq -r '.staticPreflight.artifactId' "$REQUEST")"
+          test "$(jq -r '.staticPreflightV2.artifactDigest' "$FREEZE")" = "$(jq -r '.staticPreflight.artifactDigest' "$REQUEST")"
           test "$(jq -r '.inventoryEvidence.ok' "$FREEZE")" = 'true'
-          test "$(jq -r '.inventoryEvidence.runId' "$FREEZE")" = '29868538689'
           test "$(jq -r '.ok' "$INVENTORY")" = 'true'
           test "$(jq -r '.inventory.validReferences' "$INVENTORY")" = '91'
           test "$(jq -r '.inventory.pendingReferences' "$INVENTORY")" = '2'
 
-      - name: Preflight canónico vinculante
+      - name: Verificar artefacto estático y ausencia de drift funcional
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          REQUEST="$ORBIT360_REQUEST_FILE"
+          STATIC_RUN_ID="$(jq -r '.staticPreflight.runId' "$REQUEST")"
+          STATIC_ARTIFACT_ID="$(jq -r '.staticPreflight.artifactId' "$REQUEST")"
+          STATIC_ARTIFACT_DIGEST="$(jq -r '.staticPreflight.artifactDigest' "$REQUEST")"
+          STATIC_HEAD="$(jq -r '.staticPreflight.executionHead' "$REQUEST")"
+          git cat-file -e "${STATIC_HEAD}^{commit}"
+          git diff --quiet "$STATIC_HEAD" "HEAD^" -- orbit360-platform ':!orbit360-platform/docs/**'
+          META="$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${STATIC_ARTIFACT_ID}")"
+          test "$(printf '%s' "$META" | jq -r '.workflow_run.id')" = "$STATIC_RUN_ID"
+          test "$(printf '%s' "$META" | jq -r '.digest')" = "$STATIC_ARTIFACT_DIGEST"
+          test "$(printf '%s' "$META" | jq -r '.expired')" = 'false'
+          mkdir -p "${RUNNER_TEMP}/static-evidence"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${STATIC_ARTIFACT_ID}/zip" > "${RUNNER_TEMP}/static-evidence.zip"
+          unzip -q "${RUNNER_TEMP}/static-evidence.zip" -d "${RUNNER_TEMP}/static-evidence"
+          FINAL_STATIC="$(find "${RUNNER_TEMP}/static-evidence" -name final-static-preflight-sanitized.json -print -quit)"
+          test -n "$FINAL_STATIC"
+          jq -e --arg head "$STATIC_HEAD" --argjson run "$STATIC_RUN_ID" '.ok == true and .commit == $head and .runId == $run and .executionPhase == "STATIC_PREFLIGHT" and .gateContractStatus == "GO_GATE_CONTRACT" and .visualRemediationStatus == "PASS" and .visualChecks == "29_OF_29" and .architectureStatus == "GO_STATIC_ARCHITECTURE" and .nextAuthorizedPhase == "LAB_HOSTING_DELIVERY_SEPARATE_REQUEST" and .finalGateRerun == false and .writesExecuted == false and .runtimeExecuted == false and .browserExecuted == false and .deployExecuted == false' "$FINAL_STATIC" >/dev/null
+
+      - name: Preflight canónico de fase Hosting LAB
         shell: bash
         run: |
           set -euo pipefail
@@ -87,46 +120,66 @@ jobs:
           node --check tools/orbit360-validar-gate-contracts-engine-v20260717.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'GO_GATE_CONTRACT'
-          test "$(jq -r '.executionPhase' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'STATIC_PREFLIGHT'
+          test "$(jq -r '.executionPhase' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'LAB_HOSTING_DELIVERY'
           test "$(jq -r '.canonicalLifecycleComposition' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'phase-aware-static-authorization-v2'
-          test "$(jq -r '.engineEvidenceSource' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'sync-file-evidence-not-stdout-v1'
-          test "$(jq -r '.engineStdoutParsed' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'false'
+          node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs --local-only
+          test "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
+          test "$(jq -r '.localSyntaxOk' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
 
-      - name: Contrato visual 1.0.37 semántico
+      - name: Resolver identidad LAB para entrega visual
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         shell: bash
         run: |
           set -euo pipefail
-          node --check orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js
-          node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/m1-visual-remediation-sanitized.json
-          jq -e '.status == "PASS" and .contractVersion == "1.0.37" and .validatorSemanticRevision == "responsive-token-set-v1" and .total == 29 and .passed == 29 and .failed == 0 and .runtimeExecuted == false and .browserExecuted == false and .deployExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/m1-visual-remediation-sanitized.json >/dev/null
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab-visual-review.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
 
-      - name: Arquitectura estática
+      - name: Publicar frontend correctivo en canal LAB
         shell: bash
         run: |
           set -euo pipefail
-          node --check orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
-          node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js > orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-sanitized.json
-          jq -e '.status == "GO_STATIC_ARCHITECTURE" and .failed == 0' orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-sanitized.json >/dev/null
+          jq -n --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" --arg gateId "$ORBIT360_GATE_ID" '{schemaVersion:"orbit360-runtime-build-v4-visual-review",commit:$commit,runId:($run|tonumber),gateId:$gateId,deploymentScope:"targeted_lab_frontend_visual_review_only",finalGateRerun:false,hostingOnly:true,deployExecuted:true,writesExecuted:false,browserExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false}' > orbit360-platform/runtime-build.json
+          DEPLOY_JSON="${RUNNER_TEMP}/firebase-lab-preview.json"
+          npx --yes firebase-tools@latest hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --project "$FIREBASE_PROJECT_ID" --expires 30d --non-interactive --json | tee "$DEPLOY_JSON"
+          URL="$(jq -r '.. | strings | select(test("^https://"))' "$DEPLOY_JSON" | grep -E -- "${ORBIT360_HOSTING_CHANNEL}|web\\.app|firebaseapp\\.com" | head -n 1)"
+          test -n "$URL"
+          BUILD_JSON="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/runtime-build.json?visualReview=$GITHUB_RUN_ID")"
+          test "$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty')" = "$GITHUB_SHA"
+          test "$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty')" = "$ORBIT360_GATE_ID"
+          test "$(printf '%s' "$BUILD_JSON" | jq -r '.finalGateRerun')" = 'false'
+          echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
+          jq -n --arg url "$URL" --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-targeted-lab-visual-review-v2",ok:true,url:$url,commit:$commit,runId:($run|tonumber),deploymentScope:"targeted_lab_frontend_visual_review_only",finalGateRerun:false,hostingOnly:true,writesExecuted:false,browserExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/targeted-deploy-sanitized.json
 
-      - name: Cerrar evidencia de preflight estático v2
+      - name: Verificar integridad exacta publicada
         shell: bash
         run: |
           set -euo pipefail
-          REQUEST_ID="$(jq -r '.requestId' "$ORBIT360_REQUEST_FILE")"
-          jq -n --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" --arg requestId "$REQUEST_ID" --arg decisionId "$ORBIT360_METHOD_DECISION_ID" '{schemaVersion:"orbit360-final-block1-static-preflight-v5-semantic",ok:true,commit:$commit,runId:($run|tonumber),requestId:$requestId,methodologicalDecisionId:$decisionId,requestModel:"immutable-request-bound-to-parent-head-and-run-attempt-v1",executionPhase:"STATIC_PREFLIGHT",contractVersion:"1.0.37",gateContractStatus:"GO_GATE_CONTRACT",visualRemediationStatus:"PASS",visualValidatorRevision:"responsive-token-set-v1",visualChecks:"29_OF_29",architectureStatus:"GO_STATIC_ARCHITECTURE",nextAuthorizedPhase:"LAB_HOSTING_DELIVERY_SEPARATE_REQUEST",finalGateRerun:false,writesExecuted:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/final-static-preflight-sanitized.json
+          node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs
+          test "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
+          test "$(jq -r '.exactMatch' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
+          test "$(jq -r '.browserExecuted' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'false'
 
-      - name: Subir evidencia sanitizada
+      - name: Subir evidencia sanitizada de visualización
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-canonical-static-preflight-v2-${{ github.run_id }}
+          name: orbit360-m1-targeted-hosting-visualization-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/m1-visual-remediation-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/final-static-preflight-sanitized.json
-            orbit360-platform/docs/evidence/post-recovery-inventory-29868538689-sanitized.json
-            tools/orbit360-m1-static-preflight-request-v2-20260722.json
+            orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/targeted-deploy-sanitized.json
+            orbit360-platform/runtime-build.json
+            tools/orbit360-m1-hosting-delivery-request-v1-20260722.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -138,6 +191,6 @@ jobs:
         shell: bash
         run: |
           state=success
-          description='Preflight v2 GO; listo para solicitud Hosting LAB'
-          if [ "${{ job.status }}" != success ]; then state=failure; description='Preflight v2 falló; STOP THE LINE'; fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-canonical-static-preflight-v5' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
+          description='Frontend correctivo publicado en Hosting LAB'
+          if [ "${{ job.status }}" != success ]; then state=failure; description='Entrega Hosting LAB falló; STOP THE LINE'; fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-targeted-hosting-visualization-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
