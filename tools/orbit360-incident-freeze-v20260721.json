@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v64-independent-audit-complete",
+  "schemaVersion": "orbit360-incident-freeze-v65-static-preflight-v2-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-control-plane-distributed-state-and-phase-drift-v20260722",
-  "status": "STOP_THE_LINE_INDEPENDENT_AUDIT_COMPLETE_NO_EXECUTION_AUTHORIZED",
+  "status": "CONTROL_PLANE_RECONCILED_STATIC_PREFLIGHT_V2_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -17,6 +17,19 @@
     "VALIDATOR_STALE",
     "PIPELINE_MECHANISM_FAILURE"
   ],
+  "methodologicalDecision": {
+    "id": "paula-20260722-visualization-before-m2",
+    "issuedAt": "2026-07-22",
+    "source": "user_explicit_continuation_request",
+    "visualizationBeforeM2": true,
+    "authorizedPhase": "STATIC_PREFLIGHT",
+    "allowedExecutions": 1,
+    "nextPhaseRequiresSeparateRequest": "LAB_HOSTING_DELIVERY",
+    "finalGateRerunAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "deployAllowed": false
+  },
   "historicalTechnicalEvidence": {
     "gatePassed": true,
     "runId": 29925156385,
@@ -66,19 +79,14 @@
     {
       "runId": 29953485798,
       "classification": "PIPELINE_MECHANISM_FAILURE",
-      "failedCheckIds": [
-        "CANONICAL_PREFLIGHT_ENTRYPOINT"
-      ],
+      "failedCheckIds": ["CANONICAL_PREFLIGHT_ENTRYPOINT"],
       "cause": "engine_stdout_truncated_by_process_exit",
       "productRegression": false
     },
     {
       "runId": 29954997417,
       "classification": "VALIDATOR_STALE",
-      "failedCheckIds": [
-        "WORKFLOW_PROJECT_LOCK",
-        "WORKFLOW_CHANNEL_LOCK"
-      ],
+      "failedCheckIds": ["WORKFLOW_PROJECT_LOCK", "WORKFLOW_CHANNEL_LOCK"],
       "cause": "runtime_hosting_environment_locks_enforced_unconditionally_against_static_preflight_workflow",
       "productRegression": false
     },
@@ -90,9 +98,7 @@
       "preflightChecks": "1366_OF_1366",
       "executionPhase": "STATIC_PREFLIGHT",
       "visualChecks": "28_OF_29",
-      "failedCheckIds": [
-        "ACADEMY_RESPONSIVE"
-      ],
+      "failedCheckIds": ["ACADEMY_RESPONSIVE"],
       "cause": "validator_required_brittle_exact_phrase_with_conjunction_while_academy_contains_all_required_semantic_tokens",
       "productRegression": false
     }
@@ -100,8 +106,8 @@
   "controlPlaneReconciliation": {
     "status": "ROOT_CAUSE_CLOSED_STRUCTURALLY",
     "sameStageFailures": 2,
-    "readyForImmutableRequest": false,
-    "controlPlaneRevision": "phase-capability-immutable-request-v1",
+    "readyForImmutableRequest": true,
+    "controlPlaneRevision": "phase-capability-immutable-request-v2",
     "rootCause": "Gate control was distributed across registry, extension, overlay, lifecycle patch, freeze, mutable authorization, workflow and manually maintained PR text. The registry described runtime/Hosting while the active workflow was static. The engine had unconditional environment checks, so lifecycle token composition could not align semantics.",
     "corrections": [
       "declare execution phase and capabilities in the composed canonical gate contract",
@@ -110,7 +116,8 @@
       "retire Git-tracked active/consumed authorization as an execution mechanism",
       "use one immutable execution request bound to the reconciled parent HEAD and GitHub run attempt 1",
       "keep the final technical gate historical and forbid rerun",
-      "treat GitHub run evidence and PR metadata as live state instead of manually copied HEAD text"
+      "treat GitHub run evidence and PR metadata as live state instead of manually copied HEAD text",
+      "validate Academy responsive requirements as semantic tokens instead of one brittle phrase"
     ],
     "productOwnerChanged": false,
     "dataChanged": false,
@@ -140,6 +147,7 @@
       "checkId": "ACADEMY_RESPONSIVE",
       "oldMechanism": "exact_phrase_match",
       "newMechanism": "semantic_token_set",
+      "validatorSemanticRevision": "responsive-token-set-v1",
       "academyChanged": false,
       "productChanged": false,
       "newRequestCreated": false
@@ -157,7 +165,8 @@
         "ACADEMY_RESPONSIVE validates semantic tokens individually",
         "Academy content contains titles headers tabs actions and Instalar como app"
       ],
-      "newExecutionAuthorized": false,
+      "newExecutionAuthorized": true,
+      "authorizedExecution": "STATIC_PREFLIGHT_V2_ONLY",
       "productChanged": false,
       "dataChanged": false
     }
@@ -193,12 +202,11 @@
     "reimportRequired": false
   },
   "allowedActions": [
-    "document_methodological_decision_without_execution"
+    "create_one_immutable_static_preflight_request_v2_bound_to_current_parent_head"
   ],
   "blockedActions": [
     "edit_consumed_immutable_request",
     "rerun_immutable_request_29961263105",
-    "create_new_static_preflight_request",
     "reuse_consumed_git_authorization",
     "rerun_same_github_run_attempt",
     "run_second_final_gate",
@@ -228,9 +236,9 @@
     "m1TechnicalGate": "HISTORICAL_PASS",
     "m1VisualReview": "FAILED_FUNCTIONAL_DEFECT_REMEDIATED_STATICALLY",
     "m1StaticRemediation": "PASS",
-    "m1BindingPreflight": "CONTROL_PLANE_GO_VISUAL_VALIDATOR_STALE_CORRECTED_WITHOUT_RERUN",
+    "m1BindingPreflight": "STATIC_PREFLIGHT_V2_AUTHORIZED_BEFORE_VISUALIZATION",
     "m1ValidatorLifecycleCorrection": "PHASE_CAPABILITY_MODEL_VERIFIED_1366_OF_1366",
-    "m1PipelineMechanismCorrection": "IMMUTABLE_REQUEST_CONSUMED_RUN_29961263105",
+    "m1PipelineMechanismCorrection": "IMMUTABLE_REQUEST_V2_PENDING",
     "m1Closed": false,
     "gateRerunAuthorized": false,
     "runtimeAuthorized": false,
@@ -239,9 +247,11 @@
     "reimportRequired": false,
     "m1VisualValidatorCorrection": "ACADEMY_RESPONSIVE_SEMANTIC_TOKEN_SET_APPLIED_NO_EXECUTION",
     "m1IndependentNonExecutingAudit": "PASS",
-    "m1NewExecutionAuthorized": false
+    "m1NewExecutionAuthorized": true,
+    "m1AuthorizedExecution": "STATIC_PREFLIGHT_V2_ONLY",
+    "visualizationBeforeM2": true
   },
-  "nextAllowedStep": "No execution is authorized. Preserve STOP THE LINE. The structural control-plane cause is closed and the stale visual validator is corrected, but a future immutable request may be created only after a separate methodological decision explicitly reopens execution based on this completed audit. Do not modify product, data, Store, Auth, importers, runtime, Hosting, Functions, Rules, production or the consumed request.",
+  "nextAllowedStep": "Create exactly one immutable STATIC_PREFLIGHT v2 request bound to the current reconciled parent HEAD. Accept only GO_GATE_CONTRACT, executionPhase STATIC_PREFLIGHT, visual PASS 29/29 with responsive-token-set-v1 and GO_STATIC_ARCHITECTURE. Only after PASS may a separate LAB_HOSTING_DELIVERY request be authorized to publish the corrected frontend for Paula's visual review before M2.",
   "containsPII": false,
   "containsSecrets": false
 }
