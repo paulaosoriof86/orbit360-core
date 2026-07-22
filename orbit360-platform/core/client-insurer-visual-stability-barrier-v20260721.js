@@ -7,8 +7,9 @@
   'use strict';
   window.Orbit = window.Orbit || {};
   var registryContract = { version: '20260721.2' };
+  var CRITICAL_RELEASE = 'block1-critical-runtime-20260721-4';
   var previous = window.Orbit.__clientInsurerVisualStabilityBarrierV20260721;
-  if (previous && previous.version === '20260721.3') return;
+  if (previous && previous.version === '20260721.4') return;
 
   var root = document.documentElement;
   var pendingClass = 'orbit-insurer-knowledge-pending';
@@ -53,11 +54,11 @@
   }
 
   function publish(status, reason, ready, passes) {
-    window.Orbit.__clientInsurerVisualStabilityState = { version: '20260721.3', registryVersion: registryContract.version, status: status, reason: reason || '', activeTab: activeTab(ficha()), directoryReady: directoryReady(directory()), expectedReady: ready === true, passes: passes || 0, knowledgeSettledBeforeVisible: ready === true, canonicalOwnerReapplied: ready === true, eventDriven: true, domMutationGuard: true, directoryStructuralTrigger: true, writesStore: false };
+    window.Orbit.__clientInsurerVisualStabilityState = { version: '20260721.4', registryVersion: registryContract.version, criticalRelease: CRITICAL_RELEASE, status: status, reason: reason || '', activeTab: activeTab(ficha()), directoryReady: directoryReady(directory()), expectedReady: ready === true, passes: passes || 0, knowledgeSettledBeforeVisible: ready === true, canonicalOwnerReapplied: ready === true, eventDriven: true, domMutationGuard: true, directoryStructuralTrigger: true, writesStore: false };
   }
   function markPending(reason) { if (!routeActive()) return; root.classList.add(pendingClass); publish('waiting-stable-dom', reason, false, 0); }
   function enhanceCanonicalOwner() { try { var owner = window.Orbit && window.Orbit.clientInsurerVisualContractV20260720; if (owner && typeof owner.enhance === 'function') owner.enhance(); } catch (error) {} }
-  function releaseStableView(reason, passes) { root.classList.remove(pendingClass); publish('stable', reason, true, passes); try { document.dispatchEvent(new CustomEvent('orbit:aseguradoras:visual-stable', { detail: { version: '20260721.3', registryVersion: registryContract.version, status: 'stable', reason: reason || '', passes: passes || 0 } })); } catch (error) {} }
+  function releaseStableView(reason, passes) { root.classList.remove(pendingClass); publish('stable', reason, true, passes); try { document.dispatchEvent(new CustomEvent('orbit:aseguradoras:visual-stable', { detail: { version: '20260721.4', registryVersion: registryContract.version, criticalRelease: CRITICAL_RELEASE, status: 'stable', reason: reason || '', passes: passes || 0 } })); } catch (error) {} }
 
   function runStablePass(reason) {
     var currentPassId = ++passId, passes = 0; settling = true; markPending(reason);
@@ -106,6 +107,6 @@
   window.addEventListener('orbit:store:emit', function () { if (routeActive() && !expectedReady(ficha())) scheduleStablePass('store-emit'); });
   document.addEventListener('orbit:store', function () { if (routeActive() && !expectedReady(ficha())) scheduleStablePass('store-event'); });
 
-  window.Orbit.__clientInsurerVisualStabilityBarrierV20260721 = { version: '20260721.3', registryVersion: registryContract.version, owner: 'core/router-tenant-config-bootstrap.js', canonicalVisualOwner: 'core/client-insurer-visual-contract-v20260720.js', knowledgeSettledBeforeVisible: true, eventDriven: true, domMutationGuard: true, directoryStructuralTrigger: true, scheduleStablePass: scheduleStablePass, expectedReady: expectedReady, writesStore: false, reimportsData: false, exposesSecrets: false };
+  window.Orbit.__clientInsurerVisualStabilityBarrierV20260721 = { version: '20260721.4', registryVersion: registryContract.version, criticalRelease: CRITICAL_RELEASE, owner: 'core/router-tenant-config-bootstrap.js', canonicalVisualOwner: 'core/client-insurer-visual-contract-v20260720.js', knowledgeSettledBeforeVisible: true, eventDriven: true, domMutationGuard: true, directoryStructuralTrigger: true, scheduleStablePass: scheduleStablePass, expectedReady: expectedReady, writesStore: false, reimportsData: false, exposesSecrets: false };
   scheduleStablePass('bootstrap');
 })();
