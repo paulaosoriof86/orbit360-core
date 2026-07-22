@@ -64,7 +64,9 @@ context.window.OrbitTenantInsurerKnowledgeSummaries = [{
 vm.createContext(context);
 const ownerPath = path.resolve(__dirname, '..', 'modules', 'aseguradoras.js');
 const bridgePath = path.resolve(__dirname, '..', 'modules', 'aseguradoras-v1202-import-bridge.js');
+const runtimeValidatorPath = path.resolve(__dirname, '..', '..', 'tools', 'orbit360-runtime-check-client360-v20260716.mjs');
 const bridgeSource = fs.readFileSync(bridgePath, 'utf8');
+const runtimeValidatorSource = fs.readFileSync(runtimeValidatorPath, 'utf8');
 vm.runInContext(fs.readFileSync(ownerPath, 'utf8'), context);
 
 const moduleApi = context.Orbit.modules.aseguradoras;
@@ -103,6 +105,14 @@ const reasonGuard = bridgeSource.indexOf("if (!reason) return toast('Registra el
 const insertPoint = bridgeSource.indexOf("S().insert('aseguradoras', row)");
 assert(nameGuard >= 0 && countryGuard > nameGuard && reasonGuard > countryGuard && insertPoint > reasonGuard, 'La inserción debe ocurrir solo después de nombre, país y motivo');
 
+assert(runtimeValidatorSource.includes("CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.28'"), 'El validador Cliente 360 debe declarar contrato 1.0.28');
+assert(runtimeValidatorSource.includes("SECURE_CREDENTIAL_VALIDATOR_REVISION = 'insurer-view-password-scope-v1'"), 'Falta revisión de alcance de credenciales');
+assert(runtimeValidatorSource.includes("#asg-ficha input[type=\"password\"], .m1-portal-card input[type=\"password\"]"), 'La validación de contraseñas debe limitarse a Aseguradoras');
+assert(runtimeValidatorSource.includes('passwordInputsInInsurerView'), 'Falta evidencia de contraseñas dentro de la ficha');
+assert(runtimeValidatorSource.includes('hiddenLoginPasswordInputs'), 'Falta evidencia separada del login oculto');
+assert(runtimeValidatorSource.includes('hiddenLoginExcludedFromInsurerScope: true'), 'El contrato debe excluir explícitamente el login oculto');
+assert(!runtimeValidatorSource.includes("document.querySelectorAll('input[type=\"password\"]').length"), 'No se permite volver al conteo global de contraseñas');
+
 const idempotenceTestPath = path.resolve(__dirname, '..', '..', 'tools', 'orbit360-probar-owner-visual-idempotente-v20260721.mjs');
 const visualOwnerPath = path.resolve(__dirname, '..', 'core', 'client-insurer-visual-contract-v20260720.js');
 const barrierPath = path.resolve(__dirname, '..', 'core', 'client-insurer-visual-stability-barrier-v20260721.js');
@@ -120,10 +130,10 @@ assert(Array.isArray(proof.proof.client360StructuralTriggers) && proof.proof.cli
 assert(proof.runtimeExecuted === false && proof.browserExecuted === false && proof.deployExecuted === false, 'La prueba debe ser totalmente estática');
 
 assert(barrierSource.includes("version: '20260721.4'"), 'La barrera debe declarar versión 20260721.4');
-assert(barrierSource.includes("block1-critical-runtime-20260721-4"), 'La barrera debe declarar el release crítico vigente');
+assert(barrierSource.includes('block1-critical-runtime-20260721-4'), 'La barrera debe declarar el release crítico vigente');
 assert(barrierSource.includes("registryContract = { version: '20260721.2' }"), 'La barrera debe conservar la versión pública estable del registro');
 assert(barrierSource.includes("DIRECTORY_VISIBILITY_REVISION = '20260721.4a-first-visible-complete'"), 'Falta revisión de primer directorio visible completo');
-assert(barrierSource.includes("#host .asg-grid{visibility:hidden!important;pointer-events:none!important}"), 'El directorio debe permanecer oculto y no interactivo mientras está pendiente');
+assert(barrierSource.includes('#host .asg-grid{visibility:hidden!important;pointer-events:none!important}'), 'El directorio debe permanecer oculto y no interactivo mientras está pendiente');
 assert(barrierSource.includes('directoryFirstPaintGuard: true'), 'Falta contrato reusable de primer pintado completo');
 assert(barrierSource.includes('function directoryReady(grid)'), 'Falta contrato semántico del directorio');
 assert(barrierSource.includes("node.classList.contains('asg-grid')"), 'Falta disparador estructural .asg-grid');
@@ -146,6 +156,13 @@ console.log(JSON.stringify({
   states: rows.map(item => item.estado),
   safeCreateBeforeInsert: true,
   realButtonSelectorsCovered: true,
+  secureCredentialValidator: {
+    contractVersion: '1.0.28',
+    revision: 'insurer-view-password-scope-v1',
+    passwordScope: '#asg-ficha,.m1-portal-card',
+    hiddenLoginExcluded: true,
+    globalPasswordCountForbidden: true
+  },
   ownerIdempotence: {
     revision: proof.idempotenceRevision,
     checks: proof.totalChecks,
