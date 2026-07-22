@@ -68,7 +68,7 @@ function resultAndExit(status, checks, exitCode, gate = null, overlay = null, me
       ? 'METHODOLOGY_ENFORCEMENT_FAILURE'
       : 'VALIDATOR_STALE';
   const payload = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v9-phase-capability-model',
+    schemaVersion: 'orbit360-gate-contract-preflight-v10-phase-capability-model',
     gateId: requestedGateId,
     contractVersion: gate && gate.contractVersion || '',
     diagnosticRevision: gate && gate.diagnosticRevision || '',
@@ -241,6 +241,17 @@ const staticCapabilityKeys = [
   'rulesDeploy',
   'production'
 ];
+const hostingCapabilityContract = {
+  secrets: true,
+  firestoreRead: false,
+  writes: false,
+  runtime: false,
+  browser: false,
+  deploy: true,
+  functionsDeploy: false,
+  rulesDeploy: false,
+  production: false
+};
 
 check('SCHEMA_VERSION', registry.schemaVersion === 'orbit360-gate-contract-registry-v1', registry.schemaVersion || 'missing');
 check('OVERLAY_PRESENT', Boolean(overlay), selected.rel);
@@ -265,6 +276,13 @@ if (executionPhase === 'STATIC_PREFLIGHT') {
   }
   check('STATIC_PROJECT_LOCK_DISABLED', workflowLocks.firebaseProject === false, JSON.stringify(workflowLocks));
   check('STATIC_CHANNEL_LOCK_DISABLED', workflowLocks.hostingChannel === false, JSON.stringify(workflowLocks));
+}
+if (executionPhase === 'LAB_HOSTING_DELIVERY') {
+  for (const [key, expected] of Object.entries(hostingCapabilityContract)) {
+    check(`HOSTING_CAPABILITY:${key}`, capabilities[key] === expected, `${key}=${String(capabilities[key])};expected=${String(expected)}`);
+  }
+  check('HOSTING_PROJECT_LOCK_ENABLED', workflowLocks.firebaseProject === true, JSON.stringify(workflowLocks));
+  check('HOSTING_CHANNEL_LOCK_ENABLED', workflowLocks.hostingChannel === true, JSON.stringify(workflowLocks));
 }
 
 for (const rel of gate.requiredFiles || []) check(`REQUIRED_FILE:${rel}`, exists(rel), rel);
