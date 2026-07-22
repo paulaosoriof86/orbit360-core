@@ -18,6 +18,7 @@ Orbit.access = (function () {
     gestiones: 'ops', actividades: 'cliente360', parchesPendientes: 'ops',
     correos: 'correo'
   };
+  var SCOPE_LEVEL = { none: 0, own: 1, team: 2, all: 3 };
 
   function clean(v) { return String(v == null ? '' : v).trim(); }
   function norm(v) {
@@ -104,6 +105,30 @@ Orbit.access = (function () {
     if (['ninguno', 'none', 'sinacceso'].indexOf(s) >= 0) return 'none';
     return '';
   }
+  function scopeLevel(scope) {
+    var normalized = normalizeScope(scope);
+    return Object.prototype.hasOwnProperty.call(SCOPE_LEVEL, normalized) ? SCOPE_LEVEL[normalized] : 0;
+  }
+  function roleScopeCeiling(moduleKey) {
+    var role = activeRole();
+    try {
+      var def = Orbit.ROLES && Orbit.ROLES[role];
+      if (def && def.scopes && def.scopes[moduleKey] != null) {
+        var fromRole = normalizeScope(def.scopes[moduleKey]);
+        if (fromRole) return fromRole;
+      }
+    } catch (e) {}
+    if (ALL_ROLES.indexOf(role) >= 0) return 'all';
+    if (TEAM_ROLES.indexOf(role) >= 0) return 'team';
+    if (OWN_ROLES.indexOf(role) >= 0 || /Asesor/i.test(role)) return 'own';
+    return 'none';
+  }
+  function applyRoleScopeCeiling(requestedScope, moduleKey) {
+    var requested = normalizeScope(requestedScope);
+    var ceiling = roleScopeCeiling(moduleKey);
+    if (!requested) return ceiling;
+    return scopeLevel(requested) <= scopeLevel(ceiling) ? requested : ceiling;
+  }
   function explicitScope(moduleKey) {
     var a = actorAdvisor(), src, v;
     if (!a) return '';
@@ -129,19 +154,7 @@ Orbit.access = (function () {
     var a = actorAdvisor();
     if (a && (a.inactivo || a.status === 'blocked' || a.status === 'suspended')) return 'none';
     var ex = normalizeScope(explicitScope(moduleKey));
-    if (ex) return ex;
-    var role = activeRole();
-    try {
-      var def = Orbit.ROLES && Orbit.ROLES[role];
-      if (def && def.scopes && def.scopes[moduleKey]) {
-        var fromRole = normalizeScope(def.scopes[moduleKey]);
-        if (fromRole) return fromRole;
-      }
-    } catch (e) {}
-    if (ALL_ROLES.indexOf(role) >= 0) return 'all';
-    if (TEAM_ROLES.indexOf(role) >= 0) return 'team';
-    if (OWN_ROLES.indexOf(role) >= 0 || /Asesor/i.test(role)) return 'own';
-    return 'none';
+    return applyRoleScopeCeiling(ex, moduleKey);
   }
   function scopeCanon(moduleKey) { return dataScope(moduleKey); }
   function scopeUI(moduleKey) {
@@ -446,13 +459,15 @@ Orbit.access = (function () {
     actorAdvisorId: actorAdvisorId, actorUser: actorUser, actorAdvisor: actorAdvisor, assignedRoles: assignedRoles,
     tenantConfig: tenantConfig, tenantId: tenantId, countryConfig: countryConfig, currencyFor: currencyFor,
     dataScope: dataScope, scopeCanon: scopeCanon, scopeUI: scopeUI,
+    roleScopeCeiling: roleScopeCeiling, applyRoleScopeCeiling: applyRoleScopeCeiling, scopeLevel: scopeLevel,
     recordAdvisorId: recordAdvisorId, teamAdvisorIds: teamAdvisorIds,
     puedeVerModulo: puedeVerModulo, can: can, puedeGestionar: puedeGestionar, esRestringidoCredenciales: esRestringidoCredenciales,
     filtrarPorAsesor: filtrarPorAsesor, canAccessRecord: canAccessRecord, puedeAccederRegistro: puedeAccederRegistro,
     canView: canView, filter: filter,
     missingClientFields: missingClientFields, deriveClientState: deriveClientState,
     duplicateCandidates: duplicateCandidates, prepareManual: prepareManual,
-    audit: audit, correction: correction, scopedStore: scopedStore, withScope: withScope, norm: norm
+    audit: audit, correction: correction, scopedStore: scopedStore, withScope: withScope, norm: norm,
+    __activeRoleScopeCeilingV20260721: true
   };
 })();
 
@@ -461,6 +476,7 @@ Orbit.accessScope = (function () {
   return {
     rolActivo: a.rolActivo, esAsesor: a.esAsesor,
     dataScope: a.scopeUI,
+    roleScopeCeiling: a.roleScopeCeiling,
     puedeVerModulo: a.puedeVerModulo, puedeGestionar: a.puedeGestionar,
     esRestringidoCredenciales: a.esRestringidoCredenciales,
     filtrarPorAsesor: a.filtrarPorAsesor,
