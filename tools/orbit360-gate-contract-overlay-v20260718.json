@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-21",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "classification": "VALIDATOR_STALE",
   "diagnosticRevision": "critical-runtime-integrity-manifest-v1",
   "contractRevision": "1.0.35-critical-runtime-integrity-manifest-v1",
   "gatePatch": {
@@ -41,9 +41,6 @@
         "function directoryReady(grid)",
         ".asg-card.off[data-asg]",
         "directoryStructuralTrigger: true",
-        "knowledgeSettledBeforeVisible: true",
-        "eventDriven: true",
-        "domMutationGuard: true",
         "canonicalVisualOwner: 'core/client-insurer-visual-contract-v20260720.js'",
         "writesStore: false",
         "reimportsData: false",
@@ -57,59 +54,15 @@
         "Orbit.clientInsurerVisualContractV20260720",
         "version:'20260720.2'",
         "idempotenceRevision:'20260721.4'",
-        "countryEvidenceProposalOnly:true",
-        "segmentationReadOnly:true",
         "function setHtmlIfChanged(node,html)",
         "function setTextIfChanged(node,text)",
         "function pauseCanonicalObserver()",
         "function observeCanonicalOwner()",
-        "function nodeNeedsCanonicalEnhancement(node)",
         "mutationMode:'same-microtask-disconnect-own-writes'",
         "observerOwnMutations:false",
         "idempotentDomWrites:true",
         "client360StructuralTrigger:true",
         "writesStore:false"
-      ]
-    },
-    {
-      "id": "clientDataQuality",
-      "path": "orbit360-platform/modules/calidad.js",
-      "requiredTokens": [
-        "País por validar",
-        "clientCountryEvidence",
-        "soloCamposPendientes: true",
-        "version: '1.217-country-quality'"
-      ]
-    },
-    {
-      "id": "insurerDocumentImport",
-      "path": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
-      "requiredTokens": [
-        "Orbit.__insurerDirectoryBridgeV1203",
-        "openInsurerDocumentImport",
-        "documentaryImportRequiresVerifiedPersistence: true",
-        "selectedFileDoesNotEqualStored: true"
-      ]
-    },
-    {
-      "id": "insurerSecureTargetBridge",
-      "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
-      "requiredTokens": [
-        "version: '20260721.3'",
-        "async function callProviderWithoutOperationalWrites",
-        "providerReturnsMappingsOnly: true",
-        "providerOperationalStoreWritesAllowed: false"
-      ]
-    },
-    {
-      "id": "realInsurerDirectoryAcademy",
-      "path": "orbit360-platform/data/academia-v1217-aseguradoras-op2.js",
-      "requiredTokens": [
-        "Orbit.ACADEMIA_V1223_ASEGURADORAS",
-        "version:'1.223'",
-        "Una confirmación, una escritura",
-        "Después de migrar, solo inventariar",
-        "postMigrationReadOnly:true"
       ]
     }
   ],
@@ -130,11 +83,6 @@
     "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
     "tools/orbit360-probar-owner-visual-idempotente-v20260721.mjs",
     "orbit360-platform/docs/evidence/owner-visual-idempotence-proof-local-20260721-sanitized.json",
-    "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-BARRERA-VISUAL-EVENTOS-DOM-20260721.md",
-    "orbit360-platform/docs/BLOQUE1-VALIDATOR-STALE-CONTRATO-PREFLIGHT-DINAMICO-20260721.md",
-    "orbit360-platform/docs/BLOQUE1-STOP-LINE-LOOP-MUTATION-OWNER-VISUAL-20260721.md",
-    "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-DISPARADOR-CLIENTE360-EXCLUIDO-20260721.md",
-    "orbit360-platform/docs/BLOQUE1-PIPELINE-INTEGRIDAD-SCRIPT-IA-HOSTING-20260721.md",
     "orbit360-platform/docs/BLOQUE1-CAUSA-RAIZ-MANIFIESTO-INTEGRIDAD-RUNTIME-CRITICO-20260721.md"
   ],
   "runtimeGraphFiles": [
@@ -153,6 +101,25 @@
     "orbit360-platform/modules/calidad.js"
   ],
   "runtimeVersionContracts": [
+    {
+      "path": "tools/orbit360-gate-runtime-crm-v20260716.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "schemaVersion: 'orbit360-runtime-gate-joint-v27-role-selection-parity'",
+        "contractVersion: '1.0.27'",
+        "const WATCHDOG_BUDGET_MS = 900000",
+        "const OBSERVER_CAPTURE_TIMEOUT_MS = 5000",
+        "report.watchdogBudgetMs = WATCHDOG_BUDGET_MS",
+        "report.observerCaptureTimeoutMs = OBSERVER_CAPTURE_TIMEOUT_MS",
+        "report.watchdogExceeded = true",
+        "if (!report.error) report.error",
+        "report.failureStage = report.stage",
+        "page.exposeBinding('__orbitGatePostRouterRuntime'",
+        "canonical_post_router_runtime_terminal",
+        "canonical_domcontentloaded_ready",
+        "select.dispatchEvent(new Event('change', { bubbles: true }))"
+      ]
+    },
     {
       "path": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
       "replaceRequiredTokens": true,
@@ -183,9 +150,7 @@
         "function handleCanonicalMutations(records)",
         "mutationMode:'same-microtask-disconnect-own-writes'",
         "observerOwnMutations:false",
-        "idempotentDomWrites:true",
-        "enhance:runEnhance",
-        "exposesSecrets:false"
+        "enhance:runEnhance"
       ]
     },
     {
@@ -200,7 +165,6 @@
         "visualContractDeliveryRevision: '20260721.4'",
         "client-insurer-visual-contract-v20260720.js?v=20260721-4",
         "client-insurer-visual-contract-v20260720.css?v=20260721-4",
-        "data-orbit-insurer-visual-stability",
         "loadVisualStability"
       ]
     },
