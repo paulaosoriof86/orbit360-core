@@ -2,12 +2,12 @@
    Owner de carga: core/router-tenant-config-bootstrap.js.
    No renderiza, no escribe store y no sustituye módulos.
    Mantiene oculta la ficha durante cualquier transición que pueda reemplazar
-   el DOM canónico y solo la libera cuando el contrato visual ya está completo. */
+   el DOM canónico y solo libera la vista cuando el contrato visual está completo. */
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
   var previous = window.Orbit.__clientInsurerVisualStabilityBarrierV20260721;
-  if (previous && previous.version === '20260721.2') return;
+  if (previous && previous.version === '20260721.3') return;
 
   var root = document.documentElement;
   var pendingClass = 'orbit-insurer-knowledge-pending';
@@ -31,6 +31,10 @@
     return document.getElementById('asg-ficha');
   }
 
+  function directory() {
+    return document.querySelector('#host .asg-grid');
+  }
+
   function activeTab(view) {
     var tab = view && view.querySelector('.asg-tab.on[data-tab],.asg-tab.active[data-tab]');
     return tab && String(tab.getAttribute('data-tab') || '').trim() || '';
@@ -40,9 +44,20 @@
     return view ? view.querySelectorAll(selector).length : 0;
   }
 
+  function directoryReady(grid) {
+    if (!grid) return false;
+    var inactive = grid.querySelectorAll('.asg-card.off[data-asg]');
+    if (!inactive.length) return true;
+    return Array.prototype.every.call(inactive, function (card) {
+      var reason = card.querySelector('.m1-inactive-reason');
+      return Boolean(reason && /Inactiva:/i.test(String(reason.textContent || '')));
+    });
+  }
+
   function expectedReady(view) {
     if (!routeActive()) return true;
-    if (!view || !view.classList.contains('m1-asg-ficha')) return false;
+    if (!view) return directoryReady(directory());
+    if (!view.classList.contains('m1-asg-ficha')) return false;
     var tab = activeTab(view);
     if (tab === 'contactos') {
       var contactRows = count(view, '#af-contactos .asg-row[data-cont]');
@@ -64,16 +79,18 @@
 
   function publish(status, reason, ready, passes) {
     window.Orbit.__clientInsurerVisualStabilityState = {
-      version: '20260721.2',
+      version: '20260721.3',
       status: status,
       reason: reason || '',
       activeTab: activeTab(ficha()),
+      directoryReady: directoryReady(directory()),
       expectedReady: ready === true,
       passes: passes || 0,
       knowledgeSettledBeforeVisible: ready === true,
       canonicalOwnerReapplied: ready === true,
       eventDriven: true,
       domMutationGuard: true,
+      directoryStructuralTrigger: true,
       writesStore: false
     };
   }
@@ -96,7 +113,7 @@
     publish('stable', reason, true, passes);
     try {
       document.dispatchEvent(new CustomEvent('orbit:aseguradoras:visual-stable', {
-        detail: { version: '20260721.2', status: 'stable', reason: reason || '', passes: passes || 0 }
+        detail: { version: '20260721.3', status: 'stable', reason: reason || '', passes: passes || 0 }
       }));
     } catch (error) {}
   }
@@ -154,20 +171,29 @@
     }, 0);
   }
 
-  function touchesFicha(records) {
+  function touchesAseguradoras(records) {
     return Array.prototype.some.call(records || [], function (record) {
       var target = record.target;
-      if (target && target.nodeType === 1 && (target.id === 'asg-ficha' || target.closest && target.closest('#asg-ficha'))) return true;
+      if (target && target.nodeType === 1 && (
+        target.id === 'asg-ficha' ||
+        target.classList && target.classList.contains('asg-grid') ||
+        target.closest && target.closest('#asg-ficha,.asg-grid')
+      )) return true;
       return Array.prototype.some.call(record.addedNodes || [], function (node) {
-        return node && node.nodeType === 1 && (node.id === 'asg-ficha' || node.querySelector && node.querySelector('#asg-ficha'));
+        return node && node.nodeType === 1 && (
+          node.id === 'asg-ficha' ||
+          node.classList && node.classList.contains('asg-grid') ||
+          node.matches && node.matches('.asg-card.off[data-asg]') ||
+          node.querySelector && node.querySelector('#asg-ficha,.asg-grid,.asg-card.off[data-asg]')
+        );
       });
     });
   }
 
   if (window.MutationObserver) {
     new MutationObserver(function (records) {
-      if (!routeActive() || settling || !touchesFicha(records)) return;
-      if (!expectedReady(ficha())) scheduleStablePass('ficha-dom-replaced');
+      if (!routeActive() || settling || !touchesAseguradoras(records)) return;
+      if (!expectedReady(ficha())) scheduleStablePass(ficha() ? 'ficha-dom-replaced' : 'directory-dom-replaced');
     }).observe(document.documentElement, { childList: true, subtree: true });
   }
 
@@ -191,12 +217,13 @@
   });
 
   window.Orbit.__clientInsurerVisualStabilityBarrierV20260721 = {
-    version: '20260721.2',
+    version: '20260721.3',
     owner: 'core/router-tenant-config-bootstrap.js',
     canonicalVisualOwner: 'core/client-insurer-visual-contract-v20260720.js',
     knowledgeSettledBeforeVisible: true,
     eventDriven: true,
     domMutationGuard: true,
+    directoryStructuralTrigger: true,
     scheduleStablePass: scheduleStablePass,
     expectedReady: expectedReady,
     writesStore: false,
