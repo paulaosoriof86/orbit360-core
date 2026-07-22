@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "orbit360-critical-runtime-integrity-manifest-v1",
+  "issuedAt": "2026-07-21",
+  "releaseId": "block1-critical-runtime-20260721-4",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.35",
+  "assets": [
+    {
+      "id": "index",
+      "localPath": "orbit360-platform/index.html",
+      "publicPath": "/index.html",
+      "kind": "html",
+      "syntaxRequired": false,
+      "ownerClosureRequired": false
+    },
+    {
+      "id": "routerTenantBootstrap",
+      "localPath": "orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "publicPath": "/core/router-tenant-config-bootstrap.js",
+      "kind": "script",
+      "syntaxRequired": true,
+      "ownerClosureRequired": true
+    },
+    {
+      "id": "clientInsurerVisualStabilityBarrier",
+      "localPath": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
+      "publicPath": "/core/client-insurer-visual-stability-barrier-v20260721.js",
+      "kind": "script",
+      "syntaxRequired": true,
+      "ownerClosureRequired": true
+    },
+    {
+      "id": "clientInsurerVisualContract",
+      "localPath": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+      "publicPath": "/core/client-insurer-visual-contract-v20260720.js",
+      "kind": "script",
+      "syntaxRequired": true,
+      "ownerClosureRequired": true
+    },
+    {
+      "id": "clientInsurerVisualStyle",
+      "localPath": "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
+      "publicPath": "/styles/client-insurer-visual-contract-v20260720.css",
+      "kind": "css",
+      "syntaxRequired": false,
+      "ownerClosureRequired": false
+    },
+    {
+      "id": "pwaOwner",
+      "localPath": "orbit360-platform/core/pwa.js",
+      "publicPath": "/core/pwa.js",
+      "kind": "script",
+      "syntaxRequired": true,
+      "ownerClosureRequired": true
+    },
+    {
+      "id": "serviceWorker",
+      "localPath": "orbit360-platform/sw.js",
+      "publicPath": "/sw.js",
+      "kind": "script",
+      "syntaxRequired": true,
+      "ownerClosureRequired": false
+    },
+    {
+      "id": "previewBootstrap",
+      "localPath": "orbit360-platform/ays-lab-preview.html",
+      "publicPath": "/ays-lab-preview.html",
+      "kind": "html",
+      "syntaxRequired": false,
+      "ownerClosureRequired": false
+    },
+    {
+      "id": "iaModule",
+      "localPath": "orbit360-platform/modules/ia.js",
+      "publicPath": "/modules/ia.js",
+      "kind": "script",
+      "syntaxRequired": true,
+      "ownerClosureRequired": true
+    }
+  ],
+  "acceptance": {
+    "allLocalFilesPresent": true,
+    "allRequiredScriptsSyntaxOk": true,
+    "allRemoteBytesAndSha256Exact": true,
+    "browserAllowedOnlyAfterExactMatch": true
+  },
+  "writesExecuted": false,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "deployExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
