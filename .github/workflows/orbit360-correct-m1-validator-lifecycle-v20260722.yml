@@ -1,0 +1,27 @@
+name: Orbit 360 · Correct M1 validator lifecycle 1.0.38
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-correct-m1-validator-lifecycle-v20260722.yml'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-correct-m1-validator-lifecycle-v20260722
+  cancel-in-progress: false
+jobs:
+  correct:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/ays/backend-tenant-lab-v99-20260703'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Correct validator lifecycle and retire mechanism
+        run: node tools/orbit360-correct-m1-validator-lifecycle-v20260722.mjs
