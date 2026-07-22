@@ -105,13 +105,21 @@ const reasonGuard = bridgeSource.indexOf("if (!reason) return toast('Registra el
 const insertPoint = bridgeSource.indexOf("S().insert('aseguradoras', row)");
 assert(nameGuard >= 0 && countryGuard > nameGuard && reasonGuard > countryGuard && insertPoint > reasonGuard, 'La inserción debe ocurrir solo después de nombre, país y motivo');
 
-assert(runtimeValidatorSource.includes("CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.28'"), 'El validador Cliente 360 debe declarar contrato 1.0.28');
+assert(runtimeValidatorSource.includes("CLIENT360_VALIDATOR_CONTRACT_VERSION = '1.0.29'"), 'El validador Cliente 360 debe declarar contrato 1.0.29');
 assert(runtimeValidatorSource.includes("SECURE_CREDENTIAL_VALIDATOR_REVISION = 'insurer-view-password-scope-v1'"), 'Falta revisión de alcance de credenciales');
+assert(runtimeValidatorSource.includes("DOCUMENT_IMPORT_VALIDATOR_REVISION = 'role-permission-aware-v1'"), 'Falta revisión role-aware del importador documental');
 assert(runtimeValidatorSource.includes("#asg-ficha input[type=\"password\"], .m1-portal-card input[type=\"password\"]"), 'La validación de contraseñas debe limitarse a Aseguradoras');
 assert(runtimeValidatorSource.includes('passwordInputsInInsurerView'), 'Falta evidencia de contraseñas dentro de la ficha');
 assert(runtimeValidatorSource.includes('hiddenLoginPasswordInputs'), 'Falta evidencia separada del login oculto');
 assert(runtimeValidatorSource.includes('hiddenLoginExcludedFromInsurerScope: true'), 'El contrato debe excluir explícitamente el login oculto');
 assert(!runtimeValidatorSource.includes("document.querySelectorAll('input[type=\"password\"]').length"), 'No se permite volver al conteo global de contraseñas');
+assert(runtimeValidatorSource.includes('async function readDocumentImportPermission(page)'), 'Falta lectura canónica de permiso documental');
+assert(runtimeValidatorSource.includes('effectiveCanManage'), 'Falta resolución del permiso efectivo del importador');
+assert(runtimeValidatorSource.includes("permissionMode: 'authorized-honest-proposal'"), 'Falta evidencia del flujo autorizado');
+assert(runtimeValidatorSource.includes("permissionMode: 'denied-by-active-permission'"), 'Falta evidencia del flujo restringido');
+assert(runtimeValidatorSource.includes('RESTRICTED_ROLE_DOCUMENT_IMPORT_MODAL_VISIBLE'), 'Falta bloqueo de modal para rol restringido');
+assert(runtimeValidatorSource.includes('RESTRICTED_ROLE_DOCUMENT_IMPORT_WROTE_DATA'), 'Falta control de cero escritura para rol restringido');
+assert(runtimeValidatorSource.includes('ADVISOR_DOCUMENT_IMPORT_PERMISSION_LEAK'), 'Falta control explícito del Asesor');
 
 const idempotenceTestPath = path.resolve(__dirname, '..', '..', 'tools', 'orbit360-probar-owner-visual-idempotente-v20260721.mjs');
 const visualOwnerPath = path.resolve(__dirname, '..', 'core', 'client-insurer-visual-contract-v20260720.js');
@@ -157,11 +165,18 @@ console.log(JSON.stringify({
   safeCreateBeforeInsert: true,
   realButtonSelectorsCovered: true,
   secureCredentialValidator: {
-    contractVersion: '1.0.28',
+    contractVersion: '1.0.29',
     revision: 'insurer-view-password-scope-v1',
     passwordScope: '#asg-ficha,.m1-portal-card',
     hiddenLoginExcluded: true,
     globalPasswordCountForbidden: true
+  },
+  documentImportValidator: {
+    revision: 'role-permission-aware-v1',
+    directionAuthorizedFlowRequired: true,
+    restrictedRoleNoModalRequired: true,
+    restrictedRoleNoWriteRequired: true,
+    advisorPermissionLeakForbidden: true
   },
   ownerIdempotence: {
     revision: proof.idempotenceRevision,
