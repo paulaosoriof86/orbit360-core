@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v54-visual-review-failed-functional-defect",
+  "schemaVersion": "orbit360-incident-freeze-v55-static-visual-remediation-passed-preflight-pending",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-visual-review-semantic-and-responsive-defects-v20260722",
-  "status": "STOP_THE_LINE_VISUAL_REVIEW_FAILED_FUNCTIONAL_DEFECT",
+  "status": "STATIC_VISUAL_REMEDIATION_PASSED_SINGLE_USE_PREFLIGHT_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -61,6 +61,23 @@
     "vaultFailure": false,
     "reimportRequired": false
   },
+  "staticRemediationEvidence": {
+    "status": "PASS",
+    "effectiveContractVersion": "1.0.37",
+    "visualRevision": "20260722.1",
+    "appliedCommit": "84c6d4e3e2f60d2273056619bc1ab4f53b6ec9e3",
+    "proofPath": "orbit360-platform/docs/evidence/m1-visual-remediation-static-proof-20260722-sanitized.json",
+    "dedicatedChecksPassed": 29,
+    "dedicatedChecksFailed": 0,
+    "architectureStatus": "GO_STATIC_ARCHITECTURE",
+    "writesExecuted": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "temporaryWorkflowRetired": true,
+    "temporaryScriptRetired": true,
+    "temporaryPayloadRetired": true
+  },
   "preservedInventory": {
     "clients": 414,
     "insurers": 26,
@@ -73,10 +90,10 @@
     "rawProtectedValuesInStore": 0
   },
   "allowedActions": [
-    "static_visual_owner_remediation_only"
+    "prepare_single_use_static_preflight_authorization_1_0_37",
+    "run_single_use_static_preflight_1_0_37_after_authorization"
   ],
   "blockedActions": [
-    "run_second_static_preflight",
     "run_second_final_gate",
     "run_runtime",
     "open_browser",
@@ -96,24 +113,23 @@
     "merge_main",
     "create_parallel_gate"
   ],
-  "requiredStaticClosure": {
-    "effectiveContractVersion": "1.0.37",
-    "visualRevision": "20260722.1",
-    "files": [
-      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
-      "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
-      "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
-      "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
-      "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
-      "tools/orbit360-gate-contract-overlay-v20260718.json",
-      "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json"
-    ],
-    "acceptance": "STATIC_VALIDATOR_PASS_WITH_ZERO_WRITES_RUNTIME_BROWSER_DEPLOY"
+  "preflightBoundary": {
+    "contractVersion": "1.0.37",
+    "allowedExecutions": 1,
+    "secretsAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "firestoreReadAllowed": false,
+    "writesAllowed": false,
+    "deployAllowed": false,
+    "acceptance": "GO_GATE_CONTRACT_AND_GO_STATIC_ARCHITECTURE_AND_M1_VISUAL_REMEDIATION_PASS_ONLY"
   },
   "stateClarification": {
     "m1DataRecovery": "CLOSED",
     "m1TechnicalGate": "HISTORICAL_PASS",
-    "m1VisualReview": "FAILED_FUNCTIONAL_DEFECT",
+    "m1VisualReview": "FAILED_FUNCTIONAL_DEFECT_REMEDIATED_STATICALLY",
+    "m1StaticRemediation": "PASS",
+    "m1BindingPreflight": "PENDING_SINGLE_USE_AUTHORIZATION",
     "m1Closed": false,
     "gateRerunAuthorized": false,
     "runtimeAuthorized": false,
@@ -121,7 +137,7 @@
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Apply and validate only the atomic visual owner remediation under contract 1.0.37. Keep the official gate, runtime, browser and deploy frozen until a separate one-use static-preflight authorization is created after the local static contract passes.",
+  "nextAllowedStep": "Create and consume one separate single-use authorization for the binding static preflight of contract 1.0.37. The authorization must allow no secrets, runtime, browser, Firestore read, writes or deploy. Do not rerun the final gate.",
   "containsPII": false,
   "containsSecrets": false
 }
