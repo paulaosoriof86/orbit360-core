@@ -1,16 +1,20 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v34-critical-runtime-integrity-static-preflight-r2",
+  "schemaVersion": "orbit360-incident-freeze-v35-stop-line-owner-registry-reconciliation",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-21",
   "incidentId": "insurer-directory-protected-reference-regression-v20260721",
-  "status": "FINAL_BLOCK1_STATIC_PREFLIGHT_AUTHORIZED",
+  "status": "STOP_THE_LINE_PREFLIGHT_OWNER_REGISTRY_RECONCILIATION_REQUIRED",
+  "blockedGateIds": [
+    "block1-client360-insurers-lab-v20260717"
+  ],
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "controlIssue": 7,
   "tenantId": "alianzas-soluciones",
   "classification": [
-    "VALIDATOR_STALE"
+    "VALIDATOR_STALE",
+    "PIPELINE_MECHANISM_FAILURE"
   ],
   "inventoryEvidence": {
     "ok": true,
@@ -26,63 +30,84 @@
     "writesExecuted": false,
     "deployExecuted": false
   },
-  "repeatedRuntimeEvidence": {
-    "firstRunId": 29878410649,
-    "latestRunId": 29880654490,
+  "runtimeEvidence": {
+    "firstFailedRunId": 29878410649,
+    "latestFailedRunId": 29880654490,
     "latestArtifactId": 8514643781,
     "latestArtifactDigest": "sha256:abf9993db867297046559b5396a81f450df388f1e039a175af0dafa862704550",
     "errorCode": "INSURER_INACTIVE_REASON_MISSING",
     "sameErrorRepeatedAfterLocalFix": true,
-    "runtimeReceivedNewBarrierProven": false
+    "runtimeReceivedNewBarrierProven": false,
+    "writesExecuted": false,
+    "productionTouched": false
   },
-  "failedStaticPreflightEvidence": {
-    "runId": 29881901498,
-    "artifactId": 8515080227,
-    "artifactDigest": "sha256:2833e2a425269376fd48eb938234b3a0c279f4ea4e943e94351b91c20f30e385",
-    "head": "009d7c29401af67194e7331f104e6b7942111fce",
-    "contractVersion": "1.0.35",
-    "status": "VALIDATOR_STALE",
-    "totalChecks": 1126,
-    "passedChecks": 1120,
-    "failedChecks": 6,
-    "cause": "base_runtime_gate_contract_still_required_1_0_25_and_compact_literal_tokens_not_present_in_current_executor",
-    "productChangedAfterFailure": false,
-    "validatorOverlayChanged": true
-  },
+  "staticPreflightEvidence": [
+    {
+      "runId": 29881901498,
+      "artifactId": 8515080227,
+      "artifactDigest": "sha256:2833e2a425269376fd48eb938234b3a0c279f4ea4e943e94351b91c20f30e385",
+      "head": "009d7c29401af67194e7331f104e6b7942111fce",
+      "contractVersion": "1.0.35",
+      "status": "VALIDATOR_STALE",
+      "totalChecks": 1126,
+      "passedChecks": 1120,
+      "failedChecks": 6,
+      "cause": "stale_base_runtime_gate_token_contract"
+    },
+    {
+      "runId": 29882121307,
+      "artifactId": 8515159061,
+      "artifactDigest": "sha256:c6e4c3ce786ed79f482a5a5ea59eb9ce3d5b08f2cfacdcfe0c64f5217ca5e56f",
+      "head": "9ea4d719fb7986d462aec9bb0c6ced4cb38e29bc",
+      "contractVersion": "1.0.35",
+      "status": "VALIDATOR_STALE",
+      "totalChecks": 1102,
+      "passedChecks": 1099,
+      "failedChecks": 3,
+      "failedCheckIds": [
+        "OWNER_TOKEN:insurerSecureTargetBridge:version: '20260720.1'",
+        "OWNER_TOKEN:insurerSecureTargetBridge:noProtectedValueAccess: true",
+        "OWNER_TOKEN:realInsurerDirectoryAcademy:version:'1.221'"
+      ],
+      "cause": "overlay_1_0_35_omitted_two_existing_owner_overrides"
+    }
+  ],
   "confirmedRootCause": {
     "classification": "VALIDATOR_STALE",
-    "cause": "runtime_version_contract_for_tools_orbit360_gate_runtime_crm_v20260716_mjs_was_not_replaced_by_overlay_1_0_35",
-    "pipelineManifestInvalid": false,
+    "contributingClassification": "PIPELINE_MECHANISM_FAILURE",
+    "cause": "simplified_overlay_1_0_35_replaced_runtime_contract_but_dropped_effective_overrides_for_insurerSecureTargetBridge_and_realInsurerDirectoryAcademy",
+    "sameStageFailedTwice": true,
     "productInvalid": false,
+    "criticalManifestInvalid": false,
     "dataCause": false,
-    "environmentCause": false
+    "environmentCause": false,
+    "securityCause": false
   },
-  "implementedFix": {
-    "status": "VALIDATOR_OVERLAY_UPDATED_PENDING_STATIC_PREFLIGHT",
+  "implementedProductState": {
     "contractVersion": "1.0.35",
-    "diagnosticRevision": "critical-runtime-integrity-manifest-v1",
     "criticalRelease": "block1-critical-runtime-20260721-4",
-    "runtimeGateContractReplaced": true,
-    "runtimeGateInternalContract": "1.0.27",
-    "watchdogBudgetMs": 900000,
-    "observerCaptureTimeoutMs": 5000,
-    "integrityManifest": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+    "criticalAssetManifest": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
     "criticalAssetCount": 9,
-    "writesStore": false,
-    "reimportsData": false,
-    "exposesSecrets": false,
-    "productionTouched": false
+    "multiAssetIntegrityTool": true,
+    "barrierVersion": "20260721.4",
+    "routerDeliveryRevision": "20260721.4",
+    "pwaBuild": "20260721-4",
+    "serviceWorkerBuild": "20260721-4",
+    "academyContentVersion": "1.225",
+    "ownerIdempotenceChecks": 27,
+    "baseMutations": 1,
+    "canonicalTransforms": 1,
+    "followUpObserverDeliveries": 0,
+    "runtimeValidationPending": true,
+    "productFixInvalidated": false
   },
   "staticPreflightAuthorization": {
     "authorizationId": "final-block1-static-preflight-v1",
     "authorizationRevision": 11,
-    "active": true,
-    "consumed": false,
-    "allowedExecutions": 1,
-    "action": "final_block1_static_preflight_only",
-    "gateId": "block1-client360-insurers-lab-v20260717",
-    "contractVersion": "1.0.35",
-    "diagnosticRevision": "critical-runtime-integrity-manifest-v1",
+    "active": false,
+    "consumed": true,
+    "lastRunId": 29882121307,
+    "allowedExecutions": 0,
     "secretsAllowed": false,
     "runtimeAllowed": false,
     "browserAllowed": false,
@@ -90,21 +115,24 @@
     "vaultReadAllowed": false,
     "writesAllowed": false,
     "deployAllowed": false,
-    "productionAllowed": false,
-    "acceptance": "GO_GATE_CONTRACT_AND_STATIC_OK_TRUE_ONLY"
+    "productionAllowed": false
   },
   "finalGateAuthorization": {
     "authorizationId": "final-block1-targeted-lab-deploy-gate-v1",
     "active": false,
     "consumed": true,
     "lastRunId": 29880654490,
+    "allowedExecutions": 0,
     "writesAllowed": false,
     "deployAllowed": false,
     "productionAllowed": false
   },
   "blockedActions": [
+    "third_static_preflight",
     "repeat_failed_targeted_gate_29878410649",
     "repeat_failed_targeted_gate_29880654490",
+    "patch_product_or_visual_owner",
+    "patch_another_validator_without_effective_owner_reconciliation",
     "read_secrets",
     "open_browser",
     "read_firestore",
@@ -123,7 +151,10 @@
     "create_parallel_gate"
   ],
   "allowedActions": [
-    "execute_exactly_one_static_preflight_for_contract_1_0_35_after_validator_overlay_fix"
+    "read_only_compare_base_registry_extensions_and_overlays",
+    "build_effective_owner_reconciliation_table_without_changing_files",
+    "design_single_atomic_registry_overlay_fix_for_future_separate_authorization",
+    "update_documentation_only"
   ],
   "stateClarification": {
     "m1DataRecovery": "CLOSED",
@@ -135,13 +166,13 @@
     "colombia": "INTACT",
     "reimportRequired": false,
     "selfMutationLoop": "RESOLVED",
-    "criticalRuntimeIntegrity": "IMPLEMENTED_PENDING_STATIC_PREFLIGHT",
+    "criticalRuntimeIntegrity": "IMPLEMENTED_NOT_YET_STATICALLY_EXECUTED_BEYOND_PREFLIGHT",
     "targetedLabDeployAuthorized": false,
     "finalGateAuthorized": false,
     "productionTouched": false,
     "m1Closed": false
   },
-  "nextAllowedStep": "Execute exactly one static preflight for contract 1.0.35 after replacing only the stale runtime gate token contract. No secrets, Firestore, vault, deploy or browser.",
+  "nextAllowedStep": "Without modifying files or executing workflows, reconcile effective owners across base registry, extensions and overlays; prove that all existing overrides are preserved; prepare one atomic future registry/overlay correction and request separate authorization.",
   "containsPII": false,
   "containsSecrets": false
 }
