@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v8",
+  "schemaVersion": "orbit360-final-block1-static-preflight-authorization-v9",
   "issuedAt": "2026-07-21",
   "authorizationId": "final-block1-static-preflight-v1",
-  "authorizationRevision": 8,
+  "authorizationRevision": 9,
   "action": "final_block1_static_preflight_only",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -50,7 +50,8 @@
   },
   "implementedFix": {
     "barrier": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
-    "barrierVersion": "20260721.3",
+    "registryVersion": "20260721.2",
+    "directoryStructuralRevision": "20260721.3",
     "canonicalOwner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "directoryStructuralTrigger": true,
     "inactiveReasonRequired": true,
@@ -64,6 +65,8 @@
   "expected": {
     "contractVersion": "1.0.34",
     "preflightStatus": "GO_GATE_CONTRACT",
+    "registryVersion": "20260721.2",
+    "directoryStructuralRevision": "20260721.3",
     "ownerIdempotenceChecks": 27,
     "baseMutations": 1,
     "canonicalTransforms": 1,
