@@ -5,20 +5,22 @@ on:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - 'tools/orbit360-authorize-final-block1-gate-readonly-v20260721.json'
+      - 'tools/orbit360-m1-static-preflight-request-v20260722.json'
 
 permissions:
   contents: read
   statuses: write
 
 concurrency:
-  group: orbit360-final-block1-static-preflight-v3
+  group: orbit360-final-block1-static-preflight-v4
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_STATIC_PREFLIGHT_AUTHORIZATION_ID: final-block1-static-preflight-1-0-37-v3
+  ORBIT360_GATE_PHASE: static_preflight
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-static-preflight-request-v20260722.json
+  ORBIT360_REQUEST_MODEL: immutable-request-bound-to-parent-head-and-run-attempt-v1
   ORBIT360_FINAL_GATE_POLICY: no_final_gate_rerun
 
 jobs:
@@ -31,39 +33,41 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 0
+          fetch-depth: 2
 
       - name: Preparar Node 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Validar autorización e inventario sin credenciales
+      - name: Validar solicitud inmutable e inventario sin credenciales
         shell: bash
         run: |
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "$ORBIT360_BRANCH"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          MARKER='tools/orbit360-authorize-final-block1-gate-readonly-v20260721.json'
+          test "${GITHUB_RUN_ATTEMPT}" = '1'
+          REQUEST="$ORBIT360_REQUEST_FILE"
           FREEZE='tools/orbit360-incident-freeze-v20260721.json'
           INVENTORY='orbit360-platform/docs/evidence/post-recovery-inventory-29868538689-sanitized.json'
-          test -f "$MARKER" && test -f "$FREEZE" && test -f "$INVENTORY"
-          test "$(jq -r '.action' "$MARKER")" = 'final_block1_static_preflight_1_0_37_lifecycle_v2_only'
-          test "$(jq -r '.authorizationId' "$MARKER")" = "$ORBIT360_STATIC_PREFLIGHT_AUTHORIZATION_ID"
-          test "$(jq -r '.active' "$MARKER")" = 'true'
-          test "$(jq -r '.consumed' "$MARKER")" = 'false'
-          test "$(jq -r '.allowedExecutions' "$MARKER")" = '1'
-          test "$(jq -r '.runtimeAllowed' "$MARKER")" = 'false'
-          test "$(jq -r '.browserAllowed' "$MARKER")" = 'false'
-          test "$(jq -r '.firestoreReadAllowed' "$MARKER")" = 'false'
-          test "$(jq -r '.vaultReadAllowed' "$MARKER")" = 'false'
-          test "$(jq -r '.secretsAllowed' "$MARKER")" = 'false'
-          test "$(jq -r '.writesAllowed' "$MARKER")" = 'false'
-          test "$(jq -r '.deployAllowed' "$MARKER")" = 'false'
-          test "$(jq -r '.finalGateRerunAllowed' "$MARKER")" = 'false'
-          test "$(jq -r '.status' "$FREEZE")" = 'FINAL_BLOCK1_STATIC_PREFLIGHT_AUTHORIZED'
-          test "$(jq -r '.staticPreflightAuthorization.authorizationId' "$FREEZE")" = "$ORBIT360_STATIC_PREFLIGHT_AUTHORIZATION_ID"
-          test "$(jq -r '.staticPreflightAuthorization.active' "$FREEZE")" = 'true'
+          test -f "$REQUEST" && test -f "$FREEZE" && test -f "$INVENTORY"
+          test "$(jq -r '.schemaVersion' "$REQUEST")" = 'orbit360-gate-execution-request-v1'
+          test "$(jq -r '.requestModel' "$REQUEST")" = "$ORBIT360_REQUEST_MODEL"
+          test "$(jq -r '.gateId' "$REQUEST")" = "$ORBIT360_GATE_ID"
+          test "$(jq -r '.phase' "$REQUEST")" = 'STATIC_PREFLIGHT'
+          test "$(jq -r '.allowedExecutions' "$REQUEST")" = '1'
+          test "$(jq -r '.parentHead' "$REQUEST")" = "$(git rev-parse HEAD^)"
+          test "$(jq -r '.finalGateRerunAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.runtimeAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.browserAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.firestoreReadAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.vaultReadAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.secretsAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.writesAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.deployAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.status' "$FREEZE")" = 'CONTROL_PLANE_RECONCILED_STATIC_PREFLIGHT_PENDING'
+          test "$(jq -r '.controlPlaneReconciliation.readyForImmutableRequest' "$FREEZE")" = 'true'
+          test "$(jq -r '.controlPlaneReconciliation.sameStageFailures' "$FREEZE")" = '2'
           test "$(jq -r '.inventoryEvidence.ok' "$FREEZE")" = 'true'
           test "$(jq -r '.inventoryEvidence.runId' "$FREEZE")" = '29868538689'
           test "$(jq -r '.ok' "$INVENTORY")" = 'true'
@@ -78,6 +82,7 @@ jobs:
           node --check tools/orbit360-validar-gate-contracts-engine-v20260717.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'GO_GATE_CONTRACT'
+          test "$(jq -r '.executionPhase' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'STATIC_PREFLIGHT'
           test "$(jq -r '.canonicalLifecycleComposition' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'phase-aware-static-authorization-v2'
           test "$(jq -r '.engineEvidenceSource' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'sync-file-evidence-not-stdout-v1'
           test "$(jq -r '.engineStdoutParsed' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'false'
@@ -102,7 +107,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          jq -n --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-final-block1-static-preflight-v3-canonical",ok:true,commit:$commit,runId:($run|tonumber),contractVersion:"1.0.37",gateContractStatus:"GO_GATE_CONTRACT",visualRemediationStatus:"PASS",visualChecks:"29_OF_29",architectureStatus:"GO_STATIC_ARCHITECTURE",engineEvidenceSource:"sync-file-evidence-not-stdout-v1",finalGateRerun:false,writesExecuted:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/final-static-preflight-sanitized.json
+          REQUEST_ID="$(jq -r '.requestId' "$ORBIT360_REQUEST_FILE")"
+          jq -n --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" --arg requestId "$REQUEST_ID" '{schemaVersion:"orbit360-final-block1-static-preflight-v4-phase-capability",ok:true,commit:$commit,runId:($run|tonumber),requestId:$requestId,requestModel:"immutable-request-bound-to-parent-head-and-run-attempt-v1",executionPhase:"STATIC_PREFLIGHT",contractVersion:"1.0.37",gateContractStatus:"GO_GATE_CONTRACT",visualRemediationStatus:"PASS",visualChecks:"29_OF_29",architectureStatus:"GO_STATIC_ARCHITECTURE",engineEvidenceSource:"sync-file-evidence-not-stdout-v1",finalGateRerun:false,writesExecuted:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/final-static-preflight-sanitized.json
 
       - name: Subir evidencia sanitizada
         if: always()
@@ -115,6 +121,7 @@ jobs:
             orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/final-static-preflight-sanitized.json
             orbit360-platform/docs/evidence/post-recovery-inventory-29868538689-sanitized.json
+            tools/orbit360-m1-static-preflight-request-v20260722.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -128,4 +135,4 @@ jobs:
           state=success
           description='Preflight canónico GO; gate final no repetido'
           if [ "${{ job.status }}" != success ]; then state=failure; description='Preflight canónico falló; STOP THE LINE'; fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-canonical-static-preflight-v3' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-canonical-static-preflight-v4' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
