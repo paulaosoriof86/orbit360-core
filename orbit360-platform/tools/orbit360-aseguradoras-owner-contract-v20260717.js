@@ -105,6 +105,8 @@ assert(nameGuard >= 0 && countryGuard > nameGuard && reasonGuard > countryGuard 
 
 const idempotenceTestPath = path.resolve(__dirname, '..', '..', 'tools', 'orbit360-probar-owner-visual-idempotente-v20260721.mjs');
 const visualOwnerPath = path.resolve(__dirname, '..', 'core', 'client-insurer-visual-contract-v20260720.js');
+const barrierPath = path.resolve(__dirname, '..', 'core', 'client-insurer-visual-stability-barrier-v20260721.js');
+const barrierSource = fs.readFileSync(barrierPath, 'utf8');
 const proofPath = path.resolve(__dirname, '..', 'runtime-gate-crm-v20260716', 'owner-idempotence-proof-sanitized.json');
 const proofRun = spawnSync(process.execPath, [idempotenceTestPath, visualOwnerPath, proofPath], { encoding: 'utf8' });
 assert(proofRun.status === 0, 'La prueba determinista de idempotencia falló: ' + String(proofRun.stderr || proofRun.stdout || '').slice(0, 500));
@@ -116,6 +118,15 @@ assert(proof.proof.canonicalTransforms === 1, 'Debe probar exactamente una trans
 assert(proof.proof.followUpObserverDeliveries === 0, 'Debe probar cero entregas posteriores del observer');
 assert(Array.isArray(proof.proof.client360StructuralTriggers) && proof.proof.client360StructuralTriggers.includes('f-pais') && proof.proof.client360StructuralTriggers.includes('f-seg'), 'Debe probar disparadores estructurales de país y segmento en Cliente 360');
 assert(proof.runtimeExecuted === false && proof.browserExecuted === false && proof.deployExecuted === false, 'La prueba debe ser totalmente estática');
+
+assert(barrierSource.includes("version: '20260721.3'"), 'La barrera debe declarar versión 20260721.3');
+assert(barrierSource.includes('function directoryReady(grid)'), 'Falta contrato semántico del directorio');
+assert(barrierSource.includes("node.classList.contains('asg-grid')"), 'Falta disparador estructural .asg-grid');
+assert(barrierSource.includes("node.matches('.asg-card.off[data-asg]')"), 'Falta disparador de tarjeta inactiva');
+assert(barrierSource.includes("node.querySelector('#asg-ficha,.asg-grid,.asg-card.off[data-asg]')"), 'Falta detección descendiente del directorio');
+assert(barrierSource.includes("scheduleStablePass(ficha() ? 'ficha-dom-replaced' : 'directory-dom-replaced')"), 'Falta ruta de estabilización del directorio');
+assert(barrierSource.includes('/Inactiva:/i.test'), 'La estabilidad debe exigir motivo visible de inactividad');
+assert(barrierSource.includes('directoryStructuralTrigger: true'), 'Falta marcador reusable del disparador estructural');
 
 console.log(JSON.stringify({
   test: 'orbit360-aseguradoras-owner-contract-v20260717',
@@ -131,5 +142,11 @@ console.log(JSON.stringify({
     canonicalTransforms: proof.proof.canonicalTransforms,
     followUpObserverDeliveries: proof.proof.followUpObserverDeliveries,
     client360StructuralTriggers: proof.proof.client360StructuralTriggers
+  },
+  directoryStability: {
+    barrierVersion: '20260721.3',
+    structuralTrigger: true,
+    inactiveReasonRequired: true,
+    writesStore: false
   }
 }, null, 2));
