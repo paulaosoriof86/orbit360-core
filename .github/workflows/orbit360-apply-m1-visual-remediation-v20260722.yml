@@ -1,0 +1,35 @@
+name: Orbit 360 · Apply M1 visual remediation 1.0.37
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-apply-m1-visual-remediation-v20260722.yml'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-m1-visual-remediation-v20260722
+  cancel-in-progress: false
+jobs:
+  apply:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/ays/backend-tenant-lab-v99-20260703'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Rebuild verified archive
+        run: |
+          cat \
+            tools/.m1-visual-remediation-payload-v20260722/archive-p00.b64 \
+            tools/.m1-visual-remediation-payload-v20260722/archive-p01.b64 \
+            tools/.m1-visual-remediation-payload-v20260722/archive-p02.b64 \
+            tools/.m1-visual-remediation-payload-v20260722/archive-p03.b64 \
+            > tools/.m1-visual-remediation-payload-v20260722/payload.tar.gz.b64
+      - name: Apply deterministic visual remediation and retire staging
+        run: node tools/orbit360-apply-m1-visual-remediation-v20260722.mjs
