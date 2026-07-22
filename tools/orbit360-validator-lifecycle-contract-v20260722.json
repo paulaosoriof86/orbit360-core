@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v2-composed-overlay",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v3-canonical-entrypoint",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -7,8 +7,10 @@
   "gateId": "block1-client360-insurers-lab-v20260717",
   "gateContractVersion": "1.0.37",
   "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
-  "classification": "VALIDATOR_STALE",
-  "firstFailedCheck": "FREEZE_STOP_THE_LINE",
+  "classification": [
+    "VALIDATOR_STALE",
+    "PIPELINE_MECHANISM_FAILURE"
+  ],
   "retiredLifecycleChecks": [
     "FREEZE_STOP_THE_LINE",
     "FREEZE_NO_RUNTIME",
@@ -44,16 +46,159 @@
     "rulesDeployAllowed": false,
     "productionAllowed": false
   },
-  "overlayComposition": {
-    "mechanism": "temp-mirror-no-repo-write-v1",
-    "wrapper": "tools/orbit360-validar-gate-contracts-composed-v20260722.mjs",
-    "officialPreflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-    "overlayPaths": [
-      "tools/orbit360-gate-contract-overlay-v20260718.json",
-      "tools/orbit360-gate-contract-overlay-validator-lifecycle-v20260722.json"
+  "canonicalIntegration": {
+    "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "engine": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
+    "baseOverlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
+    "parallelWrapperRetired": "tools/orbit360-validar-gate-contracts-composed-v20260722.mjs",
+    "parallelOverlayRetired": "tools/orbit360-gate-contract-overlay-validator-lifecycle-v20260722.json",
+    "compositionMechanism": "canonical-entrypoint-temp-mirror-v1",
+    "operationalWrites": 0,
+    "evidenceWrites": 1
+  },
+  "canonicalOverlayPatch": {
+    "schemaVersion": "orbit360-gate-contract-overlay-v1",
+    "issuedAt": "2026-07-22",
+    "gateId": "block1-client360-insurers-lab-v20260717",
+    "classification": "VALIDATOR_STALE",
+    "diagnosticRevision": "validator-lifecycle-canonical-entrypoint-v3",
+    "contractRevision": "1.0.37-validator-lifecycle-canonical-entrypoint-v3",
+    "gatePatch": {
+      "contractVersion": "1.0.37",
+      "diagnosticRevision": "visual-remediation-validator-lifecycle-canonical-entrypoint-v3",
+      "status": "FINAL_BLOCK1_STATIC_PREFLIGHT_AUTHORIZED",
+      "diagnosticRule": "The visual product remediation remains frozen. The official preflight entrypoint composes the lifecycle contract and invokes the preserved validation engine. The final gate is not rerun.",
+      "acceptancePolicy": "Accept only GO_GATE_CONTRACT plus visual remediation PASS and GO_STATIC_ARCHITECTURE under one single-use static authorization. Allow no secrets, Firestore, operational writes, runtime, browser, Functions, Rules, production or deploy."
+    },
+    "effectiveOwnerReconciliation": {
+      "baselineOverlayContract": "1.0.37-visual-review-semantic-responsive-remediation-v1",
+      "classification": "VALIDATOR_STALE",
+      "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
+      "productOwnersChanged": [],
+      "academyChanged": false,
+      "validatorChanged": true,
+      "workflowChanged": true,
+      "dataChanged": false,
+      "storeChanged": false,
+      "authChanged": false,
+      "vaultChanged": false,
+      "importersChanged": false,
+      "writesExecuted": false,
+      "runtimeExecuted": false,
+      "browserExecuted": false,
+      "deployExecuted": false
+    },
+    "canonicalOwners": [
+      {
+        "id": "m1VisualIntegrityAcademy",
+        "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+        "requiredTokens": [
+          "version:'1.221'",
+          "contentVersion:'1.228'",
+          "_m1visualv:1228",
+          "El usuario del portal permanece visible",
+          "El campo Uso no se muestra ni se copia",
+          "Instalar como app",
+          "visualSemanticsRemediation:true",
+          "validatorLifecyclePhaseAware:true"
+        ]
+      },
+      {
+        "id": "m1VisualRemediationContract",
+        "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+        "requiredTokens": [
+          "orbit360-m1-visual-remediation-contract-v1",
+          "contractVersion: '1.0.37'",
+          "validatorLifecycleRevision: 'phase-aware-static-authorization-v2'",
+          "FREEZE_M1_OPEN",
+          "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
+          "AUTHORIZATION_STATIC_LIFECYCLE",
+          "BANK_COPY_EXCLUDES_USE",
+          "ACADEMY_CONTENT_1228",
+          "runtimeExecuted: false",
+          "browserExecuted: false",
+          "deployExecuted: false"
+        ]
+      }
     ],
-    "historicalOverlayModified": false,
-    "repositoryWritesDuringPreflight": 0
+    "requiredFiles": [
+      "tools/orbit360-validator-lifecycle-contract-v20260722.json",
+      "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
+      "orbit360-platform/docs/BLOQUE1-CIERRE-CANONICO-PIPELINE-M1-20260722.md",
+      "orbit360-platform/docs/evidence/m1-canonical-pipeline-reconciliation-20260722-sanitized.json"
+    ],
+    "runtimeVersionContracts": [
+      {
+        "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
+        "replaceRequiredTokens": true,
+        "requiredTokens": [
+          "version:'1.221'",
+          "contentVersion:'1.228'",
+          "_m1visualv:1228",
+          "El usuario del portal permanece visible",
+          "El campo Uso no se muestra ni se copia",
+          "Instalar como app",
+          "visualSemanticsRemediation:true",
+          "validatorLifecyclePhaseAware:true"
+        ]
+      },
+      {
+        "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+        "replaceRequiredTokens": true,
+        "requiredTokens": [
+          "orbit360-m1-visual-remediation-contract-v1",
+          "contractVersion: '1.0.37'",
+          "validatorLifecycleRevision: 'phase-aware-static-authorization-v2'",
+          "FREEZE_M1_OPEN",
+          "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
+          "AUTHORIZATION_STATIC_LIFECYCLE",
+          "BANK_COPY_EXCLUDES_USE",
+          "ACADEMY_CONTENT_1228",
+          "runtimeExecuted: false",
+          "browserExecuted: false",
+          "deployExecuted: false"
+        ]
+      },
+      {
+        "path": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+        "replaceRequiredTokens": true,
+        "requiredTokens": [
+          "CANONICAL_LIFECYCLE_COMPOSITION = 'phase-aware-static-authorization-v2'",
+          "canonicalOverlayPatch",
+          "orbit360-validar-gate-contracts-engine-v20260717.mjs",
+          "parallelWrapperRetired: true",
+          "parallelOverlayRetired: true",
+          "evidenceWrites: 1"
+        ]
+      },
+      {
+        "path": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
+        "replaceRequiredTokens": true,
+        "requiredTokens": [
+          "const REGISTRY_PATH",
+          "const OVERLAY_RELS",
+          "GO_GATE_CONTRACT",
+          "PREFLIGHT_MATCH",
+          "WORKFLOW_CALLS_PREFLIGHT"
+        ]
+      },
+      {
+        "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+        "replaceRequiredTokens": true,
+        "requiredTokens": [
+          "final_block1_static_preflight_1_0_37_lifecycle_v2_only",
+          "targeted_lab_deploy_visual_review_only",
+          "ORBIT360_FINAL_GATE_POLICY: no_final_gate_rerun",
+          "node --check tools/orbit360-validar-gate-contracts-v20260717.mjs",
+          "node tools/orbit360-validar-gate-contracts-v20260717.mjs \"$ORBIT360_GATE_ID\"",
+          "node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+          "node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+          "functionsDeployed:false",
+          "rulesDeployed:false",
+          "productionTouched:false"
+        ]
+      }
+    ]
   },
   "productOwnerChanged": false,
   "dataChanged": false,

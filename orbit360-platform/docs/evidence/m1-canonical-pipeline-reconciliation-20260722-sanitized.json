@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "orbit360-m1-canonical-pipeline-reconciliation-v1",
+  "issuedAt": "2026-07-22",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.37",
+  "status": "AUTHORIZED_PENDING_SINGLE_BINDING_STATIC_PREFLIGHT",
+  "classifications": [
+    "FUNCTIONAL_DEFECT",
+    "VALIDATOR_STALE",
+    "PIPELINE_MECHANISM_FAILURE"
+  ],
+  "productCorrection": {
+    "commit": "84c6d4e3e2f60d2273056619bc1ab4f53b6ec9e3",
+    "visualRevision": "20260722.1",
+    "preserved": true,
+    "ownerChangedInThisReconciliation": false
+  },
+  "canonicalization": {
+    "officialEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "preservedEngine": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
+    "lifecycleContract": "tools/orbit360-validator-lifecycle-contract-v20260722.json",
+    "parallelWrapperRetired": true,
+    "parallelOverlayRetired": true,
+    "workflowFinalGateRerunRemoved": true,
+    "bankValidatorStaleTokenCorrected": true
+  },
+  "authorization": {
+    "id": "final-block1-static-preflight-1-0-37-v2",
+    "active": true,
+    "consumed": false,
+    "allowedExecutions": 1,
+    "secretsAllowed": false,
+    "firestoreReadAllowed": false,
+    "writesAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "deployAllowed": false,
+    "finalGateRerunAllowed": false
+  },
+  "preservedInventory": {
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "validUniqueBankReferences": 91,
+    "pendingBankReferences": 2,
+    "portalCredentials": "26_OF_26",
+    "colombia": "INTACT",
+    "reimportRequired": false
+  },
+  "operationalWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false
+}

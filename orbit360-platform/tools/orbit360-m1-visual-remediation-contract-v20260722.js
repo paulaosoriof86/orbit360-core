@@ -30,7 +30,7 @@ check('BANK_NUMBER_VISIBLE', visual.includes('data-m1-bank-number') && visual.in
 check('BANK_TEMPORARY_REVEAL', visual.includes('data-m1-bank-reveal') && visual.includes("fieldType:'bank_account'"), 'bank reveal');
 check('BANK_COPY_EXCLUDES_USE', visual.includes('bankCopyExcludesUse:true') && !visual.includes("'Uso: '+"), 'Uso excluded');
 check('BANK_HOLDER_FALLBACK_INSURER', visual.includes("clean(account&&account.titular)||clean(insurer&&insurer.nombre)||'Sin registrar'"), 'holder fallback');
-check('BANK_COPY_EXACT_FIELDS', visual.includes("['Banco: '+(c.banco||'—'),'Tipo: '+(c.tipo||'—'),'Cuenta: '+(number||accountHint(c)||'—'),'Moneda: '+(c.moneda||'—'),'Titular: '+accountHolder(c,a)]"), 'exact bank copy');
+check('BANK_COPY_EXACT_FIELDS', visual.includes("['Banco: '+(c.banco||'—'),'Tipo: '+(c.tipo||'—'),'Cuenta: '+(revealed.value||accountHint(c)||'—'),'Moneda: '+(c.moneda||'—'),'Titular: '+accountHolder(c,a)]"), 'exact bank copy');
 
 check('CSS_REMEDIATION_MARKER', css.includes('Visual remediation 20260722.1'), 'css marker');
 check('CSS_MOBILE_TITLES', css.includes('#host .mod-band .mb-tt h2') && css.includes('overflow-wrap:anywhere'), 'titles');
