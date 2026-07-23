@@ -1,34 +1,30 @@
-name: Orbit 360 · Directorio operativo 1.0.38 · HOSTING_DELIVERY
+name: Orbit 360 · M1 edit mode root patch · VALIDATION_ONLY
 
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
-    paths: ['tools/orbit360-m1-hosting-lab-delivery-request-v20260722.json']
+    paths: ['tools/orbit360-m1-edit-mode-root-validation-request-v20260722.json']
 
 permissions:
   contents: read
   statuses: write
 
 concurrency:
-  group: orbit360-m1-hosting-lab-delivery-v1
+  group: orbit360-m1-edit-mode-root-static-v1
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_PHASE: lab_hosting_delivery
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-hosting-lab-delivery-request-v20260722.json
-  ORBIT360_REQUEST_ID: m1-hosting-lab-delivery-v1
-  EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
-  FIREBASE_PROJECT_ID: ays-orbit-360-lab
-  ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
-  ORBIT360_HOSTING_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
+  ORBIT360_GATE_PHASE: static_preflight
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-edit-mode-root-validation-request-v20260722.json
+  ORBIT360_REQUEST_ID: m1-edit-mode-root-static-validation-v1
 
 jobs:
-  hosting-delivery:
-    name: Directorio operativo · Hosting LAB
+  static-validation:
+    name: M1 edit mode · STATIC_PATCH_VALIDATED
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 12
     steps:
       - name: Checkout SHA exacto
         uses: actions/checkout@v4
@@ -42,7 +38,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud inmutable y autorización
+      - name: Validar solicitud inmutable
         shell: bash
         run: |
           set -euo pipefail
@@ -54,108 +50,44 @@ jobs:
           const f=JSON.parse(fs.readFileSync('tools/orbit360-incident-freeze-v20260721.json','utf8'));
           const head=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
           const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
-          const a=f.hostingAuthorization||{},bad=[];
-          if(r.schemaVersion!=='orbit360-hosting-lab-delivery-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
-          if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.contractVersion!=='1.0.38')bad.push('scope');
-          if(r.deliveryPatchCommit!==parent||r.allowedExecutions!==1||r.hostingDelivery!==true)bad.push('binding');
-          if(r.projectId!==process.env.EXPECTED_FIREBASE_PROJECT_ID||r.channel!==process.env.ORBIT360_HOSTING_CHANNEL||r.canonicalUrl!==process.env.ORBIT360_HOSTING_URL)bad.push('target');
-          if(r.secretAccess!==true||r.deploy!==true||r.firestoreRead!==false||r.vaultRead!==false||r.writes!==false||r.runtime!==false||r.browser!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.reimport!==false)bad.push('capabilities');
-          if(r.atomicApplyRunId!==29974965244||r.atomicApplyArtifactId!==8551063445||r.atomicApplyArtifactDigest!=='sha256:9dbfb9a9d3d478d8aec00bf6a0d570c109ec6a70427e028baff07e928e9ebd35')bad.push('evidence');
-          if(f.status!=='M1_HOSTING_LAB_DELIVERY_AUTHORIZED_ONCE'||a.authorizationId!=='m1-hosting-lab-delivery-v1'||a.active!==true||a.consumed!==false||a.allowedExecutions!==1||a.deployAllowed!==true||a.remoteIntegrityRequired!==true)bad.push('freeze');
-          try{cp.execFileSync('git',['merge-base','--is-ancestor',r.sourceFrontendCommit,parent]);}catch{bad.push('source');}
+          const a=f.staticAuthorization||{},bad=[];
+          if(r.schemaVersion!=='orbit360-m1-edit-mode-root-validation-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
+          if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.contractVersion!=='1.0.39')bad.push('scope');
+          if(r.patchCommit!==parent||r.allowedExecutions!==1||r.validationOnly!==true)bad.push('binding');
+          if(r.secrets!==false||r.firestoreRead!==false||r.vaultRead!==false||r.writes!==false||r.runtime!==false||r.browser!==false||r.deploy!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.reimport!==false)bad.push('capabilities');
+          if(f.status!=='M1_EDIT_ROOT_PATCH_READY_STATIC_VALIDATION_AUTHORIZED_ONCE'||a.authorizationId!==process.env.ORBIT360_REQUEST_ID||a.active!==true||a.consumed!==false||a.allowedExecutions!==1||a.phase!=='STATIC_PREFLIGHT')bad.push('freeze');
+          if(!f.bindingTenantDecision||f.bindingTenantDecision.expectedActiveInsurers!==26||f.bindingTenantDecision.futureDeactivation!=='MANUAL_WITH_REASON_ONLY')bad.push('tenant-decision');
           if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
-          fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});
-          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/hosting-delivery-request-sanitized.json',JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,gateId:r.gateId,contractVersion:r.contractVersion,sourceFrontendCommit:r.sourceFrontendCommit,deliveryPatchCommit:r.deliveryPatchCommit,requestCommit:head,projectId:r.projectId,channel:r.channel,canonicalUrl:r.canonicalUrl,atomicApplyRunId:r.atomicApplyRunId,hostingDelivery:true,firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          const outDir='orbit360-platform/runtime-gate-crm-v20260716';fs.mkdirSync(outDir,{recursive:true});
+          fs.writeFileSync(`${outDir}/edit-mode-static-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,gateId:r.gateId,contractVersion:r.contractVersion,patchCommit:r.patchCommit,requestCommit:head,validationOnly:true,expectedInsurers:26,expectedActiveInsurers:26,manualDeactivationOnly:true,secrets:false,firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
           NODE
 
-      - name: Preflight canónico antes de identidad de despliegue
+      - name: Validar sintaxis del patch
         shell: bash
         run: |
           set -euo pipefail
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" > orbit360-platform/runtime-gate-crm-v20260716/hosting-delivery-preflight.json
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="1.0.38" and .executionPhase=="LAB_HOSTING_DELIVERY" and .canonicalOwnerScope=="overlay_replace" and .runtimeContractScope=="overlay_replace" and .capabilityProfile.secrets==true and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.deploy==true and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .sourceTransformed==false and .operationalWrites==0' orbit360-platform/runtime-gate-crm-v20260716/hosting-delivery-preflight.json >/dev/null
+          node --check orbit360-platform/core/client-insurer-edit-owner-v20260722.js
+          node --check orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js
+          node --check orbit360-platform/core/router-tenant-config-bootstrap.js
+          node --check orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
+          node --check orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
+          node --check orbit360-platform/tools/orbit360-m1-edit-mode-root-contract-v20260722.js
 
-      - name: Preparar inventario local de integridad
+      - name: Ejecutar preflight canónico
         shell: bash
         run: |
           set -euo pipefail
-          node <<'NODE'
-          const fs=require('fs'),crypto=require('crypto');
-          const files=[
-            'index.html',
-            'ays-lab-preview.html',
-            'core/router-tenant-config-bootstrap.js',
-            'core/operational-directory-field-policy-v20260722.js',
-            'core/client-insurer-operational-directory-owner-v20260722.js',
-            'core/client-insurer-visual-contract-v20260720.js',
-            'styles/client-insurer-visual-contract-v20260720.css',
-            'data/academia-v1230-operational-directory-v20260722.js',
-            'core/pwa.js'
-          ];
-          const sha=p=>crypto.createHash('sha256').update(fs.readFileSync('orbit360-platform/'+p)).digest('hex');
-          const assets=files.map(path=>({path,sha256:sha(path)}));
-          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/hosting-local-integrity.json',JSON.stringify({schemaVersion:'orbit360-hosting-local-integrity-v1',contractVersion:'1.0.38',assets,containsPII:false,containsSecrets:false},null,2)+'\n');
-          NODE
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" > orbit360-platform/runtime-gate-crm-v20260716/edit-mode-preflight.json
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="1.0.39" and .executionPhase=="STATIC_PREFLIGHT" and .canonicalOwnerScope=="overlay_replace" and .runtimeContractScope=="overlay_replace" and .capabilityProfile.secrets==false and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==false and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .sourceTransformed==false and .operationalWrites==0' orbit360-platform/runtime-gate-crm-v20260716/edit-mode-preflight.json >/dev/null
 
-      - name: Resolver identidad exclusiva de Hosting LAB
-        env:
-          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - name: Validar contrato raíz de edición
         shell: bash
         run: |
           set -euo pipefail
-          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
-          test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-hosting-lab-delivery.json"
-          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
-          chmod 600 "$KEY_FILE"
-          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
-
-      - name: Instalar Firebase CLI
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-save --package-lock=false firebase-tools@14
-          npx firebase --version
-
-      - name: Publicar exclusivamente Hosting LAB
-        shell: bash
-        run: |
-          set -euo pipefail
-          npx firebase hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --project "$EXPECTED_FIREBASE_PROJECT_ID" --config firebase.json --expires 7d --non-interactive --json > orbit360-platform/runtime-gate-crm-v20260716/hosting-deploy-output.json
-
-      - name: Verificar integridad remota exacta
-        shell: bash
-        run: |
-          set -euo pipefail
-          BASE="$ORBIT360_HOSTING_URL"
-          for attempt in $(seq 1 18); do
-            if curl -fsSL -H 'Accept-Encoding: identity' "${BASE}/ays-lab-preview.html?orbit_sha=${GITHUB_SHA}" -o /tmp/orbit-preview.html; then break; fi
-            sleep 5
-          done
-          test -s /tmp/orbit-preview.html
-          node <<'NODE'
-          const fs=require('fs'),crypto=require('crypto'),cp=require('child_process');
-          const local=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/hosting-local-integrity.json','utf8'));
-          const base=process.env.ORBIT360_HOSTING_URL;
-          const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
-          const assets=[];
-          for(const item of local.assets){
-            const url=`${base}/${item.path}?orbit_sha=${process.env.GITHUB_SHA}`;
-            const body=cp.execFileSync('curl',['-fsSL','-H','Accept-Encoding: identity',url],{maxBuffer:64*1024*1024});
-            const remote=sha(body);
-            assets.push({path:item.path,localSha256:item.sha256,remoteSha256:remote,match:item.sha256===remote});
-          }
-          const ok=assets.every(x=>x.match);
-          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/hosting-remote-integrity.json',JSON.stringify({schemaVersion:'orbit360-hosting-remote-integrity-v1',contractVersion:'1.0.38',ok,status:ok?'HOSTING_DELIVERED_AND_VERIFIED':'REMOTE_INTEGRITY_MISMATCH',canonicalUrl:base,reviewUrl:`${base}/ays-lab-preview.html`,assets,firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
-          if(!ok)process.exit(41);
-          NODE
-          jq -e '.ok==true and .status=="HOSTING_DELIVERED_AND_VERIFIED" and ([.assets[].match]|all) and .firestoreRead==false and .vaultRead==false and .writes==false and .runtime==false and .browser==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .reimport==false' orbit360-platform/runtime-gate-crm-v20260716/hosting-remote-integrity.json >/dev/null
+          node orbit360-platform/tools/orbit360-m1-edit-mode-root-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/edit-mode-root-contract.json
+          jq -e '.status=="PASS" and .contractVersion=="1.0.39" and .checksPassed==.checksTotal and .firestoreRead==false and .operationalWrites==0 and .deploy==false' orbit360-platform/runtime-gate-crm-v20260716/edit-mode-root-contract.json >/dev/null
 
       - name: Cerrar evidencia sanitizada
         if: always()
@@ -164,24 +96,23 @@ jobs:
           node <<'NODE'
           const fs=require('fs'),d='orbit360-platform/runtime-gate-crm-v20260716';
           const read=n=>{try{return JSON.parse(fs.readFileSync(`${d}/${n}`,'utf8'))}catch{return null}};
-          const p=read('hosting-delivery-preflight.json'),r=read('hosting-remote-integrity.json');
-          const ok=!!(p&&p.status==='GO_GATE_CONTRACT'&&r&&r.status==='HOSTING_DELIVERED_AND_VERIFIED'&&r.ok===true);
-          fs.writeFileSync(`${d}/hosting-delivery-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-hosting-lab-delivery-v1',generatedAt:new Date().toISOString(),ok,status:ok?'HOSTING_DELIVERED_AND_VERIFIED':'HOSTING_DELIVERY_FAILED',contractVersion:'1.0.38',preflight:p&&p.status||'NOT_RUN',projectId:process.env.EXPECTED_FIREBASE_PROJECT_ID,channel:process.env.ORBIT360_HOSTING_CHANNEL,canonicalUrl:process.env.ORBIT360_HOSTING_URL,reviewUrl:`${process.env.ORBIT360_HOSTING_URL}/ays-lab-preview.html`,assetsVerified:r&&r.assets?r.assets.length:0,allAssetsMatch:!!(r&&r.assets&&r.assets.every(x=>x.match)),firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          const p=read('edit-mode-preflight.json'),c=read('edit-mode-root-contract.json');
+          const ok=!!(p&&p.status==='GO_GATE_CONTRACT'&&c&&c.status==='PASS'&&c.checksPassed===c.checksTotal);
+          fs.writeFileSync(`${d}/edit-mode-static-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-edit-mode-root-static-v1',generatedAt:new Date().toISOString(),ok,status:ok?'STATIC_PATCH_VALIDATED':'STATIC_PATCH_FAILED',contractVersion:'1.0.39',preflight:p&&p.status||'NOT_RUN',rootContract:c&&c.status||'NOT_RUN',checksPassed:c&&c.checksPassed||0,checksTotal:c&&c.checksTotal||0,expectedInsurers:26,expectedActiveInsurers:26,manualDeactivationOnly:true,secrets:false,firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          if(!ok)process.exitCode=41;
           NODE
 
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-hosting-lab-delivery-${{ github.run_id }}
+          name: orbit360-m1-edit-mode-root-static-${{ github.run_id }}
           path: |
-            orbit360-platform/runtime-gate-crm-v20260716/hosting-delivery-request-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/edit-mode-static-request-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/hosting-delivery-preflight.json
-            orbit360-platform/runtime-gate-crm-v20260716/hosting-local-integrity.json
-            orbit360-platform/runtime-gate-crm-v20260716/hosting-deploy-output.json
-            orbit360-platform/runtime-gate-crm-v20260716/hosting-remote-integrity.json
-            orbit360-platform/runtime-gate-crm-v20260716/hosting-delivery-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/edit-mode-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/edit-mode-root-contract.json
+            orbit360-platform/runtime-gate-crm-v20260716/edit-mode-static-summary.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -191,12 +122,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          state=failure; description='1.0.38 Hosting LAB delivery failed'
-          if [ -f orbit360-platform/runtime-gate-crm-v20260716/hosting-delivery-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/hosting-delivery-summary.json)" = true ]; then state=success; description='1.0.38 Hosting LAB verified'; fi
-          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m1-hosting-lab-delivery-v1"}')"
-
-      - name: Limpiar identidad temporal
-        if: always()
-        run: |
-          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ]; then rm -f "${ORBIT360_TEMP_KEY_FILE}"; fi
-          rm -rf node_modules package-lock.json npm-shrinkwrap.json
+          state=failure; description='M1 edit root static validation failed'
+          if [ -f orbit360-platform/runtime-gate-crm-v20260716/edit-mode-static-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/edit-mode-static-summary.json)" = true ]; then state=success; description='M1 edit root STATIC_PATCH_VALIDATED'; fi
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m1-edit-mode-root-static-v1"}')"
