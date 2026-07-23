@@ -7,7 +7,7 @@
   "gateId": "block2-product-readonly-bootstrap-v20260723",
   "gateContractVersion": "2.0.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "controlPlaneRevision": "product-readonly-bootstrap-static-v1",
+  "controlPlaneRevision": "product-readonly-bootstrap-static-observable-v2",
   "methodologicalDecisionId": "paula-20260723-m1-approved-start-m2",
   "classification": [
     "FUNCTIONAL_DEFECT",
@@ -41,6 +41,8 @@
     "registryExtension": "tools/orbit360-gate-contract-registry-extension-m2-v20260723.json",
     "overlay": "tools/orbit360-gate-contract-overlay-m2-v20260723.json",
     "workflow": ".github/workflows/orbit360-m2-product-readonly-static-gate-v20260723.yml",
+    "statusContext": "orbit360/m2-product-readonly-static-v2",
+    "observableCommitStatus": true,
     "canonicalOwnerScope": "overlay_replace",
     "runtimeContractScope": "overlay_replace",
     "sourceTransformation": false,
@@ -90,8 +92,8 @@
         },
         "requestModel": "immutable-request-bound-to-m2-static-patch-v1"
       },
-      "diagnosticRule": "Validate the static product read-only bootstrap before any external capability.",
-      "acceptancePolicy": "Accept only GO_GATE_CONTRACT and M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS."
+      "diagnosticRule": "Validate the static product read-only bootstrap and publish an observable sanitized status before any external capability.",
+      "acceptancePolicy": "Accept only success status orbit360/m2-product-readonly-static-v2 with GO_GATE_CONTRACT and M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS."
     },
     "canonicalOwners": [],
     "requiredFiles": [],
@@ -103,6 +105,8 @@
     "m1ContractVersion": "1.0.40",
     "m1CssDeliveryRunId": 30020850178,
     "dynamicDirectoryPatchCommit": "6145e3b0a4173c582617bfc26dbfdc0c55b88b86",
+    "unobservableRequestCommit": "fc217b58164332498a8683a04fde3a8853a861e1",
+    "unobservableRequestResultAsserted": false,
     "clients": 414,
     "insurers": 26,
     "activeInsurers": 26,
