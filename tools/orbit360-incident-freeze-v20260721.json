@@ -1,18 +1,22 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v69-operational-directory-dryrun-authorized",
+  "schemaVersion": "orbit360-incident-freeze-v70-operational-directory-dryrun-v2-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-operational-directory-field-classification-regression-v20260722",
-  "status": "M1_VISUAL_REVIEW_FAILED_DATA_CONTRACT_REPAIR_DRYRUN_AUTHORIZED",
+  "status": "M1_VISUAL_REVIEW_FAILED_DATA_CONTRACT_REPAIR_DRYRUN_V2_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "tenantId": "alianzas-soluciones",
   "gateId": "block1-client360-insurers-lab-v20260717",
+  "blockedGateIds": [
+    "block1-client360-insurers-lab-v20260717"
+  ],
   "classification": [
     "DATA_CONTRACT_FAILURE",
     "FUNCTIONAL_DEFECT",
-    "VALIDATOR_STALE"
+    "VALIDATOR_STALE",
+    "PIPELINE_MECHANISM_FAILURE"
   ],
   "methodologicalDecision": {
     "id": "paula-20260722-operational-directory-root-repair",
@@ -27,7 +31,7 @@
     "result": "FAILED_FUNCTIONAL_DEFECT",
     "screenshotsReceived": 5,
     "observed": [
-      "Cuenta protegida or masked number remains visible",
+      "bank account remains masked or displays Cuenta protegida",
       "bank reveal returns No fue posible recuperar el dato",
       "bank copy does not complete",
       "portal username displays Usuario pendiente de registrar",
@@ -36,20 +40,9 @@
   },
   "rootCause": {
     "canonicalRule": "Username and bank account number are operational fields; password is the only secret.",
-    "regressionDocuments": [
-      "orbit360-platform/docs/CORRECCION-CONTINUIDAD-RECURSOS-PROTEGIDOS-ASEGURADORAS-20260720.md",
-      "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-CUENTAS-BANCARIAS-READINESS-DIRECTORIOS-REALES-20260721.md"
-    ],
-    "regressionCode": [
-      "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
-      "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
-      "orbit360-platform/core/insurer-directory-import-v1202.js",
-      "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
-      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
-    ],
-    "dataEffect": "91 bank numbers were removed from operational insurer records and represented only by accountRef/masks; portal usernames were removed and retained in the vault.",
-    "runtimeEffect": "Restored references may point from current account rows to vault records with historical account IDs; callable equality checks reject them.",
-    "validatorEffect": "The 29/29 visual contract required protected bank reveal instead of rejecting it."
+    "dataContractRegression": "Later provider/importer/validator layers removed operational usernames and bank numbers and required protected references for display.",
+    "runtimeMismatch": "Restored account references can point from current rows to vault records retaining historical account IDs, while the callable requires exact equality.",
+    "validatorRegression": "The previous 29/29 contract required temporary bank reveal instead of rejecting it."
   },
   "bindingCorrection": {
     "document": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
@@ -81,8 +74,22 @@
       "reimportRequired": false
     }
   },
+  "failedDryRunAttempts": [
+    {
+      "requestId": "m1-operational-directory-repair-dryrun-v1-20260722",
+      "requestCommit": "29ad157c3b2c1cec5cb35546c5c9b7bb623ce727",
+      "runId": 29968658125,
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "failureStage": "phase_alignment_before_preflight",
+      "errorCode": "SIGNATURE_INVALID:data_contract_phase_capabilities:0:0",
+      "firestoreRead": false,
+      "vaultRead": false,
+      "writesExecuted": false,
+      "productChanged": false
+    }
+  ],
   "dryRunAuthorization": {
-    "authorizationId": "m1-operational-directory-repair-dryrun-v1",
+    "authorizationId": "m1-operational-directory-repair-dryrun-v2",
     "active": true,
     "consumed": false,
     "allowedExecutions": 1,
@@ -97,9 +104,11 @@
     "functionsDeployAllowed": false,
     "rulesDeployAllowed": false,
     "productionAllowed": false,
-    "reimportAllowed": false
+    "reimportAllowed": false,
+    "lastAttemptAllowed": true
   },
   "allowedActions": [
+    "run_second_and_final_immutable_dryrun_request_after_stable_anchor_fix",
     "run_canonical_gate_preflight_after_static_code_transformation",
     "read_current_26_insurer_documents",
     "read_existing_insurer_vault",
@@ -109,8 +118,9 @@
   "blockedActions": [
     "write_firestore_operational_data",
     "write_secret_manager",
+    "run_runtime",
+    "open_browser",
     "deploy_hosting_lab",
-    "open_browser_automation",
     "deploy_functions",
     "deploy_rules",
     "deploy_production",
@@ -126,13 +136,15 @@
     "m1HumanVisualReview": "FAILED_DATA_CONTRACT_FAILURE",
     "m1Closed": false,
     "m2Authorized": false,
-    "operationalDirectoryDryRun": "AUTHORIZED_ONCE",
+    "operationalDirectoryDryRun": "V2_AUTHORIZED_ONCE_LAST_ATTEMPT",
     "operationalDirectoryApply": "NOT_AUTHORIZED",
     "hostingRepublish": "NOT_AUTHORIZED",
+    "runtimeAuthorized": false,
+    "deployAuthorized": false,
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Execute one immutable LAB_DATA_CONTRACT_REPAIR_DRYRUN. First transform code, owners, Academy and validators in the checkout; run the canonical gate preflight; then read Firestore and the existing vault without writes. Accept only sanitized evidence matching 414 clients, 26 insurers, 7 advisors, 91 bank references, two pending accounts, zero unmatched credential references and zero passwords in operational storage. Commit the static correction only if the dry-run passes.",
+  "nextAllowedStep": "Execute one second and final immutable LAB_DATA_CONTRACT_REPAIR_DRYRUN after replacing the stale Hosting-block anchor with the stable required-files-loop anchor. If phase alignment fails again, STOP THE LINE before Firestore or vault access. If it passes, accept only sanitized evidence matching 414 clients, 26 insurers, 7 advisors, 91 bank references, two pending accounts, zero unmatched credential references and zero passwords in operational storage.",
   "containsPII": false,
   "containsSecrets": false
 }
