@@ -46,8 +46,31 @@ Orbit.modules.aseguradoras = (function () {
     return countryRank(a.pais) - countryRank(b.pais) || clean(a.nombre).localeCompare(clean(b.nombre), 'es');
   }
   function paisOK(p) { return !Orbit.pais || Orbit.pais === 'TODOS' || p === Orbit.pais; }
-  function up(id, patch) { S().update('aseguradoras', id, patch); }
+  function up(id, patch) { return S().update('aseguradoras', id, patch); }
   function reload() { if (host) render(host); }
+  function roleKey(value) { return norm(value).replace(/\s+/g, ''); }
+  function isFirestoreLabStore() {
+    try { const raw = S().raw && S().raw(); return !!(raw && raw.__backend && raw.__backend.mode === 'firestore-lab'); } catch (e) { return false; }
+  }
+  function waitBackendWrite(collection, id, op, timeoutMs) {
+    if (!isFirestoreLabStore()) return Promise.resolve({ ok: true, local: true });
+    return new Promise((resolve, reject) => {
+      let done = false;
+      const finish = (error, detail) => {
+        if (done) return; done = true;
+        clearTimeout(timer);
+        window.removeEventListener('orbit:backend:write-ok', onOk);
+        window.removeEventListener('orbit:backend:write-error', onError);
+        error ? reject(error) : resolve(detail || { ok: true });
+      };
+      const matches = event => event && event.detail && event.detail.collection === collection && event.detail.id === id && event.detail.op === op;
+      const onOk = event => { if (matches(event)) finish(null, event.detail); };
+      const onError = event => { if (matches(event)) finish(new Error(event.detail.error || 'WRITE_REJECTED')); };
+      const timer = setTimeout(() => finish(new Error('WRITE_ACK_TIMEOUT')), timeoutMs || 20000);
+      window.addEventListener('orbit:backend:write-ok', onOk);
+      window.addEventListener('orbit:backend:write-error', onError);
+    });
+  }
   const ACCESO_ESTADOS = ['Sin verificar', 'Acceso disponible', 'Requiere actualización', 'Sin acceso registrado'];
   const ACCESO_TONE = { 'Sin verificar': 'warn', 'Acceso disponible': 'ok', 'Requiere actualización': 'danger', 'Sin acceso registrado': 'neutral' };
 
@@ -66,12 +89,13 @@ Orbit.modules.aseguradoras = (function () {
     try { const asesorId = Orbit.session && Orbit.session.asesorId && Orbit.session.asesorId(); return asesorId ? (S().get('asesores', asesorId) || {}) : {}; } catch (e) { return {}; }
   }
   function canEdit() {
-    try { if (Orbit.access && Orbit.access.can) return Orbit.access.can('aseguradoras', 'edit') === true; } catch (e) {}
     const a = asesorActivo();
     if ((a.restricciones || []).indexOf('aseguradoras_editar') >= 0) return false;
     if ((a.permisosExtra || []).indexOf('aseguradoras_editar') >= 0) return true;
-    return ['Dirección', 'Admin'].indexOf(activeRole()) >= 0;
+    try { if (Orbit.access && Orbit.access.can && Orbit.access.can('aseguradoras', 'edit') === true) return true; } catch (e) {}
+    return ['direccion', 'admin', 'superadmin', 'superadministrador', 'operativo'].indexOf(roleKey(activeRole())) >= 0;
   }
+  function canManageCredentials() { return canEdit(); }
   function log(a, entrada) {
     const hist = (a.actividad || []).slice();
     hist.unshift(Object.assign({ fecha: new Date().toISOString(), responsable: actorNombre() + ' · ' + activeRole() }, entrada));
@@ -267,7 +291,7 @@ Orbit.modules.aseguradoras = (function () {
       <div class="asg-grid">${all.map(a => card(a)).join('') || '<div class="muted" style="padding:16px">Sin resultados para este filtro.</div>'}</div>
     </div>`;
     if (host.querySelector('#asg-new')) host.querySelector('#asg-new').addEventListener('click', nueva);
-    if (host.querySelector('#asg-imp')) host.querySelector('#asg-imp').addEventListener('click', () => { if (!canEdit()) { U.toast('Solo Dirección/Admin puede importar.'); return; } Orbit.importa.open('directorio-aseguradoras', { onDone: reload }); });
+    if (host.querySelector('#asg-imp')) host.querySelector('#asg-imp').addEventListener('click', () => { if (!canEdit()) { U.toast('Solo Dirección, Superadmin, Admin u Operativo puede importar.'); return; } Orbit.importa.open('directorio-aseguradoras', { onDone: reload }); });
     host.querySelector('#asg-q').addEventListener('input', e => { q = e.target.value; render(host); });
     host.querySelector('#asg-fpais').addEventListener('change', e => { fPais = e.target.value; render(host); });
     host.querySelector('#asg-fram').addEventListener('change', e => { fRamo = e.target.value; render(host); });
@@ -276,7 +300,7 @@ Orbit.modules.aseguradoras = (function () {
     host.querySelectorAll('[data-asg]').forEach(el => el.addEventListener('click', e => { if (e.target.closest('.asg-switch') || e.target.closest('[data-act]')) return; ficha(el.dataset.asg); }));
     host.querySelectorAll('[data-toggle]').forEach(t => t.addEventListener('change', async e => {
       e.stopPropagation();
-      if (!canEdit()) { e.target.checked = !e.target.checked; U.toast('Solo Dirección/Admin puede cambiar la vinculación.'); return; }
+      if (!canEdit()) { e.target.checked = !e.target.checked; U.toast('Solo Dirección, Superadmin, Admin u Operativo puede cambiar la vinculación.'); return; }
       const id = t.dataset.toggle, next = t.checked;
       const motivo = await U.prompt('Motivo del cambio de vinculación:', { title: next ? 'Activar aseguradora' : 'Desactivar aseguradora' });
       if (motivo == null) { e.target.checked = !next; return; }
@@ -325,12 +349,12 @@ Orbit.modules.aseguradoras = (function () {
   }
 
   function nueva() {
-    if (!canEdit()) { U.toast('Solo Dirección/Admin puede crear aseguradoras.'); return; }
+    if (!canEdit()) { U.toast('Solo Dirección, Superadmin, Admin u Operativo puede crear aseguradoras.'); return; }
     const pais = (Orbit.pais && Orbit.pais !== 'TODOS') ? Orbit.pais : 'GT';
     const id = 'asg' + Date.now().toString().slice(-6);
     const ent = {
       id, nombre: 'Nueva aseguradora', color: '#1f3a5f', pais, ramos: [], comisionDefault: 12, comisiones: {}, comisionesProd: {}, ramosHabilitados: {}, ramosDetalle: {},
-      vinculada: false, contactos: [], cuentas: [], portales: [], docs: [], docsRequeridos: [], productos: [], facturacion: {}, actividad: [], creadaEnSesion: true
+      vinculada: true, contactos: [], cuentas: [], portales: [], docs: [], docsRequeridos: [], productos: [], facturacion: {}, actividad: [], creadaEnSesion: true
     };
     ent.actividad = log(ent, { cambio: 'Aseguradora creada' });
     S().insert('aseguradoras', ent);
@@ -350,6 +374,8 @@ Orbit.modules.aseguradoras = (function () {
   function selectTab(t) {
     const back = document.getElementById('asg-ficha'); if (!back) return;
     const id = back.dataset.id;
+    const currentState = fichaState[id];
+    if (currentState && currentState.editing && currentState.tab !== t && typeof currentState.snapshotCurrent === 'function') currentState.snapshotCurrent();
     fichaState[id].tab = t;
     back.querySelectorAll('[data-tab]').forEach(b => { const on = b.dataset.tab === t; b.classList.toggle('active', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
     const body = back.querySelector('#af-body');
@@ -364,7 +390,8 @@ Orbit.modules.aseguradoras = (function () {
     const a = S().get('aseguradoras', id); if (!a) return;
     const wantEdit = !!startEdit && canEdit();
     if ((Orbit.route && Orbit.route.params && Orbit.route.params.ficha) !== id) { history.replaceState(null, '', '#/aseguradoras?ficha=' + id); if (Orbit.route) Orbit.route.params = Object.assign({}, Orbit.route.params, { ficha: id }); }
-    fichaState[id] = { tab: (fichaState[id] || {}).tab || 'resumen', editing: wantEdit, draft: wantEdit ? cloneEnt(a) : null };
+    const priorState = fichaState[id] || {};
+    fichaState[id] = { tab: priorState.tab || 'resumen', editing: wantEdit, draft: wantEdit ? cloneEnt(a) : null, credentialDrafts: wantEdit ? {} : (priorState.credentialDrafts || {}), snapshotCurrent: null, saving: false };
     const st = fichaState[id];
     const data = st.editing ? st.draft : a;
     host.innerHTML = `<div class="page" id="asg-ficha" data-id="${id}">
@@ -396,9 +423,46 @@ Orbit.modules.aseguradoras = (function () {
     back.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
     if (back.querySelector('#af-editar')) back.querySelector('#af-editar').addEventListener('click', () => ficha(id, true));
     if (back.querySelector('#af-guardar')) back.querySelector('#af-guardar').addEventListener('click', () => guardarDraft(id, back));
-    if (back.querySelector('#af-cancelar')) back.querySelector('#af-cancelar').addEventListener('click', () => { fichaState[id].editing = false; fichaState[id].draft = null; ficha(id); });
+    if (back.querySelector('#af-cancelar')) back.querySelector('#af-cancelar').addEventListener('click', () => { fichaState[id].editing = false; fichaState[id].draft = null; fichaState[id].credentialDrafts = {}; ficha(id); });
     if (back.querySelector('#af-del')) back.querySelector('#af-del').addEventListener('click', () => borrarOdesactivar(id, back));
     wireBody(back, data, st.tab);
+  }
+
+  function credentialChanges(st, draft) {
+    return Object.keys(st && st.credentialDrafts || {}).map(key => st.credentialDrafts[key]).filter(item => item && item.password);
+  }
+  async function secureSourceHash(value) {
+    if (!window.crypto || !window.crypto.subtle || typeof TextEncoder === 'undefined') throw new Error('SECURE_HASH_UNAVAILABLE');
+    const bytes = new TextEncoder().encode(String(value || ''));
+    const digest = await window.crypto.subtle.digest('SHA-256', bytes);
+    return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+  }
+  async function persistSecureCredentialChanges(insurerId, st) {
+    const changes = credentialChanges(st, st.draft);
+    if (!changes.length) return 0;
+    if (!canManageCredentials()) throw new Error('CREDENTIAL_PERMISSION_DENIED');
+    if (!Orbit.secureImport || typeof Orbit.secureImport.importInsurerDirectory !== 'function') throw new Error('SECURE_CREDENTIAL_PROVIDER_UNAVAILABLE');
+    const sourceHash = await secureSourceHash(insurerId + ':' + Date.now());
+    const result = await Orbit.secureImport.importInsurerDirectory({
+      sourceHash,
+      items: changes.map(item => ({ type: 'credential', insurerId, portalId: item.portalId, resourceId: item.portalId, credentialRef: item.credentialRef || '', username: item.username || '', password: item.password }))
+    });
+    const mappings = [].concat(result && result.mappings || []);
+    if (mappings.length < changes.length) throw new Error('SECURE_CREDENTIAL_MAPPING_INCOMPLETE');
+    mappings.forEach(mapping => {
+      const portalId = clean(mapping.portalId || mapping.resourceId);
+      const index = (st.draft.portales || []).findIndex((portal, idx) => clean(portal.id || String(idx)) === portalId);
+      if (index < 0) return;
+      st.draft.portales[index] = Object.assign({}, st.draft.portales[index], {
+        credentialRef: clean(mapping.credentialRef) || st.draft.portales[index].credentialRef || 'backend_required',
+        estadoCredencial: mapping.available === false ? 'requiere_actualizacion' : 'registrada',
+        estadoAcceso: mapping.usernameAvailable === false || mapping.passwordAvailable === false ? 'Requiere actualización' : 'Acceso disponible',
+        credencialActualizadaAt: new Date().toISOString()
+      });
+    });
+    changes.forEach(item => { item.password = ''; });
+    st.credentialDrafts = {};
+    return mappings.length;
   }
 
   /* ---- diff simple (top-level) para trazabilidad antes/después ---- */
@@ -410,19 +474,38 @@ Orbit.modules.aseguradoras = (function () {
   }
 
   async function guardarDraft(id, back) {
-    const st = fichaState[id]; if (!st || !st.draft) return;
+    const st = fichaState[id]; if (!st || !st.draft || st.saving) return;
+    if (typeof st.snapshotCurrent === 'function') st.snapshotCurrent();
     const before = S().get('aseguradoras', id); if (!before) return;
-    const cambios = diffResumen(before, st.draft);
-    if (!cambios.length) { st.editing = false; st.draft = null; ficha(id); return; }
-    const motivo = await U.prompt('Se detectaron cambios en: ' + cambios.join(', ') + '.\n\nMotivo del cambio:', { title: 'Guardar cambios' });
-    if (motivo == null) return; // cancelar no escribe nada
-    const patch = Object.assign({}, st.draft, { actividad: log(before, { cambio: 'Actualización de ficha (' + cambios.join(', ') + ')', motivo, camposCambiados: cambios }) });
-    delete patch.id;
-    up(id, patch);
-    /* P0-RATE-AUDIT: registro estructurado y externo de cada cambio de tarifas/validación (sobrevive a la ficha) */
-    if (cambios.indexOf('cotTasas') >= 0 || cambios.indexOf('cotTasasValidadas') >= 0) tarifaValidacionAudit(id, before, st.draft, motivo);
-    st.editing = false; st.draft = null;
-    ficha(id); reload();
+    let cambios = diffResumen(before, st.draft);
+    const secureCount = credentialChanges(st, st.draft).length;
+    if (!cambios.length && !secureCount) { st.editing = false; st.draft = null; st.credentialDrafts = {}; ficha(id); return; }
+    const summary = cambios.concat(secureCount ? ['credenciales_seguras'] : []);
+    const motivo = await U.prompt('Se detectaron cambios en: ' + summary.join(', ') + '.\n\nMotivo del cambio:', { title: 'Guardar cambios' });
+    if (motivo == null) return;
+    const saveButton = back && back.querySelector('#af-guardar');
+    st.saving = true;
+    if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'Guardando…'; }
+    try {
+      if (secureCount) await persistSecureCredentialChanges(id, st);
+      cambios = diffResumen(before, st.draft);
+      if (cambios.length) {
+        const patch = Object.assign({}, st.draft, { actividad: log(before, { cambio: 'Actualización de ficha (' + cambios.join(', ') + ')', motivo, camposCambiados: cambios }) });
+        delete patch.id;
+        const ack = waitBackendWrite('aseguradoras', id, 'update', 20000);
+        up(id, patch);
+        await ack;
+        if (cambios.indexOf('cotTasas') >= 0 || cambios.indexOf('cotTasasValidadas') >= 0) tarifaValidacionAudit(id, before, st.draft, motivo);
+      }
+      st.editing = false; st.draft = null; st.credentialDrafts = {}; st.snapshotCurrent = null; st.saving = false;
+      U.toast('Cambios guardados correctamente.');
+      ficha(id); reload();
+    } catch (error) {
+      st.saving = false;
+      if (saveButton) { saveButton.disabled = false; saveButton.textContent = '💾 Guardar cambios'; }
+      U.toast('No fue posible guardar. La edición continúa abierta para corregir o reintentar.');
+      try { console.warn('[Orbit Aseguradoras] SAVE_FAILED', error && (error.code || error.message) || error); } catch (e) {}
+    }
   }
   /* Auditoría externa de cambios en tarifas/validación tarifaria — nombre estable: tarifaValidacionAudit */
   function tarifaValidacionAudit(id, before, after, motivo) {
@@ -539,7 +622,7 @@ Orbit.modules.aseguradoras = (function () {
     const portales = a.portales && a.portales.length ? a.portales : (a.portal ? [{ nombre: 'Portal principal', url: a.portal, estadoAcceso: 'Sin verificar', credentialRef: 'backend_required' }] : []);
     return `<div class="asg-sec">
       <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Plataformas y accesos ${editing ? '<button class="btn ghost sm" id="af-add-portal">+ Portal</button>' : ''}</div>
-      <div class="cfg-note" style="margin-bottom:9px">Orbit nunca guarda ni muestra contraseñas. El equipo declara el estado de acceso a cada plataforma para mantener el directorio al día.</div>
+      <div class="cfg-note" style="margin-bottom:9px">El usuario se guarda como dato operativo. Dirección, Superadmin, Admin y Operativo pueden cambiar la contraseña mediante el proveedor seguro; la contraseña nunca se escribe en la ficha.</div>
       <div id="af-portales">${portales.map((p, i) => portalRow(p, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin plataformas registradas.</div>'}</div>
       <label class="ce-l" style="margin-top:9px">📁 Drive / repositorio<input id="af-drive" class="o-sel" value="${U.esc(a.drive || '')}" ${editing ? '' : 'disabled'}></label>
     </div>`;
@@ -547,17 +630,20 @@ Orbit.modules.aseguradoras = (function () {
   function portalRow(p, i, editing) {
     const ro = editing ? '' : 'disabled';
     const estado = p.estadoAcceso || 'Sin verificar';
-    return `<div class="asg-row" data-portal="${i}" style="flex-wrap:wrap">
+    const resourceId = clean(p.id || String(i));
+    return `<div class="asg-row" data-portal="${i}" data-resource-id="${U.esc(resourceId)}" style="flex-wrap:wrap">
       <input class="o-sel" data-pn placeholder="Producto / sistema" value="${U.esc(p.nombre || '')}" style="flex:1.1" ${ro}>
       <select class="o-sel" data-ptipo style="width:110px" ${ro}><option ${p.tipo === 'Cotizador' ? 'selected' : ''}>Cotizador</option><option ${p.tipo === 'Emisión' ? 'selected' : ''}>Emisión</option><option ${p.tipo === 'Cobros' ? 'selected' : ''}>Cobros</option><option ${p.tipo === 'Siniestros' ? 'selected' : ''}>Siniestros</option><option ${p.tipo === 'Portal general' || !p.tipo ? 'selected' : ''}>Portal general</option></select>
       <input class="o-sel" data-pu placeholder="https://…" value="${U.esc(p.url || '')}" style="flex:1.2" ${ro}>
+      <input class="o-sel" data-puser placeholder="Usuario" value="${U.esc(p.usuario || p.user || p.login || '')}" style="flex:1" ${ro}>
+      ${editing && canManageCredentials() ? '<input class="o-sel" data-ppass type="password" autocomplete="new-password" placeholder="Nueva contraseña (vacío = conservar)" style="flex:1">' : ''}
       <select class="o-sel" data-ppais style="width:70px" ${ro}><option ${p.pais === 'GT' ? 'selected' : ''}>GT</option><option ${p.pais === 'CO' ? 'selected' : ''}>CO</option><option ${p.pais === 'Ambos' || !p.pais ? 'selected' : ''}>Ambos</option></select>
       <select class="o-sel" data-pest style="flex:1" ${ro}>${ACCESO_ESTADOS.map(e => `<option ${e === estado ? 'selected' : ''}>${e}</option>`).join('')}</select>
       <input class="o-sel" data-presp placeholder="Responsable" value="${U.esc(p.responsable || '')}" style="flex:1" ${ro}>
       <input class="o-sel" data-pver type="date" title="Última verificación" value="${p.ultimaVerificacion || ''}" style="width:130px" ${ro}>
       <span class="badge ${ACCESO_TONE[estado] || 'neutral'}" style="align-self:center">${estado}</span>
-      ${p.url ? `<button class="btn ghost sm" data-open-portal="${U.esc(p.url)}">↗ Abrir</button>` : ''}
-      ${editing ? `<button class="asg-del" data-del="portales:${i}">✕</button>` : ''}
+      ${p.url ? `<button class="btn ghost sm" type="button" data-open-portal="${U.esc(p.url)}">↗ Abrir</button>` : ''}
+      ${editing ? `<button class="asg-del" type="button" data-del="portales:${i}">✕</button>` : ''}
     </div>`;
   }
 
@@ -565,8 +651,8 @@ Orbit.modules.aseguradoras = (function () {
   function tabBancos(a, editing) {
     const cuentas = a.cuentas || [];
     return `<div class="asg-sec">
-      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Bancos y pagos ${editing ? '<button class="btn ghost sm" id="af-add-cta">+ Cuenta</button>' : ''}</div>
-      <div class="cfg-note" style="margin-bottom:9px">Cuentas ficticias, número enmascarado. Nunca cargar cuentas reales.</div>
+      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Bancos y pagos ${editing ? '<button class="btn ghost sm" type="button" id="af-add-cta">+ Cuenta</button>' : ''}</div>
+      <div class="cfg-note" style="margin-bottom:9px">Directorio dinámico: las cuentas se leen y actualizan desde Orbit.store. Los cambios requieren permiso, motivo, confirmación del backend y auditoría.</div>
       <div id="af-cuentas">${cuentas.map((c, i) => ctaRow(c, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin cuentas registradas.</div>'}</div>
     </div>`;
   }
@@ -578,7 +664,6 @@ Orbit.modules.aseguradoras = (function () {
         <span style="flex:1">${Orbit.vault.field(c.numero || '', { mask: 'right4' })}</span>
         <span style="width:70px;font-size:12.5px">${U.esc(c.moneda || '—')}</span>
         <span style="flex:1;font-size:12.5px">${U.esc(c.titular || '—')}</span>
-        <span style="flex:1;font-size:12.5px">${U.esc(c.uso || '—')}</span>
         <span style="flex:1;font-size:11.5px" class="muted">${c.linkPago ? '🔗 link de pago' : ''}</span>
         <span style="width:130px;font-size:11.5px" class="muted">${c.ultimaVerificacion ? U.fmtDate(c.ultimaVerificacion) : 'sin verificar'}</span>
       </div>`;
@@ -587,10 +672,9 @@ Orbit.modules.aseguradoras = (function () {
     return `<div class="asg-row" data-cta="${i}" style="flex-wrap:wrap">
       <input class="o-sel" data-cb placeholder="Banco" value="${U.esc(c.banco || '')}" style="flex:1.2" ${ro}>
       <input class="o-sel" data-ctt placeholder="Tipo de cuenta" value="${U.esc(c.tipo || '')}" style="flex:1" ${ro}>
-      <input class="o-sel" data-ccn placeholder="N.º enmascarado" value="${U.esc(c.numero || '')}" style="flex:1" ${ro}>
+      <input class="o-sel" data-ccn placeholder="Número de cuenta" value="${U.esc(c.numero || '')}" style="flex:1" ${ro}>
       <input class="o-sel" data-cm placeholder="Moneda" value="${U.esc(c.moneda || '')}" style="width:70px" ${ro}>
       <input class="o-sel" data-ctit placeholder="Titular" value="${U.esc(c.titular || '')}" style="flex:1" ${ro}>
-      <input class="o-sel" data-cuso placeholder="Uso (prima/gastos/comisión)" value="${U.esc(c.uso || '')}" style="flex:1" ${ro}>
       <input class="o-sel" data-clink placeholder="Link de pago (opcional)" value="${U.esc(c.linkPago || '')}" style="flex:1" ${ro}>
       <input class="o-sel" data-cver type="date" title="Última verificación" value="${c.ultimaVerificacion || ''}" style="width:130px" ${ro}>
       ${editing ? `<button class="asg-del" data-del="cuentas:${i}">✕</button>` : ''}
@@ -751,11 +835,20 @@ Orbit.modules.aseguradoras = (function () {
         draft.contactos = [...body.querySelectorAll('[data-cont]')].map(r => ({ nombre: r.querySelector('[data-cn]').value, area: r.querySelector('[data-ca]').value, email: r.querySelector('[data-ce]').value, tel: r.querySelector('[data-cl]').value, ext: r.querySelector('[data-cext]').value, cargo: r.querySelector('[data-cargo]').value, pais: r.querySelector('[data-cpais]').value, canal: r.querySelector('[data-cchan]').value, vigencia: r.querySelector('[data-cvig]').value, gestionPreferida: r.querySelector('[data-cgest]').value, principal: r.querySelector('[data-cppal]').checked }));
       }
       if (t === 'plataformas') {
-        draft.portales = [...body.querySelectorAll('[data-portal]')].map(r => ({ nombre: r.querySelector('[data-pn]').value, tipo: r.querySelector('[data-ptipo]').value, url: r.querySelector('[data-pu]').value, pais: r.querySelector('[data-ppais]').value, estadoAcceso: r.querySelector('[data-pest]').value, responsable: r.querySelector('[data-presp]').value, ultimaVerificacion: r.querySelector('[data-pver]').value, credentialRef: 'backend_required' }));
+        const previous = draft.portales || [];
+        draft.portales = [...body.querySelectorAll('[data-portal]')].map((r, idx) => {
+          const prior = previous[idx] || {};
+          const resourceId = clean(prior.id || r.dataset.resourceId || String(idx));
+          const portal = Object.assign({}, prior, { id: prior.id || (resourceId.indexOf('portal_') === 0 ? resourceId : undefined), nombre: r.querySelector('[data-pn]').value, tipo: r.querySelector('[data-ptipo]').value, url: r.querySelector('[data-pu]').value, usuario: r.querySelector('[data-puser]').value, pais: r.querySelector('[data-ppais]').value, estadoAcceso: r.querySelector('[data-pest]').value, responsable: r.querySelector('[data-presp]').value, ultimaVerificacion: r.querySelector('[data-pver]').value, credentialRef: prior.credentialRef || 'backend_required' });
+          const password = r.querySelector('[data-ppass]');
+          if (password && password.value) st.credentialDrafts[resourceId] = { portalId: resourceId, credentialRef: portal.credentialRef, username: portal.usuario, password: password.value };
+          return portal;
+        });
         draft.drive = (body.querySelector('#af-drive') || {}).value || draft.drive || '';
       }
       if (t === 'bancos') {
-        draft.cuentas = [...body.querySelectorAll('[data-cta]')].map(r => ({ banco: r.querySelector('[data-cb]').value, tipo: r.querySelector('[data-ctt]').value, numero: r.querySelector('[data-ccn]').value, moneda: r.querySelector('[data-cm]').value, titular: r.querySelector('[data-ctit]').value, uso: r.querySelector('[data-cuso]').value, linkPago: r.querySelector('[data-clink]').value, ultimaVerificacion: r.querySelector('[data-cver]').value }));
+        const previous = draft.cuentas || [];
+        draft.cuentas = [...body.querySelectorAll('[data-cta]')].map((r, idx) => Object.assign({}, previous[idx] || {}, { banco: r.querySelector('[data-cb]').value, tipo: r.querySelector('[data-ctt]').value, numero: r.querySelector('[data-ccn]').value, moneda: r.querySelector('[data-cm]').value, titular: r.querySelector('[data-ctit]').value, linkPago: r.querySelector('[data-clink]').value, ultimaVerificacion: r.querySelector('[data-cver]').value }));
       }
       if (t === 'productos') {
         body.querySelectorAll('[data-ramopct]').forEach(inp => { draft.comisiones = draft.comisiones || {}; draft.comisiones[inp.dataset.ramopct] = +inp.value || 0; });
@@ -794,13 +887,14 @@ Orbit.modules.aseguradoras = (function () {
         }
       }
     }
+    st.snapshotCurrent = snapshotTab;
 
-    // cualquier cambio de input snapshotea la pestaña actual al draft (sin escribir al store)
-    body.querySelectorAll('input,select,textarea').forEach(el => el.addEventListener('change', snapshotTab));
+    // cualquier cambio de input actualiza el draft; Guardar fuerza además el snapshot de la pestaña visible.
+    body.querySelectorAll('input,select,textarea').forEach(el => { el.addEventListener('change', snapshotTab); el.addEventListener('input', snapshotTab); });
 
-    if (t === 'contactos') { const add = body.querySelector('#af-add-cont'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.contactos = (draft.contactos || []).concat([{ nombre: '', area: 'Comercial', email: '', tel: '', cargo: '', canal: 'Correo', principal: false }]); selectTab('contactos'); }); }
-    if (t === 'plataformas') { const add = body.querySelector('#af-add-portal'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.portales = (draft.portales || []).concat([{ nombre: '', url: '', estadoAcceso: 'Pendiente de conexión segura', credentialRef: 'backend_required' }]); selectTab('plataformas'); }); }
-    if (t === 'bancos') { const add = body.querySelector('#af-add-cta'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.cuentas = (draft.cuentas || []).concat([{ banco: '', tipo: 'Monetaria', numero: '****' + Math.floor(1000 + Math.random() * 8999), moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', titular: '' }]); selectTab('bancos'); }); }
+    if (t === 'contactos') { const add = body.querySelector('#af-add-cont'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.contactos = (draft.contactos || []).concat([{ id: 'contact_' + Date.now().toString(36), nombre: '', area: 'Comercial', email: '', tel: '', cargo: '', canal: 'Correo', principal: false }]); selectTab('contactos'); }); }
+    if (t === 'plataformas') { const add = body.querySelector('#af-add-portal'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.portales = (draft.portales || []).concat([{ id: 'portal_' + Date.now().toString(36), nombre: '', url: '', usuario: '', estadoAcceso: 'Sin verificar', credentialRef: 'backend_required' }]); selectTab('plataformas'); }); }
+    if (t === 'bancos') { const add = body.querySelector('#af-add-cta'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.cuentas = (draft.cuentas || []).concat([{ id: 'account_' + Date.now().toString(36), banco: '', tipo: 'Monetaria', numero: '', moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', titular: '', linkPago: '', ultimaVerificacion: '' }]); selectTab('bancos'); }); }
     if (t === 'productos') {
       const addRamo = body.querySelector('#af-add-ramo'); if (addRamo) addRamo.addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; snapshotTab(); const rr = (draft.ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); draft.ramos = rr; draft.comisiones = Object.assign({}, draft.comisiones); draft.comisiones[r] = draft.comisionDefault || 12; selectTab('productos'); });
       const addReq = body.querySelector('#af-add-req'); if (addReq) addReq.addEventListener('click', () => { snapshotTab(); draft.docsRequeridos = (draft.docsRequeridos || []).concat([{ producto: '', items: '' }]); selectTab('productos'); });

@@ -4,7 +4,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
   var Orbit = window.Orbit;
-  var VERSION = '20260722.1';
+  var VERSION = '20260723.2';
   if (Orbit.clientInsurerOperationalDirectoryOwnerV20260722 && Orbit.clientInsurerOperationalDirectoryOwnerV20260722.version === VERSION) return;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
@@ -105,6 +105,7 @@
     var root = document.getElementById('asg-ficha');
     var insurer = currentInsurer();
     if (!root || !insurer) return false;
+    if (root.querySelector('#af-guardar') || root.classList.contains('od-edit-mode-ready')) return true;
     root.querySelectorAll('#af-portales .asg-row[data-portal]').forEach(function (row) { renderPortalRow(row, insurer, Number(row.dataset.portal)); });
     root.querySelectorAll('#af-cuentas .asg-row[data-cta]').forEach(function (row) { renderBankRow(row, insurer, Number(row.dataset.cta)); });
     var portalsNote = root.querySelector('#af-portales') && root.querySelector('#af-portales').parentElement.querySelector('.cfg-note');
@@ -182,6 +183,7 @@
     bankCopyFields: ['banco','tipo','numero','moneda','titular'],
     bankCopyExcludesUse: true,
     bankHolderFallbackInsurer: true,
+    skipsEditMode: true,
     writesStore: false,
     reimportsData: false,
     render: render

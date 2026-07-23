@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "orbit360-m1-dynamic-directory-patch-v2",
+  "status": "PATCH_V2_APPLIED",
+  "contractVersion": "1.0.40",
+  "changedFiles": [
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+    "orbit360-platform/core/client-insurer-edit-owner-v20260722.js",
+    "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+    "orbit360-platform/core/router-tenant-config-bootstrap.js"
+  ],
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "production": false
+  },
+  "invariants": {
+    "canonicalModuleOwnsCrud": true,
+    "readOwnerSkipsEdit": true,
+    "blankDynamicAccounts": true,
+    "securePasswordProvider": true,
+    "passwordInStore": false,
+    "currentTabSnapshotted": true,
+    "backendWriteAcknowledged": true,
+    "allowedEditRoles": [
+      "Direccion",
+      "Superadmin",
+      "Admin",
+      "Operativo"
+    ],
+    "operationalValuesInCode": false,
+    "newInsurersDefaultActive": true,
+    "secureCredentialSourceHashSha256": true
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "generatorRevision": "root-cause-corrected-v2",
+  "correctedFailure": {
+    "runId": 30009334105,
+    "diagnosticRunId": 30009737855,
+    "cause": "unterminated_bootstrap_comment_generated_by_replacement",
+    "bootstrapCommentClosed": true,
+    "diagnosticShellCaptureIssueIsolated": true
+  }
+}
