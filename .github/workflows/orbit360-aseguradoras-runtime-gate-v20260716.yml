@@ -1,33 +1,32 @@
-name: Orbit 360 · M1 directorio dinámico 1.0.40 · HOSTING_DELIVERY
+name: Orbit 360 · M1 CSS delivery root · HOSTING_CSS_DELIVERY
 
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
-    paths: ['tools/orbit360-m1-dynamic-directory-hosting-lab-request-v20260723.json']
+    paths: ['tools/orbit360-m1-css-delivery-hosting-request-v20260723.json']
 
 permissions:
   contents: read
   statuses: write
 
 concurrency:
-  group: orbit360-m1-dynamic-directory-hosting-lab-v1
+  group: orbit360-m1-css-delivery-hosting-v1
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   ORBIT360_GATE_PHASE: lab_hosting_delivery
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-dynamic-directory-hosting-lab-request-v20260723.json
-  ORBIT360_REQUEST_ID: m1-dynamic-directory-hosting-lab-v1
-  VALIDATED_PATCH_COMMIT: 6145e3b0a4173c582617bfc26dbfdc0c55b88b86
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-css-delivery-hosting-request-v20260723.json
+  ORBIT360_REQUEST_ID: m1-css-delivery-hosting-v1
   EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
   FIREBASE_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
   ORBIT360_HOSTING_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
 
 jobs:
-  hosting-delivery:
-    name: M1 directorio dinámico · HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED
+  css-delivery:
+    name: M1 CSS · HOSTING_CSS_DELIVERED_AND_VERIFIED
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -43,7 +42,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud inmutable y autorización Hosting
+      - name: Validar solicitud inmutable y freeze
         shell: bash
         run: |
           set -euo pipefail
@@ -55,42 +54,49 @@ jobs:
           const f=JSON.parse(fs.readFileSync('tools/orbit360-incident-freeze-v20260721.json','utf8'));
           const head=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
           const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
-          const a=f.hostingAuthorization||{},s=f.staticClosure||{},bad=[];
-          if(r.schemaVersion!=='orbit360-m1-dynamic-directory-hosting-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
-          if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.contractVersion!=='1.0.40')bad.push('scope');
-          if(r.hostingAlignmentCommit!==parent||r.allowedExecutions!==1||r.hostingDelivery!==true)bad.push('binding');
-          if(r.validatedPatchCommit!==process.env.VALIDATED_PATCH_COMMIT||r.staticClosureRunId!==30015526564||r.staticClosureArtifactId!==8566941885||r.staticClosureArtifactDigest!=='sha256:912d1287cec7a634be4a23fbf6e6cfe8d3c30b83c63942f0cca49859971a4773')bad.push('evidence');
+          const a=f.cssDeliveryAuthorization||{},bad=[];
+          if(r.schemaVersion!=='orbit360-m1-css-delivery-hosting-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
+          if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.contractVersion!=='1.0.40'||r.deliveryRevision!=='20260723-10')bad.push('scope');
+          if(r.cssDeliveryPatchCommit!==parent||r.allowedExecutions!==1||r.hostingDelivery!==true)bad.push('binding');
           if(r.projectId!==process.env.EXPECTED_FIREBASE_PROJECT_ID||r.channel!==process.env.ORBIT360_HOSTING_CHANNEL||r.canonicalUrl!==process.env.ORBIT360_HOSTING_URL)bad.push('target');
           if(r.secrets!==true||r.firestoreRead!==false||r.vaultRead!==false||r.operationalWrites!==false||r.runtime!==false||r.browser!==false||r.deploy!==true||r.repositoryWrite!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.reimport!==false)bad.push('capabilities');
-          if(f.status!=='M1_DYNAMIC_DIRECTORY_HOSTING_LAB_AUTHORIZED_ONCE'||f.stateClarification.nextAction!=='PUBLISH_AND_VERIFY_HOSTING_LAB_1_0_40_ONCE')bad.push('freeze');
-          if(a.authorizationId!==process.env.ORBIT360_REQUEST_ID||a.active!==true||a.consumed!==false||a.allowedExecutions!==1||a.validatedPatchCommit!==process.env.VALIDATED_PATCH_COMMIT||a.deployAllowed!==true||a.remoteIntegrityRequired!==true)bad.push('authorization');
-          if(s.runId!==30015526564||s.status!=='GO_STATIC_DYNAMIC_DIRECTORY_1_0_40'||s.canonicalChecksPassed!==153||s.canonicalChecksTotal!==153||s.dynamicChecksPassed!==23||s.dynamicChecksTotal!==23)bad.push('static-closure');
-          try{cp.execFileSync('git',['merge-base','--is-ancestor',process.env.VALIDATED_PATCH_COMMIT,parent]);}catch{bad.push('patch-ancestor');}
+          if(f.status!=='M1_CSS_DELIVERY_ROOT_FIX_HOSTING_AUTHORIZED_ONCE'||f.stateClarification.nextAction!=='PUBLISH_CSS_DELIVERY_ROOT_FIX_ONCE')bad.push('freeze');
+          if(a.authorizationId!==process.env.ORBIT360_REQUEST_ID||a.active!==true||a.consumed!==false||a.allowedExecutions!==1||a.deployAllowed!==true||a.remoteIntegrityRequired!==true||a.cssMimeRequired!==true)bad.push('authorization');
           if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
           const d='orbit360-platform/runtime-gate-crm-v20260716';fs.mkdirSync(d,{recursive:true});
-          fs.writeFileSync(`${d}/dynamic-directory-hosting-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,contractVersion:r.contractVersion,hostingAlignmentCommit:r.hostingAlignmentCommit,requestCommit:head,validatedPatchCommit:r.validatedPatchCommit,staticClosureRunId:r.staticClosureRunId,projectId:r.projectId,channel:r.channel,canonicalUrl:r.canonicalUrl,assetsExpected:16,hostingDelivery:true,secrets:true,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:true,repositoryWrite:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          fs.writeFileSync(`${d}/css-delivery-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,contractVersion:r.contractVersion,deliveryRevision:r.deliveryRevision,cssDeliveryPatchCommit:r.cssDeliveryPatchCommit,requestCommit:head,projectId:r.projectId,channel:r.channel,canonicalUrl:r.canonicalUrl,assetsExpected:22,essentialCssExpected:6,hostingDelivery:true,secrets:true,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:true,repositoryWrite:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
           NODE
 
-      - name: Preflight canónico antes de identidad
+      - name: Preflight canónico y contrato CSS antes de identidad
         shell: bash
         run: |
           set -euo pipefail
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" > orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-preflight.json
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="1.0.40" and .executionPhase=="LAB_HOSTING_DELIVERY" and .canonicalOwnerScope=="overlay_replace" and .runtimeContractScope=="overlay_replace" and .failed==0 and .capabilityProfile.secrets==true and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==true and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .sourceTransformed==false and .operationalWrites==0' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-preflight.json >/dev/null
-          node orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs > orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-contract.json
-          jq -e '.ok==true and .status=="DYNAMIC_DIRECTORY_CONTRACT_V3_PASS" and .total==23 and .passed==23 and .failed==0' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-contract.json >/dev/null
+          node --check orbit360-platform/tools/orbit360-m1-css-delivery-contract-v20260723.cjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" > orbit360-platform/runtime-gate-crm-v20260716/css-delivery-preflight.json
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="1.0.40" and .executionPhase=="LAB_HOSTING_DELIVERY" and .canonicalOwnerScope=="overlay_replace" and .runtimeContractScope=="overlay_replace" and .failed==0 and .capabilityProfile.secrets==true and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==true and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .sourceTransformed==false and .operationalWrites==0' orbit360-platform/runtime-gate-crm-v20260716/css-delivery-preflight.json >/dev/null
+          node orbit360-platform/tools/orbit360-m1-css-delivery-contract-v20260723.cjs > orbit360-platform/runtime-gate-crm-v20260716/css-delivery-contract-output.json
+          jq -e '.ok==true and .status=="CSS_DELIVERY_CONTRACT_PASS" and .failed==0 and .passed==.total and (.essentialStyles|length)==6' orbit360-platform/runtime-gate-crm-v20260716/css-delivery-contract-sanitized.json >/dev/null
 
-      - name: Preparar inventario local de 16 activos
+      - name: Preparar inventario local de 22 activos
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs=require('fs'),crypto=require('crypto');
-          const files=['index.html','ays-lab-preview.html','modules/aseguradoras.js','core/router-tenant-config-bootstrap.js','core/client-insurer-edit-owner-v20260722.js','core/client-insurer-operational-directory-owner-v20260722.js','core/client-insurer-visual-stability-barrier-v20260721.js','core/client-insurer-visual-contract-v20260720.js','styles/client-insurer-edit-mode-v20260722.css','styles/client-insurer-visual-contract-v20260720.css','data/academia-v1230-operational-directory-v20260722.js','data/tenant-alianzas-soluciones-insurers-p10.js','core/operational-directory-field-policy-v20260722.js','core/aseguradoras-credentials-provider-lab-v20260720.js','core/insurer-secure-target-bridge-v20260720.js','core/pwa.js'];
+          const files=[
+            'index.html','ays-lab-preview.html',
+            'styles/tokens.css','styles/base.css','styles/infra.css','styles/v1197-empalme.css',
+            'styles/client-insurer-visual-contract-v20260720.css','styles/client-insurer-edit-mode-v20260722.css','styles/aseguradoras-candidate.css',
+            'sw.js','core/pwa.js','modules/aseguradoras.js','core/router-tenant-config-bootstrap.js',
+            'core/client-insurer-edit-owner-v20260722.js','core/client-insurer-operational-directory-owner-v20260722.js',
+            'core/client-insurer-visual-stability-barrier-v20260721.js','core/client-insurer-visual-contract-v20260720.js',
+            'data/academia-v1230-operational-directory-v20260722.js','data/tenant-alianzas-soluciones-insurers-p10.js',
+            'core/operational-directory-field-policy-v20260722.js','core/aseguradoras-credentials-provider-lab-v20260720.js','core/insurer-secure-target-bridge-v20260720.js'
+          ];
           const sha=p=>crypto.createHash('sha256').update(fs.readFileSync('orbit360-platform/'+p)).digest('hex');
-          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-local-integrity.json',JSON.stringify({schemaVersion:'orbit360-dynamic-directory-hosting-local-integrity-v1',contractVersion:'1.0.40',assets:files.map(path=>({path,sha256:sha(path)})),containsPII:false,containsSecrets:false},null,2)+'\n');
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/css-delivery-local-integrity.json',JSON.stringify({schemaVersion:'orbit360-css-delivery-local-integrity-v1',contractVersion:'1.0.40',deliveryRevision:'20260723-10',assets:files.map(path=>({path,sha256:sha(path)})),containsPII:false,containsSecrets:false},null,2)+'\n');
           NODE
 
       - name: Resolver identidad exclusiva de Hosting LAB
@@ -103,7 +109,7 @@ jobs:
           set -euo pipefail
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
           test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-dynamic-directory-hosting.json"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-css-delivery-hosting.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
@@ -121,65 +127,80 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npx firebase hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --project "$EXPECTED_FIREBASE_PROJECT_ID" --config firebase.json --expires 7d --non-interactive --json > orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-deploy-output.json
+          npx firebase hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --project "$EXPECTED_FIREBASE_PROJECT_ID" --config firebase.json --expires 7d --non-interactive --json > orbit360-platform/runtime-gate-crm-v20260716/css-delivery-deploy-output.json
 
-      - name: Verificar integridad remota exacta
+      - name: Verificar hashes y MIME remoto
         shell: bash
         run: |
           set -euo pipefail
-          BASE="$ORBIT360_HOSTING_URL"
-          for attempt in $(seq 1 18); do
-            if curl -fsSL -H 'Accept-Encoding: identity' "${BASE}/ays-lab-preview.html?orbit_sha=${GITHUB_SHA}" -o /tmp/orbit-preview.html; then break; fi
-            sleep 5
-          done
-          test -s /tmp/orbit-preview.html
           node <<'NODE'
-          const fs=require('fs'),crypto=require('crypto'),cp=require('child_process');
-          const local=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-local-integrity.json','utf8'));
-          const base=process.env.ORBIT360_HOSTING_URL,sha=b=>crypto.createHash('sha256').update(b).digest('hex'),assets=[];
-          for(const item of local.assets){const body=cp.execFileSync('curl',['-fsSL','-H','Accept-Encoding: identity',`${base}/${item.path}?orbit_sha=${process.env.GITHUB_SHA}`],{maxBuffer:64*1024*1024});const remote=sha(body);assets.push({path:item.path,localSha256:item.sha256,remoteSha256:remote,match:item.sha256===remote});}
-          const ok=assets.length===16&&assets.every(x=>x.match);
-          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-remote-integrity.json',JSON.stringify({schemaVersion:'orbit360-dynamic-directory-hosting-remote-integrity-v1',contractVersion:'1.0.40',ok,status:ok?'HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED':'REMOTE_INTEGRITY_MISMATCH',canonicalUrl:base,reviewUrl:`${base}/ays-lab-preview.html`,assets,activeInsurers:26,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
-          if(!ok)process.exit(41);
+          const fs=require('fs'),crypto=require('crypto');
+          const local=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/css-delivery-local-integrity.json','utf8'));
+          const base=process.env.ORBIT360_HOSTING_URL;
+          const essential=new Set(['styles/tokens.css','styles/base.css','styles/infra.css','styles/v1197-empalme.css','styles/client-insurer-visual-contract-v20260720.css','styles/client-insurer-edit-mode-v20260722.css']);
+          const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+          (async()=>{
+            const assets=[];
+            for(const item of local.assets){
+              const response=await fetch(`${base}/${item.path}?orbit_sha=${process.env.GITHUB_SHA}`,{headers:{'Cache-Control':'no-cache','Accept-Encoding':'identity'}});
+              const body=Buffer.from(await response.arrayBuffer());
+              const type=String(response.headers.get('content-type')||'').toLowerCase();
+              const isCss=item.path.endsWith('.css');
+              const contentTypeOk=!isCss||type.includes('text/css');
+              const remote=sha(body);
+              assets.push({path:item.path,status:response.status,contentType:type,contentTypeOk,localSha256:item.sha256,remoteSha256:remote,match:response.ok&&item.sha256===remote});
+            }
+            const essentialRows=assets.filter(x=>essential.has(x.path));
+            const essentialCssVerified=essentialRows.length===6&&essentialRows.every(x=>x.match&&x.contentTypeOk);
+            const allAssetsMatch=assets.length===22&&assets.every(x=>x.match);
+            const allCssMimeValid=assets.filter(x=>x.path.endsWith('.css')).every(x=>x.contentTypeOk);
+            const ok=allAssetsMatch&&allCssMimeValid&&essentialCssVerified;
+            const report={schemaVersion:'orbit360-css-delivery-remote-integrity-v1',contractVersion:'1.0.40',deliveryRevision:'20260723-10',ok,status:ok?'HOSTING_CSS_DELIVERED_AND_VERIFIED':'HOSTING_CSS_DELIVERY_FAILED',canonicalUrl:base,reviewUrl:`${base}/ays-lab-preview.html`,assets,assetsVerified:assets.length,essentialCssVerified,essentialCssCount:essentialRows.length,allAssetsMatch,allCssMimeValid,activeInsurers:26,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false};
+            fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/css-delivery-remote-integrity.json',JSON.stringify(report,null,2)+'\n');
+            if(!ok)process.exitCode=41;
+          })().catch(error=>{console.error(error);process.exit(41);});
           NODE
-          jq -e '.ok==true and .status=="HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED" and (.assets|length)==16 and ([.assets[].match]|all) and .activeInsurers==26 and .firestoreRead==false and .vaultRead==false and .operationalWrites==false and .runtime==false and .browser==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .reimport==false' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-remote-integrity.json >/dev/null
+          jq -e '.ok==true and .status=="HOSTING_CSS_DELIVERED_AND_VERIFIED" and .assetsVerified==22 and .essentialCssVerified==true and .essentialCssCount==6 and .allAssetsMatch==true and .allCssMimeValid==true and .firestoreRead==false and .vaultRead==false and .operationalWrites==false and .runtime==false and .browser==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .reimport==false' orbit360-platform/runtime-gate-crm-v20260716/css-delivery-remote-integrity.json >/dev/null
 
       - name: Cerrar evidencia sanitizada
         if: always()
         shell: bash
         run: |
           node <<'NODE'
-          const fs=require('fs'),d='orbit360-platform/runtime-gate-crm-v20260716';const read=n=>{try{return JSON.parse(fs.readFileSync(`${d}/${n}`,'utf8'))}catch{return null}};
-          const p=read('dynamic-directory-hosting-preflight.json'),c=read('dynamic-directory-hosting-contract.json'),r=read('dynamic-directory-hosting-remote-integrity.json');const ok=!!(p&&p.status==='GO_GATE_CONTRACT'&&c&&c.status==='DYNAMIC_DIRECTORY_CONTRACT_V3_PASS'&&c.passed===23&&r&&r.status==='HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED'&&r.ok===true&&r.assets.length===16);
-          fs.writeFileSync(`${d}/dynamic-directory-hosting-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-dynamic-directory-hosting-v1',generatedAt:new Date().toISOString(),ok,status:ok?'HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED':'HOSTING_DYNAMIC_DIRECTORY_DELIVERY_FAILED',contractVersion:'1.0.40',validatedPatchCommit:process.env.VALIDATED_PATCH_COMMIT,canonicalPreflight:p&&p.status||'NOT_RUN',dynamicChecksPassed:c&&c.passed||0,assetsVerified:r&&r.assets?r.assets.length:0,allAssetsMatch:!!(r&&r.assets&&r.assets.every(x=>x.match)),canonicalUrl:process.env.ORBIT360_HOSTING_URL,reviewUrl:`${process.env.ORBIT360_HOSTING_URL}/ays-lab-preview.html`,activeInsurers:26,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:true,repositoryWrite:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');if(!ok)process.exitCode=41;
+          const fs=require('fs'),d='orbit360-platform/runtime-gate-crm-v20260716';
+          const read=n=>{try{return JSON.parse(fs.readFileSync(`${d}/${n}`,'utf8'))}catch{return null}};
+          const p=read('css-delivery-preflight.json'),c=read('css-delivery-contract-sanitized.json'),r=read('css-delivery-remote-integrity.json');
+          const ok=!!(p&&p.status==='GO_GATE_CONTRACT'&&c&&c.status==='CSS_DELIVERY_CONTRACT_PASS'&&c.failed===0&&r&&r.status==='HOSTING_CSS_DELIVERED_AND_VERIFIED'&&r.ok===true&&r.assetsVerified===22&&r.essentialCssVerified===true);
+          fs.writeFileSync(`${d}/css-delivery-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-css-delivery-hosting-v1',generatedAt:new Date().toISOString(),ok,status:ok?'HOSTING_CSS_DELIVERED_AND_VERIFIED':'HOSTING_CSS_DELIVERY_FAILED',contractVersion:'1.0.40',deliveryRevision:'20260723-10',canonicalPreflight:p&&p.status||'NOT_RUN',cssChecksPassed:c&&c.passed||0,cssChecksTotal:c&&c.total||0,assetsVerified:r&&r.assetsVerified||0,essentialCssVerified:!!(r&&r.essentialCssVerified),allAssetsMatch:!!(r&&r.allAssetsMatch),allCssMimeValid:!!(r&&r.allCssMimeValid),canonicalUrl:process.env.ORBIT360_HOSTING_URL,reviewUrl:`${process.env.ORBIT360_HOSTING_URL}/ays-lab-preview.html`,activeInsurers:26,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:true,repositoryWrite:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          if(!ok)process.exitCode=41;
           NODE
 
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-dynamic-directory-hosting-${{ github.run_id }}
+          name: orbit360-m1-css-delivery-hosting-${{ github.run_id }}
           path: |
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-request-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/css-delivery-request-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-preflight.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-contract.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-local-integrity.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-deploy-output.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-remote-integrity.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/css-delivery-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/css-delivery-contract-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/css-delivery-local-integrity.json
+            orbit360-platform/runtime-gate-crm-v20260716/css-delivery-deploy-output.json
+            orbit360-platform/runtime-gate-crm-v20260716/css-delivery-remote-integrity.json
+            orbit360-platform/runtime-gate-crm-v20260716/css-delivery-summary.json
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Publicar estado Hosting
+      - name: Publicar estado canónico
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          state=failure; description='1.0.40 dynamic directory Hosting failed'
-          if [ -f orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-summary.json)" = true ]; then state=success; description='1.0.40 Hosting verified 16/16'; fi
-          gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-dynamic-directory-hosting-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          state=failure; description='1.0.40 CSS delivery failed'
+          if [ -f orbit360-platform/runtime-gate-crm-v20260716/css-delivery-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/css-delivery-summary.json)" = true ]; then state=success; description='1.0.40 CSS delivery verified 22/22'; fi
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m1-css-delivery-hosting-v1"}')"
 
       - name: Limpiar identidad temporal
         if: always()
