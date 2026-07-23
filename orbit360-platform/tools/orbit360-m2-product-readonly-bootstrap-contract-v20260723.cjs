@@ -9,18 +9,9 @@ const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/m2-product-re
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const checks = [];
 
-function exists(rel) {
-  return fs.existsSync(path.join(ROOT, rel));
-}
-
-function read(rel) {
-  return fs.readFileSync(path.join(ROOT, rel), 'utf8');
-}
-
-function json(rel) {
-  return JSON.parse(read(rel));
-}
-
+function exists(rel) { return fs.existsSync(path.join(ROOT, rel)); }
+function read(rel) { return fs.readFileSync(path.join(ROOT, rel), 'utf8'); }
+function json(rel) { return JSON.parse(read(rel)); }
 function executable(rel) {
   let source = read(rel);
   if (/\.(?:js|mjs|cjs)$/i.test(rel)) source = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
@@ -28,18 +19,9 @@ function executable(rel) {
   if (/\.ya?ml$/i.test(rel)) source = source.replace(/^\s*#.*$/gm, '');
   return source;
 }
-
-function check(id, ok, detail) {
-  checks.push({ id, ok: Boolean(ok), detail: String(detail || '') });
-}
-
-function has(rel, token) {
-  return exists(rel) && executable(rel).includes(token);
-}
-
-function lacks(rel, token) {
-  return exists(rel) && !executable(rel).includes(token);
-}
+function check(id, ok, detail) { checks.push({ id, ok: Boolean(ok), detail: String(detail || '') }); }
+function has(rel, token) { return exists(rel) && executable(rel).includes(token); }
+function lacks(rel, token) { return exists(rel) && !executable(rel).includes(token); }
 
 const files = {
   taxonomy: 'orbit360-platform/core/product-role-taxonomy-p0.js',
@@ -69,6 +51,7 @@ check('MEMBERSHIP_COMPAT_OWNER', has(files.membership, 'membershipMultirolContra
 check('MEMBERSHIP_NO_WRITES', has(files.membership, 'writesStore: false'), files.membership);
 check('ACCESS_USES_TAXONOMY', has(files.access, 'canonicalMembership') && has(files.access, 'productRoleTaxonomyP0'), files.access);
 check('ACCESS_READONLY', has(files.access, 'writesAuthorized: false') && has(files.access, 'writeAuthorized: false'), files.access);
+check('ACCESS_ABSOLUTE_WRITE_DENIAL', has(files.access, "code: 'readonly_write_blocked'") && has(files.access, 'allowed: false') && has(files.access, 'ok: false'), files.access);
 check('ACCESS_TENANT_MEMBERSHIP', has(files.access, "tenantSource: 'membership_only'"), files.access);
 
 check('BOOTSTRAP_OWNER_EXPLICIT', has(files.bootstrap, 'backendProductReadOnlyBootstrapP0'), files.bootstrap);
@@ -81,6 +64,8 @@ check('BOOTSTRAP_REQUIRES_MEMBERSHIP_PROVIDER', has(files.bootstrap, "'membershi
 check('BOOTSTRAP_INSTALLS_PRODUCT_STORE', has(files.bootstrap, 'createFirestoreProductReadOnlyStoreP0') && has(files.bootstrap, 'window.Orbit.store = store'), files.bootstrap);
 check('BOOTSTRAP_READINESS_BEFORE_ATTACH', has(files.bootstrap, 'backendProductReadinessP0.readiness') && executable(files.bootstrap).indexOf('backendProductReadinessP0.readiness') < executable(files.bootstrap).indexOf('store._attachSnapshots()'), files.bootstrap);
 check('BOOTSTRAP_WAITS_STORE_READY', has(files.bootstrap, 'waitForStoreReady') && has(files.bootstrap, "status.status === 'ready-read-only'") && executable(files.bootstrap).indexOf('await waitForStoreReady') < executable(files.bootstrap).indexOf("transition(state, 'ready-read-only'"), files.bootstrap);
+check('BOOTSTRAP_INSTALL_AFTER_READY', executable(files.bootstrap).indexOf('await waitForStoreReady') < executable(files.bootstrap).indexOf('window.Orbit.store = store'), files.bootstrap);
+check('BOOTSTRAP_DETACHES_ON_FAILURE', has(files.bootstrap, 'store._detachSnapshots()'), files.bootstrap);
 check('BOOTSTRAP_NO_URL_TENANT', lacks(files.bootstrap, 'location.search') && lacks(files.bootstrap, 'URLSearchParams') && lacks(files.bootstrap, 'window.location'), files.bootstrap);
 check('BOOTSTRAP_NO_ALT_STORAGE', lacks(files.bootstrap, 'localStorage') && lacks(files.bootstrap, 'Orbit.SEED'), files.bootstrap);
 check('BOOTSTRAP_NO_ENV_VALUES', lacks(files.bootstrap, 'apiKey:') && lacks(files.bootstrap, 'projectId:'), files.bootstrap);
