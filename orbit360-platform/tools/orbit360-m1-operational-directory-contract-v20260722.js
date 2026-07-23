@@ -18,6 +18,10 @@ const addendum = read('docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENT
 const workflow = readRepo('.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml');
 const freeze = jsonRepo('tools/orbit360-incident-freeze-v20260721.json');
 const overlay = jsonRepo('tools/orbit360-gate-contract-overlay-v20260718.json');
+const phase = String(process.env.ORBIT360_GATE_PHASE || (overlay.gatePatch && overlay.gatePatch.executionProfile && overlay.gatePatch.executionProfile.phase) || '').toUpperCase();
+const isDryRun = phase === 'LAB_DATA_CONTRACT_REPAIR_DRYRUN';
+const isApply = phase === 'LAB_DATA_CONTRACT_REPAIR_APPLY';
+const isStatic = phase === 'STATIC_PREFLIGHT' || (!isDryRun && !isApply);
 
 check('POLICY_VERSION', policy.includes("var VERSION = '20260722.1'"));
 check('POLICY_OPERATIONAL_FIELDS', policy.includes("operationalFields: ['usuario', 'numero']") && policy.includes('usernameOperational: true') && policy.includes('bankNumberOperational: true'));
@@ -54,23 +58,41 @@ check('ACADEMY_ROLES', academy.includes("['Dirección','Operativo','Asesor']"));
 check('ADDENDUM_BINDING', addendum.includes('Usuario del portal') && addendum.includes('Número de cuenta bancaria') && addendum.includes('Es el único campo secreto'));
 check('OVERLAY_1038', overlay.gatePatch && overlay.gatePatch.contractVersion === '1.0.38' && String(overlay.contractRevision || '').startsWith('1.0.38'));
 check('OVERLAY_OWNERS', (overlay.canonicalOwners || []).some(x => x.id === 'operationalDirectoryFieldPolicy') && (overlay.canonicalOwners || []).some(x => x.id === 'clientInsurerOperationalDirectoryOwner'));
-check('FREEZE_STATIC_ONLY', freeze.stateClarification && freeze.stateClarification.operationalDirectoryStaticPatch === 'READY_FOR_VALIDATION' && freeze.stateClarification.operationalDirectoryDryRun === 'NOT_AUTHORIZED' && freeze.stateClarification.operationalDirectoryApply === 'NOT_AUTHORIZED');
-check('WORKFLOW_VALIDATION_ONLY', workflow.includes('VALIDATION_ONLY') && !workflow.includes('orbit360-reparar-directorio-operativo-estructural') && !workflow.includes('orbit360-aplicar-correccion-directorio-operativo') && !workflow.includes('git commit') && !workflow.includes('git push'));
-check('WORKFLOW_NO_DATA_ACCESS', !workflow.toLowerCase().includes('firestore') && !workflow.includes('GOOGLE_APPLICATION_CREDENTIALS') && !workflow.includes('FIREBASE_SERVICE_ACCOUNT') && !workflow.includes('Secret Manager'));
+check('PHASE_RECOGNIZED', isStatic || isDryRun || isApply, phase || 'missing');
+check('M1_REMAINS_OPEN', freeze.stateClarification && freeze.stateClarification.m1Closed === false && freeze.stateClarification.m2Authorized === false, freeze.status || 'missing');
+
+if (isStatic) {
+  check('FREEZE_STATIC_PHASE', freeze.stateClarification && freeze.stateClarification.operationalDirectoryApply === 'NOT_AUTHORIZED', freeze.status || 'missing');
+  check('WORKFLOW_VALIDATION_ONLY', workflow.includes('VALIDATION_ONLY') && !workflow.includes('git commit') && !workflow.includes('git push'), 'static workflow');
+  check('WORKFLOW_NO_DATA_ACCESS', !workflow.toLowerCase().includes('firestore') && !workflow.includes('GOOGLE_APPLICATION_CREDENTIALS') && !workflow.includes('FIREBASE_SERVICE_ACCOUNT'), 'static no data');
+}
+if (isDryRun) {
+  check('FREEZE_DRYRUN_AUTHORIZED', freeze.stateClarification && freeze.stateClarification.operationalDirectoryDryRun === 'AUTHORIZED_ONCE' && freeze.stateClarification.operationalDirectoryApply === 'NOT_AUTHORIZED', freeze.status || 'missing');
+  check('WORKFLOW_READ_ONLY_DRYRUN', workflow.includes('READ_ONLY_DRY_RUN') && workflow.includes('orbit360-restituir-directorio-operativo-v2-v20260722.mjs') && workflow.includes('--dry-run') && !workflow.includes('--apply'), 'dry-run workflow');
+  check('WORKFLOW_READS_AFTER_PREFLIGHT', workflow.indexOf('Preflight canónico antes de credenciales') < workflow.indexOf('Resolver identidad LAB de solo lectura'), 'preflight before credentials');
+  check('WORKFLOW_DRYRUN_NO_REPO_WRITE', !workflow.includes('git commit') && !workflow.includes('git push') && !workflow.includes('contents: write'), 'no repository write');
+  check('WORKFLOW_DRYRUN_BLOCKS_OPERATIONAL_WRITE', !workflow.includes('ATOMIC_APPLY') && !workflow.includes('transactionCommitted == true'), 'no apply');
+}
+if (isApply) {
+  check('FREEZE_APPLY_AUTHORIZED', freeze.stateClarification && freeze.stateClarification.operationalDirectoryApply === 'AUTHORIZED_ONCE', freeze.status || 'missing');
+  check('WORKFLOW_ATOMIC_APPLY', workflow.includes('ATOMIC_APPLY') && workflow.includes('orbit360-restituir-directorio-operativo-v2-v20260722.mjs') && workflow.includes('--apply'), 'apply workflow');
+}
+check('WORKFLOW_NO_SOURCE_TRANSFORMER', !workflow.includes('orbit360-reparar-directorio-operativo-estructural') && !workflow.includes('orbit360-aplicar-correccion-directorio-operativo') && !workflow.includes('orbit360-alinear-fase-reparacion-directorio'), 'transformers retired');
 
 const failed = checks.filter(x => !x.ok);
 const result = {
-  schemaVersion: 'orbit360-m1-operational-directory-contract-v1',
+  schemaVersion: 'orbit360-m1-operational-directory-contract-v2-phase-aware',
   contractVersion: '1.0.38',
-  revision: '20260722.1',
+  revision: '20260722.2',
+  executionPhase: phase,
   classification: 'DATA_CONTRACT_FAILURE',
   total: checks.length,
   passed: checks.length - failed.length,
   failed: failed.length,
   status: failed.length ? 'FAIL' : 'PASS',
   checks,
-  dataAccess: false,
-  secretAccess: false,
+  validatorDataAccess: false,
+  validatorSecretAccess: false,
   writes: 0,
   runtimeExecuted: false,
   browserExecuted: false,
