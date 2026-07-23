@@ -1,27 +1,27 @@
-name: Orbit 360 · M1 directorio dinámico 1.0.40 · CODE_PATCH_V2
+name: Orbit 360 · M1 directorio dinámico 1.0.40 · CODE_PATCH_V3
 
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
-    paths: ['tools/orbit360-m1-dynamic-directory-code-patch-v2-request-v20260723.json']
+    paths: ['tools/orbit360-m1-dynamic-directory-code-patch-v3-request-v20260723.json']
 
 permissions:
   contents: write
   statuses: write
 
 concurrency:
-  group: orbit360-m1-dynamic-directory-code-patch-v2
+  group: orbit360-m1-dynamic-directory-code-patch-v3
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-dynamic-directory-code-patch-v2-request-v20260723.json
-  ORBIT360_REQUEST_ID: m1-dynamic-directory-code-patch-v2
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-dynamic-directory-code-patch-v3-request-v20260723.json
+  ORBIT360_REQUEST_ID: m1-dynamic-directory-code-patch-v3
 
 jobs:
-  code-patch-v2:
-    name: M1 directorio dinámico · DIRECT_CANONICAL_PATCH_V2
+  code-patch-v3:
+    name: M1 directorio dinámico · DIRECT_CANONICAL_PATCH_V3
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
@@ -37,7 +37,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud inmutable y autorización v2
+      - name: Validar solicitud inmutable y autorización v3
         shell: bash
         run: |
           set -euo pipefail
@@ -49,35 +49,35 @@ jobs:
           const f=JSON.parse(fs.readFileSync('tools/orbit360-incident-freeze-v20260721.json','utf8'));
           const head=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
           const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
-          const a=f.patchV2Authorization||{},bad=[];
-          if(r.schemaVersion!=='orbit360-m1-dynamic-directory-code-patch-v2-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
+          const a=f.patchV3Authorization||{},history=f.pipelineRootCauseHistory||[],bad=[];
+          if(r.schemaVersion!=='orbit360-m1-dynamic-directory-code-patch-v3-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
           if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.contractVersion!=='1.0.40')bad.push('scope');
-          if(r.patchPreparationCommit!==parent||r.allowedExecutions!==1||r.codePatchV2!==true)bad.push('binding');
+          if(r.patchPreparationCommit!==parent||r.allowedExecutions!==1||r.codePatchV3!==true)bad.push('binding');
           if(r.secrets!==false||r.firestoreRead!==false||r.vaultRead!==false||r.operationalWrites!==false||r.runtime!==false||r.browser!==false||r.deploy!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.reimport!==false)bad.push('capabilities');
-          if(f.status!=='M1_DYNAMIC_PATCH_ROOT_CAUSE_CLOSED_V2_AUTHORIZED_ONCE'||f.stateClarification.nextAction!=='RUN_DIRECT_CANONICAL_PATCH_V2_ONCE')bad.push('freeze');
+          if(f.status!=='M1_DYNAMIC_PATCH_VALIDATOR_ROOT_CLOSED_V3_AUTHORIZED_ONCE'||f.stateClarification.nextAction!=='RUN_DIRECT_CANONICAL_PATCH_V3_ONCE')bad.push('freeze');
           if(a.authorizationId!==process.env.ORBIT360_REQUEST_ID||a.active!==true||a.consumed!==false||a.allowedExecutions!==1||a.repositoryWriteAllowed!==true)bad.push('authorization');
-          if(f.pipelineRootCause.failedPatchRunId!==30009334105||f.pipelineRootCause.diagnosticRunId!==30009737855||f.rootCauseCorrection.expectedRootChecks!==22)bad.push('root-cause-evidence');
+          if(!history.some(x=>x.runId===30010358983&&x.type==='VALIDATOR_STALE')||f.rootCauseCorrection.expectedRootChecks!==23||f.rootCauseCorrection.validatorRoot!=='orbit360-platform')bad.push('root-cause-evidence');
           if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
           const d='orbit360-platform/runtime-gate-crm-v20260716';fs.mkdirSync(d,{recursive:true});
-          fs.writeFileSync(`${d}/dynamic-directory-code-patch-v2-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,contractVersion:r.contractVersion,patchPreparationCommit:r.patchPreparationCommit,requestCommit:head,rootCauseClosed:true,codePatchV2:true,secrets:false,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          fs.writeFileSync(`${d}/dynamic-directory-code-patch-v3-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,contractVersion:r.contractVersion,patchPreparationCommit:r.patchPreparationCommit,requestCommit:head,generatorRootCauseClosed:true,validatorRootCauseClosed:true,codePatchV3:true,secrets:false,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
           NODE
 
-      - name: Validar mecanismo v2 antes de modificar
+      - name: Validar mecanismo v3 antes de modificar
         shell: bash
         run: |
           set -euo pipefail
           node --check tools/orbit360-aplicar-fix-directorio-dinamico-v20260723.mjs
           node --check tools/orbit360-aplicar-fix-directorio-dinamico-v2-v20260723.mjs
-          node --check orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v2-v20260723.cjs
+          node --check orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs
           git diff --exit-code
 
-      - name: Aplicar patch canónico v2
+      - name: Aplicar patch canónico corregido
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-aplicar-fix-directorio-dinamico-v2-v20260723.mjs | tee orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-v2-output.json
+          node tools/orbit360-aplicar-fix-directorio-dinamico-v2-v20260723.mjs | tee orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-v3-output.json
 
-      - name: Validar sintaxis y 22 controles raíz
+      - name: Validar sintaxis y 23 controles raíz
         shell: bash
         run: |
           set -euo pipefail
@@ -86,8 +86,8 @@ jobs:
           node --check orbit360-platform/core/client-insurer-edit-owner-v20260722.js
           node --check orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
           node --check orbit360-platform/core/router-tenant-config-bootstrap.js
-          node orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v2-v20260723.cjs | tee orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v2-output.json
-          jq -e '.ok==true and .status=="DYNAMIC_DIRECTORY_CONTRACT_V2_PASS" and .contractVersion=="1.0.40" and .total==22 and .passed==22 and .failed==0 and .rootCauseCorrection.unterminatedBootstrapCommentFixed==true and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.deploy==false and .capabilities.repositoryWrite==false and .capabilities.production==false' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v2-sanitized.json >/dev/null
+          node orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs | tee orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v3-output.json
+          jq -e '.ok==true and .status=="DYNAMIC_DIRECTORY_CONTRACT_V3_PASS" and .contractVersion=="1.0.40" and .total==23 and .passed==23 and .failed==0 and .rootCauseCorrection.unterminatedBootstrapCommentFixed==true and .rootCauseCorrection.validatorRootPlatformFixed==true and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.deploy==false and .capabilities.repositoryWrite==false and .capabilities.production==false' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v3-sanitized.json >/dev/null
 
       - name: Verificar alcance exacto
         shell: bash
@@ -104,7 +104,7 @@ jobs:
           sort -o /tmp/allowed-tracked.txt /tmp/allowed-tracked.txt
           diff -u /tmp/allowed-tracked.txt /tmp/changed-tracked.txt
           test -f orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-patch-sanitized.json
-          test -f orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v2-sanitized.json
+          test -f orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v3-sanitized.json
           ! git diff --name-only | grep -E '(^|/)(data/store|store-firestore|backend-lab|auth\.js|importa\.js|firestore\.rules|functions/)'
           ! git diff | grep -F "numero: '****' + Math.floor"
 
@@ -121,8 +121,8 @@ jobs:
             orbit360-platform/data/academia-v1230-operational-directory-v20260722.js \
             orbit360-platform/core/router-tenant-config-bootstrap.js \
             orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-patch-sanitized.json \
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v2-sanitized.json
-          git commit -m 'fix(m1): consolidar directorio dinámico y persistencia v2'
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v3-sanitized.json
+          git commit -m 'fix(m1): consolidar directorio dinámico y persistencia v3'
           git push origin "HEAD:${ORBIT360_BRANCH}"
           echo "PATCH_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
@@ -133,10 +133,10 @@ jobs:
           node <<'NODE'
           const fs=require('fs'),cp=require('child_process'),d='orbit360-platform/runtime-gate-crm-v20260716';
           const read=n=>{try{return JSON.parse(fs.readFileSync(`${d}/${n}`,'utf8'))}catch{return null}};
-          const contract=read('dynamic-directory-contract-v2-sanitized.json');
+          const contract=read('dynamic-directory-contract-v3-sanitized.json');
           let commit='';try{commit=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()}catch{}
-          const ok=!!(contract&&contract.ok===true&&contract.status==='DYNAMIC_DIRECTORY_CONTRACT_V2_PASS'&&contract.passed===22&&contract.failed===0&&commit!==process.env.GITHUB_SHA);
-          fs.writeFileSync(`${d}/dynamic-directory-code-patch-v2-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-dynamic-directory-code-patch-v2',generatedAt:new Date().toISOString(),ok,status:ok?'DIRECT_CANONICAL_PATCH_V2_COMMITTED':'DIRECT_CANONICAL_PATCH_V2_FAILED',contractVersion:'1.0.40',requestCommit:process.env.GITHUB_SHA,patchCommit:commit,checksPassed:contract&&contract.passed||0,checksTotal:contract&&contract.total||0,rootCauseClosed:true,secrets:false,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          const ok=!!(contract&&contract.ok===true&&contract.status==='DYNAMIC_DIRECTORY_CONTRACT_V3_PASS'&&contract.passed===23&&contract.failed===0&&commit!==process.env.GITHUB_SHA);
+          fs.writeFileSync(`${d}/dynamic-directory-code-patch-v3-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-dynamic-directory-code-patch-v3',generatedAt:new Date().toISOString(),ok,status:ok?'DIRECT_CANONICAL_PATCH_V3_COMMITTED':'DIRECT_CANONICAL_PATCH_V3_FAILED',contractVersion:'1.0.40',requestCommit:process.env.GITHUB_SHA,patchCommit:commit,checksPassed:contract&&contract.passed||0,checksTotal:contract&&contract.total||0,generatorRootCauseClosed:true,validatorRootCauseClosed:true,secrets:false,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
           if(!ok)process.exitCode=41;
           NODE
 
@@ -144,21 +144,21 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-dynamic-directory-code-patch-v2-${{ github.run_id }}
+          name: orbit360-m1-dynamic-directory-code-patch-v3-${{ github.run_id }}
           path: |
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-v2-request-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-v3-request-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-patch-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v2-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-v2-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v3-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-v3-summary.json
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Publicar estado canónico v2
+      - name: Publicar estado canónico v3
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          state=failure; description='1.0.40 dynamic directory v2 failed'
-          if [ -f orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-v2-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-v2-summary.json)" = true ]; then state=success; description='1.0.40 dynamic directory v2 committed 22/22'; fi
-          gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-dynamic-directory-code-patch-v2' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          state=failure; description='1.0.40 dynamic directory v3 failed'
+          if [ -f orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-v3-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-v3-summary.json)" = true ]; then state=success; description='1.0.40 dynamic directory v3 committed 23/23'; fi
+          gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-dynamic-directory-code-patch-v3' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
