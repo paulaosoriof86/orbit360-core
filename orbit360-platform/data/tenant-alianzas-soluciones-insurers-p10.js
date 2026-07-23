@@ -6,9 +6,11 @@
   window.OrbitTenantInsurerConfigsP10 = window.OrbitTenantInsurerConfigsP10 || [];
   var config = {
     tenantId: 'alianzas-soluciones',
-    version: '2026-07-16',
-    updatedAt: '2026-07-16',
+    version: '2026-07-22',
+    updatedAt: '2026-07-22',
     preferredInsurerCountryOrder: ['GT', 'CO'],
+    insurersDefaultActive: true,
+    insurerDeactivationPolicy: 'manual_with_reason_only',
     knowledgeSummarySrc: 'data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20260716.js',
     insurers: [
       {
@@ -82,7 +84,5 @@
     ]
   };
   window.OrbitTenantInsurerConfigsP10.push(config);
-  if (window.Orbit && window.Orbit.tenantInsurerConfigP10) {
-    window.Orbit.tenantInsurerConfigP10.registerTenantConfig(config);
-  }
+  if (window.Orbit && window.Orbit.tenantInsurerConfigP10) window.Orbit.tenantInsurerConfigP10.registerTenantConfig(config);
 })();
