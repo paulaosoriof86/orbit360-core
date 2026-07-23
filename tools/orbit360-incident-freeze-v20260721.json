@@ -10,74 +10,14 @@
   "tenantId": "alianzas-soluciones",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": ["FUNCTIONAL_DEFECT", "DATA_CONTRACT_FAILURE", "VALIDATOR_STALE"],
-  "preservedClosures": {
-    "staticRunId": 29973107802,
-    "atomicApplyRunId": 29974965244,
-    "hostingRunId": 29976616043,
-    "bankOperationalNumbers": 91,
-    "usernamesOperational": 26,
-    "bankPending": 2,
-    "credentialPasswordsAvailable": 26,
-    "operationalPasswords": 0,
-    "dataRepairStatus": "APPLIED_AND_VERIFIED",
-    "hostingStatus": "HOSTING_DELIVERED_AND_VERIFIED"
-  },
-  "humanReviewFindings": {
-    "reviewStatus": "FAILED",
-    "editBlankScreen": true,
-    "mobileTitlesResponsive": false,
-    "inactiveInsurersVisible": true,
-    "inactiveReasonFallbackPresent": true,
-    "contactActionsConditional": true,
-    "evidenceDocument": "orbit360-platform/docs/REVISION-VISUAL-M1-ASEGURADORAS-EDICION-RESPONSIVE-20260722.md"
-  },
-  "rootCause": {
-    "editBlankScreen": "The visual stability barrier requires read-mode canonical cards while the editor intentionally keeps editable controls. It hides #asg-ficha, reaches blocked-incomplete-dom and does not remove the pending visibility class.",
-    "editableContractMismatch": "modules/aseguradoras.js still implements the historical masked-account and no-password renderer. Its snapshots can rebuild portal/account arrays without preserving credentialRef/accountRef.",
-    "mobileTitles": "Responsive CSS depends on brittle renderer and inline-style selectors and does not cover all real title structures. Static validation did not represent the human mobile case."
-  },
-  "dataState": {
-    "firestoreReadAfterReview": false,
-    "vaultReadAfterReview": false,
-    "writesAfterReview": false,
-    "reimport": false,
-    "productionTouched": false
-  },
-  "authorizations": {
-    "dataApplyActive": false,
-    "hostingDeliveryActive": false,
-    "runtimeActive": false,
-    "m2Authorized": false
-  },
-  "allowedActions": [
-    "prepare_one_atomic_frontend_patch_for_edit_mode_and_mobile_titles",
-    "update_validators_and_academy_with_same_patch",
-    "perform_static_validation_without_data_access",
-    "publish_one_new_hosting_lab_visualization_after_static_pass"
-  ],
-  "blockedActions": [
-    "repeat_data_repair",
-    "read_firestore_operational_data",
-    "read_existing_insurer_vault",
-    "activate_or_deactivate_insurers_in_bulk_without_source_validation",
-    "reimport_clients",
-    "reimport_insurers",
-    "deploy_functions",
-    "deploy_rules",
-    "deploy_production",
-    "advance_m2",
-    "advance_policies",
-    "merge_main"
-  ],
-  "stateClarification": {
-    "m1TechnicalGate": "HISTORICAL_PASS",
-    "m1HumanVisualReview": "FAILED_EDIT_BLANK_AND_MOBILE_TITLES",
-    "m1Closed": false,
-    "m2Authorized": false,
-    "operationalDirectoryData": "APPLIED_AND_VERIFIED_PRESERVED",
-    "hostingVisualization": "REJECTED_BY_HUMAN_REVIEW",
-    "nextPatchDataAccess": false
-  },
+  "preservedClosures": {"staticRunId":29973107802,"atomicApplyRunId":29974965244,"hostingRunId":29976616043,"bankOperationalNumbers":91,"usernamesOperational":26,"bankPending":2,"credentialPasswordsAvailable":26,"operationalPasswords":0,"dataRepairStatus":"APPLIED_AND_VERIFIED","hostingStatus":"HOSTING_DELIVERED_AND_VERIFIED"},
+  "humanReviewFindings": {"reviewStatus":"FAILED","editBlankScreen":true,"mobileTitlesResponsive":false,"inactiveInsurersVisible":true,"inactiveReasonFallbackPresent":true,"contactActionsConditional":true,"evidenceDocument":"orbit360-platform/docs/REVISION-VISUAL-M1-ASEGURADORAS-EDICION-RESPONSIVE-20260722.md"},
+  "rootCause": {"editBlankScreen":"The visual stability barrier requires read-mode canonical cards while the editor intentionally keeps editable controls. It hides #asg-ficha, reaches blocked-incomplete-dom and does not remove the pending visibility class.","editableContractMismatch":"modules/aseguradoras.js still implements the historical masked-account and no-password renderer. Its snapshots can rebuild portal/account arrays without preserving credentialRef/accountRef.","mobileTitles":"Responsive CSS depends on brittle renderer and inline-style selectors and does not cover all real title structures. Static validation did not represent the human mobile case."},
+  "dataState": {"firestoreReadAfterReview":false,"vaultReadAfterReview":false,"writesAfterReview":false,"reimport":false,"productionTouched":false},
+  "authorizations": {"dataApplyActive":false,"hostingDeliveryActive":false,"runtimeActive":false,"m2Authorized":false},
+  "allowedActions": ["prepare_one_atomic_frontend_patch_for_edit_mode_and_mobile_titles","update_validators_and_academy_with_same_patch","perform_static_validation_without_data_access","publish_one_new_hosting_lab_visualization_after_static_pass"],
+  "blockedActions": ["repeat_data_repair","read_firestore_operational_data","read_existing_insurer_vault","activate_or_deactivate_insurers_in_bulk_without_source_validation","reimport_clients","reimport_insurers","deploy_functions","deploy_rules","deploy_production","advance_m2","advance_policies","merge_main"],
+  "stateClarification": {"m1TechnicalGate":"HISTORICAL_PASS","m1HumanVisualReview":"FAILED_EDIT_BLANK_AND_MOBILE_TITLES","m1Closed":false,"m2Authorized":false,"operationalDirectoryData":"APPLIED_AND_VERIFIED_PRESERVED","hostingVisualization":"REJECTED_BY_HUMAN_REVIEW","nextPatchDataAccess":false},
   "claudeClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "academyImpact": "ACADEMIA_ACTUALIZAR",
   "nextAllowedStep": "Build one direct atomic frontend patch integrating contract 1.0.38 into the editable insurer module, making the visual stability barrier edit-aware, preserving credentialRef/accountRef on save, and replacing brittle mobile title selectors with semantic responsive classes. Validate without data access, then publish one new Hosting LAB visualization.",
