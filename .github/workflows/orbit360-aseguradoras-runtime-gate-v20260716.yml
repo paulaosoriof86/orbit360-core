@@ -1,37 +1,36 @@
-name: Orbit 360 · M1 directorio dinámico 1.0.40 · CODE_PATCH
+name: Orbit 360 · M1 directorio dinámico 1.0.40 · DIAGNOSTIC_ONLY
 
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
-    paths: ['tools/orbit360-m1-dynamic-directory-patch-request-v20260723.json']
+    paths: ['tools/orbit360-m1-dynamic-directory-diagnostic-request-v20260723.json']
 
 permissions:
-  contents: write
+  contents: read
   statuses: write
 
 concurrency:
-  group: orbit360-m1-dynamic-directory-code-patch-v1
+  group: orbit360-m1-dynamic-directory-diagnostic-v1
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_PHASE: static_preflight
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-dynamic-directory-patch-request-v20260723.json
-  ORBIT360_REQUEST_ID: m1-dynamic-directory-code-patch-v1
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-dynamic-directory-diagnostic-request-v20260723.json
+  ORBIT360_REQUEST_ID: m1-dynamic-directory-diagnostic-v1
 
 jobs:
-  code-patch:
-    name: M1 directorio dinámico · DIRECT_CANONICAL_PATCH
+  diagnostic:
+    name: M1 directorio dinámico · EPHEMERAL_SYNTAX_DIAGNOSTIC
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 10
     steps:
       - name: Checkout SHA exacto
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
 
       - name: Preparar Node 22
         uses: actions/setup-node@v4
@@ -51,111 +50,110 @@ jobs:
           const head=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
           const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
           const bad=[];
-          if(r.schemaVersion!=='orbit360-m1-dynamic-directory-patch-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
+          if(r.schemaVersion!=='orbit360-m1-dynamic-directory-diagnostic-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
           if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.contractVersion!=='1.0.40')bad.push('scope');
-          if(r.patchPreparationCommit!==parent||r.allowedExecutions!==1||r.codePatch!==true)bad.push('binding');
-          if(r.secrets!==false||r.firestoreRead!==false||r.vaultRead!==false||r.writes!==false||r.runtime!==false||r.browser!==false||r.deploy!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.reimport!==false)bad.push('capabilities');
-          if(f.status!=='M1_HUMAN_REVIEW_FAILED_DYNAMIC_CRUD_AND_PERSISTENCE'||f.stateClarification.nextPatch!=='DIRECT_CANONICAL_OWNER_CONSOLIDATION_NO_OVERLAY_CHAIN')bad.push('freeze');
+          if(r.diagnosticPreparationCommit!==parent||r.allowedExecutions!==1||r.diagnosticOnly!==true)bad.push('binding');
+          if(r.secrets!==false||r.firestoreRead!==false||r.vaultRead!==false||r.writes!==false||r.runtime!==false||r.browser!==false||r.deploy!==false||r.repositoryWrite!==false||r.production!==false)bad.push('capabilities');
+          if(f.status!=='M1_DYNAMIC_PATCH_FAILED_BEFORE_COMMIT_DIAGNOSTIC_ONLY'||f.stateClarification.nextAction!=='EPHEMERAL_SYNTAX_DIAGNOSTIC_NO_COMMIT')bad.push('freeze');
           if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
           const d='orbit360-platform/runtime-gate-crm-v20260716';fs.mkdirSync(d,{recursive:true});
-          fs.writeFileSync(`${d}/dynamic-directory-patch-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,contractVersion:r.contractVersion,patchPreparationCommit:r.patchPreparationCommit,requestCommit:head,codePatch:true,secrets:false,firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          fs.writeFileSync(`${d}/dynamic-directory-diagnostic-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,contractVersion:r.contractVersion,diagnosticPreparationCommit:r.diagnosticPreparationCommit,requestCommit:head,diagnosticOnly:true,secrets:false,firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,deploy:false,repositoryWrite:false,production:false,containsPII:false,containsSecrets:false},null,2)+'\n');
           NODE
 
-      - name: Validar mecanismo antes de modificar
+      - name: Aplicar transformación solo en workspace efímero
         shell: bash
         run: |
           set -euo pipefail
           node --check tools/orbit360-aplicar-fix-directorio-dinamico-v20260723.mjs
-          node --check orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v20260723.js
-          git diff --exit-code
+          node tools/orbit360-aplicar-fix-directorio-dinamico-v20260723.mjs > orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic-transform.json
 
-      - name: Aplicar patch canónico determinístico
+      - name: Capturar cada verificación de sintaxis
         shell: bash
         run: |
-          set -euo pipefail
-          node tools/orbit360-aplicar-fix-directorio-dinamico-v20260723.mjs | tee orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-patch-output.json
+          set -uo pipefail
+          D=orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic
+          mkdir -p "$D/transformed" "$D/checks"
+          FILES=(
+            orbit360-platform/modules/aseguradoras.js
+            orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js
+            orbit360-platform/core/client-insurer-edit-owner-v20260722.js
+            orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
+            orbit360-platform/core/router-tenant-config-bootstrap.js
+          )
+          all_ok=true
+          printf '{"schemaVersion":"orbit360-node-check-diagnostic-v1","files":[' > "$D/node-check-summary.json"
+          first=true
+          for file in "${FILES[@]}"; do
+            name=$(echo "$file" | tr '/.' '__')
+            cp "$file" "$D/transformed/${name}.txt"
+            node --check "$file" >"$D/checks/${name}.stdout.txt" 2>"$D/checks/${name}.stderr.txt"
+            code=$?
+            [ $code -eq 0 ] || all_ok=false
+            $first || printf ',' >> "$D/node-check-summary.json"; first=false
+            FILE="$file" NAME="$name" CODE="$code" node <<'NODE' >> "$D/node-check-summary.json"
+          const fs=require('fs');
+          const out=fs.readFileSync(process.env.DIR+'/checks/'+process.env.NAME+'.stdout.txt','utf8');
+          const err=fs.readFileSync(process.env.DIR+'/checks/'+process.env.NAME+'.stderr.txt','utf8');
+          process.stdout.write(JSON.stringify({file:process.env.FILE,exitCode:Number(process.env.CODE),ok:Number(process.env.CODE)===0,stdout:out.slice(0,4000),stderr:err.slice(0,4000)}));
+          NODE
+          done
+          printf '],"allOk":%s,"secrets":false,"firestoreRead":false,"writes":false,"repositoryWrite":false}\n' "$all_ok" >> "$D/node-check-summary.json"
+          if [ "$all_ok" = true ]; then
+            node orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v20260723.js > "$D/root-contract.stdout.txt" 2> "$D/root-contract.stderr.txt"
+            echo $? > "$D/root-contract.exit.txt"
+          else
+            echo 99 > "$D/root-contract.exit.txt"
+            printf 'Skipped because at least one transformed source failed node --check.\n' > "$D/root-contract.stderr.txt"
+            : > "$D/root-contract.stdout.txt"
+          fi
+        env:
+          DIR: orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic
 
-      - name: Validar sintaxis y contrato raíz
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check orbit360-platform/modules/aseguradoras.js
-          node --check orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js
-          node --check orbit360-platform/core/client-insurer-edit-owner-v20260722.js
-          node --check orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
-          node --check orbit360-platform/core/router-tenant-config-bootstrap.js
-          node orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v20260723.js | tee orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-output.json
-          jq -e '.ok==true and .status=="DYNAMIC_DIRECTORY_CONTRACT_PASS" and .contractVersion=="1.0.40" and .failed==0 and .passed==.total and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.deploy==false and .capabilities.production==false' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-sanitized.json >/dev/null
-
-      - name: Verificar alcance exacto del patch
-        shell: bash
-        run: |
-          set -euo pipefail
-          git diff --name-only | sort > /tmp/changed.txt
-          cat > /tmp/allowed.txt <<'EOF'
-          orbit360-platform/core/client-insurer-edit-owner-v20260722.js
-          orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js
-          orbit360-platform/core/router-tenant-config-bootstrap.js
-          orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
-          orbit360-platform/modules/aseguradoras.js
-          orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-sanitized.json
-          orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-patch-sanitized.json
-          EOF
-          sort -o /tmp/allowed.txt /tmp/allowed.txt
-          diff -u /tmp/allowed.txt /tmp/changed.txt
-          ! git diff --name-only | grep -E '(^|/)(data/store|store-firestore|backend-lab|auth\.js|importa\.js|firestore\.rules|functions/)'
-          ! git diff | grep -E 'Math\.random\(\).*numero|password[[:space:]]*:[[:space:]]*["'"'][^"'"']+["'"']'
-
-      - name: Crear commit único y empujar rama obligatoria
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'orbit360-gate-bot'
-          git config user.email 'orbit360-gate-bot@users.noreply.github.com'
-          git add \
-            orbit360-platform/modules/aseguradoras.js \
-            orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js \
-            orbit360-platform/core/client-insurer-edit-owner-v20260722.js \
-            orbit360-platform/data/academia-v1230-operational-directory-v20260722.js \
-            orbit360-platform/core/router-tenant-config-bootstrap.js \
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-patch-sanitized.json \
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-sanitized.json
-          git commit -m 'fix(m1): consolidar CRUD dinámico y persistencia aseguradoras'
-          git push origin "HEAD:${ORBIT360_BRANCH}"
-          echo "PATCH_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-
-      - name: Cerrar evidencia sanitizada
+      - name: Cerrar diagnóstico sanitizado
         if: always()
         shell: bash
         run: |
           node <<'NODE'
-          const fs=require('fs'),cp=require('child_process'),d='orbit360-platform/runtime-gate-crm-v20260716';
+          const fs=require('fs'),d='orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic';
           const read=n=>{try{return JSON.parse(fs.readFileSync(`${d}/${n}`,'utf8'))}catch{return null}};
-          const contract=read('dynamic-directory-contract-sanitized.json');
-          let commit='';try{commit=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()}catch{}
-          const ok=!!(contract&&contract.ok===true&&contract.status==='DYNAMIC_DIRECTORY_CONTRACT_PASS'&&contract.failed===0);
-          fs.writeFileSync(`${d}/dynamic-directory-code-patch-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-dynamic-directory-code-patch-v1',generatedAt:new Date().toISOString(),ok,status:ok?'DIRECT_CANONICAL_PATCH_COMMITTED':'DIRECT_CANONICAL_PATCH_FAILED',contractVersion:'1.0.40',patchCommit:commit,checksPassed:contract&&contract.passed||0,checksTotal:contract&&contract.total||0,secrets:false,firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          const nodeChecks=read('node-check-summary.json');
+          const contractExit=(()=>{try{return Number(fs.readFileSync(`${d}/root-contract.exit.txt`,'utf8').trim())}catch{return -1}})();
+          const report={schemaVersion:'orbit360-m1-dynamic-directory-diagnostic-v1',generatedAt:new Date().toISOString(),ok:true,status:'DIAGNOSTIC_CAPTURED',contractVersion:'1.0.40',nodeChecksCaptured:!!nodeChecks,nodeChecksAllOk:!!(nodeChecks&&nodeChecks.allOk),failedSyntaxFiles:nodeChecks?nodeChecks.files.filter(x=>!x.ok).map(x=>x.file):[],rootContractExit:contractExit,repositoryCommitCreated:false,branchProductChanged:false,secrets:false,firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,deploy:false,repositoryWrite:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false};
+          fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic-summary.json',JSON.stringify(report,null,2)+'\n');
+          console.log(JSON.stringify(report,null,2));
           NODE
 
-      - name: Subir evidencia sanitizada
+      - name: Subir evidencia y fuentes transformadas
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-dynamic-directory-code-patch-${{ github.run_id }}
+          name: orbit360-m1-dynamic-directory-diagnostic-${{ github.run_id }}
           path: |
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-patch-request-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic-request-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic-transform.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic/**
             orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-patch-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-summary.json
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Publicar estado canónico
+      - name: Confirmar cero escritura de repositorio
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${GITHUB_SHA}"
+          git reset --hard "${GITHUB_SHA}"
+          git clean -fd
+
+      - name: Publicar estado diagnóstico
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          state=failure; description='1.0.40 direct canonical patch failed'
-          if [ -f orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-code-patch-summary.json)" = true ]; then state=success; description='1.0.40 direct canonical patch committed'; fi
-          gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-dynamic-directory-code-patch-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          state=failure; description='1.0.40 diagnostic was not captured'
+          if [ -f orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic-summary.json ] && [ "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-diagnostic-summary.json)" = DIAGNOSTIC_CAPTURED ]; then state=success; description='1.0.40 exact syntax diagnostic captured'; fi
+          gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-dynamic-directory-diagnostic-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
