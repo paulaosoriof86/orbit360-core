@@ -1,88 +1,35 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v73-stop-after-two-static-pipeline-failures",
+  "schemaVersion": "orbit360-incident-freeze-v74-direct-atomic-patch-validation",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-operational-directory-field-classification-regression-v20260722",
-  "status": "STOP_THE_LINE_AFTER_TWO_STATIC_REPAIR_PIPELINE_FAILURES",
+  "status": "M1_DIRECT_ATOMIC_PATCH_READY_STATIC_VALIDATION_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "tenantId": "alianzas-soluciones",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "blockedGateIds": [
-    "block1-client360-insurers-lab-v20260717"
-  ],
+  "blockedGateIds": [],
   "classification": [
     "DATA_CONTRACT_FAILURE",
     "FUNCTIONAL_DEFECT",
     "VALIDATOR_STALE",
     "PIPELINE_MECHANISM_FAILURE"
   ],
-  "humanVisualResult": {
-    "status": "FAILED_FUNCTIONAL_DEFECT",
-    "m1Approved": false,
-    "m2Authorized": false,
-    "observed": [
-      "bank account remains masked or displays Cuenta protegida",
-      "temporary bank reveal returns No fue posible recuperar el dato",
-      "bank copy does not complete",
-      "portal username displays Usuario pendiente de registrar",
-      "password temporary reveal works"
-    ]
+  "bindingCorrection": {
+    "document": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
+    "contractVersion": "1.0.38",
+    "mechanism": "direct-atomic-multifile-patch",
+    "workflowValidationOnly": true,
+    "usernameOperational": true,
+    "bankNumberOperational": true,
+    "passwordProtectedOnly": true
   },
-  "fieldContractRootCause": {
-    "canonicalRule": "Portal username and bank account number are operational directory fields. Password is the only secret in this scope.",
-    "regression": "Later provider, importer and validator layers removed usernames and bank numbers from the operational directory and required protected references for display and copy.",
-    "runtimeMismatch": "Restored bank references can link current account rows to vault records retaining historical account IDs; the callable requires exact accountId equality and rejects otherwise valid references.",
-    "bindingCorrection": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
-    "targetContractVersion": "1.0.38"
-  },
-  "pipelineRootCause": {
-    "retiredMechanisms": [
-      "tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
-      "tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs",
-      "tools/orbit360-reparar-directorio-operativo-estructural-v2-v20260722.mjs"
-    ],
-    "finding": "The workflow attempted to construct the product correction at execution time through one monolithic source transformer. It mixed owner edits, importers, providers, Academy, overlays and validators and enforced brittle exact-token counts across independent files.",
-    "evidence": [
-      "The first static repair failed on an index cache token that is not owned by index.html.",
-      "The second static repair failed because Academia legitimately contains contentVersion 1.228 twice while the transformer required one occurrence."
-    ],
-    "correctiveRule": "The complete multi-file patch must be assembled directly and audited before workflow execution. The workflow may validate and publish evidence only; it must never transform source files or generate the product patch."
-  },
-  "failedDataDryRunAttempts": [
-    {
-      "runId": 29968658125,
-      "errorCode": "SIGNATURE_INVALID:data_contract_phase_capabilities:0:0",
-      "firestoreRead": false,
-      "vaultRead": false,
-      "writesExecuted": false
-    },
-    {
-      "runId": 29968906716,
-      "errorCode": "SIGNATURE_INVALID:visual_bank_visible:before=0:after=0",
-      "firestoreRead": false,
-      "vaultRead": false,
-      "writesExecuted": false
-    }
-  ],
-  "failedStaticRepairAttempts": [
-    {
-      "runId": 29969478259,
-      "errorCode": "REGEX_NOT_FOUND:index_bank_cache",
-      "dataRead": false,
-      "secretsRead": false,
-      "writesExecuted": false,
-      "productCommitCreated": false
-    },
-    {
-      "runId": 29969765220,
-      "errorCode": "TOKEN_COUNT_INVALID:academy_runtime:before=2:after=0:expected=1",
-      "dataRead": false,
-      "secretsRead": false,
-      "writesExecuted": false,
-      "productCommitCreated": false
-    }
+  "retiredMechanisms": [
+    "tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
+    "tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs",
+    "tools/orbit360-reparar-directorio-operativo-estructural-v2-v20260722.mjs",
+    "workflow_source_transformation"
   ],
   "preservedInventory": {
     "clients": 414,
@@ -93,15 +40,32 @@
     "portalCredentials": "26_OF_26",
     "reimportRequired": false
   },
+  "staticValidationAuthorization": {
+    "authorizationId": "m1-operational-directory-static-validation-v1",
+    "active": true,
+    "consumed": false,
+    "allowedExecutions": 1,
+    "phase": "STATIC_PREFLIGHT",
+    "secretsAllowed": false,
+    "firestoreReadAllowed": false,
+    "vaultReadAllowed": false,
+    "writesAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "deployAllowed": false,
+    "functionsDeployAllowed": false,
+    "rulesDeployAllowed": false,
+    "productionAllowed": false
+  },
   "allowedActions": [
-    "prepare_direct_atomic_multifile_patch_without_workflow_execution",
-    "independent_nonexecuting_audit_of_complete_patch",
-    "document_exact_before_after_matrix_for_each_owner"
+    "validate_precommitted_direct_atomic_patch",
+    "run_gate_contract_preflight_static_only",
+    "run_operational_directory_behavioral_contract",
+    "run_base_architecture_gate",
+    "publish_sanitized_static_evidence"
   ],
   "blockedActions": [
-    "create_third_static_repair_request",
-    "rerun_static_repair_workflow",
-    "run_source_transformer_in_workflow",
+    "transform_product_in_workflow",
     "read_firestore_operational_data",
     "read_existing_insurer_vault",
     "write_firestore_operational_data",
@@ -124,7 +88,7 @@
     "m1HumanVisualReview": "FAILED_DATA_CONTRACT_FAILURE",
     "m1Closed": false,
     "m2Authorized": false,
-    "operationalDirectoryStaticRepair": "STOPPED_AFTER_TWO_PIPELINE_FAILURES",
+    "operationalDirectoryStaticPatch": "READY_FOR_VALIDATION",
     "operationalDirectoryDryRun": "NOT_AUTHORIZED",
     "operationalDirectoryApply": "NOT_AUTHORIZED",
     "hostingRepublish": "NOT_AUTHORIZED",
@@ -133,7 +97,7 @@
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Prepare the complete 1.0.38 correction as a direct atomic multi-file patch outside the workflow. Audit every final file and the full owner/contract/Academy/validator matrix without executing a gate, accessing Firestore or reading the vault. Do not create another request until the exact committed patch already exists and the workflow has been reduced to validation-only.",
+  "nextAllowedStep": "Move the already audited direct atomic patch to the mandatory branch once, then execute one validation-only static workflow. Accept only GO_GATE_CONTRACT, operational-directory contract PASS and base architecture GO with zero data access, writes, runtime, browser or deploy.",
   "containsPII": false,
   "containsSecrets": false
 }
