@@ -14,7 +14,7 @@ const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-san
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
 const ENGINE_EVIDENCE_USED = 'sync-file-evidence-not-stdout-v1';
-const GATE_CONTRACT_VERSION = '1.0.39';
+const GATE_CONTRACT_VERSION = '1.0.40';
 const PHASE_PROFILES = Object.freeze({
   STATIC_PREFLIGHT: { secrets:false, firestoreRead:false, writes:false, runtime:false, browser:false, deploy:false, functionsDeploy:false, rulesDeploy:false, production:false },
   LAB_DATA_CONTRACT_REPAIR_DRYRUN: { secrets:true, firestoreRead:true, writes:false, runtime:false, browser:false, deploy:false, functionsDeploy:false, rulesDeploy:false, production:false },
