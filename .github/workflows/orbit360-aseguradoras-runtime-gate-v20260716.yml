@@ -1,32 +1,32 @@
-name: Orbit 360 · Reparación estructural directorio operativo · estática
+name: Orbit 360 · Reparación estructural directorio operativo · estática v2
 
 on:
   push:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - 'tools/orbit360-m1-operational-directory-static-repair-request-v20260722.json'
+      - 'tools/orbit360-m1-operational-directory-static-repair-request-v2-20260722.json'
 
 permissions:
   contents: write
   statuses: write
 
 concurrency:
-  group: orbit360-m1-operational-directory-structural-static-repair-v1
+  group: orbit360-m1-operational-directory-structural-static-repair-v2
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   ORBIT360_GATE_PHASE: static_preflight
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-static-repair-request-v20260722.json
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-static-repair-request-v2-20260722.json
   ORBIT360_REQUEST_MODEL: immutable-request-bound-to-parent-head-and-run-attempt-v1
   ORBIT360_METHOD_DECISION_ID: paula-20260722-operational-directory-root-repair
   ORBIT360_FINAL_GATE_POLICY: no_final_gate_rerun
 
 jobs:
   structural-static-repair:
-    name: Reparar owners y contratos · cero datos
+    name: Reparar owners y contratos v2 · cero datos
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -41,7 +41,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud estática y stop line de datos
+      - name: Validar solicitud estática v2 y stop line de datos
         shell: bash
         run: |
           set -euo pipefail
@@ -59,6 +59,7 @@ jobs:
           test "$(jq -r '.phase' "$REQUEST")" = 'STATIC_PREFLIGHT'
           test "$(jq -r '.parentHead' "$REQUEST")" = "$(git rev-parse HEAD^)"
           test "$(jq -r '.allowedExecutions' "$REQUEST")" = '1'
+          test "$(jq -r '.lastAttempt' "$REQUEST")" = 'true'
           test "$(jq -r '.secretsAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.firestoreReadAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.writesAllowed' "$REQUEST")" = 'false'
@@ -70,22 +71,25 @@ jobs:
           test "$(jq -r '.productionAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.reimportAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.finalGateRerunAllowed' "$REQUEST")" = 'false'
-          test "$(jq -r '.status' "$FREEZE")" = 'M1_PIPELINE_ROOT_CAUSE_STRUCTURAL_STATIC_REPAIR_AUTHORIZED'
-          test "$(jq -r '.staticRepairAuthorization.authorizationId' "$FREEZE")" = 'm1-operational-directory-structural-static-repair-v1'
+          test "$(jq -r '.status' "$FREEZE")" = 'M1_PIPELINE_ROOT_CAUSE_STRUCTURAL_STATIC_REPAIR_V2_AUTHORIZED'
+          test "$(jq -r '.staticRepairAuthorization.authorizationId' "$FREEZE")" = 'm1-operational-directory-structural-static-repair-v2'
           test "$(jq -r '.staticRepairAuthorization.active' "$FREEZE")" = 'true'
           test "$(jq -r '.staticRepairAuthorization.allowedExecutions' "$FREEZE")" = '1'
-          test "$(jq -r '.failedDryRunAttempts | length' "$FREEZE")" = '2'
-          test "$(jq -r '.failedDryRunAttempts[0].firestoreRead' "$FREEZE")" = 'false'
-          test "$(jq -r '.failedDryRunAttempts[1].firestoreRead' "$FREEZE")" = 'false'
+          test "$(jq -r '.staticRepairAuthorization.lastAttemptAllowed' "$FREEZE")" = 'true'
+          test "$(jq -r '.failedStaticRepairAttempts[0].runId' "$FREEZE")" = '29969478259'
+          test "$(jq -r '.failedStaticRepairAttempts[0].dataRead' "$FREEZE")" = 'false'
+          test "$(jq -r '.failedStaticRepairAttempts[0].writesExecuted' "$FREEZE")" = 'false'
           test "$(jq -r '.stateClarification.operationalDirectoryDryRun' "$FREEZE")" = 'BLOCKED_UNTIL_STATIC_REPAIR_PASS'
           test "$(jq -r '.stateClarification.m2Authorized' "$FREEZE")" = 'false'
 
-      - name: Aplicar reparación estructural por límites de función
+      - name: Aplicar wrapper v2 y reparación por límites de función
         shell: bash
         run: |
           set -euo pipefail
+          node --check tools/orbit360-reparar-directorio-operativo-estructural-v2-v20260722.mjs
           node --check tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs
-          node tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs
+          node tools/orbit360-reparar-directorio-operativo-estructural-v2-v20260722.mjs
+          jq -e '.ok == true and .sourceMechanism == "function-boundary-structural-replacement-v1" and .correction == "optional_nonowner_index_cache_and_v2_request_binding" and .dataRead == false and .dataWritten == false and .secretsRead == false and .runtimeExecuted == false and .browserExecuted == false and .deployExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-structural-wrapper-v2-sanitized.json >/dev/null
           jq -e '.ok == true and .mechanism == "function-boundary-structural-replacement-v1" and .exactStringTransformerRetired == true and .contractVersion == "1.0.38" and .invariants.usernameOperationalVisible == true and .invariants.passwordProtectedOnly == true and .invariants.bankNumbersOperationalVisible == true and .invariants.bankCopyDirect == true and .invariants.bankRevealDependency == false and .invariants.dataRead == false and .invariants.dataWritten == false and .invariants.secretsRead == false and .invariants.reimportExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-structural-repair-sanitized.json >/dev/null
 
       - name: Preflight canónico 1.0.38
@@ -141,6 +145,7 @@ jobs:
             orbit360-platform/data/academia-v1221-m1-visual-integrity.js \
             orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js \
             orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js \
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-structural-wrapper-v2-sanitized.json \
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-structural-repair-sanitized.json \
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json \
             orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-static-visual-sanitized.json \
@@ -154,20 +159,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          jq -n --arg requestCommit "$GITHUB_SHA" --arg repairCommit "$ORBIT360_STATIC_REPAIR_COMMIT" --arg runId "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-operational-directory-static-repair-closure-v1",ok:true,requestCommit:$requestCommit,repairCommit:$repairCommit,runId:($runId|tonumber),executionPhase:"STATIC_PREFLIGHT",contractVersion:"1.0.38",mechanism:"function-boundary-structural-replacement-v1",gateContractStatus:"GO_GATE_CONTRACT",visualStatus:"PASS",architectureStatus:"GO_STATIC_ARCHITECTURE",dataRead:false,writesExecuted:false,secretsRead:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,reimportExecuted:false,containsPII:false,containsSecrets:false,nextAction:"DESIGN_FRESH_DATA_DRYRUN_AFTER_STATIC_BASELINE"}' > orbit360-platform/runtime-gate-crm-v20260716/operational-directory-static-repair-closure-sanitized.json
+          jq -n --arg requestCommit "$GITHUB_SHA" --arg repairCommit "$ORBIT360_STATIC_REPAIR_COMMIT" --arg runId "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-operational-directory-static-repair-closure-v2",ok:true,requestCommit:$requestCommit,repairCommit:$repairCommit,runId:($runId|tonumber),executionPhase:"STATIC_PREFLIGHT",contractVersion:"1.0.38",mechanism:"function-boundary-structural-replacement-v2",gateContractStatus:"GO_GATE_CONTRACT",visualStatus:"PASS",architectureStatus:"GO_STATIC_ARCHITECTURE",dataRead:false,writesExecuted:false,secretsRead:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,reimportExecuted:false,containsPII:false,containsSecrets:false,nextAction:"DESIGN_FRESH_DATA_DRYRUN_AFTER_STATIC_BASELINE"}' > orbit360-platform/runtime-gate-crm-v20260716/operational-directory-static-repair-closure-sanitized.json
 
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-operational-directory-static-repair-${{ github.run_id }}
+          name: orbit360-m1-operational-directory-static-repair-v2-${{ github.run_id }}
           path: |
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-structural-wrapper-v2-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-structural-repair-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-static-visual-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-static-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-static-repair-closure-sanitized.json
-            tools/orbit360-m1-operational-directory-static-repair-request-v20260722.json
+            tools/orbit360-m1-operational-directory-static-repair-request-v2-20260722.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -179,6 +185,6 @@ jobs:
         shell: bash
         run: |
           state=success
-          description='Reparación estructural estática PASS; datos aún bloqueados'
-          if [ "${{ job.status }}" != success ]; then state=failure; description='Reparación estructural falló; datos siguen bloqueados'; fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-operational-directory-structural-static-repair-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
+          description='Reparación estructural estática v2 PASS; datos aún bloqueados'
+          if [ "${{ job.status }}" != success ]; then state=failure; description='Reparación estructural v2 falló; STOP THE LINE'; fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-operational-directory-structural-static-repair-v2' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
