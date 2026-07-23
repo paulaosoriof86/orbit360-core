@@ -1,0 +1,176 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-23",
+  "gateId": "block2-product-readonly-bootstrap-v20260723",
+  "classification": "FUNCTIONAL_DEFECT",
+  "diagnosticRevision": "product-readonly-bootstrap-static-v1",
+  "contractRevision": "2.0.0-product-readonly-bootstrap-static-v1",
+  "replaceCanonicalOwners": true,
+  "replaceRequiredFiles": true,
+  "replaceRuntimeVersionContracts": true,
+  "gatePatch": {
+    "contractVersion": "2.0.0",
+    "diagnosticRevision": "product-readonly-bootstrap-static-v1",
+    "runtimeVersion": "20260723-1",
+    "block": 2,
+    "status": "M2_PRODUCT_READONLY_STATIC_PATCH_AUTHORIZED_ONCE",
+    "workflow": ".github/workflows/orbit360-m2-product-readonly-static-gate-v20260723.yml",
+    "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
+    "validators": [
+      "orbit360-platform/tools/orbit360-m2-product-readonly-bootstrap-contract-v20260723.cjs"
+    ],
+    "executionProfile": {
+      "phase": "STATIC_PREFLIGHT",
+      "capabilities": {
+        "secrets": false,
+        "firestoreRead": false,
+        "writes": false,
+        "runtime": false,
+        "browser": false,
+        "deploy": false,
+        "functionsDeploy": false,
+        "rulesDeploy": false,
+        "production": false
+      },
+      "workflowLocks": {
+        "branch": true,
+        "firebaseProject": false,
+        "hostingChannel": false
+      },
+      "requestModel": "immutable-request-bound-to-m2-static-patch-v1"
+    },
+    "diagnosticRule": "Validate membership-derived tenant, role canonicalization, an explicit product entrypoint and an installed read-only store owner without external capabilities.",
+    "acceptancePolicy": "Accept only GO_GATE_CONTRACT and M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS with zero secrets, Firebase access, Firestore read, writes, Rules, runtime, browser or deploy."
+  },
+  "canonicalOwners": [
+    {
+      "id": "productRoleTaxonomyP0",
+      "path": "orbit360-platform/core/product-role-taxonomy-p0.js",
+      "requiredTokens": ["CANONICAL_ROLES", "canonicalRole", "persistedRoleAliasesAllowed: false", "readAliasesAllowed: true"]
+    },
+    {
+      "id": "membershipMultirolEffectiveP0",
+      "path": "orbit360-platform/core/membership-multirol-effective-p0.js",
+      "requiredTokens": ["productRoleTaxonomyP0", "membershipMultirolContractP0 = api", "tenantSource: 'membership_only'", "writesStore: false"]
+    },
+    {
+      "id": "tenantAccessPolicyProductP0",
+      "path": "orbit360-platform/core/tenant-access-policy-product-p0.js",
+      "requiredTokens": ["canonicalMembership", "tenantSource: 'membership_only'", "crossTenantDenied: true", "writesAuthorized: false"]
+    },
+    {
+      "id": "backendProductReadonlyBootstrapP0",
+      "path": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "requiredTokens": ["TENANT_SOURCE = 'membership_only'", "deriveTenantFromMembership", "createFirestoreProductReadOnlyStoreP0", "backendProductReadinessP0.readiness", "queryStringTenantAllowed: false", "autoStart: false", "writesAuthorized: false"]
+    },
+    {
+      "id": "productReadonlyEntrypointP0",
+      "path": "orbit360-platform/product-readonly.html",
+      "requiredTokens": ["data-orbit-entrypoint=\"product-readonly\"", "blocked-until-authorized-runtime", "tenantSource: 'membership_only'", "queryStringTenantAllowed: false", "backend-product-readonly-bootstrap-p0.js"]
+    },
+    {
+      "id": "productReadonlyAcademyP0",
+      "path": "orbit360-platform/data/academia-v1233-product-readonly-bootstrap.js",
+      "requiredTokens": ["version: '1.233'", "tenantFromMembershipOnly: true", "queryStringTenantInProduct: false", "REPLICABLE_CLAUDE_ACUMULADO"]
+    },
+    {
+      "id": "m2ProductReadonlyContract",
+      "path": "orbit360-platform/tools/orbit360-m2-product-readonly-bootstrap-contract-v20260723.cjs",
+      "requiredTokens": ["M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS", "BOOTSTRAP_TENANT_MEMBERSHIP_ONLY", "ENTRY_NO_TEST_ENV_LOADERS", "WORKFLOW_NO_EXTERNAL_CAPABILITIES"]
+    }
+  ],
+  "requiredFiles": [
+    "tools/orbit360-gate-contract-registry-extension-m2-v20260723.json",
+    "tools/orbit360-gate-contract-overlay-m2-v20260723.json",
+    "tools/orbit360-validator-lifecycle-contract-m2-v20260723.json",
+    "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "tools/orbit360-validar-gate-contracts-engine-m2-v20260723.mjs",
+    "tools/orbit360-incident-freeze-v20260721.json",
+    ".github/workflows/orbit360-m2-product-readonly-static-gate-v20260723.yml",
+    "orbit360-platform/product-readonly.html",
+    "orbit360-platform/core/product-role-taxonomy-p0.js",
+    "orbit360-platform/core/membership-multirol-contract-p0.js",
+    "orbit360-platform/core/membership-multirol-effective-p0.js",
+    "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+    "orbit360-platform/core/tenant-access-policy-effective-p0.js",
+    "orbit360-platform/core/tenant-access-policy-product-p0.js",
+    "orbit360-platform/core/product-query-planner-contract-p0.js",
+    "orbit360-platform/core/tenant-canonical-paths-contract-p0.js",
+    "orbit360-platform/core/backend-product-readiness-contract-p0.js",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "orbit360-platform/core/product-readonly-route-rule-matrix-p0.js",
+    "orbit360-platform/core/product-readonly-smoke-contract-p0.js",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+    "orbit360-platform/data/academia-v1233-product-readonly-bootstrap.js",
+    "orbit360-platform/tools/orbit360-m2-product-readonly-bootstrap-contract-v20260723.cjs",
+    "orbit360-platform/docs/AUDITORIA-ESTATICA-M2-BOOTSTRAP-PRODUCTIVO-READONLY-20260723.md",
+    "orbit360-platform/docs/IMPLEMENTACION-M2-BOOTSTRAP-PRODUCTIVO-READONLY-20260723.md"
+  ],
+  "runtimeVersionContracts": [
+    {
+      "path": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": ["block2-product-readonly-bootstrap-v20260723", "orbit360-validar-gate-contracts-engine-m2-v20260723.mjs", "2.0.0"]
+    },
+    {
+      "path": "tools/orbit360-validar-gate-contracts-engine-m2-v20260723.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": ["orbit360-gate-contract-preflight-m2-static-v1", "M2_STATIC_PATCH_AUTHORIZED", "STATIC_PREFLIGHT"]
+    },
+    {
+      "path": "orbit360-platform/core/product-role-taxonomy-p0.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": ["p0-m2-20260723", "persistedRoleAliasesAllowed: false"]
+    },
+    {
+      "path": "orbit360-platform/core/membership-multirol-effective-p0.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": ["p0-effective-m2-20260723", "membershipMultirolContractP0 = api"]
+    },
+    {
+      "path": "orbit360-platform/core/tenant-access-policy-product-p0.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": ["p0-product-m2-20260723", "writesAuthorized: false"]
+    },
+    {
+      "path": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": ["p0-m2-20260723", "queryStringTenantAllowed: false", "autoStart: false", "writesAuthorized: false"]
+    },
+    {
+      "path": "orbit360-platform/product-readonly.html",
+      "replaceRequiredTokens": true,
+      "requiredTokens": ["m2-entry-20260723", "blocked-until-authorized-runtime"]
+    },
+    {
+      "path": "orbit360-platform/data/academia-v1233-product-readonly-bootstrap.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": ["version: '1.233'", "productRuntimeNotAuthorizedByThisLesson: true"]
+    },
+    {
+      "path": ".github/workflows/orbit360-m2-product-readonly-static-gate-v20260723.yml",
+      "replaceRequiredTokens": true,
+      "requiredTokens": ["VALIDATION_ONLY", "M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS"]
+    }
+  ],
+  "effectiveOwnerReconciliation": {
+    "contractVersion": "2.0.0",
+    "phase": "STATIC_PREFLIGHT",
+    "canonicalOwnerScope": "overlay_replace",
+    "runtimeContractScope": "overlay_replace",
+    "tenantSource": "membership_only",
+    "queryStringTenantAllowed": false,
+    "productStoreExplicit": true,
+    "storeNoFallback": true,
+    "writesAuthorized": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "rulesChanged": false,
+    "functionsChanged": false,
+    "deployExecuted": false,
+    "productionTouched": false
+  }
+}
