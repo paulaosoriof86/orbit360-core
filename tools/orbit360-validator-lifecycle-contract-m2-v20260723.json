@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m2-v1-static",
+  "issuedAt": "2026-07-23",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block2-product-readonly-bootstrap-v20260723",
+  "gateContractVersion": "2.0.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "product-readonly-bootstrap-static-v1",
+  "methodologicalDecisionId": "paula-20260723-m1-approved-start-m2",
+  "classification": [
+    "FUNCTIONAL_DEFECT",
+    "DATA_CONTRACT_FAILURE",
+    "VALIDATOR_STALE",
+    "PIPELINE_MECHANISM_FAILURE"
+  ],
+  "executionProfile": {
+    "phase": "STATIC_PREFLIGHT",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "workflowLocks": {
+      "branch": true,
+      "firebaseProject": false,
+      "hostingChannel": false
+    },
+    "requestModel": "immutable-request-bound-to-m2-static-patch-v1"
+  },
+  "canonicalIntegration": {
+    "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "engine": "tools/orbit360-validar-gate-contracts-engine-m2-v20260723.mjs",
+    "registryExtension": "tools/orbit360-gate-contract-registry-extension-m2-v20260723.json",
+    "overlay": "tools/orbit360-gate-contract-overlay-m2-v20260723.json",
+    "workflow": ".github/workflows/orbit360-m2-product-readonly-static-gate-v20260723.yml",
+    "canonicalOwnerScope": "overlay_replace",
+    "runtimeContractScope": "overlay_replace",
+    "sourceTransformation": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "operationalWrites": 0,
+    "runtime": false,
+    "browser": false,
+    "hostingDeploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false,
+    "reimport": false
+  },
+  "canonicalOverlayPatch": {
+    "schemaVersion": "orbit360-gate-contract-overlay-v1",
+    "issuedAt": "2026-07-23",
+    "gateId": "block2-product-readonly-bootstrap-v20260723",
+    "classification": "FUNCTIONAL_DEFECT",
+    "diagnosticRevision": "product-readonly-bootstrap-static-v1",
+    "contractRevision": "2.0.0-product-readonly-bootstrap-static-v1",
+    "replaceCanonicalOwners": true,
+    "replaceRequiredFiles": true,
+    "replaceRuntimeVersionContracts": true,
+    "gatePatch": {
+      "contractVersion": "2.0.0",
+      "diagnosticRevision": "product-readonly-bootstrap-static-v1",
+      "runtimeVersion": "20260723-1",
+      "status": "M2_PRODUCT_READONLY_STATIC_PATCH_AUTHORIZED_ONCE",
+      "executionProfile": {
+        "phase": "STATIC_PREFLIGHT",
+        "capabilities": {
+          "secrets": false,
+          "firestoreRead": false,
+          "writes": false,
+          "runtime": false,
+          "browser": false,
+          "deploy": false,
+          "functionsDeploy": false,
+          "rulesDeploy": false,
+          "production": false
+        },
+        "workflowLocks": {
+          "branch": true,
+          "firebaseProject": false,
+          "hostingChannel": false
+        },
+        "requestModel": "immutable-request-bound-to-m2-static-patch-v1"
+      },
+      "diagnosticRule": "Validate the static product read-only bootstrap before any external capability.",
+      "acceptancePolicy": "Accept only GO_GATE_CONTRACT and M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS."
+    },
+    "canonicalOwners": [],
+    "requiredFiles": [],
+    "runtimeVersionContracts": []
+  },
+  "preservedEvidence": {
+    "m1Closed": true,
+    "m1HumanApproved": true,
+    "m1ContractVersion": "1.0.40",
+    "m1CssDeliveryRunId": 30020850178,
+    "dynamicDirectoryPatchCommit": "6145e3b0a4173c582617bfc26dbfdc0c55b88b86",
+    "clients": 414,
+    "insurers": 26,
+    "activeInsurers": 26,
+    "advisors": 7,
+    "productionTouched": false,
+    "finalTechnicalGateRerun": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
