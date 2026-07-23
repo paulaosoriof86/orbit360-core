@@ -58,6 +58,7 @@
       essentialStyles: ESSENTIAL_STYLES.slice(),
       status: 'preparing',
       cssReady: false,
+      workerBuildReady: false,
       redirectBlockedWithoutCss: true
     };
     var statusNode = document.getElementById('status');
@@ -88,8 +89,12 @@
       if (failures.length) throw new Error(failures.join('|'));
       return true;
     }
+    function controllerHasExpectedBuild() {
+      var controller = navigator.serviceWorker && navigator.serviceWorker.controller;
+      return Boolean(controller && String(controller.scriptURL || '').indexOf('v=' + SW_BUILD) >= 0);
+    }
     async function prepareWorker() {
-      if (!('serviceWorker' in navigator)) return;
+      if (!('serviceWorker' in navigator)) throw new Error('SERVICE_WORKER_UNSUPPORTED');
       var regs = await bounded(navigator.serviceWorker.getRegistrations(), PREVIEW_OPERATION_TIMEOUT_MS, []);
       await bounded(Promise.all((regs || []).map(function(reg){ return Promise.resolve(reg.unregister()).catch(function(){ return false; }); })), PREVIEW_OPERATION_TIMEOUT_MS, []);
       if (window.caches && caches.keys) {
@@ -98,9 +103,11 @@
       }
       await bounded(navigator.serviceWorker.register('sw.js?v=' + SW_BUILD, { scope:'./' }), PREVIEW_OPERATION_TIMEOUT_MS, null);
       await bounded(navigator.serviceWorker.ready, PREVIEW_WORKER_READY_TIMEOUT_MS, null);
-      if (!navigator.serviceWorker.controller) {
-        await bounded(new Promise(function(resolve){ navigator.serviceWorker.addEventListener('controllerchange', resolve, { once:true }); }), 2500, null);
+      if (!controllerHasExpectedBuild()) {
+        await bounded(new Promise(function(resolve){ navigator.serviceWorker.addEventListener('controllerchange', resolve, { once:true }); }), 3500, null);
       }
+      if (!controllerHasExpectedBuild()) throw new Error('SERVICE_WORKER_BUILD_NOT_CONTROLLING:' + SW_BUILD);
+      state.workerBuildReady = true;
     }
     async function warmAssets() {
       await Promise.all(WARM_ASSETS.map(function(asset){ return fetchAsset(asset).catch(function(error){ if (isCss(asset)) throw error; return false; }); }));
@@ -137,7 +144,7 @@
       prepare(),
       timeout(PREVIEW_BOOTSTRAP_BUDGET_MS, false)
     ]).then(function(ready){
-      if (ready === true && state.cssReady === true) {
+      if (ready === true && state.cssReady === true && state.workerBuildReady === true) {
         state.redirectScheduled = true;
         location.replace(target);
         return;
