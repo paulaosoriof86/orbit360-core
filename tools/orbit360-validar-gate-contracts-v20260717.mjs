@@ -12,7 +12,7 @@ const LIFECYCLE_CONTRACT = 'tools/orbit360-validator-lifecycle-contract-v2026072
 const ENGINE = 'tools/orbit360-validar-gate-contracts-engine-v20260717.mjs';
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
-const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-aware-static-authorization-v2';
+const CANONICAL_LIFECYCLE_COMPOSITION = 'direct-atomic-patch-validation-v1';
 const ENGINE_EVIDENCE_USED = 'sync-file-evidence-not-stdout-v1';
 
 function readJson(rel, base = ROOT) {
@@ -52,7 +52,11 @@ function compose(base, lifecycle) {
   const patch = lifecycle && lifecycle.canonicalOverlayPatch;
   if (!patch || patch.schemaVersion !== 'orbit360-gate-contract-overlay-v1') throw new Error('CANONICAL_OVERLAY_PATCH_MISSING');
   if (base.gateId !== GATE_ID || patch.gateId !== GATE_ID || lifecycle.gateId !== GATE_ID) throw new Error('CANONICAL_GATE_MISMATCH');
+  if (lifecycle.gateContractVersion !== '1.0.38') throw new Error('CANONICAL_GATE_VERSION_MISMATCH');
   if (lifecycle.validatorLifecycleRevision !== CANONICAL_LIFECYCLE_COMPOSITION) throw new Error('CANONICAL_LIFECYCLE_REVISION_MISMATCH');
+  if (!lifecycle.executionProfile || lifecycle.executionProfile.phase !== 'STATIC_PREFLIGHT') throw new Error('CANONICAL_LIFECYCLE_PHASE_MISMATCH');
+  const capabilities = lifecycle.executionProfile.capabilities || {};
+  if (Object.keys(capabilities).some(key => capabilities[key] !== false)) throw new Error('CANONICAL_LIFECYCLE_CAPABILITY_MISMATCH');
   const owners = new Map((base.canonicalOwners || []).map(item => [item.id, item]));
   for (const owner of patch.canonicalOwners || []) owners.set(owner.id, owner);
   const merged = mergeObjects(base, patch);
@@ -132,6 +136,9 @@ try {
     engineStdoutParsed: false,
     parallelWrapperRetired: true,
     parallelOverlayRetired: true,
+    sourceTransformed: false,
+    dataAccess: false,
+    secretAccess: false,
     operationalWrites: 0,
     evidenceWrites: 1,
     secretsRead: false,
@@ -145,9 +152,9 @@ try {
   if (run.stderr) output.stderrSanitized = String(run.stderr).trim().slice(0, 2000);
 } catch (error) {
   output = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v10-canonical-engine-evidence',
+    schemaVersion: 'orbit360-gate-contract-preflight-v11-direct-atomic-validation',
     gateId: GATE_ID,
-    contractVersion: '1.0.37',
+    contractVersion: '1.0.38',
     status: 'VALIDATOR_STALE',
     classification: 'PIPELINE_MECHANISM_FAILURE',
     failed: 1,
@@ -156,6 +163,9 @@ try {
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
     engineEvidenceSource: ENGINE_EVIDENCE_USED,
     engineStdoutParsed: false,
+    sourceTransformed: false,
+    dataAccess: false,
+    secretAccess: false,
     operationalWrites: 0,
     evidenceWrites: 1,
     secretsRead: false,
