@@ -1,26 +1,86 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v82-hosting-lab-delivered",
+  "schemaVersion": "orbit360-incident-freeze-v83-human-review-edit-responsive-failed",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-operational-directory-field-classification-regression-v20260722",
-  "status": "M1_HOSTING_LAB_VISUALIZATION_READY_HUMAN_REVIEW_PENDING",
+  "status": "M1_HUMAN_VISUAL_REVIEW_FAILED_EDIT_AND_MOBILE_RESPONSIVE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "tenantId": "alianzas-soluciones",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "blockedGateIds": [],
-  "classification": ["DATA_CONTRACT_FAILURE", "FUNCTIONAL_DEFECT", "VALIDATOR_STALE", "PIPELINE_MECHANISM_FAILURE"],
-  "bindingCorrection": {"contractVersion":"1.0.38","usernameOperational":true,"bankNumberOperational":true,"passwordProtectedOnly":true,"frontendValidated":true},
-  "staticClosure": {"runId":29973107802,"preflight":"GO_GATE_CONTRACT_183_OF_183","operationalDirectoryContract":"PASS_30_OF_30","visualContract":"PASS_1_0_38","architecture":"GO_STATIC_ARCHITECTURE_35_OF_35"},
-  "applyClosure": {"runId":29974965244,"artifactId":8551063445,"artifactDigest":"sha256:9dbfb9a9d3d478d8aec00bf6a0d570c109ec6a70427e028baff07e928e9ebd35","status":"APPLIED_AND_VERIFIED","transactionCommitted":true,"rollbackExecuted":false,"bankOperationalNumbers":91,"usernamesOperational":26,"bankPending":2,"credentialPasswordsAvailable":26,"operationalPasswords":0,"remainingProposals":0,"rowCountChanges":0,"rowOrderChanges":0,"nonTargetFieldChanges":0},
-  "hostingClosure": {"runId":29976616043,"artifactId":8551656236,"artifactDigest":"sha256:b85c5cd1cd890c1a500447fe6d5fd2ca7fc9b0b2886099f77aa35942856a8e87","status":"HOSTING_DELIVERED_AND_VERIFIED","projectId":"ays-orbit-360-lab","channel":"orbit360-ays-lab","canonicalUrl":"https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app","reviewUrl":"https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app/ays-lab-preview.html","assetsVerified":9,"allAssetsMatch":true,"firestoreRead":false,"vaultRead":false,"writes":false,"runtime":false,"browser":false,"functionsDeploy":false,"rulesDeploy":false,"productionTouched":false,"reimportExecuted":false},
-  "applyAuthorization": {"authorizationId":"m1-operational-directory-atomic-apply-v2","active":false,"consumed":true,"consumedByRunId":29974965244,"allowedExecutions":0,"writesAllowed":false,"firestoreReadAllowed":false,"vaultReadAllowed":false},
-  "hostingAuthorization": {"authorizationId":"m1-hosting-lab-delivery-v1","active":false,"consumed":true,"consumedByRunId":29976616043,"allowedExecutions":0,"phase":"LAB_HOSTING_DELIVERY","projectId":"ays-orbit-360-lab","channel":"orbit360-ays-lab","secretsAllowed":false,"firestoreReadAllowed":false,"vaultReadAllowed":false,"writesAllowed":false,"runtimeAllowed":false,"browserAllowed":false,"deployAllowed":false,"functionsDeployAllowed":false,"rulesDeployAllowed":false,"productionAllowed":false},
-  "allowedActions": ["human_visual_review_direction_desktop","human_visual_review_operativo_tablet","human_visual_review_asesor_mobile","record_human_m1_approval_or_concrete_defects"],
-  "blockedActions": ["repeat_atomic_apply","repeat_hosting_delivery","read_firestore_operational_data","read_existing_insurer_vault","write_firestore_operational_data","write_secret_manager","transform_product_in_workflow","run_runtime","open_browser_automation","deploy_hosting_lab","deploy_functions","deploy_rules","deploy_production","reimport_clients","reimport_insurers","advance_m2_without_human_approval","advance_policies","run_second_final_gate","merge_main"],
-  "stateClarification": {"m1TechnicalGate":"HISTORICAL_PASS","m1HumanVisualReview":"READY_PENDING_HUMAN_APPROVAL","m1Closed":false,"m2Authorized":false,"operationalDirectoryProductPatch":"PASS_1_0_38","operationalDirectoryApply":"APPLIED_AND_VERIFIED_CONSUMED","hostingRepublish":"HOSTING_DELIVERED_AND_VERIFIED_CONSUMED","hostingDeployAuthorized":false,"runtimeAuthorized":false,"productionTouched":false,"reimportRequired":false},
-  "nextAllowedStep": "Paula performs the single human visual review of the verified Hosting LAB URL in Dirección desktop, Operativo tablet and Asesor mobile. M1 closes and M2 becomes eligible only after explicit human approval.",
+  "classification": ["FUNCTIONAL_DEFECT", "DATA_CONTRACT_FAILURE", "VALIDATOR_STALE"],
+  "preservedClosures": {
+    "staticRunId": 29973107802,
+    "atomicApplyRunId": 29974965244,
+    "hostingRunId": 29976616043,
+    "bankOperationalNumbers": 91,
+    "usernamesOperational": 26,
+    "bankPending": 2,
+    "credentialPasswordsAvailable": 26,
+    "operationalPasswords": 0,
+    "dataRepairStatus": "APPLIED_AND_VERIFIED",
+    "hostingStatus": "HOSTING_DELIVERED_AND_VERIFIED"
+  },
+  "humanReviewFindings": {
+    "reviewStatus": "FAILED",
+    "editBlankScreen": true,
+    "mobileTitlesResponsive": false,
+    "inactiveInsurersVisible": true,
+    "inactiveReasonFallbackPresent": true,
+    "contactActionsConditional": true,
+    "evidenceDocument": "orbit360-platform/docs/REVISION-VISUAL-M1-ASEGURADORAS-EDICION-RESPONSIVE-20260722.md"
+  },
+  "rootCause": {
+    "editBlankScreen": "The visual stability barrier requires read-mode canonical cards while the editor intentionally keeps editable controls. It hides #asg-ficha, reaches blocked-incomplete-dom and does not remove the pending visibility class.",
+    "editableContractMismatch": "modules/aseguradoras.js still implements the historical masked-account and no-password renderer. Its snapshots can rebuild portal/account arrays without preserving credentialRef/accountRef.",
+    "mobileTitles": "Responsive CSS depends on brittle renderer and inline-style selectors and does not cover all real title structures. Static validation did not represent the human mobile case."
+  },
+  "dataState": {
+    "firestoreReadAfterReview": false,
+    "vaultReadAfterReview": false,
+    "writesAfterReview": false,
+    "reimport": false,
+    "productionTouched": false
+  },
+  "authorizations": {
+    "dataApplyActive": false,
+    "hostingDeliveryActive": false,
+    "runtimeActive": false,
+    "m2Authorized": false
+  },
+  "allowedActions": [
+    "prepare_one_atomic_frontend_patch_for_edit_mode_and_mobile_titles",
+    "update_validators_and_academy_with_same_patch",
+    "perform_static_validation_without_data_access",
+    "publish_one_new_hosting_lab_visualization_after_static_pass"
+  ],
+  "blockedActions": [
+    "repeat_data_repair",
+    "read_firestore_operational_data",
+    "read_existing_insurer_vault",
+    "activate_or_deactivate_insurers_in_bulk_without_source_validation",
+    "reimport_clients",
+    "reimport_insurers",
+    "deploy_functions",
+    "deploy_rules",
+    "deploy_production",
+    "advance_m2",
+    "advance_policies",
+    "merge_main"
+  ],
+  "stateClarification": {
+    "m1TechnicalGate": "HISTORICAL_PASS",
+    "m1HumanVisualReview": "FAILED_EDIT_BLANK_AND_MOBILE_TITLES",
+    "m1Closed": false,
+    "m2Authorized": false,
+    "operationalDirectoryData": "APPLIED_AND_VERIFIED_PRESERVED",
+    "hostingVisualization": "REJECTED_BY_HUMAN_REVIEW",
+    "nextPatchDataAccess": false
+  },
+  "claudeClassification": "REPLICABLE_CLAUDE_ACUMULADO",
+  "academyImpact": "ACADEMIA_ACTUALIZAR",
+  "nextAllowedStep": "Build one direct atomic frontend patch integrating contract 1.0.38 into the editable insurer module, making the visual stability barrier edit-aware, preserving credentialRef/accountRef on save, and replacing brittle mobile title selectors with semantic responsive classes. Validate without data access, then publish one new Hosting LAB visualization.",
   "containsPII": false,
   "containsSecrets": false
 }
