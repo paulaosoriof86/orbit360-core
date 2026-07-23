@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v10-direct-atomic-validation",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v11-overlay-scope-reconciliation",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -7,7 +7,7 @@
   "gateId": "block1-client360-insurers-lab-v20260717",
   "gateContractVersion": "1.0.38",
   "validatorLifecycleRevision": "direct-atomic-patch-validation-v1",
-  "controlPlaneRevision": "validation-only-immutable-request-v1",
+  "controlPlaneRevision": "overlay-scope-validation-only-v1",
   "methodologicalDecisionId": "paula-20260722-operational-directory-root-repair",
   "classification": [
     "DATA_CONTRACT_FAILURE",
@@ -17,8 +17,10 @@
   ],
   "rootCause": {
     "fieldContract": "Portal username and insurer bank account number are operational directory fields. Password is the only secret.",
-    "pipeline": "The previous lifecycle still required a workflow-time source transformer and a data dry-run overlay after those mechanisms were retired.",
-    "correction": "Compose the already committed 1.0.38 overlay without adding transform, data-read or deploy requirements."
+    "firstStaticValidation": "Run 29971750026 failed before the engine because the lifecycle revision still described the retired data-dry-run transformer.",
+    "secondStaticValidation": "Run 29971998354 reached the engine and passed 846 of 861 checks. The remaining 15 failures came from unrelated global owners, historical runtime-version contracts and runtime-oriented workflow checks inherited by accumulation.",
+    "pipeline": "The registry engine merged all extension owners and all historical gate runtime contracts into every overlay. It did not support an overlay declaring an authoritative replacement scope.",
+    "correction": "Use the 20260722 overlay-scoped engine. The active overlay replaces canonical owners, required files and runtime-version contracts. The workflow declares STATIC_PREFLIGHT and publishes canonical evidence."
   },
   "executionProfile": {
     "phase": "STATIC_PREFLIGHT",
@@ -38,13 +40,16 @@
       "firebaseProject": false,
       "hostingChannel": false
     },
-    "requestModel": "immutable-request-bound-to-committed-patch-v1"
+    "requestModel": "immutable-request-bound-to-scope-reconciled-validator-patch-v1"
   },
   "canonicalIntegration": {
     "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-    "engine": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
+    "engine": "tools/orbit360-validar-gate-contracts-engine-v20260722.mjs",
     "overlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
     "bindingAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
+    "rootCauseDocument": "orbit360-platform/docs/CAUSA-RAIZ-PREFLIGHT-ALCANCE-OVERLAY-20260722.md",
+    "canonicalOwnerScope": "overlay_replace",
+    "runtimeContractScope": "overlay_replace",
     "workflowValidationOnly": true,
     "sourceTransformation": false,
     "dataAccess": false,
@@ -62,13 +67,16 @@
     "schemaVersion": "orbit360-gate-contract-overlay-v1",
     "issuedAt": "2026-07-22",
     "gateId": "block1-client360-insurers-lab-v20260717",
-    "classification": "DATA_CONTRACT_FAILURE",
-    "diagnosticRevision": "operational-directory-field-classification-v1",
-    "contractRevision": "1.0.38-direct-atomic-patch-validation-v1",
+    "classification": "VALIDATOR_STALE",
+    "diagnosticRevision": "overlay-scope-replacement-v1",
+    "contractRevision": "1.0.38-overlay-scope-reconciliation-v1",
+    "replaceCanonicalOwners": true,
+    "replaceRequiredFiles": true,
+    "replaceRuntimeVersionContracts": true,
     "gatePatch": {
       "contractVersion": "1.0.38",
-      "diagnosticRevision": "operational-directory-field-classification-v1",
-      "status": "DIRECT_ATOMIC_PATCH_STATIC_VALIDATION_ONLY",
+      "diagnosticRevision": "overlay-scope-replacement-v1",
+      "status": "PREFLIGHT_SCOPE_RECONCILED_STATIC_VALIDATION_ONLY",
       "executionProfile": {
         "phase": "STATIC_PREFLIGHT",
         "capabilities": {
@@ -87,10 +95,10 @@
           "firebaseProject": false,
           "hostingChannel": false
         },
-        "requestModel": "immutable-request-bound-to-committed-patch-v1"
+        "requestModel": "immutable-request-bound-to-scope-reconciled-validator-patch-v1"
       },
-      "diagnosticRule": "Validate the already committed 1.0.38 patch. Do not transform source, access data, read secrets, execute runtime, open a browser or deploy.",
-      "acceptancePolicy": "Accept only GO_GATE_CONTRACT with the validation-only workflow and the direct operational-directory owners already present."
+      "diagnosticRule": "Validate only the authoritative scope declared by the active overlay. Do not inherit unrelated owners or historical runtime contracts into STATIC_PREFLIGHT.",
+      "acceptancePolicy": "Accept only GO_GATE_CONTRACT with overlay_replace scopes and zero transformation, data access, secret access, writes, runtime, browser or deploy."
     },
     "canonicalOwners": [],
     "requiredFiles": [],
@@ -98,7 +106,9 @@
   },
   "preservedEvidence": {
     "historicalTechnicalGateRunId": 29925156385,
-    "failedStaticValidationRunId": 29971750026,
+    "firstFailedStaticValidationRunId": 29971750026,
+    "secondFailedStaticValidationRunId": 29971998354,
+    "secondRunChecks": "846_OF_861_PASS",
     "clients": 414,
     "insurers": 26,
     "advisors": 7,
