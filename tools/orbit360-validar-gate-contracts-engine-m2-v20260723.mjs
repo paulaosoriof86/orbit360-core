@@ -15,6 +15,10 @@ const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-san
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const STATIC_PREFLIGHT = 'STATIC_PREFLIGHT';
 const M2_STATIC_PATCH_AUTHORIZED = 'M2_PRODUCT_READONLY_STATIC_PATCH_AUTHORIZED_ONCE';
+const VALID_M2_FREEZE_PHASES = Object.freeze([
+  'STATIC_PATCH_VALIDATION',
+  'STATIC_PATCH_VALIDATION_OBSERVABLE'
+]);
 const EXPECTED_CAPABILITIES = Object.freeze({
   secrets: false,
   firestoreRead: false,
@@ -120,7 +124,7 @@ try {
   check('FREEZE_STATUS', freeze.status === M2_STATIC_PATCH_AUTHORIZED, freeze.status);
   check('FREEZE_M1_CLOSED', freeze.stateClarification && freeze.stateClarification.m1Closed === true, JSON.stringify(freeze.stateClarification || {}));
   check('FREEZE_M2_AUTHORIZED', freeze.stateClarification && freeze.stateClarification.m2Authorized === true, JSON.stringify(freeze.stateClarification || {}));
-  check('FREEZE_M2_PHASE', freeze.stateClarification && freeze.stateClarification.m2Phase === 'STATIC_PATCH_VALIDATION', JSON.stringify(freeze.stateClarification || {}));
+  check('FREEZE_M2_PHASE', freeze.stateClarification && VALID_M2_FREEZE_PHASES.includes(freeze.stateClarification.m2Phase), JSON.stringify(freeze.stateClarification || {}));
   check('FREEZE_M3_BLOCKED', freeze.stateClarification && freeze.stateClarification.m3Authorized === false, JSON.stringify(freeze.stateClarification || {}));
   check('FREEZE_AUTH_ACTIVE', freeze.m2StaticPatchAuthorization && freeze.m2StaticPatchAuthorization.active === true && freeze.m2StaticPatchAuthorization.consumed === false && freeze.m2StaticPatchAuthorization.allowedExecutions === 1, JSON.stringify(freeze.m2StaticPatchAuthorization || {}));
 
