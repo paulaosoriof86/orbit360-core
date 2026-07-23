@@ -1,20 +1,27 @@
 #!/usr/bin/env node
 'use strict';
+
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const ROOT = process.cwd();
-const GATE_ID = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
-const BASE_OVERLAY = 'tools/orbit360-gate-contract-overlay-v20260718.json';
-const LIFECYCLE_CONTRACT = 'tools/orbit360-validator-lifecycle-contract-v20260722.json';
-const ENGINE = 'tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs';
+const GATE_ID = process.argv[2] || 'block2-product-readonly-bootstrap-v20260723';
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
-const ENGINE_EVIDENCE_USED = 'sync-file-evidence-not-stdout-v1';
-const GATE_CONTRACT_VERSION = '1.0.40';
+const GATE_CONFIG = Object.freeze({
+  'block1-client360-insurers-lab-v20260717': {
+    contractVersion: '1.0.40',
+    lifecycle: 'tools/orbit360-validator-lifecycle-contract-v20260722.json',
+    engine: 'tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs'
+  },
+  'block2-product-readonly-bootstrap-v20260723': {
+    contractVersion: '2.0.0',
+    lifecycle: 'tools/orbit360-validator-lifecycle-contract-m2-v20260723.json',
+    engine: 'tools/orbit360-validar-gate-contracts-engine-m2-v20260723.mjs'
+  }
+});
 const PHASE_PROFILES = Object.freeze({
   STATIC_PREFLIGHT: { secrets:false, firestoreRead:false, writes:false, runtime:false, browser:false, deploy:false, functionsDeploy:false, rulesDeploy:false, production:false },
   LAB_DATA_CONTRACT_REPAIR_DRYRUN: { secrets:true, firestoreRead:true, writes:false, runtime:false, browser:false, deploy:false, functionsDeploy:false, rulesDeploy:false, production:false },
@@ -23,127 +30,56 @@ const PHASE_PROFILES = Object.freeze({
   LAB_RUNTIME_GATE: { secrets:true, firestoreRead:true, writes:false, runtime:true, browser:true, deploy:false, functionsDeploy:false, rulesDeploy:false, production:false }
 });
 
-function readJson(rel, base = ROOT) { return JSON.parse(fs.readFileSync(path.join(base, rel), 'utf8')); }
-function unique(values) { return [...new Set((values || []).filter(Boolean))]; }
-function mergeObjects(base, patch) {
-  if (!patch || typeof patch !== 'object' || Array.isArray(patch)) return base;
-  const out = { ...(base || {}) };
-  for (const [key, value] of Object.entries(patch)) {
-    if (value && typeof value === 'object' && !Array.isArray(value)) out[key] = mergeObjects(out[key], value);
-    else out[key] = value;
-  }
-  return out;
+function readJson(rel) {
+  return JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
 }
-function mergeContracts(baseContracts, patchContracts) {
-  const map = new Map((baseContracts || []).map(item => [item.path, { ...item, requiredTokens: unique(item.requiredTokens || []) }]));
-  for (const patch of patchContracts || []) {
-    const current = map.get(patch.path);
-    if (!current) { map.set(patch.path, { ...patch, requiredTokens: unique(patch.requiredTokens || []) }); continue; }
-    const requiredTokens = patch.replaceRequiredTokens === true ? unique(patch.requiredTokens || []) : unique([...(current.requiredTokens || []), ...(patch.requiredTokens || [])]);
-    map.set(patch.path, { ...current, ...patch, requiredTokens });
-  }
-  return [...map.values()];
-}
+
 function exactCapabilities(actual, expected) {
-  const keys = Object.keys(expected || {});
-  return keys.length > 0 && keys.every(key => actual && actual[key] === expected[key]) && Object.keys(actual || {}).every(key => Object.prototype.hasOwnProperty.call(expected, key));
+  const actualKeys = Object.keys(actual || {}).sort();
+  const expectedKeys = Object.keys(expected || {}).sort();
+  return JSON.stringify(actualKeys) === JSON.stringify(expectedKeys) && expectedKeys.every(key => actual[key] === expected[key]);
 }
-function compose(base, lifecycle) {
-  const patch = lifecycle && lifecycle.canonicalOverlayPatch;
-  if (!patch || patch.schemaVersion !== 'orbit360-gate-contract-overlay-v1') throw new Error('CANONICAL_OVERLAY_PATCH_MISSING');
-  if (base.gateId !== GATE_ID || patch.gateId !== GATE_ID || lifecycle.gateId !== GATE_ID) throw new Error('CANONICAL_GATE_MISMATCH');
-  if (lifecycle.gateContractVersion !== GATE_CONTRACT_VERSION) throw new Error('CANONICAL_GATE_VERSION_MISMATCH');
-  if (lifecycle.validatorLifecycleRevision !== CANONICAL_LIFECYCLE_COMPOSITION) throw new Error('CANONICAL_LIFECYCLE_REVISION_MISMATCH');
-  const profile = lifecycle.executionProfile || {};
-  const phase = String(profile.phase || '');
-  const expected = PHASE_PROFILES[phase];
-  if (!expected) throw new Error('CANONICAL_LIFECYCLE_PHASE_MISMATCH');
-  if (!exactCapabilities(profile.capabilities || {}, expected)) throw new Error('CANONICAL_LIFECYCLE_CAPABILITY_MISMATCH');
-  const merged = mergeObjects(base, patch);
-  const replaceOwners = patch.replaceCanonicalOwners === true || base.replaceCanonicalOwners === true;
-  const replaceRequiredFiles = patch.replaceRequiredFiles === true || base.replaceRequiredFiles === true;
-  const replaceRuntimeContracts = patch.replaceRuntimeVersionContracts === true || base.replaceRuntimeVersionContracts === true;
-  const ownerMap = new Map((base.canonicalOwners || []).map(item => [item.id, item]));
-  for (const owner of patch.canonicalOwners || []) ownerMap.set(owner.id, owner);
-  return {
-    ...merged,
-    schemaVersion: 'orbit360-gate-contract-overlay-v1',
-    gateId: GATE_ID,
-    replaceCanonicalOwners: replaceOwners,
-    replaceRequiredFiles,
-    replaceRuntimeVersionContracts: replaceRuntimeContracts,
-    canonicalOwners: [...ownerMap.values()],
-    requiredFiles: unique([...(base.requiredFiles || []), ...(patch.requiredFiles || [])]),
-    runtimeGraphFiles: unique([...(base.runtimeGraphFiles || []), ...(patch.runtimeGraphFiles || [])]),
-    runtimeVersionContracts: mergeContracts(base.runtimeVersionContracts || [], patch.runtimeVersionContracts || [])
-  };
-}
-function link(source, target) {
-  const stat = fs.lstatSync(source);
-  fs.symlinkSync(source, target, stat.isDirectory() ? 'dir' : 'file');
-}
-function createMirror(tempRoot, composedOverlay) {
-  for (const name of fs.readdirSync(ROOT)) {
-    const source = path.join(ROOT, name);
-    const target = path.join(tempRoot, name);
-    if (name === 'tools') {
-      fs.mkdirSync(target, { recursive: true });
-      for (const child of fs.readdirSync(source)) {
-        const childSource = path.join(source, child);
-        const childTarget = path.join(target, child);
-        if (child === path.basename(BASE_OVERLAY)) fs.writeFileSync(childTarget, `${JSON.stringify(composedOverlay, null, 2)}\n`, 'utf8');
-        else link(childSource, childTarget);
-      }
-      continue;
-    }
-    if (name === 'orbit360-platform') {
-      fs.mkdirSync(target, { recursive: true });
-      for (const child of fs.readdirSync(source)) {
-        const childSource = path.join(source, child);
-        const childTarget = path.join(target, child);
-        if (child === 'runtime-gate-crm-v20260716') fs.mkdirSync(childTarget, { recursive: true });
-        else link(childSource, childTarget);
-      }
-      continue;
-    }
-    link(source, target);
-  }
-}
+
 function writeEvidence(payload) {
   fs.mkdirSync(path.dirname(EVIDENCE_PATH), { recursive: true });
-  fs.writeFileSync(EVIDENCE_PATH, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  fs.writeFileSync(EVIDENCE_PATH, JSON.stringify(payload, null, 2) + '\n', 'utf8');
 }
 
 let output;
 let exitCode = 41;
-let tempRoot = '';
 try {
-  const base = readJson(BASE_OVERLAY);
-  const lifecycle = readJson(LIFECYCLE_CONTRACT);
-  const composed = compose(base, lifecycle);
-  tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'orbit360-preflight-canonical-'));
-  createMirror(tempRoot, composed);
-  const run = spawnSync(process.execPath, [ENGINE, GATE_ID], {
-    cwd: tempRoot,
+  const config = GATE_CONFIG[GATE_ID];
+  if (!config) throw new Error('CANONICAL_GATE_NOT_REGISTERED_IN_ENTRYPOINT');
+  if (!fs.existsSync(path.join(ROOT, config.lifecycle))) throw new Error('CANONICAL_LIFECYCLE_CONTRACT_MISSING');
+  if (!fs.existsSync(path.join(ROOT, config.engine))) throw new Error('CANONICAL_ENGINE_MISSING');
+
+  const lifecycle = readJson(config.lifecycle);
+  if (lifecycle.gateId !== GATE_ID) throw new Error('CANONICAL_GATE_MISMATCH');
+  if (lifecycle.gateContractVersion !== config.contractVersion) throw new Error('CANONICAL_GATE_VERSION_MISMATCH');
+  if (lifecycle.validatorLifecycleRevision !== CANONICAL_LIFECYCLE_COMPOSITION) throw new Error('CANONICAL_LIFECYCLE_REVISION_MISMATCH');
+  const profile = lifecycle.executionProfile || {};
+  const expected = PHASE_PROFILES[String(profile.phase || '')];
+  if (!expected) throw new Error('CANONICAL_LIFECYCLE_PHASE_MISMATCH');
+  if (!exactCapabilities(profile.capabilities || {}, expected)) throw new Error('CANONICAL_LIFECYCLE_CAPABILITY_MISMATCH');
+
+  const run = spawnSync(process.execPath, [config.engine, GATE_ID], {
+    cwd: ROOT,
     env: { ...process.env, ORBIT360_BRANCH: 'ays/backend-tenant-lab-v99-20260703' },
     encoding: 'utf8',
     maxBuffer: 32 * 1024 * 1024
   });
   exitCode = Number.isInteger(run.status) ? run.status : 41;
   if (run.error) throw run.error;
-  const engineEvidencePath = path.join(tempRoot, EVIDENCE_REL);
-  if (!fs.existsSync(engineEvidencePath)) throw new Error('CANONICAL_ENGINE_EVIDENCE_MISSING');
-  const parsed = readJson(EVIDENCE_REL, tempRoot);
+  if (!fs.existsSync(EVIDENCE_PATH)) throw new Error('CANONICAL_ENGINE_EVIDENCE_MISSING');
+  const parsed = readJson(EVIDENCE_REL);
   output = {
     ...parsed,
     canonicalEntrypoint: 'tools/orbit360-validar-gate-contracts-v20260717.mjs',
-    canonicalEngine: ENGINE,
-    canonicalLifecycleContract: LIFECYCLE_CONTRACT,
+    canonicalEngine: config.engine,
+    canonicalLifecycleContract: config.lifecycle,
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
-    engineEvidenceSource: ENGINE_EVIDENCE_USED,
+    engineEvidenceSource: 'sync-file-evidence-not-stdout-v1',
     engineStdoutParsed: false,
-    parallelWrapperRetired: true,
-    parallelOverlayRetired: true,
     sourceTransformed: false,
     dataAccess: false,
     secretAccess: false,
@@ -153,25 +89,26 @@ try {
     firestoreRead: false,
     runtimeExecuted: false,
     browserExecuted: false,
+    rulesApplied: false,
     deployExecuted: false,
+    productionTouched: false,
     containsPII: false,
     containsSecrets: false
   };
   if (run.stderr) output.stderrSanitized = String(run.stderr).trim().slice(0, 2000);
 } catch (error) {
+  const config = GATE_CONFIG[GATE_ID] || {};
   output = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v13-phase-capability-entrypoint',
+    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v1',
     gateId: GATE_ID,
-    contractVersion: GATE_CONTRACT_VERSION,
+    contractVersion: config.contractVersion || '',
     status: 'VALIDATOR_STALE',
     classification: 'PIPELINE_MECHANISM_FAILURE',
     failed: 1,
     failedCheckIds: ['CANONICAL_PREFLIGHT_ENTRYPOINT'],
     error: String(error && error.message || error),
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
-    canonicalEngine: ENGINE,
-    engineEvidenceSource: ENGINE_EVIDENCE_USED,
-    engineStdoutParsed: false,
+    canonicalEngine: config.engine || '',
     sourceTransformed: false,
     dataAccess: false,
     secretAccess: false,
@@ -181,14 +118,15 @@ try {
     firestoreRead: false,
     runtimeExecuted: false,
     browserExecuted: false,
+    rulesApplied: false,
     deployExecuted: false,
+    productionTouched: false,
     containsPII: false,
     containsSecrets: false
   };
   exitCode = 41;
-} finally {
-  if (tempRoot) fs.rmSync(tempRoot, { recursive: true, force: true });
 }
+
 writeEvidence(output);
 console.log(JSON.stringify(output, null, 2));
 process.exit(exitCode);
