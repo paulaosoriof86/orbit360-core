@@ -1,52 +1,30 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v9-operational-directory-repair-dryrun",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v10-direct-atomic-validation",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "gateId": "block1-client360-insurers-lab-v20260717",
   "gateContractVersion": "1.0.38",
-  "validatorLifecycleRevision": "operational-directory-field-classification-v1",
-  "controlPlaneRevision": "phase-capability-immutable-request-v3",
+  "validatorLifecycleRevision": "direct-atomic-patch-validation-v1",
+  "controlPlaneRevision": "validation-only-immutable-request-v1",
   "methodologicalDecisionId": "paula-20260722-operational-directory-root-repair",
   "classification": [
     "DATA_CONTRACT_FAILURE",
     "FUNCTIONAL_DEFECT",
-    "VALIDATOR_STALE"
+    "VALIDATOR_STALE",
+    "PIPELINE_MECHANISM_FAILURE"
   ],
-  "humanVisualEvidence": {
-    "status": "FAILED_FUNCTIONAL_DEFECT",
-    "reportedAt": "2026-07-22",
-    "observations": [
-      "bank account numbers remain masked or display Cuenta protegida",
-      "temporary bank reveal returns No fue posible recuperar el dato",
-      "bank copy depends on failed reveal",
-      "portal username is replaced by Usuario pendiente de registrar",
-      "password temporary reveal works"
-    ]
-  },
   "rootCause": {
-    "canonicalPolicy": "Portal username and insurer bank account number are operational directory fields. Password is the only secret in this scope.",
-    "regression": "A later security contract moved 91 bank numbers and portal usernames out of the operational directory, deleted numero/accountNumber and username fields, required accountRef/credentialRef for display, and trained validators to accept that behavior.",
-    "runtimeMismatch": "Sixty-eight restored account references point from current rows to vault records that retain historical account IDs; the callable requires exact accountId equality and rejects valid references.",
-    "validatorFailure": "The visual contract passed because it required temporary bank reveal and the Cuenta protegida model instead of the canonical operational-directory policy."
-  },
-  "preservedEvidence": {
-    "historicalTechnicalGateRunId": 29925156385,
-    "staticPreflightV2RunId": 29962814208,
-    "hostingVisualizationRunId": 29963445655,
-    "clients": 414,
-    "insurers": 26,
-    "advisors": 7,
-    "bankVaultRecords": 91,
-    "bankPending": 2,
-    "finalTechnicalGateRerun": false
+    "fieldContract": "Portal username and insurer bank account number are operational directory fields. Password is the only secret.",
+    "pipeline": "The previous lifecycle still required a workflow-time source transformer and a data dry-run overlay after those mechanisms were retired.",
+    "correction": "Compose the already committed 1.0.38 overlay without adding transform, data-read or deploy requirements."
   },
   "executionProfile": {
-    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "phase": "STATIC_PREFLIGHT",
     "capabilities": {
-      "secrets": true,
-      "firestoreRead": true,
+      "secrets": false,
+      "firestoreRead": false,
       "writes": false,
       "runtime": false,
       "browser": false,
@@ -57,20 +35,24 @@
     },
     "workflowLocks": {
       "branch": true,
-      "firebaseProject": true,
+      "firebaseProject": false,
       "hostingChannel": false
     },
-    "requestModel": "immutable-request-bound-to-parent-head-and-run-attempt-v1"
+    "requestModel": "immutable-request-bound-to-committed-patch-v1"
   },
   "canonicalIntegration": {
     "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "engine": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
-    "phaseAlignment": "tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs",
-    "codeRepair": "tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
-    "dataRepair": "tools/orbit360-restituir-directorio-operativo-v20260722.mjs",
+    "overlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
     "bindingAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
-    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "workflowValidationOnly": true,
+    "sourceTransformation": false,
+    "dataAccess": false,
+    "secretAccess": false,
     "operationalWrites": 0,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
     "functionsDeploy": false,
     "rulesDeploy": false,
     "production": false,
@@ -82,16 +64,16 @@
     "gateId": "block1-client360-insurers-lab-v20260717",
     "classification": "DATA_CONTRACT_FAILURE",
     "diagnosticRevision": "operational-directory-field-classification-v1",
-    "contractRevision": "1.0.38-operational-directory-repair-dryrun-v1",
+    "contractRevision": "1.0.38-direct-atomic-patch-validation-v1",
     "gatePatch": {
       "contractVersion": "1.0.38",
       "diagnosticRevision": "operational-directory-field-classification-v1",
-      "status": "OPERATIONAL_DIRECTORY_REPAIR_DRYRUN_AUTHORIZED",
+      "status": "DIRECT_ATOMIC_PATCH_STATIC_VALIDATION_ONLY",
       "executionProfile": {
-        "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+        "phase": "STATIC_PREFLIGHT",
         "capabilities": {
-          "secrets": true,
-          "firestoreRead": true,
+          "secrets": false,
+          "firestoreRead": false,
           "writes": false,
           "runtime": false,
           "browser": false,
@@ -102,148 +84,28 @@
         },
         "workflowLocks": {
           "branch": true,
-          "firebaseProject": true,
+          "firebaseProject": false,
           "hostingChannel": false
         },
-        "requestModel": "immutable-request-bound-to-parent-head-and-run-attempt-v1"
+        "requestModel": "immutable-request-bound-to-committed-patch-v1"
       },
-      "diagnosticRule": "Restore canonical field classification before any write: usernames and bank account numbers are operational; passwords remain secret. Run one sanitized dry-run against current Firestore and the existing vault. Do not reimport, deploy, open a browser or write data.",
-      "acceptancePolicy": "Accept only GO_GATE_CONTRACT in LAB_DATA_CONTRACT_REPAIR_DRYRUN, successful exact code transformation, 414/26/7 preserved, 91 bank references matched to vault, two pending accounts preserved, zero unmatched credential references, zero passwords in operational storage, a sanitized proposed-change count and zero writes."
+      "diagnosticRule": "Validate the already committed 1.0.38 patch. Do not transform source, access data, read secrets, execute runtime, open a browser or deploy.",
+      "acceptancePolicy": "Accept only GO_GATE_CONTRACT with the validation-only workflow and the direct operational-directory owners already present."
     },
-    "effectiveOwnerReconciliation": {
-      "baselineContract": "1.0.37-visual-review",
-      "classification": "DATA_CONTRACT_FAILURE",
-      "productOwnersChanged": [
-        "clientInsurerVisualContract",
-        "insurerDirectoryImport",
-        "insurerSecureTargetBridge",
-        "insurerCredentialProvider",
-        "insurerBankAccountProvider"
-      ],
-      "academyChanged": true,
-      "validatorChanged": true,
-      "workflowChanged": true,
-      "dataChanged": false,
-      "storeChanged": false,
-      "authChanged": false,
-      "vaultChanged": false,
-      "functionsChanged": false,
-      "rulesChanged": false,
-      "writesExecuted": false,
-      "runtimeExecuted": false,
-      "browserExecuted": false,
-      "deployExecuted": false
-    },
-    "canonicalOwners": [
-      {
-        "id": "m1VisualIntegrityAcademy",
-        "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
-        "requiredTokens": [
-          "contentVersion:'1.229'",
-          "_m1visualv:1229",
-          "El usuario del portal permanece visible",
-          "número completo",
-          "El campo Uso no se muestra ni se copia",
-          "operationalDirectorySemantics:true"
-        ]
-      },
-      {
-        "id": "m1VisualRemediationContract",
-        "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
-        "requiredTokens": [
-          "contractVersion: '1.0.38'",
-          "operational-directory-field-classification-v1",
-          "BANK_NUMBER_OPERATIONAL_VISIBLE",
-          "BANK_NO_TEMPORARY_REVEAL",
-          "BANK_COPY_EXACT_FIELDS",
-          "ACADEMY_CONTENT_1229"
-        ]
-      },
-      {
-        "id": "operationalDirectoryRepair",
-        "path": "tools/orbit360-restituir-directorio-operativo-v20260722.mjs",
-        "requiredTokens": [
-          "LAB_DATA_CONTRACT_REPAIR",
-          "DRY_RUN_READY",
-          "APPLIED_AND_VERIFIED",
-          "accountIdMismatchExplainsRevealFailure",
-          "passwordWrites: 0",
-          "rollbackAvailable"
-        ]
-      }
-    ],
-    "requiredFiles": [
-      "tools/orbit360-validator-lifecycle-contract-v20260722.json",
-      "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
-      "tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs",
-      "tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
-      "tools/orbit360-restituir-directorio-operativo-v20260722.mjs",
-      "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md"
-    ],
-    "runtimeVersionContracts": [
-      {
-        "path": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
-        "replaceRequiredTokens": true,
-        "requiredTokens": [
-          "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
-          "LAB_DATA_CONTRACT_REPAIR_APPLY",
-          "DATA_REPAIR_DRYRUN_CAPABILITY",
-          "DATA_REPAIR_APPLY_CAPABILITY",
-          "GO_GATE_CONTRACT"
-        ]
-      },
-      {
-        "path": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
-        "replaceRequiredTokens": true,
-        "requiredTokens": [
-          "visualRemediationRevision:'20260722.2'",
-          "data-m1-credential-user",
-          "data-m1-credential-secret",
-          "data-m1-bank-number",
-          "bankNumbersOperationalVisible:true",
-          "bankRevealDependency:false",
-          "bankCopyDirect:true",
-          "bankCopyExcludesUse:true",
-          "bankHolderFallbackInsurer:true"
-        ]
-      },
-      {
-        "path": "orbit360-platform/core/insurer-directory-import-v1202.js",
-        "replaceRequiredTokens": true,
-        "requiredTokens": [
-          "usuario: user",
-          "numero: accountValue",
-          "delete p.password",
-          "delete p.contrasena"
-        ]
-      },
-      {
-        "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
-        "replaceRequiredTokens": true,
-        "requiredTokens": [
-          "operationalDirectoryWritesOwnedByImporter: true",
-          "operationalFields: ['usuario','numero']",
-          "protectedFields: ['password','contrasena']",
-          "providerReturnsMappingsOnly: true"
-        ]
-      },
-      {
-        "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
-        "replaceRequiredTokens": true,
-        "requiredTokens": [
-          "ORBIT360_GATE_PHASE: lab_data_contract_repair_dryrun",
-          "tools/orbit360-m1-operational-directory-repair-dryrun-request-v20260722.json",
-          "node tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs",
-          "node tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
-          "node tools/orbit360-validar-gate-contracts-v20260717.mjs",
-          "node tools/orbit360-restituir-directorio-operativo-v20260722.mjs --dry-run",
-          "writesExecuted == false",
-          "functionsDeployed:false",
-          "rulesDeployed:false",
-          "productionTouched:false"
-        ]
-      }
-    ]
+    "canonicalOwners": [],
+    "requiredFiles": [],
+    "runtimeVersionContracts": []
+  },
+  "preservedEvidence": {
+    "historicalTechnicalGateRunId": 29925156385,
+    "failedStaticValidationRunId": 29971750026,
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "bankReferences": 91,
+    "bankPending": 2,
+    "portalCredentials": "26_OF_26",
+    "finalTechnicalGateRerun": false
   },
   "containsPII": false,
   "containsSecrets": false
