@@ -1,35 +1,56 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v72-structural-static-repair-v2-authorized",
+  "schemaVersion": "orbit360-incident-freeze-v73-stop-after-two-static-pipeline-failures",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-operational-directory-field-classification-regression-v20260722",
-  "status": "M1_PIPELINE_ROOT_CAUSE_STRUCTURAL_STATIC_REPAIR_V2_AUTHORIZED",
+  "status": "STOP_THE_LINE_AFTER_TWO_STATIC_REPAIR_PIPELINE_FAILURES",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "tenantId": "alianzas-soluciones",
   "gateId": "block1-client360-insurers-lab-v20260717",
+  "blockedGateIds": [
+    "block1-client360-insurers-lab-v20260717"
+  ],
   "classification": [
     "DATA_CONTRACT_FAILURE",
     "FUNCTIONAL_DEFECT",
     "VALIDATOR_STALE",
     "PIPELINE_MECHANISM_FAILURE"
   ],
-  "methodologicalDecision": {
-    "id": "paula-20260722-operational-directory-root-repair",
+  "humanVisualResult": {
+    "status": "FAILED_FUNCTIONAL_DEFECT",
     "m1Approved": false,
     "m2Authorized": false,
-    "rootRepairRequired": true,
-    "reimportAuthorized": false
+    "observed": [
+      "bank account remains masked or displays Cuenta protegida",
+      "temporary bank reveal returns No fue posible recuperar el dato",
+      "bank copy does not complete",
+      "portal username displays Usuario pendiente de registrar",
+      "password temporary reveal works"
+    ]
   },
-  "rootCause": {
-    "fieldClassification": "Username and bank account number are operational fields; password is the only secret.",
-    "dataPipeline": "Two data dry-run attempts failed before data because the first mechanism used brittle exact-string replacement inside a minified owner.",
-    "structuralAttemptV1": "The function-boundary repair itself reached a non-owner cache update and failed because the bank provider is loaded by the router bootstrap, not index.html.",
-    "replacementMechanism": "tools/orbit360-reparar-directorio-operativo-estructural-v2-v20260722.mjs",
-    "replacementRule": "Use function boundaries for owners and treat absent index cache references as non-applicable; the router bootstrap remains the cache owner."
+  "fieldContractRootCause": {
+    "canonicalRule": "Portal username and bank account number are operational directory fields. Password is the only secret in this scope.",
+    "regression": "Later provider, importer and validator layers removed usernames and bank numbers from the operational directory and required protected references for display and copy.",
+    "runtimeMismatch": "Restored bank references can link current account rows to vault records retaining historical account IDs; the callable requires exact accountId equality and rejects otherwise valid references.",
+    "bindingCorrection": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
+    "targetContractVersion": "1.0.38"
   },
-  "failedDryRunAttempts": [
+  "pipelineRootCause": {
+    "retiredMechanisms": [
+      "tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
+      "tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs",
+      "tools/orbit360-reparar-directorio-operativo-estructural-v2-v20260722.mjs"
+    ],
+    "finding": "The workflow attempted to construct the product correction at execution time through one monolithic source transformer. It mixed owner edits, importers, providers, Academy, overlays and validators and enforced brittle exact-token counts across independent files.",
+    "evidence": [
+      "The first static repair failed on an index cache token that is not owned by index.html.",
+      "The second static repair failed because Academia legitimately contains contentVersion 1.228 twice while the transformer required one occurrence."
+    ],
+    "correctiveRule": "The complete multi-file patch must be assembled directly and audited before workflow execution. The workflow may validate and publish evidence only; it must never transform source files or generate the product patch."
+  },
+  "failedDataDryRunAttempts": [
     {
       "runId": 29968658125,
       "errorCode": "SIGNATURE_INVALID:data_contract_phase_capabilities:0:0",
@@ -47,15 +68,18 @@
   ],
   "failedStaticRepairAttempts": [
     {
-      "requestId": "m1-operational-directory-structural-static-repair-v1-20260722",
-      "requestCommit": "6b4dc9ada1419c84a83d2f5dca42b54ed589c168",
       "runId": 29969478259,
-      "classification": "PIPELINE_MECHANISM_FAILURE",
-      "failureStage": "structural_repair_before_preflight",
       "errorCode": "REGEX_NOT_FOUND:index_bank_cache",
       "dataRead": false,
-      "firestoreRead": false,
-      "vaultRead": false,
+      "secretsRead": false,
+      "writesExecuted": false,
+      "productCommitCreated": false
+    },
+    {
+      "runId": 29969765220,
+      "errorCode": "TOKEN_COUNT_INVALID:academy_runtime:before=2:after=0:expected=1",
+      "dataRead": false,
+      "secretsRead": false,
       "writesExecuted": false,
       "productCommitCreated": false
     }
@@ -69,30 +93,15 @@
     "portalCredentials": "26_OF_26",
     "reimportRequired": false
   },
-  "staticRepairAuthorization": {
-    "authorizationId": "m1-operational-directory-structural-static-repair-v2",
-    "active": true,
-    "consumed": false,
-    "allowedExecutions": 1,
-    "lastAttemptAllowed": true,
-    "phase": "STATIC_PREFLIGHT",
-    "secretsAllowed": false,
-    "firestoreReadAllowed": false,
-    "writesAllowed": false,
-    "runtimeAllowed": false,
-    "browserAllowed": false,
-    "deployAllowed": false,
-    "functionsDeployAllowed": false,
-    "rulesDeployAllowed": false,
-    "productionAllowed": false,
-    "reimportAllowed": false
-  },
   "allowedActions": [
-    "run_second_and_final_structural_static_repair_v2",
-    "run_canonical_static_preflight",
-    "commit_static_owners_contracts_academy_validators_only_if_all_static_checks_pass"
+    "prepare_direct_atomic_multifile_patch_without_workflow_execution",
+    "independent_nonexecuting_audit_of_complete_patch",
+    "document_exact_before_after_matrix_for_each_owner"
   ],
   "blockedActions": [
+    "create_third_static_repair_request",
+    "rerun_static_repair_workflow",
+    "run_source_transformer_in_workflow",
     "read_firestore_operational_data",
     "read_existing_insurer_vault",
     "write_firestore_operational_data",
@@ -115,8 +124,8 @@
     "m1HumanVisualReview": "FAILED_DATA_CONTRACT_FAILURE",
     "m1Closed": false,
     "m2Authorized": false,
-    "operationalDirectoryStaticRepair": "V2_AUTHORIZED_ONCE_LAST_ATTEMPT",
-    "operationalDirectoryDryRun": "BLOCKED_UNTIL_STATIC_REPAIR_PASS",
+    "operationalDirectoryStaticRepair": "STOPPED_AFTER_TWO_PIPELINE_FAILURES",
+    "operationalDirectoryDryRun": "NOT_AUTHORIZED",
     "operationalDirectoryApply": "NOT_AUTHORIZED",
     "hostingRepublish": "NOT_AUTHORIZED",
     "runtimeAuthorized": false,
@@ -124,7 +133,7 @@
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Execute one second and final immutable STATIC_PREFLIGHT request through the v2 wrapper. Accept only wrapper PASS, structural repair PASS, GO_GATE_CONTRACT 1.0.38, behavioral visual PASS and GO_STATIC_ARCHITECTURE with zero secrets, Firestore, vault, runtime, browser or deploy. If this stage fails again, STOP THE LINE without a third static request.",
+  "nextAllowedStep": "Prepare the complete 1.0.38 correction as a direct atomic multi-file patch outside the workflow. Audit every final file and the full owner/contract/Academy/validator matrix without executing a gate, accessing Firestore or reading the vault. Do not create another request until the exact committed patch already exists and the workflow has been reduced to validation-only.",
   "containsPII": false,
   "containsSecrets": false
 }
