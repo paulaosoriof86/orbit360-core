@@ -2,18 +2,18 @@
   "schemaVersion":"orbit360-gate-contract-overlay-v1",
   "issuedAt":"2026-07-23",
   "gateId":"block1-client360-insurers-lab-v20260717",
-  "classification":"FUNCTIONAL_DEFECT",
-  "diagnosticRevision":"dynamic-directory-static-preflight-1-0-40-v1",
-  "contractRevision":"1.0.40-dynamic-directory-static-preflight-v1",
+  "classification":"VALIDATOR_STALE",
+  "diagnosticRevision":"dynamic-directory-static-preflight-1-0-40-v2",
+  "contractRevision":"1.0.40-dynamic-directory-static-preflight-v2",
   "replaceCanonicalOwners":true,
   "replaceRequiredFiles":true,
   "replaceRuntimeVersionContracts":true,
   "gatePatch":{
     "contractVersion":"1.0.40",
-    "diagnosticRevision":"dynamic-directory-static-preflight-1-0-40-v1",
-    "runtimeVersion":"20260723-16",
+    "diagnosticRevision":"dynamic-directory-static-preflight-1-0-40-v2",
+    "runtimeVersion":"20260723-17",
     "block":1,
-    "status":"DYNAMIC_DIRECTORY_STATIC_PREFLIGHT_AUTHORIZED_ONCE",
+    "status":"DYNAMIC_DIRECTORY_STATIC_PREFLIGHT_RETRY_AUTHORIZED_ONCE",
     "workflow":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
     "preflight":"tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "preflightEvidence":"orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
@@ -22,9 +22,9 @@
       "phase":"STATIC_PREFLIGHT",
       "capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
       "workflowLocks":{"branch":true,"firebaseProject":false,"hostingChannel":false},
-      "requestModel":"immutable-request-bound-to-dynamic-directory-static-preflight-v1"
+      "requestModel":"immutable-request-bound-to-dynamic-directory-static-preflight-retry-v1"
     },
-    "diagnosticRule":"Validate the committed 1.0.40 dynamic directory through the canonical gate and the platform-root contract without secrets, data access, source transformation, browser or deploy.",
+    "diagnosticRule":"Validate the frozen 1.0.40 patch using source files only; generated evidence remains in the run artifact and executable owner tokens must survive comment stripping.",
     "acceptancePolicy":"Accept only GO_GATE_CONTRACT plus DYNAMIC_DIRECTORY_CONTRACT_V3_PASS with 23 of 23 checks and every external capability false."
   },
   "canonicalOwners":[
@@ -75,7 +75,7 @@
         "editOwnerVersion: '20260723.2'",
         "operationalDirectoryOwnerVersion: '20260723.2'",
         "operationalDirectoryAcademyVersion: '1.232'",
-        "Preflight 1.0.40"
+        "visualContractDeliveryRevision: '20260723.8'"
       ]
     },
     {
@@ -112,7 +112,7 @@
     "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
     "tools/orbit360-incident-freeze-v20260721.json",
-    "tools/orbit360-m1-dynamic-directory-static-preflight-request-v20260723.json",
+    "tools/orbit360-m1-dynamic-directory-static-preflight-retry-request-v20260723.json",
     "orbit360-platform/modules/aseguradoras.js",
     "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "orbit360-platform/core/client-insurer-edit-owner-v20260722.js",
@@ -120,9 +120,7 @@
     "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
     "orbit360-platform/styles/client-insurer-edit-mode-v20260722.css",
     "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
-    "orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs",
-    "orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-patch-sanitized.json",
-    "orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v3-sanitized.json"
+    "orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs"
   ],
   "runtimeVersionContracts":[
     {
@@ -138,7 +136,7 @@
     {
       "path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "replaceRequiredTokens":true,
-      "requiredTokens":["VALIDATION_ONLY","ORBIT360_GATE_PHASE: static_preflight","orbit360-m1-dynamic-directory-static-preflight-request-v20260723.json","GO_GATE_CONTRACT","DYNAMIC_DIRECTORY_CONTRACT_V3_PASS"]
+      "requiredTokens":["VALIDATION_ONLY_RETRY","ORBIT360_GATE_PHASE: static_preflight","orbit360-m1-dynamic-directory-static-preflight-retry-request-v20260723.json","GO_GATE_CONTRACT","DYNAMIC_DIRECTORY_CONTRACT_V3_PASS"]
     },
     {
       "path":"orbit360-platform/modules/aseguradoras.js",
@@ -158,7 +156,7 @@
     {
       "path":"orbit360-platform/core/router-tenant-config-bootstrap.js",
       "replaceRequiredTokens":true,
-      "requiredTokens":["block1-critical-runtime-20260723-9","operationalDirectoryAcademyVersion: '1.232'","Preflight 1.0.40"]
+      "requiredTokens":["block1-critical-runtime-20260723-9","operationalDirectoryAcademyVersion: '1.232'","visualContractDeliveryRevision: '20260723.8'"]
     },
     {
       "path":"orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
