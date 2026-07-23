@@ -1,136 +1,138 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v68-visualization-ready-human-review",
+  "schemaVersion": "orbit360-incident-freeze-v69-operational-directory-dryrun-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
-  "incidentId": "m1-control-plane-distributed-state-and-phase-drift-v20260722",
-  "status": "M1_HOSTING_LAB_VISUALIZATION_READY_HUMAN_REVIEW_PENDING",
+  "incidentId": "m1-operational-directory-field-classification-regression-v20260722",
+  "status": "M1_VISUAL_REVIEW_FAILED_DATA_CONTRACT_REPAIR_DRYRUN_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "tenantId": "alianzas-soluciones",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": [
-    "FUNCTIONAL_DEFECT_REMEDIATED",
-    "VALIDATOR_STALE_CORRECTED",
-    "PIPELINE_MECHANISM_FAILURE_CORRECTED"
+    "DATA_CONTRACT_FAILURE",
+    "FUNCTIONAL_DEFECT",
+    "VALIDATOR_STALE"
   ],
   "methodologicalDecision": {
-    "id": "paula-20260722-visualization-before-m2",
-    "visualizationBeforeM2": true,
-    "humanApprovalRequiredToCloseM1": true,
-    "m2Authorized": false
+    "id": "paula-20260722-operational-directory-root-repair",
+    "reportedBy": "Paula",
+    "reportedAt": "2026-07-22",
+    "m1Approved": false,
+    "m2Authorized": false,
+    "rootRepairRequired": true,
+    "reimportAuthorized": false
   },
-  "historicalTechnicalGate": {
-    "status": "PASS",
-    "runId": 29925156385,
-    "artifactId": 8531633698,
-    "artifactDigest": "sha256:582d6523730a859f5197ae13ae9b220c771ef778feb27e65d49dfa280c481f8a",
-    "executedHead": "3a334d81393dc2b05fb5e271b8b1108e87f733ad",
-    "contractVersion": "1.0.36",
-    "finalGateRerun": false
-  },
-  "staticPreflightV2": {
-    "status": "PASS",
-    "runId": 29962814208,
-    "artifactId": 8546643930,
-    "artifactDigest": "sha256:0bf8160846d1f6eef7e9be5f1e54d632cfd6468a98fe3e8f9a7f3493dd83568f",
-    "executionHead": "61c235735ebd5ffd68acfe2e7314e2cad86dd5a7",
-    "gateContractStatus": "GO_GATE_CONTRACT",
-    "visualRemediationStatus": "PASS",
-    "visualChecks": "29_OF_29",
-    "visualValidatorRevision": "responsive-token-set-v1",
-    "architectureStatus": "GO_STATIC_ARCHITECTURE",
-    "writesExecuted": false,
-    "runtimeExecuted": false,
-    "browserExecuted": false,
-    "deployExecuted": false
-  },
-  "hostingVisualization": {
-    "status": "READY",
-    "runId": 29963445655,
-    "artifactId": 8546897699,
-    "artifactDigest": "sha256:5c7955a80c93ae4fd53a741cbb19b81fb9b7d519a56e0e6ddad19e2b15ee07f9",
-    "requestHead": "4c5113f8e3ecb36e9634bd3660d4ea81065c736a",
-    "publishedCommit": "6eadc942e92b82440806605be0a7bc31455843ca",
-    "url": "https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app",
-    "reusedExistingDeployment": true,
-    "deploymentScope": "targeted_lab_frontend_visual_review_only",
-    "hostingOnly": true,
-    "gateContractStatus": "GO_GATE_CONTRACT",
-    "gateContractChecks": "1357_OF_1357",
-    "remoteCriticalAssets": "9_OF_9_EXACT",
-    "remoteIntegrity": true,
-    "writesExecuted": false,
-    "firestoreRead": false,
-    "browserExecuted": false,
-    "functionsDeployed": false,
-    "rulesDeployed": false,
-    "productionTouched": false
-  },
-  "preservedInventory": {
-    "clients": 414,
-    "insurers": 26,
-    "advisors": 7,
-    "validBankReferences": 91,
-    "pendingBankReferences": 2,
-    "portalCredentials": "26_OF_26",
-    "colombia": "INTACT",
-    "rawProtectedValuesInStore": 0,
-    "reimportRequired": false
-  },
-  "humanVisualReviewScope": {
-    "views": [
-      "direccion_desktop",
-      "operativo_tablet",
-      "asesor_mobile"
-    ],
-    "checks": [
-      "responsive_titles_headers_tabs_actions_and_install_button",
-      "portal_user_visible_and_password_separate_reveal",
-      "bank_number_reveal_and_exact_copy_without_use_field",
-      "bank_holder_fallback_to_insurer",
-      "client360_list_detail_and_quality",
-      "insurers_directory_detail_and_knowledge",
-      "multi_role_scope_and_restricted_actions",
-      "honest_empty_relationships_and_zero_technical_copy"
+  "humanVisualEvidence": {
+    "result": "FAILED_FUNCTIONAL_DEFECT",
+    "screenshotsReceived": 5,
+    "observed": [
+      "Cuenta protegida or masked number remains visible",
+      "bank reveal returns No fue posible recuperar el dato",
+      "bank copy does not complete",
+      "portal username displays Usuario pendiente de registrar",
+      "password temporary reveal works"
     ]
   },
+  "rootCause": {
+    "canonicalRule": "Username and bank account number are operational fields; password is the only secret.",
+    "regressionDocuments": [
+      "orbit360-platform/docs/CORRECCION-CONTINUIDAD-RECURSOS-PROTEGIDOS-ASEGURADORAS-20260720.md",
+      "orbit360-platform/docs/CIERRE-CAUSA-RAIZ-CUENTAS-BANCARIAS-READINESS-DIRECTORIOS-REALES-20260721.md"
+    ],
+    "regressionCode": [
+      "orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js",
+      "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+      "orbit360-platform/core/insurer-directory-import-v1202.js",
+      "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+    ],
+    "dataEffect": "91 bank numbers were removed from operational insurer records and represented only by accountRef/masks; portal usernames were removed and retained in the vault.",
+    "runtimeEffect": "Restored references may point from current account rows to vault records with historical account IDs; callable equality checks reject them.",
+    "validatorEffect": "The 29/29 visual contract required protected bank reveal instead of rejecting it."
+  },
+  "bindingCorrection": {
+    "document": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
+    "contractVersion": "1.0.38",
+    "usernameOperational": true,
+    "bankNumberOperational": true,
+    "passwordProtected": true,
+    "accountRefBackupPreserved": true,
+    "credentialRefPreserved": true
+  },
+  "preservedEvidence": {
+    "historicalTechnicalGate": {
+      "status": "PASS",
+      "runId": 29925156385,
+      "finalGateRerun": false
+    },
+    "hostingVisualization": {
+      "runId": 29963445655,
+      "url": "https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app",
+      "remoteCriticalAssets": "9_OF_9_EXACT"
+    },
+    "inventory": {
+      "clients": 414,
+      "insurers": 26,
+      "advisors": 7,
+      "bankReferences": 91,
+      "bankPending": 2,
+      "portalCredentials": "26_OF_26",
+      "reimportRequired": false
+    }
+  },
+  "dryRunAuthorization": {
+    "authorizationId": "m1-operational-directory-repair-dryrun-v1",
+    "active": true,
+    "consumed": false,
+    "allowedExecutions": 1,
+    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "secretsAllowed": true,
+    "secretPurpose": "read_existing_insurer_vault_for_sanitized_matching_only",
+    "firestoreReadAllowed": true,
+    "writesAllowed": false,
+    "runtimeAllowed": false,
+    "browserAllowed": false,
+    "deployAllowed": false,
+    "functionsDeployAllowed": false,
+    "rulesDeployAllowed": false,
+    "productionAllowed": false,
+    "reimportAllowed": false
+  },
   "allowedActions": [
-    "paula_human_visual_review_in_hosting_lab",
-    "record_visual_approval_or_concrete_defects"
+    "run_canonical_gate_preflight_after_static_code_transformation",
+    "read_current_26_insurer_documents",
+    "read_existing_insurer_vault",
+    "produce_sanitized_operational_directory_repair_dryrun",
+    "commit_static_code_and_contract_correction_only_if_dryrun_passes"
   ],
   "blockedActions": [
-    "advance_m2_before_human_approval",
-    "run_second_final_gate",
-    "rerun_static_preflight",
-    "rerun_hosting_delivery",
-    "modify_product_before_review_result",
-    "open_browser_automation",
-    "read_firestore",
     "write_firestore_operational_data",
-    "read_operational_vault",
+    "write_secret_manager",
+    "deploy_hosting_lab",
+    "open_browser_automation",
     "deploy_functions",
     "deploy_rules",
     "deploy_production",
     "reimport_clients",
     "reimport_insurers",
+    "advance_m2",
     "advance_policies",
+    "run_second_final_gate",
     "merge_main"
   ],
   "stateClarification": {
-    "m1DataRecovery": "CLOSED",
     "m1TechnicalGate": "HISTORICAL_PASS",
-    "m1StaticPreflightV2": "PASS",
-    "m1VisualRemediation": "PASS_29_OF_29",
-    "m1Architecture": "GO_STATIC_ARCHITECTURE",
-    "m1HostingVisualization": "READY",
-    "m1HumanVisualReview": "PENDING_PAULA",
+    "m1HumanVisualReview": "FAILED_DATA_CONTRACT_FAILURE",
     "m1Closed": false,
     "m2Authorized": false,
+    "operationalDirectoryDryRun": "AUTHORIZED_ONCE",
+    "operationalDirectoryApply": "NOT_AUTHORIZED",
+    "hostingRepublish": "NOT_AUTHORIZED",
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Paula reviews the published Hosting LAB visualization in Dirección desktop, Operativo tablet and Asesor mobile. If she approves the requested corrections, record M1_APPROVED_HUMAN_VISUAL and authorize the planned transition to M2. If she reports defects, classify each one before any change and keep M2 blocked.",
+  "nextAllowedStep": "Execute one immutable LAB_DATA_CONTRACT_REPAIR_DRYRUN. First transform code, owners, Academy and validators in the checkout; run the canonical gate preflight; then read Firestore and the existing vault without writes. Accept only sanitized evidence matching 414 clients, 26 insurers, 7 advisors, 91 bank references, two pending accounts, zero unmatched credential references and zero passwords in operational storage. Commit the static correction only if the dry-run passes.",
   "containsPII": false,
   "containsSecrets": false
 }
