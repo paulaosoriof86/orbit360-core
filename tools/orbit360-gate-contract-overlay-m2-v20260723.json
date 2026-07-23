@@ -40,8 +40,8 @@
       },
       "requestModel": "immutable-request-bound-to-m2-static-patch-v1"
     },
-    "diagnosticRule": "Validate membership-derived tenant, canonical roles, an explicit product entrypoint, an absolute read-only write denial and store installation only after ready-read-only, without external capabilities.",
-    "acceptancePolicy": "Accept only GO_GATE_CONTRACT and M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS with zero secrets, Firebase access, Firestore read, writes, Rules, runtime, browser or deploy."
+    "diagnosticRule": "Validate membership-derived tenant, canonical roles, an explicit product entrypoint, absolute write denial, store installation only after ready-read-only and an observable sanitized commit status, without external product capabilities.",
+    "acceptancePolicy": "Accept only GO_GATE_CONTRACT and M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS with observable status and zero secrets, Firebase access, Firestore read, writes, Rules, runtime, browser or deploy."
   },
   "canonicalOwners": [
     {
@@ -77,7 +77,7 @@
     {
       "id": "m2ProductReadonlyContract",
       "path": "orbit360-platform/tools/orbit360-m2-product-readonly-bootstrap-contract-v20260723.cjs",
-      "requiredTokens": ["M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS", "BOOTSTRAP_TENANT_MEMBERSHIP_ONLY", "BOOTSTRAP_WAITS_STORE_READY", "ENTRY_NO_TEST_ENV_LOADERS", "WORKFLOW_NO_EXTERNAL_CAPABILITIES"]
+      "requiredTokens": ["M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS", "BOOTSTRAP_TENANT_MEMBERSHIP_ONLY", "BOOTSTRAP_WAITS_STORE_READY", "ENTRY_NO_TEST_ENV_LOADERS", "WORKFLOW_NO_EXTERNAL_CAPABILITIES", "WORKFLOW_OBSERVABLE_STATUS"]
     }
   ],
   "requiredFiles": [
@@ -151,7 +151,7 @@
     {
       "path": ".github/workflows/orbit360-m2-product-readonly-static-gate-v20260723.yml",
       "replaceRequiredTokens": true,
-      "requiredTokens": ["VALIDATION_ONLY", "M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS"]
+      "requiredTokens": ["VALIDATION_ONLY", "M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS", "statuses: write", "orbit360/m2-product-readonly-static-v2"]
     }
   ],
   "effectiveOwnerReconciliation": {
@@ -166,6 +166,7 @@
     "storeNoFallback": true,
     "writeDecision": "readonly_write_blocked",
     "writesAuthorized": false,
+    "observableCommitStatus": true,
     "secretAccess": false,
     "firestoreRead": false,
     "runtimeExecuted": false,
