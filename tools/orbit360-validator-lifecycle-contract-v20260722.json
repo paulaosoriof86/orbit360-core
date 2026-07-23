@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v16-edit-mode-static",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v17-all-active-apply",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -7,21 +7,15 @@
   "gateId": "block1-client360-insurers-lab-v20260717",
   "gateContractVersion": "1.0.39",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "controlPlaneRevision": "insurer-edit-mode-responsive-all-active-static-v1",
+  "controlPlaneRevision": "ays-all-26-insurers-active-atomic-v1",
   "methodologicalDecisionId": "paula-20260722-all-insurers-active-edit-root-fix",
-  "classification": ["FUNCTIONAL_DEFECT", "DATA_CONTRACT_FAILURE", "VALIDATOR_STALE"],
-  "rootCause": {
-    "editBlankScreen": "The stability barrier required read cards while edit mode intentionally kept inputs, then failed without releasing visibility.",
-    "editableContract": "The editable module could rebuild portal and bank arrays without preserving credentialRef/accountRef and retained legacy bank semantics.",
-    "mobileTitles": "Responsive rules depended on brittle inline-style selectors instead of semantic title classes.",
-    "activeState": "A&S operates all 26 insurers. They must default to active and may only be deactivated manually with reason."
-  },
+  "classification": ["DATA_CONTRACT_FAILURE", "FUNCTIONAL_DEFECT"],
   "executionProfile": {
-    "phase": "STATIC_PREFLIGHT",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
     "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
-      "writes": false,
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
       "runtime": false,
       "browser": false,
       "deploy": false,
@@ -29,88 +23,70 @@
       "rulesDeploy": false,
       "production": false
     },
-    "workflowLocks": {
-      "branch": true,
-      "firebaseProject": false,
-      "hostingChannel": false
-    },
-    "requestModel": "immutable-request-bound-to-edit-mode-root-patch-v1"
+    "workflowLocks": {"branch": true, "firebaseProject": true, "hostingChannel": false},
+    "requestModel": "immutable-request-bound-to-all-26-active-apply-v1"
   },
   "canonicalIntegration": {
-    "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-    "engine": "tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
-    "overlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
-    "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
-    "canonicalOwnerScope": "overlay_replace",
-    "runtimeContractScope": "overlay_replace",
-    "sourceTransformation": false,
-    "firestoreRead": false,
-    "secretAccess": false,
-    "operationalWrites": 0,
-    "runtime": false,
-    "browser": false,
-    "hostingDeploy": false,
-    "functionsDeploy": false,
-    "rulesDeploy": false,
-    "production": false,
-    "reimport": false
+    "entrypoint":"tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "engine":"tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
+    "overlay":"tools/orbit360-gate-contract-overlay-v20260718.json",
+    "workflow":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+    "canonicalOwnerScope":"overlay_replace",
+    "runtimeContractScope":"overlay_replace",
+    "sourceTransformation":false,
+    "firestoreRead":true,
+    "secretAccess":true,
+    "operationalWrites":1,
+    "allowedWrite":"aseguradoras[].vinculada=true only",
+    "vaultRead":false,
+    "runtime":false,
+    "browser":false,
+    "hostingDeploy":false,
+    "functionsDeploy":false,
+    "rulesDeploy":false,
+    "production":false,
+    "reimport":false
   },
   "canonicalOverlayPatch": {
-    "schemaVersion": "orbit360-gate-contract-overlay-v1",
-    "issuedAt": "2026-07-22",
-    "gateId": "block1-client360-insurers-lab-v20260717",
-    "classification": "FUNCTIONAL_DEFECT",
-    "diagnosticRevision": "insurer-edit-mode-responsive-all-active-v1",
-    "contractRevision": "1.0.39-insurer-edit-mode-responsive-all-active-v1",
-    "replaceCanonicalOwners": true,
-    "replaceRequiredFiles": true,
-    "replaceRuntimeVersionContracts": true,
+    "schemaVersion":"orbit360-gate-contract-overlay-v1",
+    "issuedAt":"2026-07-22",
+    "gateId":"block1-client360-insurers-lab-v20260717",
+    "classification":"DATA_CONTRACT_FAILURE",
+    "diagnosticRevision":"ays-all-26-insurers-active-atomic-v1",
+    "contractRevision":"1.0.39-ays-all-26-insurers-active-atomic-v1",
+    "replaceCanonicalOwners":true,
+    "replaceRequiredFiles":true,
+    "replaceRuntimeVersionContracts":true,
     "gatePatch": {
-      "contractVersion": "1.0.39",
-      "diagnosticRevision": "insurer-edit-mode-responsive-all-active-v1",
-      "runtimeVersion": "20260722-13",
-      "status": "STATIC_VALIDATION_AUTHORIZED_ONCE",
+      "contractVersion":"1.0.39",
+      "diagnosticRevision":"ays-all-26-insurers-active-atomic-v1",
+      "runtimeVersion":"20260722-14",
+      "status":"ALL_26_ACTIVE_ATOMIC_APPLY_AUTHORIZED_ONCE",
       "executionProfile": {
-        "phase": "STATIC_PREFLIGHT",
-        "capabilities": {
-          "secrets": false,
-          "firestoreRead": false,
-          "writes": false,
-          "runtime": false,
-          "browser": false,
-          "deploy": false,
-          "functionsDeploy": false,
-          "rulesDeploy": false,
-          "production": false
-        },
-        "workflowLocks": {
-          "branch": true,
-          "firebaseProject": false,
-          "hostingChannel": false
-        },
-        "requestModel": "immutable-request-bound-to-edit-mode-root-patch-v1"
+        "phase":"LAB_DATA_CONTRACT_REPAIR_APPLY",
+        "capabilities":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+        "workflowLocks":{"branch":true,"firebaseProject":true,"hostingChannel":false},
+        "requestModel":"immutable-request-bound-to-all-26-active-apply-v1"
       },
-      "diagnosticRule": "Validate the direct 1.0.39 patch only; never transform files, access data or deploy.",
-      "acceptancePolicy": "Accept only GO_GATE_CONTRACT and STATIC_PATCH_VALIDATED with all capabilities false."
+      "diagnosticRule":"Dry-run and atomically normalize only vinculada to true for all 26 insurers.",
+      "acceptancePolicy":"Accept only 26 of 26 active, zero non-target changes and verified rollback capability."
     },
-    "canonicalOwners": [],
-    "requiredFiles": [],
-    "runtimeVersionContracts": []
+    "canonicalOwners":[],
+    "requiredFiles":[],
+    "runtimeVersionContracts":[]
   },
   "preservedEvidence": {
-    "historicalTechnicalGateRunId": 29925156385,
-    "staticClosureRunId": 29973107802,
-    "atomicApplyRunId": 29974965244,
-    "atomicApplyArtifactId": 8551063445,
-    "atomicApplyArtifactDigest": "sha256:9dbfb9a9d3d478d8aec00bf6a0d570c109ec6a70427e028baff07e928e9ebd35",
-    "hostingRunId": 29976616043,
-    "bankOperationalNumbers": 91,
-    "usernamesOperational": 26,
-    "bankPending": 2,
-    "portalCredentials": "26_OF_26",
-    "humanReview": "FAILED_EDIT_BLANK_AND_MOBILE_TITLES",
-    "finalTechnicalGateRerun": false
+    "editRootStaticRunId":29980295976,
+    "editRootStaticArtifactId":8552930666,
+    "editRootStaticArtifactDigest":"sha256:cf1ae2fa0e638521b011cccc5cbfc3e473c7ebcc76cf790b1f40ad4b8ce81f8e",
+    "atomicDirectoryApplyRunId":29974965244,
+    "bankOperationalNumbers":91,
+    "usernamesOperational":26,
+    "bankPending":2,
+    "portalCredentials":"26_OF_26",
+    "humanReview":"FAILED_EDIT_BLANK_AND_MOBILE_TITLES",
+    "finalTechnicalGateRerun":false
   },
-  "containsPII": false,
-  "containsSecrets": false
+  "containsPII":false,
+  "containsSecrets":false
 }
