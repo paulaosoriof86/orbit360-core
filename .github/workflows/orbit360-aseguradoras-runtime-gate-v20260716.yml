@@ -1,36 +1,34 @@
-name: Orbit 360 · Entrega visual M1 Hosting LAB
+name: Orbit 360 · Reparación canónica directorio operativo · dry-run
 
 on:
   push:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - 'tools/orbit360-m1-hosting-delivery-request-v2-20260722.json'
+      - 'tools/orbit360-m1-operational-directory-repair-dryrun-request-v20260722.json'
 
 permissions:
-  actions: read
-  contents: read
+  contents: write
   statuses: write
 
 concurrency:
-  group: orbit360-final-block1-hosting-delivery-v2
+  group: orbit360-m1-operational-directory-repair-dryrun-v1
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_PHASE: lab_hosting_delivery
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-hosting-delivery-request-v2-20260722.json
+  ORBIT360_GATE_PHASE: lab_data_contract_repair_dryrun
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-repair-dryrun-request-v20260722.json
   ORBIT360_REQUEST_MODEL: immutable-request-bound-to-parent-head-and-run-attempt-v1
-  ORBIT360_METHOD_DECISION_ID: paula-20260722-visualization-before-m2
+  ORBIT360_METHOD_DECISION_ID: paula-20260722-operational-directory-root-repair
   EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
   FIREBASE_PROJECT_ID: ays-orbit-360-lab
-  ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
   ORBIT360_FINAL_GATE_POLICY: no_final_gate_rerun
 
 jobs:
-  targeted-hosting-delivery:
-    name: Publicar o recuperar frontend correctivo · Hosting LAB
+  operational-directory-dryrun:
+    name: Restituir contrato operativo · dry-run sin escrituras
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -45,7 +43,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud, freeze y evidencia estática
+      - name: Validar solicitud inmutable y freeze
         shell: bash
         run: |
           set -euo pipefail
@@ -54,77 +52,66 @@ jobs:
           test "${GITHUB_RUN_ATTEMPT}" = '1'
           REQUEST="$ORBIT360_REQUEST_FILE"
           FREEZE='tools/orbit360-incident-freeze-v20260721.json'
-          INVENTORY='orbit360-platform/docs/evidence/post-recovery-inventory-29868538689-sanitized.json'
-          test -f "$REQUEST" && test -f "$FREEZE" && test -f "$INVENTORY"
+          test -f "$REQUEST" && test -f "$FREEZE"
           test "$(jq -r '.schemaVersion' "$REQUEST")" = 'orbit360-gate-execution-request-v1'
           test "$(jq -r '.requestModel' "$REQUEST")" = "$ORBIT360_REQUEST_MODEL"
           test "$(jq -r '.methodologicalDecisionId' "$REQUEST")" = "$ORBIT360_METHOD_DECISION_ID"
           test "$(jq -r '.gateId' "$REQUEST")" = "$ORBIT360_GATE_ID"
-          test "$(jq -r '.phase' "$REQUEST")" = 'LAB_HOSTING_DELIVERY'
+          test "$(jq -r '.contractVersion' "$REQUEST")" = '1.0.38'
+          test "$(jq -r '.phase' "$REQUEST")" = 'LAB_DATA_CONTRACT_REPAIR_DRYRUN'
           test "$(jq -r '.parentHead' "$REQUEST")" = "$(git rev-parse HEAD^)"
           test "$(jq -r '.allowedExecutions' "$REQUEST")" = '1'
-          test "$(jq -r '.previousAttempt.runId' "$REQUEST")" = '29963097060'
-          test "$(jq -r '.previousAttempt.classification' "$REQUEST")" = 'PIPELINE_MECHANISM_FAILURE'
           test "$(jq -r '.secretsAllowed' "$REQUEST")" = 'true'
-          test "$(jq -r '.deployAllowed' "$REQUEST")" = 'true'
-          test "$(jq -r '.deploymentScope' "$REQUEST")" = 'hosting_channel_only'
-          test "$(jq -r '.firebaseProjectId' "$REQUEST")" = "$EXPECTED_FIREBASE_PROJECT_ID"
-          test "$(jq -r '.hostingChannel' "$REQUEST")" = "$ORBIT360_HOSTING_CHANNEL"
-          test "$(jq -r '.firestoreReadAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.secretPurpose' "$REQUEST")" = 'read_existing_insurer_vault_for_sanitized_matching_only'
+          test "$(jq -r '.firestoreReadAllowed' "$REQUEST")" = 'true'
           test "$(jq -r '.writesAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.runtimeAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.browserAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.deployAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.functionsDeployAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.rulesDeployAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.productionAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.reimportAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.finalGateRerunAllowed' "$REQUEST")" = 'false'
-          test "$(jq -r '.status' "$FREEZE")" = 'HOSTING_DELIVERY_V1_PIPELINE_MECHANISM_FAILURE_RETRY_AUTHORIZED'
-          test "$(jq -r '.methodologicalDecision.id' "$FREEZE")" = "$ORBIT360_METHOD_DECISION_ID"
-          test "$(jq -r '.hostingDeliveryV1.runId' "$FREEZE")" = '29963097060'
-          test "$(jq -r '.hostingDeliveryV1.classification' "$FREEZE")" = 'PIPELINE_MECHANISM_FAILURE'
-          test "$(jq -r '.hostingDeliveryV1.preflightStatus' "$FREEZE")" = 'GO_GATE_CONTRACT'
-          test "$(jq -r '.staticPreflightV2.status' "$FREEZE")" = 'PASS'
-          test "$(jq -r '.staticPreflightV2.runId' "$FREEZE")" = "$(jq -r '.staticPreflight.runId' "$REQUEST")"
-          test "$(jq -r '.inventoryEvidence.ok' "$FREEZE")" = 'true'
-          test "$(jq -r '.ok' "$INVENTORY")" = 'true'
+          test "$(jq -r '.status' "$FREEZE")" = 'M1_VISUAL_REVIEW_FAILED_DATA_CONTRACT_REPAIR_DRYRUN_AUTHORIZED'
+          test "$(jq -r '.dryRunAuthorization.authorizationId' "$FREEZE")" = 'm1-operational-directory-repair-dryrun-v1'
+          test "$(jq -r '.dryRunAuthorization.active' "$FREEZE")" = 'true'
+          test "$(jq -r '.dryRunAuthorization.consumed' "$FREEZE")" = 'false'
+          test "$(jq -r '.dryRunAuthorization.allowedExecutions' "$FREEZE")" = '1'
+          test "$(jq -r '.dryRunAuthorization.writesAllowed' "$FREEZE")" = 'false'
+          test "$(jq -r '.methodologicalDecision.m2Authorized' "$FREEZE")" = 'false'
 
-      - name: Verificar artefacto estático y ausencia de drift funcional
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Alinear transformador, lifecycle y fase
         shell: bash
         run: |
           set -euo pipefail
-          REQUEST="$ORBIT360_REQUEST_FILE"
-          STATIC_RUN_ID="$(jq -r '.staticPreflight.runId' "$REQUEST")"
-          STATIC_ARTIFACT_ID="$(jq -r '.staticPreflight.artifactId' "$REQUEST")"
-          STATIC_ARTIFACT_DIGEST="$(jq -r '.staticPreflight.artifactDigest' "$REQUEST")"
-          STATIC_HEAD="$(jq -r '.staticPreflight.executionHead' "$REQUEST")"
-          git cat-file -e "${STATIC_HEAD}^{commit}"
-          git diff --quiet "$STATIC_HEAD" "HEAD^" -- orbit360-platform ':!orbit360-platform/docs/**'
-          META="$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${STATIC_ARTIFACT_ID}")"
-          test "$(printf '%s' "$META" | jq -r '.workflow_run.id')" = "$STATIC_RUN_ID"
-          test "$(printf '%s' "$META" | jq -r '.digest')" = "$STATIC_ARTIFACT_DIGEST"
-          test "$(printf '%s' "$META" | jq -r '.expired')" = 'false'
-          mkdir -p "${RUNNER_TEMP}/static-evidence"
-          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${STATIC_ARTIFACT_ID}/zip" > "${RUNNER_TEMP}/static-evidence.zip"
-          unzip -q "${RUNNER_TEMP}/static-evidence.zip" -d "${RUNNER_TEMP}/static-evidence"
-          FINAL_STATIC="$(find "${RUNNER_TEMP}/static-evidence" -name final-static-preflight-sanitized.json -print -quit)"
-          test -n "$FINAL_STATIC"
-          jq -e --arg head "$STATIC_HEAD" --argjson run "$STATIC_RUN_ID" '.ok == true and .commit == $head and .runId == $run and .executionPhase == "STATIC_PREFLIGHT" and .gateContractStatus == "GO_GATE_CONTRACT" and .visualRemediationStatus == "PASS" and .visualChecks == "29_OF_29" and .architectureStatus == "GO_STATIC_ARCHITECTURE" and .finalGateRerun == false' "$FINAL_STATIC" >/dev/null
+          node --check tools/orbit360-corregir-transformador-directorio-v20260722.mjs
+          node --check tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs
+          node --check tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs
+          node --check tools/orbit360-restituir-directorio-operativo-v20260722.mjs
+          node tools/orbit360-corregir-transformador-directorio-v20260722.mjs
+          jq -e '.ok == true and .dataWritten == false and .secretsRead == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-transformer-alignment-sanitized.json >/dev/null
+          node tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs
+          jq -e '.ok == true and .dataWritten == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-phase-alignment-sanitized.json >/dev/null
+          node tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs
+          jq -e '.ok == true and .contractVersion == "1.0.38" and .invariants.bankNumbersOperationalVisible == true and .invariants.bankCopyDirect == true and .invariants.bankRevealDependency == false and .invariants.usernamesOperationalVisible == true and .invariants.passwordsProtectedOnly == true and .invariants.dataWritten == false and .invariants.reimportExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-code-repair-sanitized.json >/dev/null
 
-      - name: Preflight canónico de fase Hosting LAB
+      - name: Preflight contractual antes de leer datos
         shell: bash
         run: |
           set -euo pipefail
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-v20260717.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          test "$(jq -r '.status' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'GO_GATE_CONTRACT'
-          test "$(jq -r '.executionPhase' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json)" = 'LAB_HOSTING_DELIVERY'
-          node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs --local-only
-          test "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
+          jq -e '.status == "GO_GATE_CONTRACT" and .contractVersion == "1.0.38" and .executionPhase == "LAB_DATA_CONTRACT_REPAIR_DRYRUN" and .failed == 0' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          node --check orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js
+          node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-visual-contract-sanitized.json
+          jq -e '.status == "PASS" and .contractVersion == "1.0.38" and .validatorSemanticRevision == "operational-directory-field-classification-v1" and .failed == 0 and .runtimeExecuted == false and .browserExecuted == false and .deployExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-visual-contract-sanitized.json >/dev/null
+          node --check orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
+          node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js > orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-sanitized.json
+          jq -e '.status == "GO_STATIC_ARCHITECTURE" and .failed == 0' orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-sanitized.json >/dev/null
 
-      - name: Resolver identidad LAB para entrega visual
+      - name: Resolver identidad LAB de solo lectura
         env:
           SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
           SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -136,107 +123,104 @@ jobs:
           if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
           if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
           test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-firebase-lab-visual-review.json"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-operational-directory-dryrun.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
 
-      - name: Inspeccionar canal existente
+      - name: Instalar dependencias de lectura
         shell: bash
         run: |
           set -euo pipefail
-          CHANNEL_JSON="${RUNNER_TEMP}/firebase-channel-list.json"
-          CHANNEL_ERR="${RUNNER_TEMP}/firebase-channel-list.stderr"
-          set +e
-          npx --yes firebase-tools@latest hosting:channel:list --project "$FIREBASE_PROJECT_ID" --non-interactive --json > "$CHANNEL_JSON" 2> "$CHANNEL_ERR"
-          CHANNEL_STATUS=$?
-          set -e
-          node - "$CHANNEL_JSON" "$ORBIT360_HOSTING_CHANNEL" > "${RUNNER_TEMP}/existing-channel-url.txt" <<'NODE'
-          const fs=require('fs');
-          const [file,channel]=process.argv.slice(2);
-          let value={};try{value=JSON.parse(fs.readFileSync(file,'utf8'))}catch{}
-          const urls=[];const walk=x=>{if(typeof x==='string'&&/^https:\/\//.test(x))urls.push(x);else if(Array.isArray(x))x.forEach(walk);else if(x&&typeof x==='object')Object.values(x).forEach(walk)};walk(value);
-          process.stdout.write(urls.find(x=>x.includes(channel))||'');
-          NODE
-          EXISTING_URL="$(cat "${RUNNER_TEMP}/existing-channel-url.txt")"
-          jq -n --argjson status "$CHANNEL_STATUS" --arg url "$EXISTING_URL" '{schemaVersion:"orbit360-hosting-channel-inspection-v1",commandExitCode:$status,channelUrl:$url,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/hosting-channel-inspection-sanitized.json
-          if [ -n "$EXISTING_URL" ]; then
-            EXISTING_BUILD="$(curl -fsSL --retry 3 --retry-delay 2 -H 'Cache-Control: no-cache' "$EXISTING_URL/runtime-build.json?inspect=$GITHUB_RUN_ID" || true)"
-            EXISTING_COMMIT="$(printf '%s' "$EXISTING_BUILD" | jq -r '.commit // empty' 2>/dev/null || true)"
-            PREVIOUS_HEAD="$(jq -r '.previousAttempt.executionHead' "$ORBIT360_REQUEST_FILE")"
-            if [ "$EXISTING_COMMIT" = "$PREVIOUS_HEAD" ]; then
-              echo "ORBIT360_PREVIEW_URL=$EXISTING_URL" >> "$GITHUB_ENV"
-              echo "ORBIT360_PUBLISHED_COMMIT=$EXISTING_COMMIT" >> "$GITHUB_ENV"
-              echo "ORBIT360_REUSED_EXISTING=true" >> "$GITHUB_ENV"
+          npm install --no-save firebase-admin@13 @google-cloud/secret-manager@6
+          node -e "require('firebase-admin'); require('@google-cloud/secret-manager'); console.log('READ_ONLY_DEPENDENCIES_OK')"
+
+      - name: Dry-run Firestore más bóveda · cero escrituras
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-restituir-directorio-operativo-v20260722.mjs --dry-run
+          REPORT='orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json'
+          jq -e '.ok == true and .status == "DRY_RUN_READY" and .mode == "DRY_RUN" and .contractVersion == "1.0.38" and .counts.clients == 414 and .counts.insurers == 26 and .counts.advisors == 7 and .vault.bankRecords == 91 and .directory.bankReferenceRows == 91 and .directory.bankMatchedToVault == 91 and .directory.bankUnmatchedRefs == 0 and .directory.bankPendingRows == 2 and .directory.credentialUnmatchedRefs == 0 and .directory.passwordsInOperationalDirectory == 0 and .directory.accountRowsProposed > 0 and .directory.usernameRowsProposed > 0 and .acceptance.expectedOperationalBankNumbersAfter == 91 and .acceptance.accountIdMismatchExplainsRevealFailure == true and .acceptance.passwordsRemainProtected == true and .writesExecuted == false and .transactionCommitted == false and .safety.creates == 0 and .safety.deletes == 0 and .safety.reorders == 0 and .safety.passwordWrites == 0 and .safety.functionsDeploy == false and .safety.rulesDeploy == false and .safety.productionTouched == false and .safety.reimportExecuted == false and .containsPII == false and .containsSecrets == false and .containsRawBankValues == false and .containsRawUsernames == false' "$REPORT" >/dev/null
+
+      - name: Verificar alcance de archivos y confirmar corrección estática
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf node_modules package-lock.json npm-shrinkwrap.json
+          ALLOWED='^(\.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716\.yml|tools/orbit360-(aplicar-correccion-directorio-operativo|corregir-transformador-directorio|alinear-fase-reparacion-directorio|restituir-directorio-operativo|validator-lifecycle-contract|validar-gate-contracts-engine|incident-freeze|gate-contract-overlay|gate-contract-overlay-importers|gate-contract-registry-extension|critical-runtime-integrity-manifest)-v?[0-9A-Za-z.-]*\.(mjs|json)|orbit360-platform/(core/(client-insurer-visual-contract-v20260720|insurer-directory-import-v1202|aseguradoras-op2-import-ui-guard|insurer-secure-target-bridge-v20260720|aseguradoras-credentials-provider-lab-v20260720|aseguradoras-bank-accounts-provider-lab-v20260721|router-tenant-config-bootstrap)\.js|data/academia-v1221-m1-visual-integrity\.js|index\.html|tools/orbit360-m1-visual-remediation-contract-v20260722\.js|runtime-gate-crm-v20260716/.*-sanitized\.json))$'
+          while IFS= read -r file; do
+            test -z "$file" && continue
+            if ! printf '%s' "$file" | grep -Eq "$ALLOWED"; then
+              echo "UNAUTHORIZED_CHANGED_PATH:$file"
+              exit 41
             fi
-          fi
+          done < <(git status --porcelain | sed -E 's/^.. //')
+          test -z "$(git diff --name-only -- orbit360-platform/data/store.js orbit360-platform/data/store-firestore-lab.local.js orbit360-platform/core/auth.js orbit360-platform/core/importa.js firestore.rules functions)"
+          git config user.name 'orbit360-control-plane'
+          git config user.email 'orbit360-control-plane@users.noreply.github.com'
+          git add \
+            tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs \
+            tools/orbit360-corregir-transformador-directorio-v20260722.mjs \
+            tools/orbit360-validator-lifecycle-contract-v20260722.json \
+            tools/orbit360-incident-freeze-v20260721.json \
+            tools/orbit360-validar-gate-contracts-engine-v20260717.mjs \
+            tools/orbit360-gate-contract-overlay-v20260718.json \
+            tools/orbit360-gate-contract-overlay-importers-v20260720.json \
+            tools/orbit360-gate-contract-registry-extension-v20260720.json \
+            tools/orbit360-critical-runtime-integrity-manifest-v20260721.json \
+            orbit360-platform/core/client-insurer-visual-contract-v20260720.js \
+            orbit360-platform/core/insurer-directory-import-v1202.js \
+            orbit360-platform/core/aseguradoras-op2-import-ui-guard.js \
+            orbit360-platform/core/insurer-secure-target-bridge-v20260720.js \
+            orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js \
+            orbit360-platform/core/aseguradoras-bank-accounts-provider-lab-v20260721.js \
+            orbit360-platform/core/router-tenant-config-bootstrap.js \
+            orbit360-platform/index.html \
+            orbit360-platform/data/academia-v1221-m1-visual-integrity.js \
+            orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js \
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-transformer-alignment-sanitized.json \
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-phase-alignment-sanitized.json \
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-code-repair-sanitized.json \
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json \
+            orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-visual-contract-sanitized.json \
+            orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-sanitized.json \
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json
+          git diff --cached --quiet && { echo 'NO_STATIC_CORRECTION_TO_COMMIT'; exit 41; }
+          git commit -m 'fix(m1): restituir contrato operativo de usuarios y cuentas'
+          git push origin "HEAD:$ORBIT360_BRANCH"
+          echo "ORBIT360_REPAIR_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
-      - name: Publicar frontend solo si falta el build
-        if: ${{ env.ORBIT360_REUSED_EXISTING != 'true' }}
+      - name: Cerrar evidencia sanitizada
         shell: bash
         run: |
           set -euo pipefail
-          jq -n --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" --arg gateId "$ORBIT360_GATE_ID" '{schemaVersion:"orbit360-runtime-build-v5-visual-review",commit:$commit,runId:($run|tonumber),gateId:$gateId,deploymentScope:"targeted_lab_frontend_visual_review_only",finalGateRerun:false,hostingOnly:true,deployExecuted:true,writesExecuted:false,browserExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false}' > orbit360-platform/runtime-build.json
-          DEPLOY_JSON="${RUNNER_TEMP}/firebase-lab-preview.json"
-          DEPLOY_ERR="${RUNNER_TEMP}/firebase-lab-preview.stderr"
-          set +e
-          npx --yes firebase-tools@latest hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --project "$FIREBASE_PROJECT_ID" --expires 30d --non-interactive --json > "$DEPLOY_JSON" 2> "$DEPLOY_ERR"
-          DEPLOY_STATUS=$?
-          set -e
-          jq -n --argjson status "$DEPLOY_STATUS" '{schemaVersion:"orbit360-firebase-hosting-command-v1",exitCode:$status,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/firebase-hosting-command-sanitized.json
-          if [ "$DEPLOY_STATUS" -ne 0 ]; then
-            sed -E 's/(private_key|client_email|token|authorization)[^ ]*/[REDACTED]/Ig' "$DEPLOY_ERR" | tail -200 > orbit360-platform/runtime-gate-crm-v20260716/firebase-hosting-error-sanitized.txt
-            exit "$DEPLOY_STATUS"
-          fi
-          node - "$DEPLOY_JSON" "$ORBIT360_HOSTING_CHANNEL" > "${RUNNER_TEMP}/deployed-url.txt" <<'NODE'
-          const fs=require('fs');
-          const [file,channel]=process.argv.slice(2);
-          let value={};try{value=JSON.parse(fs.readFileSync(file,'utf8'))}catch{}
-          const urls=[];const walk=x=>{if(typeof x==='string'&&/^https:\/\//.test(x))urls.push(x);else if(Array.isArray(x))x.forEach(walk);else if(x&&typeof x==='object')Object.values(x).forEach(walk)};walk(value);
-          process.stdout.write(urls.find(x=>x.includes(channel))||urls.find(x=>/web\.app|firebaseapp\.com/.test(x))||'');
-          NODE
-          URL="$(cat "${RUNNER_TEMP}/deployed-url.txt")"
-          if [ -z "$URL" ]; then
-            npx --yes firebase-tools@latest hosting:channel:list --project "$FIREBASE_PROJECT_ID" --non-interactive --json > "${RUNNER_TEMP}/firebase-channel-list-after.json"
-            node - "${RUNNER_TEMP}/firebase-channel-list-after.json" "$ORBIT360_HOSTING_CHANNEL" > "${RUNNER_TEMP}/deployed-url.txt" <<'NODE'
-            const fs=require('fs');const [file,channel]=process.argv.slice(2);let value={};try{value=JSON.parse(fs.readFileSync(file,'utf8'))}catch{};const urls=[];const walk=x=>{if(typeof x==='string'&&/^https:\/\//.test(x))urls.push(x);else if(Array.isArray(x))x.forEach(walk);else if(x&&typeof x==='object')Object.values(x).forEach(walk)};walk(value);process.stdout.write(urls.find(x=>x.includes(channel))||'');
-            NODE
-            URL="$(cat "${RUNNER_TEMP}/deployed-url.txt")"
-          fi
-          test -n "$URL"
-          echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
-          echo "ORBIT360_PUBLISHED_COMMIT=$GITHUB_SHA" >> "$GITHUB_ENV"
-          echo "ORBIT360_REUSED_EXISTING=false" >> "$GITHUB_ENV"
+          REPORT='orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json'
+          jq -n \
+            --arg requestCommit "$GITHUB_SHA" \
+            --arg repairCommit "$ORBIT360_REPAIR_COMMIT" \
+            --arg runId "$GITHUB_RUN_ID" \
+            --argjson banks "$(jq '.directory.accountRowsProposed' "$REPORT")" \
+            --argjson users "$(jq '.directory.usernameRowsProposed' "$REPORT")" \
+            --argjson idMismatches "$(jq '.directory.bankReferenceAccountIdMismatches' "$REPORT")" \
+            '{schemaVersion:"orbit360-operational-directory-dryrun-closure-v1",ok:true,requestCommit:$requestCommit,repairCommit:$repairCommit,runId:($runId|tonumber),executionPhase:"LAB_DATA_CONTRACT_REPAIR_DRYRUN",contractVersion:"1.0.38",bankNumbersProposed:$banks,usernamesProposed:$users,accountIdMismatches:$idMismatches,writesExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,reimportExecuted:false,containsPII:false,containsSecrets:false,nextAction:"AUTHORIZE_SINGLE_ATOMIC_OPERATIONAL_DIRECTORY_REPAIR"}' > orbit360-platform/runtime-gate-crm-v20260716/operational-directory-dryrun-closure-sanitized.json
 
-      - name: Verificar build e integridad exacta publicada
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "${ORBIT360_PREVIEW_URL:-}"
-          BUILD_JSON="$(curl -fsSL --retry 6 --retry-delay 2 --retry-all-errors -H 'Cache-Control: no-cache' "$ORBIT360_PREVIEW_URL/runtime-build.json?visualReview=$GITHUB_RUN_ID")"
-          test "$(printf '%s' "$BUILD_JSON" | jq -r '.commit // empty')" = "$ORBIT360_PUBLISHED_COMMIT"
-          test "$(printf '%s' "$BUILD_JSON" | jq -r '.gateId // empty')" = "$ORBIT360_GATE_ID"
-          test "$(printf '%s' "$BUILD_JSON" | jq -r '.finalGateRerun')" = 'false'
-          node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs
-          test "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
-          test "$(jq -r '.exactMatch' orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json)" = 'true'
-          jq -n --arg url "$ORBIT360_PREVIEW_URL" --arg commit "$ORBIT360_PUBLISHED_COMMIT" --arg run "$GITHUB_RUN_ID" --arg reused "${ORBIT360_REUSED_EXISTING:-false}" '{schemaVersion:"orbit360-targeted-lab-visual-review-v3",ok:true,url:$url,publishedCommit:$commit,runId:($run|tonumber),reusedExistingDeployment:($reused=="true"),deploymentScope:"targeted_lab_frontend_visual_review_only",finalGateRerun:false,hostingOnly:true,writesExecuted:false,browserExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/targeted-deploy-sanitized.json
-
-      - name: Subir evidencia sanitizada de visualización
+      - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-targeted-hosting-visualization-v2-${{ github.run_id }}
+          name: orbit360-m1-operational-directory-dryrun-${{ github.run_id }}
           path: |
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-transformer-alignment-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-phase-alignment-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-code-repair-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/script-integrity-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/hosting-channel-inspection-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/firebase-hosting-command-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/firebase-hosting-error-sanitized.txt
-            orbit360-platform/runtime-gate-crm-v20260716/targeted-deploy-sanitized.json
-            orbit360-platform/runtime-build.json
-            tools/orbit360-m1-hosting-delivery-request-v2-20260722.json
+            orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-visual-contract-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-dryrun-closure-sanitized.json
+            tools/orbit360-m1-operational-directory-repair-dryrun-request-v20260722.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -248,6 +232,11 @@ jobs:
         shell: bash
         run: |
           state=success
-          description='Frontend correctivo disponible para revisión visual'
-          if [ "${{ job.status }}" != success ]; then state=failure; description='Entrega Hosting LAB v2 falló; STOP THE LINE'; fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-targeted-hosting-visualization-v2' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
+          description='Dry-run directorio operativo PASS; escritura aún bloqueada'
+          if [ "${{ job.status }}" != success ]; then state=failure; description='Dry-run directorio operativo falló; STOP THE LINE'; fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-operational-directory-repair-dryrun-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
+
+      - name: Limpiar identidad temporal
+        if: always()
+        shell: bash
+        run: rm -f "${RUNNER_TEMP}/orbit360-operational-directory-dryrun.json"
