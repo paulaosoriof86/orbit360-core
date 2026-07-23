@@ -17,6 +17,10 @@ function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
 }
 
+function json(rel) {
+  return JSON.parse(read(rel));
+}
+
 function executable(rel) {
   let source = read(rel);
   if (/\.(?:js|mjs|cjs)$/i.test(rel)) source = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
@@ -76,6 +80,7 @@ check('BOOTSTRAP_NO_FALLBACK', has(files.bootstrap, 'noFallback: true'), files.b
 check('BOOTSTRAP_REQUIRES_MEMBERSHIP_PROVIDER', has(files.bootstrap, "'membershipProvider'") && has(files.bootstrap, 'getByUid'), files.bootstrap);
 check('BOOTSTRAP_INSTALLS_PRODUCT_STORE', has(files.bootstrap, 'createFirestoreProductReadOnlyStoreP0') && has(files.bootstrap, 'window.Orbit.store = store'), files.bootstrap);
 check('BOOTSTRAP_READINESS_BEFORE_ATTACH', has(files.bootstrap, 'backendProductReadinessP0.readiness') && executable(files.bootstrap).indexOf('backendProductReadinessP0.readiness') < executable(files.bootstrap).indexOf('store._attachSnapshots()'), files.bootstrap);
+check('BOOTSTRAP_WAITS_STORE_READY', has(files.bootstrap, 'waitForStoreReady') && has(files.bootstrap, "status.status === 'ready-read-only'") && executable(files.bootstrap).indexOf('await waitForStoreReady') < executable(files.bootstrap).indexOf("transition(state, 'ready-read-only'"), files.bootstrap);
 check('BOOTSTRAP_NO_URL_TENANT', lacks(files.bootstrap, 'location.search') && lacks(files.bootstrap, 'URLSearchParams') && lacks(files.bootstrap, 'window.location'), files.bootstrap);
 check('BOOTSTRAP_NO_ALT_STORAGE', lacks(files.bootstrap, 'localStorage') && lacks(files.bootstrap, 'Orbit.SEED'), files.bootstrap);
 check('BOOTSTRAP_NO_ENV_VALUES', lacks(files.bootstrap, 'apiKey:') && lacks(files.bootstrap, 'projectId:'), files.bootstrap);
@@ -93,16 +98,22 @@ check('ACADEMY_CLAUDE_CLASSIFICATION', has(files.academy, "claudeClassification:
 check('DOCS_GATE_ID', has(files.docs, 'block2-product-readonly-bootstrap-v20260723'), files.docs);
 check('DOCS_ZERO_CAPABILITIES', has(files.docs, 'cero Firebase productivo') && has(files.docs, 'cero writes'), files.docs);
 
-check('REGISTRY_M2_GATE', has(files.extension, 'block2-product-readonly-bootstrap-v20260723') && has(files.extension, '"block": 2'), files.extension);
-check('REGISTRY_PLAN_PATCH', has(files.extension, '"activeBlock": 2'), files.extension);
-check('OVERLAY_M2_GATE', has(files.overlay, 'block2-product-readonly-bootstrap-v20260723') && has(files.overlay, '"phase":"STATIC_PREFLIGHT"'), files.overlay);
-check('LIFECYCLE_M2_GATE', has(files.lifecycle, 'block2-product-readonly-bootstrap-v20260723') && has(files.lifecycle, '"gateContractVersion":"2.0.0"'), files.lifecycle);
+let extension = null;
+let overlay = null;
+let lifecycle = null;
+try { extension = json(files.extension); } catch (error) { check('REGISTRY_EXTENSION_VALID_JSON', false, error.message); }
+try { overlay = json(files.overlay); } catch (error) { check('OVERLAY_VALID_JSON', false, error.message); }
+try { lifecycle = json(files.lifecycle); } catch (error) { check('LIFECYCLE_VALID_JSON', false, error.message); }
+check('REGISTRY_M2_GATE', !!(extension && Array.isArray(extension.gates) && extension.gates.some(gate => gate.gateId === 'block2-product-readonly-bootstrap-v20260723' && Number(gate.block) === 2)), files.extension);
+check('REGISTRY_PLAN_PATCH', !!(extension && extension.planPatch && Number(extension.planPatch.activeBlock) === 2), files.extension);
+check('OVERLAY_M2_GATE', !!(overlay && overlay.gateId === 'block2-product-readonly-bootstrap-v20260723' && overlay.gatePatch && overlay.gatePatch.executionProfile && overlay.gatePatch.executionProfile.phase === 'STATIC_PREFLIGHT'), files.overlay);
+check('LIFECYCLE_M2_GATE', !!(lifecycle && lifecycle.gateId === 'block2-product-readonly-bootstrap-v20260723' && lifecycle.gateContractVersion === '2.0.0'), files.lifecycle);
 check('FREEZE_M2_STATIC_AUTH', has(files.freeze, 'M2_PRODUCT_READONLY_STATIC_PATCH_AUTHORIZED_ONCE') && has(files.freeze, '"m1Closed":true') && has(files.freeze, '"m3Authorized":false'), files.freeze);
 check('CANONICAL_ENTRYPOINT_ROUTES_M2', has(files.entrypoint, 'block2-product-readonly-bootstrap-v20260723') && has(files.entrypoint, 'orbit360-validar-gate-contracts-engine-m2-v20260723.mjs'), files.entrypoint);
 check('M2_ENGINE_STATIC_ONLY', has(files.engine, 'STATIC_PREFLIGHT') && has(files.engine, 'M2_STATIC_PATCH_AUTHORIZED'), files.engine);
 check('WORKFLOW_VALIDATION_ONLY', has(files.workflow, 'VALIDATION_ONLY') && has(files.workflow, 'block2-product-readonly-bootstrap-v20260723'), files.workflow);
 check('WORKFLOW_NO_REPOSITORY_WRITE', lacks(files.workflow, 'git commit') && lacks(files.workflow, 'git push'), files.workflow);
-check('WORKFLOW_NO_EXTERNAL_CAPABILITIES', lacks(files.workflow, 'secrets.') && lacks(files.workflow, 'firebase deploy') && lacks(files.workflow, 'playwright') && lacks(files.workflow, 'firestore'), files.workflow);
+check('WORKFLOW_NO_EXTERNAL_CAPABILITIES', lacks(files.workflow, 'secrets.') && lacks(files.workflow, 'GOOGLE_APPLICATION_CREDENTIALS') && lacks(files.workflow, 'firebase deploy') && lacks(files.workflow, 'hosting:channel:deploy') && lacks(files.workflow, 'gcloud ') && lacks(files.workflow, 'firebase-admin') && lacks(files.workflow, 'getFirestore(') && lacks(files.workflow, 'playwright'), files.workflow);
 check('WORKFLOW_RUNS_CANONICAL_PREFLIGHT', has(files.workflow, 'orbit360-validar-gate-contracts-v20260717.mjs') && has(files.workflow, 'GO_GATE_CONTRACT'), files.workflow);
 check('WORKFLOW_RUNS_ROOT_CONTRACT', has(files.workflow, 'orbit360-m2-product-readonly-bootstrap-contract-v20260723.cjs') && has(files.workflow, 'M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS'), files.workflow);
 
