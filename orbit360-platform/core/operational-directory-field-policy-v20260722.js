@@ -37,6 +37,25 @@
       return clean(row && (row.id || String(index)), 180) === wanted;
     });
   }
+  function allMappings(result) {
+    var rows = [];
+    [result && result.credentialMappings, result && result.accountMappings, result && result.mappings].forEach(function (part) {
+      [].concat(part || []).forEach(function (row) { if (row && rows.indexOf(row) < 0) rows.push(row); });
+    });
+    return rows;
+  }
+  function mappingFor(item, result) {
+    var mappings = allMappings(result);
+    var insurerId = clean(item && item.insurerId, 180);
+    var portalId = clean(item && item.portalId, 180);
+    var accountId = clean(item && item.accountId, 180);
+    return mappings.find(function (mapping) {
+      if (insurerId && clean(mapping && mapping.insurerId, 180) !== insurerId) return false;
+      if (item.type === 'credential') return portalId && clean(mapping && mapping.portalId, 180) === portalId;
+      if (item.type === 'bank_account') return accountId && clean(mapping && mapping.accountId, 180) === accountId;
+      return false;
+    }) || null;
+  }
   function audit(before, after, result) {
     try {
       if (Orbit.access && typeof Orbit.access.audit === 'function') {
@@ -47,14 +66,14 @@
           before,
           after,
           'Confirmación protegida completada; usuario y número permanecen operativos.',
-          { policyVersion: VERSION, passwordWrites: 0, providerMappings: [].concat(result && result.mappings || []).length }
+          { policyVersion: VERSION, passwordWrites: 0, providerMappings: allMappings(result).length }
         );
       }
     } catch (error) {}
   }
   function applyOperationalFields(payload, result) {
     if (!result || result.ok !== true || !Orbit.store || typeof Orbit.store.get !== 'function' || typeof Orbit.store.update !== 'function') {
-      return { insurersUpdated: 0, usernamesWritten: 0, bankNumbersWritten: 0, passwordWrites: 0 };
+      return { insurersUpdated: 0, usernamesWritten: 0, bankNumbersWritten: 0, credentialRefsWritten: 0, accountRefsWritten: 0, passwordWrites: 0 };
     }
     var items = [].concat(payload && payload.items || []);
     var grouped = {};
@@ -66,6 +85,8 @@
     var insurersUpdated = 0;
     var usernamesWritten = 0;
     var bankNumbersWritten = 0;
+    var credentialRefsWritten = 0;
+    var accountRefsWritten = 0;
 
     Object.keys(grouped).forEach(function (insurerId) {
       var insurer = Orbit.store.get('aseguradoras', insurerId);
@@ -76,32 +97,51 @@
       var before = { portales: clone(portals), cuentas: clone(accounts) };
 
       grouped[insurerId].forEach(function (item) {
+        var mapping = mappingFor(item, result);
         if (item.type === 'credential') {
           var username = clean(item.username, 320);
-          if (!username) return;
           var portalIndex = indexById(portals, item.portalId);
           if (portalIndex < 0 && Number.isInteger(Number(item.platformIndex))) portalIndex = Number(item.platformIndex);
           if (portalIndex < 0 || !portals[portalIndex]) return;
-          portals[portalIndex].usuario = username;
-          portals[portalIndex].usuarioHint = maskRight(username, 3);
-          portals[portalIndex].estadoAcceso = 'Acceso disponible';
-          portals[portalIndex].operationalFieldPolicy = VERSION;
-          usernamesWritten += 1;
-          changed = true;
+          if (username) {
+            portals[portalIndex].usuario = username;
+            portals[portalIndex].usuarioHint = maskRight(username, 3);
+            usernamesWritten += 1;
+            changed = true;
+          }
+          var credentialRef = clean(mapping && mapping.credentialRef, 100);
+          if (credentialRef) {
+            portals[portalIndex].credentialRef = credentialRef;
+            credentialRefsWritten += 1;
+            changed = true;
+          }
+          if (username || credentialRef) {
+            portals[portalIndex].estadoAcceso = 'Acceso disponible';
+            portals[portalIndex].operationalFieldPolicy = VERSION;
+          }
           return;
         }
         if (item.type === 'bank_account') {
           var number = clean(item.accountNumber, 320);
-          if (!number) return;
           var accountIndex = indexById(accounts, item.accountId);
           if (accountIndex < 0 && Number.isInteger(Number(item.accountIndex))) accountIndex = Number(item.accountIndex);
           if (accountIndex < 0 || !accounts[accountIndex]) return;
-          accounts[accountIndex].numero = number;
-          accounts[accountIndex].numeroHint = maskRight(number, 4);
-          accounts[accountIndex].estado = 'Cuenta operativa disponible';
-          accounts[accountIndex].operationalFieldPolicy = VERSION;
-          bankNumbersWritten += 1;
-          changed = true;
+          if (number) {
+            accounts[accountIndex].numero = number;
+            accounts[accountIndex].numeroHint = maskRight(number, 4);
+            bankNumbersWritten += 1;
+            changed = true;
+          }
+          var accountRef = clean(mapping && mapping.accountRef, 100);
+          if (accountRef) {
+            accounts[accountIndex].accountRef = accountRef;
+            accountRefsWritten += 1;
+            changed = true;
+          }
+          if (number || accountRef) {
+            accounts[accountIndex].estado = number ? 'Cuenta operativa disponible' : 'Pendiente de registrar';
+            accounts[accountIndex].operationalFieldPolicy = VERSION;
+          }
         }
       });
 
@@ -116,12 +156,26 @@
       audit(before, { portales: clone(portals), cuentas: clone(accounts) }, result);
     });
 
+    var summary = {
+      insurersUpdated: insurersUpdated,
+      usernamesWritten: usernamesWritten,
+      bankNumbersWritten: bankNumbersWritten,
+      credentialRefsWritten: credentialRefsWritten,
+      accountRefsWritten: accountRefsWritten,
+      passwordWrites: 0
+    };
     try {
-      window.dispatchEvent(new CustomEvent('orbit:operational-directory-fields-updated', {
-        detail: { insurersUpdated: insurersUpdated, usernamesWritten: usernamesWritten, bankNumbersWritten: bankNumbersWritten, passwordWrites: 0, version: VERSION }
-      }));
+      window.dispatchEvent(new CustomEvent('orbit:operational-directory-fields-updated', { detail: Object.assign({ version: VERSION }, summary) }));
     } catch (error) {}
-    return { insurersUpdated: insurersUpdated, usernamesWritten: usernamesWritten, bankNumbersWritten: bankNumbersWritten, passwordWrites: 0 };
+    return summary;
+  }
+  function scrubLocalPayload(payload) {
+    [].concat(payload && payload.items || []).forEach(function (item) {
+      if (!item) return;
+      item.password = '';
+      item.accountNumber = '';
+      item.username = '';
+    });
   }
   function attach() {
     if (attaching || !Orbit.secureImport || typeof Orbit.secureImport.importInsurerDirectory !== 'function') return false;
@@ -130,10 +184,14 @@
     attaching = true;
     var wrapped = async function (payload) {
       var enriched = enrichedPayload(payload);
-      var result = await current(payload);
-      var applied = applyOperationalFields(enriched, result);
-      if (result && typeof result === 'object') result.operationalDirectory = applied;
-      return result;
+      try {
+        var result = await current(payload);
+        var applied = applyOperationalFields(enriched, result);
+        if (result && typeof result === 'object') result.operationalDirectory = applied;
+        return result;
+      } finally {
+        scrubLocalPayload(enriched);
+      }
     };
     wrapped.__operationalDirectoryFieldPolicyV20260722 = VERSION;
     wrapped.__wrappedProvider = current;
