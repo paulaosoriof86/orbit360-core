@@ -2,18 +2,18 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-22",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "DATA_CONTRACT_FAILURE",
-  "diagnosticRevision": "operational-directory-target-field-atomic-apply-v1",
-  "contractRevision": "1.0.38-operational-directory-target-field-atomic-apply-v1",
+  "classification": "FUNCTIONAL_DEFECT",
+  "diagnosticRevision": "operational-directory-hosting-delivery-v1",
+  "contractRevision": "1.0.38-operational-directory-hosting-delivery-v1",
   "replaceCanonicalOwners": true,
   "replaceRequiredFiles": true,
   "replaceRuntimeVersionContracts": true,
   "gatePatch": {
     "contractVersion": "1.0.38",
-    "diagnosticRevision": "operational-directory-target-field-atomic-apply-v1",
-    "runtimeVersion": "20260722-11",
+    "diagnosticRevision": "operational-directory-hosting-delivery-v1",
+    "runtimeVersion": "20260722-12",
     "block": 1,
-    "status": "OPERATIONAL_DIRECTORY_ATOMIC_APPLY_AUTHORIZED",
+    "status": "HOSTING_LAB_DELIVERY_AUTHORIZED_ONCE",
     "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
     "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
@@ -23,14 +23,14 @@
       "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js"
     ],
     "executionProfile": {
-      "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
+      "phase": "LAB_HOSTING_DELIVERY",
       "capabilities": {
         "secrets": true,
-        "firestoreRead": true,
-        "writes": true,
+        "firestoreRead": false,
+        "writes": false,
         "runtime": false,
         "browser": false,
-        "deploy": false,
+        "deploy": true,
         "functionsDeploy": false,
         "rulesDeploy": false,
         "production": false
@@ -38,12 +38,12 @@
       "workflowLocks": {
         "branch": true,
         "firebaseProject": true,
-        "hostingChannel": false
+        "hostingChannel": true
       },
-      "requestModel": "immutable-request-bound-to-atomic-apply-patch-v1"
+      "requestModel": "immutable-request-bound-to-hosting-delivery-patch-v1"
     },
-    "diagnosticRule": "Run the phase-aware preflight before credentials, reconstruct the same verified target-field-only plan, and apply it through one transaction with hash preconditions, read-after-write, idempotence and rollback.",
-    "acceptancePolicy": "Accept only APPLIED_AND_VERIFIED with 91 operational bank numbers, two pending accounts, 26 operational usernames, 26/26 protected passwords, zero operational passwords, zero remaining proposals and zero row/order/non-target changes."
+    "diagnosticRule": "Publish the validated frontend only to the approved Hosting LAB channel and verify remote SHA-256 integrity before human review.",
+    "acceptancePolicy": "Accept only HOSTING_DELIVERED_AND_VERIFIED with exact asset hashes and no data, runtime, browser, Functions, Rules, production or reimport activity."
   },
   "canonicalOwners": [
     {
@@ -53,7 +53,6 @@
         "operationalFields: ['usuario', 'numero']",
         "protectedFields: ['password', 'contrasena']",
         "passwordProtectedOnly: true",
-        "providerMappingsPreserved: true",
         "passwordWrites: 0"
       ]
     },
@@ -82,8 +81,7 @@
       "path": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
       "requiredTokens": [
         "phase-capability-contract-v1",
-        "orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
-        "LAB_DATA_CONTRACT_REPAIR_APPLY",
+        "LAB_HOSTING_DELIVERY",
         "sourceTransformed: false"
       ]
     },
@@ -92,40 +90,39 @@
       "path": "tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
       "requiredTokens": [
         "orbit360-gate-contract-preflight-v13-phase-capabilities",
-        "LAB_DATA_CONTRACT_REPAIR_APPLY",
-        "WORKFLOW_ATOMIC_APPLY",
-        "FREEZE_APPLY_AUTHORIZED"
+        "LAB_HOSTING_DELIVERY",
+        "WORKFLOW_HOSTING_DELIVERY"
       ]
     },
     {
-      "id": "operationalDirectoryRepairV2",
-      "path": "tools/orbit360-restituir-directorio-operativo-v2-v20260722.mjs",
+      "id": "criticalRuntimeManifest",
+      "path": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
       "requiredTokens": [
-        "orbit360-operational-directory-repair-v2-target-field-only",
-        "APPLIED_AND_VERIFIED",
-        "TRANSACTION_PRECONDITION_CHANGED",
-        "AFTER_REPAIR_NOT_IDEMPOTENT",
-        "ROLLBACK_VERIFICATION_FAILED",
-        "rollbackVerified"
+        "block1-critical-runtime-20260722-6",
+        "1.0.38",
+        "operationalDirectoryFieldPolicy",
+        "clientInsurerOperationalDirectoryOwner"
       ]
     }
   ],
   "requiredFiles": [
+    "firebase.json",
+    ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
     "tools/orbit360-validator-lifecycle-contract-v20260722.json",
     "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
     "tools/orbit360-incident-freeze-v20260721.json",
-    "tools/orbit360-gate-contract-overlay-v20260718.json",
-    "tools/orbit360-restituir-directorio-operativo-v2-v20260722.mjs",
-    "tools/orbit360-m1-operational-directory-atomic-apply-request-v20260722.json",
+    "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+    "tools/orbit360-m1-hosting-lab-delivery-request-v20260722.json",
+    "orbit360-platform/index.html",
+    "orbit360-platform/ays-lab-preview.html",
+    "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "orbit360-platform/core/operational-directory-field-policy-v20260722.js",
     "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
     "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
-    "orbit360-platform/tools/orbit360-m1-operational-directory-contract-v20260722.js",
-    "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
-    "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js",
-    "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
-    "orbit360-platform/docs/APLICACION-ATOMICA-DIRECTORIO-OPERATIVO-20260722.md"
+    "orbit360-platform/docs/HOSTING-LAB-DIRECTORIO-OPERATIVO-20260722.md"
   ],
   "runtimeVersionContracts": [
     {
@@ -133,8 +130,8 @@
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "phase-capability-contract-v1",
-        "orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
-        "LAB_DATA_CONTRACT_REPAIR_APPLY"
+        "LAB_HOSTING_DELIVERY",
+        "orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs"
       ]
     },
     {
@@ -142,88 +139,66 @@
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "orbit360-gate-contract-preflight-v13-phase-capabilities",
-        "LAB_DATA_CONTRACT_REPAIR_APPLY",
-        "WORKFLOW_ATOMIC_APPLY",
-        "FREEZE_APPLY_AUTHORIZED"
-      ]
-    },
-    {
-      "path": "tools/orbit360-restituir-directorio-operativo-v2-v20260722.mjs",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "APPLIED_AND_VERIFIED",
-        "runTransaction",
-        "TRANSACTION_PRECONDITION_CHANGED",
-        "AFTER_REPAIR_NOT_IDEMPOTENT",
-        "ROLLBACK_VERIFICATION_FAILED"
-      ]
-    },
-    {
-      "path": "orbit360-platform/core/operational-directory-field-policy-v20260722.js",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "20260722.1",
-        "providerMappingsPreserved: true",
-        "passwordWrites: 0"
-      ]
-    },
-    {
-      "path": "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "20260722.1",
-        "bankRevealDependency: false",
-        "bankCopyDirect: true"
-      ]
-    },
-    {
-      "path": "orbit360-platform/tools/orbit360-m1-operational-directory-contract-v20260722.js",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "contractVersion: '1.0.38'",
-        "FREEZE_APPLY_AUTHORIZED",
-        "WORKFLOW_ATOMIC_APPLY"
-      ]
-    },
-    {
-      "path": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js",
-      "replaceRequiredTokens": true,
-      "requiredTokens": [
-        "orbit360-block0-architecture-gate-v20260722",
-        "M1_VISUAL_REMEDIATION_CONTRACT_1038",
-        "GO_STATIC_ARCHITECTURE"
+        "LAB_HOSTING_DELIVERY",
+        "WORKFLOW_HOSTING_DELIVERY"
       ]
     },
     {
       "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "ATOMIC_APPLY",
-        "ORBIT360_GATE_PHASE: lab_data_contract_repair_apply",
+        "HOSTING_DELIVERY",
+        "ORBIT360_GATE_PHASE: lab_hosting_delivery",
         "ays-orbit-360-lab",
-        "orbit360-m1-operational-directory-atomic-apply-request-v20260722.json",
-        "preflight-sanitizado.json",
-        "orbit360-restituir-directorio-operativo-v2-v20260722.mjs",
-        "--apply"
+        "orbit360-ays-lab",
+        "orbit360-m1-hosting-lab-delivery-request-v20260722.json",
+        "hosting:channel:deploy",
+        "HOSTING_DELIVERED_AND_VERIFIED"
+      ]
+    },
+    {
+      "path": "firebase.json",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "\"public\": \"orbit360-platform\"",
+        "no-store, max-age=0"
+      ]
+    },
+    {
+      "path": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "block1-critical-runtime-20260722-6",
+        "\"contractVersion\": \"1.0.38\"",
+        "operationalDirectoryFieldPolicy",
+        "clientInsurerOperationalDirectoryOwner"
+      ]
+    },
+    {
+      "path": "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "usernameOperationalVisible: true",
+        "bankNumberOperationalVisible: true",
+        "bankCopyDirect: true"
       ]
     }
   ],
   "effectiveOwnerReconciliation": {
-    "classification": "DATA_CONTRACT_FAILURE",
+    "classification": "FUNCTIONAL_DEFECT",
     "contractVersion": "1.0.38",
-    "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
+    "phase": "LAB_HOSTING_DELIVERY",
     "canonicalOwnerScope": "overlay_replace",
     "runtimeContractScope": "overlay_replace",
     "workflowTransformsProduct": false,
-    "firestoreRead": true,
-    "vaultRead": true,
-    "writesAuthorized": true,
-    "writeScope": "14_existing_insurer_documents_target_fields_only",
-    "readAfterWrite": true,
-    "rollback": true,
+    "firestoreRead": false,
+    "vaultRead": false,
+    "writesAuthorized": false,
+    "hostingDeployAuthorized": true,
+    "project": "ays-orbit-360-lab",
+    "channel": "orbit360-ays-lab",
     "runtimeExecuted": false,
     "browserExecuted": false,
-    "deployExecuted": false,
     "functionsChanged": false,
     "rulesChanged": false,
     "productionTouched": false,
