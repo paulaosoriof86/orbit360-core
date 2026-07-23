@@ -24,16 +24,16 @@
       "workflowLocks":{"branch":true,"firebaseProject":true,"hostingChannel":true},
       "requestModel":"immutable-request-bound-to-css-delivery-hosting-v1"
     },
-    "diagnosticRule":"Do not redirect from preview until six essential styles return HTTP success, text/css and non-empty bodies. Precache them in the service worker and verify hashes plus MIME remotely.",
-    "acceptancePolicy":"Accept only HOSTING_CSS_DELIVERED_AND_VERIFIED with 22 of 22 hashes, six of six essential CSS and valid CSS MIME. Zero data, runtime, browser, Functions, Rules or production activity."
+    "diagnosticRule":"Do not redirect from preview until the expected service worker build controls the page and six essential styles return HTTP success, text/css and non-empty bodies. Precache them and verify hashes plus MIME remotely.",
+    "acceptancePolicy":"Accept only HOSTING_CSS_DELIVERED_AND_VERIFIED with 22 of 22 hashes, six of six essential CSS, valid CSS MIME and the expected worker build. Zero data, runtime, browser, Functions, Rules or production activity."
   },
   "canonicalOwners":[
     {"id":"dynamicInsurerDirectoryModule","path":"orbit360-platform/modules/aseguradoras.js","requiredTokens":["function waitBackendWrite(collection, id, op, timeoutMs)","persistSecureCredentialChanges","window.crypto.subtle.digest('SHA-256'","numero: ''","vinculada: true, contactos: [], cuentas: [], portales: []"]},
-    {"id":"cssDeliveryPreviewOwner","path":"orbit360-platform/ays-lab-preview.html","requiredTokens":["SW_BUILD = '20260723-10'","redirectBlockedWithoutCss: true","type.indexOf('text/css') < 0","MAX_STYLE_ATTEMPTS = 3","state.status = 'css-blocked'"]},
+    {"id":"cssDeliveryPreviewOwner","path":"orbit360-platform/ays-lab-preview.html","requiredTokens":["SW_BUILD = '20260723-10'","redirectBlockedWithoutCss: true","controllerHasExpectedBuild","SERVICE_WORKER_BUILD_NOT_CONTROLLING","workerBuildReady: false","type.indexOf('text/css') < 0","MAX_STYLE_ATTEMPTS = 3","state.status = 'css-blocked'"]},
     {"id":"cssDeliveryServiceWorkerOwner","path":"orbit360-platform/sw.js","requiredTokens":["CACHE = 'orbit360-v20260723-10-css-delivery'","ESSENTIAL_STYLE_PATHS","RUNTIME_CONTRACT_PATHS.concat(ESSENTIAL_STYLE_PATHS)","cache.match(canonicalRequest(pathname))","ignoreSearch: true"]},
     {"id":"cssDeliveryPwaOwner","path":"orbit360-platform/core/pwa.js","requiredTokens":["RUNTIME_BUILD = '20260723-10'","CRITICAL_RELEASE = 'block1-critical-runtime-20260723-10'"]},
     {"id":"cssDeliveryHostingHeaders","path":"firebase.json","requiredTokens":["\"source\": \"**/*.css\"","\"key\": \"X-Content-Type-Options\"","\"value\": \"nosniff\""]},
-    {"id":"cssDeliveryContract","path":"orbit360-platform/tools/orbit360-m1-css-delivery-contract-v20260723.cjs","requiredTokens":["CSS_DELIVERY_CONTRACT_PASS","PREVIEW_VALIDATES_CSS_MIME","SW_CANONICAL_FALLBACK","WORKFLOW_CHECKS_REMOTE_MIME"]},
+    {"id":"cssDeliveryContract","path":"orbit360-platform/tools/orbit360-m1-css-delivery-contract-v20260723.cjs","requiredTokens":["CSS_DELIVERY_CONTRACT_PASS","PREVIEW_REQUIRES_EXPECTED_WORKER_BUILD","PREVIEW_VALIDATES_CSS_MIME","SW_CANONICAL_FALLBACK","WORKFLOW_CHECKS_REMOTE_MIME"]},
     {"id":"cssDeliveryWorkflow","path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml","requiredTokens":["HOSTING_CSS_DELIVERY","orbit360-m1-css-delivery-hosting-request-v20260723.json","assetsExpected:22","essentialCssExpected:6","contentTypeOk","essentialCssVerified","HOSTING_CSS_DELIVERED_AND_VERIFIED"]}
   ],
   "requiredFiles":[
@@ -61,11 +61,11 @@
     {"path":"tools/orbit360-validar-gate-contracts-v20260717.mjs","replaceRequiredTokens":true,"requiredTokens":["GATE_CONTRACT_VERSION = '1.0.40'","LAB_HOSTING_DELIVERY","sourceTransformed: false"]},
     {"path":"tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs","replaceRequiredTokens":true,"requiredTokens":["LAB_HOSTING_DELIVERY","WORKFLOW_HOSTING_DELIVERY","HOSTING_PROJECT_LOCK_ENABLED","HOSTING_CHANNEL_LOCK_ENABLED"]},
     {"path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml","replaceRequiredTokens":true,"requiredTokens":["HOSTING_CSS_DELIVERY","ORBIT360_GATE_PHASE: lab_hosting_delivery","ays-orbit-360-lab","orbit360-ays-lab","orbit360-m1-css-delivery-hosting-request-v20260723.json","assetsExpected:22","essentialCssExpected:6","contentTypeOk","HOSTING_CSS_DELIVERED_AND_VERIFIED"]},
-    {"path":"orbit360-platform/ays-lab-preview.html","replaceRequiredTokens":true,"requiredTokens":["20260723.10-css-delivery-root","redirectBlockedWithoutCss: true","CSS_MIME_INVALID","CSS_BOOTSTRAP_BUDGET_EXHAUSTED"]},
+    {"path":"orbit360-platform/ays-lab-preview.html","replaceRequiredTokens":true,"requiredTokens":["20260723.10-css-delivery-root","redirectBlockedWithoutCss: true","controllerHasExpectedBuild","SERVICE_WORKER_BUILD_NOT_CONTROLLING","CSS_MIME_INVALID","CSS_BOOTSTRAP_BUDGET_EXHAUSTED"]},
     {"path":"orbit360-platform/sw.js","replaceRequiredTokens":true,"requiredTokens":["orbit360-v20260723-10-css-delivery","ESSENTIAL_STYLE_PATHS","RUNTIME_CONTRACT_PATHS.concat(ESSENTIAL_STYLE_PATHS)","cache.match(canonicalRequest(pathname))"]},
     {"path":"orbit360-platform/core/pwa.js","replaceRequiredTokens":true,"requiredTokens":["RUNTIME_BUILD = '20260723-10'","block1-critical-runtime-20260723-10"]},
     {"path":"firebase.json","replaceRequiredTokens":true,"requiredTokens":["\"source\": \"**/*.css\"","\"value\": \"nosniff\""]},
-    {"path":"orbit360-platform/tools/orbit360-m1-css-delivery-contract-v20260723.cjs","replaceRequiredTokens":true,"requiredTokens":["CSS_DELIVERY_CONTRACT_PASS","WORKFLOW_REQUIRES_ALL_CSS","total: checks.length"]}
+    {"path":"orbit360-platform/tools/orbit360-m1-css-delivery-contract-v20260723.cjs","replaceRequiredTokens":true,"requiredTokens":["CSS_DELIVERY_CONTRACT_PASS","PREVIEW_REQUIRES_EXPECTED_WORKER_BUILD","WORKFLOW_REQUIRES_ALL_CSS","total: checks.length"]}
   ],
-  "effectiveOwnerReconciliation":{"contractVersion":"1.0.40","deliveryRevision":"20260723-10","phase":"LAB_HOSTING_DELIVERY","canonicalOwnerScope":"overlay_replace","runtimeContractScope":"overlay_replace","workflowTransformsProduct":false,"firestoreRead":false,"vaultRead":false,"writesAuthorized":false,"hostingDeployAuthorized":true,"project":"ays-orbit-360-lab","channel":"orbit360-ays-lab","essentialCssRequired":6,"remoteAssetsRequired":22,"runtimeExecuted":false,"browserExecuted":false,"functionsChanged":false,"rulesChanged":false,"productionTouched":false,"reimportExecuted":false}
+  "effectiveOwnerReconciliation":{"contractVersion":"1.0.40","deliveryRevision":"20260723-10","phase":"LAB_HOSTING_DELIVERY","canonicalOwnerScope":"overlay_replace","runtimeContractScope":"overlay_replace","workflowTransformsProduct":false,"firestoreRead":false,"vaultRead":false,"writesAuthorized":false,"hostingDeployAuthorized":true,"project":"ays-orbit-360-lab","channel":"orbit360-ays-lab","essentialCssRequired":6,"remoteAssetsRequired":22,"expectedWorkerBuild":"20260723-10","runtimeExecuted":false,"browserExecuted":false,"functionsChanged":false,"rulesChanged":false,"productionTouched":false,"reimportExecuted":false}
 }
