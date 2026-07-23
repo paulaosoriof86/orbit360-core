@@ -6,7 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const ROOT = process.cwd();
-const GATE_ID = process.argv[2] || 'block2-product-readonly-bootstrap-v20260723';
+const GATE_ID = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
