@@ -1,30 +1,33 @@
-name: Orbit 360 · M1 edit mode root patch · VALIDATION_ONLY
+name: Orbit 360 · A&S 26 aseguradoras activas · ATOMIC_APPLY
 
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
-    paths: ['tools/orbit360-m1-edit-mode-root-validation-request-v20260722.json']
+    paths: ['tools/orbit360-m1-all-insurers-active-apply-request-v20260722.json']
 
 permissions:
   contents: read
   statuses: write
 
 concurrency:
-  group: orbit360-m1-edit-mode-root-static-v1
+  group: orbit360-m1-all-26-insurers-active-apply-v1
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_PHASE: static_preflight
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-edit-mode-root-validation-request-v20260722.json
-  ORBIT360_REQUEST_ID: m1-edit-mode-root-static-validation-v1
+  ORBIT360_GATE_PHASE: lab_data_contract_repair_apply
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-all-insurers-active-apply-request-v20260722.json
+  ORBIT360_REQUEST_ID: m1-all-26-insurers-active-apply-v1
+  EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_APPLY_COMPATIBILITY_OWNER: orbit360-restituir-directorio-operativo-v2-v20260722.mjs
 
 jobs:
-  static-validation:
-    name: M1 edit mode · STATIC_PATCH_VALIDATED
+  atomic-apply:
+    name: A&S · 26 aseguradoras activas · ATOMIC_APPLY
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - name: Checkout SHA exacto
         uses: actions/checkout@v4
@@ -38,7 +41,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud inmutable
+      - name: Validar solicitud inmutable y autorización
         shell: bash
         run: |
           set -euo pipefail
@@ -50,44 +53,67 @@ jobs:
           const f=JSON.parse(fs.readFileSync('tools/orbit360-incident-freeze-v20260721.json','utf8'));
           const head=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
           const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
-          const a=f.staticAuthorization||{},bad=[];
-          if(r.schemaVersion!=='orbit360-m1-edit-mode-root-validation-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
+          const a=f.applyAuthorization||{},bad=[];
+          if(r.schemaVersion!=='orbit360-m1-all-insurers-active-apply-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
           if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.contractVersion!=='1.0.39')bad.push('scope');
-          if(r.patchCommit!==parent||r.allowedExecutions!==1||r.validationOnly!==true)bad.push('binding');
-          if(r.secrets!==false||r.firestoreRead!==false||r.vaultRead!==false||r.writes!==false||r.runtime!==false||r.browser!==false||r.deploy!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.reimport!==false)bad.push('capabilities');
-          if(f.status!=='M1_EDIT_ROOT_PATCH_READY_STATIC_VALIDATION_AUTHORIZED_ONCE'||a.authorizationId!==process.env.ORBIT360_REQUEST_ID||a.active!==true||a.consumed!==false||a.allowedExecutions!==1||a.phase!=='STATIC_PREFLIGHT')bad.push('freeze');
-          if(!f.bindingTenantDecision||f.bindingTenantDecision.expectedActiveInsurers!==26||f.bindingTenantDecision.futureDeactivation!=='MANUAL_WITH_REASON_ONLY')bad.push('tenant-decision');
+          if(r.applyPatchCommit!==parent||r.allowedExecutions!==1||r.atomicApply!==true)bad.push('binding');
+          if(r.projectId!==process.env.EXPECTED_FIREBASE_PROJECT_ID||r.tenantId!=='alianzas-soluciones'||r.expectedInsurers!==26||r.expectedActiveInsurers!==26)bad.push('target');
+          if(r.allowedFields.length!==1||r.allowedFields[0]!=='vinculada')bad.push('fields');
+          if(r.secrets!==true||r.firestoreRead!==true||r.vaultRead!==false||r.writes!==true||r.runtime!==false||r.browser!==false||r.deploy!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.reimport!==false)bad.push('capabilities');
+          if(r.staticRunId!==29980295976||r.staticArtifactId!==8552930666||r.staticArtifactDigest!=='sha256:cf1ae2fa0e638521b011cccc5cbfc3e473c7ebcc76cf790b1f40ad4b8ce81f8e')bad.push('static-evidence');
+          if(f.status!=='M1_ALL_26_INSURERS_ACTIVE_ATOMIC_APPLY_AUTHORIZED_ONCE'||a.authorizationId!==process.env.ORBIT360_REQUEST_ID||a.active!==true||a.consumed!==false||a.allowedExecutions!==1||a.expectedInsurers!==26||a.expectedActiveInsurers!==26||a.allowedFields.length!==1||a.allowedFields[0]!=='vinculada')bad.push('freeze');
           if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
-          const outDir='orbit360-platform/runtime-gate-crm-v20260716';fs.mkdirSync(outDir,{recursive:true});
-          fs.writeFileSync(`${outDir}/edit-mode-static-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,gateId:r.gateId,contractVersion:r.contractVersion,patchCommit:r.patchCommit,requestCommit:head,validationOnly:true,expectedInsurers:26,expectedActiveInsurers:26,manualDeactivationOnly:true,secrets:false,firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          const d='orbit360-platform/runtime-gate-crm-v20260716';fs.mkdirSync(d,{recursive:true});
+          fs.writeFileSync(`${d}/all-active-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,contractVersion:r.contractVersion,applyPatchCommit:r.applyPatchCommit,requestCommit:head,projectId:r.projectId,tenantId:r.tenantId,expectedInsurers:26,expectedActiveInsurers:26,allowedFields:['vinculada'],atomicApply:true,secrets:true,firestoreRead:true,vaultRead:false,writes:true,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
           NODE
 
-      - name: Validar sintaxis del patch
+      - name: Preflight vinculante antes de credenciales
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          node --check tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs
-          node --check orbit360-platform/core/client-insurer-edit-owner-v20260722.js
-          node --check orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js
-          node --check orbit360-platform/core/router-tenant-config-bootstrap.js
-          node --check orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js
-          node --check orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
+          node --check tools/orbit360-normalizar-aseguradoras-activas-ays-v20260722.mjs
           node --check orbit360-platform/tools/orbit360-m1-edit-mode-root-contract-v20260722.js
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" > orbit360-platform/runtime-gate-crm-v20260716/all-active-preflight.json
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="1.0.39" and .executionPhase=="LAB_DATA_CONTRACT_REPAIR_APPLY" and .canonicalOwnerScope=="overlay_replace" and .runtimeContractScope=="overlay_replace" and .capabilityProfile.secrets==true and .capabilityProfile.firestoreRead==true and .capabilityProfile.writes==true and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==false and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .sourceTransformed==false' orbit360-platform/runtime-gate-crm-v20260716/all-active-preflight.json >/dev/null
+          node orbit360-platform/tools/orbit360-m1-edit-mode-root-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/all-active-root-contract.json
+          jq -e '.status=="PASS" and .checksPassed==.checksTotal' orbit360-platform/runtime-gate-crm-v20260716/all-active-root-contract.json >/dev/null
 
-      - name: Ejecutar preflight canónico
+      - name: Resolver identidad LAB de aplicación
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" > orbit360-platform/runtime-gate-crm-v20260716/edit-mode-preflight.json
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="1.0.39" and .executionPhase=="STATIC_PREFLIGHT" and .canonicalOwnerScope=="overlay_replace" and .runtimeContractScope=="overlay_replace" and .capabilityProfile.secrets==false and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==false and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .sourceTransformed==false and .operationalWrites==0' orbit360-platform/runtime-gate-crm-v20260716/edit-mode-preflight.json >/dev/null
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-all-active-apply.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
 
-      - name: Validar contrato raíz de edición
+      - name: Instalar dependencia de aplicación
         shell: bash
         run: |
           set -euo pipefail
-          node orbit360-platform/tools/orbit360-m1-edit-mode-root-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/edit-mode-root-contract.json
-          jq -e '.status=="PASS" and .contractVersion=="1.0.39" and .checksPassed==.checksTotal and .firestoreRead==false and .operationalWrites==0 and .deploy==false' orbit360-platform/runtime-gate-crm-v20260716/edit-mode-root-contract.json >/dev/null
+          npm install --no-save --package-lock=false firebase-admin@13
+
+      - name: Dry-run interno de vinculada solamente
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-normalizar-aseguradoras-activas-ays-v20260722.mjs --dry-run
+          jq -e '.ok==true and .status=="DRY_RUN_READY" and .expectedInsurers==26 and .expectedActiveInsurers==26 and .before.total==26 and .before.nonTargetChanges==0 and .acceptance.onlyVinculadaChanges==true and .safety.allowedFields==["vinculada"] and .safety.vaultRead==false and .safety.reimport==false' orbit360-platform/runtime-gate-crm-v20260716/ays-insurers-active-dryrun-sanitized.json >/dev/null
+
+      - name: Aplicar transacción atómica y verificar
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-normalizar-aseguradoras-activas-ays-v20260722.mjs --apply
+          jq -e '.ok==true and (.status=="ALL_26_ACTIVE_APPLIED_AND_VERIFIED" or .status=="ALL_26_ALREADY_ACTIVE_AND_VERIFIED") and .expectedInsurers==26 and .expectedActiveInsurers==26 and .after.total==26 and .after.activeTrue==26 and .after.inactiveFalse==0 and .after.missingActiveField==0 and .after.remainingProposals==0 and .after.nonTargetChanges==0 and .rollbackExecuted==false and .safety.vaultRead==false and .safety.reimport==false and .safety.functionsDeploy==false and .safety.rulesDeploy==false and .safety.production==false' orbit360-platform/runtime-gate-crm-v20260716/ays-insurers-active-apply-sanitized.json >/dev/null
 
       - name: Cerrar evidencia sanitizada
         if: always()
@@ -96,9 +122,9 @@ jobs:
           node <<'NODE'
           const fs=require('fs'),d='orbit360-platform/runtime-gate-crm-v20260716';
           const read=n=>{try{return JSON.parse(fs.readFileSync(`${d}/${n}`,'utf8'))}catch{return null}};
-          const p=read('edit-mode-preflight.json'),c=read('edit-mode-root-contract.json');
-          const ok=!!(p&&p.status==='GO_GATE_CONTRACT'&&c&&c.status==='PASS'&&c.checksPassed===c.checksTotal);
-          fs.writeFileSync(`${d}/edit-mode-static-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-edit-mode-root-static-v1',generatedAt:new Date().toISOString(),ok,status:ok?'STATIC_PATCH_VALIDATED':'STATIC_PATCH_FAILED',contractVersion:'1.0.39',preflight:p&&p.status||'NOT_RUN',rootContract:c&&c.status||'NOT_RUN',checksPassed:c&&c.checksPassed||0,checksTotal:c&&c.checksTotal||0,expectedInsurers:26,expectedActiveInsurers:26,manualDeactivationOnly:true,secrets:false,firestoreRead:false,vaultRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          const p=read('all-active-preflight.json'),dry=read('ays-insurers-active-dryrun-sanitized.json'),app=read('ays-insurers-active-apply-sanitized.json');
+          const ok=!!(p&&p.status==='GO_GATE_CONTRACT'&&dry&&dry.status==='DRY_RUN_READY'&&app&&app.ok===true&&/^ALL_26_/.test(app.status)&&app.after&&app.after.activeTrue===26&&app.after.nonTargetChanges===0);
+          fs.writeFileSync(`${d}/all-active-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-all-26-insurers-active-v1',generatedAt:new Date().toISOString(),ok,status:ok?'ALL_26_ACTIVE_VERIFIED':'ALL_26_ACTIVE_APPLY_FAILED',contractVersion:'1.0.39',preflight:p&&p.status||'NOT_RUN',dryRun:dry&&dry.status||'NOT_RUN',apply:app&&app.status||'NOT_RUN',beforeInactive:dry&&dry.before&&dry.before.inactiveFalse,missingActiveField:dry&&dry.before&&dry.before.missingActiveField,changesApplied:app&&app.before&&app.before.proposedChanges,activeAfter:app&&app.after&&app.after.activeTrue,nonTargetChanges:app&&app.after&&app.after.nonTargetChanges,transactionCommitted:!!(app&&app.transactionCommitted),rollbackExecuted:!!(app&&app.rollbackExecuted),vaultRead:false,reimport:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,containsPII:false,containsSecrets:false},null,2)+'\n');
           if(!ok)process.exitCode=41;
           NODE
 
@@ -106,13 +132,15 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-edit-mode-root-static-${{ github.run_id }}
+          name: orbit360-m1-all-26-insurers-active-${{ github.run_id }}
           path: |
-            orbit360-platform/runtime-gate-crm-v20260716/edit-mode-static-request-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/all-active-request-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/edit-mode-preflight.json
-            orbit360-platform/runtime-gate-crm-v20260716/edit-mode-root-contract.json
-            orbit360-platform/runtime-gate-crm-v20260716/edit-mode-static-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/all-active-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/all-active-root-contract.json
+            orbit360-platform/runtime-gate-crm-v20260716/ays-insurers-active-dryrun-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/ays-insurers-active-apply-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/all-active-summary.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -122,6 +150,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          state=failure; description='M1 edit root static validation failed'
-          if [ -f orbit360-platform/runtime-gate-crm-v20260716/edit-mode-static-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/edit-mode-static-summary.json)" = true ]; then state=success; description='M1 edit root STATIC_PATCH_VALIDATED'; fi
-          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m1-edit-mode-root-static-v1"}')"
+          state=failure; description='A&S all insurers active apply failed'
+          if [ -f orbit360-platform/runtime-gate-crm-v20260716/all-active-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/all-active-summary.json)" = true ]; then state=success; description='A&S 26/26 insurers active verified'; fi
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m1-all-26-insurers-active-v1"}')"
+
+      - name: Limpiar identidad temporal
+        if: always()
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ]; then rm -f "${ORBIT360_TEMP_KEY_FILE}"; fi
+          rm -rf node_modules package-lock.json npm-shrinkwrap.json
