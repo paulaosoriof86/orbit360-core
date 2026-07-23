@@ -9,7 +9,7 @@ const ROOT = process.cwd();
 const GATE_ID = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
 const BASE_OVERLAY = 'tools/orbit360-gate-contract-overlay-v20260718.json';
 const LIFECYCLE_CONTRACT = 'tools/orbit360-validator-lifecycle-contract-v20260722.json';
-const ENGINE = 'tools/orbit360-validar-gate-contracts-engine-v20260717.mjs';
+const ENGINE = 'tools/orbit360-validar-gate-contracts-engine-v20260722.mjs';
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const CANONICAL_LIFECYCLE_COMPOSITION = 'direct-atomic-patch-validation-v1';
@@ -152,7 +152,7 @@ try {
   if (run.stderr) output.stderrSanitized = String(run.stderr).trim().slice(0, 2000);
 } catch (error) {
   output = {
-    schemaVersion: 'orbit360-gate-contract-preflight-v11-direct-atomic-validation',
+    schemaVersion: 'orbit360-gate-contract-preflight-v12-overlay-scope-entrypoint',
     gateId: GATE_ID,
     contractVersion: '1.0.38',
     status: 'VALIDATOR_STALE',
@@ -161,6 +161,7 @@ try {
     failedCheckIds: ['CANONICAL_PREFLIGHT_ENTRYPOINT'],
     error: String(error && error.message || error),
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
+    canonicalEngine: ENGINE,
     engineEvidenceSource: ENGINE_EVIDENCE_USED,
     engineStdoutParsed: false,
     sourceTransformed: false,
