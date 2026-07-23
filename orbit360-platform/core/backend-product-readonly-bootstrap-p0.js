@@ -208,9 +208,10 @@
         'derive_tenant_from_membership',
         'canonicalize_roles_and_scopes',
         'compile_tenant_scoped_queries',
-        'install_product_readonly_store',
+        'create_product_readonly_store',
         'attach_allowed_snapshots',
         'wait_store_ready_read_only',
+        'install_product_readonly_store',
         'emit_sanitized_readiness'
       ]
     };
@@ -226,7 +227,7 @@
       runtimeAuthorized: options.runtimeAuthorized
     });
     var state = createState();
-    var storeInstalled = false;
+    var store = null;
     var snapshotsAttached = false;
     state.collections = plan.collections.slice();
     if (!plan.ok || options.runtimeAuthorized !== true) {
@@ -258,7 +259,7 @@
       var storeDeps = typeof deps.firebaseAdapter.storeDependencies === 'function'
         ? deps.firebaseAdapter.storeDependencies(firebaseContext)
         : { db: firebaseContext && firebaseContext.db };
-      var store = window.Orbit.createFirestoreProductReadOnlyStoreP0(storeDeps, {
+      store = window.Orbit.createFirestoreProductReadOnlyStoreP0(storeDeps, {
         tenantId: tenantId,
         collections: plan.collections,
         queryPlanner: queryPlanner,
@@ -278,14 +279,15 @@
       });
       if (!readiness.ok) throw new Error('product_readiness_blocked:' + readiness.errors.join('|'));
 
-      transition(state, 'installing');
-      window.Orbit.store = store;
-      storeInstalled = true;
-      installAuthProjection(projection);
+      transition(state, 'attaching');
       snapshotsAttached = store._attachSnapshots() !== false;
       if (!snapshotsAttached) throw new Error('snapshots_no_adjuntos');
       transition(state, 'waiting-snapshots', { ready: false, errors: [] });
       await waitForStoreReady(store, options.snapshotTimeoutMs);
+
+      transition(state, 'installing');
+      window.Orbit.store = store;
+      installAuthProjection(projection);
       transition(state, 'ready-read-only', { ready: true, errors: [] });
       return {
         ok: true,
@@ -298,9 +300,12 @@
         writeAuthorized: false
       };
     } catch (error) {
+      if (store && typeof store._detachSnapshots === 'function') {
+        try { store._detachSnapshots(); } catch (detachError) {}
+      }
       state.errors = unique(state.errors.concat([String(error && (error.message || error) || error)]));
       transition(state, 'blocked', { ready: false });
-      return { ok: false, ready: false, plan: plan, status: sanitizeState(state), storeInstalled: storeInstalled, snapshotsAttached: snapshotsAttached, writeAuthorized: false };
+      return { ok: false, ready: false, plan: plan, status: sanitizeState(state), storeInstalled: false, snapshotsAttached: false, writeAuthorized: false };
     }
   }
 
