@@ -1,100 +1,101 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v8-hosting-delivery-recovery",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v9-operational-directory-repair-dryrun",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "gateContractVersion": "1.0.37",
-  "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
-  "controlPlaneRevision": "phase-capability-immutable-request-v2",
-  "methodologicalDecisionId": "paula-20260722-visualization-before-m2",
+  "gateContractVersion": "1.0.38",
+  "validatorLifecycleRevision": "operational-directory-field-classification-v1",
+  "controlPlaneRevision": "phase-capability-immutable-request-v3",
+  "methodologicalDecisionId": "paula-20260722-operational-directory-root-repair",
   "classification": [
-    "PIPELINE_MECHANISM_FAILURE"
+    "DATA_CONTRACT_FAILURE",
+    "FUNCTIONAL_DEFECT",
+    "VALIDATOR_STALE"
   ],
-  "staticPreflightV2": {
-    "status": "PASS",
-    "runId": 29962814208,
-    "artifactId": 8546643930,
-    "artifactDigest": "sha256:0bf8160846d1f6eef7e9be5f1e54d632cfd6468a98fe3e8f9a7f3493dd83568f",
-    "executionHead": "61c235735ebd5ffd68acfe2e7314e2cad86dd5a7",
-    "gateContractStatus": "GO_GATE_CONTRACT",
-    "visualChecks": "29_OF_29",
-    "visualValidatorRevision": "responsive-token-set-v1",
-    "architectureStatus": "GO_STATIC_ARCHITECTURE",
-    "finalGateRerun": false
-  },
-  "hostingDeliveryV1": {
-    "status": "FAILED_PIPELINE_MECHANISM",
-    "runId": 29963097060,
-    "artifactId": 8546764883,
-    "artifactDigest": "sha256:8e64664d442ecaf58159175b3d28b3ce5a7a0af8355f61257ff29ddb002666a9",
-    "executionHead": "6eadc942e92b82440806605be0a7bc31455843ca",
-    "preflightStatus": "GO_GATE_CONTRACT",
-    "preflightChecks": "1356_OF_1356",
-    "identityStatus": "PASS",
-    "localIntegrityStatus": "PASS",
-    "failedStage": "publish_frontend_and_resolve_url_combined",
-    "rootCause": "The workflow combined Firebase deployment, URL extraction and build verification in one opaque step and did not persist the Firebase command output. The failure therefore could not distinguish an actual deploy failure from a successful deploy followed by URL-resolution failure.",
-    "productRegression": false,
-    "dataChanged": false
-  },
-  "replacementMechanism": {
-    "revision": "inspect-reuse-deploy-resolve-v1",
-    "steps": [
-      "inspect existing channel read-only",
-      "reuse an already published matching build",
-      "deploy only when matching build is absent",
-      "persist Firebase command exit code and sanitized stderr",
-      "resolve URL from deploy JSON with channel-list fallback",
-      "verify runtime-build and exact remote critical assets"
+  "humanVisualEvidence": {
+    "status": "FAILED_FUNCTIONAL_DEFECT",
+    "reportedAt": "2026-07-22",
+    "observations": [
+      "bank account numbers remain masked or display Cuenta protegida",
+      "temporary bank reveal returns No fue posible recuperar el dato",
+      "bank copy depends on failed reveal",
+      "portal username is replaced by Usuario pendiente de registrar",
+      "password temporary reveal works"
     ]
   },
-  "invariantsForHostingDelivery": {
-    "m1Closed": false,
-    "finalGateRerunBlocked": true,
-    "secretsAllowed": true,
-    "secretPurpose": "firebase_hosting_lab_auth_only",
-    "firestoreReadAllowed": false,
-    "writesAllowed": false,
-    "runtimeAllowed": false,
-    "browserAllowed": false,
-    "deployAllowed": true,
-    "deploymentScope": "hosting_channel_only",
-    "functionsDeployAllowed": false,
-    "rulesDeployAllowed": false,
-    "productionAllowed": false
+  "rootCause": {
+    "canonicalPolicy": "Portal username and insurer bank account number are operational directory fields. Password is the only secret in this scope.",
+    "regression": "A later security contract moved 91 bank numbers and portal usernames out of the operational directory, deleted numero/accountNumber and username fields, required accountRef/credentialRef for display, and trained validators to accept that behavior.",
+    "runtimeMismatch": "Sixty-eight restored account references point from current rows to vault records that retain historical account IDs; the callable requires exact accountId equality and rejects valid references.",
+    "validatorFailure": "The visual contract passed because it required temporary bank reveal and the Cuenta protegida model instead of the canonical operational-directory policy."
+  },
+  "preservedEvidence": {
+    "historicalTechnicalGateRunId": 29925156385,
+    "staticPreflightV2RunId": 29962814208,
+    "hostingVisualizationRunId": 29963445655,
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "bankVaultRecords": 91,
+    "bankPending": 2,
+    "finalTechnicalGateRerun": false
+  },
+  "executionProfile": {
+    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "workflowLocks": {
+      "branch": true,
+      "firebaseProject": true,
+      "hostingChannel": false
+    },
+    "requestModel": "immutable-request-bound-to-parent-head-and-run-attempt-v1"
   },
   "canonicalIntegration": {
     "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "engine": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
-    "baseOverlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
-    "compositionMechanism": "canonical-entrypoint-temp-mirror-v1",
-    "executionRequestModel": "immutable-request-bound-to-parent-head-and-run-attempt-v1",
-    "phase": "LAB_HOSTING_DELIVERY",
-    "finalTechnicalGateRerun": false,
-    "nextHumanAction": "VISUAL_REVIEW_BEFORE_M2"
+    "phaseAlignment": "tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs",
+    "codeRepair": "tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
+    "dataRepair": "tools/orbit360-restituir-directorio-operativo-v20260722.mjs",
+    "bindingAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "operationalWrites": 0,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false,
+    "reimport": false
   },
   "canonicalOverlayPatch": {
     "schemaVersion": "orbit360-gate-contract-overlay-v1",
     "issuedAt": "2026-07-22",
     "gateId": "block1-client360-insurers-lab-v20260717",
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "diagnosticRevision": "hosting-inspect-reuse-deploy-resolve-v1",
-    "contractRevision": "1.0.37-hosting-inspect-reuse-deploy-resolve-v1",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "diagnosticRevision": "operational-directory-field-classification-v1",
+    "contractRevision": "1.0.38-operational-directory-repair-dryrun-v1",
     "gatePatch": {
-      "contractVersion": "1.0.37",
-      "diagnosticRevision": "hosting-inspect-reuse-deploy-resolve-v1",
-      "status": "HOSTING_DELIVERY_V1_PIPELINE_MECHANISM_FAILURE_RETRY_AUTHORIZED",
+      "contractVersion": "1.0.38",
+      "diagnosticRevision": "operational-directory-field-classification-v1",
+      "status": "OPERATIONAL_DIRECTORY_REPAIR_DRYRUN_AUTHORIZED",
       "executionProfile": {
-        "phase": "LAB_HOSTING_DELIVERY",
+        "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
         "capabilities": {
           "secrets": true,
-          "firestoreRead": false,
+          "firestoreRead": true,
           "writes": false,
           "runtime": false,
           "browser": false,
-          "deploy": true,
+          "deploy": false,
           "functionsDeploy": false,
           "rulesDeploy": false,
           "production": false
@@ -102,25 +103,32 @@
         "workflowLocks": {
           "branch": true,
           "firebaseProject": true,
-          "hostingChannel": true
+          "hostingChannel": false
         },
         "requestModel": "immutable-request-bound-to-parent-head-and-run-attempt-v1"
       },
-      "diagnosticRule": "Inspect the Hosting LAB channel before deploying. If the prior attempt already published the exact frontend build, reuse its URL and do not deploy again. Otherwise execute one Hosting-only deploy while preserving command exit code and sanitized diagnostics, then resolve the URL from deploy output or channel-list fallback.",
-      "acceptancePolicy": "Accept only GO_GATE_CONTRACT in LAB_HOSTING_DELIVERY, verified static evidence, zero functional drift, a matching runtime-build, exact remote critical assets and a sanitized preview URL."
+      "diagnosticRule": "Restore canonical field classification before any write: usernames and bank account numbers are operational; passwords remain secret. Run one sanitized dry-run against current Firestore and the existing vault. Do not reimport, deploy, open a browser or write data.",
+      "acceptancePolicy": "Accept only GO_GATE_CONTRACT in LAB_DATA_CONTRACT_REPAIR_DRYRUN, successful exact code transformation, 414/26/7 preserved, 91 bank references matched to vault, two pending accounts preserved, zero unmatched credential references, zero passwords in operational storage, a sanitized proposed-change count and zero writes."
     },
     "effectiveOwnerReconciliation": {
-      "baselineOverlayContract": "1.0.37-targeted-hosting-delivery-before-m2-v1",
-      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "baselineContract": "1.0.37-visual-review",
+      "classification": "DATA_CONTRACT_FAILURE",
+      "productOwnersChanged": [
+        "clientInsurerVisualContract",
+        "insurerDirectoryImport",
+        "insurerSecureTargetBridge",
+        "insurerCredentialProvider",
+        "insurerBankAccountProvider"
+      ],
+      "academyChanged": true,
       "validatorChanged": true,
       "workflowChanged": true,
-      "productOwnersChanged": [],
-      "academyChanged": false,
       "dataChanged": false,
       "storeChanged": false,
       "authChanged": false,
       "vaultChanged": false,
-      "importersChanged": false,
+      "functionsChanged": false,
+      "rulesChanged": false,
       "writesExecuted": false,
       "runtimeExecuted": false,
       "browserExecuted": false,
@@ -131,107 +139,105 @@
         "id": "m1VisualIntegrityAcademy",
         "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
         "requiredTokens": [
-          "contentVersion:'1.228'",
-          "_m1visualv:1228",
+          "contentVersion:'1.229'",
+          "_m1visualv:1229",
           "El usuario del portal permanece visible",
+          "número completo",
           "El campo Uso no se muestra ni se copia",
-          "Instalar como app",
-          "visualSemanticsRemediation:true",
-          "validatorLifecyclePhaseAware:true"
+          "operationalDirectorySemantics:true"
         ]
       },
       {
         "id": "m1VisualRemediationContract",
         "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
         "requiredTokens": [
-          "contractVersion: '1.0.37'",
-          "validatorSemanticRevision: 'responsive-token-set-v1'",
-          "BANK_COPY_EXCLUDES_USE",
-          "ACADEMY_CONTENT_1228",
-          "runtimeExecuted: false",
-          "browserExecuted: false",
-          "deployExecuted: false"
+          "contractVersion: '1.0.38'",
+          "operational-directory-field-classification-v1",
+          "BANK_NUMBER_OPERATIONAL_VISIBLE",
+          "BANK_NO_TEMPORARY_REVEAL",
+          "BANK_COPY_EXACT_FIELDS",
+          "ACADEMY_CONTENT_1229"
+        ]
+      },
+      {
+        "id": "operationalDirectoryRepair",
+        "path": "tools/orbit360-restituir-directorio-operativo-v20260722.mjs",
+        "requiredTokens": [
+          "LAB_DATA_CONTRACT_REPAIR",
+          "DRY_RUN_READY",
+          "APPLIED_AND_VERIFIED",
+          "accountIdMismatchExplainsRevealFailure",
+          "passwordWrites: 0",
+          "rollbackAvailable"
         ]
       }
     ],
     "requiredFiles": [
       "tools/orbit360-validator-lifecycle-contract-v20260722.json",
       "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
-      "tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
-      "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
-      "firebase.json",
-      "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTROL-PLANE-GATES-INMUTABLES-ORBIT360-AYS-20260722.md",
-      "orbit360-platform/docs/evidence/post-recovery-inventory-29868538689-sanitized.json"
+      "tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs",
+      "tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
+      "tools/orbit360-restituir-directorio-operativo-v20260722.mjs",
+      "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md"
     ],
     "runtimeVersionContracts": [
-      {
-        "path": "orbit360-platform/data/academia-v1221-m1-visual-integrity.js",
-        "replaceRequiredTokens": true,
-        "requiredTokens": [
-          "contentVersion:'1.228'",
-          "_m1visualv:1228",
-          "El usuario del portal permanece visible",
-          "El campo Uso no se muestra ni se copia",
-          "Instalar como app",
-          "visualSemanticsRemediation:true",
-          "validatorLifecyclePhaseAware:true"
-        ]
-      },
-      {
-        "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
-        "replaceRequiredTokens": true,
-        "requiredTokens": [
-          "contractVersion: '1.0.37'",
-          "validatorSemanticRevision: 'responsive-token-set-v1'",
-          "BANK_COPY_EXCLUDES_USE",
-          "ACADEMY_CONTENT_1228",
-          "runtimeExecuted: false",
-          "browserExecuted: false",
-          "deployExecuted: false"
-        ]
-      },
-      {
-        "path": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-        "replaceRequiredTokens": true,
-        "requiredTokens": [
-          "CANONICAL_LIFECYCLE_COMPOSITION = 'phase-aware-static-authorization-v2'",
-          "canonicalOverlayPatch",
-          "orbit360-validar-gate-contracts-engine-v20260717.mjs",
-          "ENGINE_EVIDENCE_USED = 'sync-file-evidence-not-stdout-v1'",
-          "engineStdoutParsed: false"
-        ]
-      },
       {
         "path": "tools/orbit360-validar-gate-contracts-engine-v20260717.mjs",
         "replaceRequiredTokens": true,
         "requiredTokens": [
-          "LAB_HOSTING_DELIVERY",
-          "HOSTING_CAPABILITY",
-          "HOSTING_PROJECT_LOCK_ENABLED",
-          "HOSTING_CHANNEL_LOCK_ENABLED",
-          "WORKFLOW_PROJECT_LOCK",
-          "WORKFLOW_CHANNEL_LOCK",
+          "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+          "LAB_DATA_CONTRACT_REPAIR_APPLY",
+          "DATA_REPAIR_DRYRUN_CAPABILITY",
+          "DATA_REPAIR_APPLY_CAPABILITY",
           "GO_GATE_CONTRACT"
+        ]
+      },
+      {
+        "path": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+        "replaceRequiredTokens": true,
+        "requiredTokens": [
+          "visualRemediationRevision:'20260722.2'",
+          "data-m1-credential-user",
+          "data-m1-credential-secret",
+          "data-m1-bank-number",
+          "bankNumbersOperationalVisible:true",
+          "bankRevealDependency:false",
+          "bankCopyDirect:true",
+          "bankCopyExcludesUse:true",
+          "bankHolderFallbackInsurer:true"
+        ]
+      },
+      {
+        "path": "orbit360-platform/core/insurer-directory-import-v1202.js",
+        "replaceRequiredTokens": true,
+        "requiredTokens": [
+          "usuario: user",
+          "numero: accountValue",
+          "delete p.password",
+          "delete p.contrasena"
+        ]
+      },
+      {
+        "path": "orbit360-platform/core/insurer-secure-target-bridge-v20260720.js",
+        "replaceRequiredTokens": true,
+        "requiredTokens": [
+          "operationalDirectoryWritesOwnedByImporter: true",
+          "operationalFields: ['usuario','numero']",
+          "protectedFields: ['password','contrasena']",
+          "providerReturnsMappingsOnly: true"
         ]
       },
       {
         "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
         "replaceRequiredTokens": true,
         "requiredTokens": [
-          "ORBIT360_GATE_PHASE: lab_hosting_delivery",
-          "ORBIT360_REQUEST_FILE: tools/orbit360-m1-hosting-delivery-request-v2-20260722.json",
-          "EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab",
-          "ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab",
-          "previousAttempt.runId",
-          "hosting:channel:list",
-          "hosting-channel-inspection-sanitized.json",
-          "firebase-hosting-command-sanitized.json",
-          "firebase-hosting-error-sanitized.txt",
-          "hosting:channel:deploy",
-          "ORBIT360_REUSED_EXISTING",
-          "reusedExistingDeployment",
-          "targeted_lab_frontend_visual_review_only",
-          "node tools/orbit360-verificar-integridad-script-hosting-v20260721.mjs",
+          "ORBIT360_GATE_PHASE: lab_data_contract_repair_dryrun",
+          "tools/orbit360-m1-operational-directory-repair-dryrun-request-v20260722.json",
+          "node tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs",
+          "node tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
+          "node tools/orbit360-validar-gate-contracts-v20260717.mjs",
+          "node tools/orbit360-restituir-directorio-operativo-v20260722.mjs --dry-run",
+          "writesExecuted == false",
           "functionsDeployed:false",
           "rulesDeployed:false",
           "productionTouched:false"
@@ -239,12 +245,6 @@
       }
     ]
   },
-  "productOwnerChanged": false,
-  "dataChanged": false,
-  "storeChanged": false,
-  "authChanged": false,
-  "vaultChanged": false,
-  "importersChanged": false,
   "containsPII": false,
   "containsSecrets": false
 }
