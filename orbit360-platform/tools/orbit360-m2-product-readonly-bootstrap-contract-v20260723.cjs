@@ -99,6 +99,7 @@ check('M2_ENGINE_STATIC_ONLY', has(files.engine, 'STATIC_PREFLIGHT') && has(file
 check('WORKFLOW_VALIDATION_ONLY', has(files.workflow, 'VALIDATION_ONLY') && has(files.workflow, 'block2-product-readonly-bootstrap-v20260723'), files.workflow);
 check('WORKFLOW_NO_REPOSITORY_WRITE', lacks(files.workflow, 'git commit') && lacks(files.workflow, 'git push'), files.workflow);
 check('WORKFLOW_NO_EXTERNAL_CAPABILITIES', lacks(files.workflow, 'secrets.') && lacks(files.workflow, 'GOOGLE_APPLICATION_CREDENTIALS') && lacks(files.workflow, 'firebase deploy') && lacks(files.workflow, 'hosting:channel:deploy') && lacks(files.workflow, 'gcloud ') && lacks(files.workflow, 'firebase-admin') && lacks(files.workflow, 'getFirestore(') && lacks(files.workflow, 'playwright'), files.workflow);
+check('WORKFLOW_OBSERVABLE_STATUS', has(files.workflow, 'statuses: write') && has(files.workflow, 'orbit360/m2-product-readonly-static-v2') && has(files.workflow, 'Publicar estado observable sanitizado'), files.workflow);
 check('WORKFLOW_RUNS_CANONICAL_PREFLIGHT', has(files.workflow, 'orbit360-validar-gate-contracts-v20260717.mjs') && has(files.workflow, 'GO_GATE_CONTRACT'), files.workflow);
 check('WORKFLOW_RUNS_ROOT_CONTRACT', has(files.workflow, 'orbit360-m2-product-readonly-bootstrap-contract-v20260723.cjs') && has(files.workflow, 'M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS'), files.workflow);
 
