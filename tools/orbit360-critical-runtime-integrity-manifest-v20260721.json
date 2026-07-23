@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-critical-runtime-integrity-manifest-v1",
+  "schemaVersion": "orbit360-critical-runtime-integrity-manifest-v2-operational-directory",
   "issuedAt": "2026-07-22",
-  "releaseId": "block1-critical-runtime-20260721-4",
+  "releaseId": "block1-critical-runtime-20260722-6",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "contractVersion": "1.0.37",
+  "contractVersion": "1.0.38",
   "assets": [
     {
       "id": "index",
@@ -22,6 +22,14 @@
       "ownerClosureRequired": true
     },
     {
+      "id": "operationalDirectoryFieldPolicy",
+      "localPath": "orbit360-platform/core/operational-directory-field-policy-v20260722.js",
+      "publicPath": "/core/operational-directory-field-policy-v20260722.js",
+      "kind": "script",
+      "syntaxRequired": true,
+      "ownerClosureRequired": true
+    },
+    {
       "id": "clientInsurerVisualStabilityBarrier",
       "localPath": "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
       "publicPath": "/core/client-insurer-visual-stability-barrier-v20260721.js",
@@ -33,6 +41,22 @@
       "id": "clientInsurerVisualContract",
       "localPath": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
       "publicPath": "/core/client-insurer-visual-contract-v20260720.js",
+      "kind": "script",
+      "syntaxRequired": true,
+      "ownerClosureRequired": true
+    },
+    {
+      "id": "clientInsurerOperationalDirectoryOwner",
+      "localPath": "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+      "publicPath": "/core/client-insurer-operational-directory-owner-v20260722.js",
+      "kind": "script",
+      "syntaxRequired": true,
+      "ownerClosureRequired": true
+    },
+    {
+      "id": "operationalDirectoryAcademy",
+      "localPath": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+      "publicPath": "/data/academia-v1230-operational-directory-v20260722.js",
       "kind": "script",
       "syntaxRequired": true,
       "ownerClosureRequired": true
@@ -83,9 +107,15 @@
     "allRequiredScriptsSyntaxOk": true,
     "allRemoteBytesAndSha256Exact": true,
     "browserAllowedOnlyAfterExactMatch": true,
-    "visualRemediationStaticContractRequired": true
+    "visualRemediationStaticContractRequired": true,
+    "operationalDirectoryContractRequired": true,
+    "usernameOperational": true,
+    "bankNumberOperational": true,
+    "passwordProtectedOnly": true
   },
   "writesExecuted": false,
+  "dataAccess": false,
+  "secretAccess": false,
   "runtimeExecuted": false,
   "browserExecuted": false,
   "deployExecuted": false,
