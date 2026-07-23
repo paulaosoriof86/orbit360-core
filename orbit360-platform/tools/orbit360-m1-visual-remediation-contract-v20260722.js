@@ -20,6 +20,9 @@ const freeze = readJsonRepo('tools/orbit360-incident-freeze-v20260721.json');
 const overlay = readJsonRepo('tools/orbit360-gate-contract-overlay-v20260718.json');
 const manifest = readJsonRepo('tools/orbit360-critical-runtime-integrity-manifest-v20260721.json');
 const workflow = readRepo('.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml');
+const phase = String(process.env.ORBIT360_GATE_PHASE || (overlay.gatePatch && overlay.gatePatch.executionProfile && overlay.gatePatch.executionProfile.phase) || '').toUpperCase();
+const isDryRun = phase === 'LAB_DATA_CONTRACT_REPAIR_DRYRUN';
+const isApply = phase === 'LAB_DATA_CONTRACT_REPAIR_APPLY';
 
 check('VISUAL_BASE_PRESENT', visualBase.includes("version:'20260720.2'") && visualBase.includes('credentialSecretSeparateReveal:true'), 'legacy visual base preserved');
 check('OPERATIONAL_OWNER_VERSION', operationalOwner.includes("var VERSION = '20260722.1'"), 'operational owner revision');
@@ -54,20 +57,25 @@ check('ACADEMY_RESPONSIVE_ROLES', ['Dirección','Operativo','Asesor'].every(toke
 
 const blocked = Array.isArray(freeze.blockedActions) ? freeze.blockedActions : [];
 check('FREEZE_M1_OPEN', freeze.stateClarification && freeze.stateClarification.m1Closed === false && freeze.stateClarification.m2Authorized === false, freeze.status || 'missing');
-check('FREEZE_BLOCKS_DATA_RUNTIME_DEPLOY', blocked.includes('read_firestore_operational_data') && blocked.includes('read_existing_insurer_vault') && blocked.includes('run_runtime') && blocked.includes('open_browser') && blocked.includes('deploy_hosting_lab'), freeze.status || 'missing');
+check('FREEZE_BLOCKS_WRITES_RUNTIME_DEPLOY', blocked.includes('write_firestore_operational_data') && blocked.includes('write_secret_manager') && blocked.includes('run_runtime') && blocked.includes('open_browser') && blocked.includes('deploy_hosting_lab'), freeze.status || 'missing');
+if (isDryRun) check('FREEZE_ALLOWS_READ_ONLY_DRYRUN', freeze.stateClarification && freeze.stateClarification.operationalDirectoryDryRun === 'AUTHORIZED_ONCE' && freeze.stateClarification.operationalDirectoryApply === 'NOT_AUTHORIZED', freeze.status || 'missing');
+if (isApply) check('FREEZE_ALLOWS_ATOMIC_APPLY', freeze.stateClarification && freeze.stateClarification.operationalDirectoryApply === 'AUTHORIZED_ONCE', freeze.status || 'missing');
 check('OVERLAY_1038', overlay.gatePatch && overlay.gatePatch.contractVersion === '1.0.38' && String(overlay.contractRevision || '').startsWith('1.0.38'), overlay.contractRevision || 'missing');
 check('OVERLAY_SCOPE_REPLACEMENT', overlay.replaceCanonicalOwners === true && overlay.replaceRuntimeVersionContracts === true, overlay.diagnosticRevision || 'missing');
 check('MANIFEST_1038', manifest.contractVersion === '1.0.38' && manifest.releaseId === 'block1-critical-runtime-20260722-6', `${manifest.contractVersion}:${manifest.releaseId}`);
 check('MANIFEST_OPERATIONAL_ASSETS', ['operationalDirectoryFieldPolicy','clientInsurerOperationalDirectoryOwner','operationalDirectoryAcademy'].every(id => (manifest.assets || []).some(asset => asset.id === id)), 'new assets included');
-check('WORKFLOW_VALIDATION_ONLY', workflow.includes('VALIDATION_ONLY') && !workflow.includes('git commit') && !workflow.includes('git push'), 'workflow immutable');
+check('WORKFLOW_IMMUTABLE', !workflow.includes('git commit') && !workflow.includes('git push') && !workflow.includes('contents: write'), 'workflow immutable');
+if (isDryRun) check('WORKFLOW_READ_ONLY_DRYRUN', workflow.includes('READ_ONLY_DRY_RUN') && workflow.includes('--dry-run') && !workflow.includes('--apply'), phase);
+if (!isDryRun && !isApply) check('WORKFLOW_VALIDATION_ONLY', workflow.includes('VALIDATION_ONLY'), phase || 'STATIC');
 
 const failed = checks.filter(item => !item.ok);
 const result = {
-  schemaVersion: 'orbit360-m1-visual-remediation-contract-v2-operational-directory',
+  schemaVersion: 'orbit360-m1-visual-remediation-contract-v3-phase-aware',
   contractVersion: '1.0.38',
-  revision: '20260722.2',
+  revision: '20260722.3',
+  executionPhase: phase,
   validatorSemanticRevision: 'responsive-plus-operational-directory-v1',
-  validatorLifecycleRevision: 'overlay-scope-replacement-v1',
+  validatorLifecycleRevision: 'phase-capability-contract-v1',
   classification: 'DATA_CONTRACT_FAILURE',
   total: checks.length,
   passed: checks.length - failed.length,
@@ -75,8 +83,8 @@ const result = {
   status: failed.length ? 'FAIL' : 'PASS',
   checks,
   writes: 0,
-  dataAccess: false,
-  secretAccess: false,
+  validatorDataAccess: false,
+  validatorSecretAccess: false,
   runtimeExecuted: false,
   browserExecuted: false,
   deployExecuted: false,
