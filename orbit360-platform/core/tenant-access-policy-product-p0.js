@@ -73,9 +73,19 @@
 
   function canWrite(collection, action, record, patch, membership, context) {
     var owner = base();
-    if (!owner || typeof owner.canWrite !== 'function') return unavailable();
-    var decision = owner.canWrite(collection, action, record, patch, canonicalMembership(membership), context);
-    return Object.assign({}, decision, { writeAuthorized: false, productReadOnlyBootstrap: true });
+    var baseDecision = owner && typeof owner.canWrite === 'function'
+      ? owner.canWrite(collection, action, record, patch, canonicalMembership(membership), context)
+      : unavailable();
+    return {
+      ok: false,
+      allowed: false,
+      writeAuthorized: false,
+      code: 'readonly_write_blocked',
+      productReadOnlyBootstrap: true,
+      requestedCollection: String(collection || ''),
+      requestedAction: String(action || ''),
+      baseDecision: Object.assign({}, baseDecision, { writeAuthorized: false })
+    };
   }
 
   function queryConstraints(collection, membership, context) {
@@ -112,6 +122,7 @@
     validateAdvisorManagement: delegate('validateAdvisorManagement'),
     tenantSource: 'membership_only',
     crossTenantDenied: true,
-    writesAuthorized: false
+    writesAuthorized: false,
+    writeDecision: 'readonly_write_blocked'
   });
 })();
