@@ -26,6 +26,7 @@ function check(id, ok) { checks.push({ id, ok: Boolean(ok) }); }
 
 check('PREVIEW_BUILD_20260723_10', preview.includes("SW_BUILD = '20260723-10'"));
 check('PREVIEW_REDIRECT_BLOCKED_WITHOUT_CSS', preview.includes('redirectBlockedWithoutCss: true') && preview.includes("state.status = 'css-blocked'"));
+check('PREVIEW_REQUIRES_EXPECTED_WORKER_BUILD', preview.includes('controllerHasExpectedBuild') && preview.includes('SERVICE_WORKER_BUILD_NOT_CONTROLLING') && preview.includes('workerBuildReady: false') && preview.includes('state.workerBuildReady === true'));
 check('PREVIEW_VALIDATES_CSS_MIME', preview.includes("type.indexOf('text/css') < 0") && preview.includes('CSS_MIME_INVALID'));
 check('PREVIEW_VALIDATES_CSS_BODY', preview.includes('CSS_EMPTY') && preview.includes('text.trim().length < 32'));
 check('PREVIEW_RETRIES_AUTOMATICALLY', preview.includes('MAX_STYLE_ATTEMPTS = 3') && preview.includes('location.reload()'));
@@ -34,7 +35,7 @@ stylePaths.forEach(function (style) {
 });
 
 check('SW_BUILD_20260723_10', sw.includes("BUILD = '20260723-10'") && sw.includes("CACHE = 'orbit360-v20260723-10-css-delivery'"));
-check('SW_ESSENTIAL_STYLE_LIST', sw.includes('ESSENTIAL_STYLE_PATHS') && stylePaths.every(function (style) { return sw.includes("/" + style); }));
+check('SW_ESSENTIAL_STYLE_LIST', sw.includes('ESSENTIAL_STYLE_PATHS') && stylePaths.every(function (style) { return sw.includes('/' + style); }));
 check('SW_INSTALL_PRECACHES_STYLES', sw.includes('RUNTIME_CONTRACT_PATHS.concat(ESSENTIAL_STYLE_PATHS)'));
 check('SW_REJECTS_BAD_CSS_MIME', sw.includes("indexOf('text/css') >= 0") && sw.includes('UNUSABLE_RESPONSE'));
 check('SW_CANONICAL_FALLBACK', sw.includes('cache.match(canonicalRequest(pathname))') && sw.includes('ignoreSearch: true'));
@@ -42,7 +43,7 @@ check('PWA_BUILD_ALIGNED', pwa.includes("RUNTIME_BUILD = '20260723-10'") && pwa.
 check('FIREBASE_CSS_NO_STORE', firebase.includes('"source": "**/*.css"') && firebase.includes('"value": "no-store, max-age=0"'));
 check('FIREBASE_CSS_NOSNIFF', firebase.includes('"key": "X-Content-Type-Options"') && firebase.includes('"value": "nosniff"'));
 check('WORKFLOW_CHECKS_ESSENTIAL_CSS', stylePaths.every(function (style) { return workflow.includes("'" + style + "'") || workflow.includes('"' + style + '"'); }));
-check('WORKFLOW_CHECKS_REMOTE_MIME', workflow.includes('contentTypeOk') && workflow.includes("text/css"));
+check('WORKFLOW_CHECKS_REMOTE_MIME', workflow.includes('contentTypeOk') && workflow.includes('text/css'));
 check('WORKFLOW_REQUIRES_ALL_CSS', workflow.includes('essentialCssVerified') && workflow.includes('HOSTING_CSS_DELIVERED_AND_VERIFIED'));
 
 const failed = checks.filter(x => !x.ok);
