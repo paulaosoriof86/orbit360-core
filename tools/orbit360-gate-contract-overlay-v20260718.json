@@ -3,17 +3,17 @@
   "issuedAt": "2026-07-22",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": "DATA_CONTRACT_FAILURE",
-  "diagnosticRevision": "operational-directory-target-field-dryrun-v1",
-  "contractRevision": "1.0.38-operational-directory-target-field-dryrun-v1",
+  "diagnosticRevision": "operational-directory-target-field-atomic-apply-v1",
+  "contractRevision": "1.0.38-operational-directory-target-field-atomic-apply-v1",
   "replaceCanonicalOwners": true,
   "replaceRequiredFiles": true,
   "replaceRuntimeVersionContracts": true,
   "gatePatch": {
     "contractVersion": "1.0.38",
-    "diagnosticRevision": "operational-directory-target-field-dryrun-v1",
-    "runtimeVersion": "20260722-10",
+    "diagnosticRevision": "operational-directory-target-field-atomic-apply-v1",
+    "runtimeVersion": "20260722-11",
     "block": 1,
-    "status": "OPERATIONAL_DIRECTORY_READ_ONLY_DRYRUN_AUTHORIZED",
+    "status": "OPERATIONAL_DIRECTORY_ATOMIC_APPLY_AUTHORIZED",
     "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
     "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
@@ -23,11 +23,11 @@
       "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js"
     ],
     "executionProfile": {
-      "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+      "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
       "capabilities": {
         "secrets": true,
         "firestoreRead": true,
-        "writes": false,
+        "writes": true,
         "runtime": false,
         "browser": false,
         "deploy": false,
@@ -40,10 +40,10 @@
         "firebaseProject": true,
         "hostingChannel": false
       },
-      "requestModel": "immutable-request-bound-to-read-only-dryrun-patch-v1"
+      "requestModel": "immutable-request-bound-to-atomic-apply-patch-v1"
     },
-    "diagnosticRule": "Run the phase-aware canonical preflight before credentials. Then read only the current 26 insurer documents and existing vault and propose only username, bank-number and related operational status fields.",
-    "acceptancePolicy": "Accept only DRY_RUN_READY with 414 clients, 26 insurers, 7 advisors, 91 matched bank references, two pending accounts, complete credential-password coverage, zero operational passwords, zero row/order/non-target changes, zero writes and sanitized evidence."
+    "diagnosticRule": "Run the phase-aware preflight before credentials, reconstruct the same verified target-field-only plan, and apply it through one transaction with hash preconditions, read-after-write, idempotence and rollback.",
+    "acceptancePolicy": "Accept only APPLIED_AND_VERIFIED with 91 operational bank numbers, two pending accounts, 26 operational usernames, 26/26 protected passwords, zero operational passwords, zero remaining proposals and zero row/order/non-target changes."
   },
   "canonicalOwners": [
     {
@@ -83,7 +83,7 @@
       "requiredTokens": [
         "phase-capability-contract-v1",
         "orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
-        "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+        "LAB_DATA_CONTRACT_REPAIR_APPLY",
         "sourceTransformed: false"
       ]
     },
@@ -92,9 +92,9 @@
       "path": "tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
       "requiredTokens": [
         "orbit360-gate-contract-preflight-v13-phase-capabilities",
-        "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
-        "WORKFLOW_READ_ONLY_DRYRUN",
-        "PHASE_CAPABILITY"
+        "LAB_DATA_CONTRACT_REPAIR_APPLY",
+        "WORKFLOW_ATOMIC_APPLY",
+        "FREEZE_APPLY_AUTHORIZED"
       ]
     },
     {
@@ -102,10 +102,10 @@
       "path": "tools/orbit360-restituir-directorio-operativo-v2-v20260722.mjs",
       "requiredTokens": [
         "orbit360-operational-directory-repair-v2-target-field-only",
-        "credentialPasswordsAvailable",
-        "onlyTargetFieldsChanged",
-        "nonTargetFieldChanges",
-        "DRY_RUN_READY",
+        "APPLIED_AND_VERIFIED",
+        "TRANSACTION_PRECONDITION_CHANGED",
+        "AFTER_REPAIR_NOT_IDEMPOTENT",
+        "ROLLBACK_VERIFICATION_FAILED",
         "rollbackVerified"
       ]
     }
@@ -117,7 +117,7 @@
     "tools/orbit360-incident-freeze-v20260721.json",
     "tools/orbit360-gate-contract-overlay-v20260718.json",
     "tools/orbit360-restituir-directorio-operativo-v2-v20260722.mjs",
-    "tools/orbit360-m1-operational-directory-data-dryrun-request-v20260722.json",
+    "tools/orbit360-m1-operational-directory-atomic-apply-request-v20260722.json",
     "orbit360-platform/core/operational-directory-field-policy-v20260722.js",
     "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
     "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
@@ -125,7 +125,7 @@
     "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
     "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js",
     "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
-    "orbit360-platform/docs/DRY-RUN-DIRECTORIO-OPERATIVO-READ-ONLY-20260722.md"
+    "orbit360-platform/docs/APLICACION-ATOMICA-DIRECTORIO-OPERATIVO-20260722.md"
   ],
   "runtimeVersionContracts": [
     {
@@ -134,7 +134,7 @@
       "requiredTokens": [
         "phase-capability-contract-v1",
         "orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
-        "LAB_DATA_CONTRACT_REPAIR_DRYRUN"
+        "LAB_DATA_CONTRACT_REPAIR_APPLY"
       ]
     },
     {
@@ -142,20 +142,20 @@
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "orbit360-gate-contract-preflight-v13-phase-capabilities",
-        "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
-        "WORKFLOW_READ_ONLY_DRYRUN",
-        "FREEZE_DRYRUN_AUTHORIZED"
+        "LAB_DATA_CONTRACT_REPAIR_APPLY",
+        "WORKFLOW_ATOMIC_APPLY",
+        "FREEZE_APPLY_AUTHORIZED"
       ]
     },
     {
       "path": "tools/orbit360-restituir-directorio-operativo-v2-v20260722.mjs",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "orbit360-operational-directory-repair-v2-target-field-only",
-        "DRY_RUN_READY",
-        "credentialPasswordsAvailable",
-        "onlyTargetFieldsChanged",
-        "NON_TARGET_CHANGE_DETECTED"
+        "APPLIED_AND_VERIFIED",
+        "runTransaction",
+        "TRANSACTION_PRECONDITION_CHANGED",
+        "AFTER_REPAIR_NOT_IDEMPOTENT",
+        "ROLLBACK_VERIFICATION_FAILED"
       ]
     },
     {
@@ -181,8 +181,8 @@
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "contractVersion: '1.0.38'",
-        "POLICY_PASSWORD_ONLY_SECRET",
-        "OWNER_BANK_NO_REVEAL"
+        "FREEZE_APPLY_AUTHORIZED",
+        "WORKFLOW_ATOMIC_APPLY"
       ]
     },
     {
@@ -198,26 +198,29 @@
       "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "replaceRequiredTokens": true,
       "requiredTokens": [
-        "READ_ONLY_DRY_RUN",
-        "ORBIT360_GATE_PHASE: lab_data_contract_repair_dryrun",
+        "ATOMIC_APPLY",
+        "ORBIT360_GATE_PHASE: lab_data_contract_repair_apply",
         "ays-orbit-360-lab",
-        "orbit360-m1-operational-directory-data-dryrun-request-v20260722.json",
+        "orbit360-m1-operational-directory-atomic-apply-request-v20260722.json",
         "preflight-sanitizado.json",
         "orbit360-restituir-directorio-operativo-v2-v20260722.mjs",
-        "--dry-run"
+        "--apply"
       ]
     }
   ],
   "effectiveOwnerReconciliation": {
     "classification": "DATA_CONTRACT_FAILURE",
     "contractVersion": "1.0.38",
-    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
     "canonicalOwnerScope": "overlay_replace",
     "runtimeContractScope": "overlay_replace",
     "workflowTransformsProduct": false,
     "firestoreRead": true,
     "vaultRead": true,
-    "writesExecuted": false,
+    "writesAuthorized": true,
+    "writeScope": "14_existing_insurer_documents_target_fields_only",
+    "readAfterWrite": true,
+    "rollback": true,
     "runtimeExecuted": false,
     "browserExecuted": false,
     "deployExecuted": false,
