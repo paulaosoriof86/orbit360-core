@@ -56,10 +56,27 @@ check('ACADEMY_BANK_OPERATIONAL', academy.includes('El número completo permanec
 check('ACADEMY_RESPONSIVE_ROLES', ['Dirección','Operativo','Asesor'].every(token => academy.includes(token)), 'academy role coverage');
 
 const blocked = Array.isArray(freeze.blockedActions) ? freeze.blockedActions : [];
+const requiredBlockedActions = [
+  'write_secret_manager',
+  'run_runtime',
+  'open_browser',
+  'deploy_hosting_lab',
+  'deploy_functions',
+  'deploy_rules',
+  'deploy_production',
+  'reimport_clients',
+  'reimport_insurers'
+];
+if (!isApply) requiredBlockedActions.unshift('write_firestore_operational_data');
+const missingBlockedActions = requiredBlockedActions.filter(action => !blocked.includes(action));
+const targetWriteScopeOpenOnlyInApply = isApply
+  ? !blocked.includes('write_firestore_operational_data')
+  : true;
+
 check('FREEZE_M1_OPEN', freeze.stateClarification && freeze.stateClarification.m1Closed === false && freeze.stateClarification.m2Authorized === false, freeze.status || 'missing');
-check('FREEZE_BLOCKS_WRITES_RUNTIME_DEPLOY', blocked.includes('write_firestore_operational_data') && blocked.includes('write_secret_manager') && blocked.includes('run_runtime') && blocked.includes('open_browser') && blocked.includes('deploy_hosting_lab'), freeze.status || 'missing');
+check('FREEZE_BLOCKS_WRITES_RUNTIME_DEPLOY', missingBlockedActions.length === 0 && targetWriteScopeOpenOnlyInApply, JSON.stringify({ phase, missingBlockedActions, targetWriteScopeOpenOnlyInApply }));
 if (isDryRun) check('FREEZE_ALLOWS_READ_ONLY_DRYRUN', freeze.stateClarification && freeze.stateClarification.operationalDirectoryDryRun === 'AUTHORIZED_ONCE' && freeze.stateClarification.operationalDirectoryApply === 'NOT_AUTHORIZED', freeze.status || 'missing');
-if (isApply) check('FREEZE_ALLOWS_ATOMIC_APPLY', freeze.stateClarification && freeze.stateClarification.operationalDirectoryApply === 'AUTHORIZED_ONCE', freeze.status || 'missing');
+if (isApply) check('FREEZE_ALLOWS_ATOMIC_APPLY', freeze.stateClarification && freeze.stateClarification.operationalDirectoryApply === 'AUTHORIZED_ONCE' && freeze.applyAuthorization && freeze.applyAuthorization.writeScope === '14_existing_insurer_documents_target_fields_only', freeze.status || 'missing');
 check('OVERLAY_1038', overlay.gatePatch && overlay.gatePatch.contractVersion === '1.0.38' && String(overlay.contractRevision || '').startsWith('1.0.38'), overlay.contractRevision || 'missing');
 check('OVERLAY_SCOPE_REPLACEMENT', overlay.replaceCanonicalOwners === true && overlay.replaceRuntimeVersionContracts === true, overlay.diagnosticRevision || 'missing');
 check('MANIFEST_1038', manifest.contractVersion === '1.0.38' && manifest.releaseId === 'block1-critical-runtime-20260722-6', `${manifest.contractVersion}:${manifest.releaseId}`);
@@ -70,12 +87,12 @@ if (!isDryRun && !isApply) check('WORKFLOW_VALIDATION_ONLY', workflow.includes('
 
 const failed = checks.filter(item => !item.ok);
 const result = {
-  schemaVersion: 'orbit360-m1-visual-remediation-contract-v3-phase-aware',
+  schemaVersion: 'orbit360-m1-visual-remediation-contract-v4-phase-aware-apply-scope',
   contractVersion: '1.0.38',
-  revision: '20260722.3',
+  revision: '20260722.4',
   executionPhase: phase,
   validatorSemanticRevision: 'responsive-plus-operational-directory-v1',
-  validatorLifecycleRevision: 'phase-capability-contract-v1',
+  validatorLifecycleRevision: 'phase-capability-contract-v2',
   classification: 'DATA_CONTRACT_FAILURE',
   total: checks.length,
   passed: checks.length - failed.length,
