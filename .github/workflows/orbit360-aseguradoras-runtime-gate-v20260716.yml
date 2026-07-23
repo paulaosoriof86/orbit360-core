@@ -1,31 +1,35 @@
-name: Orbit 360 · M1 directorio dinámico 1.0.40 · VALIDATION_ONLY_RETRY
+name: Orbit 360 · M1 directorio dinámico 1.0.40 · HOSTING_DELIVERY
 
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
-    paths: ['tools/orbit360-m1-dynamic-directory-static-preflight-retry-request-v20260723.json']
+    paths: ['tools/orbit360-m1-dynamic-directory-hosting-lab-request-v20260723.json']
 
 permissions:
   contents: read
   statuses: write
 
 concurrency:
-  group: orbit360-m1-dynamic-directory-static-preflight-retry-v1
+  group: orbit360-m1-dynamic-directory-hosting-lab-v1
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_PHASE: static_preflight
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-dynamic-directory-static-preflight-retry-request-v20260723.json
-  ORBIT360_REQUEST_ID: m1-dynamic-directory-static-preflight-retry-v1
+  ORBIT360_GATE_PHASE: lab_hosting_delivery
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-dynamic-directory-hosting-lab-request-v20260723.json
+  ORBIT360_REQUEST_ID: m1-dynamic-directory-hosting-lab-v1
   VALIDATED_PATCH_COMMIT: 6145e3b0a4173c582617bfc26dbfdc0c55b88b86
+  EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
+  ORBIT360_HOSTING_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
 
 jobs:
-  static-preflight-retry:
-    name: M1 directorio dinámico · GO_STATIC_1_0_40_RETRY
+  hosting-delivery:
+    name: M1 directorio dinámico · HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 25
     steps:
       - name: Checkout SHA exacto
         uses: actions/checkout@v4
@@ -39,7 +43,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud inmutable y autorización corregida
+      - name: Validar solicitud inmutable y autorización Hosting
         shell: bash
         run: |
           set -euo pipefail
@@ -51,91 +55,134 @@ jobs:
           const f=JSON.parse(fs.readFileSync('tools/orbit360-incident-freeze-v20260721.json','utf8'));
           const head=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
           const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
-          const a=f.staticPreflightRetryAuthorization||{},c=f.commitClosure||{},failed=f.failedStaticPreflight||{},bad=[];
-          if(r.schemaVersion!=='orbit360-m1-dynamic-directory-static-preflight-retry-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
+          const a=f.hostingAuthorization||{},s=f.staticClosure||{},bad=[];
+          if(r.schemaVersion!=='orbit360-m1-dynamic-directory-hosting-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
           if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.contractVersion!=='1.0.40')bad.push('scope');
-          if(r.staticRetryAlignmentCommit!==parent||r.allowedExecutions!==1||r.validationOnlyRetry!==true)bad.push('binding');
-          if(r.validatedPatchCommit!==process.env.VALIDATED_PATCH_COMMIT||r.commitClosureRunId!==30011170586||r.failedStaticRunId!==30011766401)bad.push('evidence');
-          if(r.secrets!==false||r.firestoreRead!==false||r.vaultRead!==false||r.operationalWrites!==false||r.runtime!==false||r.browser!==false||r.deploy!==false||r.repositoryWrite!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.reimport!==false)bad.push('capabilities');
-          if(f.status!=='M1_STATIC_PREFLIGHT_VALIDATOR_STALE_CORRECTED_RETRY_AUTHORIZED_ONCE'||f.stateClarification.nextAction!=='RUN_CORRECTED_CANONICAL_STATIC_PREFLIGHT_RETRY_ONCE')bad.push('freeze');
-          if(a.authorizationId!==process.env.ORBIT360_REQUEST_ID||a.active!==true||a.consumed!==false||a.allowedExecutions!==1||a.validatedPatchCommit!==process.env.VALIDATED_PATCH_COMMIT||a.validatorCorrectionOnly!==true)bad.push('authorization');
-          if(c.status!=='VALIDATED_PATCH_COMMITTED'||c.patchCommit!==process.env.VALIDATED_PATCH_COMMIT||c.checksPassed!==23||c.checksTotal!==23)bad.push('commit-closure');
-          if(failed.runId!==30011766401||failed.canonicalChecksPassed!==151||failed.canonicalChecksTotal!==155||failed.failedChecks!==4||failed.classification!=='VALIDATOR_STALE')bad.push('failed-static-evidence');
+          if(r.hostingAlignmentCommit!==parent||r.allowedExecutions!==1||r.hostingDelivery!==true)bad.push('binding');
+          if(r.validatedPatchCommit!==process.env.VALIDATED_PATCH_COMMIT||r.staticClosureRunId!==30015526564||r.staticClosureArtifactId!==8566941885||r.staticClosureArtifactDigest!=='sha256:912d1287cec7a634be4a23fbf6e6cfe8d3c30b83c63942f0cca49859971a4773')bad.push('evidence');
+          if(r.projectId!==process.env.EXPECTED_FIREBASE_PROJECT_ID||r.channel!==process.env.ORBIT360_HOSTING_CHANNEL||r.canonicalUrl!==process.env.ORBIT360_HOSTING_URL)bad.push('target');
+          if(r.secrets!==true||r.firestoreRead!==false||r.vaultRead!==false||r.operationalWrites!==false||r.runtime!==false||r.browser!==false||r.deploy!==true||r.repositoryWrite!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.reimport!==false)bad.push('capabilities');
+          if(f.status!=='M1_DYNAMIC_DIRECTORY_HOSTING_LAB_AUTHORIZED_ONCE'||f.stateClarification.nextAction!=='PUBLISH_AND_VERIFY_HOSTING_LAB_1_0_40_ONCE')bad.push('freeze');
+          if(a.authorizationId!==process.env.ORBIT360_REQUEST_ID||a.active!==true||a.consumed!==false||a.allowedExecutions!==1||a.validatedPatchCommit!==process.env.VALIDATED_PATCH_COMMIT||a.deployAllowed!==true||a.remoteIntegrityRequired!==true)bad.push('authorization');
+          if(s.runId!==30015526564||s.status!=='GO_STATIC_DYNAMIC_DIRECTORY_1_0_40'||s.canonicalChecksPassed!==153||s.canonicalChecksTotal!==153||s.dynamicChecksPassed!==23||s.dynamicChecksTotal!==23)bad.push('static-closure');
           try{cp.execFileSync('git',['merge-base','--is-ancestor',process.env.VALIDATED_PATCH_COMMIT,parent]);}catch{bad.push('patch-ancestor');}
           if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
           const d='orbit360-platform/runtime-gate-crm-v20260716';fs.mkdirSync(d,{recursive:true});
-          fs.writeFileSync(`${d}/dynamic-directory-static-retry-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,contractVersion:r.contractVersion,staticRetryAlignmentCommit:r.staticRetryAlignmentCommit,requestCommit:head,validatedPatchCommit:r.validatedPatchCommit,commitClosureRunId:r.commitClosureRunId,failedStaticRunId:r.failedStaticRunId,validatorCorrectionOnly:true,checksExpected:23,validationOnlyRetry:true,secrets:false,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:false,repositoryWrite:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          fs.writeFileSync(`${d}/dynamic-directory-hosting-request-sanitized.json`,JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,contractVersion:r.contractVersion,hostingAlignmentCommit:r.hostingAlignmentCommit,requestCommit:head,validatedPatchCommit:r.validatedPatchCommit,staticClosureRunId:r.staticClosureRunId,projectId:r.projectId,channel:r.channel,canonicalUrl:r.canonicalUrl,assetsExpected:16,hostingDelivery:true,secrets:true,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:true,repositoryWrite:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
           NODE
 
-      - name: Verificar patch congelado y cuatro correcciones contractuales
-        shell: bash
-        run: |
-          set -euo pipefail
-          git diff --quiet "${VALIDATED_PATCH_COMMIT}..HEAD" -- \
-            orbit360-platform/modules/aseguradoras.js \
-            orbit360-platform/core/client-insurer-edit-owner-v20260722.js \
-            orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js \
-            orbit360-platform/core/router-tenant-config-bootstrap.js \
-            orbit360-platform/data/academia-v1230-operational-directory-v20260722.js \
-            orbit360-platform/data/store.js \
-            orbit360-platform/data/store-firestore-lab.local.js \
-            orbit360-platform/core/auth.js \
-            orbit360-platform/core/importa.js \
-            firestore.rules
-          ! grep -F 'runtime-gate-crm-v20260716/dynamic-directory-patch-sanitized.json' tools/orbit360-gate-contract-overlay-v20260718.json
-          ! grep -F 'runtime-gate-crm-v20260716/dynamic-directory-contract-v3-sanitized.json' tools/orbit360-gate-contract-overlay-v20260718.json
-          grep -F "visualContractDeliveryRevision: '20260723.8'" tools/orbit360-gate-contract-overlay-v20260718.json
-
-      - name: Ejecutar preflight canónico corregido
+      - name: Preflight canónico antes de identidad
         shell: bash
         run: |
           set -euo pipefail
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" > orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-static-retry-preflight.json
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="1.0.40" and .executionPhase=="STATIC_PREFLIGHT" and .canonicalOwnerScope=="overlay_replace" and .runtimeContractScope=="overlay_replace" and .failed==0 and .capabilityProfile.secrets==false and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==false and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .sourceTransformed==false and .dataAccess==false and .secretAccess==false and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-static-retry-preflight.json >/dev/null
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" > orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-preflight.json
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="1.0.40" and .executionPhase=="LAB_HOSTING_DELIVERY" and .canonicalOwnerScope=="overlay_replace" and .runtimeContractScope=="overlay_replace" and .failed==0 and .capabilityProfile.secrets==true and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==true and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .sourceTransformed==false and .operationalWrites==0' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-preflight.json >/dev/null
+          node orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs > orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-contract.json
+          jq -e '.ok==true and .status=="DYNAMIC_DIRECTORY_CONTRACT_V3_PASS" and .total==23 and .passed==23 and .failed==0' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-contract.json >/dev/null
 
-      - name: Ejecutar contrato dinámico 23 de 23
+      - name: Preparar inventario local de 16 activos
         shell: bash
         run: |
           set -euo pipefail
-          node --check orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs
-          node orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs > orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-static-retry-contract.json
-          jq -e '.ok==true and .status=="DYNAMIC_DIRECTORY_CONTRACT_V3_PASS" and .contractVersion=="1.0.40" and .total==23 and .passed==23 and .failed==0 and .rootCauseCorrection.unterminatedBootstrapCommentFixed==true and .rootCauseCorrection.validatorRootPlatformFixed==true' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-static-retry-contract.json >/dev/null
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const files=['index.html','ays-lab-preview.html','modules/aseguradoras.js','core/router-tenant-config-bootstrap.js','core/client-insurer-edit-owner-v20260722.js','core/client-insurer-operational-directory-owner-v20260722.js','core/client-insurer-visual-stability-barrier-v20260721.js','core/client-insurer-visual-contract-v20260720.js','styles/client-insurer-edit-mode-v20260722.css','styles/client-insurer-visual-contract-v20260720.css','data/academia-v1230-operational-directory-v20260722.js','data/tenant-alianzas-soluciones-insurers-p10.js','core/operational-directory-field-policy-v20260722.js','core/aseguradoras-credentials-provider-lab-v20260720.js','core/insurer-secure-target-bridge-v20260720.js','core/pwa.js'];
+          const sha=p=>crypto.createHash('sha256').update(fs.readFileSync('orbit360-platform/'+p)).digest('hex');
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-local-integrity.json',JSON.stringify({schemaVersion:'orbit360-dynamic-directory-hosting-local-integrity-v1',contractVersion:'1.0.40',assets:files.map(path=>({path,sha256:sha(path)})),containsPII:false,containsSecrets:false},null,2)+'\n');
+          NODE
+
+      - name: Resolver identidad exclusiva de Hosting LAB
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-dynamic-directory-hosting.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar Firebase CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-tools@14
+          npx firebase --version
+
+      - name: Publicar exclusivamente Hosting LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx firebase hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --project "$EXPECTED_FIREBASE_PROJECT_ID" --config firebase.json --expires 7d --non-interactive --json > orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-deploy-output.json
+
+      - name: Verificar integridad remota exacta
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="$ORBIT360_HOSTING_URL"
+          for attempt in $(seq 1 18); do
+            if curl -fsSL -H 'Accept-Encoding: identity' "${BASE}/ays-lab-preview.html?orbit_sha=${GITHUB_SHA}" -o /tmp/orbit-preview.html; then break; fi
+            sleep 5
+          done
+          test -s /tmp/orbit-preview.html
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto'),cp=require('child_process');
+          const local=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-local-integrity.json','utf8'));
+          const base=process.env.ORBIT360_HOSTING_URL,sha=b=>crypto.createHash('sha256').update(b).digest('hex'),assets=[];
+          for(const item of local.assets){const body=cp.execFileSync('curl',['-fsSL','-H','Accept-Encoding: identity',`${base}/${item.path}?orbit_sha=${process.env.GITHUB_SHA}`],{maxBuffer:64*1024*1024});const remote=sha(body);assets.push({path:item.path,localSha256:item.sha256,remoteSha256:remote,match:item.sha256===remote});}
+          const ok=assets.length===16&&assets.every(x=>x.match);
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-remote-integrity.json',JSON.stringify({schemaVersion:'orbit360-dynamic-directory-hosting-remote-integrity-v1',contractVersion:'1.0.40',ok,status:ok?'HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED':'REMOTE_INTEGRITY_MISMATCH',canonicalUrl:base,reviewUrl:`${base}/ays-lab-preview.html`,assets,activeInsurers:26,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          if(!ok)process.exit(41);
+          NODE
+          jq -e '.ok==true and .status=="HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED" and (.assets|length)==16 and ([.assets[].match]|all) and .activeInsurers==26 and .firestoreRead==false and .vaultRead==false and .operationalWrites==false and .runtime==false and .browser==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .reimport==false' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-remote-integrity.json >/dev/null
 
       - name: Cerrar evidencia sanitizada
         if: always()
         shell: bash
         run: |
           node <<'NODE'
-          const fs=require('fs'),d='orbit360-platform/runtime-gate-crm-v20260716';
-          const read=n=>{try{return JSON.parse(fs.readFileSync(`${d}/${n}`,'utf8'))}catch{return null}};
-          const p=read('dynamic-directory-static-retry-preflight.json'),c=read('dynamic-directory-static-retry-contract.json');
-          const ok=!!(p&&p.status==='GO_GATE_CONTRACT'&&p.contractVersion==='1.0.40'&&p.executionPhase==='STATIC_PREFLIGHT'&&p.failed===0&&c&&c.status==='DYNAMIC_DIRECTORY_CONTRACT_V3_PASS'&&c.passed===23&&c.failed===0);
-          fs.writeFileSync(`${d}/dynamic-directory-static-retry-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-dynamic-directory-static-preflight-retry-v1',generatedAt:new Date().toISOString(),ok,status:ok?'GO_STATIC_DYNAMIC_DIRECTORY_1_0_40':'STATIC_DYNAMIC_DIRECTORY_RETRY_FAILED',contractVersion:'1.0.40',validatedPatchCommit:process.env.VALIDATED_PATCH_COMMIT,canonicalPreflight:p&&p.status||'NOT_RUN',canonicalChecksPassed:p&&p.passed||0,canonicalChecksTotal:p&&p.total||0,canonicalFailed:p&&p.failed||0,dynamicContract:c&&c.status||'NOT_RUN',dynamicChecksPassed:c&&c.passed||0,dynamicChecksTotal:c&&c.total||0,secrets:false,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:false,repositoryWrite:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
-          if(!ok)process.exitCode=41;
+          const fs=require('fs'),d='orbit360-platform/runtime-gate-crm-v20260716';const read=n=>{try{return JSON.parse(fs.readFileSync(`${d}/${n}`,'utf8'))}catch{return null}};
+          const p=read('dynamic-directory-hosting-preflight.json'),c=read('dynamic-directory-hosting-contract.json'),r=read('dynamic-directory-hosting-remote-integrity.json');const ok=!!(p&&p.status==='GO_GATE_CONTRACT'&&c&&c.status==='DYNAMIC_DIRECTORY_CONTRACT_V3_PASS'&&c.passed===23&&r&&r.status==='HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED'&&r.ok===true&&r.assets.length===16);
+          fs.writeFileSync(`${d}/dynamic-directory-hosting-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-dynamic-directory-hosting-v1',generatedAt:new Date().toISOString(),ok,status:ok?'HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED':'HOSTING_DYNAMIC_DIRECTORY_DELIVERY_FAILED',contractVersion:'1.0.40',validatedPatchCommit:process.env.VALIDATED_PATCH_COMMIT,canonicalPreflight:p&&p.status||'NOT_RUN',dynamicChecksPassed:c&&c.passed||0,assetsVerified:r&&r.assets?r.assets.length:0,allAssetsMatch:!!(r&&r.assets&&r.assets.every(x=>x.match)),canonicalUrl:process.env.ORBIT360_HOSTING_URL,reviewUrl:`${process.env.ORBIT360_HOSTING_URL}/ays-lab-preview.html`,activeInsurers:26,firestoreRead:false,vaultRead:false,operationalWrites:false,runtime:false,browser:false,deploy:true,repositoryWrite:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');if(!ok)process.exitCode=41;
           NODE
 
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-dynamic-directory-static-retry-${{ github.run_id }}
+          name: orbit360-m1-dynamic-directory-hosting-${{ github.run_id }}
           path: |
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-static-retry-request-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-request-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-static-retry-preflight.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-static-retry-contract.json
-            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-static-retry-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-contract.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-local-integrity.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-deploy-output.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-remote-integrity.json
+            orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-summary.json
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Publicar estado estático corregido
+      - name: Publicar estado Hosting
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          state=failure; description='1.0.40 corrected static retry failed'
-          if [ -f orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-static-retry-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-static-retry-summary.json)" = true ]; then state=success; description='1.0.40 GO static dynamic directory 23/23'; fi
-          gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-dynamic-directory-static-retry-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          state=failure; description='1.0.40 dynamic directory Hosting failed'
+          if [ -f orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-hosting-summary.json)" = true ]; then state=success; description='1.0.40 Hosting verified 16/16'; fi
+          gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-dynamic-directory-hosting-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+      - name: Limpiar identidad temporal
+        if: always()
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ]; then rm -f "${ORBIT360_TEMP_KEY_FILE}"; fi
+          rm -rf node_modules package-lock.json npm-shrinkwrap.json
