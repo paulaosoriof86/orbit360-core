@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-v21-dynamic-directory-hosting",
+  "schemaVersion":"orbit360-validator-lifecycle-contract-v22-css-delivery-root-hosting",
   "issuedAt":"2026-07-23",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
@@ -7,13 +7,32 @@
   "gateId":"block1-client360-insurers-lab-v20260717",
   "gateContractVersion":"1.0.40",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
-  "controlPlaneRevision":"dynamic-directory-hosting-lab-1-0-40-v1",
-  "methodologicalDecisionId":"paula-20260723-dynamic-autoadministrable-directory-hosting",
-  "classification":["FUNCTIONAL_DEFECT","DATA_CONTRACT_FAILURE","PIPELINE_MECHANISM_FAILURE","VALIDATOR_STALE"],
-  "executionProfile":{"phase":"LAB_HOSTING_DELIVERY","capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},"workflowLocks":{"branch":true,"firebaseProject":true,"hostingChannel":true},"requestModel":"immutable-request-bound-to-dynamic-directory-hosting-lab-v1"},
+  "controlPlaneRevision":"css-delivery-root-hosting-20260723-10-v1",
+  "methodologicalDecisionId":"paula-20260723-css-missing-human-review",
+  "classification":["FUNCTIONAL_DEFECT","VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],
+  "executionProfile":{
+    "phase":"LAB_HOSTING_DELIVERY",
+    "capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+    "workflowLocks":{"branch":true,"firebaseProject":true,"hostingChannel":true},
+    "requestModel":"immutable-request-bound-to-css-delivery-hosting-v1"
+  },
   "canonicalIntegration":{"entrypoint":"tools/orbit360-validar-gate-contracts-v20260717.mjs","engine":"tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs","overlay":"tools/orbit360-gate-contract-overlay-v20260718.json","workflow":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml","canonicalOwnerScope":"overlay_replace","runtimeContractScope":"overlay_replace","sourceTransformation":false,"firestoreRead":false,"secretAccess":true,"operationalWrites":0,"runtime":false,"browser":false,"hostingDeploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false,"reimport":false},
-  "canonicalOverlayPatch":{"schemaVersion":"orbit360-gate-contract-overlay-v1","issuedAt":"2026-07-23","gateId":"block1-client360-insurers-lab-v20260717","classification":"FUNCTIONAL_DEFECT","diagnosticRevision":"dynamic-directory-hosting-lab-1-0-40-v1","contractRevision":"1.0.40-dynamic-directory-hosting-lab-v1","replaceCanonicalOwners":true,"replaceRequiredFiles":true,"replaceRuntimeVersionContracts":true,"gatePatch":{"contractVersion":"1.0.40","diagnosticRevision":"dynamic-directory-hosting-lab-1-0-40-v1","runtimeVersion":"20260723-18","status":"DYNAMIC_DIRECTORY_HOSTING_LAB_AUTHORIZED_ONCE","executionProfile":{"phase":"LAB_HOSTING_DELIVERY","capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},"workflowLocks":{"branch":true,"firebaseProject":true,"hostingChannel":true},"requestModel":"immutable-request-bound-to-dynamic-directory-hosting-lab-v1"},"diagnosticRule":"Publish only the frozen 1.0.40 frontend to Hosting LAB and verify remote hashes.","acceptancePolicy":"Accept only HOSTING_DYNAMIC_DIRECTORY_DELIVERED_AND_VERIFIED with 16 of 16 assets matching and zero data or runtime activity."},"canonicalOwners":[],"requiredFiles":[],"runtimeVersionContracts":[]},
-  "preservedEvidence":{"committedPatch":"6145e3b0a4173c582617bfc26dbfdc0c55b88b86","commitClosureRunId":30011170586,"commitClosureArtifactId":8565106402,"commitClosureArtifactDigest":"sha256:10121fbb4d6fc9d62e0bb6698a50c095f8af92b286c64f81a0e2b34b08e9d65c","staticClosureRunId":30015526564,"staticClosureArtifactId":8566941885,"staticClosureArtifactDigest":"sha256:912d1287cec7a634be4a23fbf6e6cfe8d3c30b83c63942f0cca49859971a4773","canonicalChecks":"153_OF_153","dynamicChecks":"23_OF_23","activeInsurers":26,"bankOperationalNumbers":91,"usernamesOperational":26,"portalCredentials":"26_OF_26","finalTechnicalGateRerun":false},
+  "canonicalOverlayPatch":{
+    "schemaVersion":"orbit360-gate-contract-overlay-v1",
+    "issuedAt":"2026-07-23",
+    "gateId":"block1-client360-insurers-lab-v20260717",
+    "classification":"FUNCTIONAL_DEFECT",
+    "diagnosticRevision":"css-delivery-root-hosting-20260723-10-v1",
+    "contractRevision":"1.0.40-css-delivery-root-v1",
+    "replaceCanonicalOwners":true,
+    "replaceRequiredFiles":true,
+    "replaceRuntimeVersionContracts":true,
+    "gatePatch":{"contractVersion":"1.0.40","diagnosticRevision":"css-delivery-root-hosting-20260723-10-v1","runtimeVersion":"20260723-20","status":"CSS_DELIVERY_ROOT_HOSTING_AUTHORIZED_ONCE","executionProfile":{"phase":"LAB_HOSTING_DELIVERY","capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},"workflowLocks":{"branch":true,"firebaseProject":true,"hostingChannel":true},"requestModel":"immutable-request-bound-to-css-delivery-hosting-v1"},"diagnosticRule":"Require six essential CSS resources before redirect and verify remote hash plus text/css MIME.","acceptancePolicy":"Accept only HOSTING_CSS_DELIVERED_AND_VERIFIED with 22 assets and six essential CSS."},
+    "canonicalOwners":[],
+    "requiredFiles":[],
+    "runtimeVersionContracts":[]
+  },
+  "preservedEvidence":{"dynamicPatchCommit":"6145e3b0a4173c582617bfc26dbfdc0c55b88b86","dynamicStaticRunId":30015526564,"previousHostingRunId":30015961729,"previousHostingArtifactId":8567138132,"previousHostingArtifactDigest":"sha256:51a5313a2450fc33fba183579665be81302be84273845e835724044c269d4c03","previousRemoteAssets":16,"previousEssentialBaseCssVerified":0,"activeInsurers":26,"bankOperationalNumbers":91,"usernamesOperational":26,"portalCredentials":"26_OF_26","finalTechnicalGateRerun":false},
   "containsPII":false,
   "containsSecrets":false
 }
