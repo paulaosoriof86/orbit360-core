@@ -177,7 +177,39 @@ Hosting LAB exacto
 revisión humana aprobada
 ```
 
-## 7. Restricciones
+## 7. Control del mecanismo de reparación
+
+Los intentos de dry-run `29968658125` y `29968906716`, y los intentos de reparación estática `29969478259` y `29969765220`, fallaron antes de acceder a datos. En todos ellos:
+
+```text
+Firestore read: false
+Vault read: false
+Operational writes: false
+Product commit created: false
+```
+
+La causa no fue el contrato operativo ni los datos. Fue el mecanismo de pipeline: el workflow intentaba construir la corrección mediante un transformador monolítico que mezclaba owners, importadores, proveedores, Academia, overlays y validadores, y dependía de conteos literales exactos.
+
+Se confirmaron dos ejemplos:
+
+- buscó en `index.html` una referencia de caché cuyo owner real es el bootstrap del router;
+- consideró error que Academia tuviera dos apariciones válidas de `contentVersion:'1.228'`.
+
+Regla vinculante:
+
+> El workflow no puede construir, transformar ni parchear el producto. El cambio completo debe existir previamente como commit atómico directo y auditarse como conjunto. El workflow solo valida el commit ya construido y produce evidencia.
+
+Quedan retirados como mecanismos de ejecución:
+
+```text
+tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs
+tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs
+tools/orbit360-reparar-directorio-operativo-estructural-v2-v20260722.mjs
+```
+
+No se autoriza una tercera solicitud estática ni otro transformador. La siguiente etapa es preparar, sin ejecución, el patch atómico completo 1.0.38 y auditar todos sus archivos finales antes de crear cualquier request.
+
+## 8. Restricciones
 
 Continúan prohibidos:
 
@@ -185,10 +217,11 @@ Continúan prohibidos:
 - desplegar Functions o Rules;
 - tocar producción, `main` o merge;
 - publicar valores en evidencia;
+- volver a acceder a datos antes de disponer del patch atómico completo;
 - avanzar a M2 antes de aprobación visual humana.
 
-## 8. Claude y Academia
+## 9. Claude y Academia
 
 **Claude:** `REPLICABLE_CLAUDE_ACUMULADO` únicamente para la semántica reusable de directorio operativo. No recibe valores, bóveda, Functions, IAM ni datos reales.
 
-**Academia:** debe enseñar que usuario y número bancario son datos operativos; la contraseña es el secreto. También debe explicar la diferencia entre protección de edición, visibilidad operativa y tratamiento de secretos.
+**Academia:** debe enseñar que usuario y número bancario son datos operativos; la contraseña es el secreto. También debe explicar la diferencia entre protección de edición, visibilidad operativa y tratamiento de secretos, y que un workflow valida un patch ya construido en lugar de fabricarlo mediante sustituciones literales durante la ejecución.
