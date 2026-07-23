@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-v19-dynamic-directory-static",
+  "schemaVersion":"orbit360-validator-lifecycle-contract-v20-dynamic-directory-static-retry",
   "issuedAt":"2026-07-23",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
@@ -7,14 +7,14 @@
   "gateId":"block1-client360-insurers-lab-v20260717",
   "gateContractVersion":"1.0.40",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
-  "controlPlaneRevision":"dynamic-directory-static-preflight-1-0-40-v1",
-  "methodologicalDecisionId":"paula-20260723-dynamic-autoadministrable-directory",
+  "controlPlaneRevision":"dynamic-directory-static-preflight-1-0-40-v2",
+  "methodologicalDecisionId":"paula-20260723-dynamic-autoadministrable-directory-validator-retry",
   "classification":["FUNCTIONAL_DEFECT","DATA_CONTRACT_FAILURE","PIPELINE_MECHANISM_FAILURE","VALIDATOR_STALE"],
   "executionProfile":{
     "phase":"STATIC_PREFLIGHT",
     "capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
     "workflowLocks":{"branch":true,"firebaseProject":false,"hostingChannel":false},
-    "requestModel":"immutable-request-bound-to-dynamic-directory-static-preflight-v1"
+    "requestModel":"immutable-request-bound-to-dynamic-directory-static-preflight-retry-v1"
   },
   "canonicalIntegration":{
     "entrypoint":"tools/orbit360-validar-gate-contracts-v20260717.mjs",
@@ -39,24 +39,24 @@
     "schemaVersion":"orbit360-gate-contract-overlay-v1",
     "issuedAt":"2026-07-23",
     "gateId":"block1-client360-insurers-lab-v20260717",
-    "classification":"FUNCTIONAL_DEFECT",
-    "diagnosticRevision":"dynamic-directory-static-preflight-1-0-40-v1",
-    "contractRevision":"1.0.40-dynamic-directory-static-preflight-v1",
+    "classification":"VALIDATOR_STALE",
+    "diagnosticRevision":"dynamic-directory-static-preflight-1-0-40-v2",
+    "contractRevision":"1.0.40-dynamic-directory-static-preflight-v2",
     "replaceCanonicalOwners":true,
     "replaceRequiredFiles":true,
     "replaceRuntimeVersionContracts":true,
     "gatePatch":{
       "contractVersion":"1.0.40",
-      "diagnosticRevision":"dynamic-directory-static-preflight-1-0-40-v1",
-      "runtimeVersion":"20260723-16",
-      "status":"DYNAMIC_DIRECTORY_STATIC_PREFLIGHT_AUTHORIZED_ONCE",
+      "diagnosticRevision":"dynamic-directory-static-preflight-1-0-40-v2",
+      "runtimeVersion":"20260723-17",
+      "status":"DYNAMIC_DIRECTORY_STATIC_PREFLIGHT_RETRY_AUTHORIZED_ONCE",
       "executionProfile":{
         "phase":"STATIC_PREFLIGHT",
         "capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
         "workflowLocks":{"branch":true,"firebaseProject":false,"hostingChannel":false},
-        "requestModel":"immutable-request-bound-to-dynamic-directory-static-preflight-v1"
+        "requestModel":"immutable-request-bound-to-dynamic-directory-static-preflight-retry-v1"
       },
-      "diagnosticRule":"Validate the committed 1.0.40 directory through the canonical static gate and the platform-root 23-check contract.",
+      "diagnosticRule":"Generated evidence remains in Actions artifacts; executable owner tokens are validated after comment stripping.",
       "acceptancePolicy":"Accept only GO_GATE_CONTRACT plus DYNAMIC_DIRECTORY_CONTRACT_V3_PASS with 23 of 23 and zero external capabilities."
     },
     "canonicalOwners":[],
@@ -70,6 +70,10 @@
     "commitClosureArtifactDigest":"sha256:10121fbb4d6fc9d62e0bb6698a50c095f8af92b286c64f81a0e2b34b08e9d65c",
     "dynamicContractStatus":"DYNAMIC_DIRECTORY_CONTRACT_V3_PASS",
     "dynamicChecks":"23_OF_23",
+    "failedStaticRunId":30011766401,
+    "failedStaticArtifactId":8565349054,
+    "failedStaticArtifactDigest":"sha256:413a946ade88de9420774b3f7219c91ae6f7e783e6284d2ba045701ff5af4b7d",
+    "failedStaticChecks":"4_OF_155_VALIDATOR_STALE",
     "activeInsurers":26,
     "bankOperationalNumbers":91,
     "usernamesOperational":26,
