@@ -1,36 +1,34 @@
-name: Orbit 360 · Reparación canónica directorio operativo · dry-run v2
+name: Orbit 360 · Reparación estructural directorio operativo · estática
 
 on:
   push:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - 'tools/orbit360-m1-operational-directory-repair-dryrun-request-v2-20260722.json'
+      - 'tools/orbit360-m1-operational-directory-static-repair-request-v20260722.json'
 
 permissions:
   contents: write
   statuses: write
 
 concurrency:
-  group: orbit360-m1-operational-directory-repair-dryrun-v2
+  group: orbit360-m1-operational-directory-structural-static-repair-v1
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_PHASE: lab_data_contract_repair_dryrun
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-repair-dryrun-request-v2-20260722.json
+  ORBIT360_GATE_PHASE: static_preflight
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-static-repair-request-v20260722.json
   ORBIT360_REQUEST_MODEL: immutable-request-bound-to-parent-head-and-run-attempt-v1
   ORBIT360_METHOD_DECISION_ID: paula-20260722-operational-directory-root-repair
-  EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
-  FIREBASE_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_FINAL_GATE_POLICY: no_final_gate_rerun
 
 jobs:
-  operational-directory-dryrun:
-    name: Restituir contrato operativo · dry-run v2 sin escrituras
+  structural-static-repair:
+    name: Reparar owners y contratos · cero datos
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     steps:
       - name: Checkout SHA exacto
         uses: actions/checkout@v4
@@ -43,7 +41,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud inmutable v2 y freeze
+      - name: Validar solicitud estática y stop line de datos
         shell: bash
         run: |
           set -euo pipefail
@@ -58,12 +56,11 @@ jobs:
           test "$(jq -r '.methodologicalDecisionId' "$REQUEST")" = "$ORBIT360_METHOD_DECISION_ID"
           test "$(jq -r '.gateId' "$REQUEST")" = "$ORBIT360_GATE_ID"
           test "$(jq -r '.contractVersion' "$REQUEST")" = '1.0.38'
-          test "$(jq -r '.phase' "$REQUEST")" = 'LAB_DATA_CONTRACT_REPAIR_DRYRUN'
+          test "$(jq -r '.phase' "$REQUEST")" = 'STATIC_PREFLIGHT'
           test "$(jq -r '.parentHead' "$REQUEST")" = "$(git rev-parse HEAD^)"
           test "$(jq -r '.allowedExecutions' "$REQUEST")" = '1'
-          test "$(jq -r '.secretsAllowed' "$REQUEST")" = 'true'
-          test "$(jq -r '.secretPurpose' "$REQUEST")" = 'read_existing_insurer_vault_for_sanitized_matching_only'
-          test "$(jq -r '.firestoreReadAllowed' "$REQUEST")" = 'true'
+          test "$(jq -r '.secretsAllowed' "$REQUEST")" = 'false'
+          test "$(jq -r '.firestoreReadAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.writesAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.runtimeAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.browserAllowed' "$REQUEST")" = 'false'
@@ -73,90 +70,50 @@ jobs:
           test "$(jq -r '.productionAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.reimportAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.finalGateRerunAllowed' "$REQUEST")" = 'false'
-          test "$(jq -r '.status' "$FREEZE")" = 'M1_VISUAL_REVIEW_FAILED_DATA_CONTRACT_REPAIR_DRYRUN_V2_AUTHORIZED'
-          test "$(jq -r '.dryRunAuthorization.authorizationId' "$FREEZE")" = 'm1-operational-directory-repair-dryrun-v2'
-          test "$(jq -r '.dryRunAuthorization.active' "$FREEZE")" = 'true'
-          test "$(jq -r '.dryRunAuthorization.consumed' "$FREEZE")" = 'false'
-          test "$(jq -r '.dryRunAuthorization.allowedExecutions' "$FREEZE")" = '1'
-          test "$(jq -r '.dryRunAuthorization.lastAttemptAllowed' "$FREEZE")" = 'true'
-          test "$(jq -r '.dryRunAuthorization.writesAllowed' "$FREEZE")" = 'false'
-          test "$(jq -r '.failedDryRunAttempts[0].runId' "$FREEZE")" = '29968658125'
+          test "$(jq -r '.status' "$FREEZE")" = 'M1_PIPELINE_ROOT_CAUSE_STRUCTURAL_STATIC_REPAIR_AUTHORIZED'
+          test "$(jq -r '.staticRepairAuthorization.authorizationId' "$FREEZE")" = 'm1-operational-directory-structural-static-repair-v1'
+          test "$(jq -r '.staticRepairAuthorization.active' "$FREEZE")" = 'true'
+          test "$(jq -r '.staticRepairAuthorization.allowedExecutions' "$FREEZE")" = '1'
+          test "$(jq -r '.failedDryRunAttempts | length' "$FREEZE")" = '2'
           test "$(jq -r '.failedDryRunAttempts[0].firestoreRead' "$FREEZE")" = 'false'
-          test "$(jq -r '.failedDryRunAttempts[0].vaultRead' "$FREEZE")" = 'false'
-          test "$(jq -r '.methodologicalDecision.m2Authorized' "$FREEZE")" = 'false'
+          test "$(jq -r '.failedDryRunAttempts[1].firestoreRead' "$FREEZE")" = 'false'
+          test "$(jq -r '.stateClarification.operationalDirectoryDryRun' "$FREEZE")" = 'BLOCKED_UNTIL_STATIC_REPAIR_PASS'
+          test "$(jq -r '.stateClarification.m2Authorized' "$FREEZE")" = 'false'
 
-      - name: Alinear solicitud v2, transformador, lifecycle y fase
+      - name: Aplicar reparación estructural por límites de función
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-alinear-solicitud-dryrun-v2-v20260722.mjs
-          node --check tools/orbit360-corregir-transformador-directorio-v20260722.mjs
-          node --check tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs
-          node --check tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs
-          node --check tools/orbit360-restituir-directorio-operativo-v20260722.mjs
-          node tools/orbit360-alinear-solicitud-dryrun-v2-v20260722.mjs
-          jq -e '.ok == true and .dataWritten == false and .secretsRead == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-request-v2-alignment-sanitized.json >/dev/null
-          node tools/orbit360-corregir-transformador-directorio-v20260722.mjs
-          jq -e '.ok == true and .dataWritten == false and .secretsRead == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-transformer-alignment-sanitized.json >/dev/null
-          node tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs
-          jq -e '.ok == true and .anchor == "required_files_loop" and .dataWritten == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-phase-alignment-sanitized.json >/dev/null
-          node tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs
-          jq -e '.ok == true and .contractVersion == "1.0.38" and .invariants.bankNumbersOperationalVisible == true and .invariants.bankCopyDirect == true and .invariants.bankRevealDependency == false and .invariants.usernamesOperationalVisible == true and .invariants.passwordsProtectedOnly == true and .invariants.dataWritten == false and .invariants.reimportExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-code-repair-sanitized.json >/dev/null
+          node --check tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs
+          node tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs
+          jq -e '.ok == true and .mechanism == "function-boundary-structural-replacement-v1" and .exactStringTransformerRetired == true and .contractVersion == "1.0.38" and .invariants.usernameOperationalVisible == true and .invariants.passwordProtectedOnly == true and .invariants.bankNumbersOperationalVisible == true and .invariants.bankCopyDirect == true and .invariants.bankRevealDependency == false and .invariants.dataRead == false and .invariants.dataWritten == false and .invariants.secretsRead == false and .invariants.reimportExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-structural-repair-sanitized.json >/dev/null
 
-      - name: Preflight contractual antes de leer datos
+      - name: Preflight canónico 1.0.38
         shell: bash
         run: |
           set -euo pipefail
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-v20260717.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status == "GO_GATE_CONTRACT" and .contractVersion == "1.0.38" and .executionPhase == "LAB_DATA_CONTRACT_REPAIR_DRYRUN" and .failed == 0' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          jq -e '.status == "GO_GATE_CONTRACT" and .contractVersion == "1.0.38" and .executionPhase == "STATIC_PREFLIGHT" and .failed == 0' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+
+      - name: Validar conducta visual y arquitectura
+        shell: bash
+        run: |
+          set -euo pipefail
           node --check orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js
-          node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-visual-contract-sanitized.json
-          jq -e '.status == "PASS" and .contractVersion == "1.0.38" and .validatorSemanticRevision == "operational-directory-field-classification-v1" and .failed == 0 and .runtimeExecuted == false and .browserExecuted == false and .deployExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-visual-contract-sanitized.json >/dev/null
+          node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-static-visual-sanitized.json
+          jq -e '.status == "PASS" and .contractVersion == "1.0.38" and .validatorSemanticRevision == "operational-directory-field-classification-v1" and .failed == 0 and .runtimeExecuted == false and .browserExecuted == false and .deployExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-static-visual-sanitized.json >/dev/null
           node --check orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js
-          node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js > orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-sanitized.json
-          jq -e '.status == "GO_STATIC_ARCHITECTURE" and .failed == 0' orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-sanitized.json >/dev/null
+          node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js > orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-static-sanitized.json
+          jq -e '.status == "GO_STATIC_ARCHITECTURE" and .failed == 0' orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-static-sanitized.json >/dev/null
 
-      - name: Resolver identidad LAB de solo lectura
-        env:
-          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - name: Verificar alcance y confirmar reparación estática
         shell: bash
         run: |
           set -euo pipefail
-          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
-          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
-          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
-          test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-operational-directory-dryrun-v2.json"
-          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
-          chmod 600 "$KEY_FILE"
-          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-
-      - name: Instalar dependencias de lectura
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-save firebase-admin@13 @google-cloud/secret-manager@6
-          node -e "require('firebase-admin'); require('@google-cloud/secret-manager'); console.log('READ_ONLY_DEPENDENCIES_OK')"
-
-      - name: Dry-run Firestore más bóveda · cero escrituras
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-restituir-directorio-operativo-v20260722.mjs --dry-run
-          REPORT='orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json'
-          jq -e '.ok == true and .status == "DRY_RUN_READY" and .mode == "DRY_RUN" and .contractVersion == "1.0.38" and .counts.clients == 414 and .counts.insurers == 26 and .counts.advisors == 7 and .vault.bankRecords == 91 and .directory.bankReferenceRows == 91 and .directory.bankMatchedToVault == 91 and .directory.bankUnmatchedRefs == 0 and .directory.bankPendingRows == 2 and .directory.credentialUnmatchedRefs == 0 and .directory.passwordsInOperationalDirectory == 0 and .directory.accountRowsProposed > 0 and .directory.usernameRowsProposed > 0 and .acceptance.expectedOperationalBankNumbersAfter == 91 and .acceptance.accountIdMismatchExplainsRevealFailure == true and .acceptance.passwordsRemainProtected == true and .writesExecuted == false and .transactionCommitted == false and .safety.creates == 0 and .safety.deletes == 0 and .safety.reorders == 0 and .safety.passwordWrites == 0 and .safety.functionsDeploy == false and .safety.rulesDeploy == false and .safety.productionTouched == false and .safety.reimportExecuted == false and .containsPII == false and .containsSecrets == false and .containsRawBankValues == false and .containsRawUsernames == false' "$REPORT" >/dev/null
-
-      - name: Verificar alcance de archivos y confirmar corrección estática
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf node_modules package-lock.json npm-shrinkwrap.json
-          ALLOWED='^(tools/orbit360-(aplicar-correccion-directorio-operativo|corregir-transformador-directorio|alinear-fase-reparacion-directorio|alinear-solicitud-dryrun-v2|restituir-directorio-operativo|validator-lifecycle-contract|validar-gate-contracts-engine|incident-freeze|gate-contract-overlay|gate-contract-overlay-importers|gate-contract-registry-extension|critical-runtime-integrity-manifest)-v?[0-9A-Za-z.-]*\.(mjs|json)|orbit360-platform/(core/(client-insurer-visual-contract-v20260720|insurer-directory-import-v1202|aseguradoras-op2-import-ui-guard|insurer-secure-target-bridge-v20260720|aseguradoras-credentials-provider-lab-v20260720|aseguradoras-bank-accounts-provider-lab-v20260721|router-tenant-config-bootstrap)\.js|data/academia-v1221-m1-visual-integrity\.js|index\.html|tools/orbit360-m1-visual-remediation-contract-v20260722\.js|runtime-gate-crm-v20260716/.*-sanitized\.json))$'
+          test -z "$(git diff --name-only -- orbit360-platform/data/store.js orbit360-platform/data/store-firestore-lab.local.js orbit360-platform/core/auth.js orbit360-platform/core/importa.js firestore.rules functions)"
+          ALLOWED='^(tools/(orbit360-validator-lifecycle-contract-v20260722\.json|orbit360-incident-freeze-v20260721\.json|orbit360-gate-contract-overlay-v20260718\.json|orbit360-gate-contract-overlay-importers-v20260720\.json|orbit360-gate-contract-registry-extension-v20260720\.json|orbit360-critical-runtime-integrity-manifest-v20260721\.json)|orbit360-platform/(core/(client-insurer-visual-contract-v20260720|insurer-directory-import-v1202|aseguradoras-op2-import-ui-guard|insurer-secure-target-bridge-v20260720|aseguradoras-credentials-provider-lab-v20260720|aseguradoras-bank-accounts-provider-lab-v20260721|router-tenant-config-bootstrap)\.js|data/academia-v1221-m1-visual-integrity\.js|index\.html|tools/(orbit360-m1-visual-remediation-contract-v20260722|orbit360-block0-architecture-gate-v20260717)\.js|runtime-gate-crm-v20260716/.*-sanitized\.json))$'
           while IFS= read -r file; do
             test -z "$file" && continue
             if ! printf '%s' "$file" | grep -Eq "$ALLOWED"; then
@@ -164,14 +121,11 @@ jobs:
               exit 41
             fi
           done < <(git status --porcelain | sed -E 's/^.. //')
-          test -z "$(git diff --name-only -- orbit360-platform/data/store.js orbit360-platform/data/store-firestore-lab.local.js orbit360-platform/core/auth.js orbit360-platform/core/importa.js firestore.rules functions)"
           git config user.name 'orbit360-control-plane'
           git config user.email 'orbit360-control-plane@users.noreply.github.com'
           git add \
-            tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs \
             tools/orbit360-validator-lifecycle-contract-v20260722.json \
             tools/orbit360-incident-freeze-v20260721.json \
-            tools/orbit360-validar-gate-contracts-engine-v20260717.mjs \
             tools/orbit360-gate-contract-overlay-v20260718.json \
             tools/orbit360-gate-contract-overlay-importers-v20260720.json \
             tools/orbit360-gate-contract-registry-extension-v20260720.json \
@@ -186,49 +140,34 @@ jobs:
             orbit360-platform/index.html \
             orbit360-platform/data/academia-v1221-m1-visual-integrity.js \
             orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js \
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-request-v2-alignment-sanitized.json \
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-transformer-alignment-sanitized.json \
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-phase-alignment-sanitized.json \
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-code-repair-sanitized.json \
+            orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js \
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-structural-repair-sanitized.json \
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json \
-            orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-visual-contract-sanitized.json \
-            orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-sanitized.json \
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json
-          git diff --cached --quiet && { echo 'NO_STATIC_CORRECTION_TO_COMMIT'; exit 41; }
-          git commit -m 'fix(m1): restituir contrato operativo de usuarios y cuentas'
+            orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-static-visual-sanitized.json \
+            orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-static-sanitized.json
+          git diff --cached --quiet && { echo 'NO_STATIC_REPAIR_TO_COMMIT'; exit 41; }
+          git commit -m 'fix(m1): restituir semántica operativa de usuarios y cuentas'
           git push origin "HEAD:$ORBIT360_BRANCH"
-          echo "ORBIT360_REPAIR_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "ORBIT360_STATIC_REPAIR_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
-      - name: Cerrar evidencia sanitizada
+      - name: Cerrar evidencia estática
         shell: bash
         run: |
           set -euo pipefail
-          REPORT='orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json'
-          jq -n \
-            --arg requestCommit "$GITHUB_SHA" \
-            --arg repairCommit "$ORBIT360_REPAIR_COMMIT" \
-            --arg runId "$GITHUB_RUN_ID" \
-            --argjson banks "$(jq '.directory.accountRowsProposed' "$REPORT")" \
-            --argjson users "$(jq '.directory.usernameRowsProposed' "$REPORT")" \
-            --argjson idMismatches "$(jq '.directory.bankReferenceAccountIdMismatches' "$REPORT")" \
-            '{schemaVersion:"orbit360-operational-directory-dryrun-closure-v2",ok:true,requestCommit:$requestCommit,repairCommit:$repairCommit,runId:($runId|tonumber),executionPhase:"LAB_DATA_CONTRACT_REPAIR_DRYRUN",contractVersion:"1.0.38",bankNumbersProposed:$banks,usernamesProposed:$users,accountIdMismatches:$idMismatches,writesExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,reimportExecuted:false,containsPII:false,containsSecrets:false,nextAction:"AUTHORIZE_SINGLE_ATOMIC_OPERATIONAL_DIRECTORY_REPAIR"}' > orbit360-platform/runtime-gate-crm-v20260716/operational-directory-dryrun-closure-sanitized.json
+          jq -n --arg requestCommit "$GITHUB_SHA" --arg repairCommit "$ORBIT360_STATIC_REPAIR_COMMIT" --arg runId "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-operational-directory-static-repair-closure-v1",ok:true,requestCommit:$requestCommit,repairCommit:$repairCommit,runId:($runId|tonumber),executionPhase:"STATIC_PREFLIGHT",contractVersion:"1.0.38",mechanism:"function-boundary-structural-replacement-v1",gateContractStatus:"GO_GATE_CONTRACT",visualStatus:"PASS",architectureStatus:"GO_STATIC_ARCHITECTURE",dataRead:false,writesExecuted:false,secretsRead:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,reimportExecuted:false,containsPII:false,containsSecrets:false,nextAction:"DESIGN_FRESH_DATA_DRYRUN_AFTER_STATIC_BASELINE"}' > orbit360-platform/runtime-gate-crm-v20260716/operational-directory-static-repair-closure-sanitized.json
 
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-operational-directory-dryrun-v2-${{ github.run_id }}
+          name: orbit360-m1-operational-directory-static-repair-${{ github.run_id }}
           path: |
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-request-v2-alignment-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-transformer-alignment-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-phase-alignment-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-code-repair-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-structural-repair-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-visual-contract-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-dryrun-closure-sanitized.json
-            tools/orbit360-m1-operational-directory-repair-dryrun-request-v2-20260722.json
+            orbit360-platform/runtime-gate-crm-v20260716/m1-operational-directory-static-visual-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-static-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-static-repair-closure-sanitized.json
+            tools/orbit360-m1-operational-directory-static-repair-request-v20260722.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -240,11 +179,6 @@ jobs:
         shell: bash
         run: |
           state=success
-          description='Dry-run v2 directorio operativo PASS; escritura aún bloqueada'
-          if [ "${{ job.status }}" != success ]; then state=failure; description='Dry-run v2 falló; STOP THE LINE'; fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-operational-directory-repair-dryrun-v2' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
-
-      - name: Limpiar identidad temporal
-        if: always()
-        shell: bash
-        run: rm -f "${RUNNER_TEMP}/orbit360-operational-directory-dryrun-v2.json"
+          description='Reparación estructural estática PASS; datos aún bloqueados'
+          if [ "${{ job.status }}" != success ]; then state=failure; description='Reparación estructural falló; datos siguen bloqueados'; fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-operational-directory-structural-static-repair-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
