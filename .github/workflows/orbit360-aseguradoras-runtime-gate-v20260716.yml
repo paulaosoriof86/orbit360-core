@@ -5,27 +5,27 @@ on:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - 'tools/orbit360-m1-operational-directory-static-scope-validation-request-v20260722.json'
+      - 'tools/orbit360-m1-operational-directory-architecture-validation-request-v20260722.json'
 
 permissions:
   contents: read
   statuses: write
 
 concurrency:
-  group: orbit360-m1-operational-directory-static-scope-validation-v1
+  group: orbit360-m1-operational-directory-architecture-validation-v1
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   ORBIT360_GATE_PHASE: static_preflight
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-static-scope-validation-request-v20260722.json
-  ORBIT360_REQUEST_ID: m1-operational-directory-static-scope-validation-v1
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-architecture-validation-request-v20260722.json
+  ORBIT360_REQUEST_ID: m1-operational-directory-architecture-validation-v1
   ORBIT360_METHOD_DECISION_ID: paula-20260722-operational-directory-root-repair
 
 jobs:
   validate-only:
-    name: Validar alcance reconciliado 1.0.38 · cero transformación
+    name: Validar arquitectura 1.0.38 · cero transformación
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -41,7 +41,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud inmutable de alcance
+      - name: Validar solicitud inmutable de arquitectura
         shell: bash
         run: |
           set -euo pipefail
@@ -54,26 +54,27 @@ jobs:
           const head = cp.execFileSync('git', ['rev-parse', 'HEAD'], { encoding:'utf8' }).trim();
           const parent = cp.execFileSync('git', ['rev-parse', 'HEAD^'], { encoding:'utf8' }).trim();
           const failures = [];
-          if (request.schemaVersion !== 'orbit360-static-scope-validation-request-v1') failures.push('schema');
+          if (request.schemaVersion !== 'orbit360-architecture-validation-request-v1') failures.push('schema');
           if (request.requestId !== process.env.ORBIT360_REQUEST_ID) failures.push('request_id');
           if (request.gateId !== process.env.ORBIT360_GATE_ID) failures.push('gate_id');
           if (request.branch !== process.env.ORBIT360_BRANCH) failures.push('branch');
           if (request.contractVersion !== '1.0.38') failures.push('contract');
-          if (request.validatorPatchCommit !== parent) failures.push('validator_patch_parent');
-          if (request.validationOnly !== true || request.scopeReconciled !== true) failures.push('validation_scope');
+          if (request.architecturePatchCommit !== parent) failures.push('architecture_patch_parent');
+          if (request.validationOnly !== true || request.architectureReconciled !== true) failures.push('validation_scope');
           if (request.dataAccess !== false || request.secretAccess !== false || request.writes !== false || request.runtime !== false || request.browser !== false || request.deploy !== false) failures.push('capabilities');
           if (failures.length) throw new Error('REQUEST_INVALID:' + failures.join(','));
           fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716', { recursive:true });
-          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-request-sanitized.json', JSON.stringify({
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-request-sanitized.json', JSON.stringify({
             schemaVersion: request.schemaVersion,
             requestId: request.requestId,
             gateId: request.gateId,
             contractVersion: request.contractVersion,
             productPatchCommit: request.productPatchCommit,
-            validatorPatchCommit: request.validatorPatchCommit,
+            scopePatchCommit: request.scopePatchCommit,
+            architecturePatchCommit: request.architecturePatchCommit,
             requestCommit: head,
             validationOnly: true,
-            scopeReconciled: true,
+            architectureReconciled: true,
             dataAccess: false,
             secretAccess: false,
             writes: false,
@@ -89,24 +90,25 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" | tee orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-preflight.json
-          grep -q '"status": "GO_GATE_CONTRACT"' orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-preflight.json
-          grep -q '"canonicalOwnerScope": "overlay_replace"' orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-preflight.json
-          grep -q '"runtimeContractScope": "overlay_replace"' orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-preflight.json
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" | tee orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-preflight.json
+          grep -q '"status": "GO_GATE_CONTRACT"' orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-preflight.json
+          grep -q '"canonicalOwnerScope": "overlay_replace"' orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-preflight.json
+          grep -q '"runtimeContractScope": "overlay_replace"' orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-preflight.json
 
       - name: Contrato conductual de directorio operativo
         shell: bash
         run: |
           set -euo pipefail
-          node orbit360-platform/tools/orbit360-m1-operational-directory-contract-v20260722.js | tee orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-operational-directory.json
-          grep -q '"status": "PASS"' orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-operational-directory.json
+          node orbit360-platform/tools/orbit360-m1-operational-directory-contract-v20260722.js | tee orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-operational-directory.json
+          grep -q '"status": "PASS"' orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-operational-directory.json
 
-      - name: Arquitectura base preservada
+      - name: Arquitectura base y visual 1.0.38 preservadas
         shell: bash
         run: |
           set -euo pipefail
-          node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js | tee orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-architecture.json
-          grep -q '"status": "GO_STATIC_ARCHITECTURE"' orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-architecture.json
+          node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js | tee orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-architecture.json
+          grep -q '"status": "GO_STATIC_ARCHITECTURE"' orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-architecture.json
+          grep -q '"contractVersion": "1.0.38"' orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-architecture.json
 
       - name: Cerrar evidencia sanitizada
         if: always()
@@ -116,12 +118,12 @@ jobs:
           const fs = require('fs');
           const dir = 'orbit360-platform/runtime-gate-crm-v20260716';
           const read = name => { try { return JSON.parse(fs.readFileSync(`${dir}/${name}`, 'utf8')); } catch (_) { return null; } };
-          const preflight = read('static-scope-validation-preflight.json');
-          const contract = read('static-scope-validation-operational-directory.json');
-          const architecture = read('static-scope-validation-architecture.json');
-          const ok = !!(preflight && preflight.status === 'GO_GATE_CONTRACT' && preflight.canonicalOwnerScope === 'overlay_replace' && preflight.runtimeContractScope === 'overlay_replace' && contract && contract.status === 'PASS' && architecture && architecture.status === 'GO_STATIC_ARCHITECTURE');
-          fs.writeFileSync(`${dir}/static-scope-validation-summary.json`, JSON.stringify({
-            schemaVersion:'orbit360-m1-operational-directory-static-scope-validation-v1',
+          const preflight = read('architecture-validation-preflight.json');
+          const contract = read('architecture-validation-operational-directory.json');
+          const architecture = read('architecture-validation-architecture.json');
+          const ok = !!(preflight && preflight.status === 'GO_GATE_CONTRACT' && preflight.canonicalOwnerScope === 'overlay_replace' && preflight.runtimeContractScope === 'overlay_replace' && contract && contract.status === 'PASS' && architecture && architecture.status === 'GO_STATIC_ARCHITECTURE' && architecture.visualRemediationContract && architecture.visualRemediationContract.contractVersion === '1.0.38');
+          fs.writeFileSync(`${dir}/architecture-validation-summary.json`, JSON.stringify({
+            schemaVersion:'orbit360-m1-operational-directory-architecture-validation-v1',
             generatedAt:new Date().toISOString(),
             ok,
             contractVersion:'1.0.38',
@@ -130,6 +132,7 @@ jobs:
             runtimeContractScope:preflight && preflight.runtimeContractScope || 'NOT_RUN',
             operationalDirectoryContract:contract && contract.status || 'NOT_RUN',
             architecture:architecture && architecture.status || 'NOT_RUN',
+            visualContract:architecture && architecture.visualRemediationContract && architecture.visualRemediationContract.contractVersion || 'NOT_RUN',
             validationOnly:true,
             sourceTransformed:false,
             dataAccess:false,
@@ -150,14 +153,14 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-operational-directory-static-scope-validation-${{ github.run_id }}
+          name: orbit360-m1-operational-directory-architecture-validation-${{ github.run_id }}
           path: |
-            orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-request-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-request-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-preflight.json
-            orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-operational-directory.json
-            orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-architecture.json
-            orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-operational-directory.json
+            orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-architecture.json
+            orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-summary.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -168,14 +171,14 @@ jobs:
         shell: bash
         run: |
           state=failure
-          description='1.0.38 scope validation failed'
-          if [ -f orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/static-scope-validation-summary.json)" = "true" ]; then
+          description='1.0.38 architecture validation failed'
+          if [ -f orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/architecture-validation-summary.json)" = "true" ]; then
             state=success
-            description='1.0.38 scope validation passed'
+            description='1.0.38 architecture validation passed'
           fi
           curl --fail-with-body -sS -X POST \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -d "$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m1-operational-directory-static-scope-validation-v1"}')"
+            -d "$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m1-operational-directory-architecture-validation-v1"}')"
