@@ -2,15 +2,18 @@
   "schemaVersion": "orbit360-gate-contract-overlay-v1",
   "issuedAt": "2026-07-22",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "classification": "DATA_CONTRACT_FAILURE",
-  "diagnosticRevision": "operational-directory-field-classification-v1",
-  "contractRevision": "1.0.38-operational-directory-direct-atomic-patch-v1",
+  "classification": "VALIDATOR_STALE",
+  "diagnosticRevision": "overlay-scope-replacement-v1",
+  "contractRevision": "1.0.38-overlay-scope-reconciliation-v1",
+  "replaceCanonicalOwners": true,
+  "replaceRequiredFiles": true,
+  "replaceRuntimeVersionContracts": true,
   "gatePatch": {
     "contractVersion": "1.0.38",
-    "diagnosticRevision": "operational-directory-field-classification-v1",
-    "runtimeVersion": "20260722-7",
+    "diagnosticRevision": "overlay-scope-replacement-v1",
+    "runtimeVersion": "20260722-8",
     "block": 1,
-    "status": "DIRECT_ATOMIC_PATCH_READY_STATIC_VALIDATION_ONLY",
+    "status": "PREFLIGHT_SCOPE_RECONCILED_STATIC_VALIDATION_ONLY",
     "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
     "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
@@ -36,10 +39,10 @@
         "firebaseProject": false,
         "hostingChannel": false
       },
-      "requestModel": "immutable-request-bound-to-committed-patch-v1"
+      "requestModel": "immutable-request-bound-to-scope-reconciled-patch-v1"
     },
-    "diagnosticRule": "Portal username and insurer bank account number are operational directory fields. Password is the only secret. The workflow validates a previously committed patch and may never transform product files.",
-    "acceptancePolicy": "Accept only GO_GATE_CONTRACT, operational-directory contract PASS, base architecture GO, zero data access, zero writes, zero runtime, zero browser and zero deploy. Data dry-run remains separately blocked."
+    "diagnosticRule": "The preflight validates only canonical owners, required files and runtime-version contracts explicitly declared by the active overlay. Global registry extensions and historical runtime contracts do not block an unrelated static phase.",
+    "acceptancePolicy": "Accept only GO_GATE_CONTRACT with owner scope overlay_replace, runtime contract scope overlay_replace, operational-directory contract PASS and base architecture GO. Source transformation, data access, secret access, writes, runtime, browser and deploy remain false."
   },
   "canonicalOwners": [
     {
@@ -49,6 +52,7 @@
         "operationalFields: ['usuario', 'numero']",
         "protectedFields: ['password', 'contrasena']",
         "passwordProtectedOnly: true",
+        "providerMappingsPreserved: true",
         "importerOwnsOperationalWrites: true",
         "passwordWrites: 0"
       ]
@@ -96,25 +100,74 @@
         "client-insurer-operational-directory-owner-v20260722.js?v=20260722-1",
         "academia-v1230-operational-directory-v20260722.js?v=20260722-1"
       ]
+    },
+    {
+      "id": "canonicalPreflightEntrypoint",
+      "path": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "requiredTokens": [
+        "tools/orbit360-validar-gate-contracts-engine-v20260722.mjs",
+        "direct-atomic-patch-validation-v1",
+        "sourceTransformed: false",
+        "dataAccess: false"
+      ]
+    },
+    {
+      "id": "overlayScopedPreflightEngine",
+      "path": "tools/orbit360-validar-gate-contracts-engine-v20260722.mjs",
+      "requiredTokens": [
+        "replaceCanonicalOwners",
+        "replaceRequiredFiles",
+        "replaceRuntimeVersionContracts",
+        "overlay_replace",
+        "GO_GATE_CONTRACT"
+      ]
     }
   ],
   "requiredFiles": [
+    "tools/orbit360-validator-lifecycle-contract-v20260722.json",
+    "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "tools/orbit360-validar-gate-contracts-engine-v20260722.mjs",
+    "tools/orbit360-incident-freeze-v20260721.json",
+    "tools/orbit360-m1-operational-directory-static-scope-validation-request-v20260722.json",
     "orbit360-platform/core/operational-directory-field-policy-v20260722.js",
     "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+    "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
     "orbit360-platform/tools/orbit360-m1-operational-directory-contract-v20260722.js",
+    "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
     "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
-    "tools/orbit360-m1-operational-directory-static-validation-request-v20260722.json"
+    "orbit360-platform/docs/MATRIZ-PATCH-ATOMICO-DIRECTORIO-OPERATIVO-1038-20260722.md",
+    "orbit360-platform/docs/CAUSA-RAIZ-PREFLIGHT-ALCANCE-OVERLAY-20260722.md"
   ],
   "runtimeVersionContracts": [
+    {
+      "path": "tools/orbit360-validar-gate-contracts-engine-v20260722.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "orbit360-gate-contract-preflight-v12-overlay-scope",
+        "replaceCanonicalOwners",
+        "replaceRuntimeVersionContracts",
+        "canonicalOwnerScope",
+        "runtimeContractScope"
+      ]
+    },
+    {
+      "path": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "tools/orbit360-validar-gate-contracts-engine-v20260722.mjs",
+        "direct-atomic-patch-validation-v1",
+        "sourceTransformed: false"
+      ]
+    },
     {
       "path": "orbit360-platform/core/operational-directory-field-policy-v20260722.js",
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "20260722.1",
         "applyOperationalFields",
-        "passwordWrites: 0",
-        "importerOwnsOperationalWrites: true"
+        "providerMappingsPreserved: true",
+        "passwordWrites: 0"
       ]
     },
     {
@@ -149,24 +202,39 @@
       ]
     },
     {
+      "path": "orbit360-platform/tools/orbit360-m1-operational-directory-contract-v20260722.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "contractVersion: '1.0.38'",
+        "WORKFLOW_VALIDATION_ONLY",
+        "WORKFLOW_NO_DATA_ACCESS"
+      ]
+    },
+    {
       "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "VALIDATION_ONLY",
-        "orbit360-m1-operational-directory-contract-v20260722.js",
+        "ORBIT360_GATE_PHASE: static_preflight",
+        "orbit360-m1-operational-directory-static-scope-validation-request-v20260722.json",
         "orbit360-validar-gate-contracts-v20260717.mjs",
+        "preflight-sanitizado.json",
+        "orbit360-m1-operational-directory-contract-v20260722.js",
         "orbit360-block0-architecture-gate-v20260717.js"
       ]
     }
   ],
   "effectiveOwnerReconciliation": {
-    "classification": "DATA_CONTRACT_FAILURE",
+    "classification": "VALIDATOR_STALE",
     "contractVersion": "1.0.38",
-    "mechanism": "direct-atomic-multifile-patch",
+    "validatorMechanismRevision": "overlay-scope-replacement-v1",
+    "canonicalOwnerScope": "overlay_replace",
+    "runtimeContractScope": "overlay_replace",
     "workflowTransformsProduct": false,
     "usernameOperational": true,
     "bankNumberOperational": true,
     "passwordProtectedOnly": true,
+    "productChanged": false,
     "dataChanged": false,
     "firestoreRead": false,
     "vaultRead": false,
