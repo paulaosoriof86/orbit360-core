@@ -52,8 +52,8 @@
       "runtimeVersion": "20260723-1",
       "block": 2,
       "status": "ACTIVE_STATIC_PATCH_VALIDATION",
-      "diagnosticRule": "Validate the explicit product read-only bootstrap, membership-derived tenant, canonical roles, separate entrypoint, absolute write denial and post-readiness installation before any productive secret, Firebase access, Rules, runtime or deploy.",
-      "acceptancePolicy": "Accept only GO_GATE_CONTRACT plus M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS with zero external capabilities.",
+      "diagnosticRule": "Validate the explicit product read-only bootstrap, membership-derived tenant, canonical roles, separate entrypoint, absolute write denial, post-readiness installation and observable sanitized status before any productive secret, Firebase access, Rules, runtime or deploy.",
+      "acceptancePolicy": "Accept only GO_GATE_CONTRACT plus M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS with observable commit status and zero external product capabilities.",
       "workflow": ".github/workflows/orbit360-m2-product-readonly-static-gate-v20260723.yml",
       "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
       "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
@@ -112,7 +112,7 @@
         },
         {
           "path": ".github/workflows/orbit360-m2-product-readonly-static-gate-v20260723.yml",
-          "requiredTokens": ["VALIDATION_ONLY", "M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS"]
+          "requiredTokens": ["VALIDATION_ONLY", "M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS", "statuses: write", "orbit360/m2-product-readonly-static-v2"]
         }
       ],
       "forbiddenRuntimeReferences": ["backend-lab-loader.js", "store-firestore-lab.local.js", "data/seed.js", "Orbit.SEED", "URLSearchParams", "location.search"],
