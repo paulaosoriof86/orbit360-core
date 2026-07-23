@@ -25,63 +25,34 @@
     visualStability: ['core/client-insurer-visual-stability-barrier-v20260721.js?v=20260722-5', '/core/client-insurer-visual-stability-barrier-v20260721.js'],
     visualBase: ['core/client-insurer-visual-contract-v20260720.js?v=20260721-4', '/core/client-insurer-visual-contract-v20260720.js'],
     operationalOwner: ['core/client-insurer-operational-directory-owner-v20260722.js?v=20260722-1', '/core/client-insurer-operational-directory-owner-v20260722.js'],
-    operationalAcademy: ['data/academia-v1230-operational-directory-v20260722.js?v=20260722-1', '/data/academia-v1230-operational-directory-v20260722.js']
+    operationalAcademy: ['data/academia-v1230-operational-directory-v20260722.js?v=20260722-2', '/data/academia-v1230-operational-directory-v20260722.js']
   };
 
   window.OrbitTenantBootstrapState = {
-    owner: 'core/router.js',
-    phase: 'shell-parse',
-    tenantResolved: Boolean(tenantId),
-    sourceResolved: Boolean(source),
-    criticalRelease: CRITICAL_RELEASE,
-    visualStabilityRequested: true,
-    visualStabilityVersion: '20260722.5',
-    visualContractRequested: true,
-    visualContractVersion: '20260720.2',
-    visualContractDeliveryRevision: '20260722.7',
-    editOwnerRequested: true,
-    editOwnerVersion: '20260722.1',
-    editStyleRequested: true,
-    sessionReadinessRequested: true,
-    sessionReadinessVersion: '20260720.1',
-    credentialProviderRequested: true,
-    credentialProviderVersion: '20260722.2',
-    secureTargetBridgeRequested: true,
-    secureTargetBridgeVersion: '20260722.2',
-    importerContractRequested: true,
-    importerContractVersion: '20260720.2',
-    importerAcademyRequested: true,
-    importerAcademyVersion: '1.227',
-    operationalDirectoryPolicyRequested: true,
-    operationalDirectoryPolicyVersion: '20260722.1',
-    operationalDirectoryOwnerRequested: true,
-    operationalDirectoryOwnerVersion: '20260722.1',
-    operationalDirectoryAcademyRequested: true,
-    operationalDirectoryAcademyVersion: '1.230',
+    owner: 'core/router.js', phase: 'shell-parse', tenantResolved: Boolean(tenantId), sourceResolved: Boolean(source), criticalRelease: CRITICAL_RELEASE,
+    visualStabilityRequested: true, visualStabilityVersion: '20260722.5',
+    visualContractRequested: true, visualContractVersion: '20260720.2', visualContractDeliveryRevision: '20260722.7',
+    editOwnerRequested: true, editOwnerVersion: '20260722.1', editStyleRequested: true,
+    sessionReadinessRequested: true, sessionReadinessVersion: '20260720.1',
+    credentialProviderRequested: true, credentialProviderVersion: '20260722.2',
+    secureTargetBridgeRequested: true, secureTargetBridgeVersion: '20260722.2',
+    importerContractRequested: true, importerContractVersion: '20260720.2',
+    importerAcademyRequested: true, importerAcademyVersion: '1.227',
+    operationalDirectoryPolicyRequested: true, operationalDirectoryPolicyVersion: '20260722.1',
+    operationalDirectoryOwnerRequested: true, operationalDirectoryOwnerVersion: '20260722.1',
+    operationalDirectoryAcademyRequested: true, operationalDirectoryAcademyVersion: '1.231',
     status: source ? 'requested' : 'visual-only'
   };
 
-  function safeSameOrigin(value, expectedPath) {
-    var target;
-    try { target = new URL(value, window.location.href); }
-    catch (error) { return null; }
-    return target.origin === window.location.origin && target.pathname === expectedPath ? target : null;
-  }
+  function safeSameOrigin(value, expectedPath) { var target; try { target = new URL(value, window.location.href); } catch (error) { return null; } return target.origin === window.location.origin && target.pathname === expectedPath ? target : null; }
   var resolved = {};
   Object.keys(sources).forEach(function (key) { resolved[key] = safeSameOrigin(sources[key][0], sources[key][1]); });
-  if (Object.keys(resolved).some(function (key) { return !resolved[key]; })) {
-    window.OrbitTenantBootstrapState.status = 'runtime-source-blocked';
-    return;
-  }
+  if (Object.keys(resolved).some(function (key) { return !resolved[key]; })) { window.OrbitTenantBootstrapState.status = 'runtime-source-blocked'; return; }
 
   var tenantTarget = null;
   if (source) {
-    try { tenantTarget = new URL(source, window.location.href); }
-    catch (error) { window.OrbitTenantBootstrapState.status = 'invalid-source'; return; }
-    if (tenantTarget.origin !== window.location.origin || !/^\/data\/tenant-[a-z0-9-]+-insurers-p10\.js$/i.test(tenantTarget.pathname)) {
-      window.OrbitTenantBootstrapState.status = 'blocked-source';
-      return;
-    }
+    try { tenantTarget = new URL(source, window.location.href); } catch (error) { window.OrbitTenantBootstrapState.status = 'invalid-source'; return; }
+    if (tenantTarget.origin !== window.location.origin || !/^\/data\/tenant-[a-z0-9-]+-insurers-p10\.js$/i.test(tenantTarget.pathname)) { window.OrbitTenantBootstrapState.status = 'blocked-source'; return; }
   }
 
   function escaped(target) { return (target.pathname + target.search).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
@@ -102,45 +73,24 @@
     writeScript(resolved.visualBase, 'data-orbit-m1-visual-contract');
     writeScript(resolved.operationalOwner, 'data-orbit-operational-directory-owner');
     writeScript(resolved.operationalAcademy, 'data-orbit-operational-directory-academy');
-    if (tenantTarget) {
-      document.write('<script src="' + escaped(tenantTarget) + '" data-orbit-router-tenant-bootstrap="1"><\/script>');
-      window.OrbitTenantBootstrapState.status = 'parser-requested';
-    } else window.OrbitTenantBootstrapState.status = 'visual-parser-requested';
+    if (tenantTarget) { document.write('<script src="' + escaped(tenantTarget) + '" data-orbit-router-tenant-bootstrap="1"><\/script>'); window.OrbitTenantBootstrapState.status = 'parser-requested'; }
+    else window.OrbitTenantBootstrapState.status = 'visual-parser-requested';
     return;
   }
 
-  function ensureStyle(target, attribute) {
-    if (document.querySelector('link[' + attribute + ']')) return;
-    var link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = target.pathname + target.search;
-    link.setAttribute(attribute, '1');
-    document.head.appendChild(link);
-  }
+  function ensureStyle(target, attribute) { if (document.querySelector('link[' + attribute + ']')) return; var link = document.createElement('link'); link.rel = 'stylesheet'; link.href = target.pathname + target.search; link.setAttribute(attribute, '1'); document.head.appendChild(link); }
   ensureStyle(resolved.visualStyle, 'data-orbit-m1-visual-style');
   ensureStyle(resolved.editStyle, 'data-orbit-m1-edit-style');
 
   function loadScript(target, attribute, ready, next, errorStatus) {
     if (ready()) { next(); return; }
-    var script = document.createElement('script');
-    script.src = target.pathname + target.search;
-    script.async = false;
-    script.setAttribute(attribute, '1');
+    var script = document.createElement('script'); script.src = target.pathname + target.search; script.async = false; script.setAttribute(attribute, '1');
     script.addEventListener('load', next, { once: true });
     script.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = errorStatus; }, { once: true });
     document.head.appendChild(script);
   }
-  function loadTenantConfig() {
-    if (!tenantTarget) { window.OrbitTenantBootstrapState.status = 'visual-loaded'; return; }
-    var script = document.createElement('script');
-    script.src = tenantTarget.pathname + tenantTarget.search;
-    script.async = false;
-    script.setAttribute('data-orbit-router-tenant-bootstrap', '1');
-    script.addEventListener('load', function () { window.OrbitTenantBootstrapState.status = 'loaded'; }, { once: true });
-    script.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'error'; }, { once: true });
-    document.head.appendChild(script);
-  }
-  function loadOperationalAcademy() { loadScript(resolved.operationalAcademy, 'data-orbit-operational-directory-academy', function () { return !!(window.Orbit && Orbit.academiaOperationalDirectoryV20260722 && Orbit.academiaOperationalDirectoryV20260722.version === '1.230'); }, loadTenantConfig, 'operational-directory-academy-error'); }
+  function loadTenantConfig() { if (!tenantTarget) { window.OrbitTenantBootstrapState.status = 'visual-loaded'; return; } var script = document.createElement('script'); script.src = tenantTarget.pathname + tenantTarget.search; script.async = false; script.setAttribute('data-orbit-router-tenant-bootstrap', '1'); script.addEventListener('load', function () { window.OrbitTenantBootstrapState.status = 'loaded'; }, { once: true }); script.addEventListener('error', function () { window.OrbitTenantBootstrapState.status = 'error'; }, { once: true }); document.head.appendChild(script); }
+  function loadOperationalAcademy() { loadScript(resolved.operationalAcademy, 'data-orbit-operational-directory-academy', function () { return !!(window.Orbit && Orbit.academiaOperationalDirectoryV20260722 && Orbit.academiaOperationalDirectoryV20260722.version === '1.231'); }, loadTenantConfig, 'operational-directory-academy-error'); }
   function loadOperationalOwner() { loadScript(resolved.operationalOwner, 'data-orbit-operational-directory-owner', function () { return !!(window.Orbit && Orbit.clientInsurerOperationalDirectoryOwnerV20260722 && Orbit.clientInsurerOperationalDirectoryOwnerV20260722.version === '20260722.1'); }, loadOperationalAcademy, 'operational-directory-owner-error'); }
   function loadVisualBase() { loadScript(resolved.visualBase, 'data-orbit-m1-visual-contract', function () { return !!(window.Orbit && Orbit.clientInsurerVisualContractV20260720 && Orbit.clientInsurerVisualContractV20260720.version === '20260720.2'); }, loadOperationalOwner, 'visual-error'); }
   function loadVisualStability() { loadScript(resolved.visualStability, 'data-orbit-insurer-visual-stability', function () { return !!(window.Orbit && Orbit.__clientInsurerVisualStabilityBarrierV20260721 && Orbit.__clientInsurerVisualStabilityBarrierV20260721.version === '20260722.5'); }, loadVisualBase, 'visual-stability-error'); }
