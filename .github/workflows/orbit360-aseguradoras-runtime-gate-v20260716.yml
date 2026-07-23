@@ -1,33 +1,30 @@
-name: Orbit 360 · Directorio operativo 1.0.38 · READ_ONLY_DRY_RUN
+name: Orbit 360 · Directorio operativo 1.0.38 · ATOMIC_APPLY
 
 on:
   push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - 'tools/orbit360-m1-operational-directory-data-dryrun-request-v20260722.json'
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['tools/orbit360-m1-operational-directory-atomic-apply-request-v20260722.json']
 
 permissions:
   contents: read
   statuses: write
 
 concurrency:
-  group: orbit360-m1-operational-directory-data-dryrun-v1
+  group: orbit360-m1-operational-directory-atomic-apply-v1
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_PHASE: lab_data_contract_repair_dryrun
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-data-dryrun-request-v20260722.json
-  ORBIT360_REQUEST_ID: m1-operational-directory-data-dryrun-v1
-  ORBIT360_METHOD_DECISION_ID: paula-20260722-operational-directory-root-repair
+  ORBIT360_GATE_PHASE: lab_data_contract_repair_apply
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-atomic-apply-request-v20260722.json
+  ORBIT360_REQUEST_ID: m1-operational-directory-atomic-apply-v1
   EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
   FIREBASE_PROJECT_ID: ays-orbit-360-lab
 
 jobs:
-  read-only-dryrun:
-    name: Directorio operativo · dry-run read-only
+  atomic-apply:
+    name: Directorio operativo · aplicación atómica
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -43,57 +40,29 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud inmutable y autorización
+      - name: Validar solicitud y evidencia dry-run
         shell: bash
         run: |
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "${ORBIT360_BRANCH}"
-          test -f "${ORBIT360_REQUEST_FILE}"
           node <<'NODE'
-          const fs = require('fs');
-          const cp = require('child_process');
-          const request = JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE, 'utf8'));
-          const freeze = JSON.parse(fs.readFileSync('tools/orbit360-incident-freeze-v20260721.json', 'utf8'));
-          const head = cp.execFileSync('git', ['rev-parse', 'HEAD'], { encoding:'utf8' }).trim();
-          const parent = cp.execFileSync('git', ['rev-parse', 'HEAD^'], { encoding:'utf8' }).trim();
-          const failures = [];
-          if (request.schemaVersion !== 'orbit360-data-dryrun-request-v1') failures.push('schema');
-          if (request.requestId !== process.env.ORBIT360_REQUEST_ID) failures.push('request_id');
-          if (request.gateId !== process.env.ORBIT360_GATE_ID) failures.push('gate_id');
-          if (request.branch !== process.env.ORBIT360_BRANCH) failures.push('branch');
-          if (request.contractVersion !== '1.0.38') failures.push('contract');
-          if (request.dryRunPatchCommit !== parent) failures.push('dryrun_patch_parent');
-          if (request.allowedExecutions !== 1 || request.readOnlyDryRun !== true) failures.push('execution');
-          if (request.secretPurpose !== 'read_existing_insurer_vault_for_sanitized_matching_only') failures.push('secret_purpose');
-          if (request.firestoreRead !== true || request.vaultRead !== true || request.secretAccess !== true) failures.push('read_capabilities');
-          if (request.writes !== false || request.runtime !== false || request.browser !== false || request.deploy !== false || request.functionsDeploy !== false || request.rulesDeploy !== false || request.production !== false || request.reimport !== false) failures.push('blocked_capabilities');
-          if (freeze.status !== 'M1_OPERATIONAL_DIRECTORY_DRYRUN_AUTHORIZED_ONCE') failures.push('freeze_status');
-          const auth = freeze.dryRunAuthorization || {};
-          if (auth.authorizationId !== 'm1-operational-directory-data-dryrun-v1' || auth.active !== true || auth.consumed !== false || auth.allowedExecutions !== 1 || auth.writesAllowed !== false) failures.push('freeze_authorization');
-          if (failures.length) throw new Error('REQUEST_INVALID:' + failures.join(','));
-          fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716', { recursive:true });
-          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-request-sanitized.json', JSON.stringify({
-            schemaVersion:request.schemaVersion,
-            requestId:request.requestId,
-            gateId:request.gateId,
-            contractVersion:request.contractVersion,
-            dryRunPatchCommit:request.dryRunPatchCommit,
-            requestCommit:head,
-            readOnlyDryRun:true,
-            firestoreRead:true,
-            vaultRead:true,
-            secretPurpose:request.secretPurpose,
-            writes:false,
-            runtime:false,
-            browser:false,
-            deploy:false,
-            functionsDeploy:false,
-            rulesDeploy:false,
-            production:false,
-            reimport:false,
-            containsPII:false,
-            containsSecrets:false
-          }, null, 2) + '\n');
+          const fs=require('fs'),cp=require('child_process');
+          const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
+          const f=JSON.parse(fs.readFileSync('tools/orbit360-incident-freeze-v20260721.json','utf8'));
+          const head=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
+          const e=r.expected||{},a=f.applyAuthorization||{},bad=[];
+          if(r.schemaVersion!=='orbit360-atomic-apply-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
+          if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.contractVersion!=='1.0.38')bad.push('scope');
+          if(r.applyPatchCommit!==parent||r.allowedExecutions!==1||r.atomicApply!==true)bad.push('binding');
+          if(r.firestoreRead!==true||r.vaultRead!==true||r.secretAccess!==true||r.writes!==true)bad.push('capabilities');
+          if(r.runtime!==false||r.browser!==false||r.deploy!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.reimport!==false)bad.push('blocked');
+          if([e.clients,e.insurers,e.advisors,e.bankNumbers,e.usernames,e.affectedDocuments,e.bankPending,e.credentialPasswords,e.accountIdMismatches].join('/')!=='414/26/7/91/26/14/2/26/68')bad.push('counts');
+          if(r.dryRunRunId!==29973981164||r.dryRunArtifactId!==8550735007||r.dryRunArtifactDigest!=='sha256:b5fe862604565ef1353fe822d8ce3a4357dd6e61e9c3d81ee338b940f2dc777a')bad.push('evidence');
+          if(f.status!=='M1_OPERATIONAL_DIRECTORY_ATOMIC_APPLY_AUTHORIZED_ONCE'||a.authorizationId!=='m1-operational-directory-atomic-apply-v1'||a.active!==true||a.consumed!==false||a.allowedExecutions!==1||a.writesAllowed!==true||a.readAfterWriteRequired!==true||a.rollbackRequired!==true)bad.push('freeze');
+          if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
+          fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-request-sanitized.json',JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,gateId:r.gateId,contractVersion:r.contractVersion,applyPatchCommit:r.applyPatchCommit,requestCommit:head,dryRunRunId:r.dryRunRunId,dryRunArtifactId:r.dryRunArtifactId,dryRunArtifactDigest:r.dryRunArtifactDigest,expected:r.expected,atomicApply:true,readAfterWrite:true,rollbackRequired:true,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
           NODE
 
       - name: Preflight canónico antes de credenciales
@@ -102,21 +71,21 @@ jobs:
           set -euo pipefail
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" | tee orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-preflight.json
-          jq -e '.status == "GO_GATE_CONTRACT" and .contractVersion == "1.0.38" and .executionPhase == "LAB_DATA_CONTRACT_REPAIR_DRYRUN" and .canonicalOwnerScope == "overlay_replace" and .runtimeContractScope == "overlay_replace" and .capabilityProfile.secrets == true and .capabilityProfile.firestoreRead == true and .capabilityProfile.writes == false and .sourceTransformed == false and .operationalWrites == 0' orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-preflight.json >/dev/null
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" > orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-preflight.json
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="1.0.38" and .executionPhase=="LAB_DATA_CONTRACT_REPAIR_APPLY" and .canonicalOwnerScope=="overlay_replace" and .runtimeContractScope=="overlay_replace" and .capabilityProfile.secrets==true and .capabilityProfile.firestoreRead==true and .capabilityProfile.writes==true and .sourceTransformed==false and .operationalWrites==0' orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-preflight.json >/dev/null
 
-      - name: Revalidar producto y arquitectura estática
+      - name: Revalidar producto y arquitectura
         shell: bash
         run: |
           set -euo pipefail
-          node orbit360-platform/tools/orbit360-m1-operational-directory-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-operational-contract.json
-          jq -e '.status == "PASS" and .contractVersion == "1.0.38" and .writes == 0' orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-operational-contract.json >/dev/null
-          node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-visual-contract.json
-          jq -e '.status == "PASS" and .contractVersion == "1.0.38" and .writes == 0' orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-visual-contract.json >/dev/null
-          node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-architecture.json
-          jq -e '.status == "GO_STATIC_ARCHITECTURE" and .failed == 0' orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-architecture.json >/dev/null
+          node orbit360-platform/tools/orbit360-m1-operational-directory-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-operational-contract.json
+          jq -e '.status=="PASS" and .contractVersion=="1.0.38" and .writes==0' orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-operational-contract.json >/dev/null
+          node orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-visual-contract.json
+          jq -e '.status=="PASS" and .contractVersion=="1.0.38" and .writes==0' orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-visual-contract.json >/dev/null
+          node orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js > orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-architecture.json
+          jq -e '.status=="GO_STATIC_ARCHITECTURE" and .failed==0' orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-architecture.json >/dev/null
 
-      - name: Resolver identidad LAB de solo lectura
+      - name: Resolver identidad LAB de escritura limitada
         env:
           SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
           SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -124,145 +93,55 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-}"
-          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
-          if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
           test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-operational-directory-readonly.json"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-operational-directory-atomic-apply.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
           echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
 
-      - name: Instalar dependencias de lectura
-        shell: bash
+      - name: Instalar dependencias controladas
         run: |
-          set -euo pipefail
           npm install --no-save --package-lock=false firebase-admin@13 @google-cloud/secret-manager@6
-          node -e "require('firebase-admin'); require('@google-cloud/secret-manager'); console.log('READ_ONLY_DEPENDENCIES_OK')"
+          node -e "require('firebase-admin');require('@google-cloud/secret-manager')"
 
-      - name: Leer Firestore y bóveda · cero escrituras
+      - name: Aplicar una transacción y verificar readback
         shell: bash
         run: |
           set -euo pipefail
           node --check tools/orbit360-restituir-directorio-operativo-v2-v20260722.mjs
-          node tools/orbit360-restituir-directorio-operativo-v2-v20260722.mjs --dry-run
-          REPORT='orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json'
-          jq -e '
-            .ok == true and
-            .status == "DRY_RUN_READY" and
-            .mode == "DRY_RUN" and
-            .contractVersion == "1.0.38" and
-            .counts.clients == 414 and
-            .counts.insurers == 26 and
-            .counts.advisors == 7 and
-            .vault.bankRecords == 91 and
-            .directory.bankReferenceRows == 91 and
-            .directory.bankMatchedToVault == 91 and
-            .directory.bankUnmatchedRefs == 0 and
-            .directory.bankPendingRows == 2 and
-            .directory.credentialReferenceRows > 0 and
-            .directory.credentialMatchedToVault == .directory.credentialReferenceRows and
-            .directory.credentialUnmatchedRefs == 0 and
-            .directory.credentialPasswordsAvailable == .directory.credentialReferenceRows and
-            .directory.passwordsInOperationalDirectory == 0 and
-            .directory.accountRowsProposed > 0 and
-            .directory.usernameRowsProposed > 0 and
-            .directory.rowCountChanges == 0 and
-            .directory.rowOrderChanges == 0 and
-            .directory.nonTargetFieldChanges == 0 and
-            .acceptance.expectedOperationalBankNumbersAfter == 91 and
-            .acceptance.onlyTargetFieldsChanged == true and
-            .acceptance.accountIdMismatchExplainsRevealFailure == true and
-            .acceptance.passwordsRemainProtected == true and
-            .writesExecuted == false and
-            .transactionCommitted == false and
-            .safety.creates == 0 and
-            .safety.deletes == 0 and
-            .safety.reorders == 0 and
-            .safety.rowCountChanges == 0 and
-            .safety.nonTargetFieldChanges == 0 and
-            .safety.passwordWrites == 0 and
-            .safety.functionsDeploy == false and
-            .safety.rulesDeploy == false and
-            .safety.productionTouched == false and
-            .safety.reimportExecuted == false and
-            .containsPII == false and
-            .containsSecrets == false and
-            .containsRawBankValues == false and
-            .containsRawUsernames == false
-          ' "$REPORT" >/dev/null
+          node tools/orbit360-restituir-directorio-operativo-v2-v20260722.mjs --apply
+          R='orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-apply-sanitized.json'
+          jq -e '.ok==true and .status=="APPLIED_AND_VERIFIED" and .mode=="APPLY" and .contractVersion=="1.0.38" and .counts.clients==414 and .counts.insurers==26 and .counts.advisors==7 and .vault.bankRecords==91 and .directory.bankReferenceRows==91 and .directory.bankMatchedToVault==91 and .directory.bankPendingRows==2 and .directory.credentialReferenceRows==26 and .directory.credentialMatchedToVault==26 and .directory.credentialPasswordsAvailable==26 and .directory.accountRowsProposed==91 and .directory.usernameRowsProposed==26 and .directory.affectedDocuments==14 and .directory.bankReferenceAccountIdMismatches==68 and .directory.passwordsInOperationalDirectory==0 and .directory.rowCountChanges==0 and .directory.rowOrderChanges==0 and .directory.nonTargetFieldChanges==0 and .writesExecuted==true and .transactionCommitted==true and .rollbackExecuted==false and .safety.creates==0 and .safety.deletes==0 and .safety.reorders==0 and .safety.passwordWrites==0 and .safety.rollbackAvailable==true and .after.bankOperationalNumbers==91 and .after.bankPendingRows==2 and .after.usernamesOperational>=26 and .after.credentialPasswordsAvailable==26 and .after.passwordsInOperationalDirectory==0 and .after.accountRowsStillProposed==0 and .after.usernameRowsStillProposed==0 and .after.credentialStatusRowsStillProposed==0 and .after.rowCountChanges==0 and .after.rowOrderChanges==0 and .after.nonTargetFieldChanges==0 and .safety.functionsDeploy==false and .safety.rulesDeploy==false and .safety.productionTouched==false and .safety.reimportExecuted==false and .containsPII==false and .containsSecrets==false and .containsRawBankValues==false and .containsRawUsernames==false' "$R" >/dev/null
 
       - name: Cerrar evidencia sanitizada
         if: always()
         shell: bash
         run: |
           node <<'NODE'
-          const fs = require('fs');
-          const dir = 'orbit360-platform/runtime-gate-crm-v20260716';
-          const read = name => { try { return JSON.parse(fs.readFileSync(`${dir}/${name}`, 'utf8')); } catch (_) { return null; } };
-          const preflight = read('data-dryrun-preflight.json');
-          const operational = read('data-dryrun-operational-contract.json');
-          const visual = read('data-dryrun-visual-contract.json');
-          const architecture = read('data-dryrun-architecture.json');
-          const dryrun = read('operational-directory-repair-dryrun-sanitized.json');
-          const ok = !!(
-            preflight && preflight.status === 'GO_GATE_CONTRACT' &&
-            operational && operational.status === 'PASS' &&
-            visual && visual.status === 'PASS' &&
-            architecture && architecture.status === 'GO_STATIC_ARCHITECTURE' &&
-            dryrun && dryrun.ok === true && dryrun.status === 'DRY_RUN_READY' && dryrun.writesExecuted === false
-          );
-          fs.writeFileSync(`${dir}/data-dryrun-summary.json`, JSON.stringify({
-            schemaVersion:'orbit360-m1-operational-directory-data-dryrun-v1',
-            generatedAt:new Date().toISOString(),
-            ok,
-            contractVersion:'1.0.38',
-            preflight:preflight && preflight.status || 'NOT_RUN',
-            operationalContract:operational && operational.status || 'NOT_RUN',
-            visualContract:visual && visual.status || 'NOT_RUN',
-            architecture:architecture && architecture.status || 'NOT_RUN',
-            dryRunStatus:dryrun && dryrun.status || 'NOT_RUN',
-            proposed:dryrun ? {
-              bankNumbers:dryrun.directory && dryrun.directory.accountRowsProposed || 0,
-              usernames:dryrun.directory && dryrun.directory.usernameRowsProposed || 0,
-              credentialStatuses:dryrun.directory && dryrun.directory.credentialStatusRowsProposed || 0,
-              affectedDocuments:dryrun.directory && dryrun.directory.affectedDocuments || 0
-            } : null,
-            matched:dryrun ? {
-              bankReferences:dryrun.directory && dryrun.directory.bankMatchedToVault || 0,
-              credentialReferences:dryrun.directory && dryrun.directory.credentialMatchedToVault || 0,
-              credentialPasswords:dryrun.directory && dryrun.directory.credentialPasswordsAvailable || 0
-            } : null,
-            onlyTargetFieldsChanged:!!(dryrun && dryrun.acceptance && dryrun.acceptance.onlyTargetFieldsChanged),
-            writes:false,
-            runtime:false,
-            browser:false,
-            deploy:false,
-            functionsDeployed:false,
-            rulesDeployed:false,
-            productionTouched:false,
-            reimport:false,
-            containsPII:false,
-            containsSecrets:false
-          }, null, 2) + '\n');
+          const fs=require('fs'),d='orbit360-platform/runtime-gate-crm-v20260716';
+          const read=n=>{try{return JSON.parse(fs.readFileSync(`${d}/${n}`,'utf8'))}catch{return null}};
+          const p=read('atomic-apply-preflight.json'),o=read('atomic-apply-operational-contract.json'),v=read('atomic-apply-visual-contract.json'),a=read('atomic-apply-architecture.json'),x=read('operational-directory-repair-apply-sanitized.json');
+          const ok=!!(p&&p.status==='GO_GATE_CONTRACT'&&o&&o.status==='PASS'&&v&&v.status==='PASS'&&a&&a.status==='GO_STATIC_ARCHITECTURE'&&x&&x.status==='APPLIED_AND_VERIFIED'&&x.transactionCommitted===true&&x.rollbackExecuted===false);
+          fs.writeFileSync(`${d}/atomic-apply-summary.json`,JSON.stringify({schemaVersion:'orbit360-m1-operational-directory-atomic-apply-v1',generatedAt:new Date().toISOString(),ok,contractVersion:'1.0.38',preflight:p&&p.status||'NOT_RUN',operationalContract:o&&o.status||'NOT_RUN',visualContract:v&&v.status||'NOT_RUN',architecture:a&&a.status||'NOT_RUN',applyStatus:x&&x.status||'NOT_RUN',restored:x?{bankNumbers:x.after&&x.after.bankOperationalNumbers||0,usernames:x.after&&x.after.usernamesOperational||0,bankPending:x.after&&x.after.bankPendingRows||0,credentialPasswords:x.after&&x.after.credentialPasswordsAvailable||0,operationalPasswords:x.after&&x.after.passwordsInOperationalDirectory||0}:null,remainingProposals:x?{bankNumbers:x.after&&x.after.accountRowsStillProposed||0,usernames:x.after&&x.after.usernameRowsStillProposed||0,credentialStatuses:x.after&&x.after.credentialStatusRowsStillProposed||0}:null,transactionCommitted:!!(x&&x.transactionCommitted),rollbackExecuted:!!(x&&x.rollbackExecuted),rowCountChanges:x&&x.after&&x.after.rowCountChanges||0,rowOrderChanges:x&&x.after&&x.after.rowOrderChanges||0,nonTargetFieldChanges:x&&x.after&&x.after.nonTargetFieldChanges||0,runtime:false,browser:false,deploy:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,reimport:false,containsPII:false,containsSecrets:false},null,2)+'\n');
           NODE
 
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-operational-directory-data-dryrun-${{ github.run_id }}
+          name: orbit360-m1-operational-directory-atomic-apply-${{ github.run_id }}
           path: |
-            orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-request-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-request-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-preflight.json
-            orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-operational-contract.json
-            orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-visual-contract.json
-            orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-architecture.json
-            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-operational-contract.json
+            orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-visual-contract.json
+            orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-architecture.json
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-apply-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-summary.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -272,22 +151,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          state=failure
-          description='1.0.38 read-only dry-run failed'
-          if [ -f orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/data-dryrun-summary.json)" = "true" ]; then
-            state=success
-            description='1.0.38 read-only dry-run passed'
-          fi
-          curl --fail-with-body -sS -X POST \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -d "$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m1-operational-directory-data-dryrun-v1"}')"
+          state=failure; description='1.0.38 atomic apply failed'
+          if [ -f orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-summary.json ] && [ "$(jq -r '.ok' orbit360-platform/runtime-gate-crm-v20260716/atomic-apply-summary.json)" = true ]; then state=success; description='1.0.38 atomic apply passed'; fi
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m1-operational-directory-atomic-apply-v1"}')"
 
       - name: Limpiar identidad temporal
         if: always()
-        shell: bash
         run: |
           if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ]; then rm -f "${ORBIT360_TEMP_KEY_FILE}"; fi
           rm -rf node_modules package-lock.json npm-shrinkwrap.json
