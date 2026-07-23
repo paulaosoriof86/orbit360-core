@@ -20,6 +20,11 @@ const GATE_CONFIG = Object.freeze({
     contractVersion: '2.0.0',
     lifecycle: 'tools/orbit360-validator-lifecycle-contract-m2-v20260723.json',
     engine: 'tools/orbit360-validar-gate-contracts-engine-m2-v20260723.mjs'
+  },
+  'block2-product-readonly-runtime-v20260723': {
+    contractVersion: '2.1.0',
+    lifecycle: 'tools/orbit360-validator-lifecycle-contract-m2-runtime-v20260723.json',
+    engine: 'tools/orbit360-validar-gate-contracts-engine-m2-runtime-v20260723.mjs'
   }
 });
 const PHASE_PROFILES = Object.freeze({
@@ -27,7 +32,8 @@ const PHASE_PROFILES = Object.freeze({
   LAB_DATA_CONTRACT_REPAIR_DRYRUN: { secrets:true, firestoreRead:true, writes:false, runtime:false, browser:false, deploy:false, functionsDeploy:false, rulesDeploy:false, production:false },
   LAB_DATA_CONTRACT_REPAIR_APPLY: { secrets:true, firestoreRead:true, writes:true, runtime:false, browser:false, deploy:false, functionsDeploy:false, rulesDeploy:false, production:false },
   LAB_HOSTING_DELIVERY: { secrets:true, firestoreRead:false, writes:false, runtime:false, browser:false, deploy:true, functionsDeploy:false, rulesDeploy:false, production:false },
-  LAB_RUNTIME_GATE: { secrets:true, firestoreRead:true, writes:false, runtime:true, browser:true, deploy:false, functionsDeploy:false, rulesDeploy:false, production:false }
+  LAB_RUNTIME_GATE: { secrets:true, firestoreRead:true, writes:false, runtime:true, browser:true, deploy:false, functionsDeploy:false, rulesDeploy:false, production:false },
+  PRODUCT_READONLY_RUNTIME: { secrets:true, firestoreRead:true, writes:true, runtime:true, browser:false, deploy:false, functionsDeploy:false, rulesDeploy:true, production:true }
 });
 
 function readJson(rel) {
