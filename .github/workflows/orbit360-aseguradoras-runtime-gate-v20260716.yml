@@ -1,25 +1,25 @@
-name: Orbit 360 · Reparación canónica directorio operativo · dry-run
+name: Orbit 360 · Reparación canónica directorio operativo · dry-run v2
 
 on:
   push:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - 'tools/orbit360-m1-operational-directory-repair-dryrun-request-v20260722.json'
+      - 'tools/orbit360-m1-operational-directory-repair-dryrun-request-v2-20260722.json'
 
 permissions:
   contents: write
   statuses: write
 
 concurrency:
-  group: orbit360-m1-operational-directory-repair-dryrun-v1
+  group: orbit360-m1-operational-directory-repair-dryrun-v2
   cancel-in-progress: false
 
 env:
   ORBIT360_GATE_ID: block1-client360-insurers-lab-v20260717
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   ORBIT360_GATE_PHASE: lab_data_contract_repair_dryrun
-  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-repair-dryrun-request-v20260722.json
+  ORBIT360_REQUEST_FILE: tools/orbit360-m1-operational-directory-repair-dryrun-request-v2-20260722.json
   ORBIT360_REQUEST_MODEL: immutable-request-bound-to-parent-head-and-run-attempt-v1
   ORBIT360_METHOD_DECISION_ID: paula-20260722-operational-directory-root-repair
   EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
@@ -28,7 +28,7 @@ env:
 
 jobs:
   operational-directory-dryrun:
-    name: Restituir contrato operativo · dry-run sin escrituras
+    name: Restituir contrato operativo · dry-run v2 sin escrituras
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -43,7 +43,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar solicitud inmutable y freeze
+      - name: Validar solicitud inmutable v2 y freeze
         shell: bash
         run: |
           set -euo pipefail
@@ -73,26 +73,33 @@ jobs:
           test "$(jq -r '.productionAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.reimportAllowed' "$REQUEST")" = 'false'
           test "$(jq -r '.finalGateRerunAllowed' "$REQUEST")" = 'false'
-          test "$(jq -r '.status' "$FREEZE")" = 'M1_VISUAL_REVIEW_FAILED_DATA_CONTRACT_REPAIR_DRYRUN_AUTHORIZED'
-          test "$(jq -r '.dryRunAuthorization.authorizationId' "$FREEZE")" = 'm1-operational-directory-repair-dryrun-v1'
+          test "$(jq -r '.status' "$FREEZE")" = 'M1_VISUAL_REVIEW_FAILED_DATA_CONTRACT_REPAIR_DRYRUN_V2_AUTHORIZED'
+          test "$(jq -r '.dryRunAuthorization.authorizationId' "$FREEZE")" = 'm1-operational-directory-repair-dryrun-v2'
           test "$(jq -r '.dryRunAuthorization.active' "$FREEZE")" = 'true'
           test "$(jq -r '.dryRunAuthorization.consumed' "$FREEZE")" = 'false'
           test "$(jq -r '.dryRunAuthorization.allowedExecutions' "$FREEZE")" = '1'
+          test "$(jq -r '.dryRunAuthorization.lastAttemptAllowed' "$FREEZE")" = 'true'
           test "$(jq -r '.dryRunAuthorization.writesAllowed' "$FREEZE")" = 'false'
+          test "$(jq -r '.failedDryRunAttempts[0].runId' "$FREEZE")" = '29968658125'
+          test "$(jq -r '.failedDryRunAttempts[0].firestoreRead' "$FREEZE")" = 'false'
+          test "$(jq -r '.failedDryRunAttempts[0].vaultRead' "$FREEZE")" = 'false'
           test "$(jq -r '.methodologicalDecision.m2Authorized' "$FREEZE")" = 'false'
 
-      - name: Alinear transformador, lifecycle y fase
+      - name: Alinear solicitud v2, transformador, lifecycle y fase
         shell: bash
         run: |
           set -euo pipefail
+          node --check tools/orbit360-alinear-solicitud-dryrun-v2-v20260722.mjs
           node --check tools/orbit360-corregir-transformador-directorio-v20260722.mjs
           node --check tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs
           node --check tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs
           node --check tools/orbit360-restituir-directorio-operativo-v20260722.mjs
+          node tools/orbit360-alinear-solicitud-dryrun-v2-v20260722.mjs
+          jq -e '.ok == true and .dataWritten == false and .secretsRead == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-request-v2-alignment-sanitized.json >/dev/null
           node tools/orbit360-corregir-transformador-directorio-v20260722.mjs
           jq -e '.ok == true and .dataWritten == false and .secretsRead == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-transformer-alignment-sanitized.json >/dev/null
           node tools/orbit360-alinear-fase-reparacion-directorio-v20260722.mjs
-          jq -e '.ok == true and .dataWritten == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-phase-alignment-sanitized.json >/dev/null
+          jq -e '.ok == true and .anchor == "required_files_loop" and .dataWritten == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-phase-alignment-sanitized.json >/dev/null
           node tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs
           jq -e '.ok == true and .contractVersion == "1.0.38" and .invariants.bankNumbersOperationalVisible == true and .invariants.bankCopyDirect == true and .invariants.bankRevealDependency == false and .invariants.usernamesOperationalVisible == true and .invariants.passwordsProtectedOnly == true and .invariants.dataWritten == false and .invariants.reimportExecuted == false' orbit360-platform/runtime-gate-crm-v20260716/operational-directory-code-repair-sanitized.json >/dev/null
 
@@ -123,7 +130,7 @@ jobs:
           if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_ORBIT_360_LAB:-}"; fi
           if [ -z "$SERVICE_ACCOUNT" ]; then SERVICE_ACCOUNT="${SA_DEFAULT:-}"; fi
           test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-operational-directory-dryrun.json"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-operational-directory-dryrun-v2.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
@@ -149,7 +156,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf node_modules package-lock.json npm-shrinkwrap.json
-          ALLOWED='^(\.github/workflows/orbit360-aseguradoras-runtime-gate-v20260716\.yml|tools/orbit360-(aplicar-correccion-directorio-operativo|corregir-transformador-directorio|alinear-fase-reparacion-directorio|restituir-directorio-operativo|validator-lifecycle-contract|validar-gate-contracts-engine|incident-freeze|gate-contract-overlay|gate-contract-overlay-importers|gate-contract-registry-extension|critical-runtime-integrity-manifest)-v?[0-9A-Za-z.-]*\.(mjs|json)|orbit360-platform/(core/(client-insurer-visual-contract-v20260720|insurer-directory-import-v1202|aseguradoras-op2-import-ui-guard|insurer-secure-target-bridge-v20260720|aseguradoras-credentials-provider-lab-v20260720|aseguradoras-bank-accounts-provider-lab-v20260721|router-tenant-config-bootstrap)\.js|data/academia-v1221-m1-visual-integrity\.js|index\.html|tools/orbit360-m1-visual-remediation-contract-v20260722\.js|runtime-gate-crm-v20260716/.*-sanitized\.json))$'
+          ALLOWED='^(tools/orbit360-(aplicar-correccion-directorio-operativo|corregir-transformador-directorio|alinear-fase-reparacion-directorio|alinear-solicitud-dryrun-v2|restituir-directorio-operativo|validator-lifecycle-contract|validar-gate-contracts-engine|incident-freeze|gate-contract-overlay|gate-contract-overlay-importers|gate-contract-registry-extension|critical-runtime-integrity-manifest)-v?[0-9A-Za-z.-]*\.(mjs|json)|orbit360-platform/(core/(client-insurer-visual-contract-v20260720|insurer-directory-import-v1202|aseguradoras-op2-import-ui-guard|insurer-secure-target-bridge-v20260720|aseguradoras-credentials-provider-lab-v20260720|aseguradoras-bank-accounts-provider-lab-v20260721|router-tenant-config-bootstrap)\.js|data/academia-v1221-m1-visual-integrity\.js|index\.html|tools/orbit360-m1-visual-remediation-contract-v20260722\.js|runtime-gate-crm-v20260716/.*-sanitized\.json))$'
           while IFS= read -r file; do
             test -z "$file" && continue
             if ! printf '%s' "$file" | grep -Eq "$ALLOWED"; then
@@ -162,7 +169,6 @@ jobs:
           git config user.email 'orbit360-control-plane@users.noreply.github.com'
           git add \
             tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs \
-            tools/orbit360-corregir-transformador-directorio-v20260722.mjs \
             tools/orbit360-validator-lifecycle-contract-v20260722.json \
             tools/orbit360-incident-freeze-v20260721.json \
             tools/orbit360-validar-gate-contracts-engine-v20260717.mjs \
@@ -180,6 +186,7 @@ jobs:
             orbit360-platform/index.html \
             orbit360-platform/data/academia-v1221-m1-visual-integrity.js \
             orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js \
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-request-v2-alignment-sanitized.json \
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-transformer-alignment-sanitized.json \
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-phase-alignment-sanitized.json \
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-code-repair-sanitized.json \
@@ -204,14 +211,15 @@ jobs:
             --argjson banks "$(jq '.directory.accountRowsProposed' "$REPORT")" \
             --argjson users "$(jq '.directory.usernameRowsProposed' "$REPORT")" \
             --argjson idMismatches "$(jq '.directory.bankReferenceAccountIdMismatches' "$REPORT")" \
-            '{schemaVersion:"orbit360-operational-directory-dryrun-closure-v1",ok:true,requestCommit:$requestCommit,repairCommit:$repairCommit,runId:($runId|tonumber),executionPhase:"LAB_DATA_CONTRACT_REPAIR_DRYRUN",contractVersion:"1.0.38",bankNumbersProposed:$banks,usernamesProposed:$users,accountIdMismatches:$idMismatches,writesExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,reimportExecuted:false,containsPII:false,containsSecrets:false,nextAction:"AUTHORIZE_SINGLE_ATOMIC_OPERATIONAL_DIRECTORY_REPAIR"}' > orbit360-platform/runtime-gate-crm-v20260716/operational-directory-dryrun-closure-sanitized.json
+            '{schemaVersion:"orbit360-operational-directory-dryrun-closure-v2",ok:true,requestCommit:$requestCommit,repairCommit:$repairCommit,runId:($runId|tonumber),executionPhase:"LAB_DATA_CONTRACT_REPAIR_DRYRUN",contractVersion:"1.0.38",bankNumbersProposed:$banks,usernamesProposed:$users,accountIdMismatches:$idMismatches,writesExecuted:false,functionsDeployed:false,rulesDeployed:false,productionTouched:false,reimportExecuted:false,containsPII:false,containsSecrets:false,nextAction:"AUTHORIZE_SINGLE_ATOMIC_OPERATIONAL_DIRECTORY_REPAIR"}' > orbit360-platform/runtime-gate-crm-v20260716/operational-directory-dryrun-closure-sanitized.json
 
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m1-operational-directory-dryrun-${{ github.run_id }}
+          name: orbit360-m1-operational-directory-dryrun-v2-${{ github.run_id }}
           path: |
+            orbit360-platform/runtime-gate-crm-v20260716/operational-directory-request-v2-alignment-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-transformer-alignment-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-phase-alignment-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-code-repair-sanitized.json
@@ -220,7 +228,7 @@ jobs:
             orbit360-platform/runtime-gate-crm-v20260716/block0-architecture-operational-directory-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-repair-dryrun-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/operational-directory-dryrun-closure-sanitized.json
-            tools/orbit360-m1-operational-directory-repair-dryrun-request-v20260722.json
+            tools/orbit360-m1-operational-directory-repair-dryrun-request-v2-20260722.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -232,11 +240,11 @@ jobs:
         shell: bash
         run: |
           state=success
-          description='Dry-run directorio operativo PASS; escritura aún bloqueada'
-          if [ "${{ job.status }}" != success ]; then state=failure; description='Dry-run directorio operativo falló; STOP THE LINE'; fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-operational-directory-repair-dryrun-v1' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
+          description='Dry-run v2 directorio operativo PASS; escritura aún bloqueada'
+          if [ "${{ job.status }}" != success ]; then state=failure; description='Dry-run v2 falló; STOP THE LINE'; fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state="$state" -f context='orbit360/m1-operational-directory-repair-dryrun-v2' -f description="$description" -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >/dev/null
 
       - name: Limpiar identidad temporal
         if: always()
         shell: bash
-        run: rm -f "${RUNNER_TEMP}/orbit360-operational-directory-dryrun.json"
+        run: rm -f "${RUNNER_TEMP}/orbit360-operational-directory-dryrun-v2.json"
