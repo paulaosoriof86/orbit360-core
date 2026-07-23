@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v74-direct-atomic-patch-validation",
+  "schemaVersion": "orbit360-incident-freeze-v75-overlay-scope-reconciliation",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-operational-directory-field-classification-regression-v20260722",
-  "status": "M1_DIRECT_ATOMIC_PATCH_READY_STATIC_VALIDATION_AUTHORIZED",
+  "status": "M1_PREFLIGHT_SCOPE_RECONCILED_VALIDATION_AUTHORIZED_ONCE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -19,18 +19,47 @@
   "bindingCorrection": {
     "document": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
     "contractVersion": "1.0.38",
-    "mechanism": "direct-atomic-multifile-patch",
+    "productMechanism": "direct-atomic-multifile-patch",
+    "validatorMechanism": "overlay-scope-replacement-v1",
     "workflowValidationOnly": true,
     "usernameOperational": true,
     "bankNumberOperational": true,
     "passwordProtectedOnly": true
   },
-  "retiredMechanisms": [
-    "tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
-    "tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs",
-    "tools/orbit360-reparar-directorio-operativo-estructural-v2-v20260722.mjs",
-    "workflow_source_transformation"
+  "staticValidationFailures": [
+    {
+      "runId": 29971750026,
+      "classification": "VALIDATOR_STALE",
+      "cause": "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
+      "engineReached": false,
+      "dataAccess": false,
+      "secretAccess": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false
+    },
+    {
+      "runId": 29971998354,
+      "classification": "VALIDATOR_STALE",
+      "cause": "GLOBAL_OWNER_AND_HISTORICAL_RUNTIME_CONTRACT_ACCUMULATION",
+      "engineReached": true,
+      "checksPassed": 846,
+      "checksTotal": 861,
+      "dataAccess": false,
+      "secretAccess": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false
+    }
   ],
+  "rootCause": {
+    "finding": "The canonical engine merged every extension owner and every historical runtime-version contract into the active overlay. A STATIC_PREFLIGHT therefore inherited unrelated bridge, Academy, PWA and runtime gate requirements.",
+    "correction": "The active overlay becomes authoritative for canonical owners, required files and runtime-version contracts. The workflow declares static_preflight and publishes canonical preflight evidence.",
+    "blindRetry": false,
+    "newStageAfterRootCauseDiagnosis": "OVERLAY_SCOPE_RECONCILIATION_VALIDATION"
+  },
   "preservedInventory": {
     "clients": 414,
     "insurers": 26,
@@ -40,12 +69,14 @@
     "portalCredentials": "26_OF_26",
     "reimportRequired": false
   },
-  "staticValidationAuthorization": {
-    "authorizationId": "m1-operational-directory-static-validation-v1",
+  "scopeValidationAuthorization": {
+    "authorizationId": "m1-operational-directory-static-scope-validation-v1",
     "active": true,
     "consumed": false,
     "allowedExecutions": 1,
     "phase": "STATIC_PREFLIGHT",
+    "canonicalOwnerScope": "overlay_replace",
+    "runtimeContractScope": "overlay_replace",
     "secretsAllowed": false,
     "firestoreReadAllowed": false,
     "vaultReadAllowed": false,
@@ -58,13 +89,15 @@
     "productionAllowed": false
   },
   "allowedActions": [
-    "validate_precommitted_direct_atomic_patch",
-    "run_gate_contract_preflight_static_only",
+    "validate_scope_reconciled_preflight_once",
     "run_operational_directory_behavioral_contract",
     "run_base_architecture_gate",
     "publish_sanitized_static_evidence"
   ],
   "blockedActions": [
+    "run_old_static_validation_request",
+    "merge_global_owner_contracts_into_active_overlay",
+    "merge_historical_runtime_contracts_into_static_preflight",
     "transform_product_in_workflow",
     "read_firestore_operational_data",
     "read_existing_insurer_vault",
@@ -88,6 +121,8 @@
     "m1HumanVisualReview": "FAILED_DATA_CONTRACT_FAILURE",
     "m1Closed": false,
     "m2Authorized": false,
+    "operationalDirectoryProductPatch": "COMMITTED_1_0_38",
+    "operationalDirectoryValidatorScope": "RECONCILED_READY_FOR_ONE_VALIDATION",
     "operationalDirectoryStaticPatch": "READY_FOR_VALIDATION",
     "operationalDirectoryDryRun": "NOT_AUTHORIZED",
     "operationalDirectoryApply": "NOT_AUTHORIZED",
@@ -97,7 +132,7 @@
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Move the already audited direct atomic patch to the mandatory branch once, then execute one validation-only static workflow. Accept only GO_GATE_CONTRACT, operational-directory contract PASS and base architecture GO with zero data access, writes, runtime, browser or deploy.",
+  "nextAllowedStep": "Execute one immutable STATIC_PREFLIGHT using overlay_replace for canonical owners and runtime-version contracts. Accept only GO_GATE_CONTRACT, operational-directory contract PASS and GO_STATIC_ARCHITECTURE with zero source transformation, data access, secret access, writes, runtime, browser or deploy.",
   "containsPII": false,
   "containsSecrets": false
 }
