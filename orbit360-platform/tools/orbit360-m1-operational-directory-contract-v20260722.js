@@ -23,8 +23,9 @@ check('POLICY_VERSION', policy.includes("var VERSION = '20260722.1'"));
 check('POLICY_OPERATIONAL_FIELDS', policy.includes("operationalFields: ['usuario', 'numero']") && policy.includes('usernameOperational: true') && policy.includes('bankNumberOperational: true'));
 check('POLICY_PASSWORD_ONLY_SECRET', policy.includes("protectedFields: ['password', 'contrasena']") && policy.includes('passwordProtectedOnly: true') && policy.includes('passwordWrites: 0'));
 check('POLICY_WRITES_AFTER_REMOTE_SUCCESS', policy.includes('var result = await current(payload);') && policy.indexOf('applyOperationalFields(enriched, result)') > policy.indexOf('var result = await current(payload);'));
-check('POLICY_PRESERVES_REFERENCES', policy.includes('accountRefBackupOnly: true') && policy.includes('credentialRefPasswordOnly: true'));
-check('POLICY_NO_PASSWORD_PERSISTENCE', !/\.password\s*=|\.contrasena\s*=|password:\s*clean\(item/.test(policy));
+check('POLICY_PRESERVES_REFERENCES', policy.includes('accountRefBackupOnly: true') && policy.includes('credentialRefPasswordOnly: true') && policy.includes('providerMappingsPreserved: true'));
+check('POLICY_NO_PASSWORD_PERSISTENCE', !policy.includes('portals[portalIndex].password') && !policy.includes('portals[portalIndex].contrasena') && !policy.includes('accounts[accountIndex].password') && !policy.includes('password: clean(item'));
+check('POLICY_SCRUBS_TEMPORARY_VALUES', policy.includes("item.password = ''") && policy.includes("item.accountNumber = ''") && policy.includes("item.username = ''"));
 
 check('OWNER_VERSION', owner.includes("var VERSION = '20260722.1'"));
 check('OWNER_USERNAME_VISIBLE', owner.includes('data-od-credential-user') && owner.includes("user || 'Sin usuario registrado'") && owner.includes('usernameOperationalVisible: true'));
@@ -44,9 +45,9 @@ const academyIndex = router.indexOf('data-orbit-operational-directory-academy');
 check('ROUTER_LOADS_ALL', policyIndex >= 0 && baseIndex >= 0 && ownerIndex >= 0 && academyIndex >= 0);
 check('ROUTER_ORDER', policyIndex < baseIndex && baseIndex < ownerIndex && ownerIndex < academyIndex, `${policyIndex},${baseIndex},${ownerIndex},${academyIndex}`);
 check('ROUTER_SAME_ORIGIN', router.includes('safeSameOrigin') && router.includes('/core/operational-directory-field-policy-v20260722.js') && router.includes('/core/client-insurer-operational-directory-owner-v20260722.js'));
-check('ROUTER_RELEASE', router.includes("block1-critical-runtime-20260722-6") && router.includes("visualContractDeliveryRevision: '20260722.6'"));
+check('ROUTER_RELEASE', router.includes('block1-critical-runtime-20260722-6') && router.includes("visualContractDeliveryRevision: '20260722.6'"));
 
-check('ACADEMY_1230', academy.includes("version: VERSION") && academy.includes("contentVersion: '1.230'") && academy.includes('operationalDirectorySemantics: true'));
+check('ACADEMY_1230', academy.includes('version: VERSION') && academy.includes("contentVersion: '1.230'") && academy.includes('operationalDirectorySemantics: true'));
 check('ACADEMY_FIELD_CLASSIFICATION', academy.includes('usernameOperational: true') && academy.includes('bankNumberOperational: true') && academy.includes('passwordOnlySecret: true'));
 check('ACADEMY_ROLES', academy.includes("['Dirección','Operativo','Asesor']"));
 
@@ -55,7 +56,7 @@ check('OVERLAY_1038', overlay.gatePatch && overlay.gatePatch.contractVersion ===
 check('OVERLAY_OWNERS', (overlay.canonicalOwners || []).some(x => x.id === 'operationalDirectoryFieldPolicy') && (overlay.canonicalOwners || []).some(x => x.id === 'clientInsurerOperationalDirectoryOwner'));
 check('FREEZE_STATIC_ONLY', freeze.stateClarification && freeze.stateClarification.operationalDirectoryStaticPatch === 'READY_FOR_VALIDATION' && freeze.stateClarification.operationalDirectoryDryRun === 'NOT_AUTHORIZED' && freeze.stateClarification.operationalDirectoryApply === 'NOT_AUTHORIZED');
 check('WORKFLOW_VALIDATION_ONLY', workflow.includes('VALIDATION_ONLY') && !workflow.includes('orbit360-reparar-directorio-operativo-estructural') && !workflow.includes('orbit360-aplicar-correccion-directorio-operativo') && !workflow.includes('git commit') && !workflow.includes('git push'));
-check('WORKFLOW_NO_DATA_ACCESS', !workflow.includes('GOOGLE_APPLICATION_CREDENTIALS') && !workflow.includes('FIREBASE_SERVICE_ACCOUNT') && !workflow.includes('Secret Manager') && !workflow.includes('firestore'));
+check('WORKFLOW_NO_DATA_ACCESS', !workflow.toLowerCase().includes('firestore') && !workflow.includes('GOOGLE_APPLICATION_CREDENTIALS') && !workflow.includes('FIREBASE_SERVICE_ACCOUNT') && !workflow.includes('Secret Manager'));
 
 const failed = checks.filter(x => !x.ok);
 const result = {
@@ -68,8 +69,8 @@ const result = {
   failed: failed.length,
   status: failed.length ? 'FAIL' : 'PASS',
   checks,
-  firestoreRead: false,
-  vaultRead: false,
+  dataAccess: false,
+  secretAccess: false,
   writes: 0,
   runtimeExecuted: false,
   browserExecuted: false,
