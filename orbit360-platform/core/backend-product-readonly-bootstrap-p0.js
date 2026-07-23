@@ -14,6 +14,7 @@
   var VERSION = 'p0-m2-20260723';
   var TENANT_SOURCE = 'membership_only';
   var WRITE_AUTHORIZED = false;
+  var DEFAULT_SNAPSHOT_TIMEOUT_MS = 20000;
   var REQUIRED_DEPENDENCIES = Object.freeze([
     'environmentProvider', 'firebaseAdapter', 'authProvider', 'membershipProvider'
   ]);
@@ -163,6 +164,23 @@
     window.Orbit.auth.user = function () { return clone(window.Orbit.auth.productUser); };
   }
 
+  function waitForStoreReady(store, timeoutMs) {
+    var timeout = Number(timeoutMs) > 0 ? Number(timeoutMs) : DEFAULT_SNAPSHOT_TIMEOUT_MS;
+    var startedAt = Date.now();
+    return new Promise(function (resolve, reject) {
+      function inspect() {
+        var status = store && typeof store._productStatus === 'function' ? store._productStatus() : {};
+        if (status.ready === true && status.status === 'ready-read-only') return resolve(status);
+        if (status.status === 'snapshot-error' || status.status === 'attach-error' || status.status === 'blocked-tenant' || status.status === 'blocked-no-collections' || status.status === 'blocked-no-database') {
+          return reject(new Error('product_store_blocked:' + text(status.status)));
+        }
+        if (Date.now() - startedAt >= timeout) return reject(new Error('product_store_readiness_timeout'));
+        setTimeout(inspect, 100);
+      }
+      inspect();
+    });
+  }
+
   function buildPlan(input) {
     input = input || {};
     var errors = [];
@@ -192,6 +210,7 @@
         'compile_tenant_scoped_queries',
         'install_product_readonly_store',
         'attach_allowed_snapshots',
+        'wait_store_ready_read_only',
         'emit_sanitized_readiness'
       ]
     };
@@ -207,11 +226,13 @@
       runtimeAuthorized: options.runtimeAuthorized
     });
     var state = createState();
+    var storeInstalled = false;
+    var snapshotsAttached = false;
     state.collections = plan.collections.slice();
     if (!plan.ok || options.runtimeAuthorized !== true) {
       state.errors = unique(plan.errors.concat(options.runtimeAuthorized === true ? [] : ['runtime_productivo_no_autorizado']));
       transition(state, 'blocked', { ready: false });
-      return { ok: false, ready: false, plan: plan, status: sanitizeState(state), storeInstalled: false, snapshotsAttached: false };
+      return { ok: false, ready: false, plan: plan, status: sanitizeState(state), storeInstalled: false, snapshotsAttached: false, writeAuthorized: false };
     }
 
     try {
@@ -259,26 +280,27 @@
 
       transition(state, 'installing');
       window.Orbit.store = store;
+      storeInstalled = true;
       installAuthProjection(projection);
-      var snapshotsAttached = store._attachSnapshots() !== false;
-      transition(state, snapshotsAttached ? 'ready-read-only' : 'waiting-snapshots', {
-        ready: snapshotsAttached,
-        errors: snapshotsAttached ? [] : ['snapshots_no_adjuntos']
-      });
+      snapshotsAttached = store._attachSnapshots() !== false;
+      if (!snapshotsAttached) throw new Error('snapshots_no_adjuntos');
+      transition(state, 'waiting-snapshots', { ready: false, errors: [] });
+      await waitForStoreReady(store, options.snapshotTimeoutMs);
+      transition(state, 'ready-read-only', { ready: true, errors: [] });
       return {
-        ok: snapshotsAttached,
-        ready: snapshotsAttached,
+        ok: true,
+        ready: true,
         plan: plan,
         readiness: readiness,
         status: sanitizeState(state),
         storeInstalled: true,
-        snapshotsAttached: snapshotsAttached,
+        snapshotsAttached: true,
         writeAuthorized: false
       };
     } catch (error) {
       state.errors = unique(state.errors.concat([String(error && (error.message || error) || error)]));
       transition(state, 'blocked', { ready: false });
-      return { ok: false, ready: false, plan: plan, status: sanitizeState(state), storeInstalled: false, snapshotsAttached: false, writeAuthorized: false };
+      return { ok: false, ready: false, plan: plan, status: sanitizeState(state), storeInstalled: storeInstalled, snapshotsAttached: snapshotsAttached, writeAuthorized: false };
     }
   }
 
@@ -288,10 +310,12 @@
     REQUIRED_DEPENDENCIES: REQUIRED_DEPENDENCIES,
     REQUIRED_CONTRACTS: REQUIRED_CONTRACTS,
     WRITE_AUTHORIZED: WRITE_AUTHORIZED,
+    DEFAULT_SNAPSHOT_TIMEOUT_MS: DEFAULT_SNAPSHOT_TIMEOUT_MS,
     buildPlan: buildPlan,
     deriveTenantFromMembership: deriveTenantFromMembership,
     validateMembershipForUser: validateMembershipForUser,
     authProjection: authProjection,
+    waitForStoreReady: waitForStoreReady,
     start: start,
     autoStart: false,
     queryStringTenantAllowed: false,
