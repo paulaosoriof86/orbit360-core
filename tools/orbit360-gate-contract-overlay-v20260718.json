@@ -3,23 +3,24 @@
   "issuedAt": "2026-07-22",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "classification": "VALIDATOR_STALE",
-  "diagnosticRevision": "overlay-scope-replacement-v1",
-  "contractRevision": "1.0.38-overlay-scope-reconciliation-v1",
+  "diagnosticRevision": "architecture-validator-1038-reconciliation-v1",
+  "contractRevision": "1.0.38-architecture-reconciliation-v1",
   "replaceCanonicalOwners": true,
   "replaceRequiredFiles": true,
   "replaceRuntimeVersionContracts": true,
   "gatePatch": {
     "contractVersion": "1.0.38",
-    "diagnosticRevision": "overlay-scope-replacement-v1",
-    "runtimeVersion": "20260722-8",
+    "diagnosticRevision": "architecture-validator-1038-reconciliation-v1",
+    "runtimeVersion": "20260722-9",
     "block": 1,
-    "status": "PREFLIGHT_SCOPE_RECONCILED_STATIC_VALIDATION_ONLY",
+    "status": "ARCHITECTURE_1038_RECONCILED_VALIDATION_ONLY",
     "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
     "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "preflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
     "validators": [
       "orbit360-platform/tools/orbit360-m1-operational-directory-contract-v20260722.js",
-      "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js"
+      "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js"
     ],
     "executionProfile": {
       "phase": "STATIC_PREFLIGHT",
@@ -39,10 +40,10 @@
         "firebaseProject": false,
         "hostingChannel": false
       },
-      "requestModel": "immutable-request-bound-to-scope-reconciled-patch-v1"
+      "requestModel": "immutable-request-bound-to-architecture-reconciled-patch-v1"
     },
-    "diagnosticRule": "The preflight validates only canonical owners, required files and runtime-version contracts explicitly declared by the active overlay. Global registry extensions and historical runtime contracts do not block an unrelated static phase.",
-    "acceptancePolicy": "Accept only GO_GATE_CONTRACT with owner scope overlay_replace, runtime contract scope overlay_replace, operational-directory contract PASS and base architecture GO. Source transformation, data access, secret access, writes, runtime, browser and deploy remain false."
+    "diagnosticRule": "The architecture gate preserves its PWA, Router, Legal, Access, scope and insurer-state checks while validating responsive and operational-directory semantics through contract 1.0.38 instead of the retired protected-bank contract 1.0.37.",
+    "acceptancePolicy": "Accept only GO_GATE_CONTRACT, operational-directory PASS, visual-responsive contract 1.0.38 PASS and GO_STATIC_ARCHITECTURE. Source transformation, data access, secret access, writes, runtime, browser and deploy remain false."
   },
   "canonicalOwners": [
     {
@@ -92,6 +93,26 @@
       ]
     },
     {
+      "id": "visualResponsiveContract1038",
+      "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "requiredTokens": [
+        "orbit360-m1-visual-remediation-contract-v2-operational-directory",
+        "contractVersion: '1.0.38'",
+        "BANK_TEMPORARY_REVEAL_RETIRED",
+        "CSS_MOBILE_TITLES",
+        "MANIFEST_OPERATIONAL_ASSETS"
+      ]
+    },
+    {
+      "id": "architectureGate1038",
+      "path": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js",
+      "requiredTokens": [
+        "orbit360-block0-architecture-gate-v20260722",
+        "M1_VISUAL_REMEDIATION_CONTRACT_1038",
+        "GO_STATIC_ARCHITECTURE"
+      ]
+    },
+    {
       "id": "routerOperationalDirectoryBootstrap",
       "path": "orbit360-platform/core/router-tenant-config-bootstrap.js",
       "requiredTokens": [
@@ -128,13 +149,15 @@
     "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "tools/orbit360-validar-gate-contracts-engine-v20260722.mjs",
     "tools/orbit360-incident-freeze-v20260721.json",
-    "tools/orbit360-m1-operational-directory-static-scope-validation-request-v20260722.json",
+    "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+    "tools/orbit360-m1-operational-directory-architecture-validation-request-v20260722.json",
     "orbit360-platform/core/operational-directory-field-policy-v20260722.js",
     "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
     "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
     "orbit360-platform/tools/orbit360-m1-operational-directory-contract-v20260722.js",
-    "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260717.js",
+    "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+    "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js",
     "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
     "orbit360-platform/docs/MATRIZ-PATCH-ATOMICO-DIRECTORIO-OPERATIVO-1038-20260722.md",
     "orbit360-platform/docs/CAUSA-RAIZ-PREFLIGHT-ALCANCE-OVERLAY-20260722.md"
@@ -211,29 +234,61 @@
       ]
     },
     {
+      "path": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "contractVersion: '1.0.38'",
+        "responsive-plus-operational-directory-v1",
+        "BANK_TEMPORARY_REVEAL_RETIRED",
+        "MANIFEST_1038"
+      ]
+    },
+    {
+      "path": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "orbit360-block0-architecture-gate-v20260722",
+        "M1_VISUAL_REMEDIATION_CONTRACT_1038",
+        "GO_STATIC_ARCHITECTURE"
+      ]
+    },
+    {
+      "path": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+      "replaceRequiredTokens": true,
+      "requiredTokens": [
+        "block1-critical-runtime-20260722-6",
+        "1.0.38",
+        "operationalDirectoryFieldPolicy",
+        "clientInsurerOperationalDirectoryOwner",
+        "operationalDirectoryAcademy"
+      ]
+    },
+    {
       "path": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
       "replaceRequiredTokens": true,
       "requiredTokens": [
         "VALIDATION_ONLY",
         "ORBIT360_GATE_PHASE: static_preflight",
-        "orbit360-m1-operational-directory-static-scope-validation-request-v20260722.json",
+        "orbit360-m1-operational-directory-architecture-validation-request-v20260722.json",
         "orbit360-validar-gate-contracts-v20260717.mjs",
         "preflight-sanitizado.json",
         "orbit360-m1-operational-directory-contract-v20260722.js",
-        "orbit360-block0-architecture-gate-v20260717.js"
+        "orbit360-block0-architecture-gate-v20260722.js"
       ]
     }
   ],
   "effectiveOwnerReconciliation": {
     "classification": "VALIDATOR_STALE",
     "contractVersion": "1.0.38",
-    "validatorMechanismRevision": "overlay-scope-replacement-v1",
+    "validatorMechanismRevision": "architecture-validator-1038-reconciliation-v1",
     "canonicalOwnerScope": "overlay_replace",
     "runtimeContractScope": "overlay_replace",
     "workflowTransformsProduct": false,
     "usernameOperational": true,
     "bankNumberOperational": true,
     "passwordProtectedOnly": true,
+    "responsiveContractPreserved": true,
+    "architectureBasePreserved": true,
     "productChanged": false,
     "dataChanged": false,
     "firestoreRead": false,
