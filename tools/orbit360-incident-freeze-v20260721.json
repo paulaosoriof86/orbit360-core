@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v71-structural-static-repair-authorized",
+  "schemaVersion": "orbit360-incident-freeze-v72-structural-static-repair-v2-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-operational-directory-field-classification-regression-v20260722",
-  "status": "M1_PIPELINE_ROOT_CAUSE_STRUCTURAL_STATIC_REPAIR_AUTHORIZED",
+  "status": "M1_PIPELINE_ROOT_CAUSE_STRUCTURAL_STATIC_REPAIR_V2_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -24,15 +24,14 @@
   },
   "rootCause": {
     "fieldClassification": "Username and bank account number are operational fields; password is the only secret.",
-    "pipelineMechanism": "Two dry-run attempts failed before data because the correction used brittle exact-string replacement inside a minified owner.",
-    "retiredMechanism": "tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
-    "replacementMechanism": "tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs",
-    "replacementRule": "Replace complete functions by semantic boundaries and validate behavior, not internal literal HTML."
+    "dataPipeline": "Two data dry-run attempts failed before data because the first mechanism used brittle exact-string replacement inside a minified owner.",
+    "structuralAttemptV1": "The function-boundary repair itself reached a non-owner cache update and failed because the bank provider is loaded by the router bootstrap, not index.html.",
+    "replacementMechanism": "tools/orbit360-reparar-directorio-operativo-estructural-v2-v20260722.mjs",
+    "replacementRule": "Use function boundaries for owners and treat absent index cache references as non-applicable; the router bootstrap remains the cache owner."
   },
   "failedDryRunAttempts": [
     {
       "runId": 29968658125,
-      "classification": "PIPELINE_MECHANISM_FAILURE",
       "errorCode": "SIGNATURE_INVALID:data_contract_phase_capabilities:0:0",
       "firestoreRead": false,
       "vaultRead": false,
@@ -40,11 +39,25 @@
     },
     {
       "runId": 29968906716,
-      "classification": "PIPELINE_MECHANISM_FAILURE",
       "errorCode": "SIGNATURE_INVALID:visual_bank_visible:before=0:after=0",
       "firestoreRead": false,
       "vaultRead": false,
       "writesExecuted": false
+    }
+  ],
+  "failedStaticRepairAttempts": [
+    {
+      "requestId": "m1-operational-directory-structural-static-repair-v1-20260722",
+      "requestCommit": "6b4dc9ada1419c84a83d2f5dca42b54ed589c168",
+      "runId": 29969478259,
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "failureStage": "structural_repair_before_preflight",
+      "errorCode": "REGEX_NOT_FOUND:index_bank_cache",
+      "dataRead": false,
+      "firestoreRead": false,
+      "vaultRead": false,
+      "writesExecuted": false,
+      "productCommitCreated": false
     }
   ],
   "preservedInventory": {
@@ -57,10 +70,11 @@
     "reimportRequired": false
   },
   "staticRepairAuthorization": {
-    "authorizationId": "m1-operational-directory-structural-static-repair-v1",
+    "authorizationId": "m1-operational-directory-structural-static-repair-v2",
     "active": true,
     "consumed": false,
     "allowedExecutions": 1,
+    "lastAttemptAllowed": true,
     "phase": "STATIC_PREFLIGHT",
     "secretsAllowed": false,
     "firestoreReadAllowed": false,
@@ -74,7 +88,7 @@
     "reimportAllowed": false
   },
   "allowedActions": [
-    "run_one_structural_static_repair",
+    "run_second_and_final_structural_static_repair_v2",
     "run_canonical_static_preflight",
     "commit_static_owners_contracts_academy_validators_only_if_all_static_checks_pass"
   ],
@@ -101,7 +115,7 @@
     "m1HumanVisualReview": "FAILED_DATA_CONTRACT_FAILURE",
     "m1Closed": false,
     "m2Authorized": false,
-    "operationalDirectoryStaticRepair": "AUTHORIZED_ONCE",
+    "operationalDirectoryStaticRepair": "V2_AUTHORIZED_ONCE_LAST_ATTEMPT",
     "operationalDirectoryDryRun": "BLOCKED_UNTIL_STATIC_REPAIR_PASS",
     "operationalDirectoryApply": "NOT_AUTHORIZED",
     "hostingRepublish": "NOT_AUTHORIZED",
@@ -110,7 +124,7 @@
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Execute one immutable STATIC_PREFLIGHT request that applies the function-boundary structural repair. Accept only GO_GATE_CONTRACT 1.0.38, behavioral visual PASS and GO_STATIC_ARCHITECTURE with zero secrets, Firestore, vault, runtime, browser or deploy. No third data dry-run is authorized in this stage.",
+  "nextAllowedStep": "Execute one second and final immutable STATIC_PREFLIGHT request through the v2 wrapper. Accept only wrapper PASS, structural repair PASS, GO_GATE_CONTRACT 1.0.38, behavioral visual PASS and GO_STATIC_ARCHITECTURE with zero secrets, Firestore, vault, runtime, browser or deploy. If this stage fails again, STOP THE LINE without a third static request.",
   "containsPII": false,
   "containsSecrets": false
 }
