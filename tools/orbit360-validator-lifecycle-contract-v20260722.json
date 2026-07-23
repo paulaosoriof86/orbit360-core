@@ -1,62 +1,55 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v15-hosting-delivery",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v16-edit-mode-static",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "gateContractVersion": "1.0.38",
+  "gateContractVersion": "1.0.39",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "controlPlaneRevision": "operational-directory-hosting-delivery-v1",
-  "methodologicalDecisionId": "paula-20260722-operational-directory-root-repair",
-  "classification": [
-    "DATA_CONTRACT_FAILURE",
-    "FUNCTIONAL_DEFECT",
-    "VALIDATOR_STALE",
-    "PIPELINE_MECHANISM_FAILURE"
-  ],
+  "controlPlaneRevision": "insurer-edit-mode-responsive-all-active-static-v1",
+  "methodologicalDecisionId": "paula-20260722-all-insurers-active-edit-root-fix",
+  "classification": ["FUNCTIONAL_DEFECT", "DATA_CONTRACT_FAILURE", "VALIDATOR_STALE"],
   "rootCause": {
-    "fieldContract": "Portal username and insurer bank account number are operational directory fields. Password is the only secret.",
-    "staticClosure": "Run 29973107802 passed the full static closure.",
-    "dataClosure": "Run 29974965244 restored and verified 91 bank numbers and 26 usernames with zero unrelated changes.",
-    "hostingDelivery": "Publish only the already validated frontend to the LAB preview channel and verify exact remote asset hashes before human review."
+    "editBlankScreen": "The stability barrier required read cards while edit mode intentionally kept inputs, then failed without releasing visibility.",
+    "editableContract": "The editable module could rebuild portal and bank arrays without preserving credentialRef/accountRef and retained legacy bank semantics.",
+    "mobileTitles": "Responsive rules depended on brittle inline-style selectors instead of semantic title classes.",
+    "activeState": "A&S operates all 26 insurers. They must default to active and may only be deactivated manually with reason."
   },
   "executionProfile": {
-    "phase": "LAB_HOSTING_DELIVERY",
+    "phase": "STATIC_PREFLIGHT",
     "capabilities": {
-      "secrets": true,
+      "secrets": false,
       "firestoreRead": false,
       "writes": false,
       "runtime": false,
       "browser": false,
-      "deploy": true,
+      "deploy": false,
       "functionsDeploy": false,
       "rulesDeploy": false,
       "production": false
     },
     "workflowLocks": {
       "branch": true,
-      "firebaseProject": true,
-      "hostingChannel": true
+      "firebaseProject": false,
+      "hostingChannel": false
     },
-    "requestModel": "immutable-request-bound-to-hosting-delivery-patch-v1"
+    "requestModel": "immutable-request-bound-to-edit-mode-root-patch-v1"
   },
   "canonicalIntegration": {
     "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "engine": "tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
     "overlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
     "workflow": ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
-    "criticalManifest": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
-    "firebaseConfig": "firebase.json",
     "canonicalOwnerScope": "overlay_replace",
     "runtimeContractScope": "overlay_replace",
     "sourceTransformation": false,
     "firestoreRead": false,
-    "secretAccess": true,
+    "secretAccess": false,
     "operationalWrites": 0,
     "runtime": false,
     "browser": false,
-    "hostingDeploy": true,
+    "hostingDeploy": false,
     "functionsDeploy": false,
     "rulesDeploy": false,
     "production": false,
@@ -67,37 +60,38 @@
     "issuedAt": "2026-07-22",
     "gateId": "block1-client360-insurers-lab-v20260717",
     "classification": "FUNCTIONAL_DEFECT",
-    "diagnosticRevision": "operational-directory-hosting-delivery-v1",
-    "contractRevision": "1.0.38-operational-directory-hosting-delivery-v1",
+    "diagnosticRevision": "insurer-edit-mode-responsive-all-active-v1",
+    "contractRevision": "1.0.39-insurer-edit-mode-responsive-all-active-v1",
     "replaceCanonicalOwners": true,
     "replaceRequiredFiles": true,
     "replaceRuntimeVersionContracts": true,
     "gatePatch": {
-      "contractVersion": "1.0.38",
-      "diagnosticRevision": "operational-directory-hosting-delivery-v1",
-      "status": "HOSTING_LAB_DELIVERY_AUTHORIZED_ONCE",
+      "contractVersion": "1.0.39",
+      "diagnosticRevision": "insurer-edit-mode-responsive-all-active-v1",
+      "runtimeVersion": "20260722-13",
+      "status": "STATIC_VALIDATION_AUTHORIZED_ONCE",
       "executionProfile": {
-        "phase": "LAB_HOSTING_DELIVERY",
+        "phase": "STATIC_PREFLIGHT",
         "capabilities": {
-          "secrets": true,
+          "secrets": false,
           "firestoreRead": false,
           "writes": false,
           "runtime": false,
           "browser": false,
-          "deploy": true,
+          "deploy": false,
           "functionsDeploy": false,
           "rulesDeploy": false,
           "production": false
         },
         "workflowLocks": {
           "branch": true,
-          "firebaseProject": true,
-          "hostingChannel": true
+          "firebaseProject": false,
+          "hostingChannel": false
         },
-        "requestModel": "immutable-request-bound-to-hosting-delivery-patch-v1"
+        "requestModel": "immutable-request-bound-to-edit-mode-root-patch-v1"
       },
-      "diagnosticRule": "Run preflight before the deployment identity, publish only Hosting LAB and verify exact remote hashes for the critical frontend assets.",
-      "acceptancePolicy": "Accept only HOSTING_DELIVERED_AND_VERIFIED with zero Firestore or vault access, zero operational writes, zero browser/runtime, zero Functions/Rules/production and exact remote asset integrity."
+      "diagnosticRule": "Validate the direct 1.0.39 patch only; never transform files, access data or deploy.",
+      "acceptancePolicy": "Accept only GO_GATE_CONTRACT and STATIC_PATCH_VALIDATED with all capabilities false."
     },
     "canonicalOwners": [],
     "requiredFiles": [],
@@ -106,14 +100,15 @@
   "preservedEvidence": {
     "historicalTechnicalGateRunId": 29925156385,
     "staticClosureRunId": 29973107802,
-    "dryRunClosureRunId": 29973981164,
     "atomicApplyRunId": 29974965244,
     "atomicApplyArtifactId": 8551063445,
     "atomicApplyArtifactDigest": "sha256:9dbfb9a9d3d478d8aec00bf6a0d570c109ec6a70427e028baff07e928e9ebd35",
+    "hostingRunId": 29976616043,
     "bankOperationalNumbers": 91,
     "usernamesOperational": 26,
     "bankPending": 2,
     "portalCredentials": "26_OF_26",
+    "humanReview": "FAILED_EDIT_BLANK_AND_MOBILE_TITLES",
     "finalTechnicalGateRerun": false
   },
   "containsPII": false,
