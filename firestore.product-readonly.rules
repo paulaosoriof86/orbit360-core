@@ -1,0 +1,53 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function membershipPath(tenantId) {
+      return /databases/$(database)/documents/tenants/$(tenantId)/members/$(request.auth.uid);
+    }
+
+    function activeMembership(tenantId) {
+      return isSignedIn()
+        && exists(membershipPath(tenantId))
+        && get(membershipPath(tenantId)).data.uid == request.auth.uid
+        && get(membershipPath(tenantId)).data.tenantId == tenantId
+        && get(membershipPath(tenantId)).data.status == 'active';
+    }
+
+    match /tenants/{tenantId}/members/{memberUid} {
+      allow get: if isSignedIn() && memberUid == request.auth.uid;
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+
+    match /tenants/{tenantId}/system/config {
+      allow read: if activeMembership(tenantId);
+      allow create, update, delete: if false;
+    }
+
+    match /tenants/{tenantId}/credentialRefs/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /tenants/{tenantId}/data/{collection}/items/{documentId} {
+      allow read: if activeMembership(tenantId);
+      allow create, update, delete: if false;
+    }
+
+    match /tenants/{tenantId}/auditEvents/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /tenants/{tenantId}/importBatches/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
