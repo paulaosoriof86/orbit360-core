@@ -1,0 +1,8 @@
+{
+  "firestore": {
+    "rules": "firestore.product-readonly.rules"
+  },
+  "storage": {
+    "rules": "storage.product-readonly.rules"
+  }
+}

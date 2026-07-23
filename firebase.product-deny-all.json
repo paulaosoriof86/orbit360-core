@@ -1,0 +1,8 @@
+{
+  "firestore": {
+    "rules": "firestore.product-deny-all.rules"
+  },
+  "storage": {
+    "rules": "storage.product-deny-all.rules"
+  }
+}
