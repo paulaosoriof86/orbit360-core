@@ -1,17 +1,14 @@
 {
-  "schemaVersion": "orbit360-incident-freeze-v70-operational-directory-dryrun-v2-authorized",
+  "schemaVersion": "orbit360-incident-freeze-v71-structural-static-repair-authorized",
   "issuedAt": "2026-07-21",
   "updatedAt": "2026-07-22",
   "incidentId": "m1-operational-directory-field-classification-regression-v20260722",
-  "status": "M1_VISUAL_REVIEW_FAILED_DATA_CONTRACT_REPAIR_DRYRUN_V2_AUTHORIZED",
+  "status": "M1_PIPELINE_ROOT_CAUSE_STRUCTURAL_STATIC_REPAIR_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "tenantId": "alianzas-soluciones",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "blockedGateIds": [
-    "block1-client360-insurers-lab-v20260717"
-  ],
   "classification": [
     "DATA_CONTRACT_FAILURE",
     "FUNCTIONAL_DEFECT",
@@ -20,83 +17,53 @@
   ],
   "methodologicalDecision": {
     "id": "paula-20260722-operational-directory-root-repair",
-    "reportedBy": "Paula",
-    "reportedAt": "2026-07-22",
     "m1Approved": false,
     "m2Authorized": false,
     "rootRepairRequired": true,
     "reimportAuthorized": false
   },
-  "humanVisualEvidence": {
-    "result": "FAILED_FUNCTIONAL_DEFECT",
-    "screenshotsReceived": 5,
-    "observed": [
-      "bank account remains masked or displays Cuenta protegida",
-      "bank reveal returns No fue posible recuperar el dato",
-      "bank copy does not complete",
-      "portal username displays Usuario pendiente de registrar",
-      "password temporary reveal works"
-    ]
-  },
   "rootCause": {
-    "canonicalRule": "Username and bank account number are operational fields; password is the only secret.",
-    "dataContractRegression": "Later provider/importer/validator layers removed operational usernames and bank numbers and required protected references for display.",
-    "runtimeMismatch": "Restored account references can point from current rows to vault records retaining historical account IDs, while the callable requires exact equality.",
-    "validatorRegression": "The previous 29/29 contract required temporary bank reveal instead of rejecting it."
-  },
-  "bindingCorrection": {
-    "document": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
-    "contractVersion": "1.0.38",
-    "usernameOperational": true,
-    "bankNumberOperational": true,
-    "passwordProtected": true,
-    "accountRefBackupPreserved": true,
-    "credentialRefPreserved": true
-  },
-  "preservedEvidence": {
-    "historicalTechnicalGate": {
-      "status": "PASS",
-      "runId": 29925156385,
-      "finalGateRerun": false
-    },
-    "hostingVisualization": {
-      "runId": 29963445655,
-      "url": "https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app",
-      "remoteCriticalAssets": "9_OF_9_EXACT"
-    },
-    "inventory": {
-      "clients": 414,
-      "insurers": 26,
-      "advisors": 7,
-      "bankReferences": 91,
-      "bankPending": 2,
-      "portalCredentials": "26_OF_26",
-      "reimportRequired": false
-    }
+    "fieldClassification": "Username and bank account number are operational fields; password is the only secret.",
+    "pipelineMechanism": "Two dry-run attempts failed before data because the correction used brittle exact-string replacement inside a minified owner.",
+    "retiredMechanism": "tools/orbit360-aplicar-correccion-directorio-operativo-v20260722.mjs",
+    "replacementMechanism": "tools/orbit360-reparar-directorio-operativo-estructural-v20260722.mjs",
+    "replacementRule": "Replace complete functions by semantic boundaries and validate behavior, not internal literal HTML."
   },
   "failedDryRunAttempts": [
     {
-      "requestId": "m1-operational-directory-repair-dryrun-v1-20260722",
-      "requestCommit": "29ad157c3b2c1cec5cb35546c5c9b7bb623ce727",
       "runId": 29968658125,
       "classification": "PIPELINE_MECHANISM_FAILURE",
-      "failureStage": "phase_alignment_before_preflight",
       "errorCode": "SIGNATURE_INVALID:data_contract_phase_capabilities:0:0",
       "firestoreRead": false,
       "vaultRead": false,
-      "writesExecuted": false,
-      "productChanged": false
+      "writesExecuted": false
+    },
+    {
+      "runId": 29968906716,
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "errorCode": "SIGNATURE_INVALID:visual_bank_visible:before=0:after=0",
+      "firestoreRead": false,
+      "vaultRead": false,
+      "writesExecuted": false
     }
   ],
-  "dryRunAuthorization": {
-    "authorizationId": "m1-operational-directory-repair-dryrun-v2",
+  "preservedInventory": {
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "bankReferences": 91,
+    "bankPending": 2,
+    "portalCredentials": "26_OF_26",
+    "reimportRequired": false
+  },
+  "staticRepairAuthorization": {
+    "authorizationId": "m1-operational-directory-structural-static-repair-v1",
     "active": true,
     "consumed": false,
     "allowedExecutions": 1,
-    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
-    "secretsAllowed": true,
-    "secretPurpose": "read_existing_insurer_vault_for_sanitized_matching_only",
-    "firestoreReadAllowed": true,
+    "phase": "STATIC_PREFLIGHT",
+    "secretsAllowed": false,
+    "firestoreReadAllowed": false,
     "writesAllowed": false,
     "runtimeAllowed": false,
     "browserAllowed": false,
@@ -104,18 +71,16 @@
     "functionsDeployAllowed": false,
     "rulesDeployAllowed": false,
     "productionAllowed": false,
-    "reimportAllowed": false,
-    "lastAttemptAllowed": true
+    "reimportAllowed": false
   },
   "allowedActions": [
-    "run_second_and_final_immutable_dryrun_request_after_stable_anchor_fix",
-    "run_canonical_gate_preflight_after_static_code_transformation",
-    "read_current_26_insurer_documents",
-    "read_existing_insurer_vault",
-    "produce_sanitized_operational_directory_repair_dryrun",
-    "commit_static_code_and_contract_correction_only_if_dryrun_passes"
+    "run_one_structural_static_repair",
+    "run_canonical_static_preflight",
+    "commit_static_owners_contracts_academy_validators_only_if_all_static_checks_pass"
   ],
   "blockedActions": [
+    "read_firestore_operational_data",
+    "read_existing_insurer_vault",
     "write_firestore_operational_data",
     "write_secret_manager",
     "run_runtime",
@@ -136,7 +101,8 @@
     "m1HumanVisualReview": "FAILED_DATA_CONTRACT_FAILURE",
     "m1Closed": false,
     "m2Authorized": false,
-    "operationalDirectoryDryRun": "V2_AUTHORIZED_ONCE_LAST_ATTEMPT",
+    "operationalDirectoryStaticRepair": "AUTHORIZED_ONCE",
+    "operationalDirectoryDryRun": "BLOCKED_UNTIL_STATIC_REPAIR_PASS",
     "operationalDirectoryApply": "NOT_AUTHORIZED",
     "hostingRepublish": "NOT_AUTHORIZED",
     "runtimeAuthorized": false,
@@ -144,7 +110,7 @@
     "productionTouched": false,
     "reimportRequired": false
   },
-  "nextAllowedStep": "Execute one second and final immutable LAB_DATA_CONTRACT_REPAIR_DRYRUN after replacing the stale Hosting-block anchor with the stable required-files-loop anchor. If phase alignment fails again, STOP THE LINE before Firestore or vault access. If it passes, accept only sanitized evidence matching 414 clients, 26 insurers, 7 advisors, 91 bank references, two pending accounts, zero unmatched credential references and zero passwords in operational storage.",
+  "nextAllowedStep": "Execute one immutable STATIC_PREFLIGHT request that applies the function-boundary structural repair. Accept only GO_GATE_CONTRACT 1.0.38, behavioral visual PASS and GO_STATIC_ARCHITECTURE with zero secrets, Firestore, vault, runtime, browser or deploy. No third data dry-run is authorized in this stage.",
   "containsPII": false,
   "containsSecrets": false
 }
