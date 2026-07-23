@@ -1,0 +1,223 @@
+name: Orbit 360 · M2 product read-only runtime · AUTHORIZED_ONCE
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['tools/orbit360-m2-product-readonly-runtime-request-v20260723.json']
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-m2-product-readonly-runtime-v1
+  cancel-in-progress: false
+
+env:
+  ORBIT360_GATE_ID: block2-product-readonly-runtime-v20260723
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: tools/orbit360-m2-product-readonly-runtime-request-v20260723.json
+  ORBIT360_TENANT_ID: alianzas-soluciones
+
+jobs:
+  runtime-product-readonly:
+    name: M2 · Product runtime read-only · No Hosting · No Functions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: orbit360-product-readonly
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar solicitud inmutable sin acceso externo
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "${ORBIT360_BRANCH}"
+          test "${GITHUB_RUN_ATTEMPT}" = '1'
+          node <<'NODE'
+          const fs=require('fs'),cp=require('child_process');
+          const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
+          const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
+          const bad=[];
+          if(r.schemaVersion!=='orbit360-m2-product-readonly-runtime-request-v1')bad.push('schema');
+          if(r.gateId!==process.env.ORBIT360_GATE_ID||r.contractVersion!=='2.1.0')bad.push('gate');
+          if(r.branch!==process.env.ORBIT360_BRANCH||r.authorizedBaseCommit!==parent)bad.push('binding');
+          if(r.explicitAuthorization!==true||r.allowedExecutions!==1||r.readOnly!==true)bad.push('authorization');
+          if(r.operationalWrites!==false||r.hostingDeploy!==false||r.functionsDeploy!==false||r.imports!==false||r.policies!==false||r.m3!==false||r.mergeMain!==false)bad.push('scope');
+          if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
+          NODE
+
+      - name: Preflight canónico antes de secretos
+        id: preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m2-runtime-v20260723.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}"
+          node orbit360-platform/tools/orbit360-m2-product-runtime-control-contract-v20260723.cjs > orbit360-platform/runtime-gate-crm-v20260716/m2-product-runtime-control-contract.json
+          jq -e '.status=="GO_GATE_CONTRACT" and .gateId=="block2-product-readonly-runtime-v20260723" and .contractVersion=="2.1.0" and .secretAccess==false and .firestoreRead==false and .operationalWrites==0 and .runtimeExecuted==false and .rulesApplied==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          jq -e '.ok==true and .status=="M2_PRODUCT_RUNTIME_CONTROL_PASS"' orbit360-platform/runtime-gate-crm-v20260716/m2-product-runtime-control-contract.json >/dev/null
+
+      - name: Instalar dependencias runtime controladas
+        shell: bash
+        run: npm install --no-save --ignore-scripts firebase-admin firebase-tools firebase
+
+      - name: Verificar referencias de entorno sin mostrar valores
+        id: envcheck
+        env:
+          ORBIT360_PRODUCT_FIREBASE_PROJECT_ID: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_PROJECT_ID }}
+          ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON }}
+          ORBIT360_PRODUCT_FIREBASE_WEB_API_KEY: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_WEB_API_KEY }}
+          ORBIT360_PRODUCT_BOOTSTRAP_UID: ${{ secrets.ORBIT360_PRODUCT_BOOTSTRAP_UID }}
+          ORBIT360_PRODUCT_BOOTSTRAP_EMAIL: ${{ secrets.ORBIT360_PRODUCT_BOOTSTRAP_EMAIL }}
+        shell: bash
+        run: node tools/orbit360-m2-product-readonly-runtime-smoke-v20260723.mjs prepare
+
+      - name: Preparar credencial efímera para Firebase CLI
+        id: credential
+        env:
+          ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const raw=process.env.ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON||'';
+          let value;
+          try{value=JSON.parse(raw);}catch(_){value=JSON.parse(Buffer.from(raw,'base64').toString('utf8'));}
+          fs.writeFileSync('.orbit360-product-service-account.json',JSON.stringify(value));
+          NODE
+          echo "GOOGLE_APPLICATION_CREDENTIALS=${GITHUB_WORKSPACE}/.orbit360-product-service-account.json" >> "$GITHUB_ENV"
+
+      - name: Configurar Auth y membership inicial auditada
+        id: bootstrap
+        env:
+          ORBIT360_PRODUCT_FIREBASE_PROJECT_ID: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_PROJECT_ID }}
+          ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON }}
+          ORBIT360_PRODUCT_FIREBASE_WEB_API_KEY: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_WEB_API_KEY }}
+          ORBIT360_PRODUCT_BOOTSTRAP_UID: ${{ secrets.ORBIT360_PRODUCT_BOOTSTRAP_UID }}
+          ORBIT360_PRODUCT_BOOTSTRAP_EMAIL: ${{ secrets.ORBIT360_PRODUCT_BOOTSTRAP_EMAIL }}
+        shell: bash
+        run: node tools/orbit360-m2-product-readonly-runtime-smoke-v20260723.mjs bootstrap
+
+      - name: Aplicar exclusivamente Rules read-only
+        id: rules
+        env:
+          ORBIT360_PRODUCT_FIREBASE_PROJECT_ID: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_PROJECT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx firebase-tools deploy --only firestore:rules,storage \
+            --project "${ORBIT360_PRODUCT_FIREBASE_PROJECT_ID}" \
+            --config firebase.product-readonly.json \
+            --non-interactive --force
+
+      - name: Ejecutar runtime y smoke read-only sin navegador
+        id: smoke
+        env:
+          ORBIT360_PRODUCT_FIREBASE_PROJECT_ID: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_PROJECT_ID }}
+          ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON }}
+          ORBIT360_PRODUCT_FIREBASE_WEB_API_KEY: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_WEB_API_KEY }}
+          ORBIT360_PRODUCT_BOOTSTRAP_UID: ${{ secrets.ORBIT360_PRODUCT_BOOTSTRAP_UID }}
+          ORBIT360_PRODUCT_BOOTSTRAP_EMAIL: ${{ secrets.ORBIT360_PRODUCT_BOOTSTRAP_EMAIL }}
+        shell: bash
+        run: node tools/orbit360-m2-product-readonly-runtime-smoke-v20260723.mjs smoke
+
+      - name: Cierre fail-closed de Rules ante fallo posterior
+        if: failure() && steps.rules.outcome == 'success'
+        env:
+          ORBIT360_PRODUCT_FIREBASE_PROJECT_ID: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_PROJECT_ID }}
+        shell: bash
+        run: |
+          npx firebase-tools deploy --only firestore:rules,storage \
+            --project "${ORBIT360_PRODUCT_FIREBASE_PROJECT_ID}" \
+            --config firebase.product-deny-all.json \
+            --non-interactive --force || true
+
+      - name: Rollback exacto de configuración ante fallo
+        if: failure() && steps.bootstrap.outcome == 'success'
+        env:
+          ORBIT360_PRODUCT_FIREBASE_PROJECT_ID: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_PROJECT_ID }}
+          ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_SERVICE_ACCOUNT_JSON }}
+          ORBIT360_PRODUCT_FIREBASE_WEB_API_KEY: ${{ secrets.ORBIT360_PRODUCT_FIREBASE_WEB_API_KEY }}
+          ORBIT360_PRODUCT_BOOTSTRAP_UID: ${{ secrets.ORBIT360_PRODUCT_BOOTSTRAP_UID }}
+          ORBIT360_PRODUCT_BOOTSTRAP_EMAIL: ${{ secrets.ORBIT360_PRODUCT_BOOTSTRAP_EMAIL }}
+        shell: bash
+        run: node tools/orbit360-m2-product-readonly-runtime-smoke-v20260723.mjs rollback || true
+
+      - name: Consolidar evidencia sanitizada
+        if: always()
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const d='orbit360-platform/runtime-gate-crm-v20260716';
+          const read=n=>{try{return JSON.parse(fs.readFileSync(path.join(d,n),'utf8'));}catch(_){return null;}};
+          const runtime=read('m2-product-readonly-runtime-summary.json');
+          const env=read('m2-product-runtime-environment.json');
+          const bootstrap=read('m2-product-runtime-bootstrap.json');
+          const preflight=read('preflight-sanitizado.json');
+          const ok=!!(runtime&&runtime.ok===true&&preflight&&preflight.status==='GO_GATE_CONTRACT');
+          const status=ok?'M2_PRODUCT_READONLY_RUNTIME_VALIDATED':(env&&env.status==='ENVIRONMENT_FAILURE'?'ENVIRONMENT_FAILURE':'M2_PRODUCT_READONLY_RUNTIME_FAILED');
+          const out={schemaVersion:'orbit360-m2-product-readonly-runtime-gate-v1',generatedAt:new Date().toISOString(),ok,status,gateId:'block2-product-readonly-runtime-v20260723',contractVersion:'2.1.0',classification:ok?null:(status==='ENVIRONMENT_FAILURE'?'ENVIRONMENT_FAILURE':'DATA_CONTRACT_FAILURE'),preflight:preflight&&preflight.status||'NOT_COMPLETED',environment:env&&env.status||'NOT_COMPLETED',bootstrap:bootstrap&&bootstrap.status||'NOT_COMPLETED',acceptance:runtime&&runtime.acceptance||{},secretAccess:env?true:false,firestoreRead:runtime?true:false,controlledConfigurationWrites:bootstrap&&bootstrap.ok?3:0,operationalWrites:0,rulesApplied:!!runtime,runtimeExecuted:!!runtime,browserExecuted:false,hostingDeploy:false,functionsDeploy:false,imports:false,policies:false,productionDeploy:false,containsPII:false,containsSecrets:false};
+          fs.mkdirSync(d,{recursive:true});
+          fs.writeFileSync(path.join(d,'m2-product-readonly-runtime-gate-summary.json'),JSON.stringify(out,null,2)+'\n');
+          NODE
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m2-product-readonly-runtime-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m2-product-runtime-control-contract.json
+            orbit360-platform/runtime-gate-crm-v20260716/m2-product-runtime-environment.json
+            orbit360-platform/runtime-gate-crm-v20260716/m2-product-runtime-bootstrap.json
+            orbit360-platform/runtime-gate-crm-v20260716/m2-product-readonly-runtime-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m2-product-runtime-rollback.json
+            orbit360-platform/runtime-gate-crm-v20260716/m2-product-readonly-runtime-gate-summary.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publicar estado observable sanitizado
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          summary='orbit360-platform/runtime-gate-crm-v20260716/m2-product-readonly-runtime-gate-summary.json'
+          state=failure
+          description='M2 product read-only runtime failed'
+          if [ -f "$summary" ]; then
+            status="$(jq -r '.status // "M2_PRODUCT_READONLY_RUNTIME_FAILED"' "$summary")"
+            if [ "$(jq -r '.ok // false' "$summary")" = true ]; then
+              state=success
+              description='M2 product read-only runtime validated'
+            elif [ "$status" = 'ENVIRONMENT_FAILURE' ]; then
+              description='M2 runtime blocked by missing environment references'
+            fi
+          fi
+          payload="$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m2-product-readonly-runtime-v1"}')"
+          curl --fail-with-body -sS -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -d "$payload"
+
+      - name: Limpiar material efímero
+        if: always()
+        shell: bash
+        run: rm -f .orbit360-product-service-account.json .orbit360-m2-runtime-state.json
