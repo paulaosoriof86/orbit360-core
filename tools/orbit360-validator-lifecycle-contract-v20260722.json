@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v13-data-dryrun",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v14-data-apply",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -7,7 +7,7 @@
   "gateId": "block1-client360-insurers-lab-v20260717",
   "gateContractVersion": "1.0.38",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "controlPlaneRevision": "operational-directory-data-dryrun-v1",
+  "controlPlaneRevision": "operational-directory-atomic-apply-v1",
   "methodologicalDecisionId": "paula-20260722-operational-directory-root-repair",
   "classification": [
     "DATA_CONTRACT_FAILURE",
@@ -17,15 +17,16 @@
   ],
   "rootCause": {
     "fieldContract": "Portal username and insurer bank account number are operational directory fields. Password is the only secret.",
-    "staticClosure": "Run 29973107802 passed preflight 183/183, operational contract 30/30 and architecture 35/35 under contract 1.0.38.",
-    "dataRepair": "Existing Firestore insurer documents still require selective restoration from the existing vault. The dry-run must read only, propose target-field changes, and prove zero row, order or unrelated-field changes before any write authorization."
+    "staticClosure": "Run 29973107802 passed preflight 183/183, operational contract 30/30 and architecture 35/35.",
+    "dryRunClosure": "Run 29973981164 proposed exactly 91 bank-number restorations and 26 username restorations across 14 documents, with 91/91 bank references, 26/26 credential references and passwords, 68 historical account-ID mismatches, zero unrelated changes and zero writes.",
+    "apply": "Apply the exact sanitized dry-run plan through one Firestore transaction, verify every resulting hash and idempotence, and roll back atomically if any readback predicate fails."
   },
   "executionProfile": {
-    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
     "capabilities": {
       "secrets": true,
       "firestoreRead": true,
-      "writes": false,
+      "writes": true,
       "runtime": false,
       "browser": false,
       "deploy": false,
@@ -38,7 +39,7 @@
       "firebaseProject": true,
       "hostingChannel": false
     },
-    "requestModel": "immutable-request-bound-to-read-only-dryrun-patch-v1"
+    "requestModel": "immutable-request-bound-to-atomic-apply-patch-v1"
   },
   "canonicalIntegration": {
     "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
@@ -48,11 +49,13 @@
     "bindingAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
     "canonicalOwnerScope": "overlay_replace",
     "runtimeContractScope": "overlay_replace",
-    "workflowReadOnlyDryRun": true,
+    "workflowAtomicApply": true,
     "sourceTransformation": false,
     "firestoreRead": true,
     "secretAccess": true,
-    "operationalWrites": 0,
+    "operationalWrites": "ONE_ATOMIC_TRANSACTION_MAX",
+    "readAfterWrite": true,
+    "rollback": true,
     "runtime": false,
     "browser": false,
     "deploy": false,
@@ -66,21 +69,21 @@
     "issuedAt": "2026-07-22",
     "gateId": "block1-client360-insurers-lab-v20260717",
     "classification": "DATA_CONTRACT_FAILURE",
-    "diagnosticRevision": "operational-directory-target-field-dryrun-v1",
-    "contractRevision": "1.0.38-operational-directory-target-field-dryrun-v1",
+    "diagnosticRevision": "operational-directory-target-field-atomic-apply-v1",
+    "contractRevision": "1.0.38-operational-directory-target-field-atomic-apply-v1",
     "replaceCanonicalOwners": true,
     "replaceRequiredFiles": true,
     "replaceRuntimeVersionContracts": true,
     "gatePatch": {
       "contractVersion": "1.0.38",
-      "diagnosticRevision": "operational-directory-target-field-dryrun-v1",
-      "status": "OPERATIONAL_DIRECTORY_READ_ONLY_DRYRUN_AUTHORIZED",
+      "diagnosticRevision": "operational-directory-target-field-atomic-apply-v1",
+      "status": "OPERATIONAL_DIRECTORY_ATOMIC_APPLY_AUTHORIZED",
       "executionProfile": {
-        "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+        "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
         "capabilities": {
           "secrets": true,
           "firestoreRead": true,
-          "writes": false,
+          "writes": true,
           "runtime": false,
           "browser": false,
           "deploy": false,
@@ -93,10 +96,10 @@
           "firebaseProject": true,
           "hostingChannel": false
         },
-        "requestModel": "immutable-request-bound-to-read-only-dryrun-patch-v1"
+        "requestModel": "immutable-request-bound-to-atomic-apply-patch-v1"
       },
-      "diagnosticRule": "Run the canonical preflight before credentials, then read the 26 insurer documents and existing vault. Propose only operational username, bank-number and related status fields. Never write, transform source, deploy or reimport.",
-      "acceptancePolicy": "Accept only a sanitized DRY_RUN_READY report with 414 clients, 26 insurers, 7 advisors, 91 bank references matched, two pending accounts, complete credential-password coverage, zero operational passwords, zero row/order/non-target changes and zero writes."
+      "diagnosticRule": "Run the phase-aware preflight before credentials, reconstruct the same target-field-only plan and apply it through one atomic transaction with hash preconditions, read-after-write, idempotence checks and rollback.",
+      "acceptancePolicy": "Accept only APPLIED_AND_VERIFIED with 91 operational bank numbers, two pending accounts, at least 26 operational usernames, 26/26 credential passwords, zero operational passwords, zero remaining proposals, zero row/order/non-target changes and no Functions, Rules, production or reimport."
     },
     "canonicalOwners": [],
     "requiredFiles": [],
@@ -105,11 +108,14 @@
   "preservedEvidence": {
     "historicalTechnicalGateRunId": 29925156385,
     "staticClosureRunId": 29973107802,
-    "staticClosureArtifactId": 8550436428,
-    "staticClosureArtifactDigest": "sha256:91de936476db7f0ae1a29ab9d026f6258291b27fc0f02bc5fbeabdecd5bfa6f4",
-    "staticPreflight": "183_OF_183_PASS",
-    "operationalDirectoryContract": "30_OF_30_PASS",
-    "architecture": "35_OF_35_PASS",
+    "dryRunClosureRunId": 29973981164,
+    "dryRunArtifactId": 8550735007,
+    "dryRunArtifactDigest": "sha256:b5fe862604565ef1353fe822d8ce3a4357dd6e61e9c3d81ee338b940f2dc777a",
+    "bankNumbersToRestore": 91,
+    "usernamesToRestore": 26,
+    "credentialStatusesToNormalize": 0,
+    "affectedDocuments": 14,
+    "accountIdMismatches": 68,
     "clients": 414,
     "insurers": 26,
     "advisors": 7,
