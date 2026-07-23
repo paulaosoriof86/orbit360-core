@@ -1,0 +1,114 @@
+name: Orbit 360 · M2 product read-only · VALIDATION_ONLY
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['tools/orbit360-m2-product-readonly-static-request-v20260723.json']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-m2-product-readonly-static-v1
+  cancel-in-progress: false
+
+env:
+  ORBIT360_GATE_ID: block2-product-readonly-bootstrap-v20260723
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_PHASE: static_preflight
+  ORBIT360_REQUEST_FILE: tools/orbit360-m2-product-readonly-static-request-v20260723.json
+  ORBIT360_REQUEST_ID: m2-product-readonly-static-v1
+
+jobs:
+  validate-m2-product-readonly:
+    name: M2 · Bootstrap product read-only · VALIDATION_ONLY
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar solicitud inmutable
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "${ORBIT360_BRANCH}"
+          test "${GITHUB_RUN_ATTEMPT}" = '1'
+          node <<'NODE'
+          const fs=require('fs'),cp=require('child_process');
+          const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
+          const head=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
+          const bad=[];
+          if(r.schemaVersion!=='orbit360-m2-product-readonly-static-request-v1'||r.requestId!==process.env.ORBIT360_REQUEST_ID)bad.push('request');
+          if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.contractVersion!=='2.0.0')bad.push('scope');
+          if(r.patchCommit!==parent||r.allowedExecutions!==1||r.validationOnly!==true)bad.push('binding');
+          if(r.secretAccess!==false||r.dataRead!==false||r.writes!==false||r.runtime!==false||r.browser!==false||r.rules!==false||r.deploy!==false||r.production!==false)bad.push('capabilities');
+          if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
+          fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/m2-request-sanitized.json',JSON.stringify({schemaVersion:r.schemaVersion,requestId:r.requestId,gateId:r.gateId,contractVersion:r.contractVersion,patchCommit:r.patchCommit,requestCommit:head,validationOnly:true,secretAccess:false,dataRead:false,writes:false,runtime:false,browser:false,rules:false,deploy:false,production:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          NODE
+
+      - name: Verificar sintaxis del patch M2
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m2-v20260723.mjs
+          node --check orbit360-platform/core/product-role-taxonomy-p0.js
+          node --check orbit360-platform/core/membership-multirol-effective-p0.js
+          node --check orbit360-platform/core/tenant-access-policy-product-p0.js
+          node --check orbit360-platform/core/backend-product-readonly-bootstrap-p0.js
+          node --check orbit360-platform/data/academia-v1233-product-readonly-bootstrap.js
+          node --check orbit360-platform/tools/orbit360-m2-product-readonly-bootstrap-contract-v20260723.cjs
+
+      - name: Ejecutar preflight canónico M2
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}" > orbit360-platform/runtime-gate-crm-v20260716/m2-canonical-preflight.json
+          jq -e '.status=="GO_GATE_CONTRACT" and .gateId=="block2-product-readonly-bootstrap-v20260723" and .contractVersion=="2.0.0" and .executionPhase=="STATIC_PREFLIGHT" and .secretAccess==false and .dataAccess==false and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .rulesApplied==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/m2-canonical-preflight.json >/dev/null
+
+      - name: Ejecutar contrato raíz M2
+        shell: bash
+        run: |
+          set -euo pipefail
+          node orbit360-platform/tools/orbit360-m2-product-readonly-bootstrap-contract-v20260723.cjs > orbit360-platform/runtime-gate-crm-v20260716/m2-product-readonly-contract.json
+          jq -e '.ok==true and .status=="M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS" and .tenantFromMembershipOnly==true and .queryStringTenantAllowed==false and .writeAuthorized==false and .secretAccess==false and .firebaseProductiveAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .rulesApplied==false and .deployExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/m2-product-readonly-contract.json >/dev/null
+
+      - name: Cerrar evidencia sanitizada
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs'),d='orbit360-platform/runtime-gate-crm-v20260716';
+          const p=JSON.parse(fs.readFileSync(`${d}/m2-canonical-preflight.json`,'utf8'));
+          const c=JSON.parse(fs.readFileSync(`${d}/m2-product-readonly-contract.json`,'utf8'));
+          const ok=p.status==='GO_GATE_CONTRACT'&&c.status==='M2_PRODUCT_READONLY_BOOTSTRAP_CONTRACT_PASS'&&c.ok===true;
+          const out={schemaVersion:'orbit360-m2-product-readonly-static-gate-v1',generatedAt:new Date().toISOString(),ok,status:ok?'M2_PRODUCT_READONLY_STATIC_VALIDATED':'M2_PRODUCT_READONLY_STATIC_FAILED',gateId:'block2-product-readonly-bootstrap-v20260723',contractVersion:'2.0.0',preflight:p.status,contract:c.status,checksPassed:c.passed,checksTotal:c.total,tenantFromMembershipOnly:true,queryStringTenantAllowed:false,writeAuthorized:false,secretAccess:false,dataAccess:false,writes:false,runtime:false,browser:false,rules:false,deploy:false,production:false,containsPII:false,containsSecrets:false};
+          fs.writeFileSync(`${d}/m2-product-readonly-static-summary.json`,JSON.stringify(out,null,2)+'\n');
+          if(!ok)process.exit(41);
+          NODE
+
+      - name: Subir evidencia sanitizada
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m2-product-readonly-static-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/m2-request-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m2-canonical-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/m2-product-readonly-static-sanitized.json
+            orbit360-platform/runtime-gate-crm-v20260716/m2-product-readonly-contract.json
+            orbit360-platform/runtime-gate-crm-v20260716/m2-product-readonly-static-summary.json
+          if-no-files-found: error
+          retention-days: 30
