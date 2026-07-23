@@ -1,70 +1,192 @@
 {
   "schemaVersion":"orbit360-gate-contract-overlay-v1",
-  "issuedAt":"2026-07-22",
+  "issuedAt":"2026-07-23",
   "gateId":"block1-client360-insurers-lab-v20260717",
   "classification":"FUNCTIONAL_DEFECT",
-  "diagnosticRevision":"edit-root-hosting-lab-1-0-39-v1",
-  "contractRevision":"1.0.39-edit-root-hosting-lab-v1",
+  "diagnosticRevision":"dynamic-directory-static-preflight-1-0-40-v1",
+  "contractRevision":"1.0.40-dynamic-directory-static-preflight-v1",
   "replaceCanonicalOwners":true,
   "replaceRequiredFiles":true,
   "replaceRuntimeVersionContracts":true,
-  "gatePatch": {
-    "contractVersion":"1.0.39",
-    "diagnosticRevision":"edit-root-hosting-lab-1-0-39-v1",
-    "runtimeVersion":"20260722-15",
+  "gatePatch":{
+    "contractVersion":"1.0.40",
+    "diagnosticRevision":"dynamic-directory-static-preflight-1-0-40-v1",
+    "runtimeVersion":"20260723-16",
     "block":1,
-    "status":"EDIT_ROOT_HOSTING_LAB_AUTHORIZED_ONCE",
+    "status":"DYNAMIC_DIRECTORY_STATIC_PREFLIGHT_AUTHORIZED_ONCE",
     "workflow":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
     "preflight":"tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "preflightEvidence":"orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
-    "validators":["orbit360-platform/tools/orbit360-m1-edit-mode-root-contract-v20260722.js"],
-    "executionProfile": {
-      "phase":"LAB_HOSTING_DELIVERY",
-      "capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-      "workflowLocks":{"branch":true,"firebaseProject":true,"hostingChannel":true},
-      "requestModel":"immutable-request-bound-to-edit-root-hosting-v1"
+    "validators":["orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs"],
+    "executionProfile":{
+      "phase":"STATIC_PREFLIGHT",
+      "capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+      "workflowLocks":{"branch":true,"firebaseProject":false,"hostingChannel":false},
+      "requestModel":"immutable-request-bound-to-dynamic-directory-static-preflight-v1"
     },
-    "diagnosticRule":"Publish only the validated 1.0.39 frontend to Hosting LAB and compare exact remote hashes for all critical edit/read assets.",
-    "acceptancePolicy":"Accept only HOSTING_EDIT_ROOT_DELIVERED_AND_VERIFIED with all assets matching and zero data, runtime, browser, Functions, Rules, production or reimport activity."
+    "diagnosticRule":"Validate the committed 1.0.40 dynamic directory through the canonical gate and the platform-root contract without secrets, data access, source transformation, browser or deploy.",
+    "acceptancePolicy":"Accept only GO_GATE_CONTRACT plus DYNAMIC_DIRECTORY_CONTRACT_V3_PASS with 23 of 23 checks and every external capability false."
   },
   "canonicalOwners":[
-    {"id":"clientInsurerEditOwner","path":"orbit360-platform/core/client-insurer-edit-owner-v20260722.js","requiredTokens":["editModeReady: true","preservesCredentialRef: true","preservesAccountRef: true","mergeByStableIdentity: true"]},
-    {"id":"clientInsurerEditAwareBarrier","path":"orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js","requiredTokens":["version: '20260722.5'","editModeAware: true","editModeStatus: 'EDIT_MODE_READY'","failVisible: true"]},
-    {"id":"clientInsurerEditResponsiveStyle","path":"orbit360-platform/styles/client-insurer-edit-mode-v20260722.css","requiredTokens":[".od-page-title",".od-section-title","@media(max-width:760px)","@media(max-width:430px)"]},
-    {"id":"routerEditOwnerBootstrap","path":"orbit360-platform/core/router-tenant-config-bootstrap.js","requiredTokens":["block1-critical-runtime-20260722-7","client-insurer-edit-owner-v20260722.js","client-insurer-edit-mode-v20260722.css","operationalDirectoryAcademyVersion: '1.231'"]},
-    {"id":"aysInsurersActivePolicy","path":"orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js","requiredTokens":["insurersDefaultActive: true","insurerDeactivationPolicy: 'manual_with_reason_only'"]},
-    {"id":"operationalDirectoryOwner","path":"orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js","requiredTokens":["usernameOperationalVisible: true","bankNumberOperationalVisible: true","bankCopyDirect: true"]},
-    {"id":"operationalDirectoryAcademy1231","path":"orbit360-platform/data/academia-v1230-operational-directory-v20260722.js","requiredTokens":["VERSION = '1.231'","allAysInsurersActive: true","manualDeactivationOnly: true","responsiveSemanticTitles: true"]}
+    {
+      "id":"dynamicInsurerDirectoryModule",
+      "path":"orbit360-platform/modules/aseguradoras.js",
+      "requiredTokens":[
+        "function waitBackendWrite(collection, id, op, timeoutMs)",
+        "orbit:backend:write-ok",
+        "orbit:backend:write-error",
+        "persistSecureCredentialChanges",
+        "window.crypto.subtle.digest('SHA-256'",
+        "id: 'account_' + Date.now().toString(36)",
+        "numero: ''",
+        "vinculada: true, contactos: [], cuentas: [], portales: []",
+        "La edición continúa abierta para corregir o reintentar"
+      ]
+    },
+    {
+      "id":"clientInsurerEditCompatibilityOwner",
+      "path":"orbit360-platform/core/client-insurer-edit-owner-v20260722.js",
+      "requiredTokens":[
+        "version: VERSION",
+        "delegatesCrudToCanonicalModule: true",
+        "replacesEditableDom: false",
+        "wrapsStore: false",
+        "passwordInputForbidden: false",
+        "securePasswordMutationRequired: true",
+        "operationalValuesInCode: false"
+      ]
+    },
+    {
+      "id":"clientInsurerReadOwner",
+      "path":"orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+      "requiredTokens":[
+        "var VERSION = '20260723.2'",
+        "root.querySelector('#af-guardar')",
+        "skipsEditMode: true",
+        "usernameOperationalVisible: true",
+        "bankNumberOperationalVisible: true"
+      ]
+    },
+    {
+      "id":"dynamicDirectoryRouterBootstrap",
+      "path":"orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "requiredTokens":[
+        "block1-critical-runtime-20260723-9",
+        "editOwnerVersion: '20260723.2'",
+        "operationalDirectoryOwnerVersion: '20260723.2'",
+        "operationalDirectoryAcademyVersion: '1.232'",
+        "Preflight 1.0.40"
+      ]
+    },
+    {
+      "id":"dynamicDirectoryAcademy1232",
+      "path":"orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+      "requiredTokens":[
+        "var VERSION = '1.232'",
+        "dynamicCrud: true",
+        "backendWriteAcknowledgement: true",
+        "secureCredentialMutation: true",
+        "operationalValuesInCode: false"
+      ]
+    },
+    {
+      "id":"dynamicDirectoryContractV3",
+      "path":"orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs",
+      "requiredTokens":[
+        "VALIDATOR_ROOT_PLATFORM",
+        "DYNAMIC_DIRECTORY_CONTRACT_V3_PASS",
+        "NEW_INSURER_DEFAULT_ACTIVE",
+        "SECURE_SOURCE_HASH_SHA256",
+        "BACKEND_WRITE_ACK"
+      ]
+    },
+    {
+      "id":"clientInsurerEditAwareBarrier",
+      "path":"orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
+      "requiredTokens":["version: '20260722.5'","editModeAware: true","editModeStatus: 'EDIT_MODE_READY'","failVisible: true"]
+    }
   ],
   "requiredFiles":[
-    "firebase.json",
     ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
     "tools/orbit360-validator-lifecycle-contract-v20260722.json",
     "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
     "tools/orbit360-incident-freeze-v20260721.json",
-    "tools/orbit360-m1-edit-root-hosting-lab-request-v20260722.json",
-    "orbit360-platform/index.html",
-    "orbit360-platform/ays-lab-preview.html",
+    "tools/orbit360-m1-dynamic-directory-static-preflight-request-v20260723.json",
+    "orbit360-platform/modules/aseguradoras.js",
     "orbit360-platform/core/router-tenant-config-bootstrap.js",
     "orbit360-platform/core/client-insurer-edit-owner-v20260722.js",
-    "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
     "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
-    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js",
     "orbit360-platform/styles/client-insurer-edit-mode-v20260722.css",
-    "orbit360-platform/styles/client-insurer-visual-contract-v20260720.css",
-    "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
     "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
-    "orbit360-platform/tools/orbit360-m1-edit-mode-root-contract-v20260722.js"
+    "orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs",
+    "orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-patch-sanitized.json",
+    "orbit360-platform/runtime-gate-crm-v20260716/dynamic-directory-contract-v3-sanitized.json"
   ],
   "runtimeVersionContracts":[
-    {"path":"tools/orbit360-validar-gate-contracts-v20260717.mjs","replaceRequiredTokens":true,"requiredTokens":["GATE_CONTRACT_VERSION = '1.0.39'","LAB_HOSTING_DELIVERY","sourceTransformed: false"]},
-    {"path":"tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs","replaceRequiredTokens":true,"requiredTokens":["LAB_HOSTING_DELIVERY","WORKFLOW_HOSTING_DELIVERY"]},
-    {"path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml","replaceRequiredTokens":true,"requiredTokens":["HOSTING_DELIVERY","ORBIT360_GATE_PHASE: lab_hosting_delivery","orbit360-m1-edit-root-hosting-lab-request-v20260722.json","hosting:channel:deploy","HOSTING_EDIT_ROOT_DELIVERED_AND_VERIFIED"]},
-    {"path":"orbit360-platform/core/client-insurer-edit-owner-v20260722.js","replaceRequiredTokens":true,"requiredTokens":["editModeReady: true","preservesCredentialRef: true","preservesAccountRef: true"]},
-    {"path":"orbit360-platform/core/client-insurer-visual-stability-barrier-v20260721.js","replaceRequiredTokens":true,"requiredTokens":["version: '20260722.5'","editModeStatus: 'EDIT_MODE_READY'","failVisible: true"]},
-    {"path":"orbit360-platform/core/router-tenant-config-bootstrap.js","replaceRequiredTokens":true,"requiredTokens":["block1-critical-runtime-20260722-7","client-insurer-edit-owner-v20260722.js","operationalDirectoryAcademyVersion: '1.231'"]},
-    {"path":"orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js","replaceRequiredTokens":true,"requiredTokens":["insurersDefaultActive: true","insurerDeactivationPolicy: 'manual_with_reason_only'"]}
+    {
+      "path":"tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "replaceRequiredTokens":true,
+      "requiredTokens":["GATE_CONTRACT_VERSION = '1.0.40'","STATIC_PREFLIGHT","sourceTransformed: false"]
+    },
+    {
+      "path":"tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
+      "replaceRequiredTokens":true,
+      "requiredTokens":["STATIC_PREFLIGHT","WORKFLOW_STATIC_VALIDATION_ONLY","WORKFLOW_PROJECT_LOCK_NOT_APPLICABLE","WORKFLOW_CHANNEL_LOCK_NOT_APPLICABLE"]
+    },
+    {
+      "path":".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml",
+      "replaceRequiredTokens":true,
+      "requiredTokens":["VALIDATION_ONLY","ORBIT360_GATE_PHASE: static_preflight","orbit360-m1-dynamic-directory-static-preflight-request-v20260723.json","GO_GATE_CONTRACT","DYNAMIC_DIRECTORY_CONTRACT_V3_PASS"]
+    },
+    {
+      "path":"orbit360-platform/modules/aseguradoras.js",
+      "replaceRequiredTokens":true,
+      "requiredTokens":["waitBackendWrite","persistSecureCredentialChanges","window.crypto.subtle.digest('SHA-256'","vinculada: true, contactos: [], cuentas: [], portales: []"]
+    },
+    {
+      "path":"orbit360-platform/core/client-insurer-edit-owner-v20260722.js",
+      "replaceRequiredTokens":true,
+      "requiredTokens":["delegatesCrudToCanonicalModule: true","replacesEditableDom: false","securePasswordMutationRequired: true"]
+    },
+    {
+      "path":"orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+      "replaceRequiredTokens":true,
+      "requiredTokens":["var VERSION = '20260723.2'","skipsEditMode: true"]
+    },
+    {
+      "path":"orbit360-platform/core/router-tenant-config-bootstrap.js",
+      "replaceRequiredTokens":true,
+      "requiredTokens":["block1-critical-runtime-20260723-9","operationalDirectoryAcademyVersion: '1.232'","Preflight 1.0.40"]
+    },
+    {
+      "path":"orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+      "replaceRequiredTokens":true,
+      "requiredTokens":["VERSION = '1.232'","dynamicCrud: true","operationalValuesInCode: false"]
+    },
+    {
+      "path":"orbit360-platform/tools/orbit360-m1-dynamic-directory-contract-v3-v20260723.cjs",
+      "replaceRequiredTokens":true,
+      "requiredTokens":["VALIDATOR_ROOT_PLATFORM","DYNAMIC_DIRECTORY_CONTRACT_V3_PASS","total: checks.length"]
+    }
   ],
-  "effectiveOwnerReconciliation":{"contractVersion":"1.0.39","phase":"LAB_HOSTING_DELIVERY","canonicalOwnerScope":"overlay_replace","runtimeContractScope":"overlay_replace","workflowTransformsProduct":false,"firestoreRead":false,"vaultRead":false,"writesAuthorized":false,"hostingDeployAuthorized":true,"project":"ays-orbit-360-lab","channel":"orbit360-ays-lab","runtimeExecuted":false,"browserExecuted":false,"functionsChanged":false,"rulesChanged":false,"productionTouched":false,"reimportExecuted":false}
+  "effectiveOwnerReconciliation":{
+    "contractVersion":"1.0.40",
+    "phase":"STATIC_PREFLIGHT",
+    "canonicalOwnerScope":"overlay_replace",
+    "runtimeContractScope":"overlay_replace",
+    "validatedPatchCommit":"6145e3b0a4173c582617bfc26dbfdc0c55b88b86",
+    "workflowTransformsProduct":false,
+    "firestoreRead":false,
+    "vaultRead":false,
+    "writesAuthorized":false,
+    "hostingDeployAuthorized":false,
+    "runtimeExecuted":false,
+    "browserExecuted":false,
+    "functionsChanged":false,
+    "rulesChanged":false,
+    "productionTouched":false,
+    "reimportExecuted":false
+  }
 }
