@@ -1,13 +1,13 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v12-architecture-1038-reconciliation",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v13-data-dryrun",
   "issuedAt": "2026-07-22",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "gateId": "block1-client360-insurers-lab-v20260717",
   "gateContractVersion": "1.0.38",
-  "validatorLifecycleRevision": "direct-atomic-patch-validation-v1",
-  "controlPlaneRevision": "architecture-1038-validation-only-v1",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "operational-directory-data-dryrun-v1",
   "methodologicalDecisionId": "paula-20260722-operational-directory-root-repair",
   "classification": [
     "DATA_CONTRACT_FAILURE",
@@ -17,15 +17,14 @@
   ],
   "rootCause": {
     "fieldContract": "Portal username and insurer bank account number are operational directory fields. Password is the only secret.",
-    "preflightScope": "Runs 29971750026 and 29971998354 exposed stale lifecycle and accumulated global scope. The 20260722 scoped engine resolved both.",
-    "architecture": "Run 29972554280 passed preflight 152/152 and operational contract 30/30, but the architecture gate still executed visual contract 1.0.37 with protected-bank semantics.",
-    "correction": "Use visual-responsive contract 1.0.38 and architecture gate v20260722 while preserving all PWA, Router, Legal, Access, scope and insurer-state checks."
+    "staticClosure": "Run 29973107802 passed preflight 183/183, operational contract 30/30 and architecture 35/35 under contract 1.0.38.",
+    "dataRepair": "Existing Firestore insurer documents still require selective restoration from the existing vault. The dry-run must read only, propose target-field changes, and prove zero row, order or unrelated-field changes before any write authorization."
   },
   "executionProfile": {
-    "phase": "STATIC_PREFLIGHT",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
+      "secrets": true,
+      "firestoreRead": true,
       "writes": false,
       "runtime": false,
       "browser": false,
@@ -36,26 +35,23 @@
     },
     "workflowLocks": {
       "branch": true,
-      "firebaseProject": false,
+      "firebaseProject": true,
       "hostingChannel": false
     },
-    "requestModel": "immutable-request-bound-to-architecture-reconciled-patch-v1"
+    "requestModel": "immutable-request-bound-to-read-only-dryrun-patch-v1"
   },
   "canonicalIntegration": {
     "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-    "engine": "tools/orbit360-validar-gate-contracts-engine-v20260722.mjs",
+    "engine": "tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs",
     "overlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
-    "visualContract": "orbit360-platform/tools/orbit360-m1-visual-remediation-contract-v20260722.js",
-    "architectureGate": "orbit360-platform/tools/orbit360-block0-architecture-gate-v20260722.js",
-    "criticalManifest": "tools/orbit360-critical-runtime-integrity-manifest-v20260721.json",
+    "repairScript": "tools/orbit360-restituir-directorio-operativo-v2-v20260722.mjs",
     "bindingAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
-    "rootCauseDocument": "orbit360-platform/docs/CAUSA-RAIZ-ARQUITECTURA-VISUAL-1037-1038-20260722.md",
     "canonicalOwnerScope": "overlay_replace",
     "runtimeContractScope": "overlay_replace",
-    "workflowValidationOnly": true,
+    "workflowReadOnlyDryRun": true,
     "sourceTransformation": false,
-    "dataAccess": false,
-    "secretAccess": false,
+    "firestoreRead": true,
+    "secretAccess": true,
     "operationalWrites": 0,
     "runtime": false,
     "browser": false,
@@ -69,21 +65,21 @@
     "schemaVersion": "orbit360-gate-contract-overlay-v1",
     "issuedAt": "2026-07-22",
     "gateId": "block1-client360-insurers-lab-v20260717",
-    "classification": "VALIDATOR_STALE",
-    "diagnosticRevision": "architecture-validator-1038-reconciliation-v1",
-    "contractRevision": "1.0.38-architecture-reconciliation-v1",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "diagnosticRevision": "operational-directory-target-field-dryrun-v1",
+    "contractRevision": "1.0.38-operational-directory-target-field-dryrun-v1",
     "replaceCanonicalOwners": true,
     "replaceRequiredFiles": true,
     "replaceRuntimeVersionContracts": true,
     "gatePatch": {
       "contractVersion": "1.0.38",
-      "diagnosticRevision": "architecture-validator-1038-reconciliation-v1",
-      "status": "ARCHITECTURE_1038_RECONCILED_VALIDATION_ONLY",
+      "diagnosticRevision": "operational-directory-target-field-dryrun-v1",
+      "status": "OPERATIONAL_DIRECTORY_READ_ONLY_DRYRUN_AUTHORIZED",
       "executionProfile": {
-        "phase": "STATIC_PREFLIGHT",
+        "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
         "capabilities": {
-          "secrets": false,
-          "firestoreRead": false,
+          "secrets": true,
+          "firestoreRead": true,
           "writes": false,
           "runtime": false,
           "browser": false,
@@ -94,13 +90,13 @@
         },
         "workflowLocks": {
           "branch": true,
-          "firebaseProject": false,
+          "firebaseProject": true,
           "hostingChannel": false
         },
-        "requestModel": "immutable-request-bound-to-architecture-reconciled-patch-v1"
+        "requestModel": "immutable-request-bound-to-read-only-dryrun-patch-v1"
       },
-      "diagnosticRule": "Validate responsive and operational-directory semantics through contract 1.0.38 and architecture gate v20260722.",
-      "acceptancePolicy": "Accept only GO_GATE_CONTRACT, operational-directory PASS, visual-responsive 1.0.38 PASS and GO_STATIC_ARCHITECTURE with every execution capability disabled."
+      "diagnosticRule": "Run the canonical preflight before credentials, then read the 26 insurer documents and existing vault. Propose only operational username, bank-number and related status fields. Never write, transform source, deploy or reimport.",
+      "acceptancePolicy": "Accept only a sanitized DRY_RUN_READY report with 414 clients, 26 insurers, 7 advisors, 91 bank references matched, two pending accounts, complete credential-password coverage, zero operational passwords, zero row/order/non-target changes and zero writes."
     },
     "canonicalOwners": [],
     "requiredFiles": [],
@@ -108,12 +104,12 @@
   },
   "preservedEvidence": {
     "historicalTechnicalGateRunId": 29925156385,
-    "firstFailedStaticValidationRunId": 29971750026,
-    "secondFailedStaticValidationRunId": 29971998354,
-    "scopeReconciliationRunId": 29972554280,
-    "scopeReconciliationPreflight": "152_OF_152_PASS",
+    "staticClosureRunId": 29973107802,
+    "staticClosureArtifactId": 8550436428,
+    "staticClosureArtifactDigest": "sha256:91de936476db7f0ae1a29ab9d026f6258291b27fc0f02bc5fbeabdecd5bfa6f4",
+    "staticPreflight": "183_OF_183_PASS",
     "operationalDirectoryContract": "30_OF_30_PASS",
-    "architectureBeforeReconciliation": "33_OF_35_PASS",
+    "architecture": "35_OF_35_PASS",
     "clients": 414,
     "insurers": 26,
     "advisors": 7,
