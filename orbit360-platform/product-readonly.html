@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" data-orbit-entrypoint="product-readonly" data-orbit-product-mode="blocked-until-authorized-runtime">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Orbit 360 · Acceso seguro</title>
+  <meta name="description" content="Acceso seguro de Orbit 360 pendiente de activación controlada.">
+  <meta name="theme-color" content="#1E2227">
+  <link rel="stylesheet" href="styles/tokens.css?v=20260723-m2">
+  <link rel="stylesheet" href="styles/base.css?v=20260723-m2">
+  <link rel="stylesheet" href="styles/infra.css?v=20260723-m2">
+</head>
+<body class="pre-auth">
+  <main style="min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--bg,#f4f2ef)">
+    <section role="status" aria-live="polite" style="max-width:560px;padding:28px;border-radius:18px;background:#fff;box-shadow:0 18px 50px rgba(30,34,39,.12)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+        <span aria-hidden="true" style="width:38px;height:38px;border-radius:50%;background:#C5162E;display:inline-block"></span>
+        <strong style="font-family:Manrope,sans-serif;font-size:20px;color:#1E2227">Orbit 360</strong>
+      </div>
+      <h1 style="font-family:Manrope,sans-serif;font-size:clamp(24px,5vw,38px);line-height:1.12;margin:0 0 12px;color:#1E2227">Acceso pendiente de activación</h1>
+      <p style="font-family:'Source Sans 3',sans-serif;font-size:17px;line-height:1.55;margin:0;color:#4c5258">La conexión segura todavía no ha sido habilitada para este entorno. Ningún dato operativo se mostrará hasta verificar identidad, membresía, rol y alcance.</p>
+      <p id="product-readonly-status" style="font-family:'Source Sans 3',sans-serif;margin:18px 0 0;color:#6a7076">Estado: esperando autorización controlada.</p>
+    </section>
+  </main>
+
+  <script src="core/product-role-taxonomy-p0.js?v=20260723-m2"></script>
+  <script src="core/membership-multirol-contract-p0.js?v=20260713"></script>
+  <script src="core/membership-multirol-effective-p0.js?v=20260723-m2"></script>
+  <script src="core/tenant-access-policy-contract-p0.js?v=20260713"></script>
+  <script src="core/aseguradoras-bank-account-visibility-policy-p0.js?v=20260713"></script>
+  <script src="core/tenant-access-policy-effective-p0.js?v=20260714"></script>
+  <script src="core/tenant-access-policy-product-p0.js?v=20260723-m2"></script>
+  <script src="core/product-query-planner-contract-p0.js?v=20260713"></script>
+  <script src="core/tenant-canonical-paths-contract-p0.js?v=20260713"></script>
+  <script src="core/backend-product-readiness-contract-p0.js?v=20260713"></script>
+  <script src="data/store-firestore-product-readonly-p0.js?v=20260713"></script>
+  <script src="core/product-readonly-route-rule-matrix-p0.js?v=20260714"></script>
+  <script src="core/product-readonly-smoke-contract-p0.js?v=20260713"></script>
+  <script src="core/backend-product-readonly-bootstrap-p0.js?v=20260723-m2"></script>
+  <script src="data/academia-v1233-product-readonly-bootstrap.js?v=20260723-m2"></script>
+  <script>
+    (function () {
+      'use strict';
+      window.Orbit = window.Orbit || {};
+      var status = document.getElementById('product-readonly-status');
+      var owner = window.Orbit.backendProductReadOnlyBootstrapP0;
+      var ready = !!(owner && owner.autoStart === false && owner.queryStringTenantAllowed === false && owner.writesAuthorized === false);
+      document.documentElement.dataset.orbitProductBootstrapContract = ready ? 'ready-fail-closed' : 'missing';
+      if (status) status.textContent = ready ? 'Estado: contrato seguro listo; conexión todavía no autorizada.' : 'Estado: acceso no disponible.';
+      window.OrbitProductReadonlyEntry = Object.freeze({
+        VERSION: 'm2-entry-20260723',
+        mode: 'product',
+        tenantSource: 'membership_only',
+        queryStringTenantAllowed: false,
+        autoStart: false,
+        writeAuthorized: false,
+        start: function (dependencies, options) {
+          if (!owner || typeof owner.start !== 'function') return Promise.resolve({ ok: false, ready: false, errors: ['bootstrap_owner_faltante'] });
+          return owner.start(dependencies, Object.assign({}, options || {}, { mode: 'product' }));
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
