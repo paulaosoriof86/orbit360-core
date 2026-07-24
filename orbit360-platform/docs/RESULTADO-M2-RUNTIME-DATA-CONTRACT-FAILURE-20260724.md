@@ -50,4 +50,4 @@ Producción tocada: no
 
 ## Control neto del cierre
 
-Un archivo raíz accidental fue creado y eliminado inmediatamente. La comparación entre el HEAD anterior y el posterior devolvió cero archivos modificados, por lo que el efecto neto fue nulo.
+Un archivo raíz accidental fue creado y eliminado inmediatamente. La comparación entre el HEAD anterior y el posterior devolvió cero archivos modificados, por lo que el efecto neto fue nulo. Este control quedó registrado en freeze, lifecycle, registry, overlay y documento de causa raíz.
