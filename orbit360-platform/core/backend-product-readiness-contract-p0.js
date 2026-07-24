@@ -10,7 +10,7 @@
 
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p0-20260724-existing-identity-transition';
+  var VERSION = 'p0-20260724-existing-identity-transition-v2';
   var PRODUCT_MODE = 'product';
   var REQUIRED_STORE_API = Object.freeze([
     'all', 'get', 'where', 'insert', 'update', 'remove', '_emit', 'on',
@@ -126,18 +126,21 @@
     return {
       ok: errors.length === 0,
       user: { uid: text(user.uid), email: lower(user.email), emailVerified: user.emailVerified === true },
+      markerPresent: marker,
       controlledExistingIdentityAccepted: marker && options.controlledExistingIdentity === true,
       errors: errors
     };
   }
 
-  function validateMembership(membership, expected) {
+  function validateMembership(membership, expected, options) {
     membership = membership || {};
     expected = expected || {};
+    options = options || {};
     var normalized = window.Orbit.membershipMultirolContractP0 && window.Orbit.membershipMultirolContractP0.normalize
       ? window.Orbit.membershipMultirolContractP0.normalize(membership)
       : {
           uid: text(membership.uid || membership.userId),
+          email: lower(membership.email || membership.correo),
           tenantId: text(membership.tenantId || membership.tenant),
           roles: Array.isArray(membership.roles) ? membership.roles.slice() : [],
           activeRole: text(membership.activeRole || membership.rolActivo),
@@ -146,6 +149,10 @@
           dataScopes: membership.dataScopes || membership.scopes || {}
         };
     var errors = [];
+    var marker = hasDemoMarker(normalized);
+    var identityBound = (!expected.uid || normalized.uid === expected.uid) &&
+      (!expected.tenantId || normalized.tenantId === expected.tenantId);
+    var controlledAccepted = marker && options.controlledExistingIdentity === true && identityBound;
     if (!normalized.uid) errors.push('membresia_uid_faltante');
     if (!normalized.tenantId) errors.push('membresia_tenant_faltante');
     if (normalized.status !== 'active') errors.push('membresia_inactiva');
@@ -153,9 +160,15 @@
     if (!normalized.activeRole || normalized.roles.indexOf(normalized.activeRole) < 0) errors.push('membresia_rol_activo_invalido');
     if (expected.uid && normalized.uid !== expected.uid) errors.push('membresia_uid_no_coincide');
     if (expected.tenantId && normalized.tenantId !== expected.tenantId) errors.push('membresia_tenant_no_coincide');
-    if (hasDemoMarker(normalized)) errors.push('membresia_demo_no_permitida');
+    if (marker && !controlledAccepted) errors.push('membresia_demo_no_permitida');
     if (secretPaths(membership).length) errors.push('membresia_contiene_secretos');
-    return { ok: errors.length === 0, membership: clone(normalized), errors: errors };
+    return {
+      ok: errors.length === 0,
+      membership: clone(normalized),
+      markerPresent: marker,
+      controlledExistingIdentityAccepted: controlledAccepted,
+      errors: errors
+    };
   }
 
   function storeMetadata(store, supplied) {
@@ -214,7 +227,7 @@
     var membership = validateMembership(input.membership || {}, {
       uid: auth.user.uid,
       tenantId: tenant.tenantId
-    });
+    }, { controlledExistingIdentity: controlled });
     var store = validateStore(input.store, input.storeMetadata, tenant.tenantId);
     var errors = [];
     [tenant, mode, config, auth, membership, store].forEach(function (check) {
@@ -233,7 +246,9 @@
       mode: mode.mode,
       tenantId: tenant.tenantId,
       controlledExistingIdentity: controlled,
-      controlledExistingIdentityAccepted: auth.controlledExistingIdentityAccepted === true,
+      controlledExistingIdentityAccepted: controlled && auth.ok && membership.ok,
+      controlledAuthMarkerAccepted: auth.controlledExistingIdentityAccepted === true,
+      controlledMembershipMarkerAccepted: membership.controlledExistingIdentityAccepted === true,
       config: config.info,
       auth: auth.user,
       membership: membership.ok ? {
@@ -280,7 +295,8 @@
         tenantIsolationRequired: true,
         membershipRequired: true,
         writeDisabledUntilSmoke: true,
-        controlledExistingIdentityRequiresExplicitReadOnlyGuard: true
+        controlledExistingIdentityRequiresExplicitReadOnlyGuard: true,
+        controlledIdentityBindsAuthAndMembership: true
       }
     };
   }
