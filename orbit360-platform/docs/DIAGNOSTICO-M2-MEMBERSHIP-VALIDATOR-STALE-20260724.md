@@ -4,7 +4,7 @@ Fecha: 2026-07-24
 Gate: `block2-product-readonly-runtime-v20260723`  
 Contrato: `2.2.1`
 
-## Ejecución consumida
+## Ejecución runtime consumida
 
 ```text
 Run: 30120872643
@@ -17,37 +17,52 @@ Store instalado: no
 Snapshots adjuntos: no
 ```
 
-Preflight, proyecto, Auth, Firestore y membership pasaron. La ejecución quedó consumida y no se permite reintento.
+Preflight, proyecto, Auth, Firestore y membership pasaron. La ejecución quedó consumida y no fue repetida.
 
-## Subcausa exacta probada desde owners
-
-El owner canónico de membership declara deliberadamente la identidad histórica con `email: orbit.lab@demo.com`, estado activo, roles, países y scopes completos. El readiness corregido inicialmente aplicó la transición controlada al usuario Auth, pero mantuvo `membresia_demo_no_permitida` sin excepción equivalente para la misma membership.
-
-El artefacto registró un único error de readiness. La reproducción estática con la membership canónica produce exactamente un error: `membresia_demo_no_permitida`. Con `emailVerified:true`, `auth_email_no_verificado` queda excluido; snapshots tampoco se alcanzaron.
+## Evidencia estática vinculante
 
 ```text
-Clasificación: VALIDATOR_STALE
-Root cause: MEMBERSHIP_DEMO_MARKER_REJECTED_CONTROLLED_EXISTING_IDENTITY
-Secondary: PIPELINE_MECHANISM_FAILURE
+Run: 30121522166
+Commit: 8f3494a1168347d0e34d28e4a5c16c39a5bb6216
+Artifact: 8607610574
+Digest: sha256:adcbc769341dbfc1c266edac7d4ebc963e8fda06bdf81f0d1da1878c0f58ff20
+Preflight canónico: GO_GATE_CONTRACT 32/32
+Prueba de causa raíz: PASS 24/24
+Resultado: M2_MEMBERSHIP_VALIDATOR_STALE_PROVEN
 ```
 
-La brecha secundaria corresponde a la sanitización que convirtió el código contractual en `[redacted]:[redacted]`.
+## Subcausa exacta
 
-## Correcciones estáticas
+El owner canónico de membership declara deliberadamente la identidad histórica con `email: orbit.lab@demo.com`, estado activo, roles, países y scopes completos. El readiness corregido inicialmente aplicó la transición controlada al usuario Auth, pero mantuvo `membresia_demo_no_permitida` sin la excepción equivalente para la misma membership.
 
-- la guarda controlada se aplica ahora tanto a Auth como a membership;
+La prueba reprodujo exactamente un error con la membership canónica: `membresia_demo_no_permitida`. También confirmó que `auth_email_no_verificado` no fue la causa y que snapshots no se alcanzaron.
+
+```text
+Clasificación vinculante: VALIDATOR_STALE
+Root cause: MEMBERSHIP_DEMO_MARKER_REJECTED_CONTROLLED_EXISTING_IDENTITY
+Secondary: PIPELINE_MECHANISM_FAILURE
+Auth email verified cause: false
+Snapshots first cause: false
+```
+
+La brecha secundaria correspondía a la sanitización que convirtió el código contractual en `[redacted]:[redacted]`.
+
+## Correcciones probadas
+
+- la guarda controlada se aplica tanto a Auth como a membership;
 - la membership debe coincidir con UID y tenant esperados;
-- sin guarda, con guarda incompleta o con identidad no vinculada, el marcador demo continúa bloqueado;
-- no se incorporó hardcode A&S en el owner genérico;
+- sin guarda o con identidad no vinculada, el marcador demo continúa bloqueado;
+- una identidad demo genérica permanece bloqueada;
+- no existe hardcode A&S en el owner genérico;
 - la evidencia conserva códigos contractuales seguros y extrae errores de readiness sin exponer PII ni secretos.
 
-## Seguridad
+## Seguridad observada
 
 ```text
 Runtime reintentado: no
-Secretos nuevos: no
-Firebase nuevo acceso: no
-Firestore nuevo acceso: no
+Secretos en prueba estática: no
+Firebase en prueba estática: no
+Firestore en prueba estática: no
 Auth/membership modificados: no
 Rules modificadas: no
 Escrituras: 0
@@ -55,9 +70,19 @@ Hosting/Functions/importaciones: no
 Pólizas/M3/merge/main: no
 ```
 
-## Siguiente frontera
+## Estado y siguiente frontera
 
-Ejecutar una única prueba estática, sin Firebase, para cerrar la clasificación y la corrección fail-closed. Solo después podría evaluarse una autorización completamente nueva del runtime; la autorización consumida no puede reutilizarse.
+Las autorizaciones runtime y estática quedaron consumidas:
+
+```text
+Runtime autorizado: no
+Allowed runtime executions: 0
+Static gate autorizado: no
+Allowed static executions: 0
+Runtime corregido preparado: sí
+```
+
+Después de dos bloqueos consecutivos en readiness, no existe reintento implícito. Cualquier futura ejecución requiere una autorización nueva y explícita, un request inmutable nuevo y revisión previa de esta evidencia.
 
 Claude: `BACKEND_PROTEGIDO_NO_CLAUDE`.  
-Academia: versión `1.243`.
+Academia: versión `1.243` cerrada.
