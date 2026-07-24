@@ -74,6 +74,10 @@ Pólizas/M3: no
 Merge/main: no
 ```
 
+## Control de modificación accidental
+
+Durante el cierre se creó accidentalmente un `README.md` raíz fuera de alcance y se eliminó inmediatamente. La comparación entre el HEAD anterior y el HEAD posterior confirmó `files: []`, por lo que el efecto neto es cero y no quedó ninguna modificación ajena al diagnóstico.
+
 ## Estado y siguiente frontera
 
 La autorización estática quedó consumida. El runtime corregido está preparado, pero permanece no autorizado:
@@ -81,7 +85,7 @@ La autorización estática quedó consumida. El runtime corregido está preparad
 ```text
 Runtime autorizado: no
 Allowed runtime executions: 0
-Runtime request created: false
+Corrected runtime request created: false
 ```
 
 La siguiente acción exige una nueva autorización explícita de una sola ejecución del runtime corregido. Esa decisión no autoriza Rules, escrituras, Hosting, Functions, importaciones, Pólizas, M3, merge ni `main`.
