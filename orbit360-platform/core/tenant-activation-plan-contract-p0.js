@@ -14,6 +14,7 @@
   var STATUS_READY = 'M3_TENANT_ACTIVATION_STATIC_READY';
   var STRONG_CONFIRMATION_PHRASE = 'CONFIRMO ACTIVAR TENANT';
   var BLOCKED_SOURCES = Object.freeze(['query_string', 'url_param', 'localstorage', 'demo', 'seed', 'hardcode']);
+  var ALLOWED_SOURCES = Object.freeze(['backend_tenant_config', 'activation_manifest', 'membership_projection']);
   var ALLOWED_INTEGRATION_STATES = Object.freeze([
     'disabled', 'reference_only', 'configured_not_connected', 'backend_required', 'connected_real'
   ]);
@@ -62,6 +63,11 @@
     if (owner && typeof owner.validateTenantId === 'function') return owner.validateTenantId(value);
     var tenantId = lower(value).replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
     return { ok: !!tenantId && tenantId === text(value), tenantId: tenantId, errors: tenantId === text(value) ? [] : ['tenant_no_canonico'] };
+  }
+  function expectedCurrency(country) {
+    var owner = window.Orbit.tenantCanonicalPathsP0;
+    var map = owner && owner.COUNTRY_CURRENCY || {};
+    return text(map[country]).toUpperCase();
   }
   function normalize(input) {
     input = input || {};
@@ -126,14 +132,17 @@
     if (!value.m2Closed || value.m2RuntimeStatus !== 'M2_EXISTING_IDENTITY_RUNTIME_VALIDATED') errors.push('m2_runtime_no_cerrado');
     if (value.identitySource !== 'membership_only') errors.push('identity_source_no_membership_only');
     if (value.tenantResolutionSource !== 'membership') errors.push('tenant_no_resuelto_desde_membership');
-    if (BLOCKED_SOURCES.indexOf(value.sourceOfTruth) >= 0 || !value.sourceOfTruth) errors.push('fuente_productiva_invalida');
+    if (BLOCKED_SOURCES.indexOf(value.sourceOfTruth) >= 0 || ALLOWED_SOURCES.indexOf(value.sourceOfTruth) < 0) errors.push('fuente_productiva_invalida');
     if (!value.readOnlyBootstrapValidated) errors.push('bootstrap_readonly_no_validado');
     if (!value.storeNoFallback) errors.push('store_fallback_no_bloqueado');
     if (value.storeWriteEnabled) errors.push('store_escritura_habilitada');
     if (!value.countries.length) errors.push('paises_faltantes');
     value.countries.forEach(function (country) {
       var config = value.countryConfig && value.countryConfig[country];
-      if (!config || !text(config.currency || config.moneda)) errors.push('config_pais_incompleta:' + country);
+      var currency = text(config && (config.currency || config.moneda)).toUpperCase();
+      var expected = expectedCurrency(country);
+      if (!config || !currency) errors.push('config_pais_incompleta:' + country);
+      if (expected && currency && expected !== currency) errors.push('pais_moneda_inconsistente:' + country);
     });
     if (!value.branding || typeof value.branding !== 'object' || !text(value.branding.name || value.branding.empresa)) errors.push('branding_incompleto');
     if (!value.modules.length) errors.push('modulos_faltantes');
@@ -209,6 +218,7 @@
     STATUS_READY: STATUS_READY,
     STRONG_CONFIRMATION_PHRASE: STRONG_CONFIRMATION_PHRASE,
     BLOCKED_SOURCES: BLOCKED_SOURCES,
+    ALLOWED_SOURCES: ALLOWED_SOURCES,
     ALLOWED_INTEGRATION_STATES: ALLOWED_INTEGRATION_STATES,
     DEFERRED_TO_M4: DEFERRED_TO_M4,
     secretPaths: secretPaths,
