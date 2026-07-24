@@ -11,7 +11,7 @@ const CANONICAL_LIFECYCLE_COMPOSITION='phase-capability-contract-v1';
 const GATE_CONFIG=Object.freeze({
   'block1-client360-insurers-lab-v20260717':{contractVersion:'1.0.40',lifecycle:'tools/orbit360-validator-lifecycle-contract-v20260722.json',engine:'tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs'},
   'block2-product-readonly-bootstrap-v20260723':{contractVersion:'2.0.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m2-v20260723.json',engine:'tools/orbit360-validar-gate-contracts-engine-m2-v20260723.mjs'},
-  'block2-product-readonly-runtime-v20260723':{contractVersion:'2.2.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m2-runtime-v20260723.json',engine:'tools/orbit360-validar-gate-contracts-engine-m2-runtime-v20260723.mjs'}
+  'block2-product-readonly-runtime-v20260723':{contractVersion:'2.2.1',lifecycle:'tools/orbit360-validator-lifecycle-contract-m2-runtime-v20260723.json',engine:'tools/orbit360-validar-gate-contracts-engine-m2-runtime-v20260723.mjs'}
 });
 const PHASE_PROFILES=Object.freeze({
   STATIC_PREFLIGHT:{secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
@@ -20,7 +20,8 @@ const PHASE_PROFILES=Object.freeze({
   LAB_HOSTING_DELIVERY:{secrets:true,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false},
   LAB_RUNTIME_GATE:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   EXISTING_PROJECT_RECONCILIATION:{secrets:true,firestoreRead:true,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
-  EXISTING_IDENTITY_RUNTIME_PREPARATION:{secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false}
+  EXISTING_IDENTITY_RUNTIME_PREPARATION:{secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  EXISTING_IDENTITY_ROOT_CAUSE_STATIC:{secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false}
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(k=>actual[k]===expected[k]);}
