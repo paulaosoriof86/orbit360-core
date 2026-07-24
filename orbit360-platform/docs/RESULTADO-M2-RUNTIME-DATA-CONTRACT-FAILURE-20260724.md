@@ -47,3 +47,7 @@ Rules modificadas: no
 Escrituras: 0
 Producción tocada: no
 ```
+
+## Control neto del cierre
+
+Un archivo raíz accidental fue creado y eliminado inmediatamente. La comparación entre el HEAD anterior y el posterior devolvió cero archivos modificados, por lo que el efecto neto fue nulo.
