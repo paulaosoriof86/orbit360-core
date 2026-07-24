@@ -1,6 +1,6 @@
 /* ============================================================
    Orbit 360 · Contrato P0 de readiness backend productivo
-   Fecha: 2026-07-13
+   Fecha: 2026-07-24
 
    Preflight puro y fail-closed. No inicializa Firebase, no autentica,
    no reemplaza Orbit.store, no lee secretos y no realiza escrituras.
@@ -10,7 +10,7 @@
 
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p0-20260713';
+  var VERSION = 'p0-20260724-existing-identity-transition';
   var PRODUCT_MODE = 'product';
   var REQUIRED_STORE_API = Object.freeze([
     'all', 'get', 'where', 'insert', 'update', 'remove', '_emit', 'on',
@@ -41,6 +41,15 @@
   function hasDemoMarker(value) {
     var serialized = lower(typeof value === 'string' ? value : JSON.stringify(value || {}));
     return DEMO_MARKERS.some(function (marker) { return serialized.indexOf(marker) >= 0; });
+  }
+
+  function controlledExistingIdentityGuard(input) {
+    var config = input && (input.firebaseConfigInfo || input.config) || {};
+    return config.controlledExistingIdentity === true &&
+      config.existingProjectReconciled === true &&
+      lower(config.identitySource) === 'membership_only' &&
+      config.readOnly === true &&
+      config.writeAuthorized === false;
   }
 
   function secretPaths(value) {
@@ -79,7 +88,12 @@
       appIdPresent: !!text(config.appId),
       apiKeyPresent: !!text(config.apiKey) || config.hasApiKey === true,
       storageBucketPresent: !!text(config.storageBucket),
-      environmentRefPresent: !!text(config.environmentRef || config.configRef || config.secretRef)
+      environmentRefPresent: !!text(config.environmentRef || config.configRef || config.secretRef),
+      controlledExistingIdentity: config.controlledExistingIdentity === true,
+      existingProjectReconciled: config.existingProjectReconciled === true,
+      identitySourceMembershipOnly: lower(config.identitySource) === 'membership_only',
+      readOnly: config.readOnly === true,
+      writeAuthorized: config.writeAuthorized === true
     };
   }
 
@@ -93,20 +107,26 @@
     if (!info.environmentRefPresent) errors.push('config_entorno_ref_faltante');
     if (secretPaths(config).length) errors.push('secretos_no_permitidos_en_preflight');
     if (hasDemoMarker(config)) errors.push('config_demo_no_permitida');
+    if (info.controlledExistingIdentity && (!info.existingProjectReconciled || !info.identitySourceMembershipOnly || !info.readOnly || info.writeAuthorized)) {
+      errors.push('transicion_identidad_existente_incompleta');
+    }
     return { ok: errors.length === 0, info: info, errors: errors };
   }
 
-  function validateAuth(user) {
+  function validateAuth(user, options) {
     user = user || {};
+    options = options || {};
     var errors = [];
+    var marker = hasDemoMarker(user);
     if (!text(user.uid)) errors.push('auth_uid_faltante');
     if (!/^\S+@\S+\.\S+$/.test(text(user.email))) errors.push('auth_email_invalido');
     if (user.emailVerified !== true) errors.push('auth_email_no_verificado');
     if (user.disabled === true) errors.push('auth_usuario_deshabilitado');
-    if (hasDemoMarker(user)) errors.push('auth_demo_no_permitido');
+    if (marker && options.controlledExistingIdentity !== true) errors.push('auth_demo_no_permitido');
     return {
       ok: errors.length === 0,
       user: { uid: text(user.uid), email: lower(user.email), emailVerified: user.emailVerified === true },
+      controlledExistingIdentityAccepted: marker && options.controlledExistingIdentity === true,
       errors: errors
     };
   }
@@ -187,8 +207,10 @@
     input = input || {};
     var tenant = canonicalTenant(input.tenantId);
     var mode = validateMode(input.mode);
-    var config = validateConfig(input.firebaseConfigInfo || input.config || {});
-    var auth = validateAuth(input.authUser || {});
+    var configInput = input.firebaseConfigInfo || input.config || {};
+    var config = validateConfig(configInput);
+    var controlled = controlledExistingIdentityGuard(input);
+    var auth = validateAuth(input.authUser || {}, { controlledExistingIdentity: controlled });
     var membership = validateMembership(input.membership || {}, {
       uid: auth.user.uid,
       tenantId: tenant.tenantId
@@ -210,6 +232,8 @@
       version: VERSION,
       mode: mode.mode,
       tenantId: tenant.tenantId,
+      controlledExistingIdentity: controlled,
+      controlledExistingIdentityAccepted: auth.controlledExistingIdentityAccepted === true,
       config: config.info,
       auth: auth.user,
       membership: membership.ok ? {
@@ -255,7 +279,8 @@
         noSecretsInRuntimeReport: true,
         tenantIsolationRequired: true,
         membershipRequired: true,
-        writeDisabledUntilSmoke: true
+        writeDisabledUntilSmoke: true,
+        controlledExistingIdentityRequiresExplicitReadOnlyGuard: true
       }
     };
   }
@@ -265,6 +290,7 @@
     PRODUCT_MODE: PRODUCT_MODE,
     REQUIRED_STORE_API: REQUIRED_STORE_API,
     sanitizeConfigInfo: sanitizeConfigInfo,
+    controlledExistingIdentityGuard: controlledExistingIdentityGuard,
     validateConfig: validateConfig,
     validateAuth: validateAuth,
     validateMembership: validateMembership,
