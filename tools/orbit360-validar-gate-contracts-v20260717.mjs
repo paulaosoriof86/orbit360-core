@@ -12,7 +12,8 @@ const ZERO={secrets:false,firestoreRead:false,writes:false,runtime:false,browser
 const GATE_CONFIG=Object.freeze({
   'block1-client360-insurers-lab-v20260717':{contractVersion:'1.0.40',lifecycle:'tools/orbit360-validator-lifecycle-contract-v20260722.json',engine:'tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs'},
   'block2-product-readonly-bootstrap-v20260723':{contractVersion:'2.0.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m2-v20260723.json',engine:'tools/orbit360-validar-gate-contracts-engine-m2-v20260723.mjs'},
-  'block2-product-readonly-runtime-v20260723':{contractVersion:'2.2.1',lifecycle:'tools/orbit360-validator-lifecycle-contract-m2-runtime-v20260723.json',engine:'tools/orbit360-validar-gate-contracts-engine-m2-runtime-v20260723.mjs'}
+  'block2-product-readonly-runtime-v20260723':{contractVersion:'2.2.1',lifecycle:'tools/orbit360-validator-lifecycle-contract-m2-runtime-v20260723.json',engine:'tools/orbit360-validar-gate-contracts-engine-m2-runtime-v20260723.mjs'},
+  'block3-tenant-activation-static-v20260724':{contractVersion:'3.0.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m3-v20260724.json',engine:'tools/orbit360-validar-gate-contracts-engine-m3-v20260724.mjs'}
 });
 const PHASE_PROFILES=Object.freeze({
   STATIC_PREFLIGHT:ZERO,
@@ -26,7 +27,8 @@ const PHASE_PROFILES=Object.freeze({
   EXISTING_IDENTITY_RUNTIME_AUTHORIZED_ONCE_PREFLIGHT:ZERO,
   EXISTING_IDENTITY_MEMBERSHIP_ROOT_CAUSE_STATIC:ZERO,
   EXISTING_IDENTITY_RUNTIME_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
-  EXISTING_IDENTITY_RUNTIME_CLOSED:ZERO
+  EXISTING_IDENTITY_RUNTIME_CLOSED:ZERO,
+  M3_TENANT_ACTIVATION_STATIC_PREPARATION:ZERO
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(k=>actual[k]===expected[k]);}
