@@ -1,78 +1,49 @@
-# Resultado M2 runtime read-only — DATA_CONTRACT_FAILURE
+# Resultado M2 runtime read-only — causa raíz cerrada
 
 Fecha: 2026-07-24  
-Gate: `block2-product-readonly-runtime-v20260723`  
-Contrato: `2.2.0`  
-Run: `30103556811`  
-Commit evaluado: `83e881394495a678cf343e2f4977669175e01cbe`  
-Artifact: `8600630817`  
-Digest: `sha256:de7cac22d8db427006938fd67c288177b6cb86a1154dc1f0566951cdee0ed99c`
+Gate: `block2-product-readonly-runtime-v20260723`
 
-## Resultado vinculante
+## Run runtime histórico
 
 ```text
-Preflight canónico: GO_GATE_CONTRACT 41/41
-Contrato estático: PASS 21/21
-Proyecto: MATCH
-Web config: derivada read-only
-Auth: legible — 2 usuarios
-Memberships: 1
-Identidad existente elegible: 1
-Runtime: ejecutado
-Bootstrap canónico ready: no
-Store instalado: no
-Clasificación: DATA_CONTRACT_FAILURE
+Run: 30103556811
+Commit: 83e881394495a678cf343e2f4977669175e01cbe
+Artifact: 8600630817
+Resultado observado: DATA_CONTRACT_FAILURE
 ```
 
-## Seguridad preservada
+Proyecto, configuración web, Auth y membership fueron resueltos. El bootstrap no instaló el store ni llegó a snapshots. No hubo Rules ni escrituras.
+
+## Diagnóstico estático posterior
 
 ```text
-Proyecto nuevo: no
-Usuarios creados o modificados: 0
-Memberships creadas o modificadas: 0
+Run: 30106013739
+Commit: a478551a31bf4799907c63bad3e8108cc8c93cb6
+Artifact: 8601596832
+Digest: sha256:8f2e8429268d1e4a7cfcd89fe2dc68e70da6f1345a3d9b2f3046de1904fb16a5
+Preflight: GO_GATE_CONTRACT 40/40
+Prueba de causa raíz: PASS 28/28
+Resultado: M2_ROOT_CAUSE_STATIC_PROVEN
+```
+
+## Reclasificación vinculante
+
+```text
+Clasificación: VALIDATOR_STALE
+Root cause: AUTH_DEMO_MARKER_REJECTED_AUTHORIZED_EXISTING_IDENTITY
+Snapshots first cause: false
+```
+
+El validador anterior rechazaba la identidad existente autorizada por un marcador histórico antes de adjuntar snapshots. La corrección mantiene el bloqueo demo general y permite únicamente una transición explícita, reconciliada, read-only, derivada desde membership y con escrituras desautorizadas.
+
+## Cobertura diagnóstica corregida
+
+Una futura ejecución guardará fase y errores sanitizados de bootstrap, readiness y snapshots. El runtime corregido sigue sin autorización.
+
+```text
+Runtime autorizado: no
+Allowed executions: 0
 Rules modificadas: no
-Escrituras de configuración: 0
-Escrituras operativas: 0
-Hosting: no
-Functions: no
-Importaciones: no
-Pólizas/M3: no
-Merge/main: no
+Escrituras: 0
+Producción tocada: no
 ```
-
-## Frontera exacta del fallo
-
-El proyecto, la cuenta existente, la configuración web, Auth y la membership se resolvieron correctamente. La falla ocurrió cuando `backendProductReadOnlyBootstrapP0.start` devolvió estado no listo. Como consecuencia:
-
-- `storeInstalled: false`;
-- `snapshotsAttached: false`;
-- `noFallback: false` porque no existió store instalado que pudiera reportarlo;
-- `localWriteBlocked: false` porque no existió store sobre el cual ejecutar la prueba local.
-
-## Brecha de diagnóstico
-
-El owner runtime redujo el resultado del bootstrap a un booleano y no conservó en la evidencia sanitizada:
-
-- fase final del bootstrap;
-- códigos de error del estado;
-- errores de readiness;
-- estado de adjunción de snapshots.
-
-Esto se clasifica adicionalmente como `PIPELINE_MECHANISM_FAILURE`. La subcausa exacta del bootstrap no queda probada y no debe inventarse.
-
-## Hipótesis principal respaldada por contratos
-
-La infraestructura LAB define el usuario `orbit.lab@demo.com`, mientras el contrato productivo de readiness incluye ese mismo correo entre los marcadores prohibidos y genera `auth_demo_no_permitido` cuando aparece en la identidad autenticada.
-
-Esto constituye la hipótesis más fuerte, pero sigue siendo una inferencia: el artefacto no preservó el correo o el código interno de la identidad seleccionada. Antes de corregir el contrato o los datos debe probarse estáticamente la identidad exacta y preservar los errores sanitizados del bootstrap.
-
-## Estado
-
-La autorización única quedó consumida. No se permite reejecución.
-
-## Siguiente acción exacta
-
-`diagnóstico estático de causa raíz con el artefacto existente → corregir exclusivamente la cobertura de evidencia sanitizada → determinar si el conflicto es identidad LAB vs readiness productivo o una falla posterior de snapshots → nueva decisión de autorización solo con causa probada`
-
-Claude: `BACKEND_PROTEGIDO_NO_CLAUDE`.  
-Academia: actualizar diferencia entre `DATA_CONTRACT_FAILURE` y `PIPELINE_MECHANISM_FAILURE` secundario.
