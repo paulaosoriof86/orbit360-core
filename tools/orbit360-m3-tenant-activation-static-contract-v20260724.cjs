@@ -36,9 +36,11 @@ check('TENANT_FROM_MEMBERSHIP',api.validate({...base,tenantResolutionSource:'que
 check('QUERY_SOURCE_BLOCKED',api.validate({...base,sourceOfTruth:'query_string'}).errors.includes('fuente_productiva_invalida'));
 check('LOCALSTORAGE_BLOCKED',api.validate({...base,sourceOfTruth:'localstorage'}).errors.includes('fuente_productiva_invalida'));
 check('DEMO_BLOCKED',api.validate({...base,sourceOfTruth:'demo'}).errors.includes('fuente_productiva_invalida'));
+check('UNKNOWN_SOURCE_BLOCKED',api.validate({...base,sourceOfTruth:'origen_no_registrado'}).errors.includes('fuente_productiva_invalida'));
 check('NO_FALLBACK_REQUIRED',api.validate({...base,storeNoFallback:false}).errors.includes('store_fallback_no_bloqueado'));
 check('WRITE_STORE_BLOCKED',api.validate({...base,storeWriteEnabled:true}).errors.includes('store_escritura_habilitada'));
 check('COUNTRY_CONFIG_REQUIRED',api.validate({...base,countryConfig:{GT:{currency:'GTQ'}}}).errors.includes('config_pais_incompleta:CO'));
+check('COUNTRY_CURRENCY_REQUIRED',api.validate({...base,countryConfig:{GT:{currency:'COP'},CO:{currency:'GTQ'}}}).errors.includes('pais_moneda_inconsistente:GT')&&api.validate({...base,countryConfig:{GT:{currency:'COP'},CO:{currency:'GTQ'}}}).errors.includes('pais_moneda_inconsistente:CO'));
 check('MEMBERSHIP_UNIQUE',api.validate({...base,memberships:{existing:2,eligible:2}}).errors.includes('membership_elegible_no_unica'));
 check('INTEGRATION_HONESTY',api.validate({...base,integrations:[{key:'drive',state:'reference_only',active:true,connectionVerified:false}]}).errors.includes('integracion_0:activa_sin_conexion_real'));
 check('REAL_CONNECTION_VERIFIED',api.validate({...base,integrations:[{key:'drive',state:'connected_real',active:true,connectionVerified:false}]}).errors.includes('integracion_0:conexion_no_verificada'));
