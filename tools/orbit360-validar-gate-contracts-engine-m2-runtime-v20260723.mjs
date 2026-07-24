@@ -10,15 +10,16 @@ try{
   check('GATE',lifecycle.gateId===GATE_ID&&lifecycle.gateContractVersion==='2.2.1');
   check('PHASE',lifecycle.executionProfile&&lifecycle.executionProfile.phase==='EXISTING_IDENTITY_ROOT_CAUSE_STATIC');
   const caps=lifecycle.executionProfile&&lifecycle.executionProfile.capabilities||{};check('CAPABILITIES_ZERO',Object.values(caps).every(v=>v===false));
-  check('RUNTIME_CONSUMED',runtimeAuth.status==='CONSUMED_FAILURE'&&runtimeAuth.authorization.allowedExecutions===0,runtimeAuth.status);
-  check('ROOT_AUTH',rootAuth.status==='AUTHORIZED_ONCE'&&rootAuth.authorization.allowedExecutions===1&&rootAuth.authorization.staticOnly===true,rootAuth.status);
+  check('RUNTIME_CONSUMED',runtimeAuth.status==='CONSUMED_FAILURE_ROOT_CAUSE_PROVEN'&&runtimeAuth.authorization.allowedExecutions===0,runtimeAuth.status);
+  check('ROOT_AUTH_CLOSED',rootAuth.status==='CONSUMED_PASS'&&rootAuth.authorization.allowedExecutions===0&&rootAuth.result&&rootAuth.result.ok===true,rootAuth.status);
   check('ROOT_AUTH_SCOPE',rootAuth.authorization.secretAccess===false&&rootAuth.authorization.firebaseAccess===false&&rootAuth.authorization.firestoreRead===false&&rootAuth.authorization.runtime===false&&rootAuth.authorization.writes===false);
-  check('FREEZE',freeze.status==='M2_ROOT_CAUSE_STATIC_AUTHORIZED_ONCE',freeze.status);
+  check('FREEZE_CLOSED',freeze.status==='M2_VALIDATOR_STALE_ROOT_CAUSE_PROVEN'&&freeze.rootCause&&freeze.rootCause.exactSubcauseProven===true,freeze.status);
+  check('RUNTIME_ZERO',freeze.m2RuntimeAuthorization&&freeze.m2RuntimeAuthorization.allowedExecutions===0&&freeze.m2RuntimeAuthorization.active===false);
   check('REQUEST',request.schemaVersion==='orbit360-m2-existing-identity-root-cause-static-request-v1'&&request.contractVersion==='2.2.1'&&request.staticOnly===true);
   check('INPUT',input.contractVersion==='2.2.1'&&input.staticOnly===true&&input.expectedIdentityFingerprint);
   check('FAILURE_BINDING',failure.runId===30103556811&&failure.artifactId===8600630817&&failure.status==='DATA_CONTRACT_FAILURE');
-  check('REGISTRY',registry.planPatch&&registry.planPatch.currentObjective==='EXISTING_IDENTITY_ROOT_CAUSE_STATIC_AUTHORIZED_ONCE');
-  check('OVERLAY',overlay.gatePatch&&overlay.gatePatch.contractVersion==='2.2.1');
+  check('REGISTRY_CLOSED',registry.planPatch&&registry.planPatch.currentObjective==='VALIDATOR_STALE_PROVEN_CORRECTED_RUNTIME_AWAITING_AUTHORIZATION');
+  check('OVERLAY_CLOSED',overlay.gatePatch&&overlay.gatePatch.contractVersion==='2.2.1'&&overlay.gatePatch.status==='M2_VALIDATOR_STALE_ROOT_CAUSE_PROVEN');
   const runtime=read(files.runtimeScript),readiness=read(files.readiness),bootstrap=read(files.bootstrap),root=read(files.rootScript),workflow=read(files.rootWorkflow);
   ['bootstrapPhase','bootstrapErrors','readinessStatus','readinessErrors','storeStatus','storeSnapshotErrorKeys'].forEach(t=>check('RUNTIME_EVIDENCE:'+t,runtime.includes(t)));
   check('READINESS_CONTROLLED_GUARD',readiness.includes('controlledExistingIdentityGuard')&&readiness.includes('transicion_identidad_existente_incompleta')&&readiness.includes('controlledExistingIdentityAccepted'));
@@ -28,5 +29,5 @@ try{
   check('WORKFLOW_NO_SECRETS',!workflow.includes('secrets.')&&workflow.includes('No Secrets · No Firebase'));
   check('WORKFLOW_NO_EXTERNAL',!workflow.includes('firebase-admin')&&!workflow.includes('google-auth-library')&&!workflow.includes('firebase-tools'));
 }catch(error){check('ENGINE_EXECUTION',false,error&&error.message||error);}
-const failed=checks.filter(x=>!x.ok),payload={schemaVersion:'orbit360-gate-contract-preflight-m2-root-cause-static-v1',gateId:GATE_ID,contractVersion:'2.2.1',executionPhase:'EXISTING_IDENTITY_ROOT_CAUSE_STATIC',generatedAt:new Date().toISOString(),status:failed.length?'VALIDATOR_STALE':'GO_GATE_CONTRACT',classification:failed.length?'VALIDATOR_STALE':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,sourceTransformed:false,dataAccess:false,secretAccess:false,firestoreRead:false,operationalWrites:0,controlledConfigurationWritesExecuted:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const failed=checks.filter(x=>!x.ok),payload={schemaVersion:'orbit360-gate-contract-preflight-m2-validator-stale-closed-v1',gateId:GATE_ID,contractVersion:'2.2.1',executionPhase:'EXISTING_IDENTITY_ROOT_CAUSE_STATIC',generatedAt:new Date().toISOString(),status:failed.length?'VALIDATOR_STALE':'GO_GATE_CONTRACT',classification:failed.length?'VALIDATOR_STALE':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,rootCauseProven:failed.length===0,rootCauseCode:failed.length?'':'AUTH_DEMO_MARKER_REJECTED_AUTHORIZED_EXISTING_IDENTITY',runtimeAuthorized:false,allowedRuntimeExecutions:0,sourceTransformed:false,dataAccess:false,secretAccess:false,firestoreRead:false,operationalWrites:0,controlledConfigurationWritesExecuted:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 fs.mkdirSync(path.dirname(EVIDENCE_PATH),{recursive:true});fs.writeFileSync(EVIDENCE_PATH,JSON.stringify(payload,null,2)+'\n');console.log(JSON.stringify(payload,null,2));process.exit(failed.length?41:0);
