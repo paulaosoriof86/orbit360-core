@@ -76,7 +76,7 @@ Merge/main: no
 
 ## Control de modificación accidental
 
-Durante el cierre se creó accidentalmente un `README.md` raíz fuera de alcance y se eliminó inmediatamente. La comparación entre el HEAD anterior y el HEAD posterior confirmó `files: []`, por lo que el efecto neto es cero y no quedó ninguna modificación ajena al diagnóstico.
+Durante el cierre se creó accidentalmente un `README.md` raíz fuera de alcance y se eliminó inmediatamente. La comparación entre el HEAD anterior y el HEAD posterior confirmó `files: []`, por lo que el efecto neto es cero y no quedó ninguna modificación ajena al diagnóstico. El freeze final registra este control.
 
 ## Estado y siguiente frontera
 
@@ -91,4 +91,4 @@ Corrected runtime request created: false
 La siguiente acción exige una nueva autorización explícita de una sola ejecución del runtime corregido. Esa decisión no autoriza Rules, escrituras, Hosting, Functions, importaciones, Pólizas, M3, merge ni `main`.
 
 Claude: `BACKEND_PROTEGIDO_NO_CLAUDE`.  
-Academia: versión `1.241`, diferencia entre defecto de datos y validador obsoleto, guardas fail-closed y trazabilidad diagnóstica sanitizada.
+Academia: versiones `1.240` y `1.241`, diferencia entre resultado histórico y causa raíz, validador obsoleto, guardas fail-closed y trazabilidad diagnóstica sanitizada.
