@@ -15,7 +15,7 @@ try{
   check('RUNTIME_NOT_AUTHORIZED',runtimeAuth.status==='PREPARED_NOT_AUTHORIZED'&&runtimeAuth.authorization.received===false&&runtimeAuth.authorization.allowedExecutions===0);
   check('FREEZE',['M2_EXISTING_IDENTITY_RUNTIME_STATIC_AUTHORIZED_ONCE','M2_EXISTING_IDENTITY_RUNTIME_STATIC_PREPARED'].includes(freeze.status),freeze.status);
   check('REQUEST',request.schemaVersion==='orbit360-m2-existing-identity-runtime-static-request-v1'&&request.contractVersion==='2.2.0'&&request.staticOnly===true);
-  check('REGISTRY',registry.planPatch&&registry.planPatch.currentObjective==='EXISTING_IDENTITY_RUNTIME_PREPARATION');
+  check('REGISTRY',registry.planPatch&&['EXISTING_IDENTITY_RUNTIME_PREPARATION','EXISTING_IDENTITY_RUNTIME_PREPARED_AWAITING_AUTHORIZATION'].includes(registry.planPatch.currentObjective),registry.planPatch&&registry.planPatch.currentObjective);
   check('OVERLAY',overlay.gatePatch&&overlay.gatePatch.contractVersion==='2.2.0');
   const runtime=read(files.runtimeScript),runtimeWorkflow=read(files.runtimeWorkflow),staticWorkflow=read(files.staticWorkflow),provider=read(files.provider),entry=read(files.entry);
   ['createUser(','updateUser(','deleteUser(','FieldValue','firebase-tools deploy','firestore:rules','storage.rules'].forEach(t=>check('NO_RUNTIME_TOKEN:'+t,!runtime.includes(t)));
