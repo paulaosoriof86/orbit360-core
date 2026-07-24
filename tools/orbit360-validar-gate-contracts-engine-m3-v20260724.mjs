@@ -13,9 +13,9 @@ try{
  const caps=lifecycle.executionProfile&&lifecycle.executionProfile.capabilities||{};check('CAPABILITIES_ZERO',Object.values(caps).every(v=>v===false));
  check('M2_CLOSED',freeze.status==='M2_PRODUCT_READONLY_RUNTIME_CLOSED'&&freeze.stateClarification&&freeze.stateClarification.m2Closed===true&&freeze.m2RuntimeClosure&&freeze.m2RuntimeClosure.ok===true,freeze.status);
  check('M3_BLOCKED',freeze.stateClarification&&freeze.stateClarification.m3Authorized===false&&freeze.stateClarification.m3Blocked===true);
- check('AUTH_ONCE',auth.status==='AUTHORIZED_ONCE'&&auth.authorization.allowedExecutions===1&&auth.authorization.staticOnly===true&&auth.authorization.activation===false,auth.status);
- check('REGISTRY_ACTIVE',registry.planPatch&&registry.planPatch.currentObjective==='M3_TENANT_ACTIVATION_STATIC_PREPARATION');
- check('OVERLAY_ACTIVE',overlay.gatePatch&&overlay.gatePatch.status==='M3_TENANT_ACTIVATION_STATIC_PREPARATION_AUTHORIZED_ONCE');
+ check('AUTH_ONCE',auth.status==='AUTHORIZED_ONCE_REQUEST_PREPARED'&&auth.authorization.allowedExecutions===1&&auth.authorization.requestCreated===true&&auth.authorization.staticOnly===true&&auth.authorization.activation===false,auth.status);
+ check('REGISTRY_ACTIVE',registry.planPatch&&registry.planPatch.currentObjective==='M3_TENANT_ACTIVATION_STATIC_PREPARATION_REQUEST_READY');
+ check('OVERLAY_ACTIVE',overlay.gatePatch&&overlay.gatePatch.status==='M3_TENANT_ACTIVATION_STATIC_PREPARATION_REQUEST_READY');
  check('M4_DEFERRED',registry.gates&&registry.gates[0]&&registry.gates[0].m4Deferral&&registry.gates[0].m4Deferral.clients===414&&registry.gates[0].m4Deferral.insurers===26);
  const contract=read(files.contract),test=read(files.test),paths=read(files.paths),membership=read(files.membership);
  check('CONTRACT_STATIC',contract.includes('M3_TENANT_ACTIVATION_STATIC_READY')&&contract.includes('writeAuthorized: false')&&contract.includes('activationExecuted: false'));
