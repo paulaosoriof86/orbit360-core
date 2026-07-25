@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-dryrun-v1",
+  "issuedAt": "2026-07-24",
+  "updatedAt": "2026-07-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-durable-writer-dryrun-v20260724",
+  "gateContractVersion": "4.1.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-durable-writer-dryrun-authorized-once-v1",
+  "methodologicalDecisionId": "authorize-one-readonly-m4-dryrun-after-static-closure-20260724",
+  "classification": "GO_RUNTIME_READONLY",
+  "secondaryClassification": null,
+  "executionProfile": {
+    "phase": "M4_DURABLE_WRITER_DRYRUN_EXECUTION",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "operationalWritesAuthorized": false,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "migrationWritesAuthorized": false,
+    "rulesChangeAuthorized": false,
+    "requestModel": "immutable-request-bound-to-parent-commit"
+  },
+  "canonicalIntegration": {
+    "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "engine": "tools/orbit360-validar-gate-contracts-engine-m4-dryrun-v20260724.mjs",
+    "registryExtension": "tools/orbit360-gate-contract-registry-extension-m4-dryrun-v20260724.json",
+    "overlay": "tools/orbit360-gate-contract-overlay-m4-dryrun-v20260724.json",
+    "freeze": "tools/orbit360-m4-durable-writer-freeze-v20260724.json",
+    "authorization": "tools/orbit360-m4-durable-writer-dryrun-authorization-v20260724.json",
+    "workflow": ".github/workflows/orbit360-m4-durable-writer-dryrun-gate-v20260724.yml",
+    "runtimeOwner": "tools/orbit360-m4-durable-writer-dryrun-v20260724.mjs",
+    "runtimeContract": "orbit360-platform/core/durable-writer-dryrun-contract-p0.js",
+    "preflightBeforeAnyExternalAccess": true,
+    "sourceTransformation": false,
+    "rulesChange": false,
+    "hostingDeploy": false,
+    "functionsDeploy": false,
+    "imports": false,
+    "policies": false,
+    "mergeMain": false
+  },
+  "prerequisites": {
+    "m3Closed": true,
+    "m3RunId": 30135928958,
+    "m4StaticClosed": true,
+    "m4StaticStatus": "M4_DURABLE_WRITER_STATIC_READY"
+  },
+  "authorization": {
+    "dryRunAuthorized": true,
+    "allowedDryRunExecutions": 1,
+    "requestCreated": true,
+    "requestPath": "tools/orbit360-m4-durable-writer-dryrun-request-v20260724.json"
+  },
+  "migrationBoundary": {
+    "sourceOrder": [
+      "configuration_catalog",
+      "memberships",
+      "clientes",
+      "aseguradoras",
+      "quality_audit"
+    ],
+    "clients": 414,
+    "insurers": 26,
+    "policiesDeferred": true
+  },
+  "nextRequiredDecision": "EXECUTE_ONE_M4_READONLY_DRYRUN",
+  "containsPII": false,
+  "containsSecrets": false
+}

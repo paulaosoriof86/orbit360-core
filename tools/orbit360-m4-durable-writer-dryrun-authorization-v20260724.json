@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "orbit360-m4-durable-writer-dryrun-authorization-v1",
+  "issuedAt": "2026-07-24",
+  "updatedAt": "2026-07-24",
+  "status": "AUTHORIZED_ONCE_REQUEST_READY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-durable-writer-dryrun-v20260724",
+  "contractVersion": "4.1.0",
+  "authorization": {
+    "received": true,
+    "source": "user_continue_after_m4_static_closure",
+    "allowedExecutions": 1,
+    "requestCreated": true,
+    "requestReady": true,
+    "requestPath": "tools/orbit360-m4-durable-writer-dryrun-request-v20260724.json",
+    "readOnlyDryRun": true,
+    "secretAccessAfterPreflight": true,
+    "firestoreReadAfterPreflight": true,
+    "writes": false,
+    "configurationWrites": false,
+    "membershipWrites": false,
+    "clientWrites": false,
+    "insurerWrites": false,
+    "auditWrites": false,
+    "rulesChange": false,
+    "hostingDeploy": false,
+    "functionsDeploy": false,
+    "imports": false,
+    "policies": false,
+    "mergeMain": false
+  },
+  "prerequisites": {
+    "m3Closed": true,
+    "m3RunId": 30135928958,
+    "m4StaticClosed": true,
+    "m4StaticCommit": "1d313031c04f7fe250cc4c1c5233c83aee2daacc"
+  },
+  "acceptance": {
+    "status": "M4_DURABLE_WRITER_DRYRUN_COMPLETED",
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "diffCategories": [
+      "create",
+      "update",
+      "omit",
+      "requires_validation"
+    ],
+    "zeroWrites": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}

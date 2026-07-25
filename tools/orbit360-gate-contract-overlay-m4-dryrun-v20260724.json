@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-m4-dryrun-v1",
+  "issuedAt": "2026-07-24",
+  "updatedAt": "2026-07-24",
+  "gatePatch": {
+    "gateId": "block4-durable-writer-dryrun-v20260724",
+    "contractVersion": "4.1.0",
+    "status": "M4_DURABLE_WRITER_DRYRUN_AUTHORIZED_ONCE",
+    "classification": "GO_RUNTIME_READONLY",
+    "allowedDryRunExecutions": 1,
+    "writeAuthorized": false,
+    "rulesChangeAuthorized": false,
+    "policiesAuthorized": false
+  },
+  "effectiveOwnerReconciliation": {
+    "m3Closed": true,
+    "m4StaticClosed": true,
+    "sourceOwner": "legacy LAB collections + activation manifest + existing canonical membership",
+    "targetOwner": "tenant canonical paths contract",
+    "diffActions": [
+      "create",
+      "update",
+      "omit",
+      "requires_validation"
+    ],
+    "successDeclaration": "remote_read_confirmation_required",
+    "configurationPersistence": "not_executed",
+    "membershipPersistence": "not_executed",
+    "dataPersistence": "not_executed"
+  },
+  "blockedActions": [
+    "write_configuration",
+    "write_memberships",
+    "write_clients",
+    "write_insurers",
+    "write_audit",
+    "deploy_rules",
+    "deploy_hosting",
+    "deploy_functions",
+    "advance_policies",
+    "merge_main"
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}
