@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-m3-runtime-v1",
+  "issuedAt": "2026-07-24",
+  "updatedAt": "2026-07-24",
+  "gatePatch": {
+    "gateId": "block3-tenant-activation-runtime-v20260724",
+    "contractVersion": "3.1.0",
+    "status": "M3_TENANT_ACTIVATION_READONLY_AUTHORIZED_ONCE",
+    "classification": "GO_RUNTIME_READONLY",
+    "allowedActivationExecutions": 1,
+    "writeAuthorized": false,
+    "rulesChangeAuthorized": false,
+    "m4Authorized": false
+  },
+  "effectiveOwnerReconciliation": {
+    "m1Closed": true,
+    "m2Closed": true,
+    "m3StaticClosed": true,
+    "activationOwner": "orbit360-platform/core/tenant-activation-runtime-contract-p0.js",
+    "runtimeOwner": "tools/orbit360-m3-tenant-activation-runtime-v20260724.mjs",
+    "tenantResolution": "membership_only",
+    "sourceOfTruth": "activation_manifest",
+    "storeMode": "product_readonly_no_fallback",
+    "configurationPersistence": "deferred_to_m4",
+    "membershipPersistence": "deferred_to_m4"
+  },
+  "blockedActions": [
+    "create_project",
+    "create_auth_user",
+    "update_auth_user",
+    "create_membership",
+    "update_membership",
+    "persist_tenant_configuration",
+    "migrate_clients",
+    "migrate_insurers",
+    "deploy_rules",
+    "deploy_hosting",
+    "deploy_functions",
+    "advance_m4",
+    "advance_policies",
+    "merge_main"
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}
