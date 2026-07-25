@@ -41,6 +41,7 @@ try{
   check('REGISTRY_CLOSED',registry.planPatch&&registry.planPatch.currentObjective==='M3_TENANT_ACTIVATED_READONLY_M4_BLOCKED'&&registry.gates&&registry.gates[0]&&registry.gates[0].status==='M3_TENANT_ACTIVATED_READONLY'&&registry.gates[0].m3Authorization.allowedActivationExecutions===0);
   check('OVERLAY_CLOSED',overlay.gatePatch&&overlay.gatePatch.status==='M3_TENANT_ACTIVATED_READONLY'&&overlay.gatePatch.m3Closed===true&&overlay.gatePatch.allowedActivationExecutions===0);
   check('M4_BLOCKED',freeze.stateClarification&&freeze.stateClarification.m4Blocked===true&&freeze.stateClarification.m4Authorized===false&&freeze.m4Deferral.clients===414&&freeze.m4Deferral.insurers===26);
+  check('METHODOLOGY_SYNC',lifecycle.methodologyClosure&&lifecycle.methodologyClosure.sameHeadSelfReferencePatternDetectedTwice===true&&registry.gates[0].methodology&&registry.gates[0].methodology.sameHeadSelfReferencePatternDetectedTwice===true&&overlay.methodology&&overlay.methodology.sameSelfReferencePatternDetectedTwice===true&&freeze.methodologyIncidents.some(item=>item.scope==='m3_closure_head_reference_repeated_pattern'));
   check('MANIFEST',manifest.schemaVersion==='orbit360-m3-tenant-activation-manifest-v1'&&manifest.tenantId==='alianzas-soluciones'&&manifest.sourceOfTruth==='activation_manifest'&&manifest.containsPII===false&&manifest.containsSecrets===false);
   check('MANIFEST_NO_SECRETS',!hasSensitiveValue(manifest));
   const contract=read(files.contract),runtime=read(files.runtime),test=read(files.test),workflow=read(files.workflow);
