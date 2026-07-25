@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m3-runtime-v1",
+  "issuedAt": "2026-07-24",
+  "updatedAt": "2026-07-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block3-tenant-activation-runtime-v20260724",
+  "gateContractVersion": "3.1.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m3-tenant-activation-readonly-authorized-once-v1",
+  "methodologicalDecisionId": "authorize-one-readonly-m3-activation-after-static-closure-20260724",
+  "classification": "GO_RUNTIME_READONLY",
+  "secondaryClassification": null,
+  "executionProfile": {
+    "phase": "M3_TENANT_ACTIVATION_EXECUTION",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "operationalWritesAuthorized": false,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "existingIdentityOnly": true,
+    "rulesChangeAuthorized": false,
+    "requestModel": "immutable-request-bound-to-parent-commit"
+  },
+  "canonicalIntegration": {
+    "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "engine": "tools/orbit360-validar-gate-contracts-engine-m3-runtime-v20260724.mjs",
+    "registryExtension": "tools/orbit360-gate-contract-registry-extension-m3-runtime-v20260724.json",
+    "overlay": "tools/orbit360-gate-contract-overlay-m3-runtime-v20260724.json",
+    "freeze": "tools/orbit360-m3-tenant-activation-freeze-v20260724.json",
+    "authorization": "tools/orbit360-m3-tenant-activation-runtime-authorization-v20260724.json",
+    "runtimeWorkflow": ".github/workflows/orbit360-m3-tenant-activation-runtime-gate-v20260724.yml",
+    "runtimeOwner": "tools/orbit360-m3-tenant-activation-runtime-v20260724.mjs",
+    "runtimeContract": "orbit360-platform/core/tenant-activation-runtime-contract-p0.js",
+    "manifest": "tools/orbit360-m3-tenant-activation-manifest-v20260724.json",
+    "preflightBeforeAnyExternalAccess": true,
+    "sourceTransformation": false,
+    "rulesChange": false,
+    "hostingDeploy": false,
+    "functionsDeploy": false,
+    "imports": false,
+    "policies": false,
+    "mergeMain": false
+  },
+  "prerequisites": {
+    "m2Closed": true,
+    "m2RunId": 30123408050,
+    "m3StaticClosed": true,
+    "m3StaticRunId": 30125893901
+  },
+  "authorization": {
+    "activationAuthorized": true,
+    "allowedActivationExecutions": 1,
+    "requestCreated": true,
+    "requestPath": "tools/orbit360-m3-tenant-activation-runtime-request-v20260724.json"
+  },
+  "persistenceBoundary": {
+    "m3Writes": 0,
+    "configurationPersistenceDeferredToM4": true,
+    "membershipPersistenceDeferredToM4": true,
+    "clientsDeferredToM4": 414,
+    "insurersDeferredToM4": 26
+  },
+  "preservedEvidence": {
+    "m1Closed": true,
+    "m2Closed": true,
+    "m3StaticClosed": true,
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7
+  },
+  "nextRequiredDecision": "EXECUTE_ONE_M3_READONLY_ACTIVATION",
+  "containsPII": false,
+  "containsSecrets": false
+}
