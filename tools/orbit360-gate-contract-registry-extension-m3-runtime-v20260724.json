@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v3",
+  "issuedAt": "2026-07-24",
+  "updatedAt": "2026-07-24",
+  "repository": {
+    "fullName": "paulaosoriof86/orbit360-core",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pr": 5,
+    "tenant": "alianzas-soluciones"
+  },
+  "planPatch": {
+    "activeBlock": 3,
+    "previousBlockStatus": "M3_TENANT_ACTIVATION_STATIC_READY",
+    "currentObjective": "M3_TENANT_ACTIVATION_READONLY_AUTHORIZED_ONCE"
+  },
+  "canonicalOwners": [
+    {
+      "id": "tenantActivationRuntimeP0",
+      "path": "orbit360-platform/core/tenant-activation-runtime-contract-p0.js",
+      "requiredTokens": ["M3_TENANT_ACTIVATED_READONLY", "membership_only", "activation_manifest", "COUNTRY_CURRENCY", "activationAuthorized", "activationExecuted"]
+    },
+    {
+      "id": "productReadOnlyBootstrapP0",
+      "path": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "requiredTokens": ["authorizedProductReadOnly", "runtimeAuthorized", "storeInstalled", "snapshotsAttached"]
+    },
+    {
+      "id": "tenantCanonicalPathsP0",
+      "path": "orbit360-platform/core/tenant-canonical-paths-contract-p0.js",
+      "requiredTokens": ["COUNTRY_CURRENCY", "tenantConfigDocumentPath", "membershipDocumentPath"]
+    }
+  ],
+  "gates": [
+    {
+      "gateId": "block3-tenant-activation-runtime-v20260724",
+      "contractVersion": "3.1.0",
+      "diagnosticRevision": "m3-readonly-activation-authorized-once-v1",
+      "block": 3,
+      "status": "AUTHORIZED_ONCE_REQUEST_READY",
+      "acceptancePolicy": "Exactly one controlled read-only activation using an existing privileged identity and tenant resolved from membership. No writes, Rules, deploys, imports or M4 persistence.",
+      "runtimeWorkflow": ".github/workflows/orbit360-m3-tenant-activation-runtime-gate-v20260724.yml",
+      "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "freeze": "tools/orbit360-m3-tenant-activation-freeze-v20260724.json",
+      "authorization": "tools/orbit360-m3-tenant-activation-runtime-authorization-v20260724.json",
+      "executionProfile": {
+        "phase": "M3_TENANT_ACTIVATION_EXECUTION",
+        "capabilities": {
+          "secrets": true,
+          "firestoreRead": true,
+          "writes": false,
+          "runtime": true,
+          "browser": false,
+          "deploy": false,
+          "functionsDeploy": false,
+          "rulesDeploy": false,
+          "production": false
+        },
+        "existingIdentityOnly": true,
+        "tenantResolution": "membership_only",
+        "rulesChangeAuthorized": false,
+        "operationalWritesAuthorized": false,
+        "configurationWritesAuthorized": false,
+        "membershipWritesAuthorized": false
+      },
+      "prerequisites": {
+        "m2Closed": true,
+        "m2RunId": 30123408050,
+        "m3StaticClosed": true,
+        "m3StaticRunId": 30125893901,
+        "m3StaticDigest": "sha256:8ef2a04146ad96bc5506de6d2a4bb092afea43c84e24aab9b0306cfa7ad027a3"
+      },
+      "m3Authorization": {
+        "activationAuthorized": true,
+        "allowedActivationExecutions": 1,
+        "requestPath": "tools/orbit360-m3-tenant-activation-runtime-request-v20260724.json"
+      },
+      "m4Deferral": {
+        "configuration": true,
+        "memberships": true,
+        "clients": 414,
+        "insurers": 26
+      },
+      "successEvidence": "orbit360-platform/runtime-gate-crm-v20260716/m3-tenant-activation-runtime-summary.json",
+      "successPredicate": "ok === true && status === M3_TENANT_ACTIVATED_READONLY",
+      "executionDispatch": {
+        "mode": "push_request_file_once",
+        "uniqueExecution": true,
+        "requestPath": "tools/orbit360-m3-tenant-activation-runtime-request-v20260724.json"
+      }
+    }
+  ]
+}
