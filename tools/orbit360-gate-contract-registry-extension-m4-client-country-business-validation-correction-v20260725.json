@@ -21,8 +21,10 @@
       },
       "validationMode": "executed_contract_fixtures",
       "literalSourceInspection": false,
-      "executionAuthorized": true,
-      "allowedExecutions": 1
+      "executionAuthorized": false,
+      "allowedExecutions": 0,
+      "validatorRevision": "4.2.6-r1",
+      "requestBoundaryMode": "absent_or_historical_or_active_bound_to_parent"
     }
   ],
   "containsPII": false,

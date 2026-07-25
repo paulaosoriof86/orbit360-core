@@ -7,7 +7,7 @@
   "gateId": "block4-client-country-business-validation-correction-dryrun-v20260725",
   "gateContractVersion": "4.2.6",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "controlPlaneRevision": "m4-business-validation-correction-dryrun-v1",
+  "controlPlaneRevision": "m4-business-validation-correction-dryrun-v1-r1",
   "methodologicalDecisionId": "execute-one-readonly-61-gt-gtq-correction-dryrun-20260725",
   "classification": "DATA_CONTRACT_REPAIR_DRYRUN",
   "executionProfile": {
@@ -37,5 +37,19 @@
     "aggregateEvidenceOnly": true
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "requestBoundary": {
+    "modes": [
+      "package_without_request",
+      "historical_request_ignored",
+      "immutable_request_present"
+    ],
+    "activeOnlyWhenAuthorizedBaseCommitEqualsParent": true
+  },
+  "authorization": {
+    "previousExecutionConsumed": true,
+    "allowedExecutions": 0,
+    "newExecutionRequiresImmutableRequest": true,
+    "writeAuthorized": false
+  }
 }

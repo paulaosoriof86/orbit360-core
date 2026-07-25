@@ -7,7 +7,7 @@
   "explicitAuthorization": true,
   "authorizationSource": "user_continua_siguiente_accion_exacta",
   "correctionDryRunReadOnly": true,
-  "allowedExecutions": 1,
+  "allowedExecutions": 0,
   "businessValidationAll61Guatemala": true,
   "proposedCountry": "GT",
   "proposedCurrency": "GTQ",
@@ -18,5 +18,10 @@
   "writeAuthorized": false,
   "operationalWrites": false,
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "previousExecutionConsumed": true,
+  "failedRequestCommit": "04da14b4030fd6fcc9be9ba8cc0f06936d8f771c",
+  "failedRun": 30164487060,
+  "newExecutionRequiresImmutableRequest": true,
+  "executionAuthorized": false
 }

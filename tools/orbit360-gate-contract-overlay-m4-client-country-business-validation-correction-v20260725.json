@@ -12,7 +12,8 @@
     "proposal_61_gt_gtq",
     "target_only_deferred_4",
     "aggregate_diff_only",
-    "zero_writes"
+    "zero_writes",
+    "request_boundary_semantic_not_presence_literal"
   ],
   "blocked": [
     "client_writes",
@@ -24,8 +25,10 @@
     "deploy",
     "production",
     "main",
-    "merge"
+    "merge",
+    "rerun_without_new_authorization"
   ],
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "validatorRevision": "4.2.6-r1"
 }

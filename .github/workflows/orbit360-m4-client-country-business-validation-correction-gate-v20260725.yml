@@ -47,7 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="4.2.6" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .validationMode=="executed_contract_fixtures" and .literalSourceInspection==false and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="4.2.6" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .validationMode=="executed_contract_fixtures" and .literalSourceInspection==false and .activationMode=="immutable_request_present" and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
       - name: Probar contrato antes de secretos
         run: node tools/orbit360-m4-client-country-business-validation-correction-contract-v20260725.cjs
       - name: Resolver cuenta existente después del preflight

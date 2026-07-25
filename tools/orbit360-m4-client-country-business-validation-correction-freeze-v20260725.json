@@ -3,7 +3,7 @@
   "issuedAt": "2026-07-25",
   "gateId": "block4-client-country-business-validation-correction-dryrun-v20260725",
   "contractVersion": "4.2.6",
-  "status": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_CORRECTION_DRYRUN_AUTHORIZED_ONCE",
+  "status": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_CORRECTION_DRYRUN_PREFLIGHT_REPAIRED_NEW_AUTHORIZATION_REQUIRED",
   "semanticClosure": "orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-semantic-closure.json",
   "expected": {
     "clients": 414,
@@ -18,5 +18,12 @@
   "writeAuthorized": false,
   "allowedWriteExecutions": 0,
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "incident": {
+    "classification": "VALIDATOR_STALE",
+    "failedRun": 30164487060,
+    "failedCheckId": "NO_REQUEST_IN_PACKAGE",
+    "rootCause": "request_absence_was_enforced_during_request_activated_execution"
+  },
+  "allowedDryRunExecutions": 0
 }
