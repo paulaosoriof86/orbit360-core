@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-target-only-retirement-dryrun-v1",
+  "issuedAt": "2026-07-25",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-target-only-retirement-dryrun-v20260725",
+  "gateContractVersion": "4.2.8",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-target-only-retirement-dryrun-v1",
+  "methodologicalDecisionId": "atomic-retirement-dryrun-exactly-four-obsolete-target-only-20260725",
+  "classification": "DATA_CONTRACT_RESOLUTION_PLANNING",
+  "executionProfile": {
+    "phase": "M4_TARGET_ONLY_RETIREMENT_DRYRUN_EXECUTION",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "operationalWritesAuthorized": false,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "migrationWritesAuthorized": false,
+    "rulesChangeAuthorized": false,
+    "requestModel": "immutable_request_bound_to_parent_commit"
+  },
+  "baseline": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-reconciliation-closure.json",
+  "authorization": {
+    "packagePublicationAuthorized": true,
+    "dryRunExecutionAuthorized": true,
+    "allowedExecutions": 1,
+    "retirementWriteAuthorized": false,
+    "requestCreated": false
+  },
+  "privacy": {
+    "mode": "aggregate_plan_and_digests_only",
+    "recordIdsExported": false,
+    "rawValuesExported": false,
+    "pseudonymousTokensExported": false
+  },
+  "nextRequiredDecision": "AFTER_SUCCESS_REQUEST_SEPARATE_AUTHORIZATION_FOR_RETIREMENT_WRITE",
+  "containsPII": false,
+  "containsSecrets": false
+}

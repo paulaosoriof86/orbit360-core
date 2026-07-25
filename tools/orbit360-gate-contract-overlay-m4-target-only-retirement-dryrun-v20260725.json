@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-target-only-retirement-dryrun-v20260725",
+  "contractVersion": "4.2.8",
+  "owner": "target-only-retirement-planning-owner",
+  "classification": "DATA_CONTRACT_RESOLUTION_PLANNING",
+  "invariants": [
+    "exactly_two_client_obsolete",
+    "exactly_two_insurer_obsolete",
+    "deterministic_selection",
+    "four_before_snapshots_planned",
+    "exact_rollback_planned",
+    "append_only_audit_planned",
+    "zero_writes",
+    "zero_deletes"
+  ],
+  "blocked": [
+    "client_writes",
+    "insurer_writes",
+    "audit_writes",
+    "deletes",
+    "merges",
+    "rules",
+    "deploy",
+    "production",
+    "main",
+    "merge",
+    "gt_gtq_write",
+    "policies"
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-m4-target-only-retirement-dryrun-authorization-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-target-only-retirement-dryrun-v20260725",
+  "contractVersion": "4.2.8",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "explicitAuthorization": true,
+  "authorizationSource": "user_autorizado_atomic_retirement_dryrun_exactly_four",
+  "packagePublicationAuthorized": true,
+  "dryRunExecutionAuthorized": true,
+  "allowedExecutions": 1,
+  "requestCreated": false,
+  "expectedClientObsolete": 2,
+  "expectedInsurerObsolete": 2,
+  "expectedTotalObsolete": 4,
+  "retirementWriteAuthorized": false,
+  "clientCorrectionWriteAuthorized": false,
+  "m4WriteAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}

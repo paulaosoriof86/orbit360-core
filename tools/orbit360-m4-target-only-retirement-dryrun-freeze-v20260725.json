@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "orbit360-m4-target-only-retirement-dryrun-freeze-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-target-only-retirement-dryrun-v20260725",
+  "contractVersion": "4.2.8",
+  "status": "M4_TARGET_ONLY_RETIREMENT_DRYRUN_PACKAGE_READY",
+  "baseline": {
+    "closure": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-reconciliation-closure.json",
+    "clientObsolete": 2,
+    "insurerObsolete": 2,
+    "totalObsolete": 4
+  },
+  "authorization": {
+    "dryRunExecutionAuthorized": true,
+    "allowedExecutions": 1,
+    "retirementWriteAuthorized": false,
+    "requestCreated": false
+  },
+  "writeAuthorized": false,
+  "deleteAuthorized": false,
+  "nextAction": "CREATE_ONE_IMMUTABLE_REQUEST_AND_EXECUTE_ONE_READONLY_DRYRUN",
+  "containsPII": false,
+  "containsSecrets": false
+}
