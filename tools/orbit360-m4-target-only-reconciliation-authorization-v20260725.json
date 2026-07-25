@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-m4-target-only-reconciliation-authorization-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-target-only-reconciliation-readonly-v20260725",
+  "contractVersion": "4.2.7",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "explicitAuthorization": true,
+  "authorizationSource": "user_continua_20260725",
+  "packagePublicationAuthorized": true,
+  "readOnlyExecutionAuthorized": true,
+  "allowedExecutions": 1,
+  "expectedClientTargetOnly": 2,
+  "expectedInsurerTargetOnly": 2,
+  "writes": false,
+  "deletes": false,
+  "merges": false,
+  "inferences": false,
+  "containsPII": false,
+  "containsSecrets": false
+}

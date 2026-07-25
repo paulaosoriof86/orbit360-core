@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v1",
+  "issuedAt": "2026-07-25",
+  "gates": [
+    {
+      "gateId": "block4-target-only-reconciliation-readonly-v20260725",
+      "contractVersion": "4.2.7",
+      "phase": "M4_TARGET_ONLY_RECONCILIATION_READONLY_EXECUTION",
+      "lifecycle": "tools/orbit360-validator-lifecycle-contract-m4-target-only-reconciliation-v20260725.json",
+      "engine": "tools/orbit360-validar-gate-contracts-engine-m4-target-only-reconciliation-v20260725.mjs",
+      "capabilities": {
+        "secrets": true,
+        "firestoreRead": true,
+        "writes": false,
+        "runtime": true,
+        "browser": false,
+        "deploy": false,
+        "functionsDeploy": false,
+        "rulesDeploy": false,
+        "production": false
+      },
+      "validationMode": "executed_contract_fixtures",
+      "literalSourceInspection": false,
+      "writeAuthorization": false
+    }
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}

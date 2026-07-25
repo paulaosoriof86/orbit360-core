@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-m4-target-only-reconciliation-freeze-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-target-only-reconciliation-readonly-v20260725",
+  "contractVersion": "4.2.7",
+  "status": "M4_TARGET_ONLY_RECONCILIATION_PACKAGE_READY",
+  "baseline": {
+    "clients": 414,
+    "insurers": 26,
+    "clientTargetOnly": 2,
+    "insurerTargetOnly": 2,
+    "totalTargetOnly": 4
+  },
+  "authorization": {
+    "readOnlyExecutionAuthorized": true,
+    "allowedExecutions": 1,
+    "writeAuthorized": false,
+    "requestCreated": false
+  },
+  "nextAction": "PUBLISH_PACKAGE_THEN_CREATE_ONE_IMMUTABLE_REQUEST",
+  "containsPII": false,
+  "containsSecrets": false
+}

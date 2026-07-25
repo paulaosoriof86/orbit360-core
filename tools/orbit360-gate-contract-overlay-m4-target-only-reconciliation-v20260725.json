@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-target-only-reconciliation-readonly-v20260725",
+  "contractVersion": "4.2.7",
+  "classification": "DATA_CONTRACT_RECONCILIATION_READONLY",
+  "invariants": [
+    "exactly_2_client_target_only",
+    "exactly_2_insurer_target_only",
+    "aggregate_classification_only",
+    "zero_writes",
+    "no_inference_sources"
+  ],
+  "classificationSet": [
+    "expected",
+    "duplicate",
+    "obsolete",
+    "requires_validation"
+  ],
+  "blocked": [
+    "writes",
+    "deletes",
+    "merges",
+    "inferences",
+    "policies",
+    "finmovs",
+    "bank_statements",
+    "deploy",
+    "production",
+    "main",
+    "merge"
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}
