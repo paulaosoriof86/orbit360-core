@@ -11,16 +11,16 @@ const CANONICAL_LIFECYCLE_COMPOSITION='phase-capability-contract-v1';
 const ZERO={secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false};
 const GATE_CONFIG=Object.freeze({
   'block1-client360-insurers-lab-v20260717':{contractVersion:'1.0.40',lifecycle:'tools/orbit360-validator-lifecycle-contract-v20260722.json',engine:'tools/orbit360-validar-gate-contracts-engine-capabilities-v20260722.mjs'},
-  'block2-product-readonly-bootstrap-v20260723':{contractVersion:'2.0.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m2-v20260723.json',engine:'tools/orbit360-validar-gate-contracts-engine-m2-v20260723.mjs'},
+  'block2-product-readonly-bootstrap-v20260723':{contractVersion:'2.0.0',lifecycle:'tols/orbit360-validator-lifecycle-contract-m2-v20260723.json',engine:'tools/orbit360-validar-gate-contracts-engine-m2-v20260723.mjs'},
   'block2-product-readonly-runtime-v20260723':{contractVersion:'2.2.1',lifecycle:'tools/orbit360-validator-lifecycle-contract-m2-runtime-v20260723.json',engine:'tools/orbit360-validar-gate-contracts-engine-m2-runtime-v20260723.mjs'},
   'block3-tenant-activation-static-v20260724':{contractVersion:'3.0.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m3-v20260724.json',engine:'tools/orbit360-validar-gate-contracts-engine-m3-v20260724.mjs'},
   'block3-tenant-activation-runtime-v20260724':{contractVersion:'3.1.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m3-runtime-v20260724.json',engine:'tools/orbit360-validar-gate-contracts-engine-m3-runtime-v20260724.mjs'},
   'block4-durable-writer-static-v20260724':{contractVersion:'4.0.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m4-v20260724.json',engine:'tools/orbit360-validar-gate-contracts-engine-m4-v20260724.mjs'},
   'block4-durable-writer-dryrun-v20260724':{contractVersion:'4.1.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m4-dryrun-v20260724.json',engine:'tools/orbit360-validar-gate-contracts-engine-m4-dryrun-v20260724.mjs'},
-  'block4-data-reconciliation-readonly-v20260725':{contractVersion:'4.2.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m4-reconciliation-v20260725.json',engine:'tools/orbit360-validar-gate-contracts-engine-m4-reconciliation-v20260725.mjs'}
+  'block4-data-reconciliation-readonly-v20260725':{contractVersion:'4.2.1',lifecycle:'tools/orbit360-validator-lifecycle-contract-m4-reconciliation-v20260725.json',engine:'tools/orbit360-validar-gate-contracts-engine-m4-reconciliation-v20260725.mjs'}
 });
 const PHASE_PROFILES=Object.freeze({
-  STATIC_PREFLIGHT:ZERO,
+  STATIC_PREFLDIGHT:ZERO,
   LAB_DATA_CONTRACT_REPAIR_DRYRUN:{secrets:true,firestoreRead:true,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   LAB_DATA_CONTRACT_REPAIR_APPLY:{secrets:true,firestoreRead:true,writes:true,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   LAB_HOSTING_DELIVERY:{secrets:true,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false},
@@ -39,7 +39,8 @@ const PHASE_PROFILES=Object.freeze({
   M4_DURABLE_WRITER_STATIC_READY:ZERO,
   M4_DURABLE_WRITER_DRYRUN_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   M4_DURABLE_WRITER_DRYRUN_CLOSED:ZERO,
-  M4_DATA_RECONCILIATION_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false}
+  M4_DATA_RECONCILIATION_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  M4_DATA_RECONCILIATION_STATIC_REPAIR_READY:ZERO
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(k=>actual[k]===expected[k]);}

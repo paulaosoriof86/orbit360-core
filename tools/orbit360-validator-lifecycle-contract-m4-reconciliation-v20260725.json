@@ -1,17 +1,64 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-m4-reconciliation-v1",
-  "issuedAt":"2026-07-25",
-  "repository":"paulaosoriof86/orbit360-core",
-  "branch":"ays/backend-tenant-lab-v99-20260703",
-  "pullRequest":5,
-  "gateId":"block4-data-reconciliation-readonly-v20260725",
-  "gateContractVersion":"4.2.0",
-  "validatorLifecycleRevision":"phase-capability-contract-v1",
-  "controlPlaneRevision":"m4-data-reconciliation-readonly-authorized-once-v1",
-  "classification":"GO_RUNTIME_READONLY",
-  "executionProfile":{"phase":"M4_DATA_RECONCILIATION_EXECUTION","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"configurationWritesAuthorized":false,"membershipWritesAuthorized":false,"migrationWritesAuthorized":false,"rulesChangeAuthorized":false,"requestModel":"immutable-request-bound-to-parent-commit"},
-  "prerequisites":{"m4DryRunClosed":true,"dryRunRunId":30145799192,"requiresValidation":65,"clientsMissingCurrency":61,"clientTargetOnly":2,"insurerTargetOnly":2},
-  "authorization":{"reconciliationAuthorized":true,"allowedExecutions":1,"requestCreated":false},
-  "nextRequiredDecision":"EXECUTE_ONE_READONLY_RECONCILIATION",
-  "containsPII":false,"containsSecrets":false
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-reconciliation-v2",
+  "issuedAt": "2026-07-25",
+  "updatedAt": "2026-07-25",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-data-reconciliation-readonly-v20260725",
+  "gateContractVersion": "4.2.1",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-data-reconciliation-static-repair-ready-v2",
+  "methodologicalDecisionId": "close-failed-run-fix-sanitization-audit-approved-client-source-no-rerun-20260725",
+  "classification": "VALIDATOR_STALE_CORRECTED",
+  "secondaryClassification": "DATA_CONTRACT_FAILURE_REMAINS",
+  "executionProfile": {
+    "phase": "M4_DATA_RECONCILIATION_STATIC_REPAIR_READY",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "operationalWritesAuthorized": false,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "migrationWritesAuthorized": false,
+    "rulesChangeAuthorized": false,
+    "requestModel": "no-execution-request-authorized"
+  },
+  "failedRun": {
+    "runId": 30148739016,
+    "artifactId": 8616917105,
+    "requestCommit": "1c0b5e65212458a694ca42ecc47ee97dd9dfe8e0",
+    "attempts": 1,
+    "authorizationConsumed": true
+  },
+  "staticRepair": {
+    "sanitizationOrderCorrected": true,
+    "schemaAuditMode": "field_names_and_counts_only",
+    "sourceAudit": "orbit360-platform/runtime-gate-crm-v20260716/m4-data-reconciliation-static-source-audit.json",
+    "contractTests": "PASS_10_OF_10"
+  },
+  "authorization": {
+    "reconciliationAuthorized": false,
+    "allowedExecutions": 0,
+    "requestConsumed": true,
+    "writeAuthorized": false,
+    "allowedWriteExecutions": 0
+  },
+  "dataBoundary": {
+    "clientsMissingCurrency": 61,
+    "explicitCountryColumnInApprovedSource": false,
+    "targetOnlyRetireCandidates": 4,
+    "automaticCurrencyAssignmentAuthorized": false
+  },
+  "nextRequiredDecision": "NEW_EXPLICIT_READONLY_SCHEMA_AUDIT_AUTHORIZATION_AFTER_STATIC_EVIDENCE",
+  "containsPII": false,
+  "containsSecrets": false
 }

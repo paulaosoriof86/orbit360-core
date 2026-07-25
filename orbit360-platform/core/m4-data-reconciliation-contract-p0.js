@@ -2,14 +2,14 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='4.2.0-readonly-20260725';
+  var VERSION='4.2.1-readonly-20260725';
   var STATUS='M4_DATA_RECONCILIATION_COMPLETED';
   var MAP=Object.freeze({GT:'GTQ',CO:'COP'});
   var RECOMMENDATIONS=Object.freeze(['conservar','actualizar_rekey','retirar_candidato','requiere_validacion']);
   function n(v){return Number(v||0);}
   function build(input){
     input=input||{};var errors=[],warnings=[];
-    var currency=input.currencyResolution||{},target=input.targetOnlyResolution||{},counts=input.sourceCounts||{};
+    var currency=input.currencyResolution||{},target=input.targetOnlyResolution||{},counts=input.sourceCounts||{},audit=input.schemaAudit||{};
     var resolved=n(currency.resolvedGTQ)+n(currency.resolvedCOP),missing=n(currency.missingCurrency),unresolved=n(currency.unresolved);
     var recs=target.recommendations||{};
     var targetTotal=n(target.total),recTotal=RECOMMENDATIONS.reduce(function(sum,key){return sum+n(recs[key]);},0);
@@ -26,11 +26,12 @@
     if(n(target.clientTotal)!==2||n(target.insurerTotal)!==2)errors.push('target_only_collection_counts_invalid');
     if(n(input.secretValueCount)!==0)errors.push('secret_values_detected');
     if(input.containsPII!==false||input.containsSecrets!==false)errors.push('sanitization_required');
+    if(audit.privacyMode!=='field_names_and_counts_only'||audit.valuesExported!==false||!Array.isArray(audit.candidateFields))errors.push('schema_audit_contract_required');
     if(input.rulesChanged||input.hostingDeploy||input.functionsDeploy||input.imports||input.policies||input.mergeMain)errors.push('scope_violation');
     if(unresolved)warnings.push('currency_unresolved:'+unresolved);
     if(n(recs.requiere_validacion))warnings.push('target_only_unresolved:'+n(recs.requiere_validacion));
     var approvalReady=errors.length===0&&unresolved===0&&n(recs.requiere_validacion)===0;
-    return {ok:errors.length===0,status:errors.length? 'DATA_CONTRACT_FAILURE':STATUS,contractVersion:VERSION,approvalReady:approvalReady,errors:errors,warnings:warnings,writeAuthorized:false,writeExecuted:false,containsPII:false,containsSecrets:false};
+    return {ok:errors.length===0,status:errors.length?'DATA_CONTRACT_FAILURE':STATUS,contractVersion:VERSION,approvalReady:approvalReady,errors:errors,warnings:warnings,writeAuthorized:false,writeExecuted:false,containsPII:false,containsSecrets:false};
   }
   window.Orbit.m4DataReconciliationP0=Object.freeze({VERSION:VERSION,STATUS:STATUS,COUNTRY_CURRENCY:MAP,RECOMMENDATIONS:RECOMMENDATIONS,build:build});
 })();

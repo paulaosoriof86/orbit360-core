@@ -1,8 +1,35 @@
 {
-  "schemaVersion":"orbit360-gate-contract-registry-extension-v4.2",
-  "issuedAt":"2026-07-25",
-  "repository":{"fullName":"paulaosoriof86/orbit360-core","branch":"ays/backend-tenant-lab-v99-20260703","pr":5,"tenant":"alianzas-soluciones"},
-  "planPatch":{"activeBlock":4,"previousBlockStatus":"M4_DURABLE_WRITER_DRYRUN_COMPLETED_DATA_VALIDATION_REQUIRED","currentObjective":"M4_DATA_RECONCILIATION_READONLY_AUTHORIZED_ONCE"},
-  "gates":[{"gateId":"block4-data-reconciliation-readonly-v20260725","contractVersion":"4.2.0","status":"AUTHORIZED_ONCE","preflight":"tools/orbit360-validar-gate-contracts-v20260717.mjs","runtime":"tools/orbit360-m4-data-reconciliation-v20260725.mjs","successEvidence":"orbit360-platform/runtime-gate-crm-v20260716/m4-data-reconciliation-summary.json","successPredicate":"ok === true && status === M4_DATA_RECONCILIATION_COMPLETED","executionDispatch":{"mode":"request_file_once","requestPath":"tools/orbit360-m4-data-reconciliation-request-v20260725.json"}}],
-  "writeAuthorization":false,"policiesDeferred":true,"containsPII":false,"containsSecrets":false
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v4.2.1",
+  "issuedAt": "2026-07-25",
+  "updatedAt": "2026-07-25",
+  "repository": {
+    "fullName": "paulaosoriof86/orbit360-core",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pr": 5,
+    "tenant": "alianzas-soluciones"
+  },
+  "planPatch": {
+    "activeBlock": 4,
+    "previousBlockStatus": "M4_DATA_RECONCILIATION_RUN_FAILED_ONCE",
+    "currentObjective": "M4_DATA_RECONCILIATION_STATIC_REPAIR_READY_EXECUTION_NOT_AUTHORIZED"
+  },
+  "gates": [
+    {
+      "gateId": "block4-data-reconciliation-readonly-v20260725",
+      "contractVersion": "4.2.1",
+      "status": "STATIC_REPAIR_READY_EXECUTION_NOT_AUTHORIZED",
+      "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "runtime": "tools/orbit360-m4-data-reconciliation-v20260725.mjs",
+      "staticEvidence": "orbit360-platform/runtime-gate-crm-v20260716/m4-data-reconciliation-static-source-audit.json",
+      "successPredicate": "status === GO_GATE_CONTRACT && executionAuthorized === false",
+      "executionDispatch": {
+        "mode": "none_until_new_explicit_readonly_schema_audit_authorization",
+        "requestPath": "new_request_required"
+      }
+    }
+  ],
+  "writeAuthorization": false,
+  "policiesDeferred": true,
+  "containsPII": false,
+  "containsSecrets": false
 }

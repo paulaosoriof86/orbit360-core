@@ -1,11 +1,50 @@
 {
-  "schemaVersion":"orbit360-m4-data-reconciliation-freeze-v1",
-  "issuedAt":"2026-07-25",
-  "status":"M4_DATA_RECONCILIATION_AUTHORIZED_ONCE",
-  "gateId":"block4-data-reconciliation-readonly-v20260725",
-  "contractVersion":"4.2.0",
-  "baseline":{"runId":30145799192,"artifactId":8615949892,"requiresValidation":65,"clientsMissingCurrency":61,"clientTargetOnly":2,"insurerTargetOnly":2},
-  "authorization":{"active":true,"allowedExecutions":1,"writeAuthorized":false},
-  "nextAction":"EXECUTE_READONLY_RECONCILIATION_ONCE",
-  "containsPII":false,"containsSecrets":false
+  "schemaVersion": "orbit360-m4-data-reconciliation-freeze-v2",
+  "issuedAt": "2026-07-25",
+  "updatedAt": "2026-07-25",
+  "status": "M4_DATA_RECONCILIATION_STATIC_REPAIR_READY_EXECUTION_NOT_AUTHORIZED",
+  "gateId": "block4-data-reconciliation-readonly-v20260725",
+  "contractVersion": "4.2.1",
+  "failedRun": {
+    "runId": 30148739016,
+    "artifactId": 8616917105,
+    "artifactDigest": "sha256:2ff4b499e9e326821af1fe170b60ad41326825c73a7db82e26307772da91fd75",
+    "attempts": 1,
+    "classification": "VALIDATOR_STALE_PLUS_DATA_CONTRACT_FAILURE"
+  },
+  "staticRepair": {
+    "sanitizationOrderCorrected": true,
+    "schemaFieldAuditPrepared": true,
+    "contractChecks": {
+      "passed": 10,
+      "total": 10,
+      "failed": 0
+    },
+    "sourceAuditStatus": "M4_SOURCE_SCHEMA_AUDITED_COUNTRY_NOT_EXPLICIT"
+  },
+  "dataState": {
+    "clients": 414,
+    "insurers": 26,
+    "clientsMissingCurrency": 61,
+    "targetOnlyRetireCandidates": 4,
+    "automaticCurrencyAssignmentAuthorized": false
+  },
+  "authorization": {
+    "active": false,
+    "allowedExecutions": 0,
+    "writeAuthorized": false,
+    "allowedWriteExecutions": 0
+  },
+  "blockedActions": [
+    "rerun_without_new_authorization",
+    "assign_currency_from_phone_region",
+    "assign_country_from_unapproved_geography",
+    "delete_target_only_markers",
+    "persist_m4",
+    "advance_policies",
+    "merge_main"
+  ],
+  "nextAction": "NEW_EXPLICIT_READONLY_SCHEMA_AUDIT_AUTHORIZATION_DECISION",
+  "containsPII": false,
+  "containsSecrets": false
 }
