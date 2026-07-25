@@ -1,0 +1,1 @@
+window.Orbit=window.Orbit||{};Orbit.academiaM4BusinessValidationCorrectionDryrun=Object.freeze({classification:'ACADEMIA_ACTUALIZAR',lesson:'Una validación empresarial por lote habilita primero un dry-run con diff agregado, trazabilidad, auditoría y rollback; nunca una escritura automática.',dryRunReadOnly:true,writesAuthorized:false,targetOnlyDeferred:4});

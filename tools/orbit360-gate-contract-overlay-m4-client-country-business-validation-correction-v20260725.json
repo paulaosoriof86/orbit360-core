@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-correction-dryrun-v20260725",
+  "contractVersion": "4.2.6",
+  "owner": "m4-client-country-correction-dryrun-owner",
+  "classification": "DATA_CONTRACT_REPAIR_DRYRUN",
+  "invariants": [
+    "exactly_414_clients",
+    "exactly_61_missing_currency",
+    "exactly_61_noncanonical_country",
+    "proposal_61_gt_gtq",
+    "target_only_deferred_4",
+    "aggregate_diff_only",
+    "zero_writes"
+  ],
+  "blocked": [
+    "client_writes",
+    "insurer_writes",
+    "configuration_writes",
+    "membership_writes",
+    "audit_writes",
+    "rules",
+    "deploy",
+    "production",
+    "main",
+    "merge"
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-business-validation-correction-authorization-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-correction-dryrun-v20260725",
+  "contractVersion": "4.2.6",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "explicitAuthorization": true,
+  "authorizationSource": "user_continua_siguiente_accion_exacta",
+  "correctionDryRunReadOnly": true,
+  "allowedExecutions": 1,
+  "businessValidationAll61Guatemala": true,
+  "proposedCountry": "GT",
+  "proposedCurrency": "GTQ",
+  "expectedClients": 414,
+  "expectedMissingCurrency": 61,
+  "expectedTargetOnlyDeferred": 4,
+  "privacyMode": "aggregate_diff_only",
+  "writeAuthorized": false,
+  "operationalWrites": false,
+  "containsPII": false,
+  "containsSecrets": false
+}

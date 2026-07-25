@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-business-validation-correction-freeze-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-correction-dryrun-v20260725",
+  "contractVersion": "4.2.6",
+  "status": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_CORRECTION_DRYRUN_AUTHORIZED_ONCE",
+  "semanticClosure": "orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-semantic-closure.json",
+  "expected": {
+    "clients": 414,
+    "missingCurrency": 61,
+    "nonCanonical": 61,
+    "country": "GT",
+    "currency": "GTQ",
+    "clientTargetOnly": 2,
+    "insurerTargetOnly": 2,
+    "targetOnlyDeferred": 4
+  },
+  "writeAuthorized": false,
+  "allowedWriteExecutions": 0,
+  "containsPII": false,
+  "containsSecrets": false
+}
