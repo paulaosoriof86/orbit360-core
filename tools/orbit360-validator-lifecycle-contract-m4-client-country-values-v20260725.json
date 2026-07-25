@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-client-country-values-v1",
+  "issuedAt": "2026-07-25",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-client-country-values-readonly-v20260725",
+  "gateContractVersion": "4.2.3",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-client-country-values-authorized-once-v1",
+  "methodologicalDecisionId": "aggregate-country-values-after-schema-audit-20260725",
+  "classification": "GO_RUNTIME_READONLY",
+  "executionProfile": {
+    "phase": "M4_CLIENT_COUNTRY_VALUES_AUDIT_EXECUTION",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "operationalWritesAuthorized": false,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "migrationWritesAuthorized": false,
+    "rulesChangeAuthorized": false,
+    "requestModel": "immutable-request-bound-to-parent-commit"
+  },
+  "baseline": {
+    "schemaAuditRun": 30161619900,
+    "clients": 414,
+    "clientsMissingCurrency": 61,
+    "explicitCountryField": "pais",
+    "sourceCollection": "tenantId/{tenant}/clientes"
+  },
+  "authorization": {
+    "valueAuditAuthorized": true,
+    "allowedExecutions": 1,
+    "requestCreated": false,
+    "writeAuthorized": false,
+    "allowedWriteExecutions": 0
+  },
+  "privacyBoundary": {
+    "mode": "aggregate_categories_only",
+    "rawValuesExported": false,
+    "individualRecordsExported": false,
+    "piiExported": false,
+    "insurersRead": false,
+    "targetRead": false
+  },
+  "nextRequiredDecision": "CREATE_ONE_IMMUTABLE_AGGREGATE_VALUE_AUDIT_REQUEST",
+  "containsPII": false,
+  "containsSecrets": false
+}

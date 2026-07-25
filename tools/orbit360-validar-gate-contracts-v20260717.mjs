@@ -18,7 +18,8 @@ const GATE_CONFIG=Object.freeze({
   'block4-durable-writer-static-v20260724':{contractVersion:'4.0.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m4-v20260724.json',engine:'tools/orbit360-validar-gate-contracts-engine-m4-v20260724.mjs'},
   'block4-durable-writer-dryrun-v20260724':{contractVersion:'4.1.0',lifecycle:'tools/orbit360-validator-lifecycle-contract-m4-dryrun-v20260724.json',engine:'tools/orbit360-validar-gate-contracts-engine-m4-dryrun-v20260724.mjs'},
   'block4-data-reconciliation-readonly-v20260725':{contractVersion:'4.2.1',lifecycle:'tools/orbit360-validator-lifecycle-contract-m4-reconciliation-v20260725.json',engine:'tools/orbit360-validar-gate-contracts-engine-m4-reconciliation-v20260725.mjs'},
-  'block4-client-country-schema-readonly-v20260725':{contractVersion:'4.2.2',lifecycle:'tools/orbit360-validator-lifecycle-contract-m4-client-country-schema-v20260725.json',engine:'tools/orbit360-validar-gate-contracts-engine-m4-client-country-schema-v20260725.mjs'}
+  'block4-client-country-schema-readonly-v20260725':{contractVersion:'4.2.2',lifecycle:'tools/orbit360-validator-lifecycle-contract-m4-client-country-schema-v20260725.json',engine:'tools/orbit360-validar-gate-contracts-engine-m4-client-country-schema-v20260725.mjs'},
+  'block4-client-country-values-readonly-v20260725':{contractVersion:'4.2.3',lifecycle:'tools/orbit360-validator-lifecycle-contract-m4-client-country-values-v20260725.json',engine:'tools/orbit360-validar-gate-contracts-engine-m4-client-country-values-v20260725.mjs'}
 });
 const PHASE_PROFILES=Object.freeze({
   STATIC_PREFLDIGHT:ZERO,
@@ -42,7 +43,8 @@ const PHASE_PROFILES=Object.freeze({
   M4_DURABLE_WRITER_DRYRUN_CLOSED:ZERO,
   M4_DATA_RECONCILIATION_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   M4_DATA_RECONCILIATION_STATIC_REPAIR_READY:ZERO,
-  M4_CLIENT_COUNTRY_SCHEMA_AUDIT_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false}
+  M4_CLIENT_COUNTRY_SCHEMA_AUDIT_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  M4_CLIENT_COUNTRY_VALUES_AUDIT_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false}
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(k=>actual[k]===expected[k]);}

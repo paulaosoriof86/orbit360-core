@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-m4-client-country-values-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-values-readonly-v20260725",
+  "contractVersion": "4.2.3",
+  "active": true,
+  "phase": "M4_CLIENT_COUNTRY_VALUES_AUDIT_EXECUTION",
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": true,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "baseline": {
+    "clients": 414,
+    "missingCurrency": 61,
+    "sourceCollection": "tenantId/{tenant}/clientes"
+  },
+  "acceptance": {
+    "distributionCategories": [
+      "GT",
+      "CO",
+      "empty",
+      "nonCanonical",
+      "conflict"
+    ],
+    "distributionTotal": 61,
+    "privacyMode": "aggregate_categories_only",
+    "rawValuesExported": false,
+    "individualRecordsExported": false,
+    "collectionsRead": 1,
+    "insurersRead": false,
+    "targetRead": false,
+    "writes": 0,
+    "containsPII": false,
+    "containsSecrets": false
+  },
+  "blocked": [
+    "infer_from_phone_region",
+    "infer_from_province",
+    "export_raw_values",
+    "read_insurers",
+    "read_target",
+    "write_firestore",
+    "modify_rules",
+    "deploy_hosting",
+    "deploy_functions",
+    "reimport",
+    "advance_policies",
+    "merge_main"
+  ]
+}

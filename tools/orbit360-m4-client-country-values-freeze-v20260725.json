@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-values-freeze-v1",
+  "issuedAt": "2026-07-25",
+  "status": "M4_CLIENT_COUNTRY_VALUES_AUDIT_AUTHORIZED_ONCE",
+  "gateId": "block4-client-country-values-readonly-v20260725",
+  "contractVersion": "4.2.3",
+  "previousGate": {
+    "gateId": "block4-client-country-schema-readonly-v20260725",
+    "contractVersion": "4.2.2",
+    "runId": 30161619900,
+    "status": "M4_CLIENT_COUNTRY_SCHEMA_AUDIT_COMPLETED",
+    "consumed": true
+  },
+  "baseline": {
+    "clients": 414,
+    "missingCurrency": 61,
+    "explicitCountryFieldPresent": 61
+  },
+  "authorization": {
+    "valueAuditAuthorized": true,
+    "allowedExecutions": 1,
+    "writeAuthorized": false,
+    "allowedWriteExecutions": 0
+  },
+  "privacy": {
+    "mode": "aggregate_categories_only",
+    "categories": [
+      "GT",
+      "CO",
+      "empty",
+      "nonCanonical",
+      "conflict"
+    ],
+    "rawValuesExported": false,
+    "individualRecordsExported": false
+  },
+  "blocked": [
+    "export_raw_country_values",
+    "export_ids_or_names",
+    "read_insurers",
+    "read_target",
+    "write_firestore",
+    "modify_rules",
+    "deploy_hosting",
+    "deploy_functions",
+    "reimport",
+    "advance_policies",
+    "merge_main"
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}
