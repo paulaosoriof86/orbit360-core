@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-business-validation-semantic-static-request-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-semantic-repair-static-v20260725",
+  "contractVersion": "4.2.5",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedBaseCommit": "010faf81ac399d375afa3428cb9616dca3a8324f",
+  "explicitAuthorization": true,
+  "authorizationSource": "user_authorized_single_static_gate_execution",
+  "allowedExecutions": 1,
+  "staticRepairOnly": true,
+  "secrets": false,
+  "firestoreRead": false,
+  "runtime": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "mergeMain": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
