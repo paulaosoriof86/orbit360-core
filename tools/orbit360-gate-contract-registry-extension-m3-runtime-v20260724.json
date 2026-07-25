@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "orbit360-gate-contract-registry-extension-v3",
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v4",
   "issuedAt": "2026-07-24",
-  "updatedAt": "2026-07-24",
+  "updatedAt": "2026-07-25",
   "repository": {
     "fullName": "paulaosoriof86/orbit360-core",
     "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -11,7 +11,7 @@
   "planPatch": {
     "activeBlock": 3,
     "previousBlockStatus": "M3_TENANT_ACTIVATION_STATIC_READY",
-    "currentObjective": "M3_TENANT_ACTIVATION_READONLY_AUTHORIZED_ONCE"
+    "currentObjective": "M3_TENANT_ACTIVATED_READONLY_M4_BLOCKED"
   },
   "canonicalOwners": [
     {
@@ -34,21 +34,21 @@
     {
       "gateId": "block3-tenant-activation-runtime-v20260724",
       "contractVersion": "3.1.0",
-      "diagnosticRevision": "m3-readonly-activation-authorized-once-v1",
+      "diagnosticRevision": "m3-readonly-activation-closed-v1",
       "block": 3,
-      "status": "AUTHORIZED_ONCE_REQUEST_READY",
-      "acceptancePolicy": "Exactly one controlled read-only activation using an existing privileged identity and tenant resolved from membership. No writes, Rules, deploys, imports or M4 persistence.",
+      "status": "M3_TENANT_ACTIVATED_READONLY",
+      "acceptancePolicy": "Read-only activation closed with an existing privileged identity and tenant resolved from membership. Persistence remains deferred to M4.",
       "runtimeWorkflow": ".github/workflows/orbit360-m3-tenant-activation-runtime-gate-v20260724.yml",
       "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
       "freeze": "tools/orbit360-m3-tenant-activation-freeze-v20260724.json",
       "authorization": "tools/orbit360-m3-tenant-activation-runtime-authorization-v20260724.json",
       "executionProfile": {
-        "phase": "M3_TENANT_ACTIVATION_EXECUTION",
+        "phase": "M3_TENANT_ACTIVATION_CLOSED",
         "capabilities": {
-          "secrets": true,
-          "firestoreRead": true,
+          "secrets": false,
+          "firestoreRead": false,
           "writes": false,
-          "runtime": true,
+          "runtime": false,
           "browser": false,
           "deploy": false,
           "functionsDeploy": false,
@@ -69,10 +69,32 @@
         "m3StaticRunId": 30125893901,
         "m3StaticDigest": "sha256:8ef2a04146ad96bc5506de6d2a4bb092afea43c84e24aab9b0306cfa7ad027a3"
       },
+      "activationClosure": {
+        "ok": true,
+        "runId": 30135928958,
+        "requestCommit": "39e1c4eb6d7097fa6daee642596ed5c87d7f9ce1",
+        "artifactId": 8612768233,
+        "artifactDigest": "sha256:989fc2e0c0a9783ed7da82e80ed0c1a645183bc546aba421e59649a610e075b5",
+        "status": "M3_TENANT_ACTIVATED_READONLY",
+        "preflight": "GO_GATE_CONTRACT_29_OF_29",
+        "contract": "PASS_20_OF_20",
+        "tenantFromMembership": true,
+        "controlledExistingIdentityAccepted": true,
+        "storeInstalled": true,
+        "snapshotsAttached": true,
+        "noFallback": true,
+        "storeWriteEnabled": false,
+        "localWriteBlocked": true,
+        "rulesChanged": false,
+        "configurationWrites": 0,
+        "membershipWrites": 0,
+        "clientWrites": 0,
+        "insurerWrites": 0
+      },
       "m3Authorization": {
-        "activationAuthorized": true,
-        "allowedActivationExecutions": 1,
-        "requestPath": "tools/orbit360-m3-tenant-activation-runtime-request-v20260724.json"
+        "activationAuthorized": false,
+        "allowedActivationExecutions": 0,
+        "requestConsumed": true
       },
       "m4Deferral": {
         "configuration": true,
@@ -80,12 +102,12 @@
         "clients": 414,
         "insurers": 26
       },
-      "successEvidence": "orbit360-platform/runtime-gate-crm-v20260716/m3-tenant-activation-runtime-summary.json",
+      "successEvidence": "artifact:8612768233/m3-tenant-activation-runtime-summary.json",
       "successPredicate": "ok === true && status === M3_TENANT_ACTIVATED_READONLY",
       "executionDispatch": {
-        "mode": "push_request_file_once",
-        "uniqueExecution": true,
-        "requestPath": "tools/orbit360-m3-tenant-activation-runtime-request-v20260724.json"
+        "mode": "none_until_new_explicit_m4_authorization",
+        "uniqueExecutionConsumed": true,
+        "nextRequest": "new_immutable_m4_request_required"
       }
     }
   ]
