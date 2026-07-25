@@ -43,7 +43,7 @@
   "methodology": {
     "sameSelfReferencePatternDetectedTwice": true,
     "classification": "PIPELINE_MECHANISM_FAILURE",
-    "correctiveRule": "HEAD may be reported only in PR/status evidence, never embedded as current HEAD in tracked metadata.",
+    "correctiveRule": "Live HEAD is external PR/status evidence only; immutable requests bind to the parent commit.",
     "netChangedFilesAfterCorrection": 0,
     "gateRerun": false,
     "productAffected": false
