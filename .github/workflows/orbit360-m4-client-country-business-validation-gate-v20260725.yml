@@ -1,0 +1,94 @@
+name: Orbit 360 · M4 client country business validation · DRYRUN_ONCE
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['tools/orbit360-m4-client-country-business-validation-request-v20260725.json']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-m4-client-country-business-validation-dryrun
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block4-client-country-business-validation-dryrun-v20260725
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: tools/orbit360-m4-client-country-business-validation-request-v20260725.json
+  ORBIT360_EXISTING_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+jobs:
+  correction-dryrun:
+    name: M4 · Client GT/GTQ correction proposal · Read-only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}', fetch-depth: 2, persist-credentials: false}
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Validar autorización inmutable sin acceso externo
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "${ORBIT360_BRANCH}"
+          test "${GITHUB_RUN_ATTEMPT}" = '1'
+          node <<'NODE'
+          const fs=require('fs'),cp=require('child_process');const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim(),bad=[];
+          if(r.schemaVersion!=='orbit360-m4-client-country-business-validation-request-v1'||r.contractVersion!=='4.2.4')bad.push('schema');
+          if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.authorizedBaseCommit!==parent)bad.push('binding');
+          if(r.explicitAuthorization!==true||r.allowedExecutions!==1||r.correctionDryRunReadOnly!==true||r.businessValidationAll61Guatemala!==true)bad.push('authorization');
+          if(r.expectedProjectId!==process.env.ORBIT360_EXISTING_FIREBASE_PROJECT_ID||r.expectedClients!==414||r.expectedMissingCurrency!==61||r.expectedTargetOnlyDeferred!==4)bad.push('baseline');
+          if(r.proposedCountry!=='GT'||r.proposedCurrency!=='GTQ'||r.privacyMode!=='aggregate_proposal_only'||r.rawValuesExported!==false||r.individualRecordsExported!==false||r.insurersRead!==false||r.targetRead!==false)bad.push('scope');
+          if(r.operationalWrites!==false||r.configurationWrites!==false||r.membershipWrites!==false||r.clientWrites!==false||r.insurerWrites!==false||r.auditWrites!==false||r.applyRules!==false||r.hostingDeploy!==false||r.functionsDeploy!==false||r.imports!==false||r.policies!==false||r.mergeMain!==false)bad.push('writes');
+          if(r.containsPII!==false||r.containsSecrets!==false)bad.push('sanitization');if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
+          NODE
+      - name: Preflight canónico antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="4.2.4" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Probar contrato antes de secretos
+        run: node tools/orbit360-m4-client-country-business-validation-contract-v20260725.cjs
+      - name: Resolver cuenta existente después del preflight
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-m4-client-country-business-validation.json"; printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"; chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_EXISTING_FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"; echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+      - name: Instalar dependencia read-only controlada
+        run: npm install --no-save --ignore-scripts firebase-admin@13
+      - name: Ejecutar dry-run read-only de corrección
+        run: node tools/orbit360-m4-client-country-business-validation-v20260725.mjs
+      - name: Validar evidencia sanitizada
+        shell: bash
+        run: |
+          jq -e '.ok==true and .status=="M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_DRYRUN_COMPLETED" and .remoteReadConfirmed==true and .sourceCounts.clientes==414 and .sourceCounts.missingCurrency==61 and .sourceDistribution.nonCanonical==61 and .proposal.records==61 and .proposal.countryFieldChanges==61 and .proposal.currencyFieldChanges==61 and .proposal.country=="GT" and .proposal.currency=="GTQ" and .proposal.targetOnlyDeferred==4 and .proposal.creates==0 and .proposal.deletes==0 and .traceability.beforeAfterPlanned==true and .rollback.planned==true and .rollback.executed==false and .approvalReadyForClientCorrection==true and .approvalReadyForM4Write==false and .privacyMode=="aggregate_proposal_only" and .rawValuesExported==false and .individualRecordsExported==false and .collectionScope.collectionsRead==1 and .collectionScope.insurersRead==false and .collectionScope.targetRead==false and .writeAuthorized==false and .writeExecuted==false and .clientWrites==0 and .insurerWrites==0 and .containsPII==false and .containsSecrets==false' orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-summary.json >/dev/null
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m4-client-country-business-validation-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-contract-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-summary.json
+          retention-days: 30
+      - name: Publicar estado observable sanitizado
+        if: always()
+        env: {GH_TOKEN: '${{ github.token }}'}
+        shell: bash
+        run: |
+          summary='orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-summary.json'; state=failure; description='M4 client GT/GTQ correction dry-run failed'
+          if [ -f "$summary" ] && [ "$(jq -r '.ok // false' "$summary")" = true ]; then state=success; description='M4 client GT/GTQ correction dry-run completed'; fi
+          payload="$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m4-client-country-business-validation"}')"
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$payload"
+      - name: Limpiar material efímero
+        if: always()
+        run: rm -f "${ORBIT360_TEMP_KEY_FILE:-}"

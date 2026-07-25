@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-m4-client-country-business-validation-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-dryrun-v20260725",
+  "contractVersion": "4.2.4",
+  "active": true,
+  "phase": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_DRYRUN_EXECUTION",
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": true,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "baseline": {
+    "clients": 414,
+    "missingCurrency": 61,
+    "nonCanonical": 61,
+    "targetOnlyDeferred": 4
+  },
+  "proposal": {
+    "country": "GT",
+    "currency": "GTQ",
+    "records": 61,
+    "writes": 0
+  },
+  "acceptance": {
+    "countryFieldChanges": 61,
+    "currencyFieldChanges": 61,
+    "creates": 0,
+    "deletes": 0,
+    "beforeAfterPlanned": true,
+    "rollbackPlanned": true,
+    "rawValuesExported": false,
+    "recordIdsExported": false,
+    "containsPII": false,
+    "containsSecrets": false
+  },
+  "blocked": [
+    "write_firestore",
+    "read_insurers",
+    "read_target",
+    "resolve_target_only",
+    "deploy_rules",
+    "deploy_hosting",
+    "deploy_functions",
+    "advance_policies",
+    "merge_main"
+  ]
+}

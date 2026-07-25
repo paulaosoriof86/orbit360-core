@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-client-country-business-validation-v1",
+  "issuedAt": "2026-07-25",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-client-country-business-validation-dryrun-v20260725",
+  "gateContractVersion": "4.2.4",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-client-country-business-validation-authorized-once-v1",
+  "methodologicalDecisionId": "business-validation-after-noncanonical-country-audit-20260725",
+  "classification": "GO_RUNTIME_READONLY_DRYRUN",
+  "executionProfile": {
+    "phase": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_DRYRUN_EXECUTION",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "operationalWritesAuthorized": false,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "migrationWritesAuthorized": false,
+    "rulesChangeAuthorized": false,
+    "requestModel": "immutable-request-bound-to-parent-commit"
+  },
+  "baseline": {
+    "clients": 414,
+    "clientsMissingCurrency": 61,
+    "countryValuesNonCanonical": 61,
+    "targetOnlyDeferred": 4,
+    "sourceCollection": "tenantId/{tenant}/clientes"
+  },
+  "authorization": {
+    "correctionDryRunAuthorized": true,
+    "businessValidationAll61Guatemala": true,
+    "allowedExecutions": 1,
+    "requestCreated": false,
+    "writeAuthorized": false,
+    "allowedWriteExecutions": 0
+  },
+  "privacyBoundary": {
+    "mode": "aggregate_proposal_only",
+    "rawValuesExported": false,
+    "individualRecordsExported": false,
+    "piiExported": false,
+    "insurersRead": false,
+    "targetRead": false
+  },
+  "nextRequiredDecision": "CREATE_ONE_IMMUTABLE_BUSINESS_VALIDATION_DRYRUN_REQUEST",
+  "containsPII": false,
+  "containsSecrets": false
+}

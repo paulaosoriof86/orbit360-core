@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v4.2.4",
+  "issuedAt": "2026-07-25",
+  "repository": {
+    "fullName": "paulaosoriof86/orbit360-core",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pr": 5,
+    "tenant": "alianzas-soluciones"
+  },
+  "planPatch": {
+    "activeBlock": 4,
+    "previousBlockStatus": "M4_CLIENT_COUNTRY_VALUES_AUDIT_COMPLETED",
+    "currentObjective": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_DRYRUN_AUTHORIZED_ONCE"
+  },
+  "gates": [
+    {
+      "gateId": "block4-client-country-business-validation-dryrun-v20260725",
+      "contractVersion": "4.2.4",
+      "status": "AUTHORIZED_ONCE",
+      "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "runtime": "tools/orbit360-m4-client-country-business-validation-v20260725.mjs",
+      "successEvidence": "orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-summary.json",
+      "successPredicate": "ok === true && proposal.records === 61 && proposal.country === GT && proposal.currency === GTQ && writeExecuted === false",
+      "executionDispatch": {
+        "mode": "request_file_once",
+        "requestPath": "tools/orbit360-m4-client-country-business-validation-request-v20260725.json"
+      }
+    }
+  ],
+  "writeAuthorization": false,
+  "targetOnlyDeferred": 4,
+  "claudeClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "containsPII": false,
+  "containsSecrets": false
+}

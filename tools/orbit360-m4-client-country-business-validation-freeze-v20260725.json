@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-business-validation-freeze-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-dryrun-v20260725",
+  "contractVersion": "4.2.4",
+  "status": "AUTHORIZED_ONCE_DRYRUN_ONLY",
+  "baseline": {
+    "clients": 414,
+    "missingCurrency": 61,
+    "countryValuesNonCanonical": 61,
+    "targetOnlyDeferred": 4,
+    "priorRun": 30162227645,
+    "priorArtifact": 8620551534
+  },
+  "businessValidation": {
+    "scope": "all_61_missing_currency_clients",
+    "country": "GT",
+    "currency": "GTQ",
+    "source": "explicit_user_business_validation",
+    "writesAuthorized": false
+  },
+  "blocked": [
+    "write_clients",
+    "write_currency",
+    "write_country",
+    "read_insurers",
+    "read_target",
+    "resolve_target_only",
+    "deploy",
+    "rules",
+    "policies",
+    "merge_main"
+  ],
+  "allowedExecutions": 1,
+  "containsPII": false,
+  "containsSecrets": false
+}
