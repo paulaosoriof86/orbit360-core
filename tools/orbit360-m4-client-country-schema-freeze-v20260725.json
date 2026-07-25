@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-schema-freeze-v1",
+  "issuedAt": "2026-07-25",
+  "status": "M4_CLIENT_COUNTRY_SCHEMA_AUDIT_AUTHORIZED_ONCE",
+  "gateId": "block4-client-country-schema-readonly-v20260725",
+  "contractVersion": "4.2.2",
+  "baseline": {"runId":30148739016,"clients":414,"clientsMissingCurrency":61,"sourceCollection":"tenantId/{tenant}/clientes"},
+  "authorization": {"active":true,"allowedExecutions":1,"requestCreated":false,"writeAuthorized":false,"allowedWriteExecutions":0},
+  "privacyBoundary": {"mode":"field_names_and_counts_only","valuesExported":false,"insurersRead":false,"targetRead":false},
+  "blockedActions": ["read_insurers","read_target","export_values","write_firestore","modify_rules","deploy_hosting","deploy_functions","reimport","advance_policies","merge_main"],
+  "nextAction": "CREATE_IMMUTABLE_REQUEST_AND_EXECUTE_ONCE",
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -1,0 +1,20 @@
+'use strict';
+const fs=require('fs'),vm=require('vm'),path=require('path');
+global.window=global;global.Orbit={};vm.runInThisContext(fs.readFileSync(path.join(process.cwd(),'orbit360-platform/core/m4-client-country-schema-contract-p0.js'),'utf8'));
+const good={readOnly:true,remoteReadConfirmed:true,writeAuthorized:false,writeExecuted:false,collectionScope:{source:'tenantId/{tenant}/clientes',collectionsRead:1,insurersRead:false,targetRead:false},sourceCounts:{clientes:414},currencyResolution:{missingCurrency:61},schemaAudit:{privacyMode:'field_names_and_counts_only',candidateFields:[{name:'Provincia',presentCount:20,explicitCountryCandidate:false}],explicitCountryFieldNames:[],recordsAudited:61,valuesExported:false},secretValueCount:0,configurationWrites:0,membershipWrites:0,clientWrites:0,insurerWrites:0,auditWrites:0,rulesChanged:false,hostingDeploy:false,functionsDeploy:false,imports:false,policies:false,mergeMain:false,containsPII:false,containsSecrets:false};
+const checks=[];function t(id,ok){checks.push({id,ok:!!ok});}
+const a=Orbit.m4ClientCountrySchemaP0.build(good);
+t('GOOD_OK',a.ok);
+t('NOT_APPROVAL_READY',a.approvalReady===false);
+t('WRITES_BLOCKED',!Orbit.m4ClientCountrySchemaP0.build({...good,writeAuthorized:true}).ok);
+t('COUNT_414',!Orbit.m4ClientCountrySchemaP0.build({...good,sourceCounts:{clientes:413}}).ok);
+t('MISSING_61',!Orbit.m4ClientCountrySchemaP0.build({...good,currencyResolution:{missingCurrency:60}}).ok);
+t('ONE_COLLECTION',!Orbit.m4ClientCountrySchemaP0.build({...good,collectionScope:{...good.collectionScope,collectionsRead:2}}).ok);
+t('NO_INSURERS',!Orbit.m4ClientCountrySchemaP0.build({...good,collectionScope:{...good.collectionScope,insurersRead:true}}).ok);
+t('NO_TARGET',!Orbit.m4ClientCountrySchemaP0.build({...good,collectionScope:{...good.collectionScope,targetRead:true}}).ok);
+t('SCHEMA_REQUIRED',!Orbit.m4ClientCountrySchemaP0.build({...good,schemaAudit:{}}).ok);
+t('VALUES_BLOCKED',!Orbit.m4ClientCountrySchemaP0.build({...good,schemaAudit:{...good.schemaAudit,valuesExported:true}}).ok);
+t('PII_BLOCKED',!Orbit.m4ClientCountrySchemaP0.build({...good,containsPII:true}).ok);
+t('VERSION',a.contractVersion==='4.2.2-readonly-20260725');
+const failed=checks.filter(x=>!x.ok),out={schemaVersion:'orbit360-m4-client-country-schema-contract-summary-v1',gateId:'block4-client-country-schema-readonly-v20260725',contractVersion:'4.2.2',ok:failed.length===0,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,containsPII:false,containsSecrets:false};
+fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-schema-contract-summary.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
