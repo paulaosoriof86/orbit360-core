@@ -94,6 +94,18 @@
       "scope": "manifest_containsSecrets_false_positive",
       "gateAffected": false,
       "productAffected": false
+    },
+    {
+      "classification": "PIPELINE_MECHANISM_FAILURE_CORRECTED_AFTER_CLOSURE_WITHOUT_GATE_RERUN",
+      "scope": "m3_closure_head_reference_repeated_pattern",
+      "rootCause": "A moving branch HEAD cannot be embedded as the current HEAD inside a tracked file because the recording commit changes that HEAD.",
+      "permanentRule": "Report live HEAD only in PR or external status evidence; immutable request files bind to their parent commit.",
+      "comparisonBase": "3e3713b61975e9c26eb0f545113aee7b0d907c19",
+      "comparisonHead": "f1e0a5de5b8ffeb3d0a9debfd2a472bef0f398b2",
+      "netChangedFiles": 0,
+      "gateRerun": false,
+      "gateAffected": false,
+      "productAffected": false
     }
   ],
   "allowedActions": [
