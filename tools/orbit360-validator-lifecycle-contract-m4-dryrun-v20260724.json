@@ -1,24 +1,24 @@
 {
   "schemaVersion": "orbit360-validator-lifecycle-contract-m4-dryrun-v1",
   "issuedAt": "2026-07-24",
-  "updatedAt": "2026-07-24",
+  "updatedAt": "2026-07-25",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "gateId": "block4-durable-writer-dryrun-v20260724",
   "gateContractVersion": "4.1.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "controlPlaneRevision": "m4-durable-writer-dryrun-authorized-once-v1",
-  "methodologicalDecisionId": "authorize-one-readonly-m4-dryrun-after-static-closure-20260724",
-  "classification": "GO_RUNTIME_READONLY",
-  "secondaryClassification": null,
+  "controlPlaneRevision": "m4-durable-writer-dryrun-closed-data-validation-required-v1",
+  "methodologicalDecisionId": "consume-success-close-dryrun-block-writes-for-data-validation-20260725",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "secondaryClassification": "GO_RUNTIME_READONLY",
   "executionProfile": {
-    "phase": "M4_DURABLE_WRITER_DRYRUN_EXECUTION",
+    "phase": "M4_DURABLE_WRITER_DRYRUN_CLOSED",
     "capabilities": {
-      "secrets": true,
-      "firestoreRead": true,
+      "secrets": false,
+      "firestoreRead": false,
       "writes": false,
-      "runtime": true,
+      "runtime": false,
       "browser": false,
       "deploy": false,
       "functionsDeploy": false,
@@ -30,7 +30,7 @@
     "membershipWritesAuthorized": false,
     "migrationWritesAuthorized": false,
     "rulesChangeAuthorized": false,
-    "requestModel": "immutable-request-bound-to-parent-commit"
+    "requestModel": "no-m4-dryrun-request-authorized"
   },
   "canonicalIntegration": {
     "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
@@ -49,7 +49,8 @@
     "functionsDeploy": false,
     "imports": false,
     "policies": false,
-    "mergeMain": false
+    "mergeMain": false,
+    "dryRunFreeze": "tools/orbit360-m4-durable-writer-dryrun-freeze-v20260725.json"
   },
   "prerequisites": {
     "m3Closed": true,
@@ -58,10 +59,11 @@
     "m4StaticStatus": "M4_DURABLE_WRITER_STATIC_READY"
   },
   "authorization": {
-    "dryRunAuthorized": true,
-    "allowedDryRunExecutions": 1,
-    "requestCreated": true,
-    "requestPath": "tools/orbit360-m4-durable-writer-dryrun-request-v20260724.json"
+    "dryRunAuthorized": false,
+    "allowedDryRunExecutions": 0,
+    "requestConsumed": true,
+    "requestPath": "tools/orbit360-m4-durable-writer-dryrun-request-v20260724.json",
+    "runId": 30145799192
   },
   "migrationBoundary": {
     "sourceOrder": [
@@ -75,7 +77,21 @@
     "insurers": 26,
     "policiesDeferred": true
   },
-  "nextRequiredDecision": "EXECUTE_ONE_M4_READONLY_DRYRUN",
+  "nextRequiredDecision": "M4_DATA_VALIDATION_REMEDIATION_BEFORE_WRITE_AUTHORIZATION",
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "dryRunClosure": {
+    "ok": true,
+    "status": "M4_DURABLE_WRITER_DRYRUN_COMPLETED",
+    "artifactId": 8615949892,
+    "artifactDigest": "sha256:692e725619087b9009671b53474ade7d04d01a2c3544b521f739efd4647b6027",
+    "canonicalPreflight": "GO_GATE_CONTRACT_33_OF_33",
+    "runtimeContract": "PASS_20_OF_20",
+    "approvalReady": false,
+    "requiresValidation": 65,
+    "clientsMissingCurrency": 61,
+    "clientTargetOnly": 2,
+    "insurerTargetOnly": 2,
+    "writeExecuted": false
+  }
 }

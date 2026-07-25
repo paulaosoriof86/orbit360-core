@@ -1,13 +1,13 @@
 {
   "schemaVersion": "orbit360-gate-contract-overlay-m4-dryrun-v1",
   "issuedAt": "2026-07-24",
-  "updatedAt": "2026-07-24",
+  "updatedAt": "2026-07-25",
   "gatePatch": {
     "gateId": "block4-durable-writer-dryrun-v20260724",
     "contractVersion": "4.1.0",
-    "status": "M4_DURABLE_WRITER_DRYRUN_AUTHORIZED_ONCE",
-    "classification": "GO_RUNTIME_READONLY",
-    "allowedDryRunExecutions": 1,
+    "status": "M4_DURABLE_WRITER_DRYRUN_COMPLETED_DATA_VALIDATION_REQUIRED",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "allowedDryRunExecutions": 0,
     "writeAuthorized": false,
     "rulesChangeAuthorized": false,
     "policiesAuthorized": false
@@ -24,9 +24,15 @@
       "requires_validation"
     ],
     "successDeclaration": "remote_read_confirmation_required",
-    "configurationPersistence": "not_executed",
-    "membershipPersistence": "not_executed",
-    "dataPersistence": "not_executed"
+    "configurationPersistence": "blocked_pending_validation",
+    "membershipPersistence": "blocked_pending_validation",
+    "dataPersistence": "blocked_pending_validation",
+    "dryRunCompleted": true,
+    "approvalReady": false,
+    "requiresValidation": 65,
+    "clientsMissingCurrency": 61,
+    "clientTargetOnly": 2,
+    "insurerTargetOnly": 2
   },
   "blockedActions": [
     "write_configuration",
@@ -38,7 +44,10 @@
     "deploy_hosting",
     "deploy_functions",
     "advance_policies",
-    "merge_main"
+    "merge_main",
+    "rerun_dryrun_without_new_evidence",
+    "authorize_m4_writes",
+    "persist_any_m4_source"
   ],
   "containsPII": false,
   "containsSecrets": false

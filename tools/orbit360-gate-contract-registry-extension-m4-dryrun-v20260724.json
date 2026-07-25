@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-gate-contract-registry-extension-v5",
   "issuedAt": "2026-07-24",
-  "updatedAt": "2026-07-24",
+  "updatedAt": "2026-07-25",
   "repository": {
     "fullName": "paulaosoriof86/orbit360-core",
     "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -11,7 +11,7 @@
   "planPatch": {
     "activeBlock": 4,
     "previousBlockStatus": "M4_DURABLE_WRITER_STATIC_READY",
-    "currentObjective": "M4_DURABLE_WRITER_DRYRUN_AUTHORIZED_ONCE"
+    "currentObjective": "M4_DRYRUN_CLOSED_DATA_VALIDATION_REQUIRED"
   },
   "canonicalOwners": [
     {
@@ -45,19 +45,19 @@
       "contractVersion": "4.1.0",
       "diagnosticRevision": "m4-readonly-dryrun-authorized-once-v1",
       "block": 4,
-      "status": "AUTHORIZED_ONCE_REQUEST_READY",
-      "acceptancePolicy": "One external read-only dry-run. Compare legacy sources with canonical targets and emit only sanitized aggregates, hashes and create/update/omit/requires_validation counts. No writes.",
+      "status": "M4_DURABLE_WRITER_DRYRUN_COMPLETED_DATA_VALIDATION_REQUIRED",
+      "acceptancePolicy": "Dry-run completed successfully. Persistence remains blocked until 61 missing currencies and 4 target-only records are validated. No rerun without new evidence.",
       "workflow": ".github/workflows/orbit360-m4-durable-writer-dryrun-gate-v20260724.yml",
       "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
       "freeze": "tools/orbit360-m4-durable-writer-freeze-v20260724.json",
       "authorization": "tools/orbit360-m4-durable-writer-dryrun-authorization-v20260724.json",
       "executionProfile": {
-        "phase": "M4_DURABLE_WRITER_DRYRUN_EXECUTION",
+        "phase": "M4_DURABLE_WRITER_DRYRUN_CLOSED",
         "capabilities": {
-          "secrets": true,
-          "firestoreRead": true,
+          "secrets": false,
+          "firestoreRead": false,
           "writes": false,
-          "runtime": true,
+          "runtime": false,
           "browser": false,
           "deploy": false,
           "functionsDeploy": false,
@@ -69,7 +69,7 @@
         "membershipWritesAuthorized": false,
         "migrationWritesAuthorized": false,
         "rulesChangeAuthorized": false,
-        "requestModel": "immutable-request-bound-to-parent-commit"
+        "requestModel": "none_until_data_validation_closure"
       },
       "prerequisites": {
         "m3Closed": true,
@@ -92,10 +92,102 @@
       "successEvidence": "orbit360-platform/runtime-gate-crm-v20260716/m4-durable-writer-dryrun-summary.json",
       "successPredicate": "ok === true && status === M4_DURABLE_WRITER_DRYRUN_COMPLETED",
       "executionDispatch": {
-        "mode": "push_request_file_once",
+        "mode": "none",
         "uniqueExecution": true,
-        "requestPath": "tools/orbit360-m4-durable-writer-dryrun-request-v20260724.json"
-      }
+        "requestConsumed": true
+      },
+      "dryRunClosure": {
+        "schemaVersion": "orbit360-m4-durable-writer-dryrun-closure-v1",
+        "issuedAt": "2026-07-25",
+        "status": "M4_DURABLE_WRITER_DRYRUN_COMPLETED_DATA_VALIDATION_REQUIRED",
+        "gateId": "block4-durable-writer-dryrun-v20260724",
+        "contractVersion": "4.1.0",
+        "runId": 30145799192,
+        "requestCommit": "c7f0f5fdea2d7636dff75803c1f3e929e4d44715",
+        "packageCommit": "147f4acd890c5a0d2fd1b907d9854c254708da19",
+        "artifactId": 8615949892,
+        "artifactDigest": "sha256:692e725619087b9009671b53474ade7d04d01a2c3544b521f739efd4647b6027",
+        "canonicalPreflight": "GO_GATE_CONTRACT_33_OF_33",
+        "runtimeContract": "PASS_20_OF_20",
+        "sourceCounts": {
+          "configuration_catalog": 1,
+          "memberships": 1,
+          "clientes": 414,
+          "aseguradoras": 26,
+          "quality_audit": 2
+        },
+        "targetCounts": {
+          "configuration_catalog": 0,
+          "memberships": 1,
+          "clientes": 2,
+          "aseguradoras": 2,
+          "importBatches": 0,
+          "auditEvents": 51
+        },
+        "diff": {
+          "configuration_catalog": {
+            "create": 1,
+            "update": 0,
+            "omit": 0,
+            "requires_validation": 0,
+            "targetOnly": 0
+          },
+          "memberships": {
+            "create": 0,
+            "update": 0,
+            "omit": 1,
+            "requires_validation": 0,
+            "targetOnly": 0
+          },
+          "clientes": {
+            "create": 353,
+            "update": 0,
+            "omit": 0,
+            "requires_validation": 61,
+            "targetOnly": 2
+          },
+          "aseguradoras": {
+            "create": 26,
+            "update": 0,
+            "omit": 0,
+            "requires_validation": 0,
+            "targetOnly": 2
+          },
+          "quality_audit": {
+            "create": 2,
+            "update": 0,
+            "omit": 0,
+            "requires_validation": 0,
+            "targetOnly": 0
+          }
+        },
+        "issues": {
+          "clientsMissingCurrency": 61,
+          "clientTargetOnly": 2,
+          "insurerTargetOnly": 2,
+          "secretValueCount": 0
+        },
+        "requiresValidation": 65,
+        "approvalReady": false,
+        "idempotencyProven": true,
+        "batchId": "m4-0267a96688d65e9ca38d4878",
+        "writeAuthorized": false,
+        "writeExecuted": false,
+        "configurationWrites": 0,
+        "membershipWrites": 0,
+        "clientWrites": 0,
+        "insurerWrites": 0,
+        "auditWrites": 0,
+        "rulesChanged": false,
+        "hostingDeploy": false,
+        "functionsDeploy": false,
+        "imports": false,
+        "policies": false,
+        "nextAction": "M4_VALIDATE_61_CLIENT_CURRENCIES_AND_RECONCILE_4_TARGET_ONLY_RECORDS",
+        "containsPII": false,
+        "containsSecrets": false
+      },
+      "dryRunFreeze": "tools/orbit360-m4-durable-writer-dryrun-freeze-v20260725.json"
     }
   ]
 }

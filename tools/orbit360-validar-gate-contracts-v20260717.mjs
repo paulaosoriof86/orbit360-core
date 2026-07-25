@@ -36,7 +36,8 @@ const PHASE_PROFILES=Object.freeze({
   M3_TENANT_ACTIVATION_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   M3_TENANT_ACTIVATION_CLOSED:ZERO,
   M4_DURABLE_WRITER_STATIC_READY:ZERO,
-  M4_DURABLE_WRITER_DRYRUN_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false}
+  M4_DURABLE_WRITER_DRYRUN_EXECUTION:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  M4_DURABLE_WRITER_DRYRUN_CLOSED:ZERO
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(k=>actual[k]===expected[k]);}
