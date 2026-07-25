@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v4",
+  "issuedAt": "2026-07-24",
+  "updatedAt": "2026-07-24",
+  "repository": {
+    "fullName": "paulaosoriof86/orbit360-core",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pr": 5,
+    "tenant": "alianzas-soluciones"
+  },
+  "planPatch": {
+    "activeBlock": 4,
+    "previousBlockStatus": "M3_TENANT_ACTIVATED_READONLY",
+    "currentObjective": "M4_DURABLE_WRITER_STATIC_READY_EXECUTION_NOT_AUTHORIZED"
+  },
+  "canonicalOwners": [
+    {
+      "id": "durableWriterPlanP0",
+      "path": "orbit360-platform/core/durable-writer-plan-contract-p0.js",
+      "requiredTokens": ["M4_DURABLE_WRITER_STATIC_READY", "async_coordinator", "remote_confirmation", "idempotency_keys", "append_only_audit", "durable_rollback", "batchId"]
+    }
+  ],
+  "gates": [
+    {
+      "gateId": "block4-durable-writer-static-v20260724",
+      "contractVersion": "4.0.0",
+      "diagnosticRevision": "m4-static-ready-v1",
+      "block": 4,
+      "status": "M4_DURABLE_WRITER_STATIC_READY_EXECUTION_NOT_AUTHORIZED",
+      "acceptancePolicy": "Static plan only. No backend access, writes, migrations, Rules or deploys. Execution requires a new immutable request and explicit authorization.",
+      "preflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "executionProfile": {
+        "phase": "M4_DURABLE_WRITER_STATIC_READY",
+        "capabilities": {"secrets": false, "firestoreRead": false, "writes": false, "runtime": false, "browser": false, "deploy": false, "functionsDeploy": false, "rulesDeploy": false, "production": false},
+        "operationalWritesAuthorized": false,
+        "configurationWritesAuthorized": false,
+        "membershipWritesAuthorized": false,
+        "migrationWritesAuthorized": false,
+        "rulesChangeAuthorized": false,
+        "requestModel": "no-m4-execution-request-authorized"
+      },
+      "m3Prerequisite": {"closed": true, "runId": 30135928958, "status": "M3_TENANT_ACTIVATED_READONLY"},
+      "firstMigrationOrder": ["configuration tenant/catálogos", "memberships autorizadas", "414 clientes confirmados", "26 aseguradoras confirmadas", "calidad y auditoría asociadas"],
+      "deferred": ["polizas", "vehiculos", "cartera", "cobros", "comisiones", "financiero_historico", "documentos_soporte"],
+      "successEvidence": "orbit360-platform/runtime-gate-crm-v20260716/m4-durable-writer-static-summary.json",
+      "successPredicate": "ok === true && status === M4_DURABLE_WRITER_STATIC_READY",
+      "executionDispatch": {"mode": "none_until_new_explicit_m4_dryrun_authorization", "requestPath": "new_immutable_m4_request_required"}
+    }
+  ]
+}

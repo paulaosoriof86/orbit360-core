@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-v1",
+  "issuedAt": "2026-07-24",
+  "updatedAt": "2026-07-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-durable-writer-static-v20260724",
+  "gateContractVersion": "4.0.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-durable-writer-static-ready-v1",
+  "methodologicalDecisionId": "prepare-m4-static-after-m3-readonly-closure-20260724",
+  "classification": "GO_STATIC_PREPARATION",
+  "secondaryClassification": null,
+  "executionProfile": {
+    "phase": "M4_DURABLE_WRITER_STATIC_READY",
+    "capabilities": {"secrets": false, "firestoreRead": false, "writes": false, "runtime": false, "browser": false, "deploy": false, "functionsDeploy": false, "rulesDeploy": false, "production": false},
+    "operationalWritesAuthorized": false,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "migrationWritesAuthorized": false,
+    "rulesChangeAuthorized": false,
+    "requestModel": "no-m4-execution-request-authorized"
+  },
+  "canonicalIntegration": {
+    "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "engine": "tools/orbit360-validar-gate-contracts-engine-m4-v20260724.mjs",
+    "registryExtension": "tools/orbit360-gate-contract-registry-extension-m4-v20260724.json",
+    "freeze": "tools/orbit360-m4-durable-writer-freeze-v20260724.json",
+    "planOwner": "orbit360-platform/core/durable-writer-plan-contract-p0.js",
+    "preflightBeforeAnyExternalAccess": true,
+    "sourceTransformation": false,
+    "rulesChange": false,
+    "hostingDeploy": false,
+    "functionsDeploy": false,
+    "imports": false,
+    "policies": false,
+    "mergeMain": false
+  },
+  "m3Prerequisite": {"closed": true, "runId": 30135928958, "status": "M3_TENANT_ACTIVATED_READONLY"},
+  "authorization": {
+    "staticPreparationAuthorized": true,
+    "staticPreparationConsumed": true,
+    "allowedStaticExecutions": 0,
+    "m4ExecutionAuthorized": false,
+    "allowedM4Executions": 0,
+    "requestCreated": false
+  },
+  "migrationBoundary": {
+    "order": ["configuration_catalog", "memberships", "clientes", "aseguradoras", "quality_audit"],
+    "clients": 414,
+    "insurers": 26,
+    "policiesDeferred": true,
+    "vehiclesDeferred": true,
+    "portfolioDeferred": true,
+    "collectionsDeferred": true,
+    "commissionsDeferred": true,
+    "financialHistoryDeferred": true
+  },
+  "nextRequiredDecision": "NEW_EXPLICIT_M4_DRYRUN_AUTHORIZATION_DECISION",
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "orbit360-m4-durable-writer-freeze-v1",
+  "issuedAt": "2026-07-24",
+  "updatedAt": "2026-07-24",
+  "status": "M4_DURABLE_WRITER_STATIC_READY_EXECUTION_NOT_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-durable-writer-static-v20260724",
+  "contractVersion": "4.0.0",
+  "classification": "GO_STATIC_PREPARATION",
+  "m3Prerequisite": {"closed": true, "runId": 30135928958, "status": "M3_TENANT_ACTIVATED_READONLY"},
+  "staticClosure": {
+    "ok": true,
+    "status": "M4_DURABLE_WRITER_STATIC_READY",
+    "canonicalPreflight": "GO_GATE_CONTRACT_22_OF_22",
+    "staticContract": "PASS_35_OF_35",
+    "secretAccess": false,
+    "firestoreRead": false,
+    "writeAuthorized": false,
+    "writeExecuted": false,
+    "executionAuthorized": false,
+    "executionExecuted": false,
+    "rulesChanged": false,
+    "configurationWrites": 0,
+    "membershipWrites": 0,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "auditWrites": 0,
+    "productionTouched": false
+  },
+  "firstMigrationBoundary": {
+    "order": ["configuration_catalog", "memberships", "clientes", "aseguradoras", "quality_audit"],
+    "clients": 414,
+    "insurers": 26
+  },
+  "deferredSources": ["polizas", "vehiculos", "cartera", "cobros", "comisiones", "financiero_historico", "documentos_soporte"],
+  "authorization": {
+    "staticPreparationConsumed": true,
+    "allowedStaticExecutions": 0,
+    "m4ExecutionAuthorized": false,
+    "allowedM4Executions": 0
+  },
+  "blockedActions": ["execute_m4_without_new_authorization", "access_secrets", "read_firestore", "persist_tenant_configuration", "persist_memberships", "migrate_clients", "migrate_insurers", "deploy_rules", "deploy_hosting", "deploy_functions", "advance_policies", "merge_main"],
+  "stateClarification": {
+    "m3Closed": true,
+    "m4StaticPrepared": true,
+    "m4StaticClosed": true,
+    "m4ExecutionAuthorized": false,
+    "m4Executed": false,
+    "allowedM4Executions": 0,
+    "nextAction": "NEW_EXPLICIT_M4_DRYRUN_AUTHORIZATION_DECISION"
+  },
+  "claudeClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academyImpact": "ACADEMIA_UPDATED_M4_DURABLE_WRITER_STATIC_READY",
+  "containsPII": false,
+  "containsSecrets": false
+}
