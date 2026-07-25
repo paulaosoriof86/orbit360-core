@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-m3-tenant-activation-manifest-v1",
+  "issuedAt": "2026-07-24",
+  "tenantId": "alianzas-soluciones",
+  "sourceOfTruth": "activation_manifest",
+  "countries": ["GT", "CO"],
+  "countryConfig": {
+    "GT": {"currency": "GTQ", "tax": 12},
+    "CO": {"currency": "COP", "tax": 19}
+  },
+  "branding": {
+    "name": "Alianzas y Soluciones Corredores de Seguros",
+    "logoRef": "white-label-slot"
+  },
+  "modules": ["inicio", "cliente360", "aseguradoras"],
+  "integrations": [
+    {"key": "drive", "state": "backend_required", "active": false, "connectionVerified": false},
+    {"key": "whatsapp", "state": "backend_required", "active": false, "connectionVerified": false},
+    {"key": "correo", "state": "backend_required", "active": false, "connectionVerified": false}
+  ],
+  "accessExpansion": false,
+  "persistence": {
+    "tenantWrites": 0,
+    "configurationWrites": 0,
+    "membershipWrites": 0,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "auditWrites": 0
+  },
+  "deployRequested": false,
+  "importsRequested": false,
+  "rulesChangeRequested": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
