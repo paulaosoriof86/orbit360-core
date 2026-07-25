@@ -4,7 +4,7 @@
   "gateId": "block4-target-only-retirement-dryrun-v20260725",
   "contractVersion": "4.2.8",
   "owner": "target-only-retirement-planning-owner",
-  "classification": "DATA_CONTRACT_RESOLUTION_PLANNING",
+  "classification": "VALIDATOR_STALE_REPAIRED",
   "invariants": [
     "exactly_two_client_obsolete",
     "exactly_two_insurer_obsolete",
@@ -13,7 +13,9 @@
     "exact_rollback_planned",
     "append_only_audit_planned",
     "zero_writes",
-    "zero_deletes"
+    "zero_deletes",
+    "target_collection_is_target_only_overlay_2_2",
+    "hypothetical_after_is_0_0"
   ],
   "blocked": [
     "client_writes",
@@ -27,8 +29,10 @@
     "main",
     "merge",
     "gt_gtq_write",
-    "policies"
+    "policies",
+    "execution_without_new_immutable_request"
   ],
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "validatorRevision": "4.2.8-r1"
 }

@@ -3,7 +3,7 @@
   "issuedAt": "2026-07-25",
   "gateId": "block4-target-only-retirement-dryrun-v20260725",
   "contractVersion": "4.2.8",
-  "status": "M4_TARGET_ONLY_RETIREMENT_DRYRUN_PACKAGE_READY",
+  "status": "M4_TARGET_ONLY_RETIREMENT_DRYRUN_VALIDATOR_REPAIRED_NEW_AUTH_REQUIRED",
   "baseline": {
     "closure": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-reconciliation-closure.json",
     "clientObsolete": 2,
@@ -11,14 +11,21 @@
     "totalObsolete": 4
   },
   "authorization": {
-    "dryRunExecutionAuthorized": true,
-    "allowedExecutions": 1,
+    "previousExecutionConsumed": true,
+    "allowedExecutions": 0,
     "retirementWriteAuthorized": false,
-    "requestCreated": false
+    "newExecutionRequiresImmutableRequest": true
   },
   "writeAuthorized": false,
   "deleteAuthorized": false,
-  "nextAction": "CREATE_ONE_IMMUTABLE_REQUEST_AND_EXECUTE_ONE_READONLY_DRYRUN",
+  "nextAction": "REQUEST_NEW_AUTHORIZATION_AND_REBIND_EXISTING_REQUEST_TO_REPAIR_COMMIT",
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "validatorRevision": "4.2.8-r1",
+  "failedRun": {
+    "runId": 30177314623,
+    "classification": "VALIDATOR_STALE",
+    "failedStage": "runtime_contract_validation",
+    "rootCause": "target collection is a target-only overlay with 2 client and 2 insurer records, not a full 416/28 projection"
+  }
 }

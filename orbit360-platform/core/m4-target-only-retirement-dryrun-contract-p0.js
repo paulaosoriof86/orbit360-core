@@ -16,14 +16,14 @@ function build(input){
  if(input.readOnly!==true||input.remoteReadConfirmed!==true)e.push('readonly_remote_required');
  if(input.priorReconciliationClosureValidated!==true)e.push('prior_reconciliation_closure_required');
  if(n(s.clientes)!==414||n(s.aseguradoras)!==26)e.push('source_counts_changed');
- if(n(t.clientes)!==416||n(t.aseguradoras)!==28)e.push('target_collection_counts_changed');
+ if(input.targetCollectionSemantic!=='target_only_overlay'||n(t.clientes)!==2||n(t.aseguradoras)!==2)e.push('target_only_overlay_counts_changed');
  if(n(sel.clientSelected)!==2||n(sel.insurerSelected)!==2||n(sel.totalSelected)!==4)e.push('exact_selection_2_2_required');
  if(sel.classification!=='obsolete'||sel.selectionRule!=='target_only_and_technical_marker_and_no_source_equivalence')e.push('selection_rule_invalid');
  if(sel.deterministicOrder!=='collection_then_document_id_asc'||sel.deterministicSelection!==true||!text(sel.selectionDigest)||!text(sel.snapshotDigest))e.push('deterministic_selection_required');
  if(sel.allTargetOnly!==true||sel.allTechnicalMarker!==true||sel.allNoSourceIdMatch!==true||sel.allNoFingerprintMatch!==true)e.push('selection_proof_invalid');
  if(sel.rawValuesExported!==false||sel.recordIdsExported!==false||sel.pseudonymousTokensExported!==false)e.push('selection_privacy_invalid');
  if(n(d.retireCandidates)!==4||n(d.wouldDeleteClients)!==2||n(d.wouldDeleteInsurers)!==2||n(d.actualDeletes)!==0||n(d.actualUpdates)!==0||n(d.actualCreates)!==0||n(d.actualMerges)!==0)e.push('dryrun_diff_invalid');
- if(n(a.targetClientsAfterHypotheticalRetirement)!==414||n(a.targetInsurersAfterHypotheticalRetirement)!==26||n(a.targetOnlyRemaining)!==0||a.approvalReadyForM4Write!==false)e.push('after_projection_invalid');
+ if(n(a.targetClientsAfterHypotheticalRetirement)!==0||n(a.targetInsurersAfterHypotheticalRetirement)!==0||n(a.targetOnlyRemaining)!==0||a.approvalReadyForM4Write!==false)e.push('after_projection_invalid');
  if(tr.mode!=='deterministic_target_only_retirement_plan'||tr.sourceCollections!==2||tr.targetCollections!==2||tr.beforeAfterPlanned!==true||tr.recordIdsExported!==false)e.push('traceability_required');
  if(rb.mode!=='exact_restore_from_four_before_snapshots'||rb.planned!==true||rb.executed!==false||n(rb.snapshotCountPlanned)!==4||n(rb.restorePathCountPlanned)!==4||rb.restoreOrder!=='reverse_deterministic_selection'||rb.snapshotValuesExported!==false||!text(rb.snapshotDigest))e.push('rollback_required');
  if(au.mode!=='append_only'||au.planned!==true||au.executed!==false||n(au.plannedEvents)!==4)e.push('audit_plan_required');

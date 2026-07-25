@@ -4,12 +4,12 @@
   "gateId": "block4-target-only-retirement-dryrun-v20260725",
   "contractVersion": "4.2.8",
   "branch": "ays/backend-tenant-lab-v99-20260703",
-  "explicitAuthorization": true,
+  "explicitAuthorization": false,
   "authorizationSource": "user_autorizado_atomic_retirement_dryrun_exactly_four",
   "packagePublicationAuthorized": true,
-  "dryRunExecutionAuthorized": true,
-  "allowedExecutions": 1,
-  "requestCreated": false,
+  "dryRunExecutionAuthorized": false,
+  "allowedExecutions": 0,
+  "requestCreated": true,
   "expectedClientObsolete": 2,
   "expectedInsurerObsolete": 2,
   "expectedTotalObsolete": 4,
@@ -17,5 +17,10 @@
   "clientCorrectionWriteAuthorized": false,
   "m4WriteAuthorized": false,
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "requestCommit": "3187e41a41bb3190a49ed870df52d470d01b843e",
+  "failedRun": 30177314623,
+  "previousExecutionConsumed": true,
+  "newExecutionRequiresImmutableRequest": true,
+  "validatorRevision": "4.2.8-r1"
 }

@@ -7,9 +7,9 @@
   "gateId": "block4-target-only-retirement-dryrun-v20260725",
   "gateContractVersion": "4.2.8",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "controlPlaneRevision": "m4-target-only-retirement-dryrun-v1",
-  "methodologicalDecisionId": "atomic-retirement-dryrun-exactly-four-obsolete-target-only-20260725",
-  "classification": "DATA_CONTRACT_RESOLUTION_PLANNING",
+  "controlPlaneRevision": "m4-target-only-retirement-dryrun-r1",
+  "methodologicalDecisionId": "target-only-overlay-2-2-not-full-projection-20260725",
+  "classification": "VALIDATOR_STALE_REPAIRED",
   "executionProfile": {
     "phase": "M4_TARGET_ONLY_RETIREMENT_DRYRUN_EXECUTION",
     "capabilities": {
@@ -32,11 +32,11 @@
   },
   "baseline": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-reconciliation-closure.json",
   "authorization": {
-    "packagePublicationAuthorized": true,
-    "dryRunExecutionAuthorized": true,
-    "allowedExecutions": 1,
+    "previousExecutionConsumed": true,
+    "dryRunExecutionAuthorized": false,
+    "allowedExecutions": 0,
     "retirementWriteAuthorized": false,
-    "requestCreated": false
+    "newExecutionRequiresImmutableRequest": true
   },
   "privacy": {
     "mode": "aggregate_plan_and_digests_only",
@@ -44,7 +44,8 @@
     "rawValuesExported": false,
     "pseudonymousTokensExported": false
   },
-  "nextRequiredDecision": "AFTER_SUCCESS_REQUEST_SEPARATE_AUTHORIZATION_FOR_RETIREMENT_WRITE",
+  "nextRequiredDecision": "REQUEST_NEW_AUTHORIZATION_FOR_ONE_REBOUND_READONLY_DRYRUN",
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "targetCollectionSemantic": "target_only_overlay"
 }
