@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-business-validation-semantic-freeze-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-semantic-repair-static-v20260725",
+  "contractVersion": "4.2.5",
+  "status": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_SEMANTIC_REPAIR_STATIC_PACKAGE_READY_EXECUTION_NOT_AUTHORIZED",
+  "frozenIncident": {
+    "failedGate": "block4-client-country-business-validation-dryrun-v20260725",
+    "failedRun": 30162986582,
+    "failedStage": "canonical_preflight",
+    "classification": "VALIDATOR_STALE",
+    "rootCause": "literal_source_token_validation_instead_of_executed_contract"
+  },
+  "repairScope": {
+    "contract": true,
+    "fixtures": true,
+    "engine": true,
+    "lifecycle": true,
+    "registry": true,
+    "overlay": true,
+    "workflow": true,
+    "academy": true,
+    "product": false,
+    "data": false
+  },
+  "runtimeExecutionAuthorized": false,
+  "writeAuthorized": false,
+  "allowedRuntimeExecutions": 0,
+  "allowedWriteExecutions": 0,
+  "nextAction": "REQUEST_NEW_AUTHORIZATION_FOR_ONE_STATIC_GATE_EXECUTION",
+  "containsPII": false,
+  "containsSecrets": false,
+  "staticPackagePublicationAuthorized": true,
+  "staticGateExecutionAuthorized": false,
+  "allowedStaticGateExecutions": 0,
+  "requestCreated": false
+}

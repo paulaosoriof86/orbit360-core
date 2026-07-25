@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v1",
+  "issuedAt": "2026-07-25",
+  "gates": [
+    {
+      "gateId": "block4-client-country-business-validation-semantic-repair-static-v20260725",
+      "contractVersion": "4.2.5",
+      "phase": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_SEMANTIC_REPAIR_STATIC",
+      "lifecycle": "tools/orbit360-validator-lifecycle-contract-m4-client-country-business-validation-semantic-v20260725.json",
+      "engine": "tools/orbit360-validar-gate-contracts-engine-m4-client-country-business-validation-semantic-v20260725.mjs",
+      "capabilities": {
+        "secrets": false,
+        "firestoreRead": false,
+        "writes": false,
+        "runtime": false,
+        "browser": false,
+        "deploy": false,
+        "functionsDeploy": false,
+        "rulesDeploy": false,
+        "production": false
+      },
+      "validationMode": "executed_contract_fixtures",
+      "literalSourceInspection": false,
+      "staticPackageReady": true,
+      "executionAuthorized": false,
+      "allowedExecutions": 0,
+      "requestCreated": false
+    }
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}

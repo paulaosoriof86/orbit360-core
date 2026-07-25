@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-client-country-business-validation-semantic-v1",
+  "issuedAt": "2026-07-25",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-client-country-business-validation-semantic-repair-static-v20260725",
+  "gateContractVersion": "4.2.5",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-business-validation-semantic-repair-static-v1",
+  "methodologicalDecisionId": "replace-literal-source-token-validation-with-executed-contract-fixtures-20260725",
+  "classification": "STATIC_ROOT_CAUSE_REPAIR",
+  "executionProfile": {
+    "phase": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_SEMANTIC_REPAIR_STATIC",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "operationalWritesAuthorized": false,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "migrationWritesAuthorized": false,
+    "rulesChangeAuthorized": false,
+    "requestModel": "future-immutable-static-request-bound-to-parent-commit"
+  },
+  "baselines": {
+    "countryClosure": "orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-values-closure.json",
+    "durableClosure": "tools/orbit360-m4-durable-writer-dryrun-freeze-v20260725.json"
+  },
+  "authorization": {
+    "staticRepairPackagePublicationAuthorized": true,
+    "staticGateExecutionAuthorized": false,
+    "allowedExecutions": 0,
+    "runtimeAuthorized": false,
+    "writeAuthorized": false,
+    "requestCreated": false
+  },
+  "validationBoundary": {
+    "mode": "executed_contract_fixtures",
+    "literalSourceInspection": false,
+    "positiveAndNegativeFixturesRequired": true
+  },
+  "nextRequiredDecision": "REQUEST_NEW_AUTHORIZATION_FOR_ONE_STATIC_GATE_EXECUTION",
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-business-validation-semantic-authorization-v2",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-semantic-repair-static-v20260725",
+  "contractVersion": "4.2.5",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "explicitAuthorization": true,
+  "authorizationSource": "user_procede_static_validator_package_publication_only",
+  "staticRepairPackagePublicationAuthorized": true,
+  "staticGateExecutionAuthorized": false,
+  "allowedExecutions": 0,
+  "requestCreated": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "runtime": false,
+  "writes": false,
+  "businessValidationPreserved": {
+    "all61Guatemala": true,
+    "country": "GT",
+    "currency": "GTQ",
+    "writeAuthorized": false
+  },
+  "nextRequiredDecision": "REQUEST_NEW_AUTHORIZATION_FOR_ONE_STATIC_GATE_EXECUTION",
+  "containsPII": false,
+  "containsSecrets": false
+}

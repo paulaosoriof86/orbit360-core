@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-semantic-repair-static-v20260725",
+  "contractVersion": "4.2.5",
+  "owner": "validator-lifecycle-semantic-contract-owner",
+  "classification": "VALIDATOR_STALE_ROOT_CAUSE_REPAIR",
+  "invariants": [
+    "no_runtime_includes",
+    "execute_positive_fixtures",
+    "execute_negative_fixtures",
+    "compose_country_and_durable_closures",
+    "zero_external_access",
+    "zero_writes"
+  ],
+  "blocked": [
+    "secrets",
+    "firestore",
+    "runtime",
+    "browser",
+    "deploy",
+    "rules",
+    "functions",
+    "production",
+    "main",
+    "merge",
+    "static_gate_execution_without_new_authorization",
+    "request_creation"
+  ],
+  "containsPII": false,
+  "containsSecrets": false,
+  "publicationBoundary": {
+    "packagePublicationAuthorized": true,
+    "gateExecutionAuthorized": false,
+    "allowedExecutions": 0,
+    "requestCreated": false
+  }
+}

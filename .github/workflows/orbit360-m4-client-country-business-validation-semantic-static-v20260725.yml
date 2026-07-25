@@ -1,0 +1,70 @@
+name: Orbit 360 · M4 semantic validator repair · STATIC_ONCE
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['tools/orbit360-m4-client-country-business-validation-semantic-request-v20260725.json']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-m4-business-validation-semantic-static
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block4-client-country-business-validation-semantic-repair-static-v20260725
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: tools/orbit360-m4-client-country-business-validation-semantic-request-v20260725.json
+jobs:
+  semantic-static:
+    name: M4 · Semantic validator repair · Static
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}', fetch-depth: 2, persist-credentials: false}
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Validar solicitud estática inmutable
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "${ORBIT360_BRANCH}"
+          test "${GITHUB_RUN_ATTEMPT}" = '1'
+          node <<'NODE'
+          const fs=require('fs'),cp=require('child_process');const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim(),bad=[];
+          if(r.schemaVersion!=='orbit360-m4-client-country-business-validation-semantic-static-request-v1'||r.contractVersion!=='4.2.5')bad.push('schema');
+          if(r.gateId!==process.env.ORBIT360_GATE_ID||r.branch!==process.env.ORBIT360_BRANCH||r.authorizedBaseCommit!==parent)bad.push('binding');
+          if(r.explicitAuthorization!==true||r.allowedExecutions!==1||r.staticRepairOnly!==true)bad.push('authorization');
+          if(r.secrets!==false||r.firestoreRead!==false||r.runtime!==false||r.writes!==false||r.deploy!==false||r.production!==false||r.mergeMain!==false)bad.push('scope');
+          if(r.containsPII!==false||r.containsSecrets!==false)bad.push('sanitization');
+          if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
+          NODE
+      - name: Ejecutar preflight semántico canónico
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="4.2.5" and .failed==0 and .validationMode=="executed_contract_fixtures" and .literalSourceInspection==false and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .operationalWrites==0' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Validar resumen de fixtures
+        shell: bash
+        run: |
+          jq -e '.status=="PASS" and .contractVersion=="4.2.5" and .failed==0 and .positiveFixtures>=5 and .negativeFixtures>=10 and .composedBaseline.targetOnlyDeferred==4 and .proposal.records==61 and .proposal.country=="GT" and .proposal.currency=="GTQ" and .approvalReadyForM4Write==false and .literalSourceInspection==false' orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-semantic-contract-summary.json >/dev/null
+      - name: Subir evidencia estática sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m4-business-validation-semantic-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-semantic-contract-summary.json
+          retention-days: 30
+      - name: Publicar estado observable
+        if: always()
+        env: {GH_TOKEN: '${{ github.token }}'}
+        shell: bash
+        run: |
+          summary='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json'; state=failure; description='M4 semantic validator repair failed'
+          if [ -f "$summary" ] && [ "$(jq -r '.status // empty' "$summary")" = GO_GATE_CONTRACT ]; then state=success; description='M4 semantic validator repair completed'; fi
+          payload="$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m4-business-validation-semantic"}')"
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$payload"
