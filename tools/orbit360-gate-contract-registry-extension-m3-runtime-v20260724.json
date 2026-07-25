@@ -102,6 +102,14 @@
         "clients": 414,
         "insurers": 26
       },
+      "methodology": {
+        "sameHeadSelfReferencePatternDetectedTwice": true,
+        "classification": "PIPELINE_MECHANISM_FAILURE",
+        "permanentRule": "Live HEAD is external evidence only; immutable requests bind to the parent commit.",
+        "netChangedFilesAfterCorrection": 0,
+        "gateRerun": false,
+        "productAffected": false
+      },
       "successEvidence": "artifact:8612768233/m3-tenant-activation-runtime-summary.json",
       "successPredicate": "ok === true && status === M3_TENANT_ACTIVATED_READONLY",
       "executionDispatch": {
