@@ -105,7 +105,7 @@
       "methodology": {
         "sameHeadSelfReferencePatternDetectedTwice": true,
         "classification": "PIPELINE_MECHANISM_FAILURE",
-        "permanentRule": "Live HEAD is external evidence only; immutable requests bind to the parent commit.",
+        "permanentRule": "Live HEAD is external PR/status evidence only; immutable requests bind to the parent commit.",
         "netChangedFilesAfterCorrection": 0,
         "gateRerun": false,
         "productAffected": false
