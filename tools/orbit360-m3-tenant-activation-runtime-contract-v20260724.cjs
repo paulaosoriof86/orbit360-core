@@ -1,0 +1,34 @@
+#!/usr/bin/env node
+'use strict';
+const fs=require('fs'),path=require('path'),vm=require('vm');
+const ROOT=process.cwd();
+function load(rel){vm.runInThisContext(fs.readFileSync(path.join(ROOT,rel),'utf8'),{filename:rel});}
+global.window=global;global.Orbit={};
+load('orbit360-platform/core/tenant-canonical-paths-contract-p0.js');
+load('orbit360-platform/core/tenant-activation-runtime-contract-p0.js');
+const api=Orbit.tenantActivationRuntimeP0;
+const manifest=JSON.parse(fs.readFileSync(path.join(ROOT,'tools/orbit360-m3-tenant-activation-manifest-v20260724.json'),'utf8'));
+const base={tenantId:manifest.tenantId,projectId:'ays-orbit-360-lab',m2RuntimeStatus:'M2_EXISTING_IDENTITY_RUNTIME_VALIDATED',m3StaticStatus:'M3_TENANT_ACTIVATION_STATIC_READY',identitySource:'membership_only',tenantResolutionSource:'membership',sourceOfTruth:manifest.sourceOfTruth,controlledExistingIdentityAccepted:true,eligibleMemberships:1,readOnlyBootstrapValidated:true,storeNoFallback:true,storeWriteEnabled:false,localWriteBlocked:true,countries:manifest.countries,countryConfig:manifest.countryConfig,branding:manifest.branding,modules:manifest.modules,integrations:manifest.integrations,accessExpansion:false,actor:{userId:'existing-privileged-membership',reason:'Activación controlada read-only M3 autorizada'},activationAuthorized:true,activationExecuted:true,persistence:manifest.persistence,deployRequested:false,importsRequested:false,rulesChangeRequested:false};
+const checks=[];const check=(id,ok)=>checks.push({id,ok:!!ok});
+check('API',api&&api.VERSION==='3.1.0-readonly-20260724');
+check('VALID',api.validate(base).ok===true&&api.validate(base).status==='M3_TENANT_ACTIVATED_READONLY');
+check('M2_REQUIRED',api.validate({...base,m2RuntimeStatus:'pending'}).errors.includes('m2_runtime_no_cerrado'));
+check('M3_STATIC_REQUIRED',api.validate({...base,m3StaticStatus:'pending'}).errors.includes('m3_static_no_cerrado'));
+check('MEMBERSHIP_ONLY',api.validate({...base,identitySource:'query_string'}).errors.includes('identity_source_no_membership_only'));
+check('TENANT_FROM_MEMBERSHIP',api.validate({...base,tenantResolutionSource:'query_string'}).errors.includes('tenant_no_resuelto_desde_membership'));
+check('UNKNOWN_SOURCE_BLOCKED',api.validate({...base,sourceOfTruth:'unknown'}).errors.includes('fuente_activacion_invalida'));
+check('UNIQUE_MEMBERSHIP',api.validate({...base,eligibleMemberships:2}).errors.includes('membership_elegible_no_unica'));
+check('NO_FALLBACK',api.validate({...base,storeNoFallback:false}).errors.includes('store_fallback_no_bloqueado'));
+check('WRITE_BLOCKED',api.validate({...base,storeWriteEnabled:true}).errors.includes('store_escritura_habilitada'));
+check('LOCAL_WRITE_BLOCKED',api.validate({...base,localWriteBlocked:false}).errors.includes('bloqueo_escritura_local_no_probado'));
+check('COUNTRY_CURRENCY',api.validate({...base,countryConfig:{GT:{currency:'COP'},CO:{currency:'GTQ'}}}).errors.includes('pais_moneda_inconsistente:GT'));
+check('INTEGRATION_HONESTY',api.validate({...base,integrations:[{key:'drive',state:'backend_required',active:true,connectionVerified:false}]}).errors.includes('integracion_0:activa_sin_conexion_real'));
+check('AUTH_REQUIRED',api.validate({...base,activationAuthorized:false}).errors.includes('activacion_no_autorizada'));
+check('EXECUTION_REQUIRED',api.validate({...base,activationExecuted:false}).errors.includes('activacion_no_ejecutada'));
+check('NO_WRITES',api.validate({...base,persistence:{...base.persistence,configurationWrites:1}}).errors.includes('m3_escritura_no_permitida:configurationWrites'));
+check('NO_DEPLOY',api.validate({...base,deployRequested:true}).errors.includes('deploy_no_permitido'));
+check('NO_IMPORTS',api.validate({...base,importsRequested:true}).errors.includes('importaciones_diferidas_a_m4'));
+check('NO_RULES',api.validate({...base,rulesChangeRequested:true}).errors.includes('rules_no_permitidas'));
+check('NO_SECRETS',api.validate({...base,token:'forbidden'}).errors.some(e=>e.startsWith('secretos_no_permitidos:')));
+const failed=checks.filter(x=>!x.ok);const payload={schemaVersion:'orbit360-m3-tenant-activation-runtime-contract-summary-v1',gateId:'block3-tenant-activation-runtime-v20260724',contractVersion:'3.1.0',ok:failed.length===0,status:failed.length?'M3_RUNTIME_CONTRACT_BLOCKED':'M3_RUNTIME_CONTRACT_READY',total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,containsPII:false,containsSecrets:false};
+console.log(JSON.stringify(payload,null,2));process.exit(failed.length?41:0);
