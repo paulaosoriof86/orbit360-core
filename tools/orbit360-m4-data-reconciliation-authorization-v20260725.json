@@ -1,0 +1,22 @@
+{
+  "schemaVersion":"orbit360-m4-data-reconciliation-authorization-v1",
+  "issuedAt":"2026-07-25",
+  "gateId":"block4-data-reconciliation-readonly-v20260725",
+  "contractVersion":"4.2.0",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "explicitAuthorization":true,
+  "authorizationSource":"user_continue_exact_next_action",
+  "readOnlyReconciliation":true,
+  "allowedExecutions":1,
+  "expectedProjectId":"ays-orbit-360-lab",
+  "baselineRunId":30145799192,
+  "baselineRequiresValidation":65,
+  "expectedClients":414,
+  "expectedInsurers":26,
+  "expectedMissingCurrency":61,
+  "expectedTargetOnlyClients":2,
+  "expectedTargetOnlyInsurers":2,
+  "operationalWrites":false,"configurationWrites":false,"membershipWrites":false,"clientWrites":false,"insurerWrites":false,"auditWrites":false,
+  "applyRules":false,"hostingDeploy":false,"functionsDeploy":false,"imports":false,"policies":false,"mergeMain":false,
+  "containsPII":false,"containsSecrets":false
+}

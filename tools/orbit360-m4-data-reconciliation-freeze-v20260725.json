@@ -1,0 +1,11 @@
+{
+  "schemaVersion":"orbit360-m4-data-reconciliation-freeze-v1",
+  "issuedAt":"2026-07-25",
+  "status":"M4_DATA_RECONCILIATION_AUTHORIZED_ONCE",
+  "gateId":"block4-data-reconciliation-readonly-v20260725",
+  "contractVersion":"4.2.0",
+  "baseline":{"runId":30145799192,"artifactId":8615949892,"requiresValidation":65,"clientsMissingCurrency":61,"clientTargetOnly":2,"insurerTargetOnly":2},
+  "authorization":{"active":true,"allowedExecutions":1,"writeAuthorized":false},
+  "nextAction":"EXECUTE_READONLY_RECONCILIATION_ONCE",
+  "containsPII":false,"containsSecrets":false
+}

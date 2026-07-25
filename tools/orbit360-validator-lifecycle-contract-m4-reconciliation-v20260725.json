@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m4-reconciliation-v1",
+  "issuedAt":"2026-07-25",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block4-data-reconciliation-readonly-v20260725",
+  "gateContractVersion":"4.2.0",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m4-data-reconciliation-readonly-authorized-once-v1",
+  "classification":"GO_RUNTIME_READONLY",
+  "executionProfile":{"phase":"M4_DATA_RECONCILIATION_EXECUTION","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"configurationWritesAuthorized":false,"membershipWritesAuthorized":false,"migrationWritesAuthorized":false,"rulesChangeAuthorized":false,"requestModel":"immutable-request-bound-to-parent-commit"},
+  "prerequisites":{"m4DryRunClosed":true,"dryRunRunId":30145799192,"requiresValidation":65,"clientsMissingCurrency":61,"clientTargetOnly":2,"insurerTargetOnly":2},
+  "authorization":{"reconciliationAuthorized":true,"allowedExecutions":1,"requestCreated":false},
+  "nextRequiredDecision":"EXECUTE_ONE_READONLY_RECONCILIATION",
+  "containsPII":false,"containsSecrets":false
+}

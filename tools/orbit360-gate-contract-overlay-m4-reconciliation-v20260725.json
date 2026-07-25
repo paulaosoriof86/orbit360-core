@@ -1,0 +1,12 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m4-reconciliation-v1",
+  "issuedAt":"2026-07-25",
+  "gateId":"block4-data-reconciliation-readonly-v20260725",
+  "contractVersion":"4.2.0",
+  "active":true,
+  "phase":"M4_DATA_RECONCILIATION_EXECUTION",
+  "capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "baseline":{"requiresValidation":65,"missingCurrency":61,"clientTargetOnly":2,"insurerTargetOnly":2},
+  "acceptance":{"sourceClients":414,"sourceInsurers":26,"missingCurrency":61,"targetOnly":4,"writes":0,"containsPII":false,"containsSecrets":false},
+  "blocked":["write_firestore","modify_rules","deploy_hosting","deploy_functions","reimport","advance_policies","merge_main"]
+}
