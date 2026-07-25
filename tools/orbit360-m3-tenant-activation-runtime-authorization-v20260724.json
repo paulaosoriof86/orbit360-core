@@ -74,7 +74,6 @@
     "imports": false,
     "m4Deferred": true
   },
-  "closureHead": "3e3713b61975e9c26eb0f545113aee7b0d907c19",
   "containsPII": false,
   "containsSecrets": false
 }
