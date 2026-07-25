@@ -9,9 +9,9 @@
   "gateContractVersion": "3.1.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "controlPlaneRevision": "m3-tenant-activation-readonly-closed-v1",
-  "methodologicalDecisionId": "consume-success-and-close-m3-readonly-activation-20260725",
+  "methodologicalDecisionId": "consume-success-close-m3-and-ban-live-head-in-tracked-metadata-20260725",
   "classification": "GO_RUNTIME_READONLY",
-  "secondaryClassification": null,
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE_CORRECTED",
   "executionProfile": {
     "phase": "M3_TENANT_ACTIVATION_CLOSED",
     "capabilities": {
@@ -86,6 +86,14 @@
     "membershipWrites": 0,
     "clientWrites": 0,
     "insurerWrites": 0
+  },
+  "methodologyClosure": {
+    "sameHeadSelfReferencePatternDetectedTwice": true,
+    "rootCause": "A tracked file cannot contain the branch's current live HEAD because committing the file moves that HEAD.",
+    "permanentRule": "Live HEAD is reported only in external PR/status evidence; immutable execution requests bind to the parent commit.",
+    "netChangedFilesAfterCorrection": 0,
+    "gateRerun": false,
+    "productAffected": false
   },
   "persistenceBoundary": {
     "m3Writes": 0,
