@@ -4,7 +4,7 @@
   "gateId": "block4-client-country-business-validation-correction-dryrun-v20260725",
   "contractVersion": "4.2.6",
   "branch": "ays/backend-tenant-lab-v99-20260703",
-  "authorizedBaseCommit": "7d00508aaa3de71cb31a4e1c2b66fb1f0b61f2da",
+  "authorizedBaseCommit": "b188af0e435d673d0537b0a0838b5694b8bd1bc9",
   "explicitAuthorization": true,
   "allowedExecutions": 1,
   "correctionDryRunReadOnly": true,
