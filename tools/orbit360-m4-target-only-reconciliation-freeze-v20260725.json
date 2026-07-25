@@ -3,7 +3,7 @@
   "issuedAt": "2026-07-25",
   "gateId": "block4-target-only-reconciliation-readonly-v20260725",
   "contractVersion": "4.2.7",
-  "status": "M4_TARGET_ONLY_RECONCILIATION_PACKAGE_READY",
+  "status": "M4_TARGET_ONLY_RECONCILIATION_READONLY_CLOSED_SUCCESS",
   "baseline": {
     "clients": 414,
     "insurers": 26,
@@ -11,13 +11,22 @@
     "insurerTargetOnly": 2,
     "totalTargetOnly": 4
   },
-  "authorization": {
-    "readOnlyExecutionAuthorized": true,
-    "allowedExecutions": 1,
-    "writeAuthorized": false,
-    "requestCreated": false
+  "result": {
+    "expected": 0,
+    "duplicate": 0,
+    "obsolete": 4,
+    "requiresValidation": 0,
+    "retireCandidate": 4
   },
-  "nextAction": "PUBLISH_PACKAGE_THEN_CREATE_ONE_IMMUTABLE_REQUEST",
+  "authorization": {
+    "readOnlyExecutionAuthorized": false,
+    "allowedExecutions": 0,
+    "executionConsumed": true,
+    "retirementWriteAuthorized": false,
+    "clientCorrectionWriteAuthorized": false,
+    "m4WriteAuthorized": false
+  },
+  "nextAction": "REQUEST_SEPARATE_AUTHORIZATION_FOR_ATOMIC_RETIREMENT_DRYRUN_OF_EXACTLY_4_OBSOLETE_TARGET_RECORDS",
   "containsPII": false,
   "containsSecrets": false
 }
