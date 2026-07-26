@@ -1,31 +1,43 @@
 {
   "schemaVersion": "orbit360-m4-target-only-retirement-dryrun-freeze-v1",
-  "issuedAt": "2026-07-25",
+  "issuedAt": "2026-07-26",
   "gateId": "block4-target-only-retirement-dryrun-v20260725",
   "contractVersion": "4.2.8",
-  "status": "M4_TARGET_ONLY_RETIREMENT_DRYRUN_VALIDATOR_REPAIRED_NEW_AUTH_REQUIRED",
+  "status": "M4_TARGET_ONLY_RETIREMENT_DRYRUN_CLOSED_SUCCESS",
   "baseline": {
     "closure": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-reconciliation-closure.json",
     "clientObsolete": 2,
     "insurerObsolete": 2,
-    "totalObsolete": 4
+    "totalObsolete": 4,
+    "targetCollectionSemantic": "target_only_overlay"
+  },
+  "dryRunClosure": {
+    "requestCommit": "fe182aee838ac383da0ccde95e916de4a290f635",
+    "runId": 30204564753,
+    "selected": 4,
+    "snapshotCountPlanned": 4,
+    "auditEventsPlanned": 4,
+    "targetOnlyRemainingAfterProjection": 0,
+    "actualDeletes": 0,
+    "actualWrites": 0
   },
   "authorization": {
     "previousExecutionConsumed": true,
+    "latestExecutionConsumed": true,
     "allowedExecutions": 0,
     "retirementWriteAuthorized": false,
-    "newExecutionRequiresImmutableRequest": true
+    "clientCorrectionWriteAuthorized": false,
+    "m4WriteAuthorized": false
   },
   "writeAuthorized": false,
   "deleteAuthorized": false,
-  "nextAction": "REQUEST_NEW_AUTHORIZATION_AND_REBIND_EXISTING_REQUEST_TO_REPAIR_COMMIT",
+  "nextAction": "REQUEST_SEPARATE_AUTHORIZATION_FOR_ATOMIC_RETIREMENT_WRITE_OF_EXACTLY_4_OBSOLETE_TARGET_ONLY_RECORDS",
   "containsPII": false,
   "containsSecrets": false,
   "validatorRevision": "4.2.8-r1",
-  "failedRun": {
+  "failedRunHistory": {
     "runId": 30177314623,
     "classification": "VALIDATOR_STALE",
-    "failedStage": "runtime_contract_validation",
-    "rootCause": "target collection is a target-only overlay with 2 client and 2 insurer records, not a full 416/28 projection"
+    "rootCause": "target collection is a target-only overlay with 2 client and 2 insurer records, not a full projection"
   }
 }
