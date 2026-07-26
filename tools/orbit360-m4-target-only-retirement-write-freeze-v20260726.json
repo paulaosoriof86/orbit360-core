@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "orbit360-m4-target-only-retirement-write-freeze-v1",
+  "issuedAt": "2026-07-26",
+  "gateId": "block4-target-only-retirement-write-v20260726",
+  "contractVersion": "4.2.9",
+  "status": "M4_TARGET_ONLY_RETIREMENT_WRITE_PACKAGE_READY_REQUEST_NOT_CREATED",
+  "baseline": {
+    "closure": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-retirement-dryrun-closure.json",
+    "clientObsolete": 2,
+    "insurerObsolete": 2,
+    "totalObsolete": 4
+  },
+  "authorization": {
+    "writeExecutionAuthorized": true,
+    "allowedExecutions": 1,
+    "requestCreated": false,
+    "snapshotWritesAuthorized": 4,
+    "auditWritesAuthorized": 4,
+    "clientDeletesAuthorized": 2,
+    "insurerDeletesAuthorized": 2
+  },
+  "writeAuthorized": true,
+  "gtGtqWriteAuthorized": false,
+  "nextAction": "CREATE_IMMUTABLE_REQUEST_BOUND_TO_PACKAGE_COMMIT",
+  "containsPII": false,
+  "containsSecrets": false
+}

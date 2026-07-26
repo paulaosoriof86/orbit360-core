@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v1",
+  "issuedAt": "2026-07-26",
+  "gates": [
+    {
+      "gateId": "block4-target-only-retirement-write-v20260726",
+      "contractVersion": "4.2.9",
+      "lifecycle": "tools/orbit360-validator-lifecycle-contract-m4-target-only-retirement-write-v20260726.json",
+      "engine": "tools/orbit360-validar-gate-contracts-engine-m4-target-only-retirement-write-v20260726.mjs",
+      "workflow": ".github/workflows/orbit360-m4-target-only-retirement-write-gate-v20260726.yml",
+      "request": "tools/orbit360-m4-target-only-retirement-write-request-v20260726.json",
+      "phase": "M4_TARGET_ONLY_RETIREMENT_WRITE_EXECUTION",
+      "oneShot": true,
+      "containsPII": false,
+      "containsSecrets": false
+    }
+  ]
+}

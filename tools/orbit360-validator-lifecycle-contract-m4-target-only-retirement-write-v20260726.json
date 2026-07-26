@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-target-only-retirement-write-v1",
+  "issuedAt": "2026-07-26",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-target-only-retirement-write-v20260726",
+  "gateContractVersion": "4.2.9",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-target-only-retirement-write-v1",
+  "methodologicalDecisionId": "atomic-retirement-exactly-four-with-snapshots-audit-rollback-20260726",
+  "classification": "DATA_CONTRACT_REPAIR_APPLY_AUTHORIZED",
+  "executionProfile": {
+    "phase": "M4_TARGET_ONLY_RETIREMENT_WRITE_EXECUTION",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "operationalWritesAuthorized": true,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "migrationWritesAuthorized": true,
+    "rulesChangeAuthorized": false,
+    "requestModel": "immutable_request_bound_to_parent_commit"
+  },
+  "baseline": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-retirement-dryrun-closure.json",
+  "authorization": {
+    "writeExecutionAuthorized": true,
+    "allowedExecutions": 1,
+    "snapshotWritesAuthorized": 4,
+    "auditWritesAuthorized": 4,
+    "clientDeletesAuthorized": 2,
+    "insurerDeletesAuthorized": 2,
+    "emergencyRollbackAuthorized": true
+  },
+  "privacy": {
+    "mode": "sanitized_aggregate_execution_evidence",
+    "recordIdsExported": false,
+    "rawValuesExported": false,
+    "pseudonymousTokensExported": false
+  },
+  "nextRequiredDecision": "CREATE_IMMUTABLE_REQUEST_FOR_ONE_ATOMIC_WRITE_EXECUTION",
+  "containsPII": false,
+  "containsSecrets": false,
+  "targetCollectionSemantic": "target_only_overlay"
+}

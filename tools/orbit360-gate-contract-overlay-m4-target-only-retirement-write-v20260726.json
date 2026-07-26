@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-26",
+  "gateId": "block4-target-only-retirement-write-v20260726",
+  "contractVersion": "4.2.9",
+  "phase": "M4_TARGET_ONLY_RETIREMENT_WRITE_EXECUTION",
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": true,
+    "runtime": true,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "expected": {
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "targetClientsBefore": 2,
+    "targetInsurersBefore": 2,
+    "targetClientsAfter": 0,
+    "targetInsurersAfter": 0,
+    "snapshotWrites": 4,
+    "auditWrites": 4,
+    "clientDeletes": 2,
+    "insurerDeletes": 2
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}

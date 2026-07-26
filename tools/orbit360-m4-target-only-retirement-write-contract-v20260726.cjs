@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+'use strict';
+const fs=require('fs'),path=require('path'),vm=require('vm');
+const ROOT=process.cwd(),OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-retirement-write-contract-summary.json');
+global.window=global;global.Orbit={};vm.runInThisContext(fs.readFileSync(path.join(ROOT,'orbit360-platform/core/m4-target-only-retirement-write-contract-p0.js'),'utf8'));
+const api=global.Orbit.m4TargetOnlyRetirementWriteP0;
+const valid={atomicWrite:true,transactionCommitted:true,priorDryRunClosureValidated:true,targetCollectionSemantic:'target_only_overlay',before:{sourceClients:414,sourceInsurers:26,targetClients:2,targetInsurers:2},after:{sourceClients:414,sourceInsurers:26,targetClients:0,targetInsurers:0},selection:{clientSelected:2,insurerSelected:2,totalSelected:4,classification:'obsolete',deterministicSelection:true,allTargetOnly:true,allTechnicalMarker:true,allNoSourceIdMatch:true,allNoFingerprintMatch:true,recordIdsExported:false,rawValuesExported:false,pseudonymousTokensExported:false,selectionDigest:'a'.repeat(64)},writes:{snapshotWrites:4,auditWrites:4,clientDeletes:2,insurerDeletes:2,totalOperationalWrites:12,clientUpdates:0,insurerUpdates:0,createsOutsideSnapshotsAndAudits:0,merges:0,gtGtqWrites:0,configurationWrites:0,membershipWrites:0},rollback:{mode:'exact_restore_from_four_before_snapshots',available:true,snapshotCount:4,restorePathCount:4,restoreOrder:'reverse_deterministic_selection',executed:false,verified:false},audit:{mode:'append_only',eventsWritten:4,eventUpdates:0,eventDeletes:0},verification:{snapshotReadback:4,auditReadback:4,deletedTargetReadback:4,targetOnlyRemaining:0,sourceCountsUnchanged:true,operationDigestVerified:true},collectionScope:{sourceClients:'tenantId/{tenant}/clientes',targetClients:'tenants/{tenant}/data/clientes/items',sourceInsurers:'tenantId/{tenant}/aseguradoras',targetInsurers:'tenants/{tenant}/data/aseguradoras/items',snapshots:'tenants/{tenant}/migrationRollbackSnapshots/{operation}/records',auditEvents:'tenants/{tenant}/auditEvents'},rulesChanged:false,hostingDeploy:false,functionsDeploy:false,imports:false,policies:false,productionTouched:false,mergeMain:false,containsPII:false,containsSecrets:false,secretValueCount:0};
+const clone=x=>JSON.parse(JSON.stringify(x));let pos=0,neg=0,fail=[];
+function yes(name,x){const r=api.build(x);if(r.ok)pos++;else fail.push('positive:'+name+':'+r.errors.join(','));}
+function no(name,mut){const x=clone(valid);mut(x);const r=api.build(x);if(!r.ok)neg++;else fail.push('negative:'+name);}
+yes('valid',valid);
+[
+['no_atomic',x=>x.atomicWrite=false],['no_commit',x=>x.transactionCommitted=false],['bad_closure',x=>x.priorDryRunClosureValidated=false],
+['source_before',x=>x.before.sourceClients=413],['source_after',x=>x.after.sourceInsurers=25],['semantic',x=>x.targetCollectionSemantic='full_projection'],
+['target_before_client',x=>x.before.targetClients=3],['target_before_insurer',x=>x.before.targetInsurers=1],['target_after_client',x=>x.after.targetClients=1],['target_after_insurer',x=>x.after.targetInsurers=1],
+['client_selected',x=>x.selection.clientSelected=1],['insurer_selected',x=>x.selection.insurerSelected=3],['total_selected',x=>x.selection.totalSelected=3],['classification',x=>x.selection.classification='duplicate'],
+['deterministic',x=>x.selection.deterministicSelection=false],['target_only',x=>x.selection.allTargetOnly=false],['technical',x=>x.selection.allTechnicalMarker=false],['source_id',x=>x.selection.allNoSourceIdMatch=false],['fingerprint',x=>x.selection.allNoFingerprintMatch=false],
+['ids_exported',x=>x.selection.recordIdsExported=true],['raw_exported',x=>x.selection.rawValuesExported=true],['digest',x=>x.selection.selectionDigest='x'],
+['snapshots',x=>x.writes.snapshotWrites=3],['audits',x=>x.writes.auditWrites=3],['client_deletes',x=>x.writes.clientDeletes=1],['insurer_deletes',x=>x.writes.insurerDeletes=1],['total_writes',x=>x.writes.totalOperationalWrites=11],
+['client_update',x=>x.writes.clientUpdates=1],['insurer_update',x=>x.writes.insurerUpdates=1],['outside_create',x=>x.writes.createsOutsideSnapshotsAndAudits=1],['merge',x=>x.writes.merges=1],['gtgtq',x=>x.writes.gtGtqWrites=1],
+['rollback_mode',x=>x.rollback.mode='none'],['rollback_available',x=>x.rollback.available=false],['rollback_count',x=>x.rollback.snapshotCount=3],['rollback_executed',x=>x.rollback.executed=true],
+['audit_mode',x=>x.audit.mode='mutable'],['audit_count',x=>x.audit.eventsWritten=3],['audit_updates',x=>x.audit.eventUpdates=1],
+['snapshot_readback',x=>x.verification.snapshotReadback=3],['audit_readback',x=>x.verification.auditReadback=3],['deleted_readback',x=>x.verification.deletedTargetReadback=3],['target_remaining',x=>x.verification.targetOnlyRemaining=1],['source_changed',x=>x.verification.sourceCountsUnchanged=false],['digest_unverified',x=>x.verification.operationDigestVerified=false],
+['scope',x=>x.collectionScope.auditEvents='bad'],['deploy',x=>x.hostingDeploy=true],['production',x=>x.productionTouched=true],['pii',x=>x.containsPII=true],['secret',x=>x.secretValueCount=1]
+].forEach(([n,m])=>no(n,m));
+const req={schemaVersion:'orbit360-m4-target-only-retirement-write-request-v1',gateId:'block4-target-only-retirement-write-v20260726',contractVersion:'4.2.9',branch:'ays/backend-tenant-lab-v99-20260703',authorizedBaseCommit:'parent',explicitAuthorization:true,allowedExecutions:1,atomicRetirementWrite:true,expectedClientObsolete:2,expectedInsurerObsolete:2,expectedTotalObsolete:4,snapshotWritesAuthorized:4,auditWritesAuthorized:4,clientDeletesAuthorized:2,insurerDeletesAuthorized:2,emergencyRollbackAuthorized:true,maxRollbackRestores:4,gtGtqWrite:false,otherClientWrites:false,otherInsurerWrites:false,merges:false,imports:false,policies:false,deploy:false,production:false,mergeMain:false,containsPII:false,containsSecrets:false};
+const boundaries=[
+api.validateActivationBoundary({requestPresent:false,parentCommit:'parent'}),
+api.validateActivationBoundary({requestPresent:true,request:{...req,authorizedBaseCommit:'old'},parentCommit:'parent'}),
+api.validateActivationBoundary({requestPresent:true,request:req,parentCommit:'parent'}),
+api.validateActivationBoundary({requestPresent:true,request:{...req,auditWritesAuthorized:5},parentCommit:'parent'})
+];
+if(boundaries[0].activationMode!=='package_without_request'||boundaries[0].executionAuthorized)fail.push('boundary_absent');
+if(boundaries[1].activationMode!=='historical_request_ignored'||boundaries[1].executionAuthorized)fail.push('boundary_historical');
+if(boundaries[2].activationMode!=='immutable_request_present'||!boundaries[2].executionAuthorized||boundaries[2].allowedExecutions!==1)fail.push('boundary_active');
+if(boundaries[3].ok||boundaries[3].executionAuthorized)fail.push('boundary_invalid');
+const summary={schemaVersion:'orbit360-m4-target-only-retirement-write-contract-summary-v1',gateId:'block4-target-only-retirement-write-v20260726',contractVersion:'4.2.9',status:fail.length?'FAIL':'PASS',total:pos+neg+boundaries.length,passed:fail.length?0:pos+neg+boundaries.length,failed:fail.length,positiveFixtures:pos+3,negativeFixtures:neg+1,validationMode:'executed_contract_fixtures',literalSourceInspection:false,errors:fail,containsPII:false,containsSecrets:false};
+fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(summary,null,2)+'\n');console.log(JSON.stringify(summary,null,2));if(fail.length)process.exit(41);
