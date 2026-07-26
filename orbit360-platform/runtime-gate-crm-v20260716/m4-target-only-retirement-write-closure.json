@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "orbit360-m4-target-only-retirement-write-closure-v1",
+  "issuedAt": "2026-07-26",
+  "gateId": "block4-target-only-retirement-write-v20260726",
+  "contractVersion": "4.2.9",
+  "status": "M4_TARGET_ONLY_RETIREMENT_WRITE_CLOSED_SUCCESS",
+  "packageCommit": "6f2608599f9b07f491e2d23053d28dfa2da17353",
+  "requestCommit": "15f7fbeb83e4dd8d715d15e9e663279536bc7779",
+  "runId": 30217615128,
+  "jobId": 89834431261,
+  "artifactId": 8636260429,
+  "artifactDigest": "sha256:e88e241e523f4266896f3ffce8bee91b66f3e56a21ca89c767747eeb89d2d444",
+  "canonicalPreflight": {
+    "status": "GO_GATE_CONTRACT",
+    "passed": 24,
+    "total": 24,
+    "failed": 0,
+    "activationMode": "immutable_request_present"
+  },
+  "fixtureContract": {
+    "status": "PASS",
+    "passed": 55,
+    "total": 55,
+    "failed": 0,
+    "positiveFixtures": 4,
+    "negativeFixtures": 51,
+    "validationMode": "executed_contract_fixtures",
+    "literalSourceInspection": false
+  },
+  "before": {
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "targetClients": 2,
+    "targetInsurers": 2
+  },
+  "after": {
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "targetClients": 0,
+    "targetInsurers": 0
+  },
+  "selection": {
+    "clientSelected": 2,
+    "insurerSelected": 2,
+    "totalSelected": 4,
+    "classification": "obsolete",
+    "deterministicSelection": true,
+    "allTargetOnly": true,
+    "allTechnicalMarker": true,
+    "allNoSourceIdMatch": true,
+    "allNoFingerprintMatch": true,
+    "recordIdsExported": false,
+    "rawValuesExported": false,
+    "pseudonymousTokensExported": false
+  },
+  "writes": {
+    "snapshotWrites": 4,
+    "auditWrites": 4,
+    "clientDeletes": 2,
+    "insurerDeletes": 2,
+    "totalOperationalWrites": 12,
+    "clientUpdates": 0,
+    "insurerUpdates": 0,
+    "gtGtqWrites": 0,
+    "configurationWrites": 0,
+    "membershipWrites": 0,
+    "merges": 0
+  },
+  "rollback": {
+    "mode": "exact_restore_from_four_before_snapshots",
+    "available": true,
+    "snapshotCount": 4,
+    "restorePathCount": 4,
+    "restoreOrder": "reverse_deterministic_selection",
+    "executed": false,
+    "verified": false
+  },
+  "audit": {
+    "mode": "append_only",
+    "eventsWritten": 4,
+    "eventUpdates": 0,
+    "eventDeletes": 0
+  },
+  "verification": {
+    "snapshotReadback": 4,
+    "auditReadback": 4,
+    "deletedTargetReadback": 4,
+    "targetOnlyRemaining": 0,
+    "sourceCountsUnchanged": true,
+    "operationDigestVerified": true
+  },
+  "authorization": {
+    "writeExecutionConsumed": true,
+    "allowedExecutions": 0,
+    "clientCorrectionWriteAuthorized": false,
+    "m4WriteAuthorized": false
+  },
+  "security": {
+    "secretAccess": true,
+    "firestoreRead": true,
+    "operationalWrites": 12,
+    "rulesApplied": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "containsPII": false,
+    "containsSecrets": false
+  },
+  "approvalReadyForPostRetirementRevalidation": true,
+  "approvalReadyForClientCorrectionWrite": false,
+  "approvalReadyForM4Write": false,
+  "classification": "DATA_CONTRACT_TARGET_ONLY_RETIREMENT_WRITE_COMPLETED",
+  "nextAction": "REQUEST_SEPARATE_AUTHORIZATION_FOR_READONLY_POST_RETIREMENT_DURABLE_REVALIDATION",
+  "claudeClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academyClassification": "ACADEMIA_ACTUALIZAR",
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -3,25 +3,34 @@
   "issuedAt": "2026-07-26",
   "gateId": "block4-target-only-retirement-write-v20260726",
   "contractVersion": "4.2.9",
-  "status": "M4_TARGET_ONLY_RETIREMENT_WRITE_PACKAGE_READY_REQUEST_NOT_CREATED",
+  "status": "M4_TARGET_ONLY_RETIREMENT_WRITE_CLOSED_SUCCESS",
   "baseline": {
     "closure": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-retirement-dryrun-closure.json",
     "clientObsolete": 2,
     "insurerObsolete": 2,
     "totalObsolete": 4
   },
-  "authorization": {
-    "writeExecutionAuthorized": true,
-    "allowedExecutions": 1,
-    "requestCreated": false,
-    "snapshotWritesAuthorized": 4,
-    "auditWritesAuthorized": 4,
-    "clientDeletesAuthorized": 2,
-    "insurerDeletesAuthorized": 2
+  "execution": {
+    "requestCommit": "15f7fbeb83e4dd8d715d15e9e663279536bc7779",
+    "runId": 30217615128,
+    "transactionCommitted": true,
+    "snapshotWrites": 4,
+    "auditWrites": 4,
+    "clientDeletes": 2,
+    "insurerDeletes": 2,
+    "targetOnlyRemaining": 0,
+    "rollbackAvailable": true,
+    "rollbackExecuted": false
   },
-  "writeAuthorized": true,
+  "authorization": {
+    "writeExecutionConsumed": true,
+    "allowedExecutions": 0,
+    "clientCorrectionWriteAuthorized": false,
+    "m4WriteAuthorized": false
+  },
+  "writeAuthorized": false,
   "gtGtqWriteAuthorized": false,
-  "nextAction": "CREATE_IMMUTABLE_REQUEST_BOUND_TO_PACKAGE_COMMIT",
+  "nextAction": "REQUEST_SEPARATE_AUTHORIZATION_FOR_READONLY_POST_RETIREMENT_DURABLE_REVALIDATION",
   "containsPII": false,
   "containsSecrets": false
 }
