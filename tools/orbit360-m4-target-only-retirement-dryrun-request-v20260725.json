@@ -1,10 +1,10 @@
 {
   "schemaVersion": "orbit360-m4-target-only-retirement-dryrun-request-v1",
-  "issuedAt": "2026-07-25",
+  "issuedAt": "2026-07-26",
   "gateId": "block4-target-only-retirement-dryrun-v20260725",
   "contractVersion": "4.2.8",
   "branch": "ays/backend-tenant-lab-v99-20260703",
-  "authorizedBaseCommit": "866e0c49f4333a400dec32746e5cd930b62e7e0c",
+  "authorizedBaseCommit": "8def3f94ee3ec5900f4fc952a0086ac411e1e231",
   "explicitAuthorization": true,
   "allowedExecutions": 1,
   "atomicRetirementDryRunReadOnly": true,
