@@ -3,12 +3,15 @@
   "issuedAt": "2026-07-28",
   "gateId": "block4-post-retirement-revalidation-readonly-v20260728",
   "contractVersion": "4.2.10",
-  "status": "READY_FOR_ONE_REPAIRED_READONLY_EXECUTION",
+  "status": "M4_POST_RETIREMENT_REVALIDATION_READONLY_CLOSED_SUCCESS",
   "retryOrdinal": 1,
   "priorFailedRunId": 30395156011,
   "priorFailureClassification": "PIPELINE_MECHANISM_FAILURE",
+  "successfulRunId": 30395639383,
+  "successfulJobId": 90397715932,
+  "artifactId": 8702669519,
   "baselineClosure": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-retirement-write-closure.json",
-  "expected": {
+  "result": {
     "sourceClients": 414,
     "sourceInsurers": 26,
     "targetClients": 0,
@@ -19,13 +22,15 @@
   },
   "repair": {
     "allowedLayer": "runtime_read_mechanism_only",
-    "indexCreationAuthorized": false,
-    "dataMutationAuthorized": false,
-    "newReadPath": "tenant auditEvents -> exact snapshotRef"
+    "indexCreated": false,
+    "dataMutationExecuted": false,
+    "newReadPath": "tenant auditEvents -> exact snapshotRef",
+    "validated": true
   },
   "authorization": {
-    "readOnlyExecutionAuthorized": true,
-    "allowedExecutions": 1,
+    "readOnlyExecutionAuthorized": false,
+    "allowedExecutions": 0,
+    "executionConsumed": true,
     "clientCorrectionWriteAuthorized": false,
     "m4WriteAuthorized": false
   },
@@ -42,8 +47,7 @@
     "production": true,
     "mergeMain": true
   },
-  "stopRule": "if_this_repaired_retry_fails_same_runtime_stage_stop_no_third_attempt",
-  "nextActionOnPass": "EVALUATE_SEPARATE_AUTHORIZATION_FOR_61_GT_GTQ_CLIENT_CORRECTIONS",
+  "nextAction": "REQUEST_SEPARATE_AUTHORIZATION_FOR_61_GT_GTQ_CLIENT_CORRECTION_WRITE",
   "containsPII": false,
   "containsSecrets": false
 }
