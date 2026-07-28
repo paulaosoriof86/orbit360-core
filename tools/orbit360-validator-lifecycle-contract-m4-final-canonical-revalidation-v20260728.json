@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m4-final-canonical-revalidation-v1",
+  "issuedAt":"2026-07-28",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block4-final-canonical-revalidation-readonly-v20260728",
+  "gateContractVersion":"4.3.2",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m4-final-canonical-revalidation-v1",
+  "classification":"FINAL_DURABLE_READONLY_REVALIDATION",
+  "executionProfile":{"phase":"M4_FINAL_CANONICAL_REVALIDATION_READONLY_EXECUTION","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
+  "baseline":"orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-write-closure.json",
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"derived_post_write_verification_from_user_autorizado_20260728","readOnlyExecutionAuthorized":true,"allowedExecutions":1,"writeAuthorized":false,"requestCreated":false},
+  "expected":{"sourceClients":414,"sourceInsurers":26,"targetConfig":1,"memberships":1,"targetClients":414,"targetInsurers":26,"snapshots":441,"recordAudits":441,"batchAudits":1,"operationalWrites":0},
+  "nextRequiredDecision":"IF_OK_CLOSE_M4_AND_UNFREEZE_M5",
+  "containsPII":false,
+  "containsSecrets":false
+}
