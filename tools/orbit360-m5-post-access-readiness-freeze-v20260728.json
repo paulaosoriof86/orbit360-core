@@ -1,0 +1,9 @@
+{
+  "schemaVersion":"orbit360-m5-post-access-readiness-freeze-v1","issuedAt":"2026-07-28","gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.3","status":"READY_FOR_ONE_POST_ACCESS_READINESS_EXECUTION",
+  "baseline":{"m4Closed":true,"access502Closed":true,"priorRcHash":"a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13","priorRcSupersededByAccessAssetChange":true},
+  "expected":{"criticalAssetCount":41,"remoteVisualAssetCount":24,"accessOwnerBound":true,"operationalWrites":0},
+  "authorization":{"readinessExecutionAuthorized":true,"allowedExecutions":1,"requestCreated":false,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false},
+  "forbidden":{"secrets":true,"firestoreRead":true,"browser":true,"hostingDeploy":true,"writes":true,"production":true,"mergeMain":true,"policies":true},
+  "nextAction":"RUN_POST_ACCESS_READINESS_5_0_3_ONCE",
+  "containsPII":false,"containsSecrets":false
+}
