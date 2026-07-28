@@ -1,9 +1,18 @@
 {
-  "schemaVersion": "orbit360-m5-release-candidate-freeze-v1",
+  "schemaVersion": "orbit360-m5-release-candidate-freeze-v2",
   "issuedAt": "2026-07-28",
+  "updatedAt": "2026-07-28",
   "gateId": "block5-release-candidate-visualization-v20260728",
   "contractVersion": "5.0.0",
-  "status": "READY_FOR_ONE_RC_READINESS_EXECUTION",
+  "status": "M5_RC_READINESS_CLOSED_RUNTIME_SMOKE_PREPARATION_ALLOWED",
+  "releaseCandidate": {
+    "hash": "a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13",
+    "hashAlgorithm": "sha256",
+    "criticalAssetCount": 40,
+    "remoteVisualAssetCount": 22,
+    "remoteVisualAssetsMatched": 22,
+    "remoteParity": true
+  },
   "expected": {
     "m1Closed": true,
     "m2Closed": true,
@@ -15,30 +24,31 @@
     "missingClientCurrency": 0,
     "targetOnlyClients": 0,
     "targetOnlyInsurers": 0,
-    "criticalAssetCount": 40,
-    "remoteVisualAssetCount": 22,
     "mobileTitleResponsiveContract": true
   },
   "authorization": {
-    "readinessExecutionAuthorized": true,
-    "allowedExecutions": 1,
+    "readinessExecutionConsumed": true,
+    "allowedReadinessExecutions": 0,
+    "runtimeSmokeAuthorized": false,
+    "allowedRuntimeSmokeExecutions": 0,
     "hostingDeployAuthorized": false,
-    "browserAuthorized": false,
+    "visualReviewAuthorized": false,
     "productionAuthorized": false,
     "policiesAuthorized": false
   },
-  "forbidden": {
+  "forbiddenUntilSeparateAuthorization": {
+    "secrets": true,
     "firestoreRead": true,
+    "browser": true,
     "operationalWrites": true,
     "hostingDeploy": true,
-    "browser": true,
     "rulesDeploy": true,
     "functionsDeploy": true,
     "production": true,
     "mergeMain": true,
     "policies": true
   },
-  "stopRule": "if_readiness_fails_classify_first_real_failure_before_any_other_phase",
+  "nextAction": "PREPARE_RUNTIME_SMOKE_5_1_0_SAME_GATE_WITHOUT_EXECUTING_PRIVILEGED_CAPABILITIES",
   "containsPII": false,
   "containsSecrets": false
 }
