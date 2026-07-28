@@ -1,7 +1,7 @@
 {
   "schemaVersion":"orbit360-m5-release-candidate-authorization-v2",
   "issuedAt":"2026-07-28","updatedAt":"2026-07-28","gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.1","branch":"ays/backend-tenant-lab-v99-20260703",
-  "explicitAuthorization":true,"authorizationSource":"continuation_after_m4_canonical_closure_20260728","packagePublicationAuthorized":true,"readinessExecutionAuthorized":true,"allowedExecutions":1,"requestCreated":false,
-  "priorInvalidatedRunId":30400072369,"priorInvalidationClassification":"VALIDATOR_STALE","priorInvalidationReason":"canonical_target_cardinality_omitted",
-  "remoteLabIntegrityRead":true,"secrets":false,"firestoreRead":false,"browser":false,"hostingDeploy":false,"operationalWrites":false,"production":false,"policies":false,"mergeMain":false,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"containsPII":false,"containsSecrets":false
+  "explicitAuthorization":false,"authorizationSource":"continuation_after_m4_canonical_closure_20260728","packagePublicationAuthorized":false,"readinessExecutionAuthorized":false,"allowedExecutions":0,"requestCreated":true,"requestCommit":"c135766b723ac34d28348463c6d179f4d5762d72","runId":30405803919,"jobId":90430826225,"artifactId":8706474484,"executionConsumed":true,
+  "outcome":"M5_RC_READY_FOR_RUNTIME_SMOKE","releaseCandidateHash":"a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13","remoteLabIntegrityRead":true,"remoteLabParity":true,
+  "secrets":false,"firestoreRead":false,"browser":false,"hostingDeploy":false,"operationalWrites":false,"production":false,"policies":false,"mergeMain":false,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"containsPII":false,"containsSecrets":false
 }
