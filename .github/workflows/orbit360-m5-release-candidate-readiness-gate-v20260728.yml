@@ -1,0 +1,76 @@
+name: Orbit 360 · M5 release candidate · RC_READINESS
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['tools/orbit360-m5-release-candidate-readiness-request-v20260728.json']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-m5-release-candidate-visualization
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: tools/orbit360-m5-release-candidate-readiness-request-v20260728.json
+jobs:
+  rc-readiness:
+    name: M5 · Release candidate readiness · no deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}', fetch-depth: 2, persist-credentials: false}
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Validar solicitud inmutable sin acceso externo
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "${ORBIT360_BRANCH}"
+          test "${GITHUB_RUN_ATTEMPT}" = '1'
+          node <<'NODE'
+          const fs=require('fs'),cp=require('child_process');const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim(),bad=[];
+          if(r.schemaVersion!=='orbit360-m5-release-candidate-readiness-request-v1'||r.gateId!==process.env.ORBIT360_GATE_ID||r.contractVersion!=='5.0.0'||r.branch!==process.env.ORBIT360_BRANCH)bad.push('schema_scope');
+          if(r.authorizedBaseCommit!==parent||r.explicitAuthorization!==true||r.allowedExecutions!==1||r.readinessStatic!==true||r.remoteLabIntegrityRead!==true)bad.push('binding_authorization');
+          if(r.secrets!==false||r.firestoreRead!==false||r.browser!==false||r.deploy!==false||r.operationalWrites!==false||r.production!==false||r.policies!==false||r.mergeMain!==false)bad.push('capabilities');
+          if(r.containsPII!==false||r.containsSecrets!==false)bad.push('sanitization');if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
+          NODE
+      - name: Preflight canónico antes de cualquier capacidad externa
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="5.0.0" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .activationMode=="immutable_request_present" and .validationMode=="executed_contract_fixtures" and .literalSourceInspection==false and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Probar contrato antes de comparar LAB
+        run: node tools/orbit360-m5-release-candidate-contract-v20260728.cjs
+      - name: Calcular RC y comparar integridad pública LAB
+        run: node tools/orbit360-m5-release-candidate-readiness-v20260728.mjs
+      - name: Validar evidencia sanitizada de readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.ok==true and (.status=="M5_RC_READY_FOR_RUNTIME_SMOKE" or .status=="M5_RC_READY_LAB_DELIVERY_REQUIRED") and .prerequisites.m1Closed==true and .prerequisites.m2Closed==true and .prerequisites.m3Closed==true and .prerequisites.m4Closed==true and .dataBaseline.clients==414 and .dataBaseline.insurers==26 and .dataBaseline.advisors==7 and .dataBaseline.missingClientCurrency==0 and .dataBaseline.targetOnlyClients==0 and .dataBaseline.targetOnlyInsurers==0 and .visualReadiness.mobileTitleResponsiveContract==true and .visualReadiness.m1HumanApprovalPresent==true and .releaseCandidate.allCriticalAssetsPresent==true and .releaseCandidate.criticalAssetCount==40 and (.releaseCandidate.hash|length)==64 and .remoteLab.assetsExpected==22 and .remoteLab.assetsChecked==22 and ((.remoteLab.remoteParity==true and .remoteLab.assetsMatched==22 and .approvalReadyForRuntimeSmoke==true and .approvalReadyForLabDelivery==false) or (.remoteLab.remoteParity==false and .remoteLab.mismatchCount>0 and .approvalReadyForRuntimeSmoke==false and .approvalReadyForLabDelivery==true)) and .writes.operationalWrites==0 and .secrets==false and .firestoreRead==false and .browser==false and .deploy==false and .productionTouched==false and .policies==false and .containsPII==false and .containsSecrets==false' orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-summary.json >/dev/null
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-release-candidate-readiness-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-contract-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-manifest.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-summary.json
+          retention-days: 30
+      - name: Publicar estado observable sanitizado
+        if: always()
+        env: {GH_TOKEN: '${{ github.token }}'}
+        shell: bash
+        run: |
+          set -euo pipefail
+          summary='orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-summary.json'; state=failure; description='M5 RC readiness failed'
+          if [ -f "$summary" ] && [ "$(jq -r '.ok // false' "$summary")" = true ]; then state=success; description="$(jq -r '.status' "$summary")"; fi
+          payload="$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m5-rc-readiness"}')"
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$payload"
