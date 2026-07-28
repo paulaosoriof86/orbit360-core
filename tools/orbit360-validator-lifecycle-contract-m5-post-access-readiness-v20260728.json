@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-post-access-readiness-v1","issuedAt":"2026-07-28","repository":"paulaosoriof86/orbit360-core","branch":"ays/backend-tenant-lab-v99-20260703","pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728","gateContractVersion":"5.0.3","validatorLifecycleRevision":"phase-capability-contract-v1","controlPlaneRevision":"m5-post-access-readiness-v1","classification":"M5_POST_ACCESS_RC_READINESS_STATIC",
+  "executionProfile":{"phase":"M5_POST_ACCESS_RC_READINESS_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
+  "baseline":{"m4":"orbit360-platform/runtime-gate-crm-v20260716/m4-block-closure.json","access":"orbit360-platform/runtime-gate-crm-v20260716/m5-access-role-boundary-502-closure.json"},
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"continuation_after_access_5_0_2_20260728","readinessExecutionAuthorized":true,"allowedExecutions":1,"browserAuthorized":false,"hostingDeployAuthorized":false,"writeAuthorized":false,"requestCreated":false},
+  "expected":{"criticalAssetCount":41,"remoteVisualAssetCount":24,"accessBoundaryClosed":true,"runtimeSmokeAuthorized":false},
+  "nextRequiredDecision":"IF_LAB_PARITY_FALSE_REQUEST_EXPLICIT_HOSTING_LAB_DELIVERY_AUTHORIZATION;_IF_TRUE_PREPARE_RUNTIME_SMOKE",
+  "containsPII":false,"containsSecrets":false
+}
