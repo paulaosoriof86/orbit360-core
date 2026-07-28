@@ -1,10 +1,11 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-freeze-v6","issuedAt":"2026-07-28","updatedAt":"2026-07-28","gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.1","status":"M5_READINESS_5_0_1_CLOSED_ACCESS_FIX_REQUIRED_BEFORE_RUNTIME_SMOKE",
-  "readinessClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-501-closure.json",
+  "schemaVersion":"orbit360-m5-release-candidate-freeze-v7","issuedAt":"2026-07-28","updatedAt":"2026-07-28","gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.3","status":"M5_LAB_DELIVERY_AUTHORIZATION_REQUIRED_BEFORE_RUNTIME_SMOKE",
   "canonicalBaseline":{"m4Closed":true,"sourceClients":414,"sourceInsurers":26,"canonicalTargetConfig":1,"canonicalTargetMemberships":1,"canonicalTargetClients":414,"canonicalTargetInsurers":26,"advisors":7,"missingClientCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0,"m4FinalRevalidationPassed":true},
-  "releaseCandidate":{"hash":"a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13","criticalAssetCount":40,"remoteVisualAssetCount":22,"remoteVisualAssetsMatched":22,"remoteParity":true,"hostingDeployRequired":false},
+  "accessBoundary":{"closed":true,"contractVersion":"5.0.2","runId":30407030063,"preflight":"29/29","hardcodedAdvisorId":false,"globalRoleEnumeration":false,"labMissingProjectionFailClosed":true,"backendWrites":0,"membershipWrites":0},
+  "releaseCandidate":{"hash":"d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045","criticalAssetCount":41,"remoteVisualAssetCount":24,"remoteVisualAssetsMatched":21,"mismatchCount":3,"remoteParity":false,"hostingDeployRequired":true},
+  "labMismatch":{"assets":["index.html","core/product-role-taxonomy-p0.js","core/access-role-session-owner-v20260728.js"],"classification":"ENVIRONMENT_DELIVERY_GAP_NOT_FUNCTIONAL_DEFECT"},
   "authorization":{"readinessExecutionConsumed":true,"allowedReadinessExecutions":0,"runtimeSmokeAuthorized":false,"allowedRuntimeSmokeExecutions":0,"hostingDeployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false},
-  "blockingFunctionalDefect":{"classification":["FUNCTIONAL_DEFECT","SECURITY_FAILURE"],"owner":"Access","issue":"legacy_role_selector_and_session_accept_roles_outside_effective_membership","requiredFix":"selector_uses_effective_membership_roles_and_session_rejects_unassigned_role"},
-  "forbiddenUntilAccessFixValidated":{"runtimeSmoke":true,"browser":true,"hostingDeploy":true,"visualReview":true,"production":true,"mergeMain":true,"policies":true,"writesToBackend":true},
-  "nextAction":"FIX_ACCESS_ROLE_SELECTOR_AND_SESSION_BOUNDARY_STATIC_THEN_PREPARE_RUNTIME_SMOKE","containsPII":false,"containsSecrets":false
+  "forbiddenUntilSeparateHostingAuthorization":{"runtimeSmoke":true,"browser":true,"hostingDeploy":true,"visualReview":true,"production":true,"mergeMain":true,"policies":true,"writesToBackend":true},
+  "nextAction":"REQUEST_EXPLICIT_AUTHORIZATION_FOR_ONE_HOSTING_LAB_DELIVERY_OF_EXACT_RC_D90EC601_THEN_RECHECK_24_OF_24",
+  "containsPII":false,"containsSecrets":false
 }
