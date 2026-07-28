@@ -1,4 +1,8 @@
 {
-  "schemaVersion":"orbit360-m5-post-access-readiness-authorization-v1","issuedAt":"2026-07-28","gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.3","branch":"ays/backend-tenant-lab-v99-20260703",
-  "explicitAuthorization":true,"authorizationSource":"continuation_after_access_5_0_2_20260728","readinessExecutionAuthorized":true,"allowedExecutions":1,"requestCreated":false,"remoteLabIntegrityRead":true,"secrets":false,"firestoreRead":false,"browser":false,"deploy":false,"operationalWrites":false,"production":false,"policies":false,"mergeMain":false,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"containsPII":false,"containsSecrets":false
+  "schemaVersion":"orbit360-m5-post-access-readiness-authorization-v1",
+  "issuedAt":"2026-07-28","updatedAt":"2026-07-28",
+  "gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.3","branch":"ays/backend-tenant-lab-v99-20260703",
+  "explicitAuthorization":false,"authorizationSource":"continuation_after_access_5_0_2_20260728","readinessExecutionAuthorized":false,"allowedExecutions":0,"requestCreated":true,"requestCommit":"aa70fd428482efaf5026541fe6659952f1d3a28b","runId":30407606087,"jobId":90436443100,"artifactId":8707145062,"executionConsumed":true,
+  "outcome":"M5_RC_READY_LAB_DELIVERY_REQUIRED","releaseCandidateHash":"d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045","remoteLabIntegrityRead":true,"remoteLabParity":false,"remoteAssetsExpected":24,"remoteAssetsMatched":21,"mismatchCount":3,
+  "secrets":false,"firestoreRead":false,"browser":false,"deploy":false,"operationalWrites":false,"production":false,"policies":false,"mergeMain":false,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"containsPII":false,"containsSecrets":false
 }
