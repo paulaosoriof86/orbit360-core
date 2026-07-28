@@ -1,0 +1,72 @@
+name: Orbit 360 · M5 Access role boundary · STATIC_5_0_2
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['tools/orbit360-m5-access-role-boundary-request-v20260728.json']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-m5-access-role-boundary
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: tools/orbit360-m5-access-role-boundary-request-v20260728.json
+jobs:
+  access-static:
+    name: M5 · Access role/session boundary · static
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}', fetch-depth: 2, persist-credentials: false}
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Validar solicitud inmutable sin acceso externo
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "${ORBIT360_BRANCH}"
+          test "${GITHUB_RUN_ATTEMPT}" = '1'
+          node <<'NODE'
+          const fs=require('fs'),cp=require('child_process');const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim(),bad=[];
+          if(r.schemaVersion!=='orbit360-m5-access-role-boundary-static-request-v1'||r.gateId!==process.env.ORBIT360_GATE_ID||r.contractVersion!=='5.0.2'||r.branch!==process.env.ORBIT360_BRANCH)bad.push('schema_scope');
+          if(r.authorizedBaseCommit!==parent||r.explicitAuthorization!==true||r.allowedExecutions!==1||r.accessStatic!==true)bad.push('binding_authorization');
+          if(r.secrets!==false||r.firestoreRead!==false||r.browser!==false||r.deploy!==false||r.operationalWrites!==false||r.production!==false||r.policies!==false||r.mergeMain!==false)bad.push('capabilities');
+          if(r.containsPII!==false||r.containsSecrets!==false)bad.push('sanitization');if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
+          NODE
+      - name: Preflight canónico Access antes de cualquier capacidad externa
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="5.0.2" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .activationMode=="immutable_request_present" and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Ejecutar fixtures funcionales Access
+        run: node tools/orbit360-m5-access-role-boundary-contract-v20260728.cjs
+      - name: Validar evidencia Access sanitizada
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.status=="PASS" and .contract.ok==true and .contract.status=="M5_ACCESS_ROLE_BOUNDARY_STATIC_READY" and .activation.ok==true and .behavior.productProjectionAccepted==true and .behavior.assignedRolesOnly==true and .behavior.canonicalActiveRolePreserved==true and .behavior.unassignedRoleRejected==true and .behavior.membershipAdvisorOnly==true and .behavior.labMissingProjectionFailClosed==true and .behavior.labMissingProjectionAllowedRoles==0 and .behavior.superAdminAliasVisualOnly==true and .behavior.adminTenantAliasVisualOnly==true and .behavior.unknownRoleDenied==true and .behavior.demoCompatibilityPreserved==true and .integration.ownerLoadedBeforeRouter==true and .integration.taxonomyLoadedBeforeOwner==true and .integration.selectorUsesAllowedRoles==true and .integration.selectorUsesRoleLabel==true and .integration.selectorDisablesWithoutMembership==true and .integration.enumeratesAllGlobalRoles==false and .integration.hardcodedAdvisorId==false and .writes.operationalWrites==0 and .writes.membershipWrites==0 and .containsPII==false and .containsSecrets==false' orbit360-platform/runtime-gate-crm-v20260716/m5-access-role-boundary-contract-summary.json >/dev/null
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-access-role-boundary-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-access-role-boundary-contract-summary.json
+          retention-days: 30
+      - name: Publicar estado observable sanitizado
+        if: always()
+        env: {GH_TOKEN: '${{ github.token }}'}
+        shell: bash
+        run: |
+          set -euo pipefail
+          summary='orbit360-platform/runtime-gate-crm-v20260716/m5-access-role-boundary-contract-summary.json'; state=failure; description='M5 Access static failed'
+          if [ -f "$summary" ] && [ "$(jq -r '.status // ""' "$summary")" = PASS ]; then state=success; description='M5 Access role boundary static ready'; fi
+          payload="$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m5-access-role-boundary"}')"
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$payload"
