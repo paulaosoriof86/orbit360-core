@@ -10,11 +10,11 @@
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m4-final-canonical-migration-write-v1-r1",
   "classification":"DATA_CONTRACT_FINAL_CANONICAL_MIGRATION_WRITE",
-  "executionProfile":{"phase":"M4_FINAL_CANONICAL_MIGRATION_WRITE_EXECUTION","capabilities":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":true,"requestModel":"immutable_request_bound_to_parent_commit"},
+  "executionProfile":{"phase":"M4_FINAL_CANONICAL_MIGRATION_WRITE_EXECUTION","capabilities":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
   "baseline":"orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-migration-dryrun-closure.json",
-  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260728","packagePublicationAuthorized":true,"writeExecutionAuthorized":true,"allowedExecutions":1,"emergencyRollbackAuthorized":true,"requestCreated":true,"retryOrdinal":1,"priorFailedRunId":30404130402,"priorFailureClassification":"VALIDATOR_STALE","priorFailureOperationalWrites":0},
+  "authorization":{"explicitAuthorization":false,"authorizationSource":"user_autorizado_20260728","packagePublicationAuthorized":false,"writeExecutionAuthorized":false,"allowedExecutions":0,"emergencyRollbackAuthorized":false,"requestCreated":true,"retryOrdinal":1,"priorFailedRunId":30404130402,"successfulRunId":30404333112,"executionConsumed":true},
   "writeBudget":{"configCreates":1,"clientCreates":414,"insurerCreates":26,"targetCreates":441,"snapshotWrites":441,"auditWrites":442,"importBatchWrites":2,"membershipWrites":0,"maxSuccessOperationalWrites":1326,"maxRollbackTargetDeletes":441,"maxRollbackAuditWrites":442,"maxRollbackBatchUpdates":1},
-  "nextRequiredDecision":"ONE_REPAIRED_RETRY_ONLY;_IF_SAME_STAGE_FAILS_STOP",
+  "nextRequiredDecision":"RUN_FINAL_DURABLE_READONLY_REVALIDATION_4_3_2",
   "containsPII":false,
   "containsSecrets":false
 }
