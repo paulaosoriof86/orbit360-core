@@ -1,0 +1,11 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v1",
+  "issuedAt":"2026-07-28",
+  "gateId":"block4-final-canonical-revalidation-readonly-v20260728",
+  "contractVersion":"4.3.2",
+  "phase":"M4_FINAL_CANONICAL_REVALIDATION_READONLY_EXECUTION",
+  "required":{"priorWriteClosureValidated":true,"sourceClients":414,"sourceInsurers":26,"targetConfig":1,"memberships":1,"targetClients":414,"targetInsurers":26,"snapshots":441,"recordAudits":441,"batchAudits":1,"batchStatus":"completed","operationalWrites":0},
+  "capabilityBoundary":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
