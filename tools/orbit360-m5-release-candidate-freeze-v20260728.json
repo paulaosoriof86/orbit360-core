@@ -1,17 +1,8 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-freeze-v4",
-  "issuedAt":"2026-07-28",
-  "updatedAt":"2026-07-28",
-  "gateId":"block5-release-candidate-visualization-v20260728",
-  "contractVersion":"5.0.1",
-  "status":"M5_UNFROZEN_CANONICAL_BASELINE_READY_READINESS_REPAIR_REQUIRED",
-  "classificationHistory":["VALIDATOR_STALE","DATA_CONTRACT_FAILURE"],
-  "releaseCandidateEvidencePreserved":{"hash":"a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13","hashAlgorithm":"sha256","criticalAssetCount":40,"remoteVisualAssetCount":22,"remoteVisualAssetsMatched":22,"remoteParity":true,"sufficientForProductReadiness":false,"mustRecalculate":true},
-  "canonicalBaseline":{"m4Closed":true,"m4Status":"M4_CLOSED_SUCCESS_CANONICAL_TARGET_VERIFIED","sourceClients":414,"sourceInsurers":26,"canonicalTargetConfig":1,"canonicalTargetMemberships":1,"canonicalTargetClients":414,"canonicalTargetInsurers":26,"missingClientCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0,"finalRevalidationRunId":30405006131},
-  "authorization":{"readinessExecutionAuthorized":false,"allowedReadinessExecutions":0,"runtimeSmokeAuthorized":false,"allowedRuntimeSmokeExecutions":0,"hostingDeployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false},
-  "forbiddenUntilCorrectedReadinessPasses":{"runtimeSmoke":true,"browser":true,"hostingDeploy":true,"visualReview":true,"production":true,"mergeMain":true,"policies":true},
-  "correctedM5ReadinessMustRequire":{"sourceClients":414,"sourceInsurers":26,"canonicalTargetConfig":1,"canonicalTargetMemberships":1,"canonicalTargetClients":414,"canonicalTargetInsurers":26,"advisors":7,"missingClientCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0,"m4FinalReadOnlyRevalidation":true},
-  "nextAction":"REPAIR_M5_READINESS_5_0_1_AND_RUN_STATIC_READINESS_WITHOUT_BROWSER_OR_DEPLOY",
-  "containsPII":false,
-  "containsSecrets":false
+  "schemaVersion":"orbit360-m5-release-candidate-freeze-v5","issuedAt":"2026-07-28","updatedAt":"2026-07-28","gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.1","status":"READY_FOR_ONE_CORRECTED_RC_READINESS_EXECUTION",
+  "priorReadiness":{"runId":30400072369,"invalidated":true,"classification":"VALIDATOR_STALE","technicalParityEvidencePreserved":true,"priorHash":"a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13","mustRecalculate":true},
+  "canonicalBaseline":{"m4Closed":true,"m4Status":"M4_CLOSED_SUCCESS_CANONICAL_TARGET_VERIFIED","sourceClients":414,"sourceInsurers":26,"canonicalTargetConfig":1,"canonicalTargetMemberships":1,"canonicalTargetClients":414,"canonicalTargetInsurers":26,"advisors":7,"missingClientCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0,"m4FinalRevalidationPassed":true},
+  "authorization":{"readinessExecutionAuthorized":true,"allowedReadinessExecutions":1,"runtimeSmokeAuthorized":false,"allowedRuntimeSmokeExecutions":0,"hostingDeployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false,"requestCreated":false},
+  "forbidden":{"runtimeSmoke":true,"browser":true,"hostingDeploy":true,"visualReview":true,"production":true,"mergeMain":true,"policies":true,"writes":true},
+  "nextAction":"CREATE_IMMUTABLE_5_0_1_REQUEST_AND_RUN_STATIC_READINESS_ONCE","containsPII":false,"containsSecrets":false
 }
