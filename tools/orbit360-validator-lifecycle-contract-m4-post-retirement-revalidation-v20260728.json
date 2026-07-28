@@ -7,9 +7,9 @@
   "gateId": "block4-post-retirement-revalidation-readonly-v20260728",
   "gateContractVersion": "4.2.10",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "controlPlaneRevision": "m4-post-retirement-revalidation-v1",
+  "controlPlaneRevision": "m4-post-retirement-revalidation-v2-audit-snapshot-ref",
   "methodologicalDecisionId": "post-retirement-durable-readonly-revalidation-before-gt-gtq-write-20260728",
-  "classification": "DATA_CONTRACT_REVALIDATION_READONLY",
+  "classification": "PIPELINE_MECHANISM_FAILURE_REPAIRED_READONLY",
   "executionProfile": {
     "phase": "M4_POST_RETIREMENT_REVALIDATION_READONLY_EXECUTION",
     "capabilities": {
@@ -31,12 +31,29 @@
     "requestModel": "immutable_request_bound_to_parent_commit"
   },
   "baseline": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-retirement-write-closure.json",
+  "priorFailedExecution": {
+    "runId": 30395156011,
+    "jobId": 90396118824,
+    "artifactId": 8702484870,
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "firstFailedStage": "M4_POST_RETIREMENT_REVALIDATION_READONLY_EXECUTION",
+    "cause": "collectionGroup_two_filter_query_required_unneeded_index",
+    "operationalWrites": 0
+  },
+  "repair": {
+    "scope": "runtime_read_mechanism_only",
+    "oldMechanism": "collectionGroup records filtered by tenantId and gateId",
+    "newMechanism": "tenant auditEvents by gateId then exact snapshotRef reads",
+    "indexCreationAuthorized": false,
+    "dataRepairAuthorized": false
+  },
   "authorization": {
     "explicitAuthorization": true,
-    "authorizationSource": "user_continuemos_20260728",
+    "authorizationSource": "user_continuemos_20260728_plus_first_failure_repair_protocol",
     "packagePublicationAuthorized": true,
     "readOnlyExecutionAuthorized": true,
     "allowedExecutions": 1,
+    "retryOrdinal": 1,
     "writeAuthorized": false,
     "requestCreated": false
   },
@@ -55,6 +72,7 @@
     "rawValuesExported": false,
     "pseudonymousTokensExported": false
   },
+  "stopRule": "if_retry_ordinal_1_fails_same_runtime_stage_stop_without_third_attempt",
   "nextRequiredDecision": "AFTER_PASS_EVALUATE_SEPARATE_AUTHORIZATION_FOR_61_GT_GTQ_CLIENT_CORRECTIONS",
   "containsPII": false,
   "containsSecrets": false
