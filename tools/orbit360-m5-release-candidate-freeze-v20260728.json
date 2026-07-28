@@ -1,30 +1,28 @@
 {
-  "schemaVersion": "orbit360-m5-release-candidate-freeze-v2",
+  "schemaVersion": "orbit360-m5-release-candidate-freeze-v3",
   "issuedAt": "2026-07-28",
   "updatedAt": "2026-07-28",
   "gateId": "block5-release-candidate-visualization-v20260728",
   "contractVersion": "5.0.0",
-  "status": "M5_RC_READINESS_CLOSED_RUNTIME_SMOKE_PREPARATION_ALLOWED",
-  "releaseCandidate": {
+  "status": "M5_FROZEN_M4_CANONICAL_TARGET_MIGRATION_PENDING",
+  "classification": ["VALIDATOR_STALE", "DATA_CONTRACT_FAILURE"],
+  "releaseCandidateEvidencePreserved": {
     "hash": "a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13",
     "hashAlgorithm": "sha256",
     "criticalAssetCount": 40,
     "remoteVisualAssetCount": 22,
     "remoteVisualAssetsMatched": 22,
-    "remoteParity": true
+    "remoteParity": true,
+    "sufficientForProductReadiness": false
   },
-  "expected": {
-    "m1Closed": true,
-    "m2Closed": true,
-    "m3Closed": true,
-    "m4Closed": true,
-    "clients": 414,
-    "insurers": 26,
-    "advisors": 7,
-    "missingClientCurrency": 0,
-    "targetOnlyClients": 0,
-    "targetOnlyInsurers": 0,
-    "mobileTitleResponsiveContract": true
+  "currentBlockingPredicate": {
+    "m4Closed": false,
+    "canonicalTargetClientsRequired": 414,
+    "canonicalTargetInsurersRequired": 26,
+    "canonicalTargetConfigRequired": 1,
+    "latestDurableTargetClients": 0,
+    "latestDurableTargetInsurers": 0,
+    "latestDurableTargetConfig": 0
   },
   "authorization": {
     "readinessExecutionConsumed": true,
@@ -36,19 +34,26 @@
     "productionAuthorized": false,
     "policiesAuthorized": false
   },
-  "forbiddenUntilSeparateAuthorization": {
-    "secrets": true,
-    "firestoreRead": true,
+  "forbiddenUntilM4Closes": {
+    "runtimeSmoke": true,
     "browser": true,
-    "operationalWrites": true,
     "hostingDeploy": true,
-    "rulesDeploy": true,
-    "functionsDeploy": true,
+    "visualReview": true,
     "production": true,
     "mergeMain": true,
     "policies": true
   },
-  "nextAction": "PREPARE_RUNTIME_SMOKE_5_1_0_SAME_GATE_WITHOUT_EXECUTING_PRIVILEGED_CAPABILITIES",
+  "futureM5ReadinessMustRequire": {
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "canonicalTargetClients": 414,
+    "canonicalTargetInsurers": 26,
+    "canonicalTargetConfig": 1,
+    "missingClientCurrency": 0,
+    "targetOnlyClients": 0,
+    "targetOnlyInsurers": 0
+  },
+  "nextAction": "RETURN_TO_M4_COMPLETE_CANONICAL_TARGET_MIGRATION_AND_REVALIDATE_BEFORE_NEW_M5_READINESS",
   "containsPII": false,
   "containsSecrets": false
 }
