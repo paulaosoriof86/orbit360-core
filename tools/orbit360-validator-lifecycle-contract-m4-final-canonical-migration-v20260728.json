@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-final-canonical-migration-v1",
+  "issuedAt": "2026-07-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-final-canonical-migration-dryrun-v20260728",
+  "gateContractVersion": "4.3.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-final-canonical-migration-dryrun-v1",
+  "classification": "DATA_CONTRACT_FINAL_CANONICAL_MIGRATION_DRYRUN",
+  "executionProfile": {
+    "phase": "M4_FINAL_CANONICAL_MIGRATION_DRYRUN_EXECUTION",
+    "capabilities": {"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+    "operationalWritesAuthorized": false,
+    "requestModel": "immutable_request_bound_to_parent_commit"
+  },
+  "baseline": "orbit360-platform/runtime-gate-crm-v20260716/m4-block-closure.json",
+  "authorization": {
+    "explicitAuthorization": true,
+    "authorizationSource": "user_continua_siguiente_accion_20260728_root_cause_recovery",
+    "packagePublicationAuthorized": true,
+    "readOnlyExecutionAuthorized": true,
+    "allowedExecutions": 1,
+    "writeAuthorized": false,
+    "requestCreated": false
+  },
+  "expected": {
+    "sourceClients":414,"sourceInsurers":26,"canonicalTargetClients":0,"canonicalTargetInsurers":0,"canonicalTargetConfig":0,
+    "clientCreates":414,"insurerCreates":26,"configCreates":1,"requiresValidation":0,"targetOnly":0,"operationalWrites":0
+  },
+  "nextRequiredDecision": "IF_PASS_REQUEST_SEPARATE_AUTHORIZATION_FOR_CANONICAL_TARGET_WRITE",
+  "containsPII": false,
+  "containsSecrets": false
+}
