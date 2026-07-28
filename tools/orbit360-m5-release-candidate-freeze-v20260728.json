@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "orbit360-m5-release-candidate-freeze-v1",
+  "issuedAt": "2026-07-28",
+  "gateId": "block5-release-candidate-visualization-v20260728",
+  "contractVersion": "5.0.0",
+  "status": "READY_FOR_ONE_RC_READINESS_EXECUTION",
+  "expected": {
+    "m1Closed": true,
+    "m2Closed": true,
+    "m3Closed": true,
+    "m4Closed": true,
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "missingClientCurrency": 0,
+    "targetOnlyClients": 0,
+    "targetOnlyInsurers": 0,
+    "criticalAssetCount": 40,
+    "remoteVisualAssetCount": 22,
+    "mobileTitleResponsiveContract": true
+  },
+  "authorization": {
+    "readinessExecutionAuthorized": true,
+    "allowedExecutions": 1,
+    "hostingDeployAuthorized": false,
+    "browserAuthorized": false,
+    "productionAuthorized": false,
+    "policiesAuthorized": false
+  },
+  "forbidden": {
+    "firestoreRead": true,
+    "operationalWrites": true,
+    "hostingDeploy": true,
+    "browser": true,
+    "rulesDeploy": true,
+    "functionsDeploy": true,
+    "production": true,
+    "mergeMain": true,
+    "policies": true
+  },
+  "stopRule": "if_readiness_fails_classify_first_real_failure_before_any_other_phase",
+  "containsPII": false,
+  "containsSecrets": false
+}
