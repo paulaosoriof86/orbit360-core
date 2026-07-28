@@ -85,11 +85,23 @@ clientCorrectionWriteAuthorized: false
 
 Por tanto, las 61 correcciones GT/GTQ continúan sin autorización de escritura.
 
-## Pólizas y demás fuentes
+## Regla vinculante de fuentes reales posteriores
 
-Pólizas continúan bloqueadas. La hoja histórica de producción no es fuente de Pólizas. Cuando corresponda el bloque Pólizas, se debe solicitar a Paula el listado/fuente vigente específico y no inferirlo desde producción.
+Cada bloque de migración debe solicitar a Paula su fuente real vigente en el momento exacto en que se necesite. Si la fuente no se ha entregado, el bloque se detiene como `FUENTE_REAL_REQUERIDA`; no se sustituye con datos inferidos de otra fuente.
 
-El mismo principio aplica a Vehículos, Recibos/cartera, Cobros, planillas, financiero y documentos: cada fuente real se solicita cuando su bloque la necesite.
+Aplicación mínima:
+
+```text
+Pólizas → pedir listado/base actual de pólizas.
+Vehículos → pedir fuente actual de vehículos.
+Recibos/cartera → pedir fuente vigente de recibos/cuotas/cartera.
+Cobros → pedir fuente real de cobros/recaudos.
+Planillas/comisiones → pedir sus planillas reales.
+Financiero histórico → pedir su fuente específica.
+Documentos/siniestros/configuración → pedir la fuente específica cuando llegue el bloque.
+```
+
+La hoja histórica `Listado producción 2025-2026` no es fuente de Pólizas y queda expresamente prohibida como sustituto para migrarlas.
 
 ## Claude y Academia
 
