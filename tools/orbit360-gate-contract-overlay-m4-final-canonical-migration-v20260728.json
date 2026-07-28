@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v1",
+  "issuedAt":"2026-07-28",
+  "gateId":"block4-final-canonical-migration-dryrun-v20260728",
+  "contractVersion":"4.3.0",
+  "phase":"M4_FINAL_CANONICAL_MIGRATION_DRYRUN_EXECUTION",
+  "required":{
+    "m4Reopened":true,"sourceClients":414,"sourceInsurers":26,"canonicalTargetClients":0,"canonicalTargetInsurers":0,"canonicalTargetConfig":0,
+    "clientCreates":414,"insurerCreates":26,"configCreates":1,"requiresValidation":0,"targetOnly":0,"operationalWrites":0
+  },
+  "capabilityBoundary":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
