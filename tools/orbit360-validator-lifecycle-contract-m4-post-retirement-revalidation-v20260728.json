@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-post-retirement-revalidation-v1",
+  "issuedAt": "2026-07-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-post-retirement-revalidation-readonly-v20260728",
+  "gateContractVersion": "4.2.10",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-post-retirement-revalidation-v1",
+  "methodologicalDecisionId": "post-retirement-durable-readonly-revalidation-before-gt-gtq-write-20260728",
+  "classification": "DATA_CONTRACT_REVALIDATION_READONLY",
+  "executionProfile": {
+    "phase": "M4_POST_RETIREMENT_REVALIDATION_READONLY_EXECUTION",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "operationalWritesAuthorized": false,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "migrationWritesAuthorized": false,
+    "rulesChangeAuthorized": false,
+    "requestModel": "immutable_request_bound_to_parent_commit"
+  },
+  "baseline": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-retirement-write-closure.json",
+  "authorization": {
+    "explicitAuthorization": true,
+    "authorizationSource": "user_continuemos_20260728",
+    "packagePublicationAuthorized": true,
+    "readOnlyExecutionAuthorized": true,
+    "allowedExecutions": 1,
+    "writeAuthorized": false,
+    "requestCreated": false
+  },
+  "expected": {
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "targetClients": 0,
+    "targetInsurers": 0,
+    "snapshotsReadable": 4,
+    "auditEventsReadable": 4,
+    "operationalWrites": 0
+  },
+  "privacy": {
+    "mode": "sanitized_aggregate_execution_evidence",
+    "recordIdsExported": false,
+    "rawValuesExported": false,
+    "pseudonymousTokensExported": false
+  },
+  "nextRequiredDecision": "AFTER_PASS_EVALUATE_SEPARATE_AUTHORIZATION_FOR_61_GT_GTQ_CLIENT_CORRECTIONS",
+  "containsPII": false,
+  "containsSecrets": false
+}
