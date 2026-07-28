@@ -1,0 +1,23 @@
+{
+  "schemaVersion":"orbit360-m4-final-canonical-migration-authorization-v1",
+  "issuedAt":"2026-07-28",
+  "gateId":"block4-final-canonical-migration-dryrun-v20260728",
+  "contractVersion":"4.3.0",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "explicitAuthorization":true,
+  "authorizationSource":"user_continua_siguiente_accion_20260728_root_cause_recovery",
+  "packagePublicationAuthorized":true,
+  "readOnlyExecutionAuthorized":true,
+  "allowedExecutions":1,
+  "requestCreated":false,
+  "secrets":true,
+  "firestoreRead":true,
+  "writes":false,
+  "browser":false,
+  "deploy":false,
+  "production":false,
+  "policies":false,
+  "mergeMain":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
