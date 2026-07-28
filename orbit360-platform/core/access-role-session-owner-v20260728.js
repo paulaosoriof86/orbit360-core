@@ -5,16 +5,18 @@
    Owner frontend fail-closed. En canales que requieren backend/membership:
    - solo acepta roles presentes en la proyección autenticada;
    - advisorId proviene únicamente de membership;
-   - aliases canónicos son solo de lectura/visualización;
+   - aliases son solo de lectura/visualización;
+   - el rol canónico de vista se conserva separado del estado legacy;
    - no escribe memberships ni backend.
    ============================================================ */
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var VERSION = '20260728.1';
+  var VERSION = '20260728.2';
   var legacy = window.Orbit.session || {};
-  var KEY = 'orbit360_sessionview';
+  var LEGACY_KEY = 'orbit360_sessionview';
+  var VIEW_KEY = 'orbit360_effective_role_view';
   var VISUAL_ROLE = Object.freeze({ SuperAdmin: 'Dirección', AdminTenant: 'Admin' });
   var PRIVILEGED = Object.freeze(['Dirección', 'SuperAdmin', 'AdminTenant']);
 
@@ -38,6 +40,16 @@
     var clean = text(value);
     if (clean === 'Admin') return 'AdminTenant';
     return clean;
+  }
+  function canonicalRoles(values) {
+    var owner = taxonomy();
+    if (owner && typeof owner.canonicalRoles === 'function') return owner.canonicalRoles(values || []);
+    var out = [];
+    (Array.isArray(values) ? values : []).forEach(function (value) {
+      var role = canonicalRole(value);
+      if (role && out.indexOf(role) < 0) out.push(role);
+    });
+    return out;
   }
   function visualRole(value) {
     var role = canonicalRole(value);
@@ -77,16 +89,6 @@
       productReadOnly: true
     };
   }
-  function canonicalRoles(values) {
-    var owner = taxonomy();
-    if (owner && typeof owner.canonicalRoles === 'function') return owner.canonicalRoles(values || []);
-    var out = [];
-    (Array.isArray(values) ? values : []).forEach(function (value) {
-      var role = canonicalRole(value);
-      if (role && out.indexOf(role) < 0) out.push(role);
-    });
-    return out;
-  }
   function queryRequiresMembership() {
     try {
       var params = new URLSearchParams(window.location && window.location.search || '');
@@ -113,11 +115,25 @@
     try { return legacy && typeof legacy.rol === 'function' ? canonicalRole(legacy.rol()) : ''; }
     catch (error) { return ''; }
   }
+  function readViewRole() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(VIEW_KEY) || 'null');
+      return canonicalRole(saved && saved.role);
+    } catch (error) { return ''; }
+  }
+  function saveViewRole(role) {
+    try { localStorage.setItem(VIEW_KEY, JSON.stringify({ role: canonicalRole(role) })); return true; }
+    catch (error) { return false; }
+  }
+  function clearSecureView() {
+    try { localStorage.removeItem(VIEW_KEY); } catch (error) {}
+    try { localStorage.removeItem(LEGACY_KEY); } catch (error) {}
+  }
   function currentRole() {
     var projection = productProjection();
     if (projection) {
-      var legacyRole = readLegacyRole();
-      return projection.roles.indexOf(legacyRole) >= 0 ? legacyRole : projection.activeRole;
+      var selected = readViewRole();
+      return projection.roles.indexOf(selected) >= 0 ? selected : projection.activeRole;
     }
     if (requiresMembership()) return '';
     var role = readLegacyRole();
@@ -130,14 +146,23 @@
     try { return legacy && typeof legacy.asesorId === 'function' ? text(legacy.asesorId()) : ''; }
     catch (error) { return ''; }
   }
-  function safeSessionWrite(role, advisorId) {
+  function emitSession() {
+    try { document.dispatchEvent(new CustomEvent('orbit:session')); } catch (error) {}
+  }
+  function safeSessionWrite(role, advisorId, projection) {
+    if (projection) {
+      clearSecureView();
+      saveViewRole(role);
+      emitSession();
+      return true;
+    }
     if (legacy && typeof legacy.set === 'function') {
       legacy.set(visualRole(role), advisorId || undefined);
       return true;
     }
     try {
-      localStorage.setItem(KEY, JSON.stringify({ rol: visualRole(role), asesorId: advisorId || '' }));
-      document.dispatchEvent(new CustomEvent('orbit:session'));
+      localStorage.setItem(LEGACY_KEY, JSON.stringify({ rol: visualRole(role), asesorId: advisorId || '' }));
+      emitSession();
       return true;
     } catch (error) { return false; }
   }
@@ -150,19 +175,21 @@
     }
     var projection = productProjection();
     var advisorId = projection ? projection.advisorId : text(ignoredAdvisorId);
-    return safeSessionWrite(role, advisorId);
+    return safeSessionWrite(role, advisorId, projection);
   }
   function syncFromAuth() {
     var projection = productProjection();
     if (!projection) {
       if (requiresMembership()) {
-        try { localStorage.removeItem(KEY); } catch (error) {}
+        clearSecureView();
         try { document.dispatchEvent(new CustomEvent('orbit:session:blocked', { detail: { reason: 'membership_projection_missing' } })); } catch (error) {}
         return false;
       }
       return true;
     }
-    return safeSessionWrite(projection.activeRole, projection.advisorId);
+    var selected = readViewRole();
+    var target = projection.roles.indexOf(selected) >= 0 ? selected : projection.activeRole;
+    return safeSessionWrite(target, projection.advisorId, projection);
   }
   function roleDefinition(role) {
     var visual = visualRole(role);
