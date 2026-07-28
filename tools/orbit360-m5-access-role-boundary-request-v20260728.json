@@ -1,0 +1,22 @@
+{
+  "schemaVersion":"orbit360-m5-access-role-boundary-static-request-v1",
+  "issuedAt":"2026-07-28",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.2",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "authorizedBaseCommit":"069caf4b3972d32e14891b8910435212b79016c0",
+  "explicitAuthorization":true,
+  "authorizationSource":"continuation_after_m5_readiness_5_0_1_20260728",
+  "allowedExecutions":1,
+  "accessStatic":true,
+  "secrets":false,
+  "firestoreRead":false,
+  "browser":false,
+  "deploy":false,
+  "operationalWrites":false,
+  "production":false,
+  "policies":false,
+  "mergeMain":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
