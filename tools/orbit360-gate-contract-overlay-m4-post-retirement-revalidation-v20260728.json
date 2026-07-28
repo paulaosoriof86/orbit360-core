@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-28",
+  "gateId": "block4-post-retirement-revalidation-readonly-v20260728",
+  "contractVersion": "4.2.10",
+  "phase": "M4_POST_RETIREMENT_REVALIDATION_READONLY_EXECUTION",
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": true,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "expected": {
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "targetClients": 0,
+    "targetInsurers": 0,
+    "snapshotsReadable": 4,
+    "auditEventsReadable": 4,
+    "operationalWrites": 0
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
