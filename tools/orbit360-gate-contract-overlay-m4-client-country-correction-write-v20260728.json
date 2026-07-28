@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-28",
+  "gateId": "block4-client-country-correction-write-v20260728",
+  "contractVersion": "4.2.11",
+  "phase": "M4_CLIENT_COUNTRY_CORRECTION_WRITE_EXECUTION",
+  "capabilities": {"secrets":true,"firestoreRead":true,"writes":true,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "expected": {"sourceClients":414,"sourceInsurers":26,"targetClients":0,"targetInsurers":0,"clientCorrections":61,"country":"GT","currency":"GTQ","snapshotWrites":61,"auditWrites":61,"clientUpdates":61,"totalOperationalWrites":183},
+  "containsPII": false,
+  "containsSecrets": false
+}
