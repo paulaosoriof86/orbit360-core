@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"orbit360-m5-access-role-boundary-freeze-v1",
+  "issuedAt":"2026-07-28",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.2",
+  "status":"READY_FOR_ONE_ACCESS_STATIC_EXECUTION",
+  "baseline":{"m4Closed":true,"m5Readiness501Closed":true,"m5Readiness501Hash":"a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13"},
+  "expected":{"ownerVersion":"20260728.2","selectorUsesAssignedRoles":true,"hardcodedAdvisorId":false,"globalRoleEnumeration":false,"labMissingProjectionFailClosed":true,"unassignedRoleRejected":true,"membershipWrites":0,"backendWrites":0},
+  "authorization":{"accessStaticExecutionAuthorized":true,"allowedExecutions":1,"requestCreated":false,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false},
+  "forbidden":{"secrets":true,"firestoreRead":true,"browser":true,"hostingDeploy":true,"writes":true,"production":true,"mergeMain":true,"policies":true},
+  "nextAction":"RUN_ACCESS_STATIC_5_0_2_ONCE",
+  "containsPII":false,
+  "containsSecrets":false
+}
