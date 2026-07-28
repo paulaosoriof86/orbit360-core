@@ -27,7 +27,8 @@ const GATE_CONFIG=Object.freeze({
   "block4-target-only-retirement-dryrun-v20260725":{contractVersion:"4.2.8",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-retirement-dryrun-v20260725.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-retirement-dryrun-v20260725.mjs"},
   "block4-target-only-retirement-write-v20260726":{contractVersion:"4.2.9",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-retirement-write-v20260726.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-retirement-write-v20260726.mjs"},
   "block4-post-retirement-revalidation-readonly-v20260728":{contractVersion:"4.2.10",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-post-retirement-revalidation-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-post-retirement-revalidation-v20260728.mjs"},
-  "block4-client-country-correction-write-v20260728":{contractVersion:"4.2.11",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-client-country-correction-write-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-client-country-correction-write-v20260728.mjs"}
+  "block4-client-country-correction-write-v20260728":{contractVersion:"4.2.11",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-client-country-correction-write-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-client-country-correction-write-v20260728.mjs"},
+  "block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-release-candidate-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-release-candidate-v20260728.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":ZERO,
@@ -42,6 +43,7 @@ const PHASE_PROFILES=Object.freeze({
   "M4_DURABLE_WRITER_DRYRUN_CLOSED":ZERO,
   "M4_DATA_RECONCILIATION_STATIC_REPAIR_READY":ZERO,
   "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_SEMANTIC_REPAIR_STATIC":ZERO,
+  "M5_RC_READINESS_STATIC":ZERO,
   "LAB_DATA_CONTRACT_REPAIR_DRYRUN":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "LAB_DATA_CONTRACT_REPAIR_APPLY":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "LAB_HOSTING_DELIVERY":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
