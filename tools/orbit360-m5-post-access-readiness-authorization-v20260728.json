@@ -1,0 +1,4 @@
+{
+  "schemaVersion":"orbit360-m5-post-access-readiness-authorization-v1","issuedAt":"2026-07-28","gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.3","branch":"ays/backend-tenant-lab-v99-20260703",
+  "explicitAuthorization":true,"authorizationSource":"continuation_after_access_5_0_2_20260728","readinessExecutionAuthorized":true,"allowedExecutions":1,"requestCreated":false,"remoteLabIntegrityRead":true,"secrets":false,"firestoreRead":false,"browser":false,"deploy":false,"operationalWrites":false,"production":false,"policies":false,"mergeMain":false,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"containsPII":false,"containsSecrets":false
+}
