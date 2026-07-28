@@ -5,12 +5,15 @@
     {
       "gateId": "block4-post-retirement-revalidation-readonly-v20260728",
       "contractVersion": "4.2.10",
+      "mechanismRevision": "r1-audit-snapshot-ref",
       "lifecycle": "tools/orbit360-validator-lifecycle-contract-m4-post-retirement-revalidation-v20260728.json",
       "engine": "tools/orbit360-validar-gate-contracts-engine-m4-post-retirement-revalidation-v20260728.mjs",
       "workflow": ".github/workflows/orbit360-m4-post-retirement-revalidation-gate-v20260728.yml",
-      "request": "tools/orbit360-m4-post-retirement-revalidation-request-v20260728.json",
+      "request": "tools/orbit360-m4-post-retirement-revalidation-request-v20260728-r1.json",
+      "incident": "orbit360-platform/docs/INCIDENTE-M4-4210-INDICE-INNECESARIO-COLLECTIONGROUP-20260728.md",
       "phase": "M4_POST_RETIREMENT_REVALIDATION_READONLY_EXECUTION",
       "oneShot": true,
+      "retryOrdinal": 1,
       "containsPII": false,
       "containsSecrets": false
     }
