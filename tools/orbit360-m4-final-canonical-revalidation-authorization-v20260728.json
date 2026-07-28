@@ -1,0 +1,23 @@
+{
+  "schemaVersion":"orbit360-m4-final-canonical-revalidation-authorization-v1",
+  "issuedAt":"2026-07-28",
+  "gateId":"block4-final-canonical-revalidation-readonly-v20260728",
+  "contractVersion":"4.3.2",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "explicitAuthorization":true,
+  "authorizationSource":"derived_post_write_verification_from_user_autorizado_20260728",
+  "readOnlyExecutionAuthorized":true,
+  "allowedExecutions":1,
+  "writeAuthorized":false,
+  "requestCreated":false,
+  "secrets":true,
+  "firestoreRead":true,
+  "writes":false,
+  "browser":false,
+  "deploy":false,
+  "production":false,
+  "policies":false,
+  "mergeMain":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
