@@ -26,21 +26,22 @@ const GATE_CONFIG=Object.freeze({
   "block4-target-only-reconciliation-readonly-v20260725":{contractVersion:"4.2.7",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-reconciliation-v20260725.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-reconciliation-v20260725.mjs"},
   "block4-target-only-retirement-dryrun-v20260725":{contractVersion:"4.2.8",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-retirement-dryrun-v20260725.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-retirement-dryrun-v20260725.mjs"},
   "block4-target-only-retirement-write-v20260726":{contractVersion:"4.2.9",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-retirement-write-v20260726.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-retirement-write-v20260726.mjs"},
-  "block4-post-retirement-revalidation-readonly-v20260728":{contractVersion:"4.2.10",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-post-retirement-revalidation-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-post-retirement-revalidation-v20260728.mjs"}
+  "block4-post-retirement-revalidation-readonly-v20260728":{contractVersion:"4.2.10",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-post-retirement-revalidation-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-post-retirement-revalidation-v20260728.mjs"},
+  "block4-client-country-correction-write-v20260728":{contractVersion:"4.2.11",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-client-country-correction-write-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-client-country-correction-write-v20260728.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
-  "STATIC_PREFLIGHT":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "EXISTING_IDENTITY_RUNTIME_PREPARATION":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "EXISTING_IDENTITY_ROOT_CAUSE_STATIC":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "EXISTING_IDENTITY_RUNTIME_AUTHORIZED_ONCE_PREFLIGHT":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "EXISTING_IDENTITY_MEMBERSHIP_ROOT_CAUSE_STATIC":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "M3_TENANT_ACTIVATION_STATIC_PREPARATION":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "M3_TENANT_ACTIVATION_STATIC_READY":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "M3_TENANT_ACTIVATION_CLOSED":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "M4_DURABLE_WRITER_STATIC_READY":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "M4_DURABLE_WRITER_DRYRUN_CLOSED":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "M4_DATA_RECONCILIATION_STATIC_REPAIR_READY":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_SEMANTIC_REPAIR_STATIC":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "STATIC_PREFLIGHT":ZERO,
+  "EXISTING_IDENTITY_RUNTIME_PREPARATION":ZERO,
+  "EXISTING_IDENTITY_ROOT_CAUSE_STATIC":ZERO,
+  "EXISTING_IDENTITY_RUNTIME_AUTHORIZED_ONCE_PREFLIGHT":ZERO,
+  "EXISTING_IDENTITY_MEMBERSHIP_ROOT_CAUSE_STATIC":ZERO,
+  "M3_TENANT_ACTIVATION_STATIC_PREPARATION":ZERO,
+  "M3_TENANT_ACTIVATION_STATIC_READY":ZERO,
+  "M3_TENANT_ACTIVATION_CLOSED":ZERO,
+  "M4_DURABLE_WRITER_STATIC_READY":ZERO,
+  "M4_DURABLE_WRITER_DRYRUN_CLOSED":ZERO,
+  "M4_DATA_RECONCILIATION_STATIC_REPAIR_READY":ZERO,
+  "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_SEMANTIC_REPAIR_STATIC":ZERO,
   "LAB_DATA_CONTRACT_REPAIR_DRYRUN":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "LAB_DATA_CONTRACT_REPAIR_APPLY":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "LAB_HOSTING_DELIVERY":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
@@ -57,7 +58,8 @@ const PHASE_PROFILES=Object.freeze({
   "M4_TARGET_ONLY_RECONCILIATION_READONLY_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "M4_TARGET_ONLY_RETIREMENT_DRYRUN_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "M4_TARGET_ONLY_RETIREMENT_WRITE_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "M4_POST_RETIREMENT_REVALIDATION_READONLY_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}
+  "M4_POST_RETIREMENT_REVALIDATION_READONLY_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "M4_CLIENT_COUNTRY_CORRECTION_WRITE_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(k=>actual[k]===expected[k]);}
