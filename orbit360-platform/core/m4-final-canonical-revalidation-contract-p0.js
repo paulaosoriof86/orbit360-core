@@ -1,0 +1,18 @@
+/* Orbit 360 · M4 final canonical durable revalidation · read-only */
+(function(){'use strict';window.Orbit=window.Orbit||{};
+var VERSION='4.3.2-readonly-20260728',STATUS='M4_FINAL_CANONICAL_REVALIDATION_COMPLETED';
+var EXPECTED=Object.freeze({clients:414,insurers:26,memberships:1,config:1,snapshots:441,recordAudits:441,batchAudits:1,idempotencyKey:'ed2f0adc554700556d80c2625913b34256a043b5226629b125d6e0203a076573'});
+function n(v){return Number(v||0);}function text(v){return String(v==null?'':v).trim();}
+function validateActivationBoundary(input){input=input||{};var q=input.request||{},parent=text(input.parentCommit),present=input.requestPresent===true;if(!present)return{ok:true,activationMode:'package_without_request',executionAuthorized:false,allowedExecutions:0};if(text(q.authorizedBaseCommit)!==parent)return{ok:true,activationMode:'historical_request_ignored',executionAuthorized:false,allowedExecutions:0};var ok=q.schemaVersion==='orbit360-m4-final-canonical-revalidation-request-v1'&&q.gateId==='block4-final-canonical-revalidation-readonly-v20260728'&&q.contractVersion==='4.3.2'&&q.branch==='ays/backend-tenant-lab-v99-20260703'&&q.explicitAuthorization===true&&n(q.allowedExecutions)===1&&q.readOnly===true&&q.secrets===true&&q.firestoreRead===true&&q.writes===false&&q.browser===false&&q.deploy===false&&q.production===false&&q.policies===false&&q.mergeMain===false&&q.containsPII===false&&q.containsSecrets===false;return{ok:ok,activationMode:ok?'immutable_request_present':'active_request_invalid',executionAuthorized:ok,allowedExecutions:ok?1:0};}
+function build(input){input=input||{};var e=[],s=input.source||{},t=input.target||{},d=input.durable||{},b=input.batch||{},v=input.verification||{},w=input.writes||{};
+ if(input.priorWriteClosureValidated!==true)e.push('prior_write_closure_invalid');
+ if(n(s.clients)!==EXPECTED.clients||n(s.insurers)!==EXPECTED.insurers)e.push('source_counts_invalid');
+ if(n(t.config)!==EXPECTED.config||n(t.memberships)!==EXPECTED.memberships||n(t.clients)!==EXPECTED.clients||n(t.insurers)!==EXPECTED.insurers)e.push('target_counts_invalid');
+ if(v.sourceDigestsMatchExpected!==true||v.membershipDigestMatchExpected!==true||v.targetDigestMatchesExpected!==true||v.targetIdsMatchSource!==true||v.allTargetsTenantScoped!==true||v.countryCurrencyConsistent!==true)e.push('data_integrity_invalid');
+ if(n(d.snapshots)!==EXPECTED.snapshots||n(d.recordAudits)!==EXPECTED.recordAudits||n(d.batchAudits)!==EXPECTED.batchAudits||d.snapshotBindingsValid!==true||d.auditBindingsValid!==true||d.auditAppendOnlyValid!==true)e.push('durability_invalid');
+ if(b.exists!==true||b.status!=='completed'||b.idempotencyKey!==EXPECTED.idempotencyKey||n(b.targetCreates)!==441||b.rollbackAvailable!==true)e.push('batch_invalid');
+ if(n(w.operationalWrites)!==0||n(w.configurationWrites)!==0||n(w.membershipWrites)!==0||n(w.clientWrites)!==0||n(w.insurerWrites)!==0||n(w.auditWrites)!==0||n(w.snapshotWrites)!==0||n(w.deletes)!==0||n(w.merges)!==0)e.push('writes_forbidden');
+ if(input.rulesChanged||input.hostingDeploy||input.functionsDeploy||input.productionTouched||input.policies||input.mergeMain)e.push('forbidden_scope');
+ if(input.containsPII!==false||input.containsSecrets!==false||n(input.secretValueCount)!==0)e.push('sanitization_required');
+ var ok=e.length===0;return{ok:ok,status:ok?STATUS:'DATA_CONTRACT_FAILURE',contractVersion:VERSION,approvalReadyForM4Closure:ok,approvalReadyForM5:ok,errors:e,containsPII:false,containsSecrets:false};}
+window.Orbit.m4FinalCanonicalRevalidationP0=Object.freeze({VERSION:VERSION,STATUS:STATUS,EXPECTED:EXPECTED,build:build,validateActivationBoundary:validateActivationBoundary});})();
