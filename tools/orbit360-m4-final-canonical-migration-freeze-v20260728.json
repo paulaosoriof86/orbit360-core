@@ -1,0 +1,16 @@
+{
+  "schemaVersion":"orbit360-m4-final-canonical-migration-freeze-v1",
+  "issuedAt":"2026-07-28",
+  "gateId":"block4-final-canonical-migration-dryrun-v20260728",
+  "contractVersion":"4.3.0",
+  "status":"READY_FOR_ONE_FINAL_CANONICAL_MIGRATION_DRYRUN",
+  "expected":{
+    "sourceClients":414,"sourceInsurers":26,"canonicalTargetClients":0,"canonicalTargetInsurers":0,"canonicalTargetConfig":0,
+    "clientCreates":414,"insurerCreates":26,"configCreates":1,"requiresValidation":0,"targetOnly":0,"rollbackSnapshotCountPlanned":441
+  },
+  "authorization":{"readOnlyExecutionAuthorized":true,"allowedExecutions":1,"writeAuthorized":false},
+  "forbidden":{"writes":true,"browser":true,"hostingDeploy":true,"rulesDeploy":true,"functionsDeploy":true,"production":true,"mergeMain":true,"policies":true},
+  "stopRule":"if_same_stage_or_error_fails_twice_stop_and_diagnose_root_cause",
+  "containsPII":false,
+  "containsSecrets":false
+}
