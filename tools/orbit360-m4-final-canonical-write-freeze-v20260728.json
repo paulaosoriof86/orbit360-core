@@ -1,0 +1,27 @@
+{
+  "schemaVersion":"orbit360-m4-final-canonical-write-freeze-v1",
+  "issuedAt":"2026-07-28",
+  "gateId":"block4-final-canonical-migration-write-v20260728",
+  "contractVersion":"4.3.1",
+  "status":"PACKAGE_READY_WRITE_NOT_AUTHORIZED",
+  "dryRunClosure":"orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-migration-dryrun-closure.json",
+  "binding":{
+    "idempotencyKey":"ed2f0adc554700556d80c2625913b34256a043b5226629b125d6e0203a076573",
+    "sourceDigests":{
+      "configuration_catalog":"94d7419b528df7b93a929aec956dd9fa2345ae5e71c9bcc66071e036809a40b8",
+      "memberships":"a3a4533b35066a3ddaabdfea99ec75e6388e28704ad3072b3b1dc35a0191fcbb",
+      "clientes":"a766afb91bf2bfdd0d5e21b1838fee2bba114a805655091da8f13a1ada5b70db",
+      "aseguradoras":"a0ad55a3cfc82b8820206024d911818a50bbfd77cdd4fa58c8a7d0877b8cfa3d"
+    }
+  },
+  "expectedBefore":{"config":0,"memberships":1,"clients":0,"insurers":0},
+  "expectedAfter":{"config":1,"memberships":1,"clients":414,"insurers":26},
+  "writeBudget":{"targetCreates":441,"snapshotWrites":441,"auditWrites":442,"importBatchWrites":2,"membershipWrites":0,"maxSuccessOperationalWrites":1326},
+  "rollbackBudget":{"maxTargetDeletes":441,"maxRollbackAuditWrites":442,"maxRollbackBatchUpdates":1,"maxRollbackOperationalWrites":884},
+  "authorization":{"writeExecutionAuthorized":false,"allowedExecutions":0,"emergencyRollbackAuthorized":false,"requestCreated":false},
+  "forbidden":{"membershipWrites":true,"policies":true,"vehicles":true,"receivables":true,"collections":true,"commissions":true,"financialHistory":true,"hostingDeploy":true,"rulesDeploy":true,"functionsDeploy":true,"production":true,"main":true,"merge":true},
+  "stopRule":"if_same_stage_or_error_fails_twice_stop_and_diagnose_root_cause",
+  "nextAction":"COMPLETE_STATIC_PACKAGE_THEN_REQUEST_USER_EXPLICIT_AUTHORIZATION_FOR_ONE_4_3_1_WRITE_EXECUTION",
+  "containsPII":false,
+  "containsSecrets":false
+}
