@@ -1,14 +1,17 @@
 {
-  "schemaVersion":"orbit360-m4-final-canonical-revalidation-freeze-v1",
+  "schemaVersion":"orbit360-m4-final-canonical-revalidation-freeze-v2",
   "issuedAt":"2026-07-28",
+  "updatedAt":"2026-07-28",
   "gateId":"block4-final-canonical-revalidation-readonly-v20260728",
   "contractVersion":"4.3.2",
-  "status":"READY_FOR_ONE_FINAL_READONLY_REVALIDATION",
+  "status":"M4_FINAL_CANONICAL_REVALIDATION_CLOSED_SUCCESS",
   "writeClosure":"orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-write-closure.json",
-  "expected":{"sourceClients":414,"sourceInsurers":26,"targetConfig":1,"memberships":1,"targetClients":414,"targetInsurers":26,"snapshots":441,"recordAudits":441,"batchAudits":1,"batchStatus":"completed"},
-  "authorization":{"readOnlyExecutionAuthorized":true,"allowedExecutions":1,"writeAuthorized":false,"requestCreated":false},
+  "revalidationClosure":"orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-revalidation-closure.json",
+  "verified":{"sourceClients":414,"sourceInsurers":26,"targetConfig":1,"memberships":1,"targetClients":414,"targetInsurers":26,"snapshots":441,"recordAudits":441,"batchAudits":1,"batchStatus":"completed","operationalWrites":0},
+  "evidence":{"runId":30405006131,"jobId":90428375820,"artifactId":8706182146,"artifactDigest":"sha256:5bf47059d99caa1759e7c4fed92e7604a0dccad5966de52d1fcde0ee537766d1"},
+  "authorization":{"readOnlyExecutionAuthorized":false,"allowedExecutions":0,"writeAuthorized":false,"requestCreated":true,"executionConsumed":true},
   "forbidden":{"writes":true,"browser":true,"hostingDeploy":true,"rulesDeploy":true,"functionsDeploy":true,"production":true,"mergeMain":true,"policies":true},
-  "stopRule":"if_same_stage_or_error_fails_twice_stop_and_diagnose_root_cause",
+  "nextAction":"M4_CLOSED_RETURN_TO_M5_READINESS_REPAIR",
   "containsPII":false,
   "containsSecrets":false
 }
