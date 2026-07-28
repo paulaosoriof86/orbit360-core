@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-correction-write-freeze-v1",
+  "issuedAt": "2026-07-28",
+  "gateId": "block4-client-country-correction-write-v20260728",
+  "contractVersion": "4.2.11",
+  "status": "READY_FOR_ONE_ATOMIC_WRITE_EXECUTION",
+  "baselines": {
+    "dryRun": "orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-correction-closure.json",
+    "postRetirementRevalidation": "orbit360-platform/runtime-gate-crm-v20260716/m4-post-retirement-revalidation-closure.json"
+  },
+  "expected": {"sourceClients":414,"sourceInsurers":26,"targetClients":0,"targetInsurers":0,"corrections":61,"country":"GT","currency":"GTQ","snapshotWrites":61,"auditWrites":61,"clientUpdates":61,"totalOperationalWrites":183},
+  "authorization": {"writeExecutionAuthorized":true,"allowedExecutions":1,"emergencyRollbackAuthorized":true,"policiesAuthorized":false},
+  "forbidden": {"insurerWrites":true,"targetOverlayWrites":true,"configurationWrites":true,"membershipWrites":true,"deletes":true,"merges":true,"imports":true,"policies":true,"rulesDeploy":true,"hostingDeploy":true,"functionsDeploy":true,"production":true,"mergeMain":true},
+  "stopRule": "if_same_stage_or_error_fails_twice_stop_and_open_root_cause_diagnosis",
+  "nextActionOnPass": "CLOSE_4_2_11_AND_EVALUATE_M4_CLOSURE",
+  "containsPII": false,
+  "containsSecrets": false
+}
