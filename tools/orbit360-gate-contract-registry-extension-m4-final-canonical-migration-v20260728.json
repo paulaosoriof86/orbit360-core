@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"orbit360-gate-contract-registry-extension-v1",
+  "issuedAt":"2026-07-28",
+  "gates":[{
+    "gateId":"block4-final-canonical-migration-dryrun-v20260728",
+    "contractVersion":"4.3.0",
+    "lifecycle":"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-migration-v20260728.json",
+    "engine":"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-migration-v20260728.mjs",
+    "workflow":".github/workflows/orbit360-m4-final-canonical-migration-dryrun-v20260728.yml",
+    "request":"tools/orbit360-m4-final-canonical-migration-request-v20260728.json",
+    "phase":"M4_FINAL_CANONICAL_MIGRATION_DRYRUN_EXECUTION",
+    "oneShot":true,"containsPII":false,"containsSecrets":false
+  }]
+}
