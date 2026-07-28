@@ -1,83 +1,60 @@
 {
-  "schemaVersion": "orbit360-m4-block-state-v2",
+  "schemaVersion": "orbit360-m4-block-state-v3",
   "issuedAt": "2026-07-28",
   "updatedAt": "2026-07-28",
-  "status": "M4_REOPENED_CANONICAL_TARGET_MIGRATION_PENDING",
+  "status": "M4_REOPENED_CANONICAL_WRITE_READY_AUTHORIZATION_PENDING",
   "classification": ["VALIDATOR_STALE", "DATA_CONTRACT_FAILURE"],
   "block": 4,
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "priorClosure": {
-    "status": "M4_CLOSED_SUCCESS",
-    "superseded": true,
-    "reason": "closure_omitted_canonical_target_cardinality"
-  },
+  "priorClosure": {"status":"M4_CLOSED_SUCCESS","superseded":true,"reason":"closure_omitted_canonical_target_cardinality"},
   "preservedEvidence": {
     "staticWriter": "orbit360-platform/runtime-gate-crm-v20260716/m4-durable-writer-static-summary.json",
     "durableDryRun": "orbit360-platform/runtime-gate-crm-v20260716/m4-durable-writer-dryrun-closure.json",
     "gtGtqDryRun": "orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-correction-closure.json",
     "targetOnlyRetirement": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-retirement-write-closure.json",
     "postRetirementRevalidation": "orbit360-platform/runtime-gate-crm-v20260716/m4-post-retirement-revalidation-closure.json",
-    "gtGtqWrite": "orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-correction-write-closure.json"
+    "gtGtqWrite": "orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-correction-write-closure.json",
+    "finalCanonicalDryRun": "orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-migration-dryrun-closure.json"
   },
-  "verifiedSourceState": {
-    "clients": 414,
-    "insurers": 26,
-    "missingClientCurrency": 0,
-    "targetOnlyClients": 0,
-    "targetOnlyInsurers": 0,
-    "gtGtqCorrectionsPreserved": 61
+  "verifiedSourceState": {"clients":414,"insurers":26,"missingClientCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0,"gtGtqCorrectionsPreserved":61},
+  "verifiedCanonicalTargetState": {"config":0,"memberships":1,"clients":0,"insurers":0,"evidenceContractVersion":"4.3.0","evidenceRunId":30401002929},
+  "finalDryRun": {
+    "status":"M4_FINAL_CANONICAL_MIGRATION_DRYRUN_CLOSED_SUCCESS",
+    "runId":30401002929,
+    "artifactId":8704692107,
+    "artifactDigest":"sha256:cf55e4d3b7d2145c2563e37582d426a974e5b0a735ec45dfa01f73e2ffe56d44",
+    "preflight":"24/24",
+    "contract":"21/21",
+    "diff":{"configCreate":1,"membershipOmit":1,"clientCreates":414,"insurerCreates":26,"qualityAuditCreates":2,"requiresValidation":0,"targetOnly":0},
+    "idempotencyKey":"ed2f0adc554700556d80c2625913b34256a043b5226629b125d6e0203a076573"
   },
-  "canonicalTargetStateFromLatestDurableRead": {
-    "clients": 0,
-    "insurers": 0,
-    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/m4-post-retirement-revalidation-closure.json",
-    "evidenceContractVersion": "4.2.10"
+  "writePackage": {
+    "gateId":"block4-final-canonical-migration-write-v20260728",
+    "contractVersion":"4.3.1",
+    "status":"PACKAGE_READY_WRITE_NOT_AUTHORIZED",
+    "staticPackageCheck":{"runId":30401935910,"artifactId":8705035965,"artifactDigest":"sha256:60f246f3081113fefa54825d73a9971a71f4553ddbca5cb83f1da6737dc7d71b","preflight":"25/25","fixtures":"30/30","activationMode":"package_without_request","executionAuthorized":false},
+    "successBudget":{"targetCreates":441,"snapshotWrites":441,"auditWrites":442,"importBatchWrites":2,"membershipWrites":0,"maxOperationalWrites":1326},
+    "rollbackBudget":{"maxTargetDeletes":441,"maxRollbackAuditWrites":442,"maxRollbackBatchUpdates":1,"maxOperationalWrites":884},
+    "requestCreated":false,
+    "writeAuthorized":false
   },
   "exitCriteria": {
-    "sourceClients": 414,
-    "sourceInsurers": 26,
-    "canonicalTargetClientsRequired": 414,
-    "canonicalTargetInsurersRequired": 26,
-    "canonicalTargetClientsSatisfied": false,
-    "canonicalTargetInsurersSatisfied": false,
-    "missingClientCurrency": 0,
-    "targetOnlyClients": 0,
-    "targetOnlyInsurers": 0,
-    "noSecrets": true,
-    "noMixedSources": true,
-    "dryRunFinalMigrationRequired": true,
-    "remoteFinalMigrationRequired": true,
-    "appendOnlyAuditRequired": true,
-    "durableRollbackRequired": true,
-    "idempotencyRequired": true
+    "sourceClients":414,"sourceInsurers":26,"canonicalTargetClientsRequired":414,"canonicalTargetInsurersRequired":26,"canonicalTargetConfigRequired":1,
+    "canonicalTargetClientsSatisfied":false,"canonicalTargetInsurersSatisfied":false,"canonicalTargetConfigSatisfied":false,
+    "missingClientCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0,"noSecrets":true,"noMixedSources":true,
+    "finalDryRunPass":true,"remoteFinalMigrationRequired":true,"appendOnlyAuditRequired":true,"durableRollbackRequired":true,"idempotencyRequired":true
   },
-  "lastGoodWrite": {
-    "gateId": "block4-client-country-correction-write-v20260728",
-    "contractVersion": "4.2.11",
-    "runId": 30397573914,
-    "artifactId": 8703407181,
-    "clientUpdates": 61,
-    "snapshotWrites": 61,
-    "auditWrites": 61,
-    "totalOperationalWrites": 183,
-    "rollbackExecuted": false,
-    "nonCandidateDigestUnchanged": true,
-    "mustNotRollback": true
-  },
-  "m5": {
-    "frozen": true,
-    "reason": "canonical_target_not_migrated",
-    "priorReadinessInvalidated": true
-  },
+  "lastGoodWrite": {"gateId":"block4-client-country-correction-write-v20260728","contractVersion":"4.2.11","runId":30397573914,"artifactId":8703407181,"clientUpdates":61,"snapshotWrites":61,"auditWrites":61,"totalOperationalWrites":183,"rollbackExecuted":false,"nonCandidateDigestUnchanged":true,"mustNotRollback":true},
+  "m5": {"frozen":true,"reason":"canonical_target_not_migrated","priorReadinessInvalidated":true,"technicalParityEvidencePreserved":true},
   "forbiddenUntouched": {"policies":true,"vehicles":true,"receivables":true,"collections":true,"commissions":true,"financialHistory":true,"rules":true,"hosting":true,"functions":true,"production":true,"main":true,"merge":true},
-  "nextBlock": 4,
-  "nextAction": "PREPARE_AND_RUN_READONLY_FINAL_CANONICAL_TARGET_MIGRATION_DRYRUN_EXPECT_414_CLIENT_CREATES_26_INSURER_CREATES_ZERO_VALIDATION_ZERO_TARGET_ONLY",
-  "policiesSourceRequiredWhenReached": true,
-  "policiesSourceRule": "request_current_specific_policy_list_from_user_when_policy_block_starts; production_sheet_is_not_valid_policy_source",
-  "claudeClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
-  "academyClassification": "ACADEMIA_ACTUALIZAR",
-  "containsPII": false,
-  "containsSecrets": false
+  "nextBlock":4,
+  "nextAction":"REQUEST_USER_EXPLICIT_AUTHORIZATION_FOR_ONE_FINAL_CANONICAL_WRITE_4_3_1",
+  "policiesSourceRequiredWhenReached":true,
+  "policiesSourceRule":"request_current_specific_policy_list_from_user_when_policy_block_starts; production_sheet_is_not_valid_policy_source",
+  "claudeClassification":"BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academyClassification":"ACADEMIA_ACTUALIZAR",
+  "containsPII":false,
+  "containsSecrets":false
 }
