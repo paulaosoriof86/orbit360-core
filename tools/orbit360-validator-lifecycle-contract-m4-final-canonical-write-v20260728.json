@@ -1,6 +1,7 @@
 {
   "schemaVersion":"orbit360-validator-lifecycle-contract-m4-final-canonical-write-v1",
   "issuedAt":"2026-07-28",
+  "updatedAt":"2026-07-28",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
   "pullRequest":5,
@@ -12,34 +13,21 @@
   "executionProfile":{
     "phase":"M4_FINAL_CANONICAL_MIGRATION_WRITE_EXECUTION",
     "capabilities":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-    "operationalWritesAuthorized":false,
+    "operationalWritesAuthorized":true,
     "requestModel":"immutable_request_bound_to_parent_commit"
   },
   "baseline":"orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-migration-dryrun-closure.json",
   "authorization":{
-    "explicitAuthorization":false,
-    "authorizationSource":"PENDING_USER_AUTHORIZATION",
+    "explicitAuthorization":true,
+    "authorizationSource":"user_autorizado_20260728",
     "packagePublicationAuthorized":true,
-    "writeExecutionAuthorized":false,
-    "allowedExecutions":0,
-    "emergencyRollbackAuthorized":false,
+    "writeExecutionAuthorized":true,
+    "allowedExecutions":1,
+    "emergencyRollbackAuthorized":true,
     "requestCreated":false
   },
-  "writeBudget":{
-    "configCreates":1,
-    "clientCreates":414,
-    "insurerCreates":26,
-    "targetCreates":441,
-    "snapshotWrites":441,
-    "auditWrites":442,
-    "importBatchWrites":2,
-    "membershipWrites":0,
-    "maxSuccessOperationalWrites":1326,
-    "maxRollbackTargetDeletes":441,
-    "maxRollbackAuditWrites":442,
-    "maxRollbackBatchUpdates":1
-  },
-  "nextRequiredDecision":"USER_EXPLICIT_AUTHORIZATION_FOR_ONE_4_3_1_WRITE_EXECUTION",
+  "writeBudget":{"configCreates":1,"clientCreates":414,"insurerCreates":26,"targetCreates":441,"snapshotWrites":441,"auditWrites":442,"importBatchWrites":2,"membershipWrites":0,"maxSuccessOperationalWrites":1326,"maxRollbackTargetDeletes":441,"maxRollbackAuditWrites":442,"maxRollbackBatchUpdates":1},
+  "nextRequiredDecision":"CREATE_IMMUTABLE_REQUEST_BOUND_TO_CURRENT_HEAD_AND_EXECUTE_ONCE",
   "containsPII":false,
   "containsSecrets":false
 }
