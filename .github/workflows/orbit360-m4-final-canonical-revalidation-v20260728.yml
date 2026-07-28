@@ -1,0 +1,94 @@
+name: Orbit 360 · M4 final canonical revalidation · READONLY_ONCE
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['tools/orbit360-m4-final-canonical-revalidation-request-v20260728.json']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-m4-final-canonical-revalidation
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block4-final-canonical-revalidation-readonly-v20260728
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: tools/orbit360-m4-final-canonical-revalidation-request-v20260728.json
+  ORBIT360_EXISTING_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+jobs:
+  final-revalidation:
+    name: M4 · Final canonical revalidation · read-only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}', fetch-depth: 2, persist-credentials: false}
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Validar solicitud inmutable sin acceso externo
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "${ORBIT360_BRANCH}"
+          test "${GITHUB_RUN_ATTEMPT}" = '1'
+          node <<'NODE'
+          const fs=require('fs'),cp=require('child_process');const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim(),bad=[];
+          if(r.schemaVersion!=='orbit360-m4-final-canonical-revalidation-request-v1'||r.gateId!==process.env.ORBIT360_GATE_ID||r.contractVersion!=='4.3.2'||r.branch!==process.env.ORBIT360_BRANCH)bad.push('schema_scope');
+          if(r.authorizedBaseCommit!==parent||r.explicitAuthorization!==true||r.allowedExecutions!==1||r.readOnly!==true)bad.push('binding_authorization');
+          if(r.secrets!==true||r.firestoreRead!==true||r.writes!==false||r.browser!==false||r.deploy!==false||r.production!==false||r.policies!==false||r.mergeMain!==false)bad.push('capabilities');
+          if(r.expectedProjectId!==process.env.ORBIT360_EXISTING_FIREBASE_PROJECT_ID||r.expectedSourceClients!==414||r.expectedSourceInsurers!==26||r.expectedTargetConfig!==1||r.expectedMemberships!==1||r.expectedTargetClients!==414||r.expectedTargetInsurers!==26||r.expectedSnapshots!==441||r.expectedRecordAudits!==441||r.expectedBatchAudits!==1)bad.push('baseline');
+          if(r.containsPII!==false||r.containsSecrets!==false)bad.push('sanitization');if(bad.length)throw new Error('REQUEST_INVALID:'+bad.join(','));
+          NODE
+      - name: Preflight canónico antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "${ORBIT360_GATE_ID}"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="4.3.2" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .activationMode=="immutable_request_present" and .validationMode=="executed_contract_fixtures" and .literalSourceInspection==false and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .operationalWrites==0' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Probar contrato antes de secretos
+        run: node tools/orbit360-m4-final-canonical-revalidation-contract-v20260728.cjs
+      - name: Resolver cuenta existente después del preflight
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-m4-final-revalidation.json"; printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"; chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_EXISTING_FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"; echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+      - name: Instalar dependencia read-only controlada
+        run: npm install --no-save --ignore-scripts firebase-admin@13
+      - name: Ejecutar revalidación durable read-only
+        run: node tools/orbit360-m4-final-canonical-revalidation-v20260728.mjs
+      - name: Validar evidencia sanitizada final
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.ok==true and .status=="M4_FINAL_CANONICAL_REVALIDATION_COMPLETED" and .priorWriteClosureValidated==true and .source.clients==414 and .source.insurers==26 and .target.config==1 and .target.memberships==1 and .target.clients==414 and .target.insurers==26 and .durable.snapshots==441 and .durable.recordAudits==441 and .durable.batchAudits==1 and .durable.snapshotBindingsValid==true and .durable.auditBindingsValid==true and .durable.auditAppendOnlyValid==true and .batch.exists==true and .batch.status=="completed" and .batch.targetCreates==441 and .batch.rollbackAvailable==true and .verification.sourceDigestsMatchExpected==true and .verification.membershipDigestMatchExpected==true and .verification.targetDigestMatchesExpected==true and .verification.targetIdsMatchSource==true and .verification.allTargetsTenantScoped==true and .verification.countryCurrencyConsistent==true and .writes.operationalWrites==0 and .approvalReadyForM4Closure==true and .approvalReadyForM5==true and .containsPII==false and .containsSecrets==false' orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-revalidation-summary.json >/dev/null
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m4-final-canonical-revalidation-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-revalidation-contract-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-revalidation-summary.json
+          retention-days: 30
+      - name: Publicar estado observable sanitizado
+        if: always()
+        env: {GH_TOKEN: '${{ github.token }}'}
+        shell: bash
+        run: |
+          set -euo pipefail
+          summary='orbit360-platform/runtime-gate-crm-v20260716/m4-final-canonical-revalidation-summary.json'; state=failure; description='M4 final canonical revalidation failed'
+          if [ -f "$summary" ] && [ "$(jq -r '.ok // false' "$summary")" = true ]; then state=success; description='M4 final canonical revalidation completed'; fi
+          payload="$(jq -n --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" '{state:$state,target_url:$target_url,description:$description,context:"orbit360/m4-final-canonical-revalidation"}')"
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -d "$payload"
+      - name: Limpiar material efímero
+        if: always()
+        run: rm -f "${ORBIT360_TEMP_KEY_FILE:-}"
