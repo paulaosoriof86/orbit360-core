@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m5-release-candidate-v1",
+  "issuedAt": "2026-07-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block5-release-candidate-visualization-v20260728",
+  "gateContractVersion": "5.0.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m5-release-candidate-readiness-v1",
+  "classification": "RELEASE_CANDIDATE_READINESS_STATIC",
+  "executionProfile": {
+    "phase": "M5_RC_READINESS_STATIC",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    },
+    "operationalWritesAuthorized": false,
+    "requestModel": "immutable_request_bound_to_parent_commit"
+  },
+  "baseline": {
+    "m1": "orbit360-platform/docs/CIERRE-M1-APROBACION-HUMANA-Y-ARRANQUE-M2-20260723.md",
+    "m2": "orbit360-platform/docs/CIERRE-M2-RUNTIME-PRODUCTIVO-READONLY-20260724.md",
+    "m3": "tools/orbit360-m3-tenant-activation-freeze-v20260724.json",
+    "m4": "orbit360-platform/runtime-gate-crm-v20260716/m4-block-closure.json"
+  },
+  "authorization": {
+    "explicitAuthorization": true,
+    "authorizationSource": "user_continua_siguiente_accion_20260728",
+    "packagePublicationAuthorized": true,
+    "readinessExecutionAuthorized": true,
+    "allowedExecutions": 1,
+    "hostingDeployAuthorized": false,
+    "browserAuthorized": false,
+    "writeAuthorized": false,
+    "requestCreated": false
+  },
+  "expected": {
+    "clients": 414,
+    "insurers": 26,
+    "advisors": 7,
+    "missingClientCurrency": 0,
+    "targetOnlyClients": 0,
+    "targetOnlyInsurers": 0,
+    "criticalAssetCount": 40,
+    "remoteVisualAssetCount": 22
+  },
+  "nextRequiredDecision": "IF_REMOTE_PARITY_FALSE_REQUEST_SEPARATE_HOSTING_LAB_DELIVERY_AUTHORIZATION;_IF_TRUE_RUN_SAME_GATE_RUNTIME_SMOKE_PHASE",
+  "containsPII": false,
+  "containsSecrets": false
+}
