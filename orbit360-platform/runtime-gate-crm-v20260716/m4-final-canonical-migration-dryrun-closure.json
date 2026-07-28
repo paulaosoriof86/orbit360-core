@@ -20,6 +20,12 @@
     "aseguradoras":{"create":26,"update":0,"omit":0,"requires_validation":0,"targetOnly":0},
     "quality_audit":{"create":2,"update":0,"omit":0,"requires_validation":0,"targetOnly":0}
   },
+  "sourceDigests":{
+    "configuration_catalog":"94d7419b528df7b93a929aec956dd9fa2345ae5e71c9bcc66071e036809a40b8",
+    "memberships":"a3a4533b35066a3ddaabdfea99ec75e6388e28704ad3072b3b1dc35a0191fcbb",
+    "clientes":"a766afb91bf2bfdd0d5e21b1838fee2bba114a805655091da8f13a1ada5b70db",
+    "aseguradoras":"a0ad55a3cfc82b8820206024d911818a50bbfd77cdd4fa58c8a7d0877b8cfa3d"
+  },
   "idempotencyKey":"ed2f0adc554700556d80c2625913b34256a043b5226629b125d6e0203a076573",
   "batchId":"m4-final-ed2f0adc554700556d80c262",
   "sameInputSameIdempotencyKey":true,
