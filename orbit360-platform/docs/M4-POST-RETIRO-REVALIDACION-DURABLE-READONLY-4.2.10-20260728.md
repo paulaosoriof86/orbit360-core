@@ -4,21 +4,14 @@ Fecha: 2026-07-28
 Gate: `block4-post-retirement-revalidation-readonly-v20260728`  
 Contrato: `4.2.10`  
 Rama: `ays/backend-tenant-lab-v99-20260703`  
-PR: #5 draft/open
+PR: #5 draft/open  
+Estado: `CERRADO / SUCCESS`
 
-## Necesidad
+## Objetivo cumplido
 
-Después del cierre 4.2.9, el retiro atómico dejó el origen en 414 clientes / 26 aseguradoras y el overlay target-only en 0/0, con cuatro snapshots de rollback y cuatro eventos append-only. Antes de evaluar cualquier escritura de las 61 normalizaciones GT/GTQ se requiere una verificación durable nueva e independiente.
+Después del cierre 4.2.9 se ejecutó una revalidación durable nueva e independiente antes de evaluar cualquier escritura de las 61 normalizaciones GT/GTQ.
 
-## Clasificación
-
-`DATA_CONTRACT_REVALIDATION_READONLY`.
-
-No es una corrección funcional ni una nueva migración. No modifica Clientes, Aseguradoras, configuración, memberships, Rules, Hosting, Functions, producción, main ni merge.
-
-## Contrato de salida
-
-La única ejecución autorizada debe demostrar:
+Resultado final:
 
 ```text
 source clientes: 414
@@ -30,27 +23,80 @@ eventos append-only legibles del retiro 4.2.9: 4
 escrituras operativas: 0
 ```
 
-La evidencia exportada debe ser agregada y sanitizada, sin IDs, valores crudos, PII ni secretos.
+La evidencia exportada fue agregada y sanitizada, sin IDs, valores crudos, PII ni secretos.
 
-## Orden metodológico
+## Ejecuciones
 
-1. Solicitud inmutable ligada al commit padre.
-2. `node tools/orbit360-validar-gate-contracts-v20260717.mjs block4-post-retirement-revalidation-readonly-v20260728`.
-3. Solo con `GO_GATE_CONTRACT`, resolver la cuenta LAB existente.
-4. Ejecutar una sola lectura durable.
-5. Validar evidencia sanitizada.
-6. Consumir la autorización.
-7. Solo si pasa, evaluar una autorización separada para las 61 correcciones GT/GTQ.
+### Primer intento
+
+Run: `30395156011`  
+Job: `90396118824`  
+Artifact: `8702484870`  
+Resultado: `FAIL`
+
+El preflight canónico pasó 25/25 y el contrato 17/17. El primer fallo real ocurrió en runtime porque una consulta `collectionGroup('records')` con dos filtros exigía un índice no necesario.
+
+Clasificación: `PIPELINE_MECHANISM_FAILURE`.
+
+No hubo escrituras.
+
+### Corrección de causa raíz
+
+Se corrigió únicamente el mecanismo de lectura:
+
+1. leer los cuatro `auditEvents` del tenant vinculados al gate 4.2.9;
+2. validar su binding y naturaleza append-only;
+3. resolver los cuatro `snapshotRef` exactos;
+4. leer directamente los cuatro snapshots.
+
+No se creó índice, no se modificaron datos ni Rules y no hubo deploy.
+
+El preflight quedó reforzado para bloquear la reaparición de `collectionGroup('records')` en este runner.
+
+### Ejecución reparada
+
+Request commit: `6f478987a66f34aefcfc0526d58d3089162a4ee7`  
+Run: `30395639383`  
+Job: `90397715932`  
+Artifact: `8702669519`  
+Digest: `sha256:dc3181a0256ccd1e26bf98fb1c9062f0aed01deef96ccd118858b2a028dcdb29`
+
+Resultado:
+
+```text
+Preflight canónico: GO_GATE_CONTRACT 28/28
+Validator revision: 4.2.10-r1
+Activation mode: immutable_request_present
+Contrato: PASS 17/17
+Runtime read-only: PASS
+Evidencia sanitizada: ok:true
+```
+
+## Autorización
+
+La autorización read-only de 4.2.10 quedó consumida.
+
+El cierre habilita únicamente la evaluación del siguiente paso:
+
+```text
+approvalReadyForClientCorrectionWrite: true
+clientCorrectionWriteAuthorized: false
+```
+
+Por tanto, las 61 correcciones GT/GTQ continúan sin autorización de escritura.
 
 ## Pólizas y demás fuentes
 
-Pólizas continúan bloqueadas. La hoja histórica de producción no es fuente de Pólizas. Cuando corresponda el bloque Pólizas, se debe solicitar a Paula el listado/fuente vigente específico y no inferirlo desde producción. El mismo principio aplica a Vehículos, Recibos/cartera, Cobros, planillas, financiero y documentos: cada fuente se solicita cuando su bloque la necesite.
+Pólizas continúan bloqueadas. La hoja histórica de producción no es fuente de Pólizas. Cuando corresponda el bloque Pólizas, se debe solicitar a Paula el listado/fuente vigente específico y no inferirlo desde producción.
+
+El mismo principio aplica a Vehículos, Recibos/cartera, Cobros, planillas, financiero y documentos: cada fuente real se solicita cuando su bloque la necesite.
 
 ## Claude y Academia
 
-Claude: `BACKEND_PROTEGIDO_NO_CLAUDE`; no se envían secretos, datos reales ni implementación del gate.  
-Academia: `ACADEMIA_ACTUALIZAR`; enseñar separación entre lectura de revalidación, autorización de escritura y fuente real por entidad.
+Claude: `BACKEND_PROTEGIDO_NO_CLAUDE`.
+
+Academia: `ACADEMIA_ACTUALIZAR`: enseñar separación entre revalidación read-only, autorización de escritura, fallo de mecanismo vs fallo de datos y fuente real por entidad.
 
 ## Siguiente acción exacta
 
-Crear la solicitud inmutable de una sola ejecución read-only. Si el resultado es `ok:true`, cerrar 4.2.10 y preparar, sin ejecutar todavía, la decisión separada sobre los 61 cambios GT/GTQ.
+Solicitar autorización nueva e independiente para aplicar las 61 correcciones GT/GTQ ya preparadas por el dry-run 4.2.6. La escritura debe tener gate propio, snapshots/rollback, auditoría append-only y verificación post-write. No avanzar a Pólizas antes de cerrar ese tramo de M4.
