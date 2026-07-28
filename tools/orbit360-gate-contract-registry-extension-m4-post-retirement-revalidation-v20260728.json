@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v1",
+  "issuedAt": "2026-07-28",
+  "gates": [
+    {
+      "gateId": "block4-post-retirement-revalidation-readonly-v20260728",
+      "contractVersion": "4.2.10",
+      "lifecycle": "tools/orbit360-validator-lifecycle-contract-m4-post-retirement-revalidation-v20260728.json",
+      "engine": "tools/orbit360-validar-gate-contracts-engine-m4-post-retirement-revalidation-v20260728.mjs",
+      "workflow": ".github/workflows/orbit360-m4-post-retirement-revalidation-gate-v20260728.yml",
+      "request": "tools/orbit360-m4-post-retirement-revalidation-request-v20260728.json",
+      "phase": "M4_POST_RETIREMENT_REVALIDATION_READONLY_EXECUTION",
+      "oneShot": true,
+      "containsPII": false,
+      "containsSecrets": false
+    }
+  ]
+}
