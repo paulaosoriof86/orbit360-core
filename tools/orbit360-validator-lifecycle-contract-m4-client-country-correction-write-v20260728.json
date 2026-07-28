@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m4-client-country-correction-write-v1",
+  "issuedAt": "2026-07-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block4-client-country-correction-write-v20260728",
+  "gateContractVersion": "4.2.11",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "controlPlaneRevision": "m4-client-country-correction-write-v1",
+  "methodologicalDecisionId": "atomic-write-exactly-61-validated-gt-gtq-client-corrections-20260728",
+  "classification": "DATA_CONTRACT_REPAIR_APPLY_AUTHORIZED",
+  "executionProfile": {
+    "phase": "M4_CLIENT_COUNTRY_CORRECTION_WRITE_EXECUTION",
+    "capabilities": {"secrets":true,"firestoreRead":true,"writes":true,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+    "operationalWritesAuthorized": true,
+    "configurationWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "migrationWritesAuthorized": true,
+    "rulesChangeAuthorized": false,
+    "requestModel": "immutable_request_bound_to_parent_commit"
+  },
+  "baselines": [
+    "orbit360-platform/runtime-gate-crm-v20260716/m4-client-country-business-validation-correction-closure.json",
+    "orbit360-platform/runtime-gate-crm-v20260716/m4-post-retirement-revalidation-closure.json"
+  ],
+  "authorization": {
+    "writeExecutionAuthorized": true,
+    "authorizationSource": "user_autorizado_20260728",
+    "allowedExecutions": 1,
+    "snapshotWritesAuthorized": 61,
+    "auditWritesAuthorized": 61,
+    "clientUpdatesAuthorized": 61,
+    "emergencyRollbackAuthorized": true,
+    "maxRollbackRestores": 61,
+    "maxRollbackAuditEvents": 61,
+    "requestCreated": false
+  },
+  "privacy": {"mode":"sanitized_aggregate_execution_evidence","recordIdsExported":false,"rawValuesExported":false,"pseudonymousTokensExported":false},
+  "nextRequiredDecision": "CREATE_IMMUTABLE_REQUEST_FOR_ONE_ATOMIC_61_CLIENT_CORRECTION_WRITE",
+  "containsPII": false,
+  "containsSecrets": false
+}
