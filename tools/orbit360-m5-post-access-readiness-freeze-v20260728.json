@@ -1,9 +1,12 @@
 {
-  "schemaVersion":"orbit360-m5-post-access-readiness-freeze-v1","issuedAt":"2026-07-28","gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.3","status":"READY_FOR_ONE_POST_ACCESS_READINESS_EXECUTION",
+  "schemaVersion":"orbit360-m5-post-access-readiness-freeze-v2",
+  "issuedAt":"2026-07-28","updatedAt":"2026-07-28",
+  "gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.3","status":"M5_POST_ACCESS_READINESS_CLOSED_LAB_DELIVERY_AUTHORIZATION_REQUIRED",
   "baseline":{"m4Closed":true,"access502Closed":true,"priorRcHash":"a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13","priorRcSupersededByAccessAssetChange":true},
-  "expected":{"criticalAssetCount":41,"remoteVisualAssetCount":24,"accessOwnerBound":true,"operationalWrites":0},
-  "authorization":{"readinessExecutionAuthorized":true,"allowedExecutions":1,"requestCreated":false,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false},
-  "forbidden":{"secrets":true,"firestoreRead":true,"browser":true,"hostingDeploy":true,"writes":true,"production":true,"mergeMain":true,"policies":true},
-  "nextAction":"RUN_POST_ACCESS_READINESS_5_0_3_ONCE",
+  "releaseCandidate":{"hash":"d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045","criticalAssetCount":41,"remoteVisualAssetCount":24,"remoteAssetsMatched":21,"mismatchCount":3,"remoteParity":false,"accessOwnerBound":true},
+  "mismatchedAssets":["index.html","core/product-role-taxonomy-p0.js","core/access-role-session-owner-v20260728.js"],
+  "authorization":{"readinessExecutionAuthorized":false,"allowedExecutions":0,"requestCreated":true,"executionConsumed":true,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false,"visualReviewAuthorized":false},
+  "forbiddenUntilSeparateHostingAuthorization":{"secrets":true,"firestoreRead":true,"browser":true,"hostingDeploy":true,"writes":true,"runtimeSmoke":true,"visualReview":true,"production":true,"mergeMain":true,"policies":true},
+  "nextAction":"REQUEST_EXPLICIT_AUTHORIZATION_FOR_ONE_HOSTING_LAB_DELIVERY_OF_RC_D90EC601_THEN_RECHECK_24_OF_24",
   "containsPII":false,"containsSecrets":false
 }
