@@ -1,0 +1,27 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-access-role-boundary-v1",
+  "issuedAt":"2026-07-28",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.2",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m5-access-role-boundary-static-v1",
+  "classification":"M5_ACCESS_ROLE_BOUNDARY_STATIC",
+  "executionProfile":{
+    "phase":"M5_ACCESS_ROLE_BOUNDARY_STATIC",
+    "capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+    "operationalWritesAuthorized":false,
+    "requestModel":"immutable_request_bound_to_parent_commit"
+  },
+  "baseline":{
+    "m4":"orbit360-platform/runtime-gate-crm-v20260716/m4-block-closure.json",
+    "m5Readiness501":"orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-501-closure.json"
+  },
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"continuation_after_m5_readiness_5_0_1_20260728","accessStaticExecutionAuthorized":true,"allowedExecutions":1,"browserAuthorized":false,"hostingDeployAuthorized":false,"writeAuthorized":false,"requestCreated":false},
+  "expected":{"ownerVersion":"20260728.2","readiness501":"M5_RC_READY_FOR_RUNTIME_SMOKE","runtimeSmokeAuthorized":false,"backendWrites":0,"membershipWrites":0},
+  "nextRequiredDecision":"IF_PASS_RECALCULATE_RELEASE_CANDIDATE_AND_COMPARE_LAB_BEFORE_RUNTIME_SMOKE",
+  "containsPII":false,
+  "containsSecrets":false
+}
