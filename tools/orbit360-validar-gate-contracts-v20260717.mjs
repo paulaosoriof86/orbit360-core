@@ -25,7 +25,8 @@ const GATE_CONFIG=Object.freeze({
   "block4-client-country-business-validation-correction-dryrun-v20260725":{contractVersion:"4.2.6",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-client-country-business-validation-correction-v20260725.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-client-country-business-validation-correction-v20260725.mjs"},
   "block4-target-only-reconciliation-readonly-v20260725":{contractVersion:"4.2.7",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-reconciliation-v20260725.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-reconciliation-v20260725.mjs"},
   "block4-target-only-retirement-dryrun-v20260725":{contractVersion:"4.2.8",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-retirement-dryrun-v20260725.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-retirement-dryrun-v20260725.mjs"},
-  "block4-target-only-retirement-write-v20260726":{contractVersion:"4.2.9",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-retirement-write-v20260726.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-retirement-write-v20260726.mjs"}
+  "block4-target-only-retirement-write-v20260726":{contractVersion:"4.2.9",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-retirement-write-v20260726.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-retirement-write-v20260726.mjs"},
+  "block4-post-retirement-revalidation-readonly-v20260728":{contractVersion:"4.2.10",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-post-retirement-revalidation-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-post-retirement-revalidation-v20260728.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
@@ -55,7 +56,8 @@ const PHASE_PROFILES=Object.freeze({
   "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_CORRECTION_DRYRUN_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "M4_TARGET_ONLY_RECONCILIATION_READONLY_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "M4_TARGET_ONLY_RETIREMENT_DRYRUN_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "M4_TARGET_ONLY_RETIREMENT_WRITE_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}
+  "M4_TARGET_ONLY_RETIREMENT_WRITE_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "M4_POST_RETIREMENT_REVALIDATION_READONLY_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(k=>actual[k]===expected[k]);}
