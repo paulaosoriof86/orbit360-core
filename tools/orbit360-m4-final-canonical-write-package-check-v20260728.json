@@ -1,0 +1,15 @@
+{
+  "schemaVersion":"orbit360-m4-final-canonical-write-package-check-v1",
+  "issuedAt":"2026-07-28",
+  "gateId":"block4-final-canonical-migration-write-v20260728",
+  "contractVersion":"4.3.1",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "secrets":false,
+  "firestoreRead":false,
+  "writes":false,
+  "browser":false,
+  "deploy":false,
+  "production":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
