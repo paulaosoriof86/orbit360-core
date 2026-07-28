@@ -1,0 +1,6 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v1","issuedAt":"2026-07-28","gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.3","phase":"M5_POST_ACCESS_RC_READINESS_STATIC",
+  "required":{"m4Closed":true,"accessBoundaryClosed":true,"sourceClients":414,"sourceInsurers":26,"canonicalTargetConfig":1,"canonicalTargetMemberships":1,"canonicalTargetClients":414,"canonicalTargetInsurers":26,"advisors":7,"criticalAssetCount":41,"remoteVisualAssetCount":24,"accessOwnerBound":true,"operationalWrites":0},
+  "capabilityBoundary":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "allowedOutcomes":["M5_RC_READY_FOR_RUNTIME_SMOKE","M5_RC_READY_LAB_DELIVERY_REQUIRED"],"containsPII":false,"containsSecrets":false
+}
