@@ -1,4 +1,4 @@
-# M5 5.0.0 — Release candidate readiness
+# M5 — release candidate readiness
 
 Fecha: 2026-07-28  
 Gate único M5: `block5-release-candidate-visualization-v20260728`  
@@ -7,69 +7,75 @@ PR: #5 draft/open
 
 ## Estado vigente
 
-`M5_FROZEN_M4_CANONICAL_TARGET_MIGRATION_PENDING`.
+`M5_UNFROZEN_CANONICAL_BASELINE_READY_READINESS_REPAIR_REQUIRED`.
 
-La ejecución 5.0.0 demostró correctamente la integridad visual de la candidata, pero su readiness de producto quedó invalidado al detectarse que el validador no exigía cardinalidad del destino canónico.
+M4 ya cerró como `M4_CLOSED_SUCCESS_CANONICAL_TARGET_VERIFIED` después de 4.3.0 dry-run, 4.3.1 escritura durable y 4.3.2 revalidación read-only.
 
-Clasificación del incidente: `VALIDATOR_STALE` + `DATA_CONTRACT_FAILURE`.
+El readiness 5.0.0 anterior permanece invalidado por `VALIDATOR_STALE` porque comprobaba conteos de fuente pero no cardinalidad del destino canónico. Su evidencia de integridad frontend se conserva únicamente como referencia técnica y debe recalcularse.
 
-## Evidencia 5.0.0 preservada
+## Evidencia técnica anterior preservada
 
 ```text
 Run: 30400072369
-Job: 90412449826
-Artifact: 8704338707
-Preflight: 31/31
-Contrato: 24/24
-RC hash: a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13
+RC hash anterior: a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13
 Activos críticos: 40/40
 Paridad visual LAB: 22/22
 Hosting deploy ejecutado: no
 ```
 
-Esta evidencia sigue siendo válida para integridad de frontend, pero no autoriza runtime smoke ni revisión visual.
+No habilita runtime smoke ni revisión visual.
 
-## Causa de invalidación
+## Readiness corregido 5.0.1
 
-El store productivo consume `tenants/{tenant}/data/{collection}/items`. El cierre M4 había probado que el origen estaba saneado en 414 clientes y 26 aseguradoras, pero no exigió que esos mismos conteos existieran en el destino canónico.
-
-La lectura durable 4.2.10 confirmó:
+Debe comprobar simultáneamente:
 
 ```text
-origen clientes: 414
-origen aseguradoras: 26
-destino canónico clientes: 0
-destino canónico aseguradoras: 0
+M1 closed = true
+M2 closed = true
+M3 closed = true
+M4 status = M4_CLOSED_SUCCESS_CANONICAL_TARGET_VERIFIED
+M4 final revalidation = PASS
+source clients = 414
+source insurers = 26
+canonical target config = 1
+canonical target memberships = 1
+canonical target clients = 414
+canonical target insurers = 26
+advisors = 7
+missing client currency = 0
+target-only clients = 0
+target-only insurers = 0
 ```
 
-Por tanto, `M4_CLOSED_SUCCESS` fue prematuro y M4 se reabrió únicamente para completar la migración canónica. Las 61 correcciones GT/GTQ permanecen válidas y no se revierten.
+Luego recalcula hash de la candidata y vuelve a comparar los activos visuales del mismo frontend publicado en LAB.
 
-## Regla corregida de readiness
-
-Ningún nuevo readiness M5 podrá pasar sin demostrar simultáneamente:
+Capacidades 5.0.1:
 
 ```text
-sourceClients == 414
-sourceInsurers == 26
-canonicalTargetClients == 414
-canonicalTargetInsurers == 26
-canonicalTargetConfig == 1
-missingClientCurrency == 0
-targetOnlyClients == 0
-targetOnlyInsurers == 0
+secrets: false
+Firestore: false
+writes: false
+browser: false
+Hosting deploy: false
+Functions/Rules: false
+production/main/merge: false
+Pólizas: false
 ```
 
-Un conteo correcto solo en origen nunca vuelve a ser suficiente.
+Resultados permitidos:
 
-## Deuda visual heredada
+```text
+M5_RC_READY_FOR_RUNTIME_SMOKE
+M5_RC_READY_LAB_DELIVERY_REQUIRED
+```
 
-M1 dejó como deuda aceptada títulos móviles no completamente responsive, con cierre obligatorio antes de la release candidate productiva.
+Solo el primer resultado habilita la preparación del smoke runtime. El segundo exige entrega Hosting LAB controlada; nunca se despliega por inferencia.
 
-La implementación viva ya contiene owner explícito de títulos responsive en `styles/client-insurer-visual-contract-v20260720.css`: `clamp`, wrapping, `overflow-wrap`, cortes a 760 px y 430 px. La evidencia estática se preserva, pero la validación de navegador permanece bloqueada hasta cerrar M4.
+## Gate runtime posterior
 
-## Próximo retorno a M5
+Después del readiness corregido debe resolver primero el selector legacy de roles para que solo exponga roles permitidos por la membership efectiva y `Orbit.session` rechace roles no autorizados. No se crean usuarios ni se modifica membership para resolverlo.
 
-Solo después del nuevo cierre M4 se repetirá el readiness sobre contrato corregido y, si pasa, el mismo gate deberá validar:
+Luego el mismo gate runtime deberá validar:
 
 - Dirección — escritorio;
 - Operativo — tableta;
@@ -84,15 +90,13 @@ Solo después del nuevo cierre M4 se repetirá el readiness sobre contrato corre
 - sin dobles listeners/renderers;
 - sin error bloqueante.
 
-Además, antes de ese smoke debe quedar resuelto el selector legacy de rol para que solo exponga roles permitidos por la membership efectiva; no se crean usuarios ni se modifican memberships para resolverlo.
-
 Solo con smoke `PASS` se habilita la revisión visual única de Paula.
 
 ## Fuentes reales
 
-Pólizas continúa `FUENTE_REAL_REQUERIDA`. Cuando llegue su bloque se solicitará a Paula el listado actual y vigente específico. `Listado producción 2025-2026` no es una fuente válida de Pólizas. La misma regla aplica a las fuentes posteriores.
+Pólizas continúa `FUENTE_REAL_REQUERIDA`. Cuando llegue su bloque se solicitará a Paula el listado actual y vigente específico. `Listado producción 2025-2026` no es una fuente válida. La misma regla aplica a las fuentes posteriores.
 
 ## Claude y Academia
 
 Claude: patrones reutilizables de source-vs-target readiness, UX y gates pueden acumularse sin datos reales; backend protegido no se envía.  
-Academia: `ACADEMIA_ACTUALIZAR` con diferencia entre fuente saneada, destino migrado, validador obsoleto y readiness visual.
+Academia: diferencia entre fuente saneada, destino migrado, validador obsoleto y readiness visual.
