@@ -3,7 +3,10 @@
   "issuedAt": "2026-07-28",
   "gateId": "block4-post-retirement-revalidation-readonly-v20260728",
   "contractVersion": "4.2.10",
-  "status": "READY_FOR_ONE_READONLY_EXECUTION",
+  "status": "READY_FOR_ONE_REPAIRED_READONLY_EXECUTION",
+  "retryOrdinal": 1,
+  "priorFailedRunId": 30395156011,
+  "priorFailureClassification": "PIPELINE_MECHANISM_FAILURE",
   "baselineClosure": "orbit360-platform/runtime-gate-crm-v20260716/m4-target-only-retirement-write-closure.json",
   "expected": {
     "sourceClients": 414,
@@ -13,6 +16,12 @@
     "snapshotsReadable": 4,
     "auditEventsReadable": 4,
     "operationalWrites": 0
+  },
+  "repair": {
+    "allowedLayer": "runtime_read_mechanism_only",
+    "indexCreationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "newReadPath": "tenant auditEvents -> exact snapshotRef"
   },
   "authorization": {
     "readOnlyExecutionAuthorized": true,
@@ -26,12 +35,14 @@
     "insurerWrites": true,
     "configurationWrites": true,
     "membershipWrites": true,
+    "indexCreation": true,
     "rulesDeploy": true,
     "hostingDeploy": true,
     "functionsDeploy": true,
     "production": true,
     "mergeMain": true
   },
+  "stopRule": "if_this_repaired_retry_fails_same_runtime_stage_stop_no_third_attempt",
   "nextActionOnPass": "EVALUATE_SEPARATE_AUTHORIZATION_FOR_61_GT_GTQ_CLIENT_CORRECTIONS",
   "containsPII": false,
   "containsSecrets": false
