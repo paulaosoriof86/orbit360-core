@@ -1,0 +1,22 @@
+{
+  "schemaVersion":"orbit360-m5-runtime-smoke-remediation-static-request-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.6",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "authorizedBaseCommit":"fa1289693f58fc7d714aa0e4c1cc662287777a44",
+  "allowedExecutions":1,
+  "staticRemediation":true,
+  "remoteLabIntegrityRead":true,
+  "secrets":false,
+  "firestoreRead":false,
+  "browser":false,
+  "runtime":false,
+  "deploy":false,
+  "operationalWrites":false,
+  "production":false,
+  "policies":false,
+  "mergeMain":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
