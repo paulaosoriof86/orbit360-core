@@ -9,32 +9,11 @@
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m5-runtime-518-one-shot-after-validator-519-v1",
   "classification":"LAB_RUNTIME_GATE",
-  "executionProfile":{
-    "phase":"LAB_RUNTIME_GATE",
-    "capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-    "operationalWritesAuthorized":false,
-    "requestModel":"immutable_one_shot_request_after_package_pass"
-  },
-  "baseline":{
-    "validator519Closed":true,
-    "validator519Status":"M5_VALIDATOR_REDESIGN_519_STATIC_PASS",
-    "candidateRuntimeContractVersion":"5.0.18",
-    "releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61",
-    "candidateRuntimeExecuted":false
-  },
-  "authorization":{
-    "authorizationSource":"user_autorizado_20260729_after_validator_519_pass",
-    "runtimeSmokeAuthorized":true,
-    "allowedExecutions":1,
-    "requestCreated":false,
-    "authorizationConsumed":false,
-    "firestoreWriteAuthorized":false,
-    "operationalWritesAuthorized":false,
-    "hostingDeployAuthorized":false,
-    "productionAuthorized":false,
-    "visualReviewAuthorized":false
-  },
-  "nextRequiredDecision":"PACKAGE_PASS_THEN_CREATE_IMMUTABLE_REQUEST_AND_EXECUTE_EXACTLY_ONE_RUNTIME_518",
+  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_one_shot_request_after_package_pass"},
+  "baseline":{"validator519Closed":true,"validator519Status":"M5_VALIDATOR_REDESIGN_519_STATIC_PASS","candidateRuntimeContractVersion":"5.0.18","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeExecuted":false},
+  "packageCheck":{"status":"M5_RUNTIME_SMOKE_520_PACKAGE_PASS","commit":"7523f906fa4029820be684973a0d4e4e0ce46c48","runId":30472800569,"jobId":90646967182,"artifactId":8732358957,"artifactDigest":"sha256:f13d8198854729ed2ffbe016c77667ef496080e4e060293d42c582b8a6f2139e"},
+  "authorization":{"authorizationSource":"user_autorizado_20260729_after_validator_519_pass","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"authorizationConsumed":false,"firestoreWriteAuthorized":false,"operationalWritesAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
+  "nextRequiredDecision":"EXECUTE_EXACTLY_ONE_RUNTIME_518_FROM_IMMUTABLE_BOUND_REQUEST; NO_RERUN_ON_FAILURE",
   "containsPII":false,
   "containsSecrets":false
 }
