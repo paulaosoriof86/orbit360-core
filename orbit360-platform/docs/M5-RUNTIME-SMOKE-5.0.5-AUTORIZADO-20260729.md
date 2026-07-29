@@ -52,10 +52,45 @@ Una sola ejecución runtime smoke LAB:
 8. Snapshot Firestore después y comparación exacta de conteos/digests.
 9. Resultado aceptable únicamente con `ok:true`.
 
+## Package check
+
+El primer package check, run `30413170457`, se detuvo por `SNAPSHOT_NO_WRITES`. La búsqueda textual genérica confundía `crypto.createHash(...).update(...)` con una escritura Firestore.
+
+Clasificación: `VALIDATOR_STALE` + `PIPELINE_MECHANISM_FAILURE`.
+
+Se corrigió exclusivamente el validador. No se modificó producto, snapshot ni datos.
+
+Cierre correcto:
+
+```text
+run: 30413254641
+job: 90454019483
+artifact: 8709200293
+digest: sha256:946302a06a2b3dd3e948f9c2d7a3f67fba9b168236d29cff463e1a68df999caf
+contract: 29/29
+secrets: no
+Firestore: no
+runtime/browser: no
+request: ausente durante el package check
+```
+
 ## Impacto Academia
 
 La Academia debe enseñar que un runtime smoke posterior a una corrección de seguridad no puede reutilizar selectores globales ni validadores de datos previos. Debe validar roles efectivos de membership, rechazo de roles no asignados, separación entre prueba automatizada y revisión visual humana, y evidencia read-only antes/después.
 
+También debe distinguir una llamada criptográfica `.update()` de una operación Firestore `.update()`: un validador estático debe identificar el owner y el contexto de la llamada antes de clasificarla como escritura.
+
 ## Estado
 
-Paquete preparado. La solicitud inmutable se crea únicamente después de cerrar y verificar conjuntamente lifecycle, autorización, freeze, router canónico, workflow, contrato y documentación.
+Control-plane sincronizado:
+
+- autorización explícita: activa una vez;
+- package check: PASS;
+- lifecycle: 5.0.5;
+- router canónico: 5.0.5;
+- freeze específico: `REQUEST_CREATED_AWAITING_ONE_RUNTIME_SMOKE_LAB`;
+- freeze global: `M5_RUNTIME_SMOKE_AUTHORIZED_ONCE_REQUEST_CREATED`;
+- Hosting: no autorizado y cero ejecuciones disponibles;
+- revisión visual humana: no autorizada.
+
+La siguiente acción es crear el archivo de solicitud inmutable como último commit, ligado al HEAD inmediatamente anterior, y aceptar exclusivamente evidencia sanitizada `ok:true`.
