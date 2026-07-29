@@ -1,13 +1,14 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-m5-runtime-smoke-v1",
+  "schemaVersion": "orbit360-validator-lifecycle-contract-m5-runtime-smoke-v2",
   "issuedAt": "2026-07-29",
+  "updatedAt": "2026-07-29",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "gateId": "block5-release-candidate-visualization-v20260728",
   "gateContractVersion": "5.0.5",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "controlPlaneRevision": "m5-runtime-smoke-lab-v1",
+  "controlPlaneRevision": "m5-runtime-smoke-lab-v2-request-created",
   "classification": "M5_RUNTIME_SMOKE_LAB",
   "executionProfile": {
     "phase": "LAB_RUNTIME_GATE",
@@ -27,7 +28,10 @@
   },
   "baseline": {
     "hostingDeliveryClosure": "orbit360-platform/runtime-gate-crm-v20260716/m5-lab-hosting-delivery-504-closure.json",
-    "releaseCandidateHash": "d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045"
+    "releaseCandidateHash": "d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045",
+    "packageCheckRunId": 30413254641,
+    "packageCheckArtifactId": 8709200293,
+    "packageCheckDigest": "sha256:946302a06a2b3dd3e948f9c2d7a3f67fba9b168236d29cff463e1a68df999caf"
   },
   "authorization": {
     "explicitAuthorization": true,
@@ -37,7 +41,7 @@
     "writeAuthorized": false,
     "hostingDeployAuthorized": false,
     "productionAuthorized": false,
-    "requestCreated": false
+    "requestCreated": true
   },
   "expected": {
     "projectId": "ays-orbit-360-lab",
