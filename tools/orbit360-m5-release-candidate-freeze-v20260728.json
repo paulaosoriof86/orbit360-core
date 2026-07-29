@@ -1,10 +1,10 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-freeze-v12",
+  "schemaVersion":"orbit360-m5-release-candidate-freeze-v13",
   "issuedAt":"2026-07-28",
   "updatedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
-  "contractVersion":"5.0.7",
-  "status":"M5_LAB_HOSTING_CLOSED_25_OF_25_RUNTIME_SMOKE_AUTHORIZATION_REQUIRED",
+  "contractVersion":"5.0.8",
+  "status":"M5_RUNTIME_SMOKE_508_REQUEST_CREATED",
   "canonicalBaseline":{"m4Closed":true,"sourceClients":414,"sourceInsurers":26,"canonicalTargetConfig":1,"canonicalTargetMemberships":1,"canonicalTargetClients":414,"canonicalTargetInsurers":26,"advisors":7,"missingClientCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0,"m4FinalRevalidationPassed":true},
   "accessBoundary":{"closed":true,"contractVersion":"5.0.2","runId":30407030063,"hardcodedAdvisorId":false,"globalRoleEnumeration":false,"labMissingProjectionFailClosed":true,"backendWrites":0,"membershipWrites":0},
   "priorHostingDelivery":{"closed":true,"contractVersion":"5.0.4","runId":30411375732,"artifactId":8708510538,"hostingDeployExecutions":1,"releaseCandidateHash":"d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045","remoteParity":"24/24","redeployExecuted":false},
@@ -12,9 +12,10 @@
   "rootCauseRemediation":{"closed":true,"contractVersion":"5.0.6","packageRunId":30415573496,"requestRunId":30415732795,"artifactId":8710079365,"artifactDigest":"sha256:7d28bc0a43e30353a93c4aae975a87636e01f02e0f32cacfa5c4ef905a90cf1c","preflight":"24/24","staticContract":"26/26","academiaFixtures":"18/18","academiaPolicyVersion":"20260729.2","staticContentTransientInLab":true,"userOperationalMutationsRemainDurable":true,"backendRuntime":"20260717-2","visualRevision":"20260723-10","protectedLabLoaderRestored":true,"protectedLabStoreUnchanged":true},
   "releaseCandidate":{"hash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091","criticalAssetCount":42,"allCriticalAssetsPresent":true,"remoteVisualAssetCount":25,"remoteVisualAssetsMatched":25,"mismatchCount":0,"remoteParity":true,"hostingDeployRequired":false,"runtimeSmokePassed":false,"approvalReadyForRuntimeSmoke":true},
   "hostingDelivery507":{"closed":true,"requestCommit":"98c28c188f00141476044628ca9a4a1d0ef6c43a","runId":30417743516,"jobId":90467807470,"artifactId":8710762943,"artifactDigest":"sha256:eca16e06d89a9accb29c98a7d36ed2719bac869fab451f87165c81e0da845669","hostingDeployExecutions":1,"publicParityRunId":30418258733,"publicParityJobId":90469348278,"publicParityArtifactId":8710924084,"publicParityArtifactDigest":"sha256:accbc8ea34cabe7daf657b1ae2dd7968d76b9d2805c2a03200a6ad04e45d80cf","publicParity":"25/25","redeployExecuted":false,"pipelineIncidentsClosed":true},
-  "authorization":{"priorHostingDeployAuthorizationConsumed":true,"staticRemediationAuthorizationConsumed":true,"hosting507AuthorizationConsumed":true,"hostingDeployAuthorized":false,"allowedHostingDeployExecutions":0,"publicParityRecoveryAuthorizationConsumed":true,"runtimeSmokeAuthorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeSmokeExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false},
-  "forbiddenUntilSeparatelyAuthorized":{"runtimeSmoke":true,"browser":true,"hostingDeploy":true,"visualReview":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"mergeMain":true,"policies":true},
-  "nextAction":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_RUNTIME_SMOKE_LAB_ON_RC_B25BF275_WITH_ZERO_WRITES",
+  "runtimeSmoke508":{"packageCheck":{"status":"PASS","runId":30420595908,"jobId":90476400727,"commit":"1d2e77b75a97cb9f4ecb2c760a30a451a405d4a4","artifactId":8711751664,"artifactDigest":"sha256:ee2d4ad2c333bd4805dd18bce9622bbd1bc1991e83e34e8298ecbfdab96f62b1"},"requestCreated":true,"expectedRuntime":"20260717-2","expectedAcademiaPolicy":"20260729.2","expectedPublicParity":"25/25"},
+  "authorization":{"priorHostingDeployAuthorizationConsumed":true,"staticRemediationAuthorizationConsumed":true,"hosting507AuthorizationConsumed":true,"hostingDeployAuthorized":false,"allowedHostingDeployExecutions":0,"publicParityRecoveryAuthorizationConsumed":true,"priorRuntimeSmokeAuthorizationConsumed":true,"runtimeSmokeAuthorized":true,"allowedRuntimeSmokeExecutions":1,"runtimeSmokeRequestCreated":true,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false},
+  "forbiddenUntilSeparatelyAuthorized":{"visualReview":true,"hostingDeploy":true,"firestoreWrite":true,"operationalWrites":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"mergeMain":true,"policies":true},
+  "nextAction":"EXECUTE_ONE_IMMUTABLE_RUNTIME_SMOKE_LAB_ON_RC_B25BF275_AND_ACCEPT_ONLY_OK_TRUE_ZERO_WRITES",
   "containsPII":false,
   "containsSecrets":false
 }
