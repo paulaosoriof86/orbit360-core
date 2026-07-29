@@ -1,0 +1,16 @@
+{
+  "schemaVersion":"orbit360-m5-hosting-delivery-535-freeze-v1",
+  "issuedAt":"2026-07-29",
+  "closedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.35",
+  "candidateContractVersion":"5.0.34",
+  "status":"M5_HOSTING_535_DELIVERED_AND_27_OF_27_VERIFIED_CLOSED",
+  "candidate":{"hash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7","criticalAssets":44,"remoteAssetsExpected":27},
+  "package":{"commit":"f755dace228db7aef3a6538e1cf368f1d6e258d4","runId":30498488128,"jobId":90732671666,"artifactId":8742528376,"artifactDigest":"sha256:c93963740d6b672667dc14159e7d4a23d6db203fc3e8c18c65f19b353bca7c32","status":"PASS","remoteAssetsMatched":26,"mismatchCount":1,"mismatchPaths":["data/academia-plus.js"]},
+  "delivery":{"authorizedBaseCommit":"5a56a26309c385ae94109a2a308e6de33d516fd9","requestCommit":"61a674f477fbb2285f5526b6707428329d3127e2","runId":30498827076,"jobId":90733704150,"artifactId":8742666048,"artifactDigest":"sha256:0af0933c0c2e520f888b833289634e35d4b5675638ed223ab9f1289babac8ad9","status":"M5_HOSTING_535_DELIVERED_AND_27_OF_27_VERIFIED","preflight":"24/24 PASS","hostingDeployExecutions":1,"remoteAssetsMatchedBefore":26,"remoteAssetsMatchedAfter":27,"mismatchCountAfter":0,"remoteParityAfter":true,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "authorization":{"authorizationSource":"user_autorizado_hosting_5_0_34_20260729","hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"requestCreated":true,"authorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "controls":{"packageWorkflowFrozen":true,"deliveryWorkflowFrozen":true,"hostingRerunForbidden":true,"runtimeRequiresNewExplicitAuthorization":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
