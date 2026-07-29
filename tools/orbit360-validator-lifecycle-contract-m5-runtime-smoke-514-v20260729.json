@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-v5",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.14",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m5-runtime-smoke-rc-ae6bb2a3-normalized-v2",
+  "classification":"M5_RUNTIME_SMOKE_AUTHORIZED_PACKAGE_PENDING",
+  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
+  "baseline":{"hosting513Closed":true,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatched":25},
+  "runtimeRequirements":{"bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs","snapshotsBeforeAfter":true,"zeroWrites":true,"roleViews":["Dirección","Operativo","Asesor"],"viewports":["desktop","tablet","mobile"]},
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260729_for_one_runtime_smoke_lab_rc_ae6bb2a3","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":false},
+  "nextRequiredDecision":"PACKAGE_PASS_THEN_CREATE_ONE_IMMUTABLE_RUNTIME_REQUEST",
+  "containsPII":false,
+  "containsSecrets":false
+}
