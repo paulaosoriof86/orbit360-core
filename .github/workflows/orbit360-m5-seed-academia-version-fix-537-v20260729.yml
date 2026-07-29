@@ -1,0 +1,58 @@
+name: Orbit 360 · M5 5.0.37 seed Academia version fix
+run-name: M5 5.0.37 · patch base seed Academia markers · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-seed-academia-version-fix-537-v20260729.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Aplicar invariante exacta al seed base
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('orbit360-platform/data/seed.js')
+          s=p.read_text()
+          old="""  ];
+
+  // ====================================================================
+  //  NOTIFICACIONES DEL PORTAL (cliente) — admin envía a todos/uno
+"""
+          new="""  ];
+  // Los cursos base son contenido estático versionado. El marcador permite
+  // proyectarlos de forma transitoria en LAB sin convertir cursos creados por usuario en seed.
+  cursos.forEach(c => { if (c && !c._cv) c._cv = 1; });
+
+  // ====================================================================
+  //  NOTIFICACIONES DEL PORTAL (cliente) — admin envía a todos/uno
+"""
+          if s.count(old)!=1: raise SystemExit(f'EXPECTED_EXACTLY_ONE_SEED_COURSE_BOUNDARY:{s.count(old)}')
+          p.write_text(s.replace(old,new,1))
+          PY
+          node --check orbit360-platform/data/seed.js
+          git diff --exit-code --quiet -- . ':!orbit360-platform/data/seed.js' || { echo 'UNEXPECTED_FILES_CHANGED' >&2; exit 41; }
+          grep -F "cursos.forEach(c => { if (c && !c._cv) c._cv = 1; });" orbit360-platform/data/seed.js >/dev/null
+      - name: Commit único
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-ci'
+          git config user.email 'orbit360-ci@users.noreply.github.com'
+          git add orbit360-platform/data/seed.js
+          git diff --cached --quiet && { echo 'NO_PATCH' >&2; exit 41; }
+          git commit -m 'm5 5.0.37: version base Academia seed courses'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
