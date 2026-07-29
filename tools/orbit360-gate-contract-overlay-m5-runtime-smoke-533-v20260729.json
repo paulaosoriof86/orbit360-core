@@ -1,0 +1,22 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m5-runtime-smoke-533-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.33",
+  "phase":"LAB_RUNTIME_GATE",
+  "releaseCandidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b",
+  "criticalAssets":43,
+  "remoteAssetsExpected":26,
+  "remoteAssetsMatched":26,
+  "lifecycle":"tools/orbit360-validator-lifecycle-contract-m5-runtime-smoke-533-v20260729.json",
+  "engine":"tools/orbit360-validar-gate-contracts-engine-m5-runtime-smoke-533-v20260729.mjs",
+  "authorization":"tools/orbit360-m5-runtime-authorization-533-v20260729.json",
+  "packageInput":"tools/orbit360-m5-runtime-package-input-533-v20260729.json",
+  "evidenceLedger":"tools/orbit360-m5-runtime-evidence-ledger-533-v20260729.json",
+  "request":"tools/orbit360-m5-runtime-smoke-533-request-v20260729.json",
+  "packagePass":{"runId":30494751648,"jobId":90720843440,"artifactId":8741127750,"artifactDigest":"sha256:4d0facb1700fb99b1e9573a57a921e7a8befccf03cfafd457633a0637da149e2"},
+  "capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "requestModel":"immutable_one_shot_request_bound_to_parent_commit",
+  "containsPII":false,
+  "containsSecrets":false
+}
