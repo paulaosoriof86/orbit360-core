@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-530-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.30",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m5-hosting-lab-post-529-schema-driven-v1",
+  "classification":"M5_LAB_HOSTING_DELIVERY",
+  "executionProfile":{"phase":"M5_LAB_HOSTING_DELIVERY","capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
+  "baseline":{"controlOverlay529":"tools/orbit360-m5-release-candidate-control-overlay-529-v20260729.json","descriptor":"tools/orbit360-m5-release-candidate-descriptor-530-v20260729.json","criticalAssets":43,"remoteAssetsExpected":26,"releaseCandidateHash":null},
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_hosting_20260729_post_529","hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"requestCreated":false,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"browserAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
+  "nextRequiredDecision":"RUN_PACKAGE_WITHOUT_SECRETS; on PASS bind exact candidate hash and create one immutable Hosting LAB request",
+  "containsPII":false,
+  "containsSecrets":false
+}
