@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-v7",
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-v8",
   "issuedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
@@ -8,11 +8,11 @@
   "gateContractVersion":"5.0.23",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m5-runtime-522-one-shot-after-validator-521-v1",
-  "classification":"LAB_RUNTIME_GATE",
-  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_one_shot_request_after_package_pass"},
-  "baseline":{"validator521Closed":true,"validator521Status":"M5_TECHNICAL_COPY_REMEDIATION_521_STATIC_PASS","candidateRuntimeContractVersion":"5.0.22","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeExecuted":false,"packageCheck":{"status":"M5_RUNTIME_SMOKE_523_PACKAGE_PASS","commit":"d81aacb48305e32699047cdaa07ca8e5152eae7d","runId":30478173184,"jobId":90665049424,"artifactId":8734473232,"artifactDigest":"sha256:642354242c6008fd106789e484ed8a71b912b1fb0f008956a5399a74fe149fab"}},
-  "authorization":{"authorizationSource":"user_autorizado_20260729_after_technical_copy_521_pass","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"authorizationConsumed":false,"firestoreWriteAuthorized":false,"operationalWritesAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
-  "nextRequiredDecision":"EXECUTE_EXACTLY_ONE_IMMUTABLE_RUNTIME_522_REQUEST",
+  "classification":"LAB_RUNTIME_GATE_STOPPED_PENDING_ROOT_CAUSE_CLASSIFICATION",
+  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"consumed_one_shot_no_rerun"},
+  "baseline":{"candidateRuntimeContractVersion":"5.0.22","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","packageRunId":30478173184,"runtimeRunId":30478442538,"firstFailure":"RESPONSIVE_TITLE_INVALID:desktopDirectionInsurers","snapshots":"11/11_before_and_after","allCountsStable":true,"allDigestsStable":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0},
+  "authorization":{"authorizationSource":"user_autorizado_20260729_after_technical_copy_521_pass","runtimeSmokeAuthorized":false,"allowedExecutions":0,"requestCreated":true,"authorizationConsumed":true,"firestoreWriteAuthorized":false,"operationalWritesAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
+  "nextRequiredDecision":"CLASSIFY_RESPONSIVE_TITLE_FAILURE_STATICALLY_BEFORE_ANY_FIX_OR_NEW_RUNTIME",
   "containsPII":false,
   "containsSecrets":false
 }
