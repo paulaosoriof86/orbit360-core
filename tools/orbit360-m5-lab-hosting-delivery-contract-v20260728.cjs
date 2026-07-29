@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+'use strict';
+const fs=require('fs'),path=require('path'),crypto=require('crypto');
+const ROOT=process.cwd(),PLAT=path.join(ROOT,'orbit360-platform');
+const EXPECTED_HASH='d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045';
+const ASSETS=['index.html','ays-lab-preview.html','styles/tokens.css','styles/base.css','styles/infra.css','styles/v1197-empalme.css','styles/client-insurer-visual-contract-v20260720.css','styles/client-insurer-edit-mode-v20260722.css','styles/aseguradoras-candidate.css','sw.js','core/pwa.js','core/router-tenant-config-bootstrap.js','core/router.js','core/auth.js','modules/cliente360.js','modules/aseguradoras.js','core/client-insurer-edit-owner-v20260722.js','core/client-insurer-operational-directory-owner-v20260722.js','core/client-insurer-visual-stability-barrier-v20260721.js','core/client-insurer-visual-contract-v20260720.js','core/operational-directory-field-policy-v20260722.js','core/aseguradoras-credentials-provider-lab-v20260720.js','core/insurer-secure-target-bridge-v20260720.js','data/tenant-alianzas-soluciones-insurers-p10.js','product-readonly.html','core/backend-product-readiness-contract-p0.js','core/backend-product-readonly-bootstrap-p0.js','core/membership-multirol-effective-p0.js','core/tenant-access-policy-product-p0.js','core/product-role-taxonomy-p0.js','core/access-role-session-owner-v20260728.js','core/product-runtime-provider-contracts-p0.js','data/store-firestore-product-readonly-p0.js','core/tenant-activation-runtime-contract-p0.js','core/membership-multirol-contract-p0.js','core/tenant-access-policy-contract-p0.js','core/product-query-planner-contract-p0.js','core/tenant-canonical-paths-contract-p0.js','core/tenant-access-policy-effective-p0.js','core/aseguradoras-bank-account-visibility-policy-p0.js','data/academia-v1230-operational-directory-v20260722.js'];
+const REMOTE=['index.html','ays-lab-preview.html','styles/tokens.css','styles/base.css','styles/infra.css','styles/v1197-empalme.css','styles/client-insurer-visual-contract-v20260720.css','styles/client-insurer-edit-mode-v20260722.css','styles/aseguradoras-candidate.css','sw.js','core/pwa.js','modules/aseguradoras.js','core/router-tenant-config-bootstrap.js','core/client-insurer-edit-owner-v20260722.js','core/client-insurer-operational-directory-owner-v20260722.js','core/client-insurer-visual-stability-barrier-v20260721.js','core/client-insurer-visual-contract-v20260720.js','data/academia-v1230-operational-directory-v20260722.js','data/tenant-alianzas-soluciones-insurers-p10.js','core/operational-directory-field-policy-v20260722.js','core/aseguradoras-credentials-provider-lab-v20260720.js','core/insurer-secure-target-bridge-v20260720.js','core/product-role-taxonomy-p0.js','core/access-role-session-owner-v20260728.js'];
+function read(rel){return fs.readFileSync(path.join(ROOT,rel),'utf8')}function json(rel){return JSON.parse(read(rel))}function sha(b){return crypto.createHash('sha256').update(b).digest('hex')}
+const checks=[];function check(id,ok){checks.push({id,ok:!!ok});}
+try{
+ const closure=json('orbit360-platform/runtime-gate-crm-v20260716/m5-post-access-readiness-503-closure.json');
+ const auth=json('tools/orbit360-m5-lab-hosting-delivery-authorization-v20260728.json');
+ const freeze=json('tools/orbit360-m5-lab-hosting-delivery-freeze-v20260728.json');
+ const lifecycle=json('tools/orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-v20260728.json');
+ const overlay=json('tools/orbit360-gate-contract-overlay-m5-lab-hosting-delivery-v20260728.json');
+ const registry=json('tools/orbit360-gate-contract-registry-extension-m5-lab-hosting-delivery-v20260728.json');
+ const firebase=json('firebase.json');
+ const rows=ASSETS.map(p=>({path:p,present:fs.existsSync(path.join(PLAT,p)),sha256:fs.existsSync(path.join(PLAT,p))?sha(fs.readFileSync(path.join(PLAT,p))):''}));
+ const candidateHash=sha(JSON.stringify(rows.map(x=>({path:x.path,sha256:x.sha256}))));
+ check('CLOSURE_STATUS',closure.status==='M5_RC_READY_LAB_DELIVERY_REQUIRED');
+ check('CLOSURE_HASH',closure.releaseCandidate?.hash===EXPECTED_HASH);
+ check('CLOSURE_COUNTS',closure.releaseCandidate?.criticalAssets===41&&closure.labParity?.assetsExpected===24&&closure.labParity?.assetsMatched===21);
+ check('CLOSURE_APPROVAL',closure.approvalReadyForLabDelivery===true&&closure.hostingDeployAuthorized===false);
+ check('AUTH_VERSION',auth.contractVersion==='5.0.4'&&auth.explicitAuthorization===true);
+ check('AUTH_ONE_SHOT',auth.hostingLabDeliveryAuthorized===true&&auth.allowedExecutions===1&&auth.requestCreated===false);
+ check('AUTH_HASH',auth.releaseCandidateHash===EXPECTED_HASH);
+ check('AUTH_TARGET',auth.projectId==='ays-orbit-360-lab'&&auth.channel==='orbit360-ays-lab');
+ check('AUTH_CAPABILITIES',auth.secrets===true&&auth.deploy===true&&auth.hostingOnly===true&&auth.firestoreRead===false&&auth.firestoreWrite===false&&auth.operationalWrites===false&&auth.browser===false&&auth.runtimeSmoke===false&&auth.rulesDeploy===false&&auth.functionsDeploy===false&&auth.production===false&&auth.mergeMain===false&&auth.policies===false);
+ check('FREEZE_STATUS',freeze.status==='READY_FOR_ONE_HOSTING_LAB_DELIVERY');
+ check('FREEZE_HASH',freeze.baseline?.releaseCandidateHash===EXPECTED_HASH);
+ check('FREEZE_COUNTS',freeze.baseline?.criticalAssets===41&&freeze.baseline?.remoteAssetsExpected===24&&freeze.requiredAfterDelivery?.remoteAssetsMatched===24);
+ check('FREEZE_TARGET',freeze.target?.projectId==='ays-orbit-360-lab'&&freeze.target?.channel==='orbit360-ays-lab');
+ check('FREEZE_FORBIDDEN',freeze.forbidden?.firestoreRead===true&&freeze.forbidden?.firestoreWrite===true&&freeze.forbidden?.operationalWrites===true&&freeze.forbidden?.rulesDeploy===true&&freeze.forbidden?.functionsDeploy===true&&freeze.forbidden?.browser===true&&freeze.forbidden?.production===true);
+ check('LIFECYCLE_VERSION',lifecycle.gateContractVersion==='5.0.4'&&lifecycle.executionProfile?.phase==='M5_LAB_HOSTING_DELIVERY');
+ check('LIFECYCLE_CAPABILITIES',lifecycle.executionProfile?.capabilities?.secrets===true&&lifecycle.executionProfile?.capabilities?.deploy===true&&lifecycle.executionProfile?.capabilities?.firestoreRead===false&&lifecycle.executionProfile?.capabilities?.writes===false&&lifecycle.executionProfile?.capabilities?.runtime===false&&lifecycle.executionProfile?.capabilities?.browser===false&&lifecycle.executionProfile?.capabilities?.functionsDeploy===false&&lifecycle.executionProfile?.capabilities?.rulesDeploy===false&&lifecycle.executionProfile?.capabilities?.production===false);
+ check('OVERLAY_SCOPE',overlay.contractVersion==='5.0.4'&&overlay.phase==='M5_LAB_HOSTING_DELIVERY'&&overlay.required?.releaseCandidateHash===EXPECTED_HASH);
+ check('OVERLAY_CAPABILITIES',overlay.capabilityBoundary?.secrets===true&&overlay.capabilityBoundary?.deploy===true&&overlay.capabilityBoundary?.firestoreRead===false&&overlay.capabilityBoundary?.writes===false&&overlay.capabilityBoundary?.browser===false&&overlay.capabilityBoundary?.functionsDeploy===false&&overlay.capabilityBoundary?.rulesDeploy===false&&overlay.capabilityBoundary?.production===false);
+ check('REGISTRY_ENTRY',registry.gates?.length===1&&registry.gates[0]?.contractVersion==='5.0.4'&&registry.gates[0]?.phase==='M5_LAB_HOSTING_DELIVERY');
+ check('FIREBASE_PUBLIC',firebase.hosting?.public==='orbit360-platform');
+ check('FIREBASE_DOCS_IGNORED',Array.isArray(firebase.hosting?.ignore)&&firebase.hosting.ignore.includes('docs/**'));
+ check('FIREBASE_NO_REWRITES',!firebase.hosting?.rewrites);
+ check('ASSET_COUNT',ASSETS.length===41);
+ check('ASSETS_PRESENT',rows.every(x=>x.present));
+ check('RC_HASH',candidateHash===EXPECTED_HASH);
+ check('REMOTE_COUNT',REMOTE.length===24);
+ check('ACCESS_ASSETS_REMOTE',REMOTE.includes('core/product-role-taxonomy-p0.js')&&REMOTE.includes('core/access-role-session-owner-v20260728.js'));
+ check('INDEX_REFERENCES_ACCESS',read('orbit360-platform/index.html').includes('core/product-role-taxonomy-p0.js')&&read('orbit360-platform/index.html').includes('core/access-role-session-owner-v20260728.js'));
+ check('WORKFLOW_PRESENT',fs.existsSync(path.join(ROOT,'.github/workflows/orbit360-m5-lab-hosting-delivery-v20260728.yml')));
+ check('REQUEST_BOUNDARY_FILE_RESERVED',true);
+ const failed=checks.filter(x=>!x.ok),out={schemaVersion:'orbit360-m5-lab-hosting-delivery-contract-summary-v1',contractVersion:'5.0.4',ok:failed.length===0,status:failed.length?'M5_LAB_HOSTING_DELIVERY_CONTRACT_FAIL':'M5_LAB_HOSTING_DELIVERY_CONTRACT_PASS',passed:checks.length-failed.length,total:checks.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),releaseCandidateHash:candidateHash,criticalAssets:ASSETS.length,remoteAssets:REMOTE.length,projectId:'ays-orbit-360-lab',channel:'orbit360-ays-lab',secretsRequired:true,firestoreRead:false,operationalWrites:0,browser:false,hostingDeploy:true,functionsDeploy:false,rulesDeploy:false,production:false,containsPII:false,containsSecrets:false};
+ const outPath=path.join(PLAT,'runtime-gate-crm-v20260716/m5-lab-hosting-delivery-contract-summary.json');fs.mkdirSync(path.dirname(outPath),{recursive:true});fs.writeFileSync(outPath,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
+}catch(error){console.error(String(error&&error.message||error));process.exit(41)}
