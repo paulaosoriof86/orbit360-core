@@ -2,7 +2,11 @@ name: Orbit 360 · M5 membership projection static · 5.0.12
 run-name: M5 5.0.12 · root cause static · ${{ github.sha }}
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-membership-projection-remediation-512-v20260729.yml'
 
 permissions:
   contents: read
