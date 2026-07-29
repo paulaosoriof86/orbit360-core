@@ -1,0 +1,202 @@
+name: Orbit 360 · M5 Hosting LAB delivery · RC f6dfa37e
+run-name: M5 5.0.10 · Hosting LAB exact RC · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-lab-hosting-delivery-510-v20260729.yml'
+      - 'tools/orbit360-m5-lab-hosting-delivery-request-510-v20260729.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-m5-lab-hosting-delivery-510-v20260729
+  cancel-in-progress: false
+
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: tools/orbit360-m5-lab-hosting-delivery-request-510-v20260729.json
+  EXPECTED_RC_HASH: f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324
+  EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
+  ORBIT360_HOSTING_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  hosting_lab_delivery:
+    name: M5 · package or one Hosting LAB delivery · verify 25/25
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolver modo controlado
+        id: mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f "$ORBIT360_REQUEST_FILE" ]; then echo 'value=request' >> "$GITHUB_OUTPUT"; else echo 'value=package' >> "$GITHUB_OUTPUT"; fi
+
+      - name: Verificar rama SHA y primer intento
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = 'push'
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Validar solicitud inmutable sin secretos
+        if: ${{ steps.mode.outputs.value == 'request' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs'),cp=require('child_process');
+          const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
+          const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
+          const bad=[];
+          if(r.schemaVersion!=='orbit360-m5-lab-hosting-delivery-request-v3'||r.gateId!==process.env.ORBIT360_GATE_ID||r.contractVersion!=='5.0.10')bad.push('schema');
+          if(r.branch!==process.env.ORBIT360_BRANCH||r.authorizedBaseCommit!==parent||r.allowedExecutions!==1||r.hostingLabDelivery!==true)bad.push('binding');
+          if(r.releaseCandidateHash!==process.env.EXPECTED_RC_HASH||r.criticalAssets!==42||r.remoteAssetsExpected!==25)bad.push('candidate');
+          if(r.projectId!==process.env.EXPECTED_FIREBASE_PROJECT_ID||r.channel!==process.env.ORBIT360_HOSTING_CHANNEL||r.canonicalUrl!==process.env.ORBIT360_HOSTING_URL)bad.push('target');
+          if(r.secrets!==true||r.deploy!==true||r.hostingOnly!==true||r.firestoreRead!==false||r.firestoreWrite!==false||r.operationalWrites!==false||r.browser!==false||r.runtimeSmoke!==false||r.functionsDeploy!==false||r.rulesDeploy!==false||r.production!==false||r.mergeMain!==false||r.policies!==false||r.containsPII!==false||r.containsSecrets!==false)bad.push('capabilities');
+          if(bad.length)throw new Error('M5_HOSTING_REQUEST_INVALID:'+bad.join(','));
+          console.log('M5_HOSTING_510_REQUEST_BOUND_OK');
+          NODE
+
+      - name: Preflight canónico antes de cualquier secreto o deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m5-lab-hosting-delivery-510-v20260729.mjs
+          node --check tools/orbit360-m5-lab-hosting-delivery-contract-510-v20260729.cjs
+          node --check tools/orbit360-m5-release-candidate-readiness-v20260728.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="5.0.10" and .executionPhase=="M5_LAB_HOSTING_DELIVERY" and .failed==0 and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==42 and .remoteAssetsExpected==25 and .capabilityProfile.secrets==true and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==true and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .dataAccess==false and .secretAccess==false and .operationalWrites==0' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          if [ '${{ steps.mode.outputs.value }}' = 'request' ]; then jq -e '.executionAuthorized==true and .allowedExecutions==1 and .activationMode=="immutable_request_present"' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null; else jq -e '.executionAuthorized==false and .allowedExecutions==0 and .activationMode=="package_without_request"' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null; fi
+
+      - name: Verificar contrato y RC local exacta
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-m5-lab-hosting-delivery-contract-510-v20260729.cjs
+          jq -e '.ok==true and .status=="M5_LAB_HOSTING_DELIVERY_CONTRACT_PASS" and .failed==0 and .passed==.total and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==42 and .remoteAssets==25 and .hostingDeploy==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeSmoke==false and .browser==false and .functionsDeploy==false and .rulesDeploy==false and .production==false' "$ORBIT360_EVIDENCE_DIR/m5-lab-hosting-delivery-510-contract-summary.json" >/dev/null
+
+      - name: Resolver identidad exclusiva de Hosting LAB después del preflight
+        if: ${{ steps.mode.outputs.value == 'request' }}
+        shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-m5-hosting-lab-510.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar Firebase CLI
+        if: ${{ steps.mode.outputs.value == 'request' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-tools@14
+          npx firebase --version
+
+      - name: Publicar exclusivamente Hosting LAB una vez
+        if: ${{ steps.mode.outputs.value == 'request' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx firebase hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --project "$EXPECTED_FIREBASE_PROJECT_ID" --config firebase.json --expires 7d --non-interactive --json > "$ORBIT360_EVIDENCE_DIR/m5-lab-hosting-510-deploy-output.json"
+          jq -e 'type=="object"' "$ORBIT360_EVIDENCE_DIR/m5-lab-hosting-510-deploy-output.json" >/dev/null
+
+      - name: Revalidar RC pública 25/25 sin navegador
+        if: ${{ steps.mode.outputs.value == 'request' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          verified=0
+          for attempt in 1 2; do
+            node tools/orbit360-m5-release-candidate-readiness-v20260728.mjs || true
+            if jq -e '.ok==true and .status=="M5_RC_READY_FOR_RUNTIME_SMOKE" and .releaseCandidate.hash==env.EXPECTED_RC_HASH and .releaseCandidate.criticalAssetCount==42 and .remoteLab.assetsExpected==25 and .remoteLab.assetsChecked==25 and .remoteLab.assetsMatched==25 and .remoteLab.mismatchCount==0 and .remoteLab.remoteParity==true and .writes.operationalWrites==0 and .browser==false and .runtime==false and .deploy==false and .rulesDeploy==false and .functionsDeploy==false and .productionTouched==false' "$ORBIT360_EVIDENCE_DIR/m5-release-candidate-readiness-summary.json" >/dev/null; then verified=1; break; fi
+            if [ "$attempt" = '1' ]; then sleep 8; fi
+          done
+          test "$verified" = '1'
+
+      - name: Crear cierre sanitizado
+        if: always()
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),path=require('path');const d=process.env.ORBIT360_EVIDENCE_DIR,mode='${{ steps.mode.outputs.value }}';
+          const read=n=>{try{return JSON.parse(fs.readFileSync(path.join(d,n),'utf8'))}catch{return null}};
+          const p=read('preflight-sanitizado.json'),c=read('m5-lab-hosting-delivery-510-contract-summary.json'),r=read('m5-release-candidate-readiness-summary.json'),dep=read('m5-lab-hosting-510-deploy-output.json');
+          const packageOk=!!(p&&p.status==='GO_GATE_CONTRACT'&&p.failed===0&&p.activationMode==='package_without_request'&&c&&c.status==='M5_LAB_HOSTING_DELIVERY_CONTRACT_PASS'&&c.failed===0);
+          const deliveryOk=!!(p&&p.status==='GO_GATE_CONTRACT'&&p.failed===0&&p.executionAuthorized===true&&c&&c.status==='M5_LAB_HOSTING_DELIVERY_CONTRACT_PASS'&&c.failed===0&&r&&r.status==='M5_RC_READY_FOR_RUNTIME_SMOKE'&&r.releaseCandidate?.hash===process.env.EXPECTED_RC_HASH&&r.remoteLab?.assetsMatched===25&&r.remoteLab?.mismatchCount===0&&r.remoteLab?.remoteParity===true&&dep);
+          const ok=mode==='request'?deliveryOk:packageOk;const matched=(r&&r.remoteLab?.assetsMatched)??0,mismatchCount=(r&&r.remoteLab?.mismatchCount)??25;
+          const out={schemaVersion:'orbit360-m5-lab-hosting-delivery-510-summary-v1',generatedAt:new Date().toISOString(),ok,status:mode==='request'?(ok?'M5_LAB_HOSTING_DELIVERED_AND_25_OF_25_VERIFIED':'M5_LAB_HOSTING_DELIVERY_FAILED'):(ok?'M5_LAB_HOSTING_DELIVERY_PACKAGE_PASS':'M5_LAB_HOSTING_DELIVERY_PACKAGE_FAIL'),mode,gateId:process.env.ORBIT360_GATE_ID,contractVersion:'5.0.10',releaseCandidateHash:process.env.EXPECTED_RC_HASH,projectId:process.env.EXPECTED_FIREBASE_PROJECT_ID,channel:process.env.ORBIT360_HOSTING_CHANNEL,canonicalUrl:process.env.ORBIT360_HOSTING_URL,canonicalPreflight:p&&p.status||'NOT_RUN',preflightPassed:p&&p.passed||0,preflightTotal:p&&p.total||0,contractStatus:c&&c.status||'NOT_RUN',contractPassed:c&&c.passed||0,contractTotal:c&&c.total||0,criticalAssets:42,remoteAssetsChecked:r&&r.remoteLab?.assetsChecked||0,remoteAssetsMatched:matched,mismatchCount,remoteParity:!!(r&&r.remoteLab?.remoteParity),hostingDeployExecuted:!!dep,hostingDeployExecutions:dep?1:0,secretsUsed:!!dep,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeSmoke:false,browser:false,functionsDeploy:false,rulesDeploy:false,production:false,mergeMain:false,policies:false,containsPII:false,containsSecrets:false,approvalReadyForRuntimeSmoke:mode==='request'&&ok,runtimeSmokeAuthorized:false,visualReviewAuthorized:false};
+          fs.writeFileSync(path.join(d,'m5-lab-hosting-delivery-510-summary.json'),JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));
+          NODE
+
+      - name: Validar cierre esperado
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ steps.mode.outputs.value }}' = 'request' ]; then
+            jq -e '.ok==true and .status=="M5_LAB_HOSTING_DELIVERED_AND_25_OF_25_VERIFIED" and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==42 and .remoteAssetsChecked==25 and .remoteAssetsMatched==25 and .mismatchCount==0 and .remoteParity==true and .hostingDeployExecuted==true and .hostingDeployExecutions==1 and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeSmoke==false and .browser==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .mergeMain==false and .policies==false and .containsPII==false and .containsSecrets==false' "$ORBIT360_EVIDENCE_DIR/m5-lab-hosting-delivery-510-summary.json" >/dev/null
+          else
+            jq -e '.ok==true and .status=="M5_LAB_HOSTING_DELIVERY_PACKAGE_PASS" and .hostingDeployExecuted==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeSmoke==false and .browser==false' "$ORBIT360_EVIDENCE_DIR/m5-lab-hosting-delivery-510-summary.json" >/dev/null
+          fi
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-lab-hosting-510-${{ steps.mode.outputs.value }}-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-lab-hosting-delivery-510-contract-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-manifest.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-lab-hosting-delivery-510-summary.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publicar estado observable sanitizado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          SUMMARY_PATH: orbit360-platform/runtime-gate-crm-v20260716/m5-lab-hosting-delivery-510-summary.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='M5 5.0.10 Hosting LAB failed';
+            try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY_PATH,'utf8'));if(s.ok===true){state='success';description=s.mode==='request'?'M5 Hosting LAB delivered; parity 25/25':'M5 Hosting LAB package verified';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-lab-hosting-delivery-510',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Limpiar identidad temporal
+        if: always()
+        shell: bash
+        run: rm -f "${ORBIT360_TEMP_KEY_FILE:-${RUNNER_TEMP}/orbit360-m5-hosting-lab-510.json}"
