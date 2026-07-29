@@ -1,0 +1,11 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v3",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.9",
+  "phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC",
+  "required":{"runtimeAttemptStatus":"M5_RUNTIME_SMOKE_LAB_FAILED_STOP_LINE","runtimeAttemptRunId":30420738744,"firestoreWrites":0,"operationalWrites":0,"countsStable":true,"digestsStable":true,"rootCauseCount":3,"indexOwnerBeforeFirestoreStore":true,"bootstrapEvidenceNormalizer":true,"protectedStoreUnchanged":true},
+  "capabilityBoundary":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
