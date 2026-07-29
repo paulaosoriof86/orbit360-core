@@ -47,7 +47,7 @@ jobs:
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
           test "$GITHUB_RUN_ATTEMPT" = '1'
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test -z "$(grep -n '\${{ *secrets\.' .github/workflows/orbit360-m5-membership-projection-512-v20260729.yml || true)"
+          test -z "$(grep -n 'secrets[.]' .github/workflows/orbit360-m5-membership-projection-512-v20260729.yml || true)"
           ! grep -Eq 'firebase[[:space:]]+(deploy|hosting:|functions:)|playwright|chromium|firestore-admin|GOOGLE_APPLICATION_CREDENTIALS' .github/workflows/orbit360-m5-membership-projection-512-v20260729.yml
 
       - name: Preflight canónico 5.0.12
