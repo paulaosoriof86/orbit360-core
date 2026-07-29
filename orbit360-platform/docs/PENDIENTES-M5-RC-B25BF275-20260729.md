@@ -8,53 +8,63 @@ Fecha: 2026-07-29 UTC / 2026-07-28 Guatemala
 - M5 5.0.1–5.0.4: cerrados.
 - Runtime smoke 5.0.5: stop-line cerrado, autorización consumida, cero escrituras.
 - Remediación estática 5.0.6: cerrada.
-- Nueva RC: `b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091`.
+- Hosting LAB 5.0.7: cerrado.
+- RC: `b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091`.
 - Activos críticos: 42/42.
-- LAB actual: 22/25.
+- Activos públicos LAB: 25/25.
+- Mismatches: 0.
+- Hosting deploy executions: 1.
+- Redeploy: no.
 
-## Pendiente único autorizado actualmente
+## Pendiente autorizado actualmente
 
-Ninguno. Hosting, runtime, navegador y revisión visual están bloqueados.
+Ninguno.
+
+```txt
+hostingDeployAuthorized: false
+allowedHostingDeployExecutions: 0
+publicParityRecoveryAuthorized: false
+runtimeSmokeAuthorized: false
+allowedRuntimeSmokeExecutions: 0
+visualReviewAuthorized: false
+```
 
 ## Próxima autorización requerida
 
-Una sola entrega Hosting LAB de la RC exacta `b25bf275…`.
+Una sola ejecución runtime smoke LAB de la RC exacta `b25bf275…`.
 
-Alcance permitido después de autorización explícita:
+Alcance permitido únicamente después de autorización explícita independiente:
 
-- canal `orbit360-ays-lab`;
-- frontend Hosting solamente;
-- una ejecución;
-- paridad pública posterior obligatoria 25/25.
+- navegador automatizado LAB;
+- autenticación y acuerdo legal una vez;
+- lectura Firestore read-only cuando el gate la requiera;
+- Dirección desktop, Operativo tablet y Asesor móvil;
+- Cliente 360 lista/ficha/calidad;
+- Aseguradoras directorio/ficha/conocimiento;
+- multirol/scopes, menú móvil, relaciones vacías honestas y cero copy técnico;
+- verificación de 414 clientes, 26 aseguradoras y 7 asesores;
+- cero escrituras.
 
 Alcance prohibido:
 
-- Firestore y datos;
+- otro deploy Hosting;
+- Firestore writes y mutaciones operativas;
 - Functions y Rules;
 - producción;
 - `main` y merge;
-- runtime smoke y navegador;
+- revisión visual humana antes de smoke `ok:true`;
 - Pólizas y cualquier otra fuente real.
 
-## Diferencias que debe cerrar Hosting
-
-1. `ays-lab-preview.html` — hash remoto anterior.
-2. `data/academia-v1230-operational-directory-v20260722.js` — hash remoto anterior.
-3. `core/academia-static-content-write-policy-v20260729.js` — no publicado, HTTP 404.
-
-## Gate de salida
-
-Aceptar únicamente evidencia sanitizada con:
+## Gate de salida esperado
 
 ```txt
 RC = b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091
-critical assets = 42/42
-remote assets = 25/25
-mismatches = 0
-hosting deploy executions = 1
+public parity = 25/25 preservada
+runtime smoke = ok:true
 Firestore writes = 0
-runtime/browser = false/false
+operational writes = 0
+hosting deploy = false
 Functions/Rules/production/main/merge = false
 ```
 
-Solo después podrá solicitarse una nueva autorización independiente para runtime smoke LAB. Pólizas continúa bloqueado hasta que su bloque solicite y reciba la fuente real vigente específica.
+Solo después podrá habilitarse la revisión visual única. Pólizas continúa bloqueado hasta que su bloque solicite y reciba la fuente real vigente específica.
