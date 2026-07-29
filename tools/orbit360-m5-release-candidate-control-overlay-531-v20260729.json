@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-531-v1",
+  "issuedAt":"2026-07-29",
+  "authoritativeForCurrentM5ControlState":true,
+  "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-hosting-stop-overlay-530-v20260729.json"],
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.31",
+  "status":"M5_HOSTING_CONTROL_PLANE_531_STATIC_PASS_READY_FOR_NEW_HOSTING_AUTHORIZATION",
+  "releaseCandidate":{"hash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"descriptor":"tools/orbit360-m5-release-candidate-descriptor-530-v20260729.json","packageInput":"tools/orbit360-m5-hosting-package-input-531-v20260729.json"},
+  "publicParity":{"assetsExpected":26,"assetsMatched":24,"mismatchCount":2,"mismatchPaths":["sw.js","core/session-multirol-visibility-v20260716.js"],"hostingDeliveryRequired":true},
+  "controlPlane":{"packageInputImmutable":true,"evidenceLedgerSeparate":true,"evidenceLedger":"tools/orbit360-m5-hosting-evidence-ledger-531-v20260729.json","packageResultStableAfterEvidence":true,"fixturePass":true,"runId":30491707657,"jobId":90710889778,"artifactId":8739935980,"artifactDigest":"sha256:33d1b605db9e4ae66397aca340965ca116a86173e96bf6bffaf05509933cf979"},
+  "authorization":{"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "safety":{"secrets":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"policies":false,"pólizas":false},
+  "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_HOSTING_LAB_AUTHORIZATION; on authorization create a new post-531 wrapper/package that consumes immutable package input and writes only append-only evidence",
+  "containsPII":false,
+  "containsSecrets":false
+}
