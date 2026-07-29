@@ -7,8 +7,9 @@ import {readGateEnvironment} from './orbit360-gate-environment-v20260717.mjs';
 const ROOT=process.cwd(),OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-browser-summary.json');
 const EXPECTED_COUNTRIES={GT:398,CO:16,REQUIERE_VALIDACION:0},EXPECTED_TYPES={Persona:391,Empresa:23};
 const REQUIRED_ROLES=['Dirección','Operativo','Asesor'],UNAUTHORIZED_ROLE='Finanzas';
+const EXPECTED_POLICY_VERSION='20260729.1';
 const {baseUrl,email,accessValue:key,runtime}=readGateEnvironment();
-const report={schemaVersion:'orbit360-m5-runtime-smoke-browser-v1',gateId:'block5-release-candidate-visualization-v20260728',contractVersion:'5.0.5',generatedAt:new Date().toISOString(),releaseCandidateHash:'d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045',projectId:'ays-orbit-360-lab',runtimeVersion:runtime,stage:'bootstrap',checks:{},roleViews:{},writeGuard:{networkWriteCandidates:[],storeCalls:[]},firestoreRead:true,firestoreWrites:0,operationalWrites:0,hostingDeploy:false,functionsDeploy:false,rulesDeploy:false,production:false,mergeMain:false,policies:false,containsPII:false,containsSecrets:false};
+const report={schemaVersion:'orbit360-m5-runtime-smoke-browser-v2',gateId:'block5-release-candidate-visualization-v20260728',contractVersion:'5.0.6-remediation-reference',generatedAt:new Date().toISOString(),releaseCandidateHash:'PENDING_RECALCULATION_AFTER_REMEDIATION',projectId:'ays-orbit-360-lab',runtimeVersion:runtime,stage:'bootstrap',checks:{},roleViews:{},writeGuard:{networkWriteCandidates:[],transientStaticCalls:[],blockedOperationalCalls:[]},firestoreRead:true,firestoreWrites:0,operationalWrites:0,hostingDeploy:false,functionsDeploy:false,rulesDeploy:false,production:false,mergeMain:false,policies:false,containsPII:false,containsSecrets:false};
 const clean=v=>String(v==null?'':v).replace(/https?:\/\/[^/\s]+/g,'').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').replace(/[A-Za-z0-9_-]{48,}/g,'[redacted]').replace(/\s+/g,' ').trim().slice(0,360);
 const save=()=>{fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(report,null,2)+'\n')};
 const stage=v=>{report.stage=v;console.log(`ORBIT360_M5_RUNTIME_STAGE:${v}`)};
@@ -18,6 +19,12 @@ function pathOnly(value){try{return new URL(String(value||'')).pathname.slice(0,
 async function awaitPreviewRedirect(page){
  await bounded('preview_redirect_ready',async()=>{const end=Date.now()+25000;while(Date.now()<end){const u=new URL(page.url());if(/\/index\.html$/.test(u.pathname)&&u.searchParams.get('orbitBackend')==='firestore-lab'&&u.searchParams.get('tenant')==='alianzas-soluciones'&&u.searchParams.get('runtime')===runtime)return;await page.waitForTimeout(100)}requireState(false,'CANONICAL_INDEX_NOT_REACHED',pathOnly(page.url()))},28000);
  report.checks.previewRedirectReady=true;
+}
+async function validateStaticWritePolicy(page){
+ await bounded('academia_static_write_policy_ready',()=>page.waitForFunction(expected=>window.Orbit&&Orbit.store&&Orbit.store.__academiaStaticWritePolicyVersion===expected&&typeof Orbit.store._writePolicy==='function',EXPECTED_POLICY_VERSION,{timeout:15000,polling:50}),17000);
+ const state=await page.evaluate(()=>({version:String(Orbit.store.__academiaStaticWritePolicyVersion||''),installed:Boolean(Orbit.academiaStaticContentWritePolicy&&Orbit.academiaStaticContentWritePolicy.installed),status:Orbit.store._transientStaticStatus?Orbit.store._transientStaticStatus():null}));
+ requireState(state.version===EXPECTED_POLICY_VERSION&&state.installed,'ACADEMIA_STATIC_WRITE_POLICY_NOT_READY',state.version);
+ report.academiaStaticWritePolicy=state;report.checks.academiaStaticWritePolicy=true;
 }
 async function selectAssignedRole(page,role){
  const result=await page.evaluate(target=>{const allowed=Orbit.session.allowedRoles();const select=document.getElementById('rol-sel');if(!allowed.includes(target))return{ok:false,code:'ROLE_NOT_ASSIGNED',allowedCount:allowed.length};if(select){const option=Array.from(select.options||[]).find(x=>String(x.value||'')===target)||Array.from(select.options||[]).find(x=>String(x.textContent||'').trim()===target);if(option){select.value=option.value;select.dispatchEvent(new Event('change',{bubbles:true}));return{ok:true,via:'selector',value:option.value}}}return{ok:Orbit.session.set(target)===true,via:'owner',value:target}},role);
@@ -73,25 +80,46 @@ async function validateMobileMenu(page){
 }
 let browser;const watchdog=setTimeout(()=>{report.ok=false;report.error=`GATE_TIMEOUT:${report.stage}`;save();process.exit(124)},900000);
 try{
- requireState(/^https:\/\//.test(baseUrl),'BLOQUEO_PREVIEW_URL');requireState(key.length>=12,'BLOQUEO_ACCESO_LAB');requireState(/^\d{8}-\d+$/.test(runtime),'BLOQUEO_RUNTIME_VERSION');
+ requireState(/^https:\/\//.test(baseUrl),'BLOQUEO_PREVIEW_URL');requireState(key.length>=12,'BLOQUEO_ACCESO_LAB');requireState(runtime==='20260717-2','BLOQUEO_RUNTIME_OWNER_VERSION',runtime);
  browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(60000);
  installBootstrapDiagnostics(page,report);
  page.on('request',request=>{const u=request.url();if(/google\.firestore\.v1\.Firestore\/(Commit|BatchWrite)|documents:(commit|batchWrite)/i.test(u)&&report.writeGuard.networkWriteCandidates.length<12)report.writeGuard.networkWriteCandidates.push({path:pathOnly(u),method:request.method()})});
- await page.addInitScript(()=>{const guard=window.__orbitM5WriteGuard={storeCalls:[],installed:false,installErrors:[]};const wrap=()=>{try{if(!window.Orbit||!Orbit.store||Orbit.store.__m5RuntimeGuarded)return;['insert','update','remove'].forEach(name=>{const original=Orbit.store[name];if(typeof original!=='function')return;Orbit.store[name]=function(){guard.storeCalls.push({method:name,collection:String(arguments[0]||'')});throw new Error('M5_RUNTIME_WRITE_BLOCKED:'+name)}});Object.defineProperty(Orbit.store,'__m5RuntimeGuarded',{value:true});guard.installed=true}catch(error){if(guard.installErrors.length<3)guard.installErrors.push(String(error&&error.name||'guard_error'))}};wrap();setInterval(wrap,20)});
+ await page.addInitScript(expectedPolicyVersion=>{
+   const guard=window.__orbitM5WriteGuard={transientStaticCalls:[],blockedOperationalCalls:[],installed:false,policyVersion:'',installErrors:[]};
+   const rowId=row=>row&&(row.id||row.uid||row.codigo||row.numero||row.key)||'';
+   const wrap=()=>{try{
+     if(!window.Orbit||!Orbit.store||Orbit.store.__m5RuntimeGuarded||typeof Orbit.store._writePolicy!=='function'||Orbit.store.__academiaStaticWritePolicyVersion!==expectedPolicyVersion)return;
+     ['insert','update','remove','setPref'].forEach(name=>{
+       const original=Orbit.store[name];if(typeof original!=='function')return;
+       Orbit.store[name]=function(){
+         const args=Array.from(arguments),collection=name==='setPref'?'__prefs':String(args[0]||''),id=name==='insert'?String(rowId(args[1])||''):String(args[1]||''),payload=name==='insert'?args[1]:(name==='update'?args[2]:(name==='setPref'?args[1]:null));
+         const decision=Orbit.store._writePolicy(name,collection,id,payload)||{mode:'durable_operational',reason:'missing_policy_decision'};
+         if(decision.mode==='transient_static_content'){
+           guard.transientStaticCalls.push({method:name,collection,reason:String(decision.reason||'')});
+           return original.apply(this,args);
+         }
+         guard.blockedOperationalCalls.push({method:name,collection,reason:String(decision.reason||'')});
+         throw new Error('M5_RUNTIME_DURABLE_WRITE_BLOCKED:'+name);
+       };
+     });
+     Object.defineProperty(Orbit.store,'__m5RuntimeGuarded',{value:true});guard.installed=true;guard.policyVersion=expectedPolicyVersion;
+   }catch(error){if(guard.installErrors.length<3)guard.installErrors.push(String(error&&error.name||'guard_error'))}};
+   document.addEventListener('orbit:academia-static-write-policy',wrap,true);wrap();setInterval(wrap,5);
+ },EXPECTED_POLICY_VERSION);
  report.browserParseDiagnostics={failedScripts:[],exceptions:[],parsedScripts:[]};const cdp=await page.context().newCDPSession(page);await cdp.send('Runtime.enable');await cdp.send('Debugger.enable');
- cdp.on('Debugger.scriptParsed',event=>{const p=pathOnly(event&&event.url);if(/data\/store\.js|core\/router\.js|core\/auth\.js|product-role-taxonomy|access-role-session-owner|client-canonical-view-projection/.test(p)&&report.browserParseDiagnostics.parsedScripts.length<24)report.browserParseDiagnostics.parsedScripts.push({path:p})});
+ cdp.on('Debugger.scriptParsed',event=>{const p=pathOnly(event&&event.url);if(/data\/store\.js|store-firestore-lab|academia-static-content-write-policy|core\/router\.js|core\/auth\.js|product-role-taxonomy|access-role-session-owner|client-canonical-view-projection/.test(p)&&report.browserParseDiagnostics.parsedScripts.length<32)report.browserParseDiagnostics.parsedScripts.push({path:p})});
  cdp.on('Debugger.scriptFailedToParse',event=>{if(report.browserParseDiagnostics.failedScripts.length<12)report.browserParseDiagnostics.failedScripts.push({path:pathOnly(event&&event.url),error:clean(event&&event.errorMessage)})});
  cdp.on('Runtime.exceptionThrown',event=>{const d=event&&event.exceptionDetails||{},f=d.stackTrace&&d.stackTrace.callFrames&&d.stackTrace.callFrames[0]||{};if(report.browserParseDiagnostics.exceptions.length<12)report.browserParseDiagnostics.exceptions.push({path:pathOnly(d.url||f.url),error:clean(d.exception&&d.exception.description||d.text)})});
- stage('open_lab_preview');await page.goto(`${baseUrl}/ays-lab-preview.html`,{waitUntil:'domcontentloaded',timeout:60000});await awaitPreviewRedirect(page);
+ stage('open_lab_preview');await page.goto(`${baseUrl}/ays-lab-preview.html`,{waitUntil:'domcontentloaded',timeout:60000});await awaitPreviewRedirect(page);await validateStaticWritePolicy(page);
  await waitForProductBootstrap(page,{runtime,bounded,requireState,report});await authenticateWithOwner(page,{email,key,runtime,bounded,requireState,report});await acceptLegalOnce(page,{bounded,requireState,report});
  await bounded('real_tenant_data',()=>page.waitForFunction(()=>window.Orbit&&Orbit.store&&Orbit.store.all&&Orbit.store.all('clientes').length===414&&Orbit.store.all('aseguradoras').length===26,null,{timeout:60000,polling:250}),65000);
  await validateAccessBoundary(page);await validateDataset(page);
  await page.setViewportSize({width:1440,height:1000});await selectAssignedRole(page,'Dirección');await validateClient360(page,'desktopDirection','Dirección');await validateInsurers(page,'desktopDirection','Dirección');report.checks.desktopDirection=true;
  await page.setViewportSize({width:820,height:1180});await selectAssignedRole(page,'Operativo');await validateClient360(page,'tabletOperativo','Operativo');await validateInsurers(page,'tabletOperativo','Operativo');report.checks.tabletOperativo=true;
  await page.setViewportSize({width:390,height:844});await selectAssignedRole(page,'Asesor');await page.evaluate(()=>{location.hash='#/inicio'});await page.waitForTimeout(500);await validateMobileMenu(page);await validateClient360(page,'mobileAsesor','Asesor');await validateInsurers(page,'mobileAsesor','Asesor');report.checks.mobileAsesor=true;
- const guard=await page.evaluate(()=>window.__orbitM5WriteGuard||{storeCalls:[],installed:false,installErrors:['missing']});report.writeGuard.storeCalls=guard.storeCalls||[];report.writeGuard.storeGuardInstalled=guard.installed===true;report.writeGuard.installErrors=guard.installErrors||[];
- requireState(report.writeGuard.storeGuardInstalled,'STORE_WRITE_GUARD_NOT_INSTALLED');requireState(report.writeGuard.storeCalls.length===0,'STORE_WRITE_CALL_DETECTED',String(report.writeGuard.storeCalls.length));requireState(report.writeGuard.networkWriteCandidates.length===0,'FIRESTORE_NETWORK_WRITE_DETECTED',String(report.writeGuard.networkWriteCandidates.length));
+ const guard=await page.evaluate(()=>window.__orbitM5WriteGuard||{transientStaticCalls:[],blockedOperationalCalls:[],installed:false,installErrors:['missing']});report.writeGuard.transientStaticCalls=guard.transientStaticCalls||[];report.writeGuard.blockedOperationalCalls=guard.blockedOperationalCalls||[];report.writeGuard.storeGuardInstalled=guard.installed===true;report.writeGuard.policyVersion=guard.policyVersion||'';report.writeGuard.installErrors=guard.installErrors||[];
+ requireState(report.writeGuard.storeGuardInstalled&&report.writeGuard.policyVersion===EXPECTED_POLICY_VERSION,'STORE_WRITE_GUARD_NOT_INSTALLED');requireState(report.writeGuard.transientStaticCalls.length>0,'TRANSIENT_STATIC_CONTENT_NOT_OBSERVED');requireState(report.writeGuard.blockedOperationalCalls.length===0,'DURABLE_STORE_WRITE_CALL_DETECTED',String(report.writeGuard.blockedOperationalCalls.length));requireState(report.writeGuard.networkWriteCandidates.length===0,'FIRESTORE_NETWORK_WRITE_DETECTED',String(report.writeGuard.networkWriteCandidates.length));
  requireState(report.browserParseDiagnostics.failedScripts.length===0,'BROWSER_SCRIPT_PARSE_FAILURE');requireState(report.browserParseDiagnostics.exceptions.length===0,'BROWSER_RUNTIME_EXCEPTION');
- report.checks.noWrites=true;report.checks.noParseFailures=true;report.ok=Object.values(report.checks).every(Boolean);stage('completed');
+ report.checks.noDurableWrites=true;report.checks.transientStaticContent=true;report.checks.noParseFailures=true;report.ok=Object.values(report.checks).every(Boolean);stage('completed');
 }catch(error){report.ok=false;report.failureStage=report.stage;report.error=clean(error&&error.stack||error)}finally{try{save()}catch{}try{if(browser)await Promise.race([browser.close(),new Promise(resolve=>setTimeout(resolve,10000))])}catch{}clearTimeout(watchdog)}
 console.log(`ORBIT360_M5_RUNTIME_SMOKE:${JSON.stringify({ok:report.ok,stage:report.stage,failureStage:report.failureStage||'',checks:report.checks,error:report.error||''})}`);process.exit(report.ok?0:1);
