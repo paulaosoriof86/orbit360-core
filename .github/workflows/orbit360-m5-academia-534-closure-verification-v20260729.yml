@@ -1,6 +1,7 @@
 name: Orbit 360 · M5 5.0.34 closure verification
 run-name: M5 5.0.34 · post-remediation zero-capability closure · ${{ github.sha }}
 
+# activation revision 2: workflow existed before this push
 on:
   push:
     branches:
