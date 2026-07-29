@@ -1,0 +1,25 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m5-hosting-delivery-535-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.35",
+  "phase":"M5_LAB_HOSTING_DELIVERY",
+  "candidateContractVersion":"5.0.34",
+  "required":{
+    "releaseCandidateHash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7",
+    "criticalAssets":44,
+    "remoteAssetsExpected":27,
+    "remoteAssetsMatchedBefore":26,
+    "mismatchPathsBefore":["data/academia-plus.js"],
+    "remoteAssetsMatchedAfter":27,
+    "mismatchCountAfter":0,
+    "hostingDeployExecutions":1,
+    "packageRunId":30498488128,
+    "packageJobId":90732671666,
+    "packageArtifactId":8742528376,
+    "packageArtifactDigest":"sha256:c93963740d6b672667dc14159e7d4a23d6db203fc3e8c18c65f19b353bca7c32"
+  },
+  "capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
