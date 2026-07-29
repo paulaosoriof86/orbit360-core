@@ -4,6 +4,15 @@
    seguro. Inyección idempotente; conserva progreso y certificados.
    ============================================================ */
 window.Orbit = window.Orbit || {};
+
+/* Contrato estático base: seed.js se carga antes de este bridge y Orbit.store.init
+   ocurre después. Solo normalizamos cursos ya declarados en Orbit.SEED; los cursos
+   creados por usuario desde modules/academia.js siguen sin _cv y permanecen durables. */
+(function normalizeBaseAcademiaSeedVersion() {
+  const rows = Orbit.SEED && Array.isArray(Orbit.SEED.cursos) ? Orbit.SEED.cursos : [];
+  rows.forEach(c => { if (c && !c._cv) c._cv = 1; });
+})();
+
 Orbit.ACADEMIA_V1197 = (function () {
   function section(icon, title, text) { return { icon, t: title, color: '#C5162E', d: text }; }
   function lesson(title, sections) { return { t: title, min: 10, tipo: 'lectura', secciones: sections }; }
