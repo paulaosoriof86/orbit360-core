@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m5-runtime-smoke-v7",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.23",
+  "phase":"LAB_RUNTIME_GATE",
+  "required":{"candidateRuntimeContractVersion":"5.0.22","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssets":42,"remoteAssetsMatched":25,"bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs","accessOwnerVersion":"20260729.3","academiaPolicyVersion":"20260729.2","visibleTechnicalCopyPredicateVersion":"20260729.1","snapshotsRequired":true,"firestoreWrites":0,"operationalWrites":0},
+  "forbidden":{"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"mergeMain":true,"policies":true,"visualReview":true,"pólizas":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
