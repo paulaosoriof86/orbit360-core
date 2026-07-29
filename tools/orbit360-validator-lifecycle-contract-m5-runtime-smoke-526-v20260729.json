@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-v9",
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-v10",
   "issuedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
@@ -7,13 +7,13 @@
   "gateId":"block5-release-candidate-visualization-v20260728",
   "gateContractVersion":"5.0.26",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
-  "controlPlaneRevision":"m5-runtime-525-one-shot-after-validator-524-v2",
-  "classification":"LAB_RUNTIME_GATE",
-  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_one_shot_request_after_package_pass"},
-  "baseline":{"validator524Closed":true,"validator524Status":"M5_RESPONSIVE_TITLE_REMEDIATION_524_STATIC_PASS","candidateRuntimeContractVersion":"5.0.25","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeExecuted":false},
-  "packageAttempt1":{"runId":30481853743,"jobId":90677666777,"classification":["VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],"rootCause":"consumer_expected_staticAttempt_instead_of_canonical_staticVerification","runtimeExecuted":false,"authorizationConsumed":false},
-  "authorization":{"authorizationSource":"user_autorizado_20260729_after_responsive_title_524_pass","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"authorizationConsumed":false,"firestoreWriteAuthorized":false,"operationalWritesAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
-  "nextRequiredDecision":"FINAL_PACKAGE_ATTEMPT_AFTER_EVIDENCE_SHAPE_FIX; ON_PASS_CREATE_IMMUTABLE_REQUEST_AND_EXECUTE_EXACTLY_ONE_RUNTIME_525; ON_FAILURE_STOP_PACKAGE_STAGE",
+  "controlPlaneRevision":"m5-runtime-525-one-shot-stopped-after-two-package-failures-v1",
+  "classification":"PIPELINE_MECHANISM_FAILURE",
+  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"STOPPED_NO_REQUEST_ALLOWED"},
+  "baseline":{"validator524Closed":true,"validator524Status":"M5_RESPONSIVE_TITLE_REMEDIATION_524_STATIC_PASS","candidateRuntimeContractVersion":"5.0.25","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeExecuted":false,"productDefectDemonstrated":false},
+  "packageFailures":{"count":2,"sameStageFailedTwice":true,"attempt1":{"runId":30481853743,"classification":["VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],"rootCause":"stale_evidence_property_name_staticAttempt"},"attempt2":{"runId":30482337946,"classification":["VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],"rootCause":"guessed_resolver_schema_shape_scopeFallback_instead_of_canonical_scopedExactTextFallback"}},
+  "authorization":{"authorizationSource":"user_autorizado_20260729_after_responsive_title_524_pass","runtimeSmokeAuthorized":false,"allowedExecutions":0,"requestCreated":false,"authorizationConsumed":false,"authorizationInvalidated":true,"firestoreWriteAuthorized":false,"operationalWritesAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
+  "nextRequiredDecision":"NEW_STATIC_CONTROL_PLANE_REDESIGN_BLOCK; NO THIRD PACKAGE AND NO RUNTIME_REQUEST",
   "containsPII":false,
   "containsSecrets":false
 }
