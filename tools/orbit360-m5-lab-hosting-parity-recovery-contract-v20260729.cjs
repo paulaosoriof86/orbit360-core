@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+'use strict';
+const fs=require('fs'),path=require('path'),crypto=require('crypto');
+const ROOT=process.cwd(),PLAT=path.join(ROOT,'orbit360-platform');
+const HASH='b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091';
+const FREEZE='tools/orbit360-m5-lab-hosting-parity-recovery-freeze-v20260729.json';
+const READINESS='tools/orbit360-m5-release-candidate-readiness-v20260728.mjs';
+const WORKFLOW='.github/workflows/orbit360-m5-lab-hosting-parity-recovery-v20260729.yml';
+const ASSETS=['index.html','ays-lab-preview.html','styles/tokens.css','styles/base.css','styles/infra.css','styles/v1197-empalme.css','styles/client-insurer-visual-contract-v20260720.css','styles/client-insurer-edit-mode-v20260722.css','styles/aseguradoras-candidate.css','sw.js','core/pwa.js','core/router-tenant-config-bootstrap.js','core/router.js','core/auth.js','modules/cliente360.js','modules/aseguradoras.js','core/client-insurer-edit-owner-v20260722.js','core/client-insurer-operational-directory-owner-v20260722.js','core/client-insurer-visual-stability-barrier-v20260721.js','core/client-insurer-visual-contract-v20260720.js','core/operational-directory-field-policy-v20260722.js','core/aseguradoras-credentials-provider-lab-v20260720.js','core/insurer-secure-target-bridge-v20260720.js','data/tenant-alianzas-soluciones-insurers-p10.js','product-readonly.html','core/backend-product-readiness-contract-p0.js','core/backend-product-readonly-bootstrap-p0.js','core/membership-multirol-effective-p0.js','core/tenant-access-policy-product-p0.js','core/product-role-taxonomy-p0.js','core/access-role-session-owner-v20260728.js','core/product-runtime-provider-contracts-p0.js','data/store-firestore-product-readonly-p0.js','core/tenant-activation-runtime-contract-p0.js','core/membership-multirol-contract-p0.js','core/tenant-access-policy-contract-p0.js','core/product-query-planner-contract-p0.js','core/tenant-canonical-paths-contract-p0.js','core/tenant-access-policy-effective-p0.js','core/aseguradoras-bank-account-visibility-policy-p0.js','data/academia-v1230-operational-directory-v20260722.js','core/academia-static-content-write-policy-v20260729.js'];
+const read=rel=>fs.readFileSync(path.join(ROOT,rel),'utf8');
+const json=rel=>JSON.parse(read(rel));
+const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
+const checks=[];const check=(id,ok,detail='')=>checks.push({id,ok:Boolean(ok),detail:String(detail||'').slice(0,220)});
+try{
+ const freeze=json(FREEZE),readiness=read(READINESS),workflow=read(WORKFLOW);
+ const rows=ASSETS.map(rel=>({path:rel,present:fs.existsSync(path.join(PLAT,rel)),sha256:fs.existsSync(path.join(PLAT,rel))?sha(fs.readFileSync(path.join(PLAT,rel))):''}));
+ const candidateHash=sha(JSON.stringify(rows.map(row=>({path:row.path,sha256:row.sha256}))));
+ check('FREEZE_STATUS',freeze.status==='READY_FOR_ONE_PUBLIC_PARITY_RECOVERY_WITHOUT_DEPLOY');
+ check('DELIVERY_EXECUTED_ONCE',freeze.deliveryEvidence?.hostingDeployExecuted===true&&freeze.deliveryEvidence?.hostingDeployExecutions===1);
+ check('DELIVERY_RUN',freeze.deliveryEvidence?.runId===30417743516&&freeze.deliveryEvidence?.jobId===90467807470&&freeze.deliveryEvidence?.artifactId===8710762943);
+ check('FAILURE_CLASSIFIED',freeze.deliveryEvidence?.postDeployFailureClassification==='PIPELINE_MECHANISM_FAILURE');
+ check('PARITY_AUTH_ONE_SHOT',freeze.authorization?.publicParityRecoveryAuthorized===true&&freeze.authorization?.allowedExecutions===1);
+ check('NO_REDEPLOY_AUTH',freeze.authorization?.hostingDeployAuthorized===false&&freeze.authorization?.allowedHostingDeployExecutions===0);
+ check('CAPABILITIES_ZERO',Object.values(freeze.capabilities||{}).every(value=>value===false));
+ check('EXPECTED_HASH',freeze.releaseCandidate?.hash===HASH);
+ check('EXPECTED_COUNTS',freeze.releaseCandidate?.criticalAssets===42&&freeze.releaseCandidate?.remoteAssetsExpected===25);
+ check('ASSET_COUNT',ASSETS.length===42);
+ check('ASSETS_PRESENT',rows.every(row=>row.present));
+ check('RC_HASH',candidateHash===HASH,candidateHash);
+ check('DURABLE_FALLBACK',readiness.includes("m5-runtime-smoke-remediation-static-506-closure.json")&&readiness.includes('durableAcademiaEvidence'));
+ check('EPHEMERAL_OPTIONAL',readiness.includes("fs.existsSync(path.join(ROOT,policyPath))")&&readiness.includes('policyTest?.ok'));
+ check('WORKFLOW_NO_SECRETS',!workflow.includes('secrets.')&&!workflow.includes('GOOGLE_APPLICATION_CREDENTIALS'));
+ check('WORKFLOW_NO_FIREBASE',!workflow.includes('firebase-tools')&&!workflow.includes('firebase hosting')&&!workflow.includes('channel:deploy'));
+ check('WORKFLOW_NO_BROWSER',!workflow.includes('playwright')&&!workflow.includes('chromium'));
+ check('WORKFLOW_NO_REDEPLOY',!workflow.includes('deploy-output')&&!workflow.includes('hostingDeployExecuted:true'));
+ check('WORKFLOW_EXACT_ASSERTION',workflow.includes('remoteLab.assetsMatched==25')&&workflow.includes('remoteLab.mismatchCount==0')&&workflow.includes('remoteLab.remoteParity==true'));
+ check('WORKFLOW_PRESENT',fs.existsSync(path.join(ROOT,WORKFLOW)));
+ const failed=checks.filter(item=>!item.ok),out={schemaVersion:'orbit360-m5-lab-hosting-parity-recovery-contract-v1',gateId:'block5-release-candidate-visualization-v20260728',contractVersion:'5.0.7-parity-recovery',ok:failed.length===0,status:failed.length?'M5_LAB_HOSTING_PARITY_RECOVERY_CONTRACT_FAIL':'M5_LAB_HOSTING_PARITY_RECOVERY_CONTRACT_PASS',passed:checks.length-failed.length,total:checks.length,failed:failed.length,failedCheckIds:failed.map(item=>item.id),checks,releaseCandidateHash:candidateHash,criticalAssets:ASSETS.length,remoteAssetsExpected:25,secrets:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,containsPII:false,containsSecrets:false};
+ const outPath=path.join(PLAT,'runtime-gate-crm-v20260716/m5-lab-hosting-parity-recovery-contract-summary.json');fs.mkdirSync(path.dirname(outPath),{recursive:true});fs.writeFileSync(outPath,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
+}catch(error){console.error(String(error&&error.message||error));process.exit(41)}
