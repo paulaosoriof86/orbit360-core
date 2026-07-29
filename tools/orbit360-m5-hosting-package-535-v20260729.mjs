@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+const ROOT=process.cwd(),PLAT=path.join(ROOT,'orbit360-platform');
+const OUT=path.join(PLAT,'runtime-gate-crm-v20260716/m5-hosting-package-535-summary.json');
+const INPUT='tools/orbit360-m5-hosting-package-input-535-v20260729.json';
+const LEDGER='tools/orbit360-m5-hosting-evidence-ledger-535-v20260729.json';
+const AUTH='tools/orbit360-m5-hosting-authorization-535-v20260729.json';
+const CONTROL='tools/orbit360-m5-release-candidate-control-overlay-534-v20260729.json';
+const DESC='tools/orbit360-m5-release-candidate-descriptor-534-v20260729.json';
+const REQUEST='tools/orbit360-m5-hosting-request-535-v20260729.json';
+const HASH='401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7';
+const read=r=>fs.readFileSync(path.join(ROOT,r),'utf8');
+const json=r=>JSON.parse(read(r));
+const sha=v=>crypto.createHash('sha256').update(v).digest('hex');
+const asset=rel=>{const p=path.join(PLAT,rel);return{path:rel,present:fs.existsSync(p),sha256:fs.existsSync(p)?sha(fs.readFileSync(p)):''};};
+const checks=[];const add=(id,ok,detail='')=>checks.push({id,ok:!!ok,detail:String(detail||'').slice(0,240)});
+try{
+  const input=json(INPUT),ledger=json(LEDGER),auth=json(AUTH),control=json(CONTROL),d=json(DESC),firebase=json('firebase.json');
+  const critical=(d.criticalAssets||[]).map(asset),computed=sha(JSON.stringify(critical.map(r=>({path:r.path,sha256:r.sha256}))));
+  const authEntry=(ledger.entries||[]).find(e=>e.kind==='hosting_authorization_received'&&e.sourceVersion==='5.0.35');
+  add('CONTROL_534',control.authoritativeForCurrentM5ControlState===true&&control.status==='M5_ACADEMIA_REMEDIATION_534_STATIC_PASS_NEW_RC_READY_TO_REQUEST_HOSTING_AUTHORIZATION');
+  add('CONTROL_AUTH_FALSE',control.authorization?.hostingLabDeliveryAuthorized===false&&control.authorization?.allowedHostingExecutions===0&&control.authorization?.runtimeSmokeAuthorized===false&&control.authorization?.allowedRuntimeExecutions===0);
+  add('CONTROL_PARITY',control.publicParity?.assetsExpected===27&&control.publicParity?.assetsMatched===26&&control.publicParity?.mismatchCount===1&&JSON.stringify(control.publicParity?.mismatchPaths||[])===JSON.stringify(['data/academia-plus.js'])&&control.publicParity?.hostingDeliveryRequired===true);
+  add('INPUT_SCHEMA',input.schemaVersion==='orbit360-m5-hosting-package-input-535-v1'&&input.contractVersion==='5.0.35'&&input.candidateContractVersion==='5.0.34'&&input.immutableAfterCreation===true);
+  add('INPUT_COUNTS',input.criticalAssets===44&&input.remoteAssetsExpected===27&&input.remoteAssetsMatchedBefore===26&&JSON.stringify(input.mismatchPathsBefore||[])===JSON.stringify(['data/academia-plus.js']));
+  add('DESCRIPTOR',d.contractVersion==='5.0.34'&&d.criticalAssets?.length===44&&d.remoteAssets?.length===27&&d.criticalAssets.includes('data/academia-plus.js')&&d.remoteAssets.includes('data/academia-plus.js'));
+  add('ASSETS_PRESENT',critical.length===44&&critical.every(r=>r.present));
+  add('CANDIDATE_HASH',computed===HASH&&input.expectedCandidateHash===HASH&&auth.releaseCandidateHash===HASH&&control.releaseCandidate?.hash===HASH);
+  add('BINDINGS',d.requiredBindings?.canonicalAccessOwnerVersion==='20260729.3'&&d.requiredBindings?.compatibilityOwnerVersion==='20260729.2'&&d.requiredBindings?.academiaStaticWritePolicyVersion==='20260729.2'&&d.requiredBindings?.academiaPlusContentVersion===8&&d.requiredBindings?.pwaCacheGeneration==='orbit360-v20260729-11-multirol-owner');
+  add('AUTH_SCHEMA',auth.schemaVersion==='orbit360-m5-hosting-authorization-535-v1'&&auth.explicitAuthorization===true&&auth.immutableAfterCreation===true&&auth.authorizationSource==='user_autorizado_hosting_5_0_34_20260729');
+  add('AUTH_EXECUTION',auth.hostingLabDeliveryAuthorized===true&&auth.allowedExecutions===1&&auth.hostingOnly===true&&auth.criticalAssets===44&&auth.remoteAssetsExpected===27&&auth.remoteAssetsMatchedBefore===26);
+  add('AUTH_TARGET',auth.target?.projectId==='ays-orbit-360-lab'&&auth.target?.channel==='orbit360-ays-lab'&&auth.target?.canonicalUrl==='https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app');
+  add('AUTH_SCOPE',auth.firestoreRead===false&&auth.firestoreWrite===false&&auth.operationalWrites===false&&auth.browser===false&&auth.runtimeSmoke===false&&auth.functionsDeploy===false&&auth.rulesDeploy===false&&auth.production===false&&auth.mergeMain===false&&auth.policies===false&&auth.pólizas===false&&auth.visualReview===false);
+  add('LEDGER',ledger.schemaVersion==='orbit360-m5-hosting-evidence-ledger-535-v1'&&ledger.appendOnly===true&&ledger.packageInput===INPUT&&!!authEntry&&authEntry.candidateHash===HASH&&authEntry.allowedExecutions===1&&authEntry.requestCreated===false&&authEntry.hostingExecuted===false);
+  add('REQUEST_ABSENT',!fs.existsSync(path.join(ROOT,REQUEST)));
+  add('FIREBASE_SCOPE',firebase.hosting?.public==='orbit360-platform'&&Array.isArray(firebase.hosting?.ignore)&&firebase.hosting.ignore.includes('docs/**')&&!firebase.hosting?.rewrites);
+  add('BASELINE',d.baseline?.clients===414&&d.baseline?.insurers===26&&d.baseline?.advisors===7&&d.baseline?.missingCurrency===0&&d.baseline?.targetOnlyClients===0&&d.baseline?.targetOnlyInsurers===0);
+  add('SANITIZED',input.containsPII===false&&input.containsSecrets===false&&auth.containsPII===false&&auth.containsSecrets===false&&ledger.containsPII===false&&ledger.containsSecrets===false);
+  const failed=checks.filter(x=>!x.ok),out={schemaVersion:'orbit360-m5-hosting-package-535-summary-v1',generatedAt:new Date().toISOString(),gateId:'block5-release-candidate-visualization-v20260728',contractVersion:'5.0.35',candidateContractVersion:'5.0.34',ok:failed.length===0,status:failed.length?'M5_HOSTING_535_PACKAGE_FAIL':'M5_HOSTING_535_PACKAGE_PASS',passed:checks.length-failed.length,total:checks.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,releaseCandidateHash:computed,criticalAssets:44,remoteAssetsExpected:27,remoteAssetsMatchedBefore:26,mismatchPathsBefore:['data/academia-plus.js'],packageInput:INPUT,evidenceLedger:LEDGER,authorization:AUTH,requestPresent:false,secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,containsPII:false,containsSecrets:false};
+  fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
+}catch(error){const out={schemaVersion:'orbit360-m5-hosting-package-535-summary-v1',gateId:'block5-release-candidate-visualization-v20260728',contractVersion:'5.0.35',ok:false,status:'PIPELINE_MECHANISM_FAILURE',failed:1,error:String(error&&error.message||error).slice(0,300),secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,production:false,containsPII:false,containsSecrets:false};fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(out,null,2)+'\n');console.error(out.error);process.exit(41);}
