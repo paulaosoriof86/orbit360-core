@@ -16,47 +16,86 @@ M4: cerrado / M4_CLOSED_SUCCESS_CANONICAL_TARGET_VERIFIED
 M5 5.0.1: readiness canónico cerrado
 M5 5.0.2: Access role/session boundary cerrado
 M5 5.0.3: RC post-Access cerrada
-M5 5.0.4: Hosting LAB entregado y verificado 24/24
-Bloque activo siguiente: autorización separada para un runtime smoke LAB
+M5 5.0.4: Hosting LAB de RC d90ec601 entregado y verificado 24/24
+M5 5.0.5: runtime smoke ejecutado una vez; stop-line cerrado, cero escrituras
+M5 5.0.6: remediación estática cerrada; nueva RC b25bf275 requiere Hosting LAB
 ```
 
-### Estado M5 5.0.4
+### Runtime smoke 5.0.5
 
-La RC exacta:
+La única ejecución autorizada llegó a navegador y fue detenida correctamente por la guarda de cero escritura.
 
 ```txt
-d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045
+Run: 30413481948
+Job: 90454714725
+Artifact: 8709301142
+Digest: sha256:082be4c8ac6e2e12d12534598736e27cc8083d1d206eb35c5ca2e37180d8e503
+Preflight: 17/17
+Contrato: 29/29
+Snapshots antes/después: 11/11 y 11/11
+Conteos y digests: estables
+Firestore writes: 0
+Operational writes: 0
 ```
 
-fue entregada una sola vez al canal Hosting LAB `orbit360-ays-lab` del proyecto `ays-orbit-360-lab`.
+Causas raíces:
+
+- `FUNCTIONAL_DEFECT` + `DATA_CONTRACT_FAILURE`: addenda estática de Academia intentaba usar escrituras durables durante el bootstrap LAB.
+- `VALIDATOR_STALE` + `PIPELINE_MECHANISM_FAILURE`: la revisión visual `20260723-10` se estaba usando como runtime backend, cuyo owner canónico es `20260717-2`.
+
+La autorización runtime quedó consumida; no se repitió el navegador.
+
+### Remediación estática 5.0.6
+
+Se incorporó la política LAB `core/academia-static-content-write-policy-v20260729.js`, versión `20260729.2`:
+
+- contenido seed y addenda versionada de Academia se monta de forma transitoria en la sesión;
+- no genera escrituras Firestore de bootstrap;
+- preserva progreso y certificaciones;
+- progreso, cursos creados y mutaciones operativas explícitas continúan siendo durables;
+- el loader y el store LAB protegidos permanecen intactos.
 
 Evidencia:
 
 ```txt
-Run: 30411375732
-Job: 90447991314
-Artifact: 8708510538
-Digest: sha256:fbe4ba382fe6d51294b2a08f17e2ba48a35e8b36dd0973303943cef8c631e1ec
-Preflight: 16/16
-Contrato: 31/31
-Activos críticos: 41/41
-Paridad pública LAB: 24/24
-Mismatches: 0
+Package run: 30415573496
+Package artifact: 8710028296
+Package digest: sha256:3ae2d78a5239ed5be90ebb7ef87ec4148ce0baa84b59ff8de28faf2cf44e4495
+Request run: 30415732795
+Request job: 90461724776
+Request artifact: 8710079365
+Request digest: sha256:7d28bc0a43e30353a93c4aae975a87636e01f02e0f32cacfa5c4ef905a90cf1c
+Preflight: 24/24
+Contrato estático: 26/26
+Fixtures Academia: 18/18
+Secrets/Firestore/runtime/browser/deploy: no/no/no/no/no
 ```
 
-El run terminó rojo únicamente porque el generador del resumen mezcló `||` y `??` sin paréntesis después de que el deploy y la revalidación 24/24 ya habían pasado. Se clasificó como `PIPELINE_MECHANISM_FAILURE`, se corrigió el workflow y no se repitió el deploy.
+Nueva candidata:
 
-La autorización Hosting quedó consumida. Runtime smoke, navegador y revisión visual siguen bloqueados hasta autorización explícita separada.
+```txt
+RC: b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091
+Activos críticos: 42/42
+Activos públicos LAB: 22/25
+Mismatches: 3
+Estado: M5_RC_READY_LAB_DELIVERY_REQUIRED
+```
 
-### Cierre M4
+Diferencias LAB:
 
-La migración canónica preserva:
+1. `ays-lab-preview.html` conserva el hash anterior.
+2. `data/academia-v1230-operational-directory-v20260722.js` conserva el hash anterior.
+3. `core/academia-static-content-write-policy-v20260729.js` aún no está publicado.
+
+### Cierre M4 preservado
 
 ```txt
 source: 414 clientes / 26 aseguradoras
 canonical target: 1 configuración / 1 membership / 414 clientes / 26 aseguradoras
 61 correcciones GT/GTQ preservadas
 moneda faltante restante: 0
+target-only: 0/0
+asesores: 7
 ```
 
 No se tocaron Pólizas ni otras fuentes reales.
@@ -64,8 +103,10 @@ No se tocaron Pólizas ni otras fuentes reales.
 ## Siguiente acción operativa
 
 ```txt
-Solicitar autorización explícita para una sola ejecución runtime smoke LAB
-sobre la RC d90ec601…, sin nuevo deploy y sin escrituras.
+Solicitar autorización explícita para una sola entrega Hosting LAB
+sobre la RC b25bf275…, sin Firestore, datos, Functions, Rules,
+producción, main, merge, runtime ni navegador.
+Después exigir paridad pública 25/25.
 ```
 
 No se inicia Pólizas dentro de M5. Cuando el Plan Maestro llegue al bloque Pólizas se debe solicitar a Paula el listado/base actual y vigente específico; `Listado producción 2025-2026` no es una fuente válida de Pólizas. La misma regla aplica a Vehículos, Recibos/cartera, Cobros, planillas, financiero, siniestros y documentos: cada fuente real se solicita cuando su bloque la necesite.
