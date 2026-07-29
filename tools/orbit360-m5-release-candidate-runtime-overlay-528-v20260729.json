@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-m5-release-candidate-runtime-overlay-v1",
+  "issuedAt":"2026-07-29",
+  "authoritativeForCurrentM5RuntimeAuthorizationState":true,
+  "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-527-v20260729.json"],
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "wrapperContractVersion":"5.0.28",
+  "candidateRuntimeContractVersion":"5.0.25",
+  "status":"M5_RUNTIME_SMOKE_528_AUTHORIZED_PACKAGE_PENDING",
+  "releaseCandidate":{"hash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssets":"42/42","remoteLab":"25/25","mismatchCount":0},
+  "controlPlane527":{"closed":true,"preflight":"16/16","candidateContract":"13/13","schemaDriven":true},
+  "candidate525":{"executed":false,"browserBlobSha":"70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12","closerBlobSha":"bf9301d1ed8bfa5d75f8d17924bd6685c520cb94"},
+  "authorization":{"source":"user_autorizado_20260729_after_control_plane_527_pass","runtimeSmokeAuthorized":true,"allowedRuntimeExecutions":1,"runtimeRequestCreated":false,"authorizationConsumed":false,"schemaDrivenCandidateContract":"tools/orbit360-m5-runtime-smoke-525-contract-schema-driven-v20260729.mjs"},
+  "forbidden":{"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
