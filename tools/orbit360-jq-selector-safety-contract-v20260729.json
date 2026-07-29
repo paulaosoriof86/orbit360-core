@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-jq-selector-safety-contract-v1",
+  "issuedAt":"2026-07-29",
+  "classification":"PIPELINE_MECHANISM_ROOT_CAUSE_CONTROL",
+  "problem":"jq dot-identifier selectors with non-ASCII property names can fail to compile",
+  "requiredRule":"JSON properties containing non-ASCII characters must be accessed by bracket or quoted selectors in jq",
+  "safeExample":".[\"polizas_unicode\"]",
+  "forbiddenPatternDescription":"dot identifier whose property token contains non-ASCII characters",
+  "knownIncidents":[
+    {"gateVersion":"5.0.13","stage":"post-check","classification":"VALIDATOR_STALE"},
+    {"gateVersion":"5.0.15","stage":"post-check","classification":"VALIDATOR_STALE"}
+  ],
+  "mechanismAction":"future gate workflows must validate this rule before relying on jq post-checks",
+  "runtimeRerunAuthorized":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
