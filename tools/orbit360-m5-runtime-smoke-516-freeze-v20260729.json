@@ -3,11 +3,11 @@
   "issuedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.16",
-  "status":"PACKAGE_PASS_AWAITING_ONE_IMMUTABLE_RUNTIME_REQUEST",
+  "status":"REQUEST_CREATED_AWAITING_ONE_RUNTIME_SMOKE_LAB",
   "baseline":{"hosting513Closed":true,"validator515Closed":true,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","remoteAssetsExpected":25,"remoteAssetsMatched":25,"mismatchCount":0,"sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7,"missingClientCurrency":0},
   "packageCheck":{"status":"M5_RUNTIME_SMOKE_516_PACKAGE_PASS","commit":"7dace8b7c720b799ff982095dddc7f1d013df32d","runId":30466972684,"jobId":90627143661,"artifactId":8729954895,"artifactDigest":"sha256:244dc0324a9f19ff874f68e116b2853085a9709ca28cac4ae869d6f307a6eeff"},
   "expected":{"countryCounts":{"GT":398,"CO":16,"REQUIERE_VALIDACION":0},"typeCounts":{"Persona":391,"Empresa":23},"academiaPolicyVersion":"20260729.2","backendRuntime":"20260717-2","accessOwnerVersion":"20260729.3","bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs","jqSelectorSafetyContract":"tools/orbit360-jq-selector-safety-contract-v20260729.json","countsStable":true,"digestsStable":true,"roleViews":["Dirección-desktop","Operativo-tablet","Asesor-mobile"]},
-  "authorization":{"explicitAuthorization":true,"runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"authorizationConsumed":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "authorization":{"explicitAuthorization":true,"runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"authorizationConsumed":false,"visualReviewAuthorized":false,"productionAuthorized":false},
   "forbidden":{"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"visualReview":true,"policies":true,"pólizas":true},
   "containsPII":false,
   "containsSecrets":false
