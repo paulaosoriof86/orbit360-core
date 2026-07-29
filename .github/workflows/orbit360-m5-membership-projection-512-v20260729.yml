@@ -1,0 +1,95 @@
+name: Orbit 360 · M5 membership projection · static 5.0.12
+run-name: M5 5.0.12 · membership projection static · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-membership-projection-512-v20260729.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-m5-membership-projection-512-v20260729
+  cancel-in-progress: false
+
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  static_membership_projection:
+    name: M5 · static only · membership projection + new RC
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar alcance estático y primer intento
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = 'push'
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(grep -n '\${{ *secrets\.' .github/workflows/orbit360-m5-membership-projection-512-v20260729.yml || true)"
+          ! grep -Eq 'firebase[[:space:]]+(deploy|hosting:|functions:)|playwright|chromium|firestore-admin|GOOGLE_APPLICATION_CREDENTIALS' .github/workflows/orbit360-m5-membership-projection-512-v20260729.yml
+
+      - name: Preflight canónico 5.0.12
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m5-membership-projection-512-v20260729.mjs
+          node --check tools/orbit360-m5-access-membership-projection-fixture-v20260729.mjs
+          node --check tools/orbit360-m5-release-candidate-readiness-v20260728.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="5.0.12" and .executionPhase=="M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC" and .failed==0 and .criticalAssets==42 and .remoteAssetsExpected==25 and .remoteAssetsMatched==24 and .remoteMismatchPaths==["core/access-role-session-owner-v20260728.js"] and .fixtureStatus=="M5_ACCESS_MEMBERSHIP_PROJECTION_FIXTURE_PASS" and .protectedFilesUnchanged==true and .approvalReadyForHostingLabDelivery==true and .capabilityProfile.secrets==false and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==false and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .dataAccess==false and .secretAccess==false and .operationalWrites==0' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Validar fixture y nueva RC
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.ok==true and .status=="M5_ACCESS_MEMBERSHIP_PROJECTION_FIXTURE_PASS" and .failed==0 and .passed==.total and .firestoreReadOnly==true and .firestoreWrites==0 and .operationalWrites==0 and .hardcodedTenant==false and .hardcodedUid==false and .hardcodedAdvisor==false' "$ORBIT360_EVIDENCE_DIR/m5-access-membership-projection-fixture.json" >/dev/null
+          jq -e '.ok==true and .status=="M5_MEMBERSHIP_PROJECTION_512_STATIC_PASS" and .failed==0 and .passed==.total and .criticalAssets==42 and .remoteAssetsExpected==25 and .remoteAssetsMatched==24 and .remoteMismatchPaths==["core/access-role-session-owner-v20260728.js"] and .protectedFilesUnchanged==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .secrets==false and .runtime==false and .browser==false and .hostingDeploy==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .visualReview==false and .approvalReadyForHostingLabDelivery==true' "$ORBIT360_EVIDENCE_DIR/m5-membership-projection-remediation-512-summary.json" >/dev/null
+          jq -e '.ok==true and .status=="M5_RC_READY_LAB_DELIVERY_REQUIRED" and .releaseCandidate.criticalAssetCount==42 and .remoteLab.assetsExpected==25 and .remoteLab.assetsChecked==25 and .remoteLab.assetsMatched==24 and .remoteLab.mismatchCount==1 and .remoteLab.remoteParity==false and .approvalReadyForLabDelivery==true and .approvalReadyForRuntimeSmoke==false' "$ORBIT360_EVIDENCE_DIR/m5-release-candidate-readiness-summary.json" >/dev/null
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-membership-projection-512-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-membership-projection-remediation-512-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-access-membership-projection-fixture.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-manifest.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publicar estado observable sanitizado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          SUMMARY_PATH: orbit360-platform/runtime-gate-crm-v20260716/m5-membership-projection-remediation-512-summary.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='M5 membership projection static failed';
+            try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY_PATH,'utf8'));if(s.ok===true){state='success';description='M5 membership projection static pass; new RC ready';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-membership-projection-512',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
