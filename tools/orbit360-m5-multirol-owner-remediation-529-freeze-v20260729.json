@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"orbit360-m5-multirol-owner-remediation-freeze-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.29",
+  "status":"M5_MULTIROL_OWNER_REMEDIATION_529_FINAL_STATIC_ATTEMPT_READY",
+  "runtime528":{"closed":true,"authorizationConsumed":true,"runId":30486294373,"firstFailure":"MOBILE_MENU_INCOMPLETE:11","classification":"FUNCTIONAL_DEFECT"},
+  "staticAttempt1":{"commit":"d5531cddbda8414b6e974e83288d887fef70b2a7","runId":30487774731,"jobId":90697655863,"artifactId":8738364952,"artifactDigest":"sha256:bdec3ed34822f3894b683a481d67c4c30aa1f65a1cf4e535cc7cf2a95bc8d9e6","classification":"PIPELINE_MECHANISM_FAILURE","firstFailure":"fixture_syntax_error_missing_initializer","productEvaluated":false,"runtime":false,"browser":false,"secrets":false,"firestoreRead":false},
+  "correction":{"scope":"fixture_only","file":"tools/orbit360-m5-multirol-owner-remediation-529-fixture-v20260729.mjs","productFilesChangedAfterAttempt1":false},
+  "authorization":{"staticAttempt2Authorized":true,"allowedExecutions":1,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false},
+  "controls":{"sameStageFailureCount":1,"secondFailureStopsStage":true,"thirdAttemptForbidden":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
