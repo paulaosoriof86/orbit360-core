@@ -1,0 +1,95 @@
+name: Orbit 360 · M5 membership projection static · 5.0.12
+run-name: M5 5.0.12 · root cause static · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-membership-projection-remediation-512-v20260729.yml'
+      - 'orbit360-platform/core/access-role-session-owner-v20260728.js'
+      - 'tools/orbit360-m5-access-membership-projection-fixture-v20260729.mjs'
+      - 'tools/orbit360-validator-lifecycle-contract-m5-membership-projection-512-v20260729.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-m5-membership-projection-512-v20260729.mjs'
+      - 'tools/orbit360-validar-gate-contracts-v20260717.mjs'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-m5-membership-projection-remediation-512-v20260729
+  cancel-in-progress: false
+
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  static_membership_projection:
+    name: M5 · membership projection owner · static only · zero access
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Confirmar rama y ausencia de capacidades externas
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          echo 'M5_512_STATIC_CAPABILITIES:secrets=false firestore=false writes=false runtime=false browser=false deploy=false'
+
+      - name: Preflight canónico 5.0.12 antes de cualquier otra acción
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="5.0.12" and .capabilityProfile.secrets==false and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==false and .approvalReadyForHostingLabDelivery==true' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Verificar cierre estático de causa raíz
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.ok==true and .status=="M5_MEMBERSHIP_PROJECTION_512_STATIC_PASS" and .classification=="FUNCTIONAL_DEFECT" and .criticalAssets==42 and .protectedFilesUnchanged==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtime==false and .browser==false and .hostingDeploy==false and .rulesDeploy==false and .production==false and .approvalReadyForHostingLabDelivery==true' "$ORBIT360_EVIDENCE_DIR/m5-membership-projection-remediation-512-summary.json" >/dev/null
+          jq -e '.ok==true and .status=="M5_ACCESS_MEMBERSHIP_PROJECTION_FIXTURE_PASS" and .firestoreWrites==0 and .operationalWrites==0' "$ORBIT360_EVIDENCE_DIR/m5-access-membership-projection-fixture.json" >/dev/null
+          echo "M5_512_NEW_RC_HASH=$(jq -r '.releaseCandidateHash' "$ORBIT360_EVIDENCE_DIR/m5-membership-projection-remediation-512-summary.json")"
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-membership-projection-512-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-membership-projection-remediation-512-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-access-membership-projection-fixture.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publicar estado sanitizado del commit
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          state='failure'
+          description='M5 5.0.12 static remediation failed'
+          if jq -e '.status=="GO_GATE_CONTRACT" and .approvalReadyForHostingLabDelivery==true' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null 2>&1 && jq -e '.ok==true and .status=="M5_MEMBERSHIP_PROJECTION_512_STATIC_PASS"' "$ORBIT360_EVIDENCE_DIR/m5-membership-projection-remediation-512-summary.json" >/dev/null 2>&1; then
+            state='success'
+            description='M5 5.0.12 static membership remediation PASS'
+          fi
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}"
+          curl -fsS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H 'Accept: application/vnd.github+json' "$api" -d "$(jq -nc --arg state "$state" --arg target_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" --arg description "$description" --arg context 'orbit360/m5-membership-projection-512' '{state:$state,target_url:$target_url,description:$description,context:$context}')" >/dev/null
