@@ -1,0 +1,31 @@
+{
+  "schemaVersion":"orbit360-m5-membership-projection-512-closure-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.12",
+  "status":"M5_MEMBERSHIP_PROJECTION_512_STATIC_CLOSED_NEW_RC_READY_FOR_HOSTING",
+  "sourceRuntime":{"closure":"orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-511-attempt-closure.json","requestCommit":"136cca57600c0aef146ad5b121aeb746a7d0dd4c","runId":30457847993,"jobId":90595950599,"artifactId":8726316517,"artifactDigest":"sha256:61740f99806fc8353d0f2cbddf5a48b8432c27ced33dbb2e5808a94372f4135e","failure":"MEMBERSHIP_BOUNDARY_NOT_ACTIVE","countsStable":true,"digestsStable":true,"firestoreWrites":0,"operationalWrites":0},
+  "rootCause":{"classification":["FUNCTIONAL_DEFECT","DATA_CONTRACT_FAILURE"],"summary":"LAB Access owner required a membership-backed product projection while the LAB auth path exposed only Firebase identity; the legacy hardcoded role/advisor shortcut is intentionally incompatible with the fail-closed multirol owner and was not restored."},
+  "remediation":{"owner":"orbit360-platform/core/access-role-session-owner-v20260728.js","version":"20260729.3","tenantDerivedFromRuntime":true,"uidDerivedFromAuthenticatedFirebaseUser":true,"membershipPath":"tenants/{tenantId}/members/{authenticatedUid}","membershipReadOnly":true,"projectionTarget":"Orbit.auth.productUser","authUserOverride":false,"failClosedMissingOrInvalidMembership":true,"hardcodedTenant":false,"hardcodedUid":false,"hardcodedAdvisor":false,"hardcodedRoleFallback":false},
+  "pipelineIncidents":[
+    {"classification":"VALIDATOR_STALE","runId":30459353001,"jobId":90601066490,"artifactId":8726897816,"artifactDigest":"sha256:afaa3d0e4a73eccbd7952692f425eb2624d8d1a89c52adf13c0000e8512d3806","summary":"fixture/validator predicates were stale; stopped before sensitive capabilities","productChanged":false},
+    {"classification":"PIPELINE_MECHANISM_FAILURE","runId":30460012885,"jobId":90603315469,"artifactId":8727159435,"artifactDigest":"sha256:12299d7c8061463128103c0ee9b7b6f10a574368404595ad2d5b5747c4c66437","summary":"workflow self-scan matched its own forbidden-token pattern; preflight was not reached","productChanged":false},
+    {"classification":"PIPELINE_MECHANISM_FAILURE","runId":30460099796,"jobId":90603615861,"artifactId":8727194381,"artifactDigest":"sha256:627af5d6e3fc03f4772801e5270d06672c80c4f3753d759163e2042dd0251985","summary":"shallow checkout omitted the historical runtime request commit required for diff validation; product edits were frozen and the mechanism was corrected","productChanged":false}
+  ],
+  "verification":{"commit":"6c01e6cbff97aa67a598fc68f43b3671bd5661b6","runId":30460202680,"jobId":90603978220,"artifactId":8727238222,"artifactDigest":"sha256:51e1e36221fecf121bc2c121b445abf5d78f6fb2de8c0cff8376a86c56f74378","workflowSafety":{"status":"M5_MEMBERSHIP_PROJECTION_512_WORKFLOW_SAFETY_PASS","passed":13,"total":13,"failed":0},"canonicalPreflight":{"status":"GO_GATE_CONTRACT","passed":36,"total":36,"failed":0},"fixture":{"status":"M5_ACCESS_MEMBERSHIP_PROJECTION_FIXTURE_PASS","passed":23,"total":23,"failed":0},"protectedFilesUnchanged":true},
+  "releaseCandidate":{"priorHash":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","hash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","hashAlgorithm":"sha256","criticalAssets":42,"allCriticalAssetsPresent":true},
+  "remoteLab":{"status":"M5_RC_READY_LAB_DELIVERY_REQUIRED","assetsExpected":25,"assetsChecked":25,"assetsMatched":24,"mismatchCount":1,"remoteParity":false,"mismatches":[{"path":"core/access-role-session-owner-v20260728.js","reason":"new_local_hash_not_delivered"}]},
+  "scope":{"secrets":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false,"hostingDeploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"mergeMain":false,"policies":false,"visualReview":false,"pólizas":false},
+  "staticRemediationConsumed":true,
+  "hostingDeployAuthorized":false,
+  "allowedHostingDeployExecutions":0,
+  "runtimeSmokeAuthorized":false,
+  "allowedRuntimeSmokeExecutions":0,
+  "visualReviewAuthorized":false,
+  "approvalReadyForHostingLabDelivery":true,
+  "approvalReadyForRuntimeSmoke":false,
+  "block5Closed":false,
+  "nextAction":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_HOSTING_LAB_DELIVERY_OF_RC_AE6BB2A3_THEN_REQUIRE_25_OF_25_PUBLIC_PARITY_BEFORE_ANY_NEW_RUNTIME",
+  "containsPII":false,
+  "containsSecrets":false
+}
