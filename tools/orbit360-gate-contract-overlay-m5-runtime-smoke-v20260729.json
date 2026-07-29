@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-gate-contract-overlay-v1",
+  "issuedAt": "2026-07-29",
+  "gateId": "block5-release-candidate-visualization-v20260728",
+  "contractVersion": "5.0.5",
+  "phase": "LAB_RUNTIME_GATE",
+  "required": {
+    "hosting504Closed": true,
+    "releaseCandidateHash": "d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045",
+    "criticalAssetCount": 41,
+    "remoteAssetCount": 24,
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "canonicalClients": 414,
+    "canonicalInsurers": 26,
+    "advisors": 7,
+    "assignedRoles": ["Dirección", "Operativo", "Asesor"],
+    "unauthorizedRoleProbe": "Finanzas",
+    "operationalWrites": 0
+  },
+  "capabilityBoundary": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": true,
+    "browser": true,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "allowedOutcomes": ["M5_RUNTIME_SMOKE_LAB_CLOSED_SUCCESS", "M5_RUNTIME_SMOKE_LAB_FAILED_STOP_LINE"],
+  "containsPII": false,
+  "containsSecrets": false
+}
