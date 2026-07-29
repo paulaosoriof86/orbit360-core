@@ -100,7 +100,8 @@ jobs:
           const c=JSON.parse(fs.readFileSync(process.env.ORBIT360_JQ_SAFETY,'utf8'));
           if(c.classification!=='PIPELINE_MECHANISM_ROOT_CAUSE_CONTROL'||!c.requiredRule||!Array.isArray(c.knownIncidents)||c.knownIncidents.length!==2)throw new Error('JQ_SELECTOR_SAFETY_CONTRACT_INVALID');
           const w=fs.readFileSync('.github/workflows/orbit360-m5-runtime-smoke-lab-516-v20260729.yml','utf8');
-          if(w.includes('.pólizas'))throw new Error('UNSAFE_JQ_UNICODE_SELECTOR_PRESENT');
+          const unsafe='.'+'p'+'ó'+'lizas';
+          if(w.includes(unsafe))throw new Error('UNSAFE_JQ_UNICODE_SELECTOR_PRESENT');
           if(!w.includes('.["pólizas"]'))throw new Error('SAFE_JQ_UNICODE_SELECTOR_MISSING');
           console.log('JQ_SELECTOR_SAFETY_PASS');
           NODE
