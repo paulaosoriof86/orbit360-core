@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "orbit360-m5-runtime-smoke-freeze-v1",
+  "issuedAt": "2026-07-29",
+  "gateId": "block5-release-candidate-visualization-v20260728",
+  "contractVersion": "5.0.5",
+  "status": "READY_FOR_ONE_RUNTIME_SMOKE_LAB",
+  "baseline": {
+    "hosting504Closed": true,
+    "hosting504Status": "M5_LAB_HOSTING_DELIVERED_AND_24_OF_24_VERIFIED",
+    "releaseCandidateHash": "d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045",
+    "criticalAssets": 41,
+    "remoteAssetsMatched": 24,
+    "remoteParity": true,
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "canonicalClients": 414,
+    "canonicalInsurers": 26,
+    "advisors": 7,
+    "missingClientCurrency": 0,
+    "targetOnlyClients": 0,
+    "targetOnlyInsurers": 0
+  },
+  "authorization": {
+    "runtimeSmokeAuthorized": true,
+    "allowedExecutions": 1,
+    "requestCreated": false,
+    "hostingDeployAuthorized": false,
+    "visualReviewAuthorized": false,
+    "productionAuthorized": false
+  },
+  "expected": {
+    "assignedRolesRequired": ["Dirección", "Operativo", "Asesor"],
+    "unauthorizedRoleProbe": "Finanzas",
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "advisors": 7,
+    "countryCounts": {"GT": 398, "CO": 16, "REQUIERE_VALIDACION": 0},
+    "typeCounts": {"Persona": 391, "Empresa": 23},
+    "remoteParity": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0
+  },
+  "forbidden": {
+    "hostingDeploy": true,
+    "firestoreWrite": true,
+    "operationalWrites": true,
+    "functionsDeploy": true,
+    "rulesDeploy": true,
+    "production": true,
+    "main": true,
+    "merge": true,
+    "policies": true,
+    "visualReview": true
+  },
+  "nextAction": "CREATE_IMMUTABLE_REQUEST_AND_EXECUTE_ONE_RUNTIME_SMOKE_LAB_THEN_REQUIRE_SANITIZED_OK_TRUE",
+  "containsPII": false,
+  "containsSecrets": false
+}
