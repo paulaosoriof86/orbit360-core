@@ -89,7 +89,7 @@ Secrets/Firestore/runtime/browser/deploy: no/no/no/no/no
 ## Nueva release candidate
 
 ```txt
-RC anterior: b25bf2750548651a719526bc4dadf7662def2255876c4dadf7662def2255876c4c2e5e32bdf90f93a091
+RC anterior: b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091
 RC nueva: f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324
 Activos críticos: 42/42
 Activos públicos LAB: 24/25
