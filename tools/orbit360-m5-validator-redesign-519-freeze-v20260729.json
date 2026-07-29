@@ -1,0 +1,13 @@
+{
+  "schemaVersion":"orbit360-m5-validator-redesign-freeze-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.19",
+  "status":"READY_FOR_ONE_STATIC_VALIDATOR_REDESIGN_VERIFICATION",
+  "baseline":{"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","remoteAssetsExpected":25,"remoteAssetsMatched":25,"runtime516RequestCommit":"8c9e58f8dc5d5b9e49b5d917af81e265ad1ea919","policyReadiness517SameStageFailedTwice":true,"policyReadiness517ThirdAttemptForbidden":true,"candidateRuntimeContractVersion":"5.0.18","candidateRuntimeExecuted":false},
+  "authorization":{"authorizationSource":"user_continue_20260729_after_517_stop_line","staticVerificationAuthorized":true,"allowedExecutions":1,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"browserAuthorized":false,"deployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "required":{"semanticLoaderDetection":true,"quoteIndependentFixtures":true,"strictEqualityNotAssignmentFixture":true,"directAssignmentDetectedFixture":true,"manualInstallDetectedFixture":true,"canonicalEvidenceWrittenByEngine":true,"productProtectedUnchanged":true,"candidate518NotExecuted":true},
+  "forbidden":{"retry517":true,"runtime518":true,"browser":true,"secrets":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"visualReview":true,"policies":true,"pólizas":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
