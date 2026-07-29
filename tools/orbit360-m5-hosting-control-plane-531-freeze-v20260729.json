@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-m5-hosting-control-plane-531-freeze-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.31",
+  "status":"M5_HOSTING_CONTROL_PLANE_531_STATIC_READY",
+  "sourceStop":"tools/orbit360-m5-release-candidate-hosting-stop-overlay-530-v20260729.json",
+  "packageInput":"tools/orbit360-m5-hosting-package-input-531-v20260729.json",
+  "evidenceLedger":"tools/orbit360-m5-hosting-evidence-ledger-531-v20260729.json",
+  "fixture":"tools/orbit360-m5-hosting-control-plane-fixture-531-v20260729.mjs",
+  "candidate":{"hash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"remoteAssetsExpected":26,"knownRemoteAssetsMatched":24,"knownMismatchCount":2,"knownMismatchPaths":["sw.js","core/session-multirol-visibility-v20260716.js"]},
+  "authorization":{"staticExecutionAuthorized":true,"allowedExecutions":1,"hostingLabDeliveryAuthorized":false,"runtimeSmokeAuthorized":false},
+  "capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "nextAction":"RUN_EXACTLY_ONE_STATIC_531",
+  "containsPII":false,
+  "containsSecrets":false
+}
