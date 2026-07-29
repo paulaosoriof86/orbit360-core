@@ -41,6 +41,38 @@
       "firestoreRead":false,
       "runtimeExecuted":false,
       "browserExecuted":false
+    },
+    {
+      "kind":"hosting_request_created",
+      "sourceVersion":"5.0.35",
+      "authorizedBaseCommit":"5a56a26309c385ae94109a2a308e6de33d516fd9",
+      "requestCommit":"61a674f477fbb2285f5526b6707428329d3127e2",
+      "candidateHash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7",
+      "allowedExecutions":1
+    },
+    {
+      "kind":"hosting_delivery_success",
+      "sourceVersion":"5.0.35",
+      "candidateContractVersion":"5.0.34",
+      "runId":30498827076,
+      "jobId":90733704150,
+      "artifactId":8742666048,
+      "artifactDigest":"sha256:0af0933c0c2e520f888b833289634e35d4b5675638ed223ab9f1289babac8ad9",
+      "status":"M5_HOSTING_535_DELIVERED_AND_27_OF_27_VERIFIED",
+      "candidateHash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7",
+      "remoteAssetsBefore":26,
+      "remoteAssetsAfter":27,
+      "mismatchCountAfter":0,
+      "remoteParityAfter":true,
+      "hostingDeployExecutions":1,
+      "firestoreRead":false,
+      "firestoreWrites":0,
+      "operationalWrites":0,
+      "runtime":false,
+      "browser":false,
+      "functionsDeploy":false,
+      "rulesDeploy":false,
+      "production":false
     }
   ],
   "containsPII":false,
