@@ -1,0 +1,12 @@
+{
+  "schemaVersion":"orbit360-responsive-title-resolver-contract-v1",
+  "version":"20260729.1",
+  "purpose":"Resolve the actual visible page or entity title before testing viewport containment; do not require one HTML tag when the UI contract is semantic.",
+  "standardSelectors":[".mod-band .mb-tt h2",".fichahdr h2",".m1-asg-hero h2","h1","[role=heading]"],
+  "scopedExactTextFallback":{"allowed":true,"requiredScope":true,"exactText":true,"candidateTags":["h1","h2","h3","div","span"],"minimumFontPx":18,"minimumFontWeight":600},
+  "insurerFicha":{"scopeSelector":"#asg-ficha","expectedTextSource":"Orbit.store.get('aseguradoras', #asg-ficha.dataset.id).nombre"},
+  "invalidPatterns":["global first div","source-file text proxy","tag-only h2 requirement"],
+  "classification":"VALIDATOR_STALE_ROOT_CAUSE_CONTROL",
+  "containsPII":false,
+  "containsSecrets":false
+}
