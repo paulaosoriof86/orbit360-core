@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-stop-overlay-v4",
+  "schemaVersion":"orbit360-m5-release-candidate-stop-overlay-v5",
   "issuedAt":"2026-07-29",
   "supersedesRuntimeAuthorizationStateIn":"tools/orbit360-m5-release-candidate-freeze-v20260728.json",
   "authoritativeForCurrentRuntimeAuthorizationState":true,
@@ -16,6 +16,7 @@
   "safety":{"secretsRead":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browserExecuted":false,"hostingDeploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"mergeMain":false,"visualReview":false,"pólizas":false},
   "controls":{"sameStageFailedTwice":true,"thirdPackageAttemptForbidden":true,"requestCreationForbidden":true,"runtimeWorkflowFrozen":true,"packageWorkflowFrozen":true,"newStaticRedesignRequiresNewUserContinuation":true},
   "nextAction":"NEW_STATIC_CONTROL_PLANE_REDESIGN_BLOCK; validators must read canonical schema/property paths directly; only after static PASS may a new explicit runtime authorization be requested",
+  "documentation":"orbit360-platform/docs/CIERRE-M5-5.0.26-STOP-PAQUETE-DOS-FALLOS-20260729.md",
   "containsPII":false,
   "containsSecrets":false
 }
