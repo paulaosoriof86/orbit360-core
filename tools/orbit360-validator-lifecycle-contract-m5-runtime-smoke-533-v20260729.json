@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-533-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.33",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"post-hosting-532-runtime-one-shot-v1",
+  "classification":"LAB_RUNTIME_GATE",
+  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_one_shot_request_after_package_pass"},
+  "baseline":{"controlOverlay":"tools/orbit360-m5-release-candidate-control-overlay-532-v20260729.json","controlStatus":"M5_HOSTING_532_CLOSED_26_OF_26_READY_TO_REQUEST_RUNTIME_AUTHORIZATION","releaseCandidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"remoteAssetsExpected":26,"remoteAssetsMatched":26,"packageInput":"tools/orbit360-m5-runtime-package-input-533-v20260729.json","browserBlobSha":"ca7d7a13c7889c8fea55ada358adbd6742422c42","closerBlobSha":"ec06019c23cb78c71fdb6f6fba16bee67758a49a","legacyProbeBlobSha":"70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12"},
+  "packageCheck":{"status":"PASS","commit":"cf415b45f0cb3aee53c9083fdc34e0fe94cc969c","runId":30494751648,"jobId":90720843440,"artifactId":8741127750,"artifactDigest":"sha256:4d0facb1700fb99b1e9573a57a921e7a8befccf03cfafd457633a0637da149e2"},
+  "authorization":{"authorizationSource":"user_autorizado_runtime_20260729_after_hosting_532_pass","runtimeSmokeAuthorized":true,"allowedExecutions":1,"firestoreWriteAuthorized":false,"operationalWritesAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
+  "nextRequiredDecision":"CREATE_IMMUTABLE_REQUEST_BOUND_TO_EXACT_PARENT_THEN_EXECUTE_ONCE",
+  "containsPII":false,
+  "containsSecrets":false
+}
