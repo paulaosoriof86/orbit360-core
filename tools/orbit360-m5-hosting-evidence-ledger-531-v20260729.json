@@ -1,0 +1,15 @@
+{
+  "schemaVersion":"orbit360-m5-hosting-evidence-ledger-531-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.31",
+  "packageInput":"tools/orbit360-m5-hosting-package-input-531-v20260729.json",
+  "appendOnly":true,
+  "entries":[
+    {"kind":"historical_package_attempt","sourceVersion":"5.0.30","runId":30490547723,"classification":"PIPELINE_MECHANISM_FAILURE","candidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","remoteAssetsMatched":24,"remoteAssetsExpected":26,"mismatchCount":2,"mismatchPaths":["sw.js","core/session-multirol-visibility-v20260716.js"],"hostingDeployExecuted":false},
+    {"kind":"historical_package_attempt","sourceVersion":"5.0.30","runId":30490737805,"classification":"PIPELINE_MECHANISM_FAILURE","candidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","failedContractCheck":"FREEZE","hostingDeployExecuted":false},
+    {"kind":"stop_verification","sourceVersion":"5.0.30","runId":30491183947,"status":"PASS","zeroCapabilities":true,"hostingDeployExecuted":false}
+  ],
+  "containsPII":false,
+  "containsSecrets":false
+}
