@@ -1,0 +1,25 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v1",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.20",
+  "phase":"LAB_RUNTIME_GATE",
+  "required":{
+    "candidateRuntimeContractVersion":"5.0.18",
+    "releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61",
+    "criticalAssets":42,
+    "remoteAssetsMatched":25,
+    "validator519Status":"M5_VALIDATOR_REDESIGN_519_STATIC_PASS",
+    "validator519Passed":30,
+    "validator519Failed":0,
+    "bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs",
+    "accessOwnerVersion":"20260729.3",
+    "academiaPolicyVersion":"20260729.2",
+    "semanticValidatorHelper":"tools/orbit360-validator-source-predicate-helpers-v20260729.mjs",
+    "jqSelectorSafetyContract":"tools/orbit360-jq-selector-safety-contract-v20260729.json",
+    "snapshotsBeforeAfter":true,
+    "zeroWrites":true
+  },
+  "forbidden":{"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
