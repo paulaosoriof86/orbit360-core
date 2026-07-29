@@ -1,12 +1,15 @@
 {
-  "schemaVersion":"orbit360-m5-lab-hosting-delivery-freeze-530-v1",
+  "schemaVersion":"orbit360-m5-lab-hosting-delivery-freeze-530-v2",
   "issuedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.30",
-  "status":"M5_LAB_HOSTING_530_AUTHORIZED_PACKAGE_PENDING",
-  "baseline":{"remediation529Closed":true,"controlOverlay":"tools/orbit360-m5-release-candidate-control-overlay-529-v20260729.json","priorReleaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","priorCandidateSuperseded":true,"newReleaseCandidateHash":null,"criticalAssets":43,"remoteAssetsExpected":26,"remoteAssetsMatchedBefore":null,"mismatchCountBefore":null,"mismatchPathsBefore":null},
+  "status":"M5_LAB_HOSTING_530_PACKAGE_ATTEMPT1_PIPELINE_FAILURE_FINAL_RETRY_ALLOWED",
+  "baseline":{"remediation529Closed":true,"controlOverlay":"tools/orbit360-m5-release-candidate-control-overlay-529-v20260729.json","priorReleaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","priorCandidateSuperseded":true,"newReleaseCandidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"remoteAssetsExpected":26,"remoteAssetsMatchedBefore":24,"mismatchCountBefore":2,"mismatchPathsBefore":["sw.js","core/session-multirol-visibility-v20260716.js"]},
+  "packageAttempt1":{"commit":"38b44af1124f1b5e0f18fbbc460bc807db6a4f0f","runId":30490547723,"jobId":90707062721,"artifactId":8739493844,"artifactDigest":"sha256:ac8af7c766f7e823c582f78db9611b578a1c84a4e8794432158f1a25c0320557","classification":"PIPELINE_MECHANISM_FAILURE","firstFailure":"summary_javascript_nullish_coalescing_requires_parentheses","preflightPass":true,"contractPass":"17/17","readinessPass":true,"releaseCandidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","remoteAssetsMatched":24,"remoteAssetsExpected":26,"mismatchCount":2,"mismatchPaths":["sw.js","core/session-multirol-visibility-v20260716.js"],"requestCreated":false,"secretsRead":false,"hostingDeployExecuted":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false},
+  "correction":{"scope":"workflow_summary_javascript_only","productFilesChanged":false,"candidateHashChanged":false},
   "target":{"projectId":"ays-orbit-360-lab","channel":"orbit360-ays-lab","canonicalUrl":"https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app"},
   "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_hosting_20260729_post_529","hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"requestCreated":false,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "controls":{"packageFailureCount":1,"secondPackageFailureStopsStage":true,"thirdPackageAttemptForbidden":true},
   "requiredAfterDelivery":{"remoteAssetsExpected":26,"remoteAssetsMatched":26,"mismatchCount":0,"remoteParity":true,"hostingDeployExecutions":1,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "containsPII":false,
   "containsSecrets":false
