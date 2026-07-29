@@ -1,0 +1,34 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v1",
+  "issuedAt":"2026-07-28",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.4",
+  "phase":"M5_LAB_HOSTING_DELIVERY",
+  "required":{
+    "m4Closed":true,
+    "readiness501Closed":true,
+    "access502Closed":true,
+    "postAccess503Closed":true,
+    "postAccessStatus":"M5_RC_READY_LAB_DELIVERY_REQUIRED",
+    "releaseCandidateHash":"d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045",
+    "criticalAssetCount":41,
+    "remoteAssetCount":24,
+    "projectId":"ays-orbit-360-lab",
+    "channel":"orbit360-ays-lab",
+    "operationalWrites":0
+  },
+  "capabilityBoundary":{
+    "secrets":true,
+    "firestoreRead":false,
+    "writes":false,
+    "runtime":false,
+    "browser":false,
+    "deploy":true,
+    "functionsDeploy":false,
+    "rulesDeploy":false,
+    "production":false
+  },
+  "allowedOutcomes":["M5_LAB_HOSTING_DELIVERED_AND_24_OF_24_VERIFIED","M5_LAB_HOSTING_DELIVERY_FAILED"],
+  "containsPII":false,
+  "containsSecrets":false
+}
