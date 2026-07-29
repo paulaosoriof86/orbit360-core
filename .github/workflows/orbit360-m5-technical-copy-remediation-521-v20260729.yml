@@ -1,13 +1,9 @@
-# mechanism-revision: visible-dom-proxy-v2-final-attempt
+# mechanism-revision: visible-dom-proxy-v2-closed
 name: Orbit 360 · M5 technical-copy validator remediation · 5.0.21
 run-name: M5 5.0.21 · static technical-copy remediation · ${{ github.sha }}
 
 on:
-  push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - '.github/workflows/orbit360-m5-technical-copy-remediation-521-v20260729.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -37,13 +33,11 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verificar rama SHA y ejecución única
+      - name: Verificar rama SHA y ejecución manual congelada
         shell: bash
         run: |
           set -euo pipefail
-          test "$GITHUB_EVENT_NAME" = 'push'
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          test "$GITHUB_RUN_ATTEMPT" = '1'
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           git cat-file -e 60562d429f2aff5583c47eeb5bf4d88c08deb184^{commit}
 
