@@ -1,0 +1,11 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m5-control-plane-redesign-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.27",
+  "phase":"M5_VALIDATOR_REDESIGN_STATIC",
+  "required":{"runtime526StopOverlay":"tools/orbit360-m5-release-candidate-stop-overlay-526-v20260729.json","canonicalResolverContract":"tools/orbit360-responsive-title-resolver-contract-v20260729.json","contractShapeReader":"tools/orbit360-contract-shape-reader-v20260729.mjs","contractShapeReaderVersion":"20260729.1","fixtures":"tools/orbit360-contract-shape-reader-fixtures-v20260729.mjs","schemaDrivenCandidateContract":"tools/orbit360-m5-runtime-smoke-525-contract-schema-driven-v20260729.mjs","candidateRuntimeContractVersion":"5.0.25","candidateExecuted":false},
+  "capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
