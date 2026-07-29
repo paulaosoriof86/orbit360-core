@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-academia-remediation-534-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.34",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "classification":"M5_VALIDATOR_REDESIGN_STATIC",
+  "executionProfile":{"phase":"M5_VALIDATOR_REDESIGN_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
+  "baseline":{"runtimeStop":"tools/orbit360-m5-runtime-stop-overlay-533-v20260729.json","freeze":"tools/orbit360-m5-academia-remediation-534-freeze-v20260729.json","descriptor":"tools/orbit360-m5-release-candidate-descriptor-534-v20260729.json","criticalAssets":44,"remoteAssetsExpected":27},
+  "authorization":{"staticExecutionAuthorized":true,"allowedExecutions":1,"runtimeSmokeAuthorized":false,"hostingLabDeliveryAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"RUN_EXACTLY_ONE_STATIC_534; only PASS may permit requesting new Hosting LAB authorization for the new candidate",
+  "containsPII":false,
+  "containsSecrets":false
+}
