@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';import path from 'node:path';
+const ROOT=process.cwd();
+const WORKFLOW='.github/workflows/orbit360-m5-membership-projection-512-v20260729.yml';
+const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/m5-membership-projection-512-workflow-safety.json');
+const source=fs.readFileSync(path.join(ROOT,WORKFLOW),'utf8');
+const checks=[];const add=(id,ok,detail='')=>checks.push({id,ok:Boolean(ok),detail:String(detail||'').slice(0,220)});
+add('PUSH_BRANCH_ONLY',/push:\s*[\s\S]*branches:\s*[\s\S]*ays\/backend-tenant-lab-v99-20260703/.test(source)&&!source.includes('workflow_dispatch:'));
+add('WORKFLOW_PATH_ONLY',source.includes("- '.github/workflows/orbit360-m5-membership-projection-512-v20260729.yml'")&&!source.includes('request-v20260729.json'));
+add('PERMISSIONS_MINIMAL',/permissions:\s*\n\s*contents:\s*read\s*\n\s*statuses:\s*write/.test(source));
+add('NO_SECRET_REFERENCES',!/\$\{\{\s*secrets\./.test(source));
+add('NO_CREDENTIAL_ENV',!/GOOGLE_APPLICATION_CREDENTIALS|FIREBASE_SERVICE_ACCOUNT|LOGIN_PASSWORD|ACCESS_KEY|PRIVATE_KEY/.test(source));
+add('NO_FIREBASE_CLI',!/(?:npx\s+)?firebase\s+(?:deploy|hosting:|functions:|firestore:)/i.test(source));
+add('NO_BROWSER_RUNTIME',!/playwright|chromium|puppeteer|selenium/i.test(source));
+add('NO_ADMIN_DATA_CLIENT',!/firebase-admin|firestore-admin|applicationDefault|getFirestore\s*\(/.test(source));
+add('NO_DEPLOY_WORDING_IN_COMMANDS',!/^\s*(?:run:\s*)?(?:npx\s+)?firebase\b.*(?:deploy|hosting:|functions:|firestore:)/im.test(source));
+add('CANONICAL_PREFLIGHT_PRESENT',source.includes('node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"'));
+add('STATIC_ENGINE_PRESENT',source.includes('tools/orbit360-validar-gate-contracts-engine-m5-membership-projection-512-v20260729.mjs'));
+add('STATIC_FIXTURE_PRESENT',source.includes('tools/orbit360-m5-access-membership-projection-fixture-v20260729.mjs'));
+add('READINESS_ONLY_PUBLIC_CHECK',source.includes('tools/orbit360-m5-release-candidate-readiness-v20260728.mjs'));
+const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-m5-membership-projection-512-workflow-safety-v1',generatedAt:new Date().toISOString(),status:failed.length?'M5_MEMBERSHIP_PROJECTION_512_WORKFLOW_SAFETY_FAIL':'M5_MEMBERSHIP_PROJECTION_512_WORKFLOW_SAFETY_PASS',ok:failed.length===0,workflow:WORKFLOW,passed:checks.length-failed.length,total:checks.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,containsPII:false,containsSecrets:false};fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
