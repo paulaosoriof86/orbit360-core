@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-v3",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.10",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m5-hosting-lab-delivery-rc-f6dfa37e-v1",
+  "classification":"M5_LAB_HOSTING_DELIVERY_AUTHORIZED_ONCE",
+  "executionProfile":{"phase":"M5_LAB_HOSTING_DELIVERY","capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
+  "baseline":{"staticRemediationClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-509-remediation-static-closure.json","releaseCandidateHash":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatched":24},
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260729_for_one_hosting_lab_delivery_rc_f6dfa37e","hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"requestCreated":false,"writeAuthorized":false,"runtimeSmokeAuthorized":false,"browserAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":false},
+  "nextRequiredDecision":"PACKAGE_CHECK_THEN_ONE_IMMUTABLE_HOSTING_LAB_DELIVERY",
+  "containsPII":false,
+  "containsSecrets":false
+}
