@@ -1,0 +1,13 @@
+{
+  "schemaVersion":"orbit360-m5-lab-hosting-delivery-freeze-530-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.30",
+  "status":"M5_LAB_HOSTING_530_AUTHORIZED_PACKAGE_PENDING",
+  "baseline":{"remediation529Closed":true,"controlOverlay":"tools/orbit360-m5-release-candidate-control-overlay-529-v20260729.json","priorReleaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","priorCandidateSuperseded":true,"newReleaseCandidateHash":null,"criticalAssets":43,"remoteAssetsExpected":26,"remoteAssetsMatchedBefore":null,"mismatchCountBefore":null,"mismatchPathsBefore":null},
+  "target":{"projectId":"ays-orbit-360-lab","channel":"orbit360-ays-lab","canonicalUrl":"https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app"},
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_hosting_20260729_post_529","hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"requestCreated":false,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "requiredAfterDelivery":{"remoteAssetsExpected":26,"remoteAssetsMatched":26,"mismatchCount":0,"remoteParity":true,"hostingDeployExecutions":1,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
