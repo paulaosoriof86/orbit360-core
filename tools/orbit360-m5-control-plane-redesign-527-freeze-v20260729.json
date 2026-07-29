@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"orbit360-m5-control-plane-redesign-freeze-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.27",
+  "status":"M5_CONTROL_PLANE_REDESIGN_527_STATIC_AUTHORIZED_PENDING",
+  "authoritativeRuntimeState":"tools/orbit360-m5-release-candidate-stop-overlay-526-v20260729.json",
+  "baseline":{"runtime526Stopped":true,"runtime525RequestCreated":false,"runtime525Executed":false,"runtimeAuthorizationInvalidated":true,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssets":42,"remoteAssetsMatched":25,"mismatchCount":0,"clients":414,"insurers":26,"advisors":7},
+  "design":{"singleShapeOwner":"tools/orbit360-responsive-title-resolver-contract-v20260729.json","shapeReader":"tools/orbit360-contract-shape-reader-v20260729.mjs","shapeReaderVersion":"20260729.1","fixtures":"tools/orbit360-contract-shape-reader-fixtures-v20260729.mjs","schemaDrivenCandidateContract":"tools/orbit360-m5-runtime-smoke-525-contract-schema-driven-v20260729.mjs","historicalStaleContractPreserved":"tools/orbit360-m5-runtime-smoke-525-contract-v20260729.cjs"},
+  "authorization":{"staticRedesignAuthorized":true,"allowedExecutions":1,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"visualReviewAuthorized":false},
+  "forbidden":{"secrets":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"runtime":true,"browser":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
