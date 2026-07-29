@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';import path from 'node:path';import vm from 'node:vm';import {spawnSync} from 'node:child_process';
+const ROOT=process.cwd(),GATE='block5-release-candidate-visualization-v20260728',OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json'),REQUEST='tools/orbit360-m5-runtime-smoke-remediation-static-request-v20260729.json';
+const files={lifecycle:'tools/orbit360-validator-lifecycle-contract-m5-runtime-smoke-remediation-static-v20260729.json',registry:'tools/orbit360-gate-contract-registry-extension-m5-runtime-smoke-remediation-static-v20260729.json',overlay:'tools/orbit360-gate-contract-overlay-m5-runtime-smoke-remediation-static-v20260729.json',freeze:'tools/orbit360-m5-runtime-smoke-remediation-static-freeze-v20260729.json',contract:'orbit360-platform/core/m5-release-candidate-contract-p0.js',fixture:'tools/orbit360-test-academia-static-content-write-policy-v20260729.mjs',staticContract:'tools/orbit360-m5-runtime-smoke-remediation-static-contract-v20260729.cjs',readiness:'tools/orbit360-m5-release-candidate-readiness-v20260728.mjs',workflow:'.github/workflows/orbit360-m5-runtime-smoke-remediation-static-v20260729.yml',stop:'orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-505-closure.json'};
+const checks=[];function add(id,ok,detail=''){checks.push({id,ok:!!ok,detail:String(detail||'').slice(0,220)});}function read(rel){return fs.readFileSync(path.join(ROOT,rel),'utf8');}function json(rel){return JSON.parse(read(rel));}
+Object.entries(files).forEach(([k,v])=>add('FILE:'+k,fs.existsSync(path.join(ROOT,v)),v));let boundary={ok:false,activationMode:'unknown',executionAuthorized:false,allowedExecutions:0};
+try{
+ const l=json(files.lifecycle),r=json(files.registry),o=json(files.overlay),f=json(files.freeze),stop=json(files.stop);
+ add('GATE',l.gateId===GATE&&r.gates?.[0]?.gateId===GATE&&o.gateId===GATE&&f.gateId===GATE);
+ add('VERSION',l.gateContractVersion==='5.0.6'&&r.gates?.[0]?.contractVersion==='5.0.6'&&o.contractVersion==='5.0.6'&&f.contractVersion==='5.0.6');
+ add('PHASE',l.executionProfile?.phase==='M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC');
+ const c=l.executionProfile?.capabilities||{};add('CAPABILITIES',c.secrets===false&&c.firestoreRead===false&&c.writes===false&&c.runtime===false&&c.browser===false&&c.deploy===false&&c.functionsDeploy===false&&c.rulesDeploy===false&&c.production===false);
+ add('STOP_LINE',stop.status==='M5_RUNTIME_SMOKE_LAB_FAILED_STOP_LINE'&&stop.authorizationConsumed===true&&stop.writes?.firestoreWrites===0&&stop.writes?.operationalWrites===0);
+ const requestPresent=fs.existsSync(path.join(ROOT,REQUEST));const request=requestPresent?json(REQUEST):null;
+ add('FREEZE_REQUEST_STATE',Boolean(f.authorization)&&f.authorization.requestCreated===requestPresent);
+ const scripts=[files.fixture,files.staticContract,files.readiness,'orbit360-platform/core/academia-static-content-write-policy-v20260729.js','tools/orbit360-m5-runtime-smoke-browser-v20260729.mjs'];
+ for(const rel of scripts){const run=spawnSync(process.execPath,['--check',rel],{cwd:ROOT,encoding:'utf8'});add('SYNTAX:'+rel,run.status===0,(run.stderr||'').slice(0,200));}
+ const fixture=spawnSync(process.execPath,[files.fixture],{cwd:ROOT,encoding:'utf8',maxBuffer:8*1024*1024});add('FIXTURE_PROCESS',fixture.status===0,(fixture.stderr||'').slice(0,200));
+ const staticRun=spawnSync(process.execPath,[files.staticContract],{cwd:ROOT,encoding:'utf8',maxBuffer:8*1024*1024});add('STATIC_CONTRACT_PROCESS',staticRun.status===0,(staticRun.stderr||'').slice(0,200));
+ globalThis.window=globalThis;globalThis.Orbit={};vm.runInThisContext(read(files.contract),{filename:files.contract});
+ const parentRun=spawnSync('git',['rev-parse','HEAD^'],{cwd:ROOT,encoding:'utf8'}),parentCommit=parentRun.status===0?String(parentRun.stdout).trim():'';
+ boundary=globalThis.Orbit.m5ReleaseCandidateP0.validateActivationBoundary({requestPresent,request,parentCommit});add('REQUEST_BOUNDARY',boundary.ok,boundary.activationMode);
+}catch(error){add('PREFLIGHT_EXCEPTION',false,error&&error.message||error);}
+const failed=checks.filter(x=>!x.ok),out={schemaVersion:'orbit360-gate-contract-preflight-m5-runtime-smoke-remediation-static-v1',gateId:GATE,contractVersion:'5.0.6',validatorRevision:'5.0.6',executionPhase:'M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC',status:failed.length?'VALIDATOR_STALE':'GO_GATE_CONTRACT',classification:failed.length?'PIPELINE_MECHANISM_FAILURE':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,activationMode:boundary.activationMode,executionAuthorized:failed.length?false:boundary.executionAuthorized,allowedExecutions:failed.length?0:boundary.allowedExecutions,sourceTransformed:false,dataAccess:false,secretAccess:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,operationalWrites:0,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
