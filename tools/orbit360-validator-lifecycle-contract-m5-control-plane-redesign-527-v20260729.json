@@ -1,6 +1,7 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-control-plane-redesign-v1",
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-control-plane-redesign-v2",
   "issuedAt":"2026-07-29",
+  "closedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
   "pullRequest":5,
@@ -11,8 +12,9 @@
   "classification":"M5_VALIDATOR_REDESIGN_STATIC",
   "executionProfile":{"phase":"M5_VALIDATOR_REDESIGN_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
   "baseline":{"runtime526Stopped":true,"candidateRuntimeContractVersion":"5.0.25","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeExecuted":false},
-  "authorization":{"source":"user_continue_20260729_after_runtime_526_package_stop","staticRedesignAuthorized":true,"allowedExecutions":1,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false},
-  "nextRequiredDecision":"RUN_EXACTLY_ONE_STATIC_SCHEMA_DRIVEN_REDIGEST_527; on PASS close and request independent runtime authorization",
+  "authorization":{"source":"user_continue_20260729_after_runtime_526_package_stop","staticRedesignAuthorized":false,"allowedExecutions":0,"authorizationConsumed":true,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false},
+  "evidence":{"status":"M5_CONTROL_PLANE_REDESIGN_527_STATIC_PASS","runId":30484633453,"jobId":90687113637,"artifactId":8737091613,"artifactDigest":"sha256:b53db58f87ac63b4ce96fdb7cc2dac6a67490b70f9cd1758e5b9b22195dcb511","preflightPassed":16,"preflightTotal":16,"schemaDrivenContractPassed":13,"schemaDrivenContractTotal":13,"failed":0},
+  "nextRequiredDecision":"REQUEST_NEW_EXPLICIT_ONE_SHOT_RUNTIME_AUTHORIZATION_FOR_CANDIDATE_5_0_25_USING_SCHEMA_DRIVEN_CONTROL_PLANE",
   "containsPII":false,
   "containsSecrets":false
 }
