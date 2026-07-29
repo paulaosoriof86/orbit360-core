@@ -29,7 +29,7 @@ try{
  check('RC_HASH',candidateHash===HASH,candidateHash);
  check('DURABLE_FALLBACK',readiness.includes("m5-runtime-smoke-remediation-static-506-closure.json")&&readiness.includes('durableAcademiaEvidence'));
  check('EPHEMERAL_OPTIONAL',readiness.includes("fs.existsSync(path.join(ROOT,policyPath))")&&readiness.includes('policyTest?.ok'));
- check('WORKFLOW_NO_SECRETS',!workflow.includes('secrets.')&&!workflow.includes('GOOGLE_APPLICATION_CREDENTIALS'));
+ check('WORKFLOW_NO_SECRETS',!/\$\{\{\s*secrets\./i.test(workflow)&&!/^\s*(?:SA_|SECRET_|TOKEN_)[A-Z0-9_]*\s*:/mi.test(workflow));
  check('WORKFLOW_NO_FIREBASE',!workflow.includes('firebase-tools')&&!workflow.includes('firebase hosting')&&!workflow.includes('channel:deploy'));
  check('WORKFLOW_NO_BROWSER',!workflow.includes('playwright')&&!workflow.includes('chromium'));
  check('WORKFLOW_NO_REDEPLOY',!workflow.includes('deploy-output')&&!workflow.includes('hostingDeployExecuted:true'));
