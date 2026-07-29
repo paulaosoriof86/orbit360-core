@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-m5-hosting-package-input-531-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.31",
+  "sourceStopOverlay":"tools/orbit360-m5-release-candidate-hosting-stop-overlay-530-v20260729.json",
+  "descriptor":"tools/orbit360-m5-release-candidate-descriptor-530-v20260729.json",
+  "expectedCandidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b",
+  "criticalAssets":43,
+  "remoteAssetsExpected":26,
+  "target":{"projectId":"ays-orbit-360-lab","channel":"orbit360-ays-lab","canonicalUrl":"https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app"},
+  "requiredBindings":{"canonicalAccessOwnerVersion":"20260729.3","compatibilityOwnerVersion":"20260729.2","pwaCacheGeneration":"orbit360-v20260729-11-multirol-owner"},
+  "capabilityCeiling":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "immutableAfterCreation":true,
+  "containsPII":false,
+  "containsSecrets":false
+}
