@@ -1,0 +1,7 @@
+{
+  "schemaVersion":"orbit360-gate-contract-registry-extension-v1",
+  "revision":"m5-technical-copy-remediation-521",
+  "gates":[{"gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.21","phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC","lifecycle":"tools/orbit360-validator-lifecycle-contract-m5-technical-copy-remediation-521-v20260729.json","overlay":"tools/orbit360-gate-contract-overlay-m5-technical-copy-remediation-521-v20260729.json","engine":"tools/orbit360-validar-gate-contracts-engine-m5-technical-copy-remediation-521-v20260729.mjs","candidateRuntimeContractVersion":"5.0.22","classification":"VALIDATOR_STALE"}],
+  "containsPII":false,
+  "containsSecrets":false
+}
