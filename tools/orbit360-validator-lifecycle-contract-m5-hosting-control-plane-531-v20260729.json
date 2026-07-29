@@ -1,6 +1,7 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-hosting-control-plane-531-v1",
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-hosting-control-plane-531-v2",
   "issuedAt":"2026-07-29",
+  "closedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
   "pullRequest":5,
@@ -10,8 +11,9 @@
   "classification":"M5_VALIDATOR_REDESIGN_STATIC",
   "executionProfile":{"phase":"M5_VALIDATOR_REDESIGN_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
   "baseline":{"stop530":"tools/orbit360-m5-release-candidate-hosting-stop-overlay-530-v20260729.json","packageInput":"tools/orbit360-m5-hosting-package-input-531-v20260729.json","evidenceLedger":"tools/orbit360-m5-hosting-evidence-ledger-531-v20260729.json","descriptor":"tools/orbit360-m5-release-candidate-descriptor-530-v20260729.json","releaseCandidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"remoteAssetsExpected":26,"knownRemoteAssetsMatched":24},
-  "authorization":{"staticRedesignAuthorized":true,"allowedExecutions":1,"hostingLabDeliveryAuthorized":false,"runtimeSmokeAuthorized":false,"productionAuthorized":false},
-  "nextRequiredDecision":"RUN_EXACTLY_ONE_STATIC_531; only PASS may permit requesting a new one-shot Hosting LAB authorization",
+  "evidence":{"runId":30491707657,"jobId":90710889778,"artifactId":8739935980,"artifactDigest":"sha256:33d1b605db9e4ae66397aca340965ca116a86173e96bf6bffaf05509933cf979","status":"PASS"},
+  "authorization":{"staticRedesignAuthorized":false,"allowedExecutions":0,"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"runtimeSmokeAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"REQUEST_NEW_EXPLICIT_ONE_SHOT_HOSTING_LAB_AUTHORIZATION_USING_POST_531_CONTROL_PLANE",
   "containsPII":false,
   "containsSecrets":false
 }
