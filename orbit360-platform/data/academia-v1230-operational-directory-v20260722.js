@@ -4,6 +4,17 @@
   window.Orbit = window.Orbit || {};
   var Orbit = window.Orbit;
   var VERSION = '1.232';
+
+  (function ensureStaticContentWritePolicy() {
+    var params = new URLSearchParams(window.location.search || '');
+    var isLab = params.get('orbitBackend') === 'firestore-lab' && (params.get('tenant') || 'alianzas-soluciones') === 'alianzas-soluciones';
+    var current = Orbit.academiaStaticContentWritePolicy;
+    if (!isLab || (current && current.version === '20260729.2' && current.installed === true)) return;
+    if (document.readyState === 'loading' && typeof document.write === 'function') {
+      document.write('<script src="core/academia-static-content-write-policy-v20260729.js?v=20260729-2"><\/script>');
+    }
+  })();
+
   if (Orbit.academiaOperationalDirectoryV20260722 && Orbit.academiaOperationalDirectoryV20260722.version === VERSION) return;
 
   function rows() {
@@ -62,7 +73,7 @@
       var config = store.get('config', 'academia') || {};
       store.update('config', 'academia', Object.assign({}, config, { contenidoDirectorioOperativo:'1.232', actualizadoAt:new Date().toISOString() }));
     } catch (error) {}
-    return { ok:true, contentVersion:'1.232', roles:['Dirección','Superadmin','Admin','Operativo','Asesor'], editModeAware:true, dynamicCrud:true, backendWriteAcknowledgement:true, secureCredentialMutation:true, operationalValuesInCode:false, allAysInsurersActive:true, manualDeactivationOnly:true, responsiveSemanticTitles:true, passwordOnlySecret:true, writesThroughOrbitStoreOnly:true };
+    return { ok:true, contentVersion:'1.232', roles:['Dirección','Superadmin','Admin','Operativo','Asesor'], editModeAware:true, dynamicCrud:true, backendWriteAcknowledgement:true, secureCredentialMutation:true, operationalValuesInCode:false, allAysInsurersActive:true, manualDeactivationOnly:true, responsiveSemanticTitles:true, passwordOnlySecret:true, writesThroughOrbitStoreOnly:true, staticContentPersistence:'transient_session_only_in_lab' };
   }
 
   Orbit.academiaOperationalDirectoryV20260722 = {
@@ -81,6 +92,7 @@
     backendWriteAcknowledgement: true,
     secureCredentialMutation: true,
     operationalValuesInCode: false,
+    staticContentPersistence: 'transient_session_only_in_lab',
     apply: apply
   };
   setTimeout(apply, 0);
