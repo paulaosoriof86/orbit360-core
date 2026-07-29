@@ -1,10 +1,10 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-freeze-v26",
+  "schemaVersion":"orbit360-m5-release-candidate-freeze-v27",
   "issuedAt":"2026-07-28",
   "updatedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
-  "contractVersion":"5.0.13",
-  "status":"M5_HOSTING_513_CLOSED_PARITY_25_OF_25_RUNTIME_REQUIRES_NEW_AUTHORIZATION",
+  "contractVersion":"5.0.14",
+  "status":"M5_RUNTIME_SMOKE_514_AUTHORIZED_PACKAGE_PENDING",
   "canonicalBaseline":{"m4Closed":true,"sourceClients":414,"sourceInsurers":26,"canonicalTargetConfig":1,"canonicalTargetMemberships":1,"canonicalTargetClients":414,"canonicalTargetInsurers":26,"advisors":7,"missingClientCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0,"m4FinalRevalidationPassed":true},
   "accessBoundary":{"closed":true,"contractVersion":"5.0.2","runId":30407030063,"hardcodedAdvisorId":false,"globalRoleEnumeration":false,"labMissingProjectionFailClosed":true,"backendWrites":0,"membershipWrites":0},
   "hostingDelivery510":{"closed":true,"requestCommit":"f7249c9b38c1a613ee957056f0e408ee54c67678","runId":30455636671,"publicParity":"25/25","hostingDeployExecutions":1,"redeployExecuted":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0},
@@ -12,9 +12,10 @@
   "rootCauseRemediation512":{"closed":true,"status":"M5_MEMBERSHIP_PROJECTION_512_STATIC_CLOSED_NEW_RC_READY_FOR_HOSTING","accessOwnerVersion":"20260729.3","preflight":"36/36","fixture":"23/23","protectedFilesUnchanged":true,"runtime":false,"browser":false,"secrets":false,"deploy":false},
   "releaseCandidate":{"priorHash":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","hash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssetCount":42,"allCriticalAssetsPresent":true,"remoteVisualAssetCount":25,"remoteVisualAssetsMatched":25,"mismatchCount":0,"remoteParity":true,"mismatches":[],"hostingDeployRequired":false,"runtimeSmokePassed":false,"approvalReadyForLabDelivery":false,"approvalReadyForRuntimeSmoke":true},
   "hostingDelivery513":{"closed":true,"packageCheck":{"status":"M5_LAB_HOSTING_DELIVERY_PACKAGE_PASS","commit":"d437951b0a52766c55df2384163354e4345813cb","runId":30461749662,"jobId":90609304405,"artifactId":8727869333,"artifactDigest":"sha256:e7930733a252aedd2a4df367fadf90b25fbf451b59f2aa21dc4a371f18e00537"},"requestCommit":"ff7b03524e91aa160d5ba5f5782f7b729364e497","runId":30461951452,"jobId":90610001393,"artifactId":8727975511,"artifactDigest":"sha256:8c67073aa4ff569d3109d06f37b5a6ee737272db299f01ad447069c19607f633","functionalStatus":"M5_LAB_HOSTING_DELIVERED_AND_25_OF_25_VERIFIED","workflowConclusion":"failure_after_delivery_due_validator_stale","validatorFailure":"jq_unicode_property_pólizas_unquoted","hostingDeployExecutions":1,"redeployExecuted":false,"publicParity":"25/25","mismatchCount":0,"authorizationConsumed":true,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false},
-  "authorization":{"hostingDeployAuthorized":false,"allowedHostingDeployExecutions":0,"hostingAuthorizationSource":"user_autorizado_20260729_for_one_hosting_lab_delivery_rc_ae6bb2a3","hostingAuthorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeSmokeExecutions":0,"runtimeAuthorizationConsumed":true,"staticRemediationAuthorized":false,"allowedStaticRemediationExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false},
-  "forbiddenUntilSeparatelyAuthorized":{"hostingDeploy":true,"runtimeSmoke":true,"browser":true,"visualReview":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"mergeMain":true,"policies":true,"pólizas":true},
-  "nextAction":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_RUNTIME_SMOKE_LAB_ON_RC_AE6BB2A35CE4F03C0353D670218C841E51B57A2461A3BA9E741D8BD7A973FD61",
+  "runtimeSmoke514":{"authorized":true,"packagePending":true,"requestCreated":false,"authorizationConsumed":false,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","allowedExecutions":1,"snapshotsBeforeAfter":true,"firestoreRead":true,"firestoreWrites":0,"operationalWrites":0,"runtime":true,"browser":true,"hostingDeploy":false},
+  "authorization":{"hostingDeployAuthorized":false,"allowedHostingDeployExecutions":0,"hostingAuthorizationConsumed":true,"runtimeSmokeAuthorized":true,"allowedRuntimeSmokeExecutions":1,"runtimeAuthorizationSource":"user_autorizado_20260729_for_one_runtime_smoke_lab_rc_ae6bb2a3","runtimeAuthorizationConsumed":false,"runtimeRequestCreated":false,"staticRemediationAuthorized":false,"allowedStaticRemediationExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false},
+  "forbiddenUntilSeparatelyAuthorized":{"hostingDeploy":true,"firestoreWrite":true,"operationalWrites":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"mergeMain":true,"policies":true,"visualReview":true,"pólizas":true},
+  "nextAction":"RUN_M5_514_PACKAGE_WITHOUT_SECRETS_OR_RUNTIME_THEN_CREATE_IMMUTABLE_REQUEST_IF_PASS",
   "containsPII":false,
   "containsSecrets":false
 }
