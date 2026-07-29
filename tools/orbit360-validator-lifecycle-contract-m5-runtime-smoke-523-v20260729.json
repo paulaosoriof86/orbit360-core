@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-v7",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.23",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m5-runtime-522-one-shot-after-validator-521-v1",
+  "classification":"LAB_RUNTIME_GATE",
+  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_one_shot_request_after_package_pass"},
+  "baseline":{"validator521Closed":true,"validator521Status":"M5_TECHNICAL_COPY_REMEDIATION_521_STATIC_PASS","candidateRuntimeContractVersion":"5.0.22","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeExecuted":false},
+  "authorization":{"authorizationSource":"user_autorizado_20260729_after_technical_copy_521_pass","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"authorizationConsumed":false,"firestoreWriteAuthorized":false,"operationalWritesAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
+  "nextRequiredDecision":"PACKAGE_PASS_THEN_CREATE_IMMUTABLE_REQUEST_AND_EXECUTE_EXACTLY_ONE_RUNTIME_522",
+  "containsPII":false,
+  "containsSecrets":false
+}
