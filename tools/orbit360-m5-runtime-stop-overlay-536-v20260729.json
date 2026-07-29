@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"orbit360-m5-runtime-stop-overlay-536-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.36",
+  "status":"M5_RUNTIME_536_STOPPED_AFTER_ONE_SHOT_SECOND_STATIC_COURSE_PRODUCER_ZERO_WRITES",
+  "releaseCandidate":{"hash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7","criticalAssets":44,"publicAssets":27,"publicParity":"27/27"},
+  "runtime536":{"runId":30500309087,"jobId":90738308918,"artifactId":8743229256,"artifactDigest":"sha256:6e6e045c8c10e4873d1d6db669122323460d9c6f47c47ddf743078dde0ef9680","status":"M5_RUNTIME_536_FAILED_STOP_LINE","failureStage":"real_tenant_data","classification":"FUNCTIONAL_DEFECT","rootCause":"base seed courses in data/seed.js lack explicit _cv static-content version marker; prior 5.0.34 remediation inventoried academia-plus but not every static cursos producer","firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0,"allCountsStable":true,"allDigestsStable":true,"roleViews":{"desktopDirection":true,"tabletOperativo":true,"mobileAsesor":true,"mobileMenu":true,"advisorInsurers":26,"advisorInsurerEditVisible":false}},
+  "authorization":{"authorizationSource":"user_autorizado_runtime_5_0_35_20260729","runtimeAuthorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"rerunForbidden":true,"runtimeRequestCreated":true,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "safety":{"secrets":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"policies":false,"pólizas":false},
+  "nextAction":"STATIC_ROOT_CAUSE_REMEDIATION_INVENTORY_ALL_STATIC_CURSOS_PRODUCERS; fix seed invariant without relaxing policy; recalculate RC and Hosting parity before any new runtime",
+  "containsPII":false,
+  "containsSecrets":false
+}
