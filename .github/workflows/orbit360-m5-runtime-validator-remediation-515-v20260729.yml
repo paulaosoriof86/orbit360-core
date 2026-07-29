@@ -2,11 +2,7 @@ name: Orbit 360 · M5 runtime validator remediation · 5.0.15
 run-name: M5 5.0.15 · static validator remediation · ${{ github.sha }}
 
 on:
-  push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - '.github/workflows/orbit360-m5-runtime-validator-remediation-515-v20260729.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -40,15 +36,30 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verificar rama y primer intento
+      - name: Verificar rama y ejecución manual congelada
         shell: bash
         run: |
           set -euo pipefail
-          test "$GITHUB_EVENT_NAME" = 'push'
+          test "$GITHUB_EVENT_NAME" = 'workflow_dispatch'
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
           test "$GITHUB_RUN_ATTEMPT" = '1'
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           git cat-file -e 0702b42346054158b7268348d6a2c2d2ffdfdad0^{commit}
+
+      - name: Verificar contrato de selectores jq Unicode
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f tools/orbit360-jq-selector-safety-contract-v20260729.json
+          node <<'NODE'
+          const fs=require('fs');
+          const files=['.github/workflows/orbit360-m5-lab-hosting-delivery-513-v20260729.yml','.github/workflows/orbit360-m5-runtime-validator-remediation-515-v20260729.yml'];
+          const unsafe=/\.[A-Za-z_][A-Za-z0-9_\u0080-\uFFFF]*[\u0080-\uFFFF][A-Za-z0-9_\u0080-\uFFFF]*/g;
+          const findings=[];
+          for(const file of files){fs.readFileSync(file,'utf8').split(/\r?\n/).forEach((line,i)=>{if(!/\bjq\b/.test(line))return;for(const m of line.matchAll(unsafe))findings.push({file,line:i+1,token:m[0]});});}
+          if(findings.length)throw new Error('UNSAFE_JQ_UNICODE_SELECTOR:'+JSON.stringify(findings));
+          console.log('PASS_JQ_UNICODE_SELECTOR_SAFETY');
+          NODE
 
       - name: Preflight canónico estático
         shell: bash
@@ -64,7 +75,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          jq -e '.ok==true and .status=="M5_RUNTIME_VALIDATOR_515_STATIC_PASS" and .classification=="VALIDATOR_STALE" and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==42 and .ownerVersion=="20260729.3" and .staleOwnerVersion=="20260728.2" and .productOwnerUnchangedSinceRuntime514==true and .stalePredicateAbsent==true and .runtime514AuthorizationConsumed==true and .priorRuntimeCountsStable==true and .priorRuntimeDigestsStable==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtime==false and .browser==false and .deploy==false and .hostingDeploy==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .mergeMain==false and .visualReview==false and .pólizas==false and .failed==0 and .passed==.total' "$ORBIT360_EVIDENCE_DIR/m5-runtime-validator-remediation-515-summary.json" >/dev/null
+          jq -e '.ok==true and .status=="M5_RUNTIME_VALIDATOR_515_STATIC_PASS" and .classification=="VALIDATOR_STALE" and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==42 and .ownerVersion=="20260729.3" and .staleOwnerVersion=="20260728.2" and .productOwnerUnchangedSinceRuntime514==true and .stalePredicateAbsent==true and .runtime514AuthorizationConsumed==true and .priorRuntimeCountsStable==true and .priorRuntimeDigestsStable==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtime==false and .browser==false and .deploy==false and .hostingDeploy==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .mergeMain==false and .visualReview==false and .["pólizas"]==false and .failed==0 and .passed==.total' "$ORBIT360_EVIDENCE_DIR/m5-runtime-validator-remediation-515-summary.json" >/dev/null
 
       - name: Subir evidencia sanitizada
         if: always()
