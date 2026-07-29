@@ -1,29 +1,29 @@
-# Pendiente único M5 — RC b25bf275
+# Pendiente único M5 — RC f6dfa37e
 
 Fecha: 2026-07-29 UTC / 2026-07-28 Guatemala
 
 ## Estado cerrado
 
 - M1–M4: cerrados.
-- M5 5.0.1–5.0.4: cerrados.
-- Runtime smoke 5.0.5: stop-line cerrado, autorización consumida, cero escrituras.
-- Remediación estática 5.0.6: cerrada.
-- Hosting LAB 5.0.7: cerrado.
-- RC: `b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091`.
+- M5 5.0.1–5.0.7: cerrados.
+- Runtime smoke 5.0.8: ejecutado una sola vez; stop-line cerrado; autorización consumida.
+- Remediación estática 5.0.9: cerrada.
+- Snapshots antes/después: conteos y digests estables.
+- Firestore writes: 0.
+- Operational writes: 0.
+- Nueva RC: `f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324`.
 - Activos críticos: 42/42.
-- Activos públicos LAB: 25/25.
-- Mismatches: 0.
-- Hosting deploy executions: 1.
-- Redeploy: no.
+- LAB actual: 24/25.
+- Única diferencia: `index.html`.
 
 ## Pendiente autorizado actualmente
 
 Ninguno.
 
 ```txt
+staticRemediationAuthorized: false
 hostingDeployAuthorized: false
 allowedHostingDeployExecutions: 0
-publicParityRecoveryAuthorized: false
 runtimeSmokeAuthorized: false
 allowedRuntimeSmokeExecutions: 0
 visualReviewAuthorized: false
@@ -31,40 +31,47 @@ visualReviewAuthorized: false
 
 ## Próxima autorización requerida
 
-Una sola ejecución runtime smoke LAB de la RC exacta `b25bf275…`.
+Una sola entrega Hosting LAB de la RC exacta `f6dfa37e…`.
 
-Alcance permitido únicamente después de autorización explícita independiente:
+Alcance permitido después de autorización explícita independiente:
 
-- navegador automatizado LAB;
-- autenticación y acuerdo legal una vez;
-- lectura Firestore read-only cuando el gate la requiera;
-- Dirección desktop, Operativo tablet y Asesor móvil;
-- Cliente 360 lista/ficha/calidad;
-- Aseguradoras directorio/ficha/conocimiento;
-- multirol/scopes, menú móvil, relaciones vacías honestas y cero copy técnico;
-- verificación de 414 clientes, 26 aseguradoras y 7 asesores;
-- cero escrituras.
+- canal `orbit360-ays-lab`;
+- frontend Hosting solamente;
+- una ejecución;
+- publicación de `index.html` con el owner Academia antes del store Firestore;
+- paridad pública posterior obligatoria 25/25.
 
 Alcance prohibido:
 
-- otro deploy Hosting;
-- Firestore writes y mutaciones operativas;
+- Firestore y datos;
+- runtime smoke y navegador;
 - Functions y Rules;
 - producción;
 - `main` y merge;
-- revisión visual humana antes de smoke `ok:true`;
+- revisión visual;
 - Pólizas y cualquier otra fuente real.
 
-## Gate de salida esperado
+## Gate de salida Hosting
 
 ```txt
-RC = b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091
-public parity = 25/25 preservada
-runtime smoke = ok:true
+RC = f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324
+critical assets = 42/42
+remote assets = 25/25
+mismatches = 0
+hosting deploy executions = 1
 Firestore writes = 0
-operational writes = 0
-hosting deploy = false
+runtime/browser = false/false
 Functions/Rules/production/main/merge = false
 ```
 
-Solo después podrá habilitarse la revisión visual única. Pólizas continúa bloqueado hasta que su bloque solicite y reciba la fuente real vigente específica.
+## Gate posterior
+
+Solo después de la paridad 25/25 podrá solicitarse un nuevo runtime smoke independiente. Debe:
+
+- usar `tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs`;
+- verificar Dirección desktop, Operativo tablet y Asesor móvil;
+- probar 414 clientes, 26 aseguradoras y 7 asesores;
+- observar contenido Academia transitorio en `cursos`, `lecciones`, `evaluaciones` y `config`;
+- cerrar con cero intentos durables, cero escrituras y evidencia sanitizada `ok:true`.
+
+Pólizas continúa bloqueado hasta que su bloque solicite y reciba la fuente real vigente específica.
