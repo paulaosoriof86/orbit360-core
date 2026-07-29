@@ -1,0 +1,121 @@
+name: Orbit 360 · M5 runtime smoke package check
+run-name: M5 5.0.5 · Package check · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - "tools/orbit360-m5-runtime-smoke-package-check-v20260729.json"
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-m5-runtime-smoke-package-check-v20260729
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  EXPECTED_RC_HASH: d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  package_check:
+    name: M5 · Runtime smoke package · no secrets · no runtime
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validar boundary estático
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = "1"
+          test ! -f tools/orbit360-m5-runtime-smoke-request-v20260729.json
+          node <<'NODE'
+          const fs=require('fs');
+          const files=[
+            'tools/orbit360-m5-runtime-smoke-authorization-v20260729.json',
+            'tools/orbit360-m5-runtime-smoke-freeze-v20260729.json',
+            'tools/orbit360-validator-lifecycle-contract-m5-runtime-smoke-v20260729.json',
+            'tools/orbit360-gate-contract-overlay-m5-runtime-smoke-v20260729.json',
+            'tools/orbit360-gate-contract-registry-extension-m5-runtime-smoke-v20260729.json',
+            'tools/orbit360-m5-runtime-smoke-package-check-v20260729.json'
+          ];
+          files.forEach(file=>JSON.parse(fs.readFileSync(file,'utf8')));
+          const auth=JSON.parse(fs.readFileSync(files[0],'utf8'));
+          const freeze=JSON.parse(fs.readFileSync(files[1],'utf8'));
+          const lifecycle=JSON.parse(fs.readFileSync(files[2],'utf8'));
+          if(auth.requestCreated!==false||auth.runtimeSmokeAuthorized!==true||auth.allowedExecutions!==1)throw new Error('PACKAGE_AUTH_BOUNDARY_INVALID');
+          if(freeze.status!=='READY_FOR_ONE_RUNTIME_SMOKE_LAB'||freeze.authorization?.requestCreated!==false)throw new Error('PACKAGE_FREEZE_BOUNDARY_INVALID');
+          const c=lifecycle.executionProfile?.capabilities||{};
+          if(c.secrets!==true||c.firestoreRead!==true||c.writes!==false||c.runtime!==true||c.browser!==true||c.deploy!==false||c.functionsDeploy!==false||c.rulesDeploy!==false||c.production!==false)throw new Error('PACKAGE_CAPABILITIES_INVALID');
+          console.log('M5_RUNTIME_PACKAGE_BOUNDARY_OK');
+          NODE
+
+      - name: Validar sintaxis y router canónico
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m5-runtime-smoke-v20260729.mjs
+          node --check tools/orbit360-m5-runtime-smoke-contract-v20260729.cjs
+          node --check tools/orbit360-m5-runtime-smoke-live-readonly-v20260729.mjs
+          node --check tools/orbit360-m5-runtime-smoke-browser-v20260729.mjs
+          node --check tools/orbit360-m5-runtime-smoke-close-v20260729.mjs
+          grep -F 'contractVersion:"5.0.5",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-runtime-smoke-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-runtime-smoke-v20260729.mjs"' tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
+
+      - name: Ejecutar contrato estático del paquete
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-m5-runtime-smoke-contract-v20260729.cjs
+          jq -e '.ok==true and .status=="M5_RUNTIME_SMOKE_CONTRACT_PASS" and .failed==0 and .passed==.total and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==41 and .firestoreRead==true and .firestoreWrites==0 and .operationalWrites==0 and .runtime==true and .browser==true and .hostingDeploy==false and .functionsDeploy==false and .rulesDeploy==false and .production==false' "$EVIDENCE_DIR/m5-runtime-smoke-contract-summary.json" >/dev/null
+
+      - name: Cerrar package check sanitizado
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const contract=JSON.parse(fs.readFileSync(path.join(process.env.EVIDENCE_DIR,'m5-runtime-smoke-contract-summary.json'),'utf8'));
+          const out={schemaVersion:'orbit360-m5-runtime-smoke-package-check-v1',generatedAt:new Date().toISOString(),ok:contract.ok===true&&contract.failed===0,status:'M5_RUNTIME_SMOKE_PACKAGE_CHECK_PASS',contractVersion:'5.0.5',releaseCandidateHash:contract.releaseCandidateHash,contractPassed:contract.passed,contractTotal:contract.total,requestPresent:false,secrets:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,containsPII:false,containsSecrets:false};
+          fs.writeFileSync(path.join(process.env.EVIDENCE_DIR,'m5-runtime-smoke-package-check-summary.json'),JSON.stringify(out,null,2)+'\n');
+          if(!out.ok)process.exit(41);
+          NODE
+          jq -e '.ok==true and .status=="M5_RUNTIME_SMOKE_PACKAGE_CHECK_PASS" and .requestPresent==false and .secrets==false and .firestoreRead==false and .runtime==false and .browser==false and .deploy==false' "$EVIDENCE_DIR/m5-runtime-smoke-package-check-summary.json" >/dev/null
+
+      - name: Subir evidencia sanitizada
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-runtime-smoke-package-check-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-contract-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-package-check-summary.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          SUMMARY_PATH: orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-package-check-summary.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='M5 runtime smoke package check failed';
+            try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY_PATH,'utf8'));if(s.ok===true&&s.requestPresent===false){state='success';description='M5 runtime smoke package ready; no secrets/runtime';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-runtime-smoke-package-check',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
