@@ -1,0 +1,23 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m5-validator-redesign-v1",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.19",
+  "phase":"M5_VALIDATOR_REDESIGN_STATIC",
+  "required":{
+    "releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61",
+    "candidateRuntimeContractVersion":"5.0.18",
+    "policyReadiness517StoppedAfterTwoFailures":true,
+    "sourcePredicateHelper":"tools/orbit360-validator-source-predicate-helpers-v20260729.mjs",
+    "sourcePredicateHelperVersion":"20260729.1",
+    "runtimeSmokeAuthorized":false,
+    "firestoreReadAuthorized":false,
+    "writesAuthorized":false,
+    "deployAuthorized":false,
+    "visualReviewAuthorized":false,
+    "productionAuthorized":false,
+    "policiesAuthorized":false,
+    "pólizas":false
+  },
+  "containsPII":false,
+  "containsSecrets":false
+}
