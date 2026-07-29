@@ -1,5 +1,5 @@
-name: Orbit 360 · M5 multirol owner remediation 5.0.29
-run-name: M5 5.0.29 · immutable Access compatibility + PWA cache · ${{ github.sha }}
+name: Orbit 360 · M5 multirol owner remediation 5.0.29 · FINAL STATIC ATTEMPT
+run-name: M5 5.0.29 · final static after fixture correction · ${{ github.sha }}
 
 on:
   push:
@@ -19,7 +19,7 @@ env:
 
 jobs:
   static_remediation:
-    name: M5 · Access/PWA root-cause remediation · zero operational capabilities
+    name: M5 · final Access/PWA root-cause remediation · zero operational capabilities
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verificar rama y ejecución única
+      - name: Verificar stop-line y segundo intento final
         shell: bash
         run: |
           set -euo pipefail
@@ -44,6 +44,8 @@ jobs:
           test "$GITHUB_RUN_ATTEMPT" = '1'
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test -f tools/orbit360-m5-runtime-smoke-528-request-v20260729.json
+          test -f tools/orbit360-m5-multirol-owner-remediation-529-freeze-v20260729.json
+          jq -e '.controls.sameStageFailureCount==1 and .controls.secondFailureStopsStage==true and .authorization.staticAttempt2Authorized==true and .authorization.allowedExecutions==1' tools/orbit360-m5-multirol-owner-remediation-529-freeze-v20260729.json >/dev/null
 
       - name: Preflight canónico 5.0.29 sin identidad ni runtime
         shell: bash
@@ -62,7 +64,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m5-multirol-owner-remediation-529-${{ github.run_id }}
+          name: orbit360-m5-multirol-owner-remediation-529-final-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/m5-multirol-owner-remediation-529-summary.json
@@ -77,6 +79,6 @@ jobs:
           SUMMARY_PATH: orbit360-platform/runtime-gate-crm-v20260716/m5-multirol-owner-remediation-529-summary.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='M5 5.0.29 static remediation failed';
+            const fs=require('fs');let state='failure',description='M5 5.0.29 final static failed';
             try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY_PATH,'utf8'));if(s.status==='M5_MULTIROL_OWNER_REMEDIATION_529_STATIC_PASS'&&s.failed===0){state='success';description='M5 5.0.29 Access/PWA static PASS';}}catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-multirol-owner-remediation-529',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
