@@ -1,14 +1,16 @@
 {
-  "schemaVersion":"orbit360-m5-technical-copy-remediation-freeze-v2",
+  "schemaVersion":"orbit360-m5-technical-copy-remediation-freeze-v3",
   "issuedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.21",
-  "status":"READY_FOR_SECOND_AND_FINAL_STATIC_TECHNICAL_COPY_VERIFICATION",
+  "status":"M5_TECHNICAL_COPY_REMEDIATION_521_STATIC_PASS_CLOSED",
   "baseline":{"runtime520Closed":true,"runtime520AuthorizationConsumed":true,"runtime520RequestCommit":"60562d429f2aff5583c47eeb5bf4d88c08deb184","runtime520RunId":30473040571,"runtime520JobId":90647758920,"firstFailure":"TECHNICAL_COPY_VISIBLE:desktopDirectionClient360","allCountsStable":true,"allDigestsStable":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeContractVersion":"5.0.22","candidateRuntimeExecuted":false},
   "staticAttempt1":{"runId":30474020102,"jobId":90651066102,"passed":39,"total":40,"failedCheckIds":["CLIENT360_NO_TECHNICAL_TERMS"],"classification":"VALIDATOR_STALE","rootCause":"source_wide_scan_was_invalid_proxy_for_visible_DOM_innerText"},
-  "authorization":{"staticRemediationAuthorized":true,"allowedExecutions":1,"authorizationConsumed":false,"attempt":"second_and_final","runtimeSmokeAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"browserAuthorized":false,"deployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
-  "required":{"rootCauseBareLabSubstring":true,"whiteLabelAllowed":true,"labelAllowed":true,"isolatedLabBlocked":true,"firebaseBlocked":true,"firestoreBlocked":true,"backendBlocked":true,"dryRunBlocked":true,"sourceWideScanUsedAsVisibleCopyProxy":false,"candidate522UsesSemanticPredicate":true,"historical518Untouched":true,"productProtectedUnchanged":true},
-  "forbidden":{"thirdStaticAttempt":true,"runtime":true,"browser":true,"secrets":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"visualReview":true,"policies":true,"pólizas":true},
+  "staticAttempt2":{"commit":"565784a0f49a8f74d5d02ef8a110095533257926","runId":30474317745,"jobId":90652075752,"artifactId":8732952852,"artifactDigest":"sha256:d5e4b7b75009b5cfb4f2ffbc971d37775934e867a4acb6b21c291430e23fed24","passed":41,"total":41,"failed":0,"status":"M5_TECHNICAL_COPY_REMEDIATION_521_STATIC_PASS"},
+  "authorization":{"staticRemediationAuthorized":false,"allowedExecutions":0,"authorizationConsumed":true,"runtimeSmokeAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"browserAuthorized":false,"deployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "verified":{"rootCauseBareLabSubstring":true,"whiteLabelAllowed":true,"labelAllowed":true,"isolatedLabBlocked":true,"firebaseBlocked":true,"firestoreBlocked":true,"backendBlocked":true,"dryRunBlocked":true,"sourceWideScanUsedAsVisibleCopyProxy":false,"candidate522UsesSemanticPredicate":true,"historical518Untouched":true,"productProtectedUnchanged":true},
+  "forbidden":{"runtimeWithoutNewAuthorization":true,"browserWithoutNewAuthorization":true,"firestoreReadWithoutNewAuthorization":true,"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"visualReview":true,"policies":true,"pólizas":true},
+  "nextAction":"REQUEST_NEW_EXPLICIT_RUNTIME_AUTHORIZATION_FOR_CANDIDATE_5_0_22",
   "containsPII":false,
   "containsSecrets":false
 }
