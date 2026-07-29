@@ -1,6 +1,7 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-stop-overlay-v1",
+  "schemaVersion":"orbit360-m5-release-candidate-stop-overlay-v2",
   "issuedAt":"2026-07-29",
+  "supersedesRuntimeAuthorizationStateIn":"tools/orbit360-m5-release-candidate-freeze-v20260728.json",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "wrapperContractVersion":"5.0.26",
   "candidateRuntimeContractVersion":"5.0.25",
