@@ -2,6 +2,35 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operativo vigente se mantiene en la rama obligatoria y PR #5 draft/open, sin merge ni producción salvo autorización explícita.
 
+## [M5-5.0.6] — 2026-07-29 UTC · Remediación estática Academia + nueva RC
+### Fixed
+- Separado el contenido estático versionado de Academia de las mutaciones durables en LAB mediante `core/academia-static-content-write-policy-v20260729.js` v`20260729.2`.
+- Cursos, lecciones, evaluaciones, seed y marcadores de contenido se montan transitoriamente en sesión; progreso, certificaciones, cursos creados y acciones operativas explícitas permanecen durables.
+- `ays-lab-preview.html` separa la revisión visual/PWA `20260723-10` del runtime backend canónico `20260717-2`.
+- `core/backend-lab-loader.js` fue restaurado exactamente a su baseline; `data/store-firestore-lab.local.js` no cambió.
+### Verified
+- Package run `30415573496`, job `90461241309`, artifact `8710028296`, digest `sha256:3ae2d78a5239ed5be90ebb7ef87ec4148ce0baa84b59ff8de28faf2cf44e4495`.
+- Request run `30415732795`, job `90461724776`, artifact `8710079365`, digest `sha256:7d28bc0a43e30353a93c4aae975a87636e01f02e0f32cacfa5c4ef905a90cf1c`.
+- Preflight 24/24; contrato estático 26/26; fixtures Academia 18/18.
+- Cero secrets, Firestore, runtime, navegador, deploy o escrituras operativas.
+- Nueva RC `b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091`, activos críticos 42/42.
+- LAB 22/25: preview y addendum Academia con hash anterior; nuevo owner Academia aún no publicado.
+### State
+- `M5_RUNTIME_SMOKE_REMEDIATION_STATIC_CLOSED_NEW_RC_READY_FOR_LAB_DELIVERY`.
+- Gate estático consumido. Hosting, runtime y revisión visual continúan bloqueados hasta autorizaciones independientes.
+
+## [M5-5.0.5] — 2026-07-29 UTC · Runtime smoke stop-line
+### Verified
+- Runtime smoke ejecutado exactamente una vez: run `30413481948`, job `90454714725`, artifact `8709301142`.
+- Preflight 17/17, contrato 29/29, snapshots antes/después 11/11.
+- Conteos y digests permanecieron idénticos; Firestore writes 0, operational writes 0, network write candidates 0.
+### Fixed
+- Clasificada la causa Academia como `FUNCTIONAL_DEFECT` + `DATA_CONTRACT_FAILURE`: contenido estático intentaba `Orbit.store.insert/update` durante bootstrap LAB.
+- Clasificada la deriva runtime como `VALIDATOR_STALE` + `PIPELINE_MECHANISM_FAILURE`: revisión visual confundida con runtime backend.
+### State
+- `M5_RUNTIME_SMOKE_LAB_FAILED_STOP_LINE` cerrado.
+- Autorización runtime consumida; no se repitió el navegador.
+
 ## [M5-5.0.4] — 2026-07-29 UTC · Entrega Hosting LAB RC post-Access
 ### Changed
 - Entregada una sola vez al canal Hosting LAB la RC `d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045`.
@@ -49,7 +78,7 @@ Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operat
 - **Modelo de comisión de asesor unificado** con `Orbit.comeng` (v1.91).
 
 ### Arquitectura y saneamiento
-- **Sin `localStorage` directo en módulos** (v1.61, v1.89): capa `pref/setPref`; logo white-label vía `Orbit.tenant`. 
+- **Sin `localStorage` directo en módulos** (v1.61, v1.89): capa `pref/setPref`; logo white-label vía `Orbit.tenant`.
 - **IA centralizada** en `Orbit.ia.complete` (v1.90): punto único de llamada al modelo.
 - **Fechas vivas** (v1.64, v1.75): el demo sigue la fecha real del sistema; sin literales quemados (v1.74).
 - **Auditoría de salud de render 28/28** (v1.79) + limpieza de código muerto.
