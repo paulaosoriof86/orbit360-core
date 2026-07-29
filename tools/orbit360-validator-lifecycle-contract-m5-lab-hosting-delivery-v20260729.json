@@ -1,6 +1,7 @@
 {
   "schemaVersion":"orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-v2",
   "issuedAt":"2026-07-29",
+  "updatedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
   "pullRequest":5,
@@ -8,11 +9,12 @@
   "gateContractVersion":"5.0.7",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m5-hosting-lab-delivery-rc-b25bf275-v2",
-  "classification":"M5_LAB_HOSTING_DELIVERY_AUTHORIZED_ONCE",
+  "classification":"M5_LAB_HOSTING_DELIVERY_REQUEST_READY",
   "executionProfile":{"phase":"M5_LAB_HOSTING_DELIVERY","capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
   "baseline":{"staticRemediationClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-remediation-static-506-closure.json","releaseCandidateHash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091","criticalAssets":42,"remoteAssetsExpected":25},
-  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260728_for_one_hosting_lab_delivery_rc_b25bf275","hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"browserAuthorized":false,"runtimeSmokeAuthorized":false,"writeAuthorized":false,"productionAuthorized":false,"requestCreated":false,"authorizationConsumed":false},
-  "nextRequiredDecision":"PACKAGE_CHECK_THEN_IMMUTABLE_REQUEST_FOR_ONE_HOSTING_LAB_DELIVERY",
+  "packageCheck":{"status":"PASS","runId":30417610407,"jobId":90467411035,"commit":"4aa996d37b413a59b48135a728edffa3fd547dd6","artifactId":8710708337,"artifactDigest":"sha256:4c861ebebcedb84bee5a31a797845b9edb2a5df15fd935fb945f992ed09a4307"},
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260728_for_one_hosting_lab_delivery_rc_b25bf275","hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"browserAuthorized":false,"runtimeSmokeAuthorized":false,"writeAuthorized":false,"productionAuthorized":false,"requestCreated":true,"authorizationConsumed":false},
+  "nextRequiredDecision":"EXECUTE_ONE_IMMUTABLE_HOSTING_LAB_DELIVERY_AND_REQUIRE_25_OF_25_PARITY",
   "containsPII":false,
   "containsSecrets":false
 }
