@@ -1,0 +1,13 @@
+{
+  "schemaVersion":"orbit360-m5-runtime-evidence-ledger-533-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.33",
+  "packageInput":"tools/orbit360-m5-runtime-package-input-533-v20260729.json",
+  "appendOnly":true,
+  "entries":[
+    {"kind":"runtime_authorization_received","sourceVersion":"5.0.33","authorizationSource":"user_autorizado_runtime_20260729_after_hosting_532_pass","candidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","allowedExecutions":1,"requestCreated":false,"runtimeExecuted":false}
+  ],
+  "containsPII":false,
+  "containsSecrets":false
+}
