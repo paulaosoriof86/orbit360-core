@@ -1,0 +1,7 @@
+{
+  "schemaVersion":"orbit360-gate-contract-registry-extension-v2",
+  "issuedAt":"2026-07-29",
+  "gates":[{"gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.7","phase":"M5_LAB_HOSTING_DELIVERY","lifecycle":"tools/orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-v20260729.json","engine":"tools/orbit360-validar-gate-contracts-engine-m5-lab-hosting-delivery-v20260729.mjs","secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false}],
+  "containsPII":false,
+  "containsSecrets":false
+}
