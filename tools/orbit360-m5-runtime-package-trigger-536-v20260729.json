@@ -1,0 +1,11 @@
+{
+  "schemaVersion":"orbit360-m5-runtime-package-trigger-536-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.36",
+  "releaseCandidateHash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7",
+  "allowedExecutions":1,
+  "zeroCapabilities":true,
+  "containsPII":false,
+  "containsSecrets":false
+}
