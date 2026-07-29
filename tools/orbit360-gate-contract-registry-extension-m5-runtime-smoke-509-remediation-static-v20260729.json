@@ -1,0 +1,7 @@
+{
+  "schemaVersion":"orbit360-gate-contract-registry-extension-v3",
+  "issuedAt":"2026-07-29",
+  "gates":[{"gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.9","phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC","lifecycle":"tools/orbit360-validator-lifecycle-contract-m5-runtime-smoke-509-remediation-static-v20260729.json","engine":"tools/orbit360-validar-gate-contracts-engine-m5-runtime-smoke-509-remediation-static-v20260729.mjs","secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}],
+  "containsPII":false,
+  "containsSecrets":false
+}
