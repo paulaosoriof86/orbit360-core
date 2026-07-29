@@ -1,0 +1,11 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.12",
+  "phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC",
+  "required":{"priorRuntimeFailure":"MEMBERSHIP_BOUNDARY_NOT_ACTIVE","priorRuntimeAuthorizationConsumed":true,"releaseCandidateHashBefore":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","membershipProjectionOwnerVersion":"20260729.3","membershipPath":"tenants/{tenantId}/members/{authenticatedUid}","readOnly":true,"fixturePass":true,"protectedFilesUnchanged":true,"newReleaseCandidate":true,"remoteParityExpected":"24/25","onlyRemoteMismatch":"core/access-role-session-owner-v20260728.js"},
+  "capabilityBoundary":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
