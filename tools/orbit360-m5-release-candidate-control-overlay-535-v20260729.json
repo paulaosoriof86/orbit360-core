@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-535-v1",
+  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-535-v2",
   "issuedAt":"2026-07-29",
   "authoritativeForCurrentM5ControlState":true,
   "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-534-v20260729.json","tools/orbit360-m5-hosting-delivery-535-freeze-v20260729.json"],
@@ -9,7 +9,7 @@
   "status":"M5_HOSTING_535_CLOSED_27_OF_27_READY_TO_REQUEST_RUNTIME_AUTHORIZATION",
   "releaseCandidate":{"hash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7","criticalAssets":44,"publicAssets":27,"descriptor":"tools/orbit360-m5-release-candidate-descriptor-534-v20260729.json","academiaPlusBound":true,"strictPolicyPreserved":true},
   "publicParity":{"assetsExpected":27,"assetsMatched":27,"mismatchCount":0,"mismatchPaths":[],"remoteParity":true,"hostingDeliveryRequired":false},
-  "hosting535":{"closed":true,"packageRunId":30498488128,"deliveryRunId":30498827076,"deliveryJobId":90733704150,"artifactId":8742666048,"artifactDigest":"sha256:0af0933c0c2e520f888b833289634e35d4b5675638ed223ab9f1289babac8ad9","hostingDeployExecutions":1,"authorizationConsumed":true,"workflowFrozen":true},
+  "hosting535":{"closed":true,"packageRunId":30498488128,"packageJobId":90732671666,"packageArtifactId":8742528376,"packageArtifactDigest":"sha256:c93963740d6b672667dc14159e7d4a23d6db203fc3e8c18c65f19b353bca7c32","deliveryRunId":30498827076,"deliveryJobId":90733704150,"artifactId":8742666048,"artifactDigest":"sha256:0af0933c0c2e520f888b833289634e35d4b5675638ed223ab9f1289babac8ad9","hostingDeployExecutions":1,"authorizationConsumed":true,"workflowFrozen":true,"closureVerification":{"runId":30499180550,"jobId":90734795651,"artifactId":8742786184,"artifactDigest":"sha256:6f2587defc55630a3930d7afb9a7772efe44a0dded1bac2914be55152f101381","status":"PASS","zeroCapabilities":true,"workflowFrozen":true}},
   "authorization":{"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"hostingAuthorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeRequestCreated":false,"visualReviewAuthorized":false,"productionAuthorized":false},
   "safety":{"secrets":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"policies":false,"pólizas":false},
   "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_RUNTIME_AUTHORIZATION_FOR_RC_401F87B1_44_27_AFTER_HOSTING_535_27_OF_27; do not reuse runtime 5.0.33 authorization",
