@@ -1,24 +1,36 @@
 /* ============================================================
    Orbit 360 · Access owner — sesión/selector de rol efectivo
-   Fecha: 2026-07-28
+   Fecha: 2026-07-28 · revisión 2026-07-29
 
    Owner frontend fail-closed. En canales que requieren backend/membership:
    - solo acepta roles presentes en la proyección autenticada;
    - advisorId proviene únicamente de membership;
    - aliases son solo de lectura/visualización;
    - el rol canónico de vista se conserva separado del estado legacy;
+   - en Firestore LAB resuelve la membership autenticada read-only;
    - no escribe memberships ni backend.
    ============================================================ */
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
 
-  var VERSION = '20260728.2';
+  var VERSION = '20260729.3';
   var legacy = window.Orbit.session || {};
   var LEGACY_KEY = 'orbit360_sessionview';
   var VIEW_KEY = 'orbit360_effective_role_view';
   var VISUAL_ROLE = Object.freeze({ SuperAdmin: 'Dirección', AdminTenant: 'Admin' });
   var PRIVILEGED = Object.freeze(['Dirección', 'SuperAdmin', 'AdminTenant']);
+  var membershipProjectionState = {
+    status: 'idle',
+    ready: false,
+    tenantBound: false,
+    assignedRoleCount: 0,
+    advisorBound: false,
+    error: ''
+  };
+  var membershipAuthBound = false;
+  var membershipBindAttempts = 0;
+  var membershipLoadGeneration = 0;
 
   function text(value) { return String(value == null ? '' : value).trim(); }
   function unique(values) {
@@ -222,6 +234,152 @@
     };
   }
 
+  function isFirestoreLabRuntime() {
+    try {
+      var params = new URLSearchParams(window.location && window.location.search || '');
+      if (params.get('orbitBackend') === 'firestore-lab') return true;
+    } catch (error) {}
+    try { return !!(window.OrbitBackend && String(OrbitBackend.mode || '') === 'firestore-lab'); }
+    catch (error) { return false; }
+  }
+  function runtimeTenantId() {
+    try {
+      var params = new URLSearchParams(window.location && window.location.search || '');
+      var fromQuery = text(params.get('tenant'));
+      if (fromQuery) return fromQuery;
+    } catch (error) {}
+    try { return text(window.OrbitBackend && (OrbitBackend.tenantId || OrbitBackend.tenant)); }
+    catch (error) { return ''; }
+  }
+  function updateMembershipProjectionState(patch) {
+    membershipProjectionState = Object.assign({}, membershipProjectionState, patch || {});
+    try {
+      window.dispatchEvent(new CustomEvent('orbit:membership-projection', {
+        detail: {
+          status: membershipProjectionState.status,
+          ready: membershipProjectionState.ready === true,
+          tenantBound: membershipProjectionState.tenantBound === true,
+          assignedRoleCount: Number(membershipProjectionState.assignedRoleCount || 0),
+          advisorBound: membershipProjectionState.advisorBound === true,
+          error: text(membershipProjectionState.error)
+        }
+      }));
+    } catch (error) {}
+  }
+  function membershipProjectionStatus() {
+    return {
+      status: membershipProjectionState.status,
+      ready: membershipProjectionState.ready === true,
+      tenantBound: membershipProjectionState.tenantBound === true,
+      assignedRoleCount: Number(membershipProjectionState.assignedRoleCount || 0),
+      advisorBound: membershipProjectionState.advisorBound === true,
+      error: text(membershipProjectionState.error)
+    };
+  }
+  function clearLabProductProjection() {
+    try {
+      if (window.Orbit.auth && Orbit.auth.productUser && Orbit.auth.productUser.__labMembershipProjection === true) delete Orbit.auth.productUser;
+    } catch (error) {}
+    clearSecureView();
+    updateMembershipProjectionState({ status: 'waiting-auth', ready: false, tenantBound: false, assignedRoleCount: 0, advisorBound: false, error: '' });
+    emitSession();
+  }
+  function normalizeLabMembership(data, docId, tenantId) {
+    data = data && typeof data === 'object' ? data : {};
+    var rawRoles = data.roles || data.rolesAsignados || (data.role || data.rol ? [data.role || data.rol] : []);
+    var roles = canonicalRoles(rawRoles);
+    var defaultRole = canonicalRole(data.defaultRole || data.rolDefault || data.roleDefault || roles[0]);
+    var activeRole = canonicalRole(data.activeRole || data.rolActivo || defaultRole || roles[0]);
+    var scopes = data.dataScopes || data.scopes || {};
+    return {
+      uid: text(data.uid || data.userId || data.id || docId),
+      tenantId: text(data.tenantId || data.tenant || tenantId),
+      roles: roles,
+      defaultRole: defaultRole,
+      activeRole: activeRole,
+      advisorId: text(data.advisorId || data.asesorId),
+      teamId: text(data.teamId || data.equipoId),
+      countries: unique(data.countries || data.paises || []).map(function (country) { return text(country).toUpperCase(); }),
+      dataScopes: clone(scopes),
+      modulesExtra: unique(data.modulesExtra || data.modulosExtra || []),
+      modulesRestricted: unique(data.modulesRestricted || data.modulosRestringidos || []),
+      status: text(data.status || data.estado).toLowerCase(),
+      productReadOnly: true,
+      __labMembershipProjection: true
+    };
+  }
+  function validateLabMembership(projection, user, tenantId) {
+    if (!projection || !user) return 'membership_missing';
+    if (!tenantId || projection.tenantId !== tenantId) return 'membership_tenant_invalid';
+    if (!projection.uid || projection.uid !== text(user.uid)) return 'membership_uid_invalid';
+    if (projection.status !== 'active' && projection.status !== 'activo') return 'membership_inactive';
+    if (!projection.roles.length) return 'membership_roles_missing';
+    if (!projection.defaultRole || projection.roles.indexOf(projection.defaultRole) < 0) return 'membership_default_role_invalid';
+    if (!projection.activeRole || projection.roles.indexOf(projection.activeRole) < 0) return 'membership_active_role_invalid';
+    return '';
+  }
+  function firebaseAuthProvider() {
+    try { return window.firebase && typeof firebase.auth === 'function' ? firebase.auth() : null; }
+    catch (error) { return null; }
+  }
+  function firebaseFirestoreProvider() {
+    try { return window.firebase && typeof firebase.firestore === 'function' ? firebase.firestore() : null; }
+    catch (error) { return null; }
+  }
+  async function loadLabMembershipProjection(user) {
+    var generation = ++membershipLoadGeneration;
+    var tenantId = runtimeTenantId();
+    if (!user || !text(user.uid)) { clearLabProductProjection(); return false; }
+    if (!tenantId) {
+      updateMembershipProjectionState({ status: 'blocked', ready: false, tenantBound: false, assignedRoleCount: 0, advisorBound: false, error: 'tenant_missing' });
+      return false;
+    }
+    var db = firebaseFirestoreProvider();
+    if (!db || typeof db.collection !== 'function') {
+      updateMembershipProjectionState({ status: 'waiting-firestore', ready: false, tenantBound: false, assignedRoleCount: 0, advisorBound: false, error: '' });
+      return false;
+    }
+    updateMembershipProjectionState({ status: 'loading', ready: false, tenantBound: false, assignedRoleCount: 0, advisorBound: false, error: '' });
+    try {
+      var snap = await db.collection('tenants').doc(tenantId).collection('members').doc(text(user.uid)).get();
+      if (generation !== membershipLoadGeneration) return false;
+      if (!snap || snap.exists !== true) {
+        clearLabProductProjection();
+        updateMembershipProjectionState({ status: 'blocked', error: 'membership_missing' });
+        return false;
+      }
+      var projection = normalizeLabMembership(snap.data ? snap.data() : {}, snap.id || text(user.uid), tenantId);
+      var validationError = validateLabMembership(projection, user, tenantId);
+      if (validationError) {
+        clearLabProductProjection();
+        updateMembershipProjectionState({ status: 'blocked', error: validationError });
+        return false;
+      }
+      window.Orbit.auth = window.Orbit.auth || {};
+      window.Orbit.auth.productUser = projection;
+      updateMembershipProjectionState({ status: 'ready', ready: true, tenantBound: true, assignedRoleCount: projection.roles.length, advisorBound: !!projection.advisorId, error: '' });
+      syncFromAuth();
+      return true;
+    } catch (error) {
+      if (generation !== membershipLoadGeneration) return false;
+      clearLabProductProjection();
+      updateMembershipProjectionState({ status: 'blocked', error: 'membership_read_failed' });
+      return false;
+    }
+  }
+  function bindLabMembershipProjection() {
+    if (!isFirestoreLabRuntime() || membershipAuthBound) return membershipAuthBound;
+    var auth = firebaseAuthProvider();
+    var db = firebaseFirestoreProvider();
+    if (!auth || typeof auth.onAuthStateChanged !== 'function' || !db) return false;
+    membershipAuthBound = true;
+    auth.onAuthStateChanged(function (user) {
+      if (!user) { membershipLoadGeneration += 1; clearLabProductProjection(); return; }
+      loadLabMembershipProjection(user);
+    });
+    return true;
+  }
+
   window.Orbit.session = Object.freeze({
     VERSION: VERSION,
     rol: currentRole,
@@ -238,8 +396,19 @@
     roleLabel: roleLabel,
     requiresMembership: requiresMembership,
     membershipBound: membershipBound,
+    membershipProjectionStatus: membershipProjectionStatus,
+    bindLabMembershipProjection: bindLabMembershipProjection,
     describe: describe,
     writeAuthorized: false,
     membershipWrites: false
   });
+
+  if (isFirestoreLabRuntime()) {
+    (function waitForLabMembershipProviders() {
+      if (bindLabMembershipProjection()) return;
+      membershipBindAttempts += 1;
+      if (membershipBindAttempts < 120) setTimeout(waitForLabMembershipProviders, 100);
+      else updateMembershipProjectionState({ status: 'blocked', ready: false, error: 'membership_provider_unavailable' });
+    })();
+  }
 })();
