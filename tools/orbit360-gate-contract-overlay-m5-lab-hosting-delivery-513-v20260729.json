@@ -1,0 +1,9 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m5-lab-hosting-delivery-v4",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.13",
+  "required":{"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatchedBefore":24,"onlyMismatchBefore":"core/access-role-session-owner-v20260728.js","remoteAssetsMatchedAfter":25,"mismatchCountAfter":0,"remoteParityAfter":true,"hostingDeployExecutions":1,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
