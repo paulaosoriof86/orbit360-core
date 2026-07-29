@@ -2,16 +2,7 @@ name: Orbit 360 · M5 membership projection static · 5.0.12
 run-name: M5 5.0.12 · root cause static · ${{ github.sha }}
 
 on:
-  push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - '.github/workflows/orbit360-m5-membership-projection-remediation-512-v20260729.yml'
-      - 'orbit360-platform/core/access-role-session-owner-v20260728.js'
-      - 'tools/orbit360-m5-access-membership-projection-fixture-v20260729.mjs'
-      - 'tools/orbit360-validator-lifecycle-contract-m5-membership-projection-512-v20260729.json'
-      - 'tools/orbit360-validar-gate-contracts-engine-m5-membership-projection-512-v20260729.mjs'
-      - 'tools/orbit360-validar-gate-contracts-v20260717.mjs'
+  workflow_dispatch:
 
 permissions:
   contents: read
