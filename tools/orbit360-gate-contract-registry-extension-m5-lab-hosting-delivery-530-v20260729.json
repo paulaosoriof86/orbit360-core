@@ -1,7 +1,10 @@
 {
-  "schemaVersion":"orbit360-gate-contract-registry-extension-v1",
+  "schemaVersion":"orbit360-gate-contract-registry-extension-v2",
   "issuedAt":"2026-07-29",
-  "gates":[{"gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.30","phase":"M5_LAB_HOSTING_DELIVERY","lifecycle":"tools/orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-530-v20260729.json","engine":"tools/orbit360-validar-gate-contracts-engine-m5-lab-hosting-delivery-530-v20260729.mjs","overlay":"tools/orbit360-gate-contract-overlay-m5-lab-hosting-delivery-530-v20260729.json"}],
+  "status":"M5_LAB_HOSTING_530_STOPPED_AFTER_TWO_PACKAGE_PIPELINE_FAILURES",
+  "gates":[{"gateId":"block5-release-candidate-visualization-v20260728","contractVersion":"5.0.30","phase":"M5_VALIDATOR_REDESIGN_STATIC","lifecycle":"tools/orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-530-v20260729.json","engine":"tools/orbit360-validar-gate-contracts-engine-m5-lab-hosting-stop-530-v20260729.mjs","overlay":"tools/orbit360-m5-release-candidate-hosting-stop-overlay-530-v20260729.json"}],
+  "authorization":{"hostingLabDeliveryAuthorized":false,"allowedExecutions":0,"requestCreated":false,"authorizationInvalidated":true},
+  "controls":{"thirdPackageAttemptForbidden":true,"hostingDeployForbidden":true},
   "containsPII":false,
   "containsSecrets":false
 }
