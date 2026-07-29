@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"orbit360-m5-policy-readiness-freeze-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.17",
+  "status":"M5_POLICY_READINESS_517_STOPPED_AFTER_TWO_STATIC_FAILURES",
+  "releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61",
+  "runtime516":{"requestCommit":"8c9e58f8dc5d5b9e49b5d917af81e265ad1ea919","runId":30467508494,"jobId":90628997310,"artifactId":8730208725,"artifactDigest":"sha256:6ff105b038be0856c8f1912f7506544787dd93c7c8484bfdbd2a480ccd77f28c","classification":["ENVIRONMENT_FAILURE","PIPELINE_MECHANISM_FAILURE"],"failureStage":"academia_static_write_policy_ready","snapshotsStable":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0},
+  "staticAttempts":[
+    {"attempt":1,"commit":"0200c6869d7bdac4cb1033d44859cca7a19b6162","runId":30468755916,"jobId":90633243156,"classification":"PIPELINE_MECHANISM_FAILURE","rootCause":"engine_did_not_refresh_canonical_preflight_evidence"},
+    {"attempt":2,"commit":"30946e1fc383a2b4c6f21d69c7dabae90bb796a0","runId":30469008976,"jobId":90634085203,"artifactId":8730790811,"artifactDigest":"sha256:30f4c1147f5493364252ab20d0a70b5cde90785dd30a7a6ef08c07aac334ec03","classification":"VALIDATOR_STALE","passed":17,"total":19,"failedCheckIds":["ENV_TRIGGER_PROVEN","NO_MANUAL_POLICY_INSTALL"],"rootCause":"static_predicates_false_positive_on_source_shape_and_equality_operator"}
+  ],
+  "evidence":{"productProtectedUnchanged":true,"releaseCandidateUnchanged":true,"actualLoaderUsesDocumentWrite":true,"candidateDoesNotManualInstallPolicy":true,"candidateRuntimeVersion":"5.0.18","candidateExecuted":false},
+  "methodology":{"sameStageFailedTwice":true,"retriesStopped":true,"thirdAttemptForbidden":true,"productFrozen":true,"runtimeFrozen":true,"browserFrozen":true,"firestoreFrozen":true},
+  "authorization":{"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"staticRemediationAuthorized":false,"allowedStaticExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "nextAction":"DO_NOT_RETRY_517_OR_RUN_518; redesign validator predicates and lifecycle in a new controlled remediation block before requesting any runtime authorization",
+  "containsPII":false,
+  "containsSecrets":false
+}
