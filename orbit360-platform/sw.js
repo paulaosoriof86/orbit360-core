@@ -1,6 +1,6 @@
 /* Orbit 360 · Service Worker — red primero con fallback offline y CSS esencial.
    El shell nunca debe quedar sin estilos por caché incompleta o respuesta MIME inválida. */
-var CACHE = 'orbit360-v20260723-10-css-delivery';
+var CACHE = 'orbit360-v20260729-11-multirol-owner';
 var BUILD = '20260723-10';
 var CRITICAL_RELEASE = 'block1-critical-runtime-20260723-10';
 var RUNTIME_CONTRACT_TIMEOUT_MS = 8000;
