@@ -3,7 +3,7 @@
   "issuedAt":"2026-07-28",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.4",
-  "status":"READY_FOR_ONE_HOSTING_LAB_DELIVERY",
+  "status":"REQUEST_CREATED_AWAITING_ONE_HOSTING_LAB_DELIVERY",
   "baseline":{
     "m4Closed":true,
     "readiness501Closed":true,
@@ -24,7 +24,7 @@
   "authorization":{
     "hostingLabDeliveryAuthorized":true,
     "allowedExecutions":1,
-    "requestCreated":false,
+    "requestCreated":true,
     "runtimeSmokeAuthorized":false,
     "visualReviewAuthorized":false,
     "productionAuthorized":false
@@ -48,7 +48,7 @@
     "merge":true,
     "policies":true
   },
-  "nextAction":"CREATE_IMMUTABLE_REQUEST_AND_DELIVER_EXACT_RC_TO_HOSTING_LAB_ONCE_THEN_REQUIRE_24_OF_24",
+  "nextAction":"RUN_ONE_HOSTING_LAB_DELIVERY_AND_REQUIRE_24_OF_24",
   "containsPII":false,
   "containsSecrets":false
 }
