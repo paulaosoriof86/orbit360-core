@@ -1,0 +1,13 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.28",
+  "candidateRuntimeContractVersion":"5.0.25",
+  "priorControlPlaneContractVersion":"5.0.27",
+  "required":{"controlPlane527Status":"M5_CONTROL_PLANE_REDESIGN_527_STATIC_PASS","schemaDrivenCandidateContract":"tools/orbit360-m5-runtime-smoke-525-contract-schema-driven-v20260729.mjs","contractShapeReaderVersion":"20260729.1","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","remoteAssetsMatched":25,"candidateBrowserBlobSha":"70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12","candidateCloserBlobSha":"bf9301d1ed8bfa5d75f8d17924bd6685c520cb94"},
+  "capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "requestModel":"immutable_one_shot_after_package_pass",
+  "containsPII":false,
+  "containsSecrets":false
+}
