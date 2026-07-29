@@ -1,0 +1,64 @@
+name: Orbit 360 · M5 Hosting 5.0.30 STOP verification
+run-name: M5 5.0.30 · zero-capability STOP verification · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-hosting-stop-verification-530-v20260729.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  verify_stop:
+    name: M5 · verify authoritative Hosting STOP · zero capabilities
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar STOP canónico
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m5-lab-hosting-stop-530-v20260729.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="M5_LAB_HOSTING_530_STOPPED_AFTER_TWO_PACKAGE_PIPELINE_FAILURES" and .contractVersion=="5.0.30" and .executionPhase=="M5_VALIDATOR_REDESIGN_STATIC" and .failed==0 and .executionAuthorized==false and .allowedExecutions==0 and .requestCreationForbidden==true and .thirdPackageAttemptForbidden==true and .releaseCandidateHash=="4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b" and .criticalAssets==43 and .remoteAssetsExpected==26 and .remoteAssetsMatchedKnown==24 and .mismatchCountKnown==2 and .capabilityProfile.secrets==false and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==false and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .secretsRead==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-hosting-stop-530-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='M5 5.0.30 STOP verification failed';
+            try{const s=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(s.status==='M5_LAB_HOSTING_530_STOPPED_AFTER_TWO_PACKAGE_PIPELINE_FAILURES'&&s.failed===0){state='success';description='M5 Hosting 5.0.30 STOP verified; zero capabilities';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-hosting-stop-530',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
