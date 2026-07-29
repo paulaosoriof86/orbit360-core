@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m5-runtime-smoke-v8",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.26",
+  "candidateRuntimeContractVersion":"5.0.25",
+  "required":{"validator524Status":"M5_RESPONSIVE_TITLE_REMEDIATION_524_STATIC_PASS","validator524Passed":28,"validator524Failed":0,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","responsiveTitleResolverVersion":"20260729.1","visibleTechnicalCopyPredicateVersion":"20260729.1","snapshotsBeforeAfter":true,"zeroWrites":true,"oneShot":true},
+  "forbidden":{"productMutation":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
