@@ -1,10 +1,10 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-freeze-v9",
+  "schemaVersion":"orbit360-m5-release-candidate-freeze-v10",
   "issuedAt":"2026-07-28",
   "updatedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.5",
-  "status":"M5_RUNTIME_SMOKE_AUTHORIZED_ONCE_REQUEST_CREATED",
+  "status":"M5_RUNTIME_SMOKE_FAILED_RC_REMEDIATION_REQUIRED",
   "canonicalBaseline":{
     "m4Closed":true,
     "sourceClients":414,
@@ -23,7 +23,6 @@
     "closed":true,
     "contractVersion":"5.0.2",
     "runId":30407030063,
-    "preflight":"29/29",
     "hardcodedAdvisorId":false,
     "globalRoleEnumeration":false,
     "labMissingProjectionFailClosed":true,
@@ -37,67 +36,73 @@
     "remoteVisualAssetsMatched":24,
     "mismatchCount":0,
     "remoteParity":true,
-    "hostingDeployRequired":false
+    "runtimeSmokePassed":false,
+    "remediationRequired":true
   },
   "hostingDelivery":{
     "closed":true,
     "contractVersion":"5.0.4",
     "runId":30411375732,
-    "jobId":90447991314,
     "artifactId":8708510538,
-    "artifactDigest":"sha256:fbe4ba382fe6d51294b2a08f17e2ba48a35e8b36dd0973303943cef8c631e1ec",
     "hostingDeployExecutions":1,
-    "remoteAssetsChecked":24,
-    "remoteAssetsMatched":24,
     "remoteParity":true,
-    "pipelineClassification":"PIPELINE_MECHANISM_FAILURE",
-    "pipelineClosureRepaired":true,
     "redeployExecuted":false
   },
-  "runtimeSmokePackage":{
-    "closed":true,
+  "runtimeSmoke":{
+    "closed":false,
     "contractVersion":"5.0.5",
-    "runId":30413254641,
-    "jobId":90454019483,
-    "artifactId":8709200293,
-    "artifactDigest":"sha256:946302a06a2b3dd3e948f9c2d7a3f67fba9b168236d29cff463e1a68df999caf",
+    "requestCommit":"610229dcead42162f1e22b34894b4a3f8230684f",
+    "runId":30413481948,
+    "jobId":90454714725,
+    "artifactId":8709301142,
+    "artifactDigest":"sha256:082be4c8ac6e2e12d12534598736e27cc8083d1d206eb35c5ca2e37180d8e503",
+    "status":"M5_RUNTIME_SMOKE_LAB_FAILED_STOP_LINE",
+    "preflight":"17/17",
     "contract":"29/29",
-    "requestPresent":false,
-    "secretsUsed":false,
-    "runtimeExecuted":false,
-    "browserExecuted":false,
-    "priorValidatorFailure":{
-      "runId":30413170457,
-      "failedCheckId":"SNAPSHOT_NO_WRITES",
-      "classification":"VALIDATOR_STALE_PIPELINE_MECHANISM_FAILURE",
-      "rootCauseCorrected":true
-    }
+    "snapshotBefore":"PASS",
+    "snapshotAfter":"PASS",
+    "allCountsStable":true,
+    "allDigestsStable":true,
+    "firestoreWrites":0,
+    "operationalWrites":0,
+    "networkWriteCandidates":0,
+    "failureStage":"canonical_backend_runtime_ready"
   },
+  "rootCauses":[
+    {
+      "classification":["FUNCTIONAL_DEFECT","DATA_CONTRACT_FAILURE"],
+      "owner":"Academia/Orbit.store LAB",
+      "cause":"static_academia_content_attempted_durable_store_writes_during_bootstrap"
+    },
+    {
+      "classification":["VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],
+      "owner":"PWA/Router/runtime smoke",
+      "cause":"visual_revision_was_confused_with_backend_runtime_owner_version"
+    }
+  ],
   "authorization":{
-    "readinessExecutionConsumed":true,
-    "allowedReadinessExecutions":0,
     "hostingDeployAuthorizationConsumed":true,
     "hostingDeployAuthorized":false,
     "allowedHostingDeployExecutions":0,
-    "runtimeSmokeAuthorized":true,
-    "allowedRuntimeSmokeExecutions":1,
-    "runtimeSmokeRequestCreated":true,
+    "runtimeSmokeAuthorizationConsumed":true,
+    "runtimeSmokeAuthorized":false,
+    "allowedRuntimeSmokeExecutions":0,
     "visualReviewAuthorized":false,
     "productionAuthorized":false,
     "policiesAuthorized":false
   },
-  "forbiddenDuringRuntimeSmoke":{
+  "forbiddenUntilRemediatedAndSeparatelyAuthorized":{
+    "runtimeSmoke":true,
+    "browser":true,
     "hostingDeploy":true,
+    "visualReview":true,
     "firestoreWrite":true,
     "operationalWrites":true,
-    "functionsDeploy":true,
-    "rulesDeploy":true,
-    "visualReview":true,
     "production":true,
     "mergeMain":true,
     "policies":true
   },
-  "nextAction":"EXECUTE_ONE_IMMUTABLE_RUNTIME_SMOKE_LAB_AND_ACCEPT_ONLY_SANITIZED_OK_TRUE",
+  "nextAction":"REMEDIATE_STATIC_ACADEMIA_WRITE_POLICY_AND_RUNTIME_OWNER_ALIGNMENT_BUILD_NEW_RC_STATIC_ONLY",
   "containsPII":false,
   "containsSecrets":false
 }
