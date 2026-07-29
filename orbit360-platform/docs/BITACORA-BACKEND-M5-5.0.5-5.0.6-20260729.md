@@ -1,4 +1,4 @@
-# Bitácora backend — M5 5.0.5 y 5.0.6
+# Bitácora backend — M5 5.0.5 a 5.0.7
 
 Fecha: 2026-07-29 UTC / 2026-07-28 Guatemala
 
@@ -8,28 +8,30 @@ M5 · release candidate, entrega LAB, runtime smoke y visualización A&S.
 
 ## Carriles
 
-- A — frontend/UX/Academia: contenido estático de Academia separado de progreso y mutaciones reales.
-- B — backend/seguridad/Orbit.store: preservados loader y store LAB protegidos; smoke con guardas de cero escritura.
+- A — frontend/UX/Academia: contenido estático de Academia separado de progreso y mutaciones reales; activos publicados en la RC.
+- B — backend/seguridad/Orbit.store: loader y store LAB protegidos; preflight antes de identidad; Hosting-only; cero escrituras.
 - C — datos reales: sin cambios; baseline 414 clientes, 26 aseguradoras, 7 asesores y destino canónico 1/1/414/26 preservado.
 
 ## Avance visible
 
 1. Hosting 5.0.4 entregó RC `d90ec601…` y cerró 24/24.
-2. Runtime smoke 5.0.5 ejecutó una vez y entró en stop-line.
-3. Snapshots antes/después probaron cero cambios y cero escrituras.
-4. Se aislaron dos causas raíces independientes.
-5. Se implementó y probó la política reusable de contenido estático de Academia.
-6. Se restauró el loader LAB protegido a su baseline.
-7. Se separó runtime backend `20260717-2` de revisión visual `20260723-10`.
-8. Gate estático 5.0.6 cerró verde y calculó RC `b25bf275…`.
+2. Runtime smoke 5.0.5 ejecutó una vez y entró en stop-line con cero escrituras.
+3. Se aislaron las causas raíces Academia/Orbit.store y runtime visual/backend.
+4. Gate estático 5.0.6 cerró verde y calculó RC `b25bf275…`.
+5. Package check 5.0.7 cerró verde sin secretos ni deploy.
+6. La RC `b25bf275…` fue publicada una sola vez en Hosting LAB.
+7. El cierre posterior falló por un archivo efímero ausente; se congeló cualquier redeploy.
+8. Se corrigió el validador para usar evidencia durable.
+9. La recuperación pública cerró 25/25, cero diferencias y cero redeploy.
 
 ## Fuente/base
 
 - Cierre Hosting 5.0.4.
-- Run runtime 5.0.5 `30413481948` y artifact `8709301142`.
-- Cierre stop-line `m5-runtime-smoke-505-closure.json`.
-- Package check 5.0.6 `30415573496`.
-- Request inmutable 5.0.6 `30415732795`.
+- Runtime 5.0.5: run `30413481948`, artifact `8709301142`.
+- Remediación 5.0.6: run `30415732795`, artifact `8710079365`.
+- Package Hosting 5.0.7: run `30417610407`, artifact `8710708337`.
+- Entrega Hosting 5.0.7: run `30417743516`, artifact `8710762943`.
+- Paridad final: run `30418258733`, artifact `8710924084`.
 - Baseline protegido: commit `610229dcead42162f1e22b34894b4a3f8230684f`.
 
 ## Causa raíz y corrección
@@ -56,27 +58,52 @@ M5 · release candidate, entrega LAB, runtime smoke y visualización A&S.
 
 **Fix:** `ays-lab-preview.html` separa ambos propietarios y el runner futuro exige `20260717-2`.
 
+### Cierre de paridad posterior al deploy
+
+**Necesidad:** verificar la entrega pública sin repetir el deploy.
+
+**Esperado:** readiness 25/25 usando únicamente fuentes durables presentes en el checkout.
+
+**Causa raíz:** el validador exigía `m5-academia-static-write-policy-test.json`, generado de forma efímera en otro workflow.
+
+**Fix:** usa `m5-runtime-smoke-remediation-static-506-closure.json` como evidencia durable; el fixture efímero es opcional.
+
+**Impacto:** recuperación de paridad sin secretos, identidad Firebase ni redeploy.
+
 ## Pruebas/evidencia
 
-- Preflight 5.0.6: 24/24.
-- Contrato estático: 26/26.
-- Fixtures Academia: 18/18.
+- Hosting preflight: 24/24.
+- Contrato Hosting: 35/35.
+- Hosting deploy executions: 1.
+- Contrato recuperación: 20/20.
 - Activos críticos: 42/42.
-- LAB: 22/25; tres diferencias exactas y explicadas.
-- Secrets: 0.
+- Activos públicos: 25/25.
+- Mismatches: 0.
+- Secrets en recuperación: 0.
 - Firestore read/write: 0/0.
-- Runtime/browser/deploy: 0/0/0.
-- Protected loader: restaurado.
-- Protected store: sin cambios.
+- Operational writes: 0.
+- Runtime/browser: no/no.
+- Redeploy: no.
+- Protected loader/store: sin cambios.
 
 ## Estado
 
-`M5_RUNTIME_SMOKE_REMEDIATION_STATIC_CLOSED_NEW_RC_READY_FOR_LAB_DELIVERY`.
+`M5_LAB_HOSTING_DELIVERED_AND_25_OF_25_VERIFIED`.
+
+## Acumulado Claude
+
+- Política reusable de contenido estático: `REPLICABLE_CLAUDE_ACUMULADO`.
+- Separación visual revision vs backend runtime: `REPLICABLE_CLAUDE_ACUMULADO`.
+- Control-plane, Firebase, gates y artifacts: `BACKEND_PROTEGIDO_NO_CLAUDE`.
+
+## Impacto Academia
+
+La siguiente revisión acumulada debe enseñar contenido estático vs progreso durable, separación de gates, y que un status rojo posterior no demuestra por sí mismo una falla del producto. No se cambia el activo de Academia después de cerrar la RC.
 
 ## Pendiente
 
-Una sola entrega Hosting LAB de RC `b25bf275…`, sujeta a autorización explícita separada. Después: paridad pública 25/25. Runtime smoke, revisión visual y Pólizas siguen bloqueados.
+Runtime smoke LAB, revisión visual y Pólizas siguen bloqueados. Hosting y recuperación de paridad están consumidos.
 
 ## Siguiente acción exacta
 
-Crear autorización y gate Hosting únicamente después de la autorización de Paula. No reutilizar autorizaciones consumidas ni desplegar en este cierre estático.
+Solicitar autorización explícita para un único runtime smoke LAB de RC `b25bf275…`, sin deploy y con cero escrituras. Solo tras `ok:true` se habilita la revisión visual única.
