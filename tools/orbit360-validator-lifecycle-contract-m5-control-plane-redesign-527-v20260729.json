@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-control-plane-redesign-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.27",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"schema-driven-contract-owner-v1",
+  "classification":"M5_VALIDATOR_REDESIGN_STATIC",
+  "executionProfile":{"phase":"M5_VALIDATOR_REDESIGN_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
+  "baseline":{"runtime526Stopped":true,"candidateRuntimeContractVersion":"5.0.25","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeExecuted":false},
+  "authorization":{"source":"user_continue_20260729_after_runtime_526_package_stop","staticRedesignAuthorized":true,"allowedExecutions":1,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false},
+  "nextRequiredDecision":"RUN_EXACTLY_ONE_STATIC_SCHEMA_DRIVEN_REDIGEST_527; on PASS close and request independent runtime authorization",
+  "containsPII":false,
+  "containsSecrets":false
+}
