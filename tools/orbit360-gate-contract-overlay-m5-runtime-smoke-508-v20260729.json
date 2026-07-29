@@ -1,0 +1,12 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v2",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.8",
+  "phase":"LAB_RUNTIME_GATE",
+  "required":{"hostingStatus":"M5_LAB_HOSTING_DELIVERED_AND_25_OF_25_VERIFIED","releaseCandidateHash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatched":25,"mismatchCount":0,"publicParity":true,"approvalReadyForRuntimeSmoke":true},
+  "capabilityBoundary":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "expected":{"sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7,"countryCounts":{"GT":398,"CO":16,"REQUIERE_VALIDACION":0},"typeCounts":{"Persona":391,"Empresa":23},"academiaPolicyVersion":"20260729.2","backendRuntime":"20260717-2"},
+  "containsPII":false,
+  "containsSecrets":false
+}
