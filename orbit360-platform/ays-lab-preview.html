@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <meta name="orbit-preview-version" content="20260723-10">
+  <meta name="orbit-backend-runtime" content="20260717-2">
   <meta name="orbit-critical-release" content="block1-critical-runtime-20260723-10">
   <title>Orbit 360 · A&S</title>
   <style>
@@ -26,8 +27,9 @@
     var RETRY_DELAY_MS = 4000;
     var MAX_STYLE_ATTEMPTS = 3;
     var SW_BUILD = '20260723-10';
+    var LAB_RUNTIME = '20260717-2';
     var CRITICAL_RELEASE = 'block1-critical-runtime-20260723-10';
-    var target = 'index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260723-10&criticalRelease=' + encodeURIComponent(CRITICAL_RELEASE) + '#/aseguradoras';
+    var target = 'index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=' + encodeURIComponent(LAB_RUNTIME) + '&criticalRelease=' + encodeURIComponent(CRITICAL_RELEASE) + '#/aseguradoras';
     var ESSENTIAL_STYLES = [
       'styles/tokens.css?v=' + SW_BUILD,
       'styles/base.css?v=' + SW_BUILD,
@@ -37,9 +39,10 @@
       'styles/client-insurer-edit-mode-v20260722.css?v=' + SW_BUILD
     ];
     var WARM_ASSETS = ESSENTIAL_STYLES.concat([
-      'core/backend-lab-loader.js?v=20260716-2',
+      'core/backend-lab-loader.js?v=20260729-1',
       'core/backend-lab-init.js?v=20260717-1',
       'data/store-firestore-lab.local.js?v=20260716-2',
+      'core/academia-static-content-write-policy-v20260729.js?v=20260729-1',
       'core/router-tenant-config-bootstrap.js?v=20260723-10',
       'core/client-insurer-visual-stability-barrier-v20260721.js?v=20260723-10',
       'core/client-insurer-visual-contract-v20260720.js?v=20260723-10',
@@ -54,6 +57,7 @@
     ]);
     var state = window.__ORBIT_PREVIEW_BOOTSTRAP__ = {
       version: '20260723.10-css-delivery-root',
+      backendRuntime: LAB_RUNTIME,
       criticalRelease: CRITICAL_RELEASE,
       essentialStyles: ESSENTIAL_STYLES.slice(),
       status: 'preparing',
