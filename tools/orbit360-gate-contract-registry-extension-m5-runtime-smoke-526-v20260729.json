@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-gate-contract-registry-extension-v2",
+  "schemaVersion":"orbit360-gate-contract-registry-extension-v3",
   "issuedAt":"2026-07-29",
   "gates":[{
     "gateId":"block5-release-candidate-visualization-v20260728",
@@ -18,7 +18,8 @@
     "closer":"tools/orbit360-m5-runtime-smoke-525-close-v20260729.mjs",
     "requestCreated":false,
     "runtimeExecuted":false,
-    "thirdPackageAttemptForbidden":true
+    "thirdPackageAttemptForbidden":true,
+    "nextAction":"NEW_STATIC_CONTROL_PLANE_REDESIGN_BLOCK"
   }],
   "containsPII":false,
   "containsSecrets":false
