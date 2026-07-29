@@ -1,9 +1,10 @@
 {
-  "schemaVersion": "orbit360-m5-runtime-smoke-freeze-v1",
+  "schemaVersion": "orbit360-m5-runtime-smoke-freeze-v2",
   "issuedAt": "2026-07-29",
+  "updatedAt": "2026-07-29",
   "gateId": "block5-release-candidate-visualization-v20260728",
   "contractVersion": "5.0.5",
-  "status": "READY_FOR_ONE_RUNTIME_SMOKE_LAB",
+  "status": "REQUEST_CREATED_AWAITING_ONE_RUNTIME_SMOKE_LAB",
   "baseline": {
     "hosting504Closed": true,
     "hosting504Status": "M5_LAB_HOSTING_DELIVERED_AND_24_OF_24_VERIFIED",
@@ -23,10 +24,18 @@
   "authorization": {
     "runtimeSmokeAuthorized": true,
     "allowedExecutions": 1,
-    "requestCreated": false,
+    "requestCreated": true,
     "hostingDeployAuthorized": false,
     "visualReviewAuthorized": false,
     "productionAuthorized": false
+  },
+  "packageCheck": {
+    "runId": 30413254641,
+    "jobId": 90454019483,
+    "artifactId": 8709200293,
+    "artifactDigest": "sha256:946302a06a2b3dd3e948f9c2d7a3f67fba9b168236d29cff463e1a68df999caf",
+    "status": "PASS",
+    "contract": "29/29"
   },
   "expected": {
     "assignedRolesRequired": ["Dirección", "Operativo", "Asesor"],
@@ -52,7 +61,7 @@
     "policies": true,
     "visualReview": true
   },
-  "nextAction": "CREATE_IMMUTABLE_REQUEST_AND_EXECUTE_ONE_RUNTIME_SMOKE_LAB_THEN_REQUIRE_SANITIZED_OK_TRUE",
+  "nextAction": "EXECUTE_IMMUTABLE_REQUEST_ONCE_AND_ACCEPT_ONLY_SANITIZED_OK_TRUE",
   "containsPII": false,
   "containsSecrets": false
 }
