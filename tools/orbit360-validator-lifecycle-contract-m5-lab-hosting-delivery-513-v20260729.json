@@ -1,6 +1,7 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-v5",
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-v6",
   "issuedAt":"2026-07-29",
+  "closedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
   "pullRequest":5,
@@ -8,12 +9,13 @@
   "gateContractVersion":"5.0.13",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m5-hosting-lab-delivery-rc-ae6bb2a3-v1",
-  "classification":"M5_LAB_HOSTING_DELIVERY_REQUEST_READY_AFTER_PACKAGE_PASS",
+  "classification":"M5_LAB_HOSTING_DELIVERY_CLOSED_WITH_VALIDATOR_STALE_POSTCHECK",
   "executionProfile":{"phase":"M5_LAB_HOSTING_DELIVERY","capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
   "baseline":{"staticRemediationFreeze":"tools/orbit360-m5-membership-projection-512-freeze-v20260729.json","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatchedBefore":24,"onlyMismatchBefore":"core/access-role-session-owner-v20260728.js"},
   "packageCheck":{"status":"M5_LAB_HOSTING_DELIVERY_PACKAGE_PASS","commit":"d437951b0a52766c55df2384163354e4345813cb","runId":30461749662,"jobId":90609304405,"artifactId":8727869333,"artifactDigest":"sha256:e7930733a252aedd2a4df367fadf90b25fbf451b59f2aa21dc4a371f18e00537"},
-  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260729_for_one_hosting_lab_delivery_rc_ae6bb2a3","hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"requestCreated":true,"writeAuthorized":false,"runtimeSmokeAuthorized":false,"browserAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":false},
-  "nextRequiredDecision":"CREATE_ONE_IMMUTABLE_HOSTING_REQUEST_BOUND_TO_CURRENT_PARENT",
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260729_for_one_hosting_lab_delivery_rc_ae6bb2a3","hostingLabDeliveryAuthorized":false,"allowedExecutions":0,"requestCreated":true,"writeAuthorized":false,"runtimeSmokeAuthorized":false,"browserAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":true},
+  "closure":{"status":"M5_LAB_HOSTING_DELIVERED_AND_25_OF_25_VERIFIED","requestCommit":"ff7b03524e91aa160d5ba5f5782f7b729364e497","deliveryRunId":30461951452,"deliveryJobId":90610001393,"deliveryArtifactId":8727975511,"deliveryArtifactDigest":"sha256:8c67073aa4ff569d3109d06f37b5a6ee737272db299f01ad447069c19607f633","hostingDeployExecutions":1,"remoteAssetsMatched":25,"remoteAssetsExpected":25,"remoteParity":true,"redeployExecuted":false,"firestoreWrites":0,"operationalWrites":0,"validatorPostcheck":"VALIDATOR_STALE_jq_unicode_property_pólizas_unquoted"},
+  "nextRequiredDecision":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_RUNTIME_SMOKE_ON_LAB_RC_AE6BB2A3",
   "containsPII":false,
   "containsSecrets":false
 }
