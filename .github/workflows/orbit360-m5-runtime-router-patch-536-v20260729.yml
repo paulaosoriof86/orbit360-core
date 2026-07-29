@@ -1,16 +1,45 @@
-name: Orbit 360 · M5 5.0.36 canonical router patch · FROZEN
+name: Orbit 360 · M5 5.0.36 canonical router stop patch
+run-name: M5 5.0.36 · return canonical gate to zero capabilities · ${{ github.sha }}
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-runtime-router-patch-536-v20260729.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  frozen:
+  patch:
     runs-on: ubuntu-24.04
     steps:
-      - name: Router patch already applied
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Reemplazo exacto único
+        shell: bash
         run: |
-          echo 'Canonical M5 gate already bound to runtime 5.0.36; patch rerun forbidden.' >&2
-          exit 41
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/orbit360-validar-gate-contracts-v20260717.mjs')
+          s=p.read_text()
+          old='"block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.36",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-runtime-536-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-runtime-536-v20260729.mjs"}'
+          new='"block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.36",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-runtime-stop-536-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-runtime-stop-536-v20260729.mjs"}'
+          if s.count(old)!=1: raise SystemExit(f'EXPECTED_EXACTLY_ONE_RUNTIME_ENTRY:{s.count(old)}')
+          p.write_text(s.replace(old,new,1))
+          PY
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+      - name: Commit único
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-ci'
+          git config user.email 'orbit360-ci@users.noreply.github.com'
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs
+          git diff --cached --quiet && { echo 'NO_PATCH' >&2; exit 41; }
+          git commit -m 'm5 5.0.36: return canonical gate to zero capabilities'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
