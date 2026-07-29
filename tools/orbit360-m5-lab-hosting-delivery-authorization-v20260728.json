@@ -8,7 +8,7 @@
   "authorizationSource":"user_autorizado_20260728_for_one_hosting_lab_delivery_rc_d90ec601",
   "hostingLabDeliveryAuthorized":true,
   "allowedExecutions":1,
-  "requestCreated":false,
+  "requestCreated":true,
   "releaseCandidateHash":"d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045",
   "projectId":"ays-orbit-360-lab",
   "channel":"orbit360-ays-lab",
