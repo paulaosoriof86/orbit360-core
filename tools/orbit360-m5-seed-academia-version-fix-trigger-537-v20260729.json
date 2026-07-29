@@ -1,0 +1,12 @@
+{
+  "schemaVersion":"orbit360-m5-seed-academia-version-fix-trigger-537-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.37",
+  "target":"orbit360-platform/data/seed.js",
+  "expectedInvariant":"all base seed cursos receive _cv=1 when unversioned",
+  "allowedExecutions":1,
+  "zeroCapabilities":true,
+  "containsPII":false,
+  "containsSecrets":false
+}
