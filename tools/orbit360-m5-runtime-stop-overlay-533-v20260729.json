@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-m5-runtime-stop-overlay-533-v1",
+  "issuedAt":"2026-07-29",
+  "authoritativeForCurrentM5RuntimeState":true,
+  "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-532-v20260729.json","tools/orbit360-m5-runtime-evidence-ledger-533-v20260729.json"],
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.33",
+  "status":"M5_RUNTIME_533_STOPPED_AFTER_ONE_SHOT_FUNCTIONAL_DEFECT_ZERO_WRITES",
+  "releaseCandidate":{"hash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"publicAssetsExpected":26,"publicAssetsMatched":26,"remoteParity":true},
+  "runtime533":{"requestCommit":"0d6ef8f708f7390406c69171e4df1e5010b666bb","authorizedBaseCommit":"f5be15dfafad6e5af68bdf2fae3869a3e7907733","runId":30495235821,"jobId":90722385990,"artifactId":8741323467,"artifactDigest":"sha256:49a8fdbcb7a58093826e8f20d3896962da943f06686a8be2742664fc25ad91d1","classification":"FUNCTIONAL_DEFECT","secondaryClassification":"VALIDATOR_STALE","failure":"academia_static_course_insert_missing_version_marker","roleViewsCompleted":true,"mobileMenuVisibleModules":12,"advisorInsurersCount":26,"advisorInsurerEditVisible":false,"snapshotsBeforeAfterStable":true,"allCountsStable":true,"allDigestsStable":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0,"blockedOperationalCalls":1},
+  "rootCause":{"product":"academia-plus static insert omits _cv even though CONTENT_V exists; strict static-content policy therefore correctly classifies the unversioned insert as durable_operational and runtime write guard blocks it before persistence","validator":"5.0.33 adapter did not derive normalizedBootstrapOwner and responsiveTitleResolver readiness fields already evidenced by the legacy probe"},
+  "authorization":{"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeAuthorizationConsumed":true,"runtimeRequestCreated":true,"runtimeRerunForbidden":true,"hostingLabDeliveryAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "safety":{"firestoreRead":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0,"hostingDeploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"policies":false,"visualReview":false,"pólizas":false},
+  "controls":{"runtimeWorkflowFrozen":true,"newRuntimeRequiresIndependentAuthorizationAfterStaticRemediation":true,"productMustRemainFrozenExceptRootCauseRemediation":true},
+  "nextAction":"STATIC_REMEDIATION_5_0_34: add CONTENT_V marker to academia-plus insert/seed paths; keep strict policy unchanged; fix 533 adapter derived readiness fields; add fixtures; recompute candidate descriptor including academia-plus; no runtime or deploy",
+  "containsPII":false,
+  "containsSecrets":false
+}
