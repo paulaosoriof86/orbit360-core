@@ -1,6 +1,7 @@
 {
   "schemaVersion":"orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-v1",
   "issuedAt":"2026-07-28",
+  "closedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
   "pullRequest":5,
@@ -8,7 +9,7 @@
   "gateContractVersion":"5.0.4",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m5-hosting-lab-delivery-v1",
-  "classification":"M5_LAB_HOSTING_DELIVERY",
+  "classification":"M5_LAB_HOSTING_DELIVERY_CLOSED",
   "executionProfile":{
     "phase":"M5_LAB_HOSTING_DELIVERY",
     "capabilities":{
@@ -32,24 +33,30 @@
   "authorization":{
     "explicitAuthorization":true,
     "authorizationSource":"user_autorizado_20260728_for_one_hosting_lab_delivery_rc_d90ec601",
-    "hostingLabDeliveryAuthorized":true,
-    "allowedExecutions":1,
+    "hostingLabDeliveryAuthorized":false,
+    "allowedExecutions":0,
     "browserAuthorized":false,
     "runtimeSmokeAuthorized":false,
     "writeAuthorized":false,
     "productionAuthorized":false,
-    "requestCreated":true
+    "requestCreated":true,
+    "authorizationConsumed":true
   },
-  "expected":{
-    "projectId":"ays-orbit-360-lab",
-    "channel":"orbit360-ays-lab",
-    "criticalAssetCount":41,
-    "remoteAssetCount":24,
-    "remoteParityAfterDelivery":true,
-    "firestoreWrites":0,
-    "operationalWrites":0
+  "closure":{
+    "status":"M5_LAB_HOSTING_DELIVERED_AND_24_OF_24_VERIFIED",
+    "runId":30411375732,
+    "jobId":90447991314,
+    "artifactId":8708510538,
+    "artifactDigest":"sha256:fbe4ba382fe6d51294b2a08f17e2ba48a35e8b36dd0973303943cef8c631e1ec",
+    "hostingDeployExecutions":1,
+    "remoteAssetsMatched":24,
+    "remoteAssetsExpected":24,
+    "remoteParity":true,
+    "pipelineClassification":"PIPELINE_MECHANISM_FAILURE",
+    "pipelineClosureRepaired":true,
+    "redeployRequired":false
   },
-  "nextRequiredDecision":"IF_24_OF_24_PASS_CONSUME_DELIVERY_AUTHORIZATION_AND_PREPARE_SEPARATE_RUNTIME_SMOKE_AUTHORIZATION",
+  "nextRequiredDecision":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_RUNTIME_SMOKE_ON_LAB_RC_D90EC601",
   "containsPII":false,
   "containsSecrets":false
 }
