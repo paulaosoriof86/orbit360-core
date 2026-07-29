@@ -1,0 +1,62 @@
+name: Orbit 360 · M5 5.0.34 Academia static marker fix
+run-name: M5 5.0.34 · patch exact Academia PLUS version markers · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-academia-plus-version-marker-fix-534-v20260729.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-m5-academia-plus-version-marker-fix-534-v20260729
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    name: M5 · exact static-source patch · no operational capabilities
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout rama exacta
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+
+      - name: Verificar contexto y aplicar dos reemplazos exactos
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('orbit360-platform/data/academia-plus.js')
+          s=p.read_text(encoding='utf-8')
+          old_insert="Orbit.store.insert('cursos', Object.assign({ progreso: 0, certificado: false, recursos: [] }, c));"
+          new_insert="Orbit.store.insert('cursos', Object.assign({ progreso: 0, certificado: false, recursos: [], _cv: CONTENT_V }, c));"
+          old_seed="Orbit.SEED.cursos.push(Object.assign({ progreso: 0, certificado: false, recursos: [] }, c));"
+          new_seed="Orbit.SEED.cursos.push(Object.assign({ progreso: 0, certificado: false, recursos: [], _cv: CONTENT_V }, c));"
+          assert s.count(old_insert)==1, f'insert pattern count={s.count(old_insert)}'
+          assert s.count(old_seed)==1, f'seed pattern count={s.count(old_seed)}'
+          s=s.replace(old_insert,new_insert).replace(old_seed,new_seed)
+          p.write_text(s,encoding='utf-8')
+          PY
+          git diff --check
+          test "$(git diff --numstat -- orbit360-platform/data/academia-plus.js | awk '{print $1}')" = '2'
+          test "$(git diff --numstat -- orbit360-platform/data/academia-plus.js | awk '{print $2}')" = '2'
+          grep -F "recursos: [], _cv: CONTENT_V" orbit360-platform/data/academia-plus.js >/dev/null
+
+      - name: Commit único de causa raíz
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-gate-bot'
+          git config user.email 'orbit360-gate-bot@users.noreply.github.com'
+          git add orbit360-platform/data/academia-plus.js
+          git commit -m 'm5 5.0.34: version Academia PLUS static inserts'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
