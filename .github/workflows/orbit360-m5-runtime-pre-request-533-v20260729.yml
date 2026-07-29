@@ -1,0 +1,63 @@
+name: Orbit 360 · M5 runtime 5.0.33 pre-request verification
+run-name: M5 5.0.33 · verify gate before immutable request · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-runtime-pre-request-533-v20260729.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  EXPECTED_RC_HASH: 4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b
+
+jobs:
+  verify:
+    name: M5 · runtime gate pre-request · zero operational capabilities used
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar gate sin request
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test ! -f tools/orbit360-m5-runtime-smoke-533-request-v20260729.json
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m5-runtime-smoke-533-v20260729.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="5.0.33" and .executionPhase=="LAB_RUNTIME_GATE" and .activationMode=="package_pass_request_pending" and .failed==0 and .executionAuthorized==false and .allowedExecutions==0 and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==43 and .remoteAssetsExpected==26 and .remoteAssetsMatched==26 and .remoteParity==true and .packageRunId==30494751648 and .packageJobId==90720843440 and .packageArtifactId==8741127750 and .browserBlobSha=="ca7d7a13c7889c8fea55ada358adbd6742422c42" and .closerBlobSha=="ec06019c23cb78c71fdb6f6fba16bee67758a49a" and .legacyProbeBlobSha=="70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12" and .capabilityProfile.writes==false and .capabilityProfile.deploy==false and .capabilityProfile.production==false and .dataAccess==false and .secretAccess==false and .secretsRead==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-runtime-pre-request-533-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='M5 runtime 5.0.33 pre-request failed';
+            try{const s=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(s.status==='GO_GATE_CONTRACT'&&s.failed===0&&s.executionAuthorized===false&&s.allowedExecutions===0){state='success';description='M5 runtime 5.0.33 gate ready; request still absent';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-runtime-pre-request-533',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
