@@ -1,13 +1,12 @@
 name: Orbit 360 · M5 5.0.37 seed Academia version fix
 run-name: M5 5.0.37 · patch base seed Academia markers · ${{ github.sha }}
 
-# activation revision 3: observable execution
 on:
   push:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
-      - '.github/workflows/orbit360-m5-seed-academia-version-fix-537-v20260729.yml'
+      - 'tools/orbit360-m5-seed-academia-version-fix-trigger-537-v20260729.json'
 
 permissions:
   contents: write
