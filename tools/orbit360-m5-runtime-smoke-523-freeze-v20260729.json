@@ -1,15 +1,16 @@
 {
-  "schemaVersion":"orbit360-m5-runtime-smoke-freeze-v7",
+  "schemaVersion":"orbit360-m5-runtime-smoke-freeze-v8",
   "issuedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "wrapperContractVersion":"5.0.23",
   "candidateRuntimeContractVersion":"5.0.22",
-  "status":"REQUEST_CREATED_AWAITING_ONE_RUNTIME_SMOKE_LAB",
-  "baseline":{"validator521Closed":true,"validator521Passed":41,"validator521Failed":0,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","remoteAssetsMatched":25,"mismatchCount":0,"sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7,"missingClientCurrency":0},
+  "status":"M5_RUNTIME_SMOKE_523_FAILED_STOP_LINE_RESPONSIVE_TITLE_DIAGNOSIS",
+  "baseline":{"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","remoteAssetsMatched":25,"sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7,"missingClientCurrency":0},
   "packageCheck":{"status":"M5_RUNTIME_SMOKE_523_PACKAGE_PASS","commit":"d81aacb48305e32699047cdaa07ca8e5152eae7d","runId":30478173184,"jobId":90665049424,"artifactId":8734473232,"artifactDigest":"sha256:642354242c6008fd106789e484ed8a71b912b1fb0f008956a5399a74fe149fab"},
-  "expected":{"countryCounts":{"GT":398,"CO":16,"REQUIERE_VALIDACION":0},"typeCounts":{"Persona":391,"Empresa":23},"accessOwnerVersion":"20260729.3","academiaPolicyVersion":"20260729.2","visibleTechnicalCopyPredicateVersion":"20260729.1","policyOwnerWaitMs":60000,"policyOwnerBoundMs":65000,"countsStable":true,"digestsStable":true,"roleViews":["Dirección desktop","Operativo tablet","Asesor mobile"]},
-  "authorization":{"runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"authorizationConsumed":false,"authorizationSource":"user_autorizado_20260729_after_technical_copy_521_pass"},
-  "forbidden":{"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
+  "runtime":{"requestCommit":"30b90e017b126a6924fd649880916cb59ae75e3d","runId":30478442538,"jobId":90665957818,"artifactId":8734620508,"artifactDigest":"sha256:3cf7ebbafcb910306d1eb092dfc11ca168d6434976812db79edbd1dc47c97524","firstFailure":"RESPONSIVE_TITLE_INVALID:desktopDirectionInsurers","snapshots":"11/11_before_and_after","allCountsStable":true,"allDigestsStable":true,"semanticCopyPredicateReady":true,"policyOwnerReady":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0},
+  "authorization":{"runtimeSmokeAuthorized":false,"allowedExecutions":0,"requestCreated":true,"authorizationConsumed":true},
+  "forbidden":{"runtime":true,"browser":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
+  "nextAction":"STATIC_DIAGNOSIS_RESPONSIVE_TITLE_INVALID_DESKTOP_DIRECTION_INSURERS_BEFORE_ANY_CHANGE",
   "containsPII":false,
   "containsSecrets":false
 }
