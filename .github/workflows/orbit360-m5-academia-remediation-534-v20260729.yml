@@ -1,6 +1,7 @@
 name: Orbit 360 · M5 5.0.34 Academia remediation static gate
 run-name: M5 5.0.34 · static root-cause validation 44/27 · ${{ github.sha }}
 
+# activation revision 2: workflow existed before this push
 on:
   push:
     branches:
