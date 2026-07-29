@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v1",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.21",
+  "phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC",
+  "required":{"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","runtime520AuthorizationConsumed":true,"runtime520FirstFailure":"TECHNICAL_COPY_VISIBLE:desktopDirectionClient360","candidateRuntimeVersion":"5.0.22","predicateVersion":"20260729.1","whiteLabelAllowed":true,"isolatedLabBlocked":true,"productProtectedUnchanged":true},
+  "forbidden":{"runtime":true,"browser":true,"secrets":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"visualReview":true,"policies":true,"pólizas":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
