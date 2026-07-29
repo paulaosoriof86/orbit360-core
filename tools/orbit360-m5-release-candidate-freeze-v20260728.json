@@ -1,10 +1,10 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-freeze-v8",
+  "schemaVersion":"orbit360-m5-release-candidate-freeze-v9",
   "issuedAt":"2026-07-28",
   "updatedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
-  "contractVersion":"5.0.4",
-  "status":"M5_LAB_HOSTING_DELIVERY_CLOSED_RUNTIME_SMOKE_AUTHORIZATION_REQUIRED",
+  "contractVersion":"5.0.5",
+  "status":"M5_RUNTIME_SMOKE_AUTHORIZED_ONCE_REQUEST_CREATED",
   "canonicalBaseline":{
     "m4Closed":true,
     "sourceClients":414,
@@ -54,29 +54,50 @@
     "pipelineClosureRepaired":true,
     "redeployExecuted":false
   },
+  "runtimeSmokePackage":{
+    "closed":true,
+    "contractVersion":"5.0.5",
+    "runId":30413254641,
+    "jobId":90454019483,
+    "artifactId":8709200293,
+    "artifactDigest":"sha256:946302a06a2b3dd3e948f9c2d7a3f67fba9b168236d29cff463e1a68df999caf",
+    "contract":"29/29",
+    "requestPresent":false,
+    "secretsUsed":false,
+    "runtimeExecuted":false,
+    "browserExecuted":false,
+    "priorValidatorFailure":{
+      "runId":30413170457,
+      "failedCheckId":"SNAPSHOT_NO_WRITES",
+      "classification":"VALIDATOR_STALE_PIPELINE_MECHANISM_FAILURE",
+      "rootCauseCorrected":true
+    }
+  },
   "authorization":{
     "readinessExecutionConsumed":true,
     "allowedReadinessExecutions":0,
     "hostingDeployAuthorizationConsumed":true,
     "hostingDeployAuthorized":false,
     "allowedHostingDeployExecutions":0,
-    "runtimeSmokeAuthorized":false,
-    "allowedRuntimeSmokeExecutions":0,
+    "runtimeSmokeAuthorized":true,
+    "allowedRuntimeSmokeExecutions":1,
+    "runtimeSmokeRequestCreated":true,
     "visualReviewAuthorized":false,
     "productionAuthorized":false,
     "policiesAuthorized":false
   },
-  "forbiddenUntilSeparateRuntimeSmokeAuthorization":{
-    "runtimeSmoke":true,
-    "browser":true,
+  "forbiddenDuringRuntimeSmoke":{
     "hostingDeploy":true,
+    "firestoreWrite":true,
+    "operationalWrites":true,
+    "functionsDeploy":true,
+    "rulesDeploy":true,
     "visualReview":true,
     "production":true,
     "mergeMain":true,
-    "policies":true,
-    "writesToBackend":true
+    "policies":true
   },
-  "nextAction":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_RUNTIME_SMOKE_ON_LAB_RC_D90EC601_BEFORE_BROWSER_OR_VISUAL_REVIEW",
+  "nextAction":"EXECUTE_ONE_IMMUTABLE_RUNTIME_SMOKE_LAB_AND_ACCEPT_ONLY_SANITIZED_OK_TRUE",
   "containsPII":false,
   "containsSecrets":false
 }
