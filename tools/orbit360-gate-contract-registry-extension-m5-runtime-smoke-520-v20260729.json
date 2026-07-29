@@ -1,0 +1,16 @@
+{
+  "schemaVersion":"orbit360-gate-contract-registry-extension-v1",
+  "revision":"m5-runtime-520-one-shot-after-validator-519",
+  "gates":[{
+    "gateId":"block5-release-candidate-visualization-v20260728",
+    "contractVersion":"5.0.20",
+    "phase":"LAB_RUNTIME_GATE",
+    "lifecycle":"tools/orbit360-validator-lifecycle-contract-m5-runtime-smoke-520-v20260729.json",
+    "overlay":"tools/orbit360-gate-contract-overlay-m5-runtime-smoke-520-v20260729.json",
+    "engine":"tools/orbit360-validar-gate-contracts-engine-m5-runtime-smoke-520-v20260729.mjs",
+    "candidateRuntimeContractVersion":"5.0.18",
+    "authorizationModel":"immutable_one_shot_request_after_package_pass"
+  }],
+  "containsPII":false,
+  "containsSecrets":false
+}
