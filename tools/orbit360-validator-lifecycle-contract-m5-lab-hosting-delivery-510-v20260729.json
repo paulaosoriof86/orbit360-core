@@ -11,8 +11,9 @@
   "classification":"M5_LAB_HOSTING_DELIVERY_AUTHORIZED_ONCE",
   "executionProfile":{"phase":"M5_LAB_HOSTING_DELIVERY","capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
   "baseline":{"staticRemediationClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-509-remediation-static-closure.json","releaseCandidateHash":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatched":24},
-  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260729_for_one_hosting_lab_delivery_rc_f6dfa37e","hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"requestCreated":false,"writeAuthorized":false,"runtimeSmokeAuthorized":false,"browserAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":false},
-  "nextRequiredDecision":"PACKAGE_CHECK_THEN_ONE_IMMUTABLE_HOSTING_LAB_DELIVERY",
+  "packageCheck":{"status":"PASS","runId":30455383510,"jobId":90587512533,"artifactId":8725278032,"artifactDigest":"sha256:b4547ef695c7d5973eb578ee4930b1ab5f13a52a2e97f549d08a10014d5e805f"},
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260729_for_one_hosting_lab_delivery_rc_f6dfa37e","hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"requestCreated":true,"writeAuthorized":false,"runtimeSmokeAuthorized":false,"browserAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":false},
+  "nextRequiredDecision":"EXECUTE_ONE_IMMUTABLE_HOSTING_LAB_DELIVERY",
   "containsPII":false,
   "containsSecrets":false
 }
