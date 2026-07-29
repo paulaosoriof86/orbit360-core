@@ -1,10 +1,10 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-freeze-v18",
+  "schemaVersion":"orbit360-m5-release-candidate-freeze-v19",
   "issuedAt":"2026-07-28",
   "updatedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
-  "contractVersion":"5.0.10",
-  "status":"M5_LAB_HOSTING_510_CLOSED_25_OF_25_RUNTIME_SMOKE_AUTHORIZATION_REQUIRED",
+  "contractVersion":"5.0.11",
+  "status":"M5_RUNTIME_SMOKE_511_AUTHORIZED_PACKAGE_PENDING",
   "canonicalBaseline":{"m4Closed":true,"sourceClients":414,"sourceInsurers":26,"canonicalTargetConfig":1,"canonicalTargetMemberships":1,"canonicalTargetClients":414,"canonicalTargetInsurers":26,"advisors":7,"missingClientCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0,"m4FinalRevalidationPassed":true},
   "accessBoundary":{"closed":true,"contractVersion":"5.0.2","runId":30407030063,"hardcodedAdvisorId":false,"globalRoleEnumeration":false,"labMissingProjectionFailClosed":true,"backendWrites":0,"membershipWrites":0},
   "hostingDelivery507":{"closed":true,"releaseCandidateHash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091","runId":30417743516,"artifactId":8710762943,"hostingDeployExecutions":1,"publicParity":"25/25","redeployExecuted":false},
@@ -12,9 +12,10 @@
   "rootCauseRemediation509":{"closed":true,"status":"M5_RUNTIME_508_ROOT_CAUSE_REMEDIATION_STATIC_CLOSED_NEW_RC_READY_FOR_LAB_DELIVERY","commit":"c48ed4542faca902f296bf0adf6936e2ba23077b","runId":30421741635,"jobId":90479808034,"artifactId":8712155374,"artifactDigest":"sha256:3c2d18d0bc64a4c7792b95cd96383a7dbb3c0f76f4abb813e5a84f11c538e328","preflight":"15/15","staticContract":"40/40","loadOrderFixture":"19/19","normalizerFixture":"7/7","indexOwnerBeforeFirestoreStore":true,"staticLessonsEvaluationsConfigTransient":true,"userProgressAndOperationalMutationsDurable":true,"protectedFirestoreStoreUnchanged":true,"protectedLabLoaderUnchanged":true},
   "releaseCandidate":{"priorHash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091","hash":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","criticalAssetCount":42,"allCriticalAssetsPresent":true,"remoteVisualAssetCount":25,"remoteVisualAssetsMatched":25,"mismatchCount":0,"remoteParity":true,"mismatches":[],"hostingDeployRequired":false,"runtimeSmokePassed":false,"approvalReadyForLabDelivery":false,"approvalReadyForRuntimeSmoke":true},
   "hostingDelivery510":{"closed":true,"packageCheck":{"status":"PASS","runId":30455383510,"jobId":90587512533,"artifactId":8725278032,"artifactDigest":"sha256:b4547ef695c7d5973eb578ee4930b1ab5f13a52a2e97f549d08a10014d5e805f"},"requestCommit":"f7249c9b38c1a613ee957056f0e408ee54c67678","runId":30455636671,"jobId":90588374673,"artifactId":8725398148,"artifactDigest":"sha256:7fd3d5f8076f77f12435673dd8105666b488984174d448696ce91bcdf26e1824","preflight":"24/24","contract":"22/22","hostingDeployExecutions":1,"publicParity":"25/25","redeployExecuted":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false},
-  "authorization":{"hostingDeployAuthorized":false,"allowedHostingDeployExecutions":0,"hostingAuthorizationConsumed":true,"staticRemediationAuthorizationConsumed":true,"runtimeSmokeAuthorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeSmokeExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false},
-  "forbiddenUntilSeparatelyAuthorized":{"runtimeSmoke":true,"browser":true,"hostingDeploy":true,"visualReview":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"mergeMain":true,"policies":true,"pólizas":true},
-  "nextAction":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_RUNTIME_SMOKE_LAB_ON_RC_F6DFA37E_USING_NORMALIZED_BOOTSTRAP_OWNER_WITH_ZERO_WRITES",
+  "runtimeSmoke511":{"authorized":true,"packageCheckPending":true,"requestCreated":false,"executionConsumed":false,"releaseCandidateHash":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs","snapshotsBeforeAfterRequired":true,"zeroWritesRequired":true},
+  "authorization":{"hostingDeployAuthorized":false,"allowedHostingDeployExecutions":0,"hostingAuthorizationConsumed":true,"staticRemediationAuthorizationConsumed":true,"priorRuntimeSmokeAuthorizationConsumed":true,"runtimeSmokeAuthorized":true,"allowedRuntimeSmokeExecutions":1,"runtimeAuthorizationSource":"user_autorizo_20260729_for_one_runtime_smoke_lab_rc_f6dfa37e","runtimeRequestCreated":false,"runtimeAuthorizationConsumed":false,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false},
+  "forbiddenUntilSeparatelyAuthorized":{"hostingDeploy":true,"visualReview":true,"firestoreWrite":true,"operationalWrites":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"mergeMain":true,"policies":true,"pólizas":true},
+  "nextAction":"RUN_RUNTIME_511_PACKAGE_WITHOUT_SECRETS_THEN_CREATE_ONE_IMMUTABLE_RUNTIME_REQUEST",
   "containsPII":false,
   "containsSecrets":false
 }
