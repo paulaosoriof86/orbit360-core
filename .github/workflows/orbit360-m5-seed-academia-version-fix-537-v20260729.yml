@@ -1,7 +1,7 @@
 name: Orbit 360 · M5 5.0.37 seed Academia version fix
 run-name: M5 5.0.37 · patch base seed Academia markers · ${{ github.sha }}
 
-# activation revision 2
+# activation revision 3: observable execution
 on:
   push:
     branches:
@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  statuses: write
 
 jobs:
   patch:
@@ -57,3 +58,15 @@ jobs:
           git diff --cached --quiet && { echo 'NO_PATCH' >&2; exit 41; }
           git commit -m 'm5 5.0.37: version base Academia seed courses'
           git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+      - name: Publicar PASS observable
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state:'success',context:'orbit360/m5-seed-academia-version-fix-537',description:'M5 5.0.37 seed Academia static marker patch applied'});
+      - name: Publicar FAIL observable
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state:'failure',context:'orbit360/m5-seed-academia-version-fix-537',description:'M5 5.0.37 seed Academia static marker patch failed'});
