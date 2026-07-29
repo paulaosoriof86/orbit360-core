@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-hosting-stop-overlay-530-v1",
+  "schemaVersion":"orbit360-m5-release-candidate-hosting-stop-overlay-530-v2",
   "issuedAt":"2026-07-29",
   "authoritativeForCurrentM5HostingState":true,
   "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-529-v20260729.json","tools/orbit360-m5-lab-hosting-delivery-freeze-530-v20260729.json"],
@@ -15,7 +15,8 @@
   "rootCause":"Control plane used one mutable freeze document both as package precondition and as append-only evidence. Evidence enrichment after attempt 1 changed newReleaseCandidateHash from null to the computed hash, while the package contract still required null before request creation; attempt 2 therefore rejected valid prior evidence.",
   "authorization":{"hostingLabDeliveryAuthorized":false,"allowedExecutions":0,"requestCreated":false,"authorizationConsumed":false,"authorizationInvalidated":true,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
   "safety":{"secretsRead":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"hostingDeployExecutions":0,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"policies":false,"pólizas":false},
-  "controls":{"packageFailureCount":2,"thirdPackageAttemptForbidden":true,"requestCreationForbidden":true,"hostingDeployForbidden":true,"workflowMustRemainFrozen":true},
+  "controls":{"packageFailureCount":2,"thirdPackageAttemptForbidden":true,"requestCreationForbidden":true,"hostingDeployForbidden":true,"workflowFrozen":true,"stopVerifierFrozen":true},
+  "stopVerification":{"status":"PASS","commit":"aa338bdc5eab9c2087e84fe84c1ea785d90ba7f7","runId":30491183947,"jobId":90709179466,"artifactId":8739731902,"artifactDigest":"sha256:880459a90b2da953f4800081223ed49a9c548a9b978e82198bbb9817a0e87a68","zeroCapabilities":true,"executionAuthorized":false,"allowedExecutions":0},
   "nextAction":"NEW_STATIC_HOSTING_CONTROL_PLANE_REDESIGN: immutable package input + separate append-only evidence state + fixture for package->evidence->package stability; only after independent static PASS may a new Hosting authorization be requested",
   "containsPII":false,
   "containsSecrets":false
