@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-m5-runtime-smoke-authorization-v9",
+  "schemaVersion":"orbit360-m5-runtime-smoke-authorization-v10",
   "issuedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "wrapperContractVersion":"5.0.26",
@@ -37,6 +37,7 @@
   "policies":false,
   "visualReview":false,
   "pólizas":false,
+  "nextAction":"NEW_STATIC_CONTROL_PLANE_REDESIGN_BLOCK_REQUIRED",
   "containsPII":false,
   "containsSecrets":false
 }
