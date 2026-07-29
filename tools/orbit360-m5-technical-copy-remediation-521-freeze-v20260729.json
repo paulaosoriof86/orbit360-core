@@ -1,0 +1,13 @@
+{
+  "schemaVersion":"orbit360-m5-technical-copy-remediation-freeze-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.21",
+  "status":"READY_FOR_ONE_STATIC_TECHNICAL_COPY_REMEDIATION_VERIFICATION",
+  "baseline":{"runtime520Closed":true,"runtime520AuthorizationConsumed":true,"runtime520RequestCommit":"60562d429f2aff5583c47eeb5bf4d88c08deb184","runtime520RunId":30473040571,"runtime520JobId":90647758920,"firstFailure":"TECHNICAL_COPY_VISIBLE:desktopDirectionClient360","allCountsStable":true,"allDigestsStable":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeContractVersion":"5.0.22","candidateRuntimeExecuted":false},
+  "authorization":{"staticRemediationAuthorized":true,"allowedExecutions":1,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"browserAuthorized":false,"deployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "required":{"rootCauseBareLabSubstring":true,"whiteLabelAllowed":true,"labelAllowed":true,"isolatedLabBlocked":true,"firebaseBlocked":true,"firestoreBlocked":true,"backendBlocked":true,"dryRunBlocked":true,"candidate522UsesSemanticPredicate":true,"historical518Untouched":true,"productProtectedUnchanged":true},
+  "forbidden":{"runtime":true,"browser":true,"secrets":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"visualReview":true,"policies":true,"pólizas":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
