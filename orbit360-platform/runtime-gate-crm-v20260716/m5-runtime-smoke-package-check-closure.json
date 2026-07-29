@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "orbit360-m5-runtime-smoke-package-check-closure-v1",
+  "issuedAt": "2026-07-29",
+  "gateId": "block5-release-candidate-visualization-v20260728",
+  "contractVersion": "5.0.5",
+  "status": "M5_RUNTIME_SMOKE_PACKAGE_CHECK_PASS",
+  "runId": 30413254641,
+  "jobId": 90454019483,
+  "artifactId": 8709200293,
+  "artifactDigest": "sha256:946302a06a2b3dd3e948f9c2d7a3f67fba9b168236d29cff463e1a68df999caf",
+  "requestPresent": false,
+  "contract": {"status": "M5_RUNTIME_SMOKE_CONTRACT_PASS", "passed": 29, "total": 29, "failed": 0},
+  "capabilitiesUsed": {
+    "secrets": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "priorFailedPackageCheck": {
+    "runId": 30413170457,
+    "jobId": 90453751063,
+    "failedCheckId": "SNAPSHOT_NO_WRITES",
+    "classification": ["VALIDATOR_STALE", "PIPELINE_MECHANISM_FAILURE"],
+    "rootCause": "generic_update_token_matched_crypto_digest_update",
+    "productChanged": false,
+    "validatorCorrected": true,
+    "repeatedFailure": false
+  },
+  "releaseCandidateHash": "d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045",
+  "approvalReadyForImmutableRequest": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
