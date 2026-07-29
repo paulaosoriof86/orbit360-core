@@ -1,0 +1,23 @@
+{
+  "schemaVersion":"orbit360-m5-control-plane-redesign-authorization-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.27",
+  "authorizationSource":"user_continue_20260729_after_runtime_526_package_stop",
+  "staticRedesignAuthorized":true,
+  "allowedExecutions":1,
+  "authorizationConsumed":false,
+  "runtimeSmokeAuthorized":false,
+  "browserAuthorized":false,
+  "secretsAuthorized":false,
+  "firestoreReadAuthorized":false,
+  "firestoreWriteAuthorized":false,
+  "operationalWritesAuthorized":false,
+  "deployAuthorized":false,
+  "productionAuthorized":false,
+  "visualReviewAuthorized":false,
+  "policiesAuthorized":false,
+  "pólizasAuthorized":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
