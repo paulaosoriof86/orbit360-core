@@ -1,47 +1,16 @@
-name: Orbit 360 · M5 5.0.36 canonical router patch
-run-name: M5 5.0.36 · patch canonical router · ${{ github.sha }}
+name: Orbit 360 · M5 5.0.36 canonical router patch · FROZEN
 
-# activation revision 2
 on:
-  push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - '.github/workflows/orbit360-m5-runtime-router-patch-536-v20260729.yml'
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  patch:
+  frozen:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ays/backend-tenant-lab-v99-20260703
-          fetch-depth: 2
-      - name: Reemplazo exacto único
-        shell: bash
+      - name: Router patch already applied
         run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('tools/orbit360-validar-gate-contracts-v20260717.mjs')
-          s=p.read_text()
-          old='"block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.35",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-hosting-535-closed-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-hosting-535-closed-v20260729.mjs"}'
-          new='"block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.36",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-runtime-536-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-runtime-536-v20260729.mjs"}'
-          if s.count(old)!=1: raise SystemExit(f'EXPECTED_EXACTLY_ONE_OLD_ENTRY:{s.count(old)}')
-          p.write_text(s.replace(old,new,1))
-          PY
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          git diff --exit-code --quiet -- . ':!tools/orbit360-validar-gate-contracts-v20260717.mjs' || { echo 'UNEXPECTED_FILES_CHANGED' >&2; exit 41; }
-      - name: Commit único
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'orbit360-ci'
-          git config user.email 'orbit360-ci@users.noreply.github.com'
-          git add tools/orbit360-validar-gate-contracts-v20260717.mjs
-          git diff --cached --quiet && { echo 'NO_PATCH' >&2; exit 41; }
-          git commit -m 'm5 5.0.36: bind canonical gate to one-shot runtime'
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          echo 'Canonical M5 gate already bound to runtime 5.0.36; patch rerun forbidden.' >&2
+          exit 41
