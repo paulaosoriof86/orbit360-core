@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"orbit360-m5-runtime-smoke-remediation-static-freeze-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.6",
+  "status":"READY_FOR_ONE_STATIC_REMEDIATION_GATE",
+  "baseline":{"failedRuntimeRunId":30413481948,"authorizationConsumed":true,"priorReleaseCandidateHash":"d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045","sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7},
+  "expected":{"policyVersion":"20260729.2","criticalAssets":42,"remoteAssets":25,"backendRuntime":"20260717-2","protectedBackendUnchanged":true,"firestoreWrites":0,"operationalWrites":0},
+  "authorization":{"staticGateAuthorized":true,"allowedExecutions":1,"requestCreated":false,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false,"visualReviewAuthorized":false},
+  "forbidden":{"secrets":true,"firestoreRead":true,"runtime":true,"browser":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true},
+  "nextAction":"CREATE_IMMUTABLE_STATIC_REQUEST_AND_REQUIRE_GO_GATE_CONTRACT_PLUS_STATIC_PASS_PLUS_NEW_RC",
+  "containsPII":false,
+  "containsSecrets":false
+}
