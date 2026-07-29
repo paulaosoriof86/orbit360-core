@@ -1,0 +1,27 @@
+{
+  "schemaVersion":"orbit360-m5-runtime-smoke-508-attempt-closure-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.8",
+  "status":"M5_RUNTIME_SMOKE_LAB_FAILED_STOP_LINE",
+  "releaseCandidateHash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091",
+  "packageCheck":{"runId":30420595908,"jobId":90476400727,"artifactId":8711751664,"artifactDigest":"sha256:ee2d4ad2c333bd4805dd18bce9622bbd1bc1991e83e34e8298ecbfdab96f62b1","status":"PASS"},
+  "runtimeAttempt":{"requestCommit":"7db1de42639cad5e53774e49286f2d585fc8f001","runId":30420738744,"jobId":90476816222,"artifactId":8711820943,"artifactDigest":"sha256:8809e9fbd4d9e829453e111ee1fc4b5ef4890cca4cf1200dae501772327adea9","runtimeExecutions":1,"browserExecutions":1,"authorizationConsumed":true},
+  "evidence":{"canonicalPreflight":{"status":"GO_GATE_CONTRACT","passed":15,"total":15,"failed":0},"staticContract":{"status":"M5_RUNTIME_SMOKE_508_CONTRACT_PASS","passed":37,"total":37,"failed":0},"beforeSnapshot":{"status":"M5_RUNTIME_LIVE_SNAPSHOT_PASS","passed":11,"total":11},"afterSnapshot":{"status":"M5_RUNTIME_LIVE_SNAPSHOT_PASS","passed":11,"total":11},"countsStable":true,"digestsStable":true,"counts":{"sourceClients":414,"sourceInsurers":26,"advisors":7,"canonicalClients":414,"canonicalInsurers":26,"memberships":1,"config":1}},
+  "writes":{"firestoreReadsAuthorized":true,"firestoreWrites":0,"operationalWrites":0,"clientWrites":0,"insurerWrites":0,"configurationWrites":0,"membershipWrites":0,"networkWriteCandidates":0},
+  "browser":{"status":"FAILED_BEFORE_ROLE_VIEWS","failureStage":"canonical_auth_ui_ready","authProviderReady":true,"routerContractProgressObserved":true,"pageErrorCount":0,"failedScriptCount":0,"exceptionCount":0,"parsedScriptsObserved":["data/store.js","data/store-firestore-lab.local.js","core/auth.js","core/product-role-taxonomy-p0.js","core/access-role-session-owner-v20260728.js","core/academia-static-content-write-policy-v20260729.js","core/router.js"],"academiaPolicyVersion":"20260729.2","academiaPolicyInstalled":true,"transientCollectionsObserved":["cursos"],"roleViewsExecuted":false,"visualReviewExecuted":false},
+  "rootCauses":[
+    {"classification":["VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],"module":"tools/orbit360-gate-bootstrap-auth-legal-v20260717.mjs","need":"recognize externally parsed owner scripts regardless of evidence row representation","expected":"data/store.js, core/router.js and core/auth.js recognized when parsedScripts contains strings or objects","cause":"helper mapped string entries through x.path and converted them to empty strings","fixRequired":"normalize each parsedScripts item as string or object in auth UI and owner handoff checks","impact":"browser stopped before role views despite real scripts being parsed and no page errors"},
+    {"classification":["FUNCTIONAL_DEFECT","DATA_CONTRACT_FAILURE"],"module":"Academia static content bootstrap","need":"mount versioned lessons, evaluations and config in session without durable Firestore calls","expected":"all versioned Academia bootstrap content classified transient before first insert/update","cause":"policy owner was loaded after Firestore store assignment and after some Academia scripts had already invoked apply","observedAttempts":[{"operation":"insert","collection":"lecciones","count":3},{"operation":"insert","collection":"evaluaciones","count":1},{"operation":"update","collection":"config","count":1}],"writeOutcome":"rejected_by_firestore_rules","durableChange":false,"fixRequired":"load policy owner before Firestore LAB store assignment so setter wraps API synchronously before seed and Academia scripts"},
+    {"classification":["VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],"module":"M5 static remediation contract 5.0.6","need":"prove runtime load order, not only textual presence inside addendum","expected":"index loads policy before Firestore store and all Academia sources","cause":"contract only checked addendum reference before function apply","fixRequired":"add index owner-before-store-before-seed-Academia gate and load-order fixture"}
+  ],
+  "scope":{"hostingDeploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"mergeMain":false,"policies":false,"pólizas":false},
+  "approvalReadyForVisualReview":false,
+  "runtimeSmokeAuthorized":false,
+  "allowedRuntimeSmokeExecutions":0,
+  "visualReviewAuthorized":false,
+  "block5Closed":false,
+  "nextAction":"STATIC_ROOT_CAUSE_REMEDIATION_WITHOUT_RUNTIME_BROWSER_FIRESTORE_SECRETS_OR_DEPLOY_THEN_CALCULATE_NEW_RC",
+  "containsPII":false,
+  "containsSecrets":false
+}
