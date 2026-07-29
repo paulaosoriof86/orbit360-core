@@ -1,0 +1,22 @@
+{
+  "schemaVersion":"orbit360-m5-release-candidate-hosting-stop-overlay-530-v1",
+  "issuedAt":"2026-07-29",
+  "authoritativeForCurrentM5HostingState":true,
+  "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-529-v20260729.json","tools/orbit360-m5-lab-hosting-delivery-freeze-530-v20260729.json"],
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.30",
+  "status":"M5_LAB_HOSTING_530_STOPPED_AFTER_TWO_PACKAGE_PIPELINE_FAILURES",
+  "releaseCandidate":{"hash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"descriptor":"tools/orbit360-m5-release-candidate-descriptor-530-v20260729.json","priorHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","priorHashSuperseded":true},
+  "publicParity":{"assetsExpected":26,"assetsMatched":24,"mismatchCount":2,"mismatchPaths":["sw.js","core/session-multirol-visibility-v20260716.js"],"source":"package_attempt_1_readiness_before_summary_failure","hostingDeliveryRequired":true},
+  "packageAttempts":[
+    {"runId":30490547723,"jobId":90707062721,"artifactId":8739493844,"artifactDigest":"sha256:ac8af7c766f7e823c582f78db9611b578a1c84a4e8794432158f1a25c0320557","classification":"PIPELINE_MECHANISM_FAILURE","failure":"summary_javascript_nullish_coalescing_requires_parentheses","preflight":true,"contract":"17/17","readiness":true},
+    {"runId":30490737805,"jobId":90707700424,"artifactId":8739564753,"artifactDigest":"sha256:1291cffe1f8353ab7d578258dc30b97af56443e7dd2973f50d33a263384c2b47","classification":"PIPELINE_MECHANISM_FAILURE","failure":"contract_freeze_state_incompatible_after_evidence_enrichment","preflight":"24/26","contract":"16/17","failedContractCheck":"FREEZE"}
+  ],
+  "rootCause":"Control plane used one mutable freeze document both as package precondition and as append-only evidence. Evidence enrichment after attempt 1 changed newReleaseCandidateHash from null to the computed hash, while the package contract still required null before request creation; attempt 2 therefore rejected valid prior evidence.",
+  "authorization":{"hostingLabDeliveryAuthorized":false,"allowedExecutions":0,"requestCreated":false,"authorizationConsumed":false,"authorizationInvalidated":true,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "safety":{"secretsRead":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"hostingDeployExecutions":0,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"policies":false,"pólizas":false},
+  "controls":{"packageFailureCount":2,"thirdPackageAttemptForbidden":true,"requestCreationForbidden":true,"hostingDeployForbidden":true,"workflowMustRemainFrozen":true},
+  "nextAction":"NEW_STATIC_HOSTING_CONTROL_PLANE_REDESIGN: immutable package input + separate append-only evidence state + fixture for package->evidence->package stability; only after independent static PASS may a new Hosting authorization be requested",
+  "containsPII":false,
+  "containsSecrets":false
+}
