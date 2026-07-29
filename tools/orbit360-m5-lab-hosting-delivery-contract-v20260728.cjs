@@ -22,16 +22,18 @@ try{
  check('CLOSURE_COUNTS',closure.releaseCandidate?.criticalAssets===41&&closure.labParity?.assetsExpected===24&&closure.labParity?.assetsMatched===21);
  check('CLOSURE_APPROVAL',closure.approvalReadyForLabDelivery===true&&closure.hostingDeployAuthorized===false);
  check('AUTH_VERSION',auth.contractVersion==='5.0.4'&&auth.explicitAuthorization===true);
- check('AUTH_ONE_SHOT',auth.hostingLabDeliveryAuthorized===true&&auth.allowedExecutions===1&&auth.requestCreated===false);
+ check('AUTH_ONE_SHOT',auth.hostingLabDeliveryAuthorized===true&&auth.allowedExecutions===1&&auth.requestCreated===true);
  check('AUTH_HASH',auth.releaseCandidateHash===EXPECTED_HASH);
  check('AUTH_TARGET',auth.projectId==='ays-orbit-360-lab'&&auth.channel==='orbit360-ays-lab');
  check('AUTH_CAPABILITIES',auth.secrets===true&&auth.deploy===true&&auth.hostingOnly===true&&auth.firestoreRead===false&&auth.firestoreWrite===false&&auth.operationalWrites===false&&auth.browser===false&&auth.runtimeSmoke===false&&auth.rulesDeploy===false&&auth.functionsDeploy===false&&auth.production===false&&auth.mergeMain===false&&auth.policies===false);
- check('FREEZE_STATUS',freeze.status==='READY_FOR_ONE_HOSTING_LAB_DELIVERY');
+ check('FREEZE_STATUS',freeze.status==='REQUEST_CREATED_AWAITING_ONE_HOSTING_LAB_DELIVERY');
+ check('FREEZE_REQUEST',freeze.authorization?.hostingLabDeliveryAuthorized===true&&freeze.authorization?.allowedExecutions===1&&freeze.authorization?.requestCreated===true);
  check('FREEZE_HASH',freeze.baseline?.releaseCandidateHash===EXPECTED_HASH);
  check('FREEZE_COUNTS',freeze.baseline?.criticalAssets===41&&freeze.baseline?.remoteAssetsExpected===24&&freeze.requiredAfterDelivery?.remoteAssetsMatched===24);
  check('FREEZE_TARGET',freeze.target?.projectId==='ays-orbit-360-lab'&&freeze.target?.channel==='orbit360-ays-lab');
  check('FREEZE_FORBIDDEN',freeze.forbidden?.firestoreRead===true&&freeze.forbidden?.firestoreWrite===true&&freeze.forbidden?.operationalWrites===true&&freeze.forbidden?.rulesDeploy===true&&freeze.forbidden?.functionsDeploy===true&&freeze.forbidden?.browser===true&&freeze.forbidden?.production===true);
  check('LIFECYCLE_VERSION',lifecycle.gateContractVersion==='5.0.4'&&lifecycle.executionProfile?.phase==='M5_LAB_HOSTING_DELIVERY');
+ check('LIFECYCLE_REQUEST',lifecycle.authorization?.requestCreated===true&&lifecycle.authorization?.allowedExecutions===1&&lifecycle.authorization?.hostingLabDeliveryAuthorized===true);
  check('LIFECYCLE_CAPABILITIES',lifecycle.executionProfile?.capabilities?.secrets===true&&lifecycle.executionProfile?.capabilities?.deploy===true&&lifecycle.executionProfile?.capabilities?.firestoreRead===false&&lifecycle.executionProfile?.capabilities?.writes===false&&lifecycle.executionProfile?.capabilities?.runtime===false&&lifecycle.executionProfile?.capabilities?.browser===false&&lifecycle.executionProfile?.capabilities?.functionsDeploy===false&&lifecycle.executionProfile?.capabilities?.rulesDeploy===false&&lifecycle.executionProfile?.capabilities?.production===false);
  check('OVERLAY_SCOPE',overlay.contractVersion==='5.0.4'&&overlay.phase==='M5_LAB_HOSTING_DELIVERY'&&overlay.required?.releaseCandidateHash===EXPECTED_HASH);
  check('OVERLAY_CAPABILITIES',overlay.capabilityBoundary?.secrets===true&&overlay.capabilityBoundary?.deploy===true&&overlay.capabilityBoundary?.firestoreRead===false&&overlay.capabilityBoundary?.writes===false&&overlay.capabilityBoundary?.browser===false&&overlay.capabilityBoundary?.functionsDeploy===false&&overlay.capabilityBoundary?.rulesDeploy===false&&overlay.capabilityBoundary?.production===false);
@@ -46,7 +48,6 @@ try{
  check('ACCESS_ASSETS_REMOTE',REMOTE.includes('core/product-role-taxonomy-p0.js')&&REMOTE.includes('core/access-role-session-owner-v20260728.js'));
  check('INDEX_REFERENCES_ACCESS',read('orbit360-platform/index.html').includes('core/product-role-taxonomy-p0.js')&&read('orbit360-platform/index.html').includes('core/access-role-session-owner-v20260728.js'));
  check('WORKFLOW_PRESENT',fs.existsSync(path.join(ROOT,'.github/workflows/orbit360-m5-lab-hosting-delivery-v20260728.yml')));
- check('REQUEST_BOUNDARY_FILE_RESERVED',true);
  const failed=checks.filter(x=>!x.ok),out={schemaVersion:'orbit360-m5-lab-hosting-delivery-contract-summary-v1',contractVersion:'5.0.4',ok:failed.length===0,status:failed.length?'M5_LAB_HOSTING_DELIVERY_CONTRACT_FAIL':'M5_LAB_HOSTING_DELIVERY_CONTRACT_PASS',passed:checks.length-failed.length,total:checks.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),releaseCandidateHash:candidateHash,criticalAssets:ASSETS.length,remoteAssets:REMOTE.length,projectId:'ays-orbit-360-lab',channel:'orbit360-ays-lab',secretsRequired:true,firestoreRead:false,operationalWrites:0,browser:false,hostingDeploy:true,functionsDeploy:false,rulesDeploy:false,production:false,containsPII:false,containsSecrets:false};
  const outPath=path.join(PLAT,'runtime-gate-crm-v20260716/m5-lab-hosting-delivery-contract-summary.json');fs.mkdirSync(path.dirname(outPath),{recursive:true});fs.writeFileSync(outPath,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
 }catch(error){console.error(String(error&&error.message||error));process.exit(41)}
