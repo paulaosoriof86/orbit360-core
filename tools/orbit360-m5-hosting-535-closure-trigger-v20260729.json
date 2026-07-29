@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"orbit360-m5-hosting-535-closure-trigger-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.35",
+  "releaseCandidateHash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7",
+  "purpose":"verify post-Hosting closure with zero capabilities",
+  "containsPII":false,
+  "containsSecrets":false
+}
