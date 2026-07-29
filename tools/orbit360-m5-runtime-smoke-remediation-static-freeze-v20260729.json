@@ -1,16 +1,17 @@
 {
-  "schemaVersion":"orbit360-m5-runtime-smoke-remediation-static-freeze-v2",
+  "schemaVersion":"orbit360-m5-runtime-smoke-remediation-static-freeze-v3",
   "issuedAt":"2026-07-29",
   "updatedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.6",
-  "status":"STATIC_REMEDIATION_REQUEST_READY",
+  "status":"STATIC_REMEDIATION_CLOSED_NEW_RC_HOSTING_DELIVERY_AUTHORIZATION_REQUIRED",
   "baseline":{"failedRuntimeRunId":30413481948,"authorizationConsumed":true,"priorReleaseCandidateHash":"d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045","sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7},
-  "packageCheck":{"status":"PASS","runId":30415573496,"jobId":90461241309,"commit":"43ce8f0da202b2d4057a63bbdc199755db8555ea","artifactId":8710028296,"artifactDigest":"sha256:3ae2d78a5239ed5be90ebb7ef87ec4148ce0baa84b59ff8de28faf2cf44e4495","secrets":false,"firestoreRead":false,"runtime":false,"browser":false,"deploy":false},
-  "expected":{"policyVersion":"20260729.2","criticalAssets":42,"remoteAssets":25,"backendRuntime":"20260717-2","protectedBackendUnchanged":true,"firestoreWrites":0,"operationalWrites":0},
-  "authorization":{"staticGateAuthorized":true,"allowedExecutions":1,"requestCreated":true,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false,"visualReviewAuthorized":false},
+  "packageCheck":{"status":"PASS","runId":30415573496,"jobId":90461241309,"commit":"43ce8f0da202b2d4057a63bbdc199755db8555ea","artifactId":8710028296,"artifactDigest":"sha256:3ae2d78a5239ed5be90ebb7ef87ec4148ce0baa84b59ff8de28faf2cf44e4495"},
+  "closure":{"status":"PASS","requestCommit":"b1552ffe248012ef59901dc326adfa671805b84b","runId":30415732795,"jobId":90461724776,"artifactId":8710079365,"artifactDigest":"sha256:7d28bc0a43e30353a93c4aae975a87636e01f02e0f32cacfa5c4ef905a90cf1c","preflight":"24/24","staticContract":"26/26","academiaFixtures":"18/18"},
+  "releaseCandidate":{"hash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatched":22,"mismatchCount":3,"remoteParity":false},
+  "authorization":{"staticGateAuthorizationConsumed":true,"staticGateAuthorized":false,"allowedExecutions":0,"requestCreated":true,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false,"allowedHostingDeployExecutions":0,"visualReviewAuthorized":false},
   "forbidden":{"secrets":true,"firestoreRead":true,"runtime":true,"browser":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true},
-  "nextAction":"CREATE_IMMUTABLE_STATIC_REQUEST_BOUND_TO_THIS_COMMIT_AND_REQUIRE_GO_GATE_CONTRACT_PLUS_STATIC_PASS_PLUS_NEW_RC",
+  "nextAction":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_HOSTING_LAB_DELIVERY_OF_RC_B25BF275_THEN_REQUIRE_25_OF_25_PUBLIC_PARITY",
   "containsPII":false,
   "containsSecrets":false
 }
