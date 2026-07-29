@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-validator-redesign-v1",
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-validator-redesign-v2",
   "issuedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
@@ -8,12 +8,13 @@
   "gateContractVersion":"5.0.19",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m5-validator-redesign-semantic-predicates-v1",
-  "classification":"PIPELINE_MECHANISM_VALIDATOR_REDESIGN_STATIC",
-  "executionProfile":{"phase":"M5_VALIDATOR_REDESIGN_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"single_static_verification_no_runtime"},
+  "classification":"PIPELINE_MECHANISM_VALIDATOR_REDESIGN_STATIC_CLOSED_PASS",
+  "executionProfile":{"phase":"M5_VALIDATOR_REDESIGN_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"single_static_verification_consumed"},
   "baseline":{"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","runtime516Closed":true,"policyReadiness517StoppedAfterTwoFailures":true,"candidateRuntimeContractVersion":"5.0.18","candidateRuntimeExecuted":false},
-  "redesign":{"helper":"tools/orbit360-validator-source-predicate-helpers-v20260729.mjs","helperVersion":"20260729.1","requirements":["quote_independent_parser_blocking_loader_detection","strict_equality_not_assignment","direct_assignment_detected","manual_policy_install_detected","canonical_preflight_written_by_engine","product_protected_unchanged"]},
-  "authorization":{"authorizationSource":"user_continue_20260729_after_517_stop_line","staticRemediationAuthorized":true,"allowedStaticExecutions":1,"runtimeSmokeAuthorized":false,"browserAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false},
-  "nextRequiredDecision":"STATIC_519_PASS_THEN_REQUEST_NEW_EXPLICIT_RUNTIME_AUTHORIZATION_FOR_EXISTING_5_0_18_CANDIDATE",
+  "redesign":{"helper":"tools/orbit360-validator-source-predicate-helpers-v20260729.mjs","helperVersion":"20260729.1","requirements":["quote_independent_parser_blocking_loader_detection","strict_equality_not_assignment","direct_assignment_detected","manual_policy_install_detected","canonical_preflight_written_by_engine","product_protected_unchanged"],"result":"30/30_PASS"},
+  "evidence":{"commit":"f67aedce6ee3c23ff9b9436cbe6ba6d1764f34ed","runId":30471418491,"jobId":90642326816,"artifactId":8731783955,"artifactDigest":"sha256:364a9b4adde3cd76b137569bbee6ab0b4de1c8753be740c48008bb6349f2581e"},
+  "authorization":{"authorizationSource":"user_continue_20260729_after_517_stop_line","staticRemediationAuthorized":false,"allowedStaticExecutions":0,"staticAuthorizationConsumed":true,"runtimeSmokeAuthorized":false,"browserAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"REQUEST_NEW_EXPLICIT_ONE_SHOT_RUNTIME_AUTHORIZATION_FOR_EXISTING_5_0_18_CANDIDATE",
   "containsPII":false,
   "containsSecrets":false
 }
