@@ -3,7 +3,7 @@
 import fs from 'node:fs';import path from 'node:path';import {spawnSync,execFileSync} from 'node:child_process';
 const ROOT=process.cwd(),GATE_ID=process.argv[2]||'',EXPECTED_GATE='block5-release-candidate-visualization-v20260728',VERSION='5.0.4';
 const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
-const checks=[];const check=(id,ok)=>checks.push({id,ok:!!ok});const readJson=rel=>JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8');
+const checks=[];const check=(id,ok)=>checks.push({id,ok:!!ok});const readJson=rel=>JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));
 try{
  const lifecycle=readJson('tools/orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-v20260728.json');
  const auth=readJson('tools/orbit360-m5-lab-hosting-delivery-authorization-v20260728.json');
