@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-validator-remediation-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.15",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m5-runtime-validator-remediation-access-owner-version-v1",
+  "classification":"VALIDATOR_STALE_REMEDIATION_STATIC",
+  "executionProfile":{"phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"static_remediation_once_no_runtime"},
+  "baseline":{"runtime514RequestCommit":"0702b42346054158b7268348d6a2c2d2ffdfdad0","runtime514RunId":30464282843,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","remoteAssetsMatched":25,"runtimeFailureClassification":"VALIDATOR_STALE","actualOwnerVersion":"20260729.3","staleExpectedVersion":"20260728.2","snapshotsStable":true,"zeroWrites":true},
+  "authorization":{"staticRemediationAuthorized":true,"allowedExecutions":1,"runtimeSmokeAuthorized":false,"browserAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false},
+  "required":{"productOwnerVersion":"20260729.3","browserValidatorExpectedOwnerVersion":"20260729.3","stalePredicateAbsent":true,"productOwnerUnchangedSinceRuntime514":true,"releaseCandidateUnchanged":true},
+  "nextRequiredDecision":"STATIC_PASS_THEN_REQUEST_NEW_EXPLICIT_RUNTIME_AUTHORIZATION",
+  "containsPII":false,
+  "containsSecrets":false
+}
