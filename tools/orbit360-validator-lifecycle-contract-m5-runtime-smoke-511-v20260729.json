@@ -11,9 +11,10 @@
   "classification":"M5_RUNTIME_SMOKE_AUTHORIZED_ONCE",
   "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
   "baseline":{"hostingClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-lab-hosting-delivery-510-closure.json","releaseCandidateHash":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatched":25},
+  "packageCheck":{"status":"M5_RUNTIME_SMOKE_511_PACKAGE_PASS","commit":"2394fa298cb948e558fbfbd6b42a21a2f5a71037","runId":30457621192,"jobId":90595169193,"artifactId":8726195633,"artifactDigest":"sha256:ed9f732c813b3feac10f2bdae1434661ed84cac3d00663d5ee739a4ed23c0a4e"},
   "runtimeRequirements":{"bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs","snapshotsBeforeAfter":true,"zeroWrites":true,"roleViews":["Dirección","Operativo","Asesor"],"viewports":["desktop","tablet","mobile"]},
-  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizo_20260729_for_one_runtime_smoke_lab_rc_f6dfa37e","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":false},
-  "nextRequiredDecision":"PACKAGE_CHECK_THEN_ONE_IMMUTABLE_RUNTIME_SMOKE_LAB",
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizo_20260729_for_one_runtime_smoke_lab_rc_f6dfa37e","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":false},
+  "nextRequiredDecision":"EXECUTE_ONE_IMMUTABLE_RUNTIME_SMOKE_LAB",
   "containsPII":false,
   "containsSecrets":false
 }
