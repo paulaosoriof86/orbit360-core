@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-stop-533-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.33",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "classification":"M5_VALIDATOR_REDESIGN_STATIC",
+  "executionProfile":{"phase":"M5_VALIDATOR_REDESIGN_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
+  "baseline":{"stopOverlay":"tools/orbit360-m5-runtime-stop-overlay-533-v20260729.json","releaseCandidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","publicParity":"26/26","runtimeRunId":30495235821,"firestoreWrites":0,"operationalWrites":0},
+  "authorization":{"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeAuthorizationConsumed":true,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"RUN_STATIC_ROOT_CAUSE_REMEDIATION_5_0_34_ONLY; no runtime or deploy until independent PASS and new authorization",
+  "containsPII":false,
+  "containsSecrets":false
+}
