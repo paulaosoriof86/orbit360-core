@@ -8,6 +8,7 @@
   var recent=[];
   var installed=false;
   var reapplying=false;
+  var watchedStoreAssignments=false;
 
   function clone(value){
     if(!value||typeof value!=='object')return value;
@@ -28,7 +29,7 @@
     var col=String(collection||'').toLowerCase();
     var key=String(id||rowId(payload)||'');
     var patch=payload&&typeof payload==='object'?payload:{};
-    if(op==='remove')return {mode:'durable_operational',reason:'removal_requires_explicit_persistence'};
+    if(op==='remove'||op==='setpref')return {mode:'durable_operational',reason:'explicit_user_or_preference_persistence'};
     if(col==='cursos'){
       var staticCourseId=/^(cur_|curso_base_|academia_)/i.test(key);
       var contentShape=hasAny(patch,['titulo','cat','emoji','color','desc','destinatarios','recursos','metaLeccion','lecciones']);
@@ -113,10 +114,28 @@
       else Object.keys(transientByCollection).forEach(function(col){reapplyCollection(store,col);});
     });
     installed=true;
-    Orbit.academiaStaticContentWritePolicy={version:VERSION,installed:true,classify:classify,status:store._transientStaticStatus};
+    Orbit.academiaStaticContentWritePolicy={version:VERSION,installed:true,classify:classify,install:install,status:store._transientStaticStatus};
     try{document.dispatchEvent(new CustomEvent('orbit:academia-static-write-policy',{detail:{version:VERSION,installed:true}}));}catch(e){}
     return true;
   }
+  function watchStoreAssignments(){
+    if(watchedStoreAssignments)return;
+    var descriptor;
+    try{descriptor=Object.getOwnPropertyDescriptor(Orbit,'store');}catch(e){}
+    if(descriptor&&descriptor.configurable===false)return;
+    var current=Orbit.store;
+    try{
+      Object.defineProperty(Orbit,'store',{
+        configurable:true,
+        enumerable:true,
+        get:function(){return current;},
+        set:function(value){current=value;try{install();}catch(e){}}
+      });
+      watchedStoreAssignments=true;
+      if(current)install();
+    }catch(e){}
+  }
   Orbit.academiaStaticContentWritePolicy={version:VERSION,installed:false,classify:classify,install:install,status:function(){return {version:VERSION,installed:installed,total:recent.length};}};
+  watchStoreAssignments();
   var attempts=0;(function waitForStore(){if(install())return;if(attempts++<400)setTimeout(waitForStore,5);}());
 }());
