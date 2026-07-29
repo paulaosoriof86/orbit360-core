@@ -1,36 +1,17 @@
 {
   "schemaVersion":"orbit360-m5-runtime-smoke-freeze-v2",
   "issuedAt":"2026-07-29",
+  "updatedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.8",
-  "status":"READY_FOR_PACKAGE_CHECK_BEFORE_ONE_RUNTIME_SMOKE_LAB",
-  "baseline":{
-    "hosting507Closed":true,
-    "hostingClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-lab-hosting-delivery-507-closure.json",
-    "releaseCandidateHash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091",
-    "criticalAssets":42,
-    "remoteAssetsMatched":25,
-    "remoteAssetsExpected":25,
-    "sourceClients":414,
-    "sourceInsurers":26,
-    "canonicalClients":414,
-    "canonicalInsurers":26,
-    "advisors":7,
-    "missingClientCurrency":0
-  },
-  "expected":{
-    "countryCounts":{"GT":398,"CO":16,"REQUIERE_VALIDACION":0},
-    "typeCounts":{"Persona":391,"Empresa":23},
-    "roles":["Dirección","Operativo","Asesor"],
-    "unauthorizedRole":"Finanzas",
-    "viewports":["desktopDirection","tabletOperativo","mobileAsesor"],
-    "academiaPolicyVersion":"20260729.2",
-    "backendRuntime":"20260717-2"
-  },
-  "authorization":{"explicitAuthorization":true,"runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"visualReviewAuthorized":false},
+  "status":"REQUEST_CREATED_AWAITING_ONE_RUNTIME_SMOKE_LAB",
+  "baseline":{"hosting507Closed":true,"hostingClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-lab-hosting-delivery-507-closure.json","releaseCandidateHash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091","criticalAssets":42,"remoteAssetsMatched":25,"remoteAssetsExpected":25,"sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7,"missingClientCurrency":0},
+  "packageCheck":{"status":"PASS","runId":30420595908,"jobId":90476400727,"commit":"1d2e77b75a97cb9f4ecb2c760a30a451a405d4a4","artifactId":8711751664,"artifactDigest":"sha256:ee2d4ad2c333bd4805dd18bce9622bbd1bc1991e83e34e8298ecbfdab96f62b1"},
+  "expected":{"countryCounts":{"GT":398,"CO":16,"REQUIERE_VALIDACION":0},"typeCounts":{"Persona":391,"Empresa":23},"roles":["Dirección","Operativo","Asesor"],"unauthorizedRole":"Finanzas","viewports":["desktopDirection","tabletOperativo","mobileAsesor"],"academiaPolicyVersion":"20260729.2","backendRuntime":"20260717-2"},
+  "authorization":{"explicitAuthorization":true,"runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"visualReviewAuthorized":false},
   "requiredAfterSmoke":{"status":"M5_RUNTIME_SMOKE_LAB_CLOSED_SUCCESS","publicParityPreserved":"25/25","allCountsStable":true,"allDigestsStable":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0,"blockedOperationalCalls":0,"hostingDeploy":false},
   "forbidden":{"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true},
-  "nextAction":"PACKAGE_CHECK_WITHOUT_SECRETS_FIRESTORE_OR_BROWSER_THEN_CREATE_IMMUTABLE_RUNTIME_REQUEST",
+  "nextAction":"CREATE_IMMUTABLE_REQUEST_BOUND_TO_CURRENT_HEAD_AND_EXECUTE_EXACTLY_ONE_RUNTIME_SMOKE_LAB",
   "containsPII":false,
   "containsSecrets":false
 }
