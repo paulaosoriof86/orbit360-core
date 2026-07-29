@@ -1,0 +1,20 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-responsive-title-remediation-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.24",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m5-responsive-title-semantic-resolver-remediation-v1",
+  "classification":"VALIDATOR_STALE",
+  "executionProfile":{"phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"single_static_remediation_after_consumed_runtime_523"},
+  "baseline":{"runtime523Closed":true,"runtime523AuthorizationConsumed":true,"runtime523FirstFailure":"RESPONSIVE_TITLE_INVALID:desktopDirectionInsurers","runtime523ZeroWrites":true,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61"},
+  "rootCause":{"historicalTitleSelector":".mod-band .mb-tt h2,.fichahdr h2,.m1-asg-hero h2","actualInsurerFichaTitle":"visible 20px font-weight 800 div inside #asg-ficha","mechanism":"tag-only validator cannot resolve actual visible semantic insurer title","productDefectDemonstrated":false},
+  "candidate":{"runtimeContractVersion":"5.0.25","browser":"tools/orbit360-m5-runtime-smoke-525-browser-v20260729.mjs","closer":"tools/orbit360-m5-runtime-smoke-525-close-v20260729.mjs","resolverContract":"tools/orbit360-responsive-title-resolver-contract-v20260729.json","resolverVersion":"20260729.1"},
+  "authorization":{"staticRemediationAuthorized":true,"allowedStaticExecutions":1,"authorizationSource":"validator_stale_methodology_after_consumed_runtime_523","runtimeSmokeAuthorized":false,"browserAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"STATIC_524_PASS_THEN_REQUEST_NEW_EXPLICIT_RUNTIME_AUTHORIZATION_FOR_5_0_25",
+  "containsPII":false,
+  "containsSecrets":false
+}
