@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m5-responsive-title-remediation-v1",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.24",
+  "phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC",
+  "required":{"classification":"VALIDATOR_STALE","runtime523Consumed":true,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeVersion":"5.0.25","responsiveTitleResolverVersion":"20260729.1","productProtectedUnchanged":true},
+  "capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
