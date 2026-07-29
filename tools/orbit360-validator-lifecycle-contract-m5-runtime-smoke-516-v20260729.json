@@ -8,12 +8,13 @@
   "gateContractVersion":"5.0.16",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m5-runtime-smoke-rc-ae6bb2a3-jq-safe-v3",
-  "classification":"M5_RUNTIME_SMOKE_AUTHORIZED_PACKAGE_PENDING",
+  "classification":"M5_RUNTIME_SMOKE_PACKAGE_PASS_AWAITING_REQUEST",
   "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
   "baseline":{"hosting513Closed":true,"validator515Closed":true,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatched":25},
+  "packageCheck":{"status":"M5_RUNTIME_SMOKE_516_PACKAGE_PASS","commit":"7dace8b7c720b799ff982095dddc7f1d013df32d","runId":30466972684,"jobId":90627143661,"artifactId":8729954895,"artifactDigest":"sha256:244dc0324a9f19ff874f68e116b2853085a9709ca28cac4ae869d6f307a6eeff"},
   "runtimeRequirements":{"bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs","accessOwnerVersion":"20260729.3","jqSelectorSafetyContract":"tools/orbit360-jq-selector-safety-contract-v20260729.json","snapshotsBeforeAfter":true,"zeroWrites":true,"roleViews":["Dirección","Operativo","Asesor"],"viewports":["desktop","tablet","mobile"]},
   "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260729_for_one_runtime_smoke_lab_rc_ae6bb2a3_after_validator_515","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":false},
-  "nextRequiredDecision":"PACKAGE_PASS_THEN_CREATE_ONE_IMMUTABLE_RUNTIME_REQUEST",
+  "nextRequiredDecision":"CREATE_ONE_IMMUTABLE_RUNTIME_REQUEST_BOUND_TO_CURRENT_HEAD",
   "containsPII":false,
   "containsSecrets":false
 }
