@@ -1,0 +1,21 @@
+{
+  "schemaVersion":"orbit360-m5-hosting-package-input-535-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.35",
+  "candidateContractVersion":"5.0.34",
+  "sourceControlOverlay":"tools/orbit360-m5-release-candidate-control-overlay-534-v20260729.json",
+  "descriptor":"tools/orbit360-m5-release-candidate-descriptor-534-v20260729.json",
+  "readiness":"tools/orbit360-m5-release-candidate-readiness-534-v20260729.mjs",
+  "expectedCandidateHash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7",
+  "criticalAssets":44,
+  "remoteAssetsExpected":27,
+  "remoteAssetsMatchedBefore":26,
+  "mismatchPathsBefore":["data/academia-plus.js"],
+  "target":{"projectId":"ays-orbit-360-lab","channel":"orbit360-ays-lab","canonicalUrl":"https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app"},
+  "requiredBindings":{"canonicalAccessOwnerVersion":"20260729.3","compatibilityOwnerVersion":"20260729.2","academiaStaticWritePolicyVersion":"20260729.2","academiaPlusContentVersion":8,"pwaCacheGeneration":"orbit360-v20260729-11-multirol-owner"},
+  "capabilityCeiling":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "immutableAfterCreation":true,
+  "containsPII":false,
+  "containsSecrets":false
+}
