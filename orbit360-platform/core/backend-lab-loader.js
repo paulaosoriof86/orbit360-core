@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Backend LAB loader v1.112
+   Orbit 360 - Backend LAB loader v1.111
    Loads Firebase SDK only for:
    ?orbitBackend=firestore-lab&tenant=alianzas-soluciones
 
@@ -62,9 +62,8 @@
     tenantId: requestedTenant,
     tenant: requestedTenant,
     loader: 'core/backend-lab-loader.js',
-    loaderVersion: 'v1.112',
+    loaderVersion: 'v1.111',
     runtimeVersion: LAB_RUNTIME,
-    academiaStaticWritePolicyVersion: '20260729.1',
     firebaseLoader: 'pending',
     configSource: isFirebaseHosting ? 'firebase-hosting-reserved-init' : 'local-ignored-config',
     configLocal: isFirebaseHosting ? null : 'core/auth-firebase.config.local.js',
@@ -86,10 +85,6 @@
     write('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js');
     write('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js');
     write(configSource);
-    /* Se carga antes de data/store-firestore-lab.local.js y de los addenda de
-       Academia. El owner espera al store explícito LAB y separa contenido
-       estático versionado de mutaciones operativas persistentes. */
-    write('core/academia-static-content-write-policy-v20260729.js?v=20260729-1');
     window.OrbitBackend.firebaseLoader = 'requested';
   } catch(e) {
     window.OrbitBackend.firebaseLoader = 'error';
