@@ -31,7 +31,7 @@ const GATE_CONFIG=Object.freeze({
   "block4-final-canonical-migration-dryrun-v20260728":{contractVersion:"4.3.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-migration-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-migration-v20260728.mjs"},
   "block4-final-canonical-migration-write-v20260728":{contractVersion:"4.3.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-write-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-write-v20260728.mjs"},
   "block4-final-canonical-revalidation-readonly-v20260728":{contractVersion:"4.3.2",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-revalidation-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-revalidation-v20260728.mjs"},
-  "block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.7",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-lab-hosting-delivery-v20260729.mjs"}
+  "block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.8",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-runtime-smoke-508-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-runtime-smoke-508-v20260729.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":ZERO,
@@ -74,29 +74,29 @@ const PHASE_PROFILES=Object.freeze({
   "M4_FINAL_CANONICAL_REVALIDATION_READONLY_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
-function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(k=>actual[k]===expected[k]);}
+function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(key=>actual[key]===expected[key]);}
 function writeEvidence(payload){fs.mkdirSync(path.dirname(EVIDENCE_PATH),{recursive:true});fs.writeFileSync(EVIDENCE_PATH,JSON.stringify(payload,null,2)+'\n','utf8');}
 let output;let exitCode=41;
 try{
- const config=GATE_CONFIG[GATE_ID];if(!config)throw new Error('CANONICAL_GATE_NOT_REGISTERED_IN_ENTRYPOINT');
- if(!fs.existsSync(path.join(ROOT,config.lifecycle)))throw new Error('CANONICAL_LIFECYCLE_CONTRACT_MISSING');
- if(!fs.existsSync(path.join(ROOT,config.engine)))throw new Error('CANONICAL_ENGINE_MISSING');
- const lifecycle=readJson(config.lifecycle);
- if(lifecycle.gateId!==GATE_ID)throw new Error('CANONICAL_GATE_MISMATCH');
- if(lifecycle.gateContractVersion!==config.contractVersion)throw new Error('CANONICAL_GATE_VERSION_MISMATCH');
- if(lifecycle.validatorLifecycleRevision!==CANONICAL_LIFECYCLE_COMPOSITION)throw new Error('CANONICAL_LIFECYCLE_REVISION_MISMATCH');
- const profile=lifecycle.executionProfile||{},expected=PHASE_PROFILES[String(profile.phase||'')];
- if(!expected)throw new Error('CANONICAL_LIFECYCLE_PHASE_MISMATCH');
- if(!exactCapabilities(profile.capabilities||{},expected))throw new Error('CANONICAL_LIFECYCLE_CAPABILITY_MISMATCH');
- const run=spawnSync(process.execPath,[config.engine,GATE_ID],{cwd:ROOT,env:{...process.env,ORBIT360_BRANCH:'ays/backend-tenant-lab-v99-20260703'},encoding:'utf8',maxBuffer:32*1024*1024});
- exitCode=Number.isInteger(run.status)?run.status:41;if(run.error)throw run.error;
- if(!fs.existsSync(EVIDENCE_PATH))throw new Error('CANONICAL_ENGINE_EVIDENCE_MISSING');
- const parsed=readJson(EVIDENCE_REL);
- output={...parsed,canonicalEntrypoint:'tools/orbit360-validar-gate-contracts-v20260717.mjs',canonicalEngine:config.engine,canonicalLifecycleContract:config.lifecycle,canonicalLifecycleComposition:CANONICAL_LIFECYCLE_COMPOSITION,engineEvidenceSource:'sync-file-evidence-not-stdout-v1',engineStdoutParsed:false,sourceTransformed:false,dataAccess:false,secretAccess:false,operationalWrites:0,evidenceWrites:1,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
- if(run.stderr)output.stderrSanitized=String(run.stderr).trim().slice(0,2000);
+  const config=GATE_CONFIG[GATE_ID];if(!config)throw new Error('CANONICAL_GATE_NOT_REGISTERED_IN_ENTRYPOINT');
+  if(!fs.existsSync(path.join(ROOT,config.lifecycle)))throw new Error('CANONICAL_LIFECYCLE_CONTRACT_MISSING');
+  if(!fs.existsSync(path.join(ROOT,config.engine)))throw new Error('CANONICAL_ENGINE_MISSING');
+  const lifecycle=readJson(config.lifecycle);
+  if(lifecycle.gateId!==GATE_ID)throw new Error('CANONICAL_GATE_MISMATCH');
+  if(lifecycle.gateContractVersion!==config.contractVersion)throw new Error('CANONICAL_GATE_VERSION_MISMATCH');
+  if(lifecycle.validatorLifecycleRevision!==CANONICAL_LIFECYCLE_COMPOSITION)throw new Error('CANONICAL_LIFECYCLE_REVISION_MISMATCH');
+  const profile=lifecycle.executionProfile||{},expected=PHASE_PROFILES[String(profile.phase||'')];
+  if(!expected)throw new Error('CANONICAL_LIFECYCLE_PHASE_MISMATCH');
+  if(!exactCapabilities(profile.capabilities||{},expected))throw new Error('CANONICAL_LIFECYCLE_CAPABILITY_MISMATCH');
+  const run=spawnSync(process.execPath,[config.engine,GATE_ID],{cwd:ROOT,env:{...process.env,ORBIT360_BRANCH:'ays/backend-tenant-lab-v99-20260703'},encoding:'utf8',maxBuffer:32*1024*1024});
+  exitCode=Number.isInteger(run.status)?run.status:41;if(run.error)throw run.error;
+  if(!fs.existsSync(EVIDENCE_PATH))throw new Error('CANONICAL_ENGINE_EVIDENCE_MISSING');
+  const parsed=readJson(EVIDENCE_REL);
+  output={...parsed,canonicalEntrypoint:'tools/orbit360-validar-gate-contracts-v20260717.mjs',canonicalEngine:config.engine,canonicalLifecycleContract:config.lifecycle,canonicalLifecycleComposition:CANONICAL_LIFECYCLE_COMPOSITION,engineEvidenceSource:'sync-file-evidence-not-stdout-v1',engineStdoutParsed:false,sourceTransformed:false,dataAccess:false,secretAccess:false,operationalWrites:0,evidenceWrites:1,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+  if(run.stderr)output.stderrSanitized=String(run.stderr).trim().slice(0,2000);
 }catch(error){
- const config=GATE_CONFIG[GATE_ID]||{};
- output={schemaVersion:'orbit360-gate-contract-preflight-canonical-router-v1',gateId:GATE_ID,contractVersion:config.contractVersion||'',status:'VALIDATOR_STALE',classification:'PIPELINE_MECHANISM_FAILURE',failed:1,failedCheckIds:['CANONICAL_PREFLIGHT_ENTRYPOINT'],error:String(error&&error.message||error),canonicalLifecycleComposition:CANONICAL_LIFECYCLE_COMPOSITION,canonicalEngine:config.engine||'',sourceTransformed:false,dataAccess:false,secretAccess:false,operationalWrites:0,evidenceWrites:1,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
- exitCode=41;
+  const config=GATE_CONFIG[GATE_ID]||{};
+  output={schemaVersion:'orbit360-gate-contract-preflight-canonical-router-v1',gateId:GATE_ID,contractVersion:config.contractVersion||'',status:'VALIDATOR_STALE',classification:'PIPELINE_MECHANISM_FAILURE',failed:1,failedCheckIds:['CANONICAL_PREFLIGHT_ENTRYPOINT'],error:String(error&&error.message||error),canonicalLifecycleComposition:CANONICAL_LIFECYCLE_COMPOSITION,canonicalEngine:config.engine||'',sourceTransformed:false,dataAccess:false,secretAccess:false,operationalWrites:0,evidenceWrites:1,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+  exitCode=41;
 }
 writeEvidence(output);console.log(JSON.stringify(output,null,2));process.exit(exitCode);
