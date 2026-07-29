@@ -1,0 +1,32 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-hosting-delivery-535-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.35",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "classification":"M5_LAB_HOSTING_DELIVERY",
+  "executionProfile":{
+    "phase":"M5_LAB_HOSTING_DELIVERY",
+    "capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+    "operationalWritesAuthorized":false
+  },
+  "baseline":{
+    "control":"tools/orbit360-m5-release-candidate-control-overlay-534-v20260729.json",
+    "descriptor":"tools/orbit360-m5-release-candidate-descriptor-534-v20260729.json",
+    "authorization":"tools/orbit360-m5-hosting-authorization-535-v20260729.json",
+    "packageInput":"tools/orbit360-m5-hosting-package-input-535-v20260729.json",
+    "ledger":"tools/orbit360-m5-hosting-evidence-ledger-535-v20260729.json",
+    "request":"tools/orbit360-m5-hosting-request-535-v20260729.json",
+    "releaseCandidateHash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7",
+    "criticalAssets":44,
+    "remoteAssetsExpected":27,
+    "remoteAssetsMatchedBefore":26
+  },
+  "authorization":{"hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"execute exactly one Hosting LAB delivery only when immutable request is present and canonical preflight returns GO_GATE_CONTRACT",
+  "containsPII":false,
+  "containsSecrets":false
+}
