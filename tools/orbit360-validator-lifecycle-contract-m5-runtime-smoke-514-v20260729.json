@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-v5",
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-v6",
   "issuedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
@@ -8,13 +8,14 @@
   "gateContractVersion":"5.0.14",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m5-runtime-smoke-rc-ae6bb2a3-normalized-v2",
-  "classification":"M5_RUNTIME_SMOKE_REQUEST_READY",
-  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
+  "classification":"VALIDATOR_STALE",
+  "executionProfile":{"phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"authorization_consumed_no_rerun"},
   "baseline":{"hosting513Closed":true,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatched":25},
   "packageCheck":{"status":"M5_RUNTIME_SMOKE_514_PACKAGE_PASS","commit":"83a756a92ecb4b143ea37e9d917b676e7c1e12df","runId":30463967369,"jobId":90616924986,"artifactId":8728776931,"artifactDigest":"sha256:b856998a41adc975ba2cc9dbe29713c909eeaa06de4b9f832925582937248850"},
-  "runtimeRequirements":{"bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs","snapshotsBeforeAfter":true,"zeroWrites":true,"roleViews":["Dirección","Operativo","Asesor"],"viewports":["desktop","tablet","mobile"]},
-  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260729_for_one_runtime_smoke_lab_rc_ae6bb2a3","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":false},
-  "nextRequiredDecision":"EXECUTE_ONE_RUNTIME_SMOKE_THEN_CONSUME_AUTHORIZATION",
+  "runtimeAttempt":{"status":"M5_RUNTIME_SMOKE_514_FAILED_STOP_LINE","requestCommit":"0702b42346054158b7268348d6a2c2d2ffdfdad0","runId":30464282843,"jobId":90617993590,"artifactId":8728921997,"artifactDigest":"sha256:04beee344614f2a051b8f7e75a8ffcdd01714c7d58e0ca28a17da44361dc41ba","firstFailure":"ACCESS_OWNER_VERSION_MISMATCH:20260729.3","failureStage":"real_tenant_data","snapshots":"11/11_before_and_after","allCountsStable":true,"allDigestsStable":true,"firestoreWrites":0,"operationalWrites":0},
+  "rootCause":{"classification":"VALIDATOR_STALE","actualAccessOwnerVersion":"20260729.3","staleValidatorExpectedVersion":"20260728.2","productFrozen":true,"rerunAllowed":false},
+  "authorization":{"explicitAuthorization":true,"runtimeSmokeAuthorized":false,"allowedExecutions":0,"requestCreated":true,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false,"authorizationConsumed":true},
+  "nextRequiredDecision":"STATIC_VALIDATOR_REMEDIATION_ONLY_THEN_REQUEST_NEW_RUNTIME_AUTHORIZATION",
   "containsPII":false,
   "containsSecrets":false
 }
