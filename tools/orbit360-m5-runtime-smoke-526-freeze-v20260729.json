@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"orbit360-m5-runtime-smoke-freeze-v8",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "wrapperContractVersion":"5.0.26",
+  "candidateRuntimeContractVersion":"5.0.25",
+  "status":"READY_FOR_PACKAGE_CHECK_BEFORE_ONE_RUNTIME_SMOKE_LAB",
+  "baseline":{"validator524Closed":true,"validator524Passed":28,"validator524Failed":0,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","remoteAssetsMatched":25,"mismatchCount":0,"sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7,"missingClientCurrency":0},
+  "expected":{"countryCounts":{"GT":398,"CO":16,"REQUIERE_VALIDACION":0},"typeCounts":{"Persona":391,"Empresa":23},"accessOwnerVersion":"20260729.3","academiaPolicyVersion":"20260729.2","visibleTechnicalCopyPredicateVersion":"20260729.1","responsiveTitleResolverVersion":"20260729.1","policyOwnerWaitMs":60000,"policyOwnerBoundMs":65000,"countsStable":true,"digestsStable":true,"roleViews":["Dirección desktop","Operativo tablet","Asesor mobile"]},
+  "authorization":{"runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"authorizationConsumed":false,"authorizationSource":"user_autorizado_20260729_after_responsive_title_524_pass"},
+  "forbidden":{"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
