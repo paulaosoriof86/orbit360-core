@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-remediation-static-v4",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.12",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m5-runtime-511-membership-projection-root-cause-static-v1",
+  "classification":"M5_RUNTIME_511_MEMBERSHIP_PROJECTION_ROOT_CAUSE_STATIC",
+  "executionProfile":{"phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"static_package_once"},
+  "baseline":{"attemptClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-511-attempt-closure.json","releaseCandidateHashBefore":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatchedBefore":25},
+  "required":{"accessOwnerVersion":"20260729.3","membershipProjectionFixture":"tools/orbit360-m5-access-membership-projection-fixture-v20260729.mjs","genericTenant":true,"authenticatedUid":true,"firestoreReadOnly":true,"failClosed":true,"newReleaseCandidate":true},
+  "authorization":{"staticRemediationAuthorized":true,"allowedExecutions":1,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"RUN_ONE_STATIC_PACKAGE_THEN_REQUIRE_HOSTING_FOR_NEW_RC",
+  "containsPII":false,
+  "containsSecrets":false
+}
