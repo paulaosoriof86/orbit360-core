@@ -1,0 +1,84 @@
+name: Orbit 360 · M5 control-plane schema redesign 5.0.27
+run-name: M5 5.0.27 · schema-driven static redesign · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-control-plane-redesign-527-v20260729.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  EXPECTED_RC_HASH: ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61
+
+jobs:
+  schema_driven_static:
+    name: M5 · schema-driven validator redesign · zero operational capabilities
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar rama y ejecución estática única
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = 'push'
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test ! -f tools/orbit360-m5-runtime-smoke-526-request-v20260729.json
+
+      - name: Preflight canónico 5.0.27 sin identidad
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m5-control-plane-redesign-527-v20260729.mjs
+          node --check tools/orbit360-contract-shape-reader-v20260729.mjs
+          node --check tools/orbit360-contract-shape-reader-fixtures-v20260729.mjs
+          node --check tools/orbit360-m5-runtime-smoke-525-contract-schema-driven-v20260729.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="5.0.27" and .candidateRuntimeContractVersion=="5.0.25" and .failed==0 and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==42 and .remoteAssetsExpected==25 and .remoteAssetsMatched==25 and .singleShapeOwner=="tools/orbit360-responsive-title-resolver-contract-v20260729.json" and .contractShapeReaderVersion=="20260729.1" and .candidateBrowserBlobSha=="70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12" and .candidateCloserBlobSha=="bf9301d1ed8bfa5d75f8d17924bd6685c520cb94" and .productProtectedUnchanged==true and .capabilityProfile.secrets==false and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==false and .capabilityProfile.production==false and .dataAccess==false and .secretAccess==false and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.ok==true and .status=="M5_RUNTIME_SMOKE_525_CONTRACT_PASS" and .failed==0 and .schemaDriven==true and .contractShapeReaderVersion=="20260729.1" and .responsiveTitleResolverVersion=="20260729.1" and .productProtectedUnchanged==true' "$ORBIT360_EVIDENCE_DIR/m5-runtime-smoke-525-contract-summary.json" >/dev/null
+          jq -e '.status=="M5_CONTROL_PLANE_REDESIGN_527_STATIC_PASS" and .failed==0 and .runtimeExecuted==false and .browserExecuted==false and .secretsRead==false and .firestoreRead==false' "$ORBIT360_EVIDENCE_DIR/m5-control-plane-redesign-527-summary.json" >/dev/null
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-control-plane-redesign-527-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-525-contract-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-control-plane-redesign-527-summary.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publicar estado observable sanitizado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          SUMMARY_PATH: orbit360-platform/runtime-gate-crm-v20260716/m5-control-plane-redesign-527-summary.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='M5 5.0.27 schema redesign failed';
+            try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY_PATH,'utf8'));if(s.status==='M5_CONTROL_PLANE_REDESIGN_527_STATIC_PASS'&&s.failed===0){state='success';description='M5 5.0.27 schema-driven static PASS';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-control-plane-redesign-527',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
