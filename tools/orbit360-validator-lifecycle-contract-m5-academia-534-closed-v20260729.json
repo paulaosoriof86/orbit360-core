@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-academia-534-closed-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.34",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "classification":"M5_POST_ACCESS_RC_READINESS_STATIC",
+  "executionProfile":{"phase":"M5_POST_ACCESS_RC_READINESS_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
+  "baseline":{"controlOverlay":"tools/orbit360-m5-release-candidate-control-overlay-534-v20260729.json","status":"M5_ACADEMIA_REMEDIATION_534_STATIC_PASS_NEW_RC_READY_TO_REQUEST_HOSTING_AUTHORIZATION","releaseCandidateHash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7","criticalAssets":44,"remoteAssetsExpected":27,"remoteAssetsMatched":26,"mismatchPaths":["data/academia-plus.js"]},
+  "authorization":{"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"REQUEST_NEW_ONE_SHOT_HOSTING_LAB_AUTHORIZATION_FOR_RC_401F87B1_44_27",
+  "containsPII":false,
+  "containsSecrets":false
+}
