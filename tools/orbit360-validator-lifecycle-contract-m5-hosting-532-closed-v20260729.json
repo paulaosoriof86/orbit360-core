@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-hosting-532-closed-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.32",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "classification":"M5_POST_ACCESS_RC_READINESS_STATIC",
+  "executionProfile":{"phase":"M5_POST_ACCESS_RC_READINESS_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
+  "baseline":{"controlOverlay":"tools/orbit360-m5-release-candidate-control-overlay-532-v20260729.json","freeze":"tools/orbit360-m5-hosting-delivery-532-freeze-v20260729.json","evidenceLedger":"tools/orbit360-m5-hosting-evidence-ledger-531-v20260729.json","releaseCandidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"remoteAssetsExpected":26,"remoteAssetsMatched":26},
+  "authorization":{"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"hostingAuthorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"REQUEST_NEW_EXPLICIT_ONE_SHOT_RUNTIME_LAB_AUTHORIZATION; visual review only after sanitized runtime ok:true",
+  "containsPII":false,
+  "containsSecrets":false
+}
