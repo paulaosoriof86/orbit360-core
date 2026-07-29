@@ -3,10 +3,11 @@
   "issuedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.14",
-  "status":"READY_FOR_PACKAGE_CHECK_BEFORE_ONE_RUNTIME_SMOKE_LAB",
+  "status":"REQUEST_CREATED_AWAITING_ONE_RUNTIME_SMOKE_LAB",
   "baseline":{"hosting513Closed":true,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","remoteAssetsExpected":25,"remoteAssetsMatched":25,"mismatchCount":0,"sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7,"missingClientCurrency":0},
+  "packageCheck":{"status":"M5_RUNTIME_SMOKE_514_PACKAGE_PASS","commit":"83a756a92ecb4b143ea37e9d917b676e7c1e12df","runId":30463967369,"jobId":90616924986,"artifactId":8728776931,"artifactDigest":"sha256:b856998a41adc975ba2cc9dbe29713c909eeaa06de4b9f832925582937248850"},
   "expected":{"countryCounts":{"GT":398,"CO":16,"REQUIERE_VALIDACION":0},"typeCounts":{"Persona":391,"Empresa":23},"academiaPolicyVersion":"20260729.2","backendRuntime":"20260717-2","bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs","countsStable":true,"digestsStable":true,"roleViews":["Dirección-desktop","Operativo-tablet","Asesor-mobile"]},
-  "authorization":{"explicitAuthorization":true,"runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"authorizationConsumed":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "authorization":{"explicitAuthorization":true,"runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"authorizationConsumed":false,"visualReviewAuthorized":false,"productionAuthorized":false},
   "forbidden":{"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"visualReview":true,"policies":true,"pólizas":true},
   "containsPII":false,
   "containsSecrets":false
