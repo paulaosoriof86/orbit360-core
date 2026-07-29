@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "orbit360-m5-runtime-smoke-package-check-request-v1",
+  "issuedAt": "2026-07-29",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "contractVersion": "5.0.5",
+  "releaseCandidateHash": "d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045",
+  "packageOnly": true,
+  "requestFileMustBeAbsent": true,
+  "secrets": false,
+  "firestoreRead": false,
+  "runtime": false,
+  "browser": false,
+  "deploy": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
