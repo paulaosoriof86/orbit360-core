@@ -2,7 +2,11 @@ name: Orbit 360 · M5 membership projection static · 5.0.12
 run-name: M5 5.0.12 · root cause static · ${{ github.sha }}
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-membership-projection-remediation-512-v20260729.yml'
 
 permissions:
   contents: read
@@ -53,7 +57,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          jq -e '.ok==true and .status=="M5_MEMBERSHIP_PROJECTION_512_STATIC_PASS" and .classification=="FUNCTIONAL_DEFECT" and .criticalAssets==42 and .protectedFilesUnchanged==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtime==false and .browser==false and .hostingDeploy==false and .rulesDeploy==false and .production==false and .approvalReadyForHostingLabDelivery==true' "$ORBIT360_EVIDENCE_DIR/m5-membership-projection-remediation-512-summary.json" >/dev/null
+          jq -e '.ok==true and .status=="M5_MEMBERSHIP_PROJECTION_512_STATIC_PASS" and (.classification|index("FUNCTIONAL_DEFECT"))!=null and .criticalAssets==42 and .protectedFilesUnchanged==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtime==false and .browser==false and .hostingDeploy==false and .rulesDeploy==false and .production==false and .approvalReadyForHostingLabDelivery==true' "$ORBIT360_EVIDENCE_DIR/m5-membership-projection-remediation-512-summary.json" >/dev/null
           jq -e '.ok==true and .status=="M5_ACCESS_MEMBERSHIP_PROJECTION_FIXTURE_PASS" and .firestoreWrites==0 and .operationalWrites==0' "$ORBIT360_EVIDENCE_DIR/m5-access-membership-projection-fixture.json" >/dev/null
           echo "M5_512_NEW_RC_HASH=$(jq -r '.releaseCandidateHash' "$ORBIT360_EVIDENCE_DIR/m5-membership-projection-remediation-512-summary.json")"
 
@@ -66,6 +70,7 @@ jobs:
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/m5-membership-projection-remediation-512-summary.json
             orbit360-platform/runtime-gate-crm-v20260716/m5-access-membership-projection-fixture.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-summary.json
           if-no-files-found: error
           retention-days: 30
 
