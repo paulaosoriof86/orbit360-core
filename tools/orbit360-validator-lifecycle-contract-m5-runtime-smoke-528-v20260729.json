@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-v9",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.28",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"post-527-schema-driven-runtime-one-shot-v1",
+  "classification":"LAB_RUNTIME_GATE",
+  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_one_shot_request_after_package_pass"},
+  "baseline":{"controlPlane527Closed":true,"controlPlane527Status":"M5_CONTROL_PLANE_REDESIGN_527_STATIC_PASS","candidateRuntimeContractVersion":"5.0.25","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeExecuted":false,"schemaDrivenCandidateContract":"tools/orbit360-m5-runtime-smoke-525-contract-schema-driven-v20260729.mjs"},
+  "authorization":{"authorizationSource":"user_autorizado_20260729_after_control_plane_527_pass","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"authorizationConsumed":false,"firestoreWriteAuthorized":false,"operationalWritesAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
+  "nextRequiredDecision":"PACKAGE_PASS_THEN_CREATE_IMMUTABLE_REQUEST_AND_EXECUTE_EXACTLY_ONE_RUNTIME_525",
+  "containsPII":false,
+  "containsSecrets":false
+}
