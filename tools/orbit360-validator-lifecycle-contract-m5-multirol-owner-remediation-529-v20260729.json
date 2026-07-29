@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-multirol-owner-remediation-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.29",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "classification":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC",
+  "executionProfile":{"phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
+  "baseline":{"runtime528Closed":true,"runtime528RunId":30486294373,"runtime528FirstFailure":"MOBILE_MENU_INCOMPLETE:11","runtime528Classification":"FUNCTIONAL_DEFECT","priorReleaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61"},
+  "remediation":{"compatibilityOwner":"orbit360-platform/core/session-multirol-visibility-v20260716.js","compatibilityOwnerVersion":"20260729.2","canonicalAccessOwnerVersion":"20260729.3","pwaOwner":"orbit360-platform/sw.js","pwaCacheGeneration":"orbit360-v20260729-11-multirol-owner","fixture":"tools/orbit360-m5-multirol-owner-remediation-529-fixture-v20260729.mjs"},
+  "authorization":{"source":"root_cause_followthrough_after_consumed_runtime_528","staticRemediationAuthorized":true,"allowedExecutions":1,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false,"visualReviewAuthorized":false},
+  "nextRequiredDecision":"RUN_EXACTLY_ONE_STATIC_529; on PASS compute/deliver a new LAB release candidate only with separate Hosting authorization",
+  "containsPII":false,
+  "containsSecrets":false
+}
