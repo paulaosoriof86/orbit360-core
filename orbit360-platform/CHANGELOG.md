@@ -2,102 +2,100 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operativo vigente se mantiene en la rama obligatoria y PR #5 draft/open, sin merge ni producción salvo autorización explícita.
 
+## [M5-5.0.9] — 2026-07-29 UTC · Remediación de causa raíz + RC f6dfa37e
+### Fixed
+- `index.html` carga `core/academia-static-content-write-policy-v20260729.js` después del store base y antes de la asignación del store Firestore, `seed.js` y los scripts Academia.
+- El owner intercepta sincrónicamente `Orbit.store = api`; `lecciones`, `evaluaciones` y `config/academia` versionados se montan en sesión sin llamadas durables.
+- Añadido `tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs` para normalizar evidencia de scripts string u objeto durante todo el bootstrap.
+- El nuevo gate valida el orden runtime real y no solo presencia textual del owner dentro del addendum.
+### Verified
+- Run `30421741635`, job `90479808034`, artifact `8712155374`, digest `sha256:3c2d18d0bc64a4c7792b95cd96383a7dbb3c0f76f4abb813e5a84f11c538e328`.
+- Preflight 15/15; contrato 40/40; fixture de orden/store 19/19; fixture normalizador 7/7.
+- `data/store-firestore-lab.local.js` y `core/backend-lab-loader.js` permanecen sin cambios respecto al baseline protegido.
+- Cero secrets, Firestore, runtime, navegador, deploy o escrituras operativas.
+- Nueva RC `f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324`, activos críticos 42/42.
+- LAB 24/25; única diferencia `index.html`.
+### State
+- `M5_RUNTIME_508_ROOT_CAUSE_REMEDIATION_STATIC_CLOSED_NEW_RC_READY_FOR_LAB_DELIVERY`.
+- Static gate consumido. Hosting, runtime y revisión visual bloqueados hasta autorizaciones independientes.
+
+## [M5-5.0.8] — 2026-07-29 UTC · Runtime smoke stop-line sobre RC b25bf275
+### Verified
+- Package run `30420595908`, job `90476400727`, artifact `8711751664`, digest `sha256:ee2d4ad2c333bd4805dd18bce9622bbd1bc1991e83e34e8298ecbfdab96f62b1`.
+- Runtime ejecutado exactamente una vez: run `30420738744`, job `90476816222`, artifact `8711820943`, digest `sha256:8809e9fbd4d9e829453e111ee1fc4b5ef4890cca4cf1200dae501772327adea9`.
+- Preflight 15/15; contrato 37/37; snapshots 11/11 antes y 11/11 después.
+- Conteos y digests idénticos; Firestore writes 0; operational writes 0.
+### Root cause
+- `VALIDATOR_STALE` + `PIPELINE_MECHANISM_FAILURE`: rutas parseadas almacenadas como strings mientras el helper esperaba `{path}`.
+- `FUNCTIONAL_DEFECT` + `DATA_CONTRACT_FAILURE`: owner Academia cargado tarde; intentos automáticos en `lecciones`, `evaluaciones` y `config` fueron rechazados por Rules.
+- `VALIDATOR_STALE` + `PIPELINE_MECHANISM_FAILURE`: el gate estático 5.0.6 no validaba el orden real de `index.html`.
+### State
+- `M5_RUNTIME_SMOKE_LAB_FAILED_STOP_LINE` cerrado.
+- Autorización runtime consumida; navegador no repetido; revisión visual no habilitada.
+
 ## [M5-5.0.7] — 2026-07-29 UTC · Hosting LAB RC b25bf275 + paridad 25/25
 ### Changed
 - Entregada exactamente una vez al canal Hosting LAB la RC `b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091`.
 - Publicados el preview con runtime canónico, el addendum operativo de Academia y el owner de contenido estático LAB junto con la candidata completa.
-- El validador de readiness ahora usa el cierre durable 5.0.6 y trata el fixture efímero de Academia como evidencia opcional.
+- El validador de readiness usa el cierre durable 5.0.6 y trata el fixture efímero de Academia como evidencia opcional.
 ### Verified
 - Package run `30417610407`, job `90467411035`, artifact `8710708337`, digest `sha256:4c861ebebcedb84bee5a31a797845b9edb2a5df15fd935fb945f992ed09a4307`.
 - Delivery run `30417743516`, job `90467807470`, artifact `8710762943`, digest `sha256:eca16e06d89a9accb29c98a7d36ed2719bac869fab451f87165c81e0da845669`.
 - Preflight 24/24; contrato Hosting 35/35; deploy executions 1.
 - Parity recovery run `30418258733`, job `90469348278`, artifact `8710924084`, digest `sha256:accbc8ea34cabe7daf657b1ae2dd7968d76b9d2805c2a03200a6ad04e45d80cf`.
-- Contrato de recuperación 20/20; activos críticos 42/42; activos públicos 25/25; mismatches 0; remote parity true.
-- Cero Firestore reads/writes, cero escrituras operativas, cero runtime/browser, cero Functions/Rules/producción/main/merge/Pólizas.
+- Activos críticos 42/42; activos públicos 25/25; mismatches 0; remote parity true.
 ### Fixed
-- `PIPELINE_MECHANISM_FAILURE`: el primer package se ejecutó antes de activar el router 5.0.7; no accedió a secretos ni desplegó.
-- `PIPELINE_MECHANISM_FAILURE`: la revalidación posterior al deploy exigía un fixture efímero ausente; el deploy ya había pasado y no se repitió.
-- `PIPELINE_MECHANISM_FAILURE`: el contrato inicial de recuperación confundía un campo sanitizado con una referencia a Secrets; falló antes de consultar LAB y fue corregido de forma focal.
+- Tres `PIPELINE_MECHANISM_FAILURE` de ensamblaje/cierre fueron corregidos sin segundo deploy.
 ### State
 - `M5_LAB_HOSTING_DELIVERED_AND_25_OF_25_VERIFIED`.
-- Autorización Hosting y recuperación de paridad consumidas; redeploy no ejecutado.
-- Runtime smoke y revisión visual continúan bloqueados hasta autorizaciones independientes.
 
-## [M5-5.0.6] — 2026-07-29 UTC · Remediación estática Academia + nueva RC
+## [M5-5.0.6] — 2026-07-29 UTC · Remediación estática Academia + RC b25bf275
 ### Fixed
-- Separado el contenido estático versionado de Academia de las mutaciones durables en LAB mediante `core/academia-static-content-write-policy-v20260729.js` v`20260729.2`.
-- Cursos, lecciones, evaluaciones, seed y marcadores de contenido se montan transitoriamente en sesión; progreso, certificaciones, cursos creados y acciones operativas explícitas permanecen durables.
-- `ays-lab-preview.html` separa la revisión visual/PWA `20260723-10` del runtime backend canónico `20260717-2`.
-- `core/backend-lab-loader.js` fue restaurado exactamente a su baseline; `data/store-firestore-lab.local.js` no cambió.
+- Separado el contenido estático versionado de Academia de las mutaciones durables mediante `core/academia-static-content-write-policy-v20260729.js` v`20260729.2`.
+- `ays-lab-preview.html` separa revisión visual/PWA `20260723-10` de runtime backend `20260717-2`.
+- Loader y store LAB protegidos permanecen intactos.
 ### Verified
-- Package run `30415573496`, job `90461241309`, artifact `8710028296`, digest `sha256:3ae2d78a5239ed5be90ebb7ef87ec4148ce0baa84b59ff8de28faf2cf44e4495`.
-- Request run `30415732795`, job `90461724776`, artifact `8710079365`, digest `sha256:7d28bc0a43e30353a93c4aae975a87636e01f02e0f32cacfa5c4ef905a90cf1c`.
+- Package run `30415573496`; request run `30415732795`; artifact final `8710079365`.
 - Preflight 24/24; contrato estático 26/26; fixtures Academia 18/18.
-- Cero secrets, Firestore, runtime, navegador, deploy o escrituras operativas.
-- Nueva RC `b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091`, activos críticos 42/42.
-- LAB 22/25: preview y addendum Academia con hash anterior; nuevo owner Academia aún no publicado.
-### State
-- `M5_RUNTIME_SMOKE_REMEDIATION_STATIC_CLOSED_NEW_RC_READY_FOR_LAB_DELIVERY`.
-- Gate estático consumido.
+- Nueva RC `b25bf275…`, activos críticos 42/42.
 
-## [M5-5.0.5] — 2026-07-29 UTC · Runtime smoke stop-line
+## [M5-5.0.5] — 2026-07-29 UTC · Primer runtime stop-line
 ### Verified
-- Runtime smoke ejecutado exactamente una vez: run `30413481948`, job `90454714725`, artifact `8709301142`.
+- Runtime ejecutado exactamente una vez: run `30413481948`, job `90454714725`, artifact `8709301142`.
 - Preflight 17/17, contrato 29/29, snapshots antes/después 11/11.
-- Conteos y digests permanecieron idénticos; Firestore writes 0, operational writes 0, network write candidates 0.
-### Fixed
-- Clasificada la causa Academia como `FUNCTIONAL_DEFECT` + `DATA_CONTRACT_FAILURE`: contenido estático intentaba `Orbit.store.insert/update` durante bootstrap LAB.
-- Clasificada la deriva runtime como `VALIDATOR_STALE` + `PIPELINE_MECHANISM_FAILURE`: revisión visual confundida con runtime backend.
+- Firestore writes 0; operational writes 0; network write candidates 0.
 ### State
-- `M5_RUNTIME_SMOKE_LAB_FAILED_STOP_LINE` cerrado.
-- Autorización runtime consumida; no se repitió el navegador.
+- Autorización consumida; navegador no repetido.
 
 ## [M5-5.0.4] — 2026-07-29 UTC · Entrega Hosting LAB RC post-Access
 ### Changed
-- Entregada una sola vez al canal Hosting LAB la RC `d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045`.
-- Publicados `index.html`, taxonomía productiva de roles y owner fail-closed de sesión/selector junto con el resto de la candidata.
-- Corregido el generador de resumen del workflow: `??` ya no se mezcla con `||` sin paréntesis.
+- Entregada una sola vez la RC `d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045`.
 ### Verified
 - Run `30411375732`; job `90447991314`; artifact `8708510538`.
-- Digest: `sha256:fbe4ba382fe6d51294b2a08f17e2ba48a35e8b36dd0973303943cef8c631e1ec`.
-- Preflight canónico 16/16; contrato ejecutable 31/31.
-- Activos críticos 41/41; paridad pública LAB 24/24; cero diferencias.
-- Cero Firestore, escrituras operativas, navegador, Functions, Rules, producción, `main`, merge o Pólizas.
-### Fixed
-- `PIPELINE_MECHANISM_FAILURE` posterior al deploy: el status rojo fue causado exclusivamente por una expresión inválida en el resumen sanitizado; Hosting y la revalidación ya habían pasado.
-- No se ejecutó un segundo deploy; la autorización quedó consumida.
-### State
-- M5 5.0.4: `M5_LAB_HOSTING_DELIVERED_AND_24_OF_24_VERIFIED`.
+- Preflight 16/16; contrato 31/31; paridad 24/24.
+- Cero Firestore, navegador, Functions, Rules, producción, `main`, merge o Pólizas.
 
 ## [M4-4.2.11] — 2026-07-28 · Corrección durable 61 clientes GT/GTQ + cierre M4
 ### Changed
-- Aplicadas exactamente 61 correcciones autorizadas de Clientes: `pais=GT`, `moneda=GTQ`.
-- Escritura atómica confirmada con 61 snapshots durables, 61 eventos append-only y 61 updates de cliente.
+- Aplicadas exactamente 61 correcciones autorizadas: `pais=GT`, `moneda=GTQ`.
 - Los otros 353 clientes conservaron digest idéntico antes/después.
-- Moneda faltante restante: 0; conteos preservados: 414 clientes / 26 aseguradoras; overlay target-only 0/0.
 ### Verified
-- Preflight canónico: 27/27 PASS.
-- Contrato ejecutado: 43/43 PASS.
-- Run 30397573914: SUCCESS.
-- Rollback exacto disponible desde 61 snapshots; no ejecutado porque el post-write fue íntegramente verde.
+- Preflight 27/27; contrato 43/43; run `30397573914` SUCCESS.
+- Conteos preservados: 414 clientes / 26 aseguradoras; moneda faltante 0; target-only 0/0.
 - Sin escrituras de Aseguradoras, configuración, memberships, Rules, Hosting, Functions, producción, `main` o merge.
 ### State
 - M4: `M4_CLOSED_SUCCESS`.
-- Pólizas permanecen bloqueadas y requieren fuente real actual específica cuando llegue su bloque; la hoja histórica de producción no es sustituto válido.
+- Pólizas permanece bloqueado y requiere fuente real vigente específica.
 
 ## [1.93.0] — 2026-07-03 · Consolidado v1.56–v1.93
 > Entrada consolidada para realinear el CHANGELOG con la bitácora viva (`docs/BITACORA-CAMBIOS.md`).
 
 ### Contabilidad y Finanzas
-- **Regla contable recaudo ≠ `finmov`** (v1.83): el pago de póliza del cliente es recaudo comercial, no movimiento de caja.
-- **Factura a aseguradora = CxC, no caja**: el `finmov` de ingreso solo nace al cobrar.
-- **Conciliación de planillas de comisión**: compara esperado vs registrado.
-- **Config fiscal multi-tenant**: `tenant.paisesCfg` es fuente única de IVA/moneda/gastos por país.
+- Recaudo ≠ `finmov`; factura a aseguradora = CxC, no caja.
+- Conciliación de planillas de comisión y configuración fiscal multi-tenant.
 
 ### Arquitectura y saneamiento
-- **Sin `localStorage` directo en módulos**: capa `pref/setPref`; logo white-label vía `Orbit.tenant`.
-- **IA centralizada** en `Orbit.ia.complete`.
-- **Seed 100% ficticio / identidad ficticia**.
+- Sin `localStorage` directo en módulos; IA centralizada; seed e identidad ficticios.
 
 ### Módulos
 - Portal, Ops, Siniestros, Renovaciones, Insights, Pólizas, Historial, Reportes, Comisiones y Academia profundizados en el prototipo comercializable.
