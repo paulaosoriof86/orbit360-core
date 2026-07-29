@@ -12,95 +12,102 @@ Merge/main/producción: no autorizados
 M1: cerrado
 M2: cerrado
 M3: cerrado
-M4: cerrado / M4_CLOSED_SUCCESS_CANONICAL_TARGET_VERIFIED
-M5 5.0.1: readiness canónico cerrado
-M5 5.0.2: Access role/session boundary cerrado
-M5 5.0.3: RC post-Access cerrada
-M5 5.0.4: Hosting LAB RC d90ec601 cerrado 24/24
-M5 5.0.5: runtime smoke stop-line cerrado, cero escrituras
-M5 5.0.6: remediación estática Academia cerrada
-M5 5.0.7: RC b25bf275 entregada a Hosting LAB y verificada 25/25
-Bloque activo siguiente: autorización separada para un runtime smoke LAB
+M4: cerrado / destino canónico verificado
+M5 5.0.1–5.0.7: cerrados
+M5 5.0.8: runtime ejecutado una vez; stop-line cerrado, cero escrituras
+M5 5.0.9: remediación estática cerrada; nueva RC f6dfa37e
+Bloque activo siguiente: autorización separada para Hosting LAB de la nueva RC
 ```
 
-## M5 5.0.7 — Hosting LAB cerrado
+## M5 5.0.8 — runtime smoke stop-line
 
-Release candidate exacta:
+RC evaluada:
 
 ```txt
 b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091
 ```
 
-### Package check
-
 ```txt
-Commit: 4aa996d37b413a59b48135a728edffa3fd547dd6
-Run: 30417610407
-Job: 90467411035
-Artifact: 8710708337
-Digest: sha256:4c861ebebcedb84bee5a31a797845b9edb2a5df15fd935fb945f992ed09a4307
-```
-
-### Entrega única Hosting LAB
-
-```txt
-Request commit: 98c28c188f00141476044628ca9a4a1d0ef6c43a
-Run: 30417743516
-Job: 90467807470
-Artifact: 8710762943
-Digest: sha256:eca16e06d89a9accb29c98a7d36ed2719bac869fab451f87165c81e0da845669
-Preflight: 24/24
-Contrato: 35/35
-Hosting deploy executions: 1
-```
-
-### Paridad pública final
-
-```txt
-Run: 30418258733
-Job: 90469348278
-Artifact: 8710924084
-Digest: sha256:accbc8ea34cabe7daf657b1ae2dd7968d76b9d2805c2a03200a6ad04e45d80cf
-Contrato recuperación: 20/20
-Activos críticos: 42/42
-Activos públicos: 25/25
-Mismatches: 0
-Remote parity: true
-Redeploy: no
-```
-
-La entrega se ejecutó una sola vez. La primera revalidación automática posterior falló por una dependencia efímera del validador, no por Hosting ni por el producto. El mecanismo se corrigió para usar el cierre durable 5.0.6 y la paridad se recuperó sin secretos, Firebase CLI ni segundo deploy.
-
-## Runtime smoke 5.0.5 y remediación 5.0.6
-
-La ejecución 5.0.5 fue detenida correctamente por la guarda de cero escritura:
-
-```txt
-Run: 30413481948
-Artifact: 8709301142
-Preflight: 17/17
-Contrato: 29/29
-Snapshots antes/después: estables
+Package run: 30420595908
+Package artifact: 8711751664
+Runtime run: 30420738744
+Runtime job: 90476816222
+Runtime artifact: 8711820943
+Runtime digest: sha256:8809e9fbd4d9e829453e111ee1fc4b5ef4890cca4cf1200dae501772327adea9
+Preflight: 15/15
+Contrato: 37/37
+Snapshots: 11/11 antes y 11/11 después
+Counts/digests: estables
 Firestore writes: 0
 Operational writes: 0
+Runtime/browser executions: 1/1
 ```
 
-Causas raíces cerradas:
+### Causas raíces
 
-- `FUNCTIONAL_DEFECT` + `DATA_CONTRACT_FAILURE`: addenda estática de Academia intentaba escrituras durables durante bootstrap LAB.
-- `VALIDATOR_STALE` + `PIPELINE_MECHANISM_FAILURE`: revisión visual `20260723-10` confundida con runtime backend `20260717-2`.
+1. `VALIDATOR_STALE` + `PIPELINE_MECHANISM_FAILURE`: el runner entregaba rutas parseadas como strings y el helper esperaba objetos `{path}`.
+2. `FUNCTIONAL_DEFECT` + `DATA_CONTRACT_FAILURE`: el owner de contenido estático se cargaba tarde; durante bootstrap se intentaron operaciones en `lecciones`, `evaluaciones` y `config`.
+3. `VALIDATOR_STALE` + `PIPELINE_MECHANISM_FAILURE`: el gate 5.0.6 validaba presencia textual, no orden real de carga.
 
-La política `core/academia-static-content-write-policy-v20260729.js` v`20260729.2` monta seed y contenido versionado de Academia de forma transitoria en LAB, conserva progreso/certificaciones y mantiene durables únicamente las mutaciones explícitas del usuario.
+Firestore Rules rechazó los intentos y los snapshots demostraron cero cambios durables. La autorización runtime quedó consumida; no se repitió el navegador.
 
-## Cierre M4 preservado
+## M5 5.0.9 — remediación estática cerrada
+
+### Corrección funcional
+
+`index.html` carga ahora:
+
+```txt
+data/store.js
+→ core/academia-static-content-write-policy-v20260729.js
+→ data/store-firestore-lab.local.js
+→ data/seed.js
+→ scripts Academia
+```
+
+El owner intercepta sincrónicamente `Orbit.store = api` y clasifica como transitorios los contenidos versionados antes de cualquier llamada durable. El adaptador Firestore y el loader LAB protegidos no fueron modificados.
+
+### Corrección de evidencia
+
+`tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs` normaliza filas string u objeto durante toda la espera del bootstrap. El próximo runtime deberá consumir este owner.
+
+### Evidencia
+
+```txt
+Commit: c48ed4542faca902f296bf0adf6936e2ba23077b
+Run: 30421741635
+Job: 90479808034
+Artifact: 8712155374
+Digest: sha256:3c2d18d0bc64a4c7792b95cd96383a7dbb3c0f76f4abb813e5a84f11c538e328
+Preflight: 15/15
+Contrato: 40/40
+Fixture orden/store: 19/19
+Fixture normalizador: 7/7
+Secrets/Firestore/runtime/browser/deploy: no/no/no/no/no
+```
+
+## Nueva release candidate
+
+```txt
+RC anterior: b25bf2750548651a719526bc4dadf7662def2255876c4dadf7662def2255876c4c2e5e32bdf90f93a091
+RC nueva: f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324
+Activos críticos: 42/42
+Activos públicos LAB: 24/25
+Mismatches: 1
+Única diferencia: index.html
+Estado: M5_RC_READY_LAB_DELIVERY_REQUIRED
+```
+
+## Baseline canónico preservado
 
 ```txt
 source: 414 clientes / 26 aseguradoras
 canonical target: 1 configuración / 1 membership / 414 clientes / 26 aseguradoras
-61 correcciones GT/GTQ preservadas
-moneda faltante restante: 0
-target-only: 0/0
 asesores: 7
+GT/CO: 398/16
+Persona/Empresa: 391/23
+moneda faltante: 0
+target-only: 0/0
 ```
 
 No se tocaron Pólizas ni otras fuentes reales.
@@ -108,9 +115,9 @@ No se tocaron Pólizas ni otras fuentes reales.
 ## Límite de autorización actual
 
 ```txt
+staticRemediationAuthorized: false
 hostingDeployAuthorized: false
 allowedHostingDeployExecutions: 0
-publicParityRecoveryAuthorized: false
 runtimeSmokeAuthorized: false
 allowedRuntimeSmokeExecutions: 0
 visualReviewAuthorized: false
@@ -121,19 +128,21 @@ policiesAuthorized: false
 ## Siguiente acción operativa
 
 ```txt
-Solicitar autorización explícita para una sola ejecución runtime smoke LAB
-sobre la RC b25bf275…, sin nuevo deploy y con cero escrituras.
+Solicitar autorización explícita para una única entrega Hosting LAB
+sobre la RC f6dfa37e…, sin Firestore, runtime, navegador,
+Functions, Rules, producción, main, merge ni Pólizas.
+Después exigir paridad pública 25/25.
 ```
 
-El runtime podrá usar lectura Firestore read-only únicamente si su gate separado la requiere. Solo después de evidencia sanitizada `ok:true` podrá habilitarse la revisión visual única.
+Solo después podrá solicitarse otro runtime smoke independiente. Ese gate deberá usar el owner normalizado de evidencia y mantener cero escrituras.
 
-No se inicia Pólizas dentro de M5. Cuando el Plan Maestro llegue al bloque Pólizas se debe solicitar a Paula el listado/base actual y vigente específico; `Listado producción 2025-2026` no es una fuente válida de Pólizas. La misma regla aplica a Vehículos, Recibos/cartera, Cobros, planillas, financiero, siniestros y documentos: cada fuente real se solicita cuando su bloque la necesite.
+No se inicia Pólizas dentro de M5. Cuando el Plan Maestro llegue al bloque Pólizas se debe solicitar a Paula la fuente actual, vigente y específica; `Listado producción 2025-2026` no es una fuente válida de Pólizas.
 
 ## Metodología vigente
 
-Antes de modificar: verificar PR, rama, HEAD, freeze, registro contractual y evidencia más reciente. Antes de secrets, Firebase, sincronización, deploy LAB o navegador: ejecutar el preflight canónico del gate. Si la misma etapa o código falla dos veces, detener reintentos y diagnosticar causa raíz. No corregir producto si el fallo es `VALIDATOR_STALE`, `ENVIRONMENT_FAILURE` o `PIPELINE_MECHANISM_FAILURE`.
+Antes de modificar: verificar PR, rama, HEAD, freeze, registro contractual y evidencia más reciente. Antes de secretos, Firebase, sincronización, deploy LAB o navegador: ejecutar el preflight canónico del gate. Si la misma etapa o código falla dos veces, detener reintentos y diagnosticar causa raíz.
 
-Un status rojo no prueba por sí mismo un defecto funcional. Debe identificarse la etapa exacta y comprobarse si el resultado operativo ocurrió antes del fallo del mecanismo de cierre.
+Un status rojo no prueba por sí mismo un defecto funcional. Debe identificarse la etapa exacta, comprobar si hubo resultado operativo y comparar snapshots/digests antes de corregir o reintentar.
 
 ## Arquitectura y capa de datos
 
@@ -148,7 +157,7 @@ orbit360-platform/
 └── tools/
 ```
 
-Los módulos usan exclusivamente `Orbit.store`. El backend adapta el store sin romper su API pública ni introducir persistencia operativa directa en módulos.
+Los módulos usan exclusivamente `Orbit.store`. El backend adapta el store sin romper su API pública ni introducir persistencia directa en módulos.
 
 ### Carriles permanentes
 
