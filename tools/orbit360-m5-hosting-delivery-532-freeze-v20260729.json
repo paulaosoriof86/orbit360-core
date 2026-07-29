@@ -1,0 +1,15 @@
+{
+  "schemaVersion":"orbit360-m5-hosting-delivery-532-freeze-v1",
+  "issuedAt":"2026-07-29",
+  "closedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.32",
+  "status":"M5_HOSTING_532_DELIVERED_AND_26_OF_26_VERIFIED_CLOSED",
+  "candidate":{"hash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"remoteAssetsExpected":26},
+  "package":{"commit":"f77e3451fc69c9a9be2136f8803bec46a8868523","runId":30492607881,"jobId":90713882472,"artifactId":8740294701,"artifactDigest":"sha256:64088d0fd5e6f00dba393194329e16a3120f52d9664176811032ca63eeb310c0","status":"PASS","remoteAssetsMatched":24,"mismatchCount":2},
+  "delivery":{"authorizedBaseCommit":"6179fc28cafb560fff8827aa27ab5242322d2af8","requestCommit":"8b4962c7a5fb2be93e64b27eec49791435edecdb","runId":30492948609,"jobId":90715009262,"artifactId":8740453250,"artifactDigest":"sha256:1cfdad19adb237d3377c99aa5ba69be52c58acea43c2e94566b49a45d2124447","status":"M5_HOSTING_532_DELIVERED_AND_26_OF_26_VERIFIED","hostingDeployExecutions":1,"remoteAssetsMatchedBefore":24,"remoteAssetsMatchedAfter":26,"mismatchCountAfter":0,"remoteParityAfter":true,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "authorization":{"authorizationSource":"user_autorizado_hosting_nuevo_20260729_post_531","hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"requestCreated":true,"authorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "controls":{"packageWorkflowFrozen":true,"deliveryWorkflowFrozen":true,"hostingRerunForbidden":true,"runtimeRequiresNewExplicitAuthorization":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
