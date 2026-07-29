@@ -2,6 +2,24 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operativo vigente se mantiene en la rama obligatoria y PR #5 draft/open, sin merge ni producción salvo autorización explícita.
 
+## [M5-5.0.4] — 2026-07-29 UTC · Entrega Hosting LAB RC post-Access
+### Changed
+- Entregada una sola vez al canal Hosting LAB la RC `d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045`.
+- Publicados `index.html`, taxonomía productiva de roles y owner fail-closed de sesión/selector junto con el resto de la candidata.
+- Corregido el generador de resumen del workflow: `??` ya no se mezcla con `||` sin paréntesis.
+### Verified
+- Run `30411375732`; job `90447991314`; artifact `8708510538`.
+- Digest: `sha256:fbe4ba382fe6d51294b2a08f17e2ba48a35e8b36dd0973303943cef8c631e1ec`.
+- Preflight canónico 16/16; contrato ejecutable 31/31.
+- Activos críticos 41/41; paridad pública LAB 24/24; cero diferencias.
+- Cero Firestore, escrituras operativas, navegador, Functions, Rules, producción, `main`, merge o Pólizas.
+### Fixed
+- `PIPELINE_MECHANISM_FAILURE` posterior al deploy: el status rojo fue causado exclusivamente por una expresión inválida en el resumen sanitizado; Hosting y la revalidación ya habían pasado.
+- No se ejecutó un segundo deploy; la autorización quedó consumida.
+### State
+- M5 5.0.4: `M5_LAB_HOSTING_DELIVERED_AND_24_OF_24_VERIFIED`.
+- Runtime smoke y revisión visual permanecen bloqueados hasta autorización explícita separada.
+
 ## [M4-4.2.11] — 2026-07-28 · Corrección durable 61 clientes GT/GTQ + cierre M4
 ### Changed
 - Aplicadas exactamente 61 correcciones autorizadas de Clientes: `pais=GT`, `moneda=GTQ`.
@@ -78,59 +96,3 @@ Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operat
 ### Added — Plantillas
 - **Editor completo** (drawer): emoji, nombre, canal (WhatsApp/Correo/Ambos/PDF), categoría, asunto (correo/PDF) y mensaje, con **9 chips de variables insertables** en el cursor.
 - **CRUD**: crear, editar, **duplicar** y eliminar.
-- **KPIs clicables** (total/WhatsApp/correo/PDF) que filtran por canal + buscador + filtros por canal/categoría.
-- **"Usar"**: elige un cliente real, **resuelve las variables** ({nombre}/{poliza}/{monto}/{vence}/{ramo}/{aseguradora}/{asesor}/{placa}) con datos del store, y enruta a **WhatsApp** (wa.me con teléfono del cliente) o **Redactar correo** (abre el compositor de Correo con asunto+cuerpo+cliente prellenados) o copiar.
-
-## [1.49.0] — 2026-07-01 · Contrato de datos + docs de migración (backend P0)
-### Added
-- **`Orbit.store._emit(collection)` público** — antes privado; permite a la capa backend emitir eventos de cambio manualmente. API pública confirmada: `all, get, where, find, insert, update, remove, on, _emit, init, reseed, raw`.
-- **Docs nuevos para el LAB backend** (solicitados por el doc de pendientes 2026-07-01): `MEJORAS-DETECTADAS.md` (contrato de datos + colecciones + mejoras a preservar), `BITACORA-ERRORES.md` (E-01..E-04 resueltos + plantilla), `BITACORA-CAMBIOS.md` (v1.42→v1.49), `REPORTE-SMOKE.md` (flujos críticos verificados).
-
-## [1.48.0] — 2026-07-01 · Calidad de datos: edición inline
-### Added — Calidad
-- **✏ Completar inline**: cada cliente incompleto abre solo sus campos faltantes; al guardar sale de la lista (re-render) con toast de conteo restante.
-
-## [1.47.0] — 2026-07-01 · Cotizador marca→línea→modelo (3er nivel)
-### Added — Cotizador
-- **3er nivel de vehículo**: además de marca→línea, ahora hay **Modelo / Versión** (`VEH_MODELOS` con versiones específicas por línea popular + fallback de trims genéricos, editable en migración). Al cambiar marca se reinicia línea+modelo; al cambiar línea se recargan los modelos. Paridad con el Comparativo, que ya tenía los 3 niveles (incluido en su PDF).
-
-## [1.46.0] — 2026-07-01 · Metas inteligentes en Insights
-### Added — Insights
-- **Metas autoadministrables**: la vista Metas lee la colección editable `metas` del mes seleccionado (empresa: prima/recaudo/nueva/renovada) con fallback al split por asesor. La nota indica si la meta viene de la colección o de la base.
-- **✨ Sugerir metas del próximo mes**: botón que calcula metas por tendencia (promedio de los últimos 3 meses +10 %), permite ajustarlas y las guarda en la colección `metas` (upsert por mes/tipo) — quedan editables luego en Equipo.
-### Verified
-- **Comparativo general→particular** funciona en vivo: segmentos general/asesor/ramo/aseguradora (4), drill por mes (12 filas) y drill por fila del criterio, todos clicables con desglose de pólizas.
-
-## [1.45.0] — 2026-07-01 · Navegación cruzada en Cobros
-### Added — Cobros
-- **Quick "💳 Pagar" en la tabla**: cada recibo pendiente/vencido tiene botón para aplicar el pago directo desde el listado, sin abrir la ficha del recibo (`aplicarPago` extraído a función reutilizable, exportada).
-- **Navegación cruzada por fila**: el número de póliza es un enlace que abre el detalle de la póliza; el nombre del cliente ya abría su ficha. El drawer del recibo ahora tiene botones **👤 Ver cliente** y **📑 Ver póliza**.
-### Fixed
-- **Bug: la tabla no se refrescaba tras aplicar un pago** — el flujo re-renderizaba `mod-host` (inexistente) en vez de `host`. Corregido; el recibo pasa a Pagado/Conciliado y la lista se actualiza en el acto.
-
-## [1.44.0] — 2026-07-01 · Finanzas profundo (audit P0 §2.5)
-### Added — Finanzas
-- **KPIs clicables con desglose**: en Movimientos, CxC/CxP y Presupuesto, clic en cada KPI abre un modal (`drillKey`) con los registros que lo componen; cada fila abre el movimiento para ver/editar.
-- **CxC/CxP con detalle completo**: las filas ahora abren el drawer de movimiento (ver/editar/eliminar/cambiar estado + adjuntar); el badge de estado sigue permitiendo cambio rápido con un clic. El desglose aclara que las partidas pendientes **arrastran mes a mes** (se listan de todos los periodos).
-- **Presupuesto editable**: `+ Partida`, editar/eliminar por fila y **Replicar mes anterior** (`editarPresup`/`replicarPresup`), leyendo/escribiendo la colección `presupuesto` del store (se eliminó la lectura de arrays quemados).
-### Fixed
-- El presupuesto ejecutado ahora normaliza moneda (`norm`) al sumar egresos.
-
-## [1.43.0] — 2026-07-01 · Fecha dinámica + logo en login + inicio del audit funcional
-### Fixed — Login white-label
-- La franja del logo del cliente ahora es **cintilla blanca a sangre** separada del bloque oscuro por línea roja (3px); el logo resalta sobre blanco.
-- `Orbit.applyBrand()` se invoca también en `auth.showLogin()` → el logo/nombre del cliente aparecen **en la pantalla de login** (antes solo tras entrar).
-### Changed — Fecha dinámica (audit P0 §2.1/2.2/2.3)
-- `core/ui.js`: la fecha deja de estar quemada. `Orbit.ui.now()/monthLabel()/monthKey()/monthProgressPct()` derivan de un **ancla configurable** (`Orbit.tenant.demoDate`); el backend pasa a fecha real con `demoDate='real'` sin tocar módulos.
-- `modules/inicio.js`: etiqueta de mes dinámica (no "Junio 2026" quemado); metas leen la colección autoadministrable `metas` (fallback demo); días del mes calculados por mes real.
-- `core/novedades.js`: fecha del modal de bienvenida dinámica.
-### Note
-- Recibida `AUDITORIA-FUNCIONAL-CLAUDE-20260630.md` (ChatGPT/Paula). Es un roadmap de profundización P0/P1 multi-sesión; ver `docs/PENDIENTES-Y-MEJORAS.md`.
-
-## [1.41.0] — 2026-06-30 · Login limpio + doc de pendientes para migración
-### Changed — Login
-- Quitado el badge superior "PLATAFORMA SEGURA · ACCESO DEL EQUIPO".
-- Quitado el texto "Tu logo aquí · white-label" del footer; el slot del logo del cliente queda **centrado**.
-- En la versión comercializable el slot va vacío; el cliente carga su logo en Configuración.
-### Added
-- `docs/PENDIENTES-Y-MEJORAS.md` — estado honesto (listo vs requiere backend vs profundización), reglas de trabajo...
