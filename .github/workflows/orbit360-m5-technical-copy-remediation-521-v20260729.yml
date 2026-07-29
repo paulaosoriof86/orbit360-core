@@ -1,3 +1,4 @@
+# mechanism-revision: visible-dom-proxy-v2-final-attempt
 name: Orbit 360 · M5 technical-copy validator remediation · 5.0.21
 run-name: M5 5.0.21 · static technical-copy remediation · ${{ github.sha }}
 
@@ -56,13 +57,13 @@ jobs:
           node --check tools/orbit360-m5-runtime-smoke-522-browser-v20260729.mjs
           node --check tools/orbit360-m5-runtime-smoke-522-close-v20260729.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.ok==true and .status=="M5_TECHNICAL_COPY_REMEDIATION_521_STATIC_PASS" and .contractVersion=="5.0.21" and .classification=="VALIDATOR_STALE" and .releaseCandidateHash==env.EXPECTED_RC_HASH and .candidateRuntimeContractVersion=="5.0.22" and .visibleTechnicalCopyPredicateVersion=="20260729.1" and .productDefectDemonstrated==false and .whiteLabelAllowed==true and .isolatedLabBlocked==true and .historical518Unchanged==true and .productProtectedUnchanged==true and .candidateExecuted==false and .failed==0 and .passed==.total and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtime==false and .browser==false and .secrets==false and .deploy==false and .hostingDeploy==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .mergeMain==false and .visualReview==false and .policies==false and .["pólizas"]==false and .containsPII==false and .containsSecrets==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.ok==true and .status=="M5_TECHNICAL_COPY_REMEDIATION_521_STATIC_PASS" and .contractVersion=="5.0.21" and .classification=="VALIDATOR_STALE" and .releaseCandidateHash==env.EXPECTED_RC_HASH and .candidateRuntimeContractVersion=="5.0.22" and .visibleTechnicalCopyPredicateVersion=="20260729.1" and .productDefectDemonstrated==false and .sourceWideScanUsedAsVisibleCopyProxy==false and .whiteLabelAllowed==true and .isolatedLabBlocked==true and .historical518Unchanged==true and .productProtectedUnchanged==true and .candidateExecuted==false and .failed==0 and .passed==.total and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtime==false and .browser==false and .secrets==false and .deploy==false and .hostingDeploy==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .mergeMain==false and .visualReview==false and .policies==false and .["pólizas"]==false and .containsPII==false and .containsSecrets==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
 
       - name: Validar regresiones semánticas
         shell: bash
         run: |
           set -euo pipefail
-          jq -e '.ok==true and .failed==0 and .passed==.total and (.checks|map(select(.ok==false))|length)==0 and .rootCause=="bare_LAB_regex_alternative_matched_lab_substring_inside_White-label" and .whiteLabelAllowed==true and .isolatedLabBlocked==true and .historical518Unchanged==true and .productProtectedUnchanged==true' "$ORBIT360_EVIDENCE_DIR/m5-technical-copy-remediation-521-summary.json" >/dev/null
+          jq -e '.ok==true and .failed==0 and .passed==.total and (.checks|map(select(.ok==false))|length)==0 and .rootCause=="bare_LAB_regex_alternative_matched_lab_substring_inside_White-label" and .sourceWideScanUsedAsVisibleCopyProxy==false and .whiteLabelAllowed==true and .isolatedLabBlocked==true and .historical518Unchanged==true and .productProtectedUnchanged==true' "$ORBIT360_EVIDENCE_DIR/m5-technical-copy-remediation-521-summary.json" >/dev/null
 
       - name: Subir evidencia sanitizada
         if: always()
