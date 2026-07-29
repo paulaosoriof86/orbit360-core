@@ -1,14 +1,17 @@
 {
-  "schemaVersion":"orbit360-m5-control-plane-redesign-freeze-v1",
+  "schemaVersion":"orbit360-m5-control-plane-redesign-freeze-v2",
   "issuedAt":"2026-07-29",
+  "closedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.27",
-  "status":"M5_CONTROL_PLANE_REDESIGN_527_STATIC_AUTHORIZED_PENDING",
+  "status":"M5_CONTROL_PLANE_REDESIGN_527_STATIC_PASS_CLOSED",
   "authoritativeRuntimeState":"tools/orbit360-m5-release-candidate-stop-overlay-526-v20260729.json",
   "baseline":{"runtime526Stopped":true,"runtime525RequestCreated":false,"runtime525Executed":false,"runtimeAuthorizationInvalidated":true,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssets":42,"remoteAssetsMatched":25,"mismatchCount":0,"clients":414,"insurers":26,"advisors":7},
   "design":{"singleShapeOwner":"tools/orbit360-responsive-title-resolver-contract-v20260729.json","shapeReader":"tools/orbit360-contract-shape-reader-v20260729.mjs","shapeReaderVersion":"20260729.1","fixtures":"tools/orbit360-contract-shape-reader-fixtures-v20260729.mjs","schemaDrivenCandidateContract":"tools/orbit360-m5-runtime-smoke-525-contract-schema-driven-v20260729.mjs","historicalStaleContractPreserved":"tools/orbit360-m5-runtime-smoke-525-contract-v20260729.cjs"},
-  "authorization":{"staticRedesignAuthorized":true,"allowedExecutions":1,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"visualReviewAuthorized":false},
+  "evidence":{"commit":"320466cfcb08ad08e6ea0253bac1c410db31c2c2","runId":30484633453,"jobId":90687113637,"artifactId":8737091613,"artifactDigest":"sha256:b53db58f87ac63b4ce96fdb7cc2dac6a67490b70f9cd1758e5b9b22195dcb511","preflight":"16/16","schemaDrivenCandidateContract":"13/13","failed":0,"productProtectedUnchanged":true,"candidateBrowserBlobSha":"70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12","candidateCloserBlobSha":"bf9301d1ed8bfa5d75f8d17924bd6685c520cb94"},
+  "authorization":{"staticRedesignAuthorized":false,"allowedExecutions":0,"authorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"visualReviewAuthorized":false},
   "forbidden":{"secrets":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"runtime":true,"browser":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
+  "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_RUNTIME_AUTHORIZATION_FOR_CANDIDATE_5_0_25_USING_SCHEMA_DRIVEN_CONTROL_PLANE",
   "containsPII":false,
   "containsSecrets":false
 }
