@@ -1,0 +1,11 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m5-hosting-delivery-532-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.32",
+  "sourceControlPlane":"tools/orbit360-m5-release-candidate-control-overlay-531-v20260729.json",
+  "required":{"releaseCandidateHash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"remoteAssetsExpected":26,"remoteAssetsMatchedBefore":24,"mismatchCountBefore":2,"mismatchPathsBefore":["sw.js","core/session-multirol-visibility-v20260716.js"],"remoteAssetsMatchedAfter":26,"mismatchCountAfter":0,"remoteParityAfter":true,"hostingDeployExecutions":1,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "package":{"runId":30492607881,"jobId":90713882472,"artifactId":8740294701,"artifactDigest":"sha256:64088d0fd5e6f00dba393194329e16a3120f52d9664176811032ca63eeb310c0","status":"PASS"},
+  "containsPII":false,
+  "containsSecrets":false
+}
