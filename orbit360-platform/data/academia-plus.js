@@ -772,7 +772,7 @@ Orbit.ACADEMIA_PLUS = (function () {
       cursos.forEach(function (c) {
         var prev = byId[c.id];
         if (!prev) {
-          try { Orbit.store.insert('cursos', Object.assign({ progreso: 0, certificado: false, recursos: [] }, c)); } catch (e) {}
+          try { Orbit.store.insert('cursos', Object.assign({ progreso: 0, certificado: false, recursos: [], _cv: CONTENT_V }, c)); } catch (e) {}
         } else if ((prev._cv || 0) !== CONTENT_V) {
           // Actualiza CONTENIDO conservando el progreso/estado del usuario.
           try { Orbit.store.update('cursos', c.id, Object.assign({}, c, { _cv: CONTENT_V, progreso: prev.progreso || 0, certificado: !!prev.certificado })); } catch (e) {}
@@ -783,7 +783,7 @@ Orbit.ACADEMIA_PLUS = (function () {
   }
 
   // También lo dejamos en el SEED para que sobreviva a un reseed manual.
-  try { if (Orbit.SEED && Array.isArray(Orbit.SEED.cursos)) { var s = {}; Orbit.SEED.cursos.forEach(function (c) { s[c.id] = true; }); cursos.forEach(function (c) { if (!s[c.id]) Orbit.SEED.cursos.push(Object.assign({ progreso: 0, certificado: false, recursos: [] }, c)); }); } } catch (e) {}
+  try { if (Orbit.SEED && Array.isArray(Orbit.SEED.cursos)) { var s = {}; Orbit.SEED.cursos.forEach(function (c) { s[c.id] = true; }); cursos.forEach(function (c) { if (!s[c.id]) Orbit.SEED.cursos.push(Object.assign({ progreso: 0, certificado: false, recursos: [], _cv: CONTENT_V }, c)); }); } } catch (e) {}
 
   // Reintento hasta que el store esté listo.
   var tries = 0;
