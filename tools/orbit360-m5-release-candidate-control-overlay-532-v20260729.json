@@ -1,6 +1,7 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-532-v1",
+  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-532-v2",
   "issuedAt":"2026-07-29",
+  "closedAt":"2026-07-29",
   "authoritativeForCurrentM5ControlState":true,
   "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-531-v20260729.json","tools/orbit360-m5-hosting-delivery-532-freeze-v20260729.json"],
   "gateId":"block5-release-candidate-visualization-v20260728",
@@ -9,6 +10,8 @@
   "releaseCandidate":{"hash":"4bf3c8025654f43f6e4af20e5d16115bdc0851352ccddc6f099649405883cf3b","criticalAssets":43,"descriptor":"tools/orbit360-m5-release-candidate-descriptor-530-v20260729.json","packageInput":"tools/orbit360-m5-hosting-package-input-531-v20260729.json"},
   "publicParity":{"assetsExpected":26,"assetsMatched":26,"mismatchCount":0,"mismatchPaths":[],"remoteParity":true,"hostingDeliveryRequired":false},
   "hosting532":{"packageRunId":30492607881,"packageJobId":90713882472,"packageArtifactId":8740294701,"packageArtifactDigest":"sha256:64088d0fd5e6f00dba393194329e16a3120f52d9664176811032ca63eeb310c0","requestCommit":"8b4962c7a5fb2be93e64b27eec49791435edecdb","authorizedBaseCommit":"6179fc28cafb560fff8827aa27ab5242322d2af8","deliveryRunId":30492948609,"deliveryJobId":90715009262,"deliveryArtifactId":8740453250,"deliveryArtifactDigest":"sha256:1cfdad19adb237d3377c99aa5ba69be52c58acea43c2e94566b49a45d2124447","hostingDeployExecutions":1,"workflowFrozen":true},
+  "closureVerification":{"commit":"d1e96d7d2647c7233ea640a99586548482ee4182","runId":30493362312,"jobId":90716375234,"artifactId":8740605103,"artifactDigest":"sha256:e3f7245114d79ee6eb9c5aa63dc59fe71def5dfb745b5b991a9efc2a598c1c91","status":"PASS","zeroCapabilities":true,"workflowFrozen":true},
+  "evidenceLedger":"tools/orbit360-m5-hosting-evidence-ledger-531-v20260729.json",
   "authorization":{"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"hostingAuthorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeRequestCreated":false,"visualReviewAuthorized":false,"productionAuthorized":false},
   "safety":{"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"policies":false,"pólizas":false},
   "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_RUNTIME_LAB_AUTHORIZATION_ON_RC_4BF3C802_AFTER_HOSTING_26_OF_26; visual review remains blocked until sanitized runtime ok:true",
