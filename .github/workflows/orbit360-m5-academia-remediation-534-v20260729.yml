@@ -1,0 +1,96 @@
+name: Orbit 360 · M5 5.0.34 Academia remediation static gate
+run-name: M5 5.0.34 · static root-cause validation 44/27 · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-m5-academia-remediation-534-v20260729.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-m5-academia-remediation-534-v20260729
+  cancel-in-progress: false
+
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  static_remediation:
+    name: M5 · Academia root-cause remediation · zero capabilities
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar rama y ejecución única
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = 'push'
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Ejecutar preflight canónico 5.0.34
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m5-academia-remediation-534-v20260729.mjs
+          node --check tools/orbit360-m5-academia-static-marker-fixture-534-v20260729.mjs
+          node --check tools/orbit360-m5-release-candidate-readiness-534-v20260729.mjs
+          node --check tools/orbit360-m5-runtime-smoke-534-browser-adapter-v20260729.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="M5_ACADEMIA_REMEDIATION_534_STATIC_PASS" and .contractVersion=="5.0.34" and .executionPhase=="M5_VALIDATOR_REDESIGN_STATIC" and .failed==0 and .executionAuthorized==false and .allowedExecutions==0 and .criticalAssets==44 and .remoteAssetsExpected==27 and .remoteAssetsMatched==26 and .mismatchCount==1 and .mismatchPaths==["data/academia-plus.js"] and .approvalReadyForLabDelivery==true and .runtimeAuthorizationConsumed==true and .runtimeSmokeAuthorized==false and .hostingLabDeliveryAuthorized==false and .visualReviewAuthorized==false and .capabilityProfile.secrets==false and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==false and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .secretsRead==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Validar fixture de política estricta y marcador
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.ok==true and .status=="M5_ACADEMIA_STATIC_MARKER_534_FIXTURE_PASS" and .failed==0 and .policyVersion=="20260729.2" and .policyBlobSha=="fa4c29d30a82673a7bf2d3d55efce52eaf4cccf3" and .academiaPlusContentVersion==8 and .strictPolicyPreserved==true and .adapterDerivedReadinessFixed==true and .criticalAssets==44 and .remoteAssetsExpected==27 and .secrets==false and .firestoreRead==false and .writes==false and .runtime==false and .browser==false and .deploy==false and .production==false' "$ORBIT360_EVIDENCE_DIR/m5-academia-static-marker-fixture-534-summary.json" >/dev/null
+
+      - name: Validar candidata y paridad pública 26/27
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.ok==true and .status=="M5_RC_534_STATIC_REMEDIATION_READY_LAB_DELIVERY_REQUIRED" and .releaseCandidate.criticalAssetCount==44 and .releaseCandidate.academiaPlusBound==true and .releaseCandidate.strictPolicyPreserved==true and .remoteLab.assetsExpected==27 and .remoteLab.assetsChecked==27 and .remoteLab.assetsMatched==26 and .remoteLab.mismatchCount==1 and .remoteLab.mismatchPaths==["data/academia-plus.js"] and .remoteLab.remoteParity==false and .remoteLab.expectedSinglePendingAcademiaPlus==true and .approvalReadyForLabDelivery==true and .approvalReadyForRuntimeSmoke==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .browser==false and .runtime==false and .deploy==false and .production==false' "$ORBIT360_EVIDENCE_DIR/m5-release-candidate-readiness-534-summary.json" >/dev/null
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-academia-remediation-534-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-academia-static-marker-fixture-534-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-534-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-manifest-534.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='M5 5.0.34 static remediation failed';
+            try{const s=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(s.status==='M5_ACADEMIA_REMEDIATION_534_STATIC_PASS'&&s.failed===0&&s.remoteAssetsMatched===26&&s.mismatchCount===1){state='success';description='M5 5.0.34 static PASS; new RC 44/27; LAB 26/27';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-academia-remediation-534',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
