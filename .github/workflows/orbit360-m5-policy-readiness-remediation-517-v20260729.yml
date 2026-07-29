@@ -1,3 +1,4 @@
+# mechanism-revision: canonical-evidence-v2
 name: Orbit 360 · M5 policy readiness remediation · 5.0.17
 run-name: M5 5.0.17 · static policy readiness root cause · ${{ github.sha }}
 
