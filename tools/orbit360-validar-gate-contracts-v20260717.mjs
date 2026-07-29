@@ -31,7 +31,7 @@ const GATE_CONFIG=Object.freeze({
   "block4-final-canonical-migration-dryrun-v20260728":{contractVersion:"4.3.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-migration-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-migration-v20260728.mjs"},
   "block4-final-canonical-migration-write-v20260728":{contractVersion:"4.3.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-write-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-write-v20260728.mjs"},
   "block4-final-canonical-revalidation-readonly-v20260728":{contractVersion:"4.3.2",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-revalidation-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-revalidation-v20260728.mjs"},
-  "block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.17",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-policy-readiness-517-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-policy-readiness-517-v20260729.mjs"}
+  "block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.19",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-validator-redesign-519-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-validator-redesign-519-v20260729.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":ZERO,
@@ -50,6 +50,7 @@ const PHASE_PROFILES=Object.freeze({
   "M5_ACCESS_ROLE_BOUNDARY_STATIC":ZERO,
   "M5_POST_ACCESS_RC_READINESS_STATIC":ZERO,
   "M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC":ZERO,
+  "M5_VALIDATOR_REDESIGN_STATIC":ZERO,
   "M5_LAB_HOSTING_DELIVERY":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "LAB_DATA_CONTRACT_REPAIR_DRYRUN":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "LAB_DATA_CONTRACT_REPAIR_APPLY":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
