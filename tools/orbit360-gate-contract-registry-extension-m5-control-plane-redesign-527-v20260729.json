@@ -1,0 +1,20 @@
+{
+  "schemaVersion":"orbit360-gate-contract-registry-extension-v1",
+  "issuedAt":"2026-07-29",
+  "gates":[{
+    "gateId":"block5-release-candidate-visualization-v20260728",
+    "contractVersion":"5.0.27",
+    "candidateRuntimeContractVersion":"5.0.25",
+    "lifecycle":"tools/orbit360-validator-lifecycle-contract-m5-control-plane-redesign-527-v20260729.json",
+    "engine":"tools/orbit360-validar-gate-contracts-engine-m5-control-plane-redesign-527-v20260729.mjs",
+    "overlay":"tools/orbit360-gate-contract-overlay-m5-control-plane-redesign-527-v20260729.json",
+    "authorization":"tools/orbit360-m5-control-plane-redesign-527-authorization-v20260729.json",
+    "freeze":"tools/orbit360-m5-control-plane-redesign-527-freeze-v20260729.json",
+    "shapeOwner":"tools/orbit360-responsive-title-resolver-contract-v20260729.json",
+    "shapeReader":"tools/orbit360-contract-shape-reader-v20260729.mjs",
+    "fixtures":"tools/orbit360-contract-shape-reader-fixtures-v20260729.mjs",
+    "schemaDrivenCandidateContract":"tools/orbit360-m5-runtime-smoke-525-contract-schema-driven-v20260729.mjs"
+  }],
+  "containsPII":false,
+  "containsSecrets":false
+}
