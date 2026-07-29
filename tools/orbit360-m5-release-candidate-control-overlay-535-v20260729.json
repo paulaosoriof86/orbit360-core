@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-535-v1",
+  "issuedAt":"2026-07-29",
+  "authoritativeForCurrentM5ControlState":true,
+  "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-534-v20260729.json","tools/orbit360-m5-hosting-delivery-535-freeze-v20260729.json"],
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.35",
+  "candidateContractVersion":"5.0.34",
+  "status":"M5_HOSTING_535_CLOSED_27_OF_27_READY_TO_REQUEST_RUNTIME_AUTHORIZATION",
+  "releaseCandidate":{"hash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7","criticalAssets":44,"publicAssets":27,"descriptor":"tools/orbit360-m5-release-candidate-descriptor-534-v20260729.json","academiaPlusBound":true,"strictPolicyPreserved":true},
+  "publicParity":{"assetsExpected":27,"assetsMatched":27,"mismatchCount":0,"mismatchPaths":[],"remoteParity":true,"hostingDeliveryRequired":false},
+  "hosting535":{"closed":true,"packageRunId":30498488128,"deliveryRunId":30498827076,"deliveryJobId":90733704150,"artifactId":8742666048,"artifactDigest":"sha256:0af0933c0c2e520f888b833289634e35d4b5675638ed223ab9f1289babac8ad9","hostingDeployExecutions":1,"authorizationConsumed":true,"workflowFrozen":true},
+  "authorization":{"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"hostingAuthorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeRequestCreated":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "safety":{"secrets":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"policies":false,"pólizas":false},
+  "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_RUNTIME_AUTHORIZATION_FOR_RC_401F87B1_44_27_AFTER_HOSTING_535_27_OF_27; do not reuse runtime 5.0.33 authorization",
+  "containsPII":false,
+  "containsSecrets":false
+}
