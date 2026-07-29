@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-stop-overlay-v5",
+  "schemaVersion":"orbit360-m5-release-candidate-stop-overlay-v6",
   "issuedAt":"2026-07-29",
   "supersedesRuntimeAuthorizationStateIn":"tools/orbit360-m5-release-candidate-freeze-v20260728.json",
   "authoritativeForCurrentRuntimeAuthorizationState":true,
@@ -12,7 +12,7 @@
   "validator524":{"closed":true,"passed":28,"total":28,"productProtectedUnchanged":true},
   "packageAttempt1":{"runId":30481853743,"jobId":90677666777,"artifactId":8735962519,"digest":"sha256:b1554fc410626c021433352098c376d7aa74b8b5ad52930578adbce28be7ca0b","classification":["VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],"rootCause":"stale_staticAttempt_property_in_526_consumers"},
   "packageAttempt2":{"runId":30482337946,"jobId":90679336990,"artifactId":8736166610,"digest":"sha256:67b20e35de59d36a4b95e7f8e894549b6d2193bd67e578f4d6015ddd43f5622e","wrapperContract":"10/10 PASS","candidateContract":"13/14","failedCheck":"RESOLVER_CONTRACT","classification":["VALIDATOR_STALE","PIPELINE_MECHANISM_FAILURE"],"rootCause":"guessed_scopeFallback_schema_does_not_match_canonical_scopedExactTextFallback_and_insurerFicha"},
-  "runtime525":{"requestCreated":false,"executed":false,"authorizationConsumed":false,"authorizationInvalidated":true,"runtimeSmokeAuthorized":false,"allowedExecutions":0},
+  "runtime525":{"requestCreated":false,"executed":false,"authorizationConsumed":false,"authorizationInvalidated":true,"runtimeSmokeAuthorized":false,"allowedExecutions":0,"candidateBrowserBlobSha":"70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12"},
   "safety":{"secretsRead":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browserExecuted":false,"hostingDeploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"mergeMain":false,"visualReview":false,"pólizas":false},
   "controls":{"sameStageFailedTwice":true,"thirdPackageAttemptForbidden":true,"requestCreationForbidden":true,"runtimeWorkflowFrozen":true,"packageWorkflowFrozen":true,"newStaticRedesignRequiresNewUserContinuation":true},
   "nextAction":"NEW_STATIC_CONTROL_PLANE_REDESIGN_BLOCK; validators must read canonical schema/property paths directly; only after static PASS may a new explicit runtime authorization be requested",
