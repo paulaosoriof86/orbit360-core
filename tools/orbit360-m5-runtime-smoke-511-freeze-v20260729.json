@@ -1,15 +1,16 @@
 {
-  "schemaVersion":"orbit360-m5-runtime-smoke-freeze-v4",
+  "schemaVersion":"orbit360-m5-runtime-smoke-freeze-v5",
   "issuedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.11",
-  "status":"REQUEST_CREATED_AWAITING_ONE_RUNTIME_SMOKE_LAB",
+  "status":"M5_RUNTIME_SMOKE_511_FAILED_STOP_LINE_AUTHORIZATION_CONSUMED",
   "baseline":{"hosting510Closed":true,"hostingClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-lab-hosting-delivery-510-closure.json","releaseCandidateHash":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","criticalAssets":42,"remoteAssetsMatched":25,"remoteAssetsExpected":25,"sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7,"missingClientCurrency":0},
   "packageCheck":{"status":"M5_RUNTIME_SMOKE_511_PACKAGE_PASS","commit":"2394fa298cb948e558fbfbd6b42a21a2f5a71037","runId":30457621192,"jobId":90595169193,"artifactId":8726195633,"artifactDigest":"sha256:ed9f732c813b3feac10f2bdae1434661ed84cac3d00663d5ee739a4ed23c0a4e"},
+  "runtimeAttempt":{"status":"M5_RUNTIME_SMOKE_511_FAILED_STOP_LINE","requestCommit":"136cca57600c0aef146ad5b121aeb746a7d0dd4c","runId":30457847993,"jobId":90595950599,"artifactId":8726316517,"artifactDigest":"sha256:61740f99806fc8353d0f2cbddf5a48b8432c27ced33dbb2e5808a94372f4135e","preflight":"17/17","contract":"42/42","snapshots":"11/11_before_and_after","allCountsStable":true,"allDigestsStable":true,"firestoreWrites":0,"operationalWrites":0,"firstFailure":"MEMBERSHIP_BOUNDARY_NOT_ACTIVE","failureStage":"real_tenant_data","classification":"FUNCTIONAL_DEFECT"},
   "expected":{"countryCounts":{"GT":398,"CO":16,"REQUIERE_VALIDACION":0},"typeCounts":{"Persona":391,"Empresa":23},"academiaPolicyVersion":"20260729.2","backendRuntime":"20260717-2","bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs","beforeSnapshotChecks":"11/11","afterSnapshotChecks":"11/11","countsStable":true,"digestsStable":true,"blockedOperationalCalls":0,"networkWriteCandidates":0,"firestoreWrites":0,"operationalWrites":0},
-  "authorization":{"explicitAuthorization":true,"runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"authorizationConsumed":false,"visualReviewAuthorized":false},
+  "authorization":{"explicitAuthorization":true,"runtimeSmokeAuthorized":false,"allowedExecutions":0,"requestCreated":true,"authorizationConsumed":true,"visualReviewAuthorized":false},
   "forbidden":{"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
-  "nextAction":"CREATE_IMMUTABLE_REQUEST_BOUND_TO_CURRENT_PARENT_THEN_EXECUTE_EXACTLY_ONCE",
+  "nextAction":"STATIC_ROOT_CAUSE_REMEDIATION_MEMBERSHIP_PROJECTION_OWNER_NO_RUNTIME_NO_SECRETS",
   "containsPII":false,
   "containsSecrets":false
 }
