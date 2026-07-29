@@ -31,7 +31,7 @@ const GATE_CONFIG=Object.freeze({
   "block4-final-canonical-migration-dryrun-v20260728":{contractVersion:"4.3.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-migration-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-migration-v20260728.mjs"},
   "block4-final-canonical-migration-write-v20260728":{contractVersion:"4.3.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-write-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-write-v20260728.mjs"},
   "block4-final-canonical-revalidation-readonly-v20260728":{contractVersion:"4.3.2",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-revalidation-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-revalidation-v20260728.mjs"},
-  "block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.10",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-510-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-lab-hosting-delivery-510-v20260729.mjs"}
+  "block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.11",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-runtime-smoke-511-v20260729.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-runtime-smoke-511-v20260729.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":ZERO,
