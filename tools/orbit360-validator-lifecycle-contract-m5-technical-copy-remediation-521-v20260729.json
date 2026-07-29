@@ -1,0 +1,20 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-technical-copy-remediation-v1",
+  "issuedAt":"2026-07-29",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.21",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "controlPlaneRevision":"m5-technical-copy-word-boundary-validator-remediation-v1",
+  "classification":"VALIDATOR_STALE",
+  "executionProfile":{"phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"single_static_remediation_after_consumed_runtime"},
+  "baseline":{"runtime520Closed":true,"runtime520AuthorizationConsumed":true,"runtime520FirstFailure":"TECHNICAL_COPY_VISIBLE:desktopDirectionClient360","runtime520ZeroWrites":true,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61"},
+  "rootCause":{"historicalPredicate":"/Firebase|Firestore|localStorage|mock|smoke|dry-run|backend|LAB/i","falsePositiveVisibleText":"White-label","mechanism":"bare_LAB_alternative_matches_lab_substring_inside_label","productDefectDemonstrated":false},
+  "candidate":{"runtimeContractVersion":"5.0.22","browser":"tools/orbit360-m5-runtime-smoke-522-browser-v20260729.mjs","closer":"tools/orbit360-m5-runtime-smoke-522-close-v20260729.mjs","predicate":"tools/orbit360-visible-technical-copy-predicate-v20260729.mjs","predicateVersion":"20260729.1"},
+  "authorization":{"staticRemediationAuthorized":true,"allowedStaticExecutions":1,"authorizationSource":"validator_stale_methodology_after_consumed_runtime_520","runtimeSmokeAuthorized":false,"browserAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"STATIC_521_PASS_THEN_REQUEST_NEW_EXPLICIT_RUNTIME_AUTHORIZATION_FOR_5_0_22",
+  "containsPII":false,
+  "containsSecrets":false
+}
