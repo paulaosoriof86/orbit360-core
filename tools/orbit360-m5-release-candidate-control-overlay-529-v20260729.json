@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-v2",
+  "issuedAt":"2026-07-29",
+  "authoritativeForCurrentM5ControlState":true,
+  "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-527-v20260729.json","tools/orbit360-m5-release-candidate-runtime-overlay-528-v20260729.json"],
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.29",
+  "status":"M5_MULTIROL_OWNER_REMEDIATION_529_STATIC_PASS_READY_TO_REQUEST_NEW_HOSTING_LAB_DELIVERY",
+  "baseline":{"clients":414,"insurers":26,"advisors":7,"countryCounts":{"GT":398,"CO":16},"typeCounts":{"Persona":391,"Empresa":23},"missingCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0},
+  "runtime528":{"closed":true,"authorizationConsumed":true,"runId":30486294373,"firstFailure":"MOBILE_MENU_INCOMPLETE:11","classification":"FUNCTIONAL_DEFECT","rootCause":"session_multirol_dynamic_contract_load_error_due_to_mutating_immutable_access_owner","allCountsStable":true,"allDigestsStable":true,"firestoreWrites":0,"operationalWrites":0},
+  "remediation529":{"closed":true,"status":"M5_MULTIROL_OWNER_REMEDIATION_529_STATIC_PASS","runId":30488008331,"jobId":90698445393,"artifactId":8738464262,"artifactDigest":"sha256:2407462c6fdd7a890c85148a1d751485815a6900af313d4b4cd5f2535d049a4d","preflight":"19/19","fixture":"13/13","failed":0,"productChangedFiles":["orbit360-platform/core/session-multirol-visibility-v20260716.js","orbit360-platform/sw.js"],"compatibilityOwnerVersion":"20260729.2","canonicalAccessOwnerVersion":"20260729.3","pwaCacheGeneration":"orbit360-v20260729-11-multirol-owner","workflowFrozen":true},
+  "releaseCandidate":{"priorHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","priorCandidateSupersededByFunctionalChange":true,"newCandidateHash":null,"newCandidateDeliveryPending":true,"remoteParityPending":true},
+  "authorization":{"staticRemediationAuthorized":false,"allowedStaticExecutions":0,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeRequestCreated":false,"hostingDeployAuthorized":false,"allowedHostingDeployExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false},
+  "forbiddenUntilSeparatelyAuthorized":{"runtimeSmoke":true,"browser":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"mergeMain":true,"policies":true,"visualReview":true,"pólizas":true},
+  "nextAction":"REQUEST_SEPARATE_ONE_SHOT_HOSTING_LAB_DELIVERY_AUTHORIZATION_FOR_NEW_POST_529_RELEASE_CANDIDATE; after delivery verify public parity before requesting any new runtime",
+  "containsPII":false,
+  "containsSecrets":false
+}
