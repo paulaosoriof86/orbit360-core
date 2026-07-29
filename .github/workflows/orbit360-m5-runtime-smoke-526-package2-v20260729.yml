@@ -1,107 +1,16 @@
-name: Orbit 360 · M5 runtime 5.0.25 · final package check 5.0.26
-run-name: M5 5.0.26 · final static package · ${{ github.sha }}
+name: Orbit 360 · M5 5.0.26 · FROZEN package stop-line
 
 on:
-  push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - '.github/workflows/orbit360-m5-runtime-smoke-526-package2-v20260729.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
-  statuses: write
-
-env:
-  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
-  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
-  EXPECTED_RC_HASH: ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61
 
 jobs:
-  package_final:
-    name: M5 · final package 5.0.26 · no operational capabilities
+  frozen:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
     steps:
-      - name: Checkout full history
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Preparar Node 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Verificar stop-line y modo package
-        shell: bash
+      - name: Stop-line contractual
         run: |
-          set -euo pipefail
-          test "$GITHUB_EVENT_NAME" = 'push'
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          test "$GITHUB_RUN_ATTEMPT" = '1'
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test ! -f tools/orbit360-m5-runtime-smoke-526-request-v20260729.json
-          jq -e '.status=="PACKAGE_ATTEMPT_1_VALIDATOR_STALE_FIXED_READY_FOR_FINAL_PACKAGE_ATTEMPT" and .packageAttempt1.runId==30481853743 and .packageAttempt2.finalPackageAttempt==true and .authorization.runtimeSmokeAuthorized==true and .authorization.allowedExecutions==1 and .authorization.requestCreated==false and .authorization.authorizationConsumed==false' tools/orbit360-m5-runtime-smoke-526-freeze-v20260729.json >/dev/null
-
-      - name: Preflight canónico final sin identidad
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          node --check tools/orbit360-validar-gate-contracts-engine-m5-runtime-smoke-526-v20260729.mjs
-          node --check tools/orbit360-m5-runtime-smoke-526-contract-v20260729.cjs
-          node --check tools/orbit360-m5-runtime-smoke-525-contract-v20260729.cjs
-          node --check tools/orbit360-m5-runtime-smoke-525-browser-v20260729.mjs
-          node --check tools/orbit360-m5-runtime-smoke-525-close-v20260729.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="5.0.25" and .authorizationWrapperVersion=="5.0.26" and .candidateRuntimeContractVersion=="5.0.25" and .activationMode=="package_without_request" and .executionAuthorized==false and .allowedExecutions==0 and .failed==0 and .releaseCandidateHash==env.EXPECTED_RC_HASH and .responsiveTitleResolverVersion=="20260729.1" and .dataAccess==false and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .operationalWrites==0' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-
-      - name: Contratos 5.0.26 y 5.0.25
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-m5-runtime-smoke-526-contract-v20260729.cjs
-          node tools/orbit360-m5-runtime-smoke-525-contract-v20260729.cjs
-          jq -e '.ok==true and .status=="M5_RUNTIME_SMOKE_526_CONTRACT_PASS" and .failed==0 and .requestPresent==false and .productProtectedUnchanged==true and .responsiveTitleResolverVersion=="20260729.1"' "$ORBIT360_EVIDENCE_DIR/m5-runtime-smoke-526-contract-summary.json" >/dev/null
-          jq -e '.ok==true and .status=="M5_RUNTIME_SMOKE_525_CONTRACT_PASS" and .failed==0 and .productProtectedUnchanged==true and .responsiveTitleResolverVersion=="20260729.1"' "$ORBIT360_EVIDENCE_DIR/m5-runtime-smoke-525-contract-summary.json" >/dev/null
-
-      - name: Resumen package final
-        shell: bash
-        run: |
-          set -euo pipefail
-          node <<'NODE'
-          const fs=require('fs'),path=require('path');const d=process.env.ORBIT360_EVIDENCE_DIR;
-          const read=n=>JSON.parse(fs.readFileSync(path.join(d,n),'utf8'));
-          const p=read('preflight-sanitizado.json'),w=read('m5-runtime-smoke-526-contract-summary.json'),c=read('m5-runtime-smoke-525-contract-summary.json');
-          const ok=p.status==='GO_GATE_CONTRACT'&&p.failed===0&&p.activationMode==='package_without_request'&&w.ok===true&&w.failed===0&&c.ok===true&&c.failed===0;
-          const out={schemaVersion:'orbit360-m5-runtime-smoke-526-final-package-summary-v1',generatedAt:new Date().toISOString(),ok,status:ok?'M5_RUNTIME_SMOKE_526_FINAL_PACKAGE_PASS':'M5_RUNTIME_SMOKE_526_FINAL_PACKAGE_FAIL',packageAttempt:2,finalPackageAttempt:true,authorizationWrapperVersion:'5.0.26',candidateRuntimeContractVersion:'5.0.25',releaseCandidateHash:process.env.EXPECTED_RC_HASH,productProtectedUnchanged:w.productProtectedUnchanged===true&&c.productProtectedUnchanged===true,responsiveTitleResolverVersion:'20260729.1',requestCreated:false,secretsRead:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,containsPII:false,containsSecrets:false};
-          fs.writeFileSync(path.join(d,'m5-runtime-smoke-526-final-package-summary.json'),JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(!ok)process.exit(41);
-          NODE
-
-      - name: Subir evidencia sanitizada
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-m5-runtime-smoke-526-final-package-${{ github.run_id }}
-          path: |
-            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-526-contract-summary.json
-            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-525-contract-summary.json
-            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-526-final-package-summary.json
-          if-no-files-found: warn
-          retention-days: 30
-
-      - name: Publicar estado observable
-        if: always()
-        uses: actions/github-script@v7
-        env:
-          SUMMARY_PATH: orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-526-final-package-summary.json
-        with:
-          script: |
-            const fs=require('fs');let state='failure',description='M5 5.0.26 final package failed';
-            try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY_PATH,'utf8'));if(s.ok===true){state='success';description='M5 5.0.26 final package PASS; no runtime used';}}catch(e){}
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-runtime-smoke-526-package2',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+          echo 'M5 5.0.26 stopped after two package pipeline failures; third package attempt forbidden.'
+          exit 41
