@@ -1,0 +1,12 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v2",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.7",
+  "phase":"M5_LAB_HOSTING_DELIVERY",
+  "required":{"staticRemediationStatus":"M5_RUNTIME_SMOKE_REMEDIATION_STATIC_CLOSED_NEW_RC_READY_FOR_LAB_DELIVERY","releaseCandidateHash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091","criticalAssets":42,"remoteAssetsExpected":25,"remoteAssetsMatchedBeforeDelivery":22,"mismatchCountBeforeDelivery":3,"approvalReadyForLabDelivery":true},
+  "capabilityBoundary":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "target":{"projectId":"ays-orbit-360-lab","channel":"orbit360-ays-lab","canonicalUrl":"https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app"},
+  "containsPII":false,
+  "containsSecrets":false
+}
