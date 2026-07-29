@@ -1,0 +1,23 @@
+{
+  "schemaVersion":"orbit360-m5-runtime-package-input-536-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.36",
+  "candidateContractVersion":"5.0.34",
+  "sourceControlOverlay":"tools/orbit360-m5-release-candidate-control-overlay-535-v20260729.json",
+  "descriptor":"tools/orbit360-m5-release-candidate-descriptor-534-v20260729.json",
+  "expectedCandidateHash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7",
+  "criticalAssets":44,
+  "remoteAssetsExpected":27,
+  "remoteAssetsMatched":27,
+  "browser":"tools/orbit360-m5-runtime-smoke-536-browser-adapter-v20260729.mjs",
+  "closer":"tools/orbit360-m5-runtime-smoke-536-close-v20260729.mjs",
+  "legacyProbe":"tools/orbit360-m5-runtime-smoke-525-browser-v20260729.mjs",
+  "snapshotTool":"tools/orbit360-m5-runtime-smoke-live-readonly-v20260729.mjs",
+  "target":{"projectId":"ays-orbit-360-lab","canonicalUrl":"https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app","reviewUrl":"https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app/ays-lab-preview.html"},
+  "packageCapabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "runtimeCapabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "immutableAfterCreation":true,
+  "containsPII":false,
+  "containsSecrets":false
+}
