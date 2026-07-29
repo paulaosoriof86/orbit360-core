@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-v1",
+  "issuedAt":"2026-07-29",
+  "authoritativeForCurrentM5ControlState":true,
+  "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-freeze-v20260728.json","tools/orbit360-m5-release-candidate-stop-overlay-526-v20260729.json"],
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.27",
+  "status":"M5_CONTROL_PLANE_REDESIGN_527_STATIC_PASS_READY_TO_REQUEST_RUNTIME_AUTHORIZATION",
+  "releaseCandidate":{"hash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","criticalAssets":"42/42","remoteLab":"25/25","mismatchCount":0},
+  "baseline":{"clients":414,"insurers":26,"advisors":7,"countryCounts":{"GT":398,"CO":16},"typeCounts":{"Persona":391,"Empresa":23},"missingCurrency":0,"targetOnlyClients":0,"targetOnlyInsurers":0},
+  "runtime526":{"stoppedAfterTwoPackageFailures":true,"requestCreated":false,"runtime525Executed":false,"authorizationInvalidated":true},
+  "controlPlane527":{"closed":true,"status":"M5_CONTROL_PLANE_REDESIGN_527_STATIC_PASS","singleShapeOwner":"tools/orbit360-responsive-title-resolver-contract-v20260729.json","shapeReader":"tools/orbit360-contract-shape-reader-v20260729.mjs","shapeReaderVersion":"20260729.1","schemaDrivenCandidateContract":"tools/orbit360-m5-runtime-smoke-525-contract-schema-driven-v20260729.mjs","preflight":"16/16","candidateContract":"13/13","runId":30484633453,"jobId":90687113637,"artifactId":8737091613,"artifactDigest":"sha256:b53db58f87ac63b4ce96fdb7cc2dac6a67490b70f9cd1758e5b9b22195dcb511","productProtectedUnchanged":true,"workflowFrozen":true},
+  "candidate525":{"executed":false,"browserBlobSha":"70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12","closerBlobSha":"bf9301d1ed8bfa5d75f8d17924bd6685c520cb94"},
+  "authorization":{"staticRedesignAuthorized":false,"allowedStaticExecutions":0,"staticAuthorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeRequestCreated":false,"visualReviewAuthorized":false,"productionAuthorized":false,"policiesAuthorized":false},
+  "forbiddenUntilSeparatelyAuthorized":{"runtimeSmoke":true,"browser":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"mergeMain":true,"policies":true,"visualReview":true,"pólizas":true},
+  "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_RUNTIME_AUTHORIZATION_FOR_CANDIDATE_5_0_25_WITH_NEW_POST_527_WRAPPER; do not reuse stopped 5.0.26",
+  "containsPII":false,
+  "containsSecrets":false
+}
