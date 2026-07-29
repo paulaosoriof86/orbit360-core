@@ -1,6 +1,7 @@
 {
   "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-smoke-remediation-static-v3",
   "issuedAt":"2026-07-29",
+  "closedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
   "pullRequest":5,
@@ -8,12 +9,12 @@
   "gateContractVersion":"5.0.9",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m5-runtime-508-root-cause-remediation-static-v1",
-  "classification":"M5_RUNTIME_508_ROOT_CAUSE_REMEDIATION_STATIC",
+  "classification":"M5_RUNTIME_508_ROOT_CAUSE_REMEDIATION_STATIC_CLOSED",
   "executionProfile":{"phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"static_package_once"},
   "baseline":{"runtimeAttemptClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-508-attempt-closure.json","releaseCandidateHashBefore":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091","publicParityBefore":"25/25","firestoreWrites":0,"operationalWrites":0},
-  "required":{"indexOwnerBeforeFirestoreStore":true,"indexOwnerBeforeSeedAndAcademia":true,"protectedFirestoreStoreUnchanged":true,"bootstrapEvidenceNormalizerReady":true,"staticLessonEvaluationConfigTransient":true,"userProgressAndOperationalMutationsDurable":true,"newReleaseCandidateRequired":true},
-  "authorization":{"staticRemediationAuthorized":true,"allowedExecutions":1,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
-  "nextRequiredDecision":"RUN_ONE_STATIC_PACKAGE_AND_CALCULATE_NEW_RC_WITHOUT_SENSITIVE_CAPABILITIES",
+  "authorization":{"staticRemediationAuthorized":false,"allowedExecutions":0,"authorizationConsumed":true,"runtimeSmokeAuthorized":false,"hostingDeployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "closure":{"status":"M5_RUNTIME_508_ROOT_CAUSE_REMEDIATION_STATIC_CLOSED_NEW_RC_READY_FOR_LAB_DELIVERY","runId":30421741635,"jobId":90479808034,"artifactId":8712155374,"artifactDigest":"sha256:3c2d18d0bc64a4c7792b95cd96383a7dbb3c0f76f4abb813e5a84f11c538e328","preflight":"15/15","staticContract":"40/40","loadOrderFixture":"19/19","normalizerFixture":"7/7","releaseCandidateHash":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","criticalAssets":42,"remoteAssetsMatched":24,"remoteAssetsExpected":25,"mismatchPath":"index.html","protectedStoreUnchanged":true,"protectedLoaderUnchanged":true},
+  "nextRequiredDecision":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_HOSTING_LAB_DELIVERY_OF_RC_F6DFA37E",
   "containsPII":false,
   "containsSecrets":false
 }
