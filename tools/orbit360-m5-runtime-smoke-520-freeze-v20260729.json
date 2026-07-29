@@ -4,12 +4,14 @@
   "gateId":"block5-release-candidate-visualization-v20260728",
   "wrapperContractVersion":"5.0.20",
   "candidateRuntimeContractVersion":"5.0.18",
-  "status":"REQUEST_CREATED_AWAITING_ONE_RUNTIME_SMOKE_LAB",
+  "status":"FAILED_STOP_LINE_TECHNICAL_COPY_DIAGNOSIS_REQUIRED",
   "packageCheck":{"status":"M5_RUNTIME_SMOKE_520_PACKAGE_PASS","commit":"7523f906fa4029820be684973a0d4e4e0ce46c48","runId":30472800569,"jobId":90646967182,"artifactId":8732358957,"artifactDigest":"sha256:f13d8198854729ed2ffbe016c77667ef496080e4e060293d42c582b8a6f2139e"},
+  "runtimeEvidence":{"requestCommit":"60562d429f2aff5583c47eeb5bf4d88c08deb184","runId":30473040571,"jobId":90647758920,"artifactId":8732476317,"artifactDigest":"sha256:b42d4718d7237b58d9d73f342dbc978ac0b279ec38806a4a3c917df1cf6ed88b","firstFailure":"TECHNICAL_COPY_VISIBLE:desktopDirectionClient360","policyOwnerReady":true,"accessBoundaryReady":true,"dataBaselineReady":true,"snapshots":"11/11_before_and_after","allCountsStable":true,"allDigestsStable":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0},
   "baseline":{"validator519Closed":true,"validator519Passed":30,"validator519Failed":0,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","remoteAssetsMatched":25,"mismatchCount":0,"sourceClients":414,"sourceInsurers":26,"canonicalClients":414,"canonicalInsurers":26,"advisors":7,"missingClientCurrency":0},
   "expected":{"countryCounts":{"GT":398,"CO":16,"REQUIERE_VALIDACION":0},"typeCounts":{"Persona":391,"Empresa":23},"accessOwnerVersion":"20260729.3","academiaPolicyVersion":"20260729.2","policyOwnerWaitMs":60000,"policyOwnerBoundMs":65000,"countsStable":true,"digestsStable":true,"roleViews":["Dirección desktop","Operativo tablet","Asesor mobile"],"jqSelectorSafetyContract":"tools/orbit360-jq-selector-safety-contract-v20260729.json"},
-  "authorization":{"runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"authorizationConsumed":false,"authorizationSource":"user_autorizado_20260729_after_validator_519_pass"},
-  "forbidden":{"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
+  "authorization":{"runtimeSmokeAuthorized":false,"allowedExecutions":0,"requestCreated":true,"authorizationConsumed":true,"authorizationSource":"user_autorizado_20260729_after_validator_519_pass"},
+  "forbidden":{"runtimeRerun":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"policies":true,"visualReview":true,"pólizas":true},
+  "nextAction":"DIAGNOSE_EXACT_VISIBLE_TECHNICAL_TERM_STATICALLY; DO_NOT_RERUN_RUNTIME",
   "containsPII":false,
   "containsSecrets":false
 }
