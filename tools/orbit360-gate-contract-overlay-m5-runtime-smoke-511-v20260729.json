@@ -1,0 +1,12 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.11",
+  "phase":"LAB_RUNTIME_GATE",
+  "required":{"releaseCandidateHash":"f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324","criticalAssets":42,"remoteAssetsMatched":25,"remoteAssetsExpected":25,"bootstrapOwner":"tools/orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs","beforeAfterSnapshots":true,"countsStable":true,"digestsStable":true,"zeroWrites":true},
+  "capabilityBoundary":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "forbidden":{"hostingDeploy":true,"firestoreWrite":true,"operationalWrites":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"mergeMain":true,"visualReview":true,"policies":true,"pólizas":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
