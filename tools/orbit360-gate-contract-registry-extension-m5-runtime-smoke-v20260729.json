@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v1",
+  "issuedAt": "2026-07-29",
+  "gates": [
+    {
+      "gateId": "block5-release-candidate-visualization-v20260728",
+      "contractVersion": "5.0.5",
+      "lifecycle": "tools/orbit360-validator-lifecycle-contract-m5-runtime-smoke-v20260729.json",
+      "engine": "tools/orbit360-validar-gate-contracts-engine-m5-runtime-smoke-v20260729.mjs",
+      "workflow": ".github/workflows/orbit360-m5-runtime-smoke-lab-v20260729.yml",
+      "request": "tools/orbit360-m5-runtime-smoke-request-v20260729.json",
+      "phase": "LAB_RUNTIME_GATE",
+      "oneShot": true,
+      "containsPII": false,
+      "containsSecrets": false
+    }
+  ]
+}
