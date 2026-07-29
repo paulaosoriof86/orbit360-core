@@ -28,6 +28,7 @@ try{
   const lifecycle=json('tools/orbit360-validator-lifecycle-contract-m5-validator-redesign-519-v20260729.json');
   const overlay=json('tools/orbit360-gate-contract-overlay-m5-validator-redesign-519-v20260729.json');
   const freeze=json('tools/orbit360-m5-validator-redesign-519-freeze-v20260729.json');
+  const registry=json('tools/orbit360-gate-contract-registry-extension-m5-validator-redesign-519-v20260729.json');
   const globalFreeze=json('tools/orbit360-m5-release-candidate-freeze-v20260728.json');
   const loader=read('orbit360-platform/core/backend-lab-loader.js');
   const candidate=read('tools/orbit360-m5-runtime-smoke-518-browser-v20260729.mjs');
@@ -40,6 +41,8 @@ try{
   const cap=lifecycle.executionProfile?.capabilities||{};
   check('ZERO_CAPABILITIES',Object.keys(cap).length===9&&Object.values(cap).every(v=>v===false));
   check('OVERLAY',overlay.contractVersion===VERSION&&overlay.phase==='M5_VALIDATOR_REDESIGN_STATIC'&&overlay.required?.releaseCandidateHash===RC&&overlay.required?.candidateRuntimeContractVersion==='5.0.18');
+  const registered=registry.gates&&registry.gates[0];
+  check('REGISTRY',registry.gates?.length===1&&registered?.gateId===EXPECTED_GATE&&registered?.contractVersion===VERSION&&registered?.phase==='M5_VALIDATOR_REDESIGN_STATIC'&&registered?.sourcePredicateHelper==='tools/orbit360-validator-source-predicate-helpers-v20260729.mjs');
   check('FREEZE_ONE_SHOT',freeze.contractVersion===VERSION&&freeze.authorization?.staticVerificationAuthorized===true&&freeze.authorization?.allowedExecutions===1&&freeze.authorization?.authorizationConsumed===false);
   check('GLOBAL_AUTH_ZERO',globalFreeze.authorization?.runtimeSmokeAuthorized===false&&globalFreeze.authorization?.allowedRuntimeSmokeExecutions===0&&globalFreeze.authorization?.visualReviewAuthorized===false&&globalFreeze.authorization?.productionAuthorized===false);
   check('PRIOR_517_STOPPED',globalFreeze.policyReadinessRemediation517?.sameStageFailedTwice===true&&globalFreeze.policyReadinessRemediation517?.retriesStopped===true&&globalFreeze.policyReadinessRemediation517?.thirdAttemptForbidden===true);
