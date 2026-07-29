@@ -1,19 +1,34 @@
 {
   "schemaVersion":"orbit360-m5-lab-hosting-delivery-freeze-v1",
   "issuedAt":"2026-07-28",
+  "closedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.4",
-  "status":"REQUEST_CREATED_AWAITING_ONE_HOSTING_LAB_DELIVERY",
+  "status":"M5_LAB_HOSTING_DELIVERY_CLOSED_SUCCESS_24_OF_24",
   "baseline":{
     "m4Closed":true,
     "readiness501Closed":true,
     "access502Closed":true,
     "postAccess503Closed":true,
-    "postAccessStatus":"M5_RC_READY_LAB_DELIVERY_REQUIRED",
     "releaseCandidateHash":"d90ec601d17c8e750cbba6f19197d3f906b29a1377817f53fb73f0779e843045",
     "criticalAssets":41,
     "remoteAssetsExpected":24,
     "remoteAssetsMatchedBeforeDelivery":21
+  },
+  "result":{
+    "runId":30411375732,
+    "jobId":90447991314,
+    "artifactId":8708510538,
+    "artifactDigest":"sha256:fbe4ba382fe6d51294b2a08f17e2ba48a35e8b36dd0973303943cef8c631e1ec",
+    "hostingDeployExecuted":true,
+    "hostingDeployExecutions":1,
+    "remoteAssetsChecked":24,
+    "remoteAssetsMatched":24,
+    "mismatchCount":0,
+    "remoteParity":true,
+    "pipelineClassification":"PIPELINE_MECHANISM_FAILURE",
+    "pipelineClosureRepaired":true,
+    "redeployExecuted":false
   },
   "target":{
     "projectId":"ays-orbit-360-lab",
@@ -22,33 +37,29 @@
     "reviewUrl":"https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app/ays-lab-preview.html"
   },
   "authorization":{
-    "hostingLabDeliveryAuthorized":true,
-    "allowedExecutions":1,
+    "hostingLabDeliveryAuthorized":false,
+    "allowedExecutions":0,
     "requestCreated":true,
+    "authorizationConsumed":true,
     "runtimeSmokeAuthorized":false,
+    "allowedRuntimeSmokeExecutions":0,
     "visualReviewAuthorized":false,
     "productionAuthorized":false
   },
-  "requiredAfterDelivery":{
-    "remoteAssetsChecked":24,
-    "remoteAssetsMatched":24,
-    "remoteParity":true,
-    "releaseCandidateHashUnchanged":true
+  "scopeVerified":{
+    "firestoreReads":0,
+    "firestoreWrites":0,
+    "operationalWrites":0,
+    "functionsDeploy":false,
+    "rulesDeploy":false,
+    "browser":false,
+    "runtimeSmoke":false,
+    "production":false,
+    "main":false,
+    "merge":false,
+    "policies":false
   },
-  "forbidden":{
-    "firestoreRead":true,
-    "firestoreWrite":true,
-    "operationalWrites":true,
-    "rulesDeploy":true,
-    "functionsDeploy":true,
-    "browser":true,
-    "runtimeSmoke":true,
-    "production":true,
-    "main":true,
-    "merge":true,
-    "policies":true
-  },
-  "nextAction":"RUN_ONE_HOSTING_LAB_DELIVERY_AND_REQUIRE_24_OF_24",
+  "nextAction":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_RUNTIME_SMOKE_ON_LAB_RC_D90EC601",
   "containsPII":false,
   "containsSecrets":false
 }
