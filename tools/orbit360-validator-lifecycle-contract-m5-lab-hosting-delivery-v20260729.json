@@ -1,7 +1,7 @@
 {
   "schemaVersion":"orbit360-validator-lifecycle-contract-m5-lab-hosting-delivery-v2",
   "issuedAt":"2026-07-29",
-  "updatedAt":"2026-07-29",
+  "closedAt":"2026-07-29",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
   "pullRequest":5,
@@ -9,12 +9,12 @@
   "gateContractVersion":"5.0.7",
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "controlPlaneRevision":"m5-hosting-lab-delivery-rc-b25bf275-v2",
-  "classification":"M5_LAB_HOSTING_DELIVERY_REQUEST_READY",
+  "classification":"M5_LAB_HOSTING_DELIVERY_CLOSED",
   "executionProfile":{"phase":"M5_LAB_HOSTING_DELIVERY","capabilities":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_request_bound_to_parent_commit"},
   "baseline":{"staticRemediationClosure":"orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-remediation-static-506-closure.json","releaseCandidateHash":"b25bf2750548651a719526bc4dadf7662def2255876c4c2e5e32bdf90f93a091","criticalAssets":42,"remoteAssetsExpected":25},
-  "packageCheck":{"status":"PASS","runId":30417610407,"jobId":90467411035,"commit":"4aa996d37b413a59b48135a728edffa3fd547dd6","artifactId":8710708337,"artifactDigest":"sha256:4c861ebebcedb84bee5a31a797845b9edb2a5df15fd935fb945f992ed09a4307"},
-  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260728_for_one_hosting_lab_delivery_rc_b25bf275","hostingLabDeliveryAuthorized":true,"allowedExecutions":1,"browserAuthorized":false,"runtimeSmokeAuthorized":false,"writeAuthorized":false,"productionAuthorized":false,"requestCreated":true,"authorizationConsumed":false},
-  "nextRequiredDecision":"EXECUTE_ONE_IMMUTABLE_HOSTING_LAB_DELIVERY_AND_REQUIRE_25_OF_25_PARITY",
+  "authorization":{"explicitAuthorization":true,"authorizationSource":"user_autorizado_20260728_for_one_hosting_lab_delivery_rc_b25bf275","hostingLabDeliveryAuthorized":false,"allowedExecutions":0,"browserAuthorized":false,"runtimeSmokeAuthorized":false,"writeAuthorized":false,"productionAuthorized":false,"requestCreated":true,"authorizationConsumed":true},
+  "closure":{"status":"M5_LAB_HOSTING_DELIVERED_AND_25_OF_25_VERIFIED","requestCommit":"98c28c188f00141476044628ca9a4a1d0ef6c43a","deliveryRunId":30417743516,"deliveryJobId":90467807470,"deliveryArtifactId":8710762943,"deliveryArtifactDigest":"sha256:eca16e06d89a9accb29c98a7d36ed2719bac869fab451f87165c81e0da845669","parityRunId":30418258733,"parityJobId":90469348278,"parityArtifactId":8710924084,"parityArtifactDigest":"sha256:accbc8ea34cabe7daf657b1ae2dd7968d76b9d2805c2a03200a6ad04e45d80cf","hostingDeployExecutions":1,"remoteAssetsMatched":25,"remoteAssetsExpected":25,"remoteParity":true,"redeployExecuted":false,"pipelineIncidentsClosed":true},
+  "nextRequiredDecision":"REQUEST_SEPARATE_EXPLICIT_AUTHORIZATION_FOR_ONE_RUNTIME_SMOKE_ON_LAB_RC_B25BF275",
   "containsPII":false,
   "containsSecrets":false
 }
