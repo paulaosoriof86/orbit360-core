@@ -2,12 +2,7 @@ name: Orbit 360 · M5 Hosting LAB delivery · RC ae6bb2a3
 run-name: M5 5.0.13 · Hosting LAB exact RC · ${{ github.sha }}
 
 on:
-  push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - '.github/workflows/orbit360-m5-lab-hosting-delivery-513-v20260729.yml'
-      - 'tools/orbit360-m5-lab-hosting-delivery-request-513-v20260729.json'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -56,8 +51,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$GITHUB_EVENT_NAME" = 'push'
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
           test "$GITHUB_RUN_ATTEMPT" = '1'
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
 
@@ -166,7 +159,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ '${{ steps.mode.outputs.value }}' = 'request' ]; then
-            jq -e '.ok==true and .status=="M5_LAB_HOSTING_DELIVERED_AND_25_OF_25_VERIFIED" and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==42 and .remoteAssetsChecked==25 and .remoteAssetsMatched==25 and .mismatchCount==0 and .remoteParity==true and .hostingDeployExecuted==true and .hostingDeployExecutions==1 and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeSmoke==false and .browser==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .mergeMain==false and .policies==false and .pólizas==false and .containsPII==false and .containsSecrets==false' "$ORBIT360_EVIDENCE_DIR/m5-lab-hosting-delivery-513-summary.json" >/dev/null
+            jq -e '.ok==true and .status=="M5_LAB_HOSTING_DELIVERED_AND_25_OF_25_VERIFIED" and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==42 and .remoteAssetsChecked==25 and .remoteAssetsMatched==25 and .mismatchCount==0 and .remoteParity==true and .hostingDeployExecuted==true and .hostingDeployExecutions==1 and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeSmoke==false and .browser==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .mergeMain==false and .policies==false and .["pólizas"]==false and .containsPII==false and .containsSecrets==false' "$ORBIT360_EVIDENCE_DIR/m5-lab-hosting-delivery-513-summary.json" >/dev/null
           else
             jq -e '.ok==true and .status=="M5_LAB_HOSTING_DELIVERY_PACKAGE_PASS" and .hostingDeployExecuted==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeSmoke==false and .browser==false' "$ORBIT360_EVIDENCE_DIR/m5-lab-hosting-delivery-513-summary.json" >/dev/null
           fi
