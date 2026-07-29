@@ -1,13 +1,15 @@
 {
-  "schemaVersion":"orbit360-m5-responsive-title-remediation-freeze-v1",
+  "schemaVersion":"orbit360-m5-responsive-title-remediation-freeze-v2",
   "issuedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.24",
-  "status":"READY_FOR_ONE_STATIC_RESPONSIVE_TITLE_REMEDIATION_VERIFICATION",
+  "status":"M5_RESPONSIVE_TITLE_REMEDIATION_524_STATIC_PASS_CLOSED",
   "baseline":{"runtime523Closed":true,"runtime523AuthorizationConsumed":true,"runtime523RequestCommit":"30b90e017b126a6924fd649880916cb59ae75e3d","runtime523RunId":30478442538,"runtime523JobId":90665957818,"firstFailure":"RESPONSIVE_TITLE_INVALID:desktopDirectionInsurers","allCountsStable":true,"allDigestsStable":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0,"releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeContractVersion":"5.0.25","candidateRuntimeExecuted":false},
-  "authorization":{"staticRemediationAuthorized":true,"allowedExecutions":1,"authorizationConsumed":false,"runtimeSmokeAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"browserAuthorized":false,"deployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
-  "required":{"actualInsurerTitleIsSemanticDiv":true,"historical522TagOnlySelector":true,"candidate525UsesScopedExactTextFallback":true,"resolverVersion":"20260729.1","historical522Untouched":true,"productProtectedUnchanged":true},
+  "staticVerification":{"commit":"c5f47810af0a93b7ffff6948fa4b130bde8ca254","runId":30479419241,"jobId":90669279075,"artifactId":8734965129,"artifactDigest":"sha256:4d828c04083765fe669c38aed1dbc90cc07a860fc6d7183c4a8ce56eb7e1e960","passed":28,"total":28,"failed":0},
+  "authorization":{"staticRemediationAuthorized":false,"allowedExecutions":0,"authorizationConsumed":true,"runtimeSmokeAuthorized":false,"firestoreReadAuthorized":false,"writeAuthorized":false,"browserAuthorized":false,"deployAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "verified":{"actualInsurerTitleIsSemanticDiv":true,"historical522TagOnlySelector":true,"candidate525UsesScopedExactTextFallback":true,"resolverVersion":"20260729.1","historical522Untouched":true,"productProtectedUnchanged":true,"productDefectDemonstrated":false},
   "forbidden":{"runtime":true,"browser":true,"secrets":true,"firestoreRead":true,"firestoreWrite":true,"operationalWrites":true,"hostingDeploy":true,"functionsDeploy":true,"rulesDeploy":true,"production":true,"main":true,"merge":true,"visualReview":true,"policies":true,"pólizas":true},
+  "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_RUNTIME_AUTHORIZATION_FOR_CANDIDATE_5_0_25",
   "containsPII":false,
   "containsSecrets":false
 }
