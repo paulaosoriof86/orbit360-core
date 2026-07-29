@@ -10,9 +10,9 @@
   "controlPlaneRevision":"m5-runtime-522-one-shot-after-validator-521-v1",
   "classification":"LAB_RUNTIME_GATE",
   "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false,"requestModel":"immutable_one_shot_request_after_package_pass"},
-  "baseline":{"validator521Closed":true,"validator521Status":"M5_TECHNICAL_COPY_REMEDIATION_521_STATIC_PASS","candidateRuntimeContractVersion":"5.0.22","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeExecuted":false},
-  "authorization":{"authorizationSource":"user_autorizado_20260729_after_technical_copy_521_pass","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":false,"authorizationConsumed":false,"firestoreWriteAuthorized":false,"operationalWritesAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
-  "nextRequiredDecision":"PACKAGE_PASS_THEN_CREATE_IMMUTABLE_REQUEST_AND_EXECUTE_EXACTLY_ONE_RUNTIME_522",
+  "baseline":{"validator521Closed":true,"validator521Status":"M5_TECHNICAL_COPY_REMEDIATION_521_STATIC_PASS","candidateRuntimeContractVersion":"5.0.22","releaseCandidateHash":"ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61","candidateRuntimeExecuted":false,"packageCheck":{"status":"M5_RUNTIME_SMOKE_523_PACKAGE_PASS","commit":"d81aacb48305e32699047cdaa07ca8e5152eae7d","runId":30478173184,"jobId":90665049424,"artifactId":8734473232,"artifactDigest":"sha256:642354242c6008fd106789e484ed8a71b912b1fb0f008956a5399a74fe149fab"}},
+  "authorization":{"authorizationSource":"user_autorizado_20260729_after_technical_copy_521_pass","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestCreated":true,"authorizationConsumed":false,"firestoreWriteAuthorized":false,"operationalWritesAuthorized":false,"hostingDeployAuthorized":false,"productionAuthorized":false,"visualReviewAuthorized":false},
+  "nextRequiredDecision":"EXECUTE_EXACTLY_ONE_IMMUTABLE_RUNTIME_522_REQUEST",
   "containsPII":false,
   "containsSecrets":false
 }
