@@ -1,0 +1,20 @@
+{
+  "schemaVersion":"orbit360-m5-academia-inventory-537-freeze-v1",
+  "issuedAt":"2026-07-30",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.37",
+  "status":"M5_ACADEMIA_STATIC_PRODUCER_INVENTORY_537_CLOSED_PASS",
+  "sourceRuntimeStop":"tools/orbit360-m5-runtime-stop-overlay-536-v20260729.json",
+  "descriptor":"tools/orbit360-m5-release-candidate-descriptor-537-v20260729.json",
+  "releaseCandidate":{"hash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a","criticalAssets":46,"remoteAssetsExpected":29,"remoteAssetsMatched":28,"mismatchPaths":["data/academia-v1197-bridge.js"]},
+  "attempts":[
+    {"runId":30501234478,"jobId":90741137000,"artifactId":8743556226,"artifactDigest":"sha256:0eebd460a09a28c2b38a12bc0fefa2767d3dcc41d02b0dad9ced639198194a82","status":"PIPELINE_MECHANISM_FAILURE","cause":"fixture evaluated unrelated full seed runtime without Orbit.primas sandbox contract","productChanged":false},
+    {"runId":30501531194,"jobId":90742043113,"artifactId":8743660777,"artifactDigest":"sha256:0d8ed0a9278c96440edae93b357b804f05479b06cf6d043a0c1c5ace569768ff","status":"PASS","preflight":"9/9 PASS","fixture":"18/18 PASS"}
+  ],
+  "controls":{"policyBlob":"fa4c29d30a82673a7bf2d3d55efce52eaf4cccf3","operationalUserCoursesRemainDurable":true,"staticWorkflowFrozen":true,"diagnosticWorkflowFrozen":true,"runtime536RerunForbidden":true},
+  "authorization":{"staticExecutionAuthorized":false,"allowedStaticExecutions":0,"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_HOSTING_LAB_AUTHORIZATION_FOR_RC_097D4E85_46_29; require 29/29 before any new runtime",
+  "containsPII":false,
+  "containsSecrets":false
+}
