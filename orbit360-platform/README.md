@@ -2,172 +2,143 @@
 
 Sistema 360 para intermediarios de seguros, comercializable, white-label y multi-tenant. A&S es el primer tenant y se configura mediante `Orbit.tenant`; no existe un fork de código para Alianzas.
 
-## Estado vivo — 2026-07-29
+> Nota de marca vigente: existe una decisión estratégica provisional para cambiar la marca visible futura a **GRAVICENTRA**, pero es NO bloqueante. Hasta el bloque formal de rebranding se conserva `Orbit 360` como nombre técnico/operativo y no se cambian backend, contratos, colecciones, tenant IDs, Firebase, rutas, repositorio ni identificadores técnicos.
+
+## Fuentes rectoras — corte 2026-07-30
+
+Leer antes de actuar:
+
+1. Documento Maestro Consolidado 20260704.
+2. Addendum Academia Profunda 20260704.
+3. Addendum Patrones Reutilizables Claude/Backend 20260707.
+4. Addendum Continuidad Clientes/Multirol/Importadores 20260709.
+5. Plan Maestro de Ejecución Productiva 20260716.
+6. Addendum Control de Causa Raíz, Validadores y Gates 20260717.
+7. `docs/ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730.md`.
+8. `docs/NOTA-RECTORA-REBRANDING-GRAVICENTRA-NO-BLOQUEANTE-20260730.md`.
+9. `docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md`.
+10. PR #5 + HEAD vivo + evidencia reciente del gate/módulo.
+
+## Estado vivo
 
 ```txt
 Repositorio: paulaosoriof86/orbit360-core
 Rama activa: ays/backend-tenant-lab-v99-20260703
 PR: #5 draft/open
-Merge/main/producción: no autorizados
-M1–M4: cerrados
-M5 5.0.1–5.0.10: cerrados
-M5 5.0.11: runtime ejecutado una vez; stop-line cerrado; cero escrituras
-M5 5.0.12: causa raíz Access/membership remediada estáticamente; nueva RC ae6bb2a3
-Siguiente gate: una única entrega Hosting LAB de la nueva RC requiere autorización separada
-Runtime/navegador: bloqueados
-Revisión visual: bloqueada
-Pólizas: bloqueado / fuente real no solicitada todavía
+main / merge / Functions: no autorizados
+
+M1–M4: CERRADOS
+M5 5.0.44: CERRADO + revisión visual aprobada
+M6 6.1.14: ROLLED_BACK_SAFE · VALIDATOR_STALE / LEGAL_GATE_DEFERRED_RENDER_RACE
+M6 6.1.15: PASS estático · blocking-gate readiness reusable
+STOP_RETRY: ACTIVO
+nuevo recovery: NO PREPARADO
+request 6.1.16: AUSENTE
+
+Producción funcional: NO LIVE
+Firestore: deny-all
+Hosting: rollback neutro
+Storage: diferido fail-closed
+Datos: intactos
+Pólizas: todavía no iniciadas
 ```
 
 ## Baseline canónico preservado
 
 ```txt
-source: 414 clientes / 26 aseguradoras
-canonical target: 1 configuración / 1 membership / 414 clientes / 26 aseguradoras
-asesores: 7
-GT/CO: 398/16
-Persona/Empresa: 391/23
+clientes: 414
+aseguradoras: 26
+asesores fuente: 7
+membership: 1
+config: 1
+GT/CO clientes: 398/16
 moneda faltante: 0
-target-only: 0/0
 ```
 
-No se tocaron Pólizas ni otras fuentes reales.
+M6 ha validado repetidamente integridad before/after, cero escrituras de datos en los recoveries read-only y rollback seguro ante fallo contractual.
 
-## M5 5.0.10 — Hosting LAB previo
+## Directiva vinculante de aceleración
 
-RC `f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324` quedó publicada con paridad 25/25.
+La prioridad es cerrar Fase A y alcanzar producción funcional lo antes posible sin regresiones.
+
+Ruta crítica:
+
+`cerrar M6 → Pólizas → Vehículos → Recibos/cartera → Cobros/conciliación → Comisiones/planillas → financiero histórico → Siniestros/Documentos → resto del plan`.
+
+Reglas:
+
+- autorización por bloque macro de riesgo, no micro-pasos;
+- diagnóstico, documentación y validación estática/sintética continúan sin autorización adicional;
+- un fallo productivo no genera automáticamente otro recovery;
+- repetición de etapa/familia de fallo activa `STOP_RETRY`;
+- producción no se usa para desarrollar validators;
+- no se prepara otro recovery hasta tener causa raíz demostrada + fix reusable + prueba estática/sintética;
+- un request productivo es inmutable y de una sola ejecución;
+- 0% manual salvo imposibilidad técnica real.
+
+## Infraestructura transversal que NO se reconstruye por módulo
+
+Fuente: `docs/ARQUITECTURA-REUTILIZABLE-INGESTA-MODULOS-POST-M6-20260730.md`.
+
+Se reutiliza en Pólizas, Vehículos, Cobros, Siniestros y módulos posteriores:
+
+- Auth/membership/scopes;
+- multirol y rol activo;
+- `Orbit.store` + write guard;
+- manifiesto canónico de colecciones;
+- aliases lógico → físico;
+- readiness de todas las colecciones;
+- blocking-gate readiness diferido;
+- Hosting readiness acotado;
+- smoke multirol/multivista;
+- diagnóstico sanitizado;
+- integridad before/after + digests;
+- cero escrituras cuando el bloque sea read-only;
+- rollback fail-closed;
+- clasificación de causa raíz + `STOP_RETRY`;
+- request inmutable y gate único.
+
+Los módulos posteriores solo deben añadir su contrato de fuente/dominio/reglas de negocio específicas.
+
+## Última causa raíz M6 cerrada estáticamente
+
+Recovery 6.1.14 llegó con runtime 414/26, alias `country → pais`, snapshots completos, write guard e integridad PASS. El fallo browser ocurrió porque el acuerdo legal se crea 520 ms después de `showApp`; el validator podía comprobar demasiado pronto que no existía y continuar antes de que el modal apareciera.
+
+Clasificación:
+
+`VALIDATOR_STALE / LEGAL_GATE_DEFERRED_RENDER_RACE`.
+
+Corrección reusable:
+
+- `tools/orbit360-browser-blocking-gate-readiness-v20260730.mjs`;
+- `tools/orbit360-browser-blocking-gate-readiness-test-v20260730.mjs`;
+- validator browser `20260730.7`.
+
+Prueba sintética 6.1.15:
 
 ```txt
-Package run: 30455383510
-Delivery run: 30455636671
-Preflight: 24/24
-Contrato: 22/22
-Hosting deploy executions: 1
-Redeploy: 0
-Firestore writes: 0
-Operational writes: 0
-Runtime/browser: false/false
+delayedGateMs: 520
+accepted: 1
+remaining: 0
+status: PASS
+run: 30552591248
+artifact: 8763394413
+recovery productivo: SKIPPED
 ```
 
-## M5 5.0.11 — runtime smoke stop-line
+## Rebranding futuro GRAVICENTRA
 
-La autorización runtime se consumió exactamente una vez sobre RC `f6dfa37e…`.
+Estado: registrado / diferido / no bloqueante.
 
-```txt
-Package run: 30457621192
-Package job: 90595169193
-Package artifact: 8726195633
-Runtime request: 136cca57600c0aef146ad5b121aeb746a7d0dd4c
-Runtime run: 30457847993
-Runtime job: 90595950599
-Runtime artifact: 8726316517
-Runtime digest: sha256:61740f99806fc8353d0f2cbddf5a48b8432c27ced33dbb2e5808a94372f4135e
-Preflight: 17/17
-Contrato: 42/42
-Snapshots: 11/11 antes + 11/11 después
-Counts/digests: estables
-Firestore writes: 0
-Operational writes: 0
-```
+El punto recomendado es el último punto técnicamente seguro antes del lanzamiento público definitivo, una vez cerrada la funcionalidad crítica y sin gate de datos/migración abierto.
 
-### Causa raíz
+En ese momento se debe anunciar:
 
-El bootstrap normalizado, autenticación y legal funcionaron. El primer fallo funcional fue `MEMBERSHIP_BOUNDARY_NOT_ACTIVE`.
+`PUNTO SEGURO DE REBRANDING GRAVICENTRA ALCANZADO`
 
-Clasificación: `FUNCTIONAL_DEFECT` + `DATA_CONTRACT_FAILURE`.
+Antes de cambiar nada se hará inventario read-only de referencias visibles a Orbit 360 y se clasificará cada una entre cambio visual, identificador técnico a conservar, documento histórico, revisión legal, asset o metadata pública.
 
-El owner fail-closed de Access exige una proyección de membership autenticada en `Orbit.auth.productUser`. El flujo LAB aportaba identidad Firebase, pero no proyectaba roles/scopes/advisor desde la membership. El fallback legado con rol/asesor hardcodeados es incompatible con el contrato multirol actual y no fue restaurado.
-
-## M5 5.0.12 — remediación Access/membership cerrada
-
-### Implementación
-
-`core/access-role-session-owner-v20260728.js` v`20260729.3` ahora:
-
-- deriva tenant del runtime;
-- deriva UID exclusivamente del usuario Firebase autenticado;
-- consulta read-only `tenants/{tenantId}/members/{authenticatedUid}`;
-- valida tenant, UID, estado, roles, rol default/activo y advisor;
-- proyecta únicamente `Orbit.auth.productUser` con `productReadOnly:true`;
-- no sobrescribe `Orbit.auth.user()`;
-- permanece fail-closed si la membership falta o es inválida;
-- no contiene tenant, UID, asesor, correo ni rol fallback hardcodeados;
-- conserva `writeAuthorized:false` y `membershipWrites:false`.
-
-No fueron modificados `data/store.js`, `data/store-firestore-lab.local.js`, `core/auth.js`, `core/backend-lab-init.js`, `core/backend-lab-loader.js`, `core/backend-lab-auth-guard.js`, `core/importa.js` ni `firestore.rules`.
-
-### Evidencia
-
-```txt
-Run final: 30460202680
-Job: 90603978220
-Artifact: 8727238222
-Digest: sha256:51e1e36221fecf121bc2c121b445abf5d78f6fb2de8c0cff8376a86c56f74378
-Workflow safety: 13/13
-Preflight canónico: 36/36
-Fixture membership: 23/23
-Protected files unchanged: true
-Secrets/Firestore/runtime/browser/deploy: false/false/false/false/false
-```
-
-La fixture cubre membership válida, inexistente y con rol activo inválido. Los casos inválidos cierran acceso sin fallback y sin escrituras.
-
-### Incidentes de pipeline
-
-Durante la convergencia 5.0.12 aparecieron validadores/mecanismos obsoletos. Se detuvo el patrón de reintentos cuando la misma etapa falló dos veces, se congelaron los cambios funcionales y se corrigió el mecanismo:
-
-- validadores de fixture demasiado amplios/exactos;
-- self-scan autorreferencial del workflow;
-- checkout superficial que no incluía el commit histórico requerido para diff;
-- seguridad del workflow movida a un owner externo y checkout con historia completa.
-
-Ninguno de esos incidentes accedió a secretos, Firestore real, navegador ni deploy.
-
-## Release candidate vigente
-
-```txt
-RC anterior: f6dfa37ec1449b627c04cde2caf7d3c43acfe453fb0a7eb73924861bb4e7d324
-RC vigente: ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61
-Activos críticos: 42/42
-Activos públicos LAB: 24/25
-Mismatches: 1
-Única diferencia: core/access-role-session-owner-v20260728.js
-Estado: M5_RC_READY_LAB_DELIVERY_REQUIRED
-```
-
-## Límite de autorización actual
-
-```txt
-staticRemediationAuthorized: false
-hostingDeployAuthorized: false
-allowedHostingDeployExecutions: 0
-runtimeSmokeAuthorized: false
-allowedRuntimeSmokeExecutions: 0
-visualReviewAuthorized: false
-productionAuthorized: false
-policiesAuthorized: false
-```
-
-## Siguiente acción operativa
-
-```txt
-Solicitar autorización explícita separada para una única entrega Hosting LAB
-sobre la RC ae6bb2a3…, sin Firestore, runtime, navegador,
-Functions, Rules, producción, main, merge ni Pólizas.
-Después exigir paridad pública 25/25.
-```
-
-Solo después de 25/25 podrá solicitarse un nuevo runtime smoke independiente. No se reutiliza la autorización consumida de 5.0.11.
-
-No se inicia Pólizas dentro de M5. Cuando el Plan Maestro llegue al bloque Pólizas se debe solicitar la fuente actual, vigente y específica; `Listado producción 2025-2026` no es una fuente válida de Pólizas.
-
-## Metodología vigente
-
-Antes de modificar: verificar PR, rama, HEAD, freeze, registro contractual y evidencia más reciente. Antes de secretos, Firebase, sincronización, deploy LAB o navegador: ejecutar el preflight canónico del gate. Si la misma etapa o código falla dos veces, detener reintentos y diagnosticar causa raíz.
-
-Un status rojo no prueba por sí mismo un defecto funcional. Debe identificarse la etapa exacta, comprobar si hubo resultado operativo y comparar snapshots/digests antes de corregir o reintentar.
-
-## Arquitectura y capa de datos
+## Arquitectura
 
 ```txt
 orbit360-platform/
@@ -180,23 +151,8 @@ orbit360-platform/
 └── tools/
 ```
 
-Los módulos usan exclusivamente `Orbit.store`. El backend adapta el store sin romper su API pública ni introducir persistencia directa en módulos.
+Los módulos consumen `Orbit.store`; el backend se adapta al store y no al revés. A&S continúa configurado como tenant, sin fork ni hardcode de datos/credenciales en módulos genéricos.
 
-### Carriles permanentes
+## Siguiente acción
 
-```txt
-A — prototipo / UX / Academia / empalmes Claude
-B — backend protegido / Auth / seguridad / Orbit.store / integraciones
-C — datos reales y migración A&S por fuentes separadas
-```
-
-## Reglas de datos
-
-- GT → GTQ; CO → COP.
-- Si falta país/moneda confiable: `REQUIERE_VALIDACION`.
-- Cobros/recaudos no son `finmovs`.
-- Producción, metas y comisiones usan prima neta recaudada.
-- Solo pólizas Vigente / Por renovar generan cartera.
-- Financiero histórico no crea clientes, pólizas, cobros ni cartera.
-- Estados bancarios sirven para conciliación, no para crear cobros directamente.
-- Documentos solo proponen datos con diff/confirmación.
+M6 permanece congelado por `STOP_RETRY`; no existe request 6.1.16 y no corresponde pedir otra autorización productiva automáticamente. La próxima reapertura de riesgo solo puede ocurrir después de que el paquete macro correspondiente esté totalmente preparado y validado fuera de producción.
