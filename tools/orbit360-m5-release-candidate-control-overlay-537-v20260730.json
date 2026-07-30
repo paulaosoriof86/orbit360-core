@@ -1,5 +1,5 @@
 {
-  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-537-v1",
+  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-537-v2",
   "issuedAt":"2026-07-30",
   "authoritativeForCurrentM5ControlState":true,
   "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-535-v20260729.json","tools/orbit360-m5-runtime-stop-overlay-536-v20260729.json","tools/orbit360-m5-academia-inventory-537-freeze-v20260729.json"],
@@ -13,6 +13,7 @@
   "remediation537":{"closed":true,"runId":30501531194,"jobId":90742043113,"artifactId":8743660777,"artifactDigest":"sha256:0d8ed0a9278c96440edae93b357b804f05479b06cf6d043a0c1c5ace569768ff","preflight":"9/9 PASS","fixture":"18/18 PASS","policyBlob":"fa4c29d30a82673a7bf2d3d55efce52eaf4cccf3","operationalUserCoursesRemainDurable":true,"workflowFrozen":true},
   "authorization":{"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeRequestCreated":false,"visualReviewAuthorized":false,"productionAuthorized":false},
   "safety":{"secrets":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"policies":false,"pólizas":false},
+  "documentation":"orbit360-platform/docs/CIERRE-M5-5.0.36-RUNTIME-Y-5.0.37-INVENTARIO-CURSOS-ESTATICOS-20260730.md",
   "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_HOSTING_LAB_AUTHORIZATION_FOR_RC_097D4E85_46_29; after delivery require 29/29 before requesting a new independent runtime authorization",
   "containsPII":false,
   "containsSecrets":false
