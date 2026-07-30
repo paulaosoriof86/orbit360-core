@@ -1,74 +1,16 @@
-name: Orbit 360 · M5 5.0.40 legacy Academia seed marker fix
-run-name: M5 5.0.40 · explicit static marker for legacy seed courses · ${{ github.sha }}
+name: Orbit 360 · M5 5.0.40 legacy Academia seed marker fix · FROZEN
 
 on:
-  push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - 'tools/orbit360-m5-academia-legacy-seed-marker-fix-540-trigger-v20260730.json'
+  workflow_dispatch:
 
 permissions:
-  contents: write
-  statuses: write
+  contents: read
 
 jobs:
-  patch:
+  frozen:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ays/backend-tenant-lab-v99-20260703
-          fetch-depth: 2
-      - name: Aplicar cuatro sustituciones exactas
-        shell: bash
+      - name: Legacy seed marker fix already applied
         run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          changes=[]
-          def replace(path,old,new,label):
-              p=Path(path);s=p.read_text()
-              n=s.count(old)
-              if n!=1: raise SystemExit(f'{label}_EXPECTED_ONCE:{n}')
-              p.write_text(s.replace(old,new,1));changes.append(path)
-          replace('orbit360-platform/core/academia-static-content-write-policy-v20260729.js',"var VERSION='20260729.2';","var VERSION='20260730.1';",'POLICY_VERSION')
-          replace('orbit360-platform/core/academia-static-content-write-policy-v20260729.js',"var staticCourseId=/^(cur_|curso_base_|academia_)/i.test(key);\n      var contentShape=hasAny(patch,['titulo','cat','emoji','color','desc','destinatarios','recursos','metaLeccion','lecciones']);\n      if(staticCourseId&&hasVersionMarker(patch)&&contentShape)return {mode:'transient_static_content',reason:'versioned_static_course'};","var staticCourseId=/^(cur_|curso_base_|academia_)/i.test(key);\n      var explicitSeedCourse=patch._staticCourse===true;\n      var contentShape=hasAny(patch,['titulo','cat','emoji','color','desc','destinatarios','recursos','metaLeccion','lecciones']);\n      if((staticCourseId||explicitSeedCourse)&&hasVersionMarker(patch)&&contentShape)return {mode:'transient_static_content',reason:explicitSeedCourse?'versioned_explicit_seed_course':'versioned_static_course'};",'POLICY_CLASSIFIER')
-          replace('orbit360-platform/data/academia-v1197-bridge.js',"rows.forEach(c => { if (c && !c._cv) c._cv = 1; });","rows.forEach(c => { if (!c) return; if (!c._cv) c._cv = 1; c._staticCourse = true; });",'SEED_MARKER')
-          replace('orbit360-platform/index.html','core/academia-static-content-write-policy-v20260729.js?v=20260729-2','core/academia-static-content-write-policy-v20260729.js?v=20260730-1','INDEX_POLICY_VERSION')
-          p=Path('orbit360-platform/data/academia-v1230-operational-directory-v20260722.js');s=p.read_text()
-          if s.count("current.version === '20260729.2'")!=1: raise SystemExit('V1230_CURRENT_VERSION_EXPECTED_ONCE')
-          if s.count('academia-static-content-write-policy-v20260729.js?v=20260729-2')!=1: raise SystemExit('V1230_SCRIPT_VERSION_EXPECTED_ONCE')
-          s=s.replace("current.version === '20260729.2'","current.version === '20260730.1'",1).replace('academia-static-content-write-policy-v20260729.js?v=20260729-2','academia-static-content-write-policy-v20260729.js?v=20260730-1',1);p.write_text(s);changes.append(str(p))
-          print('\n'.join(changes))
-          PY
-          node --check orbit360-platform/core/academia-static-content-write-policy-v20260729.js
-          node --check orbit360-platform/data/academia-v1197-bridge.js
-          node --check orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
-          grep -F "var VERSION='20260730.1';" orbit360-platform/core/academia-static-content-write-policy-v20260729.js >/dev/null
-          grep -F "explicitSeedCourse=patch._staticCourse===true" orbit360-platform/core/academia-static-content-write-policy-v20260729.js >/dev/null
-          grep -F "c._staticCourse = true" orbit360-platform/data/academia-v1197-bridge.js >/dev/null
-          grep -F 'core/academia-static-content-write-policy-v20260729.js?v=20260730-1' orbit360-platform/index.html >/dev/null
-          git diff --exit-code --quiet -- . ':!orbit360-platform/core/academia-static-content-write-policy-v20260729.js' ':!orbit360-platform/data/academia-v1197-bridge.js' ':!orbit360-platform/index.html' ':!orbit360-platform/data/academia-v1230-operational-directory-v20260722.js' || { echo UNEXPECTED_FILES_CHANGED >&2; exit 41; }
-      - name: Commit único
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'orbit360-ci'
-          git config user.email 'orbit360-ci@users.noreply.github.com'
-          git add orbit360-platform/core/academia-static-content-write-policy-v20260729.js orbit360-platform/data/academia-v1197-bridge.js orbit360-platform/index.html orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
-          git diff --cached --quiet && { echo 'NO_PATCH' >&2; exit 41; }
-          git commit -m 'm5 5.0.40: explicitly mark legacy seed courses as static'
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
-      - name: Publicar PASS observable
-        if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state:'success',context:'orbit360/m5-academia-seed-marker-fix-540',description:'M5 5.0.40 legacy seed marker fix applied'});
-      - name: Publicar FAIL observable
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state:'failure',context:'orbit360/m5-academia-seed-marker-fix-540',description:'M5 5.0.40 legacy seed marker fix failed'});
+          echo 'M5 5.0.40 legacy seed marker correction already applied and statically validated; rerun forbidden.' >&2
+          exit 41
