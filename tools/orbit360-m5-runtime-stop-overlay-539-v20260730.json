@@ -1,0 +1,16 @@
+{
+  "schemaVersion":"orbit360-m5-runtime-stop-overlay-539-v1",
+  "issuedAt":"2026-07-30",
+  "authoritativeForCurrentM5ControlState":true,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.39",
+  "status":"M5_RUNTIME_539_STOPPED_AFTER_ONE_SHOT_UNVERSIONED_COURSE_ZERO_WRITES",
+  "releaseCandidate":{"hash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a","criticalAssets":46,"publicAssets":29,"publicParity":"29/29"},
+  "runtime":{"authorizationConsumed":true,"allowedRuntimeExecutions":0,"rerunForbidden":true,"requestCommit":"5d615957c5a04941df5cd88896c1fb3dca2217be","runId":30504465098,"jobId":90751082824,"artifactId":8744778362,"artifactDigest":"sha256:d417f4b9db0c7dc664743525731198c55b2470abcb3d7336a00e25cc3f752e7f","preflight":"PASS","contract":"PASS","snapshotBeforeOk":true,"snapshotAfterOk":true,"allCountsStable":true,"allDigestsStable":true,"transientStaticCalls":62,"blockedOperationalCalls":1,"blockedCollection":"cursos","firestoreRead":true,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0},
+  "classification":"FUNCTIONAL_DEFECT",
+  "rootCauseState":"ONE_REMAINING_STATIC_COURSE_PRODUCER_NOT_VERSIONED_OR_NOT_INCLUDED_IN_CLOSED_INVENTORY",
+  "safety":{"secrets":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"pólizas":false},
+  "nextAction":"FREEZE_RUNTIME_AND_COMPLETE_STATIC_CURSOS_PRODUCER_INVENTORY_BEFORE_ANY_NEW_HOSTING_OR_RUNTIME",
+  "containsPII":false,
+  "containsSecrets":false
+}
