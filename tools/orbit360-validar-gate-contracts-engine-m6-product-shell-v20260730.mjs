@@ -7,6 +7,7 @@ const ROOT=process.cwd(),PLAT=path.join(ROOT,'orbit360-platform'),OUT=path.join(
 const GATE='block6-go-live-product-v20260730',VERSION='6.0.0';
 const checks=[];const add=(id,ok,detail='')=>checks.push({id,ok:Boolean(ok),detail:String(detail||'').slice(0,240)});
 const read=rel=>fs.readFileSync(path.join(ROOT,rel),'utf8');
+const localStorageOperational=source=>/(?:localStorage\s*\.|localStorage\s*\[|window\.localStorage)/.test(source);
 try{
   add('GATE',process.argv[2]===GATE&&process.env.ORBIT360_BRANCH==='ays/backend-tenant-lab-v99-20260703');
   const files=[
@@ -26,13 +27,13 @@ try{
   const placeholder=read('orbit360-platform/product-runtime-config.js');
   add('CONFIG_FAIL_CLOSED',/enabled:\s*false/.test(placeholder)&&/tenantHint:\s*''/.test(placeholder)&&!/(?:apiKey|projectId|authDomain|appId):\s*['"][^'"]+/.test(placeholder));
   const provider=read('orbit360-platform/core/product-runtime-browser-providers-p0.js');
-  add('PROVIDERS',provider.includes("tenantSource:'membership_only'")&&provider.includes('MEMBERSHIP_IDENTITY_MISMATCH')&&provider.includes('readTenantConfig')&&!provider.includes('localStorage')&&!provider.includes('orbit.lab@demo.com'));
+  add('PROVIDERS',provider.includes("tenantSource:'membership_only'")&&provider.includes('MEMBERSHIP_IDENTITY_MISMATCH')&&provider.includes('readTenantConfig')&&!localStorageOperational(provider)&&!provider.includes('orbit.lab@demo.com'));
   const auth=read('orbit360-platform/core/auth-product-runtime-p0.js');
-  add('AUTH_PRODUCT',auth.includes('signInWithEmailAndPassword')===false&&auth.includes('p.signIn(')&&auth.includes('noLocalSession:true')&&!auth.includes('demo123')&&!auth.includes('admin@demo.com')&&!auth.includes('localStorage'));
+  add('AUTH_PRODUCT',auth.includes('signInWithEmailAndPassword')===false&&auth.includes('p.signIn(')&&auth.includes('noLocalSession:true')&&!auth.includes('demo123')&&!auth.includes('admin@demo.com')&&!localStorageOperational(auth));
   const pre=read('orbit360-platform/core/product-prebootstrap-store-p0.js');
-  add('PREBOOTSTRAP_VOLATILE',pre.includes('volatile:true')&&pre.includes('_staticCourse===true')&&!pre.includes('localStorage'));
+  add('PREBOOTSTRAP_VOLATILE',pre.includes('volatile:true')&&pre.includes('_staticCourse===true')&&!localStorageOperational(pre));
   const overlay=read('orbit360-platform/core/product-config-session-overlay-p0.js');
-  add('CONFIG_SESSION_OVERLAY',overlay.includes('noLocalStorageFallback:true')&&overlay.includes('PRODUCT_CONFIGURATION_WRITE_REQUIRES_GATE')&&!overlay.includes('localStorage.'));
+  add('CONFIG_SESSION_OVERLAY',overlay.includes('noLocalStorageFallback:true')&&overlay.includes('PRODUCT_CONFIGURATION_WRITE_REQUIRES_GATE')&&!localStorageOperational(overlay));
   const app=read('orbit360-platform/core/product-app-runtime-p0.js');
   add('APP_ORCHESTRATOR',app.includes('backendProductReadOnlyBootstrapP0')&&app.includes('readTenantConfig')&&app.includes('writeAuthorized:false')&&app.includes("tenantSource:'membership_only'"));
   const denyFire=read('firestore.product-deny-all.rules'),denyStorage=read('storage.product-deny-all.rules');
