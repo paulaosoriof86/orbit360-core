@@ -104,6 +104,8 @@ window.Orbit = window.Orbit || {};
   function academyCourse() {
     return {
       id: 'cur_migracion_honesta_v150',
+      _cv: 150,
+      _staticCourse: true,
       titulo: 'Migración honesta y fuentes separadas',
       cat: 'Inducción',
       emoji: '🧭',
