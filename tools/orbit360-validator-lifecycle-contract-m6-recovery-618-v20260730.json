@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "gateContractVersion": "6.1.8",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "M6_PRODUCT_GO_LIVE_RECOVERY_EXECUTION",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": true,
+      "functionsDeploy": false,
+      "rulesDeploy": true,
+      "production": true
+    }
+  },
+  "singleGate": true,
+  "previousRecoveryRun": 30526024340,
+  "previousRecoveryArtifact": 8752755957,
+  "previousRecoveryResult": "ROLLED_BACK_SAFE",
+  "previousRecoveryClassification": "DATA_CONTRACT_FAILURE",
+  "rootCause": "RUNTIME_COLLECTION_MANIFEST_EXCEEDS_CANONICAL_MIGRATION_AND_POLICY",
+  "staticDataContractRemediationRun": 30526897555,
+  "canonicalMigratedCollections": ["clientes", "aseguradoras"],
+  "smokeValidatorRevision": "20260730.3",
+  "boundedHostingReadinessRequired": true,
+  "storageDeferredFailClosed": true,
+  "createStorageBucketAllowed": false,
+  "storageRulesDeployAllowed": false,
+  "productDataWritesAllowed": false,
+  "firestoreReadonlyRulesDeployAllowedOnce": true,
+  "hostingDeployAllowedOnce": true,
+  "rollbackOnFailureAuthorizedWithinSameBlock": true,
+  "functionsDeployAllowed": false,
+  "mergeMainAllowed": false,
+  "policiesAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
