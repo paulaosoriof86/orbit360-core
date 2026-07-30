@@ -9,7 +9,7 @@ const url=String(process.env.ORBIT360_PRODUCT_URL||'').trim();
 const email=String(process.env.ORBIT360_PRODUCT_SMOKE_EMAIL||'').trim();
 const password=String(process.env.ORBIT360_PRODUCT_SMOKE_PASSWORD||'');
 const REQUIRED_ROLES=['Dirección','Operativo','Asesor'];
-const report={schemaVersion:'orbit360-m6-product-browser-smoke-v2',gateId:'block6-go-live-product-v20260730',contractVersion:'6.1.4',validatorRevision:'20260730.2',generatedAt:new Date().toISOString(),stage:'init',checks:{},roleViews:{},networkWriteCandidates:[],visibleTechnicalCopyPredicateVersion:VISIBLE_TECHNICAL_COPY_PREDICATE_VERSION,firestoreRead:true,firestoreWrites:0,operationalWrites:0,functionsDeploy:false,storageDeferredFailClosed:true,production:true,containsPII:false,containsSecrets:false};
+const report={schemaVersion:'orbit360-m6-product-browser-smoke-v2',gateId:'block6-go-live-product-v20260730',contractVersion:'6.1.6',validatorRevision:'20260730.2',generatedAt:new Date().toISOString(),stage:'init',checks:{},roleViews:{},networkWriteCandidates:[],visibleTechnicalCopyPredicateVersion:VISIBLE_TECHNICAL_COPY_PREDICATE_VERSION,firestoreRead:true,firestoreWrites:0,operationalWrites:0,functionsDeploy:false,storageDeferredFailClosed:true,production:true,containsPII:false,containsSecrets:false};
 const clean=v=>String(v==null?'':v).replace(/https?:\/\/[^/\s]+/g,'').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').replace(/[A-Za-z0-9_-]{40,}/g,'[redacted]').replace(/\s+/g,' ').trim().slice(0,360);
 const save=()=>{fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(report,null,2)+'\n');};
 const need=(ok,code,detail='')=>{if(!ok)throw new Error(code+(detail?':'+detail:''));};
