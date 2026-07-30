@@ -15,10 +15,12 @@ on:
       - 'tools/orbit360-browser-blocking-gate-readiness-v20260730.mjs'
       - 'tools/orbit360-browser-blocking-gate-readiness-test-v20260730.mjs'
       - 'tools/orbit360-m6-final-closure-620-access-root-cause-v20260730.json'
+      - 'tools/orbit360-m6-final-closure-630-preflight-pipeline-root-cause-v20260730.json'
       - 'tools/orbit360-validator-lifecycle-contract-m6-final-package-630-static-v20260730.json'
       - 'tools/orbit360-validar-gate-contracts-engine-m6-final-package-630-static-v20260730.mjs'
       - 'tools/orbit360-validator-lifecycle-contract-m6-final-closure-630-v20260730.json'
       - 'tools/orbit360-validar-gate-contracts-engine-m6-final-closure-630-v20260730.mjs'
+      - 'tools/orbit360-validar-gate-contracts-engine-m6-final-closure-630-resume-v20260730.mjs'
 permissions:
   contents: read
   statuses: write
@@ -29,6 +31,7 @@ env:
   ORBIT360_GATE_ID: block6-go-live-product-v20260730
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   ORBIT360_REQUEST_FILE: tools/orbit360-m6-final-closure-630-request-v20260730.json
+  ORBIT360_PIPELINE_RC_FILE: tools/orbit360-m6-final-closure-630-preflight-pipeline-root-cause-v20260730.json
   ORBIT360_PRODUCT_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
   ORBIT360_PRODUCT_URL: https://ays-orbit-360-lab.web.app
@@ -44,13 +47,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 2
+          fetch-depth: 12
           persist-credentials: false
       - name: Preparar Node 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Detectar request nuevo sin modificar triggers previos
+      - name: Detectar request nuevo o reanudación pre-risk autorizada
         id: detect
         shell: bash
         run: |
@@ -58,7 +61,22 @@ jobs:
           echo "recovery_requested=false" >> "$GITHUB_OUTPUT"
           if git diff --name-only HEAD^ HEAD | grep -Fxq "$ORBIT360_REQUEST_FILE"; then
             echo "recovery_requested=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          test "$(git rev-parse HEAD^)" = "fd7a48ffc67c35267546fc80afde227158852f14"
+          test -f "$ORBIT360_REQUEST_FILE"
+          test -f "$ORBIT360_PIPELINE_RC_FILE"
+          node - <<'NODE'
+          const fs=require('fs'),cp=require('child_process');
+          const req=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
+          const rc=JSON.parse(fs.readFileSync(process.env.ORBIT360_PIPELINE_RC_FILE,'utf8'));
+          const requestCommit=cp.execFileSync('git',['log','-n','1','--format=%H','--',process.env.ORBIT360_REQUEST_FILE],{encoding:'utf8'}).trim();
+          const requestParent=cp.execFileSync('git',['rev-parse',requestCommit+'^'],{encoding:'utf8'}).trim();
+          if(requestCommit!==rc.sourceRequestCommit||req.recoveryBaseCommit!==requestParent)throw new Error('M6_RESUME_REQUEST_LINEAGE_INVALID');
+          if(rc.sourceRun!==30561973750||rc.canonicalChecksPassed!==23||rc.canonicalChecksFailed!==0||rc.recoverySkipped!==true||rc.secretsRead!==false||rc.firestoreRead!==false||rc.firestoreWrites!==0||rc.operationalWrites!==0||rc.browserExecuted!==false||rc.rulesApplied!==false||rc.deployExecuted!==false||rc.productionTouched!==false||rc.authorizationConsumedByDeploy!==false||rc.requestImmutable!==true||rc.sameRequestResumeAllowed!==true)throw new Error('M6_RESUME_PRE_RISK_PROOF_INVALID');
+          if(req.explicitRecoveryAuthorization!==true||req.authorizationConsumed!==false||req.allowedExecutions!==1)throw new Error('M6_RESUME_AUTHORIZATION_NOT_AVAILABLE');
+          NODE
+          echo "recovery_requested=true" >> "$GITHUB_OUTPUT"
       - name: Preflight canónico antes de cualquier capacidad
         id: static_preflight
         shell: bash
@@ -69,8 +87,14 @@ jobs:
           node --check tools/orbit360-m6-product-browser-smoke-v20260730.mjs
           node --check tools/orbit360-browser-blocking-gate-readiness-v20260730.mjs
           node --check tools/orbit360-m6-product-membership-access-bridge-test-v20260730.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m6-final-closure-630-resume-v20260730.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="6.3.0" and .failed==0 and .membershipAccessBridge==true and .advisorMigrationRequired==false and .nextRecoveryPrepared==true and .nextRecoveryRequestPresent==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .rulesApplied==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="6.3.0" and .failed==0 and .membershipAccessBridge==true and .advisorMigrationRequired==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .rulesApplied==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          if [ "${{ steps.detect.outputs.recovery_requested }}" = "true" ]; then
+            jq -e '.executionPhase=="M6_PRODUCT_GO_LIVE_RECOVERY_EXECUTION" and .executionAuthorized==true and .allowedExecutions==1 and .pipelineResumeAllowed==true and .sourcePreRiskFailedRun==30561973750' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          else
+            jq -e '.nextRecoveryPrepared==true and .nextRecoveryRequestPresent==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          fi
       - name: Publicar estado estático
         if: always()
         uses: actions/github-script@v7
@@ -100,7 +124,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 2
+          fetch-depth: 12
           persist-credentials: false
       - name: Preparar Node 22
         uses: actions/setup-node@v4
@@ -113,10 +137,17 @@ jobs:
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
           test "$GITHUB_RUN_ATTEMPT" = '1'
           test -f "$ORBIT360_REQUEST_FILE"
+          test -f "$ORBIT360_PIPELINE_RC_FILE"
           node - <<'NODE'
-          const fs=require('fs'),cp=require('child_process');const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();const bad=[];
+          const fs=require('fs'),cp=require('child_process');
+          const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
+          const prc=JSON.parse(fs.readFileSync(process.env.ORBIT360_PIPELINE_RC_FILE,'utf8'));
+          const requestCommit=cp.execFileSync('git',['log','-n','1','--format=%H','--',process.env.ORBIT360_REQUEST_FILE],{encoding:'utf8'}).trim();
+          const requestParent=cp.execFileSync('git',['rev-parse',requestCommit+'^'],{encoding:'utf8'}).trim();
+          const bad=[];
           if(r.schemaVersion!=='orbit360-m6-final-closure-request-v2'||r.gateId!==process.env.ORBIT360_GATE_ID||r.contractVersion!=='6.3.0'||r.macroClosure!==true)bad.push('schema');
-          if(r.branch!==process.env.ORBIT360_BRANCH||r.recoveryBaseCommit!==parent)bad.push('binding');
+          if(r.branch!==process.env.ORBIT360_BRANCH||r.recoveryBaseCommit!==requestParent||requestCommit!==prc.sourceRequestCommit)bad.push('binding');
+          if(prc.sourceRun!==30561973750||prc.recoverySkipped!==true||prc.deployExecuted!==false||prc.productionTouched!==false||prc.authorizationConsumedByDeploy!==false||prc.requestImmutable!==true||prc.sameRequestResumeAllowed!==true)bad.push('resume_proof');
           if(r.explicitRecoveryAuthorization!==true||r.authorizationSource!=='user_authorized_m6_final_closure_630_after_membership_access_remediation_20260730'||r.allowedExecutions!==1||r.authorizationConsumed!==false||r.rootCauseClosed!==true)bad.push('authorization');
           if(r.target?.projectId!==process.env.ORBIT360_PRODUCT_PROJECT_ID||r.target?.tenantId!==process.env.ORBIT360_PRODUCT_TENANT_ID||r.target?.liveUrl!==process.env.ORBIT360_PRODUCT_URL)bad.push('target');
           if(r.firestoreDataWrites!==false||r.hostingDeploy!==true||r.firestoreRulesDeploy!==true||r.storageRulesDeploy!==false||r.storageDeferredFailClosed!==true||r.createStorageBucket!==false||r.runtime!==true||r.browser!==true||r.production!==true||r.rollbackOnFailure!==true||r.functionsDeploy!==false||r.main!==false||r.merge!==false||r.polizas!==false)bad.push('scope');
@@ -129,7 +160,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="6.3.0" and .executionPhase=="M6_PRODUCT_GO_LIVE_RECOVERY_EXECUTION" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .macroClosure==true and .membershipAccessBridge==true and .advisorSourceOnly==true and .advisorMigrationRequired==false and .reusableBrowserReadiness==true and .blockingGateSyntheticProof==true and .canonicalMigratedCollections==["clientes","aseguradoras"] and .logicalCountryField=="country" and .physicalCountryField=="pais" and .waitAllActiveCollections==true and .semanticInsurerCardClick==true and .viewportHitTest==true and .smokeValidatorContractVersion=="6.2.0" and .smokeValidatorRevision=="20260730.7" and .storageDeferredFailClosed==true and .capabilityProfile.writes==false and .capabilityProfile.rulesDeploy==true and .capabilityProfile.production==true and .secretAccess==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="6.3.0" and .executionPhase=="M6_PRODUCT_GO_LIVE_RECOVERY_EXECUTION" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .macroClosure==true and .pipelineResumeAllowed==true and .membershipAccessBridge==true and .advisorSourceOnly==true and .advisorMigrationRequired==false and .reusableBrowserReadiness==true and .blockingGateSyntheticProof==true and .canonicalMigratedCollections==["clientes","aseguradoras"] and .logicalCountryField=="country" and .physicalCountryField=="pais" and .waitAllActiveCollections==true and .semanticInsurerCardClick==true and .viewportHitTest==true and .smokeValidatorContractVersion=="6.2.0" and .smokeValidatorRevision=="20260730.7" and .storageDeferredFailClosed==true and .capabilityProfile.writes==false and .capabilityProfile.rulesDeploy==true and .capabilityProfile.production==true and .secretAccess==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Instalar herramientas después del preflight
         shell: bash
         run: |
