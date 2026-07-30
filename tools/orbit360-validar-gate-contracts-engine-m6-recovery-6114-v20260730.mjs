@@ -15,7 +15,7 @@ const SMOKE='tools/orbit360-m6-product-browser-smoke-v20260730.mjs';
 const POLICY='orbit360-platform/core/tenant-access-policy-product-p0.js';
 const APP='orbit360-platform/core/product-app-runtime-p0.js';
 const ROOT_CAUSE='tools/orbit360-m6-insurer-card-viewport-root-cause-v20260730.json';
-const STATIC_RUN=0;
+const STATIC_RUN=30549826785;
 const checks=[];
 const add=(id,ok,detail='')=>checks.push({id,ok:Boolean(ok),detail:String(detail||'').slice(0,240)});
 const read=rel=>fs.readFileSync(path.join(ROOT,rel),'utf8');
@@ -28,7 +28,7 @@ try{
   add('BRANCH',req.branch==='ays/backend-tenant-lab-v99-20260703'&&process.env.ORBIT360_BRANCH===req.branch);
   add('BINDING',req.recoveryBaseCommit===parent,parent);
   add('AUTHORIZATION',req.explicitRecoveryAuthorization===true&&req.authorizationSource==='user_authorized_m6_recovery_6114_after_viewport_validator_20260730'&&req.allowedExecutions===1&&req.authorizationConsumed===false&&req.validatorRootCauseClosed===true);
-  add('STATIC_REMEDIATION',STATIC_RUN>0&&req.staticValidatorRemediationRun===STATIC_RUN&&req.smokeValidatorRevision==='20260730.6'&&req.semanticInsurerCardClick===true&&req.viewportHitTest===true&&req.boundedHostingReadiness===true);
+  add('STATIC_REMEDIATION',req.staticValidatorRemediationRun===STATIC_RUN&&req.smokeValidatorRevision==='20260730.6'&&req.semanticInsurerCardClick===true&&req.viewportHitTest===true&&req.boundedHostingReadiness===true);
   add('HISTORY',req.previousRecoveryRun===30549026522&&req.previousRecoveryArtifact===8762009928&&req.previousRecoveryResult==='ROLLED_BACK_SAFE');
   add('ROOT_CAUSE',rc.classification==='VALIDATOR_STALE'&&rc.rootCause==='SEMANTIC_CARD_HITTEST_MISSING_SCROLL_INTO_VIEW'&&rc.rollbackSafe===true);
   add('TARGET',req.target?.projectId==='ays-orbit-360-lab'&&req.target?.tenantId==='alianzas-soluciones'&&req.target?.liveUrl==='https://ays-orbit-360-lab.web.app'&&req.createProject===false&&req.createStorageBucket===false);
