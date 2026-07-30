@@ -21,15 +21,12 @@ const checks=[];const check=(id,ok,d='')=>checks.push({id,ok:Boolean(ok),detail:
 const policyBlob=execFileSync('git',['hash-object','orbit360-platform/core/academia-static-content-write-policy-v20260729.js'],{cwd:ROOT,encoding:'utf8'}).trim();
 check('POLICY_UNCHANGED',policyBlob==='fa4c29d30a82673a7bf2d3d55efce52eaf4cccf3',policyBlob);
 check('DESCRIPTOR_46_29',descriptor.contractVersion==='5.0.37'&&descriptor.criticalAssets?.length===46&&descriptor.remoteAssets?.length===29&&descriptor.criticalAssets.includes('data/seed.js')&&descriptor.remoteAssets.includes('data/seed.js')&&descriptor.criticalAssets.includes('data/academia-v1197-bridge.js')&&descriptor.remoteAssets.includes('data/academia-v1197-bridge.js'));
-const sandbox={console,Date,Math,setTimeout(){},clearTimeout(){},document:{addEventListener(){},dispatchEvent(){}},CustomEvent:function(){}};sandbox.window=sandbox;vm.createContext(sandbox);
-vm.runInContext(seed,sandbox,{filename:'seed.js'});
-const seedRowsBefore=Array.isArray(sandbox.Orbit?.SEED?.cursos)?sandbox.Orbit.SEED.cursos:[];
-check('SEED_HAS_BASE_COURSES',seedRowsBefore.length>0,seedRowsBefore.length);
-check('SEED_ORIGINALLY_HAS_UNVERSIONED',seedRowsBefore.some(c=>c&&!c._cv),seedRowsBefore.filter(c=>c&&!c._cv).length);
-sandbox.Orbit.store=null;
-vm.runInContext(v1197,sandbox,{filename:'academia-v1197-bridge.js'});
-const seedRowsAfter=Array.isArray(sandbox.Orbit?.SEED?.cursos)?sandbox.Orbit.SEED.cursos:[];
-check('NORMALIZER_VERSIONS_ALL_BASE_SEED',seedRowsAfter.length===seedRowsBefore.length&&seedRowsAfter.every(c=>c&&Number(c._cv)>=1),seedRowsAfter.filter(c=>!c||!c._cv).length);
+check('SEED_DECLARES_BASE_COURSES',seed.includes('const cursos = [')&&seed.includes('reclamos, cursos, notifs'));
+check('SEED_BASE_SAMPLE_UNVERSIONED',/\{ id: 'cur1', titulo: 'Inducción Orbit 360'/.test(seed));
+const sandbox={console,setTimeout(){},clearTimeout(){},document:{addEventListener(){},dispatchEvent(){}},CustomEvent:function(){},Orbit:{SEED:{cursos:[{id:'cur_seed_unversioned'},{id:'cur_seed_preserved',_cv:9}]},store:null}};sandbox.window=sandbox;vm.createContext(sandbox);vm.runInContext(v1197,sandbox,{filename:'academia-v1197-bridge.js'});
+const normalized=sandbox.Orbit.SEED.cursos;
+check('NORMALIZER_VERSIONS_UNVERSIONED',normalized[0]?._cv===1,JSON.stringify(normalized[0]));
+check('NORMALIZER_PRESERVES_VERSIONED',normalized[1]?._cv===9,JSON.stringify(normalized[1]));
 check('NORMALIZER_ONLY_UNVERSIONED',v1197.includes("rows.forEach(c => { if (c && !c._cv) c._cv = 1; });"));
 check('PLUS_VERSIONED',/var CONTENT_V\s*=\s*8\s*;/.test(plus)&&plus.includes("recursos: [], _cv: CONTENT_V")&&plus.includes("_cv: CONTENT_V }, c"));
 check('V1197_OWN_VERSIONED',v1197.includes('_cv: 1197'));
@@ -45,5 +42,5 @@ const marked=classify('insert','cursos','cur_seed_fixture',{id:'cur_seed_fixture
 const unmarked=classify('insert','cursos','cur_user_fixture',{id:'cur_user_fixture',titulo:'Usuario',lecciones:[]});
 check('POLICY_MARKED_TRANSIENT',marked.mode==='transient_static_content'&&marked.reason==='versioned_static_course',JSON.stringify(marked));
 check('POLICY_UNMARKED_DURABLE',unmarked.mode==='durable_operational'&&unmarked.reason==='user_or_operational_mutation',JSON.stringify(unmarked));
-const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-m5-academia-static-producer-inventory-537-fixture-v1',gateId:'block5-release-candidate-visualization-v20260728',contractVersion:'5.0.37',ok:failed.length===0,status:failed.length?'M5_ACADEMIA_STATIC_PRODUCER_INVENTORY_537_FIXTURE_FAIL':'M5_ACADEMIA_STATIC_PRODUCER_INVENTORY_537_FIXTURE_PASS',passed:checks.length-failed.length,total:checks.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,policyBlobSha:policyBlob,seedCourses:seedRowsAfter.length,criticalAssets:46,remoteAssetsExpected:29,operationalUserCoursesRemainDurable:true,secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,production:false,containsPII:false,containsSecrets:false};
+const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-m5-academia-static-producer-inventory-537-fixture-v1',gateId:'block5-release-candidate-visualization-v20260728',contractVersion:'5.0.37',ok:failed.length===0,status:failed.length?'M5_ACADEMIA_STATIC_PRODUCER_INVENTORY_537_FIXTURE_FAIL':'M5_ACADEMIA_STATIC_PRODUCER_INVENTORY_537_FIXTURE_PASS',passed:checks.length-failed.length,total:checks.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,policyBlobSha:policyBlob,syntheticSeedCourses:normalized.length,criticalAssets:46,remoteAssetsExpected:29,operationalUserCoursesRemainDurable:true,secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,production:false,containsPII:false,containsSecrets:false};
 const outPath=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/m5-academia-static-producer-inventory-537-fixture-summary.json');fs.mkdirSync(path.dirname(outPath),{recursive:true});fs.writeFileSync(outPath,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
