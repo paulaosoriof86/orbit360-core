@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "gateContractVersion": "6.0.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "M6_PRODUCT_SHELL_STATIC_PREPARATION",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "m5ClosedRequired": true,
+  "productShellRequired": true,
+  "rollbackRequired": true,
+  "productionAuthorizationRequiredLater": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
