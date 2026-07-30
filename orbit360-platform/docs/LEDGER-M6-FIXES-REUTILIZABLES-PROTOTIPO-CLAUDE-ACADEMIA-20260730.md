@@ -19,11 +19,15 @@ Este documento extiende el ledger acumulado de fixes locales y evita que los apr
 | Colección no migrada no se inventa para satisfacer smoke | Distinguir fuente vs colección canónica; Asesor se resuelve desde membership y no obliga a migrar 7 asesores por conveniencia | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Vigente |
 | Manifiesto runtime incluía colecciones no promovidas canónicamente | La lista de colecciones productivas debe ser intersección exacta entre fuentes migradas/aprobadas y política de acceso; módulos futuros no se agregan “por anticipado” | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | `DATA_CONTRACT_FAILURE` 6.1.6 cerrado; runtime M6 = clientes + aseguradoras |
 | Colección sin política bloqueaba todo el bootstrap | Un manifiesto debe validarse contra `COLLECTION_POLICY` antes de adjuntar snapshots; una colección desconocida permanece fail-closed y no se promueve | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Preflight 6.1.7 incorporado |
+| Política lógica usaba `country`, pero el documento canónico físico usa `pais` | Separar nombres lógicos de acceso de campos físicos de persistencia; el adaptador productivo traduce aliases contra el esquema canónico antes de construir la query | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | `DATA_CONTRACT_FAILURE` 6.1.8 cerrado; alias productivo `country → pais` |
+| Firestore devolvió snapshots válidos pero vacíos por un campo físico equivocado | Una consulta exitosa con cero documentos no prueba contrato correcto; contrastar siempre contra baseline esperado y campos físicos del esquema | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Smoke `20260730.4` exige 414/26 y verifica fields del query plan |
+| App podía mostrar producto después del primer snapshot, no después de todas las colecciones activas | Readiness de store debe esperar todas las colecciones obligatorias o un estado explícitamente denied; cualquier snapshot error bloquea la UI | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Barrera `waitActiveCollections` incorporada |
+| Diagnóstico runtime se asignaba después de assertions | Persistir primero el estado sanitizado observado y luego validar; así un fallo conserva evidencia útil de counts, plans y readiness | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Smoke `20260730.4` |
 | Deploy multi-target incluía Storage inexistente | Antes de un deploy multi-target validar existencia/readiness real de cada target; un recurso opcional ausente se difiere fail-closed, no se crea para satisfacer el gate | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Causa raíz M6 cerrada |
 | Verificación inmediata de Hosting devolvió 404 transitorio | Readiness post-deploy debe esperar propagación acotada y validar marcador/hash esperado antes de declarar fallo | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Owner implementado y validado estáticamente; run 30517683129 y revalidación 30520801419 |
 | Smoke declaró 60 s pero Playwright usó 30 s | Al usar APIs con firma `(fn, arg?, options?)`, validar semánticamente la posición de argumentos; `waitForFunction` requiere `undefined` como segundo argumento cuando no hay `arg` | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | `VALIDATOR_STALE` cerrado; validatorRevision `20260730.2`; 6.1.5 PASS estático |
-| `continue-on-error` hacía que la vista de Actions pareciera exitosa aunque el `outcome` real del smoke fuera failure | Los gates deben cerrar con `steps.<id>.outcome` y evidencia propia, no inferir éxito por presentación visual/conclusion | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Incorporado al cierre M6 y al diagnóstico de 6.1.4 |
-| Un timeout de login sin contexto no permite distinguir lentitud de fallo funcional | Ante timeout, guardar diagnóstico sanitizado del estado de arranque: app presente/iniciada, status del store, noFallback y writeEnabled; nunca credenciales ni PII | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Ampliado en smoke `20260730.3` con fase/errores sanitizados del bootstrap |
+| `continue-on-error` hacía que la vista de Actions pareciera exitosa aunque el `outcome` real del smoke fuera failure | Los gates deben cerrar con `steps.<id>.outcome` y evidencia propia, no inferir éxito por presentación visual/conclusion | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Incorporado al cierre M6 y confirmado nuevamente en 6.1.8 |
+| Un timeout de login sin contexto no permite distinguir lentitud de fallo funcional | Ante timeout, guardar diagnóstico sanitizado del estado de arranque: app presente/iniciada, status del store, noFallback y writeEnabled; nunca credenciales ni PII | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Ampliado desde smoke `20260730.3`; `20260730.4` agrega plans/collections |
 | Salida del deploy no estaba en primer artifact | Toda etapa de riesgo debe conservar resultado sanitizado del proveedor para diagnóstico de causa raíz | `BACKEND_PROTEGIDO_NO_CLAUDE` + `ACADEMIA_ACTUALIZAR` | Corregido desde 6.1.2 |
 | Request disparador no debe modificarse para marcar consumo | Trigger inmutable; consumo/estado se registra fuera del path disparador | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Regla permanente |
 | Rollback dependía del mismo recurso que causó el fallo | El rollback debe minimizar dependencias y poder cerrar el sistema aunque falle un servicio opcional | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Corregido: Firestore deny-all + Hosting neutro; Storage diferido |
@@ -41,6 +45,11 @@ Este documento extiende el ledger acumulado de fixes locales y evita que los apr
 - no crear datos o colecciones para hacer pasar un smoke;
 - el manifiesto de colecciones activas debe provenir de migración/contrato vigente, no de módulos futuros;
 - validar que toda colección activa tenga política conocida antes del bootstrap;
+- separar campo lógico de política y campo físico de persistencia mediante aliases explícitos y auditables;
+- validar queries contra el esquema real de migración, no contra nombres conceptuales;
+- no interpretar snapshot vacío como éxito funcional si existe un baseline canónico esperado;
+- esperar snapshots de todas las colecciones activas antes de mostrar la aplicación;
+- guardar diagnóstico sanitizado antes de ejecutar assertions que pueden fallar;
 - distinguir error funcional de error de validador, entorno, pipeline o contrato de datos;
 - validar firmas de APIs de automatización, especialmente argumentos opcionales y timeouts;
 - no usar `continue-on-error` como señal de éxito: leer `outcome` y evidencia del gate.
@@ -73,7 +82,10 @@ La Academia debe enseñar con el caso M6:
 8. Con `continue-on-error`, `conclusion` visible y `outcome` contractual no son equivalentes.
 9. Un timeout debe producir diagnóstico sanitizado suficiente para clasificar causa raíz sin exponer secretos.
 10. Un manifiesto runtime que excede las fuentes canónicamente migradas es `DATA_CONTRACT_FAILURE`, aunque las colecciones futuras sean válidas conceptualmente.
-11. Documentación y evidencia acompañan el avance; no sustituyen la implementación.
+11. Un alias lógico/físico incorrecto puede devolver una query técnicamente exitosa y funcionalmente vacía.
+12. El baseline canónico debe formar parte del smoke: 0 resultados no es aceptable si el contrato exige 414/26.
+13. Readiness de aplicación significa que todas las dependencias obligatorias están listas, no que una sola haya respondido.
+14. Documentación y evidencia acompañan el avance; no sustituyen la implementación.
 
 ## 5. Regla de empalme futura
 
@@ -85,6 +97,8 @@ Antes de aceptar una nueva candidata Claude se debe comparar específicamente co
 - roles no asignados;
 - integración visible como activa cuando el recurso real no existe;
 - colecciones futuras dentro del manifiesto productivo antes de migrarlas/autorizar su política;
+- queries productivas que usen directamente un nombre lógico sin validar su campo físico canónico;
+- readiness basado en la primera colección en lugar de todas las colecciones obligatorias;
 - verificación de Hosting de un solo intento inmediatamente después del deploy;
 - timeouts de automatización configurados en una posición de argumento incorrecta;
 - gates que confundan `continue-on-error` con éxito contractual.
