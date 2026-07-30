@@ -13,8 +13,14 @@ const TEST='tools/orbit360-browser-blocking-gate-readiness-test-v20260730.mjs';
 const SMOKE='tools/orbit360-m6-product-browser-smoke-v20260730.mjs';
 const AUTH='orbit360-platform/core/auth.js';
 const LEGAL='orbit360-platform/core/legal.js';
+const NEXT_LIFECYCLE='tools/orbit360-validator-lifecycle-contract-m6-final-closure-v20260730.json';
+const NEXT_ENGINE='tools/orbit360-validar-gate-contracts-engine-m6-final-closure-v20260730.mjs';
+const NEXT_REQUEST='tools/orbit360-m6-final-closure-request-v20260730.json';
+const WORKFLOW='.github/workflows/orbit360-m6-corrective-go-live-v20260730.yml';
+const ACCEL='orbit360-platform/docs/ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730.md';
+const REUSE='orbit360-platform/docs/ARQUITECTURA-REUTILIZABLE-INGESTA-MODULOS-POST-M6-20260730.md';
 const checks=[];
-const add=(id,ok,detail='')=>checks.push({id,ok:Boolean(ok),detail:String(detail||'').slice(0,260)});
+const add=(id,ok,detail='')=>checks.push({id,ok:Boolean(ok),detail:String(detail||'').slice(0,300)});
 const read=rel=>fs.readFileSync(path.join(ROOT,rel),'utf8');
 function write(payload){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(payload,null,2)+'\n','utf8');}
 try{
@@ -29,17 +35,21 @@ try{
   add('DEFERRED_GATE_SOURCE',auth.includes('setTimeout(function () {')&&auth.includes('Orbit.legal.gate(tipo, scopeId)')&&auth.includes('}, 520);'));
   add('LEGAL_BODY_SOURCE',legal.includes('data-legal-gate')&&legal.includes('class="conf-body"')&&legal.includes("back.querySelector('#lg-chk')")&&legal.includes("back.querySelector('#lg-ok')"));
   add('REUSABLE_SCOPE',rc.fixScope?.validatorOnly===true&&rc.fixScope?.reusableBrowserReadinessPrimitive===true&&Array.isArray(rc.appliesToFutureModules)&&rc.appliesToFutureModules.includes('polizas')&&rc.appliesToFutureModules.includes('cobros_conciliacion')&&rc.appliesToFutureModules.includes('siniestros'));
-  add('FILES',fs.existsSync(path.join(ROOT,HELPER))&&fs.existsSync(path.join(ROOT,TEST))&&fs.existsSync(path.join(ROOT,SMOKE)));
-  let helper='',smoke='';
-  if(fs.existsSync(path.join(ROOT,HELPER)))helper=read(HELPER);
-  if(fs.existsSync(path.join(ROOT,SMOKE)))smoke=read(SMOKE);
-  add('HELPER_CONTRACT',helper.includes('settleBlockingGates')&&helper.includes("[data-legal-gate]")&&helper.includes('arrivalWindowMs')&&helper.includes('quietWindowMs')&&helper.includes("locator('#lg-chk')")&&helper.includes("locator('#lg-ok')")&&!helper.includes('force:true'));
-  add('SMOKE_USES_HELPER',smoke.includes("from './orbit360-browser-blocking-gate-readiness-v20260730.mjs'")&&smoke.includes('await settleBlockingGates(page')&&smoke.includes("validatorRevision:'20260730.7'"));
-  let testOut='';
-  if(fs.existsSync(path.join(ROOT,TEST))){testOut=execFileSync(process.execPath,[TEST],{cwd:ROOT,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();}
-  add('SYNTHETIC_DELAY_TEST',/PASS/.test(testOut),testOut);
-  add('NO_NEW_RECOVERY_REQUEST',!fs.existsSync(path.join(ROOT,'tools/orbit360-m6-recovery-6116-request-v20260730.json')));
+  const required=[HELPER,TEST,SMOKE,NEXT_LIFECYCLE,NEXT_ENGINE,WORKFLOW,ACCEL,REUSE];
+  add('FILES',required.every(r=>fs.existsSync(path.join(ROOT,r))),required.filter(r=>!fs.existsSync(path.join(ROOT,r))).join(','));
+  const helper=read(HELPER),smoke=read(SMOKE),workflow=read(WORKFLOW),nextEngine=read(NEXT_ENGINE);
+  add('HELPER_CONTRACT',helper.includes('settleBlockingGates')&&helper.includes('[data-legal-gate]')&&helper.includes('arrivalWindowMs')&&helper.includes('quietWindowMs')&&helper.includes("locator('#lg-chk')")&&helper.includes("locator('#lg-ok')")&&!helper.includes('force:true'));
+  add('SMOKE_USES_HELPER',smoke.includes("from './orbit360-browser-blocking-gate-readiness-v20260730.mjs'")&&smoke.includes('await settleBlockingGates(page')&&smoke.includes("contractVersion:'6.2.0'")&&smoke.includes("validatorRevision:'20260730.7'")&&smoke.includes("report.checks.blockingGates=true"));
+  let testOut=execFileSync(process.execPath,[TEST],{cwd:ROOT,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  add('SYNTHETIC_DELAY_TEST',/PASS/.test(testOut)&&/520/.test(testOut),testOut);
+  const life=JSON.parse(read(NEXT_LIFECYCLE));
+  add('FINAL_LIFECYCLE',life.gateId===GATE&&life.gateContractVersion==='6.2.0'&&life.executionProfile?.phase==='M6_PRODUCT_GO_LIVE_RECOVERY_EXECUTION'&&life.executionProfile?.capabilities?.production===true&&life.executionProfile?.capabilities?.writes===false&&life.macroClosure===true&&life.staticRemediationRun===30552591248&&life.smokeValidatorRevision==='20260730.7'&&life.reusableBrowserReadinessRequired===true&&life.blockingGateSyntheticProofRequired===true&&life.futureModulesReuseRequired===true);
+  add('FINAL_ENGINE',nextEngine.includes("const VERSION='6.2.0'")&&nextEngine.includes("const REQUEST='tools/orbit360-m6-final-closure-request-v20260730.json'")&&nextEngine.includes('BLOCKING_GATE_SYNTHETIC')&&nextEngine.includes('futureModulesReuse:true')&&nextEngine.includes('macroClosure:true'));
+  add('FINAL_WORKFLOW',workflow.includes('tools/orbit360-m6-final-closure-request-v20260730.json')&&workflow.includes('M6 · final closure 6.2.0')&&workflow.includes('validatorRevision=="20260730.7"')&&workflow.includes('.checks.blockingGates==true')&&workflow.includes('M6_FINAL_CLOSURE_PASS')&&workflow.includes('firestore:rules,hosting')&&!workflow.includes('firestore:rules,storage,hosting'));
+  add('ACCELERATION_GOVERNANCE',read(ACCEL).includes('Producción no se usa como entorno de desarrollo del validator')&&read(ACCEL).includes('Reuso transversal obligatorio'));
+  add('TRANSVERSAL_ARCHITECTURE',read(REUSE).includes('Pólizas')&&read(REUSE).includes('Cobros')&&read(REUSE).includes('Siniestros'));
+  add('NO_NEW_RECOVERY_REQUEST',!fs.existsSync(path.join(ROOT,NEXT_REQUEST)));
   const failed=checks.filter(c=>!c.ok);
-  const out={schemaVersion:'orbit360-gate-contract-preflight-m6-legal-gate-static-v1',gateId:GATE,contractVersion:VERSION,executionPhase:'M6_PRODUCT_SMOKE_VALIDATOR_REMEDIATION_STATIC',status:failed.length?'VALIDATOR_STALE':'GO_GATE_CONTRACT',classification:failed.length?'VALIDATOR_STALE':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(c=>c.id),checks,productFrozen:true,retriesStopped:true,sourceRun:30551563820,sourceArtifact:8763037814,rootCause:'LEGAL_GATE_DEFERRED_RENDER_RACE',nextSmokeValidatorRevision:'20260730.7',reusableBrowserReadinessPrimitive:true,futureModulesReuse:true,storageDeferredFailClosed:true,dataAccess:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+  const out={schemaVersion:'orbit360-gate-contract-preflight-m6-legal-gate-static-v2',gateId:GATE,contractVersion:VERSION,executionPhase:'M6_PRODUCT_SMOKE_VALIDATOR_REMEDIATION_STATIC',status:failed.length?'VALIDATOR_STALE':'GO_GATE_CONTRACT',classification:failed.length?'VALIDATOR_STALE':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(c=>c.id),checks,productFrozen:true,retriesStopped:true,sourceRun:30551563820,sourceArtifact:8763037814,rootCause:'LEGAL_GATE_DEFERRED_RENDER_RACE',nextContractVersion:'6.2.0',nextSmokeValidatorRevision:'20260730.7',macroClosurePrepared:true,reusableBrowserReadinessPrimitive:true,blockingGateSyntheticProof:true,futureModulesReuse:true,accelerationGovernance:true,storageDeferredFailClosed:true,dataAccess:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
   write(out);console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
-}catch(error){write({schemaVersion:'orbit360-gate-contract-preflight-m6-legal-gate-static-v1',gateId:GATE,contractVersion:VERSION,status:'VALIDATOR_STALE',classification:'VALIDATOR_STALE',failed:1,failedCheckIds:['M6_LEGAL_GATE_STATIC_EXCEPTION'],error:String(error&&error.message||error).slice(0,500),productFrozen:true,retriesStopped:true,dataAccess:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});process.exit(41);}
+}catch(error){write({schemaVersion:'orbit360-gate-contract-preflight-m6-legal-gate-static-v2',gateId:GATE,contractVersion:VERSION,status:'VALIDATOR_STALE',classification:'VALIDATOR_STALE',failed:1,failedCheckIds:['M6_LEGAL_GATE_STATIC_EXCEPTION'],error:String(error&&error.message||error).slice(0,500),productFrozen:true,retriesStopped:true,dataAccess:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});process.exit(41);}
