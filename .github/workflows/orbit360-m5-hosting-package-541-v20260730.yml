@@ -1,0 +1,77 @@
+name: Orbit 360 · M5 Hosting package 5.0.41
+run-name: M5 5.0.41 · static Hosting package · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-m5-hosting-authorization-541-v20260730.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  EXPECTED_RC_HASH: 9bd2c847a2884be900283f86802dbbd0390ae5bc6ccc17b3a5cf4d389c78a4ee
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  AUTH_FILE: tools/orbit360-m5-hosting-authorization-541-v20260730.json
+
+jobs:
+  package:
+    name: M5 · Hosting package 5.0.41 · zero capabilities
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Preflight canónico 5.0.40 sin capacidades
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="M5_ACADEMIA_LEGACY_SEED_MARKER_540_STATIC_PASS" and .contractVersion=="5.0.40" and .failed==0 and .executionAuthorized==false and .allowedExecutions==0 and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==46 and .remoteAssetsExpected==29 and .remoteAssetsMatched==25 and .mismatchCount==4 and .capabilityProfile.secrets==false and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Validar autorización inmutable y readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.schemaVersion=="orbit360-m5-hosting-authorization-541-v1" and .explicitAuthorization==true and .hostingLabDeliveryAuthorized==true and .allowedHostingExecutions==1 and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==46 and .remoteAssetsExpected==29 and .target.projectId=="ays-orbit-360-lab" and .target.channel=="orbit360-ays-lab" and .runtime==false and .firestoreRead==false and .firestoreWrites==0 and .functionsDeploy==false and .rulesDeploy==false and .production==false and .main==false and .merge==false and .polizas==false and .immutableAfterCreation==true' "$AUTH_FILE" >/dev/null
+          node tools/orbit360-m5-release-candidate-readiness-540-v20260730.mjs
+          jq -e '.ok==true and .status=="M5_RC_540_STATIC_REMEDIATION_READY_LAB_DELIVERY_REQUIRED" and .releaseCandidate.hash==env.EXPECTED_RC_HASH and .releaseCandidate.criticalAssetCount==46 and .remoteLab.assetsExpected==29 and .remoteLab.assetsMatched==25 and .remoteLab.mismatchCount==4 and .remoteLab.expectedFourPendingLegacySeedMarkerAssets==true and .approvalReadyForLabDelivery==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .browser==false and .runtime==false and .deploy==false' "$EVIDENCE_DIR/m5-release-candidate-readiness-540-summary.json" >/dev/null
+      - name: Crear resumen sanitizado package
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const d=process.env.EVIDENCE_DIR;
+          const r=JSON.parse(fs.readFileSync(path.join(d,'m5-release-candidate-readiness-540-summary.json'),'utf8'));
+          const out={schemaVersion:'orbit360-m5-hosting-package-541-summary-v1',generatedAt:new Date().toISOString(),ok:true,status:'M5_HOSTING_PACKAGE_541_PASS_READY_FOR_REQUEST',gateId:process.env.ORBIT360_GATE_ID,contractVersion:'5.0.41',candidateContractVersion:'5.0.40',releaseCandidateHash:process.env.EXPECTED_RC_HASH,criticalAssets:46,remoteAssetsExpected:29,remoteAssetsMatched:r.remoteLab.assetsMatched,mismatchCount:r.remoteLab.mismatchCount,mismatchPaths:r.remoteLab.mismatchPaths,executionAuthorized:false,allowedExecutions:0,secrets:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,browser:false,runtime:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,main:false,merge:false,polizas:false,containsPII:false,containsSecrets:false};
+          fs.writeFileSync(path.join(d,'m5-hosting-package-541-summary.json'),JSON.stringify(out,null,2)+'\n');
+          console.log(JSON.stringify(out,null,2));
+          NODE
+      - name: Subir evidencia sanitizada
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-hosting-package-541-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-540-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-manifest-540.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-hosting-package-541-summary.json
+          retention-days: 30
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='M5 Hosting 5.0.41 package failed';
+            try{const p=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/m5-hosting-package-541-summary.json','utf8'));if(p.ok===true&&p.status==='M5_HOSTING_PACKAGE_541_PASS_READY_FOR_REQUEST'){state='success';description='M5 Hosting 5.0.41 package PASS; request may be created';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-hosting-package-541',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
