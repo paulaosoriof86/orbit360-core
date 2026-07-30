@@ -7,7 +7,7 @@
     "title": "ORBIT360-AYS-POLIZAS-CANONICAL-PRIVATE-20260730",
     "driveFileId": "1NXHACZ11815882AhoyGrQQCb9Amgbi95",
     "physicalSha256": "b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f",
-    "logicalSha256": "315a4f7123193acde4ca8cc166e15904502dabf43f3c071c36a7b974e03e3011",
+    "logicalSha256": "315a4f7169688a03a44e69edd608750e199c381cf6b532c574d7981f473e3011",
     "privateDriveOnly": true,
     "publicSharing": false
   },
@@ -16,6 +16,15 @@
     "aseguradoras": 26,
     "asesores": 7,
     "polizas": 0
+  },
+  "prewriteEvidence": {
+    "runId": 30584100004,
+    "artifactId": 8775774711,
+    "status": "PREWRITE_READY",
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "targetIdDigest": "bf3a21bbaae98cc5d2c14fd8068cc3b9c431c40ba3bdba96a0f4abe8aa701e2e"
   },
   "writePlan": {
     "clientesCreatePendingQuality": 16,
