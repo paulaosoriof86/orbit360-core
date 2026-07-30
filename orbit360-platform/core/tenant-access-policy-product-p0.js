@@ -1,6 +1,6 @@
 /* ============================================================
    Orbit 360 · Política productiva efectiva por tenant P0
-   Fecha: 2026-07-23
+   Fecha: 2026-07-30
 
    Canoniza roles antes de evaluar módulos, scopes y colecciones.
    Es read-only: no reemplaza Rules, Auth ni Orbit.store.
@@ -10,7 +10,8 @@
 
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p0-product-m2-20260723';
+  var VERSION = 'p0-product-m6-20260730.4';
+  var QUERY_FIELD_ALIASES = Object.freeze({ country: 'pais' });
 
   function base() {
     return window.Orbit.tenantAccessPolicyEffectiveP0 || window.Orbit.tenantAccessPolicyP0 || null;
@@ -88,12 +89,23 @@
     };
   }
 
+  function translateQueryProposal(proposal) {
+    var out = Object.assign({}, proposal || {});
+    out.constraints = (Array.isArray(out.constraints) ? out.constraints : []).map(function (constraint) {
+      var row = Object.assign({}, constraint || {});
+      if (QUERY_FIELD_ALIASES[row.field]) row.field = QUERY_FIELD_ALIASES[row.field];
+      return row;
+    });
+    out.productPhysicalFieldAliasesApplied = true;
+    return out;
+  }
+
   function queryConstraints(collection, membership, context) {
     var owner = base();
     if (!owner || typeof owner.queryConstraints !== 'function') {
       return { ok: false, writeAuthorized: false, collection: String(collection || ''), constraints: [], errors: ['politica_acceso_base_faltante'] };
     }
-    return owner.queryConstraints(collection, canonicalMembership(membership), context);
+    return translateQueryProposal(owner.queryConstraints(collection, canonicalMembership(membership), context));
   }
 
   function delegate(name) {
@@ -109,6 +121,7 @@
 
   window.Orbit.tenantAccessPolicyProductP0 = Object.freeze({
     VERSION: VERSION,
+    QUERY_FIELD_ALIASES: QUERY_FIELD_ALIASES,
     normalizeMembership: normalizeMembership,
     activeMembership: activeMembership,
     moduleVisible: moduleVisible,
@@ -118,6 +131,7 @@
     canRead: canRead,
     canWrite: canWrite,
     queryConstraints: queryConstraints,
+    translateQueryProposal: translateQueryProposal,
     validateAdvisorPatch: delegate('validateAdvisorPatch'),
     validateAdvisorManagement: delegate('validateAdvisorManagement'),
     tenantSource: 'membership_only',
