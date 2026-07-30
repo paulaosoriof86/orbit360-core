@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+const ROOT=process.cwd();
+const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
+const GATE='block6-go-live-product-v20260730';
+const VERSION='6.1.15';
+const ROOT_CAUSE='tools/orbit360-m6-legal-gate-race-root-cause-v20260730.json';
+const HELPER='tools/orbit360-browser-blocking-gate-readiness-v20260730.mjs';
+const TEST='tools/orbit360-browser-blocking-gate-readiness-test-v20260730.mjs';
+const SMOKE='tools/orbit360-m6-product-browser-smoke-v20260730.mjs';
+const AUTH='orbit360-platform/core/auth.js';
+const LEGAL='orbit360-platform/core/legal.js';
+const checks=[];
+const add=(id,ok,detail='')=>checks.push({id,ok:Boolean(ok),detail:String(detail||'').slice(0,260)});
+const read=rel=>fs.readFileSync(path.join(ROOT,rel),'utf8');
+function write(payload){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(payload,null,2)+'\n','utf8');}
+try{
+  const rc=JSON.parse(read(ROOT_CAUSE));
+  add('GATE',process.argv[2]===GATE&&rc.gateId===GATE);
+  add('BRANCH',process.env.ORBIT360_BRANCH==='ays/backend-tenant-lab-v99-20260703');
+  add('ROOT_CAUSE',rc.sourceRun===30551563820&&rc.sourceArtifact===8763037814&&rc.classification==='VALIDATOR_STALE'&&rc.rootCause==='LEGAL_GATE_DEFERRED_RENDER_RACE'&&rc.rollbackSafe===true&&rc.productionLive===false);
+  add('SAFE_ROLLBACK',rc.evidence?.rollbackExecuted===true&&rc.evidence?.countsStable===true&&rc.evidence?.digestsStable===true&&rc.evidence?.firestoreDataWrites===0&&rc.evidence?.operationalWrites===0&&rc.evidence?.networkWriteCandidates===0);
+  add('DATA_CONTRACT_PRESERVED',rc.evidence?.runtimeReadyReadOnly===true&&rc.evidence?.clients===414&&rc.evidence?.insurers===26&&rc.evidence?.queryAliasContractPass===true&&rc.evidence?.allActiveCollectionsReady===true&&rc.evidence?.writeGuardPass===true);
+  add('LEGAL_OVERLAY_PROOF',rc.evidence?.centerInsideViewport===true&&rc.evidence?.centerHit===false&&rc.evidence?.hitDescriptor==='div#conf-body'&&rc.evidence?.clickDispatched===false&&rc.evidence?.legalGateDeferredMs===520);
+  const auth=read(AUTH),legal=read(LEGAL);
+  add('DEFERRED_GATE_SOURCE',auth.includes('setTimeout(function () {')&&auth.includes('Orbit.legal.gate(tipo, scopeId)')&&auth.includes('}, 520);'));
+  add('LEGAL_BODY_SOURCE',legal.includes('data-legal-gate')&&legal.includes('class="conf-body"')&&legal.includes("back.querySelector('#lg-chk')")&&legal.includes("back.querySelector('#lg-ok')"));
+  add('REUSABLE_SCOPE',rc.fixScope?.validatorOnly===true&&rc.fixScope?.reusableBrowserReadinessPrimitive===true&&Array.isArray(rc.appliesToFutureModules)&&rc.appliesToFutureModules.includes('polizas')&&rc.appliesToFutureModules.includes('cobros_conciliacion')&&rc.appliesToFutureModules.includes('siniestros'));
+  add('FILES',fs.existsSync(path.join(ROOT,HELPER))&&fs.existsSync(path.join(ROOT,TEST))&&fs.existsSync(path.join(ROOT,SMOKE)));
+  let helper='',smoke='';
+  if(fs.existsSync(path.join(ROOT,HELPER)))helper=read(HELPER);
+  if(fs.existsSync(path.join(ROOT,SMOKE)))smoke=read(SMOKE);
+  add('HELPER_CONTRACT',helper.includes('settleBlockingGates')&&helper.includes("[data-legal-gate]")&&helper.includes('arrivalWindowMs')&&helper.includes('quietWindowMs')&&helper.includes("locator('#lg-chk')")&&helper.includes("locator('#lg-ok')")&&!helper.includes('force:true'));
+  add('SMOKE_USES_HELPER',smoke.includes("from './orbit360-browser-blocking-gate-readiness-v20260730.mjs'")&&smoke.includes('await settleBlockingGates(page')&&smoke.includes("validatorRevision:'20260730.7'"));
+  let testOut='';
+  if(fs.existsSync(path.join(ROOT,TEST))){testOut=execFileSync(process.execPath,[TEST],{cwd:ROOT,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();}
+  add('SYNTHETIC_DELAY_TEST',/PASS/.test(testOut),testOut);
+  add('NO_NEW_RECOVERY_REQUEST',!fs.existsSync(path.join(ROOT,'tools/orbit360-m6-recovery-6116-request-v20260730.json')));
+  const failed=checks.filter(c=>!c.ok);
+  const out={schemaVersion:'orbit360-gate-contract-preflight-m6-legal-gate-static-v1',gateId:GATE,contractVersion:VERSION,executionPhase:'M6_PRODUCT_SMOKE_VALIDATOR_REMEDIATION_STATIC',status:failed.length?'VALIDATOR_STALE':'GO_GATE_CONTRACT',classification:failed.length?'VALIDATOR_STALE':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(c=>c.id),checks,productFrozen:true,retriesStopped:true,sourceRun:30551563820,sourceArtifact:8763037814,rootCause:'LEGAL_GATE_DEFERRED_RENDER_RACE',nextSmokeValidatorRevision:'20260730.7',reusableBrowserReadinessPrimitive:true,futureModulesReuse:true,storageDeferredFailClosed:true,dataAccess:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+  write(out);console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
+}catch(error){write({schemaVersion:'orbit360-gate-contract-preflight-m6-legal-gate-static-v1',gateId:GATE,contractVersion:VERSION,status:'VALIDATOR_STALE',classification:'VALIDATOR_STALE',failed:1,failedCheckIds:['M6_LEGAL_GATE_STATIC_EXCEPTION'],error:String(error&&error.message||error).slice(0,500),productFrozen:true,retriesStopped:true,dataAccess:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});process.exit(41);}
