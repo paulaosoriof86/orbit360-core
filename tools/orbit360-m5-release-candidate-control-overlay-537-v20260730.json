@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-537-v1",
+  "issuedAt":"2026-07-30",
+  "authoritativeForCurrentM5ControlState":true,
+  "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-535-v20260729.json","tools/orbit360-m5-runtime-stop-overlay-536-v20260729.json","tools/orbit360-m5-academia-inventory-537-freeze-v20260729.json"],
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.37",
+  "status":"M5_ACADEMIA_STATIC_PRODUCER_INVENTORY_537_CLOSED_NEW_RC_READY_TO_REQUEST_HOSTING_AUTHORIZATION",
+  "priorReleaseCandidate":{"hash":"401f87b148048f85db3f4956474258c51c29e2c9e7c9a59e52f425d491ab89e7","criticalAssets":44,"publicAssets":27,"superseded":true,"reason":"runtime 5.0.36 exposed unversioned base seed courses; static normalizer owner changed"},
+  "releaseCandidate":{"hash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a","criticalAssets":46,"publicAssets":29,"descriptor":"tools/orbit360-m5-release-candidate-descriptor-537-v20260729.json","seedBound":true,"staticNormalizerBound":true,"strictPolicyPreserved":true},
+  "publicParity":{"assetsExpected":29,"assetsMatched":28,"mismatchCount":1,"mismatchPaths":["data/academia-v1197-bridge.js"],"remoteParity":false,"hostingDeliveryRequired":true},
+  "runtime536":{"authorizationConsumed":true,"allowedRuntimeExecutions":0,"rerunForbidden":true,"runId":30500309087,"jobId":90738308918,"artifactId":8743229256,"artifactDigest":"sha256:6e6e045c8c10e4873d1d6db669122323460d9c6f47c47ddf743078dde0ef9680","firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0,"allCountsStable":true,"allDigestsStable":true,"classification":"FUNCTIONAL_DEFECT","rootCause":"base seed static courses lacked explicit version marker before store init; prior remediation did not inventory every static cursos producer"},
+  "remediation537":{"closed":true,"runId":30501531194,"jobId":90742043113,"artifactId":8743660777,"artifactDigest":"sha256:0d8ed0a9278c96440edae93b357b804f05479b06cf6d043a0c1c5ace569768ff","preflight":"9/9 PASS","fixture":"18/18 PASS","policyBlob":"fa4c29d30a82673a7bf2d3d55efce52eaf4cccf3","operationalUserCoursesRemainDurable":true,"workflowFrozen":true},
+  "authorization":{"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeRequestCreated":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "safety":{"secrets":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"policies":false,"pólizas":false},
+  "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_HOSTING_LAB_AUTHORIZATION_FOR_RC_097D4E85_46_29; after delivery require 29/29 before requesting a new independent runtime authorization",
+  "containsPII":false,
+  "containsSecrets":false
+}
