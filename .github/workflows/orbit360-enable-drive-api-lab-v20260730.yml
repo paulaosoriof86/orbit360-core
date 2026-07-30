@@ -1,0 +1,92 @@
+name: Orbit 360 · Enable Drive API LAB
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['.github/workflows/orbit360-enable-drive-api-lab-v20260730.yml']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-enable-drive-api-lab-v20260730
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block7-policies-static-v20260730
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  PROJECT_ID: ays-orbit-360-lab
+  PROJECT_NUMBER: '646761409743'
+  SERVICE_NAME: drive.googleapis.com
+jobs:
+  enable:
+    name: LAB environment · enable Drive API once
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate estático antes de secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .failed==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Habilitar Drive API en LAB y verificar
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          (async()=>{
+            const sa=JSON.parse(process.env.SERVICE_ACCOUNT); if(sa.project_id!==process.env.PROJECT_ID) throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
+            const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url'), now=Math.floor(Date.now()/1000);
+            const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/cloud-platform',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig});
+            const tr=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body}); const tj=await tr.json(); if(!tr.ok||!tj.access_token) throw new Error('ENVIRONMENT_FAILURE:OAUTH_TOKEN_'+tr.status);
+            const auth={authorization:`Bearer ${tj.access_token}`};
+            const base=`https://serviceusage.googleapis.com/v1/projects/${process.env.PROJECT_NUMBER}/services/${process.env.SERVICE_NAME}`;
+            let before=await fetch(base,{headers:auth}); let beforeJson={}; try{beforeJson=await before.json();}catch{}
+            const beforeState=String(beforeJson.state||'');
+            let enableStatus='already_enabled'; let operationName='';
+            if(beforeState!=='ENABLED'){
+              const er=await fetch(base+':enable',{method:'POST',headers:{...auth,'content-type':'application/json'},body:'{}'}); let ej={}; try{ej=await er.json();}catch{}
+              if(!er.ok) throw new Error('ENVIRONMENT_FAILURE:SERVICE_ENABLE_'+er.status+':'+String(ej.error&&ej.error.status||''));
+              operationName=String(ej.name||''); enableStatus='requested';
+              for(let i=0;i<18;i++){
+                await sleep(5000);
+                const vr=await fetch(base,{headers:auth}); const vj=await vr.json(); if(vr.ok&&vj.state==='ENABLED'){enableStatus='enabled';break;}
+              }
+            }
+            const finalResp=await fetch(base,{headers:auth}); const finalJson=await finalResp.json(); if(!finalResp.ok||finalJson.state!=='ENABLED') throw new Error('ENVIRONMENT_FAILURE:SERVICE_NOT_ENABLED');
+            const out={schemaVersion:'orbit360-enable-drive-api-lab-v1',ok:true,projectId:process.env.PROJECT_ID,projectNumber:process.env.PROJECT_NUMBER,service:process.env.SERVICE_NAME,beforeState,finalState:finalJson.state,enableStatus,operationObserved:Boolean(operationName),firestoreRead:false,firestoreWrites:0,operationalWrites:0,productionTouched:false,containsPII:false,containsSecrets:false};
+            fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true});fs.writeFileSync(process.env.EVIDENCE_DIR+'/enable-drive-api-lab.json',JSON.stringify(out,null,2)+'\n');
+          })().catch(err=>{console.error(String(err&&err.message||err).slice(0,400));process.exit(41);});
+          NODE
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-enable-drive-api-lab-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/enable-drive-api-lab.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/enable-drive-api-lab.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Drive API LAB enable failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.finalState==='ENABLED'&&p.operationalWrites===0){state='success';description=`Drive API LAB ${p.enableStatus}; zero Firestore/data writes`;}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/drive-api-lab-enable',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
