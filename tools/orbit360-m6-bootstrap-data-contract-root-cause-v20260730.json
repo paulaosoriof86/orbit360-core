@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "orbit360-m6-bootstrap-data-contract-root-cause-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "sourceContractVersion": "6.1.6",
+  "sourceRun": 30526024340,
+  "sourceArtifact": 8752755957,
+  "sourceArtifactDigest": "sha256:607f737ecab80bfad280aa64c9297fcba6c68df6dc9dc60f8dc8e57976ffa619",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "rootCause": "RUNTIME_COLLECTION_MANIFEST_EXCEEDS_CANONICAL_MIGRATION_AND_POLICY",
+  "observedRuntimeCollections": ["clientes", "aseguradoras", "gestiones", "notificaciones"],
+  "canonicalMigratedCollections": ["clientes", "aseguradoras"],
+  "unsupportedPolicyCollection": "notificaciones",
+  "mechanism": [
+    "runtime config declared notificaciones",
+    "tenant access policy had no collection policy for notificaciones",
+    "query planner returned ok:false for notificaciones",
+    "product store marked attach-error before asynchronous valid snapshots attached",
+    "_attachSnapshots returned false",
+    "bootstrap returned ok:false without installing Orbit.store",
+    "productAppP0 never reached started=true"
+  ],
+  "runtimeEvidence": {
+    "productAppPresent": true,
+    "productStarted": false,
+    "productStatus": "",
+    "storeReady": false,
+    "noFallback": false,
+    "writeEnabled": false,
+    "smokeFailureStage": "login",
+    "smokeTimeoutMs": 60000
+  },
+  "providerEvidence": {
+    "firebaseDeploy": "success",
+    "hostingReadiness": "success",
+    "browser": "failure",
+    "snapshotAfter": "success",
+    "integrity": "success",
+    "rollback": "success"
+  },
+  "rollbackSafe": true,
+  "productionLive": false,
+  "countsStable": true,
+  "digestsStable": true,
+  "firestoreDataWrites": 0,
+  "operationalWrites": 0,
+  "networkWriteCandidates": 0,
+  "storageDeferredFailClosed": true,
+  "fixScope": "runtime_collection_manifest_only",
+  "containsPII": false,
+  "containsSecrets": false
+}
