@@ -2,7 +2,7 @@ name: Orbit 360 · M6 product shell static · zero capabilities
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
-    paths: ['tools/orbit360-m6-product-shell-static-request-v20260730.json']
+    paths: ['tools/orbit360-m6-product-shell-static-retry-v20260730.json']
 permissions:
   contents: read
   statuses: write
@@ -12,7 +12,7 @@ concurrency:
 env:
   ORBIT360_GATE_ID: block6-go-live-product-v20260730
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  REQUEST_FILE: tools/orbit360-m6-product-shell-static-request-v20260730.json
+  REQUEST_FILE: tools/orbit360-m6-product-shell-static-retry-v20260730.json
   EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
 jobs:
   static:
@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verificar request estático inmutable
+      - name: Verificar segundo request estático inmutable
         shell: bash
         run: |
           set -euo pipefail
@@ -38,7 +38,7 @@ jobs:
           test "$GITHUB_RUN_ATTEMPT" = '1'
           test -f "$REQUEST_FILE"
           parent="$(git rev-parse HEAD^)"
-          jq -e --arg p "$parent" '.schemaVersion=="orbit360-m6-product-shell-static-request-v1" and .gateId=="block6-go-live-product-v20260730" and .contractVersion=="6.0.0" and .branch=="ays/backend-tenant-lab-v99-20260703" and .baseCommit==$p and .zeroCapabilities==true and .production==false and .deploy==false and .firestoreRead==false and .writes==false and .containsPII==false and .containsSecrets==false' "$REQUEST_FILE" >/dev/null
+          jq -e --arg p "$parent" '.schemaVersion=="orbit360-m6-product-shell-static-request-v1" and .gateId=="block6-go-live-product-v20260730" and .contractVersion=="6.0.0" and .branch=="ays/backend-tenant-lab-v99-20260703" and .baseCommit==$p and .zeroCapabilities==true and .retryOfRun==30514625372 and .retryReason=="VALIDATOR_STALE_COMMENT_TOKEN_FALSE_POSITIVE" and .productChanged==false and .production==false and .deploy==false and .firestoreRead==false and .writes==false and .containsPII==false and .containsSecrets==false' "$REQUEST_FILE" >/dev/null
       - name: Preflight canónico M6
         shell: bash
         run: |
