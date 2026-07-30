@@ -26,8 +26,10 @@ Este documento extiende el ledger acumulado de fixes locales y evita que los apr
 | Deploy multi-target incluía Storage inexistente | Antes de un deploy multi-target validar existencia/readiness real de cada target; un recurso opcional ausente se difiere fail-closed, no se crea para satisfacer el gate | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Causa raíz M6 cerrada |
 | Verificación inmediata de Hosting devolvió 404 transitorio | Readiness post-deploy debe esperar propagación acotada y validar marcador/hash esperado antes de declarar fallo | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Owner implementado y validado estáticamente; run 30517683129 y revalidación 30520801419 |
 | Smoke declaró 60 s pero Playwright usó 30 s | Al usar APIs con firma `(fn, arg?, options?)`, validar semánticamente la posición de argumentos; `waitForFunction` requiere `undefined` como segundo argumento cuando no hay `arg` | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | `VALIDATOR_STALE` cerrado; validatorRevision `20260730.2`; 6.1.5 PASS estático |
-| `continue-on-error` hacía que la vista de Actions pareciera exitosa aunque el `outcome` real del smoke fuera failure | Los gates deben cerrar con `steps.<id>.outcome` y evidencia propia, no inferir éxito por presentación visual/conclusion | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Incorporado al cierre M6 y confirmado nuevamente en 6.1.8 |
-| Un timeout de login sin contexto no permite distinguir lentitud de fallo funcional | Ante timeout, guardar diagnóstico sanitizado del estado de arranque: app presente/iniciada, status del store, noFallback y writeEnabled; nunca credenciales ni PII | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Ampliado desde smoke `20260730.3`; `20260730.4` agrega plans/collections |
+| Playwright no despachaba click porque la tarjeta con transición visual nunca satisfacía su actionability interna | No convertir una falsa negativa del automatizador en cambio de producto; separar estabilidad geométrica, hit-test y despacho del evento antes de declarar defecto funcional | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | `VALIDATOR_STALE` 6.1.10 cerrado; validator `20260730.5` |
+| Hit-test semántico usó `elementFromPoint()` sin reproducir el scroll automático de Playwright | `visible` no equivale a `dentro del viewport`; antes del hit-test se debe centrar el target, estabilizar geometría post-scroll y probar coordenadas in-bounds | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | `VALIDATOR_STALE` 6.1.12 cerrado; validator `20260730.6`; 6.1.13 PASS estático |
+| `continue-on-error` hacía que la vista de Actions pareciera exitosa aunque el `outcome` real del smoke fuera failure | Los gates deben cerrar con `steps.<id>.outcome` y evidencia propia, no inferir éxito por presentación visual/conclusion | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Incorporado al cierre M6 y confirmado nuevamente en 6.1.12 |
+| Un timeout de login sin contexto no permite distinguir lentitud de fallo funcional | Ante timeout, guardar diagnóstico sanitizado del estado de arranque: app presente/iniciada, status del store, noFallback y writeEnabled; nunca credenciales ni PII | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Ampliado desde smoke `20260730.3`; revisiones posteriores agregan plans/actionability |
 | Salida del deploy no estaba en primer artifact | Toda etapa de riesgo debe conservar resultado sanitizado del proveedor para diagnóstico de causa raíz | `BACKEND_PROTEGIDO_NO_CLAUDE` + `ACADEMIA_ACTUALIZAR` | Corregido desde 6.1.2 |
 | Request disparador no debe modificarse para marcar consumo | Trigger inmutable; consumo/estado se registra fuera del path disparador | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Regla permanente |
 | Rollback dependía del mismo recurso que causó el fallo | El rollback debe minimizar dependencias y poder cerrar el sistema aunque falle un servicio opcional | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Corregido: Firestore deny-all + Hosting neutro; Storage diferido |
@@ -52,7 +54,9 @@ Este documento extiende el ledger acumulado de fixes locales y evita que los apr
 - guardar diagnóstico sanitizado antes de ejecutar assertions que pueden fallar;
 - distinguir error funcional de error de validador, entorno, pipeline o contrato de datos;
 - validar firmas de APIs de automatización, especialmente argumentos opcionales y timeouts;
-- no usar `continue-on-error` como señal de éxito: leer `outcome` y evidencia del gate.
+- no usar `continue-on-error` como señal de éxito: leer `outcome` y evidencia del gate;
+- validar actionability por capas: DOM → visible → scroll → estabilidad → viewport → hit-test → evento → resultado funcional;
+- no usar `force:true` ni alterar CSS aprobado para ocultar falsos negativos del automatizador.
 
 ## 3. Lo que NO se envía a Claude
 
@@ -86,6 +90,8 @@ La Academia debe enseñar con el caso M6:
 12. El baseline canónico debe formar parte del smoke: 0 resultados no es aceptable si el contrato exige 414/26.
 13. Readiness de aplicación significa que todas las dependencias obligatorias están listas, no que una sola haya respondido.
 14. Documentación y evidencia acompañan el avance; no sustituyen la implementación.
+15. Un automatizador que no llega a despachar el evento no ha demostrado un defecto funcional del producto.
+16. Un elemento `visible` puede estar fuera del viewport; un hit-test semántico debe reproducir scroll, estabilidad post-scroll y coordenadas válidas antes de `elementFromPoint()`.
 
 ## 5. Regla de empalme futura
 
@@ -101,4 +107,6 @@ Antes de aceptar una nueva candidata Claude se debe comparar específicamente co
 - readiness basado en la primera colección en lugar de todas las colecciones obligatorias;
 - verificación de Hosting de un solo intento inmediatamente después del deploy;
 - timeouts de automatización configurados en una posición de argumento incorrecta;
-- gates que confundan `continue-on-error` con éxito contractual.
+- gates que confundan `continue-on-error` con éxito contractual;
+- click/hit-test que asuma que `visible` implica estar dentro del viewport;
+- `force:true` o cambios de animación usados para hacer pasar una prueba sin demostrar un defecto del producto.
