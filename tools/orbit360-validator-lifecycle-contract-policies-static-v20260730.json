@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "block7-policies-static-v20260730",
   "gateContractVersion": "7.0.1",
-  "validatorLifecycleRevision": "phase-capability-contract-v2-vigencia-authority",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
   "executionProfile": {
     "phase": "POLICIES_STATIC_QUALIFICATION",
     "capabilities": {
