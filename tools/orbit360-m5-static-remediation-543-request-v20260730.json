@@ -1,0 +1,21 @@
+{
+  "schemaVersion":"orbit360-m5-static-remediation-543-request-v1",
+  "issuedAt":"2026-07-30",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.43",
+  "classification":"FUNCTIONAL_DEFECT_ROOT_CAUSE_REMEDIATION_STATIC",
+  "owner":"modules/portal-v1142-copyfix.js",
+  "courseId":"cur_migracion_honesta_v150",
+  "expectedCriticalAssets":47,
+  "expectedRemoteAssets":30,
+  "expectedRemoteMismatchOnly":"modules/portal-v1142-copyfix.js",
+  "secrets":false,
+  "firestoreRead":false,
+  "writes":false,
+  "runtime":false,
+  "browser":false,
+  "deploy":false,
+  "production":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
