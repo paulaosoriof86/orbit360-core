@@ -16,8 +16,12 @@ Leer antes de actuar:
 6. Addendum Control de Causa Raíz, Validadores y Gates 20260717.
 7. `docs/ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730.md`.
 8. `docs/NOTA-RECTORA-REBRANDING-GRAVICENTRA-NO-BLOQUEANTE-20260730.md`.
-9. `docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md`.
-10. PR #5 + HEAD vivo + evidencia reciente del gate/módulo.
+9. `docs/ARQUITECTURA-REUTILIZABLE-INGESTA-MODULOS-POST-M6-20260730.md`.
+10. `docs/CIERRE-M6-FINAL-630-PASS-20260730.md`.
+11. `docs/REGLA-FUENTES-OPERATIVAS-VIGENTES-BAJO-DEMANDA-20260730.md`.
+12. PR #5 + HEAD vivo + evidencia reciente del módulo.
+
+Precedencia: reglas maestras/addenda → PR/HEAD vivo → Plan Maestro → evidencia modular reciente. No reabrir trabajo cerrado por documentación anterior desactualizada.
 
 ## Estado vivo
 
@@ -29,58 +33,43 @@ main / merge / Functions: no autorizados
 
 M1–M4: CERRADOS
 M5 5.0.44: CERRADO + revisión visual aprobada
-M6 6.1.14: ROLLED_BACK_SAFE · VALIDATOR_STALE / LEGAL_GATE_DEFERRED_RENDER_RACE
-M6 6.1.15: PASS estático · blocking-gate readiness reusable
-M6 FINAL CLOSURE 6.2.0: PREPARADO / INERTE · paquete completo PASS estático
-request final closure: AUSENTE
+M6 6.3.0: CERRADO · M6_FINAL_CLOSURE_PASS
+Pólizas: PREPARACIÓN ESTÁTICA/READ-ONLY ACTIVA
 
-Producción funcional: NO LIVE
-Firestore: deny-all
-Hosting: rollback neutro
-Storage: diferido fail-closed
-Datos: intactos
-Pólizas: todavía no iniciadas
+Substrate productivo M6 read-only: LIVE
+Firestore data writes del cierre M6: 0
+Operational writes del cierre M6: 0
+Storage: inexistente / diferido fail-closed
+Pólizas reales: NO MIGRADAS / NO ACTIVADAS PRODUCTIVAMENTE
+Fuente real vigente de pólizas: PENDIENTE DE PAULA CUANDO EL DRY-RUN LA REQUIERA
 ```
 
-### Evidencia del macro-paquete final
+Evidencia M6 final:
 
 ```txt
-Static package run: 30555149234
-Artifact: 8764440108
-Digest: sha256:40005b2a221ba5f4c385add2ea07470e02497b9d9ef2bb56fa5fdd4baf79e89d
-FINAL_LIFECYCLE: PASS
-FINAL_ENGINE: PASS
-FINAL_WORKFLOW: PASS
-SMOKE_USES_HELPER: PASS
-SYNTHETIC_DELAY_TEST: PASS (520 ms · accepted 1 · remaining 0)
-ACCELERATION_GOVERNANCE: PASS
-TRANSVERSAL_ARCHITECTURE: PASS
-NO_NEW_RECOVERY_REQUEST: PASS
-Recovery productivo: SKIPPED
-Secret/Firestore/browser/deploy/production: false/false/false/false/false
+Run: 30562624279
+Artifact: 8767559350
+Digest: sha256:9a555a3b47d2605397d11d9e81996720afdd655cd7408b55994f5f531a17ba2f
+productionLive: true (substrate productivo read-only M6)
+rollbackExecuted: false
+414 clientes
+26 aseguradoras
+7 asesores fuente
+Dirección desktop: PASS
+Operativo tablet: PASS
+Asesor móvil: PASS
+countsStable: true
+digestsStable: true
+networkWriteCandidates: 0
+Firestore data writes: 0
+operational writes: 0
 ```
 
-## Baseline canónico preservado
-
-```txt
-clientes: 414
-aseguradoras: 26
-asesores fuente: 7
-membership: 1
-config: 1
-GT/CO clientes: 398/16
-moneda faltante: 0
-```
-
-M6 ha validado repetidamente integridad before/after, cero escrituras de datos en los recoveries read-only y rollback seguro ante fallo contractual.
-
-## Directiva vinculante de aceleración
-
-La prioridad es cerrar Fase A y alcanzar producción funcional lo antes posible sin regresiones.
+## Directiva de aceleración
 
 Ruta crítica:
 
-`cerrar M6 → Pólizas → Vehículos → Recibos/cartera → Cobros/conciliación → Comisiones/planillas → financiero histórico → Siniestros/Documentos → resto del plan`.
+`Pólizas → Vehículos → Recibos/cartera → Cobros/conciliación → Comisiones/planillas → financiero histórico → Siniestros/Documentos → resto del plan`.
 
 Reglas:
 
@@ -95,8 +84,6 @@ Reglas:
 
 ## Infraestructura transversal que NO se reconstruye por módulo
 
-Fuente: `docs/ARQUITECTURA-REUTILIZABLE-INGESTA-MODULOS-POST-M6-20260730.md`.
-
 Se reutiliza en Pólizas, Vehículos, Cobros, Siniestros y módulos posteriores:
 
 - Auth/membership/scopes;
@@ -104,7 +91,7 @@ Se reutiliza en Pólizas, Vehículos, Cobros, Siniestros y módulos posteriores:
 - `Orbit.store` + write guard;
 - manifiesto canónico de colecciones;
 - aliases lógico → físico;
-- readiness de todas las colecciones;
+- readiness de todas las colecciones activas;
 - blocking-gate readiness diferido;
 - Hosting readiness acotado;
 - smoke multirol/multivista;
@@ -115,42 +102,57 @@ Se reutiliza en Pólizas, Vehículos, Cobros, Siniestros y módulos posteriores:
 - clasificación de causa raíz + `STOP_RETRY`;
 - request inmutable y gate único.
 
-Los módulos posteriores solo deben añadir su contrato de fuente/dominio/reglas de negocio específicas.
+Los módulos posteriores solo añaden contrato de fuente, esquema/aliases, normalización y reglas de negocio específicas.
 
-## M6 Final Closure 6.2.0
+## Bloque activo — Pólizas
 
-Se abandonó la secuencia de micro-recoveries como unidad de avance. El siguiente riesgo productivo está agrupado en un único macro-cierre `6.2.0` que exige simultáneamente:
+Owner operativo existente: `core/policy-receipts-engine.js`, cargado por `index.html` junto con los refinamientos/bridges ya existentes.
 
-- validator browser `20260730.7`;
-- blocking-gate readiness reusable;
-- prueba sintética del gate legal diferido a 520 ms;
-- 414 clientes / 26 aseguradoras;
-- alias `country → pais`;
-- snapshots completos;
-- write guard;
-- Dirección desktop / Operativo tablet / Asesor móvil;
-- semantic insurer click + viewport hit-test;
-- Firestore Rules read-only;
-- Hosting + readiness acotado;
-- integridad before/after;
-- cero network writes;
-- rollback automático;
-- Storage diferido fail-closed;
-- reuso transversal obligatorio.
+La preparación estática puede continuar sin datos reales con:
 
-El macro-paquete está preparado, pero sigue inerte: `tools/orbit360-m6-final-closure-request-v20260730.json` NO existe.
+1. contrato canónico de póliza;
+2. identidad canónica tenant/país/aseguradora/número/cliente;
+3. permisos y scopes;
+4. prima separada en neta, gastos, IVA/impuestos y total;
+5. generación determinística de recibos únicamente para `Vigente` / `Por renovar`;
+6. histórico sin cartera para otros estados;
+7. deduplicación/idempotencia;
+8. reglas de actualización/endoso cuando existen pagos;
+9. pruebas sintéticas/ficticias;
+10. diseño del dry-run/diff reutilizando el harness M6.
+
+### Regla bloqueante de vigencia de fuente
+
+Los archivos antiguos de producción/movimientos y cualquier análisis derivado son referencia histórica/de diseño, no fuente oficial vigente para migrar pólizas.
+
+Antes del primer dry-run con filas reales se debe pedir a Paula el **corte actualizado de pólizas**. La misma regla se aplica, cuando llegue cada etapa, a vehículos, cobros, planillas, financiero histórico, siniestros y documentos operativos pendientes.
+
+No se permite:
+
+- inferir pólizas oficiales desde `finmovs` o desde producción antigua;
+- crear cartera/cobros reales con fuentes viejas;
+- asumir que un archivo disponible sigue vigente;
+- reimportar Clientes/Aseguradoras para resolver Pólizas.
+
+## Reglas de negocio permanentes
+
+- GT → GTQ; CO → COP.
+- Falta país/moneda confiable → `REQUIERE_VALIDACION`.
+- Solo `Vigente` / `Por renovar` genera recibos/cartera.
+- Cancelada/Vencida/Anulada/Rechazada permanece histórico.
+- Prima = neta + gastos + IVA/impuestos + total, sin colapsar campos.
+- Producción, metas y comisiones sobre prima neta recaudada.
+- Cobros/recaudos no son `finmovs`.
+- Estados bancarios solo concilian; no crean cobros por inferencia.
+- Documentos soporte proponen con diff/confirmación; no escriben silenciosamente.
 
 ## Rebranding futuro GRAVICENTRA
 
 Estado: registrado / diferido / no bloqueante.
 
-El punto recomendado es el último punto técnicamente seguro antes del lanzamiento público definitivo, una vez cerrada la funcionalidad crítica y sin gate de datos/migración abierto.
+El cambio visible se ejecutará únicamente en el último punto técnicamente seguro antes del lanzamiento público definitivo, sin mezclarlo con gates de datos/backend/migración abiertos. En ese punto se anunciará:
 
-En ese momento se debe anunciar:
-
-`PUNTO SEGURO DE REBRANDING GRAVICENTRA ALCANZADO`
-
-Antes de cambiar nada se hará inventario read-only de referencias visibles a Orbit 360 y se clasificará cada una entre cambio visual, identificador técnico a conservar, documento histórico, revisión legal, asset o metadata pública.
+`PUNTO SEGURO DE REBRANDING GRAVICENTRA ALCANZADO`.
 
 ## Arquitectura
 
@@ -166,7 +168,3 @@ orbit360-platform/
 ```
 
 Los módulos consumen `Orbit.store`; el backend se adapta al store y no al revés. A&S continúa configurado como tenant, sin fork ni hardcode de datos/credenciales en módulos genéricos.
-
-## Siguiente acción
-
-No queda trabajo estático pendiente antes del macro-cierre M6 6.2.0. La próxima transición de riesgo es una sola ejecución productiva del `M6 Final Closure 6.2.0`; únicamente después de PASS se cierra M6 y se entra inmediatamente a Pólizas reutilizando la infraestructura transversal, sin otro acondicionamiento general.
