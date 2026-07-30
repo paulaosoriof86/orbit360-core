@@ -18,8 +18,11 @@ Modo: `DRY_RUN_NO_WRITES`
    - implementación del dry-run: umbral tenant configurable de `1,000,000`, siempre con `provenance` de inferencia;
    - USD explícito se conserva y no se convierte automáticamente a GTQ/COP.
 4. Esta heurística es `TENANT_AYS_ONLY`; no se hardcodea como regla universal de Orbit 360.
-5. Póliza, recibo, cobro aplicado y conciliación permanecen separados.
-6. Este bloque no genera cartera ni aplica cobros.
+5. **El estado contractual/operativo de la póliza lo determina la vigencia.** Un estado fuente `Vencida` puede corresponder a pagos/recibos y no convierte en histórica una póliza cuya vigencia contiene la fecha de corte.
+6. El estado fuente se conserva íntegro para trazabilidad. Cuando contradice una vigencia activa se registra `estadoFuenteContradiceVigencia = true`, sin borrar ni reinterpretar el valor de origen.
+7. La situación de pago se resolverá posteriormente en los bloques `Recibos/cartera` y `Cobros/conciliación`; no se mezcla con el estado contractual de Pólizas.
+8. Póliza, recibo, cobro aplicado y conciliación permanecen separados.
+9. Este bloque no genera cartera ni aplica cobros.
 
 ## Fuentes recibidas en el corte
 
@@ -43,16 +46,34 @@ Los payloads reales permanecen fuera del repositorio. Este documento solo regist
 - pólizas asociadas a esos clientes: **3**;
 - estado operativo propuesto `Vigente`: **225**;
 - vigencias futuras detectadas: **7**, sin cartera antes de su inicio;
-- estados fuente `Vencida` incompatibles con vigencia activa + emisión al corte: **109**; se conserva el estado fuente y una advertencia de calidad en vez de borrar la contradicción;
+- estados fuente `Vencida` con vigencia activa: **109**; por regla de negocio confirmada no son bloqueo ni convierten la póliza en histórica; se conserva el estado fuente y se normaliza el estado contractual por vigencia;
 - recibos julio en staging: **101** (`96 Por Cobrar`, `5 Cobrado El`);
 - cobros/conciliaciones aplicados en este bloque: **0**;
 - Firestore/Orbit.store writes de este análisis: **0**.
 
-## Hallazgo de contrato
+## Cierre del hallazgo de estado `Vencida`
 
-Los 109 casos `Vencida` con vigencia que contiene el 30-07-2026 y presencia en el reporte de emitido vigente se clasifican como `DATA_CONTRACT_FAILURE` de calidad/estado fuente, no como motivo para desechar la póliza. El dry-run propone estado operativo vigente con trazabilidad de la contradicción. La cartera permanece diferida al bloque Recibos/cartera.
+La clasificación previa `DATA_CONTRACT_FAILURE` para los 109 casos queda **cerrada por definición de negocio confirmada por Paula**: en Pólizas manda la vigencia contractual. El valor `Vencida` del reporte se conserva como `estadoFuenteOriginal` y, cuando la vigencia está activa, se marca únicamente como contradicción de fuente no bloqueante.
 
-Las dos vigencias invertidas quedan bloqueadas para escritura canónica hasta validación/corrección de fuente.
+Implementación reusable:
+
+- `orbit360-platform/core/importa-polizas-p0.js`: vigencia activa + fuente `Vencida/Terminada/Reexpedida` → `vigente_operativa`, preservando `estadoFuenteOriginal` y `estadoFuenteContradiceVigencia = true`.
+- `tools/orbit360-test-importa-polizas-vigencia-authority-v20260730.mjs`: prueba sintética con datos ficticios; activo `Vencida` queda Vigente, vencido por fecha queda histórico.
+
+Resultado sintético: `PASS`; `firestoreWrites = 0`; `operationalWrites = 0`.
+
+Las dos vigencias invertidas continúan bloqueadas para escritura canónica hasta validación/corrección de fuente.
+
+## Calidad pendiente de clientes nuevos
+
+El writer controlado común fue corregido para que un cliente creado desde una fuente de póliza con `calidad_datos = pendiente_completar` conserve esa calidad después de persistir y **no sea promovido artificialmente a `validationStatus = validado`**.
+
+Implementación reusable:
+
+- `orbit360-platform/core/importa-write-p0.js`: caso controlado `pending_client_quality`.
+- `tools/orbit360-test-importa-write-p0.mjs`: prueba sintética de persistencia, auditoría y rollback con datos ficticios.
+
+Resultado sintético: `PASS`; colecciones bloqueadas continúan bloqueadas; rollback preservado; sin escrituras reales.
 
 ## Reuso transversal
 
@@ -68,7 +89,7 @@ Prueba sintética previa: `PASS`, 0 filas reales, 0 escrituras.
 ## Períodos posteriores — regla de solicitud
 
 - **Vehículos:** fuente histórica 2017–2026 ya recibida; si aparecen altas después del 30-07-2026, pedir solo el delta desde 31-07-2026 hasta el nuevo corte.
-- **Recibos/cartera:** saldo/cartera vigente al corte de migración; solo pólizas Vigente/Por renovar/futuras cuando inicie vigencia. Histórico no entra a cartera viva.
+- **Recibos/cartera:** saldo/cartera vigente al corte de migración; la vigencia contractual define qué pólizas están activas; la condición de pago se determina con recibos/cobros, no con el estado fuente de Pólizas.
 - **Cobros realizados:** para el cierre operativo inicial, mayo–julio 2026 hasta el corte vigente, como fuente separada.
 - **Planillas de aseguradora:** mayo–julio 2026 hasta el corte vigente para conciliación.
 - **Planillas de comisiones:** junio–julio 2026 hasta el corte vigente, según fuentes disponibles por aseguradora.
@@ -76,8 +97,14 @@ Prueba sintética previa: `PASS`, 0 filas reales, 0 escrituras.
 - **Financiero histórico:** 2024-11 a 2026-04 permanece como histórico; mayo–julio 2026 se completa/cierra mediante conciliación y fuentes operativas separadas.
 - **Siniestros:** al llegar al bloque se solicitará el histórico disponible hasta el corte exacto; posteriores solicitudes serán solo delta.
 
+## Impacto Claude / Academia
+
+- Clasificación: `REPLICABLE_CLAUDE_ACUMULADO` para la separación reusable entre vigencia contractual y estado de pago.
+- Academia: `ACADEMIA_ACTUALIZAR` con un caso práctico: una póliza puede estar contractualmente vigente aunque una fuente operativa la marque `Vencida` por condición de pago; Recibos/Cobros resuelven la mora y Pólizas resuelve la vigencia.
+- Backend protegido/datos reales: no se envían a Claude.
+
 ## Estado
 
-`POLIZAS_DRYRUN_CONSOLIDADO_LISTO / ESCRITURA_REAL_AUN_NO_AUTORIZADA`
+`POLIZAS_DRYRUN_CONSOLIDADO_LISTO / REGLA_VIGENCIA_Y_CALIDAD_CLIENTE_CERRADAS / ESCRITURA_REAL_AUN_NO_AUTORIZADA`
 
-Siguiente acción exacta: preparar el paquete inmutable de persistencia de pólizas + creación idempotente de los clientes faltantes, excluyendo las dos vigencias invertidas y sin materializar cartera/cobros; ejecutar validaciones estáticas/sintéticas antes de solicitar una única autorización macro de escritura.
+Siguiente acción exacta: cerrar el manifiesto/freeze sanitizado del paquete de persistencia de **1,375 pólizas + hasta 2 clientes idempotentes**, excluyendo las dos vigencias invertidas y sin materializar recibos/cartera/cobros; validar estáticamente contrato, auditoría y rollback antes de solicitar una única autorización macro de escritura.
