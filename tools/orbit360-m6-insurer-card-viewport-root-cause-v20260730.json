@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-m6-root-cause-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "sourceContractVersion": "6.1.12",
+  "sourceRun": 30549026522,
+  "sourceArtifact": 8762009928,
+  "sourceArtifactDigest": "sha256:6807b7ff1e4cc1c56b76656e496f2a0713c4167562519944714ff486cca60ad6",
+  "classification": "VALIDATOR_STALE",
+  "rootCause": "SEMANTIC_CARD_HITTEST_MISSING_SCROLL_INTO_VIEW",
+  "rollbackSafe": true,
+  "productionLive": false,
+  "evidence": {
+    "runtimeReadyReadOnly": true,
+    "clients": 414,
+    "insurers": 26,
+    "queryAliasContractPass": true,
+    "allActiveCollectionsReady": true,
+    "writeGuardPass": true,
+    "cardCount": 26,
+    "geometryStable": true,
+    "centerHit": false,
+    "clickDispatched": false,
+    "smokeFailureStage": "desktopDirection",
+    "countsStable": true,
+    "digestsStable": true,
+    "firestoreDataWrites": 0,
+    "operationalWrites": 0,
+    "networkWriteCandidates": 0,
+    "rollbackExecuted": true
+  },
+  "mechanism": [
+    "The validator waited for the first insurer card to be CSS-visible and geometrically stable.",
+    "Playwright locator visibility does not require the element center to be inside the viewport.",
+    "The replacement semantic click used document.elementFromPoint at the card center without first scrolling the card into view.",
+    "elementFromPoint can return null or another element when the center is outside the viewport, producing centerHit=false before any click is dispatched.",
+    "The original Playwright click automatically scrolls elements into view; validator revision 20260730.5 unintentionally removed that precondition while trying to avoid Playwright actionability false negatives."
+  ],
+  "fixScope": {
+    "validatorOnly": true,
+    "productModuleChanges": false,
+    "dataChanges": false,
+    "rulesChanges": false,
+    "authChanges": false,
+    "requiredBehavior": [
+      "scroll target card into the center of the viewport",
+      "wait for geometry to settle after scrolling",
+      "prove center coordinates are inside viewport bounds",
+      "prove elementFromPoint resolves to the card or a descendant",
+      "record sanitized hit-test diagnostics on failure",
+      "dispatch the canonical DOM click only after these preconditions pass",
+      "require #asg-ficha to appear"
+    ]
+  },
+  "storageDeferredFailClosed": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
