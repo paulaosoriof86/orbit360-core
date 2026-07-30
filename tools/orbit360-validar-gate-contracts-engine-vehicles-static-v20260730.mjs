@@ -2,6 +2,7 @@
 'use strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import {execFileSync} from 'node:child_process';
 const ROOT=process.cwd();
 const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
 const GATE='block8-vehicles-static-v20260730';
@@ -10,6 +11,7 @@ const files={
   policiesClose:'orbit360-platform/docs/CIERRE-WRITE-POLIZAS-AYS-20260730.md',
   dryrun:'orbit360-platform/docs/DRYRUN-VEHICULOS-AYS-20260730.md',
   freeze:'tools/orbit360-vehicles-source-freeze-v20260730.json',
+  canonicalizer:'tools/orbit360-vehicles-canonicalize-v20260730.mjs',
   policyModule:'orbit360-platform/modules/polizas.js',
   sourceRule:'orbit360-platform/docs/REGLA-FUENTES-OPERATIVAS-VIGENTES-BAJO-DEMANDA-20260730.md'
 };
@@ -23,7 +25,8 @@ try{
   const missing=Object.values(files).filter(f=>!fs.existsSync(path.join(ROOT,f)));
   add('FILES',missing.length===0,missing.join(','));
   if(missing.length)throw new Error('VEHICLES_STATIC_FILES_MISSING:'+missing.join(','));
-  const policiesClose=read(files.policiesClose),dryrun=read(files.dryrun),freeze=readJson(files.freeze),module=read(files.policyModule),sourceRule=read(files.sourceRule);
+  const policiesClose=read(files.policiesClose),dryrun=read(files.dryrun),freeze=readJson(files.freeze),canonicalizer=read(files.canonicalizer),module=read(files.policyModule),sourceRule=read(files.sourceRule);
+  execFileSync(process.execPath,['--check',files.canonicalizer],{cwd:ROOT,stdio:'pipe'});add('CANONICALIZER_SYNTAX',true);
   add('POLICIES_WRITE_PASS',policiesClose.includes('Estado: `WRITE_PASS`')&&policiesClose.includes('workflow run: `30586726130`')&&policiesClose.includes('polizas: 1373')&&policiesClose.includes('recibosEsperados: 0')&&policiesClose.includes('cobros: 0'));
   add('SOURCE_DOMAIN_SEPARATION',sourceRule.includes('vehiculos')||sourceRule.toLowerCase().includes('vehículos'));
   add('SOURCE_FREEZE_SCHEMA',freeze.schemaVersion==='orbit360-vehicles-source-freeze-v1'&&freeze.tenantId==='alianzas-soluciones'&&freeze.cutoff==='2026-07-30');
@@ -36,6 +39,8 @@ try{
   add('POLICY_STATUS_NOT_VEHICLE_AUTHORITY',freeze.identityContract?.sourcePolicyStatusOperational===false&&freeze.identityContract?.canonicalPolicyParentAuthoritative===true&&dryrun.includes('póliza canónica ya persistida es la autoridad'));
   add('NO_CROSS_RENEWAL_COLLAPSE',freeze.identityContract?.writeUnit==='vehicle_policy_association'&&freeze.identityContract?.collapseAcrossPolicyRenewals===false&&freeze.identityContract?.plateOnlyDoesNotReassignClientOwnership===true);
   add('PHYSICAL_KEY_CANDIDATE_ONLY',freeze.identityContract?.physicalVehicleKey==='candidate_plate_only'&&dryrun.includes('physicalVehicleKeyCandidate'));
+  add('CANONICALIZER_FAIL_CLOSED',canonicalizer.includes("sourceStatus==='ELIMINADA'")&&canonicalizer.includes("unsafeNumberOnlyFallback:0")&&canonicalizer.includes("vehicle_policy_association")===false&&canonicalizer.includes("TARGET_ID_COLLISION")&&canonicalizer.includes("CANONICAL_COUNTS"));
+  add('CANONICALIZER_POLICY_STATUS_PROVENANCE_ONLY',canonicalizer.includes('estadoPolizaFuenteOriginal')&&canonicalizer.includes('estadoPolizaCanonico')&&canonicalizer.includes('sourcePolicyConflict'));
   add('UI_CONTRACT_COMPATIBLE',module.includes("S().all('vehiculos').find(v => v.polizaId === p.id)")&&module.includes('veh.placa')&&module.includes('veh.marca')&&module.includes('veh.linea'));
   add('DOWNSTREAM_WRITES_ZERO',freeze.downstreamWrites?.receipts===0&&freeze.downstreamWrites?.cartera===0&&freeze.downstreamWrites?.cobros===0&&freeze.downstreamWrites?.finmovs===0);
   add('NO_REAL_WRITE_YET',freeze.realWriteExecuted===false&&freeze.authorizationRequiredForWrite===true&&dryrun.includes('No existe todavía autorización para ese write'));
