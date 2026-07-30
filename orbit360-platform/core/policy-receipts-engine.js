@@ -69,7 +69,10 @@ Orbit.policyReceipts = (function () {
   }
   function canonicalPolicyKey(p) {
     const tid = clean(p.tenantId || tenantId());
-    return [tid, clean(p.pais), clean(p.aseguradoraId), norm(p.numero)].join('|');
+    return [tid, clean(p.pais), clean(p.aseguradoraId), norm(p.numero), clean(p.clienteId)].join('|');
+  }
+  function policyVersionKey(p) {
+    return [canonicalPolicyKey(p), clean(p.vigenciaInicio || p.vigenciaIni), clean(p.vigenciaFin)].join('|');
   }
   function sequenceOf(c, fallback) {
     const raw = clean(c && (c.secuencia || c.cuota));
@@ -116,7 +119,7 @@ Orbit.policyReceipts = (function () {
     if (!clean(p.formaPago)) warnings.push('forma_pago_requiere_validacion');
     if (!clean(p.conducto)) warnings.push('conducto_requiere_validacion');
 
-    return { ok: errors.length === 0, errors, warnings, client, insurer, country, currency, key, active: statusActive };
+    return { ok: errors.length === 0, errors, warnings, client, insurer, country, currency, key, versionKey: policyVersionKey(Object.assign({}, p, { pais: country, moneda: currency })), active: statusActive };
   }
 
   function premiumBreakdown(raw, country) {
@@ -159,6 +162,7 @@ Orbit.policyReceipts = (function () {
     base.prima = d.total;
     base.recargoFinPct = d.recargoPct;
     base.policyKey = canonicalPolicyKey(base);
+    base.policyVersionKey = policyVersionKey(base);
     base.fuente = clean(base.fuente || (existing ? existing.fuente : 'ingreso_manual_plataforma'));
     base.operationId = opId;
     base.actualizado = now();
@@ -318,6 +322,7 @@ Orbit.policyReceipts = (function () {
     const check = validatePolicy(prepared, '');
     if (!check.ok) return Object.assign({ ok: false, policy: prepared }, check);
     prepared.policyKey = check.key;
+    prepared.policyVersionKey = check.versionKey;
     prepared.requiereValidacion = check.warnings.length > 0;
     prepared.validacion = { estado: prepared.requiereValidacion ? 'REQUIERE_VALIDACION' : 'VALIDADA_EN_CAPTURA', alertas: check.warnings, fecha: now() };
     prepared.historial = [].concat(prepared.historial || [], [{ icon: '✳', fecha: today(), t: 'Emisión de póliza', d: 'Alta desde plataforma · operación ' + opId }]);
@@ -362,6 +367,7 @@ Orbit.policyReceipts = (function () {
     const check = validatePolicy(merged, id);
     if (!check.ok) return Object.assign({ ok: false, policy: merged }, check);
     merged.policyKey = check.key;
+    merged.policyVersionKey = check.versionKey;
     merged.requiereValidacion = check.warnings.length > 0;
     merged.validacion = { estado: merged.requiereValidacion ? 'REQUIERE_VALIDACION' : 'VALIDADA_EN_CAPTURA', alertas: check.warnings, fecha: now() };
     merged.historial = [].concat(current.historial || [], [{
@@ -453,7 +459,7 @@ Orbit.policyReceipts = (function () {
 
   return {
     ACTIVE, isActiveState, isPaidReceipt, canManagePolicies, canApplyPayments,
-    canonicalPolicyKey, validatePolicy, preparePolicy, expectedReceipts, syncReceipts,
+    canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, expectedReceipts, syncReceipts,
     createPolicy, updatePolicy, applyPayment, createReconciliationProposal, updateClientState,
     receiptId, sequenceOf
   };
