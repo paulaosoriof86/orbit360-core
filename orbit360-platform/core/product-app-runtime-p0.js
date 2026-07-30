@@ -23,6 +23,19 @@
   }
   function collections(){var list=cfg().collections;return Array.isArray(list)&&list.length?list.slice():['clientes','aseguradoras'];}
   function failClient(){try{Orbit.auth.showLogin();}catch(e){}var node=document.getElementById('login-error');if(node)node.textContent='No fue posible abrir la plataforma. Intenta nuevamente.';}
+  function waitActiveCollections(store,list,timeoutMs){
+    var expected=Array.isArray(list)?list.slice():[],startedAt=Date.now(),timeout=Number(timeoutMs)>0?Number(timeoutMs):20000;
+    return new Promise(function(resolve,reject){
+      function inspect(){
+        var status=store&&typeof store._productStatus==='function'?store._productStatus():{},errors=Object.keys(status.snapshotErrors||{}),done=(status.attachedCollections||[]).concat(status.deniedCollections||[]);
+        if(errors.length)return reject(new Error('PRODUCT_COLLECTION_SNAPSHOT_ERROR:'+errors.join(',')));
+        if(expected.every(function(name){return done.indexOf(name)>=0;}))return resolve(status);
+        if(Date.now()-startedAt>=timeout)return reject(new Error('PRODUCT_COLLECTION_SNAPSHOT_TIMEOUT'));
+        setTimeout(inspect,100);
+      }
+      inspect();
+    });
+  }
   function hydrateRuntime(providers,result){
     var overlay=Orbit.productConfigSessionOverlayP0,member=Orbit.auth&&Orbit.auth.productUser||{},tenantId=String(member.tenantId||result&&result.status&&result.status.tenantId||'');
     if(!overlay||!tenantId)return Promise.reject(new Error('PRODUCT_RUNTIME_OVERLAY_MISSING'));
@@ -33,13 +46,15 @@
     if(activating)return activating;
     var providers=Orbit.productRuntimeBrowserProvidersP0,bootstrap=Orbit.backendProductReadOnlyBootstrapP0;
     if(!providers||!providers.enabled||!providers.enabled()||!bootstrap){failClient();return Promise.resolve({ok:false});}
-    var courses=staticCourses();
+    var courses=staticCourses(),activeCollections=collections();
     activating=providers.initialize()
-      .then(function(){return bootstrap.start(providers.dependencies(),{authorizedProductReadOnly:true,runtimeAuthorized:true,mode:'product',collections:collections(),snapshotTimeoutMs:20000});})
+      .then(function(){return bootstrap.start(providers.dependencies(),{authorizedProductReadOnly:true,runtimeAuthorized:true,mode:'product',collections:activeCollections,snapshotTimeoutMs:20000});})
       .then(function(result){
         if(!result||result.ok!==true||result.ready!==true||result.writeAuthorized!==false||!Orbit.store||typeof Orbit.store._productStatus!=='function')throw new Error('PRODUCT_BOOTSTRAP_NOT_READY');
-        Orbit.store=overlayStaticCourses(Orbit.store,courses);
-        return hydrateRuntime(providers,result).then(function(){return result;});
+        return waitActiveCollections(Orbit.store,activeCollections,20000).then(function(){
+          Orbit.store=overlayStaticCourses(Orbit.store,courses);
+          return hydrateRuntime(providers,result).then(function(){return result;});
+        });
       })
       .then(function(result){
         if(Orbit.router&&typeof Orbit.router.init==='function')Orbit.router.init();
@@ -57,5 +72,5 @@
     if(!providers||!providers.enabled||!providers.enabled()){failClient();return;}
     if(Orbit.auth&&typeof Orbit.auth.init==='function')Orbit.auth.init();
   }
-  window.Orbit.productAppP0=Object.freeze({VERSION:'p0-m6-20260730.3',init:init,activate:activate,isStarted:function(){return started;},writeAuthorized:false,noFallback:true,tenantSource:'membership_only'});
+  window.Orbit.productAppP0=Object.freeze({VERSION:'p0-m6-20260730.4',init:init,activate:activate,isStarted:function(){return started;},writeAuthorized:false,noFallback:true,tenantSource:'membership_only'});
 })();
