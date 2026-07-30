@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "orbit360-policies-write-request-v1",
+  "approved": true,
+  "phrase": "AUTORIZO ESCRITURA CONTROLADA POLIZAS AYS 20260730",
+  "packageSha256": "b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f",
+  "logicalSha256": "315a4f7169688a03a44e69edd608750e199c381cf6b532c574d7981f473e3011",
+  "scope": {
+    "clients": 16,
+    "restrictedInsurers": 4,
+    "policies": 1373,
+    "receipts": 0,
+    "cartera": 0,
+    "cobros": 0
+  },
+  "confirmedBy": "paula",
+  "reason": "Carga inicial canónica de pólizas A&S conforme PREWRITE_READY 20260730"
+}
