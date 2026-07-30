@@ -4,7 +4,7 @@ Fecha: 2026-07-30
 
 ## Objetivo
 
-Enseñar a cada rol técnico/operativo a distinguir una falla funcional de una falla del validador, del entorno o del pipeline antes de corregir producto.
+Enseñar a cada rol técnico/operativo a distinguir una falla funcional de una falla del validador, del entorno, del pipeline o del contrato de datos antes de corregir producto.
 
 ## Caso M6
 
@@ -62,6 +62,31 @@ GitHub Actions puede mostrar un step con conclusión visual tolerada cuando `con
 
 Aprendizaje: el cierre contractual debe usar `steps.<id>.outcome` y la evidencia generada por el gate. Nunca se debe declarar PASS únicamente porque la lista visual de steps parece verde.
 
+### Caso F — DATA_CONTRACT_FAILURE por manifiesto runtime
+
+En 6.1.6 el timeout del smoke ya estaba corregido y efectivamente esperó 60 segundos. Sin embargo, la aplicación no llegaba a `started=true`.
+
+El diagnóstico mostró que la configuración productiva declaraba cuatro colecciones: `clientes`, `aseguradoras`, `gestiones` y `notificaciones`, aunque M4 había promovido canónicamente para este bloque solo `clientes` y `aseguradoras`. Además, `notificaciones` no tenía política definida en `COLLECTION_POLICY`.
+
+La secuencia del fallo fue:
+
+1. el runtime pidió una colección fuera del contrato vigente;
+2. el planner la rechazó;
+3. el store entró en `attach-error`;
+4. `_attachSnapshots()` devolvió `false` antes de que los snapshots válidos terminaran de adjuntarse;
+5. el bootstrap devolvió `ok:false` y no instaló el store productivo;
+6. la aplicación nunca marcó `started=true`;
+7. el gate ejecutó rollback seguro.
+
+Aprendizaje: el manifiesto runtime no es una lista de módulos que “eventualmente existirán”. Debe ser la intersección exacta de:
+
+- fuentes efectivamente migradas/canónicas;
+- colecciones aprobadas para el bloque;
+- política de acceso vigente;
+- capacidades autorizadas para esa transición.
+
+La corrección no consiste en crear la colección faltante o ampliar permisos para hacer pasar el smoke. Se reduce el manifiesto al contrato real. En M6: `clientes` + `aseguradoras`.
+
 ## STOP_RETRY
 
 Si la misma etapa falla dos veces:
@@ -69,11 +94,11 @@ Si la misma etapa falla dos veces:
 1. detener reintentos;
 2. no abrir otro módulo;
 3. no agregar otro parche funcional;
-4. diagnosticar gate/pipeline;
+4. diagnosticar gate/pipeline/contrato;
 5. corregir causa raíz;
 6. exigir nueva evidencia antes de habilitar otra transición de riesgo.
 
-Cuando aparece un `VALIDATOR_STALE` demostrado después de un rollback seguro, el producto continúa congelado. Se corrige y valida el instrumento antes de pedir una nueva autorización productiva; la autorización ya consumida no se recicla.
+Cuando aparece un `VALIDATOR_STALE` o `DATA_CONTRACT_FAILURE` demostrado después de un rollback seguro, el producto continúa congelado. Se corrige y valida la capa responsable antes de pedir una nueva autorización productiva; la autorización ya consumida no se recicla.
 
 ## Rollback correcto
 
@@ -95,6 +120,7 @@ En el caso M6:
 | `VALIDATOR_STALE` | timeout de 60 s no se aplica por firma incorrecta de API | corregir instrumento, versionarlo y revalidar sin tocar producto |
 | `ENVIRONMENT_FAILURE` | bucket Storage inexistente | corregir alcance/entorno; no inventar recurso |
 | `PIPELINE_MECHANISM_FAILURE` | GET inmediato tras release devuelve 404 transitorio | corregir readiness/propagación |
+| `DATA_CONTRACT_FAILURE` | runtime pide una colección no migrada o sin política | reducir manifiesto al contrato canónico; no crear datos/permisos por conveniencia |
 | `DATA_CONTRACT_FAILURE` | conteos/digests o membership no coinciden | detener transición y corregir contrato/datos |
 | `SECURITY_FAILURE` | permisos insuficientes o acceso fuera de scope | fail-closed y corregir autorización/IAM |
 
@@ -109,6 +135,7 @@ Ante un fallo de deploy/smoke, el alumno debe identificar primero si:
 - el shell esperado no coincide;
 - el timeout configurado fue realmente aplicado por la API;
 - `continue-on-error` está ocultando un `outcome=failure`;
+- el manifiesto runtime contiene colecciones fuera de migración/política;
 - hubo un cambio de datos no autorizado.
 
 La respuesta correcta nunca es “volver a ejecutar” sin clasificar primero.
