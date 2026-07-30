@@ -10,7 +10,7 @@ const email=String(process.env.ORBIT360_PRODUCT_SMOKE_EMAIL||'').trim();
 const password=String(process.env.ORBIT360_PRODUCT_SMOKE_PASSWORD||'');
 const REQUIRED_ROLES=['Dirección','Operativo','Asesor'];
 const REQUIRED_COLLECTIONS=['clientes','aseguradoras'];
-const report={schemaVersion:'orbit360-m6-product-browser-smoke-v5',gateId:'block6-go-live-product-v20260730',contractVersion:'6.1.12',validatorRevision:'20260730.5',generatedAt:new Date().toISOString(),stage:'init',checks:{},roleViews:{},networkWriteCandidates:[],visibleTechnicalCopyPredicateVersion:VISIBLE_TECHNICAL_COPY_PREDICATE_VERSION,firestoreRead:true,firestoreWrites:0,operationalWrites:0,functionsDeploy:false,storageDeferredFailClosed:true,production:true,containsPII:false,containsSecrets:false};
+const report={schemaVersion:'orbit360-m6-product-browser-smoke-v6',gateId:'block6-go-live-product-v20260730',contractVersion:'6.1.14',validatorRevision:'20260730.6',generatedAt:new Date().toISOString(),stage:'init',checks:{},roleViews:{},networkWriteCandidates:[],visibleTechnicalCopyPredicateVersion:VISIBLE_TECHNICAL_COPY_PREDICATE_VERSION,firestoreRead:true,firestoreWrites:0,operationalWrites:0,functionsDeploy:false,storageDeferredFailClosed:true,production:true,containsPII:false,containsSecrets:false};
 const clean=v=>String(v==null?'':v).replace(/https?:\/\/[^/\s]+/g,'').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').replace(/[A-Za-z0-9_-]{40,}/g,'[redacted]').replace(/\s+/g,' ').trim().slice(0,360);
 const save=()=>{fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(report,null,2)+'\n');};
 const need=(ok,code,detail='')=>{if(!ok)throw new Error(code+(detail?':'+detail:''));};
@@ -20,10 +20,15 @@ async function checkClient360(page,label){await page.evaluate(()=>{location.hash
 async function verifiedSemanticCardClick(page){
   const proof=await page.evaluate(async()=>{
     const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+    let cards=Array.from(document.querySelectorAll('.asg-grid [data-asg]'));
+    let el=cards[0]||null;
+    if(cards.length!==26||!el||!el.isConnected)return{ok:false,cardCount:cards.length,scrolledIntoView:false,geometryStable:false,centerInsideViewport:false,centerHit:false,hitDescriptor:'missing-card',clickDispatched:false};
+    el.scrollIntoView({block:'center',inline:'center',behavior:'auto'});
+    await sleep(180);
     let previous=null,stable=0,node=null;
     const started=Date.now();
     while(Date.now()-started<6000){
-      const cards=Array.from(document.querySelectorAll('.asg-grid [data-asg]'));
+      cards=Array.from(document.querySelectorAll('.asg-grid [data-asg]'));
       const current=cards[0]||null;
       if(cards.length!==26||!current||!current.isConnected){previous=null;stable=0;node=current;await sleep(120);continue;}
       const r=current.getBoundingClientRect();
@@ -34,16 +39,19 @@ async function verifiedSemanticCardClick(page){
       if(stable>=4)break;
       await sleep(120);
     }
-    const cards=Array.from(document.querySelectorAll('.asg-grid [data-asg]'));
-    const el=cards[0]||null;
-    if(cards.length!==26||!el||!el.isConnected||stable<4)return{ok:false,cardCount:cards.length,geometryStable:false,centerHit:false,clickDispatched:false};
-    const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,top=document.elementFromPoint(x,y);
+    cards=Array.from(document.querySelectorAll('.asg-grid [data-asg]'));
+    el=cards[0]||null;
+    if(cards.length!==26||!el||!el.isConnected||stable<4)return{ok:false,cardCount:cards.length,scrolledIntoView:true,geometryStable:false,centerInsideViewport:false,centerHit:false,hitDescriptor:'unstable-card',clickDispatched:false};
+    const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+    const centerInsideViewport=x>=0&&x<window.innerWidth&&y>=0&&y<window.innerHeight;
+    const top=centerInsideViewport?document.elementFromPoint(x,y):null;
     const centerHit=!!top&&(top===el||el.contains(top));
-    if(!centerHit)return{ok:false,cardCount:cards.length,geometryStable:true,centerHit:false,clickDispatched:false};
+    const hitDescriptor=top?[String(top.tagName||'').toLowerCase(),String(top.id||'').slice(0,40),String(top.className||'').replace(/\s+/g,'.').slice(0,100)].filter(Boolean).join('#'):(centerInsideViewport?'none':'outside-viewport');
+    if(!centerInsideViewport||!centerHit)return{ok:false,cardCount:cards.length,scrolledIntoView:true,geometryStable:true,centerInsideViewport,centerHit,hitDescriptor,clickDispatched:false};
     el.click();
-    return{ok:true,cardCount:cards.length,geometryStable:true,centerHit:true,clickDispatched:true};
+    return{ok:true,cardCount:cards.length,scrolledIntoView:true,geometryStable:true,centerInsideViewport:true,centerHit:true,hitDescriptor,clickDispatched:true};
   });
-  need(proof&&proof.ok&&proof.cardCount===26&&proof.geometryStable&&proof.centerHit&&proof.clickDispatched,'INSURER_CARD_SEMANTIC_CLICK_PRECONDITION_FAILED',JSON.stringify(proof||{}));
+  need(proof&&proof.ok&&proof.cardCount===26&&proof.scrolledIntoView&&proof.geometryStable&&proof.centerInsideViewport&&proof.centerHit&&proof.clickDispatched,'INSURER_CARD_SEMANTIC_CLICK_PRECONDITION_FAILED',JSON.stringify(proof||{}));
   return proof;
 }
 async function checkInsurers(page,label,role){await page.evaluate(()=>{location.hash='#/aseguradoras';});await page.waitForTimeout(500);const cards=page.locator('.asg-grid [data-asg]');await cards.first().waitFor({state:'visible',timeout:20000});const count=await cards.count();need(count===26,'INSURER_COUNT_INVALID',`${label}:${count}`);const interaction=await verifiedSemanticCardClick(page);await page.locator('#asg-ficha').waitFor({state:'visible',timeout:10000});const edit=await page.locator('#af-editar').count();if(role==='Asesor')need(edit===0,'ADVISOR_INSURER_EDIT_VISIBLE');return{count,editVisible:edit>0,interaction};}
