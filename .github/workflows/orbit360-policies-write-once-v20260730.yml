@@ -14,6 +14,7 @@ env:
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
   DRIVE_FILE_ID: 1NXHACZ11815882AhoyGrQQCb9Amgbi95
   PACKAGE_SHA256: b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f
+  LOGICAL_SHA256: 315a4f7169688a03a44e69edd608750e199c381cf6b532c574d7981f473e3011
   REQUEST_PATH: .github/orbit360-requests/policies-write-20260730.json
 jobs:
   write_once:
@@ -34,13 +35,13 @@ jobs:
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq -e '.status=="GO_GATE_CONTRACT" and .failed==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-          jq -e '.schemaVersion=="orbit360-policies-write-freeze-v1" and .realWriteExecuted==false and .authorization.required==true and .authorization.requestExistsAtFreeze==false and .package.physicalSha256==env.PACKAGE_SHA256 and .writePlan.clientesCreatePendingQuality==16 and .writePlan.aseguradorasRestrictedCreate==4 and .writePlan.polizasCreate==1373 and .writePlan.polizasPendingQuality==64 and .writePlan.excluded==4 and .writePlan.recibosWrites==0 and .writePlan.carteraWrites==0 and .writePlan.cobrosWrites==0' tools/orbit360-policies-write-freeze-v20260730.json >/dev/null
+          jq -e '.schemaVersion=="orbit360-policies-write-freeze-v1" and .realWriteExecuted==false and .authorization.required==true and .authorization.requestExistsAtFreeze==false and .package.physicalSha256==env.PACKAGE_SHA256 and .package.logicalSha256==env.LOGICAL_SHA256 and .prewriteEvidence.status=="PREWRITE_READY" and .prewriteEvidence.firestoreWrites==0 and .prewriteEvidence.operationalWrites==0 and .writePlan.clientesCreatePendingQuality==16 and .writePlan.aseguradorasRestrictedCreate==4 and .writePlan.polizasCreate==1373 and .writePlan.polizasPendingQuality==64 and .writePlan.excluded==4 and .writePlan.recibosWrites==0 and .writePlan.carteraWrites==0 and .writePlan.cobrosWrites==0' tools/orbit360-policies-write-freeze-v20260730.json >/dev/null
       - name: Verificar request inmutable autorizado
         shell: bash
         run: |
           set -euo pipefail
           test -f "$REQUEST_PATH"
-          jq -e '.schemaVersion=="orbit360-policies-write-request-v1" and .approved==true and .phrase=="AUTORIZO ESCRITURA CONTROLADA POLIZAS AYS 20260730" and .packageSha256==env.PACKAGE_SHA256 and .logicalSha256=="315a4f7123193acde4ca8cc166e15904502dabf43f3c071c36a7b974e03e3011" and .scope.clients==16 and .scope.restrictedInsurers==4 and .scope.policies==1373 and .scope.receipts==0 and .scope.cartera==0 and .scope.cobros==0' "$REQUEST_PATH" >/dev/null
+          jq -e '.schemaVersion=="orbit360-policies-write-request-v1" and .approved==true and .phrase=="AUTORIZO ESCRITURA CONTROLADA POLIZAS AYS 20260730" and .packageSha256==env.PACKAGE_SHA256 and .logicalSha256==env.LOGICAL_SHA256 and .scope.clients==16 and .scope.restrictedInsurers==4 and .scope.policies==1373 and .scope.receipts==0 and .scope.cartera==0 and .scope.cobros==0' "$REQUEST_PATH" >/dev/null
       - name: Preparar dependencias aisladas
         shell: bash
         run: |
