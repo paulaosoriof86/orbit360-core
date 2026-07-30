@@ -39,5 +39,7 @@ jobs:
           EXIT_CODE: ${{ steps.fixture.outputs.exit_code }}
         with:
           script: |
-            const ok=process.env.EXIT_CODE==='0';
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state:ok?'success':'failure',context:'orbit360/m5-academia-fixture-diagnostic-537',description:ok?'Fixture 5.0.37 isolated PASS':'Fixture 5.0.37 isolated failure captured'});
+            const fs=require('fs');const ok=process.env.EXIT_CODE==='0';
+            let detail='';try{detail=fs.readFileSync('/tmp/fixture-537.log','utf8').split(/\r?\n/).filter(Boolean).slice(-1)[0]||'';}catch(e){}
+            const description=ok?'Fixture 5.0.37 isolated PASS':('Fixture fail: '+detail).slice(0,140);
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state:ok?'success':'failure',context:'orbit360/m5-academia-fixture-diagnostic-537',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
