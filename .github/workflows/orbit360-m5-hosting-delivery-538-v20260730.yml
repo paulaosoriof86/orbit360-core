@@ -1,153 +1,16 @@
-name: Orbit 360 · M5 Hosting LAB delivery 5.0.38
-run-name: M5 5.0.38 · one Hosting LAB delivery · ${{ github.sha }}
+name: Orbit 360 · M5 Hosting LAB delivery 5.0.38 · FROZEN
 
 on:
-  push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - 'tools/orbit360-m5-hosting-request-538-v20260730.json'
+  workflow_dispatch:
 
 permissions:
   contents: read
-  statuses: write
-
-concurrency:
-  group: orbit360-m5-hosting-delivery-538-v20260730
-  cancel-in-progress: false
-
-env:
-  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
-  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_REQUEST_FILE: tools/orbit360-m5-hosting-request-538-v20260730.json
-  EXPECTED_RC_HASH: 097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a
-  EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
-  ORBIT360_HOSTING_CHANNEL: orbit360-ays-lab
-  ORBIT360_HOSTING_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
-  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 
 jobs:
-  hosting_lab_delivery:
-    name: M5 · exactly one Hosting LAB delivery · verify 29/29
+  frozen:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
     steps:
-      - name: Checkout SHA exacto
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 2
-          persist-credentials: false
-      - name: Preparar Node 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Verificar rama SHA y primer intento
-        shell: bash
+      - name: Hosting delivery already closed
         run: |
-          set -euo pipefail
-          test "$GITHUB_EVENT_NAME" = 'push'
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          test "$GITHUB_RUN_ATTEMPT" = '1'
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test -f "$ORBIT360_REQUEST_FILE"
-      - name: Preflight canónico antes de cualquier secreto o deploy
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          node --check tools/orbit360-validar-gate-contracts-engine-m5-hosting-delivery-538-v20260730.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="5.0.38" and .candidateContractVersion=="5.0.37" and .executionPhase=="M5_LAB_HOSTING_DELIVERY" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .activationMode=="immutable_request_present" and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==46 and .remoteAssetsExpected==29 and .remoteAssetsMatchedBefore==28 and .mismatchPathsBefore==["data/academia-v1197-bridge.js"] and .packageInputImmutable==true and .evidenceLedgerSeparate==true and .packageRunId==30502809297 and .packageJobId==90745979716 and .packageArtifactId==8744132640 and .capabilityProfile.secrets==true and .capabilityProfile.firestoreRead==false and .capabilityProfile.writes==false and .capabilityProfile.runtime==false and .capabilityProfile.browser==false and .capabilityProfile.deploy==true and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .dataAccess==false and .secretAccess==false and .operationalWrites==0 and .deployExecuted==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-      - name: Confirmar paridad previa exacta 28/29
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-m5-release-candidate-readiness-537-v20260729.mjs
-          cp "$ORBIT360_EVIDENCE_DIR/m5-release-candidate-readiness-537-summary.json" "$ORBIT360_EVIDENCE_DIR/m5-release-candidate-readiness-538-before.json"
-          jq -e '.ok==true and .status=="M5_RC_537_STATIC_REMEDIATION_READY_LAB_DELIVERY_REQUIRED" and .releaseCandidate.hash==env.EXPECTED_RC_HASH and .releaseCandidate.criticalAssetCount==46 and .remoteLab.assetsExpected==29 and .remoteLab.assetsChecked==29 and .remoteLab.assetsMatched==28 and .remoteLab.mismatchCount==1 and .remoteLab.mismatchPaths==["data/academia-v1197-bridge.js"] and .remoteLab.remoteParity==false and .remoteLab.expectedSinglePendingStaticNormalizer==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .browser==false and .runtime==false and .deploy==false and .production==false' "$ORBIT360_EVIDENCE_DIR/m5-release-candidate-readiness-538-before.json" >/dev/null
-      - name: Resolver identidad exclusiva de Hosting LAB después del preflight
-        shell: bash
-        env:
-          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          set -euo pipefail
-          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
-          test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-m5-hosting-lab-538.json"
-          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
-          chmod 600 "$KEY_FILE"
-          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
-      - name: Instalar Firebase CLI
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-save --package-lock=false firebase-tools@14
-          npx firebase --version
-      - name: Publicar exclusivamente Hosting LAB una vez
-        shell: bash
-        run: |
-          set -euo pipefail
-          npx firebase hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --project "$EXPECTED_FIREBASE_PROJECT_ID" --config firebase.json --expires 7d --non-interactive --json > "$ORBIT360_EVIDENCE_DIR/m5-hosting-538-deploy-output.json"
-          jq -e 'type=="object"' "$ORBIT360_EVIDENCE_DIR/m5-hosting-538-deploy-output.json" >/dev/null
-      - name: Revalidar candidata pública 29/29
-        shell: bash
-        run: |
-          set -euo pipefail
-          verified=0
-          for attempt in 1 2; do
-            node tools/orbit360-m5-release-candidate-readiness-537-v20260729.mjs || true
-            if jq -e '.ok==true and .status=="M5_RC_537_READY_FOR_RUNTIME_AFTER_HOSTING" and .releaseCandidate.hash==env.EXPECTED_RC_HASH and .releaseCandidate.criticalAssetCount==46 and .remoteLab.assetsExpected==29 and .remoteLab.assetsChecked==29 and .remoteLab.assetsMatched==29 and .remoteLab.mismatchCount==0 and .remoteLab.remoteParity==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .browser==false and .runtime==false and .deploy==false and .functionsDeploy==false and .rulesDeploy==false and .production==false' "$ORBIT360_EVIDENCE_DIR/m5-release-candidate-readiness-537-summary.json" >/dev/null; then verified=1; break; fi
-            if [ "$attempt" = '1' ]; then sleep 8; fi
-          done
-          cp "$ORBIT360_EVIDENCE_DIR/m5-release-candidate-readiness-537-summary.json" "$ORBIT360_EVIDENCE_DIR/m5-release-candidate-readiness-538-after.json"
-          test "$verified" = '1'
-      - name: Crear cierre sanitizado
-        if: always()
-        shell: bash
-        run: |
-          node <<'NODE'
-          const fs=require('fs'),path=require('path');
-          const dir=process.env.ORBIT360_EVIDENCE_DIR;
-          const read=name=>{try{return JSON.parse(fs.readFileSync(path.join(dir,name),'utf8'))}catch{return null}};
-          const p=read('preflight-sanitizado.json'),before=read('m5-release-candidate-readiness-538-before.json'),after=read('m5-release-candidate-readiness-538-after.json'),dep=read('m5-hosting-538-deploy-output.json');
-          const ok=!!(p&&p.status==='GO_GATE_CONTRACT'&&p.failed===0&&p.executionAuthorized===true&&before&&before.status==='M5_RC_537_STATIC_REMEDIATION_READY_LAB_DELIVERY_REQUIRED'&&before.remoteLab?.assetsMatched===28&&before.remoteLab?.mismatchCount===1&&after&&after.status==='M5_RC_537_READY_FOR_RUNTIME_AFTER_HOSTING'&&after.releaseCandidate?.hash===process.env.EXPECTED_RC_HASH&&after.remoteLab?.assetsMatched===29&&after.remoteLab?.mismatchCount===0&&after.remoteLab?.remoteParity===true&&dep);
-          const out={schemaVersion:'orbit360-m5-hosting-delivery-538-summary-v1',generatedAt:new Date().toISOString(),ok,status:ok?'M5_HOSTING_538_DELIVERED_AND_29_OF_29_VERIFIED':'M5_HOSTING_538_DELIVERY_FAILED',gateId:process.env.ORBIT360_GATE_ID,contractVersion:'5.0.38',candidateContractVersion:'5.0.37',releaseCandidateHash:process.env.EXPECTED_RC_HASH,projectId:process.env.EXPECTED_FIREBASE_PROJECT_ID,channel:process.env.ORBIT360_HOSTING_CHANNEL,canonicalUrl:process.env.ORBIT360_HOSTING_URL,canonicalPreflight:p?.status||'NOT_RUN',preflightPassed:p?.passed||0,preflightTotal:p?.total||0,criticalAssets:46,remoteAssetsExpected:29,beforeAssetsMatched:before?.remoteLab?.assetsMatched??0,beforeMismatchCount:before?.remoteLab?.mismatchCount??29,beforeMismatchPaths:before?.remoteLab?.mismatchPaths||[],afterAssetsMatched:after?.remoteLab?.assetsMatched??0,afterMismatchCount:after?.remoteLab?.mismatchCount??29,afterRemoteParity:!!after?.remoteLab?.remoteParity,hostingDeployExecuted:!!dep,hostingDeployExecutions:dep?1:0,secretsUsed:!!dep,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeSmoke:false,browser:false,functionsDeploy:false,rulesDeploy:false,production:false,mergeMain:false,policies:false,pólizas:false,visualReview:false,containsPII:false,containsSecrets:false,approvalReadyForRuntimeSmoke:ok,runtimeSmokeAuthorized:false};
-          fs.writeFileSync(path.join(dir,'m5-hosting-delivery-538-summary.json'),JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(!ok)process.exitCode=41;
-          NODE
-      - name: Validar cierre esperado
-        shell: bash
-        run: |
-          set -euo pipefail
-          jq -e '.ok==true and .status=="M5_HOSTING_538_DELIVERED_AND_29_OF_29_VERIFIED" and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==46 and .remoteAssetsExpected==29 and .beforeAssetsMatched==28 and .beforeMismatchCount==1 and .beforeMismatchPaths==["data/academia-v1197-bridge.js"] and .afterAssetsMatched==29 and .afterMismatchCount==0 and .afterRemoteParity==true and .hostingDeployExecuted==true and .hostingDeployExecutions==1 and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeSmoke==false and .browser==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .mergeMain==false and .policies==false and .["pólizas"]==false and .visualReview==false and .containsPII==false and .containsSecrets==false' "$ORBIT360_EVIDENCE_DIR/m5-hosting-delivery-538-summary.json" >/dev/null
-      - name: Subir evidencia sanitizada
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-m5-hosting-delivery-538-${{ github.run_id }}
-          path: |
-            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-538-before.json
-            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-readiness-538-after.json
-            orbit360-platform/runtime-gate-crm-v20260716/m5-hosting-delivery-538-summary.json
-            orbit360-platform/runtime-gate-crm-v20260716/m5-release-candidate-manifest-537.json
-          if-no-files-found: warn
-          retention-days: 30
-      - name: Publicar estado observable sanitizado
-        if: always()
-        uses: actions/github-script@v7
-        env:
-          SUMMARY: orbit360-platform/runtime-gate-crm-v20260716/m5-hosting-delivery-538-summary.json
-        with:
-          script: |
-            const fs=require('fs');let state='failure',description='M5 Hosting 5.0.38 delivery failed';
-            try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY,'utf8'));if(s.ok===true&&s.status==='M5_HOSTING_538_DELIVERED_AND_29_OF_29_VERIFIED'){state='success';description='M5 Hosting LAB delivered; parity 29/29';}}catch(e){}
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-hosting-delivery-538',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
-      - name: Limpiar identidad temporal
-        if: always()
-        shell: bash
-        run: rm -f "${ORBIT360_TEMP_KEY_FILE:-${RUNNER_TEMP}/orbit360-m5-hosting-lab-538.json}"
+          echo 'M5 5.0.38 Hosting LAB already delivered once and verified 29/29; rerun forbidden.' >&2
+          exit 41
