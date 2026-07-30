@@ -23,7 +23,7 @@
   "previousRecoveryResult": "ROLLED_BACK_SAFE",
   "previousRecoveryClassification": "VALIDATOR_STALE",
   "rootCause": "SEMANTIC_CARD_HITTEST_MISSING_SCROLL_INTO_VIEW",
-  "staticValidatorRemediationRun": 0,
+  "staticValidatorRemediationRun": 30549826785,
   "canonicalMigratedCollections": ["clientes", "aseguradoras"],
   "logicalCountryField": "country",
   "physicalCountryField": "pais",
