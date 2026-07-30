@@ -1,8 +1,10 @@
 {
-  "schemaVersion":"orbit360-m5-academia-static-inventory-537-trigger-v1",
+  "schemaVersion":"orbit360-m5-academia-static-inventory-537-trigger-v2",
   "issuedAt":"2026-07-29",
   "gateId":"block5-release-candidate-visualization-v20260728",
   "contractVersion":"5.0.37",
+  "attempt":2,
+  "finalAttempt":true,
   "allowedExecutions":1,
   "zeroCapabilities":true,
   "containsPII":false,
