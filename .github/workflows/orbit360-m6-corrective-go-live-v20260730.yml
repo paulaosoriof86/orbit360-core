@@ -5,6 +5,11 @@ on:
     paths:
       - '.github/workflows/orbit360-m6-corrective-go-live-v20260730.yml'
       - 'tools/orbit360-m6-recovery-616-request-v20260730.json'
+      - 'tools/orbit360-m6-generate-product-runtime-config-v20260730.mjs'
+      - 'orbit360-platform/core/product-app-runtime-p0.js'
+      - 'tools/orbit360-m6-bootstrap-data-contract-root-cause-v20260730.json'
+      - 'tools/orbit360-validator-lifecycle-contract-m6-bootstrap-data-contract-static-v20260730.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-m6-bootstrap-data-contract-static-v20260730.mjs'
 permissions:
   contents: read
   statuses: write
