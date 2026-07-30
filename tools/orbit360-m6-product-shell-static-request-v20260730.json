@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-m6-product-shell-static-request-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "contractVersion": "6.0.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "baseCommit": "85f200bd542fad35f10dcfbafb669899f99f6db5",
+  "zeroCapabilities": true,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "runtime": false,
+  "browser": false,
+  "deploy": false,
+  "production": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "purpose": "Validate the complete M6 product shell assembly, canonical gate registration and rollback contracts without external capabilities."
+}
