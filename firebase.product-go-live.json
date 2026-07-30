@@ -2,9 +2,6 @@
   "firestore": {
     "rules": "firestore.product-readonly.rules"
   },
-  "storage": {
-    "rules": "storage.product-readonly.rules"
-  },
   "hosting": {
     "public": "orbit360-platform",
     "ignore": [
