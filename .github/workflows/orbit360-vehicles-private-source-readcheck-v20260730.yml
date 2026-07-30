@@ -2,7 +2,14 @@ name: Orbit 360 · Vehicles private sources readcheck
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
-    paths: ['.github/workflows/orbit360-vehicles-private-source-readcheck-v20260730.yml']
+    paths:
+      - '.github/workflows/orbit360-vehicles-private-source-readcheck-v20260730.yml'
+      - 'tools/orbit360-vehicles-source-freeze-v20260730.json'
+      - 'tools/orbit360-vehicles-canonicalize-v20260730.mjs'
+      - 'tools/orbit360-validator-lifecycle-contract-vehicles-static-v20260730.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-vehicles-static-v20260730.mjs'
+      - 'tools/orbit360-validar-gate-contracts-v20260717.mjs'
+      - 'orbit360-platform/docs/DRYRUN-VEHICULOS-AYS-20260730.md'
 permissions:
   contents: read
   statuses: write
