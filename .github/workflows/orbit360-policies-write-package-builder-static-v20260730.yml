@@ -1,0 +1,45 @@
+name: Orbit 360 · Policies write-package builder static
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-policies-write-package-builder-static-v20260730.yml'
+      - 'tools/orbit360-policy-staging-to-canonical-v20260730.mjs'
+      - 'tools/orbit360-test-policy-staging-to-canonical-v20260730.mjs'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-policies-write-package-builder-static-v20260730
+  cancel-in-progress: false
+jobs:
+  static:
+    name: Policies · staging to canonical static
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sintaxis y fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-policy-staging-to-canonical-v20260730.mjs
+          node --check tools/orbit360-test-policy-staging-to-canonical-v20260730.mjs
+          node tools/orbit360-test-policy-staging-to-canonical-v20260730.mjs | tee /tmp/policies-write-package-builder.json
+          jq -e '.status=="PASS" and .stagingToCanonical==true and .newClientCreatedOnce==true and .newClientPoliciesReuseId==true and .insurerResolutionFailClosed==true and .receiptsWritten==0 and .carteraWrites==0 and .cobroWrites==0 and .firestoreWrites==0 and .operationalWrites==0' /tmp/policies-write-package-builder.json >/dev/null
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Policy write-package builder static failed';
+            try{const p=JSON.parse(fs.readFileSync('/tmp/policies-write-package-builder.json','utf8'));if(p.status==='PASS'&&p.operationalWrites===0){state='success';description='Policy staging-to-canonical builder PASS; zero writes';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/policies-write-package-builder',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
