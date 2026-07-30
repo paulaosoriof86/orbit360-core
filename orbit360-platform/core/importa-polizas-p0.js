@@ -1,10 +1,14 @@
 /* ============================================================
    Orbit 360 · P0 reglas de importacion de polizas
-   Fecha: 2026-07-09
+   Fecha: 2026-07-30
 
    Modulo puro/aditivo para normalizar polizas importadas sin tocar
-   backend protegido ni escribir datos reales. Se integra despues con
-   core/importa.js cuando pase smoke.
+   backend protegido ni escribir datos reales.
+
+   Contrato vigente:
+   - Solo Vigente / Por renovar pueden generar recibos/cartera.
+   - Renovada es historico: describe la poliza anterior ya renovada.
+   - Estados ambiguos o colapsados por un parser legacy requieren validacion.
    ============================================================ */
 (function () {
   window.Orbit = window.Orbit || {};
@@ -94,19 +98,24 @@
     if (/no renov/.test(source)) {
       return { estadoOperativoOrbit: 'no_renovada_historica', estadoCartera: 'no_exigible', label: 'No renovada', requiresValidation: false };
     }
-    if (/renov/.test(source) && active) {
-      return { estadoOperativoOrbit: 'vigente_renovada', estadoCartera: 'genera_recibos_esperados', label: 'Renovada vigente', requiresValidation: false };
+    if (/^por renovar$/.test(source)) {
+      if (active) return { estadoOperativoOrbit: 'por_renovar_operativa', estadoCartera: 'genera_recibos_esperados', label: 'Por renovar', requiresValidation: false };
+      return { estadoOperativoOrbit: 'por_renovar_requiere_validacion', estadoCartera: 'requiere_validacion', label: 'Por renovar · requiere validación', requiresValidation: true };
     }
-    if (/vig/.test(source) && active) {
-      return { estadoOperativoOrbit: 'vigente_operativa', estadoCartera: 'genera_recibos_esperados', label: 'Vigente', requiresValidation: false };
+    if (/renovad/.test(source)) {
+      return { estadoOperativoOrbit: 'historica_renovada', estadoCartera: 'no_exigible', label: 'Renovada', requiresValidation: false };
     }
-    if (/venc|termin/.test(source)) {
-      return { estadoOperativoOrbit: 'historica_vencida', estadoCartera: 'recibo_analitico_no_cartera_viva', label: 'Histórica vencida', requiresValidation: false };
+    if (/^vigente$|\bvigente\b/.test(source)) {
+      if (active) return { estadoOperativoOrbit: 'vigente_operativa', estadoCartera: 'genera_recibos_esperados', label: 'Vigente', requiresValidation: false };
+      return { estadoOperativoOrbit: 'vigente_fuera_vigencia_requiere_validacion', estadoCartera: 'requiere_validacion', label: 'Vigente · requiere validación', requiresValidation: true };
+    }
+    if (/venc|termin|reexped/.test(source)) {
+      return { estadoOperativoOrbit: 'historica_vencida', estadoCartera: 'recibo_analitico_no_cartera_viva', label: 'Histórica', requiresValidation: false };
     }
     if (active) {
-      return { estadoOperativoOrbit: 'vigente_por_vigencia_requiere_validacion', estadoCartera: 'requiere_validacion', label: 'Requiere validación', requiresValidation: true };
+      return { estadoOperativoOrbit: 'requiere_validacion_estado', estadoCartera: 'requiere_validacion', label: 'Requiere validación', requiresValidation: true };
     }
-    return { estadoOperativoOrbit: 'requiere_validacion_estado', estadoCartera: 'requiere_validacion', label: 'Requiere validación', requiresValidation: true };
+    return { estadoOperativoOrbit: 'historica_estado_no_activo', estadoCartera: 'no_exigible', label: 'Histórica', requiresValidation: false };
   }
 
   function partyKey(input) {
@@ -134,13 +143,14 @@
     const dedupKey = policyDedupKey(input);
     const formaPago = input.formaPago || input.frecuencia || input.periodicidad || input.conducto || '';
 
-    const missing = [];
-    if (!dedupKey) missing.push('llave_poliza');
-    if (!countryInfo.country) missing.push('pais');
-    if (!currencyInfo.currency) missing.push('moneda');
-    if (premium.ambiguous || !premium.primaNeta) missing.push('prima_neta');
-    if (!formaPago) missing.push('forma_pago');
-    if (status.requiresValidation) missing.push('estado');
+    const missing = Array.isArray(input.motivosValidacion) ? input.motivosValidacion.slice() : [];
+    function need(reason) { if (reason && missing.indexOf(reason) < 0) missing.push(reason); }
+    if (!dedupKey) need('llave_poliza');
+    if (!countryInfo.country) need('pais');
+    if (!currencyInfo.currency) need('moneda');
+    if (premium.ambiguous || !premium.primaNeta) need('prima_neta');
+    if (!formaPago) need('forma_pago');
+    if (status.requiresValidation) need('estado');
 
     return Object.assign({}, input, {
       _dedupKey: dedupKey,
@@ -157,7 +167,7 @@
       iva: premium.iva,
       primaTotal: premium.primaTotal,
       formaPago,
-      requiereValidacion: missing.length > 0,
+      requiereValidacion: missing.length > 0 || input.requiereValidacion === true,
       motivosValidacion: missing,
       importadorP0: true
     });
@@ -165,7 +175,7 @@
 
   function shouldGenerateExpectedReceipts(policy) {
     return !policy.requiereValidacion &&
-      (policy.estadoOperativoOrbit === 'vigente_operativa' || policy.estadoOperativoOrbit === 'vigente_renovada') &&
+      (policy.estadoOperativoOrbit === 'vigente_operativa' || policy.estadoOperativoOrbit === 'por_renovar_operativa') &&
       !!policy.primaNeta && !!policy.moneda && !!policy.formaPago;
   }
 
