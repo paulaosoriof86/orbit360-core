@@ -16,7 +16,7 @@ env:
   PROJECT_ID: ays-orbit-360-lab
 jobs:
   index:
-    name: Policies · sanitized reference index v3
+    name: Policies · sanitized reference index v4
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
           set -euo pipefail
           npm init -y >/dev/null 2>&1
           npm install --no-save firebase-admin@13.4.0 >/dev/null 2>&1
-      - name: Construir índice sanitizado read-only v3
+      - name: Construir índice sanitizado read-only v4
         env:
           SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
           SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
@@ -65,22 +65,30 @@ jobs:
             return out;
           }
           const uniqueHashes=vals=>[...new Set(vals.map(norm).filter(Boolean).map(h))];
+          const identityNames=r=>[r.nombre,r.nombreCompleto,r.razonSocial,r.nombreLegal,r.clienteNombre,r.asegurado,r.nombreCanonico,r.nombreNormalizado,...list(r.aliasesIdentidad),...list(r.aliasesCliente)].filter(Boolean);
           (async()=>{
             const sa=JSON.parse(process.env.SERVICE_ACCOUNT); if(sa.project_id!==process.env.PROJECT_ID) throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
             admin.initializeApp({credential:admin.credential.cert(sa),projectId:process.env.PROJECT_ID}); const db=admin.firestore();
             async function rows(coll){const s=await db.collection('tenantId').doc(process.env.TENANT_ID).collection(coll).get();return s.docs.map(d=>({id:d.id,...d.data()}));}
             const [clients,insurers,advisors,policies]=await Promise.all([rows('clientes'),rows('aseguradoras'),rows('asesores'),rows('polizas')]);
             const clientIndex=clients.map(r=>{
-              const names=[r.nombre,r.nombreCompleto,r.razonSocial,r.asegurado,r.clienteNombre,...collectStringsByKey(r,/(nombre|razon|asegurado|contratante|cliente|alias)/i)].filter(Boolean);
+              const names=identityNames(r);
+              const relatedNames=collectStringsByKey(r,/(contacto|representante|beneficiario).*nombre|nombre.*(contacto|representante|beneficiario)/i).filter(Boolean);
               const docs=[r.numeroDocumento,r.documento,r.nit,r.dpi,r.cedulaJuridica,r.identificacion,...collectStringsByKey(r,/(document|nit|dpi|cedula|identif|rut|rtu)/i)].filter(Boolean);
               const phones=[r.whatsapp,r.telefono,r.telefonoAlterno,r.contactoPrincipalTelefono,...collectStringsByKey(r,/(whatsapp|telefono|phone|movil|celular)/i)].filter(Boolean);
               const emails=[r.correo,r.email,r.contactoPrincipalCorreo,...collectStringsByKey(r,/(correo|email|mail)/i)].filter(Boolean);
-              return{id:r.id,nameHashes:uniqueHashes(names),documentHashes:uniqueHashes(docs),phoneHashes:uniqueHashes(phones),emailHashes:uniqueHashes(emails),advisorId:clean(r.asesorId||r.asesorPrincipalId||''),country:clean(r.pais||r.country||'').toUpperCase()};
+              return{id:r.id,identityNameHashes:uniqueHashes(names),relatedNameHashes:uniqueHashes(relatedNames),documentHashes:uniqueHashes(docs),phoneHashes:uniqueHashes(phones),emailHashes:uniqueHashes(emails),advisorId:clean(r.asesorId||r.asesorPrincipalId||''),country:clean(r.pais||r.country||'').toUpperCase()};
             });
-            const insurerIndex=[]; for(const r of insurers){const vals=[r.nombre,r.nombreCorto,r.razonSocial,r.aseguradoraNombre,r.displayName,...list(r.aliases),...list(r.alias),...collectStringsByKey(r,/(nombre|razon|aseguradora|alias|display|marca)/i)].filter(Boolean);for(const aliasHash of uniqueHashes(vals)) insurerIndex.push({id:r.id,aliasHash,country:clean(r.pais||r.country||'').toUpperCase()});}
-            const advisorIndex=advisors.map(r=>({id:r.id,nameHashes:uniqueHashes([r.nombre,r.nombreCompleto,r.displayName,...collectStringsByKey(r,/(nombre|display|alias)/i)].filter(Boolean)),emailHashes:uniqueHashes([r.correo,r.email,...collectStringsByKey(r,/(correo|email)/i)].filter(Boolean))}));
+            const insurerIndex=[];
+            for(const r of insurers){
+              const vals=[r.nombre,r.nombreCorto,r.razonSocial,r.aseguradoraNombre,r.displayName,...list(r.aliases),...list(r.alias),...collectStringsByKey(r,/(nombre|razon|aseguradora|alias|display|marca)/i)].filter(Boolean);
+              const label=clean(r.nombre||r.nombreCorto||r.razonSocial||r.aseguradoraNombre||r.displayName||'');
+              const aliases=[...new Set(vals.map(clean).filter(Boolean))];
+              insurerIndex.push({id:r.id,label,country:clean(r.pais||r.country||'').toUpperCase(),aliasHashes:uniqueHashes(vals),aliases});
+            }
+            const advisorIndex=advisors.map(r=>({id:r.id,nameHashes:uniqueHashes([r.nombre,r.nombreCompleto,r.displayName].filter(Boolean)),emailHashes:uniqueHashes([r.correo,r.email].filter(Boolean))}));
             const policyIndex=policies.map(r=>({id:r.id,sourceVersionHash:clean(r._sourceVersionKey||r.sourceVersionKey||r.source_version_key)?crypto.createHash('sha256').update(clean(r._sourceVersionKey||r.sourceVersionKey||r.source_version_key)).digest('hex'):'',policyIdentityHash:crypto.createHash('sha256').update([process.env.TENANT_ID,clean(r.pais),clean(r.aseguradoraId),clean(r.numero),clean(r.clienteId)].join('|')).digest('hex')}));
-            const out={schemaVersion:'orbit360-policies-reference-index-v3',tenantId:process.env.TENANT_ID,projectId:process.env.PROJECT_ID,counts:{clients:clients.length,insurers:insurers.length,advisors:advisors.length,policies:policies.length,clientNameHashes:clientIndex.reduce((n,r)=>n+r.nameHashes.length,0),clientDocumentHashes:clientIndex.reduce((n,r)=>n+r.documentHashes.length,0),clientPhoneHashes:clientIndex.reduce((n,r)=>n+r.phoneHashes.length,0),clientEmailHashes:clientIndex.reduce((n,r)=>n+r.emailHashes.length,0),insurerAliasHashes:insurerIndex.length},clientIndex,insurerIndex,advisorIndex,policyIndex,piiPlaintext:false,documentsPlaintext:false,namesPlaintext:false,phonesPlaintext:false,emailsPlaintext:false,firestoreRead:true,firestoreWrites:0,operationalWrites:0,productionTouched:false};
+            const out={schemaVersion:'orbit360-policies-reference-index-v4',tenantId:process.env.TENANT_ID,projectId:process.env.PROJECT_ID,counts:{clients:clients.length,insurers:insurers.length,advisors:advisors.length,policies:policies.length,clientIdentityNameHashes:clientIndex.reduce((n,r)=>n+r.identityNameHashes.length,0),clientRelatedNameHashes:clientIndex.reduce((n,r)=>n+r.relatedNameHashes.length,0),clientDocumentHashes:clientIndex.reduce((n,r)=>n+r.documentHashes.length,0),clientPhoneHashes:clientIndex.reduce((n,r)=>n+r.phoneHashes.length,0),clientEmailHashes:clientIndex.reduce((n,r)=>n+r.emailHashes.length,0),insurerAliasHashes:insurerIndex.reduce((n,r)=>n+r.aliasHashes.length,0)},clientIndex,insurerIndex,advisorIndex,policyIndex,insurerLabelsAreBusinessData:true,piiPlaintext:false,documentsPlaintext:false,namesPlaintext:false,phonesPlaintext:false,emailsPlaintext:false,firestoreRead:true,firestoreWrites:0,operationalWrites:0,productionTouched:false};
             fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true});fs.writeFileSync(process.env.EVIDENCE_DIR+'/policies-reference-index-sanitized.json',JSON.stringify(out,null,2)+'\n');
           })().catch(err=>{console.error(String(err&&err.message||err));process.exit(41);});
           NODE
@@ -88,7 +96,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          jq -e '.schemaVersion=="orbit360-policies-reference-index-v3" and .piiPlaintext==false and .documentsPlaintext==false and .namesPlaintext==false and .phonesPlaintext==false and .emailsPlaintext==false and .firestoreRead==true and .firestoreWrites==0 and .operationalWrites==0 and .counts.clients==414 and .counts.insurers==26 and .counts.advisors==7 and .counts.clientNameHashes>=414 and .counts.clientPhoneHashes>0' "$EVIDENCE_DIR/policies-reference-index-sanitized.json" >/dev/null
+          jq -e '.schemaVersion=="orbit360-policies-reference-index-v4" and .piiPlaintext==false and .documentsPlaintext==false and .namesPlaintext==false and .phonesPlaintext==false and .emailsPlaintext==false and .insurerLabelsAreBusinessData==true and .firestoreRead==true and .firestoreWrites==0 and .operationalWrites==0 and .counts.clients==414 and .counts.insurers==26 and .counts.advisors==7 and .counts.clientIdentityNameHashes>=414 and .counts.clientPhoneHashes>0' "$EVIDENCE_DIR/policies-reference-index-sanitized.json" >/dev/null
       - name: Subir índice sanitizado
         if: always()
         uses: actions/upload-artifact@v4
@@ -104,6 +112,6 @@ jobs:
           INDEX: orbit360-platform/runtime-gate-crm-v20260716/policies-reference-index-sanitized.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='Policy reference index v3 failed';
-            try{const p=JSON.parse(fs.readFileSync(process.env.INDEX,'utf8'));if(p.counts.clients===414&&p.counts.insurers===26&&p.counts.advisors===7&&p.firestoreWrites===0){state='success';description=`Reference index v3 PASS: ${p.counts.clientNameHashes} names / ${p.counts.clientPhoneHashes} phones / ${p.counts.insurerAliasHashes} insurer aliases`;}}catch(e){}
+            const fs=require('fs');let state='failure',description='Policy reference index v4 failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.INDEX,'utf8'));if(p.counts.clients===414&&p.counts.insurers===26&&p.counts.advisors===7&&p.firestoreWrites===0){state='success';description=`Reference index v4 PASS: ${p.counts.clientIdentityNameHashes} identity hashes / ${p.counts.insurerAliasHashes} insurer aliases`;}}catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/policies-reference-index',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
