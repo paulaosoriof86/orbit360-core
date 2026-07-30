@@ -1,0 +1,238 @@
+name: Orbit 360 · M6 initial product go-live · single risk block
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['tools/orbit360-m6-go-live-request-v20260730.json']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-m6-product-go-live-v20260730
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block6-go-live-product-v20260730
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: tools/orbit360-m6-go-live-request-v20260730.json
+  ORBIT360_PRODUCT_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
+  ORBIT360_PRODUCT_URL: https://ays-orbit-360-lab.web.app
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  go_live:
+    name: M6 · product go-live · read-only data · automatic fail-closed rollback
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar request inmutable y primer intento
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test -f "$ORBIT360_REQUEST_FILE"
+          node - <<'NODE'
+          const fs=require('fs'),cp=require('child_process');
+          const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
+          const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
+          const bad=[];
+          if(r.schemaVersion!=='orbit360-m6-go-live-request-v1'||r.gateId!==process.env.ORBIT360_GATE_ID||r.contractVersion!=='6.1.0')bad.push('schema');
+          if(r.branch!==process.env.ORBIT360_BRANCH||r.authorizedBaseCommit!==parent)bad.push('binding');
+          if(r.explicitAuthorization!==true||r.allowedExecutions!==1||r.authorizationConsumed!==false||r.singleRiskBlock!==true)bad.push('authorization');
+          if(r.target?.projectId!==process.env.ORBIT360_PRODUCT_PROJECT_ID||r.target?.tenantId!==process.env.ORBIT360_PRODUCT_TENANT_ID||r.target?.liveUrl!==process.env.ORBIT360_PRODUCT_URL)bad.push('target');
+          if(r.firestoreDataWrites!==false||r.hostingDeploy!==true||r.firestoreRulesDeploy!==true||r.storageRulesDeploy!==true||r.runtime!==true||r.browser!==true||r.production!==true||r.rollbackOnFailure!==true||r.functionsDeploy!==false||r.main!==false||r.merge!==false||r.polizas!==false)bad.push('scope');
+          if(bad.length)throw new Error('M6_REQUEST_INVALID:'+bad.join(','));
+          NODE
+
+      - name: Preflight canónico antes de secretos, Firebase, Rules, Hosting o navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m6-go-live-v20260730.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="6.1.0" and .executionPhase=="M6_PRODUCT_GO_LIVE_EXECUTION" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .rollbackReady==true and .m5SuccessfulRun==30513413235 and .m5VisualApproved==true and .staticPreparationRun==30514717995 and .capabilityProfile.writes==false and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==true and .capabilityProfile.production==true and .dataAccess==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Instalar herramientas después del preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@latest
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Resolver identidad existente y secreto de smoke después del preflight
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          ORBIT360_EXISTING_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          test ${#ORBIT360_EXISTING_LOGIN_PASSWORD} -ge 12
+          KEY_FILE="${RUNNER_TEMP}/orbit360-m6-product.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PRODUCT_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_PRODUCT_SMOKE_PASSWORD=$ORBIT360_EXISTING_LOGIN_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Derivar configuración web e identidad de smoke en solo lectura
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-m6-generate-product-runtime-config-v20260730.mjs
+          node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
+          jq -e '.ok==true and .status=="M6_PRODUCT_RUNTIME_CONFIG_DERIVED_READ_ONLY" and .projectIdentityMatches==true and .webConfigDerivedReadOnly==true and .configCommitted==false and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-runtime-config-summary.json" >/dev/null
+          jq -e '.ok==true and .status=="M6_PRODUCT_SMOKE_IDENTITY_RESOLVED" and .eligibleSmokeIdentityCount==1 and .requiredRolesPresent==true and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-smoke-identity-summary.json" >/dev/null
+
+      - name: Snapshot productivo read-only antes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-m6-product-data-snapshot-readonly-v20260730.mjs before
+          jq -e '.ok==true and .status=="M6_PRODUCT_DATA_SNAPSHOT_PASS" and .counts.clientes==414 and .counts.aseguradoras==26 and .counts.asesores==7 and .counts.memberships==1 and .counts.config==1 and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-data-before.json" >/dev/null
+
+      - name: Construir shell productivo en workspace efímero
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-m6-build-product-shell-v20260730.mjs --apply > "$EVIDENCE_DIR/m6-product-shell-build-summary.json"
+          jq -e '.ok==true and .status=="M6_PRODUCT_SHELL_BUILT" and .apply==true and .forbiddenPresent|length==0' "$EVIDENCE_DIR/m6-product-shell-build-summary.json" >/dev/null
+          ! grep -Eq 'backend-lab-loader|store-firestore-lab|data/seed.js|admin@demo.com|orbit.lab@demo.com|demo123' orbit360-platform/index.html
+          grep -q 'auth-product-runtime-p0.js' orbit360-platform/index.html
+          grep -q 'Orbit.productAppP0.init();' orbit360-platform/index.html
+
+      - name: Ejecutar único deploy productivo M6
+        id: deploy
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only firestore:rules,storage,hosting --project "$ORBIT360_PRODUCT_PROJECT_ID" --config firebase.product-go-live.json --non-interactive --json > "$EVIDENCE_DIR/m6-product-deploy-raw.json"
+          curl --fail --silent --show-error --location --max-time 30 "$ORBIT360_PRODUCT_URL/" > "${RUNNER_TEMP}/m6-live-index.html"
+          grep -q 'auth-product-runtime-p0.js' "${RUNNER_TEMP}/m6-live-index.html"
+          ! grep -Eq 'backend-lab-loader|store-firestore-lab|data/seed.js|admin@demo.com|orbit.lab@demo.com|demo123' "${RUNNER_TEMP}/m6-live-index.html"
+
+      - name: Smoke productivo tres vistas
+        id: browser
+        if: steps.deploy.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          node tools/orbit360-m6-product-browser-smoke-v20260730.mjs
+          jq -e '.ok==true and .status=="M6_PRODUCT_BROWSER_SMOKE_PASS" and .runtime.ready==true and .runtime.noFallback==true and .runtime.writeEnabled==false and .runtime.clients==414 and .runtime.insurers==26 and .runtime.advisors==7 and .checks.writeGuard==true and .checks.roles==true and .networkWriteCandidates|length==0' "$EVIDENCE_DIR/m6-product-browser-smoke-summary.json" >/dev/null
+
+      - name: Snapshot productivo read-only después
+        id: snapshot_after
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          node tools/orbit360-m6-product-data-snapshot-readonly-v20260730.mjs after
+          jq -e '.ok==true and .status=="M6_PRODUCT_DATA_SNAPSHOT_PASS" and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-data-after.json" >/dev/null
+
+      - name: Verificar integridad before/after
+        id: integrity
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),p='orbit360-platform/runtime-gate-crm-v20260716/';
+          const read=n=>{try{return JSON.parse(fs.readFileSync(p+n,'utf8'))}catch{return null}};
+          const a=read('m6-product-data-before.json'),b=read('m6-product-data-after.json'),s=read('m6-product-browser-smoke-summary.json');
+          const keys=['clientes','aseguradoras','asesores','memberships','config'];
+          const countsStable=keys.every(k=>a&&b&&a.counts&&b.counts&&a.counts[k]===b.counts[k]);
+          const digestsStable=keys.every(k=>a&&b&&a.digests&&b.digests&&a.digests[k]===b.digests[k]);
+          const ok=Boolean(a&&a.ok&&b&&b.ok&&countsStable&&digestsStable&&s&&s.ok===true&&s.networkWriteCandidates.length===0);
+          const out={ok,status:ok?'M6_PRODUCT_INTEGRITY_PASS':'M6_PRODUCT_INTEGRITY_FAIL',countsStable,digestsStable,firestoreWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false};
+          fs.writeFileSync(p+'m6-product-integrity-summary.json',JSON.stringify(out,null,2)+'\n');if(!ok)process.exit(41);
+          NODE
+
+      - name: Rollback automático fail-closed si cualquier gate posterior falla
+        id: rollback
+        if: always() && (steps.deploy.outcome != 'success' || steps.browser.outcome != 'success' || steps.snapshot_after.outcome != 'success' || steps.integrity.outcome != 'success')
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only firestore:rules,storage,hosting --project "$ORBIT360_PRODUCT_PROJECT_ID" --config firebase.product-rollback-safe.json --non-interactive --json > "$EVIDENCE_DIR/m6-product-rollback-raw.json"
+          curl --fail --silent --show-error --location --max-time 30 "$ORBIT360_PRODUCT_URL/" > "${RUNNER_TEMP}/m6-rollback-index.html"
+          grep -q 'La plataforma no está disponible temporalmente' "${RUNNER_TEMP}/m6-rollback-index.html"
+
+      - name: Cerrar evidencia M6
+        id: close
+        if: always()
+        env:
+          DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
+          BROWSER_OUTCOME: ${{ steps.browser.outcome }}
+          SNAPSHOT_OUTCOME: ${{ steps.snapshot_after.outcome }}
+          INTEGRITY_OUTCOME: ${{ steps.integrity.outcome }}
+          ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),p='orbit360-platform/runtime-gate-crm-v20260716/';const read=n=>{try{return JSON.parse(fs.readFileSync(p+n,'utf8'))}catch{return null}};
+          const pre=read('preflight-sanitizado.json'),cfg=read('m6-product-runtime-config-summary.json'),id=read('m6-product-smoke-identity-summary.json'),before=read('m6-product-data-before.json'),after=read('m6-product-data-after.json'),smoke=read('m6-product-browser-smoke-summary.json'),integrity=read('m6-product-integrity-summary.json');
+          const outcomes={deploy:process.env.DEPLOY_OUTCOME||'',browser:process.env.BROWSER_OUTCOME||'',snapshotAfter:process.env.SNAPSHOT_OUTCOME||'',integrity:process.env.INTEGRITY_OUTCOME||'',rollback:process.env.ROLLBACK_OUTCOME||''};
+          const rollbackExecuted=outcomes.rollback==='success';
+          const ok=Boolean(pre&&pre.status==='GO_GATE_CONTRACT'&&cfg&&cfg.ok&&id&&id.ok&&before&&before.ok&&after&&after.ok&&smoke&&smoke.ok&&integrity&&integrity.ok&&outcomes.deploy==='success'&&outcomes.browser==='success'&&outcomes.snapshotAfter==='success'&&outcomes.integrity==='success'&&!rollbackExecuted);
+          const out={schemaVersion:'orbit360-m6-go-live-summary-v1',generatedAt:new Date().toISOString(),ok,status:ok?'M6_INITIAL_GO_LIVE_PASS':'M6_INITIAL_GO_LIVE_ROLLED_BACK',gateId:'block6-go-live-product-v20260730',contractVersion:'6.1.0',projectIdentityMatches:Boolean(cfg&&cfg.projectIdentityMatches),webConfigDerivedReadOnly:Boolean(cfg&&cfg.webConfigDerivedReadOnly),baselineBefore:before&&before.counts||null,baselineAfter:after&&after.counts||null,countsStable:Boolean(integrity&&integrity.countsStable),digestsStable:Boolean(integrity&&integrity.digestsStable),browserPass:Boolean(smoke&&smoke.ok),roleViewsCompleted:Boolean(smoke&&smoke.checks&&smoke.checks.roles),networkWriteCandidates:Number(smoke&&smoke.networkWriteCandidates&&smoke.networkWriteCandidates.length||0),firestoreDataWrites:0,operationalWrites:0,hostingDeployExecuted:outcomes.deploy==='success',firestoreReadonlyRulesApplied:outcomes.deploy==='success',storageReadonlyRulesApplied:outcomes.deploy==='success',functionsDeploy:false,rollbackExecuted,rollbackSucceeded:rollbackExecuted,productionLive:ok,main:false,merge:false,polizas:false,approvalReadyForQuickReview:ok,outcomes,containsPII:false,containsSecrets:false};
+          fs.writeFileSync(p+'m6-go-live-summary.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(!ok)process.exitCode=41;
+          NODE
+
+      - name: Validar cierre exitoso
+        if: always()
+        shell: bash
+        run: |
+          jq -e '.ok==true and .status=="M6_INITIAL_GO_LIVE_PASS" and .countsStable==true and .digestsStable==true and .browserPass==true and .roleViewsCompleted==true and .networkWriteCandidates==0 and .firestoreDataWrites==0 and .operationalWrites==0 and .hostingDeployExecuted==true and .firestoreReadonlyRulesApplied==true and .storageReadonlyRulesApplied==true and .functionsDeploy==false and .rollbackExecuted==false and .productionLive==true and .main==false and .merge==false and .polizas==false and .approvalReadyForQuickReview==true' "$EVIDENCE_DIR/m6-go-live-summary.json" >/dev/null
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m6-go-live-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-runtime-config-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-smoke-identity-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-shell-build-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-data-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-data-after.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-browser-smoke-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-integrity-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-go-live-summary.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publicar estado observable sanitizado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          SUMMARY: orbit360-platform/runtime-gate-crm-v20260716/m6-go-live-summary.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='M6 failed and safe rollback applied or required';
+            try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY,'utf8'));if(s.ok===true&&s.status==='M6_INITIAL_GO_LIVE_PASS'){state='success';description='M6 initial go-live PASS; read-only data; quick review ready';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m6-product-go-live',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Limpiar identidad temporal
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
