@@ -12,5 +12,5 @@ jobs:
     steps:
       - name: Diagnostic already closed
         run: |
-          echo 'M5 5.0.37 fixture diagnostic closed after isolating unrelated seed premium dependency; rerun forbidden.' >&2
+          echo 'M5 5.0.37 fixture diagnostic closed after root cause was isolated; rerun forbidden.' >&2
           exit 41
