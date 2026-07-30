@@ -4,16 +4,18 @@ on:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - '.github/workflows/orbit360-m6-corrective-go-live-v20260730.yml'
-      - 'tools/orbit360-m6-recovery-6114-request-v20260730.json'
+      - 'tools/orbit360-m6-final-closure-request-v20260730.json'
       - 'tools/orbit360-m6-generate-product-runtime-config-v20260730.mjs'
       - 'orbit360-platform/core/product-app-runtime-p0.js'
       - 'orbit360-platform/core/tenant-access-policy-product-p0.js'
       - 'tools/orbit360-m6-product-browser-smoke-v20260730.mjs'
-      - 'tools/orbit360-m6-insurer-card-viewport-root-cause-v20260730.json'
-      - 'tools/orbit360-validator-lifecycle-contract-m6-insurer-viewport-static-v20260730.json'
-      - 'tools/orbit360-validar-gate-contracts-engine-m6-insurer-viewport-static-v20260730.mjs'
-      - 'tools/orbit360-validator-lifecycle-contract-m6-recovery-6114-v20260730.json'
-      - 'tools/orbit360-validar-gate-contracts-engine-m6-recovery-6114-v20260730.mjs'
+      - 'tools/orbit360-browser-blocking-gate-readiness-v20260730.mjs'
+      - 'tools/orbit360-browser-blocking-gate-readiness-test-v20260730.mjs'
+      - 'tools/orbit360-m6-legal-gate-race-root-cause-v20260730.json'
+      - 'tools/orbit360-validator-lifecycle-contract-m6-legal-gate-static-v20260730.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-m6-legal-gate-static-v20260730.mjs'
+      - 'tools/orbit360-validator-lifecycle-contract-m6-final-closure-v20260730.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-m6-final-closure-v20260730.mjs'
 permissions:
   contents: read
   statuses: write
@@ -23,7 +25,7 @@ concurrency:
 env:
   ORBIT360_GATE_ID: block6-go-live-product-v20260730
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_REQUEST_FILE: tools/orbit360-m6-recovery-6114-request-v20260730.json
+  ORBIT360_REQUEST_FILE: tools/orbit360-m6-final-closure-request-v20260730.json
   ORBIT360_PRODUCT_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
   ORBIT360_PRODUCT_URL: https://ays-orbit-360-lab.web.app
@@ -62,6 +64,7 @@ jobs:
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-hosting-readiness-bounded-v20260730.mjs
           node --check tools/orbit360-m6-product-browser-smoke-v20260730.mjs
+          node --check tools/orbit360-browser-blocking-gate-readiness-v20260730.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq -e '.status=="GO_GATE_CONTRACT" and .failed==0 and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .rulesApplied==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Publicar estado estático
@@ -83,7 +86,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
   recovery:
-    name: M6 · recovery productivo 6.1.14 · Firestore read-only + Hosting · Storage deferred
+    name: M6 · final closure 6.2.0 · Firestore read-only + Hosting · Storage deferred
     needs: static_preflight
     if: needs.static_preflight.outputs.recovery_requested == 'true'
     runs-on: ubuntu-24.04
@@ -99,7 +102,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verificar request recovery 6.1.14 inmutable
+      - name: Verificar request macro final closure inmutable
         shell: bash
         run: |
           set -euo pipefail
@@ -108,21 +111,21 @@ jobs:
           test -f "$ORBIT360_REQUEST_FILE"
           node - <<'NODE'
           const fs=require('fs'),cp=require('child_process');const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();const bad=[];
-          if(r.schemaVersion!=='orbit360-m6-recovery-go-live-request-v6'||r.gateId!==process.env.ORBIT360_GATE_ID||r.contractVersion!=='6.1.14')bad.push('schema');
+          if(r.schemaVersion!=='orbit360-m6-final-closure-request-v1'||r.gateId!==process.env.ORBIT360_GATE_ID||r.contractVersion!=='6.2.0'||r.macroClosure!==true)bad.push('schema');
           if(r.branch!==process.env.ORBIT360_BRANCH||r.recoveryBaseCommit!==parent)bad.push('binding');
-          if(r.explicitRecoveryAuthorization!==true||r.authorizationSource!=='user_authorized_m6_recovery_6114_after_viewport_validator_20260730'||r.allowedExecutions!==1||r.authorizationConsumed!==false||r.validatorRootCauseClosed!==true)bad.push('authorization');
+          if(r.explicitRecoveryAuthorization!==true||r.authorizationSource!=='user_authorized_m6_final_closure_after_reusable_readiness_20260730'||r.allowedExecutions!==1||r.authorizationConsumed!==false||r.validatorRootCauseClosed!==true)bad.push('authorization');
           if(r.target?.projectId!==process.env.ORBIT360_PRODUCT_PROJECT_ID||r.target?.tenantId!==process.env.ORBIT360_PRODUCT_TENANT_ID||r.target?.liveUrl!==process.env.ORBIT360_PRODUCT_URL)bad.push('target');
           if(r.firestoreDataWrites!==false||r.hostingDeploy!==true||r.firestoreRulesDeploy!==true||r.storageRulesDeploy!==false||r.storageDeferredFailClosed!==true||r.createStorageBucket!==false||r.runtime!==true||r.browser!==true||r.production!==true||r.rollbackOnFailure!==true||r.functionsDeploy!==false||r.main!==false||r.merge!==false||r.polizas!==false)bad.push('scope');
-          if(JSON.stringify(r.canonicalMigratedCollections)!==JSON.stringify(['clientes','aseguradoras'])||r.logicalCountryField!=='country'||r.physicalCountryField!=='pais'||r.waitAllActiveCollections!==true||r.semanticInsurerCardClick!==true||r.viewportHitTest!==true||r.smokeValidatorRevision!=='20260730.6'||r.staticValidatorRemediationRun!==30549826785)bad.push('validator_contract');
-          if(r.previousRecoveryRun!==30549026522||r.previousRecoveryArtifact!==8762009928||r.previousRecoveryResult!=='ROLLED_BACK_SAFE')bad.push('history');
-          if(bad.length)throw new Error('M6_RECOVERY_6114_REQUEST_INVALID:'+bad.join(','));
+          if(JSON.stringify(r.canonicalMigratedCollections)!==JSON.stringify(['clientes','aseguradoras'])||r.logicalCountryField!=='country'||r.physicalCountryField!=='pais'||r.waitAllActiveCollections!==true||r.semanticInsurerCardClick!==true||r.viewportHitTest!==true||r.reusableBrowserReadiness!==true||r.blockingGateSyntheticProof!==true||r.smokeValidatorRevision!=='20260730.7'||r.staticValidatorRemediationRun!==30552591248)bad.push('validator_contract');
+          if(r.previousRecoveryRun!==30551563820||r.previousRecoveryArtifact!==8763037814||r.previousRecoveryResult!=='ROLLED_BACK_SAFE')bad.push('history');
+          if(bad.length)throw new Error('M6_FINAL_CLOSURE_REQUEST_INVALID:'+bad.join(','));
           NODE
-      - name: Repetir preflight canónico 6.1.14 antes de secretos
+      - name: Repetir preflight canónico 6.2.0 antes de secretos
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="6.1.14" and .executionPhase=="M6_PRODUCT_GO_LIVE_RECOVERY_EXECUTION" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .canonicalMigratedCollections==["clientes","aseguradoras"] and .logicalCountryField=="country" and .physicalCountryField=="pais" and .waitAllActiveCollections==true and .semanticInsurerCardClick==true and .viewportHitTest==true and .smokeValidatorRevision=="20260730.6" and .storageDeferredFailClosed==true and .capabilityProfile.writes==false and .capabilityProfile.rulesDeploy==true and .capabilityProfile.production==true and .secretAccess==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="6.2.0" and .executionPhase=="M6_PRODUCT_GO_LIVE_RECOVERY_EXECUTION" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .macroClosure==true and .reusableBrowserReadiness==true and .blockingGateSyntheticProof==true and .canonicalMigratedCollections==["clientes","aseguradoras"] and .logicalCountryField=="country" and .physicalCountryField=="pais" and .waitAllActiveCollections==true and .semanticInsurerCardClick==true and .viewportHitTest==true and .smokeValidatorRevision=="20260730.7" and .storageDeferredFailClosed==true and .capabilityProfile.writes==false and .capabilityProfile.rulesDeploy==true and .capabilityProfile.production==true and .secretAccess==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Instalar herramientas después del preflight
         shell: bash
         run: |
@@ -142,7 +145,7 @@ jobs:
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
           test -n "$SERVICE_ACCOUNT"
           test ${#ORBIT360_EXISTING_LOGIN_PASSWORD} -ge 12
-          KEY_FILE="${RUNNER_TEMP}/orbit360-m6-recovery-6114-product.json"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-m6-final-closure-product.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"; chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PRODUCT_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
@@ -186,14 +189,14 @@ jobs:
           set -euo pipefail
           ORBIT360_HOSTING_READINESS_TIMEOUT_MS=90000 ORBIT360_HOSTING_READINESS_INTERVAL_MS=3000 node tools/orbit360-hosting-readiness-bounded-v20260730.mjs product
           jq -e '.ok==true and .status=="M6_HOSTING_READINESS_PASS" and .mode=="product" and .readOnly==true' "$EVIDENCE_DIR/m6-hosting-readiness-product.json" >/dev/null
-      - name: Smoke productivo tres vistas
+      - name: Smoke productivo tres vistas con blocking-gate readiness
         id: browser
         if: steps.hosting_readiness.outcome == 'success'
         continue-on-error: true
         shell: bash
         run: |
           node tools/orbit360-m6-product-browser-smoke-v20260730.mjs
-          jq -e '.ok==true and .contractVersion=="6.1.14" and .validatorRevision=="20260730.6" and .storageDeferredFailClosed==true and .runtime.ready==true and .runtime.noFallback==true and .runtime.writeEnabled==false and .runtime.clients==414 and .runtime.insurers==26 and .runtime.advisorBound==true and .runtime.physicalCountryFieldAlias=="pais" and .runtime.queryPlansUsePhysicalCountry==true and .runtime.allActiveCollectionsReady==true and .checks.queryAlias==true and .checks.allActiveCollections==true and .checks.writeGuard==true and .checks.insurerSemanticClick==true and .checks.roles==true and .roleViews.desktopDirection.insurers.interaction.scrolledIntoView==true and .roleViews.desktopDirection.insurers.interaction.centerInsideViewport==true and .roleViews.desktopDirection.insurers.interaction.centerHit==true and .roleViews.tabletOperativo.insurers.interaction.scrolledIntoView==true and .roleViews.tabletOperativo.insurers.interaction.centerInsideViewport==true and .roleViews.tabletOperativo.insurers.interaction.centerHit==true and .roleViews.mobileAsesor.insurers.interaction.scrolledIntoView==true and .roleViews.mobileAsesor.insurers.interaction.centerInsideViewport==true and .roleViews.mobileAsesor.insurers.interaction.centerHit==true and ((.networkWriteCandidates|length)==0)' "$EVIDENCE_DIR/m6-product-browser-smoke-summary.json" >/dev/null
+          jq -e '.ok==true and .contractVersion=="6.2.0" and .validatorRevision=="20260730.7" and .storageDeferredFailClosed==true and .checks.blockingGates==true and .blockingGateSettlement.ok==true and .blockingGateSettlement.remaining==0 and .runtime.ready==true and .runtime.noFallback==true and .runtime.writeEnabled==false and .runtime.clients==414 and .runtime.insurers==26 and .runtime.advisorBound==true and .runtime.physicalCountryFieldAlias=="pais" and .runtime.queryPlansUsePhysicalCountry==true and .runtime.allActiveCollectionsReady==true and .checks.queryAlias==true and .checks.allActiveCollections==true and .checks.writeGuard==true and .checks.insurerSemanticClick==true and .checks.roles==true and .roleViews.desktopDirection.insurers.interaction.scrolledIntoView==true and .roleViews.desktopDirection.insurers.interaction.centerInsideViewport==true and .roleViews.desktopDirection.insurers.interaction.centerHit==true and .roleViews.tabletOperativo.insurers.interaction.scrolledIntoView==true and .roleViews.tabletOperativo.insurers.interaction.centerInsideViewport==true and .roleViews.tabletOperativo.insurers.interaction.centerHit==true and .roleViews.mobileAsesor.insurers.interaction.scrolledIntoView==true and .roleViews.mobileAsesor.insurers.interaction.centerInsideViewport==true and .roleViews.mobileAsesor.insurers.interaction.centerHit==true and ((.networkWriteCandidates|length)==0)' "$EVIDENCE_DIR/m6-product-browser-smoke-summary.json" >/dev/null
       - name: Snapshot productivo read-only después
         id: snapshot_after
         if: always()
@@ -231,7 +234,7 @@ jobs:
           jq -e '.status=="success"' "$EVIDENCE_DIR/m6-product-rollback-raw.json" >/dev/null
           ORBIT360_HOSTING_READINESS_TIMEOUT_MS=90000 ORBIT360_HOSTING_READINESS_INTERVAL_MS=3000 node tools/orbit360-hosting-readiness-bounded-v20260730.mjs rollback
           jq -e '.ok==true and .status=="M6_HOSTING_READINESS_PASS" and .mode=="rollback" and .readOnly==true' "$EVIDENCE_DIR/m6-hosting-readiness-rollback.json" >/dev/null
-      - name: Cerrar evidencia recovery M6 6.1.14
+      - name: Cerrar evidencia M6 Final Closure 6.2.0
         id: close
         if: always()
         env:
@@ -245,18 +248,18 @@ jobs:
         shell: bash
         run: |
           node - <<'NODE'
-          const fs=require('fs'),p='orbit360-platform/runtime-gate-crm-v20260716/';const read=n=>{try{return JSON.parse(fs.readFileSync(p+n,'utf8'))}catch{return null}};const pre=read('preflight-sanitizado.json'),cfg=read('m6-product-runtime-config-summary.json'),before=read('m6-product-data-before.json'),after=read('m6-product-data-after.json'),ready=read('m6-hosting-readiness-product.json'),smoke=read('m6-product-browser-smoke-summary.json'),integrity=read('m6-product-integrity-summary.json');const outcomes={firebaseDeploy:process.env.FIREBASE_DEPLOY_OUTCOME||'',hostingReadiness:process.env.READINESS_OUTCOME||'',browser:process.env.BROWSER_OUTCOME||'',snapshotAfter:process.env.SNAPSHOT_OUTCOME||'',integrity:process.env.INTEGRITY_OUTCOME||'',rollback:process.env.ROLLBACK_OUTCOME||''};const rollbackExecuted=process.env.ROLLBACK_EXECUTED==='true';const collectionContract=Boolean(cfg&&cfg.collectionCount===2&&JSON.stringify(cfg.collections)===JSON.stringify(['clientes','aseguradoras'])&&cfg.canonicalCollectionContract==='m4_clients_insurers_only');const queryAliasContract=Boolean(smoke&&smoke.runtime&&smoke.runtime.physicalCountryFieldAlias==='pais'&&smoke.runtime.queryPlansUsePhysicalCountry===true);const allActiveCollectionsReady=Boolean(smoke&&smoke.runtime&&smoke.runtime.allActiveCollectionsReady===true);const semanticClick=Boolean(smoke&&smoke.checks&&smoke.checks.insurerSemanticClick===true);const interactions=['desktopDirection','tabletOperativo','mobileAsesor'].map(k=>smoke&&smoke.roleViews&&smoke.roleViews[k]&&smoke.roleViews[k].insurers&&smoke.roleViews[k].insurers.interaction);const viewportHitTest=interactions.length===3&&interactions.every(x=>x&&x.scrolledIntoView===true&&x.geometryStable===true&&x.centerInsideViewport===true&&x.centerHit===true&&x.clickDispatched===true);const ok=Boolean(pre&&pre.status==='GO_GATE_CONTRACT'&&pre.contractVersion==='6.1.14'&&collectionContract&&queryAliasContract&&allActiveCollectionsReady&&semanticClick&&viewportHitTest&&before&&before.ok&&after&&after.ok&&ready&&ready.ok&&smoke&&smoke.ok&&smoke.contractVersion==='6.1.14'&&smoke.validatorRevision==='20260730.6'&&integrity&&integrity.ok&&outcomes.firebaseDeploy==='success'&&outcomes.hostingReadiness==='success'&&outcomes.browser==='success'&&outcomes.snapshotAfter==='success'&&outcomes.integrity==='success'&&!rollbackExecuted);const out={schemaVersion:'orbit360-m6-recovery-summary-v6',generatedAt:new Date().toISOString(),ok,status:ok?'M6_RECOVERY_GO_LIVE_PASS':'M6_RECOVERY_ROLLED_BACK',gateId:'block6-go-live-product-v20260730',contractVersion:'6.1.14',validatorRevision:'20260730.6',canonicalMigratedCollections:['clientes','aseguradoras'],collectionContractPass:collectionContract,logicalCountryField:'country',physicalCountryField:'pais',queryAliasContractPass:queryAliasContract,allActiveCollectionsReady,semanticInsurerCardClickPass:semanticClick,viewportHitTestPass:viewportHitTest,storageDeferredFailClosed:true,storageActive:false,firestoreDataWrites:0,operationalWrites:0,countsStable:Boolean(integrity&&integrity.countsStable),digestsStable:Boolean(integrity&&integrity.digestsStable),hostingReadinessPass:Boolean(ready&&ready.ok),browserPass:Boolean(smoke&&smoke.ok),networkWriteCandidates:Number(smoke&&smoke.networkWriteCandidates&&smoke.networkWriteCandidates.length||0),rollbackExecuted,productionLive:ok,main:false,merge:false,polizas:false,outcomes,containsPII:false,containsSecrets:false};fs.writeFileSync(p+'m6-recovery-summary.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(!ok)process.exitCode=41;
+          const fs=require('fs'),p='orbit360-platform/runtime-gate-crm-v20260716/';const read=n=>{try{return JSON.parse(fs.readFileSync(p+n,'utf8'))}catch{return null}};const pre=read('preflight-sanitizado.json'),cfg=read('m6-product-runtime-config-summary.json'),before=read('m6-product-data-before.json'),after=read('m6-product-data-after.json'),ready=read('m6-hosting-readiness-product.json'),smoke=read('m6-product-browser-smoke-summary.json'),integrity=read('m6-product-integrity-summary.json');const outcomes={firebaseDeploy:process.env.FIREBASE_DEPLOY_OUTCOME||'',hostingReadiness:process.env.READINESS_OUTCOME||'',browser:process.env.BROWSER_OUTCOME||'',snapshotAfter:process.env.SNAPSHOT_OUTCOME||'',integrity:process.env.INTEGRITY_OUTCOME||'',rollback:process.env.ROLLBACK_OUTCOME||''};const rollbackExecuted=process.env.ROLLBACK_EXECUTED==='true';const collectionContract=Boolean(cfg&&cfg.collectionCount===2&&JSON.stringify(cfg.collections)===JSON.stringify(['clientes','aseguradoras'])&&cfg.canonicalCollectionContract==='m4_clients_insurers_only');const queryAliasContract=Boolean(smoke&&smoke.runtime&&smoke.runtime.physicalCountryFieldAlias==='pais'&&smoke.runtime.queryPlansUsePhysicalCountry===true);const allActiveCollectionsReady=Boolean(smoke&&smoke.runtime&&smoke.runtime.allActiveCollectionsReady===true);const semanticClick=Boolean(smoke&&smoke.checks&&smoke.checks.insurerSemanticClick===true);const blockingGateReadiness=Boolean(smoke&&smoke.checks&&smoke.checks.blockingGates===true&&smoke.blockingGateSettlement&&smoke.blockingGateSettlement.ok===true&&smoke.blockingGateSettlement.remaining===0);const interactions=['desktopDirection','tabletOperativo','mobileAsesor'].map(k=>smoke&&smoke.roleViews&&smoke.roleViews[k]&&smoke.roleViews[k].insurers&&smoke.roleViews[k].insurers.interaction);const viewportHitTest=interactions.length===3&&interactions.every(x=>x&&x.scrolledIntoView===true&&x.geometryStable===true&&x.centerInsideViewport===true&&x.centerHit===true&&x.clickDispatched===true);const ok=Boolean(pre&&pre.status==='GO_GATE_CONTRACT'&&pre.contractVersion==='6.2.0'&&collectionContract&&queryAliasContract&&allActiveCollectionsReady&&semanticClick&&blockingGateReadiness&&viewportHitTest&&before&&before.ok&&after&&after.ok&&ready&&ready.ok&&smoke&&smoke.ok&&smoke.contractVersion==='6.2.0'&&smoke.validatorRevision==='20260730.7'&&integrity&&integrity.ok&&outcomes.firebaseDeploy==='success'&&outcomes.hostingReadiness==='success'&&outcomes.browser==='success'&&outcomes.snapshotAfter==='success'&&outcomes.integrity==='success'&&!rollbackExecuted);const out={schemaVersion:'orbit360-m6-final-closure-summary-v1',generatedAt:new Date().toISOString(),ok,status:ok?'M6_FINAL_CLOSURE_PASS':'M6_FINAL_CLOSURE_ROLLED_BACK',gateId:'block6-go-live-product-v20260730',contractVersion:'6.2.0',validatorRevision:'20260730.7',macroClosure:true,reusableBrowserReadinessPass:blockingGateReadiness,blockingGateSyntheticProof:true,futureModulesReuse:true,canonicalMigratedCollections:['clientes','aseguradoras'],collectionContractPass:collectionContract,logicalCountryField:'country',physicalCountryField:'pais',queryAliasContractPass:queryAliasContract,allActiveCollectionsReady,semanticInsurerCardClickPass:semanticClick,viewportHitTestPass:viewportHitTest,storageDeferredFailClosed:true,storageActive:false,firestoreDataWrites:0,operationalWrites:0,countsStable:Boolean(integrity&&integrity.countsStable),digestsStable:Boolean(integrity&&integrity.digestsStable),hostingReadinessPass:Boolean(ready&&ready.ok),browserPass:Boolean(smoke&&smoke.ok),networkWriteCandidates:Number(smoke&&smoke.networkWriteCandidates&&smoke.networkWriteCandidates.length||0),rollbackExecuted,productionLive:ok,main:false,merge:false,polizas:false,outcomes,containsPII:false,containsSecrets:false};fs.writeFileSync(p+'m6-recovery-summary.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));if(!ok)process.exitCode=41;
           NODE
-      - name: Validar cierre recovery
+      - name: Validar cierre final M6
         if: always()
         shell: bash
         run: |
-          jq -e '.ok==true and .status=="M6_RECOVERY_GO_LIVE_PASS" and .contractVersion=="6.1.14" and .validatorRevision=="20260730.6" and .collectionContractPass==true and .canonicalMigratedCollections==["clientes","aseguradoras"] and .logicalCountryField=="country" and .physicalCountryField=="pais" and .queryAliasContractPass==true and .allActiveCollectionsReady==true and .semanticInsurerCardClickPass==true and .viewportHitTestPass==true and .storageDeferredFailClosed==true and .storageActive==false and .countsStable==true and .digestsStable==true and .hostingReadinessPass==true and .browserPass==true and .networkWriteCandidates==0 and .firestoreDataWrites==0 and .operationalWrites==0 and .rollbackExecuted==false and .productionLive==true and .main==false and .merge==false and .polizas==false' "$EVIDENCE_DIR/m6-recovery-summary.json" >/dev/null
-      - name: Subir evidencia sanitizada recovery
+          jq -e '.ok==true and .status=="M6_FINAL_CLOSURE_PASS" and .contractVersion=="6.2.0" and .validatorRevision=="20260730.7" and .macroClosure==true and .reusableBrowserReadinessPass==true and .blockingGateSyntheticProof==true and .futureModulesReuse==true and .collectionContractPass==true and .canonicalMigratedCollections==["clientes","aseguradoras"] and .logicalCountryField=="country" and .physicalCountryField=="pais" and .queryAliasContractPass==true and .allActiveCollectionsReady==true and .semanticInsurerCardClickPass==true and .viewportHitTestPass==true and .storageDeferredFailClosed==true and .storageActive==false and .countsStable==true and .digestsStable==true and .hostingReadinessPass==true and .browserPass==true and .networkWriteCandidates==0 and .firestoreDataWrites==0 and .operationalWrites==0 and .rollbackExecuted==false and .productionLive==true and .main==false and .merge==false and .polizas==false' "$EVIDENCE_DIR/m6-recovery-summary.json" >/dev/null
+      - name: Subir evidencia sanitizada final closure
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-m6-recovery-${{ github.run_id }}
+          name: orbit360-m6-final-closure-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/m6-product-runtime-config-summary.json
@@ -273,14 +276,14 @@ jobs:
             orbit360-platform/runtime-gate-crm-v20260716/m6-recovery-summary.json
           if-no-files-found: warn
           retention-days: 30
-      - name: Publicar estado observable recovery
+      - name: Publicar estado observable final closure
         if: always()
         uses: actions/github-script@v7
         env:
           SUMMARY: orbit360-platform/runtime-gate-crm-v20260716/m6-recovery-summary.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='M6 recovery 6.1.14 stopped or rolled back';try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY,'utf8'));if(s.ok===true&&s.status==='M6_RECOVERY_GO_LIVE_PASS'){state='success';description='M6 recovery 6.1.14 PASS; viewport-safe insurer click validated';}}catch(e){}await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m6-product-go-live',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+            const fs=require('fs');let state='failure',description='M6 final closure stopped or rolled back';try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY,'utf8'));if(s.ok===true&&s.status==='M6_FINAL_CLOSURE_PASS'){state='success';description='M6 FINAL CLOSURE PASS; ready to enter Policies';}}catch(e){}await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m6-product-go-live',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
       - name: Limpiar identidad temporal
         if: always()
         shell: bash
