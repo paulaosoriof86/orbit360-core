@@ -28,7 +28,8 @@ Este documento extiende el ledger acumulado de fixes locales y evita que los apr
 | Smoke declaró 60 s pero Playwright usó 30 s | Al usar APIs con firma `(fn, arg?, options?)`, validar semánticamente la posición de argumentos; `waitForFunction` requiere `undefined` como segundo argumento cuando no hay `arg` | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | `VALIDATOR_STALE` cerrado; validatorRevision `20260730.2`; 6.1.5 PASS estático |
 | Playwright no despachaba click porque la tarjeta con transición visual nunca satisfacía su actionability interna | No convertir una falsa negativa del automatizador en cambio de producto; separar estabilidad geométrica, hit-test y despacho del evento antes de declarar defecto funcional | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | `VALIDATOR_STALE` 6.1.10 cerrado; validator `20260730.5` |
 | Hit-test semántico usó `elementFromPoint()` sin reproducir el scroll automático de Playwright | `visible` no equivale a `dentro del viewport`; antes del hit-test se debe centrar el target, estabilizar geometría post-scroll y probar coordenadas in-bounds | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | `VALIDATOR_STALE` 6.1.12 cerrado; validator `20260730.6`; 6.1.13 PASS estático |
-| `continue-on-error` hacía que la vista de Actions pareciera exitosa aunque el `outcome` real del smoke fuera failure | Los gates deben cerrar con `steps.<id>.outcome` y evidencia propia, no inferir éxito por presentación visual/conclusion | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Incorporado al cierre M6 y confirmado nuevamente en 6.1.12 |
+| Gate legal aparecía 520 ms después de `showApp`, pero el smoke comprobaba su ausencia una sola vez | La readiness de navegador debe usar ventana de llegada + resolución de gates bloqueantes + ventana de quietud antes de entrar a cualquier módulo; la ausencia instantánea no prueba ausencia durante la transición | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | `VALIDATOR_STALE` 6.1.14 cerrado estáticamente; helper reusable + prueba sintética 520 ms PASS; validator `20260730.7` |
+| `continue-on-error` hacía que la vista de Actions pareciera exitosa aunque el `outcome` real del smoke fuera failure | Los gates deben cerrar con `steps.<id>.outcome` y evidencia propia, no inferir éxito por presentación visual/conclusion | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Incorporado al cierre M6 y confirmado nuevamente en 6.1.14 |
 | Un timeout de login sin contexto no permite distinguir lentitud de fallo funcional | Ante timeout, guardar diagnóstico sanitizado del estado de arranque: app presente/iniciada, status del store, noFallback y writeEnabled; nunca credenciales ni PII | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Ampliado desde smoke `20260730.3`; revisiones posteriores agregan plans/actionability |
 | Salida del deploy no estaba en primer artifact | Toda etapa de riesgo debe conservar resultado sanitizado del proveedor para diagnóstico de causa raíz | `BACKEND_PROTEGIDO_NO_CLAUDE` + `ACADEMIA_ACTUALIZAR` | Corregido desde 6.1.2 |
 | Request disparador no debe modificarse para marcar consumo | Trigger inmutable; consumo/estado se registra fuera del path disparador | `REPLICABLE_CLAUDE_ACUMULADO` + `ACADEMIA_ACTUALIZAR` | Regla permanente |
@@ -56,6 +57,8 @@ Este documento extiende el ledger acumulado de fixes locales y evita que los apr
 - validar firmas de APIs de automatización, especialmente argumentos opcionales y timeouts;
 - no usar `continue-on-error` como señal de éxito: leer `outcome` y evidencia del gate;
 - validar actionability por capas: DOM → visible → scroll → estabilidad → viewport → hit-test → evento → resultado funcional;
+- resolver gates bloqueantes diferidos mediante ventana de llegada y ventana de quietud antes de probar cualquier módulo;
+- reutilizar la misma primitiva de browser readiness en Pólizas, Vehículos, Cobros, Siniestros, Comisiones, Documentos y módulos posteriores;
 - no usar `force:true` ni alterar CSS aprobado para ocultar falsos negativos del automatizador.
 
 ## 3. Lo que NO se envía a Claude
@@ -92,6 +95,8 @@ La Academia debe enseñar con el caso M6:
 14. Documentación y evidencia acompañan el avance; no sustituyen la implementación.
 15. Un automatizador que no llega a despachar el evento no ha demostrado un defecto funcional del producto.
 16. Un elemento `visible` puede estar fuera del viewport; un hit-test semántico debe reproducir scroll, estabilidad post-scroll y coordenadas válidas antes de `elementFromPoint()`.
+17. Un gate asíncrono puede aparecer después de un chequeo de ausencia; la readiness correcta espera una ventana de llegada, resuelve bloqueadores y exige quietud antes de probar funcionalidad.
+18. Una corrección de infraestructura de validación debe viajar a todos los módulos posteriores, no duplicarse por dominio.
 
 ## 5. Regla de empalme futura
 
@@ -109,4 +114,6 @@ Antes de aceptar una nueva candidata Claude se debe comparar específicamente co
 - timeouts de automatización configurados en una posición de argumento incorrecta;
 - gates que confundan `continue-on-error` con éxito contractual;
 - click/hit-test que asuma que `visible` implica estar dentro del viewport;
+- chequeos instantáneos de ausencia para overlays/gates que pueden aparecer de forma diferida;
+- harnesses separados por módulo que dupliquen readiness, integridad o rollback ya resueltos transversalmente;
 - `force:true` o cambios de animación usados para hacer pasar una prueba sin demostrar un defecto del producto.
