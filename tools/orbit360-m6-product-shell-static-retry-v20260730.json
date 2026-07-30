@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-m6-product-shell-static-request-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "contractVersion": "6.0.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "baseCommit": "96609019d94994c4d1beb601f0107f051185ea29",
+  "zeroCapabilities": true,
+  "retryOfRun": 30514625372,
+  "retryReason": "VALIDATOR_STALE_COMMENT_TOKEN_FALSE_POSITIVE",
+  "productChanged": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "runtime": false,
+  "browser": false,
+  "deploy": false,
+  "production": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "purpose": "Second and final static attempt after correcting only the stale source validator; product files remain unchanged."
+}
