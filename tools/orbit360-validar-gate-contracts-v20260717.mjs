@@ -32,7 +32,7 @@ const GATE_CONFIG=Object.freeze({
   "block4-final-canonical-migration-write-v20260728":{contractVersion:"4.3.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-write-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-write-v20260728.mjs"},
   "block4-final-canonical-revalidation-readonly-v20260728":{contractVersion:"4.3.2",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-revalidation-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-revalidation-v20260728.mjs"},
   "block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.44",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-corrective-delivery-runtime-544-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-corrective-delivery-runtime-544-v20260730.mjs"},
-  "block6-go-live-product-v20260730":{contractVersion:"6.2.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-m6-final-closure-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-m6-final-closure-v20260730.mjs"}
+  "block6-go-live-product-v20260730":{contractVersion:"6.2.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-m6-access-membership-static-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-m6-access-membership-static-v20260730.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":ZERO,
@@ -57,6 +57,7 @@ const PHASE_PROFILES=Object.freeze({
   "M6_PRODUCT_SMOKE_VALIDATOR_REMEDIATION_STATIC":ZERO,
   "M6_PRODUCT_BOOTSTRAP_DATA_CONTRACT_REMEDIATION_STATIC":ZERO,
   "M6_PRODUCT_QUERY_ALIAS_REMEDIATION_STATIC":ZERO,
+  "M6_PRODUCT_ACCESS_MEMBERSHIP_REMEDIATION_STATIC":ZERO,
   "M5_LAB_HOSTING_DELIVERY":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "M5_LAB_CORRECTIVE_DELIVERY_RUNTIME":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "M6_PRODUCT_GO_LIVE_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":true,"functionsDeploy":false,"rulesDeploy":true,"production":true},
