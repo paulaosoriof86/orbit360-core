@@ -6,8 +6,8 @@
    - Normaliza polizas antes de insert/update.
    - Evita pisar vigencias distintas cuando el importador deduplica por numero.
    - Redirige recibos generados por importacion desde cobros hacia recibosEsperados.
-   - Genera recibosEsperados para renovada vigente.
    - Retira defaults legacy sin procedencia (Contado / comisiones inferidas).
+   - Bloquea Por renovar si el legacy ya destruyo el estado fuente original.
    ============================================================ */
 (function () {
   window.Orbit = window.Orbit || {};
@@ -33,15 +33,10 @@
 
   /*
    * core/importa.js es un owner transversal legacy y no es fuente autoritativa
-   * de condiciones comerciales de una poliza real. En esa ruta puede completar
-   * frecuencia='Contado', comAseguradoraPct=12 y comVendedorPct=50 aunque la fila
-   * no los traiga. El wire no toca ese archivo protegido: elimina el supuesto
-   * antes de normalizar y obliga validacion cuando no hay procedencia verificable.
-   *
-   * Un importador fuente-especifico futuro puede conservar comisiones solo si
-   * declara comisionFuenteValidada=true + comisionFuente. Para el default Contado,
-   * se considera evidencia minima una forma/medio de pago explicita o una marca
-   * frecuenciaFuenteValidada=true producida por el parser con trazabilidad.
+   * de condiciones comerciales ni del estado fuente de una poliza real.
+   * Puede completar frecuencia='Contado', comisiones 12/50 y colapsar tanto
+   * 'Renovada' como 'Por renovar' a 'Por renovar'. El wire no toca ese archivo
+   * protegido: elimina los supuestos y obliga validacion si se perdio procedencia.
    */
   function sanitizeLegacyAssumptions(rec, current) {
     if (!rec) return rec;
@@ -64,6 +59,13 @@
       rec._legacyContadoDefaultRemoved = true;
       appendReason(rec, 'forma_pago');
     }
+
+    const state = text(rec.estado).toLowerCase();
+    const explicitStateEvidence = !!text(rec.estadoFuenteOriginal) || rec.estadoFuenteValidada === true;
+    if (state === 'por renovar' && !explicitStateEvidence) {
+      rec._legacyRenewalStatusCollapsed = true;
+      appendReason(rec, 'estado');
+    }
     return rec;
   }
 
@@ -73,29 +75,6 @@
     const normalized = Orbit.importaPolizasP0.normalizePolicy(rec, { today: Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : undefined });
     Object.assign(rec, normalized);
     return rec;
-  }
-
-  function ensureExpectedReceipts(policy) {
-    if (!Orbit.primas || !Orbit.importaPolizasP0 || !Orbit.importaPolizasP0.shouldGenerateExpectedReceipts(policy)) return;
-    if (policy.__p0ExpectedReceiptsGenerated) return;
-    if (!(policy.estadoOperativoOrbit === 'vigente_renovada')) return;
-    policy.__p0ExpectedReceiptsGenerated = true;
-    try {
-      const frac = Orbit.primas.cuotasDe(policy.frecuencia || policy.formaPago) > 1;
-      const desglose = Orbit.primas.desglose(policy.primaNeta, policy.pais, { fraccionado: frac });
-      const recibos = Orbit.primas.recibos(desglose, {
-        frecuencia: policy.frecuencia || policy.formaPago,
-        vigenciaInicio: policy.vigenciaIni || (Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)),
-        comAseguradoraPct: policy.comAseguradoraPct,
-        comVendedorPct: policy.comVendedorPct
-      });
-      recibos.forEach(function (r, i) {
-        const seed = Orbit.importaPolizasP0.expectedReceiptSeed(policy, r, i);
-        seed.id = 'rec_esp_p0_' + (policy.id || policy._dedupKey || Date.now()) + '_' + i;
-        seed.origen = 'poliza_importada_p0';
-        Orbit.store.insert('recibosEsperados', seed);
-      });
-    } catch (e) {}
   }
 
   function normalizeImportedReceipt(rec) {
@@ -122,9 +101,7 @@
     store.insert = function (coll, rec) {
       if (coll === 'polizas') {
         normalizePolicy(rec, null);
-        const result = originalInsert(coll, rec);
-        ensureExpectedReceipts(rec);
-        return result;
+        return originalInsert(coll, rec);
       }
       if (coll === 'cobros' && rec && rec.importado && String(rec.id || '').indexOf('cob_imp_') === 0) {
         return originalInsert('recibosEsperados', normalizeImportedReceipt(rec));
@@ -158,7 +135,9 @@
     sanitizeLegacyAssumptions: sanitizeLegacyAssumptions,
     legacyDefaultsAuthoritative: false,
     commissionSourceRequired: true,
-    paymentFrequencyProvenanceRequired: true
+    paymentFrequencyProvenanceRequired: true,
+    stateSourceProvenanceRequiredForRenewal: true,
+    directReceiptGeneration: false
   });
 
   if (!wireStore()) {
