@@ -1,0 +1,16 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-539-v1",
+  "issuedAt":"2026-07-30",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.39",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "classification":"LAB_RUNTIME_GATE",
+  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
+  "baseline":{"controlOverlay":"tools/orbit360-m5-release-candidate-control-overlay-538-v20260730.json","descriptor":"tools/orbit360-m5-release-candidate-descriptor-537-v20260729.json","packageInput":"tools/orbit360-m5-runtime-prep-input-539-v20260730.json","packageRunId":30503634111,"packageJobId":90748545383,"packageArtifactId":8744440909,"packageArtifactDigest":"sha256:5df16f20b69677d7a54931333254f3036b51410c1436cd899193424a6da46d30","releaseCandidateHash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a","criticalAssets":46,"remoteAssetsExpected":29,"remoteAssetsMatched":29,"browserBlobSha":"3acbb31a9d89265c743ab5ecce3d36341d614c6e","closerBlobSha":"870c5365cc5e55c324b327418fbc128cc33ad848","legacyProbeBlobSha":"70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12","policyBlobSha":"fa4c29d30a82673a7bf2d3d55efce52eaf4cccf3","baseSeedNormalizerBlobSha":"51172365ea8cda420aa8e3ea379ef0a9b8331db1"},
+  "authorization":{"source":"user_autorizado_runtime_5_0_39_20260730","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestRequired":true,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
