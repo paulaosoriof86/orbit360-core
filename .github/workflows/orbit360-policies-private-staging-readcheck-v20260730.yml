@@ -13,7 +13,7 @@ env:
   ORBIT360_GATE_ID: block7-policies-static-v20260730
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
   DRIVE_FILE_ID: 1NXHACZ11815882AhoyGrQQCb9Amgbi95
-  EXPECTED_FILE_SHA256: 1784e037320f98511da2c6f11b044735d9d35b7b71a0c7398831fd3828905697
+  EXPECTED_FILE_SHA256: b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f
 jobs:
   readcheck:
     name: Policies · private Drive staging read-only check
