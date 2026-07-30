@@ -1,6 +1,6 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-academia-inventory-537-v1",
-  "issuedAt":"2026-07-29",
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-academia-inventory-537-v2",
+  "issuedAt":"2026-07-30",
   "repository":"paulaosoriof86/orbit360-core",
   "branch":"ays/backend-tenant-lab-v99-20260703",
   "pullRequest":5,
@@ -9,9 +9,9 @@
   "validatorLifecycleRevision":"phase-capability-contract-v1",
   "classification":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC",
   "executionProfile":{"phase":"M5_RUNTIME_SMOKE_ROOT_CAUSE_REMEDIATION_STATIC","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
-  "baseline":{"runtimeStop":"tools/orbit360-m5-runtime-stop-overlay-536-v20260729.json","descriptor":"tools/orbit360-m5-release-candidate-descriptor-537-v20260729.json","fixture":"tools/orbit360-m5-academia-static-producer-inventory-537-fixture-v20260729.mjs","readiness":"tools/orbit360-m5-release-candidate-readiness-537-v20260729.mjs","criticalAssets":46,"remoteAssetsExpected":29},
-  "authorization":{"staticExecutionAuthorized":true,"allowedExecutions":1,"hostingLabDeliveryAuthorized":false,"runtimeSmokeAuthorized":false,"visualReviewAuthorized":false,"productionAuthorized":false},
-  "nextRequiredDecision":"RUN_ONE_STATIC_537; only PASS may permit requesting new Hosting authorization",
+  "baseline":{"runtimeStop":"tools/orbit360-m5-runtime-stop-overlay-536-v20260729.json","freeze":"tools/orbit360-m5-academia-inventory-537-freeze-v20260729.json","overlay":"tools/orbit360-m5-release-candidate-control-overlay-537-v20260730.json","descriptor":"tools/orbit360-m5-release-candidate-descriptor-537-v20260729.json","criticalAssets":46,"remoteAssetsExpected":29,"remoteAssetsMatched":28},
+  "authorization":{"staticExecutionAuthorized":false,"allowedExecutions":0,"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "nextRequiredDecision":"REQUEST_NEW_EXPLICIT_ONE_SHOT_HOSTING_LAB_AUTHORIZATION_FOR_RC_097D4E85_46_29",
   "containsPII":false,
   "containsSecrets":false
 }
