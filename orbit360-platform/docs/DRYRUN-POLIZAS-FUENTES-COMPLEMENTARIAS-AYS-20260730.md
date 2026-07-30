@@ -57,8 +57,8 @@ La clasificación previa `DATA_CONTRACT_FAILURE` para los 109 casos queda **cerr
 
 Implementación reusable:
 
-- `orbit360-platform/core/importa-polizas-p0.js`: vigencia activa + fuente `Vencida/Terminada/Reexpedida` → `vigente_operativa`, preservando `estadoFuenteOriginal` y `estadoFuenteContradiceVigencia = true`.
-- `tools/orbit360-test-importa-polizas-vigencia-authority-v20260730.mjs`: prueba sintética con datos ficticios; activo `Vencida` queda Vigente, vencido por fecha queda histórico.
+- `orbit360-platform/core/importa-polizas-p0.js`: **solo** `Vencida` + vigencia activa → `vigente_operativa`, preservando `estadoFuenteOriginal` y `estadoFuenteContradiceVigencia = true`. `Terminada` y `Reexpedida` continúan como estados históricos salvo una regla de negocio futura específica.
+- `tools/orbit360-test-importa-polizas-vigencia-authority-v20260730.mjs`: prueba sintética con datos ficticios; activo `Vencida` queda Vigente, vencido por fecha queda histórico y `Terminada/Reexpedida` no se reactivan automáticamente.
 
 Resultado sintético: `PASS`; `firestoreWrites = 0`; `operationalWrites = 0`.
 
