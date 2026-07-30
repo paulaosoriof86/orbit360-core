@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "block8-vehicles-static-v20260730",
-  "gateContractVersion": "8.0.0",
+  "gateContractVersion": "8.0.1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "executionProfile": {
     "phase": "VEHICLES_STATIC_QUALIFICATION",
@@ -34,6 +34,9 @@
   "vehicleWriteUnit": "vehicle_policy_association",
   "collapseAcrossPolicyRenewals": false,
   "physicalVehicleKeyIsCandidateOnly": true,
+  "identityCellsReadMode": "raw_cell_value",
+  "presentationFormattingAllowedForIdentity": false,
+  "numericPolicyIdentityRegressionRequired": true,
   "productDataWritesAllowed": false,
   "dryRunOnly": true,
   "nextWriteRequestPrepared": false,
