@@ -5,5 +5,5 @@ window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze({
   enabled: false,
   environmentRef: 'unconfigured',
   tenantHint: '',
-  collections: Object.freeze(['clientes','aseguradoras','asesores','gestiones','notificaciones'])
+  collections: Object.freeze(['clientes','aseguradoras','gestiones','notificaciones'])
 });
