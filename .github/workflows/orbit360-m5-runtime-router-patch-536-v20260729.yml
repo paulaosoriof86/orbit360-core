@@ -12,5 +12,5 @@ jobs:
     steps:
       - name: Router already bound
         run: |
-          echo 'Canonical M5 gate already bound to static producer inventory 5.0.37; rerun forbidden.' >&2
+          echo 'Canonical M5 gate already bound to closed static producer inventory 5.0.37; rerun forbidden.' >&2
           exit 41
