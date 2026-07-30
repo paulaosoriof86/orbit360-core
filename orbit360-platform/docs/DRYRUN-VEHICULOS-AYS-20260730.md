@@ -109,8 +109,67 @@ Este bloque reutiliza la infraestructura cerrada en Pólizas:
 
 El intento de transferir desde el sandbox el XLSX canónico generado hacia Drive fue rechazado porque el conector exige una referencia de archivo registrada y no acepta una ruta local. Clasificación: `PIPELINE_MECHANISM_FAILURE`.
 
-No se repitió la misma acción ni se trasladó trabajo manual a Paula. El diseño se corrige reutilizando el canal privado automatizado de Pólizas: las fuentes exactas se leen por Drive con la cuenta técnica LAB dentro del workflow, se validan por hash y la normalización ocurre efímeramente sin publicar PII en GitHub.
+No se repitió la misma acción ni se trasladó trabajo manual a Paula. El diseño se corrigió reutilizando el canal privado automatizado de Pólizas: las fuentes exactas se leen por Drive con la cuenta técnica LAB dentro del workflow, se validan por hash y la normalización ocurre efímeramente sin publicar PII en GitHub.
 
-## 10. Siguiente acción
+Readcheck privado cerrado:
 
-Registrar el gate único `block8-vehicles-static-v20260730`, comprobar lectura privada read-only de las tres fuentes exactas y ejecutar prewrite de Vehículos contra el baseline real. Solo si termina `PREWRITE_READY` se habilitará una autorización macro única de escritura.
+```text
+run: 30587910721
+status: SUCCESS
+fuentes/hash/filas: PASS
+Firestore: 0 lecturas / 0 escrituras
+```
+
+## 10. Causa raíz del primer canonical dry-run
+
+Primer intento de cierre canónico:
+
+```text
+run: 30587982180
+resultado: BLOCKED
+clasificación inicial del validador: DATA_CONTRACT_FAILURE
+escrituras: 0
+```
+
+Se aplicó STOP_RETRY: no se lanzó otra corrida de cierre. Una ejecución diagnóstica separada, sin Firestore y sin intento de cierre, identificó:
+
+```text
+diagnostic run: 30588348056
+filas: 1041 + 19
+identidades fuente: 1036
+duplicados: 18 / 24
+relaciones observadas por SheetJS: 909
+relaciones esperadas: 1032
+sin padre aparente: 123
+```
+
+La diferencia no era una pérdida de pólizas ni un problema de Drive. La fuente contiene 124 filas cuyo número de póliza tiene 13–14 dígitos y está almacenado como celda numérica `General`; corresponden a 123 identidades fuente únicas. El normalizador usaba `sheet_to_json(..., raw:false)`, por lo que SheetJS aplicaba formato de presentación al identificador y rompía el empate con el número canónico guardado como texto.
+
+Clasificación de causa raíz definitiva: `FUNCTIONAL_DEFECT` del normalizador.
+
+Corrección contractual:
+
+- los campos usados como identidad se leen por valor crudo de celda (`raw:true`);
+- el formato visual de Excel nunca forma parte de una clave de identidad;
+- los números de 13–14 dígitos están dentro de `Number.MAX_SAFE_INTEGER` y se convierten a texto sin notación de presentación;
+- queda prueba regresiva específica;
+- los fallos futuros publican métricas agregadas observadas, para evitar otro error opaco `CANONICAL_COUNTS`;
+- no se relaja el matching: continúa prohibido el fallback solo por número de póliza.
+
+Archivos propietarios:
+
+- `tools/orbit360-vehicles-canonicalize-v20260730.mjs`;
+- `tools/orbit360-test-vehicles-numeric-policy-identity-v20260730.mjs`;
+- `tools/orbit360-vehicles-source-freeze-v20260730.json`;
+- gate único `block8-vehicles-static-v20260730`.
+
+## 11. Clasificación Claude / Academia
+
+- `REPLICABLE_CLAUDE_ACUMULADO`: los importadores deben usar valor crudo para campos de identidad y separar representación visual de clave canónica.
+- `ACADEMIA_ACTUALIZAR`: enseñar que un identificador numérico en Excel no es una cantidad y no debe normalizarse con formato de presentación.
+- `BACKEND_PROTEGIDO_NO_CLAUDE`: workflows, gates, credenciales técnicas, Drive privado y escritor real.
+- `SECRETO_DATO_REAL`: payloads y filas reales nunca salen del canal privado.
+
+## 12. Siguiente acción
+
+Ejecutar una única segunda corrida del canonical dry-run con la causa raíz corregida. Si esa misma etapa vuelve a fallar, se aplica STOP_RETRY duro y no se crea otro parche. Solo después de `CANONICAL_DRYRUN_PASS` se ejecutará prewrite read-only contra el baseline real; únicamente `PREWRITE_READY` permitirá solicitar una autorización macro nueva de escritura de Vehículos.
