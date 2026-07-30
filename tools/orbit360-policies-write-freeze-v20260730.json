@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "orbit360-policies-write-freeze-v1",
+  "tenantId": "alianzas-soluciones",
+  "projectId": "ays-orbit-360-lab",
+  "cutoff": "2026-07-30",
+  "package": {
+    "title": "ORBIT360-AYS-POLIZAS-CANONICAL-PRIVATE-20260730",
+    "driveFileId": "1NXHACZ11815882AhoyGrQQCb9Amgbi95",
+    "physicalSha256": "b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f",
+    "logicalSha256": "315a4f7123193acde4ca8cc166e15904502dabf43f3c071c36a7b974e03e3011",
+    "privateDriveOnly": true,
+    "publicSharing": false
+  },
+  "baselineExpected": {
+    "clientes": 414,
+    "aseguradoras": 26,
+    "asesores": 7,
+    "polizas": 0
+  },
+  "writePlan": {
+    "clientesCreatePendingQuality": 16,
+    "aseguradorasRestrictedCreate": 4,
+    "polizasCreate": 1373,
+    "polizasPendingQuality": 64,
+    "excluded": 4,
+    "recibosWrites": 0,
+    "carteraWrites": 0,
+    "cobrosWrites": 0,
+    "finmovsWrites": 0
+  },
+  "postWriteExpected": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "asesores": 7,
+    "polizas": 1373
+  },
+  "invariants": {
+    "clientsPendingQualityPreserved": true,
+    "restrictedInsurersRemainInactive": true,
+    "pendingPoliciesCannotMaterializeReceipts": true,
+    "vigenciaAuthoritativeForVencida": true,
+    "sourceStatusPreserved": true,
+    "countryCurrencyConflictsKeepProvenance": true,
+    "targetIdsDeterministic": true,
+    "targetIdsMustNotExistBeforeWrite": true,
+    "noReceiptWrites": true,
+    "noCarteraWrites": true,
+    "noCobroWrites": true,
+    "noFinmovWrites": true,
+    "rollbackFailClosed": true
+  },
+  "authorization": {
+    "required": true,
+    "phrase": "AUTORIZO ESCRITURA CONTROLADA POLIZAS AYS 20260730",
+    "requestPath": ".github/orbit360-requests/policies-write-20260730.json",
+    "requestExistsAtFreeze": false,
+    "singleMacroAuthorization": true
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "realWriteExecuted": false
+}
