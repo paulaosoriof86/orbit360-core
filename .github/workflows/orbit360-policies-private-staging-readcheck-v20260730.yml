@@ -47,18 +47,20 @@ jobs:
           test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
           node <<'NODE'
           const fs=require('fs'),crypto=require('crypto');
-          const sa=JSON.parse(process.env.SERVICE_ACCOUNT); if(sa.project_id!=='ays-orbit-360-lab') throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
-          const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url'); const now=Math.floor(Date.now()/1000);
-          const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
-          const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
-          const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig});
-          const tokenResp=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body}); if(!tokenResp.ok) throw new Error('ENVIRONMENT_FAILURE:OAUTH_TOKEN_'+tokenResp.status);
-          const token=(await tokenResp.json()).access_token; if(!token) throw new Error('ENVIRONMENT_FAILURE:OAUTH_TOKEN_EMPTY');
-          const url=`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(process.env.DRIVE_FILE_ID)}?alt=media&supportsAllDrives=true`;
-          const resp=await fetch(url,{headers:{authorization:`Bearer ${token}`}}); if(!resp.ok) throw new Error('ENVIRONMENT_FAILURE:DRIVE_READ_'+resp.status);
-          const bytes=Buffer.from(await resp.arrayBuffer()),sha=crypto.createHash('sha256').update(bytes).digest('hex'); if(sha!==process.env.EXPECTED_FILE_SHA256) throw new Error('DATA_CONTRACT_FAILURE:STAGING_HASH_MISMATCH');
-          const out={schemaVersion:'orbit360-private-staging-readcheck-v1',ok:true,driveFileIdHash:crypto.createHash('sha256').update(process.env.DRIVE_FILE_ID).digest('hex'),sha256:sha,bytes:bytes.length,serviceAccountEmailDigest:crypto.createHash('sha256').update(sa.client_email).digest('hex'),privateDriveRead:true,publicSharing:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,productionTouched:false,containsPII:false,containsSecrets:false};
-          fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true});fs.writeFileSync(process.env.EVIDENCE_DIR+'/policies-private-staging-readcheck.json',JSON.stringify(out,null,2)+'\n');
+          (async()=>{
+            const sa=JSON.parse(process.env.SERVICE_ACCOUNT); if(sa.project_id!=='ays-orbit-360-lab') throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
+            const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url'); const now=Math.floor(Date.now()/1000);
+            const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig});
+            const tokenResp=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body}); if(!tokenResp.ok) throw new Error('ENVIRONMENT_FAILURE:OAUTH_TOKEN_'+tokenResp.status);
+            const token=(await tokenResp.json()).access_token; if(!token) throw new Error('ENVIRONMENT_FAILURE:OAUTH_TOKEN_EMPTY');
+            const url=`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(process.env.DRIVE_FILE_ID)}?alt=media&supportsAllDrives=true`;
+            const resp=await fetch(url,{headers:{authorization:`Bearer ${token}`}}); if(!resp.ok) throw new Error('ENVIRONMENT_FAILURE:DRIVE_READ_'+resp.status);
+            const bytes=Buffer.from(await resp.arrayBuffer()),sha=crypto.createHash('sha256').update(bytes).digest('hex'); if(sha!==process.env.EXPECTED_FILE_SHA256) throw new Error('DATA_CONTRACT_FAILURE:STAGING_HASH_MISMATCH');
+            const out={schemaVersion:'orbit360-private-staging-readcheck-v1',ok:true,driveFileIdHash:crypto.createHash('sha256').update(process.env.DRIVE_FILE_ID).digest('hex'),sha256:sha,bytes:bytes.length,serviceAccountEmailDigest:crypto.createHash('sha256').update(sa.client_email).digest('hex'),privateDriveRead:true,publicSharing:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,productionTouched:false,containsPII:false,containsSecrets:false};
+            fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true});fs.writeFileSync(process.env.EVIDENCE_DIR+'/policies-private-staging-readcheck.json',JSON.stringify(out,null,2)+'\n');
+          })().catch(err=>{console.error(String(err&&err.message||err));process.exit(41);});
           NODE
       - name: Subir evidencia sanitizada
         if: always()
