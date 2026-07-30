@@ -1,43 +1,43 @@
 {
   "schemaVersion": "orbit360-main-thread-classification-v4-checkout-provenance",
-  "generatedAt": "2026-07-19T01:15:43.341Z",
+  "generatedAt": "2026-07-30T03:57:47.943Z",
   "containsPII": false,
   "containsSecrets": false,
   "gateId": "block1-client360-insurers-lab-v20260717",
   "contractVersion": "1.0.25",
-  "sourceCommit": "11695bae995e20c8f68db13b9e54db88263d6292",
-  "reportSourceCommit": "11695bae995e20c8f68db13b9e54db88263d6292",
-  "runtimeTarget": "CHECKOUT_LOCAL",
-  "runId": "29668276251",
+  "sourceCommit": "72041fa17affa8c226747d97189114c54271d2cc",
+  "reportSourceCommit": "",
+  "runtimeTarget": "",
+  "runId": "30512552773",
   "runAttempt": "1",
   "trigger": "push",
-  "evidenceProduced": true,
+  "evidenceProduced": false,
   "classification": "PIPELINE_MECHANISM_FAILURE",
-  "finding": "MAIN_THREAD_RESPONSIVE_ON_CURRENT_CHECKOUT",
+  "finding": "DIAGNOSTIC_EVIDENCE_NOT_PRODUCED",
   "variants": [
     {
       "name": "bare",
-      "responseReady": true,
+      "responseReady": false,
       "probeError": "",
-      "topFunction": "(idle)",
+      "topFunction": "",
       "topPath": "",
       "pausedFunction": "",
       "pausedPath": ""
     },
     {
       "name": "cdp-debugger",
-      "responseReady": true,
+      "responseReady": false,
       "probeError": "",
-      "topFunction": "(idle)",
+      "topFunction": "",
       "topPath": "",
       "pausedFunction": "",
       "pausedPath": ""
     },
     {
       "name": "gate-observer",
-      "responseReady": true,
+      "responseReady": false,
       "probeError": "",
-      "topFunction": "(idle)",
+      "topFunction": "",
       "topPath": "",
       "pausedFunction": "",
       "pausedPath": ""
@@ -45,5 +45,5 @@
   ],
   "officialGateExecuted": false,
   "deployOrSyncExecuted": false,
-  "nextAction": "Run the binding preflight and the official M1 gate exactly once."
+  "nextAction": "Stop. Correct only the diagnostic execution/runtime provenance mechanism; do not rerun the official gate."
 }
