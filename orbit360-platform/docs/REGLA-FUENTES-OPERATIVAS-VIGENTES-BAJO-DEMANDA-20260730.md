@@ -38,7 +38,7 @@ Queda prohibido:
 - completar silenciosamente pólizas nuevas faltantes usando documentos anteriores;
 - asumir que el último archivo conocido sigue siendo el corte actual.
 
-Estado del bloque:
+Estado original del bloque antes de recibir el nuevo corte:
 
 `POLIZAS_ESTRUCTURA_ESTÁTICA_OK / FUENTE_REAL_VIGENTE_PENDIENTE_DE_PAULA`
 
@@ -56,6 +56,28 @@ Mientras no se necesite el dataset real, sí se permite continuar sin autorizaci
 
 En el momento exacto en que el siguiente paso requiera filas reales para dry-run, diff o escritura, se debe pedir a Paula **la fuente de pólizas actualizada al corte vigente** y detener cualquier uso del archivo antiguo como fuente de migración.
 
+### Actualización 30-07-2026 — fuente vigente recibida
+
+Paula entregó fuentes complementarias vigentes/históricas de Pólizas, Renovaciones, Emitido, pólizas+recibos desde julio 2026 y Vehículos. Se ejecutó dry-run local controlado sin escrituras y se documentó sanitizadamente en:
+
+`docs/DRYRUN-POLIZAS-FUENTES-COMPLEMENTARIAS-AYS-20260730.md`
+
+Estado vigente:
+
+`POLIZAS_FUENTE_VIGENTE_RECIBIDA / DRYRUN_CONSOLIDADO_LISTO / ESCRITURA_REAL_NO_AUTORIZADA`
+
+Decisiones tenant A&S adicionales dadas por Paula para este corte:
+
+1. Si una póliza pertenece a un cliente inexistente, se puede proponer su creación idempotente con `calidad_datos = pendiente_completar`, sin inventar datos faltantes.
+2. Para pólizas sin divisa: GT/GTQ por defecto; un monto de millones/muy grande es indicio de CO/COP. La inferencia debe conservar provenance y calidad; no se convierte en regla universal de otros tenants.
+3. Si existe divisa explícita, prevalece. USD explícito se conserva y no se fuerza automáticamente a GTQ/COP.
+4. Póliza/recibo/cobro/conciliación siguen separados; este bloque no aplica cobros ni materializa cartera.
+
+Implementación reusable tenant-only y prueba sintética:
+
+- `tools/orbit360-ays-policy-source-rules-v20260730.mjs`
+- `tools/orbit360-test-ays-policy-source-rules-v20260730.mjs`
+
 ## 3. Patrón obligatorio para módulos posteriores
 
 Para cada módulo:
@@ -63,6 +85,8 @@ Para cada módulo:
 `preparación estática/reusable → confirmar necesidad de datos → pedir corte vigente a Paula → validar fuente → dry-run/diff → reglas de dominio → única persistencia autorizada → revalidación → smoke transversal`
 
 No pedir archivos antes de que sean necesarios. No ejecutar una importación real con archivos viejos solo para adelantar.
+
+Al solicitar una fuente posterior se debe indicar **el periodo exacto** requerido, evitando solicitudes ambiguas de “todo el histórico”. Si ya existe una fuente histórica vigente al corte, la solicitud posterior será solo el delta desde ese corte.
 
 ## 4. Reuso transversal
 
@@ -86,11 +110,11 @@ Cada fuente nueva solo agrega contrato, normalización y reglas propias del domi
 
 Toda fuente vigente debe conservar trazabilidad de archivo/hoja/fila/bloque/país/moneda/periodo. No se mezclan fuentes ni se infieren datos operativos desde financiero histórico o banco.
 
-Reglas permanentes:
+Reglas permanentes generales:
 
 - GT → GTQ;
 - CO → COP;
-- falta país/moneda confiable → `REQUIERE_VALIDACION`;
+- falta país/moneda confiable → `REQUIERE_VALIDACION`, salvo regla tenant A&S explícita y trazada para el corte vigente;
 - solo `Vigente` / `Por renovar` genera recibos/cartera;
 - otros estados permanecen histórico;
 - prima separada en neta, gastos, IVA/impuestos y total;
@@ -100,6 +124,6 @@ Reglas permanentes:
 ## 6. Impacto Claude / Academia
 
 - Metodología reusable: `REPLICABLE_CLAUDE_ACUMULADO`.
-- Academia: `ACADEMIA_ACTUALIZAR` con el principio “fuente disponible ≠ fuente vigente autorizada”.
-- Datos reales A&S: `TENANT_AYS_ONLY` / `SECRETO_DATO_REAL` según aplique.
+- Academia: `ACADEMIA_ACTUALIZAR` con el principio “fuente disponible ≠ fuente vigente autorizada”, periodos explícitos y trazabilidad de inferencias.
+- Datos reales A&S y heurística tenant: `TENANT_AYS_ONLY` / `SECRETO_DATO_REAL` según aplique.
 - Backend/Rules/secrets: `BACKEND_PROTEGIDO_NO_CLAUDE`.
