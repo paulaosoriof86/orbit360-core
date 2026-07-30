@@ -38,6 +38,19 @@
     "logicalSha256": "4e9545dc580782470ea2e1b2b8a421a16f8cd152ed03264f7b7a30ea14fadc0d",
     "targetIdDigest": "c5a5eb51b69eedef33588c6e3bb8bb3746ceac8bffc4a7a9181ebcbe4995682d"
   },
+  "parserContract": {
+    "identityCellsReadMode": "raw_cell_value",
+    "presentationFormattingAllowedForIdentity": false,
+    "numericPolicyGeneralRows13To14Digits": 124,
+    "numericPolicyGeneralUniqueSourceIdentities13To14Digits": 123,
+    "maxNumericPolicyDigits": 14,
+    "numberMaxSafeIntegerCompatible": true,
+    "rootCauseClassification": "FUNCTIONAL_DEFECT",
+    "failedClosureRun": 30587982180,
+    "diagnosticRun": 30588348056,
+    "diagnosticDifferenceCountBeforeFix": 6,
+    "unmatchedCausedByPresentationFormattingBeforeFix": 123
+  },
   "identityContract": {
     "writeUnit": "vehicle_policy_association",
     "dedupWithinSamePolicyVersion": true,
