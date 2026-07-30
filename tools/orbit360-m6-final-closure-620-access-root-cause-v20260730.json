@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "orbit360-m6-root-cause-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "sourceContractVersion": "6.2.0",
+  "sourceRun": 30557653576,
+  "sourceArtifact": 8765527693,
+  "sourceArtifactDigest": "sha256:30dcccf1bb9f0aeda746314e2617199fbc1fc673e6a755e8a4dd9d603a2a4425",
+  "result": "ROLLED_BACK_SAFE",
+  "classification": ["FUNCTIONAL_DEFECT", "DATA_CONTRACT_FAILURE"],
+  "rootCause": "PRODUCT_ACCESS_ENGINE_MEMBERSHIP_PROJECTION_NOT_CONSUMED",
+  "failureStage": "tabletOperativo",
+  "failure": "Aseguradoras route not rendered for Operativo after successful Direction view",
+  "evidence": {
+    "blockingGateReadinessPass": true,
+    "directionClientCount": 414,
+    "directionInsurerCount": 26,
+    "directionSemanticClickPass": true,
+    "directionViewportHitTestPass": true,
+    "runtimeReadOnly": true,
+    "queryAliasPass": true,
+    "allActiveCollectionsReady": true,
+    "countsStable": true,
+    "digestsStable": true,
+    "firestoreDataWrites": 0,
+    "operationalWrites": 0,
+    "rollbackExecuted": true,
+    "productionLive": false
+  },
+  "canonicalContract": {
+    "membershipRoleDefinitionsIncludeInsurersForOperativo": true,
+    "membershipRoleDefinitionsIncludeInsurersForAsesor": true,
+    "productStoreCollections": ["clientes", "aseguradoras"],
+    "advisorSourceOnly": true,
+    "advisorMigrationRequiredForFix": false
+  },
+  "cause": "Product session/access visibility used legacy Orbit.ROLES and advisor-store fallbacks instead of the authenticated membership multirol effective-module contract. The production manifest intentionally excludes asesores, so the legacy dependency removes insurer visibility after switching from Direccion to Operativo/Asesor.",
+  "fixScope": {
+    "productAccessBridgeOnly": true,
+    "useAuthenticatedMembershipProjection": true,
+    "useMembershipMultirolEffectiveModules": true,
+    "preserveLegacyNonProductBehavior": true,
+    "noAdvisorMigration": true,
+    "noDataWrite": true,
+    "noRulesChange": true,
+    "noAuthChange": true,
+    "noStorage": true,
+    "noProductionRetry": true
+  },
+  "reusable": {
+    "futureModulesReuse": true,
+    "classification": ["REPLICABLE_CLAUDE_ACUMULADO", "ACADEMIA_ACTUALIZAR"],
+    "lesson": "Product access must consume membership roles/modules/scopes directly and must not depend on a domain collection being present merely to resolve authorization."
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
