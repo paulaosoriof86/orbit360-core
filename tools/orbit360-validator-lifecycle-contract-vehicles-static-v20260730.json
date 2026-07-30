@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block8-vehicles-static-v20260730",
+  "gateContractVersion": "8.0.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "VEHICLES_STATIC_QUALIFICATION",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "policiesWritePassRequired": true,
+  "policiesWriteRun": 30586726130,
+  "policiesWriteArtifact": 8776780379,
+  "reuseM6Infrastructure": true,
+  "reusePoliciesPrivateChannel": true,
+  "rebuildTransverseInfrastructureAllowed": false,
+  "sourceDomain": "vehiculos",
+  "sourceFilesAlreadyReceived": true,
+  "sourceReprofilingAllowedWithoutNewSource": false,
+  "canonicalParentDomain": "polizas",
+  "parentRelationFailClosed": true,
+  "unsafePolicyNumberOnlyFallbackAllowed": false,
+  "sourcePolicyStatusOperational": false,
+  "vehicleWriteUnit": "vehicle_policy_association",
+  "collapseAcrossPolicyRenewals": false,
+  "physicalVehicleKeyIsCandidateOnly": true,
+  "productDataWritesAllowed": false,
+  "dryRunOnly": true,
+  "nextWriteRequestPrepared": false,
+  "downstreamFinancialWritesAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
