@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "block7-policies-static-v20260730",
-  "gateContractVersion": "7.0.0",
-  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "gateContractVersion": "7.0.1",
+  "validatorLifecycleRevision": "phase-capability-contract-v2-vigencia-authority",
   "executionProfile": {
     "phase": "POLICIES_STATIC_QUALIFICATION",
     "capabilities": {
@@ -30,6 +30,10 @@
   "policyNormalizerOwner": "orbit360-platform/core/importa-polizas-p0.js",
   "policyImportWire": "orbit360-platform/core/importa-polizas-p0-wire.js",
   "policyOperationalOwner": "orbit360-platform/core/policy-receipts-engine.js",
+  "controlledWriterOwner": "orbit360-platform/core/importa-write-p0.js",
+  "vigenciaAuthoritativeForContractStatus": true,
+  "sourcePaymentLikeStatusPreservedAsProvenance": true,
+  "pendingClientQualityMustBePreserved": true,
   "productDataWritesAllowed": false,
   "dryRunOnly": true,
   "nextWriteRequestPrepared": false,
