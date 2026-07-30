@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-541-v1",
+  "issuedAt":"2026-07-30",
+  "authoritativeForCurrentM5ControlState":true,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.41",
+  "candidateContractVersion":"5.0.40",
+  "status":"M5_HOSTING_541_CLOSED_29_OF_29_READY_TO_REQUEST_RUNTIME_AUTHORIZATION",
+  "releaseCandidate":{"hash":"9bd2c847a2884be900283f86802dbbd0390ae5bc6ccc17b3a5cf4d389c78a4ee","criticalAssets":46,"publicAssets":29,"descriptor":"tools/orbit360-m5-release-candidate-descriptor-540-v20260730.json","academiaStaticWritePolicyVersion":"20260730.1"},
+  "publicParity":{"assetsExpected":29,"assetsMatched":29,"mismatchCount":0,"mismatchPaths":[],"remoteParity":true},
+  "package":{"runId":30506927144,"jobId":90758613452,"artifactId":8745675739,"artifactDigest":"sha256:3e4a7c2f00e38c222a7ceba53c9f28e483b7137155b98c133bbf7f0a880d7123","status":"PASS","workflowFrozen":true},
+  "hostingDelivery":{"requestCommit":"0560dbdaaa030fea12fa5263ede8538edd98bef6","authorizedParentCommit":"9c6fcc3b226a9c38fdd9dcb4092512d5dd69fe06","runId":30507044751,"jobId":90758958915,"artifactId":8745725142,"artifactDigest":"sha256:a8dafdffbe8015bf5c0ad6e23791ea3f2b58bb963a541240d3f118aab58e66de","beforeAssetsMatched":25,"beforeMismatchCount":4,"afterAssetsMatched":29,"afterMismatchCount":0,"remoteParity":true,"hostingDeployExecutions":1,"workflowFrozen":true},
+  "authorization":{"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"authorizationConsumed":true,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeRequestCreated":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "safety":{"secrets":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"polizas":false},
+  "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_RUNTIME_LAB_AUTHORIZATION_FOR_RC_9BD2C847_29_OF_29",
+  "containsPII":false,
+  "containsSecrets":false
+}
