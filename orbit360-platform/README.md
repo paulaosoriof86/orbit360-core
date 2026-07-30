@@ -31,9 +31,8 @@ M1–M4: CERRADOS
 M5 5.0.44: CERRADO + revisión visual aprobada
 M6 6.1.14: ROLLED_BACK_SAFE · VALIDATOR_STALE / LEGAL_GATE_DEFERRED_RENDER_RACE
 M6 6.1.15: PASS estático · blocking-gate readiness reusable
-STOP_RETRY: ACTIVO
-nuevo recovery: NO PREPARADO
-request 6.1.16: AUSENTE
+M6 FINAL CLOSURE 6.2.0: PREPARADO / INERTE · paquete completo PASS estático
+request final closure: AUSENTE
 
 Producción funcional: NO LIVE
 Firestore: deny-all
@@ -41,6 +40,24 @@ Hosting: rollback neutro
 Storage: diferido fail-closed
 Datos: intactos
 Pólizas: todavía no iniciadas
+```
+
+### Evidencia del macro-paquete final
+
+```txt
+Static package run: 30555149234
+Artifact: 8764440108
+Digest: sha256:40005b2a221ba5f4c385add2ea07470e02497b9d9ef2bb56fa5fdd4baf79e89d
+FINAL_LIFECYCLE: PASS
+FINAL_ENGINE: PASS
+FINAL_WORKFLOW: PASS
+SMOKE_USES_HELPER: PASS
+SYNTHETIC_DELAY_TEST: PASS (520 ms · accepted 1 · remaining 0)
+ACCELERATION_GOVERNANCE: PASS
+TRANSVERSAL_ARCHITECTURE: PASS
+NO_NEW_RECOVERY_REQUEST: PASS
+Recovery productivo: SKIPPED
+Secret/Firestore/browser/deploy/production: false/false/false/false/false
 ```
 
 ## Baseline canónico preservado
@@ -100,31 +117,28 @@ Se reutiliza en Pólizas, Vehículos, Cobros, Siniestros y módulos posteriores:
 
 Los módulos posteriores solo deben añadir su contrato de fuente/dominio/reglas de negocio específicas.
 
-## Última causa raíz M6 cerrada estáticamente
+## M6 Final Closure 6.2.0
 
-Recovery 6.1.14 llegó con runtime 414/26, alias `country → pais`, snapshots completos, write guard e integridad PASS. El fallo browser ocurrió porque el acuerdo legal se crea 520 ms después de `showApp`; el validator podía comprobar demasiado pronto que no existía y continuar antes de que el modal apareciera.
+Se abandonó la secuencia de micro-recoveries como unidad de avance. El siguiente riesgo productivo está agrupado en un único macro-cierre `6.2.0` que exige simultáneamente:
 
-Clasificación:
+- validator browser `20260730.7`;
+- blocking-gate readiness reusable;
+- prueba sintética del gate legal diferido a 520 ms;
+- 414 clientes / 26 aseguradoras;
+- alias `country → pais`;
+- snapshots completos;
+- write guard;
+- Dirección desktop / Operativo tablet / Asesor móvil;
+- semantic insurer click + viewport hit-test;
+- Firestore Rules read-only;
+- Hosting + readiness acotado;
+- integridad before/after;
+- cero network writes;
+- rollback automático;
+- Storage diferido fail-closed;
+- reuso transversal obligatorio.
 
-`VALIDATOR_STALE / LEGAL_GATE_DEFERRED_RENDER_RACE`.
-
-Corrección reusable:
-
-- `tools/orbit360-browser-blocking-gate-readiness-v20260730.mjs`;
-- `tools/orbit360-browser-blocking-gate-readiness-test-v20260730.mjs`;
-- validator browser `20260730.7`.
-
-Prueba sintética 6.1.15:
-
-```txt
-delayedGateMs: 520
-accepted: 1
-remaining: 0
-status: PASS
-run: 30552591248
-artifact: 8763394413
-recovery productivo: SKIPPED
-```
+El macro-paquete está preparado, pero sigue inerte: `tools/orbit360-m6-final-closure-request-v20260730.json` NO existe.
 
 ## Rebranding futuro GRAVICENTRA
 
@@ -155,4 +169,4 @@ Los módulos consumen `Orbit.store`; el backend se adapta al store y no al revé
 
 ## Siguiente acción
 
-M6 permanece congelado por `STOP_RETRY`; no existe request 6.1.16 y no corresponde pedir otra autorización productiva automáticamente. La próxima reapertura de riesgo solo puede ocurrir después de que el paquete macro correspondiente esté totalmente preparado y validado fuera de producción.
+No queda trabajo estático pendiente antes del macro-cierre M6 6.2.0. La próxima transición de riesgo es una sola ejecución productiva del `M6 Final Closure 6.2.0`; únicamente después de PASS se cierra M6 y se entra inmediatamente a Pólizas reutilizando la infraestructura transversal, sin otro acondicionamiento general.
