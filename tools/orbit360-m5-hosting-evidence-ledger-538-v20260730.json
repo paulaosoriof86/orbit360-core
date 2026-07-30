@@ -5,36 +5,9 @@
   "packageInput":"tools/orbit360-m5-hosting-package-input-538-v20260730.json",
   "appendOnly":true,
   "entries":[
-    {
-      "kind":"hosting_authorization_received",
-      "sourceVersion":"5.0.38",
-      "candidateContractVersion":"5.0.37",
-      "authorizationSource":"user_autorizado_hosting_5_0_37_20260730",
-      "candidateHash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a",
-      "criticalAssets":46,
-      "remoteAssetsExpected":29,
-      "remoteAssetsMatchedBefore":28,
-      "mismatchPathsBefore":["data/academia-v1197-bridge.js"],
-      "allowedExecutions":1,
-      "requestCreated":false,
-      "hostingExecuted":false
-    },
-    {
-      "kind":"hosting_package_pass",
-      "sourceVersion":"5.0.38",
-      "status":"PASS",
-      "candidateHash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a",
-      "criticalAssets":46,
-      "remoteAssetsExpected":29,
-      "remoteAssetsMatched":28,
-      "mismatchCount":1,
-      "mismatchPaths":["data/academia-v1197-bridge.js"],
-      "runId":30502809297,
-      "jobId":90745979716,
-      "artifactId":8744132640,
-      "artifactDigest":"sha256:0f5b1eae260e94f56515474fb93b5a092e4896d90b33adaf82c82e2190c76dd2",
-      "hostingDeployExecuted":false
-    }
+    {"kind":"hosting_authorization_received","sourceVersion":"5.0.38","candidateContractVersion":"5.0.37","authorizationSource":"user_autorizado_hosting_5_0_37_20260730","candidateHash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a","criticalAssets":46,"remoteAssetsExpected":29,"remoteAssetsMatchedBefore":28,"mismatchPathsBefore":["data/academia-v1197-bridge.js"],"allowedExecutions":1,"requestCreated":false,"hostingExecuted":false},
+    {"kind":"hosting_package_pass","sourceVersion":"5.0.38","status":"PASS","candidateHash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a","criticalAssets":46,"remoteAssetsExpected":29,"remoteAssetsMatched":28,"mismatchCount":1,"mismatchPaths":["data/academia-v1197-bridge.js"],"runId":30502809297,"jobId":90745979716,"artifactId":8744132640,"artifactDigest":"sha256:0f5b1eae260e94f56515474fb93b5a092e4896d90b33adaf82c82e2190c76dd2","hostingDeployExecuted":false},
+    {"kind":"hosting_delivery_success","sourceVersion":"5.0.38","status":"M5_HOSTING_538_DELIVERED_AND_29_OF_29_VERIFIED","candidateHash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a","remoteAssetsBefore":28,"remoteAssetsAfter":29,"mismatchCountAfter":0,"remoteParityAfter":true,"hostingDeployExecutions":1,"runId":30503145325,"jobId":90747033784,"artifactId":8744261771,"artifactDigest":"sha256:203f91caa9bba901db5c248a66d640698d993fae8f28aa30c31ae969954069ea","firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"runtime":false,"browser":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}
   ],
   "containsPII":false,
   "containsSecrets":false
