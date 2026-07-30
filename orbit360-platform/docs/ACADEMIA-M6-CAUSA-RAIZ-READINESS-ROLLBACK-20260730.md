@@ -87,6 +87,31 @@ Aprendizaje: el manifiesto runtime no es una lista de módulos que “eventualme
 
 La corrección no consiste en crear la colección faltante o ampliar permisos para hacer pasar el smoke. Se reduce el manifiesto al contrato real. En M6: `clientes` + `aseguradoras`.
 
+### Caso G — DATA_CONTRACT_FAILURE por alias lógico/físico
+
+En 6.1.8 Auth, bootstrap, deploy y readiness ya funcionaron. La aplicación alcanzó `runtime_contract`, pero el store expuso 0 clientes y 0 aseguradoras aunque el snapshot administrativo before/after seguía demostrando 414/26.
+
+El problema estaba en la diferencia entre el **nombre lógico** usado por la política y el **campo físico** persistido por la migración:
+
+```text
+política lógica: country
+esquema canónico físico: pais
+```
+
+El esquema de importación exige `pais` para clientes y aseguradoras. M4 preservó ese campo al promover los registros canónicos. La política productiva, en cambio, enviaba directamente `country` como constraint Firestore.
+
+Firestore puede resolver correctamente una consulta sobre un campo que ningún documento posee y retornar cero documentos. Por eso no hubo error de transporte: hubo una respuesta técnicamente válida pero semánticamente equivocada.
+
+Aprendizajes:
+
+1. una política puede trabajar con nombres lógicos, pero el adaptador de persistencia debe traducirlos a campos físicos;
+2. los aliases físicos se validan contra el esquema de migración, no contra intuiciones de frontend;
+3. un snapshot vacío no es éxito funcional cuando existe un baseline canónico esperado;
+4. el smoke debe contrastar el resultado con 414/26 y conservar el estado runtime antes de lanzar assertions;
+5. readiness de aplicación requiere que **todas** las colecciones obligatorias hayan completado snapshot, no solo la primera.
+
+La corrección M6 usa un alias productivo explícito `country → pais` y una barrera de readiness para `clientes + aseguradoras`. No cambia datos, Rules ni permisos.
+
 ## STOP_RETRY
 
 Si la misma etapa falla dos veces:
@@ -121,6 +146,7 @@ En el caso M6:
 | `ENVIRONMENT_FAILURE` | bucket Storage inexistente | corregir alcance/entorno; no inventar recurso |
 | `PIPELINE_MECHANISM_FAILURE` | GET inmediato tras release devuelve 404 transitorio | corregir readiness/propagación |
 | `DATA_CONTRACT_FAILURE` | runtime pide una colección no migrada o sin política | reducir manifiesto al contrato canónico; no crear datos/permisos por conveniencia |
+| `DATA_CONTRACT_FAILURE` | query usa `country`, pero el documento canónico usa `pais` | traducir alias lógico→físico y validar contra esquema/baseline |
 | `DATA_CONTRACT_FAILURE` | conteos/digests o membership no coinciden | detener transición y corregir contrato/datos |
 | `SECURITY_FAILURE` | permisos insuficientes o acceso fuera de scope | fail-closed y corregir autorización/IAM |
 
@@ -136,6 +162,9 @@ Ante un fallo de deploy/smoke, el alumno debe identificar primero si:
 - el timeout configurado fue realmente aplicado por la API;
 - `continue-on-error` está ocultando un `outcome=failure`;
 - el manifiesto runtime contiene colecciones fuera de migración/política;
+- el planner usa el campo físico correcto de la persistencia;
+- todas las colecciones obligatorias terminaron su primer snapshot;
+- una respuesta vacía contradice el baseline canónico esperado;
 - hubo un cambio de datos no autorizado.
 
 La respuesta correcta nunca es “volver a ejecutar” sin clasificar primero.
