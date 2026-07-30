@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "gateContractVersion": "6.2.1",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "M6_PRODUCT_ACCESS_MEMBERSHIP_REMEDIATION_STATIC",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "productFrozen": true,
+  "stopRetry": true,
+  "sourceRun": 30557653576,
+  "sourceArtifact": 8765527693,
+  "sourceResult": "ROLLED_BACK_SAFE",
+  "classification": ["FUNCTIONAL_DEFECT", "DATA_CONTRACT_FAILURE"],
+  "rootCause": "PRODUCT_ACCESS_ENGINE_MEMBERSHIP_PROJECTION_NOT_CONSUMED",
+  "canonicalMigratedCollections": ["clientes", "aseguradoras"],
+  "advisorSourceOnly": true,
+  "advisorMigrationRequired": false,
+  "membershipEffectiveModulesRequired": true,
+  "legacyNonProductBehaviorPreserved": true,
+  "futureModulesReuseRequired": true,
+  "storageDeferredFailClosed": true,
+  "productDataWritesAllowed": false,
+  "functionsDeployAllowed": false,
+  "mergeMainAllowed": false,
+  "polizasAllowed": false,
+  "nextRecoveryPrepared": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
