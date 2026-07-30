@@ -2,7 +2,16 @@ name: Orbit 360 · Vehicles canonical dry-run
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
-    paths: ['.github/workflows/orbit360-vehicles-canonical-dryrun-v20260730.yml']
+    paths:
+      - '.github/workflows/orbit360-vehicles-canonical-dryrun-v20260730.yml'
+      - 'tools/orbit360-vehicles-canonicalize-v20260730.mjs'
+      - 'tools/orbit360-test-vehicles-numeric-policy-identity-v20260730.mjs'
+      - 'tools/orbit360-vehicles-source-freeze-v20260730.json'
+      - 'tools/orbit360-validator-lifecycle-contract-vehicles-static-v20260730.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-vehicles-static-v20260730.mjs'
+      - 'tools/orbit360-validar-gate-contracts-v20260717.mjs'
+      - 'orbit360-platform/docs/DRYRUN-VEHICULOS-AYS-20260730.md'
+      - 'orbit360-platform/docs/ACADEMIA-IMPACT-VEHICULOS-IMPORTADOR-IDENTIDAD-20260730.md'
 permissions:
   contents: read
   statuses: write
@@ -37,7 +46,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .failed==0 and .vehiclePolicyRelationsCreate==1032 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="8.0.1" and .failed==0 and .vehiclePolicyRelationsCreate==1032 and .identityCellsReadMode=="raw_cell_value" and .longNumericPolicyUniqueIdentities==123 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Preparar parser XLSX aislado
         shell: bash
         run: |
@@ -69,7 +78,7 @@ jobs:
           ORBIT360_VEHICLES_PACKAGE=/tmp/vehicles-private.json \
           ORBIT360_VEHICLES_EVIDENCE="$EVIDENCE_DIR/vehicles-canonical-dryrun.json" \
           node tools/orbit360-vehicles-canonicalize-v20260730.mjs
-          jq -e '.status=="CANONICAL_DRYRUN_PASS" and .ok==true and .metrics.rawRows==1060 and .metrics.canonicalSourceIdentities==1036 and .metrics.vehiclePolicyRelationsCreate==1032 and .metrics.qualityPending==60 and .metrics.excluded==4 and .metrics.unsafeNumberOnlyFallback==0 and .metrics.targetIdDigest==env.EXPECTED_TARGET_DIGEST and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/vehicles-canonical-dryrun.json" >/dev/null
+          jq -e '.status=="CANONICAL_DRYRUN_PASS" and .ok==true and .metrics.rawRows==1060 and .metrics.canonicalSourceIdentities==1036 and .metrics.vehiclePolicyRelationsCreate==1032 and .metrics.qualityPending==60 and .metrics.excluded==4 and .metrics.mappingNumeroVigencia==1030 and .metrics.mappingNumeroVigenciaNombre==2 and .metrics.unsafeNumberOnlyFallback==0 and .metrics.longNumericPolicyRows13To14Digits==124 and .metrics.longNumericPolicyUniqueIdentities13To14Digits==123 and .metrics.identityCellsReadMode=="raw_cell_value" and .metrics.targetIdDigest==env.EXPECTED_TARGET_DIGEST and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/vehicles-canonical-dryrun.json" >/dev/null
           test -s /tmp/vehicles-private.json
           rm -f /tmp/vehicles-private.json /tmp/autos.xlsx /tmp/autos-delta.xlsx /tmp/policies.xlsx
       - name: Subir evidencia sanitizada únicamente
@@ -87,4 +96,4 @@ jobs:
           EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/vehicles-canonical-dryrun.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='Vehicles canonical dry-run blocked';try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.status==='CANONICAL_DRYRUN_PASS'&&p.metrics.vehiclePolicyRelationsCreate===1032&&p.operationalWrites===0){state='success';description='Vehicles canonical dry-run PASS: 1032 relations, 4 excluded';}else if(p.classification){description=`Vehicles dry-run blocked: ${p.classification}`;}}catch(e){}await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/vehicles-canonical-dryrun',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+            const fs=require('fs');let state='failure',description='Vehicles canonical dry-run blocked';try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.status==='CANONICAL_DRYRUN_PASS'&&p.metrics.vehiclePolicyRelationsCreate===1032&&p.metrics.longNumericPolicyUniqueIdentities13To14Digits===123&&p.operationalWrites===0){state='success';description='Vehicles canonical dry-run PASS: 1032 relations, raw identity fixed';}else if(p.classification){description=`Vehicles dry-run blocked: ${p.classification}`;}}catch(e){}await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/vehicles-canonical-dryrun',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
