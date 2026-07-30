@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "orbit360-m6-root-cause-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "sourceContractVersion": "6.1.10",
+  "sourceRun": 30546548132,
+  "sourceRecoveryJob": 90884094122,
+  "sourceArtifact": 8761009923,
+  "sourceArtifactDigest": "sha256:557b3c1412f3c16943c4eec5a98b598edfc813d56e64c3c5b2a1314c3c8b7f4a",
+  "classification": "VALIDATOR_STALE",
+  "rootCause": "PLAYWRIGHT_CARD_ACTIONABILITY_STABILITY_FALSE_NEGATIVE",
+  "failureStage": "desktopDirection",
+  "failedInstrument": "tools/orbit360-m6-product-browser-smoke-v20260730.mjs",
+  "failedAction": "locator('.asg-grid [data-asg]').first().click()",
+  "evidence": {
+    "runtimeReadyReadOnly": true,
+    "clients": 414,
+    "insurers": 26,
+    "queryAliasContractPass": true,
+    "allActiveCollectionsReady": true,
+    "writeGuardPass": true,
+    "networkWriteCandidates": 0,
+    "firestoreDataWrites": 0,
+    "operationalWrites": 0,
+    "countsStable": true,
+    "digestsStable": true,
+    "hostingReadinessPass": true,
+    "playwrightFailureBeforeClickDispatch": true,
+    "playwrightMessageClass": "element_not_stable",
+    "moduleCardClickHandlerPresent": true,
+    "moduleFichaRendererPresent": true,
+    "approvedCardHoverTransformPresent": true,
+    "directoryHasAdditiveAsyncOwners": true
+  },
+  "rollbackSafe": true,
+  "productionLive": false,
+  "remoteSafety": {
+    "firestore": "deny_all",
+    "hosting": "neutral_rollback_shell",
+    "storage": "deferred_fail_closed"
+  },
+  "fixScope": {
+    "productModuleChanges": false,
+    "dataChanges": false,
+    "rulesChanges": false,
+    "authChanges": false,
+    "validatorOnly": true,
+    "strategy": "wait_for_geometric_stability_and_center_hit_test_then_dispatch_same_dom_click_handler"
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
