@@ -13,6 +13,10 @@ const POLICY='orbit360-platform/core/tenant-access-policy-product-p0.js';
 const APP='orbit360-platform/core/product-app-runtime-p0.js';
 const GENERATOR='tools/orbit360-m6-generate-product-runtime-config-v20260730.mjs';
 const RULES='firestore.product-readonly.rules';
+const SMOKE='tools/orbit360-m6-product-browser-smoke-v20260730.mjs';
+const WORKFLOW='.github/workflows/orbit360-m6-corrective-go-live-v20260730.yml';
+const NEXT_LIFECYCLE='tools/orbit360-validator-lifecycle-contract-m6-recovery-6110-v20260730.json';
+const NEXT_ENGINE='tools/orbit360-validar-gate-contracts-engine-m6-recovery-6110-v20260730.mjs';
 const NEXT_REQUEST='tools/orbit360-m6-recovery-6110-request-v20260730.json';
 const checks=[];
 const add=(id,ok,detail='')=>checks.push({id,ok:Boolean(ok),detail:String(detail||'').slice(0,240)});
@@ -21,21 +25,26 @@ function write(payload){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writ
 try{
   const rc=JSON.parse(read(ROOT_CAUSE));
   const schema=JSON.parse(read(SCHEMA));
-  const policy=read(POLICY),app=read(APP),generator=read(GENERATOR),rules=read(RULES);
+  const lifecycle=JSON.parse(read(NEXT_LIFECYCLE));
+  const policy=read(POLICY),app=read(APP),generator=read(GENERATOR),rules=read(RULES),smoke=read(SMOKE),workflow=read(WORKFLOW),nextEngine=read(NEXT_ENGINE);
   add('GATE',process.argv[2]===GATE&&rc.gateId===GATE);
   add('BRANCH',process.env.ORBIT360_BRANCH==='ays/backend-tenant-lab-v99-20260703');
   add('SOURCE_RECOVERY',rc.sourceRun===30543484354&&rc.sourceArtifact===8759724162&&rc.classification==='DATA_CONTRACT_FAILURE'&&rc.rootCause==='PRODUCT_QUERY_FIELD_ALIAS_MISMATCH');
   add('SAFE_ROLLBACK',rc.rollbackSafe===true&&rc.productionLive===false&&rc.countsStable===true&&rc.digestsStable===true&&rc.firestoreDataWrites===0&&rc.operationalWrites===0&&rc.networkWriteCandidates===0);
   add('OBSERVED_ZERO_BASELINE',rc.observedCounts?.clientes===0&&rc.observedCounts?.aseguradoras===0&&rc.canonicalCounts?.clientes===414&&rc.canonicalCounts?.aseguradoras===26);
   add('CANONICAL_SCHEMA_COUNTRY_FIELD',Array.isArray(schema.collections?.clientes?.required)&&schema.collections.clientes.required.includes('pais')&&Array.isArray(schema.collections?.aseguradoras?.required)&&schema.collections.aseguradoras.required.includes('pais'));
-  for(const rel of [POLICY,APP,GENERATOR])execFileSync(process.execPath,['--check',rel],{cwd:ROOT,stdio:'pipe'});
+  for(const rel of [POLICY,APP,GENERATOR,SMOKE,NEXT_ENGINE])execFileSync(process.execPath,['--check',rel],{cwd:ROOT,stdio:'pipe'});
   add('SYNTAX',true);
   add('PRODUCT_QUERY_ALIAS',policy.includes("QUERY_FIELD_ALIASES = Object.freeze({ country: 'pais' })")&&policy.includes('translateQueryProposal')&&policy.includes('productPhysicalFieldAliasesApplied = true'));
   add('PRODUCT_APP_ALL_COLLECTION_BARRIER',app.includes('waitActiveCollections')&&app.includes("expected.every(function(name){return done.indexOf(name)>=0;})")&&app.includes("VERSION:'p0-m6-20260730.4'"));
   add('CANONICAL_COLLECTIONS_PRESERVED',generator.includes("Object.freeze(['clientes','aseguradoras'])")&&!generator.includes("'gestiones'")&&!generator.includes("'notificaciones'"));
   add('READ_ONLY_RULES_PRESERVED',rules.includes('allow create, update, delete: if false;')&&!rules.includes('allow write: if true'));
+  add('NEXT_LIFECYCLE',lifecycle.gateId===GATE&&lifecycle.gateContractVersion==='6.1.10'&&lifecycle.executionProfile?.phase==='M6_PRODUCT_GO_LIVE_RECOVERY_EXECUTION'&&lifecycle.executionProfile?.capabilities?.writes===false&&lifecycle.executionProfile?.capabilities?.rulesDeploy===true&&lifecycle.executionProfile?.capabilities?.production===true&&lifecycle.logicalCountryField==='country'&&lifecycle.physicalCountryField==='pais'&&lifecycle.waitAllActiveCollectionsRequired===true&&lifecycle.smokeValidatorRevision==='20260730.4');
+  add('NEXT_ENGINE',nextEngine.includes("const VERSION='6.1.10'")&&nextEngine.includes("user_authorized_m6_recovery_6110_after_query_alias_20260730")&&nextEngine.includes("physicalCountryField==='pais'")&&nextEngine.includes('waitAllActiveCollections===true'));
+  add('NEXT_SMOKE',smoke.includes("contractVersion:'6.1.10'")&&smoke.includes("validatorRevision:'20260730.4'")&&smoke.includes("physicalCountryFieldAlias==='pais'")&&smoke.includes('queryPlansUsePhysicalCountry')&&smoke.includes('allActiveCollectionsReady'));
+  add('NEXT_WORKFLOW',workflow.includes(NEXT_REQUEST)&&workflow.includes('recovery productivo 6.1.10')&&workflow.includes('.contractVersion=="6.1.10"')&&workflow.includes('.validatorRevision=="20260730.4"')&&workflow.includes('.runtime.physicalCountryFieldAlias=="pais"')&&workflow.includes('.runtime.allActiveCollectionsReady==true')&&workflow.includes('firestore:rules,hosting')&&!workflow.includes('firestore:rules,storage,hosting'));
   add('NEXT_REQUEST_ABSENT',!fs.existsSync(path.join(ROOT,NEXT_REQUEST)));
   const failed=checks.filter(c=>!c.ok);
-  const out={schemaVersion:'orbit360-gate-contract-preflight-m6-query-alias-static-v1',gateId:GATE,contractVersion:VERSION,executionPhase:'M6_PRODUCT_QUERY_ALIAS_REMEDIATION_STATIC',status:failed.length?'DATA_CONTRACT_FAILURE':'GO_GATE_CONTRACT',classification:failed.length?'DATA_CONTRACT_FAILURE':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(c=>c.id),checks,productFrozen:true,sourceRun:30543484354,sourceArtifact:8759724162,rootCause:'PRODUCT_QUERY_FIELD_ALIAS_MISMATCH',canonicalMigratedCollections:['clientes','aseguradoras'],logicalCountryField:'country',physicalCountryField:'pais',waitAllActiveCollections:true,storageDeferredFailClosed:true,dataAccess:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+  const out={schemaVersion:'orbit360-gate-contract-preflight-m6-query-alias-static-v2',gateId:GATE,contractVersion:VERSION,executionPhase:'M6_PRODUCT_QUERY_ALIAS_REMEDIATION_STATIC',status:failed.length?'DATA_CONTRACT_FAILURE':'GO_GATE_CONTRACT',classification:failed.length?'DATA_CONTRACT_FAILURE':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(c=>c.id),checks,productFrozen:true,sourceRun:30543484354,sourceArtifact:8759724162,rootCause:'PRODUCT_QUERY_FIELD_ALIAS_MISMATCH',canonicalMigratedCollections:['clientes','aseguradoras'],logicalCountryField:'country',physicalCountryField:'pais',waitAllActiveCollections:true,storageDeferredFailClosed:true,nextRecoveryContractVersion:'6.1.10',nextSmokeValidatorRevision:'20260730.4',nextRecoveryPrepared:failed.length===0,nextRequestAbsent:!fs.existsSync(path.join(ROOT,NEXT_REQUEST)),dataAccess:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
   write(out);console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
-}catch(error){write({schemaVersion:'orbit360-gate-contract-preflight-m6-query-alias-static-v1',gateId:GATE,contractVersion:VERSION,status:'DATA_CONTRACT_FAILURE',classification:'DATA_CONTRACT_FAILURE',failed:1,failedCheckIds:['M6_QUERY_ALIAS_STATIC_EXCEPTION'],error:String(error&&error.message||error).slice(0,500),productFrozen:true,dataAccess:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});process.exit(41);}
+}catch(error){write({schemaVersion:'orbit360-gate-contract-preflight-m6-query-alias-static-v2',gateId:GATE,contractVersion:VERSION,status:'DATA_CONTRACT_FAILURE',classification:'DATA_CONTRACT_FAILURE',failed:1,failedCheckIds:['M6_QUERY_ALIAS_STATIC_EXCEPTION'],error:String(error&&error.message||error).slice(0,500),productFrozen:true,dataAccess:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});process.exit(41);}
