@@ -1,6 +1,6 @@
 /* ============================================================
    Orbit 360 · P0 contrato de escritura controlada
-   Fecha: 2026-07-15
+   Fecha: 2026-07-30
 
    Capa pura/aditiva para escribir importaciones solo despues de:
    - dry-run aprobado;
@@ -31,9 +31,7 @@
   const ACTIVE_WRITES = Object.create(null);
   let storeGetBridgeInstalled = false;
 
-  function nowIso() {
-    return new Date().toISOString();
-  }
+  function nowIso() { return new Date().toISOString(); }
 
   function norm(value) {
     return String(value == null ? '' : value)
@@ -72,6 +70,25 @@
       data.comparativoHabilitado === false &&
       data.tarifasHabilitadas === false
     );
+  }
+
+  function isControlledPendingClient(op) {
+    const data = op && (op.data || op.record || {});
+    const quality = norm(data && (data.calidad_datos || data.calidadDatos || data.estadoCalidad || ''));
+    const validation = norm(data && data.validationStatus || '');
+    return !!(
+      op &&
+      op.collection === 'clientes' &&
+      data &&
+      quality === 'pendiente_completar' &&
+      (!validation || validation === 'pendiente_completar' || validation === 'requiere_validacion')
+    );
+  }
+
+  function controlledPendingKind(op) {
+    if (isRestrictedPendingInsurer(op)) return 'restricted_insurer';
+    if (isControlledPendingClient(op)) return 'pending_client_quality';
+    return '';
   }
 
   function labStatus() {
@@ -139,15 +156,15 @@
     const coll = op && op.collection;
     const action = op && (op.action || 'insert');
     const data = op && (op.data || op.record || {});
-    const restrictedPendingInsurer = isRestrictedPendingInsurer(op);
+    const pendingKind = controlledPendingKind(op);
     if (!coll) errors.push('collection_faltante');
     if (coll && !isAllowedCollection(coll)) errors.push('collection_no_permitida:' + coll);
     if (!['insert', 'update'].includes(action)) errors.push('accion_no_permitida:' + action);
     if (action === 'update' && !op.id) errors.push('id_requerido_update');
     if (!data || typeof data !== 'object') errors.push('data_invalida');
-    if (data && data.requiereValidacion && !restrictedPendingInsurer) errors.push('registro_requiere_validacion');
-    if (data && data.validationStatus && data.validationStatus !== 'validado' && !restrictedPendingInsurer) errors.push('validationStatus_no_validado');
-    if (data && data.estado === 'requiere_validacion' && !restrictedPendingInsurer) errors.push('estado_requiere_validacion');
+    if (data && data.requiereValidacion && !pendingKind) errors.push('registro_requiere_validacion');
+    if (data && data.validationStatus && data.validationStatus !== 'validado' && !pendingKind) errors.push('validationStatus_no_validado');
+    if (data && data.estado === 'requiere_validacion' && !pendingKind) errors.push('estado_requiere_validacion');
     if (data && data.moneda === 'REQUIERE_VALIDACION') errors.push('moneda_requiere_validacion');
     if (data && data.pais === 'REQUIERE_VALIDACION') errors.push('pais_requiere_validacion');
     return errors;
@@ -178,7 +195,12 @@
   }
 
   function auditSeed(batch, op, before, after, confirmation) {
-    const restrictedPendingInsurer = isRestrictedPendingInsurer({ collection: op.collection, data: after || op.data || op.record || {} });
+    const pendingKind = controlledPendingKind({ collection: op.collection, data: after || op.data || op.record || {} });
+    const status = pendingKind === 'restricted_insurer'
+      ? 'written_controlled_restricted'
+      : pendingKind === 'pending_client_quality'
+        ? 'written_controlled_pending_quality'
+        : 'written_controlled';
     return {
       id: 'aud_imp_' + batch.batchId + '_' + Math.random().toString(36).slice(2, 10),
       tenantId: tenantId() || batch.tenantId || '',
@@ -194,7 +216,7 @@
       reason: confirmation.reason,
       confirmedBy: confirmation.userId,
       confirmedAt: nowIso(),
-      status: restrictedPendingInsurer ? 'written_controlled_restricted' : 'written_controlled',
+      status,
       rollbackAvailable: true
     };
   }
@@ -223,7 +245,7 @@
     batch.operations.forEach(function (op, index) {
       try {
         const action = op.action || 'insert';
-        const restrictedPendingInsurer = isRestrictedPendingInsurer(op);
+        const pendingKind = controlledPendingKind(op);
         const baseData = Object.assign({}, op.data || op.record || {}, {
           tenantId: (op.data && op.data.tenantId) || tenantId() || batch.tenantId || '',
           importBatchId: batch.batchId,
@@ -232,20 +254,29 @@
           sourceHash: batch.sourceHash || '',
           createdByImport: true
         });
-        const data = restrictedPendingInsurer
-          ? Object.assign(baseData, {
-              requiereValidacion: true,
-              validationStatus: 'requiere_validacion',
-              vinculada: false,
-              cotizadorHabilitado: false,
-              comparativoHabilitado: false,
-              tarifasHabilitadas: false,
-              estadoOperativo: 'pendiente_validacion'
-            })
-          : Object.assign(baseData, {
-              requiereValidacion: false,
-              validationStatus: 'validado'
-            });
+        let data;
+        if (pendingKind === 'restricted_insurer') {
+          data = Object.assign(baseData, {
+            requiereValidacion: true,
+            validationStatus: 'requiere_validacion',
+            vinculada: false,
+            cotizadorHabilitado: false,
+            comparativoHabilitado: false,
+            tarifasHabilitadas: false,
+            estadoOperativo: 'pendiente_validacion'
+          });
+        } else if (pendingKind === 'pending_client_quality') {
+          data = Object.assign(baseData, {
+            requiereValidacion: false,
+            validationStatus: 'pendiente_completar',
+            calidad_datos: 'pendiente_completar'
+          });
+        } else {
+          data = Object.assign(baseData, {
+            requiereValidacion: false,
+            validationStatus: 'validado'
+          });
+        }
 
         let before = null;
         let after = null;
@@ -324,6 +355,8 @@
     HARD_BLOCKED_COLLECTIONS,
     isAllowedCollection,
     isRestrictedPendingInsurer,
+    isControlledPendingClient,
+    controlledPendingKind,
     validateRecord,
     validateBatch,
     validateConfirmation,
