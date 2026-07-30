@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "orbit360-m6-query-field-alias-root-cause-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "sourceContractVersion": "6.1.8",
+  "sourceRun": 30543484354,
+  "sourceArtifact": 8759724162,
+  "sourceArtifactDigest": "sha256:b9a452a975020b8a48dc8587716f1426b0e2e698e70156feb2add283497bd5a4",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "rootCause": "PRODUCT_QUERY_FIELD_ALIAS_MISMATCH",
+  "failureStage": "runtime_contract",
+  "runtimeStarted": true,
+  "observedCounts": {
+    "clientes": 0,
+    "aseguradoras": 0
+  },
+  "canonicalCounts": {
+    "clientes": 414,
+    "aseguradoras": 26
+  },
+  "canonicalSchemaEvidence": {
+    "schemaFile": "tools/orbit360-schema-importacion-ays-v104.json",
+    "clientesCountryField": "pais",
+    "aseguradorasCountryField": "pais",
+    "tenantField": "tenantId"
+  },
+  "queryMismatch": {
+    "logicalField": "country",
+    "physicalCanonicalField": "pais",
+    "tenantConstraintValid": true,
+    "snapshotTransportValid": true,
+    "result": "empty_snapshots"
+  },
+  "secondaryReadinessFinding": "PRODUCT_APP_MUST_WAIT_ALL_ACTIVE_COLLECTION_SNAPSHOTS",
+  "remediation": {
+    "productQueryAlias": "country_to_pais",
+    "waitAllActiveCollections": true,
+    "dataWritesRequired": false,
+    "rulesChangeRequired": false,
+    "newMigrationRequired": false
+  },
+  "rollbackSafe": true,
+  "productionLive": false,
+  "countsStable": true,
+  "digestsStable": true,
+  "firestoreDataWrites": 0,
+  "operationalWrites": 0,
+  "networkWriteCandidates": 0,
+  "storageDeferredFailClosed": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
