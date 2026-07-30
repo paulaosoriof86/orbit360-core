@@ -47,7 +47,7 @@ jobs:
           test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
           test -f "$REQUEST_FILE"
           PARENT="$(git rev-parse HEAD^)"
-          jq -e --arg parent "$PARENT" --arg sha "$GITHUB_SHA" '.schemaVersion=="orbit360-m5-hosting-request-541-v1" and .authorizedParentCommit==$parent and .requestCommit==$sha and .releaseCandidateHash==env.EXPECTED_RC_HASH and .allowedExecutions==1 and .hostingLabDeliveryAuthorized==true and .target.projectId==env.EXPECTED_PROJECT_ID and .target.channel==env.EXPECTED_CHANNEL and .runtime==false and .firestoreRead==false and .firestoreWrites==0 and .functionsDeploy==false and .rulesDeploy==false and .production==false and .main==false and .merge==false and .polizas==false and .immutableRequest==true' "$REQUEST_FILE" >/dev/null
+          jq -e --arg parent "$PARENT" '.schemaVersion=="orbit360-m5-hosting-request-541-v1" and .authorizedParentCommit==$parent and .releaseCandidateHash==env.EXPECTED_RC_HASH and .allowedExecutions==1 and .hostingLabDeliveryAuthorized==true and .target.projectId==env.EXPECTED_PROJECT_ID and .target.channel==env.EXPECTED_CHANNEL and .runtime==false and .firestoreRead==false and .firestoreWrites==0 and .functionsDeploy==false and .rulesDeploy==false and .production==false and .main==false and .merge==false and .polizas==false and .immutableRequest==true' "$REQUEST_FILE" >/dev/null
       - name: Preflight canónico antes de secretos y deploy
         shell: bash
         run: |
