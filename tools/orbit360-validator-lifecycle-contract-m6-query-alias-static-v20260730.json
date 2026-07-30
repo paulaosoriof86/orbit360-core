@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "gateContractVersion": "6.1.9",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "M6_PRODUCT_QUERY_ALIAS_REMEDIATION_STATIC",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "sourceRecoveryRun": 30543484354,
+  "sourceRecoveryArtifact": 8759724162,
+  "sourceRecoveryResult": "ROLLED_BACK_SAFE",
+  "sourceRecoveryClassification": "DATA_CONTRACT_FAILURE",
+  "rootCause": "PRODUCT_QUERY_FIELD_ALIAS_MISMATCH",
+  "canonicalMigratedCollections": ["clientes", "aseguradoras"],
+  "canonicalCountryField": "pais",
+  "logicalCountryField": "country",
+  "productDataWritesAllowed": false,
+  "rulesDeployAllowed": false,
+  "hostingDeployAllowed": false,
+  "runtimeAllowed": false,
+  "browserAllowed": false,
+  "storageDeferredFailClosed": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
