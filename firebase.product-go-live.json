@@ -12,7 +12,8 @@
       "**/.*",
       "**/node_modules/**",
       "runtime-gate-crm-v20260716/**",
-      "docs/**"
+      "docs/**",
+      "rollback-safe/**"
     ],
     "cleanUrls": false,
     "trailingSlash": false,
