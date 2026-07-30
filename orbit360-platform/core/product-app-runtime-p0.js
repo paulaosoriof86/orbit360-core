@@ -21,7 +21,7 @@
     facade.__productStaticOverlayP0=true;
     return facade;
   }
-  function collections(){var list=cfg().collections;return Array.isArray(list)&&list.length?list.slice():['clientes','aseguradoras','gestiones','notificaciones'];}
+  function collections(){var list=cfg().collections;return Array.isArray(list)&&list.length?list.slice():['clientes','aseguradoras'];}
   function failClient(){try{Orbit.auth.showLogin();}catch(e){}var node=document.getElementById('login-error');if(node)node.textContent='No fue posible abrir la plataforma. Intenta nuevamente.';}
   function hydrateRuntime(providers,result){
     var overlay=Orbit.productConfigSessionOverlayP0,member=Orbit.auth&&Orbit.auth.productUser||{},tenantId=String(member.tenantId||result&&result.status&&result.status.tenantId||'');
@@ -57,5 +57,5 @@
     if(!providers||!providers.enabled||!providers.enabled()){failClient();return;}
     if(Orbit.auth&&typeof Orbit.auth.init==='function')Orbit.auth.init();
   }
-  window.Orbit.productAppP0=Object.freeze({VERSION:'p0-m6-20260730.2',init:init,activate:activate,isStarted:function(){return started;},writeAuthorized:false,noFallback:true,tenantSource:'membership_only'});
+  window.Orbit.productAppP0=Object.freeze({VERSION:'p0-m6-20260730.3',init:init,activate:activate,isStarted:function(){return started;},writeAuthorized:false,noFallback:true,tenantSource:'membership_only'});
 })();
