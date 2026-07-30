@@ -1,0 +1,12 @@
+{
+  "schemaVersion":"orbit360-gate-contract-overlay-m5-runtime-539-v1",
+  "issuedAt":"2026-07-30",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.39",
+  "phase":"LAB_RUNTIME_GATE",
+  "candidateContractVersion":"5.0.37",
+  "required":{"releaseCandidateHash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a","criticalAssets":46,"remoteAssetsExpected":29,"remoteAssetsMatched":29,"packageRunId":30503634111,"packageJobId":90748545383,"packageArtifactId":8744440909,"packageArtifactDigest":"sha256:5df16f20b69677d7a54931333254f3036b51410c1436cd899193424a6da46d30","browserBlobSha":"3acbb31a9d89265c743ab5ecce3d36341d614c6e","closerBlobSha":"870c5365cc5e55c324b327418fbc128cc33ad848","legacyProbeBlobSha":"70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12","runtimeExecutions":1,"firestoreWrites":0,"operationalWrites":0},
+  "capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+  "containsPII":false,
+  "containsSecrets":false
+}
