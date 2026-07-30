@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"orbit360-m5-academia-fixture-diagnostic-537-trigger-v1",
+  "issuedAt":"2026-07-29",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.37",
+  "diagnosticOnly":true,
+  "zeroCapabilities":true,
+  "containsPII":false,
+  "containsSecrets":false
+}
