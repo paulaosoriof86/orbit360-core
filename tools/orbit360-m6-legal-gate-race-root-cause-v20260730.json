@@ -49,6 +49,13 @@
   },
   "reusableRule": "Before functional browser assertions, settle deferred blocking gates using an arrival window plus a quiet window; never infer absence from a single immediate DOM check.",
   "appliesToFutureModules": ["polizas", "vehiculos", "recibos_cartera", "cobros_conciliacion", "comisiones_planillas", "siniestros", "documentos", "cotizador_comparativo", "ops_leads", "marketing", "portal"],
+  "successorStaticRemediation": {
+    "contractVersion": "6.2.1",
+    "classification": ["FUNCTIONAL_DEFECT", "DATA_CONTRACT_FAILURE"],
+    "rootCause": "PRODUCT_ACCESS_ENGINE_MEMBERSHIP_PROJECTION_NOT_CONSUMED",
+    "triggerPurpose": "static_preflight_only",
+    "productionRetry": false
+  },
   "containsPII": false,
   "containsSecrets": false
 }
