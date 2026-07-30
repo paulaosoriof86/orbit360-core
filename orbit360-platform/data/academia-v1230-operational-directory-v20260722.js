@@ -9,9 +9,9 @@
     var params = new URLSearchParams(window.location.search || '');
     var isLab = params.get('orbitBackend') === 'firestore-lab' && (params.get('tenant') || 'alianzas-soluciones') === 'alianzas-soluciones';
     var current = Orbit.academiaStaticContentWritePolicy;
-    if (!isLab || (current && current.version === '20260729.2' && current.installed === true)) return;
+    if (!isLab || (current && current.version === '20260730.1' && current.installed === true)) return;
     if (document.readyState === 'loading' && typeof document.write === 'function') {
-      document.write('<script src="core/academia-static-content-write-policy-v20260729.js?v=20260729-2"><\/script>');
+      document.write('<script src="core/academia-static-content-write-policy-v20260729.js?v=20260730-1"><\/script>');
     }
   })();
 

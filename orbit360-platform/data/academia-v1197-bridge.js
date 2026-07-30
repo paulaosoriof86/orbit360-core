@@ -10,7 +10,7 @@ window.Orbit = window.Orbit || {};
    creados por usuario desde modules/academia.js siguen sin _cv y permanecen durables. */
 (function normalizeBaseAcademiaSeedVersion() {
   const rows = Orbit.SEED && Array.isArray(Orbit.SEED.cursos) ? Orbit.SEED.cursos : [];
-  rows.forEach(c => { if (c && !c._cv) c._cv = 1; });
+  rows.forEach(c => { if (!c) return; if (!c._cv) c._cv = 1; c._staticCourse = true; });
 })();
 
 Orbit.ACADEMIA_V1197 = (function () {

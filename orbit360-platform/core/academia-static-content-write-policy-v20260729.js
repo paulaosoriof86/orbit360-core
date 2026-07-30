@@ -3,7 +3,7 @@
   'use strict';
   window.Orbit=window.Orbit||{};
   var Orbit=window.Orbit;
-  var VERSION='20260729.2';
+  var VERSION='20260730.1';
   var transientByCollection={};
   var recent=[];
   var installed=false;
@@ -32,8 +32,9 @@
     if(op==='remove'||op==='setpref')return {mode:'durable_operational',reason:'explicit_user_or_preference_persistence'};
     if(col==='cursos'){
       var staticCourseId=/^(cur_|curso_base_|academia_)/i.test(key);
+      var explicitSeedCourse=patch._staticCourse===true;
       var contentShape=hasAny(patch,['titulo','cat','emoji','color','desc','destinatarios','recursos','metaLeccion','lecciones']);
-      if(staticCourseId&&hasVersionMarker(patch)&&contentShape)return {mode:'transient_static_content',reason:'versioned_static_course'};
+      if((staticCourseId||explicitSeedCourse)&&hasVersionMarker(patch)&&contentShape)return {mode:'transient_static_content',reason:explicitSeedCourse?'versioned_explicit_seed_course':'versioned_static_course'};
     }
     if(col==='lecciones'||col==='evaluaciones'){
       var staticLessonId=/^(m\d|m1|eval_|lesson_|leccion_|academia_)/i.test(key);
