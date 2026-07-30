@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-policies-static-v20260730",
+  "gateContractVersion": "7.0.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "POLICIES_STATIC_QUALIFICATION",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "m6Closed": true,
+  "m6FinalRun": 30562624279,
+  "m6FinalArtifact": 8767559350,
+  "reuseM6Infrastructure": true,
+  "rebuildTransverseInfrastructureAllowed": false,
+  "sourceDomain": "polizas",
+  "sourceReprofilingAllowed": false,
+  "legacyFinancialSourceAllowedToCreatePolicies": false,
+  "genericLegacyImporterAuthoritativeForPolicyDefaults": false,
+  "policyNormalizerOwner": "orbit360-platform/core/importa-polizas-p0.js",
+  "policyImportWire": "orbit360-platform/core/importa-polizas-p0-wire.js",
+  "policyOperationalOwner": "orbit360-platform/core/policy-receipts-engine.js",
+  "productDataWritesAllowed": false,
+  "dryRunOnly": true,
+  "nextWriteRequestPrepared": false,
+  "storageDeferredFailClosed": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
