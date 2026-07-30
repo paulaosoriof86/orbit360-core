@@ -2,9 +2,6 @@
   "firestore": {
     "rules": "firestore.product-deny-all.rules"
   },
-  "storage": {
-    "rules": "storage.product-deny-all.rules"
-  },
   "hosting": {
     "public": "orbit360-platform/rollback-safe",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
