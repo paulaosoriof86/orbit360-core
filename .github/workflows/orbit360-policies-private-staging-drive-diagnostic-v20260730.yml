@@ -1,0 +1,81 @@
+name: Orbit 360 · Policies private staging Drive diagnostic
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['.github/workflows/orbit360-policies-private-staging-drive-diagnostic-v20260730.yml']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-policies-private-staging-drive-diagnostic-v20260730
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block7-policies-static-v20260730
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  DRIVE_FILE_ID: 1BKbPU_0qJIzkWkKKp77e5V6Da3FRkxLe
+jobs:
+  diagnose:
+    name: Policies · Drive 403 root-cause diagnostic
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate estático antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .failed==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Diagnosticar Drive API sin descargar payload
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          (async()=>{
+            const sa=JSON.parse(process.env.SERVICE_ACCOUNT), b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url'), now=Math.floor(Date.now()/1000);
+            const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig});
+            const tr=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body});
+            const tj=await tr.json(); if(!tr.ok||!tj.access_token) throw new Error('ENVIRONMENT_FAILURE:OAUTH_TOKEN_'+tr.status);
+            const endpoints={about:'https://www.googleapis.com/drive/v3/about?fields=user(permissionId,displayName)',file:`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(process.env.DRIVE_FILE_ID)}?fields=id,name,mimeType,capabilities/canDownload&supportsAllDrives=true`};
+            const results={};
+            for(const [key,url] of Object.entries(endpoints)){
+              const r=await fetch(url,{headers:{authorization:`Bearer ${tj.access_token}`}}); let j={}; try{j=await r.json();}catch{}
+              const err=j&&j.error||{}; const reasons=Array.isArray(err.errors)?err.errors.map(x=>String(x.reason||'')).filter(Boolean):[];
+              results[key]={status:r.status,ok:r.ok,errorStatus:String(err.status||''),errorMessage:String(err.message||'').replace(/[\w.+-]+@[\w.-]+/g,'[email]').slice(0,240),reasons,hasFileId:Boolean(j&&j.id),mimeType:String(j&&j.mimeType||''),canDownload:Boolean(j&&j.capabilities&&j.capabilities.canDownload)};
+            }
+            const out={schemaVersion:'orbit360-drive-staging-diagnostic-v1',ok:true,projectId:sa.project_id,results,classification:(results.about.status===403&&results.file.status===403)?'ENVIRONMENT_FAILURE':'ACCESS_OR_FILE_DIAGNOSTIC',firestoreRead:false,firestoreWrites:0,operationalWrites:0,payloadDownloaded:false,productionTouched:false,containsPII:false,containsSecrets:false};
+            fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true});fs.writeFileSync(process.env.EVIDENCE_DIR+'/policies-private-staging-drive-diagnostic.json',JSON.stringify(out,null,2)+'\n');
+          })().catch(err=>{console.error(String(err&&err.message||err));process.exit(41);});
+          NODE
+      - name: Subir diagnóstico sanitizado
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-policies-private-staging-drive-diagnostic-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/policies-private-staging-drive-diagnostic.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Publicar estado diagnóstico
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          DIAG: orbit360-platform/runtime-gate-crm-v20260716/policies-private-staging-drive-diagnostic.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Drive root-cause diagnostic failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.DIAG,'utf8'));if(p.ok===true&&p.payloadDownloaded===false){state='success';description=`Drive diagnostic captured: ${p.classification}`;}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/policies-drive-diagnostic',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
