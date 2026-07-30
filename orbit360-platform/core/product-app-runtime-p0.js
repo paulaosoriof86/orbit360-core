@@ -5,6 +5,7 @@
    ============================================================ */
 (function(){
   'use strict';
+  // M6 6.1.9 static owner: query alias + all-active-collections barrier.
   window.Orbit=window.Orbit||{};
   var activating=null,started=false;
   function cfg(){return window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};}
