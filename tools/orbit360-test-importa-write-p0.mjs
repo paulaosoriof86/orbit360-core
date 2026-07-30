@@ -4,7 +4,7 @@ import fs from 'fs';
 import vm from 'vm';
 import assert from 'assert';
 
-const memory = { polizas: [], finmovs: [], auditoriaImportaciones: [] };
+const memory = { clientes: [], polizas: [], finmovs: [], auditoriaImportaciones: [] };
 global.window = global;
 global.Orbit = {
   tenant: { get: () => ({ id: 'tenant_demo' }) },
@@ -31,6 +31,19 @@ const blocked = Orbit.importaWriteP0.writeBatch({
 assert.equal(blocked.ok, false, 'finmovs debe estar bloqueado');
 assert.equal(memory.finmovs.length, 0);
 
+const pendingClient = Orbit.importaWriteP0.writeBatch({
+  batchId: 'batch_client', sourceType: 'polizas', status: 'dry_run_aprobado', sourceFileName: 'polizas-demo.xlsx', operations: [
+    { action: 'insert', collection: 'clientes', data: { id: 'cli_1', nombre: 'Cliente Incompleto', pais: 'GT', moneda: 'GTQ', calidad_datos: 'pendiente_completar' } }
+  ]
+}, { approved: true, phrase: 'CONFIRMO ESCRITURA CONTROLADA', userId: 'paula', reason: 'alta cliente incompleto autorizada por fuente de poliza' });
+assert.equal(pendingClient.ok, true);
+assert.equal(memory.clientes.length, 1);
+assert.equal(memory.clientes[0].calidad_datos, 'pendiente_completar');
+assert.equal(memory.clientes[0].validationStatus, 'pendiente_completar');
+assert.equal(memory.clientes[0].requiereValidacion, false);
+assert.notEqual(memory.clientes[0].validationStatus, 'validado');
+assert.equal(memory.auditoriaImportaciones.at(-1).status, 'written_controlled_pending_quality');
+
 const ok = Orbit.importaWriteP0.writeBatch({
   batchId: 'batch_2', sourceType: 'polizas', status: 'dry_run_aprobado', sourceFileName: 'polizas-demo.xlsx', operations: [
     { action: 'insert', collection: 'polizas', data: { id: 'pol_1', numero: 'POL-001', pais: 'GT', moneda: 'GTQ', validationStatus: 'validado' } }
@@ -41,11 +54,11 @@ assert.equal(ok.written, 1);
 assert.equal(memory.polizas.length, 1);
 assert.equal(memory.polizas[0].createdByImport, true);
 assert.equal(memory.polizas[0].importBatchId, 'batch_2');
-assert.equal(memory.auditoriaImportaciones.length, 1);
+assert.equal(memory.auditoriaImportaciones.length, 2);
 assert.equal(ok.rollback.length, 1);
 
 const rb = Orbit.importaWriteP0.rollback(ok.rollback, { approved: true, phrase: 'CONFIRMO ROLLBACK', userId: 'paula', reason: 'test rollback' });
 assert.equal(rb.ok, true);
 assert.equal(memory.polizas.length, 0);
 
-console.log('OK P0 controlled write contract smoke passed');
+console.log(JSON.stringify({status:'PASS',controlledWrite:true,pendingClientQualityPreserved:true,hardBlockedCollectionsPreserved:true,rollback:true,firestoreWrites:0,operationalWrites:0},null,2));
