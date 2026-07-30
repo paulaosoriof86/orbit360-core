@@ -1,0 +1,58 @@
+name: Orbit 360 · M5 5.0.38 Hosting close router
+run-name: M5 5.0.38 · return canonical gate to zero capabilities · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-m5-hosting-close-router-538-trigger-v20260730.json'
+
+permissions:
+  contents: write
+  statuses: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 2
+      - name: Reemplazo exacto único
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/orbit360-validar-gate-contracts-v20260717.mjs')
+          s=p.read_text()
+          old='"block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.38",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-hosting-delivery-538-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-hosting-delivery-538-v20260730.mjs"}'
+          new='"block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.38",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-hosting-538-closed-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-hosting-538-closed-v20260730.mjs"}'
+          if s.count(old)!=1: raise SystemExit(f'EXPECTED_EXACTLY_ONE_HOSTING_538_ENTRY:{s.count(old)}')
+          p.write_text(s.replace(old,new,1))
+          PY
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+      - name: Commit único
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-ci'
+          git config user.email 'orbit360-ci@users.noreply.github.com'
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs
+          git diff --cached --quiet && { echo 'NO_PATCH' >&2; exit 41; }
+          git commit -m 'm5 5.0.38: return canonical gate to zero capabilities after Hosting 29/29'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+      - name: Publicar PASS observable
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state:'success',context:'orbit360/m5-hosting-close-router-538',description:'M5 5.0.38 closed at zero capabilities'});
+      - name: Publicar FAIL observable
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state:'failure',context:'orbit360/m5-hosting-close-router-538',description:'M5 5.0.38 close router failed'});
