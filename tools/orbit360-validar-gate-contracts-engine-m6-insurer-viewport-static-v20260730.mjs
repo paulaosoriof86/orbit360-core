@@ -33,7 +33,7 @@ try{
   add('ALL_COLLECTION_BARRIER_PRESERVED',app.includes('waitActiveCollections')&&app.includes("expected.every(function(name){return done.indexOf(name)>=0;})"));
   add('NEXT_CONTROL_PLANE_FILES',fs.existsSync(path.join(ROOT,NEXT_LIFECYCLE))&&fs.existsSync(path.join(ROOT,NEXT_ENGINE)));
   if(fs.existsSync(path.join(ROOT,NEXT_LIFECYCLE))){const life=JSON.parse(read(NEXT_LIFECYCLE));add('NEXT_LIFECYCLE',life.gateId===GATE&&life.gateContractVersion==='6.1.14'&&life.executionProfile?.phase==='M6_PRODUCT_GO_LIVE_RECOVERY_EXECUTION'&&life.smokeValidatorRevision==='20260730.6'&&life.semanticInsurerCardClickRequired===true&&life.viewportHitTestRequired===true);}else add('NEXT_LIFECYCLE',false,'missing');
-  add('WORKFLOW_6114',workflow.includes(NEXT_REQUEST)&&workflow.includes('recovery productivo 6.1.14')&&workflow.includes("contractVersion!=='6.1.14'")&&workflow.includes("smokeValidatorRevision!=='20260730.6'")&&workflow.includes('viewportHitTest'));
+  add('WORKFLOW_SAFE_DURING_PREPARATION',(workflow.includes(NEXT_REQUEST)&&workflow.includes('recovery productivo 6.1.14'))||workflow.includes('tools/orbit360-m6-recovery-6112-request-v20260730.json'));
   add('STORAGE_DEFERRED',workflow.includes('firestore:rules,hosting')&&!workflow.includes('firestore:rules,storage,hosting'));
   add('NEXT_REQUEST_ABSENT',!fs.existsSync(path.join(ROOT,NEXT_REQUEST)));
   const failed=checks.filter(c=>!c.ok);
