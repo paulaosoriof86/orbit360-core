@@ -93,7 +93,7 @@ export function stagingClientToCanonical(staging,{indexes}={}){
   if(existing.status==='matched') return {ok:true,action:'reuse',id:existing.record.id,record:existing.record,resolution:existing};
   const name=clean(staging.nombre||staging.asegurado);
   if(!name) return {ok:false,blockingReason:'cliente_sin_nombre'};
-  const id=deterministicId('cli_pol',`${TENANT_ID}|${norm(name)}|${norm(staging.documento||'')}`);
+  const id=clean(staging.id)||deterministicId('cli_pol',`${TENANT_ID}|${norm(name)}|${norm(staging.documento||'')}`);
   const advisor=resolveAdvisor(staging.vendedor||'',indexes);
   const record={
     id, tenantId:TENANT_ID,
@@ -104,30 +104,48 @@ export function stagingClientToCanonical(staging,{indexes}={}){
     telefonoAlterno:clean(staging.telefono||''),
     pais:clean(staging.pais).toUpperCase(),
     moneda:clean(staging.moneda).toUpperCase(),
-    asesorId:advisor.status==='matched'?clean(advisor.record.id):'',
+    asesorId:clean(staging.asesorId)||(advisor.status==='matched'?clean(advisor.record.id):''),
     asesorPrincipal:advisor.status==='matched'?nameOf(advisor.record):clean(staging.vendedor||''),
     asesorRaw:clean(staging.vendedor||''),
     estadoOperativo:'pendiente_polizas',
     calidad_datos:'pendiente_completar',
     validationStatus:'pendiente_completar',
     requiereValidacion:false,
-    alertasCalidad:['PENDIENTE_POLIZAS','CLIENTE_CREADO_DESDE_POLIZA','PENDIENTE_COMPLETAR'],
-    sourceRefs:list(staging.source_refs),
-    sourceTrace:{sourceType:'polizas',cutoff:'2026-07-30',createdFromMissingPolicyParty:true}
+    alertasCalidad:[...new Set(['PENDIENTE_POLIZAS','CLIENTE_CREADO_DESDE_POLIZA','PENDIENTE_COMPLETAR',...list(staging.alertasCalidad)])],
+    sourceRefs:list(staging.source_refs||staging.sourceRefs),
+    sourceTrace:{sourceType:'polizas',cutoff:'2026-07-30',createdFromMissingPolicyParty:true,duplicateReview:clean(staging.duplicateReview||'')}
   };
   if(!record.numeroDocumento) record.alertasCalidad.push('FALTA_DOCUMENTO');
   if(!record.correo) record.alertasCalidad.push('FALTA_CORREO');
   if(!record.whatsapp) record.alertasCalidad.push('FALTA_WHATSAPP');
-  if(advisor.status!=='matched') record.alertasCalidad.push('ASESOR_PENDIENTE_CONFIRMAR');
+  if(!record.asesorId) record.alertasCalidad.push('ASESOR_PENDIENTE_CONFIRMAR');
+  record.alertasCalidad=[...new Set(record.alertasCalidad)];
   return {ok:true,action:'create',id,record,resolution:{status:'missing'},advisorResolution:advisor};
+}
+
+export function restrictedInsurerToCanonical(staging){
+  const name=clean(staging.nombre||staging.aseguradora||staging.aseguradoraNombre);
+  const country=clean(staging.pais||staging.country).toUpperCase();
+  if(!name||!country) return {ok:false,blockingReason:'aseguradora_restringida_incompleta'};
+  const id=clean(staging.id)||deterministicId('ins_pol',`${TENANT_ID}|${country}|${norm(name)}`);
+  return {ok:true,id,record:{
+    id,tenantId:TENANT_ID,nombre:name,pais:country,
+    requiereValidacion:true,validationStatus:'requiere_validacion',estadoOperativo:'pendiente_validacion',
+    vinculada:false,cotizadorHabilitado:false,comparativoHabilitado:false,tarifasHabilitadas:false,
+    calidad_datos:'pendiente_completar',
+    sourceRefs:list(staging.source_refs||staging.sourceRefs),
+    sourceTrace:{sourceType:'polizas',cutoff:'2026-07-30',restrictedReferenceOnly:true}
+  }};
 }
 
 export function stagingPolicyToCanonicalRaw(staging,{clienteId,insurerId,asesorId=''}={}){
   const numero=clean(staging.numero_poliza||staging.numero||staging.poliza);
   const start=clean(staging.vigencia_inicio||staging.vigenciaInicio||staging.vigenciaIni);
   const end=clean(staging.vigencia_fin||staging.vigenciaFin||staging.vigenciaFinal);
-  const versionKey=clean(staging.source_version_key)||[numero,clean(staging.aseguradora),clean(staging.cliente_match_fuente||staging.asegurado),start,end].join('|');
-  const id=deterministicId('pol',`${TENANT_ID}|${versionKey}`);
+  const versionKey=clean(staging.source_version_key||staging._sourceVersionKey)||[numero,clean(staging.aseguradora),clean(staging.cliente_match_fuente||staging.asegurado),start,end].join('|');
+  const id=clean(staging.id)||deterministicId('pol',`${TENANT_ID}|${versionKey}`);
+  const reasons=[...new Set(list(staging.motivos_calidad||staging.motivosCalidad).map(clean).filter(Boolean))];
+  const pending=clean(staging.calidad_datos||staging.calidadDatos).toLowerCase().startsWith('pendiente')||staging.requiereValidacion===true||reasons.some(r=>['FORMA_PAGO_FALTANTE','PRIMA_NETA_FALTANTE','PRIMA_TOTAL_FALTANTE','ASESOR_NO_CATALOGO_ACTUAL'].includes(r));
   return {
     id, tenantId:TENANT_ID,
     clienteId:clean(clienteId),
@@ -137,6 +155,7 @@ export function stagingPolicyToCanonicalRaw(staging,{clienteId,insurerId,asesorI
     vigenciaInicio:start,
     vigenciaFin:end,
     estadoFuenteOriginal:clean(staging.estado_fuente||staging.estadoFuenteOriginal),
+    estadoFuenteContradiceVigencia:staging.estadoFuenteContradiceVigencia===true,
     estado:clean(staging.estado_propuesto||staging.estado),
     pais:clean(staging.pais).toUpperCase(),
     moneda:clean(staging.moneda).toUpperCase(),
@@ -152,19 +171,33 @@ export function stagingPolicyToCanonicalRaw(staging,{clienteId,insurerId,asesorI
     aseguradoraFuenteNombre:clean(staging.aseguradora),
     asesorFuenteNombre:clean(staging.vendedor),
     _sourceVersionKey:versionKey,
-    sourceRefs:list(staging.source_refs),
-    sourceTrace:{sourceType:'polizas',cutoff:'2026-07-30',stagingContract:'orbit360-policy-persist-candidate-v1'},
+    sourceRefs:list(staging.source_refs||staging.sourceRefs),
+    sourceTrace:{sourceType:'polizas',cutoff:'2026-07-30',stagingContract:'orbit360-policy-persist-candidate-v2',countryCurrencyProvenance:list(staging.countryCurrencyProvenance)},
+    calidad_datos:pending?'pendiente_completar':'ok',
+    validationStatus:pending?'pendiente_completar':'validado',
+    requiereValidacion:pending,
+    motivosCalidad:reasons,
     carteraMaterializada:false,
+    recibosMaterializados:false,
     cobroAplicado:false,
+    estadoCartera:pending?'pendiente_datos_no_materializar':'no_materializada_en_bloque_polizas',
     importadorP0:true
   };
 }
 
 export function buildCanonicalWritePlan(candidate,{clients=[],insurers=[],advisors=[],policies=[]}={}){
   if(!candidate || candidate.tenant_id!==TENANT_ID) return {ok:false,blocking:['tenant_invalido'],operations:[]};
-  const indexes=buildReferenceIndexes({clients,insurers,advisors,policies});
-  const blocking=[]; const clientOps=[]; const policyOps=[]; const createdClients=new Map();
+  const restrictedBuilt=[];
+  for(const r of candidate.insurersRestricted||[]){
+    const built=restrictedInsurerToCanonical(r);
+    if(!built.ok) return {ok:false,blocking:[built.blockingReason],operations:[]};
+    restrictedBuilt.push(built.record);
+  }
+  const allInsurers=[...insurers,...restrictedBuilt];
+  const indexes=buildReferenceIndexes({clients,insurers:allInsurers,advisors,policies});
+  const blocking=[]; const clientOps=[]; const insurerOps=[]; const policyOps=[]; const createdClients=new Map();
   const approvedNewByName=new Map((candidate.clients||[]).map(c=>[norm(c.nombre),c]));
+  for(const r of restrictedBuilt) insurerOps.push({action:'insert',collection:'aseguradoras',id:r.id,data:r});
 
   function clientForPolicy(p){
     const resolved=resolveClient(p,indexes);
@@ -181,21 +214,21 @@ export function buildCanonicalWritePlan(candidate,{clients=[],insurers=[],adviso
   }
 
   for(const p of candidate.policies||[]){
-    const c=clientForPolicy(p); if(c.error){blocking.push({kind:'policy',reason:c.error});continue;}
-    const ins=resolveInsurer(p,indexes); if(ins.status!=='matched'){blocking.push({kind:'policy',reason:'aseguradora_'+ins.status});continue;}
-    const advisorId=advisorIdOf(c.record)||clean(c.record.asesorId)||clean(c.record.asesorPrincipalId)||'';
+    const c=clientForPolicy(p); if(c.error){blocking.push({kind:'policy',reason:c.error,sourceVersionKey:p.source_version_key||''});continue;}
+    const ins=resolveInsurer(p,indexes); if(ins.status!=='matched'){blocking.push({kind:'policy',reason:'aseguradora_'+ins.status,sourceVersionKey:p.source_version_key||''});continue;}
+    const advisorId=clean(p.asesorId)||advisorIdOf(c.record)||clean(c.record.asesorId)||clean(c.record.asesorPrincipalId)||'';
     const raw=stagingPolicyToCanonicalRaw(p,{clienteId:c.id,insurerId:ins.record.id,asesorId:advisorId});
-    if(!raw.numero||!raw.clienteId||!raw.aseguradoraId||!raw.vigenciaInicio||!raw.vigenciaFin){blocking.push({kind:'policy',reason:'contrato_canonico_incompleto'});continue;}
+    if(!raw.numero||!raw.clienteId||!raw.aseguradoraId||!raw.vigenciaInicio||!raw.vigenciaFin){blocking.push({kind:'policy',reason:'contrato_canonico_incompleto',sourceVersionKey:raw._sourceVersionKey});continue;}
     const existing=unique(indexes.policyByVersion.get(raw._sourceVersionKey)||[]);
-    if(existing.length>1){blocking.push({kind:'policy',reason:'version_poliza_duplicada_en_destino'});continue;}
+    if(existing.length>1){blocking.push({kind:'policy',reason:'version_poliza_duplicada_en_destino',sourceVersionKey:raw._sourceVersionKey});continue;}
     if(existing.length===1) policyOps.push({action:'update',collection:'polizas',id:existing[0].id,data:raw});
     else policyOps.push({action:'insert',collection:'polizas',id:raw.id,data:raw});
   }
   return {
     ok:blocking.length===0,
     blocking,
-    operations:[...clientOps,...policyOps],
-    counts:{clientCreates:clientOps.length,policyWrites:policyOps.length,policyCreates:policyOps.filter(x=>x.action==='insert').length,policyUpdates:policyOps.filter(x=>x.action==='update').length,excluded:(candidate.excluded||[]).length,receipts:0,cartera:0,cobros:0},
-    invariants:{tenantId:TENANT_ID,clientFirst:true,noReceiptWrites:true,noCarteraWrites:true,noCobroWrites:true,unresolvedRelationsBlocked:true,deterministicIds:true}
+    operations:[...clientOps,...insurerOps,...policyOps],
+    counts:{clientCreates:clientOps.length,restrictedInsurerCreates:insurerOps.length,policyWrites:policyOps.length,policyCreates:policyOps.filter(x=>x.action==='insert').length,policyUpdates:policyOps.filter(x=>x.action==='update').length,pendingPolicies:policyOps.filter(x=>x.data.requiereValidacion===true).length,excluded:(candidate.excluded||[]).length,receipts:0,cartera:0,cobros:0},
+    invariants:{tenantId:TENANT_ID,clientsAndRestrictedInsurersBeforePolicies:true,noReceiptWrites:true,noCarteraWrites:true,noCobroWrites:true,unresolvedRelationsBlocked:true,deterministicIds:true,pendingPoliciesCannotMaterializeReceipts:true}
   };
 }
