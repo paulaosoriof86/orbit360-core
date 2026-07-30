@@ -1,6 +1,6 @@
 /* ============================================================
    Orbit 360 · Product application runtime P0
-   Auth -> membership -> product read-only store -> UI.
+   Auth -> membership -> product read-only store -> tenant config -> UI.
    No fallback, no writes, no tenant from URL.
    ============================================================ */
 (function(){
@@ -16,28 +16,40 @@
     function merged(){var live=base.all('cursos')||[],seen={};return courses.concat(live).filter(function(row){var id=String(row&&row.id||'');if(!id||seen[id])return false;seen[id]=true;return true;});}
     facade.all=function(c){return c==='cursos'?merged():base.all(c);};
     facade.get=function(c,id){return c==='cursos'?(merged().find(function(r){return r&&r.id===id;})||null):base.get(c,id);};
-    facade.where=function(c,a,b,d){if(c!=='cursos')return base.where(c,a,b,d);var rows=merged();if(typeof a==='function')return rows.filter(a);if(a&&typeof a==='object')return rows.filter(function(r){return Object.keys(a).every(function(k){return r[k]===a[k];});});return rows.filter(function(r){return r&&r[a]===(arguments.length>=4?d:b);});};
+    facade.where=function(c,a,b,d){if(c!=='cursos')return base.where(c,a,b,d);var rows=merged(),argc=arguments.length;if(typeof a==='function')return rows.filter(a);if(a&&typeof a==='object')return rows.filter(function(r){return Object.keys(a).every(function(k){return r[k]===a[k];});});var value=argc>=4?d:b;return rows.filter(function(r){return r&&r[a]===value;});};
     facade.find=function(c,fn){return c==='cursos'&&typeof fn==='function'?(merged().find(fn)||null):(base.find?base.find(c,fn):null);};
     facade.__productStaticOverlayP0=true;
     return facade;
   }
   function collections(){var list=cfg().collections;return Array.isArray(list)&&list.length?list.slice():['clientes','aseguradoras','gestiones','notificaciones'];}
   function failClient(){try{Orbit.auth.showLogin();}catch(e){}var node=document.getElementById('login-error');if(node)node.textContent='No fue posible abrir la plataforma. Intenta nuevamente.';}
+  function hydrateRuntime(providers,result){
+    var overlay=Orbit.productConfigSessionOverlayP0,member=Orbit.auth&&Orbit.auth.productUser||{},tenantId=String(member.tenantId||result&&result.status&&result.status.tenantId||'');
+    if(!overlay||!tenantId)return Promise.reject(new Error('PRODUCT_RUNTIME_OVERLAY_MISSING'));
+    overlay.applyMembership(member);
+    return providers.readTenantConfig(tenantId).then(function(config){overlay.applyTenantConfig(config||{});return config||{};});
+  }
   function activate(){
     if(activating)return activating;
     var providers=Orbit.productRuntimeBrowserProvidersP0,bootstrap=Orbit.backendProductReadOnlyBootstrapP0;
     if(!providers||!providers.enabled||!providers.enabled()||!bootstrap){failClient();return Promise.resolve({ok:false});}
     var courses=staticCourses();
-    activating=providers.initialize().then(function(){return bootstrap.start(providers.dependencies(),{authorizedProductReadOnly:true,runtimeAuthorized:true,mode:'product',collections:collections(),snapshotTimeoutMs:20000});}).then(function(result){
-      if(!result||result.ok!==true||result.ready!==true||result.writeAuthorized!==false||!Orbit.store||typeof Orbit.store._productStatus!=='function')throw new Error('PRODUCT_BOOTSTRAP_NOT_READY');
-      Orbit.store=overlayStaticCourses(Orbit.store,courses);
-      if(Orbit.router&&typeof Orbit.router.init==='function')Orbit.router.init();
-      if(Orbit.novedades&&typeof Orbit.novedades.init==='function')Orbit.novedades.init();
-      try{Orbit.store._emit('*');}catch(e){}
-      Orbit.auth.showApp();started=true;
-      try{window.dispatchEvent(new CustomEvent('orbit:product-ready',{detail:{ready:true,readOnly:true,noFallback:true}}));}catch(e){}
-      return result;
-    }).catch(function(error){activating=null;failClient();throw error;});
+    activating=providers.initialize()
+      .then(function(){return bootstrap.start(providers.dependencies(),{authorizedProductReadOnly:true,runtimeAuthorized:true,mode:'product',collections:collections(),snapshotTimeoutMs:20000});})
+      .then(function(result){
+        if(!result||result.ok!==true||result.ready!==true||result.writeAuthorized!==false||!Orbit.store||typeof Orbit.store._productStatus!=='function')throw new Error('PRODUCT_BOOTSTRAP_NOT_READY');
+        Orbit.store=overlayStaticCourses(Orbit.store,courses);
+        return hydrateRuntime(providers,result).then(function(){return result;});
+      })
+      .then(function(result){
+        if(Orbit.router&&typeof Orbit.router.init==='function')Orbit.router.init();
+        if(Orbit.novedades&&typeof Orbit.novedades.init==='function')Orbit.novedades.init();
+        try{Orbit.store._emit('*');}catch(e){}
+        Orbit.auth.showApp();started=true;
+        try{window.dispatchEvent(new CustomEvent('orbit:product-ready',{detail:{ready:true,readOnly:true,noFallback:true}}));}catch(e){}
+        return result;
+      })
+      .catch(function(error){activating=null;failClient();throw error;});
     return activating;
   }
   function init(){
@@ -45,5 +57,5 @@
     if(!providers||!providers.enabled||!providers.enabled()){failClient();return;}
     if(Orbit.auth&&typeof Orbit.auth.init==='function')Orbit.auth.init();
   }
-  window.Orbit.productAppP0=Object.freeze({VERSION:'p0-m6-20260730',init:init,activate:activate,isStarted:function(){return started;},writeAuthorized:false,noFallback:true,tenantSource:'membership_only'});
+  window.Orbit.productAppP0=Object.freeze({VERSION:'p0-m6-20260730.2',init:init,activate:activate,isStarted:function(){return started;},writeAuthorized:false,noFallback:true,tenantSource:'membership_only'});
 })();
