@@ -16,7 +16,7 @@
   window.Orbit = window.Orbit || {};
 
   const ALLOWED_COLLECTIONS = [
-    'clientes', 'contactosCliente', 'calidadDatos', 'gestiones',
+    'clientes', 'contactosCliente', 'calidadDatos', 'gestiones', 'aseguradoras',
     'polizas', 'bienesAsegurados', 'recibosEsperados', 'recibosFuenteExterna', 'recibosAseguradora',
     'estadosCuentaAseguradora', 'carteraPrimas', 'conciliacionesPrimas',
     'planillasComisiones', 'comisionesDevengadas', 'facturasComisiones', 'cxcComisiones', 'conciliacionesComisiones',
@@ -85,9 +85,28 @@
     );
   }
 
+  function isControlledPendingPolicy(op) {
+    const data = op && (op.data || op.record || {});
+    const quality = norm(data && (data.calidad_datos || data.calidadDatos || data.estadoCalidad || ''));
+    const validation = norm(data && data.validationStatus || '');
+    const pendingQuality = quality === 'pendiente_completar' || quality === 'pendiente';
+    const pendingValidation = !validation || validation === 'pendiente_completar' || validation === 'requiere_validacion';
+    return !!(
+      op &&
+      op.collection === 'polizas' &&
+      data &&
+      pendingQuality &&
+      pendingValidation &&
+      data.carteraMaterializada === false &&
+      data.cobroAplicado === false &&
+      data.recibosMaterializados !== true
+    );
+  }
+
   function controlledPendingKind(op) {
     if (isRestrictedPendingInsurer(op)) return 'restricted_insurer';
     if (isControlledPendingClient(op)) return 'pending_client_quality';
+    if (isControlledPendingPolicy(op)) return 'pending_policy_quality';
     return '';
   }
 
@@ -159,6 +178,7 @@
     const pendingKind = controlledPendingKind(op);
     if (!coll) errors.push('collection_faltante');
     if (coll && !isAllowedCollection(coll)) errors.push('collection_no_permitida:' + coll);
+    if (coll === 'aseguradoras' && pendingKind !== 'restricted_insurer') errors.push('aseguradora_solo_restringida_en_p0');
     if (!['insert', 'update'].includes(action)) errors.push('accion_no_permitida:' + action);
     if (action === 'update' && !op.id) errors.push('id_requerido_update');
     if (!data || typeof data !== 'object') errors.push('data_invalida');
@@ -200,7 +220,9 @@
       ? 'written_controlled_restricted'
       : pendingKind === 'pending_client_quality'
         ? 'written_controlled_pending_quality'
-        : 'written_controlled';
+        : pendingKind === 'pending_policy_quality'
+          ? 'written_controlled_pending_policy'
+          : 'written_controlled';
     return {
       id: 'aud_imp_' + batch.batchId + '_' + Math.random().toString(36).slice(2, 10),
       tenantId: tenantId() || batch.tenantId || '',
@@ -270,6 +292,16 @@
             requiereValidacion: false,
             validationStatus: 'pendiente_completar',
             calidad_datos: 'pendiente_completar'
+          });
+        } else if (pendingKind === 'pending_policy_quality') {
+          data = Object.assign(baseData, {
+            requiereValidacion: true,
+            validationStatus: 'pendiente_completar',
+            calidad_datos: 'pendiente_completar',
+            carteraMaterializada: false,
+            cobroAplicado: false,
+            recibosMaterializados: false,
+            estadoCartera: baseData.estadoCartera || 'pendiente_datos_no_materializar'
           });
         } else {
           data = Object.assign(baseData, {
@@ -356,6 +388,7 @@
     isAllowedCollection,
     isRestrictedPendingInsurer,
     isControlledPendingClient,
+    isControlledPendingPolicy,
     controlledPendingKind,
     validateRecord,
     validateBatch,
