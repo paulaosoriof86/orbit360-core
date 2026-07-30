@@ -40,13 +40,14 @@ const productStack=[
  '<script src="core/product-prebootstrap-store-p0.js?v=20260730-m6"></script>'
 ].join('');
 html=html.replace(policyRe,productStack+'$&');
+afterSrc('core/access-role-session-owner-v20260728.js','<script src="core/product-membership-access-bridge-p0.js?v=20260730-m6-access"></script>');
 const init='Orbit.store.init(Orbit.SEED); Orbit.router.init(); Orbit.auth.init(); if (Orbit.novedades) Orbit.novedades.init();';
 if(!html.includes(init))throw new Error('M6_BUILD_INIT_ANCHOR_MISSING');
 html=html.replace(init,'Orbit.productAppP0.init();');
 const forbidden=['backend-lab-loader.js','backend-lab-init.js','store-firestore-lab.local.js','data/seed.js','core/auth.js','Orbit.store.init(Orbit.SEED)','orbitBackend=firestore-lab','tenant=alianzas-soluciones','admin@demo.com','orbit.lab@demo.com','demo123'];
 const leaked=forbidden.filter(x=>html.includes(x));
 if(leaked.length)throw new Error('M6_PRODUCT_SHELL_FORBIDDEN:'+leaked.join(','));
-const required=['product-runtime-config.js','product-prebootstrap-store-p0.js','product-runtime-browser-providers-p0.js','auth-product-runtime-p0.js','product-app-runtime-p0.js','store-firestore-product-readonly-p0.js','backend-product-readonly-bootstrap-p0.js'];
+const required=['product-runtime-config.js','product-prebootstrap-store-p0.js','product-runtime-browser-providers-p0.js','auth-product-runtime-p0.js','product-app-runtime-p0.js','store-firestore-product-readonly-p0.js','backend-product-readonly-bootstrap-p0.js','product-membership-access-bridge-p0.js'];
 // Browser providers are inserted adjacent to product stack only after contracts.
 if(!html.includes('product-runtime-browser-providers-p0.js')){
   const anchor='<script src="core/product-prebootstrap-store-p0.js?v=20260730-m6"></script>';
