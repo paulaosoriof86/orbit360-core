@@ -8,6 +8,7 @@ const PROJECT=String(process.env.ORBIT360_PRODUCT_PROJECT_ID||'').trim();
 const TENANT=String(process.env.ORBIT360_PRODUCT_TENANT_ID||'').trim();
 const OUT=path.join(ROOT,'orbit360-platform/product-runtime-config.js');
 const EVIDENCE=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/m6-product-runtime-config-summary.json');
+const CANONICAL_MIGRATED_COLLECTIONS=Object.freeze(['clientes','aseguradoras']);
 function text(v){return String(v==null?'':v).trim();}
 function safe(v){return text(v).replace(/[A-Za-z0-9_-]{30,}/g,'[redacted]').slice(0,160);}
 function writeEvidence(payload){fs.mkdirSync(path.dirname(EVIDENCE),{recursive:true});fs.writeFileSync(EVIDENCE,JSON.stringify({...payload,containsPII:false,containsSecrets:false},null,2)+'\n');}
@@ -25,8 +26,8 @@ async function resolve(){
 try{
   if(!PROJECT||!TENANT)throw new Error('PIPELINE_MECHANISM_FAILURE:PRODUCT_TARGET_NOT_BOUND');
   const {config,webAppCount}=await resolve();
-  const runtime={enabled:true,environmentRef:'firebase-existing-project-readonly',projectId:text(config.projectId),apiKey:text(config.apiKey),appId:text(config.appId),authDomain:text(config.authDomain),storageBucket:text(config.storageBucket),tenantHint:TENANT,collections:['clientes','aseguradoras','gestiones','notificaciones']};
+  const runtime={enabled:true,environmentRef:'firebase-existing-project-readonly',projectId:text(config.projectId),apiKey:text(config.apiKey),appId:text(config.appId),authDomain:text(config.authDomain),storageBucket:text(config.storageBucket),tenantHint:TENANT,collections:CANONICAL_MIGRATED_COLLECTIONS.slice()};
   const js='/* Generated in authorized M6 runner. Public Firebase Web config; no secret material. */\nwindow.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze('+JSON.stringify(runtime,null,2)+');\n';
   fs.writeFileSync(OUT,js,'utf8');
-  writeEvidence({ok:true,status:'M6_PRODUCT_RUNTIME_CONFIG_DERIVED_READ_ONLY',projectIdentityMatches:true,webConfigDerivedReadOnly:true,webAppCount,tenantBound:true,collectionCount:runtime.collections.length,canonicalMigratedCollectionsOnly:true,configWrittenToRunnerWorkspace:true,configCommitted:false,secretAccess:false,firestoreRead:false,operationalWrites:0});
+  writeEvidence({ok:true,status:'M6_PRODUCT_RUNTIME_CONFIG_DERIVED_READ_ONLY',projectIdentityMatches:true,webConfigDerivedReadOnly:true,webAppCount,tenantBound:true,collectionCount:runtime.collections.length,collections:runtime.collections.slice(),canonicalMigratedCollectionsOnly:true,canonicalCollectionContract:'m4_clients_insurers_only',configWrittenToRunnerWorkspace:true,configCommitted:false,secretAccess:false,firestoreRead:false,operationalWrites:0});
 }catch(error){writeEvidence({ok:false,status:text(error&&error.message).startsWith('PIPELINE_MECHANISM_FAILURE')?'PIPELINE_MECHANISM_FAILURE':'DATA_CONTRACT_FAILURE',classification:text(error&&error.message).split(':')[0]||'DATA_CONTRACT_FAILURE',error:safe(error&&error.message||error),projectIdentityMatches:false,webConfigDerivedReadOnly:false,configWrittenToRunnerWorkspace:false,configCommitted:false,secretAccess:false,firestoreRead:false,operationalWrites:0});process.exitCode=41;}
