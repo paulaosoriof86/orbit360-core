@@ -1,0 +1,23 @@
+{
+  "schemaVersion":"orbit360-m5-hosting-evidence-ledger-538-v1",
+  "issuedAt":"2026-07-30",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "packageInput":"tools/orbit360-m5-hosting-package-input-538-v20260730.json",
+  "appendOnly":true,
+  "entries":[{
+    "kind":"hosting_authorization_received",
+    "sourceVersion":"5.0.38",
+    "candidateContractVersion":"5.0.37",
+    "authorizationSource":"user_autorizado_hosting_5_0_37_20260730",
+    "candidateHash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a",
+    "criticalAssets":46,
+    "remoteAssetsExpected":29,
+    "remoteAssetsMatchedBefore":28,
+    "mismatchPathsBefore":["data/academia-v1197-bridge.js"],
+    "allowedExecutions":1,
+    "requestCreated":false,
+    "hostingExecuted":false
+  }],
+  "containsPII":false,
+  "containsSecrets":false
+}
