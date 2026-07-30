@@ -61,4 +61,7 @@ const rb = Orbit.importaWriteP0.rollback(ok.rollback, { approved: true, phrase: 
 assert.equal(rb.ok, true);
 assert.equal(memory.polizas.length, 0);
 
-console.log(JSON.stringify({status:'PASS',controlledWrite:true,pendingClientQualityPreserved:true,hardBlockedCollectionsPreserved:true,rollback:true,firestoreWrites:0,operationalWrites:0},null,2));
+console.log(JSON.stringify({status:'PASS',controlledWrite:true,pendingClientQualityPreserved:true,hardBlockedCollectionsPreserved:true,rollback:true,firestoreWrites:0,operationalWrites:0,testHarnessExit:'explicit'},null,2));
+// importa-write-p0 keeps a browser-oriented 10-minute sync-status timer alive.
+// This synthetic Node test has already completed all assertions; terminate the harness explicitly.
+process.exit(0);
