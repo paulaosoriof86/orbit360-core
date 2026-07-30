@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const ROOT=process.cwd();
+const PLAT=path.join(ROOT,'orbit360-platform');
+const RC='097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a';
+const INPUT='tools/orbit360-m5-runtime-prep-input-539-v20260730.json';
+const OVERLAY='tools/orbit360-m5-release-candidate-control-overlay-538-v20260730.json';
+const DESC='tools/orbit360-m5-release-candidate-descriptor-537-v20260729.json';
+const BROWSER='tools/orbit360-m5-runtime-smoke-539-browser-adapter-v20260730.mjs';
+const CLOSER='tools/orbit360-m5-runtime-smoke-539-close-v20260730.mjs';
+const LEGACY='tools/orbit360-m5-runtime-smoke-525-browser-v20260729.mjs';
+const AUTH='tools/orbit360-m5-runtime-authorization-539-v20260730.json';
+const REQUEST='tools/orbit360-m5-runtime-smoke-539-request-v20260730.json';
+const read=r=>fs.readFileSync(path.join(ROOT,r),'utf8');
+const json=r=>JSON.parse(read(r));
+const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+const checks=[];const check=(id,ok,d='')=>checks.push({id,ok:Boolean(ok),detail:String(d||'').slice(0,240)});
+try{
+  const input=json(INPUT),overlay=json(OVERLAY),descriptor=json(DESC);
+  const browser=read(BROWSER),closer=read(CLOSER),legacy=read(LEGACY),policy=read('orbit360-platform/core/academia-static-content-write-policy-v20260729.js'),bridge=read('orbit360-platform/data/academia-v1197-bridge.js');
+  const rows=[].concat(descriptor.criticalAssets||[]).map(rel=>{const file=path.join(PLAT,rel);return{path:rel,present:fs.existsSync(file),sha256:fs.existsSync(file)?sha(fs.readFileSync(file)):''};});
+  const computedHash=sha(JSON.stringify(rows.map(r=>({path:r.path,sha256:r.sha256}))));
+  const browserSha=execFileSync('git',['hash-object',BROWSER],{cwd:ROOT,encoding:'utf8'}).trim(),closerSha=execFileSync('git',['hash-object',CLOSER],{cwd:ROOT,encoding:'utf8'}).trim(),legacySha=execFileSync('git',['hash-object',LEGACY],{cwd:ROOT,encoding:'utf8'}).trim(),policyBlobSha=execFileSync('git',['hash-object','orbit360-platform/core/academia-static-content-write-policy-v20260729.js'],{cwd:ROOT,encoding:'utf8'}).trim(),bridgeBlobSha=execFileSync('git',['hash-object','orbit360-platform/data/academia-v1197-bridge.js'],{cwd:ROOT,encoding:'utf8'}).trim();
+  check('OVERLAY_538',overlay.status==='M5_HOSTING_538_CLOSED_29_OF_29_READY_TO_REQUEST_RUNTIME_AUTHORIZATION'&&overlay.releaseCandidate?.hash===RC&&overlay.publicParity?.assetsExpected===29&&overlay.publicParity?.assetsMatched===29&&overlay.publicParity?.mismatchCount===0&&overlay.publicParity?.remoteParity===true&&overlay.authorization?.runtimeSmokeAuthorized===false&&overlay.authorization?.allowedRuntimeExecutions===0&&overlay.authorization?.runtimeRequestCreated===false);
+  check('INPUT',input.schemaVersion==='orbit360-m5-runtime-prep-input-539-v1'&&input.contractVersion==='5.0.39'&&input.immutableAfterCreation===true&&input.sourceControlOverlay===OVERLAY&&input.descriptor===DESC&&input.expectedCandidateHash===RC&&input.criticalAssets===46&&input.remoteAssetsExpected===29&&input.remoteAssetsMatched===29&&input.browser===BROWSER&&input.closer===CLOSER&&input.runtimeAuthorizationPresent===false&&input.runtimeRequestPresent===false);
+  check('DESCRIPTOR',descriptor.contractVersion==='5.0.37'&&descriptor.criticalAssets?.length===46&&descriptor.remoteAssets?.length===29&&descriptor.criticalAssets.includes('data/seed.js')&&descriptor.criticalAssets.includes('data/academia-v1197-bridge.js')&&descriptor.remoteAssets.includes('data/seed.js')&&descriptor.remoteAssets.includes('data/academia-v1197-bridge.js'));
+  check('RC_HASH',rows.length===46&&rows.every(r=>r.present&&r.sha256)&&computedHash===RC,computedHash);
+  check('LEGACY_PROBE_IMMUTABLE',legacySha==='70d6ad22553bd0387fa08dd2eeeb6e3b9834fa12'&&legacy.includes("contractVersion:'5.0.25'")&&legacy.includes('MOBILE_MENU_INCOMPLETE'),legacySha);
+  check('BROWSER_ADAPTER',browser.includes("contractVersion:'5.0.39'")&&browser.includes(`const RC='${RC}'`)&&browser.includes("targetPublicParityRequired:'29/29'")&&browser.includes('expectedBaseSeedStaticVersion:1')&&browser.includes('responsiveTitleResolverReady')&&browser.includes('normalizedBootstrapOwner'));
+  check('CLOSER',closer.includes("contractVersion:'5.0.39'")&&closer.includes(`const RC='${RC}'`)&&closer.includes('M5_RUNTIME_SMOKE_539_CLOSED_SUCCESS')&&closer.includes("publicParityPreserved:'29/29'")&&closer.includes('academiaStaticMarkerFunctionalReady'));
+  check('STRICT_POLICY',policyBlobSha==='fa4c29d30a82673a7bf2d3d55efce52eaf4cccf3'&&policy.includes("var VERSION='20260729.2';"),policyBlobSha);
+  check('BASE_SEED_NORMALIZER',bridgeBlobSha==='51172365ea8cda420aa8e3ea379ef0a9b8331db1'&&bridge.includes('Orbit.SEED && Array.isArray(Orbit.SEED.cursos)')&&bridge.includes("rows.forEach(c => { if (c && !c._cv) c._cv = 1; });"),bridgeBlobSha);
+  check('TARGET',input.target?.projectId==='ays-orbit-360-lab'&&input.target?.canonicalUrl==='https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app');
+  check('PACKAGE_ZERO_CAPS',input.packageCapabilities?.secrets===false&&input.packageCapabilities?.firestoreRead===false&&input.packageCapabilities?.writes===false&&input.packageCapabilities?.runtime===false&&input.packageCapabilities?.browser===false&&input.packageCapabilities?.deploy===false&&input.packageCapabilities?.production===false);
+  check('RUNTIME_CEILING',input.runtimeCeiling?.secrets===true&&input.runtimeCeiling?.firestoreRead===true&&input.runtimeCeiling?.writes===false&&input.runtimeCeiling?.runtime===true&&input.runtimeCeiling?.browser===true&&input.runtimeCeiling?.deploy===false&&input.runtimeCeiling?.production===false);
+  check('AUTH_REQUEST_ABSENT',!fs.existsSync(path.join(ROOT,AUTH))&&!fs.existsSync(path.join(ROOT,REQUEST)));
+  const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-m5-runtime-prep-539-summary-v1',contractVersion:'5.0.39',candidateContractVersion:'5.0.37',ok:failed.length===0,status:failed.length?'M5_RUNTIME_PREP_539_FAIL':'M5_RUNTIME_PREP_539_PASS_READY_TO_REQUEST_AUTHORIZATION',releaseCandidateHash:RC,criticalAssets:46,remoteAssetsExpected:29,remoteAssetsMatched:29,remoteParity:true,browserBlobSha:browserSha,closerBlobSha:closerSha,legacyProbeBlobSha:legacySha,policyBlobSha,bridgeBlobSha,legacyProbeContractVersion:'5.0.25',packageInputImmutable:true,multirolCompatibilityVersion:'20260729.2',accessOwnerVersion:'20260729.3',academiaPolicyVersion:'20260729.2',academiaContentVersion:8,baseSeedStaticVersion:1,visibleTechnicalCopyPredicateVersion:'20260729.1',responsiveTitleResolverVersion:'20260729.1',passed:checks.length-failed.length,total:checks.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,secrets:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false,containsPII:false,containsSecrets:false};
+  const outPath=path.join(PLAT,'runtime-gate-crm-v20260716/m5-runtime-prep-539-summary.json');fs.mkdirSync(path.dirname(outPath),{recursive:true});fs.writeFileSync(outPath,JSON.stringify(out,null,2)+'\n','utf8');console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
+}catch(error){console.error(String(error&&error.stack||error));process.exit(41);}
