@@ -1,0 +1,9 @@
+{
+  "schemaVersion":"orbit360-m5-hosting-close-router-538-trigger-v1",
+  "issuedAt":"2026-07-30",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.38",
+  "zeroCapabilities":true,
+  "containsPII":false,
+  "containsSecrets":false
+}
