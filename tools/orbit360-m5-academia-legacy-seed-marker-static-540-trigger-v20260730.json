@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"orbit360-m5-academia-legacy-seed-marker-static-540-trigger-v1",
+  "issuedAt":"2026-07-30",
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.40",
+  "allowedExecutions":1,
+  "zeroCapabilities":true,
+  "containsPII":false,
+  "containsSecrets":false
+}
