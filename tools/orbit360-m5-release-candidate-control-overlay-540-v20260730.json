@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"orbit360-m5-release-candidate-control-overlay-540-v1",
+  "issuedAt":"2026-07-30",
+  "authoritativeForCurrentM5ControlState":true,
+  "preservesHistoryFrom":["tools/orbit360-m5-release-candidate-control-overlay-538-v20260730.json","tools/orbit360-m5-runtime-stop-overlay-539-v20260730.json"],
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "contractVersion":"5.0.40",
+  "status":"M5_ACADEMIA_LEGACY_SEED_MARKER_540_CLOSED_NEW_RC_READY_TO_REQUEST_HOSTING_AUTHORIZATION",
+  "priorReleaseCandidate":{"hash":"097d4e85b37e3c26406e856d94fe156e1f40723b9dec40ba567334c573cc855a","criticalAssets":46,"publicAssets":29,"superseded":true,"reason":"runtime 5.0.39 exposed legacy base seed course ids outside strict static prefix contract"},
+  "releaseCandidate":{"hash":"9bd2c847a2884be900283f86802dbbd0390ae5bc6ccc17b3a5cf4d389c78a4ee","criticalAssets":46,"publicAssets":29,"descriptor":"tools/orbit360-m5-release-candidate-descriptor-540-v20260730.json","academiaStaticWritePolicyVersion":"20260730.1","legacySeedExplicitMarker":true,"userGeneratedCoursesRemainDurable":true},
+  "publicParity":{"assetsExpected":29,"assetsMatched":25,"mismatchCount":4,"mismatchPaths":["index.html","data/academia-v1230-operational-directory-v20260722.js","core/academia-static-content-write-policy-v20260729.js","data/academia-v1197-bridge.js"],"remoteParity":false,"hostingDeliveryRequired":true},
+  "runtime539":{"authorizationConsumed":true,"allowedRuntimeExecutions":0,"rerunForbidden":true,"runId":30504465098,"jobId":90751082824,"artifactId":8744778362,"artifactDigest":"sha256:d417f4b9db0c7dc664743525731198c55b2470abcb3d7336a00e25cc3f752e7f","transientStaticCalls":62,"blockedOperationalCalls":1,"firestoreWrites":0,"operationalWrites":0,"networkWriteCandidates":0,"allCountsStable":true,"allDigestsStable":true,"classification":"FUNCTIONAL_DEFECT","rootCause":"legacy Orbit.SEED cursos use ids such as cur1/cur2 that intentionally do not match the modern static-id prefix; prior normalizer added _cv but no explicit static provenance marker"},
+  "remediation540":{"closed":true,"runId":30505323377,"jobId":90753710960,"artifactId":8745076533,"artifactDigest":"sha256:df8d5744396624d47233840f09b0cde72fd27e38408426cd45aadb1f1f69de8e","policyVersion":"20260730.1","explicitSeedMarker":true,"legacySeedCourseTransient":true,"userGeneratedCourseDurable":true,"workflowFrozen":true,"lifecycleClosed":true},
+  "authorization":{"hostingLabDeliveryAuthorized":false,"allowedHostingExecutions":0,"runtimeSmokeAuthorized":false,"allowedRuntimeExecutions":0,"runtimeRequestCreated":false,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "safety":{"secrets":false,"firestoreRead":false,"firestoreWrites":0,"operationalWrites":0,"browser":false,"runtime":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false,"main":false,"merge":false,"pólizas":false},
+  "nextAction":"REQUEST_NEW_EXPLICIT_ONE_SHOT_HOSTING_LAB_AUTHORIZATION_FOR_RC_9BD2C847_46_29; require 29/29 before any new runtime authorization",
+  "containsPII":false,
+  "containsSecrets":false
+}
