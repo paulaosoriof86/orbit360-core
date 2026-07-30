@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "gateContractVersion": "6.1.1",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "M6_PRODUCT_GO_LIVE_ROOT_CAUSE_DIAGNOSTIC",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "rootCauseAfterRun": 30516109429,
+  "diagnosticReadOnly": true,
+  "hostingReadOnly": true,
+  "rulesReadOnly": true,
+  "storageMetadataReadOnly": true,
+  "iamTestPermissionsReadOnly": true,
+  "productDataWritesAllowed": false,
+  "deployAllowed": false,
+  "rulesDeployAllowed": false,
+  "functionsDeployAllowed": false,
+  "mergeMainAllowed": false,
+  "policiesAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
