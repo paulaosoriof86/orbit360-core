@@ -6,7 +6,7 @@ import assert from 'assert';
 
 const file = 'orbit360-platform/core/importa-polizas-p0.js';
 global.window = global;
-global.Orbit = { ui: { today: () => '2026-07-09' } };
+global.Orbit = { ui: { today: () => '2026-07-30' } };
 vm.runInThisContext(fs.readFileSync(file, 'utf8'), { filename: file });
 
 const P0 = global.Orbit.importaPolizasP0;
@@ -26,33 +26,40 @@ const base = {
   formaPago: 'mensual'
 };
 
-const renovada = P0.normalizePolicy({ ...base, estadoPol: 'Renovada' }, { today: '2026-07-09' });
-assert.equal(renovada.estadoOperativoOrbit, 'vigente_renovada');
-assert.equal(renovada.estadoCartera, 'genera_recibos_esperados');
+const renovada = P0.normalizePolicy({ ...base, estadoPol: 'Renovada' }, { today: '2026-07-30' });
+assert.equal(renovada.estadoOperativoOrbit, 'historica_renovada');
+assert.equal(renovada.estadoCartera, 'no_exigible');
 assert.equal(renovada.requiereValidacion, false);
-assert.ok(P0.shouldGenerateExpectedReceipts(renovada));
+assert.equal(P0.shouldGenerateExpectedReceipts(renovada), false);
 assert.ok(renovada._dedupKey.includes('pol 001'));
 
-const vigente = P0.normalizePolicy({ ...base, estadoPol: 'Vigente' }, { today: '2026-07-09' });
-assert.equal(vigente.estadoOperativoOrbit, 'vigente_operativa');
+const porRenovar = P0.normalizePolicy({ ...base, estadoPol: 'Por renovar' }, { today: '2026-07-30' });
+assert.equal(porRenovar.estadoOperativoOrbit, 'por_renovar_operativa');
+assert.equal(porRenovar.estadoCartera, 'genera_recibos_esperados');
+assert.equal(porRenovar.requiereValidacion, false);
+assert.ok(P0.shouldGenerateExpectedReceipts(porRenovar));
 
-const vencida = P0.normalizePolicy({ ...base, vigenciaIni: '2025-01-01', vigenciaFin: '2025-12-31', estadoPol: 'Vencida' }, { today: '2026-07-09' });
+const vigente = P0.normalizePolicy({ ...base, estadoPol: 'Vigente' }, { today: '2026-07-30' });
+assert.equal(vigente.estadoOperativoOrbit, 'vigente_operativa');
+assert.ok(P0.shouldGenerateExpectedReceipts(vigente));
+
+const vencida = P0.normalizePolicy({ ...base, vigenciaIni: '2025-01-01', vigenciaFin: '2025-12-31', estadoPol: 'Vencida' }, { today: '2026-07-30' });
 assert.equal(vencida.estadoOperativoOrbit, 'historica_vencida');
 assert.equal(vencida.estadoCartera, 'recibo_analitico_no_cartera_viva');
 assert.equal(P0.shouldGenerateExpectedReceipts(vencida), false);
 
-const cancelada = P0.normalizePolicy({ ...base, estadoPol: 'Cancelada' }, { today: '2026-07-09' });
+const cancelada = P0.normalizePolicy({ ...base, estadoPol: 'Cancelada' }, { today: '2026-07-30' });
 assert.equal(cancelada.estadoOperativoOrbit, 'cancelada_terminal');
 assert.equal(P0.shouldGenerateExpectedReceipts(cancelada), false);
 
-const sinFormaPago = P0.normalizePolicy({ ...base, formaPago: '', frecuencia: '', estadoPol: 'Vigente' }, { today: '2026-07-09' });
+const sinFormaPago = P0.normalizePolicy({ ...base, formaPago: '', frecuencia: '', estadoPol: 'Vigente' }, { today: '2026-07-30' });
 assert.equal(sinFormaPago.requiereValidacion, true);
 assert.ok(sinFormaPago.motivosValidacion.includes('forma_pago'));
 
-const recibo = P0.expectedReceiptSeed(renovada, { n: 1, total: 1176, neta: 1000, iva: 126, vence: '2026-01-01' }, 0);
+const recibo = P0.expectedReceiptSeed(porRenovar, { n: 1, total: 1176, neta: 1000, iva: 126, vence: '2026-08-01' }, 0);
 assert.equal(recibo.estado, 'esperado');
 assert.equal(recibo.estadoCartera, 'recibo_esperado');
 assert.equal(recibo.confirmadoPago, false);
 assert.equal(recibo.carteraOperativa, false);
 
-console.log('OK P0 policy import rules smoke passed');
+console.log(JSON.stringify({status:'PASS',renovadaHistorical:true,porRenovarActive:true,vigenteActive:true,historicalNoReceipts:true},null,2));
