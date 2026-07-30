@@ -37,6 +37,9 @@
   function membershipByUid(uid){
     return initialize().then(function(ctx){var c=config();var ref=ctx.modules.store.doc(ctx.db,'tenants/'+c.tenantHint+'/members/'+uid);return ctx.modules.store.getDoc(ref).then(function(snap){if(!snap.exists())throw new Error('MEMBERSHIP_NOT_AVAILABLE');var row=snap.data()||{};if(String(row.uid||'')!==String(uid||'')||String(row.tenantId||'')!==String(c.tenantHint||''))throw new Error('MEMBERSHIP_IDENTITY_MISMATCH');return row;});});
   }
+  function readTenantConfig(tenantId){
+    return initialize().then(function(ctx){var c=config();if(String(tenantId||'')!==String(c.tenantHint||''))throw new Error('TENANT_CONFIG_SCOPE_MISMATCH');var ref=ctx.modules.store.doc(ctx.db,'tenants/'+tenantId+'/system/config');return ctx.modules.store.getDoc(ref).then(function(snap){return snap.exists()?(snap.data()||{}):{};});});
+  }
   function dependencies(){
     return{
       environmentProvider:{describePublicConfig:publicDescriptor},
@@ -47,6 +50,5 @@
   }
   function signIn(email,password){return initialize().then(function(ctx){return ctx.modules.auth.signInWithEmailAndPassword(ctx.auth,String(email||'').trim(),String(password||''));});}
   function signOut(){return initialize().then(function(ctx){return ctx.modules.auth.signOut(ctx.auth);});}
-  function currentUser(){try{return contextPromise?null:null;}catch(e){return null;}}
-  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-m6-20260730',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,waitForUser:waitUser,currentUser:currentUser,configDescriptor:publicDescriptor,containsSecrets:false,tenantSource:'membership_only',writeAuthorized:false,noFallback:true});
+  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-m6-20260730.2',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,waitForUser:waitUser,readTenantConfig:readTenantConfig,configDescriptor:publicDescriptor,containsSecrets:false,tenantSource:'membership_only',writeAuthorized:false,noFallback:true});
 })();
