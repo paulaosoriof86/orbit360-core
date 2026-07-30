@@ -1,0 +1,87 @@
+name: Orbit 360 · Policies controlled write once
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['.github/orbit360-requests/policies-write-20260730.json']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-policies-write-once-v20260730
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block7-policies-static-v20260730
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  DRIVE_FILE_ID: 1NXHACZ11815882AhoyGrQQCb9Amgbi95
+  PACKAGE_SHA256: b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f
+  REQUEST_PATH: .github/orbit360-requests/policies-write-20260730.json
+jobs:
+  write_once:
+    name: Policies · exact package controlled write + revalidation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate canónico antes de secrets/Firestore
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .failed==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.schemaVersion=="orbit360-policies-write-freeze-v1" and .realWriteExecuted==false and .authorization.required==true and .authorization.requestExistsAtFreeze==false and .package.physicalSha256==env.PACKAGE_SHA256 and .writePlan.clientesCreatePendingQuality==16 and .writePlan.aseguradorasRestrictedCreate==4 and .writePlan.polizasCreate==1373 and .writePlan.polizasPendingQuality==64 and .writePlan.excluded==4 and .writePlan.recibosWrites==0 and .writePlan.carteraWrites==0 and .writePlan.cobrosWrites==0' tools/orbit360-policies-write-freeze-v20260730.json >/dev/null
+      - name: Verificar request inmutable autorizado
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$REQUEST_PATH"
+          jq -e '.schemaVersion=="orbit360-policies-write-request-v1" and .approved==true and .phrase=="AUTORIZO ESCRITURA CONTROLADA POLIZAS AYS 20260730" and .packageSha256==env.PACKAGE_SHA256 and .logicalSha256=="315a4f7123193acde4ca8cc166e15904502dabf43f3c071c36a7b974e03e3011" and .scope.clients==16 and .scope.restrictedInsurers==4 and .scope.policies==1373 and .scope.receipts==0 and .scope.cartera==0 and .scope.cobros==0' "$REQUEST_PATH" >/dev/null
+      - name: Preparar dependencias aisladas
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --no-save firebase-admin@13.4.0 xlsx@0.18.5 >/dev/null 2>&1
+      - name: Descargar paquete privado exacto y ejecutar una vez
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          (async()=>{const sa=JSON.parse(process.env.SERVICE_ACCOUNT),b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url'),now=Math.floor(Date.now()/1000);if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth-grant-type:jwt-bearer',assertion:unsigned+'.'+sig});const tr=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body});const tj=await tr.json();if(!tr.ok||!tj.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+tr.status);const r=await fetch(`https://www.googleapis.com/drive/v3/files/${process.env.DRIVE_FILE_ID}?alt=media&supportsAllDrives=true`,{headers:{authorization:`Bearer ${tj.access_token}`}});if(!r.ok)throw new Error('ENVIRONMENT_FAILURE:DRIVE_'+r.status);const b=Buffer.from(await r.arrayBuffer()),sha=crypto.createHash('sha256').update(b).digest('hex');if(sha!==process.env.PACKAGE_SHA256)throw new Error('DATA_CONTRACT_FAILURE:PACKAGE_SHA');fs.writeFileSync('/tmp/policies-canonical.xlsx',b);})().catch(e=>{console.error(String(e.message||e));process.exit(41)});
+          NODE
+          ORBIT360_POLICIES_MODE=WRITE \
+          ORBIT360_POLICIES_XLSX=/tmp/policies-canonical.xlsx \
+          ORBIT360_POLICIES_XLSX_SHA256="$PACKAGE_SHA256" \
+          ORBIT360_POLICIES_REQUEST="$REQUEST_PATH" \
+          ORBIT360_POLICIES_EVIDENCE="$EVIDENCE_DIR/policies-controlled-write.json" \
+          node tools/orbit360-policies-canonical-apply-v20260730.mjs
+          jq -e '.status=="WRITE_PASS" and .ok==true and .before.clientes==414 and .before.aseguradoras==26 and .before.asesores==7 and .before.polizas==0 and .after.clientes==430 and .after.aseguradoras==30 and .after.asesores==7 and .after.polizas==1373 and .writes.clients==16 and .writes.insurers==4 and .writes.policies==1373 and .writes.receipts==0 and .writes.cartera==0 and .writes.cobros==0 and .rollback.executed==false' "$EVIDENCE_DIR/policies-controlled-write.json" >/dev/null
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-policies-controlled-write-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/policies-controlled-write.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/policies-controlled-write.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Policies controlled write blocked/failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.status==='WRITE_PASS'&&p.rollback.executed===false){state='success';description=`Policies write PASS: ${p.writes.clients}+${p.writes.insurers}+${p.writes.policies}; zero receipts/cartera/cobros`;}else if(p.status==='ROLLED_BACK_SAFE'){description='Policies write failed; rollback restored baseline safely';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/policies-write-once',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
