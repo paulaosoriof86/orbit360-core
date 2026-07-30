@@ -1,0 +1,199 @@
+name: Orbit 360 · M5 runtime final LAB · 5.0.42
+run-name: M5 5.0.42 · final runtime on RC 9bd2 · ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-m5-runtime-final-542-request-v20260730.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-m5-runtime-final-542-v20260730
+  cancel-in-progress: false
+
+env:
+  ORBIT360_GATE_ID: block5-release-candidate-visualization-v20260728
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: tools/orbit360-m5-runtime-final-542-request-v20260730.json
+  EXPECTED_RC_HASH: 9bd2c847a2884be900283f86802dbbd0390ae5bc6ccc17b3a5cf4d389c78a4ee
+  EXPECTED_FIREBASE_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_PREVIEW_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
+  ORBIT360_EXPECTED_RUNTIME: 20260717-2
+  ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  runtime_final:
+    name: M5 · final runtime 5.0.42 · one gate · zero writes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar solicitud inmutable y primer intento
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = 'push'
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -f "$ORBIT360_REQUEST_FILE"
+
+      - name: Preflight canónico antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-m5-runtime-final-542-v20260730.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="5.0.42" and .candidateContractVersion=="5.0.40" and .executionPhase=="LAB_RUNTIME_GATE" and .activationMode=="immutable_request_present" and .failed==0 and .executionAuthorized==true and .allowedExecutions==1 and .releaseCandidateHash==env.EXPECTED_RC_HASH and .criticalAssets==46 and .remoteAssetsExpected==29 and .remoteAssetsMatched==29 and .remoteParity==true and .capabilityProfile.secrets==true and .capabilityProfile.firestoreRead==true and .capabilityProfile.writes==false and .capabilityProfile.runtime==true and .capabilityProfile.browser==true and .capabilityProfile.deploy==false and .capabilityProfile.functionsDeploy==false and .capabilityProfile.rulesDeploy==false and .capabilityProfile.production==false and .dataAccess==false and .secretAccess==false and .firestoreWrites==0 and .operationalWrites==0' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Confirmar RC y paridad pública 29/29
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-m5-release-candidate-readiness-540-v20260730.mjs
+          cp "$ORBIT360_EVIDENCE_DIR/m5-release-candidate-readiness-540-summary.json" "$ORBIT360_EVIDENCE_DIR/m5-runtime-readiness-542-before.json"
+          jq -e '.ok==true and .status=="M5_RC_540_READY_FOR_RUNTIME_AFTER_HOSTING" and .releaseCandidate.hash==env.EXPECTED_RC_HASH and .releaseCandidate.criticalAssetCount==46 and .remoteLab.assetsExpected==29 and .remoteLab.assetsChecked==29 and .remoteLab.assetsMatched==29 and .remoteLab.mismatchCount==0 and .remoteLab.remoteParity==true and .approvalReadyForRuntimeSmoke==true and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .browser==false and .runtime==false and .deploy==false and .production==false' "$ORBIT360_EVIDENCE_DIR/m5-runtime-readiness-542-before.json" >/dev/null
+
+      - name: Preparar probe final sin alterar producto
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp tools/orbit360-m5-runtime-smoke-525-browser-v20260729.mjs tools/.orbit360-m5-runtime-final-542-browser.mjs
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/.orbit360-m5-runtime-final-542-browser.mjs')
+          s=p.read_text()
+          replacements={
+            'm5-runtime-smoke-525-browser-summary.json':'m5-runtime-smoke-542-browser-summary.json',
+            'ae6bb2a35ce4f03c0353d670218c841e51b57a2461a3ba9e741d8bd7a973fd61':'9bd2c847a2884be900283f86802dbbd0390ae5bc6ccc17b3a5cf4d389c78a4ee',
+            "EXPECTED_POLICY_VERSION='20260729.2'":"EXPECTED_POLICY_VERSION='20260730.1'",
+            "schemaVersion:'orbit360-m5-runtime-smoke-browser-v8'":"schemaVersion:'orbit360-m5-runtime-final-542-browser-v1'",
+            "contractVersion:'5.0.25'":"contractVersion:'5.0.42'"
+          }
+          for old,new in replacements.items():
+            if old not in s: raise SystemExit('PROBE_TRANSFORM_SOURCE_MISMATCH:'+old)
+            s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+          node --check tools/.orbit360-m5-runtime-final-542-browser.mjs
+
+      - name: Instalar dependencias read-only y navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Resolver identidad LAB después del preflight
+        shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          ORBIT360_LOGIN_SECRET: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          test ${#ORBIT360_LOGIN_SECRET} -ge 12
+          KEY_FILE="${RUNNER_TEMP}/orbit360-m5-runtime-final-542-lab.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$EXPECTED_FIREBASE_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_LAB_LOGIN_PASSWORD=$ORBIT360_LOGIN_SECRET" >> "$GITHUB_ENV"
+
+      - name: Snapshot Firestore read-only antes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-m5-runtime-smoke-live-readonly-v20260729.mjs before
+          jq -e '.ok==true and .status=="M5_RUNTIME_LIVE_SNAPSHOT_PASS" and .checksPassed==11 and .checksTotal==11 and .counts.sourceClients==414 and .counts.sourceInsurers==26 and .counts.advisors==7 and .counts.canonicalClients==414 and .counts.canonicalInsurers==26 and .counts.memberships==1 and .counts.config==1 and .firestoreRead==true and .firestoreWrites==0 and .operationalWrites==0' "$ORBIT360_EVIDENCE_DIR/m5-runtime-smoke-live-before.json" >/dev/null
+
+      - name: Ejecutar runtime final M5
+        id: browser
+        continue-on-error: true
+        shell: bash
+        run: node tools/.orbit360-m5-runtime-final-542-browser.mjs
+
+      - name: Snapshot Firestore read-only después
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-m5-runtime-smoke-live-readonly-v20260729.mjs after
+          jq -e '.ok==true and .status=="M5_RUNTIME_LIVE_SNAPSHOT_PASS" and .checksPassed==11 and .checksTotal==11 and .firestoreWrites==0 and .operationalWrites==0' "$ORBIT360_EVIDENCE_DIR/m5-runtime-smoke-live-after.json" >/dev/null
+
+      - name: Cerrar evidencia y comparar digests
+        if: always()
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),path=require('path');const d=process.env.ORBIT360_EVIDENCE_DIR,RC=process.env.EXPECTED_RC_HASH;const read=n=>{try{return JSON.parse(fs.readFileSync(path.join(d,n),'utf8'))}catch{return null}};
+          const p=read('preflight-sanitizado.json'),rdy=read('m5-runtime-readiness-542-before.json'),b=read('m5-runtime-smoke-542-browser-summary.json'),before=read('m5-runtime-smoke-live-before.json'),after=read('m5-runtime-smoke-live-after.json');
+          const keys=['sourceClients','sourceInsurers','advisors','canonicalClients','canonicalInsurers','memberships','config'];
+          const digests=Object.fromEntries(keys.map(k=>[k,Boolean(before&&after&&before.digests&&after.digests&&before.digests[k]===after.digests[k])]));
+          const allDigestsStable=keys.every(k=>digests[k]===true),allCountsStable=keys.every(k=>Boolean(before&&after&&before.counts&&after.counts&&before.counts[k]===after.counts[k]));
+          const transient=Number(b&&b.writeGuard&&Array.isArray(b.writeGuard.transientStaticCalls)?b.writeGuard.transientStaticCalls.length:0),blocked=Number(b&&b.writeGuard&&Array.isArray(b.writeGuard.blockedOperationalCalls)?b.writeGuard.blockedOperationalCalls.length:0),network=Number(b&&b.writeGuard&&Array.isArray(b.writeGuard.networkWriteCandidates)?b.writeGuard.networkWriteCandidates.length:0);
+          const roles=Boolean(b&&b.checks&&b.checks.desktopDirection===true&&b.checks.tabletOperativo===true&&b.checks.mobileAsesor===true&&b.checks.mobileMenu===true),policy=Boolean(b&&b.academiaStaticWritePolicy&&b.academiaStaticWritePolicy.ownerVersion==='20260730.1'&&b.writeGuard&&b.writeGuard.storeGuardInstalled===true&&b.writeGuard.policyVersion==='20260730.1');
+          const ok=Boolean(p&&p.status==='GO_GATE_CONTRACT'&&p.contractVersion==='5.0.42'&&p.failed===0&&rdy&&rdy.status==='M5_RC_540_READY_FOR_RUNTIME_AFTER_HOSTING'&&rdy.remoteLab&&rdy.remoteLab.remoteParity===true&&before&&before.ok===true&&after&&after.ok===true&&b&&b.ok===true&&b.releaseCandidateHash===RC&&b.contractVersion==='5.0.42'&&roles&&policy&&transient>0&&blocked===0&&network===0&&allDigestsStable&&allCountsStable);
+          const out={schemaVersion:'orbit360-m5-runtime-final-542-summary-v1',generatedAt:new Date().toISOString(),ok,status:ok?'M5_RUNTIME_FINAL_542_CLOSED_SUCCESS':'M5_RUNTIME_FINAL_542_FAILED_STOP_LINE',gateId:process.env.ORBIT360_GATE_ID,contractVersion:'5.0.42',candidateContractVersion:'5.0.40',releaseCandidateHash:RC,preflightStatus:p&&p.status||'MISSING',readinessStatus:rdy&&rdy.status||'MISSING',browserStatus:b&&b.ok===true?'PASS':'FAIL',browserStage:b&&b.stage||'NOT_RUN',failureStage:b&&b.failureStage||'',browserError:b&&b.error||'',snapshotBeforeOk:Boolean(before&&before.ok),snapshotAfterOk:Boolean(after&&after.ok),allCountsStable,allDigestsStable,digestComparisons:digests,transientStaticCalls:transient,blockedOperationalCalls:blocked,networkWriteCandidates:network,roleViewsCompleted:roles,academiaPolicyVersion:b&&b.academiaStaticWritePolicy&&b.academiaStaticWritePolicy.ownerVersion||'',firestoreRead:true,firestoreWrites:0,operationalWrites:0,runtimeExecuted:true,browserExecuted:true,hostingDeploy:false,functionsDeploy:false,rulesDeploy:false,production:false,mergeMain:false,visualReviewExecuted:false,approvalReadyForVisualReview:ok,containsPII:false,containsSecrets:false};
+          fs.writeFileSync(path.join(d,'m5-runtime-final-542-summary.json'),JSON.stringify(out,null,2)+'\n','utf8');console.log(JSON.stringify(out,null,2));if(!ok)process.exitCode=41;
+          NODE
+
+      - name: Validar cierre esperado
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.ok==true and .status=="M5_RUNTIME_FINAL_542_CLOSED_SUCCESS" and .releaseCandidateHash==env.EXPECTED_RC_HASH and .snapshotBeforeOk==true and .snapshotAfterOk==true and .allCountsStable==true and .allDigestsStable==true and .transientStaticCalls>0 and .blockedOperationalCalls==0 and .firestoreWrites==0 and .operationalWrites==0 and .networkWriteCandidates==0 and .runtimeExecuted==true and .browserExecuted==true and .hostingDeploy==false and .functionsDeploy==false and .rulesDeploy==false and .production==false and .mergeMain==false and .visualReviewExecuted==false and .approvalReadyForVisualReview==true' "$ORBIT360_EVIDENCE_DIR/m5-runtime-final-542-summary.json" >/dev/null
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-m5-runtime-final-542-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-readiness-542-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-live-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-live-after.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-smoke-542-browser-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-final-542-summary.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publicar estado observable sanitizado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          SUMMARY: orbit360-platform/runtime-gate-crm-v20260716/m5-runtime-final-542-summary.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='M5 runtime final 5.0.42 failed — STOP line';
+            try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY,'utf8'));if(s.ok===true&&s.status==='M5_RUNTIME_FINAL_542_CLOSED_SUCCESS'){state='success';description='M5 runtime final PASS; zero writes; visual review ready';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/m5-runtime-final-542',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Limpiar identidad y probe temporales
+        if: always()
+        shell: bash
+        run: rm -f "${ORBIT360_TEMP_KEY_FILE:-${RUNNER_TEMP}/orbit360-m5-runtime-final-542-lab.json}" tools/.orbit360-m5-runtime-final-542-browser.mjs
