@@ -6,7 +6,7 @@ import {execFileSync} from 'node:child_process';
 const ROOT=process.cwd();
 const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
 const GATE='block8-vehicles-static-v20260730';
-const VERSION='8.0.0';
+const VERSION='8.0.1';
 const files={
   policiesClose:'orbit360-platform/docs/CIERRE-WRITE-POLIZAS-AYS-20260730.md',
   dryrun:'orbit360-platform/docs/DRYRUN-VEHICULOS-AYS-20260730.md',
