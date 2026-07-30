@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';
+const canonicalizer=fs.readFileSync('tools/orbit360-vehicles-canonicalize-v20260730.mjs','utf8');
+const freeze=JSON.parse(fs.readFileSync('tools/orbit360-vehicles-source-freeze-v20260730.json','utf8'));
+const checks=[];
+const add=(id,ok)=>checks.push({id,ok:Boolean(ok)});
+add('RAW_TRUE_REQUIRED',(canonicalizer.match(/raw:true/g)||[]).length>=2);
+add('RAW_FALSE_FORBIDDEN',!canonicalizer.includes('raw:false'));
+add('RAW_IDENTITY_MODE',canonicalizer.includes("identityCellsReadMode:'raw_cell_value'")&&freeze.parserContract?.identityCellsReadMode==='raw_cell_value');
+add('PRESENTATION_FORMAT_IDENTITY_FORBIDDEN',freeze.parserContract?.presentationFormattingAllowedForIdentity===false);
+add('LONG_NUMERIC_ROWS_FROZEN',freeze.parserContract?.numericPolicyGeneralRows13To14Digits===124);
+add('LONG_NUMERIC_IDENTITIES_FROZEN',freeze.parserContract?.numericPolicyGeneralUniqueSourceIdentities13To14Digits===123);
+add('MAX_DIGITS_SAFE',freeze.parserContract?.maxNumericPolicyDigits===14&&freeze.parserContract?.numberMaxSafeIntegerCompatible===true);
+add('JS_LONG_IDENTITY_PLAIN',String(1234567890123)==='1234567890123'&&String(12345678901234)==='12345678901234'&&!/[eE+]/.test(String(12345678901234)));
+add('NO_NUMBER_ONLY_FALLBACK',canonicalizer.includes('unsafeNumberOnlyFallback:0'));
+add('OBSERVABLE_FAILURE_METRICS',canonicalizer.includes('observedMetrics:LAST_METRICS'));
+const failed=checks.filter(x=>!x.ok);
+console.log(JSON.stringify({schemaVersion:'orbit360-test-vehicles-numeric-policy-identity-v1',status:failed.length?'FAIL':'PASS',total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,containsPII:false,containsSecrets:false},null,2));
+if(failed.length)process.exit(41);
