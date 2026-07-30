@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "orbit360-vehicles-source-freeze-v1",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-30",
+  "sources": {
+    "historical": {
+      "name": "Autos.xlsx",
+      "driveFileId": "1lHKV1BBQy3KeMAc-khTW_wL2sD1hyQVW",
+      "sha256": "68904f19705cfa742bba11219725ce1f10de7912d82b88dc085f4119cc3204af",
+      "dataRows": 1041
+    },
+    "delta": {
+      "name": "Autos a partir de julio 2026.xlsx",
+      "driveFileId": "1wlCUk68rWVnKEgQSmaxmxsIw7WNo5WLI",
+      "sha256": "dbd31e3436946ef65bb737068394e6ee5eed44dc4a2dd96fcf975d5b3995f1d2",
+      "dataRows": 19
+    },
+    "canonicalPolicies": {
+      "name": "ORBIT360-AYS-POLIZAS-CANONICAL-PRIVATE-20260730",
+      "driveFileId": "1NXHACZ11815882AhoyGrQQCb9Amgbi95",
+      "sha256": "b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f",
+      "policies": 1373
+    }
+  },
+  "dryRun": {
+    "rawRows": 1060,
+    "canonicalSourceIdentities": 1036,
+    "duplicateGroups": 18,
+    "duplicateExtraRowsMerged": 24,
+    "vehiclePolicyRelationsCreate": 1032,
+    "qualityPending": 60,
+    "excluded": 4,
+    "excludedReason": "ESTADO_FUENTE_ELIMINADA",
+    "mappingNumeroVigencia": 1030,
+    "mappingNumeroVigenciaNombre": 2,
+    "unsafeNumberOnlyFallback": 0,
+    "sourcePolicyMetadataConflictGroups": 3,
+    "logicalSha256": "4e9545dc580782470ea2e1b2b8a421a16f8cd152ed03264f7b7a30ea14fadc0d",
+    "targetIdDigest": "c5a5eb51b69eedef33588c6e3bb8bb3746ceac8bffc4a7a9181ebcbe4995682d"
+  },
+  "identityContract": {
+    "writeUnit": "vehicle_policy_association",
+    "dedupWithinSamePolicyVersion": true,
+    "collapseAcrossPolicyRenewals": false,
+    "physicalVehicleKey": "candidate_plate_only",
+    "plateOnlyDoesNotReassignClientOwnership": true,
+    "vinRequired": false,
+    "missingPlatePersistiblePendingQuality": true,
+    "sourcePolicyStatusOperational": false,
+    "canonicalPolicyParentAuthoritative": true
+  },
+  "downstreamWrites": {
+    "receipts": 0,
+    "cartera": 0,
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "realWriteExecuted": false,
+  "authorizationRequiredForWrite": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
