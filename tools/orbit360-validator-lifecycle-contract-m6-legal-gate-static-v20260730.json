@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block6-go-live-product-v20260730",
+  "gateContractVersion": "6.1.15",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "M6_PRODUCT_SMOKE_VALIDATOR_REMEDIATION_STATIC",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "previousRecoveryRun": 30551563820,
+  "previousRecoveryArtifact": 8763037814,
+  "previousRecoveryResult": "ROLLED_BACK_SAFE",
+  "previousRecoveryClassification": "VALIDATOR_STALE",
+  "rootCause": "LEGAL_GATE_DEFERRED_RENDER_RACE",
+  "productFrozen": true,
+  "retriesStopped": true,
+  "reusableBrowserReadinessRequired": true,
+  "futureModulesReuseRequired": true,
+  "storageDeferredFailClosed": true,
+  "productDataWritesAllowed": false,
+  "functionsDeployAllowed": false,
+  "mergeMainAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
