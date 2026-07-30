@@ -1,0 +1,40 @@
+{
+  "firestore": {
+    "rules": "firestore.product-readonly.rules"
+  },
+  "storage": {
+    "rules": "storage.product-readonly.rules"
+  },
+  "hosting": {
+    "public": "orbit360-platform",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "runtime-gate-crm-v20260716/**",
+      "docs/**"
+    ],
+    "cleanUrls": false,
+    "trailingSlash": false,
+    "headers": [
+      {
+        "source": "/index.html",
+        "headers": [
+          {"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}
+        ]
+      },
+      {
+        "source": "/product-runtime-config.js",
+        "headers": [
+          {"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}
+        ]
+      },
+      {
+        "source": "/sw.js",
+        "headers": [
+          {"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}
+        ]
+      }
+    ]
+  }
+}
