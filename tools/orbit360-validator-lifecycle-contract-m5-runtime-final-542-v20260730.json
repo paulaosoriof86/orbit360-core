@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-validator-lifecycle-contract-m5-runtime-final-542-v1",
+  "issuedAt":"2026-07-30",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pullRequest":5,
+  "gateId":"block5-release-candidate-visualization-v20260728",
+  "gateContractVersion":"5.0.42",
+  "validatorLifecycleRevision":"phase-capability-contract-v1",
+  "classification":"LAB_RUNTIME_GATE",
+  "executionProfile":{"phase":"LAB_RUNTIME_GATE","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},"operationalWritesAuthorized":false},
+  "baseline":{"controlOverlay":"tools/orbit360-m5-release-candidate-control-overlay-541-v20260730.json","descriptor":"tools/orbit360-m5-release-candidate-descriptor-540-v20260730.json","releaseCandidateHash":"9bd2c847a2884be900283f86802dbbd0390ae5bc6ccc17b3a5cf4d389c78a4ee","criticalAssets":46,"remoteAssetsExpected":29,"remoteAssetsMatched":29,"academiaStaticWritePolicyVersion":"20260730.1"},
+  "authorization":{"source":"user_autorizado_runtime_final_m5_20260730","runtimeSmokeAuthorized":true,"allowedExecutions":1,"requestRequired":true,"visualReviewAuthorized":false,"productionAuthorized":false},
+  "antiFragmentation":{"singleWorkflow":true,"noPrepRouterPackageChain":true,"closedWorkReused":true},
+  "containsPII":false,
+  "containsSecrets":false
+}
