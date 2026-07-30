@@ -1,45 +1,16 @@
-name: Orbit 360 · M5 5.0.37 fixture diagnostic
-run-name: M5 5.0.37 · diagnose static producer fixture · ${{ github.sha }}
+name: Orbit 360 · M5 5.0.37 fixture diagnostic · FROZEN
 
 on:
-  push:
-    branches:
-      - ays/backend-tenant-lab-v99-20260703
-    paths:
-      - 'tools/orbit360-m5-academia-fixture-diagnostic-537-trigger-v20260729.json'
+  workflow_dispatch:
 
 permissions:
   contents: read
-  statuses: write
 
 jobs:
-  diagnose:
+  frozen:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 1
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Ejecutar fixture aislado
-        id: fixture
-        continue-on-error: true
-        shell: bash
+      - name: Diagnostic already closed
         run: |
-          set -o pipefail
-          node tools/orbit360-m5-academia-static-producer-inventory-537-fixture-v20260729.mjs 2>&1 | tee /tmp/fixture-537.log
-          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-      - name: Publicar diagnóstico observable
-        if: always()
-        uses: actions/github-script@v7
-        env:
-          EXIT_CODE: ${{ steps.fixture.outputs.exit_code }}
-        with:
-          script: |
-            const fs=require('fs');const ok=process.env.EXIT_CODE==='0';
-            let detail='';try{detail=fs.readFileSync('/tmp/fixture-537.log','utf8').split(/\r?\n/).filter(Boolean).slice(-1)[0]||'';}catch(e){}
-            const description=ok?'Fixture 5.0.37 isolated PASS':('Fixture fail: '+detail).slice(0,140);
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state:ok?'success':'failure',context:'orbit360/m5-academia-fixture-diagnostic-537',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+          echo 'M5 5.0.37 fixture diagnostic closed after isolating unrelated seed premium dependency; rerun forbidden.' >&2
+          exit 41
