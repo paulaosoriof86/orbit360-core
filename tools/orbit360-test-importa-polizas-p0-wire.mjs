@@ -8,18 +8,13 @@ const memory = { polizas: [], cobros: [], recibosEsperados: [] };
 global.window = global;
 global.document = { addEventListener() {}, head: { appendChild() {} }, createElement() { return {}; } };
 global.Orbit = {
-  ui: { today: () => '2026-07-09' },
+  ui: { today: () => '2026-07-30' },
   store: {
     all(coll) { return memory[coll] || []; },
     get(coll, id) { return (memory[coll] || []).find(x => x.id === id); },
     where(coll, fn) { return (memory[coll] || []).filter(fn); },
     insert(coll, rec) { if (!memory[coll]) memory[coll] = []; memory[coll].push(rec); return rec; },
     update(coll, id, patch) { const row = this.get(coll, id); if (row) Object.assign(row, patch); return row; }
-  },
-  primas: {
-    cuotasDe(freq) { return String(freq || '').toLowerCase().includes('mens') ? 12 : 1; },
-    desglose(neta) { return { neta, total: neta, iva: 0, gastosEmision: 0, gastosFinan: 0, otros: 0 }; },
-    recibos(d, opts) { return [{ n: 1, total: d.total, neta: d.neta, iva: d.iva, vence: opts.vigenciaInicio, fechaLimite: opts.vigenciaInicio }]; }
   }
 };
 
@@ -32,15 +27,19 @@ Orbit.store.insert('polizas', {
 });
 
 assert.equal(memory.polizas.length, 1);
-assert.equal(memory.polizas[0].estadoOperativoOrbit, 'vigente_renovada');
-assert.equal(memory.recibosEsperados.length, 1);
-assert.equal(memory.recibosEsperados[0].estadoCartera, 'recibo_esperado');
-assert.equal(memory.cobros.length, 0);
+assert.equal(memory.polizas[0].estadoOperativoOrbit, 'historica_renovada');
+assert.equal(memory.polizas[0].estadoCartera, 'no_exigible');
+assert.equal(memory.recibosEsperados.length, 0);
+assert.equal(Orbit.importaPolizasP0Wire.directReceiptGeneration, false);
 
+// El wire solo redirige un recibo que el flujo canónico ya decidió generar;
+// nunca lo interpreta como pago confirmado ni lo deja en cobros legacy.
 Orbit.store.insert('cobros', { id: 'cob_imp_pol_2_0', importado: true, polizaId: 'pol_2', monto: 100, moneda: 'GTQ', estado: 'Pendiente' });
 assert.equal(memory.cobros.length, 0);
-assert.equal(memory.recibosEsperados.length, 2);
-assert.equal(memory.recibosEsperados[1].estado, 'esperado');
-assert.equal(memory.recibosEsperados[1].confirmadoPago, false);
+assert.equal(memory.recibosEsperados.length, 1);
+assert.equal(memory.recibosEsperados[0].estado, 'esperado');
+assert.equal(memory.recibosEsperados[0].estadoCartera, 'recibo_esperado');
+assert.equal(memory.recibosEsperados[0].confirmadoPago, false);
+assert.equal(memory.recibosEsperados[0].conciliado, false);
 
-console.log('OK P0 policy wire smoke passed');
+console.log(JSON.stringify({status:'PASS',renovadaHistorical:true,directReceiptGeneration:false,legacyCobroRedirected:true,confirmedPayment:false},null,2));
