@@ -1,4 +1,4 @@
-name: Orbit 360 · Recibos/Cartera 9.1.0 · hydration diagnostic read-only
+name: Orbit 360 · Recibos/Cartera 9.1.0 · canonical read-only diagnostic runner
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
@@ -26,48 +26,52 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verificar origen y alcance read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.schemaVersion=="orbit360-hydration-diagnostic-trigger-v3" and .sourceHostingRun==30631820866 and .sourceHostingArtifact==8793675831 and .hostingDeployAlreadyConsumed==true and .classification=="STOP_RETRY_ROLE_ROUTE_DIAGNOSTIC" and .hostingRedeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .browserReadOnly==true and .production==false' .github/orbit360-triggers/receipts-portfolio-hydration-diagnostic-v910-20260730.json >/dev/null
+          node --check tools/orbit360-receipts-portfolio-role-route-diagnostic-v910-20260730.mjs
       - name: Gate canónico antes de secret/browser
         env:
           ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-receipts-portfolio-hydration-diagnostic-v910-20260730.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Preparar navegador después del gate
         shell: bash
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.52.0
           npx playwright install --with-deps chromium
-      - name: Capturar hidratación LAB read-only
+      - name: Capturar transición rol/ruta sin PII
         env:
           ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
           ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
-          ORBIT360_DIAG_WAIT_MS: '15000'
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-receipts-portfolio-hydration-diagnostic-v910-20260730.mjs
-          jq -e '.ok==true and .status=="HYDRATION_DIAGNOSTIC_CAPTURED" and .readOnly==true and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/receipts-portfolio-hydration-diagnostic-v910.json" >/dev/null
+          node tools/orbit360-receipts-portfolio-role-route-diagnostic-v910-20260730.mjs
+          jq -e '.ok==true and .status=="ROLE_ROUTE_DIAGNOSTIC_CAPTURED" and .baselineReady==true and .readOnly==true and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false and .containsPII==false and .containsSecrets==false' "$EVIDENCE_DIR/receipts-portfolio-role-route-diagnostic-v910.json" >/dev/null
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-receipts-portfolio-hydration-diagnostic-v910-${{ github.run_id }}
+          name: orbit360-receipts-portfolio-role-route-diagnostic-v910-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-hydration-diagnostic-v910.json
+            orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-role-route-diagnostic-v910.json
           if-no-files-found: warn
           retention-days: 30
       - name: Publicar estado
         if: always()
         uses: actions/github-script@v7
         env:
-          DIAG: orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-hydration-diagnostic-v910.json
+          DIAG: orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-role-route-diagnostic-v910.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='Hydration diagnostic failed';
-            try{const d=JSON.parse(fs.readFileSync(process.env.DIAG,'utf8'));if(d.ok===true&&d.status==='HYDRATION_DIAGNOSTIC_CAPTURED'){state='success';description='Hydration diagnostic captured; read-only';}}catch(e){}
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/receipts-portfolio-hydration-diagnostic-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+            const fs=require('fs');let state='failure',description='Role-route diagnostic failed';
+            try{const d=JSON.parse(fs.readFileSync(process.env.DIAG,'utf8'));if(d.ok===true&&d.status==='ROLE_ROUTE_DIAGNOSTIC_CAPTURED'){state='success';description='Role-route diagnostic captured; zero deploy';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/receipts-portfolio-role-route-diagnostic-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
