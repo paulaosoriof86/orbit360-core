@@ -15,11 +15,13 @@ add('PREMIUM_BLANK_NOT_ZERO', detail.includes('function numberOrNull') && detail
 add('POLICY_QUALITY_FAIL_CLOSED', detail.includes('policyCompleteness') && detail.includes('Información pendiente de completar'));
 add('DETAIL_MONEY_PRESERVES_CENTS', detail.includes('moneyDetail') && detail.includes('minimumFractionDigits:2'));
 add('DARK_HEADER_ACTION_VISIBLE', detail.includes('background:transparent') && detail.includes('Volver al cliente'));
+add('PREMIUM_SCHEDULE_BREAKDOWN', detail.includes('premiumBreakdown') && detail.includes("sum('gastosExpedicion')") && detail.includes("sum('gastosFinanciamiento')") && detail.includes("sum('impuestosIVA')") && detail.includes('Descuento / ajuste (campo fuente)'));
 
 // Vehicle and receipt navigation must have real details, not dead-end rows/cards.
-add('VEHICLE_TAB_FULLPAGE_ACTION', client.includes("verVehiculo('${v.id}')") && client.includes('Ver vehículo completo'));
+add('VEHICLE_TAB_FULLPAGE_ACTION', detail.includes('Ver vehículo completo') && detail.includes('patchLegacyCards') && detail.includes('verVehiculo(v.id)'));
 add('RECEIPT_DETAIL_OWNER', receipts.includes('renderReceiptDetail') && receipts.includes('data-rp-receipt-id'));
 add('RECEIPT_DETAIL_USES_EXPECTED', receipts.includes("Orbit.store.get('recibosEsperados'") && receipts.includes('Pago reportado · por conciliar'));
+add('RECEIPT_DETAIL_NOT_RECONCILED_COBRO', receipts.includes('todavía no crea un cobro conciliado') && receipts.includes('los cobros conciliados se administran por separado'));
 
 // Global Policies must not freeze on 1,373 policies and must consume canonical receipts.
 add('POLICIES_INDEXED_VEHICLES', policies.includes('vehiclesByPolicy') && !policies.includes("S().all('vehiculos').find(v => v.polizaId === p.id)"));
@@ -28,9 +30,9 @@ add('POLICIES_EXPECTED_RECEIPTS', policies.includes("S().all('recibosEsperados')
 add('POLICIES_MISSING_COMPONENTS_NOT_ZERO', !policies.includes('(p.gastosEmision || 0) + (p.gastosFinan || 0) + (p.otros || 0)'));
 
 // The visible premium label must not silently mix net and total concepts.
-add('CLIENT_PREMIUM_LABEL_EXPLICIT', client.includes('Prima total anual vigente') || client.includes('Prima neta anual vigente'));
+add('CLIENT_PREMIUM_LABEL_EXPLICIT', detail.includes('Prima total anual vigente') || client.includes('Prima total anual vigente') || client.includes('Prima neta anual vigente'));
 
 const failed=checks.filter(x=>!x.ok);
-const out={schemaVersion:'orbit360-human-visual-contract-v1',status:failed.length?'FUNCTIONAL_DEFECT':'HUMAN_VISUAL_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-human-visual-contract-v2',status:failed.length?'FUNCTIONAL_DEFECT':'HUMAN_VISUAL_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));
 if(failed.length) process.exit(41);
