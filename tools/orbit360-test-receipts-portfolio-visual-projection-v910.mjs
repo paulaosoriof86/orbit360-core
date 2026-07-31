@@ -10,6 +10,8 @@ add('SYNC_SYNTAX_FILE',fs.existsSync(sync));
 add('TENANT_SCOPED',p.includes("db.collection('tenantId').doc(tenant).collection(name)"));
 add('SUPPLEMENTAL_ONLY',p.includes("NAMES=['recibosEsperados','carteraPrimas']"));
 add('STORE_API_PRESERVED',p.includes('S.all=function')&&p.includes('S.get=function')&&p.includes('S.where=function')&&p.includes('S.find=function'));
+add('STORE_WRAP_IDEMPOTENT',p.includes('if(wrappedStore)return true;')&&p.includes("if(!Orbit.store||typeof Orbit.store.all!=='function')return false;"));
+add('ATTACH_CAN_REUSE_WRAPPED_STORE',p.includes('function attach(){')&&p.includes('if(!wrapStore())return false;')&&p.includes('if(wrappedStore)return true;'));
 add('NO_FIRESTORE_WRITE_API',!p.includes('.set(')&&!p.includes('.update(')&&!p.includes('.delete(')&&!p.includes('.add(')&&!p.includes('.batch(')&&!p.includes('.commit('));
 add('READONLY_DECLARED',p.includes("readOnly:true")&&p.includes('onSnapshot'));
 add('COBROS_SEPARATE',p.includes("Orbit.store.where('cobros'")&&p.includes('Aún no hay cobros aplicados')&&p.includes('no se infieren desde este calendario'));
@@ -28,5 +30,5 @@ add('HIST_POLICY_HONEST',p.includes('Histórico · saldo exigible')&&p.includes(
 add('SYNC_LOADS_PROJECTION',s.includes('backend-lab-receipts-portfolio-projection-v910.js'));
 add('SYNC_COUNTS',s.includes("collectionCount('recibosEsperados')")&&s.includes("collectionCount('carteraPrimas')")&&s.includes("collectionCount('cobros')"));
 add('SYNC_RENDERS_POLICIES',s.includes("key === 'polizas'"));
-const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-receipts-portfolio-visual-projection-static-v1',contractVersion:'9.1.0',status:failed.length?'FUNCTIONAL_DEFECT':'VISUAL_PROJECTION_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,firestoreRead:false,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-receipts-portfolio-visual-projection-static-v2',contractVersion:'9.1.0',status:failed.length?'FUNCTIONAL_DEFECT':'VISUAL_PROJECTION_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,firestoreRead:false,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
