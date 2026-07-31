@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-vehicles-write-request-v1",
+  "approved": true,
+  "phrase": "AUTORIZO ESCRITURA CONTROLADA VEHICULOS AYS 20260730",
+  "logicalSha256": "4e9545dc580782470ea2e1b2b8a421a16f8cd152ed03264f7b7a30ea14fadc0d",
+  "targetIdDigest": "c5a5eb51b69eedef33588c6e3bb8bb3746ceac8bffc4a7a9181ebcbe4995682d",
+  "scope": {
+    "vehicles": 1032,
+    "audit": 1,
+    "clients": 0,
+    "insurers": 0,
+    "policies": 0,
+    "receipts": 0,
+    "cartera": 0,
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "confirmedBy": "paula",
+  "reason": "Carga inicial canónica de vehículos A&S conforme PREWRITE_READY 20260730"
+}
