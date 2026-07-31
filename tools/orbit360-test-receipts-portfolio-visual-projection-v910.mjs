@@ -43,7 +43,7 @@ add('CLIENT_PROJECTION_ZERO_BACKEND_WRITES',!cp.includes("Orbit.store.insert(")&
 add('SYNC_LOADS_PROJECTION',s.includes('backend-lab-receipts-portfolio-projection-v910.js'));
 add('SYNC_COUNTS',s.includes("collectionCount('recibosEsperados')")&&s.includes("collectionCount('carteraPrimas')")&&s.includes("collectionCount('cobros')"));
 add('SYNC_RENDERS_POLICIES',s.includes("key === 'polizas'"));
-add('POLICY_CANONICAL_ALIAS',d.includes('p.primaTotal')&&d.includes('p.primaNeta')&&d.includes('out.prima = out.primaTotal'));
+add('POLICY_CANONICAL_ALIAS',d.includes('p.primaTotal')&&d.includes('p.primaNeta')&&d.includes('out.primaTotal = total;')&&d.includes('out.prima = total;')&&!d.includes('out.primaTotal = total != null ? total : net'));
 add('VEHICLE_CANONICAL_ALIAS',d.includes('v.placaNormalizada')&&d.includes('v.anioModelo')&&d.includes('v.chasisFuente')&&d.includes('v.motorFuente'));
 add('CLIENT_SUMMARY_INDEXED',d.includes("policiesByClient: group(policies, 'clienteId')")&&d.includes('summaries = new Map()')&&d.includes('if (summaries.has(clientId))'));
 add('POLICY_FULLPAGE_OWNER',d.includes('data-policy-fullpage="1"')&&d.includes('fullPagePolicy: true')&&d.includes('noReadModal: true'));
