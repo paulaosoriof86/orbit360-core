@@ -15,10 +15,11 @@
   var cache={recibosEsperados:[],carteraPrimas:[]};
   var unsub=[];
   var wrappedStore=false,wrappedQuery=false,wrappedClient=false,wrappedPolicies=false;
-  var status={version:'9.1.0',ownerRevision:'20260731.2',tenantId:tenant,readOnly:true,attached:[],counts:{recibosEsperados:0,carteraPrimas:0},errors:{},owners:{query:false,client:false,policies:false},ready:false};
+  var status={version:'9.1.0',ownerRevision:'20260731.3-human-visual',tenantId:tenant,readOnly:true,attached:[],counts:{recibosEsperados:0,carteraPrimas:0},errors:{},owners:{query:false,client:false,policies:false},ready:false};
   var recFilter={};
   var clean=function(v){return String(v==null?'':v).trim();};
   var num=function(v){var n=Number(v);return Number.isFinite(n)?n:0;};
+  var numberOrNull=function(v){if(v==null||clean(v)==='')return null;var n=Number(v);return Number.isFinite(n)?n:null;};
   var rowId=function(r){return r&&(r.id||r.uid||r.codigo||r.numero||r.key);};
   var clone=function(v){try{return JSON.parse(JSON.stringify(v));}catch(e){return v;}};
   var isSupplemental=function(name){return NAMES.indexOf(name)>=0;};
@@ -26,8 +27,9 @@
   var dueDate=function(r){return clean(r&&(r.fechaLimite||r.vence||r.fechaVencimiento));};
   var isFuture=function(r){return clean(r&&r.exigibilidad)==='futura'||clean(r&&r.estadoOperativo)==='futuro_pendiente';};
   var isHistorical=function(r){return r&&((r.historicalExigible===true)||clean(r.carteraTipo)==='cartera_historica_exigible'||clean(r.exigibilidad)==='historica_exigible');};
-  function esc(v){try{return Orbit.ui&&Orbit.ui.esc?Orbit.ui.esc(v):clean(v).replace(/[&<>"']/g,function(ch){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];});}catch(e){return clean(v);}}
+  function esc(v){try{return Orbit.ui&&Orbit.ui.esc?Orbit.ui.esc(v):clean(v).replace(/[&<>"']/g,function(ch){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'})[ch];});}catch(e){return clean(v);}}
   function money(v,cur){try{return Orbit.ui&&Orbit.ui.money?Orbit.ui.money(v,cur||'GTQ'):(cur||'GTQ')+' '+num(v).toFixed(2);}catch(e){return (cur||'GTQ')+' '+num(v).toFixed(2);}}
+  function moneyDetail(v,cur){var n=numberOrNull(v);if(n==null)return'Pendiente de completar';var code=clean(cur||'GTQ'),symbol=code==='GTQ'?'Q':code==='COP'?'$':code==='USD'?'US$':code==='EUR'?'€':code;try{return symbol+' '+n.toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2});}catch(e){return symbol+' '+n.toFixed(2);}}
   function fmtDate(v){try{return Orbit.ui&&Orbit.ui.fmtDate?Orbit.ui.fmtDate(v):clean(v);}catch(e){return clean(v);}}
   function stateLabel(r){
     var s=clean(r&&r.estadoOperativo);
@@ -104,18 +106,26 @@
         return markSummaryApplied(r);
       };
       try{Object.defineProperty(projected,'__orbitRpV910QueryOwner',{value:true});}catch(e){}
-      q.clienteResumen=projected;
-      q.__rpV910ClienteResumenOwner=projected;
+      q.clienteResumen=projected;q.__rpV910ClienteResumenOwner=projected;
     }
-    wrappedQuery=q.__rpV910ClienteResumenOwner===q.clienteResumen;
-    status.owners.query=wrappedQuery;
-    return wrappedQuery;
+    wrappedQuery=q.__rpV910ClienteResumenOwner===q.clienteResumen;status.owners.query=wrappedQuery;return wrappedQuery;
   }
   function activeClientId(){try{return Orbit.route&&Orbit.route.params&&Orbit.route.params.c||'';}catch(e){return'';}}
   function patchHeader(cid){
     var p=portfolioSummary(cid);document.querySelectorAll('.fh-kpis>div').forEach(function(cell){var lab=cell.querySelector('.fh-kpi-lab'),val=cell.querySelector('.fh-kpi-val');if(!lab||!val)return;var t=clean(lab.textContent);if(t.indexOf('Cartera al día')>=0){lab.textContent='Cartera por vencer';val.textContent=money(p.futureAmount,(Orbit.store.get('clientes',cid)||{}).moneda||'GTQ');}else if(t.indexOf('Cartera vencida')>=0){lab.textContent='Cartera exigible';val.textContent=money(p.dueAmount,(Orbit.store.get('clientes',cid)||{}).moneda||'GTQ');}});
   }
   function policyLabel(p){var a=Orbit.store.get('aseguradoras',p.aseguradoraId)||{};return clean(p.numero||'—')+(a.nombre?' · '+clean(a.nombre):'');}
+  function receiptStateNote(r){var s=clean(r&&r.estadoOperativo);if(s==='pago_reportado')return'Existe evidencia de pago reportado, pero aún no es un cobro conciliado.';if(s==='no_pendiente_segun_aseguradora')return'La aseguradora no reporta saldo pendiente; esta evidencia todavía no crea un cobro conciliado.';if(s==='requiere_validacion_estado')return'El estado requiere validación antes de cualquier conciliación.';return'Este registro pertenece al calendario de recibos; los cobros conciliados se administran por separado.';}
+  function renderReceiptDetail(receiptId,cid){
+    var r=Orbit.store.get('recibosEsperados',receiptId);if(!r)return false;
+    var p=Orbit.store.get('polizas',r.polizaId)||{},c=Orbit.store.get('clientes',cid||r.clienteId)||{},v=Orbit.store.where('vehiculos',function(x){return x&&x.polizaId===r.polizaId;})[0]||{},portfolio=Orbit.store.where('carteraPrimas',function(x){return x&&x.reciboId===r.id;})[0]||null,cur=r.moneda||p.moneda||c.moneda||'GTQ',st=stateLabel(r),target=document.getElementById('host')||document.getElementById('c360-body');if(!target)return false;
+    var back='#/cliente360?c='+encodeURIComponent(cid||r.clienteId||p.clienteId||'')+'&t=recibos';
+    var cell=function(k,val){return'<div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">'+esc(k)+'</div><div style="font-weight:650;margin-top:2px">'+esc(val==null||clean(val)===''?'Pendiente de completar':val)+'</div></div>';};
+    target.innerHTML='<div class="page orbit-receipt-fullpage" data-rp-receipt-detail="1"><div class="crumb" style="margin-bottom:14px"><a href="'+back+'" style="color:var(--red)">‹ Volver a Recibos y pagos</a> / Recibo '+esc(r.serie||r.numeroReciboFuente||'')+'</div><div class="card" style="overflow:hidden;margin-bottom:16px"><div style="padding:20px 22px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap"><div><div style="color:rgba(255,255,255,.7);font-size:11px;text-transform:uppercase;letter-spacing:.12em">Recibo esperado · '+esc(r.serie||'—')+'</div><h2 style="color:#fff;margin:4px 0">Póliza '+esc(r.polizaNumero||p.numero||'—')+'</h2><div style="color:rgba(255,255,255,.85)">'+esc([v.marca,v.linea,v.placa].filter(Boolean).join(' ')||p.ramo||'')+'</div></div><span class="badge '+st.c+'">'+esc(st.t)+'</span></div></div><div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:16px"><section class="card pad"><h3 style="margin-top:0">Desglose del recibo</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">'+cell('Prima neta',moneyDetail(r.primaNeta,cur))+cell('Gastos de expedición',moneyDetail(r.gastosExpedicion,cur))+cell('Gastos financieros',moneyDetail(r.gastosFinanciamiento,cur))+cell('Descuento / ajuste (campo fuente)',moneyDetail(r.descuento,cur))+cell('IVA / impuestos',moneyDetail(r.impuestosIVA,cur))+cell('Prima total',moneyDetail(r.primaTotal,cur))+cell('Fecha límite',fmtDate(dueDate(r)))+cell('Fecha pago reportada',r.fechaPagoReportada?fmtDate(r.fechaPagoReportada):'No reportada')+'</div></section><div style="display:grid;gap:16px"><section class="card pad"><h3 style="margin-top:0">Estado y conciliación</h3><div style="margin-bottom:10px"><span class="badge '+st.c+'">'+esc(st.t)+'</span></div><div class="muted" style="line-height:1.5">'+esc(receiptStateNote(r))+'</div>'+ (portfolio?'<div style="margin-top:10px">En cartera: <b>'+esc(moneyDetail(portfolio.primaTotal||r.primaTotal,cur))+'</b></div>':'') +'</section><section class="card pad"><h3 style="margin-top:0">Trazabilidad</h3>'+cell('Fuente autoridad',r.fuenteAutoridad||'Pendiente de completar')+cell('Corte de fuente',r.fechaCorteFuente||'Pendiente de completar')+cell('Calidad de match',r.matchQuality||'Pendiente de completar')+'</section></div></div></div>';
+    return true;
+  }
+  function openReceiptDetail(receiptId,cid){return renderReceiptDetail(receiptId,cid);}
+  function wireReceiptRows(body,cid){if(!body)return;body.querySelectorAll('[data-rp-receipt-id]').forEach(function(row){row.addEventListener('click',function(){openReceiptDetail(row.getAttribute('data-rp-receipt-id'),cid);});});}
   function renderReceipts(cid){
     var body=document.getElementById('c360-body');if(!body)return;
     var receipts=Orbit.q.recibosEsperadosDe(cid).slice().sort(function(a,b){return dueDate(a).localeCompare(dueDate(b));});
@@ -124,11 +134,9 @@
     var selected=recFilter[cid]||'todas';var shown=selected==='todas'?receipts:receipts.filter(function(r){return r.polizaId===selected;});
     var ps=portfolioSummary(cid),cur=(Orbit.store.get('clientes',cid)||{}).moneda||'GTQ';
     var opts='<option value="todas">Todas las pólizas</option>'+policies.map(function(p){return'<option value="'+esc(p.id)+'" '+(selected===p.id?'selected':'')+'>'+esc(policyLabel(p))+'</option>';}).join('');
-    var rows=shown.map(function(r){var c=byReceipt[r.id]||null,p=Orbit.store.get('polizas',r.polizaId)||{},v=Orbit.store.where('vehiculos',function(x){return x&&x.polizaId===r.polizaId;})[0],st=stateLabel(r),hist=isHistorical(r)||isHistorical(c),kind=hist?'Histórica exigible':'Calendario activo',veh=v?[v.marca,v.linea,v.placa].filter(Boolean).join(' '):'';return'<tr><td><b>'+esc(r.polizaNumero||p.numero||'—')+'</b><div class="muted" style="font-size:11px">'+esc(veh||p.ramo||'')+'</div></td><td><span class="badge '+(hist?'info':'neutral')+'">'+kind+'</span></td><td>'+esc(r.serie||r.numeroReciboFuente||'—')+'</td><td>'+fmtDate(dueDate(r))+'</td><td class="num">'+money(amount(r),r.moneda||cur)+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td></tr>';}).join('');
-    body.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="rp-v910-policy" class="o-sel" style="max-width:360px">'+opts+'</select><span class="muted" style="margin-left:auto;font-size:12px">'+shown.length+' de '+receipts.length+' recibos</span></div>'+
-      '<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px" class="rp-v910-kpis"><div class="mini-stat"><div class="muted">Por vencer</div><b>'+money(ps.futureAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">Exigible</div><b>'+money(ps.dueAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">Histórica exigible</div><b>'+money(ps.historicalAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">En cartera</div><b>'+portfolio.length+'</b></div></div>'+
-      '<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Póliza / riesgo</th><th>Tipo</th><th>Serie / recibo</th><th>Vence</th><th class="num">Monto</th><th>Estado</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="muted" style="text-align:center;padding:24px">No hay recibos esperados registrados para este cliente.</td></tr>')+'</tbody></table></div><div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Un pago reportado permanece pendiente de conciliación. Los cobros aplicados se muestran por separado y no se infieren desde este calendario.</div></div>';
-    var sel=body.querySelector('#rp-v910-policy');if(sel)sel.addEventListener('change',function(){recFilter[cid]=sel.value;renderReceipts(cid);});
+    var rows=shown.map(function(r){var c=byReceipt[r.id]||null,p=Orbit.store.get('polizas',r.polizaId)||{},v=Orbit.store.where('vehiculos',function(x){return x&&x.polizaId===r.polizaId;})[0],st=stateLabel(r),hist=isHistorical(r)||isHistorical(c),kind=hist?'Histórica exigible':'Calendario activo',veh=v?[v.marca,v.linea,v.placa].filter(Boolean).join(' '):'';return'<tr class="clickable" data-rp-receipt-id="'+esc(r.id)+'"><td><b>'+esc(r.polizaNumero||p.numero||'—')+'</b><div class="muted" style="font-size:11px">'+esc(veh||p.ramo||'')+'</div></td><td><span class="badge '+(hist?'info':'neutral')+'">'+kind+'</span></td><td>'+esc(r.serie||r.numeroReciboFuente||'—')+'</td><td>'+fmtDate(dueDate(r))+'</td><td class="num">'+moneyDetail(amount(r),r.moneda||cur)+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td></tr>';}).join('');
+    body.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="rp-v910-policy" class="o-sel" style="max-width:360px">'+opts+'</select><span class="muted" style="margin-left:auto;font-size:12px">'+shown.length+' de '+receipts.length+' recibos</span></div><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px" class="rp-v910-kpis"><div class="mini-stat"><div class="muted">Por vencer</div><b>'+money(ps.futureAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">Exigible</div><b>'+money(ps.dueAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">Histórica exigible</div><b>'+money(ps.historicalAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">En cartera</div><b>'+portfolio.length+'</b></div></div><div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Póliza / riesgo</th><th>Tipo</th><th>Serie / recibo</th><th>Vence</th><th class="num">Monto</th><th>Estado</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="muted" style="text-align:center;padding:24px">No hay recibos esperados registrados para este cliente.</td></tr>')+'</tbody></table></div><div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Un pago reportado permanece pendiente de conciliación. Los cobros aplicados se muestran por separado y no se infieren desde este calendario. Clic en un recibo abre su detalle.</div></div>';
+    var sel=body.querySelector('#rp-v910-policy');if(sel)sel.addEventListener('change',function(){recFilter[cid]=sel.value;renderReceipts(cid);});wireReceiptRows(body,cid);
   }
   function patchCobros(cid){var body=document.getElementById('c360-body');if(!body)return;var applied=Orbit.store.where('cobros',function(c){return c&&c.clienteId===cid;});if(!applied.length&&!body.querySelector('[data-rp-v910-cobros-note]')){var note=document.createElement('div');note.setAttribute('data-rp-v910-cobros-note','1');note.className='card';note.style.cssText='padding:12px 14px;margin-bottom:12px';note.innerHTML='<b>Cobros aplicados</b><div class="muted" style="font-size:12.5px;margin-top:3px">Aún no hay cobros aplicados para este cliente. Los recibos pendientes y pagos reportados se consultan en <b>Recibos y pagos</b> hasta completar su conciliación.</div>';body.insertBefore(note,body.firstChild);}}
   function patchClient(host){
@@ -139,39 +147,25 @@
   function patchPolicyDrawer(id){
     var drawer=document.getElementById('pol-desg');if(!drawer)return;var p=Orbit.store.get('polizas',id)||{},receipts=Orbit.store.where('recibosEsperados',function(r){return r&&r.polizaId===id;}),portfolio=Orbit.store.where('carteraPrimas',function(r){return r&&r.polizaId===id;}),hist=portfolio.filter(isHistorical);var cur=p.moneda||'GTQ';
     drawer.querySelectorAll('.badge').forEach(function(b){var t=clean(b.textContent);if(t==='Genera cartera')b.textContent='Genera calendario';else if(t==='Histórico (sin cartera)')b.textContent=hist.length?'Histórico · saldo exigible':'Histórico · sin saldo exigible';});
-    var headings=Array.from(drawer.querySelectorAll('div')).filter(function(d){return clean(d.textContent).indexOf('🧾 Recibos generados (')===0&&d.children.length===0;});var h=headings[0];if(h){h.textContent='🧾 Recibos esperados ('+receipts.length+')';var next=h.nextElementSibling;if(next){var html=receipts.slice(0,12).map(function(r){var st=stateLabel(r);return'<tr><td>'+esc(r.serie||'—')+'</td><td class="num">'+money(amount(r),r.moneda||cur)+'</td><td>'+fmtDate(dueDate(r))+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td></tr>';}).join('');next.outerHTML=receipts.length?'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Serie</th><th class="num">Monto</th><th>Vence</th><th>Estado</th></tr></thead><tbody>'+html+'</tbody></table></div>':'<div class="muted" style="font-size:12.5px">Sin recibos esperados registrados.</div>';}}
+    var headings=Array.from(drawer.querySelectorAll('div')).filter(function(d){return clean(d.textContent).indexOf('🧾 Recibos generados (')===0&&d.children.length===0;});var h=headings[0];if(h){h.textContent='🧾 Recibos esperados ('+receipts.length+')';var next=h.nextElementSibling;if(next){var html=receipts.slice(0,24).map(function(r){var st=stateLabel(r);return'<tr class="clickable" data-rp-receipt-id="'+esc(r.id)+'"><td>'+esc(r.serie||'—')+'</td><td class="num">'+moneyDetail(amount(r),r.moneda||cur)+'</td><td>'+fmtDate(dueDate(r))+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td></tr>';}).join('');next.outerHTML=receipts.length?'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Serie</th><th class="num">Monto</th><th>Vence</th><th>Estado</th></tr></thead><tbody>'+html+'</tbody></table></div>':'<div class="muted" style="font-size:12.5px">Sin recibos esperados registrados.</div>';wireReceiptRows(drawer,p.clienteId);}}
   }
   function installVisualBridges(){
     if(!wrappedQuery)return false;
     var mod=Orbit.modules&&Orbit.modules.cliente360;
     if(mod&&typeof mod.render==='function'){
-      if(mod.__rpV910RenderOwner!==mod.render){
-        var cr=mod.render.bind(mod),clientWrapper=function(host){var out=cr(host);setTimeout(function(){patchClient(host);},0);return out;};
-        try{Object.defineProperty(clientWrapper,'__orbitRpV910ClientOwner',{value:true});}catch(e){}
-        mod.render=clientWrapper;mod.__rpV910RenderOwner=clientWrapper;
-      }
-      wrappedClient=mod.__rpV910RenderOwner===mod.render;
+      if(mod.__rpV910RenderOwner!==mod.render){var cr=mod.render.bind(mod),clientWrapper=function(host){var out=cr(host);setTimeout(function(){patchClient(host);},0);return out;};try{Object.defineProperty(clientWrapper,'__orbitRpV910ClientOwner',{value:true});}catch(e){}mod.render=clientWrapper;mod.__rpV910RenderOwner=clientWrapper;}wrappedClient=mod.__rpV910RenderOwner===mod.render;
     }else wrappedClient=false;
     var pol=Orbit.modules&&Orbit.modules.polizas;
     if(pol&&typeof pol.verDesglose==='function'){
-      if(pol.__rpV910PolicyOwner!==pol.verDesglose){
-        var pd=pol.verDesglose.bind(pol),policyWrapper=function(id){var out=pd(id);setTimeout(function(){patchPolicyDrawer(id);},0);return out;};
-        try{Object.defineProperty(policyWrapper,'__orbitRpV910PolicyOwner',{value:true});}catch(e){}
-        pol.verDesglose=policyWrapper;pol.__rpV910PolicyOwner=policyWrapper;
-      }
-      wrappedPolicies=pol.__rpV910PolicyOwner===pol.verDesglose;
+      if(pol.__rpV910PolicyOwner!==pol.verDesglose){var pd=pol.verDesglose.bind(pol),policyWrapper=function(id){var out=pd(id);setTimeout(function(){patchPolicyDrawer(id);},0);return out;};try{Object.defineProperty(policyWrapper,'__orbitRpV910PolicyOwner',{value:true});}catch(e){}pol.verDesglose=policyWrapper;pol.__rpV910PolicyOwner=policyWrapper;}wrappedPolicies=pol.__rpV910PolicyOwner===pol.verDesglose;
     }else wrappedPolicies=false;
-    status.owners.client=wrappedClient;status.owners.policies=wrappedPolicies;
-    return wrappedClient&&wrappedPolicies;
+    status.owners.client=wrappedClient;status.owners.policies=wrappedPolicies;return wrappedClient&&wrappedPolicies;
   }
-  function reconcileOwners(){
-    wrapStore();installQueryProjection();installVisualBridges();
-    setTimeout(function(){try{patchClient(document.getElementById('host'));}catch(e){}},0);
-  }
+  function reconcileOwners(){wrapStore();installQueryProjection();installVisualBridges();setTimeout(function(){try{patchClient(document.getElementById('host'));}catch(e){}},0);}
   function boot(){wrapStore();installQueryProjection();installVisualBridges();try{if(w.firebase&&typeof w.firebase.auth==='function'){w.firebase.auth().onAuthStateChanged(function(user){if(user)attach();else detach();});if(w.firebase.auth().currentUser)attach();}}catch(e){status.errors.auth=clean(e&&e.message||e).slice(0,120);}var tries=0,t=setInterval(function(){tries++;wrapStore();installQueryProjection();installVisualBridges();if(wrappedStore&&wrappedQuery&&wrappedClient&&wrappedPolicies){clearInterval(t);}else if(tries>80){clearInterval(t);}},100);}
   w.addEventListener('hashchange',function(){setTimeout(reconcileOwners,0);});
   w.addEventListener('orbit:lab:canonical-view-hydrated',function(){setTimeout(reconcileOwners,0);});
   try{document.addEventListener('orbit:session',function(){setTimeout(reconcileOwners,0);});}catch(e){}
-  Orbit.receiptsPortfolioProjectionV910={status:function(){var s=clone(status);delete s._emit;return s;},amount:amount,dueDate:dueDate,stateLabel:stateLabel,isHistorical:isHistorical,isFuture:isFuture,renderReceipts:renderReceipts,reconcileOwners:reconcileOwners};
+  Orbit.receiptsPortfolioProjectionV910={status:function(){var s=clone(status);delete s._emit;return s;},amount:amount,dueDate:dueDate,stateLabel:stateLabel,isHistorical:isHistorical,isFuture:isFuture,renderReceipts:renderReceipts,renderReceiptDetail:renderReceiptDetail,openReceiptDetail:openReceiptDetail,reconcileOwners:reconcileOwners};
   boot();
 })();
