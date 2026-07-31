@@ -1,4 +1,4 @@
-name: Orbit 360 · Recibos/Cartera · visual focal sanitizada
+name: Orbit 360 · Recibos/Cartera · visual focal sanitizada fail-closed
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
@@ -18,7 +18,7 @@ env:
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 jobs:
   visual_focal:
-    name: Visual focal sanitizada · zero deploy/write
+    name: Visual focal sanitizada fail-closed · zero deploy/write
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -29,15 +29,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verificar cierre técnico y alcance
+      - name: Verificar recuperación SECURITY_FAILURE y alcance
         env:
           ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          jq -e '.schemaVersion=="orbit360-sanitized-visual-focal-trigger-v1" and .technicalHumanReviewRun==30673945126 and .technicalHumanReviewPassed==true and .sourceHostingRun==30670430241 and .sourceHostingDeployPassed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .production==false and .browserReadOnly==true and .screenshotsSanitized==true' "$TRIGGER" >/dev/null
+          jq -e '.schemaVersion=="orbit360-sanitized-visual-security-recovery-v2" and .classification=="SECURITY_FAILURE" and .invalidatedPriorVisualRun==30674070410 and .invalidatedPriorArtifact==8809808825 and .technicalHumanReviewRun==30673945126 and .technicalHumanReviewPassed==true and .sourceHostingRun==30670430241 and .sourceHostingDeployPassed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .production==false and .browserReadOnly==true and .screenshotsSanitizedFailClosed==true' "$TRIGGER" >/dev/null
           node --check tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
+          grep -Fq "SANITIZATION_RESIDUAL_DYNAMIC_TEXT" tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
+          grep -Fq "fs.rmSync(OUTDIR" tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Preparar navegador
@@ -46,7 +48,7 @@ jobs:
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.52.0
           npx playwright install chromium
-      - name: Generar set visual sanitizado
+      - name: Generar set visual sanitizado fail-closed
         env:
           ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
           ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
@@ -54,16 +56,27 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
-          jq -e '.ok==true and .status=="SANITIZED_VISUAL_SET_READY" and (.screens|length)==6 and .containsPII==false and .containsSecrets==false and .firestoreWrites==0 and .operationalWrites==0 and .hostingDeployExecutions==0 and .production==false' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null
-      - name: Subir evidencia visual sanitizada
-        if: always()
+          jq -e '.schemaVersion=="orbit360-human-review-sanitized-screens-v2" and .ok==true and .status=="SANITIZED_VISUAL_SET_READY" and .securityFailClosed==true and .invalidatedPriorRun==30674070410 and (.screens|length)==6 and .sanitization.residualDynamicText==0 and .sanitization.residualFormValues==0 and .containsPII==false and .containsSecrets==false and .firestoreWrites==0 and .operationalWrites==0 and .hostingDeployExecutions==0 and .production==false' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null
+          test "$(find "$EVIDENCE_DIR/human-review-sanitized-screens" -maxdepth 1 -name '*.png' | wc -l | tr -d ' ')" = '6'
+      - name: Subir evidencia visual sanitizada válida
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-human-review-sanitized-visual-${{ github.run_id }}
+          name: orbit360-human-review-sanitized-visual-secure-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens-v20260731.json
             orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens/*.png
+          if-no-files-found: error
+          retention-days: 30
+      - name: Subir solo diagnóstico si sanitización bloquea
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-human-review-sanitization-blocked-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens-v20260731.json
           if-no-files-found: warn
           retention-days: 30
       - name: Publicar estado
@@ -73,6 +86,6 @@ jobs:
           EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens-v20260731.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='Sanitized focal visual set failed';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok&&p.status==='SANITIZED_VISUAL_SET_READY'&&p.screens?.length===6){state='success';description='Sanitized focal visual set ready';}}catch(e){}
+            const fs=require('fs');let state='failure',description='Sanitization security gate blocked';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='SANITIZED_VISUAL_SET_READY'&&p.securityFailClosed===true&&p.screens?.length===6&&p.sanitization?.residualDynamicText===0&&p.sanitization?.residualFormValues===0&&p.containsPII===false&&p.containsSecrets===false){state='success';description='Sanitized focal visual set secure';}else if(p.error){description=String(p.error).slice(0,100);}}catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/sanitized-visual-focal-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
