@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "orbit360-rules-compat-resume-v1",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "sourceFailedRun": 30629152231,
+  "failedStage": "source_sync_guard",
+  "rootCause": "WORKTREE_WIDE_DIFF_GUARD_INCLUDED_RUNTIME_EVIDENCE",
+  "rulesDeployExecuted": false,
+  "hostingDeployExecuted": false,
+  "browserExecuted": false,
+  "authorizationConsumedByRulesDeploy": false,
+  "sameRequestResumeAllowed": true,
+  "newAuthorization": false
+}
