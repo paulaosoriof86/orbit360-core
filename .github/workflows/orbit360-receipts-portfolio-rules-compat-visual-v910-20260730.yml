@@ -4,6 +4,7 @@ on:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - '.github/orbit360-requests/receipts-portfolio-rules-compat-v910-20260730.json'
+      - '.github/orbit360-triggers/receipts-portfolio-rules-compat-resume-v910-20260730.json'
 permissions:
   contents: write
   statuses: write
@@ -14,6 +15,7 @@ env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   ORBIT360_GATE_ID: block9-receipts-portfolio-static-v20260730
   ORBIT360_REQUEST: .github/orbit360-requests/receipts-portfolio-rules-compat-v910-20260730.json
+  ORBIT360_RESUME: .github/orbit360-triggers/receipts-portfolio-rules-compat-resume-v910-20260730.json
   ORBIT360_AUTHORIZED_HEAD: 54e85a30a9c2a604ba50d16ebc03eed834ff4ed2
   ORBIT360_SOURCE_SHA256: 977d5841c5d54f139d2bf287914ae6bb19fad64fbe80b1cade807c5026a493ef
   ORBIT360_CANDIDATE_SHA256: a78ad9e7ec3dc7277dda81d10ef223784d762f3b5d52e4040d9436679db7f4eb
@@ -38,7 +40,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verificar autorización y lineage
+      - name: Verificar autorización, resume y lineage
         shell: bash
         run: |
           set -euo pipefail
@@ -46,8 +48,11 @@ jobs:
           test "$GITHUB_RUN_ATTEMPT" = '1'
           test -f "$ORBIT360_REQUEST"
           jq -e '.schemaVersion=="orbit360-rules-readonly-compat-authorization-v1" and .approved==true and .phrase=="AUTORIZO RULES READONLY COMPAT LAB RECIBOS CARTERA V910 20260730" and .branch==env.ORBIT360_BRANCH and .authorizedHead==env.ORBIT360_AUTHORIZED_HEAD and .sourceRulesSha256==env.ORBIT360_SOURCE_SHA256 and .candidateRulesSha256==env.ORBIT360_CANDIDATE_SHA256 and .staticProof.run==30606629580 and .staticProof.artifact==8783834911 and .scope.rulesDeploy==true and .scope.hosting==false and .scope.functions==false and .scope.storage==false and .scope.dataWrites==false and .scope.main==false and .scope.merge==false and .scope.cobros==false and .scope.visualAfterRules==true and .allowedRulesDeployExecutions==1 and .rollbackOnSecurityFailure==true' "$ORBIT360_REQUEST" >/dev/null
+          if [ -f "$ORBIT360_RESUME" ]; then
+            jq -e '.schemaVersion=="orbit360-rules-compat-resume-v1" and .classification=="PIPELINE_MECHANISM_FAILURE" and .sourceFailedRun==30629152231 and .failedStage=="source_sync_guard" and .rulesDeployExecuted==false and .hostingDeployExecuted==false and .browserExecuted==false and .authorizationConsumedByRulesDeploy==false and .sameRequestResumeAllowed==true' "$ORBIT360_RESUME" >/dev/null
+          fi
           git merge-base --is-ancestor "$ORBIT360_AUTHORIZED_HEAD" HEAD
-          bad="$(git diff --name-only "$ORBIT360_AUTHORIZED_HEAD"..HEAD | grep -Ev '^tools/orbit360-rules-compat-live-read-probe-v910-20260730.mjs$|^\.github/workflows/orbit360-receipts-portfolio-rules-compat-visual-v910-20260730.yml$|^\.github/orbit360-requests/receipts-portfolio-rules-compat-v910-20260730.json$' || true)"
+          bad="$(git diff --name-only "$ORBIT360_AUTHORIZED_HEAD"..HEAD | grep -Ev '^tools/orbit360-rules-compat-live-read-probe-v910-20260730.mjs$|^\.github/workflows/orbit360-receipts-portfolio-rules-compat-visual-v910-20260730.yml$|^\.github/orbit360-requests/receipts-portfolio-rules-compat-v910-20260730.json$|^\.github/orbit360-triggers/receipts-portfolio-rules-compat-resume-v910-20260730.json$' || true)"
           test -z "$bad"
           test "$(sha256sum firestore.product-readonly.rules | awk '{print $1}')" = "$ORBIT360_SOURCE_SHA256"
       - name: Gate canónico antes de secrets/Rules/browser
@@ -104,11 +109,12 @@ jobs:
           cp firestore.product-readonly.rules "${RUNNER_TEMP}/firestore.product-readonly.original.rules"
           cp "$EVIDENCE_DIR/firestore.product-readonly.v910-candidate.rules" firestore.product-readonly.rules
           test "$(sha256sum firestore.product-readonly.rules | awk '{print $1}')" = "$ORBIT360_CANDIDATE_SHA256"
-          test "$(git diff --name-only)" = 'firestore.product-readonly.rules'
-          git diff --check
+          git diff --check -- firestore.product-readonly.rules
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add firestore.product-readonly.rules
+          test "$(git diff --cached --name-only)" = 'firestore.product-readonly.rules'
+          git diff --cached --check
           git commit -m 'security(receipts): activate exact read-only LAB Rules compatibility 9.1.0'
           RULES_COMMIT="$(git rev-parse HEAD)"
           git push origin "HEAD:$ORBIT360_BRANCH"
@@ -161,6 +167,7 @@ jobs:
           firebase deploy --only firestore:rules --project "$ORBIT360_PROJECT_ID" --config firebase.product-go-live.json --non-interactive --json > "$EVIDENCE_DIR/rules-compat-rollback-v910.json"
           jq -e '.status=="success"' "$EVIDENCE_DIR/rules-compat-rollback-v910.json" >/dev/null
           git add firestore.product-readonly.rules
+          test "$(git diff --cached --name-only)" = 'firestore.product-readonly.rules'
           git commit -m 'rollback(receipts): restore pre-compat product read-only Rules 9.1.0'
           git push origin "HEAD:$ORBIT360_BRANCH"
           jq -n '{schemaVersion:"orbit360-rules-compat-rollback-v1",ok:true,status:"ROLLED_BACK_SAFE",rulesRollbackExecuted:true,hostingDeployExecutions:0,firestoreDataWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/rules-compat-rollback-summary-v910.json"
@@ -184,12 +191,13 @@ jobs:
         shell: bash
         run: |
           set +e
-          LIVE=false; PRODUCT=false; VISUAL=false; ROLLBACK=false
+          LIVE=false; PRODUCT=false; VISUAL=false; ROLLBACK=false; DEPLOY=false
+          jq -e '.ok==true' "$EVIDENCE_DIR/rules-compat-deploy-summary-v910.json" >/dev/null 2>&1 && DEPLOY=true
           jq -e '.ok==true' "$EVIDENCE_DIR/rules-compat-live-read-probe-v910.json" >/dev/null 2>&1 && LIVE=true
           jq -e '.ok==true' "$EVIDENCE_DIR/m6-product-browser-smoke-summary.json" >/dev/null 2>&1 && PRODUCT=true
           jq -e '.ok==true' "$EVIDENCE_DIR/receipts-portfolio-visual-lab-v910.json" >/dev/null 2>&1 && VISUAL=true
           test -f "$EVIDENCE_DIR/rules-compat-rollback-summary-v910.json" && ROLLBACK=true
-          jq -n --argjson live "$LIVE" --argjson product "$PRODUCT" --argjson visual "$VISUAL" --argjson rollback "$ROLLBACK" --arg rulesCommit "${ORBIT360_RULES_SOURCE_COMMIT:-}" '{schemaVersion:"orbit360-rules-compat-final-v1",contractVersion:"9.1.0",ok:($live and $product and $visual and ($rollback|not)),status:(if ($live and $product and $visual and ($rollback|not)) then "RULES_COMPAT_AND_VISUAL_PASS" elif $rollback then "ROLLED_BACK_SAFE" else "RULES_COMPAT_OR_VISUAL_FAIL" end),rulesSourceCommit:$rulesCommit,liveRulesReadContract:$live,productReadOnlyRegression:$product,visualLab:$visual,rollbackExecuted:$rollback,rulesDeployExecutions:1,hostingDeployExecutions:0,functionsDeploy:false,storageDeploy:false,firestoreDataWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/rules-compat-final-v910.json"
+          jq -n --argjson deploy "$DEPLOY" --argjson live "$LIVE" --argjson product "$PRODUCT" --argjson visual "$VISUAL" --argjson rollback "$ROLLBACK" --arg rulesCommit "${ORBIT360_RULES_SOURCE_COMMIT:-}" '{schemaVersion:"orbit360-rules-compat-final-v1",contractVersion:"9.1.0",ok:($deploy and $live and $product and $visual and ($rollback|not)),status:(if ($deploy and $live and $product and $visual and ($rollback|not)) then "RULES_COMPAT_AND_VISUAL_PASS" elif $rollback then "ROLLED_BACK_SAFE" else "RULES_COMPAT_OR_VISUAL_FAIL" end),rulesSourceCommit:$rulesCommit,liveRulesReadContract:$live,productReadOnlyRegression:$product,visualLab:$visual,rollbackExecuted:$rollback,rulesDeployExecutions:(if $deploy then 1 else 0 end),hostingDeployExecutions:0,functionsDeploy:false,storageDeploy:false,firestoreDataWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/rules-compat-final-v910.json"
       - name: Limpiar credencial temporal
         if: always()
         shell: bash
