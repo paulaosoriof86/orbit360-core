@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 'use strict';
 import fs from 'node:fs';
+import {spawnSync} from 'node:child_process';
 const projection='orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js';
 const sync='orbit360-platform/core/backend-lab-canonical-view-sync.js';
 const detail='orbit360-platform/modules/policy-receipts-v1199-detail-guard.js';
 const m1='orbit360-platform/core/m1-visual-integrity-v20260719.js';
+const lifecycle='tools/orbit360-test-receipts-portfolio-projection-lifecycle-v910-20260730.mjs';
 const p=fs.readFileSync(projection,'utf8'),s=fs.readFileSync(sync,'utf8'),d=fs.readFileSync(detail,'utf8'),m=fs.readFileSync(m1,'utf8');
+const life=spawnSync(process.execPath,[lifecycle],{encoding:'utf8'});
 const checks=[];const add=(id,ok)=>checks.push({id,ok:Boolean(ok)});
 add('PROJECTION_SYNTAX_FILE',fs.existsSync(projection));
 add('SYNC_SYNTAX_FILE',fs.existsSync(sync));
@@ -40,5 +43,6 @@ add('CLIENT_SUMMARY_INDEXED',d.includes("policiesByClient: group(policies, 'clie
 add('POLICY_FULLPAGE_OWNER',d.includes('data-policy-fullpage="1"')&&d.includes('fullPagePolicy: true')&&d.includes('noReadModal: true'));
 add('VEHICLE_FULLPAGE_OWNER',d.includes('data-vehicle-fullpage="1"')&&d.includes('fullPageVehicle: true'));
 add('M1_STILL_ADDITIVE',m.includes('replacesRenderer: false')&&m.includes('writesStore: false'));
-const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-receipts-portfolio-visual-projection-static-v3',contractVersion:'9.1.0',status:failed.length?'FUNCTIONAL_DEFECT':'VISUAL_PROJECTION_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,firestoreRead:false,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+add('PROJECTION_OWNER_DRIFT_LIFECYCLE',life.status===0&&/PROJECTION_LIFECYCLE_PASS/.test(life.stdout||''));
+const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-receipts-portfolio-visual-projection-static-v4',contractVersion:'9.1.0',status:failed.length?'FUNCTIONAL_DEFECT':'VISUAL_PROJECTION_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,lifecycleExit:life.status,firestoreRead:false,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
