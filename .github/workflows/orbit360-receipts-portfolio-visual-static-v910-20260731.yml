@@ -6,6 +6,7 @@ on:
       - '.github/workflows/orbit360-receipts-portfolio-visual-static-v910-20260731.yml'
       - 'orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js'
       - 'orbit360-platform/core/backend-lab-canonical-view-sync.js'
+      - 'tools/orbit360-validator-lifecycle-contract-receipts-portfolio-static-v910-20260730.json'
       - 'orbit360-platform/core/importa-dryrun-p0.js'
       - 'orbit360-platform/core/importa-clientes-p0.js'
       - 'orbit360-platform/core/importa-clientes-p0-wire.js'
@@ -52,6 +53,7 @@ jobs:
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs block9-receipts-portfolio-static-v20260730
           jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .gatePhase=="AUTHORIZED_WRITE" and .requestExists==true and .failed==0 and .operationalWrites==0 and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          jq -e '.gateId=="block9-receipts-portfolio-static-v20260730" and .gateContractVersion=="9.1.0" and .transversalIdentityUpsert.required==true and .transversalIdentityUpsert.exactIdentityAction=="update_existing" and .transversalIdentityUpsert.probableIdentityAction=="hold_no_insert" and .exactDualAuthoritativePaymentMatchMayReconcile==true and .singleSourceAutoReconciliationAllowed==false and .policyPremiumPaymentSemantics.primaTotalInferenceFromPrimaNetaAllowed==false and .policyPremiumPaymentSemantics.paymentDimensions==["frecuencia","formaPago","conductoPago"]' tools/orbit360-validator-lifecycle-contract-receipts-portfolio-static-v910-20260730.json >/dev/null
       - name: Sintaxis
         run: |
           set -euo pipefail
