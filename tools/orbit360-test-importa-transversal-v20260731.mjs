@@ -49,13 +49,20 @@ assert.equal(noTotal.primaTotal,null,'total must not be inferred from net');
 assert.ok(noTotal.motivosValidacion.includes('prima_total'));
 
 const C=Orbit.importaCarteraP0;
-const crm={sourceType:'cobros_realizados',aseguradoraNombre:'Aseguradora Demo',polizaNumero:'POL-1',moneda:'GTQ',monto:100,reciboNumero:'R-1',clienteId:'clientes_1'};
-const insurer={sourceType:'estado_cuenta_aseguradora',aseguradoraNombre:'Aseguradora Demo',polizaNumero:'POL-1',moneda:'GTQ',monto:100,reciboNumero:'R-1',clienteId:'clientes_1'};
-const exact=C.reconciliationDecision(crm,insurer,{});
+const crm={id:'crm-r1',sourceType:'cobros_realizados',aseguradoraNombre:'Aseguradora Demo',polizaNumero:'POL-1',moneda:'GTQ',monto:100,cuota:'3 DE 12',clienteId:'clientes_1',fechaPago:'2026-07-10',vence:'2026-07-01'};
+const insurer={id:'ins-r1',sourceType:'reporte_cobros_aseguradora',aseguradoraNombre:'Aseguradora Demo',polizaNumero:'POL-1',moneda:'GTQ',monto:100.01,cuota:'3/12',clienteId:'clientes_1',fechaPago:'2026-07-11',vence:'2026-07-02'};
+const exact=C.reconciliationDecision(crm,insurer,{}, {amountTolerance:0.011,paymentDateToleranceDays:2,dueDateToleranceDays:1});
 assert.equal(exact.conciliado,true);
 assert.equal(exact.autoApply,true);
+assert.ok(exact.sourceDifferences.some(x=>x.field==='monto'));
 const oneSource=C.reconciliationDecision({},insurer,{});
 assert.equal(oneSource.conciliado,false,'one source alone cannot invent reconciliation');
+const oneToOne=C.reconcileCollections([crm],[insurer],{amountTolerance:0.011,paymentDateToleranceDays:2,dueDateToleranceDays:1});
+assert.equal(oneToOne.summary.conciliados,1);
+assert.equal(oneToOne.oneToOne,true);
+const balance=C.reconcileCollections([crm],[{...insurer,sourceType:'estado_cuenta_aseguradora',monto:100}],{kind:'balance'});
+assert.equal(balance.results[0].saldoConciliado,true);
+assert.equal(balance.results[0].autoApply,false);
 
 const dry=Orbit.importaDryRunP0.buildDryRun({sourceType:'clientes',operations:[{
   action:'insert',collection:'clientes',
@@ -77,6 +84,7 @@ assert.ok(dryrunSource.includes('importa-transversal-p0-bootstrap-v20260731.js')
 console.log(JSON.stringify({
   status:'IMPORTA_TRANSVERSAL_IDEMPOTENCY_READY',
   exactUpdate:true,probableHold:true,premiumInference:false,paymentDimensionsSeparated:true,
-  dualSourceReconciliation:true,singleSourceAutoReconciliation:false,dryRunMatchesWritePlan:true,
+  dualSourceReconciliation:true,singleSourceAutoReconciliation:false,oneToOneMatcher:true,
+  sourceDifferencesPreserved:true,balancePaymentSemanticsSeparated:true,dryRunMatchesWritePlan:true,
   runtimeBootstrapActive:true,firestoreWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false
 },null,2));
