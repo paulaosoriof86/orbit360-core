@@ -1,4 +1,4 @@
-name: Orbit 360 · Recibos/Cartera · human review read-only final
+name: Orbit 360 · Recibos/Cartera · visual focal sanitizada
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
@@ -8,7 +8,7 @@ permissions:
   contents: read
   statuses: write
 concurrency:
-  group: orbit360-human-review-readonly-final-v910-20260731
+  group: orbit360-human-review-sanitized-visual-v910-20260731
   cancel-in-progress: false
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
@@ -16,12 +16,9 @@ env:
   ORBIT360_LAB_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
   TRIGGER: .github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730.json
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
-  SOURCE_HOSTING_RUN: '30670430241'
-  VALIDATOR_FIX_COMMIT: 2c6294551d0bc35c317643a11be96b36ce8adcc4
-  VALIDATOR_STATIC_RUN: '30673901625'
 jobs:
-  human_review_final:
-    name: Human review final · browser read-only · zero deploy
+  visual_focal:
+    name: Visual focal sanitizada · zero deploy/write
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -32,58 +29,50 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verificar lineage, causa raíz y alcance
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          jq -e '.schemaVersion=="orbit360-human-review-readonly-final-v4" and .classification=="VALIDATOR_STALE" and .pipelineClassification=="PIPELINE_MECHANISM_FAILURE" and .sourceHostingRun==(env.SOURCE_HOSTING_RUN|tonumber) and .sourceHostingDeployPassed==true and .sourceRemoteParityPassed==true and .sourceHydrationPassed==true and .sourceBaseVisualPassed==true and .rootCause=="VALIDATOR_INNERTEXT_FALSE_NEGATIVE_ON_SEMANTIC_FIELDS" and .validatorFixCommit==env.VALIDATOR_FIX_COMMIT and .validatorStaticRun==(env.VALIDATOR_STATIC_RUN|tonumber) and .validatorStaticPassed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .cobrosWrites==false and .production==false and .browserReadOnly==true and .newAuthorization==false' "$TRIGGER" >/dev/null
-          grep -Fq "receiptSemanticFieldsVisible" tools/orbit360-human-review-visual-lab-v20260731.mjs
-          grep -Fq "portfolioTraceVisible" tools/orbit360-human-review-visual-lab-v20260731.mjs
-      - name: Gate canónico antes de secreto/browser
+      - name: Verificar cierre técnico y alcance
         env:
           ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-human-review-visual-lab-v20260731.mjs
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          jq -e '.schemaVersion=="orbit360-sanitized-visual-focal-trigger-v1" and .technicalHumanReviewRun==30673945126 and .technicalHumanReviewPassed==true and .sourceHostingRun==30670430241 and .sourceHostingDeployPassed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .production==false and .browserReadOnly==true and .screenshotsSanitized==true' "$TRIGGER" >/dev/null
+          node --check tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-          node tools/orbit360-test-human-visual-contract-v20260731.mjs > "$EVIDENCE_DIR/human-review-final-static-v20260731.json"
-          jq -e '.status=="HUMAN_VISUAL_STATIC_READY" and .failed==0 and .passed==.total and .firestoreWrites==0 and .deployExecuted==false' "$EVIDENCE_DIR/human-review-final-static-v20260731.json" >/dev/null
-      - name: Preparar navegador después del gate
+      - name: Preparar navegador
         shell: bash
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.52.0
           npx playwright install chromium
-      - name: Ejecutar revisión humana integral read-only
+      - name: Generar set visual sanitizado
         env:
           ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
           ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-human-review-visual-lab-v20260731.mjs
-          jq -e '.ok==true and .status=="HUMAN_REVIEW_VISUAL_LAB_PASS" and .counts.clientes==430 and .counts.aseguradoras==30 and .counts.asesores==7 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1293 and .counts.carteraPrimas==673 and .counts.cobros==0 and .counts.finmovs==0 and .checks.globalPoliciesResponsive==true and .checks.globalPoliciesPaginated==true and .checks.globalPoliciesDirectionRole==true and .checks.globalPoliciesPremiumHeaderVisible==true and .checks.policyPremiumSemantic==true and .checks.policyQualityFailClosed==true and .checks.vehicleFullPage==true and .checks.vehicleSemanticFieldsVisible==true and .checks.receiptDetail==true and .checks.receiptSemanticFieldsVisible==true and .checks.reportedPaymentNotCobro==true and .checks.portfolioReconciledVisible==true and .checks.portfolioNotPayment==true and .checks.portfolioTraceVisible==true and .checks.downstreamZero==true and .checks.noPageErrors==true and .checks.noTechnicalCopy==true and .metrics.activeRoleForHumanReview=="Dirección" and .metrics.globalPoliciesRows>0 and .metrics.globalPoliciesRows<=100 and .metrics.globalPoliciesHasPremiumHeader==true and .metrics.globalPoliciesPremiumHeaderVisible==true and .metrics.globalPoliciesHasPaginationText==true and .metrics.globalPoliciesAccessCan==true and .metrics.globalPoliciesRouteKey=="polizas" and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/human-review-visual-lab-v20260731.json" >/dev/null
-      - name: Evidencia sanitizada
+          node tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
+          jq -e '.ok==true and .status=="SANITIZED_VISUAL_SET_READY" and (.screens|length)==6 and .containsPII==false and .containsSecrets==false and .firestoreWrites==0 and .operationalWrites==0 and .hostingDeployExecutions==0 and .production==false' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null
+      - name: Subir evidencia visual sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-human-review-readonly-final-${{ github.run_id }}
+          name: orbit360-human-review-sanitized-visual-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-final-static-v20260731.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-visual-lab-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens/*.png
           if-no-files-found: warn
           retention-days: 30
       - name: Publicar estado
         if: always()
         uses: actions/github-script@v7
         env:
-          HUMAN: orbit360-platform/runtime-gate-crm-v20260716/human-review-visual-lab-v20260731.json
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens-v20260731.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='Human review final read-only failed';
-            try{const h=JSON.parse(fs.readFileSync(process.env.HUMAN,'utf8'));if(h.ok===true&&h.status==='HUMAN_REVIEW_VISUAL_LAB_PASS'&&h.firestoreWrites===0&&h.operationalWrites===0&&h.productionTouched===false){state='success';description='Human review final read-only PASS';}else if(h.errorCode){description=`Human review blocked: ${String(h.errorCode).slice(0,90)}`;}}catch(e){}
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/human-review-readonly-final-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+            const fs=require('fs');let state='failure',description='Sanitized focal visual set failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok&&p.status==='SANITIZED_VISUAL_SET_READY'&&p.screens?.length===6){state='success';description='Sanitized focal visual set ready';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/sanitized-visual-focal-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
