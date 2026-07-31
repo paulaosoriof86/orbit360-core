@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-human-review-readonly-recovery-v1",
+  "schemaVersion": "orbit360-human-review-readonly-recovery-v2",
   "classification": "VALIDATOR_STALE",
   "pipelineClassification": "PIPELINE_MECHANISM_FAILURE",
   "sourceHostingRun": 30670430241,
@@ -10,17 +10,22 @@
   "sourceHydrationPassed": true,
   "sourceBaseVisualPassed": true,
   "previousHumanFailedStage": "global_policies",
-  "rootCause": "GLOBAL_POLICIES_VALIDATOR_RACE_ON_GENERIC_TABLE",
+  "secondHumanFailedStage": "global_policies",
+  "stopRetryApplied": true,
+  "rootCause": "HUMAN_VALIDATOR_MISSING_DETERMINISTIC_DIRECTION_ROLE_CONTEXT",
   "rootCauseEvidence": {
+    "baseVisualExplicitlySelectsDirectionBeforeSemantics": true,
+    "humanValidatorPreviouslyDidNotSelectRole": true,
+    "routerIsRoleAndScopeFailClosed": true,
+    "allBaselineCountsExact": true,
     "publishedPolicyOwnerHasPageSize100": true,
     "publishedPolicyOwnerHasPrimaTotalLabel": true,
     "publishedPolicyOwnerHasMostrandoText": true,
     "remoteParityPassed12Of12": true,
-    "pageErrors": 0,
-    "baselineCountsExact": true
+    "pageErrors": 0
   },
-  "validatorFixCommit": "1a4880db63b9c432ddad9ad3c3460fa4ca3235a1",
-  "validatorStaticRun": 30672509110,
+  "validatorFixCommit": "da4ae989ee8682ab865a41d1fdc2c43fca000577",
+  "validatorStaticRun": 30672771524,
   "validatorStaticPassed": true,
   "rulesDeploy": false,
   "hostingDeploy": false,
@@ -31,5 +36,5 @@
   "production": false,
   "browserReadOnly": true,
   "newAuthorization": false,
-  "notes": "Recovery consumes the already-authorized browser read-only scope. The single Hosting deployment was already consumed successfully in sourceHostingRun and must not be repeated."
+  "notes": "STOP_RETRY was applied after two failures at global_policies. Root cause was diagnosed before this resume. This run validates the already-deployed LAB only and cannot deploy or write data."
 }
