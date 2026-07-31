@@ -4,6 +4,7 @@ on:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - '.github/orbit360-requests/owner-drift-receipts-hosting-lab-v910-20260731.json'
+      - '.github/orbit360-triggers/owner-drift-receipts-hosting-resume-v910-20260731.json'
 permissions:
   contents: read
   statuses: write
@@ -14,6 +15,7 @@ env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   ORBIT360_GATE_ID: block9-receipts-portfolio-static-v20260730
   ORBIT360_REQUEST: .github/orbit360-requests/owner-drift-receipts-hosting-lab-v910-20260731.json
+  ORBIT360_RESUME: .github/orbit360-triggers/owner-drift-receipts-hosting-resume-v910-20260731.json
   ORBIT360_AUTHORIZED_HEAD: 76568148f6c67d829b755a9391fffb95214333bb
   ORBIT360_FUNCTIONAL_COMMIT: f651413cf7718daf3e795bc850b1e11760a01efe
   ORBIT360_OWNER_BLOB: 2b6b960818b93942a2f184a4715d9e38dd3fffab
@@ -44,13 +46,17 @@ jobs:
           test "$GITHUB_RUN_ATTEMPT" = '1'
           test -f "$ORBIT360_REQUEST"
           jq -e '.schemaVersion=="orbit360-owner-drift-receipts-hosting-authorization-v1" and .approved==true and .phrase=="AUTORIZO HOSTING LAB FIX OWNER DRIFT RECIBOS CARTERA V910 20260731" and .branch==env.ORBIT360_BRANCH and .authorizedHead==env.ORBIT360_AUTHORIZED_HEAD and .functionalCommit==env.ORBIT360_FUNCTIONAL_COMMIT and .ownerBlob==env.ORBIT360_OWNER_BLOB and .projectId==env.ORBIT360_PROJECT_ID and .channelId==env.ORBIT360_CHANNEL_ID and .scope.hostingLab==true and .scope.browserVisual==true and .scope.hydrationDiagnostic==true and .scope.rules==false and .scope.functions==false and .scope.storage==false and .scope.dataWrites==false and .scope.cobros==false and .scope.production==false and .scope.main==false and .scope.merge==false and .allowedDeployExecutions==1' "$ORBIT360_REQUEST" >/dev/null
+          if [ -f "$ORBIT360_RESUME" ]; then
+            jq -e '.schemaVersion=="orbit360-owner-drift-hosting-resume-v1" and .classification=="VALIDATOR_STALE" and .sourceFailedRun==30655312506 and .previousDeployExecuted==false and .previousSecretsAccessed==false and .previousBrowserExecuted==false and .newAuthorization==false and .request==env.ORBIT360_REQUEST' "$ORBIT360_RESUME" >/dev/null
+          fi
           git merge-base --is-ancestor "$ORBIT360_FUNCTIONAL_COMMIT" "$ORBIT360_AUTHORIZED_HEAD"
           git merge-base --is-ancestor "$ORBIT360_AUTHORIZED_HEAD" HEAD
-          bad="$(git diff --name-only "$ORBIT360_AUTHORIZED_HEAD"..HEAD | grep -Ev '^\.github/workflows/orbit360-owner-drift-receipts-hosting-lab-v910-20260731\.yml$|^\.github/orbit360-requests/owner-drift-receipts-hosting-lab-v910-20260731\.json$' || true)"
+          bad="$(git diff --name-only "$ORBIT360_AUTHORIZED_HEAD"..HEAD | grep -Ev '^\.github/workflows/orbit360-owner-drift-receipts-hosting-lab-v910-20260731\.yml$|^\.github/orbit360-requests/owner-drift-receipts-hosting-lab-v910-20260731\.json$|^\.github/orbit360-triggers/owner-drift-receipts-hosting-resume-v910-20260731\.json$' || true)"
           test -z "$bad"
           test "$(git hash-object orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js)" = "$ORBIT360_OWNER_BLOB"
-          grep -Fq 'projectionQueryOwner' orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js
-          grep -Fq 'projectionClientOwner' orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js
+          grep -Fq '__rpV910ClienteResumenOwner' orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js
+          grep -Fq '__rpV910RenderOwner' orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js
+          grep -Fq '__orbitRpV910SummaryApplied' orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js
       - name: Gate canónico antes de secrets deploy browser
         env:
           ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
