@@ -40,8 +40,8 @@ Orbit.modules = Orbit.modules || {};
     const total = numberOrNull(first(p.primaTotal, p.prima, p.totalPrima));
     const net = numberOrNull(first(p.primaNeta, p.neta, p.prima_neta));
     out.primaNeta = net;
-    out.primaTotal = total != null ? total : net;
-    out.prima = out.primaTotal;
+    out.primaTotal = total;
+    out.prima = total;
     out.formaPago = first(p.formaPago, p.conductoPago, p.metodoPago, p.forma);
     out.forma = first(p.forma, p.formaPago, p.frecuencia, p.conductoPago);
     out.conducto = first(p.conducto, p.conductoPago, p.formaPago);
@@ -138,7 +138,7 @@ Orbit.modules = Orbit.modules || {};
       const com = (I.comisionesByClient && I.comisionesByClient.get(clientId)) || [];
       const vigentes = pol.filter(activePolicy);
       const primaNetaAnual = vigentes.reduce((sum, p) => sum + (numberOrNull(p.primaNeta) || 0), 0);
-      const primaTotalAnual = vigentes.reduce((sum, p) => sum + (numberOrNull(first(p.primaTotal, p.prima, p.primaNeta)) || 0), 0);
+      const primaTotalAnual = vigentes.reduce((sum, p) => sum + (numberOrNull(first(p.primaTotal, p.prima)) || 0), 0);
       const sumState = state => cob.filter(c => c.estado === state).reduce((sum, c) => sum + (numberOrNull(first(c.monto, c.montoTotal, c.total)) || 0), 0);
       const cobrado = sumState('Pagado'), pendiente = sumState('Pendiente'), vencido = sumState('Vencido');
       const comisionGen = com.reduce((sum, c) => sum + (numberOrNull(c.monto) || 0), 0);
@@ -201,22 +201,22 @@ Orbit.modules = Orbit.modules || {};
       other:numberOrNull(first(p.otros,p.asistencias,p.otrosGastos)),
       taxable:numberOrNull(first(p.baseGravable,p.baseIVA,p.baseImponible)),
       iva:numberOrNull(first(p.ivaMonto,p.iva,p.impuestos,p.impuestosIVA)) ?? sch.iva,
-      total:numberOrNull(first(p.primaTotal,p.prima,p.primaNeta)),
+      total:numberOrNull(first(p.primaTotal,p.prima)),
       scheduleTotal:sch.total,
       receipts:sch.rows
     };
   }
   function receiptRows(policyId, cur) {
-    const expected = (S().all('recibosEsperados') || []).filter(r => r.polizaId === policyId);
+    const expected = (S().all('recibosEsperados') || []).filter(r => r.polizaId === policyId).slice().sort((a,b) => safe(first(a.fechaLimite,a.vence,a.fechaVencimiento)).localeCompare(safe(first(b.fechaLimite,b.vence,b.fechaVencimiento))));
     const applied = (S().all('cobros') || []).filter(r => r.polizaId === policyId);
     const rows = expected.length ? expected : applied;
     if (!rows.length) return '<div class="muted">Histórico sin calendario de recibos disponible o fuente pendiente de completar.</div>';
-    return `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Prima neta</th><th class="num">Expedición</th><th class="num">Financiamiento</th><th class="num">IVA / impuestos</th><th class="num">Total</th><th>Estado</th></tr></thead><tbody>${rows.map((r, i) => {
+    return `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Prima neta</th><th class="num">Expedición</th><th class="num">Financiamiento</th><th class="num">Ajuste fuente</th><th class="num">IVA / impuestos</th><th class="num">Total</th><th>Estado</th></tr></thead><tbody>${rows.map((r, i) => {
       const total = first(r.primaTotal, r.montoTotal, r.monto, r.total);
       const due = first(r.fechaLimite, r.vence, r.fechaVencimiento);
       const state = first(r.estadoVisual, r.estadoOperativo, r.estado, r.estadoCartera, r.status, 'Pendiente');
       const rid=safe(r.id);
-      return `<tr class="${rid?'clickable':''}" ${rid?`onclick="Orbit.receiptsPortfolioProjectionV910&&Orbit.receiptsPortfolioProjectionV910.openReceiptDetail&&Orbit.receiptsPortfolioProjectionV910.openReceiptDetail('${esc(rid)}','${esc(r.clienteId||'')}')"`:''}><td>${esc(first(r.serie, r.numero, r.cuota, i + 1))}</td><td>${esc(fmtDate(due))}</td><td class="num">${esc(moneyDetail(r.primaNeta, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosExpedicion, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosFinanciamiento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.impuestosIVA, r.moneda || cur))}</td><td class="num"><b>${esc(moneyDetail(total, r.moneda || cur))}</b></td><td>${badge(state)}</td></tr>`;
+      return `<tr class="${rid?'clickable':''}" ${rid?`onclick="Orbit.receiptsPortfolioProjectionV910&&Orbit.receiptsPortfolioProjectionV910.openReceiptDetail&&Orbit.receiptsPortfolioProjectionV910.openReceiptDetail('${esc(rid)}','${esc(r.clienteId||'')}')"`:''}><td>${esc(first(r.serie, r.numero, r.cuota, i + 1))}</td><td>${esc(fmtDate(due))}</td><td class="num">${esc(moneyDetail(r.primaNeta, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosExpedicion, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosFinanciamiento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.descuento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.impuestosIVA, r.moneda || cur))}</td><td class="num"><b>${esc(moneyDetail(total, r.moneda || cur))}</b></td><td>${badge(state)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
   }
   function vehicleCard(v, cur) {
@@ -287,7 +287,7 @@ Orbit.modules = Orbit.modules || {};
       <div class="card" style="overflow:hidden;margin-bottom:16px"><div style="padding:20px 22px;background:linear-gradient(120deg,#1f3a5f,#142840);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap"><div><div style="color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.12em;font-size:11px">Vehículo asegurado</div><h2 style="color:#fff;margin:4px 0;font-family:var(--f-display)">${esc(shown(v.marca))} ${esc(shown(v.linea))} ${esc(shown(v.anio))}</h2><div class="mono" style="color:rgba(255,255,255,.85)">${esc(shown(v.placa))}${p.numero?' · póliza '+esc(p.numero):''}</div></div><a class="btn ghost" href="${back}" style="color:#fff;border-color:rgba(255,255,255,.35);background:transparent">Volver al cliente</a></div></div>
       <div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:16px;align-items:start">
         ${section('Detalle completo del vehículo', vehicleCard(v, cur))}
-        <div style="display:grid;gap:16px">${section('Póliza vinculada', grid([field('Póliza', p.numero || '—',{mono:true}),field('Aseguradora',asg.nombre || '—'),field('Estado',p.estado || '—'),field('Vigencia',`${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`),field('Prima total',moneyDetail(first(p.primaTotal,p.prima,p.primaNeta),cur)),field('Suma asegurada',moneyDetail(first(v.sumaAsegurada,p.sumaAsegurada),cur))],2)+`<div style="margin-top:12px"><a class="btn primary" href="#/cliente360?c=${encodeURIComponent(v.clienteId)}&p=${encodeURIComponent(v.polizaId)}">Abrir póliza completa</a></div>`)}</div>
+        <div style="display:grid;gap:16px">${section('Póliza vinculada', grid([field('Póliza', p.numero || '—',{mono:true}),field('Aseguradora',asg.nombre || '—'),field('Estado',p.estado || '—'),field('Vigencia',`${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`),field('Prima total',moneyDetail(first(p.primaTotal,p.prima),cur)),field('Suma asegurada',moneyDetail(first(v.sumaAsegurada,p.sumaAsegurada),cur))],2)+`<div style="margin-top:12px"><a class="btn primary" href="#/cliente360?c=${encodeURIComponent(v.clienteId)}&p=${encodeURIComponent(v.polizaId)}">Abrir póliza completa</a></div>`)}</div>
       </div>
     </div>`;
   }
@@ -395,7 +395,7 @@ Orbit.modules = Orbit.modules || {};
   document.addEventListener('orbit:session', () => setTimeout(install, 0));
 
   Orbit.policyVehicleReadModelV1199c = {
-    version: '20260731.1', ownerRevision:'20260731.3-human-visual',
+    version: '20260731.1', ownerRevision:'20260731.4-human-visual',
     policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, premiumBreakdown,
     fullPagePolicy: true, fullPageVehicle: true,
     indexedClientSummary: true,
