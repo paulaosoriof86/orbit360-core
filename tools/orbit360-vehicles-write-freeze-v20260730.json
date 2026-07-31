@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "orbit360-vehicles-write-freeze-v1",
+  "tenantId": "alianzas-soluciones",
+  "projectId": "ays-orbit-360-lab",
+  "cutoff": "2026-07-30",
+  "gateId": "block8-vehicles-static-v20260730",
+  "contractVersion": "8.0.1",
+  "package": {
+    "historicalSha256": "68904f19705cfa742bba11219725ce1f10de7912d82b88dc085f4119cc3204af",
+    "deltaSha256": "dbd31e3436946ef65bb737068394e6ee5eed44dc4a2dd96fcf975d5b3995f1d2",
+    "policiesSha256": "b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f",
+    "logicalSha256": "4e9545dc580782470ea2e1b2b8a421a16f8cd152ed03264f7b7a30ea14fadc0d",
+    "targetIdDigest": "c5a5eb51b69eedef33588c6e3bb8bb3746ceac8bffc4a7a9181ebcbe4995682d"
+  },
+  "prewriteEvidence": {
+    "run": 30589096805,
+    "artifact": 8777656292,
+    "artifactDigest": "sha256:e19361b5d081019528a1c9625eaaa2a03699631bf1b2ba08685d907a31babaa4",
+    "status": "PREWRITE_READY",
+    "firestoreWrites": 0,
+    "operationalWrites": 0
+  },
+  "baseline": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "asesores": 7,
+    "polizas": 1373,
+    "vehiculos": 0,
+    "recibosEsperados": 0,
+    "carteraPrimas": 0,
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "writePlan": {
+    "vehiculosCreate": 1032,
+    "pendingQuality": 60,
+    "excluded": 4,
+    "auditWrites": 1,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "policyWrites": 0,
+    "receiptWrites": 0,
+    "carteraWrites": 0,
+    "cobroWrites": 0,
+    "finmovWrites": 0
+  },
+  "postWriteExpected": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "asesores": 7,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 0,
+    "carteraPrimas": 0,
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "authorization": {
+    "required": true,
+    "phrase": "AUTORIZO ESCRITURA CONTROLADA VEHICULOS AYS 20260730",
+    "requestPath": ".github/orbit360-requests/vehicles-write-20260730.json",
+    "requestExistsAtFreeze": false
+  },
+  "rollback": {
+    "failClosed": true,
+    "restoreExactBaseline": true
+  },
+  "realWriteExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
