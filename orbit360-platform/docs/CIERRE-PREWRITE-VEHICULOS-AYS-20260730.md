@@ -5,7 +5,9 @@ Proyecto: `ays-orbit-360-lab`
 Rama: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Gate: `block8-vehicles-static-v20260730` / contrato `8.0.1`  
-Estado: `PREWRITE_READY / REAL_WRITE_NOT_AUTHORIZED`
+Estado histórico del corte: `PREWRITE_READY / REAL_WRITE_NOT_AUTHORIZED`
+
+> Este documento conserva el estado previo a la autorización. El cierre posterior está documentado en `CIERRE-WRITE-VEHICULOS-AYS-20260730.md` con estado `WRITE_PASS`.
 
 ## 1. Resultado ejecutivo
 
@@ -100,9 +102,9 @@ Corrección:
 
 La única corrida corregida posterior pasó y el prewrite real también pasó; no hubo tercer intento.
 
-## 8. Plan de futura escritura
+## 8. Plan de futura escritura en ese corte
 
-Si se autoriza, el write podrá crear exclusivamente:
+El write podía crear exclusivamente:
 
 ```text
 vehiculos: +1032
@@ -130,16 +132,14 @@ cobros: 0
 finmovs: 0
 ```
 
-Cualquier desviación debe hacer fallar el write y restaurar el baseline exacto mediante rollback fail-closed.
+## 9. Autorización y cierre posterior
 
-## 9. Autorización
-
-La escritura real sigue bloqueada. La autorización macro deberá ser nueva y exclusiva para Vehículos:
+La autorización macro posterior fue:
 
 `AUTORIZO ESCRITURA CONTROLADA VEHICULOS AYS 20260730`
 
-La autorización no incluye Recibos, Cartera, Cobros ni movimientos financieros.
+Fue consumida una sola vez y terminó `WRITE_PASS`; ver `CIERRE-WRITE-VEHICULOS-AYS-20260730.md`.
 
 ## 10. Siguiente acción tras WRITE_PASS
 
-Cerrar Vehículos y avanzar directamente a `Recibos/cartera`, reutilizando el patrón transversal ya validado y manteniendo Cobros como fuente y conciliación separadas.
+Avanzar directamente a `Recibos/cartera`, reutilizando el patrón transversal ya validado y manteniendo Cobros como fuente y conciliación separadas.
