@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "orbit360-authorized-write-resume-trigger-v1",
+  "contractVersion": "9.1.0",
+  "requestPath": ".github/orbit360-requests/receipts-portfolio-write-v910-20260730.json",
+  "requestCommit": "b91435847e126676e7f070bc0671ad1aa1f96cd8",
+  "authorizationPhraseUnchanged": true,
+  "rootCauseClassification": "VALIDATOR_STALE",
+  "failedRun": 30603147547,
+  "failureBeforeSecrets": true,
+  "failureBeforeFirestore": true,
+  "failureBeforeWriter": true,
+  "newAuthorization": false,
+  "resumeSameImmutableRequest": true
+}
