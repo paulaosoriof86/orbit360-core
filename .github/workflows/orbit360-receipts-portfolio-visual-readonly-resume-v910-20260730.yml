@@ -13,14 +13,14 @@ concurrency:
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   ORBIT360_GATE_ID: block9-receipts-portfolio-static-v20260730
-  ORBIT360_RULES_SOURCE_COMMIT: 980a317fdae9d24ea1cde8efbdc3cfae6d4f8038
-  ORBIT360_VALIDATOR_FIX_COMMIT: 3a6fa4fa6adf74a1df81cfa7aa0023a8985daa46
-  ORBIT360_CANDIDATE_SHA256: a78ad9e7ec3dc7277dda81d10ef223784d762f3b5d52e4040d9436679db7f4eb
   ORBIT360_LAB_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  SOURCE_HOSTING_RUN: '30670430241'
+  SOURCE_HOSTING_ARTIFACT: '8808577341'
+  VALIDATOR_FIX_COMMIT: 1a4880db63b9c432ddad9ad3c3460fa4ca3235a1
 jobs:
   visual_readonly:
-    name: Visual LAB read-only · validator corrected
+    name: Human review recovery · browser read-only · zero deploy
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -38,54 +38,56 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          git merge-base --is-ancestor "$ORBIT360_RULES_SOURCE_COMMIT" HEAD
-          git merge-base --is-ancestor "$ORBIT360_VALIDATOR_FIX_COMMIT" HEAD
-          test -f .github/orbit360-requests/receipts-portfolio-rules-compat-v910-20260730.json
-          jq -e '.approved==true and .phrase=="AUTORIZO RULES READONLY COMPAT LAB RECIBOS CARTERA V910 20260730" and .allowedRulesDeployExecutions==1' .github/orbit360-requests/receipts-portfolio-rules-compat-v910-20260730.json >/dev/null
-          jq -e '.schemaVersion=="orbit360-visual-readonly-resume-v1" and .classification=="VALIDATOR_STALE" and .sourceRulesRun==30629363251 and .rulesDeployPassed==true and .liveRulesReadPassed==true and .productReadOnlyRegressionPassed==true and .previousVisualFailedStage=="hydrate" and .rootCause=="VISUAL_VALIDATOR_MISSING_FIRESTORE_LAB_ENTRYPOINT_QUERY_PARAMS" and .rulesDeploy==false and .hostingDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .browserReadOnly==true' .github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730.json >/dev/null
-          grep -Fq "searchParams.set('orbitBackend','firestore-lab')" tools/orbit360-receipts-portfolio-visual-lab-v910-20260730.mjs
-          grep -Fq "searchParams.set('tenant','alianzas-soluciones')" tools/orbit360-receipts-portfolio-visual-lab-v910-20260730.mjs
+          git merge-base --is-ancestor "$VALIDATOR_FIX_COMMIT" HEAD
+          test -f .github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730.json
+          jq -e '.schemaVersion=="orbit360-human-review-readonly-recovery-v1" and .classification=="VALIDATOR_STALE" and .pipelineClassification=="PIPELINE_MECHANISM_FAILURE" and .sourceHostingRun==(env.SOURCE_HOSTING_RUN|tonumber) and .sourceHostingArtifact==(env.SOURCE_HOSTING_ARTIFACT|tonumber) and .sourceHostingDeployPassed==true and .sourceRemoteParityPassed==true and .sourceHydrationPassed==true and .sourceBaseVisualPassed==true and .previousHumanFailedStage=="global_policies" and .rootCause=="GLOBAL_POLICIES_VALIDATOR_RACE_ON_GENERIC_TABLE" and .validatorFixCommit==env.VALIDATOR_FIX_COMMIT and .rulesDeploy==false and .hostingDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .cobrosWrites==false and .production==false and .browserReadOnly==true and .newAuthorization==false' .github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730.json >/dev/null
+          test "$(git diff --name-only "$VALIDATOR_FIX_COMMIT"..HEAD | grep -Ev '^\.github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730\.json$' | wc -l | tr -d ' ')" = '1'
+          grep -Fq "globalPoliciesRows" tools/orbit360-human-review-visual-lab-v20260731.mjs
+          grep -Fq "POLICIES_RENDER_CONTRACT_INCOMPLETE" tools/orbit360-human-review-visual-lab-v20260731.mjs
       - name: Gate canónico antes de secreto/browser
         env:
           ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-receipts-portfolio-visual-lab-v910-20260730.mjs
+          node --check tools/orbit360-human-review-visual-lab-v20260731.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .dataAccess==false and .firestoreRead==false and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          node tools/orbit360-test-human-visual-contract-v20260731.mjs > "$EVIDENCE_DIR/human-review-recovery-static-v20260731.json"
+          jq -e '.status=="HUMAN_VISUAL_STATIC_READY" and .failed==0 and .passed==.total and .firestoreWrites==0 and .deployExecuted==false' "$EVIDENCE_DIR/human-review-recovery-static-v20260731.json" >/dev/null
       - name: Preparar navegador después del gate
         shell: bash
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.52.0
           npx playwright install chromium
-      - name: Ejecutar revisión visual read-only
+      - name: Ejecutar runtime humano read-only corregido
         env:
           ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
           ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-receipts-portfolio-visual-lab-v910-20260730.mjs
-          jq -e '.ok==true and .status=="VISUAL_LAB_PASS" and .contractVersion=="9.1.0" and .checks.labEntrypointBound==true and .counts.clientes==430 and .counts.aseguradoras==30 and .counts.asesores==7 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1293 and .counts.carteraPrimas==673 and .counts.cobros==0 and .counts.finmovs==0 and .checks.baseline==true and .checks.projectionReady==true and .checks.downstreamZero==true and .checks.activeCalendar==true and .checks.historicalExigible==true and .checks.paymentReportedPendingReconciliation==true and .checks.cobrosSeparated==true and .roleViews["Dirección"].rowsVisible>0 and .roleViews["Operativo"].rowsVisible>0 and .roleViews["Asesor"].rowsVisible>0 and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/receipts-portfolio-visual-lab-v910.json" >/dev/null
+          node tools/orbit360-human-review-visual-lab-v20260731.mjs
+          jq -e '.ok==true and .status=="HUMAN_REVIEW_VISUAL_LAB_PASS" and .counts.clientes==430 and .counts.aseguradoras==30 and .counts.asesores==7 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1293 and .counts.carteraPrimas==673 and .counts.cobros==0 and .counts.finmovs==0 and .checks.globalPoliciesResponsive==true and .checks.globalPoliciesPaginated==true and .checks.policyPremiumSemantic==true and .checks.policyQualityFailClosed==true and .checks.vehicleFullPage==true and .checks.receiptDetail==true and .checks.reportedPaymentNotCobro==true and .checks.portfolioReconciledVisible==true and .checks.portfolioNotPayment==true and .checks.downstreamZero==true and .checks.noPageErrors==true and .checks.noTechnicalCopy==true and .metrics.globalPoliciesRows>0 and .metrics.globalPoliciesRows<=100 and .metrics.globalPoliciesHasPremiumLabel==true and .metrics.globalPoliciesHasPaginationText==true and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/human-review-visual-lab-v20260731.json" >/dev/null
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-receipts-portfolio-visual-readonly-v910-${{ github.run_id }}
+          name: orbit360-human-review-readonly-recovery-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-visual-lab-v910.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-recovery-static-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-visual-lab-v20260731.json
           if-no-files-found: warn
           retention-days: 30
       - name: Publicar estado
         if: always()
         uses: actions/github-script@v7
         env:
-          VISUAL: orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-visual-lab-v910.json
+          HUMAN: orbit360-platform/runtime-gate-crm-v20260716/human-review-visual-lab-v20260731.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='Recibos/Cartera visual read-only failed';
-            try{const v=JSON.parse(fs.readFileSync(process.env.VISUAL,'utf8'));if(v.ok===true&&v.status==='VISUAL_LAB_PASS'&&v.checks?.labEntrypointBound===true){state='success';description='Recibos/Cartera 9.1.0 visual read-only PASS';}}catch(e){}
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/receipts-portfolio-visual-readonly-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+            const fs=require('fs');let state='failure',description='Human review read-only recovery failed';
+            try{const h=JSON.parse(fs.readFileSync(process.env.HUMAN,'utf8'));if(h.ok===true&&h.status==='HUMAN_REVIEW_VISUAL_LAB_PASS'&&h.firestoreWrites===0&&h.operationalWrites===0&&h.productionTouched===false){state='success';description='Human review read-only recovery PASS';}else if(h.errorCode){description=`Human review blocked: ${String(h.errorCode).slice(0,90)}`;}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/human-review-readonly-recovery-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
