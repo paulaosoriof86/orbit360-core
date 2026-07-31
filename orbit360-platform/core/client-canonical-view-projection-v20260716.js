@@ -17,6 +17,9 @@
   'use strict';
   window.Orbit = window.Orbit || {};
 
+  var SHAPE_REVISION = '20260731.1-optional-arrays';
+  var PROJECTION_MARKER = '20260731.1-temporal';
+
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function normalized(value) {
     return clean(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
@@ -147,26 +150,36 @@
   }
 
   Orbit.clientProjection = {
-    version: '20260719.2', project: project, get: get, field: field,
+    version: '20260719.2', shapeRevision: SHAPE_REVISION, project: project, get: get, field: field,
     estadoOperativo: operationalState, alertasCalidad: qualityAlerts,
     normalizeType: normalizeType, normalizeCountry: normalizeCountry, normalizeDate: normalizeDate,
     ALIAS: ALIAS, writesStore: false, reimportsData: false, createsRelations: false
   };
 
   function signature(row) {
-    return JSON.stringify([row.nombre,row.identificacion,row.email,row.telefono,row.tipo,row.pais,row.fechaAlta,row.fechaNac,row.estadoOperativo,row.moneda,row.segmento,row.canal]);
+    return JSON.stringify([
+      row.nombre,row.identificacion,row.email,row.telefono,row.tipo,row.pais,row.fechaAlta,row.fechaNac,
+      row.estadoOperativo,row.moneda,row.segmento,row.canal,
+      Array.isArray(row.etiquetas) ? row.etiquetas : '__MISSING_ETIQUETAS_ARRAY__',
+      Array.isArray(row.alertasCalidad) ? row.alertasCalidad : '__MISSING_ALERTAS_ARRAY__'
+    ]);
   }
   function projectInPlace(row) {
     if (!row || typeof row !== 'object') return false;
     var projected = project(row);
     var before = signature(row);
     var after = signature(projected);
-    if (before !== after || row.__canonicalViewProjection !== '20260719.2-temporal') {
+    if (before !== after || row.__canonicalViewProjection !== PROJECTION_MARKER) {
       Object.assign(row, projected);
-      row.__canonicalViewProjection = '20260719.2-temporal';
+      row.__canonicalViewProjection = PROJECTION_MARKER;
       return true;
     }
     return false;
+  }
+  function publishProjectionChange(changed) {
+    if (!changed) return;
+    try { window.dispatchEvent(new CustomEvent('orbit:store:emit', { detail: { collection: 'clientes', source: 'client-canonical-view-projection', shapeRevision: SHAPE_REVISION } })); }
+    catch (error) {}
   }
   function applyAll() {
     var rows = [];
@@ -174,20 +187,23 @@
     try { rows = Orbit.store && Orbit.store.all ? (Orbit.store.all('clientes') || []) : []; } catch (error) {}
     rows.forEach(function (row) { if (projectInPlace(row)) changed += 1; });
     if (changed) {
+      publishProjectionChange(changed);
       try { if (window.OrbitLabCanonicalViewSync && typeof OrbitLabCanonicalViewSync.schedule === 'function') OrbitLabCanonicalViewSync.schedule('clientes'); }
       catch (error) {}
     }
-    return { total: rows.length, changed: changed };
+    return { total: rows.length, changed: changed, shapeRevision: SHAPE_REVISION };
   }
 
   window.addEventListener('orbit:store:emit', function (event) {
     var collection = event && event.detail && event.detail.collection;
     if (!collection || collection === '*' || collection === 'clientes' || collection === 'asesores') setTimeout(applyAll, 0);
   });
+  window.addEventListener('hashchange', function () { setTimeout(applyAll, 0); });
+  window.addEventListener('orbit:lab:canonical-view-hydrated', function () { setTimeout(applyAll, 0); });
   document.addEventListener('orbit:session', function () { setTimeout(applyAll, 0); });
 
   Orbit.clientCanonicalViewProjectionV20260716 = {
-    version: '20260719.2', project: projectInPlace, projectCopy: project, applyAll: applyAll,
+    version: '20260719.2', shapeRevision: SHAPE_REVISION, project: projectInPlace, projectCopy: project, applyAll: applyAll,
     temporaryInPlaceBridge: true, writesStore: false, reimportsData: false, replacesRenderer: false
   };
 
