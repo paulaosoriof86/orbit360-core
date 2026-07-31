@@ -1,10 +1,11 @@
 /* ============================================================
    Orbit 360 · P0 dry-run sanitizado por fuente separada
-   Fecha: 2026-07-15
+   Fecha: 2026-07-31
 
    Construye reportes de dry-run sin escribir datos reales.
    La salida puede alimentar la UI de confirmacion reforzada solo
    despues de revision humana y aprobacion explicita.
+   Carga el bootstrap P0 transversal que unifica identidad/upsert.
    ============================================================ */
 (function () {
   window.Orbit = window.Orbit || {};
@@ -20,7 +21,7 @@
       allowed: ['polizas', 'bienesAsegurados', 'recibosEsperados', 'calidadDatos', 'gestiones'],
       forbidden: ['cobros', 'finmovs', 'cxcComisiones', 'cxpAsesores'],
       required: ['numero', 'aseguradoraNombre', 'vigenciaIni', 'vigenciaFin'],
-      blocking: ['pais', 'moneda', 'formaPago']
+      blocking: ['pais', 'moneda', 'frecuencia', 'formaPago']
     },
     vehiculos: {
       allowed: ['bienesAsegurados', 'calidadDatos', 'gestiones'],
@@ -245,4 +246,18 @@
     buildDryRun,
     approveDryRun
   };
+})();
+
+(function loadTransversalImporterOwners(){
+  if(typeof document==='undefined')return;
+  const src='core/importa-transversal-p0-bootstrap-v20260731.js';
+  if(document.querySelector&&document.querySelector('script[data-orbit-transversal-importer]'))return;
+  if(document.readyState==='loading'&&typeof document.write==='function'){
+    document.write('<script data-orbit-transversal-importer src="'+src+'?v=20260731.1"><\/script>');
+    return;
+  }
+  const s=document.createElement('script');
+  s.src=src+'?v=20260731.1';
+  s.dataset.orbitTransversalImporter='1';
+  (document.head||document.documentElement).appendChild(s);
 })();
