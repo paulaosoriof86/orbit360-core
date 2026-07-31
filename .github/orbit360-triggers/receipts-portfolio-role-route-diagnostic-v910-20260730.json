@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "orbit360-role-route-diagnostic-trigger-v1",
-  "sourceHostingRun": 30631820866,
-  "sourceHostingArtifact": 8793675831,
-  "sourceHostingDigest": "sha256:ca22945825724826b725dd35201bddf5bcc8e2e4953625f33971fbcb2a8fd4ed",
+  "schemaVersion": "orbit360-role-route-diagnostic-trigger-v2",
+  "sourceHostingRun": 30655526997,
+  "sourceHostingArtifact": 8803087663,
+  "sourceHostingDigest": "sha256:9d44824706700cdc50e30234e4851d5aa2b1c53ae4d3880c39adf646b6f1ff83",
   "hostingDeployAlreadyConsumed": true,
   "hostingDeploy": false,
   "rulesDeploy": false,
@@ -10,5 +10,8 @@
   "storageDeploy": false,
   "dataWrites": false,
   "browserReadOnly": true,
-  "classificationPending": true
+  "rootCauseOnly": true,
+  "classificationPending": true,
+  "containsPII": false,
+  "containsSecrets": false
 }
