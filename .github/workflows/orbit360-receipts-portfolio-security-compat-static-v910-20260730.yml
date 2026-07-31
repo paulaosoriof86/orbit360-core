@@ -41,10 +41,16 @@ jobs:
           set -euo pipefail
           node tools/orbit360-build-legacy-lab-read-compat-candidate-v910-20260730.mjs
           jq -e '.classification=="SECURITY_FAILURE" and .candidateCommitted==false and .technicalLabIdentityOnly==true and .allowedCollections==["clientes","aseguradoras","asesores","polizas","vehiculos","recibosEsperados","carteraPrimas","cobros"] and .readOnly==true and .writesAllowed==false and .credentialRefsAllowed==false and .otherMembersLegacyAllowed==false and .productionRuleSourceModified==false and .deployExecuted==false' "$EVIDENCE_DIR/firestore-legacy-lab-compat-candidate-v910.json" >/dev/null
+      - name: Preparar Java 21 para emulador
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
       - name: Preparar emulador local aislado
         shell: bash
         run: |
           set -euo pipefail
+          java -version
           npm install --no-save --package-lock=false --ignore-scripts firebase-tools@latest @firebase/rules-unit-testing@latest firebase@latest
           cat > "${RUNNER_TEMP}/firebase-emulator-v910.json" <<JSON
           {
