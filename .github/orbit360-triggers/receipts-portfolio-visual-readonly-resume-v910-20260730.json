@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-human-review-readonly-final-v3",
+  "schemaVersion": "orbit360-human-review-readonly-final-v4",
   "classification": "VALIDATOR_STALE",
   "pipelineClassification": "PIPELINE_MECHANISM_FAILURE",
   "sourceHostingRun": 30670430241,
@@ -11,13 +11,15 @@
   "rootCauseEvidence": {
     "policiesSemanticHeaderVerified": true,
     "vehicleSemanticFieldsVerified": true,
-    "receiptOwnerContainsAllExpectedFields": true,
+    "receiptSemanticFieldsVerified": true,
+    "reportedPaymentCopyVerified": true,
+    "portfolioReconciliationCopyVerified": true,
+    "portfolioTraceOwnerContainsRequiredFields": true,
     "structuralValidationUsesVisibleDomElements": true,
-    "copyValidationStillUsesVisibleText": true,
     "pageErrors": 0
   },
-  "validatorFixCommit": "d8433b9d316f044eee8daaba0fde2b830d38a005",
-  "validatorStaticRun": 30673758393,
+  "validatorFixCommit": "2c6294551d0bc35c317643a11be96b36ce8adcc4",
+  "validatorStaticRun": 30673901625,
   "validatorStaticPassed": true,
   "hostingDeploy": false,
   "rulesDeploy": false,
@@ -28,5 +30,5 @@
   "production": false,
   "browserReadOnly": true,
   "newAuthorization": false,
-  "notes": "Final browser-only verification against already deployed LAB. Structural fields are validated semantically; operational copy remains visible-text validated."
+  "notes": "Final browser-only verification against already deployed LAB. All structural fields use visible semantic DOM validation; operational copy remains visible-text validated."
 }
