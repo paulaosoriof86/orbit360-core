@@ -1,8 +1,12 @@
 {
   "schemaVersion": "orbit360-security-compat-static-trigger-v1",
+  "revision": 2,
   "sourceHostingRun": 30605735832,
   "sourceHydrationDiagnosticRun": 30605971192,
   "sourceAuthReplayDiagnosticRun": 30606190853,
+  "sourceStaticFailureRun": 30606446332,
+  "failureClassification": "PIPELINE_MECHANISM_FAILURE",
+  "failureCode": "SECURITY_CANDIDATE_SOURCE_DRIFT_BLOB_VS_CONTENT_SHA",
   "classification": "SECURITY_FAILURE",
   "productionRuleSourceModified": false,
   "rulesDeploy": false,
