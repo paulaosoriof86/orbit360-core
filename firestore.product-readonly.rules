@@ -18,6 +18,13 @@ service cloud.firestore {
         && get(membershipPath(tenantId)).data.status == 'active';
     }
 
+    // TEMPORAL_RETIRO · compatibilidad de lectura exclusivamente para validación LAB A&S.
+    function isLegacyLabValidationUser() {
+      return isSignedIn()
+        && request.auth.uid == 'woJlxR1iFEeiQZvTscPj4qQ5Qc73'
+        && request.auth.token.email == 'orbit.lab@demo.com';
+    }
+
     match /tenants/{tenantId}/members/{memberUid} {
       allow get: if isSignedIn() && memberUid == request.auth.uid;
       allow list: if false;
@@ -44,6 +51,16 @@ service cloud.firestore {
 
     match /tenants/{tenantId}/importBatches/{document=**} {
       allow read, write: if false;
+    }
+
+
+    // TEMPORAL_RETIRO · preview LAB legado; no habilita escrituras ni otras colecciones.
+    match /tenantId/{tenantId}/{collection}/{documentId} {
+      allow read: if tenantId == 'alianzas-soluciones'
+        && isLegacyLabValidationUser()
+        && activeMembership(tenantId)
+        && collection in ['clientes', 'aseguradoras', 'asesores', 'polizas', 'vehiculos', 'recibosEsperados', 'carteraPrimas', 'cobros'];
+      allow create, update, delete: if false;
     }
 
     match /{document=**} {
