@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-receipts-portfolio-write-request-v2",
+  "contractVersion": "9.1.0",
+  "approved": true,
+  "phrase": "AUTORIZO ESCRITURA CONTROLADA RECIBOS CARTERA AYS V910 20260730",
+  "activePackageSha256": "e64e75f78f6a64101627a9a860db566a95b83677fcf20eeb05be44c6f3f6a1d7",
+  "historicalPackageSha256": "780436042d53cdec354f1bcc96a7a16e874c0c947454d121230f7cb7d9703317",
+  "activeLogicalSha256": "bb494a05aff75ff7baad39a07f23512187e39480d509f8ca1ace01e0b671362b",
+  "historicalLogicalSha256": "abb4189778e3cb3f1ffcf7e4f249645dcad88bcf522e2039be517e512f8a9d46",
+  "activeReceiptIdDigest": "f700a11643a1e4e62a13c3894d6f1097acef2ad5edfc0a32703d0d9b2ed5facf",
+  "historicalReceiptIdDigest": "431cccd46a3f05308e58d6597b68a5c43f7e7fcf00c403f24090fa91fff9f03e",
+  "activePortfolioIdDigest": "144c8967704d1d06475144508e24cd8792ea8264faa7045eb50132316264bcd6",
+  "historicalPortfolioIdDigest": "7bffffbb09e03eefcefccb860a633433d0b8e2554a3bd874289d68173e2ef8f7",
+  "scope": {
+    "receipts": 1293,
+    "portfolio": 673,
+    "historical": 32,
+    "cobros": 0,
+    "finmovs": 0
+  }
+}
