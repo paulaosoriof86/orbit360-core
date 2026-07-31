@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-human-review-readonly-final-v2",
+  "schemaVersion": "orbit360-human-review-readonly-final-v3",
   "classification": "VALIDATOR_STALE",
   "pipelineClassification": "PIPELINE_MECHANISM_FAILURE",
   "sourceHostingRun": 30670430241,
@@ -9,19 +9,15 @@
   "sourceBaseVisualPassed": true,
   "rootCause": "VALIDATOR_INNERTEXT_FALSE_NEGATIVE_ON_SEMANTIC_FIELDS",
   "rootCauseEvidence": {
-    "routerDiagnosticRun": 30673309180,
-    "policiesSemanticHeaderPresent": true,
-    "policiesSemanticHeaderVisible": true,
-    "vehicleOwnerContainsPlaca": true,
-    "vehicleOwnerContainsChasisVin": true,
-    "vehicleOwnerContainsMotor": true,
-    "vehicleOwnerContainsSumaAsegurada": true,
-    "structuralValidationNowUsesVisibleDomElements": true,
+    "policiesSemanticHeaderVerified": true,
+    "vehicleSemanticFieldsVerified": true,
+    "receiptOwnerContainsAllExpectedFields": true,
+    "structuralValidationUsesVisibleDomElements": true,
+    "copyValidationStillUsesVisibleText": true,
     "pageErrors": 0
   },
-  "routerDiagnosticRun": 30673309180,
-  "validatorFixCommit": "b4d9e040ffab729bddf036e75d9eba7a5d7b49ae",
-  "validatorStaticRun": 30673605238,
+  "validatorFixCommit": "d8433b9d316f044eee8daaba0fde2b830d38a005",
+  "validatorStaticRun": 30673758393,
   "validatorStaticPassed": true,
   "hostingDeploy": false,
   "rulesDeploy": false,
@@ -32,5 +28,5 @@
   "production": false,
   "browserReadOnly": true,
   "newAuthorization": false,
-  "notes": "Final browser-only verification against already deployed LAB. Structural labels are validated as visible semantic DOM elements, not via whole-host innerText."
+  "notes": "Final browser-only verification against already deployed LAB. Structural fields are validated semantically; operational copy remains visible-text validated."
 }
