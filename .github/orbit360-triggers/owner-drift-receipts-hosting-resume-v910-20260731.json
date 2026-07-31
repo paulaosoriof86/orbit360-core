@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "orbit360-owner-drift-hosting-resume-v1",
+  "classification": "VALIDATOR_STALE",
+  "rootCause": "HOSTING_PREFLIGHT_ASSERTED_NONEXISTENT_OWNER_IDENTIFIER_NAMES",
+  "sourceFailedRun": 30655312506,
+  "sourceFailedJob": 91238144373,
+  "previousDeployExecuted": false,
+  "previousSecretsAccessed": false,
+  "previousBrowserExecuted": false,
+  "newAuthorization": false,
+  "request": ".github/orbit360-requests/owner-drift-receipts-hosting-lab-v910-20260731.json",
+  "correctedAssertions": [
+    "__rpV910ClienteResumenOwner",
+    "__rpV910RenderOwner",
+    "__orbitRpV910SummaryApplied"
+  ],
+  "scope": {
+    "hostingLab": true,
+    "browserVisual": true,
+    "rules": false,
+    "functions": false,
+    "storage": false,
+    "dataWrites": false,
+    "cobros": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
