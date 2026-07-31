@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "orbit360-client360-optional-shape-hosting-authorization-v1",
+  "approved": true,
+  "phrase": "AUTORIZO HOSTING LAB FIX CLIENTE360 OPTIONAL SHAPE 20260731",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "2d5b8e5a125ae921b8ae6209a0107b0532008e64",
+  "functionalCommit": "cf82e29276f49e757dcbd24bc53f67c0de8efa9c",
+  "clientProjectionBlob": "0027731abe5b947e0b36bcbcc7e6135b00c4898e",
+  "staticRun": 30657011319,
+  "staticArtifact": 8803627636,
+  "staticDigest": "sha256:916fa43f1f50f9c1b5962e1bba3a2267ecf57c79277593fb5f99bf28e44661f3",
+  "projectId": "ays-orbit-360-lab",
+  "channelId": "orbit360-ays-lab",
+  "scope": {
+    "hostingLab": true,
+    "browserVisual": true,
+    "hydrationDiagnostic": true,
+    "rules": false,
+    "functions": false,
+    "storage": false,
+    "dataWrites": false,
+    "cobros": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "allowedDeployExecutions": 1
+}
