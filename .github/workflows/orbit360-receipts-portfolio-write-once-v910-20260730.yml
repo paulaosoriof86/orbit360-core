@@ -2,7 +2,9 @@ name: Orbit 360 · Receipts/portfolio controlled write once 9.1.0
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
-    paths: ['.github/orbit360-requests/receipts-portfolio-write-v910-20260730.json']
+    paths:
+      - '.github/orbit360-requests/receipts-portfolio-write-v910-20260730.json'
+      - '.github/orbit360-triggers/receipts-portfolio-write-v910-resume-20260730.json'
 permissions:
   contents: read
   statuses: write
@@ -37,17 +39,19 @@ jobs:
         with:
           node-version: '22'
       - name: Gate canónico antes de secrets/Firestore
+        env:
+          ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .receiptsExpected==1293 and .portfolioPending==673 and .historicalExigible==32 and .historicalAmountGTQ==13443.48 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .gatePhase=="AUTHORIZED_WRITE" and .requestExists==true and .requestState=="EXACT_AUTHORIZED_REQUIRED" and .failed==0 and .receiptsExpected==1293 and .portfolioPending==673 and .historicalExigible==32 and .historicalAmountGTQ==13443.48 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Verificar request inmutable autorizado
         shell: bash
         run: |
           set -euo pipefail
           test -f "$REQUEST_PATH"
-          jq -e '.schemaVersion=="orbit360-receipts-portfolio-write-request-v2" and .approved==true and .phrase=="AUTORIZO ESCRITURA CONTROLADA RECIBOS CARTERA AYS V910 20260730" and .activePackageSha256==env.ACTIVE_SHA256 and .historicalPackageSha256==env.HIST_SHA256 and .activeLogicalSha256==env.ACTIVE_LOGICAL_SHA256 and .historicalLogicalSha256==env.HIST_LOGICAL_SHA256 and .activeReceiptIdDigest==env.ACTIVE_RECEIPT_ID_DIGEST and .historicalReceiptIdDigest==env.HIST_RECEIPT_ID_DIGEST and .activePortfolioIdDigest==env.ACTIVE_PORTFOLIO_ID_DIGEST and .historicalPortfolioIdDigest==env.HIST_PORTFOLIO_ID_DIGEST and .scope.receipts==1293 and .scope.portfolio==673 and .scope.historical==32 and .scope.cobros==0 and .scope.finmovs==0' "$REQUEST_PATH" >/dev/null
+          jq -e '.schemaVersion=="orbit360-receipts-portfolio-write-request-v2" and .contractVersion=="9.1.0" and .approved==true and .phrase=="AUTORIZO ESCRITURA CONTROLADA RECIBOS CARTERA AYS V910 20260730" and .activePackageSha256==env.ACTIVE_SHA256 and .historicalPackageSha256==env.HIST_SHA256 and .activeLogicalSha256==env.ACTIVE_LOGICAL_SHA256 and .historicalLogicalSha256==env.HIST_LOGICAL_SHA256 and .activeReceiptIdDigest==env.ACTIVE_RECEIPT_ID_DIGEST and .historicalReceiptIdDigest==env.HIST_RECEIPT_ID_DIGEST and .activePortfolioIdDigest==env.ACTIVE_PORTFOLIO_ID_DIGEST and .historicalPortfolioIdDigest==env.HIST_PORTFOLIO_ID_DIGEST and .scope.receipts==1293 and .scope.portfolio==673 and .scope.historical==32 and .scope.cobros==0 and .scope.finmovs==0' "$REQUEST_PATH" >/dev/null
       - name: Preparar dependencias aisladas
         shell: bash
         run: |
