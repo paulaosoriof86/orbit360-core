@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-visual-readonly-resume-v1",
+  "classification": "VALIDATOR_STALE",
+  "sourceRulesRun": 30629363251,
+  "rulesDeployPassed": true,
+  "liveRulesReadPassed": true,
+  "productReadOnlyRegressionPassed": true,
+  "previousVisualFailedStage": "hydrate",
+  "rootCause": "VISUAL_VALIDATOR_MISSING_FIRESTORE_LAB_ENTRYPOINT_QUERY_PARAMS",
+  "validatorFixCommit": "3a6fa4fa6adf74a1df81cfa7aa0023a8985daa46",
+  "rulesSourceCommit": "980a317fdae9d24ea1cde8efbdc3cfae6d4f8038",
+  "rulesDeploy": false,
+  "hostingDeploy": false,
+  "functionsDeploy": false,
+  "storageDeploy": false,
+  "dataWrites": false,
+  "browserReadOnly": true,
+  "newAuthorization": false
+}
