@@ -8,6 +8,8 @@ PR: #5 draft/open
 
 `DATA_CONTRACT_FAILURE` del contrato 9.0.0 anterior, corregido de forma focal en Recibos/Cartera. Pólizas y Vehículos permanecen cerrados en `WRITE_PASS` y no se reimportan.
 
+Durante el primer prewrite 9.1.0 apareció además un `PIPELINE_MECHANISM_FAILURE` aislado en la URI OAuth JWT. Se corrigió únicamente el `grant_type`; no cambiaron contrato, fuentes, hashes, datos ni writer. El segundo intento cerró correctamente.
+
 ## Regla cerrada
 
 - Los términos `Vigente` y `Por renovar` continúan siendo los únicos que generan calendario activo.
@@ -56,9 +58,9 @@ cobros: 0
 finmovs: 0
 ```
 
-## Universo combinado esperado para 9.1.0
+## Universo combinado 9.1.0
 
-El paquete activo 9.0.0 no se recalcula ni se altera; se reutiliza como baseline inmutable:
+El paquete activo 9.0.0 se reutiliza como baseline inmutable:
 
 ```text
 activo recibos: 1261
@@ -68,7 +70,7 @@ activo futuro: 542
 pago_reportado: 365
 ```
 
-Con el delta histórico:
+Con el delta histórico validado:
 
 ```text
 recibosEsperados objetivo: 1293
@@ -78,16 +80,61 @@ futuro activo: 542
 histórico exigible: 32
 ```
 
-## Gate y autorización
+## Gate estático 9.1.0
 
-- Contrato siguiente: `9.1.0`.
-- El gate sigue siendo único: `block9-receipts-portfolio-static-v20260730`.
-- El prewrite 9.0.0 queda congelado como evidencia histórica y no puede escribirse.
+- run: `30602668602` · SUCCESS
+- artifact: `8782467117`
+- gate: `block9-receipts-portfolio-static-v20260730`
+- contrato: `9.1.0`
+- checks canónicos: `30/30`
+- operational writes: `0`
+- secrets/Firestore/runtime/browser/deploy/producción: `0`
+
+## Primer prewrite 9.1.0 — causa raíz cerrada
+
+- run: `30602732429` · FAILURE antes de Firestore
+- clasificación: `PIPELINE_MECHANISM_FAILURE`
+- causa: URI `grant_type` OAuth JWT construida incorrectamente
+- corrección: una sola línea, usando `urn:ietf:params:oauth:grant-type:jwt-bearer`
+- Firestore read: `0`
+- Firestore write: `0`
+- operational writes: `0`
+- bitácora: `BITACORA-CAUSA-RAIZ-PREWRITE-RECIBOS-CARTERA-V910-20260730.md`
+
+## Prewrite read-only 9.1.0 — PASS
+
+- run: `30602817285` · SUCCESS
+- artifact: `8782520657`
+- artifact digest: `sha256:f4d55558963d7f111711a0e6dd74b11d237b8868811dd7c1e35d09c79c04fd65`
+- status: `PREWRITE_READY`
+- package hashes: exactos
+- baseline live: `430 / 30 / 7 / 1373 / 1032 / 0 / 0 / 0 / 0`
+- recibos candidatos: `1293`
+- cartera candidata: `673`
+- históricos exigibles: `32`
+- monto histórico exigible: `Q 13,443.48`
+- missing parents: `0`
+- invalid active policy state: `0`
+- invalid historical policy state: `0`
+- historical terms not expired: `0`
+- relation mismatches: `0`
+- receipt collisions: `0`
+- portfolio collisions: `0`
+- Firestore read: `true`
+- Firestore writes: `0`
+- operational writes: `0`
+- `cobros`: `0`
+- `finmovs`: `0`
+- rollback: no ejecutado porque no hubo escritura
+
+## Autorización
+
+- El prewrite 9.0.0 queda congelado y no puede escribirse.
 - No existe request de escritura 9.1.0.
 - La autorización anterior no se reutiliza porque cambiaron universo, hashes y conteos.
-- Primero debe cerrar gate estático 9.1.0 y luego un nuevo prewrite read-only con cero escrituras.
-- Solo un `PREWRITE_READY` 9.1.0 habilita solicitar una nueva autorización macro.
+- El estado actual sí permite solicitar **una única autorización macro** para crear exactamente `1293` `recibosEsperados` y `673` `carteraPrimas`, incluyendo `32` obligaciones históricas exigibles, con `cobros=0` y `finmovs=0`.
+- El writer 9.1.0 es create-only, valida hashes/alcance, conserva baseline y dispone de rollback si falla la escritura.
 
 ## Estado
 
-`RECALC_SOURCE_RECONCILED_READY` — fuente y contrato funcional listos para actualización estática; cero escritura operativa, cero deploy, cero producción.
+`PREWRITE_READY_9_1_0` — listo para autorización macro de escritura; cero escritura operativa realizada hasta este punto, cero deploy, cero producción.
