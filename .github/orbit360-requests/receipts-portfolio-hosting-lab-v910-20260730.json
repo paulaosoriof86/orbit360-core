@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "orbit360-hosting-lab-authorization-v1",
+  "approved": true,
+  "phrase": "AUTORIZO HOSTING LAB RECIBOS CARTERA V910 20260730",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedFunctionalHead": "1a3b80edabceef7f61b3fc0efd93c026d3eb1aa8",
+  "projectId": "ays-orbit-360-lab",
+  "channelId": "orbit360-ays-lab",
+  "scope": {
+    "hostingLab": true,
+    "browserVisual": true,
+    "production": false,
+    "functions": false,
+    "rules": false,
+    "main": false,
+    "merge": false,
+    "cobros": false
+  },
+  "expected": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "asesores": 7,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1293,
+    "carteraPrimas": 673,
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "allowedDeployExecutions": 1
+}
