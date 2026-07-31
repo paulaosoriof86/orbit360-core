@@ -18,6 +18,14 @@
     }
   },
   "singleGate": true,
+  "authorizationLifecycle": {
+    "defaultPhase": "PREWRITE",
+    "prewriteRequiresRequestAbsent": true,
+    "authorizedWritePhase": "AUTHORIZED_WRITE",
+    "authorizedWriteRequiresExactImmutableRequest": true,
+    "sameRequestReusableAfterPreSecretValidatorStale": true,
+    "secondAuthorizationRequiredAfterPreSecretValidatorStale": false
+  },
   "policiesWritePassRequired": true,
   "vehiclesWritePassRequired": true,
   "reuseTransverseInfrastructure": true,
@@ -42,7 +50,7 @@
   "fifoReservedForCobrosConciliacion": true,
   "productDataWritesAllowed": false,
   "dryRunBeforeWriteRequired": true,
-  "writeOwnerPreparedButRequestAbsent": true,
+  "writeOwnerPrepared": true,
   "downstreamCobrosWritesAllowed": false,
   "downstreamFinmovsWritesAllowed": false,
   "containsPII": false,
