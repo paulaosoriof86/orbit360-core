@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "orbit360-security-compat-static-trigger-v1",
+  "sourceHostingRun": 30605735832,
+  "sourceHydrationDiagnosticRun": 30605971192,
+  "sourceAuthReplayDiagnosticRun": 30606190853,
+  "classification": "SECURITY_FAILURE",
+  "productionRuleSourceModified": false,
+  "rulesDeploy": false,
+  "hostingDeploy": false,
+  "firestoreWrites": 0,
+  "operationalWrites": 0,
+  "production": false
+}
