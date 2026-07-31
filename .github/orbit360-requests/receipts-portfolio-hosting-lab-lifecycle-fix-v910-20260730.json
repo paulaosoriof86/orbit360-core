@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-hosting-lab-lifecycle-fix-authorization-v1",
+  "approved": true,
+  "phrase": "AUTORIZO HOSTING LAB FIX PROYECCION RECIBOS CARTERA V910 20260730",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "46cb4d0b580f97b8f2b4cb614c4d29fc652335c1",
+  "projectionBlob": "2e3e50cd5ea788a3c88fe09eb2c3f6b1c0a4b8db",
+  "projectId": "ays-orbit-360-lab",
+  "channelId": "orbit360-ays-lab",
+  "sourceFix": {
+    "run": 30630611243,
+    "artifact": 8793162582,
+    "digest": "sha256:deca558e721d05d48ca74591605efa4214330659835a6a92faecabc93be1fc01",
+    "functionalCommit": "da9eaf6c862729f8f513ee1318acca1d00b56cd5"
+  },
+  "scope": {
+    "hostingLab": true,
+    "hydrationDiagnostic": true,
+    "browserVisual": true,
+    "rules": false,
+    "functions": false,
+    "storage": false,
+    "dataWrites": false,
+    "production": false,
+    "main": false,
+    "merge": false,
+    "cobros": false
+  },
+  "allowedDeployExecutions": 1,
+  "stopRetryOnRepeatedStageFailure": true,
+  "humanVisualRequiredBeforeCobros": true
+}
