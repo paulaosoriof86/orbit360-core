@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "orbit360-owner-drift-receipts-hosting-authorization-v1",
+  "approved": true,
+  "phrase": "AUTORIZO HOSTING LAB FIX OWNER DRIFT RECIBOS CARTERA V910 20260731",
+  "date": "2026-07-31",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "76568148f6c67d829b755a9391fffb95214333bb",
+  "functionalCommit": "f651413cf7718daf3e795bc850b1e11760a01efe",
+  "ownerBlob": "2b6b960818b93942a2f184a4715d9e38dd3fffab",
+  "projectId": "ays-orbit-360-lab",
+  "channelId": "orbit360-ays-lab",
+  "scope": {
+    "hostingLab": true,
+    "browserVisual": true,
+    "hydrationDiagnostic": true,
+    "rules": false,
+    "functions": false,
+    "storage": false,
+    "dataWrites": false,
+    "cobros": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "allowedDeployExecutions": 1,
+  "sourceStaticRun": 30654285383,
+  "sourceStaticArtifact": 8802592917,
+  "sourceStaticDigest": "sha256:90e68e2106c6900103a99dadc132d5d7751e20c50a0d792baa5454db5af2131",
+  "containsPII": false,
+  "containsSecrets": false
+}
