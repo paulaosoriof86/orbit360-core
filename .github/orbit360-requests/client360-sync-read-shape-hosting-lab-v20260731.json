@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "orbit360-client360-sync-read-shape-hosting-authorization-v1",
+  "approved": true,
+  "phrase": "AUTORIZO HOSTING LAB FIX CLIENTE360 SYNC READ SHAPE 20260731",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "498fa5fda927a8555faf6d155f1830532d2f5dcb",
+  "functionalCommit": "b164b3590a41d6ff5ff12766ab1885e50ac24f78",
+  "readModelBlob": "696acb7d762edba97fdf2e65ace4a09818704034",
+  "staticRun": 30660261652,
+  "staticArtifact": 8804859413,
+  "staticDigest": "sha256:36e014c8651956bff6104bd1c3fc5fd04cf97a00cd9dbc6b3f6112939c85ad7f",
+  "projectId": "ays-orbit-360-lab",
+  "channelId": "orbit360-ays-lab",
+  "scope": {
+    "hostingLab": true,
+    "browserVisual": true,
+    "hydrationDiagnostic": true,
+    "rules": false,
+    "functions": false,
+    "storage": false,
+    "dataWrites": false,
+    "cobros": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "allowedDeployExecutions": 1
+}
