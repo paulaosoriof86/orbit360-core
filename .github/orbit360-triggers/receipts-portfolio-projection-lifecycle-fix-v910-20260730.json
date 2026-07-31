@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "orbit360-projection-lifecycle-fix-trigger-v1",
+  "classification": "FUNCTIONAL_DEFECT",
+  "sourceDiagnosticRun": 30630222364,
+  "sourceDiagnosticArtifact": 8793036965,
+  "sourceDiagnosticDigest": "sha256:79f83fc5f934c510197b8a600a5792d1a8f6353a0d1e828e2c52a66a40f3d05d",
+  "observedBaseCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "asesores": 7,
+    "polizas": 1373,
+    "vehiculos": 1032
+  },
+  "observedProjectionCounts": {
+    "recibosEsperados": 0,
+    "carteraPrimas": 0
+  },
+  "observedProjectionAttached": 0,
+  "rootCause": "PROJECTION_WRAPSTORE_NON_IDEMPOTENT_BLOCKS_ATTACH_AFTER_BOOT_WRAP",
+  "hostingDeploy": false,
+  "rulesDeploy": false,
+  "functionsDeploy": false,
+  "storageDeploy": false,
+  "dataWrites": false,
+  "production": false
+}
