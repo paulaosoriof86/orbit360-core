@@ -1,5 +1,9 @@
 {
-  "schemaVersion": "orbit360-sanitized-visual-focal-trigger-v1",
+  "schemaVersion": "orbit360-sanitized-visual-security-recovery-v2",
+  "classification": "SECURITY_FAILURE",
+  "invalidatedPriorVisualRun": 30674070410,
+  "invalidatedPriorArtifact": 8809808825,
+  "priorArtifactApprovedForUse": false,
   "technicalHumanReviewRun": 30673945126,
   "technicalHumanReviewPassed": true,
   "technicalHumanReviewArtifact": 8809768450,
@@ -13,6 +17,15 @@
   "dataWrites": false,
   "production": false,
   "browserReadOnly": true,
-  "screenshotsSanitized": true,
-  "notes": "Generate six masked screenshots for the single focal visual review after the technical human-review runtime PASS. No real values are retained in the screenshots."
+  "screenshotsSanitizedFailClosed": true,
+  "securityRequirements": {
+    "removePreviousOutputDirectoryBeforeCapture": true,
+    "maskAllNonAllowlistedBodyText": true,
+    "maskFormAndAccessibilityValues": true,
+    "residualDynamicTextMustEqual": 0,
+    "residualFormValuesMustEqual": 0,
+    "uploadScreenshotsOnlyOnSuccess": true,
+    "containsPIIMayBeFalseOnlyAfterResidualCheck": true
+  },
+  "notes": "Replacement evidence only. Prior screenshot artifact is invalid and must not be used or shared. This recovery does not change product, Hosting, data or production."
 }
