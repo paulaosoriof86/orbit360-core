@@ -17,6 +17,13 @@
   },
   "observedProjectionAttached": 0,
   "rootCause": "PROJECTION_WRAPSTORE_NON_IDEMPOTENT_BLOCKS_ATTACH_AFTER_BOOT_WRAP",
+  "pipelineResume": {
+    "sourceFailedRun": 30630503118,
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "rootCause": "WORKTREE_WIDE_DIFF_GUARD_INCLUDED_RUNTIME_EVIDENCE",
+    "functionalPatchCommitted": false,
+    "deployExecuted": false
+  },
   "hostingDeploy": false,
   "rulesDeploy": false,
   "functionsDeploy": false,
