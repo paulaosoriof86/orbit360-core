@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "orbit360-client360-policy-vehicle-hosting-authorization-v1",
+  "approved": true,
+  "phrase": "AUTORIZO HOSTING LAB FIX CLIENTE360 POLIZAS VEHICULOS FULLPAGE 20260731",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "107d26d43a79f5c3115c488500e687b8949da157",
+  "ownerBlob": "668263c1d63cb84c389dc6a228245ba57379b66f",
+  "projectId": "ays-orbit-360-lab",
+  "channelId": "orbit360-ays-lab",
+  "sourceStatic": {
+    "run": 30648926778,
+    "artifact": 8800577269,
+    "digest": "sha256:3cde435bd32bfbbb94fc377dfeb008fc546930df2b0a2932205b41849847a9ab",
+    "checks": "33/33"
+  },
+  "scope": {
+    "hostingLab": true,
+    "browserVisual": true,
+    "hydrationDiagnostic": true,
+    "rules": false,
+    "functions": false,
+    "storage": false,
+    "dataWrites": false,
+    "cobros": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "allowedDeployExecutions": 1,
+  "containsPII": false,
+  "containsSecrets": false,
+  "rollback": "No data write; Hosting preview channel can be superseded by previously accepted audited asset set if required."
+}
