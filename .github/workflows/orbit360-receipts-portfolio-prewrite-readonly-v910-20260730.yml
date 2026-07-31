@@ -71,7 +71,7 @@ jobs:
             if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
             const u=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
             const sig=crypto.sign('RSA-SHA256',Buffer.from(u),sa.private_key).toString('base64url');
-            const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth-type:jwt-bearer'.replace('oauth-type','oauth-grant-type'),assertion:u+'.'+sig});
+            const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:u+'.'+sig});
             const tr=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body}),tj=await tr.json();
             if(!tr.ok||!tj.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+tr.status);
             await download(tj.access_token,process.env.ACTIVE_DRIVE_FILE_ID,process.env.ACTIVE_SHA256,'/tmp/receipts-active.xlsx','ACTIVE');
