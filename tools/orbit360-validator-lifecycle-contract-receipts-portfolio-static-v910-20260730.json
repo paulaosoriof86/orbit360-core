@@ -3,7 +3,7 @@
   "gateId": "block9-receipts-portfolio-static-v20260730",
   "gateContractVersion": "9.1.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "contractExtensionRevision": "20260731-transversal-import-idempotency-reconciliation-v1",
+  "contractExtensionRevision": "20260731-transversal-import-idempotency-reconciliation-v2",
   "executionProfile": {
     "phase": "RECEIPTS_PORTFOLIO_STATIC_QUALIFICATION",
     "capabilities": {
@@ -55,6 +55,20 @@
   "bankCreatesCobroByInference": false,
   "receiptIdentityEndorsementAware": true,
   "fifoReservedForCobrosConciliacion": true,
+  "reconciliationMatcher": {
+    "oneToOneRequired": true,
+    "sameCrmPaymentMayMatchMultipleInsurerRows": false,
+    "installmentAware": true,
+    "canonicalReceiptAware": true,
+    "dueDateDisambiguation": true,
+    "paymentDateDisambiguation": true,
+    "sourceDifferencesPreserved": true,
+    "sourceDifferenceMayOverwriteSourceValue": false,
+    "paymentReconciliationAction": "materializar_cobro_conciliado",
+    "balanceReconciliationAction": "marcar_cartera_conciliada",
+    "balanceReconciliationCreatesPayment": false,
+    "balanceReconciliationLabel": "Cartera conciliada con aseguradora"
+  },
   "transversalIdentityUpsert": {
     "required": true,
     "owner": "orbit360-platform/core/importa-identity-upsert-v20260731.js",
