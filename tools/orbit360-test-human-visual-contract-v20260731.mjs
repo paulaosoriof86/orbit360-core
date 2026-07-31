@@ -12,10 +12,12 @@ const add=(id,ok)=>checks.push({id,ok:Boolean(ok)});
 
 // Human-review regressions: missing values must remain unknown, never become numeric zero.
 add('PREMIUM_BLANK_NOT_ZERO', detail.includes('function numberOrNull') && detail.includes("safe(v) === ''") && !detail.includes("const finite = v => Number.isFinite(Number(v)) ? Number(v) : null"));
+add('POLICY_TOTAL_NOT_INFERRED_FROM_NET', detail.includes('out.primaTotal = total;') && !detail.includes('out.primaTotal = total != null ? total : net'));
 add('POLICY_QUALITY_FAIL_CLOSED', detail.includes('policyCompleteness') && detail.includes('Información pendiente de completar'));
 add('DETAIL_MONEY_PRESERVES_CENTS', detail.includes('moneyDetail') && detail.includes('minimumFractionDigits:2'));
 add('DARK_HEADER_ACTION_VISIBLE', detail.includes('background:transparent') && detail.includes('Volver al cliente'));
 add('PREMIUM_SCHEDULE_BREAKDOWN', detail.includes('premiumBreakdown') && detail.includes("sum('gastosExpedicion')") && detail.includes("sum('gastosFinanciamiento')") && detail.includes("sum('impuestosIVA')") && detail.includes('Descuento / ajuste (campo fuente)'));
+add('POLICY_RECEIPTS_CHRONOLOGICAL', detail.includes(".sort((a,b) => safe(first(a.fechaLimite") && detail.includes('Ajuste fuente'));
 
 // Vehicle and receipt navigation must have real details, not dead-end rows/cards.
 add('VEHICLE_TAB_FULLPAGE_ACTION', detail.includes('Ver vehículo completo') && detail.includes('patchLegacyCards') && detail.includes('verVehiculo(v.id)'));
@@ -33,6 +35,6 @@ add('POLICIES_MISSING_COMPONENTS_NOT_ZERO', !policies.includes('(p.gastosEmision
 add('CLIENT_PREMIUM_LABEL_EXPLICIT', detail.includes('Prima total anual vigente') || client.includes('Prima total anual vigente') || client.includes('Prima neta anual vigente'));
 
 const failed=checks.filter(x=>!x.ok);
-const out={schemaVersion:'orbit360-human-visual-contract-v2',status:failed.length?'FUNCTIONAL_DEFECT':'HUMAN_VISUAL_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-human-visual-contract-v3',status:failed.length?'FUNCTIONAL_DEFECT':'HUMAN_VISUAL_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));
 if(failed.length) process.exit(41);
