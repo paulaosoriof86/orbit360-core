@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "orbit360-hydration-diagnostic-trigger-v1",
+  "sourceRun": 30605735832,
+  "sourceArtifact": 8783543172,
+  "classificationPending": true,
+  "hostingRedeploy": false,
+  "firestoreWrites": 0,
+  "operationalWrites": 0,
+  "production": false
+}
