@@ -1,0 +1,185 @@
+name: Orbit 360 · Recibos/Cartera 9.1.0 owner drift · Hosting LAB once
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/owner-drift-receipts-hosting-lab-v910-20260731.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-owner-drift-receipts-hosting-lab-v910-20260731
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: block9-receipts-portfolio-static-v20260730
+  ORBIT360_REQUEST: .github/orbit360-requests/owner-drift-receipts-hosting-lab-v910-20260731.json
+  ORBIT360_AUTHORIZED_HEAD: 76568148f6c67d829b755a9391fffb95214333bb
+  ORBIT360_FUNCTIONAL_COMMIT: f651413cf7718daf3e795bc850b1e11760a01efe
+  ORBIT360_OWNER_BLOB: 2b6b960818b93942a2f184a4715d9e38dd3fffab
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_CHANNEL_ID: orbit360-ays-lab
+  ORBIT360_LAB_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  hosting_owner_drift_once:
+    name: Hosting LAB único · owner drift Recibos/Cartera
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar autorización y lineage exacto
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test -f "$ORBIT360_REQUEST"
+          jq -e '.schemaVersion=="orbit360-owner-drift-receipts-hosting-authorization-v1" and .approved==true and .phrase=="AUTORIZO HOSTING LAB FIX OWNER DRIFT RECIBOS CARTERA V910 20260731" and .branch==env.ORBIT360_BRANCH and .authorizedHead==env.ORBIT360_AUTHORIZED_HEAD and .functionalCommit==env.ORBIT360_FUNCTIONAL_COMMIT and .ownerBlob==env.ORBIT360_OWNER_BLOB and .projectId==env.ORBIT360_PROJECT_ID and .channelId==env.ORBIT360_CHANNEL_ID and .scope.hostingLab==true and .scope.browserVisual==true and .scope.hydrationDiagnostic==true and .scope.rules==false and .scope.functions==false and .scope.storage==false and .scope.dataWrites==false and .scope.cobros==false and .scope.production==false and .scope.main==false and .scope.merge==false and .allowedDeployExecutions==1' "$ORBIT360_REQUEST" >/dev/null
+          git merge-base --is-ancestor "$ORBIT360_FUNCTIONAL_COMMIT" "$ORBIT360_AUTHORIZED_HEAD"
+          git merge-base --is-ancestor "$ORBIT360_AUTHORIZED_HEAD" HEAD
+          bad="$(git diff --name-only "$ORBIT360_AUTHORIZED_HEAD"..HEAD | grep -Ev '^\.github/workflows/orbit360-owner-drift-receipts-hosting-lab-v910-20260731\.yml$|^\.github/orbit360-requests/owner-drift-receipts-hosting-lab-v910-20260731\.json$' || true)"
+          test -z "$bad"
+          test "$(git hash-object orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js)" = "$ORBIT360_OWNER_BLOB"
+          grep -Fq 'projectionQueryOwner' orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js
+          grep -Fq 'projectionClientOwner' orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js
+      - name: Gate canónico antes de secrets deploy browser
+        env:
+          ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-receipts-portfolio-visual-lab-v910-20260730.mjs
+          node --check tools/orbit360-receipts-portfolio-hydration-diagnostic-v910-20260730.mjs
+          node --check tools/orbit360-test-receipts-portfolio-visual-projection-v910.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Pruebas estáticas owner drift + regresión fullpage
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-receipts-portfolio-visual-projection-v910.mjs > "$EVIDENCE_DIR/owner-drift-visual-static-prehosting-v20260731.json"
+          jq -e '.status=="VISUAL_PROJECTION_STATIC_READY" and .failed==0 and .passed==34 and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/owner-drift-visual-static-prehosting-v20260731.json" >/dev/null
+          node tools/orbit360-test-receipts-portfolio-projection-lifecycle-v910-20260730.mjs > "$EVIDENCE_DIR/owner-drift-lifecycle-prehosting-v20260731.json"
+          jq -e '.ok==true and .status=="PROJECTION_LIFECYCLE_PASS" and .checks.ready==true and .checks.bothAttached==true and .checks.baseStorePreserved==true' "$EVIDENCE_DIR/owner-drift-lifecycle-prehosting-v20260731.json" >/dev/null
+          node tools/orbit360-test-client360-policy-vehicle-readmodel-v1199c-20260731.mjs > "$EVIDENCE_DIR/owner-drift-fullpage-regression-prehosting-v20260731.json"
+          jq -e '.ok==true and .policyAliases==true and .vehicleAliases==true and .indexedSummary==true and .fullPagePolicy==true and .fullPageVehicle==true and .noUndefinedNaN==true and .writes==0' "$EVIDENCE_DIR/owner-drift-fullpage-regression-prehosting-v20260731.json" >/dev/null
+      - name: Instalar herramientas después del gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@latest
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.52.0
+          npx playwright install chromium
+      - name: Resolver credencial técnica LAB
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-owner-drift-receipts-hosting.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+      - name: Deploy único Hosting LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase hosting:channel:deploy "$ORBIT360_CHANNEL_ID" --project "$ORBIT360_PROJECT_ID" --expires 7d --non-interactive --json > "$EVIDENCE_DIR/owner-drift-receipts-hosting-deploy-raw-v20260731.json"
+          test -s "$EVIDENCE_DIR/owner-drift-receipts-hosting-deploy-raw-v20260731.json"
+          jq -n --arg head "$GITHUB_SHA" --arg functional "$ORBIT360_FUNCTIONAL_COMMIT" --arg blob "$ORBIT360_OWNER_BLOB" '{schemaVersion:"orbit360-owner-drift-receipts-hosting-deploy-v1",ok:true,status:"HOSTING_LAB_DEPLOY_PASS",sourceHead:$head,functionalCommit:$functional,ownerBlob:$blob,hostingDeployExecutions:1,rulesDeployExecutions:0,functionsDeploy:false,storageDeploy:false,firestoreDataWrites:0,operationalWrites:0,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/owner-drift-receipts-hosting-deploy-v20260731.json"
+      - name: Paridad remota activos críticos
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=('index.html' 'core/backend-lab-receipts-portfolio-projection-v910.js' 'core/backend-lab-canonical-view-sync.js' 'modules/policy-receipts-v1199-detail-guard.js' 'modules/cliente360.js' 'sw.js')
+          pass=0
+          for f in "${files[@]}"; do
+            local_sha="$(sha256sum "orbit360-platform/$f" | awk '{print $1}')"
+            tmp="${RUNNER_TEMP}/remote-$(basename "$f")"
+            ok=false
+            for i in $(seq 1 30); do
+              if curl -fsSL --retry 2 "${ORBIT360_LAB_URL}/${f}?orbitOwnerDrift=${GITHUB_SHA}-${i}" -o "$tmp"; then
+                remote_sha="$(sha256sum "$tmp" | awk '{print $1}')"
+                if [ "$remote_sha" = "$local_sha" ]; then ok=true; break; fi
+              fi
+              sleep 3
+            done
+            test "$ok" = true
+            pass=$((pass+1))
+          done
+          jq -n --argjson pass "$pass" '{schemaVersion:"orbit360-owner-drift-parity-v1",ok:($pass==6),criticalAssets:6,passed:$pass,failed:(6-$pass),hostingLab:true,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/owner-drift-receipts-parity-v20260731.json"
+          test "$pass" = '6'
+      - name: Hidratación exacta 430 1373 1032 1293 673
+        env:
+          ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
+          ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+          ORBIT360_DIAG_WAIT_MS: '15000'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-receipts-portfolio-hydration-diagnostic-v910-20260730.mjs
+          jq -e '.ok==true and .status=="HYDRATION_DIAGNOSTIC_CAPTURED" and .state.counts.clientes==430 and .state.counts.aseguradoras==30 and .state.counts.asesores==7 and .state.counts.polizas==1373 and .state.counts.vehiculos==1032 and .state.counts.recibosEsperados==1293 and .state.counts.carteraPrimas==673 and .state.counts.cobros==0 and .state.counts.finmovs==0 and .state.storeProjection.ready==true and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/receipts-portfolio-hydration-diagnostic-v910.json" >/dev/null
+      - name: Runtime visual read-only Recibos + multirol
+        env:
+          ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
+          ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-receipts-portfolio-visual-lab-v910-20260730.mjs
+          jq -e '.ok==true and .status=="VISUAL_LAB_PASS" and .contractVersion=="9.1.0" and .checks.labEntrypointBound==true and .counts.clientes==430 and .counts.aseguradoras==30 and .counts.asesores==7 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1293 and .counts.carteraPrimas==673 and .counts.cobros==0 and .counts.finmovs==0 and .checks.baseline==true and .checks.projectionReady==true and .checks.downstreamZero==true and .checks.activeCalendar==true and .checks.historicalExigible==true and .checks.paymentReportedPendingReconciliation==true and .checks.cobrosSeparated==true and .roleViews["Dirección"].rowsVisible>0 and .roleViews["Operativo"].rowsVisible>0 and .roleViews["Asesor"].rowsVisible>0 and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/receipts-portfolio-visual-lab-v910.json" >/dev/null
+      - name: Cerrar evidencia sanitizada
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          DEPLOY=false; PARITY=false; HYDRATION=false; VISUAL=false
+          jq -e '.ok==true and .hostingDeployExecutions==1' "$EVIDENCE_DIR/owner-drift-receipts-hosting-deploy-v20260731.json" >/dev/null 2>&1 && DEPLOY=true
+          jq -e '.ok==true and .passed==6' "$EVIDENCE_DIR/owner-drift-receipts-parity-v20260731.json" >/dev/null 2>&1 && PARITY=true
+          jq -e '.ok==true and .state.counts.recibosEsperados==1293 and .state.counts.carteraPrimas==673 and .state.storeProjection.ready==true' "$EVIDENCE_DIR/receipts-portfolio-hydration-diagnostic-v910.json" >/dev/null 2>&1 && HYDRATION=true
+          jq -e '.ok==true and .status=="VISUAL_LAB_PASS"' "$EVIDENCE_DIR/receipts-portfolio-visual-lab-v910.json" >/dev/null 2>&1 && VISUAL=true
+          jq -n --argjson deploy "$DEPLOY" --argjson parity "$PARITY" --argjson hydration "$HYDRATION" --argjson visual "$VISUAL" '{schemaVersion:"orbit360-owner-drift-receipts-hosting-final-v1",ok:($deploy and $parity and $hydration and $visual),status:(if ($deploy and $parity and $hydration and $visual) then "HOSTING_LAB_OWNER_DRIFT_VISUAL_PASS" else "HOSTING_LAB_OWNER_DRIFT_OR_VISUAL_FAIL" end),hostingDeploy:$deploy,remoteParity:$parity,hydration:$hydration,visualLab:$visual,hostingDeployExecutions:(if $deploy then 1 else 0 end),rulesDeployExecutions:0,functionsDeploy:false,storageDeploy:false,firestoreDataWrites:0,operationalWrites:0,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/owner-drift-receipts-hosting-final-v20260731.json"
+      - name: Limpiar credencial temporal
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ]; then rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-owner-drift-receipts-hosting-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/owner-drift-visual-static-prehosting-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/owner-drift-lifecycle-prehosting-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/owner-drift-fullpage-regression-prehosting-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/owner-drift-receipts-hosting-deploy-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/owner-drift-receipts-parity-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-hydration-diagnostic-v910.json
+            orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-visual-lab-v910.json
+            orbit360-platform/runtime-gate-crm-v20260716/owner-drift-receipts-hosting-final-v20260731.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');const f='orbit360-platform/runtime-gate-crm-v20260716/owner-drift-receipts-hosting-final-v20260731.json';let state='failure',description='Recibos owner drift Hosting/visual failed';try{const p=JSON.parse(fs.readFileSync(f,'utf8'));if(p.ok&&p.status==='HOSTING_LAB_OWNER_DRIFT_VISUAL_PASS'){state='success';description='Recibos/Cartera owner drift LAB PASS';}}catch(e){}await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/owner-drift-receipts-hosting-lab',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
