@@ -22,6 +22,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -30,7 +31,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          jq -e '.schemaVersion=="orbit360-role-route-diagnostic-trigger-v1" and .sourceHostingRun==30631820866 and .sourceHostingArtifact==8793675831 and .hostingDeployAlreadyConsumed==true and .rulesDeploy==false and .hostingDeploy==false and .dataWrites==false and .browserReadOnly==true' .github/orbit360-triggers/receipts-portfolio-role-route-diagnostic-v910-20260730.json >/dev/null
+          jq -e '.schemaVersion=="orbit360-role-route-diagnostic-trigger-v2" and .sourceHostingRun==30655526997 and .sourceHostingArtifact==8803087663 and .sourceHostingDigest=="sha256:9d44824706700cdc50e30234e4851d5aa2b1c53ae4d3880c39adf646b6f1ff83" and .hostingDeployAlreadyConsumed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .browserReadOnly==true and .rootCauseOnly==true' .github/orbit360-triggers/receipts-portfolio-role-route-diagnostic-v910-20260730.json >/dev/null
           node --check tools/orbit360-receipts-portfolio-role-route-diagnostic-v910-20260730.mjs
       - name: Gate canónico antes de secreto/browser
         env:
@@ -45,8 +46,8 @@ jobs:
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.52.0
-          npx playwright install --with-deps chromium
-      - name: Capturar transición rol/ruta sin PII
+          npx playwright install chromium
+      - name: Capturar composición Recibos sin PII
         env:
           ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
           ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
@@ -72,6 +73,6 @@ jobs:
           DIAG: orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-role-route-diagnostic-v910.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='Role-route diagnostic failed';
-            try{const d=JSON.parse(fs.readFileSync(process.env.DIAG,'utf8'));if(d.ok===true&&d.status==='ROLE_ROUTE_DIAGNOSTIC_CAPTURED'){state='success';description='Role-route diagnostic captured; zero deploy';}}catch(e){}
+            const fs=require('fs');let state='failure',description='Recibos structural diagnostic failed';
+            try{const d=JSON.parse(fs.readFileSync(process.env.DIAG,'utf8'));if(d.ok===true&&d.status==='ROLE_ROUTE_DIAGNOSTIC_CAPTURED'){state='success';description='Recibos structural diagnostic captured; zero deploy';}}catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/receipts-portfolio-role-route-diagnostic-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
