@@ -15,7 +15,7 @@
   var cache={recibosEsperados:[],carteraPrimas:[]};
   var unsub=[];
   var wrappedStore=false,wrappedQuery=false,wrappedClient=false,wrappedPolicies=false;
-  var status={version:'9.1.0',tenantId:tenant,readOnly:true,attached:[],counts:{recibosEsperados:0,carteraPrimas:0},errors:{},ready:false};
+  var status={version:'9.1.0',ownerRevision:'20260731.2',tenantId:tenant,readOnly:true,attached:[],counts:{recibosEsperados:0,carteraPrimas:0},errors:{},owners:{query:false,client:false,policies:false},ready:false};
   var recFilter={};
   var clean=function(v){return String(v==null?'':v).trim();};
   var num=function(v){var n=Number(v);return Number.isFinite(n)?n:0;};
@@ -82,20 +82,34 @@
     function sum(a){return a.reduce(function(s,r){return s+amount(r);},0);}
     return{rows:rows,future:future,due:due,historical:hist,active:active,futureAmount:sum(future),dueAmount:sum(due),historicalAmount:sum(hist),totalAmount:sum(rows)};
   }
+  function markSummaryApplied(r){
+    if(!r||typeof r!=='object')return r;
+    try{Object.defineProperty(r,'__orbitRpV910SummaryApplied',{value:true,configurable:true,enumerable:false});}catch(e){try{r.__orbitRpV910SummaryApplied=true;}catch(ignore){}}
+    return r;
+  }
   function installQueryProjection(){
-    if(wrappedQuery||!Orbit.q||typeof Orbit.q.clienteResumen!=='function'||!wrappedStore)return false;
-    var base=Orbit.q.clienteResumen.bind(Orbit.q);
-    Orbit.q.recibosEsperadosDe=function(cid){return Orbit.store.where('recibosEsperados',function(r){return r&&r.clienteId===cid;});};
-    Orbit.q.carteraPrimasDe=function(cid){return Orbit.store.where('carteraPrimas',function(r){return r&&r.clienteId===cid;});};
-    Orbit.q.carteraPrimasResumenDe=portfolioSummary;
-    Orbit.q.clienteResumen=function(cid){
-      var r=base(cid),p=portfolioSummary(cid),rec=Orbit.q.recibosEsperadosDe(cid);
-      r.recibosEsperados=rec;r.carteraPrimas=p.rows;r.carteraActiva=p.active;r.carteraHistorica=p.historical;r.carteraFutura=p.future;r.carteraExigible=p.due;
-      r.pendiente=p.futureAmount;r.vencido=p.dueAmount;r.carteraHistoricaMonto=p.historicalAmount;r.carteraTotal=p.totalAmount;
-      if(p.dueAmount>0)r.salud=Math.max(8,Number(r.salud||70)-25);
-      return r;
-    };
-    wrappedQuery=true;return true;
+    if(!Orbit.q||typeof Orbit.q.clienteResumen!=='function'||!wrappedStore)return false;
+    var q=Orbit.q;
+    q.recibosEsperadosDe=function(cid){return Orbit.store.where('recibosEsperados',function(r){return r&&r.clienteId===cid;});};
+    q.carteraPrimasDe=function(cid){return Orbit.store.where('carteraPrimas',function(r){return r&&r.clienteId===cid;});};
+    q.carteraPrimasResumenDe=portfolioSummary;
+    if(q.__rpV910ClienteResumenOwner!==q.clienteResumen){
+      var base=q.clienteResumen.bind(q);
+      var projected=function(cid){
+        var r=base(cid);if(r&&r.__orbitRpV910SummaryApplied===true)return r;
+        r=r||{};var p=portfolioSummary(cid),rec=q.recibosEsperadosDe(cid);
+        r.recibosEsperados=rec;r.carteraPrimas=p.rows;r.carteraActiva=p.active;r.carteraHistorica=p.historical;r.carteraFutura=p.future;r.carteraExigible=p.due;
+        r.pendiente=p.futureAmount;r.vencido=p.dueAmount;r.carteraHistoricaMonto=p.historicalAmount;r.carteraTotal=p.totalAmount;
+        if(p.dueAmount>0)r.salud=Math.max(8,Number(r.salud||70)-25);
+        return markSummaryApplied(r);
+      };
+      try{Object.defineProperty(projected,'__orbitRpV910QueryOwner',{value:true});}catch(e){}
+      q.clienteResumen=projected;
+      q.__rpV910ClienteResumenOwner=projected;
+    }
+    wrappedQuery=q.__rpV910ClienteResumenOwner===q.clienteResumen;
+    status.owners.query=wrappedQuery;
+    return wrappedQuery;
   }
   function activeClientId(){try{return Orbit.route&&Orbit.route.params&&Orbit.route.params.c||'';}catch(e){return'';}}
   function patchHeader(cid){
@@ -129,15 +143,35 @@
   }
   function installVisualBridges(){
     if(!wrappedQuery)return false;
-    if(!wrappedClient&&Orbit.modules&&Orbit.modules.cliente360&&typeof Orbit.modules.cliente360.render==='function'){
-      var cr=Orbit.modules.cliente360.render.bind(Orbit.modules.cliente360);Orbit.modules.cliente360.render=function(host){var out=cr(host);setTimeout(function(){patchClient(host);},0);return out;};wrappedClient=true;
-    }
-    if(!wrappedPolicies&&Orbit.modules&&Orbit.modules.polizas&&typeof Orbit.modules.polizas.verDesglose==='function'){
-      var pd=Orbit.modules.polizas.verDesglose.bind(Orbit.modules.polizas);Orbit.modules.polizas.verDesglose=function(id){var out=pd(id);setTimeout(function(){patchPolicyDrawer(id);},0);return out;};wrappedPolicies=true;
-    }
+    var mod=Orbit.modules&&Orbit.modules.cliente360;
+    if(mod&&typeof mod.render==='function'){
+      if(mod.__rpV910RenderOwner!==mod.render){
+        var cr=mod.render.bind(mod),clientWrapper=function(host){var out=cr(host);setTimeout(function(){patchClient(host);},0);return out;};
+        try{Object.defineProperty(clientWrapper,'__orbitRpV910ClientOwner',{value:true});}catch(e){}
+        mod.render=clientWrapper;mod.__rpV910RenderOwner=clientWrapper;
+      }
+      wrappedClient=mod.__rpV910RenderOwner===mod.render;
+    }else wrappedClient=false;
+    var pol=Orbit.modules&&Orbit.modules.polizas;
+    if(pol&&typeof pol.verDesglose==='function'){
+      if(pol.__rpV910PolicyOwner!==pol.verDesglose){
+        var pd=pol.verDesglose.bind(pol),policyWrapper=function(id){var out=pd(id);setTimeout(function(){patchPolicyDrawer(id);},0);return out;};
+        try{Object.defineProperty(policyWrapper,'__orbitRpV910PolicyOwner',{value:true});}catch(e){}
+        pol.verDesglose=policyWrapper;pol.__rpV910PolicyOwner=policyWrapper;
+      }
+      wrappedPolicies=pol.__rpV910PolicyOwner===pol.verDesglose;
+    }else wrappedPolicies=false;
+    status.owners.client=wrappedClient;status.owners.policies=wrappedPolicies;
     return wrappedClient&&wrappedPolicies;
   }
+  function reconcileOwners(){
+    wrapStore();installQueryProjection();installVisualBridges();
+    setTimeout(function(){try{patchClient(document.getElementById('host'));}catch(e){}},0);
+  }
   function boot(){wrapStore();installQueryProjection();installVisualBridges();try{if(w.firebase&&typeof w.firebase.auth==='function'){w.firebase.auth().onAuthStateChanged(function(user){if(user)attach();else detach();});if(w.firebase.auth().currentUser)attach();}}catch(e){status.errors.auth=clean(e&&e.message||e).slice(0,120);}var tries=0,t=setInterval(function(){tries++;wrapStore();installQueryProjection();installVisualBridges();if(wrappedStore&&wrappedQuery&&wrappedClient&&wrappedPolicies){clearInterval(t);}else if(tries>80){clearInterval(t);}},100);}
-  Orbit.receiptsPortfolioProjectionV910={status:function(){var s=clone(status);delete s._emit;return s;},amount:amount,dueDate:dueDate,stateLabel:stateLabel,isHistorical:isHistorical,isFuture:isFuture,renderReceipts:renderReceipts};
+  w.addEventListener('hashchange',function(){setTimeout(reconcileOwners,0);});
+  w.addEventListener('orbit:lab:canonical-view-hydrated',function(){setTimeout(reconcileOwners,0);});
+  try{document.addEventListener('orbit:session',function(){setTimeout(reconcileOwners,0);});}catch(e){}
+  Orbit.receiptsPortfolioProjectionV910={status:function(){var s=clone(status);delete s._emit;return s;},amount:amount,dueDate:dueDate,stateLabel:stateLabel,isHistorical:isHistorical,isFuture:isFuture,renderReceipts:renderReceipts,reconcileOwners:reconcileOwners};
   boot();
 })();
