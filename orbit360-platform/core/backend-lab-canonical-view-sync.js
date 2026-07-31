@@ -21,7 +21,7 @@
   function routeKey() {
     try {
       var key = window.Orbit && Orbit.route && Orbit.route.key ? String(Orbit.route.key) : '';
-      if (key === 'cliente360' || key === 'aseguradoras') return key;
+      if (key === 'cliente360' || key === 'aseguradoras' || key === 'polizas') return key;
     } catch (error) {}
     return '';
   }
@@ -45,7 +45,18 @@
   }
 
   function renderSignature(route) {
-    return [route, collectionCount('clientes'), collectionCount('aseguradoras'), collectionCount('asesores'), String(location.hash || '')].join('|');
+    return [
+      route,
+      collectionCount('clientes'),
+      collectionCount('aseguradoras'),
+      collectionCount('asesores'),
+      collectionCount('polizas'),
+      collectionCount('vehiculos'),
+      collectionCount('recibosEsperados'),
+      collectionCount('carteraPrimas'),
+      collectionCount('cobros'),
+      String(location.hash || '')
+    ].join('|');
   }
 
   function renderCanonical(force) {
@@ -61,6 +72,7 @@
 
     if (route === 'cliente360' && collectionCount('clientes') === 0) return;
     if (route === 'aseguradoras' && collectionCount('aseguradoras') === 0) return;
+    if (route === 'polizas' && collectionCount('polizas') === 0) return;
 
     var signature = renderSignature(route);
     var now = Date.now();
@@ -84,6 +96,11 @@
           triggerCollection: triggerCollection,
           clientes: collectionCount('clientes'),
           aseguradoras: collectionCount('aseguradoras'),
+          polizas: collectionCount('polizas'),
+          vehiculos: collectionCount('vehiculos'),
+          recibosEsperados: collectionCount('recibosEsperados'),
+          carteraPrimas: collectionCount('carteraPrimas'),
+          cobros: collectionCount('cobros'),
           renderer: 'prototype-canonical',
           deduplicatedRender: true
         }
@@ -94,7 +111,7 @@
   function schedule(collection, force) {
     var route = routeKey();
     if (!route) return;
-    if (collection && ['clientes', 'aseguradoras', 'asesores', '*'].indexOf(collection) < 0) return;
+    if (collection && ['clientes','aseguradoras','asesores','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','*'].indexOf(collection) < 0) return;
     pendingCollection = collection || pendingCollection || '*';
     if (timer) clearTimeout(timer);
     timer = setTimeout(function () { renderCanonical(force === true); }, force ? 20 : 180);
@@ -107,6 +124,17 @@
     script.src = 'core/m1-visual-integrity-v20260719.js?v=20260719-1';
     script.async = false;
     script.dataset.orbitM1VisualIntegrity = '1';
+    script.onload = function () { schedule('*', true); };
+    (document.head || document.documentElement).appendChild(script);
+  }
+
+  function loadReceiptsPortfolioProjection() {
+    if (window.Orbit && Orbit.receiptsPortfolioProjectionV910) return;
+    if (document.querySelector('script[data-orbit-rp-v910]')) return;
+    var script = document.createElement('script');
+    script.src = 'core/backend-lab-receipts-portfolio-projection-v910.js?v=20260731-1';
+    script.async = false;
+    script.dataset.orbitRpV910 = '1';
     script.onload = function () { schedule('*', true); };
     (document.head || document.documentElement).appendChild(script);
   }
@@ -131,6 +159,11 @@
         renderer: 'prototype-canonical',
         clientes: collectionCount('clientes'),
         aseguradoras: collectionCount('aseguradoras'),
+        polizas: collectionCount('polizas'),
+        vehiculos: collectionCount('vehiculos'),
+        recibosEsperados: collectionCount('recibosEsperados'),
+        carteraPrimas: collectionCount('carteraPrimas'),
+        cobros: collectionCount('cobros'),
         deduplicatedRender: true,
         lastRenderSignature: lastRenderSignature
       };
@@ -138,5 +171,6 @@
   };
 
   loadVisualIntegrity();
+  loadReceiptsPortfolioProjection();
   schedule('*', true);
 })();
