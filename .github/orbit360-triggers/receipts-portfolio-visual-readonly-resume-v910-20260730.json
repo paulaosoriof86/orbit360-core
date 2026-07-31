@@ -9,6 +9,14 @@
   "rootCause": "VISUAL_VALIDATOR_MISSING_FIRESTORE_LAB_ENTRYPOINT_QUERY_PARAMS",
   "validatorFixCommit": "3a6fa4fa6adf74a1df81cfa7aa0023a8985daa46",
   "rulesSourceCommit": "980a317fdae9d24ea1cde8efbdc3cfae6d4f8038",
+  "preflightResume": {
+    "sourceFailedRun": 30629834920,
+    "classification": "VALIDATOR_STALE",
+    "canonicalGatePassed": 32,
+    "canonicalGateFailed": 0,
+    "browserExecuted": false,
+    "rootCause": "WORKFLOW_ASSERTED_NON_EMITTED_FIRESTOREWRITES_FIELD_AFTER_CANONICAL_GO"
+  },
   "rulesDeploy": false,
   "hostingDeploy": false,
   "functionsDeploy": false,
