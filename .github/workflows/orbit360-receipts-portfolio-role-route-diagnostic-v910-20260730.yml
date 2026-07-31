@@ -31,7 +31,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          jq -e '.schemaVersion=="orbit360-role-route-diagnostic-trigger-v2" and .sourceHostingRun==30655526997 and .sourceHostingArtifact==8803087663 and .sourceHostingDigest=="sha256:9d44824706700cdc50e30234e4851d5aa2b1c53ae4d3880c39adf646b6f1ff83" and .hostingDeployAlreadyConsumed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .browserReadOnly==true and .rootCauseOnly==true' .github/orbit360-triggers/receipts-portfolio-role-route-diagnostic-v910-20260730.json >/dev/null
+          jq -e '.schemaVersion=="orbit360-role-route-diagnostic-trigger-v2" and .sourceHostingRun==30659154509 and .sourceHostingArtifact==8804600413 and .sourceHostingDigest=="sha256:c520c7765bb183c6a3216749891e820e78d554401df740ce07e0335315c051d5" and .hostingDeployAlreadyConsumed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .browserReadOnly==true and .rootCauseOnly==true' .github/orbit360-triggers/receipts-portfolio-role-route-diagnostic-v910-20260730.json >/dev/null
           node --check tools/orbit360-receipts-portfolio-role-route-diagnostic-v910-20260730.mjs
       - name: Gate canónico antes de secreto/browser
         env:
