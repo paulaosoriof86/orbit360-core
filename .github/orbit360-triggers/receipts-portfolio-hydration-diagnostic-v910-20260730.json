@@ -1,10 +1,17 @@
 {
-  "schemaVersion": "orbit360-hydration-diagnostic-trigger-v1",
-  "sourceRun": 30605735832,
-  "sourceArtifact": 8783543172,
-  "classificationPending": true,
+  "schemaVersion": "orbit360-hydration-diagnostic-trigger-v2",
+  "sourceRulesRun": 30629363251,
+  "rulesDeployPassed": true,
+  "liveRulesReadPassed": true,
+  "productReadOnlyRegressionPassed": true,
+  "sourceVisualRun": 30629935539,
+  "sourceVisualFailureStage": "hydrate",
+  "sourceVisualEntrypointBound": true,
+  "classification": "STOP_RETRY_ROOT_CAUSE_DIAGNOSTIC",
   "hostingRedeploy": false,
+  "rulesDeploy": false,
   "firestoreWrites": 0,
   "operationalWrites": 0,
+  "browserReadOnly": true,
   "production": false
 }
