@@ -1,0 +1,130 @@
+name: Orbit 360 · Receipts/portfolio controlled write once 9.1.0
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['.github/orbit360-requests/receipts-portfolio-write-v910-20260730.json']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-receipts-portfolio-write-once-v910-20260730
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block9-receipts-portfolio-static-v20260730
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ACTIVE_DRIVE_FILE_ID: 1cttFAW4atpv8y9GAl5xrx26ojTDxQhYV
+  ACTIVE_SHA256: e64e75f78f6a64101627a9a860db566a95b83677fcf20eeb05be44c6f3f6a1d7
+  ACTIVE_LOGICAL_SHA256: bb494a05aff75ff7baad39a07f23512187e39480d509f8ca1ace01e0b671362b
+  ACTIVE_RECEIPT_ID_DIGEST: f700a11643a1e4e62a13c3894d6f1097acef2ad5edfc0a32703d0d9b2ed5facf
+  ACTIVE_PORTFOLIO_ID_DIGEST: 144c8967704d1d06475144508e24cd8792ea8264faa7045eb50132316264bcd6
+  HIST_DRIVE_FILE_ID: 1wrUcZpcGZxG0H-elPwOmSzAI_i5OSqqT
+  HIST_SHA256: 780436042d53cdec354f1bcc96a7a16e874c0c947454d121230f7cb7d9703317
+  HIST_LOGICAL_SHA256: abb4189778e3cb3f1ffcf7e4f249645dcad88bcf522e2039be517e512f8a9d46
+  HIST_RECEIPT_ID_DIGEST: 431cccd46a3f05308e58d6597b68a5c43f7e7fcf00c403f24090fa91fff9f03e
+  HIST_PORTFOLIO_ID_DIGEST: 7bffffbb09e03eefcefccb860a633433d0b8e2554a3bd874289d68173e2ef8f7
+  REQUEST_PATH: .github/orbit360-requests/receipts-portfolio-write-v910-20260730.json
+jobs:
+  write_once:
+    name: Receipts/portfolio 9.1.0 · exact controlled write + revalidation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate canónico antes de secrets/Firestore
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .receiptsExpected==1293 and .portfolioPending==673 and .historicalExigible==32 and .historicalAmountGTQ==13443.48 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Verificar request inmutable autorizado
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$REQUEST_PATH"
+          jq -e '.schemaVersion=="orbit360-receipts-portfolio-write-request-v2" and .approved==true and .phrase=="AUTORIZO ESCRITURA CONTROLADA RECIBOS CARTERA AYS V910 20260730" and .activePackageSha256==env.ACTIVE_SHA256 and .historicalPackageSha256==env.HIST_SHA256 and .activeLogicalSha256==env.ACTIVE_LOGICAL_SHA256 and .historicalLogicalSha256==env.HIST_LOGICAL_SHA256 and .activeReceiptIdDigest==env.ACTIVE_RECEIPT_ID_DIGEST and .historicalReceiptIdDigest==env.HIST_RECEIPT_ID_DIGEST and .activePortfolioIdDigest==env.ACTIVE_PORTFOLIO_ID_DIGEST and .historicalPortfolioIdDigest==env.HIST_PORTFOLIO_ID_DIGEST and .scope.receipts==1293 and .scope.portfolio==673 and .scope.historical==32 and .scope.cobros==0 and .scope.finmovs==0' "$REQUEST_PATH" >/dev/null
+      - name: Preparar dependencias aisladas
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --no-save firebase-admin@13.4.0 xlsx@0.18.5 >/dev/null 2>&1
+      - name: Descargar paquetes privados exactos
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
+          async function download(token,id,expected,out,label){
+            const r=await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media&supportsAllDrives=true`,{headers:{authorization:`Bearer ${token}`}});
+            if(!r.ok)throw new Error(`ENVIRONMENT_FAILURE:${label}_DRIVE_${r.status}`);
+            const b=Buffer.from(await r.arrayBuffer()),sha=crypto.createHash('sha256').update(b).digest('hex');
+            if(sha!==expected)throw new Error(`DATA_CONTRACT_FAILURE:${label}_PACKAGE_SHA`);
+            fs.writeFileSync(out,b);
+          }
+          (async()=>{
+            const sa=JSON.parse(process.env.SERVICE_ACCOUNT),now=Math.floor(Date.now()/1000);
+            if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
+            const u=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(u),sa.private_key).toString('base64url');
+            const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:u+'.'+sig});
+            const tr=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body}),tj=await tr.json();
+            if(!tr.ok||!tj.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+tr.status);
+            await download(tj.access_token,process.env.ACTIVE_DRIVE_FILE_ID,process.env.ACTIVE_SHA256,'/tmp/receipts-active.xlsx','ACTIVE');
+            await download(tj.access_token,process.env.HIST_DRIVE_FILE_ID,process.env.HIST_SHA256,'/tmp/receipts-historical.xlsx','HISTORICAL');
+          })().catch(e=>{console.error(String(e.message||e));process.exit(41);});
+          NODE
+      - name: Ejecutar escritura controlada una sola vez
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          ORBIT360_RECEIPTS_MODE=WRITE \
+          ORBIT360_RECEIPTS_ACTIVE_XLSX=/tmp/receipts-active.xlsx \
+          ORBIT360_RECEIPTS_HISTORICAL_XLSX=/tmp/receipts-historical.xlsx \
+          ORBIT360_RECEIPTS_ACTIVE_SHA256="$ACTIVE_SHA256" \
+          ORBIT360_RECEIPTS_ACTIVE_LOGICAL_SHA256="$ACTIVE_LOGICAL_SHA256" \
+          ORBIT360_RECEIPTS_ACTIVE_ID_DIGEST="$ACTIVE_RECEIPT_ID_DIGEST" \
+          ORBIT360_PORTFOLIO_ACTIVE_ID_DIGEST="$ACTIVE_PORTFOLIO_ID_DIGEST" \
+          ORBIT360_RECEIPTS_HISTORICAL_SHA256="$HIST_SHA256" \
+          ORBIT360_RECEIPTS_HISTORICAL_LOGICAL_SHA256="$HIST_LOGICAL_SHA256" \
+          ORBIT360_RECEIPTS_HISTORICAL_ID_DIGEST="$HIST_RECEIPT_ID_DIGEST" \
+          ORBIT360_PORTFOLIO_HISTORICAL_ID_DIGEST="$HIST_PORTFOLIO_ID_DIGEST" \
+          ORBIT360_RECEIPTS_REQUEST="$REQUEST_PATH" \
+          ORBIT360_RECEIPTS_EVIDENCE="$EVIDENCE_DIR/receipts-portfolio-controlled-write-v910.json" \
+          node tools/orbit360-receipts-portfolio-canonical-apply-v910-20260730.mjs
+          jq -e '.status=="WRITE_PASS" and .ok==true and .contractVersion=="9.1.0" and .before.clientes==430 and .before.aseguradoras==30 and .before.asesores==7 and .before.polizas==1373 and .before.vehiculos==1032 and .before.recibosEsperados==0 and .before.carteraPrimas==0 and .before.cobros==0 and .before.finmovs==0 and .after.recibosEsperados==1293 and .after.carteraPrimas==673 and .after.cobros==0 and .after.finmovs==0 and .validation.historicalReceipts==32 and .validation.historicalPortfolio==32 and .validation.historicalAmountGTQ==13443.48 and .writes.receipts==1293 and .writes.portfolio==673 and .writes.cobros==0 and .writes.finmovs==0 and .rollback.executed==false and .rollback.restored==false and .firestoreWrites==1967 and .operationalWrites==1966' "$EVIDENCE_DIR/receipts-portfolio-controlled-write-v910.json" >/dev/null
+          rm -f /tmp/receipts-active.xlsx /tmp/receipts-historical.xlsx
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-receipts-portfolio-controlled-write-v910-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-controlled-write-v910.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-controlled-write-v910.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Receipts/portfolio 9.1.0 controlled write blocked/failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.status==='WRITE_PASS'&&p.contractVersion==='9.1.0'&&p.rollback.executed===false&&p.after.recibosEsperados===1293&&p.after.carteraPrimas===673&&p.after.cobros===0&&p.after.finmovs===0){state='success';description='Receipts/portfolio WRITE_PASS 9.1.0: 1293 + 673; zero cobros/finmovs';}else if(p.rollback&&p.rollback.executed&&p.rollback.restored){description='Receipts/portfolio failed; rollback restored baseline';}else if(p.classification){description=`Receipts/portfolio blocked: ${p.classification}`;}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/receipts-portfolio-write-once-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
