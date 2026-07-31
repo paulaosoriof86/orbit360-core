@@ -17,17 +17,33 @@ const NOTE='orbit360-platform/docs/NOTA-RECTORA-CARTERA-HISTORICA-EXIGIBLE-FIFO-
 const CLOSE='orbit360-platform/docs/CIERRE-RECALC-CARTERA-HISTORICA-EXIGIBLE-AYS-20260730.md';
 const ACADEMIA='orbit360-platform/docs/ACADEMIA-IMPACT-CARTERA-HISTORICA-EXIGIBLE-20260730.md';
 const REQUEST='.github/orbit360-requests/receipts-portfolio-write-v910-20260730.json';
+const GATE_PHASE=String(process.env.ORBIT360_RECEIPTS_GATE_PHASE||'PREWRITE').toUpperCase();
+const AUTHORIZED=GATE_PHASE==='AUTHORIZED_WRITE';
 const required=[LIFECYCLE,FREEZE,OWNER,TEST,NOTE,CLOSE,ACADEMIA];
 const checks=[];const add=(id,ok)=>checks.push({id,ok:Boolean(ok)});
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function write(out){fs.mkdirSync(path.dirname(EVIDENCE),{recursive:true});fs.writeFileSync(EVIDENCE,JSON.stringify(out,null,2)+'\n','utf8');}
 function text(rel){return fs.readFileSync(path.join(ROOT,rel),'utf8');}
+function exactRequest(freeze){
+  const abs=path.join(ROOT,REQUEST);if(!fs.existsSync(abs))return false;
+  try{
+    const r=JSON.parse(fs.readFileSync(abs,'utf8'));
+    return r.schemaVersion==='orbit360-receipts-portfolio-write-request-v2'&&r.contractVersion===VERSION&&r.approved===true&&r.phrase==='AUTORIZO ESCRITURA CONTROLADA RECIBOS CARTERA AYS V910 20260730'&&
+      r.activePackageSha256===freeze.activePackage?.physicalSha256&&r.historicalPackageSha256===freeze.historicalDeltaPackage?.physicalSha256&&
+      r.activeLogicalSha256===freeze.activePackage?.logicalSha256&&r.historicalLogicalSha256===freeze.historicalDeltaPackage?.logicalSha256&&
+      r.activeReceiptIdDigest===freeze.activePackage?.receiptIdDigest&&r.historicalReceiptIdDigest===freeze.historicalDeltaPackage?.receiptIdDigest&&
+      r.activePortfolioIdDigest===freeze.activePackage?.portfolioIdDigest&&r.historicalPortfolioIdDigest===freeze.historicalDeltaPackage?.portfolioIdDigest&&
+      Number(r.scope?.receipts)===1293&&Number(r.scope?.portfolio)===673&&Number(r.scope?.historical)===32&&Number(r.scope?.cobros)===0&&Number(r.scope?.finmovs)===0;
+  }catch{return false;}
+}
 try{
   add('GATE_ID',process.argv[2]===GATE);
   add('BRANCH',String(process.env.ORBIT360_BRANCH||'')==='ays/backend-tenant-lab-v99-20260703');
+  add('GATE_PHASE',['PREWRITE','AUTHORIZED_WRITE'].includes(GATE_PHASE));
   for(const rel of required)add('FILE_'+rel,fs.existsSync(path.join(ROOT,rel)));
   const lifecycle=readJson(LIFECYCLE),freeze=readJson(FREEZE),owner=text(OWNER),note=text(NOTE),close=text(CLOSE),academia=text(ACADEMIA);
   add('LIFECYCLE_VERSION',lifecycle.gateId===GATE&&lifecycle.gateContractVersion===VERSION);
+  add('LIFECYCLE_AUTH_PHASE',!AUTHORIZED||lifecycle.authorizationLifecycle?.authorizedWriteRequiresExactImmutableRequest===true);
   add('STATIC_CAPABILITIES',Object.values(lifecycle.executionProfile?.capabilities||{}).every(v=>v===false));
   add('FREEZE_VERSION',freeze.contractVersion===VERSION&&freeze.schemaVersion==='orbit360-receipts-portfolio-source-freeze-v2');
   add('BASELINE',freeze.baseline?.clientes===430&&freeze.baseline?.aseguradoras===30&&freeze.baseline?.asesores===7&&freeze.baseline?.polizas===1373&&freeze.baseline?.vehiculos===1032&&freeze.baseline?.recibosEsperados===0&&freeze.baseline?.carteraPrimas===0&&freeze.baseline?.cobros===0&&freeze.baseline?.finmovs===0);
@@ -40,17 +56,17 @@ try{
   add('INSURER_AUTHORITY',freeze.identityContract?.higherInsurerAuthoritySupersedesSiga===true&&freeze.identityContract?.sigaAuthoritativeWhenNoHigherApplicableSource===true);
   add('NO_DOWNSTREAM',freeze.combinedExpected?.cobros===0&&freeze.combinedExpected?.finmovs===0&&freeze.identityContract?.reportedPaymentIsCobro===false);
   add('FIFO_DOWNSTREAM',freeze.identityContract?.fifoAppliedInThisBlock===false&&freeze.identityContract?.fifoReservedForCobrosConciliacion===true);
-  add('REQUEST_ABSENT',!fs.existsSync(path.join(ROOT,REQUEST)));
+  add('REQUEST_LIFECYCLE',AUTHORIZED?exactRequest(freeze):!fs.existsSync(path.join(ROOT,REQUEST)));
   add('OWNER_GUARD',owner.includes('REQUEST_MISSING')&&owner.includes('REQUEST_MISMATCH')&&owner.includes('REQUEST_SCOPE_MISMATCH')&&owner.includes('b.create(')&&owner.includes('deleteCreated'));
   add('OWNER_ACTIVE_HIST_SPLIT',owner.includes('activeInvalidPolicyState')&&owner.includes('historicalInvalidPolicyState')&&owner.includes('historicalTermNotExpired')&&owner.includes('historicalDueMayExceedCoverageEnd:true'));
   add('DOC_RULE',note.includes('vigencia vencida reciente')&&close.includes('La fecha de cobro de una cuota puede ser posterior al fin de cobertura'));
   add('ACADEMIA_RULE',academia.includes('vigencia contractual de la póliza')&&academia.includes('exigibilidad financiera del recibo/saldo'));
   add('OLD_PREWRITE_FROZEN',freeze.oldPrewrite900Frozen===true&&close.includes('9.0.0 queda congelado'));
-  const testRun=spawnSync(process.execPath,[TEST],{cwd:ROOT,encoding:'utf8',maxBuffer:8*1024*1024});
+  const testRun=spawnSync(process.execPath,[TEST],{cwd:ROOT,env:{...process.env,ORBIT360_RECEIPTS_GATE_PHASE:GATE_PHASE},encoding:'utf8',maxBuffer:8*1024*1024});
   add('STATIC_TEST_EXIT',testRun.status===0);
   let testJson={};try{testJson=JSON.parse(String(testRun.stdout||'{}'));}catch{}
-  add('STATIC_TEST_PASS',testJson.status==='STATIC_WRITE_READY'&&testJson.failed===0);
-  const failed=checks.filter(c=>!c.ok);
-  const out={schemaVersion:'orbit360-receipts-portfolio-gate-preflight-v2',gateId:GATE,contractVersion:VERSION,status:failed.length?'HOLD_GATE_CONTRACT':'GO_GATE_CONTRACT',classification:failed.length?'VALIDATOR_STALE':'STATIC_CONTRACT_READY',total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(c=>c.id),checks,receiptsExpected:1293,portfolioPending:673,historicalExigible:32,historicalAmountGTQ:13443.48,activeReceiptsPreserved:1261,activePortfolioPreserved:641,cobrosExpected:0,finmovsExpected:0,requestExists:false,operationalWrites:0,evidenceWrites:1,sourceTransformed:false,dataAccess:false,secretAccess:false,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+  add('STATIC_TEST_PASS',testJson.status==='STATIC_WRITE_READY'&&testJson.failed===0&&testJson.gatePhase===GATE_PHASE);
+  const failed=checks.filter(c=>!c.ok),requestExists=fs.existsSync(path.join(ROOT,REQUEST));
+  const out={schemaVersion:'orbit360-receipts-portfolio-gate-preflight-v2',gateId:GATE,contractVersion:VERSION,gatePhase:GATE_PHASE,status:failed.length?'HOLD_GATE_CONTRACT':'GO_GATE_CONTRACT',classification:failed.length?'VALIDATOR_STALE':(AUTHORIZED?'AUTHORIZED_WRITE_CONTRACT_READY':'STATIC_CONTRACT_READY'),total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(c=>c.id),checks,receiptsExpected:1293,portfolioPending:673,historicalExigible:32,historicalAmountGTQ:13443.48,activeReceiptsPreserved:1261,activePortfolioPreserved:641,cobrosExpected:0,finmovsExpected:0,requestExists,requestState:AUTHORIZED?'EXACT_AUTHORIZED_REQUIRED':'ABSENT_REQUIRED',operationalWrites:0,evidenceWrites:1,sourceTransformed:false,dataAccess:false,secretAccess:false,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
   write(out);console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
-}catch(e){const out={schemaVersion:'orbit360-receipts-portfolio-gate-preflight-v2',gateId:GATE,contractVersion:VERSION,status:'VALIDATOR_STALE',classification:'PIPELINE_MECHANISM_FAILURE',failed:1,failedCheckIds:['ENGINE_EXCEPTION'],error:String(e&&e.message||e).slice(0,500),operationalWrites:0,evidenceWrites:1,sourceTransformed:false,dataAccess:false,secretAccess:false,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};write(out);console.error(JSON.stringify(out,null,2));process.exit(41);}
+}catch(e){const out={schemaVersion:'orbit360-receipts-portfolio-gate-preflight-v2',gateId:GATE,contractVersion:VERSION,gatePhase:GATE_PHASE,status:'VALIDATOR_STALE',classification:'PIPELINE_MECHANISM_FAILURE',failed:1,failedCheckIds:['ENGINE_EXCEPTION'],error:String(e&&e.message||e).slice(0,500),operationalWrites:0,evidenceWrites:1,sourceTransformed:false,dataAccess:false,secretAccess:false,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};write(out);console.error(JSON.stringify(out,null,2));process.exit(41);}
