@@ -118,7 +118,8 @@ Orbit.modules = Orbit.modules || {};
     q.clienteResumen = function (clientId) {
       if (summaries.has(clientId)) return summaries.get(clientId);
       const I = idx();
-      const cli = S().get('clientes', clientId);
+      const rawCli = S().get('clientes', clientId);
+      const cli = rawCli && Orbit.clientProjection && typeof Orbit.clientProjection.project === 'function' ? Orbit.clientProjection.project(rawCli) : rawCli;
       const pol = (I.policiesByClient && I.policiesByClient.get(clientId)) || [];
       const cob = (I.cobrosByClient && I.cobrosByClient.get(clientId)) || [];
       const com = (I.comisionesByClient && I.comisionesByClient.get(clientId)) || [];
