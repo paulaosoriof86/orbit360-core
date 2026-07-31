@@ -30,7 +30,8 @@ let browser,page;
 try{
   need(/^https:\/\//.test(url),'LAB_URL_REQUIRED');need(email.includes('@'),'LAB_EMAIL_REQUIRED');need(password.length>=8,'LAB_PASSWORD_REQUIRED');
   browser=await chromium.launch({headless:true});page=await browser.newPage({viewport:{width:1440,height:1000}});
-  report.stage='navigate';await page.goto(url,{waitUntil:'domcontentloaded',timeout:45000});
+  const labEntry=new URL(url);labEntry.searchParams.set('orbitBackend','firestore-lab');labEntry.searchParams.set('tenant','alianzas-soluciones');report.checks.labEntrypointBound=true;
+  report.stage='navigate';await page.goto(labEntry.toString(),{waitUntil:'domcontentloaded',timeout:45000});
   await page.locator('#login-form').waitFor({state:'visible',timeout:20000});
   report.stage='login';await page.fill('#lg-user',email);await page.fill('#lg-pass',password);await page.click('#login-form button[type="submit"]');
   await page.waitForFunction(()=>window.Orbit&&Orbit.store&&typeof Orbit.store.all==='function',undefined,{timeout:30000});
