@@ -1,9 +1,10 @@
 /* ============================================================
    Orbit 360 · P0 wire recibos/cartera/conciliacion de primas
-   Fecha: 2026-07-09
+   Fecha: 2026-07-31
 
-   Integra reglas P0 sin modificar core/importa.js ni backend protegido.
-   Redirige estados de cuenta de aseguradora hacia entidades separadas.
+   Redirige estados de cuenta de aseguradora a entidades separadas.
+   Reimportar la misma identidad actualiza/fill-missing; no duplica.
+   La conciliacion exacta se decide en el contrato P0, no aqui por inferencia.
    ============================================================ */
 (function () {
   window.Orbit = window.Orbit || {};
@@ -11,13 +12,19 @@
   Orbit.__importaCarteraP0Wired = true;
 
   function ready() {
-    return Orbit.store && Orbit.importaCarteraP0 && typeof Orbit.store.insert === 'function';
+    return Orbit.store && Orbit.importaCarteraP0 &&
+      typeof Orbit.store.insert === 'function' && typeof Orbit.store.update === 'function';
   }
 
-  function insertIfMissing(coll, rec, keyField) {
+  function upsertByKey(coll, rec, keyField) {
     const key = keyField || '_sourceKey';
-    const found = rec[key] ? Orbit.store.all(coll).find(function (x) { return x[key] && x[key] === rec[key]; }) : null;
-    if (found) return found;
+    let found = null;
+    try {
+      found = rec && rec[key] ? Orbit.store.all(coll).find(function (x) {
+        return x && x[key] && x[key] === rec[key];
+      }) : null;
+    } catch (e) {}
+    if (found && found.id) return Orbit.store.update(coll, found.id, rec);
     return Orbit.store.insert(coll, rec);
   }
 
@@ -29,10 +36,10 @@
     const cartera = C.carteraSeed(normalized);
     const conciliacion = C.conciliacionSeed(normalized);
 
-    insertIfMissing('estadosCuentaAseguradora', estado, 'id');
-    insertIfMissing('recibosAseguradora', recibo, '_sourceKey');
-    insertIfMissing('carteraPrimas', cartera, '_sourceKey');
-    insertIfMissing('conciliacionesPrimas', conciliacion, 'id');
+    upsertByKey('estadosCuentaAseguradora', estado, 'id');
+    upsertByKey('recibosAseguradora', recibo, '_sourceKey');
+    upsertByKey('carteraPrimas', cartera, '_sourceKey');
+    upsertByKey('conciliacionesPrimas', conciliacion, 'id');
     return recibo;
   }
 
@@ -50,8 +57,16 @@
     };
 
     store.__p0CarteraWire = true;
+    store.__p0CarteraWireVersion = '20260731.2';
     return true;
   }
+
+  Orbit.importaCarteraP0Wire = Object.freeze({
+    upsertByKey,
+    routeInsurerStatement,
+    duplicateInsertAllowed: false,
+    reconciliationOwnedByContract: true
+  });
 
   if (!wireStore()) {
     document.addEventListener('orbit:store', wireStore, { once: true });
