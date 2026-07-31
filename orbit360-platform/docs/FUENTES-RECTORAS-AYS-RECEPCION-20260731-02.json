@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "orbit360-source-receipt-batch-v1",
+  "tenantId": "alianzas-soluciones",
+  "batchId": "AYS-SOURCES-20260731-02",
+  "receivedDate": "2026-07-31",
+  "status": "REGISTERED_PENDING_MANIFEST_CLOSE",
+  "receivedFiles": 6,
+  "uniqueNewSources": 3,
+  "exactDuplicates": 3,
+  "writesAllowed": false,
+  "sources": [
+    {
+      "uploadedName": "Polizas Canceladas al 31 de julio.xlsx",
+      "logicalName": "Polizas Canceladas al 31 de julio.xlsx",
+      "sha256": "4c30282888cf7c84b2361d01fc9042d7a48384535f6463543275e9bd6bf0d8ff",
+      "sizeBytes": 89822,
+      "domain": "polizas_historico_canceladas",
+      "inspectionStatus": "XLSX_VALID",
+      "sheet": "Worksheet",
+      "nonEmptyRowsIncludingHeader": 471,
+      "dataRows": 470,
+      "effectiveColumns": 38,
+      "headerSignature": "Póliza|Frecuencia de pago|Conducto de pago|Asegurado|Vigencia|Fin de vigencia|Fecha de emisión|Ramos|Sub Ramo|Tipo Ramo|Aseguradora|Prima neta|Prima total|Divisa|Vendedor|Estatus póliza|Tipo de Emisión|Canceladas|motivo cancelacion|Concepto|Comentarios Póliza|Plan Coberturas|Bien Asegurado",
+      "sourceRole": "current_historical_status_and_detail",
+      "migrationEligibility": "REQUIRES_DIFF_AGAINST_EXISTING_CANONICAL",
+      "containsRealOperationalData": true,
+      "repoPayloadAllowed": false
+    },
+    {
+      "uploadedName": "Listado de pólizas al 30 de julio 2023(1).xlsx",
+      "logicalName": "Listado de pólizas al 30 de julio 2023.xlsx",
+      "sha256": "db10c270ddd89c25a483e0eb2f824206b40fb82ad385ddc2f63e6ed4b7abdc73",
+      "sizeBytes": 220601,
+      "domain": "polizas_historico_referencia",
+      "inspectionStatus": "XLSX_VALID",
+      "sheet": "Worksheet",
+      "nonEmptyRowsIncludingHeader": 1382,
+      "dataRows": 1381,
+      "effectiveColumns": 38,
+      "headerSignature": "Póliza|Frecuencia de pago|Conducto de pago|Asegurado|Vigencia|Fin de vigencia|Fecha de emisión|Ramos|Sub Ramo|Tipo Ramo|Aseguradora|Prima neta|Prima total|Divisa|Vendedor|Estatus póliza|Tipo de Emisión|Concepto|Comentarios Póliza|Plan Coberturas|Bien Asegurado",
+      "sourceRole": "supplemental_historical_traceability_only",
+      "migrationEligibility": "REQUIRES_RECONCILIATION_NOT_DIRECT_WRITE",
+      "containsRealOperationalData": true,
+      "repoPayloadAllowed": false
+    },
+    {
+      "uploadedName": "Capturas de Pantalla SIGA CRM.docx",
+      "logicalName": "Capturas de Pantalla SIGA CRM.docx",
+      "sha256": "74391388a9c2aec8af2caab9c263482a4b68332ec7727289d90393d73184aac3",
+      "sizeBytes": 4400139,
+      "domain": "ui_reference_siga_crm",
+      "inspectionStatus": "DOCX_47_PAGES_RENDERED_IMAGES_AVAILABLE",
+      "pages": 47,
+      "sourceRole": "visual_functional_reference_not_migration_source",
+      "migrationEligibility": "NOT_A_DATA_WRITE_SOURCE",
+      "containsRealOperationalData": true,
+      "repoPayloadAllowed": false
+    }
+  ],
+  "duplicateReceipts": [
+    {
+      "uploadedName": "Reporte de vehículos 2017 a 2026(2).xlsx",
+      "sha256": "c28c81e61978231f67247ddad2fcb535059f89ab4ad22ea6852e5fb489a6c022",
+      "matchesLogicalName": "Reporte de vehículos 2017 a 2026.xlsx",
+      "originalManifest": "FUENTES-RECTORAS-AYS-MANIFIESTO-20260731-01.json",
+      "action": "NO_REPROCESS_EXACT_HASH_MATCH"
+    },
+    {
+      "uploadedName": "Listado de Emitido 2017 a 30 jul(2).xls",
+      "sha256": "eb429cf0933b9e9eb0d38bbb9e802eec6b4b6830f8d8c5fdb351e748653ebc8f",
+      "matchesLogicalName": "Listado de Emitido 2017 a 30 jul.xls",
+      "originalManifest": "FUENTES-RECTORAS-AYS-MANIFIESTO-20260731-01.json",
+      "action": "NO_REPROCESS_EXACT_HASH_MATCH"
+    },
+    {
+      "uploadedName": "Total emitido 2017 a julio 30 2026(2).xls",
+      "sha256": "44daced27cff2e81b3a6509a31773dbe1e5eb0ed0986a835cb531b86eaaa061f",
+      "matchesLogicalName": "Total emitido 2017 a julio 30 2026.xls",
+      "originalManifest": "FUENTES-RECTORAS-AYS-MANIFIESTO-20260731-01.json",
+      "action": "NO_REPROCESS_EXACT_HASH_MATCH"
+    }
+  ],
+  "invariants": {
+    "noReprocessingExactDuplicates": true,
+    "noFirestoreWrites": true,
+    "noOperationalWrites": true,
+    "noPolicyReimport": true,
+    "noVehicleReimport": true,
+    "oldDriveFallbackProhibited": true
+  }
+}
