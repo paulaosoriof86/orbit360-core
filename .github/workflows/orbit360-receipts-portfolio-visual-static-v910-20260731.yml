@@ -12,6 +12,7 @@ on:
       - 'tools/orbit360-test-receipts-portfolio-visual-projection-v910.mjs'
       - 'tools/orbit360-test-client360-policy-vehicle-readmodel-v1199c-20260731.mjs'
       - 'tools/orbit360-test-human-visual-contract-v20260731.mjs'
+      - 'tools/orbit360-human-review-visual-lab-v20260731.mjs'
 permissions:
   contents: read
   statuses: write
@@ -47,6 +48,7 @@ jobs:
           node --check tools/orbit360-test-receipts-portfolio-visual-projection-v910.mjs
           node --check tools/orbit360-test-client360-policy-vehicle-readmodel-v1199c-20260731.mjs
           node --check tools/orbit360-test-human-visual-contract-v20260731.mjs
+          node --check tools/orbit360-human-review-visual-lab-v20260731.mjs
       - name: Contrato visual static
         run: |
           set -euo pipefail
