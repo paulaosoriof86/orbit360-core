@@ -27,14 +27,15 @@ const GATE_CONFIG=Object.freeze({
   "block4-target-only-retirement-dryrun-v20260725":{contractVersion:"4.2.8",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-retirement-dryrun-v20260725.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-retirement-dryrun-v20260725.mjs"},
   "block4-target-only-retirement-write-v20260726":{contractVersion:"4.2.9",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-target-only-retirement-write-v20260726.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-target-only-retirement-write-v20260726.mjs"},
   "block4-post-retirement-revalidation-readonly-v20260728":{contractVersion:"4.2.10",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-post-retirement-revalidation-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-post-retirement-revalidation-v20260728.mjs"},
-  "block4-client-country-correction-write-v20260728":{contractVersion:"4.2.11",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-client-country-correction-write-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-client-country-correction-write-v20260728.mjs"},
+  "block4-client-country-correction-write-v20260728":{contractVersion:"4.2.11",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-client-country-correction-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-client-country-correction-write-v20260728.mjs"},
   "block4-final-canonical-migration-dryrun-v20260728":{contractVersion:"4.3.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-migration-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-migration-v20260728.mjs"},
   "block4-final-canonical-migration-write-v20260728":{contractVersion:"4.3.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-write-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-write-v20260728.mjs"},
   "block4-final-canonical-revalidation-readonly-v20260728":{contractVersion:"4.3.2",lifecycle:"tools/orbit360-validator-lifecycle-contract-m4-final-canonical-revalidation-v20260728.json",engine:"tools/orbit360-validar-gate-contracts-engine-m4-final-canonical-revalidation-v20260728.mjs"},
   "block5-release-candidate-visualization-v20260728":{contractVersion:"5.0.44",lifecycle:"tools/orbit360-validator-lifecycle-contract-m5-corrective-delivery-runtime-544-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-m5-corrective-delivery-runtime-544-v20260730.mjs"},
   "block6-go-live-product-v20260730":{contractVersion:"6.3.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-m6-final-closure-630-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-m6-final-closure-630-resume-v20260730.mjs"},
   "block7-policies-static-v20260730":{contractVersion:"7.0.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-policies-static-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-policies-static-v20260730.mjs"},
-  "block8-vehicles-static-v20260730":{contractVersion:"8.0.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-vehicles-static-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-vehicles-static-v20260730.mjs"}
+  "block8-vehicles-static-v20260730":{contractVersion:"8.0.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-vehicles-static-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-vehicles-static-v20260730.mjs"},
+  "block9-receipts-portfolio-static-v20260730":{contractVersion:"9.0.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-receipts-portfolio-static-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-receipts-portfolio-static-v20260730.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":ZERO,
@@ -63,6 +64,7 @@ const PHASE_PROFILES=Object.freeze({
   "M6_FINAL_PACKAGE_STATIC":ZERO,
   "POLICIES_STATIC_QUALIFICATION":ZERO,
   "VEHICLES_STATIC_QUALIFICATION":ZERO,
+  "RECEIPTS_PORTFOLIO_STATIC_QUALIFICATION":ZERO,
   "M5_LAB_HOSTING_DELIVERY":{"secrets":true,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "M5_LAB_CORRECTIVE_DELIVERY_RUNTIME":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":true,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "M6_PRODUCT_GO_LIVE_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":true,"functionsDeploy":false,"rulesDeploy":true,"production":true},
