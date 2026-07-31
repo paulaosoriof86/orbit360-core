@@ -69,14 +69,15 @@ jobs:
           p.write_text(s.replace(old,new,1),encoding='utf-8')
           PY
           git diff --check -- "$ORBIT360_PROJECTION"
-          test "$(git diff --name-only)" = "$ORBIT360_PROJECTION"
+          git add "$ORBIT360_PROJECTION"
+          test "$(git diff --cached --name-only)" = "$ORBIT360_PROJECTION"
       - name: Validar sintaxis, contrato y lifecycle post-fix
         shell: bash
         run: |
           set -euo pipefail
           node --check "$ORBIT360_PROJECTION"
           node tools/orbit360-test-receipts-portfolio-visual-projection-v910.mjs > "$EVIDENCE_DIR/projection-static-after-v910.json"
-          jq -e '.status=="VISUAL_PROJECTION_STATIC_READY" and .failed==0 and .checks[] | select(.id=="STORE_WRAP_IDEMPOTENT") | .ok==true' "$EVIDENCE_DIR/projection-static-after-v910.json" >/dev/null
+          jq -e '.status=="VISUAL_PROJECTION_STATIC_READY" and .failed==0 and any(.checks[]; .id=="STORE_WRAP_IDEMPOTENT" and .ok==true) and any(.checks[]; .id=="ATTACH_CAN_REUSE_WRAPPED_STORE" and .ok==true)' "$EVIDENCE_DIR/projection-static-after-v910.json" >/dev/null
           node tools/orbit360-test-receipts-portfolio-projection-lifecycle-v910-20260730.mjs > "$EVIDENCE_DIR/projection-lifecycle-after-v910.json"
           jq -e '.ok==true and .status=="PROJECTION_LIFECYCLE_PASS" and .checks.ready==true and .checks.bothAttached==true and .checks.receiptCount==true and .checks.portfolioCount==true and .checks.baseStorePreserved==true' "$EVIDENCE_DIR/projection-lifecycle-after-v910.json" >/dev/null
       - name: Registrar corrección sin deploy
@@ -85,8 +86,8 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$ORBIT360_PROJECTION"
           test "$(git diff --cached --name-only)" = "$ORBIT360_PROJECTION"
+          git diff --cached --check
           git commit -m 'fix(receipts): make LAB projection store wrap idempotent 9.1.0'
           git push origin "HEAD:$ORBIT360_BRANCH"
       - name: Subir evidencia sanitizada
