@@ -12,10 +12,10 @@ const url=String(process.env.ORBIT360_LAB_URL||'').trim();
 const email=String(process.env.ORBIT360_LAB_LOGIN_EMAIL||'').trim();
 const password=String(process.env.ORBIT360_LAB_LOGIN_PASSWORD||'');
 const EXPECT={clientes:430,aseguradoras:30,asesores:7,polizas:1373,vehiculos:1032,recibosEsperados:1293,carteraPrimas:673,cobros:0,finmovs:0};
-const report={schemaVersion:'orbit360-human-review-visual-lab-v2',generatedAt:new Date().toISOString(),stage:'init',checks:{},metrics:{},counts:{},readOnly:true,firestoreWrites:0,operationalWrites:0,productionTouched:false,containsPII:false,containsSecrets:false,pageErrors:[]};
+const report={schemaVersion:'orbit360-human-review-visual-lab-v3',generatedAt:new Date().toISOString(),stage:'init',checks:{},metrics:{},counts:{},readOnly:true,firestoreWrites:0,operationalWrites:0,productionTouched:false,containsPII:false,containsSecrets:false,pageErrors:[]};
 const clean=v=>String(v==null?'':v).replace(/https?:\/\/[^/\s]+/g,'[url]').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').replace(/[A-Za-z0-9_-]{24,}/g,'[redacted]').replace(/\s+/g,' ').trim().slice(0,360);
 const save=()=>{fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(report,null,2)+'\n');};
-const need=(ok,code,detail='')=>{if(!ok)throw new Error(code+(detail?':'+detail:''));};
+const need=(ok,code,detail='')=>{if(ok)return;const e=new Error(code+(detail?':'+detail:''));e.orbitCode=code;throw e;};
 async function route(page,hash,wait=700){await page.evaluate(h=>{location.hash=h;},hash);await page.waitForTimeout(wait);}
 async function technicalCopy(page){return page.evaluate(pattern=>new RegExp(pattern,'i').test(document.body.innerText||''),TECHNICAL_COPY_PATTERN);}
 async function bodyText(page,selector='#host'){return page.locator(selector).innerText();}
@@ -40,25 +40,22 @@ try{
 
   report.stage='samples';const samples=await page.evaluate(()=>{
     const policies=Orbit.store.all('polizas')||[],vehicles=Orbit.store.all('vehiculos')||[],receipts=Orbit.store.all('recibosEsperados')||[],portfolio=Orbit.store.all('carteraPrimas')||[];
-    const pmap=new Map(policies.map(p=>[p.id,p]));
-    const rmap=new Map(receipts.map(r=>[r.id,r]));
-    const active=p=>p&&(p.estado==='Vigente'||p.estado==='Por renovar');
+    const pmap=new Map(policies.map(p=>[p.id,p]));const rmap=new Map(receipts.map(r=>[r.id,r]));const active=p=>p&&(p.estado==='Vigente'||p.estado==='Por renovar');
     const rich=receipts.find(r=>active(pmap.get(r.polizaId))&&r.primaNeta!=null&&r.gastosExpedicion!=null&&r.gastosFinanciamiento!=null&&r.impuestosIVA!=null&&r.primaTotal!=null)||receipts.find(r=>active(pmap.get(r.polizaId)));
     const reported=receipts.find(r=>String(r.estadoOperativo||'')==='pago_reportado');
-    const reconciledBalanceRow=portfolio.find(c=>{
-      const source=String(c.fuenteAutoridad||'').trim().toLowerCase();
-      return c&&c.reciboId&&rmap.has(c.reciboId)&&source&&source!=='siga'&&c.matchQuality&&c.sourceRef&&c.requiereValidacion!==true;
-    });
+    const reconciledBalanceRow=portfolio.find(c=>{const source=String(c.fuenteAutoridad||'').trim().toLowerCase();return c&&c.reciboId&&rmap.has(c.reciboId)&&source&&source!=='siga'&&c.matchQuality&&c.sourceRef&&c.requiereValidacion!==true;});
     const reconciledBalance=reconciledBalanceRow?rmap.get(reconciledBalanceRow.reciboId):null;
     const veh=vehicles.find(v=>{const p=pmap.get(v.polizaId);return p&&p.clienteId&&v.clienteId&&p.clienteId===v.clienteId;})||vehicles[0];
-    let delta=null;
-    const byPolicy=new Map();for(const r of receipts){if(!byPolicy.has(r.polizaId))byPolicy.set(r.polizaId,[]);byPolicy.get(r.polizaId).push(r);}for(const p of policies){if(!active(p))continue;const rows=byPolicy.get(p.id)||[];if(!rows.length||p.primaTotal==null)continue;const vals=rows.map(r=>Number(r.primaTotal)).filter(Number.isFinite);if(vals.length!==rows.length)continue;const d=vals.reduce((a,b)=>a+b,0)-Number(p.primaTotal);if(Number.isFinite(d)&&Math.abs(d)>=0.005){delta={clienteId:p.clienteId,polizaId:p.id};break;}}
-    const pack=(r)=>r?{receiptId:r.id,clienteId:r.clienteId,polizaId:r.polizaId}:null;
-    return{rich:pack(rich),reported:pack(reported),reconciledBalance:pack(reconciledBalance),vehicle:veh?{vehicleId:veh.id,clienteId:veh.clienteId,polizaId:veh.polizaId}:null,delta};
+    let delta=null;const byPolicy=new Map();for(const r of receipts){if(!byPolicy.has(r.polizaId))byPolicy.set(r.polizaId,[]);byPolicy.get(r.polizaId).push(r);}for(const p of policies){if(!active(p))continue;const rows=byPolicy.get(p.id)||[];if(!rows.length||p.primaTotal==null)continue;const vals=rows.map(r=>Number(r.primaTotal)).filter(Number.isFinite);if(vals.length!==rows.length)continue;const d=vals.reduce((a,b)=>a+b,0)-Number(p.primaTotal);if(Number.isFinite(d)&&Math.abs(d)>=0.005){delta={clienteId:p.clienteId,polizaId:p.id};break;}}
+    const pack=r=>r?{receiptId:r.id,clienteId:r.clienteId,polizaId:r.polizaId}:null;return{rich:pack(rich),reported:pack(reported),reconciledBalance:pack(reconciledBalance),vehicle:veh?{vehicleId:veh.id,clienteId:veh.clienteId,polizaId:veh.polizaId}:null,delta};
   });
   need(samples.rich&&samples.reported&&samples.reconciledBalance&&samples.vehicle,'RUNTIME_SAMPLE_UNAVAILABLE');
 
-  report.stage='global_policies';let t0=Date.now();await route(page,'#/polizas',250);await page.locator('#host table.tbl').first().waitFor({state:'visible',timeout:12000});await page.waitForTimeout(250);const pstate=await page.evaluate(()=>({rows:document.querySelectorAll('#host table.tbl tbody tr').length,text:(document.getElementById('host')&&document.getElementById('host').innerText)||'',responsive:(1+1===2)}));report.metrics.globalPoliciesRenderMs=Date.now()-t0;need(pstate.responsive,'POLICIES_PAGE_UNRESPONSIVE');need(pstate.rows>0&&pstate.rows<=100,'POLICIES_DOM_NOT_PAGINATED',String(pstate.rows));need(/Prima total/.test(pstate.text)&&/Mostrando/.test(pstate.text),'POLICIES_PAGINATION_OR_PREMIUM_LABEL_MISSING');need(report.pageErrors.length===0,'PAGE_ERROR_GLOBAL_POLICIES',report.pageErrors[0]||'');report.checks.globalPoliciesResponsive=true;report.checks.globalPoliciesPaginated=true;
+  report.stage='global_policies';let t0=Date.now();await route(page,'#/polizas',150);
+  await page.waitForFunction(()=>{const host=document.getElementById('host');if(!host)return false;const text=host.innerText||'';const rows=host.querySelectorAll('table.tbl tbody tr').length;return rows>0&&rows<=100&&text.includes('Prima total')&&text.includes('Mostrando');},undefined,{timeout:12000,polling:100});
+  const pstate=await page.evaluate(()=>{const host=document.getElementById('host');const text=host&&host.innerText||'';return{rows:host?host.querySelectorAll('table.tbl tbody tr').length:0,hasPremiumLabel:text.includes('Prima total'),hasPaginationText:text.includes('Mostrando'),hash:location.hash};});
+  report.metrics.globalPoliciesRenderMs=Date.now()-t0;report.metrics.globalPoliciesRows=pstate.rows;report.metrics.globalPoliciesHasPremiumLabel=pstate.hasPremiumLabel;report.metrics.globalPoliciesHasPaginationText=pstate.hasPaginationText;
+  need(pstate.rows>0&&pstate.rows<=100,'POLICIES_DOM_NOT_PAGINATED',String(pstate.rows));need(pstate.hasPremiumLabel&&pstate.hasPaginationText,'POLICIES_RENDER_CONTRACT_INCOMPLETE');need(report.pageErrors.length===0,'PAGE_ERROR_GLOBAL_POLICIES',report.pageErrors[0]||'');report.checks.globalPoliciesResponsive=true;report.checks.globalPoliciesPaginated=true;
 
   report.stage='policy_fullpage';await route(page,`#/cliente360?c=${samples.rich.clienteId}&p=${samples.rich.polizaId}`);await page.locator('[data-policy-fullpage="1"]').waitFor({state:'visible',timeout:12000});let txt=await bodyText(page);for(const label of ['Prima neta','Gastos de expedición','Gastos financieros','Descuento / ajuste (campo fuente)','IVA / impuestos','Prima total de póliza','Total calendario de recibos'])need(txt.includes(label),'POLICY_PREMIUM_COMPONENT_MISSING',label);need(!/\bundefined\b|\bNaN\b/.test(txt),'TECHNICAL_VALUE_VISIBLE_POLICY');need(!(await technicalCopy(page)),'TECHNICAL_COPY_VISIBLE_POLICY');const qstate=await page.evaluate(pid=>{const p=Orbit.store.get('polizas',pid)||{},v=(Orbit.store.all('vehiculos')||[]).find(x=>x.polizaId===pid)||null,o=Orbit.policyVehicleReadModelV1199c;return{gaps:o&&o.policyCompleteness?o.policyCompleteness(p,v):[],text:(document.getElementById('host')&&document.getElementById('host').innerText)||''};},samples.rich.polizaId);if(qstate.gaps.length)need(qstate.text.includes('Información pendiente de completar'),'POLICY_QUALITY_NOT_FAIL_CLOSED');report.checks.policyPremiumSemantic=true;report.checks.policyQualityFailClosed=true;
 
@@ -72,7 +69,6 @@ try{
 
   report.stage='reconciled_portfolio';await route(page,`#/cliente360?c=${samples.reconciledBalance.clienteId}&t=recibos`);await page.locator('#rp-v910-policy').waitFor({state:'visible',timeout:12000});const reconciledRow=page.locator(`[data-rp-receipt-id="${samples.reconciledBalance.receiptId}"]`);await reconciledRow.waitFor({state:'visible',timeout:12000});await reconciledRow.click();await page.locator('[data-rp-receipt-detail="1"]').waitFor({state:'visible',timeout:12000});txt=await bodyText(page);need(txt.includes('Cartera conciliada con aseguradora'),'PORTFOLIO_RECONCILIATION_LABEL_NOT_VISIBLE');need(/no equivale a un pago/i.test(txt),'PORTFOLIO_CONFUSED_WITH_PAYMENT');need(txt.includes('Fuente autoridad')&&txt.includes('Calidad de match')&&txt.includes('Referencia fuente'),'PORTFOLIO_TRACE_NOT_VISIBLE');report.checks.portfolioReconciledVisible=true;report.checks.portfolioNotPayment=true;
 
-  need(report.counts.cobros===0&&report.counts.finmovs===0,'DOWNSTREAM_COLLECTIONS_NOT_ZERO');need(report.pageErrors.length===0,'PAGE_ERROR_RUNTIME',report.pageErrors[0]||'');need(!(await technicalCopy(page)),'TECHNICAL_COPY_VISIBLE_FINAL');
-  report.checks.downstreamZero=true;report.checks.noPageErrors=true;report.checks.noTechnicalCopy=true;
+  need(report.counts.cobros===0&&report.counts.finmovs===0,'DOWNSTREAM_COLLECTIONS_NOT_ZERO');need(report.pageErrors.length===0,'PAGE_ERROR_RUNTIME',report.pageErrors[0]||'');need(!(await technicalCopy(page)),'TECHNICAL_COPY_VISIBLE_FINAL');report.checks.downstreamZero=true;report.checks.noPageErrors=true;report.checks.noTechnicalCopy=true;
   report.stage='final';report.ok=true;report.status='HUMAN_REVIEW_VISUAL_LAB_PASS';
-}catch(error){report.ok=false;report.status='HUMAN_REVIEW_VISUAL_LAB_FAIL';report.failureStage=report.stage;report.error=clean(error&&error.message||error);process.exitCode=41;}finally{if(browser)await browser.close().catch(()=>{});save();}
+}catch(error){report.ok=false;report.status='HUMAN_REVIEW_VISUAL_LAB_FAIL';report.failureStage=report.stage;report.errorCode=String(error&&error.orbitCode||'UNCLASSIFIED_RUNTIME_ERROR');report.error=clean(error&&error.message||error);process.exitCode=41;}finally{if(browser)await browser.close().catch(()=>{});save();}
