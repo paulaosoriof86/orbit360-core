@@ -22,8 +22,8 @@ add('ATTACH_CAN_REUSE_WRAPPED_STORE',p.includes('function attach(){')&&p.include
 add('NO_FIRESTORE_WRITE_API',!p.includes('.set(')&&!p.includes('.update(')&&!p.includes('.delete(')&&!p.includes('.add(')&&!p.includes('.batch(')&&!p.includes('.commit('));
 add('READONLY_DECLARED',p.includes('readOnly:true')&&p.includes('onSnapshot'));
 add('COBROS_SEPARATE',p.includes("Orbit.store.where('cobros'")&&p.includes('Aún no hay cobros aplicados')&&p.includes('no se infieren desde este calendario'));
-add('QUERY_RECEIPTS',p.includes('Orbit.q.recibosEsperadosDe'));
-add('QUERY_PORTFOLIO',p.includes('Orbit.q.carteraPrimasDe')&&p.includes('Orbit.q.carteraPrimasResumenDe'));
+add('QUERY_RECEIPTS',(p.includes('Orbit.q.recibosEsperadosDe=function')||p.includes('q.recibosEsperadosDe=function')));
+add('QUERY_PORTFOLIO',(p.includes('Orbit.q.carteraPrimasDe=function')||p.includes('q.carteraPrimasDe=function'))&&(p.includes('Orbit.q.carteraPrimasResumenDe=portfolioSummary')||p.includes('q.carteraPrimasResumenDe=portfolioSummary')));
 add('ACTIVE_HIST_SPLIT',p.includes('cartera_historica_exigible')&&p.includes('Histórica exigible')&&p.includes('carteraHistoricaMonto'));
 add('AMOUNT_FIELD',p.includes('r.primaTotal'));
 add('DUE_FIELD',p.includes('r.fechaLimite'));
@@ -44,5 +44,5 @@ add('POLICY_FULLPAGE_OWNER',d.includes('data-policy-fullpage="1"')&&d.includes('
 add('VEHICLE_FULLPAGE_OWNER',d.includes('data-vehicle-fullpage="1"')&&d.includes('fullPageVehicle: true'));
 add('M1_STILL_ADDITIVE',m.includes('replacesRenderer: false')&&m.includes('writesStore: false'));
 add('PROJECTION_OWNER_DRIFT_LIFECYCLE',life.status===0&&/PROJECTION_LIFECYCLE_PASS/.test(life.stdout||''));
-const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-receipts-portfolio-visual-projection-static-v4',contractVersion:'9.1.0',status:failed.length?'FUNCTIONAL_DEFECT':'VISUAL_PROJECTION_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,lifecycleExit:life.status,firestoreRead:false,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-receipts-portfolio-visual-projection-static-v5',contractVersion:'9.1.0',status:failed.length?'FUNCTIONAL_DEFECT':'VISUAL_PROJECTION_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,lifecycleExit:life.status,firestoreRead:false,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(failed.length)process.exit(41);
