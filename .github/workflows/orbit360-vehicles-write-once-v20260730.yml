@@ -1,0 +1,114 @@
+name: Orbit 360 · Vehicles controlled write once
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths: ['.github/orbit360-requests/vehicles-write-20260730.json']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-vehicles-write-once-v20260730
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: block8-vehicles-static-v20260730
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  HIST_ID: 1lHKV1BBQy3KeMAc-khTW_wL2sD1hyQVW
+  HIST_SHA: 68904f19705cfa742bba11219725ce1f10de7912d82b88dc085f4119cc3204af
+  DELTA_ID: 1wlCUk68rWVnKEgQSmaxmxsIw7WNo5WLI
+  DELTA_SHA: dbd31e3436946ef65bb737068394e6ee5eed44dc4a2dd96fcf975d5b3995f1d2
+  POL_ID: 1NXHACZ11815882AhoyGrQQCb9Amgbi95
+  POL_SHA: b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f
+  LOGICAL_SHA: 4e9545dc580782470ea2e1b2b8a421a16f8cd152ed03264f7b7a30ea14fadc0d
+  TARGET_DIGEST: c5a5eb51b69eedef33588c6e3bb8bb3746ceac8bffc4a7a9181ebcbe4995682d
+  REQUEST_PATH: .github/orbit360-requests/vehicles-write-20260730.json
+jobs:
+  write_once:
+    name: Vehicles · exact package controlled write + revalidation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate canónico antes de secrets/Firestore
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="8.0.1" and .failed==0 and .vehiclePolicyRelationsCreate==1032 and .identityCellsReadMode=="raw_cell_value" and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.schemaVersion=="orbit360-vehicles-write-freeze-v1" and .realWriteExecuted==false and .authorization.required==true and .authorization.requestExistsAtFreeze==false and .package.historicalSha256==env.HIST_SHA and .package.deltaSha256==env.DELTA_SHA and .package.policiesSha256==env.POL_SHA and .package.logicalSha256==env.LOGICAL_SHA and .package.targetIdDigest==env.TARGET_DIGEST and .prewriteEvidence.status=="PREWRITE_READY" and .prewriteEvidence.firestoreWrites==0 and .prewriteEvidence.operationalWrites==0 and .baseline.clientes==430 and .baseline.aseguradoras==30 and .baseline.asesores==7 and .baseline.polizas==1373 and .baseline.vehiculos==0 and .writePlan.vehiculosCreate==1032 and .writePlan.pendingQuality==60 and .writePlan.excluded==4 and .writePlan.auditWrites==1 and .writePlan.clientWrites==0 and .writePlan.insurerWrites==0 and .writePlan.policyWrites==0 and .writePlan.receiptWrites==0 and .writePlan.carteraWrites==0 and .writePlan.cobroWrites==0 and .writePlan.finmovWrites==0' tools/orbit360-vehicles-write-freeze-v20260730.json >/dev/null
+      - name: Verificar request inmutable autorizado
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$REQUEST_PATH"
+          jq -e '.schemaVersion=="orbit360-vehicles-write-request-v1" and .approved==true and .phrase=="AUTORIZO ESCRITURA CONTROLADA VEHICULOS AYS 20260730" and .logicalSha256==env.LOGICAL_SHA and .targetIdDigest==env.TARGET_DIGEST and .scope.vehicles==1032 and .scope.audit==1 and .scope.clients==0 and .scope.insurers==0 and .scope.policies==0 and .scope.receipts==0 and .scope.cartera==0 and .scope.cobros==0 and .scope.finmovs==0' "$REQUEST_PATH" >/dev/null
+      - name: Preparar dependencias aisladas
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --no-save firebase-admin@13.4.0 xlsx@0.18.5 >/dev/null 2>&1
+      - name: Descargar fuentes privadas exactas y canonicalizar efímeramente
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url'),sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+          async function token(sa){const now=Math.floor(Date.now()/1000),u=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900}),s=crypto.sign('RSA-SHA256',Buffer.from(u),sa.private_key).toString('base64url'),body=new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:u+'.'+s});const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body}),j=await r.json();if(!r.ok||!j.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+r.status);return j.access_token;}
+          async function get(t,id,expected,out){const r=await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(id)}?alt=media&supportsAllDrives=true`,{headers:{authorization:`Bearer ${t}`}});if(!r.ok)throw new Error('ENVIRONMENT_FAILURE:DRIVE_'+r.status);const b=Buffer.from(await r.arrayBuffer());if(sha(b)!==expected)throw new Error('DATA_CONTRACT_FAILURE:SOURCE_HASH');fs.writeFileSync(out,b);}
+          (async()=>{const sa=JSON.parse(process.env.SERVICE_ACCOUNT);if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');const t=await token(sa);await get(t,process.env.HIST_ID,process.env.HIST_SHA,'/tmp/autos.xlsx');await get(t,process.env.DELTA_ID,process.env.DELTA_SHA,'/tmp/autos-delta.xlsx');await get(t,process.env.POL_ID,process.env.POL_SHA,'/tmp/policies.xlsx');})().catch(e=>{console.error(String(e.message||e));process.exit(41);});
+          NODE
+          ORBIT360_VEHICLES_HIST_XLSX=/tmp/autos.xlsx \
+          ORBIT360_VEHICLES_DELTA_XLSX=/tmp/autos-delta.xlsx \
+          ORBIT360_POLICIES_XLSX=/tmp/policies.xlsx \
+          ORBIT360_VEHICLES_PACKAGE=/tmp/vehicles-private.json \
+          ORBIT360_VEHICLES_EVIDENCE="$EVIDENCE_DIR/vehicles-controlled-write-package-check.json" \
+          node tools/orbit360-vehicles-canonicalize-v20260730.mjs
+          jq -e '.status=="CANONICAL_DRYRUN_PASS" and .metrics.vehiclePolicyRelationsCreate==1032 and .metrics.qualityPending==60 and .metrics.excluded==4 and .metrics.logicalSha256==env.LOGICAL_SHA and .metrics.targetIdDigest==env.TARGET_DIGEST and .firestoreWrites==0' "$EVIDENCE_DIR/vehicles-controlled-write-package-check.json" >/dev/null
+          test -s /tmp/vehicles-private.json
+      - name: Ejecutar escritura controlada una sola vez
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          ORBIT360_VEHICLES_MODE=WRITE \
+          ORBIT360_VEHICLES_PACKAGE=/tmp/vehicles-private.json \
+          ORBIT360_VEHICLES_REQUEST="$REQUEST_PATH" \
+          ORBIT360_VEHICLES_TARGET_DIGEST="$TARGET_DIGEST" \
+          ORBIT360_VEHICLES_LOGICAL_SHA256="$LOGICAL_SHA" \
+          ORBIT360_VEHICLES_PREWRITE_EVIDENCE="$EVIDENCE_DIR/vehicles-controlled-write.json" \
+          node tools/orbit360-vehicles-canonical-apply-v20260730.mjs
+          jq -e '.status=="WRITE_PASS" and .ok==true and .before.clientes==430 and .before.aseguradoras==30 and .before.asesores==7 and .before.polizas==1373 and .before.vehiculos==0 and .after.clientes==430 and .after.aseguradoras==30 and .after.asesores==7 and .after.polizas==1373 and .after.vehiculos==1032 and .after.recibosEsperados==0 and .after.carteraPrimas==0 and .after.cobros==0 and .after.finmovs==0 and .writes.vehicles==1032 and .writes.audit==1 and .writes.clients==0 and .writes.insurers==0 and .writes.policies==0 and .writes.receipts==0 and .writes.cartera==0 and .writes.cobros==0 and .writes.finmovs==0 and .rollback.executed==false' "$EVIDENCE_DIR/vehicles-controlled-write.json" >/dev/null
+          rm -f /tmp/vehicles-private.json /tmp/autos.xlsx /tmp/autos-delta.xlsx /tmp/policies.xlsx
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-vehicles-controlled-write-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/vehicles-controlled-write.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/vehicles-controlled-write.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Vehicles controlled write blocked/failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.status==='WRITE_PASS'&&p.rollback.executed===false){state='success';description='Vehicles WRITE_PASS: 1032 relations; downstream untouched';}else if(p.status==='ROLLED_BACK_SAFE'){description='Vehicles write failed; rollback restored baseline safely';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/vehicles-write-once',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
