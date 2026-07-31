@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "orbit360-receipts-portfolio-source-freeze-v2",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-30",
+  "contractVersion": "9.1.0",
+  "activePackage": {
+    "name": "ORBIT360-AYS-RECIBOS-CARTERA-CANONICAL-PRIVATE-20260730",
+    "driveFileId": "1cttFAW4atpv8y9GAl5xrx26ojTDxQhYV",
+    "physicalSha256": "e64e75f78f6a64101627a9a860db566a95b83677fcf20eeb05be44c6f3f6a1d7",
+    "logicalSha256": "bb494a05aff75ff7baad39a07f23512187e39480d509f8ca1ace01e0b671362b",
+    "receiptIdDigest": "f700a11643a1e4e62a13c3894d6f1097acef2ad5edfc0a32703d0d9b2ed5facf",
+    "portfolioIdDigest": "144c8967704d1d06475144508e24cd8792ea8264faa7045eb50132316264bcd6"
+  },
+  "historicalDeltaPackage": {
+    "name": "ORBIT360-AYS-CARTERA-HISTORICA-EXIGIBLE-DELTA-PRIVATE-20260730.xlsx",
+    "driveFileId": "1wrUcZpcGZxG0H-elPwOmSzAI_i5OSqqT",
+    "physicalSha256": "780436042d53cdec354f1bcc96a7a16e874c0c947454d121230f7cb7d9703317",
+    "logicalSha256": "abb4189778e3cb3f1ffcf7e4f249645dcad88bcf522e2039be517e512f8a9d46",
+    "receiptIdDigest": "431cccd46a3f05308e58d6597b68a5c43f7e7fcf00c403f24090fa91fff9f03e",
+    "portfolioIdDigest": "7bffffbb09e03eefcefccb860a633433d0b8e2554a3bd874289d68173e2ef8f7"
+  },
+  "baseline": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "asesores": 7,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 0,
+    "carteraPrimas": 0,
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "activeUniverse": {
+    "activePolicies": 224,
+    "activePoliciesWithCalendar": 223,
+    "activePoliciesWithoutCalendar": 1,
+    "futurePoliciesExcluded": 7,
+    "receipts": 1261,
+    "portfolio": 641,
+    "dueOrOverdue": 99,
+    "futurePending": 542,
+    "paymentReported": 365,
+    "noPendingAccordingInsurer": 211,
+    "receiptHolds": 44,
+    "portfolioQualityFlags": 28,
+    "obsoleteScheduleExcluded": 20
+  },
+  "historicalReconciliation": {
+    "sourceCandidatesHistoricalOrRenewed": 70,
+    "expiredAndDueCandidates": 65,
+    "notExpiredOrNotDueHold": 5,
+    "sigaMaterialized": 27,
+    "mapfreMaterialized": 4,
+    "elRobleMaterialized": 1,
+    "insurerReplacementRows": 5,
+    "historicalReceipts": 32,
+    "historicalPortfolio": 32,
+    "historicalAmountGTQ": 13443.48,
+    "laCeibaForced": 0
+  },
+  "combinedExpected": {
+    "receipts": 1293,
+    "portfolio": 673,
+    "dueOrOverdue": 131,
+    "futurePending": 542,
+    "historicalExigible": 32,
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "identityContract": {
+    "activePolicyStates": ["Vigente", "Por renovar"],
+    "historicalSourceBackedPolicyStates": ["Histórica", "Renovada"],
+    "futurePolicyTermsOperationalNow": false,
+    "historicalRowsSourceBackedOnly": true,
+    "historicalTermMustBeExpiredAtCutoff": true,
+    "historicalReceiptMustBeDueAtOrBeforeCutoff": true,
+    "historicalReceiptMayFallAfterCoverageEnd": true,
+    "historicalRowsGenerateSchedule": false,
+    "historicalRowsReactivatePolicy": false,
+    "higherInsurerAuthoritySupersedesSiga": true,
+    "sigaAuthoritativeWhenNoHigherApplicableSource": true,
+    "reportedPaymentIsCobro": false,
+    "bankCreatesCobroByInference": false,
+    "fifoAppliedInThisBlock": false,
+    "fifoReservedForCobrosConciliacion": true
+  },
+  "downstreamWrites": {
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "oldPrewrite900Frozen": true,
+  "realWriteExecuted": false,
+  "authorizationRequiredForWrite": true,
+  "requestExistsAtFreeze": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
