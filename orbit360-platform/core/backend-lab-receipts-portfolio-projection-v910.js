@@ -48,7 +48,7 @@
     return rows.filter(function(r){if(!r)return false;var x=r[field];if(op==='=='||op==='=')return x===value;if(op==='!=')return x!==value;if(op==='>')return x>value;if(op==='>=')return x>=value;if(op==='<')return x<value;if(op==='<=')return x<=value;if(op==='array-contains')return Array.isArray(x)&&x.indexOf(value)>=0;return false;});
   }
   function wrapStore(){
-    if(wrappedStore||!Orbit.store||typeof Orbit.store.all!=='function')return false;
+    if(wrappedStore)return true;if(!Orbit.store||typeof Orbit.store.all!=='function')return false;
     var S=Orbit.store,base={all:S.all.bind(S),get:S.get.bind(S),where:S.where.bind(S),find:S.find.bind(S),raw:typeof S.raw==='function'?S.raw.bind(S):null,emit:typeof S._emit==='function'?S._emit.bind(S):null};
     S.all=function(name){return isSupplemental(name)?storeRows(name):base.all(name);};
     S.get=function(name,id){return isSupplemental(name)?storeRows(name).find(function(r){return rowId(r)===id;})||null:base.get(name,id);};
