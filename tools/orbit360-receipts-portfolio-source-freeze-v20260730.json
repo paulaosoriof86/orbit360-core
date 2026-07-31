@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "orbit360-receipts-portfolio-source-freeze-v1",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-30",
+  "package": {
+    "name": "ORBIT360-AYS-RECIBOS-CARTERA-CANONICAL-PRIVATE-20260730",
+    "driveFileId": "1cttFAW4atpv8y9GAl5xrx26ojTDxQhYV",
+    "physicalSha256": "e64e75f78f6a64101627a9a860db566a95b83677fcf20eeb05be44c6f3f6a1d7",
+    "logicalSha256": "bb494a05aff75ff7baad39a07f23512187e39480d509f8ca1ace01e0b671362b",
+    "receiptIdDigest": "f700a11643a1e4e62a13c3894d6f1097acef2ad5edfc0a32703d0d9b2ed5facf",
+    "portfolioIdDigest": "144c8967704d1d06475144508e24cd8792ea8264faa7045eb50132316264bcd6"
+  },
+  "baseline": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "asesores": 7,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 0,
+    "carteraPrimas": 0,
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "dryRun": {
+    "activePolicies": 224,
+    "activePoliciesWithCalendar": 223,
+    "activePoliciesWithoutCalendar": 1,
+    "futurePoliciesExcluded": 7,
+    "receiptsExpected": 1261,
+    "portfolioPending": 641,
+    "dueOrOverdue": 99,
+    "futurePending": 542,
+    "paymentReported": 365,
+    "noPendingAccordingInsurer": 211,
+    "receiptHolds": 44,
+    "portfolioQualityFlags": 28,
+    "obsoleteScheduleExcluded": 20,
+    "stateCounts": {
+      "futuro_pendiente": 542,
+      "pago_reportado": 365,
+      "no_pendiente_segun_aseguradora": 211,
+      "pendiente_vencido": 97,
+      "requiere_validacion_estado": 44,
+      "pendiente_vence_corte": 2
+    }
+  },
+  "identityContract": {
+    "writeUnit": "receipt_policy_term_endorsement_series_due_date",
+    "activePolicyStates": ["Vigente", "Por renovar"],
+    "futurePolicyTermsExcluded": true,
+    "historicalCancelledRenewedTermsExcluded": true,
+    "sourceCollectionStatusOperational": false,
+    "canonicalPolicyStatusAuthoritative": true,
+    "endorsementAware": true,
+    "insurerBalanceMayOverrideSigaSchedule": true,
+    "reportedPaymentIsCobro": false,
+    "portfolioSeparatesFutureFromDue": true
+  },
+  "downstreamWrites": {
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "realWriteExecuted": false,
+  "authorizationRequiredForWrite": true,
+  "requestExistsAtFreeze": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
