@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-human-review-readonly-final-v1",
+  "schemaVersion": "orbit360-human-review-readonly-final-v2",
   "classification": "VALIDATOR_STALE",
   "pipelineClassification": "PIPELINE_MECHANISM_FAILURE",
   "sourceHostingRun": 30670430241,
@@ -7,23 +7,21 @@
   "sourceRemoteParityPassed": true,
   "sourceHydrationPassed": true,
   "sourceBaseVisualPassed": true,
-  "rootCause": "VALIDATOR_INNERTEXT_FALSE_NEGATIVE_ON_SEMANTIC_TABLE_HEADER",
+  "rootCause": "VALIDATOR_INNERTEXT_FALSE_NEGATIVE_ON_SEMANTIC_FIELDS",
   "rootCauseEvidence": {
     "routerDiagnosticRun": 30673309180,
-    "routeKeyPolizasFrom100ms": true,
-    "directionRoleBound": true,
-    "accessCanPolizas": true,
-    "rows": 100,
-    "semanticHeadersContainPrimaTotal": true,
-    "paginationTextPresent": true,
-    "hostInnerTextOmittedPrimaTotal": true,
-    "servingAssetMatchesCurrentSource": true,
+    "policiesSemanticHeaderPresent": true,
+    "policiesSemanticHeaderVisible": true,
+    "vehicleOwnerContainsPlaca": true,
+    "vehicleOwnerContainsChasisVin": true,
+    "vehicleOwnerContainsMotor": true,
+    "vehicleOwnerContainsSumaAsegurada": true,
+    "structuralValidationNowUsesVisibleDomElements": true,
     "pageErrors": 0
   },
   "routerDiagnosticRun": 30673309180,
-  "routerDiagnosticArtifact": 8809549452,
-  "validatorFixCommit": "2da68748fff9df7c930eac251eb8122641c30f37",
-  "validatorStaticRun": 30673428784,
+  "validatorFixCommit": "b4d9e040ffab729bddf036e75d9eba7a5d7b49ae",
+  "validatorStaticRun": 30673605238,
   "validatorStaticPassed": true,
   "hostingDeploy": false,
   "rulesDeploy": false,
@@ -34,5 +32,5 @@
   "production": false,
   "browserReadOnly": true,
   "newAuthorization": false,
-  "notes": "Final browser-only verification against the already deployed LAB. The single Hosting deployment remains 1 total and is not repeated."
+  "notes": "Final browser-only verification against already deployed LAB. Structural labels are validated as visible semantic DOM elements, not via whole-host innerText."
 }
