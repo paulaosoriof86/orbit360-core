@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "orbit360-auth-replay-diagnostic-trigger-v1",
+  "sourceHostingRun": 30605735832,
+  "sourceHydrationDiagnosticRun": 30605971192,
+  "hostingRedeploy": false,
+  "firestoreWrites": 0,
+  "operationalWrites": 0,
+  "production": false
+}
