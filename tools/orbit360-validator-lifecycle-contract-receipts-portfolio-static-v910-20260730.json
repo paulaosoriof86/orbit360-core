@@ -2,7 +2,8 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "block9-receipts-portfolio-static-v20260730",
   "gateContractVersion": "9.1.0",
-  "validatorLifecycleRevision": "phase-capability-contract-v2-transversal-import-idempotency-reconciliation",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "contractExtensionRevision": "20260731-transversal-import-idempotency-reconciliation-v1",
   "executionProfile": {
     "phase": "RECEIPTS_PORTFOLIO_STATIC_QUALIFICATION",
     "capabilities": {
