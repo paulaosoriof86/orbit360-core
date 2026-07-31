@@ -22,16 +22,19 @@ for(const rel of ['orbit360-platform/core/importa-polizas-p0.js','orbit360-platf
   vm.runInThisContext(fs.readFileSync(rel,'utf8'),{filename:rel});
 }
 
-const common={numero:'POL-GUARD-001',aseguradoraNombre:'Aseguradora Demo',clienteNombre:'Cliente Demo',vigenciaIni:'2026-01-01',vigenciaFin:'2026-12-31',pais:'GT',moneda:'GTQ',primaNeta:1000,importado:true};
+const common={
+  numero:'POL-GUARD-001',aseguradoraNombre:'Aseguradora Demo',clienteNombre:'Cliente Demo',
+  vigenciaIni:'2026-01-01',vigenciaFin:'2026-12-31',pais:'GT',moneda:'GTQ',
+  primaNeta:1000,primaTotal:1000,importado:true
+};
 
-// Defaults legacy: no payment provenance + commissions inferred + Renovada source.
 const legacy={...common,id:'legacy',estadoPol:'Renovada',frecuencia:'Contado',forma:'Contado',formaPago:'',comAseguradoraPct:12,comVendedorPct:50};
 Orbit.store.insert('polizas',legacy);
 assert.equal(legacy._legacyContadoDefaultRemoved,true);
 assert.equal(legacy.frecuencia,'');
 assert.equal(legacy.formaPago,'');
 assert.equal(legacy.requiereValidacion,true);
-assert.ok(Array.isArray(legacy.motivosValidacion)&&legacy.motivosValidacion.includes('forma_pago'));
+assert.ok(Array.isArray(legacy.motivosValidacion)&&legacy.motivosValidacion.includes('forma_pago')&&legacy.motivosValidacion.includes('frecuencia_pago'));
 assert.equal(Object.prototype.hasOwnProperty.call(legacy,'comAseguradoraPct'),false);
 assert.equal(Object.prototype.hasOwnProperty.call(legacy,'comVendedorPct'),false);
 assert.equal(legacy.comisionFuenteValidada,false);
@@ -39,7 +42,6 @@ assert.equal(legacy.comisionEstado,'pendiente_fuente_separada');
 assert.equal(legacy.estadoOperativoOrbit,'historica_renovada');
 assert.equal(legacy.estadoCartera,'no_exigible');
 
-// Legacy collapsed Renovada/Por renovar cannot be trusted without original state provenance.
 const collapsed={...common,id:'collapsed',numero:'POL-GUARD-002',estado:'Por renovar',frecuencia:'Mensual',formaPago:'Domiciliado'};
 Orbit.store.insert('polizas',collapsed);
 assert.equal(collapsed._legacyRenewalStatusCollapsed,true);
@@ -47,8 +49,7 @@ assert.equal(collapsed.requiereValidacion,true);
 assert.ok(collapsed.motivosValidacion.includes('estado'));
 assert.equal(collapsed.estadoOperativoOrbit,'por_renovar_operativa');
 
-// Explicit trusted source preserves an actually Vigente policy and commission provenance.
-const trusted={...common,id:'trusted',numero:'POL-GUARD-003',estadoFuenteOriginal:'Vigente',frecuencia:'Mensual',formaPago:'Transferencia',comAseguradoraPct:15,comVendedorPct:40,comisionFuenteValidada:true,comisionFuente:'planilla_validada'};
+const trusted={...common,id:'trusted',numero:'POL-GUARD-003',estadoFuenteOriginal:'Vigente',frecuencia:'Mensual',formaPago:'Transferencia',conductoPago:'Directo',comAseguradoraPct:15,comVendedorPct:40,comisionFuenteValidada:true,comisionFuente:'planilla_validada'};
 Orbit.store.insert('polizas',trusted);
 assert.equal(trusted._legacyContadoDefaultRemoved,undefined);
 assert.equal(trusted._legacyRenewalStatusCollapsed,undefined);
@@ -57,9 +58,12 @@ assert.equal(trusted.estadoOperativoOrbit,'vigente_operativa');
 assert.equal(trusted.comAseguradoraPct,15);
 assert.equal(trusted.comVendedorPct,40);
 assert.equal(trusted.comisionFuenteValidada,true);
+assert.equal(trusted.formaPago,'Transferencia');
+assert.equal(trusted.frecuencia,'Mensual');
 
-// The wire itself no longer fabricates receipts; the canonical writer owns receipt materialization.
 assert.equal(memory.recibosEsperados.length,0);
 assert.equal(Orbit.importaPolizasP0Wire.directReceiptGeneration,false);
+assert.equal(Orbit.importaPolizasP0Wire.premiumInferenceAllowed,false);
+assert.equal(Orbit.importaPolizasP0Wire.paymentDimensionsSeparated,true);
 
-console.log(JSON.stringify({status:'PASS',legacyDefaultBlocked:true,legacyCommissionDefaultsRemoved:true,renovadaHistorical:true,collapsedRenewalBlocked:true,trustedSourcePreserved:true,directReceiptGeneration:false,firestoreWrites:0,operationalWrites:0},null,2));
+console.log(JSON.stringify({status:'PASS',legacyDefaultBlocked:true,legacyCommissionDefaultsRemoved:true,renovadaHistorical:true,collapsedRenewalBlocked:true,trustedSourcePreserved:true,directReceiptGeneration:false,premiumInferenceAllowed:false,paymentDimensionsSeparated:true,firestoreWrites:0,operationalWrites:0},null,2));
