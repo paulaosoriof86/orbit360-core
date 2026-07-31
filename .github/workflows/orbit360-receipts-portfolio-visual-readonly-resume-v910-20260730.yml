@@ -17,8 +17,8 @@ env:
   TRIGGER: .github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730.json
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
   SOURCE_HOSTING_RUN: '30670430241'
-  VALIDATOR_FIX_COMMIT: b4d9e040ffab729bddf036e75d9eba7a5d7b49ae
-  VALIDATOR_STATIC_RUN: '30673605238'
+  VALIDATOR_FIX_COMMIT: d8433b9d316f044eee8daaba0fde2b830d38a005
+  VALIDATOR_STATIC_RUN: '30673758393'
 jobs:
   human_review_final:
     name: Human review final · browser read-only · zero deploy
@@ -37,9 +37,9 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          jq -e '.schemaVersion=="orbit360-human-review-readonly-final-v2" and .classification=="VALIDATOR_STALE" and .pipelineClassification=="PIPELINE_MECHANISM_FAILURE" and .sourceHostingRun==(env.SOURCE_HOSTING_RUN|tonumber) and .sourceHostingDeployPassed==true and .sourceRemoteParityPassed==true and .sourceHydrationPassed==true and .sourceBaseVisualPassed==true and .rootCause=="VALIDATOR_INNERTEXT_FALSE_NEGATIVE_ON_SEMANTIC_FIELDS" and .routerDiagnosticRun==30673309180 and .validatorFixCommit==env.VALIDATOR_FIX_COMMIT and .validatorStaticRun==(env.VALIDATOR_STATIC_RUN|tonumber) and .validatorStaticPassed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .cobrosWrites==false and .production==false and .browserReadOnly==true and .newAuthorization==false' "$TRIGGER" >/dev/null
-          grep -Fq "premiumHeaderVisible" tools/orbit360-human-review-visual-lab-v20260731.mjs
+          jq -e '.schemaVersion=="orbit360-human-review-readonly-final-v3" and .classification=="VALIDATOR_STALE" and .pipelineClassification=="PIPELINE_MECHANISM_FAILURE" and .sourceHostingRun==(env.SOURCE_HOSTING_RUN|tonumber) and .sourceHostingDeployPassed==true and .sourceRemoteParityPassed==true and .sourceHydrationPassed==true and .sourceBaseVisualPassed==true and .rootCause=="VALIDATOR_INNERTEXT_FALSE_NEGATIVE_ON_SEMANTIC_FIELDS" and .validatorFixCommit==env.VALIDATOR_FIX_COMMIT and .validatorStaticRun==(env.VALIDATOR_STATIC_RUN|tonumber) and .validatorStaticPassed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .cobrosWrites==false and .production==false and .browserReadOnly==true and .newAuthorization==false' "$TRIGGER" >/dev/null
           grep -Fq "vehicleSemanticFieldsVisible" tools/orbit360-human-review-visual-lab-v20260731.mjs
+          grep -Fq "receiptSemanticFieldsVisible" tools/orbit360-human-review-visual-lab-v20260731.mjs
       - name: Gate canónico antes de secreto/browser
         env:
           ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
@@ -65,7 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-human-review-visual-lab-v20260731.mjs
-          jq -e '.ok==true and .status=="HUMAN_REVIEW_VISUAL_LAB_PASS" and .counts.clientes==430 and .counts.aseguradoras==30 and .counts.asesores==7 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1293 and .counts.carteraPrimas==673 and .counts.cobros==0 and .counts.finmovs==0 and .checks.globalPoliciesResponsive==true and .checks.globalPoliciesPaginated==true and .checks.globalPoliciesDirectionRole==true and .checks.globalPoliciesPremiumHeaderVisible==true and .checks.policyPremiumSemantic==true and .checks.policyQualityFailClosed==true and .checks.vehicleFullPage==true and .checks.vehicleSemanticFieldsVisible==true and .checks.receiptDetail==true and .checks.reportedPaymentNotCobro==true and .checks.portfolioReconciledVisible==true and .checks.portfolioNotPayment==true and .checks.downstreamZero==true and .checks.noPageErrors==true and .checks.noTechnicalCopy==true and .metrics.activeRoleForHumanReview=="Dirección" and .metrics.globalPoliciesRows>0 and .metrics.globalPoliciesRows<=100 and .metrics.globalPoliciesHasPremiumHeader==true and .metrics.globalPoliciesPremiumHeaderVisible==true and .metrics.globalPoliciesHasPaginationText==true and .metrics.globalPoliciesAccessCan==true and .metrics.globalPoliciesRouteKey=="polizas" and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/human-review-visual-lab-v20260731.json" >/dev/null
+          jq -e '.ok==true and .status=="HUMAN_REVIEW_VISUAL_LAB_PASS" and .counts.clientes==430 and .counts.aseguradoras==30 and .counts.asesores==7 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1293 and .counts.carteraPrimas==673 and .counts.cobros==0 and .counts.finmovs==0 and .checks.globalPoliciesResponsive==true and .checks.globalPoliciesPaginated==true and .checks.globalPoliciesDirectionRole==true and .checks.globalPoliciesPremiumHeaderVisible==true and .checks.policyPremiumSemantic==true and .checks.policyQualityFailClosed==true and .checks.vehicleFullPage==true and .checks.vehicleSemanticFieldsVisible==true and .checks.receiptDetail==true and .checks.receiptSemanticFieldsVisible==true and .checks.reportedPaymentNotCobro==true and .checks.portfolioReconciledVisible==true and .checks.portfolioNotPayment==true and .checks.downstreamZero==true and .checks.noPageErrors==true and .checks.noTechnicalCopy==true and .metrics.activeRoleForHumanReview=="Dirección" and .metrics.globalPoliciesRows>0 and .metrics.globalPoliciesRows<=100 and .metrics.globalPoliciesHasPremiumHeader==true and .metrics.globalPoliciesPremiumHeaderVisible==true and .metrics.globalPoliciesHasPaginationText==true and .metrics.globalPoliciesAccessCan==true and .metrics.globalPoliciesRouteKey=="polizas" and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/human-review-visual-lab-v20260731.json" >/dev/null
       - name: Evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
