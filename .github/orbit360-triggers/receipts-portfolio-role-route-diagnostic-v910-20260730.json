@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-role-route-diagnostic-trigger-v2",
-  "diagnosticRevision": 3,
+  "diagnosticRevision": 4,
   "sourceHostingRun": 30655526997,
   "sourceHostingArtifact": 8803087663,
   "sourceHostingDigest": "sha256:9d44824706700cdc50e30234e4851d5aa2b1c53ae4d3880c39adf646b6f1ff83",
