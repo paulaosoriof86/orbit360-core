@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-rules-readonly-compat-authorization-v1",
+  "contractVersion": "9.1.0",
+  "approved": true,
+  "phrase": "AUTORIZO RULES READONLY COMPAT LAB RECIBOS CARTERA V910 20260730",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "54e85a30a9c2a604ba50d16ebc03eed834ff4ed2",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "securityFailure": "FIRESTORE_PROJECT_WIDE_PRODUCT_RULES_DENY_LEGACY_LAB_TENANTID_PATH",
+  "sourceRulesSha256": "977d5841c5d54f139d2bf287914ae6bb19fad64fbe80b1cade807c5026a493ef",
+  "candidateRulesSha256": "a78ad9e7ec3dc7277dda81d10ef223784d762f3b5d52e4040d9436679db7f4eb",
+  "staticProof": {
+    "run": 30606629580,
+    "artifact": 8783834911,
+    "artifactDigest": "sha256:e647999c9990361f478d9be9fb8bef0c3766a56ede8c800778f13b2e7dd3e950"
+  },
+  "scope": {
+    "rulesDeploy": true,
+    "hosting": false,
+    "functions": false,
+    "storage": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false,
+    "cobros": false,
+    "visualAfterRules": true
+  },
+  "allowedRulesDeployExecutions": 1,
+  "rollbackOnSecurityFailure": true,
+  "requestImmutable": true
+}
