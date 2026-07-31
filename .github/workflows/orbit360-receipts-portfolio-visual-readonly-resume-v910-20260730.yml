@@ -1,4 +1,4 @@
-name: Orbit 360 · Recibos/Cartera 9.1.0 · visual read-only resume
+name: Orbit 360 · Pólizas serving drift · diagnóstico read-only
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
@@ -8,22 +8,18 @@ permissions:
   contents: read
   statuses: write
 concurrency:
-  group: orbit360-receipts-portfolio-visual-readonly-v910-20260730
+  group: orbit360-policies-serving-drift-diagnostic-20260731
   cancel-in-progress: false
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_ID: block9-receipts-portfolio-static-v20260730
   ORBIT360_LAB_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
+  TRIGGER: .github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730.json
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
-  SOURCE_HOSTING_RUN: '30670430241'
-  SOURCE_HOSTING_ARTIFACT: '8808577341'
-  VALIDATOR_FIX_COMMIT: da4ae989ee8682ab865a41d1fdc2c43fca000577
-  VALIDATOR_STATIC_RUN: '30672771524'
 jobs:
-  visual_readonly:
-    name: Human review recovery · browser read-only · zero deploy
+  serving_drift:
+    name: Pólizas · serving/cache drift · zero browser zero deploy
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - name: Checkout exacto
         uses: actions/checkout@v4
@@ -31,64 +27,67 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Verificar lineage y alcance cero deploy
+      - name: Verificar alcance diagnóstico
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          git merge-base --is-ancestor "$VALIDATOR_FIX_COMMIT" HEAD
-          test -f .github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730.json
-          jq -e '.schemaVersion=="orbit360-human-review-readonly-recovery-v2" and .classification=="VALIDATOR_STALE" and .pipelineClassification=="PIPELINE_MECHANISM_FAILURE" and .sourceHostingRun==(env.SOURCE_HOSTING_RUN|tonumber) and .sourceHostingArtifact==(env.SOURCE_HOSTING_ARTIFACT|tonumber) and .sourceHostingDeployPassed==true and .sourceRemoteParityPassed==true and .sourceHydrationPassed==true and .sourceBaseVisualPassed==true and .previousHumanFailedStage=="global_policies" and .secondHumanFailedStage=="global_policies" and .stopRetryApplied==true and .rootCause=="HUMAN_VALIDATOR_MISSING_DETERMINISTIC_DIRECTION_ROLE_CONTEXT" and .validatorFixCommit==env.VALIDATOR_FIX_COMMIT and .validatorStaticRun==(env.VALIDATOR_STATIC_RUN|tonumber) and .validatorStaticPassed==true and .rulesDeploy==false and .hostingDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .cobrosWrites==false and .production==false and .browserReadOnly==true and .newAuthorization==false' .github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730.json >/dev/null
-          test "$(git diff --name-only "$VALIDATOR_FIX_COMMIT"..HEAD | grep -Ev '^\.github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730\.json$' | wc -l | tr -d ' ')" = '1'
-          grep -Fq "await role(page,'Dirección')" tools/orbit360-human-review-visual-lab-v20260731.mjs
-          grep -Fq "POLICIES_ACCESS_NOT_GRANTED_FOR_DIRECTION" tools/orbit360-human-review-visual-lab-v20260731.mjs
-      - name: Gate canónico antes de secreto/browser
-        env:
-          ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
+          jq -e '.schemaVersion=="orbit360-policies-serving-drift-diagnostic-v1" and .classification=="PIPELINE_MECHANISM_FAILURE" and .sourceHostingRun==30670430241 and .sourceRemoteParityPassed==true and .browserFailuresAtGlobalPolicies==3 and .lastDiagnostics.rows==100 and .lastDiagnostics.activeRole=="Dirección" and .lastDiagnostics.accessCanPolizas==true and .lastDiagnostics.hasPaginationText==true and .lastDiagnostics.hasPremiumLabel==false and .hostingDeploy==false and .browser==false and .secrets==false and .dataWrites==false and .production==false' "$TRIGGER" >/dev/null
+          grep -Fq 'modules/polizas.js?v1318' orbit360-platform/index.html
+          grep -Fq 'Prima total' orbit360-platform/modules/polizas.js
+          grep -Fq 'Mostrando' orbit360-platform/modules/polizas.js
+      - name: Comparar asset fijado vs cache-busted
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-human-review-visual-lab-v20260731.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-          node tools/orbit360-test-human-visual-contract-v20260731.mjs > "$EVIDENCE_DIR/human-review-recovery-static-v20260731.json"
-          jq -e '.status=="HUMAN_VISUAL_STATIC_READY" and .failed==0 and .passed==.total and .firestoreWrites==0 and .deployExecuted==false' "$EVIDENCE_DIR/human-review-recovery-static-v20260731.json" >/dev/null
-      - name: Preparar navegador después del gate
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-save --package-lock=false --ignore-scripts playwright@1.52.0
-          npx playwright install chromium
-      - name: Ejecutar runtime humano read-only corregido
-        env:
-          ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
-          ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-human-review-visual-lab-v20260731.mjs
-          jq -e '.ok==true and .status=="HUMAN_REVIEW_VISUAL_LAB_PASS" and .counts.clientes==430 and .counts.aseguradoras==30 and .counts.asesores==7 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1293 and .counts.carteraPrimas==673 and .counts.cobros==0 and .counts.finmovs==0 and .checks.globalPoliciesResponsive==true and .checks.globalPoliciesPaginated==true and .checks.globalPoliciesDirectionRole==true and .checks.policyPremiumSemantic==true and .checks.policyQualityFailClosed==true and .checks.vehicleFullPage==true and .checks.receiptDetail==true and .checks.reportedPaymentNotCobro==true and .checks.portfolioReconciledVisible==true and .checks.portfolioNotPayment==true and .checks.downstreamZero==true and .checks.noPageErrors==true and .checks.noTechnicalCopy==true and .metrics.activeRoleForHumanReview=="Dirección" and .metrics.globalPoliciesRows>0 and .metrics.globalPoliciesRows<=100 and .metrics.globalPoliciesHasPremiumLabel==true and .metrics.globalPoliciesHasPaginationText==true and .metrics.globalPoliciesAccessCan==true and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/human-review-visual-lab-v20260731.json" >/dev/null
+          mkdir -p "$EVIDENCE_DIR"
+          local_file='orbit360-platform/modules/polizas.js'
+          pinned="${RUNNER_TEMP}/polizas-pinned.js"
+          fresh="${RUNNER_TEMP}/polizas-fresh.js"
+          index_remote="${RUNNER_TEMP}/index-remote.html"
+          pinned_headers="${RUNNER_TEMP}/pinned-headers.txt"
+          fresh_headers="${RUNNER_TEMP}/fresh-headers.txt"
+          curl -fsSL --retry 3 -D "$pinned_headers" "${ORBIT360_LAB_URL}/modules/polizas.js?v1318" -o "$pinned"
+          curl -fsSL --retry 3 -D "$fresh_headers" "${ORBIT360_LAB_URL}/modules/polizas.js?orbitServingDiag=${GITHUB_SHA}" -o "$fresh"
+          curl -fsSL --retry 3 "${ORBIT360_LAB_URL}/index.html?orbitServingDiag=${GITHUB_SHA}" -o "$index_remote"
+          local_sha="$(sha256sum "$local_file" | awk '{print $1}')"
+          pinned_sha="$(sha256sum "$pinned" | awk '{print $1}')"
+          fresh_sha="$(sha256sum "$fresh" | awk '{print $1}')"
+          local_premium=false; pinned_premium=false; fresh_premium=false; pinned_pagination=false; fresh_pagination=false; remote_index_v1318=false
+          grep -Fq 'Prima total' "$local_file" && local_premium=true
+          grep -Fq 'Prima total' "$pinned" && pinned_premium=true
+          grep -Fq 'Prima total' "$fresh" && fresh_premium=true
+          grep -Fq 'Mostrando' "$pinned" && pinned_pagination=true
+          grep -Fq 'Mostrando' "$fresh" && fresh_pagination=true
+          grep -Fq 'modules/polizas.js?v1318' "$index_remote" && remote_index_v1318=true
+          pinned_cache="$(grep -i '^cache-control:' "$pinned_headers" | tr -d '\r' | tail -1 | sed 's/^[^:]*:[[:space:]]*//' || true)"
+          fresh_cache="$(grep -i '^cache-control:' "$fresh_headers" | tr -d '\r' | tail -1 | sed 's/^[^:]*:[[:space:]]*//' || true)"
+          classification='SERVING_DRIFT_NOT_CONFIRMED'
+          if [ "$fresh_sha" = "$local_sha" ] && [ "$pinned_sha" != "$local_sha" ]; then classification='SERVING_CACHE_VERSION_DRIFT_CONFIRMED'; fi
+          if [ "$fresh_sha" = "$local_sha" ] && [ "$pinned_sha" = "$local_sha" ]; then classification='SERVING_ASSET_MATCHES_CURRENT_SOURCE'; fi
+          jq -n \
+            --arg classification "$classification" \
+            --arg localSha "$local_sha" --arg pinnedSha "$pinned_sha" --arg freshSha "$fresh_sha" \
+            --arg pinnedCache "$pinned_cache" --arg freshCache "$fresh_cache" \
+            --argjson localPremium "$local_premium" --argjson pinnedPremium "$pinned_premium" --argjson freshPremium "$fresh_premium" \
+            --argjson pinnedPagination "$pinned_pagination" --argjson freshPagination "$fresh_pagination" --argjson remoteIndexV1318 "$remote_index_v1318" \
+            '{schemaVersion:"orbit360-policies-serving-drift-diagnostic-v1",ok:true,status:"DIAGNOSTIC_CAPTURED",classification:$classification,localSha256:$localSha,pinnedV1318Sha256:$pinnedSha,cacheBustedSha256:$freshSha,localHasPrimaTotal:$localPremium,pinnedV1318HasPrimaTotal:$pinnedPremium,cacheBustedHasPrimaTotal:$freshPremium,pinnedV1318HasMostrando:$pinnedPagination,cacheBustedHasMostrando:$freshPagination,remoteIndexLoadsV1318:$remoteIndexV1318,pinnedCacheControl:$pinnedCache,cacheBustedCacheControl:$freshCache,browserExecuted:false,secretsAccessed:false,hostingDeployExecutions:0,rulesDeployExecutions:0,functionsDeploy:false,storageDeploy:false,dataWrites:0,production:false}' > "$EVIDENCE_DIR/policies-serving-drift-diagnostic-v20260731.json"
+          jq . "$EVIDENCE_DIR/policies-serving-drift-diagnostic-v20260731.json"
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-human-review-readonly-recovery-${{ github.run_id }}
-          path: |
-            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-recovery-static-v20260731.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-visual-lab-v20260731.json
-          if-no-files-found: warn
+          name: orbit360-policies-serving-drift-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/policies-serving-drift-diagnostic-v20260731.json
+          if-no-files-found: error
           retention-days: 30
-      - name: Publicar estado
+      - name: Publicar estado diagnóstico
         if: always()
         uses: actions/github-script@v7
         env:
-          HUMAN: orbit360-platform/runtime-gate-crm-v20260716/human-review-visual-lab-v20260731.json
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/policies-serving-drift-diagnostic-v20260731.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='Human review read-only recovery failed';
-            try{const h=JSON.parse(fs.readFileSync(process.env.HUMAN,'utf8'));if(h.ok===true&&h.status==='HUMAN_REVIEW_VISUAL_LAB_PASS'&&h.firestoreWrites===0&&h.operationalWrites===0&&h.productionTouched===false){state='success';description='Human review read-only recovery PASS';}else if(h.errorCode){description=`Human review blocked: ${String(h.errorCode).slice(0,90)}`;}}catch(e){}
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/human-review-readonly-recovery-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+            const fs=require('fs');let state='failure',description='Policies serving drift diagnostic failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok&&p.status==='DIAGNOSTIC_CAPTURED'){state='success';description=String(p.classification).slice(0,100);}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/policies-serving-drift-diagnostic',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
