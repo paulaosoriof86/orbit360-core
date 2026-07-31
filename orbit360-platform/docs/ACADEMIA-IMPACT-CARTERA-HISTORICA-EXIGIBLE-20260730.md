@@ -51,8 +51,19 @@ La regla `oldest outstanding first` pertenece al bloque posterior de Cobros/conc
 
 El hallazgo que congeló el prewrite 9.0.0 fue `DATA_CONTRACT_FAILURE`, no una falla del writer ni del store: el contrato excluía toda vigencia histórica y por eso no podía representar saldos que una fuente vigente todavía consideraba pendientes. La corrección adecuada fue actualizar contrato + fuente + validador + evidencia, no reintentar la misma escritura.
 
+El intento autorizado 9.1.0 reveló un caso distinto: `VALIDATOR_STALE`. El gate había sido diseñado correctamente para la fase PREWRITE, donde el request debe estar ausente, pero esa misma condición se volvió obsoleta en la fase AUTHORIZED_WRITE, donde debe existir exactamente el request ya aprobado. La respuesta correcta no es crear otra autorización ni saltarse el gate: el lifecycle debe modelar ambas fases, conservar el mismo request inmutable y validar su frase, hashes, digests y alcance antes de permitir acceso a secretos o al store.
+
+Patrón reusable de control:
+
+- `PREWRITE` → request ausente;
+- `AUTHORIZED_WRITE` → request exacto e inmutable presente;
+- si el gate falla antes de secretos/Firestore por `VALIDATOR_STALE`, no se consume una segunda autorización ni se crea otro request;
+- se congela la ejecución, se corrigen lifecycle + validator + workflow conjuntamente y se reanuda con el mismo request aprobado;
+- si la misma etapa/código vuelve a fallar, se aplica STOP_RETRY y diagnóstico de causa raíz.
+
 ## Clasificación Claude
 
 - Arquitectura/UX reusable: `REPLICABLE_CLAUDE_INMEDIATO`.
+- Patrón lifecycle PREWRITE/AUTHORIZED_WRITE: `REPLICABLE_CLAUDE_ACUMULADO` como concepto, sin hashes, secretos ni datos reales.
 - Academia: `ACADEMIA_ACTUALIZAR`.
 - Writer, gate, hashes, fuentes privadas y datos reales: `BACKEND_PROTEGIDO_NO_CLAUDE` / `SECRETO_DATO_REAL` según corresponda.
