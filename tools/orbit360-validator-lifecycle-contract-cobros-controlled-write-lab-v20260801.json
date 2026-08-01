@@ -4,16 +4,16 @@
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "gateContractVersion": "10.9.0",
   "owner": "orbit360-cobros-controlled-write-lab-v20260801",
-  "ownerVersion": "20260801.11-residual-candidate-readonly-active",
-  "status": "RESIDUAL_CANDIDATE_READONLY_ACTIVE",
-  "classification": "READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT",
+  "ownerVersion": "20260801.12-residual-preflight-closed-four-hold",
+  "status": "CLOSED_RESIDUAL_CANDIDATE_PREFLIGHT",
+  "classification": "HOLD_LAB_COBROS_RESIDUAL_CANDIDATE_READONLY",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "executionProfile": {
-    "mode": "READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT",
-    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "mode": "CLOSED",
+    "phase": "RESIDUAL_CANDIDATE_READONLY_PREFLIGHT",
     "capabilities": {
-      "secrets": true,
-      "firestoreRead": true,
+      "secrets": false,
+      "firestoreRead": false,
       "writes": false,
       "runtime": false,
       "browser": false,
@@ -36,10 +36,11 @@
     "POST_CLOSE_RELATION_VERIFICATION",
     "CLOSED_WRITE_PASS_POST_VERIFIED",
     "RESIDUAL_LEDGER_READONLY",
-    "RESIDUAL_CANDIDATE_READONLY_PREFLIGHT"
+    "RESIDUAL_CANDIDATE_READONLY_PREFLIGHT",
+    "CLOSED_RESIDUAL_CANDIDATE_PREFLIGHT"
   ],
-  "currentPhase": "RESIDUAL_CANDIDATE_READONLY_PREFLIGHT",
-  "outcome": "ONE_RESIDUAL_CANDIDATE_PENDING_LIVE_READONLY_PREFLIGHT_THREE_HOLD",
+  "currentPhase": "CLOSED_RESIDUAL_CANDIDATE_PREFLIGHT",
+  "outcome": "FIVE_APPLIED_AND_POST_VERIFIED_FOUR_RESIDUAL_HOLD_ZERO_NEW_CANDIDATES",
   "humanDecisionRecorded": true,
   "executionAuthorized": false,
   "labWriteAuthorized": false,
@@ -47,7 +48,7 @@
   "productionAuthorized": false,
   "deployAuthorized": false,
   "diagnosisAuthorized": false,
-  "residualCandidateReadOnlyAuthorized": true,
+  "residualCandidateReadOnlyAuthorized": false,
   "requestSealedByLifecycle": true,
   "requestSemanticallyConsumed": true,
   "requestFileMutationProhibited": true,
@@ -86,7 +87,6 @@
     "artifactDigest": "sha256:f3f76d7cad4bd5e44a55ed5ceea915b0f02cb3e93e1d389ebe9553701845b614",
     "head": "1496c7e42dabdb9329ae1dbc3e582973309e5549",
     "status": "POST_CLOSE_RELATIONS_PASS",
-    "classification": "GO_LAB_COBROS_POST_CLOSE_RELATIONS_READONLY",
     "cases": 5,
     "policyRelations": 5,
     "receiptRelations": 5,
@@ -96,9 +96,7 @@
     "noFinmovCases": 5,
     "invalidCases": 0,
     "firestoreWrites": 0,
-    "productionTouched": false,
-    "validatorRootCause": "NESTED_CONCILIACION_MAP_EXACT_EQUALITY_FALSE_NEGATIVE",
-    "validatorRootFix": "POST_CLOSE_RECEIPT_RECURSIVE_SUBSET_COMPARISON"
+    "productionTouched": false
   },
   "actualFinalState": {
     "polizas": 1373,
@@ -110,51 +108,85 @@
     "insurerPaymentRowsReviewed": 9,
     "oneToOneCandidatesAppliedAndVerified": 5,
     "residualRowsReviewed": 4,
-    "initialHoldOrNoMatch": 4,
-    "newerAuthoritativeSourceAfter20260730Located": false,
     "additionalEvidenceLocated": true,
+    "finalEligibleCandidates": 0,
+    "finalHoldOrNoMatch": 4,
     "rowLevelEvidenceStoredPrivately": true,
     "inferMatchesProhibited": true,
-    "newWritesAuthorized": false
+    "newWritesAuthorized": false,
+    "newWritesExecuted": 0
   },
-  "residualCandidate": {
-    "candidateCount": 1,
-    "holdCount": 3,
-    "candidateClassification": "MULTI_SOURCE_ONE_TO_ONE_PENDING_LIVE_READONLY_PREFLIGHT",
-    "evidenceChain": {
-      "currentCrmReceipt": true,
-      "canonicalReceipt": true,
-      "canonicalPolicy": true,
-      "insurerPendingReference": true,
-      "insurerPaidReference": true,
-      "amountExactAcrossCurrentCandidateSources": true,
-      "secondaryReferenceConfirmedByTwoInsurerSources": true,
-      "crmSecondaryReferenceMissing": true,
-      "liveFirestoreSnapshotPending": true
-    },
-    "privatePackage": {
-      "driveFileId": "1KHeHbNmJSvYZgzUcop57LiR4KdB-PxOh",
-      "sha256": "ccc37815c1f90fa3965d8eb87273c4746873ba79ec57fd6987d41b6016769411",
-      "logicalSha256": "b9798a225530a4473dcd356e158211b94e1700bbb03dd988df344a8358c213ae",
-      "canonicalization": "node-json-stable-sort-v1",
-      "rawRowsStoredInRepo": 0
-    },
-    "checksRequired": [
-      "POLICY_EXISTS_AND_STATE_PRESERVED",
-      "RECEIPT_EXISTS_AND_SNAPSHOT_MATCHES",
-      "NO_EXISTING_COBRO_FOR_RECEIPT",
-      "RECEIPT_NOT_ALREADY_CONCILIATED",
-      "UNIQUE_RECEIPT_CANDIDATE",
-      "ZERO_FINMOVS",
-      "REQUEST_10_9_REPLAY_REMAINS_BLOCKED"
-    ],
-    "writeAuthorized": false
+  "residualCandidatePrivatePackage": {
+    "driveFileId": "1KHeHbNmJSvYZgzUcop57LiR4KdB-PxOh",
+    "sha256": "ccc37815c1f90fa3965d8eb87273c4746873ba79ec57fd6987d41b6016769411",
+    "logicalSha256": "b9798a225530a4473dcd356e158211b94e1700bbb03dd988df344a8358c213ae",
+    "canonicalization": "node-json-stable-sort-v1",
+    "rawRowsStoredInRepo": 0
   },
+  "residualPreflightAttempts": [
+    {
+      "run": 30714072394,
+      "artifact": 8822778919,
+      "classification": "ENVIRONMENT_FAILURE",
+      "failure": "PRIVATE_PACKAGE_DRIVE_404",
+      "firestoreRead": false,
+      "firestoreWrites": 0,
+      "rootFix": "PRIVATE_PACKAGE_LAB_READER_PERMISSION"
+    },
+    {
+      "run": 30714161725,
+      "artifact": 8822807160,
+      "classification": "HOLD_LAB_COBROS_RESIDUAL_CANDIDATE_READONLY",
+      "finding": "RECEIPT_SNAPSHOT_MISMATCH_ONLY",
+      "firestoreWrites": 0
+    },
+    {
+      "run": 30714232343,
+      "job": 91406956560,
+      "artifact": 8822826784,
+      "artifactDigest": "sha256:8202129740f8039faa4a26258cb4c2115a3cc655a2e0516927e523dc49023297",
+      "classification": "HOLD_LAB_COBROS_RESIDUAL_CANDIDATE_READONLY",
+      "finding": "ENDOSO_ONLY_MISMATCH",
+      "firestoreWrites": 0
+    },
+    {
+      "run": 30714297335,
+      "job": 91407132282,
+      "artifact": 8822846720,
+      "artifactDigest": "sha256:9e5166753de3153891fc0c113cadf571a81a1bca50e367f4603b7a46826077cc",
+      "head": "a0b9fb61de66e5919beefaeda7bf1298cd93e8cd",
+      "status": "RESIDUAL_CANDIDATE_READONLY_HOLD",
+      "classification": "HOLD_LAB_COBROS_RESIDUAL_CANDIDATE_READONLY",
+      "policyExists": true,
+      "receiptExists": true,
+      "policySnapshotOk": true,
+      "receiptNonEndosoMismatches": 0,
+      "soleMismatchedField": "endoso",
+      "noExistingCobroForReceipt": true,
+      "receiptNotAlreadyConciliated": true,
+      "uniqueReceiptCandidate": true,
+      "amountExactAcrossSources": true,
+      "insurerSourcesConfirmSameEndoso": true,
+      "liveReceiptEndosoMatchesInsurerSources": false,
+      "policyStatePreserved": true,
+      "noFinmov": true,
+      "eligible": false,
+      "firestoreWrites": 0,
+      "operationalWrites": 0,
+      "deployExecuted": false,
+      "productionTouched": false
+    }
+  ],
   "residualHolds": [
     {
       "ordinal": 1,
       "classification": "CROSS_POLICY_REFERENCE_CONFLICT_AND_AMOUNT_MISMATCH",
       "decision": "HOLD"
+    },
+    {
+      "ordinal": 2,
+      "classification": "LIVE_RECEIPT_ENDOSO_CONFLICTS_WITH_TWO_INSURER_SOURCES",
+      "decision": "HOLD_REQUIRES_AUTHORITATIVE_CORRECTION"
     },
     {
       "ordinal": 3,
@@ -180,5 +212,15 @@
     "containsAmounts": false,
     "containsSecrets": false
   },
-  "nextAction": "RUN_LIVE_READONLY_PREFLIGHT_FOR_ONE_RESIDUAL_CANDIDATE_AND_KEEP_THREE_HOLD"
+  "closure": {
+    "closedAt": "2026-08-01T13:14:00-06:00",
+    "fiveCobrosAppliedAndVerified": true,
+    "residualRows": 4,
+    "eligibleResidualCandidates": 0,
+    "holdResidualCases": 4,
+    "newWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "nextAction": "OBTAIN_AUTHORITATIVE_CORRECTIONS_FOR_FOUR_HOLD_ROWS_OR_KEEP_THEM_FORMALLY_OPEN_WHILE_ADVANCING_ONLY_WITH_ALREADY_CONCILIATED_CASES_IF_THE_MASTER_PLAN_ALLOWS"
 }
