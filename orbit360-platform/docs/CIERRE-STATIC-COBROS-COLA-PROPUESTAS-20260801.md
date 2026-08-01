@@ -5,9 +5,17 @@ Tenant: `alianzas-soluciones`
 Rama: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open
 
-## Estado
+## Veredicto
 
-`CONTROLLED_PROPOSAL_QUEUE_STATIC_READY`
+`COBROS_CONTROLLED_PROPOSAL_QUEUE_STATIC_READY`
+
+```text
+gate: block10.5-cobros-proposal-queue-static-v20260801
+run: 30706101103
+artifact: 8820364372
+digest: sha256:3d2cd9a04aaeff779bb7a8d01e73dc1c614842353d4b6420a7109e25b1072a85
+checks: 55/55 PASS
+```
 
 La matriz real del gate 10.4 contiene 70 casos de evidencia de pago:
 
@@ -66,6 +74,14 @@ Los 34 HOLD incluyen:
 
 No se solicitarán fuentes de forma masiva. Cada solicitud futura deberá indicar caso, aseguradora, periodo, fuente ya disponible y evidencia exacta que falta.
 
+## Causa raíz del primer intento
+
+El primer run, `30706025529`, no ejecutó la validación de la cola. El predecesor 10.4 rechazó el bootstrap porque esperaba literalmente la versión `20260801.3`, aunque la incorporación aditiva de la cola lo había elevado correctamente a `20260801.4`.
+
+Clasificación: `VALIDATOR_STALE`.
+
+Se corrigió el validador de la matriz para comprobar la capacidad requerida y una versión mínima, no una versión exacta. No se modificó la matriz ni la cola. La segunda y última ejecución pasó 55/55.
+
 ## Controles
 
 ```text
@@ -95,6 +111,11 @@ deploy: 0
 production: untouched
 ```
 
-## Siguiente acción
+## Siguiente acción exacta
 
-Cerrar el gate 10.5 estático. Después, los cinco casos de evidencia directa podrán convertirse en un paquete privado de autorización con diff sanitizado. Ninguna escritura se ejecutará sin autorización explícita posterior.
+Los cinco casos de evidencia directa pueden convertirse en un paquete privado de autorización con diff sanitizado:
+
+- cuatro cobros vinculados a recibos canónicos existentes;
+- un cobro que requiere crear primero el recibo histórico exigible, sin reactivar la póliza.
+
+Preparar el paquete no autoriza la escritura. Toda escritura requerirá una autorización explícita posterior y un gate independiente de ejecución atómica.
