@@ -1,0 +1,145 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-source-inventory-readonly-v1",
+  "date": "2026-08-01",
+  "tenantId": "alianzas-soluciones",
+  "environment": "LAB",
+  "classification": "READ_ONLY_SOURCE_INVENTORY",
+  "status": "PARTIAL_SOURCE_COVERAGE",
+  "scope": {
+    "reconciledCobrosEligibleForSourceInventory": 5,
+    "residualHoldCasesExcluded": 4,
+    "insurersInScope": 2,
+    "countries": ["GT"],
+    "currencies": ["GTQ"],
+    "writesAuthorized": 0,
+    "writesExecuted": 0
+  },
+  "sources": [
+    {
+      "sourceAlias": "MAPFRE_COMMISSION_PLANILLA",
+      "sourceType": "planilla_comisiones",
+      "format": "XLS_HTML_EXPORT",
+      "sourceModifiedDate": "2026-07-14",
+      "businessPeriod": "2026-06",
+      "country": "GT",
+      "currency": "GTQ",
+      "dataRows": 11,
+      "coveredReconciledCobros": 2,
+      "coveredInsurerCobros": 2,
+      "sourceCoverageCompleteForInsurer": true,
+      "containsCommissionFields": true,
+      "containsNetPremiumField": true,
+      "containsInvoiceValueField": true,
+      "containsPaymentDateField": true,
+      "containsPolicyAndReceiptKeys": true,
+      "containsIntermediaryCommission": true,
+      "containsSellerCommission": true,
+      "schemaFields": [
+        "tipo",
+        "producto",
+        "poliza",
+        "relacion_ingreso",
+        "fecha_pago",
+        "moneda",
+        "requerimiento",
+        "serie",
+        "factura",
+        "fecha_vencimiento",
+        "obligacion",
+        "numero_pago",
+        "asegurado",
+        "valor_factura",
+        "prima_neta",
+        "comision_ays",
+        "comision_vendedor",
+        "referencia_gastos_medicos"
+      ],
+      "sourcePhysicalSha256": "55e1f0622e680265cb8925d5df512ca938a22db603b0f6631d1519ddd2529697",
+      "normalizedSheetSha256": "ec287e2baf77ce8ce2d1e95f4a10e633860bcb141c570c8653b0970a563279dd",
+      "decision": "SOURCE_READY_FOR_READ_ONLY_MAPPING_AND_DRY_RUN"
+    },
+    {
+      "sourceAlias": "ASEGURADORA_GENERAL_PAYMENT_REPORT",
+      "sourceType": "planilla_aseguradora_cobros",
+      "format": "XLSX",
+      "sourcePeriodStart": "2026-07-01",
+      "sourcePeriodEnd": "2026-07-27",
+      "country": "GT",
+      "currency": "GTQ",
+      "coveredReconciledCobros": 3,
+      "containsCommissionFields": false,
+      "containsNetPremiumField": true,
+      "containsTotalPremiumField": true,
+      "containsPaymentDateField": true,
+      "containsPolicyAndReceiptKeys": true,
+      "containsIntermediaryCommission": false,
+      "containsSellerCommission": false,
+      "sourcePhysicalSha256": "8a2159bc0fe9af0f1297429577f38807188ec945b6a8384f7e837dc10abe21a2",
+      "decision": "PAYMENT_EVIDENCE_ONLY_NOT_VALID_AS_COMMISSION_PLANILLA"
+    }
+  ],
+  "excludedSources": [
+    {
+      "sourceAlias": "ASEGUATE_COMMISSION_PLANILLA",
+      "reason": "INSURER_AND_POLICY_UNIVERSE_DO_NOT_MATCH_THE_THREE_ASEGURADORA_GENERAL_CASES",
+      "useAllowed": false
+    },
+    {
+      "sourceAlias": "OTHER_INSURER_PLANILLAS",
+      "reason": "OUTSIDE_CURRENT_FIVE_RECONCILED_CASE_SCOPE",
+      "useAllowed": false
+    },
+    {
+      "sourceAlias": "FINANCIAL_MOVEMENTS_WORKBOOK",
+      "reason": "FINANCIAL_HISTORY_CANNOT_BE_USED_TO_INFER_COMMISSION_PLANILLA_OR_COBRO",
+      "useAllowed": false
+    }
+  ],
+  "coverage": {
+    "sourceReadyCobros": 2,
+    "sourceMissingCobros": 3,
+    "sourceReadyPercentage": 40,
+    "mapfre": {
+      "reconciledCobros": 2,
+      "sourceReady": 2,
+      "status": "READY_FOR_READ_ONLY_DRY_RUN"
+    },
+    "aseguradoraGeneral": {
+      "reconciledCobros": 3,
+      "sourceReady": 0,
+      "paymentEvidenceAvailable": 3,
+      "commissionPlanillaLocated": false,
+      "status": "SOURCE_MISSING_HOLD"
+    }
+  },
+  "domainControls": {
+    "commissionCalculatedFromNetCollectedPremiumOnly": true,
+    "inferCommissionRateProhibited": true,
+    "deriveCommissionFromFinancialMovementsProhibited": true,
+    "usePaymentReportAsCommissionPlanillaProhibited": true,
+    "residualHoldCasesExcluded": true,
+    "writeCommissionRecords": false,
+    "createFinmovs": false,
+    "modifyCobros": false,
+    "modifyReceipts": false,
+    "modifyPolicies": false
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "firestoreWrites": false,
+    "operationalWrites": false,
+    "browser": false,
+    "deploy": false,
+    "production": false
+  },
+  "sanitization": {
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "containsInvoiceNumbers": false,
+    "containsAuthorizationRefs": false,
+    "containsSecrets": false
+  },
+  "nextAction": "BUILD_MAPFRE_TWO_CASE_READ_ONLY_MAPPING_AND_DRY_RUN_WHILE_LOCATING_OR_REQUESTING_THE_AUTHORITATIVE_ASEGURADORA_GENERAL_COMMISSION_PLANILLA"
+}
