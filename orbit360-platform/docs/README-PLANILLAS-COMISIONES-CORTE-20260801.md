@@ -7,10 +7,14 @@
 - `AUDITORIA-READONLY-PLANILLAS-COMISIONES-POLICY-IDENTITY-RECEIPT-LINK-SANITIZADA-20260801.json`
 - `CIERRE-READONLY-PLANILLAS-COMISIONES-FIVE-RELATIONS-DRYRUN-20260801.md`
 - `AUDITORIA-READONLY-PLANILLAS-COMISIONES-FIVE-RELATIONS-DRYRUN-SANITIZADA-20260801.json`
+- `CIERRE-LAB-PLANILLAS-COMISIONES-WRITE-PASS-20260801.md`
+- `AUDITORIA-LAB-PLANILLAS-COMISIONES-WRITE-SANITIZADA-20260801.json`
 - `PLANILLAS-COMISIONES-ESTADO-VIVO-20260801.md`
 - `AUTORIZACION-READONLY-PLANILLAS-COMISIONES-FUENTES-Y-DRYRUN-20260801.md`
 - `ACADEMIA-PLANILLAS-COMISIONES-FUENTE-PERIODO-Y-PRIMA-NETA-20260801.md`
+- `ACADEMIA-PLANILLAS-COMISIONES-WRITE-ATOMICO-Y-BARRERA-VISUAL-20260801.md`
 - `CLAUDE-ACUMULADO-PLANILLAS-COMISIONES-FUENTES-VARIABLES-20260801.md`
+- `CLAUDE-ACUMULADO-PLANILLAS-COMISIONES-WRITE-BARRIER-20260801.md`
 
 Estado consolidado:
 
@@ -19,15 +23,30 @@ Estado consolidado:
 16 HOLD de póliza
 5 recibos identificados
 44 HOLD de recibo
-5 comisiones A&S candidatas
-15 documentos propuestos
+5 comisiones A&S escritas
+15 documentos creados y verificados
 3 liquidaciones de vendedor en HOLD
-0 escrituras
+0 cambios en pólizas, recibos o cobros
 0 finmovs
+```
+
+Destino LAB:
+
+```text
+planillasComisiones: 5
+comisionesDevengadas: 5
+conciliacionesComisiones: 5
 ```
 
 Estado contractual:
 
 ```text
-PLANILLAS_COMMISSION_DRYRUN_CLOSED
+PLANILLAS_COMMISSION_CONTROLLED_WRITE_CLOSED
+```
+
+Barrera visual vigente:
+
+```text
+Clientes: aprobado
+Pólizas y resto del CRM: pendientes de visualización/aprobación humana
 ```
