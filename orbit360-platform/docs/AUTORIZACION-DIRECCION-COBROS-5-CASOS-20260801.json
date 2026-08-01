@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "orbit360-cobros-direction-authorization-v1",
+  "tenantId": "alianzas-soluciones",
+  "recordedAt": "2026-08-01T11:22:00-06:00",
+  "sourceGate": {
+    "gateId": "block10.8-cobros-private-real-materialization-static-v20260801",
+    "run": 30709607082,
+    "artifact": 8821429532,
+    "checks": "64/64 PASS"
+  },
+  "decision": {
+    "directCasesApproved": true,
+    "historicalCaseApprovedSeparately": true,
+    "approvedCount": 5,
+    "rejectedCount": 0,
+    "executionAuthorized": false,
+    "labWriteAuthorized": false,
+    "productionAuthorized": false,
+    "deployAuthorized": false
+  },
+  "cases": [
+    {
+      "authorizationRef": "cob-auth-a0d4f00d5169af22d571f20b",
+      "category": "EXISTING_CANONICAL_RECEIPT",
+      "decision": "APPROVED_DIRECT",
+      "reinforced": false
+    },
+    {
+      "authorizationRef": "cob-auth-ade753baa6872ddfbbea704f",
+      "category": "EXISTING_CANONICAL_RECEIPT",
+      "decision": "APPROVED_DIRECT",
+      "reinforced": false
+    },
+    {
+      "authorizationRef": "cob-auth-d9ed3d5aa03f198a469439cc",
+      "category": "EXISTING_CANONICAL_RECEIPT",
+      "decision": "APPROVED_DIRECT",
+      "reinforced": false
+    },
+    {
+      "authorizationRef": "cob-auth-1ee62483415c6124bf64981c",
+      "category": "EXISTING_CANONICAL_RECEIPT",
+      "decision": "APPROVED_DIRECT",
+      "reinforced": false
+    },
+    {
+      "authorizationRef": "cob-auth-5ae6c8bf9ebe9680ca848b2e",
+      "category": "HISTORICAL_RECEIPT_REINFORCED",
+      "decision": "APPROVED_HISTORICAL_REINFORCED",
+      "reinforced": true,
+      "atomicHistoricalOperationRequired": true,
+      "reactivatePolicy": false,
+      "createFinmov": false
+    }
+  ],
+  "controls": {
+    "singleWriteGate": true,
+    "snapshotBeforeWrite": true,
+    "idempotencyRequired": true,
+    "atomicPerCase": true,
+    "rollbackPerCase": true,
+    "historicalCaseSeparated": true,
+    "genericWriterRemainsBlockedForCobros": true,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "containsSecrets": false
+  }
+}
