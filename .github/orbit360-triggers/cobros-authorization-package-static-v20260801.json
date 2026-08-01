@@ -4,7 +4,11 @@
   "gateId": "block10.6-cobros-authorization-package-static-v20260801",
   "contractVersion": "10.6.0",
   "branch": "ays/backend-tenant-lab-v99-20260703",
-  "authorizedHead": "bafe375fd485423bcfbfcc43298f606b1f852ee8",
+  "authorizedHead": "5d6e0ca5cdfb157d1a664e042d2b4007e9f4dc59",
+  "attempt": 2,
+  "previousRun": 30706550799,
+  "previousClassification": "VALIDATOR_STALE_PREDECESSOR_BOOTSTRAP_EXACT_VERSION",
+  "rootCauseFix": "Gate 10.5 now validates the queue owner capability and bootstrap minimum version >=4 instead of requiring an exact bootstrap version.",
   "expected": {
     "cards": 5,
     "direct": 4,
