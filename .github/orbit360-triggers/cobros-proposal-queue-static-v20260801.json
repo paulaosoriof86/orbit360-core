@@ -4,7 +4,11 @@
   "gateId": "block10.5-cobros-proposal-queue-static-v20260801",
   "contractVersion": "10.5.0",
   "branch": "ays/backend-tenant-lab-v99-20260703",
-  "authorizedHead": "1e927a0aad0b5f1b92fba5163658b0c4ec627310",
+  "authorizedHead": "93ec13e7d1e22bc76100145072f451b52a16de29",
+  "attempt": 2,
+  "previousRun": 30706025529,
+  "previousClassification": "VALIDATOR_STALE",
+  "rootCauseFix": "Gate 10.4 now validates the minimum bootstrap capability required for the matrix instead of an exact additive bootstrap version.",
   "expected": {
     "total": 70,
     "authorizationReady": 5,
