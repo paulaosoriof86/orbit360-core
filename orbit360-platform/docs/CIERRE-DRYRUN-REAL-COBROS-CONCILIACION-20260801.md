@@ -78,6 +78,23 @@ La expresión “procesado” se distingue por dominio:
 
 Por lo tanto, no todos los archivos registrados están “procesados como Cobros”; hacerlo violaría la separación de fuentes.
 
+## Cobertura de julio y fuentes faltantes
+
+El CRM contiene 68 pagos reportados en julio de 2026, distribuidos entre diez aseguradoras. Los dos reportes de pago recibidos cubren Aseguradora General y Mapfre. Para las demás aseguradoras existen principalmente reportes de saldo/cartera, que no sustituyen un reporte de ingresos o cobros pagados.
+
+Las contrapartes de pago pendientes corresponden a:
+
+- El Roble;
+- Aseguradora Guatemalteca;
+- Columna;
+- La Ceiba;
+- Universales;
+- Bantrab;
+- Ficohsa;
+- Seguros Múltiples de Inversión.
+
+Solo deben solicitarse sus reportes de cobros/ingresos pagados de julio de 2026. Estados bancarios o documentos se reservan para HOLD específicos y no se usan como autoridad única.
+
 ## Invariantes
 
 ```text
