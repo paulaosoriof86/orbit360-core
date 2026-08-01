@@ -1,86 +1,98 @@
 {
-  "schemaVersion": "orbit360-cobros-source-intake-v1",
+  "schemaVersion": "orbit360-cobros-source-intake-v2-multi-evidence",
   "tenantId": "alianzas-soluciones",
   "cutoff": "2026-07-31",
-  "status": "ENGINE_READY_PAYLOADS_REQUIRED",
+  "status": "MULTI_EVIDENCE_MODEL_ACTIVE",
+  "supersedes": "orbit360-cobros-source-intake-v1",
+  "canonicalRegistry": "REGISTRO-FUENTES-CONCILIACION-MULTIEVIDENCIA-20260801.json",
   "sourceRegistry": {
-    "index": "FUENTES-RECTORAS-AYS-INDEX-20260731.json",
-    "status": "OPEN_PENDING_MORE_FILES",
-    "uniqueSources": 23,
+    "status": "OPEN_ONLY_FOR_SPECIFIC_UNRESOLVED_EVIDENCE",
     "payloadsStoredInRepo": false,
-    "cobrosWriteBlocked": true
+    "cobrosWriteBlocked": true,
+    "registeredCurrentUploadHashes": 10,
+    "doNotReRequestSameHash": true,
+    "documentEveryReceivedSource": true
+  },
+  "freshnessRules": {
+    "planillas": "Request the current version only when a specific reconciliation requires it. Do not use an older previously supplied version after the user reports that it has changed.",
+    "bankStatements": "Request a current statement only for a specific unresolved HOLD. Do not use prior statements as current balance authority.",
+    "financialFiles": "Request the current file only in its own financial-history block. Never use it as payment or bank evidence.",
+    "portfolioSnapshots": "Older snapshots remain valid historical evidence for their own cutoff but are not current-balance authority.",
+    "postCutoffPayments": "A payment after the portfolio snapshot cutoff is valid and can explain an obligation that was pending at the earlier cutoff."
   },
   "sources": [
     {
       "sourceType": "cobros_realizados",
-      "authority": "CRM",
-      "required": true,
-      "exactPeriodRequired": "2024-01-01 through 2026-07-31, or a refreshed export containing the same historical base plus all activity through 2026-07-31",
-      "registeredLogicalName": "Cobranza Efectuada desde 2024.xlsx",
-      "registeredSha256": "727665170572143979b5f274190e200da397e7b32965d1809b1b9be6a8495302",
-      "registeredRowsIncludingHeader": 2158,
-      "payloadAccessibleToCurrentRuntime": false,
+      "authority": "DIRECT_PAYMENT_REPORTED_CRM",
       "canonicalDestinations": ["pagosReportadosFuente", "conciliaciones"],
-      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"]
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"],
+      "rule": "Requires corroboration and authorization; never auto-applies."
     },
     {
       "sourceType": "planilla_aseguradora",
-      "authority": "ASEGURADORA",
-      "required": true,
-      "exactPeriodRequired": "payment/revenue reports available through 2026-07-31 for every insurer represented in the CRM payment export",
-      "registeredSources": [
-        {"logicalName":"Reporte de Ingresos Aseguradora General.xls","sha256":"61574cc18b9200af438a49985e58deea635243f8808eac97470789df0db5b5ed","profileStatus":"XLS_BIFF_PENDING_PROFILE"},
-        {"logicalName":"Cobros Mapfre.xls","sha256":"d19559b7d5ad80930ad10f88d30ae7e0015b1647a5c0840867cf76e32c617ad8","profileStatus":"HTML_XLS_PENDING_PROFILE"}
-      ],
-      "coverageComplete": false,
-      "payloadAccessibleToCurrentRuntime": false,
+      "authority": "DIRECT_INSURER_PAYMENT_OR_REVENUE_EVIDENCE",
       "canonicalDestinations": ["reportesPagoAseguradora", "conciliaciones"],
-      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"]
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"],
+      "rule": "Direct insurer evidence, still matched one-to-one and never auto-applied."
+    },
+    {
+      "sourceType": "estado_cartera_aseguradora",
+      "authority": "TEMPORAL_PENDING_AND_CLEARING_EVIDENCE",
+      "canonicalDestinations": ["evidenciasCarteraTemporal", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs"],
+      "rule": "Presence proves pending at cutoff. Disappearance from a later comparable complete snapshot is clearing evidence but does not create a cobro alone."
+    },
+    {
+      "sourceType": "planilla_comisiones",
+      "authority": "CORROBORATIVE_INSURER_COLLECTION_RECOGNITION",
+      "canonicalDestinations": ["evidenciasComisionRecaudo", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"],
+      "rule": "A recognized or paid commission corroborates collection; timing differences and data-contract conflicts remain visible. Commission alone does not create a cobro."
     },
     {
       "sourceType": "estado_cuenta_bancario",
-      "authority": "SOPORTE_NO_AUTORITATIVO_POR_SI_SOLO",
-      "required": false,
-      "exactPeriodRequired": "2026-07-01 through 2026-07-31 for current-month corroboration; older periods only when a HOLD specifically requires them",
-      "registeredCurrentBankSource": false,
-      "excludedKnownFile": "Movimientos Ing y Eg Alianzas Guate y Col 2026.xlsx",
-      "excludedReason": "financial movements/history is not an authoritative bank statement and cannot create cobros",
+      "authority": "SUPPORT_FOR_SPECIFIC_HOLD_ONLY",
       "canonicalDestinations": ["movimientosBanco", "conciliaciones"],
-      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"]
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"],
+      "rule": "Request only when a specific HOLD needs corroboration. Bank alone does not create a cobro."
     },
     {
       "sourceType": "documentos_soporte",
-      "authority": "SOPORTE_NO_AUTORITATIVO_POR_SI_SOLO",
-      "required": false,
-      "exactPeriodRequired": "only documents linked to HOLD or unmatched payments identified by the dry-run",
+      "authority": "SUPPORT_FOR_SPECIFIC_HOLD_ONLY",
       "canonicalDestinations": ["documentosSoportePago", "conciliaciones"],
       "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas", "clientes", "polizas"]
     },
     {
-      "sourceType": "planilla_comisiones",
-      "authority": "NEXT_BLOCK",
-      "required": false,
-      "deferred": true,
-      "reason": "Commissions/plans follow Cobros/Conciliacion and are not payment proof for this block"
+      "sourceType": "financiero_historico",
+      "authority": "SEPARATE_FINANCIAL_DOMAIN",
+      "forbiddenDestinations": ["cobros", "carteraPrimas", "conciliacionesPago"],
+      "rule": "Never substitutes for a payment report, portfolio statement, commission plan, or bank statement."
     }
   ],
-  "realDryRunPrerequisites": {
-    "currentPayloadsAttached": false,
-    "manifestPerFile": true,
-    "traceability": ["file", "sheet", "row", "block", "country", "currency", "period", "sourceHash"],
-    "countryCurrencyFailClosed": true,
-    "duplicateHashNoReprocess": true,
-    "oneToOneRequired": true,
+  "reconciliationRules": {
+    "oneTemporalLineagePerCase": true,
+    "oneToOnePaymentMatch": true,
     "fifoSimulationRequired": true,
-    "rollbackPlanRequiredBeforeWrite": true,
+    "exactReceiptPrecedesGenericFifo": true,
+    "historicalExigibleIncluded": true,
+    "absenceAloneCreatesCobro": false,
+    "commissionAloneCreatesCobro": false,
+    "bankAloneCreatesCobro": false,
+    "paymentAfterSnapshotCutoffAllowed": true,
+    "rollbackPlanRequiredBeforeWrite": true
+  },
+  "currentState": {
+    "conversationPayloadsProfiled": true,
+    "realRowsStoredInRepo": false,
     "cobrosWrites": 0,
-    "finmovsWrites": 0
+    "finmovsWrites": 0,
+    "firestoreWrites": 0,
+    "productionTouched": false
   },
   "nextUserInputWhenRequested": [
-    "Attach the refreshed CRM payment export through 2026-07-31, preferably the same logical report 'Cobranza Efectuada desde 2024.xlsx'.",
-    "Attach insurer payment/revenue reports through 2026-07-31 for all insurers covered by that CRM export; at minimum reattach Aseguradora General and Mapfre sources already registered.",
-    "Bank statements for 2026-07 are optional until the dry-run identifies cases needing corroboration.",
-    "Do not send commissions plans or financial-history workbooks as substitutes for payment evidence."
+    "Ask only for the current version of a planilla, bank statement, or financial file when a specific unresolved reconciliation requires it.",
+    "Do not ask again for a source already registered with the same hash.",
+    "Do not infer an insurer identity from an ambiguous filename or workbook."
   ],
   "containsPII": false,
   "containsSecrets": false
