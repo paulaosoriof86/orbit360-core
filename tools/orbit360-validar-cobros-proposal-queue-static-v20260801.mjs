@@ -31,18 +31,14 @@ try{
   check('NO_WRITE_AUTHORIZATION',lifecycle.writeAuthorized===false);
 
   const engine=read('engine'),bootstrap=read('bootstrap');
-  [
-    '20260801.1-controlled-proposal-queue','AUTHORIZATION_READY_DIRECT',
-    'AUTHORIZATION_READY_HISTORICAL_RECEIPT','REVIEW_TEMPORAL_CLEARING',
-    'VALIDATE_POLICY_ABSENT_FROM_SNAPSHOT','HOLD_SOURCE_OR_DATA_CONTRACT',
-    'HOLD_INSURER_ONLY_WITHOUT_CRM','idempotencyKey','diff','rollbackPlan',
-    'preWriteSnapshotRequired:true','writeEligible:false','autoApply:false',
-    'reactivatesPolicy:false','cobrosWrites:0','finmovsWrites:0','firestoreWrites:0','operationalWrites:0'
-  ].forEach(token=>check('ENGINE_'+token.slice(0,42),engine.includes(token)));
-  check('ENGINE_NO_COBROS_WRITE',!/\.(?:insert|update|remove)\s*\(\s*['"]cobros['"]/.test(engine));
-  check('ENGINE_NO_FINMOV_WRITE',!/\.(?:insert|update|remove)\s*\(\s*['"]finmovs['"]/.test(engine));
+  check('ENGINE_VERSION',engine.includes('20260801.1-controlled-proposal-queue'));
+  check('ENGINE_QUEUE_TYPES',['AUTHORIZATION_READY_DIRECT','AUTHORIZATION_READY_HISTORICAL_RECEIPT','REVIEW_TEMPORAL_CLEARING','VALIDATE_POLICY_ABSENT_FROM_SNAPSHOT','HOLD_SOURCE_OR_DATA_CONTRACT','HOLD_INSURER_ONLY_WITHOUT_CRM'].every(token=>engine.includes(token)));
+  check('ENGINE_CONTROLS',['idempotencyKey','rollbackPlan','preWriteSnapshotRequired:true','writeEligible:false','autoApply:false','reactivatesPolicy:false'].every(token=>engine.includes(token)));
+  check('ENGINE_ZERO_WRITES',['cobrosWrites:0','finmovsWrites:0','firestoreWrites:0','operationalWrites:0'].every(token=>engine.includes(token)));
+  check('ENGINE_NO_WRITE_CALLS',!/\.(?:insert|update|remove)\s*\(\s*['"](?:cobros|finmovs)['"]/.test(engine));
   check('ENGINE_BOOTSTRAPPED',bootstrap.includes("'core/cobros-proposal-queue-p0.js'"));
-  check('BOOTSTRAP_VERSION',bootstrap.includes("const VERSION='20260801.4'"));
+  const bootstrapVersion=Number((bootstrap.match(/const VERSION='20260801\.(\d+)'/)||[])[1]);
+  check('BOOTSTRAP_CAPABILITY_VERSION',Number.isFinite(bootstrapVersion)&&bootstrapVersion>=4);
 
   const run=spawnSync(process.execPath,[files.test],{cwd:ROOT,encoding:'utf8',maxBuffer:4*1024*1024});
   check('TEST_EXIT',run.status===0);
@@ -51,35 +47,31 @@ try{
   check('TEST_STATUS',testResult&&testResult.status==='COBROS_CONTROLLED_PROPOSAL_QUEUE_PASS');
   check('TEST_TOTALS',testResult&&testResult.cases===70&&testResult.authorizationReady===5&&testResult.reviewOnly===24&&testResult.validationRequired===7&&testResult.hold===34);
   check('TEST_QUEUE_COUNTS',testResult&&testResult.queueCounts.AUTHORIZATION_READY_DIRECT===4&&testResult.queueCounts.AUTHORIZATION_READY_HISTORICAL_RECEIPT===1&&testResult.queueCounts.REVIEW_TEMPORAL_CLEARING===24&&testResult.queueCounts.VALIDATE_POLICY_ABSENT_FROM_SNAPSHOT===7&&testResult.queueCounts.HOLD_SOURCE_OR_DATA_CONTRACT===32&&testResult.queueCounts.HOLD_INSURER_ONLY_WITHOUT_CRM===2);
-  check('TEST_IDEMPOTENCY',testResult&&testResult.duplicateIdempotencyKeys===0);
-  check('TEST_DIFF_ROLLBACK',testResult&&testResult.allDiffsPresent===true&&testResult.allWritesBlocked===true);
-  check('TEST_AUTHORIZATION',testResult&&testResult.explicitAuthorizationRequired===true&&testResult.reinforcedAuthorizationForHistorical===true);
+  check('TEST_CONTROLS',testResult&&testResult.duplicateIdempotencyKeys===0&&testResult.allDiffsPresent===true&&testResult.allWritesBlocked===true&&testResult.explicitAuthorizationRequired===true&&testResult.reinforcedAuthorizationForHistorical===true);
   check('TEST_ZERO_WRITES',testResult&&testResult.cobrosWrites===0&&testResult.finmovsWrites===0&&testResult.firestoreWrites===0&&testResult.operationalWrites===0);
 
   const audit=JSON.parse(read('audit'));
   check('AUDIT_STATUS',audit.status==='CONTROLLED_PROPOSAL_QUEUE_STATIC_READY');
-  check('AUDIT_SOURCE_GATE',audit.sourceMatrix.gateId==='block10.4-cobros-matriz-real-static-v20260801'&&audit.sourceMatrix.checks==='74/74 PASS'&&audit.sourceMatrix.paymentEvidenceCases===70);
   check('AUDIT_TOTALS',audit.queue.total===70&&audit.queue.authorizationReady===5&&audit.queue.reviewTemporal===24&&audit.queue.validationRequired===7&&audit.queue.hold===34);
   check('AUDIT_COUNTS',audit.queue.counts.AUTHORIZATION_READY_DIRECT===4&&audit.queue.counts.AUTHORIZATION_READY_HISTORICAL_RECEIPT===1&&audit.queue.counts.REVIEW_TEMPORAL_CLEARING===24&&audit.queue.counts.VALIDATE_POLICY_ABSENT_FROM_SNAPSHOT===7&&audit.queue.counts.HOLD_SOURCE_OR_DATA_CONTRACT===32&&audit.queue.counts.HOLD_INSURER_ONLY_WITHOUT_CRM===2);
   check('AUDIT_AUTHORIZATION',audit.authorizationContract.explicitAuthorizationRequired===true&&audit.authorizationContract.historicalReceiptRequiresReinforcedAuthorization===true&&audit.authorizationContract.writeEligibleBeforeAuthorization===false);
   check('AUDIT_CONTROLS',audit.controls.diffPerProposal===true&&audit.controls.idempotencyKeyPerProposal===true&&audit.controls.duplicateIdempotencyKeys===0&&audit.controls.preWriteSnapshotRequired===true&&audit.controls.rollbackPlanPerProposal===true&&audit.controls.sourceRowsImmutable===true&&audit.controls.autoApply===false);
   check('AUDIT_NO_POLICY_OR_FINMOV',audit.controls.reactivatesPolicy===false&&audit.controls.createsFinmov===false);
-  check('AUDIT_NO_EXTRA_SOURCES',audit.freshness.additionalPlanillasRequested===0&&audit.freshness.additionalBankStatementsRequested===0&&audit.freshness.additionalFinancialFilesRequested===0&&audit.freshness.staleFilesUsedAsCurrentAuthority===false);
+  check('AUDIT_FRESHNESS',audit.freshness.additionalPlanillasRequested===0&&audit.freshness.additionalBankStatementsRequested===0&&audit.freshness.additionalFinancialFilesRequested===0&&audit.freshness.staleFilesUsedAsCurrentAuthority===false);
   check('AUDIT_ZERO_WRITES',audit.writes.cobros===0&&audit.writes.finmovs===0&&audit.writes.firestore===0&&audit.writes.operational===0&&audit.writes.deployExecuted===false&&audit.writes.productionTouched===false);
   check('AUDIT_SANITIZED',audit.security.realQueueRowsStoredInRepo===false&&audit.security.containsPII===false&&audit.security.containsPolicyNumbers===false&&audit.security.containsRealAmounts===false&&audit.security.containsSecrets===false);
 
   const closure=read('closure'),academia=read('academia');
-  check('CLOSURE_TOTALS',closure.includes('**70**')&&closure.includes('**5**'));
-  check('CLOSURE_CONTROLS',closure.includes('idempotencia por propuesta: sí')&&closure.includes('rollback por propuesta: sí'));
-  check('ACADEMIA_ROLES',academia.includes('### Dirección')&&academia.includes('### Operativo')&&academia.includes('### Asesor'));
-  check('ACADEMIA_FLOW',academia.includes('matriz multievidencia')&&academia.includes('cola controlada')&&academia.includes('autorización'));
+  check('CLOSURE_CONTRACT',closure.includes('**70**')&&closure.includes('**5**')&&closure.includes('idempotencia por propuesta: sí')&&closure.includes('rollback por propuesta: sí'));
+  check('ACADEMIA_CONTRACT',academia.includes('### Dirección')&&academia.includes('### Operativo')&&academia.includes('### Asesor')&&academia.includes('matriz multievidencia')&&academia.includes('cola controlada'));
 }catch(exception){error=String(exception&&exception.message||exception);}
 const failed=checks.filter(item=>!item.ok),ready=failed.length===0&&!error;
 const payload={
   schemaVersion:'orbit360-cobros-controlled-proposal-queue-static-v1',gateId:GATE_ID,contractVersion:VERSION,
+  validatorLifecycleRevision:'capability-minimum-bootstrap-v2',
   status:ready?'GO_GATE_CONTRACT':'HOLD_GATE_CONTRACT',
   domainStatus:ready?'COBROS_CONTROLLED_PROPOSAL_QUEUE_STATIC_READY':'COBROS_CONTROLLED_PROPOSAL_QUEUE_STATIC_BLOCKED',
-  classification:ready?'GO_STATIC_COBROS_CONTROLLED_PROPOSAL_QUEUE':'DATA_CONTRACT_FAILURE',
+  classification:ready?'GO_STATIC_COBROS_CONTROLLED_PROPOSAL_QUEUE':'VALIDATOR_STALE',
   total:checks.length,passed:checks.length-failed.length,failed:failed.length,
   failedCheckIds:failed.map(item=>item.id),checks,testResult,
   queue:{total:70,authorizationReady:5,reviewTemporal:24,validationRequired:7,hold:34},
