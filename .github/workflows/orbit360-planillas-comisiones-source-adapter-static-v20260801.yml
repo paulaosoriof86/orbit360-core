@@ -37,7 +37,19 @@ jobs:
           jq -e '.schemaVersion=="orbit360-planillas-comisiones-source-adapter-static-trigger-v1" and .mode=="STATIC_SYNTHETIC_SOURCE_ADAPTER_AUDIT" and .approved==true and .realRowsAllowed==false and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false' "$TRIGGER_PATH" >/dev/null
           test -f orbit360-platform/core/planillas-comisiones-source-adapter-p0.js
           test -f tools/orbit360-test-planillas-comisiones-source-adapter-p0-v20260801.mjs
-          ! grep -Eq 'Orbit\.store|firebase-admin|firebase\.|localStorage|fetch[[:space:]]*\(' orbit360-platform/core/planillas-comisiones-source-adapter-p0.js
+          node <<'NODE'
+          const fs=require('fs');
+          let source=fs.readFileSync('orbit360-platform/core/planillas-comisiones-source-adapter-p0.js','utf8');
+          source=source.replace(/\/\*[\s\S]*?\*\//g,'').replace(/(^|\s)\/\/.*$/gm,'$1');
+          const prohibited=[
+            ['Orbit.store',/Orbit\s*\.\s*store/],
+            ['firebase-admin',/firebase-admin/],
+            ['firebase namespace',/\bfirebase\s*\./],
+            ['localStorage',/\blocalStorage\b/],
+            ['network fetch',/\bfetch\s*\(/]
+          ].filter(([,pattern])=>pattern.test(source));
+          if(prohibited.length){console.error('PROHIBITED_STATIC_ACCESS_TOKENS:'+prohibited.map(x=>x[0]).join(','));process.exit(41);}
+          NODE
       - name: Ejecutar auditoría sintética
         shell: bash
         run: |
@@ -46,7 +58,7 @@ jobs:
           node --check orbit360-platform/core/planillas-comisiones-source-adapter-p0.js
           node --check tools/orbit360-test-planillas-comisiones-source-adapter-p0-v20260801.mjs
           node tools/orbit360-test-planillas-comisiones-source-adapter-p0-v20260801.mjs
-          jq -e '.status=="STATIC_ADAPTER_PASS" and .classification=="GO_STATIC_SOURCE_ADAPTER" and .ok==true and .failed==0 and .fixtureType=="SYNTHETIC_ONLY" and .exactPeriodRequired==true and .explicitCountryRequired==true and .explicitCurrencyRequired==true and .netPremiumSeparated==true and .intermediaryAndSellerCommissionSeparated==true and .commissionRateInferred==false and .realRowsUsed==0 and .containsPII==false and .containsPolicyNumbers==false and .containsAmounts==false and .secretsRead==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .storeAccess==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_PATH" >/dev/null
+          jq -e '.status=="STATIC_ADAPTER_PASS" and .classification=="GO_STATIC_SOURCE_ADAPTER" and .ok==true and .failed==0 and .fixtureType=="SYNTHETIC_ONLY" and .checks>=30 and .exactPeriodRequired==true and .explicitCountryRequired==true and .explicitCurrencyRequired==true and .netPremiumSeparated==true and .intermediaryAndSellerCommissionSeparated==true and .commissionRateInferred==false and .realRowsUsed==0 and .containsPII==false and .containsPolicyNumbers==false and .containsAmounts==false and .secretsRead==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .storeAccess==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_PATH" >/dev/null
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
