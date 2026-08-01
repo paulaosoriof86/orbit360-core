@@ -5,9 +5,18 @@ Tenant: `alianzas-soluciones`
 Rama: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open
 
-## Estado preparado
+## Veredicto
 
-`PRIVATE_AUTHORIZATION_MATERIALIZATION_CONTRACT_READY`
+`COBROS_PRIVATE_MATERIALIZATION_STATIC_READY`
+
+Gate `block10.7-cobros-private-materialization-static-v20260801`:
+
+```text
+run: 30706859578
+artifact: 8820592721
+digest: sha256:f90c8f2da85be677cc0caf821e868a88490c241f8294f19072678738b7f10536
+checks: 46/46 PASS
+```
 
 El contrato resuelve en memoria las cinco referencias opacas del paquete 10.6 contra un payload privado temporal:
 
@@ -24,6 +33,8 @@ Los datos privados:
 - no se incluyen en artifacts;
 - deben destruirse explícitamente al finalizar la revisión;
 - dejan un resumen sanitizado con conteos y controles, no identidades.
+
+La regresión confirmó que, después de la destrucción, quedan `0` tarjetas privadas en memoria.
 
 Cada tarjeta privada requiere al menos dos pruebas de fuente y conserva:
 
@@ -52,6 +63,8 @@ authorizationGranted: 0
 writeEligible: 0
 persistAllowed: false
 privateValuesPersisted: false
+privateCardsEnumerable: false
+serializedPayloadContainsPrivateValues: false
 ```
 
 No se solicitaron archivos adicionales. La futura materialización usará únicamente las fuentes ya registradas y sus referencias privadas vigentes.
@@ -71,4 +84,4 @@ production: untouched
 
 ## Siguiente acción exacta
 
-Cerrar el gate 10.7 estático. Después deberá resolverse si las referencias privadas necesarias siguen disponibles en el runtime seguro. Si están disponibles, se materializarán en memoria y se presentarán a Dirección; si no, se identificará exactamente la fuente privada faltante sin volver a pedir archivos ya registrados.
+Resolver si las referencias privadas necesarias siguen disponibles en el runtime seguro. Si están disponibles, materializar las cinco tarjetas solo en memoria, presentar el diff real a Dirección y destruir el payload al finalizar. Si no están disponibles, identificar exactamente la referencia o fuente privada faltante sin volver a pedir archivos ya registrados.
