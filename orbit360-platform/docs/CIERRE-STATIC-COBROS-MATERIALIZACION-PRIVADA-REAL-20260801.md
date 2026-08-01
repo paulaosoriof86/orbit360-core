@@ -1,4 +1,4 @@
-# Cierre técnico parcial — Materialización privada real de Cobros
+# Recuperación controlada — Materialización privada real de Cobros
 
 Fecha: 2026-08-01  
 Tenant: `alianzas-soluciones`  
@@ -9,13 +9,19 @@ PR: #5 draft/open
 
 `PRIVATE_AUTHORIZATION_MATERIALIZATION_REAL_ATTESTED`
 
-Las referencias privadas de las cinco tarjetas del paquete 10.6 sí continuaban disponibles en el runtime seguro. Se resolvieron contra las fuentes registradas y los paquetes canónicos privados, sin solicitar archivos adicionales.
+Las cinco referencias privadas continúan correctamente identificadas. El owner, las tarjetas y las fuentes no fueron modificados durante la recuperación.
 
-## Estado del gate 10.8
+```text
+tarjetas materializadas en memoria: 5
+recibos canónicos existentes: 4
+recibo histórico reforzado: 1
+pruebas privadas por tarjeta: 3
+hashes registrados verificados: 3
+referencias duplicadas: 0
+idempotencias duplicadas: 0
+```
 
-`STOP_RETRY_VALIDATOR_STALE`
-
-El cierre formal del gate permanece bloqueado después de dos ejecuciones. No existe una tercera ejecución autorizada.
+## Historial del STOP_RETRY
 
 ```text
 primer run: 30708592194
@@ -28,56 +34,42 @@ gate 10.8: 63/64 PASS
 clasificación: VALIDATOR_STALE
 ```
 
-La segunda falla no corresponde al producto. El validador busca literalmente `reactivatesPolicy:false`, mientras el owner canónico expresa la misma prohibición con `reactivatePolicy:false` y las pruebas conductuales confirman que ninguna tarjeta reactiva pólizas.
+La segunda falla no correspondía al producto. El validador buscaba el token plural `reactivatesPolicy:false`, mientras el owner canónico utiliza el campo `reactivatePolicy:false`. Las pruebas conductuales y la auditoría siempre confirmaron que ninguna tarjeta reactiva pólizas.
 
-Conforme a la regla de dos fallos en la misma etapa:
+## Recuperación directa obligatoria
 
-- se activa `STOP_RETRY`;
-- no se crea otro trigger;
-- no se ejecuta una tercera corrida;
-- no se toca el owner ni las tarjetas;
-- no se abre Firebase, navegador, deploy ni producción;
-- la corrección futura deberá comenzar por el contrato del validador y probarse fuera del gate cerrado antes de reabrirlo.
-
-## Resultado real preservado
+La usuaria autorizó proceder el 01/08/2026. Antes de reabrir el workflow se ejecutó el validador directamente fuera de GitHub Actions, usando una réplica temporal mínima de los archivos exactos de la rama y la evidencia cerrada del gate 10.7.
 
 ```text
-tarjetas materializadas en memoria: 5
-recibos canónicos existentes: 4
-recibo histórico reforzado: 1
-pruebas privadas por tarjeta: 3
-hashes registrados verificados: 3
-referencias duplicadas: 0
-idempotencias duplicadas: 0
+modo: DIRECT_OUTSIDE_WORKFLOW
+resultado: 64/64 PASS
+fallos: 0
+nuevo trigger utilizado: no
+nuevo gateId utilizado: no
+fuentes privadas abiertas: no
 ```
 
-La identificación coincide exactamente con el contrato del replay 10.2:
+Evidencia sanitizada:
 
-- cuatro casos enlazan un recibo canónico existente;
-- un caso pertenece a una vigencia reciente no renovada y requiere crear primero un recibo histórico exigible;
-- el caso histórico quedó de último y separado;
-- los cuatro HOLD del replay no ingresaron al paquete.
+`orbit360-platform/docs/AUDITORIA-DIRECTA-RECUPERACION-GATE10.8-20260801.json`
 
-## Fuentes verificadas
+La regla contractual quedó explícita:
 
-Se comprobaron por hash exacto:
+```text
+owner: reactivatePolicy = false
+auditoría: reactivatesPolicy = false
+prueba conductual: PASS
+```
 
-1. pagos reportados del CRM;
-2. reporte de pagos de Aseguradora General;
-3. reporte de pagos de Mapfre.
+## Decisión de reapertura
 
-También se confirmó la disponibilidad de los paquetes canónicos privados de Pólizas y Recibos/Cartera.
+`REOPEN_AUTHORIZED_AFTER_DIRECT_PASS`
 
-No se usaron como autoridad de pago:
+Se permite una reapertura controlada del **mismo gate 10.8**, no la creación de otro gate. El workflow debe verificar primero la evidencia directa 64/64 y el SHA-256 del validador corregido.
 
-- estados bancarios;
-- planillas de comisiones;
-- movimientos financieros;
-- archivos históricos desactualizados.
+Esta reapertura no elimina el historial de los dos fallos anteriores y no constituye autorización de escritura, deploy o producción.
 
 ## Privacidad y destrucción
-
-Los valores reales vivieron únicamente durante la sesión efímera. El resultado persistido contiene solo referencias opacas, categorías y controles.
 
 ```text
 campos privados enumerables: no
@@ -104,8 +96,6 @@ deploy: 0
 production: untouched
 ```
 
-La materialización no concede autorización y no constituye una escritura.
-
 ## Caso histórico
 
 La futura decisión afirmativa del quinto caso deberá autorizar expresamente una operación atómica:
@@ -118,27 +108,8 @@ crear recibo histórico exigible
 + no crear finmov
 ```
 
-Su autorización permanece separada de los cuatro casos directos.
-
 ## Siguiente acción exacta
 
-Mantener congelado el gate 10.8. En el siguiente bloque de recuperación metodológica se deberá:
+Actualizar el mismo trigger 10.8 con la reapertura autorizada y ejecutar una sola corrida de cierre. Si pasa, registrar artifact y digest. Si falla por una causa distinta, congelar de nuevo sin abrir otro frente.
 
-```text
-alinear el nombre contractual del control owner/validator
-→ ejecutar prueba estática directa del validador fuera del workflow
-→ demostrar 64/64 sin nuevo trigger
-→ registrar la corrección conjunta de owner/validator/workflow/docs
-→ decidir explícitamente si se reabre el mismo gate
-```
-
-Hasta completar ese diagnóstico no se presentan decisiones privadas ni se prepara un gate de escritura.
-
-## Corte documentado
-
-```text
-HEAD del segundo y último trigger: 7689c9d1e00967fc3f4333365443b79282584406
-run final ejecutado: 30708670724
-resultado final del gate: 63/64 PASS · BLOCKED
-tercer run: prohibido
-```
+Producción y deploy continúan bloqueados hasta autorización explícita separada.
