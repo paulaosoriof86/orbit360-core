@@ -1,0 +1,79 @@
+name: Orbit 360 · Cobros · controlled proposal queue static
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-triggers/cobros-proposal-queue-static-v20260801.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-cobros-proposal-queue-static-v20260801
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  TRIGGER: .github/orbit360-triggers/cobros-proposal-queue-static-v20260801.json
+  EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/cobros-proposal-queue-static-v20260801.json
+jobs:
+  controlled_proposal_queue_static:
+    name: Gate 10.5 · controlled proposal queue
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar trigger y lineage
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.schemaVersion=="orbit360-cobros-controlled-proposal-queue-static-trigger-v1" and .approved==true and .gateId=="block10.5-cobros-proposal-queue-static-v20260801" and .contractVersion=="10.5.0" and .branch==env.ORBIT360_BRANCH and .scope.static==true and .scope.realPayloadsInRepo==false and .scope.browser==false and .scope.secrets==false and .scope.firestoreRead==false and .scope.writes==false and .scope.deploy==false and .scope.production==false' "$TRIGGER" >/dev/null
+          AUTHORIZED_HEAD="$(jq -r '.authorizedHead' "$TRIGGER")"
+          test -n "$AUTHORIZED_HEAD"
+          git merge-base --is-ancestor "$AUTHORIZED_HEAD" HEAD
+          bad="$(git diff --name-only "$AUTHORIZED_HEAD"..HEAD | grep -Ev '^\.github/orbit360-triggers/cobros-proposal-queue-static-v20260801\.json$' || true)"
+          test -z "$bad"
+      - name: Verificar gate predecessor 10.4
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-cobros-matriz-real-static-v20260801.mjs
+          jq -e '.status=="GO_GATE_CONTRACT" and .domainStatus=="COBROS_REAL_PAYMENT_MATRIX_STATIC_READY" and .failed==0 and .coverage.crmPaymentRows==68 and .coverage.canonicalPaymentRows==63 and .coverage.historicalOmissions==5 and .coverage.unionPaymentCases==70 and .cobrosWrites==0 and .finmovsWrites==0 and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/cobros-matriz-real-static-v20260801.json >/dev/null
+      - name: Validar gate cola 10.5
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/cobros-proposal-queue-p0.js
+          node --check tools/orbit360-test-cobros-proposal-queue-p0-v20260801.mjs
+          node --check tools/orbit360-validar-cobros-proposal-queue-static-v20260801.mjs
+          node tools/orbit360-validar-cobros-proposal-queue-static-v20260801.mjs
+          jq -e '.status=="GO_GATE_CONTRACT" and .domainStatus=="COBROS_CONTROLLED_PROPOSAL_QUEUE_STATIC_READY" and .contractVersion=="10.5.0" and .failed==0 and .queue.total==70 and .queue.authorizationReady==5 and .queue.reviewTemporal==24 and .queue.validationRequired==7 and .queue.hold==34 and .duplicateIdempotencyKeys==0 and .diffsPresent==true and .rollbackPlansPresent==true and .explicitAuthorizationRequired==true and .reinforcedAuthorizationForHistorical==true and .stalePlanillasUsed==false and .staleBankStatementsUsed==false and .staleFinancialFilesUsed==false and .realRowsStoredInRepo==0 and .cobrosWrites==0 and .finmovsWrites==0 and .firestoreWrites==0 and .operationalWrites==0 and .containsPII==false and .containsPolicyNumbers==false and .containsRealAmounts==false and .containsSecrets==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE" >/dev/null
+      - name: Subir evidencia sanitizada
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-cobros-proposal-queue-static-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/cobros-proposal-queue-static-v20260801.json
+            orbit360-platform/docs/AUDITORIA-READONLY-COBROS-COLA-PROPUESTAS-SANITIZADA-20260801.json
+            orbit360-platform/docs/CIERRE-STATIC-COBROS-COLA-PROPUESTAS-20260801.md
+            orbit360-platform/docs/ACADEMIA-COLA-CONTROLADA-COBROS-20260801.md
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: ${{ env.EVIDENCE }}
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Cobros proposal queue static blocked';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='GO_GATE_CONTRACT'&&p.domainStatus==='COBROS_CONTROLLED_PROPOSAL_QUEUE_STATIC_READY'&&p.failed===0){state='success';description='Cobros proposal queue static PASS';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/cobros-proposal-queue-static',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
