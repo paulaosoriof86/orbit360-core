@@ -14,8 +14,8 @@ const LIFECYCLE='tools/orbit360-validator-lifecycle-contract-cobros-controlled-w
 const REQUEST='.github/orbit360-requests/cobros-controlled-write-lab-v20260801.json';
 const DIAGNOSIS='.github/orbit360-diagnostics/cobros-controlled-write-lab-v20260801.json';
 const PHRASE='AUTORIZO ARMAR Y EJECUTAR GATE 10.9 COBROS LAB CINCO CASOS SIN DEPLOY NI PRODUCCION';
-const PACKAGE_SHA='cc01fa733166c2201da6e4ac37c231d42692caf6bba3797208fed23b3a1c737a';
-const PACKAGE_LOGICAL='997bfc0614b4a65e8c4b5e7832996fbbe6b0063f9f0efdf3ca99b57aa79f4ff8';
+const PACKAGE_SHA='beebdac90668291686f55610bdc2d8853ae5f2de4ae17b73732bb03812218911';
+const PACKAGE_LOGICAL='fccae1f73d254a0fca8e1a0208a92f4a9a601bc83c8f8e26cb027be165f354bb';
 
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function write(payload){const target=path.join(ROOT,CANONICAL_EVIDENCE);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,JSON.stringify(payload,null,2)+'\n','utf8');}
