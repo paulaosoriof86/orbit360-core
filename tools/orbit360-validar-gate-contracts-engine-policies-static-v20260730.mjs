@@ -9,10 +9,11 @@ const GATE='block7-policies-static-v20260730';
 const VERSION='7.0.1';
 const LIFECYCLE='tools/orbit360-validator-lifecycle-contract-policies-static-v20260730.json';
 const REQUEST='.github/orbit360-requests/policies-visual-readonly-lab-v20260801.json';
+const RESUME='.github/orbit360-resume/policies-visual-readonly-lab-env-resume-v20260801.json';
 const EXPECTED_COLLECTIONS=['clientes','aseguradoras','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros'];
 const EXPECTED_BASELINE={clientes:430,aseguradoras:30,polizas:1373,vehiculos:1032,recibosEsperados:1294,carteraPrimas:673,cobros:5,finmovs:0,planillasComisiones:5,comisionesDevengadas:5,conciliacionesComisiones:5};
 const REQUIRED=[
-  LIFECYCLE,REQUEST,
+  LIFECYCLE,REQUEST,RESUME,
   'tools/orbit360-m6-generate-product-runtime-config-v20260730.mjs',
   'tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs',
   'tools/orbit360-m6-build-product-shell-v20260730.mjs',
@@ -39,12 +40,16 @@ try{
   add('GATE',process.argv[2]===GATE);
   const missing=REQUIRED.filter(rel=>!fs.existsSync(path.join(ROOT,rel)));add('FILES',missing.length===0);
   if(missing.length)throw new Error('PIPELINE_MECHANISM_FAILURE:FILES:'+missing.join(','));
-  const lifecycle=read(LIFECYCLE),request=read(REQUEST);
-  add('LIFECYCLE',lifecycle.gateId===GATE&&lifecycle.gateContractVersion===VERSION&&lifecycle.status==='POLICIES_VISUAL_READONLY_LAB_AUTHORIZED');
+  const lifecycle=read(LIFECYCLE),request=read(REQUEST),resume=read(RESUME);
+  add('LIFECYCLE',lifecycle.gateId===GATE&&lifecycle.gateContractVersion===VERSION&&lifecycle.status==='POLICIES_VISUAL_READONLY_LAB_RESUME_AUTHORIZED');
   add('PHASE',lifecycle.executionProfile?.phase==='M5_LAB_CORRECTIVE_DELIVERY_RUNTIME');
   add('AUTHORIZATION',lifecycle.authorization?.approved===true&&lifecycle.authorization?.allowedExecutions===1&&lifecycle.authorization?.consumed===false);
   add('REQUEST',request.schemaVersion==='orbit360-policies-visual-readonly-lab-request-v1'&&request.gateId===GATE&&request.contractVersion===VERSION&&request.approved===true&&request.consumed===false&&request.allowedExecutions===1);
-  add('BRANCH',request.branch==='ays/backend-tenant-lab-v99-20260703'&&request.pullRequest===5);
+  add('RESUME',resume.schemaVersion==='orbit360-policies-visual-readonly-lab-resume-v1'&&resume.gateId===GATE&&resume.contractVersion===VERSION&&resume.approved===true&&resume.resumeSequence===2&&resume.sourceRun===30723519400&&resume.sourceJob===91431066978&&resume.sourceArtifact===8825594112);
+  add('ROOT_CAUSE',resume.classification==='ENVIRONMENT_FAILURE'&&resume.rootCause==='SECRET_NAME_BINDING_MISMATCH'&&resume.expectedSecretName==='ORBIT360_LAB_LOGIN_PASSWORD'&&resume.incorrectSecretName==='ORBIT360_EXISTING_LOGIN_PASSWORD');
+  add('PRE_RISK_PROOF',resume.canonicalPreflightPassed===15&&resume.canonicalPreflightFailed===0&&resume.secretsRead===false&&resume.firestoreRead===false&&resume.firestoreWrites===0&&resume.operationalWrites===0&&resume.previewCreated===false&&resume.browserExecuted===false&&resume.deployExecuted===false&&resume.productionTouched===false&&resume.authorizationConsumed===false&&resume.requestImmutable===true&&resume.sameAuthorizationResumeAllowedOnce===true);
+  add('LIFECYCLE_RESUME_MATCH',same(lifecycle.preRiskResume,resume.lifecycleProof));
+  add('BRANCH',request.branch==='ays/backend-tenant-lab-v99-20260703'&&request.pullRequest===5&&resume.branch===request.branch&&resume.pullRequest===5);
   add('COLLECTIONS',same(request.scope?.collections,EXPECTED_COLLECTIONS)&&same(lifecycle.visualizationScope?.collections,EXPECTED_COLLECTIONS));
   add('BASELINE',same(request.expectedBaseline,EXPECTED_BASELINE)&&same(lifecycle.expectedBaseline,EXPECTED_BASELINE));
   add('DIRECTION_ONLY',request.scope?.role==='Dirección'&&lifecycle.visualizationScope?.role==='Dirección'&&request.scope?.roleProjection==='session_only_no_membership_write');
@@ -56,18 +61,19 @@ try{
   add('RULES_READONLY',rules.includes("collection in ['clientes', 'aseguradoras', 'asesores', 'polizas', 'vehiculos', 'recibosEsperados', 'carteraPrimas', 'cobros']")&&rules.includes('allow create, update, delete: if false'));
   const failed=checks.filter(x=>!x.ok);
   const out={
-    schemaVersion:'orbit360-policies-visual-readonly-lab-preflight-v1',gateId:GATE,contractVersion:VERSION,
-    executionPhase:'M5_LAB_CORRECTIVE_DELIVERY_RUNTIME',phase:'POLICIES_VISUAL_READONLY_LAB',
-    status:failed.length?'VALIDATOR_STALE':'GO_GATE_CONTRACT',classification:failed.length?'PIPELINE_MECHANISM_FAILURE':'POLICIES_VISUAL_READONLY_LAB_READY',
+    schemaVersion:'orbit360-policies-visual-readonly-lab-preflight-v2',gateId:GATE,contractVersion:VERSION,
+    executionPhase:'M5_LAB_CORRECTIVE_DELIVERY_RUNTIME',phase:'POLICIES_VISUAL_READONLY_LAB_RESUME',resumeSequence:2,sourcePreRiskFailedRun:30723519400,
+    status:failed.length?'VALIDATOR_STALE':'GO_GATE_CONTRACT',classification:failed.length?'PIPELINE_MECHANISM_FAILURE':'POLICIES_VISUAL_READONLY_LAB_RESUME_READY',
     total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,
-    executionAuthorized:failed.length===0,allowedExecutions:failed.length?0:1,hostingPreviewAuthorized:failed.length===0,runtimeAuthorized:failed.length===0,visualReviewAuthorized:failed.length===0,
+    executionAuthorized:failed.length===0,allowedExecutions:failed.length?0:1,pipelineResumeAllowed:failed.length===0,hostingPreviewAuthorized:failed.length===0,runtimeAuthorized:failed.length===0,visualReviewAuthorized:failed.length===0,
     role:'Dirección',collections:EXPECTED_COLLECTIONS,expectedBaseline:EXPECTED_BASELINE,
     humanApproval:{clientes:true,polizas:false,vehiculos:false,recibos:false,cartera:false,restoCrm:false,automatedSmokeMaySetApproval:false},
     capabilityProfile:lifecycle.executionProfile?.capabilities||{},previewOnly:true,defaultHostingDeploy:false,rollbackOnFailure:true,
+    authorizationConsumed:false,requestImmutable:true,secretBindingCorrectedTo:'ORBIT360_LAB_LOGIN_PASSWORD',
     firestoreDataWrites:0,operationalWrites:0,dataAccess:false,secretAccess:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false
   };
   save(out);console.log(JSON.stringify(out,null,2));process.exit(failed.length?41:0);
 }catch(error){
-  const out={schemaVersion:'orbit360-policies-visual-readonly-lab-preflight-v1',gateId:GATE,contractVersion:VERSION,executionPhase:'M5_LAB_CORRECTIVE_DELIVERY_RUNTIME',phase:'POLICIES_VISUAL_READONLY_LAB',status:'VALIDATOR_STALE',classification:String(error&&error.message||error).split(':')[0]||'PIPELINE_MECHANISM_FAILURE',failed:Math.max(1,checks.filter(x=>!x.ok).length),failedCheckIds:checks.filter(x=>!x.ok).map(x=>x.id),error:String(error&&error.message||error).slice(0,600),executionAuthorized:false,hostingPreviewAuthorized:false,runtimeAuthorized:false,visualReviewAuthorized:false,firestoreDataWrites:0,operationalWrites:0,dataAccess:false,secretAccess:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+  const out={schemaVersion:'orbit360-policies-visual-readonly-lab-preflight-v2',gateId:GATE,contractVersion:VERSION,executionPhase:'M5_LAB_CORRECTIVE_DELIVERY_RUNTIME',phase:'POLICIES_VISUAL_READONLY_LAB_RESUME',resumeSequence:2,status:'VALIDATOR_STALE',classification:String(error&&error.message||error).split(':')[0]||'PIPELINE_MECHANISM_FAILURE',failed:Math.max(1,checks.filter(x=>!x.ok).length),failedCheckIds:checks.filter(x=>!x.ok).map(x=>x.id),error:String(error&&error.message||error).slice(0,600),executionAuthorized:false,pipelineResumeAllowed:false,hostingPreviewAuthorized:false,runtimeAuthorized:false,visualReviewAuthorized:false,authorizationConsumed:false,firestoreDataWrites:0,operationalWrites:0,dataAccess:false,secretAccess:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
   save(out);console.log(JSON.stringify(out,null,2));process.exit(41);
 }
