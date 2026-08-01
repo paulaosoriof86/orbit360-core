@@ -3,9 +3,9 @@
   "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
   "gateContractVersion": "11.0.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "PLANILLAS_RECEIPT_LINK_DIAGNOSTIC_ACTIVE",
+  "status": "PLANILLAS_POLICY_IDENTITY_RECEIPT_LINK_READONLY_CLOSED",
   "executionProfile": {
-    "mode": "READ_ONLY_PLANILLAS_RECEIPT_LINK_DIAGNOSTIC",
+    "mode": "READ_ONLY_PLANILLAS_POLICY_IDENTITY_RECEIPT_LINK_CLOSED",
     "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
       "secrets": true,
@@ -27,23 +27,32 @@
   "sourceRowsOmitted": 2,
   "policyIdentityDiagnostic": {
     "run": 30719208561,
+    "job": 91420032333,
+    "artifact": 8824310023,
+    "digest": "sha256:28518aead736f2d3709e02492d0e7f8eb99b0ba9a4d87a44bf9a5934d05e4567",
     "resolved": 49,
     "holds": 16,
     "previousHoldsResolved": 39,
-    "classification": "VALIDATOR_STALE_ROOT_FIXED"
+    "classification": "VALIDATOR_STALE_ROOT_FIXED",
+    "closed": true
   },
-  "receiptResolverStatic": {
-    "run": 30719316572,
-    "checks": 14,
-    "fixtures": 6,
-    "status": "STATIC_RECEIPT_LINK_RESOLVER_PASS"
-  },
-  "expectedReceiptDiagnostic": {
+  "receiptLinkDiagnostic": {
+    "run": 30719464732,
+    "job": 91420695963,
+    "artifact": 8824388638,
+    "digest": "sha256:fd81c22fd70ad62511d2ec8a8a53f0f5d2aa3e058d0d31dcfd8a3f9cedffa054",
     "processed": 49,
     "resolved": 5,
     "holds": 44,
     "excludedPolicyHolds": 16,
-    "existingCobroLinked": 0
+    "existingCobroLinked": 0,
+    "closed": true
+  },
+  "holdLedger": {
+    "policyIdentity": 16,
+    "receiptAmountAmbiguous": 30,
+    "receiptNotFound": 14,
+    "totalRowsWithoutReceiptLink": 60
   },
   "financeActivated": false,
   "writeAuthorized": false,
@@ -53,6 +62,7 @@
   "cxpWritesAuthorized": false,
   "advisorLiquidationWritesAuthorized": false,
   "operationalWritesAllowed": 0,
+  "additionalReadOnlyExecutionAuthorized": false,
   "privatePackage": {
     "driveFileId": "1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84",
     "sha256": "abf5975e5cf8821489437b3b6172153c54032c8f097b720c0a98b30555a62a82",
@@ -68,8 +78,18 @@
     "privateSourceOutsideRepository": true,
     "sanitizedEvidenceOnly": true,
     "containsRealRowsInContract": false,
-    "noPaymentDateReceiptSelection": true,
+    "noPaymentDatePolicyOrReceiptSelection": true,
     "strongReferenceBeforeAmount": true,
-    "fourCobrosResidualHoldsExcluded": true
+    "fourCobrosResidualHoldsExcluded": true,
+    "requestReplayBlocked": true
+  },
+  "nextGateCondition": {
+    "scope": "FIVE_READONLY_POLICY_RECEIPT_RELATIONS_ONLY",
+    "requiresCommissionDryRun": true,
+    "requiresIdempotency": true,
+    "requiresDestinationContract": true,
+    "requiresAdvisorValidation": true,
+    "requiresSnapshotAndRollback": true,
+    "requiresSeparateWriteAuthorization": true
   }
 }
