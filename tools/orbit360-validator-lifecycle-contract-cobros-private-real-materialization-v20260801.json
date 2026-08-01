@@ -4,8 +4,8 @@
   "gateContractVersion": "10.8.0",
   "owner": "cobros-private-authorization-materializer-p0",
   "ownerVersion": "20260801.1-private-readonly-materializer",
-  "status": "REOPEN_AUTHORIZED_AFTER_DIRECT_PASS",
-  "classification": "VALIDATOR_STALE_CORRECTED",
+  "status": "CLOSED_GO_AFTER_RECOVERY",
+  "classification": "GO_STATIC_COBROS_PRIVATE_REAL_MATERIALIZATION",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "executionProfile": {
     "mode": "STATIC_ATTESTATION_ONLY",
@@ -54,16 +54,17 @@
     "createsFinmov": false,
     "autoApply": false
   },
-  "recovery": {
-    "authorizedByUser": true,
-    "authorizedAt": "2026-08-01T10:55:00-06:00",
+  "recoveryEvidence": {
     "previousRuns": [30708592194, 30708670724],
-    "directValidatorRequiredBeforeReopen": true,
-    "directValidatorEvidence": "orbit360-platform/docs/AUDITORIA-DIRECTA-RECUPERACION-GATE10.8-20260801.json",
     "directResult": "64/64 PASS",
-    "directValidatorSha256": "8335a2483a1230074c73714a19aa6ba10e99ee568c49d6ba6c4f80c6789c6146",
-    "newGateIdForbidden": true,
-    "sameGateReopenAuthorized": true,
-    "productionAuthorizationGranted": false
+    "sameGateReopened": true,
+    "newGateIdCreated": false
+  },
+  "closureEvidence": {
+    "run": 30709607082,
+    "artifact": 8821429532,
+    "digest": "sha256:7ed3cf4a446a954bdd9378026a70e3e3eb00820c5780ddb12bc80421ec29ba5c",
+    "checks": "64/64 PASS",
+    "head": "b83a28800e1bbd5e9c0cada96616ec21577f0fb9"
   }
 }
