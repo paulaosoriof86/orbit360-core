@@ -3,7 +3,7 @@
   "gateId": "block7-policies-static-v20260730",
   "gateContractVersion": "7.0.1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "POLICIES_VISUAL_READONLY_LAB_AUTHORIZED",
+  "status": "POLICIES_VISUAL_READONLY_LAB_RESUME_AUTHORIZED",
   "executionProfile": {
     "phase": "M5_LAB_CORRECTIVE_DELIVERY_RUNTIME",
     "capabilities": {
@@ -38,6 +38,30 @@
     "runtimeSmokeAuthorized": true,
     "humanVisualReviewAuthorized": true,
     "productionAuthorized": false
+  },
+  "preRiskResume": {
+    "classification": "ENVIRONMENT_FAILURE",
+    "sourceRun": 30723519400,
+    "sourceJob": 91431066978,
+    "sourceArtifact": 8825594112,
+    "failedStage": "RESOLVE_EXISTING_IDENTITY_AND_LAB_SECRET",
+    "rootCause": "SECRET_NAME_BINDING_MISMATCH",
+    "expectedSecretName": "ORBIT360_LAB_LOGIN_PASSWORD",
+    "incorrectSecretName": "ORBIT360_EXISTING_LOGIN_PASSWORD",
+    "canonicalPreflightPassed": 15,
+    "canonicalPreflightFailed": 0,
+    "secretsRead": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "previewCreated": false,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "authorizationConsumed": false,
+    "requestImmutable": true,
+    "sameAuthorizationResumeAllowedOnce": true,
+    "resumeSequence": 2
   },
   "visualizationScope": {
     "role": "Dirección",
