@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "orbit360-cobros-post-close-relations-readonly-request-v1",
+  "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
+  "contractVersion": "10.9.0",
+  "mode": "READ_ONLY_POST_CLOSE_RELATION_VERIFICATION",
+  "approved": true,
+  "reason": "Verify the five applied Cobros relations after WRITE_PASS, confirm the historical receipt and zero finmovs, and prove request replay remains blocked.",
+  "sourceExecutionRun": 30712176452,
+  "sourceExecutionJob": 91401430928,
+  "sourceExecutionArtifact": 8822218777,
+  "sourceExecutionHead": "935f8e722ee96aee9b40a69cc4c8dfbfe023d236",
+  "expected": {
+    "cases": 5,
+    "direct": 4,
+    "historical": 1,
+    "polizas": 1373,
+    "recibosEsperados": 1294,
+    "cobros": 5,
+    "finmovs": 0,
+    "policyRelations": 5,
+    "receiptRelations": 5,
+    "authorizationRelations": 5,
+    "idempotencyRelations": 5,
+    "policyStatesPreserved": 5,
+    "requestReplayBlocked": true
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "sanitization": {
+    "includeIds": false,
+    "includeAuthorizationRefs": false,
+    "includeAmounts": false,
+    "includePolicyNumbers": false,
+    "includePII": false,
+    "includeSecrets": false,
+    "includeOnlyOrdinalsCategoriesCountsAndBooleans": true
+  }
+}
