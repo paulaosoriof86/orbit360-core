@@ -7,9 +7,17 @@ Gate: `block10.9-cobros-controlled-write-lab-v20260801`
 
 ## Estado
 
-`COBROS_CONTROLLED_WRITE_GATE_PREFLIGHT_PREPARED`
+`COBROS_CONTROLLED_WRITE_GATE_PREFLIGHT_PASS`
 
-La Dirección aprobó cuatro casos directos y, de forma separada, un caso histórico reforzado. Esta aprobación permite preparar el gate, pero no ejecutar escrituras todavía.
+```text
+run: 30710608492
+artifact: 8821741047
+digest: sha256:6da1eb4d5fd39ce350ac31b4f9dd2a1ecb34b713346f14cc9d35f23a6e50ed00
+contrato canónico: PASS
+fase: PREPARED_STATIC
+```
+
+La Dirección aprobó cuatro casos directos y, de forma separada, un caso histórico reforzado. Esta aprobación permitió preparar el gate, pero todavía no autoriza su ejecución en LAB.
 
 ## Un solo gate por fases
 
@@ -22,7 +30,7 @@ PREPARED_STATIC
 
 No se creará otro gate para la escritura. La próxima autorización armará este mismo gate 10.9.
 
-## Plan sanitizado
+## Plan sanitizado validado
 
 ```text
 casos aprobados: 5
@@ -42,6 +50,17 @@ El caso histórico planifica crear un recibo histórico exigible e insertar/apli
 ## Protección estructural
 
 El writer genérico continúa bloqueando la colección `cobros`. El gate usa un owner especializado y limitado a las cinco referencias autorizadas. No se abrió una excepción global ni se modificó el writer transversal.
+
+## Causa raíz del primer intento
+
+```text
+primer run: 30710503705
+clasificación: VALIDATOR_STALE
+producto afectado: no
+owner afectado: no
+```
+
+El validador buscaba `cobros` en una ventana fija posterior a `ALLOWED_COLLECTIONS`; esa ventana alcanzaba la lista siguiente `HARD_BLOCKED_COLLECTIONS`, donde `cobros` debe estar. Se corrigió el parser para aislar ambas listas por sus límites sintácticos. La segunda y última ejecución pasó.
 
 ## Controles obligatorios
 
@@ -74,4 +93,4 @@ production: untouched
 
 ## Siguiente frontera
 
-Después del PASS del preflight, Dirección podrá autorizar explícitamente armar y ejecutar el mismo gate 10.9 en LAB. Esa autorización no incluirá deploy ni producción.
+Dirección puede autorizar explícitamente armar y ejecutar el mismo gate 10.9 en LAB. Esa autorización permitirá snapshot y escritura limitada a cinco casos; no incluirá deploy ni producción.
