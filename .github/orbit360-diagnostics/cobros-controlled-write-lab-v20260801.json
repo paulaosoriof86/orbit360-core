@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-cobros-controlled-write-lab-diagnosis-request-v1",
+  "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
+  "contractVersion": "10.9.0",
+  "mode": "READ_ONLY_ROOT_CAUSE_DIAGNOSIS",
+  "approved": true,
+  "reason": "Diagnose RECEIPT_SNAPSHOT_MISMATCH after safe rollback without another write attempt.",
+  "sourceRun": 30711578397,
+  "sourceArtifact": 8822041409,
+  "expectedBaseline": {
+    "polizas": 1373,
+    "recibosEsperados": 1293,
+    "cobros": 0,
+    "finmovs": 0
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "sanitization": {
+    "includeValues": false,
+    "includeAmounts": false,
+    "includePolicyNumbers": false,
+    "includePII": false,
+    "includeSecrets": false,
+    "includeOnlyOrdinalsKeysAndTypes": true
+  }
+}
