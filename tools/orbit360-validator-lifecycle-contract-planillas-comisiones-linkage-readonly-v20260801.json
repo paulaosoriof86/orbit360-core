@@ -3,9 +3,9 @@
   "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
   "gateContractVersion": "11.0.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "PLANILLAS_COMMISSION_DRYRUN_ACTIVE",
+  "status": "PLANILLAS_COMMISSION_DRYRUN_CLOSED",
   "executionProfile": {
-    "mode": "READ_ONLY_PLANILLAS_COMMISSION_DRYRUN",
+    "mode": "READ_ONLY_PLANILLAS_COMMISSION_DRYRUN_CLOSED",
     "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
       "secrets": true,
@@ -44,19 +44,37 @@
     "destinations": ["planillasComisiones", "comisionesDevengadas", "conciliacionesComisiones"],
     "status": "STATIC_COMMISSION_DRYRUN_PLANNER_PASS"
   },
-  "dryrunScope": {
+  "commissionDryrun": {
+    "run": 30720089823,
+    "job": 91422311027,
+    "artifact": 8824579757,
+    "digest": "sha256:97439efee94ddf7b0ff438da4f89e9fae5463c68d8a4ec19ec768d13bf9c201e",
+    "head": "e76f2cfb179468edbd8fe22b970d2010b64b8984",
     "exactPolicyReceiptRelations": 5,
-    "sourceBundles": {
-      "el_roble_gtq_2026_06": 3,
-      "universales_gtq_2026_06": 1,
-      "bantrab_gtq_2026_06": 1
+    "commissionCandidates": 5,
+    "proposedDocuments": 15,
+    "proposedPlanillasComisiones": 5,
+    "proposedComisionesDevengadas": 5,
+    "proposedConciliacionesComisiones": 5,
+    "sellerReadyOrNotApplicable": 2,
+    "sellerHolds": 3,
+    "idempotentOmits": 0,
+    "partialDestinationHolds": 0,
+    "contractHolds": 0,
+    "candidateSetDigest": "04c7da071ddadfe689e0137e730448ada36abe7aff6c228cd5abb0206c26c680",
+    "targetSnapshotDigest": "12b3763f976433e1e7e809f461dc835bca3a4c39b1d6dd1655e42a202e6cbf3f",
+    "targetSnapshot": {
+      "planillasComisiones": 0,
+      "comisionesDevengadas": 0,
+      "conciliacionesComisiones": 0
     },
-    "genericComisionesDestinationAllowed": false,
-    "invoiceWritesAllowed": false,
-    "cxcWritesAllowed": false,
-    "cxpWritesAllowed": false,
-    "advisorLiquidationWritesAllowed": false,
-    "rateInferenceAllowed": false
+    "closed": true
+  },
+  "sellerHoldLedger": {
+    "HOLD_SELLER_ALIAS_NOT_CONFIGURED": 3,
+    "liquidationAuthorized": false,
+    "sourceAmountsPreserved": true,
+    "defaultPercentageApplied": false
   },
   "financeActivated": false,
   "writeAuthorized": false,
@@ -66,6 +84,7 @@
   "cxpWritesAuthorized": false,
   "advisorLiquidationWritesAuthorized": false,
   "operationalWritesAllowed": 0,
+  "additionalReadOnlyExecutionAuthorized": false,
   "privatePackage": {
     "driveFileId": "1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84",
     "sha256": "abf5975e5cf8821489437b3b6172153c54032c8f097b720c0a98b30555a62a82",
@@ -84,15 +103,22 @@
     "noPaymentDatePolicyOrReceiptSelection": true,
     "strongReferenceBeforeAmount": true,
     "fourCobrosResidualHoldsExcluded": true,
-    "previousReadOnlyRequestClosed": true,
+    "requestSemanticallyConsumed": true,
+    "requestReplayBlocked": true,
     "separateWriteAuthorizationRequired": true
   },
-  "futureWriteRequirements": {
-    "candidateSetDigestRequired": true,
-    "targetSnapshotDigestRequired": true,
-    "idempotencyRequired": true,
-    "atomicBatchRequired": true,
-    "rollbackRequired": true,
-    "advisorValidationRequired": true
+  "nextGateCondition": {
+    "scope": "FIVE_COMMISSION_CANDIDATES_FIFTEEN_DOCUMENTS_ONLY",
+    "candidateSetDigestMustMatch": "04c7da071ddadfe689e0137e730448ada36abe7aff6c228cd5abb0206c26c680",
+    "targetSnapshotDigestMustMatch": "12b3763f976433e1e7e809f461dc835bca3a4c39b1d6dd1655e42a202e6cbf3f",
+    "targetCountsMustRemainZero": true,
+    "requiresAtomicBatch": true,
+    "requiresIdempotency": true,
+    "requiresPostVerification": true,
+    "requiresRollbackOfExactDocuments": 15,
+    "sellerLiquidationMustRemainBlocked": true,
+    "genericComisionesMustRemainUntouched": true,
+    "financeMustRemainInactive": true,
+    "requiresSeparateWriteAuthorization": true
   }
 }
