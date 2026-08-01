@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "orbit360-cobros-conciliacion-readonly-static-trigger-v1",
+  "approved": true,
+  "gateId": "block10-cobros-conciliacion-readonly-static-v20260801",
+  "contractVersion": "10.0.0",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "authorizedHead": "7ef7d81db166dd00d62c05f8448bc3c6492cd693",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "scope": {
+    "static": true,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "sourceEvidence": {
+    "reports": 2,
+    "rows": 9,
+    "candidates": 5,
+    "holdOrNoMatch": 4,
+    "rowLevelReplay": false
+  },
+  "notes": "Static qualification only. No reconstruction of real rows and no cobros or finmovs writes."
+}
