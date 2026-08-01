@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
+  "gateContractVersion": "11.0.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "PLANILLAS_COMISIONES_LINKAGE_READONLY_ACTIVE",
+  "executionProfile": {
+    "mode": "READ_ONLY_PLANILLAS_COMISIONES_LINKAGE",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "sourceDryrunClosed": true,
+  "sourceFiles": 19,
+  "sourceBundles": 10,
+  "sourceRowsObserved": 67,
+  "crmCandidateRows": 65,
+  "sourceRowsOmitted": 2,
+  "financeActivated": false,
+  "writeAuthorized": false,
+  "commissionWritesAuthorized": false,
+  "finmovWritesAuthorized": false,
+  "cxcWritesAuthorized": false,
+  "cxpWritesAuthorized": false,
+  "advisorLiquidationWritesAuthorized": false,
+  "operationalWritesAllowed": 0,
+  "privatePackage": {
+    "driveFileId": "1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84",
+    "sha256": "4933506bbe02e56c9dd2ed5f180ed3d0ad293f73a952a2044378e3f02aeed496",
+    "logicalSha256": "45a3b6f1c801482c37f17270c5fbba59602cadc2319cf88e5485ffbd304b08f8"
+  },
+  "expectedBaseline": {
+    "polizas": 1373,
+    "recibosEsperados": 1294,
+    "cobros": 5,
+    "finmovs": 0
+  },
+  "security": {
+    "privateSourceOutsideRepository": true,
+    "sanitizedEvidenceOnly": true,
+    "containsRealRowsInContract": false,
+    "noDateInference": true,
+    "strongIdentityDedupeOnly": true,
+    "fourCobrosResidualHoldsExcluded": true
+  }
+}
