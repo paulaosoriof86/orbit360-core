@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block10.1-cobros-source-intake-static-v20260801",
+  "gateContractVersion": "10.1.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "COBROS_SOURCE_INTAKE_STATIC_QUALIFICATION",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "requiredFiles": [
+    "orbit360-platform/core/importa-cobros-conciliacion-p0.js",
+    "orbit360-platform/core/importa-transversal-p0-bootstrap-v20260731.js",
+    "tools/orbit360-test-importa-cobros-conciliacion-p0-v20260801.mjs",
+    "tools/orbit360-validar-manifest-cobros-fuente-ays-v20260801.mjs",
+    "tools/orbit360-test-validar-manifest-cobros-fuente-ays-v20260801.mjs",
+    "orbit360-platform/docs/COBROS-CONCILIACION-FUENTES-INTAKE-20260801.json"
+  ],
+  "successStatus": "COBROS_SOURCE_INTAKE_STATIC_READY",
+  "writeAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
