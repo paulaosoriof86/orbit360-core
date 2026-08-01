@@ -1,0 +1,232 @@
+name: Orbit 360 · Pólizas · visualización read-only LAB
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/policies-visual-readonly-lab-v20260801.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-policies-visual-readonly-lab-v20260801
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: block7-policies-static-v20260730
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_CHANNEL_ID: orbit360-policies-review-20260801
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/policies-visual-readonly-lab-v20260801.json
+  ORBIT360_LIFECYCLE_FILE: tools/orbit360-validator-lifecycle-contract-policies-static-v20260730.json
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  visual:
+    name: Pólizas · preview LAB Dirección · read-only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar autorización y alcance visual
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          jq -e '.schemaVersion=="orbit360-policies-visual-readonly-lab-request-v1" and .gateId==env.ORBIT360_GATE_ID and .contractVersion=="7.0.1" and .approved==true and .consumed==false and .allowedExecutions==1 and .scope.role=="Dirección" and .scope.roleProjection=="session_only_no_membership_write" and .delivery.previewChannel==env.ORBIT360_CHANNEL_ID and .delivery.defaultHostingDeploy==false and .humanApproval.clientes==true and .humanApproval.polizas==false and .humanApproval.vehiculos==false and .humanApproval.recibos==false and .humanApproval.cartera==false and .humanApproval.restoCrm==false and .humanApproval.automatedSmokeMaySetApproval==false and .capabilities.firestoreRead==true and .capabilities.writes==false and .capabilities.browser==true and .capabilities.deploy==true and .capabilities.rulesDeploy==false and .capabilities.functionsDeploy==false and .capabilities.production==false' "$ORBIT360_REQUEST_FILE" >/dev/null
+          jq -e '.status=="POLICIES_VISUAL_READONLY_LAB_AUTHORIZED" and .executionProfile.phase=="M5_LAB_CORRECTIVE_DELIVERY_RUNTIME" and .executionProfile.capabilities.writes==false and .authorization.approved==true and .authorization.allowedExecutions==1 and .authorization.consumed==false and .humanApproval.polizas==false and .guards.previewChannelOnly==true and .guards.productionAllowed==false' "$ORBIT360_LIFECYCLE_FILE" >/dev/null
+
+      - name: Gate canónico antes de secretos, Firebase y navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-policies-static-v20260730.mjs
+          node --check tools/orbit360-generate-policies-visual-runtime-config-v20260801.mjs
+          node --check tools/orbit360-policies-visual-data-snapshot-readonly-v20260801.mjs
+          node --check tools/orbit360-build-policies-visual-shell-v20260801.mjs
+          node --check tools/orbit360-policies-visual-browser-smoke-v20260801.mjs
+          node --check orbit360-platform/core/policies-visual-direction-role-overlay-v20260801.js
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="POLICIES_VISUAL_READONLY_LAB_READY" and .executionAuthorized==true and .hostingPreviewAuthorized==true and .runtimeAuthorized==true and .visualReviewAuthorized==true and .allowedExecutions==1 and .humanApproval.polizas==false and .firestoreDataWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Instalar dependencias después del preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@latest >/dev/null
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Resolver identidad existente y secreto LAB
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          ORBIT360_EXISTING_LOGIN_PASSWORD: '${{ secrets.ORBIT360_EXISTING_LOGIN_PASSWORD }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          test ${#ORBIT360_EXISTING_LOGIN_PASSWORD} -ge 12
+          KEY_FILE="$RUNNER_TEMP/orbit360-policies-visual-lab.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_PRODUCT_PROJECT_ID=$ORBIT360_PROJECT_ID" >> "$GITHUB_ENV"
+          echo "ORBIT360_PRODUCT_TENANT_ID=$ORBIT360_TENANT_ID" >> "$GITHUB_ENV"
+          echo "ORBIT360_PRODUCT_SMOKE_PASSWORD=$ORBIT360_EXISTING_LOGIN_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Derivar configuración pública y usuario de revisión
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-generate-policies-visual-runtime-config-v20260801.mjs
+          node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
+          jq -e '.ok==true and .collectionCount==7 and .visualReviewRole=="Dirección" and .writeAuthorized==false' "$EVIDENCE_DIR/policies-visual-runtime-config-summary.json" >/dev/null
+          jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .requiredRolesPresent==true and .firestoreWrites==0' "$EVIDENCE_DIR/m6-product-smoke-identity-summary.json" >/dev/null
+
+      - name: Snapshot read-only previo
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-policies-visual-data-snapshot-readonly-v20260801.mjs before
+          jq -e '.ok==true and .baselineMatches==true and .counts.clientes==430 and .counts.aseguradoras==30 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1294 and .counts.carteraPrimas==673 and .counts.cobros==5 and .counts.finmovs==0 and .counts.planillasComisiones==5 and .counts.comisionesDevengadas==5 and .counts.conciliacionesComisiones==5 and .firestoreWrites==0' "$EVIDENCE_DIR/policies-visual-data-before.json" >/dev/null
+
+      - name: Construir shell efímero de revisión
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-build-policies-visual-shell-v20260801.mjs
+          jq -e '.ok==true and .status=="POLICIES_VISUAL_SHELL_BUILT" and .visualRoleOverlay==true and .visualReviewRole=="Dirección" and .writeAuthorized==false' "$EVIDENCE_DIR/policies-visual-shell-build-summary.json" >/dev/null
+
+      - name: Publicar únicamente canal preview LAB
+        id: preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase hosting:channel:deploy "$ORBIT360_CHANNEL_ID" --expires 7d --project "$ORBIT360_PROJECT_ID" --config firebase.product-go-live.json --non-interactive --json > "$EVIDENCE_DIR/policies-visual-preview-deploy-raw.json"
+          node <<'NODE'
+          const fs=require('fs');
+          const p=process.env.EVIDENCE_DIR+'/policies-visual-preview-deploy-raw.json';
+          const value=JSON.parse(fs.readFileSync(p,'utf8'));
+          const urls=[];
+          (function walk(v){if(typeof v==='string'&&/^https:\/\//.test(v))urls.push(v);else if(Array.isArray(v))v.forEach(walk);else if(v&&typeof v==='object')Object.values(v).forEach(walk);})(value);
+          const url=urls.find(x=>/web\.app/.test(x))||urls[0];
+          if(!url)throw new Error('PIPELINE_MECHANISM_FAILURE:PREVIEW_URL_NOT_FOUND');
+          fs.appendFileSync(process.env.GITHUB_ENV,`ORBIT360_POLICIES_VISUAL_URL=${url}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`url=${url}\n`);
+          fs.writeFileSync(process.env.EVIDENCE_DIR+'/policies-visual-preview-summary.json',JSON.stringify({ok:true,status:'POLICIES_VISUAL_PREVIEW_DEPLOYED',previewUrl:url,channel:'orbit360-policies-review-20260801',expiresDays:7,defaultHostingDeploy:false,rulesDeploy:false,production:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          NODE
+
+      - name: Esperar disponibilidad acotada
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          for i in $(seq 1 30); do
+            body="$(curl -fsSL --max-time 15 "$ORBIT360_POLICIES_VISUAL_URL" || true)"
+            if printf '%s' "$body" | grep -q 'orbit360-review-scope'; then ok=1; break; fi
+            sleep 3
+          done
+          test "$ok" = 1
+
+      - name: Ejecutar smoke visual Dirección
+        id: smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-policies-visual-browser-smoke-v20260801.mjs
+          jq -e '.ok==true and .status=="POLICIES_VISUAL_BROWSER_SMOKE_PASS" and .classification=="READY_FOR_HUMAN_VISUAL_REVIEW" and .visualReviewRole=="Dirección" and .humanApprovalRecorded==false and .counts.clientes==430 and .counts.aseguradoras==30 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1294 and .counts.carteraPrimas==673 and .counts.cobros==5 and .checks.runtime==true and .checks.directionRole==true and .checks.policiesList==true and .checks.receiptBreakdown==true and .checks.client360Relations==true and (.networkWriteCandidates|length)==0 and .firestoreWrites==0 and .operationalWrites==0 and .production==false' "$EVIDENCE_DIR/policies-visual-browser-smoke-summary.json" >/dev/null
+
+      - name: Snapshot posterior e integridad
+        id: integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-policies-visual-data-snapshot-readonly-v20260801.mjs after
+          node <<'NODE'
+          const fs=require('fs'),p=process.env.EVIDENCE_DIR+'/';
+          const before=JSON.parse(fs.readFileSync(p+'policies-visual-data-before.json','utf8'));
+          const after=JSON.parse(fs.readFileSync(p+'policies-visual-data-after.json','utf8'));
+          const countsStable=JSON.stringify(before.counts)===JSON.stringify(after.counts);
+          const digestsStable=JSON.stringify(before.digests)===JSON.stringify(after.digests);
+          const ok=before.ok===true&&after.ok===true&&countsStable&&digestsStable;
+          fs.writeFileSync(p+'policies-visual-integrity-summary.json',JSON.stringify({ok,status:ok?'POLICIES_VISUAL_INTEGRITY_PASS':'POLICIES_VISUAL_INTEGRITY_FAIL',countsStable,digestsStable,firestoreWrites:0,operationalWrites:0,humanApprovalRecorded:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          if(!ok)process.exit(41);
+          NODE
+
+      - name: Eliminar preview si falla cualquier control
+        if: always() && steps.preview.outcome == 'success' && (steps.smoke.outcome != 'success' || steps.integrity.outcome != 'success')
+        shell: bash
+        run: |
+          set +e
+          firebase hosting:channel:delete "$ORBIT360_CHANNEL_ID" --project "$ORBIT360_PROJECT_ID" --force --non-interactive >/dev/null 2>&1
+          echo '{"executed":true,"reason":"visual_gate_failed","defaultHostingTouched":false,"production":false,"containsPII":false,"containsSecrets":false}' > "$EVIDENCE_DIR/policies-visual-preview-rollback-summary.json"
+
+      - name: Cerrar evidencia sanitizada
+        if: always()
+        shell: bash
+        env:
+          PREVIEW_OUTCOME: ${{ steps.preview.outcome }}
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+          INTEGRITY_OUTCOME: ${{ steps.integrity.outcome }}
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),p=process.env.EVIDENCE_DIR+'/';
+          const read=n=>{try{return JSON.parse(fs.readFileSync(p+n,'utf8'));}catch{return null;}};
+          const preview=read('policies-visual-preview-summary.json'),smoke=read('policies-visual-browser-smoke-summary.json'),integrity=read('policies-visual-integrity-summary.json');
+          const ok=process.env.PREVIEW_OUTCOME==='success'&&process.env.SMOKE_OUTCOME==='success'&&process.env.INTEGRITY_OUTCOME==='success'&&smoke&&smoke.ok===true&&integrity&&integrity.ok===true;
+          const out={schemaVersion:'orbit360-policies-visual-readonly-lab-summary-v1',gateId:'block7-policies-static-v20260730',contractVersion:'7.0.1',ok,status:ok?'POLICIES_VISUAL_PREVIEW_READY':'POLICIES_VISUAL_PREVIEW_FAILED',classification:ok?'READY_FOR_HUMAN_VISUAL_REVIEW':'FUNCTIONAL_DEFECT',previewUrl:ok&&preview?preview.previewUrl:'',previewChannel:'orbit360-policies-review-20260801',expiresDays:7,role:'Dirección',counts:smoke&&smoke.counts||{},relationChecks:smoke&&smoke.relations||{},humanApproval:{clientes:true,polizas:false,vehiculos:false,recibos:false,cartera:false,restoCrm:false,automatedSmokeMaySetApproval:false},firestoreDataWrites:0,operationalWrites:0,networkWriteCandidates:smoke&&smoke.networkWriteCandidates?smoke.networkWriteCandidates.length:0,defaultHostingDeploy:false,rulesDeploy:false,functionsDeploy:false,production:false,main:false,merge:false,outcomes:{preview:process.env.PREVIEW_OUTCOME||'',smoke:process.env.SMOKE_OUTCOME||'',integrity:process.env.INTEGRITY_OUTCOME||''},containsPII:false,containsPolicyNumbers:false,containsAmounts:false,containsIds:false,containsSecrets:false};
+          fs.writeFileSync(p+'policies-visual-readonly-lab-summary.json',JSON.stringify(out,null,2)+'\n');
+          if(!ok)process.exitCode=41;
+          NODE
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-policies-visual-readonly-lab-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-visual-runtime-config-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-smoke-identity-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-visual-data-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-visual-shell-build-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-visual-preview-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-visual-browser-smoke-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-visual-data-after.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-visual-integrity-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-visual-preview-rollback-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-visual-readonly-lab-summary.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          SUMMARY: orbit360-platform/runtime-gate-crm-v20260716/policies-visual-readonly-lab-summary.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Policies visual preview failed';
+            try{const s=JSON.parse(fs.readFileSync(process.env.SUMMARY,'utf8'));if(s.ok===true&&s.status==='POLICIES_VISUAL_PREVIEW_READY'){state='success';description='Policies preview ready; human approval still pending';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/policies-visual-readonly-lab',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Limpiar identidad temporal
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
