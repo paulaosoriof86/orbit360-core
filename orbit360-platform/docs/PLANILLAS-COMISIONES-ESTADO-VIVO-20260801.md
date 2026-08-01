@@ -24,24 +24,32 @@ recibo en HOLD: 44
 cobros actuales relacionados: 0
 ```
 
-## Dry-run de comisión
+## Escritura controlada de comisión
 
 ```text
 relaciones evaluadas: 5
-comisiones A&S candidatas: 5
-HOLD u omisiones de comisión A&S: 0
-documentos propuestos: 15
-planillasComisiones: 5
-comisionesDevengadas: 5
-conciliacionesComisiones: 5
+comisiones A&S escritas: 5
+documentos creados: 15
+documentos verificados: 15
+transacción atómica: sí
+rollback ejecutado: no
 ```
 
-Snapshot destino:
+Destino:
 
 ```text
-planillasComisiones: 0
-comisionesDevengadas: 0
-conciliacionesComisiones: 0
+planillasComisiones: 0 → 5
+comisionesDevengadas: 0 → 5
+conciliacionesComisiones: 0 → 5
+```
+
+Baseline preservado:
+
+```text
+polizas: 1373 → 1373
+recibosEsperados: 1294 → 1294
+cobros: 5 → 5
+finmovs: 0 → 0
 ```
 
 Liquidación de vendedor:
@@ -49,7 +57,7 @@ Liquidación de vendedor:
 ```text
 lista o no aplicable: 2
 HOLD por alias no configurado: 3
-liquidaciones autorizadas: 0
+liquidaciones creadas: 0
 porcentaje por defecto aplicado: no
 ```
 
@@ -75,19 +83,33 @@ receipt resolver static: run 30719316572 · 14/14
 receipt link live: run 30719464732 · 5 resueltas / 44 HOLD
 commission planner static: run 30719949803 · 32/32
 commission dry-run live: run 30720089823 · 5 candidatas / 15 documentos
+commission controlled write: run 30722653179 · WRITE_PASS · 15/15
 ```
 
-Sellos:
+Sellos verificados:
 
 ```text
 candidateSetDigest: 04c7da071ddadfe689e0137e730448ada36abe7aff6c228cd5abb0206c26c680
 targetSnapshotDigest: 12b3763f976433e1e7e809f461dc835bca3a4c39b1d6dd1655e42a202e6cbf3f
 ```
 
+## Barrera visual CRM
+
+```text
+Clientes: aprobado previamente
+Pólizas: pendiente de visualización y aprobación
+Vehículos: pendiente
+Recibos: pendiente
+Cartera: pendiente
+Resto CRM: pendiente
+```
+
+El `WRITE_PASS` de comisiones no modifica ni sustituye esa revisión humana.
+
 ## Estado contractual
 
 ```text
-PLANILLAS_COMMISSION_DRYRUN_CLOSED
+PLANILLAS_COMMISSION_CONTROLLED_WRITE_CLOSED
 ```
 
-No existe autorización de escritura. El siguiente bloque requiere autorización separada y debe limitarse a los cinco candidatos y 15 documentos sellados, con batch atómico, idempotencia, post-verificación y rollback exacto. La liquidación de los tres vendedores permanece bloqueada y Finanzas continúa inactiva.
+La autorización quedó consumida y el gate volvió a cero escrituras autorizadas. Facturas, CxC, CxP, liquidaciones y Finanzas siguen inactivas. Cualquier escritura adicional requiere una autorización nueva; no hay avance automático al siguiente módulo CRM.
