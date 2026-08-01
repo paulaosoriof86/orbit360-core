@@ -4,17 +4,24 @@
   "contractVersion": "10.9.0",
   "mode": "READ_ONLY_POST_CLOSE_RELATION_VERIFICATION",
   "approved": true,
-  "sequence": 2,
-  "reason": "Diagnose the exact sanitized boolean that caused RELATION_INVALID_CASE_1 without exposing IDs or values and without any write capability.",
+  "sequence": 3,
+  "reason": "Identify only the mismatched receipt field names after all five relationship controls passed; no IDs, values or writes are allowed.",
   "sourceExecutionRun": 30712176452,
   "sourceExecutionJob": 91401430928,
   "sourceExecutionArtifact": 8822218777,
   "sourceExecutionHead": "935f8e722ee96aee9b40a69cc4c8dfbfe023d236",
-  "previousPostCloseRun": 30713132341,
-  "previousPostCloseArtifact": 8822509588,
-  "previousClassification": "DATA_CONTRACT_FAILURE",
-  "previousFailure": "RELATION_INVALID_CASE_1",
-  "diagnosticScope": "ORDINALS_CATEGORIES_AND_RELATION_BOOLEANS_ONLY",
+  "previousPostCloseRuns": [30713132341, 30713211844],
+  "previousDiagnosticArtifact": 8822532924,
+  "previousClassification": "READ_ONLY_RELATION_DIAGNOSIS",
+  "provenValid": {
+    "policyRelations": 5,
+    "receiptRelations": 5,
+    "authorizationRelations": 5,
+    "idempotencyRelations": 5,
+    "policyStatesPreserved": 5,
+    "noFinmovCases": 5
+  },
+  "remainingDiagnosticScope": "DIRECT_RECEIPT_MISMATCHED_FIELD_NAMES_ONLY",
   "expected": {
     "cases": 5,
     "direct": 4,
@@ -44,10 +51,11 @@
   "sanitization": {
     "includeIds": false,
     "includeAuthorizationRefs": false,
+    "includeValues": false,
     "includeAmounts": false,
     "includePolicyNumbers": false,
     "includePII": false,
     "includeSecrets": false,
-    "includeOnlyOrdinalsCategoriesCountsAndBooleans": true
+    "includeOnlyOrdinalsCategoriesBooleansAndFieldNames": true
   }
 }
