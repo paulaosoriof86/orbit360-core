@@ -13,7 +13,7 @@ const email=String(process.env.ORBIT360_LAB_LOGIN_EMAIL||'').trim();
 const password=String(process.env.ORBIT360_LAB_LOGIN_PASSWORD||'');
 const EXPECT={clientes:430,aseguradoras:30,asesores:7,polizas:1373,vehiculos:1032,recibosEsperados:1293,carteraPrimas:673,cobros:0,finmovs:0};
 const MASK='••••••';
-const report={schemaVersion:'orbit360-human-review-sanitized-screens-v2',generatedAt:new Date().toISOString(),ok:false,status:'INIT',classification:'SECURITY_FAILURE_RECOVERY',securityFailClosed:true,invalidatedPriorRun:30674070410,screens:[],sanitization:{maskedTextNodes:0,maskedFormValues:0,residualDynamicText:0,residualFormValues:0},readOnly:true,firestoreWrites:0,operationalWrites:0,hostingDeployExecutions:0,production:false,containsPII:null,containsSecrets:null};
+const report={schemaVersion:'orbit360-human-review-sanitized-screens-v3',generatedAt:new Date().toISOString(),ok:false,status:'INIT',classification:'SECURITY_FAILURE_RECOVERY',securityFailClosed:true,invalidatedPriorRun:30674070410,screens:[],sanitization:{maskedTextNodes:0,maskedFormValues:0,residualDynamicText:0,residualVisibleFormValues:0,hiddenInternalValuesIgnoredByScreenshotContract:0},readOnly:true,firestoreWrites:0,operationalWrites:0,hostingDeployExecutions:0,production:false,containsPII:null,containsSecrets:null};
 fs.rmSync(OUTDIR,{recursive:true,force:true});
 fs.mkdirSync(OUTDIR,{recursive:true});
 const save=()=>fs.writeFileSync(REPORT,JSON.stringify(report,null,2)+'\n');
@@ -22,7 +22,7 @@ const STATIC_LABELS=[
   'Orbit 360','Inicio','Clientes','Aseguradoras','Pólizas','Vehículos','Recibos y pagos','Cobros','Conciliaciones','Comisiones','Renovaciones','Cancelaciones','Calidad','Historial','Portal','Ops','Marketing','Academia','Dirección','Operativo','Asesor','Buscar','Filtros','Limpiar','Ver','Abrir','Cerrar','Volver','Volver al cliente','Abrir póliza completa',
   'Pólizas','Póliza','Cliente','Ramo / Producto','Ramo','Producto','Aseguradora','Asesor','Prima total','Vence','Estado','Vigencia','Moneda','Total','Resumen','Datos de la póliza','Prima y condiciones de pago','Prima neta','Gastos de expedición','Gastos financieros','Descuento / ajuste (campo fuente)','IVA / impuestos','Prima total de póliza','Total calendario de recibos','Frecuencia','Forma de pago','Conducto','Conducto de pago','Diferencia póliza vs calendario','Información pendiente de completar',
   'Vehículo','Vehículo asegurado','Detalle completo del vehículo','Póliza vinculada','Marca','Línea / tipo','Modelo / año','Placa','Inciso','Uso','Chasis / VIN','Motor','Color','Suma asegurada','Concepto','Descripción',
-  'Recibos y cartera','Recibo esperado','Recibo','Serie / recibo','Serie','Tipo','Calendario activo','Histórica exigible','Desglose del recibo','Fecha límite','Fecha pago reportada','Estado y conciliación','Trazabilidad','Fuente autoridad','Corte de fuente','Calidad de match','Referencia fuente','En cartera','Por vencer','Exigible','En cartera','Conciliada con aseguradora',
+  'Recibos y cartera','Recibo esperado','Recibo','Serie / recibo','Serie','Tipo','Calendario activo','Histórica exigible','Desglose del recibo','Fecha límite','Fecha pago reportada','Estado y conciliación','Trazabilidad','Fuente autoridad','Corte de fuente','Calidad de match','Referencia fuente','En cartera','Por vencer','Exigible','Conciliada con aseguradora',
   'Cartera conciliada con aseguradora','Cobro conciliado','Pago reportado · por conciliar','Pendiente de conciliación','Requiere validación','Futuro','Vencido','Por vencer','Sin saldo pendiente según aseguradora','No reportada','Pendiente de completar','Vigente','Por renovar','Histórica','Renovada','Cancelada','Validado','Validada','Pendiente','Activo','Activa','Inactivo','Inactiva',
   'Este pago ya fue conciliado contra fuentes autoritativas y se considera cobro conciliado.','El saldo pendiente fue conciliado contra la fuente de autoridad de la aseguradora. Esto confirma cartera; no equivale a un pago.','Existe evidencia de pago reportado, pero aún no es un cobro conciliado.','La aseguradora no reporta saldo pendiente; la ausencia de saldo no crea por sí sola un cobro conciliado.','El estado requiere validación antes de cualquier conciliación.','Este registro pertenece al calendario de recibos; los cobros conciliados se administran por separado.','Cartera conciliada confirma el saldo pendiente contra la aseguradora; no equivale a un pago. Un pago reportado solo se muestra como Cobro conciliado cuando su conciliación de fuentes está confirmada. Clic en un recibo abre su detalle.'
 ];
@@ -42,36 +42,32 @@ async function sanitizeFailClosed(page){
     const isMask=v=>/^•+$/.test(String(v||'').replace(/\s+/g,''));
     const isAllowed=v=>{const s=String(v==null?'':v).trim();return !s||isMask(s)||punctuationOnly(s)||allow.has(normalize(s));};
     const skip=node=>{const p=node.parentElement;return !p||/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE)$/.test(p.tagName);};
-    let maskedTextNodes=0,maskedFormValues=0;
-    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-    const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+    const visible=el=>{if(!el||el.type==='hidden')return false;const cs=getComputedStyle(el),box=el.getBoundingClientRect();return cs.display!=='none'&&cs.visibility!=='hidden'&&Number(cs.opacity||1)>0&&box.width>0&&box.height>0;};
+    let maskedTextNodes=0,maskedFormValues=0,hiddenInternalValuesIgnoredByScreenshotContract=0;
+    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
     nodes.forEach(node=>{if(skip(node))return;const raw=node.nodeValue||'';if(!raw.trim()||isAllowed(raw))return;node.nodeValue=raw.replace(/\S(?:[\s\S]*\S)?/,mask);maskedTextNodes++;});
-    document.querySelectorAll('input,textarea').forEach(el=>{const raw=String(el.value||'');if(raw&&!isAllowed(raw)){el.value=mask;maskedFormValues++;}if(el.placeholder&&!isAllowed(el.placeholder)){el.placeholder=mask;maskedFormValues++;}});
-    document.querySelectorAll('select option').forEach(el=>{const raw=String(el.textContent||'');if(raw&&!isAllowed(raw)){el.textContent=mask;maskedFormValues++;}});
+    document.querySelectorAll('input,textarea').forEach(el=>{if(!visible(el)){if(String(el.value||'').trim())hiddenInternalValuesIgnoredByScreenshotContract++;return;}const raw=String(el.value||'');if(raw&&!isAllowed(raw)){el.value=mask;maskedFormValues++;}if(el.placeholder&&!isAllowed(el.placeholder)){el.placeholder=mask;maskedFormValues++;}});
+    document.querySelectorAll('select').forEach(sel=>{Array.from(sel.options||[]).forEach(opt=>{const raw=String(opt.textContent||'');if(raw&&!isAllowed(raw)){opt.textContent=mask;maskedFormValues++;}if(String(opt.value||'').trim()&&!isAllowed(opt.value))hiddenInternalValuesIgnoredByScreenshotContract++;});});
     document.querySelectorAll('[title],[aria-label]').forEach(el=>{for(const attr of ['title','aria-label']){const raw=el.getAttribute(attr)||'';if(raw&&!isAllowed(raw)){el.setAttribute(attr,mask);maskedFormValues++;}}});
     document.querySelectorAll('img[alt]').forEach(el=>{const raw=el.getAttribute('alt')||'';if(raw&&!isAllowed(raw)){el.setAttribute('alt',mask);maskedFormValues++;}});
     const style=document.createElement('style');style.id='orbit-screenshot-sanitize';style.textContent='body{caret-color:transparent!important}';document.head.appendChild(style);
 
-    const residualText=[];const walker2=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);while(walker2.nextNode()){const node=walker2.currentNode;if(skip(node))continue;const raw=node.nodeValue||'';if(raw.trim()&&!isAllowed(raw))residualText.push(normalize(raw).slice(0,40));}
-    const residualForms=[];document.querySelectorAll('input,textarea,select option,[title],[aria-label],img[alt]').forEach(el=>{const vals=[];if('value'in el)vals.push(String(el.value||''));if(el.tagName==='OPTION')vals.push(String(el.textContent||''));for(const attr of ['placeholder','title','aria-label','alt'])if(el.hasAttribute&&el.hasAttribute(attr))vals.push(String(el.getAttribute(attr)||''));vals.forEach(v=>{if(v.trim()&&!isAllowed(v))residualForms.push(normalize(v).slice(0,40));});});
-    return{ok:residualText.length===0&&residualForms.length===0,maskedTextNodes,maskedFormValues,residualDynamicText:residualText.length,residualFormValues:residualForms.length};
+    const residualText=[];const walker2=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);while(walker2.nextNode()){const node=walker2.currentNode;if(skip(node))continue;const raw=node.nodeValue||'';if(raw.trim()&&!isAllowed(raw))residualText.push(1);}
+    const residualVisibleForms=[];
+    document.querySelectorAll('input,textarea').forEach(el=>{if(!visible(el))return;for(const raw of [String(el.value||''),String(el.placeholder||'')])if(raw.trim()&&!isAllowed(raw))residualVisibleForms.push(1);});
+    document.querySelectorAll('select').forEach(sel=>{if(!visible(sel))return;const opt=sel.options&&sel.selectedIndex>=0?sel.options[sel.selectedIndex]:null;const raw=opt?String(opt.textContent||''):'';if(raw.trim()&&!isAllowed(raw))residualVisibleForms.push(1);});
+    return{ok:residualText.length===0&&residualVisibleForms.length===0,maskedTextNodes,maskedFormValues,residualDynamicText:residualText.length,residualVisibleFormValues:residualVisibleForms.length,hiddenInternalValuesIgnoredByScreenshotContract};
   },{labels:STATIC_LABELS,mask:MASK});
   report.sanitization.maskedTextNodes+=result.maskedTextNodes;
   report.sanitization.maskedFormValues+=result.maskedFormValues;
   report.sanitization.residualDynamicText+=result.residualDynamicText;
-  report.sanitization.residualFormValues+=result.residualFormValues;
-  if(!result.ok)throw new Error('SANITIZATION_RESIDUAL_DYNAMIC_TEXT');
+  report.sanitization.residualVisibleFormValues+=result.residualVisibleFormValues;
+  report.sanitization.hiddenInternalValuesIgnoredByScreenshotContract+=result.hiddenInternalValuesIgnoredByScreenshotContract;
+  if(!result.ok)throw new Error('SANITIZATION_RESIDUAL_VISIBLE_CONTENT');
   return result;
 }
 
-async function shot(page,name){
-  const security=await sanitizeFailClosed(page);
-  if(!security.ok)throw new Error('SANITIZATION_NOT_OK');
-  const file=path.join(OUTDIR,name);
-  await page.screenshot({path:file,fullPage:true});
-  const st=fs.statSync(file);
-  report.screens.push({name,bytes:st.size,security:{residualDynamicText:0,residualFormValues:0}});
-}
+async function shot(page,name){const security=await sanitizeFailClosed(page);if(!security.ok)throw new Error('SANITIZATION_NOT_OK');const file=path.join(OUTDIR,name);await page.screenshot({path:file,fullPage:true});const st=fs.statSync(file);report.screens.push({name,bytes:st.size,security:{residualDynamicText:0,residualVisibleFormValues:0}});}
 
 let browser;
 try{
