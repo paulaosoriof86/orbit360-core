@@ -36,10 +36,10 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          jq -e '.schemaVersion=="orbit360-sanitized-visual-security-recovery-v2" and .classification=="SECURITY_FAILURE" and .invalidatedPriorVisualRun==30674070410 and .invalidatedPriorArtifact==8809808825 and .technicalHumanReviewRun==30673945126 and .technicalHumanReviewPassed==true and .sourceHostingRun==30670430241 and .sourceHostingDeployPassed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .production==false and .browserReadOnly==true and .screenshotsSanitizedFailClosed==true' "$TRIGGER" >/dev/null
+          jq -e '.schemaVersion=="orbit360-sanitized-visual-security-recovery-v3" and .classification=="SECURITY_FAILURE" and .invalidatedPriorVisualRun==30674070410 and .invalidatedPriorArtifact==8809808825 and .technicalHumanReviewRun==30673945126 and .technicalHumanReviewPassed==true and .sourceHostingRun==30670430241 and .sourceHostingDeployPassed==true and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .production==false and .browserReadOnly==true and .screenshotsSanitizedFailClosed==true and .visibleScreenshotSurfaceOnly==true' "$TRIGGER" >/dev/null
           node --check tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
-          grep -Fq "SANITIZATION_RESIDUAL_DYNAMIC_TEXT" tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
-          grep -Fq "fs.rmSync(OUTDIR" tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
+          grep -Fq "SANITIZATION_RESIDUAL_VISIBLE_CONTENT" tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
+          grep -Fq "residualVisibleFormValues" tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Preparar navegador
@@ -56,7 +56,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
-          jq -e '.schemaVersion=="orbit360-human-review-sanitized-screens-v2" and .ok==true and .status=="SANITIZED_VISUAL_SET_READY" and .securityFailClosed==true and .invalidatedPriorRun==30674070410 and (.screens|length)==6 and .sanitization.residualDynamicText==0 and .sanitization.residualFormValues==0 and .containsPII==false and .containsSecrets==false and .firestoreWrites==0 and .operationalWrites==0 and .hostingDeployExecutions==0 and .production==false' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null
+          jq -e '.schemaVersion=="orbit360-human-review-sanitized-screens-v3" and .ok==true and .status=="SANITIZED_VISUAL_SET_READY" and .securityFailClosed==true and .invalidatedPriorRun==30674070410 and (.screens|length)==6 and .sanitization.residualDynamicText==0 and .sanitization.residualVisibleFormValues==0 and .containsPII==false and .containsSecrets==false and .firestoreWrites==0 and .operationalWrites==0 and .hostingDeployExecutions==0 and .production==false' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null
           test "$(find "$EVIDENCE_DIR/human-review-sanitized-screens" -maxdepth 1 -name '*.png' | wc -l | tr -d ' ')" = '6'
       - name: Subir evidencia visual sanitizada válida
         if: success()
@@ -87,5 +87,5 @@ jobs:
         with:
           script: |
             const fs=require('fs');let state='failure',description='Sanitization security gate blocked';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='SANITIZED_VISUAL_SET_READY'&&p.securityFailClosed===true&&p.screens?.length===6&&p.sanitization?.residualDynamicText===0&&p.sanitization?.residualFormValues===0&&p.containsPII===false&&p.containsSecrets===false){state='success';description='Sanitized focal visual set secure';}else if(p.error){description=String(p.error).slice(0,100);}}catch(e){}
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='SANITIZED_VISUAL_SET_READY'&&p.securityFailClosed===true&&p.screens?.length===6&&p.sanitization?.residualDynamicText===0&&p.sanitization?.residualVisibleFormValues===0&&p.containsPII===false&&p.containsSecrets===false){state='success';description='Sanitized focal visual set secure';}else if(p.error){description=String(p.error).slice(0,100);}}catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/sanitized-visual-focal-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
