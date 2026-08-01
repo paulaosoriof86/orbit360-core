@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-linkage-readonly-request-v1",
+  "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
+  "contractVersion": "11.0.0",
+  "mode": "READ_ONLY_PLANILLAS_COMISIONES_LINKAGE",
+  "approved": true,
+  "sequence": 1,
+  "reason": "Cross the closed June commission source dry-run against LAB policies, expected receipts and reconciled cobros; produce sanitized linkage decisions with zero operational writes and no financial activation.",
+  "sourceCut": {
+    "filesReceived": 19,
+    "sourceBundles": 10,
+    "rowsObserved": 67,
+    "crmCandidates": 65,
+    "exactDateCandidates": 34,
+    "periodOnlyCandidates": 29,
+    "reversalCandidates": 2,
+    "omittedZeroCommission": 2,
+    "period": "2026-06"
+  },
+  "privatePackage": {
+    "driveFileId": "1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84",
+    "sha256": "4933506bbe02e56c9dd2ed5f180ed3d0ad293f73a952a2044378e3f02aeed496",
+    "logicalSha256": "45a3b6f1c801482c37f17270c5fbba59602cadc2319cf88e5485ffbd304b08f8"
+  },
+  "expectedBaseline": {
+    "polizas": 1373,
+    "recibosEsperados": 1294,
+    "cobros": 5,
+    "finmovs": 0
+  },
+  "expectedOutcome": {
+    "sourceCandidates": 65,
+    "writes": 0,
+    "financeActivated": false,
+    "fourCobrosResidualHoldsExcluded": true
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "sanitization": {
+    "includeIds": false,
+    "includePolicyNumbers": false,
+    "includeAmounts": false,
+    "includePII": false,
+    "includeSourceRows": false,
+    "includeSecrets": false,
+    "includeOnlyCountsBooleansDecisionsAndFieldNames": true
+  }
+}
