@@ -4,8 +4,17 @@
   "contractVersion": "11.0.0",
   "mode": "READ_ONLY_PLANILLAS_COMISIONES_LINKAGE",
   "approved": true,
-  "sequence": 2,
-  "reason": "Execute the registered canonical block11 gate and cross the closed June commission source dry-run against LAB policies, expected receipts and reconciled cobros; produce sanitized linkage decisions with zero operational writes and no financial activation.",
+  "sequence": 3,
+  "reason": "Repeat the same registered canonical block11 gate after correcting only the private package canonical logical hash from Python serialization to the required Node stable-sort contract; preserve the source rows, scope, permissions and zero-write boundary.",
+  "previousRun": {
+    "run": 30717963030,
+    "job": 91416756957,
+    "artifact": 8823933228,
+    "classification": "DATA_CONTRACT_FAILURE",
+    "failure": "PACKAGE_LOGICAL_SHA",
+    "firestoreRead": false,
+    "writes": 0
+  },
   "sourceCut": {
     "filesReceived": 19,
     "sourceBundles": 10,
@@ -19,8 +28,8 @@
   },
   "privatePackage": {
     "driveFileId": "1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84",
-    "sha256": "4933506bbe02e56c9dd2ed5f180ed3d0ad293f73a952a2044378e3f02aeed496",
-    "logicalSha256": "45a3b6f1c801482c37f17270c5fbba59602cadc2319cf88e5485ffbd304b08f8"
+    "sha256": "abf5975e5cf8821489437b3b6172153c54032c8f097b720c0a98b30555a62a82",
+    "logicalSha256": "a42b2eb6deee3c7b55da5747684ef7a3338bb0bfc8788bb3533d21c1eed84d74"
   },
   "expectedBaseline": {
     "polizas": 1373,
