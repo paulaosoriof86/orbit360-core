@@ -133,3 +133,11 @@ alinear el nombre contractual del control owner/validator
 ```
 
 Hasta completar ese diagnóstico no se presentan decisiones privadas ni se prepara un gate de escritura.
+
+## Corte documentado
+
+```text
+HEAD al registrar STOP_RETRY: d36a0214027d716cd5c59eba8b2264a8948c21b5
+último run ejecutado: 30708670724
+tercer run: prohibido
+```
