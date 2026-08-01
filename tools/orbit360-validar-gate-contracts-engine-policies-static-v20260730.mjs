@@ -8,72 +8,38 @@ const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/preflight
 const GATE='block7-policies-static-v20260730';
 const VERSION='7.0.1';
 const LIFECYCLE='tools/orbit360-validator-lifecycle-contract-policies-static-v20260730.json';
-const REQUEST='.github/orbit360-requests/policies-visual-readonly-lab-v20260801.json';
-const RESUME='.github/orbit360-resume/policies-visual-readonly-lab-env-resume-v20260801.json';
+const ROOT_CAUSE='tools/orbit360-policies-visual-country-projection-root-cause-v20260801.json';
+const REQUEST='.github/orbit360-diagnostics/policies-country-projection-readonly-v20260801.json';
 const EXPECTED_COLLECTIONS=['clientes','aseguradoras','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros'];
 const EXPECTED_BASELINE={clientes:430,aseguradoras:30,polizas:1373,vehiculos:1032,recibosEsperados:1294,carteraPrimas:673,cobros:5,finmovs:0,planillasComisiones:5,comisionesDevengadas:5,conciliacionesComisiones:5};
-const REQUIRED=[
-  LIFECYCLE,REQUEST,RESUME,
-  'tools/orbit360-m6-generate-product-runtime-config-v20260730.mjs',
-  'tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs',
-  'tools/orbit360-m6-build-product-shell-v20260730.mjs',
-  'tools/orbit360-browser-blocking-gate-readiness-v20260730.mjs',
-  'tools/orbit360-visible-technical-copy-predicate-v20260729.mjs',
-  'tools/orbit360-generate-policies-visual-runtime-config-v20260801.mjs',
-  'tools/orbit360-policies-visual-data-snapshot-readonly-v20260801.mjs',
-  'tools/orbit360-build-policies-visual-shell-v20260801.mjs',
-  'tools/orbit360-policies-visual-browser-smoke-v20260801.mjs',
-  'orbit360-platform/core/policies-visual-direction-role-overlay-v20260801.js',
-  'orbit360-platform/modules/polizas.js',
-  'orbit360-platform/modules/cliente360.js',
-  'orbit360-platform/modules/cobros.js',
-  'orbit360-platform/core/policy-receipts-engine.js',
-  'orbit360-platform/data/store-firestore-product-readonly-p0.js',
-  'firestore.product-readonly.rules',
-  'firebase.product-go-live.json'
-];
+const FAILED_BROWSER={clientes:414,aseguradoras:26,polizas:2,vehiculos:1,recibosEsperados:0,carteraPrimas:0,cobros:2};
+const REQUIRED=[LIFECYCLE,ROOT_CAUSE,REQUEST,'tools/orbit360-diagnosticar-policies-country-projection-readonly-v20260801.mjs','orbit360-platform/core/tenant-access-policy-contract-p0.js','orbit360-platform/core/tenant-access-policy-product-p0.js','orbit360-platform/data/store-firestore-product-readonly-p0.js','firestore.product-readonly.rules'];
 function read(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function save(payload){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(payload,null,2)+'\n','utf8');}
 function same(a,b){return JSON.stringify(a)===JSON.stringify(b);}
 const checks=[];const add=(id,ok)=>checks.push({id,ok:Boolean(ok)});
 try{
   add('GATE',process.argv[2]===GATE);
-  const missing=REQUIRED.filter(rel=>!fs.existsSync(path.join(ROOT,rel)));add('FILES',missing.length===0);
-  if(missing.length)throw new Error('PIPELINE_MECHANISM_FAILURE:FILES:'+missing.join(','));
-  const lifecycle=read(LIFECYCLE),request=read(REQUEST),resume=read(RESUME);
-  add('LIFECYCLE',lifecycle.gateId===GATE&&lifecycle.gateContractVersion===VERSION&&lifecycle.status==='POLICIES_VISUAL_READONLY_LAB_RESUME_AUTHORIZED');
-  add('PHASE',lifecycle.executionProfile?.phase==='M5_LAB_CORRECTIVE_DELIVERY_RUNTIME');
-  add('AUTHORIZATION',lifecycle.authorization?.approved===true&&lifecycle.authorization?.allowedExecutions===1&&lifecycle.authorization?.consumed===false);
-  add('REQUEST',request.schemaVersion==='orbit360-policies-visual-readonly-lab-request-v1'&&request.gateId===GATE&&request.contractVersion===VERSION&&request.approved===true&&request.consumed===false&&request.allowedExecutions===1);
-  add('RESUME',resume.schemaVersion==='orbit360-policies-visual-readonly-lab-resume-v1'&&resume.gateId===GATE&&resume.contractVersion===VERSION&&resume.approved===true&&resume.resumeSequence===2&&resume.sourceRun===30723519400&&resume.sourceJob===91431066978&&resume.sourceArtifact===8825594112);
-  add('ROOT_CAUSE',resume.classification==='ENVIRONMENT_FAILURE'&&resume.rootCause==='SECRET_NAME_BINDING_MISMATCH'&&resume.expectedSecretName==='ORBIT360_LAB_LOGIN_PASSWORD'&&resume.incorrectSecretName==='ORBIT360_EXISTING_LOGIN_PASSWORD');
-  add('PRE_RISK_PROOF',resume.canonicalPreflightPassed===15&&resume.canonicalPreflightFailed===0&&resume.secretsRead===false&&resume.firestoreRead===false&&resume.firestoreWrites===0&&resume.operationalWrites===0&&resume.previewCreated===false&&resume.browserExecuted===false&&resume.deployExecuted===false&&resume.productionTouched===false&&resume.authorizationConsumed===false&&resume.requestImmutable===true&&resume.sameAuthorizationResumeAllowedOnce===true);
-  add('LIFECYCLE_RESUME_MATCH',same(lifecycle.preRiskResume,resume.lifecycleProof));
-  add('BRANCH',request.branch==='ays/backend-tenant-lab-v99-20260703'&&request.pullRequest===5&&resume.branch===request.branch&&resume.pullRequest===5);
-  add('COLLECTIONS',same(request.scope?.collections,EXPECTED_COLLECTIONS)&&same(lifecycle.visualizationScope?.collections,EXPECTED_COLLECTIONS));
+  const missing=REQUIRED.filter(rel=>!fs.existsSync(path.join(ROOT,rel)));add('FILES',missing.length===0);if(missing.length)throw new Error('PIPELINE_MECHANISM_FAILURE:FILES:'+missing.join(','));
+  const lifecycle=read(LIFECYCLE),root=read(ROOT_CAUSE),request=read(REQUEST);
+  add('LIFECYCLE',lifecycle.gateId===GATE&&lifecycle.gateContractVersion===VERSION&&lifecycle.status==='POLICIES_COUNTRY_PROJECTION_DIAGNOSTIC_AUTHORIZED');
+  add('PHASE',lifecycle.executionProfile?.phase==='LAB_DATA_CONTRACT_REPAIR_DRYRUN');
+  add('CAPABILITIES',lifecycle.executionProfile?.capabilities?.secrets===true&&lifecycle.executionProfile?.capabilities?.firestoreRead===true&&lifecycle.executionProfile?.capabilities?.writes===false&&lifecycle.executionProfile?.capabilities?.runtime===false&&lifecycle.executionProfile?.capabilities?.browser===false&&lifecycle.executionProfile?.capabilities?.deploy===false&&lifecycle.executionProfile?.capabilities?.rulesDeploy===false&&lifecycle.executionProfile?.capabilities?.production===false);
+  add('AUTHORIZATION',lifecycle.authorization?.approved===true&&lifecycle.authorization?.diagnosticWithinAuthorizedReadOnlyScope===true&&lifecycle.authorization?.diagnosticExecutionsAllowed===1&&lifecycle.authorization?.diagnosticConsumed===false&&lifecycle.authorization?.additionalPreviewAuthorized===false);
+  add('ROOT_CAUSE',root.schemaVersion==='orbit360-policies-visual-country-projection-root-cause-v1'&&root.gateId===GATE&&root.classification==='DATA_CONTRACT_FAILURE'&&root.sourceRun===30723733270&&root.sourceJob===91431611947&&root.sourceArtifact===8825662341&&root.failureCode==='VISUAL_COUNTS_MISMATCH');
+  add('ROLLBACK_PROOF',root.executionSafety?.previewCreated===true&&root.executionSafety?.previewRolledBack===true&&root.executionSafety?.defaultHostingTouched===false&&root.executionSafety?.firestoreWrites===0&&root.executionSafety?.operationalWrites===0&&root.executionSafety?.productionTouched===false&&root.executionSafety?.humanApprovalRecorded===false);
+  add('REQUEST',request.schemaVersion==='orbit360-policies-country-projection-diagnostic-request-v1'&&request.gateId===GATE&&request.contractVersion===VERSION&&request.approved===true&&request.consumed===false&&request.allowedExecutions===1);
+  add('BRANCH',request.branch==='ays/backend-tenant-lab-v99-20260703'&&request.pullRequest===5);
+  add('COLLECTIONS',same(request.collections,EXPECTED_COLLECTIONS)&&same(lifecycle.diagnosticScope?.collections,EXPECTED_COLLECTIONS));
   add('BASELINE',same(request.expectedBaseline,EXPECTED_BASELINE)&&same(lifecycle.expectedBaseline,EXPECTED_BASELINE));
-  add('DIRECTION_ONLY',request.scope?.role==='Dirección'&&lifecycle.visualizationScope?.role==='Dirección'&&request.scope?.roleProjection==='session_only_no_membership_write');
-  add('HUMAN_APPROVAL_BARRIER',request.humanApproval?.clientes===true&&request.humanApproval?.polizas===false&&request.humanApproval?.vehiculos===false&&request.humanApproval?.recibos===false&&request.humanApproval?.cartera===false&&request.humanApproval?.restoCrm===false&&request.humanApproval?.automatedSmokeMaySetApproval===false);
-  add('NO_WRITES',request.capabilities?.writes===false&&request.capabilities?.firestoreRead===true&&request.capabilities?.browser===true&&request.capabilities?.deploy===true&&request.capabilities?.rulesDeploy===false&&request.capabilities?.functionsDeploy===false&&request.capabilities?.production===false);
-  add('PREVIEW_ONLY',request.delivery?.previewChannel==='orbit360-policies-review-20260801'&&request.delivery?.defaultHostingDeploy===false&&request.delivery?.rollbackPreviewOnFailure===true);
-  add('STATIC_HISTORY_PRESERVED',lifecycle.staticQualification?.closed===true&&lifecycle.staticQualification?.evidencePreserved===true&&lifecycle.staticQualification?.sourceReprofilingAllowed===false);
-  const rules=fs.readFileSync(path.join(ROOT,'firestore.product-readonly.rules'),'utf8');
-  add('RULES_READONLY',rules.includes("collection in ['clientes', 'aseguradoras', 'asesores', 'polizas', 'vehiculos', 'recibosEsperados', 'carteraPrimas', 'cobros']")&&rules.includes('allow create, update, delete: if false'));
+  add('FAILED_PROJECTION',same(request.failedBrowserProjection,FAILED_BROWSER)&&same(lifecycle.failedBrowserProjection,FAILED_BROWSER));
+  add('NO_INFERENCE',request.rules?.inferCountry===false&&request.rules?.writeCountry===false&&lifecycle.diagnosticScope?.inferCountry===false&&lifecycle.diagnosticScope?.writeCountry===false);
+  add('NO_VISUAL_CAPABILITIES',request.capabilities?.firestoreRead===true&&request.capabilities?.writes===false&&request.capabilities?.runtime===false&&request.capabilities?.browser===false&&request.capabilities?.deploy===false&&request.capabilities?.rulesDeploy===false&&request.capabilities?.production===false);
+  add('HUMAN_APPROVAL_BARRIER',lifecycle.humanApproval?.clientes===true&&lifecycle.humanApproval?.polizas===false&&lifecycle.humanApproval?.vehiculos===false&&lifecycle.humanApproval?.recibos===false&&lifecycle.humanApproval?.cartera===false&&lifecycle.humanApproval?.automatedDiagnosticMaySetApproval===false);
+  const productPolicy=fs.readFileSync(path.join(ROOT,'orbit360-platform/core/tenant-access-policy-product-p0.js'),'utf8');
+  const basePolicy=fs.readFileSync(path.join(ROOT,'orbit360-platform/core/tenant-access-policy-contract-p0.js'),'utf8');
+  add('QUERY_CONTRACT',productPolicy.includes("country: 'pais'")&&basePolicy.includes("field: 'country'")&&basePolicy.includes('m.countries.length === 1'));
   const failed=checks.filter(x=>!x.ok);
-  const out={
-    schemaVersion:'orbit360-policies-visual-readonly-lab-preflight-v2',gateId:GATE,contractVersion:VERSION,
-    executionPhase:'M5_LAB_CORRECTIVE_DELIVERY_RUNTIME',phase:'POLICIES_VISUAL_READONLY_LAB_RESUME',resumeSequence:2,sourcePreRiskFailedRun:30723519400,
-    status:failed.length?'VALIDATOR_STALE':'GO_GATE_CONTRACT',classification:failed.length?'PIPELINE_MECHANISM_FAILURE':'POLICIES_VISUAL_READONLY_LAB_RESUME_READY',
-    total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,
-    executionAuthorized:failed.length===0,allowedExecutions:failed.length?0:1,pipelineResumeAllowed:failed.length===0,hostingPreviewAuthorized:failed.length===0,runtimeAuthorized:failed.length===0,visualReviewAuthorized:failed.length===0,
-    role:'Dirección',collections:EXPECTED_COLLECTIONS,expectedBaseline:EXPECTED_BASELINE,
-    humanApproval:{clientes:true,polizas:false,vehiculos:false,recibos:false,cartera:false,restoCrm:false,automatedSmokeMaySetApproval:false},
-    capabilityProfile:lifecycle.executionProfile?.capabilities||{},previewOnly:true,defaultHostingDeploy:false,rollbackOnFailure:true,
-    authorizationConsumed:false,requestImmutable:true,secretBindingCorrectedTo:'ORBIT360_LAB_LOGIN_PASSWORD',
-    firestoreDataWrites:0,operationalWrites:0,dataAccess:false,secretAccess:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false
-  };
+  const out={schemaVersion:'orbit360-policies-country-projection-diagnostic-preflight-v1',gateId:GATE,contractVersion:VERSION,executionPhase:'LAB_DATA_CONTRACT_REPAIR_DRYRUN',phase:'POLICIES_COUNTRY_PROJECTION_READONLY_DIAGNOSTIC',status:failed.length?'VALIDATOR_STALE':'GO_GATE_CONTRACT',classification:failed.length?'PIPELINE_MECHANISM_FAILURE':'POLICIES_COUNTRY_PROJECTION_DIAGNOSTIC_READY',total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,executionAuthorized:failed.length===0,allowedExecutions:failed.length?0:1,firestoreReadAuthorized:failed.length===0,writeAuthorized:false,browserAuthorized:false,deployAuthorized:false,collections:EXPECTED_COLLECTIONS,expectedBaseline:EXPECTED_BASELINE,failedBrowserProjection:FAILED_BROWSER,humanApproval:{clientes:true,polizas:false,vehiculos:false,recibos:false,cartera:false,restoCrm:false,automatedDiagnosticMaySetApproval:false},countryInferenceAllowed:false,countryRepairAllowed:false,firestoreDataWrites:0,operationalWrites:0,dataAccess:false,secretAccess:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
   save(out);console.log(JSON.stringify(out,null,2));process.exit(failed.length?41:0);
-}catch(error){
-  const out={schemaVersion:'orbit360-policies-visual-readonly-lab-preflight-v2',gateId:GATE,contractVersion:VERSION,executionPhase:'M5_LAB_CORRECTIVE_DELIVERY_RUNTIME',phase:'POLICIES_VISUAL_READONLY_LAB_RESUME',resumeSequence:2,status:'VALIDATOR_STALE',classification:String(error&&error.message||error).split(':')[0]||'PIPELINE_MECHANISM_FAILURE',failed:Math.max(1,checks.filter(x=>!x.ok).length),failedCheckIds:checks.filter(x=>!x.ok).map(x=>x.id),error:String(error&&error.message||error).slice(0,600),executionAuthorized:false,pipelineResumeAllowed:false,hostingPreviewAuthorized:false,runtimeAuthorized:false,visualReviewAuthorized:false,authorizationConsumed:false,firestoreDataWrites:0,operationalWrites:0,dataAccess:false,secretAccess:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
-  save(out);console.log(JSON.stringify(out,null,2));process.exit(41);
-}
+}catch(error){const out={schemaVersion:'orbit360-policies-country-projection-diagnostic-preflight-v1',gateId:GATE,contractVersion:VERSION,executionPhase:'LAB_DATA_CONTRACT_REPAIR_DRYRUN',phase:'POLICIES_COUNTRY_PROJECTION_READONLY_DIAGNOSTIC',status:'VALIDATOR_STALE',classification:String(error&&error.message||error).split(':')[0]||'PIPELINE_MECHANISM_FAILURE',failed:Math.max(1,checks.filter(x=>!x.ok).length),failedCheckIds:checks.filter(x=>!x.ok).map(x=>x.id),error:String(error&&error.message||error).slice(0,600),executionAuthorized:false,firestoreReadAuthorized:false,writeAuthorized:false,browserAuthorized:false,deployAuthorized:false,countryInferenceAllowed:false,countryRepairAllowed:false,firestoreDataWrites:0,operationalWrites:0,dataAccess:false,secretAccess:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};save(out);console.log(JSON.stringify(out,null,2));process.exit(41);}
