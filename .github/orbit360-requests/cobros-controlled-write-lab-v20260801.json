@@ -8,7 +8,7 @@
   "projectId": "ays-orbit-360-lab",
   "authorizedBy": "Dirección / AdminTenant",
   "authorizedAt": "2026-08-01T11:40:00-06:00",
-  "authorizedHead": "a47f10d0863476f097e2b8822ed8d1eba35802f7",
+  "authorizedHead": "6e716fcd3f293a3e1a2af5495c7e27bb3a231e7a",
   "sourcePreflight": {
     "run": 30710608492,
     "artifact": 8821741047,
@@ -20,7 +20,7 @@
     "logicalSha256": "fccae1f73d254a0fca8e1a0208a92f4a9a601bc83c8f8e26cb027be165f354bb"
   },
   "recovery": {
-    "sequence": 3,
+    "sequence": 4,
     "firstFailedRun": 30711389436,
     "firstClassification": "DATA_CONTRACT_FAILURE_CANONICALIZATION",
     "secondFailedRun": 30711578397,
@@ -37,10 +37,17 @@
     "privatePackageDriveIdPreserved": true,
     "privatePackagePhysicalShaVerified": true,
     "privatePackageLogicalShaVerified": true,
-    "firestoreWritesDuringRepair": 0,
+    "readOnlyRevalidationRun": 30712109933,
+    "readOnlyRevalidationArtifact": 8822198624,
+    "readOnlyRevalidationBlockingCases": 0,
+    "readOnlyRevalidationAllFiveMatch": true,
+    "firestoreWritesDuringRepairAndRevalidation": 0,
     "operationalWritesRemaining": 0,
-    "writeFrozenPendingReadOnlyRevalidation": true,
-    "authorizationNotConsumed": true
+    "writeFrozenPendingReadOnlyRevalidation": false,
+    "sameGateFinalReopen": true,
+    "scopeExpanded": false,
+    "authorizationNotConsumed": true,
+    "finalExecutionAttempt": true
   },
   "scope": {
     "cases": 5,
