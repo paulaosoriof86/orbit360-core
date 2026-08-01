@@ -1,9 +1,11 @@
 {
-  "schemaVersion": "orbit360-sanitized-visual-security-recovery-v2",
+  "schemaVersion": "orbit360-sanitized-visual-security-recovery-v3",
   "classification": "SECURITY_FAILURE",
   "invalidatedPriorVisualRun": 30674070410,
   "invalidatedPriorArtifact": 8809808825,
   "priorArtifactApprovedForUse": false,
+  "blockedRecoveryRun": 30674318394,
+  "blockedRecoveryReason": "NON_VISIBLE_INTERNAL_FORM_VALUES_WERE_OVERCOUNTED",
   "technicalHumanReviewRun": 30673945126,
   "technicalHumanReviewPassed": true,
   "technicalHumanReviewArtifact": 8809768450,
@@ -18,14 +20,18 @@
   "production": false,
   "browserReadOnly": true,
   "screenshotsSanitizedFailClosed": true,
+  "visibleScreenshotSurfaceOnly": true,
   "securityRequirements": {
     "removePreviousOutputDirectoryBeforeCapture": true,
     "maskAllNonAllowlistedBodyText": true,
-    "maskFormAndAccessibilityValues": true,
+    "maskVisibleInputTextareaValues": true,
+    "maskVisibleSelectedOptionText": true,
+    "maskAccessibilityAndAltText": true,
     "residualDynamicTextMustEqual": 0,
-    "residualFormValuesMustEqual": 0,
+    "residualVisibleFormValuesMustEqual": 0,
+    "hiddenOptionIdsAreNotScreenshotContent": true,
     "uploadScreenshotsOnlyOnSuccess": true,
     "containsPIIMayBeFalseOnlyAfterResidualCheck": true
   },
-  "notes": "Replacement evidence only. Prior screenshot artifact is invalid and must not be used or shared. This recovery does not change product, Hosting, data or production."
+  "notes": "Replacement evidence only. Prior screenshot artifact remains invalid and must not be used or shared. Internal option values are not rendered screenshot content; all visible text and visible form content remain fail-closed."
 }
