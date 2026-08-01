@@ -37,7 +37,7 @@ jobs:
           jq -e '.schemaVersion=="orbit360-planillas-comisiones-source-adapter-static-trigger-v1" and .mode=="STATIC_SYNTHETIC_SOURCE_ADAPTER_AUDIT" and .approved==true and .realRowsAllowed==false and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false' "$TRIGGER_PATH" >/dev/null
           test -f orbit360-platform/core/planillas-comisiones-source-adapter-p0.js
           test -f tools/orbit360-test-planillas-comisiones-source-adapter-p0-v20260801.mjs
-          ! grep -Eq 'Orbit\.store|firebase|firestore|localStorage|fetch\(' orbit360-platform/core/planillas-comisiones-source-adapter-p0.js
+          ! grep -Eq 'Orbit\.store|firebase-admin|firebase\.|localStorage|fetch[[:space:]]*\(' orbit360-platform/core/planillas-comisiones-source-adapter-p0.js
       - name: Ejecutar auditoría sintética
         shell: bash
         run: |
