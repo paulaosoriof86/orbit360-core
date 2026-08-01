@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "orbit360-cobros-multievidencia-temporal-static-trigger-v1",
+  "approved": true,
+  "gateId": "block10.3-cobros-multievidencia-temporal-static-v20260801",
+  "contractVersion": "10.3.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "a950ed0b640ee7b517375498a93ec13d60594d14",
+  "registeredSourceCount": 10,
+  "rules": {
+    "requestFreshPlanillasOnlyWhenNeeded": true,
+    "requestFreshBankStatementsOnlyWhenNeeded": true,
+    "requestFreshFinancialFilesOnlyWhenNeeded": true,
+    "paymentAfterPortfolioSnapshotCutoffIsValid": true,
+    "absenceAloneCreatesCobro": false,
+    "commissionAloneCreatesCobro": false,
+    "doNotReRequestSameHash": true
+  },
+  "scope": {
+    "static": true,
+    "realPayloadsInRepo": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  }
+}
