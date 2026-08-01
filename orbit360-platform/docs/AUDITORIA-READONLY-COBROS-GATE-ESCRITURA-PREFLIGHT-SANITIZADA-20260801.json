@@ -2,12 +2,16 @@
   "schemaVersion": "orbit360-cobros-controlled-write-preflight-sanitized-v1",
   "tenantId": "alianzas-soluciones",
   "cutoff": "2026-08-01",
-  "status": "COBROS_CONTROLLED_WRITE_GATE_PREFLIGHT_PREPARED",
+  "status": "COBROS_CONTROLLED_WRITE_GATE_PREFLIGHT_PASS",
   "gate": {
     "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
     "contractVersion": "10.9.0",
     "phase": "PREPARED_STATIC",
-    "singleWriteGate": true
+    "singleWriteGate": true,
+    "run": 30710608492,
+    "artifact": 8821741047,
+    "digest": "sha256:6da1eb4d5fd39ce350ac31b4f9dd2a1ecb34b713346f14cc9d35f23a6e50ed00",
+    "canonicalContractPassed": true
   },
   "sourceGate": {
     "gateId": "block10.8-cobros-private-real-materialization-static-v20260801",
@@ -60,6 +64,14 @@
     "autoApply": false,
     "executionRequiresNewExplicitLabAuthorization": true,
     "failureRequiresRollbackOrHold": true
+  },
+  "rootCauseHistory": {
+    "firstRun": 30710503705,
+    "classification": "VALIDATOR_STALE",
+    "cause": "fixed-width allowed-list scan reached HARD_BLOCKED_COLLECTIONS",
+    "productChanged": false,
+    "ownerChanged": false,
+    "secondRunPassed": true
   },
   "writes": {
     "writeEligible": 0,
