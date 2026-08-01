@@ -31,10 +31,11 @@ try{
 
   const engine=read('engine'),bootstrap=read('bootstrap');
   [
-    "20260801.1-multi-evidence-temporal","'estado_cartera_aseguradora'","'planilla_comisiones'",
-    'CORROBORATED_COLLECTION','STILL_PENDING_AT_LATER_CUTOFF','CLEARED_OR_ADJUSTED_REQUIRES_VALIDATION',
-    'COMMISSION_RECOGNITION_REQUIRES_VALIDATION','postCutoffPaymentValid','allowPostCutoffPayment:true',
-    'absenceAloneCreatesCobro:false','commissionAloneCreatesCobro:false','bankRequestedOnlyForSpecificHold:true',
+    "20260801.2-multi-evidence-temporal-lineage","'estado_cartera_aseguradora'","'planilla_comisiones'",
+    'lineageKey','oneTemporalLineagePerCase:true','CORROBORATED_COLLECTION','STILL_PENDING_AT_LATER_CUTOFF',
+    'CLEARED_OR_ADJUSTED_REQUIRES_VALIDATION','COMMISSION_RECOGNITION_REQUIRES_VALIDATION',
+    'postCutoffPaymentValid','allowPostCutoffPayment:true','absenceAloneCreatesCobro:false',
+    'commissionAloneCreatesCobro:false','bankRequestedOnlyForSpecificHold:true',
     'cobrosWrites:0','finmovsWrites:0','firestoreWrites:0','operationalWrites:0'
   ].forEach(token=>check('ENGINE_'+token.slice(0,38),engine.includes(token)));
   check('ENGINE_NO_COBROS_WRITE',!/\.(?:insert|update|remove)\s*\(\s*['"]cobros['"]/.test(engine));
@@ -44,7 +45,10 @@ try{
   const run=spawnSync(process.execPath,[files.test],{cwd:ROOT,encoding:'utf8',maxBuffer:4*1024*1024});
   check('TEST_EXIT',run.status===0);
   if(run.status===0)testResult=JSON.parse(run.stdout);
+  else error=`test_exit_${run.status}:${String(run.stderr||run.stdout||'').slice(-1200)}`;
   check('TEST_STATUS',testResult&&testResult.status==='COBROS_TEMPORAL_MULTI_EVIDENCE_ENGINE_PASS');
+  check('TEST_VERSION',testResult&&testResult.version==='20260801.2-multi-evidence-temporal-lineage');
+  check('TEST_ONE_LINEAGE',testResult&&testResult.oneTemporalLineagePerCase===true&&testResult.cases===4);
   check('TEST_CORROBORATED',testResult&&testResult.corroborated===1);
   check('TEST_POST_CUTOFF',testResult&&testResult.postCutoffPayments===1);
   check('TEST_STILL_PENDING',testResult&&testResult.stillPending===2);
@@ -78,10 +82,11 @@ const payload={
   schemaVersion:'orbit360-cobros-multievidencia-temporal-static-v1',gateId:GATE_ID,contractVersion:VERSION,
   status:ready?'GO_GATE_CONTRACT':'HOLD_GATE_CONTRACT',
   domainStatus:ready?'COBROS_MULTIEVIDENCIA_TEMPORAL_STATIC_READY':'COBROS_MULTIEVIDENCIA_TEMPORAL_STATIC_BLOCKED',
-  classification:ready?'GO_STATIC_COBROS_MULTIEVIDENCIA_TEMPORAL':'DATA_CONTRACT_FAILURE',
+  classification:ready?'GO_STATIC_COBROS_MULTIEVIDENCIA_TEMPORAL':'FUNCTIONAL_DEFECT',
   total:checks.length,passed:checks.length-failed.length,failed:failed.length,
   failedCheckIds:failed.map(item=>item.id),checks,testResult,
-  registeredSources:10,postCutoffPaymentAllowed:true,absenceAloneCreatesCobro:false,commissionAloneCreatesCobro:false,
+  oneTemporalLineagePerCase:ready,registeredSources:10,postCutoffPaymentAllowed:true,
+  absenceAloneCreatesCobro:false,commissionAloneCreatesCobro:false,
   stalePlanillasUsed:false,staleBankStatementsUsed:false,staleFinancialFilesUsed:false,
   realRowsStoredInRepo:0,cobrosWrites:0,finmovsWrites:0,firestoreWrites:0,operationalWrites:0,
   secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,
