@@ -1,4 +1,4 @@
-name: Orbit 360 · Recibos/Cartera · continuación evidencia final
+name: Orbit 360 · Recibos/Cartera · evidencia final sanitizada v4
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
@@ -8,7 +8,7 @@ permissions:
   contents: read
   statuses: write
 concurrency:
-  group: orbit360-receipts-portfolio-final-evidence-continuation-v20260801
+  group: orbit360-receipts-portfolio-final-sanitized-evidence-v4
   cancel-in-progress: false
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
@@ -17,11 +17,12 @@ env:
   ORBIT360_POLICIES_BLOB: 46b197a77c162c88af498b5a89a759386a36e9e7
   ORBIT360_READMODEL_BLOB: 2dd34645d08b0836ebeaa369376364ac760a2f74
   ORBIT360_RECEIPTS_BLOB: bd2beaeded48d2ec2780f3830ca91f5e475fca20
+  ORBIT360_SANITIZER_BLOB: 903fcade8cbee7456c07d0a29022346893657d12
   TRIGGER: .github/orbit360-triggers/receipts-portfolio-visual-readonly-resume-v910-20260730.json
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 jobs:
-  evidence_continuation:
-    name: Evidencia final sanitizada · zero deploy/write
+  sanitized_evidence:
+    name: Evidencia sanitizada v4 · zero deploy/write
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -34,14 +35,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verificar lineage PASS y corregir solo VALIDATOR_STALE
+      - name: Verificar lineage cerrado y cero deploy
         env:
           ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          jq -e '.schemaVersion=="orbit360-receipts-portfolio-final-evidence-continuation-v1" and .classification=="VALIDATOR_STALE" and .sourceFinalHostingRun==30676303473 and .sourceFinalHostingDeployPassed==true and .sourceFinalRemoteParityPassed==true and .sourceFinalHydrationDiagnosticPassed==true and .sourceBrowserRecoveryRun==30676673787 and .sourceBrowserRecoveryArtifact==8810714415 and .sourceBrowserRecoveryDigest=="sha256:d2f2d04811da20cbb17f4bf6e713078697125f51395945e4cd4b0b447acce995" and .baseVisualPassed==true and .humanVisualPassed==true and .badgeBrowserPassed==true and .badgeHeight==21 and .badgeAlignSelf=="flex-start" and .badgeFlexGrow=="0" and .badgeFlexShrink=="0" and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .production==false and .browserReadOnly==true and .runOnlySanitizedVisualEvidence==true' "$TRIGGER" >/dev/null
+          jq -e '.schemaVersion=="orbit360-receipts-portfolio-final-sanitized-evidence-v4" and .classification=="PIPELINE_MECHANISM_FAILURE_ROLE_SELECTION" and .sourceFinalHostingRun==30676303473 and .sourceFinalHostingDeployPassed==true and .sourceBrowserRecoveryRun==30676673787 and .baseVisualPassed==true and .humanVisualPassed==true and .badgeBrowserPassed==true and .badgeHeight==21 and .sourceEvidenceContinuationRun==30676843740 and .sourceEvidenceFailure=="ROLE_SELECTION_FAILED" and .hostingDeploy==false and .rulesDeploy==false and .functionsDeploy==false and .storageDeploy==false and .dataWrites==false and .production==false and .browserReadOnly==true and .runOnlySanitizedVisualEvidence==true' "$TRIGGER" >/dev/null
           BASE="$(jq -r '.authorizedContinuationBase' "$TRIGGER")"
           test -n "$BASE"
           git merge-base --is-ancestor "$BASE" HEAD
@@ -50,7 +51,10 @@ jobs:
           test "$(git hash-object orbit360-platform/modules/polizas.js)" = "$ORBIT360_POLICIES_BLOB"
           test "$(git hash-object orbit360-platform/modules/policy-receipts-v1199-detail-guard.js)" = "$ORBIT360_READMODEL_BLOB"
           test "$(git hash-object orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js)" = "$ORBIT360_RECEIPTS_BLOB"
+          test "$(git hash-object tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs)" = "$ORBIT360_SANITIZER_BLOB"
           node --check tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
+          grep -Fq "role_ready" tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
+          grep -Fq "already-active" tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Confirmar assets publicados sin deploy
@@ -61,12 +65,12 @@ jobs:
           pass=0
           for f in "${files[@]}"; do
             local_sha="$(sha256sum "orbit360-platform/$f" | awk '{print $1}')"
-            tmp="${RUNNER_TEMP}/evidence-$(basename "$f")"
-            curl -fsSL --retry 3 "${ORBIT360_LAB_URL}/${f}?orbitEvidence=${GITHUB_SHA}" -o "$tmp"
+            tmp="${RUNNER_TEMP}/san-v4-$(basename "$f")"
+            curl -fsSL --retry 3 "${ORBIT360_LAB_URL}/${f}?orbitSanV4=${GITHUB_SHA}" -o "$tmp"
             test "$(sha256sum "$tmp" | awk '{print $1}')" = "$local_sha"
             pass=$((pass+1))
           done
-          jq -n --argjson pass "$pass" '{schemaVersion:"orbit360-final-evidence-asset-parity-v1",ok:($pass==3),passed:$pass,failed:(3-$pass),hostingDeployExecutions:0,firestoreWrites:0,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/final-evidence-asset-parity-v20260801.json"
+          jq -n --argjson pass "$pass" '{schemaVersion:"orbit360-final-sanitized-evidence-parity-v1",ok:($pass==3),passed:$pass,failed:(3-$pass),hostingDeployExecutions:0,firestoreWrites:0,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/final-sanitized-evidence-parity-v20260801.json"
           test "$pass" = '3'
       - name: Preparar navegador después del gate
         shell: bash
@@ -74,7 +78,7 @@ jobs:
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.52.0
           npx playwright install chromium
-      - name: Generar evidencia visual sanitizada fail-closed
+      - name: Generar seis capturas fail-closed
         env:
           ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
           ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
@@ -82,7 +86,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
-          jq -e '.schemaVersion=="orbit360-human-review-sanitized-screens-v3" and .ok==true and .status=="SANITIZED_VISUAL_SET_READY" and .securityFailClosed==true and (.screens|length)==6 and .sanitization.residualDynamicText==0 and .sanitization.residualVisibleFormValues==0 and .containsPII==false and .containsSecrets==false and .firestoreWrites==0 and .operationalWrites==0 and .hostingDeployExecutions==0 and .production==false' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null
+          jq -e '.schemaVersion=="orbit360-human-review-sanitized-screens-v4" and .ok==true and .status=="SANITIZED_VISUAL_SET_READY" and .securityFailClosed==true and .roleSelection.confirmed==true and .roleSelection.target=="Dirección" and (.screens|length)==6 and .sanitization.residualDynamicText==0 and .sanitization.residualVisibleFormValues==0 and .containsPII==false and .containsSecrets==false and .firestoreWrites==0 and .operationalWrites==0 and .hostingDeployExecutions==0 and .production==false' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null
           test "$(find "$EVIDENCE_DIR/human-review-sanitized-screens" -maxdepth 1 -name '*.png' | wc -l | tr -d ' ')" = '6'
       - name: Cerrar Recibos/Cartera
         if: always()
@@ -90,9 +94,9 @@ jobs:
         run: |
           set +e
           PARITY=false; VISUAL=false
-          jq -e '.ok==true and .passed==3' "$EVIDENCE_DIR/final-evidence-asset-parity-v20260801.json" >/dev/null 2>&1 && PARITY=true
-          jq -e '.ok==true and .status=="SANITIZED_VISUAL_SET_READY" and .containsPII==false and .containsSecrets==false' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null 2>&1 && VISUAL=true
-          jq -n --argjson parity "$PARITY" --argjson visual "$VISUAL" '{schemaVersion:"orbit360-receipts-portfolio-final-visual-closure-v2",ok:($parity and $visual),status:(if ($parity and $visual) then "RECEIPTS_PORTFOLIO_FINAL_VISUAL_CLOSURE_PASS" else "RECEIPTS_PORTFOLIO_FINAL_VISUAL_CLOSURE_FAIL" end),sourceHostingRun:30676303473,sourceBrowserRecoveryRun:30676673787,sourceHostingDeployPassed:true,sourceRemoteParityPassed:true,sourceHydrationPassed:true,baseVisual:true,humanVisual:true,receiptHeroBadgeCompact:true,finalAssetParity:$parity,sanitizedVisualEvidence:$visual,hostingDeployExecutions:0,rulesDeployExecutions:0,functionsDeploy:false,storageDeploy:false,firestoreDataWrites:0,operationalWrites:0,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/receipts-portfolio-final-visual-closure-v20260801.json"
+          jq -e '.ok==true and .passed==3' "$EVIDENCE_DIR/final-sanitized-evidence-parity-v20260801.json" >/dev/null 2>&1 && PARITY=true
+          jq -e '.ok==true and .status=="SANITIZED_VISUAL_SET_READY" and .containsPII==false and .containsSecrets==false and .roleSelection.confirmed==true' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null 2>&1 && VISUAL=true
+          jq -n --argjson parity "$PARITY" --argjson visual "$VISUAL" '{schemaVersion:"orbit360-receipts-portfolio-final-visual-closure-v3",ok:($parity and $visual),status:(if ($parity and $visual) then "RECEIPTS_PORTFOLIO_FINAL_VISUAL_CLOSURE_PASS" else "RECEIPTS_PORTFOLIO_FINAL_VISUAL_CLOSURE_FAIL" end),sourceHostingRun:30676303473,sourceBrowserRecoveryRun:30676673787,sourceSanitizerRecoveryRun:30676843740,sourceHostingDeployPassed:true,sourceRemoteParityPassed:true,sourceHydrationPassed:true,baseVisual:true,humanVisual:true,receiptHeroBadgeCompact:true,finalAssetParity:$parity,sanitizedVisualEvidence:$visual,hostingDeployExecutions:0,rulesDeployExecutions:0,functionsDeploy:false,storageDeploy:false,firestoreDataWrites:0,operationalWrites:0,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/receipts-portfolio-final-visual-closure-v20260801.json"
       - name: Subir evidencia final
         if: always()
         uses: actions/upload-artifact@v4
@@ -100,7 +104,7 @@ jobs:
           name: orbit360-receipts-portfolio-final-visual-closure-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/final-evidence-asset-parity-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/final-sanitized-evidence-parity-v20260801.json
             orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens-v20260731.json
             orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens/*.png
             orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-final-visual-closure-v20260801.json
