@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "orbit360-policies-country-projection-diagnostic-request-v1",
+  "gateId": "block7-policies-static-v20260730",
+  "contractVersion": "7.0.1",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "classification": "DATA_CONTRACT_FAILURE",
+  "sourceRun": 30723733270,
+  "sourceJob": 91431611947,
+  "sourceArtifact": 8825662341,
+  "collections": [
+    "clientes",
+    "aseguradoras",
+    "polizas",
+    "vehiculos",
+    "recibosEsperados",
+    "carteraPrimas",
+    "cobros"
+  ],
+  "expectedBaseline": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "finmovs": 0,
+    "planillasComisiones": 5,
+    "comisionesDevengadas": 5,
+    "conciliacionesComisiones": 5
+  },
+  "failedBrowserProjection": {
+    "clientes": 414,
+    "aseguradoras": 26,
+    "polizas": 2,
+    "vehiculos": 1,
+    "recibosEsperados": 0,
+    "carteraPrimas": 0,
+    "cobros": 2
+  },
+  "rules": {
+    "measurePais": true,
+    "measureCountry": true,
+    "measureExactRelationships": true,
+    "inferCountry": false,
+    "writeCountry": false,
+    "humanApproval": false
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  }
+}
