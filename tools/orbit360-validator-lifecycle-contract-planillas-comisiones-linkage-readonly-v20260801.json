@@ -3,9 +3,9 @@
   "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
   "gateContractVersion": "11.0.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "PLANILLAS_POLICY_IDENTITY_DIAGNOSTIC_ACTIVE",
+  "status": "PLANILLAS_RECEIPT_LINK_DIAGNOSTIC_ACTIVE",
   "executionProfile": {
-    "mode": "READ_ONLY_PLANILLAS_POLICY_IDENTITY_DIAGNOSTIC",
+    "mode": "READ_ONLY_PLANILLAS_RECEIPT_LINK_DIAGNOSTIC",
     "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
       "secrets": true,
@@ -25,27 +25,25 @@
   "sourceRowsObserved": 67,
   "crmCandidateRows": 65,
   "sourceRowsOmitted": 2,
-  "previousLinkage": {
-    "run": 30718081323,
-    "policyUnique": 10,
-    "policyMissing": 29,
-    "policyAmbiguous": 26,
-    "policyIdentityHolds": 55
-  },
-  "rootCauseDiagnostic": {
-    "classification": "VALIDATOR_STALE",
-    "exactFirstShortCircuitStale": true,
-    "insurerAliasExpansionRequired": true,
-    "receiptCalendarEvidenceRequired": true,
-    "paymentDateTermSelectionAllowed": false,
-    "sourceRowsChanged": false
-  },
-  "expectedDiagnostic": {
-    "processed": 65,
+  "policyIdentityDiagnostic": {
+    "run": 30719208561,
     "resolved": 49,
     "holds": 16,
     "previousHoldsResolved": 39,
-    "previousUniqueReclassified": 1
+    "classification": "VALIDATOR_STALE_ROOT_FIXED"
+  },
+  "receiptResolverStatic": {
+    "run": 30719316572,
+    "checks": 14,
+    "fixtures": 6,
+    "status": "STATIC_RECEIPT_LINK_RESOLVER_PASS"
+  },
+  "expectedReceiptDiagnostic": {
+    "processed": 49,
+    "resolved": 5,
+    "holds": 44,
+    "excludedPolicyHolds": 16,
+    "existingCobroLinked": 0
   },
   "financeActivated": false,
   "writeAuthorized": false,
@@ -70,8 +68,8 @@
     "privateSourceOutsideRepository": true,
     "sanitizedEvidenceOnly": true,
     "containsRealRowsInContract": false,
-    "noDateInference": true,
-    "strongIdentityDedupeOnly": true,
+    "noPaymentDateReceiptSelection": true,
+    "strongReferenceBeforeAmount": true,
     "fourCobrosResidualHoldsExcluded": true
   }
 }
