@@ -2,9 +2,10 @@
   "schemaVersion": "orbit360-planillas-comisiones-commission-dryrun-planner-static-request-v1",
   "approved": true,
   "syntheticOnly": true,
-  "reason": "Validate the canonical three-destination commission dry-run contract before reading the five live policy-receipt relations.",
+  "sequence": 2,
+  "reason": "Validate the canonical three-destination commission dry-run contract after correcting only the stale expected check count from 33 to 32.",
   "expected": {
-    "checks": 33,
+    "checks": 32,
     "fixtures": 6,
     "destinations": 3,
     "realRowsUsed": 0,
