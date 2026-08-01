@@ -49,7 +49,14 @@ try{
   check('TEST_CONTROLS',testResult?.duplicateRefs===0&&testResult?.duplicateIdempotencyKeys===0&&testResult?.authorizationGranted===0&&testResult?.writeEligible===0);
   check('TEST_ZERO_WRITES',testResult?.cobrosWrites===0&&testResult?.finmovsWrites===0&&testResult?.firestoreWrites===0&&testResult?.operationalWrites===0);
   const audit=JSON.parse(read('audit'));
-  check('AUDIT_STATUS',audit.status==='PRIVATE_AUTHORIZATION_MATERIALIZATION_CONTRACT_READY');
+  const acceptedAuditStatuses=new Set([
+    'PRIVATE_AUTHORIZATION_MATERIALIZATION_CONTRACT_READY',
+    'PRIVATE_AUTHORIZATION_MATERIALIZATION_STATIC_READY'
+  ]);
+  const finalAuditMetadataOk=audit.status!=='PRIVATE_AUTHORIZATION_MATERIALIZATION_STATIC_READY'||(
+    audit.gate?.gateId===GATE_ID&&audit.gate?.run===30706859578&&audit.gate?.checks==='46/46 PASS'
+  );
+  check('AUDIT_STATUS',acceptedAuditStatuses.has(audit.status)&&finalAuditMetadataOk);
   check('AUDIT_SOURCE',audit.sourcePackage.gateId==='block10.6-cobros-authorization-package-static-v20260801'&&audit.sourcePackage.cards===5);
   check('AUDIT_COUNTS',audit.materializationContract.privateCards===5&&audit.materializationContract.direct===4&&audit.materializationContract.historical===1);
   check('AUDIT_PRIVACY',audit.materializationContract.privateCardsEnumerable===false&&audit.materializationContract.serializedAuditContainsPrivateValues===false&&audit.privateRuntimeInput.storedInRepo===false&&audit.privateRuntimeInput.storedInArtifact===false);
