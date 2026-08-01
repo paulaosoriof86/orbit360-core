@@ -3,14 +3,14 @@
   "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
   "gateContractVersion": "11.0.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "PLANILLAS_COMMISSION_CONTROLLED_WRITE_AUTHORIZED",
+  "status": "PLANILLAS_COMMISSION_CONTROLLED_WRITE_CLOSED",
   "executionProfile": {
-    "mode": "CONTROLLED_WRITE_PLANILLAS_COMMISSION",
-    "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
+    "mode": "CONTROLLED_WRITE_PLANILLAS_COMMISSION_CLOSED",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
       "secrets": true,
       "firestoreRead": true,
-      "writes": true,
+      "writes": false,
       "runtime": false,
       "browser": false,
       "deploy": false,
@@ -25,7 +25,8 @@
     "authorizationRef": "planillas-comisiones-five-relations-write-20260801",
     "scope": "FIVE_COMMISSION_CANDIDATES_FIFTEEN_DOCUMENTS_ONLY",
     "explicit": true,
-    "consumed": false
+    "consumed": true,
+    "consumedByRun": 30722653179
   },
   "sourceDryrunClosed": true,
   "sourceFiles": 19,
@@ -57,25 +58,38 @@
     "job": 91422311027,
     "artifact": 8824579757,
     "digest": "sha256:97439efee94ddf7b0ff438da4f89e9fae5463c68d8a4ec19ec768d13bf9c201e",
-    "head": "e76f2cfb179468edbd8fe22b970d2010b64b8984",
     "exactPolicyReceiptRelations": 5,
     "commissionCandidates": 5,
     "proposedDocuments": 15,
-    "proposedPlanillasComisiones": 5,
-    "proposedComisionesDevengadas": 5,
-    "proposedConciliacionesComisiones": 5,
     "sellerReadyOrNotApplicable": 2,
     "sellerHolds": 3,
-    "idempotentOmits": 0,
-    "partialDestinationHolds": 0,
-    "contractHolds": 0,
     "candidateSetDigest": "04c7da071ddadfe689e0137e730448ada36abe7aff6c228cd5abb0206c26c680",
     "targetSnapshotDigest": "12b3763f976433e1e7e809f461dc835bca3a4c39b1d6dd1655e42a202e6cbf3f",
-    "targetSnapshot": {
+    "closed": true
+  },
+  "controlledWrite": {
+    "run": 30722653179,
+    "job": 91428836213,
+    "artifact": 8825344683,
+    "artifactDigest": "sha256:79b10118552daca5056d9408cf14243095bc3b817fd2f7ee5f7117bfd31b1260",
+    "head": "335e2f4c7a714832e6e54aadc7c6cb44ae87f373",
+    "status": "WRITE_PASS",
+    "classification": "GO_LAB_PLANILLAS_COMMISSION_CONTROLLED_WRITE",
+    "atomicCommit": true,
+    "createdDocuments": 15,
+    "verifiedDocuments": 15,
+    "rollbackExecuted": false,
+    "targetBefore": {
       "planillasComisiones": 0,
       "comisionesDevengadas": 0,
       "conciliacionesComisiones": 0
     },
+    "targetAfter": {
+      "planillasComisiones": 5,
+      "comisionesDevengadas": 5,
+      "conciliacionesComisiones": 5
+    },
+    "baselineBeforeAfterEqual": true,
     "closed": true
   },
   "sellerHoldLedger": {
@@ -95,8 +109,8 @@
     "requiresSeparateHumanVisualization": true
   },
   "financeActivated": false,
-  "writeAuthorized": true,
-  "commissionWritesAuthorized": true,
+  "writeAuthorized": false,
+  "commissionWritesAuthorized": false,
   "finmovWritesAuthorized": false,
   "cxcWritesAuthorized": false,
   "cxpWritesAuthorized": false,
@@ -104,18 +118,18 @@
   "policyWritesAuthorized": false,
   "receiptWritesAuthorized": false,
   "cobroWritesAuthorized": false,
-  "operationalWritesAllowed": 15,
-  "additionalReadOnlyExecutionAuthorized": false,
+  "operationalWritesAllowed": 0,
   "privatePackage": {
     "driveFileId": "1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84",
     "sha256": "abf5975e5cf8821489437b3b6172153c54032c8f097b720c0a98b30555a62a82",
     "logicalSha256": "a42b2eb6deee3c7b55da5747684ef7a3338bb0bfc8788bb3533d21c1eed84d74"
   },
-  "expectedBaseline": {
+  "baseline": {
     "polizas": 1373,
     "recibosEsperados": 1294,
     "cobros": 5,
-    "finmovs": 0
+    "finmovs": 0,
+    "unchangedByCommissionWrite": true
   },
   "security": {
     "privateSourceOutsideRepository": true,
@@ -124,25 +138,22 @@
     "noPaymentDatePolicyOrReceiptSelection": true,
     "strongReferenceBeforeAmount": true,
     "fourCobrosResidualHoldsExcluded": true,
+    "requestSemanticallyConsumed": true,
     "requestReplayBlocked": true,
-    "singleAtomicTransactionRequired": true,
+    "singleAtomicTransactionUsed": true,
     "exactRollbackDocuments": 15,
     "genericComisionesUntouched": true,
-    "visualApprovalBoundaryPreserved": true
+    "visualApprovalBoundaryPreserved": true,
+    "deployExecuted": false,
+    "productionTouched": false
   },
-  "writeGateCondition": {
-    "scope": "FIVE_COMMISSION_CANDIDATES_FIFTEEN_DOCUMENTS_ONLY",
-    "candidateSetDigestMustMatch": "04c7da071ddadfe689e0137e730448ada36abe7aff6c228cd5abb0206c26c680",
-    "targetSnapshotDigestMustMatch": "12b3763f976433e1e7e809f461dc835bca3a4c39b1d6dd1655e42a202e6cbf3f",
-    "targetCountsMustBeZeroBeforeFirstWrite": true,
-    "requiresAtomicBatch": true,
-    "requiresIdempotency": true,
-    "requiresPostVerification": true,
-    "requiresRollbackOfExactDocuments": 15,
-    "sellerLiquidationMustRemainBlocked": true,
-    "genericComisionesMustRemainUntouched": true,
-    "financeMustRemainInactive": true,
-    "deployMustRemainBlocked": true,
-    "productionMustRemainBlocked": true
+  "nextGateCondition": {
+    "commissionWriteClosed": true,
+    "additionalCommissionWriteRequiresNewAuthorization": true,
+    "sellerLiquidationsRemainBlocked": 3,
+    "invoicesCxcCxpRemainInactive": true,
+    "financeRemainsInactive": true,
+    "policiesAndOtherCrmRequireHumanVisualization": true,
+    "noAutomaticAdvanceToNextCrmModule": true
   }
 }
