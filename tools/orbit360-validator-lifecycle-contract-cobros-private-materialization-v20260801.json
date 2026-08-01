@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block10.7-cobros-private-materialization-static-v20260801",
+  "gateContractVersion": "10.7.0",
+  "owner": "cobros-private-authorization-materializer-p0",
+  "status": "REGISTERED",
+  "classification": "REPLICABLE_CLAUDE_ACUMULADO",
+  "executionProfile": {
+    "mode": "STATIC_ONLY",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "firestoreWrite": false,
+      "browser": false,
+      "hostingDeploy": false,
+      "rulesDeploy": false,
+      "functionsDeploy": false,
+      "storageDeploy": false,
+      "production": false
+    }
+  },
+  "writeAuthorized": false,
+  "expected": {
+    "cards": 5,
+    "direct": 4,
+    "historical": 1,
+    "duplicateRefs": 0,
+    "duplicateIdempotencyKeys": 0,
+    "authorizationGranted": 0,
+    "writeEligible": 0,
+    "remainingPrivateCardsAfterDisposal": 0
+  },
+  "protectedContracts": {
+    "ephemeralSessionRequired": true,
+    "persistAllowed": false,
+    "privateCardsEnumerable": false,
+    "serializedAuditContainsPrivateValues": false,
+    "sourceProofsMinimumPerCard": 2,
+    "packageGrantsAuthorization": false,
+    "disposalRequired": true,
+    "reactivatesPolicy": false,
+    "createsFinmov": false
+  }
+}
