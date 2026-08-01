@@ -4,7 +4,7 @@
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "contractVersion": "10.9.0",
   "branch": "ays/backend-tenant-lab-v99-20260703",
-  "authorizedHead": "b2b6bb6f476d05c98a3bc71f75084782b0fa6f57",
+  "authorizedHead": "816b680230f41fe765d5d972067857afbe193a11",
   "scope": {
     "staticPreflight": true,
     "executionAuthorized": false,
@@ -15,5 +15,16 @@
     "production": false
   },
   "createdAt": "2026-08-01T11:30:00-06:00",
-  "reason": "Prepare the single LAB write gate for four direct Cobros cases and one separately approved historical case. Validate snapshots, idempotency, atomic groups and rollback without executing writes."
+  "retry": {
+    "attempt": 2,
+    "failedRun": 30710503705,
+    "classification": "VALIDATOR_STALE",
+    "failedCheck": "GENERIC_WRITER_NO_COBROS_ALLOWED",
+    "cause": "fixed-width scan reached HARD_BLOCKED_COLLECTIONS",
+    "correctedLayer": "tools/orbit360-validar-cobros-controlled-write-preflight-static-v20260801.mjs",
+    "productChanged": false,
+    "ownerChanged": false,
+    "writesExecuted": false
+  },
+  "reason": "Second and final static preflight after replacing the fixed-width scan with exact parsing of ALLOWED_COLLECTIONS and HARD_BLOCKED_COLLECTIONS."
 }
