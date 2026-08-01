@@ -5,7 +5,7 @@ Bloque: Cobros/Conciliación 10.8
 
 ## Objetivo de aprendizaje
 
-Diferenciar cuatro estados que no pueden confundirse:
+Diferenciar estados que no pueden confundirse:
 
 ```text
 evidencia disponible
@@ -51,6 +51,28 @@ Puede consultar el estado relacionado con sus clientes, pero no puede:
 
 Cuando detecte una inconsistencia debe crear una gestión de corrección.
 
+## Defecto funcional vs. validador obsoleto
+
+El gate 10.8 enseñó una diferencia crítica:
+
+- `FUNCTIONAL_DEFECT`: el producto incumple el comportamiento esperado;
+- `VALIDATOR_STALE`: el producto cumple, pero el validador busca un nombre o estado antiguo.
+
+En este caso, el owner usaba correctamente `reactivatePolicy=false`, mientras el validador esperaba el token literal plural `reactivatesPolicy:false`.
+
+La recuperación correcta fue:
+
+```text
+congelar producto
+→ corregir contrato del validador
+→ ejecutar validador fuera del workflow
+→ demostrar 64/64 PASS
+→ sincronizar lifecycle, workflow, registro y documentación
+→ reabrir el mismo gate
+```
+
+Nunca debe corregirse el producto solo para satisfacer un token textual obsoleto.
+
 ## Escenario aplicado
 
 Un reporte del CRM y uno de aseguradora coinciden en póliza, cuota o endoso, moneda y monto dentro de la tolerancia aprobada.
@@ -66,7 +88,8 @@ Un reporte del CRM y uno de aseguradora coinciden en póliza, cuota o endoso, mo
 - volver a pedir fuentes ya registradas sin comprobar disponibilidad;
 - usar la planilla de comisiones como cobro automático;
 - crear un `finmov` a partir de un recaudo;
-- reactivar una póliza vencida al recibir un pago.
+- reactivar una póliza vencida al recibir un pago;
+- ejecutar repetidamente un gate sin corregir primero su contrato.
 
 ## Evidencia que queda
 
@@ -78,6 +101,7 @@ Solo se conserva:
 - controles de autorización;
 - conteos agregados;
 - confirmación de destrucción;
+- evidencia directa 64/64;
 - cero escrituras.
 
 No se conservan valores privados en el repositorio ni en el artifact.
