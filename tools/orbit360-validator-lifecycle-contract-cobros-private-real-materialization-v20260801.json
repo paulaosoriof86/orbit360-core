@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block10.8-cobros-private-real-materialization-static-v20260801",
+  "gateContractVersion": "10.8.0",
+  "owner": "cobros-private-authorization-materializer-p0",
+  "ownerVersion": "20260801.1-private-readonly-materializer",
+  "status": "REGISTERED",
+  "classification": "SECRETO_DATO_REAL",
+  "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
+  "executionProfile": {
+    "mode": "STATIC_ATTESTATION_ONLY",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "firestoreWrite": false,
+      "browser": false,
+      "hostingDeploy": false,
+      "rulesDeploy": false,
+      "functionsDeploy": false,
+      "storageDeploy": false,
+      "production": false
+    }
+  },
+  "writeAuthorized": false,
+  "expected": {
+    "cardCount": 5,
+    "direct": 4,
+    "historical": 1,
+    "sourceProofsPerCardMinimum": 2,
+    "registeredHashesVerified": 3,
+    "duplicateAuthorizationRefs": 0,
+    "duplicateIdempotencyKeys": 0,
+    "authorizationGranted": 0,
+    "writeEligible": 0,
+    "remainingPrivateCardsAfterDisposal": 0,
+    "remainingPrivateInputsAfterDisposal": 0
+  },
+  "protectedContracts": {
+    "realMaterializationPerformed": true,
+    "ephemeralSessionRequired": true,
+    "persistAllowed": false,
+    "privateCardsEnumerable": false,
+    "serializedAuditContainsPrivateValues": false,
+    "ownerPrivateCardsDisposed": true,
+    "callerPrivateInputDisposed": true,
+    "packageGrantsAuthorization": false,
+    "historicalCardLast": true,
+    "historicalRequiresReinforcedAuthorization": true,
+    "reactivatesPolicy": false,
+    "createsFinmov": false,
+    "autoApply": false
+  }
+}
