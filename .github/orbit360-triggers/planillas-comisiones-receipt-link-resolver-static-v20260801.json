@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-receipt-link-resolver-static-request-v1",
+  "approved": true,
+  "syntheticOnly": true,
+  "reason": "Validate the reusable receipt-link resolver before the live read-only receipt diagnostic for the 49 resolved policy identities.",
+  "expected": {
+    "checks": 14,
+    "fixtures": 6,
+    "realRowsUsed": 0,
+    "writes": 0
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  }
+}
