@@ -1,20 +1,23 @@
 {
-  "schemaVersion": "orbit360-human-review-integrated-hosting-authorization-v1",
+  "schemaVersion": "orbit360-human-review-integrated-hosting-authorization-v2",
   "approved": true,
-  "phrase": "AUTORIZO HOSTING LAB CORRECCION INTEGRAL REVISION HUMANA POLIZAS VEHICULOS RECIBOS 20260731",
-  "authorizedHead": "95f516876ffba61ff66b5ea3733448721c5ed4e3",
+  "phrase": "AUTORIZO 1 HOSTING LAB FINAL RECIBOS CARTERA BADGE 20260801",
+  "authorizedHead": "661027b16cb65613906b356afc47a5166e617a94",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "policiesBlob": "46b197a77c162c88af498b5a89a759386a36e9e7",
   "readModelBlob": "2dd34645d08b0836ebeaa369376364ac760a2f74",
-  "receiptsProjectionBlob": "e70d9fca334f1938eb84ec94f88d9cce7236d509",
-  "staticRun": 30669391345,
-  "staticArtifact": 8808188706,
-  "staticDigest": "sha256:7eac3a5e2ddfcd9fa47673b475811033eaf05ba83f27f72e61ed6474b11dda3d",
+  "receiptsProjectionBlob": "bd2beaeded48d2ec2780f3830ca91f5e475fca20",
+  "staticRun": 30674768540,
+  "staticArtifact": 8810023039,
+  "staticDigest": "sha256:f643502998ae9be1616dcb6d49bc890f0abc0c9d741b5ed84131479ad74a06e1",
+  "previousHostingRun": 30670430241,
+  "reason": "FUNCTIONAL_DEFECT_RECEIPT_HERO_BADGE_STRETCH",
   "projectId": "ays-orbit-360-lab",
   "channelId": "orbit360-ays-lab",
   "scope": {
     "hostingLab": true,
     "browserVisual": true,
+    "sanitizedVisualEvidence": true,
     "hydrationDiagnostic": true,
     "rules": false,
     "functions": false,
@@ -26,6 +29,6 @@
     "merge": false
   },
   "allowedDeployExecutions": 1,
-  "authorizedBy": "user_explicit_macro_authorization_20260731",
-  "notes": "1 Hosting LAB + browser read-only para cierre integral de Polizas, Vehiculos, Recibos/Cartera. Sin escrituras de datos ni Cobros."
+  "authorizedBy": "user_explicit_macro_authorization_20260731_1843_America_Guatemala",
+  "notes": "Autorización macro para una única publicación Hosting LAB final del fix visual del badge de Recibo, seguida de paridad, hidratación, revisión browser integral, medición del badge y evidencia sanitizada fail-closed. Sin Rules, Functions, Storage, escrituras de datos, Cobros, producción, main ni merge."
 }
