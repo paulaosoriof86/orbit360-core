@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "orbit360-cobros-real-payment-matrix-static-trigger-v1",
+  "approved": true,
+  "gateId": "block10.4-cobros-matriz-real-static-v20260801",
+  "contractVersion": "10.4.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "56756f1f31d6e04eec26a97ab05cb122dad1db79",
+  "expected": {
+    "crmPaymentRows": 68,
+    "canonicalPaymentRows": 63,
+    "historicalOmissions": 5,
+    "unionPaymentCases": 70,
+    "insurerOnlyPaidRows": 2,
+    "directEvidenceRows": 9,
+    "directMatches": 5,
+    "directHolds": 4,
+    "sourceReuse": 0
+  },
+  "rules": {
+    "paymentAfterSnapshotCutoffAllowed": true,
+    "exactReceiptPrecedesFifo": true,
+    "historicalExigibleIncluded": true,
+    "absenceAloneCreatesCobro": false,
+    "commissionAloneCreatesCobro": false,
+    "bankAloneCreatesCobro": false,
+    "reactivatesPolicy": false
+  },
+  "scope": {
+    "static": true,
+    "realPayloadsInRepo": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  }
+}
