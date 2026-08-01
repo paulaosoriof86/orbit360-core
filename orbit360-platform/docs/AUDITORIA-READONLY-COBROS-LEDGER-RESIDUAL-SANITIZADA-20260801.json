@@ -1,16 +1,19 @@
 {
-  "schemaVersion": "orbit360-cobros-residual-ledger-readonly-v1",
+  "schemaVersion": "orbit360-cobros-residual-ledger-readonly-v2",
   "date": "2026-08-01",
   "tenantId": "alianzas-soluciones",
   "environment": "LAB",
   "sourceGate": "block10.9-cobros-controlled-write-lab-v20260801",
   "classification": "READ_ONLY_RESIDUAL_CONCILIATION_LEDGER",
-  "status": "HOLD_RESIDUAL_CONFIRMED",
+  "status": "CURRENT_CUT_CLOSED_WITH_FOUR_RATIFIED_HOLD",
   "sourceControl": {
-    "authoritativeInsurerSources": 2,
+    "authoritativeInsurerSources": 4,
     "authoritativeCrmSources": 2,
+    "canonicalPrivateSources": 2,
     "newerAuthoritativeInsurerSourceLocatedAfter20260730": false,
     "newerAuthoritativeCrmSourceLocatedAfter20260730": false,
+    "additionalSupportingEvidenceLocated": true,
+    "liveLabPreflightExecuted": true,
     "rowLevelTraceabilityPreservedPrivately": true,
     "rawRowsStoredInRepo": 0
   },
@@ -18,57 +21,76 @@
     "insurerPaymentRowsReviewed": 9,
     "oneToOneCandidatesAppliedAndPostVerified": 5,
     "residualRowsReviewed": 4,
-    "newOneToOneCandidates": 0,
+    "temporaryResidualCandidates": 1,
+    "liveEligibleResidualCandidates": 0,
     "holdOrNoMatchConfirmed": 4,
     "writesAuthorized": 0,
     "writesExecuted": 0
+  },
+  "livePreflight": {
+    "runs": [30714072394, 30714161725, 30714232343, 30714297335],
+    "finalRun": 30714297335,
+    "finalJob": 91407132282,
+    "finalArtifact": 8822846720,
+    "finalArtifactDigest": "sha256:9e5166753de3153891fc0c113cadf571a81a1bca50e367f4603b7a46826077cc",
+    "finalHead": "a0b9fb61de66e5919beefaeda7bf1298cd93e8cd",
+    "status": "RESIDUAL_CANDIDATE_READONLY_HOLD",
+    "classification": "HOLD_LAB_COBROS_RESIDUAL_CANDIDATE_READONLY",
+    "baseline": {
+      "polizas": 1373,
+      "recibosEsperados": 1294,
+      "cobros": 5,
+      "finmovs": 0
+    },
+    "policyExists": true,
+    "receiptExists": true,
+    "policySnapshotOk": true,
+    "receiptNonEndosoMismatches": 0,
+    "soleMismatchedField": "endoso",
+    "noExistingCobroForReceipt": true,
+    "receiptNotAlreadyConciliated": true,
+    "uniqueReceiptCandidate": true,
+    "amountExactAcrossSources": true,
+    "twoInsurerSourcesConfirmSameEndoso": true,
+    "liveReceiptEndosoMatchesInsurerSources": false,
+    "policyStatePreserved": true,
+    "noFinmov": true,
+    "eligible": false,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "productionTouched": false
   },
   "cases": [
     {
       "ordinal": 1,
       "insurerAlias": "ASEGURADORA_GENERAL",
-      "policyKeyPresentInBothSources": true,
-      "secondaryReferencePresentInBothSources": true,
-      "amountExact": false,
-      "periodCurrentAndConsistent": true,
-      "classification": "AMOUNT_MISMATCH_MATERIAL",
+      "classification": "CROSS_POLICY_REFERENCE_CONFLICT_AND_AMOUNT_MISMATCH",
       "decision": "HOLD_REQUIRES_AUTHORITATIVE_SOURCE_CORRECTION_OR_SUPPORT",
       "automaticMatchAllowed": false
     },
     {
       "ordinal": 2,
       "insurerAlias": "ASEGURADORA_GENERAL",
-      "policyKeyPresentInBothSources": true,
-      "secondaryReferencePresentInInsurerSource": true,
-      "secondaryReferencePresentInCrmSource": false,
-      "amountExact": true,
-      "paymentDateExact": false,
-      "classification": "SOURCE_KEY_INCOMPLETE_CRM",
-      "decision": "HOLD_REQUIRES_REFERENCE_CONFIRMATION",
+      "amountExactAcrossCurrentSources": true,
+      "secondaryReferenceConfirmedByTwoInsurerSources": true,
+      "liveReceiptIsUniqueAndUnconciliated": true,
+      "liveReceiptSecondaryReferenceMatchesInsurerSources": false,
+      "classification": "LIVE_RECEIPT_ENDOSO_CONFLICTS_WITH_TWO_INSURER_SOURCES",
+      "decision": "HOLD_REQUIRES_AUTHORITATIVE_CORRECTION",
       "automaticMatchAllowed": false
     },
     {
       "ordinal": 3,
       "insurerAlias": "MAPFRE",
-      "policyKeyPresentInBothSources": true,
-      "secondaryReferenceSufficient": false,
-      "amountExact": false,
-      "periodCurrentAndConsistent": true,
-      "classification": "AMOUNT_MISMATCH_MATERIAL_AND_REFERENCE_INSUFFICIENT",
+      "classification": "INSURER_STATUS_CONFLICT_AND_AMOUNT_MISMATCH",
       "decision": "HOLD_REQUIRES_AUTHORITATIVE_SOURCE_CORRECTION_OR_SUPPORT",
       "automaticMatchAllowed": false
     },
     {
       "ordinal": 4,
       "insurerAlias": "MAPFRE",
-      "policyKeyLocatedInHistoricalCrmSource": true,
-      "policyKeyLocatedInCurrentCrmCut": false,
-      "secondaryReferencePresent": true,
-      "amountExact": false,
-      "amountWithinExistingPointZeroOneTolerance": false,
-      "sourcePeriodCurrentAndConsistent": false,
-      "classification": "MINOR_AMOUNT_MISMATCH_AND_SOURCE_PERIOD_NOT_CURRENT",
-      "decision": "HOLD_REQUIRES_CURRENT_PERIOD_CRM_SOURCE",
+      "classification": "CURRENT_PERIOD_SOURCE_CONFLICT_AND_AMOUNT_MISMATCH",
+      "decision": "HOLD_REQUIRES_CURRENT_PERIOD_CORRECTION",
       "automaticMatchAllowed": false
     }
   ],
@@ -78,8 +100,9 @@
     "updateReceipts": false,
     "reactivatePolicies": false,
     "createFinmovs": false,
-    "advanceToCommissionsForResidualCases": false,
-    "requireCurrentAuthoritativeSource": true
+    "advanceResidualCasesToCommissions": false,
+    "advanceOnlyAlreadyConciliatedCasesToNextReadOnlySourceBlock": true,
+    "requireCurrentAuthoritativeSourceForHoldResolution": true
   },
   "capabilities": {
     "secrets": false,
@@ -97,5 +120,5 @@
     "containsAuthorizationRefs": false,
     "containsSecrets": false
   },
-  "nextAction": "OBTAIN_OR_LOCATE_CORRECTED_CURRENT_AUTHORITATIVE_EVIDENCE_FOR_THE_FOUR_HOLD_ROWS_BEFORE_CLOSING_CONCILIATION"
+  "nextAction": "START_READ_ONLY_SOURCE_INVENTORY_FOR_PLANILLAS_AND_COMISIONES_USING_ONLY_THE_FIVE_ALREADY_CONCILIATED_CASES_WHILE_FOUR_RESIDUALS_REMAIN_HOLD"
 }
