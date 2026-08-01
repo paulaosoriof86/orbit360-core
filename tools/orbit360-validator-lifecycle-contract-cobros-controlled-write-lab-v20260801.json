@@ -1,5 +1,6 @@
 {
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "gateContractVersion": "10.9.0",
   "owner": "cobros-controlled-write-gate-p0",
@@ -8,16 +9,17 @@
   "classification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "executionProfile": {
+    "phase": "STATIC_PREFLIGHT",
     "mode": "STATIC_PREFLIGHT_ONLY",
     "capabilities": {
       "secrets": false,
       "firestoreRead": false,
-      "firestoreWrite": false,
+      "writes": false,
+      "runtime": false,
       "browser": false,
-      "hostingDeploy": false,
-      "rulesDeploy": false,
+      "deploy": false,
       "functionsDeploy": false,
-      "storageDeploy": false,
+      "rulesDeploy": false,
       "production": false
     }
   },
