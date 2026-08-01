@@ -2,40 +2,47 @@
   "schemaVersion": "orbit360-planillas-comisiones-linkage-readonly-request-v1",
   "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
   "contractVersion": "11.0.0",
-  "mode": "READ_ONLY_PLANILLAS_RECEIPT_LINK_DIAGNOSTIC",
+  "mode": "READ_ONLY_PLANILLAS_COMMISSION_DRYRUN",
   "approved": true,
-  "sequence": 5,
-  "reason": "Validate receipt links for the 49 resolved policy identities using strong source references first and net-premium fallback only when unique; do not select a receipt by commission payment date, change source rows, cross-link the later Cobros cut or authorize writes.",
+  "sequence": 6,
+  "reason": "Generate an exact read-only commission dry-run for the five closed policy-receipt relations, using only the canonical three P0 destination collections; verify advisor mapping, target idempotency, candidate-set digest, snapshot digest and rollback count without writing or activating finance.",
   "sourceCut": {
     "filesReceived": 19,
     "sourceBundles": 10,
     "rowsObserved": 67,
     "crmCandidates": 65,
-    "exactDateCandidates": 34,
-    "periodOnlyCandidates": 29,
-    "reversalCandidates": 2,
     "omittedZeroCommission": 2,
     "period": "2026-06"
   },
-  "policyIdentityDiagnostic": {
-    "run": 30719208561,
-    "job": 91420032333,
-    "artifact": 8824310023,
-    "digest": "sha256:28518aead736f2d3709e02492d0e7f8eb99b0ba9a4d87a44bf9a5934d05e4567",
-    "resolved": 49,
-    "holds": 16,
-    "previousHoldsResolved": 39,
-    "status": "PLANILLAS_POLICY_IDENTITY_DIAGNOSTIC_PASS"
+  "policyReceiptClosure": {
+    "policyIdentityRun": 30719208561,
+    "receiptLinkRun": 30719464732,
+    "policyResolved": 49,
+    "policyHolds": 16,
+    "receiptResolved": 5,
+    "receiptHolds": 44,
+    "currentCobrosLinked": 0,
+    "status": "PLANILLAS_POLICY_IDENTITY_RECEIPT_LINK_READONLY_CLOSED"
   },
-  "receiptResolverStatic": {
-    "run": 30719316572,
-    "job": 91420315804,
-    "artifact": 8824340344,
-    "digest": "sha256:37b923832fc189733ea7f196672b9f1d73ee2031968c56a6e4dccf4698c0600a",
-    "checks": 14,
-    "fixtures": 6,
-    "realRowsUsed": 0,
-    "status": "STATIC_RECEIPT_LINK_RESOLVER_PASS"
+  "commissionDryrunPlanner": {
+    "run": 30719949803,
+    "job": 91421949720,
+    "artifact": 8824535956,
+    "digest": "sha256:3926cf3ed356d40872b3d00cda2025567a7eb936549e56eb8a30357873682914",
+    "checks": 32,
+    "destinations": 3,
+    "status": "STATIC_COMMISSION_DRYRUN_PLANNER_PASS"
+  },
+  "expectedDryrun": {
+    "exactPolicyReceiptRelations": 5,
+    "sourceBundles": {
+      "el_roble_gtq_2026_06": 3,
+      "universales_gtq_2026_06": 1,
+      "bantrab_gtq_2026_06": 1
+    },
+    "destinationCollections": ["planillasComisiones", "comisionesDevengadas", "conciliacionesComisiones"],
+    "writes": 0,
+    "financeActivated": false
   },
   "privatePackage": {
     "driveFileId": "1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84",
@@ -47,14 +54,6 @@
     "recibosEsperados": 1294,
     "cobros": 5,
     "finmovs": 0
-  },
-  "expectedReceiptDiagnostic": {
-    "processed": 49,
-    "resolved": 5,
-    "holds": 44,
-    "excludedPolicyHolds": 16,
-    "existingCobroLinked": 0,
-    "writes": 0
   },
   "expectedOutcome": {
     "sourceCandidates": 65,
@@ -80,6 +79,6 @@
     "includePII": false,
     "includeSourceRows": false,
     "includeSecrets": false,
-    "includeOnlyCountsBooleansDecisionsAndFieldNames": true
+    "includeOnlyCountsBooleansDecisionsAndDigests": true
   }
 }
