@@ -3,12 +3,12 @@
   "gateId": "block7-policies-static-v20260730",
   "gateContractVersion": "7.0.1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "POLICIES_COUNTRY_PROJECTION_DIAGNOSTIC_RESUME_AUTHORIZED",
+  "status": "POLICIES_VISUAL_FROZEN_DUAL_PATH_DATA_CONTRACT_FAILURE",
   "executionProfile": {
-    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "phase": "POLICIES_STATIC_QUALIFICATION",
     "capabilities": {
-      "secrets": true,
-      "firestoreRead": true,
+      "secrets": false,
+      "firestoreRead": false,
       "writes": false,
       "runtime": false,
       "browser": false,
@@ -20,27 +20,26 @@
   },
   "singleGate": true,
   "blockOwner": "Policies",
-  "staticQualification": {
-    "closed": true,
-    "previousPhase": "POLICIES_STATIC_QUALIFICATION",
-    "previousContractVersion": "7.0.1",
-    "sourceDomain": "polizas",
-    "sourceReprofilingAllowed": false,
-    "evidencePreserved": true
-  },
-  "authorization": {
-    "source": "user_authorized_policies_visual_readonly_lab_20260801",
-    "approved": true,
-    "visualExecutionAttempted": true,
+  "freeze": {
+    "active": true,
+    "reason": "DUAL_PATH_BASELINE_AND_PRODUCT_RUNTIME_NOT_RECONCILED",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+    "additionalPreviewAllowed": false,
+    "additionalDiagnosticRetryAllowed": false,
+    "dataRepairAllowed": false,
+    "reimportAllowed": false,
     "humanReviewDelivered": false,
-    "humanApprovalRecorded": false,
-    "diagnosticWithinAuthorizedReadOnlyScope": true,
-    "diagnosticExecutionsAllowed": 1,
-    "diagnosticConsumed": false,
-    "diagnosticResumeAllowedOnce": true,
-    "diagnosticResumeSequence": 2,
-    "additionalPreviewAuthorized": false,
-    "productionAuthorized": false
+    "humanApprovalRecorded": false
+  },
+  "pathContract": {
+    "productCanonicalPath": "tenants/{tenantId}/data/{collection}/items",
+    "legacyOperationalPath": "tenantId/{tenantId}/{collection}",
+    "productRuntimeUsesCanonicalPath": true,
+    "previousBaselineDiagnosticsUsedLegacyPath": true,
+    "previousControlledWritersUsedLegacyPath": true,
+    "visualGateComparedDifferentPhysicalUniverses": true,
+    "authoritativePathNotYetDeclared": true
   },
   "visualExecutionHistory": {
     "preRiskFailure": {
@@ -49,7 +48,14 @@
       "artifact": 8825594112,
       "classification": "ENVIRONMENT_FAILURE",
       "rootCause": "SECRET_NAME_BINDING_MISMATCH",
-      "capabilitiesReached": false
+      "canonicalPreflightPassed": 15,
+      "canonicalPreflightFailed": 0,
+      "secretsRead": false,
+      "firestoreRead": false,
+      "previewCreated": false,
+      "browserExecuted": false,
+      "deployExecuted": false,
+      "productionTouched": false
     },
     "runtimeFailure": {
       "run": 30723733270,
@@ -58,10 +64,22 @@
       "artifactDigest": "sha256:5146e89ec68a23ac7be5ba5e957d57e2e31de530efde0631f20c64a9ea667fbf",
       "classification": "DATA_CONTRACT_FAILURE",
       "failureCode": "VISUAL_COUNTS_MISMATCH",
+      "canonicalPreflightPassed": 19,
+      "canonicalPreflightFailed": 0,
+      "browserProjection": {
+        "clientes": 414,
+        "aseguradoras": 26,
+        "polizas": 2,
+        "vehiculos": 1,
+        "recibosEsperados": 0,
+        "carteraPrimas": 0,
+        "cobros": 2
+      },
       "previewCreated": true,
       "previewRolledBack": true,
       "firestoreWrites": 0,
       "operationalWrites": 0,
+      "networkWriteCandidates": 0,
       "productionTouched": false
     }
   },
@@ -72,69 +90,56 @@
       "artifact": 8825711437,
       "artifactDigest": "sha256:bb6b14b289df020d041c34314d126b605ca1118683a1187230c836e331e321ed",
       "classification": "VALIDATOR_STALE",
-      "reportedStatus": "POLICIES_COUNTRY_PROJECTION_DIAGNOSTIC_INCONCLUSIVE",
       "rootCause": "NESTED_COUNTRY_COUNTED_AS_TOP_LEVEL_FIRESTORE_FIELD",
       "canonicalPreflightPassed": 17,
       "canonicalPreflightFailed": 0,
       "firestoreRead": true,
       "firestoreWrites": 0,
-      "operationalWrites": 0,
       "browserExecuted": false,
       "deployExecuted": false,
-      "productionTouched": false,
-      "usefulEvidencePreserved": true
+      "productionTouched": false
     },
-    "validatorCorrection": {
-      "revision": "top-level-country-v2",
-      "topLevelPaisSeparated": true,
-      "topLevelCountrySeparated": true,
-      "nestedCountryEvidenceReportedSeparately": true,
-      "countryInferenceAllowed": false,
-      "countryWriteAllowed": false
+    "secondRun": {
+      "run": 30724084271,
+      "job": 91432515980,
+      "artifact": 8825758202,
+      "artifactDigest": "sha256:38ef5d0f26f344d8237d6d4dbaed9443832894c810d6c14c3e8e95da6c4f3cd4",
+      "validatorRevision": "top-level-country-v2",
+      "canonicalPreflightPassed": 22,
+      "canonicalPreflightFailed": 0,
+      "reportedStatus": "POLICIES_COUNTRY_PROJECTION_DIAGNOSTIC_INCONCLUSIVE",
+      "classification": "DATA_CONTRACT_FAILURE",
+      "firestoreRead": true,
+      "firestoreWrites": 0,
+      "browserExecuted": false,
+      "deployExecuted": false,
+      "productionTouched": false
     }
   },
-  "diagnosticScope": {
-    "collections": [
-      "clientes",
-      "aseguradoras",
-      "polizas",
-      "vehiculos",
-      "recibosEsperados",
-      "carteraPrimas",
-      "cobros"
-    ],
-    "countryFields": ["pais", "country"],
-    "measureTopLevelFields": true,
-    "measureNestedEvidenceSeparately": true,
-    "measureCurrentPaisProjection": true,
-    "measureLogicalCountryProjection": true,
-    "measureExactRelationshipDerivation": true,
-    "inferCountry": false,
-    "writeCountry": false,
-    "browser": false,
-    "deploy": false
-  },
-  "expectedBaseline": {
-    "clientes": 430,
-    "aseguradoras": 30,
-    "polizas": 1373,
-    "vehiculos": 1032,
-    "recibosEsperados": 1294,
-    "carteraPrimas": 673,
-    "cobros": 5,
-    "finmovs": 0,
-    "planillasComisiones": 5,
-    "comisionesDevengadas": 5,
-    "conciliacionesComisiones": 5
-  },
-  "failedBrowserProjection": {
-    "clientes": 414,
-    "aseguradoras": 26,
-    "polizas": 2,
-    "vehiculos": 1,
-    "recibosEsperados": 0,
-    "carteraPrimas": 0,
-    "cobros": 2
+  "legacyPathEvidence": {
+    "counts": {
+      "clientes": 430,
+      "aseguradoras": 30,
+      "polizas": 1373,
+      "vehiculos": 1032,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5
+    },
+    "topLevelCountryMissing": {
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5,
+      "total": 1972
+    },
+    "exactRelationshipCountryCandidates": {
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5,
+      "total": 1972
+    },
+    "unresolvedRelationshipRows": 0,
+    "scopeNote": "These findings apply only to the legacy operational path and do not establish the canonical product-path baseline."
   },
   "humanApproval": {
     "clientes": true,
@@ -143,7 +148,19 @@
     "recibos": false,
     "cartera": false,
     "restoCrm": false,
-    "automatedDiagnosticMaySetApproval": false
+    "automatedEvidenceMaySetApproval": false
+  },
+  "nextGateCondition": {
+    "gateType": "CANONICAL_VS_LEGACY_PATH_RECONCILIATION_READONLY",
+    "requiresNewAuthorization": true,
+    "mustReadBothPaths": true,
+    "mustRunWithoutCountryFilter": true,
+    "mustCompareCountsIdsDigestsAndSchema": true,
+    "mustDeclareAuthoritativePathBeforeRepair": true,
+    "mustNotReimportPolicies": true,
+    "mustNotDeployPreview": true,
+    "mustNotWriteData": true,
+    "subsequentRepairRequiresSeparateDryRunAndWriteAuthorization": true
   },
   "guards": {
     "firestoreDataWritesAllowed": false,
@@ -156,7 +173,8 @@
     "mainAllowed": false,
     "mergeAllowed": false,
     "countryInferenceAllowed": false,
-    "countryRepairAllowed": false
+    "countryRepairAllowed": false,
+    "reimportAllowed": false
   },
   "containsPII": false,
   "containsSecrets": false
