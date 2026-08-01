@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-source-adapter-static-trigger-v1",
+  "mode": "STATIC_SYNTHETIC_SOURCE_ADAPTER_AUDIT",
+  "approved": true,
+  "reason": "Validate reusable aliases, normalization, exact-period controls and dry-run decisions without real rows or operational access while current commission sources remain missing.",
+  "module": "orbit360-platform/core/planillas-comisiones-source-adapter-p0.js",
+  "test": "tools/orbit360-test-planillas-comisiones-source-adapter-p0-v20260801.mjs",
+  "realRowsAllowed": false,
+  "expected": {
+    "fixtureType": "SYNTHETIC_ONLY",
+    "minimumChecks": 30,
+    "failed": 0,
+    "writes": 0,
+    "storeAccess": false,
+    "periodMismatchDecision": "HOLD_PERIOD_MISMATCH",
+    "missingSourceDataDecision": "REQUIERE_VALIDACION",
+    "duplicateDecision": "OMIT_DUPLICATE"
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  }
+}
