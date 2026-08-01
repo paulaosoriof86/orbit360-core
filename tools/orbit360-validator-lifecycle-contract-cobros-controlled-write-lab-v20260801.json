@@ -5,11 +5,11 @@
   "gateContractVersion": "10.9.0",
   "owner": "orbit360-cobros-controlled-write-lab-v20260801",
   "ownerVersion": "20260801.3-drive-exact-physical-digest",
-  "status": "ARMED_BY_EXPLICIT_LAB_AUTHORIZATION",
-  "classification": "BACKEND_PROTEGIDO_NO_CLAUDE",
-  "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
+  "status": "STOP_RETRY_DATA_CONTRACT_FAILURE",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "executionProfile": {
-    "mode": "AUTHORIZED_LAB_WRITE_ONCE",
+    "mode": "FROZEN_AFTER_TWO_FAILED_EXECUTIONS",
     "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
     "capabilities": {
       "secrets": true,
@@ -29,13 +29,15 @@
     "EXECUTED_LAB",
     "VERIFIED_OR_ROLLED_BACK"
   ],
-  "currentPhase": "ARMED_BY_EXPLICIT_LAB_AUTHORIZATION",
+  "currentPhase": "VERIFIED_OR_ROLLED_BACK",
+  "outcome": "ROLLED_BACK_BASELINE_RESTORED",
   "humanDecisionRecorded": true,
   "executionAuthorized": true,
   "labWriteAuthorized": true,
-  "writeAuthorized": true,
+  "writeAuthorized": false,
   "productionAuthorized": false,
   "deployAuthorized": false,
+  "thirdExecutionProhibited": true,
   "requestPath": ".github/orbit360-requests/cobros-controlled-write-lab-v20260801.json",
   "privatePackage": {
     "driveFileId": "1FGpp_v6ZTs52VEeOnsH2IxoNCqWwVoAD",
@@ -55,9 +57,23 @@
     "receiptUpdates": 4,
     "receiptCreates": 1,
     "policyWrites": 0,
-    "finmovsWrites": 0,
-    "duplicateAuthorizationRefs": 0,
-    "duplicateIdempotencyKeys": 0
+    "finmovsWrites": 0
+  },
+  "actualFinalState": {
+    "polizas": 1373,
+    "recibosEsperados": 1293,
+    "cobros": 0,
+    "finmovs": 0,
+    "completedGroupsBeforeFailure": 2,
+    "verifiedGroups": 0,
+    "temporaryCobrosWrites": 2,
+    "temporaryReceiptUpdates": 2,
+    "temporaryPolicyWrites": 0,
+    "temporaryFinmovsWrites": 0,
+    "rollbackExecuted": true,
+    "rollbackRestored": true,
+    "rollbackGroups": 2,
+    "remainingOperationalWrites": 0
   },
   "protectedContracts": {
     "singleWriteGate": true,
@@ -86,13 +102,30 @@
     "canonicalContract": "PASS",
     "writesExecuted": 0
   },
-  "firstExecutionAttempt": {
-    "run": 30711389436,
-    "artifact": 8821984014,
-    "classification": "DATA_CONTRACT_FAILURE_CANONICALIZATION",
-    "failedBeforeFirestore": true,
-    "executionAttempted": false,
-    "operationalWrites": 0,
-    "correctedLayer": "private package logical and Drive physical digest canonicalization"
-  }
+  "executionAttempts": [
+    {
+      "sequence": 1,
+      "run": 30711389436,
+      "artifact": 8821984014,
+      "classification": "DATA_CONTRACT_FAILURE_CANONICALIZATION",
+      "failure": "PRIVATE_PACKAGE_LOGICAL_SHA",
+      "firestoreRead": false,
+      "operationalWrites": 0,
+      "rollbackRequired": false
+    },
+    {
+      "sequence": 2,
+      "run": 30711578397,
+      "artifact": 8822041409,
+      "digest": "sha256:f9bd2cde8107481243b2937df11c434a2cff91eeccbbf99569b0f47c9b5f2b00",
+      "classification": "DATA_CONTRACT_FAILURE",
+      "failure": "RECEIPT_SNAPSHOT_MISMATCH",
+      "failedAuthorizationRef": "cob-auth-d9ed3d5aa03f198a469439cc",
+      "firestoreRead": true,
+      "temporaryOperationalWrites": 4,
+      "rollbackExecuted": true,
+      "rollbackRestored": true
+    }
+  ],
+  "nextAction": "READ_ONLY_ROOT_CAUSE_DIAGNOSTIC_CASE_3_RECEIPT_SNAPSHOT"
 }
