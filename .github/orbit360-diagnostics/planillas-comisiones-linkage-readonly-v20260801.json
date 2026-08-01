@@ -2,38 +2,10 @@
   "schemaVersion": "orbit360-planillas-comisiones-linkage-readonly-request-v1",
   "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
   "contractVersion": "11.0.0",
-  "mode": "READ_ONLY_PLANILLAS_POLICY_IDENTITY_DIAGNOSTIC",
+  "mode": "READ_ONLY_PLANILLAS_RECEIPT_LINK_DIAGNOSTIC",
   "approved": true,
-  "sequence": 4,
-  "reason": "Diagnose the 55 policy identity HOLD from the completed block11 linkage by combining insurer-specific number aliases, insured compatibility and exact receipt-calendar amounts; do not select renewal terms by payment date, change source rows or authorize writes.",
-  "previousLinkage": {
-    "run": 30718081323,
-    "job": 91417072747,
-    "artifact": 8823967179,
-    "policyUnique": 10,
-    "policyMissing": 29,
-    "policyAmbiguous": 26,
-    "policyIdentityHolds": 55,
-    "writes": 0
-  },
-  "staticResolver": {
-    "run": 30719074310,
-    "job": 91419680404,
-    "artifact": 8824265883,
-    "digest": "sha256:9c3dbc8ee18b2c09fcd3518d4877c5fe651461131ffb3d113d98df12f5b5a0f1",
-    "checks": 19,
-    "fixtures": 9,
-    "realRowsUsed": 0,
-    "status": "STATIC_POLICY_IDENTITY_RESOLVER_PASS"
-  },
-  "rootCause": {
-    "classification": "VALIDATOR_STALE",
-    "exactFirstShortCircuitStale": true,
-    "insurerAliasExpansionRequired": true,
-    "receiptCalendarEvidenceRequired": true,
-    "paymentDateTermSelectionAllowed": false,
-    "sourceRowsChanged": false
-  },
+  "sequence": 5,
+  "reason": "Validate receipt links for the 49 resolved policy identities using strong source references first and net-premium fallback only when unique; do not select a receipt by commission payment date, change source rows, cross-link the later Cobros cut or authorize writes.",
   "sourceCut": {
     "filesReceived": 19,
     "sourceBundles": 10,
@@ -44,6 +16,26 @@
     "reversalCandidates": 2,
     "omittedZeroCommission": 2,
     "period": "2026-06"
+  },
+  "policyIdentityDiagnostic": {
+    "run": 30719208561,
+    "job": 91420032333,
+    "artifact": 8824310023,
+    "digest": "sha256:28518aead736f2d3709e02492d0e7f8eb99b0ba9a4d87a44bf9a5934d05e4567",
+    "resolved": 49,
+    "holds": 16,
+    "previousHoldsResolved": 39,
+    "status": "PLANILLAS_POLICY_IDENTITY_DIAGNOSTIC_PASS"
+  },
+  "receiptResolverStatic": {
+    "run": 30719316572,
+    "job": 91420315804,
+    "artifact": 8824340344,
+    "digest": "sha256:37b923832fc189733ea7f196672b9f1d73ee2031968c56a6e4dccf4698c0600a",
+    "checks": 14,
+    "fixtures": 6,
+    "realRowsUsed": 0,
+    "status": "STATIC_RECEIPT_LINK_RESOLVER_PASS"
   },
   "privatePackage": {
     "driveFileId": "1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84",
@@ -56,12 +48,12 @@
     "cobros": 5,
     "finmovs": 0
   },
-  "expectedDiagnostic": {
-    "processed": 65,
-    "resolved": 49,
-    "holds": 16,
-    "previousHoldsResolved": 39,
-    "previousUniqueReclassified": 1,
+  "expectedReceiptDiagnostic": {
+    "processed": 49,
+    "resolved": 5,
+    "holds": 44,
+    "excludedPolicyHolds": 16,
+    "existingCobroLinked": 0,
     "writes": 0
   },
   "expectedOutcome": {
