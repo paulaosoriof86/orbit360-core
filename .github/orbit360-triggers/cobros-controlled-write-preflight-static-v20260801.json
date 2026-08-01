@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-cobros-controlled-write-preflight-trigger-v1",
+  "approved": true,
+  "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
+  "contractVersion": "10.9.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "b2b6bb6f476d05c98a3bc71f75084782b0fa6f57",
+  "scope": {
+    "staticPreflight": true,
+    "executionAuthorized": false,
+    "firestoreRead": false,
+    "writes": false,
+    "browser": false,
+    "deploy": false,
+    "production": false
+  },
+  "createdAt": "2026-08-01T11:30:00-06:00",
+  "reason": "Prepare the single LAB write gate for four direct Cobros cases and one separately approved historical case. Validate snapshots, idempotency, atomic groups and rollback without executing writes."
+}
