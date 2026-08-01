@@ -1,17 +1,27 @@
 {
-  "schemaVersion": "orbit360-receipts-portfolio-final-browser-recovery-v1",
-  "classification": "PIPELINE_MECHANISM_FAILURE_DIAGNOSTIC",
-  "authorizedRecoveryBase": "62568198ddb047d6c48d38e1db0a329e15ffe852",
-  "validatorCommit": "2e1f6a1bc4c3fa120ca7814fdd55053bee35677b",
+  "schemaVersion": "orbit360-receipts-portfolio-final-evidence-continuation-v1",
+  "classification": "VALIDATOR_STALE",
+  "authorizedContinuationBase": "fc69dbfd3423e467e9ab882484ba6e6f2f0dbc8f",
   "sourceFinalHostingRun": 30676303473,
-  "sourceFinalHostingHead": "e89e4ef437e627dcc2bdc0a5f0b39bb83b715778",
-  "sourceFinalHostingArtifact": 8810598726,
-  "sourceFinalHostingDigest": "sha256:a927d3c5ef6f6e5f0221802e0c870d1d64d6821c8983589a383346697737aa4c",
   "sourceFinalHostingDeployPassed": true,
   "sourceFinalRemoteParityPassed": true,
   "sourceFinalHydrationDiagnosticPassed": true,
-  "sourceFailureStage": "runtime_base_hydrate",
-  "sourceFailure": "page.waitForFunction timeout without hydration state diagnostics",
+  "sourceBrowserRecoveryRun": 30676673787,
+  "sourceBrowserRecoveryArtifact": 8810714415,
+  "sourceBrowserRecoveryDigest": "sha256:d2f2d04811da20cbb17f4bf6e713078697125f51395945e4cd4b0b447acce995",
+  "baseVisualPassed": true,
+  "humanVisualPassed": true,
+  "badgeBrowserPassed": true,
+  "badgeHeight": 21,
+  "badgeAlignSelf": "flex-start",
+  "badgeFlexGrow": "0",
+  "badgeFlexShrink": "0",
+  "staleValidatorMismatch": {
+    "workflowExpected": ".badge.*",
+    "testPublished": ".metrics.*",
+    "productImpact": false,
+    "rerunPassedChecks": false
+  },
   "hostingDeploy": false,
   "rulesDeploy": false,
   "functionsDeploy": false,
@@ -19,21 +29,6 @@
   "dataWrites": false,
   "production": false,
   "browserReadOnly": true,
-  "continueOnlyIfBaseVisualPasses": true,
-  "diagnosticRequirements": {
-    "captureHydrationTimeline": true,
-    "captureFinalCounts": true,
-    "captureProjectionOwners": true,
-    "captureAuthenticationState": true,
-    "captureSnapshotErrorKeys": true,
-    "noBlindRetry": true
-  },
-  "closureRequirements": {
-    "remoteParity12of12": true,
-    "baseVisualMultirol": true,
-    "humanVisualIntegral": true,
-    "receiptHeroBadgeCompact": true,
-    "sanitizedVisualEvidenceFailClosed": true
-  },
-  "notes": "Browser-only recovery after the single authorized final Hosting deploy was consumed successfully. No further deploy is permitted. If hydration fails again, stop with the instrumented timeline; if it passes, complete the remaining final closure checks."
+  "runOnlySanitizedVisualEvidence": true,
+  "notes": "Continue from the successful base visual, human visual and compact badge evidence. Do not rerun passed checks and do not deploy. Generate only secure fail-closed screenshots and final closure evidence."
 }
