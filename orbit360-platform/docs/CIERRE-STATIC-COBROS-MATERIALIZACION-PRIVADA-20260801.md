@@ -85,7 +85,3 @@ production: untouched
 ## Siguiente acción exacta
 
 Resolver si las referencias privadas necesarias siguen disponibles en el runtime seguro. Si están disponibles, materializar las cinco tarjetas solo en memoria, presentar el diff real a Dirección y destruir el payload al finalizar. Si no están disponibles, identificar exactamente la referencia o fuente privada faltante sin volver a pedir archivos ya registrados.
-
-## Nota de consistencia documental
-
-La evidencia principal de cierre está en este documento y en `AUDITORIA-READONLY-COBROS-MATERIALIZACION-PRIVADA-SANITIZADA-20260801.json`. Un intento posterior de enriquecer un registro secundario encontró conflicto de versión y fue descartado para evitar un cambio redundante; no se repitieron gates ni pruebas.
