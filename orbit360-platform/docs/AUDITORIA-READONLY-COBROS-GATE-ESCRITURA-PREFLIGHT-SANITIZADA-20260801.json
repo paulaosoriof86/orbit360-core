@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "orbit360-cobros-controlled-write-preflight-sanitized-v1",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-08-01",
+  "status": "COBROS_CONTROLLED_WRITE_GATE_PREFLIGHT_PREPARED",
+  "gate": {
+    "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
+    "contractVersion": "10.9.0",
+    "phase": "PREPARED_STATIC",
+    "singleWriteGate": true
+  },
+  "sourceGate": {
+    "gateId": "block10.8-cobros-private-real-materialization-static-v20260801",
+    "run": 30709607082,
+    "artifact": 8821429532,
+    "digest": "sha256:7ed3cf4a446a954bdd9378026a70e3e3eb00820c5780ddb12bc80421ec29ba5c",
+    "checks": "64/64 PASS"
+  },
+  "authorization": {
+    "recorded": true,
+    "directApproved": 4,
+    "historicalApprovedSeparately": 1,
+    "approvedTotal": 5,
+    "executionAuthorized": false,
+    "labWriteAuthorized": false,
+    "productionAuthorized": false,
+    "deployAuthorized": false
+  },
+  "plan": {
+    "atomicGroups": 5,
+    "directGroups": 4,
+    "historicalGroups": 1,
+    "snapshots": 11,
+    "plannedOperations": 10,
+    "rollbackSteps": 11,
+    "duplicateAuthorizationRefs": 0,
+    "duplicateIdempotencyKeys": 0,
+    "allSnapshotsRequired": true,
+    "allGroupsAtomic": true,
+    "allRollbacksPresent": true,
+    "historicalGroupLast": true,
+    "historicalOperationAtomic": true
+  },
+  "collections": {
+    "specializedOwnerRequired": true,
+    "genericWriterRemainsBlockedForCobros": true,
+    "plannedCobrosInsert": true,
+    "plannedReceiptUpdateOrInsert": true,
+    "plannedPolicyUpdate": false,
+    "plannedFinmovWrite": false
+  },
+  "controls": {
+    "snapshotBeforeWriteRequired": true,
+    "idempotencyRequired": true,
+    "atomicPerCaseRequired": true,
+    "rollbackPerCaseRequired": true,
+    "historicalCaseSeparated": true,
+    "reactivatePolicy": false,
+    "createFinmov": false,
+    "autoApply": false,
+    "executionRequiresNewExplicitLabAuthorization": true,
+    "failureRequiresRollbackOrHold": true
+  },
+  "writes": {
+    "writeEligible": 0,
+    "cobros": 0,
+    "receipts": 0,
+    "policies": 0,
+    "finmovs": 0,
+    "firestore": 0,
+    "operational": 0,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "security": {
+    "realRowsStoredInRepo": 0,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "containsSecrets": false
+  }
+}
