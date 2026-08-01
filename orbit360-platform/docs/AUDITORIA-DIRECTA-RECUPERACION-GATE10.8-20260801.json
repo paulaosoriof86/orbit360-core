@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "orbit360-gate10.8-direct-validator-recovery-v1",
+  "gateId": "block10.8-cobros-private-real-materialization-static-v20260801",
+  "date": "2026-08-01",
+  "status": "DIRECT_VALIDATOR_RECOVERY_PASS",
+  "classificationBeforeFix": "VALIDATOR_STALE",
+  "userAuthorizedRecovery": true,
+  "execution": {
+    "mode": "DIRECT_OUTSIDE_WORKFLOW",
+    "temporaryReplica": true,
+    "networkCloneUsed": false,
+    "newTriggerUsed": false,
+    "newGateIdUsed": false,
+    "privateSourcesOpened": false,
+    "realRowsPersisted": 0
+  },
+  "result": {
+    "status": "GO_GATE_CONTRACT",
+    "domainStatus": "COBROS_PRIVATE_REAL_MATERIALIZATION_STATIC_READY",
+    "classification": "GO_STATIC_COBROS_PRIVATE_REAL_MATERIALIZATION",
+    "total": 64,
+    "passed": 64,
+    "failed": 0,
+    "failedCheckIds": [],
+    "directPreflight": true
+  },
+  "contractAlignment": {
+    "ownerField": "reactivatePolicy",
+    "ownerExpected": false,
+    "auditField": "reactivatesPolicy",
+    "auditExpected": false,
+    "behavioralTestPassed": true,
+    "literalObsoleteTokenRemoved": "reactivatesPolicy:false"
+  },
+  "integrity": {
+    "validatorSha256": "8335a2483a1230074c73714a19aa6ba10e99ee568c49d6ba6c4f80c6789c6146",
+    "lifecycleSha256AtDirectRun": "6d2f6e0fd106edfff46fa81325a69fcde00603535a6a4548339637220ac1d5f4",
+    "ownerSha256": "cf6585f0a50b54b76c4e60c3081cf302bfdd8b60f24e6cfdddeaa3fbeca175e6",
+    "directOutputSha256": "ac78b01fb1ac69054b3dcbec188eb1e7cd3a2603126da93f15ee543f03d3c21a"
+  },
+  "controls": {
+    "authorizationGranted": 0,
+    "writeEligible": 0,
+    "cobrosWrites": 0,
+    "finmovsWrites": 0,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsRealAmounts": false,
+    "containsSecrets": false
+  },
+  "reopenDecision": {
+    "sameGateOnly": true,
+    "explicitUserInstruction": "procede",
+    "productionAuthorizationGranted": false
+  }
+}
