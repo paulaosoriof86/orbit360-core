@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-commission-dryrun-planner-static-request-v1",
+  "approved": true,
+  "syntheticOnly": true,
+  "reason": "Validate the canonical three-destination commission dry-run contract before reading the five live policy-receipt relations.",
+  "expected": {
+    "checks": 33,
+    "fixtures": 6,
+    "destinations": 3,
+    "realRowsUsed": 0,
+    "writes": 0
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  }
+}
