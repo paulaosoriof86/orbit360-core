@@ -69,9 +69,10 @@ congelar producto
 → demostrar 64/64 PASS
 → sincronizar lifecycle, workflow, registro y documentación
 → reabrir el mismo gate
+→ cerrar 64/64 en el workflow
 ```
 
-Nunca debe corregirse el producto solo para satisfacer un token textual obsoleto.
+El cierre final fue el run `30709607082`, con 64/64 PASS. Nunca debe corregirse el producto solo para satisfacer un token textual obsoleto.
 
 ## Escenario aplicado
 
@@ -102,6 +103,7 @@ Solo se conserva:
 - conteos agregados;
 - confirmación de destrucción;
 - evidencia directa 64/64;
+- cierre del mismo gate 64/64;
 - cero escrituras.
 
 No se conservan valores privados en el repositorio ni en el artifact.
