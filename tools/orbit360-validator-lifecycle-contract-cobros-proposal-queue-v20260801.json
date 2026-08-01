@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block10.5-cobros-proposal-queue-static-v20260801",
+  "gateContractVersion": "10.5.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "COBROS_CONTROLLED_PROPOSAL_QUEUE_STATIC_QUALIFICATION",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "requiredFiles": [
+    "orbit360-platform/core/cobros-proposal-queue-p0.js",
+    "orbit360-platform/core/importa-transversal-p0-bootstrap-v20260731.js",
+    "tools/orbit360-test-cobros-proposal-queue-p0-v20260801.mjs",
+    "orbit360-platform/docs/AUDITORIA-READONLY-COBROS-COLA-PROPUESTAS-SANITIZADA-20260801.json",
+    "orbit360-platform/docs/CIERRE-STATIC-COBROS-COLA-PROPUESTAS-20260801.md",
+    "orbit360-platform/docs/ACADEMIA-COLA-CONTROLADA-COBROS-20260801.md"
+  ],
+  "successStatus": "COBROS_CONTROLLED_PROPOSAL_QUEUE_STATIC_READY",
+  "writeAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
