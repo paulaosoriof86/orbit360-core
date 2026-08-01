@@ -1,8 +1,15 @@
 {
-  "schemaVersion": "orbit360-cobros-private-authorization-materialization-sanitized-v1",
+  "schemaVersion": "orbit360-cobros-private-authorization-materialization-sanitized-v2",
   "tenantId": "alianzas-soluciones",
   "cutoff": "2026-07-31",
-  "status": "PRIVATE_AUTHORIZATION_MATERIALIZATION_CONTRACT_READY",
+  "status": "PRIVATE_AUTHORIZATION_MATERIALIZATION_STATIC_READY",
+  "gate": {
+    "gateId": "block10.7-cobros-private-materialization-static-v20260801",
+    "run": 30706859578,
+    "artifact": 8820592721,
+    "digest": "sha256:f90c8f2da85be677cc0caf821e868a88490c241f8294f19072678738b7f10536",
+    "checks": "46/46 PASS"
+  },
   "sourcePackage": {
     "gateId": "block10.6-cobros-authorization-package-static-v20260801",
     "run": 30706617835,
@@ -44,6 +51,7 @@
     "autoApply": false
   },
   "privateRuntimeInput": {
+    "materializedWithRealValues": false,
     "storedInRepo": false,
     "storedInArtifact": false,
     "requiresAlreadyRegisteredSources": true,
