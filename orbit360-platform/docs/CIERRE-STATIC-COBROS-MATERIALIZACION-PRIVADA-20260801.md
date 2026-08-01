@@ -25,29 +25,13 @@ El contrato resuelve en memoria las cinco referencias opacas del paquete 10.6 co
 
 ## Protección del payload
 
-Los datos privados:
+Los datos privados no son enumerables, no aparecen al serializar la evidencia, no se almacenan en el repositorio ni artifacts y deben destruirse explícitamente al finalizar. La regresión confirmó `0` tarjetas privadas restantes después de la destrucción.
 
-- no son enumerables dentro del resultado;
-- no aparecen al serializar la evidencia;
-- no se almacenan en el repositorio;
-- no se incluyen en artifacts;
-- deben destruirse explícitamente al finalizar la revisión;
-- dejan un resumen sanitizado con conteos y controles, no identidades.
-
-La regresión confirmó que, después de la destrucción, quedan `0` tarjetas privadas en memoria.
-
-Cada tarjeta privada requiere al menos dos pruebas de fuente y conserva:
-
-- cliente, aseguradora, póliza, recibo, moneda, monto y fecha únicamente en memoria;
-- llave de idempotencia;
-- diff antes/después;
-- snapshot pre-write obligatorio;
-- rollback;
-- bloqueo de autorización y escritura.
+Cada tarjeta privada requiere al menos dos pruebas de fuente y conserva en memoria cliente, aseguradora, póliza, recibo, moneda, monto y fecha, además de idempotencia, diff, snapshot y rollback.
 
 ## Caso histórico
 
-La tarjeta histórica se presenta separada y debe ser la última del paquete. Una futura decisión afirmativa deberá autorizar expresamente la operación atómica:
+La tarjeta histórica se presenta separada y de último. Una futura decisión afirmativa deberá autorizar expresamente:
 
 ```text
 crear recibo histórico exigible
