@@ -1,0 +1,125 @@
+name: Orbit 360 · Cobros 10.9 · controlled LAB write once
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/cobros-controlled-write-lab-v20260801.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-cobros-controlled-write-lab-v20260801
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  GATE_ID: block10.9-cobros-controlled-write-lab-v20260801
+  REQUEST_PATH: .github/orbit360-requests/cobros-controlled-write-lab-v20260801.json
+  PACKAGE_PATH: /tmp/orbit360-cobros-gate10.9-private.json
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/cobros-controlled-write-lab-v20260801.json
+jobs:
+  controlled_write:
+    name: Gate 10.9 · snapshot + atomic write + verify/rollback
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar request y lineage
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.schemaVersion=="orbit360-cobros-controlled-write-lab-request-v1" and .gateId==env.GATE_ID and .contractVersion=="10.9.0" and .approved==true and .phrase=="AUTORIZO ARMAR Y EJECUTAR GATE 10.9 COBROS LAB CINCO CASOS SIN DEPLOY NI PRODUCCION" and .scope.cases==5 and .scope.direct==4 and .scope.historical==1 and .scope.operations==10 and .scope.policyWrites==0 and .scope.finmovs==0 and .capabilities.secrets==true and .capabilities.firestoreRead==true and .capabilities.writes==true and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false and .consumed==false' "$REQUEST_PATH" >/dev/null
+          AUTHORIZED_HEAD="$(jq -r '.authorizedHead' "$REQUEST_PATH")"
+          test -n "$AUTHORIZED_HEAD"
+          git merge-base --is-ancestor "$AUTHORIZED_HEAD" HEAD
+          bad="$(git diff --name-only "$AUTHORIZED_HEAD"..HEAD | grep -Ev '^\.github/orbit360-requests/cobros-controlled-write-lab-v20260801\.json$' || true)"
+          test -z "$bad"
+      - name: Gate canónico antes de secrets y Firestore
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-cobros-controlled-write-preflight-v20260801.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .gateId==env.GATE_ID and .contractVersion=="10.9.0" and .canonicalLifecycleComposition=="phase-capability-contract-v1" and .canonicalPhase=="LAB_DATA_CONTRACT_REPAIR_APPLY" and .phase=="ARMED_BY_EXPLICIT_LAB_AUTHORIZATION" and .requestExists==true and .requestState=="EXACT_AUTHORIZED_REQUIRED" and .failed==0 and .plan.cases==5 and .plan.direct==4 and .plan.historical==1 and .plan.operations==10 and .executionAuthorized==true and .labWriteAuthorized==true and .writeEligible==5 and .genericWriterRemainsBlockedForCobros==true and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Preparar dependencia aislada
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --no-save firebase-admin@13.4.0 >/dev/null 2>&1
+      - name: Descargar paquete privado exacto
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          PACKAGE_ID="$(jq -r '.privatePackage.driveFileId' "$REQUEST_PATH")"
+          PACKAGE_SHA="$(jq -r '.privatePackage.sha256' "$REQUEST_PATH")"
+          export PACKAGE_ID PACKAGE_SHA
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
+          (async()=>{
+            const sa=JSON.parse(process.env.SERVICE_ACCOUNT),now=Math.floor(Date.now()/1000);
+            if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
+            const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const tokenResponse=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig})});
+            const token=await tokenResponse.json();if(!tokenResponse.ok||!token.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+tokenResponse.status);
+            const response=await fetch(`https://www.googleapis.com/drive/v3/files/${process.env.PACKAGE_ID}?alt=media&supportsAllDrives=true`,{headers:{authorization:`Bearer ${token.access_token}`}});
+            if(!response.ok)throw new Error('ENVIRONMENT_FAILURE:DRIVE_'+response.status);
+            const bytes=Buffer.from(await response.arrayBuffer()),sha=crypto.createHash('sha256').update(bytes).digest('hex');
+            if(sha!==process.env.PACKAGE_SHA)throw new Error('DATA_CONTRACT_FAILURE:PRIVATE_PACKAGE_SHA');fs.writeFileSync(process.env.PACKAGE_PATH,bytes);
+          })().catch(e=>{console.error(String(e.message||e));process.exit(41);});
+          NODE
+      - name: Ejecutar escritura controlada y verificar
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          export ORBIT360_COBROS_REQUEST="$REQUEST_PATH"
+          export ORBIT360_COBROS_PACKAGE="$PACKAGE_PATH"
+          export ORBIT360_COBROS_PACKAGE_SHA256="$(jq -r '.privatePackage.sha256' "$REQUEST_PATH")"
+          export ORBIT360_COBROS_PACKAGE_LOGICAL_SHA256="$(jq -r '.privatePackage.logicalSha256' "$REQUEST_PATH")"
+          export ORBIT360_COBROS_EVIDENCE="$EVIDENCE_PATH"
+          node --check tools/orbit360-cobros-controlled-write-lab-v20260801.mjs
+          node tools/orbit360-cobros-controlled-write-lab-v20260801.mjs
+          jq -e '.status=="WRITE_PASS" and .ok==true and .gateId==env.GATE_ID and .contractVersion=="10.9.0" and .phase=="VERIFIED_OR_ROLLED_BACK" and .requestVerified==true and .packageVerified==true and .plan.cases==5 and .execution.completedGroups==5 and .execution.verifiedGroups==5 and .execution.alreadyAppliedGroups==0 and .writes.cobros==5 and .writes.receiptUpdates==4 and .writes.receiptCreates==1 and .writes.policies==0 and .writes.finmovs==0 and .writes.firestore==10 and .writes.operational==10 and .rollback.executed==false and .after.polizas==1373 and .after.recibosEsperados==1294 and .after.cobros==5 and .after.finmovs==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsPolicyNumbers==false and .containsAmounts==false and .containsSecrets==false' "$EVIDENCE_PATH" >/dev/null
+          rm -f "$PACKAGE_PATH"
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-cobros-controlled-write-lab-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/cobros-controlled-write-lab-v20260801.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: ${{ env.EVIDENCE_PATH }}
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Cobros 10.9 LAB write blocked/failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='WRITE_PASS'&&p.execution.verifiedGroups===5&&p.after.cobros===5&&p.after.recibosEsperados===1294&&p.after.finmovs===0&&p.deployExecuted===false&&p.productionTouched===false){state='success';description='Cobros 10.9 LAB WRITE_PASS: 5 verified; zero finmovs';}else if(p.rollback?.executed&&p.rollback?.restored){description='Cobros 10.9 failed; rollback restored baseline';}else if(p.classification){description=`Cobros 10.9 blocked: ${p.classification}`;}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/cobros-controlled-write-lab',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
