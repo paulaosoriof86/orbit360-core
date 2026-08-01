@@ -3,9 +3,9 @@
   "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
   "gateContractVersion": "11.0.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "PLANILLAS_POLICY_IDENTITY_RECEIPT_LINK_READONLY_CLOSED",
+  "status": "PLANILLAS_COMMISSION_DRYRUN_ACTIVE",
   "executionProfile": {
-    "mode": "READ_ONLY_PLANILLAS_POLICY_IDENTITY_RECEIPT_LINK_CLOSED",
+    "mode": "READ_ONLY_PLANILLAS_COMMISSION_DRYRUN",
     "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
       "secrets": true,
@@ -25,34 +25,38 @@
   "sourceRowsObserved": 67,
   "crmCandidateRows": 65,
   "sourceRowsOmitted": 2,
-  "policyIdentityDiagnostic": {
-    "run": 30719208561,
-    "job": 91420032333,
-    "artifact": 8824310023,
-    "digest": "sha256:28518aead736f2d3709e02492d0e7f8eb99b0ba9a4d87a44bf9a5934d05e4567",
-    "resolved": 49,
-    "holds": 16,
-    "previousHoldsResolved": 39,
-    "classification": "VALIDATOR_STALE_ROOT_FIXED",
+  "policyReceiptClosure": {
+    "policyIdentityRun": 30719208561,
+    "receiptLinkRun": 30719464732,
+    "policyResolved": 49,
+    "policyHolds": 16,
+    "receiptResolved": 5,
+    "receiptHolds": 44,
+    "currentCobrosLinked": 0,
     "closed": true
   },
-  "receiptLinkDiagnostic": {
-    "run": 30719464732,
-    "job": 91420695963,
-    "artifact": 8824388638,
-    "digest": "sha256:fd81c22fd70ad62511d2ec8a8a53f0f5d2aa3e058d0d31dcfd8a3f9cedffa054",
-    "processed": 49,
-    "resolved": 5,
-    "holds": 44,
-    "excludedPolicyHolds": 16,
-    "existingCobroLinked": 0,
-    "closed": true
+  "commissionDryrunPlanner": {
+    "run": 30719949803,
+    "job": 91421949720,
+    "artifact": 8824535956,
+    "digest": "sha256:3926cf3ed356d40872b3d00cda2025567a7eb936549e56eb8a30357873682914",
+    "checks": 32,
+    "destinations": ["planillasComisiones", "comisionesDevengadas", "conciliacionesComisiones"],
+    "status": "STATIC_COMMISSION_DRYRUN_PLANNER_PASS"
   },
-  "holdLedger": {
-    "policyIdentity": 16,
-    "receiptAmountAmbiguous": 30,
-    "receiptNotFound": 14,
-    "totalRowsWithoutReceiptLink": 60
+  "dryrunScope": {
+    "exactPolicyReceiptRelations": 5,
+    "sourceBundles": {
+      "el_roble_gtq_2026_06": 3,
+      "universales_gtq_2026_06": 1,
+      "bantrab_gtq_2026_06": 1
+    },
+    "genericComisionesDestinationAllowed": false,
+    "invoiceWritesAllowed": false,
+    "cxcWritesAllowed": false,
+    "cxpWritesAllowed": false,
+    "advisorLiquidationWritesAllowed": false,
+    "rateInferenceAllowed": false
   },
   "financeActivated": false,
   "writeAuthorized": false,
@@ -62,7 +66,6 @@
   "cxpWritesAuthorized": false,
   "advisorLiquidationWritesAuthorized": false,
   "operationalWritesAllowed": 0,
-  "additionalReadOnlyExecutionAuthorized": false,
   "privatePackage": {
     "driveFileId": "1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84",
     "sha256": "abf5975e5cf8821489437b3b6172153c54032c8f097b720c0a98b30555a62a82",
@@ -81,15 +84,15 @@
     "noPaymentDatePolicyOrReceiptSelection": true,
     "strongReferenceBeforeAmount": true,
     "fourCobrosResidualHoldsExcluded": true,
-    "requestReplayBlocked": true
+    "previousReadOnlyRequestClosed": true,
+    "separateWriteAuthorizationRequired": true
   },
-  "nextGateCondition": {
-    "scope": "FIVE_READONLY_POLICY_RECEIPT_RELATIONS_ONLY",
-    "requiresCommissionDryRun": true,
-    "requiresIdempotency": true,
-    "requiresDestinationContract": true,
-    "requiresAdvisorValidation": true,
-    "requiresSnapshotAndRollback": true,
-    "requiresSeparateWriteAuthorization": true
+  "futureWriteRequirements": {
+    "candidateSetDigestRequired": true,
+    "targetSnapshotDigestRequired": true,
+    "idempotencyRequired": true,
+    "atomicBatchRequired": true,
+    "rollbackRequired": true,
+    "advisorValidationRequired": true
   }
 }
