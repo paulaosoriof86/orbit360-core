@@ -112,6 +112,6 @@ deploy: 0
 production: untouched
 ```
 
-## Siguiente acción exacta
+## Continuidad
 
-Preparar el contrato de materialización privada read-only. Este contrato deberá resolver las cinco referencias opacas contra las fuentes reales ya registradas, producir un diff privado para Dirección y destruir el payload temporal al finalizar. No concederá autorización, no persistirá datos reales en el repositorio y no habilitará escrituras.
+El contrato de materialización privada fue cerrado posteriormente por el gate 10.7. Los datos reales de las cinco tarjetas todavía no han sido materializados; solo quedó preparado y validado el mecanismo efímero.
