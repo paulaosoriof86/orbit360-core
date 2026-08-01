@@ -5,8 +5,12 @@
   "mode": "READ_ONLY_ROOT_CAUSE_DIAGNOSIS",
   "approved": true,
   "reason": "Diagnose RECEIPT_SNAPSHOT_MISMATCH after safe rollback without another write attempt.",
+  "sequence": 2,
   "sourceRun": 30711578397,
   "sourceArtifact": 8822041409,
+  "previousDiagnosticRun": 30711682689,
+  "previousDiagnosticClassification": "VALIDATOR_STALE",
+  "correctedLayer": "CANONICAL_ENGINE_READ_ONLY_DIAGNOSIS_PHASE",
   "expectedBaseline": {
     "polizas": 1373,
     "recibosEsperados": 1293,
