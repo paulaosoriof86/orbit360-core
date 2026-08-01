@@ -2,18 +2,37 @@
   "schemaVersion": "orbit360-planillas-comisiones-linkage-readonly-request-v1",
   "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
   "contractVersion": "11.0.0",
-  "mode": "READ_ONLY_PLANILLAS_COMISIONES_LINKAGE",
+  "mode": "READ_ONLY_PLANILLAS_POLICY_IDENTITY_DIAGNOSTIC",
   "approved": true,
-  "sequence": 3,
-  "reason": "Repeat the same registered canonical block11 gate after correcting only the private package canonical logical hash from Python serialization to the required Node stable-sort contract; preserve the source rows, scope, permissions and zero-write boundary.",
-  "previousRun": {
-    "run": 30717963030,
-    "job": 91416756957,
-    "artifact": 8823933228,
-    "classification": "DATA_CONTRACT_FAILURE",
-    "failure": "PACKAGE_LOGICAL_SHA",
-    "firestoreRead": false,
+  "sequence": 4,
+  "reason": "Diagnose the 55 policy identity HOLD from the completed block11 linkage by combining insurer-specific number aliases, insured compatibility and exact receipt-calendar amounts; do not select renewal terms by payment date, change source rows or authorize writes.",
+  "previousLinkage": {
+    "run": 30718081323,
+    "job": 91417072747,
+    "artifact": 8823967179,
+    "policyUnique": 10,
+    "policyMissing": 29,
+    "policyAmbiguous": 26,
+    "policyIdentityHolds": 55,
     "writes": 0
+  },
+  "staticResolver": {
+    "run": 30719074310,
+    "job": 91419680404,
+    "artifact": 8824265883,
+    "digest": "sha256:9c3dbc8ee18b2c09fcd3518d4877c5fe651461131ffb3d113d98df12f5b5a0f1",
+    "checks": 19,
+    "fixtures": 9,
+    "realRowsUsed": 0,
+    "status": "STATIC_POLICY_IDENTITY_RESOLVER_PASS"
+  },
+  "rootCause": {
+    "classification": "VALIDATOR_STALE",
+    "exactFirstShortCircuitStale": true,
+    "insurerAliasExpansionRequired": true,
+    "receiptCalendarEvidenceRequired": true,
+    "paymentDateTermSelectionAllowed": false,
+    "sourceRowsChanged": false
   },
   "sourceCut": {
     "filesReceived": 19,
@@ -36,6 +55,14 @@
     "recibosEsperados": 1294,
     "cobros": 5,
     "finmovs": 0
+  },
+  "expectedDiagnostic": {
+    "processed": 65,
+    "resolved": 49,
+    "holds": 16,
+    "previousHoldsResolved": 39,
+    "previousUniqueReclassified": 1,
+    "writes": 0
   },
   "expectedOutcome": {
     "sourceCandidates": 65,
