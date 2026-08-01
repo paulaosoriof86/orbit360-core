@@ -22,7 +22,7 @@ function logicalDigest(obj){const copy=JSON.parse(JSON.stringify(obj));delete co
 function isPlain(v){return Boolean(v)&&typeof v==='object'&&!Array.isArray(v)&&typeof v.toDate!=='function'&&!(v instanceof Date);}
 function comparable(v){if(v&&typeof v.toDate==='function')return v.toDate().toISOString();if(v instanceof Date)return v.toISOString();if(Array.isArray(v))return v.map(comparable);if(isPlain(v)){const o={};for(const [k,x] of Object.entries(v))o[k]=comparable(x);return o;}return v;}
 function fieldEqual(actual,expected){if(isPlain(expected)){if(!isPlain(actual))return false;return Object.entries(expected).every(([k,v])=>fieldEqual(actual[k],v));}return JSON.stringify(comparable(actual??null))===JSON.stringify(comparable(expected??null));}
-function subsetEqual(actual,expected){return Boolean(actual&&expected)&&Object.entries(expected).every(([k,v])=>fieldEqual(actual[k],v));}
+function mismatchKeys(actual,expected){if(!actual||!expected)return Object.keys(expected||{}).sort();return Object.entries(expected).filter(([k,v])=>!fieldEqual(actual[k],v)).map(([k])=>k).sort();}
 function fail(code,detail=''){const e=new Error(`${code}${detail?':'+detail:''}`);e.code=code;throw e;}
 function safeError(e){return clean(e&&e.message||e).replace(/[\w.+-]+@[\w.-]+/g,'[email]').slice(0,400);}
 function ref(db,coll,id){return db.collection('tenantId').doc(TENANT).collection(coll).doc(id);}
@@ -30,7 +30,7 @@ async function count(db,coll){const snap=await db.collection('tenantId').doc(TEN
 function save(payload){fs.mkdirSync(path.dirname(evidencePath),{recursive:true});const tmp=`${evidencePath}.tmp-${process.pid}`;fs.writeFileSync(tmp,JSON.stringify(payload,null,2)+'\n','utf8');JSON.parse(fs.readFileSync(tmp,'utf8'));fs.renameSync(tmp,evidencePath);}
 
 const result={
-  schemaVersion:'orbit360-cobros-residual-candidate-readonly-evidence-v1',
+  schemaVersion:'orbit360-cobros-residual-candidate-readonly-evidence-v2',
   gateId:GATE,
   contractVersion:VERSION,
   tenantId:TENANT,
@@ -45,7 +45,9 @@ const result={
     policyExists:false,
     receiptExists:false,
     policySnapshotOk:false,
+    policyMismatchedKeys:[],
     receiptSnapshotOk:false,
+    receiptMismatchedKeys:[],
     noExistingCobroForReceipt:false,
     receiptNotAlreadyConciliated:false,
     uniqueReceiptCandidate:false,
@@ -55,6 +57,7 @@ const result={
     noFinmov:false,
     eligible:false
   },
+  diagnosticComplete:false,
   residualSummary:{sourceRows:9,appliedAndVerified:5,residualRows:4,candidates:0,holds:4},
   requestReplayBlocked:false,
   writeAuthorized:false,
@@ -109,8 +112,10 @@ try{
   result.candidate.receiptExists=receiptSnap.exists;
   if(!policySnap.exists||!receiptSnap.exists)fail('DATA_CONTRACT_FAILURE','CANDIDATE_DOCUMENT_MISSING');
   const policy=policySnap.data(),receipt=receiptSnap.data();
-  result.candidate.policySnapshotOk=subsetEqual(policy,c.expectedPolicy);
-  result.candidate.receiptSnapshotOk=subsetEqual(receipt,c.expectedReceipt);
+  result.candidate.policyMismatchedKeys=mismatchKeys(policy,c.expectedPolicy);
+  result.candidate.receiptMismatchedKeys=mismatchKeys(receipt,c.expectedReceipt);
+  result.candidate.policySnapshotOk=result.candidate.policyMismatchedKeys.length===0;
+  result.candidate.receiptSnapshotOk=result.candidate.receiptMismatchedKeys.length===0;
   result.candidate.policyStatePreserved=policy.estado===c.expectedPolicy.estado&&policy.id===c.policyId;
   result.candidate.noExistingCobroForReceipt=cobrosForReceipt.empty;
   result.candidate.receiptNotAlreadyConciliated=receipt.conciliado!==true&&!clean(receipt.cobroId);
@@ -123,6 +128,7 @@ try{
   result.candidate.eligible=result.candidate.policySnapshotOk&&result.candidate.receiptSnapshotOk&&result.candidate.policyStatePreserved&&result.candidate.noExistingCobroForReceipt&&result.candidate.receiptNotAlreadyConciliated&&result.candidate.uniqueReceiptCandidate&&result.candidate.amountExactAcrossSources&&result.candidate.endosoConfirmedByTwoInsurerSources&&result.candidate.noFinmov;
   result.residualSummary.candidates=result.candidate.eligible?1:0;
   result.residualSummary.holds=result.candidate.eligible?3:4;
+  result.diagnosticComplete=!result.candidate.receiptSnapshotOk||!result.candidate.policySnapshotOk;
   result.status=result.candidate.eligible?'RESIDUAL_CANDIDATE_READONLY_PASS':'RESIDUAL_CANDIDATE_READONLY_HOLD';
   result.classification=result.candidate.eligible?'GO_LAB_COBROS_RESIDUAL_CANDIDATE_READONLY':'HOLD_LAB_COBROS_RESIDUAL_CANDIDATE_READONLY';
   result.ok=true;
