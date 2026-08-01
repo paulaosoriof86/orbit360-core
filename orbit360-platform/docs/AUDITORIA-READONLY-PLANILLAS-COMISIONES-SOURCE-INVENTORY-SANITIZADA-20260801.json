@@ -1,10 +1,10 @@
 {
-  "schemaVersion": "orbit360-planillas-comisiones-source-inventory-readonly-v1",
+  "schemaVersion": "orbit360-planillas-comisiones-source-inventory-readonly-v2",
   "date": "2026-08-01",
   "tenantId": "alianzas-soluciones",
   "environment": "LAB",
   "classification": "READ_ONLY_SOURCE_INVENTORY",
-  "status": "PARTIAL_SOURCE_COVERAGE",
+  "status": "SCHEMA_REFERENCE_AVAILABLE_CURRENT_CASE_SOURCES_MISSING",
   "scope": {
     "reconciledCobrosEligibleForSourceInventory": 5,
     "residualHoldCasesExcluded": 4,
@@ -16,7 +16,7 @@
   },
   "sources": [
     {
-      "sourceAlias": "MAPFRE_COMMISSION_PLANILLA",
+      "sourceAlias": "MAPFRE_COMMISSION_PLANILLA_2026_06",
       "sourceType": "planilla_comisiones",
       "format": "XLS_HTML_EXPORT",
       "sourceModifiedDate": "2026-07-14",
@@ -24,9 +24,6 @@
       "country": "GT",
       "currency": "GTQ",
       "dataRows": 11,
-      "coveredReconciledCobros": 2,
-      "coveredInsurerCobros": 2,
-      "sourceCoverageCompleteForInsurer": true,
       "containsCommissionFields": true,
       "containsNetPremiumField": true,
       "containsInvoiceValueField": true,
@@ -56,7 +53,21 @@
       ],
       "sourcePhysicalSha256": "55e1f0622e680265cb8925d5df512ca938a22db603b0f6631d1519ddd2529697",
       "normalizedSheetSha256": "ec287e2baf77ce8ce2d1e95f4a10e633860bcb141c570c8653b0970a563279dd",
-      "decision": "SOURCE_READY_FOR_READ_ONLY_MAPPING_AND_DRY_RUN"
+      "reconciledMapfreCobrosInScope": 2,
+      "exactCurrentPeriodMatches": 0,
+      "reasonNoCoverage": "PLANILLA_ROWS_ARE_JUNE_2026_WHILE_RECONCILED_COBROS_ARE_JULY_2026",
+      "decision": "SCHEMA_REFERENCE_ONLY_NOT_VALID_FOR_CASE_DRY_RUN"
+    },
+    {
+      "sourceAlias": "MAPFRE_COMMISSION_PLANILLA_JULY_HISTORICAL",
+      "sourceType": "planilla_comisiones",
+      "format": "XLSX",
+      "businessPeriod": "2020-07",
+      "sourceModifiedDate": "2020-08-12",
+      "country": "GT",
+      "currency": "GTQ",
+      "containsCommissionFields": true,
+      "decision": "EXCLUDED_HISTORICAL_SOURCE_NOT_2026"
     },
     {
       "sourceAlias": "ASEGURADORA_GENERAL_PAYMENT_REPORT",
@@ -66,7 +77,7 @@
       "sourcePeriodEnd": "2026-07-27",
       "country": "GT",
       "currency": "GTQ",
-      "coveredReconciledCobros": 3,
+      "paymentRowsRelevantToReconciledCobros": 3,
       "containsCommissionFields": false,
       "containsNetPremiumField": true,
       "containsTotalPremiumField": true,
@@ -96,25 +107,29 @@
     }
   ],
   "coverage": {
-    "sourceReadyCobros": 2,
-    "sourceMissingCobros": 3,
-    "sourceReadyPercentage": 40,
+    "sourceReadyCobros": 0,
+    "sourceMissingOrPeriodMismatchCobros": 5,
+    "sourceReadyPercentage": 0,
+    "schemaReferenceAvailable": true,
     "mapfre": {
       "reconciledCobros": 2,
-      "sourceReady": 2,
-      "status": "READY_FOR_READ_ONLY_DRY_RUN"
+      "exactCurrentPeriodSourceReady": 0,
+      "schemaReferenceRowsAvailable": 11,
+      "status": "CURRENT_PERIOD_SOURCE_MISSING"
     },
     "aseguradoraGeneral": {
       "reconciledCobros": 3,
-      "sourceReady": 0,
+      "exactCurrentPeriodSourceReady": 0,
       "paymentEvidenceAvailable": 3,
       "commissionPlanillaLocated": false,
-      "status": "SOURCE_MISSING_HOLD"
+      "status": "COMMISSION_SOURCE_MISSING"
     }
   },
   "domainControls": {
     "commissionCalculatedFromNetCollectedPremiumOnly": true,
+    "exactPeriodMatchRequired": true,
     "inferCommissionRateProhibited": true,
+    "reusePriorMonthCommissionRowProhibited": true,
     "deriveCommissionFromFinancialMovementsProhibited": true,
     "usePaymentReportAsCommissionPlanillaProhibited": true,
     "residualHoldCasesExcluded": true,
@@ -141,5 +156,5 @@
     "containsAuthorizationRefs": false,
     "containsSecrets": false
   },
-  "nextAction": "BUILD_MAPFRE_TWO_CASE_READ_ONLY_MAPPING_AND_DRY_RUN_WHILE_LOCATING_OR_REQUESTING_THE_AUTHORITATIVE_ASEGURADORA_GENERAL_COMMISSION_PLANILLA"
+  "nextAction": "LOCATE_OR_REQUEST_CURRENT_2026_COMMISSION_PLANILLAS_FOR_MAPFRE_JULY_AND_ASEGURADORA_GENERAL_BEFORE_ANY_CASE_LEVEL_DRY_RUN"
 }
