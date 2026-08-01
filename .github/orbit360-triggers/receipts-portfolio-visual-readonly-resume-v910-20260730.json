@@ -1,26 +1,25 @@
 {
-  "schemaVersion": "orbit360-receipts-portfolio-final-evidence-continuation-v1",
-  "classification": "VALIDATOR_STALE",
-  "authorizedContinuationBase": "fc69dbfd3423e467e9ab882484ba6e6f2f0dbc8f",
+  "schemaVersion": "orbit360-receipts-portfolio-final-sanitized-evidence-v4",
+  "classification": "PIPELINE_MECHANISM_FAILURE_ROLE_SELECTION",
+  "authorizedContinuationBase": "507e26b1976b234a9141ca7a9e92b4b69919e515",
+  "sanitizerCommit": "d0254e6ba27b3c3ea92d5c5956f6140d8f049bc5",
+  "sanitizerBlob": "903fcade8cbee7456c07d0a29022346893657d12",
   "sourceFinalHostingRun": 30676303473,
   "sourceFinalHostingDeployPassed": true,
-  "sourceFinalRemoteParityPassed": true,
-  "sourceFinalHydrationDiagnosticPassed": true,
   "sourceBrowserRecoveryRun": 30676673787,
-  "sourceBrowserRecoveryArtifact": 8810714415,
-  "sourceBrowserRecoveryDigest": "sha256:d2f2d04811da20cbb17f4bf6e713078697125f51395945e4cd4b0b447acce995",
   "baseVisualPassed": true,
   "humanVisualPassed": true,
   "badgeBrowserPassed": true,
   "badgeHeight": 21,
-  "badgeAlignSelf": "flex-start",
-  "badgeFlexGrow": "0",
-  "badgeFlexShrink": "0",
-  "staleValidatorMismatch": {
-    "workflowExpected": ".badge.*",
-    "testPublished": ".metrics.*",
-    "productImpact": false,
-    "rerunPassedChecks": false
+  "sourceEvidenceContinuationRun": 30676843740,
+  "sourceEvidenceFailure": "ROLE_SELECTION_FAILED",
+  "rootCause": "sanitizer selected role before allowedRoles and role selector were deterministically ready",
+  "rootFix": {
+    "waitAllowedRoles": true,
+    "acceptAlreadyActiveRole": true,
+    "waitSelectorOrSessionSetter": true,
+    "confirmActiveRoleBeforeSanitization": true,
+    "preserveSecurityFailClosed": true
   },
   "hostingDeploy": false,
   "rulesDeploy": false,
@@ -30,5 +29,5 @@
   "production": false,
   "browserReadOnly": true,
   "runOnlySanitizedVisualEvidence": true,
-  "notes": "Continue from the successful base visual, human visual and compact badge evidence. Do not rerun passed checks and do not deploy. Generate only secure fail-closed screenshots and final closure evidence."
+  "notes": "Final evidence-only continuation. All product/browser checks already passed. This run only verifies three published assets and generates six fail-closed sanitized screenshots after deterministic Dirección role selection."
 }
