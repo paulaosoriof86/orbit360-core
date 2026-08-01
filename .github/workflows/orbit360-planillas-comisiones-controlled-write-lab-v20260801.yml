@@ -1,0 +1,125 @@
+name: Orbit 360 · Planillas/Comisiones · controlled write LAB
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/planillas-comisiones-controlled-write-lab-v20260801.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-planillas-comisiones-controlled-write-lab-v20260801
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  GATE_ID: block11-planillas-comisiones-linkage-readonly-v20260801
+  LIFECYCLE_PATH: tools/orbit360-validator-lifecycle-contract-planillas-comisiones-linkage-readonly-v20260801.json
+  REQUEST_PATH: .github/orbit360-requests/planillas-comisiones-controlled-write-lab-v20260801.json
+  PACKAGE_PATH: /tmp/orbit360-planillas-comisiones-linkage-private.json
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/planillas-comisiones-controlled-write-lab-v20260801.json
+jobs:
+  write:
+    name: Planillas/Comisiones · atomic 15-document LAB write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar alcance y barrera visual CRM
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          jq -e '.schemaVersion=="orbit360-planillas-comisiones-controlled-write-request-v1" and .gateId==env.GATE_ID and .contractVersion=="11.0.0" and .approved==true and .consumed==false and .authorizationRef=="planillas-comisiones-five-relations-write-20260801" and .scope.relations==5 and .scope.documents==15 and .scope.planillasComisiones==5 and .scope.comisionesDevengadas==5 and .scope.conciliacionesComisiones==5 and .scope.sellerHolds==3 and .scope.policyWrites==0 and .scope.receiptWrites==0 and .scope.cobroWrites==0 and .scope.finmovWrites==0 and .scope.invoiceWrites==0 and .scope.cxcWrites==0 and .scope.cxpWrites==0 and .scope.liquidationWrites==0 and .digests.candidateSet=="04c7da071ddadfe689e0137e730448ada36abe7aff6c228cd5abb0206c26c680" and .digests.emptyTargetSnapshot=="12b3763f976433e1e7e809f461dc835bca3a4c39b1d6dd1655e42a202e6cbf3f" and .crmVisualApproval.clientes==true and .crmVisualApproval.polizas==false and .crmVisualApproval.vehiculos==false and .crmVisualApproval.recibos==false and .crmVisualApproval.cartera==false and .crmVisualApproval.restoCrm==false and .capabilities.secrets==true and .capabilities.firestoreRead==true and .capabilities.writes==true and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false' "$REQUEST_PATH" >/dev/null
+          jq -e '.status=="PLANILLAS_COMMISSION_CONTROLLED_WRITE_AUTHORIZED" and .executionProfile.mode=="CONTROLLED_WRITE_PLANILLAS_COMMISSION" and .executionProfile.phase=="LAB_DATA_CONTRACT_REPAIR_APPLY" and .executionProfile.capabilities.writes==true and .writeAuthorized==true and .commissionWritesAuthorized==true and .operationalWritesAllowed==15 and .finmovWritesAuthorized==false and .advisorLiquidationWritesAuthorized==false and .crmVisualApproval.polizas==false and .financeActivated==false' "$LIFECYCLE_PATH" >/dev/null
+      - name: Gate canónico antes de secrets y Firestore
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-planillas-comisiones-linkage-readonly-v20260801.mjs
+          node --check orbit360-platform/core/planillas-comisiones-policy-identity-resolver-p0.js
+          node --check orbit360-platform/core/planillas-comisiones-receipt-link-resolver-p0.js
+          node --check orbit360-platform/core/planillas-comisiones-commission-dryrun-planner-p0.js
+          node --check tools/orbit360-planillas-comisiones-controlled-write-lab-v20260801.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="PLANILLAS_COMMISSION_CONTROLLED_WRITE_READY" and .canonicalPhase=="LAB_DATA_CONTRACT_REPAIR_APPLY" and .phase=="CONTROLLED_WRITE_PLANILLAS_COMMISSION" and .executionAuthorized==true and .labWriteAuthorized==true and .writeEligible==15 and .financeActivated==false and .crmVisualApproval.polizas==false and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Preparar dependencia aislada
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --no-save firebase-admin@13.4.0 >/dev/null 2>&1
+      - name: Descargar paquete privado exacto
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          PACKAGE_ID="$(jq -r '.privatePackage.driveFileId' "$REQUEST_PATH")"
+          PACKAGE_SHA="$(jq -r '.privatePackage.sha256' "$REQUEST_PATH")"
+          export PACKAGE_ID PACKAGE_SHA
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
+          (async()=>{
+            const sa=JSON.parse(process.env.SERVICE_ACCOUNT),now=Math.floor(Date.now()/1000);
+            if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
+            const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const tokenResponse=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig})});
+            const token=await tokenResponse.json();if(!tokenResponse.ok||!token.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+tokenResponse.status);
+            const response=await fetch(`https://www.googleapis.com/drive/v3/files/${process.env.PACKAGE_ID}?alt=media&supportsAllDrives=true`,{headers:{authorization:`Bearer ${token.access_token}`}});
+            if(!response.ok)throw new Error('ENVIRONMENT_FAILURE:DRIVE_'+response.status);
+            const bytes=Buffer.from(await response.arrayBuffer()),sha=crypto.createHash('sha256').update(bytes).digest('hex');
+            if(sha!==process.env.PACKAGE_SHA)throw new Error('DATA_CONTRACT_FAILURE:PRIVATE_PACKAGE_SHA');fs.writeFileSync(process.env.PACKAGE_PATH,bytes);
+          })().catch(error=>{console.error(String(error.message||error));process.exit(41);});
+          NODE
+      - name: Ejecutar escritura atómica y post-verificación
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          export ORBIT360_PLANILLAS_WRITE_REQUEST="$REQUEST_PATH"
+          export ORBIT360_PLANILLAS_LIFECYCLE="$LIFECYCLE_PATH"
+          export ORBIT360_PLANILLAS_PRIVATE_PACKAGE="$PACKAGE_PATH"
+          export ORBIT360_PLANILLAS_PRIVATE_PACKAGE_SHA256="$(jq -r '.privatePackage.sha256' "$REQUEST_PATH")"
+          export ORBIT360_PLANILLAS_PRIVATE_PACKAGE_LOGICAL_SHA256="$(jq -r '.privatePackage.logicalSha256' "$REQUEST_PATH")"
+          export ORBIT360_PLANILLAS_WRITE_EVIDENCE="$EVIDENCE_PATH"
+          node tools/orbit360-planillas-comisiones-controlled-write-lab-v20260801.mjs
+          jq -e '.status=="WRITE_PASS" and .classification=="GO_LAB_PLANILLAS_COMMISSION_CONTROLLED_WRITE" and .ok==true and .requestVerified==true and .lifecycleVerified==true and .packageVerified==true and .candidateDigestVerified==true and .plan.relations==5 and .plan.commissionCandidates==5 and .plan.documents==15 and .plan.sellerHolds==3 and .execution.verifiedDocuments==15 and (.execution.createdDocuments==15 or .execution.alreadyApplied==true) and .before.polizas==1373 and .before.recibosEsperados==1294 and .before.cobros==5 and .before.finmovs==0 and .after==.before and .targetAfter.planillasComisiones==5 and .targetAfter.comisionesDevengadas==5 and .targetAfter.conciliacionesComisiones==5 and .controls.policyWrites==false and .controls.receiptWrites==false and .controls.cobroWrites==false and .controls.finmovWrites==false and .controls.invoiceWrites==false and .controls.cxcWrites==false and .controls.cxpWrites==false and .controls.advisorLiquidationWrites==false and .controls.crmVisualApproval.polizas==false and .controls.visualApprovalInferred==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsPolicyNumbers==false and .containsAmounts==false and .containsIds==false and .containsSourceRows==false and .containsSecrets==false' "$EVIDENCE_PATH" >/dev/null
+          rm -f "$PACKAGE_PATH"
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-planillas-comisiones-controlled-write-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/planillas-comisiones-controlled-write-lab-v20260801.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: ${{ env.EVIDENCE_PATH }}
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Planillas controlled write failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='WRITE_PASS'&&p.execution.verifiedDocuments===15&&p.targetAfter.planillasComisiones===5&&p.targetAfter.comisionesDevengadas===5&&p.targetAfter.conciliacionesComisiones===5){state='success';description='Commissions write PASS: 15/15 verified; CRM visual freeze preserved';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/planillas-commission-controlled-write',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
