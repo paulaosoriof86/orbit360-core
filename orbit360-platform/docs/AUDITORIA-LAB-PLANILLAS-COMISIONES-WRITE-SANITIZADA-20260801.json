@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-controlled-write-sanitized-v1",
+  "date": "2026-08-01",
+  "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
+  "contractVersion": "11.0.0",
+  "run": 30722653179,
+  "job": 91428836213,
+  "artifact": 8825344683,
+  "artifactDigest": "sha256:79b10118552daca5056d9408cf14243095bc3b817fd2f7ee5f7117bfd31b1260",
+  "headAudited": "335e2f4c7a714832e6e54aadc7c6cb44ae87f373",
+  "status": "WRITE_PASS",
+  "classification": "GO_LAB_PLANILLAS_COMMISSION_CONTROLLED_WRITE",
+  "authorization": {
+    "explicit": true,
+    "consumed": true,
+    "relations": 5,
+    "documents": 15
+  },
+  "digests": {
+    "candidateSetVerified": true,
+    "targetSnapshotVerified": true
+  },
+  "targetBefore": {
+    "planillasComisiones": 0,
+    "comisionesDevengadas": 0,
+    "conciliacionesComisiones": 0
+  },
+  "targetAfter": {
+    "planillasComisiones": 5,
+    "comisionesDevengadas": 5,
+    "conciliacionesComisiones": 5
+  },
+  "execution": {
+    "singleAtomicTransaction": true,
+    "createdDocuments": 15,
+    "verifiedDocuments": 15,
+    "rollbackExecuted": false,
+    "idempotencyEnabled": true,
+    "replayRequiresExactOwnership": true
+  },
+  "baselineBeforeAndAfter": {
+    "polizas": 1373,
+    "recibosEsperados": 1294,
+    "cobros": 5,
+    "finmovs": 0,
+    "unchanged": true
+  },
+  "sellerBoundary": {
+    "sellerReadyOrNotApplicable": 2,
+    "sellerHolds": 3,
+    "holdReason": "HOLD_SELLER_ALIAS_NOT_CONFIGURED",
+    "liquidationsCreated": 0,
+    "defaultPercentageApplied": false
+  },
+  "excludedWrites": {
+    "polizas": 0,
+    "recibos": 0,
+    "cobros": 0,
+    "finmovs": 0,
+    "facturas": 0,
+    "cxc": 0,
+    "cxp": 0,
+    "liquidacionesAsesor": 0
+  },
+  "crmVisualApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false,
+    "approvalInferredFromWrite": false
+  },
+  "environment": {
+    "lab": true,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "sanitization": {
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "containsDocumentIds": false,
+    "containsSourceRows": false,
+    "containsSecrets": false
+  },
+  "ok": true
+}
