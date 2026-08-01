@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-cobros-source-intake-static-trigger-v1",
+  "approved": true,
+  "gateId": "block10.1-cobros-source-intake-static-v20260801",
+  "contractVersion": "10.1.0",
+  "authorizedHead": "f548a1eb2a85ad98c22be54a84599ea033864494",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "scope": {
+    "static": true,
+    "payloads": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "predecessorRun": 30678802532,
+  "registeredSourceCutoff": "2026-07-31",
+  "notes": "Qualifies the source intake engine and exact manifest boundaries. Real source rows remain unattached and cobros/finmovs writes remain zero."
+}
