@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-cobros-conciliacion-source-evidence-v1",
+  "generatedAt": "2026-08-01",
+  "sourceAudit": "orbit360-platform/docs/AUDITORIA-READONLY-CONCILIACION-COBROS-PAGADOS-20260731.md",
+  "scope": "TENANT_AYS_ONLY_SANITIZED_AGGREGATE",
+  "insurerReportsReviewed": 2,
+  "insurerPaymentRowsReviewed": 9,
+  "oneToOneCandidates": 5,
+  "holdOrNoMatch": 4,
+  "rowLevelEvidenceAvailable": false,
+  "replayableWithoutCurrentSource": false,
+  "extrapolatesToOtherInsurers": false,
+  "cobrosMaterialized": 0,
+  "finmovsMaterialized": 0,
+  "firestoreWrites": 0,
+  "operationalWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false,
+  "notes": "Aggregate historical evidence only. Do not reconstruct or fabricate the nine source rows. A new real-data dry-run requires the current authoritative source files."
+}
