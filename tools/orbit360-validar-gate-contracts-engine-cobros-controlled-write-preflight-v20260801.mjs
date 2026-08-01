@@ -14,9 +14,13 @@ const LIFECYCLE='tools/orbit360-validator-lifecycle-contract-cobros-controlled-w
 const REQUEST='.github/orbit360-requests/cobros-controlled-write-lab-v20260801.json';
 const DIAGNOSIS='.github/orbit360-diagnostics/cobros-controlled-write-lab-v20260801.json';
 const POST_CLOSE='.github/orbit360-diagnostics/cobros-post-close-relations-readonly-v20260801.json';
+const RESIDUAL='.github/orbit360-diagnostics/cobros-residual-candidate-readonly-v20260801.json';
 const PHRASE='AUTORIZO ARMAR Y EJECUTAR GATE 10.9 COBROS LAB CINCO CASOS SIN DEPLOY NI PRODUCCION';
 const PACKAGE_SHA='beebdac90668291686f55610bdc2d8853ae5f2de4ae17b73732bb03812218911';
 const PACKAGE_LOGICAL='fccae1f73d254a0fca8e1a0208a92f4a9a601bc83c8f8e26cb027be165f354bb';
+const RESIDUAL_PACKAGE_ID='1KHeHbNmJSvYZgzUcop57LiR4KdB-PxOh';
+const RESIDUAL_PACKAGE_SHA='ccc37815c1f90fa3965d8eb87273c4746873ba79ec57fd6987d41b6016769411';
+const RESIDUAL_PACKAGE_LOGICAL='b9798a225530a4473dcd356e158211b94e1700bbb03dd988df344a8358c213ae';
 
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function write(payload){const target=path.join(ROOT,CANONICAL_EVIDENCE);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,JSON.stringify(payload,null,2)+'\n','utf8');}
@@ -32,32 +36,44 @@ function validateRequest(){
   return request;
 }
 function base(plan){return {gateId:GATE,contractVersion:VERSION,plan,genericWriterRemainsBlockedForCobros:true,failed:0,failedCheckIds:[],dataAccess:false,secretAccess:false,operationalWrites:0,evidenceWrites:1,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsPolicyNumbers:false,containsAmounts:false,containsSecrets:false};}
-function plan(){return {cases:5,direct:4,historical:1,atomicGroups:5,snapshots:11,operations:10,rollbacks:11,cobros:5,receiptUpdates:4,receiptCreates:1,policyWrites:0,finmovs:0};}
-function armedPayload(){validateRequest();return {schemaVersion:'orbit360-cobros-controlled-write-canonical-armed-v1',status:'GO_GATE_CONTRACT',classification:'AUTHORIZED_LAB_WRITE_CONTRACT_READY',canonicalPhase:'LAB_DATA_CONTRACT_REPAIR_APPLY',phase:'ARMED_BY_EXPLICIT_LAB_AUTHORIZATION',requestExists:true,requestState:'EXACT_AUTHORIZED_REQUIRED',privatePackageVerifiedByContract:true,packageCanonicalization:'node-json-stable-sort-v1',executionAuthorized:true,labWriteAuthorized:true,writeEligible:5,...base(plan())};}
+function writePlan(){return {cases:5,direct:4,historical:1,atomicGroups:5,snapshots:11,operations:10,rollbacks:11,cobros:5,receiptUpdates:4,receiptCreates:1,policyWrites:0,finmovs:0};}
+function residualPlan(){return {sourceRows:9,appliedAndVerified:5,residualRows:4,readOnlyCandidates:1,holds:3,writes:0,policyWrites:0,receiptWrites:0,cobroWrites:0,finmovs:0};}
+function armedPayload(){validateRequest();return {schemaVersion:'orbit360-cobros-controlled-write-canonical-armed-v1',status:'GO_GATE_CONTRACT',classification:'AUTHORIZED_LAB_WRITE_CONTRACT_READY',canonicalPhase:'LAB_DATA_CONTRACT_REPAIR_APPLY',phase:'ARMED_BY_EXPLICIT_LAB_AUTHORIZATION',requestExists:true,requestState:'EXACT_AUTHORIZED_REQUIRED',privatePackageVerifiedByContract:true,packageCanonicalization:'node-json-stable-sort-v1',executionAuthorized:true,labWriteAuthorized:true,writeEligible:5,...base(writePlan())};}
 function diagnosisPayload(lifecycle){
   validateRequest();if(!fs.existsSync(path.join(ROOT,DIAGNOSIS)))throw new Error('DIAGNOSIS_REQUEST_MISSING');const d=readJson(DIAGNOSIS);
   if(d.schemaVersion!=='orbit360-cobros-controlled-write-lab-diagnosis-request-v1'||d.gateId!==GATE||d.contractVersion!==VERSION||d.mode!=='READ_ONLY_ROOT_CAUSE_DIAGNOSIS'||d.approved!==true)throw new Error('DIAGNOSIS_REQUEST_INVALID');
   if(d.capabilities?.secrets!==true||d.capabilities?.firestoreRead!==true||d.capabilities?.writes!==false||d.capabilities?.runtime!==false||d.capabilities?.browser!==false||d.capabilities?.deploy!==false||d.capabilities?.functionsDeploy!==false||d.capabilities?.rulesDeploy!==false||d.capabilities?.production!==false)throw new Error('DIAGNOSIS_CAPABILITIES_MISMATCH');
   if(lifecycle.status!=='ROOT_CAUSE_DIAGNOSIS_ACTIVE'||lifecycle.executionProfile?.mode!=='READ_ONLY_ROOT_CAUSE_DIAGNOSIS'||lifecycle.writeAuthorized!==false||lifecycle.thirdExecutionProhibited!==true||lifecycle.diagnosisAuthorized!==true)throw new Error('DIAGNOSIS_LIFECYCLE_INVALID');
-  return {schemaVersion:'orbit360-cobros-controlled-write-canonical-diagnosis-v1',status:'GO_GATE_CONTRACT',classification:'READ_ONLY_ROOT_CAUSE_DIAGNOSIS_READY',canonicalPhase:'LAB_DATA_CONTRACT_REPAIR_DIAGNOSIS',phase:'READ_ONLY_ROOT_CAUSE_DIAGNOSIS',requestExists:true,requestState:'WRITE_FROZEN_DIAGNOSIS_ONLY',privatePackageVerifiedByContract:true,packageCanonicalization:'node-json-stable-sort-v1',executionAuthorized:false,labWriteAuthorized:false,writeEligible:0,diagnosisAuthorized:true,diagnosisCaseOrdinal:3,thirdExecutionProhibited:true,...base(plan())};
+  return {schemaVersion:'orbit360-cobros-controlled-write-canonical-diagnosis-v1',status:'GO_GATE_CONTRACT',classification:'READ_ONLY_ROOT_CAUSE_DIAGNOSIS_READY',canonicalPhase:'LAB_DATA_CONTRACT_REPAIR_DRYRUN',phase:'READ_ONLY_ROOT_CAUSE_DIAGNOSIS',requestExists:true,requestState:'WRITE_FROZEN_DIAGNOSIS_ONLY',privatePackageVerifiedByContract:true,packageCanonicalization:'node-json-stable-sort-v1',executionAuthorized:false,labWriteAuthorized:false,writeEligible:0,diagnosisAuthorized:true,diagnosisCaseOrdinal:3,thirdExecutionProhibited:true,...base(writePlan())};
 }
 function postClosePayload(lifecycle){
   validateRequest();if(!fs.existsSync(path.join(ROOT,POST_CLOSE)))throw new Error('POST_CLOSE_REQUEST_MISSING');const d=readJson(POST_CLOSE);
   if(d.schemaVersion!=='orbit360-cobros-post-close-relations-readonly-request-v1'||d.gateId!==GATE||d.contractVersion!==VERSION||d.mode!=='READ_ONLY_POST_CLOSE_RELATION_VERIFICATION'||d.approved!==true)throw new Error('POST_CLOSE_REQUEST_INVALID');
   if(d.capabilities?.secrets!==true||d.capabilities?.firestoreRead!==true||d.capabilities?.writes!==false||d.capabilities?.runtime!==false||d.capabilities?.browser!==false||d.capabilities?.deploy!==false||d.capabilities?.functionsDeploy!==false||d.capabilities?.rulesDeploy!==false||d.capabilities?.production!==false)throw new Error('POST_CLOSE_CAPABILITIES_MISMATCH');
   if(lifecycle.status!=='POST_CLOSE_READONLY_VERIFICATION_ACTIVE'||lifecycle.executionProfile?.mode!=='READ_ONLY_POST_CLOSE_VERIFICATION'||lifecycle.executionProfile?.phase!=='LAB_DATA_CONTRACT_REPAIR_DRYRUN'||lifecycle.writeAuthorized!==false||lifecycle.additionalExecutionProhibited!==true||lifecycle.requestSemanticallyConsumed!==true)throw new Error('POST_CLOSE_LIFECYCLE_INVALID');
-  return {schemaVersion:'orbit360-cobros-post-close-canonical-readonly-v1',status:'GO_GATE_CONTRACT',classification:'READ_ONLY_POST_CLOSE_RELATION_VERIFICATION_READY',canonicalPhase:'LAB_DATA_CONTRACT_REPAIR_DRYRUN',phase:'READ_ONLY_POST_CLOSE_RELATION_VERIFICATION',requestExists:true,requestState:'SEALED_NO_REPLAY',privatePackageVerifiedByContract:true,packageCanonicalization:'node-json-stable-sort-v1',executionAuthorized:false,labWriteAuthorized:false,writeEligible:0,postCloseReadOnlyAuthorized:true,requestReplayBlocked:true,...base(plan())};
+  return {schemaVersion:'orbit360-cobros-post-close-canonical-readonly-v1',status:'GO_GATE_CONTRACT',classification:'READ_ONLY_POST_CLOSE_RELATION_VERIFICATION_READY',canonicalPhase:'LAB_DATA_CONTRACT_REPAIR_DRYRUN',phase:'READ_ONLY_POST_CLOSE_RELATION_VERIFICATION',requestExists:true,requestState:'SEALED_NO_REPLAY',privatePackageVerifiedByContract:true,packageCanonicalization:'node-json-stable-sort-v1',executionAuthorized:false,labWriteAuthorized:false,writeEligible:0,postCloseReadOnlyAuthorized:true,requestReplayBlocked:true,...base(writePlan())};
+}
+function residualPayload(lifecycle){
+  validateRequest();if(!fs.existsSync(path.join(ROOT,RESIDUAL)))throw new Error('RESIDUAL_REQUEST_MISSING');const d=readJson(RESIDUAL);
+  if(d.schemaVersion!=='orbit360-cobros-residual-candidate-readonly-request-v1'||d.gateId!==GATE||d.contractVersion!==VERSION||d.mode!=='READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT'||d.approved!==true)throw new Error('RESIDUAL_REQUEST_INVALID');
+  if(d.sourceRows!==9||d.appliedAndVerified!==5||d.residualRows!==4||d.candidateCount!==1||d.holdCount!==3)throw new Error('RESIDUAL_REQUEST_COUNTS');
+  if(d.privatePackage?.driveFileId!==RESIDUAL_PACKAGE_ID||d.privatePackage?.sha256!==RESIDUAL_PACKAGE_SHA||d.privatePackage?.logicalSha256!==RESIDUAL_PACKAGE_LOGICAL)throw new Error('RESIDUAL_PACKAGE_MISMATCH');
+  if(d.capabilities?.secrets!==true||d.capabilities?.firestoreRead!==true||d.capabilities?.writes!==false||d.capabilities?.runtime!==false||d.capabilities?.browser!==false||d.capabilities?.deploy!==false||d.capabilities?.functionsDeploy!==false||d.capabilities?.rulesDeploy!==false||d.capabilities?.production!==false)throw new Error('RESIDUAL_CAPABILITIES_MISMATCH');
+  if(lifecycle.status!=='RESIDUAL_CANDIDATE_READONLY_ACTIVE'||lifecycle.executionProfile?.mode!=='READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT'||lifecycle.executionProfile?.phase!=='LAB_DATA_CONTRACT_REPAIR_DRYRUN'||lifecycle.writeAuthorized!==false||lifecycle.requestReplayBlocked!==true||lifecycle.requestSemanticallyConsumed!==true||lifecycle.additionalExecutionProhibited!==true||lifecycle.residualCandidateReadOnlyAuthorized!==true)throw new Error('RESIDUAL_LIFECYCLE_INVALID');
+  if(lifecycle.residualCandidate?.privatePackage?.driveFileId!==RESIDUAL_PACKAGE_ID||lifecycle.residualCandidate?.privatePackage?.sha256!==RESIDUAL_PACKAGE_SHA||lifecycle.residualCandidate?.privatePackage?.logicalSha256!==RESIDUAL_PACKAGE_LOGICAL)throw new Error('RESIDUAL_LIFECYCLE_PACKAGE_MISMATCH');
+  return {schemaVersion:'orbit360-cobros-residual-candidate-canonical-readonly-v1',status:'GO_GATE_CONTRACT',classification:'READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT_READY',canonicalPhase:'LAB_DATA_CONTRACT_REPAIR_DRYRUN',phase:'READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT',requestExists:true,requestState:'SEALED_NO_REPLAY',privatePackageVerifiedByContract:true,packageCanonicalization:'node-json-stable-sort-v1',executionAuthorized:false,labWriteAuthorized:false,writeEligible:0,residualCandidateReadOnlyAuthorized:true,residualCandidateCount:1,residualHoldCount:3,requestReplayBlocked:true,...base(residualPlan())};
 }
 function closedPayload(lifecycle){
-  if(lifecycle.status!=='CLOSED_WRITE_PASS'||lifecycle.writeAuthorized!==false||lifecycle.additionalExecutionProhibited!==true||lifecycle.requestSemanticallyConsumed!==true)throw new Error('CLOSED_LIFECYCLE_INVALID');
-  return {schemaVersion:'orbit360-cobros-controlled-write-canonical-closed-v1',status:'GO_GATE_CONTRACT',classification:'CLOSED_WRITE_PASS_NO_ACCESS',canonicalPhase:'VERIFIED_OR_ROLLED_BACK',phase:'CLOSED_WRITE_PASS',requestExists:true,requestState:'SEALED_NO_REPLAY',executionAuthorized:false,labWriteAuthorized:false,writeEligible:0,requestReplayBlocked:true,...base(plan())};
+  if(!['CLOSED_WRITE_PASS','CLOSED_WRITE_PASS_POST_VERIFIED','CLOSED_RESIDUAL_CANDIDATE_PREFLIGHT'].includes(lifecycle.status)||lifecycle.writeAuthorized!==false||lifecycle.additionalExecutionProhibited!==true||lifecycle.requestSemanticallyConsumed!==true)throw new Error('CLOSED_LIFECYCLE_INVALID');
+  return {schemaVersion:'orbit360-cobros-controlled-write-canonical-closed-v1',status:'GO_GATE_CONTRACT',classification:'CLOSED_WRITE_PASS_NO_ACCESS',canonicalPhase:'VERIFIED_OR_ROLLED_BACK',phase:lifecycle.status,requestExists:true,requestState:'SEALED_NO_REPLAY',executionAuthorized:false,labWriteAuthorized:false,writeEligible:0,requestReplayBlocked:true,...base(writePlan())};
 }
 try{
   if(process.argv[2]!==GATE)throw new Error('GATE_ID_MISMATCH');
   if(String(process.env.ORBIT360_BRANCH||'')!=='ays/backend-tenant-lab-v99-20260703')throw new Error('BRANCH_MISMATCH');
   const lifecycle=readJson(LIFECYCLE);let payload;
-  if(lifecycle.status==='POST_CLOSE_READONLY_VERIFICATION_ACTIVE')payload=postClosePayload(lifecycle);
-  else if(lifecycle.status==='CLOSED_WRITE_PASS')payload=closedPayload(lifecycle);
+  if(lifecycle.status==='RESIDUAL_CANDIDATE_READONLY_ACTIVE')payload=residualPayload(lifecycle);
+  else if(lifecycle.status==='POST_CLOSE_READONLY_VERIFICATION_ACTIVE')payload=postClosePayload(lifecycle);
+  else if(['CLOSED_WRITE_PASS','CLOSED_WRITE_PASS_POST_VERIFIED','CLOSED_RESIDUAL_CANDIDATE_PREFLIGHT'].includes(lifecycle.status))payload=closedPayload(lifecycle);
   else if(lifecycle.status==='ROOT_CAUSE_DIAGNOSIS_ACTIVE')payload=diagnosisPayload(lifecycle);
   else if(lifecycle.currentPhase==='ARMED_BY_EXPLICIT_LAB_AUTHORIZATION')payload=armedPayload();
   else{
