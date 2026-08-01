@@ -3,8 +3,8 @@
   "approved": true,
   "gateId": "block10-cobros-conciliacion-readonly-static-v20260801",
   "contractVersion": "10.0.0",
-  "classification": "DATA_CONTRACT_FAILURE",
-  "authorizedHead": "7ef7d81db166dd00d62c05f8448bc3c6492cd693",
+  "classification": "VALIDATOR_STALE",
+  "authorizedHead": "74a0ca6f04fef9e76abe79c8abc9f9ccf1b933c4",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "scope": {
     "static": true,
@@ -22,5 +22,8 @@
     "holdOrNoMatch": 4,
     "rowLevelReplay": false
   },
+  "priorRun": 30678678193,
+  "priorFailure": "PREDECESSOR_BLOCK9_PREWRITE_EXPECTED_REQUEST_ABSENT",
+  "rootCause": "Closed block9 request remains correctly present; predecessor preflight must run in AUTHORIZED_WRITE lifecycle.",
   "notes": "Static qualification only. No reconstruction of real rows and no cobros or finmovs writes."
 }
