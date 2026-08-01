@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "orbit360-cobros-private-package-repair-request-v1",
+  "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
+  "contractVersion": "10.9.0",
+  "mode": "PRIVATE_PACKAGE_REPAIR_FROM_READONLY_CANONICAL_TARGET",
+  "approved": true,
+  "sourceDiagnosisRun": 30711814124,
+  "sourceDiagnosisArtifact": 8822109811,
+  "correctedCaseOrdinals": [3, 4],
+  "correctedKeys": ["endoso"],
+  "valuesExposed": false,
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "firestoreWrites": false,
+    "privatePackageWrite": true,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  }
+}
