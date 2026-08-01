@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+'use strict';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const resolver=require('../orbit360-platform/core/planillas-comisiones-receipt-link-resolver-p0.js');
+let checks=0;const assert=(ok,id)=>{checks++;if(!ok)throw new Error(`STATIC_TEST_FAIL:${id}`);};
+const receipt=(id,policyId,netPremium,series='',currency='GTQ')=>({id,policyId,netPremium,totalPremium:null,series,currency,endorsement:'',sourceReceiptNumber:'',sourceReference:''});
+const source=(netPremium,series='')=>({netPremium,currency:'GTQ',series,requirement:'',invoiceReference:'',incomeRelation:'',extraReference:''});
+const cases=[];
+cases.push(resolver.resolveReceipt({source:source(100,'A1'),policyId:'p1',receipts:[receipt('r1','p1',100,'A1'),receipt('r2','p1',100,'A2')]}));
+cases.push(resolver.resolveReceipt({source:source(125),policyId:'p1',receipts:[receipt('r1','p1',125),receipt('r2','p1',130)]}));
+cases.push(resolver.resolveReceipt({source:source(100),policyId:'p1',receipts:[receipt('r1','p1',100),receipt('r2','p1',100)]}));
+cases.push(resolver.resolveReceipt({source:source(90),policyId:'p1',receipts:[receipt('r1','p1',100)]}));
+cases.push(resolver.resolveReceipt({source:source(100),policyId:'',receipts:[receipt('r1','p1',100)]}));
+cases.push(resolver.resolveReceipt({source:source(100,'A1'),policyId:'p1',receipts:[receipt('r1','p1',100,'A1'),receipt('r2','p1',90,'A1')]}));
+const expected=['RESOLVE_RECEIPT_BY_REFERENCE','RESOLVE_RECEIPT_BY_NET_PREMIUM','HOLD_RECEIPT_AMOUNT_AMBIGUOUS','HOLD_RECEIPT_NOT_FOUND','HOLD_POLICY_IDENTITY_REQUIRED','HOLD_RECEIPT_REFERENCE_AMBIGUOUS'];
+expected.forEach((decision,index)=>assert(cases[index].decision===decision,decision));
+assert(resolver.amountMatches(receipt('r1','p1',100),-100,'GTQ')===true,'REVERSAL_ABSOLUTE');
+assert(resolver.amountMatches(receipt('r1','p1',100,'','USD'),100,'GTQ')===false,'CURRENCY_BOUNDARY');
+const summary=resolver.summarize(cases);assert(summary.total===6,'SUMMARY_TOTAL');assert(summary.resolved===2,'SUMMARY_RESOLVED');assert(summary.holds===4,'SUMMARY_HOLDS');assert(summary.writes===0,'SUMMARY_WRITES');assert(resolver.schemaVersion==='orbit360-planillas-comisiones-receipt-link-resolver-v1','SCHEMA');assert(typeof resolver.resolveReceipt==='function','API');
+console.log(JSON.stringify({status:'STATIC_RECEIPT_LINK_RESOLVER_PASS',checks,fixtures:6,realRowsUsed:0,writes:0,storeAccess:false,firestoreAccess:false,browserExecuted:false,deployExecuted:false,productionTouched:false},null,2));
