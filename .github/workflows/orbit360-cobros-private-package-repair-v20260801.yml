@@ -1,0 +1,109 @@
+name: Orbit 360 · Cobros 10.9 · private package repair
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-diagnostics/cobros-controlled-write-lab-package-repair-v20260801.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-cobros-private-package-repair-v20260801
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  GATE_ID: block10.9-cobros-controlled-write-lab-v20260801
+  REQUEST_PATH: .github/orbit360-requests/cobros-controlled-write-lab-v20260801.json
+  REPAIR_REQUEST: .github/orbit360-diagnostics/cobros-controlled-write-lab-package-repair-v20260801.json
+  PACKAGE_PATH: /tmp/orbit360-cobros-gate10.9-private.json
+  REPAIRED_PATH: /tmp/orbit360-cobros-gate10.9-private-repaired.json
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/cobros-controlled-write-lab-package-repair-v20260801.json
+jobs:
+  repair:
+    name: Gate 10.9 · repair private snapshot package only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar reparación privada fail-closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          jq -e '.schemaVersion=="orbit360-cobros-private-package-repair-request-v1" and .gateId==env.GATE_ID and .mode=="PRIVATE_PACKAGE_REPAIR_FROM_READONLY_CANONICAL_TARGET" and .approved==true and .sourceDiagnosisRun==30711814124 and .correctedCaseOrdinals==[3,4] and .correctedKeys==["endoso"] and .capabilities.secrets==true and .capabilities.firestoreRead==true and .capabilities.firestoreWrites==false and .capabilities.privatePackageWrite==true and .capabilities.deploy==false and .capabilities.production==false' "$REPAIR_REQUEST" >/dev/null
+      - name: Gate canónico antes de secrets y Firestore
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="READ_ONLY_ROOT_CAUSE_DIAGNOSIS_READY" and .writeEligible==0 and .diagnosisAuthorized==true and .thirdExecutionProhibited==true and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Preparar dependencia aislada
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --no-save firebase-admin@13.4.0 >/dev/null 2>&1
+      - name: Reparar y reemplazar paquete privado
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          PACKAGE_ID="$(jq -r '.privatePackage.driveFileId' "$REQUEST_PATH")"
+          OLD_SHA="$(jq -r '.privatePackage.sha256' "$REQUEST_PATH")"
+          export PACKAGE_ID OLD_SHA
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
+          async function token(sa,scope){const now=Math.floor(Date.now()/1000),unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope,aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900}),sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url'),r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig})}),j=await r.json();if(!r.ok||!j.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+r.status);return j.access_token;}
+          (async()=>{const sa=JSON.parse(process.env.SERVICE_ACCOUNT);if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');const t=await token(sa,'https://www.googleapis.com/auth/drive');const r=await fetch(`https://www.googleapis.com/drive/v3/files/${process.env.PACKAGE_ID}?alt=media&supportsAllDrives=true`,{headers:{authorization:`Bearer ${t}`}});if(!r.ok)throw new Error('ENVIRONMENT_FAILURE:DRIVE_READ_'+r.status);const b=Buffer.from(await r.arrayBuffer()),h=crypto.createHash('sha256').update(b).digest('hex');if(h!==process.env.OLD_SHA)throw new Error('DATA_CONTRACT_FAILURE:SOURCE_PACKAGE_SHA');fs.writeFileSync(process.env.PACKAGE_PATH,b);fs.writeFileSync('/tmp/orbit360-drive-token',t);})().catch(e=>{console.error(String(e.message||e));process.exit(41);});
+          NODE
+          export ORBIT360_COBROS_PACKAGE="$PACKAGE_PATH"
+          export ORBIT360_COBROS_REPAIRED_PACKAGE="$REPAIRED_PATH"
+          export ORBIT360_COBROS_PACKAGE_SHA256="$OLD_SHA"
+          export ORBIT360_COBROS_PACKAGE_LOGICAL_SHA256="$(jq -r '.privatePackage.logicalSha256' "$REQUEST_PATH")"
+          export ORBIT360_COBROS_REPAIR_EVIDENCE="$EVIDENCE_PATH"
+          node --check tools/orbit360-reparar-paquete-privado-cobros-gate109-v20260801.mjs
+          node tools/orbit360-reparar-paquete-privado-cobros-gate109-v20260801.mjs
+          jq -e '.status=="PACKAGE_REPAIR_READY" and .ok==true and .correctedCaseOrdinals==[3,4] and .correctedKeys==["endoso"] and .corrections==2 and .firestoreWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_PATH" >/dev/null
+          NEW_SHA="$(jq -r '.newPhysicalSha256' "$EVIDENCE_PATH")"; export NEW_SHA
+          TOKEN="$(cat /tmp/orbit360-drive-token)"
+          HTTP="$(curl -sS -o /tmp/orbit360-drive-upload-response -w '%{http_code}' -X PATCH -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' --data-binary "@$REPAIRED_PATH" "https://www.googleapis.com/upload/drive/v3/files/$PACKAGE_ID?uploadType=media&supportsAllDrives=true")"
+          test "$HTTP" = '200'
+          curl -sS -H "Authorization: Bearer $TOKEN" "https://www.googleapis.com/drive/v3/files/$PACKAGE_ID?alt=media&supportsAllDrives=true" -o /tmp/orbit360-drive-reverify
+          test "$(sha256sum /tmp/orbit360-drive-reverify | awk '{print $1}')" = "$NEW_SHA"
+          node - <<'NODE'
+          const fs=require('fs');const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_PATH,'utf8'));p.privatePackageWriteExecuted=true;p.driveReverified=true;fs.writeFileSync(process.env.EVIDENCE_PATH,JSON.stringify(p,null,2)+'\n');
+          NODE
+          rm -f "$PACKAGE_PATH" "$REPAIRED_PATH" /tmp/orbit360-drive-token /tmp/orbit360-drive-reverify /tmp/orbit360-drive-upload-response
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-cobros-private-package-repair-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/cobros-controlled-write-lab-package-repair-v20260801.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: ${{ env.EVIDENCE_PATH }}
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Cobros 10.9 private package repair failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='PACKAGE_REPAIR_READY'&&p.privatePackageWriteExecuted===true&&p.driveReverified===true&&p.firestoreWrites===0&&p.productionTouched===false){state='success';description='Cobros 10.9 private package repaired; Firestore writes 0';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/cobros-private-package-repair',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
