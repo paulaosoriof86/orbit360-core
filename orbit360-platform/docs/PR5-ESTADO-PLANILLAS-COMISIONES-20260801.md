@@ -23,3 +23,5 @@ receipt link run: 30719464732
 ```
 
 Estado contractual: `PLANILLAS_POLICY_IDENTITY_RECEIPT_LINK_READONLY_CLOSED`.
+
+Siguiente bloque permitido: contrato de dry-run de comisión limitado a las cinco relaciones inequívocas; ninguna escritura está autorizada.
