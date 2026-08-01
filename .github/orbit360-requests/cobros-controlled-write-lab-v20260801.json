@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "orbit360-cobros-controlled-write-lab-request-v1",
+  "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
+  "contractVersion": "10.9.0",
+  "approved": true,
+  "phrase": "AUTORIZO ARMAR Y EJECUTAR GATE 10.9 COBROS LAB CINCO CASOS SIN DEPLOY NI PRODUCCION",
+  "tenantId": "alianzas-soluciones",
+  "projectId": "ays-orbit-360-lab",
+  "authorizedBy": "Dirección / AdminTenant",
+  "authorizedAt": "2026-08-01T11:40:00-06:00",
+  "authorizedHead": "2bc00d2fe0b43718e71f45658be4bd6c940a6b19",
+  "sourcePreflight": {
+    "run": 30710608492,
+    "artifact": 8821741047,
+    "digest": "sha256:6da1eb4d5fd39ce350ac31b4f9dd2a1ecb34b713346f14cc9d35f23a6e50ed00"
+  },
+  "privatePackage": {
+    "driveFileId": "1FGpp_v6ZTs52VEeOnsH2IxoNCqWwVoAD",
+    "sha256": "d64e64a01104be7defdc2c643b7180fe14ffa095f219aea9e13e6708c8bc1266",
+    "logicalSha256": "1f06709e3c0a42534b17ff93809a3b527321552d68476267a2eb1ffe26a90036"
+  },
+  "scope": {
+    "cases": 5,
+    "direct": 4,
+    "historical": 1,
+    "snapshots": 11,
+    "operations": 10,
+    "rollbacks": 11,
+    "cobros": 5,
+    "receiptUpdates": 4,
+    "receiptCreates": 1,
+    "policyWrites": 0,
+    "finmovs": 0
+  },
+  "authorizationRefs": [
+    "cob-auth-a0d4f00d5169af22d571f20b",
+    "cob-auth-ade753baa6872ddfbbea704f",
+    "cob-auth-d9ed3d5aa03f198a469439cc",
+    "cob-auth-1ee62483415c6124bf64981c",
+    "cob-auth-5ae6c8bf9ebe9680ca848b2e"
+  ],
+  "controls": {
+    "snapshotBeforeWrite": true,
+    "idempotency": true,
+    "atomicPerCase": true,
+    "rollbackAllOnAnyFailure": true,
+    "verifyAfterWrite": true,
+    "reactivatePolicy": false,
+    "createFinmov": false
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": true,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "consumed": false
+}
