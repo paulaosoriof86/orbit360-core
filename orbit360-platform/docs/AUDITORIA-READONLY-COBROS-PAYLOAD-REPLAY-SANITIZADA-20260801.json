@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "orbit360-cobros-real-payload-replay-sanitized-v1",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-31",
+  "status": "REAL_PAYLOAD_REPLAY_SANITIZED_READY",
+  "classification": "DATA_CONTRACT_FAILURE_CORRECTED",
+  "sources": [
+    {
+      "logicalName": "Cobranza Efectuada desde 2024.xlsx",
+      "sourceType": "cobros_realizados",
+      "sha256": "727665170572143979b5f274190e200da397e7b32965d1809b1b9be6a8495302",
+      "exactRegisteredDuplicate": true,
+      "format": "XLSX",
+      "dataRows": 2157,
+      "role": "CRM_PAYMENT_REPORTED_AUTHORITY"
+    },
+    {
+      "logicalName": "Reporte de Ingresos Aseguradora General.xls",
+      "sourceType": "planilla_aseguradora",
+      "sha256": "61574cc18b9200af438a49985e58deea635243f8808eac97470789df0db5b5ed",
+      "exactRegisteredDuplicate": true,
+      "format": "XLS_BIFF",
+      "dataRows": 5,
+      "periodStart": "2026-07-01",
+      "periodEnd": "2026-07-27",
+      "role": "INSURER_PAID_REPORT_AUTHORITY"
+    },
+    {
+      "logicalName": "Cobros Mapfre.xls",
+      "sourceType": "planilla_aseguradora",
+      "sha256": "d19559b7d5ad80930ad10f88d30ae7e0015b1647a5c0840867cf76e32c617ad8",
+      "exactRegisteredDuplicate": true,
+      "format": "HTML_XLS",
+      "dataRows": 4,
+      "periodStart": "2026-07-01",
+      "periodEnd": "2026-07-26",
+      "role": "INSURER_PAID_REPORT_AUTHORITY"
+    }
+  ],
+  "replay": {
+    "insurerRows": 9,
+    "oneToOneCandidates": 5,
+    "hold": 4,
+    "targetModes": {
+      "linkExistingReceipt": 4,
+      "createHistoricalReceiptProposal": 1
+    },
+    "holdReasons": {
+      "IDENTIDAD_INSUFICIENTE": 2,
+      "DIFERENCIA_MONTO": 1,
+      "SIN_CONTRAPARTE_CRM": 1
+    },
+    "sourceDifferencesPreserved": {
+      "nonZeroCentDifferences": 3,
+      "dueDateDifferences": 4,
+      "paymentDateDifferences": 3
+    },
+    "wrongVigenciaInstallmentBlocked": true,
+    "historicalRecentExpiredReceiptProposed": true,
+    "historicalReceiptCreatesCobro": false,
+    "reactivatesExpiredPolicy": false,
+    "autoApply": false
+  },
+  "rootCause": {
+    "previousEngineVersion": "20260801.1",
+    "failure": "Matcher required exact amount/date equivalence and did not model endorsements or a missing historical exigible receipt.",
+    "correctedEngineVersion": "20260801.2-real-payload-replay",
+    "fixCommit": "cb299fc9e1bd8d8bb6b3378e28c162cc26a97abd",
+    "controls": [
+      "cent differences preserved",
+      "date differences preserved",
+      "endorsement and installment normalization",
+      "exact receipt precedence",
+      "wrong vigencia blocked",
+      "historical receipt remains proposal only"
+    ]
+  },
+  "priorSourcesStatus": {
+    "policies": "ROW_LEVEL_PROCESSED_AND_LAB_CLOSED",
+    "vehicles": "ROW_LEVEL_PROCESSED_AND_LAB_CLOSED",
+    "receiptsPortfolio": "ROW_LEVEL_PROCESSED_AND_LAB_CLOSED",
+    "insurerPendingBalanceReports": "PROCESSED_FOR_PORTFOLIO_NOT_AS_PAYMENT",
+    "crmPaymentReport": "PREVIOUSLY_PROCESSED_AS_PAYMENT_EVIDENCE_NOT_RECONCILED_COBRO",
+    "commissionsBankFinancialHistory": "SEPARATE_DOMAIN_NOT_WRITTEN_AS_COBROS"
+  },
+  "writes": {
+    "cobros": 0,
+    "finmovs": 0,
+    "firestore": 0,
+    "operational": 0,
+    "productionTouched": false,
+    "deployExecuted": false
+  },
+  "security": {
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsRealAmounts": false,
+    "containsSecrets": false,
+    "repoPayloads": false
+  }
+}
