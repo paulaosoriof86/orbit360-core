@@ -14,6 +14,7 @@ env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   TRIGGER: .github/orbit360-triggers/cobros-private-real-materialization-static-v20260801.json
   EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/cobros-private-real-materialization-static-v20260801.json
+  DIRECT_RECOVERY: orbit360-platform/docs/AUDITORIA-DIRECTA-RECUPERACION-GATE10.8-20260801.json
 jobs:
   private_real_materialization_static:
     name: Gate 10.8 · private real materialization attestation
@@ -35,12 +36,20 @@ jobs:
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
           test "$GITHUB_RUN_ATTEMPT" = '1'
-          jq -e '.schemaVersion=="orbit360-cobros-private-real-materialization-static-trigger-v1" and .approved==true and .gateId=="block10.8-cobros-private-real-materialization-static-v20260801" and .contractVersion=="10.8.0" and .branch==env.ORBIT360_BRANCH and .scope.staticAttestation==true and .scope.realPayloadsInRepo==false and .scope.browser==false and .scope.secrets==false and .scope.firestoreRead==false and .scope.writes==false and .scope.deploy==false and .scope.production==false' "$TRIGGER" >/dev/null
+          jq -e '.schemaVersion=="orbit360-cobros-private-real-materialization-static-trigger-v1" and .approved==true and .gateId=="block10.8-cobros-private-real-materialization-static-v20260801" and .contractVersion=="10.8.0" and .branch==env.ORBIT360_BRANCH and .reopenAfterStopRetry==true and .reopenSequence==1 and .directPreflight64of64==true and .scope.staticAttestation==true and .scope.realPayloadsInRepo==false and .scope.browser==false and .scope.secrets==false and .scope.firestoreRead==false and .scope.writes==false and .scope.deploy==false and .scope.production==false' "$TRIGGER" >/dev/null
           AUTHORIZED_HEAD="$(jq -r '.authorizedHead' "$TRIGGER")"
           test -n "$AUTHORIZED_HEAD"
           git merge-base --is-ancestor "$AUTHORIZED_HEAD" HEAD
           bad="$(git diff --name-only "$AUTHORIZED_HEAD"..HEAD | grep -Ev '^\.github/orbit360-triggers/cobros-private-real-materialization-static-v20260801\.json$' || true)"
           test -z "$bad"
+      - name: Verificar recuperación directa 64 de 64
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.status=="DIRECT_VALIDATOR_RECOVERY_PASS" and .gateId=="block10.8-cobros-private-real-materialization-static-v20260801" and .execution.mode=="DIRECT_OUTSIDE_WORKFLOW" and .execution.newTriggerUsed==false and .execution.newGateIdUsed==false and .result.status=="GO_GATE_CONTRACT" and .result.domainStatus=="COBROS_PRIVATE_REAL_MATERIALIZATION_STATIC_READY" and .result.total==64 and .result.passed==64 and .result.failed==0 and .result.directPreflight==true and .controls.authorizationGranted==0 and .controls.writeEligible==0 and .controls.cobrosWrites==0 and .controls.finmovsWrites==0 and .controls.firestoreWrites==0 and .controls.operationalWrites==0 and .controls.browserExecuted==false and .controls.deployExecuted==false and .controls.productionTouched==false' "$DIRECT_RECOVERY" >/dev/null
+          EXPECTED_SHA="$(jq -r '.integrity.validatorSha256' "$DIRECT_RECOVERY")"
+          ACTUAL_SHA="$(sha256sum tools/orbit360-validar-cobros-private-real-materialization-static-v20260801.mjs | awk '{print $1}')"
+          test "$EXPECTED_SHA" = "$ACTUAL_SHA"
       - name: Verificar gate predecessor 10.7
         shell: bash
         run: |
@@ -54,13 +63,14 @@ jobs:
           node --check tools/orbit360-test-cobros-private-real-materialization-attestation-v20260801.mjs
           node --check tools/orbit360-validar-cobros-private-real-materialization-static-v20260801.mjs
           node tools/orbit360-validar-cobros-private-real-materialization-static-v20260801.mjs
-          jq -e '.status=="GO_GATE_CONTRACT" and .domainStatus=="COBROS_PRIVATE_REAL_MATERIALIZATION_STATIC_READY" and .contractVersion=="10.8.0" and .failed==0 and .materialization.cardCount==5 and .materialization.direct==4 and .materialization.historical==1 and .materialization.registeredHashesVerified==3 and .materialization.authorizationGranted==0 and .materialization.writeEligible==0 and .materialization.ownerPrivateCardsDisposed==true and .materialization.callerPrivateInputDisposed==true and .materialization.remainingPrivateCardsAfterDisposal==0 and .materialization.remainingPrivateInputsAfterDisposal==0 and .realRowsStoredInRepo==0 and .cobrosWrites==0 and .finmovsWrites==0 and .firestoreWrites==0 and .operationalWrites==0 and .containsPII==false and .containsPolicyNumbers==false and .containsRealAmounts==false and .containsSecrets==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .domainStatus=="COBROS_PRIVATE_REAL_MATERIALIZATION_STATIC_READY" and .contractVersion=="10.8.0" and .failed==0 and .total==64 and .passed==64 and .directPreflight==true and .materialization.cardCount==5 and .materialization.direct==4 and .materialization.historical==1 and .materialization.registeredHashesVerified==3 and .materialization.authorizationGranted==0 and .materialization.writeEligible==0 and .materialization.ownerPrivateCardsDisposed==true and .materialization.callerPrivateInputDisposed==true and .materialization.remainingPrivateCardsAfterDisposal==0 and .materialization.remainingPrivateInputsAfterDisposal==0 and .realRowsStoredInRepo==0 and .cobrosWrites==0 and .finmovsWrites==0 and .firestoreWrites==0 and .operationalWrites==0 and .containsPII==false and .containsPolicyNumbers==false and .containsRealAmounts==false and .containsSecrets==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE" >/dev/null
       - name: Subir evidencia sanitizada
         uses: actions/upload-artifact@v4
         with:
           name: orbit360-cobros-private-real-materialization-static-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/cobros-private-real-materialization-static-v20260801.json
+            orbit360-platform/docs/AUDITORIA-DIRECTA-RECUPERACION-GATE10.8-20260801.json
             orbit360-platform/docs/AUDITORIA-READONLY-COBROS-MATERIALIZACION-PRIVADA-REAL-SANITIZADA-20260801.json
             orbit360-platform/docs/CIERRE-STATIC-COBROS-MATERIALIZACION-PRIVADA-REAL-20260801.md
             orbit360-platform/docs/ACADEMIA-MATERIALIZACION-PRIVADA-REAL-COBROS-20260801.md
@@ -75,5 +85,5 @@ jobs:
         with:
           script: |
             const fs=require('fs');let state='failure',description='Cobros private real materialization static blocked';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='GO_GATE_CONTRACT'&&p.domainStatus==='COBROS_PRIVATE_REAL_MATERIALIZATION_STATIC_READY'&&p.failed===0){state='success';description='Cobros private real materialization static PASS';}}catch(e){}
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='GO_GATE_CONTRACT'&&p.domainStatus==='COBROS_PRIVATE_REAL_MATERIALIZATION_STATIC_READY'&&p.failed===0&&p.total===64&&p.passed===64){state='success';description='Cobros private real materialization static PASS';}}catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/cobros-private-real-materialization-static',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
