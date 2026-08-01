@@ -4,8 +4,8 @@
   "contractVersion": "11.0.0",
   "mode": "READ_ONLY_PLANILLAS_COMISIONES_LINKAGE",
   "approved": true,
-  "sequence": 1,
-  "reason": "Cross the closed June commission source dry-run against LAB policies, expected receipts and reconciled cobros; produce sanitized linkage decisions with zero operational writes and no financial activation.",
+  "sequence": 2,
+  "reason": "Execute the registered canonical block11 gate and cross the closed June commission source dry-run against LAB policies, expected receipts and reconciled cobros; produce sanitized linkage decisions with zero operational writes and no financial activation.",
   "sourceCut": {
     "filesReceived": 19,
     "sourceBundles": 10,
