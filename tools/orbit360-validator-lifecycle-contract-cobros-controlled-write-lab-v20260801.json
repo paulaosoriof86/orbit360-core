@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
+  "gateContractVersion": "10.9.0",
+  "owner": "cobros-controlled-write-gate-p0",
+  "ownerVersion": "20260801.1-single-write-gate-preflight",
+  "status": "REGISTERED_PREPARED_STATIC",
+  "classification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
+  "executionProfile": {
+    "mode": "STATIC_PREFLIGHT_ONLY",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "firestoreWrite": false,
+      "browser": false,
+      "hostingDeploy": false,
+      "rulesDeploy": false,
+      "functionsDeploy": false,
+      "storageDeploy": false,
+      "production": false
+    }
+  },
+  "phases": [
+    "PREPARED_STATIC",
+    "ARMED_BY_EXPLICIT_LAB_AUTHORIZATION",
+    "EXECUTED_LAB",
+    "VERIFIED_OR_ROLLED_BACK"
+  ],
+  "currentPhase": "PREPARED_STATIC",
+  "humanDecisionRecorded": true,
+  "executionAuthorized": false,
+  "labWriteAuthorized": false,
+  "writeAuthorized": false,
+  "productionAuthorized": false,
+  "deployAuthorized": false,
+  "expected": {
+    "cases": 5,
+    "direct": 4,
+    "historical": 1,
+    "atomicGroups": 5,
+    "snapshots": 11,
+    "operations": 10,
+    "rollbacks": 11,
+    "duplicateAuthorizationRefs": 0,
+    "duplicateIdempotencyKeys": 0,
+    "writeEligible": 0,
+    "cobrosWrites": 0,
+    "receiptWrites": 0,
+    "policyWrites": 0,
+    "finmovsWrites": 0
+  },
+  "protectedContracts": {
+    "singleWriteGate": true,
+    "genericWriterRemainsBlockedForCobros": true,
+    "snapshotBeforeWriteRequired": true,
+    "idempotencyRequired": true,
+    "atomicPerCaseRequired": true,
+    "rollbackPerCaseRequired": true,
+    "historicalCaseSeparated": true,
+    "historicalAtomicOperationRequired": true,
+    "reactivatePolicy": false,
+    "createFinmov": false,
+    "realRowsStoredInRepo": 0,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "containsSecrets": false
+  }
+}
