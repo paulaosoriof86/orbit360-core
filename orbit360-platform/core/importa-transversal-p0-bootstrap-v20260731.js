@@ -5,8 +5,8 @@
    Hace activos los owners P0 reutilizables sin tocar core/importa.js.
    Carga normalizadores -> conciliación -> evidencia temporal ->
    matriz multievidencia -> cola controlada -> paquete autorización ->
-   identidad/upsert -> wires -> writer -> dry-run wire, en orden
-   determinista.
+   materialización privada -> identidad/upsert -> wires -> writer ->
+   dry-run wire, en orden determinista.
    ============================================================ */
 (function(){
   'use strict';
@@ -14,7 +14,7 @@
   if(Orbit.__importaTransversalP0BootstrapV20260731)return;
   Orbit.__importaTransversalP0BootstrapV20260731=true;
 
-  const VERSION='20260801.5';
+  const VERSION='20260801.6';
   const scripts=[
     'core/importa-clientes-p0.js',
     'core/importa-polizas-p0.js',
@@ -24,6 +24,7 @@
     'core/importa-cobros-matriz-multievidencia-p0.js',
     'core/cobros-proposal-queue-p0.js',
     'core/cobros-authorization-package-p0.js',
+    'core/cobros-private-authorization-materializer-p0.js',
     'core/importer-controlled-write-contract-v20260721.js',
     'core/importa-identity-upsert-v20260731.js',
     'core/importa-clientes-p0-wire.js',
