@@ -1,16 +1,17 @@
-# Autorización read-only — Planillas y Comisiones
+# Autorizaciones — Planillas y Comisiones
 
-Fecha y hora: 2026-08-01 14:21 -06:00  
 Repositorio: `paulaosoriof86/orbit360-core`  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: `#5`, debe permanecer draft/open  
-Estado: `READONLY_AUTHORIZATION_CONSUMED`
+Estado: `READONLY_AND_WRITE_AUTHORIZATIONS_CONSUMED`
 
-## Alcance expresamente autorizado
+## 1. Autorización read-only
 
-Paula Osorio autorizó recibir y verificar las fuentes vigentes, procesarlas en paquete privado read-only, ejecutar adaptadores y resolvers desconectados, cruzar las fuentes con pólizas y recibos de LAB y generar dry-runs sanitizados, sin escrituras operativas.
+Fecha y hora: 2026-08-01 14:21 -06:00
 
-## Resultado consumido
+Paula Osorio autorizó recibir y verificar las fuentes vigentes, procesarlas en paquete privado read-only, ejecutar adaptadores y resolvers, cruzar las fuentes con pólizas y recibos de LAB y generar dry-runs sanitizados.
+
+Resultado:
 
 ```text
 fuentes recibidas: 19
@@ -23,11 +24,9 @@ HOLD de recibo: 44
 comisiones A&S candidatas: 5
 documentos propuestos: 15
 HOLD de liquidación de vendedor: 3
-escrituras: 0
-finanzas activadas: no
 ```
 
-Evidencia principal:
+Evidencia:
 
 ```text
 policy identity run: 30719208561
@@ -36,46 +35,79 @@ commission planner static run: 30719949803
 commission dry-run live run: 30720089823
 ```
 
-La autorización read-only quedó consumida y el lifecycle cerró en:
+## 2. Autorización separada de escritura LAB
+
+Fecha y hora: 2026-08-01 17:00 -06:00
+
+Alcance autorizado:
 
 ```text
-PLANILLAS_COMMISSION_DRYRUN_CLOSED
+cinco comisiones A&S
+quince documentos canónicos
+una transacción atómica
+idempotencia
+post-verificación
+rollback exacto
 ```
 
-## No autorizado
-
-Esta autorización no permite:
-
-- escribir registros de comisión;
-- crear `finmovs`;
-- modificar cobros, recibos, pólizas, cartera o clientes;
-- crear facturas, CxC o CxP;
-- liquidar asesores;
-- inferir tasas de comisión;
-- aplicar el porcentaje 50% por defecto;
-- reutilizar planillas de otro periodo;
-- usar la fecha de pago de la comisión para escoger póliza o recibo;
-- conectar los resolvers a UI o a la colección genérica `comisiones`;
-- ejecutar navegador, deploy, Functions, Rules, Storage o producción;
-- modificar `main`, hacer merge o cerrar el PR.
-
-## Resultado exacto para una futura autorización
+Restricciones expresas:
 
 ```text
-candidatos: 5
-colecciones: 3
-documentos exactos: 15
-planillasComisiones: 5
-comisionesDevengadas: 5
-conciliacionesComisiones: 5
-colecciones actualmente vacías: sí
+tres liquidaciones de vendedor en HOLD
+sin facturas
+sin CxC
+sin CxP
+sin finmovs
+sin deploy
+sin producción
 ```
 
-Sellos:
+La autorización incluyó la aclaración de que Pólizas y los demás módulos CRM —excepto Clientes— todavía no habían sido visualizados ni aprobados.
+
+## Resultado de la escritura
 
 ```text
-candidateSetDigest: 04c7da071ddadfe689e0137e730448ada36abe7aff6c228cd5abb0206c26c680
-targetSnapshotDigest: 12b3763f976433e1e7e809f461dc835bca3a4c39b1d6dd1655e42a202e6cbf3f
+run: 30722653179
+job: 91428836213
+artifact: 8825344683
+resultado: WRITE_PASS
 ```
 
-Una escritura futura requiere autorización separada y deberá ser atómica, idempotente, post-verificada y reversible. Los tres HOLD de vendedor deben conservar `liquidacionAsesorAutorizada: false`; los 60 registros sin recibo inequívoco permanecen excluidos.
+```text
+planillasComisiones: 0 → 5
+comisionesDevengadas: 0 → 5
+conciliacionesComisiones: 0 → 5
+documentos creados: 15
+documentos verificados: 15
+rollback ejecutado: no
+```
+
+Baseline preservado:
+
+```text
+polizas: 1373 → 1373
+recibosEsperados: 1294 → 1294
+cobros: 5 → 5
+finmovs: 0 → 0
+```
+
+## Barrera de aprobación visual
+
+```text
+Clientes: aprobado previamente
+Pólizas: no aprobado
+Vehículos: no aprobado
+Recibos: no aprobado
+Cartera: no aprobado
+Resto CRM: no aprobado
+```
+
+El PASS de escritura no modifica esos estados ni constituye aprobación implícita.
+
+## Estado final
+
+```text
+PLANILLAS_COMMISSION_CONTROLLED_WRITE_CLOSED
+```
+
+Las dos autorizaciones quedaron consumidas. El gate volvió a cero escrituras permitidas. Cualquier escritura adicional, liquidación de vendedor, activación de facturas/CxC/CxP/Finanzas o avance productivo requiere una autorización nueva y su gate correspondiente.
