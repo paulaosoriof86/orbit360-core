@@ -38,8 +38,9 @@ try{
   [
     '20260801.1-private-readonly-materializer','privateCardsEnumerable:false','privateValuesPersisted:false',
     'packageGrantsAuthorization:false','authorizationGranted:0','writeEligible:0','disposalRequired:true',
-    'reactivatesPolicy:false','createFinmov:false','cobrosWrites:0','finmovsWrites:0'
+    'createFinmov:false','cobrosWrites:0','finmovsWrites:0'
   ].forEach(token=>check('OWNER_'+token.slice(0,42),owner.includes(token)));
+  check('OWNER_POLICY_REACTIVATION_FALSE',(owner.match(/reactivatePolicy:false/g)||[]).length>=2&&!owner.includes('reactivatePolicy:true'));
   check('OWNER_NO_COBROS_WRITE',!/\.(?:insert|update|remove)\s*\(\s*['"]cobros['"]/.test(owner));
   check('OWNER_NO_FINMOV_WRITE',!/\.(?:insert|update|remove)\s*\(\s*['"]finmovs['"]/.test(owner));
 
@@ -97,12 +98,13 @@ try{
 const failed=checks.filter(item=>!item.ok),ready=failed.length===0&&!error;
 const auditExists=fs.existsSync(path.join(ROOT,files.audit));
 const audit=auditExists?JSON.parse(read('audit')):null;
+const failureClassification=failed.length>0&&failed.every(item=>item.id.startsWith('OWNER_'))?'VALIDATOR_STALE':'DATA_CONTRACT_FAILURE';
 const payload={
   schemaVersion:'orbit360-cobros-private-real-materialization-static-v1',
   gateId:GATE_ID,contractVersion:VERSION,
   status:ready?'GO_GATE_CONTRACT':'HOLD_GATE_CONTRACT',
   domainStatus:ready?'COBROS_PRIVATE_REAL_MATERIALIZATION_STATIC_READY':'COBROS_PRIVATE_REAL_MATERIALIZATION_STATIC_BLOCKED',
-  classification:ready?'GO_STATIC_COBROS_PRIVATE_REAL_MATERIALIZATION':'DATA_CONTRACT_FAILURE',
+  classification:ready?'GO_STATIC_COBROS_PRIVATE_REAL_MATERIALIZATION':failureClassification,
   total:checks.length,passed:checks.length-failed.length,failed:failed.length,
   failedCheckIds:failed.map(item=>item.id),checks,testResult,
   materialization:audit?{
@@ -118,6 +120,7 @@ const payload={
     remainingPrivateInputsAfterDisposal:audit.ephemeralSession.remainingPrivateInputsAfterDisposal,
     integrityDigest:audit.materialization.integrityDigest
   }:null,
+  directPreflight:true,
   realRowsStoredInRepo:0,
   cobrosWrites:0,finmovsWrites:0,firestoreWrites:0,operationalWrites:0,
   secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,
