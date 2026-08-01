@@ -4,17 +4,17 @@
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "gateContractVersion": "10.9.0",
   "owner": "orbit360-cobros-controlled-write-lab-v20260801",
-  "ownerVersion": "20260801.3-drive-exact-physical-digest",
-  "status": "STOP_RETRY_DATA_CONTRACT_FAILURE",
+  "ownerVersion": "20260801.4-readonly-root-cause-diagnosis",
+  "status": "ROOT_CAUSE_DIAGNOSIS_ACTIVE",
   "classification": "DATA_CONTRACT_FAILURE",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "executionProfile": {
-    "mode": "FROZEN_AFTER_TWO_FAILED_EXECUTIONS",
-    "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
+    "mode": "READ_ONLY_ROOT_CAUSE_DIAGNOSIS",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_DIAGNOSIS",
     "capabilities": {
       "secrets": true,
       "firestoreRead": true,
-      "writes": true,
+      "writes": false,
       "runtime": false,
       "browser": false,
       "deploy": false,
@@ -27,7 +27,8 @@
     "PREPARED_STATIC",
     "ARMED_BY_EXPLICIT_LAB_AUTHORIZATION",
     "EXECUTED_LAB",
-    "VERIFIED_OR_ROLLED_BACK"
+    "VERIFIED_OR_ROLLED_BACK",
+    "READ_ONLY_ROOT_CAUSE_DIAGNOSIS"
   ],
   "currentPhase": "VERIFIED_OR_ROLLED_BACK",
   "outcome": "ROLLED_BACK_BASELINE_RESTORED",
@@ -38,6 +39,8 @@
   "productionAuthorized": false,
   "deployAuthorized": false,
   "thirdExecutionProhibited": true,
+  "diagnosisAuthorized": true,
+  "diagnosisRequestPath": ".github/orbit360-diagnostics/cobros-controlled-write-lab-v20260801.json",
   "requestPath": ".github/orbit360-requests/cobros-controlled-write-lab-v20260801.json",
   "privatePackage": {
     "driveFileId": "1FGpp_v6ZTs52VEeOnsH2IxoNCqWwVoAD",
@@ -120,12 +123,20 @@
       "digest": "sha256:f9bd2cde8107481243b2937df11c434a2cff91eeccbbf99569b0f47c9b5f2b00",
       "classification": "DATA_CONTRACT_FAILURE",
       "failure": "RECEIPT_SNAPSHOT_MISMATCH",
-      "failedAuthorizationRef": "cob-auth-d9ed3d5aa03f198a469439cc",
+      "failedCaseOrdinal": 3,
       "firestoreRead": true,
       "temporaryOperationalWrites": 4,
       "rollbackExecuted": true,
       "rollbackRestored": true
     }
   ],
-  "nextAction": "READ_ONLY_ROOT_CAUSE_DIAGNOSTIC_CASE_3_RECEIPT_SNAPSHOT"
+  "diagnosis": {
+    "sourceRun": 30711578397,
+    "sourceArtifact": 8822041409,
+    "scope": "CASE_3_RECEIPT_SNAPSHOT_KEYS_AND_TYPES_ONLY",
+    "valuesAllowed": false,
+    "writesAllowed": false,
+    "productionAllowed": false
+  },
+  "nextAction": "RUN_READ_ONLY_ROOT_CAUSE_DIAGNOSTIC_CASE_3_RECEIPT_SNAPSHOT"
 }
