@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-cobros-private-real-materialization-static-trigger-v1",
+  "approved": true,
+  "gateId": "block10.8-cobros-private-real-materialization-static-v20260801",
+  "contractVersion": "10.8.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "9c1187d60b06f4665bdbe823240f22d5139ca06e",
+  "scope": {
+    "staticAttestation": true,
+    "realPayloadsInRepo": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "createdAt": "2026-08-01T16:38:00Z",
+  "reason": "Close the sanitized attestation for the five real private Cobros authorization cards after in-memory materialization and explicit disposal."
+}
