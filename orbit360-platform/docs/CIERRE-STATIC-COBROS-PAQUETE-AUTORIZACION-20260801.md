@@ -5,9 +5,18 @@ Tenant: `alianzas-soluciones`
 Rama: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open
 
-## Estado
+## Veredicto
 
-`AUTHORIZATION_PACKAGE_STATIC_READY`
+`COBROS_AUTHORIZATION_PACKAGE_STATIC_READY`
+
+Gate `block10.6-cobros-authorization-package-static-v20260801`:
+
+```text
+run: 30706617835
+artifact: 8820517805
+digest: sha256:9ce3e47aea62840e4debb40faad6e12cda29f480e9b0daec929176af60e5b05b
+checks: 58/58 PASS
+```
 
 La cola 10.5 contiene 70 casos. Solo cinco alcanzaron el umbral para presentarse a Dirección:
 
@@ -68,9 +77,25 @@ histórica reforzada: 1
 diffs presentes: sí
 rollback presente: sí
 idempotencia duplicada: 0
-autorización concedida: no
-writeEligible: false
+autorización concedida: 0
+writeEligible: 0
 ```
+
+## Causa raíz del primer intento
+
+El primer run `30706550799` se detuvo antes de ejecutar el paquete. El validador predecesor 10.5 exigía de forma literal el bootstrap `20260801.4`; la incorporación legítima del owner del paquete elevó el bootstrap a `20260801.5`.
+
+Clasificación: `VALIDATOR_STALE_PREDECESSOR_BOOTSTRAP_EXACT_VERSION`.
+
+Se congeló el producto y se corrigió únicamente el validador 10.5 para comprobar:
+
+```text
+owner de cola presente
++ capacidad requerida
++ bootstrap mínimo >= 4
+```
+
+La segunda y última ejecución del gate 10.6 pasó 58/58. No hubo un tercer intento ni modificación del owner del paquete después del fallo.
 
 ## Seguridad
 
@@ -82,9 +107,11 @@ cobros writes: 0
 finmovs writes: 0
 Firestore writes: 0
 operational writes: 0
+browser: 0
+deploy: 0
 production: untouched
 ```
 
 ## Siguiente acción exacta
 
-Cerrar el gate 10.6 estático. Después podrá materializarse el paquete privado usando referencias opacas y las fuentes reales ya registradas. Esa materialización seguirá siendo read-only y no constituirá autorización de escritura.
+Preparar el contrato de materialización privada read-only. Este contrato deberá resolver las cinco referencias opacas contra las fuentes reales ya registradas, producir un diff privado para Dirección y destruir el payload temporal al finalizar. No concederá autorización, no persistirá datos reales en el repositorio y no habilitará escrituras.
