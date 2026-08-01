@@ -4,17 +4,17 @@
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "gateContractVersion": "10.9.0",
   "owner": "orbit360-cobros-controlled-write-lab-v20260801",
-  "ownerVersion": "20260801.6-private-package-repaired-pending-readonly-revalidation",
-  "status": "ROOT_CAUSE_DIAGNOSIS_ACTIVE",
-  "classification": "DATA_CONTRACT_FAILURE_CORRECTED_PENDING_REVALIDATION",
+  "ownerVersion": "20260801.7-root-cause-proven-final-reopen",
+  "status": "ROOT_CAUSE_PROVEN_FINAL_REOPEN",
+  "classification": "DATA_CONTRACT_FAILURE_CORRECTED",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "executionProfile": {
-    "mode": "READ_ONLY_ROOT_CAUSE_DIAGNOSIS",
-    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "mode": "CONTROLLED_WRITE",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
     "capabilities": {
       "secrets": true,
       "firestoreRead": true,
-      "writes": false,
+      "writes": true,
       "runtime": false,
       "browser": false,
       "deploy": false,
@@ -30,18 +30,21 @@
     "VERIFIED_OR_ROLLED_BACK",
     "READ_ONLY_ROOT_CAUSE_DIAGNOSIS",
     "PRIVATE_PACKAGE_REPAIRED",
-    "READ_ONLY_REVALIDATION"
+    "READ_ONLY_REVALIDATION",
+    "FINAL_REOPEN_AFTER_ROOT_CAUSE_PROOF"
   ],
-  "currentPhase": "PRIVATE_PACKAGE_REPAIRED",
-  "outcome": "BASELINE_RESTORED_PACKAGE_REPAIRED_PENDING_READONLY_REVALIDATION",
+  "currentPhase": "ARMED_BY_EXPLICIT_LAB_AUTHORIZATION",
+  "outcome": "READ_ONLY_REVALIDATION_PASS_ZERO_BLOCKERS",
   "humanDecisionRecorded": true,
   "executionAuthorized": true,
   "labWriteAuthorized": true,
-  "writeAuthorized": false,
+  "writeAuthorized": true,
   "productionAuthorized": false,
   "deployAuthorized": false,
-  "thirdExecutionProhibited": true,
-  "diagnosisAuthorized": true,
+  "thirdExecutionProhibited": false,
+  "finalReopenAfterRootCauseProof": true,
+  "additionalExecutionAfterFinalReopenProhibited": true,
+  "diagnosisAuthorized": false,
   "diagnosisRequestPath": ".github/orbit360-diagnostics/cobros-controlled-write-lab-v20260801.json",
   "requestPath": ".github/orbit360-requests/cobros-controlled-write-lab-v20260801.json",
   "privatePackage": {
@@ -148,43 +151,34 @@
     "successfulArtifact": 8822109811,
     "scope": "CASES_3_AND_4_RECEIPT_ENDOSO_TYPE_ONLY",
     "rootCause": "PRIVATE_SNAPSHOT_EXPECTED_NULL_WHILE_CANONICAL_RECEIPT_STORED_EMPTY_STRING",
+    "rootFix": "PRESERVE_CANONICAL_EMPTY_STRING_ENDOSO_IN_PRIVATE_PACKAGE",
     "valuesAllowed": false,
     "writesAllowed": false,
-    "productionAllowed": false,
-    "validatorAttempts": [
-      {
-        "run": 30711682689,
-        "failure": "SPECIFIC_VALIDATOR_FAILED_49",
-        "classification": "VALIDATOR_STALE",
-        "secretsRead": false,
-        "firestoreRead": false
-      },
-      {
-        "run": 30711748092,
-        "failure": "CANONICAL_LIFECYCLE_PHASE_MISMATCH",
-        "classification": "VALIDATOR_STALE",
-        "secretsRead": false,
-        "firestoreRead": false
-      }
-    ],
-    "repairAttempts": [
-      {
-        "run": 30711897905,
-        "classification": "VALIDATOR_STALE",
-        "failure": "NONEMPTY_STRING_ASSUMPTION",
-        "firestoreWrites": 0,
-        "privatePackageWrites": 0
-      },
-      {
-        "run": 30711980605,
-        "classification": "PIPELINE_MECHANISM_FAILURE",
-        "repairGenerated": true,
-        "newHashesGenerated": true,
-        "serviceAccountDriveWrite": false,
-        "firestoreWrites": 0
-      }
-    ],
-    "rootFix": "PRESERVE_CANONICAL_EMPTY_STRING_ENDOSO_IN_PRIVATE_PACKAGE"
+    "productionAllowed": false
   },
-  "nextAction": "RUN_READ_ONLY_REVALIDATION_ALL_FIVE_CASES_ZERO_BLOCKERS"
+  "readOnlyRevalidation": {
+    "run": 30712109933,
+    "artifact": 8822198624,
+    "artifactDigest": "sha256:ff866d8ecf4777bbac51d5862d86a42c0457e31fd1e0352059d57ec13138824d",
+    "blockingCases": 0,
+    "allFiveCasesMatch": true,
+    "baseline": {
+      "polizas": 1373,
+      "recibosEsperados": 1293,
+      "cobros": 0,
+      "finmovs": 0
+    },
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "productionTouched": false
+  },
+  "reopenDecision": {
+    "sameGate": true,
+    "sameContractVersion": true,
+    "sameFiveAuthorizedCases": true,
+    "scopeExpanded": false,
+    "existingDirectionAuthorizationApplies": true,
+    "singleFinalExecution": true
+  },
+  "nextAction": "EXECUTE_SAME_GATE_10_9_ONCE_WITH_REPAIRED_PACKAGE"
 }
