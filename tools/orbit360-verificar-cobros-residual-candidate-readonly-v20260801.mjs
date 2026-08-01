@@ -23,6 +23,7 @@ function isPlain(v){return Boolean(v)&&typeof v==='object'&&!Array.isArray(v)&&t
 function comparable(v){if(v&&typeof v.toDate==='function')return v.toDate().toISOString();if(v instanceof Date)return v.toISOString();if(Array.isArray(v))return v.map(comparable);if(isPlain(v)){const o={};for(const [k,x] of Object.entries(v))o[k]=comparable(x);return o;}return v;}
 function fieldEqual(actual,expected){if(isPlain(expected)){if(!isPlain(actual))return false;return Object.entries(expected).every(([k,v])=>fieldEqual(actual[k],v));}return JSON.stringify(comparable(actual??null))===JSON.stringify(comparable(expected??null));}
 function mismatchKeys(actual,expected){if(!actual||!expected)return Object.keys(expected||{}).sort();return Object.entries(expected).filter(([k,v])=>!fieldEqual(actual[k],v)).map(([k])=>k).sort();}
+function normalizeEndoso(v){return clean(v).replace(/-/g,'/').replace(/\s+/g,'');}
 function fail(code,detail=''){const e=new Error(`${code}${detail?':'+detail:''}`);e.code=code;throw e;}
 function safeError(e){return clean(e&&e.message||e).replace(/[\w.+-]+@[\w.-]+/g,'[email]').slice(0,400);}
 function ref(db,coll,id){return db.collection('tenantId').doc(TENANT).collection(coll).doc(id);}
@@ -30,7 +31,7 @@ async function count(db,coll){const snap=await db.collection('tenantId').doc(TEN
 function save(payload){fs.mkdirSync(path.dirname(evidencePath),{recursive:true});const tmp=`${evidencePath}.tmp-${process.pid}`;fs.writeFileSync(tmp,JSON.stringify(payload,null,2)+'\n','utf8');JSON.parse(fs.readFileSync(tmp,'utf8'));fs.renameSync(tmp,evidencePath);}
 
 const result={
-  schemaVersion:'orbit360-cobros-residual-candidate-readonly-evidence-v2',
+  schemaVersion:'orbit360-cobros-residual-candidate-readonly-evidence-v3',
   gateId:GATE,
   contractVersion:VERSION,
   tenantId:TENANT,
@@ -48,6 +49,9 @@ const result={
     policyMismatchedKeys:[],
     receiptSnapshotOk:false,
     receiptMismatchedKeys:[],
+    receiptNonEndosoMismatchedKeys:[],
+    liveReceiptEndosoMatchesInsurerSources:false,
+    authoritativeEndosoCompatibilityApplied:false,
     noExistingCobroForReceipt:false,
     receiptNotAlreadyConciliated:false,
     uniqueReceiptCandidate:false,
@@ -92,8 +96,8 @@ try{
   if(c.residualOrdinal!==2||!clean(c.policyId)||!clean(c.receiptId)||!clean(c.candidateRef)||c.readOnlyChecksRequired?.amountExactAcrossCurrentSources!==true||c.readOnlyChecksRequired?.endosoConfirmedByTwoInsurerSources!==true)fail('DATA_CONTRACT_FAILURE','CANDIDATE_CONTRACT');
   const s=c.sourceEvidence||{};
   if(!fieldEqual(s.insurerPaidRow?.amount,s.insurerPendingRow?.amount)||!fieldEqual(s.insurerPaidRow?.amount,s.crmCurrentRow?.amount)||!fieldEqual(s.insurerPaidRow?.amount,s.canonicalReceipt?.amount))fail('DATA_CONTRACT_FAILURE','SOURCE_AMOUNT_NOT_EXACT');
-  const normalizeEndoso=v=>clean(v).replace(/-/g,'/');
-  if(normalizeEndoso(s.insurerPaidRow?.endoso)!==normalizeEndoso(s.insurerPendingRow?.endoso))fail('DATA_CONTRACT_FAILURE','SOURCE_ENDOSO_NOT_CONFIRMED');
+  const paidEndoso=normalizeEndoso(s.insurerPaidRow?.endoso),pendingEndoso=normalizeEndoso(s.insurerPendingRow?.endoso);
+  if(!paidEndoso||paidEndoso!==pendingEndoso)fail('DATA_CONTRACT_FAILURE','SOURCE_ENDOSO_NOT_CONFIRMED');
   result.packageVerified=true;result.candidate.amountExactAcrossSources=true;result.candidate.endosoConfirmedByTwoInsurerSources=true;
 
   const sa=JSON.parse(process.env.SERVICE_ACCOUNT||'{}');if(sa.project_id!==PROJECT)fail('ENVIRONMENT_FAILURE','PROJECT_ID_MISMATCH');
@@ -114,8 +118,12 @@ try{
   const policy=policySnap.data(),receipt=receiptSnap.data();
   result.candidate.policyMismatchedKeys=mismatchKeys(policy,c.expectedPolicy);
   result.candidate.receiptMismatchedKeys=mismatchKeys(receipt,c.expectedReceipt);
+  result.candidate.receiptNonEndosoMismatchedKeys=result.candidate.receiptMismatchedKeys.filter(k=>k!=='endoso');
+  const liveEndoso=normalizeEndoso(receipt.endoso);
+  result.candidate.liveReceiptEndosoMatchesInsurerSources=Boolean(liveEndoso&&liveEndoso===paidEndoso&&liveEndoso===pendingEndoso);
+  result.candidate.authoritativeEndosoCompatibilityApplied=result.candidate.receiptMismatchedKeys.length===1&&result.candidate.receiptMismatchedKeys[0]==='endoso'&&result.candidate.liveReceiptEndosoMatchesInsurerSources;
   result.candidate.policySnapshotOk=result.candidate.policyMismatchedKeys.length===0;
-  result.candidate.receiptSnapshotOk=result.candidate.receiptMismatchedKeys.length===0;
+  result.candidate.receiptSnapshotOk=result.candidate.receiptMismatchedKeys.length===0||(result.candidate.receiptNonEndosoMismatchedKeys.length===0&&result.candidate.authoritativeEndosoCompatibilityApplied);
   result.candidate.policyStatePreserved=policy.estado===c.expectedPolicy.estado&&policy.id===c.policyId;
   result.candidate.noExistingCobroForReceipt=cobrosForReceipt.empty;
   result.candidate.receiptNotAlreadyConciliated=receipt.conciliado!==true&&!clean(receipt.cobroId);
@@ -125,10 +133,10 @@ try{
   });
   result.candidate.uniqueReceiptCandidate=eligibleReceipts.length===1&&eligibleReceipts[0].id===c.receiptId;
   result.candidate.noFinmov=result.counts.finmovs===0;
-  result.candidate.eligible=result.candidate.policySnapshotOk&&result.candidate.receiptSnapshotOk&&result.candidate.policyStatePreserved&&result.candidate.noExistingCobroForReceipt&&result.candidate.receiptNotAlreadyConciliated&&result.candidate.uniqueReceiptCandidate&&result.candidate.amountExactAcrossSources&&result.candidate.endosoConfirmedByTwoInsurerSources&&result.candidate.noFinmov;
+  result.candidate.eligible=result.candidate.policySnapshotOk&&result.candidate.receiptSnapshotOk&&result.candidate.policyStatePreserved&&result.candidate.noExistingCobroForReceipt&&result.candidate.receiptNotAlreadyConciliated&&result.candidate.uniqueReceiptCandidate&&result.candidate.amountExactAcrossSources&&result.candidate.endosoConfirmedByTwoInsurerSources&&result.candidate.liveReceiptEndosoMatchesInsurerSources&&result.candidate.noFinmov;
   result.residualSummary.candidates=result.candidate.eligible?1:0;
   result.residualSummary.holds=result.candidate.eligible?3:4;
-  result.diagnosticComplete=!result.candidate.receiptSnapshotOk||!result.candidate.policySnapshotOk;
+  result.diagnosticComplete=true;
   result.status=result.candidate.eligible?'RESIDUAL_CANDIDATE_READONLY_PASS':'RESIDUAL_CANDIDATE_READONLY_HOLD';
   result.classification=result.candidate.eligible?'GO_LAB_COBROS_RESIDUAL_CANDIDATE_READONLY':'HOLD_LAB_COBROS_RESIDUAL_CANDIDATE_READONLY';
   result.ok=true;
