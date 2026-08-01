@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-cobros-real-payload-replay-static-trigger-v1",
+  "approved": true,
+  "gateId": "block10.2-cobros-real-payload-replay-static-v20260801",
+  "contractVersion": "10.2.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "06740d870a414b5c9117bdafa59daad4836b685e",
+  "sourceHashes": [
+    "727665170572143979b5f274190e200da397e7b32965d1809b1b9be6a8495302",
+    "61574cc18b9200af438a49985e58deea635243f8808eac97470789df0db5b5ed",
+    "d19559b7d5ad80930ad10f88d30ae7e0015b1647a5c0840867cf76e32c617ad8"
+  ],
+  "expected": {
+    "insurerRows": 9,
+    "oneToOneCandidates": 5,
+    "hold": 4,
+    "linkExistingReceipt": 4,
+    "createHistoricalReceiptProposal": 1,
+    "cobrosWrites": 0,
+    "finmovsWrites": 0
+  },
+  "scope": {
+    "static": true,
+    "realPayloadsInRepo": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  }
+}
