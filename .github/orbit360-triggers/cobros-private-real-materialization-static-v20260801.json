@@ -4,7 +4,13 @@
   "gateId": "block10.8-cobros-private-real-materialization-static-v20260801",
   "contractVersion": "10.8.0",
   "branch": "ays/backend-tenant-lab-v99-20260703",
-  "authorizedHead": "d82d79cf51bbcc168289f3ede9d76d22585ae20b",
+  "authorizedHead": "3e4d75fc24f3cccede2104cf685c0b35b73e73b0",
+  "reopenAfterStopRetry": true,
+  "reopenSequence": 1,
+  "directPreflight64of64": true,
+  "previousRuns": [30708592194, 30708670724],
+  "previousClassification": "VALIDATOR_STALE",
+  "directRecoveryEvidence": "orbit360-platform/docs/AUDITORIA-DIRECTA-RECUPERACION-GATE10.8-20260801.json",
   "scope": {
     "staticAttestation": true,
     "realPayloadsInRepo": false,
@@ -15,16 +21,15 @@
     "deploy": false,
     "production": false
   },
-  "createdAt": "2026-08-01T16:38:00Z",
-  "retry": {
-    "attempt": 2,
-    "failedRun": 30708592194,
-    "classification": "VALIDATOR_STALE",
-    "firstFailedStep": "Verificar gate predecessor 10.7",
-    "firstFailedCheck": "AUDIT_STATUS",
-    "correctedLayer": "tools/orbit360-validar-cobros-private-materialization-static-v20260801.mjs",
-    "productChanged": false,
-    "privatePayloadReopened": false
+  "recovery": {
+    "userAuthorized": true,
+    "sameGateOnly": true,
+    "newGateIdCreated": false,
+    "ownerChanged": false,
+    "privatePayloadReopened": false,
+    "validatorContractAligned": true,
+    "workflowRequiresDirectEvidence": true,
+    "productionAuthorizationGranted": false
   },
-  "reason": "Second and final static execution after correcting the predecessor validator to accept the closed 10.7 audit state while preserving all privacy and zero-write controls."
+  "reason": "Reopen the same gate 10.8 after a direct outside-workflow 64/64 validator pass corrected the stale reactivatePolicy/reactivatesPolicy contract without changing the product or private cards."
 }
