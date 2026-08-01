@@ -8,6 +8,7 @@ const ROOT=process.cwd();
 const GATE_ID='block10-cobros-conciliacion-readonly-static-v20260801';
 const VERSION='10.0.0';
 const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/cobros-conciliacion-readonly-static-v20260801.json');
+const PREFLIGHT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
 const rel={
   lifecycle:'tools/orbit360-validator-lifecycle-contract-cobros-conciliacion-readonly-v20260801.json',
   owner:'orbit360-platform/modules/conciliaciones.js',
@@ -64,19 +65,22 @@ try{
 
   const run=spawnSync(process.execPath,[rel.test],{cwd:ROOT,encoding:'utf8',maxBuffer:4*1024*1024});
   check('TEST_EXIT',run.status===0);
-  if(run.status===0){testResult=JSON.parse(String(run.stdout||'{}'));}
+  if(run.status===0)testResult=JSON.parse(String(run.stdout||'{}'));
   check('TEST_STATUS',testResult&&testResult.status==='COBROS_CONCILIACION_READONLY_STATIC_PASS');
   check('TEST_FIFO',testResult&&testResult.fifoOldestFirst===true&&testResult.historicalExigibleIncluded===true);
   check('TEST_LEGACY_FROZEN',testResult&&testResult.legacyCobrosActionsFrozen===true);
   check('TEST_ZERO_WRITES',testResult&&testResult.cobrosWrites===0&&testResult.finmovsWrites===0&&testResult.operationalWrites===0);
 }catch(e){error=String(e&&e.message||e);}
 const failed=checks.filter(item=>!item.ok);
+const ready=failed.length===0&&!error;
 const payload={
   schemaVersion:'orbit360-cobros-conciliacion-readonly-static-v1',
   gateId:GATE_ID,
   contractVersion:VERSION,
-  status:failed.length||error?'COBROS_CONCILIACION_READONLY_STATIC_BLOCKED':'COBROS_CONCILIACION_READONLY_STATIC_READY',
-  classification:failed.length||error?'DATA_CONTRACT_FAILURE':'GO_STATIC_COBROS_CONCILIACION_READONLY',
+  gatePhase:'COBROS_CONCILIACION_READONLY_STATIC_QUALIFICATION',
+  status:ready?'GO_GATE_CONTRACT':'HOLD_GATE_CONTRACT',
+  domainStatus:ready?'COBROS_CONCILIACION_READONLY_STATIC_READY':'COBROS_CONCILIACION_READONLY_STATIC_BLOCKED',
+  classification:ready?'GO_STATIC_COBROS_CONCILIACION_READONLY':'DATA_CONTRACT_FAILURE',
   total:checks.length,passed:checks.length-failed.length,failed:failed.length,
   failedCheckIds:failed.map(item=>item.id),checks,
   canonicalQueue:'conciliaciones',projectedDomainQueue:'conciliacionesPrimas',
@@ -89,5 +93,6 @@ const payload={
 };
 fs.mkdirSync(path.dirname(OUT),{recursive:true});
 fs.writeFileSync(OUT,JSON.stringify(payload,null,2)+'\n');
+fs.writeFileSync(PREFLIGHT,JSON.stringify(payload,null,2)+'\n');
 console.log(JSON.stringify(payload,null,2));
-process.exit(payload.failed===0&&!error?0:41);
+process.exit(ready?0:41);
