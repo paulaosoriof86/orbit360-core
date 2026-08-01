@@ -4,7 +4,7 @@
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "gateContractVersion": "10.9.0",
   "owner": "orbit360-cobros-controlled-write-lab-v20260801",
-  "ownerVersion": "20260801.1-five-case-lab-write",
+  "ownerVersion": "20260801.2-node-canonical-digest",
   "status": "ARMED_BY_EXPLICIT_LAB_AUTHORIZATION",
   "classification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
@@ -39,8 +39,9 @@
   "requestPath": ".github/orbit360-requests/cobros-controlled-write-lab-v20260801.json",
   "privatePackage": {
     "driveFileId": "1FGpp_v6ZTs52VEeOnsH2IxoNCqWwVoAD",
-    "sha256": "d64e64a01104be7defdc2c643b7180fe14ffa095f219aea9e13e6708c8bc1266",
-    "logicalSha256": "1f06709e3c0a42534b17ff93809a3b527321552d68476267a2eb1ffe26a90036"
+    "sha256": "15a573e16514d702066b2500a43d714b382830638fc1e253a1a704b9e0616576",
+    "logicalSha256": "997bfc0614b4a65e8c4b5e7832996fbbe6b0063f9f0efdf3ca99b57aa79f4ff8",
+    "canonicalization": "node-json-stable-sort-v1"
   },
   "expected": {
     "cases": 5,
@@ -84,5 +85,14 @@
     "digest": "sha256:6da1eb4d5fd39ce350ac31b4f9dd2a1ecb34b713346f14cc9d35f23a6e50ed00",
     "canonicalContract": "PASS",
     "writesExecuted": 0
+  },
+  "firstExecutionAttempt": {
+    "run": 30711389436,
+    "artifact": 8821984014,
+    "classification": "DATA_CONTRACT_FAILURE_CANONICALIZATION",
+    "failedBeforeFirestore": true,
+    "executionAttempted": false,
+    "operationalWrites": 0,
+    "correctedLayer": "private package logical digest canonicalization"
   }
 }
