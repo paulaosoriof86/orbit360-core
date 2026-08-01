@@ -4,7 +4,7 @@
   "gateId": "block10.8-cobros-private-real-materialization-static-v20260801",
   "contractVersion": "10.8.0",
   "branch": "ays/backend-tenant-lab-v99-20260703",
-  "authorizedHead": "9c1187d60b06f4665bdbe823240f22d5139ca06e",
+  "authorizedHead": "d82d79cf51bbcc168289f3ede9d76d22585ae20b",
   "scope": {
     "staticAttestation": true,
     "realPayloadsInRepo": false,
@@ -16,5 +16,15 @@
     "production": false
   },
   "createdAt": "2026-08-01T16:38:00Z",
-  "reason": "Close the sanitized attestation for the five real private Cobros authorization cards after in-memory materialization and explicit disposal."
+  "retry": {
+    "attempt": 2,
+    "failedRun": 30708592194,
+    "classification": "VALIDATOR_STALE",
+    "firstFailedStep": "Verificar gate predecessor 10.7",
+    "firstFailedCheck": "AUDIT_STATUS",
+    "correctedLayer": "tools/orbit360-validar-cobros-private-materialization-static-v20260801.mjs",
+    "productChanged": false,
+    "privatePayloadReopened": false
+  },
+  "reason": "Second and final static execution after correcting the predecessor validator to accept the closed 10.7 audit state while preserving all privacy and zero-write controls."
 }
