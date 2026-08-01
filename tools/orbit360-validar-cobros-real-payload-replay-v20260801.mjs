@@ -25,7 +25,7 @@ try{
     "20260801.2-real-payload-replay",'amountTolerance','normalizeInstallment','normalizeEndorsement',
     'sourceDifferences','DIFERENCIA_MONTO','CANONICAL_RECEIPT_REQUIRED',
     'LINK_EXISTING_RECEIPT','CREATE_HISTORICAL_RECEIPT_PROPOSAL',
-    'wrong','reactivatesPolicy:false','autoApply:false','cobrosWrites:0','finmovsWrites:0'
+    'HISTORICAL_RECEIPT_PRECEDENCE','reactivatesPolicy:false','autoApply:false','cobrosWrites:0','finmovsWrites:0'
   ].forEach(token=>check('ENGINE_'+token.slice(0,36),engine.includes(token)));
   check('ENGINE_NO_COBROS_WRITE',!/\.(?:insert|update|remove)\s*\(\s*['"]cobros['"]/.test(engine));
   check('ENGINE_NO_FINMOV_WRITE',!/\.(?:insert|update|remove)\s*\(\s*['"]finmovs['"]/.test(engine));
