@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "orbit360-cobros-real-multievidence-matrix-sanitized-v1",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-31",
+  "status": "REAL_PAYMENT_MATRIX_STATIC_READY",
+  "classification": "DATA_CONTRACT_FAILURE_CORRECTED",
+  "coverage": {
+    "crmPaymentRowsJuly": 68,
+    "canonicalPaymentRowsJuly": 63,
+    "canonicalOmissions": 5,
+    "coverageBalanced": true,
+    "unionPaymentEvidenceCases": 70,
+    "insurerOnlyPaidRows": 2
+  },
+  "canonicalOmissions": {
+    "historicalRecentExpiredReceipts": 5,
+    "byInsurer": {
+      "El Roble": 3,
+      "Aseguradora General": 2
+    },
+    "resolution": {
+      "directInsurerMatchHistoricalProposal": 1,
+      "directAmountDifferenceHold": 1,
+      "historicalProposalNeedsCounterpart": 3
+    },
+    "duplicateRows": 0,
+    "reactivatesPolicy": false
+  },
+  "directInsurerEvidence": {
+    "rows": 9,
+    "oneToOneMatches": 5,
+    "holds": 4,
+    "holdReasons": {
+      "DIFERENCIA_MONTO": 1,
+      "IDENTIDAD_INSUFICIENTE": 1,
+      "SIN_CONTRAPARTE_CRM": 2
+    },
+    "sourceReuse": 0
+  },
+  "matrixStatusCounts": {
+    "DIRECT_INSURER_MATCH_READY": 4,
+    "DIRECT_INSURER_MATCH_HISTORICAL_RECEIPT_PROPOSAL": 1,
+    "HISTORICAL_RECEIPT_PROPOSAL_NEEDS_COUNTERPART": 3,
+    "HOLD_DIRECT_DIFERENCIA_MONTO": 1,
+    "HOLD_DIRECT_IDENTIDAD_INSUFICIENTE": 1,
+    "HOLD_COMMISSION_CORROBORATED_DATA_CONTRACT": 1,
+    "HOLD_STILL_PENDING_AFTER_PAYMENT": 1,
+    "TEMPORAL_CLEARING_POLICY_PRESENT_REQUIRES_AUTHORIZATION": 24,
+    "TEMPORAL_CLEARING_POLICY_ABSENT_REQUIRES_VALIDATION": 7,
+    "SOURCE_CUTOFF_BEFORE_PAYMENT_NEEDS_LATER_EVIDENCE": 14,
+    "NO_COUNTERPART_EVIDENCE_YET": 11
+  },
+  "byInsurer": {
+    "Aseguradora General": {
+      "DIRECT_INSURER_MATCH_READY": 3,
+      "DIRECT_INSURER_MATCH_HISTORICAL_RECEIPT_PROPOSAL": 1,
+      "HOLD_DIRECT_DIFERENCIA_MONTO": 1
+    },
+    "Aseguradora Guatemalteca": {
+      "TEMPORAL_CLEARING_POLICY_PRESENT_REQUIRES_AUTHORIZATION": 3,
+      "SOURCE_CUTOFF_BEFORE_PAYMENT_NEEDS_LATER_EVIDENCE": 7
+    },
+    "Bantrab": {
+      "SOURCE_CUTOFF_BEFORE_PAYMENT_NEEDS_LATER_EVIDENCE": 2
+    },
+    "Columna": {
+      "NO_COUNTERPART_EVIDENCE_YET": 10
+    },
+    "El Roble": {
+      "TEMPORAL_CLEARING_POLICY_PRESENT_REQUIRES_AUTHORIZATION": 18,
+      "TEMPORAL_CLEARING_POLICY_ABSENT_REQUIRES_VALIDATION": 5,
+      "SOURCE_CUTOFF_BEFORE_PAYMENT_NEEDS_LATER_EVIDENCE": 4,
+      "HISTORICAL_RECEIPT_PROPOSAL_NEEDS_COUNTERPART": 3,
+      "HOLD_STILL_PENDING_AFTER_PAYMENT": 1
+    },
+    "Ficohsa": {
+      "HOLD_COMMISSION_CORROBORATED_DATA_CONTRACT": 1
+    },
+    "La Ceiba": {
+      "TEMPORAL_CLEARING_POLICY_PRESENT_REQUIRES_AUTHORIZATION": 1,
+      "TEMPORAL_CLEARING_POLICY_ABSENT_REQUIRES_VALIDATION": 2
+    },
+    "Mapfre": {
+      "DIRECT_INSURER_MATCH_READY": 1,
+      "HOLD_DIRECT_IDENTIDAD_INSUFICIENTE": 1,
+      "INSURER_ONLY_WITHOUT_CRM": 2
+    },
+    "Seguros Múltiples de Inversión": {
+      "NO_COUNTERPART_EVIDENCE_YET": 1
+    },
+    "Universales": {
+      "TEMPORAL_CLEARING_POLICY_PRESENT_REQUIRES_AUTHORIZATION": 2,
+      "SOURCE_CUTOFF_BEFORE_PAYMENT_NEEDS_LATER_EVIDENCE": 1
+    }
+  },
+  "temporalRules": {
+    "paymentAfterSnapshotCutoffIsValid": true,
+    "exactReceiptPrecedesFifo": true,
+    "historicalExigibleIncluded": true,
+    "absenceAloneCreatesCobro": false,
+    "commissionAloneCreatesCobro": false,
+    "bankAloneCreatesCobro": false,
+    "oneTemporalLineagePerCase": true
+  },
+  "sourceFreshness": {
+    "stalePlanillasUsed": false,
+    "staleBankStatementsUsed": false,
+    "staleFinancialFilesUsed": false,
+    "additionalSourcesRequested": 0
+  },
+  "sourceHashes": {
+    "crm": "727665170572143979b5f274190e200da397e7b32965d1809b1b9be6a8495302",
+    "laCeiba": "389a0be4afb0f483946bc7ee98715f93cd85757a1973e7bb11f54fd057c50008",
+    "aseguradoraGeneralPending": "1c7c5b01dfb1ce4af4d4f88ee4a0c4b1c7a19e7aecedb1716a1106f5b25b46ab",
+    "gyt": "d6348e3d63c8a1dd96af5b07940f9d1fd66aba0cb0d1768d20bbdb901aabce79",
+    "aseguradoraGuatemalteca": "aba093aa526f956a151ae8e73b39024250b85b4bc73847bf5135e8a6b188ee45",
+    "elRoble": "bcf6ccf35728d262e7efd1bd06142ea50028c804995a6a92cea77282a326b3a3",
+    "universales": "92379f984781c3312fc5c7d3a88a6c09becac7b71c3cd0c534f53d5b1005196b",
+    "mapfreProjected": "45071b686e47d3b245336a1bc16f7dfffc949f4c14d0a50b7c97c5048650499c",
+    "mapfrePaid": "990844110efd815f73535d962870d6381a59268233a9b3e86a5ffc0e76df1992",
+    "ficohsaCommission": "0c465e96564f623f3c8873dd7ff188cbad4f50e772a86b281dfc9b78ba625ae3",
+    "bantrabPortfolio": "a991eaa9170fbfbfd13fcbba1db95e5bf488ac3839622dd7bf7b504427bef18a"
+  },
+  "writes": {
+    "cobros": 0,
+    "finmovs": 0,
+    "firestore": 0,
+    "operational": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "security": {
+    "realRowsStoredInRepo": false,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsRealAmounts": false,
+    "containsSecrets": false
+  }
+}
