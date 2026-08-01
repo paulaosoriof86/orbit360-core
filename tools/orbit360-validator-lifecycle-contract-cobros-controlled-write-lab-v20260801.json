@@ -4,9 +4,9 @@
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "gateContractVersion": "10.9.0",
   "owner": "orbit360-cobros-controlled-write-lab-v20260801",
-  "ownerVersion": "20260801.5-readonly-diagnosis-reuse-dryrun-profile",
+  "ownerVersion": "20260801.6-private-package-repaired-pending-readonly-revalidation",
   "status": "ROOT_CAUSE_DIAGNOSIS_ACTIVE",
-  "classification": "DATA_CONTRACT_FAILURE",
+  "classification": "DATA_CONTRACT_FAILURE_CORRECTED_PENDING_REVALIDATION",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "executionProfile": {
     "mode": "READ_ONLY_ROOT_CAUSE_DIAGNOSIS",
@@ -28,10 +28,12 @@
     "ARMED_BY_EXPLICIT_LAB_AUTHORIZATION",
     "EXECUTED_LAB",
     "VERIFIED_OR_ROLLED_BACK",
-    "READ_ONLY_ROOT_CAUSE_DIAGNOSIS"
+    "READ_ONLY_ROOT_CAUSE_DIAGNOSIS",
+    "PRIVATE_PACKAGE_REPAIRED",
+    "READ_ONLY_REVALIDATION"
   ],
-  "currentPhase": "VERIFIED_OR_ROLLED_BACK",
-  "outcome": "ROLLED_BACK_BASELINE_RESTORED",
+  "currentPhase": "PRIVATE_PACKAGE_REPAIRED",
+  "outcome": "BASELINE_RESTORED_PACKAGE_REPAIRED_PENDING_READONLY_REVALIDATION",
   "humanDecisionRecorded": true,
   "executionAuthorized": true,
   "labWriteAuthorized": true,
@@ -44,9 +46,18 @@
   "requestPath": ".github/orbit360-requests/cobros-controlled-write-lab-v20260801.json",
   "privatePackage": {
     "driveFileId": "1FGpp_v6ZTs52VEeOnsH2IxoNCqWwVoAD",
-    "sha256": "cc01fa733166c2201da6e4ac37c231d42692caf6bba3797208fed23b3a1c737a",
-    "logicalSha256": "997bfc0614b4a65e8c4b5e7832996fbbe6b0063f9f0efdf3ca99b57aa79f4ff8",
-    "canonicalization": "node-json-stable-sort-v1"
+    "sha256": "beebdac90668291686f55610bdc2d8853ae5f2de4ae17b73732bb03812218911",
+    "logicalSha256": "fccae1f73d254a0fca8e1a0208a92f4a9a601bc83c8f8e26cb027be165f354bb",
+    "canonicalization": "node-json-stable-sort-v1",
+    "repair": {
+      "sourceDiagnosisRun": 30711814124,
+      "correctedCaseOrdinals": [3, 4],
+      "correctedKeys": ["endoso"],
+      "valuesExposed": false,
+      "driveFileIdPreserved": true,
+      "driveConnectorWriteVerified": true,
+      "firestoreWrites": 0
+    }
   },
   "expected": {
     "cases": 5,
@@ -133,7 +144,10 @@
   "diagnosis": {
     "sourceRun": 30711578397,
     "sourceArtifact": 8822041409,
-    "scope": "CASE_3_RECEIPT_SNAPSHOT_KEYS_AND_TYPES_ONLY",
+    "successfulRun": 30711814124,
+    "successfulArtifact": 8822109811,
+    "scope": "CASES_3_AND_4_RECEIPT_ENDOSO_TYPE_ONLY",
+    "rootCause": "PRIVATE_SNAPSHOT_EXPECTED_NULL_WHILE_CANONICAL_RECEIPT_STORED_EMPTY_STRING",
     "valuesAllowed": false,
     "writesAllowed": false,
     "productionAllowed": false,
@@ -153,7 +167,24 @@
         "firestoreRead": false
       }
     ],
-    "rootFix": "REUSE_EXISTING_LAB_DATA_CONTRACT_REPAIR_DRYRUN_PROFILE"
+    "repairAttempts": [
+      {
+        "run": 30711897905,
+        "classification": "VALIDATOR_STALE",
+        "failure": "NONEMPTY_STRING_ASSUMPTION",
+        "firestoreWrites": 0,
+        "privatePackageWrites": 0
+      },
+      {
+        "run": 30711980605,
+        "classification": "PIPELINE_MECHANISM_FAILURE",
+        "repairGenerated": true,
+        "newHashesGenerated": true,
+        "serviceAccountDriveWrite": false,
+        "firestoreWrites": 0
+      }
+    ],
+    "rootFix": "PRESERVE_CANONICAL_EMPTY_STRING_ENDOSO_IN_PRIVATE_PACKAGE"
   },
-  "nextAction": "RUN_READ_ONLY_ROOT_CAUSE_DIAGNOSTIC_CASE_3_RECEIPT_SNAPSHOT"
+  "nextAction": "RUN_READ_ONLY_REVALIDATION_ALL_FIVE_CASES_ZERO_BLOCKERS"
 }
