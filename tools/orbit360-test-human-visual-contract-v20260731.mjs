@@ -26,6 +26,7 @@ add('RECEIPT_DETAIL_USES_EXPECTED', receipts.includes("Orbit.store.get('recibosE
 add('RECEIPT_SINGLE_SOURCE_NOT_AUTO_COBRO', receipts.includes('la ausencia de saldo no crea por sí sola un cobro conciliado') && receipts.includes('Existe evidencia de pago reportado, pero aún no es un cobro conciliado.'));
 add('RECEIPT_PAYMENT_BALANCE_SEPARATED', receipts.includes('Cobro conciliado') && receipts.includes('Cartera conciliada con aseguradora') && receipts.includes('Esto confirma cartera; no equivale a un pago.'));
 add('RECEIPT_RECONCILIATION_TRACE_VISIBLE', receipts.includes('Fuente autoridad') && receipts.includes('Calidad de match') && receipts.includes('Referencia fuente'));
+add('RECEIPT_HERO_BADGE_COMPACT', receipts.includes('data-rp-receipt-hero="1"') && receipts.includes('align-items:flex-start') && receipts.includes('data-rp-hero-status="1"') && receipts.includes('align-self:flex-start;flex:0 0 auto'));
 
 // Global Policies must not freeze on 1,373 policies and must consume canonical receipts.
 add('POLICIES_INDEXED_VEHICLES', policies.includes('vehiclesByPolicy') && !policies.includes("S().all('vehiculos').find(v => v.polizaId === p.id)"));
@@ -37,6 +38,6 @@ add('POLICIES_MISSING_COMPONENTS_NOT_ZERO', !policies.includes('(p.gastosEmision
 add('CLIENT_PREMIUM_LABEL_EXPLICIT', detail.includes('Prima total anual vigente') || client.includes('Prima total anual vigente') || client.includes('Prima neta anual vigente'));
 
 const failed=checks.filter(x=>!x.ok);
-const out={schemaVersion:'orbit360-human-visual-contract-v4',status:failed.length?'FUNCTIONAL_DEFECT':'HUMAN_VISUAL_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-human-visual-contract-v5',status:failed.length?'FUNCTIONAL_DEFECT':'HUMAN_VISUAL_STATIC_READY',classification:failed.length?'FUNCTIONAL_DEFECT':null,total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,firestoreWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));
 if(failed.length){console.error('HUMAN_VISUAL_FAILED_CHECKS='+failed.map(x=>x.id).join(','));process.exit(41);}
