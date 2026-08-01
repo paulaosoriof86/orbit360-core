@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "orbit360-policies-visual-readonly-lab-request-v1",
+  "gateId": "block7-policies-static-v20260730",
+  "contractVersion": "7.0.1",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "authorizationSource": "user_authorized_20260801_1716_gt",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "scope": {
+    "role": "Dirección",
+    "roleProjection": "session_only_no_membership_write",
+    "primaryModule": "polizas",
+    "relatedViews": ["vehiculos", "recibos", "cartera"],
+    "collections": [
+      "clientes",
+      "aseguradoras",
+      "polizas",
+      "vehiculos",
+      "recibosEsperados",
+      "carteraPrimas",
+      "cobros"
+    ]
+  },
+  "expectedBaseline": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "finmovs": 0,
+    "planillasComisiones": 5,
+    "comisionesDevengadas": 5,
+    "conciliacionesComisiones": 5
+  },
+  "delivery": {
+    "previewChannel": "orbit360-policies-review-20260801",
+    "expiresDays": 7,
+    "defaultHostingDeploy": false,
+    "rollbackPreviewOnFailure": true
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false,
+    "automatedSmokeMaySetApproval": false
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": true,
+    "browser": true,
+    "deploy": true,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "prohibitions": {
+    "dataCorrections": true,
+    "policyWrites": true,
+    "vehicleWrites": true,
+    "receiptWrites": true,
+    "portfolioWrites": true,
+    "cobroWrites": true,
+    "finmovWrites": true,
+    "commissionWrites": true,
+    "main": true,
+    "merge": true,
+    "automaticHumanApproval": true
+  }
+}
