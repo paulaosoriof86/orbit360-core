@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-source-dryrun-sanitized-v1",
+  "date": "2026-08-01",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "mode": "PRIVATE_SOURCE_PACKAGE_READONLY",
+  "sourceCut": {
+    "filesReceived": 19,
+    "sourceBundles": 10,
+    "sourcePeriod": "2026-06",
+    "detailRowsObserved": 67,
+    "crmCandidateRows": 65,
+    "candidateExactDateRows": 34,
+    "candidatePeriodOnlyRows": 29,
+    "candidateReversalRows": 2,
+    "omitZeroCommissionRows": 2
+  },
+  "reconciliation": {
+    "exactPlanillaInvoicePairs": 8,
+    "planillaOnlyBundles": 1,
+    "invoiceOnlyOrIncompleteBundles": 1,
+    "mapfreSourcePackage": "HOLD_INCOMPLETE_HTML_FRAMESET",
+    "ficohsaInvoice": "MISSING_FINANCE_HOLD"
+  },
+  "sourceBundles": [
+    {"key": "el_roble_gtq_2026_06", "rows": 32, "crm": "CANDIDATE_READONLY", "pair": "EXACT"},
+    {"key": "la_ceiba_gtq_2026_06", "rows": 6, "crm": "CANDIDATE_READONLY", "pair": "EXACT"},
+    {"key": "aseguate_gtq_2026_06", "rows": 5, "crm": "CANDIDATE_READONLY", "pair": "EXACT"},
+    {"key": "universales_gtq_2026_06", "rows": 6, "crm": "CANDIDATE_READONLY", "pair": "EXACT"},
+    {"key": "ficohsa_gtq_2026_06", "rows": 1, "crm": "CANDIDATE_READONLY", "pair": "PLANILLA_ONLY"},
+    {"key": "columna_gtq_2026_06", "rows": 9, "crm": "CANDIDATE_READONLY", "pair": "EXACT"},
+    {"key": "bantrab_gtq_2026_06", "rows": 4, "crm": "CANDIDATE_READONLY", "pair": "EXACT"},
+    {"key": "gyt_gtq_2026_06", "rows": 3, "crm": "CANDIDATE_READONLY", "pair": "EXACT"},
+    {"key": "gyt_usd_2026_06", "rows": 1, "crm": "CANDIDATE_READONLY", "pair": "EXACT"},
+    {"key": "mapfre_gtq_2026_06", "rows": 0, "crm": "HOLD_SOURCE_PACKAGE_INCOMPLETE", "pair": "INVOICE_ONLY"}
+  ],
+  "rootCauseCorrections": {
+    "classification": "VALIDATOR_STALE",
+    "periodOnlySources": "SUPPORTED_WITH_EXPLICIT_OPT_IN",
+    "weakIdentityDuplicates": "PRESERVED",
+    "strongIdentityDuplicates": "OMIT_DUPLICATE",
+    "branchIncludedInIdentity": true
+  },
+  "staticGate": {
+    "run": 30717588903,
+    "job": 91415768713,
+    "artifact": 8823819018,
+    "artifactDigest": "sha256:cbff239965dea8596956b35dc1af1d5263f7be4bfb650b9e194bceda625df34d",
+    "head": "413c34f812ff60e7d21c042da71f770c8dbffb68",
+    "status": "STATIC_ADAPTER_PASS",
+    "checks": "42/42"
+  },
+  "holds": [
+    "MAPFRE_SOURCE_PACKAGE_INCOMPLETE",
+    "FICOHSA_INVOICE_MISSING_FOR_FINANCE",
+    "ASEGUATE_INTERMEDIARY_RELATION_REQUIRES_TENANT_VALIDATION",
+    "EL_ROBLE_SELLER_TOTAL_REQUIRES_VALIDATION",
+    "SELLER_CODES_REQUIRE_TENANT_ALIAS_CONFIGURATION"
+  ],
+  "capabilities": {
+    "realRowsStoredInRepo": false,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "secretsRead": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "storeAccess": false,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "ok": true
+}
