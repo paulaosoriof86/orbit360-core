@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "orbit360-cobros-residual-ledger-readonly-v1",
+  "date": "2026-08-01",
+  "tenantId": "alianzas-soluciones",
+  "environment": "LAB",
+  "sourceGate": "block10.9-cobros-controlled-write-lab-v20260801",
+  "classification": "READ_ONLY_RESIDUAL_CONCILIATION_LEDGER",
+  "status": "HOLD_RESIDUAL_CONFIRMED",
+  "sourceControl": {
+    "authoritativeInsurerSources": 2,
+    "authoritativeCrmSources": 2,
+    "newerAuthoritativeInsurerSourceLocatedAfter20260730": false,
+    "newerAuthoritativeCrmSourceLocatedAfter20260730": false,
+    "rowLevelTraceabilityPreservedPrivately": true,
+    "rawRowsStoredInRepo": 0
+  },
+  "summary": {
+    "insurerPaymentRowsReviewed": 9,
+    "oneToOneCandidatesAppliedAndPostVerified": 5,
+    "residualRowsReviewed": 4,
+    "newOneToOneCandidates": 0,
+    "holdOrNoMatchConfirmed": 4,
+    "writesAuthorized": 0,
+    "writesExecuted": 0
+  },
+  "cases": [
+    {
+      "ordinal": 1,
+      "insurerAlias": "ASEGURADORA_GENERAL",
+      "policyKeyPresentInBothSources": true,
+      "secondaryReferencePresentInBothSources": true,
+      "amountExact": false,
+      "periodCurrentAndConsistent": true,
+      "classification": "AMOUNT_MISMATCH_MATERIAL",
+      "decision": "HOLD_REQUIRES_AUTHORITATIVE_SOURCE_CORRECTION_OR_SUPPORT",
+      "automaticMatchAllowed": false
+    },
+    {
+      "ordinal": 2,
+      "insurerAlias": "ASEGURADORA_GENERAL",
+      "policyKeyPresentInBothSources": true,
+      "secondaryReferencePresentInInsurerSource": true,
+      "secondaryReferencePresentInCrmSource": false,
+      "amountExact": true,
+      "paymentDateExact": false,
+      "classification": "SOURCE_KEY_INCOMPLETE_CRM",
+      "decision": "HOLD_REQUIRES_REFERENCE_CONFIRMATION",
+      "automaticMatchAllowed": false
+    },
+    {
+      "ordinal": 3,
+      "insurerAlias": "MAPFRE",
+      "policyKeyPresentInBothSources": true,
+      "secondaryReferenceSufficient": false,
+      "amountExact": false,
+      "periodCurrentAndConsistent": true,
+      "classification": "AMOUNT_MISMATCH_MATERIAL_AND_REFERENCE_INSUFFICIENT",
+      "decision": "HOLD_REQUIRES_AUTHORITATIVE_SOURCE_CORRECTION_OR_SUPPORT",
+      "automaticMatchAllowed": false
+    },
+    {
+      "ordinal": 4,
+      "insurerAlias": "MAPFRE",
+      "policyKeyLocatedInHistoricalCrmSource": true,
+      "policyKeyLocatedInCurrentCrmCut": false,
+      "secondaryReferencePresent": true,
+      "amountExact": false,
+      "amountWithinExistingPointZeroOneTolerance": false,
+      "sourcePeriodCurrentAndConsistent": false,
+      "classification": "MINOR_AMOUNT_MISMATCH_AND_SOURCE_PERIOD_NOT_CURRENT",
+      "decision": "HOLD_REQUIRES_CURRENT_PERIOD_CRM_SOURCE",
+      "automaticMatchAllowed": false
+    }
+  ],
+  "domainControls": {
+    "inferMatchesProhibited": true,
+    "createCobros": false,
+    "updateReceipts": false,
+    "reactivatePolicies": false,
+    "createFinmovs": false,
+    "advanceToCommissionsForResidualCases": false,
+    "requireCurrentAuthoritativeSource": true
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "firestoreWrites": false,
+    "operationalWrites": false,
+    "browser": false,
+    "deploy": false,
+    "production": false
+  },
+  "sanitization": {
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "containsAuthorizationRefs": false,
+    "containsSecrets": false
+  },
+  "nextAction": "OBTAIN_OR_LOCATE_CORRECTED_CURRENT_AUTHORITATIVE_EVIDENCE_FOR_THE_FOUR_HOLD_ROWS_BEFORE_CLOSING_CONCILIATION"
+}
