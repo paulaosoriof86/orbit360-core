@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "orbit360-cobros-controlled-proposal-queue-sanitized-v1",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-31",
+  "status": "CONTROLLED_PROPOSAL_QUEUE_STATIC_READY",
+  "sourceMatrix": {
+    "gateId": "block10.4-cobros-matriz-real-static-v20260801",
+    "run": 30705827522,
+    "artifact": 8820281038,
+    "digest": "sha256:3a7b55b7e15dc7dd8e52d8c15acb1586732b8187508edb329b445ebae510f2aa",
+    "checks": "74/74 PASS",
+    "paymentEvidenceCases": 70
+  },
+  "queue": {
+    "total": 70,
+    "authorizationReady": 5,
+    "reviewTemporal": 24,
+    "validationRequired": 7,
+    "hold": 34,
+    "counts": {
+      "AUTHORIZATION_READY_DIRECT": 4,
+      "AUTHORIZATION_READY_HISTORICAL_RECEIPT": 1,
+      "REVIEW_TEMPORAL_CLEARING": 24,
+      "VALIDATE_POLICY_ABSENT_FROM_SNAPSHOT": 7,
+      "HOLD_SOURCE_OR_DATA_CONTRACT": 32,
+      "HOLD_INSURER_ONLY_WITHOUT_CRM": 2
+    }
+  },
+  "authorizationContract": {
+    "explicitAuthorizationRequired": true,
+    "historicalReceiptRequiresReinforcedAuthorization": true,
+    "temporalClearingIsNotYetAuthorizationEligible": true,
+    "validationCasesAreNotAuthorizationEligible": true,
+    "holdCasesAreNotAuthorizationEligible": true,
+    "writeEligibleBeforeAuthorization": false
+  },
+  "controls": {
+    "diffPerProposal": true,
+    "idempotencyKeyPerProposal": true,
+    "duplicateIdempotencyKeys": 0,
+    "preWriteSnapshotRequired": true,
+    "rollbackPlanPerProposal": true,
+    "sourceRowsImmutable": true,
+    "reactivatesPolicy": false,
+    "createsFinmov": false,
+    "autoApply": false
+  },
+  "freshness": {
+    "additionalPlanillasRequested": 0,
+    "additionalBankStatementsRequested": 0,
+    "additionalFinancialFilesRequested": 0,
+    "staleFilesUsedAsCurrentAuthority": false
+  },
+  "writes": {
+    "cobros": 0,
+    "finmovs": 0,
+    "firestore": 0,
+    "operational": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "security": {
+    "realQueueRowsStoredInRepo": false,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsRealAmounts": false,
+    "containsSecrets": false
+  }
+}
