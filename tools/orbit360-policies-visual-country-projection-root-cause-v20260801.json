@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "orbit360-policies-visual-country-projection-root-cause-v1",
+  "gateId": "block7-policies-static-v20260730",
+  "contractVersion": "7.0.1",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "sourceRun": 30723733270,
+  "sourceJob": 91431611947,
+  "sourceArtifact": 8825662341,
+  "sourceArtifactDigest": "sha256:5146e89ec68a23ac7be5ba5e957d57e2e31de530efde0631f20c64a9ea667fbf",
+  "failedStage": "collections",
+  "failureCode": "VISUAL_COUNTS_MISMATCH",
+  "adminBaseline": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5
+  },
+  "browserProjection": {
+    "clientes": 414,
+    "aseguradoras": 26,
+    "polizas": 2,
+    "vehiculos": 1,
+    "recibosEsperados": 0,
+    "carteraPrimas": 0,
+    "cobros": 2
+  },
+  "observedContract": {
+    "logicalCountryField": "country",
+    "productPhysicalCountryField": "pais",
+    "queryAlwaysAppliesMembershipCountry": true,
+    "directionScope": "all",
+    "clientesAndInsurersMatchGuatemalaCut": true,
+    "relatedCollectionsDoNotMatchBaseline": true
+  },
+  "executionSafety": {
+    "canonicalPreflightPassed": 19,
+    "canonicalPreflightFailed": 0,
+    "secretBindingResolved": true,
+    "snapshotBeforePassed": true,
+    "previewCreated": true,
+    "previewRolledBack": true,
+    "defaultHostingTouched": false,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "networkWriteCandidates": 0,
+    "rulesDeploy": false,
+    "functionsDeploy": false,
+    "productionTouched": false,
+    "humanApprovalRecorded": false
+  },
+  "nextDiagnostic": {
+    "readOnly": true,
+    "browser": false,
+    "deploy": false,
+    "measureCountryFields": true,
+    "measureRelationshipDerivation": true,
+    "inferOrWriteCountry": false,
+    "requiresSeparateAuthorizationBeforeAnyDataRepair": true
+  },
+  "containsPII": false,
+  "containsPolicyNumbers": false,
+  "containsAmounts": false,
+  "containsIds": false,
+  "containsSecrets": false
+}
