@@ -29,6 +29,17 @@ dos fallos en la misma etapa
 → exigir PASS completo
 → sincronizar lifecycle, workflow, registro, docs y Academia
 → reabrir el mismo gate solo con autorización
+→ cerrar el mismo gate con evidencia completa
+```
+
+Aplicación comprobada:
+
+```text
+preflight directo: 64/64 PASS
+mismo gate 10.8: run 30709607082
+cierre: 64/64 PASS
+nuevo gateId: no
+producto modificado: no
 ```
 
 Regla: la prueba conductual debe prevalecer sobre búsquedas de tokens literales. Un owner no debe modificarse para imitar un nombre obsoleto del validador.
