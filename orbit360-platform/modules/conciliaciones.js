@@ -1,146 +1,248 @@
 /* ============================================================
-   Orbit 360 · Bandeja de Conciliaciones (UI/prototipo)
-   Lee SOLO de Orbit.store('conciliaciones'). No toca cobros.
-   Las acciones cambian estado de la propuesta vía Orbit.store.update.
-   La aplicación real de pagos queda para backend (ChatGPT/Codex).
+   Orbit 360 · Cobros/Conciliación · owner canónico read-only
+   Fecha: 2026-08-01
+
+   La bandeja canónica lee propuestas generales y proyecta
+   conciliaciones de primas sin duplicar escrituras. Durante esta
+   fase ninguna acción aplica pagos, modifica cartera ni crea finmovs.
    ============================================================ */
-window.Orbit = window.Orbit || {};
-Orbit.modules = Orbit.modules || {};
-Orbit.modules.conciliaciones = (function () {
-  const U = Orbit.ui, S = () => Orbit.store, q = Orbit.q, K = Orbit.kit;
-  let fEstado = '', fFuente = '';
+(function () {
+  'use strict';
+  window.Orbit = window.Orbit || {};
+  Orbit.modules = Orbit.modules || {};
 
-  const ESTADOS = ['PROPUESTA', 'EN_REVISION', 'VALIDADA', 'RECHAZADA', 'BLOQUEADA', 'ANULADA'];
-  const TONE = { PROPUESTA: 'info', EN_REVISION: 'info', VALIDADA: 'ok', RECHAZADA: 'danger', BLOQUEADA: 'danger', ANULADA: 'neutral' };
-  // Acciones permitidas por estado (solo cambian la propuesta; NUNCA aplican pagos ni tocan cobros)
-  const ACCIONES = {
-    PROPUESTA: ['ver_detalle', 'tomar_en_revision', 'bloquear', 'anular'],
-    EN_REVISION: ['ver_detalle', 'validar', 'rechazar', 'bloquear', 'anular'],
-    VALIDADA: ['ver_detalle', 'rechazar', 'anular'],
-    RECHAZADA: ['ver_detalle'], BLOQUEADA: ['ver_detalle'], ANULADA: ['ver_detalle']
+  const VERSION = '20260801.1';
+  const PHASE = 'READ_ONLY_DRYRUN';
+  const CANONICAL_COLLECTION = 'conciliaciones';
+  const DOMAIN_COLLECTION = 'conciliacionesPrimas';
+  let filterState = '';
+
+  const S = () => Orbit.store;
+  const U = () => Orbit.ui || {};
+  const K = () => Orbit.kit || {};
+  const text = value => String(value == null ? '' : value).trim();
+  const norm = value => text(value).toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const esc = value => U().esc ? U().esc(text(value)) : text(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const money = (value, currency) => U().money ? U().money(Number(value || 0), currency || '') : `${currency || ''} ${Number(value || 0).toFixed(2)}`.trim();
+  const safeAll = collection => { try { return S() && S().all ? (S().all(collection) || []) : []; } catch (error) { return []; } };
+  const parseAmount = value => {
+    if (value == null || value === '') return 0;
+    const cleaned = String(value).replace(/[^0-9,.-]/g, '').replace(/\.(?=\d{3}(?:\D|$))/g, '').replace(',', '.');
+    const parsed = Number.parseFloat(cleaned);
+    return Number.isFinite(parsed) ? Math.round((parsed + Number.EPSILON) * 100) / 100 : 0;
   };
-  const ACC_LBL = { ver_detalle: 'Ver', tomar_en_revision: 'Tomar en revisión', validar: 'Validar', rechazar: 'Rechazar', bloquear: 'Bloquear', anular: 'Anular' };
-  // Transiciones de estado (solo cambian la propuesta, nunca cobros)
-  const TRANS = { tomar_en_revision: 'EN_REVISION', validar: 'VALIDADA', rechazar: 'RECHAZADA', bloquear: 'BLOQUEADA', anular: 'ANULADA' };
+  const ymd = value => {
+    const raw = text(value); if (!raw) return '';
+    let match = raw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (match) return `${match[1]}-${String(match[2]).padStart(2,'0')}-${String(match[3]).padStart(2,'0')}`;
+    match = raw.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+    if (match) return `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
+    return raw.slice(0, 10);
+  };
+  const first = (row, keys) => { for (const key of keys) if (row && text(row[key])) return row[key]; return ''; };
+  const sourceRef = row => {
+    const ref = row && (row.source_ref || row.sourceRef) || {};
+    return {
+      file: text(ref.file || row.archivo || row.file),
+      sheet: text(ref.sheet || row.hoja || row.sheet),
+      row: text(ref.row || ref.row_ref || row.fila || row.row),
+      block: text(ref.block || row.bloque || row.block),
+      period: text(ref.period || row.periodo || row.period)
+    };
+  };
+  const proposalIdentity = row => text(row && (row.proposalIdentity || row._sourceKey || row.sourceKey || (row.source_ref && row.source_ref.row_hash) || (row.sourceRef && row.sourceRef.rowHash))) || [
+    norm(first(row,['tipo','source_type','fuente'])),
+    norm(first(row,['polizaId','poliza_id','polizaNumero','poliza'])),
+    norm(first(row,['reciboId','recibo_id','reciboNumero','requerimiento'])),
+    norm(first(row,['moneda','currency'])),
+    String(parseAmount(first(row,['monto','total','saldo'])))
+  ].join('|');
 
-  function all() { try { return S().all('conciliaciones') || []; } catch (e) { return []; } }
-  function scoreBadge(sc) {
-    const t = (sc || '').toUpperCase();
-    const tone = t === 'MATCH_EXACTO' ? 'ok' : t === 'MATCH_PROBABLE' ? 'info' : t === 'BLOQUEADO' ? 'danger' : 'warn';
-    return t ? '<span class="badge ' + tone + '" style="font-size:9.5px">' + U.esc(t) + '</span>' : '—';
+  function stateFor(row) {
+    const raw = norm(first(row,['queue_state','estado_bandeja','estado','status','review_state','estado_revision']));
+    if (raw.includes('bloque')) return 'BLOQUEADA';
+    if (raw.includes('rechaz')) return 'RECHAZADA';
+    if (raw.includes('validada')) return 'VALIDADA';
+    if (raw.includes('requiere validacion')) return 'REQUIERE_VALIDACION';
+    if (raw.includes('revision')) return 'EN_REVISION';
+    return 'PROPUESTA';
+  }
+  function scoreFor(row) {
+    const raw = norm(first(row,['score_decision','decision_score','score','decision','status','estado']));
+    if (raw.includes('bloque')) return 'BLOQUEADO';
+    if (raw.includes('requiere validacion')) return 'REQUIERE_VALIDACION';
+    if (raw.includes('conciliado') || raw.includes('exacto')) return 'MATCH_EXACTO';
+    return 'MATCH_PROBABLE';
+  }
+  function baseProjection(row, sourceCollection) {
+    const ref = sourceRef(row || {});
+    return {
+      id: proposalIdentity(row), sourceCollection, sourceEntityId: text(row && row.id),
+      estado: stateFor(row), score: scoreFor(row),
+      fuente: text(first(row,['fuente','source_type','sourceType','origen'])) || 'Fuente de conciliación',
+      pais: text(first(row,['pais','country'])), moneda: text(first(row,['moneda','currency'])),
+      monto: parseAmount(first(row,['monto','total','saldo','primaTotal'])),
+      cliente: text(first(row,['clienteNombre','cliente','clienteId','cliente_id'])),
+      poliza: text(first(row,['polizaNumero','poliza','polizaId','poliza_id'])),
+      recibo: text(first(row,['reciboNumero','requerimiento','reciboId','recibo_id'])),
+      archivo: ref.file, hoja: ref.sheet, fila: ref.row, bloque: ref.block, periodo: ref.period,
+      motivo: text(first(row,['reason','motivo','estado_revision','review_state'])),
+      sourceDifferences: Array.isArray(row && row.sourceDifferences) ? row.sourceDifferences.slice() : [],
+      original: row, readOnly: true
+    };
+  }
+  const projectCanonical = row => baseProjection(row, CANONICAL_COLLECTION);
+  const projectPremium = row => {
+    const projected = baseProjection(row, DOMAIN_COLLECTION);
+    projected.id = `prima:${proposalIdentity(row)}`;
+    if (!projected.fuente || projected.fuente === 'Fuente de conciliación') projected.fuente = 'Conciliación de prima';
+    return projected;
+  };
+  function proposalRows() {
+    const rows = new Map();
+    safeAll(DOMAIN_COLLECTION).forEach(row => rows.set(proposalIdentity(row), projectPremium(row)));
+    safeAll(CANONICAL_COLLECTION).forEach(row => rows.set(proposalIdentity(row), projectCanonical(row)));
+    return Array.from(rows.values()).filter(row => !filterState || row.estado === filterState);
   }
 
-  function render(host) {
-    const rows = all().filter(r => (!fEstado || (r.estado_bandeja || r.estado) === fEstado) && (!fFuente || r.fuente === fFuente));
-    const total = all();
-    const cont = {};
-    ESTADOS.forEach(e => cont[e] = total.filter(r => (r.estado_bandeja || r.estado) === e).length);
-    const fuentes = [...new Set(total.map(r => r.fuente).filter(Boolean))];
-
-    const kpis = K.kpis([
-      { label: 'Propuestas', val: cont.PROPUESTA + cont.EN_REVISION, color: 'var(--info)', foot: 'por revisar' },
-      { label: 'Validadas', val: cont.VALIDADA, color: 'var(--ok)', foot: 'para proceso posterior autorizado' },
-      { label: 'Bloqueadas / rechazadas', val: cont.BLOQUEADA + cont.RECHAZADA, color: 'var(--danger)', foot: 'requieren atención' },
-      { label: 'En revisión', val: cont.EN_REVISION, color: 'var(--ink-3)', foot: 'en curso' }
-    ]);
-
-    const chips = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 14px">'
-      + `<button class="btn ${fEstado === '' ? 'primary' : 'ghost'} sm" onclick="Orbit.modules.conciliaciones.filtro('','estado')">Todos</button>`
-      + ESTADOS.map(e => `<button class="btn ${fEstado === e ? 'primary' : 'ghost'} sm" onclick="Orbit.modules.conciliaciones.filtro('${e}','estado')">${e.replace('_', ' ')} <span class="muted">${cont[e]}</span></button>`).join('')
-      + '</div>';
-
-    const tabla = rows.length ? `<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Estado</th><th>Revisión</th><th>Score</th><th>Fuente</th><th>Archivo · fila</th><th>País/Moneda</th><th>Cliente · Póliza · Recibo</th><th class="num">Monto</th><th>Acción propuesta</th><th>Responsable</th><th>Actualizado</th><th>Acciones</th></tr></thead>
-      <tbody>${rows.map(rowHtml).join('')}</tbody></table></div></div>`
-      : `<div class="card pad" style="text-align:center;padding:44px 20px"><div style="font-size:34px;margin-bottom:8px">🗂️</div><div style="font-family:var(--f-display);font-weight:800;font-size:16px">Sin propuestas de conciliación todavía</div><p class="muted" style="font-size:13px;margin-top:6px;max-width:460px;margin-left:auto;margin-right:auto">Cuando importes un estado de cuenta o una planilla de comisión, las coincidencias aparecerán aquí como propuestas para revisar y validar. Ninguna aplica pagos por sí sola.</p></div>`;
-
-    host.innerHTML = '<div class="page">'
-      + K.banner({ icon: '🔗', title: 'Bandeja de conciliaciones', sub: 'Propuestas de cruce (banco / aseguradora / comisiones) para revisión técnica. No aplica pagos ni modifica cobros desde esta bandeja.', features: [] })
-      + '<div class="kpi-row">' + kpis + '</div>'
-      + (fuentes.length ? `<div class="cfg-note" style="margin-bottom:10px">Fuentes: ${fuentes.map(f => `<b>${U.esc(f)}</b>`).join(' · ')} · <span class="muted">las monedas no se mezclan; cada propuesta conserva su país/moneda origen.</span></div>` : '')
-      + chips
-      + tabla
-      + '</div>';
+  function isHistoricalExigible(row) {
+    return !!(row && (row.historicalExigible === true || row.exigible === true ||
+      text(row.carteraTipo) === 'cartera_historica_exigible' || text(row.exigibilidad) === 'historica_exigible'));
   }
-
-  function rowHtml(r) {
-    const est = r.estado_bandeja || r.estado || 'PROPUESTA';
-    const acciones = (r.acciones_permitidas || ACCIONES[est] || ['ver_detalle']);
-    const pm = (r.pais_moneda) || ((r.pais || '') + (r.moneda ? ' / ' + r.moneda : '')) || '—';
-    const cpr = r.cliente_poliza_recibo || [r.cliente, r.poliza, r.recibo].filter(Boolean).join(' · ') || '—';
-    const monto = (r.monto != null && r.moneda) ? U.money(r.monto, r.moneda) : (r.monto != null ? '<span class="muted" title="Moneda requerida">' + r.monto + ' ⚠</span>' : '—');
-    const btns = acciones.map(a => {
-      if (a === 'ver_detalle') return `<button class="btn ghost sm" onclick="Orbit.modules.conciliaciones.detalle('${r.id}')">Ver</button>`;
-      const danger = (a === 'rechazar' || a === 'bloquear' || a === 'anular') ? ' style="color:var(--danger)"' : '';
-      return `<button class="btn ghost sm"${danger} onclick="Orbit.modules.conciliaciones.accion('${r.id}','${a}')">${ACC_LBL[a] || a}</button>`;
-    }).join(' ');
-    const bloqueos = (r.bloqueos && r.bloqueos.length) ? `<div class="muted" style="font-size:10px;color:var(--danger)">⛔ ${r.bloqueos.map(U.esc).join(', ')}</div>` : '';
-    return `<tr>
-      <td><span class="badge ${TONE[est] || 'neutral'}">${est.replace('_', ' ')}</span></td>
-      <td style="font-size:11.5px">${U.esc(r.estado_revision || '—')}</td>
-      <td>${scoreBadge(r.score || r.decision_score)}${r.decision_score && r.decision_score !== r.score ? ' <span class="muted" style="font-size:9px">' + U.esc(r.decision_score) + '</span>' : ''}</td>
-      <td style="font-size:11.5px">${U.esc(r.fuente || '—')}</td>
-      <td class="mono" style="font-size:10.5px">${U.esc(r.archivo || '—')}${r.fila ? ' · f' + r.fila : ''}</td>
-      <td class="mono" style="font-size:11px">${U.esc(pm)}</td>
-      <td style="font-size:11.5px">${U.esc(cpr)}</td>
-      <td class="num">${monto}</td>
-      <td style="font-size:11.5px">${U.esc(r.accion_propuesta || '—')}</td>
-      <td style="font-size:11.5px">${U.esc(r.responsable || '—')}</td>
-      <td class="mono" style="font-size:10.5px">${U.esc((r.ultima_actualizacion || '').toString().slice(0, 16).replace('T', ' ') || '—')}</td>
-      <td style="white-space:nowrap">${btns}${bloqueos}</td></tr>`;
+  function outstanding(row) {
+    const direct = first(row,['saldoPendiente','saldo','pendiente','montoPendiente','primaPendiente']);
+    if (direct !== '') return Math.max(0, parseAmount(direct));
+    const total = parseAmount(first(row,['monto','total','primaTotal']));
+    const applied = parseAmount(first(row,['montoAplicado','pagado','totalPagado']));
+    return Math.max(0, Math.round((total - applied + Number.EPSILON) * 100) / 100);
   }
-
-  function accion(id, a) {
-    const r = S().get('conciliaciones', id); if (!r) return;
-    const permitidas = r.acciones_permitidas || ACCIONES[r.estado_bandeja || r.estado] || [];
-    if (permitidas.indexOf(a) < 0) { U.toast('Acción no permitida en este estado'); return; }
-    const nuevo = TRANS[a];
-    if (!nuevo) return;
-    // Solo muta la PROPUESTA, nunca cobros.
-    S().update('conciliaciones', id, {
-      estado_bandeja: nuevo,
-      estado_revision: a === 'validar' ? 'Validada por usuario' : a === 'rechazar' ? 'Rechazada' : a === 'tomar_en_revision' ? 'En revisión' : a === 'bloquear' ? 'Bloqueada' : 'Anulada',
-      ultima_actualizacion: new Date().toISOString(),
-      responsable: (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().nombre) || 'Usuario'
+  function simulateFifo(payment, obligations, options) {
+    const opts = options || {};
+    const amount = parseAmount(first(payment || {},['total_recaudado','monto','total','valor']));
+    const currency = text(first(payment || {},['moneda','currency']));
+    const clientId = text(first(payment || {},['clienteId','cliente_id']));
+    const insurerId = text(first(payment || {},['aseguradoraId','aseguradora_id']));
+    const policyScope = text(opts.scopePolicyId || '');
+    const paymentDate = ymd(first(payment || {},['fecha_recaudo','fechaPago','fecha','date'])) || ymd(new Date().toISOString());
+    const seen = new Set();
+    const eligible = (Array.isArray(obligations) ? obligations : []).filter(row => {
+      const id = text(first(row,['id','reciboId','recibo_id','_sourceKey']));
+      if (!id || seen.has(id)) return false;
+      seen.add(id);
+      const state = norm(first(row,['estado','estadoOperativo','estadoCartera']));
+      if (state.includes('pagado') || state.includes('anulado') || row.conciliadoPago === true) return false;
+      if (currency && text(first(row,['moneda','currency'])) !== currency) return false;
+      if (clientId && text(first(row,['clienteId','cliente_id'])) !== clientId) return false;
+      if (insurerId && text(first(row,['aseguradoraId','aseguradora_id'])) !== insurerId) return false;
+      if (policyScope && text(first(row,['polizaId','poliza_id'])) !== policyScope) return false;
+      if (outstanding(row) <= 0) return false;
+      const due = ymd(first(row,['vence','fechaVencimiento','fechaLimite','dueDate']));
+      return (due && due <= paymentDate) || isHistoricalExigible(row) || opts.includeFuture === true;
+    }).sort((a,b) => {
+      const ad = ymd(first(a,['vence','fechaVencimiento','fechaLimite','dueDate'])) || '9999-12-31';
+      const bd = ymd(first(b,['vence','fechaVencimiento','fechaLimite','dueDate'])) || '9999-12-31';
+      return ad.localeCompare(bd) || text(first(a,['id','reciboId','recibo_id'])).localeCompare(text(first(b,['id','reciboId','recibo_id'])));
     });
-    U.toast('✓ Propuesta → ' + nuevo.replace('_', ' '));
-    const h = document.getElementById('host'); if (h) render(h);
+    let remaining = Math.max(0, amount);
+    const allocations = [];
+    for (const row of eligible) {
+      if (remaining <= 0) break;
+      const balance = outstanding(row);
+      const applied = Math.min(balance, remaining);
+      remaining = Math.round((remaining - applied + Number.EPSILON) * 100) / 100;
+      allocations.push({
+        obligationId: text(first(row,['id','reciboId','recibo_id','_sourceKey'])),
+        policyId: text(first(row,['polizaId','poliza_id'])),
+        dueDate: ymd(first(row,['vence','fechaVencimiento','fechaLimite','dueDate'])),
+        historicalExigible: isHistoricalExigible(row), openingBalance: balance, appliedAmount: applied,
+        closingBalance: Math.round((balance - applied + Number.EPSILON) * 100) / 100
+      });
+    }
+    const appliedAmount = Math.round((amount - remaining + Number.EPSILON) * 100) / 100;
+    return Object.freeze({
+      version: VERSION, phase: PHASE, currency, paymentAmount: amount, appliedAmount,
+      remainingPayment: remaining, allocations, partial: allocations.some(item => item.closingBalance > 0),
+      excess: remaining > 0, reactivatesPolicy: false, writes: 0, operationalWrites: 0
+    });
   }
 
+  function blocked() {
+    if (U().toast) U().toast('Esta acción estará disponible después de validar la conciliación y autorizar la aplicación.');
+    return false;
+  }
+  function disableLegacyActions(root) {
+    const host = root || document;
+    if (!host || !host.querySelectorAll) return;
+    const selectors = [
+      '#cd-apply','#cd-val','#cd-conc','#pm-ok','#cc-ok','#cv-ok','#cv-rej','#cv-rev',
+      '[onclick*="aplicarPago"]','[onclick*="validarReporte"]','[onclick*="conciliarFactura"]','[onclick*=".lote("]'
+    ];
+    host.querySelectorAll(selectors.join(',')).forEach(button => {
+      button.disabled = true; button.setAttribute('aria-disabled','true'); button.removeAttribute('onclick');
+      button.onclick = event => { if (event) event.preventDefault(); blocked(); };
+      button.title = 'Disponible después de la validación y autorización correspondiente';
+      button.style.opacity = '.55'; button.style.cursor = 'not-allowed';
+    });
+  }
+  function freezeCobrosModule() {
+    const module = Orbit.modules && Orbit.modules.cobros;
+    if (!module || module.__cobrosConciliacionReadOnlyOwner === VERSION) return false;
+    ['aplicarPago','validarReporte','conciliarFactura','lote'].forEach(name => {
+      if (typeof module[name] === 'function') module[name] = blocked;
+    });
+    ['render','detalle'].forEach(name => {
+      const original = module[name];
+      if (typeof original !== 'function') return;
+      module[name] = function () {
+        const result = original.apply(this, arguments);
+        disableLegacyActions(document); setTimeout(() => disableLegacyActions(document), 0);
+        return result;
+      };
+    });
+    module.__cobrosConciliacionReadOnlyOwner = VERSION;
+    module.__cobrosConciliacionPhase = PHASE;
+    return true;
+  }
+
+  function tone(state) {
+    return state === 'VALIDADA' ? 'ok' : state === 'BLOQUEADA' || state === 'RECHAZADA' ? 'danger' : state === 'REQUIERE_VALIDACION' ? 'warn' : 'info';
+  }
+  function render(host) {
+    freezeCobrosModule();
+    const rows = proposalRows();
+    const counts = rows.reduce((acc,row) => { acc[row.estado] = (acc[row.estado] || 0) + 1; return acc; },{});
+    const filters = ['', 'PROPUESTA','EN_REVISION','REQUIERE_VALIDACION','VALIDADA','RECHAZADA','BLOQUEADA'];
+    const banner = K().banner ? K().banner({icon:'🔗',title:'Bandeja de conciliaciones',sub:'Revisión de coincidencias. Ninguna propuesta aplica pagos por sí sola.',features:[]}) : '<div class="card pad"><b>Bandeja de conciliaciones</b><div class="muted">Revisión de coincidencias. Ninguna propuesta aplica pagos por sí sola.</div></div>';
+    host.innerHTML = `<div class="page">${banner}
+      <div class="cfg-note" style="margin-bottom:12px">Los pagos continúan separados de recibos, cartera y movimientos financieros. Las coincidencias ambiguas permanecen en validación.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${filters.map(state => `<button class="btn ${filterState===state?'primary':'ghost'} sm" data-conc-filter="${state}">${state?state.replaceAll('_',' '):'Todos'}${state?` · ${counts[state]||0}`:''}</button>`).join('')}</div>
+      <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Estado</th><th>Coincidencia</th><th>Fuente</th><th>País / moneda</th><th>Cliente · póliza · recibo</th><th class="num">Monto</th><th>Trazabilidad</th><th></th></tr></thead><tbody>
+      ${rows.map(row => `<tr><td><span class="badge ${tone(row.estado)}">${esc(row.estado.replaceAll('_',' '))}</span></td><td>${esc(row.score.replaceAll('_',' '))}</td><td>${esc(row.fuente)}</td><td>${esc([row.pais,row.moneda].filter(Boolean).join(' / ')||'—')}</td><td>${esc([row.cliente,row.poliza,row.recibo].filter(Boolean).join(' · ')||'—')}</td><td class="num">${row.moneda?money(row.monto,row.moneda):esc(row.monto||'—')}</td><td class="mono" style="font-size:10.5px">${esc([row.archivo,row.hoja,row.fila?`fila ${row.fila}`:'',row.periodo].filter(Boolean).join(' · ')||'—')}</td><td><button class="btn ghost sm" data-conc-id="${esc(row.id)}">Ver</button></td></tr>`).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">Aún no hay propuestas para revisar.</td></tr>'}
+      </tbody></table></div></div></div>`;
+    host.querySelectorAll('[data-conc-filter]').forEach(button => button.addEventListener('click', () => { filterState = button.dataset.concFilter || ''; render(host); }));
+    host.querySelectorAll('[data-conc-id]').forEach(button => button.addEventListener('click', () => detalle(button.dataset.concId)));
+    disableLegacyActions(document);
+  }
   function detalle(id) {
-    const r = S().get('conciliaciones', id); if (!r) return;
-    const rowKV = (k, v) => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><span class="muted" style="font-size:12px">${k}</span><b style="font-size:12.5px;text-align:right">${v}</b></div>`;
-    modal('🔗 Detalle de propuesta', [
-      rowKV('Estado bandeja', U.esc(r.estado_bandeja || r.estado || '—')),
-      rowKV('Estado revisión', U.esc(r.estado_revision || '—')),
-      rowKV('Score', U.esc(r.score || r.decision_score || '—')),
-      rowKV('Fuente', U.esc(r.fuente || '—')),
-      rowKV('Archivo · fila', U.esc(r.archivo || '—') + (r.fila ? ' · ' + r.fila : '')),
-      rowKV('País / moneda', U.esc(r.pais_moneda || ((r.pais || '') + ' / ' + (r.moneda || '')) || '—')),
-      rowKV('Cliente · Póliza · Recibo', U.esc(r.cliente_poliza_recibo || '—')),
-      rowKV('Monto', (r.monto != null && r.moneda) ? U.money(r.monto, r.moneda) : (r.monto || '—')),
-      rowKV('Acción propuesta', U.esc(r.accion_propuesta || '—')),
-      rowKV('Responsable', U.esc(r.responsable || '—')),
-      rowKV('Última actualización', U.esc((r.ultima_actualizacion || '—').toString().slice(0, 16).replace('T', ' '))),
-      (r.bloqueos && r.bloqueos.length) ? `<div class="cfg-note" style="margin-top:10px;border-left:3px solid var(--danger)">⛔ Bloqueos: ${r.bloqueos.map(U.esc).join(', ')}</div>` : ''
-    ].join(''));
+    const row = proposalRows().find(item => item.id === id); if (!row) return;
+    const summary = [
+      ['Estado',row.estado.replaceAll('_',' ')],['Coincidencia',row.score.replaceAll('_',' ')],['Fuente',row.fuente],
+      ['País / moneda',[row.pais,row.moneda].filter(Boolean).join(' / ')||'—'],['Cliente',row.cliente||'—'],['Póliza',row.poliza||'—'],['Recibo',row.recibo||'—'],
+      ['Monto',row.moneda?money(row.monto,row.moneda):row.monto||'—'],['Archivo',row.archivo||'—'],['Hoja / fila',[row.hoja,row.fila].filter(Boolean).join(' / ')||'—']
+    ];
+    let back = document.getElementById('conc-readonly-detail'); if (back) back.remove();
+    back = document.createElement('div'); back.id='conc-readonly-detail'; back.className='drawer-back open'; back.style.cssText='display:grid;place-items:center;z-index:210';
+    back.innerHTML = `<div class="card" style="width:min(520px,94vw);max-height:88vh;overflow:auto"><div style="padding:18px"><div style="display:flex;justify-content:space-between;gap:12px"><b style="font-family:var(--f-display);font-size:17px">Detalle de conciliación</b><button class="imp-x" data-close>✕</button></div><div class="cfg-note" style="margin:12px 0">Esta propuesta está en revisión y no aplica pagos automáticamente.</div>${summary.map(([label,value])=>`<div class="vp-row"><span class="vp-l">${esc(label)}</span><span class="vp-v">${esc(value)}</span></div>`).join('')}</div><div style="padding:13px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn ghost" data-close>Cerrar</button></div></div>`;
+    document.body.appendChild(back);
+    const close=()=>back.remove(); back.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',close)); back.addEventListener('click',event=>{if(event.target===back)close();});
   }
 
-  function modal(titulo, inner) {
-    let b = document.getElementById('conc-modal'); if (b) b.remove();
-    b = document.createElement('div'); b.id = 'conc-modal'; b.className = 'drawer-back open';
-    b.style.cssText = 'display:grid;place-items:center;z-index:210';
-    b.innerHTML = `<div class="card" style="width:min(500px,94vw);max-height:88vh;overflow:auto;padding:0">
-      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">${titulo}</b><button class="imp-x" id="cm-x">✕</button></div>
-      <div style="padding:18px 20px">${inner}</div>
-      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn ghost" id="cm-c">Cerrar</button></div></div>`;
-    document.body.appendChild(b);
-    const close = () => b.remove();
-    b.addEventListener('click', e => { if (e.target === b) close(); });
-    b.querySelector('#cm-x').onclick = close; b.querySelector('#cm-c').onclick = close;
-  }
-
-  function filtro(v, tipo) { if (tipo === 'estado') fEstado = v; else fFuente = v; const h = document.getElementById('host'); if (h) render(h); }
-
-  return { render, accion, detalle, filtro };
+  Orbit.cobrosConciliacionReadOnly = Object.freeze({
+    version: VERSION, phase: PHASE, canonicalCollection: CANONICAL_COLLECTION, domainCollection: DOMAIN_COLLECTION,
+    proposalRows, simulateFifo, freezeCobrosModule, operationalWrites: 0, firestoreWrites: 0, autoApply: false
+  });
+  Orbit.modules.conciliaciones = Object.freeze({render, detalle, accion: blocked, filtro(value){filterState=value||'';const host=document.getElementById('host');if(host)render(host);}});
+  freezeCobrosModule();
+  if (document && document.addEventListener) document.addEventListener('orbit:store', freezeCobrosModule);
 })();
