@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-controlled-write-request-v1",
+  "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
+  "contractVersion": "11.0.0",
+  "tenantId": "alianzas-soluciones",
+  "projectId": "ays-orbit-360-lab",
+  "approved": true,
+  "consumed": false,
+  "authorizedBy": "Paula Osorio",
+  "authorizedAt": "2026-08-01T17:00:00-06:00",
+  "authorizationRef": "planillas-comisiones-five-relations-write-20260801",
+  "authorizationText": "Autorizo la escritura controlada en LAB de las cinco comisiones A&S y sus quince documentos canónicos, verificando previamente los digests y las colecciones vacías, mediante operación atómica, idempotencia, post-verificación y rollback exacto; manteniendo las tres liquidaciones de vendedor en HOLD y sin activar facturas, CxC, CxP, finmovs, deploy ni producción.",
+  "scope": {
+    "relations": 5,
+    "documents": 15,
+    "planillasComisiones": 5,
+    "comisionesDevengadas": 5,
+    "conciliacionesComisiones": 5,
+    "sellerHolds": 3,
+    "policyWrites": 0,
+    "receiptWrites": 0,
+    "cobroWrites": 0,
+    "finmovWrites": 0,
+    "invoiceWrites": 0,
+    "cxcWrites": 0,
+    "cxpWrites": 0,
+    "liquidationWrites": 0
+  },
+  "digests": {
+    "candidateSet": "04c7da071ddadfe689e0137e730448ada36abe7aff6c228cd5abb0206c26c680",
+    "emptyTargetSnapshot": "12b3763f976433e1e7e809f461dc835bca3a4c39b1d6dd1655e42a202e6cbf3f"
+  },
+  "privatePackage": {
+    "driveFileId": "1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84",
+    "sha256": "abf5975e5cf8821489437b3b6172153c54032c8f097b720c0a98b30555a62a82",
+    "logicalSha256": "a42b2eb6deee3c7b55da5747684ef7a3338bb0bfc8788bb3533d21c1eed84d74"
+  },
+  "expectedBaseline": {
+    "polizas": 1373,
+    "recibosEsperados": 1294,
+    "cobros": 5,
+    "finmovs": 0
+  },
+  "crmVisualApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false,
+    "note": "Esta escritura no constituye aprobación visual ni funcional de los módulos CRM pendientes."
+  },
+  "controls": {
+    "singleAtomicTransaction": true,
+    "idempotency": true,
+    "postVerification": true,
+    "rollbackExactDocuments": 15,
+    "sellerLiquidationBlocked": true,
+    "genericComisionesUntouched": true,
+    "financeInactive": true,
+    "visualApprovalNotInferred": true
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": true,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "sanitization": {
+    "includeIds": false,
+    "includePolicyNumbers": false,
+    "includeAmounts": false,
+    "includePII": false,
+    "includeSourceRows": false,
+    "includeSecrets": false
+  }
+}
