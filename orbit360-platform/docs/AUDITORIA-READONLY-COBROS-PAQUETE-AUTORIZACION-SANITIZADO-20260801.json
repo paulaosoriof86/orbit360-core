@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "orbit360-cobros-authorization-package-sanitized-v1",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-31",
+  "status": "AUTHORIZATION_PACKAGE_STATIC_READY",
+  "sourceQueue": {
+    "gateId": "block10.5-cobros-proposal-queue-static-v20260801",
+    "run": 30706101103,
+    "artifact": 8820364372,
+    "digest": "sha256:3d2cd9a04aaeff779bb7a8d01e73dc1c614842353d4b6420a7109e25b1072a85",
+    "checks": "55/55 PASS",
+    "totalCases": 70,
+    "authorizationEligible": 5
+  },
+  "package": {
+    "cards": 5,
+    "directExistingReceipt": 4,
+    "historicalReceiptReinforced": 1,
+    "decisionStatus": "PENDING_HUMAN_AUTHORIZATION",
+    "packageGrantsAuthorization": false,
+    "partialBatchDecisionAllowed": true,
+    "privateMaterializationRequired": true,
+    "privateValuesStoredInRepo": false
+  },
+  "sanitizedCards": [
+    {
+      "cardRef": "AUTH-DIRECT-01",
+      "category": "EXISTING_CANONICAL_RECEIPT",
+      "proposedChange": "CREATE_COBRO_AND_APPLY_TO_EXACT_RECEIPT",
+      "reinforcedAuthorizationRequired": false,
+      "authorizationGranted": false,
+      "writeEligible": false
+    },
+    {
+      "cardRef": "AUTH-DIRECT-02",
+      "category": "EXISTING_CANONICAL_RECEIPT",
+      "proposedChange": "CREATE_COBRO_AND_APPLY_TO_EXACT_RECEIPT",
+      "reinforcedAuthorizationRequired": false,
+      "authorizationGranted": false,
+      "writeEligible": false
+    },
+    {
+      "cardRef": "AUTH-DIRECT-03",
+      "category": "EXISTING_CANONICAL_RECEIPT",
+      "proposedChange": "CREATE_COBRO_AND_APPLY_TO_EXACT_RECEIPT",
+      "reinforcedAuthorizationRequired": false,
+      "authorizationGranted": false,
+      "writeEligible": false
+    },
+    {
+      "cardRef": "AUTH-DIRECT-04",
+      "category": "EXISTING_CANONICAL_RECEIPT",
+      "proposedChange": "CREATE_COBRO_AND_APPLY_TO_EXACT_RECEIPT",
+      "reinforcedAuthorizationRequired": false,
+      "authorizationGranted": false,
+      "writeEligible": false
+    },
+    {
+      "cardRef": "AUTH-HISTORICAL-01",
+      "category": "HISTORICAL_RECEIPT_REINFORCED",
+      "proposedChange": "CREATE_HISTORICAL_RECEIPT_AND_APPLY_PAYMENT_ATOMICALLY",
+      "reinforcedAuthorizationRequired": true,
+      "authorizationGranted": false,
+      "writeEligible": false,
+      "reactivatesPolicy": false
+    }
+  ],
+  "controls": {
+    "diffPerCard": true,
+    "idempotencyKeyPerCard": true,
+    "duplicateIdempotencyKeys": 0,
+    "preWriteSnapshotRequired": true,
+    "rollbackPlanPerCard": true,
+    "sourceRowsImmutable": true,
+    "exactReceiptPrecedesFifo": true,
+    "historicalOperationAtomic": true,
+    "reactivatesPolicy": false,
+    "createsFinmov": false,
+    "autoApply": false
+  },
+  "authorizationRules": {
+    "directionRoleRequired": true,
+    "explicitDecisionPerCardOrBatch": true,
+    "historicalCardMustBeConfirmedSeparately": true,
+    "reviewTemporalCasesExcluded": 24,
+    "validationCasesExcluded": 7,
+    "holdCasesExcluded": 34
+  },
+  "writes": {
+    "cobros": 0,
+    "finmovs": 0,
+    "firestore": 0,
+    "operational": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "security": {
+    "realCardsStoredInRepo": false,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsRealAmounts": false,
+    "containsSecrets": false
+  }
+}
