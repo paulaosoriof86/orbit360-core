@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block10.4-cobros-matriz-real-static-v20260801",
+  "gateContractVersion": "10.4.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "COBROS_REAL_PAYMENT_MATRIX_STATIC_QUALIFICATION",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "requiredFiles": [
+    "orbit360-platform/core/importa-cobros-matriz-multievidencia-p0.js",
+    "orbit360-platform/core/importa-transversal-p0-bootstrap-v20260731.js",
+    "tools/orbit360-test-importa-cobros-matriz-multievidencia-p0-v20260801.mjs",
+    "orbit360-platform/docs/AUDITORIA-READONLY-COBROS-MATRIZ-REAL-SANITIZADA-20260801.json",
+    "orbit360-platform/docs/CIERRE-STATIC-COBROS-MATRIZ-REAL-20260801.md",
+    "orbit360-platform/docs/ACADEMIA-MATRIZ-REAL-COBROS-HISTORICOS-20260801.md"
+  ],
+  "successStatus": "COBROS_REAL_PAYMENT_MATRIX_STATIC_READY",
+  "writeAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
