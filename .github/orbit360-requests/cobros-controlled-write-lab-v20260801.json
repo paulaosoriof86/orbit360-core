@@ -8,7 +8,7 @@
   "projectId": "ays-orbit-360-lab",
   "authorizedBy": "Dirección / AdminTenant",
   "authorizedAt": "2026-08-01T11:40:00-06:00",
-  "authorizedHead": "2bc00d2fe0b43718e71f45658be4bd6c940a6b19",
+  "authorizedHead": "a47f10d0863476f097e2b8822ed8d1eba35802f7",
   "sourcePreflight": {
     "run": 30710608492,
     "artifact": 8821741047,
@@ -22,14 +22,16 @@
   "recovery": {
     "sequence": 2,
     "failedRun": 30711389436,
-    "classification": "DATA_CONTRACT_FAILURE",
+    "classification": "DATA_CONTRACT_FAILURE_CANONICALIZATION",
     "firstCheckFailed": "PRIVATE_PACKAGE_LOGICAL_SHA",
-    "rootCause": "Cross-runtime JSON number canonicalization represented zero as 0.0 in the producer and 0 in the Node consumer.",
+    "rootCause": "Cross-runtime JSON number canonicalization represented decimal zeros differently; Drive exact bytes and Node stable digest are now authoritative.",
     "correctedLayer": "PRIVATE_PACKAGE_CANONICAL_DIGEST",
-    "physicalPackageReverified": true,
+    "drivePhysicalShaVerified": true,
+    "nodeLogicalShaVerified": true,
     "zeroFirestoreReadsBeforeFailure": true,
     "zeroWritesBeforeFailure": true,
-    "authorizationNotConsumed": true
+    "authorizationNotConsumed": true,
+    "finalExecutionAttempt": true
   },
   "scope": {
     "cases": 5,
