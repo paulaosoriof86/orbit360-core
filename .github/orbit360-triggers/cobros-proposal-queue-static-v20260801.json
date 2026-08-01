@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "orbit360-cobros-controlled-proposal-queue-static-trigger-v1",
+  "approved": true,
+  "gateId": "block10.5-cobros-proposal-queue-static-v20260801",
+  "contractVersion": "10.5.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "1e927a0aad0b5f1b92fba5163658b0c4ec627310",
+  "expected": {
+    "total": 70,
+    "authorizationReady": 5,
+    "reviewTemporal": 24,
+    "validationRequired": 7,
+    "hold": 34,
+    "directReady": 4,
+    "historicalReady": 1,
+    "duplicateIdempotencyKeys": 0
+  },
+  "controls": {
+    "diffPerProposal": true,
+    "rollbackPlanPerProposal": true,
+    "preWriteSnapshotRequired": true,
+    "explicitAuthorizationRequired": true,
+    "reinforcedAuthorizationForHistorical": true,
+    "writeEligible": false,
+    "reactivatesPolicy": false,
+    "createsFinmov": false
+  },
+  "scope": {
+    "static": true,
+    "realPayloadsInRepo": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  }
+}
