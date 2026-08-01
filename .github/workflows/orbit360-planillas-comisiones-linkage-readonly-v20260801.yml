@@ -1,0 +1,121 @@
+name: Orbit 360 · Planillas/Comisiones · linkage read-only LAB
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-diagnostics/planillas-comisiones-linkage-readonly-v20260801.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-planillas-comisiones-linkage-readonly-v20260801
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  GATE_ID: block11-planillas-comisiones-linkage-readonly-v20260801
+  LIFECYCLE_PATH: tools/orbit360-validator-lifecycle-contract-planillas-comisiones-linkage-readonly-v20260801.json
+  MARKER_PATH: .github/orbit360-diagnostics/planillas-comisiones-linkage-readonly-v20260801.json
+  PACKAGE_PATH: /tmp/orbit360-planillas-comisiones-linkage-private.json
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/planillas-comisiones-linkage-readonly-v20260801.json
+jobs:
+  verify:
+    name: Planillas/Comisiones · live linkage read-only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar alcance y capacidades
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          jq -e '.schemaVersion=="orbit360-planillas-comisiones-linkage-readonly-request-v1" and .gateId==env.GATE_ID and .contractVersion=="11.0.0" and .mode=="READ_ONLY_PLANILLAS_COMISIONES_LINKAGE" and .approved==true and .sourceCut.filesReceived==19 and .sourceCut.sourceBundles==10 and .sourceCut.rowsObserved==67 and .sourceCut.crmCandidates==65 and .sourceCut.omittedZeroCommission==2 and .privatePackage.driveFileId=="1aHmPWyfqN65DoXsHuk955e-Bx_JVB_84" and .privatePackage.sha256=="4933506bbe02e56c9dd2ed5f180ed3d0ad293f73a952a2044378e3f02aeed496" and .privatePackage.logicalSha256=="45a3b6f1c801482c37f17270c5fbba59602cadc2319cf88e5485ffbd304b08f8" and .capabilities.secrets==true and .capabilities.firestoreRead==true and .capabilities.writes==false and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false' "$MARKER_PATH" >/dev/null
+          jq -e '.status=="PLANILLAS_COMISIONES_LINKAGE_READONLY_ACTIVE" and .executionProfile.mode=="READ_ONLY_PLANILLAS_COMISIONES_LINKAGE" and .executionProfile.phase=="LAB_DATA_CONTRACT_REPAIR_DRYRUN" and .executionProfile.capabilities.writes==false and .sourceDryrunClosed==true and .crmCandidateRows==65 and .financeActivated==false and .writeAuthorized==false and .operationalWritesAllowed==0' "$LIFECYCLE_PATH" >/dev/null
+      - name: Gate canónico antes de secrets y Firestore
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-planillas-comisiones-linkage-readonly-v20260801.mjs
+          node --check tools/orbit360-verificar-planillas-comisiones-linkage-readonly-v20260801.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="PLANILLAS_COMISIONES_LINKAGE_READONLY_READY" and .canonicalPhase=="LAB_DATA_CONTRACT_REPAIR_DRYRUN" and .phase=="READ_ONLY_PLANILLAS_COMISIONES_LINKAGE" and .privatePackageVerifiedByContract==true and .sourceDryrunClosed==true and .sourceRows==67 and .linkageCandidates==65 and .sourceRowsOmitted==2 and .executionAuthorized==false and .labWriteAuthorized==false and .writeEligible==0 and .financeActivated==false and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Preparar dependencia aislada
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --no-save firebase-admin@13.4.0 >/dev/null 2>&1
+      - name: Descargar paquete privado exacto
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          PACKAGE_ID="$(jq -r '.privatePackage.driveFileId' "$MARKER_PATH")"
+          PACKAGE_SHA="$(jq -r '.privatePackage.sha256' "$MARKER_PATH")"
+          export PACKAGE_ID PACKAGE_SHA
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
+          (async()=>{
+            const sa=JSON.parse(process.env.SERVICE_ACCOUNT),now=Math.floor(Date.now()/1000);
+            if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
+            const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const tokenResponse=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig})});
+            const token=await tokenResponse.json();if(!tokenResponse.ok||!token.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+tokenResponse.status);
+            const response=await fetch(`https://www.googleapis.com/drive/v3/files/${process.env.PACKAGE_ID}?alt=media&supportsAllDrives=true`,{headers:{authorization:`Bearer ${token.access_token}`}});
+            if(!response.ok)throw new Error('ENVIRONMENT_FAILURE:DRIVE_'+response.status);
+            const bytes=Buffer.from(await response.arrayBuffer()),sha=crypto.createHash('sha256').update(bytes).digest('hex');
+            if(sha!==process.env.PACKAGE_SHA)throw new Error('DATA_CONTRACT_FAILURE:PRIVATE_PACKAGE_SHA');fs.writeFileSync(process.env.PACKAGE_PATH,bytes);
+          })().catch(e=>{console.error(String(e.message||e));process.exit(41);});
+          NODE
+      - name: Ejecutar linkage LAB read-only
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          export ORBIT360_PLANILLAS_LIFECYCLE="$LIFECYCLE_PATH"
+          export ORBIT360_PLANILLAS_PRIVATE_PACKAGE="$PACKAGE_PATH"
+          export ORBIT360_PLANILLAS_PRIVATE_PACKAGE_SHA256="$(jq -r '.privatePackage.sha256' "$MARKER_PATH")"
+          export ORBIT360_PLANILLAS_PRIVATE_PACKAGE_LOGICAL_SHA256="$(jq -r '.privatePackage.logicalSha256' "$MARKER_PATH")"
+          export ORBIT360_PLANILLAS_LINKAGE_EVIDENCE="$EVIDENCE_PATH"
+          node tools/orbit360-verificar-planillas-comisiones-linkage-readonly-v20260801.mjs
+          jq -e '.status=="PLANILLAS_COMISIONES_LINKAGE_READONLY_PASS" and .classification=="GO_LAB_PLANILLAS_COMISIONES_LINKAGE_READONLY" and .ok==true and .lifecycleVerified==true and .packageVerified==true and .counts.polizas==1373 and .counts.recibosEsperados==1294 and .counts.cobros==5 and .counts.finmovs==0 and .source.candidates==65 and .linkage.processed==65 and ((.linkage.policyUnique+.linkage.policyMissing+.linkage.policyAmbiguous)==65) and .financeActivated==false and .writeAuthorized==false and .firestoreRead==true and .firestoreWrites==0 and .operationalWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsPolicyNumbers==false and .containsAmounts==false and .containsIds==false and .containsSecrets==false' "$EVIDENCE_PATH" >/dev/null
+          rm -f "$PACKAGE_PATH"
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-planillas-comisiones-linkage-readonly-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/planillas-comisiones-linkage-readonly-v20260801.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: ${{ env.EVIDENCE_PATH }}
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Planillas linkage read-only failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='PLANILLAS_COMISIONES_LINKAGE_READONLY_PASS'&&p.linkage.processed===65&&p.firestoreWrites===0){state='success';description=`Planillas linkage PASS: ${p.linkage.policyUnique}/65 policy unique; zero writes`;}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/planillas-comisiones-linkage-readonly',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
