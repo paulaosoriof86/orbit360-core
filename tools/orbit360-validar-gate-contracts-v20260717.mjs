@@ -35,7 +35,8 @@ const GATE_CONFIG=Object.freeze({
   "block6-go-live-product-v20260730":{contractVersion:"6.3.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-m6-final-closure-630-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-m6-final-closure-630-resume-v20260730.mjs"},
   "block7-policies-static-v20260730":{contractVersion:"7.0.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-policies-static-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-policies-static-v20260730.mjs"},
   "block8-vehicles-static-v20260730":{contractVersion:"8.0.1",lifecycle:"tools/orbit360-validator-lifecycle-contract-vehicles-static-v20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-vehicles-static-v20260730.mjs"},
-  "block9-receipts-portfolio-static-v20260730":{contractVersion:"9.1.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-receipts-portfolio-static-v910-20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-receipts-portfolio-static-v910-20260730.mjs"}
+  "block9-receipts-portfolio-static-v20260730":{contractVersion:"9.1.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-receipts-portfolio-static-v910-20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-receipts-portfolio-static-v910-20260730.mjs"},
+  "block10.9-cobros-controlled-write-lab-v20260801":{contractVersion:"10.9.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-cobros-controlled-write-lab-v20260801.json",engine:"tools/orbit360-validar-gate-contracts-engine-cobros-controlled-write-preflight-v20260801.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":ZERO,
