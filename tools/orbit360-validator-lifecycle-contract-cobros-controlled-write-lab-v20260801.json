@@ -4,13 +4,13 @@
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "gateContractVersion": "10.9.0",
   "owner": "orbit360-cobros-controlled-write-lab-v20260801",
-  "ownerVersion": "20260801.4-readonly-root-cause-diagnosis",
+  "ownerVersion": "20260801.5-readonly-diagnosis-reuse-dryrun-profile",
   "status": "ROOT_CAUSE_DIAGNOSIS_ACTIVE",
   "classification": "DATA_CONTRACT_FAILURE",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "executionProfile": {
     "mode": "READ_ONLY_ROOT_CAUSE_DIAGNOSIS",
-    "phase": "LAB_DATA_CONTRACT_REPAIR_DIAGNOSIS",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
       "secrets": true,
       "firestoreRead": true,
@@ -136,7 +136,24 @@
     "scope": "CASE_3_RECEIPT_SNAPSHOT_KEYS_AND_TYPES_ONLY",
     "valuesAllowed": false,
     "writesAllowed": false,
-    "productionAllowed": false
+    "productionAllowed": false,
+    "validatorAttempts": [
+      {
+        "run": 30711682689,
+        "failure": "SPECIFIC_VALIDATOR_FAILED_49",
+        "classification": "VALIDATOR_STALE",
+        "secretsRead": false,
+        "firestoreRead": false
+      },
+      {
+        "run": 30711748092,
+        "failure": "CANONICAL_LIFECYCLE_PHASE_MISMATCH",
+        "classification": "VALIDATOR_STALE",
+        "secretsRead": false,
+        "firestoreRead": false
+      }
+    ],
+    "rootFix": "REUSE_EXISTING_LAB_DATA_CONTRACT_REPAIR_DRYRUN_PROFILE"
   },
   "nextAction": "RUN_READ_ONLY_ROOT_CAUSE_DIAGNOSTIC_CASE_3_RECEIPT_SNAPSHOT"
 }
