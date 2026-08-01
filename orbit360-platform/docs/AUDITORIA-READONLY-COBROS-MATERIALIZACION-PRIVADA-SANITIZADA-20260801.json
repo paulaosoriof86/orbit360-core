@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "orbit360-cobros-private-authorization-materialization-sanitized-v1",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-31",
+  "status": "PRIVATE_AUTHORIZATION_MATERIALIZATION_CONTRACT_READY",
+  "sourcePackage": {
+    "gateId": "block10.6-cobros-authorization-package-static-v20260801",
+    "run": 30706617835,
+    "artifact": 8820517805,
+    "digest": "sha256:9ce3e47aea62840e4debb40faad6e12cda29f480e9b0daec929176af60e5b05b",
+    "checks": "58/58 PASS",
+    "cards": 5
+  },
+  "materializationContract": {
+    "privateCards": 5,
+    "direct": 4,
+    "historical": 1,
+    "ephemeralSessionRequired": true,
+    "persistAllowed": false,
+    "privateCardsEnumerable": false,
+    "serializedAuditContainsPrivateValues": false,
+    "sourceProofsMinimumPerCard": 2,
+    "duplicateAuthorizationRefsAllowed": false,
+    "duplicateIdempotencyKeysAllowed": false,
+    "disposalRequired": true,
+    "remainingPrivateCardsAfterDisposal": 0
+  },
+  "authorization": {
+    "packageGrantsAuthorization": false,
+    "authorizationGranted": 0,
+    "writeEligible": 0,
+    "directionDecisionRequired": true,
+    "historicalDecisionSeparated": true,
+    "reinforcedHistoricalAuthorizationRequired": true
+  },
+  "controls": {
+    "exactReceiptPrecedesFifo": true,
+    "diffPerPrivateCard": true,
+    "preWriteSnapshotRequired": true,
+    "rollbackRequired": true,
+    "sourceRowsImmutable": true,
+    "reactivatesPolicy": false,
+    "createsFinmov": false,
+    "autoApply": false
+  },
+  "privateRuntimeInput": {
+    "storedInRepo": false,
+    "storedInArtifact": false,
+    "requiresAlreadyRegisteredSources": true,
+    "requiresNewPlanillas": false,
+    "requiresNewBankStatements": false,
+    "requiresNewFinancialFiles": false
+  },
+  "writes": {
+    "cobros": 0,
+    "finmovs": 0,
+    "firestore": 0,
+    "operational": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "security": {
+    "realPrivateCardsStoredInRepo": false,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsRealAmounts": false,
+    "containsSecrets": false
+  }
+}
