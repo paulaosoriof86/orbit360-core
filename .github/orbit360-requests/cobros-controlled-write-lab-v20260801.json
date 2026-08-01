@@ -16,8 +16,20 @@
   },
   "privatePackage": {
     "driveFileId": "1FGpp_v6ZTs52VEeOnsH2IxoNCqWwVoAD",
-    "sha256": "d64e64a01104be7defdc2c643b7180fe14ffa095f219aea9e13e6708c8bc1266",
-    "logicalSha256": "1f06709e3c0a42534b17ff93809a3b527321552d68476267a2eb1ffe26a90036"
+    "sha256": "cc01fa733166c2201da6e4ac37c231d42692caf6bba3797208fed23b3a1c737a",
+    "logicalSha256": "997bfc0614b4a65e8c4b5e7832996fbbe6b0063f9f0efdf3ca99b57aa79f4ff8"
+  },
+  "recovery": {
+    "sequence": 2,
+    "failedRun": 30711389436,
+    "classification": "DATA_CONTRACT_FAILURE",
+    "firstCheckFailed": "PRIVATE_PACKAGE_LOGICAL_SHA",
+    "rootCause": "Cross-runtime JSON number canonicalization represented zero as 0.0 in the producer and 0 in the Node consumer.",
+    "correctedLayer": "PRIVATE_PACKAGE_CANONICAL_DIGEST",
+    "physicalPackageReverified": true,
+    "zeroFirestoreReadsBeforeFailure": true,
+    "zeroWritesBeforeFailure": true,
+    "authorizationNotConsumed": true
   },
   "scope": {
     "cases": 5,
