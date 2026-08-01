@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "orbit360-cobros-source-intake-v1",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-31",
+  "status": "ENGINE_READY_PAYLOADS_REQUIRED",
+  "sourceRegistry": {
+    "index": "FUENTES-RECTORAS-AYS-INDEX-20260731.json",
+    "status": "OPEN_PENDING_MORE_FILES",
+    "uniqueSources": 23,
+    "payloadsStoredInRepo": false,
+    "cobrosWriteBlocked": true
+  },
+  "sources": [
+    {
+      "sourceType": "cobros_realizados",
+      "authority": "CRM",
+      "required": true,
+      "exactPeriodRequired": "2024-01-01 through 2026-07-31, or a refreshed export containing the same historical base plus all activity through 2026-07-31",
+      "registeredLogicalName": "Cobranza Efectuada desde 2024.xlsx",
+      "registeredSha256": "727665170572143979b5f274190e200da397e7b32965d1809b1b9be6a8495302",
+      "registeredRowsIncludingHeader": 2158,
+      "payloadAccessibleToCurrentRuntime": false,
+      "canonicalDestinations": ["pagosReportadosFuente", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"]
+    },
+    {
+      "sourceType": "planilla_aseguradora",
+      "authority": "ASEGURADORA",
+      "required": true,
+      "exactPeriodRequired": "payment/revenue reports available through 2026-07-31 for every insurer represented in the CRM payment export",
+      "registeredSources": [
+        {"logicalName":"Reporte de Ingresos Aseguradora General.xls","sha256":"61574cc18b9200af438a49985e58deea635243f8808eac97470789df0db5b5ed","profileStatus":"XLS_BIFF_PENDING_PROFILE"},
+        {"logicalName":"Cobros Mapfre.xls","sha256":"d19559b7d5ad80930ad10f88d30ae7e0015b1647a5c0840867cf76e32c617ad8","profileStatus":"HTML_XLS_PENDING_PROFILE"}
+      ],
+      "coverageComplete": false,
+      "payloadAccessibleToCurrentRuntime": false,
+      "canonicalDestinations": ["reportesPagoAseguradora", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"]
+    },
+    {
+      "sourceType": "estado_cuenta_bancario",
+      "authority": "SOPORTE_NO_AUTORITATIVO_POR_SI_SOLO",
+      "required": false,
+      "exactPeriodRequired": "2026-07-01 through 2026-07-31 for current-month corroboration; older periods only when a HOLD specifically requires them",
+      "registeredCurrentBankSource": false,
+      "excludedKnownFile": "Movimientos Ing y Eg Alianzas Guate y Col 2026.xlsx",
+      "excludedReason": "financial movements/history is not an authoritative bank statement and cannot create cobros",
+      "canonicalDestinations": ["movimientosBanco", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"]
+    },
+    {
+      "sourceType": "documentos_soporte",
+      "authority": "SOPORTE_NO_AUTORITATIVO_POR_SI_SOLO",
+      "required": false,
+      "exactPeriodRequired": "only documents linked to HOLD or unmatched payments identified by the dry-run",
+      "canonicalDestinations": ["documentosSoportePago", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas", "clientes", "polizas"]
+    },
+    {
+      "sourceType": "planilla_comisiones",
+      "authority": "NEXT_BLOCK",
+      "required": false,
+      "deferred": true,
+      "reason": "Commissions/plans follow Cobros/Conciliacion and are not payment proof for this block"
+    }
+  ],
+  "realDryRunPrerequisites": {
+    "currentPayloadsAttached": false,
+    "manifestPerFile": true,
+    "traceability": ["file", "sheet", "row", "block", "country", "currency", "period", "sourceHash"],
+    "countryCurrencyFailClosed": true,
+    "duplicateHashNoReprocess": true,
+    "oneToOneRequired": true,
+    "fifoSimulationRequired": true,
+    "rollbackPlanRequiredBeforeWrite": true,
+    "cobrosWrites": 0,
+    "finmovsWrites": 0
+  },
+  "nextUserInputWhenRequested": [
+    "Attach the refreshed CRM payment export through 2026-07-31, preferably the same logical report 'Cobranza Efectuada desde 2024.xlsx'.",
+    "Attach insurer payment/revenue reports through 2026-07-31 for all insurers covered by that CRM export; at minimum reattach Aseguradora General and Mapfre sources already registered.",
+    "Bank statements for 2026-07 are optional until the dry-run identifies cases needing corroboration.",
+    "Do not send commissions plans or financial-history workbooks as substitutes for payment evidence."
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}
