@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "orbit360-cobros-residual-candidate-readonly-request-v1",
+  "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
+  "contractVersion": "10.9.0",
+  "mode": "READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT",
+  "approved": true,
+  "reason": "Verify one residual multi-source candidate against the live LAB snapshot while keeping the original gate request sealed and three residual cases in HOLD.",
+  "sourceRows": 9,
+  "appliedAndVerified": 5,
+  "residualRows": 4,
+  "candidateCount": 1,
+  "holdCount": 3,
+  "privatePackage": {
+    "driveFileId": "1KHeHbNmJSvYZgzUcop57LiR4KdB-PxOh",
+    "sha256": "ccc37815c1f90fa3965d8eb87273c4746873ba79ec57fd6987d41b6016769411",
+    "logicalSha256": "b9798a225530a4473dcd356e158211b94e1700bbb03dd988df344a8358c213ae"
+  },
+  "expectedBaseline": {
+    "polizas": 1373,
+    "recibosEsperados": 1294,
+    "cobros": 5,
+    "finmovs": 0
+  },
+  "expectedOutcome": {
+    "candidateEligibleMaximum": 1,
+    "holdsMinimum": 3,
+    "requestReplayBlocked": true,
+    "writes": 0
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "sanitization": {
+    "includeIds": false,
+    "includePolicyNumbers": false,
+    "includeAmounts": false,
+    "includePII": false,
+    "includeAuthorizationRefs": false,
+    "includeSecrets": false,
+    "includeOnlyCountsAndBooleans": true
+  }
+}
